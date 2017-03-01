@@ -1832,8 +1832,10 @@ class OsidObjectForm(abc_osid_objects.OsidObjectForm, OsidIdentifiableForm, Osid
         if 'default_description' in kwargs:
             self._mdata['description']['default_string_values'][0]['text'] = kwargs['default_description']
         update_display_text_defaults(self._mdata['description'], self._locale_map)
-        self._display_name_default = self._mdata['display_name']
-        self._description_default = self._mdata['description']
+        self._display_name_default = dict(self._mdata['display_name']['default_string_values'][0])
+        self._description_default = dict(self._mdata['description']['default_string_values'][0])
+        # self._display_name_default = self._mdata['display_name']
+        # self._description_default = self._mdata['description']
         # self._display_name_default = unicode(self._mdata['display_name']['default_string_values'][0]['text'])
         # self._description_default = unicode(self._mdata['description']['default_string_values'][0]['text'])
         self._genus_type_default = self._mdata['genus_type']['default_type_values'][0]
@@ -1845,6 +1847,7 @@ class OsidObjectForm(abc_osid_objects.OsidObjectForm, OsidIdentifiableForm, Osid
     def _init_map(self, record_types=None):
         """Initialize map for form"""
         OsidForm._init_map(self)
+        print "\n default: "
         self._my_map['displayName'] = dict(self._display_name_default)
         self._my_map['description'] = dict(self._description_default)
         self._my_map['genusTypeId'] = self._genus_type_default
@@ -1916,10 +1919,13 @@ class OsidObjectForm(abc_osid_objects.OsidObjectForm, OsidIdentifiableForm, Osid
         *compliance: mandatory -- This method must be implemented.*
 
         """
+        print "setting displayName: ", display_name
         self._gstudio_map['name'] = unicode(display_name)
         self._gstudio_map['altnames'] = unicode(display_name)
         self._display_name = display_name
         self._my_map['displayName'] = self._get_display_text(display_name, self.get_display_name_metadata())
+        print "\n self._my_map['displayName'] : ", self._my_map['displayName']
+        print "setting displayName: my_map ", self._my_map
 
     def clear_display_name(self):
         """Clears the display name.
