@@ -1881,7 +1881,7 @@ class OsidObjectForm(abc_osid_objects.OsidObjectForm, OsidIdentifiableForm, Osid
                                     'formatTypeId': str(DEFAULT_FORMAT_TYPE)
                                 })
             # self._gstudio_map['copyright'] = get_display_text_map(self.copyright)
-            self._gstudio_map['copyright'] = self.copyright
+            self._gstudio_map['copyright'] = self.copyright.get_text()
         else:
             self._gstudio_map['name'] = self._display_name_default['text']
             self._gstudio_map['altnames'] = self._display_name_default['text']
