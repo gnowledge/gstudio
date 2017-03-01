@@ -252,17 +252,18 @@ class OsidObject(abc_osid_objects.OsidObject, osid_markers.Identifiable, osid_ma
         try:
             # Try to stand up full Type objects if they can be found
             # (Also need to LOOK FOR THE TYPE IN types or through type lookup)
-            mimetype_val = str(self._gstudio_map['gstudio_node']['if_file']['mime_type'].split('/')[-1])
-            genusType = Id(identifier=str(mimetype_val), 
-            namespace="asset-content-genus-type",
-            authority="ODL.MIT.EDU")
-            # genus_type_identifier = genusType.get_identifier()
-            # return Type(**types.Genus().get_type_data(genus_type_identifier))
+            if 'gstudio_node' in self._gstudio_map and ['if_file']['mime_type'] in self._gstudio_map['gstudio_node']['if_file']:
+                mimetype_val = str(self._gstudio_map['gstudio_node']['if_file']['mime_type'].split('/')[-1])
+                genusType = Id(identifier=str(mimetype_val), 
+                                namespace="asset-content-genus-type",
+                                authority="ODL.MIT.EDU")
+                # genus_type_identifier = genusType.get_identifier()
+                # return Type(**types.Genus().get_type_data(genus_type_identifier))
+                return Type(idstr=str(genusType))
+            return None
         except:
+            return None
             # If that doesn't work, return the id only type, still useful for comparison.
-            return Type(idstr=str(genusType))
-        finally:
-            return Type(idstr=str(genusType))
 
         # return Type('asset-content-genus-type%3Amp4%40ODL.MIT.EDU')
 
