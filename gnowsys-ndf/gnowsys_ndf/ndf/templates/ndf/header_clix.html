@@ -24,7 +24,7 @@
 
         <section class="top-bar-section">
             <!-- Right Nav Section -->
-            
+
             <ul class="right show-for-medium-up">
                 <li class=""><a href="#">Blog</a></li>
                 <li class=""><a href="#"><i class="icons-medium fi-info"></i>&nbsp;Help Topics</a></li>
@@ -39,7 +39,7 @@
                     <ul class="dropdown">
                         <li class="text-center">
                           <a href="{% url 'auth_password_change' %}">{% trans "Change Password" %}</a>
-                        </li>                        
+                        </li>
                         <li>
                           <a class="logout" href="{% url 'auth_logout' %}">
                             <i class="fi-power"></i> &nbsp;{% trans "Logout" %}
@@ -89,7 +89,7 @@
                         <img src="{{MEDIA_URL}}{{prof_pic.if_file.original.relurl}}" class="user-profile-pic-small"/>
                         {{ user.username }}
                     </a>
-                    <ul class="dropdown">  
+                    <ul class="dropdown">
                         <li>
                             <a href="{% url 'auth_password_change' %}">{% trans "Change Password" %}
                             </a>
@@ -128,7 +128,7 @@
           </section>
     </nav>
     <script type="text/javascript">
-        $(document).foundation();
+        // $(document).foundation();
         $(function(){
             $('.top-bar .toggle-topbar').on('click', function() {
                 $('.top-bar').find('.close-menu-dropdown, .side-bar-button').toggleClass('hide');

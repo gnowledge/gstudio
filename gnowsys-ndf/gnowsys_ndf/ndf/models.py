@@ -779,7 +779,7 @@ class Node(DjangoDocument):
                 for each_invalid_field in invalid_struct_fields:
                     if each_invalid_field in self.structure:
                         self.structure.pop(each_invalid_field)
-                        # print "=== removed from structure", each_invalid_field, ' : ', 
+                        # print "=== removed from structure", each_invalid_field, ' : ',
 
 
             keys_list = self.structure.keys()
@@ -790,7 +790,7 @@ class Node(DjangoDocument):
                 for each_invalid_field in invalid_struct_fields_list:
                     if each_invalid_field in self:
                         self.pop(each_invalid_field)
-                        # print "=== removed ", each_invalid_field, ' : ', 
+                        # print "=== removed ", each_invalid_field, ' : ',
 
 
         except Exception, e:
@@ -1660,7 +1660,7 @@ class GSystem(Node):
                                         #   {"csv-import": <fn name>},
                                         #   {"sync_source": "<system-pub-key>"}
                                         # ]
-        # Replace field 'license': basestring with 
+        # Replace field 'license': basestring with
         # legal: dict
         'legal': {
                     'copyright': basestring,
