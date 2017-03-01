@@ -159,7 +159,7 @@ class OsidObject(abc_osid_objects.OsidObject, osid_markers.Identifiable, osid_ma
         obj_map['id'] = str(self.get_id())
 
         obj_map['displayName'] = get_display_text_map(self._gstudio_map['displayName'])
-        obj_map['displayName'] = get_display_text_map(self._gstudio_map['displayName'])
+        obj_map['description'] = get_display_text_map(self._gstudio_map['description'])
         if 'gstudio_node' in self._gstudio_map:
             obj_map['license'] = get_display_text_map(self._gstudio_map['gstudio_node']['legal']['license'])
             obj_map['copyright'] = get_display_text_map(self._gstudio_map['gstudio_node']['legal']['copyright'])
