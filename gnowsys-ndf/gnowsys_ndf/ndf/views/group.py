@@ -117,7 +117,7 @@ class CreateGroup(object):
             group_set = kwargs.get('group_set', [])
         else:
             group_set = self.request.POST.get('group_set', [])
-        group_set = list(group_set) if not isinstance(group_set, list) else group_set
+        group_set = [group_set] if not isinstance(group_set, list) else group_set
         group_set = [ObjectId(g) for g in group_set]
 
         member_of = []
@@ -125,7 +125,7 @@ class CreateGroup(object):
             member_of = kwargs.get('member_of', [])
         else:
             member_of = self.request.POST.get('member_of', [])
-        member_of = list(member_of) if not isinstance(member_of, list) else member_of
+        member_of = [member_of] if not isinstance(member_of, list) else member_of
         member_of = [ObjectId(m) for m in member_of]
 
         if kwargs.get('group_type', ''):
@@ -206,7 +206,7 @@ class CreateGroup(object):
         for each_mof in member_of:
             if each_mof not in group_obj.member_of:
                 group_obj.member_of.append(each_mof)
-                
+
         # while doing append operation make sure to-be-append is not in the list
         if gst_group._id not in group_obj.member_of:
             group_obj.member_of.append(gst_group._id)
@@ -2589,7 +2589,7 @@ def upload_using_save_file(request,group_id):
     group_obj = node_collection.one({'_id': ObjectId(group_id)})
     title = request.POST.get('context_name','')
     selected_topic = request.POST.getlist("topic_list", "")
-    print "--------------------",selected_topic 
+    print "--------------------",selected_topic
     usrid = request.user.id
     name  = request.POST.get('name')
     # print "\n\n\nusrid",usrid
@@ -2717,9 +2717,9 @@ def upload_using_save_file(request,group_id):
             # # print "++++++++++++++++++++++++++++++++++++++++",asset_node._id
             # asset_content_node = create_assetcontent(ObjectId('58a3dd4cc6bd690400016ae5'),file_node.name,group_id,file_node.created_by)
             # print "---------------------------------------",asset_content_node
-            
+
             file_node.save(groupid=group_id,validate=False)
-            
+
             return HttpResponseRedirect( reverse('file_detail', kwargs={"group_id": group_id,'_id':file_node._id}) )
     # print "\n\nretirn gs_obj_list",gs_obj_list
     # gs_obj_id = gs_obj_list[0]['_id']
