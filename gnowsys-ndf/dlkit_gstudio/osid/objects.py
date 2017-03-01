@@ -1847,7 +1847,6 @@ class OsidObjectForm(abc_osid_objects.OsidObjectForm, OsidIdentifiableForm, Osid
     def _init_map(self, record_types=None):
         """Initialize map for form"""
         OsidForm._init_map(self)
-        print "\n default: "
         self._my_map['displayName'] = dict(self._display_name_default)
         self._my_map['description'] = dict(self._description_default)
         self._my_map['genusTypeId'] = self._genus_type_default
@@ -1919,13 +1918,10 @@ class OsidObjectForm(abc_osid_objects.OsidObjectForm, OsidIdentifiableForm, Osid
         *compliance: mandatory -- This method must be implemented.*
 
         """
-        print "setting displayName: ", display_name
         self._gstudio_map['name'] = unicode(display_name)
         self._gstudio_map['altnames'] = unicode(display_name)
         self._display_name = display_name
         self._my_map['displayName'] = self._get_display_text(display_name, self.get_display_name_metadata())
-        print "\n self._my_map['displayName'] : ", self._my_map['displayName']
-        print "setting displayName: my_map ", self._my_map
 
     def clear_display_name(self):
         """Clears the display name.
