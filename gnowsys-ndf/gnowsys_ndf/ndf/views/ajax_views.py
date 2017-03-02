@@ -6578,7 +6578,6 @@ def add_asset(request,group_id):
       group_name, group_id = get_group_name_id(group_id)
   topic_gst = node_collection.one({'_type': 'GSystemType', 'name': 'Topic'})
   topic_nodes = node_collection.find({'member_of': {'$in': [topic_gst._id]}})
-  print "9898898898988"
   return render_to_response("ndf/add_asset.html",RequestContext(request,{'group_id':group_id,'groupid':group_id,'topic_nodes':topic_nodes}))
 
 @login_required
