@@ -62,6 +62,7 @@
         formData.append('csrfmiddlewaretoken', '{{csrf_token}}');
         formData.append('user','{{request.user.id}}');
         formData.append('if_subtitle','True');
+        formData.append('assetcontentid','{{node.pk}}');
         
         if(!"{{asset_obj}}"){
             formData.append('asset_obj',assetval);

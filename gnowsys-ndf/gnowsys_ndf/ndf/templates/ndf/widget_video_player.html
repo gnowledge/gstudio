@@ -126,6 +126,7 @@ transform: rotate(90deg);
 		<source src="{{MEDIA_URL}}{{video_obj.if_file.mid.relurl}}" type="video/webm" />
         <source src="{{MEDIA_URL}}{{video_obj.if_file.original.relurl}}" type="video/ogg" />
         <source src="{{MEDIA_URL}}{{video_obj.if_file.original.relurl}}" type="video/mp4" />
+        <track kind="captions" label="English" srclang="en" src="/media/c/d/e/126b4a223e3af7b0da7b8f04f673e02b10b2547982eea739923fa2e15d7d9.vtt">
 	</video>
 	{% get_attribute_value video_obj.pk 'has_transcript' as node_transcript %}
 	{% if node_transcript %}

@@ -6610,8 +6610,23 @@ def create_edit_asset(request,group_id):
 def add_assetcontent(request,group_id):
   asset_obj = request.POST.get('asset_obj','')
   if_subtitle = request.POST.get('if_subtitle','')
+  assetcontentid = request.POST.get('assetcontentid','')
   uploaded_files = request.FILES.getlist('filehive', [])
-  print "++++++++++++++++++++++",if_subtitle,uploaded_files
+  
+  if if_subtitle == "True":
+    subtitle_obj = create_assetcontent(ObjectId(asset_obj),uploaded_files[0].name,group_id,request.user.id,files=uploaded_files,resource_type='File')
+    rt_subtitle = node_collection.one({'_type':'RelationType', 'name':'has_subtitle'})
+    subtitle_list = [ObjectId(subtitle_obj._id)]
+    
+    subtitle_grels = triple_collection.find({'_type': 'GRelation', \
+    'relation_type': rt_subtitle._id,'subject': subtitle_obj._id},
+    {'_id': 0, 'right_subject': 1})
+    for each_asset in subtitle_grels:
+      subtitle_list.append(each_asset['right_subject'])
+    sub_grel = create_grelation(ObjectId(assetcontentid), rt_subtitle, subtitle_list)  
+    print "++++++++++++++++++++++",subtitle_obj,sub_grel
+    return StreamingHttpResponse("success")
+    
   create_assetcontent(ObjectId(asset_obj),uploaded_files[0].name,group_id,request.user.id,files=uploaded_files,resource_type='File')
 
   return StreamingHttpResponse("success")
