@@ -633,7 +633,8 @@ ul.horizontal_tabs_gstudio {
 
     .asset_preview {
         min-height: 200px;
-        background-color: #eee;
+        //background-color: #eee;
+        background: url(/static/ndf/images/elibrary-01.svg)no-repeat;
     }
 
     .asset_text {

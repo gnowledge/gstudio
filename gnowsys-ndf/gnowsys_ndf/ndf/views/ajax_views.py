@@ -6624,7 +6624,7 @@ def add_assetcontent(request,group_id):
     for each_asset in subtitle_grels:
       subtitle_list.append(each_asset['right_subject'])
     sub_grel = create_grelation(ObjectId(assetcontentid), rt_subtitle, subtitle_list)  
-    print "++++++++++++++++++++++",subtitle_obj,sub_grel
+    # print "++++++++++++++++++++++",subtitle_obj,sub_grel
     return StreamingHttpResponse("success")
     
   create_assetcontent(ObjectId(asset_obj),uploaded_files[0].name,group_id,request.user.id,files=uploaded_files,resource_type='File')
