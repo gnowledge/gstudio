@@ -6609,7 +6609,9 @@ def create_edit_asset(request,group_id):
 @get_execution_time
 def add_assetcontent(request,group_id):
   asset_obj = request.POST.get('asset_obj','')
+  if_subtitle = request.POST.get('if_subtitle','')
   uploaded_files = request.FILES.getlist('filehive', [])
+  print "++++++++++++++++++++++",if_subtitle,uploaded_files
   create_assetcontent(ObjectId(asset_obj),uploaded_files[0].name,group_id,request.user.id,files=uploaded_files,resource_type='File')
 
   return StreamingHttpResponse("success")
