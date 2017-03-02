@@ -1,90 +1,67 @@
 {% load simple_filters %}
-{% xextends "ndf/base.html" with first_body_column=0 %}
+{% xextends "ndf/gbase.html" with first_body_column=0 %}
 
 {# {% extends "ndf/base.html" %} #}
 
+{% load get_nroer_menu  get_user_group  get_group_object  get_existing_groups_excluded  get_profile_pic  get_gapps_iconbar user_access_policy get_user_object check_is_gstaff get_attribute_value get_sg_member_of get_relation_value get_explore_url from ndf_tags %}
+
 {% load i18n %}
+
+{% get_explore_url as explore_url %}
 
 {% block title %} {{title}} {% endblock title %}
 
 {% block body_content %}
     <div class="row landing_page">
         <div class="landing_page_background"></div>
-        <div class="small-12 columns">
-            <img src="/static/ndf/images/landing_page/bees.svg" class="bees"/>
+        <div class="small-12 columns ">
             <div class="row" data-equalizer>
-                <div class="small-12 medium-12 large-7 columns clix_brief panel" data-equalizer-watch>
+                <div class="small-6 medium-6 columns clix_brief panel" data-equalizer-watch>
                   <img src="/static/ndf/css/themes/clix/CLIx_white-01.svg" title="Invitation to clix.">
                    <p>
-                      Through CLIx, high school students will participate in engaging, interactive, hands-on learning experiences for the development of knowledge, skills and values empowering them to be successful in the 21st century.
-                    </p>
-                    <p>
+                    <!--  
+                    
+                    -->
                         Invitation to CLIx will help you learn to do many things with a computer. Express your ideas through activities, engage with your classmate and learn together and share your knowledge.
-                      </p>
+                        <br/>
+                        Clix is an initiative to promote digital learning; with the exposure of interactives and hands on activities on electronic machine.
+                   
+                    </p>
                 </div>
+                <div class="small-5 columns">
+          			<img src="/static/ndf/images/landing_page/bees.svg" class="bees"/>
+        		</div>
                 {% if not user.is_authenticated  %}
-                    <div class="small-12 medium-12 large-4 columns panel" data-equalizer-watch>
-                        <div class="invitation_to_clix">
+                    <div class="small-6 medium-6 columns panel" data-equalizer-watch>
+                       <!-- <div class="invitation_to_clix">
                           <span>Login to&nbsp;</span>
-                          <img src="/static/ndf/css/themes/clix/logo.svg" title="Invitation to clix.">
+                          <img src="/static/ndf/css/themes/clix/logo.svg" title="Invitation to CLIx	">-->
                           <!-- <form method="post" id="loginSubmit" action="/accounts/login/" data-abide="" novalidate="novalidate"> -->
-                            {% comment %}
-                            <input type="hidden" name="csrfmiddlewaretoken" value="FwQIXOCp90gXK5XClVyvbeOAJrMoilDK">
-                            <!-- Email -->
-                            <div class="row">
-                              <div class="small-12 columns end">
-                                <label class="left">
-                                  Username or E-mail
-                                </label>
-                              </div>
-                            </div>
-                            <div class="row">
-                              <div class="small-12 columns end">
-                                <input id="id_username" maxlength="254" name="username" type="text" tabindex="1" required="required" aria-invalid="false" style="cursor: auto; background-image: url(&quot;data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR4nGP6zwAAAgcBApocMXEAAAAASUVORK5CYII=&quot;);"><small class="error">Please fill valid username</small>
-                              </div>
-                            </div>
-
-                            <!-- Password -->
-                            <div class="row">
-                              <div class="small-12 columns">
-                                <label class="left">
-                                  <label for="id_password">Password:</label>
-                                </label>
-                              </div>
-
-                            </div>
-                            <div class="row">
-                              <div class="small-12 columns end">
-                                <input id="id_password" name="password" type="password" tabindex="2" required="required" aria-invalid="false" style="cursor: auto; background-image: url(&quot;data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR4nGP6zwAAAgcBApocMXEAAAAASUVORK5CYII=&quot;);"><small class="error">Please fill valid password</small>
-                              </div>
-                            </div>
-                            {% endcomment %}
-
-
-
+                            
                             <div class="row">
                               <div class="small-12 medium-12 large-12 text-center columns end login-button">
                                 <form action="{% url 'auth_login' %}">
                                   <input type="submit" class="button small expand" tabindex="4" value="Login">
                                 </form>
                               </div>
-                            </div>
+                            </div>  
+
+                            {% else %}
+
+                            
+                              <div class="small-6 medium-6 text-center columns end explore-button">
+                                  {% get_explore_url as explore_url %}
+                                  
+                                  <a class="explore-button small expand" href="{% url explore_url %}">Explore Groups
+                                  </a>
+                                                                
+                              </div>
+                            
+
+
+
                             <div class="row">
                               <div class="medium-12 large-12 small-text-left text-center columns end forgot-password">
-                            {% comment %}
-                                <label>
-                                  <a title="Recover" your="" password="" href="/accounts/password/reset/" class="grey">Forgot your password?</a>
-                                </label>
-                                <hr />
-                                <label>
-                                    <span>
-                                    Don't have an account?
-                                    <a title="Click" here="" to="" register="" href="{{register_url}}">
-                                      Register
-                                    </a>
-                                  </span>
-                                  </label>
-                            {% endcomment %}
                               </div>
                             </div>
                             <!-- Login button -->
@@ -94,14 +71,34 @@
                         </div>
                     </div>
                 {% endif %}
-                <div class="medium-1 columns pannel"></div>
-            </div>
-            <div class="row landing-illustrations">
-                <div class="small-12 medium-12 large-6 columns">
-                  <img src="/static/ndf/images/landing_page/flowers.svg" class="flowers" />
+                <div class="medium-1 columns pannel">
+                	<!--<img src="/static/ndf/images/landing_page/flowers.svg" class="flowers" />-->
                 </div>
             </div>
-        </div>
+            <!--<div class="row landing-illustrations">
+                <div class="small-12 medium-12 columns">
+                  <img src="/static/ndf/images/landing_page/flowers.svg" class="flowers" />
+                </div>
+            
+        </div>-->
+
+          <!--   
+          {% if user.is_authenticated  %}
+
+                  <div class="row">
+                    <div class="small-12 columns end login-button">
+                      <input type="submit" class="button small expand" tabindex="4" value="Click on EXPLORE GROUPS">        
+                  </div>
+                </div>
+                
+
+              {% endif %}-->
+
+
+
+
+
+
     </div>
 
 
