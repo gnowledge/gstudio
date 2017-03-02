@@ -698,8 +698,8 @@ def search_drawer(request, group_id):
                                  "groupid": group_id, 'node_id': node_id
                                 },
                                 context_instance=RequestContext(request)
-      )    
-      
+      )
+
 @get_execution_time
 def get_topic_contents(request, group_id):
   # if request.is_ajax() and request.method == "POST":
@@ -6331,7 +6331,7 @@ def adminRenderGraph(request,group_id,node_id=None,graph_type="concept"):
           req_node = node_collection.one({'_type':'GSystem','_id':ObjectId(node_id)})
       template = "ndf/graph_"+graph_type+".html"
       variable = RequestContext(request, { 'group_id':group_id,'groupid':group_id , 'node':req_node })
-      return render_to_response(template, { 'group_id':group_id,'groupid':group_id , 'node':req_node }) 
+      return render_to_response(template, { 'group_id':group_id,'groupid':group_id , 'node':req_node })
   except Exception as e :
     print "from "+ graph_type +" Graph, exception",e,"\n\n"
 
@@ -6516,7 +6516,7 @@ def add_transcript(request, group_id):
     trans_of  = node_collection.one({'$and':[{'name':'has_transcript'},{'_type':'AttributeType'}]})
     if node_id and trans_of:
       create_gattribute(ObjectId(node_id), trans_of,unicode(trans_text))
-      
+
   return HttpResponse(json.dumps("success"))
 
 
@@ -6550,7 +6550,7 @@ def get_audio_player(request, group_id):
                 'group_id': group_id, 'groupid': group_id,'audio_obj':node_obj
             },
             context_instance=RequestContext(request))
-    
+
 @login_required
 @get_execution_time
 def get_jhapps(request,group_id):
@@ -6597,7 +6597,7 @@ def create_edit_asset(request,group_id):
   asset_grels = triple_collection.find({'_type': 'GRelation', \
     'relation_type': rt_teaches._id,'subject': asset_obj._id},
     {'_id': 0, 'right_subject': 1})
-  
+
   for each_asset in asset_grels:
     teaches_list.append(each_asset['right_subject'])
   create_grelation(asset_obj._id, rt_teaches, teaches_list)

@@ -1,5 +1,5 @@
 ''' -- imports from python libraries -- '''
-#
+import json
 
 ''' -- imports from installed packages -- '''
 try:
@@ -18,8 +18,11 @@ from gnowsys_ndf.ndf.models import node_collection
 
 from gnowsys_ndf.ndf.views.group import CreateGroup
 from gnowsys_ndf.ndf.views.methods import get_execution_time, staff_required
+from gnowsys_ndf.ndf.views.ajax_views import get_collection
 
 gst_base_unit_name, gst_base_unit_id = GSystemType.get_gst_name_id('base_unit')
+gst_lesson_name, gst_lesson_id = GSystemType.get_gst_name_id('lesson')
+gst_activity_name, gst_activity_id = GSystemType.get_gst_name_id('activity')
 
 
 @login_required
@@ -65,10 +68,51 @@ def unit_detail(request, group_id, unit_group_id):
     parent_group_name, parent_group_id = Group.get_group_name_id(group_id)
     unit_group_obj = Group.get_group_name_id(unit_group_id, get_obj=True)
 
+    # {
+    # [{
+    # //         name: 'Lesson1',
+    # //         type: 'lesson',
+    # //         id: 'l1',
+    # //         activities: [
+    # //             {
+    # //                 name: 'Activity 1',
+    # //                 type: 'activity',
+    # //                 id: 'a1'
+    # //             },
+    # //             {
+    # //                 name: 'Activity 1',
+    # //                 type: 'activity',
+    # //                 id: 'a2'
+    # //             }
+    # //         ]
+    # //     }]
+    # import ipdb; ipdb.set_trace()
+    unit_structure = []
+    for each in unit_group_obj.collection_set:
+        lesson_dict ={}
+        lesson = Node.get_node_by_id(each)
+        if lesson:
+            lesson_dict['name'] = lesson.name
+            lesson_dict['type'] = 'lesson'
+            lesson_dict['id'] = str(lesson._id)
+            lesson_dict['activities'] = []
+            if lesson.collection_set:
+                for each_act in lesson.collection_set:
+                    activity_dict ={}
+                    activity = Node.get_node_by_id(lesson._id)
+                    if activity:
+                        activity_dict['name'] = lesson.name
+                        activity_dict['type'] = 'lesson'
+                        activity_dict['id'] = str(activity._id)
+                        lesson_dict['activities'].append(activity_dict)
+            unit_structure.append(lesson_dict)
+
     template = "ndf/unit_structure.html"
+    print unit_structure
     req_context = RequestContext(request, {
                                 'group_id': parent_group_id,
-                                'unit_obj': unit_group_obj
+                                'unit_obj': unit_group_obj,
+                                'unit_structure': json.dumps(unit_structure)
                             })
     return render_to_response(template, req_context)
 
@@ -100,3 +144,73 @@ def list_units(request, group_id):
                                 'all_unit_objs': all_base_units
                             })
     return render_to_response(template, req_context)
+
+
+########### LESSON methods ##########
+
+@login_required
+@staff_required
+@get_execution_time
+def lesson_create_edit(request, group_id, unit_group_id=None):
+    '''
+    creation as well as edit of lessons
+    '''
+    # parent_group_name, parent_group_id = Group.get_group_name_id(group_id)
+    if request.method == "POST":
+        # lesson name
+        lesson_name = request.POST.get('name', '')
+        if not lesson_name:
+            return HttpResponse(0)
+
+        # parent unit id
+        unit_id_post = request.POST.get('unit_id', '')
+        unit_group_id = unit_id_post if unit_id_post else unit_group_id
+        # getting parent unit object
+        unit_group_obj = Group.get_group_name_id(unit_group_id, get_obj=True)
+
+        # unit_cs: unit collection_set
+        unit_cs_list = unit_group_obj.collection_set
+        unit_cs_objs_cur = Node.get_nodes_by_ids_list(unit_cs_list)
+        unit_cs_names_list = [u.name for u in unit_cs_objs_cur]
+
+        # print get_collection(request, ObjectId('57927168a6127d01f8e86574'), ObjectId('57927168a6127d01f8e86574'), no_res=False)
+        if lesson_name in unit_cs_names_list:
+            return HttpResponse(0)
+        else:
+            user_id = request.user.id
+            new_lesson_obj = node_collection.collection.GSystem()
+            new_lesson_obj.fill_gstystem_values(name=lesson_name,
+                                            member_of=gst_lesson_id,
+                                            group_set=unit_group_obj._id,
+                                            created_by=user_id,
+                                            status='PUBLISHED')
+            # print new_lesson_obj
+            new_lesson_obj.save(groupid=group_id)
+            unit_group_obj.collection_set.append(new_lesson_obj._id)
+            unit_group_obj.save(groupid=group_id)
+
+            unit_structure = []
+            for each in unit_group_obj.collection_set:
+                lesson_dict ={}
+                lesson = Node.get_node_by_id(each)
+                if lesson:
+                    lesson_dict['name'] = lesson.name
+                    lesson_dict['type'] = 'lesson'
+                    lesson_dict['id'] = str(lesson._id)
+                    lesson_dict['activities'] = []
+                    if lesson.collection_set:
+                        for each_act in lesson.collection_set:
+                            activity_dict ={}
+                            activity = Node.get_node_by_id(lesson._id)
+                            if activity:
+                                activity_dict['name'] = lesson.name
+                                activity_dict['type'] = 'lesson'
+                                activity_dict['id'] = str(activity._id)
+                                lesson_dict['activities'].append(activity_dict)
+                    unit_structure.append(lesson_dict)
+
+            return HttpResponse(json.dumps(unit_structure))
+
+    return HttpResponse(1)
+
+
