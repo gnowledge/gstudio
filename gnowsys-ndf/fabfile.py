@@ -9,14 +9,18 @@ def copy_schema_csvs():
 	local('cp -v ../doc/schema_directory/* gnowsys_ndf/ndf/management/commands/schema_files/')
 
 
-def update_data():
+def create_schema():
 	copy_schema_csvs()
-	local('python manage.py sync_existing_documents')
-	local('python manage.py filldb')
 	local('python manage.py create_schema STs_run1.csv')
 	local('python manage.py create_schema ATs.csv')
 	local('python manage.py create_schema RTs.csv')
 	local('python manage.py create_schema STs_run2.csv')
+
+
+def update_data():
+	local('python manage.py sync_existing_documents')
+	create_schema()
+	local('python manage.py filldb')
 	local('python manage.py sync_existing_documents')
 
 
