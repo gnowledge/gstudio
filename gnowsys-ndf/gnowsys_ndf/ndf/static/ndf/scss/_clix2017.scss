@@ -23,6 +23,7 @@ html {
 }
 body {
     background: linear-gradient(135deg, #e5a426, #ae208c);
+    //background: #eefaff;
     height: 100%;
     margin: 0;
     background-repeat: no-repeat;
@@ -521,7 +522,7 @@ body {
 
 .group_tile {
     height: 300px;
-    background: url('/static/ndf/images/course_backbround-2.png') no-repeat;
+    background: url('/static/ndf/images/Group-profile.png') no-repeat;
     background-size: 100% 100%;
     padding: 20px 22px;
     color: #fff;
@@ -534,6 +535,8 @@ body {
         letter-spacing: 1.1px;
         margin-bottom: 15px;
         display: block;
+        text-align: left;
+        color: #fff;
     }
 
     .group_desc {
@@ -630,6 +633,7 @@ ul.horizontal_tabs_gstudio {
     padding-bottom: 10px;
     border: 2px solid #eee;
     cursor: pointer;
+    margin-left: 3px;
 
     .asset_preview {
         min-height: 200px;
@@ -657,7 +661,7 @@ ul.horizontal_tabs_gstudio {
 .preview_asset {
     background: #ccc;
     border: 2px solid #999;
-    width: 100%;
+    width: 99%;
     min-height: 350px;
 }
 
@@ -667,13 +671,16 @@ ul.horizontal_tabs_gstudio {
     color: #aaa;
     font-size: 14px;
     letter-spacing: 0.6px;
+    margin-left: 10px;
 }
 
 input[type="text"], input[type="file"] {
     margin: 0px;
+    margin-left: 3px;
 }
 label {
     margin-top: 1rem;
+    margin-left: 1rem;
 }
 
 
