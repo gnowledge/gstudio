@@ -2094,7 +2094,6 @@ def course_content(request, group_id):
             })
     return render_to_response(template, context_variables)
 
-
 @get_execution_time
 def course_notebook(request, group_id, tab=None, notebook_id=None):
     group_obj = get_group_name_id(group_id, get_obj=True)
@@ -3156,4 +3155,27 @@ def assetcontent_detail(request, group_id, asset_id,asst_content_id):
     return render_to_response(template,
                                 context_variables,
                                 context_instance = RequestContext(request)
-    )    
+    )
+
+
+@get_execution_time
+def course_pages(request, group_id, page_id=None):
+    group_obj = get_group_name_id(group_id, get_obj=True)
+    group_id = group_obj._id
+    group_name = group_obj.name
+    template = 'ndf/gevent_base.html'
+
+    allow_to_join = get_group_join_status(group_obj)
+    page_gst_name, page_gst_id = GSystemType.get_gst_name_id("Asset")
+    all_pages = node_collection.find({'member_of': page_gst_id,
+                'content': {'$regex': 'clix-activity-styles.css', '$options': 'i'}})
+    context_variables = {
+            'group_id': group_id, 'groupid': group_id, 'group_name':group_name,
+            'group_obj': group_obj, 'title': 'course_pages', 'all_pages': all_pages
+            }
+
+    return render_to_response(template,
+                                context_variables,
+                                context_instance = RequestContext(request)
+    )
+

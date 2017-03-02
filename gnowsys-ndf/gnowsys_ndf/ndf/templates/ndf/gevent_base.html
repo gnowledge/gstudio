@@ -44,7 +44,7 @@
                             <a href="#">Lessons</a>
                             <!-- <a href="#group_blog">Blog</a> -->
                         </li><li>
-                            <a href="#group_pages">Pages</a>
+                            <a href="{% url 'course_pages' group_id %}" {% if title == 'course_pages' %}class="selected"{% endif %}>Pages</a>
                         </li>
 <!--                         <li>
                             <a href="#group_overview" class="selected">Overview</a>
@@ -80,6 +80,9 @@
                         {% endif %}
                     </div>
                     <div id="group_pages">
+                        {% if title == "course_pages" %}
+                            {% include "ndf/course_pages.html" %}
+                        {% endif %}
                     </div>
                     <div id="group_elibrary">
                         {% if title == "asset_list" %}
@@ -150,6 +153,7 @@
 
                       });
             });
+
     </script>
     
 
