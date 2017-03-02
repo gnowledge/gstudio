@@ -58,12 +58,13 @@
 
   <!-- JS -->
   <script src="/static/ndf/js/app.js"></script>
+  <script src="/static/ndf/bower_components/foundation/js/foundation.min.js"></script>
 
   <!-- end of footer cache -->
 
   <script type="text/javascript">
     // Initialize Foundation CSS
-      $(document).foundation();
+       $(document).foundation();
 
     // Register global ajax start and complete events to show ajax loader when request is in process
       $(document).ajaxStart($.blockUI).ajaxStop($.unblockUI);
