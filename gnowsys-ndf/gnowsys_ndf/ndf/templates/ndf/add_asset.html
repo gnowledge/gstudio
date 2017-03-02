@@ -40,7 +40,7 @@
         <div class="row">
             <div class="small-12 medium-6 large-6 columns">
                 <label> 
-                    {% if asset_obj.content %}
+                    {% if asset_obj %}
                        <i><p style="color: gray">{{asset_obj.content}} </p><i>
                     {% else %}
                         Asset description
@@ -56,7 +56,7 @@
                 
                 {% else %}
  
-                    <label>Tags
+                    <label>KeyWords
                         <input type="text" placeholder="" name="asset_tags" />
                     </label>
                 {% endif %}
@@ -64,9 +64,6 @@
         </div>
         <div class="row">
             <div class="small-12 medium-6 large-6 columns">
-            {% if asset_obj %}
-            {% else %}
-
                 <label>Learning objectives met by this asset
                     <Select name="asset_objectives" id = "asset_objectivesid" placeholder="Select topics" require>
                         <option value="">--- Select Topic ---</option>
@@ -77,7 +74,6 @@
                         {% endfor %}
                     </Select>
                 </label>
-            {% endif %}
             </div>
         </div>
 
