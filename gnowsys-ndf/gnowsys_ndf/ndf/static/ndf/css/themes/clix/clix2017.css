@@ -622,8 +622,7 @@ ul.horizontal_tabs_gstudio > li.sub_group_action:hover ul {
 /* line 638, ../../../scss/_clix2017.scss */
 .asset_tile .asset_preview {
   min-height: 200px;
-  background-color: #eee;
-  width: 95%;
+  background: url(/static/ndf/images/elibrary-01.svg) no-repeat;
 }
 /* line 644, ../../../scss/_clix2017.scss */
 .asset_tile .asset_text {
