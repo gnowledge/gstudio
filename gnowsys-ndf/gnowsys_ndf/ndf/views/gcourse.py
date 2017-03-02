@@ -2094,7 +2094,6 @@ def course_content(request, group_id):
             })
     return render_to_response(template, context_variables)
 
-
 @get_execution_time
 def course_notebook(request, group_id, tab=None, notebook_id=None):
     group_obj = get_group_name_id(group_id, get_obj=True)
@@ -2104,6 +2103,9 @@ def course_notebook(request, group_id, tab=None, notebook_id=None):
     all_blogs = blog_pages = user_blogs = user_id = None
     allow_to_comment = notebook_obj = None
     template = 'ndf/gcourse_event_group.html'
+    if 'base_unit' in group_obj.member_of_names_list:
+        template = 'ndf/gevent_base.html'
+
 
     # page_gst = node_collection.one({'_type': "GSystemType", 'name': "Page"})
     # blogpage_gst = node_collection.one({'_type': "GSystemType", 'name': "Blog page"})
@@ -2404,6 +2406,9 @@ def course_about(request, group_id):
     template = 'ndf/gcourse_event_group.html'
     if 'BaseCourseGroup' in group_obj.member_of_names_list:
         template = 'ndf/basecourse_group.html'
+        show_analytics_notifications = False
+    if 'base_unit' in group_obj.member_of_names_list:
+        template = 'ndf/gevent_base.html'
         show_analytics_notifications = False
 
     banner_pic_obj,old_profile_pics = _get_current_and_old_display_pics(group_obj)
@@ -3150,4 +3155,59 @@ def assetcontent_detail(request, group_id, asset_id,asst_content_id):
     return render_to_response(template,
                                 context_variables,
                                 context_instance = RequestContext(request)
-    )    
+    )
+
+
+@get_execution_time
+def course_pages(request, group_id, page_id=None):
+    group_obj = get_group_name_id(group_id, get_obj=True)
+    group_id = group_obj._id
+    group_name = group_obj.name
+    template = 'ndf/gevent_base.html'
+
+    page_gst_name, page_gst_id = GSystemType.get_gst_name_id("Asset")
+    all_pages = node_collection.find({'member_of': page_gst_id,
+                'content': {'$regex': 'clix-activity-styles.css', '$options': 'i'}})
+    context_variables = {
+            'group_id': group_id, 'groupid': group_id, 'group_name':group_name,
+            'group_obj': group_obj, 'title': 'course_pages', 'all_pages': all_pages
+            }
+
+    return render_to_response(template,
+                                context_variables,
+                                context_instance = RequestContext(request)
+    )
+
+def save_course_page(request, group_id):
+    group_obj = get_group_name_id(group_id, get_obj=True)
+    group_id = group_obj._id
+    group_name = group_obj.name
+    template = 'ndf/gevent_base.html'
+    page_gst_name, page_gst_id = GSystemType.get_gst_name_id("Asset")
+    all_pages = node_collection.find({'member_of': page_gst_id,
+                'content': {'$regex': 'clix-activity-styles.css', '$options': 'i'}})
+    context_variables = {
+            'group_id': group_id, 'groupid': group_id, 'group_name':group_name,
+            'group_obj': group_obj, 'title': 'course_pages', 'all_pages': all_pages
+            }
+    if request.method == "POST":
+
+        name = request.POST.get("name", "")
+        content = request.POST.get("content_org", "")
+        page_obj = node_collection.collection.GSystem()
+        page_obj.fill_gstystem_values(request=request)
+        page_obj.name = unicode(name)
+        page_obj.content = unicode(content)
+        page_obj.member_of = [page_gst_id]
+        page_obj.save(groupid=group_id)
+
+        return HttpResponseRedirect(reverse('course_pages', kwargs={'group_id': group_id}))
+
+def load_data(request, group_id):
+    node_id = request.GET.get("node_id", "")
+    node = node_collection.one({'_id': ObjectId(node_id)})
+    template = 'ndf/node_ajax_content.html'
+    return render_to_response(template,
+    {
+      "group_id":group_id,"groupid":group_id, "node": node
+    },context_instance=RequestContext(request))
