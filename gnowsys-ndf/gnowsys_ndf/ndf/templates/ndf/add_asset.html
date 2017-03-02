@@ -1,17 +1,34 @@
 
 
 <div class="row" style="margin-top: 25px; margin-bottom: 25px;">
+            {% if asset_obj.name %}
+
+            {% else %}
+
             <a class="close-reveal-modal" aria-label="Close">&#215;</a>
+            {% endif %}
             <div class="small-12 colums" >
-                <h3 class="left">Add a new asset</h3>
+            {% if asset_obj.name %}
+                <b><h2 class="left" style="color: #ce7869">&nbsp; Asset Details</h2></b>
+
+            {% else %}
+                <h3 class="left">&nbsp; Add a new asset</h3>
+            {% endif %}
+
+                {% if asset_obj.name %}
+
+                {% else %}
                 <button type="button" class="right orange-button save-asset">Save Asset</button>
+                {% endif %}
+
             </div>
         </div>
         <div class="row">
             <div class="small-12 medium-6 large-6 columns">
                 <label>
                     {% if asset_obj.name %}
-                        {{asset_obj.name}}
+
+                        <b><h2>{{asset_obj.name}}</h2></b>
                     {% else %}
                        Asset name 
                        <input type="text" placeholder=""  id = "asset-name" name="asset_name" />
@@ -24,7 +41,7 @@
             <div class="small-12 medium-6 large-6 columns">
                 <label> 
                     {% if asset_obj.content %}
-                        {{asset_obj.content}}
+                       <i><p style="color: gray">{{asset_obj.content}} </p><i>
                     {% else %}
                         Asset description
                         <input type="text" placeholder="" id = "asset-descid" name="asset_desc" />
@@ -34,13 +51,22 @@
         </div>
         <div class="row">
             <div class="small-12 medium-6 large-6 columns">
-                <label>Tags
-                    <input type="text" placeholder="" name="asset_tags" />
-                </label>
+                {% if asset_obj %}
+                    <!--<i><p style="color: #2e3f51">{{asset_obj.content}} </p><i>-->
+                
+                {% else %}
+ 
+                    <label>Tags
+                        <input type="text" placeholder="" name="asset_tags" />
+                    </label>
+                {% endif %}
             </div>
         </div>
         <div class="row">
             <div class="small-12 medium-6 large-6 columns">
+            {% if asset_obj %}
+            {% else %}
+
                 <label>Learning objectives met by this asset
                     <Select name="asset_objectives" id = "asset_objectivesid" placeholder="Select topics" require>
                         <option value="">--- Select Topic ---</option>
@@ -51,18 +77,19 @@
                         {% endfor %}
                     </Select>
                 </label>
+            {% endif %}
             </div>
         </div>
 
-        <hr />
+        
     <div class="asset-content-area"{% if not asset_obj %} style="display:none"{% endif %}>
-        <h3>Resources for this asset</h3>
+       <!-- <h3>Add esources for this asset</h3>-->
         <div class="row">
-            Add asset content
+           <!-- &nbsp;&nbsp;&nbsp;Add asset content-->
             <div class="transcript_files">
                 <form class="dropzone" id ="docPost" enctype="multipart/form-data" method="post" action="{% url 'add_assetcontent' group_id %}" >
-                    <input type="file" id="docFile" placeholder="" name="work" />
-                    <input type="button" id="" onclick="save_form()" value="Save"/>
+                    <input type="file" id="docFile" placeholder="" name="work"/>
+                    <input type="button" class ="asset-save-button" id="" onclick="save_form()" value="Save"/>
                     <input type="hidden" name="context_name" value="{{title}}">
                     <input type="hidden" class ="asset_obj_val" name="asset_obj_name" data-asset-obj-val="">
                 </form>
@@ -75,7 +102,7 @@
                     <div class="asset_preview"></div>
                     <div class="asset_text">
                         <div class="asset_title">{{each.name}}</div>
-                        <div class="asset_desc">This is a long description</div>
+                        <div class="asset_desc">Description</div>
                     </div>
                 </div>
             </div>
@@ -85,8 +112,8 @@
 
         <hr />
         <h6>
-            <b><u>All Assets</u>&nbsp; ></b>
-            Resource Name
+            <b><u>Asset Content Preview </u>&nbsp; ></b>
+           <!-- Resource Name-->
         </h6>
         <div class="row">
           {% if node %}
