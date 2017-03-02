@@ -1935,7 +1935,7 @@ def group_dashboard(request, group_id=None):
     old_profile_pics = []
     selected = request.GET.get('selected','')
     group_obj = get_group_name_id(group_id, get_obj=True)
-    if "CourseEventGroup" in group_obj.member_of_names_list or "BaseCourseGroup" in group_obj.member_of_names_list:
+    if "base_unit" in group_obj.member_of_names_list or "CourseEventGroup" in group_obj.member_of_names_list or "BaseCourseGroup" in group_obj.member_of_names_list:
         return HttpResponseRedirect(reverse('course_about', kwargs={'group_id': group_id}))
 
     if group_obj and group_obj.post_node:

@@ -52,16 +52,6 @@
 
     <div class="small-12 medium-4 columns">
       <div class="course-highlight">
-        <i class="fa fa-list"></i>
-        <span>{{group_object.collection_set|length}} Module{{group_object.collection_set|length|pluralize}}</span>
-      </div>
-      {% if show_analytics_notifications %}
-      <div class="course-highlight">
-        <i class="fa fa-clock-o"></i>
-        <span>{{weeks_count}} week{{weeks_count|pluralize}}</span>
-      </div>
-
-      <div class="course-highlight">
         <i class="fa fa-user"></i>
         <span>
         {% if 'base_unit' in group_object.member_of_names_list %}
@@ -70,6 +60,16 @@
         {{group_object.author_set|length}} student{{group_object.author_set|length|pluralize}} enrolled
         {% endif %}</span>
       </div>
+      {% if show_analytics_notifications %}
+      <div class="course-highlight">
+        <i class="fa fa-list"></i>
+        <span>{{group_object.collection_set|length}} Module{{group_object.collection_set|length|pluralize}}</span>
+      </div>
+      <div class="course-highlight">
+        <i class="fa fa-clock-o"></i>
+        <span>{{weeks_count}} week{{weeks_count|pluralize}}</span>
+      </div>
+
       {% endif %}
     </div>
   </div>
