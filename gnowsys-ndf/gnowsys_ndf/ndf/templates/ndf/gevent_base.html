@@ -24,7 +24,20 @@
                 <div class="small-12 columns group_header">
                     <div class="group_title left">English Curriculum</div>
                     <div class="group_actions right">
-                        <button class="button-hollow-white">Join the group</button>
+                        {% if user_access == "allow" %}
+                            <button class="button-hollow-white" disabled="disabled">Enrolled</button>
+                        {% else %}
+                          {% if user.is_authenticated %}
+                            {% if allow_to_join == "Open" %}
+                              <a class="enroll-btn button-hollow-white"> ENROLL</a>
+                            {% else %}
+                            <button class="button-hollow-white" disabled="disabled">Enrollment {{allow_to_join}} </button>
+
+                            {% endif %}
+                          {% else %}
+                              <a href="{% url 'auth_login' %}" class="button-hollow-white" title="Please login to Enroll">ENROLL</a>
+                          {% endif %}
+                        {% endif %}
                     </div>
                 </div>
             </div>
@@ -32,6 +45,14 @@
                 <div class="small-12 columns group_sections">
                     <ul class="horizontal_tabs_gstudio">
                         <li>
+                            <a href="#group_overview" class="selected">Overview</a>
+                        </li><li>
+                            <a href="#group_elibrary">eLibrary</a>
+                        </li><li {% ifequal title 'notebook' %}class="selected"{% endifequal %}">
+                            <a href="{% url 'course_notebook' group_id %}">Blog</a>
+                            <!-- <a href="#group_blog">Blog</a> -->
+                        </li>
+<!--                         <li>
                             <a href="#group_overview" class="selected">Overview</a>
                         </li><li>
                             <a href="#group_pages">Pages</a>
@@ -53,7 +74,7 @@
                                 </li>
                             </ul>
                         </li>
-                    </ul>
+ -->                    </ul>
                 </div>
             </div>
             <div class="row">
@@ -80,7 +101,9 @@
 
                     </div>
                     <div id="group_blog">
-
+                        {% if title == 'notebook' %}
+                            {% include "ndf/gnotebook.html" %}
+                        {% endif %}
                     </div>
                     <div id="group_calendar">
 
