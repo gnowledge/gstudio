@@ -14,6 +14,8 @@
   
 {% endblock %}
 {% block body_content %}
+{% get_group_object groupid as group_object %}
+
 {% get_breadcrumb request.path %}
     <div class="row group_content">
         <div class="small-12 columns">
@@ -23,8 +25,22 @@
             <div class="row">
                 <div class="small-12 columns group_header">
                     <div class="group_title left">English Curriculum</div>
+                    <!-- Join/Enroll options -->
                     <div class="group_actions right">
-                        <button class="button-hollow-white">Join the group</button>
+                        {% if user_access == "allow" %}
+                            <button class="button-hollow-white" disabled="disabled">Enrolled</button>
+                        {% else %}
+                          {% if user.is_authenticated %}
+                            {% if allow_to_join == "Open" %}
+                              <a class="enroll-btn button-hollow-white"> ENROLL</a>
+                            {% else %}
+                            <button class="button-hollow-white" disabled="disabled">Enrollment {{allow_to_join}} </button>
+
+                            {% endif %}
+                          {% else %}
+                              <a href="{% url 'auth_login' %}" class="button-hollow-white" title="Please login to Enroll">ENROLL</a>
+                          {% endif %}
+                        {% endif %}
                     </div>
                 </div>
             </div>
@@ -32,6 +48,16 @@
                 <div class="small-12 columns group_sections">
                     <ul class="horizontal_tabs_gstudio">
                         <li>
+                            <a href="{% url 'course_about' group_id %}" {% if title == 'about' %}class="selected"{% endif %}>Overview</a>
+                        </li>
+                        <li>
+                            <a href="{% url 'asset_list' group_id %}" {% if title == 'asset_list' or title == 'asset_detail' or title == 'asset_content_detail'%}class="selected"{% endif %}>eLibrary</a>
+                        </li>
+                        <li >
+                            <a href="{% url 'course_notebook' group_id %}" {% if title == 'notebook' %}class="selected"{% endif %}>Blog</a>
+                            <!-- <a href="#group_blog">Blog</a> -->
+                        </li>
+<!--                         <li>
                             <a href="#group_overview" class="selected">Overview</a>
                         </li><li>
                             <a href="#group_pages">Pages</a>
@@ -53,11 +79,12 @@
                                 </li>
                             </ul>
                         </li>
-                    </ul>
+ -->                    </ul>
                 </div>
             </div>
             <div class="row">
                 <div class="small-12 columns group_sections_content">
+
                     <div id="group_overview">
                         {% if title == "about" %}
                             {% include "ndf/course_about.html" %}
@@ -80,7 +107,9 @@
 
                     </div>
                     <div id="group_blog">
-
+                        {% if title == 'notebook' %}
+                            {% include "ndf/gnotebook.html" %}
+                        {% endif %}
                     </div>
                     <div id="group_calendar">
 

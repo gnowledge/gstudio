@@ -3100,19 +3100,21 @@ def assets(request, group_id, asset_id=None):
         group_id = ObjectId(group_id)
     except:
         group_name, group_id = get_group_name_id(group_id)
+    asset_gst_name, asset_gst_id = GSystemType.get_gst_name_id("Asset")
     if asset_id:
-        # print "*"
         asset_obj = node_collection.one({'_id': ObjectId(asset_id)})
         asset_content_list = get_relation_value(ObjectId(asset_obj._id),'has_assetcontent')
-        asset_gst = node_collection.one({'_type': 'GSystemType', 'name': 'Asset'})
-        asset_nodes = node_collection.find({'member_of': {'$in': [asset_gst._id]},'group_set': {'$all': [ObjectId(group_id)]}}).sort('last_update', -1)
-        topic_gst = node_collection.one({'_type': 'GSystemType', 'name': 'Topic'})
-        topic_nodes = node_collection.find({'member_of': {'$in': [topic_gst._id]}})
-        # for each in has_asset_content['grel_node']:
-        #     print each
+        topic_gst_name, topic_gst_id = GSystemType.get_gst_name_id("Topic")
+
+        asset_nodes = node_collection.find({'member_of': {'$in': [asset_gst_id]},
+            'group_set': {'$all': [ObjectId(group_id)]}}).sort('last_update', -1)
+        topic_nodes = node_collection.find({'member_of': {'$in': [topic_gst_id]}})
 
         context_variables = {
-            'group_id': group_id, 'groupid': group_id,'title':'asset_detail','asset_obj':asset_obj,'title':'asset_detail','asset_nodes':asset_nodes,'asset_content_list':asset_content_list,'topic_nodes':topic_nodes
+            'group_id': group_id, 'groupid': group_id,
+            'title':'asset_detail','asset_obj':asset_obj,
+            'asset_nodes':asset_nodes,'asset_content_list':asset_content_list,
+            'topic_nodes':topic_nodes
         }
         template = 'ndf/gevent_base.html'
         return render_to_response(template,
@@ -3120,10 +3122,11 @@ def assets(request, group_id, asset_id=None):
                                     context_instance = RequestContext(request)
         )
    
-    asset_gst = node_collection.one({'_type': 'GSystemType', 'name': 'Asset'})
-    asset_nodes = node_collection.find({'member_of': {'$in': [asset_gst._id]},'group_set': {'$all': [ObjectId(group_id)]}}).sort('last_update', -1)
+    asset_nodes = node_collection.find({'member_of': {'$in': [asset_gst_id]},
+        'group_set': {'$all': [ObjectId(group_id)]}}).sort('last_update', -1)
     context_variables = {
-            'group_id': group_id, 'groupid': group_id,'asset_nodes': asset_nodes,'title':'asset_list'
+            'group_id': group_id, 'groupid': group_id,
+            'asset_nodes': asset_nodes,'title':'asset_list'
         }
     template = 'ndf/gevent_base.html'
     return render_to_response(template,
@@ -3140,7 +3143,9 @@ def assetcontent_detail(request, group_id, asset_id,asst_content_id):
     asset_content_list = get_relation_value(ObjectId(asset_obj._id),'has_assetcontent')
     template = 'ndf/gevent_base.html'
     context_variables = {
-            'asset_content_list':asset_content_list,'group_id':group_id,'groupid':group_id,'node':assetcontent_obj,'asset_obj':asset_obj,'title':"asset_content_detail"
+            'asset_content_list':asset_content_list,'group_id':group_id,
+            'groupid':group_id,'node':assetcontent_obj,'asset_obj':asset_obj,
+            'title':"asset_content_detail"
         }
     return render_to_response(template,
                                 context_variables,
