@@ -7,7 +7,12 @@
 {% load cache %}
 {% load ndf_tags %}
 {% block title %}{% trans 'Events' %} {% endblock %}
-
+{% block head %}
+{{block.super}}
+<script type="text/javascript" src="/static/ndf/bower_components/foundation/js/foundation.min.js"></script>
+    <script type="text/javascript" src="/static/ndf/bower_components/foundation/js/foundation/foundation.topbar.js"></script>
+  
+{% endblock %}
 {% block body_content %}
 {% get_breadcrumb request.path %}
     <div class="row group_content">
@@ -61,8 +66,11 @@
                     <div id="group_pages">
                     </div>
                     <div id="group_elibrary">
-                        {% if title == "assets" %}
+                        {% if title == "asset_list" %}
                             {% include "ndf/assets.html" %}
+                        {% endif %}
+                        {% if title == "asset_detail" %}
+                            {% include "ndf/add_asset.html" %}
                         {% endif %}
                     </div>
                     <div id="addAsset" class="reveal-modal" data-reveal aria-labelledby="modalTitle" aria-hidden="true" role="dialog">
@@ -125,5 +133,80 @@
                       });
             });
     </script>
+    <script type="text/javascript">
+  var form = document.getElementById('docPost');
+  var fileSelect = document.getElementById('docFile');
+  // var uploadButton = document.getElementById('submitpostid');
+        function save_form(event) {
+        alert("sssssssssssssssssssss")
+
+        // Update button text.
+        // uploadButton.innerHTML = 'Uploading...';
+
+        // Get the selected files from the input.
+        var files = fileSelect.files;
+
+        // Create a new FormData object.
+        var formData = new FormData();
+
+        // Loop through each of the selected files.
+        for (var i = 0; i < files.length; i++) {
+          var file = files[i];
+
+          // // Check the file type.
+          // if (!file.type.match('image.*')) {  continue; }
+
+          // Add the file to the request.
+          formData.append('filehive', file, file.name);
+        }
+
+        // appending csrfmiddlewaretoken and user-id
+        formData.append('csrfmiddlewaretoken', '{{csrf_token}}');
+        formData.append('user','{{request.user.id}}');
+        formData.append('asset_obj','{{asset_obj}}');
+        formData.append('curr_time','{{asset_obj}}');
+
+        // Set up the request.
+        xhr = new XMLHttpRequest();
+
+        // Open the connection.
+        xhr.open('POST', "{% url 'add_assetcontent' group_id %}", true);
+
+        // Set up a handler for when the request finishes sucessfully.
+        xhr.onload = function () {
+          if (xhr.status === 200) 
+          {
+            // File(s) uploaded.
+           // if file is not uploaded sucessfully
+            if(xhr.responseText == "UploadError")
+            {
+               alert("Error occurred");
+            }
+            // check if image is not in the list, add it.
+            else if(xhr.responseText )
+            {
+              alert(xhr.responseText);
+            }
+
+            uploadButton.innerHTML = 'Upload';
+
+            // updating metadata of files, if file is uploaded sucessfully
+            // if(xhr.responseText != "UploadError")
+            // {
+            //   // alert('xhr.responseText != "UploadError"');
+            // }
+          }
+          else
+          {
+            alert('An error occurred!');
+          }
+        };
+
+        // Send the Data.
+        xhr.send(formData);
+      }
+
+  
+</script>
 
 {% endblock body_content %}

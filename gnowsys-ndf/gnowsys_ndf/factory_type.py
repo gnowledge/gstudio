@@ -221,7 +221,7 @@ factory_relation_types = [
     },
 
     {'teaches': {
-            'subject_type':['Page','File', 'Topic','Pandora_video'],
+            'subject_type':['Page','File', 'Topic','Pandora_video','Asset'],
             'object_type':['Page','Concept','Topic', 'File', 'Pandora_video'],
             'inverse_name':'taught_by',
             'meta_type':'factory_types',

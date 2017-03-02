@@ -6578,6 +6578,7 @@ def add_asset(request,group_id):
       group_name, group_id = get_group_name_id(group_id)
   topic_gst = node_collection.one({'_type': 'GSystemType', 'name': 'Topic'})
   topic_nodes = node_collection.find({'member_of': {'$in': [topic_gst._id]}})
+  print "9898898898988"
   return render_to_response("ndf/add_asset.html",RequestContext(request,{'group_id':group_id,'groupid':group_id,'topic_nodes':topic_nodes}))
 
 @login_required
@@ -6589,18 +6590,27 @@ def create_edit_asset(request,group_id):
       group_name, group_id = get_group_name_id(group_id)
   asset_name =  str(request.POST.get("asset_name", '')).strip()
   asset_desc =  str(request.POST.get("asset_description", '')).strip()
-  print asset_desc,"---------------------------------"
+  # print asset_desc,"---------------------------------"
   asset_objective = str(request.POST.get("asset_objective", '')).strip()
   asset_obj = create_asset(name=asset_name,group_id=group_id,created_by=request.user.id,content=unicode(asset_desc))
-  print asset_obj
-
-  # rt_has_asset_content = node_collection.one({'_type':'RelationType', 'name':'teaches'})
-  # asset_grels = triple_collection.find({'_type': 'GRelation', \
-  #   'relation_type': rt_has_asset_content._id,'subject': asset_obj._id},
-  #   {'_id': 0, 'right_subject': 1})
-  # for each_asset in asset_grels:
-  #   asset_contents_list.append(each_asset['right_subject'])
+  rt_teaches = node_collection.one({'_type':'RelationType', 'name':'teaches'})
+  teaches_list = [ObjectId(asset_objective)]
+  asset_grels = triple_collection.find({'_type': 'GRelation', \
+    'relation_type': rt_teaches._id,'subject': asset_obj._id},
+    {'_id': 0, 'right_subject': 1})
   
-  # create_grelation(asset_obj._id, rt_has_asset_content, asset_contents_list)
+  for each_asset in asset_grels:
+    teaches_list.append(each_asset['right_subject'])
+  create_grelation(asset_obj._id, rt_teaches, teaches_list)
 
-  return HttpResponse(group_id)
+  return StreamingHttpResponse(asset_obj.pk)
+
+
+@login_required
+@get_execution_time
+def add_assetcontent(request,group_id):
+  asset_obj = request.POST.get('asset_obj','')
+  uploaded_files = request.FILES.getlist('filehive', [])
+  create_assetcontent(ObjectId(asset_obj),uploaded_files[0].name,group_id,request.user.id,files=uploaded_files,resource_type='File')
+
+  return StreamingHttpResponse("success")

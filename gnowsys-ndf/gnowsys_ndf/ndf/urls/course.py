@@ -56,5 +56,7 @@ urlpatterns = patterns('gnowsys_ndf.ndf.views.gcourse',
                         url(r'^/get_resource_completion_status/$', 'get_resource_completion_status', name='get_resource_completion_status'),
                         url(r'^/manage_users/$', 'manage_users', name='manage_users'),
                         #Asset URLS
-                        url(r'^/assets/$', 'assets', name='assets'),
+                        url(r'^/asset_list/$','assets', name='asset_list'),
+                        url(r'^/asset_detail/(?P<node_id>[\w-]+)$', 'assets', name='asset_detail'),
+                        
                        )

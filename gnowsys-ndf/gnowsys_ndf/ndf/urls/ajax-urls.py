@@ -53,8 +53,9 @@ urlpatterns = patterns('gnowsys_ndf.ndf.views.ajax_views',
     url(r'^get_video_player', 'get_video_player', name='get_video_player'),
     url(r'^get_audio_player', 'get_audio_player', name='get_audio_player'),
     url(r'^get_jhapps', 'get_jhapps', name='get_jhapps'),
-    url(r'^add_asset', 'add_asset', name='add_asset'),
     url(r'^create_edit_asset', 'create_edit_asset', name='create_edit_asset'),
+    url(r'^add_assetcontent', 'add_assetcontent', name='add_assetcontent'),
+    url(r'^add_asset', 'add_asset', name='add_asset'),
     # url(r'^/upload_file/', 'upload_file', name='upload_file'),
     
                        # Ajax-urls required for MIS --------------------------------
