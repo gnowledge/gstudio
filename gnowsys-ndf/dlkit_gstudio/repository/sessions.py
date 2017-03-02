@@ -338,7 +338,7 @@ class AssetLookupSession(abc_repository_sessions.AssetLookupSession, osid_sessio
 
     assets = property(fget=get_assets)
 
-class AssetContentLookupSession(abc_repository_sessions.AssetLookupSession, osid_sessions.OsidSession):
+class AssetContentLookupSession(abc_repository_sessions.AssetContentLookupSession, osid_sessions.OsidSession):
     """This session defines methods for retrieving asset contents.
 
     An ``AssetContent`` represents an element of content stored associated
