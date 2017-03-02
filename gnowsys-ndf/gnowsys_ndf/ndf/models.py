@@ -478,6 +478,7 @@ class Node(DjangoDocument):
         elif request:
             self.group_set = request.POST.get('group_set', [])
         if self.group_set and not isinstance(self.group_set, list):
+            self.group_set = [self.group_set]
             self.group_set = [ObjectId(each) for each in self.group_set]
 
         # 'collection_set': [ObjectId]
@@ -2087,7 +2088,7 @@ class Filehive(DjangoDocument):
 
         file_content_type = file_blob.content_type if hasattr(file_blob, 'content_type') else None
         if file_name and "vtt" in file_name:
-            return "text/vtt" 
+            return "text/vtt"
         if file_content_type and file_content_type != 'application/octet-stream':
             file_mime_type = file_blob.content_type
         else:
