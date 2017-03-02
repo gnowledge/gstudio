@@ -63,7 +63,12 @@
 
       <div class="course-highlight">
         <i class="fa fa-user"></i>
-        <span>{{group_object.author_set|length}} student{{group_object.author_set|length|pluralize}} enrolled</span>
+        <span>
+        {% if 'base_unit' in group_object.member_of_names_list %}
+          {{group_object.author_set|length}} member{{group_object.author_set|length|pluralize}}
+        {% else %}
+        {{group_object.author_set|length}} student{{group_object.author_set|length|pluralize}} enrolled
+        {% endif %}</span>
       </div>
       {% endif %}
     </div>

@@ -1,0 +1,31 @@
+{% load ndf_tags %}
+{% load i18n %}
+{% load cache %}
+
+{% get_download_filename node as download_filename %}
+{% get_schema node as schema %}
+{% get_group_name groupid as group_name_tag %}
+{% get_gstudio_twitter_via as twitter_via %}
+{% check_is_gstaff groupid request.user as is_gstaff %}
+{#% get_gstudio_facebook_app_id as fb_app_id %#}
+
+ {% if 'image' in node.if_file.mime_type  %}
+       <center>
+        <div class="show-image">
+            <img  src="{{MEDIA_URL}}{{node.if_file.original.relurl}}" style="min-height:200px;" />
+          <figcaption style="position:relative;top:0;left:0" title="Click Here to View Image in Full Screen">
+              <a  target="_blank" href="{% url 'read_file' group_name_tag node.pk download_filename %}">
+                 View in Full Screen
+                 <i class="fi-projection-screen"> </i>
+            </figcaption>
+              </a>
+        </div>
+        </center>
+  {% elif 'video' in node.if_file.mime_type %}
+                {% get_attribute_value node.pk 'has_transcript' as node_transcript %}
+                {% include 'ndf/widget_video_player.html' with video_obj=node %}
+  {% else %}
+                <a href="{% url 'read_file' group_name_tag node download_filename %}" download="{{ download_filename }}">
+                  {{node.name}}
+                </a>
+  {% endif  %}
