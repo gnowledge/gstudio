@@ -2104,6 +2104,9 @@ def course_notebook(request, group_id, tab=None, notebook_id=None):
     all_blogs = blog_pages = user_blogs = user_id = None
     allow_to_comment = notebook_obj = None
     template = 'ndf/gcourse_event_group.html'
+    if 'base_unit' in group_obj.member_of_names_list:
+        template = 'ndf/gevent_base.html'
+
 
     # page_gst = node_collection.one({'_type': "GSystemType", 'name': "Page"})
     # blogpage_gst = node_collection.one({'_type': "GSystemType", 'name': "Blog page"})
@@ -2404,6 +2407,9 @@ def course_about(request, group_id):
     template = 'ndf/gcourse_event_group.html'
     if 'BaseCourseGroup' in group_obj.member_of_names_list:
         template = 'ndf/basecourse_group.html'
+        show_analytics_notifications = False
+    if 'base_unit' in group_obj.member_of_names_list:
+        template = 'ndf/gevent_base.html'
         show_analytics_notifications = False
 
     banner_pic_obj,old_profile_pics = _get_current_and_old_display_pics(group_obj)

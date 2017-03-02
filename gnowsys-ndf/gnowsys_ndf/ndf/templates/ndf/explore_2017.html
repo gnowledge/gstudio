@@ -48,7 +48,7 @@
 				{% elif "base_unit" in each_obj.member_of_names_list %}
 
 					{# {% include card with resource=each_obj has_logo=True no_footer=True url_name="groupchange" first_arg=each_obj.pk  %} #}
-					{% include card with resource=each_obj is_event=True no_footer=True has_prof_pic=True url_name="unit_detail" first_arg=groupid first_arg=groupid second_arg=each_obj.pk %}
+					{% include card with resource=each_obj is_event=True no_footer=True has_prof_pic=True url_name="groupchange" first_arg=each_obj.pk %}
 
 				{% endif %}
 				{% else %}
