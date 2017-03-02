@@ -76,10 +76,10 @@
 							{% trans "Create New " %} {{title}} :
 						{% endif  %}
 					{% endif %}
-				{% if site.SITE_NAME == "clix" %}
-				<span class="right">
-					<a  class="tiny button radius existing-template">{% trans "Create page from existing template" %}</a>
-				</span>
+				{% if not blog_type %}
+					<span class="right">
+						<a  class="tiny button radius existing-template">{% trans "Create page from existing template" %}</a>
+					</span>
 				{% endif %}
 				</span></h3>
 
