@@ -1,0 +1,96 @@
+
+<div id="addActivityPage" class="hide">
+<form id ="course_page_form" enctype="multipart/form-data" method="post" action="{% url 'save_course_page' group_id %}">{% csrf_token %}
+        <div class="medium-8 columns name-div">
+            <input type="text" name="name" placeholder="Enter name of Page">
+        </div>
+        <br/>
+        <div class="medium-8 columns editor-div">
+            {% include "ndf/html_editor.html" with var_name="content_org" var_placeholder="Enter the content here" var_value="" ckeditor_toolbar="GeneralToolbar" %}
+        </div>
+        <input type="hidden" name="node_id" class="form_node_id">
+        <span class="right">
+            <a  class="tiny button radius existing-template">Create page from existing template</a>
+        </span>
+
+        <input type="submit" class="button small" name="saveActivityPage" value="Save">
+</form>
+</div>
+<div id="page-view" class="reveal-modal medium" data-reveal aria-hidden="true" role="dialog">
+    <div class="page-content"></div>
+    <a class="close-reveal-modal" >&#215;</a>
+</div>
+<div id="templates-div" class="reveal-modal medium" data-reveal aria-hidden="true" role="dialog">
+    <div class="templates-content"></div>
+    <a class="close-reveal-modal" >&#215;</a>
+</div>
+<div id="page_listing">
+<div class="elibrary-actions">
+    <button type="button" class="right orange-button createActivityPage">
+        <i class="fi-plus"> </i>
+        Add Activity Page
+    </button>
+</div>
+
+<div class="row"> 
+      {% for each in all_pages %}
+      <a class="view-page" data-page-id="{{each.pk}}">
+      <div class="small-12 medium-6 large-3 columns">
+        <div class="asset_tile">
+            <div class="asset_preview"></div>
+            <div class="asset_text">
+                <div class="asset_title">{{each.name}}</div>
+                <div class="asset_desc">{{each.content|truncatechars:20}}</div>
+            </div>
+        </div>
+    </div>
+    </a>
+    {% endfor %}
+</div></div>
+<script type="text/javascript">
+    
+            $( ".createActivityPage" ).click(function() {
+                $("#addActivityPage").removeClass("hide")
+                $("#page_listing").addClass("hide")
+            });
+            $(document).on('click','.view-page',function(){
+                node_id = $(this).attr('data-page-id')
+                $.ajax({
+                url: "{% url 'load_data' group_id %}",
+
+                data: {
+                  node_id: node_id,
+                },
+
+                type: "GET",
+
+                dataType: "html",
+
+                success: function(data){
+                    $(".page-content").html(data)
+                    $("#page-view").foundation('reveal','open')
+                },
+                });//end of ajax
+
+
+            });
+
+    $( ".existing-template" ).click(function() {
+        $.ajax({
+            type: "GET",
+            url: "{% url 'get_templates_page' groupid %}",
+            datatype: "html",
+            data:{
+
+            },
+            success: function(data) {
+             
+                $(".templates-content").html(data);
+                $('#templates-div').foundation('reveal', 'open');
+
+            }
+        });
+    
+    });
+
+</script>
