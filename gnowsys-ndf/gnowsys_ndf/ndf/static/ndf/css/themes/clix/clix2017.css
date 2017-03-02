@@ -1413,7 +1413,6 @@ ul.jqtree-tree .jqtree-toggler:hover {
 }
 /* line 1434, ../../../scss/_clix2017.scss */
 .course_creator .course_editor .course_tree .course-lessons dd.accordion-navigation > a:before {
-  content: '&#8250';
   position: absolute;
   left: 23px;
   font-size: 45px;

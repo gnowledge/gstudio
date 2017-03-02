@@ -167,7 +167,6 @@ class OsidObject(abc_osid_objects.OsidObject, osid_markers.Identifiable, osid_ma
         # obj_map['description'] = get_display_text_map(self.get_description())
         try:
             obj_map['genusType'] = str(self.get_genus_type())
-            print "\n\nobj_map: \n", obj_map, "\n\n"
             # asset-content-genus-type%3A<mimetytpe>%40ODL.MIT.EDU
         except errors.Unimplemented:
             obj_map['genusType'] = 'Default%3ADefault%40Default'

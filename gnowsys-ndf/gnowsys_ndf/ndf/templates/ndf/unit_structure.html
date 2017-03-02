@@ -1,21 +1,12 @@
-<!DOCTYPE html>
-<html>
-<head>
-    <title>GStudio - Course Creator - 2</title>
-    <link rel="stylesheet" type="text/css" href="bower_components/foundation/css/foundation.css">
-    <link rel="stylesheet" type="text/css" href="bower_components/foundation/css/normalize.css">
-    <link rel="stylesheet" type="text/css" href="bower_components/foundation-icon-fonts/foundation-icons.css">
-    <link rel="stylesheet" type="text/css" href="css/course-creator-2.css">
-    <link rel="stylesheet" type="text/css" href="bower_components/jqtree/jqtree.css">
-    <link href="https://fonts.googleapis.com/css?family=Rubik:200,300,400,500,600,700,900" rel="stylesheet">
-    <script type="text/javascript" src="bower_components/jquery/dist/jquery.min.js"></script>
-    <script type="text/javascript" src="bower_components/foundation/js/foundation.min.js"></script>
-    <script type="text/javascript" src="bower_components/foundation/js/foundation/foundation.accordion.js"></script>
-    <script type="text/javascript" src="bower_components/modernizr/modernizr.js"></script>
-    <script type="text/javascript" src="bower_components/jqtree/tree.jquery.js"></script>
-    <script type="text/javascript" src="bower_components/handlebars/handlebars.js"></script>
-</head>
-<body>
+{% extends "ndf/gbase.html" %}
+
+{% block title %}GStudio - Course Creator{% endblock %}
+{% block head %}
+
+<script type="text/javascript" src="/static/ndf/bower_components/foundation/js/foundation.min.js"></script>
+<script type="text/javascript" src="/static/ndf/bower_components/handlebars/handlebars.min.js"></script>
+{% endblock %}
+{% block body_content %}
     <div class="course_creator_header">
         <div class="left back_to_group">
             <span>
@@ -30,7 +21,7 @@
             </span>
         </div>
         <div class="left course_heading">
-            <span>Unit name </span>
+            <span>{{unit_obj.name}}</span>
         </div>
         <div class="right course_actions">
             <ul>
@@ -239,6 +230,7 @@
         </div>
     </div>
 
+    {% verbatim %}
 
     <!-- Handlebar Templates for the course tree -->
     <script id="lesson-template" type="text/x-handlebars-template">
@@ -289,6 +281,7 @@
             </div>
         </dd>
     </script>
+    {% endverbatim %}
 
     <!-- Javascript operations -->
     <script type="text/javascript">
@@ -529,5 +522,4 @@
             })
         })
     </script>
-</body>
-</html>
+{% endblock body_content %}
