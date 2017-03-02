@@ -88,20 +88,20 @@
         
         $(function(){
             /*Group sections tabs*/
-            $('.group_sections_content >div').hide();
-            $('.group_sections_content #group_elibrary').show();
-            $('.horizontal_tabs_gstudio').on('click', ' >li>a', function(e) {
-                e.preventDefault();
-                var id = $(this).attr('href');
+            // $('.group_sections_content >div').hide();
+            // $('.group_sections_content #group_elibrary').show();
+            // $('.horizontal_tabs_gstudio').on('click', ' >li>a', function(e) {
+            //     e.preventDefault();
+            //     var id = $(this).attr('href');
 
-                if (id !== '#') { // If the id is hash then we will not handle it.
-                    $('.group_sections .selected').removeClass('selected');
-                    $(this).addClass('selected');
+            //     if (id !== '#') { // If the id is hash then we will not handle it.
+            //         $('.group_sections .selected').removeClass('selected');
+            //         $(this).addClass('selected');
 
-                    $('.group_sections_content >div').hide();
-                    $('.group_sections_content '+id).show();
-                }
-            });
+            //         $('.group_sections_content >div').hide();
+            //         $('.group_sections_content '+id).show();
+            //     }
+            // });
 
             // Create Curriculum
 

@@ -121,23 +121,64 @@ def explore_groups(request,page_no=1):
 @get_execution_time
 def explore_basecourses(request,page_no=1):
 
-    gstaff_access = check_is_gstaff(group_id,request.user)
-    if not gstaff_access:
-        return HttpResponseRedirect(reverse('explore_courses'))
+    title = 'courses'
+    # ce_cur = node_collection.find({'member_of': ce_gst._id,
+    #                                     '$or': [
+    #                                       {'created_by': request.user.id},
+    #                                       {'group_admin': request.user.id},
+    #                                       {'author_set': request.user.id},
+    #                                       {'group_type': 'PUBLIC'}
+    #                                       ]}).sort('last_update', -1)
+    # ce_page_cur = paginator.Paginator(ce_cur, page_no, GSTUDIO_NO_OF_OBJS_PP)
 
+    gst_base_unit_name, gst_base_unit_id = GSystemType.get_gst_name_id('base_unit')
+    # parent_group_name, parent_group_id = Group.get_group_name_id(group_id)
+    ce_cur = node_collection.find({
+                                    '_type': 'Group',
+                                    # 'group_set': {'$in': [parent_group_id]},
+                                    'member_of': {'$in': [gst_base_unit_id]}#,
+                                    # '$or':[
+                                    #     {'status': u'PUBLIC'},
+                                    #     {
+                                    #         '$and': [
+                                    #             {'access_policy': u"PRIVATE"},
+                                    #             {'created_by': request.user.id}
+                                    #         ]
+                                    #     }
+                                    # ]
+                                }).sort('last_update', -1)
+    ce_page_cur = paginator.Paginator(ce_cur, page_no, GSTUDIO_NO_OF_OBJS_PP)
+    print ce_cur.count()
     title = 'base courses'
-
-    course_cur = node_collection.find({'member_of': {'$in': [gst_course._id, gst_basecoursegroup._id]}}).sort('last_update', -1)
-
-    ce_page_cur = paginator.Paginator(course_cur, page_no, GSTUDIO_NO_OF_OBJS_PP)
-
     context_variable = {
-                        'title': title, 'doc_cur': course_cur, 'card': 'ndf/event_card.html',
-                        'group_id': group_id, 'groupid': group_id, 'ce_page_cur':ce_page_cur
-                        }
+                        'title': title, 'doc_cur': ce_cur,
+                        'group_id': group_id, 'groupid': group_id,
+                        'card': 'ndf/event_card.html', 'ce_page_cur':ce_page_cur
+                    }
+
 
     return render_to_response(
-        "ndf/explore.html",
+        # "ndf/explore.html", changed as per new Clix UI
+        "ndf/explore_2017.html",
         context_variable,
         context_instance=RequestContext(request))
+
+    # gstaff_access = check_is_gstaff(group_id,request.user)
+    # if not gstaff_access:
+    #     return HttpResponseRedirect(reverse('explore_courses'))
+
+
+    # course_cur = node_collection.find({'member_of': {'$in': [gst_course._id, gst_basecoursegroup._id]}}).sort('last_update', -1)
+
+    # ce_page_cur = paginator.Paginator(course_cur, page_no, GSTUDIO_NO_OF_OBJS_PP)
+
+    # context_variable = {
+    #                     'title': title, 'doc_cur': course_cur, 'card': 'ndf/event_card.html',
+    #                     'group_id': group_id, 'groupid': group_id, 'ce_page_cur':ce_page_cur
+    #                     }
+
+    # return render_to_response(
+    #     "ndf/explore.html",
+    #     context_variable,
+    #     context_instance=RequestContext(request))
 
