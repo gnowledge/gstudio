@@ -24,7 +24,7 @@
             </div>
             <div class="row">
                 <div class="small-12 columns group_header">
-                    <div class="group_title left">Unit EB</div>
+                    <div class="group_title left">{{group_object.name}}</div>
                 </div>
             </div>
             <div class="row">
@@ -34,7 +34,7 @@
                             <a href="{% url 'course_about' group_id %}" {% if title == 'about' %}class="selected"{% endif %}>Overview</a>
                         </li>
                         <li >
-                            <a href="#">Lessons</a>
+                            <a href="{% url 'unit_detail' group_id group_id %}" {% if title == 'unit_authoring' %}class="selected"{% endif %}>Lessons</a>
                             <!-- <a href="#group_blog">Blog</a> -->
                         </li>
                         <li>
@@ -108,8 +108,15 @@
 
                     </div>
                     <div id="group_assessment">
+                    </div>
+                    <div id="unit_authoring_div">
+                        {% if title == 'unit_authoring' %}
+                            {% include "ndf/unit_structure.html" %}
+                        {% endif %}
 
                     </div>
+
+
                 </div>
             </div>
         </div>
