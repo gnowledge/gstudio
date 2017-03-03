@@ -1,7 +1,7 @@
-@import '/static/ndf/bower_components/videojs/dist/video-js.css';
-@import '/static/ndf/bower_components/videojs/dist/video-js.min.css';
+@import 'static/ndf/bower_components/videojs/dist/video-js/video-js.css';
+@import '/static/ndf/bower_components/videojs/dist/video-js/video-js.min.css';
 @import '/static/ndf/css/videojs-skin-color.css';
-@import '/static/ndf/css/rubik-font.css';
+@import '/static/ndf/css/rubik-fonts.css';
 @import '/static/ndf/css/sgc-toc.css';
 
 #scstyle body{
