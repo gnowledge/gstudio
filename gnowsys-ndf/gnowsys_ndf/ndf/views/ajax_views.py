@@ -6610,20 +6610,39 @@ def create_edit_asset(request,group_id):
 def add_assetcontent(request,group_id):
   asset_obj = request.POST.get('asset_obj','')
   if_subtitle = request.POST.get('if_subtitle','')
+  if_transcript = request.POST.get('if_transcript','')
   assetcontentid = request.POST.get('assetcontentid','')
   uploaded_files = request.FILES.getlist('filehive', [])
-  
+  uploaded_transcript = request.FILES.getlist('uploaded_transcript', [])
+  uploaded_subtitle = request.FILES.getlist('uploaded_subtitle', [])
+  # print "\n\n\n\n",uploaded_subtitle
+    
+  # print "\n\n\n\n\n\n\n ","if_transcript",if_transcript,"if_subtitle",if_subtitle
   if if_subtitle == "True":
-    subtitle_obj = create_assetcontent(ObjectId(asset_obj),uploaded_files[0].name,group_id,request.user.id,files=uploaded_files,resource_type='File')
+    subtitle_obj = create_assetcontent(ObjectId(asset_obj),uploaded_subtitle[0].name,group_id,request.user.id,files=uploaded_subtitle,resource_type='File')
     rt_subtitle = node_collection.one({'_type':'RelationType', 'name':'has_subtitle'})
     subtitle_list = [ObjectId(subtitle_obj._id)]
     
     subtitle_grels = triple_collection.find({'_type': 'GRelation', \
-    'relation_type': rt_subtitle._id,'subject': subtitle_obj._id},
+    'relation_type': rt_subtitle._id,'subject': ObjectId(assetcontentid)},
     {'_id': 0, 'right_subject': 1})
     for each_asset in subtitle_grels:
       subtitle_list.append(each_asset['right_subject'])
     sub_grel = create_grelation(ObjectId(assetcontentid), rt_subtitle, subtitle_list)  
+    # print "++++++++++++++++++++++",subtitle_obj,sub_grel
+    return StreamingHttpResponse("success")
+  
+  if if_transcript == "True":
+    rt_transcript = node_collection.one({'_type':'RelationType', 'name':'has_transcript'})
+    transcript_obj = create_assetcontent(ObjectId(asset_obj),uploaded_transcript[0].name,group_id,request.user.id,files=uploaded_transcript,resource_type='File')
+    transcript_list = [ObjectId(transcript_obj._id)]
+    
+    transcript_grels = triple_collection.find({'_type': 'GRelation', \
+    'relation_type': rt_transcript._id,'subject': ObjectId(assetcontentid)},
+    {'_id': 0, 'right_subject': 1})
+    for each_trans in transcript_grels:
+      transcript_list.append(each_trans['right_subject'])
+    trans_grel = create_grelation(ObjectId(assetcontentid), rt_transcript, transcript_list)  
     # print "++++++++++++++++++++++",subtitle_obj,sub_grel
     return StreamingHttpResponse("success")
     
