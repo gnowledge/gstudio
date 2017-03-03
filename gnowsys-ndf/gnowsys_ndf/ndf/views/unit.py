@@ -64,16 +64,16 @@ def unit_create_edit(request, group_id, unit_group_id=None):
             return HttpResponseRedirect(reverse('list_units', kwargs={'group_id': group_id}))
         unit_node = result[1]
         return HttpResponseRedirect(reverse('unit_detail', 
-            kwargs={'group_id': unit_node._id, 'unit_group_id': unit_node._id}))
+            kwargs={'group_id': unit_node._id}))
     
 
 @get_execution_time
-def unit_detail(request, group_id, unit_group_id):
+def unit_detail(request, group_id):
     '''
     detail of of selected units
     '''
-    parent_group_name, parent_group_id = Group.get_group_name_id(group_id)
-    unit_group_obj = Group.get_group_name_id(unit_group_id, get_obj=True)
+    # parent_group_name, parent_group_id = Group.get_group_name_id(group_id)
+    unit_group_obj = Group.get_group_name_id(group_id, get_obj=True)
 
     # {
     # [{
@@ -120,8 +120,8 @@ def unit_detail(request, group_id, unit_group_id):
     # print unit_structure
     req_context = RequestContext(request, {
                                 'title': 'unit_authoring',
-                                'group_id': parent_group_id,
-                                'groupid': parent_group_id,
+                                'group_id': group_id,
+                                'groupid': group_id,
                                 'unit_obj': unit_group_obj,
                                 'unit_structure': json.dumps(unit_structure)
                             })
