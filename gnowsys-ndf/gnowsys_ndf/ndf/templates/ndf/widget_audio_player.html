@@ -1,11 +1,18 @@
 {% load i18n %}
 {% load ndf_tags %}
 
-
-<div class="audio-player-area" id="audio-player-{{audio_obj.pk}}">
-{% if 'audio' in audio_obj.if_file.mime_type %}
-                <audio src="{{MEDIA_URL}}{{audio_obj.if_file.original.relurl}}" controls loop>
-                  <p>{% trans 'Your browser does not support the audio element' %} </p>
-                </audio>
-{% endif %}
+	<div id="scstyle">
+	 <audio controls="" width="100px" id="audio-player-{{audio_obj.pk}}">
+	 {% if 'audio' in audio_obj.if_file.mime_type %}
+	 <source src="{{MEDIA_URL}}{{audio_obj.if_file.original.relurl}}" type="audio/mp3"/>
+	 </audio>
+ 	<!-- Transcript -->
+    <form class="trans-form">
+    <input align="right" id="toggler" type="checkbox"/>
+    <label class="toggle-me" for="toggler">Transcript <img class="arrow-toggle"><i class="fa fa-chevron-right" aria-hidden="true"></i></img></label>
+    <div class="transcript">
+       
+    </div>
+	</form>
 </div>
+	{% endif %}
