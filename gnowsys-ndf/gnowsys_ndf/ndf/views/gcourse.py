@@ -3165,9 +3165,10 @@ def course_pages(request, group_id, page_id=None):
     group_name = group_obj.name
     template = 'ndf/gevent_base.html'
 
-    page_gst_name, page_gst_id = GSystemType.get_gst_name_id("Asset")
+    page_gst_name, page_gst_id = GSystemType.get_gst_name_id("Page")
     all_pages = node_collection.find({'member_of': page_gst_id,
-                'content': {'$regex': 'clix-activity-styles.css', '$options': 'i'}})
+                # 'content': {'$regex': 'clix-activity-styles.css', '$options': 'i'}
+                })
     context_variables = {
             'group_id': group_id, 'groupid': group_id, 'group_name':group_name,
             'group_obj': group_obj, 'title': 'course_pages', 'all_pages': all_pages
@@ -3183,15 +3184,8 @@ def save_course_page(request, group_id):
     group_id = group_obj._id
     group_name = group_obj.name
     template = 'ndf/gevent_base.html'
-    page_gst_name, page_gst_id = GSystemType.get_gst_name_id("Asset")
-    all_pages = node_collection.find({'member_of': page_gst_id,
-                'content': {'$regex': 'clix-activity-styles.css', '$options': 'i'}})
-    context_variables = {
-            'group_id': group_id, 'groupid': group_id, 'group_name':group_name,
-            'group_obj': group_obj, 'title': 'course_pages', 'all_pages': all_pages
-            }
+    page_gst_name, page_gst_id = GSystemType.get_gst_name_id("Page")
     if request.method == "POST":
-
         name = request.POST.get("name", "")
         content = request.POST.get("content_org", "")
         page_obj = node_collection.collection.GSystem()
@@ -3199,11 +3193,12 @@ def save_course_page(request, group_id):
         page_obj.name = unicode(name)
         page_obj.content = unicode(content)
         page_obj.member_of = [page_gst_id]
+        page_obj.group_set = [group_id]
         page_obj.save(groupid=group_id)
 
         return HttpResponseRedirect(reverse('course_pages', kwargs={'group_id': group_id}))
 
-def load_data(request, group_id):
+def load_content_data(request, group_id):
     node_id = request.GET.get("node_id", "")
     node = node_collection.one({'_id': ObjectId(node_id)})
     template = 'ndf/node_ajax_content.html'

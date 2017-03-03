@@ -5,12 +5,13 @@
 
 <script type="text/javascript" src="/static/ndf/bower_components/foundation/js/foundation.min.js"></script>
 <script type="text/javascript" src="/static/ndf/bower_components/handlebars/handlebars.min.js"></script>
+
 {% endblock %}
 {% block body_content %}
     <div class="course_creator_header">
         <div class="left back_to_group">
             <span>
-                <a href="#">
+                <a href="{% url 'explore_basecourses' %}">
                     <svg width="13px" height="48px" viewBox="20 14 13 22" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
                         <!-- Generator: Sketch 42 (36781) - http://www.bohemiancoding.com/sketch -->
                         <desc>Created with Sketch.</desc>
@@ -37,7 +38,15 @@
                 <div class="course_tree">
                     <dl class="accordion course-lessons" data-accordion role="tablist">
                     </dl>
-                    <button type="button" class="button-hollow-grey add-lesson">Add Lesson</button>
+                    <a href="#" class="button-hollow-grey add-lesson" data-reveal-id="myModal">Add Lesson</a>
+                      <div id="myModal" class="reveal-modal" data-reveal aria-labelledby="modalTitle" aria-hidden="true" role="dialog">
+                        <h3>Lesson Name</h3>
+                        <input type="text" id="lesson-name">
+                        <button type="button" class="button-hollow-grey save-lesson">
+                          Save Lesson
+                        </button>
+                        <a class="close-reveal-modal" aria-label="Close">&#215;</a>
+                      </div>
                 </div>
                 <div class="course-editor-section hide">
                     <div class="activity-editor hide">
@@ -274,6 +283,9 @@
                                 <li>
                                     <a href="#">Create from existing template</a>
                                 </li>
+                                <li>
+                                    <a href="#">Select from Pages</a>
+                                </li>
                             </ul>
                         </div>
                     </li>
@@ -282,244 +294,286 @@
         </dd>
     </script>
     {% endverbatim %}
-
     <!-- Javascript operations -->
-    <script type="text/javascript">
-        var course_data = [
-            {
-                name: 'Lesson1',
-                type: 'lesson',
-                id: 'l1',
-                activities: [
-                    {
-                        name: 'Activity 1',
-                        type: 'activity',
-                        id: 'a1'
-                    },
-                    {
-                        name: 'Activity 1',
-                        type: 'activity',
-                        id: 'a2'
-                    }
-                ]
-            }, {
-                name: 'Lesson2',
-                type: 'lesson',
-                id: 'l2',
-                activities: [
-                    {
-                        name: 'Activity 1',
-                        type: 'activity',
-                        id: 'a1'
-                    },
-                    {
-                        name: 'Activity 1',
-                        type: 'activity',
-                        id: 'a2'
-                    }
-                ]
-            }, {
-                name: 'Lesson3',
-                type: 'lesson',
-                id: 'l3',
-                activities: [
-                    {
-                        name: 'Activity 1',
-                        type: 'activity',
-                        id: 'a1'
-                    },
-                    {
-                        name: 'Activity 1',
-                        type: 'activity',
-                        id: 'a2'
-                    }
-                ]
+  <script type="text/javascript">
+    // var course_data = [
+    //     {
+    //         name: 'Lesson1',
+    //         type: 'lesson',
+    //         id: 'l1',
+    //         activities: [
+    //             {
+    //                 name: 'Activity 1',
+    //                 type: 'activity',
+    //                 id: 'a1'
+    //             },
+    //             {
+    //                 name: 'Activity 1',
+    //                 type: 'activity',
+    //                 id: 'a2'
+    //             }
+    //         ]
+    //     }, {
+    //         name: 'Lesson2',
+    //         type: 'lesson',
+    //         id: 'l2',
+    //         activities: [
+    //             {
+    //                 name: 'Activity 1',
+    //                 type: 'activity',
+    //                 id: 'a1'
+    //             },
+    //             {
+    //                 name: 'Activity 1',
+    //                 type: 'activity',
+    //                 id: 'a2'
+    //             }
+    //         ]
+    //     }, {
+    //         name: 'Lesson3',
+    //         type: 'lesson',
+    //         id: 'l3',
+    //         activities: [
+    //             {
+    //                 name: 'Activity 1',
+    //                 type: 'activity',
+    //                 id: 'a1'
+    //             },
+    //             {
+    //                 name: 'Activity 1',
+    //                 type: 'activity',
+    //                 id: 'a2'
+    //             }
+    //         ]
+    //     }
+    // ];
+    var course_data = {{unit_structure|safe}};
+    // console.log(course_data)
+    $(function(){
+
+        /**
+        *    Tree related javascript
+        *
+        */
+
+        // Initializing foundation accordian
+        $(document).foundation({
+            accordion: {
+                multi_expand: true
             }
-        ];
-        $(function(){
+        });
 
-            /**
-            *    Tree related javascript
-            *
-            */
+        // Rendering function for the course tree
+        var course_source = $("#lesson-template").html();
+        var course_template = Handlebars.compile(course_source);
 
-            // Initializing foundation accordian
-            $(document).foundation({
-                accordion: {
-                    multi_expand: true
-                }
+        function renderCourseTree(data) {
+            var courseHtml = '';
+            $.each(data, function(ind, lesson){
+                courseHtml += course_template(lesson);
             });
+            $('.course_editor .course-lessons').html(courseHtml);
 
-            // Rendering function for the course tree
-            var course_source = $("#lesson-template").html();
-            var course_template = Handlebars.compile(course_source);
+            assignEvents();
 
-            function renderCourseTree(data) {
-                var courseHtml = '';
-                $.each(data, function(ind, lesson){
-                    courseHtml += course_template(lesson);
-                });
-                $('.course_editor .course-lessons').html(courseHtml);
-
-                assignEvents();
-
-            }
+        }
 
 
-            //Managing states and events on the tree.
-            var lastClickedActivity;
-            var selectedEntity;
-            var selectedEntityId;
-            var editorMode = 'view';
+        //Managing states and events on the tree.
+        var lastClickedActivity;
+        var selectedEntity;
+        var selectedEntityId;
+        var editorMode = 'view';
 
-            function assignEvents() {
-                lastClickedActivity = undefined;
-                $(document).foundation('accordion', 'reflow');
-            }
-
-
-            /*
-            * Handlers and actions for the lesson
-            */
-
-            $('.course-lessons').on('click', '.edit_lesson' ,function(e){
-                e.stopPropagation();
-                e.preventDefault();
-            });
-            // Edit a lesson
-            $('.course-lessons').on('click', '.lesson_edit' ,function(e){
-                e.stopPropagation();
-                e.preventDefault();
-                $('.course_editor').addClass('edit_mode');
-                var lesson_id = $(this).closest('a').attr('href').replace('#lesson-', '');
-
-                selectedEntity = 'lesson';
-                selectedEntityid = lesson_id;
-
-                setTimeout(function(){
-                    $('.course-editor-section').removeClass('hide');
-                }, 1000);
-                $('.lesson-editor').removeClass('hide');
-                $('.activity-editor').addClass('hide');
-
-                //Ajax to get the data for the activity
-            });
+        function assignEvents() {
+            lastClickedActivity = undefined;
+            $(document).foundation('accordion', 'reflow');
+        }
 
 
-            // Move a lesson down
-            $('.course-lessons').on('click', '.lesson_move_down' ,function(e){
-                e.stopPropagation();
-                e.preventDefault();
+        /*
+        * Handlers and actions for the lesson
+        */
 
-                var lesson_id = $(this).closest('a').attr('href').replace('#lesson-', '');
+        $('.course-lessons').on('click', '.edit_lesson' ,function(e){
+            e.stopPropagation();
+            e.preventDefault();
+        });
+        // Edit a lesson
+        $('.course-lessons').on('click', '.lesson_edit' ,function(e){
+            e.stopPropagation();
+            e.preventDefault();
+            $('.course_editor').addClass('edit_mode');
+            var lesson_id = $(this).closest('a').attr('href').replace('#lesson-', '');
 
-                //Ajax to move the lesson up.
-                console.log('Ajax call to move an activity. ' + lesson_id);
-                //Update the course_data after successful movedown and call rerender.
+            selectedEntity = 'lesson';
+            selectedEntityid = lesson_id;
 
-            });
+            setTimeout(function(){
+                $('.course-editor-section').removeClass('hide');
+            }, 1000);
+            $('.lesson-editor').removeClass('hide');
+            $('.activity-editor').addClass('hide');
 
-            // Move a lesson up
-            $('.course-lessons').on('click', '.lesson_move_up' ,function(e){
-                e.stopPropagation();
-                e.preventDefault();
-
-                var lesson_id = $(this).closest('a').attr('href').replace('#lesson-', '');
-
-                //Ajax to move the lesson up.
-                console.log('Ajax call to move an activity. ' + lesson_id);
-                //Update the course_data after successful moveup and call rerender.
-
-            });
-
-            // Delete a lesson
-            $('.course-lessons').on('click', '.lesson_delete' ,function(e){
-                e.stopPropagation();
-                e.preventDefault();
-
-                var lesson_id = $(this).closest('a').attr('href').replace('#lesson-', '');
-
-                //Ajax to delete the lesson.
-                console.log('Ajax call to delete an activity. ' + lesson_id);
-                //Update the course_data after successful delete and call rerender.
-
-            });
-
-            //Add a lesson
-            $('.course_tree').on('click', '.add-lesson', function(){
-                console.log('Adding another lessson');
-                //Send the query and update the course_data and call 'renderCourseTree(course_data)'
-                //To edit the newly created lesson run this $('a[href="#lesson-'+newid+'"] .edit_lesson').trigger('click');
-            })
+            //Ajax to get the data for the activity
+        });
 
 
+        // Move a lesson down
+        $('.course-lessons').on('click', '.lesson_move_down' ,function(e){
+            e.stopPropagation();
+            e.preventDefault();
+
+            var lesson_id = $(this).closest('a').attr('href').replace('#lesson-', '');
+
+            //Ajax to move the lesson up.
+            console.log('Ajax call to move an activity. ' + lesson_id);
+            //Update the course_data after successful movedown and call rerender.
+
+        });
+
+        // Move a lesson up
+        $('.course-lessons').on('click', '.lesson_move_up' ,function(e){
+            e.stopPropagation();
+            e.preventDefault();
+
+            var lesson_id = $(this).closest('a').attr('href').replace('#lesson-', '');
+
+            //Ajax to move the lesson up.
+            console.log('Ajax call to move an activity. ' + lesson_id);
+            //Update the course_data after successful moveup and call rerender.
+
+        });
+
+        // Delete a lesson
+        $('.course-lessons').on('click', '.lesson_delete' ,function(e){
+            e.stopPropagation();
+            e.preventDefault();
+
+            var lesson_id = $(this).closest('a').attr('href').replace('#lesson-', '');
+
+            //Ajax to delete the lesson.
+            console.log('Ajax call to delete an activity. ' + lesson_id);
+            //Update the course_data after successful delete and call rerender.
+
+        });
 
 
+        function addLesson(unitName, unitId) {
+          /*
+          addLesson()
+          - to add lesson of unit.
+          */
+          result = undefined;
+          $.ajax({
+              type: "POST",
+              data:{
+                  'csrfmiddlewaretoken': "{{csrf_token}}",
+                  "name": unitName,
+                  "unit_id": "{{unit_obj.pk}}"
+              },
+              url: "{% url 'lesson_create_edit' group_id %}",
+              // datatype: "",
+              success: function(data) {
+                  if(data){
+                      data=data;
+                      console.log(typeof(data));
+                      console.log(data);
+                      renderCourseTree(JSON.parse(data));
+                      // alert('Lesson saved successfully!');
+                      result = true;
+                      $('#myModal').foundation('reveal', 'close');
+                      return result;
+                  }
+                  else{
+                      alert('Save did not happen. Please try agin.');
+                      result = false;
+                      // console.log(result)
+                      return result;
+                  }
+              }
+          });
 
-            /*
-            * Handlers and actions for the Activity
-            */
-
-            // Selecting a activity.
-            $('.course-lessons').on('click', '.course-activities a', function(e){
-                e.preventDefault();
-
-                $('.course-lessons li[id^="activity-"]').removeClass('active');
-                $(this).closest('li').addClass('active');
-                var activity_id = $(this).closest('li').attr('id').replace('activity-', '');
-                selectedEntity = 'activity';
-                selectedEntityid = activity_id;
-
-                setTimeout(function(){
-                    $('.course-editor-section').removeClass('hide');
-                }, 1000);
-
-                //Ajax to get the data for this activity.
-                $('.lesson-editor').addClass('hide');
-                $('.activity-editor').removeClass('hide');
-                $('.course_editor').addClass('edit_mode');
-            });
-
-            // Add a new activity
-            $('.course-lessons').on('click', '.add_activity', function(){
-                var lesson_id = $(this).closest('div').attr('id').replace('lesson-', '');
-                console.log('Adding another activity for lessson ' + lesson_id);
-                //Send the query and update the course_data and call 'renderCourseTree(course_data)'
-                //To select the newly created activity run this $('#activity-' + newid).trigger('click');
-            });
-
-            renderCourseTree(course_data);
+          console.log(result)
+          return result;
+        }
 
 
+        //Add a lesson
+        $('.save-lesson').on('click', function(){
+            console.log('Adding another lessson');
+            addLesson($('#lesson-name').val().trim(), 'unitId')
 
-            /**
-            *    Editor area related javascript
-            *   selectedEntity has the selected Entity type
-            *   selectedEntityId has the selected Entity Id.
-            */
-
-            // Add the jquery specific to the editor area such as the modal button handlers.
-
-            $('.course-editor-section').on('click', '.delete_entity', function(){
-                // Call ajax
-            });
-
-            $('.course-editor-section').on('click', '.save_template', function(){
-                //Call ajax
-            });
-
-            $('.course-editor-section').on('click', '.save_edit_activity', function(){
-                if (editorMode === 'view') {
-                    console.log('Editing the activity');
-                    editorMode = 'edit';
-                    $('.save_edit_activity').html('Save');
-                } else {
-                    editorMode = 'view';
-                    console.log('Saving the activity');
-                    //Do the ajax to save the activity and then following command;
-                    $('.save_edit_activity').html('Edit');
-                }
-            })
+            //Send the query and update the course_data and call 'renderCourseTree(course_data)'
+            //To edit the newly created lesson run this $('a[href="#lesson-'+newid+'"] .edit_lesson').trigger('click');
         })
-    </script>
+
+
+        /*
+        * Handlers and actions for the Activity
+        */
+
+        // Selecting a activity.
+        $('.course-lessons').on('click', '.course-activities a', function(e){
+            e.preventDefault();
+
+            $('.course-lessons li[id^="activity-"]').removeClass('active');
+            $(this).closest('li').addClass('active');
+            var activity_id = $(this).closest('li').attr('id').replace('activity-', '');
+            selectedEntity = 'activity';
+            selectedEntityid = activity_id;
+
+            setTimeout(function(){
+                $('.course-editor-section').removeClass('hide');
+            }, 1000);
+
+            //Ajax to get the data for this activity.
+            $('.lesson-editor').addClass('hide');
+            $('.activity-editor').removeClass('hide');
+            $('.course_editor').addClass('edit_mode');
+        });
+
+        // Add a new activity
+        $('.course-lessons').on('click', '.add_activity', function(){
+            var lesson_id = $(this).closest('div').attr('id').replace('lesson-', '');
+            console.log('Adding another activity for lessson ' + lesson_id);
+            //Send the query and update the course_data and call 'renderCourseTree(course_data)'
+            //To select the newly created activity run this $('#activity-' + newid).trigger('click');
+        });
+
+        console.log(course_data)
+        renderCourseTree(course_data);
+
+
+
+        /**
+        *    Editor area related javascript
+        *   selectedEntity has the selected Entity type
+        *   selectedEntityId has the selected Entity Id.
+        */
+
+        // Add the jquery specific to the editor area such as the modal button handlers.
+
+        $('.course-editor-section').on('click', '.delete_entity', function(){
+            // Call ajax
+        });
+
+        $('.course-editor-section').on('click', '.save_template', function(){
+            //Call ajax
+        });
+
+        $('.course-editor-section').on('click', '.save_edit_activity', function(){
+            if (editorMode === 'view') {
+                console.log('Editing the activity');
+                editorMode = 'edit';
+                $('.save_edit_activity').html('Save');
+            } else {
+                editorMode = 'view';
+                console.log('Saving the activity');
+                //Do the ajax to save the activity and then following command;
+                $('.save_edit_activity').html('Edit');
+            }
+        })
+    })
+  </script>
 {% endblock body_content %}

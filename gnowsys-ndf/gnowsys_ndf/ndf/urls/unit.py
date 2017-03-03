@@ -9,4 +9,8 @@ urlpatterns = patterns('gnowsys_ndf.ndf.views.unit',
                         url(r'^/edit/(?P<unit_group_id>[\w-]+)/?$', 'unit_create_edit', name='unit_edit'),
                         # detail
                         url(r'^/(?P<unit_group_id>[\w-]+)/?$', 'unit_detail', name='unit_detail'),
+
+                        # LESSON
+                        # create
+                        url(r'^/lesson/create/?$', 'lesson_create_edit', name='lesson_create_edit'),
 )

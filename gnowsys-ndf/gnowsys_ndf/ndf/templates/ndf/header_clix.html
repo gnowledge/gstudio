@@ -7,7 +7,7 @@
 <nav class="top-bar" data-topbar role="navigation" id="menu_bar_gstudio">
         <ul class="title-area">
             <li class="name show-for-medium-up">
-                <a class="loggedin-user" href="#">
+                <a class="loggedin-user" href="{% url 'landing_page' %}">
                 <img src="https://clix.tiss.edu/wp-content/uploads/2015/12/curriculum-icons-clix-1.png">
                 </a>
             </li>
@@ -26,9 +26,9 @@
             <!-- Right Nav Section -->
 
             <ul class="right show-for-medium-up">
-                <li class=""><a href="#">Blog</a></li>
+<!--                 <li class=""><a href="#">Blog</a></li>
                 <li class=""><a href="#"><i class="icons-medium fi-info"></i>&nbsp;Help Topics</a></li>
-              {% if user.is_authenticated %}
+ -->              {% if user.is_authenticated %}
 
                 <li class="has-dropdown">
                     {% get_profile_pic request.user.pk as prof_pic %}

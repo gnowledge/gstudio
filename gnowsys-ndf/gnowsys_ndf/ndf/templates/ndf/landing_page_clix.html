@@ -48,15 +48,12 @@
 
                             {% else %}
 
-                            
+                            {% get_explore_url as explore_url %}
+                            <a class="explore-button small expand" href="{% url explore_url %}">
                               <div class="small-6 medium-6 text-center columns end explore-button">
-                                  {% get_explore_url as explore_url %}
-                                  
-                                  <a class="explore-button small expand" href="{% url explore_url %}">Explore Groups
-                                  </a>
-                                                                
+                                  Explore Groups
                               </div>
-                            
+                            </a>
 
 
 
