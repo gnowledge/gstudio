@@ -631,15 +631,16 @@ ul.horizontal_tabs_gstudio {
 .asset_tile {
     margin-top: 10px;
     padding-bottom: 10px;
-    border: 2px solid #eee;
+    border: 1px solid #eee;
     cursor: pointer;
-    margin-left: 3px;
+    //margin-left: 3px;
 
     .asset_preview {
         min-height: 200px;
-        margin-left: 5px;
+        //margin-left: 5px;
+        width:100%;
         //background-color: #eee;
-        background: url(/static/ndf/images/resource.png)no-repeat;
+        background: url(/static/ndf/images/asset_thumbnail.png)no-repeat;
     }
 
     .asset_text {
