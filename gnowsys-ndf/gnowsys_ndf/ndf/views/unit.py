@@ -56,7 +56,7 @@ def unit_create_edit(request, group_id, unit_group_id=None):
                                         member_of=gst_base_unit_id,
                                         node_id=unit_group_id)
 
-        print result
+        # print result
         return HttpResponse(int(result[0]))
 
 
@@ -108,7 +108,7 @@ def unit_detail(request, group_id, unit_group_id):
             unit_structure.append(lesson_dict)
 
     template = "ndf/unit_structure.html"
-    print unit_structure
+    # print unit_structure
     req_context = RequestContext(request, {
                                 'group_id': parent_group_id,
                                 'unit_obj': unit_group_obj,
