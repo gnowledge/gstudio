@@ -6590,17 +6590,17 @@ def create_edit_asset(request,group_id):
   asset_name =  str(request.POST.get("asset_name", '')).strip()
   asset_desc =  str(request.POST.get("asset_description", '')).strip()
   # print asset_desc,"---------------------------------"
-  asset_objective = str(request.POST.get("asset_objective", '')).strip()
+  # asset_objective = str(request.POST.get("asset_objective", '')).strip()
   asset_obj = create_asset(name=asset_name,group_id=group_id,created_by=request.user.id,content=unicode(asset_desc))
-  rt_teaches = node_collection.one({'_type':'RelationType', 'name':'teaches'})
-  teaches_list = [ObjectId(asset_objective)]
-  asset_grels = triple_collection.find({'_type': 'GRelation', \
-    'relation_type': rt_teaches._id,'subject': asset_obj._id},
-    {'_id': 0, 'right_subject': 1})
+  # rt_teaches = node_collection.one({'_type':'RelationType', 'name':'teaches'})
+  # teaches_list = [ObjectId(asset_objective)]
+  # asset_grels = triple_collection.find({'_type': 'GRelation', \
+  #   'relation_type': rt_teaches._id,'subject': asset_obj._id},
+  #   {'_id': 0, 'right_subject': 1})
 
-  for each_asset in asset_grels:
-    teaches_list.append(each_asset['right_subject'])
-  create_grelation(asset_obj._id, rt_teaches, teaches_list)
+  # for each_asset in asset_grels:
+  #   teaches_list.append(each_asset['right_subject'])
+  # create_grelation(asset_obj._id, rt_teaches, teaches_list)
 
   return StreamingHttpResponse(asset_obj.pk)
 

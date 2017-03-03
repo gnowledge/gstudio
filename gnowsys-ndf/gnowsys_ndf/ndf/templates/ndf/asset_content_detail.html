@@ -48,7 +48,6 @@
 
 
             console.log(selectedSubtitle)
-            alert("55555")
         // assetval = $('.asset_obj_val').attr('data-asset-obj-val');
         // Update button text.
         // uploadButton.innerHTML = 'Uploading...';
@@ -102,6 +101,7 @@
             else if(xhr.responseText )
             {
               alert(xhr.responseText);
+              location.reload();
             }
 
             uploadButton.innerHTML = 'Upload';
@@ -126,7 +126,6 @@
 
   // var form = document.getElementById('docsubtitle');
   $( ".save-transcript" ).click(function() {
-    alert("0000000000000000000");
   var selectedtrans = document.getElementById('doctranscriptfile');
   // var uploadButton = document.getElementById('submitpostid');
             // console.log(selectedSubtitle)
@@ -180,6 +179,7 @@
             else if(xhr.responseText )
             {
               alert(xhr.responseText);
+              location.reload();
             }
 
             //uploadButton.innerHTML = 'Upload';
