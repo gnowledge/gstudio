@@ -1,20 +1,32 @@
+<div class="elibrary-actions">
+    <button type="button" class="right orange-button createActivityPage">
+        <i class="fi-plus"> </i>
+        Add Activity Page
+    </button>
+</div>
 
 <div id="addActivityPage" class="hide">
-<form id ="course_page_form" enctype="multipart/form-data" method="post" action="{% url 'save_course_page' group_id %}">{% csrf_token %}
-        <div class="medium-8 columns name-div">
-            <input type="text" name="name" placeholder="Enter name of Page">
-        </div>
-        <br/>
-        <div class="medium-8 columns editor-div">
-            {% include "ndf/html_editor.html" with var_name="content_org" var_placeholder="Enter the content here" var_value="" ckeditor_toolbar="GeneralToolbar" %}
-        </div>
-        <input type="hidden" name="node_id" class="form_node_id">
-        <span class="right">
-            <a  class="tiny button radius existing-template">Create page from existing template</a>
-        </span>
+    <form id ="course_page_form" enctype="multipart/form-data" method="post" action="{% url 'save_course_page' group_id %}">{% csrf_token %}
+        <div>
+            <div class="row">
+                <div class="medium-8 columns name-div">
+                    <input type="text" name="name" placeholder="Enter name of Page">
+                </div>
+            </div>
+            <div class="row">
+                <div class="medium-8 columns editor-div">
+                    {% include "ndf/html_editor.html" with var_name="content_org" var_placeholder="Enter the content here" var_value="" ckeditor_toolbar="GeneralToolbar" %}
+                </div>
+                <div class="medium-4 columns">
+                    <a  class="tiny button radius existing-template">Create page from existing template</a>
+                </div>
+            </div>
+            <input type="hidden" name="node_id" class="form_node_id">
 
-        <input type="submit" class="button small" name="saveActivityPage" value="Save">
-</form>
+            <input type="submit" class="button small" name="saveActivityPage" value="Save">
+            <input type="button" class="button small cancel-page-create" value="Cancel">
+        </div>
+    </form>
 </div>
 <div id="page-view" class="reveal-modal medium" data-reveal aria-hidden="true" role="dialog">
     <div class="page-content"></div>
@@ -25,12 +37,6 @@
     <a class="close-reveal-modal" >&#215;</a>
 </div>
 <div id="page_listing">
-<div class="elibrary-actions">
-    <button type="button" class="right orange-button createActivityPage">
-        <i class="fi-plus"> </i>
-        Add Activity Page
-    </button>
-</div>
 
 <div class="row"> 
       {% for each in all_pages %}
@@ -53,10 +59,15 @@
                 $("#addActivityPage").removeClass("hide")
                 $("#page_listing").addClass("hide")
             });
+            $( ".cancel-page-create" ).click(function() {
+                $("#addActivityPage").addClass("hide")
+                $("#page_listing").removeClass("hide")
+            });
+
             $(document).on('click','.view-page',function(){
                 node_id = $(this).attr('data-page-id')
                 $.ajax({
-                url: "{% url 'load_data' group_id %}",
+                url: "{% url 'load_content_data' group_id %}",
 
                 data: {
                   node_id: node_id,
