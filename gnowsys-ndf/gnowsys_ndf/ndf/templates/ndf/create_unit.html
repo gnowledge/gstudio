@@ -7,18 +7,28 @@
             <form id ="course_page_form" enctype="multipart/form-data" method="post" action="{% url 'unit_create_edit' group_id %}">{% csrf_token %}
                 <div class="course_creator_header">
                     <div class="left course_heading">
+                    <h4>Unit Name:</h4>
+                    </div>
+                    <div class="right course_heading">
                         <input id="unit-name" name="name" type="text" placeholder="Enter unit name"/>
                     </div>
                 </div>
+                <hr/>
+
                 <div class="course_creator_header">
                     <div class="left course_heading">
+                    <h4>Unit display Name:</h4>
+                    </div>
+                    <div class="right course_heading">
                         <input id="unit-altnames" name="altnames" type="text" placeholder="Enter unit display name"/>
                     </div>
                 </div>
                 <div class="right course_actions">
-                    <ul>
-                        <li><input type="submit" name="save" value="Save" class="save-unit"></li>
-                    </ul>
+                    
+                        <!--<button asset-save-button type="button" class ="right orange-button save-asset" id="" value="Save"/>-->
+                       <!-- <li><input type="submit" name="save" value="Save" class="save-unit"></li>-->
+                       <input type="submit" class ="asset-save-button" id="" value="Save"/>
+                    
                 </div>
             </form>
         </div>

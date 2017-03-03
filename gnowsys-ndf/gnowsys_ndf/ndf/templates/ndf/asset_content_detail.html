@@ -1,7 +1,7 @@
     <div class="row">
             <div class="small-12 medium-6 large-6 columns">
             <h6>
-                <b><u>Asset Content Preview </u>&nbsp; ></b>
+                &nbsp;&nbsp;&nbsp;<b><u>Asset Content Preview </u>&nbsp; ></b>
                <!-- Resource Name-->
             </h6>
                 <label>Resource name: <b> {{node.name}} </b>
@@ -14,14 +14,14 @@
                 </label>
                 <div class="transcript_files">
                     <input type="file" placeholder="" name="transcript_file" />
-                    <span class="add_more_files">&nbsp;<u> + Transcript</u></span>
+                    <span class="add_more_files"><br/><u> + Transcript</u></span>
                 </div>
                 <label>Upload Subtitle
                 </label>
                 <div class="subtitle_files">
                     <form class="dropzone" id ="docsubtitle" enctype="multipart/form-data" method="post" action="{% url 'add_assetcontent' group_id %}" >
                         <input type="file" id="docsubtitlefile" placeholder="" name="doc_f" />
-                        <span class="add_more_files"><u>+ Subtitle</u></span>
+                        <span class="add_more_files"><br/><u>+ Subtitle</u></span>
                     </form>
                     <button type="button" class="right orange-button save-asset" onclick="save_asset_cont_data()">Save Asset</button>
                    <!-- <input type="asset-save-button" id="" class="orange-button" onclick="save_asset_cont_data()" value="Save"/>-->
