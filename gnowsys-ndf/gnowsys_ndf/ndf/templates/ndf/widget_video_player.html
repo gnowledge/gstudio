@@ -20,12 +20,12 @@
 		<track kind="captions" label="Hindi" src="" srclang="hi" />
 		</video>
 		</div>
-			{% get_attribute_value video_obj.pk 'has_transcript' as node_transcript %}
-			{% if node_transcript %}
+			{% get_relation_value video_obj.pk 'has_transcript' as transcript_rel %}
+			{% if transcript_rel %}
 
 		<form class="trans-form"><input align="right" id="toggler" type="checkbox" /><label class="toggle-me" for="toggler">Transcript</label><img alt="" class="arrow-toggle" src="../Images/chevron-right.svg" />
 		<div class="transcript">
-			{{node_transcript}}
+			<iframe id="html-res-iframe" width="100%" seamless="seamless" src="{{MEDIA_URL}}{{transcript_rel.grel_node.if_file.original.relurl}}">
 		</div>
 		</form>
 			{% endif %}
