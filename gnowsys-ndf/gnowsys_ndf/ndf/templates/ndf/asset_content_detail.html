@@ -13,8 +13,10 @@
                 <label>Upload Transcript
                 </label>
                 <div class="transcript_files">
-                    <input type="file" placeholder="" name="transcript_file" />
+                   <form class="dropzone" id ="doctranscript" enctype="multipart/form-data" method="post" action="{% url 'add_assetcontent' group_id %}" > 
+                    <input type="file" placeholder="" id="doctranscriptfile" name="transcript_file" />
                     <span class="add_more_files">&nbsp;<u> + Transcript</u></span>
+                    <a class="right orange-button save-asset save-transcript">Save Asset</a>
                 </div>
                 <label>Upload Subtitle
                 </label>
@@ -23,7 +25,7 @@
                         <input type="file" id="docsubtitlefile" placeholder="" name="doc_f" />
                         <span class="add_more_files"><u>+ Subtitle</u></span>
                     </form>
-                    <button type="button" class="right orange-button save-asset" onclick="save_asset_cont_data()">Save Asset</button>
+                    <button type="button" class="right orange-button save-asset" onclick="save_subtitle()">Save Asset</button>
                    <!-- <input type="asset-save-button" id="" class="orange-button" onclick="save_asset_cont_data()" value="Save"/>-->
                 </div>
             </div>
@@ -42,7 +44,11 @@
   // var form = document.getElementById('docsubtitle');
   var selectedSubtitle = document.getElementById('docsubtitlefile');
   // var uploadButton = document.getElementById('submitpostid');
-        function save_asset_cont_data(event) {
+        function save_subtitle(event) {
+
+
+            console.log(selectedSubtitle)
+            alert("55555")
         // assetval = $('.asset_obj_val').attr('data-asset-obj-val');
         // Update button text.
         // uploadButton.innerHTML = 'Uploading...';
@@ -61,7 +67,7 @@
           // if (!file.type.match('image.*')) {  continue; }
 
           // Add the file to the request.
-          formData.append('filehive', file, file.name);
+          formData.append('uploaded_subtitle', file, file.name);
         }
 
         // appending csrfmiddlewaretoken and user-id
@@ -117,4 +123,84 @@
       }
 
   
+
+  // var form = document.getElementById('docsubtitle');
+  $( ".save-transcript" ).click(function() {
+    alert("0000000000000000000");
+  var selectedtrans = document.getElementById('doctranscriptfile');
+  // var uploadButton = document.getElementById('submitpostid');
+            // console.log(selectedSubtitle)
+               // Get the selected files from the input.
+            var files = selectedtrans.files;
+
+            // Create a new FormData object.
+            var formData = new FormData();
+
+            // Loop through each of the selected files.
+            for (var i = 0; i < files.length; i++) {
+              var file = files[i];
+
+              // // Check the file type.
+              // if (!file.type.match('image.*')) {  continue; }
+
+              // Add the file to the request.
+              alert(file)
+              formData.append('uploaded_transcript', file, file.name);
+            }
+
+        // appending csrfmiddlewaretoken and user-id
+        formData.append('csrfmiddlewaretoken', '{{csrf_token}}');
+        formData.append('user','{{request.user.id}}');
+        formData.append('if_transcript','True');
+        formData.append('assetcontentid','{{node.pk}}');
+        
+        if(!"{{asset_obj}}"){
+            formData.append('asset_obj',assetval);
+        }
+        else{
+            formData.append('asset_obj','{{asset_obj}}');
+        }
+        // Set up the request.
+        xhr = new XMLHttpRequest();
+
+        // Open the connection.
+        xhr.open('POST', "{% url 'add_assetcontent' group_id %}", true);
+
+        // Set up a handler for when the request finishes sucessfully.
+        xhr.onload = function () {
+          if (xhr.status === 200) 
+          {
+            // File(s) uploaded.
+           // if file is not uploaded sucessfully
+            if(xhr.responseText == "UploadError")
+            {
+               alert("Error occurred");
+            }
+            // check if image is not in the list, add it.
+            else if(xhr.responseText )
+            {
+              alert(xhr.responseText);
+            }
+
+            //uploadButton.innerHTML = 'Upload';
+
+            // updating metadata of files, if file is uploaded sucessfully
+            // if(xhr.responseText != "UploadError")
+            // {
+            //   // alert('xhr.responseText != "UploadError"');
+            // }
+          }
+          else
+          {
+            alert('An error occurred!');
+          }
+        };
+
+        // Send the Data.
+        xhr.send(formData);
+
+});
+  
 </script>
+
+
