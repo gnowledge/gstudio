@@ -30,8 +30,9 @@
         </div>
     </form>
 </div>
-<div id="page-view" class="reveal-modal medium" data-reveal aria-hidden="true" role="dialog">
+<div class="page-view reveal-modal medium" data-reveal aria-hidden="true" role="dialog">
     <div class="page-content"></div>
+    <a class="right edit-page">Edit</a>
     <a class="close-reveal-modal" >&#215;</a>
 </div>
 <div id="templates-div" class="reveal-modal medium" data-reveal aria-hidden="true" role="dialog">
@@ -41,52 +42,62 @@
 <div id="page_listing">
 
 <div class="row"> 
-      {% for each in all_pages %}
-      <a class="view-page" data-page-id="{{each.pk}}">
-      <div class="small-12 medium-6 large-3 columns">
-        <div class="asset_tile">
-            <div class="asset_preview"></div>
-            <div class="asset_text">
-                <div class="asset_title">{{each.name}}</div>
-                <div class="asset_desc">{{each.content|truncatechars:20}}</div>
+    {% for each in all_pages %}
+        <a class="view-page" data-page-id="{{each.pk}}">
+            <div class="small-12 medium-6 large-3 columns">
+                <div class="asset_tile">
+                    <div class="asset_preview"></div>
+                        <div class="asset_text">
+                            <div class="asset_title">{{each.name}}</div>
+                            <div class="asset_desc">{{each.content|truncatechars:20}}</div>
+                    </div>
+                </div>
             </div>
-        </div>
-    </div>
-    </a>
+        </a>
     {% endfor %}
 </div></div>
 <script type="text/javascript">
     
-            $( ".createActivityPage" ).click(function() {
-                $("#addActivityPage").removeClass("hide")
-                $("#page_listing").addClass("hide")
-            });
-            $( ".cancel-page-create" ).click(function() {
-                $("#addActivityPage").addClass("hide")
-                $("#page_listing").removeClass("hide")
-            });
+    $( ".createActivityPage" ).click(function() {
+        $("#addActivityPage").removeClass("hide")
+        $("#page_listing").addClass("hide")
+    });
 
-            $(document).on('click','.view-page',function(){
-                node_id = $(this).attr('data-page-id')
-                $.ajax({
-                url: "{% url 'load_content_data' group_id %}",
+    $( ".cancel-page-create" ).click(function() {
 
-                data: {
-                  node_id: node_id,
-                },
+        $("#addActivityPage").addClass("hide")
+        $("#page_listing").removeClass("hide")
+    });
 
-                type: "GET",
+    // $(document).on('click','.edit-page',function(){
+    //     console.log($(this).attr("id"))
+    //     $("#addActivityPage").removeClass("hide")
+    //     $("#page_listing").addClass("hide")
+    //     $(".page-view").foundation('reveal','open')
+        
 
-                dataType: "html",
+    // })
 
-                success: function(data){
-                    $(".page-content").html(data)
-                    $("#page-view").foundation('reveal','open')
-                },
-                });//end of ajax
+    $(document).on('click','.view-page',function(){
+        node_id = $(this).attr('data-page-id')
+        $.ajax({
+        url: "{% url 'load_content_data' group_id %}",
 
+        data: {
+          node_id: node_id,
+        },
 
-            });
+        type: "GET",
+
+        dataType: "html",
+
+        success: function(data){
+            $(".edit-page").attr("id", node_id)
+            $(".page-content").html(data)
+            $(".page-view").foundation('reveal','open')
+        },
+        });//end of ajax
+    });
 
     $( ".existing-template" ).click(function() {
         $.ajax({
@@ -97,13 +108,10 @@
 
             },
             success: function(data) {
-             
                 $(".templates-content").html(data);
                 $('#templates-div').foundation('reveal', 'open');
-
             }
         });
-    
     });
 
 </script>

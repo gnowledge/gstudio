@@ -25,6 +25,10 @@
             <div class="row">
                 <div class="small-12 columns group_header">
                     <div class="group_title left">{{group_object.name}}</div>
+                    <div class="right course_actions">
+                      <i class="fi-widget"></i>
+                    </div>
+
                 </div>
             </div>
             <div class="row">
@@ -34,7 +38,7 @@
                             <a href="{% url 'course_about' group_id %}" {% if title == 'about' %}class="selected"{% endif %}>Overview</a>
                         </li>
                         <li >
-                            <a href="{% url 'unit_detail' group_id group_id %}" {% if title == 'unit_authoring' %}class="selected"{% endif %}>Lessons</a>
+                            <a href="{% url 'unit_detail' group_id %}" {% if title == 'unit_authoring' %}class="selected"{% endif %}>Lessons</a>
                             <!-- <a href="#group_blog">Blog</a> -->
                         </li>
                         <li>
