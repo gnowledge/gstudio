@@ -1,40 +1,40 @@
 {% load i18n %}
 {% load ndf_tags %}
-<div class="video-player-area" id="video-player-{{video_obj.pk}}">
-{% if 'video' in video_obj.if_file.mime_type %}
 
-	<video align="center" class="video-js vjs-skin-colors-clix vjs-big-play-centered center" controls="controls" data-setup="{ &quot;playbackRates&quot;: [0.5, 1, 1.5, 2] }" height="360" id="{{video_obj.pk}}" onseeked="myFunction()" onseeking="myFunction()" preload="auto" width="480">
-	<source crossorigin="anonymous" preload="metadata" source="" src="{{MEDIA_URL}}{{video_obj.if_file.original.relurl}}" type="video/mp4; codecs=&quot;avc1.42E01E, mp4a.40.2&quot;" />
-	<source crossorigin="anonymous" preload="metadata" source="" src="{{MEDIA_URL}}{{video_obj.if_file.original.relurl}}" type="video/ogg; codecs=&quot;avc1.42E01E, mp4a.40.2&quot;" />
-	<source crossorigin="anonymous" preload="metadata" source="" src="{{MEDIA_URL}}{{video_obj.if_file.mid.relurl}}" type="video/webm"; codecs=&quot;avc1.42E01E, mp4a.40.2&quot;" /> 
-	<track kind="captions" label="English" src="/media/c/d/e/126b4a223e3af7b0da7b8f04f673e02b10b2547982eea739923fa2e15d7d9.vtt" srclang="en" /> 
-	<track kind="captions" label="Telegu" src="" srclang="te" /> 
-	<track kind="captions" label="Hindi" src="" srclang="hi" />
-	</video>
 
-	
-	<!--<video width="768" height="432" controls="" id="{{video_obj.pk}}" onseeked="myFunction()" onseeking="myFunction()" preload="metadata">
-		<source src="{{MEDIA_URL}}{{video_obj.if_file.mid.relurl}}" type="video/webm" />
-        <source src="{{MEDIA_URL}}{{video_obj.if_file.original.relurl}}" type="video/ogg" />
-        <source src="{{MEDIA_URL}}{{video_obj.if_file.original.relurl}}" type="video/mp4" />
-        <track kind="captions" label="English" srclang="en" src="/media/c/d/e/126b4a223e3af7b0da7b8f04f673e02b10b2547982eea739923fa2e15d7d9">
-	</video>-->
-	{% get_attribute_value video_obj.pk 'has_transcript' as node_transcript %}
-	{% if node_transcript %}
-		<form class="trans-form">
-			<input align="right" id="toggler" type="checkbox" /> 
-			<label class="toggle-me" for="toggler">Transcript</label> 
+<div id="scstyle">
+
+	<div class="video-player-area" id="video-player-{{video_obj.pk}}">
+	{% if 'video' in video_obj.if_file.mime_type %}
+
+		<div class="vidbak">
+		<video id="{{video_obj.pk}}" class="video-js vjs-skin-colors-clix vjs-big-play-button center" controls="controls" data-setup="{ playbackRates: [0.5, 1, 1.5, 2] }" height="360" width="480">
+		<!-- different extension source files to be added -->
+		<!--<source src="{{MEDIA_URL}}{{video_obj.if_file.mid.relurl}}" crossorigin="anonymous" preload="metadata"  type="video/webmp; codecs=&quot;avc1.42E01E, mp4a.40.2 &quot;" /> 
+		<source src="{{MEDIA_URL}}{{video_obj.if_file.original.relurl}}" type="video/ogg; codecs=&quot;avc1.42E01E, mp4a.40.2&quot;" crossorigin="anonymous" preload="metadata"  /> 
+		<source src="{{MEDIA_URL}}{{video_obj.if_file.original.relurl}}" crossorigin="anonymous" preload="metadata" type="video/mp4 codecs=&quot;avc1.42E01E, mp4a.40.2&quot;" /> -->
+		<source src="{{MEDIA_URL}}{{video_obj.if_file.original.relurl}}" type="video/mp4" crossorigin="anonymous" preload="metadata" codecs="avc1.42E01E, mp4a.40.2"/>
+		<!-- adding captions in different language-->
+		<track kind="captions" label="English" src="/media/c/d/e/126b4a223e3af7b0da7b8f04f673e02b10b2547982eea739923fa2e15d7d9" srclang="en" /> 
+		<track kind="captions" label="Telegu" src="" srclang="te" /> 
+		<track kind="captions" label="Hindi" src="" srclang="hi" />
+		</video>
+		</div>
+			{% get_attribute_value video_obj.pk 'has_transcript' as node_transcript %}
+			{% if node_transcript %}
+
+		<form class="trans-form"><input align="right" id="toggler" type="checkbox" /><label class="toggle-me" for="toggler">Transcript</label><img alt="" class="arrow-toggle" src="../Images/chevron-right.svg" />
 		<div class="transcript">
 			{{node_transcript}}
 		</div>
 		</form>
+			{% endif %}
+	</div>
 	{% endif %}
-
-{% endif %}
+			<script>
+			function myFunction() { 
+			    var vid = document.getElementById(id);
+			    document.getElementById("mySpan").innerHTML = "Seeking: " + vid.seeking;
+			} 
+			</script>
 </div>
-<script>
-function myFunction() {
-var vid = document.getElementById(id);
-document.getElementById("mySpan").innerHTML = "Seeking: " + vid.seeking;
-}
-</script>

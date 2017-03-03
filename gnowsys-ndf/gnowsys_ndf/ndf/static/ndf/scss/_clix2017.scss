@@ -637,6 +637,7 @@ ul.horizontal_tabs_gstudio {
 
     .asset_preview {
         min-height: 200px;
+        margin-left: 5px;
         //background-color: #eee;
         background: url(/static/ndf/images/elibrary-01.svg)no-repeat;
     }
@@ -677,6 +678,7 @@ ul.horizontal_tabs_gstudio {
 input[type="text"], input[type="file"] {
     margin: 0px;
     margin-left: 3px;
+    width:90%;
 }
 label {
     margin-top: 1rem;
@@ -708,6 +710,13 @@ input[type="file"] {
     margin-top: 10px;
     border-radius: 4px;
     border: 1px solid #ccc;
+}
+
+input[type="button"] {
+    -webkit-appearance: button;
+    cursor: pointer;
+    margin-top:15px;
+    width:8%;
 }
 
 
