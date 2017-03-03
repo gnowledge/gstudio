@@ -30,13 +30,13 @@
                 {% get_attribute_value node.pk 'has_transcript' as node_transcript %}
                 {% include 'ndf/widget_audio_player.html' with audio_obj=node %}
                  
-                 <a  class="tiny button radius mod-btn" data-reveal-id="add_transcript{{node.pk}}"> {% trans "Add Transcript" %}</a>
+               <!--  <a  class="tiny button radius mod-btn" data-reveal-id="add_transcript{{node.pk}}"> {% trans "Add Transcript" %}</a>
                 <div id="add_transcript{{node.pk}}" class="reveal-modal" data-reveal style="position:absolute;"> 
                   <a class="close-reveal-modal" aria-label="Close">&#215;</a>
                   <textarea>{{node_transcript}}</textarea> 
                   <input onclick="add_transcript_func(this)" type="button" class="tiny button radius add-trans" data-src ="{{node}}"   value="{% trans 'Add' %}">
                   <input type="button" class="tiny button radius "  value="{% trans 'Cancel' %}">
-                </div>
+                </div>-->
   {% elif 'html' in node.if_file.mime_type %}
     <iframe id="html-res-iframe" width="100%" seamless="seamless" src="{{MEDIA_URL}}{{node.if_file.original.relurl}}">
       <p>{% trans 'Your browser does not support the audio element' %} </p>
