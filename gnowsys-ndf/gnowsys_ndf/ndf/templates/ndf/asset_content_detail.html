@@ -1,13 +1,15 @@
-        <h6>
-            <b>&nbsp; &nbsp;<u>All Assets</u>&nbsp; ></b>
-            Resource Name
-        </h6>
-        <div class="row">
+    <div class="row">
             <div class="small-12 medium-6 large-6 columns">
+            <h6>
+                <b><u>Asset Content Preview </u>&nbsp; ></b>
+               <!-- Resource Name-->
+            </h6>
                 <label>Resource name: <b> {{node.name}} </b>
                     
                     <!--<input type="text" placeholder="" name="resource_name" />-->
                 </label>
+            {% if 'video' in node.if_file.mime_type %}
+            <div class="video-related">
                 <label>Upload Transcript
                 </label>
                 <div class="transcript_files">
@@ -25,6 +27,8 @@
                    <!-- <input type="asset-save-button" id="" class="orange-button" onclick="save_asset_cont_data()" value="Save"/>-->
                 </div>
             </div>
+            {% endif %}
+        </div>
             <div class="small-12 medium-6 large-6 columns">
                 <div class="preview_asset"> 
                     {% if title == "asset_content_detail" %}
