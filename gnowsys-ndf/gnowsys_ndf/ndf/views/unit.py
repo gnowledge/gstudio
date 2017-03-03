@@ -63,9 +63,9 @@ def unit_create_edit(request, group_id, unit_group_id=None):
         if not result[0]:
             return HttpResponseRedirect(reverse('list_units', kwargs={'group_id': group_id}))
         unit_node = result[1]
-        return HttpResponseRedirect(reverse('unit_detail', 
+        return HttpResponseRedirect(reverse('unit_detail',
             kwargs={'group_id': unit_node._id}))
-    
+
 
 @get_execution_time
 def unit_detail(request, group_id):
@@ -238,7 +238,7 @@ def activity_create_edit(request, group_id, lesson_id=None):
     lesson_id = request.POST.get('lesson_id')
     lesson_obj = Node.get_node_by_id(lesson_id)
 
-    print "0000000000000000000000000000", lesson_id
+    # print "0000000000000000000000000000", lesson_id
     # parent unit id
     unit_id_post = request.POST.get('unit_id', '')
     unit_group_id = unit_id_post if unit_id_post else unit_group_id
@@ -248,7 +248,7 @@ def activity_create_edit(request, group_id, lesson_id=None):
     if request.method == "POST":
         # activity name
         activity_name = request.POST.get('name', '')
-        print "0000000000000000000000000000", activity_name
+        # print "0000000000000000000000000000", activity_name
         if not activity_name:
             return HttpResponse(0)
 
@@ -269,11 +269,11 @@ def activity_create_edit(request, group_id, lesson_id=None):
                                             created_by=user_id,
                                             status='PUBLISHED')
             new_activity_obj.save(groupid=group_id)
-            print new_activity_obj
-            print"=========================="
-            print lesson_obj.collection_set
+            # print new_activity_obj
+            # print"=========================="
+            # print lesson_obj.collection_set
             lesson_obj.collection_set.append(new_activity_obj._id)
-            print lesson_obj.collection_set
+            # print lesson_obj.collection_set
             lesson_obj.save(groupid=group_id)
 
             unit_structure = []
