@@ -62,6 +62,7 @@
                 {% endif %}
             </div>
         </div>
+        {% comment %}
         <div class="row">
             <div class="small-12 medium-6 large-6 columns">
                 <label>Learning objectives met by this asset
@@ -76,6 +77,7 @@
                 </label>
             </div>
         </div>
+        {% endcomment %}
 
         
     <div class="asset-content-area"{% if not asset_obj %} style="display:none"{% endif %}>
@@ -122,7 +124,7 @@
         asset_objective =  $('#asset_objectivesid').find(':selected').attr('value');
         $.ajax({
               type: "POST",
-              data:{ "works":"works",
+              data:{ 
                     'csrfmiddlewaretoken': "{{csrf_token}}",
                     "asset_name":asset_name,
                     "asset_description":asset_description,
@@ -134,7 +136,7 @@
                 // $('#addAsset').html(data);
                 // $('#addAsset').foundation('reveal', 'open');
                 $('.asset-content-area').css('display', 'block')
-                alert(data)
+                alert("Asset Added Successfully")
                 $('.asset_obj_val').attr('data-asset-obj-val',data);
             }
 
@@ -196,7 +198,8 @@
             // check if image is not in the list, add it.
             else if(xhr.responseText )
             {
-              alert(xhr.responseText);
+              alert("Asset Content added successfully");
+              location.reload();
             }
 
             uploadButton.innerHTML = 'Upload';
