@@ -11,8 +11,9 @@
 	   CKEDITOR.plugins.addExternal('addAudio',basePath+'ndf/js/ckPlugins/addAudio/','plugin.js');
 	   CKEDITOR.plugins.addExternal('addVideo',basePath+'ndf/js/ckPlugins/addVideo/','plugin.js');
 	   CKEDITOR.plugins.addExternal('addJhapp',basePath+'ndf/js/ckPlugins/addJhapp/','plugin.js');
-
-	})();
+	})
+	();
+    CKEDITOR.config.bodyId = 'scstyle';
 
 CKEDITOR.editorConfig = function( config ) {
 	// Define changes to default configuration here.

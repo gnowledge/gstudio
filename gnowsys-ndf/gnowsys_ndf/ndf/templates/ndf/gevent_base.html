@@ -26,9 +26,20 @@
                 <div class="small-12 columns group_header">
                     <div class="group_title left">{{group_object.name}}</div>
                     <div class="right course_actions">
-                      <i class="fi-widget"></i>
-                    </div>
+                        <span data-dropdown="course-settings-drop" aria-controls="course-settings-drop" aria-expanded="false" class="tiny radius right">
+                            <i class="fi-widget"></i>
+                        </span>
+                        <ul id="course-settings-drop" class="f-dropdown" data-dropdown-content aria-hidden="true" tabindex="-1">
+                                <a data-reveal-id="manage_users_modal" href="{% url 'manage_users' group_id %}">Manage Members</a> 
+                                <div id="manage_users_modal" class="reveal-modal large" data-reveal style="position:absolute;"> 
+                                    <div id="group_drawer">
+                                    {% include "ndf/widget_user_search.html" with subscription_status=True %}
+                                    </div>
+                                    <a class="close-reveal-modal">&#215;</a>
+                                </div>          
+                        </ul>
 
+                    </div>
                 </div>
             </div>
             <div class="row">
@@ -41,11 +52,11 @@
                             <a href="{% url 'unit_detail' group_id %}" {% if title == 'unit_authoring' %}class="selected"{% endif %}>Lessons</a>
                             <!-- <a href="#group_blog">Blog</a> -->
                         </li>
-                        <li>
-                            <a href="{% url 'asset_list' group_id %}" {% if title == 'asset_list' or title == 'asset_detail' or title == 'asset_content_detail'%}class="selected"{% endif %}>Assets</a>
+                       <li>
+                            <a href="{% url 'course_pages' group_id %}" {% if title == 'course_pages' %}class="selected"{% endif %}>Activity-Sheets</a>
                         </li>
                         <li>
-                            <a href="{% url 'course_pages' group_id %}" {% if title == 'course_pages' %}class="selected"{% endif %}>Pages</a>
+                            <a href="{% url 'asset_list' group_id %}" {% if title == 'asset_list' or title == 'asset_detail' or title == 'asset_content_detail'%}class="selected"{% endif %}>Assets</a>
                         </li>
                         <li >
                             <a href="{% url 'course_notebook' group_id %}" {% if title == 'notebook' %}class="selected"{% endif %}>Notebook</a>
