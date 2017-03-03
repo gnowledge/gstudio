@@ -600,12 +600,18 @@ ul.horizontal_tabs_gstudio {
         height: 300px;
         background: url('/static/ndf/images/course_backbround-2.png') no-repeat;
         background-size: 100% 100%;
+        margin-bottom: -80px;
     }
     .group_header {
         height: 80px;
         padding: 20px;
         background-color: #482667;
         color: #fff;
+        /* Permalink - use to edit and share this gradient: http://colorzilla.com/gradient-editor/#000000+0,000000+100&0+0,0.8+100 */
+background: -moz-linear-gradient(top, rgba(0,0,0,0) 0%, rgba(0,0,0,0.8) 100%); /* FF3.6-15 */
+background: -webkit-linear-gradient(top, rgba(0,0,0,0) 0%,rgba(0,0,0,0.8) 100%); /* Chrome10-25,Safari5.1-6 */
+background: linear-gradient(to bottom, rgba(0,0,0,0) 0%,rgba(0,0,0,0.8) 100%); /* W3C, IE10+, FF16+, Chrome26+, Opera12+, Safari7+ */
+filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#00000000', endColorstr='#cc000000',GradientType=0 ); /* IE6-9 */
         .group_title {
             font-size: 30px;
             font-weight: bold;
@@ -614,6 +620,7 @@ ul.horizontal_tabs_gstudio {
         .group_actions>button {
             display: inline-block;
             margin: 7px 10px;
+            opacity: 1;
         }
     }
     .group_sections {
@@ -723,6 +730,7 @@ input[type="file"] {
     font-size: 13px;
     cursor: pointer;
     @include transition-two-prop(color, border-color);
+    opacity: 1;
 }
 
 .orange-button {
