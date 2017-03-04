@@ -63,9 +63,9 @@ def unit_create_edit(request, group_id, unit_group_id=None):
         if not result[0]:
             return HttpResponseRedirect(reverse('list_units', kwargs={'group_id': group_id}))
         unit_node = result[1]
-        return HttpResponseRedirect(reverse('unit_detail', 
+        return HttpResponseRedirect(reverse('unit_detail',
             kwargs={'group_id': unit_node._id}))
-    
+
 
 @get_execution_time
 def unit_detail(request, group_id):
@@ -75,24 +75,6 @@ def unit_detail(request, group_id):
     # parent_group_name, parent_group_id = Group.get_group_name_id(group_id)
     unit_group_obj = Group.get_group_name_id(group_id, get_obj=True)
 
-    # {
-    # [{
-    # //         name: 'Lesson1',
-    # //         type: 'lesson',
-    # //         id: 'l1',
-    # //         activities: [
-    # //             {
-    # //                 name: 'Activity 1',
-    # //                 type: 'activity',
-    # //                 id: 'a1'
-    # //             },
-    # //             {
-    # //                 name: 'Activity 1',
-    # //                 type: 'activity',
-    # //                 id: 'a2'
-    # //             }
-    # //         ]
-    # //     }]
     # import ipdb; ipdb.set_trace()
     unit_structure = []
     for each in unit_group_obj.collection_set:
@@ -106,10 +88,10 @@ def unit_detail(request, group_id):
             if lesson.collection_set:
                 for each_act in lesson.collection_set:
                     activity_dict ={}
-                    activity = Node.get_node_by_id(lesson._id)
+                    activity = Node.get_node_by_id(each_act)
                     if activity:
-                        activity_dict['name'] = lesson.name
-                        activity_dict['type'] = 'lesson'
+                        activity_dict['name'] = activity.name
+                        activity_dict['type'] = 'activity'
                         activity_dict['id'] = str(activity._id)
                         lesson_dict['activities'].append(activity_dict)
             unit_structure.append(lesson_dict)
@@ -167,17 +149,18 @@ def lesson_create_edit(request, group_id, unit_group_id=None):
     creation as well as edit of lessons
     '''
     # parent_group_name, parent_group_id = Group.get_group_name_id(group_id)
+
+    # parent unit id
+    unit_id_post = request.POST.get('unit_id', '')
+    unit_group_id = unit_id_post if unit_id_post else unit_group_id
+    # getting parent unit object
+    unit_group_obj = Group.get_group_name_id(unit_group_id, get_obj=True)
+
     if request.method == "POST":
         # lesson name
         lesson_name = request.POST.get('name', '')
         if not lesson_name:
             return HttpResponse(0)
-
-        # parent unit id
-        unit_id_post = request.POST.get('unit_id', '')
-        unit_group_id = unit_id_post if unit_id_post else unit_group_id
-        # getting parent unit object
-        unit_group_obj = Group.get_group_name_id(unit_group_id, get_obj=True)
 
         # unit_cs: unit collection_set
         unit_cs_list = unit_group_obj.collection_set
@@ -212,15 +195,128 @@ def lesson_create_edit(request, group_id, unit_group_id=None):
                     if lesson.collection_set:
                         for each_act in lesson.collection_set:
                             activity_dict ={}
-                            activity = Node.get_node_by_id(lesson._id)
+                            activity = Node.get_node_by_id(each_act)
                             if activity:
-                                activity_dict['name'] = lesson.name
-                                activity_dict['type'] = 'lesson'
+                                activity_dict['name'] = activity.name
+                                activity_dict['type'] = 'activity'
                                 activity_dict['id'] = str(activity._id)
                                 lesson_dict['activities'].append(activity_dict)
                     unit_structure.append(lesson_dict)
 
             return HttpResponse(json.dumps(unit_structure))
+
+    for each in unit_group_obj.collection_set:
+        lesson_dict ={}
+        lesson = Node.get_node_by_id(each)
+        if lesson:
+            lesson_dict['name'] = lesson.name
+            lesson_dict['type'] = 'lesson'
+            lesson_dict['id'] = str(lesson._id)
+            lesson_dict['activities'] = []
+            if lesson.collection_set:
+                for each_act in lesson.collection_set:
+                    activity_dict ={}
+                    activity = Node.get_node_by_id(each_act)
+                    if activity:
+                        activity_dict['name'] = activity.name
+                        activity_dict['type'] = 'activity'
+                        activity_dict['id'] = str(activity._id)
+                        lesson_dict['activities'].append(activity_dict)
+            unit_structure.append(lesson_dict)
+
+
+    return HttpResponse(1)
+
+
+# @login_required
+@get_execution_time
+def activity_create_edit(request, group_id, lesson_id=None):
+    '''
+    creation as well as edit of lessons
+    '''
+    # parent_group_name, parent_group_id = Group.get_group_name_id(group_id)
+    lesson_id = request.POST.get('lesson_id')
+    lesson_obj = Node.get_node_by_id(lesson_id)
+
+    # print "0000000000000000000000000000", lesson_id
+    # parent unit id
+    unit_id_post = request.POST.get('unit_id', '')
+    unit_group_id = unit_id_post if unit_id_post else unit_group_id
+    # getting parent unit object
+    unit_group_obj = Group.get_group_name_id(unit_group_id, get_obj=True)
+
+    if request.method == "POST":
+        # activity name
+        activity_name = request.POST.get('name', '')
+        # print "0000000000000000000000000000", activity_name
+        if not activity_name:
+            return HttpResponse(0)
+
+        # unit_cs: unit collection_set
+        lesson_cs_list = lesson_obj.collection_set
+        lesson_cs_objs_cur = Node.get_nodes_by_ids_list(lesson_cs_list)
+        lesson_cs_names_list = [u.name for u in lesson_cs_objs_cur]
+
+        # print get_collection(request, ObjectId('57927168a6127d01f8e86574'), ObjectId('57927168a6127d01f8e86574'), no_res=False)
+        if activity_name in lesson_cs_names_list:
+            return HttpResponse(0)
+        else:
+            user_id = request.user.id
+            new_activity_obj = node_collection.collection.GSystem()
+            new_activity_obj.fill_gstystem_values(name=activity_name,
+                                            member_of=gst_activity_id,
+                                            group_set=unit_group_obj._id,
+                                            created_by=user_id,
+                                            status='PUBLISHED')
+            new_activity_obj.save(groupid=group_id)
+            # print new_activity_obj
+            # print"=========================="
+            # print lesson_obj.collection_set
+            lesson_obj.collection_set.append(new_activity_obj._id)
+            # print lesson_obj.collection_set
+            lesson_obj.save(groupid=group_id)
+
+            unit_structure = []
+            for each in unit_group_obj.collection_set:
+                lesson_dict ={}
+                lesson = Node.get_node_by_id(each)
+                if lesson:
+                    lesson_dict['name'] = lesson.name
+                    lesson_dict['type'] = 'lesson'
+                    lesson_dict['id'] = str(lesson._id)
+                    lesson_dict['activities'] = []
+                    if lesson.collection_set:
+                        for each_act in lesson.collection_set:
+                            activity_dict ={}
+                            activity = Node.get_node_by_id(each_act)
+                            if activity:
+                                activity_dict['name'] = activity.name
+                                activity_dict['type'] = 'activity'
+                                activity_dict['id'] = str(activity._id)
+                                lesson_dict['activities'].append(activity_dict)
+                    unit_structure.append(lesson_dict)
+
+            return HttpResponse(json.dumps(unit_structure))
+
+    for each in unit_group_obj.collection_set:
+        lesson_dict ={}
+        lesson = Node.get_node_by_id(each)
+        if lesson:
+            lesson_dict['name'] = lesson.name
+            lesson_dict['type'] = 'lesson'
+            lesson_dict['id'] = str(lesson._id)
+            lesson_dict['activities'] = []
+            if lesson.collection_set:
+                for each_act in lesson.collection_set:
+                    activity_dict ={}
+                    activity = Node.get_node_by_id(each_act)
+                    if activity:
+                        activity_dict['name'] = activity.name
+                        activity_dict['type'] = 'activity'
+                        activity_dict['id'] = str(activity._id)
+                        lesson_dict['activities'].append(activity_dict)
+            unit_structure.append(lesson_dict)
+
 
     return HttpResponse(1)
 

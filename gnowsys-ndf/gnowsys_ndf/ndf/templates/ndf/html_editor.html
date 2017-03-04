@@ -32,6 +32,7 @@
     }
     // Replace the <textarea id="editor1"> with a CKEditor
     // instance, using default configuration.
+
     CKEDITOR.replace( 'ckeditor_textarea',{
         enterMode : Number(2), //override default behaviour that adds <p></p> in ck editor
         toolbar:'{{ckeditor_toolbar}}',
@@ -41,6 +42,8 @@
         textarea_id: 'ckeditor_textarea',
         customConfig : '/static/ndf/js/ckeditor-config.js',
         height : ckeditor_height,
+        contentsCss : '/static/ndf/css/clix-activity-styles.css',
+
         // toolbar :
         //                                     [
         //                                         { name: 'basicstyles', items : [ 'Bold','Italic' ] },

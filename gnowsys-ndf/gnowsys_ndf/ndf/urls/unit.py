@@ -14,4 +14,9 @@ urlpatterns = patterns('gnowsys_ndf.ndf.views.unit',
                         # LESSON
                         # create
                         url(r'^/lesson/create/?$', 'lesson_create_edit', name='lesson_create_edit'),
+
+
+                        # ACTIVITY
+                        # create
+                        url(r'^/activity/create/?$', 'activity_create_edit', name='activity_create_edit'),
 )
