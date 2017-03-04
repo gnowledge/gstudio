@@ -445,6 +445,10 @@
           addLesson()
           - to add lesson of unit.
           */
+          if (!unitName) {
+            alert('Name can not be empty. Please provide one.');
+            return;
+          };
           result = undefined;
           $.ajax({
               type: "POST",
@@ -456,26 +460,25 @@
               url: "{% url 'lesson_create_edit' group_id %}",
               // datatype: "",
               success: function(data) {
-                  if(data){
-                      data=data;
-                      console.log(typeof(data));
-                      console.log(data);
-                      renderCourseTree(JSON.parse(data));
-                      // alert('Lesson saved successfully!');
-                      result = true;
+                  // console.log(typeof(data));
+                  data_dict = JSON.parse(data);
+                  // console.log(data);
+                  aaa = data
+                  if(data_dict.success){
+                      renderCourseTree(data_dict.unit_hierarchy);
+                      alert('Lesson saved successfully!');
+                      // handle opening of tree till recently added node with data_dict.msg
                       $('#myModal').foundation('reveal', 'close');
-                      return result;
+                      result = true;
                   }
                   else{
-                      alert('Save did not happen. Please try agin.');
+                      alert(data_dict.msg);
                       result = false;
-                      // console.log(result)
-                      return result;
                   }
+
               }
           });
-
-          console.log(result)
+          // console.log(result)
           return result;
         }
 
@@ -500,6 +503,10 @@
           addActivity()
           - to add lesson of unit.
           */
+          if (!activityName) {
+            alert('Name can not be empty. Please provide one.');
+            return;
+          };
           result = undefined;
           $.ajax({
               type: "POST",
@@ -512,26 +519,25 @@
               url: "{% url 'activity_create_edit' group_id %}",
               // datatype: "",
               success: function(data) {
-                  if(data){
-                      data=data;
-                      console.log(typeof(data));
-                      console.log(data);
-                      renderCourseTree(JSON.parse(data));
-                      // alert('Lesson saved successfully!');
-                      result = true;
+                  // console.log(typeof(data));
+                  data_dict = JSON.parse(data);
+                  // console.log(data);
+                  aaa = data
+                  if(data_dict.success){
+                      renderCourseTree(data_dict.unit_hierarchy);
+                      alert('Activity saved successfully!');
+                      // handle opening of tree till recently added node with data_dict.msg
                       $('#add-activity-modal').foundation('reveal', 'close');
-                      return result;
+                      result = true;
                   }
                   else{
-                      alert('Save did not happen. Please try agin.');
+                      alert(data_dict.msg);
                       result = false;
-                      // console.log(result)
-                      return result;
                   }
               }
           });
 
-          console.log(result)
+          // console.log(result)
           return result;
         }
 
