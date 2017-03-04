@@ -600,16 +600,19 @@ ul.horizontal_tabs_gstudio {
         height: 300px;
         background: url('/static/ndf/images/course_backbround-2.png') no-repeat;
         background-size: 100% 100%;
+        margin-bottom: -70px;
     }
     .group_header {
         height: 45px;
         padding-bottom: 5px;
-        background-color: #482667;
+        background: transparent;
         color: #fff;
         .group_title {
             font-size: 30px;
             font-weight: bold;
             letter-spacing: 0.4px;
+            font-family: 'Rubik-Italic'; 
+            padding-bottom: 10px; 
         }
         .group_actions>button {
             display: inline-block;
@@ -679,7 +682,7 @@ ul.horizontal_tabs_gstudio {
 input[type="text"], input[type="file"] {
     margin: 0px;
     margin-left: 3px;
-    width:90%;
+    width:50%;
 }
 label {
     margin-top: 1rem;
@@ -881,6 +884,7 @@ ul.jqtree-tree .jqtree-toggler {
             cursor: pointer;
             font-size: 18px;
             letter-spacing: 0.8px;
+
 
             &.active, &:hover {
                 border-bottom: 3px solid $secondary-orange;
