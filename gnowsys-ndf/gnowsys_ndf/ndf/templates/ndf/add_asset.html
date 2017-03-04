@@ -1,6 +1,6 @@
 
+<div class="row">
 
-<div class="row" style="margin-top: 25px; margin-bottom: 25px;">
             {% if asset_obj.name %}
 
             {% else %}
@@ -9,7 +9,7 @@
             {% endif %}
             <div class="small-12 colums" >
             {% if asset_obj.name %}
-                <b><h2 class="left" style="color: #ce7869">&nbsp; Asset Details</h2></b>
+                <h3 class="left">&nbsp;&nbsp;{{asset_obj.name}}</h3>
 
             {% else %}
                 <h3 class="left">&nbsp; Add a new asset</h3>
@@ -26,10 +26,7 @@
         <div class="row">
             <div class="small-12 medium-6 large-6 columns">
                 <label>
-                    {% if asset_obj.name %}
-
-                        <b><h2>{{asset_obj.name}}</h2></b>
-                    {% else %}
+                    {% if not asset_obj %}
                        Asset name 
                        <input type="text" placeholder=""  id = "asset-name" name="asset_name" />
                     {% endif %}

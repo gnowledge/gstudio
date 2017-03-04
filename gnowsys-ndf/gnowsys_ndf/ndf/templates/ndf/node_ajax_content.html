@@ -49,7 +49,9 @@
 <div class="row page" itemscope itemtype="{{schema.1.type}}">
 
   <section class="medium-9 columns">
+  {% if not hide_breadcrumbs %}{{hide_breadcrumbs}}
   {% block breadcrumb %} {% get_breadcrumb request.path %} {% endblock breadcrumb %}
+  {% endif %}
 
   {% if breadcrumbs_list %}
   <ul class="breadcrumbs">
