@@ -115,4 +115,90 @@
     })
 
 
+
+  $(document).on("click", "#subscribe_to_grp", function() {
+        user_id = $(this).attr('data-user-id')
+        asAdmin = $(this).attr('data-user-admin')
+        $.ajax({
+                type: "POST",
+                url: "{% url 'enroll_to_course' group_object.pk %}",
+                datatype: "json",
+                data:{
+                        user_id: user_id,
+                        asAdmin: asAdmin,
+                       csrfmiddlewaretoken: '{{ csrf_token }}'
+                  },
+                context: this,
+              success: function(data) {
+                data = JSON.parse(data)
+                success_state = data["success"]
+                grp_mem_count = data["member_count"]
+                if(!success_state){
+                    alert("Something went wrong. Please try again later.")
+                }
+                else{
+                    if($(this).hasClass('subscription_policy')){
+                        $(".subscription_policy")
+                            .attr("id", "unsubscribe_from_grp")
+                            .attr("value", "Unsubscribe")
+                            .attr("title", "Unsubscribe from this group")
+                        // Update Courp member count in Group-dashboard
+                        $(".grp_mem_count")
+                            .text(grp_mem_count)
+                            .attr('value',grp_mem_count)
+                    }
+                    else{
+                        $(this)
+                            .attr("id", "unsubscribe_from_grp")
+                            .text("Remove")
+                    }
+
+                }
+              }
+        });
+    });
+
+    $(document).on("click", "#unsubscribe_from_grp", function() {
+        user_id = $(this).attr('data-user-id')
+        asAdmin = $(this).attr('data-user-admin')
+
+        $.ajax({
+                type: "POST",
+                url: "{% url 'unsubscribe_from_group' group_object.pk %}",
+                datatype: "json",
+                data:{
+                        user_id: user_id,
+                        asAdmin: asAdmin,
+                       csrfmiddlewaretoken: '{{ csrf_token }}'
+                  },
+                context: this,
+                success: function(data) {
+                    data = JSON.parse(data)
+                    success_state = data["success"]
+                    grp_mem_count = data["member_count"]
+                    if(!success_state){
+                        alert("Something went wrong. Please try again later.")
+                    }
+                    else{
+                        if($(this).hasClass('subscription_policy')){
+                            $(".subscription_policy")
+                                .attr("id", "subscribe_to_grp")
+                                .attr("value", "Join")
+                                .attr("title", "Join this Group")
+                            // Update Courp member count in Group-dashboard
+                            $(".grp_mem_count")
+                                .text(grp_mem_count)
+                                .attr('value',grp_mem_count)
+                        }
+                        else{
+                            $(this)
+                                .text("Add")
+                                .attr("id", "subscribe_to_grp")
+                        }
+                    }
+                }
+        });
+    });
+
+
 </script>

@@ -326,6 +326,11 @@ class Node(DjangoDocument):
                         'rating':[],
                         'snapshot':{}
                     }
+
+    validators = {
+        'name': lambda x: x.strip() not in [None, ''],
+    }
+
     use_dot_notation = True
 
 
@@ -426,7 +431,7 @@ class Node(DjangoDocument):
         if not self.created_by:
             if kwargs.has_key('created_by'):
                 self.created_by = kwargs.get('created_by', '')
-            elif request and ('user' in request):
+            elif request and request.user.is_authenticated():
                 self.created_by = request.user.id
             self.created_by = int(self.created_by) if self.created_by else 0
 
@@ -442,12 +447,12 @@ class Node(DjangoDocument):
         self.modified_by = int(self.modified_by) if self.modified_by else self.created_by
 
         contributors = []
+        self.contributors = contributors
         # 'contributors': [int]
         if kwargs.has_key('contributors'):
             self.contributors = kwargs.get('contributors', [self.created_by])
         elif request:
             self.contributors = request.POST.get('contributors', [self.created_by])
-        self.contributors = contributors
         if self.contributors and not isinstance(self.contributors, list):
             self.contributors = [int(each) for each in self.contributors]
 
