@@ -9,32 +9,44 @@
 {% block body_content %}
 	{% check_is_gstaff groupid request.user as is_gstaff %}
 
-	<div class="row explore-header">
-		<div class="small-12 medium-2 columns heading">
-		<a href="{% url 'explore' %}">Explore</a>
+
+
+	
+		<div class="small-12 medium-2 columns heading row">
+		
 		</div>
-		<div class="small-12 medium-6 columns expore-type">
-			<div class="toggleButtons">
-				<a href="{% url 'explore_courses' %}" class="button {%if title == 'courses'%} active{% endif %}">
+		<!--<div class="small-12 medium-6 columns expore-type">-->
+		<nav class="top-bar-second" data-topbar role="navigation" id="top-bar-second">
+		<div class="small-12 medium-12 columns expore-type">
+			<!--<div class="toggleButtons">-->
+			<div class=" left title-area">
+			
+				<a href="{% url 'explore_courses' %}" class="secondary-header-tabs  {%if title == 'courses'%} active{% endif %}">
 					Courses
 				</a>
-				<a href="{% url 'explore_groups' %}" class="button {%if title == 'groups'%} active{% endif %}">
+			
+				<a href="{% url 'explore_groups' %}" class="secondary-header-tabs {%if title == 'groups'%} active{% endif %}">
 					Groups
 				</a>
+
 				{% if is_gstaff %}
-					<a href="{% url 'explore_basecourses' %}" class="button {%if title == 'base courses'%} active{% endif %}">
+					<a href="{% url 'explore_basecourses' %}" class="secondary-header-tabs {%if title == 'base courses'%} active{% endif %}">
 						Draft Course
 					</a>
 				{% endif %}
+
+				<a class="secondary-header-button right" style="float:right" href="{% url 'unit_create_edit' groupid %}"><i class="fa fa-plus-circle"></i>{% trans " Create Unit" %}</a>
+
 			</div>
 		</div>
-		{% if title == "base courses" and is_gstaff %}
+	</nav>
+		<!--{% if title == "base courses" and is_gstaff %}
 		<div class="small-12 medium-7 columns">
 			<div style="display: inline-block;">
 				<a class="tiny button radius right" href="{% url 'unit_create_edit' groupid %}"><i class="fi-plus"></i>{% trans " Create Unit" %}</a>
 			</div>
 		</div>
-		{% endif %}
+		{% endif %}-->
 	</div>
 	<div class="row">
 		{% if title == 'explore' %}

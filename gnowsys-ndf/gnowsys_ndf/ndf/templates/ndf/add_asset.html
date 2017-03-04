@@ -1,24 +1,24 @@
 
-<div class="row">
+<div class="row overlay-head">
 
             {% if asset_obj.name %}
 
             {% else %}
 
-            <a class="close-reveal-modal" aria-label="Close">&#215;</a>
+            <a class="right close-reveal-modal reveal-modal-overlay" aria-label="Close">&#215;</a>
             {% endif %}
             <div class="small-12 colums" >
             {% if asset_obj.name %}
                 <h3 class="left">&nbsp;&nbsp;{{asset_obj.name}}</h3>
 
             {% else %}
-                <h3 class="left">&nbsp; Add a new asset</h3>
+                <h3 class="left overlay-title">&nbsp; Add a new asset</h3>
             {% endif %}
 
                 {% if asset_obj.name %}
 
                 {% else %}
-                <button type="button" class="right orange-button save-asset">Save Asset</button>
+                <!--<button type="button" class="right orange-button save-asset">Save Asset</button>-->
                 {% endif %}
 
             </div>
@@ -59,22 +59,7 @@
                 {% endif %}
             </div>
         </div>
-        {% comment %}
-        <div class="row">
-            <div class="small-12 medium-6 large-6 columns">
-                <label>Learning objectives met by this asset
-                    <Select name="asset_objectives" id = "asset_objectivesid" placeholder="Select topics" require>
-                        <option value="">--- Select Topic ---</option>
-                        {% for each_topic in topic_nodes %}
-                        <option value="{{each_topic.pk}}">
-                            {{each_topic.name}}
-                        </option>
-                        {% endfor %}
-                    </Select>
-                </label>
-            </div>
-        </div>
-        {% endcomment %}
+       
 
         
     <div class="asset-content-area"{% if not asset_obj %} style="display:none"{% endif %}>
@@ -114,6 +99,9 @@
         {%  endif %}
         </div>
     </div>
+
+
+    <button type="button" class="right orange-button save-asset">Save Asset</button>
 <script type="text/javascript">
     $( ".save-asset" ).click(function() {
         asset_name = $("#asset-name").val();

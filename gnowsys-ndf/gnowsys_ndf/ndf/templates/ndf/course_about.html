@@ -38,9 +38,9 @@
 <div id="course-about">
 <div class="row">
 <div class="small-12 columns about-course">
-  <h5>About</h5>
-  <div class="row">
-    <div class="small-12 medium-8 columns">
+  <h5>About this course</h5>
+  
+    <div class="small-12 medium-12 columns">
       <div class="course-desc">
           {{group_object.content|default:'No description added yet.'|safe}}
       </div>
@@ -48,9 +48,11 @@
         <u><a class="show-more hide">Show more</a></u>
       </div>
     </div>
+  </div>
 
 
-    <div class="small-12 medium-4 columns">
+    <div class="small-12 medium-12 columns">
+      <h5>No. of Members</h5>
       <div class="course-highlight">
         <i class="fa fa-user"></i>
         <span>

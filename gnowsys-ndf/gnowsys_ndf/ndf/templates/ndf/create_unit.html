@@ -15,8 +15,10 @@
                         <input id="unit-name" name="name" type="text" placeholder="Enter unit name"/>
                     </div>
                 </div>
-<!--                 {% get_metadata_values "educationallevel" as metadata_educationallevel %}
+                <hr/>
                 <div class="course_creator_header">
+
+                 {% get_metadata_values "educationallevel" as metadata_educationallevel %}
                     <div class="left course_heading">
                     <h5>Select Grade</h5>
                     </div>
@@ -28,6 +30,7 @@
                         </select>
                     </div>
                 </div>
+
                 {% get_metadata_values "educationalsubject" as metadata_educationalsubject %}
                 <div class="course_creator_header">
                     <div class="left course_heading">
@@ -41,7 +44,7 @@
                         </select>
                     </div>
                 </div>
- -->                <hr/>
+                <hr/>
                 <label style="color:red;" class="right hide duplicate_unit_name">Unit with same name exists. Please choose another name.</label>
                 <div class="right course_actions">
                     
