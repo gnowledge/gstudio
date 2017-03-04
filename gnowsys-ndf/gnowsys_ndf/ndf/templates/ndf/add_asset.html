@@ -121,14 +121,14 @@
     $( ".save-asset" ).click(function() {
         asset_name = $("#asset-name").val();
         asset_description = $("#asset-descid").val();
-        asset_objective =  $('#asset_objectivesid').find(':selected').attr('value');
+        // asset_objective =  $('#asset_objectivesid').find(':selected').attr('value');
         $.ajax({
               type: "POST",
               data:{ 
                     'csrfmiddlewaretoken': "{{csrf_token}}",
                     "asset_name":asset_name,
                     "asset_description":asset_description,
-                    "asset_objective":asset_objective
+                    // "asset_objective":asset_objective
                 },
               url: "{% url 'create_edit_asset' group_id %}",
               datatype: "html",
