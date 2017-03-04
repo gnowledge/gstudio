@@ -125,6 +125,8 @@ def list_units(request, group_id):
 def lesson_create_edit(request, group_id, unit_group_id=None):
     '''
     creation as well as edit of lessons
+    returns following list:
+    {'success': <BOOL: 0 or 1>, 'unit_hierarchy': <unit hierarchy json>, 'msg': <error msg or objectid of newly created obj>}
     '''
     # parent_group_name, parent_group_id = Group.get_group_name_id(group_id)
 
@@ -133,12 +135,14 @@ def lesson_create_edit(request, group_id, unit_group_id=None):
     unit_group_id = unit_id_post if unit_id_post else unit_group_id
     # getting parent unit object
     unit_group_obj = Group.get_group_name_id(unit_group_id, get_obj=True)
-
+    result_dict = {'success': 0, 'unit_hierarchy': [], 'msg': ''}
     if request.method == "POST":
         # lesson name
-        lesson_name = request.POST.get('name', '')
+        lesson_name = request.POST.get('name', '').strip()
         if not lesson_name:
-            return HttpResponse(0)
+            msg = 'Name can not be empty.'
+            result_dict = {'success': 0, 'unit_hierarchy': [], 'msg': msg}
+            # return HttpResponse(0)
 
         # unit_cs: unit collection_set
         unit_cs_list = unit_group_obj.collection_set
@@ -146,7 +150,9 @@ def lesson_create_edit(request, group_id, unit_group_id=None):
         unit_cs_names_list = [u.name for u in unit_cs_objs_cur]
 
         if lesson_name in unit_cs_names_list:
-            return HttpResponse(0)
+            msg = u'Activity with same name exists in lesson: ' + unit_group_obj.name
+            result_dict = {'success': 0, 'unit_hierarchy': [], 'msg': msg}
+            # return HttpResponse(0)
         else:
             user_id = request.user.id
             new_lesson_obj = node_collection.collection.GSystem()
@@ -162,18 +168,21 @@ def lesson_create_edit(request, group_id, unit_group_id=None):
 
             unit_structure = _get_unit_hierarchy(unit_group_obj)
 
-            return HttpResponse(json.dumps(unit_structure))
+            msg = u'Added lesson under lesson: ' + unit_group_obj.name
+            result_dict = {'success': 1, 'unit_hierarchy': unit_structure, 'msg': str(new_lesson_obj._id)}
+            # return HttpResponse(json.dumps(unit_structure))
 
-    unit_structure = _get_unit_hierarchy(unit_group_obj)
-
-    return HttpResponse(1)
+    # return HttpResponse(1)
+    return HttpResponse(json.dumps(result_dict))
 
 
 # @login_required
 @get_execution_time
 def activity_create_edit(request, group_id, lesson_id=None):
     '''
-    creation as well as edit of lessons
+    creation as well as edit of activities
+    returns following list:
+    {'success': <BOOL: 0 or 1>, 'unit_hierarchy': <unit hierarchy json>, 'msg': <error msg or objectid of newly created obj>}
     '''
     # parent_group_name, parent_group_id = Group.get_group_name_id(group_id)
     lesson_id = request.POST.get('lesson_id')
@@ -182,14 +191,19 @@ def activity_create_edit(request, group_id, lesson_id=None):
     # parent unit id
     unit_id_post = request.POST.get('unit_id', '')
     unit_group_id = unit_id_post if unit_id_post else unit_group_id
+
     # getting parent unit object
     unit_group_obj = Group.get_group_name_id(unit_group_id, get_obj=True)
 
+    result_dict = {'success': 0, 'unit_hierarchy': [], 'msg': ''}
+
     if request.method == "POST":
         # activity name
-        activity_name = request.POST.get('name', '')
+        activity_name = request.POST.get('name', '').strip()
         if not activity_name:
-            return HttpResponse(0)
+            msg = 'Name can not be empty.'
+            result_dict = {'success': 0, 'unit_hierarchy': [], 'msg': msg}
+            # return HttpResponse(result_dict)
 
         # unit_cs: unit collection_set
         lesson_cs_list = lesson_obj.collection_set
@@ -197,7 +211,9 @@ def activity_create_edit(request, group_id, lesson_id=None):
         lesson_cs_names_list = [u.name for u in lesson_cs_objs_cur]
 
         if activity_name in lesson_cs_names_list:
-            return HttpResponse(0)
+            msg = u'Activity with same name exists in lesson: ' + lesson_obj.name
+            result_dict = {'success': 0, 'unit_hierarchy': [], 'msg': msg}
+            # return HttpResponse(0)
         else:
             user_id = request.user.id
             new_activity_obj = node_collection.collection.GSystem()
@@ -212,11 +228,11 @@ def activity_create_edit(request, group_id, lesson_id=None):
             lesson_obj.save(groupid=group_id)
             unit_structure = _get_unit_hierarchy(unit_group_obj)
 
-            return HttpResponse(json.dumps(unit_structure))
+            msg = u'Added activity under lesson: ' + lesson_obj.name
+            result_dict = {'success': 1, 'unit_hierarchy': unit_structure, 'msg': str(new_activity_obj._id)}
+            # return HttpResponse(json.dumps(unit_structure))
 
-    unit_structure = _get_unit_hierarchy(unit_group_obj)
-
-    return HttpResponse(1)
+    return HttpResponse(json.dumps(result_dict))
 
 
 def _get_unit_hierarchy(unit_group_obj):
