@@ -3929,3 +3929,8 @@ def get_pages(page_type):
 	page_type_gst = node_collection.one({'_type': "GSystemType", 'name': page_type})
 	page_nodes = node_collection.find({'member_of': page_gst._id, 'type_of': page_type_gst._id, 'group_set': help_page._id})
 	return page_nodes
+
+@register.assignment_tag
+def get_relation_node(node_id):
+	rel_node = triple_collection.one({'_id':ObjectId(node_id)})
+	return rel_node
