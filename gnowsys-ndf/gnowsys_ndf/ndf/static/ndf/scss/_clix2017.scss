@@ -600,16 +600,19 @@ ul.horizontal_tabs_gstudio {
         height: 300px;
         background: url('/static/ndf/images/course_backbround-2.png') no-repeat;
         background-size: 100% 100%;
+        margin-bottom: -70px;
     }
     .group_header {
-        height: 80px;
-        padding: 20px;
-        background-color: #482667;
+        height: 45px;
+        padding-bottom: 5px;
+        background: transparent;
         color: #fff;
         .group_title {
             font-size: 30px;
             font-weight: bold;
             letter-spacing: 0.4px;
+            font-family: 'Rubik-Italic'; 
+            padding-bottom: 10px; 
         }
         .group_actions>button {
             display: inline-block;
@@ -679,7 +682,7 @@ ul.horizontal_tabs_gstudio {
 input[type="text"], input[type="file"] {
     margin: 0px;
     margin-left: 3px;
-    width:90%;
+    width:50%;
 }
 label {
     margin-top: 1rem;
@@ -881,6 +884,7 @@ ul.jqtree-tree .jqtree-toggler {
             cursor: pointer;
             font-size: 18px;
             letter-spacing: 0.8px;
+
 
             &.active, &:hover {
                 border-bottom: 3px solid $secondary-orange;
@@ -1615,10 +1619,10 @@ ul.jqtree-tree .jqtree-toggler {
 
 .course_creator_header {
     width: 100%;
-    height: 60px;
+    height: 50px;
     background: #fff;
     padding: 5px 15px;
-    box-shadow: 1px 0px 13px #000;
+    box-shadow: 1px 0px 7px #000;
 
     .back_to_group {
         padding: 0px 15px 0px 10px;
@@ -1629,9 +1633,11 @@ ul.jqtree-tree .jqtree-toggler {
     .course_heading {
         input {
             width: 500px;
-            height: 50px;
+            height: 40px;
             border: 0px solid $secondry-blue;
             box-shadow: none;
+            float: right;
+            text-align: center;
 
             &:focus {
                 border: 1px solid $secondry-blue;
@@ -1678,8 +1684,8 @@ ul.jqtree-tree .jqtree-toggler {
 
 .create_unit {
     background: #fff;
-    box-shadow: 0px 2px 6px #000;
-    margin: 20px auto;
+    box-shadow: 0px 2px 3px #000;
+    margin: 10px auto;
     padding: 10px;
     height: calc(100vh - 100px);
 }
