@@ -1,4 +1,4 @@
-<div class="elibrary-actions">
+<div class="activity-sheet-actions">
     <button type="button" class="right orange-button createActivityPage">
         <i class="fi-plus"> </i>
         Add Activity Page
@@ -10,7 +10,7 @@
         <div>
             <div class="row">
                 <div class="medium-8 columns name-div">
-                    <input type="text" name="name" placeholder="Enter name of Page">
+                    <input type="text" class="node_name" name="name" placeholder="Enter name of Page">
                 </div>
             </div>
             <div class="row">
@@ -23,7 +23,7 @@
             </div>
             <input type="hidden" name="node_id" class="form_node_id">
 
-            <input type="submit" class="button small" name="saveActivityPage" value="Save">
+            <input type="submit" class="button small" class="saveActivityPage" value="Save">
             <input type="button" class="button small cancel-page-create" value="Cancel">
         </div>
     </form>
@@ -41,7 +41,7 @@
 
 <div class="row"> 
     {% for each in all_pages %}
-        <a class="view-page" data-page-id="{{each.pk}}">
+        <a class="view-page" data-page-id="{{each.pk}}" data-node-name="{{each.name}}">
             <div class="small-12 medium-6 large-3 columns">
                 <div class="asset_tile">
                     <div class="asset_preview"></div>
@@ -59,25 +59,47 @@
     $( ".createActivityPage" ).click(function() {
         $("#addActivityPage").removeClass("hide")
         $("#page_listing").addClass("hide")
+        $(".activity-sheet-actions").addClass("hide")
     });
 
     $( ".cancel-page-create" ).click(function() {
-
+        $(".activity-sheet-actions").removeClass("hide")
         $("#addActivityPage").addClass("hide")
         $("#page_listing").removeClass("hide")
     });
 
-    // $(document).on('click','.edit-page',function(){
-    //     console.log($(this).attr("id"))
-    //     $("#addActivityPage").removeClass("hide")
-    //     $("#page_listing").addClass("hide")
-    //     $(".page-view").foundation('reveal','open')
-        
+    $(document).on('click','.edit-page',function(){
+        node_id = $(this).attr("id")
+        data_node_name = $(this).attr("data-node-name")
+        $("#addActivityPage").removeClass("hide")
+        $("#page_listing").addClass("hide")
+        $(".page-view").foundation('reveal','close')
+        $(".activity-sheet-actions").addClass("hide")
+        $(".node_name").attr('value', data_node_name)
+        $.ajax({
+          url: "{% url 'inline_edit_res' group_id %}",
 
-    // })
+          type: "GET",
+          data: {
+            node_id: node_id
+          },
+
+          dataType: "html",
+
+          success: function(data){
+            console.log(data)
+            $(".editor-div").html(data);
+          },
+        });//end of ajax
+        $(".form_node_id").attr('value', node_id)
+    })
+
 
     $(document).on('click','.view-page',function(){
         node_id = $(this).attr('data-page-id')
+        node_name = $(this).attr('data-node-name')
+        // node_content = $(this).attr('data-node-content')
+
         $.ajax({
         url: "{% url 'load_content_data' group_id %}",
 
@@ -91,6 +113,8 @@
 
         success: function(data){
             $(".edit-page").attr("id", node_id)
+            $(".edit-page").attr("data-node-name", node_name)
+            // $(".edit-page").attr("data-node-content", node_content)
             $(".page-content").html(data)
             $(".page-view").foundation('reveal','open')
         },
