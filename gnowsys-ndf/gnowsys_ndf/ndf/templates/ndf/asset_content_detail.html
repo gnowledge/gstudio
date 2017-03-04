@@ -1,3 +1,5 @@
+{% load i18n %}
+{% load ndf_tags %}
     <div class="row">
             <div class="small-12 medium-6 large-6 columns">
             <h6>
@@ -16,16 +18,27 @@
                    <form class="dropzone" id ="doctranscript" enctype="multipart/form-data" method="post" action="{% url 'add_assetcontent' group_id %}" > 
                     <input type="file" placeholder="" id="doctranscriptfile" name="transcript_file" />
                     <span class="add_more_files">&nbsp;<u> + Transcript</u></span>
-                    <a class="right orange-button save-asset save-transcript">Save Asset</a>
+                    <!-- <a class="right orange-button  save-transcript">Save Asset</a> -->
+                    <button type="button" class="right orange-button save-transcript" >Save Asset</button>
                 </div>
                 <label>Upload Subtitle
                 </label>
                 <div class="subtitle_files">
                     <form class="dropzone" id ="docsubtitle" enctype="multipart/form-data" method="post" action="{% url 'add_assetcontent' group_id %}" >
                         <input type="file" id="docsubtitlefile" placeholder="" name="doc_f" />
+                        <b class="compulsory">Language</b>
+                          <select name="lan" id="sub_languageid" tabindex=3 required>
+                            <option value="">--- Select Language ---</option>
+                            {% get_language_info_list for LANGUAGES as languages %}
+                            {% for language in languages %}
+                            <option data-sub-lang="{{ language.name }}" data-sub-code="{{ language.code }}">
+                              {{ language.name }}
+                            </option>
+                            {% endfor %}
+                          </select>
                         <span class="add_more_files"><u>+ Subtitle</u></span>
                     </form>
-                    <button type="button" class="right orange-button save-asset" onclick="save_subtitle()">Save Asset</button>
+                    <button type="button" class="right orange-button" onclick="save_subtitle()">Save Asset</button>
                    <!-- <input type="asset-save-button" id="" class="orange-button" onclick="save_asset_cont_data()" value="Save"/>-->
                 </div>
             </div>
@@ -46,7 +59,8 @@
   // var uploadButton = document.getElementById('submitpostid');
         function save_subtitle(event) {
 
-
+        sel_sub_lang =  $('#sub_languageid').find(':selected').attr('data-sub-lang');
+        sel_sub_lang_code =  $('#sub_languageid').find(':selected').attr('data-sub-code');
         // assetval = $('.asset_obj_val').attr('data-asset-obj-val');
         // Update button text.
         // uploadButton.innerHTML = 'Uploading...';
@@ -73,6 +87,8 @@
         formData.append('user','{{request.user.id}}');
         formData.append('if_subtitle','True');
         formData.append('assetcontentid','{{node.pk}}');
+        formData.append('sel_sub_lang',sel_sub_lang);
+        formData.append('sel_sub_lang_code',sel_sub_lang_code);
         
         if(!"{{asset_obj}}"){
             formData.append('asset_obj',assetval);

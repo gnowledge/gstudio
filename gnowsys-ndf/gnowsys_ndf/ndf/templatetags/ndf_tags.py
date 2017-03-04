@@ -3932,5 +3932,10 @@ def get_pages(page_type):
 
 @register.assignment_tag
 def get_relation_node(node_id):
-	rel_node = triple_collection.one({'_id':ObjectId(node_id)})
-	return rel_node
+	relation_type_node = node_collection.one({'_type': 'RelationType', 'name': unicode('has_subtitle') })
+	node = node_collection.one({'_id':ObjectId(node_id)})
+	node_grel = triple_collection.find({'_type': "GRelation", "subject": node._id, 'relation_type': relation_type_node._id,'status':"PUBLISHED"})
+	sub_list = {}
+	for each in node_grel:
+		print each
+	return 1
