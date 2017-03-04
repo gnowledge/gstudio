@@ -36,22 +36,23 @@ def unit_create_edit(request, group_id, unit_group_id=None):
     parent_group_name, parent_group_id = Group.get_group_name_id(group_id)
     if request.method == "GET":
         template = "ndf/create_unit.html"
+        all_groups = node_collection.find({'_type': "Group"},{"name":1})
+        all_groups_names = [str(each_group.name) for each_group in all_groups]
         req_context = RequestContext(request, {
-                                    'group_id': parent_group_id  #,
+                                    'group_id': parent_group_id,
+                                    'all_groups_names': all_groups_names
                                     # 'unit_obj': unit_group_obj
                                 })
         return render_to_response(template, req_context)
 
     elif request.method == "POST":
         group_name = request.POST.get('name', '')
+        if not group_name:
+            raise ValueError('Unit Group must accompanied by name.')
         group_altnames = request.POST.get('altnames', '')
         unit_id_post = request.POST.get('_id', '')
         unit_group_id = unit_id_post if unit_id_post else unit_group_id
         unit_group_name, unit_group_id = Group.get_group_name_id(unit_group_id)
-
-        if not group_name:
-            raise ValueError('Unit Group must accompanied by name.')
-
         unit_group = CreateGroup(request)
         result = unit_group.create_group(group_name,
                                         group_id=parent_group_id,
