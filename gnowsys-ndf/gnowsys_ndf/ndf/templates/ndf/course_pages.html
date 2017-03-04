@@ -62,8 +62,7 @@
         $(".activity-sheet-actions").addClass("hide")
         $(".form_node_id").attr('value', '')
         $(".node_name").attr('value', '')
-        $(".ckeditor_textarea").attr('value', '')
-
+        CKEDITOR.instances['ckeditor_textarea'].setData('');
     });
 
     $( ".cancel-page-create" ).click(function() {
