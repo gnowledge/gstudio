@@ -2498,28 +2498,32 @@ def course_note_page(request, group_id):
 
 @login_required
 @get_execution_time
-def inline_edit_res(request, group_id, node_id):
+def inline_edit_res(request, group_id):
     group_obj   = get_group_name_id(group_id, get_obj=True)
     group_id    = group_obj._id
     group_name  = group_obj.name
-    node_obj = node_collection.one({'_id': ObjectId(node_id)})
     context_variables = {
             'group_id': group_id, 'groupid': group_id, 'group_name':group_name,
-            'node': node_obj
             }
     if request.method == "POST":
+        node_id = request.POST.get("node_id", "")
+        node_obj = node_collection.one({'_id': ObjectId(node_id)})
         content_val = request.POST.get("content_val", "")
         node_obj.content = content_val
         node_obj.save()
         template = 'ndf/node_ajax_content.html'
         context_variables['no_discussion'] = True
+        context_variables['node'] = node_obj
 
     else:
+        node_id = request.GET.get("node_id", "")
+        node_obj = node_collection.one({'_id': ObjectId(node_id)})
         template = 'ndf/html_editor.html'
-        context_variables['var_name'] = "content_org",
+        context_variables['var_name'] = "content_org"
         context_variables['var_value'] = node_obj.content
         context_variables['node_id'] = node_obj._id
         context_variables['ckeditor_toolbar'] ="GeneralToolbar"
+        context_variables['node'] = node_obj
     return render_to_response(template, context_variables, context_instance = RequestContext(request))
 
 
@@ -3185,17 +3189,22 @@ def save_course_page(request, group_id):
     group_name = group_obj.name
     template = 'ndf/gevent_base.html'
     page_gst_name, page_gst_id = GSystemType.get_gst_name_id("Page")
+    page_obj = None
     if request.method == "POST":
+        print request.POST
         name = request.POST.get("name", "")
-        content = request.POST.get("content_org", "")
-        page_obj = node_collection.collection.GSystem()
-        page_obj.fill_gstystem_values(request=request)
+        content = request.POST.get("content_org", None)
+        node_id = request.POST.get("node_id", "")
+        if node_id:
+            page_obj = node_collection.one({'_id': ObjectId(node_id)})
+        if not page_obj:
+            page_obj = node_collection.collection.GSystem()
+            page_obj.fill_gstystem_values(request=request)
+            page_obj.member_of = [page_gst_id]
+            page_obj.group_set = [group_id]
         page_obj.name = unicode(name)
         page_obj.content = unicode(content)
-        page_obj.member_of = [page_gst_id]
-        page_obj.group_set = [group_id]
         page_obj.save(groupid=group_id)
-
         return HttpResponseRedirect(reverse('course_pages', kwargs={'group_id': group_id}))
 
 def load_content_data(request, group_id):
