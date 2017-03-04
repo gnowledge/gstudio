@@ -1285,7 +1285,8 @@ def change_order(request, group_id):
         collection_set_list = parent_node.collection_set
         a, b = collection_set_list.index(ObjectId(node_id_up)), collection_set_list.index(ObjectId(node_id_down))
         collection_set_list[b], collection_set_list[a] = collection_set_list[a], collection_set_list[b]
-        node_collection.collection.update({'_id': parent_node._id}, {'$set': {'collection_set': collection_set_list }}, upsert=False, multi=False)
+        node_collection.collection.update({'_id': parent_node._id},
+                {'$set': {'collection_set': collection_set_list }}, upsert=False, multi=False)
         parent_node.reload()
         response_dict["success"] = True
         return HttpResponse(json.dumps(response_dict))
