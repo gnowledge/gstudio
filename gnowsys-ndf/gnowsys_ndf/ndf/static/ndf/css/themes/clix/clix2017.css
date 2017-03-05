@@ -2544,19 +2544,24 @@ ul.jqtree-tree .jqtree-toggler:hover {
   /*background-color:  #f2f2f2;*/
 }
 
-/* line 2717, ../../../scss/_clix2017.scss */
+/* line 2718, ../../../scss/_clix2017.scss */
+#activity-content {
+  height: 30rem !important;
+}
+
+/* line 2721, ../../../scss/_clix2017.scss */
 .bg-img {
   background: url(/static/ndf/images/landing.jpg);
   height: 100vh;
   background-size: 100%;
 }
 
-/* line 2723, ../../../scss/_clix2017.scss */
+/* line 2727, ../../../scss/_clix2017.scss */
 .white-text {
   color: white;
 }
 
-/* line 2726, ../../../scss/_clix2017.scss */
+/* line 2730, ../../../scss/_clix2017.scss */
 .panel-mod {
   background-color: transparent;
   border: none;
