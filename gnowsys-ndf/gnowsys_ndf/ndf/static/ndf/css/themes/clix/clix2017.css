@@ -2538,3 +2538,8 @@ ul.jqtree-tree .jqtree-toggler:hover {
   word-wrap: break-word;
   /*background-color:  #f2f2f2;*/
 }
+
+/* line 2707, ../../../scss/_clix2017.scss */
+#activity-content {
+  height: 30rem !important;
+}
