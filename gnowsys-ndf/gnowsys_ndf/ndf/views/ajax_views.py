@@ -6527,6 +6527,21 @@ def get_templates_page(request, group_id):
 
 
 @get_execution_time
+def get_group_templates_page(request, group_id):
+  # try:
+  #     group_id = ObjectId(group_id)
+  # except:
+  #     group_name, group_id = get_group_name_id(group_id)
+  templates_gst = node_collection.one({"_type":"GSystemType","name":"Template"})
+  if templates_gst:
+    templates_cur = node_collection.find({"member_of":ObjectId(GST_PAGE._id),"type_of":ObjectId(templates_gst._id)})
+  template = "ndf/group_templates_list.html"
+  # already_uploaded=request.GET.getlist('var',"")
+  variable = RequestContext(request, {'templates_cur':templates_cur })
+  return render_to_response(template, variable)
+
+
+@get_execution_time
 def add_transcript(request, group_id):
   try:
       group_id = ObjectId(group_id)
@@ -6654,7 +6669,7 @@ def add_assetcontent(request,group_id):
       subtitle_list.append(each_asset['right_subject'])
     #   sub_grel = create_grelation(ObjectId(assetcontentid), rt_subtitle, subtitle_list)
 
-    altlang_node = create_grelation(ObjectId(assetcontentid), rt_subtitle, subtitle_list, **{'triple_scope':{'relation_type_scope':{u'alt_language': unicode(subtitle_lang)}, 'subject_scope': "many"}})  
+    altlang_node = create_grelation(ObjectId(assetcontentid), rt_subtitle, subtitle_list, **{'triple_scope':{'relation_type_scope':{u'alt_language': unicode(subtitle_lang)}, 'subject_scope': "many"}})
 
     return StreamingHttpResponse("success")
 
