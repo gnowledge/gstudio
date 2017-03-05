@@ -111,6 +111,7 @@ urlpatterns = patterns('gnowsys_ndf.ndf.views.ajax_views',
     url(r'^get_node_json_from_id/', 'get_node_json_from_id', name='get_node_json_from_id'),
     url(r'^save_node/', 'save_node', name='save_node'),
     url(r'^get_group_pages/$', 'get_group_pages', name='get_group_pages'),
+    url(r'^add_to_collection_set/$', 'add_to_collection_set', name='add_to_collection_set'),
 
     # url for graph display
     url(r'^graph/adminRenderGraph/(?P<node_id>[^/]+)/fetch/(?P<graph_type>[^/]+)$', 'adminRenderGraph', name='adminRenderGraph'),

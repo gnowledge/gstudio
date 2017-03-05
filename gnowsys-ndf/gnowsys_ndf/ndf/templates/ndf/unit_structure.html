@@ -275,7 +275,7 @@
                                     <a href="#" data-reveal-id="add-activity-modal" class="add_activity">Create new</a>
                                 </li>
                                 <li>
-                                    <a href="#" data-reveal-id="select-activity-page">Select from Activity Pages</a>
+                                    <a href="#" data-reveal-id="select-activity-page" class="add_existing_activity">Select from Activity Pages</a>
                                 </li>
                             <!--
                                 <li>
@@ -301,7 +301,7 @@
 
     </div>
 
-    <div id="select-activity-page" class="reveal-modal" data-reveal aria-labelledby="modalTitle" aria-hidden="true" role="dialog">
+    <div id="select-activity-page" class="reveal-modal" data-reveal aria-labelledby="modalTitle" aria-hidden="true" role="dialog" data-lesson-id="">
       <h3>Choose Activity Page</h3>
       <div id="activity-container"></div>
       <a class="close-reveal-modal" aria-label="Close">&#215;</a>
@@ -611,7 +611,6 @@
                   // console.log(typeof(data));
                   data_dict = JSON.parse(data);
                   // console.log(data);
-                  aaa = data
                   if(data_dict.success){
                       renderCourseTree(data_dict.unit_hierarchy);
                       // handle opening of tree till recently added node with data_dict.msg
@@ -716,6 +715,17 @@
             //To select the newly created activity run this $('#activity-' + newid).trigger('click');
         });
 
+
+        // Add a new activity
+        $('.course-lessons').on('click', '.add_existing_activity', function(){
+            var lesson_id = $(this).closest('div.content').attr('id').replace('lesson-', '');
+            console.log('Adding existing activity for lessson ' + lesson_id);
+
+            $('#select-activity-page').attr('data-lesson-id', lesson_id);
+            //Send the query and update the course_data and call 'renderCourseTree(course_data)'
+            //To select the newly created activity run this $('#activity-' + newid).trigger('click');
+        });
+
         // console.log(course_data)
         renderCourseTree(course_data);
 
@@ -766,13 +776,14 @@
                       $(".activity-page").click(function(event){
                           event.preventDefault();
                           // get html content in var
-                          var activityId = $(this).attr("data-id");
-                          // console.log(activityId)
-                          var nodeContent = $(this).attr("data-name");
-                          // console.log(nodeContent);
+                          var activityPgId = $(this).attr("data-id");
+                          console.log(activityPgId)
+                          var activityContent = $(this).attr("data-name");
+                          console.log(activityContent);
 
-                          addActivity($('#activity-name').val().trim(), lesson_id);
-
+                          var lessonId = $("#select-activity-page").attr("data-lesson-id");
+                          addExistingActivityPage(lessonId, activityPgId);
+                          // addActivity($('#activity-name').val().trim(), lesson_id);
 
                           // if (editorMode != "edit"){
                           //     // console.log("jjjjjjjjjjjjjjj " + editorMode);
@@ -790,6 +801,35 @@
                     });
         }
 
+        function addExistingActivityPage(lessonId, activityPgId)
+        {
+            $.ajax({
+              type: "POST",
+              data:{
+                  'csrfmiddlewaretoken': "{{csrf_token}}",
+                  "child_node_id": activityPgId,
+                  "parent_node_id": lessonId
+              },
+              url: "{% url 'add_to_collection_set' group_id %}",
+              // datatype: "",
+              success: function(data) {
+                  if (data == "0") {
+                    console.log(data)
+                    $('#select-activity-page').foundation('reveal', 'close');
+                    alert('Same activity exists in concern lesson.');
+                    return 0;
+                  }
+                  // console.log(typeof(data));
+                  data_dict = JSON.parse(data);
+                  // console.log(data);
+                  renderCourseTree(data_dict);
+                  // handle opening of tree till recently added node with data_dict.msg
+                  $('#select-activity-page').foundation('reveal', 'close');
+                  }
+          });
+          return 1;
+        }
+
         $(document).on('opened.fndtn.reveal', '#existing_template_modal[data-reveal]', function () {
           // var modal = $(this); // console.log(this);
           getTemplates();
@@ -797,7 +837,7 @@
 
 
         $(document).on('opened.fndtn.reveal', '#select-activity-page[data-reveal]', function () {
-          var modal = $(this); // console.log(this);
+          // modal = $(this); // console.log(this);
           getActivityPages();
         });
 
@@ -929,13 +969,5 @@
                 $('.save_edit_activity').html('Edit');
             }
         })
-
-
-        // $(document).on('opened.fndtn.reveal', '[add-activity-modal]', function () {
-        //   var modal = $(this);
-        //   console.log(this);
-        // });
-
-
     })
   </script>

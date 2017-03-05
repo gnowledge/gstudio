@@ -6727,3 +6727,18 @@ def add_assetcontent(request,group_id):
   create_assetcontent(ObjectId(asset_obj),asset_cont_name,group_id,request.user.id,content=asset_cont_desc,files=uploaded_files,resource_type='File')
 
   return StreamingHttpResponse("success")
+
+
+def add_to_collection_set(request, group_id):
+    child_node_id = request.POST.get('child_node_id', None)
+    parent_node_id = request.POST.get('parent_node_id', None)
+
+    parent_node_obj = Node.get_node_by_id(parent_node_id)
+    if parent_node_obj and (ObjectId(child_node_id) not in parent_node_obj.collection_set):
+        parent_node_obj.collection_set.append(ObjectId(child_node_id))
+        parent_node_obj.save(group_id=group_id)
+        from gnowsys_ndf.ndf.views.unit import _get_unit_hierarchy
+        group_obj = Group.get_group_name_id(group_id, get_obj=True)
+        return HttpResponse(json.dumps(_get_unit_hierarchy(group_obj)))
+    else:
+        return HttpResponse(0)
