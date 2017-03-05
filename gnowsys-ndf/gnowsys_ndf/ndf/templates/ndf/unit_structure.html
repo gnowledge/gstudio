@@ -71,7 +71,7 @@
                             Editor tool will come here. //CK Editor
                         </div>
                         <div id="scstyle">
-                            
+
                         <div id="activity-content">
 
                         </div>
@@ -763,19 +763,24 @@
                       $("#activity-container").html(data);
                             // $('#existing_template_modal').foundation('reveal', 'open');
 
-                      $(".template-list").click(function(event){
+                      $(".activity-page").click(function(event){
                           // get html content in var
-                          var nodeContent = $(this).children('div').attr("data-content");
-                          if (editorMode != "edit"){
-                              // console.log("jjjjjjjjjjjjjjj " + editorMode);
-                            editNode(nodeContent);
-                          }
-                          else{
-                            CKEDITOR.instances['ckeditor_textarea'].setData(nodeContent);
-                          }
+                          var activityId = $(this).attr("data-id");
+                          console.log(activityId)
+                          var nodeContent = $(this).attr("data-name");
+                          console.log(nodeContent)
+
+                          // if (editorMode != "edit"){
+                          //     // console.log("jjjjjjjjjjjjjjj " + editorMode);
+                          //   editNode(nodeContent);
+                          // }
+                          // else{
+                          //   CKEDITOR.instances['ckeditor_textarea'].setData(nodeContent);
+                          // }
                           // Open ckeditor and append content of node in ckeditor
                           // openCkEditor('#activity-content', "BasicToolbar", nodeContent);
-                          $('#existing_template_modal').foundation('reveal', 'close');
+
+                          // $('#select-activity-page').foundation('reveal', 'close');
                         });
                       }
                     });

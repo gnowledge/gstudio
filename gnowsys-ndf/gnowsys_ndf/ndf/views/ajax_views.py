@@ -6543,11 +6543,10 @@ def get_group_templates_page(request, group_id):
 
 def get_group_pages(request, group_id):
     gst_page_name, gst_page_id = GSystemType.get_gst_name_id('Page')
-    print gst_page_id
     pages_cur = node_collection.find({'_type': 'GSystem', 'member_of': ObjectId(gst_page_id), 'group_set': ObjectId(group_id)})
     template = "ndf/group_pages.html"
-    print pages_cur.count()
-    variable = RequestContext(request, {'cursor': pages_cur, 'groupid': group_id, 'group_id': group_id })
+    card_class = 'activity-page'
+    variable = RequestContext(request, {'cursor': pages_cur, 'groupid': group_id, 'group_id': group_id, 'card_class': card_class })
     return render_to_response(template, variable)
 
 
