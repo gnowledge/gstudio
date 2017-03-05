@@ -11,20 +11,20 @@
 
 
 
-	
+
 		<div class="small-12 medium-2 columns heading row">
-		
+
 		</div>
 		<!--<div class="small-12 medium-6 columns expore-type">-->
 		<nav class="top-bar-second" data-topbar role="navigation" id="top-bar-second">
 		<div class="small-12 medium-12 columns expore-type">
 			<!--<div class="toggleButtons">-->
 			<div class=" left title-area">
-			
+
 				<a href="{% url 'explore_courses' %}" class="secondary-header-tabs  {%if title == 'courses'%} active{% endif %}">
 					Course Unit
 				</a>
-			
+
 				<a href="{% url 'explore_groups' %}" class="secondary-header-tabs {%if title == 'groups'%} active{% endif %}">
 					Groups
 				</a>
@@ -35,7 +35,7 @@
 					</a>
 				{% endif %}
 
-				<a class="secondary-header-button right" style="float:right" href="{% url 'unit_create_edit' groupid %}"><i class="fa fa-plus-circle"></i>{% trans " Create Course Unit" %}</a>
+				<a class="secondary-header-button right" style="float:right" href="{% url 'unit_create_edit' group_id %}"><i class="fa fa-plus-circle"></i>{% trans " Create Course Unit" %}</a>
 
 			</div>
 		</div>
