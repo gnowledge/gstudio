@@ -1,11 +1,18 @@
 {% load i18n %}
 {% load ndf_tags %}
 {% check_is_gstaff group_id request.user as is_gstaff %}
-    <div class="row">
-            <div class="small-12 medium-6 large-6 columns">
-            <h6>
-                &nbsp;&nbsp;&nbsp;<b><u>Asset Content Preview </u>&nbsp; ></b>
-               <!-- Resource Name-->
+<div class="row">
+  <div class="medium 12 columns">
+    <div class="left small-12 medium-6 columns">
+      <div class="preview_asset"> 
+         {% if title == "asset_content_detail" %}
+          {% include "ndf/resource_view.html" with node=node %}
+          {% endif %}
+      </div>
+    </div>
+
+  <div class="right small-12 medium-6 columns">
+      <h6><u>Asset Content Preview </u>&nbsp; ></b>
             </h6>
                 <label>Resource name: <b> {{node.name}} </b>
                     
@@ -14,23 +21,27 @@
           {% if asset_obj.created_by == request.user.id or is_gstaff %}
             {% if 'video' in node.if_file.mime_type or 'audio' in node.if_file.mime_type %}
             <div class="video-related">
-                <label>Upload Transcript
-                </label>
+                <label>Upload Transcript</label>
                 <div class="transcript_files">
                    <form class="dropzone" id ="doctranscript" enctype="multipart/form-data" method="post" action="{% url 'add_assetcontent' group_id %}" > 
-                    <input type="file" placeholder="" id="doctranscriptfile" name="transcript_file" />
+                    <input class="trans-sub" type="file" placeholder="" id="doctranscriptfile" name="transcript_file" />
                     <!-- <a class="right orange-button  save-transcript">Save Asset</a> -->
                     <button type="button" class="right orange-button save-transcript" style="display: none;" >Add Transcript </button>
-                </div>
+                
                 </form>
+
+              </div>
             {% endif %}
+
             {% if 'video' in node.if_file.mime_type %}
                 <div class="subtitle_files">
-                <label>Upload Subtitle
-                </label>
+                  <label>Upload Subtitle</label>
                     <form class="dropzone" id ="docsubtitle" enctype="multipart/form-data" method="post" action="{% url 'add_assetcontent' group_id %}" >
-                        <input type="file" id="docsubtitlefile" placeholder="" name="doc_f" />
+                        <input class="trans-sub" type="file" id="docsubtitlefile" placeholder="" name="doc_f" />
                         <br>
+                    </form>
+                </div>
+
                         <label>Language</label>
                           <select  style="display: none;" class="select-language" name="lan" id="sub_languageid" tabindex=3 >
                             <option value="">--- Select Language ---</option>
@@ -41,8 +52,8 @@
                             </option>
                             {% endfor %}
                           </select>
-                    </form>
-                    <button type="button" class="right orange-button save-subtitle" style="display: none;" onclick="save_subtitle()">Add Subtitle</button>
+                    <div class="row">
+                    <button type="button" class="right orange-button-subtitle save-subtitle" style="display: none;" onclick="save_subtitle()">Add Subtitle</button></div>
                    <!-- <input type="asset-save-button" id="" class="orange-button" onclick="save_asset_cont_data()" value="Save"/>-->
                 </div>
               {%  endif %}
@@ -50,13 +61,7 @@
             
             </div>
         </div>
-            <div class="small-12 medium-6 large-6 columns">
-                <div class="preview_asset"> 
-                    {% if title == "asset_content_detail" %}
-                        {% include "ndf/resource_view.html" with node=node %}
-                    {% endif %}
-                </div>
-            </div>
+            
         </div>
 
 <script type="text/javascript">

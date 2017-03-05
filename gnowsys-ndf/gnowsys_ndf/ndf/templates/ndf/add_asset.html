@@ -2,85 +2,82 @@
 {% load ndf_tags %}
 {% check_is_gstaff group_id request.user as is_gstaff %}
 
-    <div class="row overlay-head">
-
-        {% if asset_obj.name %}
-
-        {% else %}
-
-        <a class="right close-reveal-modal reveal-modal-overlay" aria-label="Close">&#215;</a>
-        {% endif %}
-        <div class="small-12 colums" >
-        {% if asset_obj.name %}
-            <h3 class="left">&nbsp;&nbsp;{{asset_obj.name}}</h3>
-
-        {% else %}
-            <h3 class="left overlay-title">&nbsp; Add a new asset</h3>
-            <button type="button" class="right orange-button save-asset">Save Asset</button>
-        {% endif %}
-
+<div class="row overlay-head">
             {% if asset_obj.name %}
-
             {% else %}
-            <!--<button type="button" class="right orange-button save-asset">Save Asset</button>-->
+            <a class="right close-reveal-modal reveal-modal-overlay" aria-label="Close">&#215;</a>
             {% endif %}
+            <div class="small-12 colums" >
+            {% if asset_obj.name %}
+                <p class="left">&nbsp;&nbsp;{{asset_obj.name}}</p>
+            {% else %}
+                <h3 class="left overlay-title">&nbsp; Add a new asset</h3>
+                <button type="button" class="right blue-white-button save-asset">Save Asset</button>
+            {% endif %}
+                {% if asset_obj.name %}
 
-        </div>
-    </div>
-    <div class="row">
-        <div class="small-12 medium-6 large-6 columns">
-            <label>
-                {% if not asset_obj %}
-                   Asset name 
-                   <input type="text" placeholder="" class="required" id = "asset-name" name="asset_name" />
-                {% endif %}
-
-            </label>
-        </div>
-    </div>
-    <div class="row">
-        <div class="small-12 medium-6 large-6 columns">
-            <label> 
-                {% if asset_obj %}
-                   <i><p style="color: gray">{{asset_obj.content}} </p><i>
                 {% else %}
-                    Asset description
-                    <textarea rows="4" cols="2" class="large-6 columns" placeholder="Enter Description" id="asset-descid"></textarea>
+                <!--<button type="button" class="right orange-button save-asset">Save Asset</button>-->
                 {% endif %}
-            </label>
-        </div>
-    </div>
-    {% comment %}
-    <div class="row">
-        <div class="small-12 medium-6 large-6 columns">
-            {% if asset_obj %}
-                <!--<i><p style="color: #2e3f51">{{asset_obj.content}} </p><i>-->
-            
-            {% else %}
 
-                <label>KeyWords
-                    <input type="text" placeholder="" name="asset_tags" />
+            </div>
+        </div>
+        <div class="row">
+            <div class="small-12 medium-6 large-6 columns">
+                <label>
+                    {% if not asset_obj %}
+                       Asset name 
+                       <input type="text" placeholder="" class="required" id = "asset-name" name="asset_name" />
+                    {% endif %}
+
                 </label>
-            {% endif %}
+            </div>
         </div>
-    </div>
+        <div class="row">
+            <div class="small-12 medium-6 large-6 columns">
+                <label> 
+                    {% if asset_obj %}
+                       <i><p style="color: gray">{{asset_obj.content}} </p></i>
+                    {% else %}
+                        Asset description
+                </label>
+                        <textarea rows="4" cols="2" class="small-12 columns" placeholder="Enter Description" id="asset-descid"></textarea>
+                    {% endif %}
+                
+        </div>
+        {% comment %}
+        <div class="row">
+            <div class="small-12 medium-6 large-6 columns">
+                {% if asset_obj %}
+                    <!--<i><p style="color: #2e3f51">{{asset_obj.content}} </p><i>-->
+                
+                {% else %}
+ 
+                    <label>KeyWords
+                        <input type="text" placeholder="" name="asset_tags" />
+                    </label>
+                {% endif %}
+            </div>
+        </div>
 
-    <div class="row">
-        <div class="small-12 medium-6 large-6 columns">
-            <label>Learning objectives met by this asset
-                <Select name="asset_objectives" id = "asset_objectivesid" placeholder="Select topics" require>
-                    <option value="">--- Select Topic ---</option>
-                    {% for each_topic in topic_nodes %}
-                    <option value="{{each_topic.pk}}">
-                        {{each_topic.name}}
-                    </option>
-                    {% endfor %}
-                </Select>
-            </label>
+        <div class="row">
+            <div class="small-12 medium-6 large-6 columns">
+                <label>Learning objectives met by this asset
+                    <Select name="asset_objectives" id = "asset_objectivesid" placeholder="Select topics" require>
+                        <option value="">--- Select Topic ---</option>
+                        {% for each_topic in topic_nodes %}
+                        <option value="{{each_topic.pk}}">
+                            {{each_topic.name}}
+                        </option>
+                        {% endfor %}
+                    </Select>
+                </label>
+            </div>
         </div>
-    </div>
-    {% endcomment %}
-   
+        {% endcomment %}
+       
+
+        
     <div class="asset-content-area"{% if not asset_obj %} style="display:none"{% endif %}>
        <!-- <h3>Add esources for this asset</h3>-->
         <div class="row">
@@ -89,16 +86,35 @@
             <div class="transcript_files">
                 <form class="dropzone" id ="docPost" enctype="multipart/form-data" method="post" action="{% url 'add_assetcontent' group_id %}" >
                     <input type="file" id="docFile" placeholder="" name=""/>
+                </form>
+            </div>
+    </div>
+
                     <div class="name-desc-asset-cont-area" style="display: none">
-                        <input type="text" placeholder="Enter name" class="required" id = "asset_content_name" name="" />
-                        <textarea rows="4" cols="2" class="large-6 columns" placeholder="Enter Description" id="asset_content_desc"></textarea>
+                    <div class="row">
+                    <div class="small-12 medium-6 large-6 columns">
+                    <label>
+                    Asset Content Name
+
+                        <input type="text" placeholder="Enter Asset Content's name" class="required" id = "asset_content_name" name="" />
+                    </label>
+                    </div>
+                    </div>
+                    <div class="row">
+                    <div class="small-12 medium-6 large-6 columns">
+                    <label> Asset Content Description<br/>
+                        <textarea rows="4" cols="2" class="small-12 columns" placeholder="Enter Asset Content's Description" id="asset_content_desc"></textarea>
+                    </label>
+                    </div>
+                    </div>
+                        <div class="row">
                         <button type="button"  class="right orange-button" id="upload_asset" onclick="save_form()">Upload Asset content</button>
+                        </div>
                     </div>
                     <!--<button type="button" class="right orange-button save-asset" onclick="save_asset_cont_data()">Save Asset</button>-->
                     <input type="hidden" name="context_name" value="{{title}}">
                     <input type="hidden" class ="asset_obj_val" name="asset_obj_name" data-asset-obj-val="">
-                </form>
-             </div>
+                
              {% endif %}
         </br><br><br><br><br><br>
         {% for each in asset_content_list.grel_node %}
@@ -134,19 +150,6 @@
         </div>
     </div>
 
-    <div class="row asset-comments-section">
-      <div class="columns small-10 " id="view-discussion">
-            <!-- discussion content area -->
-            {% get_thread_node asset_obj.pk as thread_node %}
-            {% if thread_node and "QuizItemEvent" not in asset_obj.member_of_names_list %}
-                {% get_disc_replies thread_node group_id global_disc_all_replies as all_replies %}
-                {% get_node thread_node as thread_node_obj %}
-                {% include 'ndf/in-line-texteditor.html' with node=thread_node_obj var_name="content_org" allow_to_comment=True ckeditor_toolbar="BasicToolbar" %}
-            {% endif %}
-
-            <!-- END of discussion content area -->
-      </div>
-    </div>
 
     
 <script type="text/javascript">
