@@ -6588,11 +6588,8 @@ def create_edit_asset(request,group_id):
   except:
       group_name, group_id = get_group_name_id(group_id)
   asset_name =  str(request.POST.get("asset_name", '')).strip()
-  asset_desc =  str(request.POST.get("asset_description", '')).strip()
-  # print asset_desc,"---------------------------------"
-  # asset_objective = str(request.POST.get("asset_objective", '')).strip()
+  asset_desc =  str(request.POST.get("asset_description", '')).strip()  
   asset_obj = create_asset(name=asset_name,group_id=group_id,created_by=request.user.id,content=unicode(asset_desc))
-  # rt_teaches = node_collection.one({'_type':'RelationType', 'name':'teaches'})
   # teaches_list = [ObjectId(asset_objective)]
   # asset_grels = triple_collection.find({'_type': 'GRelation', \
   #   'relation_type': rt_teaches._id,'subject': asset_obj._id},
@@ -6615,9 +6612,11 @@ def add_assetcontent(request,group_id):
   uploaded_files = request.FILES.getlist('filehive', [])
   uploaded_transcript = request.FILES.getlist('uploaded_transcript', [])
   uploaded_subtitle = request.FILES.getlist('uploaded_subtitle', [])
-  # print "\n\n\n\n",uploaded_subtitle
+  subtitle_lang = request.POST.get('sel_sub_lang','')
+  subtitle_lang_code = request.POST.get('sel_sub_lang_code','')
+  asset_cont_desc = request.POST.get('asset_cont_desc','')
+  asset_cont_name = request.POST.get('asset_cont_name','')
     
-  # print "\n\n\n\n\n\n\n ","if_transcript",if_transcript,"if_subtitle",if_subtitle
   if if_subtitle == "True":
     subtitle_obj = create_assetcontent(ObjectId(asset_obj),uploaded_subtitle[0].name,group_id,request.user.id,files=uploaded_subtitle,resource_type='File')
     rt_subtitle = node_collection.one({'_type':'RelationType', 'name':'has_subtitle'})
@@ -6628,8 +6627,9 @@ def add_assetcontent(request,group_id):
     {'_id': 0, 'right_subject': 1})
     for each_asset in subtitle_grels:
       subtitle_list.append(each_asset['right_subject'])
-    sub_grel = create_grelation(ObjectId(assetcontentid), rt_subtitle, subtitle_list)  
-    # print "++++++++++++++++++++++",subtitle_obj,sub_grel
+    #   sub_grel = create_grelation(ObjectId(assetcontentid), rt_subtitle, subtitle_list)
+
+    altlang_node = create_grelation(ObjectId(assetcontentid), rt_subtitle, subtitle_list, **{'triple_scope':{'relation_type_scope':{u'alt_language': unicode(subtitle_lang_code)}, 'subject_scope': "many"}})  
     return StreamingHttpResponse("success")
   
   if if_transcript == "True":
@@ -6645,7 +6645,7 @@ def add_assetcontent(request,group_id):
     trans_grel = create_grelation(ObjectId(assetcontentid), rt_transcript, transcript_list)  
     # print "++++++++++++++++++++++",subtitle_obj,sub_grel
     return StreamingHttpResponse("success")
-    
-  create_assetcontent(ObjectId(asset_obj),uploaded_files[0].name,group_id,request.user.id,files=uploaded_files,resource_type='File')
+  print "\n\n\n\n\nasset_cont_name",asset_cont_name,asset_cont_desc 
+  create_assetcontent(ObjectId(asset_obj),asset_cont_name,group_id,request.user.id,content=asset_cont_desc,files=uploaded_files,resource_type='File')
 
   return StreamingHttpResponse("success")

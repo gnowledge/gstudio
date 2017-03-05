@@ -3034,8 +3034,8 @@ def create_grelation(subject_id, relation_type_node, right_subject_id_or_list, *
                         # is PUBLISHED)
                         right_subject_id_or_list.remove(n.right_subject)
                         gr_node_list.append(n)
-                        if triple_scope_val:
-                            n = update_scope_of_triple(n, relation_type_node, triple_scope_val, is_grel=True)
+                        # if triple_scope_val:
+                        #     n = update_scope_of_triple(n, relation_type_node, triple_scope_val, is_grel=True)
 
                         node_collection.collection.update(
                             {'_id': subject_id, 'relation_set.' +

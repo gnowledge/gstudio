@@ -22,7 +22,7 @@ DEBUG_PROPAGATE_EXCEPTIONS = DEBUG
 BENCHMARK = "ON"
 GSTUDIO_DEFAULT_GROUPS_LIST = ['home', 'Trash', 'desk', 'help', 'warehouse']
 GSTUDIO_DEFAULT_GROUP = u'desk'
-LANGUAGES = (('en', 'English'), ('hi', u'\u0939\u093f\u0902\u0926\u0940'))
+LANGUAGES = (('te', 'Telugu'),('en', 'English'), ('hi', u'\u0939\u093f\u0902\u0926\u0940'))
 GSTUDIO_DEFAULT_LANGUAGE = ('en', 'English')
 OTHER_COMMON_LANGUAGES = [
     ('mr', 'Marathi'), ('mni','Manipuri'), ('ori','Oriya'),
