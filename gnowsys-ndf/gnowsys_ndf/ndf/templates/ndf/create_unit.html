@@ -31,7 +31,7 @@
                     </div>
                     <div class="right course_heading">
                         <input id="unit-altname" name="altnames" type="text" placeholder="Enter alternate name"
-                        value="{% if unit_node %}{{unit_node.name}}{% endif %}" autofocus onfocus="this.value = this.value;"/>
+                        value="{% firstof unit_node.altnames unit_node.name %}" autofocus onfocus="this.value = this.value;"/>
 
                     </div>
                 </div>
@@ -39,6 +39,18 @@
 
                 <hr/>
  
+                <div class="course_creator_header">
+                    <div class="left course_heading">
+                    <h5>Enter Description</h5>
+                    </div>
+                    <div class="right course_heading_unit">
+                        {% if unit_node %}
+                        <textarea name="content">{{unit_node.content}}</textarea>
+                        {% else %}
+                        <textarea name="content" rows="1" cols="2" class="small-12 columns" placeholder="Enter Description"></textarea>
+                        {% endif %}
+                    </div>
+                </div>
 
                 <div class="course_creator_header">
 
