@@ -23,7 +23,7 @@
                     <div class="activity-editor hide">
                         <div class="actvity-editor-header editor-header">
                             <div class="left header-left activity-name-label">
-                                <span class="activity-name ">Activity Name</span>
+                                <span class="activity-name">Activity Name</span>
                             </div>
 
                             <button type="button" class="right button-hollow-blue save_edit_activity" data-current-activity-id="">
@@ -882,7 +882,7 @@
 
         $('.course-editor-section').on('click', '.save_edit_activity', function(){
             if (editorMode === 'view') {
-                console.log('Editing the activity');
+                // console.log('Editing the activity');
                 editNode(false);
             }
             else {
@@ -890,8 +890,8 @@
                 // console.log('Saving the activity');
                 var nodeContent = CKEDITOR.instances['ckeditor_textarea'].getData();
                 // console.log(content_val);
-                nodeId = $('.save_edit_activity').attr('data-current-activity-id');
-                nodeName = 'a1';
+                var nodeId = $('.save_edit_activity').attr('data-current-activity-id');
+                var nodeName = $('#activity-' + nodeId).attr('data-name');
                 saveNode(nodeId, nodeName, nodeContent);
                 //Do the ajax to save the activity and then following command;
                 $('.save_edit_activity').html('Edit');
