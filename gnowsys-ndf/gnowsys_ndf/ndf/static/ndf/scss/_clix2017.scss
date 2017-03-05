@@ -303,6 +303,8 @@ h5{
               }
             }
         }
+
+
         .forgot-password {
           label {
             // //font-size: 10px;
@@ -323,9 +325,10 @@ h5{
 }
 
 
+
 .explore-button {
       // //font-size: 25px;
-      border-radius: 5px;
+    border-radius: 5px;
     text-transform: uppercase;
     margin-left: 150px;
     color: #ffc14e;
@@ -819,6 +822,7 @@ ul.horizontal_tabs_gstudio {
             position: absolute;
             bottom: 10px;
             left: 25px; 
+            color: $primary-blue;
         }
         .group_actions>button {
             display: inline-block;
@@ -828,7 +832,7 @@ ul.horizontal_tabs_gstudio {
     .group_sections {
         text-align: center;
         border-bottom: 1px solid #ccc;
-        background: #fff;
+        background: #eefaff;
     }
     .group_sections_content {
         min-height: 400px;
@@ -2612,7 +2616,7 @@ ul.jqtree-tree .jqtree-toggler {
 }
 
 .activity-name-label{
-    width: 50%;
+    width: 80%;
     margin-left: 20px;
     margin-top: 5px;
 
