@@ -45,7 +45,7 @@ subject_type,member_of,name,altnames,inverse_name,object_type,object_cardinality
 "[""CourseEventGroup""]","[""Binary""]",group_has_course_event,CourseEventGroup;Course,course_event_for_group,"[""Course""]",1,[],[],[]
 "[""Course"",""BaseCourseGroup"",""Group"",""ProgramEventGroup"",""PartnerGroup""]","[""Binary""]",has_logo,Course;File,logo_of,"[""File""]",1,[],[],[]
 "[""QuizItemEvent"",""Page"",""File""]","[""Binary""]",clone_of,QuizItemEvent;QuizItem,has_clone,"[""QuizItem"",""Page"",""File""]",1,[],[],[]
-"[""QuizItem"",""QuizItemEvent"",""Page"",""File"",""Forum"",""Jsmol"", ""TurtleBlocks"", ""PoliceSquad"", ""OpenStoryTool"", ""BioMechanics""]","[""Binary""]",has_thread,QuizItemEvent;Twist,thread_of,"[""Twist""]",100,[],[],[]
+"[""QuizItem"",""QuizItemEvent"",""Page"",""File"",""Forum"",""Jsmol"", ""TurtleBlocks"", ""PoliceSquad"", ""OpenStoryTool"", ""BioMechanics"", ""Asset""]","[""Binary""]",has_thread,QuizItemEvent;Twist,thread_of,"[""Twist""]",100,[],[],[]
 "[""Asset""]","[""Binary""]",has_assetcontent,AssetContent,assetcontent_of,"[""QuizItem"",""Page"",""File""]",100,"[""alt_size"",""alt_format"",""alt_language""]","[""any"",""most"",""some"",""none"",""atmost""]",[]
 "[""File""]","[""Binary""]",has_subtitle,File;File,subtitle_of,"[""File""]",100,"[""alt_language""]",[],[]
 "[""File""]","[""Binary""]",has_transcript,File;File,transcript_of,"[""File""]",1,[],[],[]
