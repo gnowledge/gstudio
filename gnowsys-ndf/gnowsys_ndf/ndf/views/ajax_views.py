@@ -6629,7 +6629,7 @@ def add_assetcontent(request,group_id):
       subtitle_list.append(each_asset['right_subject'])
     #   sub_grel = create_grelation(ObjectId(assetcontentid), rt_subtitle, subtitle_list)
 
-    altlang_node = create_grelation(ObjectId(assetcontentid), rt_subtitle, subtitle_list, **{'triple_scope':{'relation_type_scope':{u'alt_language': unicode(subtitle_lang_code)}, 'subject_scope': "many"}})  
+    altlang_node = create_grelation(ObjectId(assetcontentid), rt_subtitle, subtitle_list, **{'triple_scope':{'relation_type_scope':{u'alt_language': unicode(subtitle_lang)}, 'subject_scope': "many"}})  
     return StreamingHttpResponse("success")
   
   if if_transcript == "True":

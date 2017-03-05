@@ -25,11 +25,9 @@ CKEDITOR.plugins.add('addJhapp',
                         success: function(data) {
                           $("#group_imgs_on_modal").html(data);
                           $('#group_imgs_on_modal').foundation('reveal', 'open');
-
-                          $(".button-hollow-purple").click(function(event){
-                            var datasrc = $(this).attr("data-original-url");
-                            completeURL = "/media"+ datasrc;
-                            CKEDITOR.instances[textAreaId].insertHtml('<iframe style="border:none;width:100%;height:100%;min-height:800px;" src=' + completeURL +  '>' + '</img>');
+                            $("#insert_assessment").click(function(event){
+                            assessment_text_val = $('#paste-area-assessment').val();
+                            CKEDITOR.instances[textAreaId].insertHtml(assessment_text_val);
                             $('#group_imgs_on_modal').foundation('reveal', 'close');
                           });
 

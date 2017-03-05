@@ -3,25 +3,13 @@
 
 {% load ndf_tags %}
 {% get_group_name groupid as group_name_tag %}
-<ul class="small-block-grid-1 medium-block-grid-3 large-block-grid-3" >
-{% for each in jhapp_res %}
-<li class="card-image-wrapper" title="{{each.name}}">
 <div class="editor_modal_content">
-            <div class="app_row">
-                <div style="width: 30%" class="app_image">
-                    <div>
-                        <img src="https://s-media-cache-ak0.pinimg.com/originals/93/28/be/9328bef380f0c9091302f0caae6ee7c8.jpg"/>
-                    </div>
-                </div>
+            <div class="row app_row">
                 <div style="width: 65%" class="app_desc">
-                    <h3>{{each.name}}</h3>
-                    <p>
-                        {{each.content}}
-                    </p>
-                    <button type="button" data-original-url="{{each.if_file.original.relurl}}" class="button-hollow-purple">Select this app</button>
+                    <h3>Assessments</h3>
+                        <input type="text" placeholder="" class="required" id ="paste-area-assessment"  />
+
+                    <button type="button"  class="right orange-button" id="insert_assessment" >Insert Assessment</button>
                 </div>
             </div>
         </div>
-</li>        
-{% endfor %}
-</ul>
