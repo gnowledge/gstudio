@@ -6541,6 +6541,9 @@ def get_group_templates_page(request, group_id):
   return render_to_response(template, variable)
 
 
+def get_group_pages(request, group_id):
+  pass
+
 @get_execution_time
 def add_transcript(request, group_id):
   try:
@@ -6622,7 +6625,7 @@ def add_asset(request,group_id):
   if node_obj:
     context_variables.update({'asset_obj': node_obj})
     context_variables.update({'edit': True})
-  return render_to_response("ndf/add_asset.html",RequestContext(request, 
+  return render_to_response("ndf/add_asset.html",RequestContext(request,
     context_variables))
 
 @login_required
@@ -6633,7 +6636,7 @@ def create_edit_asset(request,group_id):
   except:
       group_name, group_id = get_group_name_id(group_id)
   asset_name =  str(request.POST.get("asset_name", '')).strip()
-  asset_desc =  str(request.POST.get("asset_description", '')).strip()  
+  asset_desc =  str(request.POST.get("asset_description", '')).strip()
   node_id = request.POST.get('node_id', None)
   asset_obj = create_asset(name=asset_name, group_id=group_id,
     created_by=request.user.id, content=unicode(asset_desc), node_id=node_id)

@@ -3131,7 +3131,7 @@ def assets(request, group_id, asset_id=None):
                                     context_variables,
                                     context_instance = RequestContext(request)
         )
-   
+
     asset_nodes = node_collection.find({'member_of': {'$in': [asset_gst_id]},
         'group_set': {'$all': [ObjectId(group_id)]}}).sort('last_update', -1)
     context_variables = {
