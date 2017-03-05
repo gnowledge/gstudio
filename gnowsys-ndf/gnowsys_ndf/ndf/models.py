@@ -350,11 +350,12 @@ class Node(DjangoDocument):
     def fill_node_values(self, request=HttpRequest(), **kwargs):
 
         # 'name': unicode,
+        name = self.name
         if kwargs.has_key('name'):
-            self.name = kwargs.get('name', '')
+            name = kwargs.get('name', '')
         elif request:
-            self.name = request.POST.get('name', '').strip()
-        self.name = unicode(self.name)
+            name = request.POST.get('name', '').strip()
+        self.name = unicode(name) if name else self.name
 
         # 'altnames': unicode,
         if kwargs.has_key('altnames'):
@@ -567,7 +568,8 @@ class Node(DjangoDocument):
         '''
         if isinstance(node_id, ObjectId) or ObjectId.is_valid(node_id):
             return node_collection.one({'_id': ObjectId(node_id)})
-        raise ValueError('No object found with id: ' + str(node_id))
+        # raise ValueError('No object found with id: ' + str(node_id))
+        return None
 
     @staticmethod
     def get_nodes_by_ids_list(node_id_list):
