@@ -47,8 +47,11 @@
 
 
 <div class="row page" itemscope itemtype="{{schema.1.type}}">
-
+{% if expand_content %}
+  <section class="medium-12 columns">
+{% else %}
   <section class="medium-9 columns">
+{% endif %}
   {% if not hide_breadcrumbs %}{{hide_breadcrumbs}}
   {% block breadcrumb %} {% get_breadcrumb request.path %} {% endblock breadcrumb %}
   {% endif %}
