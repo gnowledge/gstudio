@@ -29,11 +29,9 @@
 					Groups
 				</a>
 
-				{% if is_gstaff %}
-					<a href="{% url 'explore_basecourses' %}" class="secondary-header-tabs {%if title == 'base courses'%} active{% endif %}">
-						Draft Course Unit
-					</a>
-				{% endif %}
+				<a href="{% url 'explore_basecourses' %}" class="secondary-header-tabs {%if title == 'base courses'%} active{% endif %}">
+					Draft Course Unit
+				</a>
 
 				<a class="secondary-header-button right" style="float:right" href="{% url 'unit_create_edit' group_id %}"><i class="fa fa-plus-circle"></i>{% trans " Create Course Unit" %}</a>
 

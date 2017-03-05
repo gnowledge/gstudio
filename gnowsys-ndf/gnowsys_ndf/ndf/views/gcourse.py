@@ -3215,5 +3215,5 @@ def load_content_data(request, group_id):
     return render_to_response(template,
     {
       "group_id":group_id,"groupid":group_id, "node": node,
-      "hide_breadcrumbs": True
+      "hide_breadcrumbs": True, 'expand_content':True
     },context_instance=RequestContext(request))
