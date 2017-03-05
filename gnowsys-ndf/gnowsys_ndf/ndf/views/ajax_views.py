@@ -67,6 +67,28 @@ class Encoder(json.JSONEncoder):
             return obj
 
 
+def get_node_json_from_id(request, group_id, node_id=None):
+    if not node_id:
+        node_id = request.GET.get('node_id')
+    node_obj = Node.get_node_by_id(node_id)
+    if node_obj:
+        return HttpResponse(json.dumps(node_obj, cls=NodeJSONEncoder))
+    else:
+        return HttpResponse(0)
+
+
+def save_node(request, group_id, node_id=None):
+    if not node_id:
+        node_id = request.POST.get('node_id')
+    node_obj = Node.get_node_by_id(node_id)
+    if node_obj:
+        node_obj.fill_gstystem_values(request=request)
+        node_obj.save(group_id=group_id)
+        return HttpResponse(json.dumps(node_obj, cls=NodeJSONEncoder))
+    else:
+        return HttpResponse(0)
+
+
 def checkgroup(request, group_name):
     titl = request.GET.get("gname", "")
     retfl = check_existing_group(titl)
@@ -6588,7 +6610,7 @@ def create_edit_asset(request,group_id):
   except:
       group_name, group_id = get_group_name_id(group_id)
   asset_name =  str(request.POST.get("asset_name", '')).strip()
-  asset_desc =  str(request.POST.get("asset_description", '')).strip()  
+  asset_desc =  str(request.POST.get("asset_description", '')).strip()
   asset_obj = create_asset(name=asset_name,group_id=group_id,created_by=request.user.id,content=unicode(asset_desc))
   # teaches_list = [ObjectId(asset_objective)]
   # asset_grels = triple_collection.find({'_type': 'GRelation', \
@@ -6616,12 +6638,12 @@ def add_assetcontent(request,group_id):
   subtitle_lang_code = request.POST.get('sel_sub_lang_code','')
   asset_cont_desc = request.POST.get('asset_cont_desc','')
   asset_cont_name = request.POST.get('asset_cont_name','')
-    
+
   if if_subtitle == "True":
     subtitle_obj = create_assetcontent(ObjectId(asset_obj),uploaded_subtitle[0].name,group_id,request.user.id,files=uploaded_subtitle,resource_type='File')
     rt_subtitle = node_collection.one({'_type':'RelationType', 'name':'has_subtitle'})
     subtitle_list = [ObjectId(subtitle_obj._id)]
-    
+
     subtitle_grels = triple_collection.find({'_type': 'GRelation', \
     'relation_type': rt_subtitle._id,'subject': ObjectId(assetcontentid)},
     {'_id': 0, 'right_subject': 1})
@@ -6629,23 +6651,23 @@ def add_assetcontent(request,group_id):
       subtitle_list.append(each_asset['right_subject'])
     #   sub_grel = create_grelation(ObjectId(assetcontentid), rt_subtitle, subtitle_list)
 
-    altlang_node = create_grelation(ObjectId(assetcontentid), rt_subtitle, subtitle_list, **{'triple_scope':{'relation_type_scope':{u'alt_language': unicode(subtitle_lang_code)}, 'subject_scope': "many"}})  
+    altlang_node = create_grelation(ObjectId(assetcontentid), rt_subtitle, subtitle_list, **{'triple_scope':{'relation_type_scope':{u'alt_language': unicode(subtitle_lang_code)}, 'subject_scope': "many"}})
     return StreamingHttpResponse("success")
-  
+
   if if_transcript == "True":
     rt_transcript = node_collection.one({'_type':'RelationType', 'name':'has_transcript'})
     transcript_obj = create_assetcontent(ObjectId(asset_obj),uploaded_transcript[0].name,group_id,request.user.id,files=uploaded_transcript,resource_type='File')
     transcript_list = [ObjectId(transcript_obj._id)]
-    
+
     transcript_grels = triple_collection.find({'_type': 'GRelation', \
     'relation_type': rt_transcript._id,'subject': ObjectId(assetcontentid)},
     {'_id': 0, 'right_subject': 1})
     for each_trans in transcript_grels:
       transcript_list.append(each_trans['right_subject'])
-    trans_grel = create_grelation(ObjectId(assetcontentid), rt_transcript, transcript_list)  
+    trans_grel = create_grelation(ObjectId(assetcontentid), rt_transcript, transcript_list)
     # print "++++++++++++++++++++++",subtitle_obj,sub_grel
     return StreamingHttpResponse("success")
-  print "\n\n\n\n\nasset_cont_name",asset_cont_name,asset_cont_desc 
+  print "\n\n\n\n\nasset_cont_name",asset_cont_name,asset_cont_desc
   create_assetcontent(ObjectId(asset_obj),asset_cont_name,group_id,request.user.id,content=asset_cont_desc,files=uploaded_files,resource_type='File')
 
   return StreamingHttpResponse("success")
