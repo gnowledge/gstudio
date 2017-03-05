@@ -1,5 +1,5 @@
-@import '/static/ndf/bower_components/videojs/dist/video-js/video-js.css';
-@import '/static/ndf/bower_components/videojs/dist/video-js/video-js.min.css';
+@import '/static/ndf/bower_components/videojs/dist/video-js.css';
+@import '/static/ndf/bower_components/videojs/dist/video-js.min.css';
 @import '/static/ndf/css/videojs-skin-color.css';
 @import '/static/ndf/css/rubik-fonts.css';
 @import '/static/ndf/css/sgc-toc.css';
@@ -14,7 +14,7 @@
 #scstyle h1, h2, h4,  h6 {
   font-family: 'Rubik-Light', sans-serif;
   font-weight: normal;
-  color: #4a4a4a !important; 
+  color: #4a4a4a !important;
   color: var(--greyish-brown);
 }
 
@@ -514,7 +514,7 @@
     display: block;
     width: 60%;
     padding-top: 10px;
-    
+
 }
 
 /* Caption of Modal Image */
@@ -530,7 +530,7 @@
 }
 
 /* Add Animation */
-#scstyle .modal-content, #caption {    
+#scstyle .modal-content, #caption {
     -webkit-animation-name: zoom;
     -webkit-animation-duration: 0.6s;
     animation-name: zoom;
@@ -538,12 +538,12 @@
 }
 
 #scstyle @-webkit-keyframes zoom {
-    from {-webkit-transform:scale(0)} 
+    from {-webkit-transform:scale(0)}
     to {-webkit-transform:scale(1)}
 }
 
 #scstyle @keyframes zoom {
-    from {transform:scale(0)} 
+    from {transform:scale(0)}
     to {transform:scale(1)}
 }
 

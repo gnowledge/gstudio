@@ -23,13 +23,13 @@
                     <div class="activity-editor hide">
                         <div class="actvity-editor-header editor-header">
                             <div class="left header-left activity-name-label">
-                                <span class="activity-name ">Activity Name</span>
+                                <span class="activity-name">Activity Name</span>
                             </div>
-                                
+
                             <button type="button" class="right button-hollow-blue save_edit_activity" data-current-activity-id="">
                                   Edit
                             </button>
-                            
+
                             <div class="right custom_dropdown">
                                 <a href="">More</a>
                                 <ul class="dropdown_content right_align">
@@ -39,13 +39,15 @@
                                     <li>
                                         <a href="#" data-reveal-id="existing_template_modal">Create from existing template</a>
                                     </li>
+                                    <!--
                                     <li>
                                         <a href="#" class="delete_entity">Delete</a>
                                     </li>
+                                    -->
                                 </ul>
                             </div>
 
-                            
+
                         </div>
                         <div class="editor-tool hide">
                             <div class="editor_actions">
@@ -68,8 +70,11 @@
                             </div>
                             Editor tool will come here. //CK Editor
                         </div>
+                        <div id="scstyle">
+
                         <div id="activity-content">
 
+                        </div>
                         </div>
                     </div>
                     <div class="lesson-editor hide">
@@ -78,9 +83,11 @@
                             <div class="right custom_dropdown">
                                 <a href="">More</a>
                                 <ul class="dropdown_content right_align">
+                                    <!--
                                     <li>
                                         <a href="#">Delete</a>
                                     </li>
+                                    -->
                                 </ul>
                             </div>
                         </div>
@@ -234,8 +241,10 @@
                     <ul class="entity_actions">
                         <li class="lesson_move_up">Move up</li>
                         <li class="lesson_move_down">Move down</li>
+                        <!--
                         <li class="lesson_edit">Edit</li>
                         <li class="lesson_delete">Delete</li>
+                        -->
                     </ul>
                 </div>
             </a>
@@ -249,8 +258,10 @@
                                     <ul class="entity_actions">
                                         <li class="activity_move_up">Move up</li>
                                         <li class="activity_move_down">Move down</li>
+                                        <!--
                                         <li class="activity_edit">Edit</li>
                                         <li class="activity_delete">Delete</li>
+                                        -->
                                     </ul>
                                 </div>
                             </a>
@@ -261,7 +272,7 @@
                             <a href="#" class="button-hollow-grey add_activity">Add Activity</a>
                             <ul class="dropdown_content left_align" >
                                 <li>
-                                    <a href="#" data-reveal-id="add-activity-modal" class="right add_activity">Create new</a>
+                                    <a href="#" data-reveal-id="add-activity-modal" class="add_activity">Create new</a>
                                 </li>
                                 <li>
                                     <a href="#" data-reveal-id="select-activity-page">Select from Activity Pages</a>
@@ -292,6 +303,7 @@
 
     <div id="select-activity-page" class="reveal-modal" data-reveal aria-labelledby="modalTitle" aria-hidden="true" role="dialog">
       <h3>Choose Activity Page</h3>
+      <div id="activity-container"></div>
       <a class="close-reveal-modal" aria-label="Close">&#215;</a>
     </div>
 
@@ -548,7 +560,6 @@
                   aaa = data
                   if(data_dict.success){
                       renderCourseTree(data_dict.unit_hierarchy);
-                      alert('Lesson saved successfully!');
                       // handle opening of tree till recently added node with data_dict.msg
                       $('#myModal').foundation('reveal', 'close');
                       result = true;
@@ -603,7 +614,6 @@
                   aaa = data
                   if(data_dict.success){
                       renderCourseTree(data_dict.unit_hierarchy);
-                      alert('Activity saved successfully!');
                       // handle opening of tree till recently added node with data_dict.msg
                       $('#add-activity-modal').foundation('reveal', 'close');
                       result = true;
@@ -625,7 +635,7 @@
             console.log('Adding another lessson');
             // aaa = this
             var lesson_id = $('#add-activity-modal button.save-activity').attr('lesson_id');
-            console.log(lesson_id);
+            // console.log(lesson_id);
             addActivity($('#activity-name').val().trim(), lesson_id);
 
             //Send the query and update the course_data and call 'renderCourseTree(course_data)'
@@ -740,6 +750,46 @@
                     });
         }
 
+        function getActivityPages() {
+            $.ajax({
+                      type: "GET",
+                      url: "{% url 'get_group_pages' group_id %}",
+                      datatype: "html",
+                      data:{
+
+                      },
+                        success: function(data) {
+                          // console.log(data);
+                      $("#activity-container").html(data);
+                            // $('#existing_template_modal').foundation('reveal', 'open');
+
+                      $(".activity-page").click(function(event){
+                          event.preventDefault();
+                          // get html content in var
+                          var activityId = $(this).attr("data-id");
+                          // console.log(activityId)
+                          var nodeContent = $(this).attr("data-name");
+                          // console.log(nodeContent);
+
+                          addActivity($('#activity-name').val().trim(), lesson_id);
+
+
+                          // if (editorMode != "edit"){
+                          //     // console.log("jjjjjjjjjjjjjjj " + editorMode);
+                          //   editNode(nodeContent);
+                          // }
+                          // else{
+                          //   CKEDITOR.instances['ckeditor_textarea'].setData(nodeContent);
+                          // }
+                          // Open ckeditor and append content of node in ckeditor
+                          // openCkEditor('#activity-content', "BasicToolbar", nodeContent);
+
+                          // $('#select-activity-page').foundation('reveal', 'close');
+                        });
+                      }
+                    });
+        }
+
         $(document).on('opened.fndtn.reveal', '#existing_template_modal[data-reveal]', function () {
           // var modal = $(this); // console.log(this);
           getTemplates();
@@ -748,7 +798,7 @@
 
         $(document).on('opened.fndtn.reveal', '#select-activity-page[data-reveal]', function () {
           var modal = $(this); // console.log(this);
-          // getTemplates();
+          getActivityPages();
         });
 
 
@@ -832,7 +882,7 @@
 
         $('.course-editor-section').on('click', '.save_edit_activity', function(){
             if (editorMode === 'view') {
-                console.log('Editing the activity');
+                // console.log('Editing the activity');
                 editNode(false);
             }
             else {
@@ -840,8 +890,8 @@
                 // console.log('Saving the activity');
                 var nodeContent = CKEDITOR.instances['ckeditor_textarea'].getData();
                 // console.log(content_val);
-                nodeId = $('.save_edit_activity').attr('data-current-activity-id');
-                nodeName = 'a1';
+                var nodeId = $('.save_edit_activity').attr('data-current-activity-id');
+                var nodeName = $('#activity-' + nodeId).attr('data-name');
                 saveNode(nodeId, nodeName, nodeContent);
                 //Do the ajax to save the activity and then following command;
                 $('.save_edit_activity').html('Edit');

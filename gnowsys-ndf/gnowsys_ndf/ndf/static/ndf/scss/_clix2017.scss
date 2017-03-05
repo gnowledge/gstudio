@@ -31,6 +31,7 @@ body {
     font-family: 'Rubik-Regular', sans-serif;
 }
 
+
 h3{
     font-size: 20px;
     color: $primary-blue;
@@ -43,6 +44,8 @@ h5{
     text-transform:uppercase;
     letter-spacing:2px;
 }
+
+
 
 .overlay-head{
     background-color: #f2fbff;
@@ -61,6 +64,7 @@ h5{
 .landing_page {
   position: relative;
   text-align: center;
+  
 
   .panel {
     background-color: inherit;
@@ -72,9 +76,7 @@ h5{
     width: 100%;
     position: absolute;
     z-index: -1;
-
   }
-
 
   .clix_brief {
     text-align: left;
@@ -323,13 +325,19 @@ h5{
 
 .explore-button {
       // //font-size: 25px;
-      border-radius: 10px;
-      
-      text-transform: uppercase;
-      background-color: $primary-blue;
-      margin-top: 80px;
-      color: $secondry-blue;
-      
+      border-radius: 5px;
+    text-transform: uppercase;
+    margin-left: 150px;
+    color: #ffc14e;
+    padding: 5px 17px;
+    width: inherit;
+    font-family: "Rubik-Medium", sans-serif;
+    border: 2px solid #ffc14e;
+    &:hover{
+        background-color:rgba(255,193,78,0.3);
+        cursor:pointer;
+        color:white;
+    }
 }
 
 
@@ -2129,6 +2137,7 @@ ul.jqtree-tree .jqtree-toggler {
         /*Overriding default*/
         .accordion .accordion-navigation > .content, .accordion dd > .content {
             padding: 0px;
+            padding-left:0px;
         }
 
         /*Custom css*/
@@ -2152,9 +2161,9 @@ ul.jqtree-tree .jqtree-toggler {
 
                     &.accordion-navigation {
                         position: relative;
+                        padding-left:0px;
 
                         &>a {
-                            padding-left: 50px;
                             &:before {
                                 // content: '&#8250';
                                 position: absolute;
@@ -2209,6 +2218,7 @@ ul.jqtree-tree .jqtree-toggler {
                             // //font-size: 45px;
                             line-height: 55px;
                             color: #d7d7d7;
+
                         }
 
                         .course-activities {
@@ -2216,7 +2226,7 @@ ul.jqtree-tree .jqtree-toggler {
                             &>li {
                                 list-style: none;
                                 border-top: 1px solid #e9e9e9;
-                                padding: 10px 0px 10px 90px;
+                                padding: 10px 0px 10px 30px;
                                 background: inherit;
                                 @include transition-prop(border-color);
 
@@ -2301,14 +2311,15 @@ ul.jqtree-tree .jqtree-toggler {
 
         .add-lesson {
             //margin: 10px 50px;
-            margin-top: 5px;
-            margin-left: 26.9px;
+            margin-top: 20px;
+            margin-left: 20px;
+            float: left;
             //padding-top:5px;
         }
 
         .add_activity{
                margin-top: 3px;
-               margin-left: -47.1px;
+               //margin-left: -47.1px;
 
         }
 
@@ -2328,7 +2339,7 @@ ul.jqtree-tree .jqtree-toggler {
             }
             .course_tree {
                 @include transition-prop(all);
-                width: 20%;
+                width: 27%;
                 background-color: #2a6882;
 
                 .course-lessons {
@@ -2402,7 +2413,7 @@ ul.jqtree-tree .jqtree-toggler {
             }
 
             .course-editor-section {
-                width: 79.5%;
+                width: 72%;
                 opacity: 1;
                 overflow-x: auto;
                 //display: inline-block;
@@ -2531,8 +2542,7 @@ ul.jqtree-tree .jqtree-toggler {
         }
         
         li {
-            width:  110px;
-            padding: 5px 25px;
+            padding: 10px 35px;
             list-style: none;
             white-space: nowrap;
 
@@ -2550,7 +2560,7 @@ ul.jqtree-tree .jqtree-toggler {
 
     a {
         color: #999999;
-        margin-left: 25px;
+       // margin-left: 25px;
     }
 }
 
@@ -2704,6 +2714,20 @@ ul.jqtree-tree .jqtree-toggler {
         }
     }
 }
+
 #activity-content{
  height:30rem!important;   
 }
+.bg-img{
+    //background: url(/static/ndf/images/group-tile.png) no-repeat;
+    background: url(/static/ndf/images/landing.jpg);
+    height:100vh;
+    background-size: 100%;
+}
+.white-text{
+    color:white;
+}
+  .panel-mod{
+    background-color: transparent;
+    border: none;
+  }

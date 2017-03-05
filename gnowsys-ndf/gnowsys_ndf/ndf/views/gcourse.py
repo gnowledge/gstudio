@@ -3171,7 +3171,7 @@ def course_pages(request, group_id, page_id=None):
     template = 'ndf/gevent_base.html'
 
     page_gst_name, page_gst_id = GSystemType.get_gst_name_id("Page")
-    all_pages = node_collection.find({'member_of': page_gst_id,
+    all_pages = node_collection.find({'member_of': page_gst_id, 'group_set': group_id
                 # 'content': {'$regex': 'clix-activity-styles.css', '$options': 'i'}
                 })
     context_variables = {
@@ -3215,5 +3215,5 @@ def load_content_data(request, group_id):
     return render_to_response(template,
     {
       "group_id":group_id,"groupid":group_id, "node": node,
-      "hide_breadcrumbs": True
+      "hide_breadcrumbs": True, 'expand_content':True
     },context_instance=RequestContext(request))

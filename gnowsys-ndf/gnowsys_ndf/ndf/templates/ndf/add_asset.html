@@ -202,7 +202,6 @@
                     // $('#addAsset').html(data);
                     // $('#addAsset').foundation('reveal', 'open');
                     $('.asset-content-area').css('display', 'block')
-                    alert("Asset Added Successfully")
                     $('.save-asset').css('display', 'none')
                     $('.asset_obj_val').attr('data-asset-obj-val',data);
                 }
@@ -280,7 +279,6 @@
             // check if image is not in the list, add it.
             else if(xhr.responseText )
             {
-              alert("Asset Content added successfully");
               location.reload();
             }
 
