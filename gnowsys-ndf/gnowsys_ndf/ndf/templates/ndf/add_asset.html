@@ -2,87 +2,85 @@
 {% load ndf_tags %}
 {% check_is_gstaff group_id request.user as is_gstaff %}
 
-<div class="row overlay-head">
+    <div class="row overlay-head">
+
+        {% if asset_obj.name %}
+
+        {% else %}
+
+        <a class="right close-reveal-modal reveal-modal-overlay" aria-label="Close">&#215;</a>
+        {% endif %}
+        <div class="small-12 colums" >
+        {% if asset_obj.name %}
+            <h3 class="left">&nbsp;&nbsp;{{asset_obj.name}}</h3>
+
+        {% else %}
+            <h3 class="left overlay-title">&nbsp; Add a new asset</h3>
+            <button type="button" class="right orange-button save-asset">Save Asset</button>
+        {% endif %}
 
             {% if asset_obj.name %}
 
             {% else %}
-
-            <a class="right close-reveal-modal reveal-modal-overlay" aria-label="Close">&#215;</a>
-            {% endif %}
-            <div class="small-12 colums" >
-            {% if asset_obj.name %}
-                <h3 class="left">&nbsp;&nbsp;{{asset_obj.name}}</h3>
-
-            {% else %}
-                <h3 class="left overlay-title">&nbsp; Add a new asset</h3>
-                <button type="button" class="right orange-button save-asset">Save Asset</button>
+            <!--<button type="button" class="right orange-button save-asset">Save Asset</button>-->
             {% endif %}
 
-                {% if asset_obj.name %}
-
-                {% else %}
-                <!--<button type="button" class="right orange-button save-asset">Save Asset</button>-->
+        </div>
+    </div>
+    <div class="row">
+        <div class="small-12 medium-6 large-6 columns">
+            <label>
+                {% if not asset_obj %}
+                   Asset name 
+                   <input type="text" placeholder="" class="required" id = "asset-name" name="asset_name" />
                 {% endif %}
 
-            </div>
+            </label>
         </div>
-        <div class="row">
-            <div class="small-12 medium-6 large-6 columns">
-                <label>
-                    {% if not asset_obj %}
-                       Asset name 
-                       <input type="text" placeholder="" class="required" id = "asset-name" name="asset_name" />
-                    {% endif %}
-
-                </label>
-            </div>
-        </div>
-        <div class="row">
-            <div class="small-12 medium-6 large-6 columns">
-                <label> 
-                    {% if asset_obj %}
-                       <i><p style="color: gray">{{asset_obj.content}} </p><i>
-                    {% else %}
-                        Asset description
-                        <textarea rows="4" cols="2" class="large-6 columns" placeholder="Enter Description" id="asset-descid"></textarea>
-                    {% endif %}
-                </label>
-            </div>
-        </div>
-        {% comment %}
-        <div class="row">
-            <div class="small-12 medium-6 large-6 columns">
+    </div>
+    <div class="row">
+        <div class="small-12 medium-6 large-6 columns">
+            <label> 
                 {% if asset_obj %}
-                    <!--<i><p style="color: #2e3f51">{{asset_obj.content}} </p><i>-->
-                
+                   <i><p style="color: gray">{{asset_obj.content}} </p><i>
                 {% else %}
- 
-                    <label>KeyWords
-                        <input type="text" placeholder="" name="asset_tags" />
-                    </label>
+                    Asset description
+                    <textarea rows="4" cols="2" class="large-6 columns" placeholder="Enter Description" id="asset-descid"></textarea>
                 {% endif %}
-            </div>
+            </label>
         </div>
+    </div>
+    {% comment %}
+    <div class="row">
+        <div class="small-12 medium-6 large-6 columns">
+            {% if asset_obj %}
+                <!--<i><p style="color: #2e3f51">{{asset_obj.content}} </p><i>-->
+            
+            {% else %}
 
-        <div class="row">
-            <div class="small-12 medium-6 large-6 columns">
-                <label>Learning objectives met by this asset
-                    <Select name="asset_objectives" id = "asset_objectivesid" placeholder="Select topics" require>
-                        <option value="">--- Select Topic ---</option>
-                        {% for each_topic in topic_nodes %}
-                        <option value="{{each_topic.pk}}">
-                            {{each_topic.name}}
-                        </option>
-                        {% endfor %}
-                    </Select>
+                <label>KeyWords
+                    <input type="text" placeholder="" name="asset_tags" />
                 </label>
-            </div>
+            {% endif %}
         </div>
-        {% endcomment %}
-       
+    </div>
 
-        
+    <div class="row">
+        <div class="small-12 medium-6 large-6 columns">
+            <label>Learning objectives met by this asset
+                <Select name="asset_objectives" id = "asset_objectivesid" placeholder="Select topics" require>
+                    <option value="">--- Select Topic ---</option>
+                    {% for each_topic in topic_nodes %}
+                    <option value="{{each_topic.pk}}">
+                        {{each_topic.name}}
+                    </option>
+                    {% endfor %}
+                </Select>
+            </label>
+        </div>
+    </div>
+    {% endcomment %}
+   
     <div class="asset-content-area"{% if not asset_obj %} style="display:none"{% endif %}>
        <!-- <h3>Add esources for this asset</h3>-->
         <div class="row">
@@ -136,6 +134,19 @@
         </div>
     </div>
 
+    <div class="row asset-comments-section">
+      <div class="columns small-10 " id="view-discussion">
+            <!-- discussion content area -->
+            {% get_thread_node asset_obj.pk as thread_node %}
+            {% if thread_node and "QuizItemEvent" not in asset_obj.member_of_names_list %}
+                {% get_disc_replies thread_node group_id global_disc_all_replies as all_replies %}
+                {% get_node thread_node as thread_node_obj %}
+                {% include 'ndf/in-line-texteditor.html' with node=thread_node_obj var_name="content_org" allow_to_comment=True ckeditor_toolbar="BasicToolbar" %}
+            {% endif %}
+
+            <!-- END of discussion content area -->
+      </div>
+    </div>
 
     
 <script type="text/javascript">
