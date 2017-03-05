@@ -1,0 +1,38 @@
+- UNIT : `base_unit`
+	- LESSON : `lesson`
+		- ACTIVITY : `activity`
+
+---
+- Unit should be created under a group.
+	- `group_set	` should hold group's `_id`.
+- Hierarchy is maintained via `collection_set`.
+
+---
+1. **UNIT** needs following data in form:
+- GAttributes (Two):
+	- GRADE: `educationallevel`
+	- SUBJECT: `educationalsubject`
+	- Make relevant changes in `local_settings.py`
+- Fields (which will be used/needed amongst all GSystem fields):
+	- `name`
+	- `description`
+	- `tags`
+---
+
+2. **LESSON** needs following data in form:
+- Fields (which will be used/needed amongst all GSystem fields):
+	- `name`
+	- `description` (optional, TBD)
+---
+
+3 **ACTIVITY**:
+- a Leaf node.
+- It's a file/resource.
+- *NEED TO DISCUSS:*
+	- (How to deal with) Asset and AssetContent part incorporation ?
+		- Can we use something like pinterest?
+	- There is need to have one flow to create an activity:
+		- Author can add:
+			1. Text content or resource + text via CK editor.
+			2. A File/Resource/AssetContent
+			3. Any of tool/interactive/JHAPP.

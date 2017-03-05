@@ -6,6 +6,7 @@ def copy_schema_csvs():
 
 def update_data():
 	copy_schema_csvs()
+	local('python manage.py sync_existing_documents')
 	local('python manage.py filldb')
 	local('python manage.py create_schema STs_run1.csv')
 	local('python manage.py create_schema ATs.csv')

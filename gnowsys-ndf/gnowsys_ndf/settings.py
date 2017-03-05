@@ -548,6 +548,7 @@ GSTUDIO_GROUP_AGENCY_TYPES = [
     "Other", "Partner", "GovernmentAgency", "NGO", "College", "University",
     "School", "Institution", "Project", "SpecialInterestGroup"
 ]
+GSTUDIO_GROUP_AGENCY_TYPES_DEFAULT = 'Other'
 
 GSTUDIO_AUTHOR_AGENCY_TYPES = [
     "Student", "Teacher", "Teacher Educator", "Faculty", "Researcher", "Other"
@@ -602,7 +603,6 @@ A project of <a href="http://lab.gnowledge.org/" target="_blank">{% trans "Gnowl
 </p>'''
 GSTUDIO_SITE_FAVICON = "/static/ndf/images/favicon/logo.png"
 GSTUDIO_SITE_LOGO = "/static/ndf/css/themes/metastudio/logo.svg"
-GSTUDIO_COPYRIGHT = ""
 GSTUDIO_GIT_REPO = "https://github.com/gnowledge/gstudio"
 GSTUDIO_SITE_PRIVACY_POLICY = ""
 GSTUDIO_SITE_TERMS_OF_SERVICE = ""
@@ -747,9 +747,11 @@ GSTUDIO_GROUP_MODERATION_LEVEL = 1
 # allowed moderation levels
 GSTUDIO_ALLOWED_GROUP_MODERATION_LEVELS = [1, 2, 3]
 
-GSTUDIO_LICENSE = ["CC BY-SA", "CC BY", "CC BY-NC-SA", "CC BY-NC-ND", "CC BY-ND", "PUBLIC-DOMAIN", "FDL (FREE DOCUMENTATION LICENSE)", "NCERT License", "OTHERS"]
+GSTUDIO_COPYRIGHT = ["CC BY-SA", "CC BY", "CC BY-NC-SA", "CC BY-NC-ND", "CC BY-ND", "PUBLIC-DOMAIN", "FDL (FREE DOCUMENTATION LICENSE)", "NCERT License", "OTHERS"]
 
-GSTUDIO_DEFAULT_LICENSE = 'CC-BY-SA 4.0 unported'
+GSTUDIO_DEFAULT_COPYRIGHT = 'CC-BY-SA 4.0 unported'
+
+GSTUDIO_DEFAULT_LICENSE = 'HBCSE'
 
 GSTUDIO_FILE_UPLOAD_FORM = 'simple'  # possible values are 'simple' or 'detail'
 

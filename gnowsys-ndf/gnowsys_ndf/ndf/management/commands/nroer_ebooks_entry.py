@@ -977,7 +977,7 @@ def update_url_field(oid, name):
 # things noticed in CSV as contrast to resources CSV :
 
 # - fields that have in resources CSV and not in e-book CSV:
-#     - created_by, license, translation_of, adaptation_of, contributors, prior_node
+#     - created_by, legal, translation_of, adaptation_of, contributors, prior_node
 
 # - fields that have in e-book and not in CSV resources CSV :
 #     - base_folder (contains subject name. e.g: Mathematics-XI)
