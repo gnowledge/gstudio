@@ -213,7 +213,7 @@
     <!-- Handlebar Templates for the course tree -->
     <script id="lesson-template" type="text/x-handlebars-template">
         <dd class="accordion-navigation">
-            <a href="#lesson-{{id}}" class="entity-title">
+            <a href="#lesson-{{id}}" class="entity-title" id="lesson-accordion">
                 {{name}}
                 <div class="right edit_entity">
                     <i class="fi-list right"></i>
@@ -402,27 +402,79 @@
 
         // Move a lesson down
         $('.course-lessons').on('click', '.lesson_move_down' ,function(e){
-            e.stopPropagation();
-            e.preventDefault();
-
-            var lesson_id = $(this).closest('a').attr('href').replace('#lesson-', '');
+            var $current = $(this).closest('a#lesson-accordion')
+            var $next = $current.parent('dd').next('dd')
+            var parent_node = "{{group_id}}"; // unit_node in this case
+            var curr_lesson_id = $current.attr('href').replace('#lesson-', '');
+            var next_lesson_id = $next.find('a#lesson-accordion').attr('href').replace('#lesson-', '');
 
             //Ajax to move the lesson up.
-            console.log('Ajax call to move an activity. ' + lesson_id);
+            $.ajax({
+                url: "{% url 'change_order' group_id %}",
+
+                data: {
+                    node_id_up: next_lesson_id,
+                    node_id_down: curr_lesson_id,
+                    parent_node: parent_node,
+                    'csrfmiddlewaretoken': "{{csrf_token}}"
+                },
+
+                type: "POST",
+
+                dataType: "json",
+
+                success: function(data){
+                    success_state = data["success"]
+                    if(success_state){
+                        $current.parent('dd').insertAfter($next);
+                    }
+                },
+            });//end of ajax
+
+
+            // var lesson_id = $(this).closest('a').attr('href').replace('#lesson-', '');
+
+            //Ajax to move the lesson up.
+            // console.log('Ajax call to move an activity. ' + lesson_id);
             //Update the course_data after successful movedown and call rerender.
 
         });
 
         // Move a lesson up
         $('.course-lessons').on('click', '.lesson_move_up' ,function(e){
-            e.stopPropagation();
-            e.preventDefault();
-
-            var lesson_id = $(this).closest('a').attr('href').replace('#lesson-', '');
+            var $current = $(this).closest('a#lesson-accordion')
+            var $previous = $current.parent('dd').prev('dd')
+            var parent_node = "{{group_id}}"; // unit_node in this case
+            var curr_lesson_id = $current.attr('href').replace('#lesson-', '');
+            var prev_lesson_id = $previous.find('a#lesson-accordion').attr('href').replace('#lesson-', '');
 
             //Ajax to move the lesson up.
-            console.log('Ajax call to move an activity. ' + lesson_id);
+            $.ajax({
+                url: "{% url 'change_order' group_id %}",
+
+                data: {
+                    node_id_up: curr_lesson_id,
+                    node_id_down: prev_lesson_id,
+                    parent_node: parent_node,
+                    'csrfmiddlewaretoken': "{{csrf_token}}"
+                },
+
+                type: "POST",
+
+                dataType: "json",
+
+                success: function(data){
+                    success_state = data["success"]
+                    if(success_state){
+                        $current.parent('dd').insertBefore($previous);
+                    }
+                },
+            });//end of ajax
+
+            // console.log('Ajax call to move an activity. ' + lesson_id);
             //Update the course_data after successful moveup and call rerender.
+            // e.stopPropagation();
+            // e.preventDefault();
 
         });
 
@@ -445,6 +497,10 @@
           addLesson()
           - to add lesson of unit.
           */
+          if (!unitName) {
+            alert('Name can not be empty. Please provide one.');
+            return;
+          };
           result = undefined;
           $.ajax({
               type: "POST",
@@ -456,26 +512,25 @@
               url: "{% url 'lesson_create_edit' group_id %}",
               // datatype: "",
               success: function(data) {
-                  if(data){
-                      data=data;
-                      console.log(typeof(data));
-                      console.log(data);
-                      renderCourseTree(JSON.parse(data));
-                      // alert('Lesson saved successfully!');
-                      result = true;
+                  // console.log(typeof(data));
+                  data_dict = JSON.parse(data);
+                  // console.log(data);
+                  aaa = data
+                  if(data_dict.success){
+                      renderCourseTree(data_dict.unit_hierarchy);
+                      alert('Lesson saved successfully!');
+                      // handle opening of tree till recently added node with data_dict.msg
                       $('#myModal').foundation('reveal', 'close');
-                      return result;
+                      result = true;
                   }
                   else{
-                      alert('Save did not happen. Please try agin.');
+                      alert(data_dict.msg);
                       result = false;
-                      // console.log(result)
-                      return result;
                   }
+
               }
           });
-
-          console.log(result)
+          // console.log(result)
           return result;
         }
 
@@ -500,6 +555,10 @@
           addActivity()
           - to add lesson of unit.
           */
+          if (!activityName) {
+            alert('Name can not be empty. Please provide one.');
+            return;
+          };
           result = undefined;
           $.ajax({
               type: "POST",
@@ -512,26 +571,25 @@
               url: "{% url 'activity_create_edit' group_id %}",
               // datatype: "",
               success: function(data) {
-                  if(data){
-                      data=data;
-                      console.log(typeof(data));
-                      console.log(data);
-                      renderCourseTree(JSON.parse(data));
-                      // alert('Lesson saved successfully!');
-                      result = true;
+                  // console.log(typeof(data));
+                  data_dict = JSON.parse(data);
+                  // console.log(data);
+                  aaa = data
+                  if(data_dict.success){
+                      renderCourseTree(data_dict.unit_hierarchy);
+                      alert('Activity saved successfully!');
+                      // handle opening of tree till recently added node with data_dict.msg
                       $('#add-activity-modal').foundation('reveal', 'close');
-                      return result;
+                      result = true;
                   }
                   else{
-                      alert('Save did not happen. Please try agin.');
+                      alert(data_dict.msg);
                       result = false;
-                      // console.log(result)
-                      return result;
                   }
               }
           });
 
-          console.log(result)
+          // console.log(result)
           return result;
         }
 

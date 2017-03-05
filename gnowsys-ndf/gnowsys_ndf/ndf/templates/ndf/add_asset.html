@@ -1,26 +1,28 @@
 {% load i18n %}
 {% load ndf_tags %}
 {% check_is_gstaff group_id request.user as is_gstaff %}
-<div class="row">
+
+<div class="row overlay-head">
 
             {% if asset_obj.name %}
 
             {% else %}
 
-            <a class="close-reveal-modal" aria-label="Close">&#215;</a>
+            <a class="right close-reveal-modal reveal-modal-overlay" aria-label="Close">&#215;</a>
             {% endif %}
             <div class="small-12 colums" >
             {% if asset_obj.name %}
                 <h3 class="left">&nbsp;&nbsp;{{asset_obj.name}}</h3>
 
             {% else %}
-                <h3 class="left">&nbsp; Add a new asset</h3>
+                <h3 class="left overlay-title">&nbsp; Add a new asset</h3>
+                <button type="button" class="right orange-button save-asset">Save Asset</button>
             {% endif %}
 
                 {% if asset_obj.name %}
 
                 {% else %}
-                <button type="button" class="right orange-button save-asset">Save Asset</button>
+                <!--<button type="button" class="right orange-button save-asset">Save Asset</button>-->
                 {% endif %}
 
             </div>
@@ -62,8 +64,7 @@
                 {% endif %}
             </div>
         </div>
-        {% endcomment %}
-        {% comment %}
+
         <div class="row">
             <div class="small-12 medium-6 large-6 columns">
                 <label>Learning objectives met by this asset
@@ -79,6 +80,7 @@
             </div>
         </div>
         {% endcomment %}
+       
 
         
     <div class="asset-content-area"{% if not asset_obj %} style="display:none"{% endif %}>
@@ -111,11 +113,13 @@
                         <img src="{{MEDIA_URL}}{{each.if_file.mid.relurl}}">
                         {% elif 'video' not in each.if_file.mime_type and each.if_file.thumbnail.relurl %}
                         <img src="{{MEDIA_URL}}{{each.if_file.thumbnail.relurl}}">
+                        {% else %}
+                        <img src="/static/ndf/images/asset_thumbnail.png">
                         {% endif %}
                     </div>
                     <div class="asset_text">
                         <div class="asset_title">{{each.name}}</div>
-                        <div class="asset_desc">{{each.content|truncatechars:10}}</div>
+                        <div class="asset_desc">{{each.name|truncatechars:10}}</div>
                     </div>
                 </div>
             </div>
@@ -131,6 +135,9 @@
         {%  endif %}
         </div>
     </div>
+
+
+    
 <script type="text/javascript">
     
     $("#docFile").change(function(){
@@ -180,6 +187,7 @@
                 // $('#addAsset').foundation('reveal', 'open');
                 $('.asset-content-area').css('display', 'block')
                 alert("Asset Added Successfully")
+                $('.save-asset').css('display', 'none')
                 $('.asset_obj_val').attr('data-asset-obj-val',data);
             }
 

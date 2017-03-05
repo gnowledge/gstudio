@@ -326,6 +326,11 @@ class Node(DjangoDocument):
                         'rating':[],
                         'snapshot':{}
                     }
+
+    validators = {
+        'name': lambda x: x.strip() not in [None, ''],
+    }
+
     use_dot_notation = True
 
 

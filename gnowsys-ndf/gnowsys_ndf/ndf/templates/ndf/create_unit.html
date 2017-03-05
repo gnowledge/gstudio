@@ -1,4 +1,6 @@
 {% extends "ndf/gbase.html" %}
+{% load get_metadata_values from ndf_tags %}
+
 
 {% block title %}GStudio - Course Creator{% endblock %}
 {% block body_content %}
@@ -7,37 +9,66 @@
             <form id ="course_page_form" enctype="multipart/form-data" method="post" action="{% url 'unit_create_edit' group_id %}">{% csrf_token %}
                 <div class="course_creator_header">
                     <div class="left course_heading">
-                    <h4>Unit Name:</h4>
+                    <h5>Enter Unit Name</h5>
                     </div>
                     <div class="right course_heading">
                         <input id="unit-name" name="name" type="text" placeholder="Enter unit name"/>
                     </div>
                 </div>
                 <hr/>
-
                 <div class="course_creator_header">
+
+                 {% get_metadata_values "educationallevel" as metadata_educationallevel %}
                     <div class="left course_heading">
-                    <h4>Unit display Name:</h4>
+                    <h5>Select Grade</h5>
                     </div>
                     <div class="right course_heading">
-                        <input id="unit-altnames" name="altnames" type="text" placeholder="Enter unit display name"/>
+                         <select name="{{k}}" id ="{{k}}">
+                            {% for opts in metadata_educationallevel %}
+                                <option selected>{{opts}}</option>
+                            {% endfor %}
+                        </select>
                     </div>
                 </div>
+
+                {% get_metadata_values "educationalsubject" as metadata_educationalsubject %}
+                <div class="course_creator_header">
+                    <div class="left course_heading">
+                    <h5>Select Subject</h5>
+                    </div>
+                    <div class="right course_heading">
+                         <select name="{{k}}" id ="{{k}}">
+                            {% for opts in metadata_educationalsubject %}
+                                <option selected>{{opts}}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                </div>
+                <hr/>
+                <label style="color:red;" class="right hide duplicate_unit_name">Unit with same name exists. Please choose another name.</label>
                 <div class="right course_actions">
                     
                         <!--<button asset-save-button type="button" class ="right orange-button save-asset" id="" value="Save"/>-->
                        <!-- <li><input type="submit" name="save" value="Save" class="save-unit"></li>-->
-                       <input type="submit" class ="asset-save-button" id="" value="Save"/>
+                       <input type="submit" class ="asset-save-button" id="save_unit" value="Save"/>
                     
                 </div>
             </form>
         </div>
     </div>
     <script type="text/javascript">
-        $(document).on('keyup','#unit-name',function(){
-          var txtUnitNameval = $('#unit-name').val();
-          $('#unit-altnames').val(txtUnitNameval);
-        });        
+    var group_names_list = {{all_groups_names|safe}}
+    $("#save_unit").click(function(event) {
+        unit_name = $("#unit-name").val()
+        if (group_names_list.indexOf(unit_name) != -1){
+            $(".duplicate_unit_name").removeClass("hide")
+            event.preventDefault();
+        }
+        else{
+            $(".duplicate_unit_name").addClass("hide")
+        }
+    })
+
     </script>
 {% endblock %}
 
