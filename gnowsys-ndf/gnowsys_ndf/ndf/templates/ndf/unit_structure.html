@@ -725,9 +725,11 @@
                               // console.log("jjjjjjjjjjjjjjj " + editorMode);
                             editNode(nodeContent);
                           }
+                          else{
+                            CKEDITOR.instances['ckeditor_textarea'].setData(nodeContent);
+                          }
                           // Open ckeditor and append content of node in ckeditor
                           // openCkEditor('#activity-content', "BasicToolbar", nodeContent);
-                          // CKEDITOR.instances['ckeditor_textarea'].insertHtml(nodeContent);
                           $('#existing_template_modal').foundation('reveal', 'close');
                         });
                       }
@@ -821,7 +823,7 @@
             var nodeContent = $("#activity-content").html();
           }
           // Open ckeditor and append content of node in ckeditor
-          openCkEditor('#activity-content', "BasicToolbar", nodeContent);
+          openCkEditor('#activity-content', "GeneralToolbar", nodeContent);
         }
 
         $('.course-editor-section').on('click', '.save_edit_activity', function(){
