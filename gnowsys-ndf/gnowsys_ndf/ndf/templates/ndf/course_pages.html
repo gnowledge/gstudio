@@ -1,6 +1,6 @@
 <div class="activity-sheet-actions">
     <div class="row">
-    <button type="button" class="right orange-button createActivityPage">
+    <button type="button" class="right orange-button-template createActivityPage">
         <i class="fi-plus"> </i>
         Add Activity Page
     </button>
@@ -14,19 +14,20 @@
                 <div class="medium-8 columns name-div">
                     <input type="text" class="node_name" name="name" placeholder="Enter name of Page">
                 </div>
+                <div class="medium-4 columns">
+                    <a class="right orange-button-template existing-template">Create page from existing template</a>
+                </div>
             </div>
             <div class="row">
-                <div class="medium-8 columns editor-div">
+                <div class="medium-12 columns editor-div">
                     {% include "ndf/html_editor.html" with var_name="content_org" var_placeholder="Enter the content here" var_value="" ckeditor_toolbar="GeneralToolbar" %}
                 </div>
-                <div class="medium-4 columns">
-                    <a  class="tiny button radius existing-template">Create page from existing template</a>
-                </div>
+                
             </div>
             <input type="hidden" name="node_id" class="form_node_id">
 
-            <input type="submit" class="button small" class="saveActivityPage" value="Save">
-            <input type="button" class="button small cancel-page-create" value="Cancel">
+            <input type="submit" class="orange-button" class="saveActivityPage" value="Save">
+            <input type="button" class="orange-button" cancel-page-create" value="Cancel">
         </div>
     </form>
 </div>

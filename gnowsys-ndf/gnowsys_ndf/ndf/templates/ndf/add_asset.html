@@ -2,32 +2,26 @@
 {% load ndf_tags %}
 {% check_is_gstaff group_id request.user as is_gstaff %}
 
-<div class="row overlay-head">
-            {% if asset_obj.name %}
-            {% else %}
+    <div class="row overlay-head">
+        {% if edit or not asset_obj.name %}
             <a class="right close-reveal-modal reveal-modal-overlay" aria-label="Close">&#215;</a>
-            {% endif %}
-            <div class="small-12 colums" >
-            {% if asset_obj.name %}
+        {% endif %}
+        <div class="small-12 colums">
+            {% if not edit and asset_obj.name %}
                 <p class="left">&nbsp;&nbsp;{{asset_obj.name}}</p>
+                <a class="fi-pencil right createAsset" data-asset_id='{{asset_obj.pk}}'>Edit</a>
             {% else %}
-                <h3 class="left overlay-title">&nbsp; Add a new asset</h3>
-                <button type="button" class="right blue-white-button save-asset">Save Asset</button>
+                <h3 class="left overlay-title">&nbsp;{% if not asset_obj %} Add a new {% else %} Edit {% endif %} asset</h3>
+                <button type="button" class="right blue-white-button save-asset" data-asset_id='{{asset_obj.pk}}'>Save Asset</button>
             {% endif %}
-                {% if asset_obj.name %}
-
-                {% else %}
-                <!--<button type="button" class="right orange-button save-asset">Save Asset</button>-->
-                {% endif %}
-
-            </div>
         </div>
+    </div>
         <div class="row">
             <div class="small-12 medium-6 large-6 columns">
                 <label>
-                    {% if not asset_obj %}
+                    {% if edit or not asset_obj %}
                        Asset name 
-                       <input type="text" placeholder="" class="required" id = "asset-name" name="asset_name" />
+                       <input type="text" placeholder="" class="required" id = "asset-name" name="asset_name" value="{% if asset_obj %} {{asset_obj.name}}{% endif %}"/>
                     {% endif %}
 
                 </label>
@@ -36,50 +30,43 @@
         <div class="row">
             <div class="small-12 medium-6 large-6 columns">
                 <label> 
-                    {% if asset_obj %}
+                    {% if not edit and asset_obj %}
                        <i><p style="color: gray">{{asset_obj.content}} </p></i>
                     {% else %}
                         Asset description
                 </label>
-                        <textarea rows="4" cols="2" class="small-12 columns" placeholder="Enter Description" id="asset-descid"></textarea>
+                        <textarea rows="4" cols="2" class="small-12 columns" placeholder="Enter Description" id="asset-descid" value=''>
+                            {% if asset_obj %} {{asset_obj.content}}{% endif %}
+                        </textarea>
                     {% endif %}
                 
-        </div>
-        {% comment %}
-        <div class="row">
-            <div class="small-12 medium-6 large-6 columns">
-                {% if asset_obj %}
-                    <!--<i><p style="color: #2e3f51">{{asset_obj.content}} </p><i>-->
-                
-                {% else %}
- 
-                    <label>KeyWords
-                        <input type="text" placeholder="" name="asset_tags" />
-                    </label>
-                {% endif %}
             </div>
         </div>
+    {% comment %}
+        <div class="row">
+            <div class="small-12 medium-6 large-6 columns">
 
-        <div class="row">
-            <div class="small-12 medium-6 large-6 columns">
-                <label>Learning objectives met by this asset
-                    <Select name="asset_objectives" id = "asset_objectivesid" placeholder="Select topics" require>
-                        <option value="">--- Select Topic ---</option>
-                        {% for each_topic in topic_nodes %}
-                        <option value="{{each_topic.pk}}">
-                            {{each_topic.name}}
-                        </option>
-                        {% endfor %}
-                    </Select>
-                </label>
+            <div class="row">
+                <div class="small-12 medium-6 large-6 columns">
+                    <label>Learning objectives met by this asset
+                        <Select name="asset_objectives" id = "asset_objectivesid" placeholder="Select topics" require>
+                            <option value="">--- Select Topic ---</option>
+                            {% for each_topic in topic_nodes %}
+                            <option value="{{each_topic.pk}}">
+                                {{each_topic.name}}
+                            </option>
+                            {% endfor %}
+                        </Select>
+                    </label>
+                </div>
             </div>
         </div>
-        {% endcomment %}
+    {% endcomment %}
        
 
-        
     <div class="asset-content-area"{% if not asset_obj %} style="display:none"{% endif %}>
        <!-- <h3>Add esources for this asset</h3>-->
+        {% if not edit %}
         <div class="row">
            <!-- &nbsp;&nbsp;&nbsp;Add asset content-->
             {% if asset_obj.created_by == request.user.id or is_gstaff %}
@@ -88,35 +75,34 @@
                     <input type="file" id="docFile" placeholder="" name=""/>
                 </form>
             </div>
-    </div>
+        </div>
 
-                    <div class="name-desc-asset-cont-area" style="display: none">
-                    <div class="row">
-                    <div class="small-12 medium-6 large-6 columns">
-                    <label>
-                    Asset Content Name
+        <div class="name-desc-asset-cont-area" style="display: none">
+        <div class="row">
+        <div class="small-12 medium-6 large-6 columns">
+        <label>
+        Asset Content Name
 
-                        <input type="text" placeholder="Enter Asset Content's name" class="required" id = "asset_content_name" name="" />
-                    </label>
-                    </div>
-                    </div>
-                    <div class="row">
-                    <div class="small-12 medium-6 large-6 columns">
-                    <label> Asset Content Description<br/>
-                        <textarea rows="4" cols="2" class="small-12 columns" placeholder="Enter Asset Content's Description" id="asset_content_desc"></textarea>
-                    </label>
-                    </div>
-                    </div>
-                        <div class="row">
-                        <button type="button"  class="right orange-button" id="upload_asset" onclick="save_form()">Upload Asset content</button>
-                        </div>
-                    </div>
-                    <!--<button type="button" class="right orange-button save-asset" onclick="save_asset_cont_data()">Save Asset</button>-->
-                    <input type="hidden" name="context_name" value="{{title}}">
-                    <input type="hidden" class ="asset_obj_val" name="asset_obj_name" data-asset-obj-val="">
+            <input type="text" placeholder="Enter Asset Content's name" class="required" id = "asset_content_name" name="" />
+        </label>
+        </div>
+        </div>
+        <div class="row">
+        <div class="small-12 medium-6 large-6 columns">
+        <label> Asset Content Description<br/>
+            <textarea rows="4" cols="2" class="small-12 columns" placeholder="Enter Asset Content's Description" id="asset_content_desc"></textarea>
+        </label>
+        </div>
+        </div>
+            <div class="row">
+            <button type="button"  class="right orange-button" id="upload_asset" onclick="save_form()">Upload Asset content</button>
+            </div>
+        </div>
+        <!--<button type="button" class="right orange-button save-asset" onclick="save_asset_cont_data()">Save Asset</button>-->
+        <input type="hidden" name="context_name" value="{{title}}">
+        <input type="hidden" class ="asset_obj_val" name="asset_obj_name" data-asset-obj-val="">
                 
-             {% endif %}
-        </br><br><br><br><br><br>
+        {% endif %}
         {% for each in asset_content_list.grel_node %}
             <a href="{% url 'assetcontent_detail' group_id asset_obj.pk each.pk %}">
             <div class="small-12 medium-6 large-3 columns">
@@ -138,8 +124,8 @@
                 </div>
             </div>
             </a>
-                {% endfor %} 
-        </div>
+        {% endfor %} 
+    </div>
 
         <hr />
         
@@ -149,7 +135,20 @@
         {%  endif %}
         </div>
     </div>
+    <div class="row asset-comments-section">
+      <div class="columns small-10 " id="view-discussion">
+            <!-- discussion content area -->
+            {% get_thread_node asset_obj.pk as thread_node %}
+            {% if thread_node and "QuizItemEvent" not in asset_obj.member_of_names_list %}
+                {% get_disc_replies thread_node group_id global_disc_all_replies as all_replies %}
+                {% get_node thread_node as thread_node_obj %}
+                {% include 'ndf/in-line-texteditor.html' with node=thread_node_obj var_name="content_org" allow_to_comment=True ckeditor_toolbar="BasicToolbar" %}
+            {% endif %}
 
+            <!-- END of discussion content area -->
+      </div>
+    </div>
+    {% endif %}
 
     
 <script type="text/javascript">
@@ -158,7 +157,7 @@
         $(".name-desc-asset-cont-area").css('display','block')
     });
   
-    $('.save-asset').attr('disabled',true); 
+    // $('.save-asset').attr('disabled',true); 
     $('#upload_asset').attr('disabled',true); 
     
     $('#asset_content_name').keyup(function(){
@@ -168,46 +167,62 @@
             $('#upload_asset').attr('disabled',true);
     })
 
-    $('#asset-name').keyup(function(){
-        if($(this).val().length !=0 && $('#asset-descid').val().length !=0)
-            $('.save-asset').attr('disabled', false);            
-        else
-            $('.save-asset').attr('disabled',true);
-    })
+    // $('#asset-name').keyup(function(){
+    //     if($(this).val().length !=0 && $('#asset-descid').val().length !=0)
+    //         $('.save-asset').attr('disabled', false);            
+    //     else
+    //         $('.save-asset').attr('disabled',true);
+    // })
 
-    $('#asset-descid').keyup(function(){
-        if($(this).val().length !=0 &&  $('#asset-name').val().length !=0)
-            $('.save-asset').attr('disabled', false);            
-        else
-            $('.save-asset').attr('disabled',true);
-    })
-    $( ".save-asset" ).click(function() {
+    // $('#asset-descid').keyup(function(){
+    //     if($(this).val().length !=0 &&  $('#asset-name').val().length !=0)
+    //         $('.save-asset').attr('disabled', false);            
+    //     else
+    //         $('.save-asset').attr('disabled',true);
+    // })
+    $( ".save-asset" ).click(function(event) {
         asset_name = $("#asset-name").val();
         asset_description = $("#asset-descid").val();
+        var asset_id = $(this).attr('data-asset_id');
+        console.log(asset_description)
+        console.log(asset_name)
+        if (asset_name != '' && asset_description != ''){
+            console.log("if")
+            // asset_objective =  $('#asset_objectivesid').find(':selected').attr('value');
+            $.ajax({
+                  type: "POST",
+                  data:{ 
+                        'csrfmiddlewaretoken': "{{csrf_token}}",
+                        "asset_name":asset_name,
+                        "asset_description":asset_description,
+                        "node_id": asset_id
+                        // "asset_objective":asset_objective
+                    },
+                  url: "{% url 'create_edit_asset' group_id %}",
+                  datatype: "html",
+                  success: function(data) {
+                    // $('#addAsset').html(data);
+                    // $('#addAsset').foundation('reveal', 'open');
+                    $('.asset-content-area').css('display', 'block')
+                    alert("Asset Added Successfully")
+                    $('.save-asset').css('display', 'none')
+                    $('.asset_obj_val').attr('data-asset-obj-val',data);
+                }
+            });
 
-        // asset_objective =  $('#asset_objectivesid').find(':selected').attr('value');
-        $.ajax({
-              type: "POST",
-              data:{ 
-                    'csrfmiddlewaretoken': "{{csrf_token}}",
-                    "asset_name":asset_name,
-                    "asset_description":asset_description,
-                    // "asset_objective":asset_objective
-                },
-              url: "{% url 'create_edit_asset' group_id %}",
-              datatype: "html",
-              success: function(data) {
-                // $('#addAsset').html(data);
-                // $('#addAsset').foundation('reveal', 'open');
-                $('.asset-content-area').css('display', 'block')
-                alert("Asset Added Successfully")
-                $('.save-asset').css('display', 'none')
-                $('.asset_obj_val').attr('data-asset-obj-val',data);
-            }
-
-      });
-
+        }
+        else{
+            console.log("else")
+            console.log(asset_name)
+            console.log(asset_description)
+            event.preventDefault() 
+        }
     });
+
+    $(document).on('closed', '[data-reveal]', function () {
+        location.reload()
+    })
+
 </script>
 <script type="text/javascript">
   var form = document.getElementById('docPost');

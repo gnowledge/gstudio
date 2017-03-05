@@ -32,13 +32,16 @@
                         </span>
                         <ul id="course-settings-drop" class="f-dropdown" data-dropdown-content aria-hidden="true" tabindex="-1">
                         <li>
-                                <a data-reveal-id="manage_users_modal" href="{% url 'manage_users' group_id %}"  class="fi-torsos"> Manage Users</a> 
-                                <div id="manage_users_modal" class="reveal-modal large" data-reveal style="position:absolute;"> 
-                                    <div id="group_drawer">
-                                    {% include "ndf/widget_user_search.html" with subscription_status=True %}
-                                    </div>
-                                    <a class="close-reveal-modal">&#215;</a>
-                                </div>          
+                            <a href="{% url 'unit_edit' groupid group_object.pk %}" class="fi-pencil"> Edit</a>
+                        </li>
+                        <li>
+                            <a data-reveal-id="manage_users_modal" href="{% url 'manage_users' group_id %}"  class="fi-torsos"> Manage Users</a> 
+                            <div id="manage_users_modal" class="reveal-modal large" data-reveal style="position:absolute;"> 
+                                <div id="group_drawer">
+                                {% include "ndf/widget_user_search.html" with subscription_status=True %}
+                                </div>
+                                <a class="close-reveal-modal">&#215;</a>
+                            </div>          
                         </li>
                         <li>
                             <a href="{% url 'create_event_group' group_id 'CourseEventGroup' %}?cnode_id={{group_id}}" class="fi-volume"> Announce</a>
@@ -64,7 +67,7 @@
                             <a href="{% url 'asset_list' group_id %}" {% if title == 'asset_list' or title == 'asset_detail' or title == 'asset_content_detail'%}class="selected"{% endif %}>Assets</a>
                         </li>
                         <li >
-                            <a href="https://103.36.84.149/oat/#/" {% if title == 'Assessments' %}class="selected"{% endif %}>Assessments</a>
+                            <a href="https://103.36.84.149/oat/#/" target="_blank" {% if title == 'Assessments' %}class="selected"{% endif %}>Assessments</a>
                             <!-- <a href="#group_blog">Blog</a> -->
                         </li>
                         <li >
@@ -175,9 +178,13 @@
 
         
             $( ".createAsset" ).click(function() {
+                    var asset_id = $(this).attr('data-asset_id');
                     $.ajax({
                               type: "GET",
                               url: "{% url 'add_asset' group_id %}",
+                              data: {
+                                node_id: asset_id
+                              },
                               datatype: "html",
                               success: function(data) {
                                 $('#addAsset').foundation('reveal', 'open');

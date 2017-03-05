@@ -69,7 +69,7 @@
             css_ids.push(node.id)
           }
           $li.find('.jqtree-title').attr('data-id',node.id);
-          if (node.node_type == "CourseUnitEvent"){
+          if (node.node_type == "CourseUnitEvent" || node.node_type == "lesson"){
           // if (node.node_type == "Page" || node.node_type == "File"  || node.node_type == "QuizItemEvent" ) {
             cu_ids.push(node.id)
             if (node.collection_set && node.collection_set.length > 0 ){

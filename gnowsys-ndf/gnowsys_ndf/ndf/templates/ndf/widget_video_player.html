@@ -1,28 +1,7 @@
 {% load i18n %}
 {% load ndf_tags %}
 
-	{% get_relation_value video_obj.pk 'has_subtitle' as subtitle_rel %}
 	  {% get_relation_node video_obj.pk  as subtitle_rel_node %}
-	{% comment %}
-	{% for each in subtitle_rel.grel_node  %}
-	  	{{subtitle_rel_node.relation_type_scope.alt_language}}
-  	{% endfor %}
-	{% if subtitle_rel.grel_id %}
-		{% get_relation_node subtitle_rel.grel_id.0  as subtitle_rel_node %}
-		{{subtitle_rel_node.relation_type_scope.alt_language}}
-	{% endif %}
-
-	{% for each in subtitle_rel.grel_node %}
-
-			<track kind="captions" label="en" src="{{MEDIA_URL}}{{each.if_file.original.relurl}}" srclang="en" /> 
-			 
-		 {% endfor  %}
-		
-		 {% for each in subtitle_rel.grel_id  %}
-	  		{% get_relation_node each  as subtitle_rel_node %}
-	  			{{subtitle_rel_node.relation_type_scope.alt_language}}
-		{% endfor %}
-	{% endcomment %}
 
 <div id="scstyle">
 
@@ -33,12 +12,18 @@
 		<video id="{{video_obj.pk}}" class="video-js vjs-skin-colors-clix vjs-big-play-button center" controls="controls" data-setup="{ playbackRates: [0.5, 1, 1.5, 2] }" height="360" width="480">
 		<source src="{{MEDIA_URL}}{{video_obj.if_file.original.relurl}}" type="video/mp4" crossorigin="anonymous" preload="metadata" codecs="avc1.42E01E, mp4a.40.2"/>
 		 
+		{% for each in subtitle_rel_node %}
+			{{each.relation_type_scope.alt_language}}
+			{{each.file_path}} 
+			<track kind="captions" label="{{each.relation_type_scope.alt_language}}" src="{{MEDIA_URL}}{{each.file_path}}" srclang="" />
+		 {% endfor  %}
 
 
 		<!-- adding captions in different language-->
 		
 		</video>
 		</div>
+	
 			{% get_relation_value video_obj.pk 'has_transcript' as transcript_rel %}
 			{% if transcript_rel %}
 

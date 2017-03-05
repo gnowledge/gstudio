@@ -6600,7 +6600,15 @@ def add_asset(request,group_id):
       group_name, group_id = get_group_name_id(group_id)
   topic_gst = node_collection.one({'_type': 'GSystemType', 'name': 'Topic'})
   topic_nodes = node_collection.find({'member_of': {'$in': [topic_gst._id]}})
-  return render_to_response("ndf/add_asset.html",RequestContext(request,{'group_id':group_id,'groupid':group_id,'topic_nodes':topic_nodes}))
+  context_variables = {'group_id':group_id, 'groupid':group_id,
+    'topic_nodes':topic_nodes, 'edit': False}
+  node_id = request.GET.get('node_id', None)
+  node_obj = node_collection.one({'_id': ObjectId(node_id)})
+  if node_obj:
+    context_variables.update({'asset_obj': node_obj})
+    context_variables.update({'edit': True})
+  return render_to_response("ndf/add_asset.html",RequestContext(request, 
+    context_variables))
 
 @login_required
 @get_execution_time
@@ -6610,9 +6618,10 @@ def create_edit_asset(request,group_id):
   except:
       group_name, group_id = get_group_name_id(group_id)
   asset_name =  str(request.POST.get("asset_name", '')).strip()
-  asset_desc =  str(request.POST.get("asset_description", '')).strip()
+  asset_desc =  str(request.POST.get("asset_description", '')).strip()  
+  node_id = request.POST.get('node_id', None)
   asset_obj = create_asset(name=asset_name, group_id=group_id,
-    created_by=request.user.id, content=unicode(asset_desc))
+    created_by=request.user.id, content=unicode(asset_desc), node_id=node_id)
   thread_node = create_thread_for_node(request,group_id, asset_obj)
 
   # teaches_list = [ObjectId(asset_objective)]
@@ -6654,7 +6663,8 @@ def add_assetcontent(request,group_id):
       subtitle_list.append(each_asset['right_subject'])
     #   sub_grel = create_grelation(ObjectId(assetcontentid), rt_subtitle, subtitle_list)
 
-    altlang_node = create_grelation(ObjectId(assetcontentid), rt_subtitle, subtitle_list, **{'triple_scope':{'relation_type_scope':{u'alt_language': unicode(subtitle_lang_code)}, 'subject_scope': "many"}})
+    altlang_node = create_grelation(ObjectId(assetcontentid), rt_subtitle, subtitle_list, **{'triple_scope':{'relation_type_scope':{u'alt_language': unicode(subtitle_lang)}, 'subject_scope': "many"}})  
+
     return StreamingHttpResponse("success")
 
   if if_transcript == "True":

@@ -1048,6 +1048,24 @@ input[type="button"] {
     }
 }
 
+.orange-button-template{
+    color: $primary-orange;
+    padding: 7px 14px;
+    background:#fff ;
+    border: 1px solid #ce7869;
+    font-size: 12px;
+    font-family: "Rubik-Medium", serif;
+    border-radius: 4px;
+    margin-right: 20px;
+    margin-bottom: 8px;
+    margin-top: 10px;
+    &:hover{
+        background-color:rgba(206,120,105,0.2);
+        color: $primary-orange;
+    }
+}
+
+
 
 .orange-button-subtitle {
     color: $primary-orange;
@@ -1214,6 +1232,8 @@ ul.jqtree-tree .jqtree-toggler {
         line-height: 50px;
         // //font-size: 25px;
     }
+
+    
 
     .course_actions {
         ul li {
@@ -1981,6 +2001,37 @@ ul.jqtree-tree .jqtree-toggler {
         margin-right: 15px;
     }
 
+    .course_heading_unit{
+    
+            width: 500px;
+            height: 40px;
+            border: 0px solid $secondry-blue;
+            box-shadow: none;
+            float: right;
+            text-align: center;
+
+            &:focus {
+                border: 1px solid $secondry-blue;
+            }
+
+            &::-webkit-input-placeholder
+            /*&::-moz-placeholder,
+            &:-ms-input-placeholder,
+            &:-moz-placeholder*/ {
+                color: #d9dfe4;
+                // //font-size: 20px;
+                letter-spacing: 0.8px;
+            }
+            select{
+                font-size: 14px;
+                font-family: 'Rubik-Regular', sans-serif;
+                color: gray;
+                border: 0px solid $secondry-blue; 
+            }
+
+        }
+    
+
     .course_heading {
         input {
             width: 500px;
@@ -2478,14 +2529,16 @@ ul.jqtree-tree .jqtree-toggler {
         &.right_align {
             right: -10px;
         }
-
+        
         li {
+            width:  110px;
             padding: 5px 25px;
             list-style: none;
             white-space: nowrap;
 
             a {
                 margin: 0px;
+                width:70px;
             }
 
             &:hover {
@@ -2557,4 +2610,97 @@ ul.jqtree-tree .jqtree-toggler {
 
 .create_activity_new{
     margin-left: -15px;
+}
+
+.create-discussion {
+    position: relative;
+
+    >div {
+      display: inline-block;
+      vertical-align: top;
+      margin: 5px 0px;
+    }
+
+    .button {
+        margin: 5px 0px;
+    }
+    .ckeditor-content-comment {
+        width: 85%;
+        margin-left: 1em;
+
+        >div{
+          display: inline-block;
+          vertical-align: top;
+        }
+
+        .ckeditor-reply-area {
+          width: 90%;
+        }
+    }
+}
+
+#replies-area {
+    .ckeditor-content-reply {
+        margin-top: 1em;
+        /*width: 97%;*/
+
+        .ckeditor-reply-area {
+            display: inline-block;
+            width: 90%;
+            margin-left: 1em;
+        }
+        .post-btn-div {
+            display: inline-block;
+            vertical-align: top;
+        }
+    }
+
+    .disc-replies {
+
+        /*background-color:#ddd;*/
+        margin-left: 48px;
+        margin-top: 10px;
+        padding-bottom:0em;
+        border-top: 1px solid #B1B1B1;
+        //background-color:  #e6e6e6;
+        width: 80%;
+        .reply-btn{
+            cursor: pointer;
+            color:grey !important;
+        }
+
+        .reply-btn:hover {
+            color:#000 !important;
+        }
+        .discussion-title-username{
+            //background-color: #3e3e3e;
+            color: #ffffff !important;
+            height: 2em;
+            padding-right: 10px;
+            padding-left: 10px;
+            line-height: 1.5em;
+            //border-radius: 5px 5px 0px 0px;
+        }
+
+        .discussion-footer{
+            /*background-color:#CCCCCC;*/
+            color:gray !important;
+            height:2em;
+            padding-right:10px;
+            padding-left:10px;
+            border-radius: 0px 0px 5px 5px;
+            /*background-color:  #f2f2f2;*/
+
+            >a {
+                vertical-align: middle;
+                line-height: 2em;
+            }
+        }
+
+        .discussion-content{
+            color: #262626;
+            word-wrap: break-word;
+            /*background-color:  #f2f2f2;*/
+        }
+    }
 }
