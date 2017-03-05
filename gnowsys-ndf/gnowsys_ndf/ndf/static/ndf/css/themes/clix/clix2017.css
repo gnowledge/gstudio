@@ -2262,3 +2262,96 @@ ul.jqtree-tree .jqtree-toggler:hover {
   transition: color 1s ease, border-color 1s ease;
   -webkit-transition: color 1s ease, border-color 1s ease;
 }
+
+/* line 2421, ../../../scss/_clix2017.scss */
+.create-discussion {
+  position: relative;
+}
+/* line 2424, ../../../scss/_clix2017.scss */
+.create-discussion > div {
+  display: inline-block;
+  vertical-align: top;
+  margin: 5px 0px;
+}
+/* line 2430, ../../../scss/_clix2017.scss */
+.create-discussion .button {
+  margin: 5px 0px;
+}
+/* line 2433, ../../../scss/_clix2017.scss */
+.create-discussion .ckeditor-content-comment {
+  width: 85%;
+  margin-left: 1em;
+}
+/* line 2437, ../../../scss/_clix2017.scss */
+.create-discussion .ckeditor-content-comment > div {
+  display: inline-block;
+  vertical-align: top;
+}
+/* line 2442, ../../../scss/_clix2017.scss */
+.create-discussion .ckeditor-content-comment .ckeditor-reply-area {
+  width: 90%;
+}
+
+/* line 2449, ../../../scss/_clix2017.scss */
+#replies-area .ckeditor-content-reply {
+  margin-top: 1em;
+  /*width: 97%;*/
+}
+/* line 2453, ../../../scss/_clix2017.scss */
+#replies-area .ckeditor-content-reply .ckeditor-reply-area {
+  display: inline-block;
+  width: 90%;
+  margin-left: 1em;
+}
+/* line 2458, ../../../scss/_clix2017.scss */
+#replies-area .ckeditor-content-reply .post-btn-div {
+  display: inline-block;
+  vertical-align: top;
+}
+/* line 2464, ../../../scss/_clix2017.scss */
+#replies-area .disc-replies {
+  /*background-color:#ddd;*/
+  margin-left: 48px;
+  margin-top: 10px;
+  padding-bottom: 0em;
+  border-top: 1px solid #B1B1B1;
+  width: 80%;
+}
+/* line 2473, ../../../scss/_clix2017.scss */
+#replies-area .disc-replies .reply-btn {
+  cursor: pointer;
+  color: grey !important;
+}
+/* line 2478, ../../../scss/_clix2017.scss */
+#replies-area .disc-replies .reply-btn:hover {
+  color: #000 !important;
+}
+/* line 2481, ../../../scss/_clix2017.scss */
+#replies-area .disc-replies .discussion-title-username {
+  color: #ffffff !important;
+  height: 2em;
+  padding-right: 10px;
+  padding-left: 10px;
+  line-height: 1.5em;
+}
+/* line 2491, ../../../scss/_clix2017.scss */
+#replies-area .disc-replies .discussion-footer {
+  /*background-color:#CCCCCC;*/
+  color: gray !important;
+  height: 2em;
+  padding-right: 10px;
+  padding-left: 10px;
+  border-radius: 0px 0px 5px 5px;
+  /*background-color:  #f2f2f2;*/
+}
+/* line 2500, ../../../scss/_clix2017.scss */
+#replies-area .disc-replies .discussion-footer > a {
+  vertical-align: middle;
+  line-height: 2em;
+}
+/* line 2506, ../../../scss/_clix2017.scss */
+#replies-area .disc-replies .discussion-content {
+  color: #262626;
+  word-wrap: break-word;
+  /*background-color:  #f2f2f2;*/
+}
