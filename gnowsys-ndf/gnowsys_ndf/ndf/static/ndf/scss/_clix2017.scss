@@ -31,6 +31,7 @@ body {
     font-family: 'Rubik-Regular', sans-serif;
 }
 
+
 h3{
     font-size: 20px;
     color: $primary-blue;
@@ -43,6 +44,8 @@ h5{
     text-transform:uppercase;
     letter-spacing:2px;
 }
+
+
 
 .overlay-head{
     background-color: #f2fbff;
@@ -61,6 +64,7 @@ h5{
 .landing_page {
   position: relative;
   text-align: center;
+  
 
   .panel {
     background-color: inherit;
@@ -72,9 +76,7 @@ h5{
     width: 100%;
     position: absolute;
     z-index: -1;
-
   }
-
 
   .clix_brief {
     text-align: left;
@@ -323,13 +325,19 @@ h5{
 
 .explore-button {
       // //font-size: 25px;
-      border-radius: 10px;
-      
-      text-transform: uppercase;
-      background-color: $primary-blue;
-      margin-top: 80px;
-      color: $secondry-blue;
-      
+      border-radius: 5px;
+    text-transform: uppercase;
+    margin-left: 150px;
+    color: #ffc14e;
+    padding: 5px 17px;
+    width: inherit;
+    font-family: "Rubik-Medium", sans-serif;
+    border: 2px solid #ffc14e;
+    &:hover{
+        background-color:rgba(255,193,78,0.3);
+        cursor:pointer;
+        color:white;
+    }
 }
 
 
@@ -2704,3 +2712,16 @@ ul.jqtree-tree .jqtree-toggler {
         }
     }
 }
+.bg-img{
+    //background: url(/static/ndf/images/group-tile.png) no-repeat;
+    background: url(/static/ndf/images/landing.jpg);
+    height:100vh;
+    background-size: 100%;
+}
+.white-text{
+    color:white;
+}
+  .panel-mod{
+    background-color: transparent;
+    border: none;
+  }

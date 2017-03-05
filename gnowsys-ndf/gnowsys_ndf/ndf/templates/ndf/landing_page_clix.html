@@ -11,17 +11,16 @@
 
 {% block title %} {{title}} {% endblock title %}
 
+
 {% block body_content %}
-    <div class="row landing_page">
-        <div class="landing_page_background"></div>
+  <div class='bg-img'>
+    <div class="row">
+        <div class="landing_page_background">
         <div class="small-12 columns ">
             <div class="row" data-equalizer>
-                <div class="small-6 medium-6 columns clix_brief panel" data-equalizer-watch>
-                  <img src="/static/ndf/css/themes/clix/CLIx_white-01.svg" title="Invitation to clix.">
-                   <p>
-                    <!--  
-                    
-                    -->
+                <div class="small-6 medium-6 columns clix_brief panel-mod" data-equalizer-watch>
+                  <img src="/static/ndf/css/themes/clix/CLIx_white-01.svg" style='width:300px;margin: 40px 0px;' title="Invitation to clix."/>
+                   <p class='white-text'>
                         Invitation to CLIx will help you learn to do many things with a computer. Express your ideas through activities, engage with your classmate and learn together and share your knowledge.
                         <br/>
                         Clix is an initiative to promote digital learning; with the exposure of interactives and hands on activities on electronic machine.
@@ -30,7 +29,7 @@
                 </div>
                 <div class="small-5 columns">
           			<img src="/static/ndf/images/landing_page/bees.svg" class="bees"/>
-        		</div>
+        		    </div>
                 {% if not user.is_authenticated  %}
                     <div class="small-6 medium-6 columns panel" data-equalizer-watch>
                        <!-- <div class="invitation_to_clix">
@@ -49,7 +48,7 @@
                             {% else %}
 
                             {% get_explore_url as explore_url %}
-                            <a class="explore-button small expand" href="{% url explore_url %}">
+                            <a class="small expand" href="{% url explore_url %}">
                               <div class="small-6 medium-6 text-center columns end explore-button">
                                   Explore Projects
                               </div>
@@ -94,9 +93,9 @@
 
 
 
-
-
     </div>
 
+    </div>
+  </div>
 
 {% endblock body_content %}
