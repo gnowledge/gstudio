@@ -33,6 +33,7 @@ def unit_create_edit(request, group_id, unit_group_id=None):
     '''
     creation as well as eit of units
     '''
+
     parent_group_name, parent_group_id = Group.get_group_name_id(group_id)
     unit_node = None
     if request.method == "GET":
@@ -40,7 +41,7 @@ def unit_create_edit(request, group_id, unit_group_id=None):
         template = "ndf/create_unit.html"
         all_groups = node_collection.find({'_type': "Group"},{"name":1})
         all_groups_names = [str(each_group.name) for each_group in all_groups]
-        context_variables = {'group_id': parent_group_id, 'all_groups_names': all_groups_names}
+        context_variables = {'group_id': parent_group_id,'groupid': parent_group_id, 'all_groups_names': all_groups_names}
         if unit_node:
             context_variables.update({'unit_node': unit_node})
         req_context = RequestContext(request, context_variables)
@@ -51,6 +52,7 @@ def unit_create_edit(request, group_id, unit_group_id=None):
         group_altnames = request.POST.get('altnames', '')
         unit_id_post = request.POST.get('node_id', '')
         unit_altnames = request.POST.get('altnames', '')
+        content = request.POST.get('content', '')
 
 
         educationallevel_val = request.POST.get('educationallevel', '')
@@ -63,6 +65,7 @@ def unit_create_edit(request, group_id, unit_group_id=None):
         if unit_node:
             if unit_node.altnames is not unit_altnames:
                 unit_node.altnames = unit_altnames
+                unit_node.content = content
                 unit_node.save()
                 success_flag = True
         else:
@@ -82,7 +85,7 @@ def unit_create_edit(request, group_id, unit_group_id=None):
             create_gattribute(unit_node._id, educationalsubject_at, educationalsubject_val)
 
         if not success_flag:
-            return HttpResponseRedirect(reverse('list_units', kwargs={'group_id': group_id}))
+            return HttpResponseRedirect(reverse('list_units', kwargs={'group_id': parent_group_id, 'groupid': parent_group_id,}))
         return HttpResponseRedirect(reverse('unit_detail',
             kwargs={'group_id': unit_node._id}))
 
