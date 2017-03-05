@@ -41,7 +41,7 @@ from gnowsys_ndf.ndf.views.file import *
 from gnowsys_ndf.ndf.views.methods import check_existing_group, get_drawers, get_course_completed_ids,create_thread_for_node
 from gnowsys_ndf.ndf.views.methods import get_node_common_fields, get_node_metadata, create_grelation,create_gattribute
 from gnowsys_ndf.ndf.views.methods import create_task,parse_template_data,get_execution_time,get_group_name_id, dig_nodes_field
-from gnowsys_ndf.ndf.views.methods import get_widget_built_up_data, parse_template_data, get_prior_node_hierarchy
+from gnowsys_ndf.ndf.views.methods import get_widget_built_up_data, parse_template_data, get_prior_node_hierarchy, create_clone
 from gnowsys_ndf.ndf.views.methods import create_grelation, create_gattribute, create_task, node_thread_access, get_course_units_tree
 from gnowsys_ndf.ndf.templatetags.ndf_tags import get_profile_pic, edit_drawer_widget, get_contents, get_sg_member_of, get_attribute_value, check_is_gstaff
 from gnowsys_ndf.settings import GSTUDIO_SITE_NAME
@@ -78,11 +78,29 @@ def get_node_json_from_id(request, group_id, node_id=None):
 
 
 def save_node(request, group_id, node_id=None):
+    try:
+        group_id = ObjectId(group_id)
+    except:
+        group_name, group_id = get_group_name_id(group_id)
+
     if not node_id:
         node_id = request.POST.get('node_id')
+    type_of_gst_name = request.POST.get('type_of_gst_name', '')
+    member_of_gst_name = request.POST.get('member_of_gst_name', '')
+    replicate_resource = request.POST.get('replicate_resource', False)
     node_obj = Node.get_node_by_id(node_id)
+    type_of_gst_name, type_of_gst_id = GSystemType.get_gst_name_id(type_of_gst_name)
+    member_of_gst_name, member_of_gst_id = GSystemType.get_gst_name_id(member_of_gst_name)
     if node_obj:
-        node_obj.fill_gstystem_values(request=request)
+        if eval(replicate_resource):
+            new_node_obj = create_clone(request.user.id, node_obj, group_id)
+            new_node_obj.type_of = [type_of_gst_id]
+            new_node_obj.member_of = [member_of_gst_id]
+            node_obj = new_node_obj
+            new_node_obj.origin = [{'template_from': node_obj._id}]
+        else:
+            node_obj.fill_gstystem_values(request=request)
+            node_obj.member_of = [member_of_gst_id]
         node_obj.save(group_id=group_id)
         return HttpResponse(json.dumps(node_obj, cls=NodeJSONEncoder))
     else:
@@ -6519,7 +6537,8 @@ def get_templates_page(request, group_id):
       group_name, group_id = get_group_name_id(group_id)
   templates_gst = node_collection.one({"_type":"GSystemType","name":"Template"})
   if templates_gst._id:
-    templates_cur = node_collection.find({"member_of":ObjectId(GST_PAGE._id),"type_of":ObjectId(templates_gst._id)})
+    # templates_cur = node_collection.find({"member_of":ObjectId(GST_PAGE._id),"type_of":ObjectId(templates_gst._id)})
+    templates_cur = node_collection.find({"type_of":ObjectId(templates_gst._id)})
   template = "ndf/templates_list.html"
   already_uploaded=request.GET.getlist('var',"")
   variable = RequestContext(request, {'groupid':group_id,'group_id':group_id,'templates_cur':templates_cur })
