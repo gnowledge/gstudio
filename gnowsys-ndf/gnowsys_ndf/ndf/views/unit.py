@@ -52,6 +52,7 @@ def unit_create_edit(request, group_id, unit_group_id=None):
         group_altnames = request.POST.get('altnames', '')
         unit_id_post = request.POST.get('node_id', '')
         unit_altnames = request.POST.get('altnames', '')
+        content = request.POST.get('content', '')
 
 
         educationallevel_val = request.POST.get('educationallevel', '')
@@ -64,6 +65,7 @@ def unit_create_edit(request, group_id, unit_group_id=None):
         if unit_node:
             if unit_node.altnames is not unit_altnames:
                 unit_node.altnames = unit_altnames
+                unit_node.content = content
                 unit_node.save()
                 success_flag = True
         else:
