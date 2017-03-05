@@ -59,6 +59,15 @@ CKEDITOR.plugins.add('addJhapp',
                              CKEDITOR.instances[textAreaId].insertHtml(bm_text_val);
                             $('#group_imgs_on_modal').foundation('reveal', 'close');
                           });
+                            $("#insert_turtle").click(function(event){
+                            //ost_text_gallery = $('#paste-ost-gallery').val();
+                            //ost_text_file = $('#paste-ost-captions').val();
+                            tjs_text_val = "<iframe src='/turtleblocksjs/' style='height:100%;width:100%'></iframe>"
+                            // split_word = ost_text_val.slice(0, 18) + "gallery=" + ost_text_gallery + "&amp;file=/ost/" + ost_text_file+"'"+ ost_text_val.slice(18);
+                            // alert(split_word)
+                             CKEDITOR.instances[textAreaId].insertHtml(tjs_text_val);
+                            $('#group_imgs_on_modal').foundation('reveal', 'close');
+                          });
 
 
                         }
@@ -68,7 +77,7 @@ CKEDITOR.plugins.add('addJhapp',
 
         editor.ui.addButton('addJhapp',
             {
-                label: 'Add Jhapp from this Group',
+                label: 'Embed Tools',
                 command: pluginName,
                 icon: this.path + 'images/addJhapp.png'
             });
