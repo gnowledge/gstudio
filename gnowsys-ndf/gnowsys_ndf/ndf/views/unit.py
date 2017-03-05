@@ -18,7 +18,7 @@ from gnowsys_ndf.ndf.models import GSystemType, Group, Node  # GSystem, Triple
 from gnowsys_ndf.ndf.models import node_collection
 
 from gnowsys_ndf.ndf.views.group import CreateGroup
-from gnowsys_ndf.ndf.views.methods import get_execution_time, staff_required
+from gnowsys_ndf.ndf.views.methods import get_execution_time, staff_required, create_gattribute
 from gnowsys_ndf.ndf.views.ajax_views import get_collection
 
 gst_base_unit_name, gst_base_unit_id = GSystemType.get_gst_name_id('base_unit')
@@ -35,33 +35,52 @@ def unit_create_edit(request, group_id, unit_group_id=None):
     '''
     parent_group_name, parent_group_id = Group.get_group_name_id(group_id)
     if request.method == "GET":
+        unit_node = node_collection.one({'_id': ObjectId(unit_group_id)})
         template = "ndf/create_unit.html"
         all_groups = node_collection.find({'_type': "Group"},{"name":1})
         all_groups_names = [str(each_group.name) for each_group in all_groups]
-        req_context = RequestContext(request, {
-                                    'group_id': parent_group_id,
-                                    'all_groups_names': all_groups_names
-                                    # 'unit_obj': unit_group_obj
-                                })
+        context_variables = {'group_id': parent_group_id, 'all_groups_names': all_groups_names}
+        if unit_node:
+            context_variables.update({'unit_node': unit_node})
+        req_context = RequestContext(request, context_variables)
         return render_to_response(template, req_context)
 
     elif request.method == "POST":
         group_name = request.POST.get('name', '')
-        if not group_name:
-            raise ValueError('Unit Group must accompanied by name.')
         group_altnames = request.POST.get('altnames', '')
-        unit_id_post = request.POST.get('_id', '')
-        unit_group_id = unit_id_post if unit_id_post else unit_group_id
-        unit_group_name, unit_group_id = Group.get_group_name_id(unit_group_id)
-        unit_group = CreateGroup(request)
-        result = unit_group.create_group(group_name,
-                                        group_id=parent_group_id,
-                                        member_of=gst_base_unit_id,
-                                        node_id=unit_group_id)
+        unit_id_post = request.POST.get('node_id', '')
+        unit_altnames = request.POST.get('altnames', '')
 
-        if not result[0]:
+
+        educationallevel_val = request.POST.get('educationallevel', '')
+        educationalsubject_val = request.POST.get('educationalsubject', '')
+        # unit_group_id = unit_id_post if unit_id_post else unit_group_id
+        # unit_group_name, unit_group_id = Group.get_group_name_id(unit_group_id)
+        unit_node = node_collection.one({'_id': ObjectId(unit_id_post)})
+        success_flag = False
+        if unit_node:
+            if unit_node.altnames is not unit_altnames:
+                unit_node.altnames = unit_altnames
+                unit_node.save()
+                success_flag = True
+        else:
+            unit_group = CreateGroup(request)
+            result = unit_group.create_group(group_name,
+                                            group_id=parent_group_id,
+                                            member_of=gst_base_unit_id,
+                                            node_id=unit_group_id)
+            success_flag = result[0]
+            unit_node = result[1]
+
+        if educationallevel_val:
+            educationallevel_at = node_collection.one({'_type': 'AttributeType', 'name': "educationallevel"})
+            create_gattribute(unit_node._id, educationallevel_at, educationallevel_val)
+        if educationalsubject_val:
+            educationalsubject_at = node_collection.one({'_type': 'AttributeType', 'name': "educationalsubject"})
+            create_gattribute(unit_node._id, educationalsubject_at, educationalsubject_val)
+
+        if not success_flag:
             return HttpResponseRedirect(reverse('list_units', kwargs={'group_id': group_id}))
-        unit_node = result[1]
         return HttpResponseRedirect(reverse('unit_detail',
             kwargs={'group_id': unit_node._id}))
 

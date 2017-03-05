@@ -43,6 +43,9 @@
                         <li>
                             <a href="{% url 'create_event_group' group_id 'CourseEventGroup' %}?cnode_id={{group_id}}" class="fi-volume"> Announce</a>
                         </li>
+                        <li>
+                            <a href="{% url 'unit_edit' groupid group_object.pk %}" class="fi-pencil"> Edit</a>
+                        </li>
                         </ul>
                     </div>
                 </div>
