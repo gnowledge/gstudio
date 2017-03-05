@@ -4,19 +4,20 @@
 {% load ndf_tags %}
 {% get_group_name groupid as group_name_tag %}
 <div class="editor_modal_content">
-            <div class="row app_row">
-                <div style="width: 65%" class="app_desc">
-                    <h3>Assessments</h3>
+            <div class="row">
+                <div row style="width: 65%" class="app_desc">
+                    <h3>Insert Assessment</h3>
                 <input type="text" placeholder="" class="required" id ="paste-area-assessment"  />
-
-                    <button type="button"  class="right orange-button" id="insert_assessment" >Insert Assessment</button>
-                </div>
-                <div style="width: 65%" class="app_desc">
-                    <h3>Open Story Tool</h3>
-                        <input type="text" placeholder="" class="required" id ="paste-ost-gallery"  />
-                        <input type="text" placeholder="" class="required" id ="paste-ost-captions"  />
-
-                    <button type="button"  class="right orange-button" id="insert_ost" >Insert Assessment</button>
+                    <button inline type="button"  class="right orange-button" id="insert_assessment" >Add Assessment</button>
                 </div>
             </div>
-        </div>
+            <div class="row">
+                <br>
+                <div style="width: 65%" class="app_desc">
+                    <button type="button"  class="right orange-button" id="insert_ost" >Insert Open Story Tool</button>
+                </div>
+                <div style="width: 65%" class="app_desc">
+                    <button type="button"  class="right orange-button" id="insert_policequad" >Insert PoliceQuad</button>
+                </div>
+            </div>
+</div>
