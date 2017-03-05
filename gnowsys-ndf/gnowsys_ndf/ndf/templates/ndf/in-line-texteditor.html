@@ -38,7 +38,7 @@
 
       <div class="create-discussion">
 
-      <div  onclick="createDiscussion()" id="create-discussion" data-id="{{ node.pk }}"  class="ckeditor-comment  button small radius" style="margin-bottom:0;">
+      <div  onclick="createDiscussion()" id="create-discussion" data-id="{{ node.pk }}"  class="ckeditor-comment  explore-button" style="margin-bottom:0;">
         {% if thr_int_type %}
           {{thr_int_type}} {% if all_replies|length > 0 %}({{all_replies|length }}) {% endif %}
         {% else %}
@@ -181,10 +181,10 @@
 
                             p = $('.ckeditor-comment');
 
-                            p.after('<div class="ckeditor-content-comment"><div class="ckeditor-reply-area"></div> <div class="post-btn-div"></div> </div>');
+                            p.after('<div class="ckeditor-content-comment"><div class="ckeditor-reply-area"></div> <div class="post-btn-div" style="float: right; margin-right: 67px;">');
                                   // '<img width="'+  width + '"src=' + completeURL +  '>' + '</img>'
                                   $('.ckeditor-reply-area').html(data);
-                                  $('.post-btn-div').html('<input type="button" value="Post"  class="button small right radius reply-button" onclick="addReply(this)">');
+                                  $('.post-btn-div').html('<input type="button" value="Post"  class="explore-button reply-button" onclick="addReply(this)" style="width:34% ">');
 
                             setCurrNodeEdit(1);
 

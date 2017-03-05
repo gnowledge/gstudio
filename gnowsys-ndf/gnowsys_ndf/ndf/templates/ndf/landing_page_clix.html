@@ -31,19 +31,17 @@
           			<img src="/static/ndf/images/landing_page/bees.svg" class="bees"/>
         		    </div>
                 {% if not user.is_authenticated  %}
-                    <div class="small-6 medium-6 columns panel" data-equalizer-watch>
+                    <div class="small-6 medium-6 columns" data-equalizer-watch>
                        <!-- <div class="invitation_to_clix">
                           <span>Login to&nbsp;</span>
                           <img src="/static/ndf/css/themes/clix/logo.svg" title="Invitation to CLIx	">-->
                           <!-- <form method="post" id="loginSubmit" action="/accounts/login/" data-abide="" novalidate="novalidate"> -->
                             
-                            <div class="row">
-                              <div class="small-12 medium-12 large-12 text-center columns end login-button">
-                                <form action="{% url 'auth_login' %}">
-                                  <input type="submit" class="button small expand" tabindex="4" value="Login">
-                                </form>
+                            <a class="small expand" href="{% url 'auth_login' %}">
+                              <div class="small-6 medium-6 text-center columns end explore-button">
+                                  Login
                               </div>
-                            </div>  
+                            </a>
 
                             {% else %}
 
