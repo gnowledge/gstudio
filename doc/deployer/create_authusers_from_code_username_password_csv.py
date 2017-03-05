@@ -22,7 +22,7 @@ if os.path.exists(file_input):
     msg = '\nFound file: "' + str(file_input) + '"\n\n'
     print msg
     with open(file_input, 'rb') as csvfile:
-        users = csv.reader(csvfile, delimiter=';')
+        users = csv.reader(csvfile, delimiter=',')
         for school_code, username, password in users:
 
             # email validation from username
@@ -34,7 +34,7 @@ if os.path.exists(file_input):
             temp_csv_log_list = [school_code, username, password]
             user_obj = User.objects.create_user(username=username, email=email, password=password)
             user_id = user_obj.id
-            
+
             temp_csv_log_list.append(str(user_id))
 
             auth = node_collection.collection.Author()
