@@ -16,7 +16,6 @@
                         {% if unit_node %}
                         <input id="unit-name" name="name" type="text" placeholder="Enter unit name"
                         value="{% if unit_node %}{{unit_node.name}}{% endif %}" disabled="disabled" />
-
                         {% else %}
                         <input id="unit-name" name="name" type="text" placeholder="Enter unit name"
                          autofocus onfocus="this.value = this.value;"/>
@@ -49,7 +48,7 @@
                     <h5>Select Grade</h5>
                     </div>
                     <div class="right course_heading">
-                         <select name="educationallevel" id ="{{k}}">
+                         <select name="educationallevel">
                             <option selected>Choose Grade</option>
                             {% for opts in metadata_educationallevel %}
                                 <option {% if educationallevel_val == opts %} selected {% endif %}>{{opts}}</option>
@@ -99,6 +98,18 @@
             }
         })
     {% endif %}
+
+    // $("select#educationalsubject").change(function() {
+    //     selected_educationalsubject_index = this.selectedIndex
+    //     if (selected_educationalsubject_index != 0) {
+    //     }
+    // }) 
+
+    // $("select#educationallevel").change(function() {
+    //     selected_educationallevel_index = this.selectedIndex
+    //     if (selected_educationallevel_index != 0) {
+    //     }
+    // }) 
     </script>
 {% endblock %}
 

@@ -34,6 +34,7 @@ def unit_create_edit(request, group_id, unit_group_id=None):
     creation as well as eit of units
     '''
     parent_group_name, parent_group_id = Group.get_group_name_id(group_id)
+    unit_node = None
     if request.method == "GET":
         unit_node = node_collection.one({'_id': ObjectId(unit_group_id)})
         template = "ndf/create_unit.html"
@@ -56,7 +57,8 @@ def unit_create_edit(request, group_id, unit_group_id=None):
         educationalsubject_val = request.POST.get('educationalsubject', '')
         # unit_group_id = unit_id_post if unit_id_post else unit_group_id
         # unit_group_name, unit_group_id = Group.get_group_name_id(unit_group_id)
-        unit_node = node_collection.one({'_id': ObjectId(unit_id_post)})
+        if unit_id_post:
+            unit_node = node_collection.one({'_id': ObjectId(unit_id_post)})
         success_flag = False
         if unit_node:
             if unit_node.altnames is not unit_altnames:
@@ -72,10 +74,10 @@ def unit_create_edit(request, group_id, unit_group_id=None):
             success_flag = result[0]
             unit_node = result[1]
 
-        if educationallevel_val:
+        if educationallevel_val and "choose" not in educationallevel_val.lower():
             educationallevel_at = node_collection.one({'_type': 'AttributeType', 'name': "educationallevel"})
             create_gattribute(unit_node._id, educationallevel_at, educationallevel_val)
-        if educationalsubject_val:
+        if educationalsubject_val and "choose" not in educationalsubject_val.lower():
             educationalsubject_at = node_collection.one({'_type': 'AttributeType', 'name': "educationalsubject"})
             create_gattribute(unit_node._id, educationalsubject_at, educationalsubject_val)
 
