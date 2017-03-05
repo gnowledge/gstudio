@@ -35,6 +35,9 @@
                                         <a href="#" class="save_template">Save as template</a>
                                     </li>
                                     <li>
+                                        <a href="#" data-reveal-id="group_imgs_on_modal">Create from existing template</a>
+                                    </li>
+                                    <li>
                                         <a href="#" class="delete_entity">Delete</a>
                                     </li>
                                 </ul>
@@ -256,8 +259,8 @@
                                 <li>
                                     <a href="#" data-reveal-id="add-activity-modal" class="add_activity">Create new</a>
                                 </li>
-                                <li>
                             <!--
+                                <li>
                                     <a href="#">Create from existing template</a>
                                 </li>
                                 <li>
@@ -279,6 +282,16 @@
       <button type="button" class="button-hollow-grey save-activity" data-lesson-id="">
         Save Activity
       </button>
+      <a class="close-reveal-modal" aria-label="Close">&#215;</a>
+
+    </div>
+<div id="group_imgs_on_modal" class="reveal-modal" data-reveal aria-labelledby="modalTitle" aria-hidden="true" role="dialog">
+      <h3>Choose Templates</h3>
+      <!-- <input type="text" id="activity-name">
+      <button type="button" class="button-hollow-grey save-activity" data-lesson-id="">
+        Save Activity
+      </button> -->
+      <div id="template-container"></div>
       <a class="close-reveal-modal" aria-label="Close">&#215;</a>
     </div>
 
@@ -556,7 +569,7 @@
         function addActivity(activityName, lessonId) {
           /*
           addActivity()
-          - to add lesson of unit.
+          - to add activity of lesson of unit.
           */
           if (!activityName) {
             alert('Name can not be empty. Please provide one.');
@@ -686,6 +699,41 @@
         // console.log(course_data)
         renderCourseTree(course_data);
 
+        function getTemplates() {
+            $.ajax({
+                      type: "GET",
+                      url: "{% url 'get_group_templates_page' group_id %}",
+                      datatype: "html",
+                      data:{
+
+                      },
+                        success: function(data) {
+                          // console.log(data);
+                      $("#template-container").html(data);
+                            // $('#group_imgs_on_modal').foundation('reveal', 'open');
+
+                      $(".template-list").click(function(event){
+                          // get html content in var
+                          var nodeContent = $(this).children('div').attr("data-content");
+                          if (!editorMode == "edit"){
+                            editNode(nodeContent);
+                          }
+                          // Open ckeditor and append content of node in ckeditor
+                          // openCkEditor('#activity-content', "BasicToolbar", nodeContent);
+                          CKEDITOR.instances['ckeditor_textarea'].insertHtml(nodeContent);
+                          $('#group_imgs_on_modal').foundation('reveal', 'close');
+                        });
+                      }
+                    });
+        }
+
+        $(document).on('opened.fndtn.reveal', '#group_imgs_on_modal[data-reveal]', function () {
+          // var modal = $(this); // console.log(this);
+          getTemplates();
+        });
+
+
+
 
 
         /**
@@ -727,9 +775,9 @@
         }
 
         function saveNode(nodeId, nodeName, nodeContent) {
-          console.log(nodeId)
-          console.log(nodeName)
-          console.log(nodeContent)
+          // console.log(nodeId)
+          // console.log(nodeName)
+          // console.log(nodeContent)
           $.ajax({
             type: "POST",
             url: "{% url 'save_node' group_id %}",
@@ -752,15 +800,21 @@
             });
         }
 
+        function editNode(nodeContent) {
+          editorMode = 'edit';
+          $('.save_edit_activity').html('Save');
+          // get html content from #activity-content
+          if(!nodeContent){
+            var nodeContent = $("#activity-content").html();
+          }
+          // Open ckeditor and append content of node in ckeditor
+          openCkEditor('#activity-content', "BasicToolbar", nodeContent);
+        }
+
         $('.course-editor-section').on('click', '.save_edit_activity', function(){
             if (editorMode === 'view') {
                 console.log('Editing the activity');
-                editorMode = 'edit';
-                $('.save_edit_activity').html('Save');
-                // get html content from #activity-content
-                var nodeContent = $("#activity-content").html();
-                // Open ckeditor and append content of node in ckeditor
-                openCkEditor('#activity-content', "BasicToolbar", nodeContent);
+                editNode(false);
             }
             else {
                 editorMode = 'view';

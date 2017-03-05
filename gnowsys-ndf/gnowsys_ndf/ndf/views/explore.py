@@ -100,19 +100,25 @@ def explore_courses(request,page_no=1):
 def explore_groups(request,page_no=1):
     title = 'groups'
     gstaff_access = check_is_gstaff(group_id,request.user)
+    gst_base_unit_name, gst_base_unit_id = GSystemType.get_gst_name_id('base_unit')
+
+    query = {'_type': 'Group', 'status': u'PUBLISHED',
+             'member_of': {'$in': [gst_group._id],
+             '$nin': [gst_course._id, gst_basecoursegroup._id, ce_gst._id, gst_course._id, gst_base_unit_id]}, 
+            }
+
     if gstaff_access:
-        group_cur = node_collection.find({'_type': 'Group',
-            'member_of': gst_group._id, 'status': u'PUBLISHED'}).sort('last_update', -1)
+        group_cur = node_collection.find(query).sort('last_update', -1)
     else:
-        group_cur = node_collection.find({'_type': 'Group', 'member_of': gst_group._id,
-            'status': u'PUBLISHED', 'name':{'$nin':GSTUDIO_DEFAULT_GROUPS_LIST }}).sort('last_update', -1)
+        query.update({'name': {'$nin': GSTUDIO_DEFAULT_GROUPS_LIST}})
+        group_cur = node_collection.find(query).sort('last_update', -1)
 
     ce_page_cur = paginator.Paginator(group_cur, page_no, GSTUDIO_NO_OF_OBJS_PP)
-    context_variable = {'title': title, 'doc_cur': group_cur, 'card': 'ndf/simple_card.html',
+    context_variable = {'title': title, 'doc_cur': group_cur, 'card': 'ndf/event_card.html',
                         'group_id': group_id, 'groupid': group_id,'ce_page_cur':ce_page_cur}
 
     return render_to_response(
-        "ndf/explore.html",
+        "ndf/explore_2017.html",
         context_variable,
         context_instance=RequestContext(request))
 
