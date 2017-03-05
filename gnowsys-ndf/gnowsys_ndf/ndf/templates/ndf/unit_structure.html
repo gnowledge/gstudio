@@ -272,7 +272,7 @@
                             <a href="#" class="button-hollow-grey add_activity">Add Activity</a>
                             <ul class="dropdown_content left_align" >
                                 <li>
-                                    <a href="#" data-reveal-id="add-activity-modal" class="right add_activity">Create new</a>
+                                    <a href="#" data-reveal-id="add-activity-modal" class="add_activity">Create new</a>
                                 </li>
                                 <li>
                                     <a href="#" data-reveal-id="select-activity-page">Select from Activity Pages</a>
@@ -635,7 +635,7 @@
             console.log('Adding another lessson');
             // aaa = this
             var lesson_id = $('#add-activity-modal button.save-activity').attr('lesson_id');
-            console.log(lesson_id);
+            // console.log(lesson_id);
             addActivity($('#activity-name').val().trim(), lesson_id);
 
             //Send the query and update the course_data and call 'renderCourseTree(course_data)'
@@ -759,16 +759,20 @@
 
                       },
                         success: function(data) {
-                          console.log(data);
+                          // console.log(data);
                       $("#activity-container").html(data);
                             // $('#existing_template_modal').foundation('reveal', 'open');
 
                       $(".activity-page").click(function(event){
+                          event.preventDefault();
                           // get html content in var
                           var activityId = $(this).attr("data-id");
-                          console.log(activityId)
+                          // console.log(activityId)
                           var nodeContent = $(this).attr("data-name");
-                          console.log(nodeContent)
+                          // console.log(nodeContent);
+
+                          addActivity($('#activity-name').val().trim(), lesson_id);
+
 
                           // if (editorMode != "edit"){
                           //     // console.log("jjjjjjjjjjjjjjj " + editorMode);
