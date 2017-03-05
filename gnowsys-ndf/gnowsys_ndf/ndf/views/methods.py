@@ -5104,7 +5104,7 @@ def create_thread_for_node(request, group_id, node):
 					has_thread_status = True
 
 			release_response_val = unicode(request.POST.get("release_resp_sel",'True'))
-			interaction_type_val = unicode(request.POST.get("interaction_type_sel",'Comment'))
+			interaction_type_val = unicode(request.POST.get("interaction_type_sel",'Feedback'))
 			start_time = request.POST.get("thread_start_date", '')
 			if start_time:
 				start_time = datetime.strptime(start_time, "%d/%m/%Y")
