@@ -32,19 +32,19 @@
                         </span>
                         <ul id="course-settings-drop" class="f-dropdown" data-dropdown-content aria-hidden="true" tabindex="-1">
                         <li>
-                                <a data-reveal-id="manage_users_modal" href="{% url 'manage_users' group_id %}"  class="fi-torsos"> Manage Users</a> 
-                                <div id="manage_users_modal" class="reveal-modal large" data-reveal style="position:absolute;"> 
-                                    <div id="group_drawer">
-                                    {% include "ndf/widget_user_search.html" with subscription_status=True %}
-                                    </div>
-                                    <a class="close-reveal-modal">&#215;</a>
-                                </div>          
+                            <a href="{% url 'unit_edit' groupid group_object.pk %}" class="fi-pencil"> Edit</a>
+                        </li>
+                        <li>
+                            <a data-reveal-id="manage_users_modal" href="{% url 'manage_users' group_id %}"  class="fi-torsos"> Manage Users</a> 
+                            <div id="manage_users_modal" class="reveal-modal large" data-reveal style="position:absolute;"> 
+                                <div id="group_drawer">
+                                {% include "ndf/widget_user_search.html" with subscription_status=True %}
+                                </div>
+                                <a class="close-reveal-modal">&#215;</a>
+                            </div>          
                         </li>
                         <li>
                             <a href="{% url 'create_event_group' group_id 'CourseEventGroup' %}?cnode_id={{group_id}}" class="fi-volume"> Announce</a>
-                        </li>
-                        <li>
-                            <a href="{% url 'unit_edit' groupid group_object.pk %}" class="fi-pencil"> Edit</a>
                         </li>
                         </ul>
                     </div>
