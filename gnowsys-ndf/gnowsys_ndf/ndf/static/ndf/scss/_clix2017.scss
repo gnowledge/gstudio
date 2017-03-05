@@ -831,14 +831,20 @@ filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#0049667a', e
     margin-top: 10px;
     padding-bottom: 10px;
     cursor: pointer;
+    //height:7rem;
     //margin-left: 3px;
-
+    height:250px;
+    border: 1px solid $primary-blue;
     .asset_preview {
-        min-height: 200px;
+        height: 200px;
         //margin-left: 5px;
         width:100%;
         //background-color: #eee;
-        background: url(/static/ndf/images/asset_thumbnail.png)no-repeat;
+        //background: url(/static/ndf/images/asset_thumbnail.png)no-repeat;
+        border-width: 5px;
+        img{
+            width:100%;
+        }
     }
 
     .asset_text {
@@ -848,12 +854,12 @@ filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#0049667a', e
             overflow: hidden;
             font-size: 13px;
             color:$primary-blue;
+        
         }
         .asset_desc {
             // //font-size: 13px;
             letter-spacing: 0.3px;
             overflow: hidden;
-            //display: none;
         }
     }
 }
