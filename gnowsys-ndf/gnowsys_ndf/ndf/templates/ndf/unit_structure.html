@@ -1,5 +1,7 @@
 {% block head %}
 <script src="/static/ndf/bower_components/handlebars/handlebars.js"></script>
+<script type="text/javascript" src="/static/ndf/bower_components/ckeditor/ckeditor.js"></script>
+<script type="text/javascript" src="/static/ndf/bower_components/ckeditor/config.js"></script>
 {% endblock head %}
     <div class="row course_creator">
         <div class="small-12 columns">
@@ -21,8 +23,10 @@
                     <div class="activity-editor hide">
                         <div class="actvity-editor-header editor-header">
                             <div class="left header-left">
-                                <span class="">Activity Name</span>
-                                <button type="button" class="button-hollow-blue save_edit_activity"> Edit </button>
+                                <span class="activity-name">Activity Name</span>
+                                <button type="button" class="button-hollow-blue save_edit_activity" data-current-activity-id="">
+                                  Edit
+                                </button>
                             </div>
                             <div class="right custom_dropdown">
                                 <a href="">More</a>
@@ -36,7 +40,7 @@
                                 </ul>
                             </div>
                         </div>
-                        <div class="editor-tool">
+                        <div class="editor-tool hide">
                             <div class="editor_actions">
                                 <ul>
                                     <li style="float: left;">
@@ -56,6 +60,9 @@
                                 </ul>
                             </div>
                             Editor tool will come here. //CK Editor
+                        </div>
+                        <div id="activity-content">
+
                         </div>
                     </div>
                     <div class="lesson-editor hide">
@@ -228,7 +235,7 @@
             <div id="lesson-{{id}}" class="content">
                 <ul class="course-activities">
                     {{#each activities}}
-                        <li id="activity-{{id}}">
+                        <li id="activity-{{id}}" data-name={{name}}>
                             <a href="#" class="entity-title">{{name}}
                                 <div class="right edit_entity">
                                     <i class="fi-list right"></i>
@@ -356,9 +363,7 @@
             $('.course_editor .course-lessons').html(courseHtml);
 
             assignEvents();
-
         }
-
 
         //Managing states and events on the tree.
         var lastClickedActivity;
@@ -371,7 +376,6 @@
             $(document).foundation('accordion', 'reflow');
         }
 
-
         /*
         * Handlers and actions for the lesson
         */
@@ -380,6 +384,7 @@
             e.stopPropagation();
             e.preventDefault();
         });
+
         // Edit a lesson
         $('.course-lessons').on('click', '.lesson_edit' ,function(e){
             e.stopPropagation();
@@ -397,6 +402,8 @@
             $('.activity-editor').addClass('hide');
 
             //Ajax to get the data for the activity
+            // aaa = this
+            // console.log("oooooooooooooooo" + lesson_id)
         });
 
 
@@ -545,11 +552,7 @@
         })
 
 
-
-
-
         // add/save activity
-
         function addActivity(activityName, lessonId) {
           /*
           addActivity()
@@ -594,10 +597,10 @@
         }
 
 
-        //Add a lesson
+        //Add a activity
         $('.save-activity').on('click', function(){
             console.log('Adding another lessson');
-            aaa = this
+            // aaa = this
             var lesson_id = $('#add-activity-modal button.save-activity').attr('lesson_id');
             console.log(lesson_id);
             addActivity($('#activity-name').val().trim(), lesson_id);
@@ -607,7 +610,30 @@
         })
 
 
-
+        function getNodeData(node_id)
+        {
+          var result = undefined;
+          $.ajax({
+              type: "GET",
+              data:{
+                  "node_id": node_id,
+              },
+              url: "{% url 'get_node_json_from_id' group_id %}",
+              datatype: "JSON",
+              success: function(data) {
+                  if (data == "0"){
+                    alert('Unable to load data... Something went wrong :(')
+                    return false
+                  }
+                  // aaa = data
+                  // console.log(typeof(data));
+                  data_dict = JSON.parse(data);
+                  // console.log(data_dict);
+                  $('#activity-content').html(data_dict.content);
+                  return true
+              }
+          });
+        }
 
 
 
@@ -621,9 +647,11 @@
 
             $('.course-lessons li[id^="activity-"]').removeClass('active');
             $(this).closest('li').addClass('active');
+            // e.g: activity-58bbaf0a5e35e40049f128ee
             var activity_id = $(this).closest('li').attr('id').replace('activity-', '');
             selectedEntity = 'activity';
             selectedEntityid = activity_id;
+            lastClickedActivity = activity_id;
 
             setTimeout(function(){
                 $('.course-editor-section').removeClass('hide');
@@ -633,6 +661,16 @@
             $('.lesson-editor').addClass('hide');
             $('.activity-editor').removeClass('hide');
             $('.course_editor').addClass('edit_mode');
+            // $('#course_creator')
+            console.log("activity id: "+ activity_id);
+
+            // update content: name and description of activity.
+            var activityName = $('#activity-' + activity_id).attr('data-name');
+            // update name field of editor section
+            $('.course-editor-section .activity-name').text(activityName);
+
+            getNodeData(activity_id);
+            $('.save_edit_activity').attr('data-current-activity-id', activity_id);
         });
 
         // Add a new activity
@@ -643,11 +681,9 @@
             $('#add-activity-modal button.save-activity').attr('lesson_id', lesson_id);
             //Send the query and update the course_data and call 'renderCourseTree(course_data)'
             //To select the newly created activity run this $('#activity-' + newid).trigger('click');
-
-
         });
 
-        console.log(course_data)
+        // console.log(course_data)
         renderCourseTree(course_data);
 
 
@@ -668,14 +704,72 @@
             //Call ajax
         });
 
+        function openCkEditor(editorContainerIdOrEl, toolbarType, content)
+        {
+          $.ajax({
+            type: "GET",
+            // url: "{% url 'get_ckeditor' group_id %}",
+            url: "/home/ajax/get_ckeditor",
+            datatype: "html",
+            data:{
+                    'ckeditor_toolbar' : toolbarType
+              },
+            success: function(data) {
+                $(editorContainerIdOrEl).html(data);
+                CKEDITOR.instances['ckeditor_textarea'].setData(content);
+                }
+            });
+        }
+
+        function closeCkEditor()
+        {
+          $(".cke_button__closebtn_label").trigger( "click" );
+        }
+
+        function saveNode(nodeId, nodeName, nodeContent) {
+          console.log(nodeId)
+          console.log(nodeName)
+          console.log(nodeContent)
+          $.ajax({
+            type: "POST",
+            url: "{% url 'save_node' group_id %}",
+            // datatype: "JSON",
+            data:{
+                    'node_id' : nodeId,
+                    'name' : nodeName,
+                    'content' : nodeContent,
+                    'csrfmiddlewaretoken': '{{csrf_token}}'
+              },
+              success: function(data) {
+                  if (data == '0'){
+                    alert('Failed to save data. Please try again.');
+                    return 0;
+                  }
+                  data_dict = JSON.parse(data);
+                  closeCkEditor();
+                  $("#activity-content").html(data_dict.content);
+                }
+            });
+        }
+
         $('.course-editor-section').on('click', '.save_edit_activity', function(){
             if (editorMode === 'view') {
                 console.log('Editing the activity');
                 editorMode = 'edit';
                 $('.save_edit_activity').html('Save');
-            } else {
+                // get html content from #activity-content
+                var nodeContent = $("#activity-content").html();
+                // Open ckeditor and append content of node in ckeditor
+                openCkEditor('#activity-content', "BasicToolbar", nodeContent);
+            }
+            else {
                 editorMode = 'view';
-                console.log('Saving the activity');
+                // console.log('Saving the activity');
+                var nodeContent = CKEDITOR.instances['ckeditor_textarea'].getData();
+                // console.log(content_val);
+                nodeId = $('.save_edit_activity').attr('data-current-activity-id');
+                nodeName = 'a1';
+                saveNode(nodeId, nodeName, nodeContent);
                 //Do the ajax to save the activity and then following command;
                 $('.save_edit_activity').html('Edit');
             }

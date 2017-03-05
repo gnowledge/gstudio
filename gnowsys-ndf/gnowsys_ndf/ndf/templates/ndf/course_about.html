@@ -39,8 +39,8 @@
 <div class="row">
 <div class="small-12 columns about-course">
   <h5>About this course</h5>
-  
-    <div class="small-12 medium-12 columns">
+  <div class="row">
+    <div class="small-12 medium-6 columns">
       <div class="course-desc">
           {{group_object.content|default:'No description added yet.'|safe}}
       </div>
@@ -48,12 +48,15 @@
         <u><a class="show-more hide">Show more</a></u>
       </div>
     </div>
+    </div>
   </div>
+</div>
 
-
-    <div class="small-12 medium-12 columns">
-      <h5>No. of Members</h5>
-      <div class="course-highlight">
+<div class="row">
+  <div class="small-12 columns about-course">
+    <h5>No. of Members</h5>
+    <div class="row">
+      <div class="small-12 medium-6 columns course-highlight">
         <i class="fa fa-user"></i>
         <span>
         {% if 'base_unit' in group_object.member_of_names_list %}
@@ -62,11 +65,14 @@
         {{group_object.author_set|length}} student{{group_object.author_set|length|pluralize}} enrolled
         {% endif %}</span>
       </div>
+    
+
       {% if show_analytics_notifications %}
       <div class="course-highlight">
         <i class="fa fa-list"></i>
         <span>{{group_object.collection_set|length}} Module{{group_object.collection_set|length|pluralize}}</span>
       </div>
+      
       <div class="course-highlight">
         <i class="fa fa-clock-o"></i>
         <span>{{weeks_count}} week{{weeks_count|pluralize}}</span>
