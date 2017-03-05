@@ -1,5 +1,6 @@
 {% load i18n %}
 {% load ndf_tags %}
+{% check_is_gstaff group_id request.user as is_gstaff %}
     <div class="row">
             <div class="small-12 medium-6 large-6 columns">
             <h6>
@@ -10,24 +11,28 @@
                     
                     <!--<input type="text" placeholder="" name="resource_name" />-->
                 </label>
-            {% if 'video' in node.if_file.mime_type %}
+          {% if asset_obj.created_by == request.user.id or is_gstaff %}
+            {% if 'video' in node.if_file.mime_type or 'audio' in node.if_file.mime_type %}
             <div class="video-related">
                 <label>Upload Transcript
                 </label>
                 <div class="transcript_files">
                    <form class="dropzone" id ="doctranscript" enctype="multipart/form-data" method="post" action="{% url 'add_assetcontent' group_id %}" > 
                     <input type="file" placeholder="" id="doctranscriptfile" name="transcript_file" />
-                    <span class="add_more_files">&nbsp;<u> + Transcript</u></span>
                     <!-- <a class="right orange-button  save-transcript">Save Asset</a> -->
-                    <button type="button" class="right orange-button save-transcript" >Save Asset</button>
+                    <button type="button" class="right orange-button save-transcript" style="display: none;" >Add Transcript </button>
                 </div>
+                </form>
+            {% endif %}
+            {% if 'video' in node.if_file.mime_type %}
+                <div class="subtitle_files">
                 <label>Upload Subtitle
                 </label>
-                <div class="subtitle_files">
                     <form class="dropzone" id ="docsubtitle" enctype="multipart/form-data" method="post" action="{% url 'add_assetcontent' group_id %}" >
                         <input type="file" id="docsubtitlefile" placeholder="" name="doc_f" />
-                        <b class="compulsory">Language</b>
-                          <select name="lan" id="sub_languageid" tabindex=3 required>
+                        <br>
+                        <label>Language</label>
+                          <select  style="display: none;" class="select-language" name="lan" id="sub_languageid" tabindex=3 >
                             <option value="">--- Select Language ---</option>
                             {% get_language_info_list for LANGUAGES as languages %}
                             {% for language in languages %}
@@ -36,13 +41,14 @@
                             </option>
                             {% endfor %}
                           </select>
-                        <span class="add_more_files"><u>+ Subtitle</u></span>
                     </form>
-                    <button type="button" class="right orange-button" onclick="save_subtitle()">Save Asset</button>
+                    <button type="button" class="right orange-button save-subtitle" style="display: none;" onclick="save_subtitle()">Add Subtitle</button>
                    <!-- <input type="asset-save-button" id="" class="orange-button" onclick="save_asset_cont_data()" value="Save"/>-->
                 </div>
+              {%  endif %}
+            {%  endif %}
+            
             </div>
-            {% endif %}
         </div>
             <div class="small-12 medium-6 large-6 columns">
                 <div class="preview_asset"> 
@@ -54,6 +60,24 @@
         </div>
 
 <script type="text/javascript">
+  
+$("#doctranscript").change(function(){
+        $(".save-transcript").css('display','block')
+    });
+$("#docsubtitle").change(function(){
+        $(".select-language").css('display','block')
+    });
+
+$(".select-language").change(function(){
+        $(".save-subtitle").css('display','block')
+    });
+
+
+
+
+
+
+
   // var form = document.getElementById('docsubtitle');
   var selectedSubtitle = document.getElementById('docsubtitlefile');
   // var uploadButton = document.getElementById('submitpostid');

@@ -636,23 +636,29 @@ ul.horizontal_tabs_gstudio {
     padding-bottom: 10px;
     border: 1px solid #eee;
     cursor: pointer;
+    //height:7rem;
     //margin-left: 3px;
+    height:250px;
 
     .asset_preview {
-        min-height: 200px;
+        height: 200px;
         //margin-left: 5px;
         width:100%;
         //background-color: #eee;
-        background: url(/static/ndf/images/asset_thumbnail.png)no-repeat;
+        //background: url(/static/ndf/images/asset_thumbnail.png)no-repeat;
+        img{
+            width:100%;
+        }
     }
 
     .asset_text {
-        padding: 2px 10px;
         .asset_title {
             font-size: 15px;
             letter-spacing: 0.5px;
+            padding: -2px;
             font-weight: 600;
             overflow: hidden;
+            color:gray;
         }
         .asset_desc {
             font-size: 13px;

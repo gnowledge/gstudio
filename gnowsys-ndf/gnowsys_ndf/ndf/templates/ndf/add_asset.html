@@ -1,4 +1,6 @@
-
+{% load i18n %}
+{% load ndf_tags %}
+{% check_is_gstaff group_id request.user as is_gstaff %}
 <div class="row">
 
             {% if asset_obj.name %}
@@ -28,7 +30,7 @@
                 <label>
                     {% if not asset_obj %}
                        Asset name 
-                       <input type="text" placeholder=""  id = "asset-name" name="asset_name" />
+                       <input type="text" placeholder="" class="required" id = "asset-name" name="asset_name" />
                     {% endif %}
 
                 </label>
@@ -41,11 +43,12 @@
                        <i><p style="color: gray">{{asset_obj.content}} </p><i>
                     {% else %}
                         Asset description
-                        <input type="text" placeholder="" id = "asset-descid" name="asset_desc" />
+                        <textarea rows="4" cols="2" class="large-6 columns" placeholder="Enter Description" id="asset-descid"></textarea>
                     {% endif %}
                 </label>
             </div>
         </div>
+        {% comment %}
         <div class="row">
             <div class="small-12 medium-6 large-6 columns">
                 {% if asset_obj %}
@@ -59,6 +62,7 @@
                 {% endif %}
             </div>
         </div>
+        {% endcomment %}
         {% comment %}
         <div class="row">
             <div class="small-12 medium-6 large-6 columns">
@@ -81,24 +85,37 @@
        <!-- <h3>Add esources for this asset</h3>-->
         <div class="row">
            <!-- &nbsp;&nbsp;&nbsp;Add asset content-->
+            {% if asset_obj.created_by == request.user.id or is_gstaff %}
             <div class="transcript_files">
                 <form class="dropzone" id ="docPost" enctype="multipart/form-data" method="post" action="{% url 'add_assetcontent' group_id %}" >
-                    <input type="file" id="docFile" placeholder="" name="work"/>
-                   <input type="button" class ="asset-save-button" id="" onclick="save_form()" value="Save"/>
+                    <input type="file" id="docFile" placeholder="" name=""/>
+                    <div class="name-desc-asset-cont-area" style="display: none">
+                        <input type="text" placeholder="Enter name" class="required" id = "asset_content_name" name="" />
+                        <textarea rows="4" cols="2" class="large-6 columns" placeholder="Enter Description" id="asset_content_desc"></textarea>
+                        <button type="button"  class="right orange-button" id="upload_asset" onclick="save_form()">Upload Asset content</button>
+                    </div>
                     <!--<button type="button" class="right orange-button save-asset" onclick="save_asset_cont_data()">Save Asset</button>-->
                     <input type="hidden" name="context_name" value="{{title}}">
                     <input type="hidden" class ="asset_obj_val" name="asset_obj_name" data-asset-obj-val="">
                 </form>
              </div>
+             {% endif %}
+        </br><br><br><br><br><br>
         {% for each in asset_content_list.grel_node %}
             <a href="{% url 'assetcontent_detail' group_id asset_obj.pk each.pk %}">
             <div class="small-12 medium-6 large-3 columns">
                     
                 <div class="asset_tile">
-                    <div class="asset_preview"></div>
+                    <div class="asset_preview">
+                        {% if each.if_file.mid.relurl and 'video' not in each.if_file.mime_type %}
+                        <img src="{{MEDIA_URL}}{{each.if_file.mid.relurl}}">
+                        {% elif 'video' not in each.if_file.mime_type and each.if_file.thumbnail.relurl %}
+                        <img src="{{MEDIA_URL}}{{each.if_file.thumbnail.relurl}}">
+                        {% endif %}
+                    </div>
                     <div class="asset_text">
                         <div class="asset_title">{{each.name}}</div>
-                        <div class="asset_desc">Description</div>
+                        <div class="asset_desc">{{each.content|truncatechars:10}}</div>
                     </div>
                 </div>
             </div>
@@ -115,9 +132,38 @@
         </div>
     </div>
 <script type="text/javascript">
+    
+    $("#docFile").change(function(){
+        $(".name-desc-asset-cont-area").css('display','block')
+    });
+  
+    $('.save-asset').attr('disabled',true); 
+    $('#upload_asset').attr('disabled',true); 
+    
+    $('#asset_content_name').keyup(function(){
+        if($(this).val().length !=0 )
+            $('#upload_asset').attr('disabled', false);            
+        else
+            $('#upload_asset').attr('disabled',true);
+    })
+
+    $('#asset-name').keyup(function(){
+        if($(this).val().length !=0 && $('#asset-descid').val().length !=0)
+            $('.save-asset').attr('disabled', false);            
+        else
+            $('.save-asset').attr('disabled',true);
+    })
+
+    $('#asset-descid').keyup(function(){
+        if($(this).val().length !=0 &&  $('#asset-name').val().length !=0)
+            $('.save-asset').attr('disabled', false);            
+        else
+            $('.save-asset').attr('disabled',true);
+    })
     $( ".save-asset" ).click(function() {
         asset_name = $("#asset-name").val();
         asset_description = $("#asset-descid").val();
+
         // asset_objective =  $('#asset_objectivesid').find(':selected').attr('value');
         $.ajax({
               type: "POST",
@@ -147,6 +193,8 @@
   // var uploadButton = document.getElementById('submitpostid');
         function save_form(event) {
         assetval = $('.asset_obj_val').attr('data-asset-obj-val');
+        asset_cont_name = $('#asset_content_name').val();
+        asset_cont_desc = $('#asset_content_desc').val();
         // Update button text.
         // uploadButton.innerHTML = 'Uploading...';
 
@@ -169,6 +217,8 @@
 
         // appending csrfmiddlewaretoken and user-id
         formData.append('csrfmiddlewaretoken', '{{csrf_token}}');
+        formData.append('asset_cont_name',asset_cont_name);
+        formData.append('asset_cont_desc',asset_cont_desc);
         formData.append('user','{{request.user.id}}');
         if(!"{{asset_obj}}"){
             formData.append('asset_obj',assetval);
