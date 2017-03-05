@@ -1,5 +1,5 @@
 {% extends "ndf/gbase.html" %}
-{% load get_metadata_values from ndf_tags %}
+{% load get_metadata_values get_attribute_value from ndf_tags %}
 
 
 {% block title %}GStudio - Course Creator{% endblock %}
@@ -7,39 +7,67 @@
     <div class="row create_unit">
         <div class="small-12 columns">
             <form id ="course_page_form" enctype="multipart/form-data" method="post" action="{% url 'unit_create_edit' group_id %}">{% csrf_token %}
+            <input type="hidden" name="node_id" value="{{unit_node.pk}}">
                 <div class="course_creator_header">
                     <div class="left course_heading">
                     <h5>Enter Unit Name</h5>
                     </div>
                     <div class="right course_heading">
-                        <input id="unit-name" name="name" type="text" placeholder="Enter unit name"/>
+                        {% if unit_node %}
+                        <input id="unit-name" name="name" type="text" placeholder="Enter unit name"
+                        value="{% if unit_node %}{{unit_node.name}}{% endif %}" disabled="disabled" />
+                        {% else %}
+                        <input id="unit-name" name="name" type="text" placeholder="Enter unit name"
+                         autofocus onfocus="this.value = this.value;"/>
+                        {% endif %}
                     </div>
                 </div>
+
+
+                {% if unit_node %}
+                <div class="course_creator_header">
+                    <div class="left course_heading">
+                    <h5>Enter alternate Name</h5>
+                    </div>
+                    <div class="right course_heading">
+                        <input id="unit-altname" name="altnames" type="text" placeholder="Enter alternate name"
+                        value="{% if unit_node %}{{unit_node.name}}{% endif %}" autofocus onfocus="this.value = this.value;"/>
+
+                    </div>
+                </div>
+                {% endif %}
+
                 <hr/>
+ 
+
                 <div class="course_creator_header">
 
                  {% get_metadata_values "educationallevel" as metadata_educationallevel %}
+                 {% get_attribute_value unit_node.pk 'educationallevel' as educationallevel_val %}
                     <div class="left course_heading">
                     <h5>Select Grade</h5>
                     </div>
                     <div class="right course_heading">
-                         <select name="{{k}}" id ="{{k}}">
+                         <select name="educationallevel">
+                            <option selected>Choose Grade</option>
                             {% for opts in metadata_educationallevel %}
-                                <option selected>{{opts}}</option>
+                                <option {% if educationallevel_val == opts %} selected {% endif %}>{{opts}}</option>
                             {% endfor %}
                         </select>
                     </div>
                 </div>
 
                 {% get_metadata_values "educationalsubject" as metadata_educationalsubject %}
+                {% get_attribute_value unit_node.pk 'educationalsubject' as educationalsubject_val %}
                 <div class="course_creator_header">
                     <div class="left course_heading">
                     <h5>Select Subject</h5>
                     </div>
                     <div class="right course_heading">
-                         <select name="{{k}}" id ="{{k}}">
+                         <select name="educationalsubject">
+                            <option selected>Choose Subject</option>
                             {% for opts in metadata_educationalsubject %}
-                                <option selected>{{opts}}</option>
+                                <option {% if educationalsubject_val == opts %} selected {% endif %}>{{opts}}</option>
                             {% endfor %}
                         </select>
                     </div>
@@ -57,18 +85,31 @@
         </div>
     </div>
     <script type="text/javascript">
-    var group_names_list = {{all_groups_names|safe}}
-    $("#save_unit").click(function(event) {
-        unit_name = $("#unit-name").val()
-        if (group_names_list.indexOf(unit_name) != -1){
-            $(".duplicate_unit_name").removeClass("hide")
-            event.preventDefault();
-        }
-        else{
-            $(".duplicate_unit_name").addClass("hide")
-        }
-    })
+    {% if not unit_node %}
+        var group_names_list = {{all_groups_names|safe}}
+        $("#save_unit").click(function(event) {
+            unit_name = $("#unit-name").val()
+            if (group_names_list.indexOf(unit_name) != -1){
+                $(".duplicate_unit_name").removeClass("hide")
+                event.preventDefault();
+            }
+            else{
+                $(".duplicate_unit_name").addClass("hide")
+            }
+        })
+    {% endif %}
 
+    // $("select#educationalsubject").change(function() {
+    //     selected_educationalsubject_index = this.selectedIndex
+    //     if (selected_educationalsubject_index != 0) {
+    //     }
+    // }) 
+
+    // $("select#educationallevel").change(function() {
+    //     selected_educationallevel_index = this.selectedIndex
+    //     if (selected_educationallevel_index != 0) {
+    //     }
+    // }) 
     </script>
 {% endblock %}
 
