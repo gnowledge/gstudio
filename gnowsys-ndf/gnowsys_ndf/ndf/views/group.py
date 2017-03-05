@@ -1286,6 +1286,8 @@ class CreateCourseEventGroup(CreateEventGroup):
                 gst_node = self.subsection_event_gst
             elif gs_member_of == "CourseUnit" or gs_member_of == "CourseUnitEvent":
                 gst_node = self.courseunit_event_gst
+            elif gs_member_of == "lesson" or gs_member_of == "lesson":
+                gst_node = node_collection.one({'_type': 'GSystemType', 'name': 'lesson'})
 
             new_gsystem.member_of.append(gst_node._id)
             new_gsystem.group_set.append(group_obj._id)
@@ -1305,7 +1307,7 @@ class CreateCourseEventGroup(CreateEventGroup):
 
     def call_setup(self, request, node, prior_node_obj, group_obj):
         if node.collection_set:
-            if "CourseUnit" in node.member_of_names_list or "CourseUnitEvent" in node.member_of_names_list:
+            if "CourseUnit" in node.member_of_names_list or "CourseUnitEvent" in node.member_of_names_list or "lesson" in node.member_of_names_list:
                 for each_res in node.collection_set:
                     each_res_node = node_collection.one({'_id': ObjectId(each_res)})
                     new_res = replicate_resource(request, each_res_node, group_obj._id)
