@@ -185,7 +185,7 @@ $("#btnUploadCancel").click(function() {
                         </form>
                     </div>
   <br> <br>
- <ul class="small-block-grid-1 medium-block-grid-3 large-block-grid-6" >
+ <ul class="small-block-grid-1 medium-block-grid-3 large-block-grid-4" >
     {% for each in files_cur %}
     
     <li class="card-image-wrapper">
@@ -196,7 +196,7 @@ $("#btnUploadCancel").click(function() {
               src="{{MEDIA_URL}}{{each.if_file.thumbnail.relurl}}"
               "{% endif %}"
               data-thumbnail-src="{{MEDIA_URL}}{{each.if_file.original.relurl}}" >
-            <figcaption style="cursor:pointer">{{each.name}}</figcaption>
+            <figcaption style="cursor:pointer">{{each.name|truncatechars:15}}</figcaption>
     
     </li>
     {% endfor %}
