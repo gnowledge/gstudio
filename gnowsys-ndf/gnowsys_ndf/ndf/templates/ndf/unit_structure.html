@@ -35,7 +35,7 @@
                                         <a href="#" class="save_template">Save as template</a>
                                     </li>
                                     <li>
-                                        <a href="#" data-reveal-id="group_imgs_on_modal">Create from existing template</a>
+                                        <a href="#" data-reveal-id="existing_template_modal">Create from existing template</a>
                                     </li>
                                     <li>
                                         <a href="#" class="delete_entity">Delete</a>
@@ -291,7 +291,7 @@
       <a class="close-reveal-modal" aria-label="Close">&#215;</a>
     </div>
 
-<div id="group_imgs_on_modal" class="reveal-modal" data-reveal aria-labelledby="modalTitle" aria-hidden="true" role="dialog">
+<div id="existing_template_modal" class="reveal-modal" data-reveal aria-labelledby="modalTitle" aria-hidden="true" role="dialog">
       <h3>Choose Templates</h3>
       <!-- <input type="text" id="activity-name">
       <button type="button" class="button-hollow-grey save-activity" data-lesson-id="">
@@ -716,24 +716,25 @@
                         success: function(data) {
                           // console.log(data);
                       $("#template-container").html(data);
-                            // $('#group_imgs_on_modal').foundation('reveal', 'open');
+                            // $('#existing_template_modal').foundation('reveal', 'open');
 
                       $(".template-list").click(function(event){
                           // get html content in var
                           var nodeContent = $(this).children('div').attr("data-content");
-                          if (!editorMode == "edit"){
+                          if (editorMode != "edit"){
+                              // console.log("jjjjjjjjjjjjjjj " + editorMode);
                             editNode(nodeContent);
                           }
                           // Open ckeditor and append content of node in ckeditor
                           // openCkEditor('#activity-content', "BasicToolbar", nodeContent);
-                          CKEDITOR.instances['ckeditor_textarea'].insertHtml(nodeContent);
-                          $('#group_imgs_on_modal').foundation('reveal', 'close');
+                          // CKEDITOR.instances['ckeditor_textarea'].insertHtml(nodeContent);
+                          $('#existing_template_modal').foundation('reveal', 'close');
                         });
                       }
                     });
         }
 
-        $(document).on('opened.fndtn.reveal', '#group_imgs_on_modal[data-reveal]', function () {
+        $(document).on('opened.fndtn.reveal', '#existing_template_modal[data-reveal]', function () {
           // var modal = $(this); // console.log(this);
           getTemplates();
         });
