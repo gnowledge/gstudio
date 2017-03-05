@@ -68,7 +68,7 @@ CKEDITOR.plugins.add('addJhapp',
 
         editor.ui.addButton('addJhapp',
             {
-                label: 'Add Jhapp from this Group',
+                label: 'Embed Tools',
                 command: pluginName,
                 icon: this.path + 'images/addJhapp.png'
             });

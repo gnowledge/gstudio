@@ -55,7 +55,7 @@ CKEDITOR.plugins.add('addVideo',
 
         editor.ui.addButton('addVideo',
             {
-                label: 'Add Image from this Group',
+                label: 'Add video from this Group',
                 command: pluginName,
                 icon: this.path + 'images/addVideo.png'
             });
