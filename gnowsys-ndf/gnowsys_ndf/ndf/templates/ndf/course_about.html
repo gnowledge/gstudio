@@ -1,14 +1,16 @@
 {% load check_is_gstaff from ndf_tags %}
 {% block head %}
-  <script src="/static/ndf/bower_components/pace/pace.js"></script>
-  <link href="/static/ndf/bower_components/pace/themes/blue/pace-theme-loading-bar.css" rel="stylesheet" />
+{% if show_analytics_notifications %}
 
   <!-- DataTables -->
   <script src="/static/ndf/bower_components/DataTables/media/js/jquery.dataTables.js"></script>
   <script src="/static/ndf/bower_components/datatables-plugins/integration/foundation/dataTables.foundation.js"></script>
+
+  <script src="/static/ndf/bower_components/pace/pace.js"></script>
+  <link href="/static/ndf/bower_components/pace/themes/blue/pace-theme-loading-bar.css" rel="stylesheet" />
   <!-- DataTables CSS -->
   <link href="/static/ndf/bower_components/datatables-plugins/integration/foundation/dataTables.foundation.css" rel="stylesheet" type="text/css" />
-
+{% endif %}
 <style type="text/css">
 
   .short-text {
