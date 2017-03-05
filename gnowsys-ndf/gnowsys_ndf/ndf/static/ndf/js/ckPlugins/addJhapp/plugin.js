@@ -33,10 +33,30 @@ CKEDITOR.plugins.add('addJhapp',
                           });
 
                             $("#insert_ost").click(function(event){
-                            ost_text_gallery = $('#paste-ost-gallery').val();
+                            //ost_text_gallery = $('#paste-ost-gallery').val();
+                            //ost_text_file = $('#paste-ost-captions').val();
                             ost_text_val = "<iframe src='/ost/' style='height:100%;width:100%'></iframe>"
-                            split_word = ost_text_val.slice(0, 7) + "gallery=" + ost_text_gallery + ost_text_val.slice(7);
-                             CKEDITOR.instances[textAreaId].insertHtml(split_word);
+                            // split_word = ost_text_val.slice(0, 18) + "gallery=" + ost_text_gallery + "&amp;file=/ost/" + ost_text_file+"'"+ ost_text_val.slice(18);
+                            // alert(split_word)
+                             CKEDITOR.instances[textAreaId].insertHtml(ost_text_val);
+                            $('#group_imgs_on_modal').foundation('reveal', 'close');
+                          });
+                            $("#insert_policequad").click(function(event){
+                            //ost_text_gallery = $('#paste-ost-gallery').val();
+                            //ost_text_file = $('#paste-ost-captions').val();
+                            pq_text_val = "<iframe src='/policequad/' style='height:100%;width:100%'></iframe>"
+                            // split_word = ost_text_val.slice(0, 18) + "gallery=" + ost_text_gallery + "&amp;file=/ost/" + ost_text_file+"'"+ ost_text_val.slice(18);
+                            // alert(split_word)
+                             CKEDITOR.instances[textAreaId].insertHtml(pq_text_val);
+                            $('#group_imgs_on_modal').foundation('reveal', 'close');
+                          });
+                            $("#insert_biomechanic").click(function(event){
+                            //ost_text_gallery = $('#paste-ost-gallery').val();
+                            //ost_text_file = $('#paste-ost-captions').val();
+                            bm_text_val = "<iframe src='/biomechanic/' style='height:100%;width:100%'></iframe>"
+                            // split_word = ost_text_val.slice(0, 18) + "gallery=" + ost_text_gallery + "&amp;file=/ost/" + ost_text_file+"'"+ ost_text_val.slice(18);
+                            // alert(split_word)
+                             CKEDITOR.instances[textAreaId].insertHtml(bm_text_val);
                             $('#group_imgs_on_modal').foundation('reveal', 'close');
                           });
 
