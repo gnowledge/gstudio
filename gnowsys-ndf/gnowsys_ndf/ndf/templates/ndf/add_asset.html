@@ -80,7 +80,7 @@
         
     <div class="asset-content-area"{% if not asset_obj %} style="display:none"{% endif %}>
        <!-- <h3>Add esources for this asset</h3>-->
-        
+        <div class="row">
            <!-- &nbsp;&nbsp;&nbsp;Add asset content-->
             {% if asset_obj.created_by == request.user.id or is_gstaff %}
             <div class="transcript_files">
@@ -88,7 +88,7 @@
                     <input type="file" id="docFile" placeholder="" name=""/>
                 </form>
             </div>
-   
+    </div>
 
                     <div class="name-desc-asset-cont-area" style="display: none">
                     <div class="row">
