@@ -27,7 +27,6 @@ gst_activity_name, gst_activity_id = GSystemType.get_gst_name_id('activity')
 
 
 @login_required
-@staff_required
 @get_execution_time
 def unit_create_edit(request, group_id, unit_group_id=None):
     '''
@@ -145,7 +144,6 @@ def list_units(request, group_id):
 ########### LESSON methods ##########
 
 @login_required
-@staff_required
 @get_execution_time
 def lesson_create_edit(request, group_id, unit_group_id=None):
     '''
