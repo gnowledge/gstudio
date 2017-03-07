@@ -50,7 +50,7 @@
                 </li>
               {% else %}
                 <li>
-                    <a class="" href="{% url 'auth_login' %}{% if not is_ac_url %}?next={{request.path}}{% endif %}" accesskey="l">
+                    <a class="" href="{% url 'auth_login' %}" accesskey="l">
                     <i class="fi-key"></i>&nbsp; {% trans "Login" %}
                   </a>
                 </li>
@@ -114,7 +114,7 @@
             {% else %}
               <ul class="right hide-for-medium-up side-bar-menu hide">
                 <li class="">
-                    <a class="" href="{% url 'auth_login' %}{% if not is_ac_url %}?next={{request.path}}{% endif %}" accesskey="l">
+                    <a class="" href="{% url 'auth_login' %}" accesskey="l">
                     <i class="fi-key"></i>&nbsp; {% trans "Login" %}
                   </a>
                 </li>
