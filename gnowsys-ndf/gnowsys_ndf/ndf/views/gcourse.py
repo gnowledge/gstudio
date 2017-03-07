@@ -3170,8 +3170,10 @@ def course_pages(request, group_id, page_id=None):
     group_name = group_obj.name
     template = 'ndf/gevent_base.html'
 
-    page_gst_name, page_gst_id = GSystemType.get_gst_name_id("Page")
-    all_pages = node_collection.find({'member_of': page_gst_id, 'group_set': group_id
+    activity_gst_name, activity_gst_id = GSystemType.get_gst_name_id("activity")
+    all_pages = node_collection.find({'member_of': 
+                {'$in': [page_gst_id, activity_gst_id] }, 'group_set': group_id,
+                'type_of': {'$ne': [blog_page_gst_id]}
                 # 'content': {'$regex': 'clix-activity-styles.css', '$options': 'i'}
                 })
     context_variables = {
