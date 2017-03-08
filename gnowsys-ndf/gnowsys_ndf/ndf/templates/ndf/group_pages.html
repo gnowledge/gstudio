@@ -13,8 +13,8 @@
                 {% endif %}
             </div>
             <div class="asset_text">
-                <div class="asset_title">{{each.name}}</div>
-                <div class="asset_desc">{{each.name|truncatechars:10}}</div>
+                <div class="asset_title">{{each.name|truncatechars:35}}</div>
+                <div class="asset_desc">{{each.content|truncatechars:35}}</div>
             </div>
         </div>
     </div>

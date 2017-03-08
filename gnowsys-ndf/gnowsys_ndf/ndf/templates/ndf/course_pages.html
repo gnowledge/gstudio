@@ -58,9 +58,9 @@
                         <img src="/static/ndf/images/asset_thumbnail.png">
                         {% endif %}
                     </div>
-                        <div class="asset_text">
-                            <div class="asset_title">{{each.name}}</div>
-                            <div class="asset_desc">{{each.content|truncatechars:20}}</div>
+                    <div class="asset_text">
+                        <div class="asset_title">{{each.name|truncatechars:35}}</div>
+                        <div class="asset_desc">{{each.content|truncatechars:35}}</div>
                     </div>
                 </div>
             </div>

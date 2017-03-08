@@ -785,6 +785,7 @@ ul.horizontal_tabs_gstudio > li.sub_group_action:hover ul {
   overflow: hidden;
   padding-left: 6px;
   font-size: 11px;
+  color: grey;
 }
 
 /* line 887, ../../../scss/_clix2017.scss */
