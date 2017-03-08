@@ -251,7 +251,7 @@
             <div id="lesson-{{id}}" class="content">
                 <ul class="course-activities">
                     {{#each activities}}
-                        <li id="activity-{{id}}" data-name={{name}}>
+                        <li id="activity-{{id}}" data-name="{{name}}">
                             <a href="#" class="entity-title">{{name}}
                                 <div class="right edit_entity">
                                     <i class="fi-list right"></i>
@@ -437,8 +437,6 @@
             $('.activity-editor').addClass('hide');
 
             //Ajax to get the data for the activity
-            // aaa = this
-            // console.log("oooooooooooooooo" + lesson_id)
         });
 
 
@@ -578,7 +576,7 @@
 
         //Add a lesson
         $('.save-lesson').on('click', function(){
-            console.log('Adding another lessson');
+            // console.log('Adding another lessson');
             addLesson($('#lesson-name').val().trim(), 'unitId')
 
             //Send the query and update the course_data and call 'renderCourseTree(course_data)'
@@ -608,9 +606,7 @@
               url: "{% url 'activity_create_edit' group_id %}",
               // datatype: "",
               success: function(data) {
-                  // console.log(typeof(data));
                   data_dict = JSON.parse(data);
-                  // console.log(data);
                   if(data_dict.success){
                       renderCourseTree(data_dict.unit_hierarchy);
                       // handle opening of tree till recently added node with data_dict.msg
@@ -624,15 +620,12 @@
               }
           });
 
-          // console.log(result)
           return result;
         }
 
 
         //Add a activity
         $('.save-activity').on('click', function(){
-            console.log('Adding another lessson');
-            // aaa = this
             var lesson_id = $('#add-activity-modal button.save-activity').attr('lesson_id');
             // console.log(lesson_id);
             addActivity($('#activity-name').val().trim(), lesson_id);
@@ -657,10 +650,7 @@
                     alert('Unable to load data... Something went wrong :(')
                     return false
                   }
-                  // aaa = data
-                  // console.log(typeof(data));
                   data_dict = JSON.parse(data);
-                  // console.log(data_dict);
                   $('#activity-content').html(data_dict.content);
                   return true
               }
@@ -694,7 +684,6 @@
             $('.activity-editor').removeClass('hide');
             $('.course_editor').addClass('edit_mode');
             // $('#course_creator')
-            console.log("activity id: "+ activity_id);
 
             // update content: name and description of activity.
             var activityName = $('#activity-' + activity_id).attr('data-name');
@@ -708,7 +697,7 @@
         // Add a new activity
         $('.course-lessons').on('click', '.add_activity', function(){
             var lesson_id = $(this).closest('div.content').attr('id').replace('lesson-', '');
-            console.log('Adding another activity for lessson ' + lesson_id);
+            // console.log('Adding another activity for lessson ' + lesson_id);
 
             $('#add-activity-modal button.save-activity').attr('lesson_id', lesson_id);
             //Send the query and update the course_data and call 'renderCourseTree(course_data)'
@@ -719,7 +708,7 @@
         // Add a new activity
         $('.course-lessons').on('click', '.add_existing_activity', function(){
             var lesson_id = $(this).closest('div.content').attr('id').replace('lesson-', '');
-            console.log('Adding existing activity for lessson ' + lesson_id);
+            // console.log('Adding existing activity for lessson ' + lesson_id);
 
             $('#select-activity-page').attr('data-lesson-id', lesson_id);
             //Send the query and update the course_data and call 'renderCourseTree(course_data)'
@@ -738,15 +727,13 @@
 
                       },
                         success: function(data) {
-                          // console.log(data);
                       $("#template-container").html(data);
-                            // $('#existing_template_modal').foundation('reveal', 'open');
+                        // $('#existing_template_modal').foundation('reveal', 'open');
 
                       $(".template-list").click(function(event){
                           // get html content in var
                           var nodeContent = $(this).children('div').attr("data-content");
                           if (editorMode != "edit"){
-                              // console.log("jjjjjjjjjjjjjjj " + editorMode);
                             editNode(nodeContent);
                           }
                           else{
@@ -769,7 +756,6 @@
 
                       },
                         success: function(data) {
-                          // console.log(data);
                       $("#activity-container").html(data);
                             // $('#existing_template_modal').foundation('reveal', 'open');
 
@@ -777,16 +763,13 @@
                           event.preventDefault();
                           // get html content in var
                           var activityPgId = $(this).attr("data-id");
-                          console.log(activityPgId)
                           var activityContent = $(this).attr("data-name");
-                          console.log(activityContent);
 
                           var lessonId = $("#select-activity-page").attr("data-lesson-id");
                           addExistingActivityPage(lessonId, activityPgId);
                           // addActivity($('#activity-name').val().trim(), lesson_id);
 
                           // if (editorMode != "edit"){
-                          //     // console.log("jjjjjjjjjjjjjjj " + editorMode);
                           //   editNode(nodeContent);
                           // }
                           // else{
@@ -814,14 +797,11 @@
               // datatype: "",
               success: function(data) {
                   if (data == "0") {
-                    console.log(data)
                     $('#select-activity-page').foundation('reveal', 'close');
                     alert('Same activity exists in concern lesson.');
                     return 0;
                   }
-                  // console.log(typeof(data));
                   data_dict = JSON.parse(data);
-                  // console.log(data);
                   renderCourseTree(data_dict);
                   // handle opening of tree till recently added node with data_dict.msg
                   $('#select-activity-page').foundation('reveal', 'close');
@@ -865,7 +845,6 @@
                 else{
                     var nodeContent = $("#activity-content").text()
                 }
-                console.log(nodeContent);
                 var nodeId = $('.save_edit_activity').attr('data-current-activity-id');
                 var nodeName = $('#activity-' + nodeId).attr('data-name');
 
@@ -886,7 +865,7 @@
                             alert('Failed to save data. Please try again.');
                             return 0;
                         }
-                        console.log(data)
+                        // console.log(data)
                     }
                 });
 
@@ -915,9 +894,6 @@
         }
 
         function saveNode(nodeId, nodeName, nodeContent) {
-          // console.log(nodeId)
-          // console.log(nodeName)
-          // console.log(nodeContent)
           $.ajax({
             type: "POST",
             url: "{% url 'save_node' group_id %}",
