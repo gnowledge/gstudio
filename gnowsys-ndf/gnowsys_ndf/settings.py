@@ -481,17 +481,17 @@ INSTALLED_APPS = (
     'django.contrib.sites',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-    # 'gnowsys_ndf.benchmarker',
     'registration',
-    # 'djangoratings',
     'notification',
     'pagination',
     'captcha',
+    # 'gnowsys_ndf.benchmarker',
+    # 'django.contrib.flatpages',   #textb
+    # 'django_extensions',          #textb
+    # 'djangoratings',
     # 'gnowsys_ndf.mobwrite',       #textb
     # 'south',                      #textb
-    # 'django_extensions',          #textb
     # 'reversion',                  #textb
-    # 'django.contrib.flatpages',   #textb
     # 'online_status',              #for online_users
     # 'endless_pagination',
     # 'jsonrpc',
