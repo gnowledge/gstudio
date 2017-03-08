@@ -39,23 +39,9 @@
 
                 <hr/>
  
+                {% get_metadata_values "educationallevel" as metadata_educationallevel %}
+                {% get_attribute_value unit_node.pk 'educationallevel' as educationallevel_val %}
                 <div class="course_creator_header">
-                    <div class="left course_heading">
-                    <h5>Enter Description</h5>
-                    </div>
-                    <div class="right course_heading_unit">
-                        {% if unit_node %}
-                        <textarea name="content">{{unit_node.content}}</textarea>
-                        {% else %}
-                        <textarea name="content" rows="1" cols="2" class="small-12 columns" placeholder="Enter Description"></textarea>
-                        {% endif %}
-                    </div>
-                </div>
-
-                <div class="course_creator_header">
-
-                 {% get_metadata_values "educationallevel" as metadata_educationallevel %}
-                 {% get_attribute_value unit_node.pk 'educationallevel' as educationallevel_val %}
                     <div class="left course_heading">
                     <h5>Select Grade</h5>
                     </div>
@@ -84,8 +70,19 @@
                         </select>
                     </div>
                 </div>
+
+
                 <hr/>
                 <label style="color:red;" class="right hide duplicate_unit_name">Unit with same name exists. Please choose another name.</label>
+                <div class="course_creator_header unit_editor">
+                    <div class="left course_heading">
+                    <h5>Enter Description</h5>
+                    </div>
+                    <div class="right course_heading_unit">
+                        {% include "ndf/html_editor.html" with var_name="content" var_placeholder="Enter the content here" var_value=unit_node.content|default_if_none:"" node_id=unit_node.pk ckeditor_toolbar="GeneralToolbar" %}
+                    </div>
+                </div>
+
                 <div class="right course_actions">
                     
                         <!--<button asset-save-button type="button" class ="right orange-button save-asset" id="" value="Save"/>-->
