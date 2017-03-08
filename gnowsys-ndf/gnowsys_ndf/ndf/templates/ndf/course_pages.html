@@ -46,7 +46,7 @@
 
 <div class="row"> 
     {% for each in all_pages %}
-        <a class="view-page" data-page-id="{{each.pk}}" data-node-name="{{each.name}}">
+        <a class="view-page" data-page-id="{{each.pk}}" data-node-name="{{each.name}}" title="{{each.name}}">
             <div class="small-12 medium-6 large-3 columns">
                 <div class="asset_tile">
                     <div class="asset_preview">
@@ -59,7 +59,7 @@
                         {% endif %}
                     </div>
                     <div class="asset_text">
-                        <div class="asset_title">{{each.name|truncatechars:35}}</div>
+                        <div class="asset_title" title="{{each.name}}">{{each.name|truncatechars:35}}</div>
                         <div class="asset_desc">{{each.content|truncatechars:35}}</div>
                     </div>
                 </div>

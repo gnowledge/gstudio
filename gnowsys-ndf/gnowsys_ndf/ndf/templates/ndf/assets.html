@@ -13,7 +13,7 @@
 </div>
 <div class="row"> 
       {% for each in asset_nodes %}
-      <a href="{% url 'asset_detail' group_id each.pk %}">
+      <a href="{% url 'asset_detail' group_id each.pk %}"  title="{{each.name}}">
       <div class="small-12 medium-6 large-3 columns">
         <div class="asset_tile">
             <div class="asset_preview">
