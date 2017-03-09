@@ -42,7 +42,7 @@ from gnowsys_ndf.ndf.views.methods import check_existing_group, get_drawers, get
 from gnowsys_ndf.ndf.views.methods import get_node_common_fields, get_node_metadata, create_grelation,create_gattribute
 from gnowsys_ndf.ndf.views.methods import create_task,parse_template_data,get_execution_time,get_group_name_id, dig_nodes_field
 from gnowsys_ndf.ndf.views.methods import get_widget_built_up_data, parse_template_data, get_prior_node_hierarchy, create_clone
-from gnowsys_ndf.ndf.views.methods import create_grelation, create_gattribute, create_task, node_thread_access, get_course_units_tree
+from gnowsys_ndf.ndf.views.methods import create_grelation, create_gattribute, create_task, node_thread_access, get_course_units_tree, delete_node
 from gnowsys_ndf.ndf.templatetags.ndf_tags import get_profile_pic, edit_drawer_widget, get_contents, get_sg_member_of, get_attribute_value, check_is_gstaff
 from gnowsys_ndf.settings import GSTUDIO_SITE_NAME
 # from gnowsys_ndf.mobwrite.models import ViewObj
@@ -6742,3 +6742,14 @@ def add_to_collection_set(request, group_id):
         return HttpResponse(json.dumps(_get_unit_hierarchy(group_obj)))
     else:
         return HttpResponse(0)
+
+
+def delete_asset(request, group_id):
+    print "inside delete node"
+    file_list = request.POST.getlist('delete_files_list[]', '')
+    for each_file in file_list:
+      node_by_id = node_collection.one({'_id':ObjectId(each_file)})
+      if node_by_id:
+        del_status  = delete_node(node_id=node_by_id._id, deletion_type=1)
+        print '\nDeleted Node',del_status
+    return HttpResponse('success');
