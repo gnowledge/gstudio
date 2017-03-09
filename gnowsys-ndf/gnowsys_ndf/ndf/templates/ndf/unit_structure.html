@@ -230,12 +230,11 @@
     </div>
 
     {% verbatim %}
-
     <!-- Handlebar Templates for the course tree -->
     <script id="lesson-template" type="text/x-handlebars-template">
         <dd class="accordion-navigation">
             <a href="#lesson-{{id}}" class="entity-title" id="lesson-accordion">
-                {{name}}
+                {{name}} 
                 <div class="right edit_entity">
                     <i class="fi-list right"></i>
                     <ul class="entity_actions">
@@ -248,7 +247,7 @@
                     </ul>
                 </div>
             </a>
-            <div id="lesson-{{id}}" class="content">
+            <div id="lesson-{{id}}" class="content lesson-container">
                 <ul class="course-activities">
                     {{#each activities}}
                         <li id="activity-{{id}}" data-name="{{name}}">
@@ -445,38 +444,42 @@
             var parent_node = "{{group_id}}"; // unit_node in this case
             var curr_lesson_id = $current.attr('href').replace('#lesson-', '');
             var next_lesson_id = $next.find('a#lesson-accordion').attr('href').replace('#lesson-', '');
-
-            //Ajax to move the lesson up.
-            $.ajax({
-                url: "{% url 'change_order' group_id %}",
-
-                data: {
-                    node_id_up: next_lesson_id,
-                    node_id_down: curr_lesson_id,
-                    parent_node: parent_node,
-                    'csrfmiddlewaretoken': "{{csrf_token}}"
-                },
-
-                type: "POST",
-
-                dataType: "json",
-
-                success: function(data){
-                    success_state = data["success"]
-                    if(success_state){
-                        $current.parent('dd').insertAfter($next);
-                    }
-                },
-            });//end of ajax
-
-
-            // var lesson_id = $(this).closest('a').attr('href').replace('#lesson-', '');
-
-            //Ajax to move the lesson up.
-            // console.log('Ajax call to move an activity. ' + lesson_id);
-            //Update the course_data after successful movedown and call rerender.
-
+            var return_status = change_order_api(next_lesson_id, curr_lesson_id, parent_node)
+            if (return_status){
+                $current.parent('dd').insertAfter($next);
+            }
         });
+        //Activity Move Up
+        $('.course-lessons').on('click', '.activity_move_down' ,function(e){
+            lesson_id = $(this).parents('div.lesson-container')
+                            .attr('id').replace('lesson-', '');
+            $current = $(this).parents('li');
+            $next = $current.next('li');
+            var curr_act_id = $current.attr('id').replace('activity-', '');
+            var next_act_id = $next.attr('id').replace('activity-', '');
+            var return_status = change_order_api(next_act_id, curr_act_id, lesson_id)
+            if (return_status)
+            {
+                $current.insertAfter($next);
+            }
+        })
+
+
+
+        //Activity Move Up
+        $('.course-lessons').on('click', '.activity_move_up' ,function(e){
+            lesson_id = $(this).parents('div.lesson-container')
+                            .attr('id').replace('lesson-', '');
+            $current = $(this).parents('li');
+            $previous = $current.prev('li');
+            var curr_act_id = $current.attr('id').replace('activity-', '');
+            var prev_act_id = $previous.attr('id').replace('activity-', '');
+            var return_status = change_order_api(curr_act_id, prev_act_id, lesson_id)
+            if (return_status)
+            {
+                $current.insertBefore($previous);
+            }
+        })
 
         // Move a lesson up
         $('.course-lessons').on('click', '.lesson_move_up' ,function(e){
@@ -485,35 +488,11 @@
             var parent_node = "{{group_id}}"; // unit_node in this case
             var curr_lesson_id = $current.attr('href').replace('#lesson-', '');
             var prev_lesson_id = $previous.find('a#lesson-accordion').attr('href').replace('#lesson-', '');
+            var return_status = change_order_api(curr_lesson_id, prev_lesson_id, parent_node)
+            if (return_status){
+                $current.parent('dd').insertBefore($previous);
 
-            //Ajax to move the lesson up.
-            $.ajax({
-                url: "{% url 'change_order' group_id %}",
-
-                data: {
-                    node_id_up: curr_lesson_id,
-                    node_id_down: prev_lesson_id,
-                    parent_node: parent_node,
-                    'csrfmiddlewaretoken': "{{csrf_token}}"
-                },
-
-                type: "POST",
-
-                dataType: "json",
-
-                success: function(data){
-                    success_state = data["success"]
-                    if(success_state){
-                        $current.parent('dd').insertBefore($previous);
-                    }
-                },
-            });//end of ajax
-
-            // console.log('Ajax call to move an activity. ' + lesson_id);
-            //Update the course_data after successful moveup and call rerender.
-            // e.stopPropagation();
-            // e.preventDefault();
-
+            }
         });
 
         // Delete a lesson
@@ -946,5 +925,29 @@
                 $('.save_edit_activity').html('Edit');
             }
         })
+
+        function change_order_api(node_to_up, node_to_down, parent_id){
+            var success_state = false
+            $.ajax({
+                url: "{% url 'change_order' group_id %}",
+
+                data: {
+                    node_id_up: node_to_up,
+                    node_id_down: node_to_down,
+                    parent_node: parent_id,
+                    'csrfmiddlewaretoken': "{{csrf_token}}"
+                },
+
+                type: "POST",
+                async: false, 
+                dataType: "json",
+
+                success: function(data){
+                    success_state = data["success"]
+                },
+            });//end of ajax
+            return success_state
+        }
+
     })
   </script>
