@@ -102,7 +102,7 @@
                 
         {% endif %}
         {% for each in asset_content_list.grel_node %}
-            <a href="{% url 'assetcontent_detail' group_id asset_obj.pk each.pk %}">
+            <a href="{% url 'assetcontent_detail' group_id asset_obj.pk each.pk %}" title="{{each.name}}">
             <div class="small-12 medium-6 large-3 columns">
                     
                 <div class="asset_tile">
@@ -116,8 +116,8 @@
                         {% endif %}
                     </div>
                     <div class="asset_text">
-                        <div class="asset_title">{{each.name}}</div>
-                        <div class="asset_desc">{{each.name|truncatechars:10}}</div>
+                        <div class="asset_title">{{each.name|truncatechars:35}}</div>
+                        <div class="asset_desc">{{each.content|truncatechars:35}}</div>
                     </div>
                 </div>
             </div>

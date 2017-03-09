@@ -43,7 +43,7 @@
   <h5>About this course</h5>
   <div class="row">
     <div class="small-12 medium-6 columns">
-      <div class="course-desc">
+      <div class="course-desc" id="scstyle">
           {{group_object.content|default:'No description added yet.'|safe}}
       </div>
       <div>
@@ -84,8 +84,54 @@
     </div>
   </div>
 </div>
+
+
 </div>
+{% if educationallevel_val %}
+  <div class="row">
+    <div class="small-12 columns about-course">
+      <h5>Grade</h5>
+      <div class="row">
+        <div class="small-12 medium-6 columns">
+          <div>
+              {{educationallevel_val}}
+          </div>
+        </div>
+        </div>
+    </div>
+  </div>
+{% endif %}
+
+{% if educationalsubject_val %}
+  <div class="row">
+    <div class="small-12 columns about-course">
+      <h5>Subject</h5>
+      <div class="row">
+        <div class="small-12 medium-6 columns">
+          <div>
+              {{educationalsubject_val}}
+          </div>
+        </div>
+        </div>
+    </div>
+  </div>
+{% endif %}
+
+<div class="row">
+  <div class="small-12 columns about-course">
+    <h5>Created on</h5>
+    <div class="row">
+      <div class="small-12 medium-6 columns">
+        <div>
+            {{group_obj.created_at}}
+        </div>
+      </div>
+      </div>
+  </div>
+</div>
+
 <br/>
+
 {% if show_analytics_notifications %}
 {% check_is_gstaff group_id request.user as gstaff_access %}
   <div class="course-overview-container">

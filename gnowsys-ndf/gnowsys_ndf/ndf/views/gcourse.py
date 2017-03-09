@@ -2405,43 +2405,28 @@ def course_about(request, group_id):
       weeks_count = (end_day - start_day).days / 7
     show_analytics_notifications = True
     template = 'ndf/gcourse_event_group.html'
+    context_variables = {
+            'group_id': group_id, 'groupid': group_id, 'group_name':group_name,
+            'group_obj': group_obj, 'title': 'about', 'allow_to_join': allow_to_join,
+            'weeks_count': weeks_count
+        }
     if 'BaseCourseGroup' in group_obj.member_of_names_list:
         template = 'ndf/basecourse_group.html'
         show_analytics_notifications = False
     if 'base_unit' in group_obj.member_of_names_list:
         template = 'ndf/gevent_base.html'
         show_analytics_notifications = False
+        educationalsubject = get_attribute_value(group_obj._id,"educationalsubject")
+        educationallevel = get_attribute_value(group_obj._id,"educationallevel")
+        context_variables.update({'educationalsubject_val': educationalsubject, 
+            "educationallevel_val": educationallevel})
 
     banner_pic_obj,old_profile_pics = _get_current_and_old_display_pics(group_obj)
-    '''
-    banner_pic_obj = None
-    old_profile_pics = []
-    if not banner_pic_obj:
-        for each in group_obj.relation_set:
-            if "has_banner_pic" in each:
-                banner_pic_obj = node_collection.one(
-                    {'_type': {"$in": ["GSystem","File"]}, '_id': each["has_banner_pic"][0]}
-                )
-                break
-
-    has_banner_pic_rt = node_collection.one({'_type': 'RelationType', 'name': unicode('has_banner_pic') })
-    all_old_prof_pics = triple_collection.find({'_type': "GRelation", "subject": group_obj._id, 'relation_type': has_banner_pic_rt._id, 'status': u"DELETED"})
-    if all_old_prof_pics:
-        for each_grel in all_old_prof_pics:
-            n = node_collection.one({'_id': ObjectId(each_grel.right_subject)})
-            if n not in old_profile_pics:
-                old_profile_pics.append(n)
-
-    # print "\n\n prof_pic_obj" ,banner_pic_obj
-    '''
-    context_variables = RequestContext(request, {
-            'group_id': group_id, 'groupid': group_id, 'group_name':group_name,
-            'group_obj': group_obj, 'title': 'about', 'allow_to_join': allow_to_join,
-            'weeks_count': weeks_count,
-            'old_profile_pics':old_profile_pics, "prof_pic_obj": banner_pic_obj,
-            'show_analytics_notifications':show_analytics_notifications
-        })
-    return render_to_response(template, context_variables)
+    context_variables.update({'old_profile_pics':old_profile_pics,
+                        "prof_pic_obj": banner_pic_obj,
+                        'show_analytics_notifications':show_analytics_notifications})
+    return render_to_response(template, context_variables,
+            context_instance=RequestContext(request))
 
 
 @get_execution_time
@@ -3170,8 +3155,10 @@ def course_pages(request, group_id, page_id=None):
     group_name = group_obj.name
     template = 'ndf/gevent_base.html'
 
-    page_gst_name, page_gst_id = GSystemType.get_gst_name_id("Page")
-    all_pages = node_collection.find({'member_of': page_gst_id, 'group_set': group_id
+    activity_gst_name, activity_gst_id = GSystemType.get_gst_name_id("activity")
+    all_pages = node_collection.find({'member_of': 
+                {'$in': [page_gst_id, activity_gst_id] }, 'group_set': group_id,
+                'type_of': {'$ne': [blog_page_gst_id]}
                 # 'content': {'$regex': 'clix-activity-styles.css', '$options': 'i'}
                 })
     context_variables = {
