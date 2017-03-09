@@ -71,7 +71,7 @@
            <!-- &nbsp;&nbsp;&nbsp;Add asset content-->
             {% if asset_obj.created_by == request.user.id or is_gstaff %}
             <div class="transcript_files row">
-                <button type="button"  class="right orange-button" id="upload_asset" onclick="save_form()">Upload Asset content</button>
+                <button type="button"  style="display:none" class="right orange-button" id="upload_asset" onclick="save_form()">Upload Asset content</button>
                 <button type="button" class="right blue-white-button delete-asset-content">Delete Files</button>
                 <form class="dropzone" id ="docPost" enctype="multipart/form-data" method="post" action="{% url 'add_assetcontent' group_id %}" >
                     <input type="file" id="docFile" style="width:50%" placeholder="" name=""/>
@@ -164,6 +164,7 @@
     
     $("#docFile").change(function(){
         $(".name-desc-asset-cont-area").css('display','block')
+        $("#upload_asset").css('display','block')
     });
 
     $(".delete-asset-content").click(function(){
