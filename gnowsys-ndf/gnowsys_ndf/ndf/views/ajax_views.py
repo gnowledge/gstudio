@@ -45,7 +45,7 @@ from gnowsys_ndf.ndf.views.methods import get_widget_built_up_data, parse_templa
 from gnowsys_ndf.ndf.views.methods import create_grelation, create_gattribute, create_task, node_thread_access, get_course_units_tree
 from gnowsys_ndf.ndf.templatetags.ndf_tags import get_profile_pic, edit_drawer_widget, get_contents, get_sg_member_of, get_attribute_value, check_is_gstaff
 from gnowsys_ndf.settings import GSTUDIO_SITE_NAME
-from gnowsys_ndf.mobwrite.models import ViewObj
+# from gnowsys_ndf.mobwrite.models import ViewObj
 from gnowsys_ndf.notification import models as notification
 from gnowsys_ndf.ndf.views.asset import *
 
@@ -2238,12 +2238,11 @@ def get_visited_location(request, group_id):
   return StreamingHttpResponse(json.dumps(visited_location))
 
 
+'''
 @login_required
 @get_execution_time
 def get_online_editing_user(request, group_id):
-    '''
-    get user who is currently online and editing the node
-    '''
+    #get user who is currently online and editing the node
     if request.is_ajax() and request.method == "POST":
         editorid = request.POST.get('editorid', "")
     viewobj = ViewObj.objects.filter(filename=editorid)
@@ -2265,6 +2264,7 @@ def get_online_editing_user(request, group_id):
         userslist.append("No users")
 
     return StreamingHttpResponse(json.dumps(userslist).encode('utf-8'),content_type="text/json")
+'''
 
 @get_execution_time
 def view_articles(request, group_id):
