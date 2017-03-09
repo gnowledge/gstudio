@@ -167,27 +167,34 @@
     });
 
     $(".delete-asset-content").click(function(){
-        
-        if (confirm("Do you want to delete selected files?.") == true) {
-            coll_arr = []
-            $('.filenode:checked').each(function() {
-                coll_arr.push($(this).val());
-            });
+        var checked = $('.filenode:checked').length;
+        if (checked > 0){
             
-            $.ajax({
-                      type: "POST",
-                      data:{ 
-                            'csrfmiddlewaretoken': "{{csrf_token}}",
-                            'delete_files_list' : coll_arr
-                        },
-                      url: "{% url 'delete_asset' group_id %}",
-                      datatype: "html",
-                      success: function(data) {
-                        location.href = "{% url 'asset_detail' group_id asset_obj.pk %}";
-                    }
+            if (confirm("Do you want to delete selected files?.") == true) {
+                coll_arr = []
+                $('.filenode:checked').each(function() {
+                    coll_arr.push($(this).val());
                 });
+                
+                $.ajax({
+                          type: "POST",
+                          data:{ 
+                                'csrfmiddlewaretoken': "{{csrf_token}}",
+                                'delete_files_list' : coll_arr
+                            },
+                          url: "{% url 'delete_asset' group_id %}",
+                          datatype: "html",
+                          success: function(data) {
+                            location.href = "{% url 'asset_detail' group_id asset_obj.pk %}";
+                        }
+                    });
 
+                }
         }
+        else{
+            alert("Choose atleast one file");
+        }
+        
 
     });
   

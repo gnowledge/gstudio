@@ -3,6 +3,7 @@
 
 {% block body_content %} 
 {% get_group_name groupid as group_name_tag %}
+{% comment %}
 <script type="text/javascript">
   var form = document.getElementById('docPost');
   var fileSelect = document.getElementById('docFile');
@@ -87,6 +88,7 @@
 
   
 </script>
+{% endcomment %}
 <script type="text/javascript">
   $(function() {
      $("input:file").change(function (){
@@ -159,7 +161,6 @@ $("#btnUploadCancel").click(function() {
 </div>
 {% endif %}
 
-{% endcomment %}
 
 <br>
 <br>
@@ -185,6 +186,7 @@ $("#btnUploadCancel").click(function() {
                         </form>
                     </div>
   <br> <br>
+{% endcomment %}
   <ul class="small-block-grid-1 medium-block-grid-3 large-block-grid-4" >
     {% for each in imageCollection %}
     
