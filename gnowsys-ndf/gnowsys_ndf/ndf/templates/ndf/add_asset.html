@@ -109,7 +109,7 @@
                     <div class="asset_preview">
                         {% if each.if_file.mid.relurl and 'video' not in each.if_file.mime_type %}
                         <img src="{{MEDIA_URL}}{{each.if_file.mid.relurl}}">
-                        {% elif 'video' not in each.if_file.mime_type and each.if_file.thumbnail.relurl %}
+                        {% elif  each.if_file.thumbnail.relurl %}
                         <img src="{{MEDIA_URL}}{{each.if_file.thumbnail.relurl}}">
                         {% else %}
                         <img src="/static/ndf/images/asset_thumbnail.png">
@@ -226,6 +226,7 @@
   var fileSelect = document.getElementById('docFile');
   // var uploadButton = document.getElementById('submitpostid');
         function save_form(event) {
+        $.blockUI();
         assetval = $('.asset_obj_val').attr('data-asset-obj-val');
         asset_cont_name = $('#asset_content_name').val();
         asset_cont_desc = $('#asset_content_desc').val();
@@ -279,7 +280,9 @@
             // check if image is not in the list, add it.
             else if(xhr.responseText )
             {
+              $.unblockUI();
               location.reload();
+
             }
 
             uploadButton.innerHTML = 'Upload';
@@ -292,6 +295,7 @@
           }
           else
           {
+            $.unblockUI();
             alert('An error occurred!');
           }
         };
