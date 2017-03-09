@@ -86,7 +86,7 @@ def unit_create_edit(request, group_id, unit_group_id=None):
 
         if not success_flag:
             return HttpResponseRedirect(reverse('list_units', kwargs={'group_id': parent_group_id, 'groupid': parent_group_id,}))
-        return HttpResponseRedirect(reverse('unit_detail',
+        return HttpResponseRedirect(reverse('course_about',
             kwargs={'group_id': unit_node._id}))
 
 
