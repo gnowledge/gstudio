@@ -47,7 +47,7 @@ from gnowsys_ndf.settings import LANGUAGES, OTHER_COMMON_LANGUAGES, GSTUDIO_BUDD
 # from gnowsys_ndf.ndf.models import db, node_collection, triple_collection, counter_collection
 from gnowsys_ndf.ndf.models import *
 # from gnowsys_ndf.ndf.org2any import org2html
-from gnowsys_ndf.mobwrite.models import TextObj
+# from gnowsys_ndf.mobwrite.models import TextObj
 from gnowsys_ndf.ndf.models import HistoryManager, Benchmark
 from gnowsys_ndf.notification import models as notification
 # get pub of gpg key with which to sign syncdata attachments
@@ -2047,14 +2047,12 @@ def _split_with_maintain(value, treat_trailing_spaces_as_sentence=True, split_ch
 
     return result
 
-
+'''
 @get_execution_time
 def update_mobwrite_content_org(node_system):
-    '''
-          on revert or merge of nodes,a content_org is synced to mobwrite object
-          input :
-                  node
-    '''
+          # on revert or merge of nodes,a content_org is synced to mobwrite object
+          # input :
+          #         node
     system = node_system
     filename = TextObj.safe_name(str(system._id))
     textobj = TextObj.objects.filter(filename=filename)
@@ -2067,7 +2065,7 @@ def update_mobwrite_content_org(node_system):
         textobj = TextObj(filename=filename, text=content_org)
         textobj.save()
     return textobj
-
+'''
 
 @get_execution_time
 def cast_to_data_type(value, data_type):

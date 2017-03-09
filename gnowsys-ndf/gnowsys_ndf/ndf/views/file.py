@@ -10,7 +10,7 @@ import tempfile
 # import re
 import ast
 import ox
-import pandora_client
+# import pandora_client
 import threading
 
 from PIL import Image, ImageDraw

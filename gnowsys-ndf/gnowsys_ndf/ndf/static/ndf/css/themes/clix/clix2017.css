@@ -785,6 +785,7 @@ ul.horizontal_tabs_gstudio > li.sub_group_action:hover ul {
   overflow: hidden;
   padding-left: 6px;
   font-size: 11px;
+  color: grey;
 }
 
 /* line 887, ../../../scss/_clix2017.scss */
@@ -1867,6 +1868,16 @@ ul.jqtree-tree .jqtree-toggler:hover {
   padding: 5px 15px;
   box-shadow: 1px 0px 0px #000;
 }
+
+.unit_editor{
+  width: 100%;
+  height: 320px;
+  background: #fff;
+  padding: 5px 15px;
+  box-shadow: 1px 0px 0px #000;
+
+}
+
 /* line 2010, ../../../scss/_clix2017.scss */
 .course_creator_header .back_to_group {
   padding: 0px 15px 0px 10px;
@@ -1877,7 +1888,7 @@ ul.jqtree-tree .jqtree-toggler:hover {
 .course_creator_header .course_heading_unit {
   width: 500px;
   height: 40px;
-  border: 0px solid #acd4fa;
+  border: 1px solid #acd4fa;
   box-shadow: none;
   float: right;
   text-align: center;
@@ -1903,11 +1914,16 @@ ul.jqtree-tree .jqtree-toggler:hover {
 .course_creator_header .course_heading input {
   width: 500px;
   height: 40px;
-  border: 0px solid #acd4fa;
+  border: 1px solid #acd4fa;
   box-shadow: none;
   float: right;
   text-align: center;
 }
+
+.course_creator_header .course_heading h5 {
+  margin-top: 15px;
+}
+
 /* line 2056, ../../../scss/_clix2017.scss */
 .course_creator_header .course_heading input:focus {
   border: 1px solid #acd4fa;
@@ -1948,7 +1964,7 @@ ul.jqtree-tree .jqtree-toggler:hover {
   box-shadow: 0px 2px 3px #000;
   margin: 10px auto;
   padding: 10px;
-  height: calc(100vh - 100px);
+  height: calc(120vh - 100px);
 }
 
 /* line 2107, ../../../scss/_clix2017.scss */
@@ -2545,24 +2561,24 @@ ul.jqtree-tree .jqtree-toggler:hover {
   /*background-color:  #f2f2f2;*/
 }
 
-/* line 2718, ../../../scss/_clix2017.scss */
+/* line 2722, ../../../scss/_clix2017.scss */
 #activity-content {
   height: 30rem !important;
 }
 
-/* line 2721, ../../../scss/_clix2017.scss */
+/* line 2725, ../../../scss/_clix2017.scss */
 .bg-img {
   background: url(/static/ndf/images/landing.jpg);
   height: 100vh;
   background-size: 100%;
 }
 
-/* line 2727, ../../../scss/_clix2017.scss */
+/* line 2731, ../../../scss/_clix2017.scss */
 .white-text {
   color: white;
 }
 
-/* line 2730, ../../../scss/_clix2017.scss */
+/* line 2734, ../../../scss/_clix2017.scss */
 .panel-mod {
   background-color: transparent;
   border: none;

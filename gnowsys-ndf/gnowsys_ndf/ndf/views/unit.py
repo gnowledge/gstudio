@@ -27,7 +27,6 @@ gst_activity_name, gst_activity_id = GSystemType.get_gst_name_id('activity')
 
 
 @login_required
-@staff_required
 @get_execution_time
 def unit_create_edit(request, group_id, unit_group_id=None):
     '''
@@ -65,8 +64,6 @@ def unit_create_edit(request, group_id, unit_group_id=None):
         if unit_node:
             if unit_node.altnames is not unit_altnames:
                 unit_node.altnames = unit_altnames
-                unit_node.content = content
-                unit_node.save()
                 success_flag = True
         else:
             unit_group = CreateGroup(request)
@@ -86,7 +83,10 @@ def unit_create_edit(request, group_id, unit_group_id=None):
 
         if not success_flag:
             return HttpResponseRedirect(reverse('list_units', kwargs={'group_id': parent_group_id, 'groupid': parent_group_id,}))
-        return HttpResponseRedirect(reverse('unit_detail',
+
+        unit_node.content = content
+        unit_node.save()
+        return HttpResponseRedirect(reverse('course_about',
             kwargs={'group_id': unit_node._id}))
 
 
@@ -145,7 +145,6 @@ def list_units(request, group_id):
 ########### LESSON methods ##########
 
 @login_required
-@staff_required
 @get_execution_time
 def lesson_create_edit(request, group_id, unit_group_id=None):
     '''
