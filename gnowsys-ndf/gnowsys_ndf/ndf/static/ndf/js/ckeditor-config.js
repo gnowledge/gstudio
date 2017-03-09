@@ -22,10 +22,13 @@ CKEDITOR.editorConfig = function( config ) {
 	// http://docs.ckeditor.com/#!/api/CKEDITOR.config
 
 	// The toolbar groups arrangement, optimized for two toolbar rows.
+
+	
+
 	config.toolbar_GeneralToolbar =
 	[
 
-		{ name: 'basicstyles', items : [ 'Bold','Italic','Strike','-','RemoveFormat' ] },
+		{ name: 'basicstyles', items : [ 'Bold','Italic','Strike','-','RemoveFormat','Subscript','Superscript' ] },
 		{ name: 'editing', items : [ 'Find','Replace','-','SelectAll','-' ] },
 		{ name: 'insert', items : [ 'Flash','Table','HorizontalRule','Smiley','SpecialChar','PageBreak','Iframe','video'] },
 		{ name: 'styles', items : [ 'Styles','Format' ] },
@@ -34,10 +37,12 @@ CKEDITOR.editorConfig = function( config ) {
 		{ name: 'tools', items : [ 'addImage','addAudio','addVideo','addJhapp','Source','Maximize','-'] },
 
 	];
+	
+
 
 	config.toolbar_BasicToolbar =
 	[
-		{ name: 'basicstyles', items : [ 'Bold','Italic','Strike','-','RemoveFormat' ] },
+		{ name: 'basicstyles', items : [ 'Bold','Italic','Strike','-','RemoveFormat','Subscript', 'Superscript' ] },
 		{ name: 'paragraph', items : [ 'NumberedList','BulletedList','Mathjax','-' ] },
 		{ name: 'links', items : [ 'Link','Unlink'] },
 		{ name: 'insert', items : [ 'Flash','Iframe' ] },
@@ -75,9 +80,10 @@ CKEDITOR.editorConfig = function( config ) {
 
 	// Remove some buttons provided by the standard plugins, which are
 	// not needed in the Standard(s) toolbar.
-	config.removeButtons = 'Underline,Subscript,Superscript';
 	// config.mathJaxLib = '//cdn.mathjax.org/mathjax/2.6-latest/MathJax.js?config=TeX-AMS_HTML';
 	config.mathJaxLib = '/static/ndf/bower_components/MathJax/MathJax.js?config=TeX-AMS-MML_HTMLorMML';
+	config.removeButtons = 'Underline';
+
 	// Set the most common block elements.
 	config.format_tags = 'p;h1;h2;h3;pre';
 	config.entities = false; //set false to work with  entities such as   "" & '' in source code
