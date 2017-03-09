@@ -6745,7 +6745,6 @@ def add_to_collection_set(request, group_id):
 
 
 def delete_asset(request, group_id):
-    print "inside delete node"
     file_list = request.POST.getlist('delete_files_list[]', '')
     for each_file in file_list:
       node_by_id = node_collection.one({'_id':ObjectId(each_file)})
