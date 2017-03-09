@@ -4,7 +4,7 @@ import os
 import magic
 import subprocess
 import mimetypes
-import pandora_client
+# import pandora_client
 import datetime
 
 from PIL import Image, ImageDraw

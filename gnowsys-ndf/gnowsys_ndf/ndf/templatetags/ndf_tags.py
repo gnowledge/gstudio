@@ -48,7 +48,7 @@ except ImportError:
 from gnowsys_ndf.ndf.models import *
 from gnowsys_ndf.ndf.views.methods import check_existing_group, get_gapps, get_all_resources_for_group, get_execution_time, get_language_tuple
 from gnowsys_ndf.ndf.views.methods import get_drawers, get_group_name_id, cast_to_data_type, get_prior_node_hierarchy, get_course_completetion_status
-from gnowsys_ndf.mobwrite.models import TextObj
+# from gnowsys_ndf.mobwrite.models import TextObj
 
 from pymongo.errors import InvalidId as invalid_id
 from django.contrib.sites.models import Site
@@ -2777,13 +2777,12 @@ def mongo_id(value):
 		# Return value
 		return unicode(str(value))
 
+'''
 @get_execution_time
 @register.simple_tag
 def check_existence_textObj_mobwrite(node_id):
-		'''
-	to check object already created or not, if not then create
-	input nodeid
-		'''
+	# to check object already created or not, if not then create
+	# input nodeid
 		check = ""
 		system = node_collection.find_one({"_id":ObjectId(node_id)})
 		filename = TextObj.safe_name(str(system._id))
@@ -2801,6 +2800,7 @@ def check_existence_textObj_mobwrite(node_id):
 		check = textobj.filename
 		return check
 #textb
+'''
 
 @get_execution_time
 @register.assignment_tag
