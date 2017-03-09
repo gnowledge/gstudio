@@ -73,9 +73,6 @@ def unit_create_edit(request, group_id, unit_group_id=None):
                                             node_id=unit_group_id)
             success_flag = result[0]
             unit_node = result[1]
-        if content:
-            unit_node.content = content
-            unit_node.save()
 
         if educationallevel_val and "choose" not in educationallevel_val.lower():
             educationallevel_at = node_collection.one({'_type': 'AttributeType', 'name': "educationallevel"})
@@ -86,6 +83,9 @@ def unit_create_edit(request, group_id, unit_group_id=None):
 
         if not success_flag:
             return HttpResponseRedirect(reverse('list_units', kwargs={'group_id': parent_group_id, 'groupid': parent_group_id,}))
+
+        unit_node.content = content
+        unit_node.save()
         return HttpResponseRedirect(reverse('course_about',
             kwargs={'group_id': unit_node._id}))
 
