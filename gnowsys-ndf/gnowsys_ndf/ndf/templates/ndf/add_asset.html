@@ -22,7 +22,7 @@
             <div class="small-12 medium-6 large-6 columns">
                 <label>
                     {% if edit or not asset_obj %}
-                       Asset name 
+                       Asset name
                        <input type="text" placeholder="" class="required" id = "asset-name" name="asset_name" value="{% if asset_obj %} {{asset_obj.name}}{% endif %}"/>
                     {% endif %}
 
@@ -31,7 +31,7 @@
         </div>
         <div class="row">
             <div class="small-12 medium-6 large-6 columns">
-                <label> 
+                <label>
                     {% if not edit and asset_obj %}
                        <i><p style="color: gray">{{asset_obj.content}} </p></i>
                     {% else %}
@@ -39,7 +39,7 @@
                 </label>
                         <textarea rows="4" cols="2" class="small-12 columns" placeholder="Enter Description" id="asset-descid" value=''>{% if asset_obj %} {{asset_obj.content}}{% endif %}</textarea>
                     {% endif %}
-                
+
             </div>
         </div>
     {% comment %}
@@ -62,7 +62,7 @@
             </div>
         </div>
     {% endcomment %}
-       
+
 
     <div class="asset-content-area"{% if not asset_obj %} style="display:none"{% endif %}>
        <!-- <h3>Add esources for this asset</h3>-->
@@ -98,19 +98,19 @@
         </div>
         </div>
             <div class="row">
-            
+
             </div>
         </div>
         <!--<button type="button" class="right orange-button save-asset" onclick="save_asset_cont_data()">Save Asset</button>-->
         <input type="hidden" name="context_name" value="{{title}}">
         <input type="hidden" class ="asset_obj_val" name="asset_obj_name" data-asset-obj-val="">
-                
+
         {% endif %}
        {% if asset_obj.created_by == request.user.id or is_gstaff %}
         {% endif %}
         {% for each in asset_content_list.grel_node %}
             <div class="small-12 medium-6 large-3 columns">
-                    
+
                 <div class="asset_tile">
                     <div class="asset_preview">
                     <a href="{% url 'assetcontent_detail' group_id asset_obj.pk each.pk %}" title="{{each.name}}">
@@ -133,11 +133,11 @@
                     </div>
                 </div>
             </div>
-        {% endfor %} 
+        {% endfor %}
     </div>
 
         <hr />
-        
+
         <div class="row">
           {% if node %}
            &nbsp; {% include "ndf/asset_content_detail.html" with node=node %}
@@ -159,9 +159,9 @@
     </div>
     {% endif %}
 
-    
+
 <script type="text/javascript">
-    
+
     $("#docFile").change(function(){
         $(".name-desc-asset-cont-area").css('display','block')
         $("#upload_asset").css('display','block')
@@ -170,23 +170,25 @@
     $(".delete-asset-content").click(function(){
         var checked = $('.filenode:checked').length;
         if (checked > 0){
-            
+
             if (confirm("Do you want to delete selected files?.") == true) {
                 coll_arr = []
                 $('.filenode:checked').each(function() {
                     coll_arr.push($(this).val());
                 });
-                
+
                 $.ajax({
                           type: "POST",
-                          data:{ 
+                          data:{
                                 'csrfmiddlewaretoken': "{{csrf_token}}",
                                 'delete_files_list' : coll_arr
                             },
                           url: "{% url 'delete_asset' group_id %}",
                           datatype: "html",
                           success: function(data) {
-                            location.href = "{% url 'asset_detail' group_id asset_obj.pk %}";
+                            {% if asset_obj %}
+                                location.href = "{% url 'asset_detail' group_id asset_obj.pk %}";
+                            {% endif %}
                         }
                     });
 
@@ -195,30 +197,30 @@
         else{
             alert("Choose atleast one file");
         }
-        
+
 
     });
-  
-    // $('.save-asset').attr('disabled',true); 
-    $('#upload_asset').attr('disabled',true); 
-    
+
+    // $('.save-asset').attr('disabled',true);
+    $('#upload_asset').attr('disabled',true);
+
     $('#asset_content_name').keyup(function(){
         if($(this).val().length !=0 )
-            $('#upload_asset').attr('disabled', false);            
+            $('#upload_asset').attr('disabled', false);
         else
             $('#upload_asset').attr('disabled',true);
     })
 
     // $('#asset-name').keyup(function(){
     //     if($(this).val().length !=0 && $('#asset-descid').val().length !=0)
-    //         $('.save-asset').attr('disabled', false);            
+    //         $('.save-asset').attr('disabled', false);
     //     else
     //         $('.save-asset').attr('disabled',true);
     // })
 
     // $('#asset-descid').keyup(function(){
     //     if($(this).val().length !=0 &&  $('#asset-name').val().length !=0)
-    //         $('.save-asset').attr('disabled', false);            
+    //         $('.save-asset').attr('disabled', false);
     //     else
     //         $('.save-asset').attr('disabled',true);
     // })
@@ -233,7 +235,7 @@
             // asset_objective =  $('#asset_objectivesid').find(':selected').attr('value');
             $.ajax({
                   type: "POST",
-                  data:{ 
+                  data:{
                         'csrfmiddlewaretoken': "{{csrf_token}}",
                         "asset_name":asset_name,
                         "asset_description":asset_description,
@@ -256,7 +258,7 @@
             console.log("else")
             console.log(asset_name)
             console.log(asset_description)
-            event.preventDefault() 
+            event.preventDefault()
         }
     });
 
@@ -313,7 +315,7 @@
 
         // Set up a handler for when the request finishes sucessfully.
         xhr.onload = function () {
-          if (xhr.status === 200) 
+          if (xhr.status === 200)
           {
             // File(s) uploaded.
            // if file is not uploaded sucessfully
@@ -348,5 +350,5 @@
         xhr.send(formData);
       }
 
-  
+
 </script>
