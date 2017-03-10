@@ -329,6 +329,7 @@ class Node(DjangoDocument):
 
     validators = {
         'name': lambda x: x.strip() not in [None, ''],
+        'created_by': lambda x: isinstance(x, int) and (x != 0)
     }
 
     use_dot_notation = True
