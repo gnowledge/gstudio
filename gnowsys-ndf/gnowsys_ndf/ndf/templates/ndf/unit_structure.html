@@ -300,9 +300,9 @@ This will not be used because now only existing activities will be added.
                                 <ul class="entity_actions">
                                     <li class="activity_move_up">Move up</li>
                                     <li class="activity_move_down">Move down</li>
+                                    <li class="activity_remove">Remove</li>
                                     <!--
                                     <li class="activity_edit">Edit</li>
-                                    <li class="activity_delete">Delete</li>
                                     -->
                                 </ul>
                             </div>
@@ -479,6 +479,42 @@ This will not be used because now only existing activities will be added.
             if (return_status) {
                 $current.insertBefore($previous);
             }
+        })
+
+        function removeFromCollectionSet(parent_node_id, child_node_id, $el_to_remove){
+          $.ajax({
+              type: "POST",
+              data:{
+                  'csrfmiddlewaretoken': "{{csrf_token}}",
+                  "parent_node_id": parent_node_id,
+                  "child_node_id": child_node_id,
+                  "node_field": "collection_set"
+              },
+              url: "{% url 'remove_from_nodelist' group_id %}",
+              // datatype: "",
+              success: function(data) {
+                  // console.log(typeof(data));
+                  data = JSON.parse(data);
+                  // console.log(data);
+                  if(data){
+                    $el_to_remove.remove()
+                  }
+                  else{
+                      return false;
+                  }
+              }
+          });
+        }
+
+        // remove activity
+        $('.course-lessons').on('click', '.activity_remove' ,function(e){
+            lesson_id = $(this).parents('div.lesson-container')
+                            .attr('id').replace('lesson-', '');
+            $current = $(this).parents('li');
+            var curr_act_id = $current.attr('id').replace('activity-', '');
+            var return_status = removeFromCollectionSet(lesson_id, curr_act_id, $current);
+            // NEED TO DO:
+            // after removing activity, content area showing activity's content on RHS should be clear.
         })
 
 

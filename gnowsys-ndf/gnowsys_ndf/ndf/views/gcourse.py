@@ -3192,6 +3192,7 @@ def save_course_page(request, group_id):
             page_obj.group_set = [group_id]
         page_obj.name = unicode(name)
         page_obj.content = unicode(content)
+        page_obj.created_by = request.user.id
         page_obj.save(groupid=group_id)
         return HttpResponseRedirect(reverse('course_pages', kwargs={'group_id': group_id}))
 
