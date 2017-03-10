@@ -2418,7 +2418,7 @@ def course_about(request, group_id):
         show_analytics_notifications = False
         educationalsubject = get_attribute_value(group_obj._id,"educationalsubject")
         educationallevel = get_attribute_value(group_obj._id,"educationallevel")
-        context_variables.update({'educationalsubject_val': educationalsubject, 
+        context_variables.update({'educationalsubject_val': educationalsubject,
             "educationallevel_val": educationallevel})
 
     banner_pic_obj,old_profile_pics = _get_current_and_old_display_pics(group_obj)
@@ -3156,7 +3156,7 @@ def course_pages(request, group_id, page_id=None):
     template = 'ndf/gevent_base.html'
 
     activity_gst_name, activity_gst_id = GSystemType.get_gst_name_id("activity")
-    all_pages = node_collection.find({'member_of': 
+    all_pages = node_collection.find({'member_of':
                 {'$in': [page_gst_id, activity_gst_id] }, 'group_set': group_id,
                 'type_of': {'$ne': [blog_page_gst_id]}
                 # 'content': {'$regex': 'clix-activity-styles.css', '$options': 'i'}
@@ -3171,6 +3171,7 @@ def course_pages(request, group_id, page_id=None):
                                 context_instance = RequestContext(request)
     )
 
+@login_required
 def save_course_page(request, group_id):
     group_obj = get_group_name_id(group_id, get_obj=True)
     group_id = group_obj._id
@@ -3179,7 +3180,6 @@ def save_course_page(request, group_id):
     page_gst_name, page_gst_id = GSystemType.get_gst_name_id("Page")
     page_obj = None
     if request.method == "POST":
-        print request.POST
         name = request.POST.get("name", "")
         content = request.POST.get("content_org", None)
         node_id = request.POST.get("node_id", "")
