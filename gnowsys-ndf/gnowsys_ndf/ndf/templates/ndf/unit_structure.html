@@ -545,58 +545,6 @@ This will not be used because now only existing activities will be added.
             //To edit the newly created lesson run this $('a[href="#lesson-'+newid+'"] .edit_lesson').trigger('click');
         })
 
-
-        // add/save activity
-        function addActivity(activityName, lessonId) {
-          /*
-          addActivity()
-          - to add activity of lesson of unit.
-          */
-          if (!activityName) {
-            alert('Name can not be empty. Please provide one.');
-            return;
-          };
-          result = undefined;
-          $.ajax({
-              type: "POST",
-              data:{
-                  'csrfmiddlewaretoken': "{{csrf_token}}",
-                  "unit_id": "{{unit_obj.pk}}",
-                  "name": activityName,
-                  "lesson_id": lessonId
-              },
-              url: "{% url 'activity_create_edit' group_id %}",
-              // datatype: "",
-              success: function(data) {
-                  data_dict = JSON.parse(data);
-                  if(data_dict.success){
-                      renderCourseTree(data_dict.unit_hierarchy);
-                      // handle opening of tree till recently added node with data_dict.msg
-                      $('#add-activity-modal').foundation('reveal', 'close');
-                      result = true;
-                  }
-                  else{
-                      alert(data_dict.msg);
-                      result = false;
-                  }
-              }
-          });
-
-          return result;
-        }
-
-
-        //Add a activity
-        $('.save-activity').on('click', function(){
-            var lesson_id = $('#add-activity-modal button.save-activity').attr('lesson_id');
-            // console.log(lesson_id);
-            addActivity($('#activity-name').val().trim(), lesson_id);
-
-            //Send the query and update the course_data and call 'renderCourseTree(course_data)'
-            //To edit the newly created lesson run this $('a[href="#lesson-'+newid+'"] .edit_lesson').trigger('click');
-        })
-
-
         function getNodeData(node_id)
         {
           var result = undefined;
@@ -618,6 +566,7 @@ This will not be used because now only existing activities will be added.
               }
           });
         }
+
 
 
         /*
@@ -654,6 +603,7 @@ This will not be used because now only existing activities will be added.
             $('.save_edit_activity').attr('data-current-activity-id', activity_id);
         });
 
+        /*
         // Add a new activity
         $('.course-lessons').on('click', '.add_activity', function(){
             var lesson_id = $(this).closest('div.content').attr('id').replace('lesson-', '');
@@ -663,9 +613,9 @@ This will not be used because now only existing activities will be added.
             //Send the query and update the course_data and call 'renderCourseTree(course_data)'
             //To select the newly created activity run this $('#activity-' + newid).trigger('click');
         });
+        */
 
-
-        // Add a new activity
+        // Add a existing activity
         $('.course-lessons').on('click', '.add_existing_activity', function(){
             var lesson_id = $(this).closest('div.content').attr('id').replace('lesson-', '');
             // console.log('Adding existing activity for lessson ' + lesson_id);
@@ -675,37 +625,7 @@ This will not be used because now only existing activities will be added.
             //To select the newly created activity run this $('#activity-' + newid).trigger('click');
         });
 
-        // console.log(course_data)
         renderCourseTree(course_data);
-
-        function getTemplates() {
-            $.ajax({
-                      type: "GET",
-                      url: "{% url 'get_group_templates_page' group_id %}",
-                      datatype: "html",
-                      data:{
-
-                      },
-                        success: function(data) {
-                      $("#template-container").html(data);
-                        // $('#existing_template_modal').foundation('reveal', 'open');
-
-                      $(".template-list").click(function(event){
-                          // get html content in var
-                          var nodeContent = $(this).children('div').attr("data-content");
-                          if (editorMode != "edit"){
-                            editNode(nodeContent);
-                          }
-                          else{
-                            CKEDITOR.instances['ckeditor_textarea'].setData(nodeContent);
-                          }
-                          // Open ckeditor and append content of node in ckeditor
-                          // openCkEditor('#activity-content', "BasicToolbar", nodeContent);
-                          $('#existing_template_modal').foundation('reveal', 'close');
-                        });
-                      }
-                    });
-        }
 
         function getActivityPages() {
             $.ajax({
@@ -770,15 +690,13 @@ This will not be used because now only existing activities will be added.
           return 1;
         }
 
-        // foundation reveal modal events handling
-        $(document).on('opened.fndtn.reveal', '#existing_template_modal[data-reveal]', function () {
-          // var modal = $(this); // console.log(this);
-          getTemplates();
-        });
 
+        // foundation reveal modal events handling
+        // $(document).on('opened.fndtn.reveal', '#existing_template_modal[data-reveal]', function () {
+        //   getTemplates();
+        // });
 
         $(document).on('opened.fndtn.reveal', '#select-activity-page[data-reveal]', function () {
-          // modal = $(this); // console.log(this);
           getActivityPages();
         });
 
@@ -786,7 +704,6 @@ This will not be used because now only existing activities will be added.
             $("#lesson-name").val('')
         });
         // END of foundation reveal modal events handling
-
 
 
         /**
@@ -801,6 +718,48 @@ This will not be used because now only existing activities will be added.
             // Call ajax
         });
 
+
+        $('.course-editor-section').on('click', '.save_edit_activity', function(){
+            if (editorMode === 'view') {
+                // console.log('Editing the activity');
+                // editNode(false);
+            }
+            else {
+                editorMode = 'view';
+                // var nodeContent = CKEDITOR.instances['ckeditor_textarea'].getData();
+                // var nodeId = $('.save_edit_activity').attr('data-current-activity-id');
+                // var nodeName = $('#activity-' + nodeId).attr('data-name');
+                // saveNode(nodeId, nodeName, nodeContent);
+                // //Do the ajax to save the activity and then following command;
+                $('.save_edit_activity').html('Edit');
+            }
+        })
+
+        function change_order_api(node_to_up, node_to_down, parent_id){
+            var success_state = false
+            $.ajax({
+                url: "{% url 'change_order' group_id %}",
+
+                data: {
+                    node_id_up: node_to_up,
+                    node_id_down: node_to_down,
+                    parent_node: parent_id,
+                    'csrfmiddlewaretoken': "{{csrf_token}}"
+                },
+
+                type: "POST",
+                async: false,
+                dataType: "json",
+
+                success: function(data){
+                    success_state = data["success"]
+                },
+            });//end of ajax
+            return success_state
+        }
+
+
+        /*
         $('.course-editor-section').on('click', '.save_template', function(){
             //Call ajax
                 if (Object.keys(CKEDITOR.instances).length > 0 ){
@@ -832,7 +791,6 @@ This will not be used because now only existing activities will be added.
                         // console.log(data)
                     }
                 });
-
         });
 
         function openCkEditor(editorContainerIdOrEl, toolbarType, content)
@@ -856,6 +814,7 @@ This will not be used because now only existing activities will be added.
         {
           $(".cke_button__closebtn_label").trigger( "click" );
         }
+
 
         function saveNode(nodeId, nodeName, nodeContent) {
           $.ajax({
@@ -891,47 +850,91 @@ This will not be used because now only existing activities will be added.
           // Open ckeditor and append content of node in ckeditor
           openCkEditor('#activity-content', "GeneralToolbar", nodeContent);
         }
+        */
 
-        $('.course-editor-section').on('click', '.save_edit_activity', function(){
-            if (editorMode === 'view') {
-                // console.log('Editing the activity');
-                editNode(false);
-            }
-            else {
-                editorMode = 'view';
-                // console.log('Saving the activity');
-                var nodeContent = CKEDITOR.instances['ckeditor_textarea'].getData();
-                // console.log(content_val);
-                var nodeId = $('.save_edit_activity').attr('data-current-activity-id');
-                var nodeName = $('#activity-' + nodeId).attr('data-name');
-                saveNode(nodeId, nodeName, nodeContent);
-                //Do the ajax to save the activity and then following command;
-                $('.save_edit_activity').html('Edit');
-            }
-        })
 
-        function change_order_api(node_to_up, node_to_down, parent_id){
-            var success_state = false
-            $.ajax({
-                url: "{% url 'change_order' group_id %}",
+        /*
+        // add/save activity
+        function addActivity(activityName, lessonId) {
+          // addActivity()
+          // - to add activity of lesson of unit.
+          if (!activityName) {
+            alert('Name can not be empty. Please provide one.');
+            return;
+          };
+          result = undefined;
+          $.ajax({
+              type: "POST",
+              data:{
+                  'csrfmiddlewaretoken': "{{csrf_token}}",
+                  "unit_id": "{{unit_obj.pk}}",
+                  "name": activityName,
+                  "lesson_id": lessonId
+              },
+              url: "{% url 'activity_create_edit' group_id %}",
+              // datatype: "",
+              success: function(data) {
+                  data_dict = JSON.parse(data);
+                  if(data_dict.success){
+                      renderCourseTree(data_dict.unit_hierarchy);
+                      // handle opening of tree till recently added node with data_dict.msg
+                      $('#add-activity-modal').foundation('reveal', 'close');
+                      result = true;
+                  }
+                  else{
+                      alert(data_dict.msg);
+                      result = false;
+                  }
+              }
+          });
 
-                data: {
-                    node_id_up: node_to_up,
-                    node_id_down: node_to_down,
-                    parent_node: parent_id,
-                    'csrfmiddlewaretoken': "{{csrf_token}}"
-                },
-
-                type: "POST",
-                async: false,
-                dataType: "json",
-
-                success: function(data){
-                    success_state = data["success"]
-                },
-            });//end of ajax
-            return success_state
+          return result;
         }
+
+        //Add a activity
+        $('.save-activity').on('click', function(){
+            var lesson_id = $('#add-activity-modal button.save-activity').attr('lesson_id');
+            // console.log(lesson_id);
+            addActivity($('#activity-name').val().trim(), lesson_id);
+
+            //Send the query and update the course_data and call 'renderCourseTree(course_data)'
+            //To edit the newly created lesson run this $('a[href="#lesson-'+newid+'"] .edit_lesson').trigger('click');
+        })
+        **/
+
+
+        /*
+        function getTemplates() {
+            $.ajax({
+                      type: "GET",
+                      url: "{% url 'get_group_templates_page' group_id %}",
+                      datatype: "html",
+                      data:{
+
+                      },
+                        success: function(data) {
+                      $("#template-container").html(data);
+                        // $('#existing_template_modal').foundation('reveal', 'open');
+
+                      $(".template-list").click(function(event){
+                          // get html content in var
+                          var nodeContent = $(this).children('div').attr("data-content");
+                          if (editorMode != "edit"){
+                            editNode(nodeContent);
+                          }
+                          else{
+                            CKEDITOR.instances['ckeditor_textarea'].setData(nodeContent);
+                          }
+                          // Open ckeditor and append content of node in ckeditor
+                          // openCkEditor('#activity-content', "BasicToolbar", nodeContent);
+                          $('#existing_template_modal').foundation('reveal', 'close');
+                        });
+                      }
+                    });
+        }
+        */
+
+
 
     })
 </script>
