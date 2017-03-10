@@ -8,8 +8,10 @@
         {% endif %}
         <div class="small-12 colums">
             {% if not edit and asset_obj.name %}
+                {% if asset_obj.created_by == request.user.id or is_gstaff %}
                 <p class="left">&nbsp;&nbsp;{{asset_obj.name}}</p>
                 <a class="fi-pencil right createAsset" data-asset_id='{{asset_obj.pk}}'>Edit</a>
+                {% endif %}
             {% else %}
                 <h3 class="left overlay-title">&nbsp;{% if not asset_obj %} Add a new {% else %} Edit {% endif %} asset</h3>
                 <button type="button" class="right blue-white-button save-asset" data-asset_id='{{asset_obj.pk}}'>Save Asset</button>
@@ -68,11 +70,14 @@
         <div class="row">
            <!-- &nbsp;&nbsp;&nbsp;Add asset content-->
             {% if asset_obj.created_by == request.user.id or is_gstaff %}
-            <div class="transcript_files">
+            <div class="transcript_files row">
+                <button type="button"  style="display:none" class="right orange-button" id="upload_asset" onclick="save_form()">Upload Asset content</button>
+                <button type="button" class="right blue-white-button delete-asset-content">Delete Files</button>
                 <form class="dropzone" id ="docPost" enctype="multipart/form-data" method="post" action="{% url 'add_assetcontent' group_id %}" >
-                    <input type="file" id="docFile" placeholder="" name=""/>
+                    <input type="file" id="docFile" style="width:50%" placeholder="" name=""/>
                 </form>
             </div>
+
         </div>
 
         <div class="name-desc-asset-cont-area" style="display: none">
@@ -93,7 +98,7 @@
         </div>
         </div>
             <div class="row">
-            <button type="button"  class="right orange-button" id="upload_asset" onclick="save_form()">Upload Asset content</button>
+            
             </div>
         </div>
         <!--<button type="button" class="right orange-button save-asset" onclick="save_asset_cont_data()">Save Asset</button>-->
@@ -101,27 +106,33 @@
         <input type="hidden" class ="asset_obj_val" name="asset_obj_name" data-asset-obj-val="">
                 
         {% endif %}
+       {% if asset_obj.created_by == request.user.id or is_gstaff %}
+        {% endif %}
         {% for each in asset_content_list.grel_node %}
-            <a href="{% url 'assetcontent_detail' group_id asset_obj.pk each.pk %}" title="{{each.name}}">
             <div class="small-12 medium-6 large-3 columns">
                     
                 <div class="asset_tile">
                     <div class="asset_preview">
+                    <a href="{% url 'assetcontent_detail' group_id asset_obj.pk each.pk %}" title="{{each.name}}">
                         {% if each.if_file.mid.relurl and 'video' not in each.if_file.mime_type %}
                         <img src="{{MEDIA_URL}}{{each.if_file.mid.relurl}}">
-                        {% elif 'video' not in each.if_file.mime_type and each.if_file.thumbnail.relurl %}
+                        {% elif  each.if_file.thumbnail.relurl %}
                         <img src="{{MEDIA_URL}}{{each.if_file.thumbnail.relurl}}">
                         {% else %}
                         <img src="/static/ndf/images/asset_thumbnail.png">
                         {% endif %}
                     </div>
                     <div class="asset_text">
-                        <div class="asset_title">{{each.name|truncatechars:35}}</div>
+                        <div class="asset_title">{{each.name|truncatechars:35}}
+                        </a>
+                        {% if user.is_authenticated  and not group_object.edit_policy == "NON_EDITABLE"  or gstaff_access %}
+                        <input type="checkbox" class="filenode" name="filenode" value="{{each.pk}}" style="margin:0; float:right;" class="asset_content_checkbox">
+                        {% endif %}
+                        </div>
                         <div class="asset_desc">{{each.content|truncatechars:35}}</div>
                     </div>
                 </div>
             </div>
-            </a>
         {% endfor %} 
     </div>
 
@@ -153,6 +164,39 @@
     
     $("#docFile").change(function(){
         $(".name-desc-asset-cont-area").css('display','block')
+        $("#upload_asset").css('display','block')
+    });
+
+    $(".delete-asset-content").click(function(){
+        var checked = $('.filenode:checked').length;
+        if (checked > 0){
+            
+            if (confirm("Do you want to delete selected files?.") == true) {
+                coll_arr = []
+                $('.filenode:checked').each(function() {
+                    coll_arr.push($(this).val());
+                });
+                
+                $.ajax({
+                          type: "POST",
+                          data:{ 
+                                'csrfmiddlewaretoken': "{{csrf_token}}",
+                                'delete_files_list' : coll_arr
+                            },
+                          url: "{% url 'delete_asset' group_id %}",
+                          datatype: "html",
+                          success: function(data) {
+                            location.href = "{% url 'asset_detail' group_id asset_obj.pk %}";
+                        }
+                    });
+
+                }
+        }
+        else{
+            alert("Choose atleast one file");
+        }
+        
+
     });
   
     // $('.save-asset').attr('disabled',true); 
@@ -226,6 +270,7 @@
   var fileSelect = document.getElementById('docFile');
   // var uploadButton = document.getElementById('submitpostid');
         function save_form(event) {
+        $.blockUI();
         assetval = $('.asset_obj_val').attr('data-asset-obj-val');
         asset_cont_name = $('#asset_content_name').val();
         asset_cont_desc = $('#asset_content_desc').val();
@@ -279,7 +324,9 @@
             // check if image is not in the list, add it.
             else if(xhr.responseText )
             {
+              $.unblockUI();
               location.reload();
+
             }
 
             uploadButton.innerHTML = 'Upload';
@@ -292,6 +339,7 @@
           }
           else
           {
+            $.unblockUI();
             alert('An error occurred!');
           }
         };

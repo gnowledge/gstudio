@@ -19,6 +19,7 @@
    <!--  <h1>
         <div id="timer">2:00</div>
     </h1> -->
+    {% comment %}
     <div class="upload-file small-12 medium-3 large-2 columns" id="upload_form_div">
                         <form class="dropzone" id ="docPost" enctype="multipart/form-data" method="post" action="{% url 'upload_file_ckeditor' group_id %}">
                             {% csrf_token %}
@@ -40,6 +41,7 @@
                         </form>
                     </div>
 
+    {% endcomment %}
     
       <i class="fi-info"></i>You can record audio for max 30 seconds.!<br>
     
@@ -68,7 +70,7 @@
     
     <li class="card-audio-wrapper">
             <audio  controls loop  src="{{MEDIA_URL}}{{each.if_file.original.relurl}}" > </audio>
-            <figcaption title="Click here to add this file in editor" class="audio-caption" data-audio-id="{{each.pk}}" src="{{MEDIA_URL}}{{each.if_file.original.relurl}}" data-audio-src="{{MEDIA_URL}}{{each.if_file.original.relurl}}">{{each.name|truncatechars:10}}</figcaption>
+            <figcaption title="{{each.name}}" class="audio-caption" data-audio-id="{{each.pk}}" src="{{MEDIA_URL}}{{each.if_file.original.relurl}}" data-audio-src="{{MEDIA_URL}}{{each.if_file.original.relurl}}">{{each.name|truncatechars:15}}</figcaption>
     
     </li>
     {% endfor %}
@@ -293,6 +295,7 @@
     };
     </script>
 
+{% comment %}
 <script type="text/javascript">
   var form = document.getElementById('docPost');
   var fileSelect = document.getElementById('docFile');
@@ -371,6 +374,7 @@
 
   
 </script>
+{% endcomment %}
 <script type="text/javascript">
   $(function() {
      $("input:file").change(function (){
