@@ -107,6 +107,26 @@ def save_node(request, group_id, node_id=None):
         return HttpResponse(0)
 
 
+@login_required
+def remove_from_nodelist(request, group_id):
+    parent_node_id = request.POST.get('parent_node_id', None)
+    child_node_id = request.POST.get('child_node_id', None)
+    node_field = request.POST.get('node_field', None)
+    result = 0
+
+    if (parent_node_id and child_node_id) and (node_field in Node.structure):
+        node_obj = Node.get_node_by_id(parent_node_id)
+        try:
+            node_obj[node_field].pop(node_obj[node_field].index(ObjectId(child_node_id)))
+            node_obj.save(group_id=group_id)
+        except Exception, e:
+            print e
+        result = 1
+
+    return HttpResponse(result)
+
+
+
 def checkgroup(request, group_name):
     titl = request.GET.get("gname", "")
     retfl = check_existing_group(titl)
