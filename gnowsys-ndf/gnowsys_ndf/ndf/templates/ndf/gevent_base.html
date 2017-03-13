@@ -1,12 +1,13 @@
 {% load simple_filters %}
 {% xextends "ndf/gbase.html" with first_body_column=0 %}
-
 {# {% extends "ndf/base.html" %} #}
-
 {% load i18n %}
 {% load cache %}
 {% load ndf_tags %}
-{% block title %}{% trans 'Events' %} {% endblock %}
+{% block title %}
+    {% get_group_object groupid as group_object %}
+    {% trans 'Unit: ' %}{% firstof group_object.altnames group_object.name  %}
+{% endblock %}
 {% block head %}
 {{block.super}}
 <script type="text/javascript" src="/static/ndf/bower_components/foundation/js/foundation.min.js"></script>
