@@ -42,7 +42,7 @@ def unit_create_edit(request, group_id, unit_group_id=None):
         all_groups_names = [str(each_group.name) for each_group in all_groups]
         context_variables = {'group_id': parent_group_id,'groupid': parent_group_id, 'all_groups_names': all_groups_names}
         if unit_node:
-            context_variables.update({'unit_node': unit_node})
+            context_variables.update({'unit_node': unit_node, 'title': 'Create Unit'})
         req_context = RequestContext(request, context_variables)
         return render_to_response(template, req_context)
 
