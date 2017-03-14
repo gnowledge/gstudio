@@ -278,7 +278,7 @@ This will not be used because now only existing activities will be added.
 {% verbatim %}
 <!-- Handlebar Templates for the course tree -->
 <script id="lesson-template" type="text/x-handlebars-template">
-    <dd class="accordion-navigation">
+    <dd class="accordion-navigation active">
         <a href="#lesson-{{id}}" class="entity-title" id="lesson-accordion">
             {{name}}
             <div class="right edit_entity">
@@ -291,7 +291,7 @@ This will not be used because now only existing activities will be added.
                 </ul>
             </div>
         </a>
-        <div id="lesson-{{id}}" class="content lesson-container">
+        <div id="lesson-{{id}}" class="content lesson-container active">
             <ul class="course-activities">
                 {{#each activities}}
                     <li id="activity-{{id}}" data-name="{{name}}">
