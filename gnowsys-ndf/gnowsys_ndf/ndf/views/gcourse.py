@@ -3191,8 +3191,9 @@ def save_course_page(request, group_id):
         name = request.POST.get("name", "")
         content = request.POST.get("content_org", None)
         node_id = request.POST.get("node_id", "")
-        return_url = 'course_pages'
-        return_url = request.POST.get("return_url")
+        return_url = request.POST.get("return_url", None)
+        if not return_url:
+            return_url = 'course_pages'
         if node_id:
             page_obj = node_collection.one({'_id': ObjectId(node_id)})
         if not page_obj:
