@@ -21,17 +21,23 @@
             </div>
             <div class="row">
                 <div class="large-12 columns editor-div">
+                    {% if not editor_view %}
+
                     {% include "ndf/html_editor.html" with var_name="content_org" var_placeholder="Enter the content here" var_value="" ckeditor_toolbar="GeneralToolbar" %}
+                    {% endif %}
                 </div>
                 
             </div>
             <input type="hidden" name="node_id" class="form_node_id">
-
+            {% if editor_view %}
+            <input type="hidden" name="return_url" value="{{return_url}}">
+            {% endif %}
             <input type="submit" class="orange-button" class="saveActivityPage" value="Save">
             <input type="button" class="orange-button cancel-page-create" value="Cancel">
         </div>
     </form>
 </div>
+
 <div class="page-view reveal-modal medium" id="scstyle" data-reveal aria-hidden="true" role="dialog">
     <h4 class="page-name"></h4>
     <div class="page-content"></div>
@@ -42,6 +48,7 @@
     <div class="templates-content"></div>
     <a class="close-reveal-modal" >&#215;</a>
 </div>
+
 <div id="page_listing">
 
 <div class="row"> 
@@ -60,7 +67,7 @@
                     </div>
                     <div class="asset_text">
                         <div class="asset_title" title="{{each.name}}">{{each.name|truncatechars:35}}</div>
-                        <div class="asset_desc">{{each.content|truncatechars:35}}</div>
+                        <div class="asset_desc">{{each.content|striptags|truncatechars:35}}</div>
                     </div>
                 </div>
             </div>
@@ -69,6 +76,12 @@
 </div></div>
 <script type="text/javascript">
     
+    $(document).ready(function(){
+        {% if editor_view %}
+            load_inline_content_editor("{{node_obj.pk}}","{{node_obj.name}}")
+        {% endif %}
+    })
+
     $( ".createActivityPage" ).click(function() {
         $("#addActivityPage").removeClass("hide")
         $("#page_listing").addClass("hide")
@@ -100,11 +113,16 @@
     $(document).on('click','.edit-page',function(){
         node_id = $(this).attr("id")
         data_node_name = $(this).attr("data-node-name")
+        load_inline_content_editor(node_id, data_node_name)
+
+    })
+
+    function load_inline_content_editor(node_id, node_name){
         $("#addActivityPage").removeClass("hide")
         $("#page_listing").addClass("hide")
         $(".page-view").foundation('reveal','close')
         $(".activity-sheet-actions").addClass("hide")
-        $(".node_name").attr('value', data_node_name)
+        $(".node_name").attr('value', node_name)
         $.ajax({
           url: "{% url 'inline_edit_res' group_id %}",
 
@@ -112,16 +130,17 @@
           data: {
             node_id: node_id
           },
-
+          async: false,
           dataType: "html",
 
           success: function(data){
-            console.log(data)
+            $(".editor-div").html('');
             $(".editor-div").html(data);
+            window.history.pushState(null, null, "?edit="+node_id+"");
           },
         });//end of ajax
         $(".form_node_id").attr('value', node_id)
-    })
+    }
 
 
     $(document).on('click','.view-page',function(){

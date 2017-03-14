@@ -1444,8 +1444,8 @@ def get_resources(request, group_id):
                     resource_gst_id = [GSystemType.get_gst_name_id(each_gst)[1] for each_gst in resource_type]
                 else:
                     resource_gst_name, resource_gst_id = GSystemType.get_gst_name_id(resource_type)
-                # resource_gst = node_collection.one({'_type': "GSystemType", 'name': resource_type})
-
+                    # resource_gst = node_collection.one({'_type': "GSystemType", 'name': resource_type})
+                    resource_gst_id = [resource_gst_id]
                 res = node_collection.find(
                     {
                         'member_of': {'$in': resource_gst_id},
@@ -2503,6 +2503,7 @@ def inline_edit_res(request, group_id):
 
     else:
         node_id = request.GET.get("node_id", "")
+        node_id_to_be_edited = request.GET.get("edit", "")
         node_obj = node_collection.one({'_id': ObjectId(node_id)})
         template = 'ndf/html_editor.html'
         context_variables['var_name'] = "content_org"
@@ -3163,9 +3164,16 @@ def course_pages(request, group_id, page_id=None):
                 })
     context_variables = {
             'group_id': group_id, 'groupid': group_id, 'group_name':group_name,
-            'group_obj': group_obj, 'title': 'course_pages', 'all_pages': all_pages
-            }
+            'group_obj': group_obj, 'title': 'course_pages', 'all_pages': all_pages,
+            'editor_view': False}
+    if request.method == "GET":
 
+        node_id = request.GET.get('edit', None)
+        return_url = request.GET.get('return', None)
+        if node_id:
+            node_obj = node_collection.one({'_id': ObjectId(node_id)})
+            context_variables.update({'node_obj': node_obj,
+                'editor_view': True, 'return_url': str(return_url)})
     return render_to_response(template,
                                 context_variables,
                                 context_instance = RequestContext(request)
@@ -3183,6 +3191,9 @@ def save_course_page(request, group_id):
         name = request.POST.get("name", "")
         content = request.POST.get("content_org", None)
         node_id = request.POST.get("node_id", "")
+        return_url = request.POST.get("return_url", None)
+        if not return_url:
+            return_url = 'course_pages'
         if node_id:
             page_obj = node_collection.one({'_id': ObjectId(node_id)})
         if not page_obj:
@@ -3194,7 +3205,7 @@ def save_course_page(request, group_id):
         page_obj.content = unicode(content)
         page_obj.created_by = request.user.id
         page_obj.save(groupid=group_id)
-        return HttpResponseRedirect(reverse('course_pages', kwargs={'group_id': group_id}))
+        return HttpResponseRedirect(reverse(str(return_url), kwargs={'group_id': group_id}))
 
 def load_content_data(request, group_id):
     node_id = request.GET.get("node_id", "")

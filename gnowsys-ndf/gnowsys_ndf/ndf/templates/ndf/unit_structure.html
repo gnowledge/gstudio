@@ -31,7 +31,7 @@
                             <span class="activity-name"><!-- Activity Name --></span>
                         </div>
 
-                        <button type="button" class="right button-hollow-blue save_edit_activity" data-current-activity-id=""> Edit </button>
+                        <a class="right button-hollow-blue save_edit_activity" data-current-activity-id="" > Edit </a>
 
                         <!-- commenting following as activities now will be created/edited
                         from activity area -->
@@ -73,11 +73,12 @@
                         </div>
                         Editor tool will come here. //CK Editor
                     </div>
-                    <div id="scstyle">
                      -->
 
-                    <div id="activity-content">
-                        <!-- selected activities content will go here (JS) -->
+                    <div id="scstyle">
+                        <div id="activity-content">
+                            <!-- selected activities content will go here (JS) -->
+                        </div>
                     </div>
                 </div>
             </div>
@@ -285,7 +286,7 @@ This will not be used because now only existing activities will be added.
                 <ul class="entity_actions">
                     <li class="lesson_move_up">Move up</li>
                     <li class="lesson_move_down">Move down</li>
-                    <li class="lesson_edit">Edit</li>
+                    <!-- <li class="lesson_edit">Edit</li> -->
                     <li class="lesson_delete">Delete</li>
                 </ul>
             </div>
@@ -636,6 +637,7 @@ This will not be used because now only existing activities will be added.
             $('.course-editor-section .activity-name').text(activityName);
 
             getNodeData(activity_id);
+            $('.save_edit_activity').attr('href',"{% url 'course_pages' group_id %}?edit="+ activity_id + "&return=unit_detail")
             $('.save_edit_activity').attr('data-current-activity-id', activity_id);
         });
 
@@ -755,21 +757,21 @@ This will not be used because now only existing activities will be added.
         });
 
 
-        $('.course-editor-section').on('click', '.save_edit_activity', function(){
-            if (editorMode === 'view') {
-                // console.log('Editing the activity');
-                // editNode(false);
-            }
-            else {
-                editorMode = 'view';
-                // var nodeContent = CKEDITOR.instances['ckeditor_textarea'].getData();
-                // var nodeId = $('.save_edit_activity').attr('data-current-activity-id');
-                // var nodeName = $('#activity-' + nodeId).attr('data-name');
-                // saveNode(nodeId, nodeName, nodeContent);
-                // //Do the ajax to save the activity and then following command;
-                $('.save_edit_activity').html('Edit');
-            }
-        })
+        // $('.course-editor-section').on('click', '.save_edit_activity', function(){
+        //     if (editorMode === 'view') {
+        //         console.log('Editing the activity');
+        //         // editNode(false);
+        //     }
+        //     else {
+        //         editorMode = 'view';
+        //         // var nodeContent = CKEDITOR.instances['ckeditor_textarea'].getData();
+        //         // var nodeId = $('.save_edit_activity').attr('data-current-activity-id');
+        //         // var nodeName = $('#activity-' + nodeId).attr('data-name');
+        //         // saveNode(nodeId, nodeName, nodeContent);
+        //         // //Do the ajax to save the activity and then following command;
+        //         $('.save_edit_activity').html('Edit');
+        //     }
+        // })
 
         function change_order_api(node_to_up, node_to_down, parent_id){
             var success_state = false
