@@ -11,14 +11,6 @@
                 <dl class="accordion course-lessons" data-accordion role="tablist">
                 </dl>
                 <a class="button-hollow-grey add-lesson" data-reveal-id="add-lesson-reveal">Add Lesson</a>
-                <!-- overlay/reveal to add lesson -->
-                <div id="add-lesson-reveal" class="reveal-modal" data-reveal aria-labelledby="modalTitle" aria-hidden="true" role="dialog">
-                    <h3>Lesson Name</h3>
-                    <input type="text" id="lesson-name">
-                    <button type="button" class="button-hollow-grey save-lesson"> Save Lesson </button>
-                    <a class="close-reveal-modal" aria-label="Close">&#215;</a>
-                </div>
-                <!-- END of overlay/reveal to add lesson -->
             </div>
             <!-- END of LEFT PANEL -->
 
@@ -245,7 +237,7 @@ APP
     </div>
 </div>
 
-OVERLAY div for adding activity
+OVERLAY div's for adding activity
 This will not be used because now only existing activities will be added.
 <div id="add-activity-modal" class="reveal-modal" data-reveal aria-labelledby="modalTitle" aria-hidden="true" role="dialog">
     <h3>Activity Name</h3>
@@ -265,12 +257,23 @@ This will not be used because now only existing activities will be added.
 </div>
 -->
 
+<!-- overlay/reveal to add lesson -->
+<div id="add-lesson-reveal" class="reveal-modal" data-reveal aria-labelledby="modalTitle" aria-hidden="true" role="dialog">
+    <h3>Lesson Name</h3>
+    <input type="text" id="lesson-name">
+    <button type="button" class="button-hollow-grey save-lesson" data-node-id=""> Save Lesson </button>
+    <a class="close-reveal-modal" aria-label="Close">&#215;</a>
+</div>
+<!-- END of overlay/reveal to add lesson -->
+
+
 <div id="select-activity-page" class="reveal-modal" data-reveal aria-labelledby="modalTitle" aria-hidden="true" role="dialog" data-lesson-id="">
     <h3>Choose Activity Page</h3>
     <div id="activity-container"></div>
     <a class="close-reveal-modal" aria-label="Close">&#215;</a>
 </div>
 
+<!-- END of OVERLAY div's for adding activity -->
 <!-- END of all modals div's -->
 
 
@@ -279,14 +282,14 @@ This will not be used because now only existing activities will be added.
 <!-- Handlebar Templates for the course tree -->
 <script id="lesson-template" type="text/x-handlebars-template">
     <dd class="accordion-navigation active">
-        <a href="#lesson-{{id}}" class="entity-title" id="lesson-accordion">
+        <a href="#lesson-{{id}}" class="entity-title" id="lesson-accordion" data_lesson_name="{{name}}">
             {{name}}
             <div class="right edit_entity">
                 <i class="fi-list right"></i>
                 <ul class="entity_actions">
                     <li class="lesson_move_up">Move up</li>
                     <li class="lesson_move_down">Move down</li>
-                    <!-- <li class="lesson_edit">Edit</li> -->
+                    <li class="lesson_edit">Edit</li>
                     <li class="lesson_delete">Delete</li>
                 </ul>
             </div>
@@ -411,6 +414,7 @@ This will not be used because now only existing activities will be added.
             e.stopPropagation();
             e.preventDefault();
             var lesson_id = $(this).closest('a').attr('href').replace('#lesson-', '');
+            var lesson_name = $(this).closest('a').attr('data_lesson_name');
 
             selectedEntity = 'lesson';
             selectedEntityid = lesson_id;
@@ -425,6 +429,10 @@ This will not be used because now only existing activities will be added.
 
             //Ajax to get data for activity
             console.log("editing lesson: " + lesson_id);
+            $('.save-lesson').attr('data-node-id', lesson_id);
+            $('#lesson-name').val(lesson_name);
+            $('#add-lesson-reveal').foundation('reveal', 'open');
+            // addLesson(node_id, name)
         });
 
 
@@ -532,12 +540,12 @@ This will not be used because now only existing activities will be added.
         });
 
 
-        function addLesson(unitName, unitId) {
+        function addLesson(lessonName, lessonId) {
           /*
           addLesson()
           - to add lesson of unit.
           */
-          if (!unitName) {
+          if (!lessonName) {
             alert('Name can not be empty. Please provide one.');
             return;
           };
@@ -546,7 +554,8 @@ This will not be used because now only existing activities will be added.
               type: "POST",
               data:{
                   'csrfmiddlewaretoken': "{{csrf_token}}",
-                  "name": unitName,
+                  "name": lessonName,
+                  "lesson_id": lessonId,
                   "unit_id": "{{unit_obj.pk}}"
               },
               url: "{% url 'lesson_create_edit' group_id %}",
@@ -576,7 +585,8 @@ This will not be used because now only existing activities will be added.
         //Add a lesson
         $('.save-lesson').on('click', function(){
             // console.log('Adding another lessson');
-            addLesson($('#lesson-name').val().trim(), 'unitId')
+            var node_id = $('.save-lesson').attr('data-node-id');
+            addLesson($('#lesson-name').val().trim(), node_id)
 
             //Send the query and update the course_data and call 'renderCourseTree(course_data)'
             //To edit the newly created lesson run this $('a[href="#lesson-'+newid+'"] .edit_lesson').trigger('click');
@@ -738,8 +748,9 @@ This will not be used because now only existing activities will be added.
           getActivityPages();
         });
 
-        $(document).on('open.fndtn.reveal', '#add-lesson-reveal', function () {
-            $("#lesson-name").val('')
+        $(document).on('closed.fndtn.reveal', '#add-lesson-reveal', function () {
+            $("#lesson-name").val('');
+            $('.save-lesson').attr('data-node-id', '');
         });
         // END of foundation reveal modal events handling
 

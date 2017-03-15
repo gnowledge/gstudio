@@ -155,6 +155,7 @@ def lesson_create_edit(request, group_id, unit_group_id=None):
     # parent_group_name, parent_group_id = Group.get_group_name_id(group_id)
 
     # parent unit id
+    lesson_id = request.POST.get('lesson_id', None)
     unit_id_post = request.POST.get('unit_id', '')
     unit_group_id = unit_id_post if unit_id_post else unit_group_id
     # getting parent unit object
@@ -177,6 +178,14 @@ def lesson_create_edit(request, group_id, unit_group_id=None):
             msg = u'Activity with same name exists in lesson: ' + unit_group_obj.name
             result_dict = {'success': 0, 'unit_hierarchy': [], 'msg': msg}
             # return HttpResponse(0)
+        elif lesson_id and ObjectId.is_valid(lesson_id):
+            lesson_obj = Node.get_node_by_id(lesson_id)
+            if (lesson_obj.name != lesson_name):
+                lesson_obj.name = lesson_name
+                lesson_obj.save(group_id=group_id)
+            unit_structure = _get_unit_hierarchy(unit_group_obj)
+            msg = u'Lesson name updated.'
+            result_dict = {'success': 1, 'unit_hierarchy': unit_structure, 'msg': str(lesson_obj._id)}
         else:
             user_id = request.user.id
             new_lesson_obj = node_collection.collection.GSystem()
