@@ -22,7 +22,26 @@ a:hover + .box,.box:hover{
 
 {% endblock %}
 {% block body_content %} 
- 	<ul class="small-block-grid-1 medium-block-grid-3 large-block-grid-3" >
+<div class="row"> 
+    {% for each in templates_cur %}
+        <a class="view-page" data-page-id="{{each.pk}}" data-node-name="{{each.name}}" title="{{each.name}}">
+            <div class="small-12 medium-6 large-2 columns">
+                <div class="template_tile">
+                    <div class="template_preview">
+                        
+                        <img src="/static/ndf/images/template-icon.png">
+                        
+                    </div>
+                    <div class="template_text">
+                        <div class="template_title" title="{{each.name}}">{{each.name|truncatechars:20}}</div>
+                       <!--  <div class="template_desc">{{each.content|striptags|truncatechars:35}}</div> -->
+                    </div>
+                </div>
+            </div>
+        </a>
+    {% endfor %}
+</div>
+ 	<!-- <ul class="small-block-grid-1 medium-block-grid-3 large-block-grid-3" >
     {% for each in templates_cur %}
 
     <li class="template-list">
@@ -32,7 +51,7 @@ a:hover + .box,.box:hover{
 
     </li>
     {% endfor %}
-  </ul>
+  </ul> -->
 {% endblock %}
 
 <script type="text/javascript">

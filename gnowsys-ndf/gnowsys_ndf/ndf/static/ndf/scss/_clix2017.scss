@@ -884,6 +884,50 @@ ul.horizontal_tabs_gstudio {
 }
 
 
+.template_tile {
+    margin-top: 10px;
+    padding-bottom: 10px;
+    cursor: pointer;
+    //height:7rem;
+    //margin-left: 3px;
+    //height:260px;
+   // border: 1px solid $primary-blue;
+    .template_preview {
+        height: 85px;
+        //margin-left: 5px;
+        width:100%;
+        //background-color: #eee;
+        //background: url(/static/ndf/images/asset_thumbnail.png)no-repeat;
+       // border-width: 0px;
+        img{
+            width:100%;
+        }
+    }
+
+    .template_text {
+        padding: 7px 0px 0px 0px;
+        .template_title {
+            letter-spacing: 0.2px;
+            overflow: hidden;
+            font-size: 13px;
+            color:$primary-blue;
+            padding-top: 10px;
+            padding-left: 6px;
+        
+        }
+        .template_desc {
+            // //font-size: 13px;
+            letter-spacing: 0.3px;
+            overflow: hidden;
+            padding-left: 6px;
+            font-size: 11px;
+            color: grey;
+        }
+    }
+}
+
+
+
 
 .preview_asset {
     background: #ccc;
