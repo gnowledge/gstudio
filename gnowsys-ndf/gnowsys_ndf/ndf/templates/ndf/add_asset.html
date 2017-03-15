@@ -22,7 +22,7 @@
             <div class="small-12 medium-6 large-6 columns">
                 <label>
                     {% if edit or not asset_obj %}
-                       Asset name
+                       Asset name *
                        <input type="text" placeholder="" class="required" id = "asset-name" name="asset_name" value="{% if asset_obj %} {{asset_obj.name}}{% endif %}"/>
                     {% endif %}
 
@@ -35,7 +35,7 @@
                     {% if not edit and asset_obj %}
                        <i><p style="color: gray">{{asset_obj.content}} </p></i>
                     {% else %}
-                        Asset description
+                        Asset description *
                 </label>
                         <textarea rows="4" cols="2" class="small-12 columns" placeholder="Enter Description" id="asset-descid" value=''>{% if asset_obj %} {{asset_obj.content}}{% endif %}</textarea>
                     {% endif %}
@@ -71,33 +71,35 @@
            <!-- &nbsp;&nbsp;&nbsp;Add asset content-->
             {% if asset_obj.created_by == request.user.id or is_gstaff %}
             <div class="transcript_files row">
-                <button type="button"  style="display:none" class="right orange-button" id="upload_asset" onclick="save_form()">Upload Asset content</button>
-                <button type="button" class="right blue-white-button delete-asset-content">Delete Files</button>
+
+            <div class="small-8 columns">
                 <form class="dropzone" id ="docPost" enctype="multipart/form-data" method="post" action="{% url 'add_assetcontent' group_id %}" >
-                    <input type="file" id="docFile" style="width:50%" placeholder="" name=""/>
+                    <input type="file" id="docFile" class="asset_content_upload" placeholder="" name=""/>
                 </form>
+            </div>
+
             </div>
 
         </div>
 
         <div class="name-desc-asset-cont-area" style="display: none">
-        <div class="row">
-        <div class="small-12 medium-6 large-6 columns">
-        <label>
-        Asset Content Name
-
-            <input type="text" placeholder="Enter Asset Content's name" class="required" id = "asset_content_name" name="" />
-        </label>
-        </div>
-        </div>
-        <div class="row">
-        <div class="small-12 medium-6 large-6 columns">
-        <label> Asset Content Description<br/>
-            <textarea rows="4" cols="2" class="small-12 columns" placeholder="Enter Asset Content's Description" id="asset_content_desc"></textarea>
-        </label>
-        </div>
-        </div>
             <div class="row">
+                <div class="small-8 medium-6 large-6 columns">
+                    <label>Asset Content Name *
+                        <input type="text" placeholder="Enter Asset Content's name" class="required" id = "asset_content_name" name="" />
+                    </label>
+                </div>
+            </div>
+            <div class="row">
+                <div class="small-8 medium-6 large-6 columns">
+                <label> Asset Content Description *<br/>
+                    <textarea rows="4" cols="2" class="small-12 columns" placeholder="Enter Asset Content's Description" id="asset_content_desc"></textarea>
+                </label>
+                </div>
+                <div class="small-4 columns">
+                    <button type="button" class="orange-button hide" id="upload_asset" onclick="save_form()">Upload File</button>
+                </div>
+
 
             </div>
         </div>
@@ -106,8 +108,12 @@
         <input type="hidden" class ="asset_obj_val" name="asset_obj_name" data-asset-obj-val="">
 
         {% endif %}
-       {% if asset_obj.created_by == request.user.id or is_gstaff %}
-        {% endif %}
+        <div class="row">
+            <button type="button" class="orange-button delete-asset-content right" title="Click on the checkbox on the files below to Delete">Delete Files</button>
+        </div>
+
+
+        <div class="row">
         {% for each in asset_content_list.grel_node %}
             <div class="small-12 medium-6 large-3 columns">
 
@@ -134,10 +140,9 @@
                 </div>
             </div>
         {% endfor %}
-    </div>
-
+        </div>
+        </div>
         <hr />
-
         <div class="row">
           {% if node %}
            &nbsp; {% include "ndf/asset_content_detail.html" with node=node %}
@@ -164,7 +169,7 @@
 
     $("#docFile").change(function(){
         $(".name-desc-asset-cont-area").css('display','block')
-        $("#upload_asset").css('display','block')
+        $("#upload_asset").removeClass("hide")
     });
 
     $(".delete-asset-content").click(function(){
