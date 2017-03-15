@@ -40,8 +40,8 @@
                             <input type="hidden" name="context_name" value="{{title}}">
                         </form>
                     </div>
-
     {% endcomment %}
+
     
       <i class="fi-info"></i>You can record audio for max 30 seconds.!<br>
     
@@ -64,18 +64,25 @@
     </div>
 
     <div id="audios-container"></div>
-    <div>
-     <ul class="small-block-grid-1 medium-block-grid-3 large-block-grid-3" >
+    <div class="row">
     {% for each in audioCollection %}
-    
-    <li class="card-audio-wrapper">
+
+        <div class="audio_tile">
+          <div class="audio_preview">
             <audio  controls loop  src="{{MEDIA_URL}}{{each.if_file.original.relurl}}" > </audio>
             <figcaption title="{{each.name}}" class="audio-caption" data-audio-id="{{each.pk}}" src="{{MEDIA_URL}}{{each.if_file.original.relurl}}" data-audio-src="{{MEDIA_URL}}{{each.if_file.original.relurl}}">{{each.name|truncatechars:15}}</figcaption>
-    
-    </li>
+          </div>
+        </div>
     {% endfor %}
-  </ul>
     </div>
+<!--
+     <ul class="small-block-grid-1 medium-block-grid-3 large-block-grid-3" >
+     <li class="card-audio-wrapper">
+            <audio  controls loop  src="{{MEDIA_URL}}{{each.if_file.original.relurl}}" > </audio>
+            <figcaption title="{{each.name}}" class="audio-caption" data-audio-id="{{each.pk}}" src="{{MEDIA_URL}}{{each.if_file.original.relurl}}" data-audio-src="{{MEDIA_URL}}{{each.if_file.original.relurl}}">{{each.name|truncatechars:15}}</figcaption>
+    </li>
+  </ul>
+ -->   
 
     <script>
 

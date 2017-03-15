@@ -883,6 +883,30 @@ ul.horizontal_tabs_gstudio {
     }
 }
 
+.audio_tile {
+    display: inline-block;
+    margin-top: 10px;
+    padding-bottom: 10px;
+    cursor: pointer;
+    height:75px;
+    border: 1px solid $primary-blue;
+    width: 270px;
+    margin-right: 15px;
+    .audio_preview {
+        audio{
+            width: 100%;
+        }
+    }
+
+    &:hover {
+        border-width: 2px 2px 5px 2px;
+        border-style: solid;
+        border-color:  $primary-orange;
+    }
+
+
+}
+
 
 .template_tile {
     margin-top: 10px;
