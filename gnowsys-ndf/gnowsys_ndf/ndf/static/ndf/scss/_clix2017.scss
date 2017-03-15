@@ -909,23 +909,26 @@ ul.horizontal_tabs_gstudio {
 
 
 .template_tile {
+    display: inline-block;
     margin-top: 10px;
     padding-bottom: 10px;
     cursor: pointer;
-    //height:7rem;
-    //margin-left: 3px;
-    //height:260px;
-   // border: 1px solid $primary-blue;
+    height: 140px;
+    border: 1px solid $primary-blue;
+    width: 100px;
+    margin-right: 15px;
+
     .template_preview {
         height: 85px;
-        //margin-left: 5px;
         width:100%;
-        //background-color: #eee;
-        //background: url(/static/ndf/images/asset_thumbnail.png)no-repeat;
-       // border-width: 0px;
         img{
             width:100%;
         }
+    }
+    &:hover {
+        border-width: 2px 2px 5px 2px;
+        border-style: solid;
+        border-color:  $primary-orange;
     }
 
     .template_text {
@@ -933,7 +936,7 @@ ul.horizontal_tabs_gstudio {
         .template_title {
             letter-spacing: 0.2px;
             overflow: hidden;
-            font-size: 13px;
+            font-size: 14px;
             color:$primary-blue;
             padding-top: 10px;
             padding-left: 6px;
