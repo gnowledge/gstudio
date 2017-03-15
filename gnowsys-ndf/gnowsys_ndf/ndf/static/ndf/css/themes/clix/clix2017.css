@@ -1026,7 +1026,7 @@ input[type="button"] {
   border: 1px solid #ce7869;
   font-size: 12px;
   font-family: "Rubik-Medium", serif;
-  border-radius: 5px;
+  border-radius: 5px !important;
   margin-right: 20px;
   margin-bottom: 8px;
   margin-top: 8px;
