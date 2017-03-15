@@ -370,7 +370,12 @@ def create_edit_page(request, group_id, node_id=None):
 
         if ce_id or res or program_res:
             url_name = "/" + group_name + "/" + str(page_node._id)
-            if ce_id:
+            if ce_id and blog_type:
+                if 'base_unit' in group_obj.member_of_names_list:
+                    return HttpResponseRedirect(reverse('course_notebook_tab_note',
+                      kwargs={'group_id': group_id, 'tab': 'my-notes',
+                              "notebook_id": page_node._id }))
+
                 # url_name = "/" + group_name + "/#journal-tab"
                 url_name = "/" + group_name
             if res or program_res:

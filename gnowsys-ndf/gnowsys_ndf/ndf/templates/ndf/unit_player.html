@@ -183,7 +183,7 @@
           type: "GET",
 
           data: {
-            node_id: {{node.pk}}
+            node_id: "{{node.pk}}"
           },
           dataType: "html",
 
@@ -206,7 +206,7 @@
 
           data: {
             content_val: content_val,
-            node_id: {{node.pk}},
+            node_id: "{{node.pk}}",
             'csrfmiddlewaretoken': "{{csrf_token}}"
           },
 
@@ -216,7 +216,7 @@
 
           success: function(data){
             $(".node_details").html(data);
-            $(".save_res_unit").text("Edit")
+            $(".save_res_unit").text("Edit Content")
                           .addClass("edit_res_unit")
                           .removeClass("save_res_unit")
           },
