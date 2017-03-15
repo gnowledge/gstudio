@@ -12,7 +12,7 @@
     </div>
 
   <div class="right small-12 medium-6 columns">
-      <h6><u>Asset Content Preview </u>&nbsp; ></b>
+      <h6> <b>Asset Content Preview&nbsp;></b>
             </h6>
                 <label>Resource name: <b> {{node.name}} </b>
                     
@@ -21,7 +21,7 @@
           {% if asset_obj.created_by == request.user.id or is_gstaff %}
             {% if 'video' in node.if_file.mime_type or 'audio' in node.if_file.mime_type %}
             <div class="video-related">
-                <label>Upload Transcript</label>
+                <label><u>Upload Transcript</u></label>
                 <div class="transcript_files">
                    <form class="dropzone" id ="doctranscript" enctype="multipart/form-data" method="post" action="{% url 'add_assetcontent' group_id %}" > 
                     <input class="trans-sub" type="file" placeholder="" id="doctranscriptfile" name="transcript_file" />
@@ -35,14 +35,14 @@
 
             {% if 'video' in node.if_file.mime_type %}
                 <div class="subtitle_files">
-                  <label>Upload Subtitle</label>
+                  <label><u>Upload Subtitle</u></label>
                     <form class="dropzone" id ="docsubtitle" enctype="multipart/form-data" method="post" action="{% url 'add_assetcontent' group_id %}" >
                         <input class="trans-sub" type="file" id="docsubtitlefile" placeholder="" name="doc_f" />
                         <br>
                     </form>
                 </div>
 
-                        <label>Language</label>
+                        <label><u>Language</u></label>
                           <select  style="display: none;" class="select-language" name="lan" id="sub_languageid" tabindex=3 >
                             <option value="">--- Select Language ---</option>
                             {% get_language_info_list for LANGUAGES as languages %}

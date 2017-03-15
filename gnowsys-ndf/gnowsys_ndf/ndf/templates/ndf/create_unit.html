@@ -82,17 +82,28 @@
                         {% include "ndf/html_editor.html" with var_name="content" var_placeholder="Enter the content here" var_value=unit_node.content|default_if_none:"" node_id=unit_node.pk ckeditor_toolbar="GeneralToolbar" %}
                     </div>
                 </div>
+            </form>
+        </div>
 
-                <div class="right course_actions">
+
                     
                         <!--<button asset-save-button type="button" class ="right orange-button save-asset" id="" value="Save"/>-->
                        <!-- <li><input type="submit" name="save" value="Save" class="save-unit"></li>-->
-                       <input type="submit" class ="asset-save-button" id="save_unit" value="Save"/>
-                    
-                </div>
-            </form>
-        </div>
+    <div class="row">
+       <button type="button" class ="right asset-unit-button" id="save_unit">Save</button>
     </div>
+
+</div>
+
+                       
+                    
+        
+
+
+
+
+
+   
     <script type="text/javascript">
     {% if not unit_node %}
         var group_names_list = {{all_groups_names|safe}}

@@ -35,7 +35,7 @@ CKEDITOR.plugins.add('addJhapp',
                             $("#insert_ost").click(function(event){
                             //ost_text_gallery = $('#paste-ost-gallery').val();
                             //ost_text_file = $('#paste-ost-captions').val();
-                            ost_text_val = "<iframe src='/ost/' style='height:100%;width:100%'></iframe>"
+                            ost_text_val = "<iframe src='/openstorytool/' style='height:100%;width:100%'></iframe>"
                             // split_word = ost_text_val.slice(0, 18) + "gallery=" + ost_text_gallery + "&amp;file=/ost/" + ost_text_file+"'"+ ost_text_val.slice(18);
                             // alert(split_word)
                              CKEDITOR.instances[textAreaId].insertHtml(ost_text_val);
@@ -66,6 +66,16 @@ CKEDITOR.plugins.add('addJhapp',
                             // split_word = ost_text_val.slice(0, 18) + "gallery=" + ost_text_gallery + "&amp;file=/ost/" + ost_text_file+"'"+ ost_text_val.slice(18);
                             // alert(split_word)
                              CKEDITOR.instances[textAreaId].insertHtml(tjs_text_val);
+                            $('#group_imgs_on_modal').foundation('reveal', 'close');
+                          });
+
+                            $("#insert_earth_rotation").click(function(event){
+                            //ost_text_gallery = $('#paste-ost-gallery').val();
+                            //ost_text_file = $('#paste-ost-captions').val();
+                            ert_text_val = "<iframe src='/rotation/' style='height:100%;width:100%'></iframe>"
+                            // split_word = ost_text_val.slice(0, 18) + "gallery=" + ost_text_gallery + "&amp;file=/ost/" + ost_text_file+"'"+ ost_text_val.slice(18);
+                            // alert(split_word)
+                             CKEDITOR.instances[textAreaId].insertHtml(ert_text_val);
                             $('#group_imgs_on_modal').foundation('reveal', 'close');
                           });
 
