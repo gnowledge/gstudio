@@ -620,7 +620,7 @@
 #toggler07 ~ .transcript,
 #toggler08 ~ .transcript,
 #toggler09 ~ .transcript  {
-  height: 0;
+  height: 100%;
   padding: 0 0 10px !important;
   border-bottom: 2px solid #ddd;
   opacity: 0;
