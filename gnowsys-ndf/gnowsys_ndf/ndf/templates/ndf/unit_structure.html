@@ -501,12 +501,13 @@ This will not be used because now only existing activities will be added.
               },
               url: "{% url 'remove_from_nodelist' group_id %}",
               // datatype: "",
+              async: true,
               success: function(data) {
                   // console.log(typeof(data));
                   data = JSON.parse(data);
                   // console.log(data);
                   if(data){
-                    $el_to_remove.remove()
+                    $el_to_remove.remove();
                   }
                   else{
                       return false;
@@ -520,6 +521,7 @@ This will not be used because now only existing activities will be added.
             lesson_id = $(this).parents('div.lesson-container')
                             .attr('id').replace('lesson-', '');
             $current = $(this).parents('li');
+            $current.remove();
             var curr_act_id = $current.attr('id').replace('activity-', '');
             var return_status = removeFromCollectionSet(lesson_id, curr_act_id, $current);
             // NEED TO DO:
@@ -623,7 +625,11 @@ This will not be used because now only existing activities will be added.
         $('.course-lessons').on('click', '.course-activities>li:not(:last-child) a', function(e){
             e.preventDefault();
 
+            if(!document.getElementById($(this).parent().attr('id'))){
+                return 1;
+            }
             $('.course-lessons li[id^="activity-"]').removeClass('active');
+
             $(this).closest('li').addClass('active');
             // e.g: activity-58bbaf0a5e35e40049f128ee
             var activity_id = $(this).closest('li').attr('id').replace('activity-', '');
