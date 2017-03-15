@@ -1070,10 +1070,11 @@ input[type="button"] {
     border: 1px solid #ce7869;
     font-size: 12px;
     font-family: "Rubik-Medium", serif;
-    border-radius: 4px;
+    border-radius: 5px;
     margin-right: 20px;
     margin-bottom: 8px;
     margin-top: 8px;
+    cursor: pointer;
     &:hover{
         background-color:rgba(206,120,105,0.2);
         color: $primary-orange;
@@ -1120,20 +1121,14 @@ input[type="button"] {
 .asset-unit-button {
     color: $primary-orange;
     padding: 7px 14px;
-    border-radius: 8px;
     background:#fff ;
     border: 1px solid #ce7869;
     font-size: 12px;
     font-family: "Rubik-Medium", serif;
+    border-radius: 4px;
     margin-right: 30px;
     margin-bottom: 8px;
     margin-top: 300px;
-    outline: none;
-    white-space: nowrap;
-    -webkit-user-select: none;
-    cursor: pointer;
-    font-weight: 500;
-    float: right;
     &:hover{
         background-color:rgba(206,120,105,0.2);
         color: $primary-orange;
