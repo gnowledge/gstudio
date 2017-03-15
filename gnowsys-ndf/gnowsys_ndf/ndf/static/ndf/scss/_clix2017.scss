@@ -896,6 +896,9 @@ ul.horizontal_tabs_gstudio {
         audio{
             width: 100%;
         }
+        figcaption {
+            margin-left: 5px;
+        }
     }
 
     &:hover {
@@ -2857,3 +2860,11 @@ ul.jqtree-tree .jqtree-toggler {
     background-color: transparent;
     border: none;
   }
+
+.asset_content_upload{
+    width: 100% !important;
+}
+
+#upload_asset{
+    margin-top: 60px !important;
+}
