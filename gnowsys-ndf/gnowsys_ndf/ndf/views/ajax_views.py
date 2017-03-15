@@ -6771,4 +6771,4 @@ def delete_asset(request, group_id):
       if node_by_id:
         del_status  = delete_node(node_id=node_by_id._id, deletion_type=1)
         print '\nDeleted Node',del_status
-    return HttpResponse('success');
+    return HttpResponse('success')
