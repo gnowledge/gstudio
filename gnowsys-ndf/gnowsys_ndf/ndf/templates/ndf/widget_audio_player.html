@@ -6,6 +6,7 @@
 	 <audio controls="" width="100px" id="audio-player-{{audio_obj.pk}}">
 	 <source src="{{MEDIA_URL}}{{audio_obj.if_file.original.relurl}}" type="audio/mp3"/>
 	 </audio>
+</div>
  	<!-- Transcript -->
     {% get_relation_value audio_obj.pk 'has_transcript' as transcript_rel %}
 	{% if transcript_rel %}
@@ -19,5 +20,4 @@
 		</div>
 	</form>
 	{% endif %}
-</div>
 	{% endif %}
