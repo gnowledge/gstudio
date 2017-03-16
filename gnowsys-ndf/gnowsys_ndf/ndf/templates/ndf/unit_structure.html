@@ -290,7 +290,7 @@ This will not be used because now only existing activities will be added.
                     <li class="lesson_move_up">Move up</li>
                     <li class="lesson_move_down">Move down</li>
                     <li class="lesson_edit">Edit</li>
-                    <!-- <li class="lesson_delete">Delete</li> -->
+                    <li class="lesson_delete">Delete</li>
                 </ul>
             </div>
         </a>
@@ -516,6 +516,29 @@ This will not be used because now only existing activities will be added.
           });
         }
 
+
+        function deleteNode(node_to_delete, $el_to_remove, deletion_type=0){
+          $.ajax({
+              type: "POST",
+              data:{
+                  'csrfmiddlewaretoken': "{{csrf_token}}",
+                  "node_to_delete": node_to_delete,
+                  "deletion_type": deletion_type,
+              },
+              url: "{% url 'ajax_delete_node' group_id %}",
+              success: function(data) {
+                  // console.log(typeof(data));
+                  // console.log(data);
+                  data_list = JSON.parse(data);
+                  if(data_list[0]){
+                    $el_to_remove.remove();
+                  }
+                  alert(data_list[1])
+              }
+          });
+
+        }
+
         // remove activity
         $('.course-lessons').on('click', '.activity_remove' ,function(e){
             lesson_id = $(this).parents('div.lesson-container')
@@ -535,10 +558,17 @@ This will not be used because now only existing activities will be added.
             e.preventDefault();
 
             var lesson_id = $(this).closest('a').attr('href').replace('#lesson-', '');
-
-            //Ajax to delete the lesson.
+            var activitiesLength = $(this).closest('a').parent('dd.accordion-navigation').find('ul.course-activities').children().length;
+            if(activitiesLength > 1){
+                alert('You have to remove ' + String(activitiesLength - 1) + ' activities first which are falling under this lesson!');
+            }
+            else if(activitiesLength == 1){
+                var node_to_delete = lesson_id;
+                deleteNode(node_to_delete, $(this, delete_mode=0).closest('a').parent('dd.accordion-navigation'), deletion_type=1);
+            }
+            // Ajax to delete the lesson.
             console.log('Ajax call to delete an activity. ' + lesson_id);
-            //Update the course_data after successful delete and call rerender.
+            // Update the course_data after successful delete and call rerender.
         });
 
 
