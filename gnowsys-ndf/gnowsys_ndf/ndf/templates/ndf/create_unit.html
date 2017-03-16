@@ -1,7 +1,6 @@
 {% extends "ndf/gbase.html" %}
 {% load get_metadata_values get_attribute_value from ndf_tags %}
 
-
 {% block title %} {{title}} {% endblock %}
 {% block body_content %}
     <div class="row create_unit">
@@ -82,29 +81,15 @@
                         {% include "ndf/html_editor.html" with var_name="content" var_placeholder="Enter the content here" var_value=unit_node.content|default_if_none:"" node_id=unit_node.pk ckeditor_toolbar="GeneralToolbar" %}
                     </div>
                 </div>
+                <div class="row">
+                    {% comment %}
+                        <button type="button" class ="right asset-unit-button" id="save_unit">Save</button>
+                    {% endcomment %}
+                    <input type="submit" class ="asset-unit-button" id="save_unit" value="Save"/>
+                </div>
             </form>
         </div>
-
-
-                    
-                        <!--<button asset-save-button type="button" class ="right orange-button save-asset" id="" value="Save"/>-->
-                       <!-- <li><input type="submit" name="save" value="Save" class="save-unit"></li>-->
-    <div class="row">
-        
-        <input type="submit" class ="asset-unit-button" id="save_unit" value="Save"/>
     </div>
-
-</div>
-
-                       
-                    
-        
-
-
-
-
-
-   
     <script type="text/javascript">
     {% if not unit_node %}
         var group_names_list = {{all_groups_names|safe}}
@@ -119,18 +104,6 @@
             }
         })
     {% endif %}
-
-    // $("select#educationalsubject").change(function() {
-    //     selected_educationalsubject_index = this.selectedIndex
-    //     if (selected_educationalsubject_index != 0) {
-    //     }
-    // }) 
-
-    // $("select#educationallevel").change(function() {
-    //     selected_educationallevel_index = this.selectedIndex
-    //     if (selected_educationallevel_index != 0) {
-    //     }
-    // }) 
     </script>
 {% endblock %}
 
