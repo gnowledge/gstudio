@@ -126,6 +126,12 @@ def remove_from_nodelist(request, group_id):
     return HttpResponse(result)
 
 
+@login_required
+def ajax_delete_node(request, group_id):
+    node_to_delete = request.POST.get('node_to_delete', None)
+    deletion_type = eval(request.POST.get('deletion_type', 0))
+    return HttpResponse(json.dumps(delete_node(node_id=node_to_delete, deletion_type=deletion_type)))
+
 
 def checkgroup(request, group_name):
     titl = request.GET.get("gname", "")
