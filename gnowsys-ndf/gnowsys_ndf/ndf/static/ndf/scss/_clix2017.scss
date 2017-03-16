@@ -1083,6 +1083,10 @@ input[type="button"] {
     margin-left: 24px;
 }
 
+#asset_content_desc, #asset_content_name{
+    color: black !important;
+    font-size: 13px; 
+}
 
 /*  Buttons custom css */
 .button-hollow-white {    background: inherit;
