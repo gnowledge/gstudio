@@ -834,7 +834,7 @@ ul.horizontal_tabs_gstudio {
     .group_sections_content {
         min-height: 400px;
         background-color: #fff;
-        
+        margin-bottom: 100px;
     }
 }
 
@@ -2261,7 +2261,8 @@ ul.jqtree-tree .jqtree-toggler {
         height: 100%;
     }
     .course_editor {
-        height: 80vh;
+        // height: 80vh;
+        margin-bottom: 10px;
         position: relative;
 
         /*Overriding default*/
@@ -2874,3 +2875,4 @@ ul.jqtree-tree .jqtree-toggler {
     height: 40px;
     margin-right: 5px;
 }
+
