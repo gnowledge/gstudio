@@ -19,6 +19,8 @@ from django.contrib.sessions.models import Session
 from django.db import models
 from django.http import HttpRequest
 from celery import task
+from django.template.defaultfilters import slugify
+from django.core.cache import cache
 
 from django_mongokit import connection
 from django_mongokit import get_database
@@ -615,6 +617,61 @@ class Node(DjangoDocument):
         return type_of_names
 
 
+    @staticmethod
+    def get_name_id_from_type(node_name_or_id, node_type, get_obj=False):
+        if not get_obj:
+            # if cached result exists return it
+
+            slug = slugify(node_name_or_id)
+            cache_key = node_type + '_name_id' + str(slug)
+            cache_result = cache.get(cache_key)
+
+            if cache_result:
+                # todo:  return OID after casting
+                return cache_result
+            # ---------------------------------
+
+        node_id = ObjectId(node_name_or_id) if ObjectId.is_valid(node_name_or_id) else None
+        node_obj = node_collection.one({
+                                        "_type": {"$in": [
+                                                # "GSystemType",
+                                                # "MetaType",
+                                                # "RelationType",
+                                                # "AttributeType",
+                                                # "Group",
+                                                # "Author",
+                                                node_type
+                                            ]},
+                                        "$or":[
+                                            {"_id": node_id},
+                                            {"name": unicode(node_name_or_id)}
+                                        ]
+                                    })
+
+        if node_obj:
+            node_name = node_obj.name
+            node_id = node_obj._id
+
+            # setting cache with ObjectId
+            cache_key = node_type + '_name_id' + str(slugify(node_id))
+            cache.set(cache_key, (node_name, node_id), 60 * 60)
+
+            # setting cache with node_name
+            cache_key = node_type + '_name_id' + str(slugify(node_name))
+            cache.set(cache_key, (node_name, node_id), 60 * 60)
+
+            if get_obj:
+                return node_obj
+            else:
+                return node_name, node_id
+
+        if get_obj:
+            return None
+        else:
+            return None, None
+
+
+
     ########## Setter(@x.setter) & Getter(@property) ##########
     @property
     def member_of_names_list(self):
@@ -1180,6 +1237,12 @@ class Node(DjangoDocument):
 
         return possible_relations
 
+
+    def get_relation(self, relation_type_name):
+        rt_name, rt_id = Node.get_name_id_from_type('translation_of', 'RelationType')
+        list_grelations = triple_collection.find(
+            {"_type": "GRelation", "subject": self._id, "relation_type": rt_id})
+
     def get_neighbourhood(self, member_of):
         """Attaches attributes and relations of the node to itself;
         i.e. key's types to it's structure and key's values to itself
@@ -1527,6 +1590,7 @@ class RelationType(Node):
         return rel_dict
 
 
+
 @connection.register
 class MetaType(Node):
     """MetaType class: Its members are any of GSystemType, AttributeType,
@@ -1579,32 +1643,9 @@ class GSystemType(Node):
     use_autorefs = True                         # To support Embedding of Documents
 
 
-    # @staticmethod
-    # def get_id_from_name(gst_name):
-    #     from django.template.defaultfilters import slugify
-    #     from django.core.cache import cache
-
-    #     slug = slugify(gst_name)
-    #     cache_key = 'gst_name_' + str(gst_name) if slug else str(abs(hash(gst_name)))
-    #     cache_result = cache.get(cache_key)
-
-    #     if cache_result:
-    #         return cache_result
-
-    #     # setting cache with both ObjectId and group_name
-    #     gst_id = node_collection.one(
-    #                                 {'_type': u'GSystemType', 'name': unicode(gst_name)},
-    #                                 {'_id': True}
-    #                             ).get('_id')
-    #     cache.set(cache_key, gst_id, 60 * 60)
-    #     return gst_id
-
     @staticmethod
     def get_gst_name_id(gst_name_or_id):
         # if cached result exists return it
-        from django.template.defaultfilters import slugify
-        from django.core.cache import cache
-
         slug = slugify(gst_name_or_id)
         cache_key = 'gst_name_id' + str(slug)
         cache_result = cache.get(cache_key)
@@ -2355,8 +2396,6 @@ class Group(GSystem):
         '''
         # if cached result exists return it
         if not get_obj:
-            from django.template.defaultfilters import slugify
-            from django.core.cache import cache
 
             slug = slugify(group_name_or_id)
             # for unicode strings like hindi-text slugify doesn't works
@@ -3206,6 +3245,26 @@ class Triple(DjangoDocument):
                       'object_scope': None
                   }
 
+  @classmethod
+  def get_triples_from_sub_type(cls, triple_type, subject_id, gt_or_rt_name_or_id):
+        triple_node_mapping_dict = {
+            'GAttribute': 'AttributeType',
+            'GRelation': 'RelationType'
+        }
+        triple_class_field_mapping_dict = {
+            'GAttribute': 'attribute_type',
+            'GRelation': 'relation_type'
+        }
+        gr_or_rt_name, gr_or_rt_id = Node.get_name_id_from_type(gt_or_rt_name_or_id,
+            triple_node_mapping_dict[triple_type])
+        print gr_or_rt_name, gr_or_rt_id
+
+        return triple_collection.find({
+                                        '_type': triple_type,
+                                        'subject': ObjectId(subject_id),
+                                        triple_class_field_mapping_dict[triple_type]: gr_or_rt_id
+                                        #, 'status':"PUBLISHED"
+                                    })
   ########## Built-in Functions (Overridden) ##########
   def __unicode__(self):
     return self._id
