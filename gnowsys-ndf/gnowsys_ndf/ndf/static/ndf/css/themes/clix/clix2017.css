@@ -744,7 +744,6 @@ ul.horizontal_tabs_gstudio > li.sub_group_action:hover ul {
 }
 /* line 834, ../../../scss/_clix2017.scss */
 .group_content .group_sections_content {
-  min-height: 400px;
   background-color: #fff;
   margin-bottom: 100px;
 }
