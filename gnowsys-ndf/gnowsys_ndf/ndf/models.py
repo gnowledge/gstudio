@@ -1239,9 +1239,12 @@ class Node(DjangoDocument):
 
 
     def get_relation(self, relation_type_name):
-        rt_name, rt_id = Node.get_name_id_from_type('translation_of', 'RelationType')
-        list_grelations = triple_collection.find(
-            {"_type": "GRelation", "subject": self._id, "relation_type": rt_id})
+        return GRelation.get_triples_from_sub_type(self._id, relation_type_name)
+
+
+    def get_attribute(self, attribute_type_name):
+        return GAttribute.get_triples_from_sub_type(self._id, attribute_type_name)
+
 
     def get_neighbourhood(self, member_of):
         """Attaches attributes and relations of the node to itself;
@@ -3246,7 +3249,7 @@ class Triple(DjangoDocument):
                   }
 
   @classmethod
-  def get_triples_from_sub_type(cls, triple_type, subject_id, gt_or_rt_name_or_id):
+  def get_triples_from_sub_type(cls, subject_id, gt_or_rt_name_or_id):
         triple_node_mapping_dict = {
             'GAttribute': 'AttributeType',
             'GRelation': 'RelationType'
@@ -3256,15 +3259,16 @@ class Triple(DjangoDocument):
             'GRelation': 'relation_type'
         }
         gr_or_rt_name, gr_or_rt_id = Node.get_name_id_from_type(gt_or_rt_name_or_id,
-            triple_node_mapping_dict[triple_type])
-        print gr_or_rt_name, gr_or_rt_id
+            triple_node_mapping_dict[cls._meta.verbose_name])
 
         return triple_collection.find({
-                                        '_type': triple_type,
+                                        '_type': cls._meta.verbose_name,
                                         'subject': ObjectId(subject_id),
-                                        triple_class_field_mapping_dict[triple_type]: gr_or_rt_id
+                                        triple_class_field_mapping_dict[cls._meta.verbose_name]: gr_or_rt_id
                                         #, 'status':"PUBLISHED"
                                     })
+
+
   ########## Built-in Functions (Overridden) ##########
   def __unicode__(self):
     return self._id
