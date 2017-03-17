@@ -9,6 +9,10 @@ from html import HTML
 from django.template.defaultfilters import slugify
 from gnowsys_ndf.settings import GSTUDIO_EPUBS_LOC_PATH
 from gnowsys_ndf.ndf.models import node_collection
+try:
+    from bson import ObjectId
+except ImportError:  # old pymongo
+    from pymongo.objectid import ObjectId
 
 
 oebps_files = ["Fonts", "Audio", "Images", "Videos", "Text", "Styles", "Misc"]
@@ -171,26 +175,34 @@ def parse_content(path, content_soup):
     # Fetching the files
     for each_src in all_src:
         src_attr = each_src["src"]
+        file_node = None
         if src_attr.startswith("/media"): # file
             src_attr = src_attr.split("media/")[-1]
             file_extension = src_attr.rsplit(".",1)[-1]
             file_node = node_collection.find_one({"$or": [{'if_file.original.relurl': src_attr},
                 {'if_file.mid.relurl': src_attr},{'if_file.thumbnail.relurl': src_attr}]})
-            if file_node:
-                mimetype_val = file_node.if_file.mime_type.lower()
-                # mimetype can be audio|video|image
-                # file_name = slugify(file_node.name) + "." + file_extension
-                file_name = file_node.name
-                file_loc = None
-                if "image" in mimetype_val:
-                    file_loc = "Images"
-                elif "video" in mimetype_val:
-                    file_loc = "Videos"
-                elif "audio" in mimetype_val:
-                    file_loc = "Audios"
-                each_src["src"] = (os.path.join('..',file_loc, file_name))
-                shutil.copyfile("/data/media/" + src_attr, os.path.join(oebps_path, file_loc, file_name))
-                create_update_content_file(file_name, file_loc, mimetype_val, is_non_html=True)
+
+        if "readDoc" in src_attr:
+            split_src = src_attr.split('/')
+            node_id = split_src[split_src.index('readDoc') + 1]
+            file_node = node_collection.one({'_id': ObjectId(node_id)})
+
+
+        if file_node:
+            mimetype_val = file_node.if_file.mime_type.lower()
+            # mimetype can be audio|video|image
+            # file_name = slugify(file_node.name) + "." + file_extension
+            file_name = file_node.name
+            file_loc = None
+            if "image" in mimetype_val:
+                file_loc = "Images"
+            elif "video" in mimetype_val:
+                file_loc = "Videos"
+            elif "audio" in mimetype_val:
+                file_loc = "Audios"
+            each_src["src"] = (os.path.join('..',file_loc, file_name))
+            shutil.copyfile("/data/media/" + file_node['if_file']['original']['relurl'], os.path.join(oebps_path, file_loc, file_name))
+            create_update_content_file(file_name, file_loc, mimetype_val, is_non_html=True)
 
     # ==== updating assessment iframes ==== 
 
