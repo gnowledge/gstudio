@@ -52,14 +52,14 @@
                 </div>
             </div>
             <div class="row">
-                <div class="small-12 columns group_sections">
-                    <ul class="horizontal_tabs_gstudio">
+                <div class="small-12 columns group_sections sticky">
+                    <nav data-topbar data-options="sticky_on: large" role="navigation">
+                        <ul class="title-area text-center horizontal_tabs_gstudio">
                         <li>
                             <a href="{% url 'course_about' group_id %}" {% if title == 'about' %}class="selected"{% endif %}>Overview</a>
                         </li>
                         <li >
                             <a href="{% url 'unit_detail' group_id %}" {% if title == 'unit_authoring' %}class="selected"{% endif %}>Lessons</a>
-                            <!-- <a href="#group_blog">Blog</a> -->
                         </li>
                        <li>
                             <a href="{% url 'course_pages' group_id %}" {% if title == 'course_pages' %}class="selected"{% endif %}>Activities</a>
@@ -69,36 +69,14 @@
                         </li>
                         <li >
                             <a href="https://clix-authoring.mit.edu/#/" target="_blank" {% if title == 'Assessments' %}class="selected"{% endif %}>Assessments</a>
-                            <!-- <a href="#group_blog">Blog</a> -->
                         </li>
                         <li >
                             <a href="{% url 'course_notebook' group_id %}" {% if title == 'notebook' %}class="selected"{% endif %}>Notebook</a>
-                            <!-- <a href="#group_blog">Blog</a> -->
                         </li>
+                    </ul>
+                </nav>
 
-<!--                         <li>
-                            <a href="#group_overview" class="selected">Overview</a>
-                        </li><li>
-                            <a href="#group_pages">Pages</a>
-                        </li><li>
-                            <a href="#group_elibrary">eLibrary</a>
-                        </li><li>
-                            <a href="#group_forum">Forum</a>
-                        </li><li>
-                            <a href="#group_blog">Blog</a>
-                        </li><li>
-                            <a href="#group_calendar">Calendar</a>
-                        </li><li>
-                            <a href="#group_assessment">Assessment</a>
-                        </li><li class="sub_group_action">
-                            <a href="#"> &bull;&bull;&bull;</a>
-                            <ul>
-                                <li class="create_curriculum">
-                                    <a href="./create-curriculum.html">Create curriculum</a>
-                                </li>
-                            </ul>
-                        </li>
- -->                    </ul>
+
                 </div>
             </div>
             <div class="row">
