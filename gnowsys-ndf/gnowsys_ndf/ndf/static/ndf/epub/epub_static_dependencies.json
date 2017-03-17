@@ -2,11 +2,8 @@
 	"Fonts": [],
 	"Styles": ["/static/ndf/bower_components/foundation/css/foundation.css",
 	"/static/ndf/bower_components/videojs/dist/video-js/video-js.css",
-	"/static/ndf/css/videojs-skin-color.css",
-	"/static/ndf/css/clix-activity-styles.css"],
+	],
 	"Misc": ["/static/ndf/bower_components/videojs/dist/video-js/video.js", 
-		"/static/ndf/js/assess-sizer.js",
-		"/static/ndf/js/photo-zoom.js",
 		"/static/ndf/bower_components/jquery/dist/jquery.min.js"
 	],
 	"Images": []
