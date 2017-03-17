@@ -165,6 +165,7 @@ def parse_content(path, content_soup):
         2. Copy media file object
     """
     # all_a = content_soup.find_all('a', href=True)
+    # ==== updating media elements ==== 
     all_src = content_soup.find_all(src=True)
     # Fetching the files
     for each_src in all_src:
@@ -189,6 +190,10 @@ def parse_content(path, content_soup):
                 each_src["src"] = (os.path.join('..',file_loc, file_name))
                 shutil.copyfile("/data/media/" + src_attr, os.path.join(oebps_path, file_loc, file_name))
                 create_update_content_file(file_name, file_loc, mimetype_val, is_non_html=True)
+
+    # ==== updating assessment iframes ==== 
+
+    # ==== updating App iframes ==== 
 
     return content_soup
 
@@ -263,3 +268,10 @@ def create_epub(node_obj):
     print "Successfully created epub: ", epub_name
 
 # create_epub(node.name, node.collection_dict)
+
+def check_ip_validity():
+    import re
+    if re.match(r'^((\d{1,2}|1\d{2}|2[0-4]\d|25[0-5])\.){3}(\d{1,2}|1\d{2}|2[0-4]\d|25[0-5])$', ip):  
+        print "Valid IP"  
+    else:
+        print "Invalid IP"
