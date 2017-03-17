@@ -1,4 +1,5 @@
 import os
+import zipfile
 import json
 from xml.dom import minidom
 import shutil
@@ -242,7 +243,15 @@ def fill_from_static():
         dependencies_data = json.load(dependencies_file)
         for dep_type, dep_list in dependencies_data.items():
             [shutil.copyfile(each_dep, os.path.join(oebps_path, dep_type, each_dep.split('/')[-1])) for each_dep in dep_list]
-            
+
+
+def epub_dump(path, ziph):
+    abs_src = os.path.abspath(path)
+    for root, dirs, files in os.walk(path):
+        for file in files:
+            absname = os.path.abspath(os.path.join(root, file))
+            arcname = absname[len(abs_src) + 1:]
+            ziph.write(absname, arcname)
 
 def create_epub(node_obj):
     epub_name = node_obj.name
@@ -266,6 +275,9 @@ def create_epub(node_obj):
     # create_ncx_file(os.path.join(epub_name,"OEBPS"),content_list)
     fill_from_static()
     print "Successfully created epub: ", epub_name
+    zipf = zipfile.ZipFile(epub_root + epub_name + '.epub', 'w', zipfile.ZIP_DEFLATED)
+    epub_dump(epub_root, zipf)
+    zipf.close()
 
 # create_epub(node.name, node.collection_dict)
 
@@ -275,3 +287,4 @@ def check_ip_validity():
         print "Valid IP"  
     else:
         print "Invalid IP"
+
