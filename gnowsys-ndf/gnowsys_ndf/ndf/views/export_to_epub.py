@@ -15,7 +15,7 @@ except ImportError:  # old pymongo
     from pymongo.objectid import ObjectId
 
 
-oebps_files = ["Fonts", "Audio", "Images", "Videos", "Text", "Styles", "Misc"]
+oebps_files = ["Fonts", "Audios", "Images", "Videos", "Text", "Styles", "Misc"]
 oebps_path = None
 def create_subfolders(root,subfolder_names_list):
     for subfolder in subfolder_names_list:
@@ -200,6 +200,8 @@ def parse_content(path, content_soup):
                 file_loc = "Videos"
             elif "audio" in mimetype_val:
                 file_loc = "Audios"
+            elif "text" in mimetype_val:
+                file_loc = "Misc"
             each_src["src"] = (os.path.join('..',file_loc, file_name))
             shutil.copyfile("/data/media/" + file_node['if_file']['original']['relurl'], os.path.join(oebps_path, file_loc, file_name))
             create_update_content_file(file_name, file_loc, mimetype_val, is_non_html=True)
@@ -287,7 +289,7 @@ def create_epub(node_obj):
     # create_ncx_file(os.path.join(epub_name,"OEBPS"),content_list)
     fill_from_static()
     print "Successfully created epub: ", epub_name
-    zipf = zipfile.ZipFile(epub_root + epub_name + '.epub', 'w', zipfile.ZIP_DEFLATED)
+    zipf = zipfile.ZipFile(epub_root + '.epub', 'w', zipfile.ZIP_DEFLATED)
     epub_dump(epub_root, zipf)
     zipf.close()
 
