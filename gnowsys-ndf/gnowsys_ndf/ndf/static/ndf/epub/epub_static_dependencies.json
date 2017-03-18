@@ -3,6 +3,8 @@
 	"Styles": ["/static/ndf/bower_components/foundation/css/foundation.css",
 	"/static/ndf/bower_components/videojs/dist/video-js/video-js.css",
 	"/static/ndf/css/videojs-skin-color.css",
+	"/static/ndf/css/sgc-toc.css",
+	"/static/ndf/css/rubik-fonts.css",
 	"/static/ndf/css/clix-activity-styles.css"],
 	"Misc": ["/static/ndf/bower_components/videojs/dist/video-js/video.js", 
 		"/static/ndf/js/assess-sizer.js",
