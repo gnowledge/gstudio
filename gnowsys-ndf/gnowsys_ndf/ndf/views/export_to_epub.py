@@ -170,6 +170,16 @@ def parse_content(path, content_soup):
         2. Copy media file object
     """
     # all_a = content_soup.find_all('a', href=True)
+    # remove bower links
+    import re
+    scoped_style = content_soup.find_all('style', {'scoped': ''})
+    static_imports = content_soup.find_all('script', src=re.compile('static'))
+    for each_style in scoped_style:
+        each_style.extract()
+    for each_script in static_imports:
+        each_script.extract()
+
+
     # ==== updating media elements ==== 
     all_src = content_soup.find_all(src=True)
     # Fetching the files
