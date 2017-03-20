@@ -3,6 +3,7 @@ import zipfile
 import json
 from xml.dom import minidom
 import shutil
+import re
 from datetime import datetime
 from bs4 import BeautifulSoup
 from html import HTML
@@ -171,7 +172,6 @@ def parse_content(path, content_soup):
     """
     # all_a = content_soup.find_all('a', href=True)
     # remove bower links
-    import re
     scoped_style = content_soup.find_all('style', {'scoped': ''})
     static_imports = content_soup.find_all('script', src=re.compile('static'))
     for each_style in scoped_style:
@@ -298,10 +298,12 @@ def create_epub(node_obj):
     # create_content_file(os.path.join(epub_name,"OEBPS"),content_list)
     # create_ncx_file(os.path.join(epub_name,"OEBPS"),content_list)
     fill_from_static()
-    print "Successfully created epub: ", epub_name
+    print "Successfully created epub extraction: ", epub_name
     zipf = zipfile.ZipFile(epub_root + '.epub', 'w', zipfile.ZIP_DEFLATED)
     epub_dump(epub_root, zipf)
     zipf.close()
+    print "Successfully created epub: ", epub_name
+    return str(epub_root + '.epub')
 
 # create_epub(node.name, node.collection_dict)
 
