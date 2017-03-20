@@ -3161,7 +3161,7 @@ def course_pages(request, group_id, page_id=None):
                 {'$in': [page_gst_id, activity_gst_id] }, 'group_set': group_id,
                 'type_of': {'$ne': [blog_page_gst_id]}
                 # 'content': {'$regex': 'clix-activity-styles.css', '$options': 'i'}
-                })
+                }).sort('last_update',-1)
     context_variables = {
             'group_id': group_id, 'groupid': group_id, 'group_name':group_name,
             'group_obj': group_obj, 'title': 'course_pages', 'all_pages': all_pages,
