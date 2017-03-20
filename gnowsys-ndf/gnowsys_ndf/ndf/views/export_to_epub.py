@@ -227,6 +227,7 @@ def parse_content(path, content_soup):
     all_iframes = content_soup.find_all('iframe',src=True)
     for each_iframe in all_iframes:
         iframe_src_attr = each_iframe["src"]
+        new_iframe_src = iframe_src_attr
         if iframe_src_attr:
             for each_tool_key,each_tool_val in tool_mapping.items():
                 if each_tool_key in iframe_src_attr:
