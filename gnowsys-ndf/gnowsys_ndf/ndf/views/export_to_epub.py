@@ -18,6 +18,10 @@ except ImportError:  # old pymongo
 
 oebps_files = ["Fonts", "Audios", "Images", "Videos", "Text", "Styles", "Misc"]
 oebps_path = None
+tool_mapping = {'policequad': 'modules/Tools/Police Quad/index.html',
+                'turtleblocksjs': 'modules/Tools/Turtle Blocks/index.html',
+                'biomechanic': 'modules/Tools/Bio- Mechanic/index.html'}
+
 def create_subfolders(root,subfolder_names_list):
     for subfolder in subfolder_names_list:
         os.makedirs(os.path.join(root, subfolder))
@@ -181,7 +185,8 @@ def parse_content(path, content_soup):
 
 
     # ==== updating media elements ==== 
-    all_src = content_soup.find_all(src=True)
+    # all_src = content_soup.find_all(src=True)
+    all_src = content_soup.find_all(src=re.compile('media|readDoc'))
     # Fetching the files
     for each_src in all_src:
         src_attr = each_src["src"]
@@ -219,7 +224,14 @@ def parse_content(path, content_soup):
     # ==== updating assessment iframes ==== 
 
     # ==== updating App iframes ==== 
-
+    all_iframes = content_soup.find_all('iframe',src=True)
+    for each_iframe in all_iframes:
+        iframe_src_attr = each_iframe["src"]
+        if iframe_src_attr:
+            for each_tool_key,each_tool_val in tool_mapping.items():
+                if each_tool_key in iframe_src_attr:
+                    new_iframe_src = iframe_src_attr.replace(each_tool_key,each_tool_val)
+            each_iframe["src"] = new_iframe_src
     return content_soup
 
 def build_html(path,obj):
