@@ -3948,3 +3948,12 @@ def get_relation_node(node_id):
 	 	data_list.append(data_dict)
 	print data_list
 	return data_list
+
+@register.assignment_tag
+def get_lessons(unit_node):
+	# return list of ObjectIds of all lessons
+	# lesson_gst_name, lesson_gst_id = GSystemType.get_gst_name_id('lesson')
+	# all_lessons_for_unit = node_collection.find({'member_of': lesson_gst_id,
+	# 						'group_set': unit_node})
+	lesson_nodes = node_collection.find({'_id': {'$in': unit_node.collection_set}})
+	return lesson_nodes
