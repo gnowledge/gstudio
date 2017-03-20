@@ -47,6 +47,18 @@
                         <li>
                             <a href="{% url 'create_event_group' group_id 'CourseEventGroup' %}?cnode_id={{group_id}}" class="fi-volume"> Announce</a>
                         </li>
+
+                        {% get_lessons group_object as lessons_list %}
+                        <li class="has-dropdown">
+                            <a class="fi-page-export"> Export</a>
+                            <ul class="dropdown">
+                                {% for each_lesson in lessons_list  %}
+                                <li><a href="{% url 'export_to_epub' group_id each_lesson.pk %}" class="export_lesson">{{each_lesson.name}}</a></li>
+                                {% endfor %}
+                            </ul>
+
+                        </li>
+
                         </ul>
                     </div>
                 </div>
@@ -128,6 +140,14 @@
             </div>
         </div>
     </div>
+
+    <div id="exportLessonModal" class="reveal-modal medium success radius" data-reveal data-alert>
+        <div id="exportLessonModalLabel">Epub will be downloaded automatically.</div>
+        <a class="close-reveal-modal">&#215;</a>
+    </div>
+
+
+
     <script type="text/javascript">
 
         $(function(){
@@ -154,6 +174,14 @@
                 $(this).closest('div').prepend('<input type="file" name="'+input.attr('name')+'"/>');
             })
         });
+
+            $(document).on('click','.export_lesson',  function(){
+                $("#exportLessonModal").foundation('reveal', 'open');
+                setTimeout(
+                    function() {
+                        $("#exportLessonModal").foundation('reveal', 'close');
+                    }, 2000);
+            })
 
 
             $( ".createAsset" ).click(function() {
