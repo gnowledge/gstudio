@@ -6778,3 +6778,19 @@ def delete_asset(request, group_id):
         del_status  = delete_node(node_id=node_by_id._id, deletion_type=1)
         print '\nDeleted Node',del_status
     return HttpResponse('success')
+
+
+def export_to_epub(request, group_id, node_id):
+    from gnowsys_ndf.ndf.views.export_to_epub import *
+    response_dict = {'success': False}
+    try:
+        node_obj = node_collection.one({'_id': ObjectId(node_id)})
+        epub_loc = create_epub(node_obj)
+        zip_file = open(epub_loc, 'rb')
+        response = HttpResponse(zip_file.read(), content_type="application/epub+zip")
+        response['Content-Disposition'] = 'attachment; filename="'+ slugify(node_obj.name) + '.epub"'       
+        return response
+    except Exception as export_fail:
+        # print "\n export_fail: ", export_fail
+        pass
+    return HttpResponse(json.dumps(response_dict))
