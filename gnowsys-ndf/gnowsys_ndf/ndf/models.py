@@ -3236,7 +3236,7 @@ class Triple(DjangoDocument):
     'subject_scope': basestring,
     'object_scope': basestring,
     'subject': ObjectId,  # ObjectId's of GSystem Class
-    'lang': basestring,  # Put validation for standard language codes
+    'language': (basestring, basestring),  # e.g: ('en', 'English') or ['en', 'English']
     'status': STATUS_CHOICES_TU
   }
 
