@@ -6793,4 +6793,4 @@ def export_to_epub(request, group_id, node_id):
     except Exception as export_fail:
         # print "\n export_fail: ", export_fail
         pass
-    return HttpResponse(json.dumps(response_dict))
+    return HttpResponseRedirect(reverse('unit_detail', kwargs={'group_id': group_id}))
