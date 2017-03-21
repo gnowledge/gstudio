@@ -38,7 +38,7 @@ from gnowsys_ndf.ndf.models import NodeJSONEncoder
 from gnowsys_ndf.ndf.models import node_collection, triple_collection
 from gnowsys_ndf.ndf.models import *
 from gnowsys_ndf.ndf.views.file import *
-from gnowsys_ndf.ndf.views.methods import check_existing_group, get_drawers, get_course_completed_ids,create_thread_for_node
+from gnowsys_ndf.ndf.views.methods import check_existing_group, get_drawers, get_course_completed_ids,create_thread_for_node, delete_gattribute
 from gnowsys_ndf.ndf.views.methods import get_node_common_fields, get_node_metadata, create_grelation,create_gattribute
 from gnowsys_ndf.ndf.views.methods import create_task,parse_template_data,get_execution_time,get_group_name_id, dig_nodes_field
 from gnowsys_ndf.ndf.views.methods import get_widget_built_up_data, parse_template_data, get_prior_node_hierarchy, create_clone
@@ -6792,22 +6792,19 @@ def save_metadata(request, group_id):
   node_id = request.POST.get('node_id', None)
   node  = node_collection.one({"_id":ObjectId(node_id)})
   source = request.POST.get("source_val", "")
-  Audience = request.POST.getlist("audience", "")
-  mtitle = request.POST.get("docTitle", "")
-  language = request.POST.get("lan", "")
   copyright = request.POST.get("copyright_val", "")
-  Audience = request.POST.getlist("audience", "")
   Based_url = request.POST.get("basedonurl_val", "")
-  co_contributors = request.POST.get("co_contributors", "")
-  subject = request.POST.get("Subject", "")
-  level = request.POST.getlist("Level", "")
   obj_list = request.POST.get("obj_list", "")
   for k, v in json.loads(obj_list).iteritems():
-    if v !=  None and v != "--Select--":
-      attr_node = node_collection.one({'_type':'AttributeType','name':unicode(k)})
+    attr_node = node_collection.one({'_type':'AttributeType','name':unicode(k)},{'_id': 1})
+    if v is not None and (not isinstance(v,list) and "select" not in v.lower()) or (isinstance(v,list) and "select" not in v[0].lower() ):
       if attr_node: 
         create_gattribute(ObjectId(node_id), attr_node, v)
-  
+    else:
+        ga_node = triple_collection.find_one({'_type': "GAttribute",
+             "subject": ObjectId(node_id), 'attribute_type': attr_node._id, 'status':"PUBLISHED"})
+        if ga_node:
+            d,dd = delete_gattribute(subject_id=None, deletion_type=1, **{'node_id': ga_node._id})
   if source:
     source_attr = node_collection.one({'_type':'AttributeType','name':'source'})
     create_gattribute(ObjectId(node_id), source_attr, source)
