@@ -33,11 +33,9 @@ CKEDITOR.plugins.add('addJhapp',
                           });
 
                             $("#insert_ost").click(function(event){
-                            //ost_text_gallery = $('#paste-ost-gallery').val();
-                            //ost_text_file = $('#paste-ost-captions').val();
-                            ost_text_val = "<iframe src='/openstorytool/' style='height:100%;width:100%'></iframe>"
-                            // split_word = ost_text_val.slice(0, 18) + "gallery=" + ost_text_gallery + "&amp;file=/ost/" + ost_text_file+"'"+ ost_text_val.slice(18);
-                            // alert(split_word)
+                            var ost_files_name = prompt("Please enter width in px");
+                            ost_files_name  = ost_files_name.trim();
+                            ost_text_val = "<iframe src='http://172.17.0.2/ost/?gallery="+ost_files_name+"&amp;file=/ost_file/"+ost_files_name+".csst' style='border:none;width:100%;height:100%;min-height:800px;' ></iframe>"
                              CKEDITOR.instances[textAreaId].insertHtml(ost_text_val);
                             $('#group_imgs_on_modal').foundation('reveal', 'close');
                           });

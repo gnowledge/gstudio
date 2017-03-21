@@ -6713,7 +6713,7 @@ def add_assetcontent(request,group_id):
   subtitle_lang_code = request.POST.get('sel_sub_lang_code','')
   asset_cont_desc = request.POST.get('asset_cont_desc','')
   asset_cont_name = request.POST.get('asset_cont_name','')
-
+  node_id = request.POST.get('node_id',None)
   if if_subtitle == "True":
     subtitle_obj = create_assetcontent(ObjectId(asset_obj),uploaded_subtitle[0].name,group_id,request.user.id,files=uploaded_subtitle,resource_type='File')
     rt_subtitle = node_collection.one({'_type':'RelationType', 'name':'has_subtitle'})
@@ -6741,11 +6741,9 @@ def add_assetcontent(request,group_id):
     for each_trans in transcript_grels:
       transcript_list.append(each_trans['right_subject'])
     trans_grel = create_grelation(ObjectId(assetcontentid), rt_transcript, transcript_list)
-    # print "++++++++++++++++++++++",subtitle_obj,sub_grel
     return StreamingHttpResponse("success")
-  print "\n\n\n\n\nasset_cont_name",asset_cont_name,asset_cont_desc
+  
   create_assetcontent(ObjectId(asset_obj),asset_cont_name,group_id,request.user.id,content=asset_cont_desc,files=uploaded_files,resource_type='File')
-
   return StreamingHttpResponse("success")
 
 
@@ -6772,3 +6770,34 @@ def delete_asset(request, group_id):
         del_status  = delete_node(node_id=node_by_id._id, deletion_type=1)
         print '\nDeleted Node',del_status
     return HttpResponse('success')
+
+
+def get_metadata_page(request, group_id):
+  node_id = request.POST.get('node_id', None)
+  asset_id = request.POST.get('asset_id', None)
+  node_obj = node_collection.one({'_id':ObjectId(node_id)})
+  return render_to_response('ndf/metadata.html',
+            {
+                'group_id': group_id, 'groupid': group_id,
+                'node_id':node_id,'asset_id':asset_id,'node':node_obj
+            },
+            context_instance=RequestContext(request))
+
+def save_metadata(request, group_id):
+  node_id = request.POST.get('node_id', None)
+  source = request.POST.get("source_val", "")
+  Audience = request.POST.getlist("audience", "")
+  mtitle = request.POST.get("docTitle", "")
+  language = request.POST.get("lan", "")
+  copyright = request.POST.get("Copyright", "")
+  source = request.POST.get("Source", "")
+  Audience = request.POST.getlist("audience", "")
+  Based_url = request.POST.get("based_url", "")
+  co_contributors = request.POST.get("co_contributors", "")
+  subject = request.POST.get("Subject", "")
+  level = request.POST.getlist("Level", "")
+  if source:
+      # create gattribute for file with source value
+      source_AT = node_collection.one({'_type':'AttributeType','name':'source'})
+      src = create_gattribute(ObjectId(node_id), source_AT, source)
+  return HttpResponse('success')

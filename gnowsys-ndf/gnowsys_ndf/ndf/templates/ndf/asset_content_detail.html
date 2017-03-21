@@ -12,13 +12,16 @@
     </div>
 
   <div class="right small-12 medium-6 columns">
-      <h6> <b>Asset Content Preview&nbsp;></b>
+
+      <h6><u>Asset Content Preview </u>&nbsp; ></b>
+            <button type="button" class="right blue-white-button edit-metadata">Edit Metadata</button>
             </h6>
                 <label>Resource name: <b> {{node.name}} </b>
                     
                     <!--<input type="text" placeholder="" name="resource_name" />-->
                 </label>
           {% if asset_obj.created_by == request.user.id or is_gstaff %}
+
             {% if 'video' in node.if_file.mime_type or 'audio' in node.if_file.mime_type %}
             <div class="video-related">
                 <label><u>Upload Transcript</u></label>
@@ -243,6 +246,23 @@ $(".select-language").change(function(){
         xhr.send(formData);
 
 });
+    $( ".edit-metadata" ).click(function(event) {
+    $.ajax({
+              type: "POST",
+              data:{
+                    'csrfmiddlewaretoken': "{{csrf_token}}",
+                    "node_id":'{{node.pk}}',
+                    "asset_id":'{{asset_obj}}',
+                },
+              url: "{% url 'get_metadata_page' group_id  %}",
+              datatype: "html",
+              success: function(data) {
+              $('#addAsset').foundation('reveal', 'open');
+              $('#addAsset').html(data);
+            }
+        });
+});
+    
   
 </script>
 
