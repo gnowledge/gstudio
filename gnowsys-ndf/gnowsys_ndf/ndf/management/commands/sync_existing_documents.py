@@ -29,7 +29,7 @@ class Command(BaseCommand):
     # --------------------------------------------------------------------------
     # All Triples - Replacing <'lang': ''> field to <'language': []>
     # i.e: removing first 'lang' then adding 'language' with data type: (basestring, basestring)
-    all_tr = triple_collection.collection.update({}, {'$unset':{'lang': None}, '$set':{'language': GSTUDIO_DEFAULT_LANGUAGE} }, upsert=False, multi=True)
+    all_tr = triple_collection.collection.update({'lang': {'$exists': True}}, {'$unset':{'lang': None}, '$set':{'language': GSTUDIO_DEFAULT_LANGUAGE} }, upsert=False, multi=True)
     if all_tr["updatedExisting"] and all_tr["nModified"]:
         print "\n Replaced 'lang' fields to 'language' for : " + all_tr['nModified'].__str__() + " Triples (AttributeType and RelationType) instances."
 
