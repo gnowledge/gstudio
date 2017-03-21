@@ -276,10 +276,40 @@ def fill_from_static():
         OEBPS/Misc
         from /static/ndf/epub/epub_static_dependencies.json
     """
+    # clean bower links from stylesheets
+    clean_css_files = ['/static/ndf/css/clix-activity-styles.css', '/static/ndf/css/rubik-fonts.css']
+
+    css_rf = open('/static/ndf/css/clix-activity-styles.css', 'r')
+    tmp_file = css_rf.readlines()
+    css_rf.close()
+
+    with open('/tmp/clix-activity-styles.css', 'w+') as tmp_css_file:
+        for each_css_line in tmp_file:
+            if '@import' not in each_css_line:
+                tmp_css_file.write(each_css_line)
+
+    fonts_css_rf = open('/static/ndf/css/rubik-fonts.css', 'r')
+    tmp_fonts_file = fonts_css_rf.readlines()
+    fonts_css_rf.close()
+
+    rubik_font_line = '/static/ndf/bower_components/rubik-googlefont'
+    with open('/tmp/rubik-fonts.css', 'w+') as tmp_fonts_css_file:
+        for each_fontscss_line in tmp_fonts_file:
+            if rubik_font_line in each_fontscss_line:
+                each_fontscss_line.replace(rubik_font_line, '../Fonts')
+                tmp_fonts_css_file.write(each_fontscss_line)
+
     with open('/static/ndf/epub/epub_static_dependencies.json') as dependencies_file:
         dependencies_data = json.load(dependencies_file)
         for dep_type, dep_list in dependencies_data.items():
-            [shutil.copyfile(each_dep, os.path.join(oebps_path, dep_type, each_dep.split('/')[-1])) for each_dep in dep_list]
+            for each_dep in dep_list:
+                tmp_filename = each_dep.split('/')[-1]
+                new_filepath = os.path.join(oebps_path, dep_type, tmp_filename)
+                if each_dep in clean_css_files:
+                    shutil.copyfile('/tmp/'+tmp_filename, new_filepath)
+                else:
+                    shutil.copyfile(each_dep, new_filepath)
+            # [shutil.copyfile(each_dep, os.path.join(oebps_path, dep_type, each_dep.split('/')[-1])) for each_dep in dep_list]
 
 
 def epub_dump(path, ziph):
