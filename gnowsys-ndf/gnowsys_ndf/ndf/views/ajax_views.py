@@ -6781,7 +6781,7 @@ def delete_asset(request, group_id):
 def get_metadata_page(request, group_id):
   node_id = request.POST.get('node_id', None)
   node_obj = node_collection.one({'_id':ObjectId(node_id)})
-  return render_to_response('ndf/metadata.html',
+  return render_to_response('ndf/widget_metadata.html',
             {
                 'group_id': group_id, 'groupid': group_id,
                 'node_id':node_id,'node':node_obj
