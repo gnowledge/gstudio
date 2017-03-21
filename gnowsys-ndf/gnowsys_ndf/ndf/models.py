@@ -3287,6 +3287,9 @@ class Triple(DjangoDocument):
 
   @classmethod
   def get_triples_from_sub_type(cls, subject_id, gt_or_rt_name_or_id, status):
+        '''
+        getting triples from SUBject and TYPE (attribute_type or relation_type)
+        '''
         triple_node_mapping_dict = {
             'GAttribute': 'AttributeType',
             'GRelation': 'RelationType'
