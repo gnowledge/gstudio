@@ -163,6 +163,33 @@ def update_content_metadata(node_id, date_value):
             dc_ident.string = node_id
             content_meta_file_obj.write(soup.prettify("utf-8"))
 
+
+def copy_file_and_update_content_file(file_node, source_ele, src_val):
+    mimetype_val = file_node.if_file.mime_type.lower()
+    # mimetype can be audio|video|image
+    # file_name = slugify(file_node.name) + "." + file_extension
+    file_name = file_node.name
+    file_loc = None
+    if "image" in mimetype_val:
+        file_loc = "Images"
+    elif "video" in mimetype_val:
+        file_loc = "Videos"
+    elif "audio" in mimetype_val:
+        file_loc = "Audios"
+    elif "text" in mimetype_val:
+        file_loc = "Misc"
+    source_ele[src_val] = (os.path.join('..',file_loc, file_name))
+    shutil.copyfile("/data/media/" + file_node['if_file']['original']['relurl'], os.path.join(oebps_path, file_loc, file_name))
+    create_update_content_file(file_name, file_loc, mimetype_val, is_non_html=True)
+
+def find_file_from_media_url(source_attr):
+    print "\n source_attr: ", source_attr
+    source_attr = source_attr.split("media/")[-1]
+    file_extension = source_attr.rsplit(".",1)[-1]
+    file_node = node_collection.find_one({"$or": [{'if_file.original.relurl': source_attr},
+        {'if_file.mid.relurl': source_attr},{'if_file.thumbnail.relurl': source_attr}]})
+    return file_node
+
 # =====
 def parse_content(path, content_soup):
     """
@@ -185,6 +212,18 @@ def parse_content(path, content_soup):
 
 
     # ==== updating media elements ==== 
+    #Transcipt file
+    all_transcript_data = content_soup.find_all(attrs={'class':'transcript'})
+    for each_transcript in all_transcript_data:
+        trans_file_node = None
+        data_ele = each_transcript.findNext('object',data=True)
+        if data_ele:
+            if 'media' in data_ele['data']:
+                trans_file_node = find_file_from_media_url(data_ele['data'])
+                print "\ntrans_file_node: ",trans_file_node
+                copy_file_and_update_content_file(trans_file_node, data_ele, 'data')
+
+
     # all_src = content_soup.find_all(src=True)
     all_src = content_soup.find_all(src=re.compile('media|readDoc'))
     # Fetching the files
@@ -192,34 +231,15 @@ def parse_content(path, content_soup):
         src_attr = each_src["src"]
         file_node = None
         if src_attr.startswith("/media"): # file
-            src_attr = src_attr.split("media/")[-1]
-            file_extension = src_attr.rsplit(".",1)[-1]
-            file_node = node_collection.find_one({"$or": [{'if_file.original.relurl': src_attr},
-                {'if_file.mid.relurl': src_attr},{'if_file.thumbnail.relurl': src_attr}]})
+            file_node = find_file_from_media_url(src_attr)
 
         if "readDoc" in src_attr:
             split_src = src_attr.split('/')
             node_id = split_src[split_src.index('readDoc') + 1]
             file_node = node_collection.one({'_id': ObjectId(node_id)})
 
-
         if file_node:
-            mimetype_val = file_node.if_file.mime_type.lower()
-            # mimetype can be audio|video|image
-            # file_name = slugify(file_node.name) + "." + file_extension
-            file_name = file_node.name
-            file_loc = None
-            if "image" in mimetype_val:
-                file_loc = "Images"
-            elif "video" in mimetype_val:
-                file_loc = "Videos"
-            elif "audio" in mimetype_val:
-                file_loc = "Audios"
-            elif "text" in mimetype_val:
-                file_loc = "Misc"
-            each_src["src"] = (os.path.join('..',file_loc, file_name))
-            shutil.copyfile("/data/media/" + file_node['if_file']['original']['relurl'], os.path.join(oebps_path, file_loc, file_name))
-            create_update_content_file(file_name, file_loc, mimetype_val, is_non_html=True)
+            copy_file_and_update_content_file(file_node, each_src, 'src')
 
     # ==== updating assessment iframes ==== 
 
@@ -234,6 +254,8 @@ def parse_content(path, content_soup):
                     new_iframe_src = iframe_src_attr.replace(each_tool_key,each_tool_val)
             each_iframe["src"] = new_iframe_src
     return content_soup
+
+
 
 def build_html(path,obj):
     """
