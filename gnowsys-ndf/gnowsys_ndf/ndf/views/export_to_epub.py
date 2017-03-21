@@ -1,7 +1,6 @@
 import os
 import zipfile
 import json
-from xml.dom import minidom
 import shutil
 import re
 from datetime import datetime
@@ -183,7 +182,6 @@ def copy_file_and_update_content_file(file_node, source_ele, src_val):
     create_update_content_file(file_name, file_loc, mimetype_val, is_non_html=True)
 
 def find_file_from_media_url(source_attr):
-    print "\n source_attr: ", source_attr
     source_attr = source_attr.split("media/")[-1]
     file_extension = source_attr.rsplit(".",1)[-1]
     file_node = node_collection.find_one({"$or": [{'if_file.original.relurl': source_attr},
@@ -220,7 +218,6 @@ def parse_content(path, content_soup):
         if data_ele:
             if 'media' in data_ele['data']:
                 trans_file_node = find_file_from_media_url(data_ele['data'])
-                print "\ntrans_file_node: ",trans_file_node
                 copy_file_and_update_content_file(trans_file_node, data_ele, 'data')
 
 
@@ -318,8 +315,8 @@ def fill_from_static():
     with open('/tmp/rubik-fonts.css', 'w+') as tmp_fonts_css_file:
         for each_fontscss_line in tmp_fonts_file:
             if rubik_font_line in each_fontscss_line:
-                each_fontscss_line.replace(rubik_font_line, '../Fonts')
-                tmp_fonts_css_file.write(each_fontscss_line)
+                each_fontscss_line = each_fontscss_line.replace(rubik_font_line, '../Fonts')
+            tmp_fonts_css_file.write(each_fontscss_line)
 
     with open('/static/ndf/epub/epub_static_dependencies.json') as dependencies_file:
         dependencies_data = json.load(dependencies_file)
