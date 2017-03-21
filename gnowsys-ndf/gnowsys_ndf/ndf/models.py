@@ -47,7 +47,7 @@ from gnowsys_ndf.settings import GSTUDIO_DEFAULT_COPYRIGHT, GSTUDIO_DEFAULT_LICE
 from gnowsys_ndf.settings import META_TYPE
 from gnowsys_ndf.settings import GSTUDIO_BUDDY_LOGIN
 from gnowsys_ndf.ndf.rcslib import RCS
-from gnowsys_ndf.ndf.views.utils import add_to_list
+from gnowsys_ndf.ndf.views.utils import add_to_list, cast_to_data_type
 
 
 NODE_TYPE_CHOICES = (
@@ -352,209 +352,246 @@ class Node(DjangoDocument):
     # custom methods provided for Node class
     def fill_node_values(self, request=HttpRequest(), **kwargs):
 
-        # 'name': unicode,
-        name = self.name
-        if kwargs.has_key('name'):
-            name = kwargs.get('name', '')
-        elif request:
-            name = request.POST.get('name', '').strip()
-        self.name = unicode(name) if name else self.name
+        user_id = kwargs.get('created_by', None)
+        # dict to sum both dicts, kwargs and request.POST
+        values_dict = {}
+        if request:
+            if request.POST:
+                values_dict.update(request.POST)
+            if (not user_id) and request.user:
+                user_id = request.user.id
+        # adding kwargs dict later to give more priority to values passed via kwargs.
+        values_dict.update(kwargs)
 
-        # 'altnames': unicode,
-        if kwargs.has_key('altnames'):
-            self.altnames = kwargs.get('altnames', self.name)
-        elif request:
-            self.altnames = request.POST.get('altnames', self.name).strip()
-        self.altnames = unicode(self.altnames)
+        # handling storing user id values.
+        if user_id:
+            if 'created_by' not in values_dict:
+                values_dict.update({'created_by': user_id})
+            if 'modified_by' not in values_dict:
+                values_dict.update({'modified_by': user_id})
+            if 'contributors' not in values_dict:
+                values_dict.update({'contributors': add_to_list(self.contributors, user_id)})
 
-        # 'plural': unicode,
-        if kwargs.has_key('plural'):
-            self.plural = kwargs.get('plural', None)
-        elif request:
-            self.plural = request.POST.get('plural', None)
-        # self.plural = unicode(plural)
+        # filter keys from values dict there in node structure.
+        node_str = Node.structure
+        node_str_keys_set = set(node_str.keys())
+        values_dict_keys_set = set(values_dict.keys())
 
-        # 'prior_node': [ObjectId],
-        if kwargs.has_key('prior_node'):
-            self.prior_node = kwargs.get('prior_node', [])
-        elif request:
-            self.prior_node = request.POST.get('prior_node', [])
-        # self.prior_node = prior_node
-        if self.prior_node and not isinstance(self.prior_node, list):
-            self.prior_node = [ObjectId(each) for each in self.prior_node]
+        for each_key in values_dict_keys_set.intersection(node_str_keys_set):
+            temp_prev_val = self[each_key]
+            # checking for proper casting for each field
+            if isinstance(node_str[each_key], type):
+                node_str_data_type = node_str[each_key].__name__
+            else:
+                node_str_data_type = node_str[each_key]
+            casted_new_val = cast_to_data_type(values_dict[each_key], node_str_data_type)
+            # check for uniqueness and addition of prev values for dict, list datatype values
+            self[each_key] = casted_new_val
 
-        # 'post_node': [ObjectId]
-        if kwargs.has_key('post_node'):
-            self.post_node = kwargs.get('post_node', [])
-        elif request:
-            self.post_node = request.POST.get('post_node', [])
-        # self.post_node = post_node
-        if self.post_node and not isinstance(self.post_node, list):
-            self.post_node = [ObjectId(each) for each in self.post_node]
 
-        # 'language': (basestring, basestring)
-        if kwargs.has_key('language'):
-            self.language = kwargs.get('language', ('en', 'English'))
-        elif request:
-            self.language = request.POST.get('language', ('en', 'English'))
-        # self.language = language
+        # # 'name': unicode,
+        # name = self.name
+        # if kwargs.has_key('name'):
+        #     name = kwargs.get('name', '')
+        # elif request:
+        #     name = request.POST.get('name', '').strip()
+        # self.name = unicode(name) if name else self.name
 
-        # 'type_of': [ObjectId]
-        if kwargs.has_key('type_of'):
-            self.type_of = kwargs.get('type_of', [])
-        elif request:
-            self.type_of = request.POST.get('type_of', [])
-        # self.type_of = type_of
-        if self.type_of and not isinstance(self.type_of, list):
-            self.type_of = [ObjectId(each) for each in self.type_of]
+        # # 'altnames': unicode,
+        # if kwargs.has_key('altnames'):
+        #     self.altnames = kwargs.get('altnames', self.name)
+        # elif request:
+        #     self.altnames = request.POST.get('altnames', self.name).strip()
+        # self.altnames = unicode(self.altnames)
 
-        # 'member_of': [ObjectId]
-        if kwargs.has_key('member_of'):
-            self.member_of = kwargs.get('member_of', [])
-        elif request:
-            self.member_of = request.POST.get('member_of', [])
-        self.member_of = [ObjectId(self.member_of)] if self.member_of and not isinstance(self.member_of, list) else self.member_of
-        # if member_of and not isinstance(member_of, list):
-        #     self.member_of = [ObjectId(each) for each in member_of]
+        # # 'plural': unicode,
+        # if kwargs.has_key('plural'):
+        #     self.plural = kwargs.get('plural', None)
+        # elif request:
+        #     self.plural = request.POST.get('plural', None)
+        # # self.plural = unicode(plural)
 
-        # 'access_policy': unicode
-        if kwargs.has_key('access_policy'):
-            self.access_policy = kwargs.get('access_policy', u'PUBLIC')
-        elif request:
-            self.access_policy = request.POST.get('access_policy', u'PUBLIC')
-        # self.access_policy = unicode(access_policy)
+        # # 'prior_node': [ObjectId],
+        # if kwargs.has_key('prior_node'):
+        #     self.prior_node = kwargs.get('prior_node', [])
+        # elif request:
+        #     self.prior_node = request.POST.get('prior_node', [])
+        # # self.prior_node = prior_node
+        # if self.prior_node and not isinstance(self.prior_node, list):
+        #     self.prior_node = [ObjectId(each) for each in self.prior_node]
 
-        # 'created_at': datetime.datetime
-        #   - this will be system generated (while instantiation time), always.
+        # # 'post_node': [ObjectId]
+        # if kwargs.has_key('post_node'):
+        #     self.post_node = kwargs.get('post_node', [])
+        # elif request:
+        #     self.post_node = request.POST.get('post_node', [])
+        # # self.post_node = post_node
+        # if self.post_node and not isinstance(self.post_node, list):
+        #     self.post_node = [ObjectId(each) for each in self.post_node]
 
-        # 'last_update': datetime.datetime,
-        #   - this will be system generated (from save method), always.
+        # # 'language': (basestring, basestring)
+        # if kwargs.has_key('language'):
+        #     self.language = kwargs.get('language', ('en', 'English'))
+        # elif request:
+        #     self.language = request.POST.get('language', ('en', 'English'))
+        # # self.language = language
 
-        created_by = 0
-        # 'created_by': int
-        if not self.created_by:
-            if kwargs.has_key('created_by'):
-                self.created_by = kwargs.get('created_by', '')
-            elif request and request.user.is_authenticated():
-                self.created_by = request.user.id
-            self.created_by = int(self.created_by) if self.created_by else 0
+        # # 'type_of': [ObjectId]
+        # if kwargs.has_key('type_of'):
+        #     self.type_of = kwargs.get('type_of', [])
+        # elif request:
+        #     self.type_of = request.POST.get('type_of', [])
+        # # self.type_of = type_of
+        # if self.type_of and not isinstance(self.type_of, list):
+        #     self.type_of = [ObjectId(each) for each in self.type_of]
 
-        modified_by = 0
-        # 'modified_by': int, # test required: only ids of Users
-        if kwargs.has_key('modified_by'):
-            self.modified_by = kwargs.get('modified_by', None)
-        elif request:
-            if hasattr(request, 'user'):
-                self.modified_by = request.user.id
-            elif kwargs.has_key('created_by'):
-                self.modified_by = self.created_by
-        self.modified_by = int(self.modified_by) if self.modified_by else self.created_by
+        # # 'member_of': [ObjectId]
+        # if kwargs.has_key('member_of'):
+        #     self.member_of = kwargs.get('member_of', [])
+        # elif request:
+        #     self.member_of = request.POST.get('member_of', [])
+        # self.member_of = [ObjectId(self.member_of)] if self.member_of and not isinstance(self.member_of, list) else self.member_of
+        # # if member_of and not isinstance(member_of, list):
+        # #     self.member_of = [ObjectId(each) for each in member_of]
 
-        contributors = []
-        self.contributors = contributors
-        # 'contributors': [int]
-        if kwargs.has_key('contributors'):
-            self.contributors = kwargs.get('contributors', [self.created_by])
-        elif request:
-            self.contributors = request.POST.get('contributors', [self.created_by])
-        if self.contributors and not isinstance(self.contributors, list):
-            self.contributors = [int(each) for each in self.contributors]
+        # # 'access_policy': unicode
+        # if kwargs.has_key('access_policy'):
+        #     self.access_policy = kwargs.get('access_policy', u'PUBLIC')
+        # elif request:
+        #     self.access_policy = request.POST.get('access_policy', u'PUBLIC')
+        # # self.access_policy = unicode(access_policy)
 
-        # 'location': [dict]
-        if kwargs.has_key('location'):
-            self.location = kwargs.get('location', [])
-        elif request:
-            self.location = request.POST.get('location', [])
-            self.location = list(self.location) if not isinstance(self.location, list) else self.location
+        # # 'created_at': datetime.datetime
+        # #   - this will be system generated (while instantiation time), always.
 
-        # 'content': unicode
-        if kwargs.has_key('content'):
-            self.content = kwargs.get('content', '')
-        elif request:
-            self.content = request.POST.get('content', '')
-        self.content = unicode(self.content)
+        # # 'last_update': datetime.datetime,
+        # #   - this will be system generated (from save method), always.
 
-        # 'content_org': unicode
-        if kwargs.has_key('content_org'):
-            self.content_org = kwargs.get('content_org', '')
-        elif request:
-            self.content_org = request.POST.get('content_org', '')
-        self.content_org = unicode(self.content_org)
+        # created_by = 0
+        # # 'created_by': int
+        # if not self.created_by:
+        #     if kwargs.has_key('created_by'):
+        #         self.created_by = kwargs.get('created_by', '')
+        #     elif request and request.user.is_authenticated():
+        #         self.created_by = request.user.id
+        #     self.created_by = int(self.created_by) if self.created_by else 0
 
-        # 'group_set': [ObjectId]
-        if kwargs.has_key('group_set'):
-            self.group_set = kwargs.get('group_set', [])
-        elif request:
-            self.group_set = request.POST.get('group_set', [])
-        if self.group_set and not isinstance(self.group_set, list):
-            self.group_set = [self.group_set]
-            self.group_set = [ObjectId(each) for each in self.group_set]
+        # modified_by = 0
+        # # 'modified_by': int, # test required: only ids of Users
+        # if kwargs.has_key('modified_by'):
+        #     self.modified_by = kwargs.get('modified_by', None)
+        # elif request:
+        #     if hasattr(request, 'user'):
+        #         self.modified_by = request.user.id
+        #     elif kwargs.has_key('created_by'):
+        #         self.modified_by = self.created_by
+        # self.modified_by = int(self.modified_by) if self.modified_by else self.created_by
 
-        # 'collection_set': [ObjectId]
-        if kwargs.has_key('collection_set'):
-            self.collection_set = kwargs.get('collection_set', [])
-        elif request:
-            self.collection_set = request.POST.get('collection_set', [])
-        if self.collection_set and not isinstance(self.collection_set, list):
-            self.collection_set = [ObjectId(each) for each in self.collection_set]
+        # contributors = []
+        # self.contributors = contributors
+        # # 'contributors': [int]
+        # if kwargs.has_key('contributors'):
+        #     self.contributors = kwargs.get('contributors', [self.created_by])
+        # elif request:
+        #     self.contributors = request.POST.get('contributors', [self.created_by])
+        # if self.contributors and not isinstance(self.contributors, list):
+        #     self.contributors = [int(each) for each in self.contributors]
 
-        # 'property_order': []
-        if kwargs.has_key('property_order'):
-            self.property_order = kwargs.get('property_order', [])
-        elif request:
-            self.property_order = request.POST.get('property_order', [])
-        self.property_order = list(self.property_order) if not isinstance(self.property_order, list) else self.property_order
+        # # 'location': [dict]
+        # if kwargs.has_key('location'):
+        #     self.location = kwargs.get('location', [])
+        # elif request:
+        #     self.location = request.POST.get('location', [])
+        #     self.location = list(self.location) if not isinstance(self.location, list) else self.location
 
-        # 'start_publication': datetime.datetime,
-        if kwargs.has_key('start_publication'):
-            self.start_publication = kwargs.get('start_publication', None)
-        elif request:
-            self.start_publication = request.POST.get('start_publication', None)
+        # # 'content': unicode
+        # if kwargs.has_key('content'):
+        #     self.content = kwargs.get('content', '')
+        # elif request:
+        #     self.content = request.POST.get('content', '')
+        # self.content = unicode(self.content)
 
-        # self.start_publication = datetime.datetime(start_publication) if not isinstance(start_publication, datetime.datetime) elif request start_publication
+        # # 'content_org': unicode
+        # if kwargs.has_key('content_org'):
+        #     self.content_org = kwargs.get('content_org', '')
+        # elif request:
+        #     self.content_org = request.POST.get('content_org', '')
+        # self.content_org = unicode(self.content_org)
 
-        # 'tags': [unicode],
-        if kwargs.has_key('tags'):
-            self.tags = kwargs.get('tags', [])
-        elif request:
-            self.tags = request.POST.get('tags', [])
-        if self.tags and not isinstance(self.tags, list):
-            self.tags = [unicode(each.strip()) for each in self.tags.split(',')]
+        # # 'group_set': [ObjectId]
+        # if kwargs.has_key('group_set'):
+        #     self.group_set = kwargs.get('group_set', [])
+        # elif request:
+        #     self.group_set = request.POST.get('group_set', [])
+        # if self.group_set and not isinstance(self.group_set, list):
+        #     self.group_set = [self.group_set]
+        #     self.group_set = [ObjectId(each) for each in self.group_set]
 
-        # 'featured': bool,
-        if kwargs.has_key('featured'):
-            self.featured = kwargs.get('featured', None)
-        elif request:
-            self.featured = request.POST.get('featured', None)
-        self.featured = bool(self.featured)
+        # # 'collection_set': [ObjectId]
+        # if kwargs.has_key('collection_set'):
+        #     self.collection_set = kwargs.get('collection_set', [])
+        # elif request:
+        #     self.collection_set = request.POST.get('collection_set', [])
+        # if self.collection_set and not isinstance(self.collection_set, list):
+        #     self.collection_set = [ObjectId(each) for each in self.collection_set]
 
-        # 'url': unicode,
-        if kwargs.has_key('url'):
-            self.url = kwargs.get('url', None)
-        elif request:
-            self.url = request.POST.get('url', None)
-        self.url = unicode(self.url)
+        # # 'property_order': []
+        # if kwargs.has_key('property_order'):
+        #     self.property_order = kwargs.get('property_order', [])
+        # elif request:
+        #     self.property_order = request.POST.get('property_order', [])
+        # self.property_order = list(self.property_order) if not isinstance(self.property_order, list) else self.property_order
 
-        # 'comment_enabled': bool,
-        if kwargs.has_key('comment_enabled'):
-            self.comment_enabled = kwargs.get('comment_enabled', None)
-        elif request:
-            self.comment_enabled = request.POST.get('comment_enabled', None)
-        self.comment_enabled = bool(self.comment_enabled)
+        # # 'start_publication': datetime.datetime,
+        # if kwargs.has_key('start_publication'):
+        #     self.start_publication = kwargs.get('start_publication', None)
+        # elif request:
+        #     self.start_publication = request.POST.get('start_publication', None)
 
-        # 'login_required': bool,
-        if kwargs.has_key('login_required'):
-            self.login_required = kwargs.get('login_required', None)
-        elif request:
-            self.login_required = request.POST.get('login_required', None)
-        self.login_required = bool(self.login_required)
+        # # self.start_publication = datetime.datetime(start_publication) if not isinstance(start_publication, datetime.datetime) elif request start_publication
 
-        # 'status': STATUS_CHOICES_TU,
-        if kwargs.has_key('status'):
-            status = kwargs.get('status', u'DRAFT')
-        else:
-            status = request.POST.get('status', u'DRAFT')
-        self.status = unicode(status)
+        # # 'tags': [unicode],
+        # if kwargs.has_key('tags'):
+        #     self.tags = kwargs.get('tags', [])
+        # elif request:
+        #     self.tags = request.POST.get('tags', [])
+        # if self.tags and not isinstance(self.tags, list):
+        #     self.tags = [unicode(each.strip()) for each in self.tags.split(',')]
+
+        # # 'featured': bool,
+        # if kwargs.has_key('featured'):
+        #     self.featured = kwargs.get('featured', None)
+        # elif request:
+        #     self.featured = request.POST.get('featured', None)
+        # self.featured = bool(self.featured)
+
+        # # 'url': unicode,
+        # if kwargs.has_key('url'):
+        #     self.url = kwargs.get('url', None)
+        # elif request:
+        #     self.url = request.POST.get('url', None)
+        # self.url = unicode(self.url)
+
+        # # 'comment_enabled': bool,
+        # if kwargs.has_key('comment_enabled'):
+        #     self.comment_enabled = kwargs.get('comment_enabled', None)
+        # elif request:
+        #     self.comment_enabled = request.POST.get('comment_enabled', None)
+        # self.comment_enabled = bool(self.comment_enabled)
+
+        # # 'login_required': bool,
+        # if kwargs.has_key('login_required'):
+        #     self.login_required = kwargs.get('login_required', None)
+        # elif request:
+        #     self.login_required = request.POST.get('login_required', None)
+        # self.login_required = bool(self.login_required)
+
+        # # 'status': STATUS_CHOICES_TU,
+        # if kwargs.has_key('status'):
+        #     status = kwargs.get('status', u'DRAFT')
+        # else:
+        #     status = request.POST.get('status', u'DRAFT')
+        # self.status = unicode(status)
         # 'rating':[{'score':int, 'user_id':int, 'ip_address':basestring}],
         #       - mostly, it's on detail view and by AJAX and not in/within forms.
 
