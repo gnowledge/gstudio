@@ -257,6 +257,24 @@ This will not be used because now only existing activities will be added.
 </div>
 -->
 
+<!-- overlay/reveal to delete lesson -->
+
+  <div id="deleteLessonModal" class="reveal-modal medium radius" data-reveal data-alert>
+    <p id="deleteLessonModalLabel"></p>
+    <div class="row">
+      <div class="small-3 small-offset-3 columns">
+        <button id="delLessonbtnConfirmYes" class="orange-button">Yes</button>
+      </div>
+      <div class="small-3 columns end">
+        <button id="delLessonbtnConfirmNo" class="orange-button">No</button>
+      </div>
+    </div>
+    <a class="close-reveal-modal">&#215;</a>
+  </div>
+
+
+
+
 <!-- overlay/reveal to add lesson -->
 <div id="add-lesson-reveal" class="reveal-modal" data-reveal aria-labelledby="modalTitle" aria-hidden="true" role="dialog">
     <h3>Lesson Name</h3>
@@ -281,7 +299,7 @@ This will not be used because now only existing activities will be added.
 {% verbatim %}
 <!-- Handlebar Templates for the course tree -->
 <script id="lesson-template" type="text/x-handlebars-template">
-    <dd class="accordion-navigation active">
+    <dd class="accordion-navigation active" data-lesson-ele="lesson-accordion-{{id}}">
         <a href="#lesson-{{id}}" class="entity-title" id="lesson-accordion" data_lesson_name="{{name}}">
             {{name}}
             <div class="right edit_entity">
@@ -290,7 +308,7 @@ This will not be used because now only existing activities will be added.
                     <li class="lesson_move_up">Move up</li>
                     <li class="lesson_move_down">Move down</li>
                     <li class="lesson_edit">Edit</li>
-                    <!-- <li class="lesson_delete">Delete</li> -->
+                    <li class="lesson_delete">Delete</li>
                 </ul>
             </div>
         </a>
@@ -516,6 +534,29 @@ This will not be used because now only existing activities will be added.
           });
         }
 
+
+        function deleteNode(node_to_delete, $el_to_remove, deletion_type=0){
+          $.ajax({
+              type: "POST",
+              data:{
+                  'csrfmiddlewaretoken': "{{csrf_token}}",
+                  "node_to_delete": node_to_delete,
+                  "deletion_type": deletion_type,
+              },
+              url: "{% url 'ajax_delete_node' group_id %}",
+              success: function(data) {
+                  // console.log(typeof(data));
+                  // console.log(data);
+                  data_list = JSON.parse(data);
+                  if(data_list[0]){
+                    $el_to_remove.remove();
+                  }
+                  // alert(data_list[1])
+              }
+          });
+
+        }
+
         // remove activity
         $('.course-lessons').on('click', '.activity_remove' ,function(e){
             lesson_id = $(this).parents('div.lesson-container')
@@ -535,10 +576,62 @@ This will not be used because now only existing activities will be added.
             e.preventDefault();
 
             var lesson_id = $(this).closest('a').attr('href').replace('#lesson-', '');
+            var activitiesLength = $(this).closest('a').parent('dd.accordion-navigation').find('ul.course-activities').children().length;
+            if(activitiesLength > 1){
+                alert('You have to remove ' + String(activitiesLength - 1) + ' activities first which are falling under this lesson!');
+            }
+            else if(activitiesLength == 1){
+                confirm_delete_lesson(lesson_id,$(this, delete_mode=0).closest('a').parent('dd.accordion-navigation'), deletion_type=1)
+            }
+        });
 
-            //Ajax to delete the lesson.
-            console.log('Ajax call to delete an activity. ' + lesson_id);
-            //Update the course_data after successful delete and call rerender.
+        var set_href = false;
+        function confirm_delete_lesson(lesson_id, dom_element, deletion_type){
+            if(!set_href){
+                lbl_msg = "Are you sure you want to delete this lesson ?"
+                $("#deleteLessonModalLabel").text(lbl_msg);
+                $("#deleteLessonModal")
+                  .removeClass("medium").addClass("small")
+                lesson_id_hidden_ele = document.createElement("input");
+                lesson_id_hidden_ele.setAttribute("type", "hidden");
+                lesson_id_hidden_ele.setAttribute("name", "hidden_lesson_id");
+                lesson_id_hidden_ele.setAttribute("value", lesson_id);
+                dom_ele_hidden_ele = document.createElement("input");
+                dom_ele_hidden_ele.setAttribute("type", "hidden");
+                dom_ele_hidden_ele.setAttribute("name", "hidden_dom_ele");
+                dom_ele_hidden_ele.setAttribute("value", dom_element.attr('data-lesson-ele'));
+                del_type_hidden_ele = document.createElement("input");
+                del_type_hidden_ele.setAttribute("type", "hidden");
+                del_type_hidden_ele.setAttribute("name", "hidden_del_type");
+                del_type_hidden_ele.setAttribute("value", deletion_type);
+                $("#deleteLessonModal").append(lesson_id_hidden_ele, dom_ele_hidden_ele,del_type_hidden_ele)
+                $("#deleteLessonModal").foundation('reveal', 'open');
+            }
+
+        }
+
+        //Confirm or Cancel Deletion
+        $("#deleteLessonModal").on("click", "#delLessonbtnConfirmYes", function() {
+            set_href = true;
+            var node_to_delete = $("#deleteLessonModal").find("input[name='hidden_lesson_id']").attr('value')
+            var del_type = $("#deleteLessonModal").find("input[name='hidden_del_type']").attr('value')
+            var dom_ele_value = $("#deleteLessonModal").find("input[name='hidden_dom_ele']").attr('value')
+            dom_ele = $("[data-lesson-ele='" + dom_ele_value + "'");
+            deleteNode(node_to_delete, dom_ele, del_type);
+            $("#deleteLessonModal").find("input[name='hidden_del_type']")
+            $("#deleteLessonModal").foundation('reveal', 'close');
+
+        });
+
+        $("#deleteLessonModal").on("click", "#delLessonbtnConfirmNo", function() {
+            $("#deleteLessonModal").foundation('reveal', 'close');
+        });
+
+        $(document).on('closed.fndtn.reveal', '#deleteLessonModal', function () {
+            set_href = false;
+            $("#deleteLessonModal").find("input[name='hidden_lesson_id']").remove()
+            $("#deleteLessonModal").find("input[name='hidden_dom_ele']").remove()
+            $("#deleteLessonModal").find("input[name='hidden_del_type']").remove()
         });
 
 

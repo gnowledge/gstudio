@@ -82,18 +82,18 @@
 
         </div>
 
-        <div class="name-desc-asset-cont-area" style="display: none">
+        <div class="name-desc-asset-cont-area hide">
             <div class="row">
                 <div class="small-8 medium-6 large-6 columns">
-                    <label>Asset Content Name *
-                        <input type="text" placeholder="Enter Asset Content's name" class="required" id = "asset_content_name" name="" />
+                    <label>Enter File Name *
+                        <input type="text" placeholder="Enter File name" class="required" id = "asset_content_name" name="" />
                     </label>
                 </div>
             </div>
             <div class="row">
                 <div class="small-8 medium-6 large-6 columns">
-                <label> Asset Content Description *<br/>
-                    <textarea rows="4" cols="2" class="small-12 columns" placeholder="Enter Asset Content's Description" id="asset_content_desc"></textarea>
+                <label>Enter File Description *<br/>
+                    <textarea rows="4" cols="2" class="small-12 columns" placeholder="Enter File Description" id="asset_content_desc"></textarea>
                 </label>
                 </div>
                 <div class="small-4 columns">
@@ -130,6 +130,7 @@
                     </div>
                     <div class="asset_text">
                         <div class="asset_title" style="color: #2e3f51">{{each.name|truncatechars:35}}
+
                         </a>
                         {% if user.is_authenticated  and not group_object.edit_policy == "NON_EDITABLE"  or gstaff_access %}
                         <input type="checkbox" class="filenode" name="filenode" value="{{each.pk}}" style="margin:0; float:right;" class="asset_content_checkbox">
@@ -168,7 +169,7 @@
 <script type="text/javascript">
 
     $("#docFile").change(function(){
-        $(".name-desc-asset-cont-area").css('display','block')
+        $(".name-desc-asset-cont-area").removeClass("hide")
         $("#upload_asset").removeClass("hide")
     });
 

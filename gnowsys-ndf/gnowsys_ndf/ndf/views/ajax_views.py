@@ -126,6 +126,12 @@ def remove_from_nodelist(request, group_id):
     return HttpResponse(result)
 
 
+@login_required
+def ajax_delete_node(request, group_id):
+    node_to_delete = request.POST.get('node_to_delete', None)
+    deletion_type = eval(request.POST.get('deletion_type', 0))
+    return HttpResponse(json.dumps(delete_node(node_id=node_to_delete, deletion_type=deletion_type)))
+
 
 def checkgroup(request, group_name):
     titl = request.GET.get("gname", "")
@@ -6801,3 +6807,18 @@ def save_metadata(request, group_id):
       source_AT = node_collection.one({'_type':'AttributeType','name':'source'})
       src = create_gattribute(ObjectId(node_id), source_AT, source)
   return HttpResponse('success')
+
+def export_to_epub(request, group_id, node_id):
+    from gnowsys_ndf.ndf.views.export_to_epub import *
+    response_dict = {'success': False}
+    try:
+        node_obj = node_collection.one({'_id': ObjectId(node_id)})
+        epub_loc = create_epub(node_obj)
+        zip_file = open(epub_loc, 'rb')
+        response = HttpResponse(zip_file.read(), content_type="application/epub+zip")
+        response['Content-Disposition'] = 'attachment; filename="'+ slugify(node_obj.name) + '.epub"'       
+        return response
+    except Exception as export_fail:
+        # print "\n export_fail: ", export_fail
+        pass
+    return HttpResponse(json.dumps(response_dict))

@@ -681,9 +681,6 @@ h5{
 }
 
 
-
-
-
 #menu_bar_gstudio {
     .user-profile-pic-small {
         height: 46px;
@@ -835,9 +832,9 @@ ul.horizontal_tabs_gstudio {
         background: #eefaff;
     }
     .group_sections_content {
-        min-height: 400px;
+        // min-height: 400px;
         background-color: #fff;
-        
+        margin-bottom: 100px;
     }
 }
 
@@ -1083,6 +1080,10 @@ input[type="button"] {
     margin-left: 24px;
 }
 
+#asset_content_desc, #asset_content_name{
+    color: black !important;
+    font-size: 13px; 
+}
 
 /*  Buttons custom css */
 .button-hollow-white {    background: inherit;
@@ -2260,7 +2261,8 @@ ul.jqtree-tree .jqtree-toggler {
         height: 100%;
     }
     .course_editor {
-        height: 80vh;
+        // height: 80vh;
+        margin-bottom: 10px;
         position: relative;
 
         /*Overriding default*/
@@ -2868,3 +2870,9 @@ ul.jqtree-tree .jqtree-toggler {
 #upload_asset{
     margin-top: 60px !important;
 }
+
+#profile-img {
+    height: 40px;
+    margin-right: 5px;
+}
+

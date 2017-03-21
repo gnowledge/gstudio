@@ -59,7 +59,7 @@ urlpatterns = patterns('gnowsys_ndf.ndf.views.ajax_views',
     url(r'^delete_asset', 'delete_asset', name='delete_asset'),
     url(r'^get_metadata_page', 'get_metadata_page', name='get_metadata_page'),
     url(r'^save_metadata', 'save_metadata', name='save_metadata'),
-
+    url(r'^export_to_epub/(?P<node_id>[\w-]+)', 'export_to_epub', name='export_to_epub'),
     # url(r'^/upload_file/', 'upload_file', name='upload_file'),
 
                        # Ajax-urls required for MIS --------------------------------
@@ -117,6 +117,7 @@ urlpatterns = patterns('gnowsys_ndf.ndf.views.ajax_views',
     url(r'^get_group_pages/$', 'get_group_pages', name='get_group_pages'),
     url(r'^add_to_collection_set/$', 'add_to_collection_set', name='add_to_collection_set'),
     url(r'^remove_from_nodelist/$', 'remove_from_nodelist', name='remove_from_nodelist'),
+    url(r'^ajax_delete_node/$', 'ajax_delete_node', name='ajax_delete_node'),
 
     # url for graph display
     url(r'^graph/adminRenderGraph/(?P<node_id>[^/]+)/fetch/(?P<graph_type>[^/]+)$', 'adminRenderGraph', name='adminRenderGraph'),
