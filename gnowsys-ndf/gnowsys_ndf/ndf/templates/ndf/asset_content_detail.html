@@ -14,7 +14,6 @@
   <div class="right small-12 medium-6 columns">
 
       <h6><u>Asset Content Preview </u>&nbsp; ></b>
-            <button type="button" class="right blue-white-button edit-metadata">Edit Metadata</button>
             </h6>
                 <label>Resource name: <b> {{node.name}} </b>
                     
@@ -246,22 +245,7 @@ $(".select-language").change(function(){
         xhr.send(formData);
 
 });
-    $( ".edit-metadata" ).click(function(event) {
-    $.ajax({
-              type: "POST",
-              data:{
-                    'csrfmiddlewaretoken': "{{csrf_token}}",
-                    "node_id":'{{node.pk}}',
-                    "asset_id":'{{asset_obj}}',
-                },
-              url: "{% url 'get_metadata_page' group_id  %}",
-              datatype: "html",
-              success: function(data) {
-              $('#addAsset').foundation('reveal', 'open');
-              $('#addAsset').html(data);
-            }
-        });
-});
+    
     
   
 </script>
