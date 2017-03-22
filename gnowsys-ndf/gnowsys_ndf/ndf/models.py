@@ -716,7 +716,7 @@ class Node(DjangoDocument):
         File, etc.), built from 'member_of' field (list of ObjectIds)
 
         """
-        return [GSystemType.get_gst_name_id(gst_id)[0] for gst_id in self.member_of]
+        return [Group.get_group_name_id(gst_id)[0] for gst_id in self.member_of]
 
 
     @property
