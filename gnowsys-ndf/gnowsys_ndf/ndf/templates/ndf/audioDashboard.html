@@ -40,7 +40,7 @@
                             <input type="hidden" name="context_name" value="{{title}}">
                         </form>
                     </div>
-    {% endcomment %}
+
 
     
       <i class="fi-info"></i>You can record audio for max 30 seconds.!<br>
@@ -64,6 +64,8 @@
     </div>
 
     <div id="audios-container"></div>
+    {% endcomment %}
+     <ul class="small-block-grid-1 medium-block-grid-3 large-block-grid-3" >
     <h4>Select Audio: </h4>
     <div class="row">
     {% for each in audioCollection %}
@@ -85,6 +87,7 @@
   </ul>
  -->   
 
+{% comment %}
     <script>
 
     // 
@@ -303,7 +306,6 @@
     };
     </script>
 
-{% comment %}
 <script type="text/javascript">
   var form = document.getElementById('docPost');
   var fileSelect = document.getElementById('docFile');
@@ -382,7 +384,6 @@
 
   
 </script>
-{% endcomment %}
 <script type="text/javascript">
   $(function() {
      $("input:file").change(function (){
@@ -439,3 +440,4 @@ $("#btnUploadCancel").click(function() {
   });
 
 </script>
+{% endcomment %}

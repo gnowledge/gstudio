@@ -57,6 +57,8 @@ urlpatterns = patterns('gnowsys_ndf.ndf.views.ajax_views',
     url(r'^add_assetcontent', 'add_assetcontent', name='add_assetcontent'),
     url(r'^add_asset', 'add_asset', name='add_asset'),
     url(r'^delete_asset', 'delete_asset', name='delete_asset'),
+    url(r'^get_metadata_page', 'get_metadata_page', name='get_metadata_page'),
+    url(r'^save_metadata', 'save_metadata', name='save_metadata'),
     url(r'^export_to_epub/(?P<node_id>[\w-]+)', 'export_to_epub', name='export_to_epub'),
     # url(r'^/upload_file/', 'upload_file', name='upload_file'),
 
