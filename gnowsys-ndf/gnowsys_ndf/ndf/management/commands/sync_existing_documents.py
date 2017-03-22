@@ -858,7 +858,7 @@ class Command(BaseCommand):
         if not isinstance(rt_node, ObjectId):
             rt_obj = RelationType(db.dereference(rt_node))
             each_grelation.relation_type = rt_obj._id
-            print each_grelation
+            # print each_grelation
             try:
                 each_grelation.save(triple_node=rt_obj,triple_id=rt_obj._id)
             except Exception as er:
