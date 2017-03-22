@@ -114,17 +114,17 @@ def get_execution_time(f):
             # except :
             #     pass
 
-        # record_in_benchmark.delay(kwargs_len=len(kwargs),
-        #                     # total_param_size=sum([getsizeof(each_kwarg) for each_kwarg in kwargs.values()]),
-        #                     total_param_size=None,
-        #                     post_bool=post_bool,
-        #                     get_bool=get_bool,
-        #                     sessionid=sessionid,
-        #                     user_name=user_name,
-        #                     path=path,
-        #                     funct_name=f.func_name,
-        #                     time_taken=unicode(str(time2 - time1))
-        #                 )
+        record_in_benchmark(kwargs_len=len(kwargs),
+                            # total_param_size=sum([getsizeof(each_kwarg) for each_kwarg in kwargs.values()]),
+                            total_param_size=None,
+                            post_bool=post_bool,
+                            get_bool=get_bool,
+                            sessionid=sessionid,
+                            user_name=user_name,
+                            path=path,
+                            funct_name=f.func_name,
+                            time_taken=unicode(str(time2 - time1))
+                        )
         return ret
     return wrap
 
