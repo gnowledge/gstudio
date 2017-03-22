@@ -1,5 +1,5 @@
 import os
-import time
+import datetime
 import subprocess
 from django.core.management.base import BaseCommand, CommandError
 from gnowsys_ndf.ndf.models import *
@@ -17,7 +17,8 @@ media_url_not_found = set()
 media_url_found = set()
 historyMgr = HistoryManager()
 # /data/gstudio_data_restore
-restore_rcs_data_path = os.path.join(GSTUDIO_DATA_ROOT, 'gstudio_data_restore')
+datetimestamp = datetime.datetime.now().isoformat()
+restore_rcs_data_path = os.path.join(GSTUDIO_DATA_ROOT, 'gstudio_data_restore', str(datetimestamp))
 restore_media_path = os.path.join(restore_rcs_data_path, 'media')
 
 if not os.path.exists(restore_rcs_data_path):
@@ -137,14 +138,14 @@ class Command(BaseCommand):
                 print '!'*60
                 pass
 
-            log_file_name = 'data_dump_of_' + str(group_id)+ '.log'
+            log_file_name = 'group_dump_' + str(group_id)+ '.log'
             if not os.path.exists(GSTUDIO_LOGS_DIR_PATH):
                 os.makedirs(GSTUDIO_LOGS_DIR_PATH)
 
             log_file_path = os.path.join(GSTUDIO_LOGS_DIR_PATH, log_file_name)
             # print log_file_path
             with open(log_file_path, 'a+') as log_file:
-                log_file.write("######### Script ran on : " + time.strftime("%c") + " #########\n\n")
+                log_file.write("######### Script ran on : " + str(datetime.datetime.now()) + " #########\n\n")
 
                 log_file.write("\n*************************************************************")
                 log_file.write("\n\nTotal Migrations Expected: "+ str(len(node_collection_ids) + len(triple_collection_ids) + len(filehives_collection_ids) + len(filehives_media_urls) + len(counter_collection_ids)))
@@ -227,6 +228,9 @@ def dump_node_ids(list_of_ids,collection_name):
             elif collection_name == "counter_collection":
                 each_node_by_id = counter_collection.find_one({"_id":ObjectId(each_id_of_list)})
             if each_node_by_id:
+                # To update RCS
+                each_node_by_id.save()
+
                 path = historyMgr.get_file_path(each_node_by_id)
                 path = path + ",v"
 
