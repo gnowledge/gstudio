@@ -65,8 +65,8 @@ class Command(BaseCommand):
 
     print "\nUpdating GRelations and GAttributes."
     grel_res = triple_collection.collection.update({'_type': 'GRelation',\
-     '$or': [{'relation_type_scope': {'$eq': None}, 'subject_scope': \
-     {'$exists': False}, 'object_scope': {'$exists': False}}]},\
+     '$or': [{'relation_type_scope': {'$eq': None}}, {'subject_scope': \
+     {'$exists': False}}, {'object_scope': {'$exists': False}}]},\
      {'$unset': { 'right_subject_scope': ""} , '$set': \
      {'relation_type_scope': {}, 'object_scope': None,\
      'subject_scope': None }}, upsert=False, multi=True)
@@ -74,8 +74,8 @@ class Command(BaseCommand):
         print "\n Added 'scope' fields to " + grel_res['n'].__str__() + " GRelation instances."
 
     gattr_res = triple_collection.collection.update({'_type': 'GAttribute',\
-     '$or': [{'attribute_type_scope': {'$eq': None}, 'subject_scope': \
-     {'$exists': False}, 'object_scope': {'$exists': False} }]}, \
+     '$or': [{'attribute_type_scope': {'$eq': None}}, {'subject_scope': \
+     {'$exists': False}}, {'object_scope': {'$exists': False}}]}, \
      {'$unset': { 'object_value_scope': ""} , '$set': \
      {'attribute_type_scope': {}, 'object_scope': None, \
      'subject_scope': None }}, upsert=False, multi=True)
