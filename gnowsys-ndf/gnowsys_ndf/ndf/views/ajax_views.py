@@ -136,12 +136,12 @@ def collection_create(request, group_id):
     create_gattribute(page_node._id, discussion_enable_at, True)
     return_status = create_thread_for_node(request,group_id, page_node)
     group_object = node_collection.one({'_id': ObjectId(group_id)})
-    if group_object.edit_policy == "EDITABLE_MODERATED":
-                    # print "\n\n\n\ninside editable moderated block"
-                    page_node.group_set = get_moderator_group_set(page_node.group_set, group_object._id)
-                    # print "\n\n\npage_node._id",page_node._id
-                    page_node.status = u'MODERATION'
-                    # print "\n\n\n page_node.status",page_node.status
+    # if group_object.edit_policy == "EDITABLE_MODERATED":
+    #                 # print "\n\n\n\ninside editable moderated block"
+    #                 page_node.group_set = get_moderator_group_set(page_node.group_set, group_object._id)
+    #                 # print "\n\n\npage_node._id",page_node._id
+    #                 page_node.status = u'MODERATION'
+    #                 # print "\n\n\n page_node.status",page_node.status
 
     if coll_redir == "raw-material":
       page_node.tags.append(u'raw@material')
@@ -701,15 +701,15 @@ def search_drawer(request, group_id):
       
 @get_execution_time
 def get_topic_contents(request, group_id):
-  if request.is_ajax() and request.method == "POST":
-    node_id = request.POST.get("node_id", '')
-    selected = request.POST.get("selected", '')
-    choice = request.POST.get("choice", '')
-    # node = node_collection.one({'_id': ObjectId(node_id) })
+  # if request.is_ajax() and request.method == "POST":
+  node_id = request.GET.get("node_id", '')
+  selected = request.GET.get("selected", '')
+  choice = request.GET.get("choice", '')
+  # node = node_collection.one({'_id': ObjectId(node_id) })
 
-    contents = get_contents(node_id, selected, choice)
+  contents = get_contents(node_id, selected, choice)
 
-    return HttpResponse(json.dumps(contents))
+  return HttpResponse(json.dumps(contents))
 
 
 ####Bellow part is for manipulating theme topic hierarchy####
@@ -6397,8 +6397,24 @@ def search_users(request, group_id):
     if request.is_ajax() and request.method == "GET":
         from bson import json_util
         username_str = request.GET.get("username_str", '')
-        filtered_users = User.objects.filter(username__icontains=str(username_str)).values_list('id', 'username')
-        # print "filtered_users ;; ", len(filtered_users)
+        subscription_status_val = request.GET.get("subscription_status_val", '')
+        if subscription_status_val:
+            filtered_users = []
+            users_data = User.objects.filter(username__icontains=str(username_str)).values_list('id', 'username')
+            group_object = node_collection.one({'_id': ObjectId(group_id)})
+            for each_filtered_user in users_data:
+                if each_filtered_user[0] in group_object.author_set:
+                    if each_filtered_user[0] in group_object.group_admin:
+                        filtered_users.append(each_filtered_user+(True,True))
+                    else:
+                        filtered_users.append(each_filtered_user+(True,False))
+                else:
+                    if each_filtered_user[0] in group_object.group_admin:
+                        filtered_users.append(each_filtered_user+(False,True))
+                    else:
+                        filtered_users.append(each_filtered_user+(False,False))
+        else:
+            filtered_users = User.objects.filter(username__icontains=str(username_str)).values_list('id', 'username')
         return HttpResponse(json_util.dumps(filtered_users, cls=NodeJSONEncoder))
 
 
@@ -6444,3 +6460,44 @@ def upload_video_thumbnail(request,group_id):
       node_collection.collection.update({'_id': ObjectId(gs_obj_id)}, {'$set': {'group_set': [warehouse_grp_obj._id] }}, upsert=False, multi=False)
 
     return StreamingHttpResponse(str(gs_obj_id))
+
+
+@get_execution_time
+def get_paged_images(request, group_id):
+  is_create_collection =  request.GET.get('is_create_collection','')
+  is_add_to_collection =  request.GET.get('is_add_to_collection','')
+  result_cur = node_collection.find({
+                          'member_of': {'$in': [GST_FILE._id, GST_PAGE._id]},
+                                            'group_set': {'$all': [ObjectId(group_id)]},
+                                            '$or': [
+                                                {'access_policy': u"PUBLIC"},
+                                                {'$and': [
+                                                    {'access_policy': u"PRIVATE"},
+                                                    {'created_by': request.user.id}
+                                                ]
+                                             }
+                                            ],
+                                            'collection_set': {'$exists': "true", '$not': {'$size': 0} }
+                                        }).sort("last_update", -1)
+  # print "\n\n\n result",result_cur.count()
+
+
+  return render_to_response('ndf/course_create_collection.html',
+    {
+      "group_id":group_id,"result_cur":result_cur,"is_create_collection":is_create_collection,"is_add_to_collection":is_add_to_collection
+    },context_instance=RequestContext(request))
+
+
+@get_execution_time
+def get_templates_page(request, group_id):
+  try:
+      group_id = ObjectId(group_id)
+  except:
+      group_name, group_id = get_group_name_id(group_id)
+  templates_gst = node_collection.one({"_type":"GSystemType","name":"Template"})
+  if templates_gst._id:
+    templates_cur = node_collection.find({"member_of":ObjectId(GST_PAGE._id),"type_of":ObjectId(templates_gst._id)})
+  template = "ndf/templates_list.html"
+  already_uploaded=request.GET.getlist('var',"")
+  variable = RequestContext(request, {'groupid':group_id,'group_id':group_id,'templates_cur':templates_cur })
+  return render_to_response(template, variable)

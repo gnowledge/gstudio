@@ -1,4 +1,4 @@
-{% load get_course_filters get_group_name from ndf_tags %}
+{% load get_course_filters get_group_name  check_is_gstaff from ndf_tags %}
 {% load i18n %}
 {% load simple_filters %}
 
@@ -45,14 +45,19 @@
                             <span> Create note</span>
                         </a>
                         </div>
+                        {% check_is_gstaff group_id request.user as gstaff_access %}
+                        {% if gstaff_access %}
                         <div class="create-collection " id="create-collection">
                             <i class="fi-folder"></i>
                             <span> Create new collection</span>
                         </div>
+                        {% endif %}
+                        {% comment %}
                         <div class ="add-to-collection " id="add-to-collection">
                             <i class="fa fa-plus"></i>
                             <span>Add to collection</span>
                         </div>
+                        {% endcomment %}
                         <!-- <div class="download-file hide">
                             <i class="fi-download"></i>
                             <span> Download</span>

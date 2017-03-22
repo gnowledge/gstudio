@@ -1,0 +1,366 @@
+body
+        {
+            font-family:arial;
+            font-size:14px;
+            line-height:24px;
+        }
+        a
+        {
+            color:#0b57a4;
+            text-decoration:none;
+        }
+        a:hover
+        {
+            text-decoration: underline;
+        }
+        .wid
+        {
+            width:90%;
+            margin:auto;
+        }
+        .left-20
+{
+    width:20%;
+    display:inline-block;
+    vertical-align:top;
+     border:1px solid #e0e0e0;
+     font-size:0px;
+}
+        .jmolImage
+        {
+          font-family:arial !important;
+          border:1px solid #888;
+        }
+        #myJmol1_Image_app_title
+        {
+          background:#eaeaea !important;
+        }
+        .outer-container
+        {
+            height:630px;
+            display:inline;
+            float:right;
+            margin:0px 0px 20px 20px;
+           margin-top:0px;
+            padding:20px;
+            padding-top:0px;
+        }
+        .jmol-container
+        {
+            width:100%;
+            height:auto;
+          background:#fff;
+        }
+        .Jmol-title
+        {
+            text-align:center;
+            font-weight:bold;
+            margin-bottom:10px;
+            /*background: linear-gradient(#eaeaea, #fff);*/
+            background:#71A7DE;
+line-height: 40px;
+color: white;
+font-size:14px;
+        }
+        input, select
+        {
+            webkit-border-radius: 0px;
+background-color: #FFFFFF;
+font-family: inherit;
+border-style: solid;
+border-width: 1px;
+border-color: #cccccc;
+box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.1);
+color: rgba(0, 0, 0, 0.75);
+padding: 0.5rem;
+margin:0px;
+-webkit-box-sizing: border-box;
+-moz-box-sizing: border-box;
+box-sizing: border-box;
+transition: box-shadow 0.45s, border-color 0.45s ease-in-out;
+margin-bottom:15px;
+        }
+        button
+        {
+            border-style: solid;
+border-width: 0px;
+cursor: pointer;
+font-family: "Source Sans Pro", "Open Sans", "Ubuntu", "FreeSans", "Helvetica Neue", Helvetica, Arial, sans-serif;
+font-weight: normal;
+line-height: normal;
+margin: 0 0 1.25rem;
+position: relative;
+text-decoration: none;
+text-align: center;
+-webkit-appearance: none;
+-webkit-border-radius: 0;
+display: inline-block;
+padding: 0.5rem 1.1rem;
+font-size: 1rem;
+background-color: #03a9f4;
+border-color: #0287c3;
+color: #FFFFFF;
+transition: background-color 300ms ease-out;
+margin-left:10px;
+        }
+        
+
+.left-10
+{
+    width:20%;
+    display:inline-block;
+    vertical-align:top;
+    border:1px solid #f5f5f5;
+}
+.left-55
+{
+    width:54%;
+    margin:0% 2%;
+    display:inline-block;
+     vertical-align:top;
+}
+.left-10 table
+{
+    background:#d9edfb;
+    font-size:13px;
+   border: 1px solid #c5c5c5;
+-webkit-box-shadow: 0 3px 8px rgba(0, 0, 0, .25);
+-moz-box-shadow: 0 3px 8px rgba(0, 0, 0, .25);
+box-shadow: 0 3px 8px rgba(0, 0, 0, .25);
+   
+}
+.left-10 table td
+{
+    padding:7px;
+    border:1px solid #fff;
+}
+.bg-td
+{
+    background: #fcf3cf;
+color: #000;
+font-weight: normal;
+}
+.blue-bg
+{
+    background:#71A7DE ;
+    color:white;
+    font-weight:bold;
+    font-size: 14px;
+    text-align: center;
+}
+p
+{
+    margin-top:0px;
+}
+#myJmol1_appletinfotablediv {
+    height: 500px !important;
+    width: 700px !important;
+    margin: auto;
+    max-width: 100%;
+}
+.left-20 img
+{
+
+max-width:50%;
+margin:auto;
+}
+.image-3d img
+{
+max-width:80%;
+margin:auto;
+}
+.left
+{
+    display:inline-block;
+    width:50%;
+    vertical-align:top;
+    margin:0px;
+}
+.clear
+{
+    clear:both;
+}
+#myJmol1_query, #myJmol1_select, #myJmol1_submit, .jmol-container br
+{
+    display:none;
+}
+
+
+
+.box {
+  width: 20%;
+  margin: 0 auto;
+  background: rgba(255,255,255,0.2);
+  padding: 35px;
+  border: 2px solid #fff;
+  border-radius: 20px/50px;
+  background-clip: padding-box;
+  text-align: center;
+}
+
+.button {
+  font-size: 1em;
+  padding: 10px;
+  color: #fff;
+  border: 2px solid #06D85F;
+  border-radius: 20px/50px;
+  text-decoration: none;
+  cursor: pointer;
+  transition: all 0.3s ease-out;
+}
+.button:hover {
+  background: #06D85F;
+}
+
+.overlay {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  background: rgba(0, 0, 0, 0.7);
+  transition: opacity 500ms;
+  visibility: hidden;
+  opacity: 0;
+}
+.overlay:target {
+  visibility: visible;
+  opacity: 1;
+  top: 0;
+}
+
+.popup {
+  margin: 70px auto;
+  padding: 20px;
+  background: #fff;
+  border-radius: 5px;
+  width: 50%;
+  position: relative;
+  transition: all 5s ease-in-out;
+}
+
+.popup h2 {
+  margin-top: 0;
+  color: #333;
+  font-family: Tahoma, Arial, sans-serif;
+}
+.popup .close {
+  position: absolute;
+  top: 20px;
+  right: 30px;
+  transition: all 200ms;
+  font-size: 30px;
+  font-weight: bold;
+  text-decoration: none;
+  color: #333;
+  font-size:16px;
+  z-index: 10000;
+}
+.popup .close:hover {
+  color: red;
+}
+.popup .content {
+  max-height: 30%;
+  overflow: auto;
+}
+
+@media screen and (max-width: 700px){
+  .box{
+    width: 70%;
+  }
+  .popup{
+    width: 70%;
+  }
+}
+
+.view
+{
+    font-size:14px;
+}
+.left-20 .close
+{
+    font-size:16px !important;
+    color:#333;
+}
+.left-20 .popup
+{
+  font-size:12px !important;
+  font-style: italic;
+  color:#666;
+}
+.left-20 .popup img
+{
+  max-width:80%;
+}
+#popup2 .popup
+{
+  width:80%;
+}
+
+#popup3 .popup
+{
+  width:70%;
+  
+}
+
+.enlarge
+{
+    text-align:right;
+    padding-right:5px;
+}
+.source
+{
+  font-style: italic;
+  font-weight: normal;
+  text-align:right;
+  font-size:12px;
+}
+    /* Large desktop */
+    @media (min-width: 1200px) { ... }
+     
+    /* Portrait tablet to landscape and desktop */
+    @media (min-width: 768px) and (max-width: 979px) {
+.left-20
+{
+  width:20%;
+}
+.left-55
+      {
+        width:75%;
+      }
+.left-10
+      {
+        width:100%;
+        margin-top:20px;
+      }
+      .left-10 table td {
+    width: 50%;
+}
+     }
+     
+    /* Landscape phone to portrait tablet */
+    @media (max-width: 767px) { ... }
+     
+    /* Landscape phones and down */
+    @media (max-width: 480px) { 
+      .left-20, .left-55, .left-10
+      {
+        width:100%;
+      }
+ .box{
+    width: 70%;
+  }
+  .left-55, .left-10
+  {
+    margin-top:20px;
+  }
+  .popup{
+    width: 90%;
+    padding:0px;
+  }
+    }
+    .enlarge h4
+    {
+      margin:2px 0px;
+      padding:0px;
+    }

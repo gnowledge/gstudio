@@ -38,6 +38,7 @@ from django.template.loader import render_to_string
 # to display error template if non existent pub is given in settings.py
 from django.shortcuts import render
 from django.core.handlers.wsgi import WSGIRequest
+from django.core.exceptions import PermissionDenied
 
 ''' -- imports from application folders/files -- '''
 from gnowsys_ndf.settings import META_TYPE, GSTUDIO_NROER_GAPPS
@@ -62,10 +63,24 @@ topic_GST = node_collection.one({'_type': 'GSystemType', 'name': 'Topic'})
 grp_st = node_collection.one({'$and': [{'_type': 'GSystemType'}, {'name': 'Group'}]})
 ins_objectid = ObjectId()
 
+
 # C O M M O N   M E T H O D S   D E F I N E D   F O R   V I E W S
 
-def get_execution_time(f):
+def staff_required(func):
+    """
+    Decorator for CRUD views of Group and Event to check whether a user
+    is allowed and is active.
+    Currently, ONLY SuperUsers will be allowed.
+    """
+    def wrapper(*args, **kwargs):
+        for arg in args:
+            if arg.user.is_superuser and arg.user.is_active:
+                return func(*args, **kwargs)
+            raise PermissionDenied
+    return wrapper
 
+
+def get_execution_time(f):
     def wrap(*args,**kwargs):
 
         time1 = time.time()
@@ -1128,7 +1143,7 @@ def get_node_common_fields(request, node, group_id, node_type, coll_set=None):
         # print "\n\n\n content_org",content_org
         tags = request.POST.get('tags','')
     language = request.POST.get('lan')
-    license = request.POST.get('license')
+    copyright = request.POST.get('copyright')
     sub_theme_name = request.POST.get("sub_theme_name", '')
     add_topic_name = request.POST.get("add_topic_name", '')
     is_changed = False
@@ -1337,8 +1352,8 @@ def get_node_common_fields(request, node, group_id, node_type, coll_set=None):
         node.location = map_geojson_data  # Storing location data
         is_changed = True
 
-    if node.license != license:
-        node.license = license
+    if node.legal['copyright'] != copyright:
+        node.legal['copyright'] = copyright
         is_changed = True
 
     if user_last_visited_location:

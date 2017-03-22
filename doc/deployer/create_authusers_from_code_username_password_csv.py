@@ -1,13 +1,14 @@
 import os
 import csv
 import time
+import re
 from bson import ObjectId
 from django.contrib.auth.models import User
 from gnowsys_ndf.settings import GSTUDIO_LOGS_DIR_PATH
 from gnowsys_ndf.ndf.models import Author, node_collection
 
 if not os.path.isdir(GSTUDIO_LOGS_DIR_PATH):
-	os.makedirs(GSTUDIO_LOGS_DIR_PATH)
+    os.makedirs(GSTUDIO_LOGS_DIR_PATH)
 
 auth_gst = node_collection.one({'_type': u'GSystemType', 'name': u'Author'})
 auth_gst_id = auth_gst._id
@@ -23,12 +24,22 @@ if os.path.exists(file_input):
     with open(file_input, 'rb') as csvfile:
         users = csv.reader(csvfile, delimiter=';')
         for school_code, username, password in users:
+
+            # email validation from username
+            email = ''
+            match = re.match('^[_a-z0-9-]+(\.[_a-z0-9-]+)*@[a-z0-9-]+(\.[a-z0-9-]+)*(\.[a-z]{2,4})$', username)
+            if match:
+                email = username
+
             temp_csv_log_list = [school_code, username, password]
-            user_obj = User.objects.create_user(username=username, password=password)
+            user_obj = User.objects.create_user(username=username, email=email, password=password)
             user_id = user_obj.id
+            
             temp_csv_log_list.append(str(user_id))
+
             auth = node_collection.collection.Author()
             auth['name'] = unicode(username)
+            auth['email'] = unicode(email)
             auth['member_of'] = [auth_gst_id]
             auth['group_type'] = u"PUBLIC"
             auth['edit_policy'] = u"NON_EDITABLE"

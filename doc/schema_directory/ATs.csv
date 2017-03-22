@@ -85,6 +85,6 @@ quizitem_max_attempts,QuizItem Maximum Attempts,int,[],"[""QuizItem"",""QuizItem
 quizitem_check_answer,QuizItem Check Answer,bool,[],"[""QuizItem"",""QuizItemEvent""]",FALSE,TRUE,[],[],
 quizitempost_user_submitted_ans,QuizItemPost User Submitted Answer,list,[],"[""QuizItemPost""]",TRUE,TRUE,[],[],
 quizitempost_user_checked_ans,QuizItemPost User Checked Answer,list,[],"[""QuizItemPost""]",TRUE,TRUE,[],[],
-discussion_enable,Discussion Enable,bool,[],"[""Page"", ""File"",""E-Book"",""QuizItemEvent""]",TRUE,TRUE,[],[],
+discussion_enable,Discussion Enable,bool,[],"[""Page"", ""File"",""E-Book"",""QuizItemEvent"", ""Jsmol"", ""TurtleBlocks"", ""PoliceSquad"", ""OpenStoryTool"", ""BioMechanics""]",TRUE,TRUE,[],[],
 is_bigbluebutton,Online Meeting,bool,[],"[""Event""]",TRUE,TRUE,[],[],
 open_event,Open Event (All group members can join the event),bool,[],"[""Event""]",TRUE,TRUE,[],[],

@@ -75,7 +75,7 @@
             if (node.collection_set && node.collection_set.length > 0 ){
               cr_ids = cr_ids.concat(node.collection_set)
               $li.find('.jqtree-title').addClass('module-page');
-              url = '/{{group_name_tag}}/gcourse/course_section/' + node.parent.id + '/' + node.id + '/' + node.collection_set[0]
+              url = '/{{group_name_tag}}/course/course_section/' + node.parent.id + '/' + node.id + '/' + node.collection_set[0]
               $li.find('.jqtree-title')
                 .html('<a href="'+url+'" id='+node.collection_set[0]+' class="redirect_to_unitplayer"><span>' + $li.find('.jqtree-title').html() + ' </a></span>');
             }
@@ -171,7 +171,6 @@
                   $("#view_page").html(data);
                 }
             });
-            $('article').unblock()
             }
             else if(node['node_type']=="CourseUnitEvent"){
               $(".view_page_link").trigger('click')

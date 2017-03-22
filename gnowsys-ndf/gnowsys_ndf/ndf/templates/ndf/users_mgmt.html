@@ -18,7 +18,7 @@
   }
 {% endblock %}
 {% block meta_content %}
-    <a href="{% url 'groupchange' group_name %}"><h3><u>Go back to Course '{{group_name}}' </u></h3></a>
+    <a href="{% url 'groupchange' group_name %}"><h3><u>Go back to '{{group_name}}' </u></h3></a>
 {% endblock %}
 
 
@@ -54,89 +54,11 @@
     <a class="close-reveal-modal">&#215;</a>
   </div>
 
-<br/><br/>
-  <div class="batch_div">
-  <div class="row">
-    <div style="text-align: center;">
-      <div class="small-4 columns end" style="display: inline-block;  ">
-        <h5>{% trans 'Search Student by name : ' %}</h5>
-      </div>
-      <div class="small-4 columns end" style="display: inline-block;  ">
-        <input type="text" class="student_name small-6 columns" value="" placeholder="Enter atleast 3 letters to search">
-        <input type="button" class="tiny radius button search_stud_btn" value="Find Students" />
-        <a href="{% url 'groupchange' group_name %}" class="tiny radius button">Cancel</a>
-      </div>
-    </div>
-  </div>
-  </div>
-  <div id="student_count_div"></div>
-  <div id="student_data_set_div"></div>
-
-
+    {% include "ndf/widget_user_search.html" %}
 {% endblock %}
 
 {% block script %}
-    var search_text_old = "";
-    $(document).on( 'click', '.search_stud_btn', function (e) {
-        var search_text = $(".student_name").val().toLowerCase();
-        var search_text_len = (search_text.length);
-        if (search_text_len > 2){
-        $.ajax({
-          type: "GET",
-          url: "{% url 'search_users' groupid %}",
-          datatype: "json",
-          data:{
-            'username_str': search_text,
-          },
-          success: function(data) {
-            $("#student_data_set_div").html("")
-            data = JSON.parse(data)
-            if(data.length > 0){
-              $("#student_count_div").html("Total "+ data.length+" student(s) found.")
-              var stud_table = document.createElement('table');
-              outer_div = document.getElementById("student_data_set_div");
-              stud_table.style.width = "100%"
-              outer_div.style.height = "450px"
-              outer_div.style.overflowX = "hidden"
-              outer_div.style.overflowY = "auto"
-              var table_header = stud_table.createTHead();
-              var header_row = table_header.insertRow(0)     
-              var cell1 = header_row.insertCell(0)
-              var cell2 = header_row.insertCell(1)
-              var cell3 = header_row.insertCell(2)
-              cell1.innerHTML = "<b>No.</b>"
-              cell2.innerHTML = "<b>Name</b>"
-              cell3.innerHTML = "<b>Action</b>"
-              var table_body = stud_table.createTBody();
-    
-              $.each(data, function(index_val,tuple_obj){
-                var data_row = table_body.insertRow(-1); 
-                data_row.id =  tuple_obj[0]
-                var serial_no_cell = data_row.insertCell(0);
-                var data_cell = data_row.insertCell(1);
-                var change_pass = data_row.insertCell(2);
-
-                serial_no_cell.innerHTML = index_val + 1
-                data_cell.innerHTML = tuple_obj[1]
-                data_cell.className = "username"
-                change_pass.innerHTML = "<a>Change Password</a>"
-                change_pass.className = "change_pass"
-              })
-
-              $("#student_data_set_div").append(stud_table);
-            }
-            else{
-              $("#student_data_set_div").html("No results found")      
-            }
-          },
-        });
-        }
-        else{
-          alert("Please enter some text to search.")
-        }
-    })
-
-    $(document).on('click','.change_pass', function(event){
+    $(document).on('click','.action_on_user', function(event){
       $(".password1").val("")
       $(".password2").val("")
       student_id = $(this).closest('tr').attr('id')

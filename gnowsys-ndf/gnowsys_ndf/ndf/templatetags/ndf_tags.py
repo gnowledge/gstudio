@@ -108,7 +108,7 @@ def get_site_variables():
 	site_var['ORG_NAME'] = GSTUDIO_ORG_NAME
 	site_var['LOGO'] = GSTUDIO_SITE_LOGO
 	site_var['FAVICON'] = GSTUDIO_SITE_FAVICON
-	site_var['COPYRIGHT'] = GSTUDIO_COPYRIGHT
+	site_var['COPYRIGHT'] = GSTUDIO_DEFAULT_COPYRIGHT
 	site_var['GIT_REPO'] = GSTUDIO_GIT_REPO
 	site_var['PRIVACY_POLICY'] = GSTUDIO_SITE_PRIVACY_POLICY
 	site_var['TERMS_OF_SERVICE'] = GSTUDIO_SITE_TERMS_OF_SERVICE
@@ -184,8 +184,8 @@ def get_group_agency_types():
 
 @get_execution_time
 @register.assignment_tag
-def get_license():
-   return GSTUDIO_LICENSE
+def get_copyright():
+   return GSTUDIO_COPYRIGHT
 
 
 @get_execution_time
@@ -1473,12 +1473,9 @@ def get_edit_url(groupid):
 	node = node_collection.one({'_id': ObjectId(groupid) })
 	if node._type == 'GSystem':
 
-		type_name = node_collection.one({'_id': node.member_of[0]}).name
-
+		type_name = node_collection.one({'_id': ObjectId(node.member_of[0])}).name
 		if type_name == 'Quiz':
 			return 'quiz_edit'
-		elif type_name == 'Page':
-			return 'page_create_edit'
 		elif type_name == 'Term':
 			return 'term_create_edit'
 		elif type_name == 'Theme' or type_name == 'Topic':
@@ -1491,6 +1488,8 @@ def get_edit_url(groupid):
 			return 'edit_thread'
 		elif type_name == 'File':
 			return 'file_edit'
+		else:
+			return 'page_create_edit'
 
 
 	elif node._type == 'Group' or node._type == 'Author' :
@@ -2751,7 +2750,7 @@ def str_to_dict(str1):
                       filesize_dic[k1] = v1
               dict_format[k] = filesize_dic
     order_dict_format = OrderedDict()
-    order_val=['altnames','language','plural','_type','member_of','created_by','created_at','tags','modified_by','author_set','group_set','collection_set','contributors','last_update','start_publication','location','license','attribute_set','relation_set']
+    order_val=['altnames','language','plural','_type','member_of','created_by','created_at','tags','modified_by','author_set','group_set','collection_set','contributors','last_update','start_publication','location','legal','attribute_set','relation_set']
     for each in order_val:
             order_dict_format[each]=dict_format[each]
     return order_dict_format
@@ -3827,18 +3826,22 @@ def get_info_pages(group_id):
 @register.assignment_tag
 def get_download_filename(node, file_size_name='original'):
 
+	extension = None
 	if hasattr(node, 'if_file') and node.if_file[file_size_name].relurl:
-
 		from django.template.defaultfilters import slugify
 		relurl = node.if_file[file_size_name].relurl
 		relurl_split_list = relurl.split('.')
 
 		if len(relurl_split_list) > 1:
-			extension = relurl_split_list[-1]
+			extension = "." + relurl_split_list[-1]
 		elif 'epub' in node.if_file.mime_type:
-			extension = 'epub'
+			extension = '.epub'
+		elif not extension:
+			file_hive_obj = filehive_collection.one({'_id':ObjectId(node.if_file.original.id)})
+			file_blob = node.get_file(node.if_file.original.relurl)
+			file_mime_type = file_hive_obj.get_file_mimetype(file_blob)
+			extension = mimetypes.guess_extension(file_mime_type)
 		else:
-			import mimetypes
 			extension = mimetypes.guess_extension(node.if_file.mime_type)
 
 		name = node.altnames if node.altnames else node.name
@@ -3846,7 +3849,7 @@ def get_download_filename(node, file_size_name='original'):
 		file_name = slugify(name)
 
 		if extension:
-			file_name += '.' + extension
+			file_name += extension
 
 		return file_name
 

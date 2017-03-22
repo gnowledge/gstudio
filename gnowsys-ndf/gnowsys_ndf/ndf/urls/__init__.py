@@ -57,6 +57,7 @@ urlpatterns = patterns('',
     (r'^(?P<group_id>[^/]+)/mailclient', include('gnowsys_ndf.ndf.urls.mailclient')),
     (r'^(?P<group_id>[^/]+)/analytics', include('gnowsys_ndf.ndf.urls.analytics')),
     (r'^(?P<group_id>[^/]+)/file', include('gnowsys_ndf.ndf.urls.file')),
+    (r'^(?P<group_id>[^/]+)/jhapp', include('gnowsys_ndf.ndf.urls.jhapp')),
     (r'^(?P<group_id>[^/]+)/filehive', include('gnowsys_ndf.ndf.urls.filehive')),
     (r'^(?P<group_id>[^/]+)/image', include('gnowsys_ndf.ndf.urls.image')),
     (r'^(?P<group_id>[^/]+)/audio', include('gnowsys_ndf.ndf.urls.audio')),
@@ -67,11 +68,12 @@ urlpatterns = patterns('',
     (r'^(?P<group_id>[^/]+)/forum', include('gnowsys_ndf.ndf.urls.forum')),
     (r'^(?P<group_id>[^/]+)/quiz', include('gnowsys_ndf.ndf.urls.quiz')),
     (r'^(?P<group_id>[^/]+)/discussion', include('gnowsys_ndf.ndf.urls.discussion')),
+    (r'^(?P<group_id>[^/]+)/unit',include('gnowsys_ndf.ndf.urls.unit')),
 
     # Commented following url for khaal hackathon
-    # (r'^(?P<group_id>[^/]+)/course', include('gnowsys_ndf.ndf.urls.course')),
+    (r'^(?P<group_id>[^/]+)/course', include('gnowsys_ndf.ndf.urls.course')),
 
-    (r'^(?P<group_id>[^/]+)/gcourse', include('gnowsys_ndf.ndf.urls.gcourse')),
+    # (r'^(?P<group_id>[^/]+)/gcourse', include('gnowsys_ndf.ndf.urls.gcourse')),
 
     (r'^(?P<group_id>[^/]+)/program', include('gnowsys_ndf.ndf.urls.program')),
     (r'^(?P<group_id>[^/]+)/module', include('gnowsys_ndf.ndf.urls.module')),

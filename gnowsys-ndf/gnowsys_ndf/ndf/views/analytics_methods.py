@@ -259,9 +259,6 @@ class AnalyticsMethods(object):
 
 		self.all_comments_on_user_notes = node_collection.find({'member_of': self.reply_gst._id, 'origin': {'$in': list_of_dict_notes}},{'_id': 1, 'created_by': 1})
 		if return_cur_obj:
-
-
-
 			return self.all_comments_on_user_notes
 
 
@@ -594,9 +591,6 @@ class AnalyticsMethods(object):
 				'user':{'$ne': self.username}}).sort('last_update',-1)
 			unique_users_read_my_files = self.calc_unique_users(self.my_files_read_count)
 
-
-
-
 		return len(unique_users_read_my_files)
 
 	def get_other_files_commented_by_user_count(self):
@@ -604,7 +598,7 @@ class AnalyticsMethods(object):
 		prior_node_ids = []
 		self.twist_gst = node_collection.one({'_type': "GSystemType", 'name': "Twist"})
 		twist_cur = node_collection.find({'member_of': self.twist_gst._id, 'author_set': self.user_id})
-		prior_node_ids = [eachtw.prior_node for eachtw in twist_cur if eachtw.prior_node]
+		prior_node_ids = [eachtw.prior_node[0] for eachtw in twist_cur if eachtw.prior_node]
 		# for eachtw in twist_cur:
 		# 	if eachtw.prior_node:
 		# 		prior_node_ids.append(eachtw.prior_node)
@@ -623,11 +617,13 @@ class AnalyticsMethods(object):
 			return 0
 
 	def get_other_notes_commented_by_user_count(self):
-
+		'''
+		Count of comments on notes created by other users
+		'''
 		prior_node_ids = []
 		self.twist_gst = node_collection.one({'_type': "GSystemType", 'name': "Twist"})
 		twist_cur = node_collection.find({'member_of': self.twist_gst._id, 'author_set': self.user_id})
-		prior_node_ids = [eachtw.prior_node for eachtw in twist_cur if eachtw.prior_node]
+		prior_node_ids = [eachtw.prior_node[0] for eachtw in twist_cur if eachtw.prior_node]
 		# for eachtw in twist_cur:
 		# 	if eachtw.prior_node:
 		# 		prior_node_ids.append(eachtw.prior_node)

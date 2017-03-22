@@ -366,7 +366,6 @@ $(document).on('click',".adminRenderConceptGraph",function(){
     global:false,
     async: true,
     success: function(result) {
-      $('article').unblock();
       $("#view-concept-graph").html(result);
     },
   });
@@ -384,7 +383,6 @@ $(document).on('click',".adminRenderCollectionGraph",function(){
       graph_type : "collection"
     },
     success: function(result) {
-      $('article').unblock();
       $("#view-collection-graph").html(result);
     },
   });
@@ -403,7 +401,6 @@ $(document).on('click',".adminRenderDependencyGraph",function(){
       graph_type : "dependency"
     },
     success: function(result) {
-      $('article').unblock();
       $("#view-Dependency-graph").html(result);
     },
   });

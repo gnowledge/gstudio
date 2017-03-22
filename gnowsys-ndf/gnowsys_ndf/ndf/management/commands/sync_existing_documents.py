@@ -11,7 +11,7 @@ except ImportError:  # old pymongo
 ''' imports from application folders/files '''
 from gnowsys_ndf.ndf.models import node_collection, triple_collection
 from gnowsys_ndf.ndf.models import Node, db, AttributeType, RelationType
-from gnowsys_ndf.settings import GSTUDIO_AUTHOR_AGENCY_TYPES, LANGUAGES, OTHER_COMMON_LANGUAGES
+from gnowsys_ndf.settings import GSTUDIO_AUTHOR_AGENCY_TYPES, LANGUAGES, OTHER_COMMON_LANGUAGES, GSTUDIO_DEFAULT_LICENSE
 from gnowsys_ndf.ndf.views.methods import create_gattribute, create_grelation
 from gnowsys_ndf.ndf.templatetags.ndf_tags import get_relation_value, get_attribute_value
 
@@ -22,34 +22,58 @@ class Command(BaseCommand):
       + "(only if they doesn't exists) in your database."
 
   def handle(self, *args, **options):
-    all_grelations = triple_collection.find({'_type': 'GRelation'})
-    all_gattributes = triple_collection.find({'_type': 'GAttribute'})
+    # Keep latest changes in field(s) to be added at top
+
+
+    # Adds "legal" field (with default values) to all documents belonging to GSystems.
+    all_gs = node_collection.find({'_type': 'GSystem', 'legal': {'$exists': False}})
+    all_gs_count = all_gs.count()
+    print "\n Total GSystems found to update 'legal' field: ", all_gs_count
+    for index, each_gs in enumerate(all_gs):
+        print "\n GSystem: ", index, ' of ', all_gs_count
+        each_gs.legal = {'copyright': each_gs.license, 'license': GSTUDIO_DEFAULT_LICENSE}
+        each_gs.pop('license')
+        each_gs.save()
+
+
+    # updating GRelation nodes to replace relation_type's data of DBRef with ObjectId.
+    # 
+    # all_grelations = triple_collection.find({'_type': 'GRelation'}, time_out=False)
+    # all_grelations = triple_collection.find({'_type': 'GRelation','relation_type': {'$type': 'object'}})
+    all_grelations = triple_collection.find({
+                                            '_type': 'GRelation',
+                                            'relation_type': {'$not': {'$type': "objectId"}}
+                                            }, time_out=False)
+
     print "\n Working on Triples data. \n Total GRelations found: ", all_grelations.count()
-    print " Total GAttributes found: ", all_gattributes.count()
     print "\n This will take few minutes. Please wait.."
     for each_grelation in all_grelations:
         # print each_grelation
         print '.',
-        rt_node = each_grelation.relation_type
-        if not isinstance(rt_node, ObjectId):
-            rt_obj = RelationType(db.dereference(rt_node))
-            each_grelation.relation_type = rt_obj._id
-            try:
-                each_grelation.save(triple_node=rt_obj,triple_id=rt_obj._id)
-            except Exception as er:
-                print "\n Error Occurred while updating Triples data. ", er
-                pass
+        rt_obj = RelationType(db.dereference(each_grelation.relation_type))
+        each_grelation.relation_type = rt_obj._id
+        try:
+            each_grelation.save(triple_node=rt_obj,triple_id=rt_obj._id)
+        except Exception as er:
+            print "\n Error Occurred while updating Triples data. ", er
+            pass
+                
+    # updating GRelation nodes to replace relation_type's data of DBRef with ObjectId.
+    # 
+    # all_gattributes = triple_collection.find({'_type': 'GAttribute'}, time_out=False)
+    # all_gattributes = triple_collection.find({'_type': 'GAttribute', 'attribute_type': {'$type': 'object'}})
+    all_gattributes = triple_collection.find({
+                                            '_type': 'GAttribute',
+                                            'attribute_type': {'$not': {'$type': "objectId"}}
+                                            }, time_out=False)
 
+    print " Total GAttributes found: ", all_gattributes.count()
+    print "\n This will take few minutes. Please wait.."
     for each_gattribute in all_gattributes:
         print '.',
-        at_node = each_gattribute.attribute_type
-        if not isinstance(at_node, ObjectId):
-            at_obj = AttributeType(db.dereference(at_node))
-            each_gattribute.attribute_type = at_obj._id
-            each_gattribute.save(triple_node=at_obj,triple_id=at_obj._id)
-
-
-    # Keep latest changes in field(s) to be added at top
+        at_obj = AttributeType(db.dereference(each_gattribute.attribute_type))
+        each_gattribute.attribute_type = at_obj._id
+        each_gattribute.save(triple_node=at_obj,triple_id=at_obj._id)
 
     # adding 'if_file' in GSystem instances:
     # 'if_file': {
@@ -94,7 +118,7 @@ class Command(BaseCommand):
     # - Firstly, replacing None to ('en', 'English')
     node_collection.collection.update({ '_type': {'$in': ['AttributeType', 'RelationType', 'MetaType', 'ProcessType', 'GSystemType', 'GSystem', 'File', 'Group', 'Author']}, 'language': {'$in': [None, '', u'']} }, {"$set": {"language": ('en', 'English')}}, upsert=False, multi=True)
 
-    all_nodes = node_collection.find({'_type': {'$in': ['AttributeType', 'RelationType', 'MetaType', 'ProcessType', 'GSystemType', 'GSystem', 'File', 'Group', 'Author']} })
+    all_nodes = node_collection.find({'_type': {'$in': ['AttributeType', 'RelationType', 'MetaType', 'ProcessType', 'GSystemType', 'GSystem', 'File', 'Group', 'Author']} }, time_out=False)
 
     all_languages = list(LANGUAGES) + OTHER_COMMON_LANGUAGES
     all_languages_concanated = reduce(lambda x, y: x+y, all_languages)
@@ -471,6 +495,8 @@ class Command(BaseCommand):
     if res['updatedExisting']: # and res['nModified']:
         print "\n 'attribute_set' field added to following no. of documents: ", res['n']
 
+    '''
+    Replace foll. with legal field update code - katkamrachana
     # Adds "license" field (with default value as "") to all documents belonging to GSystems.
     res = node_collection.collection.update({'_type': {'$nin': ["MetaType", "GSystemType", "RelationType", "AttributeType", "GRelation", "GAttribute", "ReducedDocs", "ToReduceDocs", "IndexedWordList", "node_holder"]}, 'license': {'$exists': False}},
                             {'$set': {'license': None}},
@@ -478,6 +504,7 @@ class Command(BaseCommand):
     )
     if res['updatedExisting']: # and res['nModified']:
         print "\n 'license' field added to following no. of documents: ", res['n']
+    '''
 
     # Adding "Agency_type" field adding to group documents with default values
     res = node_collection.collection.update({'_type': {'$in': ['Group']}, 'agency_type': {'$exists': False}},
