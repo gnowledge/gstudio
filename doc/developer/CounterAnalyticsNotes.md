@@ -1,3 +1,11 @@
+**POINTS Multiplier factor**
+- FILE UPLOAD POINTS = 25
+- NOTE CREATE POINTS = 30
+- QUIZ CORRECT POINTS = 5
+- COMMENT POINTS = 5
+
+--
+
 username : user's username
 
 COURSE

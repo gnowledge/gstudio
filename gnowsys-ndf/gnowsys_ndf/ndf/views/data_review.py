@@ -239,7 +239,7 @@ def data_review_save(request, group_id):
     request.POST = post_req
     # print "\n---\n", request.POST, "\n---\n"
 
-    license = request.POST.get('license', '')
+    copyright = request.POST.get('copyright', '')
 
     file_node = node_collection.one({"_id": ObjectId(node_oid)})
 

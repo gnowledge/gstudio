@@ -108,7 +108,7 @@ def get_site_variables():
 	site_var['ORG_NAME'] = GSTUDIO_ORG_NAME
 	site_var['LOGO'] = GSTUDIO_SITE_LOGO
 	site_var['FAVICON'] = GSTUDIO_SITE_FAVICON
-	site_var['COPYRIGHT'] = GSTUDIO_COPYRIGHT
+	site_var['COPYRIGHT'] = GSTUDIO_DEFAULT_COPYRIGHT
 	site_var['GIT_REPO'] = GSTUDIO_GIT_REPO
 	site_var['PRIVACY_POLICY'] = GSTUDIO_SITE_PRIVACY_POLICY
 	site_var['TERMS_OF_SERVICE'] = GSTUDIO_SITE_TERMS_OF_SERVICE
@@ -184,8 +184,8 @@ def get_group_agency_types():
 
 @get_execution_time
 @register.assignment_tag
-def get_license():
-   return GSTUDIO_LICENSE
+def get_copyright():
+   return GSTUDIO_COPYRIGHT
 
 
 @get_execution_time
@@ -2750,7 +2750,7 @@ def str_to_dict(str1):
                       filesize_dic[k1] = v1
               dict_format[k] = filesize_dic
     order_dict_format = OrderedDict()
-    order_val=['altnames','language','plural','_type','member_of','created_by','created_at','tags','modified_by','author_set','group_set','collection_set','contributors','last_update','start_publication','location','license','attribute_set','relation_set']
+    order_val=['altnames','language','plural','_type','member_of','created_by','created_at','tags','modified_by','author_set','group_set','collection_set','contributors','last_update','start_publication','location','legal','attribute_set','relation_set']
     for each in order_val:
             order_dict_format[each]=dict_format[each]
     return order_dict_format
