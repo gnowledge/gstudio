@@ -42,7 +42,7 @@ from django.core.exceptions import PermissionDenied
 
 ''' -- imports from application folders/files -- '''
 from gnowsys_ndf.settings import META_TYPE, GSTUDIO_NROER_GAPPS
-from gnowsys_ndf.settings import GSTUDIO_DEFAULT_GAPPS_LIST, GSTUDIO_WORKING_GAPPS, BENCHMARK
+from gnowsys_ndf.settings import GSTUDIO_DEFAULT_GAPPS_LIST, GSTUDIO_WORKING_GAPPS, BENCHMARK, GSTUDIO_DEFAULT_LANGUAGE
 from gnowsys_ndf.settings import LANGUAGES, OTHER_COMMON_LANGUAGES, GSTUDIO_BUDDY_LOGIN
 # from gnowsys_ndf.ndf.models import db, node_collection, triple_collection, counter_collection
 from gnowsys_ndf.ndf.models import *
@@ -2821,6 +2821,7 @@ def create_grelation(subject_id, relation_type_node, right_subject_id_or_list, *
     gr_node = None
     multi_relations = False
     triple_scope_val = kwargs.get('triple_scope', None)
+    language = get_language_tuple(kwargs.get('language', None))
     '''
     Example:
     triple_scope:
@@ -2848,6 +2849,7 @@ def create_grelation(subject_id, relation_type_node, right_subject_id_or_list, *
             gr_node.relation_type = relation_type_node._id
             gr_node.right_subject = right_subject_id_or_list
             # gr_node.relation_type_scope = relation_type_scope
+            gr_node.language = language
             gr_node.status = u"PUBLISHED"
             gr_node.save(triple_node=relation_type_node, triple_id=relation_type_node._id)
 
@@ -2921,6 +2923,7 @@ def create_grelation(subject_id, relation_type_node, right_subject_id_or_list, *
 
         def _update_deleted_to_published(gr_node, relation_type_node, relation_type_text, triple_scope_val=None):
             gr_node.status = u"PUBLISHED"
+            # gr_node.language = language
             gr_node.save(triple_node=relation_type_node, triple_id=relation_type_node._id)
 
             gr_node_name = gr_node.name

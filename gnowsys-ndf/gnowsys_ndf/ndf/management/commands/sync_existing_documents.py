@@ -11,7 +11,7 @@ except ImportError:  # old pymongo
 ''' imports from application folders/files '''
 from gnowsys_ndf.ndf.models import node_collection, triple_collection
 from gnowsys_ndf.ndf.models import Node, db, AttributeType, RelationType
-from gnowsys_ndf.settings import GSTUDIO_AUTHOR_AGENCY_TYPES, LANGUAGES, OTHER_COMMON_LANGUAGES, GSTUDIO_DEFAULT_LICENSE
+from gnowsys_ndf.settings import GSTUDIO_AUTHOR_AGENCY_TYPES, LANGUAGES, OTHER_COMMON_LANGUAGES, GSTUDIO_DEFAULT_LICENSE, GSTUDIO_DEFAULT_LANGUAGE
 from gnowsys_ndf.ndf.views.methods import create_gattribute, create_grelation
 from gnowsys_ndf.ndf.templatetags.ndf_tags import get_relation_value, get_attribute_value
 
@@ -24,6 +24,14 @@ class Command(BaseCommand):
   def handle(self, *args, **options):
 
     # Keep latest changes in field(s) to be added at top
+
+
+    # --------------------------------------------------------------------------
+    # All Triples - Replacing <'lang': ''> field to <'language': []>
+    # i.e: removing first 'lang' then adding 'language' with data type: (basestring, basestring)
+    all_tr = triple_collection.collection.update({'lang': {'$exists': True}}, {'$unset':{'lang': None}, '$set':{'language': GSTUDIO_DEFAULT_LANGUAGE} }, upsert=False, multi=True)
+    if all_tr["updatedExisting"] and all_tr["nModified"]:
+        print "\n Replaced 'lang' fields to 'language' for : " + all_tr['nModified'].__str__() + " Triples (AttributeType and RelationType) instances."
 
 
     # Adds "legal" field (with default values) to all documents belonging to GSystems.
