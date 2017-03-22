@@ -2163,6 +2163,8 @@ class Filehive(DjangoDocument):
         file_content_type = file_blob.content_type if hasattr(file_blob, 'content_type') else None
         if file_name and "vtt" in file_name:
             return "text/vtt"
+        if file_name and "srt" in file_name:
+            return "text/srt"
         if file_content_type and file_content_type != 'application/octet-stream':
             file_mime_type = file_blob.content_type
         else:
@@ -2199,6 +2201,10 @@ class Filehive(DjangoDocument):
         elif poss_ext == '.vtt':
             file_mime_type = 'text/vtt'
             file_extension = '.vtt'
+
+        elif poss_ext == '.srt':
+            file_mime_type = 'text/srt'
+            file_extension = '.srt'
 
         elif file_mime_type == 'text/plain':
             file_extension = '.txt'
