@@ -716,31 +716,16 @@ class Node(DjangoDocument):
         File, etc.), built from 'member_of' field (list of ObjectIds)
 
         """
-        # member_of_names = []
-
-        # if self.member_of:
-        #     for each_member_id in self.member_of:
-        #         if type(each_member_id) == ObjectId:
-        #             _id = each_member_id
-        #         else:
-        #             _id = each_member_id['$oid']
-        #         if _id:
-        #             mem = node_collection.one({'_id': ObjectId(_id)})
-        #             if mem:
-        #                 member_of_names.append(mem.name)
-        # else:
-        #     if "gsystem_type" in self:
-        #         for each_member_id in self.gsystem_type:
-        #             if type(each_member_id) == ObjectId:
-        #                 _id = each_member_id
-        #             else:
-        #                 _id = each_member_id['$oid']
-        #             if _id:
-        #                 mem = node_collection.one({'_id': ObjectId(_id)})
-        #                 if mem:
-        #                     member_of_names.append(mem.name)
-        # return member_of_names
         return [GSystemType.get_gst_name_id(gst_id)[0] for gst_id in self.member_of]
+
+
+    @property
+    def group_set_names_list(self):
+        """Returns a list having names of each member (Group name),
+        built from 'group_set' field (list of ObjectIds)
+
+        """
+        return [Node.get_name_id_from_type(gr_id, u'Group') for gr_id in self.group_set]
 
 
     @property
