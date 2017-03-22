@@ -725,7 +725,7 @@ class Node(DjangoDocument):
         built from 'group_set' field (list of ObjectIds)
 
         """
-        return [Node.get_name_id_from_type(gr_id, u'Group') for gr_id in self.group_set]
+        return [Node.get_name_id_from_type(gr_id, u'Group')[0] for gr_id in self.group_set]
 
 
     @property
