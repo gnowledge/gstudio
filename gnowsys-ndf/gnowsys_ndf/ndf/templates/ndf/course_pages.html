@@ -12,7 +12,7 @@
         <div>
             <div class="row">
                 <div class="medium-8 columns name-div">
-                    <input type="text" class="node_name" name="name" placeholder="Enter name of Page">
+                    <input type="text" class="node_name" value="{{node_obj.name}}" name="name" placeholder="Enter name of Activity">
                     <label class="node_name_empty hide" style="color:red">Please enter Name</label> 
                 </div>
                 <div class="medium-4 columns">
@@ -122,7 +122,6 @@
         $("#page_listing").addClass("hide")
         $(".page-view").foundation('reveal','close')
         $(".activity-sheet-actions").addClass("hide")
-        $(".node_name").attr('value', node_name)
         $.ajax({
           url: "{% url 'inline_edit_res' group_id %}",
 
