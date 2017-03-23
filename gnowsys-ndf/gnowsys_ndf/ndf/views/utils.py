@@ -52,7 +52,7 @@ def cast_to_data_type(value, data_type):
     This method will cast first argument: "value" to second argument: "data_type" and returns catsed value.
     '''
 
-    if data_type in ["basestring", "unicode"]:
+    if (data_type in ["basestring", "unicode"]) and isinstance(value, (str, unicode)):
         value = value.strip()
     casted_value = value
 

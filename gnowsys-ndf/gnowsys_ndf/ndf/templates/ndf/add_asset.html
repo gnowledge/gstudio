@@ -33,11 +33,11 @@
             <div class="small-12 medium-6 large-6 columns">
                 <label>
                     {% if not edit and asset_obj %}
-                       <i><p style="color: gray">{{asset_obj.content}} </p></i>
+                       <i><p style="color: gray">{{asset_obj.content|safe|striptags}} </p></i>
                     {% else %}
                         Asset description *
                 </label>
-                        <textarea rows="4" cols="2" class="small-12 columns" placeholder="Enter Description" id="asset-descid" value=''>{% if asset_obj %} {{asset_obj.content}}{% endif %}</textarea>
+                        <textarea rows="4" cols="2" class="small-12 columns" placeholder="Enter Description" id="asset-descid" value=''>{% if asset_obj %} {{asset_obj.content|safe|striptags}}{% endif %}</textarea>
                     {% endif %}
 
             </div>
