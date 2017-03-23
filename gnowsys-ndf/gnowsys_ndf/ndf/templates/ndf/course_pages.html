@@ -1,3 +1,4 @@
+{% if user.is_authenticated %}
 <div class="activity-sheet-actions">
     <div class="row">
     <button type="button" class="right orange-button-template createActivityPage">
@@ -6,6 +7,7 @@
     </button>
     </div>
 </div>
+{% endif %}
 
 <div id="addActivityPage" class="hide">
     <form id ="course_page_form" enctype="multipart/form-data" method="post" action="{% url 'save_course_page' group_id %}">{% csrf_token %}
@@ -113,6 +115,7 @@
     $(document).on('click','.edit-page',function(){
         node_id = $(this).attr("id")
         data_node_name = $(this).attr("data-node-name")
+        $(".node_name").attr('value', data_node_name)
         load_inline_content_editor(node_id, data_node_name)
 
     })
