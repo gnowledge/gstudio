@@ -1260,11 +1260,11 @@ class Node(DjangoDocument):
         return possible_relations
 
 
-    def get_relation(self, relation_type_name, status):
+    def get_relation(self, relation_type_name, status='PUBLISHED'):
         return GRelation.get_triples_from_sub_type(self._id, relation_type_name, status)
 
 
-    def get_attribute(self, attribute_type_name, status):
+    def get_attribute(self, attribute_type_name, status='PUBLISHED'):
         return GAttribute.get_triples_from_sub_type(self._id, attribute_type_name, status)
 
 
@@ -3277,7 +3277,7 @@ class Triple(DjangoDocument):
                   }
 
   @classmethod
-  def get_triples_from_sub_type(cls, subject_id, gt_or_rt_name_or_id, status):
+  def get_triples_from_sub_type(cls, subject_id, gt_or_rt_name_or_id, status=None):
         '''
         getting triples from SUBject and TYPE (attribute_type or relation_type)
         '''
@@ -3292,11 +3292,13 @@ class Triple(DjangoDocument):
         gr_or_rt_name, gr_or_rt_id = Node.get_name_id_from_type(gt_or_rt_name_or_id,
             triple_node_mapping_dict[cls._meta.verbose_name])
 
+        status = [status] if status else ['PUBLISHED', 'DELETED']
+
         return triple_collection.find({
                                     '_type': cls._meta.verbose_name,
                                     'subject': ObjectId(subject_id),
                                     triple_class_field_mapping_dict[cls._meta.verbose_name]: gr_or_rt_id,
-                                    'status': status
+                                    'status': {'$in': status}
                                 })
 
 
