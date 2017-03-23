@@ -12,7 +12,6 @@
     </div>
 
   <div class="right small-12 medium-6 columns">
-
       <h6><u>Asset Content Preview </u>&nbsp; ></b>
             </h6>
                 <label>Resource name: <b> {{node.name}} </b>
@@ -66,6 +65,17 @@
             
         </div>
 
+     {% get_relation_value node.pk 'has_subtitle' as grel_sub %}
+     {% for each in grel_sub.grel_node %}
+      {{each.name}} <button type="button" data-sub-id = "{{each.pk}}" class="right orange-button-subtitle delete-subtitle" onclick="delete_rel_files('{{each.pk}}','has_subtitle')">delete subtitle</button></div> <br>
+     {% endfor %}
+
+    {% get_relation_value node.pk 'has_transcript' as grel_trans %}
+    {% if grel_trans.grel_node.pk %}
+      {{grel_trans.grel_node.name}} <button type="button"  class="right orange-button-subtitle delete-transcript" onclick="delete_rel_files('{{grel_trans.grel_node.pk}}','has_transcript')" >delete transcript</button></div> <br>
+    {% endif %}
+    
+     
 <script type="text/javascript">
   
 $("#doctranscript").change(function(){
@@ -245,9 +255,23 @@ $(".select-language").change(function(){
         xhr.send(formData);
 
 });
-    
-    
-  
+
+function delete_rel_files(sel_sub,rel_type){    
+    $.ajax({
+              type: "POST",
+              data:{
+                    'csrfmiddlewaretoken': "{{csrf_token}}",
+                    'node':"{{node}}",
+                    'asset_obj':"{{asset_obj}}",
+                    'grel_name':rel_type,
+                    'sel_file' : sel_sub
+                },
+              url: "{% url 'remove_related_doc' group_id  %}",
+              datatype: "html",
+              success: function(data) {
+            }
+        });
+}
 </script>
 
 
