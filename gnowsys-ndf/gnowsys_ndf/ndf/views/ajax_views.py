@@ -6832,3 +6832,13 @@ def export_to_epub(request, group_id, node_id):
         # print "\n export_fail: ", export_fail
         pass
     return HttpResponseRedirect(reverse('unit_detail', kwargs={'group_id': group_id}))
+
+def remove_related_doc(request, group_id):
+    node = request.POST.get('node', None)
+    selected_obj = request.POST.get('sel_file', None)
+    node_obj = node_collection.one({'_id': ObjectId(node)})
+    
+    grel_name = request.POST.get('grel_name', None)
+    asset_obj = request.POST.get('asset_obj', None)
+    rel_node = triple_collection.one({'right_subject':ObjectId(selected_obj),'subject':ObjectId(node_obj.pk)})
+    delete_grelation(subject_id=ObjectId(node_obj.pk), deletion_type=1, **{'node_id': ObjectId(rel_node._id)})
