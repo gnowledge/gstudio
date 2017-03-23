@@ -82,9 +82,12 @@ def cast_to_data_type(value, data_type):
                 casted_value = False
 
     elif (data_type in [list, "list"] or isinstance(data_type, list)):
-        if not isinstance(value, list):
+
+        if isinstance(value, str):
             value = value.replace("\n", "").split(",")
 
+        if not isinstance(value, list):
+            value = [value]
         # check for complex list type like: [int] or [unicode] or [ObjectId]
         if isinstance(value, list) and len(value) and isinstance(data_type[0], type):
             casted_value = [data_type[0](i) for i in value if i]
