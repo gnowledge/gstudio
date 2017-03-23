@@ -11,7 +11,7 @@ except ImportError:  # old pymongo
 ''' imports from application folders/files '''
 from gnowsys_ndf.ndf.models import node_collection, triple_collection
 from gnowsys_ndf.ndf.models import Node, db, AttributeType, RelationType
-from gnowsys_ndf.settings import GSTUDIO_AUTHOR_AGENCY_TYPES, LANGUAGES, OTHER_COMMON_LANGUAGES, GSTUDIO_DEFAULT_LICENSE
+from gnowsys_ndf.settings import GSTUDIO_AUTHOR_AGENCY_TYPES, LANGUAGES, OTHER_COMMON_LANGUAGES, GSTUDIO_DEFAULT_LICENSE, GSTUDIO_DEFAULT_LANGUAGE
 from gnowsys_ndf.ndf.views.methods import create_gattribute, create_grelation
 from gnowsys_ndf.ndf.templatetags.ndf_tags import get_relation_value, get_attribute_value
 
@@ -24,6 +24,14 @@ class Command(BaseCommand):
   def handle(self, *args, **options):
 
     # Keep latest changes in field(s) to be added at top
+
+
+    # --------------------------------------------------------------------------
+    # All Triples - Replacing <'lang': ''> field to <'language': []>
+    # i.e: removing first 'lang' then adding 'language' with data type: (basestring, basestring)
+    all_tr = triple_collection.collection.update({'lang': {'$exists': True}}, {'$unset':{'lang': None}, '$set':{'language': GSTUDIO_DEFAULT_LANGUAGE} }, upsert=False, multi=True)
+    if all_tr["updatedExisting"] and all_tr["nModified"]:
+        print "\n Replaced 'lang' fields to 'language' for : " + all_tr['nModified'].__str__() + " Triples (AttributeType and RelationType) instances."
 
 
     # Adds "legal" field (with default values) to all documents belonging to GSystems.
@@ -57,8 +65,8 @@ class Command(BaseCommand):
 
     print "\nUpdating GRelations and GAttributes."
     grel_res = triple_collection.collection.update({'_type': 'GRelation',\
-     '$or': [{'relation_type_scope': {'$eq': None}, 'subject_scope': \
-     {'$exists': False}, 'object_scope': {'$exists': False}}]},\
+     '$or': [{'relation_type_scope': {'$eq': None}}, {'subject_scope': \
+     {'$exists': False}}, {'object_scope': {'$exists': False}}]},\
      {'$unset': { 'right_subject_scope': ""} , '$set': \
      {'relation_type_scope': {}, 'object_scope': None,\
      'subject_scope': None }}, upsert=False, multi=True)
@@ -66,8 +74,8 @@ class Command(BaseCommand):
         print "\n Added 'scope' fields to " + grel_res['n'].__str__() + " GRelation instances."
 
     gattr_res = triple_collection.collection.update({'_type': 'GAttribute',\
-     '$or': [{'attribute_type_scope': {'$eq': None}, 'subject_scope': \
-     {'$exists': False}, 'object_scope': {'$exists': False} }]}, \
+     '$or': [{'attribute_type_scope': {'$eq': None}}, {'subject_scope': \
+     {'$exists': False}}, {'object_scope': {'$exists': False}}]}, \
      {'$unset': { 'object_value_scope': ""} , '$set': \
      {'attribute_type_scope': {}, 'object_scope': None, \
      'subject_scope': None }}, upsert=False, multi=True)
@@ -850,7 +858,7 @@ class Command(BaseCommand):
         if not isinstance(rt_node, ObjectId):
             rt_obj = RelationType(db.dereference(rt_node))
             each_grelation.relation_type = rt_obj._id
-            print each_grelation
+            # print each_grelation
             try:
                 each_grelation.save(triple_node=rt_obj,triple_id=rt_obj._id)
             except Exception as er:

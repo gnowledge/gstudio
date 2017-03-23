@@ -3,6 +3,9 @@ Include all core python code/methods to process set/batch of data.
 Possibly avoid (direct) queries.
 '''
 
+import datetime
+
+
 def get_dict_from_list_of_dicts(list_of_dicts,convert_objid_to_str=False):
     req_dict = {}
     [req_dict.update(d) for d in list_of_dicts]
@@ -29,11 +32,8 @@ def get_query_dict(**kwargs):
     temp_dict = {}
     for k, v in kwargs.items():
         temp_dict.update({k: {'$in':v if isinstance(v, list) else [v]}})
-    # print temp_dict
-
     # just for testing, for time being. no query will be in this method/file.
     q = node_collection.find(temp_dict)
-    # print q.count()
 
     return q
 
@@ -45,3 +45,60 @@ def add_to_list(list_to_update, value_to_append):
     if value_to_append not in list_to_update:
         list_to_update.append(value_to_append)
     return list_to_update
+
+
+def cast_to_data_type(value, data_type):
+    '''
+    This method will cast first argument: "value" to second argument: "data_type" and returns catsed value.
+    '''
+
+    if (data_type in ["basestring", "unicode"]) and isinstance(value, (str, unicode)):
+        value = value.strip()
+    casted_value = value
+
+    if data_type in [unicode, "unicode"]:
+        casted_value = unicode(value)
+
+    elif data_type in [basestring, "basestring"]:
+        casted_value = unicode(value)
+
+    elif (data_type in [int, "int"]) and str(value):
+        casted_value = int(value) if (str.isdigit(str(value))) else value
+
+    elif (data_type in [float, "float"]) and str(value):
+        casted_value = float(value) if (str.isdigit(str(value))) else value
+
+    elif (data_type in [long, "long"]) and str(value):
+        casted_value = long(value) if (str.isdigit(str(value))) else value
+
+    # converting unicode to int and then to bool
+    elif data_type in [bool, "bool"] and str(value):
+        if (str.isdigit(str(value))):
+            casted_value = bool(int(value))
+        elif unicode(value) in [u"True", u"False"]:
+            if (unicode(value) == u"True"):
+                casted_value = True
+            elif (unicode(value) == u"False"):
+                casted_value = False
+
+    elif (data_type in [list, "list"] or isinstance(data_type, list)):
+
+        if isinstance(value, str):
+            value = value.replace("\n", "").split(",")
+
+        if not isinstance(value, list):
+            value = [value]
+        # check for complex list type like: [int] or [unicode] or [ObjectId]
+        if isinstance(value, list) and len(value) and isinstance(data_type[0], type):
+            casted_value = [data_type[0](i) for i in value if i]
+            casted_value = list(set(casted_value))
+        # else:  # otherwise normal list
+        #     casted_value = [i.strip() for i in value if i]
+
+    elif data_type in [datetime.datetime, "datetime.datetime"]:
+        # "value" should be in following example format
+        # In [10]: datetime.strptime( "11/12/2014", "%d/%m/%Y")
+        # Out[10]: datetime(2014, 12, 11, 0, 0)
+        casted_value = datetime.strptime(value, "%d/%m/%Y")
+
+    return casted_value
