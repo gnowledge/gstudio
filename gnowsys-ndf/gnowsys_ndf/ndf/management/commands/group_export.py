@@ -1,9 +1,14 @@
 import os
 import datetime
 import subprocess
+try:
+    from bson import ObjectId
+except ImportError:  # old pymongo
+    from pymongo.objectid import ObjectId
 from django.core.management.base import BaseCommand, CommandError
-from gnowsys_ndf.ndf.models import *
-from gnowsys_ndf.settings import *
+from gnowsys_ndf.ndf.models import node_collection, triple_collection, filehive_collection, counter_collection
+from gnowsys_ndf.ndf.models import HistoryManager
+from gnowsys_ndf.settings import GSTUDIO_DATA_ROOT, GSTUDIO_LOGS_DIR_PATH, MEDIA_ROOT
 from schema_mapping import create_factory_schema_mapper
 
 
@@ -17,7 +22,6 @@ rcs_paths_found = set()
 media_url_not_found = set()
 media_url_found = set()
 historyMgr = HistoryManager()
-# /data/data_export
 data_export_path = None
 media_export_path = None
 
@@ -63,17 +67,12 @@ def get_triple_data(node_id, node_triple_set, is_triple_rt):
                     triple_node = triple_collection.find(triple_query)
                     if triple_node:
                         for each_triple_node in triple_node:
-                            # print "\n 1. Adding to triple_collection_ids: ", triple_collection_ids
                             triple_collection_ids.add(each_triple_node._id)
-                            # print "\n 2. Adding to triple_collection_ids: ", triple_collection_ids
                             # Get ObjectIds in object_value fields
                             if type(each_triple_node[fetch_value]) == list and all(isinstance(each_obj_value, ObjectId) for each_obj_value in each_triple_node[fetch_value]):
-                                # print "\n 1. Adding to node_collection_ids: ", node_collection_ids
                                 node_collection_ids.extend(each_triple_node[fetch_value])
                             elif isinstance(each_triple_node[fetch_value], ObjectId):
-                                # print "\n 1. Adding to node_collection_ids: ", node_collection_ids
                                 node_collection_ids.add(each_triple_node[fetch_value])
-                            # print "\n 2. Adding to node_collection_ids: ", node_collection_ids
 
 class Command(BaseCommand):
     def handle(self, *args, **options):
