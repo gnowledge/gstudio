@@ -1,14 +1,16 @@
 import os
 import json
 from bson import json_util
-from gnowsys_ndf.ndf.models import *
+from gnowsys_ndf.ndf.models import node_collection, TYPES_LIST
+from gnowsys_ndf.settings import GSTUDIO_DEFAULT_GROUPS
 type_json = {"_type": None, "name": None, "source_id": None, "target_id": None }
 
 def create_factory_schema_mapper(path):
     dump_list = [type_json]
     schema_dump_path = os.path.join(path, 'factory_schema.json')
-    types_list = ['GSystemType', 'RelationType', 'AttributeType', 'MetaType', 'ProcessType']
-    all_factory_types = node_collection.find({'_type': {'$in': types_list }})
+    
+    all_factory_types = node_collection.find({'$or': [{'_type': {'$in': TYPES_LIST }},
+                                             {'name': {'$in': GSTUDIO_DEFAULT_GROUPS }}]})
     factory_json_list =  []
     for e in all_factory_types:
         each_type_json = type_json.copy()
