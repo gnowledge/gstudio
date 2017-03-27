@@ -6593,7 +6593,14 @@ def get_group_pages(request, group_id):
     if except_collection_set_of_obj:
         except_collection_set = except_collection_set_of_obj.collection_set
     gst_page_name, gst_page_id = GSystemType.get_gst_name_id('Page')
-    pages_cur = node_collection.find({'_type': 'GSystem', 'member_of': ObjectId(gst_page_id), 'group_set': ObjectId(group_id), '_id': {'$nin': except_collection_set} })
+    gst_blog_page_name, gst_blog_page_id = GSystemType.get_gst_name_id('Blog page')
+    pages_cur = node_collection.find({
+                                      '_type': 'GSystem',
+                                      'member_of': ObjectId(gst_page_id),
+                                      'type_of': {'$nin': [gst_blog_page_id]},
+                                      'group_set': ObjectId(group_id),
+                                      '_id': {'$nin': except_collection_set}
+                                    })
     template = "ndf/group_pages.html"
     card_class = 'activity-page'
     variable = RequestContext(request, {'cursor': pages_cur, 'groupid': group_id, 'group_id': group_id, 'card_class': card_class })

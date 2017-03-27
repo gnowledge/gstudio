@@ -193,7 +193,7 @@ def lesson_create_edit(request, group_id, unit_group_id=None):
                                             member_of=gst_lesson_id,
                                             group_set=unit_group_obj._id,
                                             created_by=user_id,
-                                            status='PUBLISHED')
+                                            status=u'PUBLISHED')
             # print new_lesson_obj
             new_lesson_obj.save(groupid=group_id)
             unit_group_obj.collection_set.append(new_lesson_obj._id)
