@@ -122,6 +122,8 @@ DATA_TYPE_CHOICES = (
     "IS()"
 )
 
+TYPES_LIST = ['GSystemType', 'RelationType', 'AttributeType', 'MetaType', 'ProcessType']
+
 my_doc_requirement = u'storing_orignal_doc'
 reduced_doc_requirement = u'storing_reduced_doc'
 to_reduce_doc_requirement = u'storing_to_be_reduced_doc'
