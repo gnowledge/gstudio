@@ -10,7 +10,7 @@ except ImportError:  # old pymongo
 from django.core.management.base import BaseCommand, CommandError
 from gnowsys_ndf.ndf.models import node_collection, triple_collection, filehive_collection, counter_collection
 from gnowsys_ndf.ndf.models import HistoryManager
-from gnowsys_ndf.settings import GSTUDIO_DATA_ROOT, GSTUDIO_LOGS_DIR_PATH, MEDIA_ROOT
+from gnowsys_ndf.settings import GSTUDIO_DATA_ROOT, GSTUDIO_LOGS_DIR_PATH, MEDIA_ROOT, GSTUDIO_INSTITUTE_ID
 from schema_mapping import create_factory_schema_mapper
 
 
@@ -27,6 +27,9 @@ historyMgr = HistoryManager()
 data_export_path = None
 media_export_path = None
 log_file = None
+IS_FORK = False
+IS_CLONE = False
+RESTORE_USER_DATA = False
 
 def create_log_file(dump_path):
     '''
@@ -61,6 +64,17 @@ def setup_dump_path(group_name):
         os.makedirs(media_export_path)
     return data_export_path
 
+def create_configs_file(group_id, data_dump_path):
+    global IS_FORK
+    global IS_CLONE
+    global RESTORE_USER_DATA
+    configs_file_path = os.path.join(data_dump_path, "configs.py")
+    with open(configs_file_path, 'w+') as configs_file_out:
+        configs_file_out.write("\nFORK=" + str(IS_FORK))
+        configs_file_out.write("\nCLONE=" + str(IS_CLONE))
+        configs_file_out.write("\nRESTORE_USER_DATA=" + str(RESTORE_USER_DATA))
+        configs_file_out.write("\nGSTUDIO_INSTITUTE_ID=" + str(GSTUDIO_INSTITUTE_ID))
+        configs_file_out.write("\nGROUP_ID=" + str(group_id))
 
 def get_triple_data(node_id):
     '''
@@ -93,17 +107,53 @@ def get_triple_data(node_id):
 
 class Command(BaseCommand):
     def handle(self, *args, **options):
-        group_id = raw_input("Please enter group id:\t")
-        group_node = node_collection.one({"_type":"Group","_id":ObjectId(group_id)})
+        group_id = raw_input("\n\tPlease enter group id:\t")
+        try:
+
+            group_node = node_collection.one({"_type":"Group","_id":ObjectId(group_id)})
+        except Exception as group_id_error:
+            print "\n Enter a valid ObjectId"
+            print "\n Exiting..."
+            os._exit(0)
+
         if group_node:
             print "\tRequest received for Export of : ", group_node.name
+            fork_clone_opt = "\n\tExport Options:"
+            fork_clone_opt += "\n\t\t 1. Fork (What is Fork?"
+            fork_clone_opt += " Restore will create 'New' instances(new Ids)"
+            fork_clone_opt += "\n\t\t 2. Clone (What is Clone?"
+            fork_clone_opt += " Restore will NOT create 'New' instances(new Ids)"
+            fork_clone_opt += "\n\tEnter options 1 or 2 or any other key to cancel: \t"
+
+            fork_clone_confirm = raw_input(fork_clone_opt)
+            global IS_FORK
+            global IS_CLONE
+            global RESTORE_USER_DATA
+            if fork_clone_confirm == '1':
+                print "\n\t!!! Chosen FORK option !!!"
+                IS_FORK = True
+                IS_CLONE = False
+            elif fork_clone_confirm == '2':
+                print "\n\t!!! Chosen CLONE option !!!"
+                IS_FORK = False
+                IS_CLONE = True
+            else:
+                print "\n Exiting..."
+                os._exit(0)
+            user_data_dump = raw_input("\n\tDo you want to include Users in this export ? Enter y/n:\t ")
+            if user_data_dump == 'y' or user_data_dump == 'Y':
+                RESTORE_USER_DATA = True
+            else:
+                RESTORE_USER_DATA = False
+
             nodes_falling_under_grp = node_collection.find({"group_set":ObjectId(group_node._id)})
-            print "\n\tTotal GSystem objects found: ", nodes_falling_under_grp.count()
+            print "\n\tTotal objects found: ", nodes_falling_under_grp.count()
             confirm_export = raw_input("\n\tDo you want to continue? Enter y/n:\t ")
-            if confirm_export == 'y' or confirm_export == 'Y':
+            if confirm_export is 'y' or confirm_export is 'Y':
                 print "START : ", str(datetime.datetime.now())
                 group_dump_path = setup_dump_path(group_node.name)
                 create_factory_schema_mapper(group_dump_path)
+                create_configs_file(group_node._id, group_dump_path)
                 log_file_path = create_log_file(group_dump_path)
 
                 print "*"*70
@@ -117,13 +167,18 @@ class Command(BaseCommand):
                 call_group_export(group_node, nodes_falling_under_grp, num_of_processes=multiprocessing.cpu_count())
                 get_counter_ids(group_id)
                 # dump_media_data()
-            global log_file
-            log_file.write("\n*************************************************************")
-            log_file.write("\n######### Script Completed at : " + str(datetime.datetime.now()) + " #########\n\n")
-            print "END : ", str(datetime.datetime.now())
+                global log_file
+                log_file.write("\n*************************************************************")
+                log_file.write("\n######### Script Completed at : " + str(datetime.datetime.now()) + " #########\n\n")
+                print "END : ", str(datetime.datetime.now())
+            else:
+                print "\n Exiting..."
+                os._exit(0)
 
         else:
             print "\n Enter a valid ObjectId"
+            print "\n Exiting..."
+            os._exit(0)
 
 
 def call_group_export(group_node, nodes_cur, num_of_processes=4):
@@ -221,8 +276,10 @@ def copy_rcs(node):
                 path = historyMgr.get_file_path(node)
                 path = path + ",v"
                 build_rcs.add(path)
+
             cp = "cp  -vu " + path + " " +" --parents " + data_export_path + "/"
             subprocess.Popen(cp,stderr=subprocess.STDOUT,shell=True)
+
             log_file.write("\n RCS Copied " + str(path) )
 
         except Exception as copyRCSError:
