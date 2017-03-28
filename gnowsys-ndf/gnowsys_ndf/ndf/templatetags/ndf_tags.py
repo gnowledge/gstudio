@@ -3933,9 +3933,9 @@ def get_pages(page_type):
 	return page_nodes
 
 @register.assignment_tag
-def get_relation_node(node_id):
+def get_relation_node(node_id,rel_name):
 	node = node_collection.one({'_id':ObjectId(node_id)})
-	rt_subtitle = node_collection.one({'_type':'RelationType', 'name':'has_subtitle'})
+	rt_subtitle = node_collection.one({'_type':'RelationType', 'name':unicode(rel_name)})
 	grel_nodes = triple_collection.find({'relation_type': rt_subtitle._id, 'subject': node._id},
               {'right_subject':1, 'relation_type_scope': 1, '_id': 0})
 	
