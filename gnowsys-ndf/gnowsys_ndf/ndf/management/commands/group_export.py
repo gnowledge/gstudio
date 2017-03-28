@@ -114,7 +114,7 @@ class Command(BaseCommand):
                 print "*"*70
                 # import ipdb; ipdb.set_trace()
 
-                call_group_export(nodes_falling_under_grp, num_of_processes=multiprocessing.cpu_count())
+                call_group_export(group_node, nodes_falling_under_grp, num_of_processes=multiprocessing.cpu_count())
                 get_counter_ids(group_id)
                 # dump_media_data()
             global log_file
@@ -126,12 +126,14 @@ class Command(BaseCommand):
             print "\n Enter a valid ObjectId"
 
 
-def call_group_export(nodes_cur, num_of_processes=4):
+def call_group_export(group_node, nodes_cur, num_of_processes=4):
     '''
         Introducing multiprocessing to use cores available on the system to 
         take dump of nodes of the entire group.
     '''
     nodes_cur = list(nodes_cur)
+    # Include Group Object.
+    nodes_cur.append(group_node)
     def worker(nodes_cur, out_q):
         for each_node in nodes_cur:
             print ".",
