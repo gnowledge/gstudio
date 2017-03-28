@@ -3957,3 +3957,16 @@ def get_lessons(unit_node):
 	# 						'group_set': unit_node})
 	lesson_nodes = node_collection.find({'_id': {'$in': unit_node.collection_set}})
 	return lesson_nodes
+
+
+@register.assignment_tag
+def get_gstudio_alt_file_formats(mime_type):
+ 	return GSTUDIO_ALTERNATE_FORMATS[mime_type]
+
+@register.assignment_tag
+def get_gstudio_alt_size(mime_type):
+ 	return GSTUDIO_ALTERNATE_SIZE[mime_type]
+
+@register.assignment_tag
+def get_gstudio_alt_opts():
+ 	return GSTUDIO_ALTERNATE_OPTS

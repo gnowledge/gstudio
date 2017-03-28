@@ -6688,9 +6688,17 @@ def create_edit_asset(request,group_id):
       group_name, group_id = get_group_name_id(group_id)
   asset_name =  str(request.POST.get("asset_name", '')).strip()
   asset_desc =  str(request.POST.get("asset_description", '')).strip()
+  tags =  request.POST.get("sel_tags", '')
+  
+  if tags:
+    if not type(tags) is list:
+        tags = [unicode(t.strip()) for t in tags.split(",") if t != ""]
   node_id = request.POST.get('node_id', None)
   asset_obj = create_asset(name=asset_name, group_id=group_id,
     created_by=request.user.id, content=unicode(asset_desc), node_id=node_id)
+  print "++++++++++++++++++++++++++",tags
+  asset_obj.tags = tags
+  asset_obj.save()
   thread_node = create_thread_for_node(request,group_id, asset_obj)
 
   # teaches_list = [ObjectId(asset_objective)]
@@ -6711,12 +6719,19 @@ def add_assetcontent(request,group_id):
   asset_obj = request.POST.get('asset_obj','')
   if_subtitle = request.POST.get('if_subtitle','')
   if_transcript = request.POST.get('if_transcript','')
+  if_alt_lang_file = request.POST.get('if_alt_file','')
+  if_alt_format_file = request.POST.get('if_alt_format_file','')
   assetcontentid = request.POST.get('assetcontentid','')
+ 
   uploaded_files = request.FILES.getlist('filehive', [])
   uploaded_transcript = request.FILES.getlist('uploaded_transcript', [])
   uploaded_subtitle = request.FILES.getlist('uploaded_subtitle', [])
+  uploaded_alt_lang_file = request.FILES.getlist('uploaded_alt_lang_file', [])
+  
   subtitle_lang = request.POST.get('sel_sub_lang','')
-  subtitle_lang_code = request.POST.get('sel_sub_lang_code','')
+  sel_alt_value = request.POST.get('sel_alt_value','')
+  alt_file_format = request.POST.get('sel_alt_fr_type','')
+  
   asset_cont_desc = request.POST.get('asset_cont_desc','')
   asset_cont_name = request.POST.get('asset_cont_name','')
   node_id = request.POST.get('node_id',None)
@@ -6736,6 +6751,7 @@ def add_assetcontent(request,group_id):
 
     return StreamingHttpResponse("success")
 
+
   if if_transcript == "True":
     rt_transcript = node_collection.one({'_type':'RelationType', 'name':'has_transcript'})
     transcript_obj = create_assetcontent(ObjectId(asset_obj),uploaded_transcript[0].name,group_id,request.user.id,files=uploaded_transcript,resource_type='File')
@@ -6749,6 +6765,22 @@ def add_assetcontent(request,group_id):
     trans_grel = create_grelation(ObjectId(assetcontentid), rt_transcript, transcript_list)
     return StreamingHttpResponse("success")
   
+  if if_alt_lang_file == "True":
+    alt_file_type = request.POST.get('alt_file_type','')
+    alt_lang_file_obj = create_assetcontent(ObjectId(asset_obj),uploaded_alt_lang_file[0].name,group_id,request.user.id,files=uploaded_alt_lang_file,resource_type='File')
+    rt_alt_content = node_collection.one({'_type':'RelationType', 'name':'has_alt_content'})
+    alt_lang_file_list = [ObjectId(alt_lang_file_obj._id)]
+
+    alt_lang_file_grels = triple_collection.find({'_type': 'GRelation', \
+    'relation_type': rt_alt_content._id,'subject': ObjectId(assetcontentid)},
+    {'_id': 0, 'right_subject': 1})
+    for each_asset in alt_lang_file_grels:
+      alt_lang_file_list.append(each_asset['right_subject'])
+
+    alt_lang_file_node = create_grelation(ObjectId(assetcontentid), rt_alt_content, alt_lang_file_list, **{'triple_scope':{'relation_type_scope':{ alt_file_type : sel_alt_value }, 'subject_scope': "many"}})
+
+    return StreamingHttpResponse("success")
+
   create_assetcontent(ObjectId(asset_obj),asset_cont_name,group_id,request.user.id,content=asset_cont_desc,files=uploaded_files,resource_type='File')
   return StreamingHttpResponse("success")
 
@@ -6796,7 +6828,7 @@ def save_metadata(request, group_id):
   Based_url = request.POST.get("basedonurl_val", "")
   obj_list = request.POST.get("obj_list", "")
   for k, v in json.loads(obj_list).iteritems():
-    attr_node = node_collection.one({'_type':'AttributeType','name':unicode(k)},{'_id': 1})
+    attr_node = node_collection.one({'_type':'AttributeType','name':unicode(k)})
     if v is not None and (not isinstance(v,list) and "select" not in v.lower()) or (isinstance(v,list) and "select" not in v[0].lower() ):
       if attr_node: 
         create_gattribute(ObjectId(node_id), attr_node, v)
