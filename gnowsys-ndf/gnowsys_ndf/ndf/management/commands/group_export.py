@@ -169,16 +169,23 @@ def call_group_export(nodes_cur, num_of_processes=4):
 def build_rcs(node, collection_name):
     if node:
         global log_file
-        if collection_name is triple_collection:
-            if 'attribute_type' in node:
-                triple_node_RT_AT = node_collection.one({'_id': node.attribute_type})
-            elif 'relation_type' in node:
-                triple_node_RT_AT = node_collection.one({'_id': node.relation_type})
-            node.save(triple_node=triple_node_RT_AT, triple_id=triple_node_RT_AT._id)
-        else:
-            node.save()
-        log_file.write("\n RCS Built for " + str(node._id) )
-        copy_rcs(node)
+        try:
+            if collection_name is triple_collection:
+                if 'attribute_type' in node:
+                    triple_node_RT_AT = node_collection.one({'_id': node.attribute_type})
+                elif 'relation_type' in node:
+                    triple_node_RT_AT = node_collection.one({'_id': node.relation_type})
+                node.save(triple_node=triple_node_RT_AT, triple_id=triple_node_RT_AT._id)
+            else:
+                node.save()
+            log_file.write("\n RCS Built for " + str(node._id) )
+            copy_rcs(node)
+        except Exception as buildRCSError:
+            error_log = "\n !!! Error found while Building RCS ."
+            error_log += "\nError: " + str(buildRCSError)
+            log_file.write(error_log)
+            print error_log
+            pass
 
 def copy_rcs(node):
 
@@ -234,9 +241,9 @@ def dump_node(collection_name=node_collection, node=None, node_id=None, node_id_
 
 def dump_media_data(media_path):
     # Copy media file to /data/media location
-    print "\n--- Copying Inititated for Filehives Media --- "
     # print media_export_path
     global log_file
+    log_file.write("\n--- Media Copying in process --- ", str(media_path))
     try:
         print "\n each_file_media_url: ", media_path
         fp = os.path.join(MEDIA_ROOT,media_path)
