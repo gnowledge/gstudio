@@ -13,12 +13,15 @@
     <form id ="course_page_form" enctype="multipart/form-data" method="post" action="{% url 'save_course_page' group_id %}">{% csrf_token %}
         <div>
             <div class="row">
-                <div class="medium-8 columns name-div">
+                <div class="medium-4 columns name-div">
                     <input type="text" class="node_name" value="{{node_obj.name}}" name="name" placeholder="Enter name of Activity">
                     <label class="node_name_empty hide" style="color:red">Please enter Name</label> 
                 </div>
                 <div class="medium-4 columns">
                     <a class="right orange-button-template existing-template">Create page from existing template</a>
+                </div>
+                <div class="medium-4 columns">
+                    <button type="button" class="orange-button edit-activity-metadata right">Edit Metadata</button>
                 </div>
             </div>
             <div class="row">
@@ -186,5 +189,28 @@
             }
         });
     });
+
+$( ".edit-activity-metadata" ).click(function(event) {
+    if('{{node_obj.pk}}'){
+        node_id = '{{node_obj.pk}}'
+    }
+    else{
+        
+        node_id = $('.view-page').attr('data-page-id')
+    }
+    $.ajax({
+              type: "POST",
+              data:{
+                    'csrfmiddlewaretoken': "{{csrf_token}}",
+                    "node_id":node_id,
+                },
+              url: "{% url 'get_metadata_page' groupid  %}",
+              datatype: "html",
+              success: function(data) {
+              $('#addAsset').foundation('reveal', 'open');
+              $('#addAsset').html(data);
+            }
+        });
+});
 
 </script>
