@@ -12,24 +12,17 @@ from gnowsys_ndf.ndf.models import node_collection, triple_collection, filehive_
 from gnowsys_ndf.ndf.models import HistoryManager
 from gnowsys_ndf.settings import GSTUDIO_DATA_ROOT, GSTUDIO_LOGS_DIR_PATH, MEDIA_ROOT, GSTUDIO_INSTITUTE_ID
 from schema_mapping import create_factory_schema_mapper
+from dump_users import create_users_dump
 
 
-node_collection_ids = set()
-triple_collection_ids = set()
-filehives_collection_ids = set()
-counter_collection_ids = set()
-filehives_media_urls = set()
-build_rcs = set()
-rcs_paths_found = set()
-media_url_not_found = set()
-media_url_found = set()
-historyMgr = HistoryManager()
-data_export_path = None
-media_export_path = None
-log_file = None
+GROUP_CONTRIBUTORS = set()
+DATA_EXPORT_PATH = None
+MEDIA_EXPORT_PATH = None
 IS_FORK = False
 IS_CLONE = False
 RESTORE_USER_DATA = False
+log_file = None
+historyMgr = HistoryManager()
 
 def create_log_file(dump_path):
     '''
@@ -53,16 +46,16 @@ def setup_dump_path(group_name):
         Creates factory_schema.json which will hold basic info
         like ObjectId, name, type of TYPES_LIST and GSTUDIO_DEFAULT_GROUPS
     '''
-    global data_export_path
-    global media_export_path
+    global DATA_EXPORT_PATH
+    global MEDIA_EXPORT_PATH
     datetimestamp = datetime.datetime.now().isoformat()
-    data_export_path = os.path.join(GSTUDIO_DATA_ROOT, 'data_export', group_name + "_" + str(datetimestamp))
-    media_export_path = os.path.join(data_export_path, 'media_files')
-    if not os.path.exists(data_export_path):
-        os.makedirs(data_export_path)
-    if not os.path.exists(media_export_path):
-        os.makedirs(media_export_path)
-    return data_export_path
+    DATA_EXPORT_PATH = os.path.join(GSTUDIO_DATA_ROOT, 'data_export', group_name + "_" + str(datetimestamp))
+    MEDIA_EXPORT_PATH = os.path.join(DATA_EXPORT_PATH, 'media_files')
+    if not os.path.exists(DATA_EXPORT_PATH):
+        os.makedirs(DATA_EXPORT_PATH)
+    if not os.path.exists(MEDIA_EXPORT_PATH):
+        os.makedirs(MEDIA_EXPORT_PATH)
+    return DATA_EXPORT_PATH
 
 def create_configs_file(group_id, data_dump_path):
     global IS_FORK
@@ -129,6 +122,7 @@ class Command(BaseCommand):
             global IS_FORK
             global IS_CLONE
             global RESTORE_USER_DATA
+            global GROUP_CONTRIBUTORS
             if fork_clone_confirm == '1':
                 print "\n\t!!! Chosen FORK option !!!"
                 IS_FORK = True
@@ -157,7 +151,7 @@ class Command(BaseCommand):
                 log_file_path = create_log_file(group_dump_path)
 
                 print "*"*70
-                print "\n Export will be found at: ", data_export_path
+                print "\n Export will be found at: ", DATA_EXPORT_PATH
                 print "\n Log will be found at: ", log_file_path
 
                 print "\n This will take few minutes. Please be patient.\n"
@@ -167,6 +161,8 @@ class Command(BaseCommand):
                 call_group_export(group_node, nodes_falling_under_grp, num_of_processes=multiprocessing.cpu_count())
                 get_counter_ids(group_id)
                 # dump_media_data()
+                print "\n Total GROUP_CONTRIBUTORS: ", len(GROUP_CONTRIBUTORS)
+                create_users_dump(group_dump_path, GROUP_CONTRIBUTORS)
                 global log_file
                 log_file.write("\n*************************************************************")
                 log_file.write("\n######### Script Completed at : " + str(datetime.datetime.now()) + " #########\n\n")
@@ -242,6 +238,8 @@ def build_rcs(node, collection_name):
     '''
     if node:
         global log_file
+        global GROUP_CONTRIBUTORS
+
         try:
             if collection_name is triple_collection:
                 if 'attribute_type' in node:
@@ -251,6 +249,9 @@ def build_rcs(node, collection_name):
                 node.save(triple_node=triple_node_RT_AT, triple_id=triple_node_RT_AT._id)
             else:
                 node.save()
+                print "\n CC: ", len(node.contributors)
+                GROUP_CONTRIBUTORS.update(node.contributors)
+
             log_file.write("\n RCS Built for " + str(node._id) )
             copy_rcs(node)
         except Exception as buildRCSError:
@@ -275,9 +276,8 @@ def copy_rcs(node):
             if not os.path.exists(path):
                 path = historyMgr.get_file_path(node)
                 path = path + ",v"
-                build_rcs.add(path)
 
-            cp = "cp  -vu " + path + " " +" --parents " + data_export_path + "/"
+            cp = "cp  -vu " + path + " " +" --parents " + DATA_EXPORT_PATH + "/"
             subprocess.Popen(cp,stderr=subprocess.STDOUT,shell=True)
 
             log_file.write("\n RCS Copied " + str(path) )
@@ -322,21 +322,19 @@ def dump_node(collection_name=node_collection, node=None, node_id=None, node_id_
 
 def dump_media_data(media_path):
     # Copy media file to /data/media location
-    # print media_export_path
+    # print MEDIA_EXPORT_PATH
     global log_file
-    log_file.write("\n--- Media Copying in process --- ", str(media_path))
+    log_file.write("\n--- Media Copying in process --- "+ str(media_path))
     try:
         print "\n each_file_media_url: ", media_path
         fp = os.path.join(MEDIA_ROOT,media_path)
         if os.path.exists(fp):
-            cp = "cp  -u " + fp + " " +" --parents " + media_export_path + "/"
+            cp = "cp  -u " + fp + " " +" --parents " + MEDIA_EXPORT_PATH + "/"
             subprocess.Popen(cp,stderr=subprocess.STDOUT,shell=True)
-            media_url_found.add(fp)
             log_file.write("\n Media Copied:  " + str(fp) )
 
         else:
             log_file.write("\n Media NOT Copied:  " + str(fp) )
-            media_url_not_found.add(fp)
     except Exception as dumpMediaError:
         error_log = "\n !!! Error found while taking dump of Media.\n" +  str(media_path)
         error_log += "\nError: " + str(dumpMediaError)
