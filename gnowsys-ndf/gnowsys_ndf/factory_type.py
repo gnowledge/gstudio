@@ -192,7 +192,8 @@ factory_relation_types = [
             'subject_type':['Page','Topic','Theme','theme_item','File','GAPP','factory_types','Binary'],
             'object_type':['Page','Topic','Theme','theme_item','File','GAPP','factory_types','Binary'],
             'inverse_name':'translation_of',
-            'meta_type':'factory_types'
+            'meta_type':'factory_types',
+            'object_cardinality': 100
         }
     },
 

@@ -31,7 +31,7 @@
                     {% include "ndf/html_editor.html" with var_name="content_org" var_placeholder="Enter the content here" var_value="" ckeditor_toolbar="GeneralToolbar" %}
                     {% endif %}
                 </div>
-                
+
             </div>
             <input type="hidden" name="node_id" class="form_node_id">
             {% if editor_view %}
@@ -59,7 +59,7 @@
 
 <div id="page_listing">
 
-<div class="row"> 
+<div class="row">
     {% for each in all_pages %}
         <a class="view-page" data-page-id="{{each.pk}}" data-node-name="{{each.name}}" title="{{each.name}}">
             <div class="small-12 medium-6 large-3 columns">
@@ -75,7 +75,7 @@
                     </div>
                     <div class="asset_text">
                         <div class="asset_title" title="{{each.name}}">{{each.name|truncatechars:25}}</div>
-                        <div class="asset_desc">{{each.content|striptags|truncatechars:35}}</div>
+                        <div class="asset_desc">{{each.content|safe|striptags|truncatechars:35}}</div>
                     </div>
                 </div>
             </div>
@@ -83,7 +83,7 @@
     {% endfor %}
 </div></div>
 <script type="text/javascript">
-    
+
     $(document).ready(function(){
         {% if editor_view %}
             load_inline_content_editor("{{node_obj.pk}}","{{node_obj.name}}")

@@ -312,7 +312,7 @@ This will not be used because now only existing activities will be added.
                 </ul>
             </div>
         </a>
-        <div id="lesson-{{id}}" class="content lesson-container active">
+        <div id="lesson-{{id}}" class="content lesson-container">
             <ul class="course-activities">
                 {{#each activities}}
                     <li id="activity-{{id}}" data-name="{{name}}">
@@ -775,12 +775,13 @@ This will not be used because now only existing activities will be added.
         renderCourseTree(course_data);
 
         function getActivityPages() {
+            var lessonId = $("#select-activity-page").attr("data-lesson-id");
             $.ajax({
                       type: "GET",
                       url: "{% url 'get_group_pages' group_id %}",
                       datatype: "html",
                       data:{
-
+                        'except_collection_set_of_id': lessonId
                       },
                         success: function(data) {
                       $("#activity-container").html(data);
@@ -792,7 +793,6 @@ This will not be used because now only existing activities will be added.
                           var activityPgId = $(this).attr("data-id");
                           var activityContent = $(this).attr("data-name");
 
-                          var lessonId = $("#select-activity-page").attr("data-lesson-id");
                           addExistingActivityPage(lessonId, activityPgId);
                           // addActivity($('#activity-name').val().trim(), lesson_id);
 

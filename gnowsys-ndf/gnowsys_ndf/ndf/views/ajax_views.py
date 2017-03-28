@@ -6587,8 +6587,13 @@ def get_group_templates_page(request, group_id):
 
 
 def get_group_pages(request, group_id):
+    except_collection_set_of_id = request.GET.get('except_collection_set_of_id', None)
+    except_collection_set_of_obj = Node.get_node_by_id(except_collection_set_of_id)
+    except_collection_set = []
+    if except_collection_set_of_obj:
+        except_collection_set = except_collection_set_of_obj.collection_set
     gst_page_name, gst_page_id = GSystemType.get_gst_name_id('Page')
-    pages_cur = node_collection.find({'_type': 'GSystem', 'member_of': ObjectId(gst_page_id), 'group_set': ObjectId(group_id)})
+    pages_cur = node_collection.find({'_type': 'GSystem', 'member_of': ObjectId(gst_page_id), 'group_set': ObjectId(group_id), '_id': {'$nin': except_collection_set} })
     template = "ndf/group_pages.html"
     card_class = 'activity-page'
     variable = RequestContext(request, {'cursor': pages_cur, 'groupid': group_id, 'group_id': group_id, 'card_class': card_class })
@@ -6830,7 +6835,7 @@ def save_metadata(request, group_id):
   for k, v in json.loads(obj_list).iteritems():
     attr_node = node_collection.one({'_type':'AttributeType','name':unicode(k)})
     if v is not None and (not isinstance(v,list) and "select" not in v.lower()) or (isinstance(v,list) and "select" not in v[0].lower() ):
-      if attr_node: 
+      if attr_node:
         create_gattribute(ObjectId(node_id), attr_node, v)
     else:
         ga_node = triple_collection.find_one({'_type': "GAttribute",
@@ -6840,11 +6845,11 @@ def save_metadata(request, group_id):
   if source:
     source_attr = node_collection.one({'_type':'AttributeType','name':'source'})
     create_gattribute(ObjectId(node_id), source_attr, source)
-  
+
   if copyright:
     node.legal.copyright = unicode(copyright)
     node.save()
-  
+
   if Based_url:
     basedurl_attr = node_collection.one({'_type':'AttributeType','name':'basedonurl'})
     create_gattribute(ObjectId(node_id), basedurl_attr, Based_url)
@@ -6858,7 +6863,7 @@ def export_to_epub(request, group_id, node_id):
         epub_loc = create_epub(node_obj)
         zip_file = open(epub_loc, 'rb')
         response = HttpResponse(zip_file.read(), content_type="application/epub+zip")
-        response['Content-Disposition'] = 'attachment; filename="'+ slugify(node_obj.name) + '.epub"'       
+        response['Content-Disposition'] = 'attachment; filename="'+ slugify(node_obj.name) + '.epub"'
         return response
     except Exception as export_fail:
         # print "\n export_fail: ", export_fail
