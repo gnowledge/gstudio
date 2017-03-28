@@ -289,6 +289,11 @@ def get_file_node_details(node):
     #     user_list.extend(node.author_set)
 
 def get_nested_ids(node,field_name):
+    '''
+        Recursive function to fetch Objectids from a 
+        particular field of passed node.
+        field_name can be : collection_set, post_node, prior_node
+    '''
     if node[field_name]:
         for each_id in node[field_name]:
             each_node = node_collection.one({"_id":ObjectId(each_id)})
@@ -296,8 +301,11 @@ def get_nested_ids(node,field_name):
             if each_node and each_node[field_name]:
                 get_nested_ids(each_node, field_name)
 
-def get_counter_ids(group_id) :
+def get_counter_ids(group_id):
+    '''
+    Fetch all the Counter instances of the exporting Group
+    '''
     counter_collection_cur = counter_collection.find({'group_id':ObjectId(group_id)})
     if counter_collection_cur :
         for each_obj in counter_collection_cur :
-            dump_node(node=each_obj,collection_name="counter_collection")
+            dump_node(node=each_obj,collection_name=counter_collection)
