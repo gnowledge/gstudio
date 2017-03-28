@@ -38,7 +38,10 @@
             <input type="hidden" name="return_url" value="{{return_url}}">
             {% endif %}
             <input type="submit" class="orange-button" class="saveActivityPage" value="Save">
+
             <input type="button" class="orange-button cancel-page-create" value="Cancel">
+                    {% include 'ndf/widget_tags.html' with node=asset_obj %}
+            
         </div>
     </form>
 </div>
