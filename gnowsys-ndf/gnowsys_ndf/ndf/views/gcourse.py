@@ -3184,6 +3184,7 @@ def save_course_page(request, group_id):
     group_obj = get_group_name_id(group_id, get_obj=True)
     group_id = group_obj._id
     group_name = group_obj.name
+    tags = request.POST.get("tags", '[]')
     template = 'ndf/gevent_base.html'
     page_gst_name, page_gst_id = GSystemType.get_gst_name_id("Page")
     page_obj = None
@@ -3196,6 +3197,10 @@ def save_course_page(request, group_id):
             return_url = 'course_pages'
         if node_id:
             page_obj = node_collection.one({'_id': ObjectId(node_id)})
+            if tags:
+                if not type(tags) is list:
+                    tags = [unicode(t.strip()) for t in tags.split(",") if t != ""]
+                page_obj.tags = tags
         if not page_obj:
             page_obj = node_collection.collection.GSystem()
             page_obj.fill_gstystem_values(request=request)
@@ -3204,7 +3209,7 @@ def save_course_page(request, group_id):
         page_obj.name = unicode(name)
         page_obj.content = unicode(content)
         page_obj.created_by = request.user.id
-        page_obj.save(groupid=group_id)
+        page_obj.save(groupid=ObjectId(group_id))
         return HttpResponseRedirect(reverse(str(return_url), kwargs={'group_id': group_id}))
 
 def load_content_data(request, group_id):
