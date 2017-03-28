@@ -28,8 +28,9 @@ data_export_path = None
 media_export_path = None
 log_file = None
 
-def create_log_file(group_name):
-    log_file_name = 'group_dump_' + str(group_name)+ '.log'
+def create_log_file(dump_path):
+    dump_path = dump_path.split("/")[-1]
+    log_file_name = 'group_dump_' + str(dump_path)+ '.log'
     if not os.path.exists(GSTUDIO_LOGS_DIR_PATH):
         os.makedirs(GSTUDIO_LOGS_DIR_PATH)
 
@@ -37,7 +38,8 @@ def create_log_file(group_name):
     # print log_file_path
     global log_file
     log_file = open(log_file_path, 'w+')
-    log_file.write("######### Script ran on : " + str(datetime.datetime.now()) + " #########\n\n")
+    log_file.write("\n######### Script ran on : " + str(datetime.datetime.now()) + " #########\n\n")
+    return log_file_path
 
 def setup_dump_path(group_name):
     '''
@@ -56,165 +58,200 @@ def setup_dump_path(group_name):
     return data_export_path
 
 
-def get_triple_data(node_id, node_triple_set, is_triple_rt):
-    # node_triple_set can be node.attribute_set OR
-    # node.relation_set
-    if is_triple_rt:
-        rt_at_query = {"_type": "RelationType"}
-        triple_query = {"_type": "GRelation", "subject": node_id}
-        fetch_value = 'right_subject'
-    else:
-        rt_at_query = {"_type": "AttributeType"}
-        triple_query = {"_type": "GAttribute", "subject": node_id}
-        fetch_value = 'object_value'
-    for each_triple_val in node_triple_set:
-        if each_triple_val:
-            each_triple_val_name = each_triple_val.keys()[0]
-            # print "\neach_triple_val_name: ", each_triple_val_name
-            if each_triple_val_name:
-                rt_at_query.update({"name": unicode(each_triple_val_name)})
-                rt_at_node = node_collection.one(rt_at_query)
-                if rt_at_node:
-                    if is_triple_rt:
-                        triple_query.update({"relation_type": rt_at_node._id})
-                    else:
-                        triple_query.update({"attribute_type": rt_at_node._id})
+def get_triple_data(node_id):
 
-                    triple_node = triple_collection.find(triple_query)
-                    if triple_node:
-                        for each_triple_node in triple_node:
-                            triple_collection_ids.add(each_triple_node._id)
-                            # Get ObjectIds in object_value fields
-                            if type(each_triple_node[fetch_value]) == list and all(isinstance(each_obj_value, ObjectId) for each_obj_value in each_triple_node[fetch_value]):
-                                node_collection_ids.extend(each_triple_node[fetch_value])
-                            elif isinstance(each_triple_node[fetch_value], ObjectId):
-                                node_collection_ids.add(each_triple_node[fetch_value])
+    triple_query = {"_type": {'$in': ["GAttribute", "GRelation"]}, "subject": node_id}
+
+    node_gattr_grel_cur = triple_collection.find(triple_query)
+    fetch_value = None
+    if node_gattr_grel_cur:
+
+        for each_triple_node in node_gattr_grel_cur:
+            dump_node(node=each_triple_node,
+                collection_name=triple_collection)
+            # Get ObjectIds in object_value fields
+            if each_triple_node._type is "GAttribute":
+                fetch_value = "object_value"
+            elif each_triple_node._type is "GRelation":
+                fetch_value = "right_subject"
+            if fetch_value:
+                print "\n fetch_value -- ", fetch_value
+                if type(each_triple_node[fetch_value]) == list and all(isinstance(each_obj_value, ObjectId) for each_obj_value in each_triple_node[fetch_value]):
+                    dump_node(node_id_list=each_triple_node[fetch_value],
+                        collection_name=node_collection)
+                elif isinstance(each_triple_node[fetch_value], ObjectId):
+                    dump_node(node_id=each_triple_node[fetch_value],
+                            collection_name=node_collection)
+
 
 class Command(BaseCommand):
     def handle(self, *args, **options):
         group_id = raw_input("Please enter group id:\t")
         group_node = node_collection.one({"_type":"Group","_id":ObjectId(group_id)})
         if group_node:
-            print "\n Initializing Dump of : ", group_node.name
-            group_dump_path = setup_dump_path(group_node.name)
-            create_factory_schema_mapper(group_dump_path)
+            print "\tRequest received for Export of : ", group_node.name
             nodes_falling_under_grp = node_collection.find({"group_set":ObjectId(group_node._id)})
-            print "\n Export will be found at: ", data_export_path
-            print "\n Total GSystem objects found: ", nodes_falling_under_grp.count()
-            confirm_export = raw_input("Do you want to continue? Enter y/n:\t ")
+            print "\n\tTotal GSystem objects found: ", nodes_falling_under_grp.count()
+            confirm_export = raw_input("\n\tDo you want to continue? Enter y/n:\t ")
             if confirm_export == 'y' or confirm_export == 'Y':
+                print "START : ", str(datetime.datetime.now())
+                group_dump_path = setup_dump_path(group_node.name)
+                create_factory_schema_mapper(group_dump_path)
+                log_file_path = create_log_file(group_dump_path)
+
                 print "*"*70
+                print "\n Export will be found at: ", data_export_path
+                print "\n Log will be found at: ", log_file_path
+
                 print "\n This will take few minutes. Please be patient.\n"
                 print "*"*70
-                for each_node in nodes_falling_under_grp:
-                    print ".",
-                    node_collection_ids.add(each_node._id)
-                    if 'File' in each_node.member_of_names_list:
-                        get_file_node_details(each_node)
+                # import ipdb; ipdb.set_trace()
 
-                    if each_node.collection_set:
-                        get_nested_ids(each_node,'collection_set')
-
-                    if each_node.prior_node:
-                        get_nested_ids(each_node,'prior_node')
-
-                    if each_node.post_node:
-                        get_nested_ids(each_node,'post_node')
-
-                    if each_node.attribute_set:
-                        #fetch attribute_type
-                        get_triple_data(node_id=each_node._id, node_triple_set=each_node.attribute_set,is_triple_rt=False)
-                    if each_node.relation_set:
-                        get_triple_data(node_id=each_node._id, node_triple_set=each_node.relation_set,is_triple_rt=True)
-
-                initiate_dump()
-            create_log_file(group_node.name)
+                call_group_export(nodes_falling_under_grp, num_of_processes=multiprocessing.cpu_count())
+                get_counter_ids(group_id)
+                # dump_media_data()
+            global log_file
             log_file.write("\n*************************************************************")
-            log_file.write("\n\nTotal Migrations Expected: "+ str(len(node_collection_ids) + len(triple_collection_ids) + len(filehives_collection_ids) + len(filehives_media_urls) + len(counter_collection_ids)))
-
-            log_file.write("\n*************************************************************")
-            log_file.write("Nodes Migrations Expected: "+ str(len(node_collection_ids)))
-            log_file.write("Triple Migrations Expected: "+ str(len(triple_collection_ids)))
-            log_file.write("Filehives Migrations Expected: "+ str(len(filehives_collection_ids)))
-            log_file.write("File Media Migrations Expected: "+ str(len(filehives_media_urls)))
-            log_file.write("Counters Migrations Expected: "+ str(len(counter_collection_ids)))
-
-            log_file.write("\n*************************************************************")
-            log_file.write("Successful Migrations: "+ str(len(rcs_paths_found)))
-            log_file.write("Unsuccessful Migrations: "+ str(len(build_rcs)))
-
-            log_file.write("\n*************************************************************")
-            log_file.write("Successful Media Migrations: " + str(len(media_url_found)))
-            log_file.write("Unsuccessful Media Migrations: " + str(len(media_url_not_found)))
-
-            log_file.write("\n*************************************************************")
-            log_file.write("Details of RCS Paths Not Found: " + str(build_rcs))
-            log_file.write("\n*************************************************************")
-            log_file.write("Details of Media Paths Not Found: " + str(media_url_not_found))
-            log_file.write("######### Script Completed at : " + str(datetime.datetime.now()) + " #########\n\n")
+            log_file.write("\n######### Script Completed at : " + str(datetime.datetime.now()) + " #########\n\n")
+            print "END : ", str(datetime.datetime.now())
 
         else:
-            print "\n Please enter a Valid ObjectId."
+            print "\n Enter a valid ObjectId"
 
 
+def call_group_export(nodes_cur, num_of_processes=4):
+    nodes_cur = list(nodes_cur)
+    def worker(nodes_cur, out_q):
+        for each_node in nodes_cur:
+            print ".",
+            dump_node(node=each_node,collection_name=node_collection)
+            # node_collection_ids.add(each_node._id)
+            if 'File' in each_node.member_of_names_list:
+                get_file_node_details(each_node)
 
-def initiate_dump():
+            if each_node.collection_set:
+                get_nested_ids(each_node,'collection_set')
+
+            if each_node.prior_node:
+                get_nested_ids(each_node,'prior_node')
+
+            if each_node.post_node:
+                get_nested_ids(each_node,'post_node')
+
+            #fetch triple_data
+            get_triple_data(each_node._id)
+    # Each process will get 'chunksize' student_cur and a queue to put his out
+    # dict into
+    out_q = multiprocessing.Queue()
+    chunksize = int(math.ceil(len(nodes_cur) / float(num_of_processes)))
+    procs = []
+
+    for i in range(num_of_processes):
+        p = multiprocessing.Process(
+            target=worker,
+            args=(nodes_cur[chunksize * i:chunksize * (i + 1)], out_q)
+        )
+        procs.append(p)
+        p.start()
+
+    # Collect all results into a single result list. We know how many lists
+    # with results to expect.
+    # resultlist = []
+    # for i in range(num_of_processes):
+    #     resultlist.extend(out_q.get())
+
+    # Wait for all worker processes to finish
+    for p in procs:
+        p.join()
+
+    # return resultlist
+
+def build_rcs(node, collection_name):
+    if node:
+        global log_file
+        if collection_name is triple_collection:
+            if 'attribute_type' in node:
+                triple_node_RT_AT = node_collection.one({'_id': node.attribute_type})
+            elif 'relation_type' in node:
+                triple_node_RT_AT = node_collection.one({'_id': node.relation_type})
+            node.save(triple_node=triple_node_RT_AT, triple_id=triple_node_RT_AT._id)
+        else:
+            node.save()
+        log_file.write("\n RCS Built for " + str(node._id) )
+        copy_rcs(node)
+
+def copy_rcs(node):
+
+    if node:
+        global log_file
+        try:
+            # To update RCS
+            path = historyMgr.get_file_path(node)
+            path = path + ",v"
+
+            if not os.path.exists(path):
+                path = historyMgr.get_file_path(node)
+                path = path + ",v"
+                build_rcs.add(path)
+            cp = "cp  -vu " + path + " " +" --parents " + data_export_path + "/"
+            subprocess.Popen(cp,stderr=subprocess.STDOUT,shell=True)
+            log_file.write("\n RCS Copied " + str(path) )
+
+        except Exception as copyRCSError:
+            error_log = "\n !!! Error found while Copying RCS ."
+            error_log += "\nError: " + str(copyRCSError)
+            log_file.write(error_log)
+            print error_log
+            pass
+
+
+def dump_node(collection_name=node_collection, node=None, node_id=None, node_id_list=None):
     try:
-        # rcs of Nodes collection
-        print "*"*90
-        print "\n--- Dump Inititated for Nodes --- "
-        print "*"*90
-        dump_node_ids(node_collection_ids,'node_collection', num_of_processes=multiprocessing.cpu_count())
+        global log_file
+        log_file.write("\n dump_node invoked for: " + str(collection_name))
+        if node:
+            log_file.write("\tNode: " + str(node))
+            build_rcs(node, collection_name)
+            log_file.write("\n dump node finished for:  " + str(node._id) )
+        elif node_id:
+            log_file.write("\tNode_id : " + str(node_id))
+            node = collection_name.one({'_id': ObjectId(node_id)})
+            build_rcs(node, collection_name)
+            log_file.write("\n dump node finished for:  " + str(node._id) )
+        elif node_id_list:
+            node_cur = collection_name.one({'_id': {'$in': node_id_list}})
+            log_file.write("\tNode_id_list : " + str(node_id_list))
+            for each_node in nodes_cur:
+                build_rcs(node, collection_name)
+                log_file.write("\n dump node finished for:  " + str(node._id) )
 
-        # rcs of Triples collection
-        print "*"*90
-        print "\n--- Dump Inititated for Triples --- "
-        print "*"*90
-        dump_node_ids(triple_collection_ids,'triple_collection', num_of_processes=multiprocessing.cpu_count())
-
-        # rcs of Filehives collection
-        print "*"*90
-        print "\n--- Dump Inititated for Filehives --- "
-        print "*"*90
-        dump_node_ids(filehives_collection_ids,'filehive_collection', num_of_processes=multiprocessing.cpu_count())
-
-        # rcs of Counter collection
-        print "*"*90
-        print "\n--- Dump Inititated for Counters --- "
-        print "*"*90
-        get_counter_ids(group_node._id)
-        dump_node_ids(counter_collection_ids,'counter_collection', num_of_processes=multiprocessing.cpu_count())
-
-
-        dump_media_data()
     except Exception as dump_err:
-        error_log = "\n !!! Error found while taking dump in initiate_dump() ."
-        error_log =+ "\nError: " + str(dump_err)
+        error_log = "\n !!! Error found while taking dump in dump_node() ."
+        error_log += "\nError: " + str(dump_err)
         log_file.write(error_log)
         print error_log
         pass
 
-def dump_media_data():
+def dump_media_data(media_path):
     # Copy media file to /data/media location
-    print "*"*90
-    print "\n--- Dump Inititated for Filehives Media --- "
-    print "*"*90
-
-    print media_export_path
-
+    print "\n--- Copying Inititated for Filehives Media --- "
+    # print media_export_path
+    global log_file
     try:
-        for each_file_media_url in filehives_media_urls:
-            # import ipdb;ipdb.set_trace()
-            fp = os.path.join(MEDIA_ROOT,each_file_media_url)
-            if os.path.exists(fp):
-                cp = "cp  -u " + fp + " " +" --parents " + media_export_path + "/"
-                subprocess.Popen(cp,stderr=subprocess.STDOUT,shell=True)
-                media_url_found.add(fp)
-            else:
-                media_url_not_found.add(fp)
+        print "\n each_file_media_url: ", media_path
+        fp = os.path.join(MEDIA_ROOT,media_path)
+        if os.path.exists(fp):
+            cp = "cp  -u " + fp + " " +" --parents " + media_export_path + "/"
+            subprocess.Popen(cp,stderr=subprocess.STDOUT,shell=True)
+            media_url_found.add(fp)
+            log_file.write("\n Media Copied:  " + str(fp) )
+
+        else:
+            log_file.write("\n Media NOT Copied:  " + str(fp) )
+            media_url_not_found.add(fp)
     except Exception as dumpMediaError:
-        error_log = "\n !!! Error found while taking dump of Media.\n" +  str(each_file_media_url)
-        error_log =+ "\nError: " + str(dumpMediaError)
+        error_log = "\n !!! Error found while taking dump of Media.\n" +  str(media_path)
+        error_log += "\nError: " + str(dumpMediaError)
         log_file.write(error_log)
         print error_log
         pass
@@ -230,28 +267,25 @@ def get_file_node_details(node):
                 },
 
     '''
-    for each_field,each_value in node.items():
-        if each_field =='if_file':
-            filehives_collection_ids.add(each_value['original']['id'])
-            filehives_collection_ids.add(each_value['mid']['id'])
-            filehives_collection_ids.add(each_value['thumbnail']['id'])
-            filehives_media_urls.add(each_value['original']['relurl'])
-            filehives_media_urls.add(each_value['mid']['relurl'])
-            filehives_media_urls.add(each_value['thumbnail']['relurl'])
-
-        # if each_field == 'group_set':
-        #     for each_grp_id in node.group_set:
-        #         group_node = node_collection.find_one({"_id":ObjectId(each_grp_id)})
-        #         if group_node and group_node._type != unicode('Author'):
-        #             group_set.extend(group_node.group_set)
-        # if each_field == 'author_set':
-        #     user_list.extend(node.author_set)
+    dump_node(node_id=node.if_file['original']['id'], collection_name=filehive_collection)
+    dump_node(node_id=node.if_file['mid']['id'], collection_name=filehive_collection)
+    dump_node(node_id=node.if_file['thumbnail']['id'], collection_name=filehive_collection)
+    dump_media_data(node.if_file['original']['relurl'])
+    dump_media_data(node.if_file['mid']['relurl'])
+    dump_media_data(node.if_file['thumbnail']['relurl'])
+    # if each_field == 'group_set':
+    #     for each_grp_id in node.group_set:
+    #         group_node = node_collection.find_one({"_id":ObjectId(each_grp_id)})
+    #         if group_node and group_node._type != unicode('Author'):
+    #             group_set.extend(group_node.group_set)
+    # if each_field == 'author_set':
+    #     user_list.extend(node.author_set)
 
 def get_nested_ids(node,field_name):
     if node[field_name]:
         for each_id in node[field_name]:
-            node_collection_ids.add(each_id)
             each_node = node_collection.one({"_id":ObjectId(each_id)})
+            dump_node(node=each_node, collection_name=node_collection)
             if each_node and each_node[field_name]:
                 get_nested_ids(each_node, field_name)
 
@@ -259,75 +293,4 @@ def get_counter_ids(group_id) :
     counter_collection_cur = counter_collection.find({'group_id':ObjectId(group_id)})
     if counter_collection_cur :
         for each_obj in counter_collection_cur :
-            counter_collection_ids.add(each_obj._id)
-
-def dump_node_ids(list_of_ids,collection_name, num_of_processes=4):
-    def worker(list_of_ids, out_q):
-        for each_id_of_list in list_of_ids:
-            try:
-                if isinstance(each_id_of_list, ObjectId):
-                    each_node_by_id = None
-                    if collection_name == "node_collection":
-                        each_node_by_id = node_collection.find_one({"_id":ObjectId(each_id_of_list)})
-                        each_node_by_id.save()
-                    elif collection_name == "triple_collection":
-                        each_node_by_id = triple_collection.find_one({"_id":ObjectId(each_id_of_list)})
-                        if 'attribute_type' in each_node_by_id:
-                            triple_node_RT_AT = node_collection.one({'_id': each_node_by_id.attribute_type})
-                        else:
-                            triple_node_RT_AT = node_collection.one({'_id': each_node_by_id.relation_type})
-                        # import ipdb; ipdb.set_trace()
-                        each_node_by_id.save(triple_node=triple_node_RT_AT, triple_id=triple_node_RT_AT._id)
-                    elif collection_name == "filehive_collection":
-                        each_node_by_id = filehive_collection.find_one({"_id":ObjectId(each_id_of_list)})
-                        each_node_by_id.save()
-                    elif collection_name == "counter_collection":
-                        each_node_by_id = counter_collection.find_one({"_id":ObjectId(each_id_of_list)})
-                        each_node_by_id.save()
-                    if each_node_by_id:
-                        # To update RCS
-                        path = historyMgr.get_file_path(each_node_by_id)
-                        path = path + ",v"
-
-                        if not os.path.exists(path):
-                            path = historyMgr.get_file_path(each_node_by_id)
-                            path = path + ",v"
-                            build_rcs.add(path)
-                        cp = "cp  -vu " + path + " " +" --parents " + data_export_path + "/"
-                        subprocess.Popen(cp,stderr=subprocess.STDOUT,shell=True)
-                        rcs_paths_found.add(path)
-            except Exception as dumpError:
-                error_log = "\n !!! Error while taking dump !!! " + str(each_id_of_list)
-                error_log =+ "\nError: " + str(error_log)
-                log_file.write(error_log)
-                print error_log
-                pass
-        # out_q.put(list_of_ids)
-
-    # Each process will get 'chunksize' student_cur and a queue to put his out
-    # dict into
-    out_q = multiprocessing.Queue()
-    chunksize = int(math.ceil(len(list_of_ids) / float(num_of_processes)))
-    procs = []
-
-    for i in range(num_of_processes):
-        p = multiprocessing.Process(
-            target=worker,
-            args=(list_of_ids[chunksize * i:chunksize * (i + 1)], out_q)
-        )
-        procs.append(p)
-        p.start()
-
-
-
-    # Collect all results into a single result list. We know how many lists
-    # with results to expect.
-    # resultlist = []
-    # for i in range(num_of_processes):
-    #     resultlist.extend(out_q.get())
-
-    # Wait for all worker processes to finish
-    for p in procs:
-        p.join()
-
-    # return resultlist
+            dump_node(node=each_obj,collection_name="counter_collection")
