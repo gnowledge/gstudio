@@ -40,12 +40,11 @@
             <input type="submit" class="orange-button" class="saveActivityPage" value="Save">
 
             <input type="button" class="orange-button cancel-page-create" value="Cancel">
-                    {% include 'ndf/widget_tags.html' with node=asset_obj %}
+                    {% include 'ndf/widget_tags.html' with node=node_obj %}
             
         </div>
     </form>
 </div>
-
 <div class="page-view reveal-modal medium" id="scstyle" data-reveal aria-hidden="true" role="dialog">
     <h4 class="page-name"></h4>
     <div class="page-content"></div>
