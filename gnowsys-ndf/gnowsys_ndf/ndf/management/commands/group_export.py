@@ -29,6 +29,10 @@ media_export_path = None
 log_file = None
 
 def create_log_file(dump_path):
+    '''
+        Creates log file in gstudio-logs/ with 
+        the name of the dump folder
+    '''
     dump_path = dump_path.split("/")[-1]
     log_file_name = 'group_dump_' + str(dump_path)+ '.log'
     if not os.path.exists(GSTUDIO_LOGS_DIR_PATH):
@@ -59,7 +63,10 @@ def setup_dump_path(group_name):
 
 
 def get_triple_data(node_id):
-
+    '''
+    Gets all data stored in triples for this node.
+    Fetches GAttrtibutes as wells as GRelations.
+    '''
     triple_query = {"_type": {'$in': ["GAttribute", "GRelation"]}, "subject": node_id}
 
     node_gattr_grel_cur = triple_collection.find(triple_query)
@@ -120,6 +127,10 @@ class Command(BaseCommand):
 
 
 def call_group_export(nodes_cur, num_of_processes=4):
+    '''
+        Introducing multiprocessing to use cores available on the system to 
+        take dump of nodes of the entire group.
+    '''
     nodes_cur = list(nodes_cur)
     def worker(nodes_cur, out_q):
         for each_node in nodes_cur:
@@ -167,6 +178,11 @@ def call_group_export(nodes_cur, num_of_processes=4):
     # return resultlist
 
 def build_rcs(node, collection_name):
+    '''
+    Updates the rcs json with the current node's strcuture that 
+    might have missed due to update queries.
+    Runs a save() method on the node and calls copy_rcs()
+    '''
     if node:
         global log_file
         try:
@@ -188,7 +204,10 @@ def build_rcs(node, collection_name):
             pass
 
 def copy_rcs(node):
-
+    '''
+    Actual copying of RCS files from /data/rcs-repo/ to export_path/rcs-repo
+     of the nodes called from dump_node() and build_rcs()
+    '''
     if node:
         global log_file
         try:
@@ -211,8 +230,11 @@ def copy_rcs(node):
             print error_log
             pass
 
-
 def dump_node(collection_name=node_collection, node=None, node_id=None, node_id_list=None):
+    '''
+    Receives all nodes pertaining to exporting group belonging to all existing collections.
+    Calls build_rcs.
+    '''
     try:
         global log_file
         log_file.write("\n dump_node invoked for: " + str(collection_name))
@@ -265,7 +287,7 @@ def dump_media_data(media_path):
 
 def get_file_node_details(node):
     '''
-    Check if_file field and update filehives_collection_ids list
+    Check if_file field and take its dump
     'if_file': {
                     'mime_type': basestring,
                     'original': {'id': ObjectId, 'relurl': basestring},
