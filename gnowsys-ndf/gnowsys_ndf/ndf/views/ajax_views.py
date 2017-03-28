@@ -1054,7 +1054,6 @@ def add_topics(request, group_id):
 def add_page(request, group_id):
   is_create_note = request.POST.get("is_create_note", '')
   tags = request.POST.get("tags", '')
-  print "\ninside add_page",request
   if request.is_ajax() and request.method == "POST" and  is_create_note == "True":
       blog_type = request.POST.get("blog_type", '')
       # return HttpResponseRedirect(reverse('page_create_edit', kwargs={'group_id': group_id}))
@@ -6695,14 +6694,13 @@ def create_edit_asset(request,group_id):
   asset_desc =  str(request.POST.get("asset_description", '')).strip()
   tags =  request.POST.get("sel_tags", '')
   
-  if tags:
-    if not type(tags) is list:
-        tags = [unicode(t.strip()) for t in tags.split(",") if t != ""]
   node_id = request.POST.get('node_id', None)
   asset_obj = create_asset(name=asset_name, group_id=group_id,
     created_by=request.user.id, content=unicode(asset_desc), node_id=node_id)
-  print "++++++++++++++++++++++++++",tags
-  asset_obj.tags = tags
+  if tags:
+    if not type(tags) is list:
+        tags = [unicode(t.strip()) for t in tags.split(",") if t != ""]
+    asset_obj.tags = tags
   asset_obj.save()
   thread_node = create_thread_for_node(request,group_id, asset_obj)
 
