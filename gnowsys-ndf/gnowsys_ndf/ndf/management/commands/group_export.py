@@ -13,9 +13,10 @@ from gnowsys_ndf.ndf.models import HistoryManager
 from gnowsys_ndf.settings import GSTUDIO_DATA_ROOT, GSTUDIO_LOGS_DIR_PATH, MEDIA_ROOT, GSTUDIO_INSTITUTE_ID
 from schema_mapping import create_factory_schema_mapper
 from dump_users import create_users_dump
+from gnowsys_ndf.ndf.views.methods import get_group_name_id
 
 
-GROUP_CONTRIBUTORS = set()
+GROUP_CONTRIBUTORS = []
 DATA_EXPORT_PATH = None
 MEDIA_EXPORT_PATH = None
 IS_FORK = False
@@ -100,28 +101,23 @@ def get_triple_data(node_id):
 
 class Command(BaseCommand):
     def handle(self, *args, **options):
-        group_id = raw_input("\n\tPlease enter group id:\t")
-        try:
-
-            group_node = node_collection.one({"_type":"Group","_id":ObjectId(group_id)})
-        except Exception as group_id_error:
-            print "\n Enter a valid ObjectId"
-            call_exit()
+        group_name_or_id = raw_input("\n\tPlease enter Name or ObjectID of the Group:\t")
+        group_node   = get_group_name_id(group_name_or_id, get_obj=True)
 
         if group_node:
-            print "\tRequest received for Export of : ", group_node.name
+            print "\tRequest received for Export of : ", group_node.name , ' | ObjectId: ', group_node._id
             fork_clone_opt = "\n\tExport Options:"
             fork_clone_opt += "\n\t\t 1. Fork (What is Fork?"
-            fork_clone_opt += " Restore will create 'New' instances(new Ids)"
+            fork_clone_opt += " Restore will create instances with NEW Ids)"
             fork_clone_opt += "\n\t\t 2. Clone (What is Clone?"
-            fork_clone_opt += " Restore will NOT create 'New' instances(new Ids)"
+            fork_clone_opt += " Restore will create instances with OLD Ids)"
             fork_clone_opt += "\n\tEnter options 1 or 2 or any other key to cancel: \t"
 
             fork_clone_confirm = raw_input(fork_clone_opt)
             global IS_FORK
             global IS_CLONE
             global RESTORE_USER_DATA
-            global GROUP_CONTRIBUTORS
+            
             if fork_clone_confirm == '1':
                 print "\n\t!!! Chosen FORK option !!!"
                 IS_FORK = True
@@ -154,11 +150,11 @@ class Command(BaseCommand):
 
                 print "\n This will take few minutes. Please be patient.\n"
                 print "*"*70
-                # import ipdb; ipdb.set_trace()
 
                 call_group_export(group_node, nodes_falling_under_grp, num_of_processes=multiprocessing.cpu_count())
-                get_counter_ids(group_id)
-                # dump_media_data()
+                get_counter_ids(group_node._id)
+                # import ipdb; ipdb.set_trace()
+                
                 print "\n Total GROUP_CONTRIBUTORS: ", len(GROUP_CONTRIBUTORS)
                 create_users_dump(group_dump_path, GROUP_CONTRIBUTORS)
                 global log_file
@@ -168,7 +164,7 @@ class Command(BaseCommand):
             else:
                 call_exit()
         else:
-            print "\n Node not found with provided ObjectID"
+            print "\n Node not found with provided Name or ObjectID"
             call_exit()
 
 
@@ -238,7 +234,6 @@ def build_rcs(node, collection_name):
     '''
     if node:
         global log_file
-        global GROUP_CONTRIBUTORS
 
         try:
             if collection_name is triple_collection:
@@ -249,8 +244,12 @@ def build_rcs(node, collection_name):
                 node.save(triple_node=triple_node_RT_AT, triple_id=triple_node_RT_AT._id)
             else:
                 node.save()
-                print "\n CC: ", len(node.contributors)
-                GROUP_CONTRIBUTORS.update(node.contributors)
+                
+                print "\n NC: ", len(node.contributors)
+                if "contributors" in node:
+                    
+                    GROUP_CONTRIBUTORS.extend(node.contributors)
+                    print "\n Added - GC -- : ", node.contributors
 
             log_file.write("\n RCS Built for " + str(node._id) )
             copy_rcs(node)
