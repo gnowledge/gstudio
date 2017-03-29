@@ -105,6 +105,7 @@ def unit_detail(request, group_id):
     # print unit_structure
     req_context = RequestContext(request, {
                                 'title': 'unit_authoring',
+                                'hide_bannerpic': True,
                                 'group_id': group_id,
                                 'groupid': group_id,
                                 'unit_obj': unit_group_obj,
