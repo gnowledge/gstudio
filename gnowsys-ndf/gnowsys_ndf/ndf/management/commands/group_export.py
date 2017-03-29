@@ -106,8 +106,7 @@ class Command(BaseCommand):
             group_node = node_collection.one({"_type":"Group","_id":ObjectId(group_id)})
         except Exception as group_id_error:
             print "\n Enter a valid ObjectId"
-            print "\n Exiting..."
-            os._exit(0)
+            call_exit()
 
         if group_node:
             print "\tRequest received for Export of : ", group_node.name
@@ -132,8 +131,7 @@ class Command(BaseCommand):
                 IS_FORK = False
                 IS_CLONE = True
             else:
-                print "\n Exiting..."
-                os._exit(0)
+                call_exit()
             user_data_dump = raw_input("\n\tDo you want to include Users in this export ? Enter y/n:\t ")
             if user_data_dump == 'y' or user_data_dump == 'Y':
                 RESTORE_USER_DATA = True
@@ -168,14 +166,16 @@ class Command(BaseCommand):
                 log_file.write("\n######### Script Completed at : " + str(datetime.datetime.now()) + " #########\n\n")
                 print "END : ", str(datetime.datetime.now())
             else:
-                print "\n Exiting..."
-                os._exit(0)
-
+                call_exit()
         else:
-            print "\n Enter a valid ObjectId"
-            print "\n Exiting..."
-            os._exit(0)
+            print "\n Node not found with provided ObjectID"
+            call_exit()
 
+
+
+def call_exit():
+    print "\n Exiting..."
+    os._exit(0)
 
 def call_group_export(group_node, nodes_cur, num_of_processes=4):
     '''
