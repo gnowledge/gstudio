@@ -789,8 +789,11 @@ ul.horizontal_tabs_gstudio {
         }
     }
 }
-
+.max-width{
+    max-width:100%;
+}
 .group_content {
+    
     .group_banner {
         @include transition-prop(all);
         height: 300px;
@@ -2283,7 +2286,7 @@ ul.jqtree-tree .jqtree-toggler {
             background-color: #fff;
             max-height: 100%;
             overflow-y: auto;
-            height: inherit;
+            height: 100vh;
 
             .course-lessons {
                 dd {
@@ -2470,7 +2473,7 @@ ul.jqtree-tree .jqtree-toggler {
             }
             .course_tree {
                 @include transition-prop(all);
-                width: 27%;
+                width: 20%;
                 background-color: #2a6882;
 
                 .course-lessons {
@@ -2878,3 +2881,6 @@ ul.jqtree-tree .jqtree-toggler {
     margin-right: 5px;
 }
 
+.activity-editor{
+    margin:50px;
+}
