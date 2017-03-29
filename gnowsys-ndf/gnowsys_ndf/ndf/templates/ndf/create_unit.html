@@ -81,10 +81,12 @@
                         {% include "ndf/html_editor.html" with var_name="content" var_placeholder="Enter the content here" var_value=unit_node.content|default_if_none:"" node_id=unit_node.pk ckeditor_toolbar="GeneralToolbar" %}
                     </div>
                 </div>
+
                 <div class="row">
                     {% comment %}
                         <button type="button" class ="right asset-unit-button" id="save_unit">Save</button>
                     {% endcomment %}
+                 {% include 'ndf/widget_tags.html' with node=unit_node %}
                     <input type="submit" class ="asset-unit-button" id="save_unit" value="Save"/>
                 </div>
             </form>
