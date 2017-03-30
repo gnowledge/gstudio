@@ -12,6 +12,7 @@
 	   CKEDITOR.plugins.addExternal('addVideo',basePath+'ndf/js/ckPlugins/addVideo/','plugin.js');
 	   CKEDITOR.plugins.addExternal('addJhapp',basePath+'ndf/js/ckPlugins/addJhapp/','plugin.js');
 	   CKEDITOR.plugins.addExternal('mathjax',basePath+'ndf/bower_components/ckeditor/plugins/mathjax/','plugin.js');
+	   CKEDITOR.plugins.addExternal('font',basePath+'ndf/bower_components/ckeditor/plugins/font/','plugin.js');
 	})
 	();
     CKEDITOR.config.bodyId = 'scstyle';
@@ -29,12 +30,15 @@ CKEDITOR.editorConfig = function( config ) {
 	[
 
 		{ name: 'basicstyles', items : [ 'Bold','Italic','Strike','-','RemoveFormat','Subscript','Superscript' ] },
-		{ name: 'editing', items : [ 'Find','Replace','-','SelectAll','-' ] },
+		{ name: 'editing', items : [ 'Find','Replace','-','SelectAll','-','Scayt' ] },
 		{ name: 'insert', items : [ 'Flash','Table','HorizontalRule','Smiley','SpecialChar','PageBreak','Iframe','video'] },
-		{ name: 'styles', items : [ 'Styles','Format' ] },
+		{ name: 'styles', items: [ 'Format', 'FontSize' ] },
 		{ name: 'paragraph', items : [ 'NumberedList','BulletedList','Mathjax','-','Outdent','Indent','-','Blockquote','JustifyLeft', 'JustifyCenter', 'JustifyRight', 'JustifyBlock' ] },
 		{ name: 'links', items : [ 'Link','Unlink' ] },
 		{ name: 'tools', items : [ 'addImage','addAudio','addVideo','addJhapp','Source','Maximize','-'] },
+		{ name: 'document', items: [ '-', 'Save', 'NewPage', 'Preview', 'Print', '-', 'Templates' ] },
+		
+
 
 	];
 	
@@ -43,10 +47,13 @@ CKEDITOR.editorConfig = function( config ) {
 	config.toolbar_BasicToolbar =
 	[
 		{ name: 'basicstyles', items : [ 'Bold','Italic','Strike','-','RemoveFormat','Subscript', 'Superscript' ] },
-		{ name: 'paragraph', items : [ 'NumberedList','BulletedList','Mathjax','-', 'JustifyLeft', 'JustifyCenter', 'JustifyRight', 'JustifyBlock' ] },
+		{ name: 'paragraph', items : [ 'NumberedList','BulletedList','Mathjax','-','JustifyLeft', 'JustifyCenter', 'JustifyRight', 'JustifyBlock' ] },
 		{ name: 'links', items : [ 'Link','Unlink'] },
+		{ name: 'editing', groups: [ 'find', 'selection', 'spellchecker' ]},
 		{ name: 'insert', items : [ 'Flash','Iframe' ] },
 		{ name: 'tools', items : [ 'addImage','addAudio','addVideo','addJhapp','Source', 'Maximize','-','closebtn'] },
+		{ name: 'document', groups: [ 'mode', 'document', 'doctools' ] },
+		{ name: 'styles' },
 	];
 
 	config.toolbar_GgallaryCommentsToolbar =
@@ -92,7 +99,7 @@ CKEDITOR.editorConfig = function( config ) {
 
 	// Simplify the dialog windows.
 	config.removeDialogTabs = 'image:advanced;link:advanced';
-	config.extraPlugins = 'addImage,closebtn,addAudio,addVideo,addJhapp,mathjax,justify';
+	config.extraPlugins = 'addImage,closebtn,addAudio,addVideo,addJhapp,mathjax,justify,font';
 	config.allowedContent = true;
 
 };
