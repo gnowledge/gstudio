@@ -18,7 +18,7 @@ from gnowsys_ndf.ndf.models import GSystemType, Group, Node  # GSystem, Triple
 from gnowsys_ndf.ndf.models import node_collection
 
 from gnowsys_ndf.ndf.views.group import CreateGroup
-from gnowsys_ndf.ndf.views.methods import get_execution_time, staff_required, create_gattribute
+from gnowsys_ndf.ndf.views.methods import get_execution_time, staff_required, create_gattribute,get_language_tuple
 from gnowsys_ndf.ndf.views.ajax_views import get_collection
 
 gst_base_unit_name, gst_base_unit_id = GSystemType.get_gst_name_id('base_unit')
@@ -52,7 +52,8 @@ def unit_create_edit(request, group_id, unit_group_id=None):
         unit_id_post = request.POST.get('node_id', '')
         unit_altnames = request.POST.get('altnames', '')
         content = request.POST.get('content', '')
-
+        tags = request.POST.get('tags', [])
+        language = request.POST.get('lan', '')
 
         educationallevel_val = request.POST.get('educationallevel', '')
         educationalsubject_val = request.POST.get('educationalsubject', '')
@@ -74,6 +75,9 @@ def unit_create_edit(request, group_id, unit_group_id=None):
             success_flag = result[0]
             unit_node = result[1]
 
+        if language:
+            language_val = get_language_tuple(unicode(language))
+            unit_node.language = language_val
         if educationallevel_val and "choose" not in educationallevel_val.lower():
             educationallevel_at = node_collection.one({'_type': 'AttributeType', 'name': "educationallevel"})
             create_gattribute(unit_node._id, educationallevel_at, educationallevel_val)
@@ -84,6 +88,13 @@ def unit_create_edit(request, group_id, unit_group_id=None):
         if not success_flag:
             return HttpResponseRedirect(reverse('list_units', kwargs={'group_id': parent_group_id, 'groupid': parent_group_id,}))
 
+        # if tags:
+        #     if not type(tags) is list:
+        #         tags = [unicode(t.strip()) for t in tags.split(",") if t != ""]
+        #     unit_node.tags = tags
+        if tags:
+            tags = json.loads(tags)
+        unit_node.tags = tags
         unit_node.content = content
         unit_node.save()
         return HttpResponseRedirect(reverse('course_about',
@@ -105,6 +116,7 @@ def unit_detail(request, group_id):
     # print unit_structure
     req_context = RequestContext(request, {
                                 'title': 'unit_authoring',
+                                'hide_bannerpic': True,
                                 'group_id': group_id,
                                 'groupid': group_id,
                                 'unit_obj': unit_group_obj,
@@ -156,6 +168,7 @@ def lesson_create_edit(request, group_id, unit_group_id=None):
 
     # parent unit id
     lesson_id = request.POST.get('lesson_id', None)
+    lesson_language = request.POST.get('sel_lesson_lang','')
     unit_id_post = request.POST.get('unit_id', '')
     unit_group_id = unit_id_post if unit_id_post else unit_group_id
     # getting parent unit object
@@ -175,6 +188,12 @@ def lesson_create_edit(request, group_id, unit_group_id=None):
         unit_cs_names_list = [u.name for u in unit_cs_objs_cur]
 
         if lesson_name in unit_cs_names_list:
+            lesson_obj = Node.get_node_by_id(lesson_id)
+            if lesson_language != lesson_obj.language[0]:
+                if lesson_language:
+                    language = get_language_tuple(lesson_language)
+                    lesson_obj.language = language
+                    lesson_obj.save()
             msg = u'Activity with same name exists in lesson: ' + unit_group_obj.name
             result_dict = {'success': 0, 'unit_hierarchy': [], 'msg': msg}
             # return HttpResponse(0)
@@ -182,7 +201,11 @@ def lesson_create_edit(request, group_id, unit_group_id=None):
             lesson_obj = Node.get_node_by_id(lesson_id)
             if (lesson_obj.name != lesson_name):
                 lesson_obj.name = lesson_name
+                if lesson_language:
+                    language = get_language_tuple(lesson_language)
+                    lesson_obj.language = language
                 lesson_obj.save(group_id=group_id)
+                
             unit_structure = _get_unit_hierarchy(unit_group_obj)
             msg = u'Lesson name updated.'
             result_dict = {'success': 1, 'unit_hierarchy': unit_structure, 'msg': str(lesson_obj._id)}
@@ -195,6 +218,9 @@ def lesson_create_edit(request, group_id, unit_group_id=None):
                                             created_by=user_id,
                                             status=u'PUBLISHED')
             # print new_lesson_obj
+            if lesson_language:
+                language = get_language_tuple(lesson_language)
+                new_lesson_obj.language = language
             new_lesson_obj.save(groupid=group_id)
             unit_group_obj.collection_set.append(new_lesson_obj._id)
             unit_group_obj.save(groupid=group_id)
@@ -254,7 +280,7 @@ def activity_create_edit(request, group_id, lesson_id=None):
                                             member_of=gst_activity_id,
                                             group_set=unit_group_obj._id,
                                             created_by=user_id,
-                                            status='PUBLISHED')
+                                            status=u'PUBLISHED')
             new_activity_obj.save(groupid=group_id)
 
             lesson_obj.collection_set.append(new_activity_obj._id)
@@ -309,6 +335,7 @@ def _get_unit_hierarchy(unit_group_obj):
             lesson_dict['name'] = lesson.name
             lesson_dict['type'] = 'lesson'
             lesson_dict['id'] = str(lesson._id)
+            lesson_dict['language'] = lesson.language[0]
             lesson_dict['activities'] = []
             if lesson.collection_set:
                 for each_act in lesson.collection_set:

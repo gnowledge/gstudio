@@ -2304,25 +2304,6 @@ def course_gallery(request, group_id,node_id=None,page_no=1):
     allow_to_join = query_dict = None
     allow_to_join = get_group_join_status(group_obj)
     banner_pic_obj,old_profile_pics = _get_current_and_old_display_pics(group_obj)
-    '''
-    banner_pic_obj = None
-    old_profile_pics = []
-    if not banner_pic_obj:
-        for each in group_obj.relation_set:
-            if "has_banner_pic" in each:
-                banner_pic_obj = node_collection.one(
-                    {'_type': {'$in': ["GSystem", "File"]}, '_id': each["has_banner_pic"][0]}
-                )
-                break
-
-    has_banner_pic_rt = node_collection.one({'_type': 'RelationType', 'name': unicode('has_banner_pic') })
-    all_old_prof_pics = triple_collection.find({'_type': "GRelation", "subject": group_obj._id, 'relation_type': has_banner_pic_rt._id, 'status': u"DELETED"})
-    if all_old_prof_pics:
-        for each_grel in all_old_prof_pics:
-            n = node_collection.one({'_id': ObjectId(each_grel.right_subject)})
-            if n not in old_profile_pics:
-                old_profile_pics.append(n)
-    '''
 
     context_variables = {
             'group_id': group_id, 'groupid': group_id, 'group_name':group_name,
@@ -3150,30 +3131,51 @@ def assetcontent_detail(request, group_id, asset_id,asst_content_id):
 
 
 @get_execution_time
+def create_edit_course_page(request, group_id, page_id=None):
+    group_obj = get_group_name_id(group_id, get_obj=True)
+    group_id = group_obj._id
+    group_name = group_obj.name
+    template = 'ndf/gevent_base.html'
+    context_variables = {
+            'group_id': group_id, 'groupid': group_id, 'group_name':group_name,
+            'group_obj': group_obj, 'title': 'create_course_pages',
+            'activity_node': None}
+
+    if page_id:
+        node_obj = node_collection.one({'_id': ObjectId(page_id)})
+        context_variables.update({'activity_node': node_obj, 'hide_breadcrumbs': True})
+
+
+    return render_to_response(template,
+                                context_variables,
+                                context_instance = RequestContext(request)
+    )
+
+@get_execution_time
 def course_pages(request, group_id, page_id=None):
     group_obj = get_group_name_id(group_id, get_obj=True)
     group_id = group_obj._id
     group_name = group_obj.name
     template = 'ndf/gevent_base.html'
-
-    activity_gst_name, activity_gst_id = GSystemType.get_gst_name_id("activity")
-    all_pages = node_collection.find({'member_of':
-                {'$in': [page_gst_id, activity_gst_id] }, 'group_set': group_id,
-                'type_of': {'$ne': [blog_page_gst_id]}
-                # 'content': {'$regex': 'clix-activity-styles.css', '$options': 'i'}
-                }).sort('last_update',-1)
     context_variables = {
             'group_id': group_id, 'groupid': group_id, 'group_name':group_name,
-            'group_obj': group_obj, 'title': 'course_pages', 'all_pages': all_pages,
-            'editor_view': False}
-    if request.method == "GET":
+            'group_obj': group_obj, 'title': 'course_pages',
+            'editor_view': True, 'activity_node': None, 'all_pages': None}
 
-        node_id = request.GET.get('edit', None)
-        return_url = request.GET.get('return', None)
-        if node_id:
-            node_obj = node_collection.one({'_id': ObjectId(node_id)})
-            context_variables.update({'node_obj': node_obj,
-                'editor_view': True, 'return_url': str(return_url)})
+    if page_id:
+        node_obj = node_collection.one({'_id': ObjectId(page_id)})
+        context_variables.update({'activity_node': node_obj, 'hide_breadcrumbs': True})
+        context_variables.update({'editor_view': False})
+
+
+    else:
+        activity_gst_name, activity_gst_id = GSystemType.get_gst_name_id("activity")
+        all_pages = node_collection.find({'member_of':
+                    {'$in': [page_gst_id, activity_gst_id] }, 'group_set': group_id,
+                    'type_of': {'$ne': [blog_page_gst_id]}
+                    # 'content': {'$regex': 'clix-activity-styles.css', '$options': 'i'}
+                    }).sort('last_update',-1)
+        context_variables.update({'editor_view': False, 'all_pages': all_pages})
     return render_to_response(template,
                                 context_variables,
                                 context_instance = RequestContext(request)
@@ -3184,16 +3186,17 @@ def save_course_page(request, group_id):
     group_obj = get_group_name_id(group_id, get_obj=True)
     group_id = group_obj._id
     group_name = group_obj.name
+    tags = request.POST.get("tags", [])
+    if tags:
+        tags = json.loads(tags)
     template = 'ndf/gevent_base.html'
     page_gst_name, page_gst_id = GSystemType.get_gst_name_id("Page")
     page_obj = None
+    activity_lang =  request.POST.get("lan", '')
     if request.method == "POST":
         name = request.POST.get("name", "")
         content = request.POST.get("content_org", None)
         node_id = request.POST.get("node_id", "")
-        return_url = request.POST.get("return_url", None)
-        if not return_url:
-            return_url = 'course_pages'
         if node_id:
             page_obj = node_collection.one({'_id': ObjectId(node_id)})
         if not page_obj:
@@ -3201,11 +3204,17 @@ def save_course_page(request, group_id):
             page_obj.fill_gstystem_values(request=request)
             page_obj.member_of = [page_gst_id]
             page_obj.group_set = [group_id]
+        
+        if activity_lang:
+            language = get_language_tuple(activity_lang)
+            page_obj.language = language
+        page_obj.fill_gstystem_values(tags=tags)
         page_obj.name = unicode(name)
         page_obj.content = unicode(content)
         page_obj.created_by = request.user.id
         page_obj.save(groupid=group_id)
-        return HttpResponseRedirect(reverse(str(return_url), kwargs={'group_id': group_id}))
+        return HttpResponseRedirect(reverse("view_course_page",
+         kwargs={'group_id': group_id, 'page_id': page_obj._id}))
 
 def load_content_data(request, group_id):
     node_id = request.GET.get("node_id", "")

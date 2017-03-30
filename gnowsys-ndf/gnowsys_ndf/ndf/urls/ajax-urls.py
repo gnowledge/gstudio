@@ -60,6 +60,8 @@ urlpatterns = patterns('gnowsys_ndf.ndf.views.ajax_views',
     url(r'^get_metadata_page', 'get_metadata_page', name='get_metadata_page'),
     url(r'^save_metadata', 'save_metadata', name='save_metadata'),
     url(r'^export_to_epub/(?P<node_id>[\w-]+)', 'export_to_epub', name='export_to_epub'),
+    url(r'^remove_related_oc/', 'remove_related_doc', name='remove_related_doc'),
+    
     # url(r'^/upload_file/', 'upload_file', name='upload_file'),
 
                        # Ajax-urls required for MIS --------------------------------

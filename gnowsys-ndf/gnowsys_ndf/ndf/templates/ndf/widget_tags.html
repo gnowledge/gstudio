@@ -120,7 +120,7 @@
 			tagsArr.push(this.textContent.trim().toLowerCase());
 		});
 
-		$("input:hidden[name='tags']").val(tagsArr.toString());
+		$("input:hidden[name='tags']").val(JSON.stringify(tagsArr));
 		// console.log(tagsArr)
 	}
 
@@ -129,9 +129,9 @@
 
 		$(this).parent().fadeOut("slow", function(){
 			$(this).detach();
+			updateAllTags();
 		});
 
-		updateAllTags();
 	});
 
 	// $(".remove-tag").click(removeTag);
