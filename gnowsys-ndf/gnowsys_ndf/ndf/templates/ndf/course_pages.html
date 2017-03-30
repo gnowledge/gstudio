@@ -5,9 +5,20 @@
 {% if activity_node and not editor_view %}
     <div class="activity-detail-page">
         <div class="row">
-            <div class="small-8 columns">
+            <div class="small-6 columns">
                 <h4 class="page-name">{{activity_node.name}}</h4>
             </div>
+            <div class="small-2 columns">
+                 {% if activity_node.tags %}
+                    {% for tag in activity_node.tags %}
+                            <small><label class="lbl_tag label">
+                        <a href="{% url 'tag_info' group_id tag %}">{{tag}} </a></label></small>
+                    {% endfor %} 
+                {% else %}
+                    <i><small><label class="lbl_tag">{% trans "No tags defined yet!" %}</label></small></i>
+                {% endif %}   
+            </div>
+            
             <div class="small-2 columns">
                 <a href="{% url 'edit_course_page' group_id activity_node.pk %}">Edit</a>
             </div>
