@@ -1054,7 +1054,6 @@ def add_topics(request, group_id):
 def add_page(request, group_id):
   is_create_note = request.POST.get("is_create_note", '')
   tags = request.POST.get("tags", '')
-  print "\ninside add_page",request
   if request.is_ajax() and request.method == "POST" and  is_create_note == "True":
       blog_type = request.POST.get("blog_type", '')
       # return HttpResponseRedirect(reverse('page_create_edit', kwargs={'group_id': group_id}))
@@ -6691,11 +6690,22 @@ def create_edit_asset(request,group_id):
       group_id = ObjectId(group_id)
   except:
       group_name, group_id = get_group_name_id(group_id)
+  
   asset_name =  str(request.POST.get("asset_name", '')).strip()
   asset_desc =  str(request.POST.get("asset_description", '')).strip()
+  tags =  request.POST.get("sel_tags", '')
+  asset_lang =  request.POST.get("sel_asset_lang", '')
+  # file_node.language = get_language_tuple(language)
   node_id = request.POST.get('node_id', None)
   asset_obj = create_asset(name=asset_name, group_id=group_id,
     created_by=request.user.id, content=unicode(asset_desc), node_id=node_id)
+  
+  asset_obj.fill_gstystem_values(tags=tags)
+  
+  if asset_lang:
+    language = get_language_tuple(asset_lang)
+    asset_obj.language = language
+  asset_obj.save()
   thread_node = create_thread_for_node(request,group_id, asset_obj)
 
   # teaches_list = [ObjectId(asset_objective)]
@@ -6716,12 +6726,19 @@ def add_assetcontent(request,group_id):
   asset_obj = request.POST.get('asset_obj','')
   if_subtitle = request.POST.get('if_subtitle','')
   if_transcript = request.POST.get('if_transcript','')
+  if_alt_lang_file = request.POST.get('if_alt_file','')
+  if_alt_format_file = request.POST.get('if_alt_format_file','')
   assetcontentid = request.POST.get('assetcontentid','')
+ 
   uploaded_files = request.FILES.getlist('filehive', [])
   uploaded_transcript = request.FILES.getlist('uploaded_transcript', [])
   uploaded_subtitle = request.FILES.getlist('uploaded_subtitle', [])
+  uploaded_alt_lang_file = request.FILES.getlist('uploaded_alt_lang_file', [])
+  
   subtitle_lang = request.POST.get('sel_sub_lang','')
-  subtitle_lang_code = request.POST.get('sel_sub_lang_code','')
+  sel_alt_value = request.POST.get('sel_alt_value','')
+  alt_file_format = request.POST.get('sel_alt_fr_type','')
+  
   asset_cont_desc = request.POST.get('asset_cont_desc','')
   asset_cont_name = request.POST.get('asset_cont_name','')
   node_id = request.POST.get('node_id',None)
@@ -6741,6 +6758,7 @@ def add_assetcontent(request,group_id):
 
     return StreamingHttpResponse("success")
 
+
   if if_transcript == "True":
     rt_transcript = node_collection.one({'_type':'RelationType', 'name':'has_transcript'})
     transcript_obj = create_assetcontent(ObjectId(asset_obj),uploaded_transcript[0].name,group_id,request.user.id,files=uploaded_transcript,resource_type='File')
@@ -6752,6 +6770,22 @@ def add_assetcontent(request,group_id):
     for each_trans in transcript_grels:
       transcript_list.append(each_trans['right_subject'])
     trans_grel = create_grelation(ObjectId(assetcontentid), rt_transcript, transcript_list)
+    return StreamingHttpResponse("success")
+  
+  if if_alt_lang_file == "True":
+    alt_file_type = request.POST.get('alt_file_type','')
+    alt_lang_file_obj = create_assetcontent(ObjectId(asset_obj),uploaded_alt_lang_file[0].name,group_id,request.user.id,files=uploaded_alt_lang_file,resource_type='File')
+    rt_alt_content = node_collection.one({'_type':'RelationType', 'name':'has_alt_content'})
+    alt_lang_file_list = [ObjectId(alt_lang_file_obj._id)]
+
+    alt_lang_file_grels = triple_collection.find({'_type': 'GRelation', \
+    'relation_type': rt_alt_content._id,'subject': ObjectId(assetcontentid)},
+    {'_id': 0, 'right_subject': 1})
+    for each_asset in alt_lang_file_grels:
+      alt_lang_file_list.append(each_asset['right_subject'])
+
+    alt_lang_file_node = create_grelation(ObjectId(assetcontentid), rt_alt_content, alt_lang_file_list, **{'triple_scope':{'relation_type_scope':{ alt_file_type : sel_alt_value }, 'subject_scope': "many"}})
+
     return StreamingHttpResponse("success")
 
   create_assetcontent(ObjectId(asset_obj),asset_cont_name,group_id,request.user.id,content=asset_cont_desc,files=uploaded_files,resource_type='File')
@@ -6801,7 +6835,7 @@ def save_metadata(request, group_id):
   Based_url = request.POST.get("basedonurl_val", "")
   obj_list = request.POST.get("obj_list", "")
   for k, v in json.loads(obj_list).iteritems():
-    attr_node = node_collection.one({'_type':'AttributeType','name':unicode(k)},{'_id': 1})
+    attr_node = node_collection.one({'_type':'AttributeType','name':unicode(k)})
     if v is not None and (not isinstance(v,list) and "select" not in v.lower()) or (isinstance(v,list) and "select" not in v[0].lower() ):
       if attr_node:
         create_gattribute(ObjectId(node_id), attr_node, v)
@@ -6837,3 +6871,13 @@ def export_to_epub(request, group_id, node_id):
         # print "\n export_fail: ", export_fail
         pass
     return HttpResponseRedirect(reverse('unit_detail', kwargs={'group_id': group_id}))
+
+def remove_related_doc(request, group_id):
+    node = request.POST.get('node', None)
+    selected_obj = request.POST.get('sel_file', None)
+    node_obj = node_collection.one({'_id': ObjectId(node)})
+    
+    grel_name = request.POST.get('grel_name', None)
+    asset_obj = request.POST.get('asset_obj', None)
+    rel_node = triple_collection.one({'right_subject':ObjectId(selected_obj),'subject':ObjectId(node_obj.pk)})
+    delete_grelation(subject_id=ObjectId(node_obj.pk), deletion_type=1, **{'node_id': ObjectId(rel_node._id)})

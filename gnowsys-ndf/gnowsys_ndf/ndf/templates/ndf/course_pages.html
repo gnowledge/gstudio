@@ -1,3 +1,6 @@
+{% load i18n %}
+{% load ndf_tags %}
+
 <!-- Handles Activity page detail and listing -->
 {% if activity_node and not editor_view %}
     <div class="activity-detail-page">
@@ -17,17 +20,16 @@
         </div>
     </div>
 
-{% else %}
-    <div id="templates-div" class="reveal-modal medium" data-reveal aria-hidden="true" role="dialog">
-        <div class="templates-content"></div>
-        <a class="close-reveal-modal" >&#215;</a>
-    </div>
 
-    <div class="activity-sheet-actions">
-        <div class="row">
-        <a class="right orange-button-template" href="{% url 'create_course_page' group_id %}">Add Activity Page</a>
+{% else %}
+    {% if user.is_authenticated %}
+        <div class="activity-sheet-actions">
+            <div class="row">
+            <a class="right orange-button-template" href="{% url 'create_course_page' group_id %}">Add Activity Page</a>
+            </div>
         </div>
-    </div>
+    {% endif %}
+
 
     <div id="page_listing">
         <div class="row">
@@ -54,6 +56,8 @@
             {% endfor %}
         </div>
     </div>
+
+
 
 {% endif %}
 

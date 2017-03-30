@@ -2590,8 +2590,6 @@ def upload_using_save_file(request,group_id):
 
     group_obj = node_collection.one({'_id': ObjectId(group_id)})
     title = request.POST.get('context_name','')
-    selected_topic = request.POST.getlist("topic_list", "")
-    print "--------------------",selected_topic
     usrid = request.user.id
     name  = request.POST.get('name')
     # print "\n\n\nusrid",usrid
@@ -2614,14 +2612,13 @@ def upload_using_save_file(request,group_id):
     is_user_gstaff = check_is_gstaff(group_obj._id, request.user)
     content_org = request.POST.get('content_org', '')
     uploaded_files = request.FILES.getlist('filehive', [])
-    asset_content_node = create_assetcontent(ObjectId('58a3dd4cc6bd690400016ae5'),name,group_id,request.user.id,content_org,uploaded_files)
-    print asset_content_node
-    relation_type = node_collection.one({'_type':'RelationType', 'name':'teaches'})
-    create_grelation(file_node._id,relation_type,ObjectId(selected_topic[0]))
     # gs_obj_list = write_files(request, group_id)
     # fileobj_list = write_files(request, group_id)
     # fileobj_id = fileobj_list[0]['_id']
-    file_node = node_collection.one({'_id': ObjectId(asset_content_node._id) })
+    fileobj_list = write_files(request, group_id)
+    # fileobj_list = write_files(request, group_id)
+    fileobj_id = fileobj_list[0]['_id']
+    file_node = node_collection.one({'_id': ObjectId(fileobj_id) })
 
     # if GSTUDIO_FILE_UPLOAD_FORM == 'detail' and GSTUDIO_SITE_NAME == "NROER" and title != "raw material" and title != "gallery":
     if GSTUDIO_FILE_UPLOAD_FORM == 'detail' and title != "raw material" and title != "gallery":
