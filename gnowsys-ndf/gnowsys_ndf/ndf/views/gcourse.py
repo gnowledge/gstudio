@@ -3188,6 +3188,7 @@ def save_course_page(request, group_id):
     template = 'ndf/gevent_base.html'
     page_gst_name, page_gst_id = GSystemType.get_gst_name_id("Page")
     page_obj = None
+    activity_lang =  request.POST.get("lan", '')
     if request.method == "POST":
         name = request.POST.get("name", "")
         content = request.POST.get("content_org", None)
@@ -3197,15 +3198,16 @@ def save_course_page(request, group_id):
             return_url = 'course_pages'
         if node_id:
             page_obj = node_collection.one({'_id': ObjectId(node_id)})
-            if tags:
-                if not type(tags) is list:
-                    tags = [unicode(t.strip()) for t in tags.split(",") if t != ""]
-                page_obj.tags = tags
         if not page_obj:
             page_obj = node_collection.collection.GSystem()
             page_obj.fill_gstystem_values(request=request)
             page_obj.member_of = [page_gst_id]
             page_obj.group_set = [group_id]
+        
+        if activity_lang:
+            language = get_language_tuple(activity_lang)
+            page_obj.language = language
+        page_obj.fill_gstystem_values(tags=tags)
         page_obj.name = unicode(name)
         page_obj.content = unicode(content)
         page_obj.created_by = request.user.id
