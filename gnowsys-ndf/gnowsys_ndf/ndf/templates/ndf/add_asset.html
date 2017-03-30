@@ -123,6 +123,19 @@
                 </label>
                         <textarea rows="4" cols="2" class="small-12 columns" placeholder="Enter Description" id="asset-descid" value=''>{% if asset_obj %} {{asset_obj.content|safe|striptags}}{% endif %}</textarea>
                     {% include 'ndf/widget_tags.html' with node=asset_obj %}
+                            {% get_language_info_list for LANGUAGES as languages %}
+                    <select class="asset-lang" name="lan" id="asset_lang" >
+                            {% for language in languages %}
+                            {% if asset_obj.language.0 == language.code  %}
+                                <option selected data-sub-lang="{{ language.name }}" data-sub-code="{{ language.code }}">
+                                {{language.name}}
+                            {%  else %}
+                                <option data-sub-lang="{{ language.name }}" data-sub-code="{{ language.code }}">
+                                  {{ language.name }}
+                                </option>
+                            {% endif %}
+                            {% endfor %}
+                          </select>
 
                     {% endif %}
 
@@ -321,7 +334,18 @@
     //         $('.save-asset').attr('disabled',true);
     // })
     $( ".save-asset" ).click(function(event) {
-         sel_tags = $("input:hidden[name='tags']").val()
+        updateAllTags();
+        var tagsStr = tags.value.trim();
+        if(checkTag())
+        {
+            $("input:hidden[name='tags']").val($("input:hidden[name='tags']").val() + ', ' + tagsStr);
+        }
+        else if(tagsStr)
+        {
+            event.preventDefault();
+        }
+        sel_tags = $("input:hidden[name='tags']").val()
+        sel_asset_lang =  $('#asset_lang').find(':selected').attr('data-sub-code');
         asset_name = $("#asset-name").val();
         asset_description = $("#asset-descid").val();
         var asset_id = $(this).attr('data-asset_id');
@@ -337,7 +361,8 @@
                         "asset_name":asset_name,
                         "asset_description":asset_description,
                         "node_id": asset_id,
-                        "sel_tags":sel_tags
+                        "sel_tags":sel_tags,
+                        "sel_asset_lang":sel_asset_lang
                         // "asset_objective":asset_objective
                     },
                   url: "{% url 'create_edit_asset' group_id %}",
