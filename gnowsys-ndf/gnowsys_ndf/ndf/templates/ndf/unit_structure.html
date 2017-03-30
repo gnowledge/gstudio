@@ -1,3 +1,5 @@
+{% load i18n %}
+{% load ndf_tags %}
 {% block head %}
     <script src="/static/ndf/bower_components/handlebars/handlebars.js"></script>
 {% endblock head %}
@@ -279,6 +281,20 @@ This will not be used because now only existing activities will be added.
 <div id="add-lesson-reveal" class="reveal-modal" data-reveal aria-labelledby="modalTitle" aria-hidden="true" role="dialog">
     <h3>Lesson Name</h3>
     <input type="text" id="lesson-name">
+    <select class="lesson-lang" name="lan" id="lesson_lang" >
+                            {% get_language_info_list for LANGUAGES as languages %}
+                            
+                            {% for language in languages %}
+                                {% if lesson_language == language.code %}
+                                    <option selected value="{{ language.code }}" data-sub-lang="{{ language.name }}" data-sub-code="{{ language.code }}">
+                                      {{ language.name }}
+                                {% else %}
+                                    <option value="{{ language.code }}" data-sub-lang="{{ language.name }}" data-sub-code="{{ language.code }}">
+                                      {{ language.name }}
+                                    </option>
+                                {% endif %}
+                            {% endfor %}
+                          </select>
     <button type="button" class="button-hollow-grey save-lesson" data-node-id=""> Save Lesson </button>
     <a class="close-reveal-modal" aria-label="Close">&#215;</a>
 </div>
@@ -300,7 +316,7 @@ This will not be used because now only existing activities will be added.
 <!-- Handlebar Templates for the course tree -->
 <script id="lesson-template" type="text/x-handlebars-template">
     <dd class="accordion-navigation active" data-lesson-ele="lesson-accordion-{{id}}">
-        <a href="#lesson-{{id}}" class="entity-title" id="lesson-accordion" data_lesson_name="{{name}}">
+        <a href="#lesson-{{id}}" class="entity-title" id="lesson-accordion" data_lesson_name="{{name}}"  data_lesson_language="{{language}}">
             {{name}}
             <div class="right edit_entity">
                 <i class="fi-list right"></i>
@@ -433,6 +449,7 @@ This will not be used because now only existing activities will be added.
             e.preventDefault();
             var lesson_id = $(this).closest('a').attr('href').replace('#lesson-', '');
             var lesson_name = $(this).closest('a').attr('data_lesson_name');
+            var lesson_language = $(this).closest('a').attr('data_lesson_language');
 
             selectedEntity = 'lesson';
             selectedEntityid = lesson_id;
@@ -448,7 +465,9 @@ This will not be used because now only existing activities will be added.
             //Ajax to get data for activity
             console.log("editing lesson: " + lesson_id);
             $('.save-lesson').attr('data-node-id', lesson_id);
+            $(".lesson-lang").val(lesson_language);
             $('#lesson-name').val(lesson_name);
+
             $('#add-lesson-reveal').foundation('reveal', 'open');
             // addLesson(node_id, name)
         });
@@ -645,13 +664,15 @@ This will not be used because now only existing activities will be added.
             return;
           };
           result = undefined;
+          sel_lesson_lang =  $('#lesson_lang').find(':selected').attr('data-sub-code');
           $.ajax({
               type: "POST",
               data:{
                   'csrfmiddlewaretoken': "{{csrf_token}}",
                   "name": lessonName,
                   "lesson_id": lessonId,
-                  "unit_id": "{{unit_obj.pk}}"
+                  "unit_id": "{{unit_obj.pk}}",
+                  "sel_lesson_lang":sel_lesson_lang
               },
               url: "{% url 'lesson_create_edit' group_id %}",
               // datatype: "",
@@ -746,7 +767,7 @@ This will not be used because now only existing activities will be added.
             $('.course-editor-section .activity-name').text(activityName);
 
             getNodeData(activity_id);
-            $('.save_edit_activity').attr('href',"{% url 'course_pages' group_id %}?edit="+ activity_id + "&return=unit_detail")
+            $('.save_edit_activity').attr('href', "{% url 'edit_course_page' group_id 'activity_id' %}".replace('activity_id', activity_id))
             $('.save_edit_activity').attr('data-current-activity-id', activity_id);
         });
 

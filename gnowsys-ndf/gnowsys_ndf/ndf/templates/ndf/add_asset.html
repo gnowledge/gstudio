@@ -1,6 +1,75 @@
 {% load i18n %}
 {% load ndf_tags %}
 {% check_is_gstaff group_id request.user as is_gstaff %}
+{% block head %}
+    <style type="text/css">
+    .right-btn, .left-btn{
+        /*float: left;*/
+        /*margin-left: 1rem;*/
+        width: 40%;
+        font-size: 0.85em !important;
+        margin-top: 0.1rem !important;
+        text-align: center;
+    }
+    .tag-rating-div{
+        margin-left: 0.6rem !important;
+        margin-top: 0.3rem !important;
+    }
+    /*  
+    .right-btn{
+        float: right;
+        margin-right: 1rem;
+        width: 8rem;
+        font-size: 0.75rem !important
+    }
+    */
+    .rating-lbl{
+        display: inline-block;
+        font-size: 1rem !important;
+        /*font-style: italic;*/
+        /*margin-left: 3rem;*/
+
+    }
+    .rating_template{
+        display: inline-table;
+    }
+    .mod-btn{
+        width: 80% !important;
+        font-size: 0.75rem !important;
+    }
+    .btn-row{
+        /*margin-left: 1rem !important;*/
+        text-align: center;
+        margin-bottom: -1rem !important;
+    }
+    .lbl_tag{
+        display: inline-block;
+        font-size: 0.80rem !important;
+    }
+    .lbl_field{
+        width: 20%;
+        color: #194d6f;
+        /*font-weight: bold;*/
+        margin-top: 1rem;
+        font-size: 1rem !important;
+    }
+    .label > a{
+        color: white !important;
+    }
+
+    .graph_btn{
+        margin-left: 3rem;
+    }
+
+    #group_drawer{
+        height: 400px;
+        overflow-y: auto;
+        margin-left: 2em;
+    }
+</style>
+{% endblock %}
+   
+
 
     <div class="row overlay-head">
         {% if edit or not asset_obj.name %}
@@ -10,6 +79,21 @@
             {% if not edit and asset_obj.name %}
                 {% if asset_obj.created_by == request.user.id or is_gstaff %}
                 <p class="left">&nbsp;&nbsp;{{asset_obj.name}}</p>
+                {% if asset_obj.tags %}
+                    {% for tag in asset_obj.tags %}
+                        {% if forloop.counter < 3 %}
+                            <small><label class="lbl_tag label">
+                        {% else %}
+                            <small><label class="lbl_tag label tag_ele hide">
+                        {% endif %}
+                        <a href="{% url 'tag_info' group_id tag %}">{{tag}} </a></label></small>
+                    {% endfor %}
+                    {% if asset_obj.tags|length > 2 %}
+                        <small><label class="view-more-tags" style="display:inline-block;">More</label></small>
+                    {% endif %} 
+                {% else %}
+                    <i><small><label class="lbl_tag">{% trans "No tags defined yet!" %}</label></small></i>
+                {% endif %}
                 <a class="fi-pencil right createAsset" data-asset_id='{{asset_obj.pk}}'>Edit</a>
                 {% endif %}
             {% else %}
@@ -38,10 +122,26 @@
                         Asset description *
                 </label>
                         <textarea rows="4" cols="2" class="small-12 columns" placeholder="Enter Description" id="asset-descid" value=''>{% if asset_obj %} {{asset_obj.content|safe|striptags}}{% endif %}</textarea>
+                    {% include 'ndf/widget_tags.html' with node=asset_obj %}
+                            {% get_language_info_list for LANGUAGES as languages %}
+                    <select class="asset-lang" name="lan" id="asset_lang" >
+                            {% for language in languages %}
+                            {% if asset_obj.language.0 == language.code  %}
+                                <option selected data-sub-lang="{{ language.name }}" data-sub-code="{{ language.code }}">
+                                {{language.name}}
+                            {%  else %}
+                                <option data-sub-lang="{{ language.name }}" data-sub-code="{{ language.code }}">
+                                  {{ language.name }}
+                                </option>
+                            {% endif %}
+                            {% endfor %}
+                          </select>
+
                     {% endif %}
 
             </div>
         </div>
+    
     {% comment %}
         <div class="row">
             <div class="small-12 medium-6 large-6 columns">
@@ -234,6 +334,18 @@
     //         $('.save-asset').attr('disabled',true);
     // })
     $( ".save-asset" ).click(function(event) {
+        updateAllTags();
+        var tagsStr = tags.value.trim();
+        if(checkTag())
+        {
+            $("input:hidden[name='tags']").val($("input:hidden[name='tags']").val() + ', ' + tagsStr);
+        }
+        else if(tagsStr)
+        {
+            event.preventDefault();
+        }
+        sel_tags = $("input:hidden[name='tags']").val()
+        sel_asset_lang =  $('#asset_lang').find(':selected').attr('data-sub-code');
         asset_name = $("#asset-name").val();
         asset_description = $("#asset-descid").val();
         var asset_id = $(this).attr('data-asset_id');
@@ -248,7 +360,9 @@
                         'csrfmiddlewaretoken': "{{csrf_token}}",
                         "asset_name":asset_name,
                         "asset_description":asset_description,
-                        "node_id": asset_id
+                        "node_id": asset_id,
+                        "sel_tags":sel_tags,
+                        "sel_asset_lang":sel_asset_lang
                         // "asset_objective":asset_objective
                     },
                   url: "{% url 'create_edit_asset' group_id %}",

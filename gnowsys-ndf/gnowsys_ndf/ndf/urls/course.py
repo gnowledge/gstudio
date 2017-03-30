@@ -60,7 +60,12 @@ urlpatterns = patterns('gnowsys_ndf.ndf.views.gcourse',
                         url(r'^/asset_detail/(?P<asset_id>[\w-]+)$', 'assets', name='asset_detail'),
                         url(r'^/asset_detail/(?P<asset_id>[\w-]+)/asset_content/(?P<asst_content_id>[\w-]+)$', 'assetcontent_detail', name='assetcontent_detail'),
                         
-                        url(r'^/pages/$', 'course_pages', name='course_pages'),
+                        url(r'^/activities/$', 'course_pages', name='course_pages'),
+                        url(r'^/activity/detail/(?P<page_id>[\w-]+)$', 'course_pages', name='view_course_page'),
+                        url(r'^/activity/create$', 'create_edit_course_page', name='create_course_page'),
+                        url(r'^/activity/edit/(?P<page_id>[\w-]+)$', 'create_edit_course_page', name='edit_course_page'),
+
+
                         url(r'^/load_content_data/$', 'load_content_data', name='load_content_data'),
                         url(r'^/save_course_page/$', 'save_course_page', name='save_course_page'),
 

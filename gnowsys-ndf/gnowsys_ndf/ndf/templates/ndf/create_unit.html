@@ -1,5 +1,6 @@
 {% extends "ndf/gbase.html" %}
-{% load get_metadata_values get_attribute_value from ndf_tags %}
+{% load i18n %}
+{% load ndf_tags %}
 
 {% block title %} {{title}} {% endblock %}
 {% block body_content %}
@@ -70,6 +71,29 @@
                     </div>
                 </div>
 
+                <div class="course_creator_header">
+                    <div class="left course_heading">
+                    <h5>Select Language</h5>
+                    </div>
+                    <div class="right course_heading_unit">
+                         <select class="activity-lang" name="lan" id="activity_lang" >
+                            {% get_language_info_list for LANGUAGES as languages %}
+                            
+                            {% for language in languages %}
+                                {% if unit_node.language.0 == language.code %}
+                                    <option selected value="{{ language.code }}" data-sub-lang="{{ language.name }}" data-sub-code="{{ language.code }}">
+                                      {{ language.name }}
+                                {% else %}
+                                    <option value="{{ language.code }}" data-sub-lang="{{ language.name }}" data-sub-code="{{ language.code }}">
+                                      {{ language.name }}
+                                    </option>
+                                {% endif %}
+                            {% endfor %}
+                          </select>
+                    </div>
+                </div>
+
+
 
                 <hr/>
                 <label style="color:red;" class="right hide duplicate_unit_name">Unit with same name exists. Please choose another name.</label>
@@ -81,19 +105,32 @@
                         {% include "ndf/html_editor.html" with var_name="content" var_placeholder="Enter the content here" var_value=unit_node.content|default_if_none:"" node_id=unit_node.pk ckeditor_toolbar="GeneralToolbar" %}
                     </div>
                 </div>
+
                 <div class="row">
                     {% comment %}
                         <button type="button" class ="right asset-unit-button" id="save_unit">Save</button>
                     {% endcomment %}
+                 {% include 'ndf/widget_tags.html' with node=unit_node %}
                     <input type="submit" class ="asset-unit-button" id="save_unit" value="Save"/>
                 </div>
             </form>
         </div>
     </div>
     <script type="text/javascript">
-    {% if not unit_node %}
         var group_names_list = {{all_groups_names|safe}}
         $("#save_unit").click(function(event) {
+            updateAllTags();
+
+        var tagsStr = tags.value.trim();
+        if(checkTag())
+        {
+            $("input:hidden[name='tags']").val($("input:hidden[name='tags']").val() + ', ' + tagsStr);
+        }
+        else if(tagsStr)
+        {
+            event.preventDefault();
+        }
+        {% if not unit_node %}
             unit_name = $("#unit-name").val()
             if (group_names_list.indexOf(unit_name) != -1){
                 $(".duplicate_unit_name").removeClass("hide")
@@ -102,8 +139,9 @@
             else{
                 $(".duplicate_unit_name").addClass("hide")
             }
+        {% endif %}
         })
-    {% endif %}
+
     </script>
 {% endblock %}
 

@@ -2720,6 +2720,22 @@ ul.jqtree-tree .jqtree-toggler:hover {
 }
 
 /* line 2884, ../../../scss/_clix2017.scss */
+.activity-detail-page {
+  margin-top: 20px;
+  margin-left: 15px;
+}
+
+/* line 2889, ../../../scss/_clix2017.scss */
+.activity-detail-content {
+  margin-left: 20px !important;
+}
+
+/* line 2893, ../../../scss/_clix2017.scss */
+.activity-detail-content #scstyle header {
+  margin-top: 0px !important;
+}
+
+/* line 2897, ../../../scss/_clix2017.scss */
 .activity-editor {
   margin: 50px;
 }
