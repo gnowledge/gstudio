@@ -1,5 +1,4 @@
 import os
-import json
 from bson import json_util
 from gnowsys_ndf.ndf.models import node_collection, TYPES_LIST
 from gnowsys_ndf.settings import GSTUDIO_DEFAULT_GROUPS
