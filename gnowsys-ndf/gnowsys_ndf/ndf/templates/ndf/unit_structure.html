@@ -1,3 +1,5 @@
+{% load i18n %}
+{% load ndf_tags %}
 {% block head %}
     <script src="/static/ndf/bower_components/handlebars/handlebars.js"></script>
 {% endblock head %}
@@ -279,6 +281,20 @@ This will not be used because now only existing activities will be added.
 <div id="add-lesson-reveal" class="reveal-modal" data-reveal aria-labelledby="modalTitle" aria-hidden="true" role="dialog">
     <h3>Lesson Name</h3>
     <input type="text" id="lesson-name">
+    <select class="activity-lang" name="lan" id="lesson_lang" >
+                            {% get_language_info_list for LANGUAGES as languages %}
+                            
+                            {% for language in languages %}
+                                {% if unit_node.language.0 == language.code %}
+                                    <option selected value="{{ language.code }}" data-sub-lang="{{ language.name }}" data-sub-code="{{ language.code }}">
+                                      {{ language.name }}
+                                {% else %}
+                                    <option value="{{ language.code }}" data-sub-lang="{{ language.name }}" data-sub-code="{{ language.code }}">
+                                      {{ language.name }}
+                                    </option>
+                                {% endif %}
+                            {% endfor %}
+                          </select>
     <button type="button" class="button-hollow-grey save-lesson" data-node-id=""> Save Lesson </button>
     <a class="close-reveal-modal" aria-label="Close">&#215;</a>
 </div>
@@ -645,13 +661,15 @@ This will not be used because now only existing activities will be added.
             return;
           };
           result = undefined;
+          sel_lesson_lang =  $('#lesson_lang').find(':selected').attr('data-sub-code');
           $.ajax({
               type: "POST",
               data:{
                   'csrfmiddlewaretoken': "{{csrf_token}}",
                   "name": lessonName,
                   "lesson_id": lessonId,
-                  "unit_id": "{{unit_obj.pk}}"
+                  "unit_id": "{{unit_obj.pk}}",
+                  "sel_lesson_lang":sel_lesson_lang
               },
               url: "{% url 'lesson_create_edit' group_id %}",
               // datatype: "",
