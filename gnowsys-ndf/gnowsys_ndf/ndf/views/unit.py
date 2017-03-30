@@ -52,7 +52,7 @@ def unit_create_edit(request, group_id, unit_group_id=None):
         unit_id_post = request.POST.get('node_id', '')
         unit_altnames = request.POST.get('altnames', '')
         content = request.POST.get('content', '')
-        tags = request.POST.get('tags', '')
+        tags = request.POST.get('tags', [])
         language = request.POST.get('lan', '')
 
         educationallevel_val = request.POST.get('educationallevel', '')
@@ -63,7 +63,6 @@ def unit_create_edit(request, group_id, unit_group_id=None):
             unit_node = node_collection.one({'_id': ObjectId(unit_id_post)})
         success_flag = False
         if unit_node:
-            unit_node.fill_gstystem_values(tags=tags)
             if unit_node.altnames is not unit_altnames:
                 unit_node.altnames = unit_altnames
                 success_flag = True
@@ -89,10 +88,13 @@ def unit_create_edit(request, group_id, unit_group_id=None):
         if not success_flag:
             return HttpResponseRedirect(reverse('list_units', kwargs={'group_id': parent_group_id, 'groupid': parent_group_id,}))
 
+        # if tags:
+        #     if not type(tags) is list:
+        #         tags = [unicode(t.strip()) for t in tags.split(",") if t != ""]
+        #     unit_node.tags = tags
         if tags:
-            if not type(tags) is list:
-                tags = [unicode(t.strip()) for t in tags.split(",") if t != ""]
-            unit_node.tags = tags
+            tags = json.loads(tags)
+        unit_node.tags = tags
         unit_node.content = content
         unit_node.save()
         return HttpResponseRedirect(reverse('course_about',
