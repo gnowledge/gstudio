@@ -90,7 +90,6 @@ def get_triple_data(node_id):
             elif each_triple_node._type is "GRelation":
                 fetch_value = "right_subject"
             if fetch_value:
-                print "\n fetch_value -- ", fetch_value
                 if type(each_triple_node[fetch_value]) == list and all(isinstance(each_obj_value, ObjectId) for each_obj_value in each_triple_node[fetch_value]):
                     dump_node(node_id_list=each_triple_node[fetch_value],
                         collection_name=node_collection)
@@ -101,7 +100,7 @@ def get_triple_data(node_id):
 
 class Command(BaseCommand):
     def handle(self, *args, **options):
-        group_name_or_id = raw_input("\n\tPlease enter Name or ObjectID of the Group:\t")
+        group_name_or_id = raw_input("\n\tPlease enter Name or ObjectID of the Group: ")
         group_node   = get_group_name_id(group_name_or_id, get_obj=True)
 
         if group_node:
@@ -154,10 +153,16 @@ class Command(BaseCommand):
                 call_group_export(group_node, nodes_falling_under_grp, num_of_processes=multiprocessing.cpu_count())
                 get_counter_ids(group_node._id)
                 # import ipdb; ipdb.set_trace()
-                
+
                 print "\n Total GROUP_CONTRIBUTORS: ", len(GROUP_CONTRIBUTORS)
                 create_users_dump(group_dump_path, GROUP_CONTRIBUTORS)
                 global log_file
+                print "*"*70
+                print "\n Export will be found at: ", DATA_EXPORT_PATH
+                print "\n Log will be found at: ", log_file_path
+                print "*"*70
+
+
                 log_file.write("\n*************************************************************")
                 log_file.write("\n######### Script Completed at : " + str(datetime.datetime.now()) + " #########\n\n")
                 print "END : ", str(datetime.datetime.now())
@@ -181,38 +186,38 @@ def call_group_export(group_node, nodes_cur, num_of_processes=4):
     nodes_cur = list(nodes_cur)
     # Include Group Object.
     nodes_cur.append(group_node)
-    def worker(nodes_cur, out_q):
-        for each_node in nodes_cur:
-            print ".",
-            dump_node(node=each_node,collection_name=node_collection)
-            # node_collection_ids.add(each_node._id)
-            if 'File' in each_node.member_of_names_list:
-                get_file_node_details(each_node)
+    # def worker(nodes_cur, out_q):
+    for each_node in nodes_cur:
+        print ".",
+        dump_node(node=each_node,collection_name=node_collection)
+        # node_collection_ids.add(each_node._id)
+        if 'File' in each_node.member_of_names_list:
+            get_file_node_details(each_node)
 
-            if each_node.collection_set:
-                get_nested_ids(each_node,'collection_set')
+        if each_node.collection_set:
+            get_nested_ids(each_node,'collection_set')
 
-            if each_node.prior_node:
-                get_nested_ids(each_node,'prior_node')
+        if each_node.prior_node:
+            get_nested_ids(each_node,'prior_node')
 
-            if each_node.post_node:
-                get_nested_ids(each_node,'post_node')
+        if each_node.post_node:
+            get_nested_ids(each_node,'post_node')
 
-            #fetch triple_data
-            get_triple_data(each_node._id)
+        #fetch triple_data
+        get_triple_data(each_node._id)
     # Each process will get 'chunksize' student_cur and a queue to put his out
     # dict into
-    out_q = multiprocessing.Queue()
-    chunksize = int(math.ceil(len(nodes_cur) / float(num_of_processes)))
-    procs = []
+    # out_q = multiprocessing.Queue()
+    # chunksize = int(math.ceil(len(nodes_cur) / float(num_of_processes)))
+    # procs = []
 
-    for i in range(num_of_processes):
-        p = multiprocessing.Process(
-            target=worker,
-            args=(nodes_cur[chunksize * i:chunksize * (i + 1)], out_q)
-        )
-        procs.append(p)
-        p.start()
+    # for i in range(num_of_processes):
+    #     p = multiprocessing.Process(
+    #         target=worker,
+    #         args=(nodes_cur[chunksize * i:chunksize * (i + 1)], out_q)
+    #     )
+    #     procs.append(p)
+    #     p.start()
 
     # Collect all results into a single result list. We know how many lists
     # with results to expect.
@@ -221,10 +226,11 @@ def call_group_export(group_node, nodes_cur, num_of_processes=4):
     #     resultlist.extend(out_q.get())
 
     # Wait for all worker processes to finish
-    for p in procs:
-        p.join()
+    # for p in procs:
+    #     p.join()
 
     # return resultlist
+
 
 def build_rcs(node, collection_name):
     '''
@@ -232,9 +238,10 @@ def build_rcs(node, collection_name):
     might have missed due to update queries.
     Runs a save() method on the node and calls copy_rcs()
     '''
+    # import ipdb; ipdb.set_trace()
     if node:
         global log_file
-
+        global GROUP_CONTRIBUTORS
         try:
             if collection_name is triple_collection:
                 if 'attribute_type' in node:
@@ -247,9 +254,7 @@ def build_rcs(node, collection_name):
                 
                 print "\n NC: ", len(node.contributors)
                 if "contributors" in node:
-                    
                     GROUP_CONTRIBUTORS.extend(node.contributors)
-                    print "\n Added - GC -- : ", node.contributors
 
             log_file.write("\n RCS Built for " + str(node._id) )
             copy_rcs(node)
@@ -325,7 +330,6 @@ def dump_media_data(media_path):
     global log_file
     log_file.write("\n--- Media Copying in process --- "+ str(media_path))
     try:
-        print "\n each_file_media_url: ", media_path
         fp = os.path.join(MEDIA_ROOT,media_path)
         if os.path.exists(fp):
             cp = "cp  -u " + fp + " " +" --parents " + MEDIA_EXPORT_PATH + "/"
