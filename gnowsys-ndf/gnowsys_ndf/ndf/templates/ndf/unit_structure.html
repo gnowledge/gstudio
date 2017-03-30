@@ -285,7 +285,7 @@ This will not be used because now only existing activities will be added.
                             {% get_language_info_list for LANGUAGES as languages %}
                             
                             {% for language in languages %}
-                                {% if unit_node.language.0 == language.code %}
+                                {% if lesson_language == language.code %}
                                     <option selected value="{{ language.code }}" data-sub-lang="{{ language.name }}" data-sub-code="{{ language.code }}">
                                       {{ language.name }}
                                 {% else %}
@@ -316,7 +316,7 @@ This will not be used because now only existing activities will be added.
 <!-- Handlebar Templates for the course tree -->
 <script id="lesson-template" type="text/x-handlebars-template">
     <dd class="accordion-navigation active" data-lesson-ele="lesson-accordion-{{id}}">
-        <a href="#lesson-{{id}}" class="entity-title" id="lesson-accordion" data_lesson_name="{{name}}">
+        <a href="#lesson-{{id}}" class="entity-title" id="lesson-accordion" data_lesson_name="{{name}}"  data_lesson_language="{{language}}">
             {{name}}
             <div class="right edit_entity">
                 <i class="fi-list right"></i>
@@ -449,6 +449,7 @@ This will not be used because now only existing activities will be added.
             e.preventDefault();
             var lesson_id = $(this).closest('a').attr('href').replace('#lesson-', '');
             var lesson_name = $(this).closest('a').attr('data_lesson_name');
+            var lesson_language = $(this).closest('a').attr('data_lesson_language');
 
             selectedEntity = 'lesson';
             selectedEntityid = lesson_id;
@@ -464,7 +465,9 @@ This will not be used because now only existing activities will be added.
             //Ajax to get data for activity
             console.log("editing lesson: " + lesson_id);
             $('.save-lesson').attr('data-node-id', lesson_id);
+            $(".lesson-lang").val(lesson_language);
             $('#lesson-name').val(lesson_name);
+
             $('#add-lesson-reveal').foundation('reveal', 'open');
             // addLesson(node_id, name)
         });

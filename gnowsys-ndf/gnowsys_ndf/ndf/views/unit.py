@@ -332,6 +332,7 @@ def _get_unit_hierarchy(unit_group_obj):
             lesson_dict['name'] = lesson.name
             lesson_dict['type'] = 'lesson'
             lesson_dict['id'] = str(lesson._id)
+            lesson_dict['language'] = lesson.language[0]
             lesson_dict['activities'] = []
             if lesson.collection_set:
                 for each_act in lesson.collection_set:
