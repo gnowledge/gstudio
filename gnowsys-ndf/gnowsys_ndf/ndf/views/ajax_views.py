@@ -6690,17 +6690,21 @@ def create_edit_asset(request,group_id):
       group_id = ObjectId(group_id)
   except:
       group_name, group_id = get_group_name_id(group_id)
+  
   asset_name =  str(request.POST.get("asset_name", '')).strip()
   asset_desc =  str(request.POST.get("asset_description", '')).strip()
   tags =  request.POST.get("sel_tags", '')
-  
+  asset_lang =  request.POST.get("sel_asset_lang", '')
+  # file_node.language = get_language_tuple(language)
   node_id = request.POST.get('node_id', None)
   asset_obj = create_asset(name=asset_name, group_id=group_id,
     created_by=request.user.id, content=unicode(asset_desc), node_id=node_id)
-  if tags:
-    if not type(tags) is list:
-        tags = [unicode(t.strip()) for t in tags.split(",") if t != ""]
-    asset_obj.tags = tags
+  
+  asset_obj.fill_gstystem_values(tags=tags)
+  
+  if asset_lang:
+    language = get_language_tuple(asset_lang)
+    asset_obj.language = language
   asset_obj.save()
   thread_node = create_thread_for_node(request,group_id, asset_obj)
 
