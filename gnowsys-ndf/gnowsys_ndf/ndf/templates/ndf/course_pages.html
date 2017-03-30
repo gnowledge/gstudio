@@ -1,3 +1,5 @@
+{% load i18n %}
+{% load ndf_tags %}
 {% if user.is_authenticated %}
 <div class="activity-sheet-actions">
     <div class="row">
@@ -13,14 +15,31 @@
     <form id ="course_page_form" enctype="multipart/form-data" method="post" action="{% url 'save_course_page' group_id %}">{% csrf_token %}
         <div>
             <div class="row">
-                <div class="medium-4 columns name-div">
+                <div class="medium-3 columns name-div">
                     <input type="text" class="node_name" value="{{node_obj.name}}" name="name" placeholder="Enter name of Activity">
                     <label class="node_name_empty hide" style="color:red">Please enter Name</label> 
                 </div>
-                <div class="medium-4 columns">
+                <div class="medium-3 columns">
                     <a class="right orange-button-template existing-template">Create page from existing template</a>
                 </div>
-                <div class="medium-4 columns">
+                <div class="medium-3 columns">
+                        <select class="activity-lang" name="lan" id="activity_lang" >
+                            {% get_language_info_list for LANGUAGES as languages %}
+                            
+                            {% for language in languages %}
+                                {% if node_obj.language.0 == language.code %}
+                                    <option selected data-sub-lang="{{ language.name }}" data-sub-code="{{ language.code }}">
+                                      {{ language.name }}
+                                {% else %}
+                                    <option data-sub-lang="{{ language.name }}" data-sub-code="{{ language.code }}">
+                                      {{ language.name }}
+                                    </option>
+                                {% endif %}
+                            {% endfor %}
+                          </select>
+                </div>
+                
+                <div class="medium-3 columns">
                     <button type="button" class="orange-button edit-activity-metadata right">Edit Metadata</button>
                 </div>
             </div>
@@ -215,4 +234,16 @@ $( ".edit-activity-metadata" ).click(function(event) {
         });
 });
 
+$( ".saveActivityPage" ).click(function(event) {
+        updateAllTags();
+        var tagsStr = tags.value.trim();
+        if(checkTag())
+        {
+            $("input:hidden[name='tags']").val($("input:hidden[name='tags']").val() + ', ' + tagsStr);
+        }
+        else if(tagsStr)
+        {
+            event.preventDefault();
+        }
+    });
 </script>
