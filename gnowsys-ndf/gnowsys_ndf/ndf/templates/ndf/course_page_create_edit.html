@@ -1,14 +1,38 @@
+{% load i18n %}
+{% load ndf_tags %}
     <div id="addActivityPage" >
         <form id ="course_page_form" enctype="multipart/form-data" method="post" action="{% url 'save_course_page' group_id %}">{% csrf_token %}
             <div>
                 <div class="row">
-                    <div class="medium-8 columns name-div">
+                    <div class="medium-3 columns name-div">
                         <input type="text" class="node_name" name="name" placeholder="Enter name of Page" value="{{activity_node.name}}">
                         <label class="node_name_empty hide" style="color:red">Please enter Name</label>
                     </div>
-                    <div class="medium-4 columns">
+                    <div class="medium-3 columns">
                         <a class="right orange-button-template existing-template">Create page from existing template</a>
                     </div>
+                    <div class="medium-3 columns">
+                            <select class="activity-lang" name="lan" id="activity_lang" >
+                                {% get_language_info_list for LANGUAGES as languages %}
+                                {% for language in languages %}
+                                    {% if activity_node.language.0 == language.code %}
+                                        <option selected data-sub-lang="{{ language.name }}" data-sub-code="{{ language.code }}">
+                                          {{ language.name }}
+                                    {% else %}
+                                        <option data-sub-lang="{{ language.name }}" data-sub-code="{{ language.code }}">
+                                          {{ language.name }}
+                                        </option>
+                                    {% endif %}
+                                {% endfor %}
+                              </select>
+                    </div>
+                    {% if activity_node %}
+                    <div class="medium-3 columns">
+                        <button type="button" class="orange-button edit-activity-metadata right">Edit Metadata</button>
+                    </div>
+                    {% endif %}
+
+
                 </div>
                 <div class="row">
                     <div class="large-12 columns editor-div">
@@ -17,10 +41,17 @@
 
                 </div>
                 <input type="hidden" name="node_id" class="form_node_id" value="{{activity_node.pk}}">
+                {% include 'ndf/widget_tags.html' with node=activity_node %}
+
+
                 <input type="submit" class="orange-button" class="saveActivityPage" value="Save">
                 <a href="{% url 'course_pages' group_id %}" class="orange-button cancel-page-create">Cancel</a>
             </div>
         </form>
+    </div>
+    <div id="templates-div" class="reveal-modal medium" data-reveal aria-hidden="true" role="dialog">
+        <div class="templates-content"></div>
+        <a class="close-reveal-modal" >&#215;</a>
     </div>
 
 <script type="text/javascript">
@@ -53,5 +84,35 @@
             }
         });
     });
+
+    $( ".edit-activity-metadata" ).click(function(event) {
+        $.ajax({
+                  type: "POST",
+                  data:{
+                        'csrfmiddlewaretoken': "{{csrf_token}}",
+                        "node_id":'{{activity_node.pk}}',
+                    },
+                  url: "{% url 'get_metadata_page' groupid  %}",
+                  datatype: "html",
+                  success: function(data) {
+                  $('#addAsset').foundation('reveal', 'open');
+                  $('#addAsset').html(data);
+                }
+            });
+    });
+
+    $( ".saveActivityPage" ).click(function(event) {
+        updateAllTags();
+        var tagsStr = tags.value.trim();
+        if(checkTag())
+        {
+            $("input:hidden[name='tags']").val($("input:hidden[name='tags']").val() + ', ' + tagsStr);
+        }
+        else if(tagsStr)
+        {
+            event.preventDefault();
+        }
+    });
+
 
 </script>
