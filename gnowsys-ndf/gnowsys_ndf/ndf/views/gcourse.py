@@ -3189,6 +3189,8 @@ def save_course_page(request, group_id):
     tags = request.POST.get("tags", [])
     if tags:
         tags = json.loads(tags)
+    else:
+        tags = []    
     template = 'ndf/gevent_base.html'
     page_gst_name, page_gst_id = GSystemType.get_gst_name_id("Page")
     page_obj = None
@@ -3208,7 +3210,7 @@ def save_course_page(request, group_id):
         if activity_lang:
             language = get_language_tuple(activity_lang)
             page_obj.language = language
-        page_obj.fill_gstystem_values(tags=tags)
+        page_obj.tags = tags
         page_obj.name = unicode(name)
         page_obj.content = unicode(content)
         page_obj.created_by = request.user.id
