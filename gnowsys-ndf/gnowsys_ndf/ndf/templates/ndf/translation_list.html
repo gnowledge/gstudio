@@ -1,0 +1,17 @@
+{% extends "ndf/gbase.html" %}
+
+{% block title %} {{title}} {% endblock %}
+
+{% block body_content %}
+
+    <h2 class="text-center"> {{node.name}} </h2>
+
+    {% include 'ndf/node_ajax_content.html' %}
+    <hr/>
+    Translations
+    <br/>
+    {% for each_node in nodes %}
+        {% include "ndf/widget_card.html" with node=each_node url_name=card_url_name url_first_arg=group_id url_second_arg=source_node_id url_third_arg=each_node.language.0 %}
+    {% endfor %}
+{% endblock %}
+
