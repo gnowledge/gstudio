@@ -2713,3 +2713,19 @@ ul.jqtree-tree .jqtree-toggler:hover {
   height: 40px;
   margin-right: 5px;
 }
+
+/* line 2881, ../../../scss/_clix2017.scss */
+.activity-detail-page {
+  margin-top: 20px;
+  margin-left: 15px;
+}
+
+/* line 2886, ../../../scss/_clix2017.scss */
+.activity-detail-content {
+  margin-left: 20px !important;
+}
+
+/* line 2890, ../../../scss/_clix2017.scss */
+.activity-detail-content #scstyle header {
+  margin-top: 0px !important;
+}

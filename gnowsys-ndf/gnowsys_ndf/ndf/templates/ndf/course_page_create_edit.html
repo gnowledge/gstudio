@@ -1,0 +1,57 @@
+    <div id="addActivityPage" >
+        <form id ="course_page_form" enctype="multipart/form-data" method="post" action="{% url 'save_course_page' group_id %}">{% csrf_token %}
+            <div>
+                <div class="row">
+                    <div class="medium-8 columns name-div">
+                        <input type="text" class="node_name" name="name" placeholder="Enter name of Page" value="{{activity_node.name}}">
+                        <label class="node_name_empty hide" style="color:red">Please enter Name</label>
+                    </div>
+                    <div class="medium-4 columns">
+                        <a class="right orange-button-template existing-template">Create page from existing template</a>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="large-12 columns editor-div">
+                        {% include "ndf/html_editor.html" with var_name="content_org" var_placeholder="Enter the content here" ckeditor_toolbar="GeneralToolbar" var_value=activity_node.content %}
+                    </div>
+
+                </div>
+                <input type="hidden" name="node_id" class="form_node_id" value="{{activity_node.pk}}">
+                <input type="submit" class="orange-button" class="saveActivityPage" value="Save">
+                <a href="{% url 'course_pages' group_id %}" class="orange-button cancel-page-create">Cancel</a>
+            </div>
+        </form>
+    </div>
+
+<script type="text/javascript">
+
+
+    $(document).on('click','#course_page_form',function(event){
+        node_name_val = $(".node_name").val()
+        if(!node_name_val){
+            event.preventDefault()
+            $('.node_name_empty').removeClass('hide')
+        }
+        else{
+            $('.node_name_empty').addClass('hide')
+        }
+    })
+
+
+
+    $( ".existing-template" ).click(function() {
+        $.ajax({
+            type: "GET",
+            url: "{% url 'get_templates_page' groupid %}",
+            datatype: "html",
+            data:{
+
+            },
+            success: function(data) {
+                $(".templates-content").html(data);
+                $('#templates-div').foundation('reveal', 'open');
+            }
+        });
+    });
+
+</script>
