@@ -6592,7 +6592,9 @@ def get_group_pages(request, group_id):
     if except_collection_set_of_obj:
         except_collection_set = except_collection_set_of_obj.collection_set
     gst_page_name, gst_page_id = GSystemType.get_gst_name_id('Page')
-    pages_cur = node_collection.find({'_type': 'GSystem', 'member_of': ObjectId(gst_page_id), 'group_set': ObjectId(group_id), '_id': {'$nin': except_collection_set} })
+    pages_cur = node_collection.find({'_type': 'GSystem',
+     'member_of': ObjectId(gst_page_id), 'group_set': ObjectId(group_id),
+     '_id': {'$nin': except_collection_set} }).sort('last_update', -1)
     template = "ndf/group_pages.html"
     card_class = 'activity-page'
     variable = RequestContext(request, {'cursor': pages_cur, 'groupid': group_id, 'group_id': group_id, 'card_class': card_class })
@@ -6693,7 +6695,10 @@ def create_edit_asset(request,group_id):
   
   asset_name =  str(request.POST.get("asset_name", '')).strip()
   asset_desc =  str(request.POST.get("asset_description", '')).strip()
-  tags =  request.POST.get("sel_tags", '')
+  tags =  request.POST.get("sel_tags", [])
+  if tags:
+      tags = json.loads(tags)
+
   asset_lang =  request.POST.get("sel_asset_lang", '')
   # file_node.language = get_language_tuple(language)
   node_id = request.POST.get('node_id', None)
