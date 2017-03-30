@@ -1262,12 +1262,16 @@ class Node(DjangoDocument):
         return possible_relations
 
 
-    def get_relation(self, relation_type_name, status='PUBLISHED'):
+    def get_attribute(self, attribute_type_name, status=None):
+        return GAttribute.get_triples_from_sub_type(self._id, attribute_type_name, status)
+
+
+    def get_relation(self, relation_type_name, status=None):
         return GRelation.get_triples_from_sub_type(self._id, relation_type_name, status)
 
 
-    def get_attribute(self, attribute_type_name, status='PUBLISHED'):
-        return GAttribute.get_triples_from_sub_type(self._id, attribute_type_name, status)
+    def get_relation_right_subject_nodes(self, relation_type_name, status=None):
+        return node_collection.find({'_id': {'$in': [r.right_subject for r in self.get_relation(relation_type_name)]} })
 
 
     def get_neighbourhood(self, member_of):
