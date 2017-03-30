@@ -32,7 +32,7 @@ CKEDITOR.editorConfig = function( config ) {
 		{ name: 'editing', items : [ 'Find','Replace','-','SelectAll','-' ] },
 		{ name: 'insert', items : [ 'Flash','Table','HorizontalRule','Smiley','SpecialChar','PageBreak','Iframe','video'] },
 		{ name: 'styles', items : [ 'Styles','Format' ] },
-		{ name: 'paragraph', items : [ 'NumberedList','BulletedList','Mathjax','-','Outdent','Indent','-','Blockquote' ] },
+		{ name: 'paragraph', items : [ 'NumberedList','BulletedList','Mathjax','-','Outdent','Indent','-','Blockquote','JustifyLeft', 'JustifyCenter', 'JustifyRight', 'JustifyBlock' ] },
 		{ name: 'links', items : [ 'Link','Unlink' ] },
 		{ name: 'tools', items : [ 'addImage','addAudio','addVideo','addJhapp','Source','Maximize','-'] },
 
@@ -43,7 +43,7 @@ CKEDITOR.editorConfig = function( config ) {
 	config.toolbar_BasicToolbar =
 	[
 		{ name: 'basicstyles', items : [ 'Bold','Italic','Strike','-','RemoveFormat','Subscript', 'Superscript' ] },
-		{ name: 'paragraph', items : [ 'NumberedList','BulletedList','Mathjax','-' ] },
+		{ name: 'paragraph', items : [ 'NumberedList','BulletedList','Mathjax','-', 'JustifyLeft', 'JustifyCenter', 'JustifyRight', 'JustifyBlock' ] },
 		{ name: 'links', items : [ 'Link','Unlink'] },
 		{ name: 'insert', items : [ 'Flash','Iframe' ] },
 		{ name: 'tools', items : [ 'addImage','addAudio','addVideo','addJhapp','Source', 'Maximize','-','closebtn'] },
@@ -51,7 +51,7 @@ CKEDITOR.editorConfig = function( config ) {
 
 	config.toolbar_GgallaryCommentsToolbar =
 	[
-		{ name: 'basicstyles', items : [ 'Bold','Italic' ] },
+		{ name: 'basicstyles', items : [ 'Bold','Italic','align' ] },
 		{ name: 'links', items : [ 'Link','Unlink'] },
 		{ name: 'tools', items : ['closebtn'] },
 	];
@@ -92,7 +92,7 @@ CKEDITOR.editorConfig = function( config ) {
 
 	// Simplify the dialog windows.
 	config.removeDialogTabs = 'image:advanced;link:advanced';
-	config.extraPlugins = 'addImage,closebtn,addAudio,addVideo,addJhapp,mathjax';
+	config.extraPlugins = 'addImage,closebtn,addAudio,addVideo,addJhapp,mathjax,justify';
 	config.allowedContent = true;
 
 };
