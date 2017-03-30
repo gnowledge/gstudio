@@ -18,10 +18,10 @@
 {% get_group_object groupid as group_object %}
 
 {% comment %}{% get_breadcrumb request.path %}{% endcomment %}
-    <div class="row group_content">
+    <div class="row group_content {% if hide_bannerpic %} max-width {% endif %}">
         <div class="small-12 columns">
             <div class="row">
-                <div class="small-12 columns group_banner"></div>
+                <div class="small-12 columns group_banner {% if hide_bannerpic %}hide {% endif %}"></div>
             </div>
             <div class="row">
                 <div class="small-12 columns group_header">
