@@ -101,7 +101,7 @@ def get_triple_data(node_id):
 class Command(BaseCommand):
     def handle(self, *args, **options):
         group_name_or_id = raw_input("\n\tPlease enter Name or ObjectID of the Group: ")
-        group_node   = get_group_name_id(group_name_or_id, get_obj=True)
+        group_node   = get_group_name_id(group_name_or_id.strip(), get_obj=True)
 
         if group_node:
             print "\tRequest received for Export of : ", group_node.name , ' | ObjectId: ', group_node._id
