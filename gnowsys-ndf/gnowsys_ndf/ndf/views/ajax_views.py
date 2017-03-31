@@ -6592,9 +6592,14 @@ def get_group_pages(request, group_id):
     if except_collection_set_of_obj:
         except_collection_set = except_collection_set_of_obj.collection_set
     gst_page_name, gst_page_id = GSystemType.get_gst_name_id('Page')
-    pages_cur = node_collection.find({'_type': 'GSystem',
-     'member_of': ObjectId(gst_page_id), 'group_set': ObjectId(group_id),
-     '_id': {'$nin': except_collection_set} }).sort('last_update', -1)
+    gst_blog_page_name, gst_blog_page_id = GSystemType.get_gst_name_id('Blog page')
+    pages_cur = node_collection.find({
+                                      '_type': 'GSystem',
+                                      'member_of': ObjectId(gst_page_id),
+                                      'type_of': {'$nin': [gst_blog_page_id]},
+                                      'group_set': ObjectId(group_id),
+                                      '_id': {'$nin': except_collection_set}
+                                    }).sort('last_update', -1)
     template = "ndf/group_pages.html"
     card_class = 'activity-page'
     variable = RequestContext(request, {'cursor': pages_cur, 'groupid': group_id, 'group_id': group_id, 'card_class': card_class })
@@ -6692,7 +6697,7 @@ def create_edit_asset(request,group_id):
       group_id = ObjectId(group_id)
   except:
       group_name, group_id = get_group_name_id(group_id)
-  
+
   asset_name =  str(request.POST.get("asset_name", '')).strip()
   asset_desc =  str(request.POST.get("asset_description", '')).strip()
   tags =  request.POST.get("sel_tags", [])
@@ -6704,9 +6709,9 @@ def create_edit_asset(request,group_id):
   node_id = request.POST.get('node_id', None)
   asset_obj = create_asset(name=asset_name, group_id=group_id,
     created_by=request.user.id, content=unicode(asset_desc), node_id=node_id)
-  
+
   asset_obj.fill_gstystem_values(tags=tags)
-  
+
   if asset_lang:
     language = get_language_tuple(asset_lang)
     asset_obj.language = language
@@ -6734,16 +6739,16 @@ def add_assetcontent(request,group_id):
   if_alt_lang_file = request.POST.get('if_alt_file','')
   if_alt_format_file = request.POST.get('if_alt_format_file','')
   assetcontentid = request.POST.get('assetcontentid','')
- 
+
   uploaded_files = request.FILES.getlist('filehive', [])
   uploaded_transcript = request.FILES.getlist('uploaded_transcript', [])
   uploaded_subtitle = request.FILES.getlist('uploaded_subtitle', [])
   uploaded_alt_lang_file = request.FILES.getlist('uploaded_alt_lang_file', [])
-  
+
   subtitle_lang = request.POST.get('sel_sub_lang','')
   sel_alt_value = request.POST.get('sel_alt_value','')
   alt_file_format = request.POST.get('sel_alt_fr_type','')
-  
+
   asset_cont_desc = request.POST.get('asset_cont_desc','')
   asset_cont_name = request.POST.get('asset_cont_name','')
   node_id = request.POST.get('node_id',None)
@@ -6776,7 +6781,7 @@ def add_assetcontent(request,group_id):
       transcript_list.append(each_trans['right_subject'])
     trans_grel = create_grelation(ObjectId(assetcontentid), rt_transcript, transcript_list)
     return StreamingHttpResponse("success")
-  
+
   if if_alt_lang_file == "True":
     alt_file_type = request.POST.get('alt_file_type','')
     alt_lang_file_obj = create_assetcontent(ObjectId(asset_obj),uploaded_alt_lang_file[0].name,group_id,request.user.id,files=uploaded_alt_lang_file,resource_type='File')
@@ -6881,7 +6886,7 @@ def remove_related_doc(request, group_id):
     node = request.POST.get('node', None)
     selected_obj = request.POST.get('sel_file', None)
     node_obj = node_collection.one({'_id': ObjectId(node)})
-    
+
     grel_name = request.POST.get('grel_name', None)
     asset_obj = request.POST.get('asset_obj', None)
     rel_node = triple_collection.one({'right_subject':ObjectId(selected_obj),'subject':ObjectId(node_obj.pk)})
