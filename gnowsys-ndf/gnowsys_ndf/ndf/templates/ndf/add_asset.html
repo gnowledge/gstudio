@@ -206,11 +206,18 @@
             <button type="button" class="orange-button edit-metadata right">Edit Metadata</button>
         </div>
         {% endif %}
+        {% get_relation_node asset_obj.pk  'has_assetcontent' as asset_cont_grel %}
+        {% if not asset_cont_grel %}
+        <div class="row">
+            <button type="button" class="orange-button delete-asset right">Delete Asset</button>
+        </div>
+        {% endif  %}
         {% endif %}
 
 
         <div class="row">
         {% for each in asset_content_list.grel_node %}
+            {% if  'DELETED' != each.status %}
             <div class="small-12 medium-6 large-3 columns">
 
                 <div class="asset_tile">
@@ -236,6 +243,7 @@
                     </div>
                 </div>
             </div>
+            {% endif %}
         {% endfor %}
         </div>
         </div>
@@ -283,7 +291,8 @@
                           type: "POST",
                           data:{
                                 'csrfmiddlewaretoken': "{{csrf_token}}",
-                                'delete_files_list' : coll_arr
+                                'delete_files_list' : coll_arr,
+                                'delete_asset_content' : 'True'
                             },
                           url: "{% url 'delete_asset' group_id %}",
                           datatype: "html",
@@ -300,6 +309,25 @@
             alert("Choose atleast one file");
         }
 
+
+    });
+    $(".delete-asset").click(function(){
+        
+        $.ajax({
+                  type: "POST",
+                  data:{
+                        'csrfmiddlewaretoken': "{{csrf_token}}",
+                        'delete_asset':'True',
+                        'asset_id':'{{asset_obj.pk}}',
+                        'asset_id':'{{asset_obj.pk}}',
+                        'group_id':'{{group_id}}',
+                    },
+                  url: "{% url 'delete_asset' group_id %}",
+                  datatype: "html",
+                  success: function(data) {
+                        location.href = "{% url 'asset_list' group_id  %}";
+                }
+            });
 
     });
 

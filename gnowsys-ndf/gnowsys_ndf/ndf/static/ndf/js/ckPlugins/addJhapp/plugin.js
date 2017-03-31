@@ -36,23 +36,23 @@ CKEDITOR.plugins.add('addJhapp',
                             var ost_files_name = prompt("Please enter OST file name");
                             ost_files_name  = ost_files_name.trim();
                             ost_text_val = "<iframe src='/openstorytool/?gallery="+ost_files_name+"&amp;file=/openstorytool/"+ost_files_name+".csst' style='border:none\
-;width:100%;height:100%;min-height:800px;' ></iframe>"
+;width:100%;height:100vh;min-height:800px;' ></iframe>"
                              CKEDITOR.instances[textAreaId].insertHtml(ost_text_val);
                             $('#group_imgs_on_modal').foundation('reveal', 'close');
                           });
                             $("#insert_policequad").click(function(event){
                             //ost_text_gallery = $('#paste-ost-gallery').val();
                             //ost_text_file = $('#paste-ost-captions').val();
-                            pq_text_val = "<iframe src='/policequad/' style='height:100%;width:100%'></iframe>"
+                            pq_text_val = "<iframe src='/policequad/' style='height:100vh;width:100%'></iframe>"
                             // split_word = ost_text_val.slice(0, 18) + "gallery=" + ost_text_gallery + "&amp;file=/ost/" + ost_text_file+"'"+ ost_text_val.slice(18);
                             // alert(split_word)
                              CKEDITOR.instances[textAreaId].insertHtml(pq_text_val);
                             $('#group_imgs_on_modal').foundation('reveal', 'close');
                           });
-                            $("#insert_biomechanic").click(function(event){
+                            $("#insert_runkittyrun").click(function(event){
                             //ost_text_gallery = $('#paste-ost-gallery').val();
                             //ost_text_file = $('#paste-ost-captions').val();
-                            bm_text_val = "<iframe src='/biomechanic/' style='height:100%;width:100%'></iframe>"
+                            bm_text_val = "<iframe src='/runkittyrun/' style='height:100vh;width:100%'></iframe>"
                             // split_word = ost_text_val.slice(0, 18) + "gallery=" + ost_text_gallery + "&amp;file=/ost/" + ost_text_file+"'"+ ost_text_val.slice(18);
                             // alert(split_word)
                              CKEDITOR.instances[textAreaId].insertHtml(bm_text_val);
@@ -61,7 +61,17 @@ CKEDITOR.plugins.add('addJhapp',
                             $("#insert_turtle").click(function(event){
                             //ost_text_gallery = $('#paste-ost-gallery').val();
                             //ost_text_file = $('#paste-ost-captions').val();
-                            tjs_text_val = "<iframe src='/turtleblocksjs/' style='height:100%;width:100%'></iframe>"
+                            tjs_text_val = "<iframe src='/turtleblocksjs/' style='height:100vh;width:100%'></iframe>"
+                            // split_word = ost_text_val.slice(0, 18) + "gallery=" + ost_text_gallery + "&amp;file=/ost/" + ost_text_file+"'"+ ost_text_val.slice(18);
+                            // alert(split_word)
+                             CKEDITOR.instances[textAreaId].insertHtml(tjs_text_val);
+                            $('#group_imgs_on_modal').foundation('reveal', 'close');
+                          });
+
+                            $("#insert_physics-video-player").click(function(event){
+                            //ost_text_gallery = $('#paste-ost-gallery').val();
+                            //ost_text_file = $('#paste-ost-captions').val();
+                            tjs_text_val = "<iframe src='/physics-video-player/' style='height:100vh;width:100%'></iframe>"
                             // split_word = ost_text_val.slice(0, 18) + "gallery=" + ost_text_gallery + "&amp;file=/ost/" + ost_text_file+"'"+ ost_text_val.slice(18);
                             // alert(split_word)
                              CKEDITOR.instances[textAreaId].insertHtml(tjs_text_val);
@@ -71,7 +81,7 @@ CKEDITOR.plugins.add('addJhapp',
                             $("#insert_earth_rotation").click(function(event){
                             //ost_text_gallery = $('#paste-ost-gallery').val();
                             //ost_text_file = $('#paste-ost-captions').val();
-                            ert_text_val = "<iframe src='/rotation/' style='height:100%;width:100%'></iframe>"
+                            ert_text_val = "<iframe src='/rotation/' style='height:100vh;width:100%'></iframe>"
                             // split_word = ost_text_val.slice(0, 18) + "gallery=" + ost_text_gallery + "&amp;file=/ost/" + ost_text_file+"'"+ ost_text_val.slice(18);
                             // alert(split_word)
                              CKEDITOR.instances[textAreaId].insertHtml(ert_text_val);
