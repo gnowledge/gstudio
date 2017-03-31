@@ -37,9 +37,10 @@ from gnowsys_ndf.ndf.views.group import *
 from gnowsys_ndf.ndf.views.methods import get_property_order_with_value, get_group_name_id, get_course_completetion_status, replicate_resource
 from gnowsys_ndf.ndf.views.ajax_views import get_collection
 from gnowsys_ndf.ndf.views.analytics_methods import *
-from gnowsys_ndf.ndf.views.methods import create_gattribute, create_grelation, create_task, delete_grelation, node_thread_access, get_group_join_status
+from gnowsys_ndf.ndf.views.methods import create_gattribute, create_grelation, create_task, delete_grelation, node_thread_access, get_group_join_status, delete_node
 from gnowsys_ndf.notification import models as notification
 from gnowsys_ndf.settings import GSTUDIO_NOTE_CREATE_POINTS, GSTUDIO_QUIZ_CORRECT_POINTS, GSTUDIO_COMMENT_POINTS, GSTUDIO_FILE_UPLOAD_POINTS
+from gnowsys_ndf.ndf.views.trash import trash_resource 
 
 GST_COURSE = node_collection.one({'_type': "GSystemType", 'name': "Course"})
 course_gst_name, course_gst_id = GSystemType.get_gst_name_id("Course")
@@ -3227,3 +3228,17 @@ def load_content_data(request, group_id):
       "group_id":group_id,"groupid":group_id, "node": node,
       "hide_breadcrumbs": True, 'expand_content':True
     },context_instance=RequestContext(request))
+
+
+def delete_activity_page(request, group_id):
+    file_list = request.POST.getlist('delete_files_list[]', '')
+    for each_file in file_list:
+        asset_cont_node = node_collection.one({'_id':ObjectId(each_file)})
+        if asset_cont_node:
+            trash_resource(request,ObjectId(group_id),ObjectId(asset_cont_node._id))
+            del_status  = delete_node(node_id=asset_cont_node._id, deletion_type=0)
+            # print '\nDeleted Node',del_status
+            return HttpResponse('success')
+    return HttpResponse('fail')
+
+
