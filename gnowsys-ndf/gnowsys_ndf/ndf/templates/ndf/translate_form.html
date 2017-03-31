@@ -1,0 +1,9 @@
+{% extends "ndf/gbase.html" %}
+{# {% load get_metadata_values get_attribute_value from ndf_tags %} #}
+
+{% block title %} {{title}} {% endblock %}
+
+{% block body_content %}
+    {% include 'ndf/widget_node_form.html' %}
+{% endblock %}
+

@@ -19,6 +19,8 @@
                 {% endif %}   
             </div>
             
+                <a href="{% url 'all_translations' group_id activity_node.pk %}">Translate</a>
+            </div>
             <div class="small-2 columns">
                 <a href="{% url 'edit_course_page' group_id activity_node.pk %}">Edit</a>
             </div>
