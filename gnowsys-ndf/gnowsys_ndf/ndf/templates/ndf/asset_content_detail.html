@@ -57,7 +57,11 @@
                    <!-- <input type="asset-save-button" id="" class="orange-button" onclick="save_asset_cont_data()" value="Save"/>-->
                 </div>
                 
-                {% get_relation_node node.pk  'has_alt_content' as alt_lang_rel_node %}
+                
+                
+              {%  endif %}
+            {%  endif %}
+            {% get_relation_node node.pk  'has_alt_content' as alt_lang_rel_node %}
                   {% if alt_lang_rel_node %}
                       Alternate Files : 
                     {% for each in  alt_lang_rel_node %} 
@@ -66,10 +70,6 @@
                       </a>
                     {% endfor  %} 
                   {% endif %}
-                
-              {%  endif %}
-            {%  endif %}
-            
             </div>
         </div>
             
@@ -87,29 +87,32 @@
           {% get_gstudio_alt_size 'audio' as size_types %}
           {% get_gstudio_alt_file_formats  'audio' as format_types %}
         {% endif %}
-        <div class="subtitle_files">
-                  <label><u>Upload Alternate File</u></label>
-                    <form class="dropzone large-6 columns" id ="docalternate" enctype="multipart/form-data" method="post" action="{% url 'add_assetcontent' group_id %}" >
-                        <input class="alternate-file" type="file" id="docalternatefile" placeholder="" name="doc_altf" />
-                        <br>
-                    </form>
-                </div>                          
-                    <div class="row">
-                    <button type="button" class="right orange-button-subtitle save-altfile" onclick="save_alternate_file()">Add alternate file</button></div>
+  
+  {% if 'audio' in node.if_file.mime_type or 'video' in node.if_file.mime_type or 'image' in node.if_file.mime_type %}
+        <div class="alternate_files">
+          <label><u>Upload Alternate File</u></label>
+            <form class="dropzone large-6 columns" id ="docalternate" enctype="multipart/form-data" method="post" action="{% url 'add_assetcontent' group_id %}" >
+                <input class="alternate-file" type="file" id="docalternatefile" placeholder="" name="doc_altf" />
+                <br>
+            </form>
+        </div>                          
+        <div class="row">
+          <button type="button" style="display: none" class="right orange-button-subtitle save-altfile" onclick="save_alternate_file()">Add alternate file</button>
+        </div>
                    <!-- <input type="asset-save-button" id="" class="orange-button" onclick="save_asset_cont_data()" value="Save"/>-->
-                </div>
-         <select   class="select-language" name="lan" id="alt_types" tabindex=3 >
-                            <option value="">--- Select Alternate Type ---</option>
-                     {% for each_alt_types in alt_opts %}
+        </div>
+         <select   class="select-language" name="lan" id="alt_types" style="display: none" >
+              <option value="">--- Select Alternate Type ---</option>
+              {% for each_alt_types in alt_opts %}
 
-                            <option data-opts="{{each_alt_types}}" >
-                              {{ each_alt_types }}
-                            </option>
-                            {% endfor %}
+              <option data-opts="{{each_alt_types}}" >
+                {{ each_alt_types }}
+              </option>
+              {% endfor %}
           </select>
 
           <div class="alt-langauge-area" style="display: none">   
-            <select   class="select-language alt-langauge" name="lan" id="alt_languageid" tabindex=3 >
+            <select   class="select-language alt-langauge alt-type" name="lan" id="alt_languageid" tabindex=3 >
                               <option value="">--- Select Language ---</option>
                               {% get_language_info_list for LANGUAGES as languages %}
                               {% for language in languages %}
@@ -121,7 +124,7 @@
           </div>
 
           <div class="alt-fr-type" style="display: none">
-            <select class="select-language alt-fr-type" name="lan" id="" tabindex=3 >
+            <select class="select-language alt-fr-type alt-type" name="lan" id="" tabindex=3 >
                             <option value="">--- Select Format ---</option>
                         {% for each_fr_type in format_types %}
 
@@ -133,7 +136,7 @@
           </div>
 
           <div class="alt-size-area" style="display: none">
-            <select class="select-language alt-size-type" name="lan" id="" tabindex=3 >
+            <select class="select-language alt-size-type alt-type" name="lan" id="" tabindex=3 >
                             <option value="">--- Select sizes ---</option>
                         {% for each_fr_type in size_types %}
 
@@ -144,6 +147,7 @@
             </select>
           </div>
 
+  {% endif %}
 
 
      <div class="row">
@@ -177,6 +181,15 @@ $("#docsubtitle").change(function(){
 $(".select-subtitle-langauge").change(function(){
         $(".save-subtitle").css('display','block')
     });
+
+$("#docalternatefile").change(function(){
+        $("#alt_types").css('display','block')
+    });
+
+$(".alt-type").change(function(){
+    
+        $(".save-altfile").css('display','block')
+  });
 
 $("#alt_types").change(function(){
     sel_alt_types =  $('#alt_types').find(':selected').attr('data-opts');
