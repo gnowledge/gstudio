@@ -48,6 +48,7 @@ from gnowsys_ndf.settings import GSTUDIO_SITE_NAME
 # from gnowsys_ndf.mobwrite.models import ViewObj
 from gnowsys_ndf.notification import models as notification
 from gnowsys_ndf.ndf.views.asset import *
+from gnowsys_ndf.ndf.views.trash import * 
 
 theme_GST = node_collection.one({'_type': 'GSystemType', 'name': 'Theme'})
 topic_GST = node_collection.one({'_type': 'GSystemType', 'name': 'Topic'})
@@ -6813,13 +6814,24 @@ def add_to_collection_set(request, group_id):
 
 
 def delete_asset(request, group_id):
-    file_list = request.POST.getlist('delete_files_list[]', '')
-    for each_file in file_list:
-      node_by_id = node_collection.one({'_id':ObjectId(each_file)})
-      if node_by_id:
-        del_status  = delete_node(node_id=node_by_id._id, deletion_type=1)
-        print '\nDeleted Node',del_status
-    return HttpResponse('success')
+    if_delete_asset = request.POST.get('delete_asset', '')
+    if_delete_asset_content = request.POST.get('delete_asset_content', '')
+    if if_delete_asset == "True":
+      asset_id = request.POST.get('asset_id', '')
+      asset_obj = node_collection.one({'_id':ObjectId(asset_id)})
+      if asset_obj:
+        trash_resource(request,ObjectId(group_id),asset_obj._id)
+      return HttpResponse('success')
+
+    if if_delete_asset_content:
+      file_list = request.POST.getlist('delete_files_list[]', '')
+      for each_file in file_list:
+        asset_cont_node = node_collection.one({'_id':ObjectId(each_file)})
+        if asset_cont_node:
+          trash_resource(request,ObjectId(group_id),ObjectId(asset_cont_node._id))
+          del_status  = delete_node(node_id=asset_cont_node._id, deletion_type=0)
+          # print '\nDeleted Node',del_status
+      return HttpResponse('success')
 
 
 def get_metadata_page(request, group_id):
