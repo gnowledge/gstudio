@@ -17,6 +17,8 @@ from gnowsys_ndf.settings import GSTUDIO_DEFAULT_LANGUAGE
 
 # gst_page_name, gst_page_id = GSystemType.get_gst_name_id(u'Page')
 rt_translation_of = Node.get_name_id_from_type('translation_of', 'RelationType', get_obj=True)
+supported_languages = ['Hindi', 'Telugu']
+
 
 def all_translations(request, group_id, node_id):
     '''
@@ -36,7 +38,8 @@ def all_translations(request, group_id, node_id):
                                 'nodes': all_translation_nodes,
                                 'node': node_obj,
                                 'source_node_id': node_id,
-                                'card_url_name': 'show_translation'
+                                'card_url_name': 'show_translation',
+                                'supported_languages': supported_languages
                                },
                               context_instance=RequestContext(request))
 
@@ -46,7 +49,7 @@ def show_translation(request, group_id, node_id, lang):
     for VIEW/READ: show translated provided node to provided LANG CODE
     lang could be either proper/full language-name/language-code
     '''
-    node = None
+    node = translated_node_id = None
     grel_node = triple_collection.one({
                             '_type': 'GRelation',
                             'subject': ObjectId(node_id),
