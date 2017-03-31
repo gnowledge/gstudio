@@ -153,9 +153,9 @@ class Command(BaseCommand):
                 call_group_export(group_node, nodes_falling_under_grp, num_of_processes=multiprocessing.cpu_count())
                 get_counter_ids(group_node._id)
                 # import ipdb; ipdb.set_trace()
-
-                print "\n Total GROUP_CONTRIBUTORS: ", len(GROUP_CONTRIBUTORS)
-                create_users_dump(group_dump_path, GROUP_CONTRIBUTORS)
+                if RESTORE_USER_DATA:
+                    print "\n Total GROUP_CONTRIBUTORS: ", len(GROUP_CONTRIBUTORS)
+                    create_users_dump(group_dump_path, GROUP_CONTRIBUTORS)
                 global log_file
                 print "*"*70
                 print "\n Export will be found at: ", DATA_EXPORT_PATH
@@ -251,10 +251,11 @@ def build_rcs(node, collection_name):
                 node.save(triple_node=triple_node_RT_AT, triple_id=triple_node_RT_AT._id)
             else:
                 node.save()
-                
-                print "\n NC: ", len(node.contributors)
-                if "contributors" in node:
-                    GROUP_CONTRIBUTORS.extend(node.contributors)
+                global RESTORE_USER_DATA
+                if RESTORE_USER_DATA:
+                    print "\n NC: ", len(node.contributors)
+                    if "contributors" in node:
+                        GROUP_CONTRIBUTORS.extend(node.contributors)
 
             log_file.write("\n RCS Built for " + str(node._id) )
             copy_rcs(node)
