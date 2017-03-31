@@ -5,8 +5,11 @@
 {% if activity_node and not editor_view %}
     <div class="activity-detail-page">
         <div class="row">
-            <div class="small-8 columns">
+            <div class="small-6 columns">
                 <h4 class="page-name">{{activity_node.name}}</h4>
+            </div>
+            <div class="small-2 columns">
+                <a href="{% url 'all_translations' group_id activity_node.pk %}">Translate</a>
             </div>
             <div class="small-2 columns">
                 <a href="{% url 'edit_course_page' group_id activity_node.pk %}">Edit</a>
