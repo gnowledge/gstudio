@@ -88,7 +88,7 @@
   </div>
   </div>
     <button type="button" class="right blue-white-button save-metadata">Save Changes</button>
-    <button type="button" class="right orange-button cancel-metadata">Cancel</button>
+    <button type="button" class="right blue-white-button cancel-metadata">Cancel</button>
 <script type="text/javascript">
   $( ".save-metadata" ).click(function(event) {
       source_val = $("#source").val();
@@ -125,4 +125,8 @@
 
 
 });
+
+  $( ".cancel-metadata" ).click(function(event) {
+    $('#addAsset').foundation('reveal', 'close');     
+  });
 </script>
