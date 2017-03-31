@@ -4,72 +4,28 @@
 <div class="row">
   <div class="medium 12 columns">
     <div class="left small-12 medium-6 columns">
+                <label>File name: <b> {{node.name}} </b>
+                    
+                    <!--<input type="text" placeholder="" name="resource_name" />-->
+                </label>
       <div class="preview_asset"> 
          {% if title == "asset_content_detail" %}
+
           {% include "ndf/resource_view.html" with node=node %}
           {% endif %}
       </div>
     </div>
 
   <div class="right small-12 medium-6 columns">
-      <h6><u>Asset Content Preview </u>&nbsp; ></b>
-            </h6>
-                <label>Resource name: <b> {{node.name}} </b>
-                    
-                    <!--<input type="text" placeholder="" name="resource_name" />-->
-                </label>
           {% if asset_obj.created_by == request.user.id or is_gstaff %}
-
-            {% if 'video' in node.if_file.mime_type or 'audio' in node.if_file.mime_type %}
-            <div class="video-related">
-                <label><u>Upload Transcript</u></label>
-                <div class="transcript_files">
-                   <form class="dropzone" id ="doctranscript" enctype="multipart/form-data" method="post" action="{% url 'add_assetcontent' group_id %}" > 
-                    <input class="trans-sub" type="file" placeholder="" id="doctranscriptfile" name="transcript_file" />
-                    <!-- <a class="right orange-button  save-transcript">Save Asset</a> -->
-                    <button type="button" class="right orange-button save-transcript" style="display: none;" >Add Transcript </button>
-                
-                </form>
-
-              </div>
-            {% endif %}
-
-            {% if 'video' in node.if_file.mime_type %}
-                <div class="subtitle_files">
-                  <label><u>Upload Subtitle</u></label>
-                    <form class="dropzone" id ="docsubtitle" enctype="multipart/form-data" method="post" action="{% url 'add_assetcontent' group_id %}" >
-                        <input class="trans-sub" type="file" id="docsubtitlefile" placeholder="" name="doc_f" />
-                        <br>
-                    </form>
-                </div>
-
-                          <select  style="display: none;" class="select-subtitle-langauge" name="lan" id="sub_languageid" tabindex=3 >
-                            <option value="">--- Select Language ---</option>
-                            {% get_language_info_list for LANGUAGES as languages %}
-                            {% for language in languages %}
-                            <option data-sub-lang="{{ language.name }}" data-sub-code="{{ language.code }}">
-                              {{ language.name }}
-                            </option>
-                            {% endfor %}
-                          </select>
-                    <div class="row">
-                    <button type="button" class="right orange-button-subtitle save-subtitle" style="display: none;" onclick="save_subtitle()">Add Subtitle</button></div>
-                   <!-- <input type="asset-save-button" id="" class="orange-button" onclick="save_asset_cont_data()" value="Save"/>-->
-                </div>
-                
-                
-                
-              {%  endif %}
+                <span data-dropdown="assetcontent-settings-drop" aria-controls="assetcontent-settings-drop" aria-expanded="false" class="orange-button">
+                    Add File
+                </span>
+                <ul id="assetcontent-settings-drop" class="f-dropdown" data-dropdown-content aria-hidden="true" tabindex="-1">
+                <li><a onclick="load_file_upload_modal(1)">Add Alternate File</a> </li>
+                <li><a onclick="load_file_upload_modal(2)">Add Transcript</a></li>
+                <li><a onclick="load_file_upload_modal(3)">Add Subtitle</a></li>
             {%  endif %}
-            {% get_relation_node node.pk  'has_alt_content' as alt_lang_rel_node %}
-                  {% if alt_lang_rel_node %}
-                      Alternate Files : 
-                    {% for each in  alt_lang_rel_node %} 
-                      <a href="{% url 'assetcontent_detail' group_id asset_obj.pk each.file_id %}" >
-                          {{each.file_name}} &nbsp; &nbsp;
-                      </a>
-                    {% endfor  %} 
-                  {% endif %}
             </div>
         </div>
             
@@ -88,67 +44,6 @@
           {% get_gstudio_alt_file_formats  'audio' as format_types %}
         {% endif %}
   
-  {% if 'audio' in node.if_file.mime_type or 'video' in node.if_file.mime_type or 'image' in node.if_file.mime_type %}
-        <div class="alternate_files">
-          <label><u>Upload Alternate File</u></label>
-            <form class="dropzone large-6 columns" id ="docalternate" enctype="multipart/form-data" method="post" action="{% url 'add_assetcontent' group_id %}" >
-                <input class="alternate-file" type="file" id="docalternatefile" placeholder="" name="doc_altf" />
-                <br>
-            </form>
-        </div>                          
-        <div class="row">
-          <button type="button" style="display: none" class="right orange-button-subtitle save-altfile" onclick="save_alternate_file()">Add alternate file</button>
-        </div>
-                   <!-- <input type="asset-save-button" id="" class="orange-button" onclick="save_asset_cont_data()" value="Save"/>-->
-        </div>
-         <select   class="select-language" name="lan" id="alt_types" style="display: none" >
-              <option value="">--- Select Alternate Type ---</option>
-              {% for each_alt_types in alt_opts %}
-
-              <option data-opts="{{each_alt_types}}" >
-                {{ each_alt_types }}
-              </option>
-              {% endfor %}
-          </select>
-
-          <div class="alt-langauge-area" style="display: none">   
-            <select   class="select-language alt-langauge alt-type" name="lan" id="alt_languageid" tabindex=3 >
-                              <option value="">--- Select Language ---</option>
-                              {% get_language_info_list for LANGUAGES as languages %}
-                              {% for language in languages %}
-                              <option data-sub-lang="{{ language.name }}" data-sub-code="{{ language.code }}">
-                                {{ language.name }}
-                              </option>
-                              {% endfor %}
-            </select>
-          </div>
-
-          <div class="alt-fr-type" style="display: none">
-            <select class="select-language alt-fr-type alt-type" name="lan" id="" tabindex=3 >
-                            <option value="">--- Select Format ---</option>
-                        {% for each_fr_type in format_types %}
-
-                            <option data-opts = "{{each_fr_type}}">
-                              {{ each_fr_type }}
-                            </option>
-                            {% endfor %}
-            </select>
-          </div>
-
-          <div class="alt-size-area" style="display: none">
-            <select class="select-language alt-size-type alt-type" name="lan" id="" tabindex=3 >
-                            <option value="">--- Select sizes ---</option>
-                        {% for each_fr_type in size_types %}
-
-                            <option data-opts = "{{each_fr_type}}">
-                              {{ each_fr_type }}
-                            </option>
-                            {% endfor %}
-            </select>
-          </div>
-
-  {% endif %}
-
 
      <div class="row">
 
@@ -158,23 +53,164 @@
         {{each.name}}  
       </div>
        <div class="large-6 columns" >
-        <button type="button" data-sub-id = "{{each.pk}}" class="right orange-button-subtitle delete-subtitle" onclick="delete_rel_files('{{each.pk}}','has_subtitle')">delete subtitle</button> <br>
+        <button type="button" data-sub-id = "{{each.pk}}" class="right orange-button-subtitle delete-subtitle" onclick="delete_rel_files('{{each.pk}}','has_subtitle')">Delete subtitle</button> <br>
          
        </div>
      {% endfor %}
      </div>
     {% get_relation_value node.pk 'has_transcript' as grel_trans %}
     {% if grel_trans.grel_node.pk %}
-      {{grel_trans.grel_node.name}} <button type="button"  class="right orange-button-subtitle delete-transcript" onclick="delete_rel_files('{{grel_trans.grel_node.pk}}','has_transcript')" >delete transcript</button></div> <br>
+      {{grel_trans.grel_node.name}} <button type="button"  class="right orange-button-subtitle delete-transcript" onclick="delete_rel_files('{{grel_trans.grel_node.pk}}','has_transcript')" >Delete transcript</button></div> <br>
     {% endif %}
     
+            {% get_relation_node node.pk  'has_alt_content' as alt_lang_rel_node %}
+              {% if alt_lang_rel_node %}
+                  Alternate Files : 
+                {% for each in  alt_lang_rel_node %} 
+                  <a href="{% url 'assetcontent_detail' group_id asset_obj.pk each.file_id %}" >
+                      {{each.file_name}} &nbsp; &nbsp;
+                  </a>
+                {% endfor  %} 
+              {% endif %}
+
+  <div id="addSupportingFile" class="reveal-modal medium radius" data-reveal data-alert>
+    <p id="addSupportingFileLabel"></p>
+    <div class="file-upload-div-modal">
+        {% if 'video' in node.if_file.mime_type or 'audio' in node.if_file.mime_type %}
+          <div class="video-related transcript-upload hide">
+              <label><u>Upload Transcript</u></label>
+              <div class="transcript_files">
+                <form class="dropzone" id ="doctranscript" enctype="multipart/form-data" method="post" action="{% url 'add_assetcontent' group_id %}" > 
+                    <input class="trans-sub" type="file" placeholder="" id="doctranscriptfile" name="transcript_file" />
+                    <!-- <a class="right orange-button  save-transcript">Save Asset</a> -->
+                    <button type="button" class="right orange-button save-transcript" style="display: none;" >Upload </button>
+                </form>
+              </div>
+          </div>
+        {% endif %}
+
+        {% if 'video' in node.if_file.mime_type %}
+            <div class="subtitle-upload hide">
+              
+              <div class="subtitle_files ">
+                <label><u>Upload Subtitle</u></label>
+                  <form class="dropzone" id ="docsubtitle" enctype="multipart/form-data" method="post" action="{% url 'add_assetcontent' group_id %}" >
+                      <input class="trans-sub" type="file" id="docsubtitlefile" placeholder="" name="doc_f" />
+                      <br>
+                  </form>
+              </div>
+
+              <select  style="display: none;" class="select-subtitle-langauge" name="lan" id="sub_languageid" tabindex=3 >
+                <option value="">--- Select Language ---</option>
+                {% get_language_info_list for LANGUAGES as languages %}
+                {% for language in languages %}
+                <option data-sub-lang="{{ language.name }}" data-sub-code="{{ language.code }}">
+                  {{ language.name }}
+                </option>
+                {% endfor %}
+              </select>
+              <div class="row">
+                <button type="button" class="right orange-button-subtitle save-subtitle" style="display: none;" onclick="save_subtitle()">Upload</button></div>
+              </div>
+        {%  endif %}
+
+
+        {% if 'audio' in node.if_file.mime_type or 'video' in node.if_file.mime_type or 'image' in node.if_file.mime_type %}
+        <div class="alt-file-upload hide">
+               <select   class="select-language" name="lan" id="alt_types" >
+                    <option value="">--- Select Alternate Type ---</option>
+                    {% for each_alt_types in alt_opts %}
+
+                    <option data-opts="{{each_alt_types}}" >
+                      {{ each_alt_types }}
+                    </option>
+                    {% endfor %}
+                </select>
+
+                <div class="alt-fr-type" style="display: none">
+                  <select class="select-language alt-fr-type alt-type" name="lan" id="" tabindex=3 >
+                                  <option value="">--- Select Format ---</option>
+                              {% for each_fr_type in format_types %}
+
+                                  <option data-opts = "{{each_fr_type}}">
+                                    {{ each_fr_type }}
+                                  </option>
+                                  {% endfor %}
+                  </select>
+                </div>
+
+                <div class="alt-langauge-area" style="display: none">   
+                  <select   class="select-language alt-langauge alt-type" name="lan" id="alt_languageid" tabindex=3 >
+                                    <option value="">--- Select Language ---</option>
+                                    {% get_language_info_list for LANGUAGES as languages %}
+                                    {% for language in languages %}
+                                    <option data-sub-lang="{{ language.name }}" data-sub-code="{{ language.code }}">
+                                      {{ language.name }}
+                                    </option>
+                                    {% endfor %}
+                  </select>
+                </div>
+
+
+               <select   class="select-language" name="lan" id="alt_types" style="display: none" >
+                    <option value="">--- Select Alternate Type ---</option>
+                    {% for each_alt_types in alt_opts %}
+
+                    <option data-opts="{{each_alt_types}}" >
+                      {{ each_alt_types }}
+                    </option>
+                    {% endfor %}
+                </select>
+
+                <div class="alt-size-area" style="display: none">
+                  <select class="select-language alt-size-type alt-type" name="lan" id="" tabindex=3 >
+                                  <option value="">--- Select sizes ---</option>
+                              {% for each_fr_type in size_types %}
+
+                                  <option data-opts = "{{each_fr_type}}">
+                                    {{ each_fr_type }}
+                                  </option>
+                                  {% endfor %}
+                  </select>
+                </div>
+
+              <div class="alternate_files hide">
+                <label><u>Upload Alternate File</u></label>
+                  <form class="dropzone large-6 columns" id ="docalternate" enctype="multipart/form-data" method="post" action="{% url 'add_assetcontent' group_id %}" >
+                      <input class="alternate-file" type="file" id="docalternatefile" placeholder="" name="doc_altf" />
+                      <br>
+                  </form>
+              </div>                          
+              <div class="row">
+                <button type="button" style="display: none" class="right orange-button-subtitle save-altfile" onclick="save_alternate_file()">Upload</button>
+              </div>
+                         <!-- <input type="asset-save-button" id="" class="orange-button" onclick="save_asset_cont_data()" value="Save"/>-->
+
+          </div>
+        {% endif %}
+    </div>
+    <!-- <a class="close-reveal-modal">&#215;</a> -->
+
+  </div>
      
 <script type="text/javascript">
   
-$("#doctranscript").change(function(){
+  function load_file_upload_modal(choice){
+    if (choice == 1){
+      $(".alt-file-upload").removeClass("hide");
+    }
+    else if(choice == 2){
+      $(".transcript-upload").removeClass("hide");
+    }
+    else if (choice == 3){
+      $(".subtitle-upload").removeClass("hide");
+    }
+    $('#addSupportingFile').foundation('reveal', 'open');
+  }
+$("#doctranscriptfile").change(function(){
         $(".save-transcript").css('display','block')
     });
-$("#docsubtitle").change(function(){
+$("#docsubtitlefile").change(function(){
         $(".select-subtitle-langauge").css('display','block')
     });
 
@@ -183,15 +219,21 @@ $(".select-subtitle-langauge").change(function(){
     });
 
 $("#docalternatefile").change(function(){
-        $("#alt_types").css('display','block')
+        $(".save-altfile").css('display','block')
     });
 
 $(".alt-type").change(function(){
-    
-        $(".save-altfile").css('display','block')
-  });
+    $(".alternate_files").removeClass("hide")
+    $("#docalternatefile").val('')
+    $(".save-altfile").css('display','none')
+
+        // $("#alt_types").css('display','block')
+});
 
 $("#alt_types").change(function(){
+    $("#docalternatefile").val('')
+    $(".save-altfile").css('display','none')
+
     sel_alt_types =  $('#alt_types').find(':selected').attr('data-opts');
     if(sel_alt_types == "Language"){
         $(".alt-langauge-area").css('display','block')
