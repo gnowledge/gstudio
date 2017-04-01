@@ -1,5 +1,72 @@
 {% load i18n %}
 {% load ndf_tags %}
+{% block head %}
+<style type="text/css">
+    .right-btn, .left-btn{
+        /*float: left;*/
+        /*margin-left: 1rem;*/
+        width: 40%;
+        font-size: 0.85em !important;
+        margin-top: 0.1rem !important;
+        text-align: center;
+    }
+    .tag-rating-div{
+        margin-left: 0.6rem !important;
+        margin-top: 0.3rem !important;
+    }
+    /*  
+    .right-btn{
+        float: right;
+        margin-right: 1rem;
+        width: 8rem;
+        font-size: 0.75rem !important
+    }
+    */
+    .rating-lbl{
+        display: inline-block;
+        font-size: 1rem !important;
+        /*font-style: italic;*/
+        /*margin-left: 3rem;*/
+
+    }
+    .rating_template{
+        display: inline-table;
+    }
+    .mod-btn{
+        width: 80% !important;
+        font-size: 0.75rem !important;
+    }
+    .btn-row{
+        /*margin-left: 1rem !important;*/
+        text-align: center;
+        margin-bottom: -1rem !important;
+    }
+    .lbl_tag{
+        display: inline-block;
+        font-size: 0.80rem !important;
+    }
+    .lbl_field{
+        width: 20%;
+        color: #194d6f;
+        /*font-weight: bold;*/
+        margin-top: 1rem;
+        font-size: 1rem !important;
+    }
+    .label > a{
+        color: white !important;
+    }
+
+    .graph_btn{
+        margin-left: 3rem;
+    }
+
+    #group_drawer{
+        height: 400px;
+        overflow-y: auto;
+        margin-left: 2em;
+    }
+</style>
+{% endblock %}
 
 <!-- Handles Activity page detail and listing -->
 {% if activity_node and not editor_view %}
@@ -19,7 +86,7 @@
                 {% endif %}   
             </div>
             
-                <a href="{% url 'all_translations' group_id activity_node.pk %}">Translate</a>
+                <a href="{% url 'all_translations' group_id activity_node.pk %}">Alternate Language</a>
             </div>
             <div class="small-2 columns">
                 <a href="{% url 'edit_course_page' group_id activity_node.pk %}">Edit</a>

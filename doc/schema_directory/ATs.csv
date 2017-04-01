@@ -88,4 +88,4 @@ quizitempost_user_checked_ans,QuizItemPost User Checked Answer,list,[],"[""QuizI
 discussion_enable,Discussion Enable,bool,[],"[""Page"", ""File"",""E-Book"",""QuizItemEvent"", ""Jsmol"", ""TurtleBlocks"", ""PoliceSquad"", ""OpenStoryTool"", ""BioMechanics""]",TRUE,TRUE,[],[],,[],[],[]
 is_bigbluebutton,Online Meeting,bool,[],"[""Event""]",TRUE,TRUE,[],[],,[],[],[]
 open_event,Open Event (All group members can join the event),bool,[],"[""Event""]",TRUE,TRUE,[],[],,[],[],[]
-player_discussion_enable,Player Discussion Enable,bool,[],"[""Page"", ""File"",""E-Book"",""QuizItemEvent"", ""Jsmol"", ""TurtleBlocks"", ""PoliceSquad"", ""OpenStoryTool"", ""BioMechanics""]",TRUE,TRUE,[],[],,[],[],[]
+player_discussion_enable,Player Discussion Enable,bool,[],"[""Page"", ""File"",""E-Book"",""QuizItemEvent"", ""Jsmol"", ""TurtleBlocks"", ""PoliceSquad"", ""OpenStoryTool"", ""BioMechanics"",""Asset""]",TRUE,TRUE,[],[],,[],[],[]
