@@ -88,6 +88,7 @@
                             <div class="asset_text">
                                 <div class="asset_title" title="{{each.name}}">{{each.name|truncatechars:25}}</div>
                                     {% if user.is_authenticated  and not group_object.edit_policy == "NON_EDITABLE"  or gstaff_access %}
+                                    </a>
                                     <input type="checkbox" class="activitynode" name="activitynode" value="{{each.pk}}" style="margin:0; float:right;" class="asset_content_checkbox">
                                     {% endif %}
                                 <div class="asset_desc">{{each.content|safe|striptags|truncatechars:25}}</div>
