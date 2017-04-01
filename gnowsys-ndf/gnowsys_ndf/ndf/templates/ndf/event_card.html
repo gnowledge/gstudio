@@ -12,8 +12,8 @@
 {% endif %}
 
           <div class="group_tile">
-              <span class="group-name">{{resource.name}}</span>
-                <p class="group_desc">{{resource.content|safe|striptags}}</p>
+              <span class="group-name">{% firstof resource.altnames resource.name  %}</span>
+                <p class="group_desc" title="{{resource.content}}">{{resource.content|safe|striptags|truncatechars:150}}</p>
           </div>
     </a>
 </div>
