@@ -200,19 +200,17 @@
         <input type="hidden" name="context_name" value="{{title}}">
         <input type="hidden" class ="asset_obj_val" name="asset_obj_name" data-asset-obj-val="">
 
+        <div class = "row">
+            <button type="button" class="orange-button delete-asset right">Delete Asset</button>
         {% if asset_content_list %}
+            
         <div class="row">
             <button type="button" class="orange-button delete-asset-content right" title="Click on the checkbox on the files below to Delete">Delete Files</button>
             <button type="button" class="orange-button edit-metadata right">Edit Metadata</button>
         </div>
         {% endif %}
-        {% get_relation_node asset_obj.pk  'has_assetcontent' as asset_cont_grel %}
-        {% if not asset_cont_grel %}
-        <div class="row">
-            <button type="button" class="orange-button delete-asset right">Delete Asset</button>
-        </div>
-        {% endif  %}
         {% endif %}
+        </div>
 
 
         <div class="row">
@@ -312,7 +310,8 @@
 
     });
     $(".delete-asset").click(function(){
-        
+        if (confirm("Do you want to delete selected files?.") == true){
+
         $.ajax({
                   type: "POST",
                   data:{
@@ -328,6 +327,7 @@
                         location.href = "{% url 'asset_list' group_id  %}";
                 }
             });
+        }
 
     });
 
