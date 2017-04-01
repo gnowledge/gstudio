@@ -27,7 +27,6 @@
         {% endif %}
         <div class="small-9 columns">
             {% if not edit and asset_obj.name %}
-                {% if asset_obj.created_by == request.user.id or is_gstaff %}
                 <p class="left">&nbsp;&nbsp;{{asset_obj.name}}</p>
 
 
@@ -42,13 +41,13 @@
 
                <i><p style="color: gray">{{asset_obj.content|safe|striptags}} </p></i>      
 
-                {% endif %}
             {% else %}
                 <h3 class="left overlay-title">&nbsp;{% if not asset_obj %} Add a new {% else %} Edit {% endif %} asset</h3>
                 <button type="button" class="right blue-white-button save-asset" data-asset_id='{{asset_obj.pk}}'>Save Asset</button>
             {% endif %}
         </div>
         {% if not edit and asset_obj %}
+             {% if asset_obj.created_by == request.user.id or is_gstaff %}
             <div class="small-3 columns">
                 <span data-dropdown="asset-settings-drop" aria-controls="asset-settings-drop" aria-expanded="false" class="orange-button right">
                     Options
@@ -65,6 +64,7 @@
                     {% endif  %}
                 </li>
             </div>
+            {% endif %}
         {% endif%}
     </div>
         <div class="row">
@@ -221,12 +221,15 @@
     <div class="row asset-comments-section">
       <div class="columns small-10 " id="view-discussion">
             <!-- discussion content area -->
+            {% if user.is_authenticated %}
             {% get_thread_node asset_obj.pk as thread_node %}
             {% if thread_node and "QuizItemEvent" not in asset_obj.member_of_names_list %}
                 {% get_disc_replies thread_node group_id global_disc_all_replies as all_replies %}
                 {% get_node thread_node as thread_node_obj %}
                 {% include 'ndf/in-line-texteditor.html' with node=thread_node_obj var_name="content_org" allow_to_comment=True ckeditor_toolbar="BasicToolbar" %}
             {% endif %}
+            {% endif %}
+
 
             <!-- END of discussion content area -->
       </div>

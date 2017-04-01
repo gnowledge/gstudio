@@ -104,6 +104,7 @@
                 <a href="{% url 'all_translations' group_id activity_node.pk %}">Alternate Language</a>
             </div>
 
+            {% if activity_node.created_by == request.user.id or is_gstaff %}
             <div class="small-2 columns">
                 <span data-dropdown="activity-page-settings-drop" aria-controls="activity-page-settings-drop" aria-expanded="false" class="orange-button right">
                     Options
@@ -115,6 +116,7 @@
                 <li><a href="{% url 'edit_course_page' group_id activity_node.pk %}">Edit</a></li>
                 <li><a href="{% url 'course_pages' group_id %}" >Back to Activities</a></li>
             </div>
+            {% endif %}
         </div>
         <div class="row activity-detail-content">
             {% include "ndf/node_ajax_content.html" with node=activity_node %}

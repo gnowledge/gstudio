@@ -17,7 +17,7 @@
     </div>
 
   <div class="right small-12 medium-6 columns">
-          {% if asset_obj.created_by == request.user.id or is_gstaff %}
+          {% if node.created_by == request.user.id or is_gstaff %}
                 <span data-dropdown="assetcontent-settings-drop" aria-controls="assetcontent-settings-drop" aria-expanded="false" class="orange-button">
                     Link/Add Related File
                 </span>
@@ -57,14 +57,18 @@
         {{each.name}}  
       </div>
        <div class="large-6 columns" >
+        {% if node.created_by == request.user.id or is_gstaff %}
         <button type="button" data-sub-id = "{{each.pk}}" class="right orange-button-subtitle delete-subtitle" onclick="delete_rel_files('{{each.pk}}','has_subtitle')">Delete subtitle</button> <br>
+        {% endif %}
          
        </div>
      {% endfor %}
      </div>
     {% get_relation_value node.pk 'has_transcript' as grel_trans %}
     {% if grel_trans.grel_node.pk %}
+      {% if node.created_by == request.user.id or is_gstaff %}
       {{grel_trans.grel_node.name}} <button type="button"  class="right orange-button-subtitle delete-transcript" onclick="delete_rel_files('{{grel_trans.grel_node.pk}}','has_transcript')" >Delete transcript</button></div> <br>
+      {% endif %}
     {% endif %}
     
             {% get_relation_node node.pk  'has_alt_content' as alt_lang_rel_node %}
