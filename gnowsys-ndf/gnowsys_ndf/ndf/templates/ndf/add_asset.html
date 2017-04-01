@@ -12,6 +12,7 @@
         margin-top: 0.1rem !important;
         text-align: center;
     }
+
 </style>
 {% endblock %}
 
@@ -23,9 +24,7 @@
         {% endif %}
         <div class="small-9 columns">
             {% if not edit and asset_obj.name %}
-                <p class="left">&nbsp;&nbsp;{{asset_obj.name}}</p>
-
-
+                <p class="left">{{asset_obj.name}}</p>
                 {% if asset_obj.tags %}
                     {% for tag in asset_obj.tags %}
                             <small><label class="tag-ele">
@@ -34,6 +33,7 @@
                 {% else %}
                     <i><small><label>{% trans "No tags defined yet!" %}</label></small></i>
                 {% endif %}
+                
 
                <i><p style="color: gray">{{asset_obj.content|safe|striptags}} </p></i>      
 
@@ -45,8 +45,8 @@
         {% if not edit and asset_obj %}
              {% if asset_obj.created_by == request.user.id or is_gstaff %}
             <div class="small-3 columns">
-                <span data-dropdown="asset-settings-drop" aria-controls="asset-settings-drop" aria-expanded="false" class="orange-button right">
-                    Options
+                <span data-dropdown="asset-settings-drop" aria-controls="asset-settings-drop" aria-expanded="false" class="large orange-button right">
+                    Settings
                 </span>
                 <ul id="asset-settings-drop" class="f-dropdown" data-dropdown-content aria-hidden="true" tabindex="-1">
                 <li> <a class="createAsset" data-asset_id='{{asset_obj.pk}}'>Edit</a></li>
@@ -63,6 +63,7 @@
             {% endif %}
         {% endif%}
     </div>
+    <hr/>
         <div class="row">
             <div class="small-12 medium-6 large-6 columns">
                 <label>
@@ -100,35 +101,12 @@
             </div>
         </div>
     
-    {% comment %}
-        <div class="row">
-            <div class="small-12 medium-6 large-6 columns">
-
-            <div class="row">
-                <div class="small-12 medium-6 large-6 columns">
-                    <label>Learning objectives met by this asset
-                        <Select name="asset_objectives" id = "asset_objectivesid" placeholder="Select topics" require>
-                            <option value="">--- Select Topic ---</option>
-                            {% for each_topic in topic_nodes %}
-                            <option value="{{each_topic.pk}}">
-                                {{each_topic.name}}
-                            </option>
-                            {% endfor %}
-                        </Select>
-                    </label>
-                </div>
-            </div>
-        </div>
-    {% endcomment %}
 
 
     <div class="asset-content-area"{% if not asset_obj %} style="display:none"{% endif %}>
-       <!-- <h3>Add esources for this asset</h3>-->
         {% if not edit %}
         <div class="row">
-           <!-- &nbsp;&nbsp;&nbsp;Add asset content-->
             {% if asset_obj.created_by == request.user.id or is_gstaff %}
-
         </div>
 
         <div class="name-desc-asset-cont-area hide">
@@ -136,18 +114,18 @@
             <div class="row">
                 <div class="small-8 medium-6 large-6 columns">
                     <label>Enter File Name *
-                        <input type="text" placeholder="Enter File name" class="required" id = "asset_content_name" name="" />
+                        <input type="text" placeholder="Enter File name" class="required" id = "asset_content_name" name="" style="padding-bottom: 10px;margin-bottom: 31px;"/>
                     </label>
-                    <form class="dropzone" id ="docPost" enctype="multipart/form-data" method="post" action="{% url 'add_assetcontent' group_id %}" >
+                    <form class="dropzone" id ="docPost" enctype="multipart/form-data" method="post" action="{% url 'add_assetcontent' group_id %}" style="margin-left: -13px;width: 429px;" >
                         <input type="file" id="docFile" class="asset_content_upload" placeholder="" name=""/>
                     </form>
 
                 </div>
                 <div class="small-8 medium-6 large-6 columns">
                 <label>Enter File Description *<br/>
-                    <textarea rows="4" cols="2" class="small-12 columns" placeholder="Enter File Description" id="asset_content_desc"></textarea>
+                    <textarea rows="6" cols="2" class="small-12 columns" placeholder="Enter File Description" id="asset_content_desc"></textarea>
                 </label>
-                    <button type="button" class="orange-button right" id="upload_asset" onclick="save_form()">Upload</button>
+                    <button type="button" class="orange-button right" id="upload_asset" onclick="save_form()" style="margin-right: -3px;">Upload</button>
 
                 </div>
             </div>
@@ -172,6 +150,8 @@
         {% endif %}
         </div>
 
+        <hr/>
+
 
         <div class="row">
         {% for each in asset_content_list.grel_node %}
@@ -191,13 +171,11 @@
                     </div>
                     <div class="asset_text">
                         <div class="asset_title" style="color: #2e3f51">{{each.name|truncatechars:35}}
-
-                        </a>
                         {% if user.is_authenticated  and not group_object.edit_policy == "NON_EDITABLE"  or gstaff_access %}
-                        <input type="checkbox" class="filenode" name="filenode" value="{{each.pk}}" style="margin:0; float:right;" class="asset_content_checkbox">
+                        <input type="checkbox" class="filenode" name="filenode" value="{{each.pk}}" style="margin-top:6px; margin-right: 2px; float:right;" class="asset_content_checkbox">
                         {% endif %}
-                        </div>
                         <div class="asset_desc">{{each.content|truncatechars:35}}</div>
+                        </div>
                     </div>
                 </div>
             </div>

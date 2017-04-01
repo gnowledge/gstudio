@@ -48,7 +48,7 @@ h5{
 
 
 .overlay-head{
-    background-color: #f2fbff;
+    background-color: #fff;
     height: 60px;
     margin-bottom:20px;
 }
@@ -1059,6 +1059,9 @@ input[type="file"] {
     border: 1px solid #ccc;
     width: 95%;
 }
+
+
+
 
 input[type="button"] {
     -webkit-appearance: button;
@@ -2898,9 +2901,21 @@ ul.jqtree-tree .jqtree-toggler {
     margin:50px;
 }
 
-.tag-ele{
-    display: inline-block;
-    font-size: 0.80rem !important;
-    background-color: gold !important;
 
+.tag-ele{
+    font-weight: normal;
+    text-align: center;
+    text-decoration: none;
+    line-height: 1;
+    white-space: nowrap;
+    display: inline-block;
+    position: relative;
+    margin-bottom: inherit;
+    padding: 0.25rem 0.5rem 0.25rem;
+    font-size: 0.6875rem;
+    background-color: #ffffff;
+    color: #ce7869;
+    border: 1px solid;
+    border-radius: 6px;
 }
+
