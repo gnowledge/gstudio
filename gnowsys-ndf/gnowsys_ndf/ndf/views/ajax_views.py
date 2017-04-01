@@ -6834,8 +6834,8 @@ def delete_asset(request, group_id):
         asset_cont_node = node_collection.one({'_id':ObjectId(each_file)})
         if asset_cont_node:
           trash_resource(request,ObjectId(group_id),ObjectId(asset_cont_node._id))
-          del_status  = delete_node(node_id=asset_cont_node._id, deletion_type=0)
-          # print '\nDeleted Node',del_status
+          del_rel = delete_grelation(subject_id=ObjectId(asset_cont_node._id),deletion_type=0)
+          print '\nDeleted Node',del_rel
       return HttpResponse('success')
 
 
@@ -6849,6 +6849,33 @@ def get_metadata_page(request, group_id):
             },
             context_instance=RequestContext(request))
 
+def get_interaction_widget(request, group_id):
+  node_id = request.POST.get('node_id', None)
+  node_obj = node_collection.one({'_id':ObjectId(node_id)})
+  return render_to_response('ndf/widget_interaction.html',
+            {
+                'group_id': group_id, 'groupid': group_id,
+                'node_id':node_id,'node':node_obj
+            },
+            context_instance=RequestContext(request)) 
+
+def save_interactions(request, group_id):
+  node_id = request.POST.get('node_id', None)
+  node  = node_collection.one({"_id":ObjectId(node_id)})
+
+  thread_create_val = request.POST.get("thread_create",'')
+
+  # print "\n\n help_info_page  === ", help_info_page
+  player_discussion_enable_at = node_collection.one({"_type": "AttributeType", "name": "player_discussion_enable"})
+  if thread_create_val == "Yes":
+    create_gattribute(node._id, player_discussion_enable_at, True)
+
+    return_status = create_thread_for_node(request,group_id, node)
+  else:
+    create_gattribute(node._id, player_discussion_enable_at, False)
+  return HttpResponseRedirect(reverse('view_course_page', kwargs={'group_id':ObjectId(group_id),'page_id': ObjectId(node._id)}))
+  
+
 def save_metadata(request, group_id):
   node_id = request.POST.get('node_id', None)
   node  = node_collection.one({"_id":ObjectId(node_id)})
@@ -6856,16 +6883,18 @@ def save_metadata(request, group_id):
   copyright = request.POST.get("copyright_val", "")
   Based_url = request.POST.get("basedonurl_val", "")
   obj_list = request.POST.get("obj_list", "")
-  for k, v in json.loads(obj_list).iteritems():
-    attr_node = node_collection.one({'_type':'AttributeType','name':unicode(k)})
-    if v is not None and (not isinstance(v,list) and "select" not in v.lower()) or (isinstance(v,list) and "select" not in v[0].lower() ):
-      if attr_node:
-        create_gattribute(ObjectId(node_id), attr_node, v)
-    else:
-        ga_node = triple_collection.find_one({'_type': "GAttribute",
-             "subject": ObjectId(node_id), 'attribute_type': attr_node._id, 'status':"PUBLISHED"})
-        if ga_node:
-            d,dd = delete_gattribute(subject_id=None, deletion_type=1, **{'node_id': ga_node._id})
+
+  if obj_list :
+    for k, v in json.loads(obj_list).iteritems():
+      attr_node = node_collection.one({'_type':'AttributeType','name':unicode(k)})
+      if v is not None and (not isinstance(v,list) and "select" not in v.lower()) or (isinstance(v,list) and "select" not in v[0].lower() ):
+        if attr_node:
+          create_gattribute(ObjectId(node_id), attr_node, v)
+      else:
+          ga_node = triple_collection.find_one({'_type': "GAttribute",
+               "subject": ObjectId(node_id), 'attribute_type': attr_node._id, 'status':"PUBLISHED"})
+          if ga_node:
+              d,dd = delete_gattribute(subject_id=None, deletion_type=1, **{'node_id': ga_node._id})
   if source:
     source_attr = node_collection.one({'_type':'AttributeType','name':'source'})
     create_gattribute(ObjectId(node_id), source_attr, source)
@@ -6877,7 +6906,11 @@ def save_metadata(request, group_id):
   if Based_url:
     basedurl_attr = node_collection.one({'_type':'AttributeType','name':'basedonurl'})
     create_gattribute(ObjectId(node_id), basedurl_attr, Based_url)
-  return HttpResponse('success')
+  if "Page" in node.member_of_names_list:
+    return HttpResponseRedirect(reverse('view_course_page', kwargs={'group_id':ObjectId(group_id),'page_id': ObjectId(node._id)}))
+  else:
+    return HttpResponseRedirect(reverse('asset_detail', kwargs={'group_id':ObjectId(group_id),'asset_id': ObjectId(node._id)}))
+  # return HttpResponse('success')
 
 def export_to_epub(request, group_id, node_id):
     from gnowsys_ndf.ndf.views.export_to_epub import *
