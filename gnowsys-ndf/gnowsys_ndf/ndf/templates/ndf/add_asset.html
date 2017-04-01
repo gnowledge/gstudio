@@ -22,10 +22,10 @@
         {% if edit or not asset_obj.name %}
             <a class="right close-reveal-modal reveal-modal-overlay" aria-label="Close">&#215;</a>
         {% endif %}
-        <div class="small-9 columns">
+        <div class="small-10 columns">
             {% if not edit and asset_obj.name %}
                 <p class="left">{{asset_obj.name}}</p>
-                {% if asset_obj.tags %}
+                {% if asset_obj.tTags %}
                     {% for tag in asset_obj.tags %}
                             <small><label class="tag-ele">
                         <a href="{% url 'tag_info' group_id tag %}">{{tag}} </a></label></small>
@@ -39,7 +39,8 @@
 
             {% else %}
                 <h3 class="left overlay-title">&nbsp;{% if not asset_obj %} Add a new {% else %} Edit {% endif %} asset</h3>
-                <button type="button" class="right blue-white-button save-asset" data-asset_id='{{asset_obj.pk}}'>Save Asset</button>
+                <button type="button" class="blue-white-button save-asset right" data-asset_id='{{asset_obj.pk}}' style="margin-top: 9px;
+    margin-right: -133px;">Save Asset</button>
             {% endif %}
         </div>
         {% if not edit and asset_obj %}
@@ -65,7 +66,7 @@
     </div>
     <hr/>
         <div class="row">
-            <div class="small-12 medium-6 large-6 columns">
+            <div class="small-12 medium-10 large-10 columns">
                 <label>
                     {% if edit or not asset_obj %}
                        Asset name *
@@ -75,12 +76,15 @@
             </div>
         </div>
         <div class="row">
-            <div class="small-12 medium-12 large-12 columns">
+            <div class="small-12 medium-10 large-10 columns">
                     <label>
                         {% if edit or not asset_obj %}
                             Asset description *
                             </label>
-                            <textarea rows="4" cols="2" class="small-12 columns" placeholder="Enter Description" id="asset-descid" value=''>{% if asset_obj %} {{asset_obj.content|safe|striptags}}{% endif %}</textarea>
+                            <textarea rows="4" cols="2" class="small-12 columns" placeholder="Enter Description" id="asset-descid" value='' style="margin-left: 20px;width: 98%;">
+                            {% if asset_obj %} {{asset_obj.content|safe|striptags}}
+                            {% endif %}
+                            </textarea>
                             {% include 'ndf/widget_tags.html' with node=asset_obj %}
                             {% get_language_info_list for LANGUAGES as languages %}
                             <select class="asset-lang" name="lan" id="asset_lang" >

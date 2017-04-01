@@ -1216,6 +1216,11 @@ input[type="button"] {
     }
 }
 
+
+.save-asset{
+    margin-top: 9px;
+    margin-right: -133px;
+}
 .asset-save-button {
     color: $primary-orange;
     display: inline-block;
@@ -2919,3 +2924,8 @@ ul.jqtree-tree .jqtree-toggler {
     border-radius: 6px;
 }
 
+.asset-lang{
+    height: 50px;
+    margin-left: 20px;
+    width: 99%;
+}
