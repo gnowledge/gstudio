@@ -45,7 +45,8 @@
 
 
                 <input type="submit" class="orange-button" class="saveActivityPage" value="Save">
-                <a href="{% url 'course_pages' group_id %}" class="orange-button cancel-page-create">Cancel</a>
+
+                <a href="{{cancel_activity_url}}" class="orange-button cancel-page-create">Cancel</a>
             </div>
         </form>
     </div>
@@ -57,7 +58,7 @@
 <script type="text/javascript">
 
 
-    $(document).on('click','#course_page_form',function(event){
+    $(document).on('submit','#course_page_form',function(event){
         node_name_val = $(".node_name").val()
         if(!node_name_val){
             event.preventDefault()
