@@ -20,7 +20,7 @@
           </div>
         </div>
         <div class="thread-settings-div {% if not node.discussion_enable %} hide {% endif %}">
-            {% get_thread_node asset_obj.pk as thread_node %}
+            {% get_thread_node node as thread_node %}
             {% if thread_node %}
                 {% get_attribute_value thread_node.pk 'release_response' as resp_val %}
                 {% get_attribute_value thread_node.pk 'thread_interaction_type' as thr_int_type %}
@@ -74,104 +74,13 @@
             $("select#interaction_type_sel").removeAttr("disabled");
         })
 
-        var startEnrollDt = $("#thread_start_date");
-        var endEnrollDt = $("#thread_close_date");
-
-        currentDate = new Date();
-        var currentDay = currentDate.getDate();
-        var currentMonth = currentDate.getMonth();
-        var currentYear = currentDate.getFullYear();
-        lowerYearLimit = currentYear;
-        upperYearLimit = currentYear + 20;
-
-
-        $(".date_month_day_year").datepicker({
-            changeMonth: true,
-            changeYear: true,
-            dateFormat: 'dd/mm/yy',
-            yearRange: lowerYearLimit + ":" + upperYearLimit,
-            defaultDate: '0',
-
-            onClose: function(dateText, inst) {
-              $(this).val(dateText);
-
-              var month_year = $(this).val();
-              day = currentDay;
-              month = currentMonth;
-              year = currentYear;
-
-              if ($(this).attr('id') == "thread_start_date") {
-                if (month_year) {
-                  month_year = month_year.split("/");
-                  day = parseInt(month_year[0]);
-                  month = parseInt(month_year[1]);
-                  year = parseInt(month_year[2]);
-                }
-
-                if (endEnrollDt.val() != '') {
-                  var testStartDate = startEnrollDt.datepicker('getDate');
-                  var testEndDate = endEnrollDt.datepicker('getDate');
-
-                  if (testStartDate > testEndDate) {
-                    endEnrollDt.datepicker('setDate', testStartDate);
-                  }
-
-                  else {
-                    $(this).val(day+"/"+month+"/"+year);
-                    $(this).datepicker('setDate', new Date(year, (month-1), day));
-                  }
-                }
-
-                else {
-                  endEnrollDt.val(day+"/"+month+"/"+year);
-                  $(this).datepicker('setDate', new Date(year, (month-1), day));
-                }
-                $("#thread_close_date").datepicker('option', 'minDate', new Date(year, (month-1), day));
-              }
-
-              else if ($(this).attr('id') == "thread_close_date") {
-                if (month_year) {
-                  month_year = month_year.split("/");
-                  day = parseInt(month_year[0]);
-                  month = parseInt(month_year[1]);
-                  year = parseInt(month_year[2]);
-                }
-
-                if (startEnrollDt.val() != '') {
-                  var testStartDate = startEnrollDt.datepicker('getDate');
-                  var testEndDate = endEnrollDt.datepicker('getDate');
-
-                  if (testStartDate > testEndDate) {
-                    startEnrollDt.datepicker('setDate', testEndDate);
-                  }
-                  else {
-                    $(this).val(day+"/"+month+"/"+year);
-                    $(this).datepicker('setDate', new Date(year, (month-1), day));
-                  }
-                }
-
-                else {
-                  startEnrollDt.val(day+"/"+month+"/"+year);
-                  $(this).datepicker('setDate', new Date(year, (month-1), day));
-                }
-              }
-            },
-
-            beforeShow: function() {
-              var month_year = $(this).val();
-              day = currentDay;
-              month = currentMonth;
-              year = currentYear;
-
-              if (month_year) {
-                month_year = month_year.split("/");
-                day = parseInt(month_year[0]);
-                month = parseInt(month_year[1]);
-                year = parseInt(month_year[2]);
-              }
-              $(this).datepicker('option', 'defaultDate', new Date(year, (month-1), day));
-              $(this).datepicker('setDate', new Date(year, (month-1), day));
-            },
-        });
-
+        $(document).ready(function(){
+			{% if node %}							
+				$("input[name='thread_create'][value='Yes']").attr("checked","checked");
+				$("input[name='thread_create']").trigger("change");
+				// $("input[name='thread_create']").attr("disabled",true);
+			{% else %}
+				$("input[name='thread_create'][value='No']").attr("checked","checked");
+			{% endif %}
+	});
     </script>
