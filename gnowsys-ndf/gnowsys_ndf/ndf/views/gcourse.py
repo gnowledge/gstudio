@@ -3231,13 +3231,20 @@ def load_content_data(request, group_id):
 
 
 def delete_activity_page(request, group_id):
-    file_list = request.POST.getlist('delete_files_list[]', '')
-    for each_file in file_list:
-        asset_cont_node = node_collection.one({'_id':ObjectId(each_file)})
-        if asset_cont_node:
-            trash_resource(request,ObjectId(group_id),ObjectId(asset_cont_node._id))
-            del_status  = delete_node(node_id=asset_cont_node._id, deletion_type=0)
-            # print '\nDeleted Node',del_status
+    activity_id_list = request.POST.getlist('delete_files_list[]', '')
+    activity_id = request.POST.getlist('activity_id', '')
+    if activity_id_list:
+        for each_activity in activity_id_list:
+            activity_page_node = node_collection.one({'_id':ObjectId(each_activity)})
+            if activity_page_node:
+                trash_resource(request,ObjectId(group_id),ObjectId(activity_page_node._id))
+                del_status  = delete_node(node_id=activity_page_node._id, deletion_type=0)
+                return HttpResponse('success')
+    if activity_id:
+        activity_page_node = node_collection.one({'_id':ObjectId(each_activity)})
+        if activity_page_node:
+            trash_resource(request,ObjectId(group_id),ObjectId(activity_page_node._id))
+            del_status  = delete_node(node_id=activity_page_node._id, deletion_type=0)
             return HttpResponse('success')
     return HttpResponse('fail')
 

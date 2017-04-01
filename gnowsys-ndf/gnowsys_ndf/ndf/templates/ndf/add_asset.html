@@ -11,60 +11,9 @@
         margin-top: 0.1rem !important;
         text-align: center;
     }
-    .tag-rating-div{
-        margin-left: 0.6rem !important;
-        margin-top: 0.3rem !important;
-    }
-    /*  
-    .right-btn{
-        float: right;
-        margin-right: 1rem;
-        width: 8rem;
-        font-size: 0.75rem !important
-    }
-    */
-    .rating-lbl{
-        display: inline-block;
-        font-size: 1rem !important;
-        /*font-style: italic;*/
-        /*margin-left: 3rem;*/
-
-    }
-    .rating_template{
-        display: inline-table;
-    }
-    .mod-btn{
-        width: 80% !important;
-        font-size: 0.75rem !important;
-    }
-    .btn-row{
-        /*margin-left: 1rem !important;*/
-        text-align: center;
-        margin-bottom: -1rem !important;
-    }
     .lbl_tag{
         display: inline-block;
         font-size: 0.80rem !important;
-    }
-    .lbl_field{
-        width: 20%;
-        color: #194d6f;
-        /*font-weight: bold;*/
-        margin-top: 1rem;
-        font-size: 1rem !important;
-    }
-    .label > a{
-        color: white !important;
-    }
-
-    .graph_btn{
-        margin-left: 3rem;
-    }
-
-    #group_drawer{
-        height: 400px;
-        overflow-y: auto;
-        margin-left: 2em;
     }
 </style>
 {% endblock %}
@@ -80,7 +29,7 @@
                 <p class="left">&nbsp;&nbsp;{{asset_obj.name}}</p>
                 {% if asset_obj.tags %}
                     {% for tag in asset_obj.tags %}
-                            <small><label class="lbl_tag label">
+                            <small><label class="label">
                         <a href="{% url 'tag_info' group_id tag %}">{{tag}} </a></label></small>
                     {% endfor %} 
                 {% else %}
@@ -95,7 +44,8 @@
                 <button type="button" class="right blue-white-button save-asset" data-asset_id='{{asset_obj.pk}}'>Save Asset</button>
             {% endif %}
         </div>
-        <div class="small-3 columns">
+        {% if not edit and asset_obj %}
+            <div class="small-3 columns">
                 <span data-dropdown="asset-settings-drop" aria-controls="asset-settings-drop" aria-expanded="false" class="orange-button right">
                     Options
                 </span>
@@ -106,12 +56,12 @@
                     {% if asset_obj %}
                         {% get_relation_node asset_obj.pk  'has_assetcontent' as asset_cont_grel %}
                         {% if not asset_cont_grel %}
-                        <a class="delete-asset">Delete Asset</button>
+                        <a class="delete-asset">Delete Asset</a>
                         {% endif  %}
                     {% endif  %}
                 </li>
-            
-        </div>
+            </div>
+        {% endif%}
     </div>
         <div class="row">
             <div class="small-12 medium-6 large-6 columns">
@@ -127,7 +77,7 @@
         <div class="row">
             <div class="small-12 medium-12 large-12 columns">
                     <label>
-                        {% if edit and asset_obj %}
+                        {% if edit or not asset_obj %}
                             Asset description *
                             </label>
                             <textarea rows="4" cols="2" class="small-12 columns" placeholder="Enter Description" id="asset-descid" value=''>{% if asset_obj %} {{asset_obj.content|safe|striptags}}{% endif %}</textarea>
@@ -179,10 +129,6 @@
         <div class="row">
            <!-- &nbsp;&nbsp;&nbsp;Add asset content-->
             {% if asset_obj.created_by == request.user.id or is_gstaff %}
-            <div class="transcript_files row">
-
-
-            </div>
 
         </div>
 
@@ -193,9 +139,9 @@
                     <label>Enter File Name *
                         <input type="text" placeholder="Enter File name" class="required" id = "asset_content_name" name="" />
                     </label>
-                <form class="dropzone" id ="docPost" enctype="multipart/form-data" method="post" action="{% url 'add_assetcontent' group_id %}" >
-                    <input type="file" id="docFile" class="asset_content_upload" placeholder="" name=""/>
-                </form>
+                    <form class="dropzone" id ="docPost" enctype="multipart/form-data" method="post" action="{% url 'add_assetcontent' group_id %}" >
+                        <input type="file" id="docFile" class="asset_content_upload" placeholder="" name=""/>
+                    </form>
 
                 </div>
                 <div class="small-8 medium-6 large-6 columns">
@@ -212,9 +158,9 @@
         <input type="hidden" name="context_name" value="{{title}}">
         <input type="hidden" class ="asset_obj_val" name="asset_obj_name" data-asset-obj-val="">
 
+        <button type="button" class="orange-button add-asset-content right">Add Files</button>
         {% if asset_content_list.grel_id %}
         <div class="row">
-            <button type="button" class="orange-button add-asset-content right">Add Files</button>
             <button type="button" class="orange-button delete-asset-content right" title="Click on the checkbox on the files below to Delete">Delete Files</button>
         </div>
         {% endif %}
@@ -280,7 +226,9 @@
 
     $(".add-asset-content").click(function(){
         alert("close")
+        $(".asset-content-area").removeClass("hide")
         $(".name-desc-asset-cont-area").removeClass("hide")
+
         $("#upload_asset").removeClass("hide")
     });
 
@@ -380,7 +328,6 @@
         console.log(asset_description)
         console.log(asset_name)
         if (asset_name != '' && asset_description != ''){
-            console.log("if")
             // asset_objective =  $('#asset_objectivesid').find(':selected').attr('value');
             $.ajax({
                   type: "POST",
@@ -398,8 +345,8 @@
                   success: function(data) {
                     // $('#addAsset').html(data);
                     // $('#addAsset').foundation('reveal', 'open');
-                    $('.asset-content-area').css('display', 'block')
                     $('.save-asset').css('display', 'none')
+                    $('.asset-content-area').css('display', 'block')
                     $('.asset_obj_val').attr('data-asset-obj-val',data);
                 }
             });
@@ -411,11 +358,9 @@
             console.log(asset_description)
             event.preventDefault()
         }
-    });
-
-    $(document).on('closed', '[data-reveal]', function () {
+        $('#addAsset').foundation('reveal', 'close');
         location.reload()
-    })
+    });
 
 </script>
 <script type="text/javascript">
