@@ -6754,7 +6754,13 @@ def add_assetcontent(request,group_id):
   asset_cont_name = request.POST.get('asset_cont_name','')
   node_id = request.POST.get('node_id',None)
   if if_subtitle == "True":
-    subtitle_obj = create_assetcontent(ObjectId(asset_obj),uploaded_subtitle[0].name,group_id,request.user.id,files=uploaded_subtitle,resource_type='File')
+    file_name = uploaded_subtitle[0].name
+    if not file_name:
+      file_name = asset_cont_name
+    subtitle_obj = create_assetcontent(asset_id=ObjectId(asset_obj),
+      name=file_name, group_name_or_id=group_id, created_by=request.user.id, 
+      files=uploaded_subtitle,resource_type='File')
+
     rt_subtitle = node_collection.one({'_type':'RelationType', 'name':'has_subtitle'})
     subtitle_list = [ObjectId(subtitle_obj._id)]
 
@@ -6771,8 +6777,14 @@ def add_assetcontent(request,group_id):
 
 
   if if_transcript == "True":
+    file_name = uploaded_transcript[0].name
+    if not file_name:
+      file_name = asset_cont_name
+
     rt_transcript = node_collection.one({'_type':'RelationType', 'name':'has_transcript'})
-    transcript_obj = create_assetcontent(ObjectId(asset_obj),uploaded_transcript[0].name,group_id,request.user.id,files=uploaded_transcript,resource_type='File')
+    transcript_obj = create_assetcontent(asset_id=ObjectId(asset_obj),
+      name=file_name,  group_name_or_id=group_id, created_by=request.user.id, 
+      files=uploaded_transcript, resource_type='File')
     transcript_list = [ObjectId(transcript_obj._id)]
 
     transcript_grels = triple_collection.find({'_type': 'GRelation', \
@@ -6784,8 +6796,14 @@ def add_assetcontent(request,group_id):
     return StreamingHttpResponse("success")
 
   if if_alt_lang_file == "True":
+    file_name = uploaded_alt_lang_file[0].name
+    if not file_name:
+      file_name = asset_cont_name
+    print "\n uploaded_alt_lang_file: ", len(uploaded_alt_lang_file)
     alt_file_type = request.POST.get('alt_file_type','')
-    alt_lang_file_obj = create_assetcontent(ObjectId(asset_obj),uploaded_alt_lang_file[0].name,group_id,request.user.id,files=uploaded_alt_lang_file,resource_type='File')
+    alt_lang_file_obj = create_assetcontent(asset_id=ObjectId(asset_obj), 
+      name=file_name, group_name_or_id=group_id, created_by=request.user.id,
+      files=uploaded_alt_lang_file,resource_type='File')
     rt_alt_content = node_collection.one({'_type':'RelationType', 'name':'has_alt_content'})
     alt_lang_file_list = [ObjectId(alt_lang_file_obj._id)]
 
@@ -6869,7 +6887,6 @@ def save_interactions(request, group_id):
   player_discussion_enable_at = node_collection.one({"_type": "AttributeType", "name": "player_discussion_enable"})
   if thread_create_val == "Yes":
     create_gattribute(node._id, player_discussion_enable_at, True)
-
     return_status = create_thread_for_node(request,group_id, node)
   else:
     create_gattribute(node._id, player_discussion_enable_at, False)
