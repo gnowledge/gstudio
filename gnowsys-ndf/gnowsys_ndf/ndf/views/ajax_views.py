@@ -6906,7 +6906,10 @@ def save_metadata(request, group_id):
   if Based_url:
     basedurl_attr = node_collection.one({'_type':'AttributeType','name':'basedonurl'})
     create_gattribute(ObjectId(node_id), basedurl_attr, Based_url)
-  return HttpResponseRedirect(reverse('asset_detail', kwargs={'group_id':ObjectId(group_id),'asset_id': ObjectId(node._id)}))
+  if "Page" in node.member_of_names_list:
+    return HttpResponseRedirect(reverse('view_course_page', kwargs={'group_id':ObjectId(group_id),'page_id': ObjectId(node._id)}))
+  else:
+    return HttpResponseRedirect(reverse('asset_detail', kwargs={'group_id':ObjectId(group_id),'asset_id': ObjectId(node._id)}))
   # return HttpResponse('success')
 
 def export_to_epub(request, group_id, node_id):
