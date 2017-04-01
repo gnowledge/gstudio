@@ -37,9 +37,10 @@ from gnowsys_ndf.ndf.views.group import *
 from gnowsys_ndf.ndf.views.methods import get_property_order_with_value, get_group_name_id, get_course_completetion_status, replicate_resource
 from gnowsys_ndf.ndf.views.ajax_views import get_collection
 from gnowsys_ndf.ndf.views.analytics_methods import *
-from gnowsys_ndf.ndf.views.methods import create_gattribute, create_grelation, create_task, delete_grelation, node_thread_access, get_group_join_status
+from gnowsys_ndf.ndf.views.methods import create_gattribute, create_grelation, create_task, delete_grelation, node_thread_access, get_group_join_status, delete_node
 from gnowsys_ndf.notification import models as notification
 from gnowsys_ndf.settings import GSTUDIO_NOTE_CREATE_POINTS, GSTUDIO_QUIZ_CORRECT_POINTS, GSTUDIO_COMMENT_POINTS, GSTUDIO_FILE_UPLOAD_POINTS
+from gnowsys_ndf.ndf.views.trash import trash_resource 
 
 GST_COURSE = node_collection.one({'_type': "GSystemType", 'name': "Course"})
 course_gst_name, course_gst_id = GSystemType.get_gst_name_id("Course")
@@ -3139,11 +3140,19 @@ def create_edit_course_page(request, group_id, page_id=None):
     context_variables = {
             'group_id': group_id, 'groupid': group_id, 'group_name':group_name,
             'group_obj': group_obj, 'title': 'create_course_pages',
-            'activity_node': None}
+            'activity_node': None, 'cancel_activity_url': reverse('course_pages',
+                                        kwargs={
+                                        'group_id': group_id
+                                        })}
 
     if page_id:
         node_obj = node_collection.one({'_id': ObjectId(page_id)})
-        context_variables.update({'activity_node': node_obj, 'hide_breadcrumbs': True})
+        context_variables.update({'activity_node': node_obj, 'hide_breadcrumbs': True,
+            'cancel_activity_url': reverse('view_course_page',
+                                        kwargs={
+                                        'group_id': group_id,
+                                        'page_id': node_obj._id
+                                        })})
 
 
     return render_to_response(template,
@@ -3227,3 +3236,24 @@ def load_content_data(request, group_id):
       "group_id":group_id,"groupid":group_id, "node": node,
       "hide_breadcrumbs": True, 'expand_content':True
     },context_instance=RequestContext(request))
+
+
+def delete_activity_page(request, group_id):
+    activity_id_list = request.POST.getlist('delete_files_list[]', '')
+    activity_id = request.POST.getlist('activity_id', '')
+    if activity_id_list:
+        for each_activity in activity_id_list:
+            activity_page_node = node_collection.one({'_id':ObjectId(each_activity)})
+            if activity_page_node:
+                trash_resource(request,ObjectId(group_id),ObjectId(activity_page_node._id))
+                del_status  = delete_node(node_id=activity_page_node._id, deletion_type=0)
+                return HttpResponse('success')
+    if activity_id:
+        activity_page_node = node_collection.one({'_id':ObjectId(each_activity)})
+        if activity_page_node:
+            trash_resource(request,ObjectId(group_id),ObjectId(activity_page_node._id))
+            del_status  = delete_node(node_id=activity_page_node._id, deletion_type=0)
+            return HttpResponse('success')
+    return HttpResponse('fail')
+
+
