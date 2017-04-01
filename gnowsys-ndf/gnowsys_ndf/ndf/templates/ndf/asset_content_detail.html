@@ -19,12 +19,16 @@
   <div class="right small-12 medium-6 columns">
           {% if asset_obj.created_by == request.user.id or is_gstaff %}
                 <span data-dropdown="assetcontent-settings-drop" aria-controls="assetcontent-settings-drop" aria-expanded="false" class="orange-button">
-                    Add File
+                    Link/Add Related File
                 </span>
                 <ul id="assetcontent-settings-drop" class="f-dropdown" data-dropdown-content aria-hidden="true" tabindex="-1">
                 <li><a onclick="load_file_upload_modal(1)">Add Alternate File</a> </li>
-                <li><a onclick="load_file_upload_modal(2)">Add Transcript</a></li>
-                <li><a onclick="load_file_upload_modal(3)">Add Subtitle</a></li>
+                {% if 'video' in node.if_file.mime_type or 'audio' in node.if_file.mime_type %}
+                  <li><a onclick="load_file_upload_modal(2)">Add Transcript</a></li>
+                {%  endif %}
+                {% if 'video' in node.if_file.mime_type %}
+                  <li><a onclick="load_file_upload_modal(3)">Add Subtitle</a></li>
+                {%  endif %}
             {%  endif %}
             </div>
         </div>
@@ -198,12 +202,18 @@
   function load_file_upload_modal(choice){
     if (choice == 1){
       $(".alt-file-upload").removeClass("hide");
+      $(".transcript-upload").addClass("hide");
+      $(".subtitle-upload").addClass("hide");
     }
     else if(choice == 2){
       $(".transcript-upload").removeClass("hide");
+      $(".alt-file-upload").addClass("hide");
+      $(".subtitle-upload").addClass("hide");
     }
     else if (choice == 3){
       $(".subtitle-upload").removeClass("hide");
+      $(".transcript-upload").addClass("hide");
+      $(".alt-file-upload").addClass("hide");
     }
     $('#addSupportingFile').foundation('reveal', 'open');
   }
@@ -535,6 +545,7 @@ function delete_rel_files(sel_sub,rel_type){
               url: "{% url 'remove_related_doc' group_id  %}",
               datatype: "html",
               success: function(data) {
+                location.reload()
             }
         });
 }
