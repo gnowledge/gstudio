@@ -357,7 +357,7 @@ $("#alt_types").change(function(){
           }
           else
           {
-            alert('An error occurred!');
+            alert('An error occurred while uploading subtitle-file!');
           }
         };
 
@@ -434,7 +434,7 @@ $("#alt_types").change(function(){
           }
           else
           {
-            alert('An error occurred!');
+            alert('An error occurred while uploading transcript-file!');
           }
         };
 
@@ -488,6 +488,12 @@ $("#alt_types").change(function(){
           formData.append('sel_alt_value',sel_alt_fr_type);
           formData.append('alt_file_type','alt_format');
         }
+        if(sel_alt_type == 'Size' ){
+          sel_alt_fr_type =  $('.alt-size-type').find(':selected').attr('data-opts');
+          formData.append('if_alt_file','True');
+          formData.append('sel_alt_value',sel_alt_fr_type);
+          formData.append('alt_file_type','alt_size');
+        }
         
         if(!"{{asset_obj}}"){
             formData.append('asset_obj',assetval);
@@ -528,7 +534,7 @@ $("#alt_types").change(function(){
           }
           else
           {
-            alert('An error occurred!');
+            alert('An error occurred while uploading alternate-file!');
           }
         };
 
