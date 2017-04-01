@@ -6834,8 +6834,8 @@ def delete_asset(request, group_id):
         asset_cont_node = node_collection.one({'_id':ObjectId(each_file)})
         if asset_cont_node:
           trash_resource(request,ObjectId(group_id),ObjectId(asset_cont_node._id))
-          del_status  = delete_node(node_id=asset_cont_node._id, deletion_type=0)
-          # print '\nDeleted Node',del_status
+          del_rel = delete_grelation(subject_id=ObjectId(asset_cont_node._id),deletion_type=0)
+          print '\nDeleted Node',del_rel
       return HttpResponse('success')
 
 
@@ -6849,13 +6849,20 @@ def get_metadata_page(request, group_id):
             },
             context_instance=RequestContext(request))
 
-def save_metadata(request, group_id):
+def get_interaction_widget(request, group_id):
+  node_id = request.POST.get('node_id', None)
+  node_obj = node_collection.one({'_id':ObjectId(node_id)})
+  return render_to_response('ndf/widget_interaction.html',
+            {
+                'group_id': group_id, 'groupid': group_id,
+                'node_id':node_id,'node':node_obj
+            },
+            context_instance=RequestContext(request)) 
+
+def save_interactions(request, group_id):
   node_id = request.POST.get('node_id', None)
   node  = node_collection.one({"_id":ObjectId(node_id)})
-  source = request.POST.get("source_val", "")
-  copyright = request.POST.get("copyright_val", "")
-  Based_url = request.POST.get("basedonurl_val", "")
-  obj_list = request.POST.get("obj_list", "")
+
   thread_create_val = request.POST.get("thread_create",'')
 
   # print "\n\n help_info_page  === ", help_info_page
@@ -6866,7 +6873,16 @@ def save_metadata(request, group_id):
     return_status = create_thread_for_node(request,group_id, node)
   else:
     create_gattribute(node._id, player_discussion_enable_at, False)
+  return HttpResponseRedirect(reverse('view_course_page', kwargs={'group_id':ObjectId(group_id),'page_id': ObjectId(node._id)}))
   
+
+def save_metadata(request, group_id):
+  node_id = request.POST.get('node_id', None)
+  node  = node_collection.one({"_id":ObjectId(node_id)})
+  source = request.POST.get("source_val", "")
+  copyright = request.POST.get("copyright_val", "")
+  Based_url = request.POST.get("basedonurl_val", "")
+  obj_list = request.POST.get("obj_list", "")
 
   if obj_list :
     for k, v in json.loads(obj_list).iteritems():
