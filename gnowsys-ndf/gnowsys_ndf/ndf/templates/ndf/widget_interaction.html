@@ -20,7 +20,7 @@
           </div>
         </div>
         <div class="thread-settings-div {% if not node.discussion_enable %} hide {% endif %}">
-            {% get_thread_node node as thread_node %}
+            {% get_thread_node node.pk as thread_node %}
             {% if thread_node %}
                 {% get_attribute_value thread_node.pk 'release_response' as resp_val %}
                 {% get_attribute_value thread_node.pk 'thread_interaction_type' as thr_int_type %}
@@ -83,4 +83,7 @@
 				$("input[name='thread_create'][value='No']").attr("checked","checked");
 			{% endif %}
 	});
+        $( ".cancel-metadata" ).click(function(event) {
+    $('#addAsset').foundation('reveal', 'close');     
+  });
     </script>
