@@ -2739,3 +2739,10 @@ ul.jqtree-tree .jqtree-toggler:hover {
 .activity-editor {
   margin: 50px;
 }
+
+/* line 2901, ../../../scss/_clix2017.scss */
+.tag-ele {
+  display: inline-block;
+  font-size: 0.80rem !important;
+  background-color: gold !important;
+}
