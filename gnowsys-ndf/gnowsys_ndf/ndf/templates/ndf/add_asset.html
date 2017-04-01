@@ -11,11 +11,7 @@
         margin-top: 0.1rem !important;
         text-align: center;
     }
-    .lbl_tag{
-            display: inline-block;
-            font-size: 0.9rem !important;
-            padding-left: 100px;
-    }
+
 </style>
 {% endblock %}
    
@@ -27,14 +23,18 @@
         <div class="small-9 columns">
             {% if not edit and asset_obj.name %}
                 {% if asset_obj.created_by == request.user.id or is_gstaff %}
+
                 <p class="left">{{asset_obj.name}}</p>
+
+
+
                 {% if asset_obj.tags %}
                     {% for tag in asset_obj.tags %}
-                            <small><label class="label">
+                            <small><label class="tag-ele">
                         <a href="{% url 'tag_info' group_id tag %}">{{tag}} </a></label></small>
                     {% endfor %} 
                 {% else %}
-                    <i><small><label class="lbl_tag">{% trans "No tags defined yet!" %}</label></small></i>
+                    <i><small><label>{% trans "No tags defined yet!" %}</label></small></i>
                 {% endif %}
                 
 

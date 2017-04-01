@@ -3140,11 +3140,19 @@ def create_edit_course_page(request, group_id, page_id=None):
     context_variables = {
             'group_id': group_id, 'groupid': group_id, 'group_name':group_name,
             'group_obj': group_obj, 'title': 'create_course_pages',
-            'activity_node': None}
+            'activity_node': None, 'cancel_activity_url': reverse('course_pages',
+                                        kwargs={
+                                        'group_id': group_id
+                                        })}
 
     if page_id:
         node_obj = node_collection.one({'_id': ObjectId(page_id)})
-        context_variables.update({'activity_node': node_obj, 'hide_breadcrumbs': True})
+        context_variables.update({'activity_node': node_obj, 'hide_breadcrumbs': True,
+            'cancel_activity_url': reverse('view_course_page',
+                                        kwargs={
+                                        'group_id': group_id,
+                                        'page_id': node_obj._id
+                                        })})
 
 
     return render_to_response(template,
