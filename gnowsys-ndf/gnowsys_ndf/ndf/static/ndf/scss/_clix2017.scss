@@ -1416,7 +1416,10 @@ ul.jqtree-tree .jqtree-toggler {
 
 
 
-
+.node_name_empty{
+    border-radius: 5px;
+    margin-top: 11px;
+}
 
 
 
@@ -2924,8 +2927,18 @@ ul.jqtree-tree .jqtree-toggler {
     border-radius: 6px;
 }
 
+.activity-lang{
+    border: 1px solid #cccccc;
+    border-radius: 5px;
+    margin-top: 7px;
+    height: 40px;
+}
 .asset-lang{
     height: 50px;
     margin-left: 20px;
     width: 99%;
+}
+
+.editor-div{
+    height:100%;
 }
