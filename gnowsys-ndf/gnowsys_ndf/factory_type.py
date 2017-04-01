@@ -284,6 +284,16 @@ factory_relation_types = [
         }
     },
 
+    {'has_admin_page': {
+            'subject_type':['*'],
+            'object_type':['*'],
+            'inverse_name':'admin_page_of',
+            'meta_type':'factory_types',
+            'member_of': 'Binary',
+            'object_cardinality': 100
+        }
+    },
+
 ]
 
 

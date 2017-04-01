@@ -5,14 +5,29 @@
 {% if activity_node and not editor_view %}
     <div class="activity-detail-page">
         <div class="row">
-            <div class="small-8 columns">
+            <div class="small-6 columns">
                 <h4 class="page-name">{{activity_node.name}}</h4>
             </div>
-            <div class="small-2 columns">
-                <a href="{% url 'edit_course_page' group_id activity_node.pk %}">Edit</a>
+            <div class="small-4 columns">
+                 {% if activity_node.tags %}
+                    {% for tag in activity_node.tags %}
+                            <small><label class="lbl_tag label">
+                        <a href="{% url 'tag_info' group_id tag %}">{{tag}} </a></label></small>
+                    {% endfor %} 
+                {% else %}
+                    <i><small><label class="lbl_tag">{% trans "No tags defined yet!" %}</label></small></i>
+                {% endif %}   
             </div>
-            <div class="small-2 columns ">
-                <a href="{% url 'course_pages' group_id %}" >Back to Activities</a>
+
+            <div class="small-2 columns">
+                <span data-dropdown="activity-page-settings-drop" aria-controls="activity-page-settings-drop" aria-expanded="false" class="orange-button right">
+                    Options
+                </span>
+                <ul id="activity-page-settings-drop" class="f-dropdown" data-dropdown-content aria-hidden="true" tabindex="-1">
+            
+                <li><a href="{% url 'all_translations' group_id activity_node.pk %}">Translate</a></li>
+                <li><a href="{% url 'edit_course_page' group_id activity_node.pk %}">Edit</a></li>
+                <li><a href="{% url 'course_pages' group_id %}" >Back to Activities</a></li>
             </div>
         </div>
         <div class="row activity-detail-content">
@@ -32,6 +47,11 @@
 
 
     <div id="page_listing">
+    {% if all_pages.count %}
+    <div class="row">
+        <button type="button" class="orange-button delete-activity right" title="Click on the checkbox on the files below to Delete">Delete Activity</button>
+    </div>
+    {% endif %}
         <div class="row">
             {% for each in all_pages %}
                 <a class="view-page" data-page-id="{{each.pk}}" data-node-name="{{each.name}}" title="{{each.name}}" href="{% url 'view_course_page' group_id each.pk %}">
@@ -48,6 +68,9 @@
                             </div>
                             <div class="asset_text">
                                 <div class="asset_title" title="{{each.name}}">{{each.name|truncatechars:25}}</div>
+                                    {% if user.is_authenticated  and not group_object.edit_policy == "NON_EDITABLE"  or gstaff_access %}
+                                    <input type="checkbox" class="activitynode" name="activitynode" value="{{each.pk}}" style="margin:0; float:right;" class="asset_content_checkbox">
+                                    {% endif %}
                                 <div class="asset_desc">{{each.content|safe|striptags|truncatechars:35}}</div>
                             </div>
                         </div>
@@ -61,3 +84,43 @@
 
 {% endif %}
 
+<script type="text/javascript">
+    $(".delete-activity").click(function(){
+        var checked = $('.activitynode:checked').length;
+        if (checked > 0){
+
+            if (confirm("Do you want to delete selected files?.") == true) {
+                coll_arr = []
+                $('.activitynode:checked').each(function() {
+                    coll_arr.push($(this).val());
+                });
+
+                $.ajax({
+                          type: "POST",
+                          data:{
+                                'csrfmiddlewaretoken': "{{csrf_token}}",
+                                'delete_files_list' : coll_arr,
+                            },
+                          url: "{% url 'delete_activity_page' group_id %}",
+                          datatype: "json",
+                          success: function(data) {
+                            console.log(data)
+                            if (data=="success"){
+                                location.reload()
+                            }
+                            else{
+                                alert("Something went wrong. Please try again later.")
+                            }
+                        }
+                    });
+
+                }
+        }
+        else{
+            alert("Choose atleast one Activity");
+        }
+
+
+    });
+    
+</script>

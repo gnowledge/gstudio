@@ -4,7 +4,7 @@ from django.template import RequestContext
 from gnowsys_ndf.ndf.models import *
 # from gnowsys_ndf.ndf.views.page import page
 # from gnowsys_ndf.ndf.views.file import file
-from gnowsys_ndf.ndf.views.group import group_dashboard
+from gnowsys_ndf.ndf.views.group import *
 from gnowsys_ndf.ndf.views.methods import *
 from django.core.urlresolvers import reverse
 from gnowsys_ndf.settings import GSTUDIO_SITE_NAME
@@ -21,9 +21,13 @@ def trash_resource(request,group_id,node_id):
 
 
 	auth = node_collection.one({'_type': 'Author', 'name': unicode(request.user.username) })
+	gst_base_unit = node_collection.one({'_type': 'GSystemType', 'name': 'base_unit'})
+	 
 	node_obj = node_collection.find_one({"_id":ObjectId(node_id)})
 	group_obj = node_collection.find_one({"_id":ObjectId(group_id)})
 	trash_group = node_collection.find_one({"name":"Trash"});
+	response_dict = {}
+	response_dict['success'] = False
 	
 	if trash_group._id in node_obj.group_set:
 		try:
@@ -32,7 +36,7 @@ def trash_resource(request,group_id,node_id):
 				response_dict['success'] = True
 		except Exception as e:
 			pass
-		return HttpResponse(json.dumps(group_id))
+		return HttpResponse(json.dumps(response_dict))
 
 	if ObjectId(group_id) in node_obj.group_set: 		 
 		node_obj.group_set.remove(ObjectId(group_id))
@@ -53,11 +57,13 @@ def trash_resource(request,group_id,node_id):
 
 	# get_member_of = node_collection.find_one({"_id":{'$in':node_obj.member_of}})
 	# if get_member_of.name == 'Page':
-	if "Page" in node_obj.member_of_names_list and not "CourseEventGroup" in group_obj.member_of_names_list:
+	if gst_base_unit._id in  node_obj.group_set:
+		return HttpResponse("True")
+	elif "Page" in node_obj.member_of_names_list and not "CourseEventGroup" in group_obj.member_of_names_list:
 		return HttpResponseRedirect(reverse('page', kwargs={'group_id': group_id}))
 		# return (eval('page')(request, group_id))
 	elif "File" in node_obj.member_of_names_list and not "CourseEventGroup" in group_obj.member_of_names_list :
-		return HttpResponse(json.dumps(group_id))
+		return HttpResponse(json.dumps(response_dict))
 		# elif get_member_of.name == 'File':
 		# return(eval('file')(request, group_id))
 	elif "CourseEventGroup" in group_obj.member_of_names_list:

@@ -93,7 +93,10 @@
                     </div>
                 </div>
 
-
+                <div class=" course_heading_unit">
+                 {% include 'ndf/widget_tags.html' with node=unit_node %}
+                  
+                </div>
 
                 <hr/>
                 <label style="color:red;" class="right hide duplicate_unit_name">Unit with same name exists. Please choose another name.</label>
@@ -110,7 +113,6 @@
                     {% comment %}
                         <button type="button" class ="right asset-unit-button" id="save_unit">Save</button>
                     {% endcomment %}
-                 {% include 'ndf/widget_tags.html' with node=unit_node %}
                     <input type="submit" class ="asset-unit-button" id="save_unit" value="Save"/>
                 </div>
             </form>

@@ -124,6 +124,8 @@ DATA_TYPE_CHOICES = (
     "IS()"
 )
 
+TYPES_LIST = ['GSystemType', 'RelationType', 'AttributeType', 'MetaType', 'ProcessType']
+
 my_doc_requirement = u'storing_orignal_doc'
 reduced_doc_requirement = u'storing_reduced_doc'
 to_reduce_doc_requirement = u'storing_to_be_reduced_doc'
@@ -357,7 +359,7 @@ class Node(DjangoDocument):
         values_dict = {}
         if request:
             if request.POST:
-                values_dict.update(request.POST)
+                values_dict.update(request.POST.dict())
             if (not user_id) and request.user:
                 user_id = request.user.id
         # adding kwargs dict later to give more priority to values passed via kwargs.
@@ -365,7 +367,9 @@ class Node(DjangoDocument):
 
         # handling storing user id values.
         if user_id:
-            if 'created_by' not in values_dict:
+            if not self['created_by'] and ('created_by' not in values_dict):
+                # if `created_by` field is blank i.e: it's new node and add/fill user_id in it.
+                # otherwise escape it (for subsequent update/node-modification).
                 values_dict.update({'created_by': user_id})
             if 'modified_by' not in values_dict:
                 values_dict.update({'modified_by': user_id})
@@ -1260,12 +1264,16 @@ class Node(DjangoDocument):
         return possible_relations
 
 
-    def get_relation(self, relation_type_name, status='PUBLISHED'):
+    def get_attribute(self, attribute_type_name, status=None):
+        return GAttribute.get_triples_from_sub_type(self._id, attribute_type_name, status)
+
+
+    def get_relation(self, relation_type_name, status=None):
         return GRelation.get_triples_from_sub_type(self._id, relation_type_name, status)
 
 
-    def get_attribute(self, attribute_type_name, status='PUBLISHED'):
-        return GAttribute.get_triples_from_sub_type(self._id, attribute_type_name, status)
+    def get_relation_right_subject_nodes(self, relation_type_name, status=None):
+        return node_collection.find({'_id': {'$in': [r.right_subject for r in self.get_relation(relation_type_name)]} })
 
 
     def get_neighbourhood(self, member_of):

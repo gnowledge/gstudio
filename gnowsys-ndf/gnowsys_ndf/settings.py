@@ -25,7 +25,8 @@ GSTUDIO_ALTERNATE_OPTS = ['Size', 'Format', 'Language']
 GSTUDIO_ALTERNATE_FORMATS = {'image':['png','jpeg'],'video':['mkv','webm'],'audio':['mp3']}
 GSTUDIO_ALTERNATE_SIZE = {'image':['100px','1048px'],'video':['144px','720px'],'audio':['128kbps']}
 GSTUDIO_DEFAULT_GROUP = u'desk'
-LANGUAGES = (('en', 'English'), ('hi', u'\u0939\u093f\u0902\u0926\u0940'),('te','telugu'))
+
+LANGUAGES = (('en', 'English'), ('hi', u'Hindi'),('te','Telugu'))
 GSTUDIO_DEFAULT_LANGUAGE = ('en', 'English')
 OTHER_COMMON_LANGUAGES = [
     ('mr', 'Marathi'), ('mni','Manipuri'), ('ori','Oriya'),

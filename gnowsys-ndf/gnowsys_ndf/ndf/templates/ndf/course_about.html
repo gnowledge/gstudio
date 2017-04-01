@@ -1,4 +1,5 @@
-{% load check_is_gstaff from ndf_tags %}
+{% load i18n %}
+{% load ndf_tags %}
 {% block head %}
 {% if show_analytics_notifications %}
 
@@ -11,6 +12,71 @@
   <!-- DataTables CSS -->
   <link href="/static/ndf/bower_components/datatables-plugins/integration/foundation/dataTables.foundation.css" rel="stylesheet" type="text/css" />
 {% endif %}
+<style type="text/css">
+    .right-btn, .left-btn{
+        /*float: left;*/
+        /*margin-left: 1rem;*/
+        width: 40%;
+        font-size: 0.85em !important;
+        margin-top: 0.1rem !important;
+        text-align: center;
+    }
+    .tag-rating-div{
+        margin-left: 0.6rem !important;
+        margin-top: 0.3rem !important;
+    }
+    /*  
+    .right-btn{
+        float: right;
+        margin-right: 1rem;
+        width: 8rem;
+        font-size: 0.75rem !important
+    }
+    */
+    .rating-lbl{
+        display: inline-block;
+        font-size: 1rem !important;
+        /*font-style: italic;*/
+        /*margin-left: 3rem;*/
+
+    }
+    .rating_template{
+        display: inline-table;
+    }
+    .mod-btn{
+        width: 80% !important;
+        font-size: 0.75rem !important;
+    }
+    .btn-row{
+        /*margin-left: 1rem !important;*/
+        text-align: center;
+        margin-bottom: -1rem !important;
+    }
+    .lbl_tag{
+        display: inline-block;
+        font-size: 0.80rem !important;
+    }
+    .lbl_field{
+        width: 20%;
+        color: #194d6f;
+        /*font-weight: bold;*/
+        margin-top: 1rem;
+        font-size: 1rem !important;
+    }
+    .label > a{
+        color: white !important;
+    }
+
+    .graph_btn{
+        margin-left: 3rem;
+    }
+
+    #group_drawer{
+        height: 400px;
+        overflow-y: auto;
+        margin-left: 2em;
+    }
+</style>
 <style type="text/css">
 
   .short-text {
@@ -46,6 +112,14 @@
       <div class="course-desc" id="scstyle">
           {{group_object.content|default:'No description added yet.'|safe}}
       </div>
+      {% if group_object.tags %}
+          {% for tag in group_object.tags %}
+                  <small><label class="lbl_tag label">
+              <a href="{% url 'tag_info' group_id tag %}">{{tag}} </a></label></small>
+          {% endfor %} 
+      {% else %}
+          <i><small><label class="lbl_tag">{% trans "No tags defined yet!" %}</label></small></i>
+      {% endif %}
       <div>
         <u><a class="show-more hide">Show more</a></u>
       </div>

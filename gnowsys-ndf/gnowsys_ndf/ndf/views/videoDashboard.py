@@ -44,7 +44,8 @@ def videoDashboard(request, group_id):
                                         '_type': {'$in': ["GSystem"]},
                                         'member_of': file_gst._id,
                                         'group_set': {'$all': [ObjectId(group_id)]},
-                                        'if_file.mime_type': {'$regex': 'mp4'}
+                                        'if_file.mime_type': {'$regex': 'video'},
+                                        'status' : { '$ne': u"DELETED" }
 
                                         # 'created_by': {'$in': gstaff_users},
                             # '$or': [

@@ -1,0 +1,38 @@
+<div class="row">
+    <div class="small-12 columns">
+        <form enctype="multipart/form-data" method="post" action="{{url}}">
+            {% csrf_token %}
+            <!-- _id -->
+            <input type="hidden" name="_id" value="{{node_obj.pk}}">
+
+            <!-- name -->
+            <div class="">
+                <div class="left">
+                <h5>Name</h5>
+                <div class="gray-text">{{source_obj.name}}</div>
+                </div>
+                <div class="right">
+                    <input name="name" type="text" placeholder="Enter Name"
+                    value="{{node_obj.name|safe}}"/>
+                </div>
+            </div>
+
+            <hr/>
+
+            <!-- content -->
+            <div class="">
+                <div class="left">
+                <h5>Description</h5>
+                {{source_obj.content|safe}}
+                </div>
+                <div class="right">
+                    {% include "ndf/html_editor.html" with var_name="content" var_placeholder="Enter the content here" var_value=node_obj.content|safe|default_if_none:"" node_id=node_obj.pk ckeditor_toolbar="GeneralToolbar" %}
+                </div>
+            </div>
+            <hr/>
+            <div class="row">
+                <input type="submit" class ="small-12 columns" id="" value="Save"/>
+            </div>
+        </form>
+    </div>
+</div>

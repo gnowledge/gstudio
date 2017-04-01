@@ -3945,6 +3945,8 @@ def get_relation_node(node_id,rel_name):
 		file_node = node_collection.one({'_id': ObjectId(each_grel['right_subject'])})
 		data_dict.update({'file_path': file_node['if_file']['original']['relurl']})
 		data_dict.update({'relation_type_scope': each_grel['relation_type_scope']})
+		data_dict.update({'file_name': file_node.name})
+		data_dict.update({'file_id': ObjectId(file_node.pk)})
 	 	data_list.append(data_dict)
 	print data_list
 	return data_list

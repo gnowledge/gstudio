@@ -865,7 +865,8 @@ This will not be used because now only existing activities will be added.
         // });
 
         $(document).on('opened.fndtn.reveal', '#select-activity-page[data-reveal]', function () {
-          getActivityPages();
+            $("#activity-container").html('');
+            getActivityPages();
         });
 
         $(document).on('closed.fndtn.reveal', '#add-lesson-reveal', function () {

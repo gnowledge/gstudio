@@ -11,96 +11,57 @@
         margin-top: 0.1rem !important;
         text-align: center;
     }
-    .tag-rating-div{
-        margin-left: 0.6rem !important;
-        margin-top: 0.3rem !important;
-    }
-    /*  
-    .right-btn{
-        float: right;
-        margin-right: 1rem;
-        width: 8rem;
-        font-size: 0.75rem !important
-    }
-    */
-    .rating-lbl{
-        display: inline-block;
-        font-size: 1rem !important;
-        /*font-style: italic;*/
-        /*margin-left: 3rem;*/
-
-    }
-    .rating_template{
-        display: inline-table;
-    }
-    .mod-btn{
-        width: 80% !important;
-        font-size: 0.75rem !important;
-    }
-    .btn-row{
-        /*margin-left: 1rem !important;*/
-        text-align: center;
-        margin-bottom: -1rem !important;
-    }
     .lbl_tag{
         display: inline-block;
         font-size: 0.80rem !important;
-    }
-    .lbl_field{
-        width: 20%;
-        color: #194d6f;
-        /*font-weight: bold;*/
-        margin-top: 1rem;
-        font-size: 1rem !important;
-    }
-    .label > a{
-        color: white !important;
-    }
-
-    .graph_btn{
-        margin-left: 3rem;
-    }
-
-    #group_drawer{
-        height: 400px;
-        overflow-y: auto;
-        margin-left: 2em;
     }
 </style>
 {% endblock %}
    
 
-
     <div class="row overlay-head">
         {% if edit or not asset_obj.name %}
             <a class="right close-reveal-modal reveal-modal-overlay" aria-label="Close">&#215;</a>
         {% endif %}
-        <div class="small-12 colums">
+        <div class="small-9 columns">
             {% if not edit and asset_obj.name %}
                 {% if asset_obj.created_by == request.user.id or is_gstaff %}
                 <p class="left">&nbsp;&nbsp;{{asset_obj.name}}</p>
                 {% if asset_obj.tags %}
                     {% for tag in asset_obj.tags %}
-                        {% if forloop.counter < 3 %}
-                            <small><label class="lbl_tag label">
-                        {% else %}
-                            <small><label class="lbl_tag label tag_ele hide">
-                        {% endif %}
+                            <small><label class="label">
                         <a href="{% url 'tag_info' group_id tag %}">{{tag}} </a></label></small>
-                    {% endfor %}
-                    {% if asset_obj.tags|length > 2 %}
-                        <small><label class="view-more-tags" style="display:inline-block;">More</label></small>
-                    {% endif %} 
+                    {% endfor %} 
                 {% else %}
                     <i><small><label class="lbl_tag">{% trans "No tags defined yet!" %}</label></small></i>
                 {% endif %}
-                <a class="fi-pencil right createAsset" data-asset_id='{{asset_obj.pk}}'>Edit</a>
+
+               <i><p style="color: gray">{{asset_obj.content|safe|striptags}} </p></i>      
+
                 {% endif %}
             {% else %}
                 <h3 class="left overlay-title">&nbsp;{% if not asset_obj %} Add a new {% else %} Edit {% endif %} asset</h3>
                 <button type="button" class="right blue-white-button save-asset" data-asset_id='{{asset_obj.pk}}'>Save Asset</button>
             {% endif %}
         </div>
+        {% if not edit and asset_obj %}
+            <div class="small-3 columns">
+                <span data-dropdown="asset-settings-drop" aria-controls="asset-settings-drop" aria-expanded="false" class="orange-button right">
+                    Options
+                </span>
+                <ul id="asset-settings-drop" class="f-dropdown" data-dropdown-content aria-hidden="true" tabindex="-1">
+                <li> <a class="createAsset" data-asset_id='{{asset_obj.pk}}'>Edit</a></li>
+                <li><a class="edit-metadata">Edit Metadata</a></li>
+                <li>
+                    {% if asset_obj %}
+                        {% get_relation_node asset_obj.pk  'has_assetcontent' as asset_cont_grel %}
+                        {% if not asset_cont_grel %}
+                        <a class="delete-asset">Delete Asset</a>
+                        {% endif  %}
+                    {% endif  %}
+                </li>
+            </div>
+        {% endif%}
     </div>
         <div class="row">
             <div class="small-12 medium-6 large-6 columns">
@@ -114,30 +75,28 @@
             </div>
         </div>
         <div class="row">
-            <div class="small-12 medium-6 large-6 columns">
-                <label>
-                    {% if not edit and asset_obj %}
-                       <i><p style="color: gray">{{asset_obj.content|safe|striptags}} </p></i>
-                    {% else %}
-                        Asset description *
-                </label>
-                        <textarea rows="4" cols="2" class="small-12 columns" placeholder="Enter Description" id="asset-descid" value=''>{% if asset_obj %} {{asset_obj.content|safe|striptags}}{% endif %}</textarea>
-                    {% include 'ndf/widget_tags.html' with node=asset_obj %}
+            <div class="small-12 medium-12 large-12 columns">
+                    <label>
+                        {% if edit or not asset_obj %}
+                            Asset description *
+                            </label>
+                            <textarea rows="4" cols="2" class="small-12 columns" placeholder="Enter Description" id="asset-descid" value=''>{% if asset_obj %} {{asset_obj.content|safe|striptags}}{% endif %}</textarea>
+                            {% include 'ndf/widget_tags.html' with node=asset_obj %}
                             {% get_language_info_list for LANGUAGES as languages %}
-                    <select class="asset-lang" name="lan" id="asset_lang" >
-                            {% for language in languages %}
-                            {% if asset_obj.language.0 == language.code  %}
-                                <option selected data-sub-lang="{{ language.name }}" data-sub-code="{{ language.code }}">
-                                {{language.name}}
-                            {%  else %}
-                                <option data-sub-lang="{{ language.name }}" data-sub-code="{{ language.code }}">
-                                  {{ language.name }}
-                                </option>
-                            {% endif %}
-                            {% endfor %}
-                          </select>
+                            <select class="asset-lang" name="lan" id="asset_lang" >
+                                {% for language in languages %}
+                                {% if asset_obj.language.0 == language.code  %}
+                                    <option selected data-sub-lang="{{ language.name }}" data-sub-code="{{ language.code }}">
+                                    {{language.name}}
+                                {%  else %}
+                                    <option data-sub-lang="{{ language.name }}" data-sub-code="{{ language.code }}">
+                                      {{ language.name }}
+                                    </option>
+                                {% endif %}
+                                {% endfor %}
+                            </select>
 
-                    {% endif %}
+                {% endif %}
 
             </div>
         </div>
@@ -170,47 +129,39 @@
         <div class="row">
            <!-- &nbsp;&nbsp;&nbsp;Add asset content-->
             {% if asset_obj.created_by == request.user.id or is_gstaff %}
-            <div class="transcript_files row">
-
-            <div class="small-8 columns">
-                <form class="dropzone" id ="docPost" enctype="multipart/form-data" method="post" action="{% url 'add_assetcontent' group_id %}" >
-                    <input type="file" id="docFile" class="asset_content_upload" placeholder="" name=""/>
-                </form>
-            </div>
-
-            </div>
 
         </div>
 
         <div class="name-desc-asset-cont-area hide">
+
             <div class="row">
                 <div class="small-8 medium-6 large-6 columns">
                     <label>Enter File Name *
                         <input type="text" placeholder="Enter File name" class="required" id = "asset_content_name" name="" />
                     </label>
+                    <form class="dropzone" id ="docPost" enctype="multipart/form-data" method="post" action="{% url 'add_assetcontent' group_id %}" >
+                        <input type="file" id="docFile" class="asset_content_upload" placeholder="" name=""/>
+                    </form>
+
                 </div>
-            </div>
-            <div class="row">
                 <div class="small-8 medium-6 large-6 columns">
                 <label>Enter File Description *<br/>
                     <textarea rows="4" cols="2" class="small-12 columns" placeholder="Enter File Description" id="asset_content_desc"></textarea>
                 </label>
-                </div>
-                <div class="small-4 columns">
-                    <button type="button" class="orange-button hide" id="upload_asset" onclick="save_form()">Upload File</button>
-                </div>
+                    <button type="button" class="orange-button right" id="upload_asset" onclick="save_form()">Upload</button>
 
-
+                </div>
             </div>
+
         </div>
         <!--<button type="button" class="right orange-button save-asset" onclick="save_asset_cont_data()">Save Asset</button>-->
         <input type="hidden" name="context_name" value="{{title}}">
         <input type="hidden" class ="asset_obj_val" name="asset_obj_name" data-asset-obj-val="">
 
-        {% if asset_content_list %}
+        <button type="button" class="orange-button add-asset-content right">Add Files</button>
+        {% if asset_content_list.grel_id %}
         <div class="row">
             <button type="button" class="orange-button delete-asset-content right" title="Click on the checkbox on the files below to Delete">Delete Files</button>
-            <button type="button" class="orange-button edit-metadata right">Edit Metadata</button>
         </div>
         {% endif %}
         {% endif %}
@@ -218,6 +169,7 @@
 
         <div class="row">
         {% for each in asset_content_list.grel_node %}
+            {% if  'DELETED' != each.status %}
             <div class="small-12 medium-6 large-3 columns">
 
                 <div class="asset_tile">
@@ -243,6 +195,7 @@
                     </div>
                 </div>
             </div>
+            {% endif %}
         {% endfor %}
         </div>
         </div>
@@ -271,8 +224,11 @@
 
 <script type="text/javascript">
 
-    $("#docFile").change(function(){
+    $(".add-asset-content").click(function(){
+        alert("close")
+        $(".asset-content-area").removeClass("hide")
         $(".name-desc-asset-cont-area").removeClass("hide")
+
         $("#upload_asset").removeClass("hide")
     });
 
@@ -290,7 +246,8 @@
                           type: "POST",
                           data:{
                                 'csrfmiddlewaretoken': "{{csrf_token}}",
-                                'delete_files_list' : coll_arr
+                                'delete_files_list' : coll_arr,
+                                'delete_asset_content' : 'True'
                             },
                           url: "{% url 'delete_asset' group_id %}",
                           datatype: "html",
@@ -307,6 +264,25 @@
             alert("Choose atleast one file");
         }
 
+
+    });
+    $(".delete-asset").click(function(){
+        
+        $.ajax({
+                  type: "POST",
+                  data:{
+                        'csrfmiddlewaretoken': "{{csrf_token}}",
+                        'delete_asset':'True',
+                        'asset_id':'{{asset_obj.pk}}',
+                        'asset_id':'{{asset_obj.pk}}',
+                        'group_id':'{{group_id}}',
+                    },
+                  url: "{% url 'delete_asset' group_id %}",
+                  datatype: "html",
+                  success: function(data) {
+                        location.href = "{% url 'asset_list' group_id  %}";
+                }
+            });
 
     });
 
@@ -352,7 +328,6 @@
         console.log(asset_description)
         console.log(asset_name)
         if (asset_name != '' && asset_description != ''){
-            console.log("if")
             // asset_objective =  $('#asset_objectivesid').find(':selected').attr('value');
             $.ajax({
                   type: "POST",
@@ -370,8 +345,8 @@
                   success: function(data) {
                     // $('#addAsset').html(data);
                     // $('#addAsset').foundation('reveal', 'open');
-                    $('.asset-content-area').css('display', 'block')
                     $('.save-asset').css('display', 'none')
+                    $('.asset-content-area').css('display', 'block')
                     $('.asset_obj_val').attr('data-asset-obj-val',data);
                 }
             });
@@ -383,11 +358,9 @@
             console.log(asset_description)
             event.preventDefault()
         }
-    });
-
-    $(document).on('closed', '[data-reveal]', function () {
+        $('#addAsset').foundation('reveal', 'close');
         location.reload()
-    })
+    });
 
 </script>
 <script type="text/javascript">
