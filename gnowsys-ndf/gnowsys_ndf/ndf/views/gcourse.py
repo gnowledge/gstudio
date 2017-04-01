@@ -2477,6 +2477,7 @@ def inline_edit_res(request, group_id):
         node_id = request.POST.get("node_id", "")
         node_obj = node_collection.one({'_id': ObjectId(node_id)})
         content_val = request.POST.get("content_val", "")
+        custom_redirect = request.POST.get("custom_redirect", "")
         node_obj.content = content_val
         node_obj.save()
         template = 'ndf/node_ajax_content.html'
@@ -2487,9 +2488,10 @@ def inline_edit_res(request, group_id):
         node_id = request.GET.get("node_id", "")
         node_id_to_be_edited = request.GET.get("edit", "")
         node_obj = node_collection.one({'_id': ObjectId(node_id)})
+        node_content = request.GET.get("node_content", node_obj.content)
         template = 'ndf/html_editor.html'
         context_variables['var_name'] = "content_org"
-        context_variables['var_value'] = node_obj.content
+        context_variables['var_value'] = node_content
         context_variables['node_id'] = node_obj._id
         context_variables['ckeditor_toolbar'] ="GeneralToolbar"
         context_variables['node'] = node_obj

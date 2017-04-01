@@ -506,10 +506,10 @@
 
           <!-- <div id="commentable-area"> -->
           {% if "QuizItemEvent" not in node.member_of_names_list %}
-          <div>
+          <div class="node-content-div">
             {% with node.content|safe as description %}
             {% if description != "None" %}
-              <span itemprop="{{schema.1.description}}">{{ description }}</span>
+              <span itemprop="{{schema.1.description}}" class="content_val">{{ description }}</span>
             {% endif %}
             {% endwith %}
           </div>

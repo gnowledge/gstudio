@@ -25,9 +25,11 @@
                 </span>
                 <ul id="activity-page-settings-drop" class="f-dropdown" data-dropdown-content aria-hidden="true" tabindex="-1">
             
-                <li><a href="{% url 'all_translations' group_id activity_node.pk %}">Translate</a></li>
-                <li><a href="{% url 'edit_course_page' group_id activity_node.pk %}">Edit</a></li>
+                <li><a href="{% url 'edit_course_page' group_id activity_node.pk %}">Edit Activity</a></li>
+                <li><a title="Edit Content" class="edit_res_unit">{% trans " Edit Only Content" %}</a></li>
+                <li><a href="{% url 'all_translations' group_id activity_node.pk %}">Alternate Language</a></li>
                 <li><a href="{% url 'course_pages' group_id %}" >Back to Activities</a></li>
+
             </div>
         </div>
         <div class="row activity-detail-content">
@@ -122,5 +124,54 @@
 
 
     });
-    
+        $(document).on('click',".edit_res_unit",function(){
+        $.ajax({
+          url: "{% url 'inline_edit_res' group_id %}",
+
+          type: "GET",
+
+          data: {
+            "node_id": "{{activity_node.pk}}",
+            "node_content": $(".activity-detail-content .content_val").html()
+          },
+          dataType: "html",
+
+          success: function(data){
+            $(".activity-detail-content").html(data);
+            $(".edit_res_unit").text("Save Content")
+                          .addClass("save_res_unit")
+                          .removeClass("edit_res_unit")
+          },
+        });//end of ajax
+    });
+
+    $(document).on('click',".save_res_unit",function(){
+        var content_val = CKEDITOR.instances['ckeditor_textarea'].getData();
+        // console.log(content_val)
+        $.ajax({
+          url: "{% url 'inline_edit_res' group_id %}",
+
+          data: {
+            "content_val": content_val,
+            "node_id": "{{activity_node.pk}}",
+            "custom_redirect": "view_course_page",
+            'csrfmiddlewaretoken': "{{csrf_token}}"
+          },
+
+          type: "POST",
+
+          dataType: "html",
+
+          success: function(data){
+            $(".node_details").html(data);
+            $(".save_res_unit").text("Edit Content")
+                          .addClass("edit_res_unit")
+                          .removeClass("save_res_unit")
+            location.reload()
+          },
+        });//end of ajax
+
+    });
+
+
 </script>
