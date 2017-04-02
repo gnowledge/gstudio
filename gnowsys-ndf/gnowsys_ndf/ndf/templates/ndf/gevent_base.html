@@ -16,7 +16,7 @@
 {% endblock %}
 {% block body_content %}
 {% get_group_object groupid as group_object %}
-
+{% check_is_gstaff group_id request.user as is_gstaff %}
 {% comment %}{% get_breadcrumb request.path %}{% endcomment %}
     <div class="row group_content {% if hide_bannerpic %} max-width {% endif %}">
         <div class="small-12 columns">
