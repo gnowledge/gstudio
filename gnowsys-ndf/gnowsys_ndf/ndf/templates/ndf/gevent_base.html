@@ -16,7 +16,7 @@
 {% endblock %}
 {% block body_content %}
 {% get_group_object groupid as group_object %}
-
+{% check_is_gstaff group_id request.user as is_gstaff %}
 {% comment %}{% get_breadcrumb request.path %}{% endcomment %}
     <div class="row group_content {% if hide_bannerpic %} max-width {% endif %}">
         <div class="small-12 columns">
@@ -28,7 +28,7 @@
                     <div class="group_title left">{% firstof group_object.altnames group_object.name  %}</div>
                     <div class="right course_actions">
 
-                        <span data-dropdown="course-settings-drop" aria-controls="course-settings-drop" aria-expanded="false" class="tiny radius right">
+                        <span data-dropdown="course-settings-drop" aria-controls="course-settings-drop" aria-expanded="false" class="tiny radius right" data-options="align:left">
                             <i class="icon-widget fi-widget"></i>
                         </span>
                         <ul id="course-settings-drop" class="f-dropdown" data-dropdown-content aria-hidden="true" tabindex="-1">

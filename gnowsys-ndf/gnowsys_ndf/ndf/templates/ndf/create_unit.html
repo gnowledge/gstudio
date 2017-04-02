@@ -93,7 +93,7 @@
                     </div>
                 </div>
 
-                <div class=" course_heading_unit">
+                <div class=" course_heading_unit tags-container">
                  {% include 'ndf/widget_tags.html' with node=unit_node %}
                   
                 </div>
@@ -108,12 +108,12 @@
                         {% include "ndf/html_editor.html" with var_name="content" var_placeholder="Enter the content here" var_value=unit_node.content|default_if_none:"" node_id=unit_node.pk ckeditor_toolbar="GeneralToolbar" %}
                     </div>
                 </div>
-
+                <br/>
                 <div class="row">
                     {% comment %}
                         <button type="button" class ="right asset-unit-button" id="save_unit">Save</button>
                     {% endcomment %}
-                    <input type="submit" class ="asset-unit-button" id="save_unit" value="Save"/>
+                    <input type="submit" class="asset-unit-button right" id="save_unit" value="Save"/>
                 </div>
             </form>
         </div>

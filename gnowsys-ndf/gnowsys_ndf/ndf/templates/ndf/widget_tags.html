@@ -24,26 +24,27 @@
 </style>
 
 	<div class="row">
-		<div class="small-8 columns">
 			<span>
 
 				<div class="row">
-					<h3 >
-					<span  class="subheader small-3 columns"  data-tooltip class="has-tip" title="{% trans 'Tags help identify similiar work easily. Just add tag text and click Add Tag button' %}"> {% trans "Add Tag" %}:
-					</span>
-
-					</h3>
-					<div class="small-9 columns">
-					<div class="row collapse">
-
-					<div class="small-10 columns">
-				    	<input id="tags_id" tabindex="2" type="text" value="" placeholder="{% trans 'Add tag text and click on [Add Tag] button' %}">
-				    	<input type="hidden" value="{{node.tags|join:', '|default_if_none:""}}" name="tags">
-			        </div>
-			        <div class="small-2 columns">
-			          <span tabindex="3" id="add-tag-btn" class="tiny button radius">{% trans 'Add Tag' %}</span>
-			        </div>
+					{% if not hide_lbl %}
+					<div class="small-3 columns add-tag-heading">
+						<h3>
+						<span  class="subheader small-3 columns"  data-tooltip class="has-tip" title="{% trans 'Tags help identify similiar work easily. Just add tag text and click Add Tag button' %}"> {% trans "Add Tag" %}:
+						</span>
+						</h3>
 					</div>
+					{% endif %}
+					<div class="small-8 columns tag-input-ele">
+						<div class="row collapse">
+							<div class="small-9 columns">
+						    	<input id="tags_id" tabindex="2" type="text" value="" placeholder="{% trans 'Add tag text and click on [Add Tag] button' %}">
+						    	<input type="hidden" value="{{node.tags|join:', '|default_if_none:""}}" name="tags">
+					        </div>
+					        <div class="small-3 columns">
+					          <span tabindex="3" id="add-tag-btn" class="tiny button radius orange-button add-tag-btn">{% trans 'Add Tag' %}</span>
+					        </div>
+						</div>
 
 					</div>
 				</div>
@@ -54,7 +55,7 @@
 				</div>
 
 				<!-- show added tags -->
-				<div class="row">
+				<div class="row added-tags-div">
 					<div id="added_tags" class="small-9 small-push-3 columns">
 						{% for each_tag in node.tags %}
 							<div class="tags label radius info">{{each_tag}}<i title="Remove this tag" class="fi-x-circle remove-tag"></i></div>
@@ -63,7 +64,6 @@
 				</div>
 
 	    	</span>
-    	</div>
 	</div>
 <script type="text/javascript">
 	var tags = document.getElementById("tags_id");

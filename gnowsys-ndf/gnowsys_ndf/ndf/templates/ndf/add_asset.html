@@ -22,7 +22,7 @@
         {% if edit or not asset_obj.name %}
             <a class="right close-reveal-modal reveal-modal-overlay" aria-label="Close">&#215;</a>
         {% endif %}
-        <div class="small-9 columns">
+        <div class="small-10 columns">
             {% if not edit and asset_obj.name %}
                 <p class="left">{{asset_obj.name}}</p>
                 {% if asset_obj.tags %}
@@ -39,12 +39,13 @@
 
             {% else %}
                 <h3 class="left overlay-title">&nbsp;{% if not asset_obj %} Add a new {% else %} Edit {% endif %} asset</h3>
-                <button type="button" class="right blue-white-button save-asset" data-asset_id='{{asset_obj.pk}}'>Save Asset</button>
+                <button type="button" class="blue-white-button save-asset right" data-asset_id='{{asset_obj.pk}}' style="margin-top: 9px;
+    margin-right: -133px;">Save Asset</button>
             {% endif %}
         </div>
         {% if not edit and asset_obj %}
              {% if asset_obj.created_by == request.user.id or is_gstaff %}
-            <div class="small-3 columns">
+            <div class="small-2 columns">
                 <span data-dropdown="asset-settings-drop" aria-controls="asset-settings-drop" aria-expanded="false" class="large orange-button right">
                     Settings
                 </span>
@@ -65,7 +66,7 @@
     </div>
     <hr/>
         <div class="row">
-            <div class="small-12 medium-6 large-6 columns">
+            <div class="small-12 medium-10 large-10 columns">
                 <label>
                     {% if edit or not asset_obj %}
                        Asset name *
@@ -74,33 +75,51 @@
                 </label>
             </div>
         </div>
+
+        {% if edit or not asset_obj %}
+
         <div class="row">
-            <div class="small-12 medium-12 large-12 columns">
-                    <label>
-                        {% if edit or not asset_obj %}
-                            Asset description *
-                            </label>
-                            <textarea rows="4" cols="2" class="small-12 columns" placeholder="Enter Description" id="asset-descid" value=''>{% if asset_obj %} {{asset_obj.content|safe|striptags}}{% endif %}</textarea>
-                            {% include 'ndf/widget_tags.html' with node=asset_obj %}
-                            {% get_language_info_list for LANGUAGES as languages %}
-                            <select class="asset-lang" name="lan" id="asset_lang" >
-                                {% for language in languages %}
-                                {% if asset_obj.language.0 == language.code  %}
-                                    <option selected data-sub-lang="{{ language.name }}" data-sub-code="{{ language.code }}">
-                                    {{language.name}}
-                                {%  else %}
-                                    <option data-sub-lang="{{ language.name }}" data-sub-code="{{ language.code }}">
-                                      {{ language.name }}
-                                    </option>
-                                {% endif %}
-                                {% endfor %}
-                            </select>
-
-                {% endif %}
-
+            <div class="small-12 medium-10 large-10 columns">
+            <label>
+                    Asset description *
+                    <textarea rows="4" cols="2" class="small-12 columns" placeholder="Enter Description" id="asset-descid" value=''>{% if asset_obj %} {{asset_obj.content|safe|striptags}}{% endif %}
+                    </textarea>
+            </label>
             </div>
         </div>
-    
+
+
+        <div class="row">
+            <div class="small-12 medium-10 large-10 columns">
+                <label>
+                    Select Language
+                {% get_language_info_list for LANGUAGES as languages %}
+                <select class="asset-lang" name="lan" id="asset_lang" >
+                    {% for language in languages %}
+                    {% if asset_obj.language.0 == language.code  %}
+                        <option selected data-sub-lang="{{ language.name }}" data-sub-code="{{ language.code }}">
+                        {{language.name}}
+                    {%  else %}
+                        <option data-sub-lang="{{ language.name }}" data-sub-code="{{ language.code }}">
+                          {{ language.name }}
+                    {% endif %}
+                    </option>
+                    {% endfor %}
+                </select>
+                </label>
+            </div>
+        </div>
+        <div class="row">
+            <div class="asset-tags-container small-12 medium-10 large-10 columns">
+            <label>
+            Add tags:
+            {% include 'ndf/widget_tags.html' with node=asset_obj hide_lbl=True %}
+            </label>
+            </div>
+
+        </div>
+
+        {% endif %}
 
 
     <div class="asset-content-area"{% if not asset_obj %} style="display:none"{% endif %}>
@@ -417,7 +436,7 @@
 
             }
 
-            uploadButton.innerHTML = 'Upload';
+            // uploadButton.innerHTML = 'Upload';
 
             // updating metadata of files, if file is uploaded sucessfully
             // if(xhr.responseText != "UploadError")
