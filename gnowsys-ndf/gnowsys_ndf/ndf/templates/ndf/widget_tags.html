@@ -27,20 +27,22 @@
 			<span>
 
 				<div class="row">
+					{% if not hide_lbl %}
 					<div class="small-3 columns add-tag-heading">
 						<h3>
 						<span  class="subheader small-3 columns"  data-tooltip class="has-tip" title="{% trans 'Tags help identify similiar work easily. Just add tag text and click Add Tag button' %}"> {% trans "Add Tag" %}:
 						</span>
 						</h3>
 					</div>
-					<div class="small-9 columns tag-input-ele">
+					{% endif %}
+					<div class="small-8 columns tag-input-ele">
 						<div class="row collapse">
 							<div class="small-9 columns">
 						    	<input id="tags_id" tabindex="2" type="text" value="" placeholder="{% trans 'Add tag text and click on [Add Tag] button' %}">
 						    	<input type="hidden" value="{{node.tags|join:', '|default_if_none:""}}" name="tags">
 					        </div>
 					        <div class="small-3 columns">
-					          <span tabindex="3" id="add-tag-btn" class="add-tag-btn" class="tiny button radius">{% trans 'Add Tag' %}</span>
+					          <span tabindex="3" id="add-tag-btn" class="tiny button radius orange-button add-tag-btn">{% trans 'Add Tag' %}</span>
 					        </div>
 						</div>
 
