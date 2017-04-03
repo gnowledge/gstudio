@@ -192,7 +192,7 @@
                         <div class="asset_title" style="color: #2e3f51">{{each.name|truncatechars:35}}
                         {% if user.is_authenticated  and not group_object.edit_policy == "NON_EDITABLE"  or gstaff_access %}
                         </a>
-                        <input type="checkbox" class="filenode" name="filenode" value="{{each.pk}}" style="margin-top:6px; margin-right: 2px; float:right;" class="asset_content_checkbox">
+                        <input type="checkbox" class="filenode" name="filenode" value="{{each.pk}}" style="margin-top:6px; margin-right: 2px; float:righ`t;" class="asset_content_checkbox">
                         {% endif %}
                         <div class="asset_desc">{{each.content|truncatechars:35}}</div>
                         </div>
@@ -368,7 +368,7 @@
             event.preventDefault()
         }
         $('#addAsset').foundation('reveal', 'close');
-        location.reload()
+        location.href = "{% url 'asset_detail' group_id asset_obj.pk %}";
     });
 
 </script>
