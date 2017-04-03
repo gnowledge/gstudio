@@ -1060,7 +1060,7 @@ label {
  label>.tag-ele{
     text-transform: none;
   }
-  
+
 input[type="file"]::-webkit-file-upload-button{
     visibility: hidden;
 }
@@ -3101,3 +3101,6 @@ ul.jqtree-tree .jqtree-toggler {
     margin-bottom:7px;
 }
 
+.page-name{
+    margin-top:4px;
+}
