@@ -3197,7 +3197,7 @@ def save_course_page(request, group_id):
     group_obj = get_group_name_id(group_id, get_obj=True)
     group_id = group_obj._id
     group_name = group_obj.name
-    tags = request.POST.get("tags", [])
+    tags = request.POST.get("tags",[])
     if tags:
         tags = json.loads(tags)
     else:
@@ -3221,7 +3221,12 @@ def save_course_page(request, group_id):
         if activity_lang:
             language = get_language_tuple(activity_lang)
             page_obj.language = language
-        page_obj.tags = tags
+        
+        page_obj.fill_gstystem_values(tags=tags)
+        # if tags:
+        #     page_obj.tags = tags
+        # else:
+        #     page_obj.tags = []
         page_obj.name = unicode(name)
         page_obj.content = unicode(content)
         page_obj.created_by = request.user.id
