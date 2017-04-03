@@ -6727,8 +6727,8 @@ def create_edit_asset(request,group_id):
   # for each_asset in asset_grels:
   #   teaches_list.append(each_asset['right_subject'])
   # create_grelation(asset_obj._id, rt_teaches, teaches_list)
-
-  return StreamingHttpResponse(asset_obj.pk)
+  # print "+++++++++++++++++++++++++++++++++++++++++"
+  return HttpResponse("success")
 
 
 @login_required
