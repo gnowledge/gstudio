@@ -94,7 +94,10 @@ def unit_create_edit(request, group_id, unit_group_id=None):
         #     unit_node.tags = tags
         if tags:
             tags = json.loads(tags)
-        unit_node.tags = tags
+        else:
+            tags = []
+        # unit_node.tags = tags
+        unit_node.fill_gstystem_values(tags=tags)
         unit_node.content = content
         unit_node.save()
         return HttpResponseRedirect(reverse('course_about',

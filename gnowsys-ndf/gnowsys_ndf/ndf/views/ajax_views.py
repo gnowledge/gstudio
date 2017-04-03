@@ -6679,10 +6679,9 @@ def add_asset(request,group_id):
       group_id = ObjectId(group_id)
   except:
       group_name, group_id = get_group_name_id(group_id)
-  topic_gst = node_collection.one({'_type': 'GSystemType', 'name': 'Topic'})
-  topic_nodes = node_collection.find({'member_of': {'$in': [topic_gst._id]}})
-  context_variables = {'group_id':group_id, 'groupid':group_id,
-    'topic_nodes':topic_nodes, 'edit': False}
+  # topic_gst = node_collection.one({'_type': 'GSystemType', 'name': 'Topic'})
+  # topic_nodes = node_collection.find({'member_of': {'$in': [topic_gst._id]}})
+  context_variables = {'group_id':group_id, 'groupid':group_id,'edit': False}
   node_id = request.GET.get('node_id', None)
   node_obj = node_collection.one({'_id': ObjectId(node_id)})
   if node_obj:
@@ -6704,7 +6703,8 @@ def create_edit_asset(request,group_id):
   tags =  request.POST.get("sel_tags", [])
   if tags:
       tags = json.loads(tags)
-
+  else:
+      tags = []
   asset_lang =  request.POST.get("sel_asset_lang", '')
   # file_node.language = get_language_tuple(language)
   node_id = request.POST.get('node_id', None)
@@ -6727,8 +6727,8 @@ def create_edit_asset(request,group_id):
   # for each_asset in asset_grels:
   #   teaches_list.append(each_asset['right_subject'])
   # create_grelation(asset_obj._id, rt_teaches, teaches_list)
-
-  return StreamingHttpResponse(asset_obj.pk)
+  # print "+++++++++++++++++++++++++++++++++++++++++"
+  return HttpResponse("success")
 
 
 @login_required
