@@ -24,7 +24,7 @@
             <div class="small-4 columns">
                  {% if activity_node.tags %}
                     {% for tag in activity_node.tags %}
-                            <small><label class="tag-ele">
+                            <small><label class="tag-ele" style="margin-top: 13px;">
                         <a href="{% url 'tag_info' group_id tag %}">{{tag}} </a></label></small>
                     {% endfor %} 
                 {% else %}
