@@ -99,6 +99,7 @@
                             <div class="asset_text">
                                 <div class="asset_title" title="{{each.name}}">{{each.name|truncatechars:25}}</div>
                                     {% if user.is_authenticated  and not group_object.edit_policy == "NON_EDITABLE"  or gstaff_access %}
+                                    </a>
                                     <input type="checkbox" class="activitynode" name="activitynode" value="{{each.pk}}" style="margin:0; float:right;" class="asset_content_checkbox">
                                     {% endif %}
                                 <div class="asset_desc">{{each.content|safe|striptags|truncatechars:25}}</div>
@@ -176,11 +177,13 @@
         $.ajax({
           url: "{% url 'inline_edit_res' group_id %}",
 
-          type: "GET",
+          type: "POST",
 
           data: {
             "node_id": "{{activity_node.pk}}",
-            "node_content": $(".activity-detail-content .content_val").html()
+            'csrfmiddlewaretoken': "{{csrf_token}}",
+            "node_content": $(".activity-detail-content .content_val").html(),
+            "type": "edit"
           },
           dataType: "html",
 
@@ -203,7 +206,9 @@
             "content_val": content_val,
             "node_id": "{{activity_node.pk}}",
             "custom_redirect": "view_course_page",
-            'csrfmiddlewaretoken': "{{csrf_token}}"
+            'csrfmiddlewaretoken': "{{csrf_token}}",
+            "type": "save"
+
           },
 
           type: "POST",

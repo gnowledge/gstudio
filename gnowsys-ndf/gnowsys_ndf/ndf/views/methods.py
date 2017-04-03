@@ -4255,12 +4255,13 @@ def delete_gattribute(subject_id=None, deletion_type=0, **kwargs):
         # print "\n 4 >> gattributes.count()... ", gattributes.count()
 
         # Perform normal delete operation (i.e. deletion_type == 0)
-        for each_ga in gattributes:
-            gattribute_deleted_id.append(each_ga._id.__str__())
+        if deletion_type == 1:
+            for each_ga in gattributes:
+                gattribute_deleted_id.append(each_ga._id.__str__())
 
-            if each_ga.status != u"DELETED":
-                create_gattribute(each_ga.subject, each_ga.attribute_type)
-                # print "\t 4 >> each_ga (0) ... ", each_ga._id
+                if each_ga.status != u"DELETED":
+                    create_gattribute(each_ga.subject, each_ga.attribute_type)
+                    # print "\t 4 >> each_ga (0) ... ", each_ga._id
 
         # print "\n 5 >> gattribute_deleted_id... " + ",
         # ".join(gattribute_deleted_id)

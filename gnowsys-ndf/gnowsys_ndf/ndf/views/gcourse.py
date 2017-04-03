@@ -2473,28 +2473,27 @@ def inline_edit_res(request, group_id):
     context_variables = {
             'group_id': group_id, 'groupid': group_id, 'group_name':group_name,
             }
+    template = None
     if request.method == "POST":
         node_id = request.POST.get("node_id", "")
         node_obj = node_collection.one({'_id': ObjectId(node_id)})
-        content_val = request.POST.get("content_val", "")
-        custom_redirect = request.POST.get("custom_redirect", "")
-        node_obj.content = content_val
-        node_obj.save()
-        template = 'ndf/node_ajax_content.html'
-        context_variables['no_discussion'] = True
-        context_variables['node'] = node_obj
-
-    else:
-        node_id = request.GET.get("node_id", "")
-        node_id_to_be_edited = request.GET.get("edit", "")
-        node_obj = node_collection.one({'_id': ObjectId(node_id)})
-        node_content = request.GET.get("node_content", node_obj.content)
-        template = 'ndf/html_editor.html'
-        context_variables['var_name'] = "content_org"
-        context_variables['var_value'] = node_content
-        context_variables['node_id'] = node_obj._id
-        context_variables['ckeditor_toolbar'] ="GeneralToolbar"
-        context_variables['node'] = node_obj
+        type_of_req = request.POST.get("type", "")
+        if type_of_req == "edit":
+            node_content = request.POST.get("node_content", node_obj.content)
+            template = 'ndf/html_editor.html'
+            context_variables['var_name'] = "content_org"
+            context_variables['var_value'] = node_content
+            context_variables['node_id'] = node_obj._id
+            context_variables['ckeditor_toolbar'] ="GeneralToolbar"
+            context_variables['node'] = node_obj
+        elif type_of_req == "save":
+            content_val = request.POST.get("content_val", "")
+            custom_redirect = request.POST.get("custom_redirect", "")
+            node_obj.content = content_val
+            node_obj.save()
+            template = 'ndf/node_ajax_content.html'
+            context_variables['no_discussion'] = True
+            context_variables['node'] = node_obj
     return render_to_response(template, context_variables, context_instance = RequestContext(request))
 
 
@@ -3197,7 +3196,7 @@ def save_course_page(request, group_id):
     group_obj = get_group_name_id(group_id, get_obj=True)
     group_id = group_obj._id
     group_name = group_obj.name
-    tags = request.POST.get("tags", [])
+    tags = request.POST.get("tags",[])
     if tags:
         tags = json.loads(tags)
     else:
@@ -3221,7 +3220,12 @@ def save_course_page(request, group_id):
         if activity_lang:
             language = get_language_tuple(activity_lang)
             page_obj.language = language
-        page_obj.tags = tags
+        
+        page_obj.fill_gstystem_values(tags=tags)
+        # if tags:
+        #     page_obj.tags = tags
+        # else:
+        #     page_obj.tags = []
         page_obj.name = unicode(name)
         page_obj.content = unicode(content)
         page_obj.created_by = request.user.id

@@ -27,7 +27,7 @@ CKEDITOR.plugins.add('addJhapp',
                           $('#group_imgs_on_modal').foundation('reveal', 'open');
                             $("#insert_assessment").click(function(event){
                             assessment_text_val = $('#paste-area-assessment').val();
-                            split_word = assessment_text_val.slice(0, 7) + ' style="height:100%;width:100%" ' + assessment_text_val.slice(7);
+                            split_word = assessment_text_val.slice(0, 7) + ' style="height:100vh;width:100%" ' + assessment_text_val.slice(7);
                              CKEDITOR.instances[textAreaId].insertHtml(split_word);
                             $('#group_imgs_on_modal').foundation('reveal', 'close');
                           });
