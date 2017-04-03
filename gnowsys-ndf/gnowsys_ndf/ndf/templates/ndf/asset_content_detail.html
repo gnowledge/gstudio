@@ -51,36 +51,39 @@
 
         <hr/>
      
-
-     {% get_relation_value node.pk 'has_subtitle' as grel_sub %}
-     {% for each in grel_sub.grel_node %}
-      <div class="medium-6 columns left">
-        {{each.name}}  
+      <div class="row">
+           {% get_relation_value node.pk 'has_subtitle' as grel_sub %}
+           {% for each in grel_sub.grel_node %}
+            <div class="small-4 columns asset_list">
+              {{each.name}}  
+            </div>
+             <div class="small-4 columns right" >
+              {% if node.created_by == request.user.id or is_gstaff %}
+              <button type="button" data-sub-id = "{{each.pk}}" class="right orange-button-subtitle delete-subtitle" onclick="delete_rel_files('{{each.pk}}','has_subtitle')">Delete subtitle</button> <br>
+              {% endif %}
+             </div>
+           {% endfor %}
       </div>
-       <div class="medium-6 columns right" >
+      
+    <div class="row">     
+        {% get_relation_value node.pk 'has_transcript' as grel_trans %}
+        {% if grel_trans.grel_node.pk %}
         {% if node.created_by == request.user.id or is_gstaff %}
-        <button type="button" data-sub-id = "{{each.pk}}" class="right orange-button-subtitle delete-subtitle" onclick="delete_rel_files('{{each.pk}}','has_subtitle')">Delete subtitle</button> <br>
+        <div class="small-4 columns asset_list">
+          {{grel_trans.grel_node.name}}
+        </div>
+        <div class="small-4 columns right " >
+           <button type="button"  class="right orange-button-subtitle delete-transcript" onclick="delete_rel_files('{{grel_trans.grel_node.pk}}','has_transcript')" >Delete transcript</button>
+        </div> 
+          {% endif %}
+        <br>
         {% endif %}
-         
-       </div>
-     {% endfor %}
-     
-    {% get_relation_value node.pk 'has_transcript' as grel_trans %}
-    {% if grel_trans.grel_node.pk %}
-    {% if node.created_by == request.user.id or is_gstaff %}
-    <div class="medium-6 columns left">
-      {{grel_trans.grel_node.name}}
     </div>
-    <div class="medium-6 columns left" >
-       <button type="button"  class="right orange-button-subtitle delete-transcript" onclick="delete_rel_files('{{grel_trans.grel_node.pk}}','has_transcript')" >Delete transcript</button>
-    </div> 
-      {% endif %}
-    <br>
-    {% endif %}
     
+    <div class="row">
             {% get_relation_node node.pk  'has_alt_content' as alt_lang_rel_node %}
               {% if alt_lang_rel_node %}
-              	<div class="medium-6 columns left">
+              	<div class="small-4 columns asset_list">
                   Alternate Files : 
                 {% for each in  alt_lang_rel_node %} 
                   <a href="{% url 'assetcontent_detail' group_id asset_obj.pk each.file_id %}" >
@@ -89,6 +92,7 @@
                 {% endfor  %} 
                 </div>
               {% endif %}
+    </div>
 
   <div id="addSupportingFile" class="reveal-modal medium radius" data-reveal data-alert>
     <p id="addSupportingFileLabel"></p>
