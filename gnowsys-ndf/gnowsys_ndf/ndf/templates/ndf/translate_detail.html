@@ -4,6 +4,8 @@
 {% block title %} {{title}} {% endblock %}
 
 {% block body_content %}
+<div class="row group_content">
+    <div class="small-12 columns  group_sections_content" id="scstyle">
 	<h2 class="text-center"> {{node.name}}
 		<small>
 			<a href="{% url 'translated' group_id source_node_id node.language.0 node.pk %}">[ EDIT ] </a>
@@ -25,6 +27,8 @@
     Original Resource:
     <br/>
     {% include "ndf/widget_card.html" with node=source_node_obj url_name='all_translations' url_first_arg=group_id url_second_arg=source_node_id %}
+    </div>
+</div>
 
 {% endblock %}
 
