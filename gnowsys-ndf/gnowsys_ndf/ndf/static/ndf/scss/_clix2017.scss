@@ -1057,7 +1057,10 @@ label {
     margin-left: 20px;
 }
 
-
+ label>.tag-ele{
+    text-transform: none;
+  }
+  
 input[type="file"]::-webkit-file-upload-button{
     visibility: hidden;
 }

@@ -972,6 +972,11 @@ label {
   margin-left: 20px;
 }
 
+  label>.tag-ele{
+  	text-transform: none;
+  }
+
+
 /* line 1060, ../../../scss/_clix2017.scss */
 input[type="file"]::-webkit-file-upload-button {
   visibility: hidden;
