@@ -108,20 +108,24 @@
 <div class="small-12 columns about-course">
   <!-- <h5>About this course</h5> -->
   <div class="row">
-    <div class="small-12 medium-6 columns">
+    <div class="small-12 columns">
+    <h5>Description:</h5>
       <div class="course-desc" id="scstyle">
           {{group_object.content|default:'No description added yet.'|safe}}
       </div>
       <div>
         <u><a class="show-more hide">Show more</a></u>
       </div>
+      <br/>
       {% if group_object.tags %}
+          <h5>Tags:</h5>
           {% for tag in group_object.tags %}
-                  <small><label class="lbl_tag label">
+                  <small><label class="tag-ele">
+
               <a href="{% url 'tag_info' group_id tag %}">{{tag}} </a></label></small>
           {% endfor %} 
       {% else %}
-          <i><small><label class="lbl_tag">{% trans "No tags defined yet!" %}</label></small></i>
+          <i><small><label class="tag-ele">{% trans "No tags defined yet!" %}</label></small></i>
       {% endif %}
 
     </div>

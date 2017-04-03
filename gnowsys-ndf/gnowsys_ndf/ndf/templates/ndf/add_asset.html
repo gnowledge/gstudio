@@ -47,11 +47,11 @@
              {% if asset_obj.created_by == request.user.id or is_gstaff %}
             <div class="small-2 columns">
                 <span data-dropdown="asset-settings-drop" aria-controls="asset-settings-drop" aria-expanded="false" class="large orange-button right">
-                    Settings
+                    Settings <i class="fa fa-chevron-down"></i>
                 </span>
                 <ul id="asset-settings-drop" class="f-dropdown" data-dropdown-content aria-hidden="true" tabindex="-1">
                 <li> <a class="createAsset" data-asset_id='{{asset_obj.pk}}'>Edit</a></li>
-                <li><a class="edit-metadata">Edit Metadata</a></li>
+                <li><a class="edit-metadata">Metadata</a></li>
                 <li>
                     {% if asset_obj %}
                         {% get_relation_node asset_obj.pk  'has_assetcontent' as asset_cont_grel %}
