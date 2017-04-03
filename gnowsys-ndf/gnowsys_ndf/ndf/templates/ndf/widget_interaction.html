@@ -7,23 +7,25 @@
   {% if thread_node %}
       {% get_attribute_value thread_node 'release_response' as resp_val %}
       {% get_attribute_value thread_node 'thread_interaction_type' as thr_int_type %}
-      {{thr_int_type}}
   {% endif %}
 	{% csrf_token %}
 	<input type="hidden" name="node_id" class="form_node_id" value="{{node.pk}}">
 
-        <div class="content contents" id="panel-thread" >
-        <div class="row">
-            <h7> {% trans "Do you want to enable Comments/Discussion on this Activity for Students ? " %} </h7>
-        </div>
+        <div class="interaction-settings-div">
+          <div class="row">
+          <h3> Interaction Settings </h3>
+          </div>
+          <div class="small-12 columns">
+              <h4> {% trans "Do you want to enable Comments/Discussion on this Activity for Students ? " %} </h4>
+          </div>
 
         <div class="row yes_no_disc_div">
-          <div class="large-2 medium-4 columns"><h5>{% trans "Interaction : " %}</h5>
-          </div>
-          <div class="large-6 medium-8 columns">
+          <!-- <div class="large-2 medium-4 columns"><h5>{% trans "Interaction : " %}</h5>
+          </div> -->
+          <!-- <div class="large-6 medium-8 columns"> -->
             <input type="radio" name="thread_create" value="Yes"/>Yes &nbsp;&nbsp;
             <input type="radio" name="thread_create" value="No" checked="checked" />No
-          </div>
+         <!--  </div> -->
         </div>
         <div class="thread-settings-div  hide">
             <div class="row">
@@ -37,6 +39,7 @@
                 </select>
               </div>
             </div>
+            <br/>
 
             <div class="row">
               <div class="large-2 medium-4 columns "><h5>{% trans "Interaction Type:" %}</h5>

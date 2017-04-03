@@ -39,7 +39,7 @@
             {% if not edit and asset_obj %}
                 {% if asset_obj.created_by == request.user.id or is_gstaff %}
                 <span data-dropdown="asset-settings-drop" aria-controls="asset-settings-drop" aria-expanded="false" class="large orange-button right">
-                    Settings <i class="fa fa-chevron-down"></i>
+                    Actions <i class="fa fa-chevron-down"></i>
                 </span>
                 <ul id="asset-settings-drop" class="f-dropdown" data-dropdown-content aria-hidden="true" tabindex="-1">
                     <li> <a class="createAsset" data-asset_id='{{asset_obj.pk}}'>Edit</a></li>
@@ -61,7 +61,7 @@
                 </ul>
                 {% endif %}
             {% endif%}
-            <button type="button" class="orange-button add-asset-content right"><i class="fi-plus"></i> Files</button>
+            <button type="button" class="orange-button add-asset-content right"><i class="fi-plus"></i> Add File</button>
             </div>
             
 
@@ -199,7 +199,7 @@
         <div class="row">
             {% if asset_content_list.grel_id %}
             <div class="row">
-                <button type="button" class="orange-button delete-asset-content right icon-widget" style="margin-right: 53px;" title="Click on the checkbox on the files below to Delete"><i class="fa fa-trash"></i> Files</button>
+                <button type="button" class="orange-button delete-asset-content right icon-widget" style="margin-right: 53px;" title="Click on the checkbox on the files below to Delete"><i class="fa fa-trash"></i> Delete Files</button>
             </div>
             {% endif %}
             {% for each in asset_content_list.grel_node %}
@@ -232,14 +232,15 @@
         </div>
         <!-- </div> -->
     
-    <hr/>
+    
         <div class="row">
               {% if node %}
+              <hr/>
                &nbsp; {% include "ndf/asset_content_detail.html" with node=node %}
               {%  endif %}
         </div>
     <!-- </div> -->
-
+    <hr/>
     <div class="row asset-comments-section">
       <div class="small-10 columns" id="view-discussion">
             <!-- discussion content area -->
