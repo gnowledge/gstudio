@@ -370,6 +370,8 @@
         $('#addAsset').foundation('reveal', 'close');
         {% if asset_obj %}
             location.href = "{% url 'asset_detail' group_id asset_obj.pk %}";
+        {% else %}
+        location.reload();
         {% endif %}
     });
 
