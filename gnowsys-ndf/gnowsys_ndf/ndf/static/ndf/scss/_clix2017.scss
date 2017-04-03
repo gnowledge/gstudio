@@ -56,6 +56,7 @@ h5{
 
 .icon-widget{
     font-size:24px;
+
 }
 
 
@@ -1056,6 +1057,9 @@ label {
     margin-left: 20px;
 }
 
+ label>.tag-ele{
+    text-transform: none;
+  }
 
 input[type="file"]::-webkit-file-upload-button{
     visibility: hidden;
@@ -3095,4 +3099,8 @@ ul.jqtree-tree .jqtree-toggler {
 
 #asset-descid{
     margin-bottom:7px;
+}
+
+.page-name{
+    margin-top:4px;
 }

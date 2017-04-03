@@ -18,10 +18,33 @@
 {% if activity_node and not editor_view %}
     <div class="activity-detail-page">
         <div class="row">
-            <div class="small-6 columns">
+            <div class="small-1 columns icon-widget" style="margin-top: 5.6px;">
+            <a href="{% url 'course_pages' group_id %}"><i class="fa fa-chevron-left large" aria-hidden="true"></i></a>
+            
+            </div>
+
+            <div class="small-8 columns">
                 <h4 class="page-name">{{activity_node.name}}</h4>
             </div>
-            <div class="small-4 columns">
+            
+            {% if activity_node.created_by == request.user.id or is_gstaff %}
+            <div class="small-3 columns right">
+                <span data-dropdown="activity-page-settings-drop" aria-controls="activity-page-settings-drop" aria-expanded="false" class="orange-button right">
+                    Settings <i class="fa fa-chevron-down"></i>
+                </span>
+                <ul id="activity-page-settings-drop" class="f-dropdown" data-dropdown-content aria-hidden="true" tabindex="-1">
+            
+                <li><a href="{% url 'edit_course_page' group_id activity_node.pk %}">Edit</a></li>
+                <li><a title="Edit Content" class="edit_res_unit">{% trans " Edit Content" %}</a></li>
+                <li><a title="Edit Interaction Settings" class="edit-interaction">{% trans "Interaction Settings" %}</a></li>
+                <li><a href="{% url 'all_translations' group_id activity_node.pk %}" target="_blank">Alternate Language</a></li>
+                </ul>
+
+            </div>
+            {% endif %}
+        </div>
+        <div class="row">
+            <div class="small-10 columns left">
                  {% if activity_node.tags %}
                     {% for tag in activity_node.tags %}
                             <small><label class="tag-ele" style="margin-top: 13px;">
@@ -31,24 +54,8 @@
                     <i><small><label>{% trans "No tags defined yet!" %}</label></small></i>
                 {% endif %}   
             </div>
-
-            {% if activity_node.created_by == request.user.id or is_gstaff %}
-            <div class="small-2 columns">
-                <span data-dropdown="activity-page-settings-drop" aria-controls="activity-page-settings-drop" aria-expanded="false" class="orange-button right">
-                    Settings
-                </span>
-                <ul id="activity-page-settings-drop" class="f-dropdown" data-dropdown-content aria-hidden="true" tabindex="-1">
-            
-                <li><a href="{% url 'edit_course_page' group_id activity_node.pk %}">Edit Activity</a></li>
-                <li><a title="Edit Content" class="edit_res_unit">{% trans " Edit Only Content" %}</a></li>
-                <li><a title="Edit Interaction Settings" class="edit-interaction">{% trans "Interaction Settings" %}</a></li>
-                <li><a href="{% url 'all_translations' group_id activity_node.pk %}">Alternate Language</a></li>
-
-                <li><a href="{% url 'course_pages' group_id %}" >Back to Activities</a></li>
-
-            </div>
-            {% endif %}
         </div>
+
         <div class="row activity-detail-content">
             {% include "ndf/node_ajax_content.html" with node=activity_node %}
         </div>

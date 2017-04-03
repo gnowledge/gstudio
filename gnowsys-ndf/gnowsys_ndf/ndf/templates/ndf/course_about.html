@@ -118,8 +118,8 @@
       </div>
       <br/>
       {% if group_object.tags %}
-          {% for tag in group_object.tags %}
           <h5>Tags:</h5>
+          {% for tag in group_object.tags %}
                   <small><label class="tag-ele">
 
               <a href="{% url 'tag_info' group_id tag %}">{{tag}} </a></label></small>

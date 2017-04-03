@@ -99,7 +99,8 @@
 			var tagsArr = new Array();
 
 			$("#added_tags").children("div.tags.label").each(function(){
-				tagsArr.push(this.textContent.trim().toLowerCase());
+				tagsArr.push(this.textContent.trim());
+				// tagsArr.push(this.textContent.trim().toLowerCase());
 			});
 
 			if(tagsArr.indexOf(textValue) != -1){
@@ -117,7 +118,8 @@
 		var tagsArr = new Array();
 
 		$("#added_tags").children("div.tags.label").each(function(){
-			tagsArr.push(this.textContent.trim().toLowerCase());
+			tagsArr.push(this.textContent.trim());
+			// tagsArr.push(this.textContent.trim().toLowerCase());
 		});
 
 		$("input:hidden[name='tags']").val(JSON.stringify(tagsArr));
@@ -147,7 +149,8 @@
 	function addTag() {
 		if(checkTag())
 		{
-			var textValue = tags.value.trim().toLowerCase();
+			var textValue = tags.value.trim();
+			// var textValue = tags.value.trim().toLowerCase();
 			tags.value = '';
 
 			var tagDiv = document.createElement("div");
