@@ -1141,7 +1141,10 @@ def get_node_common_fields(request, node, group_id, node_type, coll_set=None):
         name = request.POST.get('name', '').strip()
         content_org = request.POST.get('content_org')
         # print "\n\n\n content_org",content_org
-        tags = request.POST.get('tags','')
+        tags = request.POST.get('tags',[])
+        if tags:
+            tags = json.loads(tags)
+
     language = request.POST.get('lan')
     copyright = request.POST.get('copyright')
     sub_theme_name = request.POST.get("sub_theme_name", '')
@@ -1267,16 +1270,19 @@ def get_node_common_fields(request, node, group_id, node_type, coll_set=None):
 
     # tags
     # if tags:
-    tags_list = []
+
+    # tags_list = []
     if tags != node.tags:
-        for tag in tags.split(","):
-            tag = unicode(tag.strip())
+        # for tag in tags.split(","):
+        #     tag = unicode(tag.strip())
 
-            if tag:
-                tags_list.append(tag)
+        #     if tag:
+        #         tags_list.append(tag)
 
-        if set(node.tags) != set(tags_list):
-            node.tags = tags_list
+        # if set(node.tags) != set(tags_list):
+            # node.tags = tags_list
+        if set(node.tags) != tags:
+            node.tags = tags
             is_changed = True
 
     #  Build collection, prior node, teaches and assesses lists
