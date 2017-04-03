@@ -2827,6 +2827,7 @@ ul.jqtree-tree .jqtree-toggler {
 
 .create-discussion {
     position: relative;
+    margin-bottom:20px;
 
     >div {
       display: inline-block;
@@ -2993,7 +2994,6 @@ ul.jqtree-tree .jqtree-toggler {
     height: 50px;
     background: #fff;
     padding: 5px 15px;
-    box-shadow: 1px 0px 0px #000;
     margin-bottom: 65px;
     
     .tag-input-ele {

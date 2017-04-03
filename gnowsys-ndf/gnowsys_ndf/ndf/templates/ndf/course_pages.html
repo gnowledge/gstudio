@@ -20,7 +20,6 @@
         <div class="row">
             <div class="small-1 columns icon-widget" style="margin-top: 5.6px;">
             <a href="{% url 'course_pages' group_id %}"><i class="fa fa-chevron-left large" aria-hidden="true"></i></a>
-            
             </div>
 
             <div class="small-8 columns">
@@ -63,21 +62,26 @@
 
 
 {% else %}
-    {% if user.is_authenticated %}
+    
         <div class="activity-sheet-actions">
             <div class="row">
-            <a class="right orange-button-template" href="{% url 'create_course_page' group_id %}">Add Activity Page</a>
+            {% if all_pages.count %}
+            <button type="button" class="orange-button delete-activity right" title="Click on the checkbox on the files below to Delete"><i class="fa fa-trash"></i> Activity Page</button>
+            {% endif %}
+            {% if user.is_authenticated %}
+            <a class="right orange-button-template" href="{% url 'create_course_page' group_id %}"><i class="fi-plus"></i> Activity Page</a>
+            {% endif %}
+
+
             </div>
         </div>
-    {% endif %}
+    
 
 
     <div id="page_listing">
-    {% if all_pages.count %}
-    <div class="row">
-        <button type="button" class="orange-button delete-activity right" title="Click on the checkbox on the files below to Delete">Delete Activity</button>
-    </div>
-    {% endif %}
+    
+    
+    
         <div class="row">
             {% for each in all_pages %}
                 <a class="view-page" data-page-id="{{each.pk}}" data-node-name="{{each.name}}" title="{{each.name}}" href="{% url 'view_course_page' group_id each.pk %}">
