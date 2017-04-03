@@ -56,6 +56,7 @@ h5{
 
 .icon-widget{
     font-size:24px;
+
 }
 
 
@@ -808,6 +809,7 @@ ul.horizontal_tabs_gstudio {
         padding-bottom: 5px;
         background: transparent;
         color: #fff;
+        width:100%;
         
         /* Permalink - use to edit and share this gradient: http://colorzilla.com/gradient-editor/#49667a+0,49667a+100&0+0,0.5+100 */
         background: -moz-linear-gradient(top,  rgba(73,102,122,0) 0%, rgba(73,102,122,0.8) 100%); /* FF3.6-15 */
@@ -838,6 +840,30 @@ ul.horizontal_tabs_gstudio {
         // min-height: 400px;
         background-color: #fff;
         margin-bottom: 100px;
+    }
+
+    .course_actions>span{
+              margin-right: 5px;
+              background: rgb(46, 63, 81);
+              border: 1px solid rgba(255, 255, 255, 0.7);
+              padding: 1px 8px;
+              color: #fff;
+              font-size: 12px;
+              margin: 0px 10px 0px 0px;
+              cursor: pointer;
+              border-radius: 3px;
+    }
+
+    .course_actions>i{
+              margin-right: 5px;
+              background: rgba(0, 0, 0, 0.6);
+              border: 1px solid rgba(255, 255, 255, 0.7);
+              padding: 1px 8px;
+              color: #fff;
+              font-size: 12px;
+              margin: 0px 10px 0px 0px;
+              cursor: pointer;
+              border-radius: 3px;
     }
 }
 
@@ -1031,6 +1057,9 @@ label {
     margin-left: 20px;
 }
 
+ label>.tag-ele{
+    text-transform: none;
+  }
 
 input[type="file"]::-webkit-file-upload-button{
     visibility: hidden;
@@ -2233,8 +2262,35 @@ ul.jqtree-tree .jqtree-toggler {
             }
         }
 
+        span {
+              margin-right: 5px;
+              background: rgba(0, 0, 0, 0.6);
+              border: 1px solid rgba(255, 255, 255, 0.7);
+              padding: 1px 8px;
+              color: #fff;
+              font-size: 12px;
+              margin: 0px 10px 0px 0px;
+              cursor: pointer;
+              border-radius: 3px;
+            }
+
+        i {
+
+              margin-right: 5px;
+              background: rgba(0, 0, 0, 0.6);
+              border: 1px solid rgba(255, 255, 255, 0.7);
+              padding: 1px 8px;
+              color: #fff;
+              font-size: 12px;
+              margin: 0px 10px 0px 0px;
+              cursor: pointer;
+              border-radius: 3px;
+
+        }
+
     }
 }
+
 
 .create_unit {
     background: #fff;
@@ -2925,6 +2981,7 @@ ul.jqtree-tree .jqtree-toggler {
     color: #ce7869;
     border: 1px solid;
     border-radius: 6px;
+    text-transform: none;
 }
 
 
@@ -2983,7 +3040,7 @@ ul.jqtree-tree .jqtree-toggler {
             width: 40%;
             color:#99aaba;
             font-size:10px;
-            text-transform:uppercase;
+            // text-transform:uppercase;
             letter-spacing:2px;
             margin-top: 15px;
             margin-left: 8px;
@@ -3042,4 +3099,8 @@ ul.jqtree-tree .jqtree-toggler {
 
 #asset-descid{
     margin-bottom:7px;
+}
+
+.page-name{
+    margin-top:4px;
 }
