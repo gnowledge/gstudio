@@ -334,8 +334,8 @@
         asset_name = $("#asset-name").val();
         asset_description = $("#asset-descid").val();
         var asset_id = $(this).attr('data-asset_id');
-        console.log(asset_description)
-        console.log(asset_name)
+        // console.log(asset_description)
+        // console.log(asset_name)
         if (asset_name != '' && asset_description != ''){
             // asset_objective =  $('#asset_objectivesid').find(':selected').attr('value');
             $.ajax({
@@ -368,7 +368,7 @@
             event.preventDefault()
         }
         $('#addAsset').foundation('reveal', 'close');
-        location.href = "{% url 'asset_detail' group_id asset_obj.pk %}";
+        location.reload();
     });
 
 </script>

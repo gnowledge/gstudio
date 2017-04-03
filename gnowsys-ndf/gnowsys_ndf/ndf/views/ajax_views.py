@@ -6679,10 +6679,9 @@ def add_asset(request,group_id):
       group_id = ObjectId(group_id)
   except:
       group_name, group_id = get_group_name_id(group_id)
-  topic_gst = node_collection.one({'_type': 'GSystemType', 'name': 'Topic'})
-  topic_nodes = node_collection.find({'member_of': {'$in': [topic_gst._id]}})
-  context_variables = {'group_id':group_id, 'groupid':group_id,
-    'topic_nodes':topic_nodes, 'edit': False}
+  # topic_gst = node_collection.one({'_type': 'GSystemType', 'name': 'Topic'})
+  # topic_nodes = node_collection.find({'member_of': {'$in': [topic_gst._id]}})
+  context_variables = {'group_id':group_id, 'groupid':group_id,'edit': False}
   node_id = request.GET.get('node_id', None)
   node_obj = node_collection.one({'_id': ObjectId(node_id)})
   if node_obj:
