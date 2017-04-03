@@ -82,8 +82,7 @@
             <div class="small-12 medium-10 large-10 columns">
             <label>
                     Asset description *
-                    <textarea rows="4" cols="2" class="small-12 columns" placeholder="Enter Description" id="asset-descid" value=''>{% if asset_obj %} {{asset_obj.content|safe|striptags}}{% endif %}
-                    </textarea>
+                    <textarea rows="4" cols="2" class="small-12 columns" placeholder="Enter Description" id="asset-descid" value=''>{% if asset_obj %} {{asset_obj.content|safe|striptags}}{% endif %}</textarea>
             </label>
             </div>
         </div>
@@ -191,6 +190,7 @@
                     <div class="asset_text">
                         <div class="asset_title" style="color: #2e3f51">{{each.name|truncatechars:35}}
                         {% if user.is_authenticated  and not group_object.edit_policy == "NON_EDITABLE"  or gstaff_access %}
+                        </a>
                         <input type="checkbox" class="filenode" name="filenode" value="{{each.pk}}" style="margin-top:6px; margin-right: 2px; float:right;" class="asset_content_checkbox">
                         {% endif %}
                         <div class="asset_desc">{{each.content|truncatechars:35}}</div>
@@ -333,8 +333,8 @@
         asset_name = $("#asset-name").val();
         asset_description = $("#asset-descid").val();
         var asset_id = $(this).attr('data-asset_id');
-        console.log(asset_description)
-        console.log(asset_name)
+        // console.log(asset_description)
+        // console.log(asset_name)
         if (asset_name != '' && asset_description != ''){
             // asset_objective =  $('#asset_objectivesid').find(':selected').attr('value');
             $.ajax({
@@ -349,25 +349,28 @@
                         // "asset_objective":asset_objective
                     },
                   url: "{% url 'create_edit_asset' group_id %}",
-                  datatype: "html",
+                  datatype: "json",
                   success: function(data) {
                     // $('#addAsset').html(data);
                     // $('#addAsset').foundation('reveal', 'open');
                     $('.save-asset').css('display', 'none')
                     $('.asset-content-area').css('display', 'block')
                     $('.asset_obj_val').attr('data-asset-obj-val',data);
+                    $('#addAsset').foundation('reveal', 'close');
+                    {% if asset_obj %}
+
+                        location.href = "{% url 'asset_detail' group_id asset_obj.pk %}";
+                    {% else %}
+                        location.reload();
+                    {% endif %}
                 }
             });
 
         }
         else{
-            console.log("else")
-            console.log(asset_name)
-            console.log(asset_description)
             event.preventDefault()
         }
-        $('#addAsset').foundation('reveal', 'close');
-        location.reload()
+        
     });
 
 </script>
