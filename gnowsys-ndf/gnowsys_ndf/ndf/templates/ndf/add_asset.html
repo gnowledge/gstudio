@@ -17,59 +17,98 @@
 {% endblock %}
 
    <!--  Interaction settings modal ends  -->
-
-    <div class="row overlay-head">
+<div class="overlay-head">
+   <div class="row">
         {% if edit or not asset_obj.name %}
             <a class="right close-reveal-modal reveal-modal-overlay" aria-label="Close">&#215;</a>
         {% endif %}
-        <div class="small-10 columns">
+            <div class="small-1 columns icon-widget" style="margin-top: 5.6px;">
+                <a href="{% url 'asset_list' group_id %}""><i class="fa fa-chevron-left large" aria-hidden="true"></i></a>
+            </div>
+
+            <div class="small-7 columns">
             {% if not edit and asset_obj.name %}
-                <p class="left">{{asset_obj.name}}</p>
-                {% if asset_obj.tags %}
+                <h4 class="page-name">{{asset_obj.name}}</h4>
+            </div>
+            
+            
+
+            
+            <div class="small-4 columns right">
+                
+            {% if not edit and asset_obj %}
+                {% if asset_obj.created_by == request.user.id or is_gstaff %}
+                <span data-dropdown="asset-settings-drop" aria-controls="asset-settings-drop" aria-expanded="false" class="large orange-button right">
+                    Settings <i class="fa fa-chevron-down"></i>
+                </span>
+                <ul id="asset-settings-drop" class="f-dropdown" data-dropdown-content aria-hidden="true" tabindex="-1">
+                    <li> <a class="createAsset" data-asset_id='{{asset_obj.pk}}'>Edit</a></li>
+                    <li><a class="edit-metadata">Metadata</a></li>
+                    <!-- <li>
+                        {% if asset_obj %}
+                            {% get_relation_node asset_obj.pk  'has_assetcontent' as asset_cont_grel %}
+                            {% if not asset_cont_grel %}
+                            <a class="delete-asset">Delete Asset</a>
+                            {% endif  %}
+                        {% endif  %}
+                    </li> -->
+                    <li>
+                    {% if not asset_content_list.grel_id %}
+                    <a class="delete-asset">Delete Asset</a>
+                    {% endif  %}
+                    </li>
+                    
+                </ul>
+                {% endif %}
+            {% endif%}
+            <button type="button" class="orange-button add-asset-content right"><i class="fi-plus"></i> Files</button>
+            </div>
+            
+
+
+
+        <!-- <div class="small-2 columns right">
+            
+            </div> -->
+   </div>
+
+
+        <div class="row">
+            <div class="small-10 columns left">
+                 {% if asset_obj.tags %}
                     {% for tag in asset_obj.tags %}
                             <small><label class="tag-ele">
                         <a href="{% url 'tag_info' group_id tag %}">{{tag}} </a></label></small>
                     {% endfor %} 
                 {% else %}
                     <i><small><label>{% trans "No tags defined yet!" %}</label></small></i>
-                {% endif %}
-                
+                {% endif %}   
+            </div>
+        </div>
+        <br/>
 
-               <i><p style="color: gray">{{asset_obj.content|safe|striptags}} </p></i>      
+        
+            <div class="row activity-detail-content">
+              {{asset_obj.content|safe|striptags}} 
+            </div>
+            
 
             {% else %}
+                
                 <h3 class="left overlay-title">&nbsp;{% if not asset_obj %} Add a new {% else %} Edit {% endif %} asset</h3>
-                <button type="button" class="blue-white-button save-asset right" data-asset_id='{{asset_obj.pk}}' style="margin-top: 9px;
-    margin-right: -133px;">Save Asset</button>
+
+                <button type="button" class="blue-white-button save-asset right" data-asset_id='{{asset_obj.pk}}' style="margin-top: 9px;margin-right: -150px;">Save Asset</button>
             {% endif %}
-        </div>
-        {% if not edit and asset_obj %}
-             {% if asset_obj.created_by == request.user.id or is_gstaff %}
-            <div class="small-2 columns">
-                <span data-dropdown="asset-settings-drop" aria-controls="asset-settings-drop" aria-expanded="false" class="large orange-button right">
-                    Settings <i class="fa fa-chevron-down"></i>
-                </span>
-                <ul id="asset-settings-drop" class="f-dropdown" data-dropdown-content aria-hidden="true" tabindex="-1">
-                <li> <a class="createAsset" data-asset_id='{{asset_obj.pk}}'>Edit</a></li>
-                <li><a class="edit-metadata">Metadata</a></li>
-                <li>
-                    {% if asset_obj %}
-                        {% get_relation_node asset_obj.pk  'has_assetcontent' as asset_cont_grel %}
-                        {% if not asset_cont_grel %}
-                        <a class="delete-asset">Delete Asset</a>
-                        {% endif  %}
-                    {% endif  %}
-                </li>
-            </div>
-            {% endif %}
-        {% endif%}
-    </div>
+        <!-- </div> -->
+        
+    <!-- </div>
+ -->    
     <hr/>
         <div class="row">
             <div class="small-12 medium-10 large-10 columns">
                 <label>
                     {% if edit or not asset_obj %}
-                       Asset name *
+                       Asset name <h9 style="color: red;">*</h9>
                        <input type="text" placeholder="" class="required" id = "asset-name" name="asset_name" value="{% if asset_obj %} {{asset_obj.name}}{% endif %}"/>
                     {% endif %}
                 </label>
@@ -81,7 +120,7 @@
         <div class="row">
             <div class="small-12 medium-10 large-10 columns">
             <label>
-                    Asset description *
+                    Asset description <h9 style="color: red;">*</h9>
                     <textarea rows="4" cols="2" class="small-12 columns" placeholder="Enter Description" id="asset-descid" value=''>{% if asset_obj %} {{asset_obj.content|safe|striptags}}{% endif %}</textarea>
             </label>
             </div>
@@ -96,7 +135,7 @@
                 <select class="asset-lang" name="lan" id="asset_lang" >
                     {% for language in languages %}
                     {% if asset_obj.language.0 == language.code  %}
-                        <option selected data-sub-lang="{{ language.name }}" data-sub-code="{{ language.code }}">
+                        <option selected data-sub-lang="{{ language.name }}" data-sub-code="{{ language.code }}"/>
                         {{language.name}}
                     {%  else %}
                         <option data-sub-lang="{{ language.name }}" data-sub-code="{{ language.code }}">
@@ -110,12 +149,11 @@
         </div>
         <div class="row">
             <div class="asset-tags-container small-12 medium-10 large-10 columns">
-            <label>
-            Add tags:
-            {% include 'ndf/widget_tags.html' with node=asset_obj hide_lbl=True %}
-            </label>
+                <label>
+                Add tags:
+                {% include 'ndf/widget_tags.html' with node=asset_obj hide_lbl=True %}
+                </label>
             </div>
-
         </div>
 
         {% endif %}
@@ -128,90 +166,82 @@
         </div>
 
         <div class="name-desc-asset-cont-area hide">
-
             <div class="row">
                 <div class="small-8 medium-6 large-6 columns">
-                    <label>Enter File Name *
+                    <label>Enter File Name <h9 style="color: red;">*</h9>
                         <input type="text" placeholder="Enter File name" class="required" id = "asset_content_name" name="" style="padding-bottom: 10px;margin-bottom: 31px;"/>
                     </label>
                     <form class="dropzone" id ="docPost" enctype="multipart/form-data" method="post" action="{% url 'add_assetcontent' group_id %}" style="margin-left: -13px;width: 429px;" >
                         <input type="file" id="docFile" class="asset_content_upload" placeholder="" name=""/>
                     </form>
-
                 </div>
+
                 <div class="small-8 medium-6 large-6 columns">
-                <label>Enter File Description *<br/>
+                <label>Enter File Description <h9 style="color: red;">*</h9><br/>
                     <textarea rows="6" cols="2" class="small-12 columns" placeholder="Enter File Description" id="asset_content_desc"></textarea>
                 </label>
                     <button type="button" class="orange-button right" id="upload_asset" onclick="save_form()" style="margin-right: -3px;">Upload</button>
-
                 </div>
             </div>
-
         </div>
         <!--<button type="button" class="right orange-button save-asset" onclick="save_asset_cont_data()">Save Asset</button>-->
-        <input type="hidden" name="context_name" value="{{title}}">
-        <input type="hidden" class ="asset_obj_val" name="asset_obj_name" data-asset-obj-val="">
-
-        <div class = "row">
-        {% if not asset_content_list.grel_id %}
+        <input type="hidden" name="context_name" value="{{title}}"/>
+        <input type="hidden" class ="asset_obj_val" name="asset_obj_name" data-asset-obj-val=""/>
         
-            <button type="button" class="orange-button delete-asset right">Delete Asset</button>
-        {% endif %}
             
-        <button type="button" class="orange-button add-asset-content right">Add Files</button>
-        {% if asset_content_list.grel_id %}
-        <div class="row">
-            <button type="button" class="orange-button delete-asset-content right" title="Click on the checkbox on the files below to Delete">Delete Files</button>
-        </div>
-        {% endif %}
-        {% endif %}
-        </div>
-
-        <hr/>
+        
+            {% endif %}
+   
+    </div>
 
 
         <div class="row">
-        {% for each in asset_content_list.grel_node %}
-            {% if  'DELETED' != each.status %}
-            <div class="small-12 medium-6 large-3 columns">
+            {% if asset_content_list.grel_id %}
+            <div class="row">
+                <button type="button" class="orange-button delete-asset-content right icon-widget" style="margin-right: 53px;" title="Click on the checkbox on the files below to Delete"><i class="fa fa-trash"></i> Files</button>
+            </div>
+            {% endif %}
 
-                <div class="asset_tile">
-                    <div class="asset_preview">
-                    <a href="{% url 'assetcontent_detail' group_id asset_obj.pk each.pk %}" title="{{each.name}}">
-                        {% if each.if_file.mid.relurl and 'video' not in each.if_file.mime_type %}
-                        <img src="{{MEDIA_URL}}{{each.if_file.mid.relurl}}">
-                        {% elif  each.if_file.thumbnail.relurl %}
-                        <img src="{{MEDIA_URL}}{{each.if_file.thumbnail.relurl}}">
-                        {% else %}
-                        <img src="/static/ndf/images/asset_thumbnail.png">
-                        {% endif %}
-                    </div>
-                    <div class="asset_text">
-                        <div class="asset_title" style="color: #2e3f51">{{each.name|truncatechars:35}}
-                        {% if user.is_authenticated  and not group_object.edit_policy == "NON_EDITABLE"  or gstaff_access %}
-                        </a>
-                        <input type="checkbox" class="filenode" name="filenode" value="{{each.pk}}" style="margin-top:6px; margin-right: 2px; float:right;" class="asset_content_checkbox">
-                        {% endif %}
-                        <div class="asset_desc">{{each.content|truncatechars:35}}</div>
+            {% for each in asset_content_list.grel_node %}
+                {% if  'DELETED' != each.status %}
+                <div class="small-12 medium-6 large-3 columns">
+                    <div class="asset_tile">
+                        <div class="asset_preview">
+                            <a href="{% url 'assetcontent_detail' group_id asset_obj.pk each.pk %}" title="{{each.name}}">
+                                {% if each.if_file.mid.relurl and 'video' not in each.if_file.mime_type %}
+                                <img src="{{MEDIA_URL}}{{each.if_file.mid.relurl}}"/>
+                                {% elif  each.if_file.thumbnail.relurl %}
+                                <img src="{{MEDIA_URL}}{{each.if_file.thumbnail.relurl}}"/>
+                                {% else %}
+                                <img src="/static/ndf/images/asset_thumbnail.png"/>
+                                {% endif %}
+                            </a>
+                        </div>
+                        <div class="asset_text">
+                            <div class="asset_title" style="color: #2e3f51">{{each.name|truncatechars:35}}
+                            {% if user.is_authenticated  and not group_object.edit_policy == "NON_EDITABLE"  or gstaff_access %}
+                                <input type="checkbox" class="filenode" name="filenode" value="{{each.pk}}" style="margin-top:6px; margin-right: 2px; float:right;" class="asset_content_checkbox"/>
+                            {% endif %}
+                                <div class="asset_desc">{{each.content|truncatechars:35}}</div>
+                            </div>
                         </div>
                     </div>
                 </div>
-            </div>
-            {% endif %}
-        {% endfor %}
+                {% endif %}
+            {% endfor %}
         </div>
-        </div>
-        <hr />
+        <!-- </div> -->
+    
+    <hr/>
         <div class="row">
-          {% if node %}
-           &nbsp; {% include "ndf/asset_content_detail.html" with node=node %}
-        {%  endif %}
+              {% if node %}
+               &nbsp; {% include "ndf/asset_content_detail.html" with node=node %}
+              {%  endif %}
         </div>
-    </div>
+    <!-- </div> -->
 
     <div class="row asset-comments-section">
-      <div class="columns small-10 " id="view-discussion">
+      <div class="small-10 columns" id="view-discussion">
             <!-- discussion content area -->
             {% if user.is_authenticated %}
             {% get_thread_node asset_obj.pk as thread_node %}
@@ -226,8 +256,9 @@
             <!-- END of discussion content area -->
       </div>
     </div>
-    {% endif %}
 
+    {% endif %}
+</div>
 
 <script type="text/javascript">
 
