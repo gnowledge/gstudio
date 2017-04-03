@@ -125,7 +125,10 @@
                           success: function(data) {
                             console.log(data)
                             if (data=="success"){
-                                location.reload()
+                                $.each(coll_arr, function(ind,activity_id){
+                                    $("a[data-page-id='"+activity_id+"']").addClass('hide')
+                                })
+                                // location.reload()
                             }
                             else{
                                 alert("Something went wrong. Please try again later.")
