@@ -6703,7 +6703,8 @@ def create_edit_asset(request,group_id):
   tags =  request.POST.get("sel_tags", [])
   if tags:
       tags = json.loads(tags)
-
+  else:
+      tags = []
   asset_lang =  request.POST.get("sel_asset_lang", '')
   # file_node.language = get_language_tuple(language)
   node_id = request.POST.get('node_id', None)
