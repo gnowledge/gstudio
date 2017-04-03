@@ -368,7 +368,9 @@
             event.preventDefault()
         }
         $('#addAsset').foundation('reveal', 'close');
-        location.reload();
+        {% if asset_obj %}
+            location.href = "{% url 'asset_detail' group_id asset_obj.pk %}";
+        {% endif %}
     });
 
 </script>
