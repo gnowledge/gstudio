@@ -104,7 +104,7 @@ def explore_groups(request,page_no=1):
 
     query = {'_type': 'Group', 'status': u'PUBLISHED',
              'member_of': {'$in': [gst_group._id],
-             '$nin': [gst_course._id, gst_basecoursegroup._id, ce_gst._id, gst_course._id, gst_base_unit_id]}, 
+             '$nin': [gst_course._id, gst_basecoursegroup._id, ce_gst._id, gst_course._id, gst_base_unit_id]},
             }
 
     if gstaff_access:
@@ -142,16 +142,17 @@ def explore_basecourses(request,page_no=1):
     ce_cur = node_collection.find({
                                     '_type': 'Group',
                                     # 'group_set': {'$in': [parent_group_id]},
-                                    'member_of': {'$in': [gst_base_unit_id]}#,
-                                    # '$or':[
-                                    #     {'status': u'PUBLIC'},
-                                    #     {
-                                    #         '$and': [
-                                    #             {'access_policy': u"PRIVATE"},
-                                    #             {'created_by': request.user.id}
-                                    #         ]
-                                    #     }
-                                    # ]
+                                    'member_of': {'$in': [gst_base_unit_id]},
+                                    '$or':[
+                                        {'group_type': u'PUBLIC'},
+                                        {
+                                            '$and': [
+                                                {'access_policy': u"PRIVATE"},
+                                                {'created_by': request.user.id}
+                                            ]
+                                        }
+                                    ],
+                                    'status': u'PUBLISHED'
                                 }).sort('last_update', -1)
     ce_page_cur = paginator.Paginator(ce_cur, page_no, GSTUDIO_NO_OF_OBJS_PP)
     print ce_cur.count()
