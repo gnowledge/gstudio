@@ -2,6 +2,7 @@
 {% load ndf_tags %}
 {% block head %}
     <script src="/static/ndf/bower_components/handlebars/handlebars.js"></script>
+    <script type="text/javascript" src="/static/ndf/bower_components/MathJax/MathJax.js?config=TeX-AMS-MML_HTMLorMML" async></script>
 {% endblock head %}
 
 <div class="row course_creator">
@@ -20,7 +21,7 @@
             <div class="course-editor-section hide">
                 <div class="activity-editor hide">
                     <!-- Right panel Header -->
-                    <div class="actvity-editor-header editor-header">
+                    <div class="actvity-editor-header editor-header" id="actvity-editor-headerid">
                         <div class="left header-left activity-name-label">
                             <span class="activity-name"><!-- Activity Name --></span>
                         </div>
@@ -725,6 +726,8 @@ This will not be used because now only existing activities will be added.
                   }
                   data_dict = JSON.parse(data);
                   $('#activity-content').html(data_dict.content);
+                   MathJax.Hub.Queue(["Typeset",MathJax.Hub,'activity-content']);
+                  
                   return true
               }
           });
@@ -765,6 +768,7 @@ This will not be used because now only existing activities will be added.
             var activityName = $('#activity-' + activity_id).attr('data-name');
             // update name field of editor section
             $('.course-editor-section .activity-name').text(activityName);
+            MathJax.Hub.Queue(["Typeset",MathJax.Hub,'actvity-editor-headerid']);
 
             getNodeData(activity_id);
             $('.save_edit_activity').attr('href', "{% url 'edit_course_page' group_id 'activity_id' %}".replace('activity_id', activity_id))
