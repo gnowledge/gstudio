@@ -3220,7 +3220,17 @@ def save_course_page(request, group_id):
         if activity_lang:
             language = get_language_tuple(activity_lang)
             page_obj.language = language
-        
+        if 'admin_info_page' in request.POST:
+            admin_info_page = request.POST['admin_info_page']
+            if admin_info_page:
+                admin_info_page = json.loads(admin_info_page)
+            if "None" not in admin_info_page:
+                has_admin_rt = node_collection.one({'_type': "RelationType", 'name': "has_admin_page"})
+                admin_info_page = map(ObjectId, admin_info_page)
+                create_grelation(page_obj._id, has_admin_rt,admin_info_page)
+                page_obj.reload()
+            return HttpResponseRedirect(reverse("view_course_page",
+             kwargs={'group_id': group_id, 'page_id': page_obj._id}))
         page_obj.fill_gstystem_values(tags=tags)
         # if tags:
         #     page_obj.tags = tags
