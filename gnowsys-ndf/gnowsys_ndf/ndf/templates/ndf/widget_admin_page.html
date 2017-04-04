@@ -5,7 +5,7 @@
     {% csrf_token %}
         <input type="hidden" name="node_id"  value="{{node.pk}}">
         <div class="row">
-            <h7>{% trans "Select help page(s) for this resource from following options:"%} </h7>
+            <h7>{% trans "Select admin page(s) for this resource from following options:"%} </h7>
         </div>
         <div class="help-settings-div">
             {% get_help_pages_of_node node "has_admin_page" as admin_page_list %}
@@ -18,6 +18,6 @@
 </form>
 <script type="text/javascript">
     $( ".save-metadata" ).click(function(event) {
-     test = getSelValuesHiddenElement('admin_info_page','form-edit-node');
+        getSelValuesHiddenElement('admin_info_page','form-edit-node');
     });
 </script>
