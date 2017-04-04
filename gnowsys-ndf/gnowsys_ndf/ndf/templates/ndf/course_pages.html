@@ -38,6 +38,7 @@
                 <li><a href="{% url 'edit_course_page' group_id activity_node.pk %}">Edit</a></li>
                 <li><a title="Edit Content" class="edit_res_unit">{% trans " Edit Content" %}</a></li>
                 <li><a title="Edit Interaction Settings" class="edit-interaction">{% trans "Interaction Settings" %}</a></li>
+                <li><a title="add admin page" class="add-admin-page">{% trans "add-admin-page" %}</a></li>
                 <li><a href="{% url 'all_translations' group_id activity_node.pk %}" target="_blank">Alternate Language</a></li>
                 </ul>
 
@@ -166,6 +167,22 @@
                         "node_id":'{{activity_node.pk}}',
                     },
                   url: "{% url 'get_interaction_widget' group_id  %}",
+                  datatype: "html",
+                  success: function(data) {
+                  $('#addAsset').foundation('reveal', 'open');
+                  $('#addAsset').html(data);
+                }
+            });
+        });
+
+        $( ".add-admin-page" ).click(function(event) {
+            $.ajax({
+                  type: "POST",
+                  data:{
+                        'csrfmiddlewaretoken': "{{csrf_token}}",
+                        "node_id":'{{activity_node.pk}}',
+                    },
+                  url: "{% url 'get_admin_page_form' group_id  %}",
                   datatype: "html",
                   success: function(data) {
                   $('#addAsset').foundation('reveal', 'open');
