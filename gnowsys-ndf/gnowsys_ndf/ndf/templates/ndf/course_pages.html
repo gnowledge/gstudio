@@ -1,5 +1,6 @@
 {% load i18n %}
 {% load ndf_tags %}
+
 {% block head %}
     
     <style type="text/css">
@@ -26,6 +27,7 @@
                 <h4 class="page-name">{{activity_node.name}}</h4>
             </div>
             
+            {% check_is_gstaff groupid request.user as is_gstaff %}
             {% if activity_node.created_by == request.user.id or is_gstaff %}
             <div class="small-3 columns right">
                 <span data-dropdown="activity-page-settings-drop" aria-controls="activity-page-settings-drop" aria-expanded="false" class="orange-button right">
