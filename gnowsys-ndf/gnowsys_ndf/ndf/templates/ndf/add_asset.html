@@ -207,7 +207,7 @@
                 <div class="small-12 medium-6 large-3 columns">
                     <div class="asset_tile">
                         <div class="asset_preview">
-                            <a href="{% url 'assetcontent_detail' group_id asset_obj.pk each.pk %}" title="{{each.name}}">
+                            <a href="{% url 'assetcontent_detail' group_id asset_obj.pk each.pk %}" title="{{each.name}}" >
                                 {% if each.if_file.mid.relurl and 'video' not in each.if_file.mime_type %}
                                 <img src="{{MEDIA_URL}}{{each.if_file.mid.relurl}}"/>
                                 {% elif  each.if_file.thumbnail.relurl %}
@@ -233,7 +233,7 @@
         <!-- </div> -->
     
     
-        <div class="row">
+        <div class="row asset-content-detail">
               {% if node %}
               <hr/>
                &nbsp; {% include "ndf/asset_content_detail.html" with node=node %}
@@ -505,4 +505,11 @@ $( ".edit-metadata" ).click(function(event) {
         });
 })
 
+{% if node %}
+    $( document ).ready(function() {
+        $('html,body').animate({
+                scrollTop: $(".asset-content-detail").offset().top},
+                'slow');
+    });
+{% endif %}
 </script>
