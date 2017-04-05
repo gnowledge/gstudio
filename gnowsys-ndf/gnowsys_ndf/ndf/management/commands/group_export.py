@@ -182,6 +182,7 @@ class Command(BaseCommand):
                 log_file.write("\n*************************************************************")
                 log_file.write("\n######### Script Completed at : " + str(datetime.datetime.now()) + " #########\n\n")
                 print "END : ", str(datetime.datetime.now())
+                log_file.close()
             else:
                 call_exit()
         else:
@@ -192,6 +193,7 @@ class Command(BaseCommand):
 
 def call_exit():
     print "\n Exiting..."
+    log_file.close()
     os._exit(0)
 
 def worker_export(nodes_cur):
