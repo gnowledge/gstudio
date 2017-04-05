@@ -1,21 +1,33 @@
 import os
 import json
 import time
-
 from bson.json_util import dumps,loads,object_hook
-
 from django.core.management.base import BaseCommand, CommandError
 from django.core import serializers
-
-node_diff = []
-triple_diff = []
 from gnowsys_ndf.ndf.models  import *
 from gnowsys_ndf.settings import *
+
+
+
+def call_exit():
+    print "\n Exiting..."
+    os._exit(0)
+
+
+def validate_data_dump(dump_data_path):
+    from checksumdir import dirhash
+    md5hash = dirhash(os.path.join(group_dump_path,'dump'), 'md5')
+    from dump_data_path.migration_configs import MD5
+    if MD5 != md5hash:
+        print "\n MD5 NOT matching."
+        call_exit()
 
 class Command(BaseCommand):
     def handle(self, *args, **options):
         # import ipdb; ipdb.set_trace()
         # path  = os.path.abspath(os.path.dirname(os.pardir))
+        data_restore_path = raw_input("\n\tEnter absolute path of data-dump folder to restore ?")
+        validate_data_dump(data_restore_path)
         nodes_path = '/data/gstudio_data_restore/data/rcs-repo/Nodes'
         triples_path = '/data/gstudio_data_restore/data/rcs-repo/Triples'
         filehives_path = '/data/gstudio_data_restore/data/rcs-repo/Filehives'
