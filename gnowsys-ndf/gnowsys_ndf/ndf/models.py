@@ -621,7 +621,10 @@ class Node(DjangoDocument):
             Takes list of ObjectIds or objectIds as string as arg
                 and return list of object
         '''
-        node_id_list = map(ObjectId, node_id_list)
+        try:
+            node_id_list = map(ObjectId, node_id_list)
+        except:
+            node_id_list = [ObjectId(nid) for nid in node_id_list if nid]
         return node_collection.find({'_id': {'$in': node_id_list}})
 
 
@@ -1945,12 +1948,13 @@ class GSystem(Node):
                             'group_set': {'$in': [group_id]},
                             'member_of': {'$in': [gst_id]},
                             '$or':[
-                                    {'access_policy': u'Public'},
-                                    {'$and': [
-                                        {'access_policy': u"PRIVATE"},
-                                        {'created_by': user_id}
-                                        ]
-                                    }
+                                    {'access_policy': {'$in': [u'Public', u'PUBLIC']}},
+                                    # {'$and': [
+                                    #     {'access_policy': u"PRIVATE"},
+                                    #     {'created_by': user_id}
+                                    #     ]
+                                    # },
+                                    {'created_by': user_id}
                                 ]
                         }).sort('last_update', -1)
     # --- END of static query methods
