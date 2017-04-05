@@ -81,7 +81,7 @@ def user_objs_restoration():
             user_json_file_path = os.path.join(DATA_DUMP_PATH, 'users_dump.json')
             with open(user_json_file_path, 'rb+') as user_json_fin:
                 user_json_data = json.loads(user_json_fin.read())
-                load_users_dump(user_json_file_path, user_json_data)
+                load_users_dump(DATA_DUMP_PATH, user_json_data)
             # print "user_json_data: ", user_json_data
             # print "user_json_data type: ", type(user_json_data)
         else:
