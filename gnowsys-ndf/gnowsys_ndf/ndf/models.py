@@ -307,7 +307,7 @@ class Node(DjangoDocument):
                         'language': ('en', 'English'),
                         'type_of': [],
                         'member_of': [],
-                        'access_policy': u'',
+                        'access_policy': u'Public',
                         'created_at': datetime.datetime.now,
                         # 'created_by': int,
                         'last_update': datetime.datetime.now,
@@ -1933,6 +1933,28 @@ class GSystem(Node):
         return file_blob
 
 
+    # static query methods
+    @staticmethod
+    def query_list(group_id, member_of_name, user_id=None):
+
+        group_name, group_id = Group.get_group_name_id(group_id)
+        gst_name, gst_id = GSystemType.get_gst_name_id(member_of_name)
+
+        return node_collection.find({
+                            '_type': 'GSystem',
+                            'group_set': {'$in': [group_id]},
+                            'member_of': {'$in': [gst_id]},
+                            '$or':[
+                                    {'access_policy': u'Public'},
+                                    {'$and': [
+                                        {'access_policy': u"PRIVATE"},
+                                        {'created_by': user_id}
+                                        ]
+                                    }
+                                ]
+                        }).sort('last_update', -1)
+    # --- END of static query methods
+
 
 @connection.register
 class Filehive(DjangoDocument):
@@ -2280,7 +2302,6 @@ class Filehive(DjangoDocument):
             print "Exception in converting image to mid size: ", e
             return None
 
-
     def save(self, *args, **kwargs):
 
         is_new = False if ('_id' in self) else True
@@ -2453,7 +2474,7 @@ class Group(GSystem):
             # checking if group_obj is valid
             if group_obj:
                 # if (group_name_or_id == group_obj._id):
-                group_id = group_name_or_id
+                group_id = ObjectId(group_name_or_id)
                 group_name = group_obj.name
 
                 if get_obj:
