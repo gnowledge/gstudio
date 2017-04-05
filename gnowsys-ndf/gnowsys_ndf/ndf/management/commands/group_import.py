@@ -1,33 +1,111 @@
 import os
 import json
 import time
+import json
+import imp
+try:
+    from bson import ObjectId
+except ImportError:  # old pymongo
+    from pymongo.objectid import ObjectId
+
 from bson.json_util import dumps,loads,object_hook
 from django.core.management.base import BaseCommand, CommandError
 from django.core import serializers
-from gnowsys_ndf.ndf.models  import *
-from gnowsys_ndf.settings import *
+from gnowsys_ndf.ndf.models  import node_collection, triple_collection, filehive_collection, counter_collection
+from gnowsys_ndf.settings import GSTUDIO_DATA_ROOT, GSTUDIO_LOGS_DIR_PATH, MEDIA_ROOT, GSTUDIO_INSTITUTE_ID
+from dump_users import load_users_dump
 
-
+# global variables declaration
+DATA_RESTORE_PATH = None
+CONFIG_VARIABLES = None
+DATA_DUMP_PATH = None
+DEFAULT_USER_ID = None
+DEFAULT_USER_SET = False
+'''
+Following will be available:
+    CONFIG_VARIABLES.FORK=True
+    CONFIG_VARIABLES.CLONE=False
+    CONFIG_VARIABLES.RESTORE_USER_DATA=True
+    CONFIG_VARIABLES.GSTUDIO_INSTITUTE_ID='MZ-10'
+    CONFIG_VARIABLES.GROUP_ID='58dded48cc566201992f6e79'
+    CONFIG_VARIABLES.MD5='aeba0e3629fb0443861c699ae327d962'
+'''
 
 def call_exit():
     print "\n Exiting..."
     os._exit(0)
 
+def read_config_file():
+    """
+    Read migration_configs.py file generated during
+     the export of group and load the variables in 
+     CONFIG_VARIABLES to be accessible in entire program
+    """
+    global CONFIG_VARIABLES
+    CONFIG_VARIABLES = imp.load_source('config_variables',
+            os.path.join(DATA_RESTORE_PATH,'migration_configs.py'))
 
-def validate_data_dump(dump_data_path):
+def validate_data_dump():
+    """
+    For validation of the exported dump and the 
+     importing data-dump, calculate MD5 and
+     check with CONFIG_VARIABLES.MD5
+     This will ensure the exported data is NOT altered
+     before importing
+    """
     from checksumdir import dirhash
-    md5hash = dirhash(os.path.join(group_dump_path,'dump'), 'md5')
-    from dump_data_path.migration_configs import MD5
-    if MD5 != md5hash:
+    md5hash = dirhash(DATA_DUMP_PATH, 'md5')
+    if CONFIG_VARIABLES.MD5 != md5hash:
         print "\n MD5 NOT matching."
         call_exit()
+    else:
+        print "\nValidation Success..!"
+
+def check_group_availability():
+    group_node = node_collection.one({'_id': ObjectId(CONFIG_VARIABLES.GROUP_ID)})
+    if group_node:
+        print "\n Group with restoration ID already exists."
+        call_exit()
+    else:
+        print "\n Group with restoration ID does not exists."
+        print " Proceeding to restore."
+
+def user_objs_restoration():
+    user_json_data = None
+    print "CONFIG_VARIABLES.RESTORE_USER_DATA"
+    if CONFIG_VARIABLES.RESTORE_USER_DATA:
+        user_dump_restore = raw_input("User dump is available.  \
+            Would you like to restore it (y/n) ?: ")
+        if user_dump_restore == 'y' or user_dump_restore == 'Y':
+            user_json_file_path = os.path.join(DATA_DUMP_PATH, 'users_dump.json')
+            with open(user_json_file_path, 'rb+') as user_json_fin:
+                user_json_data = json.loads(user_json_fin.read())
+                load_users_dump(user_json_data)
+            # print "user_json_data: ", user_json_data
+            # print "user_json_data type: ", type(user_json_data)
+        else:
+            DEFAULT_USER_SET = True
+            default_user_confirmation = raw_input("Restoration will use default usre-id=1. \
+            Enter y to continue, or n if you want to use some other id?: ")
+            if default_user_confirmation == 'y' or default_user_confirmation == 'Y':
+                DEFAULT_USER_ID = 1
+            else:
+                DEFAULT_USER_ID = int(raw_input("Enter user-id: "))
+
 
 class Command(BaseCommand):
     def handle(self, *args, **options):
-        # import ipdb; ipdb.set_trace()
-        # path  = os.path.abspath(os.path.dirname(os.pardir))
-        data_restore_path = raw_input("\n\tEnter absolute path of data-dump folder to restore ?")
-        validate_data_dump(data_restore_path)
+
+        global DATA_RESTORE_PATH
+        global DATA_DUMP_PATH
+        DATA_RESTORE_PATH = raw_input("\n\tEnter absolute path of data-dump folder to restore:")
+        if os.path.exists(DATA_RESTORE_PATH):
+            DATA_DUMP_PATH = os.path.join(DATA_RESTORE_PATH, 'dump')
+            read_config_file()
+            validate_data_dump()
+            # print "\nCONFIG_VARIABLES: ", CONFIG_VARIABLES
+            check_group_availability()
+            user_objs_restoration()
         nodes_path = '/data/gstudio_data_restore/data/rcs-repo/Nodes'
         triples_path = '/data/gstudio_data_restore/data/rcs-repo/Triples'
         filehives_path = '/data/gstudio_data_restore/data/rcs-repo/Filehives'
