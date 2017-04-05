@@ -3212,10 +3212,14 @@ def save_course_page(request, group_id):
         if node_id:
             page_obj = node_collection.one({'_id': ObjectId(node_id)})
         if not page_obj:
+            is_info_page = request.POST.get("info-page", "")
             page_obj = node_collection.collection.GSystem()
             page_obj.fill_gstystem_values(request=request)
             page_obj.member_of = [page_gst_id]
             page_obj.group_set = [group_id]
+            if is_info_page:
+                info_page_gst_name, info_page_gst_id = GSystemType.get_gst_name_id('Info page')
+                page_obj.type_of = [info_page_gst_id]
         
         if activity_lang:
             language = get_language_tuple(activity_lang)
@@ -3244,10 +3248,6 @@ def save_course_page(request, group_id):
             return HttpResponseRedirect(reverse("view_course_page",
              kwargs={'group_id': group_id, 'page_id': page_obj._id}))
         page_obj.fill_gstystem_values(tags=tags)
-        # if tags:
-        #     page_obj.tags = tags
-        # else:
-        #     page_obj.tags = []
         page_obj.name = unicode(name)
         page_obj.content = unicode(content)
         page_obj.created_by = request.user.id
