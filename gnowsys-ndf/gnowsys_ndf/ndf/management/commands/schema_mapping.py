@@ -1,5 +1,6 @@
 import os
-from bson import json_util
+import json
+# from bson import json_util
 from gnowsys_ndf.ndf.models import node_collection, TYPES_LIST
 from gnowsys_ndf.settings import GSTUDIO_DEFAULT_GROUPS
 type_json = {"_type": None, "name": None, "source_id": None, "target_id": None }
@@ -18,15 +19,26 @@ def create_factory_schema_mapper(path):
                                                 ]
                                             })
     factory_json_list =  []
-    for e in all_factory_types:
+    for each_type in all_factory_types:
         each_type_json = type_json.copy()
-        each_type_json['_type'] = e._type
-        each_type_json['name'] = e.name
-        each_type_json['source_id'] = e._id
+        each_type_json['_type'] = each_type._type
+        each_type_json['name'] = each_type.name
+        each_type_json['source_id'] = str(each_type._id)
         factory_json_list.append(each_type_json)
 
     with open(schema_dump_path, 'w+') as schema_file_out:
-        schema_file_out.write(json_util.dumps(factory_json_list))
-        #while reading
-        # doc = json.loads(in_doc, object_hook=decoder)
+        schema_file_out.write(json.dumps(factory_json_list))
 
+
+def update_factory_schema_mapper(path):
+    schema_dump_path = os.path.join(path, 'factory_schema.json')
+    schema_file_in_out = open(schema_dump_path, 'w+')
+    factory_json_list = json.loads(schema_file_in_out.read())
+    updated_factory_json_list = []
+
+    for each_type in factory_json_list:
+        type_node = node_collection.one({'_type': each_type['_type'], 'name':each_type['name']},{'_id':1})
+        each_type['target_id'] = type_node._id
+        updated_factory_json_list.append(each_type)
+    schema_file_in_out.write(updated_factory_json_list)
+    schema_file_in_out.close()
