@@ -6877,6 +6877,16 @@ def get_admin_page_form(request, group_id):
             },
             context_instance=RequestContext(request))
 
+def get_help_page_form(request, group_id):
+  node_id = request.POST.get('node_id', None)
+  node_obj = node_collection.one({'_id':ObjectId(node_id)})
+  return render_to_response('ndf/widget_help_page.html',
+           {
+              'group_id': group_id, 'groupid': group_id,
+              'node_id':node_id,'node':node_obj
+            },
+            context_instance=RequestContext(request))
+
 def get_interaction_widget(request, group_id):
   node_id = request.POST.get('node_id', None)
   node_obj = node_collection.one({'_id':ObjectId(node_id)})
