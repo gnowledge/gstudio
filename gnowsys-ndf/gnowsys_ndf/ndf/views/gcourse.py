@@ -3231,6 +3231,18 @@ def save_course_page(request, group_id):
                 page_obj.reload()
             return HttpResponseRedirect(reverse("view_course_page",
              kwargs={'group_id': group_id, 'page_id': page_obj._id}))
+
+        if 'help_info_page' in request.POST:
+            help_info_page = request.POST['help_info_page']
+            if help_info_page:
+                help_info_page = json.loads(help_info_page)
+            if "None" not in help_info_page:
+                has_help_rt = node_collection.one({'_type': "RelationType", 'name': "has_help"})
+                help_info_page = map(ObjectId, help_info_page)
+                create_grelation(page_obj._id, has_help_rt,help_info_page)
+                page_obj.reload()
+            return HttpResponseRedirect(reverse("view_course_page",
+             kwargs={'group_id': group_id, 'page_id': page_obj._id}))
         page_obj.fill_gstystem_values(tags=tags)
         # if tags:
         #     page_obj.tags = tags
