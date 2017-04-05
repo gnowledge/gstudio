@@ -1,7 +1,7 @@
 
 <div class="row group_content">
     <div class="small-12 columns  group_sections_content" id="scstyle">
-        <form enctype="multipart/form-data" method="post" action="{{url}}">
+        <form enctype="multipart/form-data" method="post" action="{{post_url}}">
             {% csrf_token %}
             <!-- _id -->
             <input type="hidden" name="_id" value="{{node_obj.pk}}">
