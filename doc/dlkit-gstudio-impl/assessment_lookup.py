@@ -11,27 +11,29 @@ all_banks.available()
 
 # ======
 
-from dlkit_runtime import PROXY_SESSION, RUNTIME
-from dlkit_gstudio.gstudio_user_proxy import GStudioRequest
-condition = PROXY_SESSION.get_proxy_condition()
-proxy = PROXY_SESSION.get_proxy(condition)
-assessment_service_mgr = RUNTIME.get_service_manager('ASSESSMENT', proxy=proxy)
-all_banks = assessment_service_mgr.get_banks()
-all_banks.available()
-from dlkit.primordium.id.primitives import Id
-bank = assessment_service_mgr.get_bank(Id('assessment.Bank%3A57c00fbded849b11f52fc8ec%40ODL.MIT.EDU'))
-bank.get_display_name().text
-# bank = all_banks.next()
-assessment_items = bank.get_assessments()
-assessment_items.available()
-a = assessment_items.next()  
-offerings = bank.get_assessments_offered_for_assessment(a.get_id())
+# from dlkit_runtime import PROXY_SESSION, RUNTIME
+# from dlkit_gstudio.gstudio_user_proxy import GStudioRequest
+# condition = PROXY_SESSION.get_proxy_condition()
+# proxy = PROXY_SESSION.get_proxy(condition)
+# assessment_service_mgr = RUNTIME.get_service_manager('ASSESSMENT', proxy=proxy)
+# all_banks = assessment_service_mgr.get_banks()
+# all_banks.available()
+# from dlkit.primordium.id.primitives import Id
+# bank = assessment_service_mgr.get_bank(Id('assessment.Bank%3A57c00fbded849b11f52fc8ec%40ODL.MIT.EDU'))
+# bank.get_display_name().text
+# # bank = all_banks.next()
+# assessment_items = bank.get_assessments()
+# assessment_items.available()
+# a = assessment_items.next()
+# offerings = bank.get_assessments_offered_for_assessment(a.get_id())
+
+
 # Error:
 # /home/docker/code/gstudio/gnowsys-ndf/qbank_lite/dlkit/mongo/assessment/objects.pyc in next(self)
-#    1190 
+#    1190
 #    1191     def next(self):
 # -> 1192         return self._get_next_object(Assessment)
-#    1193 
+#    1193
 #    1194     next_assessment = property(fget=get_next_assessment)
 
 # /home/docker/code/gstudio/gnowsys-ndf/qbank_lite/dlkit/mongo/osid/objects.pyc in _get_next_object(self, object_class)
@@ -42,24 +44,24 @@ offerings = bank.get_assessments_offered_for_assessment(a.get_id())
 #    2458             next_object = Id(next_object)
 
 # /home/docker/code/gstudio/gnowsys-ndf/qbank_lite/dlkit/mongo/assessment/objects.pyc in __init__(self, **kwargs)
-#     827 
+#     827
 #     828     def __init__(self, **kwargs):
 # --> 829         osid_objects.OsidObject.__init__(self, object_name='ASSESSMENT', **kwargs)
 #     830         self._catalog_name = 'bank'
-#     831 
+#     831
 
 # /home/docker/code/gstudio/gnowsys-ndf/qbank_lite/dlkit/mongo/osid/objects.pyc in __init__(self, osid_object_map, runtime, **kwargs)
 #     114         osid_markers.Extensible.__init__(self, runtime=runtime, **kwargs)
 #     115         self._my_map = osid_object_map
 # --> 116         self._load_records(osid_object_map['recordTypeIds'])
-#     117 
+#     117
 #     118     def get_object_map(self, obj_map=None):
 
 # /home/docker/code/gstudio/gnowsys-ndf/qbank_lite/dlkit/mongo/osid/markers.pyc in _load_records(self, record_type_idstrs)
 #     174         """Load all records from given record_type_idstrs."""
 #     175         for record_type_idstr in record_type_idstrs:
 # --> 176             self._init_record(record_type_idstr)
-#     177 
+#     177
 #     178     def _init_records(self, record_types):
 
 # /home/docker/code/gstudio/gnowsys-ndf/qbank_lite/dlkit/mongo/osid/markers.pyc in _init_record(self, record_type_idstr)

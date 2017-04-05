@@ -42,8 +42,8 @@ MANAGER_PATHS = {
                      'dlkit.mongo.grading.managers.GradingProxyManager')
     },
     'gstudio': {
-        # 'ASSESSMENT': ('dlkit.mongo.assessment.managers.AssessmentManager',
-        #                'dlkit.mongo.assessment.managers.AssessmentProxyManager'),
+        'ASSESSMENT': ('dlkit.mongo.assessment.managers.AssessmentManager',
+                       'dlkit.mongo.assessment.managers.AssessmentProxyManager'),
         # 'ASSESSMENT_AUTHORING': ('dlkit.mongo.assessment_authoring.managers.AssessmentAuthoringManager',
         #                          'dlkit.mongo.assessment_authoring.managers.AssessmentAuthoringProxyManager'),
         'AUTHORIZATION': ('dlkit_gstudio.authorization.managers.AuthorizationManager',
