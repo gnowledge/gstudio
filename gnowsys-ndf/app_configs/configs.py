@@ -300,7 +300,7 @@ AUTHZ_ADAPTER_1 = {
             'displayName': 'Assessment Provider Implementation',
             'description': 'Implementation for assessment service provider',
             'values': [
-                {'value': 'MONGO_1', 'priority': 1}
+                {'value': 'GSTUDIO_1', 'priority': 1}
             ]
         },
         # Use MIT AssessmentAuthoring Provider for OEA Tool Integration Task
