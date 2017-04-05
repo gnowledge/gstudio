@@ -1,20 +1,21 @@
 import os
 import json
-import time
-import json
 import imp
+
 try:
     from bson import ObjectId
 except ImportError:  # old pymongo
     from pymongo.objectid import ObjectId
 
+import time
+
 from bson.json_util import dumps,loads,object_hook
 from django.core.management.base import BaseCommand, CommandError
-from django.core import serializers
 from gnowsys_ndf.ndf.models  import node_collection, triple_collection, filehive_collection, counter_collection
 from gnowsys_ndf.settings import GSTUDIO_DATA_ROOT, GSTUDIO_LOGS_DIR_PATH, MEDIA_ROOT, GSTUDIO_INSTITUTE_ID
 from dump_users import load_users_dump
 
+from django.core import serializers
 # global variables declaration
 DATA_RESTORE_PATH = None
 CONFIG_VARIABLES = None
@@ -80,7 +81,7 @@ def user_objs_restoration():
             user_json_file_path = os.path.join(DATA_DUMP_PATH, 'users_dump.json')
             with open(user_json_file_path, 'rb+') as user_json_fin:
                 user_json_data = json.loads(user_json_fin.read())
-                load_users_dump(user_json_data)
+                load_users_dump(user_json_file_path, user_json_data)
             # print "user_json_data: ", user_json_data
             # print "user_json_data type: ", type(user_json_data)
         else:
