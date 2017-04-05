@@ -222,7 +222,7 @@
                             {% if user.is_authenticated  and not group_object.edit_policy == "NON_EDITABLE"  or gstaff_access %}
                                 <input type="checkbox" class="filenode" name="filenode" value="{{each.pk}}" style="margin-top:6px; margin-right: 2px; float:right;" class="asset_content_checkbox"/>
                             {% endif %}
-                                <div class="asset_desc">{{each.content|truncatechars:35}}</div>
+                                <div title="{{each.content}}"class="asset_desc">{{each.content|truncatechars:35}}</div>
                             </div>
                         </div>
                     </div>
