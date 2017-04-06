@@ -10,8 +10,6 @@
 {% endblock %}
 {% block head %}
 {{block.super}}
-<script type="text/javascript" src="/static/ndf/bower_components/foundation/js/foundation.min.js"></script>
-    <script type="text/javascript" src="/static/ndf/bower_components/foundation/js/foundation/foundation.topbar.js"></script>
 
 {% endblock %}
 {% block body_content %}
@@ -59,6 +57,8 @@
 
                         </li>
 
+                        <li> <a class="" data-reveal-id="delete-unit">Delete</a> </li>
+
                         </ul>
                     </div>
                 </div>
@@ -105,7 +105,7 @@
                         {% elif title == "create_course_pages" %}
                             {% include "ndf/course_page_create_edit.html" %}
                         {% endif %}
-                        
+
                     </div>
                     <div id="group_elibrary">
                         {% if title == "asset_list" %}
@@ -118,6 +118,17 @@
                     <div id="addAsset" class="reveal-modal reveal-modal-overlay" data-reveal aria-labelledby="modalTitle" aria-hidden="true" role="dialog">
                         <a class="close-reveal-modal" aria-label="Close">&#215;</a>
                     </div>
+
+                    <div id="delete-unit" class="reveal-modal tiny text-center" data-reveal>
+                    <h3>Delete Unit: {% firstof group_object.altnames group_object.name  %} ?</h3>
+                        <br/>
+                        Are you sure want to delete this unit?
+                        <br/>
+                        <a href="#" class="button tiny success">Cancel</a>
+                        <a href="{% url 'delete_group_url_redirect' group_object.pk 'explore_basecourses' %}" class="button tiny alert">Yes</a>
+                        <a class="close-reveal-modal" aria-label="Close">&#215;</a>
+                    </div>
+
                     <div id="group_forum">
 
                     </div>
