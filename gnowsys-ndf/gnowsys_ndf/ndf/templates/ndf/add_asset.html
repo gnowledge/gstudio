@@ -31,66 +31,49 @@
                 <h4 class="page-name">{{asset_obj.name}}</h4>
             </div>
             
-            
-
-            
-            <div class="small-4 columns right">
-                
+            <div class="small-4 columns right">       
             {% if not edit and asset_obj %}
                 {% if asset_obj.created_by == request.user.id or is_gstaff %}
-                <span data-dropdown="asset-settings-drop" aria-controls="asset-settings-drop" aria-expanded="false" class="large orange-button right">
-                    Actions <i class="fa fa-chevron-down"></i>
-                </span>
-                <ul id="asset-settings-drop" class="f-dropdown" data-dropdown-content aria-hidden="true" tabindex="-1">
-                    <li> <a class="createAsset" data-asset_id='{{asset_obj.pk}}'>Edit</a></li>
-                    <li><a class="edit-metadata">Metadata</a></li>
-                    <!-- <li>
-                        {% if asset_obj %}
-                            {% get_relation_node asset_obj.pk  'has_assetcontent' as asset_cont_grel %}
-                            {% if not asset_cont_grel %}
+                    <span data-dropdown="asset-settings-drop" aria-controls="asset-settings-drop" aria-expanded="false" class="large orange-button right">
+                        Actions <i class="fa fa-chevron-down"></i>
+                    </span>
+                    <ul id="asset-settings-drop" class="f-dropdown" data-dropdown-content aria-hidden="true" tabindex="-1">
+                        <li> <a class="createAsset" data-asset_id='{{asset_obj.pk}}'>Edit</a></li>
+                        <li><a class="edit-metadata">Metadata</a></li>
+                        <li>
+                        {% if not asset_content_list.grel_id %}
                             <a class="delete-asset">Delete Asset</a>
-                            {% endif  %}
                         {% endif  %}
-                    </li> -->
-                    <li>
-                    {% if not asset_content_list.grel_id %}
-                    <a class="delete-asset">Delete Asset</a>
-                    {% endif  %}
-                    </li>
-                    
-                </ul>
+                        </li>   
+                    </ul>
                 {% endif %}
+            
             {% endif%}
-            <button type="button" class="orange-button add-asset-content right"><i class="fi-plus"></i> Add File</button>
+            
+            {% if user.is_authenticated %}
+                <button type="button" class="orange-button add-asset-content right"><i class="fi-plus"></i> Add File</button>
+            {% endif %}
             </div>
-            
-
-
-
-        <!-- <div class="small-2 columns right">
-            
-            </div> -->
    </div>
 
-
-        <div class="row">
-            <div class="small-10 columns left">
-                 {% if asset_obj.tags %}
-                    {% for tag in asset_obj.tags %}
-                            <small><label class="tag-ele">
-                        <a href="{% url 'tag_info' group_id tag %}">{{tag}} </a></label></small>
-                    {% endfor %} 
-                {% else %}
-                    <i><small><label>{% trans "No tags defined yet!" %}</label></small></i>
-                {% endif %}   
-            </div>
+    <div class="row">
+        <div class="small-10 columns left">
+             {% if asset_obj.tags %}
+                {% for tag in asset_obj.tags %}
+                        <small><label class="tag-ele">
+                    <a href="{% url 'tag_info' group_id tag %}">{{tag}} </a></label></small>
+                {% endfor %} 
+            {% else %}
+                <i><small><label>{% trans "No tags defined yet!" %}</label></small></i>
+            {% endif %}   
         </div>
-        <br/>
+    </div>
+    <br/>
 
         
-            <div class="row activity-detail-content">
-              {{asset_obj.content|safe|striptags}} 
-            </div>
+    <div class="row activity-detail-content">
+      {{asset_obj.content|safe|striptags}} 
+    </div>
             
 
             {% else %}
@@ -99,10 +82,7 @@
 
                 <button type="button" class="blue-white-button save-asset right" data-asset_id='{{asset_obj.pk}}' style="margin-top: 9px;margin-right: -150px;">Save Asset</button>
             {% endif %}
-        <!-- </div> -->
-        
-    <!-- </div>
- -->    
+
     <hr/>
         <div class="row">
             <div class="small-12 medium-10 large-10 columns">
@@ -196,7 +176,7 @@
 
 
         <div class="row">
-            {% if asset_content_list.grel_id %}
+            {% if asset_content_list.grel_id and user.is_authenticated %}
             <div class="row">
                 <button type="button" class="orange-button delete-asset-content right icon-widget" style="margin-right: 53px;" title="Click on the checkbox on the files below to Delete"><i class="fa fa-trash"></i> Delete Files</button>
             </div>
