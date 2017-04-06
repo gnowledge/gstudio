@@ -316,19 +316,19 @@
             $('#upload_asset').attr('disabled',true);
     })
 
-    // $('#asset-name').keyup(function(){
-    //     if($(this).val().length !=0 && $('#asset-descid').val().length !=0)
-    //         $('.save-asset').attr('disabled', false);
-    //     else
-    //         $('.save-asset').attr('disabled',true);
-    // })
+    $('#asset-name').keyup(function(){
+        if($(this).val().length !=0 && $('#asset-descid').val().length !=0)
+            $('.save-asset').attr('disabled', false);
+        else
+            $('.save-asset').attr('disabled',true);
+    })
 
-    // $('#asset-descid').keyup(function(){
-    //     if($(this).val().length !=0 &&  $('#asset-name').val().length !=0)
-    //         $('.save-asset').attr('disabled', false);
-    //     else
-    //         $('.save-asset').attr('disabled',true);
-    // })
+    $('#asset-descid').keyup(function(){
+        if($(this).val().length !=0 &&  $('#asset-name').val().length !=0)
+            $('.save-asset').attr('disabled', false);
+        else
+            $('.save-asset').attr('disabled',true);
+    })
     $( ".save-asset" ).click(function(event) {
         updateAllTags();
         var tagsStr = tags.value.trim();
@@ -345,10 +345,7 @@
         asset_name = $("#asset-name").val();
         asset_description = $("#asset-descid").val();
         var asset_id = $(this).attr('data-asset_id');
-        // console.log(asset_description)
-        // console.log(asset_name)
         if (asset_name != '' && asset_description != ''){
-            // asset_objective =  $('#asset_objectivesid').find(':selected').attr('value');
             $.ajax({
                   type: "POST",
                   data:{
