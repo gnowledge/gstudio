@@ -565,6 +565,9 @@ $("#alt_types").change(function(){
       }
 
 function delete_rel_files(sel_sub,rel_type){    
+   if (confirm("Do you want to delete selected file?.") == true){
+    
+
     $.ajax({
               type: "POST",
               data:{
@@ -580,6 +583,7 @@ function delete_rel_files(sel_sub,rel_type){
                 location.reload()
             }
         });
+   }
 }
 </script>
 
