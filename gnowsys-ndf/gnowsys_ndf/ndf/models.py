@@ -68,6 +68,10 @@ NODE_TYPE_CHOICES = (
     ('Process')
 )
 
+NODE_ACCESS_POLICY = (
+    ('PUBLIC'),
+    ('PRIVATE')
+)
 
 TYPES_OF_GROUP = (
     ('PUBLIC'),
@@ -307,7 +311,7 @@ class Node(DjangoDocument):
                         'language': ('en', 'English'),
                         'type_of': [],
                         'member_of': [],
-                        'access_policy': u'Public',
+                        'access_policy': u'PUBLIC',
                         'created_at': datetime.datetime.now,
                         # 'created_by': int,
                         'last_update': datetime.datetime.now,
@@ -333,7 +337,8 @@ class Node(DjangoDocument):
 
     validators = {
         'name': lambda x: x.strip() not in [None, ''],
-        'created_by': lambda x: isinstance(x, int) and (x != 0)
+        'created_by': lambda x: isinstance(x, int) and (x != 0),
+        'access_policy': lambda x: x in NODE_ACCESS_POLICY
     }
 
     use_dot_notation = True
