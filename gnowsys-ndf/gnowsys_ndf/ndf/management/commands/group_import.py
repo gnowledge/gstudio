@@ -23,6 +23,8 @@ CONFIG_VARIABLES = None
 DATA_DUMP_PATH = None
 DEFAULT_USER_ID = None
 DEFAULT_USER_SET = False
+USER_ID_MAP = dict
+SCHEMA_ID_MAP = dict
 '''
 Following will be available:
     CONFIG_VARIABLES.FORK=True
@@ -73,6 +75,7 @@ def check_group_availability():
         print " Proceeding to restore."
 
 def user_objs_restoration():
+    global USER_ID_MAP
     user_json_data = None
     print "CONFIG_VARIABLES.RESTORE_USER_DATA"
     if CONFIG_VARIABLES.RESTORE_USER_DATA:
@@ -82,9 +85,8 @@ def user_objs_restoration():
             user_json_file_path = os.path.join(DATA_DUMP_PATH, 'users_dump.json')
             with open(user_json_file_path, 'rb+') as user_json_fin:
                 user_json_data = json.loads(user_json_fin.read())
-                load_users_dump(DATA_DUMP_PATH, user_json_data)
-            # print "user_json_data: ", user_json_data
-            # print "user_json_data type: ", type(user_json_data)
+                USER_ID_MAP = load_users_dump(DATA_DUMP_PATH, user_json_data)
+                # print "\nUSER_ID_MAP: ", USER_ID_MAP
         else:
             DEFAULT_USER_SET = True
             default_user_confirmation = raw_input("Restoration will use default usre-id=1. \
@@ -100,15 +102,17 @@ class Command(BaseCommand):
 
         global DATA_RESTORE_PATH
         global DATA_DUMP_PATH
+        global SCHEMA_ID_MAP
         DATA_RESTORE_PATH = raw_input("\n\tEnter absolute path of data-dump folder to restore:")
         if os.path.exists(DATA_RESTORE_PATH):
             DATA_DUMP_PATH = os.path.join(DATA_RESTORE_PATH, 'dump')
             read_config_file()
             validate_data_dump()
-            # print "\nCONFIG_VARIABLES: ", CONFIG_VARIABLES
             check_group_availability()
             user_objs_restoration()
-            update_factory_schema_mapper(DATA_DUMP_PATH)
+
+            SCHEMA_ID_MAP = update_factory_schema_mapper(DATA_DUMP_PATH)
+            # print "\n SCHEMA_ID_MAP: ", len(SCHEMA_ID_MAP)
 
         nodes_path = '/data/gstudio_data_restore/data/rcs-repo/Nodes'
         triples_path = '/data/gstudio_data_restore/data/rcs-repo/Triples'
