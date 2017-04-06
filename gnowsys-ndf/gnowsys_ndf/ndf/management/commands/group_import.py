@@ -13,7 +13,8 @@ from bson.json_util import dumps,loads,object_hook
 from django.core.management.base import BaseCommand, CommandError
 from gnowsys_ndf.ndf.models  import node_collection, triple_collection, filehive_collection, counter_collection
 from gnowsys_ndf.settings import GSTUDIO_DATA_ROOT, GSTUDIO_LOGS_DIR_PATH, MEDIA_ROOT, GSTUDIO_INSTITUTE_ID
-from dump_users import load_users_dump
+from users_dump_restore import load_users_dump
+from schema_mapping import update_factory_schema_mapper
 
 from django.core import serializers
 # global variables declaration
@@ -107,6 +108,8 @@ class Command(BaseCommand):
             # print "\nCONFIG_VARIABLES: ", CONFIG_VARIABLES
             check_group_availability()
             user_objs_restoration()
+            update_factory_schema_mapper(DATA_DUMP_PATH)
+
         nodes_path = '/data/gstudio_data_restore/data/rcs-repo/Nodes'
         triples_path = '/data/gstudio_data_restore/data/rcs-repo/Triples'
         filehives_path = '/data/gstudio_data_restore/data/rcs-repo/Filehives'
