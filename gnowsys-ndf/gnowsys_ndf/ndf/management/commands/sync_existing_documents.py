@@ -10,7 +10,7 @@ except ImportError:  # old pymongo
 
 ''' imports from application folders/files '''
 from gnowsys_ndf.ndf.models import node_collection, triple_collection
-from gnowsys_ndf.ndf.models import Node, db, AttributeType, RelationType
+from gnowsys_ndf.ndf.models import Node, db, AttributeType, RelationType, GSystem
 from gnowsys_ndf.settings import GSTUDIO_AUTHOR_AGENCY_TYPES, LANGUAGES, OTHER_COMMON_LANGUAGES, GSTUDIO_DEFAULT_LICENSE, GSTUDIO_DEFAULT_LANGUAGE
 from gnowsys_ndf.ndf.views.methods import create_gattribute, create_grelation
 from gnowsys_ndf.ndf.templatetags.ndf_tags import get_relation_value, get_attribute_value
