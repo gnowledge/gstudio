@@ -1,8 +1,9 @@
 import os
 import datetime
 import subprocess
-import multiprocessing
-import math
+# from threading import Thread
+# import multiprocessing
+# import math
 try:
     from bson import ObjectId
 except ImportError:  # old pymongo
@@ -15,8 +16,9 @@ from schema_mapping import create_factory_schema_mapper
 from dump_users import create_users_dump
 from gnowsys_ndf.ndf.views.methods import get_group_name_id
 
-
+# global variables declaration
 GROUP_CONTRIBUTORS = []
+DUMP_PATH = None
 DATA_EXPORT_PATH = None
 MEDIA_EXPORT_PATH = None
 IS_FORK = False
@@ -47,10 +49,12 @@ def setup_dump_path(group_name):
         Creates factory_schema.json which will hold basic info
         like ObjectId, name, type of TYPES_LIST and GSTUDIO_DEFAULT_GROUPS
     '''
+    global DUMP_PATH
     global DATA_EXPORT_PATH
     global MEDIA_EXPORT_PATH
     datetimestamp = datetime.datetime.now().isoformat()
-    DATA_EXPORT_PATH = os.path.join(GSTUDIO_DATA_ROOT, 'data_export', group_name + "_" + str(datetimestamp))
+    DUMP_PATH = os.path.join(GSTUDIO_DATA_ROOT, 'data_export', group_name + "_" + str(datetimestamp))
+    DATA_EXPORT_PATH = os.path.join(DUMP_PATH, 'dump')
     MEDIA_EXPORT_PATH = os.path.join(DATA_EXPORT_PATH, 'media_files')
     if not os.path.exists(DATA_EXPORT_PATH):
         os.makedirs(DATA_EXPORT_PATH)
@@ -58,17 +62,26 @@ def setup_dump_path(group_name):
         os.makedirs(MEDIA_EXPORT_PATH)
     return DATA_EXPORT_PATH
 
-def create_configs_file(group_id, data_dump_path):
+def create_configs_file(group_id):
     global IS_FORK
     global IS_CLONE
     global RESTORE_USER_DATA
-    configs_file_path = os.path.join(data_dump_path, "configs.py")
+    global DUMP_PATH
+    configs_file_path = os.path.join(DUMP_PATH, "migration_configs.py")
     with open(configs_file_path, 'w+') as configs_file_out:
         configs_file_out.write("\nFORK=" + str(IS_FORK))
         configs_file_out.write("\nCLONE=" + str(IS_CLONE))
         configs_file_out.write("\nRESTORE_USER_DATA=" + str(RESTORE_USER_DATA))
-        configs_file_out.write("\nGSTUDIO_INSTITUTE_ID=" + str(GSTUDIO_INSTITUTE_ID))
-        configs_file_out.write("\nGROUP_ID=" + str(group_id))
+        configs_file_out.write("\nGSTUDIO_INSTITUTE_ID='" + str(GSTUDIO_INSTITUTE_ID) + "'")
+        configs_file_out.write("\nGROUP_ID='" + str(group_id) + "'")
+    return configs_file_path
+
+def write_md5_of_dump(group_dump_path, configs_file_path):
+    global DUMP_PATH
+    from checksumdir import dirhash
+    md5hash = dirhash(group_dump_path, 'md5')
+    with open(configs_file_path, 'a+') as configs_file_out:
+        configs_file_out.write("\nMD5='" + str(md5hash) + "'")
 
 def get_triple_data(node_id):
     '''
@@ -140,25 +153,28 @@ class Command(BaseCommand):
                 print "START : ", str(datetime.datetime.now())
                 group_dump_path = setup_dump_path(group_node.name)
                 create_factory_schema_mapper(group_dump_path)
-                create_configs_file(group_node._id, group_dump_path)
+                configs_file_path = create_configs_file(group_node._id)
                 log_file_path = create_log_file(group_dump_path)
 
                 print "*"*70
-                print "\n Export will be found at: ", DATA_EXPORT_PATH
+                # print "\n Export will be found at: ", DATA_EXPORT_PATH
+                print "\n Export will be found at: ", DUMP_PATH
                 print "\n Log will be found at: ", log_file_path
 
                 print "\n This will take few minutes. Please be patient.\n"
                 print "*"*70
 
-                call_group_export(group_node, nodes_falling_under_grp, num_of_processes=multiprocessing.cpu_count())
+                call_group_export(group_node, nodes_falling_under_grp)
                 get_counter_ids(group_node._id)
                 # import ipdb; ipdb.set_trace()
                 if RESTORE_USER_DATA:
                     print "\n Total GROUP_CONTRIBUTORS: ", len(GROUP_CONTRIBUTORS)
                     create_users_dump(group_dump_path, GROUP_CONTRIBUTORS)
+
+                write_md5_of_dump(group_dump_path, configs_file_path)
                 global log_file
                 print "*"*70
-                print "\n Export will be found at: ", DATA_EXPORT_PATH
+                print "\n Export will be found at: ", DUMP_PATH
                 print "\n Log will be found at: ", log_file_path
                 print "*"*70
 
@@ -166,6 +182,7 @@ class Command(BaseCommand):
                 log_file.write("\n*************************************************************")
                 log_file.write("\n######### Script Completed at : " + str(datetime.datetime.now()) + " #########\n\n")
                 print "END : ", str(datetime.datetime.now())
+                log_file.close()
             else:
                 call_exit()
         else:
@@ -176,17 +193,10 @@ class Command(BaseCommand):
 
 def call_exit():
     print "\n Exiting..."
+    log_file.close()
     os._exit(0)
 
-def call_group_export(group_node, nodes_cur, num_of_processes=4):
-    '''
-        Introducing multiprocessing to use cores available on the system to 
-        take dump of nodes of the entire group.
-    '''
-    nodes_cur = list(nodes_cur)
-    # Include Group Object.
-    nodes_cur.append(group_node)
-    # def worker(nodes_cur, out_q):
+def worker_export(nodes_cur):
     for each_node in nodes_cur:
         print ".",
         dump_node(node=each_node,collection_name=node_collection)
@@ -205,18 +215,31 @@ def call_group_export(group_node, nodes_cur, num_of_processes=4):
 
         #fetch triple_data
         get_triple_data(each_node._id)
+
+def call_group_export(group_node, nodes_cur, num_of_processes=5):
+    '''
+        Introducing multiprocessing to use cores available on the system to 
+        take dump of nodes of the entire group.
+    '''
+    worker_export(nodes_cur)
+    # nodes_cur = list(nodes_cur)
+    # print "\nlen(nodes_cur): ", len(nodes_cur)
+    # Include Group Object.
+    # nodes_cur.append(group_node)
     # Each process will get 'chunksize' student_cur and a queue to put his out
     # dict into
     # out_q = multiprocessing.Queue()
     # chunksize = int(math.ceil(len(nodes_cur) / float(num_of_processes)))
     # procs = []
+    # print "\n chunk: ", chunksize
 
     # for i in range(num_of_processes):
-    #     p = multiprocessing.Process(
+    #     list_of_nodes = nodes_cur[chunksize * i:chunksize * (i + 1)]
+    #     print "\nlist_of_nodes", len(list_of_nodes)
+    #     p = Thread(
     #         target=worker,
-    #         args=(nodes_cur[chunksize * i:chunksize * (i + 1)], out_q)
+    #         args=(list_of_nodes)
     #     )
-    #     procs.append(p)
     #     p.start()
 
     # Collect all results into a single result list. We know how many lists
@@ -251,12 +274,14 @@ def build_rcs(node, collection_name):
                 node.save(triple_node=triple_node_RT_AT, triple_id=triple_node_RT_AT._id)
             else:
                 node.save()
-                global RESTORE_USER_DATA
-                if RESTORE_USER_DATA:
-                    print "\n NC: ", len(node.contributors)
-                    if "contributors" in node:
-                        GROUP_CONTRIBUTORS.extend(node.contributors)
-
+                try:
+                    global RESTORE_USER_DATA
+                    if RESTORE_USER_DATA:
+                        print "\n NC: ", len(node.contributors)
+                        if "contributors" in node:
+                            GROUP_CONTRIBUTORS.extend(node.contributors)
+                except Exception as no_contributors_err:
+                    pass
             log_file.write("\n RCS Built for " + str(node._id) )
             copy_rcs(node)
         except Exception as buildRCSError:
@@ -357,6 +382,7 @@ def get_file_node_details(node):
                 },
 
     '''
+    print "\n dumping fh -- "
     dump_node(node_id=node.if_file['original']['id'], collection_name=filehive_collection)
     dump_node(node_id=node.if_file['mid']['id'], collection_name=filehive_collection)
     dump_node(node_id=node.if_file['thumbnail']['id'], collection_name=filehive_collection)
