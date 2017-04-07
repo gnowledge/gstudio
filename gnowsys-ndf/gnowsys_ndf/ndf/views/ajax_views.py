@@ -6741,7 +6741,7 @@ def add_assetcontent(request,group_id):
   uploaded_alt_lang_file = request.FILES.getlist('uploaded_alt_lang_file', [])
 
   subtitle_lang = request.POST.get('sel_sub_lang','')
-  sel_alt_value = request.POST.get('sel_alt_value','')
+  # sel_alt_value = request.POST.get('sel_alt_value','')
   alt_file_format = request.POST.get('sel_alt_fr_type','')
 
   asset_cont_desc = request.POST.get('asset_cont_desc','')
@@ -6793,7 +6793,6 @@ def add_assetcontent(request,group_id):
     file_name = uploaded_alt_lang_file[0].name
     if not file_name:
       file_name = asset_cont_name
-    print "\n uploaded_alt_lang_file: ", len(uploaded_alt_lang_file)
     alt_file_type = request.POST.get('alt_file_type','')
     alt_lang_file_obj = create_assetcontent(asset_id=ObjectId(asset_obj), 
       name=file_name, group_name_or_id=group_id, created_by=request.user.id,
@@ -6807,7 +6806,7 @@ def add_assetcontent(request,group_id):
     for each_asset in alt_lang_file_grels:
       alt_lang_file_list.append(each_asset['right_subject'])
 
-    alt_lang_file_node = create_grelation(ObjectId(assetcontentid), rt_alt_content, alt_lang_file_list, **{'triple_scope':{'relation_type_scope':{ alt_file_type : sel_alt_value }, 'subject_scope': "many"}})
+    alt_lang_file_node = create_grelation(ObjectId(assetcontentid), rt_alt_content, alt_lang_file_list, **{'triple_scope':{'relation_type_scope':{ alt_file_type : '' }, 'subject_scope': "many"}})
 
     return StreamingHttpResponse("success")
 
