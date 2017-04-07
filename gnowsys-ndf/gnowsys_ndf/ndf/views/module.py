@@ -46,13 +46,13 @@ def list_modules(request, group_id):
 
 @login_required
 @get_execution_time
-def module_create_edit(request, group_id, unit_group_id=None):
+def module_create_edit(request, group_id, module_id=None):
     if request.method == "GET":
 
         template = 'ndf/module_form.html'
 
         req_context = RequestContext(request, {
-                                    'title': 'Module',
+                                    'title': 'Module', 'node_obj': Node.get_node_by_id(module_id),
                                     'group_id': group_id, 'groupid': group_id,
                                     'post_url': reverse('node_create', kwargs={
                                         'group_id': group_id,
@@ -72,12 +72,14 @@ def module_detail(request, group_id, node_id):
 
     module_obj = Node.get_node_by_id(node_id)
 
+    units_under_module = Node.get_nodes_by_ids_list(module_obj.collection_set)
+
     template = 'ndf/module_detail.html'
 
     req_context = RequestContext(request, {
                                 'title': 'Module',
-                                'group_id': group_id,
-                                'groupid': group_id,
-                                'node': module_obj,
+                                'node': module_obj, 'units_under_module': units_under_module,
+                                'group_id': group_id, 'groupid': group_id,
+                                'card': 'ndf/event_card.html', 'card_url_name': 'module_detail'
                             })
     return render_to_response(template, req_context)
