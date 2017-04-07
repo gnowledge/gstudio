@@ -15,6 +15,7 @@ from gnowsys_ndf.settings import GSTUDIO_DATA_ROOT, GSTUDIO_LOGS_DIR_PATH, MEDIA
 from schema_mapping import create_factory_schema_mapper
 from dump_users import create_users_dump
 from gnowsys_ndf.ndf.views.methods import get_group_name_id
+from gnowsys_ndf.ndf.templatetags.simple_filters import get_latest_git_hash
 
 # global variables declaration
 GROUP_CONTRIBUTORS = []
@@ -74,6 +75,7 @@ def create_configs_file(group_id):
         configs_file_out.write("\nRESTORE_USER_DATA=" + str(RESTORE_USER_DATA))
         configs_file_out.write("\nGSTUDIO_INSTITUTE_ID='" + str(GSTUDIO_INSTITUTE_ID) + "'")
         configs_file_out.write("\nGROUP_ID='" + str(group_id) + "'")
+        configs_file_out.write("\nGIT_COMMIT_HASH='" + str(get_latest_git_hash) + "'")
     return configs_file_path
 
 def write_md5_of_dump(group_dump_path, configs_file_path):
