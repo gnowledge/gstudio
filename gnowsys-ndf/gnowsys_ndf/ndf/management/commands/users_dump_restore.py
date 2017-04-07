@@ -36,7 +36,7 @@ def create_users_dump(path, user_id_list):
         schema_file_out.write(json.dumps(user_json_list))
 
 def load_users_dump(path, user_json_list):
-
+    USER_ID_MAP = {} # {old-id: new-id}
     user_obj = None
     datetimestamp = datetime.datetime.now().isoformat()
     restore_users_log_file = "user_dump_restoration"+ "_" + str(datetimestamp) +".log"
@@ -85,6 +85,7 @@ def load_users_dump(path, user_json_list):
                                         str(each_user_record["new_user_id"]) + \
                                         "\t New Author Id: " +  \
                                         str(each_user_record["new_user_id"])
+                    USER_ID_MAP[each_user_record['user_id']] = new_user_id
                 except Exception as user_auth_creation_error:
                     each_user_record["new_user_id"] = "Failed"
                     each_user_record["new_author_id"] = "Failed"
@@ -105,6 +106,7 @@ def load_users_dump(path, user_json_list):
                                     str(each_user_record["new_user_id"]) + \
                                     "\t New Author Id: " +  \
                                     str(each_user_record["new_user_id"])
+                USER_ID_MAP[each_user_record['user_id']] = new_user_id
             except Exception as user_auth_creation_error:
                 each_user_record["new_user_id"] = "Failed"
                 each_user_record["new_author_id"] = "Failed"
@@ -116,6 +118,7 @@ def load_users_dump(path, user_json_list):
         user_log_fout.write(user_obj_restore_log)
 
     user_restore_fout.write(json.dumps(users_restorations))
+    return USER_ID_MAP
 
 def create_user_and_auth_obj(each_user_record_dict):
     user_obj = User.objects.create_user(
