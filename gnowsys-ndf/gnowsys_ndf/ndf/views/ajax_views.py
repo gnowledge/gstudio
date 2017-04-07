@@ -6698,37 +6698,31 @@ def create_edit_asset(request,group_id):
   except:
       group_name, group_id = get_group_name_id(group_id)
 
-  asset_name =  str(request.POST.get("asset_name", '')).strip()
-  asset_desc =  str(request.POST.get("asset_description", '')).strip()
-  tags =  request.POST.get("sel_tags", [])
-  if tags:
-      tags = json.loads(tags)
-  else:
-      tags = []
-  asset_lang =  request.POST.get("sel_asset_lang", '')
-  # file_node.language = get_language_tuple(language)
-  node_id = request.POST.get('node_id', None)
-  asset_obj = create_asset(name=asset_name, group_id=group_id,
-    created_by=request.user.id, content=unicode(asset_desc), node_id=node_id)
+  if request.method == "POST":
+    asset_name =  str(request.POST.get("asset_name", '')).strip()
+    asset_desc =  str(request.POST.get("asset_description", '')).strip()
+    tags =  request.POST.get("sel_tags", [])
+    if tags:
+        tags = json.loads(tags)
+    else:
+        tags = []
+    asset_lang =  request.POST.get("sel_asset_lang", '')
+    node_id = request.POST.get('node_id', None)
+    asset_obj = create_asset(name=asset_name, group_id=group_id,
+      created_by=request.user.id, content=unicode(asset_desc), node_id=node_id)
 
-  asset_obj.fill_gstystem_values(tags=tags)
+    asset_obj.fill_gstystem_values(tags=tags)
+    
+    if "asset@asset" not in asset_obj.tags:
+      asset_obj.tags.append(u'asset@asset')
+    
+    if asset_lang:
+      language = get_language_tuple(asset_lang)
+      asset_obj.language = language
+    asset_obj.save()
+    thread_node = create_thread_for_node(request,group_id, asset_obj)
 
-  if asset_lang:
-    language = get_language_tuple(asset_lang)
-    asset_obj.language = language
-  asset_obj.save()
-  thread_node = create_thread_for_node(request,group_id, asset_obj)
-
-  # teaches_list = [ObjectId(asset_objective)]
-  # asset_grels = triple_collection.find({'_type': 'GRelation', \
-  #   'relation_type': rt_teaches._id,'subject': asset_obj._id},
-  #   {'_id': 0, 'right_subject': 1})
-
-  # for each_asset in asset_grels:
-  #   teaches_list.append(each_asset['right_subject'])
-  # create_grelation(asset_obj._id, rt_teaches, teaches_list)
-  # print "+++++++++++++++++++++++++++++++++++++++++"
-  return HttpResponse("success")
+    return HttpResponse("success")
 
 
 @login_required
@@ -6747,7 +6741,7 @@ def add_assetcontent(request,group_id):
   uploaded_alt_lang_file = request.FILES.getlist('uploaded_alt_lang_file', [])
 
   subtitle_lang = request.POST.get('sel_sub_lang','')
-  sel_alt_value = request.POST.get('sel_alt_value','')
+  # sel_alt_value = request.POST.get('sel_alt_value','')
   alt_file_format = request.POST.get('sel_alt_fr_type','')
 
   asset_cont_desc = request.POST.get('asset_cont_desc','')
@@ -6799,7 +6793,6 @@ def add_assetcontent(request,group_id):
     file_name = uploaded_alt_lang_file[0].name
     if not file_name:
       file_name = asset_cont_name
-    print "\n uploaded_alt_lang_file: ", len(uploaded_alt_lang_file)
     alt_file_type = request.POST.get('alt_file_type','')
     alt_lang_file_obj = create_assetcontent(asset_id=ObjectId(asset_obj), 
       name=file_name, group_name_or_id=group_id, created_by=request.user.id,
@@ -6813,7 +6806,7 @@ def add_assetcontent(request,group_id):
     for each_asset in alt_lang_file_grels:
       alt_lang_file_list.append(each_asset['right_subject'])
 
-    alt_lang_file_node = create_grelation(ObjectId(assetcontentid), rt_alt_content, alt_lang_file_list, **{'triple_scope':{'relation_type_scope':{ alt_file_type : sel_alt_value }, 'subject_scope': "many"}})
+    alt_lang_file_node = create_grelation(ObjectId(assetcontentid), rt_alt_content, alt_lang_file_list, **{'triple_scope':{'relation_type_scope':{ alt_file_type : '' }, 'subject_scope': "many"}})
 
     return StreamingHttpResponse("success")
 
@@ -6864,6 +6857,26 @@ def get_metadata_page(request, group_id):
             {
                 'group_id': group_id, 'groupid': group_id,
                 'node_id':node_id,'node':node_obj
+            },
+            context_instance=RequestContext(request))
+
+def get_admin_page_form(request, group_id):
+  node_id = request.POST.get('node_id', None)
+  node_obj = node_collection.one({'_id':ObjectId(node_id)})
+  return render_to_response('ndf/widget_admin_page.html',
+           {
+              'group_id': group_id, 'groupid': group_id,
+              'node_id':node_id,'node':node_obj
+            },
+            context_instance=RequestContext(request))
+
+def get_help_page_form(request, group_id):
+  node_id = request.POST.get('node_id', None)
+  node_obj = node_collection.one({'_id':ObjectId(node_id)})
+  return render_to_response('ndf/widget_help_page.html',
+           {
+              'group_id': group_id, 'groupid': group_id,
+              'node_id':node_id,'node':node_obj
             },
             context_instance=RequestContext(request))
 
