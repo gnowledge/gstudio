@@ -434,6 +434,20 @@ $("#alt_types").change(function(){
           formData.append('sel_alt_value',sel_alt_fr_type);
           formData.append('alt_file_type','alt_size');
         }
+
+        if(sel_alt_type == 'Content' ){
+          sel_alt_fr_type =  $('.alt-size-type').find(':selected').attr('data-opts');
+          formData.append('if_alt_file','True');
+          formData.append('sel_alt_value',sel_alt_fr_type);
+          formData.append('alt_file_type','alt_content');
+        }
+
+        if(sel_alt_type == 'Other' ){
+          sel_alt_fr_type =  $('.alt-size-type').find(':selected').attr('data-opts');
+          formData.append('if_alt_file','True');
+          formData.append('sel_alt_value',sel_alt_fr_type);
+          formData.append('alt_file_type','alt_other');
+        }
         
         if(!"{{asset_obj}}"){
             formData.append('asset_obj',assetval);
