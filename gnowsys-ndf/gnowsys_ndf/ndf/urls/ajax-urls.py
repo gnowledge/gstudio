@@ -63,6 +63,8 @@ urlpatterns = patterns('gnowsys_ndf.ndf.views.ajax_views',
     url(r'^save_interactions', 'save_interactions', name='save_interactions'),
     url(r'^export_to_epub/(?P<node_id>[\w-]+)', 'export_to_epub', name='export_to_epub'),
     url(r'^remove_related_oc/', 'remove_related_doc', name='remove_related_doc'),
+    url(r'^get_admin_page_form', 'get_admin_page_form', name='get_admin_page_form'),
+    url(r'^get_help_page_form', 'get_help_page_form', name='get_help_page_form'),
     
     # url(r'^/upload_file/', 'upload_file', name='upload_file'),
 

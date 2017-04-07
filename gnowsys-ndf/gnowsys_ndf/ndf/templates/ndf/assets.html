@@ -5,11 +5,13 @@
     </button>
 
  -->    <div class="row">
-        <button type="button" class="right orange-button createAsset">
-        <i class="fi-plus"> </i>
-        Add 
-    </button>
-    </div>
+        {% if user.is_authenticated %}
+            <button type="button" class="right orange-button createAsset">
+                <i class="fi-plus"> </i>
+                Add 
+            </button>
+        {% endif %}
+        </div>
 </div>
 <div class="row"> 
       {% for each in asset_nodes %}

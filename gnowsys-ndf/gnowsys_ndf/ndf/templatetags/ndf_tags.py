@@ -3873,10 +3873,10 @@ def get_file_obj(node):
 
 @get_execution_time
 @register.assignment_tag
-def get_help_pages_of_node(node_obj):
+def get_help_pages_of_node(node_obj,rel_name="has_help"):
 	all_help_page_node_list = []
 	try:
-		has_help_rt = node_collection.one({'_type': 'RelationType', 'name': 'has_help'})
+		has_help_rt = node_collection.one({'_type': 'RelationType', 'name': rel_name})
 		help_rt = triple_collection.find({'subject':node_obj._id,'relation_type': has_help_rt._id, 'status': u'PUBLISHED'})
 		if help_rt:
 			for each_help_rt in help_rt:

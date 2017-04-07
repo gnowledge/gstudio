@@ -29,68 +29,58 @@
             <div class="small-7 columns">
             {% if not edit and asset_obj.name %}
                 <h4 class="page-name">{{asset_obj.name}}</h4>
+
             </div>
             
-            
-
-            
-            <div class="small-4 columns right">
-                
+            <div class="small-4 columns right">       
             {% if not edit and asset_obj %}
                 {% if asset_obj.created_by == request.user.id or is_gstaff %}
-                <span data-dropdown="asset-settings-drop" aria-controls="asset-settings-drop" aria-expanded="false" class="large orange-button right">
-                    Actions <i class="fa fa-chevron-down"></i>
-                </span>
-                <ul id="asset-settings-drop" class="f-dropdown" data-dropdown-content aria-hidden="true" tabindex="-1">
-                    <li> <a class="createAsset" data-asset_id='{{asset_obj.pk}}'>Edit</a></li>
-                    <li><a class="edit-metadata">Metadata</a></li>
-                    <!-- <li>
-                        {% if asset_obj %}
-                            {% get_relation_node asset_obj.pk  'has_assetcontent' as asset_cont_grel %}
-                            {% if not asset_cont_grel %}
+                    <span data-dropdown="asset-settings-drop" aria-controls="asset-settings-drop" aria-expanded="false" class="large orange-button right">
+                        Actions <i class="fa fa-chevron-down"></i>
+                    </span>
+                    <ul id="asset-settings-drop" class="f-dropdown" data-dropdown-content aria-hidden="true" tabindex="-1">
+                        <li> <a class="createAsset" data-asset_id='{{asset_obj.pk}}'>Edit</a></li>
+                        <li><a class="edit-metadata">Metadata</a></li>
+                        <li>
+                        {% if not asset_content_list.grel_id %}
                             <a class="delete-asset">Delete Asset</a>
-                            {% endif  %}
                         {% endif  %}
-                    </li> -->
-                    <li>
-                    {% if not asset_content_list.grel_id %}
-                    <a class="delete-asset">Delete Asset</a>
-                    {% endif  %}
-                    </li>
-                    
-                </ul>
+                        </li>   
+                    </ul>
                 {% endif %}
+            
             {% endif%}
-            <button type="button" class="orange-button add-asset-content right"><i class="fi-plus"></i> Add File</button>
+            
+            {% if user.is_authenticated %}
+                <button type="button" class="orange-button add-asset-content right"><i class="fi-plus"></i> Add File</button>
+            {% endif %}
             </div>
-            
-
-
-
-        <!-- <div class="small-2 columns right">
-            
-            </div> -->
    </div>
 
-
-        <div class="row">
-            <div class="small-10 columns left">
-                 {% if asset_obj.tags %}
-                    {% for tag in asset_obj.tags %}
-                            <small><label class="tag-ele">
+    <div class="row">
+        <div class="small-8 columns left">
+             {% if asset_obj.tags %}
+                {% for tag in asset_obj.tags %}
+                    {% if tag != "asset@asset" %}
+                        <small><label class="tag-ele">
                         <a href="{% url 'tag_info' group_id tag %}">{{tag}} </a></label></small>
-                    {% endfor %} 
-                {% else %}
-                    <i><small><label>{% trans "No tags defined yet!" %}</label></small></i>
-                {% endif %}   
-            </div>
+                    {% endif %}
+                {% endfor %} 
+            {% else %}
+                <i><small><label>{% trans "No tags defined yet!" %}</label></small></i>
+            {% endif %}   
         </div>
-        <br/>
-
-        
-            <div class="row activity-detail-content">
-              {{asset_obj.content|safe|striptags}} 
+            <div class="small-4 columns right">
+            {% include 'ndf/rating.html' with node=asset_obj %}
+                
             </div>
+
+    </div>
+    <br/>
+
+    <div class="row activity-detail-content">
+      {{asset_obj.content|safe|striptags}} 
+    </div>
             
 
             {% else %}
@@ -99,10 +89,7 @@
 
                 <button type="button" class="blue-white-button save-asset right" data-asset_id='{{asset_obj.pk}}' style="margin-top: 9px;margin-right: -150px;">Save Asset</button>
             {% endif %}
-        <!-- </div> -->
-        
-    <!-- </div>
- -->    
+
     <hr/>
         <div class="row">
             <div class="small-12 medium-10 large-10 columns">
@@ -158,7 +145,6 @@
 
         {% endif %}
 
-
     <div class="asset-content-area"{% if not asset_obj %} style="display:none"{% endif %}>
         {% if not edit %}
         <div class="row">
@@ -196,7 +182,7 @@
 
 
         <div class="row">
-            {% if asset_content_list.grel_id %}
+            {% if asset_content_list.grel_id and user.is_authenticated %}
             <div class="row">
                 <button type="button" class="orange-button delete-asset-content right icon-widget" style="margin-right: 53px;" title="Click on the checkbox on the files below to Delete"><i class="fa fa-trash"></i> Delete Files</button>
             </div>
@@ -207,7 +193,7 @@
                 <div class="small-12 medium-6 large-3 columns">
                     <div class="asset_tile">
                         <div class="asset_preview">
-                            <a href="{% url 'assetcontent_detail' group_id asset_obj.pk each.pk %}" title="{{each.name}}">
+                            <a href="{% url 'assetcontent_detail' group_id asset_obj.pk each.pk %}" title="{{each.name}}" >
                                 {% if each.if_file.mid.relurl and 'video' not in each.if_file.mime_type %}
                                 <img src="{{MEDIA_URL}}{{each.if_file.mid.relurl}}"/>
                                 {% elif  each.if_file.thumbnail.relurl %}
@@ -222,7 +208,7 @@
                             {% if user.is_authenticated  and not group_object.edit_policy == "NON_EDITABLE"  or gstaff_access %}
                                 <input type="checkbox" class="filenode" name="filenode" value="{{each.pk}}" style="margin-top:6px; margin-right: 2px; float:right;" class="asset_content_checkbox"/>
                             {% endif %}
-                                <div class="asset_desc">{{each.content|truncatechars:35}}</div>
+                                <div title="{{each.content}}"class="asset_desc">{{each.content|truncatechars:35}}</div>
                             </div>
                         </div>
                     </div>
@@ -233,7 +219,7 @@
         <!-- </div> -->
     
     
-        <div class="row">
+        <div class="row asset-content-detail">
               {% if node %}
               <hr/>
                &nbsp; {% include "ndf/asset_content_detail.html" with node=node %}
@@ -336,19 +322,19 @@
             $('#upload_asset').attr('disabled',true);
     })
 
-    // $('#asset-name').keyup(function(){
-    //     if($(this).val().length !=0 && $('#asset-descid').val().length !=0)
-    //         $('.save-asset').attr('disabled', false);
-    //     else
-    //         $('.save-asset').attr('disabled',true);
-    // })
+    $('#asset-name').keyup(function(){
+        if($(this).val().length !=0 && $('#asset-descid').val().length !=0)
+            $('.save-asset').attr('disabled', false);
+        else
+            $('.save-asset').attr('disabled',true);
+    })
 
-    // $('#asset-descid').keyup(function(){
-    //     if($(this).val().length !=0 &&  $('#asset-name').val().length !=0)
-    //         $('.save-asset').attr('disabled', false);
-    //     else
-    //         $('.save-asset').attr('disabled',true);
-    // })
+    $('#asset-descid').keyup(function(){
+        if($(this).val().length !=0 &&  $('#asset-name').val().length !=0)
+            $('.save-asset').attr('disabled', false);
+        else
+            $('.save-asset').attr('disabled',true);
+    })
     $( ".save-asset" ).click(function(event) {
         updateAllTags();
         var tagsStr = tags.value.trim();
@@ -365,10 +351,7 @@
         asset_name = $("#asset-name").val();
         asset_description = $("#asset-descid").val();
         var asset_id = $(this).attr('data-asset_id');
-        // console.log(asset_description)
-        // console.log(asset_name)
         if (asset_name != '' && asset_description != ''){
-            // asset_objective =  $('#asset_objectivesid').find(':selected').attr('value');
             $.ajax({
                   type: "POST",
                   data:{
@@ -505,4 +488,11 @@ $( ".edit-metadata" ).click(function(event) {
         });
 })
 
+{% if node %}
+    $( document ).ready(function() {
+        $('html,body').animate({
+                scrollTop: $(".asset-content-detail").offset().top},
+                'slow');
+    });
+{% endif %}
 </script>
