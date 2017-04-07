@@ -615,10 +615,11 @@ class Node(DjangoDocument):
             Takes ObjectId or objectId as string as arg
                 and return object
         '''
-        if isinstance(node_id, ObjectId) or ObjectId.is_valid(node_id):
+        if node_id and (isinstance(node_id, ObjectId) or ObjectId.is_valid(node_id)):
             return node_collection.one({'_id': ObjectId(node_id)})
-        # raise ValueError('No object found with id: ' + str(node_id))
-        return None
+        else:
+            # raise ValueError('No object found with id: ' + str(node_id))
+            return None
 
     @staticmethod
     def get_nodes_by_ids_list(node_id_list):
@@ -630,7 +631,10 @@ class Node(DjangoDocument):
             node_id_list = map(ObjectId, node_id_list)
         except:
             node_id_list = [ObjectId(nid) for nid in node_id_list if nid]
-        return node_collection.find({'_id': {'$in': node_id_list}})
+        if node_id_list:
+            return node_collection.find({'_id': {'$in': node_id_list}})
+        else:
+            return None
 
 
     @staticmethod
@@ -1962,6 +1966,16 @@ class GSystem(Node):
                                     {'created_by': user_id}
                                 ]
                         }).sort('last_update', -1)
+
+    @staticmethod
+    def child_class_names():
+        '''
+        Currently, this is hardcoded but it should be dynamic.
+        Try following:
+        import inspect
+        inspect.getmro(GSystem)
+        '''
+        return ['Group', 'Author', 'File']
     # --- END of static query methods
 
 

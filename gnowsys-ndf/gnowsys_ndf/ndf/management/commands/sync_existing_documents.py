@@ -136,7 +136,7 @@ class Command(BaseCommand):
     #         'thumbnail': {'_id': None, 'relurl': None}
     #     },
     gsres = node_collection.collection.update({
-                    '_type': {'$in': [u'GSystem', u'File', u'Group']},
+                    '_type': {'$in': [u'GSystem'] + GSystem.child_class_names()},
                     'if_file': {'$exists': False}
                 },
                 {
