@@ -29,7 +29,6 @@
             <div class="small-7 columns">
             {% if not edit and asset_obj.name %}
                 <h4 class="page-name">{{asset_obj.name}}</h4>
-                {% include 'ndf/rating.html' with node=asset_obj %}
 
             </div>
             
@@ -59,7 +58,7 @@
    </div>
 
     <div class="row">
-        <div class="small-10 columns left">
+        <div class="small-8 columns left">
              {% if asset_obj.tags %}
                 {% for tag in asset_obj.tags %}
                     {% if tag != "asset@asset" %}
@@ -71,6 +70,11 @@
                 <i><small><label>{% trans "No tags defined yet!" %}</label></small></i>
             {% endif %}   
         </div>
+            <div class="small-4 columns right">
+            {% include 'ndf/rating.html' with node=asset_obj %}
+                
+            </div>
+
     </div>
     <br/>
 

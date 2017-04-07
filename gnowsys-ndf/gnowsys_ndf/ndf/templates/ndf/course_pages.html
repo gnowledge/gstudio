@@ -26,7 +26,6 @@
             <div class="small-8 columns">
                 <h4 class="page-name">{{activity_node.name}}</h4>
             </div>
-                        {% include 'ndf/rating.html' with node=activity_node %}
               
             {% check_is_gstaff groupid request.user as is_gstaff %}
             {% if activity_node.created_by == request.user.id or is_gstaff %}
@@ -48,7 +47,7 @@
             {% endif %}
         </div>
         <div class="row">
-            <div class="small-10 columns left">
+            <div class="small-8 columns left">
                  {% if activity_node.tags %}
                     {% for tag in activity_node.tags %}
                             <small><label class="tag-ele" style="margin-top: 13px;">
@@ -57,6 +56,10 @@
                 {% else %}
                     <i><small><label>{% trans "No tags defined yet!" %}</label></small></i>
                 {% endif %}   
+            </div>
+            <div class="small-4 columns right">
+                {% include 'ndf/rating.html' with node=activity_node %}
+              
             </div>
         </div>
 
