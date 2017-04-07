@@ -13,7 +13,7 @@ from gnowsys_ndf.ndf.models import node_collection, triple_collection, filehive_
 from gnowsys_ndf.ndf.models import HistoryManager
 from gnowsys_ndf.settings import GSTUDIO_DATA_ROOT, GSTUDIO_LOGS_DIR_PATH, MEDIA_ROOT, GSTUDIO_INSTITUTE_ID
 from schema_mapping import create_factory_schema_mapper
-from dump_users import create_users_dump
+from users_dump_restore import create_users_dump
 from gnowsys_ndf.ndf.views.methods import get_group_name_id
 from gnowsys_ndf.ndf.templatetags.simple_filters import get_latest_git_hash, get_active_branch_name
 
