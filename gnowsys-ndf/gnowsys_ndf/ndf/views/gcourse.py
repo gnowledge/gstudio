@@ -3133,13 +3133,13 @@ def assetcontent_detail(request, group_id, asset_id,asst_content_id):
 
 
 @get_execution_time
-def create_edit_course_page(request, group_id, page_id=None):
+def create_edit_course_page(request, group_id, page_id=None,page_type=None):
     group_obj = get_group_name_id(group_id, get_obj=True)
     group_id = group_obj._id
     group_name = group_obj.name
     template = 'ndf/gevent_base.html'
     context_variables = {
-            'group_id': group_id, 'groupid': group_id, 'group_name':group_name,
+            'group_id': group_id, 'groupid': group_id, 'group_name':group_name,'page_type':page_type,
             'group_obj': group_obj, 'title': 'create_course_pages',
             'activity_node': None, 'cancel_activity_url': reverse('course_pages',
                                         kwargs={
@@ -3212,12 +3212,12 @@ def save_course_page(request, group_id):
         if node_id:
             page_obj = node_collection.one({'_id': ObjectId(node_id)})
         if not page_obj:
-            is_info_page = request.POST.get("info-page", "")
+            is_info_page = request.POST.get("page_type", "")
             page_obj = node_collection.collection.GSystem()
             page_obj.fill_gstystem_values(request=request)
             page_obj.member_of = [page_gst_id]
             page_obj.group_set = [group_id]
-            if is_info_page:
+            if is_info_page == "Info":
                 info_page_gst_name, info_page_gst_id = GSystemType.get_gst_name_id('Info page')
                 page_obj.type_of = [info_page_gst_id]
         

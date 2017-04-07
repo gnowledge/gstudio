@@ -63,6 +63,7 @@ urlpatterns = patterns('gnowsys_ndf.ndf.views.gcourse',
                         url(r'^/activities/$', 'course_pages', name='course_pages'),
                         url(r'^/activity/detail/(?P<page_id>[\w-]+)$', 'course_pages', name='view_course_page'),
                         url(r'^/activity/create$', 'create_edit_course_page', name='create_course_page'),
+                        url(r'^/activity/create/(?P<page_type>[\w-]+)$', 'create_edit_course_page', name='create_course_page_info'),
                         url(r'^/activity/edit/(?P<page_id>[\w-]+)$', 'create_edit_course_page', name='edit_course_page'),
 
 
