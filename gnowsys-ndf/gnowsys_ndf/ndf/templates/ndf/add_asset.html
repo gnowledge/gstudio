@@ -29,6 +29,8 @@
             <div class="small-7 columns">
             {% if not edit and asset_obj.name %}
                 <h4 class="page-name">{{asset_obj.name}}</h4>
+                {% include 'ndf/rating.html' with node=asset_obj %}
+
             </div>
             
             <div class="small-4 columns right">       
@@ -72,7 +74,6 @@
     </div>
     <br/>
 
-        
     <div class="row activity-detail-content">
       {{asset_obj.content|safe|striptags}} 
     </div>

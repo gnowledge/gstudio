@@ -4123,7 +4123,7 @@ class Counter(DjangoDocument):
 
         # ideally, member_of field should be used to check resource_type. But it may cause performance hit.
         # hence using 'if_file.mime_type'
-        if resource_obj.if_file.mime_type or (u'File' in resource_obj.member_of_names_list):
+        if resource_obj.if_file.mime_type or (u'File' in resource_obj.member_of_names_list) or (u'Asset' in resource_obj.member_of_names_list):
             resource_type = 'file'
 
         elif u'Page' in resource_obj.member_of_names_list:
@@ -4379,7 +4379,6 @@ class Counter(DjangoDocument):
         resource_obj = Node.get_node_obj_from_id_or_obj(resource_obj_or_id, GSystem)
         resource_oid = resource_obj._id
         resource_type, resource_type_of = Counter._get_resource_type_tuple(resource_obj)
-
         # get resource's creator:
         # resource_created_by_user_id = resource_obj.created_by
         resource_contributors_user_ids_list = resource_obj.contributors
