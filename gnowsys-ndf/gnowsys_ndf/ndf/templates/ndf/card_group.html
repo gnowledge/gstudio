@@ -1,16 +1,30 @@
 {% load i18n %}
 
-<div class="unit_card">
+
+
+    <div class="unit_card">
+        {% comment %}
         <div class="unit_status in-progress-status">
             In-progress
         </div>
-        <div class="unit_header">
-            <img class="unit_banner" src="/static/ndf/images/module_banner.png"/>
-            <span class="unit_title">Algebra</span>
-        </div>
-        <div class="unit_desc">
-            More Text is often written for the reason to write more text iteself and not for any useful purpose.
-        </div>
+        {% endcomment %}
+                {% if first_arg and second_arg and third_arg %}
+            <a href="{% url url_name first_arg second_arg third_arg %}{{search_url_text|safe}}">
+          {% elif first_arg and second_arg %}
+            <a href="{% url url_name first_arg second_arg %}{{search_url_text|safe}}">
+          {% elif first_arg %}
+            <a href='{% url url_name first_arg %}{{search_url_text|safe}}'>
+          {% endif %}
+
+                <div class="unit_header">
+                    <img class="unit_banner" src="/static/ndf/images/module_banner.png"/>
+                    <span class="unit_title">{{node.name}}</span>
+                </div>
+                <div class="unit_desc">
+                {{node.content}}
+                </div>
+        {% comment %}
+        
         <div class="unit_breif">
             <div class="unit_breif_row">
                 <i class="fa fa-list-ul"></i>
@@ -25,9 +39,12 @@
                 5 Students Enrolled
             </div>
         </div>
+        {% endcomment %}
+
         <div class="unit_actions">
             <a href="#" class="text-button-blue">
                 <span>Continue</span>
             </a>
         </div>
+    
 </div>

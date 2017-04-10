@@ -3505,3 +3505,13 @@ ul.nav_menu_1 li:hover {
   color: #fff;
   background-color: #fd9e29;
 }
+
+/* line 3688, ../../../scss/_clix2017.scss */
+.title-strip {
+  box-shadow: 0px 0px 6px rgba(0, 0, 0, 0.2);
+  margin-top: -29px;
+}
+/* line 3692, ../../../scss/_clix2017.scss */
+.title-strip a {
+  color: #2b333f;
+}

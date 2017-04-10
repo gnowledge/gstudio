@@ -3684,3 +3684,12 @@ $inCompleteBgColor: #fd9e29;
     color: $inCompleteColor;
     background-color: $inCompleteBgColor;
 }
+
+.title-strip{
+    box-shadow: 0px 0px 6px rgba(0, 0, 0, 0.2);
+    margin-top: -29px;
+
+    a{
+        color: #2b333f;
+    }
+}
