@@ -41,6 +41,9 @@
                 <li><a title="add admin page" class="add-admin-page">{% trans "Link Teacher's page" %}</a></li>
                 <li><a title="add help page" class="add-help-page">{% trans "Link Help page" %}</a></li>
                 <li><a href="{% url 'all_translations' group_id activity_node.pk %}" target="_blank">Alternate Language</a></li>
+                <li><a class="view-admin-page" data-current-activity-id="" > View Teacher's page</a></li>
+                <li><a class="view-help-page" data-current-activity-id="" > View Help page</a></li>
+
                 </ul>
 
             </div>
@@ -66,6 +69,10 @@
         <div class="row activity-detail-content">
             {% include "ndf/node_ajax_content.html" with node=activity_node %}
         </div>
+        <div id="info-page-area">
+                    
+        </div>
+        
     </div>
 
 
@@ -266,6 +273,50 @@
         });//end of ajax
 
     });
+    $(".view-admin-page").click(function(event){
+                $.ajax({
+                      type: "POST",
 
+                      url: "{% url 'get_info_pages' group_id %}",
+                      datatype: "html",
+                      data:{
+                        'csrfmiddlewaretoken': "{{csrf_token}}",
+                        'node_id':'{{activity_node.pk}}',
+                        'page_type':'has_admin_page'
+
+                      },
+                        success: function(data) {
+                        // $('#info-page-area').html(data);
+                        parent = $("#info-page-area");
+                        parent.html(data);
+                        $('html,body').animate({
+                          scrollTop: $("#info-page-area").offset().top},'slow');
+                      }
+                    });
+      });
+
+            $(".view-help-page").click(function(event){
+                          
+                $.ajax({
+                      type: "POST",
+
+                      url: "{% url 'get_info_pages' group_id %}",
+                      datatype: "html",
+                      data:{
+                        'csrfmiddlewaretoken': "{{csrf_token}}",
+                        'node_id':'{{activity_node.pk}}',
+                        'page_type':'has_help'
+
+                      },
+                        success: function(data) {
+                        // $('#info-page-area').html(data);
+                        parent = $("#info-page-area");
+                        parent.html(data);
+                        $('html,body').animate({
+                          scrollTop: $("#info-page-area").offset().top},'slow');
+                      }
+                    });
+            });
+            
 
 </script>

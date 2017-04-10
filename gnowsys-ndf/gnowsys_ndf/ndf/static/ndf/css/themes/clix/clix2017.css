@@ -3047,17 +3047,18 @@ ul.jqtree-tree .jqtree-toggler:hover {
 
 /* line 3210, ../../../scss/_clix2017.scss */
 .activity-slides-container {
-  border: 1px solid black;
   height: 100%;
+  width: 90% !important;
   background: #CCCCCC;
   margin-bottom: 2em;
   padding: 0em 1em;
+  margin: 50px !important;
 }
-/* line 3217, ../../../scss/_clix2017.scss */
+/* line 3219, ../../../scss/_clix2017.scss */
 .activity-slides-container .activity-slides {
   height: 100%;
 }
-/* line 3221, ../../../scss/_clix2017.scss */
+/* line 3223, ../../../scss/_clix2017.scss */
 .activity-slides-container .activity-slides .activity-slide {
   padding: 1em;
   height: inherit;

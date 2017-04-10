@@ -3208,19 +3208,19 @@ ul.jqtree-tree .jqtree-toggler {
 }
 
 .activity-slides-container {
-    border: 1px solid black;
+    //border: 1px solid black;
     height: 100%;
+    width:90%!important;
     background: #CCCCCC;
     margin-bottom: 2em;
     padding: 0em 1em;
+    margin:50px!important;
 
     .activity-slides {
       height: 100%;
 
 
       .activity-slide {
-        // display: none;
-        // left: 100%;
         padding: 1em;
         height: inherit;
         background: #fff;

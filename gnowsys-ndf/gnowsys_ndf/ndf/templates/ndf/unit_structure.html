@@ -737,7 +737,7 @@ This will not be used because now only existing activities will be added.
                   data_dict = JSON.parse(data);
                   $('#activity-content').html(data_dict.content);
                    MathJax.Hub.Queue(["Typeset",MathJax.Hub,'activity-content']);
-                  
+                    $("#info-page-area").html("");          
                   return true
               }
           });
@@ -797,8 +797,10 @@ This will not be used because now only existing activities will be added.
                       },
                         success: function(data) {
                         // $('#info-page-area').html(data);
-                        parent = $("#scstyle");
-                        parent.replaceWith(data);
+                        parent = $("#info-page-area");
+                        parent.html(data);
+                        $('html,body').animate({
+                          scrollTop: $("#info-page-area").offset().top},'slow');
                       }
                     });
             });
@@ -813,13 +815,15 @@ This will not be used because now only existing activities will be added.
                       data:{
                         'csrfmiddlewaretoken': "{{csrf_token}}",
                         'node_id':activity_id,
-                        'page_type':'has_help_page'
+                        'page_type':'has_help'
 
                       },
                         success: function(data) {
                         // $('#info-page-area').html(data);
-                        parent = $("#scstyle");
-                        parent.replaceWith(data);
+                        parent = $("#info-page-area");
+                        parent.html(data);
+                        $('html,body').animate({
+                          scrollTop: $("#info-page-area").offset().top},'slow');
                       }
                     });
             });
