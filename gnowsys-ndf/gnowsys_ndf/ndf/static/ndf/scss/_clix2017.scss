@@ -3566,3 +3566,121 @@ ul.nav_menu_1 {
     }
 }
 }
+
+
+
+/**
+ * Sass styles related to unit cards
+ */
+$unit-card-font-size: 14px;
+$unit-card-line-height: 1.4;
+$unit-card-lines-to-show: 3;
+
+.unit_card {
+    width: 300px;
+    height: 300px;
+    color: #000;
+    padding: 15px;
+    margin: 10px;
+    cursor: pointer;
+    border-radius: 5px;
+    font-size: $unit-card-font-size;
+    border: 2px solid #d5d5d5;
+    position: relative;
+
+    &:hover {
+        box-shadow: 0px 0px 15px rgba(0, 0, 0, 0.2);
+    }
+
+    .unit_status {
+        position: absolute;
+        right: 0px;
+        top: -10px;
+        height: 25px;
+        padding: 2px 10px;
+        line-height: 20px;
+        border-radius: 3px;
+        letter-spacing: 0.6px;
+    }
+
+    .unit_header {
+        display: table;
+        .unit_banner {
+            display: table-cell;
+            border-radius: 5px;
+            height: 50px;
+            width: 50px;
+            margin-right: 10px;
+        }
+        .unit_title {
+            display: table-cell;
+            font-size: 20px;
+            font-weight: 500;
+            letter-spacing: 0.6px;
+            margin: 0px 0px 12px;
+            width: 200px;
+            overflow: hidden;
+            white-space: nowrap;
+            text-overflow: ellipsis;
+            vertical-align: middle;
+        }
+    }
+    .unit_desc {
+        display: block; /* Fallback for non-webkit */
+        display: -webkit-box;
+        height: $unit-card-font-size*$unit-card-line-height*$unit-card-lines-to-show; /* Fallback for non-webkit */
+        max-width: 400px;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        font-size: $unit-card-font-size;
+        line-height: $unit-card-line-height;
+        -webkit-line-clamp: $unit-card-lines-to-show;
+        -webkit-box-orient: vertical;
+        margin:  10px 0px 20px;
+    }
+    .unit_breif {
+        .unit_breif_row {
+            i {
+                margin-right: 10px;
+                color: #99aaba;
+            }
+        }
+    }
+    .unit_actions {
+        border-top : 1px solid #ccc;
+        margin: 20px 0px 0px;
+        padding: 5px 0px;
+    }
+}
+
+/*
+   Common css
+ */
+.text-button-blue {
+    background-color: transparent;
+    color: #00A9EE;
+    padding: 3px 10px;
+    font-size: 16px;
+    letter-spacing: 0.7px;
+    line-height: 25px;
+}
+
+
+/**
+    Status styles added for the unit styles.
+ */
+$inProgressColor: #fff;
+$inProgressBgColor: #fd9e29;
+
+$inCompleteColor: #fff;
+$inCompleteBgColor: #fd9e29;
+
+.in-progress-status {
+    color: $inProgressColor;
+    background-color: $inProgressBgColor;
+}
+
+.in-complete-status {
+    color: $inCompleteColor;
+    background-color: $inCompleteBgColor;
+}

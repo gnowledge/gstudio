@@ -3,8 +3,15 @@
 {% block title %} {{title}} {% endblock %}
 
 {% block body_content %}
+{% include 'ndf/explore_secondary_header.html' %}
+
+
+
 <a href="{% url 'module_edit' group_id node.pk %}">[Edit]</a>
 {{node.name}}
+
+
+{% include 'ndf/card_group.html' %}
 <br/>
 <br/>
 <br/>
