@@ -51,14 +51,20 @@ def module_create_edit(request, group_id, module_id=None):
 
         template = 'ndf/module_form.html'
 
+        if module_id:
+            # existing module.
+            url_name = 'node_edit'
+            url_kwargs={'group_id': group_id, 'node_id': module_id, 'detail_url_name': 'module_detail'}
+
+        else:
+            # new module
+            url_name = 'node_create'
+            url_kwargs={'group_id': group_id, 'member_of': 'Module', 'detail_url_name': 'module_detail'}
+
         req_context = RequestContext(request, {
                                     'title': 'Module', 'node_obj': Node.get_node_by_id(module_id),
                                     'group_id': group_id, 'groupid': group_id,
-                                    'post_url': reverse('node_create', kwargs={
-                                        'group_id': group_id,
-                                        'member_of': 'Module',
-                                        'detail_url_name': 'module_detail',
-                                        })
+                                    'post_url': reverse(url_name, kwargs=url_kwargs)
                                 })
         return render_to_response(template, req_context)
 
