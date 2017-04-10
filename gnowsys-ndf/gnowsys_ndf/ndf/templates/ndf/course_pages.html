@@ -38,16 +38,18 @@
                 <li><a href="{% url 'edit_course_page' group_id activity_node.pk %}">Edit</a></li>
                 <li><a title="Edit Content" class="edit_res_unit">{% trans " Edit Content" %}</a></li>
                 <li><a title="Edit Interaction Settings" class="edit-interaction">{% trans "Interaction Settings" %}</a></li>
-                <li><a title="add admin page" class="add-admin-page">{% trans "Link Teacher's page" %}</a></li>
-                <li><a title="add help page" class="add-help-page">{% trans "Link Help page" %}</a></li>
+                {% if not activity_node.type_of %}
+                  <li><a title="add admin page" class="add-admin-page">{% trans "Link Teacher's page" %}</a></li>
+                  <li><a title="add help page" class="add-help-page">{% trans "Link Help page" %}</a></li>
+                {% endif %}
                 <li><a href="{% url 'all_translations' group_id activity_node.pk %}" target="_blank">Alternate Language</a></li>
                 {% get_relation_value activity_node.pk 'has_admin_page' as grel_admin %}
                 {% get_relation_value activity_node.pk 'has_help' as grel_help %}
                 {% if grel_admin.grel_id %}
-                <li><a class="view-admin-page" data-current-activity-id="" > View Teacher's page</a></li>
+                  <li><a class="view-admin-page" data-current-activity-id="" > View Teacher's page</a></li>
                 {% endif %}
                 {% if grel_help.grel_id %}
-                <li><a class="view-help-page" data-current-activity-id="" > View Help page</a></li>
+                  <li><a class="view-help-page" data-current-activity-id="" > View Help page</a></li>
                 {% endif %}
 
                 </ul>
