@@ -9,8 +9,6 @@
                         <label class="node_name_empty hide" style="color:red">Please enter Name</label>
                     <!-- </div> -->
                 </div>
-
-                
                     
                     <div class="small-5 columns">
                             <select class="activity-lang" name="lan" id="activity_lang" >
@@ -41,6 +39,7 @@
                 <hr/>
                 
                 <input type="hidden" name="node_id" class="form_node_id" value="{{activity_node.pk}}">
+                <input type="hidden" name="page_type" class="form_node_id" value="{{page_type}}">
                 <div class="row">
                     <div class="asset-tags-container">
                         <label>
@@ -61,6 +60,7 @@
                 <input type="submit" class="orange-button" style="margin-left: 21px" class="saveActivityPage" value="Save">
 
                 <a href="{{cancel_activity_url}}" class="orange-button cancel-page-create">Cancel</a>
+
                 </div>
             </div>
         </form>

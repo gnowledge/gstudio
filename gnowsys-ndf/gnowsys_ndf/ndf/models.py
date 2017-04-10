@@ -68,6 +68,10 @@ NODE_TYPE_CHOICES = (
     ('Process')
 )
 
+NODE_ACCESS_POLICY = (
+    ('PUBLIC'),
+    ('PRIVATE')
+)
 
 TYPES_OF_GROUP = (
     ('PUBLIC'),
@@ -307,7 +311,7 @@ class Node(DjangoDocument):
                         'language': ('en', 'English'),
                         'type_of': [],
                         'member_of': [],
-                        'access_policy': u'',
+                        'access_policy': u'PUBLIC',
                         'created_at': datetime.datetime.now,
                         # 'created_by': int,
                         'last_update': datetime.datetime.now,
@@ -333,7 +337,8 @@ class Node(DjangoDocument):
 
     validators = {
         'name': lambda x: x.strip() not in [None, ''],
-        'created_by': lambda x: isinstance(x, int) and (x != 0)
+        'created_by': lambda x: isinstance(x, int) and (x != 0),
+        'access_policy': lambda x: x in (list(NODE_ACCESS_POLICY) + [None])
     }
 
     use_dot_notation = True
@@ -610,10 +615,11 @@ class Node(DjangoDocument):
             Takes ObjectId or objectId as string as arg
                 and return object
         '''
-        if isinstance(node_id, ObjectId) or ObjectId.is_valid(node_id):
+        if node_id and (isinstance(node_id, ObjectId) or ObjectId.is_valid(node_id)):
             return node_collection.one({'_id': ObjectId(node_id)})
-        # raise ValueError('No object found with id: ' + str(node_id))
-        return None
+        else:
+            # raise ValueError('No object found with id: ' + str(node_id))
+            return None
 
     @staticmethod
     def get_nodes_by_ids_list(node_id_list):
@@ -621,8 +627,14 @@ class Node(DjangoDocument):
             Takes list of ObjectIds or objectIds as string as arg
                 and return list of object
         '''
-        node_id_list = map(ObjectId, node_id_list)
-        return node_collection.find({'_id': {'$in': node_id_list}})
+        try:
+            node_id_list = map(ObjectId, node_id_list)
+        except:
+            node_id_list = [ObjectId(nid) for nid in node_id_list if nid]
+        if node_id_list:
+            return node_collection.find({'_id': {'$in': node_id_list}})
+        else:
+            return None
 
 
     @staticmethod
@@ -1933,6 +1945,39 @@ class GSystem(Node):
         return file_blob
 
 
+    # static query methods
+    @staticmethod
+    def query_list(group_id, member_of_name, user_id=None):
+
+        group_name, group_id = Group.get_group_name_id(group_id)
+        gst_name, gst_id = GSystemType.get_gst_name_id(member_of_name)
+
+        return node_collection.find({
+                            '_type': 'GSystem',
+                            'group_set': {'$in': [group_id]},
+                            'member_of': {'$in': [gst_id]},
+                            '$or':[
+                                    {'access_policy': {'$in': [u'Public', u'PUBLIC']}},
+                                    # {'$and': [
+                                    #     {'access_policy': u"PRIVATE"},
+                                    #     {'created_by': user_id}
+                                    #     ]
+                                    # },
+                                    {'created_by': user_id}
+                                ]
+                        }).sort('last_update', -1)
+
+    @staticmethod
+    def child_class_names():
+        '''
+        Currently, this is hardcoded but it should be dynamic.
+        Try following:
+        import inspect
+        inspect.getmro(GSystem)
+        '''
+        return ['Group', 'Author', 'File']
+    # --- END of static query methods
+
 
 @connection.register
 class Filehive(DjangoDocument):
@@ -2280,7 +2325,6 @@ class Filehive(DjangoDocument):
             print "Exception in converting image to mid size: ", e
             return None
 
-
     def save(self, *args, **kwargs):
 
         is_new = False if ('_id' in self) else True
@@ -2453,7 +2497,7 @@ class Group(GSystem):
             # checking if group_obj is valid
             if group_obj:
                 # if (group_name_or_id == group_obj._id):
-                group_id = group_name_or_id
+                group_id = ObjectId(group_name_or_id)
                 group_name = group_obj.name
 
                 if get_obj:
@@ -4123,7 +4167,7 @@ class Counter(DjangoDocument):
 
         # ideally, member_of field should be used to check resource_type. But it may cause performance hit.
         # hence using 'if_file.mime_type'
-        if resource_obj.if_file.mime_type or (u'File' in resource_obj.member_of_names_list):
+        if resource_obj.if_file.mime_type or (u'File' in resource_obj.member_of_names_list) or (u'Asset' in resource_obj.member_of_names_list):
             resource_type = 'file'
 
         elif u'Page' in resource_obj.member_of_names_list:
@@ -4379,7 +4423,6 @@ class Counter(DjangoDocument):
         resource_obj = Node.get_node_obj_from_id_or_obj(resource_obj_or_id, GSystem)
         resource_oid = resource_obj._id
         resource_type, resource_type_of = Counter._get_resource_type_tuple(resource_obj)
-
         # get resource's creator:
         # resource_created_by_user_id = resource_obj.created_by
         resource_contributors_user_ids_list = resource_obj.contributors

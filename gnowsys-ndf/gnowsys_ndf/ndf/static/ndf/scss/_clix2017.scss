@@ -884,6 +884,7 @@ ul.horizontal_tabs_gstudio {
         border-width: 5px;
         img{
             width:100%;
+            height:210px;
         }
     }
 
@@ -896,6 +897,11 @@ ul.horizontal_tabs_gstudio {
             color:$primary-blue;
             padding-top: 10px;
             padding-left: 6px;
+
+            .filenode {
+                z-index: -1;
+
+            }
         
         }
         .asset_desc {
@@ -3479,4 +3485,84 @@ ul.nav_menu_1 {
 
 .activity_page_rendered{
     margin-top:20px;
+}
+/* Rating css */
+
+.rating-bar {
+
+  &>span {
+      /* remove inline-block whitespace */
+      font-size: 0;
+      /* flip the order so we can use the + and ~ combinators */
+      unicode-bidi: bidi-override;
+      direction: rtl;
+  }
+
+  &.unrated{
+    /* If the user has not rated yet */
+    &:checked ~ label:before{
+      color: $secondary-orange;
+    }
+}
+
+
+[type*="radio"] {
+    display: none;
+    & + label {
+      /* only enough room for the star */
+      display: inline-block;
+      overflow: hidden;
+      text-indent: 9999px;
+      width: 1em;
+      height: 1.4em;
+      white-space: nowrap;
+      font-size: 1.2rem;
+      margin:0;
+      vertical-align: bottom;
+
+      &:before {
+        display: inline-block;
+        text-indent: -9999px;
+        content: '\2606'; /* WHITE STAR */
+        color: #888;
+        }
+    }
+    &:checked ~ label:before,
+    & + label:hover ~ label:before,
+    & + label:hover:before {
+      content: '\2605'; /* BLACK STAR */
+      color: #FF980D;
+      text-shadow: 0 0 1px #333;
+    }
+}
+
+/* the hidden clearer */
+
+.last[type*="radio"] + label {
+    text-indent: -9999px;
+    width: .5em;
+    margin-left: -.5em;
+}
+
+
+.last[type*="radio"] + label:before {
+    width: .5em;
+    height: 1.4em;
+}
+
+  /* this is gross, I threw this in to override the starred
+  buttons when hovering. */
+  &:hover{
+   [type*="radio"] + label:before {
+        content: '\2606'; /* WHITE STAR */
+        color: #888;
+        text-shadow: none;
+    }
+    [type*="radio"] + label:hover ~ label:before,
+    [type*="radio"] + label:hover:before {
+        content: '\2605'; /* BLACK STAR */
+        color: #FF980D;
+        text-shadow: 0 0 1px #333;
+    }
+}
 }

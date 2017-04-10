@@ -99,6 +99,7 @@ urlpatterns = patterns('',
     (r'^(?P<group_id>[^/]+)/trash',include('gnowsys_ndf.ndf.urls.trash')),
     (r'^(?P<group_id>[^/]+)/buddy',include('gnowsys_ndf.ndf.urls.buddy')),
     (r'^(?P<group_id>[^/]+)/translation',include('gnowsys_ndf.ndf.urls.translation')),
+    (r'^(?P<group_id>[^/]+)/node',include('gnowsys_ndf.ndf.urls.node')),
     # needs to decide on asset and it's url(s).
     # (r'^(?P<group_id>[^/]+)/asset',include('gnowsys_ndf.ndf.urls.asset')),
 
