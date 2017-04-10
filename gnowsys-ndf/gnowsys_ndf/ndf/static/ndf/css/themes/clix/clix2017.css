@@ -3301,3 +3301,8 @@ ul.nav_menu_1 li:hover {
 .activity-title > li.active {
   background: rgba(116, 0, 255, 0.31);
 }
+
+/* line 3480, ../../../scss/_clix2017.scss */
+.activity_page_rendered {
+  margin-top: 20px;
+}
