@@ -49,9 +49,7 @@
                   {% if each.has_admin_page %}
                     <li><a class="view-admin-page" data-current-activity-id="" > View Teacher's page</a></li>
                   {% endif %}
-                {% endfor %}
 
-                {% for each in  activity_node.relation_set %}
                   {% if each.has_help %}
                     <li><a class="view-help-page" data-current-activity-id="" > View Help page</a></li>
                   {% endif %}
