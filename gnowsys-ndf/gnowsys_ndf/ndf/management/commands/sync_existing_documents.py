@@ -26,7 +26,7 @@ class Command(BaseCommand):
     # Keep latest changes in field(s) to be added at top
 
     # updating access_policy from inconsistent values like 'public', 'Public' to 'PUBLIC'
-    all_ap = node_collection.collection.update({'access_policy': {'$in': [u'public', u'Public']}}, {'$set':{'access_policy': u'PUBLIC'} }, upsert=False, multi=True)
+    all_ap = node_collection.collection.update({'_type': {'$nin': [u'ToReduceDocs']}, 'access_policy': {'$in': [u'public', u'Public', '', None]}}, {'$set':{'access_policy': u'PUBLIC'} }, upsert=False, multi=True)
     if all_ap['nModified']:
         print "\n `access_policy`: Replaced non u'PUBLIC' values of public nodes to 'PUBLIC' for : " + all_ap['nModified'].__str__() + " instances."
 
@@ -42,17 +42,18 @@ class Command(BaseCommand):
     all_gs = node_collection.find({'_type': {'$in' : ['GSystem', 'Group', 'Author', 'File']},
                  '$or': [{'legal': {'$exists': False}}, {'license': {'$exists': True}}],
                 })
-    all_gs_count = all_gs.count()
-    print "\n Total GSystems found to update 'legal' field: ", all_gs_count
-    for index, each_gs in enumerate(all_gs):
-        try:
-            print "\n GSystem: ", index, ' of ', all_gs_count
-            each_gs.legal = {'copyright': each_gs.license, 'license': GSTUDIO_DEFAULT_LICENSE}
-            each_gs.pop('license')
-            each_gs.save()
-        except AttributeError as noLicense:
-            print "\n No license found for: ", each_gs._id
-            pass
+    # all_gs_count = all_gs.count()
+    if all_gs:
+        print "\n Total GSystems found to update 'legal' field: ", all_gs.count()
+        for index, each_gs in enumerate(all_gs):
+            try:
+                print "\n GSystem: ", index, ' of ', all_gs_count
+                each_gs.legal = {'copyright': each_gs.license, 'license': GSTUDIO_DEFAULT_LICENSE}
+                each_gs.pop('license')
+                each_gs.save()
+            except AttributeError as noLicense:
+                print "\n No license found for: ", each_gs._id
+                pass
 
     # --------------------------------------------------------------------------
     # Adding <'relation_type_scope': []> field to all RelationType objects
