@@ -86,6 +86,6 @@ def module_detail(request, group_id, node_id):
                                 'title': 'Module',
                                 'node': module_obj, 'units_under_module': units_under_module,
                                 'group_id': group_id, 'groupid': group_id,
-                                'card': 'ndf/event_card.html', 'card_url_name': 'module_detail'
+                                'card': 'ndf/event_card.html', 'card_url_name': 'groupchange'
                             })
     return render_to_response(template, req_context)

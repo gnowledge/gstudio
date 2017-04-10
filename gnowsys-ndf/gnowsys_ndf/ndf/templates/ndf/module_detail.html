@@ -3,14 +3,13 @@
 {% block title %} {{title}} {% endblock %}
 
 {% block body_content %}
-{{node.name}}
 <a href="{% url 'module_edit' group_id node.pk %}">[Edit]</a>
 <br/>
 <br/>
 <br/>
-{% for each_node in units_under_module  %}
 
-	{% include card with resource=each_node is_event=True no_footer=True has_prof_pic=True url_name=card_url_name first_arg=group_id second_arg=each_node.pk  next_session=True %}
+{% for each_node in units_under_module  %}
+	{% include card with resource=each_node is_event=True no_footer=True has_prof_pic=True url_name=card_url_name first_arg=each_node.pk next_session=True %}
 	{{each_node.name}}
 {% endfor %}
 {% endblock %}
