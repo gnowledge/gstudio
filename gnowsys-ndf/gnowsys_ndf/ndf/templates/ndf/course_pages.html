@@ -38,11 +38,21 @@
                 <li><a href="{% url 'edit_course_page' group_id activity_node.pk %}">Edit</a></li>
                 <li><a title="Edit Content" class="edit_res_unit">{% trans " Edit Content" %}</a></li>
                 <li><a title="Edit Interaction Settings" class="edit-interaction">{% trans "Interaction Settings" %}</a></li>
-                <li><a title="add admin page" class="add-admin-page">{% trans "Link Teacher's page" %}</a></li>
-                <li><a title="add help page" class="add-help-page">{% trans "Link Help page" %}</a></li>
+                {% if not activity_node.type_of %}
+                  <li><a title="add admin page" class="add-admin-page">{% trans "Link Teacher's page" %}</a></li>
+                  <li><a title="add help page" class="add-help-page">{% trans "Link Help page" %}</a></li>
+                {% endif %}
                 <li><a href="{% url 'all_translations' group_id activity_node.pk %}" target="_blank">Alternate Language</a></li>
-                </ul>
+                {% get_relation_value activity_node.pk 'has_admin_page' as grel_admin %}
+                {% get_relation_value activity_node.pk 'has_help' as grel_help %}
+                {% if grel_admin.grel_id %}
+                  <li><a class="view-admin-page" data-current-activity-id="" > View Teacher's page</a></li>
+                {% endif %}
+                {% if grel_help.grel_id %}
+                  <li><a class="view-help-page" data-current-activity-id="" > View Help page</a></li>
+                {% endif %}
 
+                </ul>
             </div>
             {% endif %}
         </div>
@@ -66,6 +76,10 @@
         <div class="row activity-detail-content">
             {% include "ndf/node_ajax_content.html" with node=activity_node %}
         </div>
+        <div id="info-page-area">
+                    
+        </div>
+        
     </div>
 
 
@@ -266,6 +280,50 @@
         });//end of ajax
 
     });
+    $(".view-admin-page").click(function(event){
+                $.ajax({
+                      type: "POST",
 
+                      url: "{% url 'get_info_pages' group_id %}",
+                      datatype: "html",
+                      data:{
+                        'csrfmiddlewaretoken': "{{csrf_token}}",
+                        'node_id':'{{activity_node.pk}}',
+                        'page_type':'has_admin_page'
+
+                      },
+                        success: function(data) {
+                        // $('#info-page-area').html(data);
+                        parent = $("#info-page-area");
+                        parent.html(data);
+                        $('html,body').animate({
+                          scrollTop: $("#info-page-area").offset().top},'slow');
+                      }
+                    });
+      });
+
+            $(".view-help-page").click(function(event){
+                          
+                $.ajax({
+                      type: "POST",
+
+                      url: "{% url 'get_info_pages' group_id %}",
+                      datatype: "html",
+                      data:{
+                        'csrfmiddlewaretoken': "{{csrf_token}}",
+                        'node_id':'{{activity_node.pk}}',
+                        'page_type':'has_help'
+
+                      },
+                        success: function(data) {
+                        // $('#info-page-area').html(data);
+                        parent = $("#info-page-area");
+                        parent.html(data);
+                        $('html,body').animate({
+                          scrollTop: $("#info-page-area").offset().top},'slow');
+                      }
+                    });
+            });
+            
 
 </script>

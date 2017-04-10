@@ -6606,6 +6606,14 @@ def get_group_pages(request, group_id):
     variable = RequestContext(request, {'cursor': pages_cur, 'groupid': group_id, 'group_id': group_id, 'card_class': card_class })
     return render_to_response(template, variable)
 
+def get_info_pages(request, group_id):
+    node_id = request.POST.get("node_id", '')
+    page_type = request.POST.get("page_type", '')
+    node  = Node.get_node_obj_from_id_or_obj(node_id, GSystem)
+    template = "ndf/get_info_pages.html"
+    variable = RequestContext(request, {'node': node, 'groupid': group_id, 'group_id': group_id,'page_type':unicode(page_type) })
+    return render_to_response(template, variable)
+
 
 @get_execution_time
 def add_transcript(request, group_id):
