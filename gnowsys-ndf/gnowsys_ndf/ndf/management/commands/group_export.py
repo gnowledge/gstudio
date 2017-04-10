@@ -225,8 +225,9 @@ def call_group_export(group_node, nodes_cur, num_of_processes=5):
         Introducing multiprocessing to use cores available on the system to 
         take dump of nodes of the entire group.
     '''
+    nodes_cur = list(nodes_cur)
+    nodes_cur.append(group_node)
     worker_export(nodes_cur)
-    # nodes_cur = list(nodes_cur)
     # print "\nlen(nodes_cur): ", len(nodes_cur)
     # Include Group Object.
     # nodes_cur.append(group_node)
