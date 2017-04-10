@@ -1,16 +1,11 @@
-{% load simple_filters %}
+{% extends "ndf/gbase.html" %}
 {% load check_is_gstaff from ndf_tags %}
-{% xextends "ndf/gbase.html" with first_body_column=0 %}
-
 {% load i18n %}
 
 {% block title %} {{title|capfirst}} {% endblock title %}
 
 {% block body_content %}
 	{% check_is_gstaff groupid request.user as is_gstaff %}
-
-
-
 
 		<div class="small-12 medium-2 columns heading row">
 
@@ -29,11 +24,17 @@
 					Groups
 				</a>
 
+				<a href="{% url 'explore_modules' group_id %}" class="secondary-header-tabs {%if title == 'Modules' %} active{% endif %}">
+					Modules
+				</a>
+
 				<a href="{% url 'explore_basecourses' %}" class="secondary-header-tabs {%if title == 'base courses'%} active{% endif %}">
 					Draft Course Unit
 				</a>
 
 				<a class="secondary-header-button right" style="float:right" href="{% url 'unit_create_edit' group_id %}"><i class="fa fa-plus-circle"></i>{% trans " Create Course Unit" %}</a>
+
+				<a class="secondary-header-button right" style="float:right" href="{% url 'module_create' group_id %}"><i class="fa fa-plus-circle"></i>{% trans " Create Module" %}</a>
 
 			</div>
 		</div>
@@ -59,13 +60,14 @@
 
 					{# {% include card with resource=each_obj has_logo=True no_footer=True url_name="groupchange" first_arg=each_obj.pk  %} #}
 					{% include card with resource=each_obj is_event=True no_footer=True has_prof_pic=True url_name="groupchange" first_arg=each_obj.pk %}
-
 				{% endif %}
-				{% else %}
-					{# {% include card with resource=each_obj is_event=True no_footer=True has_prof_pic=True url_name="unit_detail" first_arg=groupid first_arg=groupid second_arg=each_obj.pk %} #}
+			{% elif title == "Modules" %}
+				{% include card with resource=each_obj is_event=True no_footer=True has_prof_pic=True url_name=card_url_name first_arg=group_id second_arg=each_obj.pk  next_session=True %}
+			{% else %}
+				{# {% include card with resource=each_obj is_event=True no_footer=True has_prof_pic=True url_name="unit_detail" first_arg=groupid first_arg=groupid second_arg=each_obj.pk %} #}
 
-					{% include card with resource=each_obj is_event=True no_footer=True has_prof_pic=True url_name="groupchange" first_arg=each_obj.pk  next_session=True %}
-				{% endif %}
+				{% include card with resource=each_obj is_event=True no_footer=True has_prof_pic=True url_name="groupchange" first_arg=each_obj.pk  next_session=True %}
+			{% endif %}
 	          <!--/li-->
 			{% endfor %}
 		<!--/section-->
