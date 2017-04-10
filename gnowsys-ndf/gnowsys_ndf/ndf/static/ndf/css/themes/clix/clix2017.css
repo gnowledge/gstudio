@@ -3044,3 +3044,134 @@ ul.jqtree-tree .jqtree-toggler:hover {
   color: #FF980D;
   text-shadow: 0 0 1px #333;
 }
+
+/* line 3210, ../../../scss/_clix2017.scss */
+.activity-slides-container {
+  border: 1px solid black;
+  height: 100%;
+  background: #CCCCCC;
+  margin-bottom: 2em;
+  padding: 0em 1em;
+}
+/* line 3217, ../../../scss/_clix2017.scss */
+.activity-slides-container .activity-slides {
+  height: 100%;
+}
+/* line 3221, ../../../scss/_clix2017.scss */
+.activity-slides-container .activity-slides .activity-slide {
+  padding: 1em;
+  height: inherit;
+  background: #fff;
+  position: relative;
+}
+/* line 3229, ../../../scss/_clix2017.scss */
+.activity-slides-container .activity-slides .activity-slide .view-related-content {
+  border: 1px solid #999;
+  display: inline-block;
+  padding: 2px 7px;
+  color: #999999;
+  margin-left: 12%;
+}
+/* line 3237, ../../../scss/_clix2017.scss */
+.activity-slides-container .activity-slides .activity-slide .page > section {
+  margin-left: 50%;
+  transform: translate(-50%);
+}
+/* line 3243, ../../../scss/_clix2017.scss */
+.activity-slides-container .activity-slides .related-content-close {
+  position: absolute;
+  right: -2px;
+  top: -8px;
+  font-size: 25px !important;
+  display: none;
+  color: #8E8E8E;
+}
+/* line 3252, ../../../scss/_clix2017.scss */
+.activity-slides-container .activity-slides .content-expanded > i {
+  font-size: 20px !important;
+  color: #ccc !important;
+  top: 8px !important;
+}
+/* line 3257, ../../../scss/_clix2017.scss */
+.activity-slides-container .activity-slides .content-expanded .related-content-header {
+  margin-left: 20px !important;
+}
+/* line 3259, ../../../scss/_clix2017.scss */
+.activity-slides-container .activity-slides .content-expanded .related-content-header > span:first-child {
+  display: none !important;
+}
+/* line 3262, ../../../scss/_clix2017.scss */
+.activity-slides-container .activity-slides .content-expanded .related-content-header .back-to-activity {
+  display: inline-block !important;
+  float: right;
+  background: #dddddd;
+  padding: 2px 7px;
+  border: 1px solid #ccc;
+  font-size: 13px;
+  color: #757575;
+  margin-right: 20px;
+}
+/* line 3272, ../../../scss/_clix2017.scss */
+.activity-slides-container .activity-slides .content-expanded .related-content-header .related-content-title {
+  font-size: 15px !important;
+  position: relative;
+}
+/* line 3276, ../../../scss/_clix2017.scss */
+.activity-slides-container .activity-slides .content-expanded .related-content-header .related-content-title .related-content-close {
+  display: block;
+}
+/* line 3279, ../../../scss/_clix2017.scss */
+.activity-slides-container .activity-slides .content-expanded .related-content-header .related-content-title > i {
+  display: none !important;
+}
+/* line 3284, ../../../scss/_clix2017.scss */
+.activity-slides-container .activity-slides .content-expanded .related-content-body {
+  display: block !important;
+}
+/* line 3288, ../../../scss/_clix2017.scss */
+.activity-slides-container .activity-slides #related-content {
+  width: 75%;
+  margin: 0px auto;
+  border: 1px solid #ccc;
+  padding: 5px 10px;
+  background: #eee;
+  margin-top: 10px;
+  min-height: 50px;
+  position: relative;
+}
+/* line 3298, ../../../scss/_clix2017.scss */
+.activity-slides-container .activity-slides #related-content > i {
+  color: #fff;
+  font-size: 40px;
+  position: absolute;
+  left: 8px;
+  top: 4px;
+}
+/* line 3306, ../../../scss/_clix2017.scss */
+.activity-slides-container .activity-slides #related-content .related-content-header {
+  margin-left: 40px;
+}
+/* line 3308, ../../../scss/_clix2017.scss */
+.activity-slides-container .activity-slides #related-content .related-content-header .back-to-activity {
+  display: none;
+}
+/* line 3311, ../../../scss/_clix2017.scss */
+.activity-slides-container .activity-slides #related-content .related-content-header span {
+  display: block;
+  vertical-align: top;
+  margin: 2px 0px 2px 5px;
+  font-weight: 600;
+  font-size: 13px;
+  letter-spacing: 0.8px;
+  color: #999999;
+}
+/* line 3320, ../../../scss/_clix2017.scss */
+.activity-slides-container .activity-slides #related-content .related-content-header .related-content-title {
+  font-size: 20px;
+  color: #000;
+  cursor: pointer;
+}
+/* line 3326, ../../../scss/_clix2017.scss */
+.activity-slides-container .activity-slides #related-content .related-content-body {
+  display: none;
+}
