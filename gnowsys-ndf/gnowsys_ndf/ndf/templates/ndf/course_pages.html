@@ -45,18 +45,22 @@
                 <li><a href="{% url 'all_translations' group_id activity_node.pk %}" target="_blank">Alternate Language</a></li>
                 {% get_relation_value activity_node.pk 'has_admin_page' as grel_admin %}
                 {% get_relation_value activity_node.pk 'has_help' as grel_help %}
-                {% if grel_admin.grel_id %}
-                  <li><a class="view-admin-page" data-current-activity-id="" > View Teacher's page</a></li>
-                {% endif %}
-                {% if grel_help.grel_id %}
-                  <li><a class="view-help-page" data-current-activity-id="" > View Help page</a></li>
-                {% endif %}
+                {% for each in  activity_node.relation_set %}
+                  {% if each.has_admin_page %}
+                    <li><a class="view-admin-page" data-current-activity-id="" > View Teacher's page</a></li>
+                  {% endif %}
+
+                  {% if each.has_help %}
+                    <li><a class="view-help-page" data-current-activity-id="" > View Help page</a></li>
+                  {% endif %}
+                {% endfor %}
 
                 </ul>
             </div>
             {% endif %}
         </div>
-        <div class="row">
+
+            <div class="row">
             <div class="small-8 columns left">
                  {% if activity_node.tags %}
                     {% for tag in activity_node.tags %}
