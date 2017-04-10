@@ -3,14 +3,33 @@
 {% block title %} {{title}} {% endblock %}
 
 {% block body_content %}
-<a href="{% url 'module_edit' group_id node.pk %}">[Edit]</a>
+{% include 'ndf/explore_secondary_header.html' %}
+
+
+<div class="title-strip">
+Showing all Units in <a style="color: #2e3f51">{{node.name}}</a> <br/>
+Module Description:<i> {{node.content}} </i>
+<a style="float:right" href="{% url 'module_edit' group_id node.pk %}">Edit</a>
+</div>
+
+
+{# {% include 'ndf/card_group.html' with node %} #}
 <br/>
 <br/>
 <br/>
 
+<!-- Existing card list-->
+
+
+
+
 {% for each_node in units_under_module  %}
 	{% include card with resource=each_node is_event=True no_footer=True has_prof_pic=True url_name=card_url_name first_arg=each_node.pk next_session=True %}
-	{{each_node.name}}
 {% endfor %}
+
+
 {% endblock %}
+
+
+
 

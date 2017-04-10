@@ -38,3 +38,14 @@ def query_doc(request, doc_id_or_name=None):
         {'result': result},
         context_instance=RequestContext(request)
     )
+
+
+
+
+
+def render_test_template(request):
+	return render_to_response(
+        'ndf/test_template.html',
+        context_instance=RequestContext(request)
+    )
+	

@@ -11,34 +11,8 @@
 
 		</div>
 		<!--<div class="small-12 medium-6 columns expore-type">-->
-		<nav class="top-bar-second" data-topbar role="navigation" id="top-bar-second">
-		<div class="small-12 medium-12 columns expore-type">
-			<!--<div class="toggleButtons">-->
-			<div class=" left title-area">
 
-				<a href="{% url 'explore_courses' %}" class="secondary-header-tabs  {%if title == 'courses'%} active{% endif %}">
-					Course Unit
-				</a>
-
-				<a href="{% url 'explore_groups' %}" class="secondary-header-tabs {%if title == 'groups'%} active{% endif %}">
-					Groups
-				</a>
-
-				<a href="{% url 'explore_modules' group_id %}" class="secondary-header-tabs {%if title == 'Modules' %} active{% endif %}">
-					Modules
-				</a>
-
-				<a href="{% url 'explore_basecourses' %}" class="secondary-header-tabs {%if title == 'base courses'%} active{% endif %}">
-					Draft Course Unit
-				</a>
-
-				<a class="secondary-header-button right" style="float:right" href="{% url 'unit_create_edit' group_id %}"><i class="fa fa-plus-circle"></i>{% trans " Create Course Unit" %}</a>
-
-				<a class="secondary-header-button right" style="float:right" href="{% url 'module_create' group_id %}"><i class="fa fa-plus-circle"></i>{% trans " Create Module" %}</a>
-
-			</div>
-		</div>
-	</nav>
+		{% include 'ndf/explore_secondary_header.html' %}
 		<!--{% if title == "base courses" and is_gstaff %}
 		<div class="small-12 medium-7 columns">
 			<div style="display: inline-block;">
