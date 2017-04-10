@@ -25,6 +25,10 @@ class Command(BaseCommand):
 
     # Keep latest changes in field(s) to be added at top
 
+    # updating access_policy from inconsistent values like 'public', 'Public' to 'PUBLIC'
+    all_ap = node_collection.collection.update({'access_policy': {'$in': [u'public', u'Public']}}, {'$set':{'access_policy': u'PUBLIC'} }, upsert=False, multi=True)
+    if all_ap['nModified']:
+        print "\n `access_policy`: Replaced non u'PUBLIC' values of public nodes to 'PUBLIC' for : " + all_ap['nModified'].__str__() + " instances."
 
     # --------------------------------------------------------------------------
     # All Triples - Replacing <'lang': ''> field to <'language': []>
