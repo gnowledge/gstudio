@@ -3,7 +3,7 @@ import json
 import imp
 import subprocess
 from bson import json_util
-
+import pathlib2
 try:
     from bson import ObjectId
 except ImportError:  # old pymongo
@@ -173,9 +173,15 @@ def update_schema_and_user_ids(document_json):
     '''
 
 def copy_version_file(filepath):
-    cp = "cp  -vu " + filepath + " " +" --parents " + RCS_REPO_DIR + "/"
-    print "\ncp: ", cp
-    subprocess.Popen(cp,stderr=subprocess.STDOUT,shell=True)
+    if os.path.exists(filepath):
+        cwd_path = os.getcwd()
+        posix_filepath = pathlib2.Path(filepath)
+        rcs_data_path = str(pathlib2.Path(*posix_filepath.parts[:7]))
+        rcs_file_path = str(pathlib2.Path(*posix_filepath.parts[7:]))
+        os.chdir(rcs_data_path)
+        cp = "cp  -v " + rcs_file_path + " " +" --parents " + RCS_REPO_DIR + "/"
+        subprocess.Popen(cp,stderr=subprocess.STDOUT,shell=True)
+        os.chdir(cwd_path)
 
 
 def restore_filehive_objects(rcs_filehives_path):
@@ -185,14 +191,20 @@ def restore_filehive_objects(rcs_filehives_path):
     for dir_, _, files in os.walk(rcs_filehives_path):
         for filename in files:
             filepath =  os.path.join(dir_, filename)
-            fh_json, fh_filepath = get_json_file(filepath)
+            fh_json= get_json_file(filepath)
             fh_obj = filehive_collection.one({'_id': ObjectId(fh_json['_id'])})
+
             if not fh_obj:
+                copy_version_file(filepath)
+                log_file.write("\nRCS file copied : \n\t" + str(filepath) )
+
                 filehive_collection.collection.insert(fh_json)
-                log_file.write("\nInserting new Filehive Object : \n\tNew-obj: " + \
+                log_file.write("\nInserted new Filehive Object : \n\tNew-obj: " + \
                     str(fh_json))
-                copy_version_file(fh_filepath)
-                log_file.write("\nRCS file copied : \n\t" + str(fh_filepath) )
+                print "\n fh_json: ", fh_json
+                fh_obj = filehive_collection.one({'_id': ObjectId(fh_json['_id'])})
+                fh_obj.save()
+                log_file.write("\nUpdate RCS using save()")
             else:
                 log_file.write("\nFound Existing Filehive Object : \n\tFound-obj: " + \
                     str(fh_obj) + "\n\tExiting-obj: "+str(fh_json))
@@ -204,7 +216,7 @@ def restore_node_objects(rcs_nodes_path):
     for dir_, _, files in os.walk(rcs_nodes_path):
         for filename in files:
             filepath =  os.path.join(dir_, filename)
-            node_json, node_rcs_filepath = get_json_file(filepath)
+            node_json = get_json_file(filepath)
             node_obj = node_collection.one({'_id': ObjectId(node_json['_id'])})
 
             if node_obj:
@@ -263,13 +275,15 @@ def restore_node_objects(rcs_nodes_path):
                     log_file.write("\n Node Updated: \n\t OLD: " + str(n), + "\n\tNew: "+str(data))
                     node_obj.save()
             else:
-                print "Inserting Node doc"
+                copy_version_file(filepath)
+                log_file.write("\n RCS file copied : \n\t" + str(filepath))
                 node_json = update_schema_and_user_ids(node_json)
-                log_file.write("\n Inserting Node doc : \n\t" + str(node_json))
+                print "\nnode_json: ", node_json
                 node_collection.collection.insert(node_json)
-                copy_version_file(node_rcs_filepath)
-                log_file.write("\n RCS file copied : \n\t" + str(node_rcs_filepath))
-
+                log_file.write("\n Inserted Node doc : \n\t" + str(node_json))
+                node_obj = node_collection.one({'_id': ObjectId(node_json['_id'])})
+                node_obj.save(groupid=ObjectId(CONFIG_VARIABLES.GROUP_ID))
+                log_file.write("\nUpdate RCS using save()")
 
 def restore_triple_objects(rcs_triples_path):
     print "\nRestoring Triples.."
@@ -278,7 +292,7 @@ def restore_triple_objects(rcs_triples_path):
     for dir_, _, files in os.walk(rcs_triples_path):
         for filename in files:
             filepath =  os.path.join(dir_, filename)
-            triple_json, triple_rcs_filepath = get_json_file(filepath)
+            triple_json = get_json_file(filepath)
             triple_obj = triple_collection.one({'_id': ObjectId(triple_json['_id'])})
 
             if triple_obj:
@@ -312,11 +326,23 @@ def restore_triple_objects(rcs_triples_path):
                                 multi=False, upsert=False)
                         log_file.write("\n GAttribute Updated: \n\t OLD: " + str(triple_obj), + "\n\tNew: "+str(triple_json))
             else:
+                copy_version_file(filepath)
+                log_file.write("\n RCS file copied : \n\t" + str(filepath))
+
                 triple_json = update_schema_id_for_triple(triple_json)
-                log_file.write("\n Inserting Triple doc : " + str(triple_json))
                 triple_collection.collection.insert(triple_json)
-                copy_version_file(triple_rcs_filepath)
-                log_file.write("\n RCS file copied : \n\t" + str(triple_rcs_filepath))
+                log_file.write("\n Inserted Triple doc : " + str(triple_json))
+
+                triple_obj = triple_collection.one({'_id': ObjectId(triple_json['_id'])})
+                triple_node_RT_AT_id = None
+                if 'attribute_type' in triple_json:
+                    triple_node_RT_AT_id = triple_json['attribute_type']
+                else:
+                    triple_node_RT_AT_id = triple_json['relation_type']
+                triple_node_RT_AT = node_collection.one({'_id': ObjectId(triple_node_RT_AT_id)})
+                triple_obj.save(triple_node=triple_node_RT_AT, triple_id=triple_node_RT_AT._id)
+                log_file.write("\nUpdate RCS using save()")
+
 
 def restore_counter_objects(rcs_counters_path):
     print "\nRestoring Counters.."
@@ -456,6 +482,17 @@ def call_group_import(rcs_repo_path):
     restore_triple_objects(rcs_triples_path)
     # restore_counter_objects(rcs_counters_path)
 
+
+def copy_media_data(media_path):
+    # MEDIA_ROOT is destination usually: /data/media/
+    # media_path is "dump-data/data/media"
+    if os.path.exists(media_path):
+        media_copy_cmd = "rsync -avzhP " + media_path + "/*  " + MEDIA_ROOT + "/"
+        subprocess.Popen(media_copy_cmd,stderr=subprocess.STDOUT,shell=True)
+        log_file.write("\n Media Copied:  " + str(media_path) )
+
+
+
 class Command(BaseCommand):
     def handle(self, *args, **options):
 
@@ -477,19 +514,112 @@ class Command(BaseCommand):
             print "\n Validating the data-dump"
             # validate_data_dump()
             print "\n Checking the dump Group-id availability."
-            check_group_availability()
+            # check_group_availability()
             print "\n User Restoration."
             user_objs_restoration()
 
             print "\n Factory Schema Restoration. Please wait.."
             SCHEMA_ID_MAP = update_factory_schema_mapper(DATA_DUMP_PATH)
-            print "\n SCHEMA_ID_MAP: ", len(SCHEMA_ID_MAP)
             print "\n Log will be found at: ", log_file_path
 
             call_group_import(os.path.join(DATA_DUMP_PATH, 'data', 'rcs-repo'))
+            copy_media_data(os.path.join(DATA_DUMP_PATH, 'media_files', 'data', 'media'))
         else:
             print "\n No dump found at entered path."
             call_exit()
+
+def hook(d):
+    # This decoder will be moved to models next to class NodeJSONEncoder
+    if 'uploaded_at' in d:
+        d['uploaded_at'] = datetime.datetime.fromtimestamp(d['uploaded_at']/1e3)
+    if 'last_update' in d:
+        d['last_update'] = datetime.datetime.fromtimestamp(d['last_update']/1e3)
+    if 'created_at' in d:
+        d['created_at'] = datetime.datetime.fromtimestamp(d['created_at']/1e3)
+    if '_id' in d:
+        d['_id'] = ObjectId(d['_id']['$oid'])
+    if 'auth_id' in d:
+        d['auth_id'] = ObjectId(d['auth_id']['$oid'])
+    if 'group_id' in d:
+        d['group_id'] = ObjectId(d['group_id']['$oid'])
+    if 'attribute_type' in d:
+        d['attribute_type'] = ObjectId(d['attribute_type']['$oid'])
+    if 'relation_type' in d:
+        d['relation_type'] = ObjectId(d['relation_type']['$oid'])
+    if 'first_parent' in d:
+        d['first_parent'] = ObjectId(d['first_parent']['$oid'])
+    if 'subject' in d:
+        d['subject'] = ObjectId(d['subject']['$oid'])
+    if 'right_subject' in d:
+        if isinstance(d['right_subject'], list):
+            rs_list = []
+            for each_rs in d['right_subject']:
+                rs_list.append(ObjectId(each_rs['$oid']))
+            d['right_subject'] = rs_list
+        else:
+            d['right_subject'] = ObjectId(d['right_subject']['$oid'])
+    if 'relation_set' in d:
+        for each_relation_dict in d['relation_set']:
+            for each_key, each_val in each_relation_dict.iteritems():
+                rset_list = []
+                for each_id in each_val:
+                    rset_list.append(ObjectId(each_id[u'$oid']))
+                each_relation_dict[each_key] = rset_list
+    if 'member_of' in d:
+        mem_list = []
+        for each_mem_of in d['member_of']:
+            mem_list.append(ObjectId(each_mem_of['$oid']))
+        d['member_of'] = mem_list
+    if 'type_of' in d:
+        type_of_list = []
+        for each_type_of in d['type_of']:
+            type_of_list.append(ObjectId(each_type_of['$oid']))
+        d['type_of'] = type_of_list
+    if 'group_set' in d:
+        group_set_list = []
+        for each_group_id in d['group_set']:
+            group_set_list.append(ObjectId(each_group_id['$oid']))
+        d['group_set'] = group_set_list
+
+    if 'collection_set' in d:
+        collection_set_list = []
+        for each_node_id in d['collection_set']:
+            collection_set_list.append(ObjectId(each_node_id['$oid']))
+        d['collection_set'] = collection_set_list
+
+    if 'prior_node' in d:
+        prior_node_list = []
+        for each_prior_node_id in d['prior_node']:
+            prior_node_list.append(ObjectId(each_prior_node_id['$oid']))
+        d['prior_node'] = prior_node_list
+
+    if 'post_node' in d:
+        post_node_list = []
+        for each_post_node_id in d['post_node']:
+            post_node_list.append(ObjectId(each_post_node_id['$oid']))
+        d['post_node'] = post_node_list
+
+
+    if 'if_file' in d:
+        # 'if_file': {
+        #                 'mime_type': basestring,
+        #                 'original': {'id': ObjectId, 'relurl': basestring},
+        #                 'mid': {'id': ObjectId, 'relurl': basestring},
+        #                 'thumbnail': {'id': ObjectId, 'relurl': basestring}
+        #             },
+        try:
+            for key,val in d['if_file'].iteritems():
+                print "\nkey: ", key
+                if key == "original" and val['id'] is not None:
+                    val['id'] = ObjectId(val['id']['$oid'])
+                if key == "mid"  and val['id'] is not None:
+                    val['id'] = ObjectId(val['id']['$oid'])
+                if key == "thumbnail"  and val['id'] is not None:
+                    val['id'] = ObjectId(val['id']['$oid'])
+        except Exception as ed:
+            print "\n if_file ERROR: ",ed
+            pass
+    return d
 
 def get_json_file(filepath):
     history_manager = HistoryManager()
@@ -505,10 +635,11 @@ def get_json_file(filepath):
         if fp.endswith(',v'):
             fp = fp.split(',')[0]
         with open(fp, 'r') as version_file:
-            obj_as_json = json.loads(version_file.read(), object_hook=json_util.object_hook)
+            obj_as_json = json.loads(version_file.read(), object_hook=hook)
+            print "\n obj_as_json: ", obj_as_json
             rcs.checkin(fp)
         # os.remove(fp)
-        return obj_as_json, filepath
+        return obj_as_json
 
     except Exception, e:
         print "Exception while getting JSON: ", e
