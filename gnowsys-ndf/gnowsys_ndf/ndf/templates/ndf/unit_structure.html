@@ -26,8 +26,14 @@
                             <span class="activity-name"><!-- Activity Name --></span>
                         </div>
 
-                        <a class="right button-hollow-blue save_edit_activity" data-current-activity-id="" > Edit </a>
-
+                    <span data-dropdown="activity-settings-drop" aria-controls="activity-settings-drop" aria-expanded="false" class="large orange-button right">
+                        Actions <i class="fa fa-chevron-down"></i>
+                    </span>
+                    <ul id="activity-settings-drop" class="f-dropdown" data-dropdown-content aria-hidden="true" tabindex="-1">
+                        <li><a class="save_edit_activity" data-current-activity-id="" > Edit </a></li>
+                        <li><a class="view-admin-page" data-current-activity-id="" > View Teacher's page</a></li>
+                        <li><a class="view-help-page" data-current-activity-id="" > View Help page</a></li>
+                    </ul>
                         <!-- commenting following as activities now will be created/edited
                         from activity area -->
                         <!--
@@ -76,6 +82,10 @@
                         </div>
                     </div>
                 </div>
+                <div id="info-page-area">
+                    
+                </div>
+
             </div>
             <!-- END of Right panel -->
 
@@ -771,6 +781,49 @@ This will not be used because now only existing activities will be added.
             MathJax.Hub.Queue(["Typeset",MathJax.Hub,'actvity-editor-headerid']);
 
             getNodeData(activity_id);
+            
+            $(".view-admin-page").click(function(event){
+                          
+                $.ajax({
+                      type: "POST",
+
+                      url: "{% url 'get_info_pages' group_id %}",
+                      datatype: "html",
+                      data:{
+                        'csrfmiddlewaretoken': "{{csrf_token}}",
+                        'node_id':activity_id,
+                        'page_type':'has_admin_page'
+
+                      },
+                        success: function(data) {
+                        // $('#info-page-area').html(data);
+                        parent = $("#scstyle");
+                        parent.replaceWith(data);
+                      }
+                    });
+            });
+
+            $(".view-help-page").click(function(event){
+                          
+                $.ajax({
+                      type: "POST",
+
+                      url: "{% url 'get_info_pages' group_id %}",
+                      datatype: "html",
+                      data:{
+                        'csrfmiddlewaretoken': "{{csrf_token}}",
+                        'node_id':activity_id,
+                        'page_type':'has_help_page'
+
+                      },
+                        success: function(data) {
+                        // $('#info-page-area').html(data);
+                        parent = $("#scstyle");
+                        parent.replaceWith(data);
+                      }
+                    });
+            });
+            
             $('.save_edit_activity').attr('href', "{% url 'edit_course_page' group_id 'activity_id' %}".replace('activity_id', activity_id))
             $('.save_edit_activity').attr('data-current-activity-id', activity_id);
         });
