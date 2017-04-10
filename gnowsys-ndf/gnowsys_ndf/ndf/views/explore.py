@@ -155,7 +155,7 @@ def explore_basecourses(request,page_no=1):
                                     'status': u'PUBLISHED'
                                 }).sort('last_update', -1)
     ce_page_cur = paginator.Paginator(ce_cur, page_no, GSTUDIO_NO_OF_OBJS_PP)
-    print ce_cur.count()
+    # print ce_cur.count()
     title = 'base courses'
     context_variable = {
                         'title': title, 'doc_cur': ce_cur,

@@ -99,4 +99,7 @@ alter table notification_noticetype alter COLUMN label TYPE varchar(1024);
 alter table notification_noticetype alter COLUMN description TYPE varchar(1024);
 
 # to reset last author id
+select max(id) from auth_user;
+select max_value from auth_user_id_seq;
+ALTER SEQUENCE auth_user_id_seq RESTART WITH 1261000;
 alter sequence auth_user_id_seq restart

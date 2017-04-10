@@ -38,7 +38,20 @@
                 {% endif %}
 
                 <hr/>
- 
+                <div class="course_creator_header">
+                    <div class="left course_heading">
+                    <h5>Select Module</h5>
+                    </div>
+                    <div class="right course_heading_unit">
+                         <select name="module" multiple="">
+                            <option value="">Choose Module</option>
+                            {% for opts in modules %}
+                                <option value="{{opts.pk}}" {% if opts.pk in module_val_list %} selected {% endif %}>{{opts.name}}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                </div>
+
                 {% get_metadata_values "educationallevel" as metadata_educationallevel %}
                 {% get_attribute_value unit_node.pk 'educationallevel' as educationallevel_val %}
                 <div class="course_creator_header">
@@ -78,7 +91,7 @@
                     <div class="right course_heading_unit">
                          <select class="activity-lang" name="lan" id="activity_lang" >
                             {% get_language_info_list for LANGUAGES as languages %}
-                            
+
                             {% for language in languages %}
                                 {% if unit_node.language.0 == language.code %}
                                     <option selected value="{{ language.code }}" data-sub-lang="{{ language.name }}" data-sub-code="{{ language.code }}">
@@ -95,7 +108,7 @@
 
                 <div class=" course_heading_unit tags-container">
                  {% include 'ndf/widget_tags.html' with node=unit_node %}
-                  
+
                 </div>
 
                 <hr/>

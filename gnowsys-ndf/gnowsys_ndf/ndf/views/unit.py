@@ -14,7 +14,7 @@ from django.contrib.auth.decorators import login_required
 from django.core.urlresolvers import reverse
 
 ''' -- imports from application folders/files -- '''
-from gnowsys_ndf.ndf.models import GSystemType, Group, Node  # GSystem, Triple
+from gnowsys_ndf.ndf.models import GSystemType, Group, Node, GSystem  #, Triple
 from gnowsys_ndf.ndf.models import node_collection
 
 from gnowsys_ndf.ndf.views.group import CreateGroup
@@ -24,7 +24,7 @@ from gnowsys_ndf.ndf.views.ajax_views import get_collection
 gst_base_unit_name, gst_base_unit_id = GSystemType.get_gst_name_id('base_unit')
 gst_lesson_name, gst_lesson_id = GSystemType.get_gst_name_id('lesson')
 gst_activity_name, gst_activity_id = GSystemType.get_gst_name_id('activity')
-
+gst_module_name, gst_module_id = GSystemType.get_gst_name_id('Module')
 
 @login_required
 @get_execution_time
@@ -42,7 +42,13 @@ def unit_create_edit(request, group_id, unit_group_id=None):
         all_groups_names = [str(each_group.name) for each_group in all_groups]
         context_variables = {'group_id': parent_group_id,'groupid': parent_group_id, 'all_groups_names': all_groups_names}
         if unit_node:
-            context_variables.update({'unit_node': unit_node, 'title': 'Create Unit'})
+            # get all modules which are parent's of this unit/group
+            parent_modules = node_collection.find({
+                    '_type': 'GSystem',
+                    'member_of': gst_module_id,
+                    'collection_set': {'$in': [unit_node._id]}
+                })
+            context_variables.update({'unit_node': unit_node, 'title': 'Create Unit', 'modules': GSystem.query_list('home', 'Module', request.user.id), 'module_val_list': [str(pm._id) for pm in parent_modules]})
         req_context = RequestContext(request, context_variables)
         return render_to_response(template, req_context)
 
@@ -75,6 +81,7 @@ def unit_create_edit(request, group_id, unit_group_id=None):
             success_flag = result[0]
             unit_node = result[1]
 
+        unit_id = unit_node._id
         if language:
             language_val = get_language_tuple(unicode(language))
             unit_node.language = language_val
@@ -84,6 +91,41 @@ def unit_create_edit(request, group_id, unit_group_id=None):
         if educationalsubject_val and "choose" not in educationalsubject_val.lower():
             educationalsubject_at = node_collection.one({'_type': 'AttributeType', 'name': "educationalsubject"})
             create_gattribute(unit_node._id, educationalsubject_at, educationalsubject_val)
+        # modules
+        module_val = request.POST.getlist('module', [])
+        # get all modules which are parent's of this unit/group
+        parent_modules = node_collection.find({
+                '_type': 'GSystem',
+                'member_of': gst_module_id,
+                'collection_set': {'$in': [unit_id]}
+            })
+        # check for any mismatch in parent_modules and module_val
+        if parent_modules or module_val:
+            # import ipdb; ipdb.set_trace()
+            module_oid_list = [ObjectId(m) for m in module_val if m]
+            parent_modules_oid_list = [o._id for o in parent_modules]
+
+            # summing all ids to iterate over
+            oids_set = set(module_oid_list + parent_modules_oid_list)
+
+            for each_oid in oids_set:
+                if each_oid not in module_oid_list:
+                    # it is an old module existed with curent unit.
+                    # remove current node's id from it's collection_set
+                    # existing deletion
+                    each_node_obj = Node.get_node_by_id(each_oid)
+                    each_node_obj_cs = each_node_obj.collection_set
+                    each_node_obj_cs.pop(each_node_obj_cs.index(unit_id))
+                    each_node_obj.collection_set = each_node_obj_cs
+                    each_node_obj.save(group_id=group_id)
+                elif each_oid not in parent_modules_oid_list:
+                    # if this id does not exists with existing parent's id list
+                    # then add current node_id in collection_set of each_oid.
+                    # new addition
+                    each_node_obj = Node.get_node_by_id(each_oid)
+                    if unit_id not in each_node_obj.collection_set:
+                        each_node_obj.collection_set.append(unit_id)
+                        each_node_obj.save(group_id=group_id)
 
         if not success_flag:
             return HttpResponseRedirect(reverse('list_units', kwargs={'group_id': parent_group_id, 'groupid': parent_group_id,}))
@@ -208,7 +250,7 @@ def lesson_create_edit(request, group_id, unit_group_id=None):
                     language = get_language_tuple(lesson_language)
                     lesson_obj.language = language
                 lesson_obj.save(group_id=group_id)
-                
+
             unit_structure = _get_unit_hierarchy(unit_group_obj)
             msg = u'Lesson name updated.'
             result_dict = {'success': 1, 'unit_hierarchy': unit_structure, 'msg': str(lesson_obj._id)}

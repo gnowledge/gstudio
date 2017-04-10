@@ -123,7 +123,7 @@ def translate(request, group_id, node_id, lang, translated_node_id=None, **kwarg
                                 'group_id': group_id,
                                 'node_obj': translated_node,
                                 'source_obj': source_obj,
-                                'url': reverse('translate', kwargs={
+                                'post_url': reverse('translate', kwargs={
                                         'group_id': group_id,
                                         'node_id': node_id,
                                         'lang': lang,
