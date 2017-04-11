@@ -45,12 +45,6 @@ h5 {
   font-size: 24px;
 }
 
-/* line 62, ../../../scss/_clix2017.scss */
-.icon-color {
-  color: #2e3f51 !important;
-  padding: right;
-}
-
 /* Landing page */
 /* line 69, ../../../scss/_clix2017.scss */
 .landing_page {
@@ -3531,11 +3525,11 @@ ul.nav_menu_1 li:hover {
 /* line 3710, ../../../scss/_clix2017.scss */
 .activity-slides-container {
   height: 100%;
-  width: 80%;
-  background: #f8f8f8;
+  width: 90% !important;
+  background: #CCCCCC;
   margin-bottom: 2em;
-  padding: 0em 0em 0em 0em;
-  margin-bottom: 15px;
+  padding: 0em 1em;
+  margin: 50px !important;
 }
 /* line 3719, ../../../scss/_clix2017.scss */
 .activity-slides-container .activity-slides {
@@ -3615,16 +3609,17 @@ ul.nav_menu_1 li:hover {
 }
 /* line 3789, ../../../scss/_clix2017.scss */
 .activity-slides-container .activity-slides #related-content {
-  width: 100%;
+  width: 75%;
   margin: 0px auto;
-  /* border: 0px solid #ccc; */
+  border: 1px solid #ccc;
   padding: 5px 10px;
-  background: #f8f8f8;
+  background: #eee;
   margin-top: 10px;
   min-height: 50px;
   position: relative;
+  color: #222222;
 }
-/* line 3799, ../../../scss/_clix2017.scss */
+/* line 3800, ../../../scss/_clix2017.scss */
 .activity-slides-container .activity-slides #related-content > i {
   color: #fff;
   font-size: 40px;
@@ -3632,15 +3627,15 @@ ul.nav_menu_1 li:hover {
   left: 8px;
   top: 4px;
 }
-/* line 3807, ../../../scss/_clix2017.scss */
+/* line 3808, ../../../scss/_clix2017.scss */
 .activity-slides-container .activity-slides #related-content .related-content-header {
   margin-left: 40px;
 }
-/* line 3809, ../../../scss/_clix2017.scss */
+/* line 3810, ../../../scss/_clix2017.scss */
 .activity-slides-container .activity-slides #related-content .related-content-header .back-to-activity {
   display: none;
 }
-/* line 3812, ../../../scss/_clix2017.scss */
+/* line 3813, ../../../scss/_clix2017.scss */
 .activity-slides-container .activity-slides #related-content .related-content-header span {
   display: block;
   vertical-align: top;
@@ -3650,13 +3645,13 @@ ul.nav_menu_1 li:hover {
   letter-spacing: 0.8px;
   color: #999999;
 }
-/* line 3821, ../../../scss/_clix2017.scss */
+/* line 3822, ../../../scss/_clix2017.scss */
 .activity-slides-container .activity-slides #related-content .related-content-header .related-content-title {
   font-size: 20px;
   color: #000;
   cursor: pointer;
 }
-/* line 3827, ../../../scss/_clix2017.scss */
+/* line 3828, ../../../scss/_clix2017.scss */
 .activity-slides-container .activity-slides #related-content .related-content-body {
   display: none;
 }
@@ -3664,7 +3659,7 @@ ul.nav_menu_1 li:hover {
 /**
  * Sass styles related to module cards
  */
-/* line 3841, ../../../scss/_clix2017.scss */
+/* line 3842, ../../../scss/_clix2017.scss */
 .module_card {
   display: table;
   height: 250px;
@@ -3673,16 +3668,16 @@ ul.nav_menu_1 li:hover {
   border-radius: 5px;
   position: relative;
 }
-/* line 3850, ../../../scss/_clix2017.scss */
+/* line 3851, ../../../scss/_clix2017.scss */
 .module_card:hover {
   box-shadow: 0px 0px 15px rgba(0, 0, 0, 0.2);
 }
-/* line 3854, ../../../scss/_clix2017.scss */
+/* line 3855, ../../../scss/_clix2017.scss */
 .module_card > div {
   display: table-cell;
   height: 290px;
 }
-/* line 3858, ../../../scss/_clix2017.scss */
+/* line 3859, ../../../scss/_clix2017.scss */
 .module_card .card_banner {
   width: 300px;
   vertical-align: middle;
@@ -3696,7 +3691,7 @@ ul.nav_menu_1 li:hover {
   -webkit-transition: border-radius .2s;
   transition: border-radius .2s;
 }
-/* line 3872, ../../../scss/_clix2017.scss */
+/* line 3873, ../../../scss/_clix2017.scss */
 .module_card .card_title {
   display: block;
   width: 230px;
@@ -3707,27 +3702,27 @@ ul.nav_menu_1 li:hover {
   margin: 0px auto;
   letter-spacing: 1px;
 }
-/* line 3884, ../../../scss/_clix2017.scss */
+/* line 3885, ../../../scss/_clix2017.scss */
 .module_card.animated_card .card_banner {
   border-radius: 8px;
 }
-/* line 3887, ../../../scss/_clix2017.scss */
+/* line 3888, ../../../scss/_clix2017.scss */
 .module_card.animated_card:hover .card_banner {
   border-radius: 8px 0px 0px 8px;
 }
-/* line 3892, ../../../scss/_clix2017.scss */
+/* line 3893, ../../../scss/_clix2017.scss */
 .module_card.animated_card.isOpen .card_banner {
   border-radius: 8px 0px 0px 8px;
 }
-/* line 3896, ../../../scss/_clix2017.scss */
+/* line 3897, ../../../scss/_clix2017.scss */
 .module_card.animated_card:hover .card_summary {
   left: 30px;
 }
-/* line 3899, ../../../scss/_clix2017.scss */
+/* line 3900, ../../../scss/_clix2017.scss */
 .module_card.animated_card .card_summary {
   left: 5px;
 }
-/* line 3903, ../../../scss/_clix2017.scss */
+/* line 3904, ../../../scss/_clix2017.scss */
 .module_card .card_summary {
   width: 290px;
   padding: 0px 15px;
@@ -3743,34 +3738,34 @@ ul.nav_menu_1 li:hover {
   /* Safari */
   transition-property: left;
 }
-/* line 3917, ../../../scss/_clix2017.scss */
+/* line 3918, ../../../scss/_clix2017.scss */
 .module_card .card_summary .card_label {
   font-weight: 600;
   font-size: 12.5px;
   letter-spacing: 1px;
 }
-/* line 3922, ../../../scss/_clix2017.scss */
+/* line 3923, ../../../scss/_clix2017.scss */
 .module_card .card_summary .card_section {
   margin: 5px 0px;
   padding: 5px 0px;
 }
-/* line 3926, ../../../scss/_clix2017.scss */
+/* line 3927, ../../../scss/_clix2017.scss */
 .module_card .card_summary .card_section:not(:last-child) {
   border-bottom: 1px solid #ccc;
 }
-/* line 3929, ../../../scss/_clix2017.scss */
+/* line 3930, ../../../scss/_clix2017.scss */
 .module_card .card_summary .card_section p {
   margin-bottom: 7px;
   font-size: 12.5px;
 }
-/* line 3933, ../../../scss/_clix2017.scss */
+/* line 3934, ../../../scss/_clix2017.scss */
 .module_card .card_summary .card_section .ellipsis {
   width: 245px;
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
 }
-/* line 3941, ../../../scss/_clix2017.scss */
+/* line 3942, ../../../scss/_clix2017.scss */
 .module_card .card_summary .module_brief {
   display: block;
   /* Fallback for non-webkit */
