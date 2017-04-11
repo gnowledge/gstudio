@@ -230,9 +230,10 @@ def lesson_create_edit(request, group_id, unit_group_id=None):
         # unit_cs: unit collection_set
         unit_cs_list = unit_group_obj.collection_set
         unit_cs_objs_cur = Node.get_nodes_by_ids_list(unit_cs_list)
-        unit_cs_names_list = [u.name for u in unit_cs_objs_cur]
+        if unit_cs_objs_cur:
+            unit_cs_names_list = [u.name for u in unit_cs_objs_cur]
 
-        if lesson_name in unit_cs_names_list:
+        if unit_cs_objs_cur  and  lesson_name in unit_cs_names_list :
             lesson_obj = Node.get_node_by_id(lesson_id)
             if lesson_language != lesson_obj.language[0]:
                 if lesson_language:
