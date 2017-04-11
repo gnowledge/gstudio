@@ -512,9 +512,9 @@ class Command(BaseCommand):
             global log_file
             log_file.write("\nUpdated CONFIG_VARIABLES: "+ str(CONFIG_VARIABLES))
             print "\n Validating the data-dump"
-            # validate_data_dump()
+            validate_data_dump()
             print "\n Checking the dump Group-id availability."
-            # check_group_availability()
+            check_group_availability()
             print "\n User Restoration."
             user_objs_restoration()
 
@@ -609,15 +609,14 @@ def hook(d):
         #             },
         try:
             for key,val in d['if_file'].iteritems():
-                print "\nkey: ", key
                 if key == "original" and val['id'] is not None:
                     val['id'] = ObjectId(val['id']['$oid'])
                 if key == "mid"  and val['id'] is not None:
                     val['id'] = ObjectId(val['id']['$oid'])
                 if key == "thumbnail"  and val['id'] is not None:
                     val['id'] = ObjectId(val['id']['$oid'])
-        except Exception as ed:
-            print "\n if_file ERROR: ",ed
+        except Exception as if_file_err:
+            print "\n if_file ERROR: ", if_file_err
             pass
     return d
 
@@ -636,7 +635,7 @@ def get_json_file(filepath):
             fp = fp.split(',')[0]
         with open(fp, 'r') as version_file:
             obj_as_json = json.loads(version_file.read(), object_hook=hook)
-            print "\n obj_as_json: ", obj_as_json
+            # print "\n obj_as_json: ", obj_as_json
             rcs.checkin(fp)
         # os.remove(fp)
         return obj_as_json
