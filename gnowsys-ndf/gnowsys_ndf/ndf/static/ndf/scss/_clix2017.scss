@@ -3579,7 +3579,7 @@ $unit-card-lines-to-show: 3;
 
 .unit_card {
     width: 300px;
-    height: 300px;
+    // height: 300px; commented as info of number of lesson and etc was not passed currently
     color: #000;
     padding: 15px;
     margin: 10px;
@@ -3612,6 +3612,7 @@ $unit-card-lines-to-show: 3;
             height: 50px;
             width: 50px;
             margin-right: 10px;
+            color: #333333;
         }
         .unit_title {
             display: table-cell;
@@ -3624,6 +3625,7 @@ $unit-card-lines-to-show: 3;
             white-space: nowrap;
             text-overflow: ellipsis;
             vertical-align: middle;
+            color: #333333;
         }
     }
     .unit_desc {
@@ -3638,6 +3640,7 @@ $unit-card-lines-to-show: 3;
         -webkit-line-clamp: $unit-card-lines-to-show;
         -webkit-box-orient: vertical;
         margin:  10px 0px 20px;
+        color: #333333;
     }
     .unit_breif {
         .unit_breif_row {
@@ -3689,9 +3692,13 @@ $inCompleteBgColor: #fd9e29;
 .title-strip{
     box-shadow: 0px 0px 6px rgba(0, 0, 0, 0.2);
     margin-top: -29px;
-
+    padding-left:10px;
     a{
-        color: #2b333f;
+        
+        float: right;
+        padding-right: 18px;
+        text-transform: uppercase;
+        color: #007095;
     }
 }
 
