@@ -284,50 +284,51 @@
         });//end of ajax
 
     });
-    $(".view-admin-page").click(function(event){
-                $.ajax({
-                      type: "POST",
-
-                      url: "{% url 'get_info_pages' group_id %}",
-                      datatype: "html",
-                      data:{
-                        'csrfmiddlewaretoken': "{{csrf_token}}",
-                        'node_id':'{{activity_node.pk}}',
-                        'page_type':'has_admin_page'
-
-                      },
-                        success: function(data) {
-                        // $('#info-page-area').html(data);
-                        parent = $("#info-page-area");
-                        parent.html(data);
-                        $('html,body').animate({
-                          scrollTop: $("#info-page-area").offset().top},'slow');
-                      }
-                    });
-      });
-
-            $(".view-help-page").click(function(event){
-                          
-                $.ajax({
-                      type: "POST",
-
-                      url: "{% url 'get_info_pages' group_id %}",
-                      datatype: "html",
-                      data:{
-                        'csrfmiddlewaretoken': "{{csrf_token}}",
-                        'node_id':'{{activity_node.pk}}',
-                        'page_type':'has_help'
-
-                      },
-                        success: function(data) {
-                        // $('#info-page-area').html(data);
-                        parent = $("#info-page-area");
-                        parent.html(data);
-                        $('html,body').animate({
-                          scrollTop: $("#info-page-area").offset().top},'slow');
-                      }
-                    });
-            });
             
+$( document ).ready(function() {
+    
+    {% for each in  activity_node.relation_set %}
+      {% if each.has_help %}
+        $.ajax({
+                type: "POST",
 
+                url: "{% url 'get_info_pages' group_id %}",
+                datatype: "html",
+                data:{
+                  'csrfmiddlewaretoken': "{{csrf_token}}",
+                  'node_id':'{{activity_node.pk}}',
+                  'page_type':'has_help'
+
+                },
+                  success: function(data) {
+                  // $('#info-page-area').html(data);
+                  parent = $("#info-page-area");
+                  parent.after(data);
+                }
+          });
+
+        {% endif %}
+      
+      {% if each.has_admin_page %}
+
+        $.ajax({
+                type: "POST",
+
+                url: "{% url 'get_info_pages' group_id %}",
+                datatype: "html",
+                data:{
+                  'csrfmiddlewaretoken': "{{csrf_token}}",
+                  'node_id':'{{activity_node.pk}}',
+                  'page_type':'has_admin_page'
+
+                },
+                  success: function(data) {
+                  // $('#info-page-area').html(data);
+                  parent = $("#info-page-area");
+                  parent.after(data);
+                }
+              });
+        {% endif %}
+    {% endfor %}
+});
 </script>
