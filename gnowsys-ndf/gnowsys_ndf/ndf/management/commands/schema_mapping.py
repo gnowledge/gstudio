@@ -31,6 +31,7 @@ def create_factory_schema_mapper(path):
 
 
 def update_factory_schema_mapper(path):
+    SCHEMA_ID_MAP = {} # {ObjectId-on-source: ObjectId-on-target}
     schema_dump_path = os.path.join(path, 'factory_schema.json')
     if os.path.exists(schema_dump_path):
         with open(schema_dump_path, 'r') as schema_file_in:
@@ -40,8 +41,11 @@ def update_factory_schema_mapper(path):
                 type_node = node_collection.one({'_type': each_type['_type'], 'name':each_type['name']},{'_id':1})
                 each_type['target_id'] = type_node._id
                 updated_factory_json_list.append(each_type)
+                if each_type['target_id'] != each_type['source_id']:
+                    SCHEMA_ID_MAP[each_type['source_id']] = each_type['target_id']
         with open(schema_dump_path, 'w+') as schema_file_out:
             schema_file_out.write(json_util.dumps(updated_factory_json_list))
             schema_file_out.close()
+        return SCHEMA_ID_MAP
     else:
         print "\n No factory_schema.json file found."
