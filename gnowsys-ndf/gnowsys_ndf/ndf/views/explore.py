@@ -160,7 +160,7 @@ def explore_basecourses(request,page_no=1):
     context_variable = {
                         'title': title, 'doc_cur': ce_cur,
                         'group_id': group_id, 'groupid': group_id,
-                        'card': 'ndf/event_card.html', 'ce_page_cur':ce_page_cur
+                        'card': 'ndf/card_group.html', 'ce_page_cur':ce_page_cur
                     }
 
 
