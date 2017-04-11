@@ -15,14 +15,14 @@ body {
   margin: 0;
   background-repeat: no-repeat;
   background-attachment: fixed;
-  font-family: 'Rubik-Regular', sans-serif;
+  font-family: 'OpenSans-Regular', sans-serif;
 }
 
 /* line 35, ../../../scss/_clix2017.scss */
 h3 {
   font-size: 20px;
   color: #2e3f51;
-  font-family: 'Rubik-Medium';
+  font-family: 'OpenSans-Semibold';
 }
 
 /* line 41, ../../../scss/_clix2017.scss */
@@ -305,7 +305,7 @@ h5 {
   color: #ffc14e;
   padding: 5px 17px;
   width: inherit;
-  font-family: "Rubik-Medium", sans-serif;
+  font-family: "OpenSans-Semibold", sans-serif;
   border: 2px solid #ffc14e;
 }
 /* line 344, ../../../scss/_clix2017.scss */
@@ -470,7 +470,7 @@ h5 {
   letter-spacing: 0.5px;
   display: block;
   padding: 12px 0 12px 0;
-  font-family: "Rubik-Regular";
+  font-family: "OpenSans-Regular";
   font-size: 16px;
 }
 /* line 552, ../../../scss/_clix2017.scss */
@@ -1109,7 +1109,7 @@ input[type="button"] {
   background: #fff;
   border: 1px solid #ce7869;
   font-size: 12px;
-  font-family: "Rubik-Medium", serif;
+  font-family: "OpenSans-Regular", serif;
   border-radius: 5px !important;
   margin-right: 20px;
   margin-bottom: 8px;
@@ -1129,7 +1129,7 @@ input[type="button"] {
   background: #fff;
   border: 1px solid #ce7869;
   font-size: 12px;
-  font-family: "Rubik-Medium", serif;
+  font-family: "OpenSans-Regular", serif;
   border-radius: 4px;
   margin-right: 20px;
   margin-bottom: 8px;
@@ -1148,7 +1148,7 @@ input[type="button"] {
   background: #fff;
   border: 1px solid #ce7869;
   font-size: 12px;
-  font-family: "Rubik-Medium", serif;
+  font-family: "OpenSans-Regular", serif;
   border-radius: 4px;
   margin-right: 20px;
   margin-bottom: 8px;
@@ -1167,7 +1167,7 @@ input[type="button"] {
   background: #fff;
   border: 1px solid #ce7869;
   font-size: 12px;
-  font-family: "Rubik-Medium", serif;
+  font-family: "OpenSans-Regular", serif;
   border-radius: 4px;
   margin-right: 30px;
   margin-bottom: 8px;
@@ -2078,7 +2078,7 @@ ul.jqtree-tree .jqtree-toggler:hover {
 /* line 2212, ../../../scss/_clix2017.scss */
 .course_creator_header .course_heading_unit select {
   font-size: 14px;
-  font-family: 'Rubik-Regular', sans-serif;
+  font-family: 'OpenSans-Regular', sans-serif;
   color: gray;
   border: 0px solid #acd4fa;
 }
@@ -2860,7 +2860,7 @@ ul.jqtree-tree .jqtree-toggler:hover {
   background: #fff;
   border: 1px solid #ce7869;
   font-size: 12px;
-  font-family: "Rubik-Medium", serif;
+  font-family: "OpenSans-Regular", serif;
   border-radius: 5px !important;
   margin-right: 20px;
   margin-bottom: 8px;
@@ -2911,7 +2911,7 @@ ul.jqtree-tree .jqtree-toggler:hover {
   background: #fff;
   border: 1px solid #ce7869;
   font-size: 12px;
-  font-family: "Rubik-Medium", serif;
+  font-family: "OpenSans-Regular", serif;
   border-radius: 5px !important;
   margin-right: 20px;
   margin-bottom: 8px;

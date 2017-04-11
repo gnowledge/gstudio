@@ -28,14 +28,14 @@ body {
     margin: 0;
     background-repeat: no-repeat;
     background-attachment: fixed;
-    font-family: 'Rubik-Regular', sans-serif;
+    font-family: 'OpenSans-Regular', sans-serif;
 }
 
 
 h3{
     font-size: 20px;
     color: $primary-blue;
-    font-family: 'Rubik-Medium';
+    font-family: 'OpenSans-Semibold';
 }
 
 h5{
@@ -339,7 +339,7 @@ h5{
     color: #ffc14e;
     padding: 5px 17px;
     width: inherit;
-    font-family: "Rubik-Medium", sans-serif;
+    font-family: "OpenSans-Semibold", sans-serif;
     border: 2px solid #ffc14e;
     &:hover{
         background-color:rgba(255,193,78,0.3);
@@ -545,7 +545,7 @@ h5{
                     letter-spacing: 0.5px;
                     display: block;
                     padding: 12px 0 12px 0;
-                    font-family: "Rubik-Regular";
+                    font-family: "OpenSans-Regular";
                     font-size: 16px;
                 }
                 &:hover, &.active {
@@ -1186,7 +1186,7 @@ input[type="button"] {
     background:#fff ;
     border: 1px solid #ce7869;
     font-size: 12px;
-    font-family: "Rubik-Medium", serif;
+    font-family: "OpenSans-Regular", serif;
     border-radius: 5px !important;
     margin-right: 20px;
     margin-bottom: 8px;
@@ -1204,7 +1204,7 @@ input[type="button"] {
     background:#fff ;
     border: 1px solid #ce7869;
     font-size: 12px;
-    font-family: "Rubik-Medium", serif;
+    font-family: "OpenSans-Regular", serif;
     border-radius: 4px;
     margin-right: 20px;
     margin-bottom: 8px;
@@ -1223,7 +1223,7 @@ input[type="button"] {
     background:#fff ;
     border: 1px solid #ce7869;
     font-size: 12px;
-    font-family: "Rubik-Medium", serif;
+    font-family: "OpenSans-Regular", serif;
     border-radius: 4px;
     margin-right: 20px;
     margin-bottom: 8px;
@@ -1241,7 +1241,7 @@ input[type="button"] {
     background:#fff ;
     border: 1px solid #ce7869;
     font-size: 12px;
-    font-family: "Rubik-Medium", serif;
+    font-family: "OpenSans-Regular", serif;
     border-radius: 4px;
     margin-right: 30px;
     margin-bottom: 8px;
@@ -2211,7 +2211,7 @@ ul.jqtree-tree .jqtree-toggler {
             }
             select{
                 font-size: 14px;
-                font-family: 'Rubik-Regular', sans-serif;
+                font-family: 'OpenSans-Regular', sans-serif;
                 color: gray;
                 border: 0px solid $secondry-blue; 
             }
@@ -3025,7 +3025,7 @@ ul.jqtree-tree .jqtree-toggler {
         background:#fff ;
         border: 1px solid #ce7869;
         font-size: 12px;
-        font-family: "Rubik-Medium", serif;
+        font-family: "OpenSans-Regular", serif;
         border-radius: 5px !important;
         margin-right: 20px;
         margin-bottom: 8px;
@@ -3076,7 +3076,7 @@ ul.jqtree-tree .jqtree-toggler {
         background:#fff ;
         border: 1px solid #ce7869;
         font-size: 12px;
-        font-family: "Rubik-Medium", serif;
+        font-family: "OpenSans-Regular", serif;
         border-radius: 5px !important;
         margin-right: 20px;
         margin-bottom: 8px;
