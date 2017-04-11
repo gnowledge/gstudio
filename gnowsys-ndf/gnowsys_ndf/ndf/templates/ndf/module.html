@@ -134,30 +134,30 @@
     <div class="small-6 large-12 columns">
       <ul class="small-block-grid-1 medium-block-grid-2 large-block-grid-4">
 
-	{% for module in module_coll %}
-	<li class="bullet-item text-left">
-	  <div class="row">
-            <div class="small-5 columns ">	  
-	      <!-- bellow div for making tree from json data -->
-	      <div class="tree" data-url="{% url 'get_module_json' groupid %}?_id={{module.pk}}"></div>
+  {% for module in module_coll %}
+  <li class="bullet-item text-left">
+    <div class="row">
+            <div class="small-5 columns ">    
+        <!-- bellow div for making tree from json data -->
+        <div class="tree" data-url="{% url 'get_module_json' groupid %}?_id={{module.pk}}"></div>
             </div>                
             <div class="small-7 columns text-right">
               <i class="label secondary" >Created by {{module.user_details_dict.created_by}} on {{module.created_at|date:"j F Y"}} </i>
             </div>    
             <div class="small-12 columns" style="padding-top:5px;">
-	      <p>{{ node.html_content|safe|striptags|truncatechars:150 }}</p>
+        <p>{{ node.html_content|safe|striptags|truncatechars:150 }}</p>
             </div>
-	  </div>
-	</li>
+    </div>
+  </li>
 
-	{% empty %}
-	  <div class="row">
-	    <div class="small-12 columns">
+  {% empty %}
+    <div class="row">
+      <div class="small-12 columns">
        <h5> {% blocktrans %}This group doesn't have any modules. <b>Be the first to create a Module!</b>{% endblocktrans %} </h5>
-	    </div>
-	  </div>
+      </div>
+    </div>
 
-	{% endfor %}
+  {% endfor %}
 {% paginate %}
 {% endcomment %}
 

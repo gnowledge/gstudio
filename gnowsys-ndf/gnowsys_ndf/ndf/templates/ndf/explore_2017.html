@@ -21,11 +21,16 @@
 		</div>
 		{% endif %}-->
 	</div>
+	{% if title != "Modules" %}
 	<div class="row">
+	{% endif %}
 		{% if title == 'explore' %}
 			Please select course or a group.
 		{% else %}
 		<!--section role="tabpanel" aria-hidden="true" class="content active " style="border-style:none;"-->
+			{% if title == "Modules" %}
+			<ul class="small-block-grid-1 medium-block-grid-2 large-block-grid-2" >
+			 {% endif %}
 		{% for each_obj in doc_cur %}
 			<!--li class="card-image-wrapper"-->
 			{% if title == "base courses" %}
@@ -36,7 +41,9 @@
 					{% include card with resource=each_obj is_event=True no_footer=True has_prof_pic=True url_name="groupchange" first_arg=each_obj.pk %}
 				{% endif %}
 			{% elif title == "Modules" %}
-				{% include card with resource=each_obj is_event=True no_footer=True has_prof_pic=True url_name=card_url_name first_arg=group_id second_arg=each_obj.pk  next_session=True %}
+			<li class="card-image-wrapper" >
+				{% include card with node=each_obj is_event=True no_footer=True has_prof_pic=True url_name=card_url_name first_arg=group_id second_arg=each_obj.pk  next_session=True %}
+			</li>
 			{% else %}
 				{# {% include card with resource=each_obj is_event=True no_footer=True has_prof_pic=True url_name="unit_detail" first_arg=groupid first_arg=groupid second_arg=each_obj.pk %} #}
 
@@ -44,6 +51,9 @@
 			{% endif %}
 	          <!--/li-->
 			{% endfor %}
+			{% if title == "Modules" %}
+				</ul>
+			{% endif %}
 		<!--/section-->
 			{% if title == "courses" %}
 				{% include 'ndf/pagination.html' with urlname="courses_paged" first_arg="" second_arg=""  third_arg="" page_info=ce_page_cur %}
