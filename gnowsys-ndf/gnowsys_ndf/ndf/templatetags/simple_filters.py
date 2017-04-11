@@ -114,6 +114,19 @@ def get_latest_git_hash():
 	git_commit_hash = os.popen("git rev-parse --short HEAD").read().strip()
 	return git_commit_hash
 
+@get_execution_time
+@register.assignment_tag
+def get_active_branch_name():
+    """
+    Template tag that returns current active git branch.
+
+    Returns:
+        str: branch-name
+    """
+
+    import os
+    git_branch_name = os.popen("git rev-parse --abbrev-ref HEAD").read().strip()
+    return git_branch_name
 
 @get_execution_time
 @register.filter
