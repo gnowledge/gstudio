@@ -2107,6 +2107,8 @@ def course_notebook(request, group_id, tab=None, notebook_id=None):
     template = 'ndf/gcourse_event_group.html'
     if 'base_unit' in group_obj.member_of_names_list:
         template = 'ndf/gevent_base.html'
+    if 'announced_unit' in group_obj.member_of_names_list:
+        template = 'ndf/gevent_base.html'
 
 
     # page_gst = node_collection.one({'_type': "GSystemType", 'name': "Page"})
