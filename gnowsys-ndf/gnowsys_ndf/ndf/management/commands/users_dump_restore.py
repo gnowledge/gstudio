@@ -21,16 +21,21 @@ def create_users_dump(path, user_id_list):
 
     user_json_list =  []
     for each_auth in auth_cur:
-        each_user_json = user_json.copy()
-        each_user_json['user_id'] = each_auth.created_by
-        each_user_json['user_name'] = each_auth.name
-        # for email
-        user_email_val = User.objects.get(pk=each_auth.created_by).email
-        if user_email_val == '':
-            user_email_val = each_auth.name
-        each_user_json['user_email'] = user_email_val
-        each_user_json['user_author_id'] = str(each_auth._id)
-        user_json_list.append(each_user_json)
+        try:
+            user_obj = User.objects.get(pk=each_auth.created_by)
+        except Exception as no_user:
+            pass
+        if user_obj:
+            each_user_json = user_json.copy()
+            each_user_json['user_id'] = user_obj.id
+            each_user_json['user_name'] = user_obj.name
+            # for email
+            user_email_val = user_obj.email
+            if user_email_val == '':
+                user_email_val = user_obj.name
+            each_user_json['user_email'] = user_email_val
+            each_user_json['user_author_id'] = str(each_auth._id)
+            user_json_list.append(each_user_json)
 
     with open(schema_dump_path, 'w+') as schema_file_out:
         schema_file_out.write(json.dumps(user_json_list))

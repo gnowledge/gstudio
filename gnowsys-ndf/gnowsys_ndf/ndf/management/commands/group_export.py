@@ -171,8 +171,10 @@ class Command(BaseCommand):
                 call_group_export(group_node, nodes_falling_under_grp)
                 get_counter_ids(group_node._id)
                 # import ipdb; ipdb.set_trace()
+                global GROUP_CONTRIBUTORS
                 if RESTORE_USER_DATA:
                     print "\n Total GROUP_CONTRIBUTORS: ", len(GROUP_CONTRIBUTORS)
+                    GROUP_CONTRIBUTORS = list(set(GROUP_CONTRIBUTORS))
                     create_users_dump(group_dump_path, GROUP_CONTRIBUTORS)
 
                 write_md5_of_dump(group_dump_path, configs_file_path)
