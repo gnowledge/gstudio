@@ -95,9 +95,11 @@ def check_group_availability():
     group_node = node_collection.one({'_id': ObjectId(CONFIG_VARIABLES.GROUP_ID)})
     global log_file
     if group_node:
-        log_file.write("\n Group with Restore Group ID is FOUND on Target system.")
-        print "\n Group with restoration ID already exists."
-        call_exit()
+        confirm_grp_data_merge = raw_input("Dump Group already exists here. Would you like to merge the data ?")
+        if confirm_grp_data_merge != 'y' or confirm_grp_data_merge != 'Y':
+            log_file.write("\n Group with Restore Group ID is FOUND on Target system.")
+            print "\n Group with restoration ID already exists."
+            call_exit()
     else:
         log_file.write("\n Group with Restore Group ID NOT found on Target system.")
         print "\n Group with restoration ID does not exists."
