@@ -59,10 +59,10 @@ h5{
 
 }
 
-// .icon-color{
-//     color:#2e3f51 !important;
-//     padding: right;
-// }
+.icon-color{
+    color:#2e3f51 !important;
+    padding: right;
+}
 
 
 /* Landing page */
@@ -3710,11 +3710,11 @@ $inCompleteBgColor: #fd9e29;
 .activity-slides-container {
     //border: 1px solid black;
     height: 100%;
-    width: 90% !important;
-    background: #CCCCCC;
+    width: 80%;
+    background: #f8f8f8;
     margin-bottom: 2em;
-    padding: 0em 1em ;
-    margin: 50px !important;
+    padding: 0em 0em 0em 0em;
+    margin-bottom: 15px;
 
     .activity-slides {
       height: 100%;
@@ -3787,22 +3787,22 @@ $inCompleteBgColor: #fd9e29;
         }
       }
       #related-content {
-        width: 75%;
+        width: 100%;
         margin: 0px auto;
-        border: 1px solid #ccc; 
+        /* border: 0px solid #ccc; */
         padding: 5px 10px;
-        background: #eee;        
+        background: #f8f8f8;
         margin-top: 10px;
         min-height: 50px;
         position: relative;
-        color:#222222;
+        color: #222222;
 
         >i {
-                color: #fff;
-               font-size: 40px;
-               position: absolute;
-              left: 8px;
-             top: 4px;
+            color: #fff;
+            font-size: 40px;
+            position: absolute;
+            left: 8px;
+            top: 4px;
         }
 
         .related-content-header {

@@ -45,6 +45,12 @@ h5 {
   font-size: 24px;
 }
 
+/* line 62, ../../../scss/_clix2017.scss */
+.icon-color {
+  color: #2e3f51 !important;
+  padding: right;
+}
+
 /* Landing page */
 /* line 69, ../../../scss/_clix2017.scss */
 .landing_page {
@@ -3525,11 +3531,11 @@ ul.nav_menu_1 li:hover {
 /* line 3710, ../../../scss/_clix2017.scss */
 .activity-slides-container {
   height: 100%;
-  width: 90% !important;
-  background: #CCCCCC;
+  width: 80%;
+  background: #f8f8f8;
   margin-bottom: 2em;
-  padding: 0em 1em;
-  margin: 50px !important;
+  padding: 0em 0em 0em 0em;
+  margin-bottom: 15px;
 }
 /* line 3719, ../../../scss/_clix2017.scss */
 .activity-slides-container .activity-slides {
@@ -3609,11 +3615,11 @@ ul.nav_menu_1 li:hover {
 }
 /* line 3789, ../../../scss/_clix2017.scss */
 .activity-slides-container .activity-slides #related-content {
-  width: 75%;
+  width: 100%;
   margin: 0px auto;
-  border: 1px solid #ccc;
+  /* border: 0px solid #ccc; */
   padding: 5px 10px;
-  background: #eee;
+  background: #f8f8f8;
   margin-top: 10px;
   min-height: 50px;
   position: relative;
