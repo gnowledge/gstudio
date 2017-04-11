@@ -1,0 +1,90 @@
+@font-face {
+    font-family: 'OpenSans-Bold';
+    src: url('/static/ndf/bower_components/open-sans-fontface/fonts/OpenSans-Bold.ttf') format('truetype');
+    src: url('/static/ndf/bower_components/open-sans-fontface/fonts/OpenSans-Bold.woff') format('woff');
+    font-weight: normal;
+    font-style: normal;
+
+}
+@font-face {
+    font-family: 'OpenSans-BoldItalic';
+    src: url('/static/ndf/bower_components/open-sans-fontface/fonts/OpenSans-BoldItalic.ttf') format('truetype');
+    src: url('/static/ndf/bower_components/open-sans-fontface/fonts/OpenSans-BoldItalic.woff') format('woff');
+    font-weight: normal;
+    font-style: normal;
+
+}
+
+@font-face {
+    font-family: 'OpenSans-ExtraBold';
+    src: url('/static/ndf/bower_components/open-sans-fontface/fonts/OpenSans-ExtraBold.ttf') format('truetype');
+    src: url('/static/ndf/bower_components/open-sans-fontface/fonts/OpenSans-ExtraBold.woff') format('woff');
+    font-weight: normal;
+    font-style: normal;
+
+}
+
+@font-face {
+    font-family: 'OpenSans-ExtraBoldItalic';
+    src: url('/static/ndf/bower_components/open-sans-fontface/fonts/OpenSans-ExtraBoldItalic.ttf') format('truetype');
+    src: url('/static/ndf/bower_components/open-sans-fontface/fonts/OpenSans-ExtraBoldItalic.woff') format('woff');
+    font-weight: normal;
+    font-style: normal;
+
+}
+
+@font-face {
+    font-family: 'OpenSans-Italic';
+    src: url('/static/ndf/bower_components/open-sans-fontface/fonts/OpenSans-Italic.ttf') format('truetype');
+    src: url('/static/ndf/bower_components/open-sans-fontface/fonts/OpenSans-Italic.woff') format('woff');
+    font-weight: normal;
+    font-style: normal;
+
+}
+
+@font-face {
+    font-family: 'OpenSans-Light';
+    src: url('/static/ndf/bower_components/open-sans-fontface/fonts/OpenSans-Light.ttf') format('truetype');
+    src: url('/static/ndf/bower_components/open-sans-fontface/fonts/OpenSans-Light.woff') format('woff');
+    font-weight: normal;
+    font-style: normal;
+
+}
+
+@font-face {
+    font-family: 'OpenSans-LightItalic';
+    src: url('/static/ndf/bower_components/open-sans-fontface/fonts/OpenSans-LightItalicOpenSans-Light.ttf') format('truetype');
+    src: url('/static/ndf/bower_components/open-sans-fontface/fonts/OpenSans-LightItalic.woff') format('woff');
+    font-weight: normal;
+    font-style: normal;
+
+}
+
+@font-face {
+    font-family: 'OpenSans-Regular';
+    src: url('/static/ndf/bower_components/open-sans-fontface/fonts/OpenSans-Regular.ttf') format('truetype');
+    src: url('/static/ndf/bower_components/open-sans-fontface/fonts/OpenSans-Regular.woff') format('woff');
+    font-weight: normal;
+    font-style: normal;
+
+}
+
+@font-face {
+    font-family: 'OpenSans-Semibold';
+    src: url('/static/ndf/bower_components/open-sans-fontface/fonts/OpenSans-Semibold.ttf') format('truetype');
+    src: url('/static/ndf/bower_components/open-sans-fontface/fonts/OpenSans-Semibold.woff') format('woff');
+    font-weight: normal;
+    font-style: normal;
+
+}
+
+@font-face {
+    font-family: 'OpenSans-SemiboldItalic';
+    src: url('/static/ndf/bower_components/open-sans-fontface/fonts/OpenSans-SemiboldItalic.ttf') format('truetype');
+    src: url('/static/ndf/bower_components/open-sans-fontface/fonts/OpenSans-SemiboldItalic.woff') format('woff');
+    font-weight: normal;
+    font-style: normal;
+
+}
+
+
