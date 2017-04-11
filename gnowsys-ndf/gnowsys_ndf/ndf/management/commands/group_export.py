@@ -282,7 +282,6 @@ def build_rcs(node, collection_name):
                 try:
                     global RESTORE_USER_DATA
                     if RESTORE_USER_DATA:
-                        print "\n NC: ", len(node.contributors)
                         if "contributors" in node:
                             GROUP_CONTRIBUTORS.extend(node.contributors)
                 except Exception as no_contributors_err:

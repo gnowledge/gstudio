@@ -30,3 +30,4 @@ django-mailbox==4.4.1
 Fabric==1.12.0
 bs4==0.0.1
 html==1.16
+checksumdir==1.1.0
