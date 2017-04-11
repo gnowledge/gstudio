@@ -21,23 +21,22 @@ this template is modified. So for the fields in the template it supports -
  -->
 
 {% block meta_content %}
-  {% blocktrans %}
-    <h3>Types of Groups</h3>
-    <hr/>
-    <h5>Open Groups</h5>
-    <p class="subheader">Open groups are ideal for projects that require a high level of collaboration and participation. Any metastudio user can join this group without prior approval</p>
-    <h5>Closed Groups</h5>
-    <p class="subheader">Closed groups are ideal for projects that require restricted access to content and documents. Users can only join after their membership request is approved or have been invited.</p>
-  {% endblocktrans %}
 {% endblock %}
 
 
 {% block body_content %}
   <h2 class="text-center">
     <small>
-      {% if node %} Edit | {{node.name}}
+      {% if node %}
+        Edit | {{node.name}}
+
       {% else %} 
-        {% trans "Create " %}{{spl_group_type}}
+        {% trans "Create " %}
+        {% if spl_group_type == "CourseEventGroup" %}
+          Course
+        {% elif spl_group_type == "ProgramEventGroup" %}
+          Program
+        {% endif %}
       {% endif %}
     </small>
   </h2>
@@ -354,13 +353,13 @@ this template is modified. So for the fields in the template it supports -
       <!-- <div class="small-12 medium-6 medium-centered columns"> -->
     <dl class="accordion row" title="Click to Add/Edit Description" data-accordion>
       <dd class="accordion-navigation small-12 medium-6 medium-centered columns">
-        <a href="#content_org">
+        <a href="#content">
           <label for="right-label" class="">
-            {% if node.content_org %}Edit{% else %}Add{% endif %} {% trans "Description" %}
+            {% if node.content %}Edit{% else %}Add{% endif %} {% trans "Description" %}
           </label>
         </a>
-        <div id="content_org" class="content">
-          {% include "ndf/html_editor.html" with var_name="content_org" var_placeholder="Enter the content here" var_value=node.content|default_if_none:"" ckeditor_toolbar="GeneralToolbar" node_id=node.pk %}
+        <div id="content" class="content">
+          {% include "ndf/html_editor.html" with var_name="content" var_placeholder="Enter the content here" var_value=node.content|default_if_none:"" ckeditor_toolbar="GeneralToolbar" node_id=node.pk %}
         </div>
       </dd>
     </dl>
