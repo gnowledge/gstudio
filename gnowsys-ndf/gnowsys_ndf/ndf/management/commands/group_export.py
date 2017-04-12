@@ -412,7 +412,7 @@ def get_nested_ids(node,field_name):
     if node[field_name]:
         for each_id in node[field_name]:
             each_node = node_collection.one({"_id":ObjectId(each_id)})
-            if node._id != each_node._id:
+            if each_node and (node._id != each_node._id):
                 dump_node(node=each_node, collection_name=node_collection)
                 if each_node and each_node[field_name]:
                     get_nested_ids(each_node, field_name)
