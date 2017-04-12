@@ -70,6 +70,9 @@
                         <li>
                             <a href="{% url 'course_about' group_id %}" {% if title == 'about' %}class="selected"{% endif %}>Overview</a>
                         </li>
+                        <li>
+                            <a href="{% url 'course_content' group_id %}" {% if title == 'course content' %}class="selected"{% endif %}>Course Content</a>
+                        </li>
                         <li >
                             <a href="{% url 'unit_detail' group_id %}" {% if title == 'unit_authoring' %}class="selected"{% endif %}>Lessons</a>
                         </li>
@@ -97,6 +100,11 @@
                     <div id="group_overview">
                         {% if title == "about" %}
                             {% include "ndf/course_about.html" %}
+                        {% endif %}
+                    </div>
+                    <div id="group_course_content">
+                        {% if title == "course content" %}
+                            {% include "ndf/course_content.html" %}
                         {% endif %}
                     </div>
                     <div id="group_pages">
