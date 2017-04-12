@@ -28,7 +28,7 @@ def create_users_dump(path, user_id_list):
         if user_obj:
             each_user_json = user_json.copy()
             each_user_json['user_id'] = user_obj.id
-            each_user_json['user_name'] = user_obj.name
+            each_user_json['user_name'] = user_obj.username
             # for email
             user_email_val = user_obj.email
             if user_email_val == '':
