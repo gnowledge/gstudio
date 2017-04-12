@@ -7,8 +7,8 @@
 
     <div class="card_summary">
         <div class="card_section">
-            <p class="module_brief">
-                {{node.content|safe}}
+            <p class="module_brief" title="{{node.content|safe}}">
+                {{node.content|safe|truncatechars:30}}
             </p>
         </div>
         <div class="card_section">
