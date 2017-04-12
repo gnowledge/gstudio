@@ -6975,13 +6975,3 @@ def remove_related_doc(request, group_id):
     rel_node = triple_collection.one({'right_subject':ObjectId(selected_obj),'subject':ObjectId(node_obj.pk)})
     delete_grelation(subject_id=ObjectId(node_obj.pk), deletion_type=1, **{'node_id': ObjectId(rel_node._id)})
     return HttpResponse('success')
-
-def if_relation_exists(request, group_id):
-    node = request.POST.get('node_id', None)
-    rel_name = request.POST.get('rel_name', None)
-    node_obj = node_collection.one({'_id':ObjectId(node)})
-    rel_cur =  get_relation_value(ObjectId(node_obj._id),rel_name)
-    if rel_cur['grel_id']:
-      return HttpResponse('success')
-    else:
-      return HttpResponse('fail')

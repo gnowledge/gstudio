@@ -26,8 +26,10 @@
                             <span class="activity-name"><!-- Activity Name --></span>
                         </div>
                     <div class="row">
-                        <a style="display:none" class="view-admin-page right orange-button-template" data-current-activity-id="" > View Teacher's page</a>
-                        <a style="display:none" class="view-help-page right orange-button-template" data-current-activity-id="" > View Help page</a>
+                        {% comment %}
+                        <a  class="view-admin-page right orange-button-template" data-current-activity-id="" > View Teacher's page</a>
+                        <a  class="view-help-page right orange-button-template" data-current-activity-id="" > View Help page</a>
+                        {% endcomment %}
                         <a style="margin-top:10px!important" class="save_edit_activity right orange-button-template" data-current-activity-id="" > Edit </a>
                     </div>   
                      <!-- commenting following as activities now will be created/edited
@@ -734,8 +736,6 @@ This will not be used because now only existing activities will be added.
                   $('#activity-content').html(data_dict.content);
                    MathJax.Hub.Queue(["Typeset",MathJax.Hub,'activity-content']);
                     $("#info-page-area").html("");
-                    $(".view-admin-page").css('display','none')
-                    $(".view-help-page").css('display','none')
 
                   return true
               }
@@ -780,48 +780,8 @@ This will not be used because now only existing activities will be added.
             MathJax.Hub.Queue(["Typeset",MathJax.Hub,'actvity-editor-headerid']);
 
             getNodeData(activity_id);
-           
-            $.ajax({
-                      type: "POST",
-
-                      url: "{% url 'if_relation_exists' group_id %}",
-                      datatype: "html",
-                      data:{
-                        'csrfmiddlewaretoken': "{{csrf_token}}",
-                        'node_id':activity_id,
-                        'rel_name':'has_admin_page'
-
-                      },
-                        success: function(data) {
-                            if(data == "success"){
-                                $(".view-admin-page").css('display','block')
-                                
-                            }
-
-                      }
-            });
-
-            $.ajax({
-                      type: "POST",
-
-                      url: "{% url 'if_relation_exists' group_id %}",
-                      datatype: "html",
-                      data:{
-                        'csrfmiddlewaretoken': "{{csrf_token}}",
-                        'node_id':activity_id,
-                        'rel_name':'has_help'
-
-                      },
-                        success: function(data) {
-                        if(data == "success"){
-                        $(".view-help-page").css('display','block')
-                        }
-                      }
-            });
-
-            $(".view-admin-page").click(function(event){
-                          
-                $.ajax({
+     
+              $.ajax({
                       type: "POST",
 
                       url: "{% url 'get_info_pages' group_id %}",
@@ -835,14 +795,10 @@ This will not be used because now only existing activities will be added.
                         success: function(data) {
                         // $('#info-page-area').html(data);
                         parent = $("#info-page-area");
-                        parent.html(data);
-                        $('html,body').animate({
-                          scrollTop: $("#info-page-area").offset().top},'slow');
+                        parent.append(data);
                       }
                     });
-            });
 
-            $(".view-help-page").click(function(event){
                           
                 $.ajax({
                       type: "POST",
@@ -858,12 +814,9 @@ This will not be used because now only existing activities will be added.
                         success: function(data) {
                         // $('#info-page-area').html(data);
                         parent = $("#info-page-area");
-                        parent.html(data);
-                        $('html,body').animate({
-                          scrollTop: $("#info-page-area").offset().top},'slow');
+                        parent.append(data);
                       }
                     });
-            });
             
             $('.save_edit_activity').attr('href', "{% url 'edit_course_page' group_id 'activity_id' %}".replace('activity_id', activity_id))
             $('.save_edit_activity').attr('data-current-activity-id', activity_id);

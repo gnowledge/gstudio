@@ -36,7 +36,7 @@
 
   <script type="text/javascript">
     $(".related-content-title").on('click', function(){
-      $(this).closest('#related-content').toggleClass('content-expanded');
+      $(this).closest('#related-content').addClass('content-expanded');
     });
     $('.related-content-close').on('click', function(e){
       e.stopPropagation();
