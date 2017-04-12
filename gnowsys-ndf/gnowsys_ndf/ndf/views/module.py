@@ -35,7 +35,7 @@ def list_modules(request, group_id):
     context_variable = {
                         'title': 'Modules', 'doc_cur': all_modules,
                         'group_id': group_id, 'groupid': group_id,
-                        'card': 'ndf/event_card.html', 'card_url_name': 'module_detail'
+                        'card': 'ndf/horizontal_card.html', 'card_url_name': 'module_detail'
                     }
 
     return render_to_response(
