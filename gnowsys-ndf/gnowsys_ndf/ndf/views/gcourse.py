@@ -2060,12 +2060,13 @@ def course_content(request, group_id):
     group_obj   = get_group_name_id(group_id, get_obj=True)
     group_id    = group_obj._id
     group_name  = group_obj.name
-
     allow_to_join = get_group_join_status(group_obj)
     template = 'ndf/gcourse_event_group.html'
-
+    unit_structure =  _get_unit_hierarchy(group_obj)
     if 'BaseCourseGroup' in group_obj.member_of_names_list:
         template = 'ndf/basecourse_group.html'
+    if 'base_unit' in group_obj.member_of_names_list:
+        template = 'ndf/gevent_base.html'
     banner_pic_obj,old_profile_pics = _get_current_and_old_display_pics(group_obj)
     '''
     banner_pic_obj = None
@@ -2092,7 +2093,8 @@ def course_content(request, group_id):
             'group_id': group_id, 'groupid': group_id, 'group_name':group_name,
             'group_obj': group_obj,'node': group_obj, 'title': 'course content',
             'allow_to_join': allow_to_join,
-            'old_profile_pics':old_profile_pics, "prof_pic_obj": banner_pic_obj
+            'old_profile_pics':old_profile_pics, "prof_pic_obj": banner_pic_obj,
+            'unit_structure': json.dumps(unit_structure,cls=NodeJSONEncoder)
             })
     return render_to_response(template, context_variables)
 
@@ -2365,7 +2367,7 @@ def course_gallery(request, group_id,node_id=None,page_no=1):
 
 @get_execution_time
 def course_about(request, group_id):
-    group_obj   = get_group_name_id(group_id, get_obj=True)
+    group_obj   = Group.get_group_name_id(group_id, get_obj=True)
     group_id    = group_obj._id
     group_name  = group_obj.name
 
@@ -2385,6 +2387,7 @@ def course_about(request, group_id):
 
       # print 'Weeks:', (end_day - start_day).days / 7
       weeks_count = (end_day - start_day).days / 7
+    
     show_analytics_notifications = True
     template = 'ndf/gcourse_event_group.html'
     context_variables = {
@@ -3285,3 +3288,56 @@ def delete_activity_page(request, group_id):
     return HttpResponse('fail')
 
 
+def _get_unit_hierarchy(unit_group_obj):
+    '''
+    ARGS: unit_group_obj
+    Result will be of following form:
+    {
+        name: 'Lesson1',
+        type: 'lesson',
+        id: 'l1',
+        activities: [
+            {
+                name: 'Activity 1',
+                type: 'activity',
+                id: 'a1'
+            },
+            {
+                name: 'Activity 1',
+                type: 'activity',
+                id: 'a2'
+            }
+        ]
+    }, {
+        name: 'Lesson2',
+        type: 'lesson',
+        id: 'l2',
+        activities: [
+            {
+                name: 'Activity 1',
+                type: 'activity',
+                id: 'a1'
+            }
+        ]
+    }
+    '''
+    unit_structure = []
+    for each in unit_group_obj.collection_set:
+        lesson_dict ={}
+        lesson = Node.get_node_by_id(each)
+        if lesson:
+            lesson_dict['label'] = lesson.name
+            lesson_dict['id'] = lesson._id
+            lesson_dict['type'] = 'unit-name'
+            lesson_dict['children'] = []
+            if lesson.collection_set:
+                for each_act in lesson.collection_set:
+                    activity_dict ={}
+                    activity = Node.get_node_by_id(each_act)
+                    if activity:
+                        activity_dict['label'] = activity.name
+                        activity_dict['type'] = 'activity-group'
+                        activity_dict['id'] = str(activity._id)
+                        lesson_dict['children'].append(activity_dict)
+            unit_structure.append(lesson_dict)
+    return unit_structure
