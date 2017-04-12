@@ -32,7 +32,7 @@ def create_users_dump(path, user_id_list):
             # for email
             user_email_val = user_obj.email
             if user_email_val == '':
-                user_email_val = user_obj.name
+                user_email_val = user_obj.username
             each_user_json['user_email'] = user_email_val
             each_user_json['user_author_id'] = str(each_auth._id)
             user_json_list.append(each_user_json)
