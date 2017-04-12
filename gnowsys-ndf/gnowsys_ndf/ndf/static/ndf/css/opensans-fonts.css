@@ -1,7 +1,7 @@
 @font-face {
     font-family: 'OpenSans-Bold';
     src: url('/static/ndf/bower_components/open-sans-fontface/fonts/Bold/OpenSans-Bold.ttf') format('truetype');
-    src: url('/static/ndf/bower_components/open-sans-fontface/fonts/Bold/BOpenSans-Bold.woff') format('woff');
+    src: url('/static/ndf/bower_components/open-sans-fontface/fonts/Bold/OpenSans-Bold.woff') format('woff');
     font-weight: normal;
     font-style: normal;
 
