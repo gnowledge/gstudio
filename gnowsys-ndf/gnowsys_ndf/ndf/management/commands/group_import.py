@@ -96,10 +96,13 @@ def check_group_availability():
     global log_file
     if group_node:
         confirm_grp_data_merge = raw_input("Dump Group already exists here. Would you like to merge the data ?")
-        if confirm_grp_data_merge != 'y' or confirm_grp_data_merge != 'Y':
+        if confirm_grp_data_merge != 'y' and confirm_grp_data_merge != 'Y':
             log_file.write("\n Group with Restore Group ID is FOUND on Target system.")
             print "\n Group with restoration ID already exists."
             call_exit()
+        else:
+            log_file.write("\n Group Merge confirmed.")
+            print " Proceeding to restore."
     else:
         log_file.write("\n Group with Restore Group ID NOT found on Target system.")
         print "\n Group with restoration ID does not exists."
@@ -199,14 +202,18 @@ def restore_filehive_objects(rcs_filehives_path):
             if not fh_obj:
                 copy_version_file(filepath)
                 log_file.write("\nRCS file copied : \n\t" + str(filepath) )
+                try:
+                    log_file.write("\nInserting new Filehive Object : \n\tNew-obj: " + \
+                        str(fh_json))
+                    node_id = filehive_collection.collection.insert(fh_json)
+                    # print "\n fh_json: ", fh_json
+                    fh_obj = filehive_collection.one({'_id': node_id})
 
-                filehive_collection.collection.insert(fh_json)
-                log_file.write("\nInserted new Filehive Object : \n\tNew-obj: " + \
-                    str(fh_json))
-                print "\n fh_json: ", fh_json
-                fh_obj = filehive_collection.one({'_id': ObjectId(fh_json['_id'])})
-                fh_obj.save()
-                log_file.write("\nUpdate RCS using save()")
+                    fh_obj.save()
+                    log_file.write("\nUpdate RCS using save()")
+                except Exception as fh_insert_err:
+                    log_file.write("\nError while inserting FH obj" + str(fh_insert_err))
+                    pass
             else:
                 log_file.write("\nFound Existing Filehive Object : \n\tFound-obj: " + \
                     str(fh_obj) + "\n\tExiting-obj: "+str(fh_json))
@@ -225,67 +232,72 @@ def restore_node_objects(rcs_nodes_path):
                 log_file.write("\nFound Existing Node : " + str(node_obj._id))
                 node_changed = False
                 if node_obj.author_set != node_json['author_set'] and node_json['author_set']:
-                    log_file.write("\n Old author_set :\n\t ", str(node_obj.author_set))
+                    log_file.write("\n Old author_set :\n\t " + str(node_obj.author_set))
                     merge_lists_and_maintain_unique_ele(node_obj.author_set,
                         node_json['author_set'])
-                    log_file.write("\n New author_set :\n\t ", str(node_obj.author_set))
+                    log_file.write("\n New author_set :\n\t "+ str(node_obj.author_set))
                     node_changed = True
 
                 if node_obj.relation_set != node_json['relation_set'] and node_json['relation_set']:
-                    log_file.write("\n Old relation_set :\n\t ", str(node_obj.relation_set))
+                    log_file.write("\n Old relation_set :\n\t "+ str(node_obj.relation_set))
                     merge_lists_and_maintain_unique_ele(node_obj.relation_set,
-                        node_json['relation_set'])
-                    log_file.write("\n New relation_set :\n\t ", str(node_obj.relation_set))
+                        node_json['relation_set'], advanced_merge=True)
+                    log_file.write("\n New relation_set :\n\t "+ str(node_obj.relation_set))
                     node_changed = True
 
                 if node_obj.attribute_set != node_json['attribute_set'] and node_json['attribute_set']:
-                    log_file.write("\n Old attribute_set :\n\t ", str(node_obj.attribute_set))
+                    log_file.write("\n Old attribute_set :\n\t "+ str(node_obj.attribute_set))
                     merge_lists_and_maintain_unique_ele(node_obj.attribute_set,
-                        node_json['attribute_set'])
-                    log_file.write("\n New attribute_set :\n\t ", str(node_obj.attribute_set))
+                        node_json['attribute_set'], advanced_merge=True)
+                    log_file.write("\n New attribute_set :\n\t "+ str(node_obj.attribute_set))
                     node_changed = True
 
                 if node_obj.post_node != node_json['post_node'] and node_json['post_node']:
-                    log_file.write("\n Old post_node :\n\t ", str(node_obj.post_node))
+                    log_file.write("\n Old post_node :\n\t "+ str(node_obj.post_node))
                     merge_lists_and_maintain_unique_ele(node_obj.post_node,
                         node_json['post_node'])
-                    log_file.write("\n New post_node :\n\t ", str(node_obj.post_node))
+                    log_file.write("\n New post_node :\n\t "+ str(node_obj.post_node))
                     node_changed = True
 
                 if node_obj.prior_node != node_json['prior_node'] and node_json['prior_node']:
-                    log_file.write("\n Old prior_node :\n\t ", str(node_obj.prior_node))
+                    log_file.write("\n Old prior_node :\n\t "+ str(node_obj.prior_node))
                     merge_lists_and_maintain_unique_ele(node_obj.prior_node,
                         node_json['prior_node'])
-                    log_file.write("\n New prior_node :\n\t ", str(node_obj.prior_node))
+                    log_file.write("\n New prior_node :\n\t "+ str(node_obj.prior_node))
                     node_changed = True
 
                 if node_obj.origin != node_json['origin'] and node_json['origin']:
-                    log_file.write("\n Old origin :\n\t ", str(node_obj.origin))
+                    log_file.write("\n Old origin :\n\t "+ str(node_obj.origin))
                     merge_lists_and_maintain_unique_ele(node_obj.origin,
                         node_json['origin'])
-                    log_file.write("\n New origin :\n\t ", str(node_obj.origin))
+                    log_file.write("\n New origin :\n\t "+ str(node_obj.origin))
                     node_changed = True
 
                 if node_obj.collection_set != node_json['collection_set'] and node_json['collection_set']:
-                    log_file.write("\n Old collection_set :\n\t ", str(node_obj.collection_set))
+                    log_file.write("\n Old collection_set :\n\t "+ str(node_obj.collection_set))
                     merge_lists_and_maintain_unique_ele(node_obj.collection_set,
                         node_json['collection_set'])
-                    log_file.write("\n New collection_set :\n\t ", str(node_obj.collection_set))
+                    log_file.write("\n New collection_set :\n\t "+ str(node_obj.collection_set))
                     node_changed = True
 
                 if node_changed:
-                    log_file.write("\n Node Updated: \n\t OLD: " + str(n), + "\n\tNew: "+str(data))
+                    log_file.write("\n Node Updated: \n\t OLD: " + str(node_obj) + "\n\tNew: "+str(node_json))
                     node_obj.save()
             else:
                 copy_version_file(filepath)
                 log_file.write("\n RCS file copied : \n\t" + str(filepath))
                 node_json = update_schema_and_user_ids(node_json)
-                print "\nnode_json: ", node_json
-                node_collection.collection.insert(node_json)
-                log_file.write("\n Inserted Node doc : \n\t" + str(node_json))
-                node_obj = node_collection.one({'_id': ObjectId(node_json['_id'])})
-                node_obj.save(groupid=ObjectId(CONFIG_VARIABLES.GROUP_ID))
-                log_file.write("\nUpdate RCS using save()")
+                # print "\nnode_json: ", node_json
+                try:
+                    log_file.write("\n Inserting Node doc : \n\t" + str(node_json))
+                    node_id = node_collection.collection.insert(node_json)
+                    node_obj = node_collection.one({'_id': node_id})
+                    node_obj.save(groupid=ObjectId(CONFIG_VARIABLES.GROUP_ID))
+                    log_file.write("\nUpdate RCS using save()")
+                except Exception as node_insert_err:
+                    log_file.write("\nError while inserting Node obj" + str(node_insert_err))
+                    pass
+
 
 def restore_triple_objects(rcs_triples_path):
     print "\nRestoring Triples.."
@@ -332,18 +344,22 @@ def restore_triple_objects(rcs_triples_path):
                 log_file.write("\n RCS file copied : \n\t" + str(filepath))
 
                 triple_json = update_schema_id_for_triple(triple_json)
-                triple_collection.collection.insert(triple_json)
-                log_file.write("\n Inserted Triple doc : " + str(triple_json))
+                try:
+                    log_file.write("\n Inserting Triple doc : " + str(triple_json))
+                    node_id = triple_collection.collection.insert(triple_json)
+                    triple_obj = triple_collection.one({'_id': node_id})
+                    triple_node_RT_AT_id = None
+                    if 'attribute_type' in triple_json:
+                        triple_node_RT_AT_id = triple_json['attribute_type']
+                    else:
+                        triple_node_RT_AT_id = triple_json['relation_type']
+                    triple_node_RT_AT = node_collection.one({'_id': ObjectId(triple_node_RT_AT_id)})
+                    triple_obj.save(triple_node=triple_node_RT_AT, triple_id=triple_node_RT_AT._id)
+                    log_file.write("\nUpdate RCS using save()")
+                except Exception as tr_insert_err:
+                    log_file.write("\nError while inserting Triple obj" + str(tr_insert_err))
+                    pass
 
-                triple_obj = triple_collection.one({'_id': ObjectId(triple_json['_id'])})
-                triple_node_RT_AT_id = None
-                if 'attribute_type' in triple_json:
-                    triple_node_RT_AT_id = triple_json['attribute_type']
-                else:
-                    triple_node_RT_AT_id = triple_json['relation_type']
-                triple_node_RT_AT = node_collection.one({'_id': ObjectId(triple_node_RT_AT_id)})
-                triple_obj.save(triple_node=triple_node_RT_AT, triple_id=triple_node_RT_AT._id)
-                log_file.write("\nUpdate RCS using save()")
 
 
 def restore_counter_objects(rcs_counters_path):
@@ -359,117 +375,120 @@ def restore_counter_objects(rcs_counters_path):
                 counter_changed = False
                 log_file.write("\nFound Existing Counter Object : " + str(c._id))
 
-                # if counter_obj.last_update != data['last_update'] :
-                #     counter_obj.last_update = data['last_update']
+                # if counter_obj.last_update != counter_json['last_update'] :
+                #     counter_obj.last_update = counter_json['last_update']
                 #     counter_changed = True
 
-                if counter_obj.enrolled != data['enrolled'] :
-                    counter_obj.enrolled = data['enrolled']
+                if counter_obj.enrolled != counter_json['enrolled'] :
+                    counter_obj.enrolled = counter_json['enrolled']
                     counter_changed = True
 
-                if counter_obj.modules_completed != data['modules_completed'] :
-                    counter_obj.modules_completed = data['modules_completed']
+                if counter_obj.modules_completed != counter_json['modules_completed'] :
+                    counter_obj.modules_completed = counter_json['modules_completed']
                     counter_changed = True
 
-                if counter_obj.course_score != data['course_score'] :
-                    counter_obj.course_score = data['course_score']
+                if counter_obj.course_score != counter_json['course_score'] :
+                    counter_obj.course_score = counter_json['course_score']
                     counter_changed = True
 
-                if counter_obj.units_completed != data['units_completed'] :
-                    counter_obj.units_completed = data['units_completed']
+                if counter_obj.units_completed != counter_json['units_completed'] :
+                    counter_obj.units_completed = counter_json['units_completed']
                     counter_changed = True
 
-                if counter_obj.no_comments_by_user != data['no_comments_by_user'] :
-                    counter_obj.no_comments_by_user = data['no_comments_by_user']
+                if counter_obj.no_comments_by_user != counter_json['no_comments_by_user'] :
+                    counter_obj.no_comments_by_user = counter_json['no_comments_by_user']
                     counter_changed = True
 
-                if counter_obj.no_comments_for_user != data['no_comments_for_user'] :
-                    counter_obj.no_comments_for_user = data['no_comments_for_user']
+                if counter_obj.no_comments_for_user != counter_json['no_comments_for_user'] :
+                    counter_obj.no_comments_for_user = counter_json['no_comments_for_user']
                     counter_changed = True
 
-                if counter_obj.no_files_created != data['no_files_created'] :
-                    counter_obj.no_files_created = data['no_files_created']
+                if counter_obj.no_files_created != counter_json['no_files_created'] :
+                    counter_obj.no_files_created = counter_json['no_files_created']
                     counter_changed = True
 
-                if counter_obj.no_visits_gained_on_files != data['no_visits_gained_on_files'] :
-                    counter_obj.no_visits_gained_on_files = data['no_visits_gained_on_files']
+                if counter_obj.no_visits_gained_on_files != counter_json['no_visits_gained_on_files'] :
+                    counter_obj.no_visits_gained_on_files = counter_json['no_visits_gained_on_files']
                     counter_changed = True
 
-                if counter_obj.no_comments_received_on_files != data['no_comments_received_on_files'] :
-                    counter_obj.no_comments_received_on_files = data['no_comments_received_on_files']
+                if counter_obj.no_comments_received_on_files != counter_json['no_comments_received_on_files'] :
+                    counter_obj.no_comments_received_on_files = counter_json['no_comments_received_on_files']
                     counter_changed = True
 
-                if counter_obj.no_others_files_visited != data['no_others_files_visited'] :
-                    counter_obj.no_others_files_visited = data['no_others_files_visited']
+                if counter_obj.no_others_files_visited != counter_json['no_others_files_visited'] :
+                    counter_obj.no_others_files_visited = counter_json['no_others_files_visited']
                     counter_changed = True
 
-                if counter_obj.no_comments_on_others_files != data['no_comments_on_others_files'] :
-                    counter_obj.no_comments_on_others_files = data['no_comments_on_others_files']
+                if counter_obj.no_comments_on_others_files != counter_json['no_comments_on_others_files'] :
+                    counter_obj.no_comments_on_others_files = counter_json['no_comments_on_others_files']
                     counter_changed = True
 
-                if counter_obj.rating_count_received_on_files != data['rating_count_received_on_files'] :
-                    counter_obj.rating_count_received_on_files = data['rating_count_received_on_files']
+                if counter_obj.rating_count_received_on_files != counter_json['rating_count_received_on_files'] :
+                    counter_obj.rating_count_received_on_files = counter_json['rating_count_received_on_files']
                     counter_changed = True
 
-                if counter_obj.avg_rating_received_on_files != data['avg_rating_received_on_files'] :
-                    counter_obj.avg_rating_received_on_files = data['avg_rating_received_on_files']
+                if counter_obj.avg_rating_received_on_files != counter_json['avg_rating_received_on_files'] :
+                    counter_obj.avg_rating_received_on_files = counter_json['avg_rating_received_on_files']
                     counter_changed = True
 
-                if counter_obj.no_questions_attempted != data['no_questions_attempted'] :
-                    counter_obj.no_questions_attempted = data['no_questions_attempted']
+                if counter_obj.no_questions_attempted != counter_json['no_questions_attempted'] :
+                    counter_obj.no_questions_attempted = counter_json['no_questions_attempted']
                     counter_changed = True
 
-                if counter_obj.no_correct_answers != data['no_correct_answers'] :
-                    counter_obj.no_correct_answers = data['no_correct_answers']
+                if counter_obj.no_correct_answers != counter_json['no_correct_answers'] :
+                    counter_obj.no_correct_answers = counter_json['no_correct_answers']
                     counter_changed = True
 
-                if counter_obj.no_incorrect_answers != data['no_incorrect_answers'] :
-                    counter_obj.no_incorrect_answers = data['no_incorrect_answers']
+                if counter_obj.no_incorrect_answers != counter_json['no_incorrect_answers'] :
+                    counter_obj.no_incorrect_answers = counter_json['no_incorrect_answers']
                     counter_changed = True
 
-                if counter_obj.no_notes_written != data['no_notes_written'] :
-                    counter_obj.no_notes_written = data['no_notes_written']
+                if counter_obj.no_notes_written != counter_json['no_notes_written'] :
+                    counter_obj.no_notes_written = counter_json['no_notes_written']
                     counter_changed = True
 
-                if counter_obj.no_views_gained_on_notes != data['no_views_gained_on_notes'] :
-                    counter_obj.no_views_gained_on_notes = data['no_views_gained_on_notes']
+                if counter_obj.no_views_gained_on_notes != counter_json['no_views_gained_on_notes'] :
+                    counter_obj.no_views_gained_on_notes = counter_json['no_views_gained_on_notes']
                     counter_changed = True
 
-                if counter_obj.no_others_notes_visited != data['no_others_notes_visited'] :
-                    counter_obj.no_others_notes_visited = data['no_others_notes_visited']
+                if counter_obj.no_others_notes_visited != counter_json['no_others_notes_visited'] :
+                    counter_obj.no_others_notes_visited = counter_json['no_others_notes_visited']
                     counter_changed = True
 
-                if counter_obj.no_comments_received_on_notes != data['no_comments_received_on_notes'] :
-                    counter_obj.no_comments_received_on_notes = data['no_comments_received_on_notes']
+                if counter_obj.no_comments_received_on_notes != counter_json['no_comments_received_on_notes'] :
+                    counter_obj.no_comments_received_on_notes = counter_json['no_comments_received_on_notes']
                     counter_changed = True
 
-                if counter_obj.no_comments_on_others_notes != data['no_comments_on_others_notes'] :
-                    counter_obj.no_comments_on_others_notes = data['no_comments_on_others_notes']
+                if counter_obj.no_comments_on_others_notes != counter_json['no_comments_on_others_notes'] :
+                    counter_obj.no_comments_on_others_notes = counter_json['no_comments_on_others_notes']
                     counter_changed = True
 
-                if counter_obj.rating_count_received_on_notes != data['rating_count_received_on_notes'] :
-                    counter_obj.rating_count_received_on_notes = data['rating_count_received_on_notes']
+                if counter_obj.rating_count_received_on_notes != counter_json['rating_count_received_on_notes'] :
+                    counter_obj.rating_count_received_on_notes = counter_json['rating_count_received_on_notes']
                     counter_changed = True
 
-                if counter_obj.avg_rating_received_on_notes != data['avg_rating_received_on_notes'] :
-                    counter_obj.avg_rating_received_on_notes = data['avg_rating_received_on_notes']
+                if counter_obj.avg_rating_received_on_notes != counter_json['avg_rating_received_on_notes'] :
+                    counter_obj.avg_rating_received_on_notes = counter_json['avg_rating_received_on_notes']
                     counter_changed = True
 
-                if counter_obj.comments_by_others_on_files != data['comments_by_others_on_files'] and data['comments_by_others_on_files']:
-                    n.comments_by_others_on_files.extend(data['comments_by_others_on_files'])
+                if counter_obj.comments_by_others_on_files != counter_json['comments_by_others_on_files'] and counter_json['comments_by_others_on_files']:
+                    n.comments_by_others_on_files.extend(counter_json['comments_by_others_on_files'])
                     counter_changed = True
 
-                if counter_obj.comments_by_others_on_notes != data['comments_by_others_on_notes'] and data['comments_by_others_on_notes']:
-                    n.comments_by_others_on_notes.extend(data['comments_by_others_on_notes'])
+                if counter_obj.comments_by_others_on_notes != counter_json['comments_by_others_on_notes'] and counter_json['comments_by_others_on_notes']:
+                    n.comments_by_others_on_notes.extend(counter_json['comments_by_others_on_notes'])
                     counter_changed = True
 
                 if counter_changed:
-                    log_file.write("\n Counter Updated: \n\t OLD: " + str(counter_obj), + "\n\tNew: "+str(data))
+                    log_file.write("\n Counter Updated: \n\t OLD: " + str(counter_obj), + "\n\tNew: "+str(counter_json))
                     counter_obj.save()
             else:
-                print "Inserting Counter doc"
-                log_file.write("\n Inserting Counter doc : " + str(data))
-                counter_collection.collection.insert(data)
+                try:
+                    log_file.write("\n Inserting Counter doc : " + str(counter_json))
+                    node_id = counter_collection.collection.insert(counter_json)
+                except Exception as counter_insert_err:
+                    log_file.write("\nError while inserting Counter obj" + str(counter_insert_err))
+                    pass
 
 def call_group_import(rcs_repo_path):
 
@@ -514,7 +533,7 @@ class Command(BaseCommand):
             global log_file
             log_file.write("\nUpdated CONFIG_VARIABLES: "+ str(CONFIG_VARIABLES))
             print "\n Validating the data-dump"
-            validate_data_dump()
+            # validate_data_dump()
             print "\n Checking the dump Group-id availability."
             check_group_availability()
             print "\n User Restoration."
@@ -532,27 +551,27 @@ class Command(BaseCommand):
 
 def hook(d):
     # This decoder will be moved to models next to class NodeJSONEncoder
-    if 'uploaded_at' in d:
+    if u'uploaded_at' in d:
         d['uploaded_at'] = datetime.datetime.fromtimestamp(d['uploaded_at']/1e3)
-    if 'last_update' in d:
+    if u'last_update' in d:
         d['last_update'] = datetime.datetime.fromtimestamp(d['last_update']/1e3)
-    if 'created_at' in d:
+    if u'created_at' in d:
         d['created_at'] = datetime.datetime.fromtimestamp(d['created_at']/1e3)
-    if '_id' in d:
+    if u'_id' in d:
         d['_id'] = ObjectId(d['_id']['$oid'])
-    if 'auth_id' in d:
+    if u'auth_id' in d:
         d['auth_id'] = ObjectId(d['auth_id']['$oid'])
-    if 'group_id' in d:
+    if u'group_id' in d:
         d['group_id'] = ObjectId(d['group_id']['$oid'])
-    if 'attribute_type' in d:
+    if u'attribute_type' in d:
         d['attribute_type'] = ObjectId(d['attribute_type']['$oid'])
-    if 'relation_type' in d:
+    if u'relation_type' in d:
         d['relation_type'] = ObjectId(d['relation_type']['$oid'])
-    if 'first_parent' in d:
+    if u'first_parent' in d:
         d['first_parent'] = ObjectId(d['first_parent']['$oid'])
-    if 'subject' in d:
+    if u'subject' in d:
         d['subject'] = ObjectId(d['subject']['$oid'])
-    if 'right_subject' in d:
+    if u'right_subject' in d:
         if isinstance(d['right_subject'], list):
             rs_list = []
             for each_rs in d['right_subject']:
@@ -560,49 +579,54 @@ def hook(d):
             d['right_subject'] = rs_list
         else:
             d['right_subject'] = ObjectId(d['right_subject']['$oid'])
-    if 'relation_set' in d:
+    if u'relation_set' in d:
         for each_relation_dict in d['relation_set']:
             for each_key, each_val in each_relation_dict.iteritems():
                 rset_list = []
                 for each_id in each_val:
                     rset_list.append(ObjectId(each_id[u'$oid']))
                 each_relation_dict[each_key] = rset_list
-    if 'member_of' in d:
+    if u'attribute_set' in d:
+        for each_attr_dict in d['attribute_set']:
+            for each_key, each_val in each_attr_dict.iteritems():
+                if each_key in ["start_time", "end_time", "start_enroll", "end_enroll"]:
+                    each_attr_dict[each_key] = datetime.datetime.fromtimestamp(d[each_key]/1e3)
+    if u'member_of' in d:
         mem_list = []
         for each_mem_of in d['member_of']:
             mem_list.append(ObjectId(each_mem_of['$oid']))
         d['member_of'] = mem_list
-    if 'type_of' in d:
+    if u'type_of' in d:
         type_of_list = []
         for each_type_of in d['type_of']:
             type_of_list.append(ObjectId(each_type_of['$oid']))
         d['type_of'] = type_of_list
-    if 'group_set' in d:
+    if u'group_set' in d:
         group_set_list = []
         for each_group_id in d['group_set']:
             group_set_list.append(ObjectId(each_group_id['$oid']))
         d['group_set'] = group_set_list
 
-    if 'collection_set' in d:
+    if u'collection_set' in d:
         collection_set_list = []
         for each_node_id in d['collection_set']:
             collection_set_list.append(ObjectId(each_node_id['$oid']))
         d['collection_set'] = collection_set_list
 
-    if 'prior_node' in d:
+    if u'prior_node' in d:
         prior_node_list = []
         for each_prior_node_id in d['prior_node']:
             prior_node_list.append(ObjectId(each_prior_node_id['$oid']))
         d['prior_node'] = prior_node_list
 
-    if 'post_node' in d:
+    if u'post_node' in d:
         post_node_list = []
         for each_post_node_id in d['post_node']:
             post_node_list.append(ObjectId(each_post_node_id['$oid']))
         d['post_node'] = post_node_list
 
 
-    if 'if_file' in d:
+    if u'if_file' in d:
         # 'if_file': {
         #                 'mime_type': basestring,
         #                 'original': {'id': ObjectId, 'relurl': basestring},
