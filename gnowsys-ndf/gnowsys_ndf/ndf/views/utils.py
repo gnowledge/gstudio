@@ -60,11 +60,23 @@ def replace_in_list(list_to_update, old_val, new_val, append_if_not=False):
     # finally:
     #     return list_to_update
 
-def merge_lists_and_maintain_unique_ele(list_a, list_b):
+def merge_lists_and_maintain_unique_ele(list_a, list_b, advanced_merge=False):
     '''
     Merge 2 lists list_a and list_b and remove
     duplicate elements and return the result list.
     '''
-
-    merged_list = list(set(list_a) | set(list_b))
+    if advanced_merge:
+        concat_list = list_a + list_b
+        merged_list = []
+        flat_dict = {}
+        for each_dict in concat_list:
+            for key,val in each_dict.iteritems():
+                if key in flat_dict:
+                    flat_dict[key].extend(val)
+                else:
+                    flat_dict.update({key:val})
+        for key,val in flat_dict.iteritems():
+            merged_list.append({key:val})
+    else:
+        merged_list = list(set(list_a) | set(list_b))
     return merged_list
