@@ -173,7 +173,7 @@ class Command(BaseCommand):
                 # import ipdb; ipdb.set_trace()
                 global GROUP_CONTRIBUTORS
                 if RESTORE_USER_DATA:
-                    print "\n Total GROUP_CONTRIBUTORS: ", len(GROUP_CONTRIBUTORS)
+                    print "\n Total Group_CONTRIBUTORS: ", len(GROUP_CONTRIBUTORS)
                     GROUP_CONTRIBUTORS = list(set(GROUP_CONTRIBUTORS))
                     create_users_dump(group_dump_path, GROUP_CONTRIBUTORS)
 
@@ -412,9 +412,10 @@ def get_nested_ids(node,field_name):
     if node[field_name]:
         for each_id in node[field_name]:
             each_node = node_collection.one({"_id":ObjectId(each_id)})
-            dump_node(node=each_node, collection_name=node_collection)
-            if each_node and each_node[field_name]:
-                get_nested_ids(each_node, field_name)
+            if node._id != each_node._id:
+                dump_node(node=each_node, collection_name=node_collection)
+                if each_node and each_node[field_name]:
+                    get_nested_ids(each_node, field_name)
 
 def get_counter_ids(group_id):
     '''
