@@ -42,8 +42,8 @@
                     <div class="left course_heading">
                     <h5>Select Module</h5>
                     </div>
-                    <div class="right course_heading_unit">
-                         <select name="module" multiple="">
+                    <div class="right course_heading_unit" style="height:49px;">
+                         <select name="module" multiple style="height:46px;">
                             <option value="">Choose Module</option>
                             {% for opts in modules %}
                                 <option value="{{opts.pk}}" {% if opts.pk in module_val_list %} selected {% endif %}>{{opts.name}}</option>
