@@ -28,12 +28,13 @@ RESTORE_USER_DATA = False
 log_file = None
 historyMgr = HistoryManager()
 
-def create_log_file(dump_path):
+def create_log_file():
     '''
         Creates log file in gstudio-logs/ with 
         the name of the dump folder
     '''
-    dump_path = dump_path.split("/")[-1]
+    global DUMP_PATH
+    dump_path = DUMP_PATH.split("/")[-1]
     log_file_name = 'group_dump_' + str(dump_path)+ '.log'
     if not os.path.exists(GSTUDIO_LOGS_DIR_PATH):
         os.makedirs(GSTUDIO_LOGS_DIR_PATH)
@@ -158,7 +159,7 @@ class Command(BaseCommand):
                 group_dump_path = setup_dump_path(group_node.name)
                 create_factory_schema_mapper(group_dump_path)
                 configs_file_path = create_configs_file(group_node._id)
-                log_file_path = create_log_file(group_dump_path)
+                log_file_path = create_log_file()
 
                 print "*"*70
                 # print "\n Export will be found at: ", DATA_EXPORT_PATH
