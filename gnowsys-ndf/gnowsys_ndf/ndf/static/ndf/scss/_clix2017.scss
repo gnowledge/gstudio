@@ -3954,3 +3954,49 @@ $module-card-lines-to-show: 3;
     }
 }
 
+.course-content {
+    background: #fff;
+    margin: 20px auto;
+    padding: 20px 0px;
+
+    ul.jqtree-tree {
+        .course-tree-node {
+            &.jqtree-selected .jqtree-element{
+                background: #fff;
+            }
+            &>div{
+                height: 35px;
+                a {
+                    margin-right: 0.7em;
+                }
+            }
+        }
+    }
+
+    .course-unit-name {
+        padding-left: 20px;
+        &:not(:last-child){
+            border-bottom: 1px solid #d2cfcf;
+        }
+
+        >div {
+            .jqtree-title {
+                color: #3c5264;
+                font-size: 19px;
+                font-weight: 600;
+            }
+        }
+    }
+    .course-activity-group >div {
+        .jqtree-title {
+            color: #74a0c0;
+            font-size: 17px;
+        }
+    }
+    .course-activity-name >div {
+        .jqtree-title {
+            color: #74a0c0;
+            font-size: 17px;
+        }
+    }
+}

@@ -3785,3 +3785,46 @@ ul.nav_menu_1 li:hover {
   -webkit-line-clamp: 3;
   -webkit-box-orient: vertical;
 }
+
+/* line 3957, ../../../scss/_clix2017.scss */
+.course-content {
+  background: #fff;
+  margin: 20px auto;
+  padding: 20px 0px;
+}
+/* line 3964, ../../../scss/_clix2017.scss */
+.course-content ul.jqtree-tree .course-tree-node.jqtree-selected .jqtree-element {
+  background: #fff;
+}
+/* line 3967, ../../../scss/_clix2017.scss */
+.course-content ul.jqtree-tree .course-tree-node > div {
+  height: 35px;
+}
+/* line 3969, ../../../scss/_clix2017.scss */
+.course-content ul.jqtree-tree .course-tree-node > div a {
+  margin-right: 0.7em;
+}
+/* line 3976, ../../../scss/_clix2017.scss */
+.course-content .course-unit-name {
+  padding-left: 20px;
+}
+/* line 3978, ../../../scss/_clix2017.scss */
+.course-content .course-unit-name:not(:last-child) {
+  border-bottom: 1px solid #d2cfcf;
+}
+/* line 3983, ../../../scss/_clix2017.scss */
+.course-content .course-unit-name > div .jqtree-title {
+  color: #3c5264;
+  font-size: 19px;
+  font-weight: 600;
+}
+/* line 3991, ../../../scss/_clix2017.scss */
+.course-content .course-activity-group > div .jqtree-title {
+  color: #74a0c0;
+  font-size: 17px;
+}
+/* line 3997, ../../../scss/_clix2017.scss */
+.course-content .course-activity-name > div .jqtree-title {
+  color: #74a0c0;
+  font-size: 17px;
+}
