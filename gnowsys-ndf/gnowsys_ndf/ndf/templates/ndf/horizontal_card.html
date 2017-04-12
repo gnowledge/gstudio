@@ -1,8 +1,4 @@
 {% load i18n %}
-
-
-{# <h5>Module Card</h5> #}
-
 <div class="module_card">
     <div class="card_banner">
         <span class="card_title">{{node.name}}</span>
@@ -18,7 +14,7 @@
     <div class="card_summary">
         <div class="card_section">
             <p class="module_brief">
-                {{node.content}}
+                {{node.content|safe}}
             </p>
         </div>
         <div class="card_section">
