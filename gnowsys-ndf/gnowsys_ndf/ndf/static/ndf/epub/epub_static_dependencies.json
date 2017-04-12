@@ -1,8 +1,8 @@
 {
-	"Fonts": ["/static/ndf/bower_components/rubik-googlefont/Rubik-Black.ttf",
-		"/static/ndf/bower_components/rubik-googlefont/Rubik-Medium.ttf",
-		"/static/ndf/bower_components/rubik-googlefont/Rubik-Regular.ttf",
-		"/static/ndf/bower_components/rubik-googlefont/Rubik-Light.ttf"
+	"Fonts": ["/static/ndf/bower_components/open-sans-fontface/fonts/Bold/OpenSans-Bold.ttf",
+		"/static/ndf/bower_components/open-sans-fontface/fonts/Italic/OpenSans-Italic.ttf",
+		"/static/ndf/bower_components/open-sans-fontface/fonts/Regular/OpenSans-Regular.ttf",
+		"/static/ndf/bower_components/open-sans-fontface/fonts/Light/OpenSans-Light.ttf"
 	],
 	"Styles": ["/static/ndf/bower_components/foundation/css/foundation.css",
 	"/static/ndf/bower_components/videojs/dist/video-js.css",

@@ -22,19 +22,17 @@
                 <div class="activity-editor hide">
                     <!-- Right panel Header -->
                     <div class="actvity-editor-header editor-header" id="actvity-editor-headerid">
-                        <div class="left header-left activity-name-label">
+                        <div class="left header-left activity-name-label row">
                             <span class="activity-name"><!-- Activity Name --></span>
                         </div>
-
-                    <span data-dropdown="activity-settings-drop" aria-controls="activity-settings-drop" aria-expanded="false" class="large orange-button right">
-                        Actions <i class="fa fa-chevron-down"></i>
-                    </span>
-                    <ul id="activity-settings-drop" class="f-dropdown" data-dropdown-content aria-hidden="true" tabindex="-1">
-                        <li><a class="save_edit_activity" data-current-activity-id="" > Edit </a></li>
-                        <li><a class="view-admin-page" data-current-activity-id="" > View Teacher's page</a></li>
-                        <li><a class="view-help-page" data-current-activity-id="" > View Help page</a></li>
-                    </ul>
-                        <!-- commenting following as activities now will be created/edited
+                    <div class="row">
+                        {% comment %}
+                        <a  class="view-admin-page right orange-button-template" data-current-activity-id="" > View Teacher's page</a>
+                        <a  class="view-help-page right orange-button-template" data-current-activity-id="" > View Help page</a>
+                        {% endcomment %}
+                        <a style="margin-top:10px!important" class="save_edit_activity right orange-button-template" data-current-activity-id="" > Edit </a>
+                    </div>   
+                     <!-- commenting following as activities now will be created/edited
                         from activity area -->
                         <!--
                         <div class="right custom_dropdown">
@@ -737,7 +735,8 @@ This will not be used because now only existing activities will be added.
                   data_dict = JSON.parse(data);
                   $('#activity-content').html(data_dict.content);
                    MathJax.Hub.Queue(["Typeset",MathJax.Hub,'activity-content']);
-                    $("#info-page-area").html("");          
+                    $("#info-page-area").html("");
+
                   return true
               }
           });
@@ -781,10 +780,8 @@ This will not be used because now only existing activities will be added.
             MathJax.Hub.Queue(["Typeset",MathJax.Hub,'actvity-editor-headerid']);
 
             getNodeData(activity_id);
-            
-            $(".view-admin-page").click(function(event){
-                          
-                $.ajax({
+     
+              $.ajax({
                       type: "POST",
 
                       url: "{% url 'get_info_pages' group_id %}",
@@ -798,14 +795,10 @@ This will not be used because now only existing activities will be added.
                         success: function(data) {
                         // $('#info-page-area').html(data);
                         parent = $("#info-page-area");
-                        parent.html(data);
-                        $('html,body').animate({
-                          scrollTop: $("#info-page-area").offset().top},'slow');
+                        parent.append(data);
                       }
                     });
-            });
 
-            $(".view-help-page").click(function(event){
                           
                 $.ajax({
                       type: "POST",
@@ -821,12 +814,9 @@ This will not be used because now only existing activities will be added.
                         success: function(data) {
                         // $('#info-page-area').html(data);
                         parent = $("#info-page-area");
-                        parent.html(data);
-                        $('html,body').animate({
-                          scrollTop: $("#info-page-area").offset().top},'slow');
+                        parent.append(data);
                       }
                     });
-            });
             
             $('.save_edit_activity').attr('href', "{% url 'edit_course_page' group_id 'activity_id' %}".replace('activity_id', activity_id))
             $('.save_edit_activity').attr('data-current-activity-id', activity_id);
