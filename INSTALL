@@ -188,3 +188,12 @@
   (a) curl -sS https://dl.yarnpkg.com/debian/pubkey.gpg | sudo apt-key add -
   (b) echo "deb https://dl.yarnpkg.com/debian/ stable main" | sudo tee /etc/apt/sources.list.d/yarn.list
   (c) sudo apt-get update && sudo apt-get install yarn
+
+
+* Installing mongodb#3.2.4
+  (a) > sudo apt-key adv --keyserver hkp://keyserver.ubuntu.com:80 --recv 7F0CEB10
+  (b) > echo "deb http://repo.mongodb.org/apt/ubuntu trusty/mongodb-org/3.0 multiverse" | sudo tee /etc/apt/sources.list.d/mongodb-org-3.0.list
+  (c) > sudo apt-get update
+  (d) > sudo apt-get install -y mongodb-org=3.2.4 mongodb-org-server=3.2.4 mongodb-org-shell=3.2.4 mongodb-org-mongos=3.2.4 mongodb-org-tools=3.2.4
+  === OR ===
+  > sudo apt-get install -y --force-yes mongodb-org=3.2.4 mongodb-org-server=3.2.4 mongodb-org-shell=3.2.4 mongodb-org-mongos=3.2.4 mongodb-org-tools=3.2.4
