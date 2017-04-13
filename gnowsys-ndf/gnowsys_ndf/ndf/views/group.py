@@ -1189,7 +1189,7 @@ class CreateEventGroup(CreateModeratedGroup):
             return True, group_obj
 
         except Exception as e:
-            print "\n ", 'Cannot Set Dates to EventGroup.' + str(e)
+            # print "\n ", 'Cannot Set Dates to EventGroup.' + str(e)
             return False, 'Cannot Set Dates to EventGroup.' + str(e)
 
 
