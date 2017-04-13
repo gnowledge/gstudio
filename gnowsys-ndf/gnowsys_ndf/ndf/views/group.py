@@ -1692,6 +1692,36 @@ class EventGroupCreateEditHandler(View):
                 # mod_group.set_logo(request,group_obj,logo_rt = "has_profile_pic")
                 mod_group.set_logo(request,group_obj,logo_rt = "has_banner_pic")
                 group_name = group_obj.name
+                if "announced_unit" in group_obj.member_of_names_list:
+                    # check if base_unit is assigned to any module
+                    gst_module_name, gst_module_id = GSystemType.get_gst_name_id('Module')
+                    parent_modules = node_collection.find({
+                        '_type': 'GSystem',
+                        'member_of': gst_module_id,
+                        'collection_set': {'$in': [group_obj._id]}
+                    })
+                    for each_parent_module in parent_modules:
+                        each_parent_module.collection_set.append(group_obj._id)
+                        each_parent_module.save()
+                    # check if base_unit has attr assigned
+                    # Add attr  educationallevel_val and educationalsubject
+                    educationalsubject_val = get_attribute_value(parent_group_obj._id,"educationalsubject")
+                    educationallevel_val = get_attribute_value(parent_group_obj._id,"educationallevel")
+                    # print "\n educationalsubject_val: ", educationalsubject_val
+                    # print "\n educationallevel_val: ", educationallevel_val
+                    if educationalsubject_val:
+                        educationalsubject_at = node_collection.one({
+                            '_type': 'AttributeType',
+                            'name': "educationalsubject"
+                        })
+                        create_gattribute(group_obj._id, educationalsubject_at, unicode(educationalsubject_val))
+                    if educationallevel_val:
+                        educationallevel_at = node_collection.one({
+                            '_type': 'AttributeType',
+                            'name': "educationallevel"
+                        })
+                        create_gattribute(group_obj._id, educationallevel_at, unicode(educationallevel_val))
+                    group_obj.reload()
                 url_name = 'groupchange'
             else:
                 # operation fail: redirect to group-listing
