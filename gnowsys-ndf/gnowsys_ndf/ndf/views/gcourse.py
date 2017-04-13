@@ -1990,6 +1990,49 @@ def course_resource_detail(request, group_id, course_sub_section, course_unit, r
 
     return render_to_response(template, variable)
 
+@get_execution_time
+def activity_player_detail(request, group_id, lesson_id, activity_id):
+    group_name, group_id = get_group_name_id(group_id)
+
+    lesson_node = node_collection.one({'_id': ObjectId(lesson_id)})
+    node_obj = node_collection.one({'_id': ObjectId(activity_id)})
+    lesson_obj_collection_set = lesson_node.collection_set
+
+    # all metadata reg position and next prev of resource
+
+    resource_index = resource_next_id = resource_prev_id = None
+    resource_count = len(lesson_obj_collection_set)
+    unit_resources_list_of_dict = node_collection.find({
+                                    '_id': {'$in': lesson_obj_collection_set}},
+                                    {'name': 1, 'altnames': 1})
+    resource_index = lesson_obj_collection_set.index(node_obj._id)
+
+    if (resource_index + 1) < resource_count:
+        resource_next_id = lesson_node.collection_set[resource_index + 1]
+
+    if resource_index > 0:
+        resource_prev_id = lesson_node.collection_set[resource_index - 1]
+
+    # --- END of all metadata reg position and next prev of resource ---
+
+    node_obj.get_neighbourhood(node_obj.member_of)
+
+    thread_node = allow_to_comment = None
+    thread_node, allow_to_comment = node_thread_access(group_id, node_obj)
+
+    variable = RequestContext(request, {
+        'group_id': group_id, 'groupid': group_id, 'group_name':group_name,
+        'allow_to_comment': allow_to_comment,
+        'node': node_obj, 'lesson_node': lesson_node, 'activity_id': activity_id,
+        'resource_index': resource_index, 'resource_next_id': resource_next_id,
+        'resource_prev_id': resource_prev_id, 'resource_count': resource_count,
+        'unit_resources_list_of_dict': unit_resources_list_of_dict
+    })
+
+    template = "ndf/activity_player.html"
+
+    return render_to_response(template, variable)
+
 
 # def course_resource_detail(request, group_id, course_section, course_sub_section, course_unit, resource_id):
 #     pass
