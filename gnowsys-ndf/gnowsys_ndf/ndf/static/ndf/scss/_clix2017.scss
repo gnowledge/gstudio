@@ -4062,6 +4062,7 @@ $module-card-lines-to-show: 3;
     color: #fff;
     box-shadow: 0 0 2px 0 rgba(0, 0, 0, 0.2);
 }
+
 $nav_menu_1_color: #ce7869;
 $nav_menu_1_bg_color: #fff;
 $nav_menu_1_tab_border: #ffc14e;
@@ -4085,93 +4086,3 @@ ul.nav_menu_1 {
     }
 }
 
-
-
-//New My Desk LMS
-
-.mydesk_page {
-    .page_banner {
-        width: 100%;
-        height: 150px;
-        background-image: url('/static/ndf/images/mydesk_banner.png');
-        background-size: 100% 100%;
-        position: relative;
-
-        &:before {
-            content: ' ';
-            background-color: rgba(0,0,0,.1);
-            opacity: .5;
-            width: 100%;
-            position: absolute;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            z-index: 10;
-            box-shadow: inset 0 0 40px rgba(0,0,0,.2);
-        }
-
-        .banner_profile {
-            position: absolute;
-            bottom: 30px;
-            left: 40px;
-
-            .buddy_logo {
-                display: inline-block;
-                margin-right: 10px;
-                height: 100px;
-                border-radius: 5px;
-                overflow: hidden;
-
-                svg {
-                    height: 100px;
-                    width: 100px;
-
-                    path {
-                        fill: #7a422a;
-                    }
-                }
-            }
-            .banner_heading {
-                color: #fff;
-                display: inline-block;
-                vertical-align: top;
-
-                .buddy_name {
-                    font-size: 23px;
-                    display: block;
-                    margin-bottom: 10px;
-                }
-            }
-        }
-    }
-    .page_menu {
-        border-bottom: 1px solid #e5e5e5;
-
-        li {
-            padding: 12px 20px 9px;
-        }
-    }
-}
-
-$nav_menu_1_color: #ce7869;
-$nav_menu_1_bg_color: #fff;
-$nav_menu_1_tab_border: #ffc14e;
-ul.nav_menu_1 {
-    margin-bottom: 0px;
-    background-color: $nav_menu_1_bg_color;
-    li {
-        list-style-type: none;
-        display: inline-block;
-        padding: 12px 12px 9px;
-        color: $nav_menu_1_color;
-        cursor: pointer;
-        font-size: 18px;
-        letter-spacing: 0.8px;
-        border-bottom: 3px solid transparent;
-
-        &:hover {
-            border-bottom: 3px solid $nav_menu_1_tab_border;
-        }
-    }
-}
