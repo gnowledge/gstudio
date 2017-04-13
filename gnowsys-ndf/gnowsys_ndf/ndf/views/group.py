@@ -1278,8 +1278,10 @@ class CreateCourseEventGroup(CreateEventGroup):
 
         # June 17 2016. Importing files uploaded by user 'administrator' in old_group_obj
         administrator_user = User.objects.get(username='administrator')
+        # raw_material_fetch_query = {'group_set': old_group_obj._id,
+        #  '$or':[{'tags': 'raw@material'}, {'created_by': administrator_user.id}]}
         raw_material_fetch_query = {'group_set': old_group_obj._id,
-         '$or':[{'tags': 'raw@material'}, {'created_by': administrator_user.id}]}
+         'tags': 'raw@material'}
 
         if "announced_unit" in new_group_obj.member_of_names_list:
             asset_gst = node_collection.one({'_type': 'GSystemType', 'name': 'Asset'})
@@ -1655,7 +1657,8 @@ class EventGroupCreateEditHandler(View):
             group_obj = result[1]
             group_obj.fill_node_values(request)
             if sg_type == "CourseEventGroup":
-                if "base_unit" in parent_group_obj.member_of_names_list:
+                if ("base_unit" in parent_group_obj.member_of_names_list or 
+                    "announced_unit" in parent_group_obj.member_of_names_list):
                     group_obj.member_of = [ObjectId(announced_unit_gst._id)]
                 else:
                     group_obj.member_of = [ObjectId(courseevent_group_gst._id)]
