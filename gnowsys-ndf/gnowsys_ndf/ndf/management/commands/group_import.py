@@ -30,6 +30,11 @@ USER_ID_MAP = {}
 SCHEMA_ID_MAP = {}
 log_file = None
 CONFIG_VARIABLES = None
+DATE_AT_IDS = []
+date_related_at_cur = node_collection.find({'_type': 'AttributeType', 
+    'name': {'$in': ["start_time", "end_time", "start_enroll", "end_enroll"]}})
+for each_date_related_at in date_related_at_cur:
+    DATE_AT_IDS.append(each_date_related_at._id)
 '''
 Following will be available:
     CONFIG_VARIABLES.FORK=True
@@ -84,9 +89,11 @@ def validate_data_dump():
     md5hash = dirhash(DATA_DUMP_PATH, 'md5')
     if CONFIG_VARIABLES.MD5 != md5hash:
         print "\n MD5 NOT matching."
-        log_file.write("\n Checksum validation Failed on dump data")
-
-        call_exit()
+        proceed_without_validation = raw_input("MD5 not matching. Restoration not recommended.\n \
+                        Would you still like to continue ?")
+        if proceed_without_validation != 'y' and proceed_without_validation != 'Y':
+            log_file.write("\n Checksum validation Failed on dump data")
+            call_exit()
     else:
         log_file.write("\n Checksum validation Success on dump data")
         print "\nValidation Success..!"
@@ -287,7 +294,6 @@ def restore_node_objects(rcs_nodes_path):
                 copy_version_file(filepath)
                 log_file.write("\n RCS file copied : \n\t" + str(filepath))
                 node_json = update_schema_and_user_ids(node_json)
-                # print "\nnode_json: ", node_json
                 try:
                     log_file.write("\n Inserting Node doc : \n\t" + str(node_json))
                     node_id = node_collection.collection.insert(node_json)
@@ -343,7 +349,6 @@ def restore_triple_objects(rcs_triples_path):
                 copy_version_file(filepath)
                 log_file.write("\n RCS file copied : \n\t" + str(filepath))
 
-                triple_json = update_schema_id_for_triple(triple_json)
                 try:
                     log_file.write("\n Inserting Triple doc : " + str(triple_json))
                     node_id = triple_collection.collection.insert(triple_json)
@@ -501,7 +506,7 @@ def call_group_import(rcs_repo_path):
     restore_filehive_objects(rcs_filehives_path)
     restore_node_objects(rcs_nodes_path)
     restore_triple_objects(rcs_triples_path)
-    # restore_counter_objects(rcs_counters_path)
+    restore_counter_objects(rcs_counters_path)
 
 
 def copy_media_data(media_path):
@@ -533,7 +538,7 @@ class Command(BaseCommand):
             global log_file
             log_file.write("\nUpdated CONFIG_VARIABLES: "+ str(CONFIG_VARIABLES))
             print "\n Validating the data-dump"
-            # validate_data_dump()
+            validate_data_dump()
             print "\n Checking the dump Group-id availability."
             check_group_availability()
             print "\n User Restoration."
@@ -549,7 +554,7 @@ class Command(BaseCommand):
             print "\n No dump found at entered path."
             call_exit()
 
-def hook(d):
+def parse_datetime_values(d):
     # This decoder will be moved to models next to class NodeJSONEncoder
     if u'uploaded_at' in d:
         d['uploaded_at'] = datetime.datetime.fromtimestamp(d['uploaded_at']/1e3)
@@ -557,93 +562,16 @@ def hook(d):
         d['last_update'] = datetime.datetime.fromtimestamp(d['last_update']/1e3)
     if u'created_at' in d:
         d['created_at'] = datetime.datetime.fromtimestamp(d['created_at']/1e3)
-    if u'_id' in d:
-        d['_id'] = ObjectId(d['_id']['$oid'])
-    if u'auth_id' in d:
-        d['auth_id'] = ObjectId(d['auth_id']['$oid'])
-    if u'group_id' in d:
-        d['group_id'] = ObjectId(d['group_id']['$oid'])
+    if u'attribute_type' in d or u'relation_type' in d:
+        d = update_schema_id_for_triple(d)
     if u'attribute_type' in d:
-        d['attribute_type'] = ObjectId(d['attribute_type']['$oid'])
-    if u'relation_type' in d:
-        d['relation_type'] = ObjectId(d['relation_type']['$oid'])
-    if u'first_parent' in d:
-        d['first_parent'] = ObjectId(d['first_parent']['$oid'])
-    if u'subject' in d:
-        d['subject'] = ObjectId(d['subject']['$oid'])
-    if u'right_subject' in d:
-        if isinstance(d['right_subject'], list):
-            rs_list = []
-            for each_rs in d['right_subject']:
-                rs_list.append(ObjectId(each_rs['$oid']))
-            d['right_subject'] = rs_list
-        else:
-            d['right_subject'] = ObjectId(d['right_subject']['$oid'])
-    if u'relation_set' in d:
-        for each_relation_dict in d['relation_set']:
-            for each_key, each_val in each_relation_dict.iteritems():
-                rset_list = []
-                for each_id in each_val:
-                    rset_list.append(ObjectId(each_id[u'$oid']))
-                each_relation_dict[each_key] = rset_list
+        if d['attribute_type'] in DATE_AT_IDS:
+            d['object_value'] = datetime.datetime.fromtimestamp(d['object_value']/1e3)
     if u'attribute_set' in d:
         for each_attr_dict in d['attribute_set']:
             for each_key, each_val in each_attr_dict.iteritems():
                 if each_key in ["start_time", "end_time", "start_enroll", "end_enroll"]:
-                    each_attr_dict[each_key] = datetime.datetime.fromtimestamp(d[each_key]/1e3)
-    if u'member_of' in d:
-        mem_list = []
-        for each_mem_of in d['member_of']:
-            mem_list.append(ObjectId(each_mem_of['$oid']))
-        d['member_of'] = mem_list
-    if u'type_of' in d:
-        type_of_list = []
-        for each_type_of in d['type_of']:
-            type_of_list.append(ObjectId(each_type_of['$oid']))
-        d['type_of'] = type_of_list
-    if u'group_set' in d:
-        group_set_list = []
-        for each_group_id in d['group_set']:
-            group_set_list.append(ObjectId(each_group_id['$oid']))
-        d['group_set'] = group_set_list
-
-    if u'collection_set' in d:
-        collection_set_list = []
-        for each_node_id in d['collection_set']:
-            collection_set_list.append(ObjectId(each_node_id['$oid']))
-        d['collection_set'] = collection_set_list
-
-    if u'prior_node' in d:
-        prior_node_list = []
-        for each_prior_node_id in d['prior_node']:
-            prior_node_list.append(ObjectId(each_prior_node_id['$oid']))
-        d['prior_node'] = prior_node_list
-
-    if u'post_node' in d:
-        post_node_list = []
-        for each_post_node_id in d['post_node']:
-            post_node_list.append(ObjectId(each_post_node_id['$oid']))
-        d['post_node'] = post_node_list
-
-
-    if u'if_file' in d:
-        # 'if_file': {
-        #                 'mime_type': basestring,
-        #                 'original': {'id': ObjectId, 'relurl': basestring},
-        #                 'mid': {'id': ObjectId, 'relurl': basestring},
-        #                 'thumbnail': {'id': ObjectId, 'relurl': basestring}
-        #             },
-        try:
-            for key,val in d['if_file'].iteritems():
-                if key == "original" and val['id'] is not None:
-                    val['id'] = ObjectId(val['id']['$oid'])
-                if key == "mid"  and val['id'] is not None:
-                    val['id'] = ObjectId(val['id']['$oid'])
-                if key == "thumbnail"  and val['id'] is not None:
-                    val['id'] = ObjectId(val['id']['$oid'])
-        except Exception as if_file_err:
-            print "\n if_file ERROR: ", if_file_err
-            pass
+                    each_attr_dict[each_key] = datetime.datetime.fromtimestamp(each_val/1e3)
     return d
 
 def get_json_file(filepath):
@@ -653,18 +581,17 @@ def get_json_file(filepath):
     # this will create a .json file of the document(node)
     # at manage.py level
     # Returns json and rcs filepath
-    rcs.checkout(filepath)
-
     try:
+        rcs.checkout(filepath)
         fp = filepath.split('/')[-1]
         if fp.endswith(',v'):
             fp = fp.split(',')[0]
         with open(fp, 'r') as version_file:
-            obj_as_json = json.loads(version_file.read(), object_hook=hook)
-            # print "\n obj_as_json: ", obj_as_json
+            obj_as_json = json.loads(version_file.read(), object_hook=json_util.object_hook)
+            parse_datetime_values(obj_as_json)
             rcs.checkin(fp)
         # os.remove(fp)
         return obj_as_json
-
-    except Exception, e:
-        print "Exception while getting JSON: ", e
+    except Exception as get_json_err:
+        print "Exception while getting JSON: ", get_json_err
+        pass
