@@ -2401,19 +2401,20 @@ def course_about(request, group_id):
     if 'BaseCourseGroup' in group_obj.member_of_names_list:
         template = 'ndf/basecourse_group.html'
         show_analytics_notifications = False
-    if 'base_unit' in group_obj.member_of_names_list:
+    if ('base_unit' in group_obj.member_of_names_list or 
+        'announced_unit' in group_obj.member_of_names_list):
         template = 'ndf/gevent_base.html'
         show_analytics_notifications = False
         educationalsubject = get_attribute_value(group_obj._id,"educationalsubject")
         educationallevel = get_attribute_value(group_obj._id,"educationallevel")
         context_variables.update({'educationalsubject_val': educationalsubject,
             "educationallevel_val": educationallevel})
-    if 'announced_unit' in group_obj.member_of_names_list:
-        template = 'ndf/gevent_base.html'
-        show_analytics_notifications = False
-        # Uncomment the following lines when 
-        # template for announced_unit is ready.
-        # template = 'ndf/announced_unit.html'
+    # Uncomment the following lines when 
+    # template for announced_unit is ready.
+    # if 'announced_unit' in group_obj.member_of_names_list:
+    #     template = 'ndf/gevent_base.html'
+    #     show_analytics_notifications = False
+    #     template = 'ndf/announced_unit.html'
 
     banner_pic_obj,old_profile_pics = _get_current_and_old_display_pics(group_obj)
     context_variables.update({'old_profile_pics':old_profile_pics,
