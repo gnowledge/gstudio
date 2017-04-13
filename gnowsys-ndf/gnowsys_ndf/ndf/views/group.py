@@ -381,7 +381,7 @@ class CreateGroup(object):
         # if logo_img_node_grel_id:
         #     logo_img_node = logo_img_node_grel_id[0]
         #     grel_id = logo_img_node_grel_id[1]
-        f = request.FILES.get("docFile", "")
+        f = request.FILES.get("filehive", "")
         # print "\nf is ",f
 
         if f:
@@ -1149,9 +1149,6 @@ class CreateEventGroup(CreateModeratedGroup):
         '''
 
         # retrieves node_id. means it's edit operation of existing group.
-        group_obj = node_collection.one({'_id': ObjectId(group_id)})
-        if parent_group_obj._id != group_obj._id:
-            self.add_subgroup_to_parents_postnode(parent_group_obj._id, group_obj._id, "Event")
         # group_obj.prior_node.append(parent_group_obj._id)
         # group_obj.save()
 
@@ -1160,6 +1157,9 @@ class CreateEventGroup(CreateModeratedGroup):
         #         {'$push': {'member_of': ObjectId(programevent_group_gst._id)}}, upsert=False, multi=False)
         #     group_obj.reload()
         try:
+            group_obj = node_collection.one({'_id': ObjectId(group_id)})
+            if parent_group_obj._id != group_obj._id:
+                self.add_subgroup_to_parents_postnode(parent_group_obj._id, group_obj._id, "Event")
             start_date_val = self.request.POST.get('event_start_date','')
             if start_date_val:
                 start_date_val = datetime.strptime(start_date_val, "%d/%m/%Y")
@@ -1189,7 +1189,7 @@ class CreateEventGroup(CreateModeratedGroup):
             return True, group_obj
 
         except Exception as e:
-            # print "\n ", 'Cannot Set Dates to EventGroup.' + str(e)
+            print "\n ", 'Cannot Set Dates to EventGroup.' + str(e)
             return False, 'Cannot Set Dates to EventGroup.' + str(e)
 
 
@@ -1278,10 +1278,16 @@ class CreateCourseEventGroup(CreateEventGroup):
 
         # June 17 2016. Importing files uploaded by user 'administrator' in old_group_obj
         administrator_user = User.objects.get(username='administrator')
+        raw_material_fetch_query = {'group_set': old_group_obj._id,
+         '$or':[{'tags': 'raw@material'}, {'created_by': administrator_user.id}]}
 
-        rm_files_cur = node_collection.find({'member_of': file_gst._id, 'group_set': old_group_obj._id, \
-            '$or':[{'tags': 'raw@material'}, {'created_by': administrator_user.id}]})
+        if "announced_unit" in new_group_obj.member_of_names_list:
+            asset_gst = node_collection.one({'_type': 'GSystemType', 'name': 'Asset'})
+            raw_material_fetch_query.update({'member_of': asset_gst._id})
+        else:
+            raw_material_fetch_query.update({'member_of': file_gst._id})
 
+        rm_files_cur = node_collection.find(raw_material_fetch_query)
         if rm_files_cur.count():
             for each_rm_file in rm_files_cur:
                 each_rm_file.group_set.append(new_group_obj._id)
