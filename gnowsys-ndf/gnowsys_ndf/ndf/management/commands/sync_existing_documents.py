@@ -42,7 +42,7 @@ class Command(BaseCommand):
     all_gs = node_collection.find({'_type': {'$in' : ['GSystem', 'Group', 'Author', 'File']},
                  '$or': [{'legal': {'$exists': False}}, {'license': {'$exists': True}}],
                 })
-    # all_gs_count = all_gs.count()
+    all_gs_count = all_gs.count()
     if all_gs:
         print "\n Total GSystems found to update 'legal' field: ", all_gs.count()
         for index, each_gs in enumerate(all_gs):

@@ -24,6 +24,8 @@
 	{% if title != "Modules" %}
 	<div class="row">
 	{% endif %}
+	</div>
+
 		{% if title == 'explore' %}
 			Please select course or a group.
 		{% else %}
@@ -31,14 +33,23 @@
 			{% if title == "Modules" %}
 			<ul class="small-block-grid-1 medium-block-grid-2 large-block-grid-2" >
 			 {% endif %}
-		{% for each_obj in doc_cur %}
+
+			{% if title == "base courses" %}
+			<ul class="small-block-grid-1 medium-block-grid-3 large-block-grid-4">
+			{% endif %}
+
+			{% for each_obj in doc_cur %}
 			<!--li class="card-image-wrapper"-->
 			{% if title == "base courses" %}
-				{% if "Course" in each_obj.member_of_names_list %}						{% include card with resource=each_obj has_logo=True no_footer=True url_name="course_detail" first_arg=groupid second_arg=each_obj.pk  %}
+				{% if "Course" in each_obj.member_of_names_list %} {{each_obj.name}}						
+				{% include card with resource=each_obj has_logo=True no_footer=True url_name="course_detail" first_arg=groupid second_arg=each_obj.pk  %}
+				
 				{% elif "base_unit" in each_obj.member_of_names_list %}
+				<li class="card-image-wrapper" >
 
 					{# {% include card with resource=each_obj has_logo=True no_footer=True url_name="groupchange" first_arg=each_obj.pk  %} #}
-					{% include card with resource=each_obj is_event=True no_footer=True has_prof_pic=True url_name="groupchange" first_arg=each_obj.pk %}
+					{% include card with node=each_obj is_event=True no_footer=True has_prof_pic=True url_name="groupchange" first_arg=each_obj.pk %}
+				</li>
 				{% endif %}
 			{% elif title == "Modules" %}
 			<li class="card-image-wrapper" >
@@ -52,6 +63,9 @@
 	          <!--/li-->
 			{% endfor %}
 			{% if title == "Modules" %}
+				</ul>
+			{% endif %}
+			{% if title == "base_unit" %}
 				</ul>
 			{% endif %}
 		<!--/section-->
