@@ -123,28 +123,30 @@ class Command(BaseCommand):
 
         if group_node:
             print "\tRequest received for Export of : ", group_node.name , ' | ObjectId: ', group_node._id
-            fork_clone_opt = "\n\tExport Options:"
-            fork_clone_opt += "\n\t\t 1. Fork (What is Fork?"
-            fork_clone_opt += " Restore will create instances with NEW Ids)"
-            fork_clone_opt += "\n\t\t 2. Clone (What is Clone?"
-            fork_clone_opt += " Restore will create instances with OLD Ids)"
-            fork_clone_opt += "\n\tEnter options 1 or 2 or any other key to cancel: \t"
+            # fork_clone_opt = "\n\tExport Options:"
+            # fork_clone_opt += "\n\t\t 1. Fork (What is Fork?"
+            # fork_clone_opt += " Restore will create instances with NEW Ids)"
+            # fork_clone_opt += "\n\t\t 2. Clone (What is Clone?"
+            # fork_clone_opt += " Restore will create instances with OLD Ids)"
+            # fork_clone_opt += "\n\tEnter options 1 or 2 or any other key to cancel: \t"
 
-            fork_clone_confirm = raw_input(fork_clone_opt)
+            # fork_clone_confirm = raw_input(fork_clone_opt)
             global IS_FORK
             global IS_CLONE
             global RESTORE_USER_DATA
+            IS_FORK = True
+            IS_CLONE = False
             
-            if fork_clone_confirm == '1':
-                print "\n\t!!! Chosen FORK option !!!"
-                IS_FORK = True
-                IS_CLONE = False
-            elif fork_clone_confirm == '2':
-                print "\n\t!!! Chosen CLONE option !!!"
-                IS_FORK = False
-                IS_CLONE = True
-            else:
-                call_exit()
+            # if fork_clone_confirm == '1':
+            #     print "\n\t!!! Chosen FORK option !!!"
+            #     IS_FORK = True
+            #     IS_CLONE = False
+            # elif fork_clone_confirm == '2':
+            #     print "\n\t!!! Chosen CLONE option !!!"
+            #     IS_FORK = False
+            #     IS_CLONE = True
+            # else:
+            #     call_exit()
             user_data_dump = raw_input("\n\tDo you want to include Users in this export ? Enter y/n:\t ")
             if user_data_dump == 'y' or user_data_dump == 'Y':
                 RESTORE_USER_DATA = True
@@ -174,7 +176,6 @@ class Command(BaseCommand):
                 # import ipdb; ipdb.set_trace()
                 global GROUP_CONTRIBUTORS
                 if RESTORE_USER_DATA:
-                    print "\n Total Group_CONTRIBUTORS: ", len(GROUP_CONTRIBUTORS)
                     GROUP_CONTRIBUTORS = list(set(GROUP_CONTRIBUTORS))
                     create_users_dump(group_dump_path, GROUP_CONTRIBUTORS)
 

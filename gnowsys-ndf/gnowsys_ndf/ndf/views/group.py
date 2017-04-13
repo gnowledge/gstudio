@@ -369,7 +369,7 @@ class CreateGroup(object):
         # if logo_img_node_grel_id:
         #     logo_img_node = logo_img_node_grel_id[0]
         #     grel_id = logo_img_node_grel_id[1]
-        f = request.FILES.get("filehive", "")
+        f = request.FILES.get("docFile", "")
         # print "\nf is ",f
 
         if f:

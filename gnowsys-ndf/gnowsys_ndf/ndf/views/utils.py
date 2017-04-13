@@ -2,6 +2,10 @@
 Include all core python code/methods to process set/batch of data.
 Possibly avoid (direct) queries.
 '''
+try:
+    from bson import ObjectId
+except ImportError:  # old pymongo
+    from pymongo.objectid import ObjectId
 
 def get_dict_from_list_of_dicts(list_of_dicts,convert_objid_to_str=False):
     req_dict = {}
@@ -71,10 +75,11 @@ def merge_lists_and_maintain_unique_ele(list_a, list_b, advanced_merge=False):
         flat_dict = {}
         for each_dict in concat_list:
             for key,val in each_dict.iteritems():
-                if key in flat_dict:
-                    flat_dict[key].extend(val)
-                else:
-                    flat_dict.update({key:val})
+                if isinstance(val, ObjectId):
+                    if key in flat_dict:
+                        flat_dict[key].extend(val)
+                    else:
+                        flat_dict.update({key:val})
         for key,val in flat_dict.iteritems():
             merged_list.append({key:val})
     else:
