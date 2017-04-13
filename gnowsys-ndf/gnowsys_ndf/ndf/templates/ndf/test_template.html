@@ -1,82 +1,51 @@
 {% extends "ndf/gbase.html" %}
+
 {% load i18n %}
 
 
-
 {% block body_content %}
+ 
+ <!-- LMS.html -->
 
-<div class="activity_player_secondary_header activity_player_header">
-        <div class="header_icon_block back_button">
-            <a href="#"><i class="fa fa-angle-left header_icon"></i></a>
-        </div><div class="header_icon_block ">
-            <a href="#"><i class="fa fa-list-ul thumbnails header_icon"></i></a>
-        </div><div class="header_title header_text_block">
-            Invitation 2 CLIx in English
-        </div><div class="">
-        </div><div class="new_note header_text_block">
-            <a href="#">
-                <i class="fa fa-edit header_icon"></i>&nbsp;
-                WRITE A NEW NOTE
-            </a>
-        </div><div class="pagination prev_button header_text_block">
-            <a href="#">
-                <i class="fa fa-angle-left header_icon"></i>
-                &nbsp;PREV
-            </a>
-        </div><div class="pagination page_count header_text_block">
-            2 OF 3
-        </div>
-        <div class="pagination page_count header_text_block">
-            <a href="#">
-                NEXT&nbsp;
-                <i class="fa fa-angle-right header_icon"></i>
-            </a>
-        </div>
-</div>
 
-<div class="row activity_sheet">
-    <div class="small-12 columns">
-        <div class="course_editor ">
-          <div class="small-2 columns">
-            <div class="course_tree">
-              <div class="lesson-title">
-                  Lesson Title
-              </div>
-              <div class="activity-title">
-                <li class="active">Activity Title</li>
-                <li>Activity Title</li>
-                <li>Activity Title</li>
-                <li>Activity Title</li>
-              </div>
-              </div>
-          </div>
-          <div class="small-9 columns">
-            <div class="course_editor_section">
-              <div class="input_links">
-              <a href="#">Discuss</a>
-              <a href="#"> Related Help</a>
-              <a href="#">Translate</a>
-              </div>
-              <div class="activity_page_rendered">
-              Lorem Ipsum
-              "Neque porro quisquam est qui dolorem ipsum quia dolor sit amet, consectetur, adipisci velit..."
-              "There is no one who loves pain itself, who seeks after it and wants to have it, simply because it is pain..."
-
-              What is Lorem Ipsum?
-              Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book. It has survived not only five centuries, but also the leap into electronic typesetting, remaining essentially unchanged. It was popularised in the 1960s with the release of Letraset sheets containing Lorem Ipsum passages, and more recently with desktop publishing software like Aldus PageMaker including versions of Lorem Ipsum.
-              </div>
-            </div>
-          </div>
+<div class="lms_page">
+      <div class="lms_banner">
+        <div class="small-12 columns lms_heading">
+          <div class="left unit_name">Unit Name</div>
+          <div class="right enroll_unit"><a href="#">Enroll me</a></div>
         </div>
       </div>
 </div>
+<div class="lms_secondary_header">
+  <ul class="nav_menu_1">
+    <li> Overview
+    {# <a href="{% url 'course_about' group_id %}" {% if title == 'about' %}class="selected"{% endif %}>Overview</a> #} 
+    </li>
+    <li> Lessons </li>
+    <li> Raw Material </li>
+    <li>Notebook
+    {# <a href="{% url 'course_notebook' group_id %}" {% if title == 'notebook' %}class="selected"{% endif %}>Notebook</a> #}
+    </li>
+    <li> Gallery </li>
+  </ul>
+</div>
 
+<div class="row">
+  <div class="small-12 columns group_sections_content">
 
+   <div id="group_overview">
+      {% if title == "about" %}
+        {% include "ndf/course_about.html" %}
+      {% endif %}
+    </div>
 
+    <div id="group_blog">
+       {% if title == 'notebook' %}
+          {% include "ndf/gnotebook.html" %}
+        {% endif %}
+    </div>
+  </div>
+</div>
 
-
-    
-        
-             
-
+  
 {% endblock %}

@@ -1,11 +1,15 @@
 /*Blue color variables*/
-$primary-blue : #2e3f51;
-$secondry-blue : #acd4fa;
+$primary-blue : #164A7B;
+$secondry-blue : #74b3dc;
 $tertiary-blue : #719dc7;
 
 /*Orange color variables*/
 $primary-orange : #ce7869;
 $secondary-orange : #ffc14e;
+
+$header-link-hover-color: #50c2fa;
+$header-link-active-color: #50c2fa;
+
 
 @mixin transition-prop($prop) {
     transition: $prop 1s ease;
@@ -503,7 +507,7 @@ h5{
 /*Overridding foundation css*/
 
 .top-bar, .top-bar .name {
-    height: 55px;
+    height: 52px;
     background: $primary-blue;
 
 }
@@ -520,7 +524,6 @@ h5{
             position: absolute;
             left: 15px;
             color: #fff;
-            // //font-size: 35px;
             font-weight: 100;
         }
 
@@ -534,25 +537,39 @@ h5{
     }
     .top-bar-section {
         ul {
+            &.left li {
+                border-right: 1px solid #CCFDFF;
+            }
             li {
                 background: $primary-blue;
+
                 &>a {
-                    border-left: 3px solid transparent;
-                    //border-bottom: 1px solid #4b5b6b;
                     color: $secondry-blue;
                     line-height: 40px;
-                    font-weight: bold;
-                    // //font-size: 14px;
-                    letter-spacing: 0.5px;
+                    font-weight: 500;
+                    letter-spacing: 1px;
                     display: block;
                     padding: 12px 0 12px 0;
                     font-family: "OpenSans-Regular";
                     font-size: 16px;
                 }
-                &:hover, &.active {
+                &:hover {
                     &>a {
-                        border-left-color: $secondary-orange;
-                        color: #ffc14f;
+                        //border-left-color: $secondary-orange;
+                        //color: $primary-orange;
+                        color:#fff;
+                        //color: $header-link-hover-color;
+                    }
+                }
+
+                &.active{
+                    color:#fff;
+                }
+                &.active {
+                    &>a {
+                        //border-left-color: $secondary-orange;
+                        color: #fff;
+                        //border-bottom: 3px solid $secondary-orange;
                     }
                 }
             }
@@ -582,6 +599,12 @@ h5{
             }
         }
         .top-bar-section {
+            ul.left li>a {
+                padding: 0px 30px;
+                    &.active{
+                    color:#fff;
+                    }
+            }
             li {
                 &:not(.has-form) {
                     a:not(.button) {
@@ -591,23 +614,21 @@ h5{
                         line-height: 52px;
                         border-left-width: 0px;
 
-                        &:hover {
-                            color: #ffc14f;
-                           //
-                        }
                     }
                     &.active {
                         a:not(.button) {
-                            color: $primary-orange;
-                            border-bottom: 3px solid $secondary-orange;
+                            //color: $header-link-active-color;
+                            //color: $primary-orange;
+                            color: #fff;;
+                            //border-bottom: 3px solid $secondary-orange;
                         }
                     }
-
                     &.has-dropdown {
                         a:not(.button) {
                             &:hover {
                                 color: $secondry-blue;
                                 border-bottom: 0px;
+                                border-left: 3px solid $secondary-orange;
                             }
                         }
                     }
@@ -616,7 +637,18 @@ h5{
                 &.active:not(.has-form) {
                     a:not(.button):hover {
                         background: transparent;
+                        color: #fff;
                     }
+                }
+            }
+
+            .profile-menu {
+                &>a svg {
+                    height: 52px;
+                    width: 52px;
+                    vertical-align: top;
+                    background: #fff;
+                    margin-right: 15px;
                 }
             }
 
@@ -631,7 +663,7 @@ h5{
                     &:hover, &.active{
                         a:not(.button){
                             background: $primary-blue;
-                            color: $secondry-blue;
+                            color: $header-link-hover-color;
                             border-bottom: 0px;
                             border-left-width: 2px;
                             /*&:hover {
@@ -646,6 +678,8 @@ h5{
         }
     }
 }
+
+
 
 /*Custom css*/
 [class*="column"] + [class*="column"]:last-child {
@@ -3243,19 +3277,25 @@ $nav_menu_1_tab_border: #ffc14e;
 ul.nav_menu_1 {
     margin-bottom: 0px;
     background-color: $nav_menu_1_bg_color;
-    li {
-        list-style-type: none;
-        display: inline-block;
-        padding: 12px 12px 9px;
-        color: $nav_menu_1_color;
-        cursor: pointer;
-        font-size: 18px;
-        letter-spacing: 0.8px;
-        border-bottom: 3px solid transparent;
+    >li {
+            display: inline-block;
 
-        &:hover {
-            border-bottom: 3px solid $nav_menu_1_tab_border;
+        >a{
+            list-style-type: none;
+            display: inline-block;
+            padding: 12px 12px 9px;
+            color: $nav_menu_1_color;
+            cursor: pointer;
+            font-size: 18px;
+            letter-spacing: 0.8px;
+            border-bottom: 3px solid transparent;
+        
+
+            &.selected, &:hover{
+                border-bottom: 3px solid $nav_menu_1_tab_border;
+            }
         }
+
     }
 }
 
@@ -3953,4 +3993,185 @@ $module-card-lines-to-show: 3;
         }
     }
 }
+//LMS Page: Unit detail of LMS
 
+.lms_page{
+    .lms_banner{
+        width:100%;
+        height:150px;
+        background-image: url('/static/ndf/images/maths-cover.png');
+        background-size:100% 100%;
+        position:relative; 
+
+        &:before {
+            content: ' ';
+            background-color: rgba(0,0,0,.1);
+            opacity: .5;
+            width: 100%;
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            z-index: 10;
+            box-shadow: inset 0 0 40px rgba(0,0,0,.2);
+
+            a{
+                cursor: pointer;
+            }
+        }
+        .enroll_unit>a{
+            cursor: pointer;
+        }
+    }
+    
+        .lms_heading {
+            color: #fff;
+            display: inline-block;
+            vertical-align: top;
+
+
+            .unit_name {
+                font-size: 30px;
+                font-family: OpenSans-Semibold;
+                display: block;
+                margin-top: 90px;
+                margin-left: 40px;
+            }
+            .enroll_unit{
+                margin-top: 100px;
+                margin-right: 50px;
+                border: 2px solid #fff;
+                border-radius: 6px;
+                padding: 1px 5px 1px 5px;
+                text-transform: none;
+                text-align: center;
+                cursor: pointer;
+
+                &>a{
+                    color:#fff;
+                }
+
+            }
+        }
+}
+
+.lms_secondary_header{
+    width: 100%;
+    position: relative;
+    color: #fff;
+    box-shadow: 0 0 2px 0 rgba(0, 0, 0, 0.2);
+}
+$nav_menu_1_color: #ce7869;
+$nav_menu_1_bg_color: #fff;
+$nav_menu_1_tab_border: #ffc14e;
+ul.nav_menu_1 {
+    margin-bottom: 0px;
+    background-color: $nav_menu_1_bg_color;
+    li {
+        list-style-type: none;
+        display: inline-block;
+        padding: 12px 12px 9px;
+        color: $nav_menu_1_color;
+        cursor: pointer;
+        font-size: 18px;
+        font-family: OpenSans-Regular;
+        letter-spacing: 0.8px;
+        border-bottom: 3px solid transparent;
+
+        &:hover {
+            border-bottom: 3px solid $nav_menu_1_tab_border;
+        }
+    }
+}
+
+
+
+//New My Desk LMS
+
+.mydesk_page {
+    .page_banner {
+        width: 100%;
+        height: 150px;
+        background-image: url('/static/ndf/images/mydesk_banner.png');
+        background-size: 100% 100%;
+        position: relative;
+
+        &:before {
+            content: ' ';
+            background-color: rgba(0,0,0,.1);
+            opacity: .5;
+            width: 100%;
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            z-index: 10;
+            box-shadow: inset 0 0 40px rgba(0,0,0,.2);
+        }
+
+        .banner_profile {
+            position: absolute;
+            bottom: 30px;
+            left: 40px;
+
+            .buddy_logo {
+                display: inline-block;
+                margin-right: 10px;
+                height: 100px;
+                border-radius: 5px;
+                overflow: hidden;
+
+                svg {
+                    height: 100px;
+                    width: 100px;
+
+                    path {
+                        fill: #7a422a;
+                    }
+                }
+            }
+            .banner_heading {
+                color: #fff;
+                display: inline-block;
+                vertical-align: top;
+
+                .buddy_name {
+                    font-size: 23px;
+                    display: block;
+                    margin-bottom: 10px;
+                }
+            }
+        }
+    }
+    .page_menu {
+        border-bottom: 1px solid #e5e5e5;
+
+        li {
+            padding: 12px 20px 9px;
+        }
+    }
+}
+
+$nav_menu_1_color: #ce7869;
+$nav_menu_1_bg_color: #fff;
+$nav_menu_1_tab_border: #ffc14e;
+ul.nav_menu_1 {
+    margin-bottom: 0px;
+    background-color: $nav_menu_1_bg_color;
+    li {
+        list-style-type: none;
+        display: inline-block;
+        padding: 12px 12px 9px;
+        color: $nav_menu_1_color;
+        cursor: pointer;
+        font-size: 18px;
+        letter-spacing: 0.8px;
+        border-bottom: 3px solid transparent;
+
+        &:hover {
+            border-bottom: 3px solid $nav_menu_1_tab_border;
+        }
+    }
+}
