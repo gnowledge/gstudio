@@ -3832,7 +3832,6 @@ ul.nav_menu_1 > li > a.selected, ul.nav_menu_1 > li > a:hover {
   left: 0;
   right: 0;
   bottom: 0;
-  z-index: 10;
   box-shadow: inset 0 0 40px rgba(0, 0, 0, 0.2);
 }
 /* line 4019, ../../../scss/_clix2017.scss */
@@ -3843,22 +3842,22 @@ ul.nav_menu_1 > li > a.selected, ul.nav_menu_1 > li > a:hover {
 .lms_page .lms_banner .enroll_unit > a {
   cursor: pointer;
 }
-/* line 4028, ../../../scss/_clix2017.scss */
-.lms_page .lms_heading {
+/* line 4027, ../../../scss/_clix2017.scss */
+.lms_page .lms_banner .lms_heading {
   color: #fff;
   display: inline-block;
   vertical-align: top;
 }
-/* line 4034, ../../../scss/_clix2017.scss */
-.lms_page .lms_heading .unit_name {
+/* line 4033, ../../../scss/_clix2017.scss */
+.lms_page .lms_banner .lms_heading .unit_name {
   font-size: 30px;
   font-family: OpenSans-Semibold;
   display: block;
   margin-top: 90px;
   margin-left: 40px;
 }
-/* line 4041, ../../../scss/_clix2017.scss */
-.lms_page .lms_heading .enroll_unit {
+/* line 4040, ../../../scss/_clix2017.scss */
+.lms_page .lms_banner .lms_heading .enroll_unit {
   margin-top: 100px;
   margin-right: 50px;
   border: 2px solid #fff;
@@ -3867,9 +3866,10 @@ ul.nav_menu_1 > li > a.selected, ul.nav_menu_1 > li > a:hover {
   text-transform: none;
   text-align: center;
   cursor: pointer;
+  color: #000;
 }
-/* line 4051, ../../../scss/_clix2017.scss */
-.lms_page .lms_heading .enroll_unit > a {
+/* line 4050, ../../../scss/_clix2017.scss */
+.lms_page .lms_banner .lms_heading .enroll_unit > a {
   color: #fff;
 }
 
