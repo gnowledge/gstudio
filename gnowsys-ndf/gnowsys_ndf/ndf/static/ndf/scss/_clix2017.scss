@@ -3468,7 +3468,7 @@ ul.nav_menu_1 {
     padding-top: 10px;
     padding-left: 23px;
     margin: 0px;
-                            
+
         &>li {
                 list-style: none;
                 border-top: 1px solid #e9e9e9;
@@ -3482,7 +3482,10 @@ ul.nav_menu_1 {
                             background: rgba(116, 0, 255, 0.31);
 
                         }
-                    }
+                &>a {
+                            color:black;
+                        }
+            }
 
 }
 
