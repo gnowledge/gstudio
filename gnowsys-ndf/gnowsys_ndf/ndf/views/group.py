@@ -426,7 +426,7 @@ class CreateGroup(object):
             # fileobj,fs = save_file(f,f.name,request.user.id,group_obj._id, "", "", username=unicode(request.user.username), access_policy="PUBLIC", count=0, first_object="", oid=True)
             if fileobj:
                 rt_has_logo = node_collection.one({'_type': "RelationType", 'name': unicode(logo_rt)})
-                print "\n creating GRelation has_logo\n"
+                # print "\n creating GRelation has_logo\n"
                 create_grelation(group_obj._id, rt_has_logo, ObjectId(fileobj._id))
 
 # --- END of class CreateGroup ---
@@ -1662,6 +1662,7 @@ class EventGroupCreateEditHandler(View):
                     group_obj.member_of = [ObjectId(announced_unit_gst._id)]
                 else:
                     group_obj.member_of = [ObjectId(courseevent_group_gst._id)]
+                group_obj.language = parent_group_obj.language
                 group_obj.save()
 
             # to make PE/CE as sub groups of the grp from which it is created.
