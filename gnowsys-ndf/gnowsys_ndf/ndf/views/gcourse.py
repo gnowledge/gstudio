@@ -2250,11 +2250,15 @@ def course_raw_material(request, group_id, node_id=None,page_no=1):
                                     loggedin_userid=request.user.id)
 
     else:
+        type_of_files = file_gst_id
+        if "announced_unit" in group_obj.member_of_names_list:
+            asset_gst_name, asset_gst_id = GSystemType.get_gst_name_id("Asset")
+            type_of_files = asset_gst_id
 
         files_cur = node_collection.find({
                                         '_type': {'$in': ["File", "GSystem"]},
                                         '$or': [
-                                                {'member_of': file_gst_id},
+                                                {'member_of': type_of_files},
                                                 {
                                                     'collection_set': {'$exists': "true",'$not': {'$size': 0} },
                                                     'member_of': page_gst_id,
