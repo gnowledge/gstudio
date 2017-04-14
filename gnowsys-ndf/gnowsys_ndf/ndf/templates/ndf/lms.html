@@ -29,7 +29,7 @@
     <li>
       <a href="{% url 'course_content' group_id %}" {% if title == 'course content' %}class="selected"{% endif %}>Lessons</a> 
      </li>
-    <li> Raw Material </li>
+    <li>  <a href="{% url 'course_content' group_id %}" {% if title == 'course content' %}class="selected"{% endif %}>Raw Material</a> </li>
     <li>
       <a href="{% url 'course_notebook' group_id %}" {% if title == 'notebook' %}class="selected"{% endif %}>Notebook</a>
     </li>

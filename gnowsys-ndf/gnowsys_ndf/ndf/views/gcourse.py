@@ -2007,6 +2007,10 @@ def activity_player_detail(request, group_id, lesson_id, activity_id):
                                     {'name': 1, 'altnames': 1})
     resource_index = lesson_obj_collection_set.index(node_obj._id)
 
+    # cur_list = {c._id: c.name for c in unit_resources_list_of_dict }
+    # less_dict = []
+    # for each in cur_list:
+    #     print "***",each. 
     if (resource_index + 1) < resource_count:
         resource_next_id = lesson_node.collection_set[resource_index + 1]
 

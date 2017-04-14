@@ -3501,7 +3501,7 @@ ul.nav_menu_1 {
 .lesson-title{
     font-size: 18px;
     padding-top: 10px;
-    padding-left: 23px;
+    padding-left: 10px;
 }
 
 .activity-title{
@@ -4066,27 +4066,31 @@ $module-card-lines-to-show: 3;
     color: #fff;
     box-shadow: 0 0 2px 0 rgba(0, 0, 0, 0.2);
 }
-
 $nav_menu_1_color: #ce7869;
 $nav_menu_1_bg_color: #fff;
 $nav_menu_1_tab_border: #ffc14e;
 ul.nav_menu_1 {
     margin-bottom: 0px;
     background-color: $nav_menu_1_bg_color;
-    li {
-        list-style-type: none;
-        display: inline-block;
-        padding: 12px 12px 9px;
-        color: $nav_menu_1_color;
-        cursor: pointer;
-        font-size: 18px;
-        font-family: OpenSans-Regular;
-        letter-spacing: 0.8px;
-        border-bottom: 3px solid transparent;
+    >li {
+            display: inline-block;
 
-        &:hover {
-            border-bottom: 3px solid $nav_menu_1_tab_border;
+        >a{
+            list-style-type: none;
+            display: inline-block;
+            padding: 12px 12px 9px;
+            color: $nav_menu_1_color;
+            cursor: pointer;
+            font-size: 18px;
+            letter-spacing: 0.8px;
+            border-bottom: 3px solid transparent;
+        
+
+            &.selected, &:hover{
+                border-bottom: 3px solid $nav_menu_1_tab_border;
+            }
         }
+
     }
 }
 
