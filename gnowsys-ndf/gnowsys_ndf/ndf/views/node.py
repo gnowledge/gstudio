@@ -18,7 +18,7 @@ from gnowsys_ndf.ndf.models import GSystemType, Group, Node, GSystem  #, Triple
 from gnowsys_ndf.ndf.models import node_collection
 
 from gnowsys_ndf.ndf.views.methods import get_execution_time, staff_required
-from gnowsys_ndf.ndf.views.methods import get_language_tuple
+from gnowsys_ndf.ndf.views.methods import get_language_tuple, create_gattribute
 
 ''' -- common db queries -- '''
 
@@ -59,5 +59,12 @@ def node_create_edit(request,
                                             **kwargs)
         node_obj.save(group_id=group_id)
         node_id = node_obj['_id']
+
+        post_req = request.POST
+        attrs_to_create_update = [f for f in post_req.keys() if ('attribute' in f)]
+        attrs_to_create_update = [a.split('_')[1] for a in attrs_to_create_update]
+
+        for each_attr_name in attrs_to_create_update:
+            print create_gattribute(node_id, each_attr_name, object_value=post_req['attribute_'+each_attr_name])
 
         return HttpResponseRedirect(reverse(detail_url_name, kwargs={'group_id': group_id, 'node_id': node_id}))
