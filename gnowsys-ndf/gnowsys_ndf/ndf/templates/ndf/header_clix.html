@@ -4,6 +4,8 @@
 
   {% get_group_object groupid as group_object %}
   {% get_explore_url as explore_url %}
+  
+      
 <nav class="top-bar" data-topbar role="navigation" id="menu_bar_gstudio">
         <ul class="title-area">
             <li class="name show-for-medium-up">
@@ -58,8 +60,8 @@
               {% endif %}
             </ul>
             <ul class="right hide-for-medium-up dropdown-menu hide">
-                <li class=""><a href="#">new My Desk</a></li>
-                <li class=""><a  title="" class="{%if title == 'Explore'%}active{%endif%}" href="{% url explore_url %}" > new Explore Projects</a></li>
+                <li class=""><a href="#">My Desk</a></li>
+                <li><a  class="{%if title == 'courses'%}active{%endif%}" href="{% url explore_url %}">Explore Projects </a></li>
                 <li class=""><a href="#"> new Blog</a></li>
                 <li class=""><a href="#"><i class="fi-info"></i>&nbsp; new Help Topics</a></li>
                 <!--li class="has-dropdown not-click">
@@ -123,9 +125,9 @@
             {% endif %}
 
             <!-- Left Nav Section -->
-            <ul class="left show-for-large-up">
+            <ul class="left show-for-medium-up">
                 <li class=""><a href="#">My Desk</a></li>
-                <li><a  class="{%if title == 'Explore'%}active{%endif%}" href="{% url explore_url %}">Explore Projects</a></li>
+                <li><a  class="{%if title == 'courses'%}active{%endif%}" href="{% url explore_url %}">Explore Projects </a></li>   
             </ul>
           </section>
     </nav>
@@ -149,3 +151,6 @@
             })
         })
     </script>
+  
+
+  
