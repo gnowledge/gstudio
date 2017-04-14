@@ -2026,7 +2026,7 @@ def activity_player_detail(request, group_id, lesson_id, activity_id):
 
     variable = RequestContext(request, {
         'group_id': group_id, 'groupid': group_id, 'group_name':group_name,
-        'allow_to_comment': allow_to_comment,
+        'allow_to_comment': True,
         'node': node_obj, 'lesson_node': lesson_node, 'activity_id': activity_id,
         'resource_index': resource_index, 'resource_next_id': resource_next_id,
         'resource_prev_id': resource_prev_id, 'resource_count': resource_count,
