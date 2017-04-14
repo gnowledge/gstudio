@@ -4396,23 +4396,38 @@ ul.nav_menu_1 {
     height: 40px;
     background-color:#fff;
     color: $primary-blue;
-    
-
     >p{
         margin-left: 81px;
-        padding: 3px 0px 0px 1px;
+        padding: 12px 0px 0px 1px;
         font-family: OpenSans-Semibold;
         font-size: 20px;
     }
-
     >a{
-        padding: 7px 85px 3px 0px;
+        padding: 12px 85px 3px 0px;
     }
-
-    
+}
+.lms_explore_head_unit{
+    width: 100%;
+    height: 40px;
+    background-color:#fff;
+    color: $primary-blue;
+    >p{
+        margin-left: 81px;
+        padding: 0px 0px 0px 1px;
+        font-family: OpenSans-Semibold;
+        font-size: 20px;
+    }
+    >a{
+        padding: 0px 85px 3px 0px;
+    }
 }
 
 .lms_explore_back{
     background-color: #fff;
+}
+
+.lms_explore_back_unit{
+    background-color: #fff;
+    margin-top:-23.3px;
 }
 

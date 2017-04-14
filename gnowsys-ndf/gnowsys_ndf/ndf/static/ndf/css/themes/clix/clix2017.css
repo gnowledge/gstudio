@@ -4205,19 +4205,44 @@ ul.nav_menu_1 > li > a.selected, ul.nav_menu_1 > li > a:hover {
   background-color: #fff;
   color: #164A7B;
 }
-/* line 4401, ../../../scss/_clix2017.scss */
+/* line 4399, ../../../scss/_clix2017.scss */
 .lms_explore_head > p {
   margin-left: 81px;
-  padding: 3px 0px 0px 1px;
+  padding: 12px 0px 0px 1px;
   font-family: OpenSans-Semibold;
   font-size: 20px;
 }
-/* line 4408, ../../../scss/_clix2017.scss */
+/* line 4405, ../../../scss/_clix2017.scss */
 .lms_explore_head > a {
-  padding: 7px 85px 3px 0px;
+  padding: 12px 85px 3px 0px;
 }
 
-/* line 4415, ../../../scss/_clix2017.scss */
+/* line 4409, ../../../scss/_clix2017.scss */
+.lms_explore_head_unit {
+  width: 100%;
+  height: 40px;
+  background-color: #fff;
+  color: #164A7B;
+}
+/* line 4414, ../../../scss/_clix2017.scss */
+.lms_explore_head_unit > p {
+  margin-left: 81px;
+  padding: 0px 0px 0px 1px;
+  font-family: OpenSans-Semibold;
+  font-size: 20px;
+}
+/* line 4420, ../../../scss/_clix2017.scss */
+.lms_explore_head_unit > a {
+  padding: 0px 85px 3px 0px;
+}
+
+/* line 4425, ../../../scss/_clix2017.scss */
 .lms_explore_back {
   background-color: #fff;
+}
+
+/* line 4429, ../../../scss/_clix2017.scss */
+.lms_explore_back_unit {
+  background-color: #fff;
+  margin-top: -23.3px;
 }
