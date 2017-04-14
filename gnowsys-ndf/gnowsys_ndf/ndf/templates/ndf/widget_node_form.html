@@ -38,7 +38,7 @@
                     </div>
                     <div class="right course_heading_unit">
                          <select name="attribute_{{v.name}}" {{v.widget_attr}}>
-                            <option>Choose {{k}}</option>
+                            <option value=''>Choose {{k}}</option>
                             {% for each_opt in v.all_options %}
                                 <option {% if v.value == each_opt %} selected {% endif %}>
                                     {{each_opt}}
