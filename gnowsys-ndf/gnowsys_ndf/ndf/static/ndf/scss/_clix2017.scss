@@ -3258,6 +3258,203 @@ $ah_2_background_color_hover: rgba(244, 244, 244, 0.3);;
 }
 
 /*
+Buddy Vertical Bar Css
+*/
+
+$bp_background_color: #101d29;
+.buddy_panel {
+    position: fixed;
+    right: 0px;
+    top: 0px;
+    width: 70px;
+    height: 100vh;
+    padding: 10px;
+    background-color: $bp_background_color;
+    overflow-y: auto;
+
+
+    .add_buddy_icon {
+        height: 50px;
+        width: 50px;
+        border-radius: 4px;
+        cursor: pointer;
+    }
+}
+
+.buddy_icon {
+    border-radius: 4px;
+    overflow: hidden;
+    height: 50px;
+    width: 50px;
+    cursor: pointer;
+    margin-bottom: 10px;
+    position: relative;
+
+    svg {
+        height: 50px;
+        width: 50px;
+        background-color: #fff;
+    }
+
+    &.buddy_inactive:before {
+        content: '';
+        position: absolute;
+        left: 0px;
+        top: 0px;
+        height: 100%;
+        width: 100%;
+        display: block;
+        background: rgba(0,0,0,0.5);
+    }
+
+    .buddy_edit, .buddy_delete {
+        display: none;
+    }
+
+    &.buddy_editable {
+        &:hover .buddy_edit {
+            position: absolute;
+            background: rgba(255,255,255,0.5);
+            padding: 3px;
+            right: 0px;
+            bottom: 0px;
+            display: block;
+        }
+    }
+
+    &.buddy_deleteable {
+        &:hover .buddy_delete {
+            position: absolute;
+            background: rgba(255,255,255,0.5);
+            padding: 3px;
+            right: 0px;
+            bottom: 0px;
+            display: block;
+        }
+    }
+}
+
+.add_buddy_modal {
+    padding: 0px;
+    .modal_header {
+        padding: 10px 20px;
+        position: relative;
+
+        .modal_title {
+            font-size: 25px;
+            color: #CE7869;
+            letter-spacing: 0;
+            line-height: 35px;
+        }
+        .modal_meta {
+            font-size: 14px;
+            color: #9DBEDD;
+            letter-spacing: 0;
+            line-height: 30px;
+        }
+
+        .sample_buddy {
+            position: absolute;
+            right: 30px;
+            top: 15px;
+        }
+    }
+
+    .modal_body {
+        background-color: #101d29;
+        padding: 10px 20px;
+        max-height: 500px;
+        overflow: auto;
+
+        .step_title {
+            font-size: 20px;
+            font-weight: 400;
+            color: #fff;
+            letter-spacing: 0.9px;
+            margin: 10px 0px;
+
+            .step_number {
+                color: #82A4C3;
+            }
+        }
+
+        .buddy_color_option {
+            max-width: 75px;
+            display: inline-block;
+            vertical-align: top;
+            margin: 10px 20px;
+            cursor: pointer;
+
+            .color_sample {
+                display: block;
+                width: 50px;
+                height: 50px;
+                border-radius: 100%;
+                margin: 0px auto;
+            }
+
+            .color_name {
+                text-transform: capitalize;
+                font-size: 15px;
+                color: #82A4C3;
+                text-align: center;
+                font-weight: 400;
+                letter-spacing: 1px;
+                margin-top: 10px;
+            }
+
+            &:hover, &.selected {
+                .color_sample {
+                    border: 3px solid #bfe0ff;
+                }
+            }
+        }
+
+        .buddy_animal {
+            display: inline-block;
+            margin: 10px;
+            cursor: pointer;
+
+            svg {
+                height: 80px;
+                width: 80px;
+
+                path {
+                    fill: #374B5E;
+                }
+            }
+
+            .buddy_animal_name {
+                color: #fff;
+                text-align: center;
+                text-transform: capitalize;
+                letter-spacing: 1px;
+            }
+
+            &:hover, &.selected {
+                path {
+                    fill: #bfe0ff;
+                }
+            }
+        }
+    }
+
+    .modal_footer {
+        height: 70px;
+        padding: 20px;
+
+        .removeBuddy {
+            i {
+                color: #bd2b2b;
+                font-size: 25px;
+            }
+        }
+    }
+}
+
+
+
+/*
     Common css that can be kept at a single place.
 */
 $primary-button-color: #fff;
@@ -3265,6 +3462,15 @@ $primary-button-background-color: #00a9ee;
 .blue_round_button {
     background-color: #00a9ee;
     color: #fff;
+    border-radius: 4px;
+    padding: 3px 10px;
+    font-size: 16px;
+    letter-spacing: 0.7px;
+    line-height: 25px;
+}
+.text_button {
+    background-color: #fff;
+    color: #949494;
     border-radius: 4px;
     padding: 3px 10px;
     font-size: 16px;
