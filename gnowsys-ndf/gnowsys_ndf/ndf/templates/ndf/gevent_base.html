@@ -24,6 +24,7 @@
             <div class="row">
                 <div class="small-12 columns group_header">
                     <div class="group_title left">{% firstof group_object.altnames group_object.name  %}</div>
+                    {% if is_gstaff %}
                     <div class="right course_actions">
 
                         <span data-dropdown="course-settings-drop" aria-controls="course-settings-drop" aria-expanded="false" class="tiny radius right" data-options="align:left">
@@ -47,20 +48,21 @@
                         </li>
 
                         {% get_lessons group_object as lessons_list %}
-                        <li class="has-dropdown">
-                            <a class="fi-page-export"> Export</a>
-                            <ul class="dropdown">
-                                {% for each_lesson in lessons_list  %}
-                                <li><a href="{% url 'export_to_epub' group_id each_lesson.pk %}" class="export_lesson">{{each_lesson.name}}</a></li>
-                                {% endfor %}
-                            </ul>
-
+                        <li class="lesson-dropdown">
+                        <a href="#" class="fi-page-export"> {% trans "Export to ePub" %}</a>
+                        <ul>
+                            {% for each_lesson in lessons_list  %}
+                            <li class="lesson_name_in_export"><a href="{% url 'export_to_epub' group_id each_lesson.pk %}" class="export_lesson" title="{{each_lesson.name}}">{{each_lesson.name|truncatechars:15}}</a></li>
+                            {% endfor %}
+                        </ul>
                         </li>
 
-                        <li> <a class="" data-reveal-id="delete-unit">Delete</a> </li>
+
+                        <li> <a data-reveal-id="delete-unit"><i class="fa fa-trash"></i> Delete</a> </li>
 
                         </ul>
                     </div>
+                    {% endif %}
                 </div>
             </div>
             <div class="row">

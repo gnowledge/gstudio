@@ -3975,3 +3975,22 @@ ul.nav_menu_1 > li > a.selected, ul.nav_menu_1 > li > a:hover {
   background-color: #eefaff;
   letter-spacing: 0.3px;
 }
+
+/* line 4164, ../../../scss/_clix2017.scss */
+.lesson-dropdown ul {
+  display: none;
+}
+
+/* line 4168, ../../../scss/_clix2017.scss */
+.lesson-dropdown:hover ul {
+  display: block;
+}
+
+/* line 4172, ../../../scss/_clix2017.scss */
+.lesson_name_in_export {
+  list-style: none;
+}
+/* line 4174, ../../../scss/_clix2017.scss */
+.lesson_name_in_export:hover {
+  border-left: 2.5px solid #ce7869;
+}
