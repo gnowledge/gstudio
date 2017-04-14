@@ -681,7 +681,7 @@ class Node(DjangoDocument):
 
             if cache_result:
                 # todo:  return OID after casting
-                return cache_result
+                return (cache_result[0], ObjectId(cache_result[1]))
             # ---------------------------------
 
         node_id = ObjectId(node_name_or_id) if ObjectId.is_valid(node_name_or_id) else None
@@ -1698,7 +1698,7 @@ class GSystemType(Node):
         cache_result = cache.get(cache_key)
 
         if cache_result:
-            return cache_result
+            return (cache_result[0], ObjectId(cache_result[1]))
         # ---------------------------------
 
         gst_id = ObjectId(gst_name_or_id) if ObjectId.is_valid(gst_name_or_id) else None
@@ -2488,7 +2488,7 @@ class Group(GSystem):
             cache_result = cache.get(cache_key)
 
             if cache_result:
-                return cache_result
+                return (cache_result[0], ObjectId(cache_result[1]))
         # ---------------------------------
 
         # case-1: argument - "group_name_or_id" is ObjectId

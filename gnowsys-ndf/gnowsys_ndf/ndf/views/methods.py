@@ -346,7 +346,7 @@ def get_group_name_id(group_name_or_id, get_obj=False):
         cache_result = cache.get(cache_key)
 
         if cache_result:
-            return cache_result
+            return (cache_result[0], ObjectId(cache_result[1]))
     # ---------------------------------
 
     # case-1: argument - "group_name_or_id" is ObjectId
