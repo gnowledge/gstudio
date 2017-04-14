@@ -2110,6 +2110,8 @@ def course_content(request, group_id):
         template = 'ndf/basecourse_group.html'
     if 'base_unit' in group_obj.member_of_names_list:
         template = 'ndf/gevent_base.html'
+    if 'CourseEventGroup' in group_obj.member_of_names_list:
+        template = 'ndf/lms.html'
     banner_pic_obj,old_profile_pics = _get_current_and_old_display_pics(group_obj)
     '''
     banner_pic_obj = None
@@ -2152,6 +2154,8 @@ def course_notebook(request, group_id, tab=None, notebook_id=None):
     template = 'ndf/gcourse_event_group.html'
     if 'base_unit' in group_obj.member_of_names_list:
         template = 'ndf/gevent_base.html'
+    if 'CourseEventGroup' in group_obj.member_of_names_list:
+        template = 'ndf/lms.html'
 
 
     # page_gst = node_collection.one({'_type': "GSystemType", 'name': "Page"})
@@ -2448,7 +2452,10 @@ def course_about(request, group_id):
         educationallevel = get_attribute_value(group_obj._id,"educationallevel")
         context_variables.update({'educationalsubject_val': educationalsubject,
             "educationallevel_val": educationallevel})
-
+    
+    if 'CourseEventGroup' in group_obj.member_of_names_list:
+        template = 'ndf/lms.html'
+    
     banner_pic_obj,old_profile_pics = _get_current_and_old_display_pics(group_obj)
     context_variables.update({'old_profile_pics':old_profile_pics,
                         "prof_pic_obj": banner_pic_obj,

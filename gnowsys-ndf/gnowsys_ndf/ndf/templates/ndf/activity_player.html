@@ -72,7 +72,8 @@
               </div>
               <div class="activity_page_rendered">
                 activity name : {{node.name}}
-                {{node.content|safe}}
+                {# {{node.content|safe}} #}
+                {% include "ndf/node_ajax_content.html" with node=node %}
               </div>
               <div id="info-page-area">
                 
