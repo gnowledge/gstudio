@@ -34,7 +34,7 @@
                 <li class=""><a href="#"><i class="icons-medium fi-info"></i>&nbsp;Help Topics</a></li>
  -->              {% if user.is_authenticated %}
 
-                <li class="has-dropdown">
+                <li class="has-dropdown buddy_margin">
                     {% get_profile_pic request.user.pk as prof_pic %}
                     <a href="{% url 'dashboard' request.user.pk %}">
                       <img src="{{MEDIA_URL}}{{prof_pic.if_file.original.relurl}}" id="profile-img">
