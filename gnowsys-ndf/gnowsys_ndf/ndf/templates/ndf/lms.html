@@ -25,12 +25,19 @@
     <li>
       <a href="{% url 'course_content' group_id %}" {% if title == 'course content' %}class="selected"{% endif %}>Lessons</a> 
      </li>
-    <li>  <a href="{% url 'course_content' group_id %}" {% if title == 'course content' %}class="selected"{% endif %}>Raw Material</a> </li>
+    <li>  <a href="{% url 'course_raw_material' group_id %}" {% if title == 'raw material' %}class="selected"{% endif %}>Resources</a> </li>
+    <li>
+    <li>  <a href="{% url 'course_gallery' group_id %}" {% if title == 'gallery' %}class="selected"{% endif %}>Gallery</a> </li>
     <li>
       <a href="{% url 'course_notebook' group_id %}" {% if title == 'notebook' %}class="selected"{% endif %}>Notebook</a>
     </li>
     <li> Gallery </li>
   </ul>
+</div>
+
+
+<div id="addAsset" class="reveal-modal reveal-modal-overlay" data-reveal aria-labelledby="modalTitle" aria-hidden="true" role="dialog">
+    <a class="close-reveal-modal" aria-label="Close">&#215;</a>
 </div>
 
 <div class="row">
@@ -50,6 +57,19 @@
     <div id="group_course_content">
        {% if title == 'course content' %}
           {% include "ndf/course_content.html" %}
+        {% endif %}
+    </div>
+    <div id="group_elibrary">
+        {% if title == "raw material" %}
+            {% include "ndf/assets.html" %}
+        {% endif %}
+        
+        {% if title == "gallery" %}
+              {% include "ndf/assets.html" %}
+        {% endif %}
+        
+        {% if title == "asset_detail" or title == "asset_content_detail" %}
+            {% include "ndf/add_asset.html" %}
         {% endif %}
     </div>
   </div>
@@ -134,3 +154,4 @@
 
   
 {% endblock %}
+

@@ -60,7 +60,7 @@
         <div class="small-8 columns left">
              {% if asset_obj.tags %}
                 {% for tag in asset_obj.tags %}
-                    {% if tag != "asset@asset" and tag != "raw@material" %}
+                    {% if tag != "asset@asset" and tag != "raw@material" and tag != "asset@gallery" %}
                         <small><label class="tag-ele">
                         <a href="{% url 'tag_info' group_id tag %}">{{tag}} </a></label></small>
                     {% endif %}
@@ -144,7 +144,6 @@
         <div class="row">
             <div class="asset-tags-container small-12 medium-10 large-10 columns">
                 <label>
-
                 <input type="checkbox" name="is_raw_material" class="is_raw_material" {% if "raw@material" in asset_obj.tags %} checked="checked" {% endif %}> Mark as Raw Material
 
                 </label>
@@ -374,7 +373,8 @@
                         "node_id": asset_id,
                         "sel_tags":sel_tags,
                         "sel_asset_lang":sel_asset_lang,
-                        "is_raw_material": is_raw_material
+                        "is_raw_material": is_raw_material,
+                        title :"{{title}}"
                         // "asset_objective":asset_objective
                     },
                   url: "{% url 'create_edit_asset' group_id %}",
@@ -509,4 +509,21 @@ $( ".edit-metadata" ).click(function(event) {
                     'slow');
         });
     {% endif %}
+    $( ".createAsset" ).click(function() {
+                    var asset_id = $(this).attr('data-asset_id');
+                    
+                    $.ajax({
+                              type: "GET",
+                              url: "{% url 'add_asset' group_id %}",
+                              data: {
+                                node_id: asset_id
+                              },
+                              datatype: "html",
+                              success: function(data) {
+                                $('#addAsset').foundation('reveal', 'open');
+                                $('#addAsset').html(data);
+                            }
+
+                      });
+            });
 </script>

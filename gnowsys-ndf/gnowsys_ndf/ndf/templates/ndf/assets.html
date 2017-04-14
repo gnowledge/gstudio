@@ -8,7 +8,7 @@
         {% if user.is_authenticated %}
             <button type="button" class="right orange-button createAsset">
                 <i class="fi-plus"> </i>
-                Add 
+                Add  
             </button>
         {% endif %}
         </div>
@@ -39,3 +39,22 @@
     </a>
     {% endfor %}
 </div>
+<script type="text/javascript">
+    $( ".createAsset" ).click(function() {
+                    var asset_id = $(this).attr('data-asset_id');
+                    $.ajax({
+                              type: "GET",
+                              url: "{% url 'add_asset' group_id %}",
+                              data: {
+                                node_id: asset_id,
+                                "title" : '{{title}}'
+                              },
+                              datatype: "html",
+                              success: function(data) {
+                                $('#addAsset').foundation('reveal', 'open');
+                                $('#addAsset').html(data);
+                            }
+
+                      });
+            });
+</script>
