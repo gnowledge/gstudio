@@ -8,22 +8,26 @@
  <!-- LMS.html -->
 
 <div class="lms_page">
-      <div class="lms_banner">
-        <div class="small-12 columns lms_heading">
-          <div class="left unit_name">Unit Name</div>
-          <div class="right enroll_unit"><a href="#">Enroll me</a></div>
-        </div>
-      </div>
+     <div class="lms_banner">
+       <div class="small-12 columns lms_heading">
+         <div class="left unit_name">Unit Name</div>
+         <div class="right enroll_unit"><a href="#">Enroll me</a></div>
+       </div>
+     </div>
 </div>
+
 <div class="lms_secondary_header">
+ 
   <ul class="nav_menu_1">
-    <li> Overview
-    {# <a href="{% url 'course_about' group_id %}" {% if title == 'about' %}class="selected"{% endif %}>Overview</a> #} 
+    <li>
+      <a href="{% url 'course_about' group_id %}" {% if title == 'about' %}class="selected"{% endif %}>Overview</a> 
     </li>
-    <li> Lessons </li>
-    <li> Raw Material </li>
-    <li>Notebook
-    {# <a href="{% url 'course_notebook' group_id %}" {% if title == 'notebook' %}class="selected"{% endif %}>Notebook</a> #}
+    <li>
+      <a href="{% url 'course_content' group_id %}" {% if title == 'course content' %}class="selected"{% endif %}>Lessons</a> 
+     </li>
+    <li>  <a href="{% url 'course_content' group_id %}" {% if title == 'course content' %}class="selected"{% endif %}>Raw Material</a> </li>
+    <li>
+      <a href="{% url 'course_notebook' group_id %}" {% if title == 'notebook' %}class="selected"{% endif %}>Notebook</a>
     </li>
     <li> Gallery </li>
   </ul>
@@ -41,6 +45,11 @@
     <div id="group_blog">
        {% if title == 'notebook' %}
           {% include "ndf/gnotebook.html" %}
+        {% endif %}
+    </div>
+    <div id="group_course_content">
+       {% if title == 'course content' %}
+          {% include "ndf/course_content.html" %}
         {% endif %}
     </div>
   </div>

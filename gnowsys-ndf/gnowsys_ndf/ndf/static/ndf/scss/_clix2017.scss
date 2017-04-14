@@ -3501,7 +3501,7 @@ ul.nav_menu_1 {
 .lesson-title{
     font-size: 18px;
     padding-top: 10px;
-    padding-left: 23px;
+    padding-left: 10px;
 }
 
 .activity-title{
@@ -3509,7 +3509,7 @@ ul.nav_menu_1 {
     padding-top: 10px;
     padding-left: 23px;
     margin: 0px;
-                            
+
         &>li {
                 list-style: none;
                 border-top: 1px solid #e9e9e9;
@@ -3523,7 +3523,10 @@ ul.nav_menu_1 {
                             background: rgba(116, 0, 255, 0.31);
 
                         }
-                    }
+                &>a {
+                            color:black;
+                        }
+            }
 
 }
 
@@ -4063,26 +4066,77 @@ $module-card-lines-to-show: 3;
     color: #fff;
     box-shadow: 0 0 2px 0 rgba(0, 0, 0, 0.2);
 }
-
 $nav_menu_1_color: #ce7869;
 $nav_menu_1_bg_color: #fff;
 $nav_menu_1_tab_border: #ffc14e;
 ul.nav_menu_1 {
     margin-bottom: 0px;
     background-color: $nav_menu_1_bg_color;
-    li {
-        list-style-type: none;
-        display: inline-block;
-        padding: 12px 12px 9px;
-        color: $nav_menu_1_color;
-        cursor: pointer;
-        font-size: 18px;
-        font-family: OpenSans-Regular;
-        letter-spacing: 0.8px;
-        border-bottom: 3px solid transparent;
+    >li {
+            display: inline-block;
 
-        &:hover {
-            border-bottom: 3px solid $nav_menu_1_tab_border;
+        >a{
+            list-style-type: none;
+            display: inline-block;
+            padding: 12px 12px 9px;
+            color: $nav_menu_1_color;
+            cursor: pointer;
+            font-size: 18px;
+            letter-spacing: 0.8px;
+            border-bottom: 3px solid transparent;
+        
+
+            &.selected, &:hover{
+                border-bottom: 3px solid $nav_menu_1_tab_border;
+            }
+        }
+
+    }
+}
+
+.course-content {
+    background: #fff;
+    margin: 20px auto;
+    padding: 20px 0px;
+
+    ul.jqtree-tree {
+        .course-tree-node {
+            &.jqtree-selected .jqtree-element{
+                background: #fff;
+            }
+            &>div{
+                height: 35px;
+                a {
+                    margin-right: 0.7em;
+                }
+            }
+        }
+    }
+
+    .course-unit-name {
+        padding-left: 20px;
+        &:not(:last-child){
+            border-bottom: 1px solid #d2cfcf;
+        }
+
+        >div {
+            .jqtree-title {
+                color: #3c5264;
+                font-size: 19px;
+                font-weight: 600;
+            }
+        }
+    }
+    .course-activity-group >div {
+        .jqtree-title {
+            color: #74a0c0;
+            font-size: 17px;
+        }
+    }
+    .course-activity-name >div {
+        .jqtree-title {
+            color: #74a0c0;
+            font-size: 17px;
         }
     }
 }
@@ -4105,4 +4159,19 @@ ul.nav_menu_1 {
   border: 2px solid #ffc14e;
   background-color: #eefaff;
   letter-spacing: 0.3px;
+}
+
+.lesson-dropdown ul {
+    display:none;
+}
+
+.lesson-dropdown:hover ul{
+    display:block;
+}
+
+.lesson_name_in_export{
+    list-style: none;
+    &:hover{
+        border-left: 2.5px solid #ce7869;
+    }
 }

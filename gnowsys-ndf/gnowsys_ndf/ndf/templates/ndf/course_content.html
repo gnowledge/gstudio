@@ -1,0 +1,65 @@
+<div class="row course-content">
+        <div class="small-12 collumns">
+            <div id="tree1"></div>
+        </div>
+    </div>
+    <script type="text/javascript">
+        $(function(){
+            // var data = [
+            //     {
+            //         label: 'Let us learn together',
+            //         id: 1,
+            //         type: 'unit-name',
+            //         children: [
+            //             {
+            //                 label: 'Let us Begin!',
+            //                 id: 2,
+            //                 type: 'activity-group',
+            //                 children: [{
+            //                     label: 'About the Course',
+            //                     id: 3,
+            //                     type: 'activity-name',
+            //                 }]
+            //             }
+            //         ]
+            //     },
+            //     {
+            //         label: 'Module 1: Introduction and Indic Typing',
+            //         id: 4,
+            //         type: 'unit-name',
+            //         children: [
+            //             { label: 'child3', id: 5, type: 'activity-group'}
+            //         ]
+            //     },
+            //     {
+            //         label: 'Module 2: Analysing with Spreadsheets',
+            //         id: 6,
+            //         type: 'unit-name',
+            //         children: [
+            //             { label: 'child3', id: 7, type: 'activity-group' }
+            //         ]
+            //     }
+            // ];
+            var course_data = {{unit_structure|safe}};
+            $('#tree1').tree({
+                data: course_data,
+                autoOpen: false,
+                dragAndDrop: false,
+                closedIcon: $('<i class="fa fa-plus" aria-hidden="true"></i>'),
+                openedIcon: $('<i class="fa fa-minus" aria-hidden="true"></i>'),
+                onCreateLi: function(node, $li){
+                    $li.addClass('course-tree-node course-'+node.type);
+                    // console.log(node);
+                    // alert(node.parent.id + "node.parent")
+                    // alert(node.parent + "node")
+                    if (node.type == "activity-group"){
+                        url = '/{{group_id}}/course/activity_player/' + node.parent.id + '/' + node.id
+                        // alert(node.name)
+                        $li.find('.jqtree-title')
+                            .html('<a href="'+url+'" id='+node.id +' class="redirect_to_unitplayer"><span>' + $li.find('.jqtree-title').html() + ' </a></span>');
+                    }
+
+                }
+            });
+        })
+    </script>

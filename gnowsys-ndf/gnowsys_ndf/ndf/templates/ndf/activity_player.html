@@ -1,0 +1,125 @@
+{% extends "ndf/gbase.html" %}
+{% load i18n %}
+
+{% block title %} {{lesson_node.name}}  {% endblock %}
+
+
+{% block body_content %}
+
+<div class="activity_player_secondary_header activity_player_header">
+        <div class="header_icon_block back_button">
+            <a href="{% url 'course_content' group_id  %}"><i class="fa fa-angle-left header_icon"></i></a>
+        </div>
+        <div class="header_title header_text_block">
+            {{group_name}}
+        </div>
+        <div class="new_note header_text_block">
+            <a href="#">
+                <i class="fa fa-edit header_icon"></i>&nbsp;
+                WRITE A NEW NOTE
+            </a>
+        </div>
+        <div class="pagination prev_button header_text_block">
+            {% if resource_prev_id %}
+              <a href="{% url 'activity_player_detail' group_id lesson_node.pk resource_prev_id %}"> 
+                  <i class="fa fa-angle-left header_icon"></i>
+                  &nbsp;PREV
+              </a>
+            {% endif %}
+        </div>
+        <div class="pagination page_count header_text_block">
+            {{resource_index|add:'1'}} OF {{lesson_node.collection_set|length}}
+        </div>
+        <div class="pagination page_count header_text_block">
+            {% if resource_next_id %}
+              <a href="{% url 'activity_player_detail' group_id lesson_node.pk resource_next_id %}">
+                  NEXT&nbsp;
+                  <i class="fa fa-angle-right header_icon"></i>
+              </a>
+            {% endif %}
+        </div>
+</div>
+
+<div class="row activity_sheet">
+    <div class="small-12 columns">
+        <div class="course_editor ">
+          <div class="small-2 columns">
+            <div class="course_tree">
+              <div class="lesson-title" title="{{lesson_node.name}}">
+                  <b>{{lesson_node.name}}</b>
+              </div>
+              <div class="activity-title">
+              {% for each in unit_resources_list_of_dict %}
+                 <li  {% if each.pk == node.pk %} class="active" {% endif %}> <a href="{% url 'activity_player_detail' group_id lesson_node.pk each.pk %}">{{each.name}}</a></li>
+              {% endfor %}
+              </div>
+              </div>
+          </div>
+          <div class="small-9 columns">
+            <div class="course_editor_section">
+              <div class="input_links row">
+              {% for each in node.relation_set %}
+                {% if "has_help" in each %}
+                  <button type="button" class="orange-button student-page right"> Student Help</button>
+                {% endif %}
+                {% if "has_admin_page" in each %}
+                  <button type="button" class="orange-button admin-page right"> Teacher's Help</button>
+                {% endif  %}
+              {% endfor %}
+              <button type="button" class="orange-button discuss right"> discuss</button>
+              <button type="button" class="orange-button translate right"> Translate</button>
+
+              </div>
+              <div class="activity_page_rendered">
+                activity name : {{node.name}}
+                {# {{node.content|safe}} #}
+                {% include "ndf/node_ajax_content.html" with node=node %}
+              </div>
+              <div id="info-page-area">
+                
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+</div>             
+<script type="text/javascript">
+  $(".admin-page").click(function(event){
+          $.ajax({
+                      type: "POST",
+                      url: "{% url 'get_info_pages' group_id %}",
+                      datatype: "html",
+                      data:{
+                        'csrfmiddlewaretoken': "{{csrf_token}}",
+                        'node_id':'{{node.pk}}',
+                        'page_type':'has_admin_page'
+
+                      },
+                        success: function(data) {
+                        // $('#info-page-area').html(data);
+                        parent = $("#info-page-area");
+                        parent.html(data);
+                      }
+                    });
+      });
+  
+  $(".student-page").click(function(event){
+          $.ajax({
+                      type: "POST",
+                      url: "{% url 'get_info_pages' group_id %}",
+                      datatype: "html",
+                      data:{
+                        'csrfmiddlewaretoken': "{{csrf_token}}",
+                        'node_id':'{{node.pk}}',
+                        'page_type':'has_help'
+
+                      },
+                        success: function(data) {
+                        // $('#info-page-area').html(data);
+                        parent = $("#info-page-area");
+                        parent.html(data);
+                      }
+                    });
+      });
+</script>
+{% endblock %}
