@@ -3974,3 +3974,18 @@ $module-card-lines-to-show: 3;
   background-color: #eefaff;
   letter-spacing: 0.3px;
 }
+
+.lesson-dropdown ul {
+    display:none;
+}
+
+.lesson-dropdown:hover ul{
+    display:block;
+}
+
+.lesson_name_in_export{
+    list-style: none;
+    &:hover{
+        border-left: 2.5px solid #ce7869;
+    }
+}

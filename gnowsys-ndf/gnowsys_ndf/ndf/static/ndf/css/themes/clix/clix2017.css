@@ -3808,3 +3808,22 @@ ul.nav_menu_1 li:hover {
   background-color: #eefaff;
   letter-spacing: 0.3px;
 }
+
+/* line 3978, ../../../scss/_clix2017.scss */
+.lesson-dropdown ul {
+  display: none;
+}
+
+/* line 3982, ../../../scss/_clix2017.scss */
+.lesson-dropdown:hover ul {
+  display: block;
+}
+
+/* line 3986, ../../../scss/_clix2017.scss */
+.lesson_name_in_export {
+  list-style: none;
+}
+/* line 3988, ../../../scss/_clix2017.scss */
+.lesson_name_in_export:hover {
+  border-left: 2.5px solid #ce7869;
+}
