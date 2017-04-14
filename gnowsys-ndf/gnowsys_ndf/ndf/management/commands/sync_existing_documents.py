@@ -28,7 +28,7 @@ class Command(BaseCommand):
     # updating access_policy from inconsistent values like 'public', 'Public' to 'PUBLIC'
     all_ap = node_collection.collection.update({'_type': {'$nin': [u'ToReduceDocs']}, 'access_policy': {'$in': [u'public', u'Public', '', None]}}, {'$set':{'access_policy': u'PUBLIC'} }, upsert=False, multi=True)
     if all_ap['nModified']:
-        print "\n `access_policy`: Replaced non u'PUBLIC' values of public nodes to 'PUBLIC' for : " + all_ap['nModified'].__str__() + " instances."
+        print "\n `access_policy`: Replaced non u'PUBLIC' values of public nodes to u'PUBLIC' for : " + all_ap['nModified'].__str__() + " instances."
 
     # --------------------------------------------------------------------------
     # All Triples - Replacing <'lang': ''> field to <'language': []>
@@ -225,16 +225,17 @@ class Command(BaseCommand):
 
     # updating author_set of desk and home group w.ref. to home group's author_set
     home_group = node_collection.one({"_type":"Group", "name": "home"})
-    prev_home_author_set = home_group.author_set
-    total_author_set = list(set(authors_list + home_group.author_set))
+    if home_group:
+        prev_home_author_set = home_group.author_set
+        total_author_set = list(set(authors_list + home_group.author_set))
 
-    result = node_collection.collection.update({"_type": "Group", "name": {"$in": [u"home", u"desk"]}, "author_set": {"$ne": total_author_set} }, {"$set": {"author_set": total_author_set}}, upsert=False, multi=True )
+        result = node_collection.collection.update({"_type": "Group", "name": {"$in": [u"home", u"desk"]}, "author_set": {"$ne": total_author_set} }, {"$set": {"author_set": total_author_set}}, upsert=False, multi=True )
 
-    if result['updatedExisting']: # and result['nModified']:
-        home_group.reload()
-        print "\n Updated author_set of 'home' and 'desk' group:" + \
-            "\n\t - Previously it was   : " + str(len(prev_home_author_set)) + " users."\
-            "\n\t - Now it's updated to : " + str(len(home_group.author_set)) + " users."
+        if result['updatedExisting']: # and result['nModified']:
+            home_group.reload()
+            print "\n Updated author_set of 'home' and 'desk' group:" + \
+                "\n\t - Previously it was   : " + str(len(prev_home_author_set)) + " users."\
+                "\n\t - Now it's updated to : " + str(len(home_group.author_set)) + " users."
 
 
     # --------------------------------------------------------------------------
@@ -500,56 +501,58 @@ class Command(BaseCommand):
 
     # Updates already created has_profile_pic grelations' status - Except latest one (PUBLISHED) others' are set to DELETED
     has_profile_pic = node_collection.one({'_type': "RelationType", 'name': u"has_profile_pic"})
-    op = triple_collection.collection.aggregate([
-        {'$match': {
-        '_type': "GRelation",
-        'relation_type': has_profile_pic._id
-        }},
-        {'$group': {
-        '_id': {'auth_id': "$subject"},
-        'pp_data': {'$addToSet': {'gr_id': "$_id", 'status': "$status"}}
-        }}
-    ])
+    if has_profile_pic:
+        op = triple_collection.collection.aggregate([
+            {'$match': {
+            '_type': "GRelation",
+            'relation_type': has_profile_pic._id
+            }},
+            {'$group': {
+            '_id': {'auth_id': "$subject"},
+            'pp_data': {'$addToSet': {'gr_id': "$_id", 'status': "$status"}}
+            }}
+        ])
 
-    res = 0
-    for each in op["result"]:
-        auth_id = each["_id"]["auth_id"]
-        pub_id = None
-        pub_res = 0
-        del_id = []
-        del_res = 0
+        res = 0
+        for each in op["result"]:
+            auth_id = each["_id"]["auth_id"]
+            pub_id = None
+            pub_res = 0
+            del_id = []
+            del_res = 0
 
-        for l in each["pp_data"]:
-            if l["status"] == u"PUBLISHED":
-                pub_id = l["gr_id"]
+            for l in each["pp_data"]:
+                if l["status"] == u"PUBLISHED":
+                    pub_id = l["gr_id"]
 
-            else:
-                del_id.append(l["gr_id"])
+                else:
+                    del_id.append(l["gr_id"])
 
-        if not pub_id:
-            pub_id = each["pp_data"][len(each["pp_data"])-1]["gr_id"]
-            pub_res = node_collection.collection.update({'_id': pub_id}, {'$set': {'status': u"PUBLISHED"}}, upsert=False, multi=False)
-            pub_res = pub_res['n']
-            del_id.pop()
+            if not pub_id:
+                pub_id = each["pp_data"][len(each["pp_data"])-1]["gr_id"]
+                pub_res = node_collection.collection.update({'_id': pub_id}, {'$set': {'status': u"PUBLISHED"}}, upsert=False, multi=False)
+                pub_res = pub_res['n']
+                del_id.pop()
 
-        del_res = node_collection.collection.update({'_id': {'$in': del_id}}, {'$set': {'status': u"DELETED"}}, upsert=False, multi=True)
+            del_res = node_collection.collection.update({'_id': {'$in': del_id}}, {'$set': {'status': u"DELETED"}}, upsert=False, multi=True)
 
-        if pub_res or del_res['n']:
-            res += 1
+            if pub_res or del_res['n']:
+                res += 1
 
-    if res:
-        print "\n Updated following no. of has_profile_pic GRelation document(s): ", res
+        if res:
+            print "\n Updated following no. of has_profile_pic GRelation document(s): ", res
 
     # Updates the value of object_cardinality to 100. So that teaches will behave as 1:M (one-to-many) relation.
     teaches = node_collection.one({'_type': "RelationType", 'name': "teaches"})
-    res = node_collection.collection.update({'_id': teaches._id, 'object_cardinality': {'$ne': 100}},
-            {'$set': {'object_cardinality': 100}},
-            upsert=False, multi=False
-        )
-    if res["updatedExisting"]:
-        print "\n 'teaches' RelationType updated with object_cardinality: 100. Changed document: ", res['n']
-    else:
-        print "\n 'teaches' RelationType: no need to update."
+    if teaches:
+        res = node_collection.collection.update({'_id': teaches._id, 'object_cardinality': {'$ne': 100}},
+                {'$set': {'object_cardinality': 100}},
+                upsert=False, multi=False
+            )
+        if res["updatedExisting"]:
+            print "\n 'teaches' RelationType updated with object_cardinality: 100. Changed document: ", res['n']
+        else:
+            print "\n 'teaches' RelationType: no need to update."
 
     # Replacing object_type of "has_course" relationship from "NUSSD Course" to "Announced Course"
     ann_course = node_collection.one({'_type': "GSystemType", 'name': "AnnouncedCourse"})
@@ -868,11 +871,12 @@ class Command(BaseCommand):
     '''
     # Correct Eventype and CollegeEventtype Node  by setting their modified by field
     glist = node_collection.one({'_type': "GSystemType", 'name': "GList"})
-    node = node_collection.find({'member_of':ObjectId(glist._id),"name":{'$in':['Eventtype','CollegeEvents']}})
-    for i in node:
-        i.modified_by = 1
-        i.save()
-        print "Updated",i.name,"'s modified by feild from null to 1"
+    if glist:
+        event_type_node_cur = node_collection.find({'member_of':ObjectId(glist._id),"name":{'$in':['Eventtype','CollegeEvents']}})
+        for i in event_type_node_cur:
+            i.modified_by = 1
+            i.save()
+            print "Updated",i.name,"'s modified by feild from null to 1"
 
     all_grelations = triple_collection.find({'_type': 'GRelation'})
     all_gattributes = triple_collection.find({'_type': 'GAttribute'})

@@ -35,6 +35,7 @@ from gnowsys_ndf.ndf.templatetags.ndf_tags import check_is_gstaff
 gst_course = node_collection.one({'_type': "GSystemType", 'name': "Course"})
 gst_basecoursegroup = node_collection.one({'_type': "GSystemType", 'name': "BaseCourseGroup"})
 ce_gst = node_collection.one({'_type': "GSystemType", 'name': "CourseEventGroup"})
+announced_unit_gst = node_collection.one({'_type': "GSystemType", 'name': "announced_unit"})
 gst_acourse = node_collection.one({'_type': "GSystemType", 'name': "Announced Course"})
 gst_group = node_collection.one({'_type': "GSystemType", 'name': "Group"})
 group_id = node_collection.one({'_type': "Group", 'name': "home"})._id
@@ -56,7 +57,7 @@ def explore(request):
 @get_execution_time
 def explore_courses(request,page_no=1):
     title = 'courses'
-    ce_cur = node_collection.find({'member_of': ce_gst._id,
+    ce_cur = node_collection.find({'member_of': {'$in': [ce_gst._id, announced_unit_gst._id]},
                                         '$or': [
                                           {'created_by': request.user.id},
                                           {'group_admin': request.user.id},

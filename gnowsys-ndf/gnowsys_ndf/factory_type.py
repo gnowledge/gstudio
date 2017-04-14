@@ -110,10 +110,10 @@ factory_attribute_types = [{'start_time':{'gsystem_names_list':['QuizItem','Foru
                            {'readinglevel':{'gsystem_names_list':['Quiz','Topic','File','Page','Pandora_video', 'E-Book','Jsmol','Asset'],
                                             'data_type':'basestring',
                                             'meta_type':'factory_types'}},
-                           {'educationalsubject':{'gsystem_names_list':['Quiz','Topic','File','Page','Pandora_video', 'E-Book','Jsmol', 'base_unit','Asset'],
+                           {'educationalsubject':{'gsystem_names_list':['Quiz','Topic','File','Page','Pandora_video', 'E-Book','Jsmol', 'base_unit','Asset', 'announced_unit'],
                                                   'data_type':'basestring',
                                                   'meta_type':'factory_types'}},
-                           {'educationallevel':{'gsystem_names_list':['Quiz','Topic','File','Page','Pandora_video', 'E-Book','Jsmol', 'base_unit','Asset'],
+                           {'educationallevel':{'gsystem_names_list':['Quiz','Topic','File','Page','Pandora_video', 'E-Book','Jsmol', 'base_unit','Asset', 'announced_unit'],
                                                 'data_type':'list',
                                                 'meta_type':'factory_types'}},
                            {'educationalalignment':{'gsystem_names_list':['Quiz','QuizItem','Topic','File','Page','NUSSD Course', 'Pandora_video', 'Theme', 'E-Book','Jsmol','Asset'],
@@ -214,7 +214,7 @@ factory_relation_types = [
     },
 
     {'has_banner_pic': {
-            'subject_type':['Author','Group','ModeratingGroup','CourseEventGroup','ProgramEventGroup','PartnerGroup', 'BaseCourseGroup'],
+            'subject_type':['Author','Group','ModeratingGroup','CourseEventGroup','ProgramEventGroup','PartnerGroup', 'BaseCourseGroup', 'announced_unit'],
             'object_type':['Image','File'],
             'inverse_name':'banner_pic_of',
             'meta_type':'factory_types'

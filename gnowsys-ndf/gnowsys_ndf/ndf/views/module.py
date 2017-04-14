@@ -22,6 +22,7 @@ from gnowsys_ndf.ndf.views.methods import get_execution_time, staff_required, cr
 from gnowsys_ndf.ndf.views.ajax_views import get_collection
 
 gst_module_name, gst_module_id = GSystemType.get_gst_name_id('Module')
+gst_base_unit_name, gst_base_unit_id = GSystemType.get_gst_name_id('base_unit')
 
 
 @get_execution_time
@@ -78,7 +79,9 @@ def module_detail(request, group_id, node_id):
 
     module_obj = Node.get_node_by_id(node_id)
 
-    units_under_module = Node.get_nodes_by_ids_list(module_obj.collection_set)
+    # units_under_module = Node.get_nodes_by_ids_list(module_obj.collection_set)
+    units_under_module = node_collection.find({'_id': {'$in': module_obj.collection_set},
+                            'member_of': gst_base_unit_id})
 
     template = 'ndf/module_detail.html'
 

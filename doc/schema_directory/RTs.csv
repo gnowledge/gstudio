@@ -49,4 +49,4 @@ subject_type,member_of,name,altnames,inverse_name,object_type,object_cardinality
 "[""Asset""]","[""Binary""]",has_assetcontent,AssetContent,assetcontent_of,"[""QuizItem"",""Page"",""File""]",100,"[""alt_size"",""alt_format"",""alt_language""]","[""any"",""most"",""some"",""none"",""atmost""]",[]
 "[""File""]","[""Binary""]",has_subtitle,File;File,subtitle_of,"[""File""]",100,"[""alt_language""]",[],[]
 "[""File""]","[""Binary""]",has_transcript,File;File,transcript_of,"[""File""]",1,[],[],[]
-"[""Page"",""File""]","[""Binary""]",has_alt_content,File;File,alt_content_of,"[""Page"",""File""]",100,"[""alt_size"",""alt_format"",""alt_language"",""alt_content"",""alt_others""]","[""any"",""most"",""some"",""none"",""atmost""]",[]
+"[""Page"",""File""]","[""Binary""]",has_alt_content,File;File,alt_content_of,"[""Page"",""File""]",100,"[""alt_size"",""alt_format"",""alt_language""]","[""any"",""most"",""some"",""none"",""atmost""]",[]

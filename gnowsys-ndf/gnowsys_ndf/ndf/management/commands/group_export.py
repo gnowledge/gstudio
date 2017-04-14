@@ -28,12 +28,13 @@ RESTORE_USER_DATA = False
 log_file = None
 historyMgr = HistoryManager()
 
-def create_log_file(dump_path):
+def create_log_file():
     '''
         Creates log file in gstudio-logs/ with 
         the name of the dump folder
     '''
-    dump_path = dump_path.split("/")[-1]
+    global DUMP_PATH
+    dump_path = DUMP_PATH.split("/")[-1]
     log_file_name = 'group_dump_' + str(dump_path)+ '.log'
     if not os.path.exists(GSTUDIO_LOGS_DIR_PATH):
         os.makedirs(GSTUDIO_LOGS_DIR_PATH)
@@ -122,28 +123,30 @@ class Command(BaseCommand):
 
         if group_node:
             print "\tRequest received for Export of : ", group_node.name , ' | ObjectId: ', group_node._id
-            fork_clone_opt = "\n\tExport Options:"
-            fork_clone_opt += "\n\t\t 1. Fork (What is Fork?"
-            fork_clone_opt += " Restore will create instances with NEW Ids)"
-            fork_clone_opt += "\n\t\t 2. Clone (What is Clone?"
-            fork_clone_opt += " Restore will create instances with OLD Ids)"
-            fork_clone_opt += "\n\tEnter options 1 or 2 or any other key to cancel: \t"
+            # fork_clone_opt = "\n\tExport Options:"
+            # fork_clone_opt += "\n\t\t 1. Fork (What is Fork?"
+            # fork_clone_opt += " Restore will create instances with NEW Ids)"
+            # fork_clone_opt += "\n\t\t 2. Clone (What is Clone?"
+            # fork_clone_opt += " Restore will create instances with OLD Ids)"
+            # fork_clone_opt += "\n\tEnter options 1 or 2 or any other key to cancel: \t"
 
-            fork_clone_confirm = raw_input(fork_clone_opt)
+            # fork_clone_confirm = raw_input(fork_clone_opt)
             global IS_FORK
             global IS_CLONE
             global RESTORE_USER_DATA
+            IS_FORK = True
+            IS_CLONE = False
             
-            if fork_clone_confirm == '1':
-                print "\n\t!!! Chosen FORK option !!!"
-                IS_FORK = True
-                IS_CLONE = False
-            elif fork_clone_confirm == '2':
-                print "\n\t!!! Chosen CLONE option !!!"
-                IS_FORK = False
-                IS_CLONE = True
-            else:
-                call_exit()
+            # if fork_clone_confirm == '1':
+            #     print "\n\t!!! Chosen FORK option !!!"
+            #     IS_FORK = True
+            #     IS_CLONE = False
+            # elif fork_clone_confirm == '2':
+            #     print "\n\t!!! Chosen CLONE option !!!"
+            #     IS_FORK = False
+            #     IS_CLONE = True
+            # else:
+            #     call_exit()
             user_data_dump = raw_input("\n\tDo you want to include Users in this export ? Enter y/n:\t ")
             if user_data_dump == 'y' or user_data_dump == 'Y':
                 RESTORE_USER_DATA = True
@@ -158,7 +161,7 @@ class Command(BaseCommand):
                 group_dump_path = setup_dump_path(group_node.name)
                 create_factory_schema_mapper(group_dump_path)
                 configs_file_path = create_configs_file(group_node._id)
-                log_file_path = create_log_file(group_dump_path)
+                log_file_path = create_log_file()
 
                 print "*"*70
                 # print "\n Export will be found at: ", DATA_EXPORT_PATH
@@ -171,8 +174,9 @@ class Command(BaseCommand):
                 call_group_export(group_node, nodes_falling_under_grp)
                 get_counter_ids(group_node._id)
                 # import ipdb; ipdb.set_trace()
+                global GROUP_CONTRIBUTORS
                 if RESTORE_USER_DATA:
-                    print "\n Total GROUP_CONTRIBUTORS: ", len(GROUP_CONTRIBUTORS)
+                    GROUP_CONTRIBUTORS = list(set(GROUP_CONTRIBUTORS))
                     create_users_dump(group_dump_path, GROUP_CONTRIBUTORS)
 
                 write_md5_of_dump(group_dump_path, configs_file_path)
@@ -282,7 +286,6 @@ def build_rcs(node, collection_name):
                 try:
                     global RESTORE_USER_DATA
                     if RESTORE_USER_DATA:
-                        print "\n NC: ", len(node.contributors)
                         if "contributors" in node:
                             GROUP_CONTRIBUTORS.extend(node.contributors)
                 except Exception as no_contributors_err:
@@ -411,9 +414,10 @@ def get_nested_ids(node,field_name):
     if node[field_name]:
         for each_id in node[field_name]:
             each_node = node_collection.one({"_id":ObjectId(each_id)})
-            dump_node(node=each_node, collection_name=node_collection)
-            if each_node and each_node[field_name]:
-                get_nested_ids(each_node, field_name)
+            if each_node and (node._id != each_node._id):
+                dump_node(node=each_node, collection_name=node_collection)
+                if each_node and each_node[field_name]:
+                    get_nested_ids(each_node, field_name)
 
 def get_counter_ids(group_id):
     '''

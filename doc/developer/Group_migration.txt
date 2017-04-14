@@ -1,0 +1,32 @@
+How to take DUMP?
+
+1. Go to manage.py level
+2. Run fab update_data
+3. python manage.py group_export
+	3.1. A prompt will be asked whether you want to take User objects that are linked with Group-data as contributors or creators.
+	3.2 A final confirmation prompt which displays total number of nodes.
+4. After completion of dump, the path of data-dump and log file will be displayed.
+	We need this data-dump to restore.
+
+How to take RESTORE?
+
+1. Go to manage.py level
+2. python manage.py group_import
+	3.1. This will prompt absolute path of data-dump [ref. DUMP pt.4]:
+			Enter Path
+	3.2. Next prompt will be whether you want to use User objects that are part of dump.
+		[if DUMP 3.1 is yes]
+		If you do not wish to use the users from the dump, say 'no', and the program will 
+		give another prompt that, the default user-id [as creator or contributor] used wille be 1
+		.Enter yes to proceed or say no to provide a default user-id in the next prompt.
+3. Run fab update_data
+4. After completion of dump, the path of log file will be displayed.
+
+
+Note:
+Remember, the import script generates bunch of json files at manage.py level
+Run `rm 5*` to get rid of them
+
+If the dump or restore breaks at any point or if the restore does not reflect properly,
+make sure you have the log files generated at dump and restore actions, and send them on 
+gnowsys-dev@gnowledge.org.
