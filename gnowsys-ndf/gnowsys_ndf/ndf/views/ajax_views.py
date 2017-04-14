@@ -6728,7 +6728,7 @@ def create_edit_asset(request,group_id):
       asset_obj.tags.append(u'asset@asset')
     if is_raw_material and u'raw@material' not in asset_obj.tags:
       asset_obj.tags.append(u'raw@material')
-    elif u'raw@material' in asset_obj.tags:
+    elif not is_raw_material and u'raw@material' in asset_obj.tags:
       asset_obj.tags.remove(u'raw@material')
     if asset_lang:
       language = get_language_tuple(asset_lang)
