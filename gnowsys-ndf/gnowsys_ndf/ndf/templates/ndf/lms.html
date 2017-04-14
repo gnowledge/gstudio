@@ -8,16 +8,12 @@
  <!-- LMS.html -->
 
 <div class="lms_page">
-      <div class="lms_banner">
-        {% include 'ndf/widget_photo_upload.html' with url_name='course_about' widget_for="group_banner" is_banner=True is_profile=False no_update_btn=False%}
-      </div>
-      <span data-dropdown="course-settings-drop" aria-controls="course-settings-drop" aria-expanded="false" class="tiny radius right">
-                  <i class="fi-widget"></i>
-                </span>
-                <span data-reveal-id="group_banner_prof_pic_prop" id="group_banner_btnUploadProfilePic" class="right">
-                  <i class="fi-photo"></i>
-                  <span style="position: relative;top: -3px;left: 2px;">Change image</span>
-                </span>
+     <div class="lms_banner">
+       <div class="small-12 columns lms_heading">
+         <div class="left unit_name">Unit Name</div>
+         <div class="right enroll_unit"><a href="#">Enroll me</a></div>
+       </div>
+     </div>
 </div>
 
 <div class="lms_secondary_header">
