@@ -1279,6 +1279,8 @@ class Node(DjangoDocument):
     def get_attribute(self, attribute_type_name, status=None):
         return GAttribute.get_triples_from_sub_type(self._id, attribute_type_name, status)
 
+    def get_attributes_from_names_list(self, attribute_type_name_list, status=None, get_obj=False):
+        return GAttribute.get_triples_from_sub_type_list(self._id, attribute_type_name_list, status, get_obj)
 
     def get_relation(self, relation_type_name, status=None):
         return GRelation.get_triples_from_sub_type(self._id, relation_type_name, status)
@@ -3352,6 +3354,48 @@ class Triple(DjangoDocument):
                                     triple_class_field_mapping_dict[cls._meta.verbose_name]: gr_or_rt_id,
                                     'status': {'$in': status}
                                 })
+
+
+  @classmethod
+  def get_triples_from_sub_type_list(cls, subject_id, gt_or_rt_name_or_id_list, status=None, get_obj=True):
+        '''
+        getting triples from SUBject and TYPE (attribute_type or relation_type)
+        '''
+        triple_node_mapping_dict = {
+            'GAttribute': 'AttributeType',
+            'GRelation': 'RelationType'
+        }
+        triple_class_field_mapping_dict = {
+            'GAttribute': 'attribute_type',
+            'GRelation': 'relation_type'
+        }
+        triple_class_field_mapping_key_dict = {
+            'GAttribute': 'object_value',
+            'GRelation': 'right_subject'
+        }
+
+        if not isinstance(gt_or_rt_name_or_id_list, list):
+            gt_or_rt_name_or_id_list = [gt_or_rt_name_or_id_list]
+
+        gt_or_rt_id_name_dict = {}
+        for each_gr_or_rt in gt_or_rt_name_or_id_list:
+            gr_or_rt_name, gr_or_rt_id = Node.get_name_id_from_type(each_gr_or_rt,
+                triple_node_mapping_dict[cls._meta.verbose_name])
+            gt_or_rt_id_name_dict.update({gr_or_rt_id: gr_or_rt_name})
+
+        status = [status] if status else ['PUBLISHED', 'DELETED']
+
+        tr_cur = triple_collection.find({
+                                    '_type': cls._meta.verbose_name,
+                                    'subject': ObjectId(subject_id),
+                                    triple_class_field_mapping_dict[cls._meta.verbose_name]: {'$in': gt_or_rt_id_name_dict.keys()},
+                                    'status': {'$in': status}
+                                })
+
+        gt_or_rt_name_value_or_obj_dict = {gt_or_rt: '' for gt_or_rt in gt_or_rt_name_or_id_list}
+        for each_tr in tr_cur:
+            gt_or_rt_name_value_or_obj_dict[gt_or_rt_id_name_dict[each_tr[triple_class_field_mapping_dict[cls._meta.verbose_name]]]] = each_tr if get_obj else each_tr[triple_class_field_mapping_key_dict[cls._meta.verbose_name]]
+        return gt_or_rt_name_value_or_obj_dict
 
 
   ########## Built-in Functions (Overridden) ##########
