@@ -21,7 +21,9 @@ def update_data():
 	local('python manage.py sync_existing_documents')
 	create_schema()
 	local('python manage.py filldb')
+	local('python manage.py create_schema ATs.csv')
 	local('python manage.py sync_existing_documents')
+
 
 
 def install_requirements():

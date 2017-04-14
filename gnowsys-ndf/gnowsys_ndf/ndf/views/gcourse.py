@@ -2107,6 +2107,8 @@ def course_notebook(request, group_id, tab=None, notebook_id=None):
     template = 'ndf/gcourse_event_group.html'
     if 'base_unit' in group_obj.member_of_names_list:
         template = 'ndf/gevent_base.html'
+    if 'announced_unit' in group_obj.member_of_names_list:
+        template = 'ndf/gevent_base.html'
 
 
     # page_gst = node_collection.one({'_type': "GSystemType", 'name': "Page"})
@@ -2250,11 +2252,15 @@ def course_raw_material(request, group_id, node_id=None,page_no=1):
                                     loggedin_userid=request.user.id)
 
     else:
+        type_of_files = file_gst_id
+        if "announced_unit" in group_obj.member_of_names_list:
+            asset_gst_name, asset_gst_id = GSystemType.get_gst_name_id("Asset")
+            type_of_files = asset_gst_id
 
         files_cur = node_collection.find({
                                         '_type': {'$in': ["File", "GSystem"]},
                                         '$or': [
-                                                {'member_of': file_gst_id},
+                                                {'member_of': type_of_files},
                                                 {
                                                     'collection_set': {'$exists': "true",'$not': {'$size': 0} },
                                                     'member_of': page_gst_id,
@@ -2395,13 +2401,20 @@ def course_about(request, group_id):
     if 'BaseCourseGroup' in group_obj.member_of_names_list:
         template = 'ndf/basecourse_group.html'
         show_analytics_notifications = False
-    if 'base_unit' in group_obj.member_of_names_list:
+    if ('base_unit' in group_obj.member_of_names_list or 
+        'announced_unit' in group_obj.member_of_names_list):
         template = 'ndf/gevent_base.html'
         show_analytics_notifications = False
         educationalsubject = get_attribute_value(group_obj._id,"educationalsubject")
         educationallevel = get_attribute_value(group_obj._id,"educationallevel")
         context_variables.update({'educationalsubject_val': educationalsubject,
             "educationallevel_val": educationallevel})
+    # Uncomment the following lines when 
+    # template for announced_unit is ready.
+    # if 'announced_unit' in group_obj.member_of_names_list:
+    #     template = 'ndf/gevent_base.html'
+    #     show_analytics_notifications = False
+    #     template = 'ndf/announced_unit.html'
 
     banner_pic_obj,old_profile_pics = _get_current_and_old_display_pics(group_obj)
     context_variables.update({'old_profile_pics':old_profile_pics,

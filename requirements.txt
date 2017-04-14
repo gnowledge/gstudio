@@ -54,3 +54,4 @@ waitress==0.8.10
 -e git://github.com/CLIxIndia-Dev/webpy.git@362dcecae9416eef6622922264e6c6482992c898#egg=web.py
 bs4==0.0.1
 html==1.16
+checksumdir==1.1.0

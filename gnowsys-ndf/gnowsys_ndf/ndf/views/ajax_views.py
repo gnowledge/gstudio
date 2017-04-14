@@ -6715,6 +6715,9 @@ def create_edit_asset(request,group_id):
     else:
         tags = []
     asset_lang =  request.POST.get("sel_asset_lang", '')
+    is_raw_material = eval(request.POST.get('is_raw_material', "False"))
+    # print "\nis_raw_material: ", is_raw_material, " type: ", type(is_raw_material)
+
     node_id = request.POST.get('node_id', None)
     asset_obj = create_asset(name=asset_name, group_id=group_id,
       created_by=request.user.id, content=unicode(asset_desc), node_id=node_id)
@@ -6723,7 +6726,10 @@ def create_edit_asset(request,group_id):
     
     if "asset@asset" not in asset_obj.tags:
       asset_obj.tags.append(u'asset@asset')
-    
+    if is_raw_material and u'raw@material' not in asset_obj.tags:
+      asset_obj.tags.append(u'raw@material')
+    elif not is_raw_material and u'raw@material' in asset_obj.tags:
+      asset_obj.tags.remove(u'raw@material')
     if asset_lang:
       language = get_language_tuple(asset_lang)
       asset_obj.language = language
