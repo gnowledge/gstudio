@@ -2458,7 +2458,7 @@ def course_about(request, group_id):
         context_variables.update({'educationalsubject_val': educationalsubject,
             "educationallevel_val": educationallevel})
     
-    if 'announced_unit' in group_obj.member_of_names_list
+    if 'announced_unit' in group_obj.member_of_names_list:
         template = 'ndf/lms.html'
     
     banner_pic_obj,old_profile_pics = _get_current_and_old_display_pics(group_obj)
