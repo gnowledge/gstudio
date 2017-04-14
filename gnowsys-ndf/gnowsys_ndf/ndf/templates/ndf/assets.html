@@ -13,12 +13,15 @@
         {% endif %}
         </div>
 </div>
-<div class="row"> 
+<div class="row listing-row"> 
       {% for each in asset_nodes %}
       <a href="{% url 'asset_detail' group_id each.pk %}"  title="{{each.name}}">
-      <div class="small-12 medium-6 large-3 columns">
+      <div class="small-12 medium-6 large-3 columns ">
         <div class="asset_tile">
             <div class="asset_preview">
+            {% if "raw@material" in each.tags %}
+                <div class="raw_material_asset">Raw Material</div>
+            {% endif %}
                 {% if each.if_file.mid.relurl and 'video' not in each.if_file.mime_type %}
                     <img src="{{MEDIA_URL}}{{each.if_file.mid.relurl}}">
                 {% elif 'video' not in each.if_file.mime_type and each.if_file.thumbnail.relurl %}

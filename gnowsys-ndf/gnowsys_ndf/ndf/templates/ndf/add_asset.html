@@ -50,7 +50,6 @@
                 {% endif %}
             
             {% endif%}
-            
             {% if user.is_authenticated %}
                 <button type="button" class="orange-button add-asset-content right"><i class="fi-plus"></i> Add File</button>
             {% endif %}
@@ -61,7 +60,7 @@
         <div class="small-8 columns left">
              {% if asset_obj.tags %}
                 {% for tag in asset_obj.tags %}
-                    {% if tag != "asset@asset" %}
+                    {% if tag != "asset@asset" and tag != "raw@material" %}
                         <small><label class="tag-ele">
                         <a href="{% url 'tag_info' group_id tag %}">{{tag}} </a></label></small>
                     {% endif %}
@@ -139,6 +138,15 @@
                 <label>
                 Add tags:
                 {% include 'ndf/widget_tags.html' with node=asset_obj hide_lbl=True %}
+                </label>
+            </div>
+        </div>
+        <div class="row">
+            <div class="asset-tags-container small-12 medium-10 large-10 columns">
+                <label>
+
+                <input type="checkbox" name="is_raw_material" class="is_raw_material" {% if "raw@material" in asset_obj.tags %} checked="checked" {% endif %}> Mark as Raw Material
+
                 </label>
             </div>
         </div>
@@ -346,6 +354,11 @@
         {
             event.preventDefault();
         }
+        is_raw_material = "False"
+        if($('input[name="is_raw_material"]:checked').length > 0)
+        {
+            is_raw_material = "True"
+        }
         sel_tags = $("input:hidden[name='tags']").val()
         sel_asset_lang =  $('#asset_lang').find(':selected').attr('data-sub-code');
         asset_name = $("#asset-name").val();
@@ -360,7 +373,8 @@
                         "asset_description":asset_description,
                         "node_id": asset_id,
                         "sel_tags":sel_tags,
-                        "sel_asset_lang":sel_asset_lang
+                        "sel_asset_lang":sel_asset_lang,
+                        "is_raw_material": is_raw_material
                         // "asset_objective":asset_objective
                     },
                   url: "{% url 'create_edit_asset' group_id %}",
@@ -488,11 +502,11 @@ $( ".edit-metadata" ).click(function(event) {
         });
 })
 
-{% if node %}
-    $( document ).ready(function() {
-        $('html,body').animate({
-                scrollTop: $(".asset-content-detail").offset().top},
-                'slow');
-    });
-{% endif %}
+    {% if node %}
+        $( document ).ready(function() {
+            $('html,body').animate({
+                    scrollTop: $(".asset-content-detail").offset().top},
+                    'slow');
+        });
+    {% endif %}
 </script>
