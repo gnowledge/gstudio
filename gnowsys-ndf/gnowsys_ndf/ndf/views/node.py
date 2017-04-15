@@ -65,6 +65,12 @@ def node_create_edit(request,
         attrs_to_create_update = [a.split('_')[1] for a in attrs_to_create_update]
 
         for each_attr_name in attrs_to_create_update:
-            create_gattribute(node_id, each_attr_name, object_value=post_req['attribute_'+each_attr_name])
+            each_attr_name_obj = Node.get_name_id_from_type(each_attr_name, 'AttributeType', get_obj=True)
+            post_req_attr_key = 'attribute_'+each_attr_name
+            post_method = 'getlist' if (each_attr_name_obj.data_type in [list, 'list']) else 'get'
+            create_gattribute(node_id,
+                            each_attr_name_obj,
+                            object_value=getattr(post_req, post_method)(post_req_attr_key))
+
 
         return HttpResponseRedirect(reverse(detail_url_name, kwargs={'group_id': group_id, 'node_id': node_id}))

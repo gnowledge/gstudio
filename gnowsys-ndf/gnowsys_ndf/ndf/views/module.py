@@ -73,7 +73,7 @@ def module_create_edit(request, group_id, module_id=None):
                     'Grade': {
                         'name' :'educationallevel',
                         'widget': 'dropdown',
-                        # 'widget_attr': 'multiple',
+                        'widget_attr': 'multiple',
                         'value': module_attr_values['educationallevel'],
                         'all_options': GSTUDIO_RESOURCES_EDUCATIONAL_LEVEL
                     }

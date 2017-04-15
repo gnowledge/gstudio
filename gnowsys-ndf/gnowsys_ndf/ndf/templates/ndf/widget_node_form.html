@@ -18,7 +18,6 @@
                 </div>
             </div>
 
-            <hr/>
 
             <!-- content -->
             <div class="">
@@ -40,9 +39,10 @@
                          <select name="attribute_{{v.name}}" {{v.widget_attr}}>
                             <option value=''>Choose {{k}}</option>
                             {% for each_opt in v.all_options %}
-                                <option {% if v.value == each_opt %} selected {% endif %}>
-                                    {{each_opt}}
-                                </option>
+                                    <option {% if each_opt in v.value %} selected {% endif %}>
+                                        {{each_opt}}
+                                    </option>
+                                
                             {% endfor %}
                         </select>
                     </div>
