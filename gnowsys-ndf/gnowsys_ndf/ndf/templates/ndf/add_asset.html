@@ -51,15 +51,15 @@
             
             {% endif%}
             
-            {% if user.is_authenticated  %}
+            {% if request.user.is_authenticated  %}
             
-                {% if 'raw material' in asset_obj.tags and is_gstaff %}
+                {% if 'raw@material' in asset_obj.tags and is_gstaff %}
                 <button type="button" class="orange-button add-asset-content right"><i class="fi-plus"></i> Add File</button>
                 {% endif %}
-                {% if 'gallery' in asset_obj.tags  %}
+                {% if 'asset@gallery' in asset_obj.tags  %}
                 <button type="button" class="orange-button add-asset-content right"><i class="fi-plus"></i> Add File</button>
                 {% endif %}
-                {% if 'asset_list' in asset_obj.member_of_names_list  %}
+                {% if 'asset_detail' in asset_obj.member_of_names_list  %}
                 <button type="button" class="orange-button add-asset-content right"><i class="fi-plus"></i> Add File</button>
                 {% endif %}
             
