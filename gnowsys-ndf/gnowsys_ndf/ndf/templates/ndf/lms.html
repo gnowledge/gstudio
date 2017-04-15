@@ -43,7 +43,7 @@
      </li>
     <li>  <a href="{% url 'course_raw_material' group_id %}" {% if title == 'raw material' or title == "raw_material_detail"  %}class="selected"{% endif %}>Resources</a> </li>
     <li>
-    <li>  <a href="{% url 'course_gallery' group_id %}" {% if title == 'gallery' %}class="selected"{% endif %}>Gallery</a> </li>
+    <li>  <a href="{% url 'course_gallery' group_id %}" {% if title == 'gallery' or title == "asset_gallery_detail" %}class="selected"{% endif %}>Gallery</a> </li>
     <li>
       <a href="{% url 'course_notebook' group_id %}" {% if title == 'notebook' %}class="selected"{% endif %}>Notebook</a>
     </li>
@@ -83,7 +83,7 @@
         {% if title == "gallery" %}
               {% include "ndf/assets.html" with title=title %}
         {% endif %}
-        {% if title == "asset_detail" or title == "asset_content_detail" or title == "raw_material_detail"  %}
+        {% if title == "asset_detail" or title == "asset_content_detail" or  title == "raw_material_detail" or title == "asset_gallery_detail"  %}
             {% include "ndf/add_asset.html"  with title=title %}
         {% endif %}
     </div>

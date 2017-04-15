@@ -3177,8 +3177,10 @@ def assets(request, group_id, asset_id=None):
         }
         if 'announced_unit' in group_obj.member_of_names_list:
             template = 'ndf/lms.html'     
-   
-            context_variables.update({'title':'raw_material_detail'})
+            if 'raw@material' in asset_obj.tags:
+                context_variables.update({'title':'raw_material_detail'})
+            if 'asset@gallery' in asset_obj.tags:
+                context_variables.update({'title':'asset_gallery_detail'})
             
         
         return render_to_response(template,
