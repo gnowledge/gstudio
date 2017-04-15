@@ -1,3 +1,4 @@
+{% load get_dict_from_list_of_dicts from simple_filters %}
 {% load i18n %}
 {% if first_arg and second_arg and third_arg %}
     <a href="{% url url_name first_arg second_arg third_arg %}{{search_url_text|safe}}"/>
@@ -6,10 +7,11 @@
 {% elif first_arg %}
     <a href='{% url url_name first_arg %}{{search_url_text|safe}}'/>
 {% endif %}
-<div class="module_card">
 
+<div class="module_card">
     <div class="card_banner">
         <span class="card_title">{{node.name}}</span>
+    {% get_dict_from_list_of_dicts node.attribute_set as node_attrs %}
     </div>
     <div class="card_summary">
         <div class="card_section">
@@ -19,16 +21,16 @@
         </div>
         <div class="card_section">
             <span class="card_label">
-                Subjects
+                Subject: {{node_attrs.educationalsubject}}
             </span class="card_label">
             <p class="ellipsis"></p>
                 <span class="card_label">
-                    Grades
+                    Grade: {{node_attrs.educationallevel|join:', '}}
                 </span class="card_label">
             <p class="ellipsis"></p>
-                <span class="card_label">
+                <!-- <span class="card_label">
                     Units
-                </span class="card_label">
+                </span class="card_label"> -->
             <p class="ellipsis"></p>
         </div>
         <div class="card_section">

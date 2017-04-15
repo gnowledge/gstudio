@@ -117,7 +117,6 @@ def explore_groups(request,page_no=1):
     else:
         query.update({'name': {'$nin': GSTUDIO_DEFAULT_GROUPS_LIST}})
         group_cur = node_collection.find(query).sort('last_update', -1)
-    print "\ngroup_cur.count()", group_cur.count()
 
     grp_page_cur = paginator.Paginator(group_cur, page_no, GSTUDIO_NO_OF_OBJS_PP)
     context_variable = {'title': title, 'groups_cur': group_cur, 'card': 'ndf/card_group.html',
@@ -235,8 +234,8 @@ def explore_drafts(request,page_no=1):
     modules_cur = node_collection.find({'member_of': gst_module_id }).sort('last_update', -1)
 
     module_unit_ids = [val for each_module in modules_cur for val in each_module.collection_set ]
-    modules_cur.rewind()
 
+    modules_cur.rewind()
     modules_page_cur = paginator.Paginator(modules_cur, page_no, GSTUDIO_NO_OF_OBJS_PP)
 
     base_unit_cur = node_collection.find({'member_of': gst_base_unit_id,

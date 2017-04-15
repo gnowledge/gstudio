@@ -18,7 +18,6 @@
                 </div>
             </div>
 
-            <hr/>
 
             <!-- content -->
             <div class="">
@@ -31,6 +30,25 @@
                 </div>
             </div>
             <hr/>
+            {% for k, v in additional_form_fields.attribute.iteritems %}
+                <div class="course_creator_header">
+                    <div class="left course_heading">
+                    <h5>{{k}}</h5>
+                    </div>
+                    <div class="right course_heading_unit">
+                         <select name="attribute_{{v.name}}" {{v.widget_attr}}>
+                            <option value=''>Choose {{k}}</option>
+                            {% for each_opt in v.all_options %}
+                                    <option {% if each_opt in v.value %} selected {% endif %}>
+                                        {{each_opt}}
+                                    </option>
+                                
+                            {% endfor %}
+                        </select>
+                    </div>
+                </div>
+
+            {% endfor %}
             <div class="row">
                 <input type="submit" class ="small-2 columns right orange-button" id="" value="Save"/>
             </div>
