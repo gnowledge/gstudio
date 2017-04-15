@@ -346,7 +346,7 @@ def get_group_name_id(group_name_or_id, get_obj=False):
         cache_result = cache.get(cache_key)
 
         if cache_result:
-            return cache_result
+            return (cache_result[0], ObjectId(cache_result[1]))
     # ---------------------------------
 
     # case-1: argument - "group_name_or_id" is ObjectId
@@ -2623,7 +2623,10 @@ def create_gattribute(subject_id, attribute_type_node, object_value=None, **kwar
     info_message = ""
     old_object_value = None
     triple_scope_val = kwargs.get('triple_scope', None)
-    attribute_type_node = Node.get_node_obj_from_id_or_obj(attribute_type_node, AttributeType)
+    try:
+        attribute_type_node = Node.get_node_obj_from_id_or_obj(attribute_type_node, AttributeType)
+    except Exception:
+        attribute_type_node = Node.get_name_id_from_type(attribute_type_node, 'AttributeType', get_obj=True)
 
     ga_node = triple_collection.one(
         {'_type': "GAttribute", 'subject': subject_id, 'attribute_type': attribute_type_node._id})

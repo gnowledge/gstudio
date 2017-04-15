@@ -20,6 +20,7 @@ from gnowsys_ndf.ndf.models import node_collection
 from gnowsys_ndf.ndf.views.group import CreateGroup
 from gnowsys_ndf.ndf.views.methods import get_execution_time, staff_required, create_gattribute,get_language_tuple
 from gnowsys_ndf.ndf.views.ajax_views import get_collection
+from gnowsys_ndf.settings import GSTUDIO_RESOURCES_EDUCATIONAL_LEVEL, GSTUDIO_RESOURCES_EDUCATIONAL_SUBJECT
 from gnowsys_ndf.ndf.templatetags.ndf_tags import check_is_gstaff
 gst_module_name, gst_module_id = GSystemType.get_gst_name_id('Module')
 gst_base_unit_name, gst_base_unit_id = GSystemType.get_gst_name_id('base_unit')
@@ -52,11 +53,33 @@ def module_create_edit(request, group_id, module_id=None):
     if request.method == "GET":
 
         template = 'ndf/module_form.html'
+        additional_form_fields = {}
 
         if module_id:
             # existing module.
             url_name = 'node_edit'
             url_kwargs={'group_id': group_id, 'node_id': module_id, 'detail_url_name': 'module_detail'}
+            module_obj = Node.get_node_by_id(module_id)
+            module_attrs = ['educationalsubject', 'educationallevel']
+            module_attr_values = module_obj.get_attributes_from_names_list(module_attrs)
+            additional_form_fields = {
+                'attribute': {
+                    'Subject': {
+                        'name' :'educationalsubject',
+                        'widget': 'dropdown',
+                        # 'widget_attr': 'multiple',
+                        'value': module_attr_values['educationalsubject'],
+                        'all_options': GSTUDIO_RESOURCES_EDUCATIONAL_SUBJECT
+                    },
+                    'Grade': {
+                        'name' :'educationallevel',
+                        'widget': 'dropdown',
+                        'widget_attr': 'multiple',
+                        'value': module_attr_values['educationallevel'],
+                        'all_options': GSTUDIO_RESOURCES_EDUCATIONAL_LEVEL
+                    }
+                }
+            }
 
         else:
             # new module
@@ -66,6 +89,7 @@ def module_create_edit(request, group_id, module_id=None):
         req_context = RequestContext(request, {
                                     'title': 'Module', 'node_obj': Node.get_node_by_id(module_id),
                                     'group_id': group_id, 'groupid': group_id,
+                                    'additional_form_fields': additional_form_fields,
                                     'post_url': reverse(url_name, kwargs=url_kwargs)
                                 })
         return render_to_response(template, req_context)
@@ -81,7 +105,7 @@ def module_detail(request, group_id, node_id):
     module_obj = Node.get_node_by_id(node_id)
     module_detail_query = {'_id': {'$in': module_obj.collection_set}}
     # units_under_module = Node.get_nodes_by_ids_list(module_obj.collection_set)
-    gstaff_access = check_is_gstaff(group_id,request.user)
+    gstaff_access = check_is_gstaff(group_id, request.user)
     if gstaff_access:
         module_detail_query.update({'member_of': {'$in': [gst_announced_unit_id, gst_base_unit_id]}})
     else:
