@@ -3,6 +3,7 @@
 
 {% block title %} {{lesson_node.name}}  {% endblock %}
 
+{% load ndf_tags %}
 
 {% block body_content %}
 
@@ -66,15 +67,29 @@
                   <button type="button" class="orange-button admin-page right"> Teacher's Help</button>
                 {% endif  %}
               {% endfor %}
-              <button type="button" class="orange-button discuss right"> discuss</button>
+              {% if node.player_discussion_enable %}
+                <button type="button" class="orange-button discuss right"> discuss</button>
+              {% endif %}
               <button type="button" class="orange-button translate right"> Translate</button>
 
               </div>
               <div class="activity_page_rendered">
-                activity name : {{node.name}}
                 {# {{node.content|safe}} #}
-                {% include "ndf/node_ajax_content.html" with node=node %}
+                {% include "ndf/node_ajax_content.html" with node=node  hide_breadcrumbs=True %}
               </div>
+
+                {% if node.player_discussion_enable %}
+                  {% get_thread_node node.pk as thread_node %}  
+                    {% if thread_node %}
+                        {% get_disc_replies thread_node group_id global_disc_all_replies as all_replies %}
+                        {% get_node thread_node as thread_node_obj %}
+                        {% include 'ndf/in-line-texteditor.html' with node=thread_node_obj var_name="content_org" ckeditor_toolbar="BasicToolbar" %}
+                    {% else %}
+                        {% get_disc_replies node.pk group_id global_disc_all_replies as all_replies %}
+                        {% include 'ndf/in-line-texteditor.html' with var_name="content_org" ckeditor_toolbar="BasicToolbar" %}
+                    {% endif %}
+                {% endif %}
+              
               <div id="info-page-area">
                 
               </div>
@@ -83,6 +98,7 @@
         </div>
       </div>
 </div>             
+
 <script type="text/javascript">
   $(".admin-page").click(function(event){
           $.ajax({
@@ -99,6 +115,7 @@
                         // $('#info-page-area').html(data);
                         parent = $("#info-page-area");
                         parent.html(data);
+                        $('html,body').animate({scrollTop: $("#info-page-area").offset().top},'slow');
                       }
                     });
       });
@@ -118,8 +135,24 @@
                         // $('#info-page-area').html(data);
                         parent = $("#info-page-area");
                         parent.html(data);
+                        $('html,body').animate({scrollTop: $("#info-page-area").offset().top},'slow');
+
                       }
                     });
       });
+  
+  $(".discuss").click(function(event){
+          $('html,body').animate({
+                    scrollTop: $(".create-discussion").offset().top},
+                    'slow');
+      });
+  
+  $("#create-discussion").click(function(event){
+           setTimeout(function(){  $('html,body').animate({
+                    scrollTop: $(".post-btn-div").offset().top},
+                    'slow'); }, 1000);
+          
+      });
+  
 </script>
 {% endblock %}

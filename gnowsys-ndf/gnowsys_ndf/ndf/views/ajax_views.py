@@ -6687,34 +6687,45 @@ def add_asset(request,group_id):
       group_id = ObjectId(group_id)
   except:
       group_name, group_id = get_group_name_id(group_id)
+  group_obj = Group.get_group_name_id(group_id, get_obj=True)
+
   # topic_gst = node_collection.one({'_type': 'GSystemType', 'name': 'Topic'})
   # topic_nodes = node_collection.find({'member_of': {'$in': [topic_gst._id]}})
   context_variables = {'group_id':group_id, 'groupid':group_id,'edit': False}
   node_id = request.GET.get('node_id', None)
+  title = request.GET.get('title', None)
   node_obj = node_collection.one({'_id': ObjectId(node_id)})
   if node_obj:
     context_variables.update({'asset_obj': node_obj})
     context_variables.update({'edit': True})
+  context_variables.update({'group_obj': group_obj,'title':title})
   return render_to_response("ndf/add_asset.html",RequestContext(request,
     context_variables))
 
 @login_required
 @get_execution_time
 def create_edit_asset(request,group_id):
+  
   try:
       group_id = ObjectId(group_id)
   except:
       group_name, group_id = get_group_name_id(group_id)
-
+  
+  group_obj = Group.get_group_name_id(group_id, get_obj=True)
+  
   if request.method == "POST":
     asset_name =  str(request.POST.get("asset_name", '')).strip()
     asset_desc =  str(request.POST.get("asset_description", '')).strip()
+    title =  request.POST.get("title", '')
     tags =  request.POST.get("sel_tags", [])
+
     if tags:
         tags = json.loads(tags)
     else:
         tags = []
+    
     asset_lang =  request.POST.get("sel_asset_lang", '')
+    
     is_raw_material = eval(request.POST.get('is_raw_material', "False"))
     # print "\nis_raw_material: ", is_raw_material, " type: ", type(is_raw_material)
 
@@ -6722,14 +6733,23 @@ def create_edit_asset(request,group_id):
     asset_obj = create_asset(name=asset_name, group_id=group_id,
       created_by=request.user.id, content=unicode(asset_desc), node_id=node_id)
 
+
     asset_obj.fill_gstystem_values(tags=tags)
     
-    if "asset@asset" not in asset_obj.tags:
+    if "asset@asset" not in asset_obj.tags and "base_unit" in group_obj.member_of_names_list:
       asset_obj.tags.append(u'asset@asset')
-    if is_raw_material and u'raw@material' not in asset_obj.tags:
+
+    if is_raw_material and u'raw@material' not in asset_obj.tags and "base_unit" in group_obj.member_of_names_list:
       asset_obj.tags.append(u'raw@material')
-    elif not is_raw_material and u'raw@material' in asset_obj.tags:
+    elif not is_raw_material and u'raw@material' in asset_obj.tags and "base_unit" in group_obj.member_of_names_list:
       asset_obj.tags.remove(u'raw@material')
+    
+    if "announced_unit" in group_obj.member_of_names_list and title == "raw material":
+      asset_obj.tags.append(u'raw@material')
+    
+    if "announced_unit" in group_obj.member_of_names_list and "gallery" == title:
+      asset_obj.tags.append(u'asset@gallery')    
+    
     if asset_lang:
       language = get_language_tuple(asset_lang)
       asset_obj.language = language
