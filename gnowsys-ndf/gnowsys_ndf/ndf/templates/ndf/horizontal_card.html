@@ -1,12 +1,18 @@
 {% load get_dict_from_list_of_dicts from simple_filters %}
 {% load i18n %}
+{% if first_arg and second_arg and third_arg %}
+    <a href="{% url url_name first_arg second_arg third_arg %}{{search_url_text|safe}}"/>
+{% elif first_arg and second_arg %}
+    <a href="{% url url_name first_arg second_arg %}{{search_url_text|safe}}"/>
+{% elif first_arg %}
+    <a href='{% url url_name first_arg %}{{search_url_text|safe}}'/>
+{% endif %}
 <div class="module_card">
+
     <div class="card_banner">
         <span class="card_title">{{node.name}}</span>
-</div>
-
+    </div>
     {% get_dict_from_list_of_dicts node.attribute_set as node_attrs %}
-
     <div class="card_summary">
         <div class="card_section">
             <p class="module_brief" title="{{node.content|safe}}">
@@ -28,17 +34,10 @@
             <p class="ellipsis"></p>
         </div>
         <div class="card_section">
-                {% if first_arg and second_arg and third_arg %}
-                    <a href="{% url url_name first_arg second_arg third_arg %}{{search_url_text|safe}}"/>
-                {% elif first_arg and second_arg %}
-                    <a href="{% url url_name first_arg second_arg %}{{search_url_text|safe}}"/>
-                {% elif first_arg %}
-                    <a href='{% url url_name first_arg %}{{search_url_text|safe}}'/>
-                {% endif %}
                 <i class="fa fa-book"></i>
                 <span>Explore</span>
-                </a>
         </div>
     </div>
 </div>
+    </a>
 

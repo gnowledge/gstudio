@@ -40,7 +40,10 @@ def unit_create_edit(request, group_id, unit_group_id=None):
         template = "ndf/create_unit.html"
         all_groups = node_collection.find({'_type': "Group"},{"name":1})
         all_groups_names = [str(each_group.name) for each_group in all_groups]
-        context_variables = {'group_id': parent_group_id,'groupid': parent_group_id, 'all_groups_names': all_groups_names}
+        modules = GSystem.query_list('home', 'Module', request.user.id)
+
+        context_variables = {'group_id': parent_group_id,'groupid': parent_group_id, 'all_groups_names': all_groups_names, 
+        'modules': modules}
         if unit_node:
             # get all modules which are parent's of this unit/group
             parent_modules = node_collection.find({
@@ -48,7 +51,7 @@ def unit_create_edit(request, group_id, unit_group_id=None):
                     'member_of': gst_module_id,
                     'collection_set': {'$in': [unit_node._id]}
                 })
-            context_variables.update({'unit_node': unit_node, 'title': 'Create Unit', 'modules': GSystem.query_list('home', 'Module', request.user.id), 'module_val_list': [str(pm._id) for pm in parent_modules]})
+            context_variables.update({'unit_node': unit_node, 'title': 'Create Unit',  'module_val_list': [str(pm._id) for pm in parent_modules]})
         req_context = RequestContext(request, context_variables)
         return render_to_response(template, req_context)
 

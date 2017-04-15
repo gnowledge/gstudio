@@ -39,7 +39,8 @@ announced_unit_gst = node_collection.one({'_type': "GSystemType", 'name': "annou
 gst_acourse = node_collection.one({'_type': "GSystemType", 'name': "Announced Course"})
 gst_group = node_collection.one({'_type': "GSystemType", 'name': "Group"})
 group_id = node_collection.one({'_type': "Group", 'name': "home"})._id
-
+gst_module_name, gst_module_id = GSystemType.get_gst_name_id('Module')
+gst_base_unit_name, gst_base_unit_id = GSystemType.get_gst_name_id('base_unit')
 
 def explore(request):
     return HttpResponseRedirect(reverse('explore_courses', kwargs={}))
@@ -54,8 +55,12 @@ def explore(request):
         context_instance=RequestContext(request))
 
 
+'''
+Depricated as on 15 Apr 2017 - katkamrachana
+For new explore UI to list Modules and announced-units
 @get_execution_time
 def explore_courses(request,page_no=1):
+    # this will be announced tab
     title = 'courses'
     ce_cur = node_collection.find({'member_of': {'$in': [ce_gst._id, announced_unit_gst._id]},
                                         '$or': [
@@ -95,13 +100,12 @@ def explore_courses(request,page_no=1):
         "ndf/explore_2017.html",
         context_variable,
         context_instance=RequestContext(request))
-
+'''
 
 @get_execution_time
 def explore_groups(request,page_no=1):
     title = 'groups'
     gstaff_access = check_is_gstaff(group_id,request.user)
-    gst_base_unit_name, gst_base_unit_id = GSystemType.get_gst_name_id('base_unit')
 
     query = {'_type': 'Group', 'status': u'PUBLISHED',
              'member_of': {'$in': [gst_group._id],
@@ -113,10 +117,11 @@ def explore_groups(request,page_no=1):
     else:
         query.update({'name': {'$nin': GSTUDIO_DEFAULT_GROUPS_LIST}})
         group_cur = node_collection.find(query).sort('last_update', -1)
+    print "\ngroup_cur.count()", group_cur.count()
 
-    ce_page_cur = paginator.Paginator(group_cur, page_no, GSTUDIO_NO_OF_OBJS_PP)
-    context_variable = {'title': title, 'doc_cur': group_cur, 'card': 'ndf/event_card.html',
-                        'group_id': group_id, 'groupid': group_id,'ce_page_cur':ce_page_cur}
+    grp_page_cur = paginator.Paginator(group_cur, page_no, GSTUDIO_NO_OF_OBJS_PP)
+    context_variable = {'title': title, 'groups_cur': group_cur, 'card': 'ndf/card_group.html',
+                        'group_id': group_id, 'groupid': group_id,'grp_page_cur': grp_page_cur}
 
     return render_to_response(
         "ndf/explore_2017.html",
@@ -138,7 +143,6 @@ def explore_basecourses(request,page_no=1):
     #                                       ]}).sort('last_update', -1)
     # ce_page_cur = paginator.Paginator(ce_cur, page_no, GSTUDIO_NO_OF_OBJS_PP)
 
-    gst_base_unit_name, gst_base_unit_id = GSystemType.get_gst_name_id('base_unit')
     # parent_group_name, parent_group_id = Group.get_group_name_id(group_id)
     ce_cur = node_collection.find({
                                     '_type': 'Group',
@@ -190,3 +194,70 @@ def explore_basecourses(request,page_no=1):
     #     context_variable,
     #     context_instance=RequestContext(request))
 
+@get_execution_time
+def explore_courses(request,page_no=1):
+    # this will be announced tab
+    title = 'courses'
+    modules_cur = node_collection.find({'member_of': gst_module_id }).sort('last_update', -1)
+
+    module_unit_ids = [val for each_module in modules_cur for val in each_module.collection_set ]
+    modules_cur.rewind()
+
+    modules_page_cur = paginator.Paginator(modules_cur, page_no, GSTUDIO_NO_OF_OBJS_PP)
+
+    base_unit_cur = node_collection.find({'member_of': {'$in': [ce_gst._id, announced_unit_gst._id]},
+                                          '_id': {'$nin': module_unit_ids},
+                                        '$or': [
+                                          {'created_by': request.user.id},
+                                          {'group_admin': request.user.id},
+                                          {'author_set': request.user.id},
+                                          {'group_type': 'PUBLIC'}
+                                          ]}).sort('last_update', -1)
+    base_unit_page_cur = paginator.Paginator(base_unit_cur, page_no, GSTUDIO_NO_OF_OBJS_PP)
+
+    context_variable = {
+                        'title': title, 'modules_cur': modules_cur,
+                        'units_cur': base_unit_cur, 
+                        'group_id': group_id, 'groupid': group_id,
+                    }
+
+    return render_to_response(
+        # "ndf/explore.html", changed as per new Clix UI
+        "ndf/explore_2017.html",
+        # "ndf/lms_explore.html",
+        context_variable,
+        context_instance=RequestContext(request))
+
+@login_required
+@get_execution_time
+def explore_drafts(request,page_no=1):
+    title = 'drafts'
+    modules_cur = node_collection.find({'member_of': gst_module_id }).sort('last_update', -1)
+
+    module_unit_ids = [val for each_module in modules_cur for val in each_module.collection_set ]
+    modules_cur.rewind()
+
+    modules_page_cur = paginator.Paginator(modules_cur, page_no, GSTUDIO_NO_OF_OBJS_PP)
+
+    base_unit_cur = node_collection.find({'member_of': gst_base_unit_id,
+                                          '_id': {'$nin': module_unit_ids},
+                                        '$or': [
+                                          {'created_by': request.user.id},
+                                          {'group_admin': request.user.id},
+                                          {'author_set': request.user.id},
+                                          {'group_type': 'PUBLIC'}
+                                          ]}).sort('last_update', -1)
+    base_unit_page_cur = paginator.Paginator(base_unit_cur, page_no, GSTUDIO_NO_OF_OBJS_PP)
+
+    context_variable = {
+                        'title': title, 'modules_cur': modules_cur,
+                        'units_cur': base_unit_cur, 
+                        'group_id': group_id, 'groupid': group_id,
+                    }
+
+    return render_to_response(
+        # "ndf/explore.html", changed as per new Clix UI
+        "ndf/explore_2017.html",
+        # "ndf/lms_explore.html",
+        context_variable,
+        context_instance=RequestContext(request))
