@@ -2287,7 +2287,7 @@ def course_raw_material(request, group_id, node_id=None,page_no=1):
     '''
     asset_gst_name, asset_gst_id = GSystemType.get_gst_name_id("Asset")
     asset_nodes = node_collection.find({'member_of': {'$in': [asset_gst_id]},
-            'group_set': {'$all': [ObjectId(group_id)]}}).sort('last_update', -1)
+            'group_set': {'$all': [ObjectId(group_id)]},'tags': "raw@material"}).sort('last_update', -1)
     context_variables = {
             'group_id': group_id, 'groupid': group_id, 'group_name':group_name,
             'group_obj': group_obj, 'title': 'raw material',
@@ -2343,11 +2343,15 @@ def course_raw_material(request, group_id, node_id=None,page_no=1):
     #     allow_to_upload = True
     if gstaff_access:
         allow_to_upload = True
-    template = 'ndf/lms.html'
+    template = 'ndf/gcourse_event_group.html'
+    
+    if "announced_unit" in group_obj.member_of_names_list:
+        template = 'ndf/lms.html'
+
     if 'BaseCourseGroup' in group_obj.member_of_names_list:
         template = 'ndf/basecourse_group.html'
 
-    context_variables.update({'files_cur': files_cur,'raw_material_page_info':raw_material_page_info ,'allow_to_upload': allow_to_upload,'allow_to_join': allow_to_join})
+    context_variables.update({'title':'raw material' ,'files_cur': files_cur,'raw_material_page_info':raw_material_page_info ,'allow_to_upload': allow_to_upload,'allow_to_join': allow_to_join})
     return render_to_response(template,
                                 context_variables,
                                 context_instance = RequestContext(request)
@@ -3172,8 +3176,11 @@ def assets(request, group_id, asset_id=None):
             'topic_nodes':topic_nodes
         }
         if 'announced_unit' in group_obj.member_of_names_list:
-            template = 'ndf/lms.html'
+            template = 'ndf/lms.html'     
+   
+            context_variables.update({'title':'raw_material_detail'})
             
+        
         return render_to_response(template,
                                     context_variables,
                                     context_instance = RequestContext(request)

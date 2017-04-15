@@ -6733,18 +6733,20 @@ def create_edit_asset(request,group_id):
     asset_obj = create_asset(name=asset_name, group_id=group_id,
       created_by=request.user.id, content=unicode(asset_desc), node_id=node_id)
 
+
     asset_obj.fill_gstystem_values(tags=tags)
     
     if "asset@asset" not in asset_obj.tags and "base_unit" in group_obj.member_of_names_list:
       asset_obj.tags.append(u'asset@asset')
 
-    if is_raw_material and u'raw@material' not in asset_obj.tags:
+    if is_raw_material and u'raw@material' not in asset_obj.tags and "base_unit" in group_obj.member_of_names_list:
       asset_obj.tags.append(u'raw@material')
-    elif not is_raw_material and u'raw@material' in asset_obj.tags:
+    elif not is_raw_material and u'raw@material' in asset_obj.tags and "base_unit" in group_obj.member_of_names_list:
       asset_obj.tags.remove(u'raw@material')
     
     if "announced_unit" in group_obj.member_of_names_list and title == "raw material":
       asset_obj.tags.append(u'raw@material')
+    
     if "announced_unit" in group_obj.member_of_names_list and "gallery" == title:
       asset_obj.tags.append(u'asset@gallery')    
     

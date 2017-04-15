@@ -2,6 +2,8 @@
 
 {% load i18n %}
 
+{% load ndf_tags %}
+
 
 {% block body_content %}
  
@@ -10,7 +12,9 @@
 <div class="lms_page">
      <div class="lms_banner">
        <div class="small-12 columns lms_heading">
-         <div class="left unit_name">Unit Name</div>
+       {% get_group_object groupid as group_object %}
+    <div class="left unit_name"> {% trans 'Unit: ' %}{% firstof group_object.altnames group_object.name  %}</div>
+         
          <div class="right enroll_unit"><a href="#">Enroll me</a></div>
        </div>
      </div>
@@ -25,7 +29,7 @@
     <li>
       <a href="{% url 'course_content' group_id %}" {% if title == 'course content' %}class="selected"{% endif %}>Lessons</a> 
      </li>
-    <li>  <a href="{% url 'course_raw_material' group_id %}" {% if title == 'raw material' %}class="selected"{% endif %}>Resources</a> </li>
+    <li>  <a href="{% url 'course_raw_material' group_id %}" {% if title == 'raw material' or title == "raw_material_detail"  %}class="selected"{% endif %}>Resources</a> </li>
     <li>
     <li>  <a href="{% url 'course_gallery' group_id %}" {% if title == 'gallery' %}class="selected"{% endif %}>Gallery</a> </li>
     <li>
@@ -61,23 +65,18 @@
     </div>
     <div id="group_elibrary">
         {% if title == "raw material" %}
-            {% include "ndf/assets.html" %}
+            {% include "ndf/assets.html" with title=title %}
         {% endif %}
         
         {% if title == "gallery" %}
-              {% include "ndf/assets.html" %}
+              {% include "ndf/assets.html" with title=title %}
         {% endif %}
-        
-        {% if title == "asset_detail" or title == "asset_content_detail" %}
-            {% include "ndf/add_asset.html" %}
+        {% if title == "asset_detail" or title == "asset_content_detail" or title == "raw_material_detail"  %}
+            {% include "ndf/add_asset.html"  with title=title %}
         {% endif %}
     </div>
   </div>
 </div>
-
-  
-
-
 
 
 {% comment %}
