@@ -33,7 +33,11 @@
     {% else %}
         <img class="unit_banner" src="/static/ndf/images/module_banner.png" style="height:50px ;width:50px"/>
     {% endif %}
-        <span class="unit_title" title="{{node.name}}">{% firstof node.altnames node.name  %}</span>
+    {% if node.altnames %}
+        <span class="unit_title" title="{{node.altnames}}">{{node.altnames|truncatechars:20}}</span>
+    {% else %}
+        <span class="unit_title" title="{{node.name}}">{{node.name|truncatechars:20}}</span>
+    {% endif %}
     </div>
     <div class="unit_desc">
         {{node.content|safe|striptags|truncatechars:30}}
