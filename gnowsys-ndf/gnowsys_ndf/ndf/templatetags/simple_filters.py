@@ -82,9 +82,12 @@ def get_dict_from_list_of_dicts(list_of_dicts,convert_objid_to_str=False):
 
 @get_execution_time
 @register.filter
-def split(str, splitter):
-    return str.split(splitter)
+def split(str, delimiter):
+    return str.split(delimiter)
 
+@register.filter
+def joinby(delimiter, arg):
+    return arg.join(delimiter)
 
 @register.filter
 @stringfilter
