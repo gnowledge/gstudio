@@ -7,6 +7,11 @@
 
 {% block body_content %}
 
+<style type="text/css">
+  .disabled , .disabled i {
+    color:grey !important;
+  }
+</style>
 <div class="activity_player_secondary_header activity_player_header">
         <div class="header_icon_block back_button">
             <a href="{% url 'course_content' group_id  %}"><i class="fa fa-angle-left header_icon"></i></a>
@@ -15,29 +20,26 @@
             {{group_name}}
         </div>
         <div class="new_note header_text_block">
-            <a href="#">
+            <a href="{% url 'page_create_edit' group_name %}?course_event_id={{group_id}}&blog_type=True">
                 <i class="fa fa-edit header_icon"></i>&nbsp;
                 WRITE A NEW NOTE
             </a>
         </div>
         <div class="pagination prev_button header_text_block">
-            {% if resource_prev_id %}
-              <a href="{% url 'activity_player_detail' group_id lesson_node.pk resource_prev_id %}"> 
-                  <i class="fa fa-angle-left header_icon"></i>
-                  &nbsp;PREV
+            
+              <a {% if resource_prev_id %} href="{% url 'activity_player_detail' group_id lesson_node.pk resource_prev_id %}" {% else %} class = "disabled"{% endif %}> 
+                  <i class="fa fa-angle-left header_icon"></i> PREV
               </a>
-            {% endif %}
+            
         </div>
         <div class="pagination page_count header_text_block">
             {{resource_index|add:'1'}} OF {{lesson_node.collection_set|length}}
         </div>
         <div class="pagination page_count header_text_block">
-            {% if resource_next_id %}
-              <a href="{% url 'activity_player_detail' group_id lesson_node.pk resource_next_id %}">
-                  NEXT&nbsp;
-                  <i class="fa fa-angle-right header_icon"></i>
+              <a {% if resource_next_id %}  href="{% url 'activity_player_detail' group_id lesson_node.pk resource_next_id %}" {% else %} class = "disabled" {% endif %}>
+                  NEXT <i class="fa fa-angle-right header_icon"></i>
               </a>
-            {% endif %}
+            
         </div>
 </div>
 
@@ -68,7 +70,7 @@
                 {% endif  %}
               {% endfor %}
               {% if node.player_discussion_enable %}
-                <button type="button" class="orange-button discuss right"> discuss</button>
+                <button type="button" class="orange-button discuss right"> Discuss</button>
               {% endif %}
               <button type="button" class="orange-button translate right"> Translate</button>
 
