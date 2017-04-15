@@ -1,0 +1,27 @@
+{% extends "ndf/gbase.html" %}
+{% load i18n %}
+{% block body_content %}
+
+{# lms_explore.html - for lms Explore Screen #}
+
+<div class="lms_explore_back">
+      <div class="lms_explore_head">
+        <p class="left"> Modules </p>
+        <a href="#" class="right text_button"><i class="fa fa-plus"> New Module</i></a>
+      </div>
+        <div class="small-12 columns">
+          {% include "ndf/horizontal_card.html" %}
+        </div>
+        <br/>
+    <hr/>
+    <div class="lms_explore_head_unit ">
+        <p class="left"> Units </p>
+        <a href="#" class="right text_button"><i class="fa fa-plus"> New Unit</i></a>
+    </div>
+      <div class="small-12 columns lms_explore_back_unit">
+        {% include "ndf/card_group.html" %}
+      </div>
+    
+</div>
+  
+{% endblock body_content %}
