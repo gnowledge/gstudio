@@ -13,9 +13,12 @@
   }
 </style>
 <div class="activity_player_secondary_header activity_player_header">
-        <div class="header_icon_block back_button">
-            <a href="{% url 'course_content' group_id  %}"><i class="fa fa-angle-left header_icon"></i></a>
+      <div class="small-1 columns end">
+        <a href="{% url 'course_content' group_id  %}"><div class="header_icon_block prev_button">
+            <i class="fa fa-angle-left header_icon"></i>
         </div>
+        </a>
+</div>
         <div class="header_title header_text_block">
             {{group_name}}
         </div>
@@ -46,7 +49,7 @@
 <div class="row activity_sheet">
     <div class="small-12 columns">
         <div class="course_editor ">
-          <div class="small-2 columns">
+          <div class="small-3 columns">
             <div class="course_tree">
               <div class="lesson-title" title="{{lesson_node.name}}">
                   <b>{{lesson_node.name}}</b>
@@ -58,21 +61,23 @@
               </div>
               </div>
           </div>
-          <div class="small-9 columns">
+          <div class="small-8 columns">
             <div class="course_editor_section">
               <div class="input_links row">
               {% for each in node.relation_set %}
                 {% if "has_help" in each %}
-                  <button type="button" class="orange-button student-page right"> Student Help</button>
+                  <a class="student-page right"> Student Help</a>
                 {% endif %}
                 {% if "has_admin_page" in each %}
-                  <button type="button" class="orange-button admin-page right"> Teacher's Help</button>
+                  <a class="admin-page right"> Teacher's Help></a>
                 {% endif  %}
               {% endfor %}
               {% if node.player_discussion_enable %}
-                <button type="button" class="orange-button discuss right"> Discuss</button>
+              <a class="discuss right"> Discuss</a>
               {% endif %}
-              <button type="button" class="orange-button translate right"> Translate</button>
+              {% comment %}
+              <a class="translate right"> Translate</a>
+              {% endcomment %}
 
               </div>
               <div class="activity_page_rendered">
