@@ -8,6 +8,7 @@
 
 {% block body_content %}
 {% get_group_object groupid as group_object %}
+{% check_is_gstaff group_id request.user as is_gstaff %}
 
  
  <!-- LMS.html -->
@@ -15,10 +16,50 @@
 <div class="lms_page">
      <div class="lms_banner">
        <div class="small-12 columns lms_heading">
-    <div class="left unit_name"> {% trans 'Unit: ' %}{% firstof group_object.altnames group_object.name  %}</div>
-         
-         <div class="right enroll_unit">
-             {% if request.user.is_authenticated %}
+    <div class="left unit_name"> {% firstof group_object.altnames group_object.name  %}</div>
+          {% if is_gstaff %}
+          <div class="right course_actions">
+
+              <span data-dropdown="course-settings-drop" aria-controls="course-settings-drop" aria-expanded="false" class="tiny radius right" data-options="align:left">
+                  <i class="icon-widget fi-widget"></i>
+              </span>
+              <ul id="course-settings-drop" class="f-dropdown" data-dropdown-content aria-hidden="true" tabindex="-1">
+              <li>
+                  <a href="{% url 'unit_edit' groupid group_object.pk %}" class="fi-pencil"> Edit</a>
+              </li>
+              <li>
+                  <a data-reveal-id="manage_users_modal" href="{% url 'manage_users' group_id %}"  class="fi-torsos"> Manage Users</a>
+                  <div id="manage_users_modal" class="reveal-modal large" data-reveal style="position:absolute;">
+                      <div id="group_drawer">
+                      {% include "ndf/widget_user_search.html" with subscription_status=True %}
+                      </div>
+                      <a class="close-reveal-modal">&#215;</a>
+                  </div>
+              </li>
+              <li>
+                  <a href="{% url 'create_event_group' group_id 'CourseEventGroup' %}" class="fi-volume"> Announce</a>
+              </li>
+
+              {% get_lessons group_object as lessons_list %}
+              <li class="lesson-dropdown">
+              <a href="#" class="fi-page-export"> {% trans "Export to ePub" %}</a>
+              <ul>
+                  {% for each_lesson in lessons_list  %}
+                  <li class="lesson_name_in_export"><a href="{% url 'export_to_epub' group_id each_lesson.pk %}" class="export_lesson" title="{{each_lesson.name}}">{{each_lesson.name|truncatechars:15}}</a></li>
+                  {% endfor %}
+              </ul>
+              </li>
+
+
+              <li> <a data-reveal-id="delete-unit"><i class="fa fa-trash"></i> Delete</a> </li>
+
+              </ul>
+          </div>
+          {% endif %}
+
+        <div class="right enroll_unit">
+ 
+            {% if request.user.is_authenticated %}
                 {% if request.user.id not in group_object.author_set %}
                   <a class="enroll-btn"> ENROLL</a>
                 {% else %}
@@ -56,7 +97,7 @@
     <a class="close-reveal-modal" aria-label="Close">&#215;</a>
 </div>
 
-<div class="row">
+
   <div class="small-12 columns group_sections_content">
 
    <div id="group_overview">
@@ -88,7 +129,7 @@
         {% endif %}
     </div>
   </div>
-</div>
+
 
 
 {% comment %}
