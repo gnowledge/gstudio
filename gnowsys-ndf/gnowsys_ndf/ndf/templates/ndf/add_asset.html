@@ -50,8 +50,20 @@
                 {% endif %}
             
             {% endif%}
-            {% if user.is_authenticated %}
+            
+            {% if request.user.is_authenticated  %}
+            
+                {% if 'raw@material' in asset_obj.tags and is_gstaff %}
                 <button type="button" class="orange-button add-asset-content right"><i class="fi-plus"></i> Add File</button>
+                {% endif %}
+                {% if 'asset@gallery' in asset_obj.tags  %}
+                <button type="button" class="orange-button add-asset-content right"><i class="fi-plus"></i> Add File</button>
+                {% endif %}
+                {% if 'asset_detail' in asset_obj.member_of_names_list  %}
+                <button type="button" class="orange-button add-asset-content right"><i class="fi-plus"></i> Add File</button>
+                {% endif %}
+            
+
             {% endif %}
             </div>
    </div>
@@ -60,7 +72,7 @@
         <div class="small-8 columns left">
              {% if asset_obj.tags %}
                 {% for tag in asset_obj.tags %}
-                    {% if tag != "asset@asset" and tag != "raw@material" %}
+                    {% if tag != "asset@asset" and tag != "raw@material" and tag != "asset@gallery" %}
                         <small><label class="tag-ele">
                         <a href="{% url 'tag_info' group_id tag %}">{{tag}} </a></label></small>
                     {% endif %}
@@ -94,7 +106,14 @@
             <div class="small-12 medium-10 large-10 columns">
                 <label>
                     {% if edit or not asset_obj %}
-                       Asset name <h9 style="color: red;">*</h9>
+                        {% if title == "raw material"  or 'raw@material' in asset_obj.tags %}
+                            Resource Name
+                        
+                        {% elif title == "gallery"  or 'asset@gallery' in asset_obj.tags %}
+                             File Name
+                        
+                        {% else %}
+                       Asset name  {% endif %}<h9 style="color: red;">*</h9>
                        <input type="text" placeholder="" class="required" id = "asset-name" name="asset_name" value="{% if asset_obj %} {{asset_obj.name}}{% endif %}"/>
                     {% endif %}
                 </label>
@@ -106,7 +125,15 @@
         <div class="row">
             <div class="small-12 medium-10 large-10 columns">
             <label>
-                    Asset description <h9 style="color: red;">*</h9>
+                
+                    {% if title == "raw material"  or 'raw@material' in asset_obj.tags %}
+                        Resource Description
+                    
+                    {% elif title == "gallery"  or 'asset@gallery' in asset_obj.tags %}
+                         File Description
+                    {% else %}
+                    
+                    Asset description {% endif %} <h9 style="color: red;">*</h9>
                     <textarea rows="4" cols="2" class="small-12 columns" placeholder="Enter Description" id="asset-descid" value=''>{% if asset_obj %} {{asset_obj.content|safe|striptags}}{% endif %}</textarea>
             </label>
             </div>
@@ -144,10 +171,11 @@
         <div class="row">
             <div class="asset-tags-container small-12 medium-10 large-10 columns">
                 <label>
-
+                {% if not "announced_unit" in group_obj.member_of_names_list %}
                 <input type="checkbox" name="is_raw_material" class="is_raw_material" {% if "raw@material" in asset_obj.tags %} checked="checked" {% endif %}> Mark as Raw Material
 
                 </label>
+                {% endif %}
             </div>
         </div>
 
@@ -374,7 +402,8 @@
                         "node_id": asset_id,
                         "sel_tags":sel_tags,
                         "sel_asset_lang":sel_asset_lang,
-                        "is_raw_material": is_raw_material
+                        "is_raw_material": is_raw_material,
+                        title :"{{title}}"
                         // "asset_objective":asset_objective
                     },
                   url: "{% url 'create_edit_asset' group_id %}",
@@ -509,4 +538,22 @@ $( ".edit-metadata" ).click(function(event) {
                     'slow');
         });
     {% endif %}
+    $( ".createAsset" ).click(function() {
+                    var asset_id = $(this).attr('data-asset_id');
+                    
+                    $.ajax({
+                              type: "GET",
+                              url: "{% url 'add_asset' group_id %}",
+                              data: {
+                                node_id: asset_id,
+                                'title' : "{{title}}"
+                              },
+                              datatype: "html",
+                              success: function(data) {
+                                $('#addAsset').foundation('reveal', 'open');
+                                $('#addAsset').html(data);
+                            }
+
+                      });
+            });
 </script>

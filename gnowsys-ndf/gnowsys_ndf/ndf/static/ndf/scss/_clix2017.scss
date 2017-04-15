@@ -3705,7 +3705,8 @@ ul.nav_menu_1 {
 
 .course_editor_section{
     background:#fff;
-    height: 100vh;
+    min-height: 100vh;
+    margin-bottom:10px;
 }
 
 .lesson-title{
@@ -3743,7 +3744,8 @@ ul.nav_menu_1 {
 
 
 .activity_page_rendered{
-    margin-top:20px;
+    //margin-top:10px;
+    margin-left:40px;
 }
 /* Rating css */
 

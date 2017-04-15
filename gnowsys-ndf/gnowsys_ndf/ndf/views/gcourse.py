@@ -2026,7 +2026,7 @@ def activity_player_detail(request, group_id, lesson_id, activity_id):
 
     variable = RequestContext(request, {
         'group_id': group_id, 'groupid': group_id, 'group_name':group_name,
-        'allow_to_comment': allow_to_comment,
+        'allow_to_comment': True,
         'node': node_obj, 'lesson_node': lesson_node, 'activity_id': activity_id,
         'resource_index': resource_index, 'resource_next_id': resource_next_id,
         'resource_prev_id': resource_prev_id, 'resource_count': resource_count,
@@ -2285,10 +2285,14 @@ def course_raw_material(request, group_id, node_id=None,page_no=1):
             if n not in old_profile_pics:
                 old_profile_pics.append(n)
     '''
+    asset_gst_name, asset_gst_id = GSystemType.get_gst_name_id("Asset")
+    asset_nodes = node_collection.find({'member_of': {'$in': [asset_gst_id]},
+            'group_set': {'$all': [ObjectId(group_id)]},'tags': "raw@material"}).sort('last_update', -1)
     context_variables = {
             'group_id': group_id, 'groupid': group_id, 'group_name':group_name,
             'group_obj': group_obj, 'title': 'raw material',
-            'old_profile_pics':old_profile_pics, "prof_pic_obj": banner_pic_obj
+            'old_profile_pics':old_profile_pics, "prof_pic_obj": banner_pic_obj,
+            'asset_nodes':asset_nodes
         }
     if node_id:
         file_obj = node_collection.one({'_id': ObjectId(node_id)})
@@ -2340,10 +2344,14 @@ def course_raw_material(request, group_id, node_id=None,page_no=1):
     if gstaff_access:
         allow_to_upload = True
     template = 'ndf/gcourse_event_group.html'
+    
+    if "announced_unit" in group_obj.member_of_names_list:
+        template = 'ndf/lms.html'
+
     if 'BaseCourseGroup' in group_obj.member_of_names_list:
         template = 'ndf/basecourse_group.html'
 
-    context_variables.update({'files_cur': files_cur,'raw_material_page_info':raw_material_page_info ,'allow_to_upload': allow_to_upload,'allow_to_join': allow_to_join})
+    context_variables.update({'title':'raw material' ,'files_cur': files_cur,'raw_material_page_info':raw_material_page_info ,'allow_to_upload': allow_to_upload,'allow_to_join': allow_to_join})
     return render_to_response(template,
                                 context_variables,
                                 context_instance = RequestContext(request)
@@ -2414,7 +2422,15 @@ def course_gallery(request, group_id,node_id=None,page_no=1):
         context_variables.update({'files_cur': files_cur})
         gallery_page_info = paginator.Paginator(files_cur, page_no, 25)
         context_variables.update({'gallery_page_info':gallery_page_info,'coll_cur':files_cur})
-    template = 'ndf/gcourse_event_group.html'
+    
+    asset_gst_name, asset_gst_id = GSystemType.get_gst_name_id("Asset")
+    
+    asset_nodes = node_collection.find({'member_of': {'$in': [asset_gst_id]},
+            'group_set': {'$all': [ObjectId(group_id)]},'tags': "asset@gallery"}).sort('last_update', -1)
+    
+    template = 'ndf/lms.html'
+    
+    context_variables.update({'asset_nodes': asset_nodes})
 
     return render_to_response(template,
                                 context_variables,
@@ -3141,7 +3157,9 @@ def assets(request, group_id, asset_id=None):
         group_id = ObjectId(group_id)
     except:
         group_name, group_id = get_group_name_id(group_id)
+    group_obj = get_group_name_id(group_id, get_obj=True)
     asset_gst_name, asset_gst_id = GSystemType.get_gst_name_id("Asset")
+    template = 'ndf/gevent_base.html'
     if asset_id:
         asset_obj = node_collection.one({'_id': ObjectId(asset_id)})
         asset_content_list = get_relation_value(ObjectId(asset_obj._id),'has_assetcontent')
@@ -3157,7 +3175,14 @@ def assets(request, group_id, asset_id=None):
             'asset_nodes':asset_nodes,'asset_content_list':asset_content_list,
             'topic_nodes':topic_nodes
         }
-        template = 'ndf/gevent_base.html'
+        if 'announced_unit' in group_obj.member_of_names_list:
+            template = 'ndf/lms.html'     
+            if 'raw@material' in asset_obj.tags:
+                context_variables.update({'title':'raw_material_detail'})
+            if 'asset@gallery' in asset_obj.tags:
+                context_variables.update({'title':'asset_gallery_detail'})
+            
+        
         return render_to_response(template,
                                     context_variables,
                                     context_instance = RequestContext(request)
@@ -3169,7 +3194,9 @@ def assets(request, group_id, asset_id=None):
             'group_id': group_id, 'groupid': group_id,
             'asset_nodes': asset_nodes,'title':'asset_list'
         }
-    template = 'ndf/gevent_base.html'
+    
+    if 'announced_unit' in group_obj.member_of_names_list:
+            template = 'ndf/lms.html'
     return render_to_response(template,
                                 context_variables,
                                 context_instance = RequestContext(request)

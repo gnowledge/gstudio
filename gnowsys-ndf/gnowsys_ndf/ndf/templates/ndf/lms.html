@@ -3,6 +3,7 @@
 {% load i18n %}
 {% load ndf_tags %}
 
+
 {% block title %} Unit {% endblock%}
 
 {% block body_content %}
@@ -14,18 +15,19 @@
 <div class="lms_page">
      <div class="lms_banner">
        <div class="small-12 columns lms_heading">
-         <div class="left unit_name">Unit Name</div>
+    <div class="left unit_name"> {% trans 'Unit: ' %}{% firstof group_object.altnames group_object.name  %}</div>
+         
          <div class="right enroll_unit">
-<!--             {% if request.user.is_authenticated %}
+             {% if request.user.is_authenticated %}
                 {% if request.user.id not in group_object.author_set %}
-                  <a class="enroll-btn "> ENROLL</a>
+                  <a class="enroll-btn"> ENROLL</a>
                 {% else %}
                   <a disabled="disabled"> ENROLLED</a>
                 {% endif %}
             {% else %}
                 <a href="{% url 'auth_login' %}" title="Please login to Enroll">ENROLL</a>
             {% endif %}
- -->         </div>
+         </div>
        </div>
      </div>
 </div>
@@ -39,12 +41,19 @@
     <li>
       <a href="{% url 'course_content' group_id %}" {% if title == 'course content' %}class="selected"{% endif %}>Lessons</a> 
      </li>
-    <li>  <a href="{% url 'course_content' group_id %}" {% if title == 'course content' %}class="selected"{% endif %}>Raw Material</a> </li>
+    <li>  <a href="{% url 'course_raw_material' group_id %}" {% if title == 'raw material' or title == "raw_material_detail"  %}class="selected"{% endif %}>Resources</a> </li>
+    <li>
+    <li>  <a href="{% url 'course_gallery' group_id %}" {% if title == 'gallery' or title == "asset_gallery_detail" %}class="selected"{% endif %}>Gallery</a> </li>
     <li>
       <a href="{% url 'course_notebook' group_id %}" {% if title == 'notebook' %}class="selected"{% endif %}>Notebook</a>
     </li>
     <li> Gallery </li>
   </ul>
+</div>
+
+
+<div id="addAsset" class="reveal-modal reveal-modal-overlay" data-reveal aria-labelledby="modalTitle" aria-hidden="true" role="dialog">
+    <a class="close-reveal-modal" aria-label="Close">&#215;</a>
 </div>
 
 <div class="row">
@@ -66,12 +75,20 @@
           {% include "ndf/course_content.html" %}
         {% endif %}
     </div>
+    <div id="group_elibrary">
+        {% if title == "raw material" %}
+            {% include "ndf/assets.html" with title=title %}
+        {% endif %}
+        
+        {% if title == "gallery" %}
+              {% include "ndf/assets.html" with title=title %}
+        {% endif %}
+        {% if title == "asset_detail" or title == "asset_content_detail" or  title == "raw_material_detail" or title == "asset_gallery_detail"  %}
+            {% include "ndf/add_asset.html"  with title=title %}
+        {% endif %}
+    </div>
   </div>
 </div>
-
-  
-
-
 
 
 {% comment %}
@@ -147,13 +164,12 @@
 {% endcomment %}
 
   
-{% endblock %}
 
 <script type="text/javascript">
     $(document).on('click','.enroll-btn',function(){
     //trigger the ajax call to enroll
     $.ajax({
-      url: "{% url 'enroll_to_course' group_id %}",
+      url: "{% url 'enroll_to_course' group_object.pk %}",
 
       data: {
         'csrfmiddlewaretoken': "{{csrf_token}}"
@@ -175,3 +191,4 @@
   })
 
 </script>
+{% endblock %}
