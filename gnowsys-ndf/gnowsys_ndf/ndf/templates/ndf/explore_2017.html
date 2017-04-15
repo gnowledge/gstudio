@@ -5,76 +5,25 @@
 {% block title %} {{title|capfirst}} {% endblock title %}
 
 {% block body_content %}
-	{% check_is_gstaff groupid request.user as is_gstaff %}
-
-		<div class="small-12 medium-2 columns heading row">
-
-		</div>
-		<!--<div class="small-12 medium-6 columns expore-type">-->
-
 		{% include 'ndf/explore_secondary_header.html' %}
-		<!--{% if title == "base courses" and is_gstaff %}
-		<div class="small-12 medium-7 columns">
-			<div style="display: inline-block;">
-				<a class="tiny button radius right" href="{% url 'unit_create_edit' groupid %}"><i class="fi-plus"></i>{% trans " Create Unit" %}</a>
-			</div>
-		</div>
-		{% endif %}-->
-	</div>
-	{% if title != "Modules" %}
-	<div class="row">
-	{% endif %}
-	</div>
-
-		{% if title == 'explore' %}
-			Please select course or a group.
-		{% else %}
 		<!--section role="tabpanel" aria-hidden="true" class="content active " style="border-style:none;"-->
-			{% if title == "Modules" %}
-			<ul class="small-block-grid-1 medium-block-grid-2 large-block-grid-2" >
-			 {% endif %}
-
-			{% if title == "base courses" %}
-			<ul class="small-block-grid-1 medium-block-grid-3 large-block-grid-4">
-			{% endif %}
-
-			{% for each_obj in doc_cur %}
-			<!--li class="card-image-wrapper"-->
-			{% if title == "base courses" %}
-				{% if "Course" in each_obj.member_of_names_list %} {{each_obj.name}}						
-				{% include card with resource=each_obj has_logo=True no_footer=True url_name="course_detail" first_arg=groupid second_arg=each_obj.pk  %}
-				
-				{% elif "base_unit" in each_obj.member_of_names_list %}
-				<li class="card-image-wrapper" >
-
-					{# {% include card with resource=each_obj has_logo=True no_footer=True url_name="groupchange" first_arg=each_obj.pk  %} #}
-					{% include card with node=each_obj is_event=True no_footer=True has_prof_pic=True url_name="groupchange" first_arg=each_obj.pk %}
+		{% if title == "groups" %}
+	        <ul class="small-block-grid-1 medium-block-grid-3 large-block-grid-4">
+			{% for each_obj in groups_cur %}
+		        <li class="card-image-wrapper">
+					{% include card with node=each_obj has_logo=True no_footer=True url_name="groupchange" first_arg=each_obj.pk %}
 				</li>
-				{% endif %}
-			{% elif title == "Modules" %}
-			<li class="card-image-wrapper" >
-				{% include card with node=each_obj is_event=True no_footer=True has_prof_pic=True url_name=card_url_name first_arg=group_id second_arg=each_obj.pk  next_session=True %}
-			</li>
-			{% else %}
-				{# {% include card with resource=each_obj is_event=True no_footer=True has_prof_pic=True url_name="unit_detail" first_arg=groupid first_arg=groupid second_arg=each_obj.pk %} #}
-
-				{% include card with resource=each_obj is_event=True no_footer=True has_prof_pic=True url_name="groupchange" first_arg=each_obj.pk  next_session=True %}
-			{% endif %}
-	          <!--/li-->
 			{% endfor %}
-			{% if title == "Modules" %}
-				</ul>
+			</ul>
+		{% else %}
+			{% if title == "drafts" and request.user.is_authenticated %}
+		        <a href="{% url 'unit_create_edit' group_id %}" class="right text_button"><i class="fa fa-plus"> New Unit</i></a>
+                <a href="{% url 'module_create' group_id %}" class="right text_button"><i class="fa fa-plus"> New Module</i></a>
 			{% endif %}
-			{% if title == "base_unit" %}
-				</ul>
-			{% endif %}
-		<!--/section-->
-			{% if title == "courses" %}
-				{% include 'ndf/pagination.html' with urlname="courses_paged" first_arg="" second_arg=""  third_arg="" page_info=ce_page_cur %}
-			{% elif title == "base courses"  %}
-				{% include 'ndf/pagination.html' with urlname="basecourses_paged" first_arg="" second_arg=""  third_arg="" page_info=ce_page_cur %}
-			{% elif title == "groups" %}
-				{% include 'ndf/pagination.html' with urlname="groups_paged" first_arg="" second_arg=""  third_arg="" page_info=ce_page_cur %}
-			{% endif %}
-	{% endif %}
+			{% include "ndf/lms_explore.html"  %}
+		{% endif %}
+
+
+
+
 {% endblock body_content %}

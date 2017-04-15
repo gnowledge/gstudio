@@ -1,30 +1,23 @@
 {% load i18n %}
+{% load check_is_gstaff from ndf_tags %}
+{% check_is_gstaff group_id request.user as is_gstaff %}
 
 <nav class="top-bar-second" data-topbar role="navigation" id="top-bar-second">
 		<div class="small-12 medium-12 columns expore-type">
 			<!--<div class="toggleButtons">-->
-			<div class=" left title-area">
+			<div class="title-area">
 
 				<a href="{% url 'explore_courses' %}" class="secondary-header-tabs  {%if title == 'courses'%} active{% endif %}">
-					Unit
+					Courses
 				</a>
-
 				<a href="{% url 'explore_groups' %}" class="secondary-header-tabs {%if title == 'groups'%} active{% endif %}">
-					Groups
+					Projects
 				</a>
-
-				<a href="{% url 'explore_modules' group_id %}" class="secondary-header-tabs {%if title == 'Modules' %} active{% endif %}">
-					Modules
+				{% if is_gstaff %}
+				<a href="{% url 'explore_drafts' %}" class="secondary-header-tabs {%if title == 'drafts'%} active{% endif %}">
+					Drafts
 				</a>
-
-				<a href="{% url 'explore_basecourses' %}" class="secondary-header-tabs {%if title == 'base courses'%} active{% endif %}">
-					Draft Unit
-				</a>
-
-				<a class="secondary-header-button right" style="float:right" href="{% url 'unit_create_edit' group_id %}"><i class="fa fa-plus-circle"></i>{% trans " Create Unit" %}</a>
-
-				<a class="secondary-header-button right" style="float:right" href="{% url 'module_create' group_id %}"><i class="fa fa-plus-circle"></i>{% trans " Create Module" %}</a>
-
+				{% endif %}
 			</div>
 		</div>
 	</nav>

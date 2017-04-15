@@ -1,21 +1,33 @@
 {% extends "ndf/gbase.html" %}
 
 {% load i18n %}
-
 {% load ndf_tags %}
 
 
+{% block title %} Unit {% endblock%}
+
 {% block body_content %}
+{% get_group_object groupid as group_object %}
+
  
  <!-- LMS.html -->
 
 <div class="lms_page">
      <div class="lms_banner">
        <div class="small-12 columns lms_heading">
-       {% get_group_object groupid as group_object %}
     <div class="left unit_name"> {% trans 'Unit: ' %}{% firstof group_object.altnames group_object.name  %}</div>
          
-         <div class="right enroll_unit"><a href="#">Enroll me</a></div>
+         <div class="right enroll_unit">
+             {% if request.user.is_authenticated %}
+                {% if request.user.id not in group_object.author_set %}
+                  <a class="enroll-btn"> ENROLL</a>
+                {% else %}
+                  <a disabled="disabled"> ENROLLED</a>
+                {% endif %}
+            {% else %}
+                <a href="{% url 'auth_login' %}" title="Please login to Enroll">ENROLL</a>
+            {% endif %}
+         </div>
        </div>
      </div>
 </div>
@@ -154,3 +166,29 @@
   
 {% endblock %}
 
+<script type="text/javascript">
+    $(document).on('click','.enroll-btn',function(){
+    //trigger the ajax call to enroll
+    $.ajax({
+      url: "{% url 'enroll_to_course' group_object.pk %}",
+
+      data: {
+        'csrfmiddlewaretoken': "{{csrf_token}}"
+      },
+
+      type: "POST",
+
+      dataType: "json",
+
+      success: function(data){
+        success_state = data["success"]
+        if(success_state){
+        $(".enroll-btn").attr('value', 'ENROLLED')
+        $(".enroll-btn").attr("disabled","disabled")
+        location.reload();
+        }
+      },
+    });//end of ajax
+  })
+
+</script>
