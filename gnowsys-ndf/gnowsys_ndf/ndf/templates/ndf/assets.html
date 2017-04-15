@@ -8,11 +8,12 @@
         {% if user.is_authenticated %}
             <button type="button" class="right orange-button createAsset">
                 <i class="fi-plus"> </i>
-                Add  
+                Add  {% if title == "raw material" %} Resource {% elif title == "gallery" %} File {% else %} Asset {% endif %}
             </button>
         {% endif %}
         </div>
 </div>
+
 <div class="row listing-row"> 
       {% for each in asset_nodes %}
       <a href="{% url 'asset_detail' group_id each.pk %}"  title="{{each.name}}">
