@@ -51,18 +51,16 @@
             
             {% endif%}
             
-            {% if request.user.is_authenticated  %}
-            
-                {% if 'raw@material' in asset_obj.tags and is_gstaff %}
-                <button type="button" class="orange-button add-asset-content right"><i class="fi-plus"></i> Add File</button>
+            {% if request.user.is_authenticated  %}            
+                {% if 'raw@material' in asset_obj.tags and is_gstaff and title == "raw_material_detail"  %}
+                <button type="button" class="orange-button add-asset-content right"><i class="fi-plus"></i> Add File1</button>
                 {% endif %}
                 {% if 'asset@gallery' in asset_obj.tags  %}
-                <button type="button" class="orange-button add-asset-content right"><i class="fi-plus"></i> Add File</button>
+                <button type="button" class="orange-button add-asset-content right"><i class="fi-plus"></i> Add File2</button>
                 {% endif %}
-                {% if title == 'asset_detail' %}
-                <button type="button" class="orange-button add-asset-content right"><i class="fi-plus"></i> Add File</button>
+                {% if title == 'asset_detail'  %}
+                <button type="button" class="orange-button add-asset-content right"><i class="fi-plus"></i> Add File3</button>
                 {% endif %}
-            
 
             {% endif %}
             </div>
