@@ -9,7 +9,7 @@
 
 <div class="activity_player_secondary_header activity_player_header">
         <div class="header_icon_block back_button">
-            <a href="{% url 'course_content' group_id  %}"><i class="fa fa-angle-left header_icon"></i></a>
+            <i class="fa fa-angle-left header_icon"></i>
         </div>
         <div class="header_title header_text_block">
             {{group_name}}
@@ -152,6 +152,10 @@
                     scrollTop: $(".post-btn-div").offset().top},
                     'slow'); }, 1000);
           
+      });
+  
+  $(".header_icon_block").click(function(event){
+           location.href = "{% url 'course_content' group_id  %}"           
       });
   
 </script>
