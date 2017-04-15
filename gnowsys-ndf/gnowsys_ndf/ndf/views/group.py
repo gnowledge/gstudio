@@ -1702,7 +1702,7 @@ class EventGroupCreateEditHandler(View):
                     parent_modules = node_collection.find({
                         '_type': 'GSystem',
                         'member_of': gst_module_id,
-                        'collection_set': {'$in': [group_obj._id]}
+                        'collection_set': {'$in': [parent_group_obj._id]}
                     })
                     for each_parent_module in parent_modules:
                         each_parent_module.collection_set.append(group_obj._id)
