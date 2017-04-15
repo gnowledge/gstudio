@@ -126,7 +126,7 @@
 
             <!-- Left Nav Section -->
             <ul class="left show-for-medium-up">
-                <li class=""><a href="#">My Desk</a></li>
+                <li class=""><a href="{% url 'my_desk' request.user.id %}" {% if title == "my desk" %} class="active" {% endif %}>My Desk</a></li>
                 <li><a  class="{%if title == 'courses'%}active{%endif%}" href="{% url explore_url %}"> Explore</a></li>
             </ul>
           </section>
