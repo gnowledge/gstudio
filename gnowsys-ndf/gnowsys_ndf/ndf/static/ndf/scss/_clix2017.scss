@@ -3723,6 +3723,9 @@ ul.nav_menu_1 {
     background:#fff;
     min-height: 100vh;
     margin-bottom:10px;
+    #scstyle{
+        margin-top:-30px;
+    }
 }
 
 .lesson-title{
@@ -4525,3 +4528,11 @@ ul.nav_menu_1 {
     }
 }
 
+
+.input_links{
+    margin-right: 50px;
+    a{
+        margin-right: 35px;
+        margin-top: 5px;
+    }
+}
