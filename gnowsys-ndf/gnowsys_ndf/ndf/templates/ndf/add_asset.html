@@ -34,7 +34,7 @@
             
             <div class="small-4 columns right">       
             {% if not edit and asset_obj %}
-                {% if asset_obj.created_by == request.user.id or is_gstaff %}
+                {% if asset_obj.created_by == request.user.id or is_gstaff or user.is_superuser %}
                     <span data-dropdown="asset-settings-drop" aria-controls="asset-settings-drop" aria-expanded="false" class="large orange-button right">
                         Actions <i class="fa fa-chevron-down"></i>
                     </span>
@@ -182,7 +182,7 @@
     <div class="asset-content-area"{% if not asset_obj %} style="display:none"{% endif %}>
         {% if not edit %}
         <div class="row">
-            {% if asset_obj.created_by == request.user.id or is_gstaff %}
+            {% if asset_obj.created_by == request.user.id or is_gstaff or user.is_superuser %}
         </div>
 
         <div class="name-desc-asset-cont-area hide">
@@ -216,7 +216,7 @@
 
 
         <div class="row">
-            {% if asset_content_list.grel_id and user.is_authenticated %}
+            {% if asset_content_list.grel_id and asset_obj.created_by == request.user.id or is_gstaff or  user.is_superuser %}
             <div class="row">
                 <button type="button" class="orange-button delete-asset-content right icon-widget" style="margin-right: 53px;" title="Click on the checkbox on the files below to Delete"><i class="fa fa-trash"></i> Delete Files</button>
             </div>
