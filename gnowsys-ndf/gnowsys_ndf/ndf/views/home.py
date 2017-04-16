@@ -105,6 +105,10 @@ def landing_page(request):
                             )
 
     elif GSTUDIO_SITE_LANDING_TEMPLATE:
+        if GSTUDIO_SITE_NAME == "clix":
+            if not request.user.is_superuser:
+                return HttpResponseRedirect( reverse('my_desk', kwargs={"group_id": request.user.id}) )        
+        
         return render_to_response(
                                 GSTUDIO_SITE_LANDING_TEMPLATE,
                                 {
