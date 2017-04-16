@@ -35,7 +35,7 @@
       <div class="small-12 medium-6 large-3 columns ">
         <div class="asset_tile">
             <div class="asset_preview">
-            {% if "raw@material" in each.tags %}
+            {% if "raw@material" in each.tags and title == "asset_list" %}
                 <div class="raw_material_asset">Raw Material</div>
             {% endif %}
                 {% if each.if_file.mid.relurl and 'video' not in each.if_file.mime_type %}
