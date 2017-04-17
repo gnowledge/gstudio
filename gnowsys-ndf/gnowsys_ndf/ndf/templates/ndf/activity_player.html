@@ -85,7 +85,7 @@
               </div>
               <div class="activity_page_rendered">
                 {# {{node.content|safe}} #}
-                {% include "ndf/node_ajax_content.html" with node=node  hide_breadcrumbs=True %}
+                {% include "ndf/node_ajax_content.html" with node=node expand_content=True  hide_breadcrumbs=True %}
               </div>
 
                 {% if node.player_discussion_enable %}
