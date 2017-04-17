@@ -17,7 +17,7 @@
             {% endif %}
             {% if title == "gallery"  %}
                 <button type="button" class="right orange-button createAsset">
-                    <i class="fi-plus"> </i>Add File 
+                    <i class="fi-plus"> </i>Add Folder 
                 </button>
             {% endif %}
             {% if title == "asset_list"  %}
@@ -35,7 +35,7 @@
       <div class="small-12 medium-6 large-3 columns ">
         <div class="asset_tile">
             <div class="asset_preview">
-            {% if "raw@material" in each.tags %}
+            {% if "raw@material" in each.tags and title == "asset_list" %}
                 <div class="raw_material_asset">Raw Material</div>
             {% endif %}
                 {% if each.if_file.mid.relurl and 'video' not in each.if_file.mime_type %}
