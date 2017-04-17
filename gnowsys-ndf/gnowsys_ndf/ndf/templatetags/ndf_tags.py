@@ -588,16 +588,14 @@ def get_attribute_value(node_id, attr_name, get_data_type=False):
     	# node = node_collection.one({'_id': ObjectId(node_id) })
     	gattr = node_collection.one({'_type': 'AttributeType', 'name': unicode(attr_name) })
 
-    	# print "node: ",node.name,"\n"
-    	# print "attr: ",gattr.name,"\n"
     	if get_data_type:
     		data_type = gattr.data_type
     	if gattr: # and node  :
-    		node_attr = triple_collection.find_one({'_type': "GAttribute", "subject": ObjectId(node_id), 'attribute_type': gattr._id, 'status':"PUBLISHED"})
+    		node_attr = triple_collection.find_one({'_type': "GAttribute", "subject": ObjectId(node_id), 'attribute_type': gattr._id, 'status': u"PUBLISHED"})
 
     if node_attr:
     	attr_val = node_attr.object_value
-
+    # print "\n here: ", attr_name, " : ", attr_val, " : ", node_id
     if get_data_type:
         return {'value': attr_val, 'data_type': data_type}
 
