@@ -21,10 +21,18 @@ TEMPLATE_DEBUG = DEBUG
 DEBUG_PROPAGATE_EXCEPTIONS = DEBUG
 BENCHMARK = "ON"
 GSTUDIO_DEFAULT_GROUPS_LIST = ['home', 'Trash', 'desk', 'help', 'warehouse']
+GROUP_SETTING_1 = {'edit_policy': 'NON_EDITABLE'}
+GROUP_SETTING_2 = {'edit_policy': 'EDITABLE_NON_MODERATED'}
+
+GSTUDIO_DEFAULT_FACTORY_GROUPS = {'home': GROUP_SETTING_1,
+             'warehouse':GROUP_SETTING_2, 'Trash': GROUP_SETTING_1,
+             'desk': GROUP_SETTING_2, 'help': GROUP_SETTING_2}
+
 GSTUDIO_ALTERNATE_OPTS = ['Size', 'Format', 'Language','Content','Other']
 GSTUDIO_ALTERNATE_FORMATS = {'image':['png','jpeg'],'video':['mkv','webm'],'audio':['mp3']}
 GSTUDIO_ALTERNATE_SIZE = {'image':['100px','1048px'],'video':['144px','720px'],'audio':['128kbps']}
 GSTUDIO_DEFAULT_GROUP = u'desk'
+GSTUDIO_EDUCATIONAL_SUBJECTS_AS_GROUPS = False
 
 LANGUAGES = (('en', 'English'), ('hi', u'Hindi'),('te','Telugu'))
 GSTUDIO_DEFAULT_LANGUAGE = ('en', 'English')
