@@ -2088,7 +2088,7 @@ def _get_current_and_old_display_pics(group_obj):
     for each in group_obj.relation_set:
         if "has_banner_pic" in each:
             banner_pic_obj = node_collection.one(
-                {'_type': {'$in': ["GSystem", "File"]}, '_id': each["has_banner_pic"][0]}
+                {'_type': {'$in': ["GSystem", "File"]}, '_id': each["has_banner_pic"]}
             )
             break
 
