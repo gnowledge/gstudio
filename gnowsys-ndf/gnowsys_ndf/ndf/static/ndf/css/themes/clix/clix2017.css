@@ -3046,10 +3046,6 @@ body {
 .activity_player_header > div:not(:last-child) {
   border-right: 1px solid #fff;
 }
-/* line 3225, ../../../scss/_clix2017.scss */
-.activity_player_header > div:hover {
-  background-color: rgba(244, 244, 244, 0.3);
-}
 /* line 3230, ../../../scss/_clix2017.scss */
 .activity_player_header .header_icon {
   font-size: 20px;
