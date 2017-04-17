@@ -48,7 +48,6 @@ h5{
     font-size:10px;
     text-transform:uppercase;
     letter-spacing:2px;
-    margin-left:5px;
 }
 
 
@@ -70,15 +69,7 @@ h5{
     padding: right;
 }
 
-.icon-wid{
-    font-size: 34px;
-    color: #a2b1be;
-    margin-right: 10px;
-}
 
-.module_text{
-    margin-left: -7px;
-}
 /* Landing page */
 .landing_page {
   position: relative;
@@ -547,7 +538,7 @@ h5{
     .top-bar-section {
         ul {
             &.left li {
-                border-right: 1px solid #CCFDFF;
+                border-right: 1px solid #719599;
             }
             li {
                 background: $primary-blue;
@@ -560,7 +551,7 @@ h5{
                     letter-spacing: 1px;
                     display: block;
                     padding: 12px 0 12px 0;
-                    font-family: "OpenSans-Regular";
+                    font-family: OpenSans-Regular;
                     font-size: 16px;
 
                 }
@@ -615,6 +606,8 @@ h5{
                 padding: 0px 30px;
                     &.active{
                     color:#fff;
+                    font-size: 18.3px;
+                    font-family: OpenSans-Bold;
                     }
             }
             li {
@@ -624,7 +617,8 @@ h5{
                         background: transparent;
                         border-bottom: 0px;
                         line-height: 52px;
-                        border-left-width: 0px;
+                        
+                        
 
                     }
                     &.active {
@@ -632,6 +626,7 @@ h5{
                             //color: $header-link-active-color;
                             //color: $primary-orange;
                             color: #fff;;
+                            
                             //border-bottom: 3px solid $secondary-orange;
                         }
                     }
@@ -891,7 +886,6 @@ ul.horizontal_tabs_gstudio {
         // min-height: 400px;
         background-color: #fff;
         margin-bottom: 100px;
-        margin-top:-18px;
     }
 
     .course_actions>span{
@@ -1544,7 +1538,6 @@ ul.jqtree-tree .jqtree-toggler {
 
 /* abput and modules */
 .about-course {
-  background-color: #fff;;
   padding: 10px 23px ;
   > h5 {
     text-transform: uppercase;
@@ -1554,7 +1547,6 @@ ul.jqtree-tree .jqtree-toggler {
     display: block;
     margin: 2px 0px 0px;
     color: #99aaba;
-    margin-left:5px;
   }
 }
 .course-desc {
@@ -1569,18 +1561,14 @@ ul.jqtree-tree .jqtree-toggler {
 }
 .course-highlight {
     
+    // //font-size: 20px;
     letter-spacing: 0.7px;
     font-weight: 400;
-    color: #164A7B;
-    font-size: 14px;
-    margin-top: -11px;
+    color: $primary-blue;
+    font-size:14px;
+    margin-top: 5px;
     margin-left: 4px 0px 0px;
-    margin-left: 4px;
     margin-bottom: 5px;
-
-    >span{
-        color: $primary-orange;
-    }
 }
 
 
@@ -3515,7 +3503,7 @@ ul.nav_menu_1 {
             cursor: pointer;
             font-size: 18px;
             letter-spacing: 0.8px;
-            border-bottom: 5px solid transparent;
+            border-bottom: 3px solid transparent;
         
 
             &.selected, &:hover{
@@ -3723,9 +3711,6 @@ ul.nav_menu_1 {
     background:#fff;
     min-height: 100vh;
     margin-bottom:10px;
-    #scstyle{
-        margin-top:-30px;
-    }
 }
 
 .lesson-title{
@@ -4117,8 +4102,7 @@ $module-card-lines-to-show: 3;
 
 .module_card {
     display: table;
-    height: 200px;
-    //width:500px;
+    height: 250px;
     // width: 630px;
     margin: 10px;
     border-radius: 5px;
@@ -4133,7 +4117,7 @@ $module-card-lines-to-show: 3;
         height: 290px;
     }
     .card_banner {
-        width: 250px;
+        width: 300px;
         vertical-align: middle;
         overflow: hidden;
         background-size: 100% 100%;
@@ -4148,7 +4132,7 @@ $module-card-lines-to-show: 3;
     }
     .card_title {
         display: block;
-        width: 200px;
+        width: 230px;
         color: #fff;
         font-size: 20px;
         font-weight: 600;
@@ -4178,7 +4162,7 @@ $module-card-lines-to-show: 3;
     }
 
     .card_summary{
-        width: 230px;
+        width: 290px;
         padding: 0px 15px;
         vertical-align: middle;
         border-style: solid;
@@ -4218,7 +4202,7 @@ $module-card-lines-to-show: 3;
         .module_brief {
             display: block; /* Fallback for non-webkit */
             display: -webkit-box;
-            //height: $module-card-font-size*$module-card-line-height*$module-card-lines-to-show; /* Fallback for non-webkit */
+            height: $module-card-font-size*$module-card-line-height*$module-card-lines-to-show; /* Fallback for non-webkit */
             max-width: 400px;
             overflow: hidden;
             text-overflow: ellipsis;
@@ -4238,6 +4222,7 @@ $module-card-lines-to-show: 3;
         background-image: url('/static/ndf/images/maths-cover.png');
         background-size:100% 100%;
         position:relative; 
+
 
         &:before {
             content: ' ';
@@ -4276,15 +4261,22 @@ $module-card-lines-to-show: 3;
             .enroll_unit{
                 margin-top: 100px;
                 margin-right: 50px;
-                border: 2px solid #fff;
-                border-radius: 6px;
+                //margin-left: 150px;
+                border: 2px solid #ffc14e;
+                border-radius: 5px;
                 padding: 1px 5px 1px 5px;
                 text-transform: none;
                 text-align: center;
                 cursor: pointer;
-                color: #000;
+                color: #ffc14e;
+                font-family: OpenSans-Semibold;
                 &>a{
-                    color:#fff;
+                    color:#ffc14e;
+                }
+                &:hover{
+                background-color:rgba(255,193,78,0.3);
+                cursor:pointer;
+                color:white;
                 }
 
             }
@@ -4297,7 +4289,6 @@ $module-card-lines-to-show: 3;
     position: relative;
     color: #fff;
     box-shadow: 0 0 2px 0 rgba(0, 0, 0, 0.2);
-    border-bottom: 1px solid rgba(0, 0, 0, 0.25);
 }
 $nav_menu_1_color: #ce7869;
 $nav_menu_1_bg_color: #fff;
@@ -4419,7 +4410,6 @@ ul.nav_menu_1 {
     height: 40px;
     background-color:#fff;
     color: $primary-blue;
-    margin-top:-30px;
     >p{
         margin-left: 81px;
         padding: 12px 0px 0px 1px;
@@ -4528,11 +4518,8 @@ ul.nav_menu_1 {
     }
 }
 
-
-.input_links{
-    margin-right: 50px;
-    a{
-        margin-right: 35px;
-        margin-top: 5px;
-    }
+.header-block-style{
+    font-family: OpenSans-Bold;
+    font-size: 18px;
+    //font-weight: 600;
 }
