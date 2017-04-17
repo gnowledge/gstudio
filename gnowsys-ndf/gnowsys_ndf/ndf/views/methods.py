@@ -5472,6 +5472,8 @@ def replicate_resource(request, node, group_id):
                 at_id = each_gattr['attribute_type']
                 obj_val = each_gattr['object_value']
                 at_node = node_collection.one({'_id': ObjectId(at_id)})
+                if at_node.name == u"player_discussion_enable":
+                    at_node = node_collection.one({'_type': "AttributeType", 'name': 'discussion_enable'})
                 create_gattribute(new_gsystem._id,at_node,obj_val)
 
             ##### TRIPLES GRELATIONS
@@ -5500,6 +5502,7 @@ def replicate_resource(request, node, group_id):
             # print "\n\n relation_dict_rt_key_rs_val === ",relation_dict_rt_key_rs_val
 
             for eachrtid, eachrsval in relation_dict_rt_key_rs_val.items():
+                right_subj_node = None
                 rt_node = node_collection.one({'_id': ObjectId(eachrtid)})
                 if isinstance(eachrsval, ObjectId):
                     right_subj_node = node_collection.one({'_id': ObjectId(eachrsval)})
@@ -5519,6 +5522,15 @@ def replicate_resource(request, node, group_id):
                     if right_sub_new_node:
                         right_sub_new_node.prior_node = [new_gsystem._id]
                         right_sub_new_node.save()
+
+                    thread_node_gattr_cur = triple_collection.find({'_type': 'GAttribute',
+                     'subject': right_subj_node._id})
+
+                    for each_gattr in thread_node_gattr_cur:
+                        at_id = each_gattr['attribute_type']
+                        obj_val = each_gattr['object_value']
+                        at_node = node_collection.one({'_id': ObjectId(at_id)})
+                        create_gattribute(right_sub_new_node._id,at_node,obj_val)
 
             if "QuizItemEvent" in new_gsystem.member_of_names_list:
                 if not thread_created and request:
