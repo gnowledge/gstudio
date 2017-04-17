@@ -3606,13 +3606,15 @@ def get_user_course_groups(user_id):
 						}
 
 	for each_course in all_user_groups:
-		each_course.course_status_field = get_event_status(each_course)
-		all_courses_obj_grouped[each_course.course_status_field].append(each_course)
-		# all_courses_obj_grouped['all'].append(each_course)
+		status_val = get_event_status(each_course)
+		if status_val:
+			each_course.course_status_field = status_val
+			all_courses_obj_grouped[each_course.course_status_field].append(each_course)
+			# all_courses_obj_grouped['all'].append(each_course)
 
-		courses_status_count_dict[each_course.course_status_field] += 1
+			courses_status_count_dict[each_course.course_status_field] += 1
 
-		# all_courses.append(each_course)
+			# all_courses.append(each_course)
 
 	# print "::: ", courses_status_count_dict
 	# print "::: ", all_courses_obj_grouped
