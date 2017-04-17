@@ -121,7 +121,7 @@
               <a href="{% url 'tag_info' group_id tag %}">{{tag}} </a></label></small>
           {% endfor %} 
       {% else %}
-          <i><small><label class="tag-ele">{% trans "No tags defined yet!" %}</label></small></i>
+          <!-- <i><small><label class="tag-ele">{% trans "No tags defined yet!" %}</label></small></i> -->
       {% endif %}
   </div>
 
@@ -154,7 +154,7 @@
           <i class="icon-wid fa fa-list"></i>
         </div>
         <div class="left module_text">
-          <h5>No. of Modules</h5>
+          <h5>No. of Lessons</h5>
           <div class="course-highlight">
              <span>{{group_object.collection_set|length}} Lessons{{group_object.collection_set|length|pluralize}}</span>
           </div>

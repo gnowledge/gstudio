@@ -94,10 +94,10 @@
             {% if thread_node %}
                 {% get_disc_replies thread_node group_id global_disc_all_replies as all_replies %}
                 {% get_node thread_node as thread_node_obj %}
-                {% include 'ndf/gin-line-texteditor.html' with node=thread_node_obj var_name="content_org" ckeditor_toolbar="BasicToolbar" %}
+                {% include 'ndf/gin-line-texteditor.html' with node=thread_node_obj var_name="content_org" ckeditor_toolbar="LMSStuentsToolbar" %}
             {% else %}
                 {% get_disc_replies node.pk group_id global_disc_all_replies as all_replies %}
-                {% include 'ndf/gin-line-texteditor.html' with var_name="content_org" ckeditor_toolbar="BasicToolbar" %}
+                {% include 'ndf/gin-line-texteditor.html' with var_name="content_org" ckeditor_toolbar="LMSStuentsToolbar" %}
             {% endif %}
     </div>
     {% comment %}

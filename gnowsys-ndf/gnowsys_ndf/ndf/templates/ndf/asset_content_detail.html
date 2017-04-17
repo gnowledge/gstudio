@@ -24,7 +24,7 @@
           <a class="text_button right"  href="{% url 'read_file' group_name_tag node download_filename %}"  download="{{ download_filename }}">
                     <i class="fa fa-download" aria-hidden="true"></i> {% trans 'Download' %}
           </a>
-          {% if node.created_by == request.user.id or is_gstaff %}
+          {% if node.created_by == request.user.id or is_gstaff  or user.is_superuser%}
                 <span data-dropdown="assetcontent-settings-drop" aria-controls="assetcontent-settings-drop" aria-expanded="false" class="orange-button right">
                     Link/Add Related File <i class="fa fa-chevron-down"></i>
                 </span>
@@ -42,6 +42,8 @@
         </div>
             
         </div>
+        
+
         {% get_gstudio_alt_opts as alt_opts %}
         {% if 'video' in node.if_file.mime_type %}
           {% get_gstudio_alt_size 'video' as size_types %}
@@ -145,7 +147,6 @@
         {%  endif %}
 
 
-        {% if 'audio' in node.if_file.mime_type or 'video' in node.if_file.mime_type or 'image' in node.if_file.mime_type %}
         <div class="alt-file-upload hide">
         	<a class="right close-reveal-modal reveal-modal-overlay" aria-label="Close">&#215;</a>
                <select   class="select-language" name="lan" id="alt_types" >
@@ -170,7 +171,6 @@
                 <button type="button" style="display: none" class="right orange-button-subtitle save-altfile" onclick="save_alternate_file()">Upload</button>
               </div>
         </div>
-        {% endif %}
     </div>
     <!-- <a class="close-reveal-modal">&#215;</a> -->
 

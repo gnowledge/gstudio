@@ -2088,7 +2088,7 @@ def _get_current_and_old_display_pics(group_obj):
     for each in group_obj.relation_set:
         if "has_banner_pic" in each:
             banner_pic_obj = node_collection.one(
-                {'_type': {'$in': ["GSystem", "File"]}, '_id': each["has_banner_pic"][0]}
+                {'_type': {'$in': ["GSystem", "File"]}, '_id': each["has_banner_pic"]}
             )
             break
 
@@ -3207,9 +3207,13 @@ def assets(request, group_id, asset_id=None):
 def assetcontent_detail(request, group_id, asset_id,asst_content_id):
     assetcontent_obj = node_collection.one({'_id': ObjectId(asst_content_id)})
     asset_obj = node_collection.one({'_id': ObjectId(asset_id)})
+    group_obj = get_group_name_id(group_id, get_obj=True)
     # print group_id,asset_id,asst_content_id
     asset_content_list = get_relation_value(ObjectId(asset_obj._id),'has_assetcontent')
     template = 'ndf/gevent_base.html'
+    if "announced_unit" in group_obj.member_of_names_list and  "raw@material" in asset_obj.tags or "asset@gallery" in asset_obj.tags:
+        template = 'ndf/lms.html'
+
     context_variables = {
             'asset_content_list':asset_content_list,'group_id':group_id,
             'groupid':group_id,'node':assetcontent_obj,'asset_obj':asset_obj,
