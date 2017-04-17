@@ -129,7 +129,7 @@
                 {% if request.user.id %}
                 <li class=""><a href="{% url 'my_desk' request.user.id %}" {% if title == "my desk" %} class="active" {% endif %}>My Desk</a></li>
                 {% endif %}
-                <li><a  class="{%if title == 'courses'%}active{%endif%}" href="{% url explore_url %}"> Explore</a></li>
+                <li><a  class="{%if title == 'base courses'%}active{%endif%}" href="{% url explore_url %}"> Explore</a></li>
             </ul>
           </section>
     </nav>

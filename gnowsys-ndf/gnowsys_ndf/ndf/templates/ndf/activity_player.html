@@ -26,7 +26,7 @@
              {{group_name}}
         </div>
         <div class="new_note header_text_block">
-            <a href="{% url 'page_create_edit' group_name %}?course_event_id={{group_id}}&blog_type=True">
+            <a href="{% url 'page_create_edit' group_name %}?course_event_id={{group_id}}&blog_type=True"target="_blank">
                 <i class="fa fa-edit header_icon"></i>&nbsp;
                 WRITE A NEW NOTE
             </a>
@@ -74,7 +74,7 @@
                   <a class="student-page right"> Student Help</a>
                 {% endif %}
                 {% if  is_gstaff or user.is_superuser %}
-                  {% if grel_admin_page.grel_id %}<a class="admin-page right"> Teacher's Help></a>{% endif %}
+                  {% if grel_admin_page.grel_id %}<a class="admin-page right"> Teacher's Help</a>{% endif %}
                 {% endif  %}
               {% if node.player_discussion_enable %}
               <a class="discuss right"> Discuss</a>

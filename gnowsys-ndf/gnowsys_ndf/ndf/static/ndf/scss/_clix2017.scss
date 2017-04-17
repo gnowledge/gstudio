@@ -3216,15 +3216,15 @@ $ah_2_background_color_hover: rgba(244, 244, 244, 0.3);;
         line-height: $activity-header-height;
         display: inline-block;
         vertical-align: top;
-        cursor: pointer;
+        //cursor: pointer;
 
         &:not(:last-child) {
             border-right: 1px solid #fff;
         }
 
-        &:hover {
-            background-color: $ah_2_background_color_hover;
-        }
+        //&:hover {
+          //  background-color: $ah_2_background_color_hover;
+        //}
     }
 
     .header_icon {
