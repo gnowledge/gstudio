@@ -615,6 +615,8 @@ h5{
                 padding: 0px 30px;
                     &.active{
                     color:#fff;
+                    font-size: 18px;
+                    font-family: OpenSans-Bold;
                     }
             }
             li {
@@ -625,13 +627,16 @@ h5{
                         border-bottom: 0px;
                         line-height: 52px;
                         border-left-width: 0px;
+                        font-family: OpenSans-Regular;
 
                     }
                     &.active {
                         a:not(.button) {
                             //color: $header-link-active-color;
                             //color: $primary-orange;
-                            color: #fff;;
+                            color: #fff;
+                            font-family: OpenSans-Bold;
+                            font-size: 18px;
                             //border-bottom: 3px solid $secondary-orange;
                         }
                     }
@@ -3724,7 +3729,7 @@ ul.nav_menu_1 {
     min-height: 100vh;
     margin-bottom:10px;
     #scstyle{
-        margin-top:-30px;
+        margin-top:-10px;
     }
 }
 
@@ -3764,7 +3769,8 @@ ul.nav_menu_1 {
 
 .activity_page_rendered{
     //margin-top:10px;
-    margin-left:40px;
+    margin-left:10px;
+   // width:145%;
 }
 /* Rating css */
 
@@ -4276,15 +4282,22 @@ $module-card-lines-to-show: 3;
             .enroll_unit{
                 margin-top: 100px;
                 margin-right: 50px;
-                border: 2px solid #fff;
+                border: 2px solid #ffc14e;
                 border-radius: 6px;
                 padding: 1px 5px 1px 5px;
                 text-transform: none;
                 text-align: center;
                 cursor: pointer;
                 color: #000;
+                font-family: OpenSans-Semibold;
+
                 &>a{
-                    color:#fff;
+                    color:#ffc14e;
+                }
+                &:hover{
+                background-color:rgba(255,193,78,0.3);
+                cursor:pointer;
+                color:white;
                 }
 
             }

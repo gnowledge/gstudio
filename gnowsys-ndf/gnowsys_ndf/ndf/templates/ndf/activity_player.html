@@ -10,17 +10,18 @@
 
 <style type="text/css">
   .disabled , .disabled i {
-    color:grey !important;
+    color:gray !important;
   }
 </style>
-<div class="activity_player_secondary_header activity_player_header">
-
+<div class="activity_player_secondary_header activity_player_header sticky">
+  <nav class="activity_player_secondary_header activity_player_header" data-topbar role="navigation" data-options="sticky_on: large">
       <div class="small-1 columns end">
-        <a href="{% url 'course_content' group_id  %}"><div class="header_icon_block prev_button">
+        <a href="{% url 'course_content' group_id  %}">
+        <div class="header_icon_block prev_button">
             <i class="fa fa-angle-left header_icon"></i>
         </div>
         </a>
-</div>
+      </div>
         <div class="header_title header_text_block">
              {{group_name}}
         </div>
@@ -46,6 +47,7 @@
               </a>
             
         </div>
+</nav>
 </div>
 
 <div class="row activity_sheet">
@@ -84,7 +86,7 @@
               </div>
               <div class="activity_page_rendered">
                 {# {{node.content|safe}} #}
-                {% include "ndf/node_ajax_content.html" with node=node  hide_breadcrumbs=True %}
+                {% include "ndf/node_ajax_content.html" with node=node expand_content=True  hide_breadcrumbs=True %}
               </div>
 
                 {% if node.player_discussion_enable %}
