@@ -28,7 +28,7 @@ auth_gst_id = auth_gst._id
 # csv_log_list = []
 
 user_icons_dir_path = '/home/docker/code/display-pics/'
-
+tc_elem_names_list = ['carbon', 'chlorine', 'copper', 'helium', 'iron', 'nitrogen', 'oxygen', 'silver', 'sodium', 'zinc']
 
 class Command(BaseCommand):
     help = "Creating user, author and attaching profile pics from CSV's.\n\t- CSV file schema: user_id, school_code, username, password, oid\n\t- CSV file-name-path needs to be passed either as argument or can be passed on demand/asked by script.\n\t- Please keep user-display-pics folder at following location:\n\t\t/home/docker/code/display-pics/"
@@ -83,6 +83,9 @@ class Command(BaseCommand):
                         auth['contributors'] = [user_id]
                         auth['group_admin'] = [user_id]
                         auth['agency_type'] = "Student"
+                        if username.split('-')[1] in tc_elem_names_list:
+                            # overwrite agency_type if teacher
+                            auth['agency_type'] = "Teacher"
                         oid = ObjectId(oid)
                         auth['_id'] = oid
                         auth.save(groupid=oid)
