@@ -40,12 +40,12 @@ CKEDITOR.plugins.add('addJhapp',
                              CKEDITOR.instances[textAreaId].insertHtml(ost_text_val);
                             $('#group_imgs_on_modal').foundation('reveal', 'close');
                           });
+                            
                             $("#insert_policequad").click(function(event){
-                            //ost_text_gallery = $('#paste-ost-gallery').val();
-                            //ost_text_file = $('#paste-ost-captions').val();
-                            pq_text_val = "<iframe src='/policequad/' style='height:100vh;width:100%'></iframe>"
-                            // split_word = ost_text_val.slice(0, 18) + "gallery=" + ost_text_gallery + "&amp;file=/ost/" + ost_text_file+"'"+ ost_text_val.slice(18);
-                            // alert(split_word)
+                            
+
+                            pq_text_val = "<a href='/policequad' onclick='javascript:opneinnewindow() return false;' target='_blank'><img src='/static/ndf/images/PoliceQuad_pt33x.png' alt='Police quad thumbnail'  height='1000px' width='1000px' >"
+                            
                              CKEDITOR.instances[textAreaId].insertHtml(pq_text_val);
                             $('#group_imgs_on_modal').foundation('reveal', 'close');
                           });

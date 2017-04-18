@@ -105,14 +105,19 @@ def landing_page(request):
                             )
 
     elif GSTUDIO_SITE_LANDING_TEMPLATE:
-        return render_to_response(
-                                GSTUDIO_SITE_LANDING_TEMPLATE,
-                                {
-                                    "group_id": "home", 'groupid':"home",
-                                    'title': 'CLIx'
-                                },
-                                context_instance=RequestContext(request)
-                            )
+        if GSTUDIO_SITE_NAME == "clix":
+            if request.user.id:
+                return HttpResponseRedirect( reverse('my_desk', kwargs={"group_id": request.user.id}) )        
+            else:
+        
+                return render_to_response(
+                                        GSTUDIO_SITE_LANDING_TEMPLATE,
+                                        {
+                                            "group_id": "home", 'groupid':"home",
+                                            'title': 'CLIx'
+                                        },
+                                        context_instance=RequestContext(request)
+                                    )
     else:
         return HttpResponseRedirect( reverse('groupchange', kwargs={"group_id": "home"}) )
 

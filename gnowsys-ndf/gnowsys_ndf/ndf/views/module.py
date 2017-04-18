@@ -54,37 +54,40 @@ def module_create_edit(request, group_id, module_id=None):
 
         template = 'ndf/module_form.html'
         additional_form_fields = {}
+        module_attrs = ['educationalsubject', 'educationallevel']
+        # ma: module attr
+        module_attr_values = {ma: '' for ma in module_attrs}
 
         if module_id:
             # existing module.
             url_name = 'node_edit'
             url_kwargs={'group_id': group_id, 'node_id': module_id, 'detail_url_name': 'module_detail'}
+            # updating module attr dict:
             module_obj = Node.get_node_by_id(module_id)
-            module_attrs = ['educationalsubject', 'educationallevel']
             module_attr_values = module_obj.get_attributes_from_names_list(module_attrs)
-            additional_form_fields = {
-                'attribute': {
-                    'Subject': {
-                        'name' :'educationalsubject',
-                        'widget': 'dropdown',
-                        # 'widget_attr': 'multiple',
-                        'value': module_attr_values['educationalsubject'],
-                        'all_options': GSTUDIO_RESOURCES_EDUCATIONAL_SUBJECT
-                    },
-                    'Grade': {
-                        'name' :'educationallevel',
-                        'widget': 'dropdown',
-                        'widget_attr': 'multiple',
-                        'value': module_attr_values['educationallevel'],
-                        'all_options': GSTUDIO_RESOURCES_EDUCATIONAL_LEVEL
-                    }
-                }
-            }
 
         else:
             # new module
             url_name = 'node_create'
             url_kwargs={'group_id': group_id, 'member_of': 'Module', 'detail_url_name': 'module_detail'}
+
+        additional_form_fields = {
+            'attribute': {
+                'Subject': {
+                    'name' :'educationalsubject',
+                    'widget': 'dropdown',
+                    'value': module_attr_values['educationalsubject'],
+                    'all_options': GSTUDIO_RESOURCES_EDUCATIONAL_SUBJECT
+                },
+                'Grade': {
+                    'name' :'educationallevel',
+                    'widget': 'dropdown',
+                    'widget_attr': 'multiple',
+                    'value': module_attr_values['educationallevel'],
+                    'all_options': GSTUDIO_RESOURCES_EDUCATIONAL_LEVEL
+                }
+            }
+        }
 
         req_context = RequestContext(request, {
                                     'title': 'Module', 'node_obj': Node.get_node_by_id(module_id),
