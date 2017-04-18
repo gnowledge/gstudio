@@ -2428,7 +2428,9 @@ def course_gallery(request, group_id,node_id=None,page_no=1):
     asset_nodes = node_collection.find({'member_of': {'$in': [asset_gst_id]},
             'group_set': {'$all': [ObjectId(group_id)]},'tags': "asset@gallery"}).sort('last_update', -1)
     
-    template = 'ndf/lms.html'
+    template = 'ndf/gcourse_event_group.html'
+    if "announced_unit" in group_obj.member_of_names_list:
+        template = 'ndf/lms.html'
     
     context_variables.update({'asset_nodes': asset_nodes})
 
