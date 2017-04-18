@@ -13,6 +13,8 @@
  
  <!-- LMS.html -->
 
+{% include 'ndf/widget_user_access_modal.html' %}
+
 <div class="lms_page">
      <div class="lms_banner">
        <div class="small-12 columns lms_heading">
@@ -61,7 +63,8 @@
  
             {% if request.user.is_authenticated %}
                 {% if request.user.id not in group_object.author_set %}
-                  <a class="enroll-btn"> ENROLL</a>
+                  {% include 'ndf/widget_enroll.html' %}
+
                 {% else %}
                   <a disabled="disabled"> ENROLLED</a>
                 {% endif %}
@@ -206,30 +209,4 @@
 
   
 
-<script type="text/javascript">
-    $(document).on('click','.enroll-btn',function(){
-    //trigger the ajax call to enroll
-    $.ajax({
-      url: "{% url 'enroll_to_course' group_object.pk %}",
-
-      data: {
-        'csrfmiddlewaretoken': "{{csrf_token}}"
-      },
-
-      type: "POST",
-
-      dataType: "json",
-
-      success: function(data){
-        success_state = data["success"]
-        if(success_state){
-        $(".enroll-btn").attr('value', 'ENROLLED')
-        $(".enroll-btn").attr("disabled","disabled")
-        location.reload();
-        }
-      },
-    });//end of ajax
-  })
-
-</script>
 {% endblock %}
