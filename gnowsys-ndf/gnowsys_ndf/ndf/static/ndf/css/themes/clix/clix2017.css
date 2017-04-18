@@ -4356,3 +4356,9 @@ ul.nav_menu_1 > li > a.selected, ul.nav_menu_1 > li > a:hover {
   margin-right: 35px;
   margin-top: 5px;
 }
+
+/* line 4553, ../../../scss/_clix2017.scss */
+#course-notification
+#status {
+  width: 100% !important;
+}
