@@ -6,13 +6,18 @@
 {% load ndf_tags %}
 {% check_is_gstaff group_id request.user as is_gstaff %}
 
+
 {% block body_content %}
+{% user_access_policy groupid request.user as user_access_priv %}
 
 <style type="text/css">
   .disabled , .disabled i {
     color:gray !important;
   }
 </style>
+
+{% include 'ndf/widget_user_access_modal.html' %}
+
 <div class="activity_player_secondary_header activity_player_header sticky">
   <nav class="activity_player_secondary_header activity_player_header" data-topbar role="navigation" data-options="sticky_on: large">
       <div class="small-1 columns end">
@@ -26,7 +31,7 @@
              {{group_name}}
         </div>
         <div class="new_note header_text_block">
-            <a href="{% url 'page_create_edit' group_name %}?course_event_id={{group_id}}&blog_type=True"target="_blank">
+            <a {% if user_access_priv == "allow" %} href="{% url 'page_create_edit' group_name %}?course_event_id={{group_id}}&blog_type=True" target="_blank" {% else %} class="user_not_enrolled" {% endif %}>
                 <i class="fa fa-edit header_icon"></i>&nbsp;
                 WRITE A NEW NOTE
             </a>
@@ -117,44 +122,44 @@
 
 <script type="text/javascript">
   $(".admin-page").click(function(event){
-          $.ajax({
-                      type: "POST",
-                      url: "{% url 'get_info_pages' group_id %}",
-                      datatype: "html",
-                      data:{
-                        'csrfmiddlewaretoken': "{{csrf_token}}",
-                        'node_id':'{{node.pk}}',
-                        'page_type':'has_admin_page'
+      $.ajax({
+              type: "POST",
+              url: "{% url 'get_info_pages' group_id %}",
+              datatype: "html",
+              data:{
+                'csrfmiddlewaretoken': "{{csrf_token}}",
+                'node_id':'{{node.pk}}',
+                'page_type':'has_admin_page'
 
-                      },
-                        success: function(data) {
-                        // $('#info-page-area').html(data);
-                        parent = $("#info-page-area");
-                        parent.html(data);
-                        $('html,body').animate({scrollTop: $("#info-page-area").offset().top},'slow');
-                      }
-                    });
+              },
+                success: function(data) {
+                // $('#info-page-area').html(data);
+                parent = $("#info-page-area");
+                parent.html(data);
+                $('html,body').animate({scrollTop: $("#info-page-area").offset().top},'slow');
+              }
+            });
       });
   
   $(".student-page").click(function(event){
-          $.ajax({
-                      type: "POST",
-                      url: "{% url 'get_info_pages' group_id %}",
-                      datatype: "html",
-                      data:{
-                        'csrfmiddlewaretoken': "{{csrf_token}}",
-                        'node_id':'{{node.pk}}',
-                        'page_type':'has_help'
+      $.ajax({
+                type: "POST",
+                url: "{% url 'get_info_pages' group_id %}",
+                datatype: "html",
+                data:{
+                  'csrfmiddlewaretoken': "{{csrf_token}}",
+                  'node_id':'{{node.pk}}',
+                  'page_type':'has_help'
 
-                      },
-                        success: function(data) {
-                        // $('#info-page-area').html(data);
-                        parent = $("#info-page-area");
-                        parent.html(data);
-                        $('html,body').animate({scrollTop: $("#info-page-area").offset().top},'slow');
+                },
+                  success: function(data) {
+                  // $('#info-page-area').html(data);
+                  parent = $("#info-page-area");
+                  parent.html(data);
+                  $('html,body').animate({scrollTop: $("#info-page-area").offset().top},'slow');
 
-                      }
-                    });
+                }
+            });
       });
   
   $(".discuss").click(function(event){
