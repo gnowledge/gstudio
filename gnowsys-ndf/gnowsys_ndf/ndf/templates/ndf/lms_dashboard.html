@@ -30,17 +30,19 @@
         </div>
 
     <ul class="small-block-grid-1 medium-block-grid-2 large-block-grid-2" >
+        {% comment %}
+
         {% for each_obj in modules_cur %}
           <li class="card-image-wrapper">
             {% include "ndf/horizontal_card.html" with node=each_obj url_name="module_detail" first_arg=group_id second_arg=each_obj.pk %}
           </li>
         {% empty %}
-          No modules found!
+          No modules foun
         {% endfor %}
         </ul>
         </div>
-    </br>
-
+        {% endcomment %}
+          </br>
     <div class="small-12 columns group_sections_content">
                 {% if title == "my desk" %}
                     <div class="small-12 columns lms_explore_back_unit">

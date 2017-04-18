@@ -734,7 +734,6 @@ def my_desk(request, group_id):
 
     my_units = node_collection.find({'member_of': {'$in': [ce_gst._id, announced_unit_gst._id]},
                                           'author_set': request.user.id,
-                                          'prior_node': {'$nin': my_modules},
                                         }).sort('last_update', -1)
     my_modules_cur.rewind()
     return render_to_response('ndf/lms_dashboard.html',
@@ -743,7 +742,7 @@ def my_desk(request, group_id):
                     'node': auth_obj, 'title': title,
                     'my_course_objs': my_course_objs,
                     'units_cur':my_units,
-                    'modules_cur': my_modules_cur
+                    # 'modules_cur': my_modules_cur
                 },
                 context_instance=RequestContext(request)
         )
