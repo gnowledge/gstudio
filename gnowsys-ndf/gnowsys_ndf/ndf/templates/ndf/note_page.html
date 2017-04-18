@@ -2,12 +2,6 @@
 {% load i18n %}
 
 {% check_is_gstaff group_id request.user as is_gstaff %}
-<style type="text/css">
-    .lbl_of_tag{
-        background-color: gold !important;
-    }
-
-</style>
     <div class="row note-toolbar">
         <div class="small-12 medium-10 columns">
 
@@ -17,12 +11,15 @@
                    {% if node.tags %}
                         <div class="tag-rating-div">
                                 {% for tag in node.tags %}
-                                    {% if forloop.counter < 3 %}
-                                        <small><label class="lbl_of_tag label">
+                                    {% if forloop.counter < 5 %}
+                                        <small><label class="tag-ele" style="margin-top: 13px;">
                                     {% else %}
-                                        <small><label class="lbl_of_tag label tag_ele hide">
+                                        <small><label class="tag-ele toggle-tag hide" style="margin-top: 13px;">
+                                        <!-- <small><label class="lbl_of_tag label tag_ele hide"> -->
                                     {% endif %}
-                                    <a href="{% url 'tag_info' groupid tag %}">{{tag}} </a></label></small>
+
+                                    <a href="{% url 'tag_info' group_id tag %}">{{tag}} </a></label></small>
+                                    <!-- <a href="{% url 'tag_info' groupid tag %}">{{tag}} </a></label></small> -->
                                 {% endfor %}
                                 {% if node.tags|length > 2 %}
                                     <small><label class="view-more-tags" style="display:inline-block;">More</label></small>
@@ -131,11 +128,11 @@
 <script type="text/javascript">
 $(document).on('click','.view-more-tags',function(){
     if($(this).text()=="Less"){
-        $(".tag_ele").addClass("hide")
+        $(".toggle-tag").addClass("hide")
         $(this).text("More")
     }
     else{
-        $(".tag_ele").removeClass("hide")
+        $(".toggle-tag").removeClass("hide")
         $(this).text("Less")
     }
 })
