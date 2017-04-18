@@ -11,8 +11,11 @@
             <div class="banner_profile">
                 <div class="buddy_logo">
                     {% get_profile_pic request.user.pk as prof_pic %}
-                      <img src="{{MEDIA_URL}}{{prof_pic.if_file.original.relurl}}" id="">
-
+                        {% if prof_pic %}
+                            <img src="{{MEDIA_URL}}{{prof_pic.if_file.original.relurl}}" id="">
+                        {% else %}
+                            <i class="fa fa-user fa-5x buddy_logo" aria-hidden="true"></i>
+                        {% endif %}
                 </div>
                 <div class="banner_heading">
                     <span class="buddy_name">{{user.username}}</span>
