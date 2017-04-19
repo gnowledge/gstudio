@@ -37,8 +37,12 @@
                 <li class="has-dropdown buddy_margin">
                     {% get_profile_pic request.user.pk as prof_pic %}
                     <a href="{% url 'dashboard' request.user.pk %}">
+                    {% if prof_pic %}
                       <img src="{{MEDIA_URL}}{{prof_pic.if_file.original.relurl}}" id="profile-img">
                       {{ user.username }}
+                    {% else %}
+                            <img class="profile-img" style="background-color:#d18425;" src="/static/ndf/bower_components/foundation-icon-fonts/svgs/fi-torso.svg" >
+                    {% endif %}
                     </a>
                     <ul class="dropdown">
                         <li class="text-center">

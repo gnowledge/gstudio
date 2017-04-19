@@ -547,7 +547,7 @@ h5{
     .top-bar-section {
         ul {
             &.left li {
-                border-right: 1px solid #CCFDFF;
+                border-right: 2px solid #16539f;
             }
             li {
                 background: $primary-blue;
@@ -589,6 +589,7 @@ h5{
 
         .dropdown li.parent-link a {
             display: none;
+
         }
 
         .side-bar-menu {
@@ -646,6 +647,7 @@ h5{
                                 color: $secondry-blue;
                                 border-bottom: 0px;
                                 border-left: 3px solid $secondary-orange;
+
                             }
                         }
                     }
@@ -675,6 +677,7 @@ h5{
                         border-left-width: 2px;
                         color: $secondry-blue;
                         background: $primary-blue;
+                        
                     }
 
                     &:hover, &.active{
@@ -3019,6 +3022,13 @@ ul.jqtree-tree .jqtree-toggler {
 #profile-img {
     height: 40px;
     margin-right: 5px;
+}
+
+.profile-img {
+    height: 40px;
+    width:40px;
+    margin-right: 5px;
+    border-radius:2px;
 }
 
 .activity-detail-page{
