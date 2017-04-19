@@ -1,11 +1,11 @@
 {% extends "ndf/gbase.html" %}
 {% load check_is_gstaff from ndf_tags %}
 {% load i18n %}
-{% check_is_gstaff group_id request.user as is_gstaff %}
 
 {% block title %} {{title|capfirst}} {% endblock title %}
 
 {% block body_content %}
+{% check_is_gstaff group_id request.user as is_gstaff %}
 		{% include 'ndf/explore_secondary_header.html' %}
 		<!--section role="tabpanel" aria-hidden="true" class="content active " style="border-style:none;"-->
 		{% if title == "groups" %}
