@@ -711,36 +711,37 @@ def my_desk(request, group_id):
 
     auth_id = auth_obj._id
     title = 'my desk'
-    modules_cur = node_collection.find({'member_of': gst_module_id  }).sort('last_update', -1)
-
-    my_course_objs = get_user_course_groups(user_id)
-    module_unit_ids = [val for each_module in modules_cur for val in each_module.collection_set ]
-
-    modules_cur.rewind()
-        # print my_course_objs
-    base_unit_cur = node_collection.find({'member_of': {'$in': [ce_gst._id, announced_unit_gst._id]},
-                                          'author_set': request.user.id,
-                                        }).sort('last_update', -1)
-    my_list_unit = []
-    for each in base_unit_cur:
-        my_list_unit.append(each._id)
-
-    base_unit_cur.rewind()
-    my_modules_cur = node_collection.find({'member_of': gst_module_id ,'collection_set':{'$in':my_list_unit } }).sort('last_update', -1)
     
-    my_modules = []
-    for each in my_modules_cur:
-        my_modules.append(each._id)
+    # modules_cur = node_collection.find({'member_of': gst_module_id  }).sort('last_update', -1)
+
+    # my_course_objs = get_user_course_groups(user_id)
+    # module_unit_ids = [val for each_module in modules_cur for val in each_module.collection_set ]
+
+    # modules_cur.rewind()
+        # print my_course_objs
+    # base_unit_cur = node_collection.find({'member_of': {'$in': [ce_gst._id, announced_unit_gst._id]},
+    #                                       'author_set': request.user.id,
+    #                                     }).sort('last_update', -1)
+    # my_list_unit = []
+    # for each in base_unit_cur:
+    #     my_list_unit.append(each._id)
+
+    # base_unit_cur.rewind()
+    # my_modules_cur = node_collection.find({'member_of': gst_module_id ,'collection_set':{'$in':my_list_unit } }).sort('last_update', -1)
+    
+    # my_modules = []
+    # for each in my_modules_cur:
+    #     my_modules.append(each._id)
 
     my_units = node_collection.find({'member_of': {'$in': [ce_gst._id, announced_unit_gst._id]},
                                           'author_set': request.user.id,
                                         }).sort('last_update', -1)
-    my_modules_cur.rewind()
+    # my_modules_cur.rewind()
     return render_to_response('ndf/lms_dashboard.html',
                 {
                     'group_id': auth_id, 'groupid': auth_id,
                     'node': auth_obj, 'title': title,
-                    'my_course_objs': my_course_objs,
+                    # 'my_course_objs': my_course_objs,
                     'units_cur':my_units,
                     # 'modules_cur': my_modules_cur
                 },
