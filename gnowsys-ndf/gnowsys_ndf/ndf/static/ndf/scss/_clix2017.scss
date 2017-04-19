@@ -204,10 +204,12 @@ h5{
     input.button {
       // //font-size: 25px;
       border-radius: 10px;
+
       
       text-transform: uppercase;
       background-color: $primary-blue;
       margin-top: 80px;
+      background-color:rgba(255,193,78,0.3);
     }
     a.grey {
       color: #999;
@@ -677,7 +679,7 @@ h5{
                         border-left-width: 2px;
                         color: $secondry-blue;
                         background: $primary-blue;
-                        
+
                     }
 
                     &:hover, &.active{
@@ -4314,6 +4316,24 @@ $module-card-lines-to-show: 3;
         }
     }
 }
+
+.enroll-btn{
+                width: 90px;
+                opacity: 1;
+                background-color: rgba(0,0,0,.1);
+                /* margin-bottom: -69px; */
+                color: #ffc14e;
+                background-color: none;
+                /* margin-bottom: 8px; */
+                cursor: pointer;
+                padding: 1px 5px 1px 5px;
+                border-radius: 6px;
+                border: 2px solid #ffc14e;
+
+            }
+
+            
+
 
 .lms_secondary_header{
     width: 100%;
