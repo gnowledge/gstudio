@@ -1,6 +1,7 @@
 {% extends "ndf/gbase.html" %}
 {% load check_is_gstaff from ndf_tags %}
 {% load i18n %}
+{% check_is_gstaff group_id request.user as is_gstaff %}
 
 {% block title %} {{title|capfirst}} {% endblock title %}
 
@@ -16,7 +17,7 @@
 			{% endfor %}
 			</ul>
 		{% else %}
-			{% if title == "drafts" and request.user.is_authenticated %}
+			{% if title == "drafts" and request.user.is_authenticated and is_gstaff or request.user.is_superuser %}
 		        <a href="{% url 'unit_create_edit' group_id %}" class="right text_button"><i class="fa fa-plus"> New Unit</i></a>
                 <a href="{% url 'module_create' group_id %}" class="right text_button"><i class="fa fa-plus"> New Module</i></a>
 			{% endif %}

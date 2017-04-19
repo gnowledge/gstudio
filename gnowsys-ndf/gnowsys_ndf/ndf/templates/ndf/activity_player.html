@@ -81,7 +81,9 @@
                 {% if  is_gstaff or user.is_superuser %}
                   {% if grel_admin_page.grel_id %}<a class="admin-page right"> Teacher's Help</a>{% endif %}
                 {% endif  %}
-              {% if node.player_discussion_enable %}
+
+              {% get_attribute_value node.pk 'discussion_enable' as node_discussion %}
+              {% if node_discussion %}
               <a class="discuss right"> Discuss</a>
               {% endif %}
               {% comment %}
@@ -91,10 +93,10 @@
               </div>
               <div class="activity_page_rendered">
                 {# {{node.content|safe}} #}
-                {% include "ndf/node_ajax_content.html" with node=node expand_content=True  hide_breadcrumbs=True %}
+                {% include "ndf/node_ajax_content.html" with node=node expand_content=True  no_discussion=True hide_breadcrumbs=True %}
               </div>
 
-                {% if node.player_discussion_enable %}
+                {% if node_discussion %}
                   {% get_thread_node node.pk as thread_node %}  
                     {% if thread_node %}
                         {% get_disc_replies thread_node group_id global_disc_all_replies as all_replies %}
