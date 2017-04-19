@@ -2148,7 +2148,7 @@ def course_content(request, group_id):
     return render_to_response(template, context_variables)
 
 @get_execution_time
-def course_notebook(request, group_id, tab=None, notebook_id=None):
+def course_notebook(request, group_id, node_id=None, tab="my-notes"):
     group_obj = get_group_name_id(group_id, get_obj=True)
     group_id = group_obj._id
     group_name = group_obj.name
@@ -2207,13 +2207,16 @@ def course_notebook(request, group_id, tab=None, notebook_id=None):
          'group_set': group_obj._id, 'created_by': user_id },{'_id': 1, 'created_at': 1, 'created_by': 1, 'name': 1, 'content': 1}).sort('created_at', -1)
         # print "\n -- user --",user_blogs.count()
 
-    if notebook_id:
-        notebook_obj = node_collection.one({'_id': ObjectId(notebook_id)})
+    if node_id:
+        notebook_obj = node_collection.one({'_id': ObjectId(node_id)})
         thread_node, allow_to_comment = node_thread_access(group_id, notebook_obj)
-
-        if user_id :
+        if user_id:
+            if user_id == notebook_obj.created_by:
+                tab = 'my-notes'
+            if user_id != notebook_obj.created_by:
+                tab = 'all-notes'
             #updating counters collection
-            # update_notes_or_files_visited(request.user.id, ObjectId(group_id),ObjectId(notebook_id),False,True)
+            # update_notes_or_files_visited(request.user.id, ObjectId(group_id),ObjectId(node_id),False,True)
             if request.user.is_authenticated():
                 Counter.add_visit_count.delay(resource_obj_or_id=notebook_obj._id.__str__(),
                                         current_group_id=group_id.__str__(),
@@ -2233,7 +2236,10 @@ def course_notebook(request, group_id, tab=None, notebook_id=None):
             tab = 'all-notes'
 
         if notebook_obj:
-            return HttpResponseRedirect(reverse('course_notebook_tab_note', kwargs={'group_id': group_id, 'tab': tab, "notebook_id": notebook_obj.pk }))
+            # return HttpResponseRedirect(reverse('course_notebook_tab_note', 
+                # kwargs={'group_id': group_id, "node_id": notebook_obj.pk, 'tab': tab}))
+            return HttpResponseRedirect(reverse('course_notebook_note', 
+                kwargs={'group_id': group_id, "node_id": notebook_obj.pk}))
 
     context_variables.update({'allow_to_comment': allow_to_comment})
     context_variables.update({'blog_pages': blog_pages})
@@ -2623,7 +2629,8 @@ def course_filters(request, group_id):
         query.update({'member_of':page_gst_id, 'type_of': blog_page_gst_id})
         notebook_filter = True
         no_url_flag = False
-        detail_urlname = "course_notebook_tab_note"
+        # detail_urlname = "course_notebook_tab_note"
+        detail_urlname = "course_notebook_note"
     if title.lower() == "gallery":
         query.update({'created_by': {'$nin': gstaff_users}})
         no_url_flag = False
@@ -3438,3 +3445,37 @@ def _get_unit_hierarchy(unit_group_obj):
                         lesson_dict['children'].append(activity_dict)
             unit_structure.append(lesson_dict)
     return unit_structure
+
+def widget_page_create_edit(request, group_id, node_id=None):
+    node_id = request.GET.get('node_id', None)
+    detail_url = request.GET.get('detail_url',)
+    template = 'ndf/widget_node_form.html'
+    if node_id:
+        # existing note.
+        url_name = 'node_edit'
+        url_kwargs={'group_id': group_id, 'node_id': node_id, 'detail_url_name': detail_url}
+        node_obj = Node.get_node_by_id(node_id)
+
+    else:
+        # new note
+        url_name = 'node_create'
+        url_kwargs={'group_id': group_id, 'member_of': 'Page', 'detail_url_name': detail_url}
+    blog_type_gst_name, blog_type_gst_id = GSystemType.get_gst_name_id("Blog page")
+
+    additional_form_fields = {
+        'node': {
+            'name' :'type_of',
+            'widget': 'input',
+            'widget_attr': 'hidden',
+            'value': str(blog_type_gst_id)
+
+        }
+    }
+
+    req_context = RequestContext(request, {
+                                'title': 'Note Create', 'node_obj': Node.get_node_by_id(node_id),
+                                'group_id': group_id, 'groupid': group_id,
+                                'additional_form_fields': additional_form_fields,
+                                'post_url': reverse(url_name, kwargs=url_kwargs)
+                            })
+    return render_to_response(template, req_context)
