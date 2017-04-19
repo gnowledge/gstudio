@@ -17,7 +17,7 @@
 			{% endfor %}
 			</ul>
 		{% else %}
-			{% if title == "drafts" and request.user.is_authenticated and is_gstaff or request.user.is_superuser %}
+			{% if title == "drafts" and  is_gstaff  %}
 		        <a href="{% url 'unit_create_edit' group_id %}" class="right text_button"><i class="fa fa-plus"> New Unit</i></a>
                 <a href="{% url 'module_create' group_id %}" class="right text_button"><i class="fa fa-plus"> New Module</i></a>
 			{% endif %}

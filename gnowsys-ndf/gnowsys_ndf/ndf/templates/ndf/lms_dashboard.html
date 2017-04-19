@@ -14,9 +14,9 @@
                 <div class="buddy_logo">
                     {% get_profile_pic request.user.pk as prof_pic %}
                         {% if prof_pic %}
-                            <img src="{{MEDIA_URL}}{{prof_pic.if_file.original.relurl}}" id="">
+                            <img src="{{MEDIA_URL}}{{prof_pic.if_file.original.relurl}}" >
                         {% else %}
-                            <img style="background-color:#915A2F" src="/static/ndf/bower_components/foundation-icon-fonts/svgs/fi-torso.svg" id="">
+                            <img style="background-color:#915A2F" src="/static/ndf/bower_components/foundation-icon-fonts/svgs/fi-torso.svg" >
                         {% endif %}
                 </div>
                 <div class="banner_heading">
@@ -42,7 +42,7 @@
             {% include "ndf/horizontal_card.html" with node=each_obj url_name="module_detail" first_arg=group_id second_arg=each_obj.pk %}
           </li>
         {% empty %}
-          No modules foun
+          No modules found!
         {% endfor %}
         </ul>
         </div>

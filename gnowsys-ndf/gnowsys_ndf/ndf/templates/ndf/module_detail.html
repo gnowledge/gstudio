@@ -10,7 +10,7 @@
 			Showing all Units in<h7 class="text-button-blue">{{node.name}} </h7><br/>
 			Module Description:<h7 class="text-button-blue">{{node.content|safe}}</h7>
 			
-			{% if is_gstaff or node.created_by == request.user.id or request.user.is_superuser %}
+			{% if is_gstaff or node.created_by == request.user.id  %}
 			<a style="float:right" href="{% url 'module_edit' group_id node.pk %}"><i class="fa fa-pencil"></i> Edit</a>
 			{% endif %}
 		</div>
