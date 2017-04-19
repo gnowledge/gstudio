@@ -2155,13 +2155,13 @@ def course_notebook(request, group_id, node_id=None, tab="my-notes"):
 
     all_blogs = blog_pages = user_blogs = user_id = None
     allow_to_comment = notebook_obj = None
+    create_flag = eval(request.GET.get('create', 'False'))
     template = 'ndf/gcourse_event_group.html'
     if 'base_unit' in group_obj.member_of_names_list:
         template = 'ndf/gevent_base.html'
 
     if 'announced_unit' in group_obj.member_of_names_list:
         template = 'ndf/lms.html'
-
 
     # page_gst = node_collection.one({'_type': "GSystemType", 'name': "Page"})
     # blogpage_gst = node_collection.one({'_type': "GSystemType", 'name': "Blog page"})
@@ -2192,7 +2192,8 @@ def course_notebook(request, group_id, node_id=None, tab="my-notes"):
     context_variables = {
             'group_id': group_id, 'groupid': group_id, 'group_name':group_name,
             'group_obj': group_obj, 'title': 'notebook', 'allow_to_join': allow_to_join,
-            'old_profile_pics':old_profile_pics, "prof_pic_obj": banner_pic_obj
+            'old_profile_pics':old_profile_pics, "prof_pic_obj": banner_pic_obj,
+            'create_flag': create_flag
             }
 
     if request.user.is_authenticated():
