@@ -236,7 +236,7 @@
                               url: "{% url 'get_ckeditor' group_id %}",
                               datatype: "html",
                               data:{
-                                      'ckeditor_toolbar' : "BasicToolbar"
+                                      'ckeditor_toolbar' : "{{ckeditor_toolbar}}"
 
                                 },
                             success: function(data) {

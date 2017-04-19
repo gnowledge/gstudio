@@ -24,7 +24,7 @@
           <a class="text_button right"  href="{% url 'read_file' group_name_tag node download_filename %}"  download="{{ download_filename }}">
                     <i class="fa fa-download" aria-hidden="true"></i> {% trans 'Download' %}
           </a>
-          {% if node.created_by == request.user.id or is_gstaff  or user.is_superuser%}
+          {% if node.created_by == request.user.id or is_gstaff  %}
                 <span data-dropdown="assetcontent-settings-drop" aria-controls="assetcontent-settings-drop" aria-expanded="false" class="orange-button right">
                     Link/Add Related File <i class="fa fa-chevron-down"></i>
                 </span>

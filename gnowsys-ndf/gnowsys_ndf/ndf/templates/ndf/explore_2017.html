@@ -5,6 +5,7 @@
 {% block title %} {{title|capfirst}} {% endblock title %}
 
 {% block body_content %}
+{% check_is_gstaff group_id request.user as is_gstaff %}
 		{% include 'ndf/explore_secondary_header.html' %}
 		<!--section role="tabpanel" aria-hidden="true" class="content active " style="border-style:none;"-->
 		{% if title == "groups" %}
@@ -16,7 +17,7 @@
 			{% endfor %}
 			</ul>
 		{% else %}
-			{% if title == "drafts" and request.user.is_authenticated %}
+			{% if title == "drafts" and  is_gstaff  %}
 		        <a href="{% url 'unit_create_edit' group_id %}" class="right text_button"><i class="fa fa-plus"> New Unit</i></a>
                 <a href="{% url 'module_create' group_id %}" class="right text_button"><i class="fa fa-plus"> New Module</i></a>
 			{% endif %}
