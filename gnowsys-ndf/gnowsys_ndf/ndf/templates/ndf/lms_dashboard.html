@@ -1,6 +1,8 @@
 {# lms_dashboard.html lms My Desk screen #}
 {% extends "ndf/gbase.html" %}
-
+{% block title %}
+ {{title}}
+{% endblock  %}
 {% block body_content %}
 {% load ndf_tags %}
 
@@ -14,7 +16,7 @@
                         {% if prof_pic %}
                             <img src="{{MEDIA_URL}}{{prof_pic.if_file.original.relurl}}" id="">
                         {% else %}
-                            <i class="fa fa-user fa-5x buddy_logo" aria-hidden="true"></i>
+                            <img style="background-color:#915A2F" src="/static/ndf/bower_components/foundation-icon-fonts/svgs/fi-torso.svg" id="">
                         {% endif %}
                 </div>
                 <div class="banner_heading">
