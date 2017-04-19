@@ -1,7 +1,12 @@
-{% load get_username get_thread_node get_disc_replies get_node check_is_gstaff from ndf_tags %}
+{% load get_username get_thread_node get_disc_replies get_node check_is_gstaff user_access_policy from ndf_tags %}
 {% load i18n %}
 
 {% check_is_gstaff group_id request.user as is_gstaff %}
+{% user_access_policy groupid request.user as user_access_priv %}
+
+
+{% include 'ndf/widget_user_access_modal.html' %}
+
     <div class="row note-toolbar">
         <div class="small-12 medium-10 columns">
 
@@ -47,6 +52,7 @@
                     {# <div>Your rating</div> #}
 
                         <div>
+
                         {% include 'ndf/rating.html'%}
                         {% comment %}
                             <i class="fi-like"></i>
@@ -70,8 +76,7 @@
         </div>
         <div class="small-12 medium-2 columns creator-rating">
             {% if is_gstaff or node.created_by == request.user.id %}
-                <a href="{% url 'page_create_edit' group_id node.pk %}?course_event_id={{group_id}}&blog_type=True"
-                    style="float:right;     border: 1px solid #CFCFCF; padding: 5px 10px; border-radius: 3px;color:#A2A2A2;background-color: #f7f7f7;"><i class="fi-pencil" style="margin-right: 5px;"></i>Edit</a>
+                <a href="{% url 'page_create_edit' group_id node.pk %}?course_event_id={{group_id}}&blog_type=True" style="float:right;     border: 1px solid #CFCFCF; padding: 5px 10px; border-radius: 3px;color:#A2A2A2;background-color: #f7f7f7;"><i class="fi-pencil" style="margin-right: 5px;"></i>Edit</a>
             {% endif %}
         </div>
     </div>
