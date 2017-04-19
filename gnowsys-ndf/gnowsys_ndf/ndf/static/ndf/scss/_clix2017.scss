@@ -805,20 +805,20 @@ h5{
 /* curriculum */
 ul.horizontal_tabs_gstudio {
     margin: 0px;
-    height: 60px;
+    height: 44px;
     >li {
         display: inline-block;
         height: 100%;
         >a {
             color: $primary-orange;
-            padding: 17px 12px 14.5px;
+            padding: 8px 20px 7.5px;
             display: block;
             border-bottom: 3px solid transparent;
             // //font-size: 17px;
             letter-spacing: 0.3px;
 
             &.selected, &:hover {
-                border-bottom: 3px solid $secondary-orange;
+                border-bottom: 4px solid $secondary-orange;
             }
         }
         &.sub_group_action {
@@ -894,7 +894,7 @@ ul.horizontal_tabs_gstudio {
     }
     .group_sections {
         text-align: center;
-        border-bottom: 1px solid #ccc;
+        border-bottom: 19px solid #ccc;
         background: #eefaff;
     }
     .group_sections_content {
@@ -4255,7 +4255,8 @@ $module-card-lines-to-show: 3;
         height:150px;
         background-image: url('/static/ndf/images/maths-cover.png');
         background-size:100% 100%;
-        position:relative; 
+        position:relative;
+        opacity:0.9; 
 
         &:before {
             content: ' ';
@@ -4311,8 +4312,33 @@ $module-card-lines-to-show: 3;
                 cursor:pointer;
                 color:white;
                 }
-
             }
+
+            .course_actions>span{
+              margin-right: 5px;
+              background: rgb(46, 63, 81);
+              border: 1px solid rgba(255, 255, 255, 0.7);
+              padding: 1px 8px;
+              color: #fff;
+              font-size: 12px;
+              margin: 0px 10px 0px 0px;
+              cursor: pointer;
+              border-radius: 3px;
+            }
+
+            .course_actions>i{
+              margin-right: 5px;
+              background: rgba(0, 0, 0, 0.6);
+              border: 1px solid rgba(255, 255, 255, 0.7);
+              padding: 1px 8px;
+              color: #fff;
+              font-size: 12px;
+              margin: 0px 10px 0px 0px;
+              cursor: pointer;
+              border-radius: 3px;
+            }
+
+            
         }
     }
 }
