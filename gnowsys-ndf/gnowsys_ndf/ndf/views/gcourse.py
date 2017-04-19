@@ -3213,14 +3213,19 @@ def assetcontent_detail(request, group_id, asset_id,asst_content_id):
     # print group_id,asset_id,asst_content_id
     asset_content_list = get_relation_value(ObjectId(asset_obj._id),'has_assetcontent')
     template = 'ndf/gevent_base.html'
-    if "announced_unit" in group_obj.member_of_names_list and  "raw@material" in asset_obj.tags or "asset@gallery" in asset_obj.tags:
-        template = 'ndf/lms.html'
-
     context_variables = {
             'asset_content_list':asset_content_list,'group_id':group_id,
             'groupid':group_id,'node':assetcontent_obj,'asset_obj':asset_obj,
             'title':"asset_content_detail"
         }
+    if "announced_unit" in group_obj.member_of_names_list and  "raw@material" in asset_obj.tags or "asset@gallery" in asset_obj.tags:
+        template = 'ndf/lms.html'
+        if "raw@material" in asset_obj.tags:
+            context_variables.update( {'title':"raw_material_detail"})
+        if "asset@gallery" in asset_obj.tags:
+            context_variables.update( {'title':"asset_gallery_detail"})
+            
+    
     return render_to_response(template,
                                 context_variables,
                                 context_instance = RequestContext(request)
