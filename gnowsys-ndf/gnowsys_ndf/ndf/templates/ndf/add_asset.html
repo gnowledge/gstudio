@@ -51,7 +51,15 @@
                         <li><a class="edit-metadata">Metadata</a></li>
                         <li>
                         {% if not asset_content_list.grel_id %}
-                            <a class="delete-asset">Delete Asset</a>
+                            <a class="delete-asset">
+                            {% if 'raw@material' in asset_obj.tags and is_gstaff and title == "raw_material_detail"  %}
+                                Delete Asset
+                            {% elif 'asset@gallery' in asset_obj.tags  %}
+                                Delete Folder
+                            {% elif title == 'asset_detail'  %}
+                            Delete Asset
+                            {% endif  %}
+                            </a>
                         {% endif  %}
                         </li>   
                     </ul>
@@ -102,9 +110,22 @@
 
             {% else %}
                 
-                <h3 class="left overlay-title">&nbsp;{% if not asset_obj %} Add a new {% else %} Edit {% endif %} asset</h3>
+                <h3 class="left overlay-title">&nbsp;
+                {% if not asset_obj %} 
+                    Add a new 
+                {% else %} 
+                    Edit 
+                {% endif %}
+                {% if title == "raw material"   and is_gstaff %}
+                    Resource
+                {% elif title == "gallery"  %}
+                    Folder
+                {% elif title == "asset_list"  %}
+                    Asset
+                {% endif     %}
+                </h3>
 
-                <button type="button" class="blue-white-button save-asset right" data-asset_id='{{asset_obj.pk}}' style="margin-top: 9px;margin-right: -150px;">Save Asset</button>
+                <button type="button" class="blue-white-button save-asset right" data-asset_id='{{asset_obj.pk}}' style="margin-top: 9px;margin-right: -150px;">Save</button>
             {% endif %}
 
     <hr/>
@@ -116,7 +137,7 @@
                             Resource Name
                         
                         {% elif title == "gallery"  or 'asset@gallery' in asset_obj.tags %}
-                             File Name
+                             Folder Name
                         
                         {% else %}
                        Asset name  {% endif %}<h9 style="color: red;">*</h9>
@@ -136,7 +157,7 @@
                         Resource Description
                     
                     {% elif title == "gallery"  or 'asset@gallery' in asset_obj.tags %}
-                         File Description
+                         Folder Description
                     {% else %}
                     
                     Asset description {% endif %} <h9 style="color: red;">*</h9>
