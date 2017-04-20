@@ -3467,12 +3467,13 @@ def widget_page_create_edit(request, group_id, node_id=None):
     blog_type_gst_name, blog_type_gst_id = GSystemType.get_gst_name_id("Blog page")
 
     additional_form_fields = {
-        'node': {
-            'name' :'type_of',
-            'widget': 'input',
-            'widget_attr': 'hidden',
-            'value': str(blog_type_gst_id)
-
+        'fields': {
+            '': {
+                'name' :'type_of',
+                'widget': 'input',
+                'widget_attr': 'hidden',
+                'value': str(blog_type_gst_id)
+            }
         }
     }
 
@@ -3481,6 +3482,7 @@ def widget_page_create_edit(request, group_id, node_id=None):
                                 'group_id': group_id, 'groupid': group_id,
                                 'additional_form_fields': additional_form_fields,
                                 'editor_type': editor_type,
-                                'post_url': reverse(url_name, kwargs=url_kwargs)
+                                'post_url': reverse(url_name, kwargs=url_kwargs),
+                                'cancel_url': reverse('course_notebook', kwargs={'group_id': group_id})
                             })
     return render_to_response(template, req_context)
