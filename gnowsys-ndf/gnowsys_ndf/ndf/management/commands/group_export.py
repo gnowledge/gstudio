@@ -426,21 +426,30 @@ def get_file_node_details(node):
                 },
 
     '''
-    print "\n dumping fh -- "
-    dump_node(node=node, collection_name=node_collection)
-    dump_node(node_id=node.if_file['original']['id'], collection_name=filehive_collection)
-    dump_node(node_id=node.if_file['mid']['id'], collection_name=filehive_collection)
-    dump_node(node_id=node.if_file['thumbnail']['id'], collection_name=filehive_collection)
-    dump_media_data(node.if_file['original']['relurl'])
-    dump_media_data(node.if_file['mid']['relurl'])
-    dump_media_data(node.if_file['thumbnail']['relurl'])
-    # if each_field == 'group_set':
-    #     for each_grp_id in node.group_set:
-    #         group_node = node_collection.find_one({"_id":ObjectId(each_grp_id)})
-    #         if group_node and group_node._type != unicode('Author'):
-    #             group_set.extend(group_node.group_set)
-    # if each_field == 'author_set':
-    #     user_list.extend(node.author_set)
+    try:
+        global log_file
+        log_file.write("\n get_file_node_details invoked for: " + str(node))
+
+        dump_node(node=node, collection_name=node_collection)
+        dump_node(node_id=node.if_file['original']['id'], collection_name=filehive_collection)
+        dump_node(node_id=node.if_file['mid']['id'], collection_name=filehive_collection)
+        dump_node(node_id=node.if_file['thumbnail']['id'], collection_name=filehive_collection)
+        dump_media_data(node.if_file['original']['relurl'])
+        dump_media_data(node.if_file['mid']['relurl'])
+        dump_media_data(node.if_file['thumbnail']['relurl'])
+        # if each_field == 'group_set':
+        #     for each_grp_id in node.group_set:
+        #         group_node = node_collection.find_one({"_id":ObjectId(each_grp_id)})
+        #         if group_node and group_node._type != unicode('Author'):
+        #             group_set.extend(group_node.group_set)
+        # if each_field == 'author_set':
+        #     user_list.extend(node.author_set)
+    except Exception as file_dump_err:
+        error_log = "\n !!! Error found while taking dump in get_file_node_details() ."
+        error_log += "\nError: " + str(file_dump_err)
+        log_file.write(error_log)
+        print error_log
+        pass
 
 def get_nested_ids(node,field_name):
     '''
