@@ -11,6 +11,7 @@ try:
     from bson import ObjectId
 except ImportError:  # old pymongo
     from pymongo.objectid import ObjectId
+from django.template.defaultfilters import slugify
 from django.core.management.base import BaseCommand, CommandError
 from gnowsys_ndf.ndf.models import node_collection, triple_collection, filehive_collection, counter_collection
 from gnowsys_ndf.ndf.models import HistoryManager
@@ -161,7 +162,7 @@ class Command(BaseCommand):
             confirm_export = raw_input("\n\tDo you want to continue? Enter y/n:\t ")
             if confirm_export is 'y' or confirm_export is 'Y':
                 print "START : ", str(datetime.datetime.now())
-                group_dump_path = setup_dump_path(group_node.name)
+                group_dump_path = setup_dump_path(slugify(group_node.name))
                 create_factory_schema_mapper(group_dump_path)
                 configs_file_path = create_configs_file(group_node._id)
                 log_file_path = create_log_file()
