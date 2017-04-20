@@ -298,7 +298,7 @@
             {% if thread_node and "QuizItemEvent" not in asset_obj.member_of_names_list %}
                 {% get_disc_replies thread_node group_id global_disc_all_replies as all_replies %}
                 {% get_node thread_node as thread_node_obj %}
-                {% include 'ndf/in-line-texteditor.html' with node=thread_node_obj var_name="content_org" allow_to_comment=True ckeditor_toolbar="LMSStuentsToolbar" %}
+                {% include 'ndf/in-line-texteditor.html' with node=thread_node_obj var_name="content_org" allow_to_comment=True ckeditor_toolbar="LMSStudentsToolbar" %}
             {% endif %}
             {% endif %}
 
