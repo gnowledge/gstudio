@@ -424,6 +424,7 @@ def get_file_node_details(node_or_node_id):
     print "\n dumping fh -- "
     if isinstance(node_or_node_id, ObjectId):
         node_or_node_id = node_collection.one({'_id': ObjectId(node_or_node_id)})
+    dump_node(node=node_or_node_id, collection_name=node_collection)
     dump_node(node_id=node_or_node_id.if_file['original']['id'], collection_name=filehive_collection)
     dump_node(node_id=node_or_node_id.if_file['mid']['id'], collection_name=filehive_collection)
     dump_node(node_id=node_or_node_id.if_file['thumbnail']['id'], collection_name=filehive_collection)
