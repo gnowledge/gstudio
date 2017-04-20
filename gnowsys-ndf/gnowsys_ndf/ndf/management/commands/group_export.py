@@ -311,9 +311,8 @@ def find_file_from_media_url(source_attr):
         node_id = split_src[split_src.index('readDoc') + 1]
         file_node = node_collection.one({'_id': ObjectId(node_id)})
 
-    if "media" in source_attr:
+    elif "media" in source_attr:
         source_attr = source_attr.split("media/")[-1]
-        file_extension = source_attr.rsplit(".",1)[-1]
         file_node = node_collection.find_one({"$or": [{'if_file.original.relurl': source_attr},
             {'if_file.mid.relurl': source_attr},{'if_file.thumbnail.relurl': source_attr}]})
     if file_node:
