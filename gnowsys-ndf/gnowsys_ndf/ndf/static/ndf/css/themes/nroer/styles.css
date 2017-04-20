@@ -28034,3 +28034,41 @@ h5 {
   letter-spacing: 2px;
   margin-left: 5px;
 }
+
+/* line 4621, ../../../scss/_app_styles.scss */
+.edit-note-btn {
+  float: right;
+  border: 1px solid #CFCFCF;
+  padding: 5px 10px;
+  border-radius: 3px;
+  color: #A2A2A2;
+  background-color: #f7f7f7;
+}
+/* line 4628, ../../../scss/_app_styles.scss */
+.edit-note-btn i {
+  margin-right: 5px;
+}
+
+/* line 4633, ../../../scss/_app_styles.scss */
+.bef-note-btn {
+  padding: 3px 11px;
+  border-radius: 100%;
+  float: right;
+  margin: 5px 5px 8px 0px;
+  border: 1px solid #6153AE;
+  background: #fff;
+  font-size: 23px;
+  color: #6153AE;
+}
+
+/* line 4644, ../../../scss/_app_styles.scss */
+.add-note-btn {
+  padding: 3px 11px;
+  border-radius: 100%;
+  float: right;
+  margin: 5px 5px 8px 0px;
+  border: 1px solid #6153AE;
+  background: #fff;
+  font-size: 23px;
+  color: #6153AE;
+}

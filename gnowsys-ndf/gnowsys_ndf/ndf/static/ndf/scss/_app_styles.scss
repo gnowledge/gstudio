@@ -4617,3 +4617,37 @@ h5{
     letter-spacing:2px;
     margin-left:5px;
 }
+
+.edit-note-btn{
+    float:right;
+    border: 1px solid #CFCFCF;
+    padding: 5px 10px;
+    border-radius: 3px;
+    color:#A2A2A2;
+    background-color: #f7f7f7;
+    i{
+        margin-right: 5px;
+    }
+}
+
+.bef-note-btn{
+    padding: 3px 11px;
+    border-radius: 100%;
+    float: right;
+    margin: 5px 5px 8px 0px;
+    border: 1px solid #6153AE;
+    background: #fff;
+    font-size: 23px;
+    color: #6153AE;
+}
+
+.add-note-btn{
+    padding: 3px 11px;
+    border-radius: 100%;
+    float: right;
+    margin: 5px 5px 8px 0px;
+    border: 1px solid #6153AE;
+    background: #fff;
+    font-size: 23px;
+    color: #6153AE;
+}
