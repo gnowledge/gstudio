@@ -305,10 +305,16 @@ def build_rcs(node, collection_name):
             pass
 
 def find_file_from_media_url(source_attr):
-    source_attr = source_attr.split("media/")[-1]
-    file_extension = source_attr.rsplit(".",1)[-1]
-    file_node = node_collection.find_one({"$or": [{'if_file.original.relurl': source_attr},
-        {'if_file.mid.relurl': source_attr},{'if_file.thumbnail.relurl': source_attr}]})
+    if "readDoc" in source_attr:
+        split_src = source_attr.split('/')
+        node_id = split_src[split_src.index('readDoc') + 1]
+        file_node = node_collection.one({'_id': ObjectId(node_id)})
+
+    if "media" in source_attr:
+        source_attr = source_attr.split("media/")[-1]
+        file_extension = source_attr.rsplit(".",1)[-1]
+        file_node = node_collection.find_one({"$or": [{'if_file.original.relurl': source_attr},
+            {'if_file.mid.relurl': source_attr},{'if_file.thumbnail.relurl': source_attr}]})
     if file_node:
         get_file_node_details(file_node)
 
@@ -321,17 +327,7 @@ def pick_media_from_content(content_soup):
     # Fetching the files
     for each_src in all_src:
         src_attr = each_src["src"]
-        file_node = None
-        if src_attr.startswith("/media"): # file
-            file_node = find_file_from_media_url(src_attr)
-
-        if "readDoc" in src_attr:
-            split_src = src_attr.split('/')
-            node_id = split_src[split_src.index('readDoc') + 1]
-            file_node = node_collection.one({'_id': ObjectId(node_id)})
-
-        if file_node:
-            copy_file_and_update_content_file(file_node, each_src, 'src')
+        find_file_from_media_url(src_attr)
 
 def copy_rcs(node):
     '''
