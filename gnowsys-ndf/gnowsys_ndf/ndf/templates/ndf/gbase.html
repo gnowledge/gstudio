@@ -57,6 +57,9 @@
 <body>
     {% include "ndf/header_clix.html" %}
     {% block extended_header %}{% endblock %}
+    {% if request.author.agency_type == 'Student' %}
+        {% include "ndf/buddy.html" %}
+    {% endif %}
 
     {% block body_content %} {% endblock %}
 
