@@ -4253,7 +4253,7 @@ $module-card-lines-to-show: 3;
     .lms_banner{
         width:100%;
         height:150px;
-        background-image: url('/static/ndf/images/maths-cover.png');
+        //background-image: url('/static/ndf/images/maths-cover.png');
         background-size:100% 100%;
         position:relative;
         //opacity:0.9;
@@ -4275,6 +4275,14 @@ $module-card-lines-to-show: 3;
                 cursor: pointer;
             }
         }
+        .div-height{
+            width:100%!important;
+            height:150px!important;
+            background-size:100% 100%;
+            position:absolute!important; 
+
+        }
+
         .enroll_unit>a{
             cursor: pointer;
         }

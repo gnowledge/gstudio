@@ -93,15 +93,16 @@
             </div>
         </div>
     </div>
-    <div class="comment-sections">
+    <div class="comment-sections" style="overflow-x:auto;overflow-y:hidden">
         {% get_thread_node node.pk as thread_node %}
             {% if thread_node %}
                 {% get_disc_replies thread_node group_id global_disc_all_replies as all_replies %}
                 {% get_node thread_node as thread_node_obj %}
-                {% include 'ndf/in-line-texteditor.html' with node=thread_node_obj var_name="content_org" ckeditor_toolbar="LMSStuentsToolbar" %}
+                {% include 'ndf/in-line-texteditor.html' with node=thread_node_obj var_name="content_org" ckeditor_toolbar="LMSStudentsToolbar" %}
             {% else %}
                 {% get_disc_replies node.pk group_id global_disc_all_replies as all_replies %}
-                {% include 'ndf/in-line-texteditor.html' with var_name="content_org" ckeditor_toolbar="LMSStuentsToolbar" %}
+                {% include 'ndf/in-line-texteditor.html' with var_name="content_org" ckeditor_toolbar="LMSStudentsToolbar" %}
+
             {% endif %}
     </div>
     {% comment %}
