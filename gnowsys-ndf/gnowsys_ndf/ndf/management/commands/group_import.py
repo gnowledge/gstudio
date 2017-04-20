@@ -160,7 +160,7 @@ def update_schema_id_for_triple(document_json):
 
 
 def update_group_set(document_json):
-    if 'group_set' document_json:
+    if 'group_set' in document_json:
         document_json['group_set'] = ObjectId(CONFIG_VARIABLES.GROUP_ID)
     return document_json
 
