@@ -225,8 +225,6 @@ def worker_export(nodes_cur):
         if each_node.post_node:
             get_nested_ids(each_node,'post_node')
 
-        #fetch triple_data
-        get_triple_data(each_node._id)
 
 def call_group_export(group_node, nodes_cur, num_of_processes=5):
     '''
@@ -368,17 +366,21 @@ def dump_node(collection_name=node_collection, node=None, node_id=None, node_id_
         log_file.write("\n dump_node invoked for: " + str(collection_name))
         if node:
             log_file.write("\tNode: " + str(node))
+            #fetch triple_data
+            get_triple_data(node._id)
             build_rcs(node, collection_name)
             log_file.write("\n dump node finished for:  " + str(node._id) )
         elif node_id:
             log_file.write("\tNode_id : " + str(node_id))
             node = collection_name.one({'_id': ObjectId(node_id)})
+            get_triple_data(node._id)
             build_rcs(node, collection_name)
             log_file.write("\n dump node finished for:  " + str(node._id) )
         elif node_id_list:
             node_cur = collection_name.one({'_id': {'$in': node_id_list}})
             log_file.write("\tNode_id_list : " + str(node_id_list))
             for each_node in nodes_cur:
+                get_triple_data(each_node._id)
                 build_rcs(node, collection_name)
                 log_file.write("\n dump node finished for:  " + str(node._id) )
 
