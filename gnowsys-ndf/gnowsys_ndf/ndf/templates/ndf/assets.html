@@ -1,5 +1,5 @@
 {% load ndf_tags %}
-
+{% user_access_policy groupid request.user as user_access_priv %}
 {% check_is_gstaff groupid request.user as is_gstaff %}
 
 <div class="elibrary-actions">
@@ -8,7 +8,9 @@
         Filter
     </button>
 
- -->    <div class="row">
+ -->    
+    {% include 'ndf/widget_user_access_modal.html' %}
+        <div class="row">
         {% if user.is_authenticated  %}
             {% if title == "raw material"   and is_gstaff %}
                 <button type="button" class="right orange-button createAsset">
@@ -16,7 +18,7 @@
                 </button>
             {% endif %}
             {% if title == "gallery"  %}
-                <button type="button" class="right orange-button createAsset">
+                <button {% if user_access_priv == "allow" %} type="button" class="right orange-button createAsset" {% else %} class=" right orange-button user_not_enrolled" {% endif %}>
                     <i class="fi-plus"> </i>Add Folder 
                 </button>
             {% endif %}

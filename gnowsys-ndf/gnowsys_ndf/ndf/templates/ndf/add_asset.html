@@ -1,6 +1,7 @@
 {% load i18n %}
 {% load ndf_tags %}
 {% check_is_gstaff group_id request.user as is_gstaff %}
+{% user_access_policy groupid request.user as user_access_priv %}
 {% block head %}
     
     <style type="text/css">
@@ -17,6 +18,8 @@
 {% endblock %}
 
    <!--  Interaction settings modal ends  -->
+   {% include 'ndf/widget_user_access_modal.html' %}
+
 <div class="overlay-head">
    <div class="row">
         {% if edit or not asset_obj.name %}
@@ -72,7 +75,7 @@
                 <button type="button" class="orange-button add-asset-content right"><i class="fi-plus"></i> Add File</button>
                 {% endif %}
                 {% if 'asset@gallery' in asset_obj.tags  %}
-                <button type="button" class="orange-button add-asset-content right"><i class="fi-plus"></i> Add File</button>
+                <button {% if user_access_priv == "allow" %}  type="button" class="orange-button add-asset-content right" {% else %} class=" right orange-button user_not_enrolled" {% endif %}><i class="fi-plus"></i> Add File</button>
                 {% endif %}
                 {% if title == 'asset_detail'  %}
                 <button type="button" class="orange-button add-asset-content right"><i class="fi-plus"></i> Add File</button>
