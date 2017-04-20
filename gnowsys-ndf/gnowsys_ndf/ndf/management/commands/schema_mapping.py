@@ -2,7 +2,7 @@ import os
 import json
 from bson import json_util
 from gnowsys_ndf.ndf.models import node_collection, TYPES_LIST
-from gnowsys_ndf.settings import GSTUDIO_DEFAULT_GROUPS
+from gnowsys_ndf.settings import GSTUDIO_DEFAULT_GROUPS_LIST
 type_json = {"_type": None, "name": None, "source_id": None, "target_id": None }
 
 def create_factory_schema_mapper(path):
@@ -14,7 +14,7 @@ def create_factory_schema_mapper(path):
                                                     {'_type': {'$in': TYPES_LIST }},
                                                     {
                                                         '_type': u'Group',
-                                                        'name': {'$in': GSTUDIO_DEFAULT_GROUPS }
+                                                        'name': {'$in': GSTUDIO_DEFAULT_GROUPS_LIST }
                                                     }
                                                 ]
                                             })
