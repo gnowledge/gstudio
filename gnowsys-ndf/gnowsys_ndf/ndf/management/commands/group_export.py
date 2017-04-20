@@ -4,6 +4,8 @@ import subprocess
 # from threading import Thread
 # import multiprocessing
 # import math
+from bs4 import BeautifulSoup
+
 try:
     from bson import ObjectId
 except ImportError:  # old pymongo
@@ -281,6 +283,9 @@ def build_rcs(node, collection_name):
                 elif 'relation_type' in node:
                     triple_node_RT_AT = node_collection.one({'_id': node.relation_type})
                 node.save(triple_node=triple_node_RT_AT, triple_id=triple_node_RT_AT._id)
+            elif collection_name is node_collection:
+                pick_media_from_content(BeautifulSoup(node.content, 'html.parser'))
+                node.save()
             else:
                 node.save()
                 try:
@@ -298,6 +303,35 @@ def build_rcs(node, collection_name):
             log_file.write(error_log)
             print error_log
             pass
+
+def find_file_from_media_url(source_attr):
+    source_attr = source_attr.split("media/")[-1]
+    file_extension = source_attr.rsplit(".",1)[-1]
+    file_node = node_collection.find_one({"$or": [{'if_file.original.relurl': source_attr},
+        {'if_file.mid.relurl': source_attr},{'if_file.thumbnail.relurl': source_attr}]})
+    if file_node:
+        get_file_node_details(file_node)
+
+def pick_media_from_content(content_soup):
+    '''
+    Parses through the content of node and finds the media 
+    files and dump it
+    '''
+    all_src = content_soup.find_all(src=re.compile('media|readDoc'))
+    # Fetching the files
+    for each_src in all_src:
+        src_attr = each_src["src"]
+        file_node = None
+        if src_attr.startswith("/media"): # file
+            file_node = find_file_from_media_url(src_attr)
+
+        if "readDoc" in src_attr:
+            split_src = src_attr.split('/')
+            node_id = split_src[split_src.index('readDoc') + 1]
+            file_node = node_collection.one({'_id': ObjectId(node_id)})
+
+        if file_node:
+            copy_file_and_update_content_file(file_node, each_src, 'src')
 
 def copy_rcs(node):
     '''
@@ -379,7 +413,7 @@ def dump_media_data(media_path):
         print error_log
         pass
 
-def get_file_node_details(node):
+def get_file_node_details(node_or_node_id):
     '''
     Check if_file field and take its dump
     'if_file': {
@@ -391,6 +425,8 @@ def get_file_node_details(node):
 
     '''
     print "\n dumping fh -- "
+    if isinstance(node_or_node_id, ObjectId):
+        node_or_node_id = node_collection.one({'_id': ObjectId(node_or_node_id)})
     dump_node(node_id=node.if_file['original']['id'], collection_name=filehive_collection)
     dump_node(node_id=node.if_file['mid']['id'], collection_name=filehive_collection)
     dump_node(node_id=node.if_file['thumbnail']['id'], collection_name=filehive_collection)
