@@ -1,10 +1,14 @@
 {# lms_dashboard.html lms My Desk screen #}
 {% extends "ndf/gbase.html" %}
-{% block title %}
- {{title}}
-{% endblock  %}
+
+
+{% block title %} My Desk {% endblock%}
+
+
 {% block body_content %}
 {% load ndf_tags %}
+
+
 
 
 <div class="mydesk_page">
@@ -16,7 +20,7 @@
                         {% if prof_pic %}
                             <img src="{{MEDIA_URL}}{{prof_pic.if_file.original.relurl}}" >
                         {% else %}
-                            <img style="background-color:#915A2F" src="/static/ndf/bower_components/foundation-icon-fonts/svgs/fi-torso.svg" >
+                            <img style="background-color:rgba(0, 0, 0, 0.34);" src="/static/ndf/bower_components/foundation-icon-fonts/svgs/fi-torso.svg" >
                         {% endif %}
                 </div>
                 <div class="banner_heading">

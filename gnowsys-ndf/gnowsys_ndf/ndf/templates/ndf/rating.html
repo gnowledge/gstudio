@@ -1,11 +1,14 @@
 {% load ndf_tags %}
+{% user_access_policy groupid request.user as user_access %}
 {% load i18n %}
 <!-- <div id="rating-bar" class="show-on-hover"> -->
 {% get_node_ratings request node.pk as ratings %}
+
+{% include 'ndf/widget_user_access_modal.html' %}
     <form style="display: inline-block">
     <!-- Sets the rating values as data attributes -->
         <span datat-tooltip title="Your rating" class="lbl_tag" style="display: inline-block">
-            <div class="rating-bar show" data-node="{{node}}" data-avg-rating="{{ratings.avg}}" data-votes="{{ratings.tot}}"  data-user-rating="{{ratings.user_rating}}">
+            <div {% if user_access_priv == "allow" %}  data-node="{{node}}" data-avg-rating="{{ratings.avg}}" data-votes="{{ratings.tot}}" class="rating-bar" data-user-rating="{{ratings.user_rating}}" {% else %} class=" rating-bar show user_not_enrolled" {% endif %}>
                 <span>
                     <input type="radio" id="rating-5" name="rating" value="5" />
                         <label for="rating-5">5</label>
@@ -92,7 +95,9 @@
     $("input[name=rating]").click(function() {
         var user = "{{user.is_authenticated}}";
         if (user == "True"){
-            updateRating();
+            if ( "{{ user_access_priv }}" == "allow"){
+                    updateRating();
+                }
         }
         else{
             alert("{% trans 'Please login to rate this resource' %}");
