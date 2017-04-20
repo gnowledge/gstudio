@@ -308,17 +308,31 @@ def build_rcs(node, collection_name):
             pass
 
 def find_file_from_media_url(source_attr):
-    if "readDoc" in source_attr:
-        split_src = source_attr.split('/')
-        node_id = split_src[split_src.index('readDoc') + 1]
-        file_node = node_collection.one({'_id': ObjectId(node_id)})
+    try:
+        global log_file
+        log_file.write("\n find_file_from_media_url invoked for: " + str(source_attr))
 
-    elif "media" in source_attr:
-        source_attr = source_attr.split("media/")[-1]
-        file_node = node_collection.find_one({"$or": [{'if_file.original.relurl': source_attr},
-            {'if_file.mid.relurl': source_attr},{'if_file.thumbnail.relurl': source_attr}]})
-    if file_node:
-        get_file_node_details(file_node)
+        if "media" in source_attr:
+            source_attr = source_attr.split("media/")[-1]
+            file_node = node_collection.find_one({"$or": [{'if_file.original.relurl': source_attr},
+                {'if_file.mid.relurl': source_attr},{'if_file.thumbnail.relurl': source_attr}]})
+
+        # elif "readDoc" in source_attr:
+        #     split_src = source_attr.split('/')
+        #     node_id = split_src[split_src.index('readDoc') + 1]
+        #     file_node = node_collection.one({'_id': ObjectId(node_id)})
+
+        if file_node:
+            log_file.write("\n media file_node gs found:  " + str(file_node._id) )
+            get_file_node_details(file_node)
+
+    except Exception as find_file_from_media_url_err:
+        error_log = "\n !!! Error found while taking dump in find_file_from_media_url() ."
+        error_log += "\nError: " + str(find_file_from_media_url_err)
+        print "\n Error: ", error_log
+        log_file.write(error_log)
+        print error_log
+        pass
 
 def pick_media_from_content(content_soup):
     '''
