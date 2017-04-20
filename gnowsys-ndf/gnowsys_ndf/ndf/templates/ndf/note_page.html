@@ -86,7 +86,7 @@
             </div>
         </div>
     </div>
-    <div class="comment-sections">
+    <div class="comment-sections" style="overflow-x:auto;overflow-y:hidden">
         {% get_thread_node node.pk as thread_node %}
             {% if thread_node %}
                 {% get_disc_replies thread_node group_id global_disc_all_replies as all_replies %}
