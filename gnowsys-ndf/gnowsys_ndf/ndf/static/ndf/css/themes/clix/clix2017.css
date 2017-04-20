@@ -4425,6 +4425,18 @@ ul.nav_menu_1 > li > a.selected, ul.nav_menu_1 > li > a:hover {
 }
 
 /* line 4628, ../../../scss/_clix2017.scss */
+.bef-note-btn {
+  padding: 3px 11px;
+  border-radius: 100%;
+  float: right;
+  margin: 5px 5px 8px 0px;
+  border: 1px solid #6153AE;
+  background: #fff;
+  font-size: 23px;
+  color: #6153AE;
+}
+
+/* line 4639, ../../../scss/_clix2017.scss */
 .edit-note-btn {
   float: right;
   border: 1px solid #CFCFCF;
@@ -4433,7 +4445,7 @@ ul.nav_menu_1 > li > a.selected, ul.nav_menu_1 > li > a:hover {
   color: #A2A2A2;
   background-color: #f7f7f7;
 }
-/* line 4635, ../../../scss/_clix2017.scss */
+/* line 4646, ../../../scss/_clix2017.scss */
 .edit-note-btn i {
   margin-right: 5px;
 }
