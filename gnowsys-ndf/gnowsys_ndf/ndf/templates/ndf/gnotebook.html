@@ -1,12 +1,11 @@
 {% load get_course_filters get_username from ndf_tags %}
 {% load simple_filters %}
-
 <div class="notebook">
     {% comment %}
-    div class="row notebook-header collapse">
+    <div class="row notebook-header collapse">
         {% get_course_filters group_id title as filter_dict %}
         {% include "ndf/filters.html" with filter_dict=filter_dict %}
-    </div
+    </div>
 
     <div class="row notebook-header collapse">
         <div class="medium-6 columns filters">
@@ -73,9 +72,10 @@
                     {% comment %}
                     <a href="#" data-reveal-id="newNoteModal" class="button expand radius" style="margin: 0em 0em 1em;"><i class="fi-plus"></i> </a>
                     {% endcomment %}
-                    <a href="{% url 'page_create_edit' group_name %}?course_event_id={{group_id}}&blog_type=True" class="button radius" style="padding: 3px 11px;border-radius: 100%;float: right;margin: 5px 5px 8px 0px;border: 1px solid #6153AE;background: #fff;font-size: 23px;color: #6153AE;"><i class="fi-plus"></i></a>
+                    <a class="add-note-btn"><i class="fi-plus"></i></a>
+<!--                     <a href="{% url 'page_create_edit' group_name %}?course_event_id={{group_id}}&blog_type=True" class="button radius" style="padding: 3px 11px;border-radius: 100%;float: right;margin: 5px 5px 8px 0px;border: 1px solid #6153AE;background: #fff;font-size: 23px;color: #6153AE;"><i class="fi-plus"></i></a>
 
-                    {% endif %}
+ -->                    {% endif %}
                 </div>
             </div>
 
@@ -90,7 +90,7 @@
             </ul>
 
             <div class="small-12 columns tabs-content">
-                <div class="content notes{% ifequal tab 'all-notes' %} active{% endifequal %}" id="all-notes">
+                <div class="content notes all-notes-tab{% ifequal tab 'all-notes' %} active{% endifequal %}" id="all-notes">
                 {% for each_blog in blog_pages %}
                     {% comment %}
                         <div class="date">
@@ -98,7 +98,7 @@
                             <span class="notes-count right">2</span>
                         </div>
                     {% endcomment %}
-                    <a href="{% url 'course_notebook_tab_note' group_name 'all-notes' each_blog.pk %}" title="{{each_blog.content|safe|striptags|default_if_none:each_blog.name}}">
+                    <a href="{% url 'course_notebook_note' group_name each_blog.pk %}" title="{{each_blog.content|safe|striptags|default_if_none:each_blog.name}}">
 
                     <div class="note {% if node.pk == each_blog.pk %} active {% endif %}" id="{{each_blog.pk}}">
                         <div class="note-heading"> {{each_blog.name}} </div>
@@ -126,7 +126,7 @@
                 {% endfor %}
                 </div>
 
-                <div class="content notes{% ifequal tab 'my-notes' %} active{% endifequal %}" id="my-notes">
+                <div class="content notes my-notes-tab {% ifequal tab 'my-notes' %} active{% endifequal %}" id="my-notes">
                 {% for each_user_blog in user_blogs %}
                     {% comment %}
                         <div class="date">
@@ -134,7 +134,7 @@
                             <span class="notes-count right">2</span>
                         </div>
                     {% endcomment %}
-                    <a href="{% url 'course_notebook_tab_note' group_name 'my-notes' each_user_blog.pk %}" title="{{each_user_blog.content|safe|striptags|default_if_none:each_user_blog.name}}">
+                    <a href="{% url 'course_notebook_note' group_name each_user_blog.pk %}" title="{{each_user_blog.content|safe|striptags|default_if_none:each_user_blog.name}}">
                     <div class="note {% if node.pk == each_user_blog.pk %} active {% endif %}" id="{{each_user_blog.pk}}">
                         <div class="note-heading"> {{each_user_blog.name}} </div>
                         <div class="note-meta">
@@ -428,5 +428,36 @@
           },
         });//end of ajax
     }
+    $(document).on('click', '.add-note-btn', function() {
+        load_page_create_edit()
+    });
 
+    function load_page_create_edit(node_id){
+        $.ajax({
+          url: "{% url 'widget_page_create_edit' group_id %}",
+
+          data: {
+            node_id: node_id,
+            detail_url: "course_notebook_note",
+            editor_type: "LMSStuentsToolbar"
+          },
+
+          type: "GET",
+
+          dataType: "html",
+
+          success: function(data){
+            $(".note-page").html(data);
+            $(".note-page").css('margin-top: 30px')
+          },
+        });//end of ajax
+
+    }
+
+    $(document).ready(function(){
+        {% if create_flag %}
+            load_page_create_edit()
+        {% endif %}
+
+    })
 </script>

@@ -31,8 +31,7 @@
              {{group_name}}
         </div>
         <div class="new_note header_text_block">
-            <a {% if user_access_priv == "allow" %} href="{% url 'page_create_edit' group_name %}?course_event_id={{group_id}}&blog_type=True" target="_blank" {% else %} class="user_not_enrolled" {% endif %}>
-                <i class="fa fa-edit header_icon"></i>&nbsp;
+            <a {% if user_access_priv == "allow" %} href="{% url 'course_notebook' group_id %}?create=True" {% else %} class="user_not_enrolled" {% endif %}><i class="fa fa-edit header_icon"></i>&nbsp;
                 WRITE A NEW NOTE
             </a>
         </div>

@@ -1070,11 +1070,11 @@ def add_page(request, group_id):
         create_gattribute(page_node._id, discussion_enable_at, True)
         return_status = create_thread_for_node(request,group_id, page_node)
       page_node.save()
-      return HttpResponseRedirect(reverse('course_notebook_tab_note',
+      return HttpResponseRedirect(reverse('course_notebook_note',
                                     kwargs={
                                             'group_id': group_id,
-                                            'tab': 'my-notes',
-                                            'notebook_id': page_node._id
+                                            'node_id': page_node._id,
+                                            # 'tab': 'my-notes'
                                             })
                                       )
 

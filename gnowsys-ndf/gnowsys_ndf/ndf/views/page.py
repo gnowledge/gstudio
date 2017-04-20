@@ -361,11 +361,11 @@ def create_edit_page(request, group_id, node_id=None):
                   each_counter_obj.last_update = datetime.datetime.now()
                   each_counter_obj.save()
 
-            return HttpResponseRedirect(reverse('course_notebook_tab_note',
+            return HttpResponseRedirect(reverse('course_notebook_note',
                                     kwargs={
                                             'group_id': group_id,
-                                            'tab': 'my-notes',
-                                            'notebook_id': page_node._id
+                                            'node_id': page_node._id,
+                                            # 'tab': 'my-notes'
                                             })
                                       )
 
@@ -373,9 +373,9 @@ def create_edit_page(request, group_id, node_id=None):
             url_name = "/" + group_name + "/" + str(page_node._id)
             if ce_id and blog_type:
                 if 'base_unit' in group_obj.member_of_names_list:
-                    return HttpResponseRedirect(reverse('course_notebook_tab_note',
-                      kwargs={'group_id': group_id, 'tab': 'my-notes',
-                              "notebook_id": page_node._id }))
+                    return HttpResponseRedirect(reverse('course_notebook_note',
+                      kwargs={'group_id': group_id, "node_id": page_node._id,
+                      'tab': 'my-notes' }))
 
                 # url_name = "/" + group_name + "/#journal-tab"
                 url_name = "/" + group_name
