@@ -6,7 +6,7 @@ urlpatterns = patterns('gnowsys_ndf.ndf.views.module',
                         url(r'^[/]?$', 'list_modules', name='list_modules'),
 
 						# create
-                        url(r'^/create/?$', 'module_create_edit', name='module_create'),
+                        url(r'^/create/?$', 'module_create_edit', {'cancel_url': 'landing_page'}, name='module_create'),
                         # edit
                         url(r'^/edit/(?P<module_id>[\w-]+)/?$', 'module_create_edit', name='module_edit'),
 
