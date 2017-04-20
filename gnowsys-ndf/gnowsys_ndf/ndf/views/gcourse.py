@@ -2156,6 +2156,7 @@ def course_notebook(request, group_id, node_id=None, tab="my-notes"):
     all_blogs = blog_pages = user_blogs = user_id = None
     allow_to_comment = notebook_obj = None
     create_flag = eval(request.GET.get('create', 'False'))
+
     template = 'ndf/gcourse_event_group.html'
     if 'base_unit' in group_obj.member_of_names_list:
         template = 'ndf/gevent_base.html'
@@ -3450,6 +3451,8 @@ def _get_unit_hierarchy(unit_group_obj):
 def widget_page_create_edit(request, group_id, node_id=None):
     node_id = request.GET.get('node_id', None)
     detail_url = request.GET.get('detail_url',)
+    editor_type = request.GET.get('editor_type', 'GeneralToolbar')
+
     template = 'ndf/widget_node_form.html'
     if node_id:
         # existing note.
@@ -3477,6 +3480,7 @@ def widget_page_create_edit(request, group_id, node_id=None):
                                 'title': 'Note Create', 'node_obj': Node.get_node_by_id(node_id),
                                 'group_id': group_id, 'groupid': group_id,
                                 'additional_form_fields': additional_form_fields,
+                                'editor_type': editor_type,
                                 'post_url': reverse(url_name, kwargs=url_kwargs)
                             })
     return render_to_response(template, req_context)
