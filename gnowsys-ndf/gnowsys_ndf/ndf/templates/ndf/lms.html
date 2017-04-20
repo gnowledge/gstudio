@@ -17,6 +17,9 @@
 
 <div class="lms_page">
      <div class="lms_banner">
+        
+      {% include 'ndf/widget_photo_upload.html' with url_name='course_about' widget_for="group_banner" is_banner=True  no_update_btn=True node=group_obj %}
+
        <div class="small-12 columns lms_heading">
     <div class="left unit_name"> {% firstof group_object.altnames group_object.name  %}</div>
           {% if is_gstaff %}
@@ -30,6 +33,10 @@
                   <a href="{% url 'unit_edit' groupid group_object.pk %}" class="fi-pencil"> Edit</a>
               </li>
               <li>
+                    <a class="fi-photo" style="position: relative;top: -3px;left: 2px;" data-reveal-id="group_banner_prof_pic_prop">
+                    Change image</a>
+              </li>
+              <li>
                   <a data-reveal-id="manage_users_modal" href="{% url 'manage_users' group_id %}"  class="fi-torsos"> Manage Users</a>
                   <div id="manage_users_modal" class="reveal-modal large" data-reveal style="position:absolute;">
                       <div id="group_drawer">
@@ -38,6 +45,7 @@
                       <a class="close-reveal-modal">&#215;</a>
                   </div>
               </li>
+              
               <li>
                   <a href="{% url 'create_event_group' group_id 'CourseEventGroup' %}" class="fi-volume"> Announce</a>
               </li>
@@ -68,6 +76,7 @@
                 {% else %}
                   <a disabled="disabled"> ENROLLED</a>
                 {% endif %}
+
             {% else %}
                 <a href="{% url 'auth_login' %}" title="Please login to Enroll">ENROLL</a>
             {% endif %}
