@@ -63,7 +63,7 @@ CKEDITOR.editorConfig = function( config ) {
 		{ name: 'tools', items : ['closebtn'] },
 	];
 
-	config.toolbar_LMSStuentsToolbar =
+	config.toolbar_LMSStudentsToolbar =
 	[
 		{ name: 'basicstyles', items : [ 'Bold','Italic','align' ] },
 		{ name: 'paragraph', items : [ 'NumberedList','BulletedList','Mathjax','-','JustifyLeft', 'JustifyCenter', 'JustifyRight', 'JustifyBlock' ] },

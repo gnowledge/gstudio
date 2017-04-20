@@ -6,6 +6,7 @@
 {% get_attribute_value node.pk 'release_response' as resp_val %}
 {% get_attribute_value node.pk 'thread_interaction_type' as thr_int_type %}
 {% check_is_gstaff groupid request.user as is_gstaff %}
+
 {% block head %}
   <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
   <script type="text/javascript" src="/static/ndf/bower_components/MathJax/MathJax.js?config=TeX-AMS-MML_HTMLorMML" async></script> <!-- checked -->
@@ -18,6 +19,9 @@
     <script type="text/javascript" src="/static/ndf/bower_components/ckeditor/config.js"></script>
 
   {% endif %}
+
+ 
+
 <style type="text/css">
   div.reveal-modal > label{
     color: black !important;
@@ -26,8 +30,8 @@
 
 {% endblock %}
 
-
 <div >
+{% user_access_policy groupid request.user as user_access_priv %}
   
     {% if allow_to_comment %}
       <div data-alert class="alert-box new_comments hide info radius">
@@ -38,7 +42,7 @@
 
       <div class="create-discussion">
 
-      <div  onclick="createDiscussion()" id="create-discussion" data-id="{{ node.pk }}"  class="ckeditor-comment  explore-button" style="margin-bottom:0;">
+      <div {% if user_access_priv == "allow" %} onclick="createDiscussion()" class="ckeditor-comment  explore-button "{% else %} class="ckeditor-comment explore-button user_not_enrolled" {% endif %} id="create-discussion" data-id="{{ node.pk }}"   style="margin-bottom:0;">
         {% if thr_int_type %}
           {{thr_int_type}} {% if all_replies|length > 0 %}({{all_replies|length }}) {% endif %}
         {% else %}
@@ -247,7 +251,7 @@
                                   // '<img width="'+  width + '"src=' + completeURL +  '>' + '</img>'
                                   $('.ckeditor-reply-area').html(data);
 
-                                  $('.post-btn-div').html('<input data-id=""  type="button" value="Post"  class="button small right radius reply-button" onclick="addReply(parent_obj)">');
+                                  $('.post-btn-div').html('<input data-id=""  type="button" value="Post"  class="button right small explore-button reply-button" onclick="addReply(parent_obj)">');
 
                                   setCurrNodeEdit(1);
 
