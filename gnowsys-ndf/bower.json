@@ -54,7 +54,8 @@
     "blueimp-canvas-to-blob": "#3.3.0",
     "jsmol": "#1.1.0",
     "rubik-googlefont": "#a23ec91574",
-    "MathJax": "2.7.0"
+    "MathJax": "2.7.0",
+    "jquery-backstretch": "^2.1.15"
   },
   "resolutions": {
     "jquery": "2.2.1"
