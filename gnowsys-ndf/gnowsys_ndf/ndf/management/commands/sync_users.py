@@ -83,9 +83,12 @@ class Command(BaseCommand):
                         auth['contributors'] = [user_id]
                         auth['group_admin'] = [user_id]
                         auth['agency_type'] = "Student"
-                        if username.split('-')[1] in tc_elem_names_list:
-                            # overwrite agency_type if teacher
-                            auth['agency_type'] = "Teacher"
+                        try:
+                            if username.split('-')[1] in tc_elem_names_list:
+                                # overwrite agency_type if teacher
+                                auth['agency_type'] = "Teacher"
+                        except Exception, e:
+                            print e
                         oid = ObjectId(oid)
                         auth['_id'] = oid
                         auth.save(groupid=oid)
