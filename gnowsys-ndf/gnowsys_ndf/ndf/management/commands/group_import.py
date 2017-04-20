@@ -158,6 +158,12 @@ def update_schema_id_for_triple(document_json):
             document_json['attribute_type'] = SCHEMA_ID_MAP[document_json['attribute_type']]
         return document_json
 
+
+def update_group_set(document_json):
+    if 'group_set' document_json:
+        document_json['group_set'] = ObjectId(CONFIG_VARIABLES.GROUP_ID)
+    return document_json
+
 def update_schema_and_user_ids(document_json):
     if SCHEMA_ID_MAP:
         if document_json['member_of']:
@@ -266,6 +272,13 @@ def restore_node_objects(rcs_nodes_path):
                     log_file.write("\n New post_node :\n\t "+ str(node_obj.post_node))
                     node_changed = True
 
+                if node_obj.group_set != node_json['group_set'] and node_json['group_set']:
+                    log_file.write("\n Old group_set :\n\t "+ str(node_obj.group_set))
+                    merge_lists_and_maintain_unique_ele(node_obj.group_set,
+                        node_json['group_set'])
+                    log_file.write("\n New group_set :\n\t "+ str(node_obj.group_set))
+                    node_changed = True
+
                 if node_obj.prior_node != node_json['prior_node'] and node_json['prior_node']:
                     log_file.write("\n Old prior_node :\n\t "+ str(node_obj.prior_node))
                     merge_lists_and_maintain_unique_ele(node_obj.prior_node,
@@ -294,6 +307,7 @@ def restore_node_objects(rcs_nodes_path):
                 copy_version_file(filepath)
                 log_file.write("\n RCS file copied : \n\t" + str(filepath))
                 node_json = update_schema_and_user_ids(node_json)
+                node_json = update_group_set(node_json)
                 try:
                     log_file.write("\n Inserting Node doc : \n\t" + str(node_json))
                     node_id = node_collection.collection.insert(node_json)
