@@ -286,6 +286,9 @@ def build_rcs(node, collection_name):
             elif collection_name is node_collection:
                 pick_media_from_content(BeautifulSoup(node.content, 'html.parser'))
                 node.save()
+            elif collection_name is filehive_collection:
+                dump_node(node_id=node['first_parent'], collection_name=node_collection)
+                node.save()
             else:
                 node.save()
                 try:
@@ -367,21 +370,21 @@ def dump_node(collection_name=node_collection, node=None, node_id=None, node_id_
         if node:
             log_file.write("\tNode: " + str(node))
             #fetch triple_data
-            get_triple_data(node._id)
             build_rcs(node, collection_name)
+            get_triple_data(node._id)
             log_file.write("\n dump node finished for:  " + str(node._id) )
         elif node_id:
             log_file.write("\tNode_id : " + str(node_id))
             node = collection_name.one({'_id': ObjectId(node_id)})
-            get_triple_data(node._id)
             build_rcs(node, collection_name)
+            get_triple_data(node._id)
             log_file.write("\n dump node finished for:  " + str(node._id) )
         elif node_id_list:
             node_cur = collection_name.one({'_id': {'$in': node_id_list}})
             log_file.write("\tNode_id_list : " + str(node_id_list))
             for each_node in nodes_cur:
-                get_triple_data(each_node._id)
                 build_rcs(node, collection_name)
+                get_triple_data(each_node._id)
                 log_file.write("\n dump node finished for:  " + str(node._id) )
 
     except Exception as dump_err:
@@ -412,7 +415,7 @@ def dump_media_data(media_path):
         print error_log
         pass
 
-def get_file_node_details(node_or_node_id):
+def get_file_node_details(node):
     '''
     Check if_file field and take its dump
     'if_file': {
@@ -424,15 +427,13 @@ def get_file_node_details(node_or_node_id):
 
     '''
     print "\n dumping fh -- "
-    if isinstance(node_or_node_id, ObjectId):
-        node_or_node_id = node_collection.one({'_id': ObjectId(node_or_node_id)})
-    dump_node(node=node_or_node_id, collection_name=node_collection)
-    dump_node(node_id=node_or_node_id.if_file['original']['id'], collection_name=filehive_collection)
-    dump_node(node_id=node_or_node_id.if_file['mid']['id'], collection_name=filehive_collection)
-    dump_node(node_id=node_or_node_id.if_file['thumbnail']['id'], collection_name=filehive_collection)
-    dump_media_data(node_or_node_id.if_file['original']['relurl'])
-    dump_media_data(node_or_node_id.if_file['mid']['relurl'])
-    dump_media_data(node_or_node_id.if_file['thumbnail']['relurl'])
+    dump_node(node=node, collection_name=node_collection)
+    dump_node(node_id=node.if_file['original']['id'], collection_name=filehive_collection)
+    dump_node(node_id=node.if_file['mid']['id'], collection_name=filehive_collection)
+    dump_node(node_id=node.if_file['thumbnail']['id'], collection_name=filehive_collection)
+    dump_media_data(node.if_file['original']['relurl'])
+    dump_media_data(node.if_file['mid']['relurl'])
+    dump_media_data(node.if_file['thumbnail']['relurl'])
     # if each_field == 'group_set':
     #     for each_grp_id in node.group_set:
     #         group_node = node_collection.find_one({"_id":ObjectId(each_grp_id)})
