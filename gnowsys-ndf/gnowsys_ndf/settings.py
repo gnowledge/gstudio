@@ -443,6 +443,7 @@ MIDDLEWARE_CLASSES = (
 
     # gstudio custom middleware(s):
     'gnowsys_ndf.ndf.middleware.SetCookie.UserId',
+    'gnowsys_ndf.ndf.middleware.SetData.Author',
     # 'gnowsys_ndf.ndf.middleware.Buddy.BuddySession',
     # 'gnowsys_ndf.ndf.middleware.UserRestrictMiddleware.UserRestrictMiddleware',
 
