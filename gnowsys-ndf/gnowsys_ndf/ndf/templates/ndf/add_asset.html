@@ -169,13 +169,14 @@
 
         <div class="row">
             <div class="small-12 medium-10 large-10 columns">
-                <label>
+                <label style="text-transform: none!important;">
                     Select Language
                 {% get_language_info_list for LANGUAGES as languages %}
                 <select class="asset-lang" name="lan" id="asset_lang" >
+                    asset_obj.language.0
                     {% for language in languages %}
-                    {% if asset_obj.language.0 == language.code  %}
-                        <option selected data-sub-lang="{{ language.name }}" data-sub-code="{{ language.code }}"/>
+                    {% if asset_obj.language.0 in  language.code  %}
+                        <option selected data-sub-lang="{{ language.name }}" data-sub-code="{{ language.code }}">
                         {{language.name}}
                     {%  else %}
                         <option data-sub-lang="{{ language.name }}" data-sub-code="{{ language.code }}">
