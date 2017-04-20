@@ -14,7 +14,7 @@ def create_factory_schema_mapper(path):
                                                     {'_type': {'$in': TYPES_LIST }},
                                                     {
                                                         '_type': u'Group',
-                                                        'name': {'$in': GSTUDIO_DEFAULT_GROUPS }
+                                                        'name': {'$in': GSTUDIO_DEFAULT_GROUPS_LIST }
                                                     }
                                                 ]
                                             })
