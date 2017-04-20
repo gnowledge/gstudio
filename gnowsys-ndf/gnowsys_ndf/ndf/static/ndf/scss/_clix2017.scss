@@ -4256,7 +4256,7 @@ $module-card-lines-to-show: 3;
         background-image: url('/static/ndf/images/maths-cover.png');
         background-size:100% 100%;
         position:relative;
-        opacity:0.9; 
+        //opacity:0.9;
 
         &:before {
             content: ' ';
@@ -4324,6 +4324,8 @@ $module-card-lines-to-show: 3;
               margin: 0px 10px 0px 0px;
               cursor: pointer;
               border-radius: 3px;
+              opacity:0.8;
+        
             }
 
             .course_actions>i{
