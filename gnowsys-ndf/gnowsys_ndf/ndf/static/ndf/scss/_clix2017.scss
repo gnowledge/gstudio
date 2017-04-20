@@ -76,6 +76,15 @@ h5{
     margin-right: 10px;
 }
 
+.buddy-wid{
+    font-size: 34px;
+    color: #a2b1be;
+    margin-right: 30px;
+    margin-top:8px;
+
+
+}
+
 .module_text{
     margin-left: -7px;
 }
@@ -3306,9 +3315,11 @@ $bp_background_color: #101d29;
     width: 70px;
     height: 100vh;
     padding: 10px;
-    background-color: $bp_background_color;
+    //background-color: $bp_background_color;
+    background-color: rgba(16, 29, 41, 0.64);
     overflow-y: auto;
-
+    z-index:100;
+    //margin-top:52px;
 
     .add_buddy_icon {
         height: 50px;
