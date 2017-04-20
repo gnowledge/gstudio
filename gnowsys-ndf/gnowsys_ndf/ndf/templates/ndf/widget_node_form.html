@@ -7,7 +7,7 @@
             <input type="hidden" name="_id" value="{{node_obj.pk}}">
 
             <!-- name -->
-            <div class="">
+            <div>
                 <div class="left">
                 <h5>Name</h5>
                 <div class="gray-text">{{source_obj.name}}</div>
@@ -20,16 +20,19 @@
 
 
             <!-- content -->
-            <div class="">
+            <div>
                 <div class="left">
                 <h5>Description</h5>
                 {{source_obj.content|safe}}
-                </div>
-                <div class="right">
-                    {% include "ndf/html_editor.html" with var_name="content" var_placeholder="Enter the content here" var_value=node_obj.content|safe|default_if_none:"" node_id=node_obj.pk ckeditor_toolbar="GeneralToolbar" %}
+                </div><br/> 
+                <div class="left">
+                    {% include "ndf/html_editor.html" with var_name="content" var_placeholder="Enter the content here" var_value=node_obj.content|safe|default_if_none:"" node_id=node_obj.pk ckeditor_toolbar=editor_type %}
                 </div>
             </div>
             <hr/>
+            {% for k, v in additional_form_fields.iteritems %}
+                <{{v.widget}} type="{{v.widget_attr}}" name="{{v.name}}" value="{{v.value}}">
+            {% endfor %}
             {% for k, v in additional_form_fields.attribute.iteritems %}
                 <div class="course_creator_header">
                     <div class="left course_heading">

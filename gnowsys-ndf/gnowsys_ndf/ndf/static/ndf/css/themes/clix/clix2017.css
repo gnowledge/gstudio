@@ -4362,3 +4362,29 @@ ul.nav_menu_1 > li > a.selected, ul.nav_menu_1 > li > a:hover {
 #status {
   width: 100% !important;
 }
+
+/* line 4559, ../../../scss/_clix2017.scss */
+.add-note-btn {
+  padding: 3px 11px;
+  border-radius: 100%;
+  float: right;
+  margin: 5px 5px 8px 0px;
+  border: 1px solid #6153AE;
+  background: #fff;
+  font-size: 23px;
+  color: #6153AE;
+}
+
+/* line 4570, ../../../scss/_clix2017.scss */
+.edit-note-btn {
+  float: right;
+  border: 1px solid #CFCFCF;
+  padding: 5px 10px;
+  border-radius: 3px;
+  color: #A2A2A2;
+  background-color: #f7f7f7;
+}
+/* line 4577, ../../../scss/_clix2017.scss */
+.edit-note-btn i {
+  margin-right: 5px;
+}
