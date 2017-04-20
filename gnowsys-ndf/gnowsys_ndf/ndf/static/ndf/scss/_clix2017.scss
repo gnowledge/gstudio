@@ -4292,6 +4292,28 @@ $module-card-lines-to-show: 3;
                 margin-top: 90px;
                 margin-left: 40px;
             }
+            .enroll-unit{
+                margin-top: 100px;
+                margin-right: 50px;
+                //border: 2px solid #ffc14e;
+                //border-radius: 6px;
+                padding: 1px 5px 1px 5px;
+                text-transform: none;
+                text-align: center;
+                cursor: pointer;
+                //color: #000;
+                font-family: OpenSans-Semibold;
+
+                &>a{
+                    color:#ffc14e;
+                }
+                &:hover{
+                background-color:rgba(255,193,78,0.3);
+                cursor:pointer;
+                color:white;
+                }
+            }
+
             .enroll_unit{
                 margin-top: 100px;
                 margin-right: 50px;

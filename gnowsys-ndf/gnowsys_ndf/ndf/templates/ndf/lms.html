@@ -61,17 +61,17 @@
           </div>
           {% endif %}
 
-        <div class="right enroll_unit">
+        <div class="right enroll-unit">
  
             {% if request.user.is_authenticated %}
                 {% if request.user.id not in group_object.author_set %}
                   {% include 'ndf/widget_enroll.html' %}
 
                 {% else %}
-                  <a disabled="disabled"> ENROLLED</a>
+                  <a disabled="disabled" class="enroll_unit"> ENROLLED</a>
                 {% endif %}
             {% else %}
-                <a href="{% url 'auth_login' %}" title="Please login to Enroll">ENROLL</a>
+                <a href="{% url 'auth_login' %}" title="Please login to Enroll" class="enroll_unit">ENROLL</a>
             {% endif %}
          </div>
        </div>
