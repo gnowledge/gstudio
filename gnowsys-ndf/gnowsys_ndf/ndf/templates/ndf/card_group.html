@@ -16,7 +16,7 @@
         <a href='{% url url_name first_arg %}{{search_url_text|safe}}'/>
     {% endif %}
     {% if "base_unit" in node.member_of_names_list %}
-    <div class="raw_material_asset">DRAFT</div>
+    <div class="status-draft">DRAFT</div>
     {% endif  %}
     {% if get_status %}
         <div class="status-{{get_status}}">{{get_status}}</div>
