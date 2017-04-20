@@ -225,8 +225,6 @@ def worker_export(nodes_cur):
         if each_node.post_node:
             get_nested_ids(each_node,'post_node')
 
-        #fetch triple_data
-        get_triple_data(each_node._id)
 
 def call_group_export(group_node, nodes_cur, num_of_processes=5):
     '''
@@ -287,6 +285,9 @@ def build_rcs(node, collection_name):
                 node.save(triple_node=triple_node_RT_AT, triple_id=triple_node_RT_AT._id)
             elif collection_name is node_collection:
                 pick_media_from_content(BeautifulSoup(node.content, 'html.parser'))
+                node.save()
+            elif collection_name is filehive_collection:
+                dump_node(node_id=node['first_parent'], collection_name=node_collection)
                 node.save()
             else:
                 node.save()
@@ -368,18 +369,22 @@ def dump_node(collection_name=node_collection, node=None, node_id=None, node_id_
         log_file.write("\n dump_node invoked for: " + str(collection_name))
         if node:
             log_file.write("\tNode: " + str(node))
+            #fetch triple_data
             build_rcs(node, collection_name)
+            get_triple_data(node._id)
             log_file.write("\n dump node finished for:  " + str(node._id) )
         elif node_id:
             log_file.write("\tNode_id : " + str(node_id))
             node = collection_name.one({'_id': ObjectId(node_id)})
             build_rcs(node, collection_name)
+            get_triple_data(node._id)
             log_file.write("\n dump node finished for:  " + str(node._id) )
         elif node_id_list:
             node_cur = collection_name.one({'_id': {'$in': node_id_list}})
             log_file.write("\tNode_id_list : " + str(node_id_list))
             for each_node in nodes_cur:
                 build_rcs(node, collection_name)
+                get_triple_data(each_node._id)
                 log_file.write("\n dump node finished for:  " + str(node._id) )
 
     except Exception as dump_err:
@@ -410,7 +415,7 @@ def dump_media_data(media_path):
         print error_log
         pass
 
-def get_file_node_details(node_or_node_id):
+def get_file_node_details(node):
     '''
     Check if_file field and take its dump
     'if_file': {
@@ -421,23 +426,30 @@ def get_file_node_details(node_or_node_id):
                 },
 
     '''
-    print "\n dumping fh -- "
-    if isinstance(node_or_node_id, ObjectId):
-        node_or_node_id = node_collection.one({'_id': ObjectId(node_or_node_id)})
-    dump_node(node=node_or_node_id, collection_name=node_collection)
-    dump_node(node_id=node_or_node_id.if_file['original']['id'], collection_name=filehive_collection)
-    dump_node(node_id=node_or_node_id.if_file['mid']['id'], collection_name=filehive_collection)
-    dump_node(node_id=node_or_node_id.if_file['thumbnail']['id'], collection_name=filehive_collection)
-    dump_media_data(node_or_node_id.if_file['original']['relurl'])
-    dump_media_data(node_or_node_id.if_file['mid']['relurl'])
-    dump_media_data(node_or_node_id.if_file['thumbnail']['relurl'])
-    # if each_field == 'group_set':
-    #     for each_grp_id in node.group_set:
-    #         group_node = node_collection.find_one({"_id":ObjectId(each_grp_id)})
-    #         if group_node and group_node._type != unicode('Author'):
-    #             group_set.extend(group_node.group_set)
-    # if each_field == 'author_set':
-    #     user_list.extend(node.author_set)
+    try:
+        global log_file
+        log_file.write("\n get_file_node_details invoked for: " + str(node))
+
+        dump_node(node=node, collection_name=node_collection)
+        dump_node(node_id=node.if_file['original']['id'], collection_name=filehive_collection)
+        dump_node(node_id=node.if_file['mid']['id'], collection_name=filehive_collection)
+        dump_node(node_id=node.if_file['thumbnail']['id'], collection_name=filehive_collection)
+        dump_media_data(node.if_file['original']['relurl'])
+        dump_media_data(node.if_file['mid']['relurl'])
+        dump_media_data(node.if_file['thumbnail']['relurl'])
+        # if each_field == 'group_set':
+        #     for each_grp_id in node.group_set:
+        #         group_node = node_collection.find_one({"_id":ObjectId(each_grp_id)})
+        #         if group_node and group_node._type != unicode('Author'):
+        #             group_set.extend(group_node.group_set)
+        # if each_field == 'author_set':
+        #     user_list.extend(node.author_set)
+    except Exception as file_dump_err:
+        error_log = "\n !!! Error found while taking dump in get_file_node_details() ."
+        error_log += "\nError: " + str(file_dump_err)
+        log_file.write(error_log)
+        print error_log
+        pass
 
 def get_nested_ids(node,field_name):
     '''
