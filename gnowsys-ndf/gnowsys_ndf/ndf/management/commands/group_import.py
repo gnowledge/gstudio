@@ -160,7 +160,7 @@ def update_schema_id_for_triple(document_json):
 
 
 def update_group_set(document_json):
-    if 'group_set' document_json:
+    if 'group_set' in document_json:
         document_json['group_set'] = ObjectId(CONFIG_VARIABLES.GROUP_ID)
     return document_json
 
@@ -246,56 +246,56 @@ def restore_node_objects(rcs_nodes_path):
                 node_changed = False
                 if node_obj.author_set != node_json['author_set'] and node_json['author_set']:
                     log_file.write("\n Old author_set :\n\t " + str(node_obj.author_set))
-                    merge_lists_and_maintain_unique_ele(node_obj.author_set,
+                    node_obj.author_set = merge_lists_and_maintain_unique_ele(node_obj.author_set,
                         node_json['author_set'])
                     log_file.write("\n New author_set :\n\t "+ str(node_obj.author_set))
                     node_changed = True
 
                 if node_obj.relation_set != node_json['relation_set'] and node_json['relation_set']:
                     log_file.write("\n Old relation_set :\n\t "+ str(node_obj.relation_set))
-                    merge_lists_and_maintain_unique_ele(node_obj.relation_set,
+                    node_obj.relation_set = merge_lists_and_maintain_unique_ele(node_obj.relation_set,
                         node_json['relation_set'], advanced_merge=True)
                     log_file.write("\n New relation_set :\n\t "+ str(node_obj.relation_set))
                     node_changed = True
 
                 if node_obj.attribute_set != node_json['attribute_set'] and node_json['attribute_set']:
                     log_file.write("\n Old attribute_set :\n\t "+ str(node_obj.attribute_set))
-                    merge_lists_and_maintain_unique_ele(node_obj.attribute_set,
+                    node_obj.attribute_set = merge_lists_and_maintain_unique_ele(node_obj.attribute_set,
                         node_json['attribute_set'], advanced_merge=True)
                     log_file.write("\n New attribute_set :\n\t "+ str(node_obj.attribute_set))
                     node_changed = True
 
                 if node_obj.post_node != node_json['post_node'] and node_json['post_node']:
                     log_file.write("\n Old post_node :\n\t "+ str(node_obj.post_node))
-                    merge_lists_and_maintain_unique_ele(node_obj.post_node,
+                    node_obj.post_node = merge_lists_and_maintain_unique_ele(node_obj.post_node,
                         node_json['post_node'])
                     log_file.write("\n New post_node :\n\t "+ str(node_obj.post_node))
                     node_changed = True
 
                 if node_obj.group_set != node_json['group_set'] and node_json['group_set']:
                     log_file.write("\n Old group_set :\n\t "+ str(node_obj.group_set))
-                    merge_lists_and_maintain_unique_ele(node_obj.group_set,
+                    node_obj.group_set = merge_lists_and_maintain_unique_ele(node_obj.group_set,
                         node_json['group_set'])
                     log_file.write("\n New group_set :\n\t "+ str(node_obj.group_set))
                     node_changed = True
 
                 if node_obj.prior_node != node_json['prior_node'] and node_json['prior_node']:
                     log_file.write("\n Old prior_node :\n\t "+ str(node_obj.prior_node))
-                    merge_lists_and_maintain_unique_ele(node_obj.prior_node,
+                    node_obj.prior_node = merge_lists_and_maintain_unique_ele(node_obj.prior_node,
                         node_json['prior_node'])
                     log_file.write("\n New prior_node :\n\t "+ str(node_obj.prior_node))
                     node_changed = True
 
                 if node_obj.origin != node_json['origin'] and node_json['origin']:
                     log_file.write("\n Old origin :\n\t "+ str(node_obj.origin))
-                    merge_lists_and_maintain_unique_ele(node_obj.origin,
+                    node_obj.origin = merge_lists_and_maintain_unique_ele(node_obj.origin,
                         node_json['origin'])
                     log_file.write("\n New origin :\n\t "+ str(node_obj.origin))
                     node_changed = True
 
                 if node_obj.collection_set != node_json['collection_set'] and node_json['collection_set']:
                     log_file.write("\n Old collection_set :\n\t "+ str(node_obj.collection_set))
-                    merge_lists_and_maintain_unique_ele(node_obj.collection_set,
+                    node_obj.collection_set = merge_lists_and_maintain_unique_ele(node_obj.collection_set,
                         node_json['collection_set'])
                     log_file.write("\n New collection_set :\n\t "+ str(node_obj.collection_set))
                     node_changed = True
