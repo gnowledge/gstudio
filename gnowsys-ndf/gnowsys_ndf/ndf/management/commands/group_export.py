@@ -424,12 +424,12 @@ def get_file_node_details(node_or_node_id):
     print "\n dumping fh -- "
     if isinstance(node_or_node_id, ObjectId):
         node_or_node_id = node_collection.one({'_id': ObjectId(node_or_node_id)})
-    dump_node(node_id=node.if_file['original']['id'], collection_name=filehive_collection)
-    dump_node(node_id=node.if_file['mid']['id'], collection_name=filehive_collection)
-    dump_node(node_id=node.if_file['thumbnail']['id'], collection_name=filehive_collection)
-    dump_media_data(node.if_file['original']['relurl'])
-    dump_media_data(node.if_file['mid']['relurl'])
-    dump_media_data(node.if_file['thumbnail']['relurl'])
+    dump_node(node_id=node_or_node_id.if_file['original']['id'], collection_name=filehive_collection)
+    dump_node(node_id=node_or_node_id.if_file['mid']['id'], collection_name=filehive_collection)
+    dump_node(node_id=node_or_node_id.if_file['thumbnail']['id'], collection_name=filehive_collection)
+    dump_media_data(node_or_node_id.if_file['original']['relurl'])
+    dump_media_data(node_or_node_id.if_file['mid']['relurl'])
+    dump_media_data(node_or_node_id.if_file['thumbnail']['relurl'])
     # if each_field == 'group_set':
     #     for each_grp_id in node.group_set:
     #         group_node = node_collection.find_one({"_id":ObjectId(each_grp_id)})
