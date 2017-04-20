@@ -4286,8 +4286,9 @@ $module-card-lines-to-show: 3;
                 cursor: pointer;
             }
         }
+
         .div-height{
-            width:100%!important;
+            //width:100%!important;
             height:150px!important;
             background-size:100% 100%;
             position:absolute!important; 
@@ -4755,4 +4756,9 @@ ul.nav_menu_1 {
     i{
         margin-right: 5px;
     }
+}
+
+.img-height{
+    height:150px;
+    width:1351px;
 }
