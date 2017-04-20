@@ -4314,7 +4314,7 @@ $module-card-lines-to-show: 3;
             }
             .enroll-unit{
                 margin-top: 100px;
-                margin-right: 50px;
+                margin-right: -45px;
                 //border: 2px solid #ffc14e;
                 //border-radius: 6px;
                 padding: 1px 5px 1px 5px;
@@ -4357,7 +4357,7 @@ $module-card-lines-to-show: 3;
             }
 
             .course_actions>span{
-              margin-right: 5px;
+              //margin-right: 5px;
               background: rgb(46, 63, 81);
               border: 1px solid rgba(255, 255, 255, 0.7);
               padding: 1px 8px;
@@ -4367,6 +4367,8 @@ $module-card-lines-to-show: 3;
               cursor: pointer;
               border-radius: 3px;
               opacity:0.8;
+              margin-top:90px;
+              margin-right:65px;
         
             }
 
