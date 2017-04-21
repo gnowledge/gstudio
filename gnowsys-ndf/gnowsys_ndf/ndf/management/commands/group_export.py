@@ -345,6 +345,14 @@ def pick_media_from_content(content_soup):
         src_attr = each_src["src"]
         find_file_from_media_url(src_attr)
 
+
+    all_transcript_data = content_soup.find_all(attrs={'class':'transcript'})
+    for each_transcript in all_transcript_data:
+        data_ele = each_transcript.findNext('object',data=True)
+        if data_ele:
+            if 'media' in data_ele['data']:
+                find_file_from_media_url(data_ele['data'])
+
 def copy_rcs(node):
     '''
     Actual copying of RCS files from /data/rcs-repo/ to export_path/rcs-repo
