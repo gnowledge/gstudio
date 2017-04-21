@@ -390,16 +390,18 @@ def dump_node(collection_name=node_collection, node=None, node_id=None, node_id_
         elif node_id:
             log_file.write("\tNode_id : " + str(node_id))
             node = collection_name.one({'_id': ObjectId(node_id)})
-            build_rcs(node, collection_name)
-            get_triple_data(node._id)
-            log_file.write("\n dump node finished for:  " + str(node._id) )
+            if node:
+                build_rcs(node, collection_name)
+                get_triple_data(node._id)
+                log_file.write("\n dump node finished for:  " + str(node._id) )
         elif node_id_list:
             node_cur = collection_name.one({'_id': {'$in': node_id_list}})
             log_file.write("\tNode_id_list : " + str(node_id_list))
             for each_node in nodes_cur:
-                build_rcs(node, collection_name)
+                if each_node:
+                build_rcs(each_node, collection_name)
                 get_triple_data(each_node._id)
-                log_file.write("\n dump node finished for:  " + str(node._id) )
+                log_file.write("\n dump node finished for:  " + str(each_node._id) )
 
     except Exception as dump_err:
         error_log = "\n !!! Error found while taking dump in dump_node() ."
