@@ -829,3 +829,35 @@ def my_dashboard(request, group_id):
                 },
                 context_instance=RequestContext(request)
         )
+
+
+def my_performance(request, group_id):
+
+    if str(request.user) == 'AnonymousUser':
+        raise Http404("You don't have an authority for this page!")
+
+    try:
+        auth_obj = get_group_name_id(group_id, get_obj=True)
+        user_id = auth_obj.created_by
+
+    except:
+        user_id = eval(group_id)
+        auth_obj = node_collection.one({'_type': "Author", 'created_by': user_id})
+
+    auth_id = auth_obj._id
+    title = 'my performance'
+
+    my_units = node_collection.find({'member_of': {'$in': [ce_gst._id, announced_unit_gst._id]},
+                                          'author_set': request.user.id,
+                                        }).sort('last_update', -1)
+    # my_modules_cur.rewind()
+    return render_to_response('ndf/lms_dashboard.html',
+                {
+                    'group_id': auth_id, 'groupid': auth_id,
+                    'node': auth_obj, 'title': title,
+                    # 'my_course_objs': my_course_objs,
+                    'units_cur':my_units,
+                    # 'modules_cur': my_modules_cur
+                },
+                context_instance=RequestContext(request)
+        )
