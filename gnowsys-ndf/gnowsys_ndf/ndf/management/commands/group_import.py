@@ -303,6 +303,8 @@ def restore_node_objects(rcs_nodes_path):
                 log_file.write("\n Old group_set :\n\t "+ str(node_obj.group_set))
                 node_obj.group_set = [ObjectId(CONFIG_VARIABLES.GROUP_ID)]
                 log_file.write("\n New group_set :\n\t "+ str(node_obj.group_set))
+                node_obj.access_policy = u'PUBLIC'
+                log_file.write("\n Setting access_policy: u'PUBLIC'")
                 node_changed = True
 
 
