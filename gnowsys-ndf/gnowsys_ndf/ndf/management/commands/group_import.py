@@ -300,13 +300,18 @@ def restore_node_objects(rcs_nodes_path):
                     log_file.write("\n New collection_set :\n\t "+ str(node_obj.collection_set))
                     node_changed = True
 
+                if node_obj.content != node_json['content'] and node_json['content']:
+                    log_file.write("\n Old content :\n\t "+ str(node_obj.content))
+                    node_obj.content = node_json['content']
+                    node_changed = True
+                    log_file.write("\n New content :\n\t "+ str(node_obj.content))
+
                 log_file.write("\n Old group_set :\n\t "+ str(node_obj.group_set))
                 node_obj.group_set = [ObjectId(CONFIG_VARIABLES.GROUP_ID)]
                 log_file.write("\n New group_set :\n\t "+ str(node_obj.group_set))
                 node_obj.access_policy = u'PUBLIC'
                 log_file.write("\n Setting access_policy: u'PUBLIC'")
                 node_changed = True
-
 
                 if node_changed:
                     log_file.write("\n Node Updated: \n\t OLD: " + str(node_obj) + "\n\tNew: "+str(node_json))
