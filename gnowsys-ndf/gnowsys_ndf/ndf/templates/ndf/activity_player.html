@@ -9,6 +9,8 @@
 
 {% block body_content %}
 {% user_access_policy groupid request.user as user_access_priv %}
+    {% get_group_object groupid as group_object %}
+
 
 <style type="text/css">
   .disabled , .disabled i {
@@ -28,7 +30,7 @@
         </a>
       </div>
         <div class="header_title header_text_block">
-             {{group_name}}
+             {% firstof group_object.altnames group_object.name  %}
         </div>
         <div class="new_note header_text_block">
             <a {% if user_access_priv == "allow" %} href="{% url 'course_notebook' group_id %}?create=True" {% else %} class="user_not_enrolled" {% endif %}><i class="fa fa-edit header_icon"></i>&nbsp;
