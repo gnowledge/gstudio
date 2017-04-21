@@ -411,8 +411,8 @@ def restore_counter_objects(rcs_counters_path):
                 #     counter_obj.last_update = counter_json['last_update']
                 #     counter_changed = True
 
-                if counter_obj.enrolled != counter_json['enrolled'] :
-                    counter_obj.enrolled = counter_json['enrolled']
+                if counter_obj.is_group_member != counter_json['is_group_member'] :
+                    counter_obj.is_group_member = counter_json['is_group_member']
                     counter_changed = True
 
                 if counter_obj.modules_completed != counter_json['modules_completed'] :
@@ -533,7 +533,10 @@ def call_group_import(rcs_repo_path):
     restore_filehive_objects(rcs_filehives_path)
     restore_node_objects(rcs_nodes_path)
     restore_triple_objects(rcs_triples_path)
-    restore_counter_objects(rcs_counters_path)
+
+    # skip foll. command katkamrachana 21Apr2017
+    # Instead run python manage.py fillCounter
+    # restore_counter_objects(rcs_counters_path)
 
 
 def copy_media_data(media_path):
