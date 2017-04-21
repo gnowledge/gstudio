@@ -405,7 +405,7 @@ def restore_counter_objects(rcs_counters_path):
             counter_obj = counter_collection.one({'_id': ObjectId(counter_json['_id'])})
             if counter_obj:
                 counter_changed = False
-                log_file.write("\nFound Existing Counter Object : " + str(c._id))
+                log_file.write("\nFound Existing Counter Object : " + str(counter_obj._id))
 
                 # if counter_obj.last_update != counter_json['last_update'] :
                 #     counter_obj.last_update = counter_json['last_update']
