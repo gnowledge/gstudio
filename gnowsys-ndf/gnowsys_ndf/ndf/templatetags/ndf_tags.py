@@ -3972,3 +3972,7 @@ def get_gstudio_alt_size(mime_type):
 @register.assignment_tag
 def get_gstudio_alt_opts():
  	return GSTUDIO_ALTERNATE_OPTS
+
+@register.assignment_tag
+def get_test_page_oid():
+ 	return GSTUDIO_OID_HELP

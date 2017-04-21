@@ -643,7 +643,7 @@ GSTUDIO_EBOOKS_HELP_TEXT = "" #ebook help text page  url(page:"how to read ebook
 GSTUDIO_SUPPORTED_JHAPPS = ['Jsmol','Police Squad','OpenStoryTool','BioMechanics', 'TurtleBlocks']
 # terms & conditions
 GSTUDIO_OID_TC = None
-
+GSTUDIO_OID_HELP = "58f91441c6bd6950f165792d"
 # GSTUDIO_SITE_EDITOR = "orgitdown"  #possible values are 'aloha'and 'orgitdown'
 # Visibility for 'Create Group'
 CREATE_GROUP_VISIBILITY = True
