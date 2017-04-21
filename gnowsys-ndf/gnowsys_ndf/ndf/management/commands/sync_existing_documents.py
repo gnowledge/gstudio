@@ -25,8 +25,18 @@ class Command(BaseCommand):
 
     # Keep latest changes in field(s) to be added at top
 
+
+    # updating visited_nodes for Counter instances
+    counter_objs = counter_collection.collection.update({'_type': 'Counter', 'visited_nodes': {'$exists': False}},
+        {'$set': {'visited_nodes': {}}},upsert=False, multi=True)  
+    if counter_objs['nModified']:
+        print "\n Updated Counters adding field: visited_nodes for " + all_ap['nModified'].__str__() + " instances."
+          
+
     # updating access_policy from inconsistent values like 'public', 'Public' to 'PUBLIC'
-    all_ap = node_collection.collection.update({'_type': {'$nin': [u'ToReduceDocs']}, 'access_policy': {'$in': [u'public', u'Public', '', None]}}, {'$set':{'access_policy': u'PUBLIC'} }, upsert=False, multi=True)
+    all_ap = node_collection.collection.update({'_type': {'$nin': [u'ToReduceDocs']},
+     'access_policy': {'$in': [u'public', u'Public', '', None]}},
+      {'$set':{'access_policy': u'PUBLIC'} }, upsert=False, multi=True)
     if all_ap['nModified']:
         print "\n `access_policy`: Replaced non u'PUBLIC' values of public nodes to u'PUBLIC' for : " + all_ap['nModified'].__str__() + " instances."
 

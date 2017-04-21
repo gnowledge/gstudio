@@ -4163,7 +4163,12 @@ class Counter(DjangoDocument):
 
         # Total fields should be updated on enroll action
         # On module/unit add/delete, update 'total' fields for all users in celery
-        'course':{'modules':{'completed':int, 'total':int}, 'units':{'completed':int, 'total':int}}
+        
+        'course':{'modules':{'completed':int, 'total':int}, 'units':{'completed':int, 'total':int}},
+
+        # 'visited_nodes' = {str(ObjectId): int(count_of_visits)}
+        'visited_nodes': {basestring: int}
+
     }
 
     default_values = {
