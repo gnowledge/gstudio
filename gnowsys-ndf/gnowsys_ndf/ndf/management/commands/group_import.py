@@ -161,7 +161,7 @@ def update_schema_id_for_triple(document_json):
 
 def update_group_set(document_json):
     if 'group_set' in document_json:
-        document_json['group_set'] = ObjectId(CONFIG_VARIABLES.GROUP_ID)
+        document_json['group_set'] = [ObjectId(CONFIG_VARIABLES.GROUP_ID)]
     return document_json
 
 def update_schema_and_user_ids(document_json):
@@ -271,14 +271,14 @@ def restore_node_objects(rcs_nodes_path):
                         node_json['post_node'])
                     log_file.write("\n New post_node :\n\t "+ str(node_obj.post_node))
                     node_changed = True
-
-                if node_obj.group_set != node_json['group_set'] and node_json['group_set']:
+                '''
+                if  node_obj.group_set != node_json['group_set'] and node_json['group_set']:
                     log_file.write("\n Old group_set :\n\t "+ str(node_obj.group_set))
                     node_obj.group_set = merge_lists_and_maintain_unique_ele(node_obj.group_set,
                         node_json['group_set'])
                     log_file.write("\n New group_set :\n\t "+ str(node_obj.group_set))
                     node_changed = True
-
+                '''
                 if node_obj.prior_node != node_json['prior_node'] and node_json['prior_node']:
                     log_file.write("\n Old prior_node :\n\t "+ str(node_obj.prior_node))
                     node_obj.prior_node = merge_lists_and_maintain_unique_ele(node_obj.prior_node,
@@ -299,6 +299,14 @@ def restore_node_objects(rcs_nodes_path):
                         node_json['collection_set'])
                     log_file.write("\n New collection_set :\n\t "+ str(node_obj.collection_set))
                     node_changed = True
+
+                log_file.write("\n Old group_set :\n\t "+ str(node_obj.group_set))
+                node_obj.group_set = [ObjectId(CONFIG_VARIABLES.GROUP_ID)]
+                log_file.write("\n New group_set :\n\t "+ str(node_obj.group_set))
+                node_obj.access_policy = u'PUBLIC'
+                log_file.write("\n Setting access_policy: u'PUBLIC'")
+                node_changed = True
+
 
                 if node_changed:
                     log_file.write("\n Node Updated: \n\t OLD: " + str(node_obj) + "\n\tNew: "+str(node_json))

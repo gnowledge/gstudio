@@ -308,17 +308,31 @@ def build_rcs(node, collection_name):
             pass
 
 def find_file_from_media_url(source_attr):
-    if "readDoc" in source_attr:
-        split_src = source_attr.split('/')
-        node_id = split_src[split_src.index('readDoc') + 1]
-        file_node = node_collection.one({'_id': ObjectId(node_id)})
+    try:
+        global log_file
+        log_file.write("\n find_file_from_media_url invoked for: " + str(source_attr))
 
-    elif "media" in source_attr:
-        source_attr = source_attr.split("media/")[-1]
-        file_node = node_collection.find_one({"$or": [{'if_file.original.relurl': source_attr},
-            {'if_file.mid.relurl': source_attr},{'if_file.thumbnail.relurl': source_attr}]})
-    if file_node:
-        get_file_node_details(file_node)
+        if "media" in source_attr:
+            source_attr = source_attr.split("media/")[-1]
+            file_node = node_collection.find_one({"$or": [{'if_file.original.relurl': source_attr},
+                {'if_file.mid.relurl': source_attr},{'if_file.thumbnail.relurl': source_attr}]})
+
+        # elif "readDoc" in source_attr:
+        #     split_src = source_attr.split('/')
+        #     node_id = split_src[split_src.index('readDoc') + 1]
+        #     file_node = node_collection.one({'_id': ObjectId(node_id)})
+
+        if file_node:
+            log_file.write("\n media file_node gs found:  " + str(file_node._id) )
+            get_file_node_details(file_node)
+
+    except Exception as find_file_from_media_url_err:
+        error_log = "\n !!! Error found while taking dump in find_file_from_media_url() ."
+        error_log += "\nError: " + str(find_file_from_media_url_err)
+        print "\n Error: ", error_log
+        log_file.write(error_log)
+        print error_log
+        pass
 
 def pick_media_from_content(content_soup):
     '''
@@ -330,6 +344,14 @@ def pick_media_from_content(content_soup):
     for each_src in all_src:
         src_attr = each_src["src"]
         find_file_from_media_url(src_attr)
+
+
+    all_transcript_data = content_soup.find_all(attrs={'class':'transcript'})
+    for each_transcript in all_transcript_data:
+        data_ele = each_transcript.findNext('object',data=True)
+        if data_ele:
+            if 'media' in data_ele['data']:
+                find_file_from_media_url(data_ele['data'])
 
 def copy_rcs(node):
     '''
@@ -376,16 +398,18 @@ def dump_node(collection_name=node_collection, node=None, node_id=None, node_id_
         elif node_id:
             log_file.write("\tNode_id : " + str(node_id))
             node = collection_name.one({'_id': ObjectId(node_id)})
-            build_rcs(node, collection_name)
-            get_triple_data(node._id)
-            log_file.write("\n dump node finished for:  " + str(node._id) )
+            if node:
+                build_rcs(node, collection_name)
+                get_triple_data(node._id)
+                log_file.write("\n dump node finished for:  " + str(node._id) )
         elif node_id_list:
             node_cur = collection_name.one({'_id': {'$in': node_id_list}})
             log_file.write("\tNode_id_list : " + str(node_id_list))
             for each_node in nodes_cur:
-                build_rcs(node, collection_name)
-                get_triple_data(each_node._id)
-                log_file.write("\n dump node finished for:  " + str(node._id) )
+                if each_node:
+                    build_rcs(each_node, collection_name)
+                    get_triple_data(each_node._id)
+                    log_file.write("\n dump node finished for:  " + str(each_node._id) )
 
     except Exception as dump_err:
         error_log = "\n !!! Error found while taking dump in dump_node() ."
