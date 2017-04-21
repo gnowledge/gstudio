@@ -3976,3 +3976,8 @@ def get_gstudio_alt_opts():
 @register.assignment_tag
 def get_test_page_oid():
  	return GSTUDIO_OID_HELP
+
+@register.assignment_tag
+def get_unit_total_points(user_id,group_id):
+	counter_obj = Counter.get_counter_obj(user_id, ObjectId(group_id))
+	return counter_obj['group_points']
