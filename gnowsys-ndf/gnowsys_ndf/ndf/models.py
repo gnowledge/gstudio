@@ -330,7 +330,7 @@ class Node(DjangoDocument):
                         # 'comment_enabled': bool,
                         # 'login_required': bool,
                         # 'password': basestring,
-                        'status': u'DRAFT',
+                        'status': u'PUBLISHED',
                         'rating':[],
                         'snapshot':{}
                     }
