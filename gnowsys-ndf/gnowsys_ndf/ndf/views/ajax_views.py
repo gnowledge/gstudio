@@ -6594,10 +6594,11 @@ def get_group_pages(request, group_id):
         except_collection_set = except_collection_set_of_obj.collection_set
     gst_page_name, gst_page_id = GSystemType.get_gst_name_id('Page')
     gst_blog_page_name, gst_blog_page_id = GSystemType.get_gst_name_id('Blog page')
+    gst_info_page_name, gst_info_page_id = GSystemType.get_gst_name_id('Info page')
     pages_cur = node_collection.find({
                                       '_type': 'GSystem',
                                       'member_of': ObjectId(gst_page_id),
-                                      'type_of': {'$nin': [gst_blog_page_id]},
+                                      'type_of': {'$nin': [gst_blog_page_id, gst_info_page_id]},
                                       'group_set': ObjectId(group_id),
                                       '_id': {'$nin': except_collection_set}
                                     }).sort('last_update', -1)
