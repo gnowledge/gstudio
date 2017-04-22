@@ -115,12 +115,13 @@ def update_buddies(request, group_id):
                                                 },
                                                 {'name': 1})
 
-        updated_buddies_authid_name_dict = { b['_id'].__str__(): b['name'] for b in updated_buddies_cur}
+        updated_buddies_authid_name_dict = { str(b['_id']): b['name'] for b in updated_buddies_cur}
         # print "\n\nupdated_buddies : ", updated_buddies_authid_name_dict
 
         request.session['buddies_userid_list']      = [ b['created_by'] for b in updated_buddies_cur]
         request.session['buddies_authid_list']      = active_buddy_auth_list
-        request.session['buddies_authid_name_dict'] = updated_buddies_authid_name_dict
+        request.session['buddies_authid_name_dict'] = json.dumps(updated_buddies_authid_name_dict)
+        # print "\n\nrequest.session['buddies_authid_name_dict'] : ", request.session['buddies_authid_name_dict']
 
     result_dict = {
                 'buddies': updated_buddies_authid_name_dict,
