@@ -55,10 +55,8 @@
 
 </head>
 <body>
-    {% if site.BUDDY_LOGIN and user.is_authenticated %}
-        {% if request.author.agency_type == 'Student' %}
-            {% include "ndf/buddy.html" %}
-        {% endif %}
+    {% if site.BUDDY_LOGIN and user.is_authenticated and request.author.agency_type == 'Student'%}
+        {% include "ndf/buddy.html" %}
     {% endif %}
 
     {% include "ndf/header_clix.html" %}
