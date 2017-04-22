@@ -4543,3 +4543,19 @@ ul.nav_menu_1 > li > a.selected, ul.nav_menu_1 > li > a:hover {
 .edit-note-btn i {
   margin-right: 5px;
 }
+
+/* line 4749, ../../../scss/_clix2017.scss */
+.jqtree-title > .fa-check {
+  color: green;
+}
+
+/* line 4752, ../../../scss/_clix2017.scss */
+.jqtree-title > .fa-clock-o {
+  color: orange;
+}
+
+/* line 4755, ../../../scss/_clix2017.scss */
+.course-status-icon {
+  font-size: 20px;
+  margin-right: 5px;
+}
