@@ -28,7 +28,7 @@
                     </p>
                 </div>
                 <div class="small-5 columns">
-          			<img src="/static/ndf/images/landing_page/bees.svg" class="bees"/>
+          			{# <img src="/static/ndf/images/landing_page/bees.svg" class="bees"/> #}
         		    </div>
                 {% if not user.is_authenticated  %}
                     <div class="small-6 medium-6 columns" data-equalizer-watch>
@@ -38,7 +38,7 @@
                           <!-- <form method="post" id="loginSubmit" action="/accounts/login/" data-abide="" novalidate="novalidate"> -->
                             
                             <a class="small expand" href="{% url 'auth_login' %}">
-                              <div class="small-6 medium-6 text-center columns end explore-button">
+                              <div class="small-6 medium-6 text-center columns end login-home-button">
                                   Login
                               </div>
                             </a>
@@ -47,7 +47,7 @@
 
                             {% get_explore_url as explore_url %}
                             <a class="small expand" href="{% url explore_url %}">
-                              <div class="small-6 medium-6 text-center columns end explore-button">
+                              <div class="small-6 medium-6 text-center columns end login-home-button">
                                   Explore Projects
                               </div>
                             </a>
@@ -94,6 +94,11 @@
     </div>
 
     </div>
+      
   </div>
+  {% include "ndf/footer_clix.html" %}
+
+
+
 
 {% endblock body_content %}

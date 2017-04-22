@@ -52,7 +52,7 @@ CKEDITOR.plugins.add('addJhapp',
                             $("#insert_runkittyrun").click(function(event){
                             //ost_text_gallery = $('#paste-ost-gallery').val();
                             //ost_text_file = $('#paste-ost-captions').val();
-                            bm_text_val = "<iframe src='/runkittyrun/' style='height:100vh;width:100%'></iframe>"
+                            bm_text_val = "<a href='/runkittyrun/' onclick='javascript:opneinnewindow() return false;' target='_blank'><img src='/static/ndf/images/RKR.jpg' alt='Run Kitty Run' height='1000px' width='1000px' >"
                             // split_word = ost_text_val.slice(0, 18) + "gallery=" + ost_text_gallery + "&amp;file=/ost/" + ost_text_file+"'"+ ost_text_val.slice(18);
                             // alert(split_word)
                              CKEDITOR.instances[textAreaId].insertHtml(bm_text_val);
@@ -71,7 +71,7 @@ CKEDITOR.plugins.add('addJhapp',
                             $("#insert_physics-video-player").click(function(event){
                             //ost_text_gallery = $('#paste-ost-gallery').val();
                             //ost_text_file = $('#paste-ost-captions').val();
-                            tjs_text_val = "<iframe src='/physics-video-player/' style='height:100vh;width:100%'></iframe>"
+                            tjs_text_val = "<a href='/physics-video-player/' onclick='javascript:opneinnewindow() return false;' target='_blank'><img src='/static/ndf/images/physics-video-player.jpg' alt='Physics Video Player' height='1000px' width='1000px' >"
                             // split_word = ost_text_val.slice(0, 18) + "gallery=" + ost_text_gallery + "&amp;file=/ost/" + ost_text_file+"'"+ ost_text_val.slice(18);
                             // alert(split_word)
                              CKEDITOR.instances[textAreaId].insertHtml(tjs_text_val);

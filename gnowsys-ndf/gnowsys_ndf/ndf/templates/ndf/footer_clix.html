@@ -1,0 +1,78 @@
+
+<footer>
+		<div class="footer_clix">
+			<div class="row">
+				<div class="footer-top">
+					<div class="row">
+						<p class="left footer-heading-left">Technology Partners</p>
+						<p class="right footer-heading-right">CLIx</p>
+					</div>
+				</div>
+					<div class="small-6 columns">
+						<div class="small-2 columns">
+							<a href="http://www.hbcse.tifr.res.in/" target="_blank">
+								<img src="/static/ndf/images/logos/tifr.png" class=""/>
+							</a>
+						</div>
+						<div class="small-2 columns">
+							<a href="http://www.mit.edu" target="_blank">
+								<img src="/static/ndf/images/mit-logo.png" class=""/>
+							</a>
+						</div>
+						<div class="small-2 columns">
+							<a href="http://www.tiss.edu/" target="_blank" >
+								<img src="/static/ndf/images/logos/tiss-logo-text.svg" class=""/>
+							</a>
+						</div>
+						<hr/>
+						<p class="footer-small-text">
+						<a href="#overlay" id="open-overlay">Terms of Use</a> | <a href="#overlay" id="open-overlay">Privacy</a></p>
+					</div>
+					<div class="right small-3 columns">
+                		<div class="footer_link_cont">
+                			<div class="links_collapse">
+                				<ul>
+									<li><a href="http://clix.tiss.edu/about/" target="_blank">About</a></li>
+									<li><a href="http://clix.tiss.edu/contact/" target="_blank">Contact</a></li>
+									<li><a href="http://www.tiss.edu/disclaimer/" target="_blank">Disclaimer</a></li>
+								</ul>
+							</div>
+							{# <div class="show_foot_links">Show More</div> #}
+					</div>
+				</div>
+				<hr/>
+			<div class="row">
+				<div class="footer-bottom" style="text-align:center">
+					<h6>Powered by<a href="https://gitlab.com/gnowledge/gstudio/tree/f245470" target="_blank"><b>gstudio</b></a>  built at  <a href="http://www.hbcse.tifr.res.in/" target="_blank"><b>Gnowledge  Lab of HBCSE</b></a> & <a href="http://osid.org/" target="_blank"><b>OSID</b></a></h6>
+					<br/>
+					<p class="footer-tiny"><i>Caveat Emptor! BETA site – testing in progress; please visit again for updates!</i></p>
+				</div>
+			</div>
+		</div>
+	</div>
+
+
+
+	<div id="overlay">
+		<a href="#" class="close">&times;</a>
+    <h2 style="font-size:35px">Coming Up! Please check after a while!</h2>
+	</div>
+	<div id="mask" onclick="document.location='#';"></div>
+
+
+</footer>
+<script>
+    $(document).ready(function(){
+        $('.show_foot_links').click(function(){
+            var col = $(this).parent().find('.links_collapse');
+            if(col.hasClass('links_show')){
+                col.removeClass('links_show');
+                $(this).text('Show More');
+            }
+            else{
+                col.addClass('links_show');
+                $(this).text('Show Less');
+            }
+        });
+    });
+</script>
