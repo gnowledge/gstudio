@@ -47,9 +47,9 @@
         <img class="unit_banner" src="/static/ndf/images/module_banner.png" style="height:50px ;width:50px"/>
     {% endif %}
     {% if node.altnames %}
-        <span class="unit_title" onclick="show_my_performance($(this))" data-node-id = "{{node.pk}}" title="{{node.altnames}}">{{node.altnames|truncatechars:20}}</span>
+        <span class="unit_title" title="{{node.altnames}}">{{node.altnames|truncatechars:20}}</span>
     {% else %}
-        <span class="unit_title" onclick="show_my_performance($(this))" data-node-id = "{{node.pk}}" title="{{node.name}}">{{node.name|truncatechars:20}}</span>
+        <span class="unit_title" title="{{node.name}}">{{node.name|truncatechars:20}}</span>
     {% endif %}
     </div>
     <div class="unit_desc">
@@ -72,8 +72,10 @@
     </div>
     {% endcomment %}
 
-    <div class="unit_actions">
-            <span>{% if group_counts %} Total Points :  {{get_unit_points}} {% else %} Continue {% endif %}</span>
+     <div class="unit_actions">
+            <span>{% if group_counts %} Total Points :  {{get_unit_points}} <a onclick="show_my_performance($(this))" data-node-id = "{{node.pk}}">Click here to see details.</span>{% else %} Continue {% endif %}</a>
     </div>
-</div>
+  
+    
+ </div>
      
