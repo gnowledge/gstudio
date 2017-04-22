@@ -113,10 +113,11 @@ def explore_groups(request,page_no=1):
             }
 
     if gstaff_access:
-        group_cur = node_collection.find(query).sort('last_update', -1)
+        query.update({'group_type': u'PRIVATE'})
     else:
-        query.update({'name': {'$nin': GSTUDIO_DEFAULT_GROUPS_LIST}})
-        group_cur = node_collection.find(query).sort('last_update', -1)
+        query.update({'name': {'$nin': GSTUDIO_DEFAULT_GROUPS_LIST},
+                    'group_type': u'PUBLIC'})
+    group_cur = node_collection.find(query).sort('last_update', -1)
 
     grp_page_cur = paginator.Paginator(group_cur, page_no, GSTUDIO_NO_OF_OBJS_PP)
     context_variable = {'title': title, 'groups_cur': group_cur, 'card': 'ndf/card_group.html',
@@ -143,6 +144,7 @@ def explore_basecourses(request,page_no=1):
     # ce_page_cur = paginator.Paginator(ce_cur, page_no, GSTUDIO_NO_OF_OBJS_PP)
 
     # parent_group_name, parent_group_id = Group.get_group_name_id(group_id)
+    '''
     ce_cur = node_collection.find({
                                     '_type': 'Group',
                                     # 'group_set': {'$in': [parent_group_id]},
@@ -158,6 +160,24 @@ def explore_basecourses(request,page_no=1):
                                     ],
                                     'status': u'PUBLISHED'
                                 }).sort('last_update', -1)
+    '''
+    gstaff_access = check_is_gstaff(group_id,request.user)
+
+    query = {'_type': 'Group', 'status': u'PUBLISHED',
+             'member_of': {'$in': [gst_base_unit_id]},
+            }
+
+    if gstaff_access:
+        query.update({'group_type': u'PRIVATE'})
+    else:
+        query.update({'group_type': u'PUBLIC'})
+        if request.user.is_authenticated():
+            query.update({'$and': [{'group_type': u'PRIVATE'},
+                                        {'created_by': request.user.id}]})
+    ce_cur = node_collection.find(query).sort('last_update', -1)
+
+
+
     ce_page_cur = paginator.Paginator(ce_cur, page_no, GSTUDIO_NO_OF_OBJS_PP)
     # print ce_cur.count()
     title = 'base courses'
