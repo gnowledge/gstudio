@@ -4167,7 +4167,10 @@ class Counter(DjangoDocument):
         'course':{'modules':{'completed':int, 'total':int}, 'units':{'completed':int, 'total':int}},
 
         # 'visited_nodes' = {str(ObjectId): int(count_of_visits)}
-        'visited_nodes': {basestring: int}
+        'visited_nodes': {basestring: int},
+        'assessment': {
+                    'offered_id': {'total': int, 'correct': int, 'incorrect': int}
+                    }
 
     }
 

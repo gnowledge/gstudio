@@ -151,6 +151,29 @@ class Command(BaseCommand):
         each_gattribute.save(triple_node=at_obj,triple_id=at_obj._id)
     # --------------------------------------------------------------------------
 
+    # adding 'assessments' in Counter instances:
+    # 'assessment': {
+    #             'offered_id': {'total': int, 'correct': int, 'incorrect': int}
+    #             }
+
+
+    ctr_res = counter_collection.collection.update({
+                    '_type': 'Counter',
+                    'assessment': {'$exists': False}
+                },
+                {
+                    '$set': {
+                            'assessment': {
+                                'offered_id': {'total': None, 'correct': None, 'incorrect': None},
+                            },
+                        }
+                },
+                upsert=False, multi=True)
+
+    if ctr_res['updatedExisting']: # and ctr_res['nModified']:
+        print "\n Added 'assessment' field to " + ctr_res['n'].__str__() + " Counter instances."
+
+
     # adding 'if_file' in GSystem instances:
     # 'if_file': {
     #         'mime_type': None,
