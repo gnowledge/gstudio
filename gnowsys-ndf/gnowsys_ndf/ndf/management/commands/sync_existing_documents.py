@@ -9,9 +9,9 @@ except ImportError:  # old pymongo
   from pymongo.objectid import ObjectId
 
 ''' imports from application folders/files '''
-from gnowsys_ndf.ndf.models import node_collection, triple_collection
+from gnowsys_ndf.ndf.models import node_collection, triple_collection, counter_collection
 from gnowsys_ndf.ndf.models import Node, db, AttributeType, RelationType, GSystem
-from gnowsys_ndf.settings import GSTUDIO_AUTHOR_AGENCY_TYPES, LANGUAGES, OTHER_COMMON_LANGUAGES, GSTUDIO_DEFAULT_LICENSE, GSTUDIO_DEFAULT_LANGUAGE
+from gnowsys_ndf.settings import GSTUDIO_AUTHOR_AGENCY_TYPES, LANGUAGES, OTHER_COMMON_LANGUAGES, GSTUDIO_DEFAULT_LICENSE, GSTUDIO_DEFAULT_LANGUAGE, GSTUDIO_DEFAULT_COPYRIGHT
 from gnowsys_ndf.ndf.views.methods import create_gattribute, create_grelation
 from gnowsys_ndf.ndf.templatetags.ndf_tags import get_relation_value, get_attribute_value
 
@@ -27,7 +27,8 @@ class Command(BaseCommand):
 
 
     # updating visited_nodes for Counter instances
-    counter_objs = counter_collection.collection.update({'_type': 'Counter', 'visited_nodes': {'$exists': False}},
+    counter_objs = counter_collection.collection.update({'_type': 'Counter',
+        'visited_nodes': {'$exists': False}},
         {'$set': {'visited_nodes': {}}},upsert=False, multi=True)  
     if counter_objs['nModified']:
         print "\n Updated Counters adding field: visited_nodes for " + all_ap['nModified'].__str__() + " instances."
@@ -49,21 +50,28 @@ class Command(BaseCommand):
 
 
     # Adds "legal" field (with default values) to all documents belonging to GSystems.
-    all_gs = node_collection.find({'_type': {'$in' : ['GSystem', 'Group', 'Author', 'File']},
+    all_gs = node_collection.collection.update({'_type': {'$in' : ['GSystem', 'Group', 'Author', 'File']},
                  '$or': [{'legal': {'$exists': False}}, {'license': {'$exists': True}}],
-                })
-    all_gs_count = all_gs.count()
-    if all_gs:
-        print "\n Total GSystems found to update 'legal' field: ", all_gs.count()
-        for index, each_gs in enumerate(all_gs):
-            try:
-                print "\n GSystem: ", index, ' of ', all_gs_count
-                each_gs.legal = {'copyright': each_gs.license, 'license': GSTUDIO_DEFAULT_LICENSE}
-                each_gs.pop('license')
-                each_gs.save()
-            except AttributeError as noLicense:
-                print "\n No license found for: ", each_gs._id
-                pass
+                },
+        {'$set': {'legal': {'copyright': GSTUDIO_DEFAULT_COPYRIGHT, 'license': GSTUDIO_DEFAULT_LICENSE}}, 
+        '$unset': {'license': None}},upsert=False, multi=True)  
+
+
+    # all_gs = node_collection.find({'_type': {'$in' : ['GSystem', 'Group', 'Author', 'File']},
+    #              '$or': [{'legal': {'$exists': False}}, {'license': {'$exists': True}}],
+    #             })
+    # all_gs_count = all_gs.count()
+    # if all_gs:
+    #     print "\n Total GSystems found to update 'legal' field: ", all_gs.count()
+    #     for index, each_gs in enumerate(all_gs):
+    #         try:
+    #             print "\n GSystem: ", index, ' of ', all_gs_count
+    #             each_gs.legal = {'copyright': each_gs.license, 'license': GSTUDIO_DEFAULT_LICENSE}
+    #             each_gs.pop('license')
+    #             each_gs.save()
+    #         except AttributeError as noLicense:
+    #             print "\n No license found for: ", each_gs._id
+    #             pass
 
     # --------------------------------------------------------------------------
     # Adding <'relation_type_scope': []> field to all RelationType objects
