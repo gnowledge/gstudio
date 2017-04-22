@@ -2032,7 +2032,22 @@ def activity_player_detail(request, group_id, lesson_id, activity_id):
         'resource_prev_id': resource_prev_id, 'resource_count': resource_count,
         'unit_resources_list_of_dict': unit_resources_list_of_dict
     })
+    active_user_ids_list = [request.user.id]
+    if GSTUDIO_BUDDY_LOGIN:
+        active_user_ids_list += Buddy.get_buddy_userids_list_within_datetime(request.user.id, datetime.datetime.now())
+    # removing redundancy of user ids:
+    active_user_ids_list = dict.fromkeys(active_user_ids_list).keys()
+    counter_objs_cur = Counter.get_counter_objs_cur(active_user_ids_list, group_id)
+    for each_counter_obj in counter_objs_cur:
+        # print "\n OLD updated counter_obj: ", each_counter_obj['visited_nodes']
+        if str(activity_id) in each_counter_obj['visited_nodes']:
+            each_counter_obj['visited_nodes'][str(activity_id)] = each_counter_obj['visited_nodes'][str(activity_id)] + 1
+        else:
+            each_counter_obj['visited_nodes'].update({str(activity_id): 1})
 
+        each_counter_obj.last_update = datetime.datetime.now()
+        each_counter_obj.save()
+        # print "\n updated counter_obj: ", each_counter_obj['visited_nodes']
     template = "ndf/activity_player.html"
 
     return render_to_response(template, variable)
@@ -2110,6 +2125,7 @@ def course_content(request, group_id):
     allow_to_join = get_group_join_status(group_obj)
     template = 'ndf/gcourse_event_group.html'
     unit_structure =  _get_unit_hierarchy(group_obj)
+    visited_nodes = []
     if 'BaseCourseGroup' in group_obj.member_of_names_list:
         template = 'ndf/basecourse_group.html'
     if 'base_unit' in group_obj.member_of_names_list:
@@ -2117,33 +2133,18 @@ def course_content(request, group_id):
     if 'announced_unit' in group_obj.member_of_names_list:
         template = 'ndf/lms.html'
     banner_pic_obj,old_profile_pics = _get_current_and_old_display_pics(group_obj)
-    '''
-    banner_pic_obj = None
-    old_profile_pics = []
-    if not banner_pic_obj:
-        for each in group_obj.relation_set:
-            if "has_banner_pic" in each:
-                banner_pic_obj = node_collection.one(
-                    {'_type': {'$in': ["GSystem", "File"]}, '_id': each["has_banner_pic"][0]}
-                )
-                break
-
-    has_banner_pic_rt = node_collection.one({'_type': 'RelationType', 'name': unicode('has_banner_pic') })
-    all_old_prof_pics = triple_collection.find({'_type': "GRelation", "subject": group_obj._id, 'relation_type': has_banner_pic_rt._id, 'status': u"DELETED"})
-
-    if all_old_prof_pics:
-        for each_grel in all_old_prof_pics:
-            n = node_collection.one({'_id': ObjectId(each_grel.right_subject)})
-            if n not in old_profile_pics:
-                old_profile_pics.append(n)
-    '''
-
+    if request.user.is_authenticated():
+        counter_obj = Counter.get_counter_obj(request.user.id, ObjectId(group_id))
+        if counter_obj:
+            # visited_nodes = map(str,counter_obj['visited_nodes'].keys())
+            visited_nodes = counter_obj['visited_nodes']
     context_variables = RequestContext(request, {
             'group_id': group_id, 'groupid': group_id, 'group_name':group_name,
             'group_obj': group_obj,'node': group_obj, 'title': 'course content',
             'allow_to_join': allow_to_join,
             'old_profile_pics':old_profile_pics, "prof_pic_obj": banner_pic_obj,
-            'unit_structure': json.dumps(unit_structure,cls=NodeJSONEncoder)
+            'unit_structure': json.dumps(unit_structure,cls=NodeJSONEncoder),
+            'visited_nodes': json.dumps(visited_nodes)
             })
     return render_to_response(template, context_variables)
 
