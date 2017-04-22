@@ -265,8 +265,10 @@
                                 <img src="{{MEDIA_URL}}{{each.if_file.mid.relurl}}"/>
                                 {% elif  each.if_file.thumbnail.relurl %}
                                 <img src="{{MEDIA_URL}}{{each.if_file.thumbnail.relurl}}"/>
+                                {% elif  'audio' in each.if_file.mime_type %}
+                                <img src="/static/ndf/images/audio.png"/>
                                 {% else %}
-                                <img src="/static/ndf/images/asset_thumbnail.png"/>
+                                <img src="/static/ndf/images/file.png"/>
                                 {% endif %}
                             </a>
                         </div>
