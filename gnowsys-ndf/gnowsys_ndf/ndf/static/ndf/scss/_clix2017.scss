@@ -4306,7 +4306,7 @@ $module-card-lines-to-show: 3;
 
 
             .unit_name {
-                font-size: 30px;
+                font-size: 36px;
                 font-family: OpenSans-Semibold;
                 display: block;
                 margin-top: 90px;
@@ -4316,19 +4316,22 @@ $module-card-lines-to-show: 3;
                 text-shadow: 3px 2px #164a7b;
             }
             .enroll-unit{
-                margin-top: 100px;
-                margin-right: -45px;
-                padding: 1px 5px 1px 5px;
-                text-transform: none;
-                text-align: center;
-                cursor: pointer;
-                font-family: OpenSans-Semibold;
-                color: #ffc14e;
-               // margin-right: 103px;
-                box-shadow: 0.6px 0.9px #164a7b;
-                text-shadow: 1px 1px #164a7b;
-                opacity: 1;
-                margin-right:6px;
+                    margin-top: 100px;
+                    margin-right: -45px;
+                    padding: 1px 5px 1px 5px;
+                    text-transform: none;
+                    text-align: center;
+                    cursor: pointer;
+                    font-family: OpenSans-Semibold;
+                    color: #ffc14e;
+                    box-shadow: 0.6px 0.9px #164a7b;
+                    text-shadow: 1px 1px #164a7b;
+                    opacity: 1;
+                    margin-right: 6px;
+                    border-radius: 4px;
+                    border: 1px solid #c1b4b5;
+                    background-color: #4b4852;
+
 
                 &>a{
                     color:white;
@@ -4341,16 +4344,16 @@ $module-card-lines-to-show: 3;
             }
 
             .enroll_unit{
-                margin-top: 100px;
-                margin-right: 50px;
-                border: 2px solid #ffc14e;
-                border-radius: 6px;
-                padding: 1px 5px 1px 5px;
-                text-transform: none;
-                text-align: center;
-                cursor: pointer;
-                color: #000;
-                font-family: OpenSans-Semibold;
+                    margin-top: 100px;
+                    /* margin-right: -5px; */
+                    /* border: 2.2px solid #e6a109; */
+                    border-radius: 6px;
+                    text-transform: none;
+                    text-align: center;
+                    cursor: pointer;
+                    color: #000;
+                    //border: 1px solid rgba(255, 255, 255, 0.7);
+                    font-family: OpenSans-Semibold;
 
                 &>a{
                     color:white;
@@ -4803,7 +4806,7 @@ ul.nav_menu_1 {
                 padding-top: 5px;
                 color: rgba(107, 0, 83, 0.66);
                 font-family: 'OpenSans-Semibold';
-                margin-right: 180px;
+                margin-right: 271px;
                 padding-bottom: 5px;
                 letter-spacing: 0.5px;
         }
