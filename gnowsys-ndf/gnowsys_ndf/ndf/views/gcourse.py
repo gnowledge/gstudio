@@ -2671,6 +2671,9 @@ def course_analytics(request, group_id, user_id, render_template=False, get_resu
     # without being redirected to template. So that this method can
     # use to get dict result data in shell or for any command.
     # this will omit data from request.
+    unit_id = request.GET.get("data_unit_id",'')
+    if unit_id:
+        group_id = ObjectId(unit_id)
     if request and not get_result_dict:
         cache_key = u'course_analytics' + unicode(group_id) + "_" + unicode(user_id)
         cache_result = cache.get(cache_key)

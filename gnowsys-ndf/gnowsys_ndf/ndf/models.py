@@ -4251,7 +4251,7 @@ class Counter(DjangoDocument):
         group_id = ObjectId(group_id)
 
         # query and check for existing counter obj:
-        counter_obj = counter_collection.one({'user_id': user_id, 'group_id': group_id})
+        counter_obj = counter_collection.find_one({'user_id': user_id, 'group_id': group_id})
 
         # create one if not exists:
         if not counter_obj :

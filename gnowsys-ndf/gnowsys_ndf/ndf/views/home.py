@@ -171,3 +171,16 @@ def landing_page(request):
 #             # If user is not loggedin it will redirect to home as our base group.
 #             #return "/home/dashboard/group"
 #             return "/home/"
+
+@get_execution_time
+def help_page_view(request,page_id):
+    page_obj = Node.get_node_by_id(page_id)
+    return render_to_response(
+                                        "ndf/help_page.html",
+                                        {
+                                            "group_id": page_id,
+                                            'title': 'Help',
+                                            'page_obj':page_obj
+                                        },
+                                        context_instance=RequestContext(request)
+                                    )
