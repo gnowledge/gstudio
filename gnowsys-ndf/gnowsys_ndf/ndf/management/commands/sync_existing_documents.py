@@ -31,7 +31,7 @@ class Command(BaseCommand):
         'visited_nodes': {'$exists': False}},
         {'$set': {'visited_nodes': {}}},upsert=False, multi=True)  
     if counter_objs['nModified']:
-        print "\n Updated Counters adding field: visited_nodes for " + all_ap['nModified'].__str__() + " instances."
+        print "\n Updated Counters adding field: visited_nodes for " + counter_objs['nModified'].__str__() + " instances."
           
 
     # updating access_policy from inconsistent values like 'public', 'Public' to 'PUBLIC'
