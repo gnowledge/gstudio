@@ -2680,6 +2680,9 @@ def course_analytics(request, group_id, user_id, render_template=False, get_resu
     #                                 cache_result,
     #                                 context_instance = RequestContext(request)
     #                             )
+    unit_id = request.GET.get("data_unit_id",'')
+    if unit_id:
+        group_id = ObjectId(unit_id)
 
     group_obj   = get_group_name_id(group_id, get_obj=True)
     group_id    = group_obj._id
