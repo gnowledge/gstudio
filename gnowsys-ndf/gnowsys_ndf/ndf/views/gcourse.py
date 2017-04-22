@@ -2220,7 +2220,7 @@ def course_notebook(request, group_id, node_id=None, tab="my-notes"):
             #updating counters collection
             # update_notes_or_files_visited(request.user.id, ObjectId(group_id),ObjectId(node_id),False,True)
             if request.user.is_authenticated():
-                Counter.add_visit_count.delay(resource_obj_or_id=notebook_obj._id.__str__(),
+                Counter.add_visit_count(resource_obj_or_id=notebook_obj._id.__str__(),
                                         current_group_id=group_id.__str__(),
                                         loggedin_userid=request.user.id)
 
@@ -3227,6 +3227,12 @@ def assetcontent_detail(request, group_id, asset_id,asst_content_id):
             'groupid':group_id,'node':assetcontent_obj,'asset_obj':asset_obj,
             'title':"asset_content_detail"
         }
+    if request.user.is_authenticated():
+        # Counter.add_visit_count.delay(resource_obj_or_id=file_obj._id.__str__(),
+        Counter.add_visit_count(resource_obj_or_id=assetcontent_obj._id.__str__(),
+                                current_group_id=group_obj._id.__str__(),
+                                loggedin_userid=request.user.id)
+
     if "announced_unit" in group_obj.member_of_names_list and  "raw@material" in asset_obj.tags or "asset@gallery" in asset_obj.tags:
         template = 'ndf/lms.html'
         if "raw@material" in asset_obj.tags:
