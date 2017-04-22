@@ -102,7 +102,7 @@
         </span>
         <div class="row">
           <div class="columns small-12 medium-4">
-            <span class="course-metric-heading">Files Created</span>
+            <span class="course-metric-heading">Files Uploaded</span>
             <span class="course-metric-count user_files">{{user_files}}</span>
           </div>
           <div class="columns small-12 medium-4">
@@ -116,7 +116,7 @@
         </div>
         <div class="row">
           <div class="columns small-12 medium-4">
-            <span class="course-metric-heading">Others File Visited</span>
+            <span class="course-metric-heading">Visits on Other Files</span>
             <span class="course-metric-count total_files_viewed_by_user">{{total_files_viewed_by_user}}</span>
           </div>
           <div class="columns small-12 medium-4">
@@ -166,27 +166,38 @@
           </div>
         </div>
       </div>
-      <div class="course-notes course-section">
+
+      <div class="course-gallery-uploads course-section">
         <span class="course-section-heading">Note Making</span>
         <span class="course-section-icon">
-          <i class="fa fa-book"></i>
+          <i class="fa fa-file-text"></i>
         </span>
         <div class="row">
-          <div class="columns small-12 medium-6">
+          <div class="columns small-12 medium-4">
             <span class="course-metric-heading">Notes Written</span>
             <span class="course-metric-count user_notes">{{user_notes}}</span>
           </div>
-          <div class="columns small-12 medium-6">
+          <div class="columns small-12 medium-4">
             <span class="course-metric-heading">Views Gained</span>
             <span class="course-metric-count others_reading_my_notes">{{others_reading_my_notes}}</span>
           </div>
+          <div class="columns small-12 medium-4">
+            <span class="course-metric-heading">Comments recieved</span>
+            <span class="course-metric-count cmts_on_user_notes">{{cmts_on_user_notes}}</span>
+          </div>
         </div>
         <div class="row">
-          <div class="columns small-12 medium-6">
-            <span class="course-metric-heading">Others notes visited</span>
+          <div class="columns small-12 medium-4">
+            <span class="course-metric-heading">Visits on Other Notes</span>
             <span class="course-metric-count total_notes_read_by_user">{{total_notes_read_by_user}}</span>
           </div>
-          <div class="columns small-12 medium-6">
+          <div class="columns small-12 medium-4">
+            <span class="course-metric-heading">Comments on other notes</span>
+            <span class="course-metric-count commented_on_others_notes">{{commented_on_others_notes}}</span>
+          </div>
+        </div>
+        <div class="row">
+          <div class="columns small-12">
             <span class="course-metric-heading">Avg. Rating Awarded</span>
             <span class="course-metric-count">
               <div class="row total_rating_rcvd_on_notes">
