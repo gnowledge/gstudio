@@ -14,8 +14,6 @@
 	function saveBuddies () {
 		var selectedBuddiesArr = getSelectedValues('select_buddies');
 		// console.log(selectedBuddiesArr)
-		// console.log(JSON.stringify(selectedBuddiesArr))
-		// alert(selectedBuddiesArr)
 
 		$.ajax({
 			url: "{% url 'update_buddies' group_id %}",

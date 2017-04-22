@@ -58,7 +58,7 @@
     <!-- END of RHS Buddy Panel -->
 
 
-    <!--Modal for Buddy.-->
+    <!--Modal for Adding Buddy.-->
     <div class="reveal-modal add_buddy_modal" id="add_buddy_modal" data-reveal aria-labelledby="modalTitle" aria-hidden="true" role="dialog">
         <div class="modal_header">
             <div class="modal_title"> Add a buddy</div>
@@ -101,7 +101,7 @@
             </div>
         </div>
     </div>
-    <!-- END of Modal for Buddy.-->
+    <!-- END of Modal for Adding Buddy.-->
 
     <div class="reveal-modal delete_buddy_modal small" id="delete_buddy_modal" data-reveal aria-labelledby="modalTitle" aria-hidden="true" role="dialog">
         <div>Are you sure you want to delete the buddy?</div>
@@ -184,24 +184,24 @@
              * ColorId: String
              * @type {Array}
              */
-            var onlineBuddies = [
-                {
-                  id: 1,
-                  animalId: 1,
-                  colorId: 1,
-                  isActive: true,
-                  isEditable: false,
-                  isDeletable: true,
-                },
-                {
-                  id: 2,
-                  animalId: 1,
-                  colorId: 6,
-                  isActive: false,
-                  isEditable: false, //Implementation removed.
-                  isDeletable: true,
-                }
-            ];
+            // var onlineBuddies = [
+            //     {
+            //       id: 1,
+            //       animalId: 1,
+            //       colorId: 1,
+            //       isActive: true,
+            //       isEditable: false,
+            //       isDeletable: true,
+            //     },
+            //     {
+            //       id: 2,
+            //       animalId: 1,
+            //       colorId: 6,
+            //       isActive: false,
+            //       isEditable: false, //Implementation removed.
+            //       isDeletable: true,
+            //     }
+            // ];
 
             var colorsList = [
                 {
@@ -842,26 +842,28 @@
                 animalsKeyNameMap[animalObj.name] = animalObj;
             });
 
-            var onlineBuddies = [
-                {
-                  id: 1,
-                  animalId: 1,
-                  colorId: 1,
-                  isActive: true,
-                  isEditable: false,
-                  isDeletable: true,
-                },
-                {
-                  id: 2,
-                  animalId: 1,
-                  colorId: 6,
-                  isActive: false,
-                  isEditable: false, //Implementation removed.
-                  isDeletable: true,
-                }
-            ];
-
             onlineBuddies = []
+
+            function addInOnlineBuddies(authId, animalName, colorName) {
+              var animalObj = animalsKeyNameMap[animalName];
+              var colorObj = colorsKeyNameMap[colorName]
+
+              if (animalName && colorName){
+                onlineBuddies.push({
+                                    // id: animalObj.id,
+                                    id: authId,
+                                    authId: authId,
+                                    animalId: animalObj.id,
+                                    animalName: animalName,
+                                    colorId: colorObj.id,
+                                    colorName: colorName,
+                                    isActive: false,
+                                    isEditable: false, //Implementation removed.
+                                    isDeletable: true,
+                                  })
+              }
+              updateBuddyObjectMap(onlineBuddies)
+            }
 
             buddies_authid_name_dict_js = {{request.session.buddies_authid_name_dict|safe}}
             // console.log(buddies_authid_name_dict_js)
@@ -870,24 +872,29 @@
               var buddyNameSplit = buddyName.split('-');
               var buddyColorName = buddyNameSplit[0];
               var buddyAnimalName = buddyNameSplit[1];
-              var buddyInstCodeName = buddyNameSplit[2];
+              // var buddyInstCodeName = buddyNameSplit[2];
               // var animalSVGObj = animalsKeyNameMap[buddyAnimalName];
-              // console.log(colorsKeyIdMap[buddyColorName])
-              if (buddyAnimalName && buddyColorName){
+              // var colorObj = colorsKeyNameMap[buddyColorName]
 
-                onlineBuddies.push({
-                                    id: 2,
-                                    // animalId: animalSVGObj.id,
-                                    animalName: buddyAnimalName,
-                                    colorName: buddyColorName,
-                                    isActive: false,
-                                    isEditable: false, //Implementation removed.
-                                    isDeletable: true,
-                                  })
-              }
+              addInOnlineBuddies(buddyAuthId, buddyAnimalName, buddyColorName)
+              // if (buddyAnimalName && buddyColorName){
+
+              //   onlineBuddies.push({
+              //                       // id: animalSVGObj.id,
+              //                       id: buddyAuthId,
+              //                       authId: buddyAuthId,
+              //                       animalId: animalSVGObj.id,
+              //                       animalName: buddyAnimalName,
+              //                       colorId: colorObj.id,
+              //                       colorName: buddyColorName,
+              //                       isActive: false,
+              //                       isEditable: false, //Implementation removed.
+              //                       isDeletable: true,
+              //                     })
+              // }
             }
-            console.log(onlineBuddies)
-            var onlineBuddiesMap = {};
+            // console.log(onlineBuddies)
+            onlineBuddiesMap = {};
             /**
              * Creates a Object with id as buddy id and object as value.
              * This is useful for quick access of the buddy info by id.
@@ -903,7 +910,7 @@
              * Function to update the buddy panel with
              * udpate list of joined buddies
              */
-            function upadteBuddyPanel(activeBuddiesList) {
+            function updateBuddyPanel(activeBuddiesList) {
                 // Creates a list of objects with id replaced by equivalent objects.
                 var activeBuddyMap = activeBuddiesList.map(function(buddy){
                     return {
@@ -924,7 +931,7 @@
                 updateBuddyObjectMap(activeBuddiesList)
             }
 
-            upadteBuddyPanel(onlineBuddies);
+            updateBuddyPanel(onlineBuddies);
             //console.log(activeBuddyTemplate(context));
 
             // Populating the colors from the list of colors
@@ -988,26 +995,18 @@
                     }
                     $('.add_buddy_step_2').find('[data=' + id + ']').addClass('selected');
                 }
+                // console.log(currentSelectedBuddy)
+                // console.log(getDuplicateBuddies(currentSelectedBuddy))
             }
 
-            /**
-             * When a user selects a color we update the current* variables.
-             * We also update the sample logo on top right corner.
-             */
-            $('.add_buddy_step_1').on('click', '.buddy_color_option', function() {
-                selectColor(parseInt($(this).attr('data')));
-            });
+            function getDuplicateBuddies(selectedBuddy) {
+                let duplicateBuddies = onlineBuddies.filter(function(buddy){
+                    return (buddy.animalId === selectedBuddy.animalId && buddy.colorId === selectedBuddy.colorId);
+                });
+                return duplicateBuddies;
+            }
 
-            /**
-             * When a user selects a animal we update the current* variables.
-             * We also update the sample logo on top right corner.
-             */
-            $('.add_buddy_step_2').on('click', '.buddy_animal', function() {
-                selectAnimal(parseInt($(this).attr('data')));
-            });
-
-            // Create the buddy logo
-            $('.add_buddy_icon').on('click', function() {
+            function resetBuddyModal() {
                 isEditMode = false;
                 currentSelectedBuddy = {};
                 currentSelectedAnimal = {};
@@ -1016,6 +1015,36 @@
                 selectColor();
                 $('.sample_buddy svg').empty();
                 $('.add_buddy_submit').html('Add');
+            }
+
+            function removeDuplicateSelectedBuddy (currentSelectedBuddy) {
+              if (getDuplicateBuddies(currentSelectedBuddy).length) {
+                  alert('You can not select already added buddy.\n\nYou may choose another :)');
+                  resetBuddyModal()
+                };
+            }
+            /**
+             * When a user selects a color we update the current* variables.
+             * We also update the sample logo on top right corner.
+             */
+            $('.add_buddy_step_1').on('click', '.buddy_color_option', function() {
+                selectColor(parseInt($(this).attr('data')));
+                removeDuplicateSelectedBuddy (currentSelectedBuddy)
+            });
+
+            /**
+             * When a user selects a animal we update the current* variables.
+             * We also update the sample logo on top right corner.
+             */
+            $('.add_buddy_step_2').on('click', '.buddy_animal', function() {
+                selectAnimal(parseInt($(this).attr('data')));
+                removeDuplicateSelectedBuddy (currentSelectedBuddy)
+            });
+
+            // Create the buddy logo
+            $('.add_buddy_icon').on('click', function() {
+                // at modal opening time
+                resetBuddyModal()
             });
 
             /**
@@ -1057,17 +1086,87 @@
                 console.log('Deleted the buddy');
             })
 
-            function getDuplicateBuddies(selectedBuddy) {
-                let duplicateBuddies = onlineBuddies.filter(function(buddy){
-                    return (buddy.animalId === selectedBuddy.animalId && buddy.colorId === selectedBuddy.colorId);
-                });
-                return duplicateBuddies;
-            }
-
             var buddyIdCount = 3;
             /**
              * On submitting the buddy form you can take actions based on the mode.
              */
+            function getAuthId(colorName, animalName){
+              var buddyInstCodeName = "{{site.INSTITUTE_ID}}";
+              var buddyName = colorName.trim() + "-" + animalName.trim() + "-" + buddyInstCodeName;
+              // console.log(buddyName);
+              var auth_id = 0;
+              $.ajax({
+                url: "{% url 'get_buddy_auth_id_from_name' group_id %}",
+                type: 'GET',
+                data: {selected_buddy_username: buddyName},
+                success: function (data) {
+                  alert(data)
+                  if (data['success']){
+                    auth_id = data
+                  }
+                  else{
+                    auth_id = 0
+                  }
+                }
+              })
+              console.log("jjjjjjjjjj : " + auth_id)
+              return auth_id
+            }
+
+
+            function saveBuddies (selectedBuddiesArr) {
+                                      
+              $.ajax({
+                url: "{% url 'update_buddies' group_id %}",
+                type: 'POST',
+                data: {
+                  selected_buddies_list: JSON.stringify(selectedBuddiesArr),
+                  csrfmiddlewaretoken: '{{ csrf_token }}'
+                },
+                success: function (data) {
+                  // console.log(data);
+                  var resultData = JSON.parse(data)
+                  var buddyOidNameObj = resultData['buddies'];
+                  var alreadyActiveIdNameObj = resultData['already_active'];
+
+                  displayMsg = buddyUserNames = alreadyActiveUserNames = '';
+
+                  for(var eachUserName in buddyOidNameObj){
+                    // console.log(buddyOidNameObj[eachUserName]);
+                    buddyUserNames += '\n- ' + buddyOidNameObj[eachUserName]
+                  }
+
+                  for(var eachUserName in alreadyActiveIdNameObj){
+                    // console.log(alreadyActiveIdNameObj[eachUserName]);
+                    alreadyActiveUserNames += '\n- ' + alreadyActiveIdNameObj[eachUserName]
+                  }
+                  // console.log(alreadyActiveUserNames);
+
+                  if (alreadyActiveUserNames)
+                  {
+                    displayMsg += 'Following can not be your buddies (because they are already active on site, either as a buddy or as a logged in user):\n'
+                    displayMsg += alreadyActiveUserNames;
+                  }
+
+                  if (buddyUserNames)
+                  {
+                    displayMsg += '\n\nCurrently, following are your buddies:\n'
+                    displayMsg += buddyUserNames;
+                  }
+                  else
+                  {
+                    displayMsg += '\n\nCurrently, you have NO buddies:\n'
+                  };
+
+                  alert(displayMsg);
+                  location.reload();
+                  // addInOnlineBuddies(authId, buddyAnimalName, buddyColorName)
+                  //         updateBuddyPanel(onlineBuddies);
+                }
+              });
+            }
+
+
             $('.add_buddy_submit').on('click', function(e) {
                 e.preventDefault();
                 if (!currentSelectedColor.id) {
@@ -1111,6 +1210,7 @@
                         }
                     });
                 } else {
+                  console.log(currentSelectedBuddy)
                     /**
                      * Send a api request to add a new buddy
                      * New Buddy information is in the currentSelectedBuddy
@@ -1125,17 +1225,31 @@
                      *
                      */
                     if (getDuplicateBuddies(currentSelectedBuddy).length === 0) {
-                        onlineBuddies.push({
-                            id: buddyIdCount++,
-                            animalId: currentSelectedAnimal.id,
-                            colorId: currentSelectedColor.id,
-                            isActive: true,
-                            isEditable: false,
-                            isDeletable: true,
-                        });
+
+                        var buddyColorName = colorsKeyIdMap[currentSelectedColor.id].color;
+                        var buddyAnimalName = animalsKeyIdMap[currentSelectedAnimal.id].name;
+                        authId = getAuthId(buddyColorName, buddyAnimalName)
+                        console.log(authId)
+                        if (authId == 0){
+                          alert('This buddy seems to be online with somebody.');
+                        }
+                        else{
+                          listOfOID = Object.keys(onlineBuddiesMap)
+                          // call ajax to save buddy
+                          saveBuddies(listOfOID)
+                          
+                        }
+                        // onlineBuddies.push({
+                        //     id: buddyIdCount++,
+                        //     animalId: currentSelectedAnimal.id,
+                        //     colorId: currentSelectedColor.id,
+                        //     isActive: true,
+                        //     isEditable: false,
+                        //     isDeletable: true,
+                        // });
                         $('#add_buddy_modal').foundation('reveal', 'close');
                         // You can do a submit or ajax call from here
-                        upadteBuddyPanel(onlineBuddies);
+                        // console.log(onlineBuddies)
                     } else {
                         alert('Buddy already exist with this animal and color.');
                     }
@@ -1147,7 +1261,7 @@
                 onlineBuddies = onlineBuddies.filter(function(buddy){
                   return buddy.id !== buddyToDelete.id;
                 });
-                upadteBuddyPanel(onlineBuddies);
+                updateBuddyPanel(onlineBuddies);
             }
 
             /*
