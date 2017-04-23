@@ -37,7 +37,7 @@
 
                 <li class="has-dropdown buddy_margin">
                     {% get_profile_pic request.user.pk as prof_pic %}
-                    <a href="{% url 'dashboard' request.user.pk %}">
+                    <!-- <a href="{% url 'dashboard' request.user.pk %}"> -->
                     {% if prof_pic %}
                       <img src="{{MEDIA_URL}}{{prof_pic.if_file.original.relurl}}" id="profile-img">
                       {{ user.username }}
@@ -45,7 +45,7 @@
                             <img class="profile-img" style="background-color:rgba(0, 0, 0, 0.34);" src="/static/ndf/bower_components/foundation-icon-fonts/svgs/fi-torso.svg" >
                             {{ user.username }}
                     {% endif %}
-                    </a>
+                    <!-- </a> -->
                     <ul class="dropdown">
                         <li class="text-center">
                           <a href="{% url 'auth_password_change' %}">{% trans "Change Password" %}</a>
