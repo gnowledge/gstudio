@@ -2312,7 +2312,7 @@ def course_raw_material(request, group_id, node_id=None,page_no=1):
         #updating counters collection
         # update_notes_or_files_visited(request.user.id, ObjectId(group_id),ObjectId(node_id),True,False)
         if request.user.is_authenticated():
-            Counter.add_visit_count.delay(resource_obj_or_id=file_obj._id.__str__(),
+            Counter.add_visit_count(resource_obj_or_id=file_obj._id.__str__(),
                                     current_group_id=group_id.__str__(),
                                     loggedin_userid=request.user.id)
 
@@ -2397,7 +2397,7 @@ def course_gallery(request, group_id,node_id=None,page_no=1):
         # updating counters collection:
         # update_notes_or_files_visited(request.user.id, ObjectId(group_id),ObjectId(node_id),True,False)
         if request.user.is_authenticated():
-            Counter.add_visit_count.delay(resource_obj_or_id=file_obj._id.__str__(),
+            Counter.add_visit_count(resource_obj_or_id=file_obj._id.__str__(),
                                     current_group_id=group_id.__str__(),
                                     loggedin_userid=request.user.id)
 
