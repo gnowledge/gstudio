@@ -2032,22 +2032,23 @@ def activity_player_detail(request, group_id, lesson_id, activity_id):
         'resource_prev_id': resource_prev_id, 'resource_count': resource_count,
         'unit_resources_list_of_dict': unit_resources_list_of_dict
     })
-    active_user_ids_list = [request.user.id]
-    if GSTUDIO_BUDDY_LOGIN:
-        active_user_ids_list += Buddy.get_buddy_userids_list_within_datetime(request.user.id, datetime.datetime.now())
-    # removing redundancy of user ids:
-    active_user_ids_list = dict.fromkeys(active_user_ids_list).keys()
-    counter_objs_cur = Counter.get_counter_objs_cur(active_user_ids_list, group_id)
-    for each_counter_obj in counter_objs_cur:
-        # print "\n OLD updated counter_obj: ", each_counter_obj['visited_nodes']
-        if str(activity_id) in each_counter_obj['visited_nodes']:
-            each_counter_obj['visited_nodes'][str(activity_id)] = each_counter_obj['visited_nodes'][str(activity_id)] + 1
-        else:
-            each_counter_obj['visited_nodes'].update({str(activity_id): 1})
+    if request.user.is_authenticated():
+        active_user_ids_list = [request.user.id]
+        if GSTUDIO_BUDDY_LOGIN:
+            active_user_ids_list += Buddy.get_buddy_userids_list_within_datetime(request.user.id, datetime.datetime.now())
+        # removing redundancy of user ids:
+        active_user_ids_list = dict.fromkeys(active_user_ids_list).keys()
+        counter_objs_cur = Counter.get_counter_objs_cur(active_user_ids_list, group_id)
+        for each_counter_obj in counter_objs_cur:
+            # print "\n OLD updated counter_obj: ", each_counter_obj['visited_nodes']
+            if str(activity_id) in each_counter_obj['visited_nodes']:
+                each_counter_obj['visited_nodes'][str(activity_id)] = each_counter_obj['visited_nodes'][str(activity_id)] + 1
+            else:
+                each_counter_obj['visited_nodes'].update({str(activity_id): 1})
 
-        each_counter_obj.last_update = datetime.datetime.now()
-        each_counter_obj.save()
-        # print "\n updated counter_obj: ", each_counter_obj['visited_nodes']
+            each_counter_obj.last_update = datetime.datetime.now()
+            each_counter_obj.save()
+            # print "\n updated counter_obj: ", each_counter_obj['visited_nodes']
     template = "ndf/activity_player.html"
 
     return render_to_response(template, variable)
