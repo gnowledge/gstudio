@@ -317,10 +317,10 @@ def find_file_from_media_url(source_attr):
             file_node = node_collection.find_one({"$or": [{'if_file.original.relurl': source_attr},
                 {'if_file.mid.relurl': source_attr},{'if_file.thumbnail.relurl': source_attr}]})
 
-        # elif "readDoc" in source_attr:
-        #     split_src = source_attr.split('/')
-        #     node_id = split_src[split_src.index('readDoc') + 1]
-        #     file_node = node_collection.one({'_id': ObjectId(node_id)})
+        elif "readDoc" in source_attr:
+            split_src = source_attr.split('/')
+            node_id = split_src[split_src.index('readDoc') + 1]
+            file_node = node_collection.one({'_id': ObjectId(node_id)})
 
         if file_node:
             log_file.write("\n media file_node gs found:  " + str(file_node._id) )

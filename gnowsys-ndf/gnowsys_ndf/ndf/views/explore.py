@@ -113,7 +113,7 @@ def explore_groups(request,page_no=1):
             }
 
     if gstaff_access:
-        query.update({'group_type': u'PRIVATE'})
+        query.update({'group_type': {'$in': [u'PUBLIC', u'PRIVATE']}})
     else:
         query.update({'name': {'$nin': GSTUDIO_DEFAULT_GROUPS_LIST},
                     'group_type': u'PUBLIC'})
