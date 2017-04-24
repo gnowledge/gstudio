@@ -4351,12 +4351,15 @@ $module-card-lines-to-show: 3;
                     opacity: 1;
                     margin-right: 6px;
                     border-radius: 4px;
-                    border: 1px solid #c1b4b5;
-                    background-color: #4b4852;
+                   // border: 1px solid #c1b4b5;
+                   // background-color: #4b4852;
 
 
                 &>a{
                     color:white;
+                    border: 1px solid #c1b4b5;
+                    background-color: #4b4852;
+                    padding: 1px 6px 1px 7px;
                 }
                 &:hover{
                 //background-color:rgba(255,193,78,0.3);
@@ -4376,6 +4379,8 @@ $module-card-lines-to-show: 3;
                     color: #000;
                     //border: 1px solid rgba(255, 255, 255, 0.7);
                     font-family: OpenSans-Semibold;
+                    border: 1px solid #c1b4b5;
+                    background-color: #4b4852;
 
                 &>a{
                     color:white;
@@ -4385,6 +4390,21 @@ $module-card-lines-to-show: 3;
                 cursor:pointer;
                 color:#ffc14e;
                 //margin-right:6px;
+                }
+                .enroll-btn{
+                    width: 90px;
+                opacity: 1;
+                background-color: rgba(0,0,0,.1);
+                /* margin-bottom: -69px; */
+                color: #ffc14e;
+                background-color: none;
+                /* margin-bottom: 8px; */
+                cursor: pointer;
+                padding: 1px 5px 1px 5px;
+                border-radius: 6px;
+                //border: 2px solid #ffc14e;
+                border: 1px solid #c1b4b5;
+                background-color: #4b4852;
                 }
             }
 
@@ -4421,20 +4441,7 @@ $module-card-lines-to-show: 3;
     }
 }
 
-.enroll-btn{
-                width: 90px;
-                opacity: 1;
-                background-color: rgba(0,0,0,.1);
-                /* margin-bottom: -69px; */
-                color: #ffc14e;
-                background-color: none;
-                /* margin-bottom: 8px; */
-                cursor: pointer;
-                padding: 1px 5px 1px 5px;
-                border-radius: 6px;
-                border: 2px solid #ffc14e;
 
-            }
 
             
 
@@ -5005,3 +5012,19 @@ ul.nav_menu_1 {
     -o-border-radius: 10px;
 }
 
+.enroll-btn{
+                width: 90px;
+                opacity: 1;
+                background-color: rgba(0,0,0,.1);
+                /* margin-bottom: -69px; */
+                color: #ffc14e;
+                background-color: none;
+                /* margin-bottom: 8px; */
+                cursor: pointer;
+                padding: 1px 5px 1px 5px;
+                border-radius: 6px;
+                //border: 2px solid #ffc14e;
+                border: 1px solid #c1b4b5;
+                background-color: #4b4852;
+
+            }
