@@ -179,7 +179,7 @@ def help_page_view(request,page_id):
                                         "ndf/help_page.html",
                                         {
                                             "group_id": page_id,
-                                            'title': 'Help',
+                                            'title': 'Help Page',
                                             'page_obj':page_obj
                                         },
                                         context_instance=RequestContext(request)
