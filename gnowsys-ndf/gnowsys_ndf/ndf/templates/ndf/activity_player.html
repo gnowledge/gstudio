@@ -137,22 +137,39 @@
        var match = iframes[i].src.search(key);
        if(match != -1) {
             source_attr = iframes[i].getAttribute('src')
-        if (source_attr.indexOf("://") > -1) {
-            src_split = source_attr.split('/');
-            hostname = src_split.slice(0, 3).join("/")
-            new_source = source_attr.replace(hostname, location.host)
-            $(iframes[i]).attr('src', new_source)
-        }
-        else {
-            src_split = source_attr.split('/');
-            hostname = src_split[0]
-            new_source = source_attr.replace(hostname, location.host)
-            $(iframes[i]).attr('src', new_source)
-        }
+            oac_url = 'oac'
+            // to handle if window.location.protocol is 'http:'
+            // Force to 'https:' for ART, audio record tool assessment type.
+            domain_prefix = "https:" 
+
+            if (source_attr.indexOf("://") > -1) {
+                src_split = source_attr.split('/');
+                if (src_split.indexOf(oac_url) > -1 ){
+
+                  new_url = domain_prefix + '//'+ window.location.host
+                }
+                else{
+                  new_url = domain_prefix + '//'+ window.location.host + '/' + oac_url
+                }
+                hostname = src_split.slice(0, 3).join("/")
+                new_source = source_attr.replace(hostname, new_url)
+                $(iframes[i]).attr('src', new_source)
+            }
+            else {
+                src_split = source_attr.split('/');
+                if (src_split.indexOf(oac_url) > -1 ){
+                  new_url = domain_prefix + '//'+ window.location.host
+                }
+                else{
+                  new_url = domain_prefix + '//'+ window.location.host + '/' + oac_url
+                }
+                hostname = src_split[0]
+                new_source = source_attr.replace(hostname, new_url)
+                $(iframes[i]).attr('src', new_source)
+            }
        }
     }
   })
-
   $(".admin-page").click(function(event){
       $.ajax({
               type: "POST",

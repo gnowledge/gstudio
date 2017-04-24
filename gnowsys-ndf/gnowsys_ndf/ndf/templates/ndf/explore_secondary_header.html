@@ -10,10 +10,10 @@
 				<a href="{% url 'explore_courses' %}" class="secondary-header-tabs  {%if title == 'courses'%} active{% endif %}">
 					Courses
 				</a>
+				{% if is_gstaff %}
 				<a href="{% url 'explore_groups' %}" class="secondary-header-tabs {%if title == 'groups'%} active{% endif %}">
 					Projects
 				</a>
-				{% if is_gstaff %}
 				<a href="{% url 'explore_drafts' %}" class="secondary-header-tabs {%if title == 'drafts'%} active{% endif %}">
 					Drafts
 				</a>

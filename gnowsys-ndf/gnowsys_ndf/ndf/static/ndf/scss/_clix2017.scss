@@ -1921,7 +1921,6 @@ ul.jqtree-tree .jqtree-toggler {
   }
   .notebook-body {
     padding: 0px 0px;
-
     .note-cards {
       .row {
         margin: 30px 0px;
@@ -2115,6 +2114,9 @@ ul.jqtree-tree .jqtree-toggler {
       // display: none;
       background-color: #fff;
       padding-bottom: 30px;
+      .group_sections_content{
+        margin-top:5px;
+      }
 
       >div{
         background-color: #fff;
@@ -5002,3 +5004,4 @@ ul.nav_menu_1 {
     -moz-border-radius: 10px;
     -o-border-radius: 10px;
 }
+

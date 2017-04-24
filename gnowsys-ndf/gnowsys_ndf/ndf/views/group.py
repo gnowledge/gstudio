@@ -2681,7 +2681,7 @@ def upload_using_save_file(request,group_id):
     # gs_obj_list = write_files(request, group_id)
     # fileobj_list = write_files(request, group_id)
     # fileobj_id = fileobj_list[0]['_id']
-    fileobj_list = write_files(request, group_id)
+    fileobj_list = write_files(request, group_id,unique_gs_per_file=False)
     # fileobj_list = write_files(request, group_id)
     fileobj_id = fileobj_list[0]['_id']
     file_node = node_collection.one({'_id': ObjectId(fileobj_id) })
@@ -2798,7 +2798,8 @@ def upload_using_save_file(request,group_id):
             each_gs_file.contributors.append(usrid)
 
         if title == "raw material" or (title == "gallery" and is_user_gstaff):
-            each_gs_file.tags =  [u'raw@material']
+            if u'raw@material' not in each_gs_file.tags:
+                each_gs_file.tags.append(u'raw@material')
 
         group_object = node_collection.one({'_id': ObjectId(group_id)})
         if (group_object.edit_policy == "EDITABLE_MODERATED") and (group_object.moderation_level > 0):

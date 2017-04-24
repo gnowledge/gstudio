@@ -2032,22 +2032,23 @@ def activity_player_detail(request, group_id, lesson_id, activity_id):
         'resource_prev_id': resource_prev_id, 'resource_count': resource_count,
         'unit_resources_list_of_dict': unit_resources_list_of_dict
     })
-    active_user_ids_list = [request.user.id]
-    if GSTUDIO_BUDDY_LOGIN:
-        active_user_ids_list += Buddy.get_buddy_userids_list_within_datetime(request.user.id, datetime.datetime.now())
-    # removing redundancy of user ids:
-    active_user_ids_list = dict.fromkeys(active_user_ids_list).keys()
-    counter_objs_cur = Counter.get_counter_objs_cur(active_user_ids_list, group_id)
-    for each_counter_obj in counter_objs_cur:
-        # print "\n OLD updated counter_obj: ", each_counter_obj['visited_nodes']
-        if str(activity_id) in each_counter_obj['visited_nodes']:
-            each_counter_obj['visited_nodes'][str(activity_id)] = each_counter_obj['visited_nodes'][str(activity_id)] + 1
-        else:
-            each_counter_obj['visited_nodes'].update({str(activity_id): 1})
+    if request.user.is_authenticated():
+        active_user_ids_list = [request.user.id]
+        if GSTUDIO_BUDDY_LOGIN:
+            active_user_ids_list += Buddy.get_buddy_userids_list_within_datetime(request.user.id, datetime.datetime.now())
+        # removing redundancy of user ids:
+        active_user_ids_list = dict.fromkeys(active_user_ids_list).keys()
+        counter_objs_cur = Counter.get_counter_objs_cur(active_user_ids_list, group_id)
+        for each_counter_obj in counter_objs_cur:
+            # print "\n OLD updated counter_obj: ", each_counter_obj['visited_nodes']
+            if str(activity_id) in each_counter_obj['visited_nodes']:
+                each_counter_obj['visited_nodes'][str(activity_id)] = each_counter_obj['visited_nodes'][str(activity_id)] + 1
+            else:
+                each_counter_obj['visited_nodes'].update({str(activity_id): 1})
 
-        each_counter_obj.last_update = datetime.datetime.now()
-        each_counter_obj.save()
-        # print "\n updated counter_obj: ", each_counter_obj['visited_nodes']
+            each_counter_obj.last_update = datetime.datetime.now()
+            each_counter_obj.save()
+            # print "\n updated counter_obj: ", each_counter_obj['visited_nodes']
     template = "ndf/activity_player.html"
 
     return render_to_response(template, variable)
@@ -2312,7 +2313,7 @@ def course_raw_material(request, group_id, node_id=None,page_no=1):
         #updating counters collection
         # update_notes_or_files_visited(request.user.id, ObjectId(group_id),ObjectId(node_id),True,False)
         if request.user.is_authenticated():
-            Counter.add_visit_count.delay(resource_obj_or_id=file_obj._id.__str__(),
+            Counter.add_visit_count(resource_obj_or_id=file_obj._id.__str__(),
                                     current_group_id=group_id.__str__(),
                                     loggedin_userid=request.user.id)
 
@@ -2397,7 +2398,7 @@ def course_gallery(request, group_id,node_id=None,page_no=1):
         # updating counters collection:
         # update_notes_or_files_visited(request.user.id, ObjectId(group_id),ObjectId(node_id),True,False)
         if request.user.is_authenticated():
-            Counter.add_visit_count.delay(resource_obj_or_id=file_obj._id.__str__(),
+            Counter.add_visit_count(resource_obj_or_id=file_obj._id.__str__(),
                                     current_group_id=group_id.__str__(),
                                     loggedin_userid=request.user.id)
 
@@ -3538,10 +3539,11 @@ def widget_page_create_edit(request, group_id, node_id=None):
     }
 
     req_context = RequestContext(request, {
-                                'title': 'Note Create', 'node_obj': Node.get_node_by_id(node_id),
+                                'node_obj': Node.get_node_by_id(node_id),
                                 'group_id': group_id, 'groupid': group_id,
                                 'additional_form_fields': additional_form_fields,
                                 'editor_type': editor_type,
+                                'title': 'notebook',
                                 'post_url': reverse(url_name, kwargs=url_kwargs)
                             })
     return render_to_response(template, req_context)
