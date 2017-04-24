@@ -7,8 +7,8 @@ class UserId(object):
     def process_request(self, request):
         # will only add cookie if request does not have it already
         try:
-            if not request.COOKIES.get('user_id'):
-                request.COOKIES['user_id'] = request.user.id
+            # if not request.COOKIES.get('user_id'):
+            request.COOKIES['user_id'] = request.user.id
         except Exception, e:
             pass
 

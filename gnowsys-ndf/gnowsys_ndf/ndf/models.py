@@ -330,7 +330,7 @@ class Node(DjangoDocument):
                         # 'comment_enabled': bool,
                         # 'login_required': bool,
                         # 'password': basestring,
-                        'status': u'DRAFT',
+                        'status': u'PUBLISHED',
                         'rating':[],
                         'snapshot':{}
                     }
@@ -2775,6 +2775,10 @@ class Author(Group):
         return True
 
     @staticmethod
+    def get_author_by_userid(user_id):
+        return node_collection.one({'_type': 'Author', 'created_by': user_id})
+
+    @staticmethod
     def get_user_id_list_from_author_oid_list(author_oids_list=[]):
         all_authors_cur = node_collection.find({'_id': {'$in': [ObjectId(a) for a in author_oids_list]} },
                                                 {'_id': 0, 'created_by': 1} )
@@ -4169,9 +4173,8 @@ class Counter(DjangoDocument):
         # 'visited_nodes' = {str(ObjectId): int(count_of_visits)}
         'visited_nodes': {basestring: int},
         'assessment': {
-                    'offered_id': {'total': int, 'correct': int, 'incorrect': int}
+                    'offered_id': {'total': int, 'correct': int, 'incorrect_attempts': int}
                     }
-
     }
 
     default_values = {
