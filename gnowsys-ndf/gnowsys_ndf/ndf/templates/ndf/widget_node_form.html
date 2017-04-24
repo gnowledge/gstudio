@@ -32,7 +32,7 @@
                 </div>
             </div>
             <hr/>
-            {% for k, v in additional_form_fields.iteritems %}
+            {% for k, v in additional_form_fields.fields.iteritems %}
                 <{{v.widget}} type="{{v.widget_attr}}" name="{{v.name}}" value="{{v.value}}">
             {% endfor %}
             {% for k, v in additional_form_fields.attribute.iteritems %}
@@ -55,7 +55,11 @@
 
             {% endfor %}
             <div class="row">
-                <input type="submit" class ="small-2 columns right orange-button" id="" value="Save"/>
+                <input type="submit" class="small-2 columns right orange-button" id="" value="Save"/>
+
+                {% if cancel_url %}
+                    <a class="small-2 small-push-1 columns text-center orange-button" href="{{cancel_url}}">Cancel</a>
+                {% endif %}
             </div>
         </form>
     </div>

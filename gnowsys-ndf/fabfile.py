@@ -18,12 +18,25 @@ def create_schema():
 
 
 def update_data():
-	local('python manage.py sync_existing_documents')
+	try:
+		# for existing data
+		local('python manage.py sync_existing_documents')
+	except Exception, e:
+		# exception will happen for fresh data
+		pass
 	create_schema()
 	local('python manage.py filldb')
 	local('python manage.py create_schema ATs.csv')
 	local('python manage.py sync_existing_documents')
 
+
+def update(branch):
+	local('git pull origin ' + branch)
+	local('python manage.py syncdb')
+	install_requirements()
+	local('bower install --allow-root')
+	local('python manage.py collectstatic --noinput')
+	update_data()
 
 
 def install_requirements():
