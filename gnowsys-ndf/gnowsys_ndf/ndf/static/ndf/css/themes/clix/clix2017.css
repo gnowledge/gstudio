@@ -2848,15 +2848,9 @@ ul.jqtree-tree .jqtree-toggler:hover {
   background-size: 100%;
 }
 
-<<<<<<< HEAD
 /* line 3039, ../../../scss/_clix2017.scss */
-.white-text {
-  color: white;
-=======
-/* line 3037, ../../../scss/_clix2017.scss */
 .clix-text {
   z-index: -1;
->>>>>>> a8f7f48b8acfaa4276a0b8cb4b1eb830bd18771b
 }
 
 /* line 3042, ../../../scss/_clix2017.scss */
@@ -4832,7 +4826,7 @@ ul.nav_menu_1 > li > a.selected, ul.nav_menu_1 > li > a:hover {
   background-color: #4b4852;
 }
 
-/* line 5033, ../../../scss/_clix2017.scss */
+/* line 5035, ../../../scss/_clix2017.scss */
 .img-style-land {
   margin-top: 28px;
   margin-left: -56px;
