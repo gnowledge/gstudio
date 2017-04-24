@@ -4825,3 +4825,9 @@ ul.nav_menu_1 > li > a.selected, ul.nav_menu_1 > li > a:hover {
   border: 1px solid #c1b4b5;
   background-color: #4b4852;
 }
+
+/* line 5033, ../../../scss/_clix2017.scss */
+.img-style-land {
+  margin-top: 28px;
+  margin-left: -56px;
+}
