@@ -3539,10 +3539,11 @@ def widget_page_create_edit(request, group_id, node_id=None):
     }
 
     req_context = RequestContext(request, {
-                                'title': 'Note Create', 'node_obj': Node.get_node_by_id(node_id),
+                                'node_obj': Node.get_node_by_id(node_id),
                                 'group_id': group_id, 'groupid': group_id,
                                 'additional_form_fields': additional_form_fields,
                                 'editor_type': editor_type,
+                                'title': 'notebook',
                                 'post_url': reverse(url_name, kwargs=url_kwargs)
                             })
     return render_to_response(template, req_context)

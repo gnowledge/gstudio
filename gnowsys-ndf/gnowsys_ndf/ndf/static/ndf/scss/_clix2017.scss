@@ -1922,6 +1922,9 @@ ul.jqtree-tree .jqtree-toggler {
   .notebook-body {
     padding: 0px 0px;
 
+    .node-create-edit-form{
+        margin-top: 30px;
+    }
     .note-cards {
       .row {
         margin: 30px 0px;
@@ -5002,3 +5005,4 @@ ul.nav_menu_1 {
     -moz-border-radius: 10px;
     -o-border-radius: 10px;
 }
+
