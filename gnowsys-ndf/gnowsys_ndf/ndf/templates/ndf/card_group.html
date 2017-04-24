@@ -1,20 +1,27 @@
 {% load i18n %}
-{% load get_relation_value get_event_status from ndf_tags %}
+{% load get_relation_value get_event_status get_unit_total_points from ndf_tags %}
 
     {% get_event_status node as get_status %}
+    {% if group_counts %}
+        {% get_unit_total_points request.user.id  node.pk as get_unit_points %}
+    {% endif %}
+
 <div class="unit_card">
     {% comment %}
     <div class="unit_status in-progress-status">
         In-progress
     </div>
     {% endcomment %}
-    {% if first_arg and second_arg and third_arg %}
-        <a href="{% url url_name first_arg second_arg third_arg %}{{search_url_text|safe}}"/>
-    {% elif first_arg and second_arg %}
-        <a href="{% url url_name first_arg second_arg %}{{search_url_text|safe}}"/>
-    {% elif first_arg %}
-        <a href='{% url url_name first_arg %}{{search_url_text|safe}}'/>
+    {% if not no_url %}
+        {% if first_arg and second_arg and third_arg %}
+            <a href="{% url url_name first_arg second_arg third_arg %}{{search_url_text|safe}}"/>
+        {% elif first_arg and second_arg %}
+            <a href="{% url url_name first_arg second_arg %}{{search_url_text|safe}}"/>
+        {% elif first_arg %}
+            <a href='{% url url_name first_arg %}{{search_url_text|safe}}'/>
+        {% endif %}
     {% endif %}
+
     {% if "base_unit" in node.member_of_names_list %}
     <div class="status-draft">DRAFT</div>
     {% endif  %}
@@ -65,8 +72,10 @@
     </div>
     {% endcomment %}
 
-    <div class="unit_actions">
-            <span>Continue</span>
+     <div class="unit_actions">
+            <span>{% if group_counts %} Total Points :  {{get_unit_points}} <a onclick="show_my_performance($(this))" data-node-id = "{{node.pk}}">Click here to see details.</span>{% else %} Continue {% endif %}</a>
     </div>
-</div>
+  
+    
+ </div>
      

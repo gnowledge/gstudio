@@ -40,27 +40,33 @@
     //Ajax to post the user rating and fetch the new average
     function updateRating() {
         // surl="/{{node}}/ratings/add_ratings/";
-        user_rating = $('input[name=rating]:checked').val();
+        {% if request.user.id in node.contributors %}
+            alert("{% trans 'You cannot rate your own resource' %}");
+            setStars({{ratings.avg}})
+            return false;
+        {% else %}
+            user_rating = $('input[name=rating]:checked').val();
 
-        $.ajax({
-                // url: surl,
-                url: "{% url 'rate_node' group_id node.pk %}",
-                type: 'POST',
-                data: {
-                    rating: user_rating,
-                    node: '{{node.pk}}',
-                    csrfmiddlewaretoken: '{{ csrf_token }}'
-                },
+            $.ajax({
+                    // url: surl,
+                    url: "{% url 'rate_node' group_id node.pk %}",
+                    type: 'POST',
+                    data: {
+                        rating: user_rating,
+                        node: '{{node.pk}}',
+                        csrfmiddlewaretoken: '{{ csrf_token }}'
+                    },
 
-                success: function(data){
-                   //Replace rating bar with new values
-                   //'rating_template' is a div.class of parent template
-                   // $(".rating_template").html(data);
-                   // console.log(data)
-                   data = JSON.parse(data)
-                   setRating(data);
-                }
-        });
+                    success: function(data){
+                       //Replace rating bar with new values
+                       //'rating_template' is a div.class of parent template
+                       // $(".rating_template").html(data);
+                       // console.log(data)
+                       data = JSON.parse(data)
+                       setRating(data);
+                    }
+            });
+        {% endif %}
 
     }
 

@@ -12,7 +12,7 @@
 	                </label>
 
 	      <div class="preview_asset"> 
-	         {% if title == "asset_content_detail" %}
+           {% if title == "asset_content_detail" or title == "asset_gallery_detail" or title == "raw_material_detail"%}
 
 	          {% include "ndf/resource_view.html" with node=node %}
 	          {% endif %}

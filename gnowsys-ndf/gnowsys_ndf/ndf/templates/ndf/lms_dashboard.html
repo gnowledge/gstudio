@@ -28,10 +28,11 @@
         <div class="page_menu">
             <ul class="nav_menu_1">
                 <li class="">
-                <a href="#" {% if title == "my desk" %} class="selected" {% endif %}>My Courses </a>
+                <a href="{% url 'my_desk' request.user.id  %}" {% if title == "my desk" %} class="selected" {% endif %}>My Courses </a>
                 </li>
                 
-                {% comment %}<li class=""><a href="#">My Performance</a> </li> {% endcomment %}
+                <li class=""><a {% if title == "my performance" %} class="selected" {% endif %} href="{% url 'my_performance' request.user.id  %}">My Performance</a> </li>
+
             </ul>
         </div>
 
@@ -62,5 +63,41 @@
       </div>
                 {% endif %}
         </div>
+
+        <div class="small-12 columns group_sections_content">
+    {% if title == "my performance" %}
+                    <div class="small-12 columns lms_explore_back_unit">
+        <ul class="small-block-grid-1 medium-block-grid-3 large-block-grid-4">
+        {% for each_obj in units_cur %}
+          <li class="card-image-wrapper">
+            {% include "ndf/card_group.html" with group_counts=True node=each_obj no_url=True first_arg=each_obj.pk %}
+          </li>
+        {% endfor %}
+        </ul>
+      </div>
+        </div>
+
     </div>
+    <div id="show-overlay" class="reveal-modal reveal-modal-overlay" data-reveal aria-labelledby="modalTitle" aria-hidden="true" role="dialog">
+    <script type="text/javascript">
+        
+        function show_my_performance(this_obj){
+            data_unit_id  = $(this_obj).attr("data-node-id");
+            $.ajax({
+              url: "{% url 'course_analytics' group_id request.user.id %}",
+              type: "GET",
+              dataType: "html",
+              data: {
+                        "data_unit_id":data_unit_id
+                    },
+                global: false,
+              success: function(data){
+                        $('#show-overlay').foundation('reveal', 'open');
+                        $('#show-overlay').html(data);
+              },
+          });
+        }
+
+    </script>
+    {% endif %}
 {% endblock  %}

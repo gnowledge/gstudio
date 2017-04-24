@@ -126,6 +126,31 @@
 </div>             
 
 <script type="text/javascript">
+  // start of document.ready()
+  $(document).ready(function() {
+    var iframes = document.getElementsByTagName('iframe');
+    var key = 'assessment.Bank';
+
+    for (var i = 0; i != iframes.length; ++i) {
+       var match = iframes[i].src.search(key);
+       if(match != -1) {
+            source_attr = iframes[i].getAttribute('src')
+        if (source_attr.indexOf("://") > -1) {
+            src_split = source_attr.split('/');
+            hostname = src_split.slice(0, 3).join("/")
+            new_source = source_attr.replace(hostname, location.host)
+            $(iframes[i]).attr('src', new_source)
+        }
+        else {
+            src_split = source_attr.split('/');
+            hostname = src_split[0]
+            new_source = source_attr.replace(hostname, location.host)
+            $(iframes[i]).attr('src', new_source)
+        }
+       }
+    }
+  })
+
   $(".admin-page").click(function(event){
       $.ajax({
               type: "POST",

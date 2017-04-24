@@ -2032,7 +2032,22 @@ def activity_player_detail(request, group_id, lesson_id, activity_id):
         'resource_prev_id': resource_prev_id, 'resource_count': resource_count,
         'unit_resources_list_of_dict': unit_resources_list_of_dict
     })
+    active_user_ids_list = [request.user.id]
+    if GSTUDIO_BUDDY_LOGIN:
+        active_user_ids_list += Buddy.get_buddy_userids_list_within_datetime(request.user.id, datetime.datetime.now())
+    # removing redundancy of user ids:
+    active_user_ids_list = dict.fromkeys(active_user_ids_list).keys()
+    counter_objs_cur = Counter.get_counter_objs_cur(active_user_ids_list, group_id)
+    for each_counter_obj in counter_objs_cur:
+        # print "\n OLD updated counter_obj: ", each_counter_obj['visited_nodes']
+        if str(activity_id) in each_counter_obj['visited_nodes']:
+            each_counter_obj['visited_nodes'][str(activity_id)] = each_counter_obj['visited_nodes'][str(activity_id)] + 1
+        else:
+            each_counter_obj['visited_nodes'].update({str(activity_id): 1})
 
+        each_counter_obj.last_update = datetime.datetime.now()
+        each_counter_obj.save()
+        # print "\n updated counter_obj: ", each_counter_obj['visited_nodes']
     template = "ndf/activity_player.html"
 
     return render_to_response(template, variable)
@@ -2110,6 +2125,7 @@ def course_content(request, group_id):
     allow_to_join = get_group_join_status(group_obj)
     template = 'ndf/gcourse_event_group.html'
     unit_structure =  _get_unit_hierarchy(group_obj)
+    visited_nodes = []
     if 'BaseCourseGroup' in group_obj.member_of_names_list:
         template = 'ndf/basecourse_group.html'
     if 'base_unit' in group_obj.member_of_names_list:
@@ -2117,33 +2133,18 @@ def course_content(request, group_id):
     if 'announced_unit' in group_obj.member_of_names_list:
         template = 'ndf/lms.html'
     banner_pic_obj,old_profile_pics = _get_current_and_old_display_pics(group_obj)
-    '''
-    banner_pic_obj = None
-    old_profile_pics = []
-    if not banner_pic_obj:
-        for each in group_obj.relation_set:
-            if "has_banner_pic" in each:
-                banner_pic_obj = node_collection.one(
-                    {'_type': {'$in': ["GSystem", "File"]}, '_id': each["has_banner_pic"][0]}
-                )
-                break
-
-    has_banner_pic_rt = node_collection.one({'_type': 'RelationType', 'name': unicode('has_banner_pic') })
-    all_old_prof_pics = triple_collection.find({'_type': "GRelation", "subject": group_obj._id, 'relation_type': has_banner_pic_rt._id, 'status': u"DELETED"})
-
-    if all_old_prof_pics:
-        for each_grel in all_old_prof_pics:
-            n = node_collection.one({'_id': ObjectId(each_grel.right_subject)})
-            if n not in old_profile_pics:
-                old_profile_pics.append(n)
-    '''
-
+    if request.user.is_authenticated():
+        counter_obj = Counter.get_counter_obj(request.user.id, ObjectId(group_id))
+        if counter_obj:
+            # visited_nodes = map(str,counter_obj['visited_nodes'].keys())
+            visited_nodes = counter_obj['visited_nodes']
     context_variables = RequestContext(request, {
             'group_id': group_id, 'groupid': group_id, 'group_name':group_name,
             'group_obj': group_obj,'node': group_obj, 'title': 'course content',
             'allow_to_join': allow_to_join,
             'old_profile_pics':old_profile_pics, "prof_pic_obj": banner_pic_obj,
-            'unit_structure': json.dumps(unit_structure,cls=NodeJSONEncoder)
+            'unit_structure': json.dumps(unit_structure,cls=NodeJSONEncoder),
+            'visited_nodes': json.dumps(visited_nodes)
             })
     return render_to_response(template, context_variables)
 
@@ -2220,7 +2221,7 @@ def course_notebook(request, group_id, node_id=None, tab="my-notes"):
             #updating counters collection
             # update_notes_or_files_visited(request.user.id, ObjectId(group_id),ObjectId(node_id),False,True)
             if request.user.is_authenticated():
-                Counter.add_visit_count.delay(resource_obj_or_id=notebook_obj._id.__str__(),
+                Counter.add_visit_count(resource_obj_or_id=notebook_obj._id.__str__(),
                                         current_group_id=group_id.__str__(),
                                         loggedin_userid=request.user.id)
 
@@ -2671,14 +2672,21 @@ def course_analytics(request, group_id, user_id, render_template=False, get_resu
     # without being redirected to template. So that this method can
     # use to get dict result data in shell or for any command.
     # this will omit data from request.
-    if request and not get_result_dict:
-        cache_key = u'course_analytics' + unicode(group_id) + "_" + unicode(user_id)
-        cache_result = cache.get(cache_key)
-        if cache_result:
-            return render_to_response("ndf/user_course_analytics.html",
-                                    cache_result,
-                                    context_instance = RequestContext(request)
-                                )
+    # if request and not get_result_dict:
+    #     cache_key = u'course_analytics' + unicode(group_id) + "_" + unicode(user_id)
+    #     cache_result = cache.get(cache_key)
+    #     if cache_result:
+    #         return render_to_response("ndf/user_course_analytics.html",
+    #                                 cache_result,
+    #                                 context_instance = RequestContext(request)
+    #                             )
+    unit_id = request.GET.get("data_unit_id",'')
+    if unit_id:
+        group_id = ObjectId(unit_id)
+
+    group_obj   = get_group_name_id(group_id, get_obj=True)
+    group_id    = group_obj._id
+    group_name  = group_obj.name
 
     analytics_data = {}
     data_points_dict = {}
@@ -2701,18 +2709,76 @@ def course_analytics(request, group_id, user_id, render_template=False, get_resu
 
     counter_obj = Counter.get_counter_obj(user_id, ObjectId(group_id))
     analytics_instance = AnalyticsMethods(user_obj.id,user_obj.username, group_id)
-    # Modules Section
-    all_modules= analytics_instance.get_total_modules_count()
 
-    # TO IMPROVE
-    completed_modules = analytics_instance.get_completed_modules_count()
 
-    # Units Section
-    all_units = analytics_instance.get_total_units_count()
-    # print "\n Total Units =  ", all_units, "\n\n"
-    completed_units = analytics_instance.get_completed_units_count()
-    # print "\n Completed Units =  ", completed_units, "\n\n"
+    if "CourseEventGroup" in group_obj.member_of_names_list:
+        # Modules Section
+        all_modules= analytics_instance.get_total_modules_count()
+        # TO IMPROVE
+        completed_modules = analytics_instance.get_completed_modules_count()
+        # Units Section
+        all_units = analytics_instance.get_total_units_count()
+        # print "\n Total Units =  ", all_units, "\n\n"
+        completed_units = analytics_instance.get_completed_units_count()
+        # print "\n Completed Units =  ", completed_units, "\n\n"
+        analytics_data['level1_lbl'] = "Module Completion"
+        analytics_data['level2_lbl'] = "Unit Completion"
+        analytics_data['level1_progress_stmt'] = str(completed_modules) + " out of " + str(all_modules) + " Modules completed"
+        analytics_data['level2_progress_stmt'] = str(completed_units) + " out of " + str(all_units) + " Units completed"
+        if completed_modules and all_modules:
+            analytics_data['level1_progress_meter'] = (completed_modules/float(all_modules))*100
+        else:
+            analytics_data['level1_progress_meter'] = 0
 
+        if completed_units and all_units:
+            analytics_data['level2_progress_meter'] = (completed_units/float(all_units))*100
+        else:
+            analytics_data['level2_progress_meter'] = 0
+
+
+    if "announced_unit" in group_obj.member_of_names_list:
+        counter_obj = Counter.get_counter_obj(request.user.id, ObjectId(group_id))
+        visited_nodes = []
+        if counter_obj:
+            visited_nodes = counter_obj['visited_nodes'].keys()
+
+        unit_structure = _get_unit_hierarchy(group_obj)
+        all_lessons = len(unit_structure)
+        print "\n all_l: ", all_lessons
+        all_activities = 0
+        completed_activities = 0
+        completed_lessons = 0
+        for each_lesson_dict in unit_structure:
+            lesson_act_ids = []
+            for each_lesson_key, each_lesson_val in each_lesson_dict.iteritems():
+                if each_lesson_key == 'id':
+                    lesson_id = each_lesson_dict[each_lesson_key]
+                    
+                if each_lesson_key == 'children':
+                    all_activities = all_activities + len(each_lesson_dict[each_lesson_key])
+                    for each_act_dict in each_lesson_dict[each_lesson_key]:
+                        for each_act_key, each_act_val in each_act_dict.iteritems():
+                            if each_act_key == 'id':
+                                act_id = each_act_dict[each_act_key]
+                                lesson_act_ids.append(act_id)
+                                if act_id in visited_nodes:
+                                    completed_activities = completed_activities + 1
+            if all(each_act_id in visited_nodes for each_act_id in lesson_act_ids):
+                completed_lessons = completed_lessons + 1
+        analytics_data['level1_lbl'] = "Lesson Completion"
+        analytics_data['level2_lbl'] = "Activity Completion"
+
+        analytics_data['level1_progress_stmt'] = str(completed_lessons) + " out of " + str(all_lessons) + " Lessons completed"
+        analytics_data['level2_progress_stmt'] = str(completed_activities) + " out of " + str(all_activities) + " Activities completed"
+        if completed_lessons and all_lessons:
+            analytics_data['level1_progress_meter'] = (completed_lessons/float(all_lessons))*100
+        else:
+            analytics_data['level1_progress_meter'] = 0
+        if completed_activities and all_activities:
+            analytics_data['level2_progress_meter'] = (completed_activities/float(all_activities))*100
+        else:
+            analytics_data['level2_progress_meter'] = 0
+        print "\n an: ", analytics_data
     # Resources Section
     # analytics_data['total_res'] = analytics_instance.get_total_resources_count()
     # print "\n Total Resources === ", total_res, "\n\n"
@@ -2818,17 +2884,6 @@ def course_analytics(request, group_id, user_id, render_template=False, get_resu
     if 'cmts_on_user_notes' in analytics_data and 'cmts_on_user_files' in analytics_data:
         analytics_data['cmnts_rcvd_by_user'] = analytics_data['cmts_on_user_notes'] + analytics_data['cmts_on_user_files']
 
-    analytics_data['units_progress_stmt'] = str(completed_units) + " out of " + str(all_units) + " Units completed"
-    analytics_data['module_progress_stmt'] = str(completed_modules) + " out of " + str(all_modules) + " Modules completed"
-    if completed_modules and all_modules:
-        analytics_data['module_progress_meter'] = (completed_modules/float(all_modules))*100
-    else:
-        analytics_data['module_progress_meter'] = 0
-
-    if completed_units and all_units:
-        analytics_data['unit_progress_meter'] = (completed_units/float(all_units))*100
-    else:
-        analytics_data['unit_progress_meter'] = 0
 
     if "users_points" not in analytics_data:
         # analytics_data['users_points'] = counter_obj.course_score
@@ -2843,7 +2898,7 @@ def course_analytics(request, group_id, user_id, render_template=False, get_resu
     if get_result_dict:
         return analytics_data
 
-    cache.set(cache_key, analytics_data, 60*10)
+    # cache.set(cache_key, analytics_data, 60*10)
 
     return render_to_response("ndf/user_course_analytics.html",
                                 analytics_data,
@@ -3227,6 +3282,12 @@ def assetcontent_detail(request, group_id, asset_id,asst_content_id):
             'groupid':group_id,'node':assetcontent_obj,'asset_obj':asset_obj,
             'title':"asset_content_detail"
         }
+    if request.user.is_authenticated():
+        # Counter.add_visit_count.delay(resource_obj_or_id=file_obj._id.__str__(),
+        Counter.add_visit_count(resource_obj_or_id=assetcontent_obj._id.__str__(),
+                                current_group_id=group_obj._id.__str__(),
+                                loggedin_userid=request.user.id)
+
     if "announced_unit" in group_obj.member_of_names_list and  "raw@material" in asset_obj.tags or "asset@gallery" in asset_obj.tags:
         template = 'ndf/lms.html'
         if "raw@material" in asset_obj.tags:

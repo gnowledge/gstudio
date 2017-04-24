@@ -45,7 +45,7 @@
                 {% elif 'video' not in each.if_file.mime_type and each.if_file.thumbnail.relurl %}
                     <img src="{{MEDIA_URL}}{{each.if_file.thumbnail.relurl}}">
                 {% else %}
-                    <img src="/static/ndf/images/asset_thumbnail.png">
+                    <img src="/static/ndf/images/asset.png">
                 {% endif %}
             </div>
             <div class="asset_text">

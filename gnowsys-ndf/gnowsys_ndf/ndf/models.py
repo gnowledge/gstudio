@@ -4167,7 +4167,15 @@ class Counter(DjangoDocument):
 
         # Total fields should be updated on enroll action
         # On module/unit add/delete, update 'total' fields for all users in celery
-        'course':{'modules':{'completed':int, 'total':int}, 'units':{'completed':int, 'total':int}}
+        
+        'course':{'modules':{'completed':int, 'total':int}, 'units':{'completed':int, 'total':int}},
+
+        # 'visited_nodes' = {str(ObjectId): int(count_of_visits)}
+        'visited_nodes': {basestring: int},
+        'assessment': {
+                    'offered_id': {'total': int, 'correct': int, 'incorrect': int}
+                    }
+
     }
 
     default_values = {
@@ -4215,7 +4223,10 @@ class Counter(DjangoDocument):
 
         # ideally, member_of field should be used to check resource_type. But it may cause performance hit.
         # hence using 'if_file.mime_type'
-        if resource_obj.if_file.mime_type or (u'File' in resource_obj.member_of_names_list) or (u'Asset' in resource_obj.member_of_names_list):
+        if resource_obj.if_file.mime_type or \
+         u'File' in resource_obj.member_of_names_list or \
+         u'Asset' in resource_obj.member_of_names_list or \
+         u'AssetContent' in resource_obj.member_of_names_list:
             resource_type = 'file'
 
         elif u'Page' in resource_obj.member_of_names_list:
@@ -4255,7 +4266,7 @@ class Counter(DjangoDocument):
         group_id = ObjectId(group_id)
 
         # query and check for existing counter obj:
-        counter_obj = counter_collection.one({'user_id': user_id, 'group_id': group_id})
+        counter_obj = counter_collection.find_one({'user_id': user_id, 'group_id': group_id})
 
         # create one if not exists:
         if not counter_obj :
@@ -4355,7 +4366,9 @@ class Counter(DjangoDocument):
         resource_obj = Node.get_node_obj_from_id_or_obj(resource_obj_or_id, GSystem)
         resource_oid = resource_obj._id
         resource_type, resource_type_of = Counter._get_resource_type_tuple(resource_obj)
-        if resource_type and resource_type_of:
+
+        # if resource_type and resource_type_of:
+        if resource_type:
             # get resource's creator:
             resource_created_by_user_id = resource_obj.created_by
             resource_contributors_user_ids_list = resource_obj.contributors
@@ -4369,20 +4382,22 @@ class Counter(DjangoDocument):
             # counter object of resource contributor
             # ------- creator counter update: done ---------
             for each_resource_contributor in resource_contributors_user_ids_list:
-                counter_obj_each_contributor = Counter.get_counter_obj(each_resource_contributor, current_group_id)
-                # update counter obj
-                for each_active_user_id in active_user_id_list:
-                    existing_user_comment_cnt = eval(key_str).get(str(each_active_user_id), 0)
-                    eval(key_str).update({str(each_active_user_id): (existing_user_comment_cnt + 1) })
+                if each_resource_contributor not in active_user_id_list:
+                    counter_obj_each_contributor = Counter.get_counter_obj(each_resource_contributor, current_group_id)
 
-                # update comments gained:
-                key_str_comments_gained = "counter_obj_each_contributor" \
-                                          + key_str_resource_type
-                comments_gained = eval(key_str_comments_gained + '["comments_gained"]')
-                eval(key_str_comments_gained).update({"comments_gained": (comments_gained + 1)})
+                    # update counter obj
+                    for each_active_user_id in active_user_id_list:
+                        existing_user_comment_cnt = eval(key_str).get(str(each_active_user_id), 0)
+                        eval(key_str).update({str(each_active_user_id): (existing_user_comment_cnt + 1) })
 
-                counter_obj_each_contributor.last_update = datetime.datetime.now()
-                counter_obj_each_contributor.save()
+                    # update comments gained:
+                    key_str_comments_gained = "counter_obj_each_contributor" \
+                                              + key_str_resource_type
+                    comments_gained = eval(key_str_comments_gained + '["comments_gained"]')
+                    eval(key_str_comments_gained).update({"comments_gained": (comments_gained + 1)})
+
+                    counter_obj_each_contributor.last_update = datetime.datetime.now()
+                    counter_obj_each_contributor.save()
             # ------- creator counter update: done ---------
 
             # processing analytics for (one) active user.
@@ -4406,8 +4421,9 @@ class Counter(DjangoDocument):
 
                     counter_obj.last_update = datetime.datetime.now()
                     counter_obj.save()
+
     @staticmethod
-    @task
+    # @task
     def add_visit_count(resource_obj_or_id, current_group_id, loggedin_userid):
 
         active_user_ids_list = [loggedin_userid]
@@ -4478,6 +4494,9 @@ class Counter(DjangoDocument):
         # creating {user_id: score}
         # e.g: {162: 5, 163: 3, 164: 4}
         userid_score_rating_dict = {d['user_id']: d['score'] for d in resource_obj.rating}
+        for user_id_val in active_user_id_list:
+            if user_id_val in userid_score_rating_dict.keys():
+                userid_score_rating_dict.pop(user_id_val)
 
         user_counter_cur = Counter.get_counter_objs_cur(resource_contributors_user_ids_list, current_group_id)
 
@@ -4492,35 +4511,32 @@ class Counter(DjangoDocument):
         # iterating over each user id in contributors
         # uc: user counter
         for each_uc in user_counter_cur:
-
             for each_active_user_id in active_user_id_list:
+                if each_active_user_id not in resource_contributors_user_ids_list:
+                    userid_score_rating_dict_copy = userid_score_rating_dict.copy()
 
-                userid_score_rating_dict_copy = userid_score_rating_dict.copy()
+                    rating_count_received = eval(key_str_counter_resource_type_rating_count_received)
+                    avg_rating_gained = eval(key_str_counter_resource_type_avg_rating_gained)
+                    total_rating = sum(userid_score_rating_dict_copy.values())
+                    # total_rating = rating_count_received * avg_rating_gained
 
-                rating_count_received = eval(key_str_counter_resource_type_rating_count_received)
-                avg_rating_gained = eval(key_str_counter_resource_type_avg_rating_gained)
+                    # first time rating giving user:
+                    if each_active_user_id not in userid_score_rating_dict_copy:
+                        # add new key: value in dict to avoid errors
+                        userid_score_rating_dict_copy.update({each_active_user_id: 0})
+                        eval(key_str_counter_resource_type).update( \
+                                            {'rating_count_received': (rating_count_received + 1)} )
+                    total_rating = total_rating - userid_score_rating_dict_copy[each_active_user_id]
+                    total_rating = total_rating + int(rating_given)
 
-                total_rating = rating_count_received * avg_rating_gained
-
-                # first time rating giving user:
-                if each_active_user_id not in userid_score_rating_dict_copy:
-                    # add new key: value in dict to avoid errors
-                    userid_score_rating_dict_copy.update({each_active_user_id: 0})
+                    # getting value from updated 'rating_count_received'. hence repeated.
+                    rating_count_received = eval(key_str_counter_resource_type_rating_count_received) or 1
+                    # storing float result to get more accurate avg.
+                    avg_rating_gained = float(format(total_rating / float(len(userid_score_rating_dict_copy.keys())), '.2f'))
                     eval(key_str_counter_resource_type).update( \
-                                        {'rating_count_received': (rating_count_received + 1)} )
+                                            {'avg_rating_gained': avg_rating_gained})
 
-                total_rating = total_rating - userid_score_rating_dict_copy[each_active_user_id]
-                total_rating = total_rating + int(rating_given)
-
-                # getting value from updated 'rating_count_received'. hence repeated.
-                rating_count_received = eval(key_str_counter_resource_type_rating_count_received) or 1
-                # storing float result to get more accurate avg.
-                avg_rating_gained = float(format(total_rating / float(rating_count_received), '.2f'))
-
-                eval(key_str_counter_resource_type).update( \
-                                        {'avg_rating_gained': avg_rating_gained})
-
-                each_uc.save()
+                    each_uc.save()
 
 
     def save(self, *args, **kwargs):
