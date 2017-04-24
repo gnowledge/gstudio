@@ -2848,9 +2848,15 @@ ul.jqtree-tree .jqtree-toggler:hover {
   background-size: 100%;
 }
 
+<<<<<<< HEAD
 /* line 3039, ../../../scss/_clix2017.scss */
 .white-text {
   color: white;
+=======
+/* line 3037, ../../../scss/_clix2017.scss */
+.clix-text {
+  z-index: -1;
+>>>>>>> a8f7f48b8acfaa4276a0b8cb4b1eb830bd18771b
 }
 
 /* line 3042, ../../../scss/_clix2017.scss */
