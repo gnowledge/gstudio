@@ -10,6 +10,10 @@
                   	                    
 	                    <!--<input type="text" placeholder="" name="resource_name" />-->
 	                </label>
+                  <label>Created By: <b> {{ node.user_details_dict.contributors|join:', ' }} </b>
+                                        
+                      <!--<input type="text" placeholder="" name="resource_name" />-->
+                  </label>
 
 	      <div class="preview_asset"> 
            {% if title == "asset_content_detail" or title == "asset_gallery_detail" or title == "raw_material_detail"%}
