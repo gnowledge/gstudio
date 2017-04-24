@@ -49,7 +49,7 @@ def list_modules(request, group_id):
 
 @login_required
 @get_execution_time
-def module_create_edit(request, group_id, module_id=None):
+def module_create_edit(request, group_id, module_id=None, cancel_url='list_modules'):
     if request.method == "GET":
 
         template = 'ndf/module_form.html'

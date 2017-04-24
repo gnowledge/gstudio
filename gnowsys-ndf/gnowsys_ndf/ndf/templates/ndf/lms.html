@@ -7,6 +7,10 @@
 
 {% block title %} Unit {% endblock%}
 
+{% block head %}
+  <script src="/static/ndf/bower_components/jquery-backstretch/jquery.backstretch.min.js"></script>
+{% endblock head %}
+
 {% block body_content %}
 {% get_group_object groupid as group_object %}
 {% check_is_gstaff group_id request.user as is_gstaff %}
@@ -14,10 +18,8 @@
  
  <!-- LMS.html -->
 {% comment %}
-
  {% include "ndf/buddy.html" %}
 {% endcomment %}
-
 {% include 'ndf/widget_user_access_modal.html' %}
 
 <div class="lms_page">
@@ -221,6 +223,11 @@
 
 {% endcomment %}
 
-  
+<script type="text/javascript">
+  var imgSrc = $('.lms_banner .div-height img').attr('src');
+  $('.lms_banner .div-height img').attr('src', '');
+  $('.lms_banner .div-height img').attr('alt', '');
+  $('.lms_banner .div-height').backstretch(imgSrc);
+</script>
 
 {% endblock %}

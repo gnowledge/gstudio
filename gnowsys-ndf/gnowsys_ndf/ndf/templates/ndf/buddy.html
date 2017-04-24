@@ -1,14 +1,14 @@
 {% block head %}
-
-<script src="/static/ndf/bower_components/handlebars/handlebars.js"></script>
-  
+  <script src="/static/ndf/bower_components/handlebars/handlebars.js"></script>
 {% endblock head %}
 
 {% block body_content %}
-  
-<div class="buddy_panel" id="sample_buddy_panel">
+  <!-- RHS Buddy Panel -->
+  <div class="buddy_panel" id="sample_buddy_panel">
         <div class="add_buddy_icon">
             <a href="#" data-reveal-id="add_buddy_modal">
+
+              <!-- Add-Buddy-Button -->
               <svg viewBox="0 0 35 35" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
                   <defs>
                       <rect id="path-1" x="0" y="0" width="35" height="35" rx="5"></rect>
@@ -25,10 +25,15 @@
                       </g>
                   </g>
               </svg>
+              <!-- END of Add-Buddy-Button -->
+
             </a>
         </div>
     </div>
-    <!--Modal for Buddy.-->
+    <!-- END of RHS Buddy Panel -->
+
+
+    <!--Modal for Adding Buddy.-->
     <div class="reveal-modal add_buddy_modal" id="add_buddy_modal" data-reveal aria-labelledby="modalTitle" aria-hidden="true" role="dialog">
         <div class="modal_header">
             <div class="modal_title"> Add a buddy</div>
@@ -71,6 +76,7 @@
             </div>
         </div>
     </div>
+    <!-- END of Modal for Adding Buddy.-->
 
     <div class="reveal-modal delete_buddy_modal small" id="delete_buddy_modal" data-reveal aria-labelledby="modalTitle" aria-hidden="true" role="dialog">
         <div>Are you sure you want to delete the buddy?</div>
@@ -84,6 +90,18 @@
     {% verbatim %}
       
     <script id="online_buddy_template" type="text/x-handlebars-template">
+        <!-- 
+        // {
+        //   id: buddy.id,
+        //   isActive: buddy.isActive,
+        //   isEditable: buddy.isEditable,
+        //   isDeletable: buddy.isDeletable,
+        //   animalObj: animalsKeyIdMap[buddy.animalId],
+        //   colorObj: colorsKeyIdMap[buddy.colorId]
+        // }
+        //
+        -->
+
         {{#each onlineBuddies}}
             {{#if this.isActive}}
     
@@ -141,24 +159,25 @@
              * ColorId: String
              * @type {Array}
              */
-            var onlineBuddies = [
-                {
-                  id: 1,
-                  animalId: 1,
-                  colorId: 1,
-                  isActive: true,
-                  isEditable: false,
-                  isDeletable: true,
-                },
-                {
-                  id: 2,
-                  animalId: 1,
-                  colorId: 6,
-                  isActive: false,
-                  isEditable: false, //Implementation removed.
-                  isDeletable: true,
-                }
-            ];
+            // var onlineBuddies = [
+            //     {
+            //       id: 1,
+            //       animalId: 1,
+            //       colorId: 1,
+            //       isActive: true,
+            //       isEditable: false,
+            //       isDeletable: true,
+            //     },
+            //     {
+            //       id: 2,
+            //       animalId: 1,
+            //       colorId: 6,
+            //       isActive: false,
+            //       isEditable: false, //Implementation removed.
+            //       isDeletable: true,
+            //     }
+            // ];
+
             var colorsList = [
                 {
                   id: 1,
@@ -190,8 +209,8 @@
                   code: '#158aff'
                 },{
                   id: 8,
-                  color: 'cyan',
-                  code: '#00c8ee'
+                  color: 'indigo',
+                  code: '#4b0082'
                 },{
                   id: 9,
                   color: 'violet',
@@ -200,12 +219,28 @@
                   id: 10,
                   color: 'green',
                   code: '#7fcc2c'
+                },{
+                  id: 11,
+                  color: 'green',
+                  code: '#7fcc2c'
+                },{
+                  id: 12,
+                  color: 'gray',
+                  code: '#808080'
+                },{
+                  id: 13,
+                  color: 'khaki',
+                  code: '#F0E68C'
+                },{
+                  id: 14,
+                  color: 'maroon',
+                  code: '#800000'
             }];
 
             var animalList = [
                 {
                   id: 1,
-                  name: 'Fox',
+                  name: 'fox',
                   svg: `<svg xmlns:svg="http://www.w3.org/2000/svg" xmlns="http://www.w3.org/2000/svg" width="100px" height="100px" viewBox="0 0 100 100" version="1.1">
                             <g transform="translate(-381.42857,-570.93361)">
                                 <path
@@ -216,7 +251,7 @@
                 },
                 {
                   id: 2,
-                  name: 'Tortoise',
+                  name: 'tortoise',
                   svg: `<svg xmlns:svg="http://www.w3.org/2000/svg" xmlns="http://www.w3.org/2000/svg" width="100" height="100" viewBox="0 0 100 100" version="1.1">
                       <g transform="translate(-555.71429,-439.50506)">
                         <path
@@ -227,7 +262,7 @@
                 },
                 {
                   id: 3,
-                  name: 'Bat',
+                  name: 'bat',
                   svg: `<svg xmlns:svg="http://www.w3.org/2000/svg" xmlns="http://www.w3.org/2000/svg" width="100" height="100" viewBox="0 0 100 100" version="1.1">
                       <g transform="translate(-395.71429,-559.50504)">
                         <path
@@ -238,7 +273,7 @@
                 },
                 {
                   id: 4,
-                  name: 'Bear',
+                  name: 'bear',
                   svg: `<svg xmlns:svg="http://www.w3.org/2000/svg" xmlns="http://www.w3.org/2000/svg" width="100" height="100" viewBox="0 0 100 100" version="1.1">
                       <g transform="translate(-144.28571,-462.36218)">
                         <path
@@ -249,7 +284,7 @@
                 },
                 {
                   id: 5,
-                  name: 'Bulbul',
+                  name: 'bulbul',
                   svg: `<svg xmlns:svg="http://www.w3.org/2000/svg" xmlns="http://www.w3.org/2000/svg" width="100" height="100" viewBox="0 0 100 100" version="1.1">
                       <g transform="translate(-398.57143,-608.07647)">
                         <path
@@ -260,7 +295,7 @@
                 },
                 {
                   id: 6,
-                  name: 'Bull',
+                  name: 'bull',
                   svg: `<svg xmlns:svg="http://www.w3.org/2000/svg" xmlns="http://www.w3.org/2000/svg" width="100" height="100" viewBox="0 0 100 100" version="1.1">
                       <g transform="translate(-112.85714,-562.36218)">
                         <path
@@ -271,7 +306,7 @@
                 },
                 {
                   id: 7,
-                  name: 'Butterfly',
+                  name: 'butterfly',
                   svg: `<svg xmlns:svg="http://www.w3.org/2000/svg" xmlns="http://www.w3.org/2000/svg" width="100" height="100" viewBox="0 0 100 100" version="1.1">
                       <g transform="translate(-652.85714,-573.79075)">
                         <path
@@ -282,7 +317,7 @@
                 },
                 {
                   id: 8,
-                  name: 'Camel',
+                  name: 'camel',
                   svg: `<svg xmlns:svg="http://www.w3.org/2000/svg" xmlns="http://www.w3.org/2000/svg" width="100" height="100" viewBox="0 0 100 100" version="1.1">
                       <g transform="translate(-412.85714,-305.21933)">
                         <path
@@ -293,7 +328,7 @@
                 },
                  {
                   id: 9,
-                  name: 'Cat',
+                  name: 'cat',
                   svg: `<svg xmlns:svg="http://www.w3.org/2000/svg" xmlns="http://www.w3.org/2000/svg" width="100" height="100" viewBox="0 0 100 100" version="1.1">
                       <g transform="translate(-210,-470.93361)">
                         <path
@@ -304,7 +339,7 @@
                 },
                 {
                   id: 10,
-                  name: 'Cheetah',
+                  name: 'cheetah',
                   svg: `<svg xmlns:svg="http://www.w3.org/2000/svg" xmlns="http://www.w3.org/2000/svg" width="100" height="100" viewBox="0 0 100 100" version="1.1">
                       <g transform="translate(-472.85714,-645.21933)">
                         <path
@@ -315,7 +350,7 @@
                 },
                 {
                   id: 11,
-                  name: 'Cobra',
+                  name: 'cobra',
                   svg: `<svg xmlns:svg="http://www.w3.org/2000/svg" xmlns="http://www.w3.org/2000/svg" width="100" height="100" viewBox="0 0 100 100" version="1.1">
                       <g transform="translate(-472.85714,-573.79075)">
                         <path
@@ -326,7 +361,7 @@
                 },
                 {
                   id: 12,
-                  name: 'Crab',
+                  name: 'crab',
                   svg: `<svg xmlns:svg="http://www.w3.org/2000/svg" xmlns="http://www.w3.org/2000/svg" width="100" height="100" viewBox="0 0 100 100" version="1.1">
                       <g transform="translate(-512.85714,-550.93364)">
                         <path
@@ -337,7 +372,7 @@
                 },
                 {
                   id: 13,
-                  name: 'Deer',
+                  name: 'deer',
                   svg: `<svg xmlns:svg="http://www.w3.org/2000/svg" xmlns="http://www.w3.org/2000/svg" width="100" height="100" viewBox="0 0 100 100" version="1.1">
                       <g transform="translate(-330,-253.79075)">
                         <path
@@ -348,7 +383,7 @@
                 },
                 {
                   id: 14,
-                  name: 'Dog',
+                  name: 'dog',
                   svg: `<svg xmlns:svg="http://www.w3.org/2000/svg" xmlns="http://www.w3.org/2000/svg" width="100" height="100" viewBox="0 0 100 100" version="1.1">
                       <g transform="translate(-438.57143,-502.36218)">
                         <path
@@ -359,7 +394,7 @@
                 },
                 {
                   id: 15,
-                  name: 'Dolphin',
+                  name: 'dolphin',
                   svg: `<svg xmlns:svg="http://www.w3.org/2000/svg" xmlns="http://www.w3.org/2000/svg" width="100" height="100" viewBox="0 0 100 100" version="1.1">
                       <g transform="translate(-292.85714,-482.36218)">
                         <path
@@ -370,7 +405,7 @@
                 },
                 {
                   id: 16,
-                  name: 'Dragon',
+                  name: 'dragon',
                   svg: `<svg xmlns:svg="http://www.w3.org/2000/svg" xmlns="http://www.w3.org/2000/svg" width="100" height="100" viewBox="0 0 100 100" version="1.1">
                       <g transform="translate(-490,-393.79078)">
                         <path
@@ -381,7 +416,7 @@
                 },
                 {
                   id: 17,
-                  name: 'Duck',
+                  name: 'duck',
                   svg: `<svg xmlns:svg="http://www.w3.org/2000/svg" xmlns="http://www.w3.org/2000/svg" width="100" height="100" viewBox="0 0 100 100" version="1.1">
                       <g transform="translate(-458.57143,-662.36218)">
                         <path
@@ -392,7 +427,7 @@
                 },
                 {
                   id: 18,
-                  name: 'Eagle',
+                  name: 'eagle',
                   svg: `<svg xmlns:svg="http://www.w3.org/2000/svg" xmlns="http://www.w3.org/2000/svg" width="100" height="100" viewBox="0 0 100 100" version="1.1">
                       <g transform="translate(-512.85714,-499.50504)">
                         <path
@@ -403,7 +438,7 @@
                 },
                 {
                   id: 19,
-                  name: 'Elephant',
+                  name: 'elephant',
                   svg: `<svg xmlns:svg="http://www.w3.org/2000/svg" xmlns="http://www.w3.org/2000/svg" width="100" height="100" viewBox="0 0 100 100" version="1.1">
                       <g transform="translate(-492.85714,-373.79075)">
                         <path
@@ -414,7 +449,7 @@
                 },
                 {
                   id: 20,
-                  name: 'Flamingo',
+                  name: 'flamingo',
                   svg: `<svg xmlns:svg="http://www.w3.org/2000/svg" xmlns="http://www.w3.org/2000/svg" width="100" height="100" viewBox="0 0 100 100" version="1.1">
                       <g transform="translate(-578.57143,-299.50504)">
                         <path
@@ -425,7 +460,7 @@
                 },
                 {
                   id: 21,
-                  name: 'Gorilla',
+                  name: 'gorilla',
                   svg: `<svg xmlns:svg="http://www.w3.org/2000/svg" xmlns="http://www.w3.org/2000/svg" width="100" height="100" viewBox="0 0 100 100" version="1.1">
                       <g transform="translate(-412.85714,-690.93361)">
                         <path
@@ -436,7 +471,7 @@
                 },
                 {
                   id: 22,
-                  name: 'Hen',
+                  name: 'hen',
                   svg: `<svg xmlns:svg="http://www.w3.org/2000/svg" xmlns="http://www.w3.org/2000/svg" width="100" height="100" viewBox="0 0 100 100" version="1.1">
                       <g transform="translate(-310,-590.93361)">
                         <path
@@ -447,7 +482,7 @@
                 },
                 {
                   id: 23,
-                  name: 'Heron',
+                  name: 'heron',
                   svg: `<svg xmlns:svg="http://www.w3.org/2000/svg" xmlns="http://www.w3.org/2000/svg" width="100" height="100" viewBox="0 0 100 100" version="1.1">
                       <g transform="translate(-501.42857,-576.6479)">
                         <path
@@ -458,7 +493,7 @@
                 },
                 {
                   id: 24,
-                  name: 'Hippo',
+                  name: 'hippo',
                   svg: `<svg xmlns:svg="http://www.w3.org/2000/svg" xmlns="http://www.w3.org/2000/svg" width="100" height="100" viewBox="0 0 100 100" version="1.1">
                       <g transform="translate(-512.85714,-650.93361)">
                         <path
@@ -469,7 +504,7 @@
                 },
                 {
                   id: 25,
-                  name: 'Horse',
+                  name: 'horse',
                   svg: `<svg xmlns:svg="http://www.w3.org/2000/svg" xmlns="http://www.w3.org/2000/svg" width="100" height="100" viewBox="0 0 100 100" version="1.1">
                       <g transform="translate(-467.14286,-502.36218)">
                         <path
@@ -480,7 +515,7 @@
                 },
                 {
                   id: 26,
-                  name: 'Kangroo',
+                  name: 'kangroo',
                   svg: `<svg xmlns:svg="http://www.w3.org/2000/svg" xmlns="http://www.w3.org/2000/svg" width="100" height="100" viewBox="0 0 100 100" version="1.1">
                       <g transform="translate(-618.57143,-533.79075)">
                         <path
@@ -491,7 +526,7 @@
                 },
                 {
                   id: 27,
-                  name: 'Kiwi',
+                  name: 'kiwi',
                   svg: `<svg xmlns:svg="http://www.w3.org/2000/svg" xmlns="http://www.w3.org/2000/svg" width="100" height="100" viewBox="0 0 100 100" version="1.1">
                       <g transform="translate(-412.85714,-325.21933)">
                         <path
@@ -502,7 +537,7 @@
                 },
                 {
                   id: 28,
-                  name: 'Lion',
+                  name: 'lion',
                   svg: `<svg xmlns:svg="http://www.w3.org/2000/svg" xmlns="http://www.w3.org/2000/svg" width="100" height="100" viewBox="0 0 100 100" version="1.1">
                       <g transform="translate(-552.85714,-605.21935)">
                         <path
@@ -513,7 +548,7 @@
                 },
                 {
                   id: 29,
-                  name: 'Llama',
+                  name: 'llama',
                   svg: `<svg xmlns:svg="http://www.w3.org/2000/svg" xmlns="http://www.w3.org/2000/svg" width="100" height="100" viewBox="0 0 100 100" version="1.1">
                       <g transform="translate(-550,-525.21933)">
                         <path
@@ -524,7 +559,7 @@
                 },
                 {
                   id: 30,
-                  name: 'Monkey',
+                  name: 'monkey',
                   svg: `<svg xmlns:svg="http://www.w3.org/2000/svg" xmlns="http://www.w3.org/2000/svg" width="100" height="100" viewBox="0 0 100 100" version="1.1">
                       <g transform="translate(-321.42857,-436.6479)">
                         <path
@@ -535,7 +570,7 @@
                 },
                 {
                   id: 31,
-                  name: 'Mouse',
+                  name: 'mouse',
                   svg: `<svg xmlns:svg="http://www.w3.org/2000/svg" xmlns="http://www.w3.org/2000/svg" width="100" height="100" viewBox="0 0 100 100" version="1.1">
                       <g transform="translate(-167.14286,-299.50504)">
                         <path
@@ -546,7 +581,7 @@
                 },
                 {
                   id: 32,
-                  name: 'Octopus',
+                  name: 'octopus',
                   svg: `<svg xmlns:svg="http://www.w3.org/2000/svg" xmlns="http://www.w3.org/2000/svg" width="100" height="100" viewBox="0 0 100 100" version="1.1">
                       <g transform="translate(-407.14286,-636.6479)">
                         <path
@@ -557,7 +592,7 @@
                 },
                 {
                   id: 33,
-                  name: 'Ostrich',
+                  name: 'ostrich',
                   svg: `<svg xmlns:svg="http://www.w3.org/2000/svg" xmlns="http://www.w3.org/2000/svg" width="100" height="100" viewBox="0 0 100 100" version="1.1">
                       <g transform="translate(-264.28571,-422.36218)">
                         <path
@@ -568,7 +603,7 @@
                 },
                 {
                   id: 34,
-                  name: 'Owl',
+                  name: 'owl',
                   svg: `<svg xmlns:svg="http://www.w3.org/2000/svg" xmlns="http://www.w3.org/2000/svg" width="100" height="100" viewBox="0 0 100 100" version="1.1">
                       <g transform="translate(-627.14286,-462.36218)">
                         <path
@@ -579,7 +614,7 @@
                 },
                 {
                   id: 35,
-                  name: 'Panda',
+                  name: 'panda',
                   svg: `<svg xmlns:svg="http://www.w3.org/2000/svg" xmlns="http://www.w3.org/2000/svg" width="100" height="100" viewBox="0 0 100 100" version="1.1">
                       <g transform="translate(-350,-539.50504)">
                         <path
@@ -590,7 +625,7 @@
                 },
                 {
                   id: 36,
-                  name: 'Parrot',
+                  name: 'parrot',
                   svg: `<svg xmlns:svg="http://www.w3.org/2000/svg" xmlns="http://www.w3.org/2000/svg" width="100" height="100" viewBox="0 0 100 100" version="1.1">
                       <g transform="translate(-721.42857,-650.93361)">
                         <path
@@ -601,7 +636,7 @@
                 },
                 {
                   id: 37,
-                  name: 'Peacock',
+                  name: 'peacock',
                   svg: `<svg xmlns:svg="http://www.w3.org/2000/svg" xmlns="http://www.w3.org/2000/svg" width="100" height="100" viewBox="0 0 100 100" version="1.1">
                       <g transform="translate(-387.14286,-496.6479)">
                         <path
@@ -612,7 +647,7 @@
                 },
                 {
                   id: 38,
-                  name: 'Piegon',
+                  name: 'piegon',
                   svg: `<svg xmlns:svg="http://www.w3.org/2000/svg" xmlns="http://www.w3.org/2000/svg" width="100" height="100" viewBox="0 0 100 100" version="1.1">
                       <g transform="translate(-581.42857,-545.21933)">
                         <path
@@ -623,7 +658,7 @@
                 },
                 {
                   id: 39,
-                  name: 'Python',
+                  name: 'python',
                   svg: `<svg xmlns:svg="http://www.w3.org/2000/svg" xmlns="http://www.w3.org/2000/svg" width="100" height="100" viewBox="0 0 100 100" version="1.1">
                       <g transform="translate(-495.71429,-385.21933)">
                         <path
@@ -634,7 +669,7 @@
                 },
                 {
                   id: 40,
-                  name: 'Rabbit',
+                  name: 'rabbit',
                   svg: `<svg xmlns:svg="http://www.w3.org/2000/svg" xmlns="http://www.w3.org/2000/svg" width="100" height="100" viewBox="0 0 100 100" version="1.1">
                       <g transform="translate(-521.42857,-439.50504)">
                         <path
@@ -645,7 +680,7 @@
                 },
                 {
                   id: 41,
-                  name: 'Rhino',
+                  name: 'rhino',
                   svg: `<svg xmlns:svg="http://www.w3.org/2000/svg" xmlns="http://www.w3.org/2000/svg" width="100" height="100" viewBox="0 0 100 100" version="1.1">
                       <g transform="translate(-278.57143,-522.36218)">
                         <path
@@ -656,7 +691,7 @@
                 },
                 {
                   id: 42,
-                  name: 'Seahorse',
+                  name: 'seahorse',
                   svg: `<svg xmlns:svg="http://www.w3.org/2000/svg" xmlns="http://www.w3.org/2000/svg" width="100" height="100" viewBox="0 0 100 100" version="1.1">
                       <g transform="translate(-370,-676.6479)">
                         <path
@@ -667,7 +702,7 @@
                 },
                 {
                   id: 43,
-                  name: 'Seal',
+                  name: 'seal',
                   svg: `<svg xmlns:svg="http://www.w3.org/2000/svg" xmlns="http://www.w3.org/2000/svg" width="100" height="100" viewBox="0 0 100 100" version="1.1">
                       <g transform="translate(-450,-390.93361)">
                         <path
@@ -678,7 +713,7 @@
                 },
                 {
                   id: 44,
-                  name: 'Shark',
+                  name: 'shark',
                   svg: `<svg xmlns:svg="http://www.w3.org/2000/svg" xmlns="http://www.w3.org/2000/svg" width="100" height="100" viewBox="0 0 100 100" version="1.1">
                       <g transform="translate(-541.42857,-610.93364)">
                         <path
@@ -689,7 +724,7 @@
                 },
                 {
                   id: 45,
-                  name: 'Snail',
+                  name: 'snail',
                   svg: `<svg xmlns:svg="http://www.w3.org/2000/svg" xmlns="http://www.w3.org/2000/svg" width="100" height="100" viewBox="0 0 100 100" version="1.1">
                       <g transform="translate(-335.71429,-436.6479)">
                         <path
@@ -700,7 +735,7 @@
                 },
                 {
                   id: 46,
-                  name: 'Sparrow',
+                  name: 'sparrow',
                   svg: `<svg xmlns:svg="http://www.w3.org/2000/svg" xmlns="http://www.w3.org/2000/svg" width="100" height="100" viewBox="0 0 100 100" version="1.1">
                       <g transform="translate(-441.42857,-482.36218)">
                         <path
@@ -711,7 +746,7 @@
                 },
                 {
                   id: 47,
-                  name: 'Squirrel',
+                  name: 'squirrel',
                   svg: `<svg xmlns:svg="http://www.w3.org/2000/svg" xmlns="http://www.w3.org/2000/svg" width="100" height="100" viewBox="0 0 100 100" version="1.1">
                       <g transform="translate(-264.28571,-596.6479)">
                         <path
@@ -722,7 +757,7 @@
                 },
                 {
                   id: 48,
-                  name: 'Swan',
+                  name: 'swan',
                   svg: `<svg xmlns:svg="http://www.w3.org/2000/svg" xmlns="http://www.w3.org/2000/svg" width="100" height="100" viewBox="0 0 100 100" version="1.1">
                       <g transform="translate(-227.14286,-530.93361)">">
                         <path
@@ -733,7 +768,7 @@
                 },
                 {
                   id: 49,
-                  name: 'Tiger',
+                  name: 'tiger',
                   svg: `<svg xmlns:svg="http://www.w3.org/2000/svg" xmlns="http://www.w3.org/2000/svg" width="100" height="100" viewBox="0 0 100 100" version="1.1">
                       <g transform="translate(-352.85714,-533.79075)">
                         <path
@@ -744,7 +779,7 @@
                 },
                 {
                   id: 50,
-                  name: 'Whale',
+                  name: 'whale',
                   svg: `<svg xmlns:svg="http://www.w3.org/2000/svg" xmlns="http://www.w3.org/2000/svg" width="100" height="100" viewBox="0 0 100 100" version="1.1">
                       <g transform="translate(-244.28571,-568.07647)">
                         <path
@@ -755,7 +790,7 @@
                 },
                 {
                   id: 51,
-                  name: 'Wolf',
+                  name: 'wolf',
                   svg: `<svg xmlns:svg="http://www.w3.org/2000/svg" xmlns="http://www.w3.org/2000/svg" width="100" height="100" viewBox="0 0 100 100" version="1.1">
                       <g transform="translate(-524.28571,-653.79078)">
                         <path
@@ -766,7 +801,7 @@
                 },
                 {
                   id: 52,
-                  name: 'Zebra',
+                  name: 'zebra',
                   svg: `<svg xmlns:svg="http://www.w3.org/2000/svg" xmlns="http://www.w3.org/2000/svg" width="100" height="100" viewBox="0 0 100 100" version="1.1">
                       <g transform="translate(-567.14286,-445.21933)">
                         <path
@@ -778,17 +813,84 @@
 
             ]
 
-            var colorsMap = {};
+            var colorsKeyIdMap = {};
             $.each(colorsList, function(index, colorObj) {
-                colorsMap[colorObj.id] = colorObj;
+                colorsKeyIdMap[colorObj.id] = colorObj;
             });
 
-            var animalsMap = {};
+            var colorsKeyNameMap = {};
+            $.each(colorsList, function(index, colorObj) {
+                colorsKeyNameMap[colorObj.color] = colorObj;
+            });
+
+            var animalsKeyIdMap = {};
             $.each(animalList, function(index, animalObj) {
-                animalsMap[animalObj.id] = animalObj;
+                animalsKeyIdMap[animalObj.id] = animalObj;
             });
 
-            var onlineBuddiesMap = {};
+            var animalsKeyNameMap = {};
+            $.each(animalList, function(index, animalObj) {
+                animalsKeyNameMap[animalObj.name] = animalObj;
+            });
+
+            onlineBuddies = []
+
+            function addInOnlineBuddies(authId, animalName, colorName) {
+              var animalObj = animalsKeyNameMap[animalName];
+              var colorObj = colorsKeyNameMap[colorName]
+
+              if (animalName && colorName){
+                onlineBuddies.push({
+                                    // id: animalObj.id,
+                                    id: authId,
+                                    authId: authId,
+                                    animalId: animalObj.id,
+                                    animalName: animalName,
+                                    colorId: colorObj.id,
+                                    colorName: colorName,
+                                    isActive: false,
+                                    isEditable: false, //Implementation removed.
+                                    isDeletable: true,
+                                  })
+              }
+              updateBuddyObjectMap(onlineBuddies)
+            }
+
+              {% if request.session.buddies_authid_name_dict %}
+                buddies_authid_name_dict_js = {{request.session.buddies_authid_name_dict|safe}};
+              {% else %}
+                buddies_authid_name_dict_js = {};
+              {% endif %}
+
+            // console.log(buddies_authid_name_dict_js)
+            for (buddyAuthId in buddies_authid_name_dict_js){
+              var buddyName = buddies_authid_name_dict_js[buddyAuthId];
+              var buddyNameSplit = buddyName.split('-');
+              var buddyColorName = buddyNameSplit[0];
+              var buddyAnimalName = buddyNameSplit[1];
+              // var buddyInstCodeName = buddyNameSplit[2];
+              // var animalSVGObj = animalsKeyNameMap[buddyAnimalName];
+              // var colorObj = colorsKeyNameMap[buddyColorName]
+
+              addInOnlineBuddies(buddyAuthId, buddyAnimalName, buddyColorName)
+              // if (buddyAnimalName && buddyColorName){
+
+              //   onlineBuddies.push({
+              //                       // id: animalSVGObj.id,
+              //                       id: buddyAuthId,
+              //                       authId: buddyAuthId,
+              //                       animalId: animalSVGObj.id,
+              //                       animalName: buddyAnimalName,
+              //                       colorId: colorObj.id,
+              //                       colorName: buddyColorName,
+              //                       isActive: false,
+              //                       isEditable: false, //Implementation removed.
+              //                       isDeletable: true,
+              //                     })
+              // }
+            }
+            // console.log(onlineBuddies)
+            onlineBuddiesMap = {};
             /**
              * Creates a Object with id as buddy id and object as value.
              * This is useful for quick access of the buddy info by id.
@@ -804,7 +906,7 @@
              * Function to update the buddy panel with
              * udpate list of joined buddies
              */
-            function upadteBuddyPanel(activeBuddiesList) {
+            function updateBuddyPanel(activeBuddiesList) {
                 // Creates a list of objects with id replaced by equivalent objects.
                 var activeBuddyMap = activeBuddiesList.map(function(buddy){
                     return {
@@ -812,8 +914,8 @@
                       isActive: buddy.isActive,
                       isEditable: buddy.isEditable,
                       isDeletable: buddy.isDeletable,
-                      animalObj: animalsMap[buddy.animalId],
-                      colorObj: colorsMap[buddy.colorId]
+                      animalObj: animalsKeyNameMap[buddy.animalName],
+                      colorObj: colorsKeyNameMap[buddy.colorName]
                     }
                 });
 
@@ -825,7 +927,7 @@
                 updateBuddyObjectMap(activeBuddiesList)
             }
 
-            upadteBuddyPanel(onlineBuddies);
+            updateBuddyPanel(onlineBuddies);
             //console.log(activeBuddyTemplate(context));
 
             // Populating the colors from the list of colors
@@ -889,26 +991,18 @@
                     }
                     $('.add_buddy_step_2').find('[data=' + id + ']').addClass('selected');
                 }
+                // console.log(currentSelectedBuddy)
+                // console.log(getDuplicateBuddies(currentSelectedBuddy))
             }
 
-            /**
-             * When a user selects a color we update the current* variables.
-             * We also update the sample logo on top right corner.
-             */
-            $('.add_buddy_step_1').on('click', '.buddy_color_option', function() {
-                selectColor(parseInt($(this).attr('data')));
-            });
+            function getDuplicateBuddies(selectedBuddy) {
+                let duplicateBuddies = onlineBuddies.filter(function(buddy){
+                    return (buddy.animalId === selectedBuddy.animalId && buddy.colorId === selectedBuddy.colorId);
+                });
+                return duplicateBuddies;
+            }
 
-            /**
-             * When a user selects a animal we update the current* variables.
-             * We also update the sample logo on top right corner.
-             */
-            $('.add_buddy_step_2').on('click', '.buddy_animal', function() {
-                selectAnimal(parseInt($(this).attr('data')));
-            });
-
-            // Create the buddy logo
-            $('.add_buddy_icon').on('click', function() {
+            function resetBuddyModal() {
                 isEditMode = false;
                 currentSelectedBuddy = {};
                 currentSelectedAnimal = {};
@@ -917,6 +1011,36 @@
                 selectColor();
                 $('.sample_buddy svg').empty();
                 $('.add_buddy_submit').html('Add');
+            }
+
+            function removeDuplicateSelectedBuddy (currentSelectedBuddy) {
+              if (getDuplicateBuddies(currentSelectedBuddy).length) {
+                  alert('You can not select already added buddy.\n\nYou may choose another :)');
+                  resetBuddyModal()
+                };
+            }
+            /**
+             * When a user selects a color we update the current* variables.
+             * We also update the sample logo on top right corner.
+             */
+            $('.add_buddy_step_1').on('click', '.buddy_color_option', function() {
+                selectColor(parseInt($(this).attr('data')));
+                removeDuplicateSelectedBuddy (currentSelectedBuddy)
+            });
+
+            /**
+             * When a user selects a animal we update the current* variables.
+             * We also update the sample logo on top right corner.
+             */
+            $('.add_buddy_step_2').on('click', '.buddy_animal', function() {
+                selectAnimal(parseInt($(this).attr('data')));
+                removeDuplicateSelectedBuddy (currentSelectedBuddy)
+            });
+
+            // Create the buddy logo
+            $('.add_buddy_icon').on('click', function() {
+                // at modal opening time
+                resetBuddyModal()
             });
 
             /**
@@ -953,22 +1077,91 @@
              */
             $('.buddy_panel').on('click', '.buddy_icon .buddy_delete', function(e) {
                 //e.stopPropagation();
-                buddyClickedForDeletion = onlineBuddiesMap[parseInt($(this).closest('.buddy_icon').attr('data'))];
-
-                console.log('Deleted the buddy');
+                buddyClickedForDeletion = onlineBuddiesMap[$(this).closest('.buddy_icon').attr('data')];
             })
-
-            function getDuplicateBuddies(selectedBuddy) {
-                let duplicateBuddies = onlineBuddies.filter(function(buddy){
-                    return (buddy.animalId === selectedBuddy.animalId && buddy.colorId === selectedBuddy.colorId);
-                });
-                return duplicateBuddies;
-            }
 
             var buddyIdCount = 3;
             /**
              * On submitting the buddy form you can take actions based on the mode.
              */
+            
+
+            function saveBuddies (selectedBuddiesArr) {
+                                      
+              $.ajax({
+                url: "{% url 'update_buddies' group_id %}",
+                type: 'POST',
+                data: {
+                  selected_buddies_list: JSON.stringify(selectedBuddiesArr),
+                  csrfmiddlewaretoken: '{{ csrf_token }}'
+                },
+                success: function (data) {
+                  // console.log(data);
+                  var resultData = JSON.parse(data)
+                  var buddyOidNameObj = resultData['buddies'];
+                  var alreadyActiveIdNameObj = resultData['already_active'];
+
+                  displayMsg = buddyUserNames = alreadyActiveUserNames = '';
+
+                  for(var eachUserName in buddyOidNameObj){
+                    // console.log(buddyOidNameObj[eachUserName]);
+                    buddyUserNames += '\n- ' + buddyOidNameObj[eachUserName]
+                  }
+
+                  for(var eachUserName in alreadyActiveIdNameObj){
+                    // console.log(alreadyActiveIdNameObj[eachUserName]);
+                    alreadyActiveUserNames += '\n- ' + alreadyActiveIdNameObj[eachUserName]
+                  }
+                  // console.log(alreadyActiveUserNames);
+
+                  if (alreadyActiveUserNames)
+                  {
+                    displayMsg += 'Following can not be your buddies (because they are already active on site, either as a buddy or as a logged in user):\n'
+                    displayMsg += alreadyActiveUserNames;
+                  }
+
+                  if (buddyUserNames)
+                  {
+                    displayMsg += '\n\nCurrently, following are your buddies:\n'
+                    displayMsg += buddyUserNames;
+                  }
+                  else
+                  {
+                    displayMsg += '\n\nCurrently, you have NO buddies:\n'
+                  };
+
+                  alert(displayMsg);
+                  location.reload();
+                  // addInOnlineBuddies(authId, buddyAnimalName, buddyColorName)
+                  updateBuddyPanel(onlineBuddies);
+                }
+              });
+            }
+
+
+            function getAuthIdSaveBuddy(colorName, animalName){
+              var buddyInstCodeName = "{{site.INSTITUTE_ID}}";
+              var buddyName = colorName.trim() + "-" + animalName.trim() + "-" + buddyInstCodeName;
+              var auth_id = 0;
+              $.ajax({
+                url: "{% url 'get_buddy_auth_id_from_name' group_id %}",
+                type: 'GET',
+                data: {selected_buddy_username: buddyName},
+                success: function (data) {
+                  var dataObj = JSON.parse(data);
+                  if (dataObj['success']){
+                    addInOnlineBuddies(dataObj['auth_id'], animalName, colorName)
+                    saveBuddies(Object.keys(onlineBuddiesMap));
+                  }
+                  else{
+                    alert('This buddy seems to be online with somebody.');
+                  }
+                }
+              })
+            }
+
+
+
             $('.add_buddy_submit').on('click', function(e) {
                 e.preventDefault();
                 if (!currentSelectedColor.id) {
@@ -1026,17 +1219,14 @@
                      *
                      */
                     if (getDuplicateBuddies(currentSelectedBuddy).length === 0) {
-                        onlineBuddies.push({
-                            id: buddyIdCount++,
-                            animalId: currentSelectedAnimal.id,
-                            colorId: currentSelectedColor.id,
-                            isActive: true,
-                            isEditable: false,
-                            isDeletable: true,
-                        });
+
+                        var buddyColorName = colorsKeyIdMap[currentSelectedColor.id].color;
+                        var buddyAnimalName = animalsKeyIdMap[currentSelectedAnimal.id].name;
+                        getAuthIdSaveBuddy(buddyColorName, buddyAnimalName)
+
                         $('#add_buddy_modal').foundation('reveal', 'close');
                         // You can do a submit or ajax call from here
-                        upadteBuddyPanel(onlineBuddies);
+                        // console.log(onlineBuddies)
                     } else {
                         alert('Buddy already exist with this animal and color.');
                     }
@@ -1048,7 +1238,8 @@
                 onlineBuddies = onlineBuddies.filter(function(buddy){
                   return buddy.id !== buddyToDelete.id;
                 });
-                upadteBuddyPanel(onlineBuddies);
+                updateBuddyPanel(onlineBuddies);
+                saveBuddies(Object.keys(onlineBuddiesMap));
             }
 
             /*
