@@ -138,7 +138,7 @@
                 <li><a href="{% url explore_url %}" {% if title == 'base courses' or title == "courses" or title == "drafts" %} class="active" {% endif %} > Explore</a>
                 </li>
                 {% if help_oid %}
-                <li class=""><a target="_blank" href="{% url 'help_page_view' help_oid %}"><i class="fi-info"></i> Help Topics</a></li>
+                <li class=""><a {% if title == 'Help Page'  %} class="active" {% endif %} target="_blank" href="{% url 'help_page_view' help_oid %}"><i class="fi-info"></i> Help Topics</a></li>
                 {% endif %}
             </ul>
           </section>
