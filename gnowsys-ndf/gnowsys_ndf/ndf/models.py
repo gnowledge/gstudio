@@ -330,7 +330,7 @@ class Node(DjangoDocument):
                         # 'comment_enabled': bool,
                         # 'login_required': bool,
                         # 'password': basestring,
-                        'status': u'DRAFT',
+                        'status': u'PUBLISHED',
                         'rating':[],
                         'snapshot':{}
                     }
@@ -2773,6 +2773,10 @@ class Author(Group):
 
     def is_authenticated(self):
         return True
+
+    @staticmethod
+    def get_author_by_userid(user_id):
+        return node_collection.one({'_type': 'Author', 'created_by': user_id})
 
     @staticmethod
     def get_user_id_list_from_author_oid_list(author_oids_list=[]):
