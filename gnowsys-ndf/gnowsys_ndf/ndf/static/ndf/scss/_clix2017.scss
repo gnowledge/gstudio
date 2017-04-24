@@ -3036,9 +3036,9 @@ ul.jqtree-tree .jqtree-toggler {
     height:100vh;
     background-size: 100%;
 }
-.white-text{
-    color:white;
-}
+.clix-text{
+    z-index:-1;
+    }
   .panel-mod{
     background-color: transparent;
     border: none;
@@ -5027,6 +5027,8 @@ ul.nav_menu_1 {
                 border: 1px solid #c1b4b5;
                 background-color: #4b4852;
 
+
+
     }
 
 
@@ -5034,3 +5036,6 @@ ul.nav_menu_1 {
         margin-top: 28px;
     margin-left: -56px;
 }
+
+           
+
