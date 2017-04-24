@@ -2,31 +2,6 @@
   <script src="/static/ndf/bower_components/handlebars/handlebars.js"></script>
 {% endblock head %}
 
-{% comment %}
-  
-              <li>
-                <a href="#" data-reveal-id="add-buddy" data-reveal-ajax="{% url 'list_buddy' 'home' %}">
-                  My buddies ({{request.session.buddies_authid_list|length}})
-                </a>
-
-                <div id="add-buddy" class="reveal-modal tiny" data-reveal aria-labelledby="modalTitle" aria-hidden="true" role="dialog">
-
-                </div>
-
-              </li>
-
-              <blockquote>
-                <ul>
-                  {% for i, each_buddy in request.session.buddies_authid_name_dict.items %}
-                  <li class="text-left">
-                    <h5><small class="fi-torso"> {{each_buddy}}</small></h5>
-                  </li>
-                  {% endfor %}
-                </ul>
-              </blockquote>
-              {# --{{request.session.buddies_authid_name_dict}}-- #}
-{% endcomment %}
-
 {% block body_content %}
   <!-- RHS Buddy Panel -->
   <div class="buddy_panel" id="sample_buddy_panel">
@@ -865,7 +840,12 @@
               updateBuddyObjectMap(onlineBuddies)
             }
 
-            buddies_authid_name_dict_js = {{request.session.buddies_authid_name_dict|safe}}
+              {% if request.session.buddies_authid_name_dict %}
+                buddies_authid_name_dict_js = {{request.session.buddies_authid_name_dict|safe}};
+              {% else %}
+                buddies_authid_name_dict_js = {};
+              {% endif %}
+
             // console.log(buddies_authid_name_dict_js)
             for (buddyAuthId in buddies_authid_name_dict_js){
               var buddyName = buddies_authid_name_dict_js[buddyAuthId];
@@ -1081,38 +1061,14 @@
              */
             $('.buddy_panel').on('click', '.buddy_icon .buddy_delete', function(e) {
                 //e.stopPropagation();
-                buddyClickedForDeletion = onlineBuddiesMap[parseInt($(this).closest('.buddy_icon').attr('data'))];
-
-                console.log('Deleted the buddy');
+                buddyClickedForDeletion = onlineBuddiesMap[$(this).closest('.buddy_icon').attr('data')];
             })
 
             var buddyIdCount = 3;
             /**
              * On submitting the buddy form you can take actions based on the mode.
              */
-            function getAuthId(colorName, animalName){
-              var buddyInstCodeName = "{{site.INSTITUTE_ID}}";
-              var buddyName = colorName.trim() + "-" + animalName.trim() + "-" + buddyInstCodeName;
-              // console.log(buddyName);
-              var auth_id = 0;
-              $.ajax({
-                url: "{% url 'get_buddy_auth_id_from_name' group_id %}",
-                type: 'GET',
-                data: {selected_buddy_username: buddyName},
-                success: function (data) {
-                  alert(data)
-                  if (data['success']){
-                    auth_id = data
-                  }
-                  else{
-                    auth_id = 0
-                  }
-                }
-              })
-              console.log("jjjjjjjjjj : " + auth_id)
-              return auth_id
-            }
-
+            
 
             function saveBuddies (selectedBuddiesArr) {
                                       
@@ -1161,10 +1117,33 @@
                   alert(displayMsg);
                   location.reload();
                   // addInOnlineBuddies(authId, buddyAnimalName, buddyColorName)
-                  //         updateBuddyPanel(onlineBuddies);
+                  updateBuddyPanel(onlineBuddies);
                 }
               });
             }
+
+
+            function getAuthIdSaveBuddy(colorName, animalName){
+              var buddyInstCodeName = "{{site.INSTITUTE_ID}}";
+              var buddyName = colorName.trim() + "-" + animalName.trim() + "-" + buddyInstCodeName;
+              var auth_id = 0;
+              $.ajax({
+                url: "{% url 'get_buddy_auth_id_from_name' group_id %}",
+                type: 'GET',
+                data: {selected_buddy_username: buddyName},
+                success: function (data) {
+                  var dataObj = JSON.parse(data);
+                  if (dataObj['success']){
+                    addInOnlineBuddies(dataObj['auth_id'], animalName, colorName)
+                    saveBuddies(Object.keys(onlineBuddiesMap));
+                  }
+                  else{
+                    alert('This buddy seems to be online with somebody.');
+                  }
+                }
+              })
+            }
+
 
 
             $('.add_buddy_submit').on('click', function(e) {
@@ -1210,7 +1189,6 @@
                         }
                     });
                 } else {
-                  console.log(currentSelectedBuddy)
                     /**
                      * Send a api request to add a new buddy
                      * New Buddy information is in the currentSelectedBuddy
@@ -1228,25 +1206,8 @@
 
                         var buddyColorName = colorsKeyIdMap[currentSelectedColor.id].color;
                         var buddyAnimalName = animalsKeyIdMap[currentSelectedAnimal.id].name;
-                        authId = getAuthId(buddyColorName, buddyAnimalName)
-                        console.log(authId)
-                        if (authId == 0){
-                          alert('This buddy seems to be online with somebody.');
-                        }
-                        else{
-                          listOfOID = Object.keys(onlineBuddiesMap)
-                          // call ajax to save buddy
-                          saveBuddies(listOfOID)
-                          
-                        }
-                        // onlineBuddies.push({
-                        //     id: buddyIdCount++,
-                        //     animalId: currentSelectedAnimal.id,
-                        //     colorId: currentSelectedColor.id,
-                        //     isActive: true,
-                        //     isEditable: false,
-                        //     isDeletable: true,
-                        // });
+                        getAuthIdSaveBuddy(buddyColorName, buddyAnimalName)
+
                         $('#add_buddy_modal').foundation('reveal', 'close');
                         // You can do a submit or ajax call from here
                         // console.log(onlineBuddies)
@@ -1262,6 +1223,7 @@
                   return buddy.id !== buddyToDelete.id;
                 });
                 updateBuddyPanel(onlineBuddies);
+                saveBuddies(Object.keys(onlineBuddiesMap));
             }
 
             /*

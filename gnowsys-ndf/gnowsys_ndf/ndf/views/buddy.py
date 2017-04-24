@@ -64,7 +64,7 @@ def list_buddy(request, group_id='home'):
 def update_buddies(request, group_id):
 
     selected_buddies_list = eval(request.POST.get('selected_buddies_list', '[]'))
-    print "=== selected_buddies_list : ", selected_buddies_list
+    # print "=== selected_buddies_list : ", selected_buddies_list
     selected_buddies_userids_list = Author.get_user_id_list_from_author_oid_list(selected_buddies_list)
     selected_buddies_userids_set = set(selected_buddies_userids_list)
 
@@ -158,8 +158,5 @@ def get_buddy_auth_id_from_name(request, group_id, username=None):
     if auth_node and (auth_node.created_by not in sitewide_active_userids_list):
         response_dict.update({'auth_id': str(auth_node._id)})
         response_dict.update({'success': True})
-        # print "\n rp: ", response_dict
-        return HttpResponse(json.dumps(response_dict))
-    else:
-        # print "\n fail rp: ", response_dict
-        return HttpResponse(json.dumps(response_dict))
+        
+    return HttpResponse(json.dumps(response_dict))
