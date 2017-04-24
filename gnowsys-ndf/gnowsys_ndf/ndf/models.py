@@ -4169,9 +4169,8 @@ class Counter(DjangoDocument):
         # 'visited_nodes' = {str(ObjectId): int(count_of_visits)}
         'visited_nodes': {basestring: int},
         'assessment': {
-                    'offered_id': {'total': int, 'correct': int, 'incorrect': int}
+                    'offered_id': {'total': int, 'correct': int, 'incorrect_attempts': int}
                     }
-
     }
 
     default_values = {
