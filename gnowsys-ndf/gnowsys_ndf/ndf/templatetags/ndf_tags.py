@@ -2246,19 +2246,19 @@ def resource_info(node):
 @register.assignment_tag
 def edit_policy(groupid,node,user):
 	groupnode = node_collection.find_one({"_id":ObjectId(groupid)})
-	resource_infor=resource_info(node)
+	# node=resource_info(node)
 	#code for public Groups and its Resources
-	resource_type = node_collection.find_one({"_id": {"$in":resource_infor.member_of}})
+	resource_type = node_collection.find_one({"_id": {"$in":node.member_of}})
 	if resource_type.name == 'Page':
-		if resource_infor.type_of:
-			resource_type_name = get_objectid_name(resource_infor.type_of[0])
+		if node.type_of:
+			resource_type_name = get_objectid_name(node.type_of[0])
 			if resource_type_name == 'Info page':
 				if user.id in groupnode.group_admin:
 					return "allow"
 			elif resource_type_name == 'Wiki page':
 				return "allow"
 			elif resource_type_name == 'Blog page':
-				if user.id ==  resource_infor.created_by:
+				if user.id ==  node.created_by:
 					return "allow"
 		else:
 			return "allow"
