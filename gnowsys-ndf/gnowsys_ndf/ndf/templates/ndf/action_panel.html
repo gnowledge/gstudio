@@ -102,7 +102,6 @@
 			<!-- Edit and Publish -->
 				<div class="row btn-row">
 					<!-- Edit button -->
-						{% edit_policy groupid node request.user as status %}
 						{% if is_user_authenticated %}
 							{% get_edit_url node.pk as edit_url %}
 							{% if is_group %}
