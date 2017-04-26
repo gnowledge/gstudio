@@ -2745,7 +2745,7 @@ def course_analytics(request, group_id, user_id, render_template=False, get_resu
 
         unit_structure = _get_unit_hierarchy(group_obj)
         all_lessons = len(unit_structure)
-        print "\n all_l: ", all_lessons
+        # print "\n all_l: ", all_lessons
         all_activities = 0
         completed_activities = 0
         completed_lessons = 0
@@ -2779,7 +2779,7 @@ def course_analytics(request, group_id, user_id, render_template=False, get_resu
             analytics_data['level2_progress_meter'] = (completed_activities/float(all_activities))*100
         else:
             analytics_data['level2_progress_meter'] = 0
-        print "\n an: ", analytics_data
+        # print "\n an: ", analytics_data
     # Resources Section
     # analytics_data['total_res'] = analytics_instance.get_total_resources_count()
     # print "\n Total Resources === ", total_res, "\n\n"
@@ -2900,7 +2900,7 @@ def course_analytics(request, group_id, user_id, render_template=False, get_resu
         return analytics_data
 
     # cache.set(cache_key, analytics_data, 60*10)
-
+    analytics_data['group_member_of'] = group_obj.member_of_names_list
     return render_to_response("ndf/user_course_analytics.html",
                                 analytics_data,
                                 context_instance = RequestContext(request)
