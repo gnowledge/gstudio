@@ -133,9 +133,8 @@
 <script type="text/javascript">
   // for discussion tab
   // storing ndf_tags return values in JS variables
-   var user_access = "{{ user_access }}"; // "allow" or "disallow"
-  {% edit_policy groupid node request.user as status %}
-  var edit_policy = "{{ status }}"; // "allow" or "disallow"
+  var user_access = "{{ user_access }}"; // "allow" or "disallow"
+  var edit_policy = "allow"; // "allow" or "disallow"
   var is_user_authenticated = {{ request.user.is_authenticated|lower }};
 
   function createDiscussion()
