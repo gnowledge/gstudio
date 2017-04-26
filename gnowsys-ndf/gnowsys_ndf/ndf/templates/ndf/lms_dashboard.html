@@ -83,6 +83,7 @@
         
         function show_my_performance(this_obj){
             data_unit_id  = $(this_obj).attr("data-node-id");
+            $.blockUI();
             $.ajax({
               url: "{% url 'course_analytics' group_id request.user.id %}",
               type: "GET",
@@ -92,6 +93,7 @@
                     },
                 global: false,
               success: function(data){
+                        $.unblockUI();
                         $('#show-overlay').foundation('reveal', 'open');
                         $('#show-overlay').html(data);
               },
