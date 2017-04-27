@@ -3349,9 +3349,7 @@ class Triple(DjangoDocument):
         }
         gr_or_rt_name, gr_or_rt_id = Node.get_name_id_from_type(gt_or_rt_name_or_id,
             triple_node_mapping_dict[cls._meta.verbose_name])
-
         status = [status] if status else ['PUBLISHED', 'DELETED']
-
         return triple_collection.find({
                                     '_type': cls._meta.verbose_name,
                                     'subject': ObjectId(subject_id),
@@ -4172,9 +4170,11 @@ class Counter(DjangoDocument):
 
         # 'visited_nodes' = {str(ObjectId): int(count_of_visits)}
         'visited_nodes': {basestring: int},
-        'assessment': {
-                    'offered_id': {'total': int, 'correct': int, 'incorrect_attempts': int}
-                    }
+        'assessment': []
+        #             [{'id: basestring, 'correct': int, 'failed_attempts': int}]
+        # 'assessment': {
+        #             'offered_id': {'total': int, 'correct': int, 'incorrect_attempts': int}
+        #             }
     }
 
     default_values = {
@@ -4319,6 +4319,12 @@ class Counter(DjangoDocument):
         from gnowsys_ndf.settings import GSTUDIO_QUIZ_CORRECT_POINTS
         return self['quiz']['correct'] * GSTUDIO_QUIZ_CORRECT_POINTS
 
+    def get_assessment_points(self):
+        from gnowsys_ndf.settings import GSTUDIO_QUIZ_CORRECT_POINTS
+        total_correct = 0
+        for each_dict in self['assessment']:
+            total_correct = each_dict['correct']
+        return total_correct * GSTUDIO_QUIZ_CORRECT_POINTS
 
     def get_interaction_points(self):
         from gnowsys_ndf.settings import GSTUDIO_COMMENT_POINTS
