@@ -112,9 +112,16 @@ def export_group_analytics(group_obj):
                     analytics_data['activities_completed'] = int(temp_activities_stat_str.split(' ')[0])
                     analytics_data['total_activities'] = int(temp_activities_stat_str.split(' ')[3])
                     analytics_data.pop('level2_progress_stmt')
-                    # removing non required fields
+
+                    # remove non required fields
                     analytics_data.pop('level1_lbl')
                     analytics_data.pop('level2_lbl')
+
+                    analytics_data['percentage_lessons_completed'] = analytics_data['level1_progress_meter']
+                    analytics_data['percentage_activities_completed'] = analytics_data['level2_progress_meter']
+                    analytics_data.pop('level1_progress_meter')
+                    analytics_data.pop('level2_progress_meter')
+
                 # print analytics_data
 
                 with open(file_name_path, 'a') as f:  # Just use 'w' mode in 3.x
