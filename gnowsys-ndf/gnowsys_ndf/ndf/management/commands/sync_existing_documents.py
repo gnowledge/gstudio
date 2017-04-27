@@ -163,9 +163,7 @@ class Command(BaseCommand):
                 },
                 {
                     '$set': {
-                            'assessment': {
-                                'offered_id': {'total': None, 'correct': None, 'incorrect_attempts': None},
-                            },
+                            'assessment': [],
                         }
                 },
                 upsert=False, multi=True)
