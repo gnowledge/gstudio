@@ -41,6 +41,8 @@ from gnowsys_ndf.ndf.views.methods import create_gattribute, create_grelation, c
 from gnowsys_ndf.notification import models as notification
 from gnowsys_ndf.settings import GSTUDIO_NOTE_CREATE_POINTS, GSTUDIO_QUIZ_CORRECT_POINTS, GSTUDIO_COMMENT_POINTS, GSTUDIO_FILE_UPLOAD_POINTS
 from gnowsys_ndf.ndf.views.trash import trash_resource 
+from gnowsys_ndf.ndf.views.assessment_analytics import questionCount
+
 
 GST_COURSE = node_collection.one({'_type': "GSystemType", 'name': "Course"})
 course_gst_name, course_gst_id = GSystemType.get_gst_name_id("Course")
@@ -2689,7 +2691,7 @@ def course_analytics(request, group_id, user_id, render_template=False, get_resu
     group_id    = group_obj._id
     group_name  = group_obj.name
 
-    analytics_data = {}
+    analytics_data = {'user_id': user_id}
     data_points_dict = {}
 
     if request and not get_result_dict:
@@ -2711,6 +2713,7 @@ def course_analytics(request, group_id, user_id, render_template=False, get_resu
     counter_obj = Counter.get_counter_obj(user_id, ObjectId(group_id))
     analytics_instance = AnalyticsMethods(user_obj.id,user_obj.username, group_id)
 
+    analytics_data['total_quizitems'] = 0
 
     if "CourseEventGroup" in group_obj.member_of_names_list:
         # Modules Section
@@ -2736,16 +2739,38 @@ def course_analytics(request, group_id, user_id, render_template=False, get_resu
         else:
             analytics_data['level2_progress_meter'] = 0
 
+        # Depricated on 27Apr2017 - katkamrachana
+        analytics_data['total_quizitems'] = analytics_instance.get_total_quizitems_count()
+        # New implementation of using AT: 'total_assessment_items'
+        # print "\n Total QuizItemEvents === ", analytics_data['total_quizitems'], "\n\n"
+        # analytics_data['attempted_quizitems'] = counter_obj.no_questions_attempted
+        analytics_data['attempted_quizitems'] = counter_obj['quiz']['attempted']
+        # print "\n Attempted QuizItemEvents === ", analytics_data['attempted_quizitems'], "\n\n"
+        if 'correct_attempted_quizitems' not in analytics_data:
+            # analytics_data['correct_attempted_quizitems'] = counter_obj.no_correct_answers
+            analytics_data['correct_attempted_quizitems'] = counter_obj['quiz']['correct']
+        # print "\n Correct Attempted QuizItemEvents === ", analytics_data['correct_attempted_quizitems'], "\n\n"
+        # analytics_data['incorrect_attempted_quizitems'] = counter_obj.no_incorrect_answers
+        analytics_data['incorrect_attempted_quizitems'] = counter_obj['quiz']['incorrect']
+        # print "\n InCorrect Attempted QuizItemEvents === ", analytics_data['incorrect_attempted_quizitems'], "\n\n"
+
+    # Resources Section
+    # analytics_data['total_res'] = analytics_instance.get_total_resources_count()
+    # print "\n Total Resources === ", total_res, "\n\n"
+    # analytics_data['completed_res'] = analytics_instance.get_completed_resources_count()
+    # print "\n Completed Resources === ", completed_res, "\n\n"
+
+    analytics_data['username'] = user_obj.username
+    # QuizItem Section
+
+
 
     if "announced_unit" in group_obj.member_of_names_list:
-        counter_obj = Counter.get_counter_obj(request.user.id, ObjectId(group_id))
         visited_nodes = []
         if counter_obj:
             visited_nodes = counter_obj['visited_nodes'].keys()
-
         unit_structure = _get_unit_hierarchy(group_obj)
         all_lessons = len(unit_structure)
-        print "\n all_l: ", all_lessons
         all_activities = 0
         completed_activities = 0
         completed_lessons = 0
@@ -2779,27 +2804,20 @@ def course_analytics(request, group_id, user_id, render_template=False, get_resu
             analytics_data['level2_progress_meter'] = (completed_activities/float(all_activities))*100
         else:
             analytics_data['level2_progress_meter'] = 0
-        print "\n an: ", analytics_data
-    # Resources Section
-    # analytics_data['total_res'] = analytics_instance.get_total_resources_count()
-    # print "\n Total Resources === ", total_res, "\n\n"
-    # analytics_data['completed_res'] = analytics_instance.get_completed_resources_count()
-    # print "\n Completed Resources === ", completed_res, "\n\n"
 
-    analytics_data['username'] = user_obj.username
-    # QuizItem Section
-    analytics_data['total_quizitems'] = analytics_instance.get_total_quizitems_count()
-    # print "\n Total QuizItemEvents === ", analytics_data['total_quizitems'], "\n\n"
-    # analytics_data['attempted_quizitems'] = counter_obj.no_questions_attempted
-    analytics_data['attempted_quizitems'] = counter_obj['quiz']['attempted']
-    # print "\n Attempted QuizItemEvents === ", analytics_data['attempted_quizitems'], "\n\n"
-    if 'correct_attempted_quizitems' not in analytics_data:
-        # analytics_data['correct_attempted_quizitems'] = counter_obj.no_correct_answers
-        analytics_data['correct_attempted_quizitems'] = counter_obj['quiz']['correct']
-    # print "\n Correct Attempted QuizItemEvents === ", analytics_data['correct_attempted_quizitems'], "\n\n"
-    # analytics_data['incorrect_attempted_quizitems'] = counter_obj.no_incorrect_answers
-    analytics_data['incorrect_attempted_quizitems'] = counter_obj['quiz']['incorrect']
-    # print "\n InCorrect Attempted QuizItemEvents === ", analytics_data['incorrect_attempted_quizitems'], "\n\n"
+        items_count_cur = group_obj.get_attribute("total_assessment_items")
+        if items_count_cur.count():
+            analytics_data['total_quizitems'] = items_count_cur[0].object_value
+
+        # assessment_list_cur = group_obj.get_attribute("assessment_list")
+        # if assessment_list_cur.count():
+        #     assessment_list_cur = assessment_list_cur[0]
+        total_quiz_points = 0
+        analytics_data['correct_attempted_quizitems'] = 0
+        assessment_data_list = counter_obj['assessment']
+        for each_dict in assessment_data_list:
+            if 'correct' in each_dict:
+                analytics_data['correct_attempted_quizitems'] = analytics_data['correct_attempted_quizitems'] + each_dict['correct']
 
     # Notes Section
     # analytics_data['total_notes'] = analytics_instance.get_total_notes_count()
@@ -2892,7 +2910,7 @@ def course_analytics(request, group_id, user_id, render_template=False, get_resu
 
     # analytics_data['users_points_breakup'] = analytics_instance.get_users_points(True)
     analytics_data['users_points_breakup'] = counter_obj.get_all_user_points_dict()
-
+    analytics_data['group_obj'] = group_obj
     del analytics_instance
     # print analytics_data
 
@@ -2963,10 +2981,16 @@ def course_analytics_admin(request, group_id):
         if NOTES_MAX_POINT_VAL < admin_analytics_data['notes_points']:
             NOTES_MAX_POINT_VAL = admin_analytics_data['notes_points']
 
-        # admin_analytics_data['quiz_points'] = user_counter_obj['quiz']['correct'] * GSTUDIO_QUIZ_CORRECT_POINTS
-        admin_analytics_data['quiz_points'] = user_counter_obj.get_quiz_points()
-        if QUIZ_MAX_POINT_VAL < admin_analytics_data['quiz_points']:
-            QUIZ_MAX_POINT_VAL = admin_analytics_data['quiz_points']
+
+        if "announced_unit" in group_obj.member_of_names_list:
+            admin_analytics_data['quiz_points'] = user_counter_obj.get_assessment_points()
+            if QUIZ_MAX_POINT_VAL < admin_analytics_data['quiz_points']:
+                QUIZ_MAX_POINT_VAL = admin_analytics_data['quiz_points']
+        else:
+            # admin_analytics_data['quiz_points'] = user_counter_obj['quiz']['correct'] * GSTUDIO_QUIZ_CORRECT_POINTS
+            admin_analytics_data['quiz_points'] = user_counter_obj.get_quiz_points()
+            if QUIZ_MAX_POINT_VAL < admin_analytics_data['quiz_points']:
+                QUIZ_MAX_POINT_VAL = admin_analytics_data['quiz_points']
 
         # admin_analytics_data['interactions_points'] = user_counter_obj['total_comments_by_user'] * GSTUDIO_COMMENT_POINTS
         admin_analytics_data['interactions_points'] = user_counter_obj.get_interaction_points()
@@ -3549,3 +3573,52 @@ def widget_page_create_edit(request, group_id, node_id=None):
                                 'title': 'notebook'
                             })
     return render_to_response(template, req_context)
+
+@login_required
+def load_assessment_analytics(request, group_id):
+    domain = request.GET.get('domain')
+    result_set = {'correct_attempted_quizitems': 0}
+    # print "\n domain: ", domain
+    # domain = "staging-clix.tiss.edu"
+    user_id = request.GET.get('user_id')
+    group_obj = get_group_name_id(group_id, get_obj=True)
+    group_id = group_obj._id
+    group_name = group_obj.name
+    correctAttemptCount = 0
+    assessment_list_cur = group_obj.get_attribute("assessment_list")
+    if assessment_list_cur.count():
+        assessment_list = assessment_list_cur[0].object_value
+        for each_sublist in assessment_list:
+            # each_sublist[0] -- bankID
+            # each_sublist[1] -- OfferedId
+            correctAttempt = questionCount("https://"+domain, user_id, each_sublist[0], each_sublist[1])
+            correctAttemptCount = correctAttemptCount + correctAttempt['Correct']
+
+    if correctAttemptCount:
+        counter_obj = Counter.get_counter_obj(user_id, group_id)
+        #create
+        if not counter_obj['assessment']:
+            assessment_dict = {'id': each_sublist[1], 'correct': correctAttemptCount}
+            counter_obj['assessment'].append(assessment_dict)
+            counter_obj['group_points'] += (correctAttemptCount * GSTUDIO_QUIZ_CORRECT_POINTS)
+        else:
+            #edit
+            reattempt = False
+            for each_dict in counter_obj['assessment']:
+                for each_dict in counter_obj['assessment']:
+                    if each_sublist[1] in each_dict.values():
+                        counter_obj['group_points'] -= (each_dict['correct']) * GSTUDIO_QUIZ_CORRECT_POINTS
+                        counter_obj['group_points'] += (correctAttemptCount * GSTUDIO_QUIZ_CORRECT_POINTS)
+                        each_dict.update({'correct': correctAttemptCount})
+                        reattempt = True
+            if not reattempt:
+                assessment_dict = {'id': each_sublist[1], 'correct': correctAttemptCount}
+                counter_obj['assessment'].append(assessment_dict)
+                counter_obj['group_points'] += (correctAttemptCount * GSTUDIO_QUIZ_CORRECT_POINTS)
+        counter_obj.last_update = datetime.datetime.now()
+        counter_obj.save()
+        assessment_data_list = counter_obj['assessment']
+        for each_dict in assessment_data_list:
+            if 'correct' in each_dict:
+                result_set['correct_attempted_quizitems'] = result_set['correct_attempted_quizitems'] + each_dict['correct']
+    return HttpResponse(json.dumps(result_set))
