@@ -3240,7 +3240,7 @@ def assets(request, group_id, asset_id=None):
             'group_id': group_id, 'groupid': group_id,
             'title':'asset_detail','asset_obj':asset_obj,
             'asset_nodes':asset_nodes,'asset_content_list':asset_content_list,
-            'topic_nodes':topic_nodes
+            'topic_nodes':topic_nodes,'group_obj':group_obj
         }
         if 'announced_unit' in group_obj.member_of_names_list:
             template = 'ndf/lms.html'     
@@ -3259,7 +3259,8 @@ def assets(request, group_id, asset_id=None):
         'group_set': {'$all': [ObjectId(group_id)]}}).sort('last_update', -1)
     context_variables = {
             'group_id': group_id, 'groupid': group_id,
-            'asset_nodes': asset_nodes,'title':'asset_list'
+            'asset_nodes': asset_nodes,'title':'asset_list',
+            'group_obj':group_obj
         }
     
     if 'announced_unit' in group_obj.member_of_names_list:
@@ -3281,7 +3282,7 @@ def assetcontent_detail(request, group_id, asset_id,asst_content_id):
     context_variables = {
             'asset_content_list':asset_content_list,'group_id':group_id,
             'groupid':group_id,'node':assetcontent_obj,'asset_obj':asset_obj,
-            'title':"asset_content_detail"
+            'title':"asset_content_detail",'group_obj':group_obj
         }
     if request.user.is_authenticated():
         # Counter.add_visit_count.delay(resource_obj_or_id=file_obj._id.__str__(),
