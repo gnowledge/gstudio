@@ -2683,32 +2683,38 @@ def course_analytics(request, group_id, user_id, render_template=False, get_resu
     #                                 cache_result,
     #                                 context_instance = RequestContext(request)
     #                             )
-    unit_id = request.GET.get("data_unit_id",'')
-    if unit_id:
-        group_id = ObjectId(unit_id)
+
+    analytics_data = {'user_id': user_id}
+    data_points_dict = {}
+    
+    try:
+        user_obj = User.objects.get(pk=int(user_id))
+    except Exception, e:
+        print e
+        return analytics_data
+
+    if request:
+        # let's keep all get calls from request in this block.
+        # so that we can use this method for api calls
+        if not get_result_dict:
+            data_points_dict = request.GET.get('data_points_dict', {})
+
+        unit_id = request.GET.get("data_unit_id",'')
+        if unit_id:
+            group_id = ObjectId(unit_id)
 
     group_obj   = get_group_name_id(group_id, get_obj=True)
     group_id    = group_obj._id
     group_name  = group_obj.name
 
-    analytics_data = {'user_id': user_id}
-    data_points_dict = {}
-
-    if request and not get_result_dict:
-        data_points_dict = request.GET.get('data_points_dict', {})
-        # print '== data_points_dict: ', data_points_dict
-
     if data_points_dict and not isinstance(data_points_dict, dict):
 
         data_points_dict = json.loads(data_points_dict)
-        # print "\n\ndata_points_dict",data_points_dict
         analytics_data['correct_attempted_quizitems'] = (data_points_dict['quiz_points'] / GSTUDIO_QUIZ_CORRECT_POINTS)
         analytics_data['user_notes'] = (data_points_dict['notes_points'] / GSTUDIO_NOTE_CREATE_POINTS)
         analytics_data['user_files'] = (data_points_dict['files_points'] / GSTUDIO_FILE_UPLOAD_POINTS)
         analytics_data['total_cmnts_by_user'] = (data_points_dict['interactions_points'] / GSTUDIO_COMMENT_POINTS)
         analytics_data['users_points'] = data_points_dict['users_points']
-
-    user_obj = User.objects.get(pk=int(user_id))
 
     counter_obj = Counter.get_counter_obj(user_id, ObjectId(group_id))
     analytics_instance = AnalyticsMethods(user_obj.id,user_obj.username, group_id)
@@ -2804,6 +2810,12 @@ def course_analytics(request, group_id, user_id, render_template=False, get_resu
             analytics_data['level2_progress_meter'] = (completed_activities/float(all_activities))*100
         else:
             analytics_data['level2_progress_meter'] = 0
+        # print "\n an: ", analytics_data
+        # Resources Section
+        # analytics_data['total_res'] = analytics_instance.get_total_resources_count()
+        # print "\n Total Resources === ", total_res, "\n\n"
+        # analytics_data['completed_res'] = analytics_instance.get_completed_resources_count()
+        # print "\n Completed Resources === ", completed_res, "\n\n"
 
         items_count_cur = group_obj.get_attribute("total_assessment_items")
         if items_count_cur.count():
