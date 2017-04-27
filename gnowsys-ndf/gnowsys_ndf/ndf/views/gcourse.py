@@ -2907,6 +2907,7 @@ def course_analytics(request, group_id, user_id, render_template=False, get_resu
         return analytics_data
 
     # cache.set(cache_key, analytics_data, 60*10)
+    analytics_data['group_member_of'] = group_obj.member_of_names_list
     return render_to_response("ndf/user_course_analytics.html",
                                 analytics_data,
                                 context_instance = RequestContext(request)
