@@ -30,8 +30,6 @@
             <span data-tooltip title="Average Rating: {{ratings.avg}}<br>No. of Users rated: {{node.rating|length}}" style="display: inline-block;vertical-align: baseline;">
                 <label class="rating-lbl" style="font-size: 15px;color: #7D7D7D" id="avg-rating" >Avg. : &nbsp;{{ratings.avg|default:"unrated"}} {% trans ' by ' %}{{ node.rating|length }}</label>
             </span>
-        {% else %}
-            <small style="display: inline-block"><label class="lbl_tag" id="avg-rating" ><i>{% trans 'Not rated yet!' %}</i></label></small>
         {% endif %}
 
 
