@@ -89,6 +89,8 @@
 						<input type="submit" class="button small expand" tabindex= "4" value="{% trans "Login" %}" style="font-size:15px" />
 					</div>
 				</div>
+		{% get_gstudio_registration as registration %}
+		{% if registration %}
 				<div class="row">
 					<div class="medium-12 large-12 small-text-left text-center columns end forgot-password">
 						<label>
@@ -101,7 +103,7 @@
 				<!-- Forgot password link & New Registration link -->
       			{# {% if site.SITE_NAME != "NROER" %}  #}
 					<div class="row">
-						<div class="small-12 medium-12 large-12 text-ceter columns end register-user">
+						<div class="small-12 medium-12 large-12 text-ceter columns end `-user">
 							<center>
 							<label>
 							<a title={% trans "Click here to register" %} href="{{ register_url }}">
@@ -120,6 +122,7 @@
 							</center>
 						</div>
 					</div>
+					{% endif  %}
 				{# {% endif %} #}
 				<input type="hidden" name="next" value="{{ next }}" />
 			</form>

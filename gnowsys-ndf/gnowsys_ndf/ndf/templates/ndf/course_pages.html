@@ -56,8 +56,6 @@
                             <small><label class="tag-ele" style="margin-top: 13px;">
                         <a href="{% url 'tag_info' group_id tag %}">{{tag}} </a></label></small>
                     {% endfor %} 
-                {% else %}
-                    <i><small><label>{% trans "No tags defined yet!" %}</label></small></i>
                 {% endif %}   
             </div>
             <div class="small-4 columns right">

@@ -75,7 +75,7 @@
                 <button type="button" class="orange-button add-asset-content right"><i class="fi-plus"></i> Add File</button>
                 {% endif %}
                 {% if 'asset@gallery' in asset_obj.tags  %}
-                <button {% if user_access_priv == "allow" %}  type="button" class="orange-button add-asset-content right" {% else %} class=" right orange-button user_not_enrolled" {% endif %}><i class="fi-plus"></i> Add File</button>
+                <button   type="button" class="orange-button add-asset-content right" ><i class="fi-plus"></i> Add File</button>
                 {% endif %}
                 {% if title == 'asset_detail'  %}
                 <button type="button" class="orange-button add-asset-content right"><i class="fi-plus"></i> Add File</button>
@@ -94,8 +94,6 @@
                         <a href="{% url 'tag_info' group_id tag %}">{{tag}} </a></label></small>
                     {% endif %}
                 {% endfor %} 
-            {% else %}
-                <i><small><label>{% trans "No tags defined yet!" %}</label></small></i>
             {% endif %}   
         </div>
             <div class="small-4 columns right">
@@ -215,7 +213,6 @@
     <div class="asset-content-area"{% if not asset_obj %} style="display:none"{% endif %}>
         {% if not edit %}
         <div class="row">
-            {% if asset_obj.created_by == request.user.id or is_gstaff  %}
         </div>
 
         <div class="name-desc-asset-cont-area hide">
@@ -243,7 +240,6 @@
         
             
         
-            {% endif %}
    
     </div>
 
