@@ -5,6 +5,9 @@
   {% get_group_object groupid as group_object %}
   {% get_explore_url as explore_url %}
   {% get_test_page_oid as help_oid %}
+  {% get_gstudio_registration as registration %}
+
+
   
       
 <nav class="top-bar" data-topbar role="navigation" id="menu_bar_gstudio">
@@ -46,8 +49,7 @@
                             {{ user.username }}
                     {% endif %}
                     <!-- </a> -->
-                    {% get_gstudio_registration as registration %}
-                    <ul class="dropdown">
+                                        <ul class="dropdown">
                         {% if registration %}
                         <li class="text-center">
                           <a href="{% url 'auth_password_change' %}">{% trans "Change Password" %}</a>
