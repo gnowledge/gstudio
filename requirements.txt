@@ -28,6 +28,7 @@ celery==3.1.19
 django-celery==3.1.16
 django-mailbox==4.4.1
 Fabric==1.12.0
+pathlib2==2.2.1
 # QBANK-LITE REQ: https://github.com/CLIxIndia-Dev/qbank-lite/blob/master/requirements.txt
 # also make sure following are updated w.r.t qbank repo
 beautifulsoup4==4.4.1
