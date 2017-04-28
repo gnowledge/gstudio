@@ -39,10 +39,11 @@ def update_factory_schema_mapper(path):
             updated_factory_json_list = []
             for each_type in factory_json_list:
                 type_node = node_collection.one({'_type': each_type['_type'], 'name':each_type['name']},{'_id':1})
-                each_type['target_id'] = type_node._id
-                updated_factory_json_list.append(each_type)
-                if each_type['target_id'] != each_type['source_id']:
-                    SCHEMA_ID_MAP[each_type['source_id']] = each_type['target_id']
+                if type_node:
+                    each_type['target_id'] = type_node._id
+                    updated_factory_json_list.append(each_type)
+                    if each_type['target_id'] != each_type['source_id']:
+                        SCHEMA_ID_MAP[each_type['source_id']] = each_type['target_id']
         with open(schema_dump_path, 'w+') as schema_file_out:
             schema_file_out.write(json_util.dumps(updated_factory_json_list))
             schema_file_out.close()
