@@ -150,14 +150,20 @@ def user_objs_restoration():
 
 
 
+# def update_schema_id_for_triple(document_json):
+#     if SCHEMA_ID_MAP:
+#         if 'relation_type' in document_json and document_json['relation_type'] in SCHEMA_ID_MAP:
+#             document_json['relation_type'] = SCHEMA_ID_MAP[document_json['relation_type']]
+#         if 'attribute_type' in document_json and document_json['attribute_type'] in SCHEMA_ID_MAP:
+#             document_json['attribute_type'] = SCHEMA_ID_MAP[document_json['attribute_type']]
+#         return document_json
 def update_schema_id_for_triple(document_json):
     if SCHEMA_ID_MAP:
-        if 'relation_type' in document_json and document_json['relation_type'] in SCHEMA_ID_MAP:
-            document_json['relation_type'] = SCHEMA_ID_MAP[document_json['relation_type']]
-        if 'attribute_type' in document_json and document_json['attribute_type'] in SCHEMA_ID_MAP:
-            document_json['attribute_type'] = SCHEMA_ID_MAP[document_json['attribute_type']]
-        return document_json
-
+        if u'relation_type' in document_json and document_json[u'relation_type'] in SCHEMA_ID_MAP:
+            document_json[u'relation_type'] = SCHEMA_ID_MAP[document_json[u'relation_type']]
+        if u'attribute_type' in document_json and document_json[u'attribute_type'] in SCHEMA_ID_MAP:
+            document_json[u'attribute_type'] = SCHEMA_ID_MAP[document_json[u'attribute_type']]
+    return document_json
 
 def update_group_set(document_json):
     if 'group_set' in document_json:
@@ -340,7 +346,10 @@ def restore_triple_objects(rcs_triples_path):
         for filename in files:
             filepath =  os.path.join(dir_, filename)
             triple_json = get_json_file(filepath)
-            triple_obj = triple_collection.one({'_id': ObjectId(triple_json['_id'])})
+            if triple_json and ('_id' in triple_json):
+                triple_obj = triple_collection.one({'_id': ObjectId(triple_json['_id'])})
+            else:
+                triple_obj = None
 
             if triple_obj:
                 log_file.write("\n Found Existing Triple : \n\t " + str(triple_obj))
@@ -584,25 +593,46 @@ class Command(BaseCommand):
             print "\n No dump found at entered path."
             call_exit()
 
+# def parse_datetime_values(d):
+#     # This decoder will be moved to models next to class NodeJSONEncoder
+#     if u'uploaded_at' in d:
+#         d['uploaded_at'] = datetime.datetime.fromtimestamp(d['uploaded_at']/1e3)
+#     if u'last_update' in d:
+#         d['last_update'] = datetime.datetime.fromtimestamp(d['last_update']/1e3)
+#     if u'created_at' in d:
+#         d['created_at'] = datetime.datetime.fromtimestamp(d['created_at']/1e3)
+#     if u'attribute_type' in d or u'relation_type' in d:
+#         d = update_schema_id_for_triple(d)
+#     if u'attribute_type' in d:
+#         if d['attribute_type'] in DATE_AT_IDS:
+#             d['object_value'] = datetime.datetime.fromtimestamp(d['object_value']/1e3)
+#     if u'attribute_set' in d:
+#         for each_attr_dict in d['attribute_set']:
+#             for each_key, each_val in each_attr_dict.iteritems():
+#                 if each_key in ["start_time", "end_time", "start_enroll", "end_enroll"]:
+#                     each_attr_dict[each_key] = datetime.datetime.fromtimestamp(each_val/1e3)
+#     return d
+
 def parse_datetime_values(d):
     # This decoder will be moved to models next to class NodeJSONEncoder
     if u'uploaded_at' in d:
-        d['uploaded_at'] = datetime.datetime.fromtimestamp(d['uploaded_at']/1e3)
+        d[u'uploaded_at'] = datetime.datetime.fromtimestamp(d[u'uploaded_at']/1e3)
     if u'last_update' in d:
-        d['last_update'] = datetime.datetime.fromtimestamp(d['last_update']/1e3)
+        d[u'last_update'] = datetime.datetime.fromtimestamp(d[u'last_update']/1e3)
     if u'created_at' in d:
-        d['created_at'] = datetime.datetime.fromtimestamp(d['created_at']/1e3)
+        d[u'created_at'] = datetime.datetime.fromtimestamp(d[u'created_at']/1e3)
     if u'attribute_type' in d or u'relation_type' in d:
         d = update_schema_id_for_triple(d)
     if u'attribute_type' in d:
-        if d['attribute_type'] in DATE_AT_IDS:
-            d['object_value'] = datetime.datetime.fromtimestamp(d['object_value']/1e3)
+        if d[u'attribute_type'] in DATE_AT_IDS:
+            d[u'object_value'] = datetime.datetime.fromtimestamp(d[u'object_value']/1e3)
     if u'attribute_set' in d:
-        for each_attr_dict in d['attribute_set']:
+        for each_attr_dict in d[u'attribute_set']:
             for each_key, each_val in each_attr_dict.iteritems():
-                if each_key in ["start_time", "end_time", "start_enroll", "end_enroll"]:
+                if each_key in [u"start_time", u"end_time", u"start_enroll", u"end_enroll"]:
                     each_attr_dict[each_key] = datetime.datetime.fromtimestamp(each_val/1e3)
     return d
+
 
 def get_json_file(filepath):
     history_manager = HistoryManager()
