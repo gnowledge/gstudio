@@ -449,10 +449,10 @@ def group_dashboard(request, group_id):
                         profile_pic_image = node_collection.one(
                             {'_type': {"$in": ["GSystem", "File"]}, '_id': each["has_profile_pic"][0]}
                         )
-                if "has_Banner_pic" in each:
-                    if each["has_Banner_pic"]:
+                if "has_banner_pic" in each:
+                    if each["has_banner_pic"]:
                         banner_pic = node_collection.one(
-                            {'_type': {"$in": ["GSystem", "File"]}, '_id': each["has_Banner_pic"][0]}
+                            {'_type': {"$in": ["GSystem", "File"]}, '_id': each["has_banner_pic"][0]}
                         )
                 if ("has_thumbnail" in each) and each["has_thumbnail"]:
                         banner_pic = node_collection.one(
