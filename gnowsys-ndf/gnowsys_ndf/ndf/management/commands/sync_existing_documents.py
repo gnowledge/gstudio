@@ -921,33 +921,3 @@ class Command(BaseCommand):
             i.save()
             print "Updated",i.name,"'s modified by feild from null to 1"
 
-    all_grelations = triple_collection.find({'_type': 'GRelation'})
-    all_gattributes = triple_collection.find({'_type': 'GAttribute'})
-    print "\n Working on Triples data. \n Total GRelations found: ", all_grelations.count()
-    print " Total GAttributes found: ", all_gattributes.count()
-    print "\n This will take few minutes. Please wait.."
-    for each_grelation in all_grelations:
-        # print each_grelation
-        print '.',
-        rt_node = each_grelation.relation_type
-        if not isinstance(rt_node, ObjectId):
-            rt_obj = RelationType(db.dereference(rt_node))
-            each_grelation.relation_type = rt_obj._id
-            # print each_grelation
-            try:
-                # each_grelation.save(triple_node=rt_obj,triple_id=rt_obj._id)
-                each_grelation.save()
-            except Exception as er:
-                print "Error Occurred while updating Triples data. ", er
-                pass
-
-    for each_gattribute in all_gattributes:
-        print '.',
-        at_node = each_gattribute.attribute_type
-        if not isinstance(at_node, ObjectId):
-            at_obj = AttributeType(db.dereference(at_node))
-            each_gattribute.attribute_type = at_obj._id
-            # each_gattribute.save(triple_node=at_obj,triple_id=at_obj._id)
-            each_gattribute.save()
-
-    print "\nTriples data updated successfully."
