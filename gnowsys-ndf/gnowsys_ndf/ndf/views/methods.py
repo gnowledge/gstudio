@@ -2213,7 +2213,8 @@ def create_grelation_list(subject_id, relation_type_name, right_subject_id_list)
             gr_node.relation_type = relationtype._id
             gr_node.right_subject = ObjectId(relation_id)
             gr_node.status = u"PUBLISHED"
-            gr_node.save(triple_node=relationtype, triple_id=relationtype._id)
+            gr_node.save()
+            # gr_node.save(triple_node=relationtype, triple_id=relationtype._id)
 
 
 @get_execution_time
@@ -2608,7 +2609,8 @@ def update_scope_of_triple(triple_node, rt_at_type_node, req_scope_values, is_gr
             triple_node.relation_type_scope = validated_scope_values['relation_type_scope']
         elif 'attribute_type_scope' in validated_scope_values:
             triple_node.attribute_type_scope = validated_scope_values['attribute_type_scope']
-        triple_node.save(triple_node=rt_at_type_node, triple_id=rt_at_type_node._id)
+        triple_node.save()
+        # triple_node.save(triple_node=rt_at_type_node, triple_id=rt_at_type_node._id)
         return triple_node
 
 @get_execution_time
@@ -2660,7 +2662,8 @@ def create_gattribute(subject_id, attribute_type_node, object_value=None, **kwar
                 ga_node.status = u"PUBLISHED"
 
             ga_node.object_value = object_value
-            ga_node.save(triple_node=attribute_type_node, triple_id=attribute_type_node._id)
+            # ga_node.save(triple_node=attribute_type_node, triple_id=attribute_type_node._id)
+            ga_node.save()
             if triple_scope_val:
                 ga_node = update_scope_of_triple(ga_node,attribute_type_node, triple_scope_val, is_grel=False)
 
@@ -2695,7 +2698,8 @@ def create_gattribute(subject_id, attribute_type_node, object_value=None, **kwar
                 old_object_value = ga_node.object_value
 
                 ga_node.status = u"DELETED"
-                ga_node.save(triple_node=attribute_type_node, triple_id=attribute_type_node._id)
+                ga_node.save()
+                # ga_node.save(triple_node=attribute_type_node, triple_id=attribute_type_node._id)
                 if triple_scope_val:
                     ga_node = update_scope_of_triple(ga_node,attribute_type_node, triple_scope_val, is_grel=False)
 
@@ -2741,7 +2745,8 @@ def create_gattribute(subject_id, attribute_type_node, object_value=None, **kwar
                 if is_ga_node_changed or ga_node.status == u"DELETED":
                     if ga_node.status == u"DELETED":
                         ga_node.status = u"PUBLISHED"
-                        ga_node.save(triple_node=attribute_type_node, triple_id=attribute_type_node._id)
+                        ga_node.save()
+                        # ga_node.save(triple_node=attribute_type_node, triple_id=attribute_type_node._id)
                         if triple_scope_val:
                             ga_node = update_scope_of_triple(ga_node,attribute_type_node, triple_scope_val, is_grel=False)
 
@@ -2766,7 +2771,8 @@ def create_gattribute(subject_id, attribute_type_node, object_value=None, **kwar
 
                     else:
                         ga_node.status = u"PUBLISHED"
-                        ga_node.save(triple_node=attribute_type_node, triple_id=attribute_type_node._id)
+                        ga_node.save()
+                        # ga_node.save(triple_node=attribute_type_node, triple_id=attribute_type_node._id)
                         if triple_scope_val:
                             ga_node = update_scope_of_triple(ga_node,attribute_type_node, triple_scope_val, is_grel=False)
 
@@ -2860,7 +2866,8 @@ def create_grelation(subject_id, relation_type_node, right_subject_id_or_list, *
             # gr_node.relation_type_scope = relation_type_scope
             gr_node.language = language
             gr_node.status = u"PUBLISHED"
-            gr_node.save(triple_node=relation_type_node, triple_id=relation_type_node._id)
+            gr_node.save()
+            # gr_node.save(triple_node=relation_type_node, triple_id=relation_type_node._id)
 
             gr_node_name = gr_node.name
             info_message = "%(relation_type_text)s: GRelation (%(gr_node_name)s) " % locals() \
@@ -2933,7 +2940,8 @@ def create_grelation(subject_id, relation_type_node, right_subject_id_or_list, *
         def _update_deleted_to_published(gr_node, relation_type_node, relation_type_text, triple_scope_val=None):
             gr_node.status = u"PUBLISHED"
             # gr_node.language = language
-            gr_node.save(triple_node=relation_type_node, triple_id=relation_type_node._id)
+            gr_node.save()
+            # gr_node.save(triple_node=relation_type_node, triple_id=relation_type_node._id)
 
             gr_node_name = gr_node.name
             relation_type_node_name = relation_type_node.name
@@ -3068,7 +3076,8 @@ def create_grelation(subject_id, relation_type_node, right_subject_id_or_list, *
                     # Case: When already existing entry doesn't exists in newly come list of right_subject(s)
                     # So change their status from PUBLISHED to DELETED
                     n.status = u"DELETED"
-                    n.save(triple_node=relation_type_node, triple_id=relation_type_node._id)
+                    n.save()
+                    # n.save(triple_node=relation_type_node, triple_id=relation_type_node._id)
 
                     info_message = " MultipleGRelation: GRelation (" + n.name + \
                         ") status updated from 'PUBLISHED' to 'DELETED' successfully.\n"
@@ -3181,7 +3190,8 @@ def create_grelation(subject_id, relation_type_node, right_subject_id_or_list, *
                     # to DELETED
                     if node.status == u'PUBLISHED':
                         node.status = u"DELETED"
-                        node.save(triple_node=relation_type_node, triple_id=relation_type_node._id)
+                        node.save()
+                        # node.save(triple_node=relation_type_node, triple_id=relation_type_node._id)
 
                         node_collection.collection.update({
                             '_id': subject_id, 'relation_set.' + relation_type_node_name: {'$exists': True}
@@ -4457,7 +4467,8 @@ def delete_grelation(subject_id=None, deletion_type=0, **kwargs):
         # relation_set field updated -- \n", res
 
         gr_node.status = u"DELETED"
-        gr_node.save(triple_node=rt_node, triple_id=rt_node._id)
+        gr_node.save()
+        # gr_node.save(triple_node=rt_node, triple_id=rt_node._id)
 
 
     try:

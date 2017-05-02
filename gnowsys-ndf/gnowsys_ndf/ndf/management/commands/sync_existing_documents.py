@@ -128,7 +128,8 @@ class Command(BaseCommand):
         rt_obj = RelationType(db.dereference(each_grelation.relation_type))
         each_grelation.relation_type = rt_obj._id
         try:
-            each_grelation.save(triple_node=rt_obj,triple_id=rt_obj._id)
+            # each_grelation.save(triple_node=rt_obj,triple_id=rt_obj._id)
+            each_grelation.save()
         except Exception as er:
             print "\n Error Occurred while updating Triples data. ", er
             pass
@@ -148,7 +149,8 @@ class Command(BaseCommand):
         print '.',
         at_obj = AttributeType(db.dereference(each_gattribute.attribute_type))
         each_gattribute.attribute_type = at_obj._id
-        each_gattribute.save(triple_node=at_obj,triple_id=at_obj._id)
+        # each_gattribute.save(triple_node=at_obj,triple_id=at_obj._id)
+        each_gattribute.save()
     # --------------------------------------------------------------------------
 
     # adding 'assessments' in Counter instances:
@@ -933,7 +935,8 @@ class Command(BaseCommand):
             each_grelation.relation_type = rt_obj._id
             # print each_grelation
             try:
-                each_grelation.save(triple_node=rt_obj,triple_id=rt_obj._id)
+                # each_grelation.save(triple_node=rt_obj,triple_id=rt_obj._id)
+                each_grelation.save()
             except Exception as er:
                 print "Error Occurred while updating Triples data. ", er
                 pass
@@ -944,6 +947,7 @@ class Command(BaseCommand):
         if not isinstance(at_node, ObjectId):
             at_obj = AttributeType(db.dereference(at_node))
             each_gattribute.attribute_type = at_obj._id
-            each_gattribute.save(triple_node=at_obj,triple_id=at_obj._id)
+            # each_gattribute.save(triple_node=at_obj,triple_id=at_obj._id)
+            each_gattribute.save()
 
     print "\nTriples data updated successfully."
