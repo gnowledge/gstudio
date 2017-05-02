@@ -285,20 +285,23 @@ def build_rcs(node, collection_name):
                 node.save()
                 # node.save(triple_node=triple_node_RT_AT, triple_id=triple_node_RT_AT._id)
             elif collection_name is node_collection:
-                pick_media_from_content(BeautifulSoup(node.content, 'html.parser'))
                 node.save()
+                if node.content:
+                    pick_media_from_content(BeautifulSoup(node.content, 'html.parser'))
             elif collection_name is filehive_collection:
                 dump_node(node_id=node['first_parent'], collection_name=node_collection)
                 node.save()
             else:
                 node.save()
-                try:
-                    global RESTORE_USER_DATA
-                    if RESTORE_USER_DATA:
-                        if "contributors" in node:
-                            GROUP_CONTRIBUTORS.extend(node.contributors)
-                except Exception as no_contributors_err:
-                    pass
+            try:
+                global RESTORE_USER_DATA
+                if RESTORE_USER_DATA:
+                    if "contributors" in node:
+                        GROUP_CONTRIBUTORS.extend(node.contributors)
+            except Exception as no_contributors_err:
+                log_file.write("\n Error while fetching contributors " + str(no_contributors_err) +\
+                 " for: " + str(node._id) + " with contributors: " + str(node.contributors))
+                pass
             log_file.write("\n RCS Built for " + str(node._id) )
             copy_rcs(node)
         except Exception as buildRCSError:
