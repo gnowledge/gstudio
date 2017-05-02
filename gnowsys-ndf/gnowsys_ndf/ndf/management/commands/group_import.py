@@ -156,7 +156,7 @@ def update_schema_id_for_triple(document_json):
             document_json['relation_type'] = SCHEMA_ID_MAP[document_json['relation_type']]
         if 'attribute_type' in document_json and document_json['attribute_type'] in SCHEMA_ID_MAP:
             document_json['attribute_type'] = SCHEMA_ID_MAP[document_json['attribute_type']]
-        return document_json
+    return document_json
 
 
 def update_group_set(document_json):
@@ -381,12 +381,13 @@ def restore_triple_objects(rcs_triples_path):
                     node_id = triple_collection.collection.insert(triple_json)
                     triple_obj = triple_collection.one({'_id': node_id})
                     triple_node_RT_AT_id = None
-                    if 'attribute_type' in triple_json:
-                        triple_node_RT_AT_id = triple_json['attribute_type']
-                    else:
-                        triple_node_RT_AT_id = triple_json['relation_type']
-                    triple_node_RT_AT = node_collection.one({'_id': ObjectId(triple_node_RT_AT_id)})
-                    triple_obj.save(triple_node=triple_node_RT_AT, triple_id=triple_node_RT_AT._id)
+                    # if 'attribute_type' in triple_json:
+                    #     triple_node_RT_AT_id = triple_json['attribute_type']
+                    # else:
+                    #     triple_node_RT_AT_id = triple_json['relation_type']
+                    # triple_node_RT_AT = node_collection.one({'_id': ObjectId(triple_node_RT_AT_id)})
+                    # triple_obj.save(triple_node=triple_node_RT_AT, triple_id=triple_node_RT_AT._id)
+                    triple_obj.save()
                     log_file.write("\nUpdate RCS using save()")
                 except Exception as tr_insert_err:
                     log_file.write("\nError while inserting Triple obj" + str(tr_insert_err))
