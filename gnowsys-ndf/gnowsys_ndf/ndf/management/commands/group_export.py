@@ -278,11 +278,12 @@ def build_rcs(node, collection_name):
         global GROUP_CONTRIBUTORS
         try:
             if collection_name is triple_collection:
-                if 'attribute_type' in node:
-                    triple_node_RT_AT = node_collection.one({'_id': node.attribute_type})
-                elif 'relation_type' in node:
-                    triple_node_RT_AT = node_collection.one({'_id': node.relation_type})
-                node.save(triple_node=triple_node_RT_AT, triple_id=triple_node_RT_AT._id)
+                # if 'attribute_type' in node:
+                #     triple_node_RT_AT = node_collection.one({'_id': node.attribute_type})
+                # elif 'relation_type' in node:
+                #     triple_node_RT_AT = node_collection.one({'_id': node.relation_type})
+                node.save()
+                # node.save(triple_node=triple_node_RT_AT, triple_id=triple_node_RT_AT._id)
             elif collection_name is node_collection:
                 pick_media_from_content(BeautifulSoup(node.content, 'html.parser'))
                 node.save()
@@ -339,19 +340,30 @@ def pick_media_from_content(content_soup):
     Parses through the content of node and finds the media 
     files and dump it
     '''
-    all_src = content_soup.find_all(src=re.compile('media|readDoc'))
-    # Fetching the files
-    for each_src in all_src:
-        src_attr = each_src["src"]
-        find_file_from_media_url(src_attr)
+    try:
+        global log_file
+        log_file.write("\n pick_media_from_content invoked.")
+
+        all_src = content_soup.find_all(src=re.compile('media|readDoc'))
+        # Fetching the files
+        for each_src in all_src:
+            src_attr = each_src["src"]
+            find_file_from_media_url(src_attr)
 
 
-    all_transcript_data = content_soup.find_all(attrs={'class':'transcript'})
-    for each_transcript in all_transcript_data:
-        data_ele = each_transcript.findNext('object',data=True)
-        if data_ele:
-            if 'media' in data_ele['data']:
-                find_file_from_media_url(data_ele['data'])
+        all_transcript_data = content_soup.find_all(attrs={'class':'transcript'})
+        for each_transcript in all_transcript_data:
+            data_ele = each_transcript.findNext('object',data=True)
+            if data_ele:
+                if 'media' in data_ele['data']:
+                    find_file_from_media_url(data_ele['data'])
+    except Exception as pick_media_err:
+        error_log = "\n !!! Error found in pick_media_from_content()."
+        error_log += "\nError: " + str(pick_media_err)
+        print "\n Error: ", error_log
+        log_file.write(error_log)
+        print error_log
+        pass
 
 def copy_rcs(node):
     '''
@@ -424,14 +436,18 @@ def dump_media_data(media_path):
     global log_file
     log_file.write("\n--- Media Copying in process --- "+ str(media_path))
     try:
-        fp = os.path.join(MEDIA_ROOT,media_path)
-        if os.path.exists(fp):
-            cp = "cp  -u " + fp + " " +" --parents " + MEDIA_EXPORT_PATH + "/"
-            subprocess.Popen(cp,stderr=subprocess.STDOUT,shell=True)
-            log_file.write("\n Media Copied:  " + str(fp) )
+        if media_path:
+            fp = os.path.join(MEDIA_ROOT,media_path)
+            if os.path.exists(fp):
+                cp = "cp  -u " + fp + " " +" --parents " + MEDIA_EXPORT_PATH + "/"
+                subprocess.Popen(cp,stderr=subprocess.STDOUT,shell=True)
+                log_file.write("\n Media Copied:  " + str(fp) )
 
+            else:
+                log_file.write("\n Media NOT Copied:  " + str(fp) )
         else:
-            log_file.write("\n Media NOT Copied:  " + str(fp) )
+            log_file.write("\n No MediaPath found:  " + str(media_path) )
+    
     except Exception as dumpMediaError:
         error_log = "\n !!! Error found while taking dump of Media.\n" +  str(media_path)
         error_log += "\nError: " + str(dumpMediaError)
