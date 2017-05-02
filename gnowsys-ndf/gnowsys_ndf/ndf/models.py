@@ -3429,15 +3429,17 @@ class Triple(DjangoDocument):
     subject_type_list = []
     subject_member_of_list = []
     name_value = u""
-    if (self._type == "GAttribute") and ('triple_node' in kwargs):
-      self.attribute_type = kwargs['triple_node']
-      attribute_type_name = self.attribute_type['name']
+    # if (self._type == "GAttribute") and ('triple_node' in kwargs):
+    if (self._type == "GAttribute"):
+      # self.attribute_type = kwargs['triple_node']
+      at_node = node_collection.one({'_id': ObjectId(self.attribute_type)})
+      attribute_type_name = at_node.name
       attribute_object_value = unicode(self.object_value)
 
       self.name = "%(subject_name)s -- %(attribute_type_name)s -- %(attribute_object_value)s" % locals()
       name_value = self.name
 
-      subject_type_list = self.attribute_type['subject_type']
+      subject_type_list = at_node.subject_type
       subject_member_of_list = subject_document.member_of
 
       intersection = set(subject_member_of_list) & set(subject_type_list)
@@ -3452,16 +3454,17 @@ class Triple(DjangoDocument):
           if set(gst_node.type_of) & set(subject_type_list):
             subject_system_flag = True
             break
-      self.attribute_type = kwargs['triple_id']
+      # self.attribute_type = kwargs['triple_id']
 
-    elif self._type == "GRelation" and ('triple_node' in kwargs):
-      self.relation_type = kwargs['triple_node']
-      subject_type_list = self.relation_type['subject_type']
-      object_type_list = self.relation_type['object_type']
+    elif self._type == "GRelation":
+      rt_node = node_collection.one({'_id': ObjectId(self.relation_type)})
+      # self.relation_type = kwargs['triple_node']
+      subject_type_list = rt_node.subject_type
+      object_type_list = rt_node.object_type
 
       left_subject_member_of_list = subject_document.member_of
-      relation_type_name = self.relation_type['name']
-      if META_TYPE[4] in self.relation_type.member_of_names_list:
+      relation_type_name = rt_node.name
+      if META_TYPE[4] in rt_node.member_of_names_list:
         #  print META_TYPE[3], self.relation_type.member_of_names_list,"!!!!!!!!!!!!!!!!!!!!!"
         # Relationship Other than Binary one found; e.g, Triadic
         # Single relation: [ObjectId(), ObjectId(), ...]
@@ -3493,8 +3496,6 @@ class Triple(DjangoDocument):
         # with other comma-separated values from another list(s)
         object_type_list = list(chain.from_iterable(object_type_list))
         right_subject_member_of_list = list(chain.from_iterable(right_subject_member_of_list))
-
-
       else:
           #META_TYPE[3] in self.relation_type.member_of_names_list:
           # If Binary relationship found
@@ -3503,7 +3504,6 @@ class Triple(DjangoDocument):
 
           right_subject_list = self.right_subject if isinstance(self.right_subject, list) else [self.right_subject]
           right_subject_document = node_collection.find_one({'_id': {'$in': right_subject_list} })
-
           if right_subject_document:
               right_subject_member_of_list = right_subject_document.member_of
               right_subject_name = right_subject_document.name
@@ -3516,12 +3516,10 @@ class Triple(DjangoDocument):
       right_intersection = set(object_type_list) & set(right_subject_member_of_list)
       if left_intersection and right_intersection:
         subject_system_flag = True
-
       else:
         left_subject_system_flag = False
         if left_intersection:
           left_subject_system_flag = True
-
         else:
           for gst_id in left_subject_member_of_list:
             gst_node = node_collection.one({'_id': gst_id}, {'type_of': 1})
@@ -3544,7 +3542,7 @@ class Triple(DjangoDocument):
         if left_subject_system_flag and right_subject_system_flag:
           subject_system_flag = True
 
-      self.relation_type = kwargs['triple_id']
+      # self.relation_type = kwargs['triple_id']
 
     if self._type =="GRelation" and subject_system_flag == False:
       # print "The 2 lists do not have any common element"
