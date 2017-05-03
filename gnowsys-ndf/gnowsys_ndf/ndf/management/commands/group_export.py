@@ -97,28 +97,41 @@ def get_triple_data(node_id):
     Gets all data stored in triples for this node.
     Fetches GAttrtibutes as wells as GRelations.
     '''
-    triple_query = {"_type": {'$in': ["GAttribute", "GRelation"]}, "subject": node_id}
+    try:
+        global log_file
+        log_file.write("\n get_triple_data invoked for: " + str(node_id))
 
-    node_gattr_grel_cur = triple_collection.find(triple_query)
-    fetch_value = None
-    if node_gattr_grel_cur:
+        triple_query = {"_type": {'$in': ["GAttribute", "GRelation"]}, "subject": node_id}
 
-        for each_triple_node in node_gattr_grel_cur:
-            dump_node(node=each_triple_node,
-                collection_name=triple_collection)
-            # Get ObjectIds in object_value fields
-            if each_triple_node._type is "GAttribute":
-                fetch_value = "object_value"
-            elif each_triple_node._type is "GRelation":
-                fetch_value = "right_subject"
-            if fetch_value:
-                if type(each_triple_node[fetch_value]) == list and all(isinstance(each_obj_value, ObjectId) for each_obj_value in each_triple_node[fetch_value]):
-                    dump_node(node_id_list=each_triple_node[fetch_value],
-                        collection_name=node_collection)
-                elif isinstance(each_triple_node[fetch_value], ObjectId):
-                    dump_node(node_id=each_triple_node[fetch_value],
+        node_gattr_grel_cur = triple_collection.find(triple_query)
+        fetch_value = None
+        if node_gattr_grel_cur:
+
+            for each_triple_node in node_gattr_grel_cur:
+                dump_node(node=each_triple_node,
+                    collection_name=triple_collection)
+                # Get ObjectIds in object_value fields
+                if each_triple_node._type is "GAttribute":
+                    fetch_value = "object_value"
+                elif each_triple_node._type is "GRelation":
+                    fetch_value = "right_subject"
+                if fetch_value:
+                    if type(each_triple_node[fetch_value]) == list and all(isinstance(each_obj_value, ObjectId) for each_obj_value in each_triple_node[fetch_value]):
+                        dump_node(node_id_list=each_triple_node[fetch_value],
                             collection_name=node_collection)
+                    elif isinstance(each_triple_node[fetch_value], ObjectId):
+                        dump_node(node_id=each_triple_node[fetch_value],
+                                collection_name=node_collection)
 
+        log_file.write("\n get_triple_data finished for: " + str(node_id))
+
+    except Exception as get_triple_data_err:
+        error_log = "\n !!! Error found while taking triple data in get_triple_data() ."
+        error_log += "\nError: " + str(get_triple_data_err)
+        print "\n Error: ", error_log
+        log_file.write(error_log)
+        print error_log
+        pass
 
 class Command(BaseCommand):
     def handle(self, *args, **options):
