@@ -5519,6 +5519,23 @@ def replicate_resource(request, node, group_id):
                     right_subj_node = node_collection.one({'_id': ObjectId(eachrsval)})
                     right_sub_new_node = create_clone(user_id, right_subj_node, group_id)
                     create_grelation(new_gsystem._id,rt_node,right_sub_new_node._id)
+
+                    # To maintain the thread-node relation using prior_node field
+                    if rt_node.name == u'has_thread':
+                        thread_created = True
+                        if right_sub_new_node:
+                            right_sub_new_node.prior_node = [new_gsystem._id]
+                            right_sub_new_node.save()
+
+                        thread_node_gattr_cur = triple_collection.find({'_type': 'GAttribute',
+                         'subject': right_subj_node._id})
+
+                        for each_gattr in thread_node_gattr_cur:
+                            at_id = each_gattr['attribute_type']
+                            obj_val = each_gattr['object_value']
+                            at_node = node_collection.one({'_id': ObjectId(at_id)})
+                            create_gattribute(right_sub_new_node._id,at_node,obj_val)
+
                 else:
                     cloned_rs_ids = []
                     for eachrsval_id in eachrsval:
@@ -5527,21 +5544,6 @@ def replicate_resource(request, node, group_id):
                         cloned_rs_ids.append(right_sub_new_node._id)
                     create_grelation(new_gsystem._id,rt_node,cloned_rs_ids)
 
-                # To maintain the thread-node relation using prior_node field
-                if rt_node.name == 'has_thread':
-                    thread_created = True
-                    if right_sub_new_node:
-                        right_sub_new_node.prior_node = [new_gsystem._id]
-                        right_sub_new_node.save()
-
-                    thread_node_gattr_cur = triple_collection.find({'_type': 'GAttribute',
-                     'subject': right_subj_node._id})
-
-                    for each_gattr in thread_node_gattr_cur:
-                        at_id = each_gattr['attribute_type']
-                        obj_val = each_gattr['object_value']
-                        at_node = node_collection.one({'_id': ObjectId(at_id)})
-                        create_gattribute(right_sub_new_node._id,at_node,obj_val)
 
             if "QuizItemEvent" in new_gsystem.member_of_names_list:
                 if not thread_created and request:
