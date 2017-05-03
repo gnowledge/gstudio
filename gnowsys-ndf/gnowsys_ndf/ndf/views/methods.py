@@ -5521,7 +5521,6 @@ def replicate_resource(request, node, group_id):
                     right_subj_node = node_collection.one({'_id': ObjectId(eachrsval)})
                     right_sub_new_node = create_clone(user_id, right_subj_node, group_id)
                     create_grelation(new_gsystem._id,rt_node,right_sub_new_node._id)
-
                     # To maintain the thread-node relation using prior_node field
                     if rt_node.name == u'has_thread':
                         thread_created = True
@@ -5550,6 +5549,14 @@ def replicate_resource(request, node, group_id):
             if "QuizItemEvent" in new_gsystem.member_of_names_list:
                 if not thread_created and request:
                     thread_obj = create_thread_for_node(request,group_id, new_gsystem)
+                    # To maintain the thread-node relation using prior_node field
+
+            if "raw@material" in new_gsystem.tags and request and "File" in new_gsystem.member_of_names_list:
+                if not thread_created:
+                    thread_obj = create_thread_for_node(request,group_id, new_gsystem)
+                    if thread_obj:
+                        thread_obj.prior_node = [new_gsystem._id]
+                        thread_obj.save()
 
         # clone_of_RT = node_collection.one({'_type': "RelationType", 'name': "clone_of"})
         # create_grelation(new_gsystem._id, clone_of_RT, node._id)
