@@ -219,10 +219,10 @@ def worker_export(nodes_cur):
         if each_node.collection_set:
             get_nested_ids(each_node,'collection_set')
 
-        if each_node.prior_node:
+        if each_node._type != "Group" and each_node.prior_node:
             get_nested_ids(each_node,'prior_node')
 
-        if each_node.post_node:
+        if each_node._type != "Group" and each_node.post_node:
             get_nested_ids(each_node,'post_node')
 
 
