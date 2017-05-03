@@ -5447,6 +5447,7 @@ def create_clone(user_id, node, group_id):
         cloned_copy['relation_set'] = []
         cloned_copy['attribute_set'] = []
         cloned_copy['tags'] = node.tags
+        cloned_copy['if_file'] = node.if_file
         cloned_copy['origin'] = [{'fork_of': node._id}]
         if "QuizItem" in node.member_of_names_list:
             quiz_item_event_gst = node_collection.one({'_type': "GSystemType", 'name': "QuizItemEvent"})
