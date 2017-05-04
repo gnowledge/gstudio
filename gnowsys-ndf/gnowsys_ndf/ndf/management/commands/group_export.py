@@ -115,7 +115,7 @@ def get_triple_data(node_id):
                     fetch_value = "object_value"
                 elif each_triple_node._type is "GRelation":
                     fetch_value = "right_subject"
-                if fetch_value:
+                if fetch_value == "right_subject":
                     if type(each_triple_node[fetch_value]) == list and all(isinstance(each_obj_value, ObjectId) for each_obj_value in each_triple_node[fetch_value]):
                         dump_node(node_id_list=each_triple_node[fetch_value],
                             collection_name=node_collection)
