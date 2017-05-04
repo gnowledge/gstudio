@@ -170,7 +170,7 @@ class Command(BaseCommand):
             else:
                 RESTORE_USER_DATA = False
 
-            nodes_falling_under_grp = node_collection.find({"group_set":ObjectId(group_node._id)})
+            nodes_falling_under_grp = node_collection.find({"group_set":ObjectId(group_node._id), '_type': {'$nin': ['Group', 'Author']}})
             print "\n\tTotal objects found: ", nodes_falling_under_grp.count()
             confirm_export = raw_input("\n\tDo you want to continue? Enter y/n:\t ")
             if confirm_export is 'y' or confirm_export is 'Y':
@@ -232,10 +232,10 @@ def worker_export(nodes_cur):
         if each_node.collection_set:
             get_nested_ids(each_node,'collection_set')
 
-        if each_node._type != "Group" and each_node.prior_node:
+        if each_node.prior_node:
             get_nested_ids(each_node,'prior_node')
 
-        if each_node._type != "Group" and each_node.post_node:
+        if each_node.post_node:
             get_nested_ids(each_node,'post_node')
 
 
@@ -244,8 +244,11 @@ def call_group_export(group_node, nodes_cur, num_of_processes=5):
         Introducing multiprocessing to use cores available on the system to 
         take dump of nodes of the entire group.
     '''
+    dump_node(node=group_node,collection_name=node_collection)
+    if group_node.collection_set:
+        get_nested_ids(group_node,'collection_set')
+
     nodes_cur = list(nodes_cur)
-    nodes_cur.append(group_node)
     worker_export(nodes_cur)
     # print "\nlen(nodes_cur): ", len(nodes_cur)
     # Include Group Object.
@@ -417,7 +420,7 @@ def dump_node(collection_name=node_collection, node=None, node_id=None, node_id_
     try:
         global log_file
         log_file.write("\n dump_node invoked for: " + str(collection_name))
-        if node:
+        if node and node._type != "Group":
             log_file.write("\tNode: " + str(node))
             #fetch triple_data
             build_rcs(node, collection_name)
@@ -425,13 +428,13 @@ def dump_node(collection_name=node_collection, node=None, node_id=None, node_id_
             log_file.write("\n dump node finished for:  " + str(node._id) )
         elif node_id:
             log_file.write("\tNode_id : " + str(node_id))
-            node = collection_name.one({'_id': ObjectId(node_id)})
-            if node:
+            node = collection_name.one({'_id': ObjectId(node_id), '_type': {'$nin': ['Group', 'Author']}})
+            if node and node._type != "Group":
                 build_rcs(node, collection_name)
                 get_triple_data(node._id)
                 log_file.write("\n dump node finished for:  " + str(node._id) )
         elif node_id_list:
-            node_cur = collection_name.one({'_id': {'$in': node_id_list}})
+            node_cur = collection_name.one({'_id': {'$in': node_id_list}, '_type': {'$nin': ['Group', 'Author']}})
             log_file.write("\tNode_id_list : " + str(node_id_list))
             for each_node in nodes_cur:
                 if each_node:
@@ -515,7 +518,7 @@ def get_nested_ids(node,field_name):
     '''
     if node[field_name]:
         for each_id in node[field_name]:
-            each_node = node_collection.one({"_id":ObjectId(each_id)})
+            each_node = node_collection.one({"_id":ObjectId(each_id), '_type': {'$nin': ['Group', 'Author']}})
             if each_node and (node._id != each_node._id):
                 dump_node(node=each_node, collection_name=node_collection)
                 if each_node and each_node[field_name]:
