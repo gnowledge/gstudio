@@ -111,9 +111,9 @@ def get_triple_data(node_id):
                 dump_node(node=each_triple_node,
                     collection_name=triple_collection)
                 # Get ObjectIds in object_value fields
-                if each_triple_node._type is "GAttribute":
+                if each_triple_node._type == "GAttribute":
                     fetch_value = "object_value"
-                elif each_triple_node._type is "GRelation":
+                elif each_triple_node._type == "GRelation":
                     fetch_value = "right_subject"
                 log_file.write("\n fetch_value: " + str(fetch_value))
                 if fetch_value == "right_subject":
