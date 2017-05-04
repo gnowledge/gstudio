@@ -173,12 +173,15 @@ def landing_page(request):
 #             return "/home/"
 
 @get_execution_time
-def help_page_view(request,page_id):
-    page_obj = Node.get_node_by_id(page_id)
+def help_page_view(request,page_name):
+    # page_obj = Node.get_node_by_id(page_id)
+    help_grp = node_collection.one({'$and':[{'_type': u'Group'}, {'name': u'help'}]})
+    
+    page_obj = node_collection.one({"name":unicode(page_name),"group_set":ObjectId(help_grp._id)})
     return render_to_response(
                                         "ndf/help_page.html",
                                         {
-                                            "group_id": page_id,
+                                            "group_id": page_obj._id,
                                             'title': 'Help Page',
                                             'page_obj':page_obj
                                         },

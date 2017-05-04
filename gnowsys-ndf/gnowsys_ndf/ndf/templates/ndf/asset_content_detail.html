@@ -2,7 +2,7 @@
 {% load ndf_tags %}
 {% check_is_gstaff group_id request.user as is_gstaff %}
 {% get_download_filename node as download_filename %}
-
+{% get_group_object groupid as group_object %}
 <div class="row">
   <div class="medium 12 columns">
 	    <div class="left small-12 medium-6 columns">
@@ -10,8 +10,7 @@
                   	                    
 	                    <!--<input type="text" placeholder="" name="resource_name" />-->
 	                </label>
-                  <label>Created By: <b> {{ node.user_details_dict.contributors|join:', ' }} </b>
-                                        
+                    <label>Created By: <b> {{ node.user_details_dict.contributors|join:', ' }} </b>
                       <!--<input type="text" placeholder="" name="resource_name" />-->
                   </label>
 
