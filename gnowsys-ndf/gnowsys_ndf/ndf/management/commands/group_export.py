@@ -24,6 +24,7 @@ from gnowsys_ndf.ndf.templatetags.simple_filters import get_latest_git_hash, get
 # global variables declaration
 GROUP_CONTRIBUTORS = []
 DUMP_PATH = None
+GROUP_ID = None
 DATA_EXPORT_PATH = None
 MEDIA_EXPORT_PATH = None
 IS_FORK = False
@@ -191,7 +192,8 @@ class Command(BaseCommand):
 
                 print "\n This will take few minutes. Please be patient.\n"
                 print "*"*70
-
+                global GROUP_ID
+                GROUP_ID = group_node._id
                 call_group_export(group_node, nodes_falling_under_grp)
                 get_counter_ids(group_node._id)
                 # import ipdb; ipdb.set_trace()
@@ -424,7 +426,7 @@ def dump_node(collection_name=node_collection, node=None, node_id=None, node_id_
     try:
         global log_file
         log_file.write("\n dump_node invoked for: " + str(collection_name))
-        if node and node._type != "Group":
+        if node and (node._id != GROUP_ID or node._type != "Group"):
             log_file.write("\tNode: " + str(node))
             #fetch triple_data
             build_rcs(node, collection_name)
