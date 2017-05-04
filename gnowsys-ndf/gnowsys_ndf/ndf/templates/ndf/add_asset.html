@@ -104,7 +104,7 @@
     </div>
     <br/>
 
-    <div class="row activity-detail-content">
+    <div class="row ">
       {{asset_obj.content|safe|striptags}} 
     </div>
             
@@ -128,8 +128,9 @@
 
                 <button type="button" class="blue-white-button save-asset right" data-asset_id='{{asset_obj.pk}}' style="margin-top: 9px;margin-right: -150px;">Save</button>
             {% endif %}
-
+<div class="row">
     <hr/>
+</div>
         <div class="row">
             <div class="small-12 medium-10 large-10 columns">
                 <label>
@@ -291,7 +292,9 @@
               {%  endif %}
         </div>
     <!-- </div> -->
+    <div class="row">
     <hr/>
+    </div>
     <div class="row asset-comments-section">
       <div class="small-10 columns" id="view-discussion" style="overflow-x:auto;overflow-y:hidden">
             <!-- discussion content area -->
