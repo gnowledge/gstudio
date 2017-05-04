@@ -39,7 +39,7 @@
  -->              {% if user.is_authenticated %}
 
                 {% if help_oid %}
-                <li class=""><a {% if title == 'Help Page'  %} class="active" {% endif %} target="_blank" href="{% url 'help_page_view' help_oid %}"> Help Topics</a></li>
+                <li class=""><a {% if title == 'Help Page'  %} class="active" {% endif %} target="_blank" href="{% url 'help_page_view' help_oid %}"> <i class="fa fa-info-circle"></i> Help </a></li>
                 {% endif %}
                 <li class="has-dropdown buddy_margin">
                     {% get_profile_pic request.user.pk as prof_pic %}
