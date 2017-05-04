@@ -425,6 +425,7 @@ def dump_node(collection_name=node_collection, node=None, node_id=None, node_id_
     '''
     try:
         global log_file
+        global GROUP_ID
         log_file.write("\n dump_node invoked for: " + str(collection_name))
         if node and (node._id != GROUP_ID or node._type != "Group"):
             log_file.write("\tNode: " + str(node))
