@@ -181,7 +181,7 @@ def help_page_view(request,page_name):
     return render_to_response(
                                         "ndf/help_page.html",
                                         {
-                                            "group_id": page_obj.pk,
+                                            "group_id": page_obj._id,
                                             'title': 'Help Page',
                                             'page_obj':page_obj
                                         },
