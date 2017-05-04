@@ -115,11 +115,15 @@ def get_triple_data(node_id):
                     fetch_value = "object_value"
                 elif each_triple_node._type is "GRelation":
                     fetch_value = "right_subject"
+                log_file.write("\n fetch_value: " + str(fetch_value))
                 if fetch_value == "right_subject":
+                    log_file.write("\n Picking up right-subject nodes.\n\t " + str(each_triple_node[fetch_value]))
                     if type(each_triple_node[fetch_value]) == list and all(isinstance(each_obj_value, ObjectId) for each_obj_value in each_triple_node[fetch_value]):
+                        log_file.write("\n List:  " + str(True))
                         dump_node(node_id_list=each_triple_node[fetch_value],
                             collection_name=node_collection)
                     elif isinstance(each_triple_node[fetch_value], ObjectId):
+                        log_file.write("\n ObjectId:  " + str(True))
                         dump_node(node_id=each_triple_node[fetch_value],
                                 collection_name=node_collection)
 
