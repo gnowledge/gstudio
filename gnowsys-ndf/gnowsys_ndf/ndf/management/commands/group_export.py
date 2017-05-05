@@ -32,7 +32,7 @@ IS_CLONE = False
 RESTORE_USER_DATA = False
 log_file = None
 historyMgr = HistoryManager()
-DUMP_IDS = set()
+DUMP_IDS = []
 
 def create_log_file():
     '''
@@ -446,7 +446,7 @@ def dump_node(collection_name=node_collection, node=None, node_id=None, node_id_
                 print "\n Finished dumping group node----"
                 print "*"*80
             global DUMP_IDS
-            DUMP_IDS.add(node._id)
+            DUMP_IDS.append(node._id)
             log_file.write("\n dump node finished for:  " + str(node._id) )
         elif node_id:
             log_file.write("\tNode_id : " + str(node_id))
@@ -459,7 +459,7 @@ def dump_node(collection_name=node_collection, node=None, node_id=None, node_id_
                 if 'File' in node.member_of_names_list:
                     get_file_node_details(node)
                 global DUMP_IDS
-                DUMP_IDS.add(node._id)
+                DUMP_IDS.append(node._id)
         elif node_id_list:
             node_cur = collection_name.one({'_id': {'$in': node_id_list}, '_type': {'$nin': ['Group', 'Author']}})
             log_file.write("\tNode_id_list : " + str(node_id_list))
@@ -472,7 +472,7 @@ def dump_node(collection_name=node_collection, node=None, node_id=None, node_id_
 
                     log_file.write("\n dump node finished for:  " + str(each_node._id) )
                     global DUMP_IDS
-                    DUMP_IDS.add(each_node._id)
+                    DUMP_IDS.append(each_node._id)
 
     except Exception as dump_err:
         error_log = "\n !!! Error found while taking dump in dump_node() ."
