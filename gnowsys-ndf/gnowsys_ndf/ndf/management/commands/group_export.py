@@ -32,6 +32,7 @@ IS_CLONE = False
 RESTORE_USER_DATA = False
 log_file = None
 historyMgr = HistoryManager()
+DUMP_IDS = set()
 
 def create_log_file():
     '''
@@ -427,8 +428,9 @@ def dump_node(collection_name=node_collection, node=None, node_id=None, node_id_
     try:
         global log_file
         global GROUP_ID
+        global DUMP_IDS
         log_file.write("\n dump_node invoked for: " + str(collection_name))
-        if node and (node._id == GROUP_ID or node._type != "Group"):
+        if node._id not in DUMP_IDS and node and (node._id == GROUP_ID or node._type != "Group"):
 
             log_file.write("\tNode: " + str(node))
             if node._id == GROUP_ID:
@@ -440,34 +442,36 @@ def dump_node(collection_name=node_collection, node=None, node_id=None, node_id_
             get_triple_data(node._id)
             if 'File' in node.member_of_names_list:
                 get_file_node_details(node)
-
             if node._id == GROUP_ID:
                 print "*"*80
                 print "\n Finished dumping group node----"
                 print "*"*80
 
+            DUMP_IDS.add(node._id)
             log_file.write("\n dump node finished for:  " + str(node._id) )
         elif node_id:
             log_file.write("\tNode_id : " + str(node_id))
             node = collection_name.one({'_id': ObjectId(node_id), '_type': {'$nin': ['Group', 'Author']}})
-            if node and node._type != "Group":
+            if node._id not in DUMP_IDS and node and node._type != "Group":
 
                 build_rcs(node, collection_name)
                 get_triple_data(node._id)
                 log_file.write("\n dump node finished for:  " + str(node._id) )
                 if 'File' in node.member_of_names_list:
                     get_file_node_details(node)
+                DUMP_IDS.add(node._id)
         elif node_id_list:
             node_cur = collection_name.one({'_id': {'$in': node_id_list}, '_type': {'$nin': ['Group', 'Author']}})
             log_file.write("\tNode_id_list : " + str(node_id_list))
             for each_node in nodes_cur:
-                if each_node:
+                if each_node._id not in DUMP_IDS and each_node:
                     build_rcs(each_node, collection_name)
                     get_triple_data(each_node._id)
                     if 'File' in each_node.member_of_names_list:
                         get_file_node_details(each_node)
 
                     log_file.write("\n dump node finished for:  " + str(each_node._id) )
+                    DUMP_IDS.add(each_node._id)
 
     except Exception as dump_err:
         error_log = "\n !!! Error found while taking dump in dump_node() ."
