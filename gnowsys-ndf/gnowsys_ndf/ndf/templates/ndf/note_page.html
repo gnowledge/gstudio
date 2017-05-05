@@ -37,7 +37,7 @@
                 <div class="small-12 columns creator-title">
                     <i class="fi-torso"></i>
 
-                    <span class="note-creator" title="{{node.created_by|get_username}}">{{node.created_by|get_username}}</span>
+                    <span class="note-creator" title="{{ node.user_details_dict.contributors|join:', ' }}">{{ node.user_details_dict.contributors|join:', ' }}</span>
                     &nbsp;
                     &#8226;
                     &nbsp;
