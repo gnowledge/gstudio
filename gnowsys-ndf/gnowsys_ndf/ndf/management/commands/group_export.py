@@ -32,7 +32,6 @@ IS_CLONE = False
 RESTORE_USER_DATA = False
 log_file = None
 historyMgr = HistoryManager()
-DUMP_IDS = []
 
 def create_log_file():
     '''
@@ -428,9 +427,8 @@ def dump_node(collection_name=node_collection, node=None, node_id=None, node_id_
     try:
         global log_file
         global GROUP_ID
-        global DUMP_IDS
         log_file.write("\n dump_node invoked for: " + str(collection_name))
-        if node and node._id not in DUMP_IDS  and (node._id == GROUP_ID or node._type != "Group"):
+        if node and (node._id == GROUP_ID or node._type != "Group"):
             log_file.write("\tNode: " + str(node))
             if node._id == GROUP_ID:
                 print "*"*80
@@ -440,39 +438,33 @@ def dump_node(collection_name=node_collection, node=None, node_id=None, node_id_
             build_rcs(node, collection_name)
             get_triple_data(node._id)
             if 'File' in node.member_of_names_list:
-                get_file_node_details(node)
+                get_file_node_details(node, exclude_node=True)
             if node._id == GROUP_ID:
                 print "*"*80
                 print "\n Finished dumping group node----"
                 print "*"*80
-            global DUMP_IDS
-            DUMP_IDS.append(node._id)
             log_file.write("\n dump node finished for:  " + str(node._id) )
         elif node_id:
             log_file.write("\tNode_id : " + str(node_id))
             node = collection_name.one({'_id': ObjectId(node_id), '_type': {'$nin': ['Group', 'Author']}})
-            if node and node._id not in DUMP_IDS and node._type != "Group":
+            if node and node._type != "Group":
 
                 build_rcs(node, collection_name)
                 get_triple_data(node._id)
                 log_file.write("\n dump node finished for:  " + str(node._id) )
                 if 'File' in node.member_of_names_list:
-                    get_file_node_details(node)
-                global DUMP_IDS
-                DUMP_IDS.append(node._id)
+                    get_file_node_details(node, exclude_node=True)
         elif node_id_list:
             node_cur = collection_name.one({'_id': {'$in': node_id_list}, '_type': {'$nin': ['Group', 'Author']}})
             log_file.write("\tNode_id_list : " + str(node_id_list))
             for each_node in nodes_cur:
-                if each_node and each_node._id not in DUMP_IDS :
+                if each_node:
                     build_rcs(each_node, collection_name)
                     get_triple_data(each_node._id)
                     if 'File' in each_node.member_of_names_list:
-                        get_file_node_details(each_node)
+                        get_file_node_details(each_node, exclude_node=True)
 
                     log_file.write("\n dump node finished for:  " + str(each_node._id) )
-                    global DUMP_IDS
-                    DUMP_IDS.append(each_node._id)
 
     except Exception as dump_err:
         error_log = "\n !!! Error found while taking dump in dump_node() ."
@@ -506,7 +498,7 @@ def dump_media_data(media_path):
         print error_log
         pass
 
-def get_file_node_details(node):
+def get_file_node_details(node, exclude_node=False):
     '''
     Check if_file field and take its dump
     'if_file': {
@@ -520,8 +512,8 @@ def get_file_node_details(node):
     try:
         global log_file
         log_file.write("\n get_file_node_details invoked for: " + str(node))
-
-        dump_node(node=node, collection_name=node_collection)
+        if not exclude_node:
+            dump_node(node=node, collection_name=node_collection)
         dump_node(node_id=node.if_file['original']['id'], collection_name=filehive_collection)
         dump_node(node_id=node.if_file['mid']['id'], collection_name=filehive_collection)
         dump_node(node_id=node.if_file['thumbnail']['id'], collection_name=filehive_collection)
