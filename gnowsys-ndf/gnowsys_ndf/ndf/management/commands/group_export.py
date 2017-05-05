@@ -192,6 +192,7 @@ class Command(BaseCommand):
 
                 print "\n This will take few minutes. Please be patient.\n"
                 print "*"*70
+                # import ipdb; ipdb.set_trace()
                 global GROUP_ID
                 GROUP_ID = group_node._id
                 call_group_export(group_node, nodes_falling_under_grp)
@@ -250,7 +251,9 @@ def call_group_export(group_node, nodes_cur, num_of_processes=5):
         Introducing multiprocessing to use cores available on the system to 
         take dump of nodes of the entire group.
     '''
+    print "taking dump of group---"
     dump_node(node=group_node,collection_name=node_collection)
+    print "taking dump of group collections_set---"
     if group_node.collection_set:
         get_nested_ids(group_node,'collection_set')
 
@@ -427,11 +430,20 @@ def dump_node(collection_name=node_collection, node=None, node_id=None, node_id_
         global log_file
         global GROUP_ID
         log_file.write("\n dump_node invoked for: " + str(collection_name))
-        if node and (node._id != GROUP_ID or node._type != "Group"):
+        if node and (node._id == GROUP_ID or node._type != "Group"):
             log_file.write("\tNode: " + str(node))
+            if node._id == GROUP_ID:
+                print "*"*80
+                print "\n Found group node for dump----"
+                print "*"*80
             #fetch triple_data
             build_rcs(node, collection_name)
             get_triple_data(node._id)
+            if node._id == GROUP_ID:
+                print "*"*80
+                print "\n Finished dumping group node----"
+                print "*"*80
+
             log_file.write("\n dump node finished for:  " + str(node._id) )
         elif node_id:
             log_file.write("\tNode_id : " + str(node_id))
