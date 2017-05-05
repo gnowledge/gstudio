@@ -68,7 +68,7 @@ Still keeping for future ref (if needed).
 {% else %}
   <section class="medium-9 columns">
 {% endif %}
-  {% if not hide_breadcrumbs %}{{hide_breadcrumbs}}
+  {% if not hide_breadcrumbs %}
   {% block breadcrumb %} {% get_breadcrumb request.path %} {% endblock breadcrumb %}
   {% endif %}
 
