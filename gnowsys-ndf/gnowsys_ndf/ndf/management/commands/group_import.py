@@ -130,6 +130,8 @@ def check_group_availability():
     log_file.write("\n Restoring Group")
     fp = get_file_path_with_id(CONFIG_VARIABLES.GROUP_ID)
     if fp:
+        if not fp.endswith(',v'):
+            fp = fp + ',v'
         log_file.write("\n Restoring Group: " + str(fp))
         restore_node(fp)
     group_node = node_collection.one({'_id': ObjectId(CONFIG_VARIABLES.GROUP_ID)})
