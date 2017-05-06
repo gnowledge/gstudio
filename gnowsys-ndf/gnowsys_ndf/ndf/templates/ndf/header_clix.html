@@ -7,9 +7,6 @@
   {% get_test_page_oid as help_oid %}
   {% get_gstudio_registration as registration %}
 
-
-  
-      
 <nav class="top-bar" data-topbar role="navigation" id="menu_bar_gstudio">
         <ul class="title-area">
             <li class="name show-for-medium-up">
@@ -36,11 +33,12 @@
             <ul class="right show-for-medium-up">
 <!--                 <li class=""><a href="#">Blog</a></li>
                 <li class=""><a href="#"><i class="icons-medium fi-info"></i>&nbsp;Help Topics</a></li>
- -->              {% if user.is_authenticated %}
+ -->             
 
                 {% if help_oid %}
                 <li class=""><a {% if title == 'Help Page'  %} class="active" {% endif %} target="_blank" href="{% url 'help_page_view' help_oid %}"> <i class="fa fa-info-circle"></i> Help </a></li>
                 {% endif %}
+            {% if user.is_authenticated %}
                 <li class="has-dropdown buddy_margin">
                     {% get_profile_pic request.user.pk as prof_pic %}
                     <!-- <a href="{% url 'dashboard' request.user.pk %}"> -->
