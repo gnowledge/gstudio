@@ -106,13 +106,15 @@ def get_triple_data(node_id):
         triple_query = {"_type": {'$in': ["GAttribute", "GRelation"]}, "subject": node_id}
 
         node_gattr_grel_cur = triple_collection.find(triple_query)
-        fetch_value = None
         if node_gattr_grel_cur:
-
             for each_triple_node in node_gattr_grel_cur:
+                fetch_value = None
                 dump_node(node=each_triple_node,
                     collection_name=triple_collection)
                 # Get ObjectIds in object_value fields
+
+
+
                 print "\neach_triple_node._type --- ", each_triple_node._type
                 if each_triple_node._type == u"GAttribute":
                     fetch_value = "object_value"
@@ -121,10 +123,12 @@ def get_triple_data(node_id):
                 log_file.write("\n fetch_value: " + str(fetch_value))
                 if fetch_value == "right_subject":
                     log_file.write("\n Picking up right-subject nodes.\n\t " + str(each_triple_node[fetch_value]))
+
                     if type(each_triple_node[fetch_value]) == list and all(isinstance(each_obj_value, ObjectId) for each_obj_value in each_triple_node[fetch_value]):
                         log_file.write("\n List:  " + str(True))
                         dump_node(node_id_list=each_triple_node[fetch_value],
                             collection_name=node_collection)
+
                     elif isinstance(each_triple_node[fetch_value], ObjectId):
                         log_file.write("\n ObjectId:  " + str(True))
                         dump_node(node_id=each_triple_node[fetch_value],
@@ -302,22 +306,26 @@ def build_rcs(node, collection_name):
         global log_file
         global GROUP_CONTRIBUTORS
         try:
-            if collection_name is triple_collection:
-                # if 'attribute_type' in node:
-                #     triple_node_RT_AT = node_collection.one({'_id': node.attribute_type})
-                # elif 'relation_type' in node:
-                #     triple_node_RT_AT = node_collection.one({'_id': node.relation_type})
-                # node.save(triple_node=triple_node_RT_AT, triple_id=triple_node_RT_AT._id)
-                node.save()
-            elif collection_name is node_collection:
-                node.save()
-                if node.content:
-                    pick_media_from_content(BeautifulSoup(node.content, 'html.parser'))
-            elif collection_name is filehive_collection:
-                dump_node(node_id=node['first_parent'], collection_name=node_collection)
-                node.save()
-            else:
-                node.save()
+            node.save()
+            if collection_name is node_collection and node.content:
+                pick_media_from_content(BeautifulSoup(node.content, 'html.parser'))
+
+            # if collection_name is triple_collection:
+            #     # if 'attribute_type' in node:
+            #     #     triple_node_RT_AT = node_collection.one({'_id': node.attribute_type})
+            #     # elif 'relation_type' in node:
+            #     #     triple_node_RT_AT = node_collection.one({'_id': node.relation_type})
+            #     # node.save(triple_node=triple_node_RT_AT, triple_id=triple_node_RT_AT._id)
+            #     node.save()
+            # elif collection_name is node_collection:
+            #     node.save()
+            #     if node.content:
+            #         pick_media_from_content(BeautifulSoup(node.content, 'html.parser'))
+            # elif collection_name is filehive_collection:
+            #     # dump_node(node_id=node['first_parent'], collection_name=node_collection)
+            #     node.save()
+            # else:
+            #     node.save()
             try:
                 global RESTORE_USER_DATA
                 if RESTORE_USER_DATA:
@@ -431,11 +439,14 @@ def dumping_call(node, collection_name):
         print "\n CHECK =  ", node._id not in DUMPED_NODE_IDS
         if (node._id == GROUP_ID or node._type != "Group") and node._id not in DUMPED_NODE_IDS:
             build_rcs(node, collection_name)
+
             if collection_name == node_collection:
                 get_triple_data(node._id)
+                DUMPED_NODE_IDS.add(node._id)
                 if 'File' in node.member_of_names_list:
                     get_file_node_details(node, exclude_node=True)
-            DUMPED_NODE_IDS.add(node._id)
+            else:
+                DUMPED_NODE_IDS.add(node._id)
             log_file.write("\n Dump node finished for:  " + str(node._id) )
         else:
             log_file.write("\n Already dumped node: " + str(node._id) )
