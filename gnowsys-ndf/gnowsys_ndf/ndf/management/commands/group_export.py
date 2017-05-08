@@ -305,8 +305,8 @@ def build_rcs(node, collection_name):
                 #     triple_node_RT_AT = node_collection.one({'_id': node.attribute_type})
                 # elif 'relation_type' in node:
                 #     triple_node_RT_AT = node_collection.one({'_id': node.relation_type})
-                node.save()
                 # node.save(triple_node=triple_node_RT_AT, triple_id=triple_node_RT_AT._id)
+                node.save()
             elif collection_name is node_collection:
                 node.save()
                 if node.content:
@@ -430,29 +430,19 @@ def dump_node(collection_name=node_collection, node=None, node_id=None, node_id_
         log_file.write("\n dump_node invoked for: " + str(collection_name))
         if node and (node._id == GROUP_ID or node._type != "Group"):
             log_file.write("\tNode: " + str(node))
-            if node._id == GROUP_ID:
-                print "*"*80
-                print "\n Found group node for dump----"
-                print "*"*80
-            #fetch triple_data
             build_rcs(node, collection_name)
             get_triple_data(node._id)
-            if 'File' in node.member_of_names_list:
+            if collection_name == node_collection and 'File' in node.member_of_names_list:
                 get_file_node_details(node, exclude_node=True)
-            if node._id == GROUP_ID:
-                print "*"*80
-                print "\n Finished dumping group node----"
-                print "*"*80
             log_file.write("\n dump node finished for:  " + str(node._id) )
         elif node_id:
             log_file.write("\tNode_id : " + str(node_id))
             node = collection_name.one({'_id': ObjectId(node_id), '_type': {'$nin': ['Group', 'Author']}})
             if node and node._type != "Group":
-
                 build_rcs(node, collection_name)
                 get_triple_data(node._id)
                 log_file.write("\n dump node finished for:  " + str(node._id) )
-                if 'File' in node.member_of_names_list:
+                if collection_name == node_collection and 'File' in node.member_of_names_list:
                     get_file_node_details(node, exclude_node=True)
         elif node_id_list:
             node_cur = collection_name.one({'_id': {'$in': node_id_list}, '_type': {'$nin': ['Group', 'Author']}})
@@ -461,9 +451,8 @@ def dump_node(collection_name=node_collection, node=None, node_id=None, node_id_
                 if each_node:
                     build_rcs(each_node, collection_name)
                     get_triple_data(each_node._id)
-                    if 'File' in each_node.member_of_names_list:
+                    if collection_name == node_collection and 'File' in each_node.member_of_names_list:
                         get_file_node_details(each_node, exclude_node=True)
-
                     log_file.write("\n dump node finished for:  " + str(each_node._id) )
 
     except Exception as dump_err:
