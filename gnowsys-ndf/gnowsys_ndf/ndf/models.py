@@ -2702,6 +2702,7 @@ class Group(GSystem):
 
             for each in grp_res:
                 del_status, del_status_msg = delete_node(node_id=each._id, deletion_type=1 )
+                # print del_status, del_status_msg
                 if not del_status:
                     print "*"*80
                     print "\n Error node: _id: ", each._id, " , name: ", each.name, " type: ", each.member_of_names_list
@@ -2709,6 +2710,7 @@ class Group(GSystem):
 
             print "\n Purging group: "
             del_status, del_status_msg = delete_node(node_id=group_id, deletion_type=1)
+            print del_status, del_status_msg
 
             # poping group_id from each of shared nodes under group
             all_nodes_under_gr.rewind()
