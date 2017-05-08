@@ -113,9 +113,10 @@ def get_triple_data(node_id):
                 dump_node(node=each_triple_node,
                     collection_name=triple_collection)
                 # Get ObjectIds in object_value fields
-                if each_triple_node._type == "GAttribute":
+                print "\neach_triple_node._type --- ", each_triple_node._type
+                if each_triple_node._type == u"GAttribute":
                     fetch_value = "object_value"
-                elif each_triple_node._type == "GRelation":
+                elif each_triple_node._type == u"GRelation":
                     fetch_value = "right_subject"
                 log_file.write("\n fetch_value: " + str(fetch_value))
                 if fetch_value == "right_subject":
@@ -419,6 +420,33 @@ def copy_rcs(node):
             print error_log
             pass
 
+def dumping_call(node, collection_name):
+    try:
+        global log_file
+        global GROUP_ID
+        global DUMPED_NODE_IDS
+        log_file.write("\nDumping Call for : " + str(node))
+        print "\n Requesting dump for: ", node._id
+        print "\n DUMPED_NODE_IDS: ", DUMPED_NODE_IDS
+        print "\n CHECK =  ", node._id not in DUMPED_NODE_IDS
+        if (node._id == GROUP_ID or node._type != "Group") and node._id not in DUMPED_NODE_IDS:
+            build_rcs(node, collection_name)
+            if collection_name == node_collection:
+                get_triple_data(node._id)
+                if 'File' in node.member_of_names_list:
+                    get_file_node_details(node, exclude_node=True)
+            DUMPED_NODE_IDS.add(node._id)
+            log_file.write("\n Dump node finished for:  " + str(node._id) )
+        else:
+            log_file.write("\n Already dumped node: " + str(node._id) )
+
+    except Exception as dumping_call_err:
+        error_log = "\n !!! Error found in dumping_call_node() ."
+        error_log += "\nError: " + str(dumping_call_err)
+        log_file.write(error_log)
+        print error_log
+        pass
+
 def dump_node(collection_name=node_collection, node=None, node_id=None, node_id_list=None):
     '''
     Receives all nodes pertaining to exporting group belonging to all existing collections.
@@ -426,51 +454,21 @@ def dump_node(collection_name=node_collection, node=None, node_id=None, node_id_
     '''
     try:
         global log_file
-        global GROUP_ID
-        global DUMPED_NODE_IDS
         log_file.write("\n dump_node invoked for: " + str(collection_name))
-        if node and (node._id == GROUP_ID or node._type != "Group"):
-            if node._id not in DUMPED_NODE_IDS:
-                print "\n1. DUMPED_NODE_IDS: ", DUMPED_NODE_IDS
-                log_file.write("\tNode: " + str(node))
-                build_rcs(node, collection_name)
-                get_triple_data(node._id)
-                if collection_name == node_collection and 'File' in node.member_of_names_list:
-                    get_file_node_details(node, exclude_node=True)
-                DUMPED_NODE_IDS.add(node._id)
-                log_file.write("\n dump node finished for:  " + str(node._id) )
-            else:
-                log_file.write("\n Already dumped node: " + str(node._id) )
-
+        if node:
+                dumping_call(node,collection_name)
         elif node_id:
             log_file.write("\tNode_id : " + str(node_id))
             node = collection_name.one({'_id': ObjectId(node_id), '_type': {'$nin': ['Group', 'Author']}})
-            if node and node._type != "Group":
-                if node._id not in DUMPED_NODE_IDS:
-                    print "\n2. DUMPED_NODE_IDS: ", DUMPED_NODE_IDS
-                    build_rcs(node, collection_name)
-                    get_triple_data(node._id)
-                    log_file.write("\n dump node finished for:  " + str(node._id) )
-                    if collection_name == node_collection and 'File' in node.member_of_names_list:
-                        get_file_node_details(node, exclude_node=True)
-                    DUMPED_NODE_IDS.add(node._id)
-                else:
-                    log_file.write("\n Already dumped node: " + str(node._id) )
+            if node:
+                dumping_call(node,collection_name)
+
         elif node_id_list:
             node_cur = collection_name.one({'_id': {'$in': node_id_list}, '_type': {'$nin': ['Group', 'Author']}})
             log_file.write("\tNode_id_list : " + str(node_id_list))
             for each_node in nodes_cur:
                 if each_node:
-                    if each_node._id not in DUMPED_NODE_IDS:
-                        print "\n3. DUMPED_NODE_IDS: ", DUMPED_NODE_IDS
-                        build_rcs(each_node, collection_name)
-                        get_triple_data(each_node._id)
-                        if collection_name == node_collection and 'File' in each_node.member_of_names_list:
-                            get_file_node_details(each_node, exclude_node=True)
-                        DUMPED_NODE_IDS.add(each_node._id)
-                        log_file.write("\n dump node finished for:  " + str(each_node._id) )
-                    else:
-                        log_file.write("\n Already dumped node: " + str(each_node._id))
+                    dumping_call(node,collection_name)
 
     except Exception as dump_err:
         error_log = "\n !!! Error found while taking dump in dump_node() ."
