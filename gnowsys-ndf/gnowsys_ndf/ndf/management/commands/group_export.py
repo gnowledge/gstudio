@@ -113,9 +113,6 @@ def get_triple_data(node_id):
                     collection_name=triple_collection)
                 # Get ObjectIds in object_value fields
 
-
-
-                print "\neach_triple_node._type --- ", each_triple_node._type
                 if each_triple_node._type == u"GAttribute":
                     fetch_value = "object_value"
                 elif each_triple_node._type == u"GRelation":
@@ -255,9 +252,7 @@ def call_group_export(group_node, nodes_cur, num_of_processes=5):
         Introducing multiprocessing to use cores available on the system to 
         take dump of nodes of the entire group.
     '''
-    print "taking dump of group---"
     dump_node(node=group_node,collection_name=node_collection)
-    print "taking dump of group collections_set---"
     if group_node.collection_set:
         get_nested_ids(group_node,'collection_set')
 
@@ -434,9 +429,6 @@ def dumping_call(node, collection_name):
         global GROUP_ID
         global DUMPED_NODE_IDS
         log_file.write("\nDumping Call for : " + str(node))
-        print "\n Requesting dump for: ", node._id
-        print "\n DUMPED_NODE_IDS: ", DUMPED_NODE_IDS
-        print "\n CHECK =  ", node._id not in DUMPED_NODE_IDS
         if (node._id == GROUP_ID or node._type != "Group") and node._id not in DUMPED_NODE_IDS:
             build_rcs(node, collection_name)
 
