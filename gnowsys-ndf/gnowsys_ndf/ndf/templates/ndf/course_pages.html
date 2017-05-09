@@ -72,7 +72,7 @@
         </div>
         <div class="row listing-row"> 
           {% for each in other_translations %}
-            <a href="{% url 'asset_detail' group_id each.pk %}"  title="{{each.name}}">
+            <a href="{% url 'view_course_page' group_id each.pk %}"  title="{{each.name}}">
               <div class="small-12 medium-6 large-3 columns ">
                 <div class="asset_tile">
                   <div class="asset_preview">
