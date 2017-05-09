@@ -924,7 +924,7 @@ ul.horizontal_tabs_gstudio {
     }
     .group_sections {
         text-align: center;
-        border-bottom: 19px solid #ccc;
+        border-bottom: 19px solid rgba(255,255,255,255);
         background: #eefaff;
     }
     .group_sections_content {
@@ -2567,12 +2567,13 @@ ul.jqtree-tree .jqtree-toggler {
             background: #fff;
 
             .editor-header{
-                height: 100px;
+                height: 55px;
                 background-color: #e5f1f6;
                 border-bottom: 1px solid #e6e6e7;
+                margin-bottom: 10px;
 
                 .header-left {
-                    padding: 29px 0px;
+                    padding: 14px 10px 10px 10px;
 
                     >span {
                         color: #3c5264;
@@ -2650,6 +2651,7 @@ ul.jqtree-tree .jqtree-toggler {
                 @include transition-prop(all);
                 width: 20%;
                 background-color: #2a6882;
+                border: 1px solid #e5f1f6;
 
                 .course-lessons {
                     dd {
@@ -2722,7 +2724,7 @@ ul.jqtree-tree .jqtree-toggler {
             }
 
             .course-editor-section {
-                width: 72%;
+                width: 77%;
                 opacity: 1;
                 max-width: 100%;
                 background: #fff;
@@ -3091,6 +3093,7 @@ ul.jqtree-tree .jqtree-toggler {
 
 .activity-editor{
     margin:50px;
+    margin-left: 15px;
 }
 
 
@@ -5062,5 +5065,14 @@ ul.nav_menu_1 {
     margin-left: -56px;
 }
 
+.top-margin-translation{
+    margin-top: 0px;
+}
            
+.activity-editor-header-top{
+    margin-top:-50px;
 
+}
+.add-lesson-top-margin{
+    margin-top:5px;
+}
