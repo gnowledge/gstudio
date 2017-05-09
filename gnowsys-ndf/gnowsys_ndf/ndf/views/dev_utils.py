@@ -18,29 +18,24 @@ from gnowsys_ndf.ndf.models import node_collection, triple_collection, gridfs_co
 
 def query_doc(request, doc_id_or_name=None):
 
-	result = ''
+	if ObjectId.is_valid(doc_id_or_name):
+		doc_id_or_name = ObjectId(doc_id_or_name)
 
-	try:
-		oid = ObjectId(doc_id_or_name)
-		document = node_collection.one({'_id': oid})
-		result = json.dumps(document, cls=NodeJSONEncoder, sort_keys=True)
-		result = [result]
+	query_res = node_collection.find({
+								'$or': [
+										{'_id': doc_id_or_name},
+										{'name': unicode(doc_id_or_name)}
+									]
+								})
 
-	except:
-		name = doc_id_or_name
-		documents = node_collection.find({'name': unicode(name)})
-		result = []
-		for each_doc in documents:
-			result.append(json.dumps(each_doc, cls=NodeJSONEncoder, sort_keys=True))
+	result = []
+	for each_doc in query_res:
+		result.append(json.dumps(each_doc, cls=NodeJSONEncoder, sort_keys=True))
 
-	return render_to_response(
-        'ndf/dev_query_doc.html',
-        {'result': result},
-        context_instance=RequestContext(request)
-    )
-
-
-
+	return render_to_response('ndf/dev_query_doc.html',
+					        {'result': result},
+					        context_instance=RequestContext(request)
+						    )
 
 
 def render_test_template(request):

@@ -128,13 +128,13 @@ def check_group_availability():
     global log_file
     print '\n\n Restoring Group'
     log_file.write("\n Restoring Group")
-    fp = get_file_path_with_id(CONFIG_VARIABLES.GROUP_ID)
-    if fp:
-        if not fp.endswith(',v'):
-            fp = fp + ',v'
-        log_file.write("\n Restoring Group: " + str(fp))
-        restore_node(fp)
-    group_node = node_collection.one({'_id': ObjectId(CONFIG_VARIABLES.GROUP_ID)})
+    # fp = get_file_path_with_id(CONFIG_VARIABLES.GROUP_ID)
+    # if fp:
+    #     if not fp.endswith(',v'):
+    #         fp = fp + ',v'
+    #     log_file.write("\n Restoring Group: " + str(fp))
+    #     restore_node(fp)
+    # group_node = node_collection.one({'_id': ObjectId(CONFIG_VARIABLES.GROUP_ID)})
     if group_node:
         confirm_grp_data_merge = raw_input("Dump Group already exists here. Would you like to merge the data ?")
         if confirm_grp_data_merge != 'y' and confirm_grp_data_merge != 'Y':
@@ -517,6 +517,7 @@ class Command(BaseCommand):
 
             print "\n Factory Schema Restoration. Please wait.."
             SCHEMA_ID_MAP = update_factory_schema_mapper(DATA_DUMP_PATH)
+            print "\n SCHEMA: ", SCHEMA_ID_MAP
             print "\n Log will be found at: ", log_file_path
             call_group_import(os.path.join(DATA_DUMP_PATH, 'data', 'rcs-repo'))
             copy_media_data(os.path.join(DATA_DUMP_PATH, 'media_files', 'data', 'media'))
@@ -675,13 +676,14 @@ def get_json_file(filepath):
     try:
         rcs.checkout(filepath)
         fp = filepath.split('/')[-1]
+        # fp = filepath
         if fp.endswith(',v'):
             fp = fp.split(',')[0]
         with open(fp, 'r') as version_file:
             obj_as_json = json.loads(version_file.read(), object_hook=json_util.object_hook)
             parse_datetime_values(obj_as_json)
             rcs.checkin(fp)
-        # os.remove(fp)
+            # os.remove(fp)
         return obj_as_json
     except Exception as get_json_err:
         print "Exception while getting JSON: ", get_json_err

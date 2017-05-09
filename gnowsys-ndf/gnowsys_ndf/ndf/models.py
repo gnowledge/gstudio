@@ -1017,7 +1017,7 @@ class Node(DjangoDocument):
             fp = history_manager.get_file_path(self)
 
             try:
-                rcs_obj.checkout(fp)
+                rcs_obj.checkout(fp, otherflags="-f")
             except Exception as err:
                 try:
                     if history_manager.create_or_replace_json_file(self):
@@ -2353,7 +2353,7 @@ class Filehive(DjangoDocument):
             fp = history_manager.get_file_path(self)
 
             try:
-                rcs_obj.checkout(fp)
+                rcs_obj.checkout(fp, otherflags="-f")
 
             except Exception as err:
                 try:
@@ -2702,6 +2702,7 @@ class Group(GSystem):
 
             for each in grp_res:
                 del_status, del_status_msg = delete_node(node_id=each._id, deletion_type=1 )
+                # print del_status, del_status_msg
                 if not del_status:
                     print "*"*80
                     print "\n Error node: _id: ", each._id, " , name: ", each.name, " type: ", each.member_of_names_list
@@ -2709,6 +2710,7 @@ class Group(GSystem):
 
             print "\n Purging group: "
             del_status, del_status_msg = delete_node(node_id=group_id, deletion_type=1)
+            print del_status, del_status_msg
 
             # poping group_id from each of shared nodes under group
             all_nodes_under_gr.rewind()
@@ -3089,7 +3091,7 @@ class HistoryManager():
 
         fp = self.get_file_path(document_object)
         rcs = RCS()
-        rcs.checkout((fp, version_no))
+        rcs.checkout((fp, version_no), otherflags="-f")
 
         json_data = ""
         with open(fp, 'r') as version_file:
@@ -3583,7 +3585,7 @@ class Triple(DjangoDocument):
       fp = history_manager.get_file_path(self)
 
       try:
-          rcs_obj.checkout(fp)
+          rcs_obj.checkout(fp, otherflags="-f")
       except Exception as err:
           try:
               if history_manager.create_or_replace_json_file(self):
@@ -4044,7 +4046,7 @@ class Buddy(DjangoDocument):
             fp = history_manager.get_file_path(self)
 
             try:
-                rcs_obj.checkout(fp)
+                rcs_obj.checkout(fp, otherflags="-f")
 
             except Exception as err:
                 try:
@@ -4559,7 +4561,7 @@ class Counter(DjangoDocument):
             fp = history_manager.get_file_path(self)
 
             try:
-                rcs_obj.checkout(fp)
+                rcs_obj.checkout(fp, otherflags="-f")
 
             except Exception as err:
                 try:
