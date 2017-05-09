@@ -675,8 +675,8 @@ def get_json_file(filepath):
     # Returns json and rcs filepath
     try:
         rcs.checkout(filepath)
-        # fp = filepath.split('/')[-1]
-        fp = filepath
+        fp = filepath.split('/')[-1]
+        # fp = filepath
         if fp.endswith(',v'):
             fp = fp.split(',')[0]
         with open(fp, 'r') as version_file:

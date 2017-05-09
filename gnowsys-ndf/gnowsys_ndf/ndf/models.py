@@ -1017,7 +1017,7 @@ class Node(DjangoDocument):
             fp = history_manager.get_file_path(self)
 
             try:
-                rcs_obj.checkout(fp)
+                rcs_obj.checkout(fp, otherflags="-f")
             except Exception as err:
                 try:
                     if history_manager.create_or_replace_json_file(self):
@@ -2353,7 +2353,7 @@ class Filehive(DjangoDocument):
             fp = history_manager.get_file_path(self)
 
             try:
-                rcs_obj.checkout(fp)
+                rcs_obj.checkout(fp, otherflags="-f")
 
             except Exception as err:
                 try:
@@ -3091,7 +3091,7 @@ class HistoryManager():
 
         fp = self.get_file_path(document_object)
         rcs = RCS()
-        rcs.checkout((fp, version_no))
+        rcs.checkout((fp, version_no), otherflags="-f")
 
         json_data = ""
         with open(fp, 'r') as version_file:
@@ -3585,7 +3585,7 @@ class Triple(DjangoDocument):
       fp = history_manager.get_file_path(self)
 
       try:
-          rcs_obj.checkout(fp)
+          rcs_obj.checkout(fp, otherflags="-f")
       except Exception as err:
           try:
               if history_manager.create_or_replace_json_file(self):
@@ -4046,7 +4046,7 @@ class Buddy(DjangoDocument):
             fp = history_manager.get_file_path(self)
 
             try:
-                rcs_obj.checkout(fp)
+                rcs_obj.checkout(fp, otherflags="-f")
 
             except Exception as err:
                 try:
@@ -4561,7 +4561,7 @@ class Counter(DjangoDocument):
             fp = history_manager.get_file_path(self)
 
             try:
-                rcs_obj.checkout(fp)
+                rcs_obj.checkout(fp, otherflags="-f")
 
             except Exception as err:
                 try:
