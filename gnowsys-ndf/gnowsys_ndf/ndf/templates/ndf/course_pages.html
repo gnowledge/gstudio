@@ -49,7 +49,7 @@
             {% endif %}
         </div>
 
-            <div class="row">
+         <div class="row">
             <div class="small-8 columns left">
                  {% if activity_node.tags %}
                     {% for tag in activity_node.tags %}
@@ -70,7 +70,24 @@
         <div id="info-page-area">
                     
         </div>
-        
+        <div class="row listing-row"> 
+          {% for each in other_translations %}
+            <a href="{% url 'asset_detail' group_id each.pk %}"  title="{{each.name}}">
+              <div class="small-12 medium-6 large-3 columns ">
+                <div class="asset_tile">
+                  <div class="asset_preview">
+                    <div class="raw_material_asset">{{each.language.1}}</div>                
+                      <img src="/static/ndf/images/asset.png">
+                  </div>
+                  <div class="asset_text">
+                      <div class="asset_title">{{each.name|truncatechars:25}}</div>
+                      <div class="asset_desc">{{each.content|striptags|truncatechars:25}}</div>
+                  </div>
+                </div>
+              </div>
+            </a>
+          {% endfor %}
+        </div>
     </div>
 
 
