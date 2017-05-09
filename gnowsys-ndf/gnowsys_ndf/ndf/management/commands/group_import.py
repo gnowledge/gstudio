@@ -675,14 +675,15 @@ def get_json_file(filepath):
     # Returns json and rcs filepath
     try:
         rcs.checkout(filepath)
-        fp = filepath.split('/')[-1]
+        # fp = filepath.split('/')[-1]
+        fp = filepath
         if fp.endswith(',v'):
             fp = fp.split(',')[0]
         with open(fp, 'r') as version_file:
             obj_as_json = json.loads(version_file.read(), object_hook=json_util.object_hook)
             parse_datetime_values(obj_as_json)
             rcs.checkin(fp)
-        # os.remove(fp)
+            # os.remove(fp)
         return obj_as_json
     except Exception as get_json_err:
         print "Exception while getting JSON: ", get_json_err
