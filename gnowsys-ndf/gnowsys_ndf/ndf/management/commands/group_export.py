@@ -32,6 +32,7 @@ IS_CLONE = False
 RESTORE_USER_DATA = False
 log_file = None
 historyMgr = HistoryManager()
+DUMPED_NODE_IDS = set()
 
 def create_log_file():
     '''
@@ -105,24 +106,26 @@ def get_triple_data(node_id):
         triple_query = {"_type": {'$in': ["GAttribute", "GRelation"]}, "subject": node_id}
 
         node_gattr_grel_cur = triple_collection.find(triple_query)
-        fetch_value = None
         if node_gattr_grel_cur:
-
             for each_triple_node in node_gattr_grel_cur:
+                fetch_value = None
                 dump_node(node=each_triple_node,
                     collection_name=triple_collection)
                 # Get ObjectIds in object_value fields
-                if each_triple_node._type == "GAttribute":
+
+                if each_triple_node._type == u"GAttribute":
                     fetch_value = "object_value"
-                elif each_triple_node._type == "GRelation":
+                elif each_triple_node._type == u"GRelation":
                     fetch_value = "right_subject"
                 log_file.write("\n fetch_value: " + str(fetch_value))
                 if fetch_value == "right_subject":
                     log_file.write("\n Picking up right-subject nodes.\n\t " + str(each_triple_node[fetch_value]))
+
                     if type(each_triple_node[fetch_value]) == list and all(isinstance(each_obj_value, ObjectId) for each_obj_value in each_triple_node[fetch_value]):
                         log_file.write("\n List:  " + str(True))
                         dump_node(node_id_list=each_triple_node[fetch_value],
                             collection_name=node_collection)
+
                     elif isinstance(each_triple_node[fetch_value], ObjectId):
                         log_file.write("\n ObjectId:  " + str(True))
                         dump_node(node_id=each_triple_node[fetch_value],
@@ -233,8 +236,6 @@ def worker_export(nodes_cur):
         print ".",
         dump_node(node=each_node,collection_name=node_collection)
         # node_collection_ids.add(each_node._id)
-        if 'File' in each_node.member_of_names_list:
-            get_file_node_details(each_node)
 
         if each_node.collection_set:
             get_nested_ids(each_node,'collection_set')
@@ -251,9 +252,7 @@ def call_group_export(group_node, nodes_cur, num_of_processes=5):
         Introducing multiprocessing to use cores available on the system to 
         take dump of nodes of the entire group.
     '''
-    print "taking dump of group---"
     dump_node(node=group_node,collection_name=node_collection)
-    print "taking dump of group collections_set---"
     if group_node.collection_set:
         get_nested_ids(group_node,'collection_set')
 
@@ -302,22 +301,26 @@ def build_rcs(node, collection_name):
         global log_file
         global GROUP_CONTRIBUTORS
         try:
-            if collection_name is triple_collection:
-                # if 'attribute_type' in node:
-                #     triple_node_RT_AT = node_collection.one({'_id': node.attribute_type})
-                # elif 'relation_type' in node:
-                #     triple_node_RT_AT = node_collection.one({'_id': node.relation_type})
-                node.save()
-                # node.save(triple_node=triple_node_RT_AT, triple_id=triple_node_RT_AT._id)
-            elif collection_name is node_collection:
-                node.save()
-                if node.content:
-                    pick_media_from_content(BeautifulSoup(node.content, 'html.parser'))
-            elif collection_name is filehive_collection:
-                dump_node(node_id=node['first_parent'], collection_name=node_collection)
-                node.save()
-            else:
-                node.save()
+            node.save()
+            if collection_name is node_collection and node.content:
+                pick_media_from_content(BeautifulSoup(node.content, 'html.parser'))
+
+            # if collection_name is triple_collection:
+            #     # if 'attribute_type' in node:
+            #     #     triple_node_RT_AT = node_collection.one({'_id': node.attribute_type})
+            #     # elif 'relation_type' in node:
+            #     #     triple_node_RT_AT = node_collection.one({'_id': node.relation_type})
+            #     # node.save(triple_node=triple_node_RT_AT, triple_id=triple_node_RT_AT._id)
+            #     node.save()
+            # elif collection_name is node_collection:
+            #     node.save()
+            #     if node.content:
+            #         pick_media_from_content(BeautifulSoup(node.content, 'html.parser'))
+            # elif collection_name is filehive_collection:
+            #     # dump_node(node_id=node['first_parent'], collection_name=node_collection)
+            #     node.save()
+            # else:
+            #     node.save()
             try:
                 global RESTORE_USER_DATA
                 if RESTORE_USER_DATA:
@@ -378,7 +381,6 @@ def pick_media_from_content(content_soup):
             src_attr = each_src["src"]
             find_file_from_media_url(src_attr)
 
-
         all_transcript_data = content_soup.find_all(attrs={'class':'transcript'})
         for each_transcript in all_transcript_data:
             data_ele = each_transcript.findNext('object',data=True)
@@ -421,6 +423,33 @@ def copy_rcs(node):
             print error_log
             pass
 
+def dumping_call(node, collection_name):
+    try:
+        global log_file
+        global GROUP_ID
+        global DUMPED_NODE_IDS
+        log_file.write("\nDumping Call for : " + str(node))
+        if (node._id == GROUP_ID or node._type != "Group") and node._id not in DUMPED_NODE_IDS:
+            build_rcs(node, collection_name)
+
+            if collection_name == node_collection:
+                get_triple_data(node._id)
+                DUMPED_NODE_IDS.add(node._id)
+                if 'File' in node.member_of_names_list:
+                    get_file_node_details(node, exclude_node=True)
+            else:
+                DUMPED_NODE_IDS.add(node._id)
+            log_file.write("\n Dump node finished for:  " + str(node._id) )
+        else:
+            log_file.write("\n Already dumped node: " + str(node._id) )
+
+    except Exception as dumping_call_err:
+        error_log = "\n !!! Error found in dumping_call_node() ."
+        error_log += "\nError: " + str(dumping_call_err)
+        log_file.write(error_log)
+        print error_log
+        pass
+
 def dump_node(collection_name=node_collection, node=None, node_id=None, node_id_list=None):
     '''
     Receives all nodes pertaining to exporting group belonging to all existing collections.
@@ -428,38 +457,21 @@ def dump_node(collection_name=node_collection, node=None, node_id=None, node_id_
     '''
     try:
         global log_file
-        global GROUP_ID
         log_file.write("\n dump_node invoked for: " + str(collection_name))
-        if node and (node._id == GROUP_ID or node._type != "Group"):
-            log_file.write("\tNode: " + str(node))
-            if node._id == GROUP_ID:
-                print "*"*80
-                print "\n Found group node for dump----"
-                print "*"*80
-            #fetch triple_data
-            build_rcs(node, collection_name)
-            get_triple_data(node._id)
-            if node._id == GROUP_ID:
-                print "*"*80
-                print "\n Finished dumping group node----"
-                print "*"*80
-
-            log_file.write("\n dump node finished for:  " + str(node._id) )
+        if node:
+                dumping_call(node,collection_name)
         elif node_id:
             log_file.write("\tNode_id : " + str(node_id))
             node = collection_name.one({'_id': ObjectId(node_id), '_type': {'$nin': ['Group', 'Author']}})
-            if node and node._type != "Group":
-                build_rcs(node, collection_name)
-                get_triple_data(node._id)
-                log_file.write("\n dump node finished for:  " + str(node._id) )
+            if node:
+                dumping_call(node,collection_name)
+
         elif node_id_list:
             node_cur = collection_name.one({'_id': {'$in': node_id_list}, '_type': {'$nin': ['Group', 'Author']}})
             log_file.write("\tNode_id_list : " + str(node_id_list))
             for each_node in nodes_cur:
                 if each_node:
-                    build_rcs(each_node, collection_name)
-                    get_triple_data(each_node._id)
-                    log_file.write("\n dump node finished for:  " + str(each_node._id) )
+                    dumping_call(node,collection_name)
 
     except Exception as dump_err:
         error_log = "\n !!! Error found while taking dump in dump_node() ."
@@ -493,7 +505,7 @@ def dump_media_data(media_path):
         print error_log
         pass
 
-def get_file_node_details(node):
+def get_file_node_details(node, exclude_node=False):
     '''
     Check if_file field and take its dump
     'if_file': {
@@ -507,8 +519,8 @@ def get_file_node_details(node):
     try:
         global log_file
         log_file.write("\n get_file_node_details invoked for: " + str(node))
-
-        dump_node(node=node, collection_name=node_collection)
+        if not exclude_node:
+            dump_node(node=node, collection_name=node_collection)
         dump_node(node_id=node.if_file['original']['id'], collection_name=filehive_collection)
         dump_node(node_id=node.if_file['mid']['id'], collection_name=filehive_collection)
         dump_node(node_id=node.if_file['thumbnail']['id'], collection_name=filehive_collection)

@@ -31,16 +31,20 @@ def update_data():
 
 
 def update(branch):
-	local('git pull origin ' + branch)
-	local('python manage.py syncdb')
-	install_requirements()
-	local('bower install --allow-root')
-	local('python manage.py collectstatic --noinput')
-	update_data()
+	try:
+		local('git pull origin ' + branch)
+		local('python manage.py syncdb')
+		install_requirements()
+		local('python manage.py collectstatic --noinput')
+	except Exception, e:
+		print e
+	finally:
+		update_data()
 
 
 def install_requirements():
 	local('pip install -r ../requirements.txt')
+	local('bower install --allow-root')
 
 
 def purge_group():

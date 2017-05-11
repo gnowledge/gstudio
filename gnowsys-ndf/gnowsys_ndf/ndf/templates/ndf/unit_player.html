@@ -104,7 +104,7 @@
                     <a id="related-content-button" href="#related-content" class="view-related-content"><i class="fa fa-arrow-circle-down"></i>&nbsp;View related contents</a>
                   {% endif %}
                   {# {{node.content|safe}} #}
-                  {% include 'ndf/node_ajax_content.html' with no_discussion=True %}
+                  {% include 'ndf/node_ajax_content.html' with no_discussion=True hide_breadcrumbs=True %}
               </div>
               {% if help_page_list %}
               {% for each_help_page in help_page_list %}
