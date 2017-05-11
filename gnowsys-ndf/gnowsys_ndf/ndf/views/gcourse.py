@@ -3353,7 +3353,18 @@ def course_pages(request, group_id, page_id=None):
 
     if page_id:
         node_obj = node_collection.one({'_id': ObjectId(page_id)})
-        context_variables.update({'activity_node': node_obj, 'hide_breadcrumbs': True})
+        
+        rt_translation_of = Node.get_name_id_from_type('translation_of', 'RelationType', get_obj=True)
+
+        other_translations_grels = triple_collection.find({
+                            '_type': u'GRelation',
+                            'subject': ObjectId(page_id),
+                            'relation_type': rt_translation_of._id,
+                            'right_subject': {'$nin': [node_obj._id]}
+                        })
+        other_translations = node_collection.find({'_id': {'$in': [r.right_subject for r in other_translations_grels]} })
+        
+        context_variables.update({'activity_node': node_obj, 'hide_breadcrumbs': True,'other_translations':other_translations})
         context_variables.update({'editor_view': False})
 
 
