@@ -1196,7 +1196,7 @@ def get_disc_replies( oid, group_id, global_disc_all_replies, level=1 ):
 			temp_disc_reply["prior_node"] = str(each.prior_node[0])
 			temp_disc_reply["collection_set"] = [node_collection.one({'_id': ObjectId(i)}) for i in each.collection_set]
 			temp_disc_reply["level"] = level
-
+			temp_disc_reply["contributors"] = each.user_details_dict["contributors"]
 			# to avoid redundancy of dicts, it checks if any 'oid' is not equals to each._id. Then only append to list
 			if not any( d['oid'] == str(each._id) for d in global_disc_all_replies ):
 				if type(global_disc_all_replies) == str:
