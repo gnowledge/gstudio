@@ -820,7 +820,7 @@ ul.horizontal_tabs_gstudio > li.sub_group_action:hover ul {
 /* line 925, ../../../scss/_clix2017.scss */
 .group_content .group_sections {
   text-align: center;
-  border-bottom: 2px solid white;
+  border-bottom: 2px solid #f5f5f5;
   background: #eefaff;
 }
 /* line 930, ../../../scss/_clix2017.scss */
