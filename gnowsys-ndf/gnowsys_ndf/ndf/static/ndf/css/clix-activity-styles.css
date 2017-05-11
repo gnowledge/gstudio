@@ -207,6 +207,7 @@
 
 #scstyle section{
   margin-left: auto;
+  width:auto;
 }
 
 #scstyle audio {

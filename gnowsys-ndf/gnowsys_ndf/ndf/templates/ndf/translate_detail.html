@@ -4,13 +4,13 @@
 {% block title %} {{title}} {% endblock %}
 
 {% block body_content %}
-<div class="row group_content">
-    <div class="small-12 columns  group_sections_content" id="scstyle">
-	<h2 class="text-center"> {{node.name}}
+<div class="row group_content translation-detail-top-margin">
+    <div class="small-12 columns  top-bar-secondions_content" id="scstyle">
+	<h1 class="text-center"> {{node.name}}
 		<small>
-			<a href="{% url 'translated' group_id source_node_id node.language.0 node.pk %}">[ EDIT ] </a>
+			<a href="{% url 'translated' group_id source_node_id node.language.0 node.pk %}"> <i>[EDIT] </i></a>
 		</small>
-	</h2>
+	</h1>
 
     {% include 'ndf/node_ajax_content.html' %}
 
