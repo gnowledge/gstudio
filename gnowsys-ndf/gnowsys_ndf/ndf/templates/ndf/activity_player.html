@@ -95,6 +95,34 @@
               {% comment %}
               <a class="translate right"> Translate</a>
               {% endcomment %}
+              
+              
+              {% if translation.count %}
+                  
+            <div>
+                <button href="#" data-dropdown="alt-lang-dd" aria-controls="alt-lang-dd" aria-expanded="false" class="orange-button right" tiny>Alternate Language &nbsp;<i class="fa fa-chevron-down"></i></button><br/>
+
+                <ul id="alt-lang-dd" class="f-dropdown" data-dropdown-content aria-hidden="true" tabindex="-1">
+                {% for  each_trans in translation  %}
+                    <li><a href="#">{{each_trans.language.1}}</a></li>
+                {% endfor %}
+                  </ul>
+
+                {% comment %}
+                  
+            
+                <ul id="drop1" data-dropdown-content class="f-dropdown" aria-hidden="true">
+                {% for each_lang in supported_languages %}
+                    <li><a href="{% url 'translate' group_id source_node_id each_lang %}">{{each_lang}}</a></li>
+                {% endfor %}
+                </ul>
+                {% endcomment %}
+            </div>
+              {% endif %}
+      
+                
+              
+
 
               </div>
               <div class="activity_page_rendered">
@@ -221,5 +249,13 @@
                     'slow'); }, 1000);
           
       });
+
+  $( "#alt-lang-dd li" ).click(function() {
+        
+            alert('helo')
+            
+    });
+
+  
 </script>
 {% endblock %}
