@@ -7,6 +7,9 @@
                     <!-- <div class="small-4 columns name-div"> -->
                         <input type="text" class="node_name" name="name" placeholder="Enter name of Page" value="{{activity_node.name}}" style="border-radius: 5px; margin-top: 11px;">
                         <label class="node_name_empty hide" style="color:red">Please enter Name</label>
+
+                        <input type="text" class="node_altname" name="alt_name" placeholder="Enter display name of Page"  value="{{activity_node.altnames}}" style="border-radius: 5px; margin-top: 11px;">
+                        <label class="node_altname_empty hide" style="color:red">Please enter display Name</label>
                     <!-- </div> -->
                 </div>
                     
@@ -75,6 +78,7 @@
 
     $(document).on('submit','#course_page_form',function(event){
         node_name_val = $(".node_name").val()
+        node_altname_val = $(".node_altname").val()
         updateAllTags();
         var tagsStr = tags.value.trim();
         if(checkTag())
@@ -92,6 +96,15 @@
         else{
             $('.node_name_empty').addClass('hide')
         }
+
+        if(!node_altname_val){
+            event.preventDefault()
+            $('.node_altname_empty').removeClass('hide')
+        }
+        else{
+            $('.node_altname_empty').addClass('hide')
+        }
+    
     })
 
 
