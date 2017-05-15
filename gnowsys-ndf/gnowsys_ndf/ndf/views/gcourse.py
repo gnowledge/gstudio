@@ -3404,7 +3404,7 @@ def save_course_page(request, group_id):
             page_obj = node_collection.one({'_id': ObjectId(node_id)})
             if page_obj.altnames != alt_name:
                 page_obj.altnames = unicode(alt_name)
-        if not page_obj:
+        else:
             is_info_page = request.POST.get("page_type", "")
             page_obj = node_collection.collection.GSystem()
             page_obj.fill_gstystem_values(request=request)
