@@ -3397,16 +3397,20 @@ def save_course_page(request, group_id):
     activity_lang =  request.POST.get("lan", '')
     if request.method == "POST":
         name = request.POST.get("name", "")
+        alt_name = request.POST.get("alt_name", "")
         content = request.POST.get("content_org", None)
         node_id = request.POST.get("node_id", "")
         if node_id:
             page_obj = node_collection.one({'_id': ObjectId(node_id)})
-        if not page_obj:
+            if page_obj.altnames != alt_name:
+                page_obj.altnames = unicode(alt_name)
+        else:
             is_info_page = request.POST.get("page_type", "")
             page_obj = node_collection.collection.GSystem()
             page_obj.fill_gstystem_values(request=request)
             page_obj.member_of = [page_gst_id]
             page_obj.group_set = [group_id]
+            page_obj.altnames = unicode(alt_name)
             if is_info_page == "Info":
                 info_page_gst_name, info_page_gst_id = GSystemType.get_gst_name_id('Info page')
                 page_obj.type_of = [info_page_gst_id]
