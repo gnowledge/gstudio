@@ -96,11 +96,11 @@
               <a class="translate right"> Translate</a>
               {% endcomment %}
               
-              
+              {# Adding alternate Language, if present #}
               {% if translation.count %}
                   
             <div>
-                <button href="#" data-dropdown="alt-lang-dd" aria-controls="alt-lang-dd" aria-expanded="false" class="orange-button right" tiny>Alternate Language &nbsp;<i class="fa fa-chevron-down"></i></button><br/>
+                <button href="#" data-dropdown="alt-lang-dd" aria-controls="alt-lang-dd" aria-expanded="false" class="orange-button right" tiny>Alternate Language <i class="fa fa-chevron-down"></i></button><br/>
 
                 <ul id="alt-lang-dd" class="f-dropdown" data-dropdown-content aria-hidden="true" tabindex="-1">
                 {% for  each_trans in translation  %}
@@ -152,6 +152,12 @@
         </div>
       </div>
 </div>             
+
+<div data-reveal-id="alt-lang-dd" class="reveal-modal reveal-modal-overlay"  aria-labelledby="modalTitle" aria-hidden="true" role="dialog">
+      <a class="close-reveal-modal" aria-label="Close">&#215;</a>
+      <h2 style="font-size:35px">Coming Up! Please check after a while!</h2>
+</div>
+
 
 <script type="text/javascript">
   // start of document.ready()
@@ -251,10 +257,11 @@
       });
 
   $( "#alt-lang-dd li" ).click(function() {
-        
-            alert('helo')
-            
-    });
+
+       
+       $( "#alt-lang-dd" ).foundation('reveal','open');
+       
+      });
 
   
 </script>
