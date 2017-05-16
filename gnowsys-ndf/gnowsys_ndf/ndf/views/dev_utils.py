@@ -39,8 +39,10 @@ def query_doc(request, doc_id_or_name=None):
 
 
 def render_test_template(request):
+	test_node = node_collection.one({"_id":ObjectId("591a8607c6bd6905d395c317")})
 	return render_to_response(
         'ndf/test_template.html',
+        {"node":test_node},
         context_instance=RequestContext(request)
     )
 	
