@@ -10,7 +10,7 @@
             <div>
                 <div class="left">
                 <h5>Name</h5>
-                <div class="gray-text">{{source_obj.name}}</div>
+                <div class="gray-text"></div>
                 </div>
                 <div class="small-11 medium-11 large-11 columns">
                     <input name="name" type="text" class="orange-button node_name" style="margin-top:11px;margin-left:40px" placeholder="Enter Name"  
@@ -18,6 +18,7 @@
                     <label class="node_name_empty hide" style="color:red">Please enter Name</label>
 
                 </div>
+                {{source_obj.name}}
             </div>
 
 
@@ -25,13 +26,16 @@
             <div>
                 <div class="left">
                 <h5>Description</h5>
-                {{source_obj.content|safe}}
                 </div><br/> 
-                <div class="left">
+                <div class="left" style="width:980px;">
                     {% include "ndf/html_editor.html" with var_name="content" var_placeholder="Enter the content here" var_value=node_obj.content|safe|default_if_none:"" node_id=node_obj.pk ckeditor_toolbar=editor_type %}
+                    <br/>
                 </div>
             </div>
             <hr/>
+            <div>
+                {{source_obj.content|safe}}
+            </div>
             {% for k, v in additional_form_fields.fields.iteritems %}
                 <{{v.widget}} type="{{v.widget_attr}}" name="{{v.name}}" value="{{v.value}}">
             {% endfor %}
