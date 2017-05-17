@@ -3986,3 +3986,29 @@ def get_gstudio_registration():
 def get_unit_total_points(user_id,group_id):
 	counter_obj = Counter.get_counter_obj(user_id, ObjectId(group_id))
 	return counter_obj['group_points']
+
+
+@register.assignment_tag
+def get_node_hierarchy(node_obj):
+    node_structure = []
+    for each in node_obj.collection_set:
+        lesson_dict ={}
+        lesson = Node.get_node_by_id(each)
+        if lesson:
+            lesson_dict['name'] = lesson.name
+            lesson_dict['type'] = 'lesson'
+            lesson_dict['id'] = str(lesson._id)
+            lesson_dict['language'] = lesson.language[0]
+            lesson_dict['activities'] = []
+            if lesson.collection_set:
+                for each_act in lesson.collection_set:
+                    activity_dict ={}
+                    activity = Node.get_node_by_id(each_act)
+                    if activity:
+                        activity_dict['name'] = activity.name
+                        activity_dict['type'] = 'activity'
+                        activity_dict['id'] = str(activity._id)
+                        lesson_dict['activities'].append(activity_dict)
+            node_structure.append(lesson_dict)
+
+    return json.dumps(node_structure)
