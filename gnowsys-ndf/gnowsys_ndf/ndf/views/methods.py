@@ -5483,7 +5483,6 @@ def clone_triple(node_obj, triple_obj, group_id, user_id, grelation=False):
                 cloned_rs_ids.append(right_sub_new_node._id)
             if cloned_rs_ids:
                 cloned_copy['right_subject'] = cloned_rs_ids
-    print "\nCC: ", cloned_copy['right_subject']
     cloned_obj_id = triple_collection.collection.insert(cloned_copy)
     cloned_obj = triple_collection.one({'_id': ObjectId(cloned_obj_id)})
     cloned_obj.save(groupid=group_id, validate=False)
@@ -5494,16 +5493,16 @@ def pull_triples(source_node, target_node, group_id, user_id):
     # Fetching triples irrespective of status, 
     # since we will create a clone of triple object.
     # GAttributes
-    print "\n Pulling Triples---------"
+    # print "\n Pulling Triples---------"
     node_gattr_cur = triple_collection.find({'_type': 'GAttribute', 'subject': source_node._id})
-    print "\n GA: ", node_gattr_cur.count()
+    # print "\n GA: ", node_gattr_cur.count()
     for each_gattr in node_gattr_cur:
         cloned_gattr = clone_triple(node_obj=target_node, triple_obj=each_gattr,
                             group_id=group_id, user_id=user_id)
 
     # GRelations
     node_grel_cur = triple_collection.find({'_type': 'GRelation', 'subject': source_node._id})
-    print "\n GR: ", node_grel_cur.count()
+    # print "\n GR: ", node_grel_cur.count()
     for each_grel in node_grel_cur:
         cloned_grel = clone_triple(node_obj=target_node, triple_obj=each_grel,
                             group_id=group_id, user_id=user_id, grelation=True)
