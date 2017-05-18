@@ -24,7 +24,7 @@
             </div>
 
             <div class="small-8 columns">
-                <h4 class="page-name">{{activity_node.name}}</h4>
+                <h4 class="page-name">{% firstof activity_node.altnames activity_node.name %}</h4>
             </div>
               
             {% check_is_gstaff groupid request.user as is_gstaff %}
@@ -129,7 +129,7 @@
                                 {% endif %}
                             </div>
                             <div class="asset_text">
-                                <div class="asset_title" title="{{each.name}}">{{each.name|truncatechars:25}}</div>
+                                <div class="asset_title" title="{{each.name}}">{% firstof each.altnames|truncatechars:25 each.name|truncatechars:25 %}</div>
                                     {% if user.is_authenticated  and not group_object.edit_policy == "NON_EDITABLE"  or gstaff_access %}
                                     </a>
                                     <input type="checkbox" class="activitynode" name="activitynode" value="{{each.pk}}" style="margin:0; float:right;" class="asset_content_checkbox">
