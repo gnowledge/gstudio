@@ -2725,10 +2725,17 @@ def create_gattribute(subject_id, attribute_type_node, object_value=None, **kwar
                                 ga_node.object_value = object_value
                                 is_ga_node_changed = True
 
-                    elif set(ga_node.object_value) != set(object_value):
-                        old_object_value = ga_node.object_value
-                        ga_node.object_value = object_value
-                        is_ga_node_changed = True
+                    elif type(ga_node.object_value[0]) == list:
+                        if ga_node.object_value != object_value:
+                            old_object_value = ga_node.object_value
+                            ga_node.object_value = object_value
+                            is_ga_node_changed = True
+
+                    else:
+                        if set(ga_node.object_value) != set(object_value):
+                            old_object_value = ga_node.object_value
+                            ga_node.object_value = object_value
+                            is_ga_node_changed = True
 
                 elif type(ga_node.object_value) == dict:
                     if cmp(ga_node.object_value, object_value) != 0:
@@ -5874,3 +5881,61 @@ def get_course_completetion_status(group_obj, user_id,ids_list=False):
     except Exception as error_in_get_course_completion_status:
       # print "\n ERROR in get_course_completetion_status", error_in_get_course_completion_status
       return result_dict
+
+
+def get_all_iframes_of_unit(group_obj, domain):
+    # tuple : [[assessment.Bank<id>, assessment.Offered<id>],
+    # [assessment.Bank<id>, assessment.Offered<id>]]
+    # ref: https://docs.python.org/2.7/library/urlparse.html#urlparse.parse_qsl
+    from bs4 import BeautifulSoup
+    result_set = []
+    assessment_str = "assessment.Bank"
+    group_id  = group_obj._id
+    gst_page_name, gst_page_id = GSystemType.get_gst_name_id("Page")
+    gst_wiki_page_name, gst_wiki_page_id = GSystemType.get_gst_name_id("Wiki page")
+    pages_holding_assessments_cur = node_collection.find({'group_set': ObjectId(group_id), 'content': {'$regex': assessment_str, '$options': "i"}})
+    for each_node in pages_holding_assessments_cur:
+        all_iframes = BeautifulSoup(each_node.content, 'html.parser').find_all('iframe',src=re.compile(assessment_str))
+        for each_iframe in all_iframes:
+            src_attr = each_iframe["src"]
+            bank_offered_id = parse_assessment_url(src_attr)
+            if bank_offered_id not in result_set:
+                result_set.append(bank_offered_id)
+    create_gattribute(group_id, "assessment_list", result_set)
+    group_obj.reload()
+    update_total_assessment_items(group_id, result_set, domain)
+    group_obj.reload()
+    return group_obj
+
+def parse_assessment_url(url_as_str):
+    import urlparse
+    bank_offered_id = [None,None]
+    parsed_src = urlparse.urlparse(url_as_str)
+    get_params = urlparse.parse_qsl(parsed_src.query)
+    for param in get_params:
+        if 'bank' in param[0]:
+            bank_offered_id[0] = param[1]
+        if 'assessment_offered_id' in param[0]:
+            bank_offered_id[1] = param[1]
+    return bank_offered_id
+
+def update_total_assessment_items(group_id, assessment_list, domain):
+    from gnowsys_ndf.ndf.views.assessment_analytics import userSpecificData
+    import urllib
+    questionCount = 0
+    for each_assessment_list in assessment_list:
+        result_data_set = userSpecificData(domain,each_assessment_list[0],each_assessment_list[1])
+        for each_dict in result_data_set:
+            qtn_found = False
+            if 'sections' in each_dict:
+                # get questions dict from each_dict['sections'] list
+                for section in each_dict['sections']:
+                    if 'questions' in section:
+                        questionCount = questionCount + len(section['questions'])
+                        qtn_found = True
+                        break
+            if qtn_found:
+                break
+        # print "\nAC: ", questionCount
+    create_gattribute(group_id, "total_assessment_items", questionCount)
+    return questionCount

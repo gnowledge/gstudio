@@ -1266,6 +1266,7 @@ class CreateCourseEventGroup(CreateEventGroup):
 
             self.update_raw_material_group_set(existing_course_obj, new_course_obj)
             self.call_setup(request, existing_course_obj, new_course_obj, new_course_obj)
+            new_course_obj = get_all_iframes_of_unit(new_course_obj, request.META['HTTP_HOST'])
             return True
 
         except Exception as e:
