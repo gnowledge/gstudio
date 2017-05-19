@@ -36,8 +36,8 @@
     <!--Modal for Adding Buddy.-->
     <div class="reveal-modal add_buddy_modal" id="add_buddy_modal" data-reveal aria-labelledby="modalTitle" aria-hidden="true" role="dialog">
         <div class="modal_header">
-            <div class="modal_title"> Add a buddy</div>
-            <div class="modal_meta"> Multiple users can be logged into the platform. Just specify your color and animal and click add to join the session.</div>
+            <div class="modal_title">{% trans "Add a buddy" %} </div>
+            <div class="modal_meta"> {% trans "Multiple users can be logged into the platform. Just specify your color and animal and click add to join the session." %}</div>
             <div class="sample_buddy buddy_icon">
                 <svg xmlns:svg="http://www.w3.org/2000/svg" xmlns="http://www.w3.org/2000/svg" width="100px" height="100px" viewBox="0 0 100 100" version="1.1">
                     <g transform="translate(-381.42857,-570.93361)">
@@ -48,8 +48,8 @@
         <div class="modal_body">
             <div class="add_buddy_step_1">
                 <div class="step_title">
-                    <span class="step_number"> Step 1</span>
-                    <span>Select your color</span>
+                    <span class="step_number">{% trans "Step 1" %} </span>
+                    <span>{% trans "Select your color" %}</span>
                 </div>
                 <div class="step_body">
 
@@ -57,8 +57,8 @@
             </div>
             <div class="add_buddy_step_2">
                 <div class="step_title">
-                    <span class="step_number">Step 2</span>
-                    <span >Select your animal/flower/fruit</span>
+                    <span class="step_number">{% trans "Step 2" %}</span>
+                    <span >{% trans "Select your animal/flower/fruit" %}</span>
                 </div>
                 <div class="step_body">
                 </div>
@@ -71,18 +71,18 @@
                 </a>
             </div>
             <div class="right">
-                <button type="button" class="text_button close_add_buddy_modal">Cancel</button>
-                <button type="button" class="blue_round_button add_buddy_submit">Add</button>
+                <button type="button" class="text_button close_add_buddy_modal">{% trans "Cancel" %}</button>
+                <button type="button" class="blue_round_button add_buddy_submit">{% trans "Add" %}</button>
             </div>
         </div>
     </div>
     <!-- END of Modal for Adding Buddy.-->
 
     <div class="reveal-modal delete_buddy_modal small" id="delete_buddy_modal" data-reveal aria-labelledby="modalTitle" aria-hidden="true" role="dialog">
-        <div>Are you sure you want to delete the buddy?</div>
+        <div>{% trans "Are you sure you want to delete the buddy?" %}</div>
         <div class="right">
-            <button type="button" class="text_button close_delete_buddy_modal">Cancel</button>
-            <button type="button" class="blue_round_button delete_buddy_submit">Delete</button>
+            <button type="button" class="text_button close_delete_buddy_modal">{% trans "Cancel" %}</button>
+            <button type="button" class="blue_round_button delete_buddy_submit">{% trans "Delete" %}</button>
         </div>
 
     </div>
