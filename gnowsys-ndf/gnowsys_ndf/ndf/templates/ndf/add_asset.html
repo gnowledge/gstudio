@@ -142,8 +142,13 @@
                              Folder Name
                         
                         {% else %}
-                       Asset name  {% endif %}<h9 style="color: red;">*</h9>
-                       <input type="text" placeholder="" class="required" id = "asset-name" name="asset_name" value="{% if asset_obj %} {{asset_obj.name}}{% endif %}"/>
+                       Unique Asset Name: <h9 style="color: red;">*</h9>
+                       <input type="text" placeholder="" class="required" id = "asset-name" name="asset_unique_name" value="{% if asset_obj %} {{asset_obj.name}}{% endif %}"/>
+
+                        Display Asset Name:  {% endif %}<h9 style="color: red;">*</h9>
+                       <input type="text" placeholder="" class="required" id = "asset-disp-name" name="asset_display_name" value="{% if asset_obj %} {{asset_obj.name}}{% endif %}"/>                       
+
+
                     {% endif %}
                 </label>
             </div>
@@ -422,6 +427,7 @@
         sel_tags = $("input:hidden[name='tags']").val()
         sel_asset_lang =  $('#asset_lang').find(':selected').attr('data-sub-code');
         asset_name = $("#asset-name").val();
+        asset_disp_name = $("#asset-disp-name").val();
         asset_description = $("#asset-descid").val();
         var asset_id = $(this).attr('data-asset_id');
         if (asset_name != '' && asset_description != ''){
@@ -430,6 +436,7 @@
                   data:{
                         'csrfmiddlewaretoken': "{{csrf_token}}",
                         "asset_name":asset_name,
+                        "asset_disp_name":asset_disp_name,
                         "asset_description":asset_description,
                         "node_id": asset_id,
                         "sel_tags":sel_tags,

@@ -49,7 +49,7 @@
                 {% endif %}
             </div>
             <div class="asset_text">
-                <div class="asset_title">{{each.name|truncatechars:25}}</div>
+                <div class="asset_title" title="{% firstof each.altnames each.name %}">{% firstof each.altnames|truncatechars:25  each.name|truncatechars:25 %}</div>
                 <div class="asset_desc">{{each.content|striptags|truncatechars:25}}</div>
             </div>
         </div>
