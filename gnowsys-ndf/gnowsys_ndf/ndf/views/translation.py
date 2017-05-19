@@ -142,6 +142,8 @@ def translate(request, group_id, node_id, lang, translated_node_id=None, **kwarg
         translated_node.fill_gstystem_values(request=request,
                                             language=language,
                                             **kwargs)
+        trans_alt_name = request.POST.get('altnames', None)
+        translated_node.altnames = unicode(trans_alt_name)
         translated_node.save(group_id=group_id)
         if not existing_grel:
             trans_grel_list = [ObjectId(translated_node._id)]
