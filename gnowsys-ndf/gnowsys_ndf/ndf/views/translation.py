@@ -144,7 +144,12 @@ def translate(request, group_id, node_id, lang, translated_node_id=None, **kwarg
                                             **kwargs)
         translated_node.save(group_id=group_id)
         if not existing_grel:
-            translate_grel = create_grelation(node_id, rt_translation_of, translated_node._id, language=language)
+            trans_grel_list = [ObjectId(translated_node._id)]
+            trans_grels = triple_collection.find({'_type': 'GRelation', \
+                            'relation_type': rt_translation_of._id,'subject': ObjectId(node_id)},{'_id': 0, 'right_subject': 1})
+            for each_rel in trans_grels:
+                trans_grel_list.append(each_rel['right_subject'])
+            translate_grel = create_grelation(node_id, rt_translation_of, trans_grel_list, language=language)
 
     # page_gst_name, page_gst_id = Node.get_name_id_from_type('Page', 'GSystemType')
     # return HttpResponseRedirect(reverse('page_details', kwargs={'group_id': group_id, 'app_id': page_gst_id }))
