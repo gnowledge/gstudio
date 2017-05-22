@@ -144,6 +144,19 @@ def unit_create_edit(request, group_id, unit_group_id=None):
         # unit_node.tags = tags
         unit_node.fill_gstystem_values(tags=tags)
         unit_node.content = content
+        tab_name = request.POST.get('tab_name', '')
+        section_name = request.POST.get('section_name', '')
+        subsection_name = request.POST.get('subsection_name', '')
+        if tab_name:
+            unit_node['project_config'].update( {"tab_name":tab_name})
+        else:
+            unit_node['project_config'].update( {"tab_name":"Lessons"})
+        
+        if section_name:
+            unit_node['project_config'].update( {"section_name":section_name})
+        else:
+            unit_node['project_config'].update({"section_name":"Lesson"})
+
         unit_node.save()
         return HttpResponseRedirect(reverse('course_about',
             kwargs={'group_id': unit_node._id}))
