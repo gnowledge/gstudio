@@ -8,14 +8,14 @@
 			<div class="title-area">
 
 				<a href="{% url 'explore_courses' %}" class="secondary-header-tabs  {%if title == 'courses'%} active{% endif %}">
-					Courses
+					{% trans "Courses" %}
 				</a>
 				{% if is_gstaff %}
 				<a href="{% url 'explore_groups' %}" class="secondary-header-tabs {%if title == 'groups'%} active{% endif %}">
-					Projects
+					{% trans "Projects" %}
 				</a>
 				<a href="{% url 'explore_drafts' %}" class="secondary-header-tabs {%if title == 'drafts'%} active{% endif %}">
-					Drafts
+					{% trans "Drafts Courses" %}
 				</a>
 				{% endif %}
 			</div>
