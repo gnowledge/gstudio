@@ -1,3 +1,4 @@
+{% load i18n %}
 {% load simple_filters %}
 {% xextends "ndf/gbase.html" with first_body_column=0 %}
 
@@ -38,7 +39,7 @@
                             
                             <a class="small expand" href="{% url 'auth_login' %}">
                               <div class="small-6 medium-6 text-center columns end login-home-button">
-                                  Login
+                                  {% trans "Login" %}
                               </div>
                             </a>
 
@@ -47,7 +48,7 @@
                             {% get_explore_url as explore_url %}
                             <a class="small expand" href="{% url explore_url %}">
                               <div class="small-6 medium-6 text-center columns end login-home-button">
-                                  Explore Projects
+                                  {% trans "Explore Projects" %}
                               </div>
                             </a>
 
