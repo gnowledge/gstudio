@@ -4012,3 +4012,30 @@ def get_node_hierarchy(node_obj):
             node_structure.append(lesson_dict)
 
     return json.dumps(node_structure)
+
+@register.assignment_tag
+def user_groups(is_super_user,user_id):
+	user_grps_count = {}
+	gst_base_unit_name, gst_base_unit_id = GSystemType.get_gst_name_id('base_unit')
+	gst_group = node_collection.one({'_type': "GSystemType", 'name': "Group"})
+	gst_course = node_collection.one({'_type': "GSystemType", 'name': "Course"})
+	gst_basecoursegroup = node_collection.one({'_type': "GSystemType", 'name': "BaseCourseGroup"})
+	ce_gst = node_collection.one({'_type': "GSystemType", 'name': "CourseEventGroup"})
+	
+	query = {'_type': 'Group', 'status': u'PUBLISHED',
+             'member_of': {'$in': [gst_group._id],
+             '$nin': [gst_course._id, gst_basecoursegroup._id, ce_gst._id, gst_course._id, gst_base_unit_id]},
+            }
+
+	if is_super_user:
+		query.update({'group_type': {'$in': [u'PUBLIC', u'PRIVATE']}})
+	else:
+		query.update({'name': {'$nin': GSTUDIO_DEFAULT_GROUPS_LIST},
+                    'group_type': u'PUBLIC'})
+	group_cur = node_collection.find(query).sort('last_update', -1)
+	
+	user_draft_nodes = node_collection.find({'_type': "Group",'member_of':ObjectId(gst_base_unit_id),'$or': [{'group_admin': user_id}, {'author_set': user_id},{'created_by':user_id}]})
+	# user_projects_nodes = node_collection.find({'_type': "Group",'$or': [{'group_admin': user_id}, {'author_set': user_id},{'created_by':user_id}]})
+	user_grps_count['drafts'] = user_draft_nodes.count()
+	user_grps_count['projects'] = group_cur.count()
+	return user_grps_count

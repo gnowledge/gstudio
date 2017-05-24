@@ -4876,3 +4876,14 @@ ul.nav_menu_1 > li > a.selected, ul.nav_menu_1 > li > a:hover {
 .translation-detail-top-margin {
   margin-top: 0px;
 }
+
+/* line 5086, ../../../scss/_clix2017.scss */
+.outer {
+  width: 100%;
+  text-align: center;
+}
+
+/* line 5091, ../../../scss/_clix2017.scss */
+.inner {
+  display: inline-block;
+}
