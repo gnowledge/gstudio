@@ -105,6 +105,7 @@
                           </select>
                     </div>
                 </div>
+                {% comment %}
                 <div class="course_creator_header">
                     <div class="left course_heading">
                     <h5>Enter tab name</h5>
@@ -129,7 +130,7 @@
                          <input id="subsection-name" name="subsection_name" type="text" placeholder="Enter Sub Section name"/>
                     </div>
                 </div>
-
+                {% endcomment %}
                 <div class=" course_heading_unit tags-container">
                  {% include 'ndf/widget_tags.html' with node=unit_node %}
 
