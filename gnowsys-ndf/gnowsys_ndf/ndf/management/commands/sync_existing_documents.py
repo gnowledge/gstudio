@@ -26,7 +26,7 @@ class Command(BaseCommand):
     # Keep latest changes in field(s) to be added at top
 
     # updating project_config for Groups
-    proj_config = node_collection.collection.update({'_type': 'Group','project_config': {'$exists': False} },{'$set': {'project_config': {} }}, upsert=False, multi=True)
+    proj_config = node_collection.collection.update({'_type':{'$in': [u'Author', u'Group']},'project_config': {'$exists': False} },{'$set': {'project_config': {} }}, upsert=False, multi=True)
 
     # updating visited_nodes for Counter instances
     counter_objs = counter_collection.collection.update({'_type': 'Counter',
