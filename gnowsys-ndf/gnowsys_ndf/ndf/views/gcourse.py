@@ -3570,6 +3570,6 @@ def widget_page_create_edit(request, group_id, node_id=None):
                                 'post_url': reverse(url_name, kwargs=url_kwargs),
                                 'cancel_url': reverse('course_notebook', kwargs={'group_id': group_id}),
                                 'title': 'notebook',
-                                'no_altname':True
+                                'no_altnames':True
                             })
     return render_to_response(template, req_context)
