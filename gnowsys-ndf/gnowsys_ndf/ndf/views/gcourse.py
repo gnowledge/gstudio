@@ -3542,7 +3542,7 @@ def widget_page_create_edit(request, group_id, node_id=None):
     if node_id:
         # existing note.
         url_name = 'node_edit'
-        url_kwargs={'group_id': group_id, 'node_id': node_id, 'detail_url_name': detail_url}
+        url_kwargs={'group_id': group_id, 'node_id': node_id, 'detail_url_name': detail_url }
         node_obj = Node.get_node_by_id(node_id)
 
     else:
@@ -3569,6 +3569,7 @@ def widget_page_create_edit(request, group_id, node_id=None):
                                 'editor_type': editor_type,
                                 'post_url': reverse(url_name, kwargs=url_kwargs),
                                 'cancel_url': reverse('course_notebook', kwargs={'group_id': group_id}),
-                                'title': 'notebook'
+                                'title': 'notebook',
+                                'no_altname':True
                             })
     return render_to_response(template, req_context)
