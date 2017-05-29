@@ -108,37 +108,37 @@ CKEDITOR.plugins.add('addJhapp',
                             $('#group_imgs_on_modal').foundation('reveal', 'close');
                           });
                             $("#insert_rp_l2a1").click(function(event){
-                                iframe_url = "<iframe src='/RatioPattens/en/L2A1/' style='height:100vh;width:100%'></iframe>"
+                                iframe_url = "<iframe src='/RatioPatterns/en/L2A1/' style='height:100vh;width:100%'></iframe>"
                             
                              CKEDITOR.instances[textAreaId].insertHtml(iframe_url);
                             $('#group_imgs_on_modal').foundation('reveal', 'close');
                           });
                             $("#insert_rp_l2a2").click(function(event){
-                                iframe_url = "<iframe src='/RatioPattens/en/L2A2/' style='height:100vh;width:100%'></iframe>"
+                                iframe_url = "<iframe src='/RatioPatterns/en/L2A2/' style='height:100vh;width:100%'></iframe>"
                             
                              CKEDITOR.instances[textAreaId].insertHtml(iframe_url);
                             $('#group_imgs_on_modal').foundation('reveal', 'close');
                           });
                             $("#insert_rp_l2a3").click(function(event){
-                                iframe_url = "<iframe src='/RatioPattens/en/L2A3/' style='height:100vh;width:100%'></iframe>"
+                                iframe_url = "<iframe src='/RatioPatterns/en/L2A3/' style='height:100vh;width:100%'></iframe>"
                             
                              CKEDITOR.instances[textAreaId].insertHtml(iframe_url);
                             $('#group_imgs_on_modal').foundation('reveal', 'close');
                           });
                             $("#insert_rp_l2a4").click(function(event){
-                                iframe_url = "<iframe src='/RatioPattens/en/L2A4/' style='height:100vh;width:100%'></iframe>"
+                                iframe_url = "<iframe src='/RatioPatterns/en/L2A4/' style='height:100vh;width:100%'></iframe>"
                             
                              CKEDITOR.instances[textAreaId].insertHtml(iframe_url);
                             $('#group_imgs_on_modal').foundation('reveal', 'close');
                           });
                             $("#insert_rp_l2a5").click(function(event){
-                                iframe_url = "<iframe src='/RatioPattens/en/L2A5/' style='height:100vh;width:100%'></iframe>"
+                                iframe_url = "<iframe src='/RatioPatterns/en/L2A5/' style='height:100vh;width:100%'></iframe>"
                             
                              CKEDITOR.instances[textAreaId].insertHtml(iframe_url);
                             $('#group_imgs_on_modal').foundation('reveal', 'close');
                           });
                             $("#insert_rp_l2a6").click(function(event){
-                                iframe_url = "<iframe src='/RatioPattens/en/L2A6/' style='height:100vh;width:100%'></iframe>"
+                                iframe_url = "<iframe src='/RatioPatterns/en/L2A6/' style='height:100vh;width:100%'></iframe>"
                             
                              CKEDITOR.instances[textAreaId].insertHtml(iframe_url);
                             $('#group_imgs_on_modal').foundation('reveal', 'close');
