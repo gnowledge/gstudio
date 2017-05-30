@@ -11,7 +11,8 @@ except ImportError:  # old pymongo
 ''' imports from application folders/files '''
 from gnowsys_ndf.ndf.models import node_collection, triple_collection, counter_collection
 from gnowsys_ndf.ndf.models import Node, db, AttributeType, RelationType, GSystem
-from gnowsys_ndf.settings import GSTUDIO_AUTHOR_AGENCY_TYPES, LANGUAGES, OTHER_COMMON_LANGUAGES, GSTUDIO_DEFAULT_LICENSE, GSTUDIO_DEFAULT_LANGUAGE, GSTUDIO_DEFAULT_COPYRIGHT
+from gnowsys_ndf.settings import GSTUDIO_AUTHOR_AGENCY_TYPES, LANGUAGES, OTHER_COMMON_LANGUAGES, GSTUDIO_DEFAULT_SYSTEM_TYPES_LIST
+from gnowsys_ndf.settings import GSTUDIO_DEFAULT_LICENSE, GSTUDIO_DEFAULT_LANGUAGE, GSTUDIO_DEFAULT_COPYRIGHT
 from gnowsys_ndf.ndf.views.methods import create_gattribute, create_grelation
 from gnowsys_ndf.ndf.templatetags.ndf_tags import get_relation_value, get_attribute_value
 
@@ -923,3 +924,27 @@ class Command(BaseCommand):
             i.save()
             print "Updated",i.name,"'s modified by feild from null to 1"
 
+    
+
+    # Adding default st. -katkamrachana
+
+    default_st_cur = node_collection.find({'_type': 'GSystemType',
+                    'name': {'$in': GSTUDIO_DEFAULT_SYSTEM_TYPES_LIST}})
+    default_st_ids = [st._id for st in default_st_cur]
+
+
+    print "\nUpdating RelationTypes and AttributeTypes."
+    rt_res_default_st = node_collection.collection.update({'_type': 'RelationType',
+        '$or': [{'subject_type': {'$nin': default_st_ids}}, {'object_type': {'$nin': default_st_ids}}]}, \
+        {'$addToSet': {'subject_type': {'$each': default_st_ids}, 'object_type': {'$each': default_st_ids},\
+        }}, upsert=False, multi=True)
+
+    if rt_res_default_st['updatedExisting']: # and res['nModified']:
+        print "\n Added 'GSTUDIO_DEFAULT_SYSTEM_TYPES_LIST' ids to " + rt_res_default_st['n'].__str__() + " RelationType instances."
+
+    at_res_default_st = node_collection.collection.update({'_type': 'AttributeType',
+        'subject_type': {'$nin': default_st_ids}}, \
+     {'$addToSet': {'subject_type': {'$each': default_st_ids}}}, upsert=False, multi=True)
+
+    if at_res_default_st['updatedExisting']: # and res['nModified']:
+        print "\n Added 'GSTUDIO_DEFAULT_SYSTEM_TYPES_LIST' ids to " + at_res_default_st['n'].__str__() + " AttributeType instances."
