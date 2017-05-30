@@ -77,15 +77,73 @@ CKEDITOR.plugins.add('addJhapp',
                              CKEDITOR.instances[textAreaId].insertHtml(tjs_text_val);
                             $('#group_imgs_on_modal').foundation('reveal', 'close');
                           });
-                            // $("#insert_earth_rotation").click(function(event){
-                            // //ost_text_gallery = $('#paste-ost-gallery').val();
-                            // //ost_text_file = $('#paste-ost-captions').val();
-                            // ert_text_val = "<iframe src='/rotation/' style='height:100vh;width:100%'></iframe>"
-                            // // split_word = ost_text_val.slice(0, 18) + "gallery=" + ost_text_gallery + "&amp;file=/ost/" + ost_text_file+"'"+ ost_text_val.slice(18);
-                            // // alert(split_word)
-                            //  CKEDITOR.instances[textAreaId].insertHtml(ert_text_val);
-                            // $('#group_imgs_on_modal').foundation('reveal', 'close');
-                          // })
+                            $("#insert_geogebra_proportional_reasoning").click(function(event){
+                            gpr_text_val = "<iframe src='/Geogebra-Proportional-Reasoning/' style='height:100vh;width:100%'></iframe>"
+                            
+                             CKEDITOR.instances[textAreaId].insertHtml(gpr_text_val);
+                            $('#group_imgs_on_modal').foundation('reveal', 'close');
+                          });
+                            $("#insert_fst_l1_a1").click(function(event){
+                                iframe_url = "<iframe src='/FoodSharingTool/en/L1A1/' style='height:100vh;width:100%'></iframe>"
+                            
+                             CKEDITOR.instances[textAreaId].insertHtml(iframe_url);
+                            $('#group_imgs_on_modal').foundation('reveal', 'close');
+                          });
+                            $("#insert_fst_l1_a2").click(function(event){
+                                iframe_url = "<iframe src='/FoodSharingTool/en/L1A2/' style='height:100vh;width:100%'></iframe>"
+                            
+                             CKEDITOR.instances[textAreaId].insertHtml(iframe_url);
+                            $('#group_imgs_on_modal').foundation('reveal', 'close');
+                          });
+                            $("#insert_fst_l1_a3").click(function(event){
+                                iframe_url = "<iframe src='/FoodSharingTool/en/L1A3/' style='height:100vh;width:100%'></iframe>"
+                            
+                             CKEDITOR.instances[textAreaId].insertHtml(iframe_url);
+                            $('#group_imgs_on_modal').foundation('reveal', 'close');
+                          });
+                            $("#insert_fst_l1_a4").click(function(event){
+                                iframe_url = "<iframe src='/FoodSharingTool/en/L1A4/' style='height:100vh;width:100%'></iframe>"
+                            
+                             CKEDITOR.instances[textAreaId].insertHtml(iframe_url);
+                            $('#group_imgs_on_modal').foundation('reveal', 'close');
+                          });
+                            $("#insert_rp_l2a1").click(function(event){
+                                iframe_url = "<iframe src='/RatioPattens/en/L2A1/' style='height:100vh;width:100%'></iframe>"
+                            
+                             CKEDITOR.instances[textAreaId].insertHtml(iframe_url);
+                            $('#group_imgs_on_modal').foundation('reveal', 'close');
+                          });
+                            $("#insert_rp_l2a2").click(function(event){
+                                iframe_url = "<iframe src='/RatioPattens/en/L2A2/' style='height:100vh;width:100%'></iframe>"
+                            
+                             CKEDITOR.instances[textAreaId].insertHtml(iframe_url);
+                            $('#group_imgs_on_modal').foundation('reveal', 'close');
+                          });
+                            $("#insert_rp_l2a3").click(function(event){
+                                iframe_url = "<iframe src='/RatioPattens/en/L2A3/' style='height:100vh;width:100%'></iframe>"
+                            
+                             CKEDITOR.instances[textAreaId].insertHtml(iframe_url);
+                            $('#group_imgs_on_modal').foundation('reveal', 'close');
+                          });
+                            $("#insert_rp_l2a4").click(function(event){
+                                iframe_url = "<iframe src='/RatioPattens/en/L2A4/' style='height:100vh;width:100%'></iframe>"
+                            
+                             CKEDITOR.instances[textAreaId].insertHtml(iframe_url);
+                            $('#group_imgs_on_modal').foundation('reveal', 'close');
+                          });
+                            $("#insert_rp_l2a5").click(function(event){
+                                iframe_url = "<iframe src='/RatioPattens/en/L2A5/' style='height:100vh;width:100%'></iframe>"
+                            
+                             CKEDITOR.instances[textAreaId].insertHtml(iframe_url);
+                            $('#group_imgs_on_modal').foundation('reveal', 'close');
+                          });
+                            $("#insert_rp_l2a6").click(function(event){
+                                iframe_url = "<iframe src='/RatioPattens/en/L2A6/' style='height:100vh;width:100%'></iframe>"
+                            
+                             CKEDITOR.instances[textAreaId].insertHtml(iframe_url);
+                            $('#group_imgs_on_modal').foundation('reveal', 'close');
+                          });
+
                         }
                     });
             }
