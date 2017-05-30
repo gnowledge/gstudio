@@ -6716,6 +6716,7 @@ def create_edit_asset(request,group_id):
   
   if request.method == "POST":
     asset_name =  str(request.POST.get("asset_name", '')).strip()
+    asset_disp_name =  str(request.POST.get("asset_disp_name", '')).strip()
     asset_desc =  str(request.POST.get("asset_description", '')).strip()
     title =  request.POST.get("title", '')
     tags =  request.POST.get("sel_tags", [])
@@ -6754,6 +6755,8 @@ def create_edit_asset(request,group_id):
     if asset_lang:
       language = get_language_tuple(asset_lang)
       asset_obj.language = language
+    if asset_disp_name:
+      asset_obj.altnames = unicode(asset_disp_name)
     asset_obj.save()
     thread_node = create_thread_for_node(request,group_id, asset_obj)
 

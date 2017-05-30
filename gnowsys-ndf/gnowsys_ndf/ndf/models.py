@@ -2424,7 +2424,8 @@ class Group(GSystem):
         'encryption_policy': basestring,     # Encryption - yes or no
         'agency_type': basestring,           # A choice field such as Pratner,Govt.Agency, NGO etc.
         'group_admin': [int],		     # ObjectId of Author class
-        'moderation_level': int              # range from 0 till any integer level
+        'moderation_level': int,              # range from 0 till any integer level
+        'project_config': dict
     }
 
     use_dot_notation = True

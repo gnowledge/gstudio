@@ -32,10 +32,10 @@
                         </span>
                         <ul id="course-settings-drop" class="f-dropdown" data-dropdown-content aria-hidden="true" tabindex="-1">
                         <li>
-                            <a href="{% url 'unit_edit' groupid group_object.pk %}" class="fi-pencil"> Edit</a>
+                            <a href="{% url 'unit_edit' groupid group_object.pk %}" class="fi-pencil">{% trans "Edit" %} </a>
                         </li>
                         <li>
-                            <a data-reveal-id="manage_users_modal" href="{% url 'manage_users' group_id %}"  class="fi-torsos"> Manage Users</a>
+                            <a data-reveal-id="manage_users_modal" href="{% url 'manage_users' group_id %}"  class="fi-torsos">{% trans "Manage Users" %} </a>
                             <div id="manage_users_modal" class="reveal-modal large" data-reveal style="position:absolute;">
                                 <div id="group_drawer">
                                 {% include "ndf/widget_user_search.html" with subscription_status=True %}
@@ -44,7 +44,7 @@
                             </div>
                         </li>
                         <li>
-                            <a href="{% url 'create_event_group' group_id 'CourseEventGroup' %}" class="fi-volume"> Announce</a>
+                            <a href="{% url 'create_event_group' group_id 'CourseEventGroup' %}" class="fi-volume"> {% trans "Announce" %}</a>
                         </li>
 
                         {% get_lessons group_object as lessons_list %}
@@ -58,7 +58,7 @@
                         </li>
 
 
-                        <li> <a data-reveal-id="delete-unit"><i class="fa fa-trash"></i> Delete</a> </li>
+                        <li> <a data-reveal-id="delete-unit"><i class="fa fa-trash"></i>{% trans "Delete" %}</a> </li>
 
                         </ul>
                     </div>
@@ -70,22 +70,25 @@
                     <nav data-topbar data-options="sticky_on: large" role="navigation">
                         <ul class="title-area text-center horizontal_tabs_gstudio">
                         <li>
-                            <a href="{% url 'course_about' group_id %}" {% if title == 'about' %}class="selected"{% endif %}>Overview</a>
+                            <a href="{% url 'course_about' group_id %}" {% if title == 'about' %}class="selected"{% endif %}>{% trans "Overview" %}</a>
                         </li>
                         <li >
-                            <a href="{% url 'unit_detail' group_id %}" {% if title == 'unit_authoring' %}class="selected"{% endif %}>Lessons</a>
+
+                            <a href="{% url 'unit_detail' group_id %}" {% if title == 'unit_authoring' %}class="selected"{% endif %}>{% trans "Lessons" %}</a>
+
+
                         </li>
                        <li>
-                            <a href="{% url 'course_pages' group_id %}" {% if title == 'course_pages' or title == 'create_course_pages' %}class="selected"{% endif %}>Activities</a>
+                            <a href="{% url 'course_pages' group_id %}" {% if title == 'course_pages' or title == 'create_course_pages' %}class="selected"{% endif %}>{% trans "Activities" %}</a>
                         </li>
                         <li>
-                            <a href="{% url 'asset_list' group_id %}" {% if title == 'asset_list' or title == 'asset_detail' or title == 'asset_content_detail'%}class="selected"{% endif %}>Assets</a>
+                            <a href="{% url 'asset_list' group_id %}" {% if title == 'asset_list' or title == 'asset_detail' or title == 'asset_content_detail'%}class="selected"{% endif %}>{%trans "Assets" %}</a>
                         </li>
                         <li >
-                            <a href="https://clix-authoring.mit.edu/#/" target="_blank" {% if title == 'Assessments' %}class="selected"{% endif %}>Assessments</a>
+                            <a href="https://clix-authoring.mit.edu/#/" target="_blank" {% if title == 'Assessments' %}class="selected"{% endif %}>{% trans "Assessments" %}</a>
                         </li>
                         <li >
-                            <a href="{% url 'course_notebook' group_id %}" {% if title == 'notebook' %}class="selected"{% endif %}>Notebook</a>
+                            <a href="{% url 'course_notebook' group_id %}" {% if title == 'notebook' %}class="selected"{% endif %}>{% trans "Notebook" %}</a>
                         </li>
                     </ul>
                 </nav>
@@ -122,12 +125,12 @@
                     </div>
 
                     <div id="delete-unit" class="reveal-modal tiny text-center" data-reveal>
-                    <h3>Delete Unit: {% firstof group_object.altnames group_object.name  %} ?</h3>
+                    <h3>{% trans "Delete Unit:" %} {% firstof group_object.altnames group_object.name  %} ?</h3>
                         <br/>
-                        Are you sure want to delete this unit?
+                        {% trans "Are you sure want to delete this unit?" %}
                         <br/>
-                        <a href="#" class="button tiny success">Cancel</a>
-                        <a href="{% url 'delete_group_url_redirect' group_object.pk 'explore_basecourses' %}" class="button tiny alert">Yes</a>
+                        <a href="#" class="button tiny success">{% trans "Cancel" %}</a>
+                        <a href="{% url 'delete_group_url_redirect' group_object.pk 'explore_basecourses' %}" class="button tiny alert">{% trans "Yes" %}</a>
                         <a class="close-reveal-modal" aria-label="Close">&#215;</a>
                     </div>
 
@@ -146,7 +149,11 @@
                     </div>
                     <div id="unit_authoring_div">
                         {% if title == 'unit_authoring' %}
-                            {% include "ndf/unit_structure.html" %}
+                        {% include "ndf/unit_structure.html" %}
+                        {% comment %}
+                        {% get_node_hierarchy group_object as node_hierarchy %}
+                            {% include "ndf/section_subsection.html" with unit_structure=node_hierarchy unit_obj=group_object group_id=group_object.pk section_name=group_object.project_config.section_name sub_section_name="Activity"  %}
+                        {% endcomment %}
                         {% endif %}
 
                     </div>
@@ -158,7 +165,7 @@
     </div>
 
     <div id="exportLessonModal" class="reveal-modal medium success radius" data-reveal data-alert>
-        <div id="exportLessonModalLabel">Epub will be downloaded automatically.</div>
+        <div id="exportLessonModalLabel">{% trans "Epub will be downloaded automatically." %}</div>
         <a class="close-reveal-modal">&#215;</a>
     </div>
 
