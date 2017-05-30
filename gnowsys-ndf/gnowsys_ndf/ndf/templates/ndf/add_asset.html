@@ -396,14 +396,20 @@
     })
 
     $('#asset-name').keyup(function(){
-        if($(this).val().length !=0 && $('#asset-descid').val().length !=0)
+        if($(this).val().length !=0 && $('#asset-descid').val().length !=0 && $('#asset-disp-name').val().length !=0 )
             $('.save-asset').attr('disabled', false);
         else
             $('.save-asset').attr('disabled',true);
     })
 
     $('#asset-descid').keyup(function(){
-        if($(this).val().length !=0 &&  $('#asset-name').val().length !=0)
+        if($(this).val().length !=0 &&  $('#asset-name').val().length !=0 && $('#asset-disp-name').val().length !=0)
+            $('.save-asset').attr('disabled', false);
+        else
+            $('.save-asset').attr('disabled',true);
+    })
+    $('#asset-disp-name').keyup(function(){
+        if($(this).val().length !=0 &&  $('#asset-name').val().length !=0 && $('#asset-descid').val().length !=0 )
             $('.save-asset').attr('disabled', false);
         else
             $('.save-asset').attr('disabled',true);
