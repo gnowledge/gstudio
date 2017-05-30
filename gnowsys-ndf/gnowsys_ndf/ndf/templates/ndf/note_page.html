@@ -27,7 +27,7 @@
                                     <!-- <a href="{% url 'tag_info' groupid tag %}">{{tag}} </a></label></small> -->
                                 {% endfor %}
                                 {% if node.tags|length > 2 %}
-                                    <small><label class="view-more-tags" style="display:inline-block;">More</label></small>
+                                    <small><label class="view-more-tags" style="display:inline-block;">{% trans "More" %}</label></small>
                                 {% endif %}
                         </div>
                     {% endif %}
