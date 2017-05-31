@@ -1996,6 +1996,8 @@ def activity_player_detail(request, group_id, lesson_id, activity_id):
     parent_node_id = activity_id
     node_obj = node_collection.one({'_id': ObjectId(activity_id)})
     trans_node = get_lang_node(node_obj,request.LANGUAGE_CODE)
+    if not trans_node:
+        trans_node = node_obj
     lesson_node = node_collection.one({'_id': ObjectId(lesson_id)})
     lesson_obj_collection_set = lesson_node.collection_set
 
@@ -2005,7 +2007,7 @@ def activity_player_detail(request, group_id, lesson_id, activity_id):
     resource_count = len(lesson_obj_collection_set)
     unit_resources_list_of_dict = node_collection.find({
                                     '_id': {'$in': lesson_obj_collection_set}},
-                                    {'name': 1, 'altnames': 1})
+                                    {'name': 1, 'altnames': 1,'language':1})
     resource_index = lesson_obj_collection_set.index(node_obj._id)
 
     # cur_list = {c._id: c.name for c in unit_resources_list_of_dict }
@@ -3582,6 +3584,4 @@ def get_lang_node(node_obj,lang):
     for each in rel_value['grel_node']:
         if each.language[0] ==  get_language_tuple(lang)[0]:
             trans_node = each
-        else:
-            trans_node = node_obj
-    return trans_node
+            return trans_node
