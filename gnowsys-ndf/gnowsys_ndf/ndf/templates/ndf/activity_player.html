@@ -66,7 +66,7 @@
               </div>
               <div class="activity-title">
               {% for each in unit_resources_list_of_dict %}
-                 <li  {% if each.pk == node.pk %} class="active" {% endif %}> <a href="{% url 'activity_player_detail' group_id lesson_node.pk each.pk %}">{{each.name}}</a></li>
+                 <li  {% if each.pk == node.pk %} class="active" {% endif %}> <a href="{% url 'activity_player_detail' group_id lesson_node.pk each.pk %}"> {{each.name}} </a></li>
               {% endfor %}
               </div>
               </div>
@@ -97,9 +97,10 @@
               {% endcomment %}
 
               </div>
+              {{trans_node.name}}
               <div class="activity_page_rendered">
                 {# {{node.content|safe}} #}
-                {% include "ndf/node_ajax_content.html" with node=node expand_content=True  no_discussion=True hide_breadcrumbs=True %}
+                {% include "ndf/node_ajax_content.html" with node=trans_node expand_content=True  no_discussion=True hide_breadcrumbs=True %}
               </div>
               <div class="discussion-area activity_page_rendered" style="overflow-x:auto;overflow-y:hidden">
                 
