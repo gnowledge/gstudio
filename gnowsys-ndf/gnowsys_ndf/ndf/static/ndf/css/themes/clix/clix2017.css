@@ -4601,7 +4601,7 @@ ul.nav_menu_1 > li > a.selected, ul.nav_menu_1 > li > a:hover {
 .edit-note-btn {
   float: right;
   border: 1px solid #CFCFCF;
-  padding: 5px 10px;
+  padding: 1px 16px;
   border-radius: 3px;
   color: #A2A2A2;
   background-color: #f7f7f7;
@@ -4615,7 +4615,7 @@ ul.nav_menu_1 > li > a.selected, ul.nav_menu_1 > li > a:hover {
 .delete-note-btn {
   float: right;
   border: 1px solid #CFCFCF;
-  padding: 5px 10px;
+  padding: 1px 8px;
   border-radius: 3px;
   color: #A2A2A2;
   background-color: #f7f7f7;
