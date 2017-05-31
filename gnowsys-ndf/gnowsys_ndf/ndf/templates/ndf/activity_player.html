@@ -55,7 +55,6 @@
         </div>
 </nav>
 </div>
-
 <div class="row activity_sheet">
     <div class="small-12 columns">
         <div class="course_editor ">
@@ -65,8 +64,8 @@
                   <b>{{lesson_node.name}}</b>
               </div>
               <div class="activity-title">
-              {% for each in unit_resources_list_of_dict %}
-                 <li  {% if each.pk == node.pk %} class="active" {% endif %}> <a href="{% url 'activity_player_detail' group_id lesson_node.pk each.pk %}"> {{each.name}} </a></li>
+              {% for k,v in act_list.items %}
+                 <li  {% if v.basenodeid == activityid %} class="active" {% endif %}> <a href="{% url 'activity_player_detail' group_id lesson_node.pk v.basenodeid %}"> {{v.name}} </a></li>
               {% endfor %}
               </div>
               </div>
