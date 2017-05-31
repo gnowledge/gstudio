@@ -5446,8 +5446,6 @@ def create_clone(user_id, node, group_id):
         cloned_copy['prior_node'] = []
         cloned_copy['relation_set'] = []
         cloned_copy['attribute_set'] = []
-        cloned_copy['tags'] = node.tags
-        cloned_copy['if_file'] = node.if_file
         cloned_copy['origin'] = [{'fork_of': node._id}]
         if "QuizItem" in node.member_of_names_list:
             quiz_item_event_gst = node_collection.one({'_type': "GSystemType", 'name': "QuizItemEvent"})
@@ -5462,7 +5460,113 @@ def create_clone(user_id, node, group_id):
         print "Failed cloning resource"
         return None
 
+@get_execution_time
+def clone_triple(node_obj, triple_obj, group_id, user_id, grelation=False):
+    cloned_copy = triple_obj.copy()
+    cloned_copy['_id'] = ObjectId()
+    cloned_copy['subject'] = node_obj._id
+    if grelation:
+        if isinstance(triple_obj.right_subject, ObjectId):
+            right_subj_node = node_collection.one({'_id': ObjectId(triple_obj.right_subject)})
+            right_sub_new_node = create_clone(user_id, right_subj_node, group_id)
+            pull_triples(source_node=right_subj_node, target_node=right_sub_new_node, 
+                            group_id=group_id, user_id=user_id)
+            cloned_copy['right_subject'] = right_sub_new_node._id
 
+        if isinstance(triple_obj.right_subject, list):
+            cloned_rs_ids = []
+            for rs_id in triple_obj.right_subject:
+                right_subj_node = node_collection.one({'_id': ObjectId(rs_id)})
+                right_sub_new_node = create_clone(user_id, right_subj_node, group_id)
+                pull_triples(source_node=right_subj_node, target_node=right_sub_new_node, 
+                            group_id=group_id, user_id=user_id)
+                cloned_rs_ids.append(right_sub_new_node._id)
+            if cloned_rs_ids:
+                cloned_copy['right_subject'] = cloned_rs_ids
+    cloned_obj_id = triple_collection.collection.insert(cloned_copy)
+    cloned_obj = triple_collection.one({'_id': ObjectId(cloned_obj_id)})
+    cloned_obj.save(groupid=group_id, validate=False)
+
+@get_execution_time
+def pull_triples(source_node, target_node, group_id, user_id):
+    # - katkamrachana , 18May2017.
+    # Fetching triples irrespective of status, 
+    # since we will create a clone of triple object.
+    # GAttributes
+    # print "\n Pulling Triples---------"
+    node_gattr_cur = triple_collection.find({'_type': 'GAttribute', 'subject': source_node._id})
+    # print "\n GA: ", node_gattr_cur.count()
+    for each_gattr in node_gattr_cur:
+        cloned_gattr = clone_triple(node_obj=target_node, triple_obj=each_gattr,
+                            group_id=group_id, user_id=user_id)
+
+    # GRelations
+    node_grel_cur = triple_collection.find({'_type': 'GRelation', 'subject': source_node._id})
+    # print "\n GR: ", node_grel_cur.count()
+    for each_grel in node_grel_cur:
+        cloned_grel = clone_triple(node_obj=target_node, triple_obj=each_grel,
+                            group_id=group_id, user_id=user_id, grelation=True)
+    '''
+    relation_dict_rt_key_rs_val = {}
+    for each_rel in node_grel_cur:
+        rt_id = each_rel['relation_type']
+        right_subj = each_rel['right_subject']
+        if rt_id in relation_dict_rt_key_rs_val.keys() :
+            val_list = relation_dict_rt_key_rs_val[rt_id]
+            if not isinstance(val_list,list):
+                rs_list = []
+                rs_list.append(val_list)
+                rs_list.append(right_subj)
+                relation_dict_rt_key_rs_val[rt_id] = rs_list
+            else:
+                relation_dict_rt_key_rs_val[rt_id].append(right_subj)
+        else:
+            relation_dict_rt_key_rs_val[rt_id] = right_subj
+    # print "\n\n relation_dict_rt_key_rs_val === ",relation_dict_rt_key_rs_val
+
+    for eachrtid, eachrsval in relation_dict_rt_key_rs_val.items():
+        right_subj_node = None
+        rt_node = node_collection.one({'_id': ObjectId(eachrtid)})
+        if isinstance(eachrsval, ObjectId):
+            right_subj_node = node_collection.one({'_id': ObjectId(eachrsval)})
+            right_sub_new_node = create_clone(user_id, right_subj_node, group_id)
+            create_grelation(new_gsystem._id,rt_node,right_sub_new_node._id,language=right_subj_node.language)
+            # To maintain the thread-node relation using prior_node field
+            if rt_node.name == u'has_thread':
+                thread_created = True
+                if right_sub_new_node:
+                    right_sub_new_node.prior_node = [new_gsystem._id]
+                    right_sub_new_node.save()
+
+                thread_node_gattr_cur = triple_collection.find({'_type': 'GAttribute',
+                 'subject': right_subj_node._id})
+
+                for each_gattr in thread_node_gattr_cur:
+                    at_id = each_gattr['attribute_type']
+                    obj_val = each_gattr['object_value']
+                    at_node = node_collection.one({'_id': ObjectId(at_id)})
+                    create_gattribute(right_sub_new_node._id,at_node,obj_val)
+
+        else:
+            cloned_rs_ids = []
+            for eachrsval_id in eachrsval:
+                right_subj_node = node_collection.one({'_id': ObjectId(eachrsval_id)})
+                right_sub_new_node = create_clone(user_id, right_subj_node, group_id)
+                cloned_rs_ids.append(right_sub_new_node._id)
+            create_grelation(new_gsystem._id,rt_node,cloned_rs_ids)
+
+    if "QuizItemEvent" in new_gsystem.member_of_names_list:
+        if not thread_created and request:
+            thread_obj = create_thread_for_node(request,group_id, new_gsystem)
+            # To maintain the thread-node relation using prior_node field
+
+    if "raw@material" in new_gsystem.tags and request and "File" in new_gsystem.member_of_names_list:
+        if not thread_created:
+            thread_obj = create_thread_for_node(request,group_id, new_gsystem)
+            if thread_obj:
+                thread_obj.prior_node = [new_gsystem._id]
+                thread_obj.save()
+    '''
 
 @get_execution_time
 def replicate_resource(request, node, group_id):
@@ -5479,84 +5583,15 @@ def replicate_resource(request, node, group_id):
             # FORKING TRIPLES
 
             ##### TRIPLES GATTRIBUTES
-            node_gattr_cur = triple_collection.find({'_type': 'GAttribute', 'subject': node._id})
-
-            for each_gattr in node_gattr_cur:
-                at_id = each_gattr['attribute_type']
-                obj_val = each_gattr['object_value']
-                at_node = node_collection.one({'_id': ObjectId(at_id)})
-                if at_node.name == u"player_discussion_enable":
-                    at_node = node_collection.one({'_type': "AttributeType", 'name': 'discussion_enable'})
-                create_gattribute(new_gsystem._id,at_node,obj_val)
-
-            ##### TRIPLES GRELATIONS
-            node_grel_cur = triple_collection.find({'_type': 'GRelation', 'subject': node._id, 'status': u'PUBLISHED'})
+            # commented below line fetching only PUBLISHED triple objects. 
+            # node_grel_cur = triple_collection.find({'_type': 'GRelation', 'subject': node._id, 'status': u'PUBLISHED'})
             # To handle multiple GRelations of same RT i.e of object_cardinality  > 1
             # If looped over the list and called create_grelation multiple time, this will create
             # all grelations but will set PUBLISHED status for ONLY the last one and mark as DELETED the earlier ones
             # Hence making use of following dictionary
 
-
-            relation_dict_rt_key_rs_val = {}
-            for each_rel in node_grel_cur:
-                rt_id = each_rel['relation_type']
-                right_subj = each_rel['right_subject']
-                if rt_id in relation_dict_rt_key_rs_val.keys() :
-                    val_list = relation_dict_rt_key_rs_val[rt_id]
-                    if not isinstance(val_list,list):
-                        rs_list = []
-                        rs_list.append(val_list)
-                        rs_list.append(right_subj)
-                        relation_dict_rt_key_rs_val[rt_id] = rs_list
-                    else:
-                        relation_dict_rt_key_rs_val[rt_id].append(right_subj)
-                else:
-                    relation_dict_rt_key_rs_val[rt_id] = right_subj
-            # print "\n\n relation_dict_rt_key_rs_val === ",relation_dict_rt_key_rs_val
-
-            for eachrtid, eachrsval in relation_dict_rt_key_rs_val.items():
-                right_subj_node = None
-                rt_node = node_collection.one({'_id': ObjectId(eachrtid)})
-                if isinstance(eachrsval, ObjectId):
-                    right_subj_node = node_collection.one({'_id': ObjectId(eachrsval)})
-                    right_sub_new_node = create_clone(user_id, right_subj_node, group_id)
-                    create_grelation(new_gsystem._id,rt_node,right_sub_new_node._id)
-                    # To maintain the thread-node relation using prior_node field
-                    if rt_node.name == u'has_thread':
-                        thread_created = True
-                        if right_sub_new_node:
-                            right_sub_new_node.prior_node = [new_gsystem._id]
-                            right_sub_new_node.save()
-
-                        thread_node_gattr_cur = triple_collection.find({'_type': 'GAttribute',
-                         'subject': right_subj_node._id})
-
-                        for each_gattr in thread_node_gattr_cur:
-                            at_id = each_gattr['attribute_type']
-                            obj_val = each_gattr['object_value']
-                            at_node = node_collection.one({'_id': ObjectId(at_id)})
-                            create_gattribute(right_sub_new_node._id,at_node,obj_val)
-
-                else:
-                    cloned_rs_ids = []
-                    for eachrsval_id in eachrsval:
-                        right_subj_node = node_collection.one({'_id': ObjectId(eachrsval_id)})
-                        right_sub_new_node = create_clone(user_id, right_subj_node, group_id)
-                        cloned_rs_ids.append(right_sub_new_node._id)
-                    create_grelation(new_gsystem._id,rt_node,cloned_rs_ids)
-
-
-            if "QuizItemEvent" in new_gsystem.member_of_names_list:
-                if not thread_created and request:
-                    thread_obj = create_thread_for_node(request,group_id, new_gsystem)
-                    # To maintain the thread-node relation using prior_node field
-
-            if "raw@material" in new_gsystem.tags and request and "File" in new_gsystem.member_of_names_list:
-                if not thread_created:
-                    thread_obj = create_thread_for_node(request,group_id, new_gsystem)
-                    if thread_obj:
-                        thread_obj.prior_node = [new_gsystem._id]
-                        thread_obj.save()
+            pull_triples(source_node=node, target_node=new_gsystem, 
+                            group_id=group_id, user_id=user_id)
 
         # clone_of_RT = node_collection.one({'_type': "RelationType", 'name': "clone_of"})
         # create_grelation(new_gsystem._id, clone_of_RT, node._id)
