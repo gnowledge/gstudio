@@ -1995,19 +1995,27 @@ def activity_player_detail(request, group_id, lesson_id, activity_id):
     group_name, group_id = get_group_name_id(group_id)
     parent_node_id = activity_id
     node_obj = node_collection.one({'_id': ObjectId(activity_id)})
-    trans_node = get_lang_node(node_obj,request.LANGUAGE_CODE)
+    trans_node = get_lang_node(node_obj._id,request.LANGUAGE_CODE)
     if not trans_node:
         trans_node = node_obj
     lesson_node = node_collection.one({'_id': ObjectId(lesson_id)})
     lesson_obj_collection_set = lesson_node.collection_set
-
+    
     # all metadata reg position and next prev of resource
 
     resource_index = resource_next_id = resource_prev_id = None
     resource_count = len(lesson_obj_collection_set)
     unit_resources_list_of_dict = node_collection.find({
                                     '_id': {'$in': lesson_obj_collection_set}},
-                                    {'name': 1, 'altnames': 1,'language':1})
+                                    {'name': 1, 'altnames': 1,'_id':1})
+    act_list = {}
+    for each in unit_resources_list_of_dict:
+        each_node = get_lang_node(each._id,request.LANGUAGE_CODE)
+        if each_node :
+            act_list.update({ObjectId(each_node._id): {"name":each_node.name,"basenodeid":ObjectId(each._id)}})
+        else:
+            act_list.update({ObjectId(each._id): {"name":each.name,"basenodeid":ObjectId(each._id)}})
+    unit_resources_list_of_dict.rewind()
     resource_index = lesson_obj_collection_set.index(node_obj._id)
 
     # cur_list = {c._id: c.name for c in unit_resources_list_of_dict }
@@ -2030,12 +2038,14 @@ def activity_player_detail(request, group_id, lesson_id, activity_id):
     variable = RequestContext(request, {
         'group_id': group_id, 'groupid': group_id, 'group_name':group_name,
         'allow_to_comment': True,
-        'node': node_obj, 'lesson_node': lesson_node, 'activity_id': activity_id,
+        'node': node_obj, 'lesson_node': lesson_node, 'activityid': ObjectId(activity_id),
         'resource_index': resource_index, 'resource_next_id': resource_next_id,
         'resource_prev_id': resource_prev_id, 'resource_count': resource_count,
         'unit_resources_list_of_dict': unit_resources_list_of_dict,
-        'trans_node':trans_node
+        'trans_node':trans_node,
+        'act_list':act_list
     })
+
     if request.user.is_authenticated():
         active_user_ids_list = [request.user.id]
         if GSTUDIO_BUDDY_LOGIN:
@@ -3579,8 +3589,8 @@ def widget_page_create_edit(request, group_id, node_id=None):
     return render_to_response(template, req_context)
 
 
-def get_lang_node(node_obj,lang):
-    rel_value = get_relation_value(node_obj._id,"translation_of")
+def get_lang_node(node_id,lang):
+    rel_value = get_relation_value(ObjectId(node_id),"translation_of")
     for each in rel_value['grel_node']:
         if each.language[0] ==  get_language_tuple(lang)[0]:
             trans_node = each
