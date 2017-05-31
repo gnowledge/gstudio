@@ -650,7 +650,7 @@ GSTUDIO_OID_HELP = ""
 # GSTUDIO_SITE_EDITOR = "orgitdown"  #possible values are 'aloha'and 'orgitdown'
 # Visibility for 'Create Group'
 CREATE_GROUP_VISIBILITY = True
-
+GSTUDIO_DEFAULT_SYSTEM_TYPES_LIST = []
 EMACS_INIT_FILE_PATH = "~/.emacs"
 
 ###########################################################################

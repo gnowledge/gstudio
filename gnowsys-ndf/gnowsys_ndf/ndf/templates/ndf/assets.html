@@ -1,3 +1,4 @@
+{% load i18n %}
 {% load ndf_tags %}
 {% user_access_policy groupid request.user as user_access_priv %}
 {% check_is_gstaff groupid request.user as is_gstaff %}
@@ -14,17 +15,17 @@
         {% if user.is_authenticated  %}
             {% if title == "raw material"   and is_gstaff %}
                 <button type="button" class="right orange-button createAsset">
-                    <i class="fi-plus"> </i>Add Resource 
+                    <i class="fi-plus"> </i>{% trans "Add Resource" %} 
                 </button>
             {% endif %}
             {% if title == "gallery"  %}
                 <button {% if user_access_priv == "allow" %} type="button" class="right orange-button createAsset" {% else %} class=" right orange-button user_not_enrolled" {% endif %}>
-                    <i class="fi-plus"> </i>Add Folder 
+                    <i class="fi-plus"> </i>{% trans "Add Folder" %} 
                 </button>
             {% endif %}
             {% if title == "asset_list"  %}
                 <button type="button" class="right orange-button createAsset">
-                    <i class="fi-plus"> </i>Add Asset 
+                    <i class="fi-plus"> </i>{% trans "Add Asset" %} 
                 </button>
             {% endif %}
         
@@ -38,7 +39,7 @@
         <div class="asset_tile">
             <div class="asset_preview">
             {% if "raw@material" in each.tags and title == "asset_list" %}
-                <div class="raw_material_asset">Raw Material</div>
+                <div class="raw_material_asset">{% trans "Raw Material" %}</div>
             {% endif %}
                 {% if each.if_file.mid.relurl and 'video' not in each.if_file.mime_type %}
                     <img src="{{MEDIA_URL}}{{each.if_file.mid.relurl}}">
@@ -49,7 +50,7 @@
                 {% endif %}
             </div>
             <div class="asset_text">
-                <div class="asset_title">{{each.name|truncatechars:25}}</div>
+                <div class="asset_title" title="{% firstof each.altnames each.name %}">{% firstof each.altnames|truncatechars:25  each.name|truncatechars:25 %}</div>
                 <div class="asset_desc">{{each.content|striptags|truncatechars:25}}</div>
             </div>
         </div>
