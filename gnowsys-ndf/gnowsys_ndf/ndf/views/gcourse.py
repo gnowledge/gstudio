@@ -1993,9 +1993,10 @@ def course_resource_detail(request, group_id, course_sub_section, course_unit, r
 @get_execution_time
 def activity_player_detail(request, group_id, lesson_id, activity_id):
     group_name, group_id = get_group_name_id(group_id)
-
-    lesson_node = node_collection.one({'_id': ObjectId(lesson_id)})
+    parent_node_id = activity_id
     node_obj = node_collection.one({'_id': ObjectId(activity_id)})
+    trans_node = get_lang_node(node_obj,request.LANGUAGE_CODE)
+    lesson_node = node_collection.one({'_id': ObjectId(lesson_id)})
     lesson_obj_collection_set = lesson_node.collection_set
 
     # all metadata reg position and next prev of resource
@@ -2030,7 +2031,8 @@ def activity_player_detail(request, group_id, lesson_id, activity_id):
         'node': node_obj, 'lesson_node': lesson_node, 'activity_id': activity_id,
         'resource_index': resource_index, 'resource_next_id': resource_next_id,
         'resource_prev_id': resource_prev_id, 'resource_count': resource_count,
-        'unit_resources_list_of_dict': unit_resources_list_of_dict
+        'unit_resources_list_of_dict': unit_resources_list_of_dict,
+        'trans_node':trans_node
     })
     if request.user.is_authenticated():
         active_user_ids_list = [request.user.id]
@@ -3573,3 +3575,13 @@ def widget_page_create_edit(request, group_id, node_id=None):
                                 'no_altnames':True
                             })
     return render_to_response(template, req_context)
+
+
+def get_lang_node(node_obj,lang):
+    rel_value = get_relation_value(node_obj._id,"translation_of")
+    for each in rel_value['grel_node']:
+        if each.language[0] ==  get_language_tuple(lang)[0]:
+            trans_node = each
+        else:
+            trans_node = node_obj
+    return trans_node
