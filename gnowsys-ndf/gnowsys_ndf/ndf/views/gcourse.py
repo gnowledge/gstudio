@@ -2010,12 +2010,9 @@ def activity_player_detail(request, group_id, lesson_id, activity_id):
                                     {'name': 1, 'altnames': 1,'_id':1})
     act_list = []
     trans_act_list = get_trans_node_list(lesson_node.collection_set,request.LANGUAGE_CODE)
-    resource_index = lesson_obj_collection_set.index(node_obj._id)
 
-    # cur_list = {c._id: c.name for c in unit_resources_list_of_dict }
-    # less_dict = []
-    # for each in cur_list:
-    #     print "***",each. 
+    resource_index = lesson_obj_collection_set.index(node_obj._id)
+ 
     if (resource_index + 1) < resource_count:
         resource_next_id = lesson_node.collection_set[resource_index + 1]
 
@@ -2133,7 +2130,7 @@ def course_content(request, group_id):
     group_name  = group_obj.name
     allow_to_join = get_group_join_status(group_obj)
     template = 'ndf/gcourse_event_group.html'
-    unit_structure =  _get_unit_hierarchy(group_obj)
+    unit_structure =  _get_unit_hierarchy(group_obj,request.LANGUAGE_CODE)
     visited_nodes = []
     if 'BaseCourseGroup' in group_obj.member_of_names_list:
         template = 'ndf/basecourse_group.html'
@@ -3487,7 +3484,7 @@ def delete_activity_page(request, group_id):
     return HttpResponse('fail')
 
 
-def _get_unit_hierarchy(unit_group_obj):
+def _get_unit_hierarchy(unit_group_obj,lang="en"):
     '''
     ARGS: unit_group_obj
     Result will be of following form:
@@ -3520,12 +3517,24 @@ def _get_unit_hierarchy(unit_group_obj):
         ]
     }
     '''
+    # n = node_collection.one({'_id': ObjectId('593043c64a82533fc27b78f8')})
+    # trans_act_list = get_lang_node(n._id,request.LANGUAGE_CODE)
+    # for each in trans_act_list:
+    #     for k,v in trans_act_list.iteritems():
+    #         lesson_dict = {}
+    #         lesson
+
     unit_structure = []
     for each in unit_group_obj.collection_set:
         lesson_dict ={}
         lesson = Node.get_node_by_id(each)
+        # trans_lesson = get_lang_node(< each Lesson >,'hi')
+        trans_lesson  = []
         if lesson:
-            lesson_dict['label'] = lesson.name
+            if trans_lesson:
+                lesson_dict['label'] = trans_lesson.name
+            else:
+                lesson_dict['label'] = lesson.name
             lesson_dict['id'] = lesson._id
             lesson_dict['type'] = 'unit-name'
             lesson_dict['children'] = []
@@ -3533,8 +3542,12 @@ def _get_unit_hierarchy(unit_group_obj):
                 for each_act in lesson.collection_set:
                     activity_dict ={}
                     activity = Node.get_node_by_id(each_act)
+                    trans_act_name = get_lang_node(each_act,lang)
                     if activity:
-                        activity_dict['label'] = activity.name
+                        if trans_act_name:
+                            activity_dict['label'] = trans_act_name.name
+                        else:
+                            activity_dict['label'] = activity.name
                         activity_dict['type'] = 'activity-group'
                         activity_dict['id'] = str(activity._id)
                         lesson_dict['children'].append(activity_dict)
