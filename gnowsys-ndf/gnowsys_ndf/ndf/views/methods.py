@@ -62,7 +62,7 @@ theme_item_GST = node_collection.one({'_type': 'GSystemType', 'name': 'theme_ite
 topic_GST = node_collection.one({'_type': 'GSystemType', 'name': 'Topic'})
 grp_st = node_collection.one({'$and': [{'_type': 'GSystemType'}, {'name': 'Group'}]})
 ins_objectid = ObjectId()
-
+player_disc_enable_at_name, player_disc_enable_at_id = Node.get_name_id_from_type('player_discussion_enable', 'AttributeType')
 
 # C O M M O N   M E T H O D S   D E F I N E D   F O R   V I E W S
 
@@ -5461,31 +5461,39 @@ def create_clone(user_id, node, group_id):
         return None
 
 @get_execution_time
-def clone_triple(node_obj, triple_obj, group_id, user_id, grelation=False):
-    cloned_copy = triple_obj.copy()
-    cloned_copy['_id'] = ObjectId()
-    cloned_copy['subject'] = node_obj._id
-    if grelation:
-        if isinstance(triple_obj.right_subject, ObjectId):
-            right_subj_node = node_collection.one({'_id': ObjectId(triple_obj.right_subject)})
-            right_sub_new_node = create_clone(user_id, right_subj_node, group_id)
-            pull_triples(source_node=right_subj_node, target_node=right_sub_new_node, 
-                            group_id=group_id, user_id=user_id)
-            cloned_copy['right_subject'] = right_sub_new_node._id
-
-        if isinstance(triple_obj.right_subject, list):
-            cloned_rs_ids = []
-            for rs_id in triple_obj.right_subject:
-                right_subj_node = node_collection.one({'_id': ObjectId(rs_id)})
+def clone_triple(node_obj, triple_obj, group_id, user_id, override_AT_with=None, grelation=False):
+    try:
+        cloned_copy = triple_obj.copy()
+        cloned_copy['_id'] = ObjectId()
+        cloned_copy['subject'] = node_obj._id
+        if grelation:
+            if isinstance(triple_obj.right_subject, ObjectId):
+                right_subj_node = node_collection.one({'_id': ObjectId(triple_obj.right_subject)})
                 right_sub_new_node = create_clone(user_id, right_subj_node, group_id)
                 pull_triples(source_node=right_subj_node, target_node=right_sub_new_node, 
-                            group_id=group_id, user_id=user_id)
-                cloned_rs_ids.append(right_sub_new_node._id)
-            if cloned_rs_ids:
-                cloned_copy['right_subject'] = cloned_rs_ids
-    cloned_obj_id = triple_collection.collection.insert(cloned_copy)
-    cloned_obj = triple_collection.one({'_id': ObjectId(cloned_obj_id)})
-    cloned_obj.save(groupid=group_id, validate=False)
+                                group_id=group_id, user_id=user_id)
+                cloned_copy['right_subject'] = right_sub_new_node._id
+
+            if isinstance(triple_obj.right_subject, list):
+                cloned_rs_ids = []
+                for rs_id in triple_obj.right_subject:
+                    right_subj_node = node_collection.one({'_id': ObjectId(rs_id)})
+                    right_sub_new_node = create_clone(user_id, right_subj_node, group_id)
+                    pull_triples(source_node=right_subj_node, target_node=right_sub_new_node, 
+                                group_id=group_id, user_id=user_id)
+                    cloned_rs_ids.append(right_sub_new_node._id)
+                if cloned_rs_ids:
+                    cloned_copy['right_subject'] = cloned_rs_ids
+        else:
+            if override_AT_with:
+                cloned_copy['attribute_type'] = node_collection.one({
+                    '_type': 'AttributeType', 'name': override_AT_with})._id
+        cloned_obj_id = triple_collection.collection.insert(cloned_copy)
+        cloned_obj = triple_collection.one({'_id': ObjectId(cloned_obj_id)})
+        cloned_obj.save(groupid=group_id, validate=False)
+    except Exception as clone_triple_err:
+        # print "\n!!!Error while cloning Triple instance.!!!"
+        pass
 
 @get_execution_time
 def pull_triples(source_node, target_node, group_id, user_id):
@@ -5497,8 +5505,11 @@ def pull_triples(source_node, target_node, group_id, user_id):
     node_gattr_cur = triple_collection.find({'_type': 'GAttribute', 'subject': source_node._id})
     # print "\n GA: ", node_gattr_cur.count()
     for each_gattr in node_gattr_cur:
+        override_AT_with = None
+        if each_gattr.attribute_type == player_disc_enable_at_id:
+            override_AT_with = "discussion_enable" 
         cloned_gattr = clone_triple(node_obj=target_node, triple_obj=each_gattr,
-                            group_id=group_id, user_id=user_id)
+                            group_id=group_id, user_id=user_id, override_AT_with=override_AT_with)
 
     # GRelations
     node_grel_cur = triple_collection.find({'_type': 'GRelation', 'subject': source_node._id})
