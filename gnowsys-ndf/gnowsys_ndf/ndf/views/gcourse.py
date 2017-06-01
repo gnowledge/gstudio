@@ -2009,13 +2009,7 @@ def activity_player_detail(request, group_id, lesson_id, activity_id):
                                     '_id': {'$in': lesson_obj_collection_set}},
                                     {'name': 1, 'altnames': 1,'_id':1})
     act_list = []
-    for each in unit_resources_list_of_dict:
-        each_node = get_lang_node(each._id,request.LANGUAGE_CODE)
-        if each_node :
-            act_list.append({ObjectId(each_node._id): {"name":each_node.name,"basenodeid":ObjectId(each._id)}})
-        else:
-            act_list.append({ObjectId(each._id): {"name":each.name,"basenodeid":ObjectId(each._id)}})
-    # unit_resources_list_of_dict.rewind()
+    trans_act_list = get_trans_node_list(lesson_node.collection_set,request.LANGUAGE_CODE)
     resource_index = lesson_obj_collection_set.index(node_obj._id)
 
     # cur_list = {c._id: c.name for c in unit_resources_list_of_dict }
@@ -2043,7 +2037,7 @@ def activity_player_detail(request, group_id, lesson_id, activity_id):
         'resource_prev_id': resource_prev_id, 'resource_count': resource_count,
         # 'unit_resources_list_of_dict': unit_resources_list_of_dict,
         'trans_node':trans_node,
-        'act_list':act_list
+        'act_list':trans_act_list
     })
 
     if request.user.is_authenticated():
@@ -3595,3 +3589,14 @@ def get_lang_node(node_id,lang):
         if each.language[0] ==  get_language_tuple(lang)[0]:
             trans_node = each
             return trans_node
+
+def get_trans_node_list(node_list,lang):
+    trans_node_list = []
+    for each in node_list:
+        each_node = get_lang_node(each,lang)
+        if each_node :
+            trans_node_list.append({ObjectId(each_node._id): {"name":each_node.name,"basenodeid":ObjectId(each)}})
+        else:
+            node = node_collection.one({"_id":ObjectId(each)})
+            trans_node_list.append({ObjectId(node._id): {"name":node.name,"basenodeid":ObjectId(node._id)}})
+    return trans_node_list
