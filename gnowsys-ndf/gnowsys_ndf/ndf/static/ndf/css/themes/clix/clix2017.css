@@ -4887,3 +4887,19 @@ ul.nav_menu_1 > li > a.selected, ul.nav_menu_1 > li > a:hover {
 .inner {
   display: inline-block;
 }
+
+/* line 5098, ../../../scss/_clix2017.scss */
+.transcript-toggler {
+  display: block;
+  width: 155px;
+  height: 30px;
+  margin: 0;
+  padding: 9px 16px 2px;
+  background: radial-gradient(#573d8f, #412e6b);
+  border-radius: 0 0 5px 5px;
+  color: #fff;
+  cursor: pointer;
+  font-size: .75rem;
+  padding-top: 7px !important;
+  text-transform: uppercase;
+}

@@ -6,7 +6,7 @@
 	<script>
          
 
-         function toggleMe(a){
+         function togglerTranscript(a){
                 $(a).next(".transcript-data").toggleClass("hide");
             };         
            
@@ -21,7 +21,7 @@
 	{% if transcript_rel %}
 
 	<div>	
-      <button class="transcript-toggler" onclick="togglerTranscript(this)">A</button>
+      <button class="small radius transcript-toggler" onclick="togglerTranscript(this)">Transcript</button>
       <div class="transcript-data hide">
       	<object type="text/html" data="{{MEDIA_URL}}{{transcript_rel.grel_node.if_file.original.relurl}}"></object>
       </div>
