@@ -226,8 +226,9 @@ def parse_data_create_gtype(json_file_path):
         perform_eval_type("complex_data_type", json_document, type_name, "AttributeType")
         perform_eval_type("subject_type", json_document, type_name, "GSystemType")
         perform_eval_type("validators", json_document, type_name, "AttributeType")
-        if GSTUDIO_DEFAULT_SYSTEM_TYPES_LIST:
-          json_document["subject_type"] = update_default_st(json_document["subject_type"])
+
+        # if GSTUDIO_DEFAULT_SYSTEM_TYPES_LIST:
+        #   json_document["subject_type"] = update_default_st(json_document["subject_type"])
 
       except Exception as e:
         error_message = "\n While parsing "+type_name+"(" + json_document['name'] + ") got following error...\n " + str(e)
@@ -265,6 +266,7 @@ def parse_data_create_gtype(json_file_path):
           json_document["subject_scope"] = map(unicode,json_document["subject_scope"])
         if json_document["object_scope"]:
           json_document["object_scope"] = map(unicode,json_document["object_scope"])
+
         json_document["is_reflexive"] = ast.literal_eval(json_document['is_reflexive'].title())
         json_document["is_transitive"] = ast.literal_eval(json_document['is_transitive'].title())
         json_document["is_symmetric"] = ast.literal_eval(json_document['is_symmetric'].title())
@@ -272,9 +274,10 @@ def parse_data_create_gtype(json_file_path):
         perform_eval_type("subject_type", json_document, type_name, "GSystemType")
         perform_eval_type("object_type", json_document, type_name, "GSystemType")
         perform_eval_type("member_of", json_document, type_name, "MetaType")
-        if GSTUDIO_DEFAULT_SYSTEM_TYPES_LIST:
-          json_document["subject_type"] = update_default_st(json_document["subject_type"])
-          json_document["object_type"] = update_default_st(json_document["object_type"])
+
+        # if GSTUDIO_DEFAULT_SYSTEM_TYPES_LIST:
+        #   json_document["subject_type"] = update_default_st(json_document["subject_type"])
+        #   json_document["object_type"] = update_default_st(json_document["object_type"])
 
       except Exception as e:
         error_message = "\n While parsing "+type_name+"(" + json_document['name'] + ") got following error at line #" + str(exc_info()[-1].tb_lineno) + "...\n " + str(e)
@@ -409,7 +412,25 @@ def create_edit_type(type_name, json_document, user_id):
               if type(old_data[0]) == list:
                   old_data = list(chain.from_iterable(old_data))
                   new_data = list(chain.from_iterable(new_data))
+          if [] in old_data:
+            old_data.remove([])
+          if [] in new_data:
+            new_data.remove([])
 
+          old_data_refined = []
+          new_data_refined = []
+          for each_odata in old_data:
+              if isinstance(each_odata,list):
+                  old_data_refined.extend(each_odata)
+              else:
+                  old_data_refined.append(each_odata)
+          for each_ndata in new_data:
+              if isinstance(each_ndata,list):
+                  new_data_refined.extend(each_ndata)
+              else:
+                  new_data_refined.append(each_ndata)
+          old_data = old_data_refined
+          new_data = new_data_refined
           if set(old_data) != set(new_data):
             # node[key].extend(json_document[key])
             # Avoiding extend's use
