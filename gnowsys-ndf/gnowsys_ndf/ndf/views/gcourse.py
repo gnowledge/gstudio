@@ -2008,14 +2008,14 @@ def activity_player_detail(request, group_id, lesson_id, activity_id):
     unit_resources_list_of_dict = node_collection.find({
                                     '_id': {'$in': lesson_obj_collection_set}},
                                     {'name': 1, 'altnames': 1,'_id':1})
-    act_list = {}
+    act_list = []
     for each in unit_resources_list_of_dict:
         each_node = get_lang_node(each._id,request.LANGUAGE_CODE)
         if each_node :
-            act_list.update({ObjectId(each_node._id): {"name":each_node.name,"basenodeid":ObjectId(each._id)}})
+            act_list.append({ObjectId(each_node._id): {"name":each_node.name,"basenodeid":ObjectId(each._id)}})
         else:
-            act_list.update({ObjectId(each._id): {"name":each.name,"basenodeid":ObjectId(each._id)}})
-    unit_resources_list_of_dict.rewind()
+            act_list.append({ObjectId(each._id): {"name":each.name,"basenodeid":ObjectId(each._id)}})
+    # unit_resources_list_of_dict.rewind()
     resource_index = lesson_obj_collection_set.index(node_obj._id)
 
     # cur_list = {c._id: c.name for c in unit_resources_list_of_dict }
@@ -2041,7 +2041,7 @@ def activity_player_detail(request, group_id, lesson_id, activity_id):
         'node': node_obj, 'lesson_node': lesson_node, 'activityid': ObjectId(activity_id),
         'resource_index': resource_index, 'resource_next_id': resource_next_id,
         'resource_prev_id': resource_prev_id, 'resource_count': resource_count,
-        'unit_resources_list_of_dict': unit_resources_list_of_dict,
+        # 'unit_resources_list_of_dict': unit_resources_list_of_dict,
         'trans_node':trans_node,
         'act_list':act_list
     })

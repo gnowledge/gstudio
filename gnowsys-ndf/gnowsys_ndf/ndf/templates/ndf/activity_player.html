@@ -64,8 +64,10 @@
                   <b>{{lesson_node.name}}</b>
               </div>
               <div class="activity-title">
-              {% for k,v in act_list.items %}
-                 <li  {% if v.basenodeid == activityid %} class="active" {% endif %}> <a href="{% url 'activity_player_detail' group_id lesson_node.pk v.basenodeid %}"> {{v.name}} </a></li>
+              {% for each in act_list %}
+                  {% for k,v in each.items  %}
+                    <li  {% if v.basenodeid == activityid %} class="active" {% endif %}> <a href="{% url 'activity_player_detail' group_id lesson_node.pk v.basenodeid %}"> {{v.name}} </a></li>
+                  {% endfor %}
               {% endfor %}
               </div>
               </div>
