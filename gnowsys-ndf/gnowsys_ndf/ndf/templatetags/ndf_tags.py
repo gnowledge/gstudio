@@ -3373,7 +3373,8 @@ def get_thread_node(node_id):
 		node_obj = node_collection.one({'_id': ObjectId(node_id)})
 		thread_obj = None
 		has_thread_rt = node_collection.one({'_type': 'RelationType', 'name': 'has_thread'})
-		thread_rt = triple_collection.find_one({'subject': ObjectId(node_id),'relation_type': has_thread_rt._id})
+		thread_rt = triple_collection.find_one({'subject': ObjectId(node_id),
+			'relation_type': has_thread_rt._id, 'status': u'PUBLISHED'})
 		if thread_rt:
 			thread_obj = thread_rt['right_subject']
 
