@@ -84,61 +84,62 @@ CKEDITOR.plugins.add('addJhapp',
                             $('#group_imgs_on_modal').foundation('reveal', 'close');
                           });
                             $("#insert_fst_l1_a1").click(function(event){
-                                iframe_url = "<iframe src='/FoodSharingTool/en/L1A1/' style='height:100vh;width:100%'></iframe>"
+                                fst_val_a1 = "<a href='/FoodSharingTool/en/L1A1/' onclick='javascript:opneinnewindow() return false;' target='_blank'><img src='/static/ndf/images/FST.png' alt='Food Sharing Tool' height='1000px' width='1000px' >"
+                                
                             
                              CKEDITOR.instances[textAreaId].insertHtml(iframe_url);
                             $('#group_imgs_on_modal').foundation('reveal', 'close');
                           });
                             $("#insert_fst_l1_a2").click(function(event){
-                                iframe_url = "<iframe src='/FoodSharingTool/en/L1A2/' style='height:100vh;width:100%'></iframe>"
+                                fst_val_a2 = "<a href='/FoodSharingTool/en/L1A2/' onclick='javascript:opneinnewindow() return false;' target='_blank'><img src='/static/ndf/images/FST.png' alt='Food Sharing Tool' height='1000px' width='1000px' >"
                             
                              CKEDITOR.instances[textAreaId].insertHtml(iframe_url);
                             $('#group_imgs_on_modal').foundation('reveal', 'close');
                           });
                             $("#insert_fst_l1_a3").click(function(event){
-                                iframe_url = "<iframe src='/FoodSharingTool/en/L1A3/' style='height:100vh;width:100%'></iframe>"
+                                fst_val_a3 = "<a href='/FoodSharingTool/en/L1A3/' onclick='javascript:opneinnewindow() return false;' target='_blank'><img src='/static/ndf/images/FST.png' alt='Food Sharing Tool' height='1000px' width='1000px' >"
                             
                              CKEDITOR.instances[textAreaId].insertHtml(iframe_url);
                             $('#group_imgs_on_modal').foundation('reveal', 'close');
                           });
                             $("#insert_fst_l1_a4").click(function(event){
-                                iframe_url = "<iframe src='/FoodSharingTool/en/L1A4/' style='height:100vh;width:100%'></iframe>"
+                                fst_val_a4 = "<a href='/FoodSharingTool/en/L1A4/' onclick='javascript:opneinnewindow() return false;' target='_blank'><img src='/static/ndf/images/FST.png' alt='Food Sharing Tool' height='1000px' width='1000px' >"
                             
                              CKEDITOR.instances[textAreaId].insertHtml(iframe_url);
                             $('#group_imgs_on_modal').foundation('reveal', 'close');
                           });
                             $("#insert_rp_l2a1").click(function(event){
-                                iframe_url = "<iframe src='/RatioPattens/en/L2A1/' style='height:100vh;width:100%'></iframe>"
+                                rp_val_l2a1 = "<a href='/RatioPattens/en/L2A1/' onclick='javascript:opneinnewindow() return false;' target='_blank'><img src='/static/ndf/images/RP.png' alt='Ratio Patterns Tool' height='1000px' width='1000px' >"
                             
                              CKEDITOR.instances[textAreaId].insertHtml(iframe_url);
                             $('#group_imgs_on_modal').foundation('reveal', 'close');
                           });
                             $("#insert_rp_l2a2").click(function(event){
-                                iframe_url = "<iframe src='/RatioPattens/en/L2A2/' style='height:100vh;width:100%'></iframe>"
+                                rp_val_l2a2 = "<a href='/RatioPattens/en/L2A2/' onclick='javascript:opneinnewindow() return false;' target='_blank'><img src='/static/ndf/images/RP.png' alt='Ratio Patterns Tool' height='1000px' width='1000px' >"
                             
                              CKEDITOR.instances[textAreaId].insertHtml(iframe_url);
                             $('#group_imgs_on_modal').foundation('reveal', 'close');
                           });
                             $("#insert_rp_l2a3").click(function(event){
-                                iframe_url = "<iframe src='/RatioPattens/en/L2A3/' style='height:100vh;width:100%'></iframe>"
+                                rp_val_l2a3 = "<a href='/RatioPattens/en/L2A3/' onclick='javascript:opneinnewindow() return false;' target='_blank'><img src='/static/ndf/images/RP.png' alt='Ratio Patterns Tool' height='1000px' width='1000px' >"
                             
                              CKEDITOR.instances[textAreaId].insertHtml(iframe_url);
                             $('#group_imgs_on_modal').foundation('reveal', 'close');
                           });
                             $("#insert_rp_l2a4").click(function(event){
-                                iframe_url = "<iframe src='/RatioPattens/en/L2A4/' style='height:100vh;width:100%'></iframe>"
+                                rp_val_l2a4 = "<a href='/RatioPattens/en/L2A4/' onclick='javascript:opneinnewindow() return false;' target='_blank'><img src='/static/ndf/images/RP.png' alt='Ratio Patterns Tool' height='1000px' width='1000px' >"
                             
                              CKEDITOR.instances[textAreaId].insertHtml(iframe_url);
                             $('#group_imgs_on_modal').foundation('reveal', 'close');
                           });
                             $("#insert_rp_l2a5").click(function(event){
-                                iframe_url = "<iframe src='/RatioPattens/en/L2A5/' style='height:100vh;width:100%'></iframe>"
+                                rp_val_l2a5 = "<a href='/RatioPattens/en/L2A5/' onclick='javascript:opneinnewindow() return false;' target='_blank'><img src='/static/ndf/images/RP.png' alt='Ratio Patterns Tool' height='1000px' width='1000px' >"
                             
                              CKEDITOR.instances[textAreaId].insertHtml(iframe_url);
                             $('#group_imgs_on_modal').foundation('reveal', 'close');
                           });
                             $("#insert_rp_l2a6").click(function(event){
-                                iframe_url = "<iframe src='/RatioPattens/en/L2A6/' style='height:100vh;width:100%'></iframe>"
+                                rp_val_l2a6 = "<a href='/RatioPattens/en/L2A6/' onclick='javascript:opneinnewindow() return false;' target='_blank'><img src='/static/ndf/images/RP.png' alt='Ratio Patterns Tool' height='1000px' width='1000px' >"
                             
                              CKEDITOR.instances[textAreaId].insertHtml(iframe_url);
                             $('#group_imgs_on_modal').foundation('reveal', 'close');
