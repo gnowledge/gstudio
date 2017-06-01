@@ -87,61 +87,61 @@ CKEDITOR.plugins.add('addJhapp',
                                 fst_val_a1 = "<a href='/FoodSharingTool/en/L1A1/' onclick='javascript:opneinnewindow() return false;' target='_blank'><img src='/static/ndf/images/FST.png' alt='Food Sharing Tool' height='1000px' width='1000px' >"
                                 
                             
-                             CKEDITOR.instances[textAreaId].insertHtml(iframe_url);
+                             CKEDITOR.instances[textAreaId].insertHtml(fst_val_a1);
                             $('#group_imgs_on_modal').foundation('reveal', 'close');
                           });
                             $("#insert_fst_l1_a2").click(function(event){
                                 fst_val_a2 = "<a href='/FoodSharingTool/en/L1A2/' onclick='javascript:opneinnewindow() return false;' target='_blank'><img src='/static/ndf/images/FST.png' alt='Food Sharing Tool' height='1000px' width='1000px' >"
                             
-                             CKEDITOR.instances[textAreaId].insertHtml(iframe_url);
+                             CKEDITOR.instances[textAreaId].insertHtml(fst_val_a2);
                             $('#group_imgs_on_modal').foundation('reveal', 'close');
                           });
                             $("#insert_fst_l1_a3").click(function(event){
                                 fst_val_a3 = "<a href='/FoodSharingTool/en/L1A3/' onclick='javascript:opneinnewindow() return false;' target='_blank'><img src='/static/ndf/images/FST.png' alt='Food Sharing Tool' height='1000px' width='1000px' >"
                             
-                             CKEDITOR.instances[textAreaId].insertHtml(iframe_url);
+                             CKEDITOR.instances[textAreaId].insertHtml(fst_val_a3);
                             $('#group_imgs_on_modal').foundation('reveal', 'close');
                           });
                             $("#insert_fst_l1_a4").click(function(event){
                                 fst_val_a4 = "<a href='/FoodSharingTool/en/L1A4/' onclick='javascript:opneinnewindow() return false;' target='_blank'><img src='/static/ndf/images/FST.png' alt='Food Sharing Tool' height='1000px' width='1000px' >"
                             
-                             CKEDITOR.instances[textAreaId].insertHtml(iframe_url);
+                             CKEDITOR.instances[textAreaId].insertHtml(fst_val_a4);
                             $('#group_imgs_on_modal').foundation('reveal', 'close');
                           });
                             $("#insert_rp_l2a1").click(function(event){
                                 rp_val_l2a1 = "<a href='/RatioPattens/en/L2A1/' onclick='javascript:opneinnewindow() return false;' target='_blank'><img src='/static/ndf/images/RP.png' alt='Ratio Patterns Tool' height='1000px' width='1000px' >"
                             
-                             CKEDITOR.instances[textAreaId].insertHtml(iframe_url);
+                             CKEDITOR.instances[textAreaId].insertHtml(rp_val_l2a);
                             $('#group_imgs_on_modal').foundation('reveal', 'close');
                           });
                             $("#insert_rp_l2a2").click(function(event){
                                 rp_val_l2a2 = "<a href='/RatioPattens/en/L2A2/' onclick='javascript:opneinnewindow() return false;' target='_blank'><img src='/static/ndf/images/RP.png' alt='Ratio Patterns Tool' height='1000px' width='1000px' >"
                             
-                             CKEDITOR.instances[textAreaId].insertHtml(iframe_url);
+                             CKEDITOR.instances[textAreaId].insertHtml(rp_val_l2a2);
                             $('#group_imgs_on_modal').foundation('reveal', 'close');
                           });
                             $("#insert_rp_l2a3").click(function(event){
                                 rp_val_l2a3 = "<a href='/RatioPattens/en/L2A3/' onclick='javascript:opneinnewindow() return false;' target='_blank'><img src='/static/ndf/images/RP.png' alt='Ratio Patterns Tool' height='1000px' width='1000px' >"
                             
-                             CKEDITOR.instances[textAreaId].insertHtml(iframe_url);
+                             CKEDITOR.instances[textAreaId].insertHtml(rp_val_l2a3);
                             $('#group_imgs_on_modal').foundation('reveal', 'close');
                           });
                             $("#insert_rp_l2a4").click(function(event){
                                 rp_val_l2a4 = "<a href='/RatioPattens/en/L2A4/' onclick='javascript:opneinnewindow() return false;' target='_blank'><img src='/static/ndf/images/RP.png' alt='Ratio Patterns Tool' height='1000px' width='1000px' >"
                             
-                             CKEDITOR.instances[textAreaId].insertHtml(iframe_url);
+                             CKEDITOR.instances[textAreaId].insertHtml(rp_val_l2a4);
                             $('#group_imgs_on_modal').foundation('reveal', 'close');
                           });
                             $("#insert_rp_l2a5").click(function(event){
                                 rp_val_l2a5 = "<a href='/RatioPattens/en/L2A5/' onclick='javascript:opneinnewindow() return false;' target='_blank'><img src='/static/ndf/images/RP.png' alt='Ratio Patterns Tool' height='1000px' width='1000px' >"
                             
-                             CKEDITOR.instances[textAreaId].insertHtml(iframe_url);
+                             CKEDITOR.instances[textAreaId].insertHtml(rp_val_l2a5);
                             $('#group_imgs_on_modal').foundation('reveal', 'close');
                           });
                             $("#insert_rp_l2a6").click(function(event){
                                 rp_val_l2a6 = "<a href='/RatioPattens/en/L2A6/' onclick='javascript:opneinnewindow() return false;' target='_blank'><img src='/static/ndf/images/RP.png' alt='Ratio Patterns Tool' height='1000px' width='1000px' >"
                             
-                             CKEDITOR.instances[textAreaId].insertHtml(iframe_url);
+                             CKEDITOR.instances[textAreaId].insertHtml(rp_val_l2a6);
                             $('#group_imgs_on_modal').foundation('reveal', 'close');
                           });
 
