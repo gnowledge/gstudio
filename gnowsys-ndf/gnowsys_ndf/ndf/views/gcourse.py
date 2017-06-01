@@ -3464,7 +3464,6 @@ def delete_activity_page(request, group_id):
     activity_id_list = request.POST.getlist('delete_files_list[]', '')
     activity_id = request.POST.get('activity_id', '')
     if activity_id_list:
-        print "55555555555555555555555555"
         for each_activity in activity_id_list:
             activity_page_node = node_collection.one({'_id':ObjectId(each_activity)})
             if activity_page_node:
@@ -3472,7 +3471,6 @@ def delete_activity_page(request, group_id):
                 del_status  = delete_node(node_id=activity_page_node._id, deletion_type=0)
                 return HttpResponse('success')
     if activity_id:
-        print "6666666666666666666666",activity_id
         activity_page_node = node_collection.one({'_id':ObjectId(activity_id)})
         if activity_page_node:
             trash_resource(request,ObjectId(group_id),ObjectId(activity_page_node._id))
