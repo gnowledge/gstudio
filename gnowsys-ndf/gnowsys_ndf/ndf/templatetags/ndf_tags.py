@@ -586,20 +586,17 @@ def get_attribute_value(node_id, attr_name, get_data_type=False):
     attr_val = ""
     node_attr = data_type = None
     if node_id:
-    	# node = node_collection.one({'_id': ObjectId(node_id) })
-    	gattr = node_collection.one({'_type': 'AttributeType', 'name': unicode(attr_name) })
-
-    	if get_data_type:
-    		data_type = gattr.data_type
-    	if gattr: # and node  :
-    		node_attr = triple_collection.find_one({'_type': "GAttribute", "subject": ObjectId(node_id), 'attribute_type': gattr._id, 'status': u"PUBLISHED"})
-
+        # print "\n attr_name: ", attr_name
+        gattr = node_collection.one({'_type': 'AttributeType', 'name': unicode(attr_name) })
+        if get_data_type:
+            data_type = gattr.data_type
+        if gattr: # and node  :
+            node_attr = triple_collection.find_one({'_type': "GAttribute", "subject": ObjectId(node_id), 'attribute_type': gattr._id, 'status': u"PUBLISHED"})
     if node_attr:
-    	attr_val = node_attr.object_value
-    # print "\n here: ", attr_name, " : ", attr_val, " : ", node_id
+        attr_val = node_attr.object_value
+        # print "\n here: ", attr_name, " : ", attr_val, " : ", node_id
     if get_data_type:
         return {'value': attr_val, 'data_type': data_type}
-
     cache.set(cache_key, attr_val, 60 * 60)
     return attr_val
 
@@ -3376,7 +3373,9 @@ def get_thread_node(node_id):
 		thread_rt = triple_collection.find_one({'subject': ObjectId(node_id),
 			'relation_type': has_thread_rt._id, 'status': u'PUBLISHED'})
 		if thread_rt:
-			thread_obj = thread_rt['right_subject']
+			thread_id = thread_rt['right_subject']
+			if thread_id:
+				thread_obj = node_collection.one({'_id': ObjectId(thread_id)})
 
 		# if node_obj.relation_set:
 		# 	for rel in node_obj.relation_set:
