@@ -286,12 +286,13 @@ This will not be used because now only existing activities will be added.
 
 
 
+
 <!-- overlay/reveal to add lesson -->
 <div id="add-lesson-reveal" class="reveal-modal" data-reveal aria-labelledby="modalTitle" aria-hidden="true" role="dialog">
    <div>
-        <div class="small-3 columns left"><h3>Language Selection</h3></div>
+        <div class="small-3 columns left"><h3>Language Selection<h9 style="color:red">*</h9></h3></div>
         <div class="small-9 columns right">
-               <select class="lesson-lang" name="lan" id="lesson_lang" style="height: 42px;">
+               <select class="lesson-lang" name="lan" id="lesson_lang" onchange="myLang()" style="height: 42px;">
                     {% get_language_info_list for LANGUAGES as languages %}
                                         
                         {% for language in languages %}
@@ -305,12 +306,12 @@ This will not be used because now only existing activities will be added.
         </div>
     </div>
     <div>
-        <div class="small-3 columns left lesson-form-name"><h3>{% trans "Lesson Name" %}</h3></div>
-        <div class="small-9 columns right"><input type="text" id="lesson-name"></div>
+        <div class="small-3 columns left lesson-form-name"><h3>{% trans "Lesson Name" %}<h9 style="color:red">*</h9></h3></div>
+        <div class="small-9 columns right lesson_disp_name"><input type="text" id="lesson-name"></div>
     </div>
     <div>
-        <div class="small-3 columns left lesson-form-desc"><h3>{% trans "Lesson Description" %}</h3></div>
-        <div class="small-9 columns right"><textarea rows="6" cols="50"></textarea></div>
+        <div class="small-3 columns left lesson-form-desc"><h3>{% trans "Lesson Description" %}<h9 style="color: rgba(128, 128, 128, 0.48);font-style: italic;font-size: 15px;"> optional</h9></h3></div>
+        <div class="small-9 columns right lesson_disp_desc"><textarea rows="3" cols="50" id="lesson-desc"></textarea></div>
     </div>
     <div class="double-buttons">
         <button type="button" class="button-hollow-grey save-lesson add-lesson-top-margin" data-node-id=""> {% trans "Save Lesson" %} </button>
@@ -413,6 +414,37 @@ This will not be used because now only existing activities will be added.
     //         ]
     //     }
     // ];
+
+    function myLang(){
+        var x = document.getElementById("lesson_lang").value;
+        alert(x)
+        var en_name = "eng name"
+        var hi_name = "Hindi name"
+        var te_name = "telugu name"
+
+        if (x=='te'){
+            $('#lesson-name').val(te_name);
+            alert('te')
+
+        } 
+        else if (x=='hi'){
+            $('#lesson-name').val(hi_name);
+            alert('hi')
+                
+        } 
+        else {
+            
+            $('#lesson-name').val(en_name);
+        }
+
+        
+        
+        
+
+        
+
+    
+    }
 
     var course_data = {{unit_structure|safe}};
 
