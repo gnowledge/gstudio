@@ -1344,8 +1344,20 @@ class CreateCourseEventGroup(CreateEventGroup):
         if node.collection_set:
             try:
                 for each_res in node.collection_set:
+                    gst_node = None
                     each_res_node = node_collection.one({'_id': ObjectId(each_res)})
-                    new_res = replicate_resource(request, each_res_node, group_obj._id)
+                    each_res_node_mem_list = each_res_node.member_of_names_list
+                    if any(base_gs_mem in ["CourseSection", "CourseSectionEvent"] for base_gs_mem in each_res_node_mem_list):
+                        gst_node_id = self.section_event_gst._id
+                    if any(base_gs_mem in ["CourseSubSection", "CourseSubSectionEvent"] for base_gs_mem in each_res_node_mem_list):
+                        gst_node_id = self.subsection_event_gst._id
+                    if any(base_gs_mem in ["CourseUnit", "CourseUnitEvent"] for base_gs_mem in each_res_node_mem_list):
+                        gst_node_id = self.courseunit_event_gst._id
+                    if any(base_gs_mem in ["lesson"] for base_gs_mem in each_res_node_mem_list):
+                        gst_node_id = self.lesson_gst._id
+
+                    new_res = replicate_resource(request, each_res_node, 
+                        group_obj._id, mem_of_node=gst_node)
                     # new_res = self.replicate_resource(request, each_res_node, group_obj)
                     prior_node_obj.collection_set.append(new_res._id)
                     new_res.prior_node.append(prior_node_obj._id)
