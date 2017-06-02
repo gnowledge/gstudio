@@ -1299,27 +1299,38 @@ class CreateCourseEventGroup(CreateEventGroup):
                 each_rm_file.save(groupid=new_group_obj._id)
 
 
-    def create_corresponding_gsystem(self,gs_name,gs_member_of,gs_under_coll_set_of_obj, group_obj):
-
+    def create_corresponding_gsystem(self,base_gsystem,gs_under_coll_set_of_obj, group_obj):
+        '''
+        Depricated this method. katkamrachana - 02June2017
+        'replicate_resource' will be used for resources and hierarchy nodes.
+        '''
         try:
-            new_gsystem = node_collection.collection.GSystem()
-            new_gsystem.name = unicode(gs_name)
-            if gs_member_of == "CourseSection" or gs_member_of == "CourseSectionEvent":
+            user_id = base_gsystem.created_by
+            new_gsystem = create_clone(user_id, base_gsystem, group_obj._id)
+            base_gsystem_mem_list = base_gsystem.member_of_names_list
+            if any(base_gs_mem in ["CourseSection", "CourseSectionEvent"] for base_gs_mem in base_gsystem_mem_list):
                 gst_node = self.section_event_gst
-            elif gs_member_of == "CourseSubSection" or gs_member_of == "CourseSubSectionEvent":
+            if any(base_gs_mem in ["CourseSubSection", "CourseSubSectionEvent"] for base_gs_mem in base_gsystem_mem_list):
                 gst_node = self.subsection_event_gst
-            elif gs_member_of == "CourseUnit" or gs_member_of == "CourseUnitEvent":
+            if any(base_gs_mem in ["CourseUnit", "CourseUnitEvent"] for base_gs_mem in base_gsystem_mem_list):
                 gst_node = self.courseunit_event_gst
-            elif gs_member_of == "lesson" or gs_member_of == "lesson":
+            if any(base_gs_mem in ["lesson"] for base_gs_mem in base_gsystem_mem_list):
                 gst_node = self.lesson_gst
 
+            # new_gsystem = node_collection.collection.GSystem()
+            # new_gsystem.name = unicode(gs_name)
+            # if gs_member_of == "CourseSection" or gs_member_of == "CourseSectionEvent":
+            #     gst_node = self.section_event_gst
+            # elif gs_member_of == "CourseSubSection" or gs_member_of == "CourseSubSectionEvent":
+            #     gst_node = self.subsection_event_gst
+            # elif gs_member_of == "CourseUnit" or gs_member_of == "CourseUnitEvent":
+            #     gst_node = self.courseunit_event_gst
+            # elif gs_member_of == "lesson" or gs_member_of == "lesson":
+            #     gst_node = self.lesson_gst
+            # new_gsystem.modified_by = int(self.user_id)
+            # new_gsystem.save()
             new_gsystem.member_of.append(gst_node._id)
             new_gsystem.group_set.append(group_obj._id)
-            new_gsystem.modified_by = int(self.user_id)
-            new_gsystem.status = u"PUBLISHED"
-            new_gsystem.created_by = int(self.user_id)
-            new_gsystem.contributors.append(int(self.user_id))
-            new_gsystem.save()
             gs_under_coll_set_of_obj.collection_set.append(new_gsystem._id)
             gs_under_coll_set_of_obj.save()
             new_gsystem.prior_node.append(gs_under_coll_set_of_obj._id)
@@ -1331,9 +1342,7 @@ class CreateCourseEventGroup(CreateEventGroup):
 
     def call_setup(self, request, node, prior_node_obj, group_obj):
         if node.collection_set:
-            if ("CourseUnit" in node.member_of_names_list or 
-                "CourseUnitEvent" in node.member_of_names_list or
-                 "lesson" in node.member_of_names_list):
+            try:
                 for each_res in node.collection_set:
                     each_res_node = node_collection.one({'_id': ObjectId(each_res)})
                     new_res = replicate_resource(request, each_res_node, group_obj._id)
@@ -1347,15 +1356,19 @@ class CreateCourseEventGroup(CreateEventGroup):
                     # prior_node_obj.collection_set.append(each_res_node._id)
                     # node.save()
                     prior_node_obj.save()
-            else:
-                for each in node.collection_set:
-                    each_node = node_collection.one({'_id': ObjectId(each)})
-                    if each_node:
-                        name_arg = each_node.name
-                        member_of_name_str = each_node.member_of_names_list[0]
-                        new_node = self.create_corresponding_gsystem(name_arg,member_of_name_str, prior_node_obj, group_obj)
-                        self.call_setup(request, each_node, new_node, group_obj)
-
+                    if each_res_node.collection_set:
+                        self.call_setup(request, each_res_node, new_res, group_obj)
+                    # else:
+                    #     for each in node.collection_set:
+                    #         each_node = node_collection.one({'_id': ObjectId(each)})
+                    #         if each_node:
+                    #             # name_arg = each_node.name
+                    #             # member_of_name_str = each_node.member_of_names_list[0]
+                    #             new_node = self.create_corresponding_gsystem(each_node, prior_node_obj, group_obj)
+                    #             self.call_setup(request, each_node, new_node, group_obj)
+            except Exception as call_set_err:
+                # print "\n !!!Error while creating Course Structure!!!"
+                pass
 
 
 # --- END of class CreateCourseEventGroup ---
