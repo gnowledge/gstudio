@@ -286,25 +286,37 @@ This will not be used because now only existing activities will be added.
 
 
 
+
 <!-- overlay/reveal to add lesson -->
 <div id="add-lesson-reveal" class="reveal-modal" data-reveal aria-labelledby="modalTitle" aria-hidden="true" role="dialog">
-    <h3>{% trans "Lesson Name" %}</h3>
-    <input type="text" id="lesson-name">
-    <select class="lesson-lang" name="lan" id="lesson_lang" style="height:43px;">
-                            {% get_language_info_list for LANGUAGES as languages %}
-                            
-                            {% for language in languages %}
-                                {% if lesson_language == language.code %}
-                                    <option selected value="{{ language.code }}" data-sub-lang="{{ language.name }}" data-sub-code="{{ language.code }}">
-                                      {{ language.name }}
-                                {% else %}
-                                    <option value="{{ language.code }}" data-sub-lang="{{ language.name }}" data-sub-code="{{ language.code }}">
-                                      {{ language.name }}
-                                    </option>
-                                {% endif %}
-                            {% endfor %}
-                          </select><br/>
-    <button type="button" class="button-hollow-grey save-lesson add-lesson-top-margin" data-node-id=""> {% trans "Save Lesson" %} </button>
+   <div>
+        <div class="small-3 columns left"><h3>Language Selection<h9 style="color:red">*</h9></h3></div>
+        <div class="small-9 columns right">
+               <select disabled class="lesson-lang" name="lan" id="lesson_lang" onchange="myLang()" style="height: 42px;">
+                    {% get_language_info_list for LANGUAGES as languages %}
+                                        
+                        {% for language in languages %}
+                            {% if lesson_language == language.code %}
+                                <option selected value="{{ language.code }}" data-sub-lang="{{ language.name }}" data-sub-code="{{ language.code }}">{{ language.name }}</option>
+                            {% else %}
+                                <option value="{{ language.code }}" data-sub-lang="{{ language.name }}" data-sub-code="{{ language.code }}">{{ language.name }}</option>
+                            {% endif %}
+                        {% endfor %}
+                </select><br/>
+        </div>
+    </div>
+    <div>
+        <div class="small-3 columns left lesson-form-name"><h3>{% trans "Lesson Name" %}<h9 style="color:red">*</h9></h3></div>
+        <div class="small-9 columns right lesson_disp_name"><input type="text" id="lesson-name"></div>
+    </div>
+    <div>
+        <div class="small-3 columns left lesson-form-desc"><h3>{% trans "Lesson Description" %}<h9 style="color: rgba(128, 128, 128, 0.48);font-style: italic;font-size: 15px;"> optional</h9></h3></div>
+        <div class="small-9 columns right lesson_disp_desc"><textarea rows="3" cols="50" id="lesson-desc"></textarea></div>
+    </div>
+    <div class="double-buttons">
+        <button type="button" class="button-hollow-grey save-lesson add-lesson-top-margin" data-node-id=""> {% trans "Save Lesson" %} </button>
+        <button type="button" class="button-hollow-grey save-lesson add-lesson-top-margin" data-node-id=""> {% trans "Cancel" %} </button>
+    </div>
     <a class="close-reveal-modal" aria-label="Close">&#215;</a>
 </div>
 <!-- END of overlay/reveal to add lesson -->
@@ -403,6 +415,37 @@ This will not be used because now only existing activities will be added.
     //     }
     // ];
 
+    function myLang(){
+        var x = document.getElementById("lesson_lang").value;
+        alert(x)
+        var en_name = "eng name"
+        var hi_name = "Hindi name"
+        var te_name = "telugu name"
+
+        if (x=='te'){
+            $('#lesson-name').val(te_name);
+            alert('te')
+
+        } 
+        else if (x=='hi'){
+            $('#lesson-name').val(hi_name);
+            alert('hi')
+                
+        } 
+        else {
+            
+            $('#lesson-name').val(en_name);
+        }
+
+        
+        
+        
+
+        
+
+    
+    }
+
     var course_data = {{unit_structure|safe}};
 
     $(function(){
@@ -456,6 +499,7 @@ This will not be used because now only existing activities will be added.
         $('.course-lessons').on('click', '.lesson_edit' ,function(e){
             e.stopPropagation();
             e.preventDefault();
+            $('.lesson-lang').removeAttr("disabled");
             var lesson_id = $(this).closest('a').attr('href').replace('#lesson-', '');
             var lesson_name = $(this).closest('a').attr('data_lesson_name');
             var lesson_language = $(this).closest('a').attr('data_lesson_language');
@@ -668,6 +712,7 @@ This will not be used because now only existing activities will be added.
           addLesson()
           - to add lesson of unit.
           */
+
           if (!lessonName) {
             alert('Name can not be empty. Please provide one.');
             return;
@@ -681,7 +726,7 @@ This will not be used because now only existing activities will be added.
                   "name": lessonName,
                   "lesson_id": lessonId,
                   "unit_id": "{{unit_obj.pk}}",
-                  "sel_lesson_lang":sel_lesson_lang
+                  // "sel_lesson_lang":sel_lesson_lang
               },
               url: "{% url 'lesson_create_edit' group_id %}",
               // datatype: "",
@@ -694,6 +739,7 @@ This will not be used because now only existing activities will be added.
                       // handle opening of tree till recently added node with data_dict.msg
                       $('#add-lesson-reveal').foundation('reveal', 'close');
                       result = true;
+
                   }
                   else{
                       alert(data_dict.msg);
@@ -923,6 +969,13 @@ This will not be used because now only existing activities will be added.
         $(document).on('closed.fndtn.reveal', '#add-lesson-reveal', function () {
             $("#lesson-name").val('');
             $('.save-lesson').attr('data-node-id', '');
+        });
+
+        $(document).on('open.fndtn.reveal', '#add-lesson-reveal', function () {
+            lesson_id_val = $("#add-lesson-reveal").find(".save-lesson").attr('data-node-id')
+            if(!lesson_id_val){
+                $('.lesson-lang').attr("disabled","disabled");
+            }
         });
         // END of foundation reveal modal events handling
 

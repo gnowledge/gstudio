@@ -44,7 +44,7 @@ CKEDITOR.plugins.add('addJhapp',
                             $("#insert_policequad").click(function(event){
                             
 
-                            pq_text_val = "<a href='/policequad' onclick='javascript:opneinnewindow() return false;' target='_blank'><img src='/static/ndf/images/PoliceQuad_pt33x.png' alt='Police quad thumbnail'  height='1000px' width='1000px' >"
+                            pq_text_val = "<a href='/policequad' target='_blank'><img src='/static/ndf/images/PoliceQuad_pt33x.png' alt='Police quad thumbnail'  height='1000px' width='1000px' >"
                             
                              CKEDITOR.instances[textAreaId].insertHtml(pq_text_val);
                             $('#group_imgs_on_modal').foundation('reveal', 'close');
@@ -52,7 +52,7 @@ CKEDITOR.plugins.add('addJhapp',
                             $("#insert_runkittyrun").click(function(event){
                             //ost_text_gallery = $('#paste-ost-gallery').val();
                             //ost_text_file = $('#paste-ost-captions').val();
-                            bm_text_val = "<a href='/runkittyrun/' onclick='javascript:opneinnewindow() return false;' target='_blank'><img src='/static/ndf/images/RKR.jpg' alt='Run Kitty Run' height='1000px' width='1000px' >"
+                            bm_text_val = "<a href='/runkittyrun/' target='_blank'><img src='/static/ndf/images/RKR.jpg' alt='Run Kitty Run' height='1000px' width='1000px' >"
                             // split_word = ost_text_val.slice(0, 18) + "gallery=" + ost_text_gallery + "&amp;file=/ost/" + ost_text_file+"'"+ ost_text_val.slice(18);
                             // alert(split_word)
                              CKEDITOR.instances[textAreaId].insertHtml(bm_text_val);
@@ -71,7 +71,7 @@ CKEDITOR.plugins.add('addJhapp',
                             $("#insert_physics-video-player").click(function(event){
                             //ost_text_gallery = $('#paste-ost-gallery').val();
                             //ost_text_file = $('#paste-ost-captions').val();
-                            tjs_text_val = "<a href='/physics-video-player/' onclick='javascript:opneinnewindow() return false;' target='_blank'><img src='/static/ndf/images/physics-video-player.jpg' alt='Physics Video Player' height='1000px' width='1000px' >"
+                            tjs_text_val = "<a href='/physics-video-player/' target='_blank'><img src='/static/ndf/images/physics-video-player.jpg' alt='Physics Video Player' height='1000px' width='1000px' >"
                             // split_word = ost_text_val.slice(0, 18) + "gallery=" + ost_text_gallery + "&amp;file=/ost/" + ost_text_file+"'"+ ost_text_val.slice(18);
                             // alert(split_word)
                              CKEDITOR.instances[textAreaId].insertHtml(tjs_text_val);
@@ -84,63 +84,65 @@ CKEDITOR.plugins.add('addJhapp',
                             $('#group_imgs_on_modal').foundation('reveal', 'close');
                           });
                             $("#insert_fst_l1_a1").click(function(event){
-                                iframe_url = "<iframe src='/FoodSharingTool/en/L1A1/' style='height:100vh;width:100%'></iframe>"
+                                fst_val_a1 = "<a href='/FoodSharingTool/en/L1A1/' target='_blank'><img src='/static/ndf/images/FST.png' alt='Food Sharing Tool' height='1000px' width='1000px' >"
+                                
                             
-                             CKEDITOR.instances[textAreaId].insertHtml(iframe_url);
+                             CKEDITOR.instances[textAreaId].insertHtml(fst_val_a1);
                             $('#group_imgs_on_modal').foundation('reveal', 'close');
                           });
                             $("#insert_fst_l1_a2").click(function(event){
-                                iframe_url = "<iframe src='/FoodSharingTool/en/L1A2/' style='height:100vh;width:100%'></iframe>"
+                                fst_val_a2 = "<a href='/FoodSharingTool/en/L1A2/' target='_blank'><img src='/static/ndf/images/FST.png' alt='Food Sharing Tool' height='1000px' width='1000px' >"
                             
-                             CKEDITOR.instances[textAreaId].insertHtml(iframe_url);
+                             CKEDITOR.instances[textAreaId].insertHtml(fst_val_a2);
                             $('#group_imgs_on_modal').foundation('reveal', 'close');
                           });
                             $("#insert_fst_l1_a3").click(function(event){
-                                iframe_url = "<iframe src='/FoodSharingTool/en/L1A3/' style='height:100vh;width:100%'></iframe>"
+                                fst_val_a3 = "<a href='/FoodSharingTool/en/L1A3/' target='_blank'><img src='/static/ndf/images/FST.png' alt='Food Sharing Tool' height='1000px' width='1000px' >"
                             
-                             CKEDITOR.instances[textAreaId].insertHtml(iframe_url);
+                             CKEDITOR.instances[textAreaId].insertHtml(fst_val_a3);
                             $('#group_imgs_on_modal').foundation('reveal', 'close');
                           });
                             $("#insert_fst_l1_a4").click(function(event){
-                                iframe_url = "<iframe src='/FoodSharingTool/en/L1A4/' style='height:100vh;width:100%'></iframe>"
+                                fst_val_a4 = "<a href='/FoodSharingTool/en/L1A4/' target='_blank'><img src='/static/ndf/images/FST.png' alt='Food Sharing Tool' height='1000px' width='1000px' >"
                             
-                             CKEDITOR.instances[textAreaId].insertHtml(iframe_url);
+                             CKEDITOR.instances[textAreaId].insertHtml(fst_val_a4);
                             $('#group_imgs_on_modal').foundation('reveal', 'close');
                           });
                             $("#insert_rp_l2a1").click(function(event){
-                                iframe_url = "<iframe src='/RatioPatterns/en/L2A1/' style='height:100vh;width:100%'></iframe>"
+
+                                rp_val_l2a1 = "<a href='/RatioPattens/en/L2A1/' target='_blank'><img src='/static/ndf/images/RP.png' alt='Ratio Patterns Tool' height='1000px' width='1000px' >"
                             
-                             CKEDITOR.instances[textAreaId].insertHtml(iframe_url);
+                             CKEDITOR.instances[textAreaId].insertHtml(rp_val_l2a);
                             $('#group_imgs_on_modal').foundation('reveal', 'close');
                           });
                             $("#insert_rp_l2a2").click(function(event){
-                                iframe_url = "<iframe src='/RatioPatterns/en/L2A2/' style='height:100vh;width:100%'></iframe>"
+                                rp_val_l2a2 = "<a href='/RatioPattens/en/L2A2/' target='_blank'><img src='/static/ndf/images/RP.png' alt='Ratio Patterns Tool' height='1000px' width='1000px' >"
                             
-                             CKEDITOR.instances[textAreaId].insertHtml(iframe_url);
+                             CKEDITOR.instances[textAreaId].insertHtml(rp_val_l2a2);
                             $('#group_imgs_on_modal').foundation('reveal', 'close');
                           });
                             $("#insert_rp_l2a3").click(function(event){
-                                iframe_url = "<iframe src='/RatioPatterns/en/L2A3/' style='height:100vh;width:100%'></iframe>"
+                                rp_val_l2a3 = "<a href='/RatioPattens/en/L2A3/' target='_blank'><img src='/static/ndf/images/RP.png' alt='Ratio Patterns Tool' height='1000px' width='1000px' >"
                             
-                             CKEDITOR.instances[textAreaId].insertHtml(iframe_url);
+                             CKEDITOR.instances[textAreaId].insertHtml(rp_val_l2a3);
                             $('#group_imgs_on_modal').foundation('reveal', 'close');
                           });
                             $("#insert_rp_l2a4").click(function(event){
-                                iframe_url = "<iframe src='/RatioPatterns/en/L2A4/' style='height:100vh;width:100%'></iframe>"
+                                rp_val_l2a4 = "<a href='/RatioPattens/en/L2A4/' target='_blank'><img src='/static/ndf/images/RP.png' alt='Ratio Patterns Tool' height='1000px' width='1000px' >"
                             
-                             CKEDITOR.instances[textAreaId].insertHtml(iframe_url);
+                             CKEDITOR.instances[textAreaId].insertHtml(rp_val_l2a4);
                             $('#group_imgs_on_modal').foundation('reveal', 'close');
                           });
                             $("#insert_rp_l2a5").click(function(event){
-                                iframe_url = "<iframe src='/RatioPatterns/en/L2A5/' style='height:100vh;width:100%'></iframe>"
+                                rp_val_l2a5 = "<a href='/RatioPattens/en/L2A5/' target='_blank'><img src='/static/ndf/images/RP.png' alt='Ratio Patterns Tool' height='1000px' width='1000px' >"
                             
-                             CKEDITOR.instances[textAreaId].insertHtml(iframe_url);
+                             CKEDITOR.instances[textAreaId].insertHtml(rp_val_l2a5);
                             $('#group_imgs_on_modal').foundation('reveal', 'close');
                           });
                             $("#insert_rp_l2a6").click(function(event){
-                                iframe_url = "<iframe src='/RatioPatterns/en/L2A6/' style='height:100vh;width:100%'></iframe>"
+                                rp_val_l2a6 = "<a href='/RatioPattens/en/L2A6/' target='_blank'><img src='/static/ndf/images/RP.png' alt='Ratio Patterns Tool' height='1000px' width='1000px' >"
                             
-                             CKEDITOR.instances[textAreaId].insertHtml(iframe_url);
+                             CKEDITOR.instances[textAreaId].insertHtml(rp_val_l2a6);
                             $('#group_imgs_on_modal').foundation('reveal', 'close');
                           });
 
