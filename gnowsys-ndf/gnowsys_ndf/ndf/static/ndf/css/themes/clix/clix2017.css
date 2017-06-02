@@ -4903,3 +4903,19 @@ ul.nav_menu_1 > li > a.selected, ul.nav_menu_1 > li > a:hover {
   padding-top: 7px !important;
   text-transform: uppercase;
 }
+
+/* line 5113, ../../../scss/_clix2017.scss */
+.double-buttons {
+  margin-top: 285px;
+  margin-left: 729px;
+}
+
+/* line 5118, ../../../scss/_clix2017.scss */
+.lesson-form-name {
+  padding-top: 10px;
+}
+
+/* line 5122, ../../../scss/_clix2017.scss */
+.lesson-form-desc {
+  padding-top: 25px;
+}
