@@ -424,26 +424,16 @@ This will not be used because now only existing activities will be added.
 
         if (x=='te'){
             $('#lesson-name').val(te_name);
-            alert('te')
-
+            // alert('te')
         } 
         else if (x=='hi'){
             $('#lesson-name').val(hi_name);
-            alert('hi')
-                
+            // alert('hi')
         } 
         else {
             
             $('#lesson-name').val(en_name);
         }
-
-        
-        
-        
-
-        
-
-    
     }
 
     var course_data = {{unit_structure|safe}};
@@ -719,14 +709,17 @@ This will not be used because now only existing activities will be added.
           };
           result = undefined;
           sel_lesson_lang =  $('#lesson_lang').find(':selected').attr('data-sub-code');
+          lesson_desc = document.getElementById('lesson-desc').value;
+          console.log(sel_lesson_lang)
           $.ajax({
               type: "POST",
               data:{
                   'csrfmiddlewaretoken': "{{csrf_token}}",
                   "name": lessonName,
                   "lesson_id": lessonId,
+                  "lesson_desc": lesson_desc,
                   "unit_id": "{{unit_obj.pk}}",
-                  // "sel_lesson_lang":sel_lesson_lang
+                  "sel_lesson_lang":sel_lesson_lang
               },
               url: "{% url 'lesson_create_edit' group_id %}",
               // datatype: "",
