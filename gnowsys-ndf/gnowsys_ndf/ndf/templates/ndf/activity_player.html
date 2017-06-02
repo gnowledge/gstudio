@@ -105,10 +105,9 @@
               <div class="discussion-area activity_page_rendered" style="overflow-x:auto;overflow-y:hidden">
                 
                 {% if node_discussion %}
-                  {% get_thread_node node.pk as thread_node %}  
-                    {% if thread_node %}
-                        {% get_disc_replies thread_node group_id global_disc_all_replies as all_replies %}
-                        {% get_node thread_node as thread_node_obj %}
+                    {% get_thread_node node.pk as thread_node_obj %}
+                    {% if thread_node_obj %}
+                        {% get_disc_replies thread_node_obj.pk group_id global_disc_all_replies as all_replies %}
                         {% include 'ndf/in-line-texteditor.html' with node=thread_node_obj var_name="content_org" ckeditor_toolbar="LMSStudentsToolbar" %}
                     {% else %}
                         {% get_disc_replies node.pk group_id global_disc_all_replies as all_replies %}

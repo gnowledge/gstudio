@@ -966,3 +966,17 @@ class Command(BaseCommand):
                                 upsert=False, multi=True)
     if right_subj_update_res['updatedExisting']: # and res['nModified']:
         print "\n Added 'trans_node' _id in " + right_subj_update_res['n'].__str__() + " 'translation_of' right_subject instances."
+
+
+    # changing member_of from `activity` to `Page`
+    print "\nReplacing member_of field from 'activity' to'Page'"
+
+    activity_gst = node_collection.one({'_type': 'GSystemType', 'name': 'activity'})
+    activity_cur = node_collection.find({'member_of': activity_gst._id})
+    print "\n Activities found: ", activity_cur.count()
+    page_gst = node_collection.one({'_type': 'GSystemType', 'name': 'Page'})
+    wiki_page_gst = node_collection.one({'_type': 'GSystemType', 'name': 'Wiki page'})
+    activity_gs_mem_update_res = node_collection.collection.update({'member_of': activity_gst._id},
+        {'$set': {'member_of': [page_gst._id], 'type_of': [wiki_page_gst._id]}} ,upsert=False, multi=True)
+    if activity_gs_mem_update_res['updatedExisting']: # and res['nModified']:
+        print "\n Replaced member_of field from 'activity' to'Page' in " + activity_gs_mem_update_res['n'].__str__() + " instances."
