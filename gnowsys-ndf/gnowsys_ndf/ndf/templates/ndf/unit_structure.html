@@ -292,7 +292,7 @@ This will not be used because now only existing activities will be added.
    <div>
         <div class="small-3 columns left"><h3>Language Selection<h9 style="color:red">*</h9></h3></div>
         <div class="small-9 columns right">
-               <select class="lesson-lang" name="lan" id="lesson_lang" onchange="myLang()" style="height: 42px;">
+               <select disabled class="lesson-lang" name="lan" id="lesson_lang" onchange="myLang()" style="height: 42px;">
                     {% get_language_info_list for LANGUAGES as languages %}
                                         
                         {% for language in languages %}
@@ -499,6 +499,7 @@ This will not be used because now only existing activities will be added.
         $('.course-lessons').on('click', '.lesson_edit' ,function(e){
             e.stopPropagation();
             e.preventDefault();
+            $('.lesson-lang').removeAttr("disabled");
             var lesson_id = $(this).closest('a').attr('href').replace('#lesson-', '');
             var lesson_name = $(this).closest('a').attr('data_lesson_name');
             var lesson_language = $(this).closest('a').attr('data_lesson_language');
@@ -711,6 +712,7 @@ This will not be used because now only existing activities will be added.
           addLesson()
           - to add lesson of unit.
           */
+
           if (!lessonName) {
             alert('Name can not be empty. Please provide one.');
             return;
@@ -724,7 +726,7 @@ This will not be used because now only existing activities will be added.
                   "name": lessonName,
                   "lesson_id": lessonId,
                   "unit_id": "{{unit_obj.pk}}",
-                  "sel_lesson_lang":sel_lesson_lang
+                  // "sel_lesson_lang":sel_lesson_lang
               },
               url: "{% url 'lesson_create_edit' group_id %}",
               // datatype: "",
@@ -737,6 +739,7 @@ This will not be used because now only existing activities will be added.
                       // handle opening of tree till recently added node with data_dict.msg
                       $('#add-lesson-reveal').foundation('reveal', 'close');
                       result = true;
+
                   }
                   else{
                       alert(data_dict.msg);
@@ -966,6 +969,13 @@ This will not be used because now only existing activities will be added.
         $(document).on('closed.fndtn.reveal', '#add-lesson-reveal', function () {
             $("#lesson-name").val('');
             $('.save-lesson').attr('data-node-id', '');
+        });
+
+        $(document).on('open.fndtn.reveal', '#add-lesson-reveal', function () {
+            lesson_id_val = $("#add-lesson-reveal").find(".save-lesson").attr('data-node-id')
+            if(!lesson_id_val){
+                $('.lesson-lang').attr("disabled","disabled");
+            }
         });
         // END of foundation reveal modal events handling
 
