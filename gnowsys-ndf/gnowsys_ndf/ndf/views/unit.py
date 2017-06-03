@@ -15,10 +15,11 @@ from django.core.urlresolvers import reverse
 
 ''' -- imports from application folders/files -- '''
 from gnowsys_ndf.ndf.models import GSystemType, Group, Node, GSystem  #, Triple
-from gnowsys_ndf.ndf.models import node_collection
+from gnowsys_ndf.ndf.models import node_collection,triple_collection
 
 from gnowsys_ndf.ndf.views.group import CreateGroup
-from gnowsys_ndf.ndf.views.methods import get_execution_time, staff_required, create_gattribute,get_language_tuple
+from gnowsys_ndf.ndf.views.gcourse import get_lang_node
+from gnowsys_ndf.ndf.views.methods import get_execution_time, staff_required, create_gattribute,get_language_tuple,create_grelation
 from gnowsys_ndf.ndf.views.ajax_views import get_collection
 
 gst_base_unit_name, gst_base_unit_id = GSystemType.get_gst_name_id('base_unit')
@@ -171,7 +172,7 @@ def unit_detail(request, group_id):
     # parent_group_name, parent_group_id = Group.get_group_name_id(group_id)
     unit_group_obj = Group.get_group_name_id(group_id, get_obj=True)
 
-    unit_structure = _get_unit_hierarchy(unit_group_obj)
+    unit_structure = _get_unit_hierarchy(unit_group_obj,request.LANGUAGE_CODE)
     # template = "ndf/unit_structure.html"
     template = 'ndf/gevent_base.html'
 
@@ -309,11 +310,25 @@ def lesson_create_edit(request, group_id, unit_group_id=None):
                         language = get_language_tuple(lesson_language)
                         new_lesson_obj.language = language
                     new_lesson_obj.save(groupid=group_id)
-                    translate_grel = create_grelation(lesson_id, rt_translation_of, new_lesson_obj._id, language=language)
+                    
+                    trans_grel_list = [ObjectId(new_lesson_obj._id)]
+                    trans_grels = triple_collection.find({'_type': 'GRelation', \
+                            'relation_type': rt_translation_of._id,'subject': ObjectId(lesson_id)},{'_id': 0, 'right_subject': 1})
+                    for each_rel in trans_grels:
+                        trans_grel_list.append(each_rel['right_subject'])
+                    # translate_grel = create_grelation(node_id, rt_translation_of, trans_grel_list, language=language)
+
+                    create_grelation(lesson_id, rt_translation_of, trans_grel_list, language=language)
+
+
 
             lesson_obj = Node.get_node_by_id(lesson_id)
             if lesson_obj and (lesson_obj.name != lesson_name):
-                lesson_obj.name = lesson_name
+                trans_lesson = get_lang_node(lesson_obj._id,lesson_language)
+                if trans_lesson:
+                    trans_lesson.name = lesson_name
+                else:
+                    lesson_obj.name = lesson_name
                 # if lesson_language:
                 #     language = get_language_tuple(lesson_language)
                 #     lesson_obj.language = language
@@ -400,7 +415,7 @@ def activity_create_edit(request, group_id, lesson_id=None):
 
             lesson_obj.collection_set.append(new_activity_obj._id)
             lesson_obj.save(groupid=group_id)
-            unit_structure = _get_unit_hierarchy(unit_group_obj)
+            unit_structure = _get_unit_hierarchy(unit_group_obj,request.LANGUAGE_CODE)
 
             msg = u'Added activity under lesson: ' + lesson_obj.name
             result_dict = {'success': 1, 'unit_hierarchy': unit_structure, 'msg': str(new_activity_obj._id)}
@@ -409,7 +424,7 @@ def activity_create_edit(request, group_id, lesson_id=None):
     return HttpResponse(json.dumps(result_dict))
 
 
-def _get_unit_hierarchy(unit_group_obj):
+def _get_unit_hierarchy(unit_group_obj,lang="en"):
     '''
     ARGS: unit_group_obj
     Result will be of following form:
@@ -446,8 +461,12 @@ def _get_unit_hierarchy(unit_group_obj):
     for each in unit_group_obj.collection_set:
         lesson_dict ={}
         lesson = Node.get_node_by_id(each)
+        trans_lesson = get_lang_node(lesson._id,lang)
         if lesson:
-            lesson_dict['name'] = lesson.name
+            if trans_lesson:
+                lesson_dict['name'] = trans_lesson.name
+            else:
+                lesson_dict['name'] = lesson.name
             lesson_dict['type'] = 'lesson'
             lesson_dict['id'] = str(lesson._id)
             lesson_dict['language'] = lesson.language[0]
@@ -456,8 +475,12 @@ def _get_unit_hierarchy(unit_group_obj):
                 for each_act in lesson.collection_set:
                     activity_dict ={}
                     activity = Node.get_node_by_id(each_act)
+                    trans_act = get_lang_node(activity._id,lang)
                     if activity:
-                        activity_dict['name'] = activity.name
+                        if trans_act:
+                            activity_dict['name'] = trans_act.name
+                        else:
+                            activity_dict['name'] = activity.name
                         activity_dict['type'] = 'activity'
                         activity_dict['id'] = str(activity._id)
                         lesson_dict['activities'].append(activity_dict)
