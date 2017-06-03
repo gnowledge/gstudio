@@ -3528,8 +3528,7 @@ def _get_unit_hierarchy(unit_group_obj,lang="en"):
     for each in unit_group_obj.collection_set:
         lesson_dict ={}
         lesson = Node.get_node_by_id(each)
-        # trans_lesson = get_lang_node(< each Lesson >,'hi')
-        trans_lesson  = []
+        trans_lesson = get_lang_node(lesson._id,lang)
         if lesson:
             if trans_lesson:
                 lesson_dict['label'] = trans_lesson.name
