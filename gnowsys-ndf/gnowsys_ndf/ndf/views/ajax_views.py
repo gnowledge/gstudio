@@ -7012,3 +7012,13 @@ def remove_related_doc(request, group_id):
     rel_node = triple_collection.one({'right_subject':ObjectId(selected_obj),'subject':ObjectId(node_obj.pk)})
     delete_grelation(subject_id=ObjectId(node_obj.pk), deletion_type=1, **{'node_id': ObjectId(rel_node._id)})
     return HttpResponse('success')
+
+def get_translated_node(request, group_id):
+    node_id = request.GET.get('node_id', None)
+    language = request.GET.get('language', None)
+    node_obj = Node.get_node_by_id(node_id)
+    trans_node = get_lang_node(node_obj._id,language)
+    if trans_node:
+      return HttpResponse(json.dumps(trans_node, cls=NodeJSONEncoder))
+    else:
+      return HttpResponse(json.dumps(node_obj, cls=NodeJSONEncoder))

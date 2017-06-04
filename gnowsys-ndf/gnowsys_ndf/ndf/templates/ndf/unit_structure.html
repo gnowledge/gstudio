@@ -416,24 +416,22 @@ This will not be used because now only existing activities will be added.
     // ];
 
     function myLang(){
-        var x = document.getElementById("lesson_lang").value;
-        alert(x)
-        var en_name = "eng name"
-        var hi_name = "Hindi name"
-        var te_name = "telugu name"
+        var lang_val = document.getElementById("lesson_lang").value;
+        lesson_id =  $('.save-lesson').attr('data-node-id');
+        $.ajax({
+                  type: "GET",
+                  data:{
+                        'node_id':lesson_id,
+                        'language':lang_val
+                    },
+                  url: "{% url 'get_translated_node' group_id %}",
+                  datatype: "html",
+                  success: function(data) {
+                        data_dict = JSON.parse(data);
+                        $('#lesson-name').val(data_dict.name);   
+                }
+        });
 
-        if (x=='te'){
-            $('#lesson-name').val(te_name);
-            // alert('te')
-        } 
-        else if (x=='hi'){
-            $('#lesson-name').val(hi_name);
-            // alert('hi')
-        } 
-        else {
-            
-            $('#lesson-name').val(en_name);
-        }
     }
 
     var course_data = {{unit_structure|safe}};
@@ -512,6 +510,7 @@ This will not be used because now only existing activities will be added.
             $('#lesson-name').val(lesson_name);
 
             $('#add-lesson-reveal').foundation('reveal', 'open');
+            myLang();
             // addLesson(node_id, name)
         });
 
