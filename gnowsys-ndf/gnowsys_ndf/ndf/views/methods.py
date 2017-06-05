@@ -4843,7 +4843,7 @@ def delete_node(
                 # Search deleting-node's ObjectId in collection_set field and
                 # remove from it, if found any
                 res = node_collection.collection.update({
-                    "_type": "GSystem",
+                    "_type": {'$in': ['GSystem', 'Group']},
                     "collection_set": node_to_be_deleted._id
                 }, {
                     "$pull": {"collection_set": node_to_be_deleted._id}
