@@ -5093,22 +5093,21 @@ ul.nav_menu_1 {
     display: inline-block;
 }
 
-
-
 .transcript-toggler{
-    display: block;
-    width: 155px;
-    height: 30px;
-    margin: 0;
-    padding: 9px 16px 2px;
-    background: radial-gradient(hsla(259, 40%, 40%, 1), hsla(259, 40%,30%, 1));
-    border-radius: 0 0 5px 5px;
-    color: #fff;
-    cursor: pointer;
-    font-size: .75rem;
-    padding-top:7px !important;
-    text-transform: uppercase;
+        display: block;
+        width: 155px !important;
+        height: 30px;
+        margin-top: -14px !important;
+        padding: 9px 16px 2px;
+        background: radial-gradient(hsla(259, 40%, 40%, 1), hsla(259, 40%,30%, 1));
+        border-radius: 0 0 5px 5px;
+        color: #fff;
+        cursor: pointer;
+        font-size: .75rem;
+        padding-top:7px !important;
+        text-transform: uppercase;
 }
+
 
 .double-buttons{
     margin-top: 200px;

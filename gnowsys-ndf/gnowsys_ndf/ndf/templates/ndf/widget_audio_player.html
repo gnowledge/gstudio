@@ -21,7 +21,8 @@
 	{% if transcript_rel %}
 
 	<div>	
-      <button class="small radius transcript-toggler" onclick="togglerTranscript(this)">Transcript</button>
+      {# <button type = "button" class="small radius transcript-toggler" onclick="togglerTranscript(this)">Transcript</button> #}
+      <input type="button" class="small radius transcript-toggler" onclick="togglerTranscript(this)" value="Transcript">
       <div class="transcript-data hide">
       	<object type="text/html" data="{{MEDIA_URL}}{{transcript_rel.grel_node.if_file.original.relurl}}"></object>
       </div>
