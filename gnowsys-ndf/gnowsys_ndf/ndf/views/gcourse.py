@@ -2000,7 +2000,11 @@ def activity_player_detail(request, group_id, lesson_id, activity_id):
         trans_node = node_obj
     lesson_node = node_collection.one({'_id': ObjectId(lesson_id)})
     lesson_obj_collection_set = lesson_node.collection_set
-    
+    trans_lesson_node = get_lang_node(lesson_node._id,request.LANGUAGE_CODE)
+    if trans_lesson_node:
+        lesson_name = trans_lesson_node.name
+    else:
+        lesson_name  = lesson_node.name 
     # all metadata reg position and next prev of resource
 
     resource_index = resource_next_id = resource_prev_id = None
@@ -2034,7 +2038,8 @@ def activity_player_detail(request, group_id, lesson_id, activity_id):
         'resource_prev_id': resource_prev_id, 'resource_count': resource_count,
         # 'unit_resources_list_of_dict': unit_resources_list_of_dict,
         'trans_node':trans_node,
-        'act_list':trans_act_list
+        'act_list':trans_act_list,
+        'trans_lesson_name':lesson_name
     })
 
     if request.user.is_authenticated():
