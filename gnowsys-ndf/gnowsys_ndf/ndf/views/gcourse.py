@@ -35,7 +35,7 @@ from gnowsys_ndf.ndf.views.methods import get_node_common_fields, parse_template
 from gnowsys_ndf.ndf.views.notify import set_notif_val
 from gnowsys_ndf.ndf.views.group import *
 from gnowsys_ndf.ndf.views.methods import get_property_order_with_value, get_group_name_id, get_course_completetion_status, replicate_resource
-from gnowsys_ndf.ndf.views.ajax_views import get_collection
+from gnowsys_ndf.ndf.views.ajax_views import *
 from gnowsys_ndf.ndf.views.analytics_methods import *
 from gnowsys_ndf.ndf.views.methods import create_gattribute, create_grelation, create_task, delete_grelation, node_thread_access, get_group_join_status, delete_node
 from gnowsys_ndf.notification import models as notification
@@ -2000,7 +2000,11 @@ def activity_player_detail(request, group_id, lesson_id, activity_id):
         trans_node = node_obj
     lesson_node = node_collection.one({'_id': ObjectId(lesson_id)})
     lesson_obj_collection_set = lesson_node.collection_set
-    
+    trans_lesson_node = get_lang_node(lesson_node._id,request.LANGUAGE_CODE)
+    if trans_lesson_node:
+        lesson_name = trans_lesson_node.name
+    else:
+        lesson_name  = lesson_node.name 
     # all metadata reg position and next prev of resource
 
     resource_index = resource_next_id = resource_prev_id = None
@@ -2034,7 +2038,8 @@ def activity_player_detail(request, group_id, lesson_id, activity_id):
         'resource_prev_id': resource_prev_id, 'resource_count': resource_count,
         # 'unit_resources_list_of_dict': unit_resources_list_of_dict,
         'trans_node':trans_node,
-        'act_list':trans_act_list
+        'act_list':trans_act_list,
+        'trans_lesson_name':lesson_name
     })
 
     if request.user.is_authenticated():
@@ -3528,9 +3533,8 @@ def _get_unit_hierarchy(unit_group_obj,lang="en"):
     for each in unit_group_obj.collection_set:
         lesson_dict ={}
         lesson = Node.get_node_by_id(each)
-        # trans_lesson = get_lang_node(< each Lesson >,'hi')
-        trans_lesson  = []
         if lesson:
+            trans_lesson = get_lang_node(lesson._id,lang)
             if trans_lesson:
                 lesson_dict['label'] = trans_lesson.name
             else:
@@ -3542,8 +3546,8 @@ def _get_unit_hierarchy(unit_group_obj,lang="en"):
                 for each_act in lesson.collection_set:
                     activity_dict ={}
                     activity = Node.get_node_by_id(each_act)
-                    trans_act_name = get_lang_node(each_act,lang)
                     if activity:
+                        trans_act_name = get_lang_node(each_act,lang)
                         if trans_act_name:
                             activity_dict['label'] = trans_act_name.name
                         else:
@@ -3612,4 +3616,5 @@ def get_trans_node_list(node_list,lang):
         else:
             node = node_collection.one({"_id":ObjectId(each)})
             trans_node_list.append({ObjectId(node._id): {"name":node.name,"basenodeid":ObjectId(node._id)}})
-    return trans_node_list
+    if trans_node_list:
+        return trans_node_list

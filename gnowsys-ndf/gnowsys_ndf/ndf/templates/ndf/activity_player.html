@@ -1,7 +1,7 @@
 {% extends "ndf/gbase.html" %}
 {% load i18n %}
 
-{% block title %} {{lesson_node.name}}  {% endblock %}
+{% block title %} {{trans_lesson_name}}  {% endblock %}
 
 {% load ndf_tags %}
 {% check_is_gstaff group_id request.user as is_gstaff %}
@@ -60,8 +60,8 @@
         <div class="course_editor ">
           <div class="small-3 columns">
             <div class="course_tree">
-              <div class="lesson-title" title="{{lesson_node.name}}">
-                  <b>{{lesson_node.name}}</b>
+              <div class="lesson-title" title="{{trans_lesson_name}}">
+                  <b>{{trans_lesson_name}}</b>
               </div>
               <div class="activity-title">
               {% for each in act_list %}
