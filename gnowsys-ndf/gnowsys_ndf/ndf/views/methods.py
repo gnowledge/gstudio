@@ -5496,6 +5496,7 @@ def create_clone(user_id, node, group_id, mem_of_node=None):
         # cloned_copy['prior_node'] = node.prior_node
         cloned_copy['contributors'] = [int(user_id)]
         cloned_copy['post_node'] = []
+        cloned_copy['collection_set'] = []
         cloned_copy['prior_node'] = []
         cloned_copy['relation_set'] = []
         cloned_copy['attribute_set'] = []
