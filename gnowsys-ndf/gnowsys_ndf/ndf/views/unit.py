@@ -172,7 +172,7 @@ def unit_detail(request, group_id):
     # parent_group_name, parent_group_id = Group.get_group_name_id(group_id)
     unit_group_obj = Group.get_group_name_id(group_id, get_obj=True)
 
-    unit_structure = _get_unit_hierarchy(unit_group_obj,request.LANGUAGE_CODE)
+    unit_structure = _get_unit_hierarchy(unit_group_obj, request.LANGUAGE_CODE)
     # template = "ndf/unit_structure.html"
     template = 'ndf/gevent_base.html'
 
@@ -238,9 +238,9 @@ def lesson_create_edit(request, group_id, unit_group_id=None):
     lesson_language = request.POST.get('sel_lesson_lang','')
     unit_id_post = request.POST.get('unit_id', '')
     lesson_content = request.POST.get('lesson_desc', '')
-    print "lesson_id: ", lesson_id
-    print "lesson_language: ", lesson_language
-    print "unit_id_post: ", unit_id_post
+    # print "lesson_id: ", lesson_id
+    # print "lesson_language: ", lesson_language
+    # print "unit_id_post: ", unit_id_post
     unit_group_id = unit_id_post if unit_id_post else unit_group_id
     # getting parent unit object
     unit_group_obj = Group.get_group_name_id(unit_group_id, get_obj=True)
@@ -334,7 +334,7 @@ def lesson_create_edit(request, group_id, unit_group_id=None):
                 #     lesson_obj.language = language
                 lesson_obj.save(group_id=group_id)
 
-                unit_structure = _get_unit_hierarchy(unit_group_obj)
+                unit_structure = _get_unit_hierarchy(unit_group_obj, request.LANGUAGE_CODE)
                 msg = u'Lesson name updated.'
                 result_dict = {'success': 1, 'unit_hierarchy': unit_structure, 'msg': str(lesson_obj._id)}
 
@@ -355,7 +355,7 @@ def lesson_create_edit(request, group_id, unit_group_id=None):
             unit_group_obj.collection_set.append(new_lesson_obj._id)
             unit_group_obj.save(groupid=group_id)
 
-            unit_structure = _get_unit_hierarchy(unit_group_obj)
+            unit_structure = _get_unit_hierarchy(unit_group_obj, request.LANGUAGE_CODE)
 
             msg = u'Added lesson under lesson: ' + unit_group_obj.name
             result_dict = {'success': 1, 'unit_hierarchy': unit_structure, 'msg': str(new_lesson_obj._id)}
@@ -415,7 +415,7 @@ def activity_create_edit(request, group_id, lesson_id=None):
 
             lesson_obj.collection_set.append(new_activity_obj._id)
             lesson_obj.save(groupid=group_id)
-            unit_structure = _get_unit_hierarchy(unit_group_obj,request.LANGUAGE_CODE)
+            unit_structure = _get_unit_hierarchy(unit_group_obj, request.LANGUAGE_CODE)
 
             msg = u'Added activity under lesson: ' + lesson_obj.name
             result_dict = {'success': 1, 'unit_hierarchy': unit_structure, 'msg': str(new_activity_obj._id)}
