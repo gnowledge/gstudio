@@ -486,6 +486,13 @@ CKEDITOR.plugins.add('addJhapp',
                              CKEDITOR.instances[textAreaId].insertHtml(icl_val_l4a2_te);
                             $('#group_imgs_on_modal').foundation('reveal', 'close');
                           });
+
+                            $("#insert_find_the_rate").click(function(event){
+                                ftr_val = "<iframe src='/FindTheRateProportionalReasoning/' style='height:100vh;width:100%'></iframe>"
+                            
+                             CKEDITOR.instances[textAreaId].insertHtml(ftr_val);
+                            $('#group_imgs_on_modal').foundation('reveal', 'close');
+                          });
                             
 
                         }
