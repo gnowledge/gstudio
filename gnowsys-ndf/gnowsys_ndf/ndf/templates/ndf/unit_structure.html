@@ -964,6 +964,7 @@ This will not be used because now only existing activities will be added.
         $(document).on('closed.fndtn.reveal', '#add-lesson-reveal', function () {
             $("#lesson-name").val('');
             $('.save-lesson').attr('data-node-id', '');
+            $("#lesson_lang").prop('selectedIndex',0);
         });
 
         $(document).on('open.fndtn.reveal', '#add-lesson-reveal', function () {
