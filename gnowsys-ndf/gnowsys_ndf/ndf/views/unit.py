@@ -320,8 +320,6 @@ def lesson_create_edit(request, group_id, unit_group_id=None):
 
                     create_grelation(lesson_id, rt_translation_of, trans_grel_list, language=language)
 
-
-
             lesson_obj = Node.get_node_by_id(lesson_id)
             if lesson_obj and (lesson_obj.name != lesson_name):
                 trans_lesson = get_lang_node(lesson_obj._id,lesson_language)
@@ -337,6 +335,10 @@ def lesson_create_edit(request, group_id, unit_group_id=None):
                 unit_structure = _get_unit_hierarchy(unit_group_obj, request.LANGUAGE_CODE)
                 msg = u'Lesson name updated.'
                 result_dict = {'success': 1, 'unit_hierarchy': unit_structure, 'msg': str(lesson_obj._id)}
+            else:
+                unit_structure = _get_unit_hierarchy(unit_group_obj, request.LANGUAGE_CODE)
+                msg = u'Nothing to update.'
+                result_dict = {'success': 1, 'unit_hierarchy': unit_structure, 'msg': msg}
 
         else: # creating a fresh lesson object
             user_id = request.user.id
