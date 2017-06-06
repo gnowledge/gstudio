@@ -4902,7 +4902,7 @@ ul.nav_menu_1 > li > a.selected, ul.nav_menu_1 > li > a:hover {
   display: inline-block;
 }
 
-/* line 5096, ../../../scss/_clix2017.scss */
+/* line 5107, ../../../scss/_clix2017.scss */
 .transcript-toggler {
   display: block;
   width: 155px !important;
@@ -4918,18 +4918,18 @@ ul.nav_menu_1 > li > a.selected, ul.nav_menu_1 > li > a:hover {
   text-transform: uppercase;
 }
 
-/* line 5112, ../../../scss/_clix2017.scss */
+/* line 5123, ../../../scss/_clix2017.scss */
 .double-buttons {
-  margin-top: 200px;
+  margin-top: 100px;
   margin-left: 729px;
 }
 
-/* line 5117, ../../../scss/_clix2017.scss */
+/* line 5128, ../../../scss/_clix2017.scss */
 .lesson-form-name {
   padding-top: 10px;
 }
 
-/* line 5121, ../../../scss/_clix2017.scss */
+/* line 5132, ../../../scss/_clix2017.scss */
 .lesson-form-desc {
   padding-top: 25px;
 }
