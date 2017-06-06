@@ -41,18 +41,36 @@ CKEDITOR.plugins.add('addJhapp',
                             $('#group_imgs_on_modal').foundation('reveal', 'close');
                           });
                             
-                            $("#insert_policequad").click(function(event){
+                            $("#insert_policequad_en").click(function(event){
                             
 
-                            pq_text_val = "<a href='/policequad' target='_blank'><img src='/static/ndf/images/PoliceQuad_pt33x.png' alt='Police quad thumbnail'  height='1000px' width='1000px' >"
+                            pq_text_val_en = "<a href='policequad/en/' target='_blank'><img src='/static/ndf/images/PoliceQuad_pt33x.png' alt='Police quad thumbnail'  height='1000px' width='1000px' >"
                             
-                             CKEDITOR.instances[textAreaId].insertHtml(pq_text_val);
+                             CKEDITOR.instances[textAreaId].insertHtml(pq_text_val_en);
                             $('#group_imgs_on_modal').foundation('reveal', 'close');
                           });
+
+                            $("#insert_policequad_hi").click(function(event){
+                            
+
+                            pq_text_val_hi = "<a href='policequad/hi/' target='_blank'><img src='/static/ndf/images/PoliceQuad_pt33x.png' alt='Police quad thumbnail'  height='1000px' width='1000px' >"
+                            
+                             CKEDITOR.instances[textAreaId].insertHtml(pq_text_val_hi);
+                            $('#group_imgs_on_modal').foundation('reveal', 'close');
+                          }); 
+                            $("#insert_policequad_te").click(function(event){
+                            
+
+                            pq_text_val_te = "<a href='policequad/te/' target='_blank'><img src='/static/ndf/images/PoliceQuad_pt33x.png' alt='Police quad thumbnail'  height='1000px' width='1000px' >"
+                            
+                             CKEDITOR.instances[textAreaId].insertHtml(pq_text_val_te);
+                            $('#group_imgs_on_modal').foundation('reveal', 'close');
+                          });
+
                             $("#insert_runkittyrun").click(function(event){
                             //ost_text_gallery = $('#paste-ost-gallery').val();
                             //ost_text_file = $('#paste-ost-captions').val();
-                            bm_text_val = "<a href='/runkittyrun/' target='_blank'><img src='/static/ndf/images/RKR.jpg' alt='Run Kitty Run' height='1000px' width='1000px' >"
+                            bm_text_val = "<a href='runkittyrun' target='_blank'><img src='/static/ndf/images/RKR.jpg' alt='Run Kitty Run' height='1000px' width='1000px' >"
                             // split_word = ost_text_val.slice(0, 18) + "gallery=" + ost_text_gallery + "&amp;file=/ost/" + ost_text_file+"'"+ ost_text_val.slice(18);
                             // alert(split_word)
                              CKEDITOR.instances[textAreaId].insertHtml(bm_text_val);
@@ -67,6 +85,15 @@ CKEDITOR.plugins.add('addJhapp',
                              CKEDITOR.instances[textAreaId].insertHtml(tjs_text_val);
                             $('#group_imgs_on_modal').foundation('reveal', 'close');
                           });
+                            $("#insert_geogebra_geometric_reasoning").click(function(event){
+                            //ost_text_gallery = $('#paste-ost-gallery').val();
+                            //ost_text_file = $('#paste-ost-captions').val();
+                            ggr_text_val = "<iframe src='/GeogebraGeometricReasoning/' style='height:100vh;width:100%'></iframe>"
+                            // split_word = ost_text_val.slice(0, 18) + "gallery=" + ost_text_gallery + "&amp;file=/ost/" + ost_text_file+"'"+ ost_text_val.slice(18);
+                            // alert(split_word)
+                             CKEDITOR.instances[textAreaId].insertHtml(ggr_text_val);
+                            $('#group_imgs_on_modal').foundation('reveal', 'close');
+                          });
 
                             $("#insert_physics-video-player").click(function(event){
                             //ost_text_gallery = $('#paste-ost-gallery').val();
@@ -77,42 +104,244 @@ CKEDITOR.plugins.add('addJhapp',
                              CKEDITOR.instances[textAreaId].insertHtml(tjs_text_val);
                             $('#group_imgs_on_modal').foundation('reveal', 'close');
                           });
-                            $("#insert_geogebra_proportional_reasoning").click(function(event){
-                            gpr_text_val = "<iframe src='/Geogebra-Proportional-Reasoning/' style='height:100vh;width:100%'></iframe>"
+                            $("#insert_geogebra_proportional_reasoning1").click(function(event){
+                            gpr1_text_val = "<iframe src='/GeogebraProportionalReasoning1/' style='height:100vh;width:100%'></iframe>"
                             
-                             CKEDITOR.instances[textAreaId].insertHtml(gpr_text_val);
+                             CKEDITOR.instances[textAreaId].insertHtml(gpr1_text_val);
                             $('#group_imgs_on_modal').foundation('reveal', 'close');
                           });
-                            $("#insert_fst_l1_a1").click(function(event){
-                                fst_val_a1 = "<a href='/FoodSharingTool/en/L1A1/' target='_blank'><img src='/static/ndf/images/FST.png' alt='Food Sharing Tool' height='1000px' width='1000px' >"
+                            $("#insert_geogebra_proportional_reasoning2_a1_q1").click(function(event){
+                            gpr2_a1_q1_text_val = "<iframe src='/GeogebraProportionalReasoning2/PR-unit2-activity1-q1/' style='height:100vh;width:100%'></iframe>"
+                            
+                             CKEDITOR.instances[textAreaId].insertHtml(gpr2_a1_q1_text_val);
+                            $('#group_imgs_on_modal').foundation('reveal', 'close');
+                          });
+                            $("#insert_geogebra_proportional_reasoning2_a1_q3").click(function(event){
+                            gpr2_a1_q3_text_val = "<iframe src='/GeogebraProportionalReasoning2/PR-unit2-activity1-q3/' style='height:100vh;width:100%'></iframe>"
+                            
+                             CKEDITOR.instances[textAreaId].insertHtml(gpr2_a1_q3_text_val);
+                            $('#group_imgs_on_modal').foundation('reveal', 'close');
+                          });
+                            $("#insert_geogebra_proportional_reasoning2_a2_q1").click(function(event){
+                            gpr2_a2_q1_text_val = "<iframe src='/GeogebraProportionalReasoning2/PR-unit2-activity2-q1/' style='height:100vh;width:100%'></iframe>"
+                            
+                             CKEDITOR.instances[textAreaId].insertHtml(gpr2_a2_q1_text_val);
+                            $('#group_imgs_on_modal').foundation('reveal', 'close');
+                          });
+                            $("#insert_fst_l1_a1_en").click(function(event){
+                                fst_val_a1_en = "<a href='/FoodSharingTool/en/L1A1/' target='_blank'><img src='/static/ndf/images/FST.png' alt='Food Sharing Tool' height='1000px' width='1000px' >"
                                 
                             
-                             CKEDITOR.instances[textAreaId].insertHtml(fst_val_a1);
+                             CKEDITOR.instances[textAreaId].insertHtml(fst_val_a1_en);
                             $('#group_imgs_on_modal').foundation('reveal', 'close');
                           });
-                            $("#insert_fst_l1_a2").click(function(event){
-                                fst_val_a2 = "<a href='/FoodSharingTool/en/L1A2/' target='_blank'><img src='/static/ndf/images/FST.png' alt='Food Sharing Tool' height='1000px' width='1000px' >"
+                            $("#insert_fst_l1_a2_en").click(function(event){
+                                fst_val_a2_en = "<a href='/FoodSharingTool/en/L1A2/' target='_blank'><img src='/static/ndf/images/FST.png' alt='Food Sharing Tool' height='1000px' width='1000px' >"
                             
-                             CKEDITOR.instances[textAreaId].insertHtml(fst_val_a2);
+                             CKEDITOR.instances[textAreaId].insertHtml(fst_val_a2_en);
                             $('#group_imgs_on_modal').foundation('reveal', 'close');
                           });
-                            $("#insert_fst_l1_a3").click(function(event){
-                                fst_val_a3 = "<a href='/FoodSharingTool/en/L1A3/' target='_blank'><img src='/static/ndf/images/FST.png' alt='Food Sharing Tool' height='1000px' width='1000px' >"
+                            $("#insert_fst_l1_a3_en").click(function(event){
+                                fst_val_a3_en = "<a href='/FoodSharingTool/en/L1A3/' target='_blank'><img src='/static/ndf/images/FST.png' alt='Food Sharing Tool' height='1000px' width='1000px' >"
                             
-                             CKEDITOR.instances[textAreaId].insertHtml(fst_val_a3);
+                             CKEDITOR.instances[textAreaId].insertHtml(fst_val_a3_en);
                             $('#group_imgs_on_modal').foundation('reveal', 'close');
                           });
-                            $("#insert_fst_l1_a4").click(function(event){
-                                fst_val_a4 = "<a href='/FoodSharingTool/en/L1A4/' target='_blank'><img src='/static/ndf/images/FST.png' alt='Food Sharing Tool' height='1000px' width='1000px' >"
+                            $("#insert_fst_l1_a4_en").click(function(event){
+                                fst_val_a4_en = "<a href='/FoodSharingTool/en/L1A4/' target='_blank'><img src='/static/ndf/images/FST.png' alt='Food Sharing Tool' height='1000px' width='1000px' >"
                             
-                             CKEDITOR.instances[textAreaId].insertHtml(fst_val_a4);
+                             CKEDITOR.instances[textAreaId].insertHtml(fst_val_a4_en);
                             $('#group_imgs_on_modal').foundation('reveal', 'close');
                           });
+                            $("#insert_fst_l2_a1_en").click(function(event){
+                                fst_val_l2_a1_en = "<a href='/FoodSharingTool/en/L2A1/' target='_blank'><img src='/static/ndf/images/FST.png' alt='Food Sharing Tool' height='1000px' width='1000px' >"
+                            
+                             CKEDITOR.instances[textAreaId].insertHtml(fst_val_a4_en);
+                            $('#group_imgs_on_modal').foundation('reveal', 'close');
+                          });
+                            $("#insert_fst_l2_a2_en").click(function(event){
+                                fst_val_l2_a2_en = "<a href='/FoodSharingTool/en/L2A2/' target='_blank'><img src='/static/ndf/images/FST.png' alt='Food Sharing Tool' height='1000px' width='1000px' >"
+                            
+                             CKEDITOR.instances[textAreaId].insertHtml(fst_val_l2_a2_en);
+                            $('#group_imgs_on_modal').foundation('reveal', 'close');
+                          });
+                            $("#insert_fst_l2_a3_en").click(function(event){
+                                fst_val_l2_a3_en = "<a href='/FoodSharingTool/en/L2A3/' target='_blank'><img src='/static/ndf/images/FST.png' alt='Food Sharing Tool' height='1000px' width='1000px' >"
+                            
+                             CKEDITOR.instances[textAreaId].insertHtml(fst_val_l2_a3_en);
+                            $('#group_imgs_on_modal').foundation('reveal', 'close');
+                          });
+                            $("#insert_fst_l2_a4_en").click(function(event){
+                                fst_val_l2_a4_en = "<a href='/FoodSharingTool/en/L2A4/' target='_blank'><img src='/static/ndf/images/FST.png' alt='Food Sharing Tool' height='1000px' width='1000px' >"
+                            
+                             CKEDITOR.instances[textAreaId].insertHtml(fst_val_l2_a4_en);
+                            $('#group_imgs_on_modal').foundation('reveal', 'close');
+                          });
+                            $("#insert_fst_l3_a1_en").click(function(event){
+                                fst_val_l3_a1_en = "<a href='/FoodSharingTool/en/L3A1/' target='_blank'><img src='/static/ndf/images/FST.png' alt='Food Sharing Tool' height='1000px' width='1000px' >"
+                            
+                             CKEDITOR.instances[textAreaId].insertHtml(fst_val_l3_a1_en);
+                            $('#group_imgs_on_modal').foundation('reveal', 'close');
+                          });
+                            $("#insert_fst_l3_a2_en").click(function(event){
+                                fst_val_l3_a2_en = "<a href='/FoodSharingTool/en/L3A2/' target='_blank'><img src='/static/ndf/images/FST.png' alt='Food Sharing Tool' height='1000px' width='1000px' >"
+                            
+                             CKEDITOR.instances[textAreaId].insertHtml(fst_val_l3_a2_en);
+                            $('#group_imgs_on_modal').foundation('reveal', 'close');
+                          });
+                            $("#insert_fst_l3_a3_en").click(function(event){
+                                fst_val_l3_a3_en = "<a href='/FoodSharingTool/en/L3A3/' target='_blank'><img src='/static/ndf/images/FST.png' alt='Food Sharing Tool' height='1000px' width='1000px' >"
+                            
+                             CKEDITOR.instances[textAreaId].insertHtml(fst_val_l3_a3_en);
+                            $('#group_imgs_on_modal').foundation('reveal', 'close');
+                          });
+                            $("#insert_fst_l1_a1_hi").click(function(event){
+                                fst_val_l1_a1_hi = "<a href='/FoodSharingTool/hi/L1A1/' target='_blank'><img src='/static/ndf/images/FST.png' alt='Food Sharing Tool' height='1000px' width='1000px' >"
+                            
+                             CKEDITOR.instances[textAreaId].insertHtml(fst_val_l1_a1_hi);
+                            $('#group_imgs_on_modal').foundation('reveal', 'close');
+                          });
+                            $("#insert_fst_l1_a2_hi").click(function(event){
+                                fst_val_l1_a2_hi = "<a href='/FoodSharingTool/hi/L1A2/' target='_blank'><img src='/static/ndf/images/FST.png' alt='Food Sharing Tool' height='1000px' width='1000px' >"
+                            
+                             CKEDITOR.instances[textAreaId].insertHtml(fst_val_l1_a2_hi);
+                            $('#group_imgs_on_modal').foundation('reveal', 'close');
+                          });
+                            $("#insert_fst_l1_a3_hi").click(function(event){
+                                fst_val_l1_a3_hi = "<a href='/FoodSharingTool/hi/L1A3/' target='_blank'><img src='/static/ndf/images/FST.png' alt='Food Sharing Tool' height='1000px' width='1000px' >"
+                            
+                             CKEDITOR.instances[textAreaId].insertHtml(fst_val_l1_a3_hi);
+                            $('#group_imgs_on_modal').foundation('reveal', 'close');
+                          });
+                            $("#insert_fst_l1_a4_hi").click(function(event){
+                                fst_val_l1_a4_hi = "<a href='/FoodSharingTool/hi/L1A4/' target='_blank'><img src='/static/ndf/images/FST.png' alt='Food Sharing Tool' height='1000px' width='1000px' >"
+                            
+                             CKEDITOR.instances[textAreaId].insertHtml(fst_val_l1_a4_hi);
+                            $('#group_imgs_on_modal').foundation('reveal', 'close');
+                          });
+                            $("#insert_fst_l2_a1_hi").click(function(event){
+                                fst_val_l2_a1_hi = "<a href='/FoodSharingTool/hi/L2A1/' target='_blank'><img src='/static/ndf/images/FST.png' alt='Food Sharing Tool' height='1000px' width='1000px' >"
+                            
+                             CKEDITOR.instances[textAreaId].insertHtml(fst_val_l2_a1_hi);
+                            $('#group_imgs_on_modal').foundation('reveal', 'close');
+                          });
+                            $("#insert_fst_l2_a2_hi").click(function(event){
+                                fst_val_l2_a2_hi = "<a href='/FoodSharingTool/hi/L2A2/' target='_blank'><img src='/static/ndf/images/FST.png' alt='Food Sharing Tool' height='1000px' width='1000px' >"
+                            
+                             CKEDITOR.instances[textAreaId].insertHtml(fst_val_l2_a2_hi);
+                            $('#group_imgs_on_modal').foundation('reveal', 'close');
+                          });
+                            $("#insert_fst_l2_a3_hi").click(function(event){
+                                fst_val_l2_a3_hi = "<a href='/FoodSharingTool/hi/L2A3/' target='_blank'><img src='/static/ndf/images/FST.png' alt='Food Sharing Tool' height='1000px' width='1000px' >"
+                            
+                             CKEDITOR.instances[textAreaId].insertHtml(fst_val_l2_a3_hi);
+                            $('#group_imgs_on_modal').foundation('reveal', 'close');
+                          });
+                            $("#insert_fst_l2_a4_hi").click(function(event){
+                                fst_val_l2_a4_hi = "<a href='/FoodSharingTool/hi/L2A4/' target='_blank'><img src='/static/ndf/images/FST.png' alt='Food Sharing Tool' height='1000px' width='1000px' >"
+                            
+                             CKEDITOR.instances[textAreaId].insertHtml(fst_val_l2_a4_hi);
+                            $('#group_imgs_on_modal').foundation('reveal', 'close');
+                          });
+                            $("#insert_fst_l3_a1_hi").click(function(event){
+                                fst_val_l3_a1_hi = "<a href='/FoodSharingTool/hi/L3A1/' target='_blank'><img src='/static/ndf/images/FST.png' alt='Food Sharing Tool' height='1000px' width='1000px' >"
+                            
+                             CKEDITOR.instances[textAreaId].insertHtml(fst_val_l3_a1_hi);
+                            $('#group_imgs_on_modal').foundation('reveal', 'close');
+                          });
+                            $("#insert_fst_l3_a2_hi").click(function(event){
+                                fst_val_l3_a2_hi = "<a href='/FoodSharingTool/hi/L3A2/' target='_blank'><img src='/static/ndf/images/FST.png' alt='Food Sharing Tool' height='1000px' width='1000px' >"
+                            
+                             CKEDITOR.instances[textAreaId].insertHtml(fst_val_l3_a2_hi);
+                            $('#group_imgs_on_modal').foundation('reveal', 'close');
+                          });
+                            $("#insert_fst_l3_a3_hi").click(function(event){
+                                fst_val_l3_a3_hi = "<a href='/FoodSharingTool/hi/L3A3/' target='_blank'><img src='/static/ndf/images/FST.png' alt='Food Sharing Tool' height='1000px' width='1000px' >"
+                            
+                             CKEDITOR.instances[textAreaId].insertHtml(fst_val_l3_a3_hi);
+                            $('#group_imgs_on_modal').foundation('reveal', 'close');
+                          });
+                             $("#insert_fst_l1_a1_te").click(function(event){
+                                fst_val_l1_a1_te = "<a href='/FoodSharingTool/te/L1A1/' target='_blank'><img src='/static/ndf/images/FST.png' alt='Food Sharing Tool' height='1000px' width='1000px' >"
+                            
+                             CKEDITOR.instances[textAreaId].insertHtml(fst_val_l1_a1_te);
+                            $('#group_imgs_on_modal').foundation('reveal', 'close');
+                          });
+                            $("#insert_fst_l1_a2_te").click(function(event){
+                                fst_val_l1_a2_te = "<a href='/FoodSharingTool/te/L1A2/' target='_blank'><img src='/static/ndf/images/FST.png' alt='Food Sharing Tool' height='1000px' width='1000px' >"
+                            
+                             CKEDITOR.instances[textAreaId].insertHtml(fst_val_l1_a2_te);
+                            $('#group_imgs_on_modal').foundation('reveal', 'close');
+                          });
+                            $("#insert_fst_l1_a3_te").click(function(event){
+                                fst_val_l1_a3_te = "<a href='/FoodSharingTool/te/L1A3/' target='_blank'><img src='/static/ndf/images/FST.png' alt='Food Sharing Tool' height='1000px' width='1000px' >"
+                            
+                             CKEDITOR.instances[textAreaId].insertHtml(fst_val_l1_a3_hi);
+                            $('#group_imgs_on_modal').foundation('reveal', 'close');
+                          });
+                            $("#insert_fst_l1_a4_te").click(function(event){
+                                fst_val_l1_a4_te = "<a href='/FoodSharingTool/te/L1A4/' target='_blank'><img src='/static/ndf/images/FST.png' alt='Food Sharing Tool' height='1000px' width='1000px' >"
+                            
+                             CKEDITOR.instances[textAreaId].insertHtml(fst_val_l1_a4_te);
+                            $('#group_imgs_on_modal').foundation('reveal', 'close');
+                          });
+                            $("#insert_fst_l2_a1_te").click(function(event){
+                                fst_val_l2_a1_te = "<a href='/FoodSharingTool/te/L2A1/' target='_blank'><img src='/static/ndf/images/FST.png' alt='Food Sharing Tool' height='1000px' width='1000px' >"
+                            
+                             CKEDITOR.instances[textAreaId].insertHtml(fst_val_l2_a1_te);
+                            $('#group_imgs_on_modal').foundation('reveal', 'close');
+                          });
+                            $("#insert_fst_l2_a2_te").click(function(event){
+                                fst_val_l2_a2_te = "<a href='/FoodSharingTool/te/L2A2/' target='_blank'><img src='/static/ndf/images/FST.png' alt='Food Sharing Tool' height='1000px' width='1000px' >"
+                            
+                             CKEDITOR.instances[textAreaId].insertHtml(fst_val_l2_a2_te);
+                            $('#group_imgs_on_modal').foundation('reveal', 'close');
+                          });
+                            $("#insert_fst_l2_a3_te").click(function(event){
+                                fst_val_l2_a3_te = "<a href='/FoodSharingTool/te/L2A3/' target='_blank'><img src='/static/ndf/images/FST.png' alt='Food Sharing Tool' height='1000px' width='1000px' >"
+                            
+                             CKEDITOR.instances[textAreaId].insertHtml(fst_val_l2_a3_te);
+                            $('#group_imgs_on_modal').foundation('reveal', 'close');
+                          });
+                            $("#insert_fst_l2_a4_te").click(function(event){
+                                fst_val_l2_a4_te = "<a href='/FoodSharingTool/te/L2A4/' target='_blank'><img src='/static/ndf/images/FST.png' alt='Food Sharing Tool' height='1000px' width='1000px' >"
+                            
+                             CKEDITOR.instances[textAreaId].insertHtml(fst_val_l2_a4_te);
+                            $('#group_imgs_on_modal').foundation('reveal', 'close');
+                          });
+                            $("#insert_fst_l3_a1_te").click(function(event){
+                                fst_val_l3_a1_te = "<a href='/FoodSharingTool/te/L3A1/' target='_blank'><img src='/static/ndf/images/FST.png' alt='Food Sharing Tool' height='1000px' width='1000px' >"
+                            
+                             CKEDITOR.instances[textAreaId].insertHtml(fst_val_l3_a1_te);
+                            $('#group_imgs_on_modal').foundation('reveal', 'close');
+                          });
+                            $("#insert_fst_l3_a2_te").click(function(event){
+                                fst_val_l3_a2_te = "<a href='/FoodSharingTool/te/L3A2/' target='_blank'><img src='/static/ndf/images/FST.png' alt='Food Sharing Tool' height='1000px' width='1000px' >"
+                            
+                             CKEDITOR.instances[textAreaId].insertHtml(fst_val_l3_a2_te);
+                            $('#group_imgs_on_modal').foundation('reveal', 'close');
+                          });
+                            $("#insert_fst_l3_a3_te").click(function(event){
+                                fst_val_l3_a3_te = "<a href='/FoodSharingTool/te/L3A3/' target='_blank'><img src='/static/ndf/images/FST.png' alt='Food Sharing Tool' height='1000px' width='1000px' >"
+                            
+                             CKEDITOR.instances[textAreaId].insertHtml(fst_val_l3_a3_te);
+                            $('#group_imgs_on_modal').foundation('reveal', 'close');
+                          });
+
+
+
+
+
+
+
+
+
+
                             $("#insert_rp_l2a1").click(function(event){
 
                                 rp_val_l2a1 = "<a href='/RatioPattens/en/L2A1/' target='_blank'><img src='/static/ndf/images/RP.png' alt='Ratio Patterns Tool' height='1000px' width='1000px' >"
                             
-                             CKEDITOR.instances[textAreaId].insertHtml(rp_val_l2a);
+                             CKEDITOR.instances[textAreaId].insertHtml(rp_val_l2a1);
                             $('#group_imgs_on_modal').foundation('reveal', 'close');
                           });
                             $("#insert_rp_l2a2").click(function(event){
@@ -145,6 +374,119 @@ CKEDITOR.plugins.add('addJhapp',
                              CKEDITOR.instances[textAreaId].insertHtml(rp_val_l2a6);
                             $('#group_imgs_on_modal').foundation('reveal', 'close');
                           });
+
+                            $("#insert_rp_l2a1_hi").click(function(event){
+
+                                rp_val_l2a1_hi = "<a href='/RatioPattens/hi/L2A1/' target='_blank'><img src='/static/ndf/images/RP.png' alt='Ratio Patterns Tool' height='1000px' width='1000px' >"
+                            
+                             CKEDITOR.instances[textAreaId].insertHtml(rp_val_l2a1_hi);
+                            $('#group_imgs_on_modal').foundation('reveal', 'close');
+                          });
+                            $("#insert_rp_l2a2_hi").click(function(event){
+                                rp_val_l2a2_hi = "<a href='/RatioPattens/hi/L2A2/' target='_blank'><img src='/static/ndf/images/RP.png' alt='Ratio Patterns Tool' height='1000px' width='1000px' >"
+                            
+                             CKEDITOR.instances[textAreaId].insertHtml(rp_val_l2a2_hi);
+                            $('#group_imgs_on_modal').foundation('reveal', 'close');
+                          });
+                            $("#insert_rp_l2a3_hi").click(function(event){
+                                rp_val_l2a3_hi = "<a href='/RatioPattens/hi/L2A3/' target='_blank'><img src='/static/ndf/images/RP.png' alt='Ratio Patterns Tool' height='1000px' width='1000px' >"
+                            
+                             CKEDITOR.instances[textAreaId].insertHtml(rp_val_l2a3_hi);
+                            $('#group_imgs_on_modal').foundation('reveal', 'close');
+                          });
+                            $("#insert_rp_l2a4_hi").click(function(event){
+                                rp_val_l2a4_hi = "<a href='/RatioPattens/hi/L2A4/' target='_blank'><img src='/static/ndf/images/RP.png' alt='Ratio Patterns Tool' height='1000px' width='1000px' >"
+                            
+                             CKEDITOR.instances[textAreaId].insertHtml(rp_val_l2a4_hi);
+                            $('#group_imgs_on_modal').foundation('reveal', 'close');
+                          });
+                            $("#insert_rp_l2a5_hi").click(function(event){
+                                rp_val_l2a5_hi = "<a href='/RatioPattens/hi/L2A5/' target='_blank'><img src='/static/ndf/images/RP.png' alt='Ratio Patterns Tool' height='1000px' width='1000px' >"
+                            
+                             CKEDITOR.instances[textAreaId].insertHtml(rp_val_l2a5_hi);
+                            $('#group_imgs_on_modal').foundation('reveal', 'close');
+                          });
+                            $("#insert_rp_l2a6_hi").click(function(event){
+                                rp_val_l2a6_hi = "<a href='/RatioPattens/hi/L2A6/' target='_blank'><img src='/static/ndf/images/RP.png' alt='Ratio Patterns Tool' height='1000px' width='1000px' >"
+                            
+                             CKEDITOR.instances[textAreaId].insertHtml(rp_val_l2a6_hi);
+                            $('#group_imgs_on_modal').foundation('reveal', 'close');
+                          });
+
+                            $("#insert_rp_l2a1_te").click(function(event){
+
+                                rp_val_l2a1_te = "<a href='/RatioPattens/te/L2A1/' target='_blank'><img src='/static/ndf/images/RP.png' alt='Ratio Patterns Tool' height='1000px' width='1000px' >"
+                            
+                             CKEDITOR.instances[textAreaId].insertHtml(rp_val_l2a1_te);
+                            $('#group_imgs_on_modal').foundation('reveal', 'close');
+                          });
+                            $("#insert_rp_l2a2_te").click(function(event){
+                                rp_val_l2a2_te = "<a href='/RatioPattens/te/L2A2/' target='_blank'><img src='/static/ndf/images/RP.png' alt='Ratio Patterns Tool' height='1000px' width='1000px' >"
+                            
+                             CKEDITOR.instances[textAreaId].insertHtml(rp_val_l2a2_te);
+                            $('#group_imgs_on_modal').foundation('reveal', 'close');
+                          });
+                            $("#insert_rp_l2a3_te").click(function(event){
+                                rp_val_l2a3_te = "<a href='/RatioPattens/te/L2A3/' target='_blank'><img src='/static/ndf/images/RP.png' alt='Ratio Patterns Tool' height='1000px' width='1000px' >"
+                            
+                             CKEDITOR.instances[textAreaId].insertHtml(rp_val_l2a3_te);
+                            $('#group_imgs_on_modal').foundation('reveal', 'close');
+                          });
+                            $("#insert_rp_l2a4_te").click(function(event){
+                                rp_val_l2a4_te = "<a href='/RatioPattens/hi/L2A4/' target='_blank'><img src='/static/ndf/images/RP.png' alt='Ratio Patterns Tool' height='1000px' width='1000px' >"
+                            
+                             CKEDITOR.instances[textAreaId].insertHtml(rp_val_l2a4_te);
+                            $('#group_imgs_on_modal').foundation('reveal', 'close');
+                          });
+                            $("#insert_rp_l2a5_te").click(function(event){
+                                rp_val_l2a5_te = "<a href='/RatioPattens/te/L2A5/' target='_blank'><img src='/static/ndf/images/RP.png' alt='Ratio Patterns Tool' height='1000px' width='1000px' >"
+                            
+                             CKEDITOR.instances[textAreaId].insertHtml(rp_val_l2a5_hi);
+                            $('#group_imgs_on_modal').foundation('reveal', 'close');
+                          });
+                            $("#insert_rp_l2a6_te").click(function(event){
+                                rp_val_l2a6_te = "<a href='/RatioPattens/te/L2A6/' target='_blank'><img src='/static/ndf/images/RP.png' alt='Ratio Patterns Tool' height='1000px' width='1000px' >"
+                            
+                             CKEDITOR.instances[textAreaId].insertHtml(rp_val_l2a6_te);
+                            $('#group_imgs_on_modal').foundation('reveal', 'close');
+                          });
+                            $("#insert_icl_l4a1_en").click(function(event){
+                                icl_val_l4a1_en = "<iframe src='/IceCubesInLemonade/en/L4A1/' style='height:100vh;width:100%'></iframe>"
+                            
+                             CKEDITOR.instances[textAreaId].insertHtml(icl_val_l4a1_en);
+                            $('#group_imgs_on_modal').foundation('reveal', 'close');
+                          });
+                            $("#insert_icl_l4a2_en").click(function(event){
+                                icl_val_l4a2_en = "<iframe src='/IceCubesInLemonade/en/L4A2/' style='height:100vh;width:100%'></iframe>"
+                            
+                             CKEDITOR.instances[textAreaId].insertHtml(icl_val_l4a2_en);
+                            $('#group_imgs_on_modal').foundation('reveal', 'close');
+                          });
+                            $("#insert_icl_l4a1_hi").click(function(event){
+                                icl_val_l4a1_hi = "<iframe src='/IceCubesInLemonade/hi/L4A1/' style='height:100vh;width:100%'></iframe>"
+                            
+                             CKEDITOR.instances[textAreaId].insertHtml(icl_val_l4a1_hi);
+                            $('#group_imgs_on_modal').foundation('reveal', 'close');
+                          });
+                            $("#insert_icl_l4a2_hi").click(function(event){
+                                icl_val_l4a2_hi = "<iframe src='/IceCubesInLemonade/hi/L4A2/' style='height:100vh;width:100%'></iframe>"
+                            
+                             CKEDITOR.instances[textAreaId].insertHtml(icl_val_l4a2_hi);
+                            $('#group_imgs_on_modal').foundation('reveal', 'close');
+                          });
+                            $("#insert_icl_l4a1_te").click(function(event){
+                                icl_val_l4a1_te = "<iframe src='/IceCubesInLemonade/te/L4A1/' style='height:100vh;width:100%'></iframe>"
+                            
+                             CKEDITOR.instances[textAreaId].insertHtml(icl_val_l4a1_te);
+                            $('#group_imgs_on_modal').foundation('reveal', 'close');
+                          });
+                            $("#insert_icl_l4a2_te").click(function(event){
+                                icl_val_l4a2_hi = "<iframe src='/IceCubesInLemonade/te/L4A2/' style='height:100vh;width:100%'></iframe>"
+                            
+                             CKEDITOR.instances[textAreaId].insertHtml(icl_val_l4a2_te);
+                            $('#group_imgs_on_modal').foundation('reveal', 'close');
+                          });
+                            
 
                         }
                     });
