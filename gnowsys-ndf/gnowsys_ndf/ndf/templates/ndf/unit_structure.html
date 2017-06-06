@@ -605,6 +605,7 @@ This will not be used because now only existing activities will be added.
                   'csrfmiddlewaretoken': "{{csrf_token}}",
                   "node_to_delete": node_to_delete,
                   "deletion_type": deletion_type,
+                  "right_subject": 1
               },
               url: "{% url 'ajax_delete_node' group_id %}",
               success: function(data) {

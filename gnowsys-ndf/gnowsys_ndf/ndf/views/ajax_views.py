@@ -136,6 +136,11 @@ def remove_from_nodelist(request, group_id):
 def ajax_delete_node(request, group_id):
     node_to_delete = request.POST.get('node_to_delete', None)
     deletion_type = eval(request.POST.get('deletion_type', 0))
+    right_subject = eval(request.POST.get('right_subject', None))
+    if right_subject in [0, 1]:
+        all_grels = triple_collection.find({'_type': 'GRelation', 'subject': ObjectId(node_to_delete)})
+        for each_grel in all_grels:
+            delete_node(node_id=each_grel['right_subject'], deletion_type=right_subject)
     return HttpResponse(json.dumps(delete_node(node_id=node_to_delete, deletion_type=deletion_type)))
 
 
