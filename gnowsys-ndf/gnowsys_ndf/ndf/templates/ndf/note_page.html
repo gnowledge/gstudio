@@ -76,6 +76,7 @@
             {% if is_gstaff or node.created_by == request.user.id %}
 
                <a class="edit-note-btn" data-note-id="{{node.pk}}"><i class ="fi-pencil"></i>Edit</a> 
+               <a class="delete-note-btn" data-note-id="{{node.pk}}"><i class ="fi-trash"></i>Delete</a> 
             {% endif %}
 
         </div>
@@ -92,16 +93,15 @@
         </div>
     </div>
     <div class="comment-sections" style="overflow-x:auto;overflow-y:hidden">
-        {% get_thread_node node.pk as thread_node %}
-            {% if thread_node %}
-                {% get_disc_replies thread_node group_id global_disc_all_replies as all_replies %}
-                {% get_node thread_node as thread_node_obj %}
-                {% include 'ndf/in-line-texteditor.html' with node=thread_node_obj var_name="content_org" ckeditor_toolbar="LMSStudentsToolbar" %}
-            {% else %}
-                {% get_disc_replies node.pk group_id global_disc_all_replies as all_replies %}
-                {% include 'ndf/in-line-texteditor.html' with var_name="content_org" ckeditor_toolbar="LMSStudentsToolbar" %}
+        {% get_thread_node node.pk as thread_node_obj %}
+        {% if thread_node_obj %}
+            {% get_disc_replies thread_node_obj.pk group_id global_disc_all_replies as all_replies %}
+            {% include 'ndf/in-line-texteditor.html' with node=thread_node_obj var_name="content_org" ckeditor_toolbar="LMSStudentsToolbar" %}
+        {% else %}
+            {% get_disc_replies node.pk group_id global_disc_all_replies as all_replies %}
+            {% include 'ndf/in-line-texteditor.html' with var_name="content_org" ckeditor_toolbar="LMSStudentsToolbar" %}
 
-            {% endif %}
+        {% endif %}
     </div>
     {% comment %}
         <div class="comments-header">
@@ -146,6 +146,32 @@ $(document).on('click','.view-more-tags',function(){
     $(document).on('click', '.edit-note-btn', function() {
         node_id = $(this).attr('data-note-id')
         load_page_create_edit(node_id)
+    });
+    $(".delete-note-btn").click(function(){
+            if (confirm("Do you want to delete this note?.") == true) {
+                $.ajax({
+                          type: "POST",
+                          data:{
+                                'csrfmiddlewaretoken': "{{csrf_token}}",
+                                'activity_id' : "{{node.pk}}",
+                            },
+                          url: "{% url 'delete_activity_page' group_id %}",
+                          datatype: "json",
+                          success: function(data) {
+                            console.log(data)
+                            if (data=="success"){
+                                // $.each(coll_arr, function(ind,activity_id){
+                                //     $("a[data-del-activity-page-id='"+activity_id+"']").addClass('hide')
+                                // })
+                                location.href = "{% url 'course_notebook' group_id %}"
+                            }
+                            else{
+                                alert("Something went wrong. Please try again later.")
+                            }
+                        }
+                    });
+                }
+
     });
 
 </script>

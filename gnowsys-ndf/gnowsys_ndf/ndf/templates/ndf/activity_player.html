@@ -1,7 +1,7 @@
 {% extends "ndf/gbase.html" %}
 {% load i18n %}
 
-{% block title %} {{lesson_node.name}}  {% endblock %}
+{% block title %} {{trans_lesson_name}}  {% endblock %}
 
 {% load ndf_tags %}
 {% check_is_gstaff group_id request.user as is_gstaff %}
@@ -58,18 +58,19 @@
         </div>
 </nav>
 </div>
-
 <div class="row activity_sheet">
     <div class="small-12 columns">
         <div class="course_editor ">
           <div class="small-3 columns">
             <div class="course_tree">
-              <div class="lesson-title" title="{{lesson_node.name}}">
-                  <b>{{lesson_node.name}}</b>
+              <div class="lesson-title" title="{{trans_lesson_name}}">
+                  <b>{{trans_lesson_name}}</b>
               </div>
               <div class="activity-title">
-              {% for each in unit_resources_list_of_dict %}
-                 <li  {% if each.pk == node.pk %} class="active" {% endif %}> <a href="{% url 'activity_player_detail' group_id lesson_node.pk each.pk %}">{{each.name}}</a></li>
+              {% for each in act_list %}
+                  {% for k,v in each.items  %}
+                    <li  {% if v.basenodeid == activityid %} class="active" {% endif %}> <a href="{% url 'activity_player_detail' group_id lesson_node.pk v.basenodeid %}"> {{v.name}} </a></li>
+                  {% endfor %}
               {% endfor %}
               </div>
               </div>
@@ -102,15 +103,14 @@
               </div>
               <div class="activity_page_rendered">
                 {# {{node.content|safe}} #}
-                {% include "ndf/node_ajax_content.html" with node=node expand_content=True  no_discussion=True hide_breadcrumbs=True %}
+                {% include "ndf/node_ajax_content.html" with node=trans_node expand_content=True  no_discussion=True hide_breadcrumbs=True %}
               </div>
               <div class="discussion-area activity_page_rendered" style="overflow-x:auto;overflow-y:hidden">
                 
                 {% if node_discussion %}
-                  {% get_thread_node node.pk as thread_node %}  
-                    {% if thread_node %}
-                        {% get_disc_replies thread_node group_id global_disc_all_replies as all_replies %}
-                        {% get_node thread_node as thread_node_obj %}
+                    {% get_thread_node node.pk as thread_node_obj %}
+                    {% if thread_node_obj %}
+                        {% get_disc_replies thread_node_obj.pk group_id global_disc_all_replies as all_replies %}
                         {% include 'ndf/in-line-texteditor.html' with node=thread_node_obj var_name="content_org" ckeditor_toolbar="LMSStudentsToolbar" %}
                     {% else %}
                         {% get_disc_replies node.pk group_id global_disc_all_replies as all_replies %}
@@ -129,6 +129,34 @@
 </div>             
 
 <script type="text/javascript">
+
+   function onMessage(message) {
+    // Inconveniently, we don't seem to be able to locate the
+    // assessment-player's iframe inside the content's iframe.  Conventiently,
+    // the assessment-player sends a message up to us to indicate its available
+    // locales.  Although we ignore the available locales, we use that message's
+    // source to target a message back down to the assessment-player.
+    var data = message.data;
+    if(typeof(message.data) == "string"){
+      data = JSON.parse(message.data);
+    }
+    const type = data.open_assessments_msg;
+
+    switch(type) {
+      case "open_assessments_available_locales":
+        message.source.postMessage({
+          open_assessments_msg: "open_assessments_set_locale",
+          locale: '{{LANGUAGE_CODE}}'
+        }, "*");
+        break;
+    }
+  }
+
+  function componentDidMount() {
+    window.addEventListener("message", (e) => this.onMessage(e), false);
+  }
+  componentDidMount()
+
   // start of document.ready()
   $(document).ready(function() {
     var iframes = document.getElementsByTagName('iframe');
@@ -171,6 +199,7 @@
        }
     }
   })
+
   $(".admin-page").click(function(event){
       $.ajax({
               type: "POST",

@@ -226,6 +226,7 @@ def parse_data_create_gtype(json_file_path):
         perform_eval_type("complex_data_type", json_document, type_name, "AttributeType")
         perform_eval_type("subject_type", json_document, type_name, "GSystemType")
         perform_eval_type("validators", json_document, type_name, "AttributeType")
+
         # if GSTUDIO_DEFAULT_SYSTEM_TYPES_LIST:
         #   json_document["subject_type"] = update_default_st(json_document["subject_type"])
 
@@ -266,12 +267,18 @@ def parse_data_create_gtype(json_file_path):
         if json_document["object_scope"]:
           json_document["object_scope"] = map(unicode,json_document["object_scope"])
 
+        json_document["is_reflexive"] = ast.literal_eval(json_document['is_reflexive'].title())
+        json_document["is_transitive"] = ast.literal_eval(json_document['is_transitive'].title())
+        json_document["is_symmetric"] = ast.literal_eval(json_document['is_symmetric'].title())
+
         perform_eval_type("subject_type", json_document, type_name, "GSystemType")
         perform_eval_type("object_type", json_document, type_name, "GSystemType")
         perform_eval_type("member_of", json_document, type_name, "MetaType")
+
         # if GSTUDIO_DEFAULT_SYSTEM_TYPES_LIST:
         #   json_document["subject_type"] = update_default_st(json_document["subject_type"])
         #   json_document["object_type"] = update_default_st(json_document["object_type"])
+
       except Exception as e:
         error_message = "\n While parsing "+type_name+"(" + json_document['name'] + ") got following error at line #" + str(exc_info()[-1].tb_lineno) + "...\n " + str(e)
         log_list.append(error_message)

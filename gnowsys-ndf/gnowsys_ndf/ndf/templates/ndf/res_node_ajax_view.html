@@ -302,16 +302,17 @@
 
       <div class="content small-12 columns"  id="view-discussion">
   
-          {% get_node group_id as group_obj %}
-          {% get_thread_node node.pk as thread_node %}
-          {% if thread_node %}
-              {% get_disc_replies thread_node group_id global_disc_all_replies as all_replies %}
-              {% get_node thread_node as thread_node_obj %}
-              {% include 'ndf/in-line-texteditor.html' with node=thread_node_obj %}
-          {% else %}            
-              {% get_disc_replies node.pk group_id global_disc_all_replies as all_replies %}
-              {% include 'ndf/in-line-texteditor.html' %}
-          {% endif %}
+        {% get_node group_id as group_obj %}
+
+        {% get_thread_node node.pk as thread_node_obj %}
+        {% if thread_node_obj %}
+            {% get_disc_replies thread_node_obj.pk group_id global_disc_all_replies as all_replies %}
+            {% include 'ndf/in-line-texteditor.html' with node=thread_node_obj %}
+        {% else %}
+            {% get_disc_replies node.pk group_id global_disc_all_replies as all_replies %}
+            {% include 'ndf/in-line-texteditor.html' %}
+        {% endif %}
+
           {% comment %}
           {% else %}
             {% if node.discussion_enable == True %}

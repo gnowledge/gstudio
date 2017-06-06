@@ -189,11 +189,15 @@ factory_relation_types = [
     },
 
     {'translation_of': {
-            'subject_type':['Page','Topic','Theme','theme_item','File','GAPP','factory_types','Binary'],
-            'object_type':['Page','Topic','Theme','theme_item','File','GAPP','factory_types','Binary'],
+            'subject_type':['*'],
+            'object_type':['*'],
+            # 'subject_type':['Page','Topic','Theme','theme_item','File','GAPP','factory_types','Binary'],
+            # 'object_type':['Page','Topic','Theme','theme_item','File','GAPP','factory_types','Binary'],
             'inverse_name':'translation_of',
             'meta_type':'factory_types',
-            'object_cardinality': 100
+            'object_cardinality': 100,
+            'is_reflexive': True,
+            'is_transitive': True
         }
     },
 

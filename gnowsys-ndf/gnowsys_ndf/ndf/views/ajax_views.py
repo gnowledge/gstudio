@@ -38,6 +38,7 @@ from gnowsys_ndf.ndf.models import NodeJSONEncoder
 from gnowsys_ndf.ndf.models import node_collection, triple_collection
 from gnowsys_ndf.ndf.models import *
 from gnowsys_ndf.ndf.views.file import *
+from gnowsys_ndf.ndf.views.gcourse import *
 from gnowsys_ndf.ndf.views.methods import check_existing_group, get_drawers, get_course_completed_ids,create_thread_for_node, delete_gattribute
 from gnowsys_ndf.ndf.views.methods import get_node_common_fields, get_node_metadata, create_grelation,create_gattribute
 from gnowsys_ndf.ndf.views.methods import create_task,parse_template_data,get_execution_time,get_group_name_id, dig_nodes_field
@@ -73,9 +74,13 @@ def get_node_json_from_id(request, group_id, node_id=None):
         node_id = request.GET.get('node_id')
     node_obj = Node.get_node_by_id(node_id)
     if node_obj:
+      trans_node = get_lang_node(node_obj._id,request.LANGUAGE_CODE)
+      if trans_node:
+        return HttpResponse(json.dumps(trans_node, cls=NodeJSONEncoder))
+      else:
         return HttpResponse(json.dumps(node_obj, cls=NodeJSONEncoder))
     else:
-        return HttpResponse(0)
+      return HttpResponse(0)
 
 
 def save_node(request, group_id, node_id=None):
@@ -131,6 +136,11 @@ def remove_from_nodelist(request, group_id):
 def ajax_delete_node(request, group_id):
     node_to_delete = request.POST.get('node_to_delete', None)
     deletion_type = eval(request.POST.get('deletion_type', 0))
+    right_subject = eval(request.POST.get('right_subject', None))
+    if right_subject in [0, 1]:
+        all_grels = triple_collection.find({'_type': 'GRelation', 'subject': ObjectId(node_to_delete)})
+        for each_grel in all_grels:
+            delete_node(node_id=each_grel['right_subject'], deletion_type=right_subject)
     return HttpResponse(json.dumps(delete_node(node_id=node_to_delete, deletion_type=deletion_type)))
 
 
@@ -7007,3 +7017,13 @@ def remove_related_doc(request, group_id):
     rel_node = triple_collection.one({'right_subject':ObjectId(selected_obj),'subject':ObjectId(node_obj.pk)})
     delete_grelation(subject_id=ObjectId(node_obj.pk), deletion_type=1, **{'node_id': ObjectId(rel_node._id)})
     return HttpResponse('success')
+
+def get_translated_node(request, group_id):
+    node_id = request.GET.get('node_id', None)
+    language = request.GET.get('language', None)
+    node_obj = Node.get_node_by_id(node_id)
+    trans_node = get_lang_node(node_obj._id,language)
+    if trans_node:
+      return HttpResponse(json.dumps(trans_node, cls=NodeJSONEncoder))
+    else:
+      return HttpResponse(json.dumps(node_obj, cls=NodeJSONEncoder))
