@@ -425,7 +425,7 @@ CKEDITOR.plugins.add('addJhapp',
                             $('#group_imgs_on_modal').foundation('reveal', 'close');
                           });
                             $("#insert_rp_l2a4_te").click(function(event){
-                                rp_val_l2a4_te = "<a href='/RatioPatterns/hi/L2A4/' target='_blank'><img src='/static/ndf/images/RP.png' alt='Ratio Patterns Tool' height='1000px' width='1000px' >"
+                                rp_val_l2a4_te = "<a href='/RatioPatterns/te/L2A4/' target='_blank'><img src='/static/ndf/images/RP.png' alt='Ratio Patterns Tool' height='1000px' width='1000px' >"
                             
                              CKEDITOR.instances[textAreaId].insertHtml(rp_val_l2a4_te);
                             $('#group_imgs_on_modal').foundation('reveal', 'close');
