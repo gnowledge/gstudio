@@ -78,13 +78,7 @@
         <div class="right enroll-unit">
  
             {% if request.user.is_authenticated %}
-                {% if request.user.id not in group_object.author_set %}
-                  {% include 'ndf/widget_enroll.html' %}
-
-                {% else %}
-                  <a disabled="disabled" class="enroll_unit">{% trans "ENROLLED" %} </a>
-                {% endif %}
-
+              {% include 'ndf/widget_enroll.html' %}
             {% else %}
                 <a href="{% url 'auth_login' %}" title="Please login to Enroll" class="enroll_unit">{% trans "ENROLL" %}</a>
             {% endif %}
