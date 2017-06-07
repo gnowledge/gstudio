@@ -4,7 +4,7 @@
 <input type="button" data-reveal-id="enrollBuddiesModal" class="enrollBtn" value="Enrollment" />
 
 <div id="enrollBuddiesModal" class="reveal-modal medium radius" data-reveal data-alert>
-    <div id="enrollBuddiesModalLabel">{% trans "Enrollment Status:" %}</div><br/>
+    <h4 id="enrollBuddiesModalLabel">{% trans "Enrollment Status:" %}</h4><br/>
     <div class="small-12 medium-12 columns buddiesList center">
     {% if request.session.buddies_username_id_dict %}
       {% with request.session.buddies_username_id_dict|apply_eval as buddies_dict %}

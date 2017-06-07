@@ -8,5 +8,5 @@
 
 {% block body_content %}
 	{# <h4 class="text-center">{{title}}</h4> #}
-    {% include 'ndf/widget_node_form.html' with post_url=post_url node_obj=node_obj additional_form_fields=additional_form_fields%}
+    {% include 'ndf/widget_node_form.html' with editor_type="GeneralToolbar" post_url=post_url node_obj=node_obj additional_form_fields=additional_form_fields %}
 {% endblock %}

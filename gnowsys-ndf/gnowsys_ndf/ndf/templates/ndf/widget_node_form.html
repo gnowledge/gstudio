@@ -1,7 +1,7 @@
 {% load i18n %}
 
 <div class="row group_content">
-    <div class="small-12 columns  group_sections_content" id="scstyle">
+    <div class="small-12 columns  group_sections_content">
         <form enctype="multipart/form-data" method="post" action="{{post_url}}" class="node-create-edit-form">
             {% csrf_token %}
             <!-- _id -->
@@ -41,7 +41,7 @@
                 <h5>{% trans "Description" %}</h5>
                 </div><br/> 
                 <div class="left" style="width:980px;">
-                    {% include "ndf/html_editor.html" with var_name="content" var_placeholder="Enter the content here" var_value=node_obj.content|safe|default_if_none:"" node_id=node_obj.pk ckeditor_toolbar=editor_type %}
+                    {% include "ndf/html_editor.html" with var_name="content" var_value=node_obj.content node_id=node_obj.pk ckeditor_toolbar=editor_type %}
                     <br/>
                 </div>
             </div>

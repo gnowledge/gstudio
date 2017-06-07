@@ -309,10 +309,10 @@ This will not be used because now only existing activities will be added.
         <div class="small-3 columns left lesson-form-name"><h3>{% trans "Lesson Name" %}<h9 style="color:red">*</h9></h3></div>
         <div class="small-9 columns right lesson_disp_name"><input type="text" id="lesson-name"></div>
     </div>
-    <div>
+    <div class="hide">
         <div class="small-3 columns left lesson-form-desc"><h3>{% trans "Lesson Description" %}<h9 style="color: rgba(128, 128, 128, 0.48);font-style: italic;font-size: 15px;"> optional</h9></h3></div>
         <div class="small-9 columns right lesson_disp_desc"><textarea rows="3" cols="50" id="lesson-desc"></textarea></div>
-    </div>
+    </div> 
     <div class="double-buttons">
         <button type="button" class="button-hollow-grey save-lesson add-lesson-top-margin" data-node-id=""> {% trans "Save Lesson" %} </button>
         {% comment %}
@@ -964,6 +964,7 @@ This will not be used because now only existing activities will be added.
         $(document).on('closed.fndtn.reveal', '#add-lesson-reveal', function () {
             $("#lesson-name").val('');
             $('.save-lesson').attr('data-node-id', '');
+            $("#lesson_lang").prop('selectedIndex',0);
         });
 
         $(document).on('open.fndtn.reveal', '#add-lesson-reveal', function () {
