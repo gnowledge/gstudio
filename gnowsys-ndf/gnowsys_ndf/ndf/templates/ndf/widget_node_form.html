@@ -40,8 +40,8 @@
                 <div class="left">
                 <h5>{% trans "Description" %}</h5>
                 </div><br/> 
-                <div class="left" style="width:980px;">
-                    {% include "ndf/html_editor.html" with var_name="content" var_placeholder="Enter the content here" var_value=node_obj.content|safe|default_if_none:"" node_id=node_obj.pk ckeditor_toolbar=editor_type %}
+                <div class="left editor-div" style="width:980px;">
+                    {% include "ndf/html_editor.html" with var_name="content" var_value=node_obj.content node_id=node_obj.pk ckeditor_toolbar=editor_type %}
                     <br/>
                 </div>
             </div>
