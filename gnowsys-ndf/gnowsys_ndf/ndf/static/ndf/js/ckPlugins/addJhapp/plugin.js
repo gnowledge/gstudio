@@ -331,37 +331,37 @@ CKEDITOR.plugins.add('addJhapp',
 
                             $("#insert_rp_l2a1").click(function(event){
 
-                                rp_val_l2a1 = "<a href='/RatioPattens/en/L2A1/' target='_blank'><img src='/static/ndf/images/RP.png' alt='Ratio Patterns Tool' height='1000px' width='1000px' >"
+                                rp_val_l2a1 = "<a href='/RatioPatterns/en/L2A1/' target='_blank'><img src='/static/ndf/images/RP.png' alt='Ratio Patterns Tool' height='1000px' width='1000px' >"
                             
                              CKEDITOR.instances[textAreaId].insertHtml(rp_val_l2a1);
                             $('#group_imgs_on_modal').foundation('reveal', 'close');
                           });
                             $("#insert_rp_l2a2").click(function(event){
-                                rp_val_l2a2 = "<a href='/RatioPattens/en/L2A2/' target='_blank'><img src='/static/ndf/images/RP.png' alt='Ratio Patterns Tool' height='1000px' width='1000px' >"
+                                rp_val_l2a2 = "<a href='/RatioPatterns/en/L2A2/' target='_blank'><img src='/static/ndf/images/RP.png' alt='Ratio Patterns Tool' height='1000px' width='1000px' >"
                             
                              CKEDITOR.instances[textAreaId].insertHtml(rp_val_l2a2);
                             $('#group_imgs_on_modal').foundation('reveal', 'close');
                           });
                             $("#insert_rp_l2a3").click(function(event){
-                                rp_val_l2a3 = "<a href='/RatioPattens/en/L2A3/' target='_blank'><img src='/static/ndf/images/RP.png' alt='Ratio Patterns Tool' height='1000px' width='1000px' >"
+                                rp_val_l2a3 = "<a href='/RatioPatterns/en/L2A3/' target='_blank'><img src='/static/ndf/images/RP.png' alt='Ratio Patterns Tool' height='1000px' width='1000px' >"
                             
                              CKEDITOR.instances[textAreaId].insertHtml(rp_val_l2a3);
                             $('#group_imgs_on_modal').foundation('reveal', 'close');
                           });
                             $("#insert_rp_l2a4").click(function(event){
-                                rp_val_l2a4 = "<a href='/RatioPattens/en/L2A4/' target='_blank'><img src='/static/ndf/images/RP.png' alt='Ratio Patterns Tool' height='1000px' width='1000px' >"
+                                rp_val_l2a4 = "<a href='/RatioPatterns/en/L2A4/' target='_blank'><img src='/static/ndf/images/RP.png' alt='Ratio Patterns Tool' height='1000px' width='1000px' >"
                             
                              CKEDITOR.instances[textAreaId].insertHtml(rp_val_l2a4);
                             $('#group_imgs_on_modal').foundation('reveal', 'close');
                           });
                             $("#insert_rp_l2a5").click(function(event){
-                                rp_val_l2a5 = "<a href='/RatioPattens/en/L2A5/' target='_blank'><img src='/static/ndf/images/RP.png' alt='Ratio Patterns Tool' height='1000px' width='1000px' >"
+                                rp_val_l2a5 = "<a href='/RatioPatterns/en/L2A5/' target='_blank'><img src='/static/ndf/images/RP.png' alt='Ratio Patterns Tool' height='1000px' width='1000px' >"
                             
                              CKEDITOR.instances[textAreaId].insertHtml(rp_val_l2a5);
                             $('#group_imgs_on_modal').foundation('reveal', 'close');
                           });
                             $("#insert_rp_l2a6").click(function(event){
-                                rp_val_l2a6 = "<a href='/RatioPattens/en/L2A6/' target='_blank'><img src='/static/ndf/images/RP.png' alt='Ratio Patterns Tool' height='1000px' width='1000px' >"
+                                rp_val_l2a6 = "<a href='/RatioPatterns/en/L2A6/' target='_blank'><img src='/static/ndf/images/RP.png' alt='Ratio Patterns Tool' height='1000px' width='1000px' >"
                             
                              CKEDITOR.instances[textAreaId].insertHtml(rp_val_l2a6);
                             $('#group_imgs_on_modal').foundation('reveal', 'close');
@@ -369,37 +369,37 @@ CKEDITOR.plugins.add('addJhapp',
 
                             $("#insert_rp_l2a1_hi").click(function(event){
 
-                                rp_val_l2a1_hi = "<a href='/RatioPattens/hi/L2A1/' target='_blank'><img src='/static/ndf/images/RP.png' alt='Ratio Patterns Tool' height='1000px' width='1000px' >"
+                                rp_val_l2a1_hi = "<a href='/RatioPatterns/hi/L2A1/' target='_blank'><img src='/static/ndf/images/RP.png' alt='Ratio Patterns Tool' height='1000px' width='1000px' >"
                             
                              CKEDITOR.instances[textAreaId].insertHtml(rp_val_l2a1_hi);
                             $('#group_imgs_on_modal').foundation('reveal', 'close');
                           });
                             $("#insert_rp_l2a2_hi").click(function(event){
-                                rp_val_l2a2_hi = "<a href='/RatioPattens/hi/L2A2/' target='_blank'><img src='/static/ndf/images/RP.png' alt='Ratio Patterns Tool' height='1000px' width='1000px' >"
+                                rp_val_l2a2_hi = "<a href='/RatioPatterns/hi/L2A2/' target='_blank'><img src='/static/ndf/images/RP.png' alt='Ratio Patterns Tool' height='1000px' width='1000px' >"
                             
                              CKEDITOR.instances[textAreaId].insertHtml(rp_val_l2a2_hi);
                             $('#group_imgs_on_modal').foundation('reveal', 'close');
                           });
                             $("#insert_rp_l2a3_hi").click(function(event){
-                                rp_val_l2a3_hi = "<a href='/RatioPattens/hi/L2A3/' target='_blank'><img src='/static/ndf/images/RP.png' alt='Ratio Patterns Tool' height='1000px' width='1000px' >"
+                                rp_val_l2a3_hi = "<a href='/RatioPatterns/hi/L2A3/' target='_blank'><img src='/static/ndf/images/RP.png' alt='Ratio Patterns Tool' height='1000px' width='1000px' >"
                             
                              CKEDITOR.instances[textAreaId].insertHtml(rp_val_l2a3_hi);
                             $('#group_imgs_on_modal').foundation('reveal', 'close');
                           });
                             $("#insert_rp_l2a4_hi").click(function(event){
-                                rp_val_l2a4_hi = "<a href='/RatioPattens/hi/L2A4/' target='_blank'><img src='/static/ndf/images/RP.png' alt='Ratio Patterns Tool' height='1000px' width='1000px' >"
+                                rp_val_l2a4_hi = "<a href='/RatioPatterns/hi/L2A4/' target='_blank'><img src='/static/ndf/images/RP.png' alt='Ratio Patterns Tool' height='1000px' width='1000px' >"
                             
                              CKEDITOR.instances[textAreaId].insertHtml(rp_val_l2a4_hi);
                             $('#group_imgs_on_modal').foundation('reveal', 'close');
                           });
                             $("#insert_rp_l2a5_hi").click(function(event){
-                                rp_val_l2a5_hi = "<a href='/RatioPattens/hi/L2A5/' target='_blank'><img src='/static/ndf/images/RP.png' alt='Ratio Patterns Tool' height='1000px' width='1000px' >"
+                                rp_val_l2a5_hi = "<a href='/RatioPatterns/hi/L2A5/' target='_blank'><img src='/static/ndf/images/RP.png' alt='Ratio Patterns Tool' height='1000px' width='1000px' >"
                             
                              CKEDITOR.instances[textAreaId].insertHtml(rp_val_l2a5_hi);
                             $('#group_imgs_on_modal').foundation('reveal', 'close');
                           });
                             $("#insert_rp_l2a6_hi").click(function(event){
-                                rp_val_l2a6_hi = "<a href='/RatioPattens/hi/L2A6/' target='_blank'><img src='/static/ndf/images/RP.png' alt='Ratio Patterns Tool' height='1000px' width='1000px' >"
+                                rp_val_l2a6_hi = "<a href='/RatioPatterns/hi/L2A6/' target='_blank'><img src='/static/ndf/images/RP.png' alt='Ratio Patterns Tool' height='1000px' width='1000px' >"
                             
                              CKEDITOR.instances[textAreaId].insertHtml(rp_val_l2a6_hi);
                             $('#group_imgs_on_modal').foundation('reveal', 'close');
@@ -407,37 +407,37 @@ CKEDITOR.plugins.add('addJhapp',
 
                             $("#insert_rp_l2a1_te").click(function(event){
 
-                                rp_val_l2a1_te = "<a href='/RatioPattens/te/L2A1/' target='_blank'><img src='/static/ndf/images/RP.png' alt='Ratio Patterns Tool' height='1000px' width='1000px' >"
+                                rp_val_l2a1_te = "<a href='/RatioPatterns/te/L2A1/' target='_blank'><img src='/static/ndf/images/RP.png' alt='Ratio Patterns Tool' height='1000px' width='1000px' >"
                             
                              CKEDITOR.instances[textAreaId].insertHtml(rp_val_l2a1_te);
                             $('#group_imgs_on_modal').foundation('reveal', 'close');
                           });
                             $("#insert_rp_l2a2_te").click(function(event){
-                                rp_val_l2a2_te = "<a href='/RatioPattens/te/L2A2/' target='_blank'><img src='/static/ndf/images/RP.png' alt='Ratio Patterns Tool' height='1000px' width='1000px' >"
+                                rp_val_l2a2_te = "<a href='/RatioPatterns/te/L2A2/' target='_blank'><img src='/static/ndf/images/RP.png' alt='Ratio Patterns Tool' height='1000px' width='1000px' >"
                             
                              CKEDITOR.instances[textAreaId].insertHtml(rp_val_l2a2_te);
                             $('#group_imgs_on_modal').foundation('reveal', 'close');
                           });
                             $("#insert_rp_l2a3_te").click(function(event){
-                                rp_val_l2a3_te = "<a href='/RatioPattens/te/L2A3/' target='_blank'><img src='/static/ndf/images/RP.png' alt='Ratio Patterns Tool' height='1000px' width='1000px' >"
+                                rp_val_l2a3_te = "<a href='/RatioPatterns/te/L2A3/' target='_blank'><img src='/static/ndf/images/RP.png' alt='Ratio Patterns Tool' height='1000px' width='1000px' >"
                             
                              CKEDITOR.instances[textAreaId].insertHtml(rp_val_l2a3_te);
                             $('#group_imgs_on_modal').foundation('reveal', 'close');
                           });
                             $("#insert_rp_l2a4_te").click(function(event){
-                                rp_val_l2a4_te = "<a href='/RatioPattens/hi/L2A4/' target='_blank'><img src='/static/ndf/images/RP.png' alt='Ratio Patterns Tool' height='1000px' width='1000px' >"
+                                rp_val_l2a4_te = "<a href='/RatioPatterns/hi/L2A4/' target='_blank'><img src='/static/ndf/images/RP.png' alt='Ratio Patterns Tool' height='1000px' width='1000px' >"
                             
                              CKEDITOR.instances[textAreaId].insertHtml(rp_val_l2a4_te);
                             $('#group_imgs_on_modal').foundation('reveal', 'close');
                           });
                             $("#insert_rp_l2a5_te").click(function(event){
-                                rp_val_l2a5_te = "<a href='/RatioPattens/te/L2A5/' target='_blank'><img src='/static/ndf/images/RP.png' alt='Ratio Patterns Tool' height='1000px' width='1000px' >"
+                                rp_val_l2a5_te = "<a href='/RatioPatterns/te/L2A5/' target='_blank'><img src='/static/ndf/images/RP.png' alt='Ratio Patterns Tool' height='1000px' width='1000px' >"
                             
                              CKEDITOR.instances[textAreaId].insertHtml(rp_val_l2a5_hi);
                             $('#group_imgs_on_modal').foundation('reveal', 'close');
                           });
                             $("#insert_rp_l2a6_te").click(function(event){
-                                rp_val_l2a6_te = "<a href='/RatioPattens/te/L2A6/' target='_blank'><img src='/static/ndf/images/RP.png' alt='Ratio Patterns Tool' height='1000px' width='1000px' >"
+                                rp_val_l2a6_te = "<a href='/RatioPatterns/te/L2A6/' target='_blank'><img src='/static/ndf/images/RP.png' alt='Ratio Patterns Tool' height='1000px' width='1000px' >"
                             
                              CKEDITOR.instances[textAreaId].insertHtml(rp_val_l2a6_te);
                             $('#group_imgs_on_modal').foundation('reveal', 'close');
