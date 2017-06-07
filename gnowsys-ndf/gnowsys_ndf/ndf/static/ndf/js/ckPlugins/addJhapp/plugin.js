@@ -44,7 +44,7 @@ CKEDITOR.plugins.add('addJhapp',
                             $("#insert_policequad_en").click(function(event){
                             
 
-                            pq_text_val_en = "<a href='policequad/en/' target='_blank'><img src='/static/ndf/images/PoliceQuad_pt33x.png' alt='Police quad thumbnail'  height='1000px' width='1000px' >"
+                            pq_text_val_en = "<a href='/policequad/en/' target='_blank'><img src='/static/ndf/images/PoliceQuad_pt33x.png' alt='Police quad thumbnail'  height='1000px' width='1000px' >"
                             
                              CKEDITOR.instances[textAreaId].insertHtml(pq_text_val_en);
                             $('#group_imgs_on_modal').foundation('reveal', 'close');
@@ -53,7 +53,7 @@ CKEDITOR.plugins.add('addJhapp',
                             $("#insert_policequad_hi").click(function(event){
                             
 
-                            pq_text_val_hi = "<a href='policequad/hi/' target='_blank'><img src='/static/ndf/images/PoliceQuad_pt33x.png' alt='Police quad thumbnail'  height='1000px' width='1000px' >"
+                            pq_text_val_hi = "<a href='/policequad/hi/' target='_blank'><img src='/static/ndf/images/PoliceQuad_pt33x.png' alt='Police quad thumbnail'  height='1000px' width='1000px' >"
                             
                              CKEDITOR.instances[textAreaId].insertHtml(pq_text_val_hi);
                             $('#group_imgs_on_modal').foundation('reveal', 'close');
@@ -61,7 +61,7 @@ CKEDITOR.plugins.add('addJhapp',
                             $("#insert_policequad_te").click(function(event){
                             
 
-                            pq_text_val_te = "<a href='policequad/te/' target='_blank'><img src='/static/ndf/images/PoliceQuad_pt33x.png' alt='Police quad thumbnail'  height='1000px' width='1000px' >"
+                            pq_text_val_te = "<a href='/policequad/te/' target='_blank'><img src='/static/ndf/images/PoliceQuad_pt33x.png' alt='Police quad thumbnail'  height='1000px' width='1000px' >"
                             
                              CKEDITOR.instances[textAreaId].insertHtml(pq_text_val_te);
                             $('#group_imgs_on_modal').foundation('reveal', 'close');
@@ -70,7 +70,7 @@ CKEDITOR.plugins.add('addJhapp',
                             $("#insert_runkittyrun").click(function(event){
                             //ost_text_gallery = $('#paste-ost-gallery').val();
                             //ost_text_file = $('#paste-ost-captions').val();
-                            bm_text_val = "<a href='runkittyrun' target='_blank'><img src='/static/ndf/images/RKR.jpg' alt='Run Kitty Run' height='1000px' width='1000px' >"
+                            bm_text_val = "<a href='/runkittyrun/' target='_blank'><img src='/static/ndf/images/RKR.jpg' alt='Run Kitty Run' height='1000px' width='1000px' >"
                             // split_word = ost_text_val.slice(0, 18) + "gallery=" + ost_text_gallery + "&amp;file=/ost/" + ost_text_file+"'"+ ost_text_val.slice(18);
                             // alert(split_word)
                              CKEDITOR.instances[textAreaId].insertHtml(bm_text_val);
@@ -327,14 +327,6 @@ CKEDITOR.plugins.add('addJhapp',
                              CKEDITOR.instances[textAreaId].insertHtml(fst_val_l3_a3_te);
                             $('#group_imgs_on_modal').foundation('reveal', 'close');
                           });
-
-
-
-
-
-
-
-
 
 
                             $("#insert_rp_l2a1").click(function(event){
