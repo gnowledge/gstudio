@@ -129,34 +129,34 @@ CKEDITOR.plugins.add('addJhapp',
                             $('#group_imgs_on_modal').foundation('reveal', 'close');
                           });
                             $("#insert_fst_l1_a1_en").click(function(event){
-                                fst_val_a1_en = "<a href='/FoodSharingTool/en/L1A1/' target='_blank'><img src='/static/ndf/images/FST.png' alt='Food Sharing Tool' height='1000px' width='1000px' >"
+                                fst_val_l1_a1_en = "<a href='/FoodSharingTool/en/L1A1/' target='_blank'><img src='/static/ndf/images/FST.png' alt='Food Sharing Tool' height='1000px' width='1000px' >"
                                 
                             
-                             CKEDITOR.instances[textAreaId].insertHtml(fst_val_a1_en);
+                             CKEDITOR.instances[textAreaId].insertHtml(fst_val_l1_a1_en);
                             $('#group_imgs_on_modal').foundation('reveal', 'close');
                           });
                             $("#insert_fst_l1_a2_en").click(function(event){
-                                fst_val_a2_en = "<a href='/FoodSharingTool/en/L1A2/' target='_blank'><img src='/static/ndf/images/FST.png' alt='Food Sharing Tool' height='1000px' width='1000px' >"
+                                fst_val_l1_a2_en = "<a href='/FoodSharingTool/en/L1A2/' target='_blank'><img src='/static/ndf/images/FST.png' alt='Food Sharing Tool' height='1000px' width='1000px' >"
                             
-                             CKEDITOR.instances[textAreaId].insertHtml(fst_val_a2_en);
+                             CKEDITOR.instances[textAreaId].insertHtml(fst_val_l1_a2_en);
                             $('#group_imgs_on_modal').foundation('reveal', 'close');
                           });
                             $("#insert_fst_l1_a3_en").click(function(event){
-                                fst_val_a3_en = "<a href='/FoodSharingTool/en/L1A3/' target='_blank'><img src='/static/ndf/images/FST.png' alt='Food Sharing Tool' height='1000px' width='1000px' >"
+                                fst_val_l1_a3_en = "<a href='/FoodSharingTool/en/L1A3/' target='_blank'><img src='/static/ndf/images/FST.png' alt='Food Sharing Tool' height='1000px' width='1000px' >"
                             
-                             CKEDITOR.instances[textAreaId].insertHtml(fst_val_a3_en);
+                             CKEDITOR.instances[textAreaId].insertHtml(fst_val_l1_a3_en);
                             $('#group_imgs_on_modal').foundation('reveal', 'close');
                           });
                             $("#insert_fst_l1_a4_en").click(function(event){
-                                fst_val_a4_en = "<a href='/FoodSharingTool/en/L1A4/' target='_blank'><img src='/static/ndf/images/FST.png' alt='Food Sharing Tool' height='1000px' width='1000px' >"
+                                fst_val_l1_a4_en = "<a href='/FoodSharingTool/en/L1A4/' target='_blank'><img src='/static/ndf/images/FST.png' alt='Food Sharing Tool' height='1000px' width='1000px' >"
                             
-                             CKEDITOR.instances[textAreaId].insertHtml(fst_val_a4_en);
+                             CKEDITOR.instances[textAreaId].insertHtml(fst_val_l1_a4_en);
                             $('#group_imgs_on_modal').foundation('reveal', 'close');
                           });
                             $("#insert_fst_l2_a1_en").click(function(event){
                                 fst_val_l2_a1_en = "<a href='/FoodSharingTool/en/L2A1/' target='_blank'><img src='/static/ndf/images/FST.png' alt='Food Sharing Tool' height='1000px' width='1000px' >"
                             
-                             CKEDITOR.instances[textAreaId].insertHtml(fst_val_a4_en);
+                             CKEDITOR.instances[textAreaId].insertHtml(fst_val_l2_a1_en);
                             $('#group_imgs_on_modal').foundation('reveal', 'close');
                           });
                             $("#insert_fst_l2_a2_en").click(function(event){
@@ -433,7 +433,7 @@ CKEDITOR.plugins.add('addJhapp',
                             $("#insert_rp_l2a5_te").click(function(event){
                                 rp_val_l2a5_te = "<a href='/RatioPattens/te/L2A5/' target='_blank'><img src='/static/ndf/images/RP.png' alt='Ratio Patterns Tool' height='1000px' width='1000px' >"
                             
-                             CKEDITOR.instances[textAreaId].insertHtml(rp_val_l2a5_hi);
+                             CKEDITOR.instances[textAreaId].insertHtml(rp_val_l2a5_te);
                             $('#group_imgs_on_modal').foundation('reveal', 'close');
                           });
                             $("#insert_rp_l2a6_te").click(function(event){
