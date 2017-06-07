@@ -15,9 +15,9 @@
             </div>
             <div class="small-4 medium-4 columns">
             {% if userid in group_object.author_set %}
-                <input id="exampleCheckboxSwitch_{{userid}}" type="checkbox" class="enroll_chkbox" checked disabled> Enrolled
+                <input id="enrollchk_{{userid}}" type="checkbox" class="enroll_chkbox" checked disabled> Enrolled
             {% else %}
-              <input id="exampleCheckboxSwitch_{{userid}}" type="checkbox" class="enroll_chkbox" onclick="enroll_user('{{userid}}')" data-user-id='{{userid}}'> Enroll
+              <input id="enrollchk_{{userid}}" type="checkbox" class="enroll_chkbox" onclick="enroll_user('{{userid}}')" data-user-id='{{userid}}'> Enroll
             {% endif %}
             </div>
             <hr>
