@@ -543,7 +543,7 @@ def publish_page(request,group_id,node):
     else:
         page_node,v=get_page(request,node)
         node.content = unicode(page_node.content)
-        node.content_org = unicode(page_node.content_org)
+        # node.content_org = unicode(page_node.content_org)
         node.status = unicode("PUBLISHED")
         node.modified_by = int(request.user.id)
         node.save(groupid=group_id)
