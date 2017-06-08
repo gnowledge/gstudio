@@ -79,8 +79,6 @@
  
             {% if request.user.is_authenticated %}
               {% include 'ndf/widget_enroll.html' %}
-            {% else %}
-                <a href="{% url 'auth_login' %}" title="Please login to Enroll" class="enroll_unit">{% trans "ENROLL" %}</a>
             {% endif %}
          </div>
        </div>
