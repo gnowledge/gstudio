@@ -55,7 +55,7 @@
 
       data: {
         'csrfmiddlewaretoken': "{{csrf_token}}",
-        'user_id': user_id
+        'user_id': JSON.stringify(user_id)
       },
 
       type: "POST",
@@ -79,7 +79,8 @@
   function enroll_all_users(){
     var user_id_list = []
     {% if request.session.buddies_userid_list %}
-      user_id_list = "{{request.session.buddies_userid_list}}"
+      user_id_list = {{request.session.buddies_userid_list}}
+      user_id_list.push({{request.user.pk}})
     {% endif %}
     enroll_user(user_id_list)
   }

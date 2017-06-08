@@ -1891,12 +1891,17 @@ def enroll_to_course(request, group_id):
                 user_id = ast.literal_eval(user_id)
 
 
+            if isinstance(user_id, list):
+                user_id = map(int, user_id)
+            else:
+                user_id = int(user_id)
             group_obj = get_group_name_id(group_id, get_obj=True)
             if add_admin:
                 if isinstance(user_id, list):
                     non_admin_user_ids = [each_userid for each_userid in user_id if each_userid not in group_obj.group_admin ]
                     if non_admin_user_ids:
                         group_obj.group_admin.extend(non_admin_user_ids)
+                        group_obj.group_admin = list(set(group_obj.group_admin))
                 else:
                     if user_id not in group_obj.group_admin:
                         group_obj.group_admin.append(user_id)
@@ -1905,6 +1910,7 @@ def enroll_to_course(request, group_id):
                     non_member_user_ids = [each_userid for each_userid in user_id if each_userid not in group_obj.author_set ]
                     if non_member_user_ids:
                         group_obj.author_set.extend(non_member_user_ids)
+                        group_obj.author_set = list(set(group_obj.author_set))
                 else:
                     if user_id not in group_obj.author_set:
                         group_obj.author_set.append(user_id)
