@@ -4904,3 +4904,8 @@ ul.nav_menu_1 > li > a.selected, ul.nav_menu_1 > li > a:hover {
   font-weight: bold;
   border: 2px solid rgba(255, 255, 255, 0.7);
 }
+
+/* line 5100, ../../../scss/_clix2017.scss */
+.enroll-act_lbl {
+  color: #0c2944;
+}
