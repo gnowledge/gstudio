@@ -14,9 +14,9 @@
     {% get_dict_from_list_of_dicts node.attribute_set as node_attrs %}
     </div>
     <div class="card_summary">
-        <div class="card_section">
-            <p class="module_brief" style="height:10rem;">
-                {{node.content|safe}}
+        <div class="card_section" style="height:6rem;">
+            <p class="module_brief">
+                {{node.content|safe|striptags}}
             </p>
         </div>
         <div class="card_section">

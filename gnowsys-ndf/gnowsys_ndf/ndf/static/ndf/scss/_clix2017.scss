@@ -4302,10 +4302,11 @@ $module-card-lines-to-show: 3;
             max-width: 400px;
             overflow: hidden;
             text-overflow: ellipsis;
-            font-size: $module-card-font-size;
+            font-size: 13px;;
             line-height: $module-card-line-height;
             -webkit-line-clamp: $module-card-lines-to-show;
             -webkit-box-orient: vertical;
+            margin-bottom: 10px;
         }
     }
 }
