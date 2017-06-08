@@ -5092,8 +5092,9 @@ ul.nav_menu_1 {
     margin-top: 90px !important;
     margin-right: 65px;
     &:hover {
-        font-weight: bold;
-        border: 2px solid rgba(255, 255, 255, 0.7);
+        opacity: 1;
+        background: #ffffff;
+        color: #000000;
     }
 }
 

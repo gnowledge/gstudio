@@ -4901,11 +4901,12 @@ ul.nav_menu_1 > li > a.selected, ul.nav_menu_1 > li > a:hover {
 }
 /* line 5094, ../../../scss/_clix2017.scss */
 .enrollBtn:hover {
-  font-weight: bold;
-  border: 2px solid rgba(255, 255, 255, 0.7);
+  opacity: 1;
+  background: #ffffff;
+  color: #000000;
 }
 
-/* line 5100, ../../../scss/_clix2017.scss */
+/* line 5101, ../../../scss/_clix2017.scss */
 .enroll-act_lbl {
   color: #0c2944;
 }
