@@ -2948,7 +2948,7 @@ class HistoryManager():
                         doc_obj[k] = oid_ObjectId_list
 
                 except Exception as e:
-                    print "\n Exception for document's ("+doc_obj.name+") key ("+k+") -- ", str(e), "\n"
+                    print "\n Exception for document's ("+str(doc_obj._id)+") key ("+k+") -- ", str(e), "\n"
 
         return doc_obj
 
