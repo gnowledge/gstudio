@@ -75,8 +75,8 @@
         <div class="small-12 medium-2 columns creator-rating">
             {% if is_gstaff or node.created_by == request.user.id %}
 
-               <a class="edit-note-btn" data-note-id="{{node.pk}}"><i class ="fi-pencil"></i>Edit</a> 
-               <a class="delete-note-btn" data-note-id="{{node.pk}}"><i class ="fi-trash"></i>Delete</a> 
+               <a class="edit-note-btn" data-note-id="{{node.pk}}"><i class ="fi-pencil"></i>{% trans "Edit" %}</a> 
+               <a class="delete-note-btn" data-note-id="{{node.pk}}"><i class ="fi-trash"></i>{% trans "Delete" %}</a> 
             {% endif %}
 
         </div>
