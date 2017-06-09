@@ -4371,79 +4371,6 @@ $module-card-lines-to-show: 3;
                     margin-right: 56px;
             }
 
-            .enroll-unit{
-                    margin-top: 100px;
-                    //margin-right: -45px;
-                    padding: 1px 5px 1px 5px;
-                    text-transform: none;
-                    text-align: center;
-                    cursor: pointer;
-                    font-family: OpenSans-Semibold;
-                    color: #ffc14e;
-                    box-shadow: 0.6px 0.9px #164a7b;
-                    text-shadow: 1px 1px #164a7b;
-                    opacity: 1;
-                    margin-right: 56px;
-                    border-radius: 4px;
-                   // border: 1px solid #c1b4b5;
-                   // background-color: #4b4852;
-
-
-                &>a{
-                    color:white;
-                    border: 1px solid #c1b4b5;
-                    background-color: #4b4852;
-                    padding: 1px 6px 1px 7px;
-                }
-                &:hover{
-                //background-color:rgba(255,193,78,0.3);
-                cursor:pointer;
-                color:#ffc14e;
-                }
-                
-            }
-
-
-
-            .enroll_unit{
-                    margin-top: 100px;
-                    /* margin-right: -5px; */
-                    /* border: 2.2px solid #e6a109; */
-                    border-radius: 6px;
-                    text-transform: none;
-                    text-align: center;
-                    cursor: pointer;
-                    color: #000;
-                    //border: 1px solid rgba(255, 255, 255, 0.7);
-                    font-family: OpenSans-Semibold;
-                    border: 1px solid #c1b4b5;
-                    background-color: #4b4852;
-
-                &>a{
-                    color:white;
-                }
-                &:hover{
-                //background-color:rgba(255,193,78,0.3);
-                cursor:pointer;
-                color:#ffc14e;
-                //margin-right:6px;
-                }
-                .enroll-btn{
-                    width: 90px;
-                opacity: 1;
-                background-color: rgba(0,0,0,.1);
-                /* margin-bottom: -69px; */
-                color: #ffc14e;
-                background-color: none;
-                /* margin-bottom: 8px; */
-                cursor: pointer;
-                padding: 1px 5px 1px 5px;
-                border-radius: 6px;
-                //border: 2px solid #ffc14e;
-                border: 1px solid #c1b4b5;
-                background-color: #4b4852;
-                }
-            }
 
             .course_actions>span{
               //margin-right: 5px;
@@ -5144,3 +5071,33 @@ ul.nav_menu_1 {
     padding-top: 25px;
 }
 
+.enroll_chkbox{
+    transform: scale(1.5);
+}
+.enroll_all_users{
+    width: 15% !important;
+}
+
+.enrollBtn{
+    width: 124px !important;
+    background: #4b4852;
+    border: 1px solid rgba(255, 255, 255, 0.7);
+    padding: 5px 8px;
+    color: #fff;
+    font-size: 20px;
+    margin: 0px 10px 0px 0px;
+    cursor: pointer;
+    border-radius: 3px;
+    opacity: 0.8;
+    margin-top: 90px !important;
+    margin-right: 65px;
+    &:hover {
+        opacity: 1;
+        background: #ffffff;
+        color: #000000;
+    }
+}
+
+.enroll-act_lbl{
+    color: #0c2944;
+}

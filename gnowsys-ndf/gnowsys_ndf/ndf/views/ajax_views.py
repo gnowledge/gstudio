@@ -6595,7 +6595,7 @@ def get_group_templates_page(request, group_id):
   variable = RequestContext(request, {'templates_cur':templates_cur })
   return render_to_response(template, variable)
 
-
+@login_required
 def get_group_pages(request, group_id):
     except_collection_set_of_id = request.GET.get('except_collection_set_of_id', None)
     except_collection_set_of_obj = Node.get_node_by_id(except_collection_set_of_id)

@@ -417,25 +417,6 @@ This will not be used because now only existing activities will be added.
     //     }
     // ];
 
-    function myLang(){
-        var lang_val = document.getElementById("lesson_lang").value;
-        lesson_id =  $('.save-lesson').attr('data-node-id');
-        $.ajax({
-                  type: "GET",
-                  data:{
-                        'node_id':lesson_id,
-                        'language':lang_val
-                    },
-                  url: "{% url 'get_translated_node' group_id %}",
-                  datatype: "html",
-                  success: function(data) {
-                        data_dict = JSON.parse(data);
-                        $('#lesson-name').val(data_dict.name);   
-                }
-        });
-
-    }
-
     var course_data = {{unit_structure|safe}};
 
     $(function(){
@@ -451,9 +432,16 @@ This will not be used because now only existing activities will be added.
             }
         });
 
+    // Read events
+
         // Rendering function for the course tree
         var course_source = $("#lesson-template").html();
         var course_template = Handlebars.compile(course_source);
+        //Managing states and events on the tree.
+        var lastClickedActivity;
+        var selectedEntity;
+        var selectedEntityId;
+        var editorMode = 'view';
 
         function renderCourseTree(data) {
             var courseHtml = '';
@@ -465,15 +453,138 @@ This will not be used because now only existing activities will be added.
             assignEvents();
         }
 
-        //Managing states and events on the tree.
-        var lastClickedActivity;
-        var selectedEntity;
-        var selectedEntityId;
-        var editorMode = 'view';
 
         function assignEvents() {
             lastClickedActivity = undefined;
             $(document).foundation('accordion', 'reflow');
+        }
+
+        function getNodeData(node_id)
+        {
+          var result = undefined;
+          $.ajax({
+              type: "GET",
+              data:{
+                  "node_id": node_id,
+              },
+              url: "{% url 'get_node_json_from_id' group_id %}",
+              datatype: "JSON",
+              success: function(data) {
+                  if (data == "0"){
+                    alert('Unable to load data... Something went wrong :(')
+                    return false
+                  }
+                  data_dict = JSON.parse(data);
+                  $('#activity-content').html(data_dict.content);
+                   MathJax.Hub.Queue(["Typeset",MathJax.Hub,'activity-content']);
+                    $("#info-page-area").html("");
+
+                  return true
+              }
+          });
+        }
+
+        /*
+        * Handlers and actions for the Activity
+        */
+        // Selecting a activity.
+        $('.course-lessons').on('click', '.course-activities>li:not(:last-child) a', function(e){
+            e.preventDefault();
+
+            if(!document.getElementById($(this).parent().attr('id'))){
+                return 1;
+            }
+            $('.course-lessons li[id^="activity-"]').removeClass('active');
+
+            $(this).closest('li').addClass('active');
+            // e.g: activity-58bbaf0a5e35e40049f128ee
+            var activity_id = $(this).closest('li').attr('id').replace('activity-', '');
+            selectedEntity = 'activity';
+            selectedEntityid = activity_id;
+            lastClickedActivity = activity_id;
+
+            setTimeout(function(){
+                $('.course-editor-section').removeClass('hide');
+            }, 1000);
+
+            //Ajax to get the data for this activity.
+            $('.lesson-editor').addClass('hide');
+            $('.activity-editor').removeClass('hide');
+            $('.course_editor').addClass('edit_mode');
+            // $('#course_creator')
+
+            // update content: name and description of activity.
+            var activityName = $('#activity-' + activity_id).attr('data-name');
+            // update name field of editor section
+            $('.course-editor-section .activity-name').text(activityName);
+            MathJax.Hub.Queue(["Typeset",MathJax.Hub,'actvity-editor-headerid']);
+
+            getNodeData(activity_id);
+     
+              $.ajax({
+                      type: "POST",
+
+                      url: "{% url 'get_info_pages' group_id %}",
+                      datatype: "html",
+                      data:{
+                        'csrfmiddlewaretoken': "{{csrf_token}}",
+                        'node_id':activity_id,
+                        'page_type':'has_admin_page'
+
+                      },
+                        success: function(data) {
+                        // $('#info-page-area').html(data);
+                        parent = $("#info-page-area");
+                        parent.append(data);
+                      }
+                    });
+
+                          
+                $.ajax({
+                      type: "POST",
+
+                      url: "{% url 'get_info_pages' group_id %}",
+                      datatype: "html",
+                      data:{
+                        'csrfmiddlewaretoken': "{{csrf_token}}",
+                        'node_id':activity_id,
+                        'page_type':'has_help'
+
+                      },
+                        success: function(data) {
+                        // $('#info-page-area').html(data);
+                        parent = $("#info-page-area");
+                        parent.append(data);
+                      }
+                    });
+            
+            $('.save_edit_activity').attr('href', "{% url 'edit_course_page' group_id 'activity_id' %}".replace('activity_id', activity_id))
+            $('.save_edit_activity').attr('data-current-activity-id', activity_id);
+        });
+
+
+        renderCourseTree(course_data);
+
+
+        {% if request.user.is_authenticated %}
+        // Write events
+        function myLang(){
+            var lang_val = document.getElementById("lesson_lang").value;
+            lesson_id =  $('.save-lesson').attr('data-node-id');
+            $.ajax({
+                      type: "GET",
+                      data:{
+                            'node_id':lesson_id,
+                            'language':lang_val
+                        },
+                      url: "{% url 'get_translated_node' group_id %}",
+                      datatype: "html",
+                      success: function(data) {
+                            data_dict = JSON.parse(data);
+                            $('#lesson-name').val(data_dict.name);   
+                    }
+            });
+
         }
 
         /*
@@ -758,111 +869,6 @@ This will not be used because now only existing activities will be added.
             //To edit the newly created lesson run this $('a[href="#lesson-'+newid+'"] .edit_lesson').trigger('click');
         })
 
-        function getNodeData(node_id)
-        {
-          var result = undefined;
-          $.ajax({
-              type: "GET",
-              data:{
-                  "node_id": node_id,
-              },
-              url: "{% url 'get_node_json_from_id' group_id %}",
-              datatype: "JSON",
-              success: function(data) {
-                  if (data == "0"){
-                    alert('Unable to load data... Something went wrong :(')
-                    return false
-                  }
-                  data_dict = JSON.parse(data);
-                  $('#activity-content').html(data_dict.content);
-                   MathJax.Hub.Queue(["Typeset",MathJax.Hub,'activity-content']);
-                    $("#info-page-area").html("");
-
-                  return true
-              }
-          });
-        }
-
-
-
-        /*
-        * Handlers and actions for the Activity
-        */
-        // Selecting a activity.
-        $('.course-lessons').on('click', '.course-activities>li:not(:last-child) a', function(e){
-            e.preventDefault();
-
-            if(!document.getElementById($(this).parent().attr('id'))){
-                return 1;
-            }
-            $('.course-lessons li[id^="activity-"]').removeClass('active');
-
-            $(this).closest('li').addClass('active');
-            // e.g: activity-58bbaf0a5e35e40049f128ee
-            var activity_id = $(this).closest('li').attr('id').replace('activity-', '');
-            selectedEntity = 'activity';
-            selectedEntityid = activity_id;
-            lastClickedActivity = activity_id;
-
-            setTimeout(function(){
-                $('.course-editor-section').removeClass('hide');
-            }, 1000);
-
-            //Ajax to get the data for this activity.
-            $('.lesson-editor').addClass('hide');
-            $('.activity-editor').removeClass('hide');
-            $('.course_editor').addClass('edit_mode');
-            // $('#course_creator')
-
-            // update content: name and description of activity.
-            var activityName = $('#activity-' + activity_id).attr('data-name');
-            // update name field of editor section
-            $('.course-editor-section .activity-name').text(activityName);
-            MathJax.Hub.Queue(["Typeset",MathJax.Hub,'actvity-editor-headerid']);
-
-            getNodeData(activity_id);
-     
-              $.ajax({
-                      type: "POST",
-
-                      url: "{% url 'get_info_pages' group_id %}",
-                      datatype: "html",
-                      data:{
-                        'csrfmiddlewaretoken': "{{csrf_token}}",
-                        'node_id':activity_id,
-                        'page_type':'has_admin_page'
-
-                      },
-                        success: function(data) {
-                        // $('#info-page-area').html(data);
-                        parent = $("#info-page-area");
-                        parent.append(data);
-                      }
-                    });
-
-                          
-                $.ajax({
-                      type: "POST",
-
-                      url: "{% url 'get_info_pages' group_id %}",
-                      datatype: "html",
-                      data:{
-                        'csrfmiddlewaretoken': "{{csrf_token}}",
-                        'node_id':activity_id,
-                        'page_type':'has_help'
-
-                      },
-                        success: function(data) {
-                        // $('#info-page-area').html(data);
-                        parent = $("#info-page-area");
-                        parent.append(data);
-                      }
-                    });
-            
-            $('.save_edit_activity').attr('href', "{% url 'edit_course_page' group_id 'activity_id' %}".replace('activity_id', activity_id))
-            $('.save_edit_activity').attr('data-current-activity-id', activity_id);
-        });
-
         /*
         // Add a new activity
         $('.course-lessons').on('click', '.add_activity', function(){
@@ -885,7 +891,6 @@ This will not be used because now only existing activities will be added.
             //To select the newly created activity run this $('#activity-' + newid).trigger('click');
         });
 
-        renderCourseTree(course_data);
 
         function getActivityPages() {
             var lessonId = $("#select-activity-page").attr("data-lesson-id");
@@ -1027,6 +1032,7 @@ This will not be used because now only existing activities will be added.
             });//end of ajax
             return success_state
         }
+        {% endif %}
 
 
         /*
