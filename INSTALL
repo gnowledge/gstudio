@@ -77,8 +77,9 @@
               - Removing existing nodejs and npm (if installed previously):
                 - sudo apt-get purge nodejs
                 - sudo apt-get purge npm
+
               (a) sudo apt-get install npm
-              (b) sudo npm cache clean
+              (b) sudo npm cache clean  OR  sudo npm cache vefify
               (c) sudo npm install -g n
               (d) sudo n latest
               (e) ln -sf /usr/local/n/versions/node/<version no from above step>/bin/node /usr/bin/node

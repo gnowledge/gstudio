@@ -1203,8 +1203,34 @@ This will not be used because now only existing activities will be added.
                     });
         }
         */
-
-
-
     })
+
+    
+   function onMessage(message) {
+    // Inconveniently, we don't seem to be able to locate the
+    // assessment-player's iframe inside the content's iframe.  Conventiently,
+    // the assessment-player sends a message up to us to indicate its available
+    // locales.  Although we ignore the available locales, we use that message's
+    // source to target a message back down to the assessment-player.
+    var data = message.data;
+    if(typeof(message.data) == "string"){
+      data = JSON.parse(message.data);
+    }
+    const type = data.open_assessments_msg;
+
+    switch(type) {
+      case "open_assessments_available_locales":
+        message.source.postMessage({
+          open_assessments_msg: "open_assessments_set_locale",
+          locale: '{{LANGUAGE_CODE}}'
+        }, "*");
+        break;
+    }
+  }
+
+  function componentDidMount() {
+    window.addEventListener("message", (e) => this.onMessage(e), false);
+  }
+  componentDidMount()
+
 </script>
