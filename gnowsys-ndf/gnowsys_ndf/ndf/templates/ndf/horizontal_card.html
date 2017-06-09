@@ -16,7 +16,7 @@
     <div class="card_summary">
         <div class="card_section" style="height:6rem;">
             <p class="module_brief">
-                {{node.content|safe|striptags}}
+                {{node.content|safe|striptags|truncatechars:100}}
             </p>
         </div>
         <div class="card_section">
