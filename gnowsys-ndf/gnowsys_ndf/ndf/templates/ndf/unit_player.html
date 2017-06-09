@@ -19,7 +19,7 @@
 
 
 
-{% block title %} Course: {{group_name}} > Activity: {% firstof node.altnames node.name %}  {% endblock %}
+{% block title %} {% trans "Course" %}: {{group_name}} > {% trans "Activity" %}: {% firstof node.altnames node.name %}  {% endblock %}
 
 
 
@@ -34,7 +34,7 @@
               {% if resource_prev_id %}
               <a href="{% url 'course_resource_detail' group_name course_sub_section course_unit resource_prev_id %}" class="prev-activity" title="Click here to view previous resource">
                   <i class="fa fa-hand-o-left"></i>
-                  Previous Activity
+                  {% trans "Previous Activity" %}
               </a>
               {% comment %}
               {% else %}
@@ -81,7 +81,7 @@
               <div style="float: right;">
                   {% if resource_next_id %}
                   <a href="{% url 'course_resource_detail' group_name course_sub_section course_unit resource_next_id %}" class="next-activity" title="Click here to view next resource">
-                      Next Activity
+                      {% trans "Next Activity" %}
                       <i class="fa fa-hand-o-right"></i>
                   </a>
                   {% comment %}
@@ -101,7 +101,7 @@
           <div class="columns small-12 activity-slides">
               <div class="row activity-slide node_details" >
                   {% if help_page_list %}
-                    <a id="related-content-button" href="#related-content" class="view-related-content"><i class="fa fa-arrow-circle-down"></i>&nbsp;View related contents</a>
+                    <a id="related-content-button" href="#related-content" class="view-related-content"><i class="fa fa-arrow-circle-down"></i>&nbsp;{% trans "View related contents" %}</a>
                   {% endif %}
                   {# {{node.content|safe}} #}
                   {% include 'ndf/node_ajax_content.html' with no_discussion=True hide_breadcrumbs=True %}
@@ -111,10 +111,10 @@
               <div id="related-content">
                 <i class="fa fa-info-circle"></i>
                 <div class="related-content-header">
-                  <span>Related Help Topic</span>
+                  <span>{% trans "Related Help Topic" %}</span>
                     <span class="related-content-title">
                       <i class="fa fa-caret-right"></i>&nbsp;{{each_help_page.name}}
-                      <a href="#related-content-button" class="back-to-activity"><i class="fa fa-arrow-circle-up"></i>&nbsp;Go back to activity</a>
+                      <a href="#related-content-button" class="back-to-activity"><i class="fa fa-arrow-circle-up"></i>&nbsp;{% trans "Go back to activity" %}</a>
                       <div class="related-content-close">&times;</div>
                     </span>
                   </div>

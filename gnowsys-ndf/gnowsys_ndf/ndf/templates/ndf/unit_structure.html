@@ -290,7 +290,7 @@ This will not be used because now only existing activities will be added.
 <!-- overlay/reveal to add lesson -->
 <div id="add-lesson-reveal" class="reveal-modal" data-reveal aria-labelledby="modalTitle" aria-hidden="true" role="dialog">
    <div>
-        <div class="small-3 columns left"><h3>Language Selection<h9 style="color:red">*</h9></h3></div>
+        <div class="small-3 columns left"><h3>{% trans "Language Selection" %}<h9 style="color:red">*</h9></h3></div>
         <div class="small-9 columns right">
                <select disabled class="lesson-lang" name="lan" id="lesson_lang" onchange="myLang()" style="height: 42px;">
                     {% get_language_info_list for LANGUAGES as languages %}
@@ -310,7 +310,7 @@ This will not be used because now only existing activities will be added.
         <div class="small-9 columns right lesson_disp_name"><input type="text" id="lesson-name"></div>
     </div>
     <div class="hide">
-        <div class="small-3 columns left lesson-form-desc"><h3>{% trans "Lesson Description" %}<h9 style="color: rgba(128, 128, 128, 0.48);font-style: italic;font-size: 15px;"> optional</h9></h3></div>
+        <div class="small-3 columns left lesson-form-desc"><h3>{% trans "Lesson Description" %}<h9 style="color: rgba(128, 128, 128, 0.48);font-style: italic;font-size: 15px;"> {% trans "optional" %}</h9></h3></div>
         <div class="small-9 columns right lesson_disp_desc"><textarea rows="3" cols="50" id="lesson-desc"></textarea></div>
     </div> 
     <div class="double-buttons">
