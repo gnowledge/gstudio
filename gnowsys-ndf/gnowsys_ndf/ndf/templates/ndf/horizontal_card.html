@@ -21,11 +21,11 @@
         </div>
         <div class="card_section">
             <span class="card_label">
-                Subject: {{node_attrs.educationalsubject}}
+                {% trans "Subject" %}: {{node_attrs.educationalsubject}}
             </span class="card_label">
             <p class="ellipsis"></p>
                 <span class="card_label">
-                    Grade: {{node_attrs.educationallevel|join:', '}}
+                   {% trans "Grade" %} : {{node_attrs.educationallevel|join:', '}}
                 </span class="card_label">
             <p class="ellipsis"></p>
                 <!-- <span class="card_label">
@@ -35,7 +35,7 @@
         </div>
         <div class="card_section">
                 <i class="fa fa-book"></i>
-                <span>Explore</span>
+                <span>{% trans "Explore" %}</span>
         </div>
     </div>
 </div>
