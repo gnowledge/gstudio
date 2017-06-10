@@ -181,6 +181,11 @@ class CreateGroup(object):
         if not content or not content_org:
             content = content_org = u""
 
+        if kwargs.get('language', ''):
+            language = kwargs.get('language', '')
+        elif self.request:
+            language = self.request.POST.get('language', ('en', 'English'))
+
         # whenever we are passing int: 0, condition gets false
         # therefor casting to str
         if str(kwargs.get('moderation_level', '')):
@@ -214,6 +219,7 @@ class CreateGroup(object):
 
         if gst_group._id not in group_obj.type_of:
             group_obj.type_of.append(gst_group._id)
+
         # user related fields:
         user_id = int(self.request.user.id)
         group_obj.created_by = user_id
@@ -235,6 +241,9 @@ class CreateGroup(object):
         group_obj.encryption_policy = encryption_policy
         group_obj.agency_type = agency_type
 
+        if language:
+            language_val = get_language_tuple(unicode(language))
+            group_obj.language = language_val
         #  org-content
         if group_obj.content_org != content_org:
             group_obj.content_org = content_org
@@ -620,7 +629,9 @@ class CreateModeratedGroup(CreateSubGroup):
         }
 
 
-    def create_edit_moderated_group(self, group_name, moderation_level=1, sg_member_of="ModeratingGroup", top_mod_groups_parent=None, **kwargs):
+    def create_edit_moderated_group(self, group_name, moderation_level=1,
+             sg_member_of="ModeratingGroup", top_mod_groups_parent=None,
+             perform_checks=True, **kwargs):
         '''
         Creates/Edits top level group as well as underlying sub-mod groups.
         - Takes group_name as compulsory argument and optional kwargs.
@@ -636,49 +647,49 @@ class CreateModeratedGroup(CreateSubGroup):
 
             # values will be taken from POST form fields
             group_obj = self.get_group_fields(group_name, node_id=node_id)
-            # print group_obj
+            group_obj.save()
+            if perform_checks:
+                try:
+                    if top_mod_groups_parent:
+                        # check if group object's prior_node has _id of parent group,
+                        # otherwise add one.
+                        if ObjectId(top_mod_groups_parent) not in group_obj.prior_node:
+                            group_obj.prior_node.append(ObjectId(top_mod_groups_parent))
 
-            try:
-                if top_mod_groups_parent:
-                    # check if group object's prior_node has _id of parent group,
-                    # otherwise add one.
-                    if ObjectId(top_mod_groups_parent) not in group_obj.prior_node:
-                        group_obj.prior_node.append(ObjectId(top_mod_groups_parent))
+                    group_obj.save()
 
-                group_obj.save()
+                    if top_mod_groups_parent:
+                        # equivalently, adding newly created top moderated group's _id
+                        # in post node of it's immediate parent group
+                        self.add_subgroup_to_parents_postnode(top_mod_groups_parent, group_obj._id, sg_member_of=sg_member_of)
 
-                if top_mod_groups_parent:
-                    # equivalently, adding newly created top moderated group's _id
-                    # in post node of it's immediate parent group
-                    self.add_subgroup_to_parents_postnode(top_mod_groups_parent, group_obj._id, sg_member_of=sg_member_of)
+                except Exception, e:
+                    # if any errors return tuple with False and error
+                    # print e
+                    return False, e
+                if node_id:
+                    # i.e: Editing already existed group object.
+                    # method modifies the underlying mod-sub-group structure and doesn't return anything.
+                    self.check_reset_mod_group_hierarchy(sg_member_of=sg_member_of, top_group_obj=group_obj)
 
-            except Exception, e:
-                # if any errors return tuple with False and error
-                # print e
-                return False, e
-            if node_id:
-                # i.e: Editing already existed group object.
-                # method modifies the underlying mod-sub-group structure and doesn't return anything.
-                self.check_reset_mod_group_hierarchy(sg_member_of=sg_member_of, top_group_obj=group_obj)
+                else:
+                    # i.e: New group is created and following code will create
+                    # sub-mod-groups as per specified in the form.
+                    parent_group_id = group_obj._id
 
-            else:
-                # i.e: New group is created and following code will create
-                # sub-mod-groups as per specified in the form.
-                parent_group_id = group_obj._id
+                    for each_sg_iter in range(0, int(moderation_level)):
 
-                for each_sg_iter in range(0, int(moderation_level)):
+                        result = self.add_moderation_level(parent_group_id, sg_member_of=sg_member_of)
 
-                    result = self.add_moderation_level(parent_group_id, sg_member_of=sg_member_of)
+                        # result is tuple of (bool, newly-created-sub-group-obj)
+                        if result[0]:
+                            # overwritting parent's group_id with currently/newly-created group object
+                            parent_group_id = result[1]._id
 
-                    # result is tuple of (bool, newly-created-sub-group-obj)
-                    if result[0]:
-                        # overwritting parent's group_id with currently/newly-created group object
-                        parent_group_id = result[1]._id
-
-                    else:
-                        # if result is False, means sub-group is not created.
-                        # In this case, there is no point to go ahead and create subsequent sub-group.
-                        break
+                        else:
+                            # if result is False, means sub-group is not created.
+                            # In this case, there is no point to go ahead and create subsequent sub-group.
+                            break
 
             return True, group_obj
 
@@ -1676,88 +1687,96 @@ class EventGroupCreateEditHandler(View):
                 mod_group = CreateCourseEventGroup(request)
 
             # calling method to create new group
-            result = mod_group.create_edit_moderated_group(group_name, moderation_level, sg_type, node_id=node_id)
+            result = mod_group.create_edit_moderated_group(group_name, moderation_level, sg_type, node_id=node_id, perform_checks=False)
         if result[0]:
             # operation success: create ATs
             group_obj = result[1]
             group_obj.fill_node_values(request)
+            language = request.POST.get('language', ('en', 'English'))
+            if language:
+                language_val = get_language_tuple(unicode(language))
+                group_obj.language = language_val
+
             if sg_type == "CourseEventGroup":
                 if ("base_unit" in parent_group_obj.member_of_names_list or 
                     "announced_unit" in parent_group_obj.member_of_names_list):
                     group_obj.member_of = [ObjectId(announced_unit_gst._id)]
                 else:
                     group_obj.member_of = [ObjectId(courseevent_group_gst._id)]
-                group_obj.language = parent_group_obj.language
+                # group_obj.language = parent_group_obj.language
                 if parent_group_obj.project_config:
                     group_obj.project_config = parent_group_obj.project_config
                 group_obj.save()
-
+                if node_id:
+                    return HttpResponseRedirect(reverse('groupchange',
+                     kwargs={'group_id': group_name}))
             # to make PE/CE as sub groups of the grp from which it is created.
             # parent_group_obj.post_node.append(group_obj._id)
             # group_obj.prior_node.append(parent_group_obj._id)
             # group_obj.save()
             # parent_group_obj.save()
-            date_result = mod_group.set_event_and_enrollment_dates(request, group_obj._id, parent_group_obj)
-            if date_result[0]:
-                # Successfully had set dates to EventGroup
-                if sg_type == "CourseEventGroup":
-                    mod_group.initialize_course_event_structure(request, group_obj, parent_group_obj)
-                    # creating a new counter document for a user for a given course for the purpose of analytics
+            if not node_id:
+                date_result = mod_group.set_event_and_enrollment_dates(request, group_obj._id, parent_group_obj)
+                if date_result[0]:
+                    # Successfully had set dates to EventGroup
+                    if sg_type == "CourseEventGroup":
+                        mod_group.initialize_course_event_structure(request, group_obj, parent_group_obj)
+                        # creating a new counter document for a user for a given course for the purpose of analytics
 
-                    # counter_obj = Counter.get_counter_obj(userid, group_id)
-                    # print "===========================", counter_obj
+                        # counter_obj = Counter.get_counter_obj(userid, group_id)
+                        # print "===========================", counter_obj
 
-                    # auth_obj= node_collection.one({'_type':'Author','created_by':request.user.id})
+                        # auth_obj= node_collection.one({'_type':'Author','created_by':request.user.id})
 
-                    # counter_obj = counter_collection.collection.Counter()
-                    # counter_obj.fill_counter_values(
-                    #                                 user_id=request.user.id,
-                    #                                 auth_id=auth_obj._id,
-                    #                                 group_id=group_obj._id,
-                    #                                 is_group_member=True
-                    #                             )
-                    # counter_obj.save()
+                        # counter_obj = counter_collection.collection.Counter()
+                        # counter_obj.fill_counter_values(
+                        #                                 user_id=request.user.id,
+                        #                                 auth_id=auth_obj._id,
+                        #                                 group_id=group_obj._id,
+                        #                                 is_group_member=True
+                        #                             )
+                        # counter_obj.save()
 
-                # elif sg_type == "ProgramEventGroup":
-                    # mod_group.set_logo(request,group_obj,logo_rt = "has_logo")
-                # mod_group.set_logo(request,group_obj,logo_rt = "has_profile_pic")
-                mod_group.set_logo(request,group_obj,logo_rt = "has_banner_pic")
-                group_name = group_obj.name
-                if "announced_unit" in group_obj.member_of_names_list:
-                    # check if base_unit is assigned to any module
-                    gst_module_name, gst_module_id = GSystemType.get_gst_name_id('Module')
-                    parent_modules = node_collection.find({
-                        '_type': 'GSystem',
-                        'member_of': gst_module_id,
-                        'collection_set': {'$in': [parent_group_obj._id]}
-                    })
-                    for each_parent_module in parent_modules:
-                        each_parent_module.collection_set.append(group_obj._id)
-                        each_parent_module.save()
-                    # check if base_unit has attr assigned
-                    # Add attr  educationallevel_val and educationalsubject
-                    educationalsubject_val = get_attribute_value(parent_group_obj._id,"educationalsubject")
-                    educationallevel_val = get_attribute_value(parent_group_obj._id,"educationallevel")
-                    # print "\n educationalsubject_val: ", educationalsubject_val
-                    # print "\n educationallevel_val: ", educationallevel_val
-                    if educationalsubject_val:
-                        educationalsubject_at = node_collection.one({
-                            '_type': 'AttributeType',
-                            'name': "educationalsubject"
+                    # elif sg_type == "ProgramEventGroup":
+                        # mod_group.set_logo(request,group_obj,logo_rt = "has_logo")
+                    # mod_group.set_logo(request,group_obj,logo_rt = "has_profile_pic")
+                    mod_group.set_logo(request,group_obj,logo_rt = "has_banner_pic")
+                    group_name = group_obj.name
+                    if "announced_unit" in group_obj.member_of_names_list:
+                        # check if base_unit is assigned to any module
+                        gst_module_name, gst_module_id = GSystemType.get_gst_name_id('Module')
+                        parent_modules = node_collection.find({
+                            '_type': 'GSystem',
+                            'member_of': gst_module_id,
+                            'collection_set': {'$in': [parent_group_obj._id]}
                         })
-                        create_gattribute(group_obj._id, educationalsubject_at, unicode(educationalsubject_val))
-                    if educationallevel_val:
-                        educationallevel_at = node_collection.one({
-                            '_type': 'AttributeType',
-                            'name': "educationallevel"
-                        })
-                        create_gattribute(group_obj._id, educationallevel_at, unicode(educationallevel_val))
-                    group_obj.reload()
-                url_name = 'groupchange'
-            else:
-                # operation fail: redirect to group-listing
-                group_name = 'home'
-                url_name = 'group'
+                        for each_parent_module in parent_modules:
+                            each_parent_module.collection_set.append(group_obj._id)
+                            each_parent_module.save()
+                        # check if base_unit has attr assigned
+                        # Add attr  educationallevel_val and educationalsubject
+                        educationalsubject_val = get_attribute_value(parent_group_obj._id,"educationalsubject")
+                        educationallevel_val = get_attribute_value(parent_group_obj._id,"educationallevel")
+                        # print "\n educationalsubject_val: ", educationalsubject_val
+                        # print "\n educationallevel_val: ", educationallevel_val
+                        if educationalsubject_val:
+                            educationalsubject_at = node_collection.one({
+                                '_type': 'AttributeType',
+                                'name': "educationalsubject"
+                            })
+                            create_gattribute(group_obj._id, educationalsubject_at, unicode(educationalsubject_val))
+                        if educationallevel_val:
+                            educationallevel_at = node_collection.one({
+                                '_type': 'AttributeType',
+                                'name': "educationallevel"
+                            })
+                            create_gattribute(group_obj._id, educationallevel_at, unicode(educationallevel_val))
+                        group_obj.reload()
+                    url_name = 'groupchange'
+                else:
+                    # operation fail: redirect to group-listing
+                    group_name = 'home'
+                    url_name = 'group'
         else:
             # operation fail: redirect to group-listing
             group_name = 'home'
