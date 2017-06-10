@@ -4271,12 +4271,13 @@ $module-card-lines-to-show: 3;
         transition: left .4s ease-in-out;
         -webkit-transition-property: left; /* Safari */
         transition-property: left;
-        background-color:rgba(221, 221, 221, 0.19);
+        background-color:rgba(231, 231, 231, 0.25);
 
         .card_label {
-            font-weight: 600;
+            font-weight: 500;
             font-size: $module-card-font-size;
             letter-spacing: 1px;
+            color: black;
         }
         .card_section {
             margin: 5px 0px;
@@ -4309,6 +4310,7 @@ $module-card-lines-to-show: 3;
             -webkit-line-clamp: $module-card-lines-to-show;
             -webkit-box-orient: vertical;
             margin-bottom: 10px;
+            color: black;
         }
     }
 }
