@@ -1688,6 +1688,8 @@ class EventGroupCreateEditHandler(View):
                 else:
                     group_obj.member_of = [ObjectId(courseevent_group_gst._id)]
                 group_obj.language = parent_group_obj.language
+                if parent_group_obj.project_config:
+                    group_obj.project_config = parent_group_obj.project_config
                 group_obj.save()
 
             # to make PE/CE as sub groups of the grp from which it is created.
