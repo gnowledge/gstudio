@@ -3654,3 +3654,98 @@ def get_trans_node_list(node_list,lang):
             trans_node_list.append({ObjectId(node._id): {"name":node.name,"basenodeid":ObjectId(node._id)}})
     if trans_node_list:
         return trans_node_list
+
+@get_execution_time
+def course_quiz_data(request, group_id):
+    group_obj   = Group.get_group_name_id(group_id, get_obj=True)
+    group_id    = group_obj._id
+    group_name  = group_obj.name
+
+    allow_to_join = get_group_join_status(group_obj)
+    template = 'ndf/gcourse_event_group.html'
+    context_variables = {
+            'group_id': group_id, 'groupid': group_id, 'group_name':group_name,
+            'group_obj': group_obj, 'title': 'course_quiz_data', 'allow_to_join': allow_to_join
+        }
+
+    admin_analytics_data_list = []
+    admin_analytics_data_append = admin_analytics_data_list.append
+    qip_gst = node_collection.one({ '_type': 'GSystemType', 'name': 'QuizItemPost'})
+
+    query = {'member_of': qip_gst._id, 'created_by': 1, 'group_set': group_id}
+
+    rec = node_collection.collection.aggregate([
+        {
+            '$match': query
+        }, {
+            '$project': {
+                '_id': 0,
+                'name': '$name',
+                'check': '$attribute_set.quizitempost_user_checked_ans',
+                'submit': '$attribute_set.quizitempost_user_submitted_ans',
+                'user_id': '$created_by'
+            }
+        },
+        {
+            '$sort': {'created_at': 1}
+        }
+    ])
+
+    l = []
+    for d in rec['result']:
+        for key,val in d.items():
+            if key == "check":
+                for each_list in val[0]:
+                    for k,v in each_list.items():
+                        l2 = []
+                        l2.append(d['name'])
+                        l2.append(d['user_id'])
+                        l2.append(','.join(v))
+                        l2.append(k)
+                        l2.append("NA")
+                        l2.append("NA")
+                        l.append(l2)
+
+            if key == "submit":
+                for each_list in val[0]:
+                    for k,v in each_list.items():
+                        l1 = []
+                        l1.append(d['name'])
+                        l1.append(d['user_id'])
+                        l1.append("NA")
+                        l1.append("NA")
+                        l1.append(','.join(v))
+                        l1.append(k)
+                        l.append(l1)
+
+    '''
+    for each_qip in qip_cur:
+        for each_at in each_qip.attribute_set:
+            for eachk, eachv in each_at.iteritems():
+                if eachk == "quizitempost_user_checked_ans" or \
+                        eachk == "quizitempost_user_submitted_ans":
+                    admin_analytics_data = []
+                    admin_analytics_data.append(each_qip.name)
+                    admin_analytics_data.append(str(each_qip.created_by))
+                    if eachk == "quizitempost_user_checked_ans":
+                        if isinstance(eachv, list):
+                            for eachu in eachv:
+                                for eachkk, eachvv in eachu.iteritems():
+                                    admin_analytics_data.append(eachkk)
+                                    admin_analytics_data.append(eachvv)
+
+                    if eachk == "quizitempost_user_submitted_ans":
+                        if isinstance(eachv, list):
+                            for eachu in eachv:
+                                for eachkk, eachvv in eachu.iteritems():
+                                    admin_analytics_data.append(eachkk)
+                                    admin_analytics_data.append(eachvv)
+
+        admin_analytics_data_append(admin_analytics_data)
+    '''
+    # print "\nadmin_analytics_data: ", admin_analytics_data_list
+    banner_pic_obj,old_profile_pics = _get_current_and_old_display_pics(group_obj)
+    context_variables.update({'old_profile_pics':old_profile_pics,
+                        "prof_pic_obj": banner_pic_obj, 'data': json.dumps(l)})
+    return render_to_response(template, context_variables,
+            context_instance=RequestContext(request))
