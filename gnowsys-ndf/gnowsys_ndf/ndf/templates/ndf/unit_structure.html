@@ -13,7 +13,9 @@
             <div class="course_tree">
                 <dl class="accordion course-lessons" data-accordion role="tablist">
                 </dl>
-                <a class="button-hollow-grey add-lesson add-lesson-top-margin" data-reveal-id="add-lesson-reveal">{% trans "Add Lesson" %}</a>
+                <a class="button-hollow-grey add-lesson add-lesson-top-margin" data-reveal-id="add-lesson-reveal">
+                    {% if not unit_obj.project_config.section_name %}{% trans "Add Lesson" %}{% else %}{% trans 'add' %} {{unit_obj.project_config.section_name}} {% endif %}
+                </a>
             </div>
             <!-- END of LEFT PANEL -->
 
@@ -306,7 +308,7 @@ This will not be used because now only existing activities will be added.
         </div>
     </div>
     <div>
-        <div class="small-3 columns left lesson-form-name"><h3>{% trans "Lesson Name" %}<h9 style="color:red">*</h9></h3></div>
+        <div class="small-3 columns left lesson-form-name"><h3>{% if not unit_obj.project_config.section_name %}{% trans "Lesson Name" %}{% else %} {{unit_obj.project_config.section_name}} {% endif %} <h9 style="color:red">*</h9></h3></div>
         <div class="small-9 columns right lesson_disp_name"><input type="text" id="lesson-name"></div>
     </div>
     <div class="hide">
@@ -314,7 +316,7 @@ This will not be used because now only existing activities will be added.
         <div class="small-9 columns right lesson_disp_desc"><textarea rows="3" cols="50" id="lesson-desc"></textarea></div>
     </div> 
     <div class="double-buttons">
-        <button type="button" class="button-hollow-grey save-lesson add-lesson-top-margin" data-node-id=""> {% trans "Save Lesson" %} </button>
+        <button type="button" class="button-hollow-grey save-lesson add-lesson-top-margin" data-node-id=""> {% if not unit_obj.project_config.section_name %}{% trans "Save Lesson" %}{% else %} {% trans 'Save' %} {{unit_obj.project_config.section_name}}  {% endif %} </button>
         {% comment %}
         <button type="button" class="button-hollow-grey save-lesson add-lesson-top-margin" data-node-id=""> {% trans "Cancel" %} </button>
         {% endcomment %}

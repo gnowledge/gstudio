@@ -3985,7 +3985,6 @@ def get_gstudio_registration():
 @register.assignment_tag
 def get_unit_total_points(user_id,group_id):
 	counter_obj = Counter.get_counter_obj(user_id, ObjectId(group_id))
-	return counter_obj['group_points']
 
 
 @register.assignment_tag
@@ -4039,3 +4038,8 @@ def user_groups(is_super_user,user_id):
 	user_grps_count['drafts'] = user_draft_nodes.count()
 	user_grps_count['projects'] = group_cur.count()
 	return user_grps_count
+	return counter_obj['group_points']
+
+@register.assignment_tag
+def if_edit_course_structure():
+	return GSTUDIO_EDIT_LMS_COURSE_STRUCTURE
