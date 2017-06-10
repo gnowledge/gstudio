@@ -36,7 +36,7 @@
  -->             
 
                 {% if help_oid %}
-                <li class=""><a {% if title == 'Help Page'  %} class="active" {% endif %} target="_blank" href="{% url 'help_page_view' help_oid %}"> <i class="fa fa-info-circle"></i> Help </a></li>
+                <li class=""><a {% if title == 'Help Page'  %} class="active" {% endif %} target="_blank" href="{% url 'groupchange' help_oid %}"> <i class="fa fa-info-circle"></i> Help </a></li>
                 {% endif %}
                 <ul class="">
           <li class="has-dropdown">

@@ -105,7 +105,7 @@
                           </select>
                     </div>
                 </div>
-                {% comment %}
+                
                 <div class="course_creator_header">
                     <div class="left course_heading">
                     <h5>Enter tab name</h5>
@@ -119,7 +119,7 @@
                     <h5>Enter Section Name</h5>
                     </div>
                     <div class="right course_heading_unit">
-                         <input id="section-name" name="section_name"  type="text" placeholder="Enter Section name"/>
+                         <input id="section-name" name="section_name" value="{{unit_node.project_config.section_name}}"  type="text" placeholder="Enter Section name"/>
                     </div>
                 </div>
                 <div class="course_creator_header">
@@ -127,10 +127,10 @@
                     <h5>Enter Sub Section name</h5>
                     </div>
                     <div class="right course_heading_unit">
-                         <input id="subsection-name" name="subsection_name" type="text" placeholder="Enter Sub Section name"/>
+                         <input id="subsection-name" name="subsection_name" value="{{unit_node.project_config.subsection_name}}" type="text" placeholder="Enter Sub Section name"/>
                     </div>
                 </div>
-                {% endcomment %}
+                
                 <div class=" course_heading_unit tags-container">
                  {% include 'ndf/widget_tags.html' with node=unit_node %}
 
