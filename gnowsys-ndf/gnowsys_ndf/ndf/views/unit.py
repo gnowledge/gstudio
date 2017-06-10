@@ -163,6 +163,13 @@ def unit_create_edit(request, group_id, unit_group_id=None):
         else:
             unit_node['project_config'].update({"section_name":"Section"})
 
+        if subsection_name:
+            unit_node['project_config'].update( {"subsection_name":subsection_name})
+        elif "base_unit" in unit_node.member_of_names_list or "announced_unit" in unit_node.member_of_names_list :
+            unit_node['project_config'].update({"subsection_name":"Add from Activities"})
+        else:
+            unit_node['project_config'].update({"subsection_name":"Add SubSection"})
+
         unit_node.save()
         return HttpResponseRedirect(reverse('course_about',
             kwargs={'group_id': unit_node._id}))
