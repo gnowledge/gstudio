@@ -146,18 +146,22 @@ def unit_create_edit(request, group_id, unit_group_id=None):
         # unit_node.tags = tags
         unit_node.fill_gstystem_values(tags=tags)
         unit_node.content = content
-        # tab_name = request.POST.get('tab_name', '')
-        # section_name = request.POST.get('section_name', '')
-        # subsection_name = request.POST.get('subsection_name', '')
-        # if tab_name:
-        #     unit_node['project_config'].update( {"tab_name":tab_name})
-        # else:
-        #     unit_node['project_config'].update( {"tab_name":"Lessons"})
+        tab_name = request.POST.get('tab_name', '')
+        section_name = request.POST.get('section_name', '')
+        subsection_name = request.POST.get('subsection_name', '')
+        if tab_name:
+            unit_node['project_config'].update( {"tab_name":tab_name})
+        elif "base_unit" in unit_node.member_of_names_list or "announced_unit" in unit_node.member_of_names_list :
+            unit_node['project_config'].update( {"tab_name":"Lessons"})
+        else:
+            unit_node['project_config'].update( {"tab_name":"Tab Name"})
         
-        # if section_name:
-        #     unit_node['project_config'].update( {"section_name":section_name})
-        # else:
-        #     unit_node['project_config'].update({"section_name":"Lesson"})
+        if section_name:
+            unit_node['project_config'].update( {"section_name":section_name})
+        elif "base_unit" in unit_node.member_of_names_list or "announced_unit" in unit_node.member_of_names_list :
+            unit_node['project_config'].update({"section_name":"Lesson"})
+        else:
+            unit_node['project_config'].update({"section_name":"Section"})
 
         unit_node.save()
         return HttpResponseRedirect(reverse('course_about',

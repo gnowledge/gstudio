@@ -644,6 +644,7 @@ GSTUDIO_SITE_NAME = "metaStudio"  # holds the name of site. e.g: "NROER, "tiss" 
 GSTUDIO_SITE_ISSUES_PAGE = ""
 GSTUDIO_EBOOKS_HELP_TEXT = "" #ebook help text page  url(page:"how to read ebooks")
 GSTUDIO_SUPPORTED_JHAPPS = ['Jsmol','Police Squad','OpenStoryTool','BioMechanics', 'TurtleBlocks']
+GSTUDIO_EDIT_LMS_COURSE_STRUCTURE = False
 # terms & conditions
 GSTUDIO_OID_TC = None
 GSTUDIO_OID_HELP = ""
