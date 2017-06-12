@@ -88,7 +88,7 @@
   $(document).ready(function(){
     user_id_list = {{request.session.buddies_userid_list}}
     group_member_ids = {{group_object.author_set}}
-    var isSuperset = user_id_list.every(function(val) {
+    isSuperset = user_id_list.every(function(val) {
       return group_member_ids.indexOf(val) >= 0; 
     });
     if (isSuperset){
