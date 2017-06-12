@@ -3801,7 +3801,9 @@ ul.nav_menu_1 {
 .course_editor_section{
     background:#fff;
     min-height: 100vh;
+    min-width:910px;
     margin-bottom:10px;
+    padding-right:4px;
     #scstyle{
         margin-top:-10px;
     }
@@ -4203,9 +4205,10 @@ $module-card-lines-to-show: 3;
     margin: 10px;
     border-radius: 5px;
     position: relative;
+    box-shadow: 0px 0px 15px rgb(193, 227, 238);
 
     &:hover {
-        box-shadow: 0px 0px 15px rgba(0, 0, 0, 0.2);
+        box-shadow: 0px 0px 15px black;
     }
 
     &>div {
@@ -4265,16 +4268,18 @@ $module-card-lines-to-show: 3;
         border-width: 1px 1px 1px 0px;
         border-radius: 0px 7px 7px 0px;
         border-color: #d5d5d5;
-        box-shadow: inset 6px 0px 13px -5px;
+        // box-shadow: inset 6px 0px 13px -5px;
         -webkit-transition: left .4s ease-in-out;
         transition: left .4s ease-in-out;
         -webkit-transition-property: left; /* Safari */
         transition-property: left;
+        background-color:rgba(231, 231, 231, 0.25);
 
         .card_label {
-            font-weight: 600;
+            font-weight: 500;
             font-size: $module-card-font-size;
             letter-spacing: 1px;
+            color: black;
         }
         .card_section {
             margin: 5px 0px;
@@ -4307,6 +4312,7 @@ $module-card-lines-to-show: 3;
             -webkit-line-clamp: $module-card-lines-to-show;
             -webkit-box-orient: vertical;
             margin-bottom: 10px;
+            color: black;
         }
     }
 }

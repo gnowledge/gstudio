@@ -16,8 +16,13 @@
   .disabled , .disabled i {
     color:gray !important;
   }
+  .course_editor_section{
+    min-width:930px;
+    margin-left: -15px;
+  }
   .node-content-div{
-    overflow-x: scroll;
+    
+    margin-left: -4px;
   }
 </style>
 
@@ -105,7 +110,7 @@
                 {# {{node.content|safe}} #}
                 {% include "ndf/node_ajax_content.html" with node=trans_node expand_content=True  no_discussion=True hide_breadcrumbs=True %}
               </div>
-              <div class="discussion-area activity_page_rendered" style="overflow-x:auto;overflow-y:hidden">
+              <div class="discussion-area activity_page_rendered" style="">
                 
                 {% if node_discussion %}
                     {% get_thread_node node.pk as thread_node_obj %}
