@@ -3657,6 +3657,16 @@ def get_trans_node_list(node_list,lang):
 
 @get_execution_time
 def course_quiz_data(request, group_id):
+    def _merged_to_from(min_list, max_list, na_index):
+        # max list contains more num of list
+        # min list contains less num of list
+        mod_max_list = max_list[:len(min_list)]
+        exception_list = max_list[len(min_list):]
+        for j,k in zip(min_list, mod_max_list):
+            for ind in na_index:
+                k[ind] = j[ind]
+        return mod_max_list + exception_list
+
     group_obj   = Group.get_group_name_id(group_id, get_obj=True)
     group_id    = group_obj._id
     group_name  = group_obj.name
@@ -3672,7 +3682,7 @@ def course_quiz_data(request, group_id):
     admin_analytics_data_append = admin_analytics_data_list.append
     qip_gst = node_collection.one({ '_type': 'GSystemType', 'name': 'QuizItemPost'})
 
-    query = {'member_of': qip_gst._id, 'created_by': 1, 'group_set': group_id}
+    query = {'member_of': qip_gst._id, 'group_set': group_id}
 
     rec = node_collection.collection.aggregate([
         {
@@ -3683,7 +3693,8 @@ def course_quiz_data(request, group_id):
                 'name': '$name',
                 'check': '$attribute_set.quizitempost_user_checked_ans',
                 'submit': '$attribute_set.quizitempost_user_submitted_ans',
-                'user_id': '$created_by'
+                'user_id': '$created_by',
+                'thread_node': '$prior_node'
             }
         },
         {
@@ -3692,60 +3703,71 @@ def course_quiz_data(request, group_id):
     ])
 
     l = []
+    # print "rec['result']", rec['result']
     for d in rec['result']:
         for key,val in d.items():
-            if key == "check":
+            if key == "user_id":
+                d['user_id'] = User.objects.get(pk=int(val)).username
+            if key == "thread_node" and val:
+                qie_node = node_collection.find_one({'_id': {'$in': val}, 
+                    'name': {'$regex': '^(?!Thread of).*'}})
+                d['name'] = qie_node.content
+            if key == "check" and val:
                 for each_list in val[0]:
                     for k,v in each_list.items():
                         l2 = []
                         l2.append(d['name'])
                         l2.append(d['user_id'])
-                        l2.append(','.join(v))
                         l2.append(k)
-                        l2.append("NA")
-                        l2.append("NA")
+                        l2.append(','.join(v))
+                        l2.append("--")
+                        l2.append("--")
                         l.append(l2)
 
-            if key == "submit":
+            if key == "submit" and val:
                 for each_list in val[0]:
                     for k,v in each_list.items():
                         l1 = []
                         l1.append(d['name'])
                         l1.append(d['user_id'])
-                        l1.append("NA")
-                        l1.append("NA")
-                        l1.append(','.join(v))
+                        l1.append("--")
+                        l1.append("--")
                         l1.append(k)
+                        l1.append(','.join(v))
                         l.append(l1)
 
-    '''
-    for each_qip in qip_cur:
-        for each_at in each_qip.attribute_set:
-            for eachk, eachv in each_at.iteritems():
-                if eachk == "quizitempost_user_checked_ans" or \
-                        eachk == "quizitempost_user_submitted_ans":
-                    admin_analytics_data = []
-                    admin_analytics_data.append(each_qip.name)
-                    admin_analytics_data.append(str(each_qip.created_by))
-                    if eachk == "quizitempost_user_checked_ans":
-                        if isinstance(eachv, list):
-                            for eachu in eachv:
-                                for eachkk, eachvv in eachu.iteritems():
-                                    admin_analytics_data.append(eachkk)
-                                    admin_analytics_data.append(eachvv)
 
-                    if eachk == "quizitempost_user_submitted_ans":
-                        if isinstance(eachv, list):
-                            for eachu in eachv:
-                                for eachkk, eachvv in eachu.iteritems():
-                                    admin_analytics_data.append(eachkk)
-                                    admin_analytics_data.append(eachvv)
+    # print "\nadmin_analytics_data: ", l
+    checked_ans_list = []
+    submitted_ans_list = []
+    user_dict_list = []
+    user_dict = {}
+    for e in l:
+        # print "\n this is e: ", e, any(e[1] not in euu for euu in user_dict_list)
+        if any(e[1] in euu.keys() for euu in user_dict_list):
+            for en in user_dict_list:
+                if e[1] in en.keys():
+                    user_dict = en
+        else:
+            user_dict = {e[1]: {'check': [], 'submit': []}}
+            user_dict_list.append(user_dict)
+        if e.index('--') in [2,3]:
+            user_dict[e[1]]['submit'].append(e)
+        elif e.index('--') in [4,5]:
+            user_dict[e[1]]['check'].append(e)
+    return_list = []
+    for each_user_dict in user_dict_list:
+        for ked, ved in each_user_dict.items():
+            if len(ved['check'])< len(ved['submit']):
+                return_list.extend(_merged_to_from(ved['check'],ved['submit'], na_index=[2,3]))
+            elif len(ved['submit'])< len(ved['check']):
+                return_list.extend(_merged_to_from(ved['submit'],ved['check'], na_index=[4,5]))
+    print "*"*80
+    print "*"*80
+    print "\nadmin_analytics_data: ", return_list
 
-        admin_analytics_data_append(admin_analytics_data)
-    '''
-    # print "\nadmin_analytics_data: ", admin_analytics_data_list
     banner_pic_obj,old_profile_pics = _get_current_and_old_display_pics(group_obj)
     context_variables.update({'old_profile_pics':old_profile_pics,
-                        "prof_pic_obj": banner_pic_obj, 'data': json.dumps(l)})
+                        "prof_pic_obj": banner_pic_obj, 'data': json.dumps(return_list)})
     return render_to_response(template, context_variables,
             context_instance=RequestContext(request))
