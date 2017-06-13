@@ -3660,12 +3660,12 @@ def course_quiz_data(request, group_id):
     def _merged_to_from(min_list, max_list, na_index):
         # max list contains more num of list
         # min list contains less num of list
-        mod_max_list = max_list[:len(min_list)]
+        partly_max_list = max_list[:len(min_list)]
         exception_list = max_list[len(min_list):]
-        for j,k in zip(min_list, mod_max_list):
+        for min_list_ele,mod_max_list_ele in zip(min_list, partly_max_list):
             for ind in na_index:
-                k[ind] = j[ind]
-        return mod_max_list + exception_list
+                partly_max_list_ele[ind] = min_list_ele[ind]
+        return partly_max_list + exception_list
 
     group_obj   = Group.get_group_name_id(group_id, get_obj=True)
     group_id    = group_obj._id
@@ -3684,7 +3684,7 @@ def course_quiz_data(request, group_id):
 
     query = {'member_of': qip_gst._id, 'group_set': group_id}
 
-    rec = node_collection.collection.aggregate([
+    record_set = node_collection.collection.aggregate([
         {
             '$match': query
         }, {
@@ -3704,32 +3704,43 @@ def course_quiz_data(request, group_id):
 
     l = []
     # print "rec['result']", rec['result']
-    for d in rec['result']:
-        for key,val in d.items():
-            if key == "user_id":
-                d['user_id'] = User.objects.get(pk=int(val)).username
-            if key == "thread_node" and val:
-                qie_node = node_collection.find_one({'_id': {'$in': val}, 
+    for each_record in record_set['result']:
+        for record_key,record_val in each_record.items():
+            if record_key == "user_id":
+                # To prevent in error in case where 
+                # User object does not exist, return user-id
+                user_obj = User.objects.get(pk=int(record_val))
+                if user_obj:
+                    username = user_obj.username
+                else:
+                    username = record_val                    
+                each_record['user_id'] = username
+
+            if record_key == "thread_node" and record_val:
+                # QuizItemPost's prior_node list contains ObjectId
+                # of its Thread node and QuizItemEvent node
+                qie_node = node_collection.find_one({'_id': {'$in': record_val}, 
                     'name': {'$regex': '^(?!Thread of).*'}})
-                d['name'] = qie_node.content
-            if key == "check" and val:
-                for each_list in val[0]:
-                    for k,v in each_list.items():
+                each_record['name'] = qie_node.content
+
+            if record_key == "check" and record_val:
+                for checked_ans_dict in record_val[0]:
+                    for k,v in checked_ans_dict.items():
                         l2 = []
-                        l2.append(d['name'])
-                        l2.append(d['user_id'])
+                        l2.append(each_record['name'])
+                        l2.append(each_record['user_id'])
                         l2.append(k)
                         l2.append(','.join(v))
                         l2.append("--")
                         l2.append("--")
                         l.append(l2)
 
-            if key == "submit" and val:
-                for each_list in val[0]:
-                    for k,v in each_list.items():
+            if record_key == "submit" and record_val:
+                for submitted_ans_dict in record_val[0]:
+                    for k,v in submitted_ans_dict.items():
                         l1 = []
-                        l1.append(d['name'])
-                        l1.append(d['user_id'])
+                        l1.append(each_record['name'])
+                        l1.append(each_record['user_id'])
                         l1.append("--")
                         l1.append("--")
                         l1.append(k)
@@ -3755,6 +3766,7 @@ def course_quiz_data(request, group_id):
             user_dict[e[1]]['submit'].append(e)
         elif e.index('--') in [4,5]:
             user_dict[e[1]]['check'].append(e)
+
     return_list = []
     for each_user_dict in user_dict_list:
         for ked, ved in each_user_dict.items():
@@ -3762,9 +3774,6 @@ def course_quiz_data(request, group_id):
                 return_list.extend(_merged_to_from(ved['check'],ved['submit'], na_index=[2,3]))
             elif len(ved['submit'])< len(ved['check']):
                 return_list.extend(_merged_to_from(ved['submit'],ved['check'], na_index=[4,5]))
-    print "*"*80
-    print "*"*80
-    print "\nadmin_analytics_data: ", return_list
 
     banner_pic_obj,old_profile_pics = _get_current_and_old_display_pics(group_obj)
     context_variables.update({'old_profile_pics':old_profile_pics,
