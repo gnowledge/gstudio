@@ -185,6 +185,7 @@ def user_objs_restoration():
     else:
         print "*"*80
         print "\n No RESTORE_USER_DATA available. Setting Default user with id: 1"
+        DEFAULT_USER_SET = True
         DEFAULT_USER_ID = 1
         log_file.write("\n No RESTORE_USER_DATA available. Setting Default user with id :" + str(DEFAULT_USER_SET))
 
@@ -203,6 +204,8 @@ def update_group_set(document_json):
     return document_json
 
 def update_schema_and_user_ids(document_json):
+    global DEFAULT_USER_SET
+    global DEFAULT_USER_ID
     if SCHEMA_ID_MAP:
         if document_json['member_of']:
             for each_mem_of_id in document_json['member_of']:
@@ -214,18 +217,18 @@ def update_schema_and_user_ids(document_json):
                 if each_mem_of_id in SCHEMA_ID_MAP:
                     replace_in_list(document_json['type_of'], 
                         each_mem_of_id, SCHEMA_ID_MAP[each_mem_of_id])
-    if CONFIG_VARIABLES.RESTORE_USER_DATA and USER_ID_MAP:
+    if DEFAULT_USER_SET:
+        replace_in_list(document_json['contributors'],
+            document_json['created_by'], DEFAULT_USER_ID)
+        document_json['created_by'] = DEFAULT_USER_ID
+        document_json['modified_by'] = DEFAULT_USER_ID
+    elif CONFIG_VARIABLES.RESTORE_USER_DATA and USER_ID_MAP:
         if document_json['created_by'] in USER_ID_MAP:
             replace_in_list(document_json['contributors'],
                 document_json['created_by'], USER_ID_MAP[document_json['created_by']])
             document_json['created_by'] = USER_ID_MAP[document_json['created_by']]
         if document_json['modified_by'] in USER_ID_MAP:
             document_json['modified_by'] = USER_ID_MAP[document_json['modified_by']]
-    elif not CONFIG_VARIABLES.RESTORE_USER_DATA:
-        replace_in_list(document_json['contributors'],
-            document_json['created_by'], DEFAULT_USER_ID)
-        document_json['created_by'] = DEFAULT_USER_ID
-        document_json['modified_by'] = DEFAULT_USER_ID
 
     return document_json
 
