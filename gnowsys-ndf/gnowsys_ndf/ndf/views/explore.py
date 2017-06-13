@@ -226,6 +226,7 @@ def explore_courses(request,page_no=1):
 
     base_unit_cur = node_collection.find({'member_of': {'$in': [ce_gst._id, announced_unit_gst._id]},
                                           '_id': {'$nin': module_unit_ids},
+                                          'status':'PUBLISHED',
                                         '$or': [
                                           {'created_by': request.user.id},
                                           {'group_admin': request.user.id},
@@ -260,6 +261,7 @@ def explore_drafts(request,page_no=1):
 
     base_unit_cur = node_collection.find({'member_of': gst_base_unit_id,
                                           '_id': {'$nin': module_unit_ids},
+                                          'status':'PUBLISHED',
                                         '$or': [
                                           {'created_by': request.user.id},
                                           {'group_admin': request.user.id},
