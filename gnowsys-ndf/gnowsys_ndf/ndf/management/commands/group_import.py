@@ -155,9 +155,6 @@ def user_objs_restoration():
     global DEFAULT_USER_SET
     global log_file
     user_json_data = None
-    print "*"*80
-    print "\nCONFIG_VARIABLES.RESTORE_USER_DATA: ", CONFIG_VARIABLES.RESTORE_USER_DATA, " Type: ",type(CONFIG_VARIABLES.RESTORE_USER_DATA)
-    print "*"*80
     if CONFIG_VARIABLES.RESTORE_USER_DATA:
         user_dump_restore = raw_input("\n\tUser dump is available.  \
             Would you like to restore it (y/n) ?: ")
@@ -208,8 +205,7 @@ def _mapper(json_obj, key, MAP_obj, is_list=False):
         if is_list:
             for eu in json_obj[key]:
                 if eu in MAP_obj:
-                    replace_in_list(json_obj[key],
-                        eu, MAP_obj[eu])
+                    replace_in_list(json_obj[key],eu, MAP_obj[eu])
         else:
             json_obj[key] = MAP_obj[json_obj[key]]
 
