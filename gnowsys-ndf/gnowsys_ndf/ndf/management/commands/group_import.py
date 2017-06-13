@@ -175,6 +175,7 @@ def user_objs_restoration():
             \n\tEnter y to continue, or n if you want to use some other id?: ")
             if default_user_confirmation == 'y' or default_user_confirmation == 'Y':
                 log_file.write("\n Request for Default user with id=1 : Yes.")
+                DEFAULT_USER_ID = 1
             else:
                 log_file.write("\n Request for Default user with id=1 : No.")
                 DEFAULT_USER_ID = int(raw_input("Enter user-id: "))
@@ -486,8 +487,7 @@ def call_group_import(rcs_repo_path):
     rcs_filehives_path = os.path.join(rcs_repo_path, "Filehives")
     rcs_nodes_path = os.path.join(rcs_repo_path, "Nodes")
     rcs_triples_path = os.path.join(rcs_repo_path, "Triples")
-    if CONFIG_VARIABLES.RESTORE_USER_DATA:
-        rcs_counters_path = os.path.join(rcs_repo_path, "Counters")
+    rcs_counters_path = os.path.join(rcs_repo_path, "Counters")
 
     # Following sequence is IMPORTANT
     # restore_filehive_objects(rcs_filehives_path)
