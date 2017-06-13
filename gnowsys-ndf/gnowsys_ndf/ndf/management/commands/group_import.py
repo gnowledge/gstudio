@@ -155,7 +155,9 @@ def user_objs_restoration():
     global DEFAULT_USER_SET
     global log_file
     user_json_data = None
-    # print "CONFIG_VARIABLES.RESTORE_USER_DATA"
+    print "*"*80
+    print "\nCONFIG_VARIABLES.RESTORE_USER_DATA: ", CONFIG_VARIABLES.RESTORE_USER_DATA, " Type: ",type(CONFIG_VARIABLES.RESTORE_USER_DATA)
+    print "*"*80
     if CONFIG_VARIABLES.RESTORE_USER_DATA:
         user_dump_restore = raw_input("\n\tUser dump is available.  \
             Would you like to restore it (y/n) ?: ")
@@ -176,12 +178,15 @@ def user_objs_restoration():
             \n\tEnter y to continue, or n if you want to use some other id?: ")
             if default_user_confirmation == 'y' or default_user_confirmation == 'Y':
                 log_file.write("\n Request for Default user with id=1 : Yes.")
-                DEFAULT_USER_ID = 1
             else:
                 log_file.write("\n Request for Default user with id=1 : No.")
                 DEFAULT_USER_ID = int(raw_input("Enter user-id: "))
                 log_file.write("\n Request for Setting Default user with id :" + str(DEFAULT_USER_SET))
-
+    else:
+        print "*"*80
+        print "\n No RESTORE_USER_DATA available. Setting Default user with id: 1"
+        DEFAULT_USER_ID = 1
+        log_file.write("\n No RESTORE_USER_DATA available. Setting Default user with id :" + str(DEFAULT_USER_SET))
 
 
 def update_schema_id_for_triple(document_json):
@@ -209,13 +214,19 @@ def update_schema_and_user_ids(document_json):
                 if each_mem_of_id in SCHEMA_ID_MAP:
                     replace_in_list(document_json['type_of'], 
                         each_mem_of_id, SCHEMA_ID_MAP[each_mem_of_id])
-    if USER_ID_MAP:
+    if CONFIG_VARIABLES.RESTORE_USER_DATA and USER_ID_MAP:
         if document_json['created_by'] in USER_ID_MAP:
-            replace_in_list(document_json['contributors'], 
+            replace_in_list(document_json['contributors'],
                 document_json['created_by'], USER_ID_MAP[document_json['created_by']])
             document_json['created_by'] = USER_ID_MAP[document_json['created_by']]
         if document_json['modified_by'] in USER_ID_MAP:
             document_json['modified_by'] = USER_ID_MAP[document_json['modified_by']]
+    elif not CONFIG_VARIABLES.RESTORE_USER_DATA:
+        replace_in_list(document_json['contributors'],
+            document_json['created_by'], DEFAULT_USER_ID)
+        document_json['created_by'] = DEFAULT_USER_ID
+        document_json['modified_by'] = DEFAULT_USER_ID
+
     return document_json
 
     '''
@@ -470,7 +481,8 @@ def call_group_import(rcs_repo_path):
     rcs_filehives_path = os.path.join(rcs_repo_path, "Filehives")
     rcs_nodes_path = os.path.join(rcs_repo_path, "Nodes")
     rcs_triples_path = os.path.join(rcs_repo_path, "Triples")
-    rcs_counters_path = os.path.join(rcs_repo_path, "Counters")
+    if CONFIG_VARIABLES.RESTORE_USER_DATA:
+        rcs_counters_path = os.path.join(rcs_repo_path, "Counters")
 
     # Following sequence is IMPORTANT
     # restore_filehive_objects(rcs_filehives_path)
