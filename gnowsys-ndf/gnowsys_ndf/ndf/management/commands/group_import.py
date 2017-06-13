@@ -203,32 +203,38 @@ def update_group_set(document_json):
         document_json['group_set'] = [ObjectId(CONFIG_VARIABLES.GROUP_ID)]
     return document_json
 
+def _mapper(json_obj, key, MAP_obj, is_list=False):
+    if key in json_obj:
+        if is_list:
+            for eu in json_obj[key]:
+                if eu in MAP_obj:
+                    replace_in_list(json_obj[key],
+                        eu, MAP_obj[eu])
+        else:
+            json_obj[key] = MAP_obj[json_obj[key]]
+
 def update_schema_and_user_ids(document_json):
     global DEFAULT_USER_SET
     global DEFAULT_USER_ID
     if SCHEMA_ID_MAP:
-        if document_json['member_of']:
-            for each_mem_of_id in document_json['member_of']:
-                if each_mem_of_id in SCHEMA_ID_MAP:
-                    replace_in_list(document_json['member_of'], 
-                        each_mem_of_id, SCHEMA_ID_MAP[each_mem_of_id])
-        if document_json['type_of']:
-            for each_mem_of_id in document_json['type_of']:
-                if each_mem_of_id in SCHEMA_ID_MAP:
-                    replace_in_list(document_json['type_of'], 
-                        each_mem_of_id, SCHEMA_ID_MAP[each_mem_of_id])
+        _mapper(document_json, 'member_of', SCHEMA_ID_MAP, is_list=True)
+        _mapper(document_json, 'type_of', SCHEMA_ID_MAP, is_list=True)
+
     if DEFAULT_USER_SET:
-        replace_in_list(document_json['contributors'],
-            document_json['created_by'], DEFAULT_USER_ID)
+        document_json['contributors'] = [DEFAULT_USER_ID]
         document_json['created_by'] = DEFAULT_USER_ID
         document_json['modified_by'] = DEFAULT_USER_ID
+        if 'group_admin' in document_json:
+            document_json['group_admin'] = [DEFAULT_USER_ID]
+        if 'author_set' in document_json:
+            document_json['author_set'] = [DEFAULT_USER_ID]
+
     elif CONFIG_VARIABLES.RESTORE_USER_DATA and USER_ID_MAP:
-        if document_json['created_by'] in USER_ID_MAP:
-            replace_in_list(document_json['contributors'],
-                document_json['created_by'], USER_ID_MAP[document_json['created_by']])
-            document_json['created_by'] = USER_ID_MAP[document_json['created_by']]
-        if document_json['modified_by'] in USER_ID_MAP:
-            document_json['modified_by'] = USER_ID_MAP[document_json['modified_by']]
+        _mapper(document_json, 'contributors', USER_ID_MAP, is_list=True)
+        _mapper(document_json, 'group_admin', USER_ID_MAP, is_list=True)
+        _mapper(document_json, 'author_set', USER_ID_MAP, is_list=True)
+        _mapper(document_json, 'created_by', USER_ID_MAP)
+        _mapper(document_json, 'modified_by', USER_ID_MAP)
 
     return document_json
 
