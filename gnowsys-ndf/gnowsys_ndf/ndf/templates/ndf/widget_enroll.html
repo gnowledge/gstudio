@@ -19,7 +19,7 @@
       </div>
       <hr>
 
-    {% if request.session.buddies_username_id_dict %}
+    {% if request.session.buddies_userid_list %}
       {% with request.session.buddies_username_id_dict|apply_eval as buddies_dict %}
         {% for username,userid in buddies_dict.items %}
             <div class="small-8 medium-8 columns">
@@ -35,10 +35,10 @@
             <hr>
         {% endfor %}
       {% endwith %}
+    <input type="button" class="orange-button right enroll_all_users" onclick="enroll_all_users()" value="Enroll All">
     {% endif %}
     </div>
     </div>
-    <input type="button" class="orange-button right enroll_all_users" onclick="enroll_all_users()" value="Enroll All">
 
     <a class="close-reveal-modal">&#215;</a>
 </div>
@@ -85,20 +85,21 @@
     enroll_user(user_id_list)
   }
 
-  $(document).ready(function(){
-    try{
-    user_id_list = {{request.session.buddies_userid_list}}
-    group_member_ids = {{group_object.author_set}}
-    isSuperset = user_id_list.every(function(val) {
-      return group_member_ids.indexOf(val) >= 0; 
-    });
-    if (isSuperset){
-      $(".enroll_all_users").addClass("hide")
-    }
-  }
-    catch(ch){
-    }
-  })
+  {% if request.session.buddies_userid_list %}
+    $(document).ready(function(){
+
+      user_id_list = {{request.session.buddies_userid_list}}
+      group_member_ids = {{group_object.author_set}}
+      isSuperset = user_id_list.every(function(val) {
+        return group_member_ids.indexOf(val) >= 0; 
+      });
+
+      if (isSuperset){
+        $(".enroll_all_users").addClass("hide")
+      }
+
+    })
+  {% endif %}
 
 
 
