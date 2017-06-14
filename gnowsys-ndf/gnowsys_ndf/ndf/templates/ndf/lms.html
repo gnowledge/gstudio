@@ -75,7 +75,7 @@
               </li>
 
 
-              <li> <a data-reveal-id="delete-unit"><i class="fa fa-trash"></i> {% trans "Delete" %}</a> </li>
+              {# <li> <a data-reveal-id="delete-unit"><i class="fa fa-trash"></i> {% trans "Delete" %}</a> </li> #}
 
               </ul>
           </div>
@@ -148,6 +148,7 @@
         {% endif %}
     </div>
   </div>
+{% comment %}
 <div id="delete-unit" class="reveal-modal tiny text-center" data-reveal>
   <h3>{% trans "Delete Unit:" %} {% firstof group_object.altnames group_object.name  %} ?</h3>
       <br/>
@@ -159,7 +160,6 @@
 </div>
 
 
-{% comment %}
 
   ---- LMS Activity Player ----
 
