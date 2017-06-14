@@ -103,7 +103,7 @@ def get_triple_data(node_id):
         global log_file
         log_file.write("\n get_triple_data invoked for: " + str(node_id))
 
-        triple_query = {"_type": {'$in': ["GAttribute", "GRelation"]}, "subject": node_id}
+        triple_query = {"_type": {'$in': ["GAttribute", "GRelation"]}, "subject": ObjectId(node_id)}
 
         node_gattr_grel_cur = triple_collection.find(triple_query)
         if node_gattr_grel_cur:
