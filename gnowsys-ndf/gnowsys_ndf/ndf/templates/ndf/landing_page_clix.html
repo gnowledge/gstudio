@@ -13,9 +13,10 @@
 
 
 {% block body_content %}
+<div class="land_page">
   <div class='bg-img'>
     <div class="row">
-        <div class="landing_page_background">
+      <div class="landing_page_background" style="height: 100vh;">
         <div class="small-12 columns ">
             <div class="row" data-equalizer>
                 <div class="small-6 medium-6 columns clix_brief panel-mod" data-equalizer-watch>
@@ -35,39 +36,30 @@
                           <span>Login to&nbsp;</span>
                           <img src="/static/ndf/css/themes/clix/logo.svg" title="Invitation to CLIx ">-->
                           <!-- <form method="post" id="loginSubmit" action="/accounts/login/" data-abide="" novalidate="novalidate"> -->
-                            
-                            <a class="small expand" href="{% url 'auth_login' %}">
-                              <div class="small-6 medium-6 text-center columns end login-home-button">
-                                  {% trans "Login" %}
-                              </div>
-                            </a>
-
-                            {% else %}
-
-                            {% get_explore_url as explore_url %}
-                            <a class="small expand" href="{% url explore_url %}">
-                              <div class="small-6 medium-6 text-center columns end login-home-button">
-                                  {% trans "Explore Projects" %}
-                              </div>
-                            </a>
-
-
-
-                            <div class="row">
-                              <div class="medium-12 large-12 small-text-left text-center columns end forgot-password">
-                              </div>
-                            </div>
-                            <!-- Login button -->
-
-                            <input type="hidden" name="next" value="/welcome">
-                          <!-- </form> -->
+                    <a class="small expand" href="{% url 'auth_login' %}">
+                        <div class="small-6 medium-6 text-center columns end login-home-button">
+                          {% trans "Login" %}
                         </div>
+                    </a>
+                      {% else %}
+                      {% get_explore_url as explore_url %}
+                      <a class="small expand" href="{% url explore_url %}">
+                          <div class="small-6 medium-6 text-center columns end login-home-button">
+                            {% trans "Explore Projects" %}
+                          </div>
+                      </a>
+                      <div class="row">
+                          <div class="medium-12 large-12 small-text-left text-center columns end forgot-password">
+                          </div>
+                      </div>
+                      <input type="hidden" name="next" value="/welcome">
                     </div>
-                {% endif %}
-                <div class="medium-1 columns pannel">
-                  <!--<img src="/static/ndf/images/landing_page/flowers.svg" class="flowers" />-->
-                </div>
             </div>
+                {% endif %}
+            <!--<div class="medium-1 columns pannel">-->
+                  <!--<img src="/static/ndf/images/landing_page/flowers.svg" class="flowers" />-->
+            <!--</div> -->
+        </div>
             <!--<div class="row landing-illustrations">
                 <div class="small-12 medium-12 columns">
                   <img src="/static/ndf/images/landing_page/flowers.svg" class="flowers" />
@@ -86,18 +78,14 @@
                 
 
               {% endif %}-->
-
-
-
-
+      </div>
     </div>
-
-    </div>
-      
   </div>
-
-
-
+</div>
 
 
 {% endblock body_content %}
+
+
+
+
