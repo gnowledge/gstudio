@@ -4804,19 +4804,19 @@ ul.nav_menu_1 {
 
 .footer_clix{
     clear: both;
-    position: absolute;
-    right:0;
-    bottom:0;
-    left:0;
-    padding:1rem;
+    position: fixed;
+    right: 0;
+    bottom: 0;
+    left: 0;
+    //padding: 1rem;
     z-index: 10;
-    //height: 5em;
-    margin-top: -100em;
-    //background-color: #D4D5D6;
-    background-color: rgba(107, 0, 83, 0.09);
+    //background-color: rgba(255, 255, 255, 0.7);
+    background-color: #164a7b;
     color: #fff;
-    margin-bottom:-307px;
-    //height:10px;
+        a{
+            color: #fff;
+            //letter-spacing:0.5rem;
+    }
 
     .footer-top{
         margin-bottom:-16px;
@@ -4931,8 +4931,103 @@ ul.nav_menu_1 {
     }  
       
       
-      
+ 
 
+}
+
+.wrapper-footer{
+    box-shadow: 0 -1px 5px 0 rgba(0,0,0,0.1);
+    border-top: 1px solid #c5c6c7;
+    padding: 6px 0px 0px 3px;
+    background: rgba(221, 221, 221, 0.18);
+    clear: both;
+    // position: absolute;
+    right: 0;
+    bottom: 0;
+    left: 0;
+    z-index:10;
+
+    #footer-clix{
+        box-sizing: border-box;
+        max-width: 1200px;
+        margin-left: auto;
+        margin-right: auto;
+        margin: 0 auto;
+    
+
+    .links-logos{
+        float: left;
+        display: block;
+        margin-right: 2.35765%;
+        width: 65.88078%;
+
+        .nav-links-logos{
+                margin: 5px 0 30px 0;
+                ol {
+                    display:inline;
+                    list-style-type: none;
+                    li {
+                        float: left;
+                        margin-right: 15px;
+                        &>a{
+                            color:$primary-orange;
+                            &:hover {
+                            color: $primary-orange;
+                            border-bottom: 3px solid $secondary-orange;
+                        }
+                        }
+                    }
+
+
+                }
+            }
+
+            .nav-legal{
+                margin: -4px 0 5px 0;
+                ol {
+                    display:inline;
+                    list-style-type: none;
+                    li {
+                        float: left;
+                        margin-right: 15px;
+                        display: inline-block;
+                        font-size: 0.6875em;
+                        &>a{
+                            transition: link-color 0.15s ease-in-out 0s,border 0.15s ease-in-out 0s;
+                            border-bottom: none;
+                            color: #777;
+                            text-decoration: none !important;
+                            &:hover {
+                            color:#777;
+                            border-bottom: 3px solid hsla(316, 88%, 42%, 1);
+                        }
+                        }
+                    }
+
+
+                }
+            }
+            .wrapper-logo{
+                margin: 13px 0;
+                display:inline-block;
+                p{
+                    color:inherit;
+                    margin:0;
+                    display:inline-block;
+                    a{
+                        display: inline-block;
+                    }
+                }
+
+                .footer-logo{
+                   &>img{
+                        height: 10px;
+                    }
+                } 
+            }
+        }
+    }
+    
 }
 
 #overlay{ /* we set all of the properties for are overlay */

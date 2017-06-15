@@ -4596,16 +4596,17 @@ ul.nav_menu_1 > li > a.selected, ul.nav_menu_1 > li > a:hover {
 /* line 4805, ../../../scss/_clix2017.scss */
 .footer_clix {
   clear: both;
-  position: absolute;
+  position: fixed;
   right: 0;
   bottom: 0;
   left: 0;
-  padding: 1rem;
   z-index: 10;
-  margin-top: -100em;
-  background-color: rgba(107, 0, 83, 0.09);
+  background-color: #164a7b;
   color: #fff;
-  margin-bottom: -307px;
+}
+/* line 4816, ../../../scss/_clix2017.scss */
+.footer_clix a {
+  color: #fff;
 }
 /* line 4821, ../../../scss/_clix2017.scss */
 .footer_clix .footer-top {
@@ -4720,6 +4721,104 @@ ul.nav_menu_1 > li > a.selected, ul.nav_menu_1 > li > a:hover {
 }
 
 /* line 4938, ../../../scss/_clix2017.scss */
+.wrapper-footer {
+  box-shadow: 0 -1px 5px 0 rgba(0, 0, 0, 0.1);
+  border-top: 1px solid #c5c6c7;
+  padding: 6px 0px 0px 3px;
+  background: rgba(221, 221, 221, 0.18);
+  clear: both;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  z-index: 10;
+}
+/* line 4950, ../../../scss/_clix2017.scss */
+.wrapper-footer #footer-clix {
+  box-sizing: border-box;
+  max-width: 1200px;
+  margin-left: auto;
+  margin-right: auto;
+  margin: 0 auto;
+}
+/* line 4958, ../../../scss/_clix2017.scss */
+.wrapper-footer #footer-clix .links-logos {
+  float: left;
+  display: block;
+  margin-right: 2.35765%;
+  width: 65.88078%;
+}
+/* line 4964, ../../../scss/_clix2017.scss */
+.wrapper-footer #footer-clix .links-logos .nav-links-logos {
+  margin: 5px 0 30px 0;
+}
+/* line 4966, ../../../scss/_clix2017.scss */
+.wrapper-footer #footer-clix .links-logos .nav-links-logos ol {
+  display: inline;
+  list-style-type: none;
+}
+/* line 4969, ../../../scss/_clix2017.scss */
+.wrapper-footer #footer-clix .links-logos .nav-links-logos ol li {
+  float: left;
+  margin-right: 15px;
+}
+/* line 4972, ../../../scss/_clix2017.scss */
+.wrapper-footer #footer-clix .links-logos .nav-links-logos ol li > a {
+  color: #ce7869;
+}
+/* line 4974, ../../../scss/_clix2017.scss */
+.wrapper-footer #footer-clix .links-logos .nav-links-logos ol li > a:hover {
+  color: #ce7869;
+  border-bottom: 3px solid #ffc14e;
+}
+/* line 4985, ../../../scss/_clix2017.scss */
+.wrapper-footer #footer-clix .links-logos .nav-legal {
+  margin: -4px 0 5px 0;
+}
+/* line 4987, ../../../scss/_clix2017.scss */
+.wrapper-footer #footer-clix .links-logos .nav-legal ol {
+  display: inline;
+  list-style-type: none;
+}
+/* line 4990, ../../../scss/_clix2017.scss */
+.wrapper-footer #footer-clix .links-logos .nav-legal ol li {
+  float: left;
+  margin-right: 15px;
+  display: inline-block;
+  font-size: 0.6875em;
+}
+/* line 4995, ../../../scss/_clix2017.scss */
+.wrapper-footer #footer-clix .links-logos .nav-legal ol li > a {
+  transition: link-color 0.15s ease-in-out 0s,border 0.15s ease-in-out 0s;
+  border-bottom: none;
+  color: #777;
+  text-decoration: none !important;
+}
+/* line 5000, ../../../scss/_clix2017.scss */
+.wrapper-footer #footer-clix .links-logos .nav-legal ol li > a:hover {
+  color: #777;
+  border-bottom: 3px solid #c90d97;
+}
+/* line 5010, ../../../scss/_clix2017.scss */
+.wrapper-footer #footer-clix .links-logos .wrapper-logo {
+  margin: 13px 0;
+  display: inline-block;
+}
+/* line 5013, ../../../scss/_clix2017.scss */
+.wrapper-footer #footer-clix .links-logos .wrapper-logo p {
+  color: inherit;
+  margin: 0;
+  display: inline-block;
+}
+/* line 5017, ../../../scss/_clix2017.scss */
+.wrapper-footer #footer-clix .links-logos .wrapper-logo p a {
+  display: inline-block;
+}
+/* line 5023, ../../../scss/_clix2017.scss */
+.wrapper-footer #footer-clix .links-logos .wrapper-logo .footer-logo > img {
+  height: 10px;
+}
+
+/* line 5033, ../../../scss/_clix2017.scss */
 #overlay {
   /* we set all of the properties for are overlay */
   height: 116px;
@@ -4740,7 +4839,7 @@ ul.nav_menu_1 > li > a.selected, ul.nav_menu_1 > li > a:hover {
   border-radius: 10px;
 }
 
-/* line 4958, ../../../scss/_clix2017.scss */
+/* line 5053, ../../../scss/_clix2017.scss */
 #mask {
   /* create are mask */
   position: fixed;
@@ -4754,13 +4853,13 @@ ul.nav_menu_1 > li > a.selected, ul.nav_menu_1 > li > a:hover {
 }
 
 /* use :target to look for a link to the overlay then we find are mask */
-/* line 4969, ../../../scss/_clix2017.scss */
+/* line 5064, ../../../scss/_clix2017.scss */
 #overlay:target, #overlay:target + #mask {
   display: block;
   opacity: 1;
 }
 
-/* line 4973, ../../../scss/_clix2017.scss */
+/* line 5068, ../../../scss/_clix2017.scss */
 .close {
   /* to make a nice looking pure CSS3 close button */
   display: block;
@@ -4782,7 +4881,7 @@ ul.nav_menu_1 > li > a.selected, ul.nav_menu_1 > li > a:hover {
   border-radius: 38px;
 }
 
-/* line 4992, ../../../scss/_clix2017.scss */
+/* line 5087, ../../../scss/_clix2017.scss */
 #open-overlay {
   /* open the overlay */
   padding: 0px 0px;
@@ -4795,7 +4894,7 @@ ul.nav_menu_1 > li > a.selected, ul.nav_menu_1 > li > a:hover {
   -o-border-radius: 10px;
 }
 
-/* line 5003, ../../../scss/_clix2017.scss */
+/* line 5098, ../../../scss/_clix2017.scss */
 .enroll-btn {
   width: 90px;
   opacity: 1;
@@ -4811,44 +4910,44 @@ ul.nav_menu_1 > li > a.selected, ul.nav_menu_1 > li > a:hover {
   background-color: #4b4852;
 }
 
-/* line 5023, ../../../scss/_clix2017.scss */
+/* line 5118, ../../../scss/_clix2017.scss */
 .img-style-land {
   margin-top: 28px;
   margin-left: -56px;
 }
 
-/* line 5028, ../../../scss/_clix2017.scss */
+/* line 5123, ../../../scss/_clix2017.scss */
 .top-margin-translation {
   margin-top: 0px;
 }
 
-/* line 5032, ../../../scss/_clix2017.scss */
+/* line 5127, ../../../scss/_clix2017.scss */
 .activity-editor-header-top {
   margin-top: -50px;
 }
 
-/* line 5036, ../../../scss/_clix2017.scss */
+/* line 5131, ../../../scss/_clix2017.scss */
 .add-lesson-top-margin {
   margin-top: 5px;
 }
 
-/* line 5039, ../../../scss/_clix2017.scss */
+/* line 5134, ../../../scss/_clix2017.scss */
 .translation-detail-top-margin {
   margin-top: 0px;
 }
 
-/* line 5042, ../../../scss/_clix2017.scss */
+/* line 5137, ../../../scss/_clix2017.scss */
 .outer {
   width: 100%;
   text-align: center;
 }
 
-/* line 5047, ../../../scss/_clix2017.scss */
+/* line 5142, ../../../scss/_clix2017.scss */
 .inner {
   display: inline-block;
 }
 
-/* line 5052, ../../../scss/_clix2017.scss */
+/* line 5147, ../../../scss/_clix2017.scss */
 .transcript-toggler {
   display: block;
   width: 155px !important;
@@ -4864,33 +4963,33 @@ ul.nav_menu_1 > li > a.selected, ul.nav_menu_1 > li > a:hover {
   text-transform: uppercase;
 }
 
-/* line 5068, ../../../scss/_clix2017.scss */
+/* line 5163, ../../../scss/_clix2017.scss */
 .double-buttons {
   margin-top: 100px;
   margin-left: 729px;
 }
 
-/* line 5073, ../../../scss/_clix2017.scss */
+/* line 5168, ../../../scss/_clix2017.scss */
 .lesson-form-name {
   padding-top: 10px;
 }
 
-/* line 5077, ../../../scss/_clix2017.scss */
+/* line 5172, ../../../scss/_clix2017.scss */
 .lesson-form-desc {
   padding-top: 25px;
 }
 
-/* line 5081, ../../../scss/_clix2017.scss */
+/* line 5176, ../../../scss/_clix2017.scss */
 .enroll_chkbox {
   transform: scale(1.5);
 }
 
-/* line 5084, ../../../scss/_clix2017.scss */
+/* line 5179, ../../../scss/_clix2017.scss */
 .enroll_all_users {
   width: 15% !important;
 }
 
-/* line 5088, ../../../scss/_clix2017.scss */
+/* line 5183, ../../../scss/_clix2017.scss */
 .enrollBtn {
   width: 124px !important;
   background: #4b4852;
@@ -4905,14 +5004,14 @@ ul.nav_menu_1 > li > a.selected, ul.nav_menu_1 > li > a:hover {
   margin-top: 90px !important;
   margin-right: 65px;
 }
-/* line 5101, ../../../scss/_clix2017.scss */
+/* line 5196, ../../../scss/_clix2017.scss */
 .enrollBtn:hover {
   opacity: 1;
   background: #ffffff;
   color: #000000;
 }
 
-/* line 5108, ../../../scss/_clix2017.scss */
+/* line 5203, ../../../scss/_clix2017.scss */
 .enroll-act_lbl {
   color: #0c2944;
 }
