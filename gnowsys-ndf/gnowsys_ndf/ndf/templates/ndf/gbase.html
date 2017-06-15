@@ -63,7 +63,9 @@
     {% block extended_header %}{% endblock %}
 
     {% block body_content %} {% endblock %}
-
+{% if not no_footer %}
+    {% include 'ndf/footer_clix.html' %}
+{% endif %}
   <!-- JS -->
   <!--<script src="/static/ndf/js/app.js"></script>-->
   <script src="/static/ndf/bower_components/foundation/js/foundation.min.js"></script>

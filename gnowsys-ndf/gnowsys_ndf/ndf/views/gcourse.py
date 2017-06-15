@@ -2075,7 +2075,8 @@ def activity_player_detail(request, group_id, lesson_id, activity_id):
         # 'unit_resources_list_of_dict': unit_resources_list_of_dict,
         'trans_node':trans_node,
         'act_list':trans_act_list,
-        'trans_lesson_name':lesson_name
+        'trans_lesson_name':lesson_name,
+        'no_footer': True
     })
 
     if request.user.is_authenticated():

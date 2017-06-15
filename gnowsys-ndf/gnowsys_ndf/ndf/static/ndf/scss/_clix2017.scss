@@ -100,7 +100,8 @@ h5{
   }
 
   .landing_page_background {
-    height: 100%;
+    //height: 100%;
+    height: 100vh;
     width: 100%;
     position: absolute;
     z-index: -1;
@@ -378,11 +379,11 @@ h5{
 .login-home-button{
             border-radius: 5px;
             text-transform: uppercase;
-            margin-left: 150px;
+            margin-left: 70px;
             color: #ffc14e;
-            padding: 5px 17px;
+            padding: 6px 17px;
             font-family: "OpenSans-Semibold", sans-serif;
-            margin-top: 223px;
+            margin-top: 50px;
             border: 2px solid #ffc14e;
 
             &:hover{
@@ -3058,12 +3059,15 @@ ul.jqtree-tree .jqtree-toggler {
 #activity-content{
 //  height:30rem!important;   
  }
-.bg-img{
+
+    .bg-img{
     //background: url(/static/ndf/images/group-tile.png) no-repeat;
     background: url(/static/ndf/images/i2c-bg.png);
-    height:100vh;
+    height:100%;
     background-size: 100%;
-}
+    background-repeat: no-repeat;
+ }
+
 .clix-text{
     z-index:-1;
     }
@@ -4938,14 +4942,16 @@ ul.nav_menu_1 {
 .wrapper-footer{
     box-shadow: 0 -1px 5px 0 rgba(0,0,0,0.1);
     border-top: 1px solid #c5c6c7;
-    padding: 6px 0px 0px 3px;
+    padding: 0px 0px 0px 3px;
     background: rgba(221, 221, 221, 0.18);
     clear: both;
-    // position: absolute;
+    //position: fixed;
+    //margin-top: -100px;
     right: 0;
     bottom: 0;
     left: 0;
     z-index:10;
+    //height:200px;
 
     #footer-clix{
         box-sizing: border-box;
