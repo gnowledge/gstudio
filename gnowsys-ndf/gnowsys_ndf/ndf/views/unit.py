@@ -491,11 +491,9 @@ def _get_unit_hierarchy(unit_group_obj,lang="en"):
                     trans_act = get_lang_node(activity._id,lang)
                     if activity:
                         if trans_act:
-                            trans_act_name = trans_act.altnames or trans_act.name
-                            activity_dict['name'] = trans_act_name
+                            activity_dict['name'] = trans_act.altnames or trans_act.name
                         else:
-                            act_name = activity.altnames or activity.name
-                            activity_dict['name'] = act_name
+                            activity_dict['name'] = activity.altnames or activity.name
                         activity_dict['type'] = 'activity'
                         activity_dict['id'] = str(activity._id)
                         lesson_dict['activities'].append(activity_dict)
