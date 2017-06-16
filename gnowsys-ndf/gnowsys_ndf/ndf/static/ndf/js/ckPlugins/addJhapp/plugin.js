@@ -67,10 +67,28 @@ CKEDITOR.plugins.add('addJhapp',
                             $('#group_imgs_on_modal').foundation('reveal', 'close');
                           });
 
-                            $("#insert_runkittyrun").click(function(event){
+                            $("#insert_runkittyrun_en").click(function(event){
                             //ost_text_gallery = $('#paste-ost-gallery').val();
                             //ost_text_file = $('#paste-ost-captions').val();
-                            tool_val = "<a href='/runkittyrun/' target='_blank'><img src='/static/ndf/images/RKR.jpg' alt='Run Kitty Run' height='1000px' width='1000px' >"
+                            tool_val = "<a href='/runkittyrun/en/' target='_blank'><img src='/static/ndf/images/RKR.jpg' alt='Run Kitty Run' height='1000px' width='1000px' >"
+                            // split_word = ost_text_val.slice(0, 18) + "gallery=" + ost_text_gallery + "&amp;file=/ost/" + ost_text_file+"'"+ ost_text_val.slice(18);
+                            // alert(split_word)
+                             CKEDITOR.instances[textAreaId].insertHtml(tool_val);
+                            $('#group_imgs_on_modal').foundation('reveal', 'close');
+                          });
+                            $("#insert_runkittyrun_hi").click(function(event){
+                            //ost_text_gallery = $('#paste-ost-gallery').val();
+                            //ost_text_file = $('#paste-ost-captions').val();
+                            tool_val = "<a href='/runkittyrun/hi/' target='_blank'><img src='/static/ndf/images/RKR.jpg' alt='Run Kitty Run' height='1000px' width='1000px' >"
+                            // split_word = ost_text_val.slice(0, 18) + "gallery=" + ost_text_gallery + "&amp;file=/ost/" + ost_text_file+"'"+ ost_text_val.slice(18);
+                            // alert(split_word)
+                             CKEDITOR.instances[textAreaId].insertHtml(tool_val);
+                            $('#group_imgs_on_modal').foundation('reveal', 'close');
+                          });
+                            $("#insert_runkittyrun_te").click(function(event){
+                            //ost_text_gallery = $('#paste-ost-gallery').val();
+                            //ost_text_file = $('#paste-ost-captions').val();
+                            tool_val = "<a href='/runkittyrun/te/' target='_blank'><img src='/static/ndf/images/RKR.jpg' alt='Run Kitty Run' height='1000px' width='1000px' >"
                             // split_word = ost_text_val.slice(0, 18) + "gallery=" + ost_text_gallery + "&amp;file=/ost/" + ost_text_file+"'"+ ost_text_val.slice(18);
                             // alert(split_word)
                              CKEDITOR.instances[textAreaId].insertHtml(tool_val);
