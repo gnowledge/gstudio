@@ -14,18 +14,18 @@
     {% get_dict_from_list_of_dicts node.attribute_set as node_attrs %}
     </div>
     <div class="card_summary">
-        <div class="card_section">
-            <p class="module_brief" title="{{node.content|safe}}">
-                {{node.content|safe|truncatechars:30}}
+        <div class="card_section" style="height:6rem;">
+            <p class="module_brief">
+                {{node.content|safe|striptags|truncatechars:100}}
             </p>
         </div>
         <div class="card_section">
             <span class="card_label">
-                Subject: {{node_attrs.educationalsubject}}
+                {% trans "Subject" %}: {{node_attrs.educationalsubject}}
             </span class="card_label">
             <p class="ellipsis"></p>
                 <span class="card_label">
-                    Grade: {{node_attrs.educationallevel|join:', '}}
+                   {% trans "Grade" %} : {{node_attrs.educationallevel|join:', '}}
                 </span class="card_label">
             <p class="ellipsis"></p>
                 <!-- <span class="card_label">
@@ -35,7 +35,7 @@
         </div>
         <div class="card_section">
                 <i class="fa fa-book"></i>
-                <span>Explore</span>
+                <span>{% trans "Explore" %}</span>
         </div>
     </div>
 </div>

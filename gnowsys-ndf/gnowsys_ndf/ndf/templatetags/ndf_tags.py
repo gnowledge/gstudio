@@ -37,7 +37,7 @@ from django.core.cache import cache
 from mongokit import IS
 
 ''' -- imports from application folders/files -- '''
-from gnowsys_ndf.settings import GAPPS as setting_gapps, GSTUDIO_DEFAULT_GAPPS_LIST, META_TYPE, CREATE_GROUP_VISIBILITY, GSTUDIO_SITE_DEFAULT_LANGUAGE,GSTUDIO_DEFAULT_EXPLORE_URL
+from gnowsys_ndf.settings import GAPPS as setting_gapps, GSTUDIO_DEFAULT_GAPPS_LIST, META_TYPE, CREATE_GROUP_VISIBILITY, GSTUDIO_SITE_DEFAULT_LANGUAGE,GSTUDIO_DEFAULT_EXPLORE_URL,GSTUDIO_EDIT_LMS_COURSE_STRUCTURE
 # from gnowsys_ndf.settings import GSTUDIO_SITE_LOGO,GSTUDIO_COPYRIGHT,GSTUDIO_GIT_REPO,GSTUDIO_SITE_PRIVACY_POLICY, GSTUDIO_SITE_TERMS_OF_SERVICE,GSTUDIO_ORG_NAME,GSTUDIO_SITE_ABOUT,GSTUDIO_SITE_POWEREDBY,GSTUDIO_SITE_PARTNERS,GSTUDIO_SITE_GROUPS,GSTUDIO_SITE_CONTACT,GSTUDIO_ORG_LOGO,GSTUDIO_SITE_CONTRIBUTE,GSTUDIO_SITE_VIDEO,GSTUDIO_SITE_LANDING_PAGE
 from gnowsys_ndf.settings import *
 try:
@@ -586,20 +586,17 @@ def get_attribute_value(node_id, attr_name, get_data_type=False):
     attr_val = ""
     node_attr = data_type = None
     if node_id:
-    	# node = node_collection.one({'_id': ObjectId(node_id) })
-    	gattr = node_collection.one({'_type': 'AttributeType', 'name': unicode(attr_name) })
-
-    	if get_data_type:
-    		data_type = gattr.data_type
-    	if gattr: # and node  :
-    		node_attr = triple_collection.find_one({'_type': "GAttribute", "subject": ObjectId(node_id), 'attribute_type': gattr._id, 'status': u"PUBLISHED"})
-
+        # print "\n attr_name: ", attr_name
+        gattr = node_collection.one({'_type': 'AttributeType', 'name': unicode(attr_name) })
+        if get_data_type:
+            data_type = gattr.data_type
+        if gattr: # and node  :
+            node_attr = triple_collection.find_one({'_type': "GAttribute", "subject": ObjectId(node_id), 'attribute_type': gattr._id, 'status': u"PUBLISHED"})
     if node_attr:
-    	attr_val = node_attr.object_value
-    # print "\n here: ", attr_name, " : ", attr_val, " : ", node_id
+        attr_val = node_attr.object_value
+        # print "\n here: ", attr_name, " : ", attr_val, " : ", node_id
     if get_data_type:
         return {'value': attr_val, 'data_type': data_type}
-
     cache.set(cache_key, attr_val, 60 * 60)
     return attr_val
 
@@ -3373,9 +3370,12 @@ def get_thread_node(node_id):
 		node_obj = node_collection.one({'_id': ObjectId(node_id)})
 		thread_obj = None
 		has_thread_rt = node_collection.one({'_type': 'RelationType', 'name': 'has_thread'})
-		thread_rt = triple_collection.find_one({'subject': ObjectId(node_id),'relation_type': has_thread_rt._id})
+		thread_rt = triple_collection.find_one({'subject': ObjectId(node_id),
+			'relation_type': has_thread_rt._id, 'status': u'PUBLISHED'})
 		if thread_rt:
-			thread_obj = thread_rt['right_subject']
+			thread_id = thread_rt['right_subject']
+			if thread_id:
+				thread_obj = node_collection.one({'_id': ObjectId(thread_id)})
 
 		# if node_obj.relation_set:
 		# 	for rel in node_obj.relation_set:
@@ -3985,7 +3985,6 @@ def get_gstudio_registration():
 @register.assignment_tag
 def get_unit_total_points(user_id,group_id):
 	counter_obj = Counter.get_counter_obj(user_id, ObjectId(group_id))
-	return counter_obj['group_points']
 
 
 @register.assignment_tag
@@ -4039,3 +4038,8 @@ def user_groups(is_super_user,user_id):
 	user_grps_count['drafts'] = user_draft_nodes.count()
 	user_grps_count['projects'] = group_cur.count()
 	return user_grps_count
+	return counter_obj['group_points']
+
+@register.assignment_tag
+def if_edit_course_structure():
+	return GSTUDIO_EDIT_LMS_COURSE_STRUCTURE

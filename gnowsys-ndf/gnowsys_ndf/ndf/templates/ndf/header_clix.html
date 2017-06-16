@@ -36,10 +36,9 @@
  -->             
 
                 {% if help_oid %}
-                <li class=""><a {% if title == 'Help Page'  %} class="active" {% endif %} target="_blank" href="{% url 'help_page_view' help_oid %}"> <i class="fa fa-info-circle"></i> Help </a></li>
+                <li class=""><a {% if title == 'Help Page'  %} class="active" {% endif %} target="_blank" href="{% url 'groupchange' help_oid %}"> <i class="fa fa-info-circle"></i> Help </a></li>
                 {% endif %}
                 <ul class="">
-          {% comment %}
           <li class="has-dropdown">
             <a>{% trans "Language" %} &nbsp; | &nbsp; {{request.LANGUAGE_CODE}}</a>
             <ul class="dropdown">
@@ -57,7 +56,6 @@
 
             </ul>
           </li>
-          {% endcomment %}
         </ul>
             {% if user.is_authenticated %}
                 <li class="has-dropdown buddy_margin">

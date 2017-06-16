@@ -10,7 +10,7 @@
             <input type="hidden" name="node_id" value="{{unit_node.pk}}">
                 <div class="course_creator_header">
                     <div class="left course_heading">
-                    <h5>Enter Unit Name</h5>
+                    <h5>{% trans "Enter Unit Name" %}</h5>
                     </div>
                     <div class="right course_heading">
                         {% if unit_node %}
@@ -27,7 +27,7 @@
                 {% if unit_node %}
                 <div class="course_creator_header">
                     <div class="left course_heading">
-                    <h5>Enter alternate Name</h5>
+                    <h5>{% trans "Enter alternate Name" %}</h5>
                     </div>
                     <div class="right course_heading">
                         <input id="unit-altname" name="altnames" type="text" placeholder="Enter alternate name"
@@ -40,11 +40,11 @@
                 <hr/>
                 <div class="course_creator_header">
                     <div class="left course_heading">
-                    <h5>Select Module</h5>
+                    <h5>{% trans "Select Module" %}</h5>
                     </div>
                     <div class="right course_heading_unit" style="height:49px;">
                          <select name="module" multiple style="height:46px;">
-                            <option value="">Choose Module</option>
+                            <option value="">{% trans "Choose Module" %}</option>
                             {% for opts in modules %}
                                 <option value="{{opts.pk}}" {% if opts.pk in module_val_list %} selected {% endif %}>{{opts.name}}</option>
                             {% endfor %}
@@ -56,11 +56,11 @@
                 {% get_attribute_value unit_node.pk 'educationallevel' as educationallevel_val %}
                 <div class="course_creator_header">
                     <div class="left course_heading">
-                    <h5>Select Grade</h5>
+                    <h5>{% trans "Select Grade" %}</h5>
                     </div>
                     <div class="right course_heading_unit">
                          <select name="educationallevel">
-                            <option selected>Choose Grade</option>
+                            <option selected>{% trans "Choose Grade" %}</option>
                             {% for opts in metadata_educationallevel %}
                                 <option {% if educationallevel_val == opts %} selected {% endif %}>{{opts}}</option>
                             {% endfor %}
@@ -72,11 +72,11 @@
                 {% get_attribute_value unit_node.pk 'educationalsubject' as educationalsubject_val %}
                 <div class="course_creator_header">
                     <div class="left course_heading">
-                    <h5>Select Subject</h5>
+                    <h5>{% trans "Select Subject" %}</h5>
                     </div>
                     <div class="right course_heading_unit">
                          <select name="educationalsubject">
-                            <option selected>Choose Subject</option>
+                            <option selected>{% trans "Choose Subject" %}</option>
                             {% for opts in metadata_educationalsubject %}
                                 <option {% if educationalsubject_val == opts %} selected {% endif %}>{{opts}}</option>
                             {% endfor %}
@@ -86,7 +86,7 @@
 
                 <div class="course_creator_header">
                     <div class="left course_heading">
-                    <h5>Select Language</h5>
+                    <h5>{% trans "Select Language" %}</h5>
                     </div>
                     <div class="right course_heading_unit">
                          <select class="activity-lang" name="lan" id="activity_lang" >
@@ -105,7 +105,7 @@
                           </select>
                     </div>
                 </div>
-                {% comment %}
+                
                 <div class="course_creator_header">
                     <div class="left course_heading">
                     <h5>Enter tab name</h5>
@@ -119,7 +119,7 @@
                     <h5>Enter Section Name</h5>
                     </div>
                     <div class="right course_heading_unit">
-                         <input id="section-name" name="section_name"  type="text" placeholder="Enter Section name"/>
+                         <input id="section-name" name="section_name" value="{{unit_node.project_config.section_name}}"  type="text" placeholder="Enter Section name"/>
                     </div>
                 </div>
                 <div class="course_creator_header">
@@ -127,20 +127,20 @@
                     <h5>Enter Sub Section name</h5>
                     </div>
                     <div class="right course_heading_unit">
-                         <input id="subsection-name" name="subsection_name" type="text" placeholder="Enter Sub Section name"/>
+                         <input id="subsection-name" name="subsection_name" value="{{unit_node.project_config.subsection_name}}" type="text" placeholder="Enter Sub Section name"/>
                     </div>
                 </div>
-                {% endcomment %}
+                
                 <div class=" course_heading_unit tags-container">
                  {% include 'ndf/widget_tags.html' with node=unit_node %}
 
                 </div>
 
                 <hr/>
-                <label style="color:red;" class="right hide duplicate_unit_name">Unit with same name exists. Please choose another name.</label>
+                <label style="color:red;" class="right hide duplicate_unit_name">{% trans "Unit with same name exists" %}. {% trans "Please choose another name" %}.</label>
                 <div class="course_creator_header unit_editor">
                     <div class="left course_heading">
-                    <h5>Enter Description</h5>
+                    <h5>{% trans "Enter Description" %}</h5>
                     </div>
                     <div class="right course_heading_unit">
                         {% include "ndf/html_editor.html" with var_name="content" var_placeholder="Enter the content here" var_value=unit_node.content|default_if_none:"" node_id=unit_node.pk ckeditor_toolbar="GeneralToolbar" %}
@@ -152,7 +152,7 @@
                         <button type="button" class ="right asset-unit-button" id="save_unit">Save</button>
                     {% endcomment %}
                     <!-- <input type="button" class="asset-unit-button right" value="Cancel"/> -->
-                    <a href="{% if unit_node %} {% url 'groupchange' unit_node.pk %}{% else %} {% url 'explore_basecourses' %}{% endif %} " class="asset-unit-button right" value="Cancel"/>Cancel</a>
+                    <a href="{% if unit_node %} {% url 'groupchange' unit_node.pk %}{% else %} {% url 'explore_basecourses' %}{% endif %} " class="asset-unit-button right" value="Cancel"/>{% trans "Cancel" %}</a>
                     <input type="submit" class="asset-unit-button right" id="save_unit" value="Save"/>
                 </div>
             </form>

@@ -18,6 +18,8 @@ from gnowsys_ndf.settings import GSTUDIO_DEFAULT_LANGUAGE
 # gst_page_name, gst_page_id = GSystemType.get_gst_name_id(u'Page')
 rt_translation_of = Node.get_name_id_from_type('translation_of', 'RelationType', get_obj=True)
 supported_languages = ['Hindi', 'Telugu']
+trans_node_gst_name, trans_node_gst_id = GSystemType.get_gst_name_id("trans_node")
+
 
 
 def all_translations(request, group_id, node_id):
@@ -136,14 +138,24 @@ def translate(request, group_id, node_id, lang, translated_node_id=None, **kwarg
             # create a new translated new
             # translated_node = node_collection.collection.GSystem()
             # copy source_obj's data into a new
-            translated_node = source_obj.__deepcopy__()
-            translated_node['_id'] = ObjectId()
+            if source_obj._type == "Group":
+                translated_node = node_collection.collection.GSystem()
+                exclude_fields = ['_id','member_of','_type','type_of','modified_by','prior_node','post_node']
+                for each in translated_node:
+                    if each not in exclude_fields:
+                        translated_node[each] = source_obj[each]
+                translated_node.group_set.append(source_obj._id)
+            else:
+                translated_node = source_obj.__deepcopy__()
+                translated_node['_id'] = ObjectId()
 
         translated_node.fill_gstystem_values(request=request,
                                             language=language,
                                             **kwargs)
         trans_alt_name = request.POST.get('altnames', None)
+        
         translated_node.altnames = unicode(trans_alt_name)
+        translated_node.member_of = [ObjectId(trans_node_gst_id)]
         translated_node.save(group_id=group_id)
         if not existing_grel:
             trans_grel_list = [ObjectId(translated_node._id)]

@@ -63,7 +63,7 @@ def export_group_analytics(group_obj):
             group_name = slugify(group_obj['name'])
         except Exception, e:
             print e
-            group_name = 'i2c'
+            group_name = str(group_obj['_id'])
 
         # dt: date time
         # e.g: '21-November-2016-19h-08m-10s'
@@ -82,6 +82,8 @@ def export_group_analytics(group_obj):
         for index, each_user in enumerate(group_users):
             try:
                 analytics_data = course_analytics(None, group_obj._id, each_user, get_result_dict=True)
+                analytics_data['school_id'] = GSTUDIO_INSTITUTE_ID
+                analytics_data['unit_name'] = group_name
                 if not analytics_data:
                     continue
 

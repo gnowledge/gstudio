@@ -1,4 +1,5 @@
 {% extends "ndf/gbase.html" %}
+{% load i18n %}
 
 {% block title %} {{title}} {% endblock %}
 
@@ -7,11 +8,11 @@
 
 
 		<div class="title-strip">
-			Showing all Units in<h7 class="text-button-blue">{{node.name}} </h7><br/>
-			Module Description:<h7 class="text-button-blue">{{node.content|safe}}</h7>
+			{% trans "Showing all Units in" %}<h7 class="text-button-blue">{{node.name}} </h7><br/>
+			{% trans "Module Description:" %}<h7 class="text-button-blue">{{node.content|safe}}</h7>
 			
 			{% if is_gstaff or node.created_by == request.user.id  %}
-			<a  class="buddy_margin right" href="{% url 'module_edit' group_id node.pk %}"><i class="fa fa-pencil"></i> Edit</a>
+			<a  class="buddy_margin right" href="{% url 'module_edit' group_id node.pk %}"><i class="fa fa-pencil"></i> {% trans "Edit" %}</a>
 			{% endif %}
 		</div>
 
