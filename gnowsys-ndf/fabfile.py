@@ -24,10 +24,11 @@ def update_data():
 	except Exception, e:
 		# exception will happen for fresh data
 		pass
-	create_schema()
-	local('python manage.py filldb')
-	local('python manage.py create_schema ATs.csv')
-	local('python manage.py sync_existing_documents')
+	finally:
+		create_schema()
+		local('python manage.py filldb')
+		local('python manage.py create_schema ATs.csv')
+		local('python manage.py sync_existing_documents')
 
 
 def update(branch):
