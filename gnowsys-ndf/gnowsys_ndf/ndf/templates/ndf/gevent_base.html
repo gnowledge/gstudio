@@ -16,6 +16,7 @@
 {% get_group_object groupid as group_object %}
 {% check_is_gstaff group_id request.user as is_gstaff %}
 {% comment %}{% get_breadcrumb request.path %}{% endcomment %}
+<div class="">
     <div class="row group_content {% if hide_bannerpic %} max-width {% endif %}">
         <div class="small-12 columns">
             <div class="row">
@@ -168,7 +169,11 @@
         <div id="exportLessonModalLabel">{% trans "Epub will be downloaded automatically." %}</div>
         <a class="close-reveal-modal">&#215;</a>
     </div>
+</div>
 
+
+
+        
 
 
     <script type="text/javascript">
