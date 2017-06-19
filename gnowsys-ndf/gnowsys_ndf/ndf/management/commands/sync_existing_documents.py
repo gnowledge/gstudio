@@ -9,9 +9,10 @@ except ImportError:  # old pymongo
   from pymongo.objectid import ObjectId
 
 ''' imports from application folders/files '''
-from gnowsys_ndf.ndf.models import node_collection, triple_collection
-from gnowsys_ndf.ndf.models import Node, db, AttributeType, RelationType, GSystem
-from gnowsys_ndf.settings import GSTUDIO_AUTHOR_AGENCY_TYPES, LANGUAGES, OTHER_COMMON_LANGUAGES, GSTUDIO_DEFAULT_LICENSE, GSTUDIO_DEFAULT_LANGUAGE
+from gnowsys_ndf.ndf.models import node_collection, triple_collection, counter_collection
+from gnowsys_ndf.ndf.models import Node, db, AttributeType, RelationType, GSystem, GSystemType
+from gnowsys_ndf.settings import GSTUDIO_AUTHOR_AGENCY_TYPES, LANGUAGES, OTHER_COMMON_LANGUAGES, GSTUDIO_DEFAULT_SYSTEM_TYPES_LIST
+from gnowsys_ndf.settings import GSTUDIO_DEFAULT_LICENSE, GSTUDIO_DEFAULT_LANGUAGE, GSTUDIO_DEFAULT_COPYRIGHT
 from gnowsys_ndf.ndf.views.methods import create_gattribute, create_grelation
 from gnowsys_ndf.ndf.templatetags.ndf_tags import get_relation_value, get_attribute_value
 
@@ -25,8 +26,21 @@ class Command(BaseCommand):
 
     # Keep latest changes in field(s) to be added at top
 
+    # updating project_config for Groups
+    proj_config = node_collection.collection.update({'_type':{'$in': [u'Author', u'Group']},'project_config': {'$exists': False} },{'$set': {'project_config': {} }}, upsert=False, multi=True)
+
+    # updating visited_nodes for Counter instances
+    counter_objs = counter_collection.collection.update({'_type': 'Counter',
+        'visited_nodes': {'$exists': False}},
+        {'$set': {'visited_nodes': {}}},upsert=False, multi=True)  
+    if counter_objs['nModified']:
+        print "\n Updated Counters adding field: visited_nodes for " + counter_objs['nModified'].__str__() + " instances."
+          
+
     # updating access_policy from inconsistent values like 'public', 'Public' to 'PUBLIC'
-    all_ap = node_collection.collection.update({'_type': {'$nin': [u'ToReduceDocs']}, 'access_policy': {'$in': [u'public', u'Public', '', None]}}, {'$set':{'access_policy': u'PUBLIC'} }, upsert=False, multi=True)
+    all_ap = node_collection.collection.update({'_type': {'$nin': [u'ToReduceDocs']},
+     'access_policy': {'$in': [u'public', u'Public', '', None]}},
+      {'$set':{'access_policy': u'PUBLIC'} }, upsert=False, multi=True)
     if all_ap['nModified']:
         print "\n `access_policy`: Replaced non u'PUBLIC' values of public nodes to u'PUBLIC' for : " + all_ap['nModified'].__str__() + " instances."
 
@@ -39,21 +53,28 @@ class Command(BaseCommand):
 
 
     # Adds "legal" field (with default values) to all documents belonging to GSystems.
-    all_gs = node_collection.find({'_type': {'$in' : ['GSystem', 'Group', 'Author', 'File']},
+    all_gs = node_collection.collection.update({'_type': {'$in' : ['GSystem', 'Group', 'Author', 'File']},
                  '$or': [{'legal': {'$exists': False}}, {'license': {'$exists': True}}],
-                })
-    all_gs_count = all_gs.count()
-    if all_gs:
-        print "\n Total GSystems found to update 'legal' field: ", all_gs.count()
-        for index, each_gs in enumerate(all_gs):
-            try:
-                print "\n GSystem: ", index, ' of ', all_gs_count
-                each_gs.legal = {'copyright': each_gs.license, 'license': GSTUDIO_DEFAULT_LICENSE}
-                each_gs.pop('license')
-                each_gs.save()
-            except AttributeError as noLicense:
-                print "\n No license found for: ", each_gs._id
-                pass
+                },
+        {'$set': {'legal': {'copyright': GSTUDIO_DEFAULT_COPYRIGHT, 'license': GSTUDIO_DEFAULT_LICENSE}}, 
+        '$unset': {'license': None}},upsert=False, multi=True)  
+
+
+    # all_gs = node_collection.find({'_type': {'$in' : ['GSystem', 'Group', 'Author', 'File']},
+    #              '$or': [{'legal': {'$exists': False}}, {'license': {'$exists': True}}],
+    #             })
+    # all_gs_count = all_gs.count()
+    # if all_gs:
+    #     print "\n Total GSystems found to update 'legal' field: ", all_gs.count()
+    #     for index, each_gs in enumerate(all_gs):
+    #         try:
+    #             print "\n GSystem: ", index, ' of ', all_gs_count
+    #             each_gs.legal = {'copyright': each_gs.license, 'license': GSTUDIO_DEFAULT_LICENSE}
+    #             each_gs.pop('license')
+    #             each_gs.save()
+    #         except AttributeError as noLicense:
+    #             print "\n No license found for: ", each_gs._id
+    #             pass
 
     # --------------------------------------------------------------------------
     # Adding <'relation_type_scope': []> field to all RelationType objects
@@ -110,7 +131,8 @@ class Command(BaseCommand):
         rt_obj = RelationType(db.dereference(each_grelation.relation_type))
         each_grelation.relation_type = rt_obj._id
         try:
-            each_grelation.save(triple_node=rt_obj,triple_id=rt_obj._id)
+            # each_grelation.save(triple_node=rt_obj,triple_id=rt_obj._id)
+            each_grelation.save()
         except Exception as er:
             print "\n Error Occurred while updating Triples data. ", er
             pass
@@ -130,8 +152,32 @@ class Command(BaseCommand):
         print '.',
         at_obj = AttributeType(db.dereference(each_gattribute.attribute_type))
         each_gattribute.attribute_type = at_obj._id
-        each_gattribute.save(triple_node=at_obj,triple_id=at_obj._id)
+        # each_gattribute.save(triple_node=at_obj,triple_id=at_obj._id)
+        each_gattribute.save()
     # --------------------------------------------------------------------------
+
+    # adding 'assessments' in Counter instances:
+    # 'assessment': {
+    #             'offered_id': {'total': int, 'correct': int, 'incorrect': int}
+    #             }
+
+
+    ctr_res = counter_collection.collection.update({
+                    '_type': 'Counter',
+                    'assessment': {'$exists': False}
+                },
+                {
+                    '$set': {
+                            'assessment': {
+                                'offered_id': {'total': None, 'correct': None, 'incorrect_attempts': None},
+                            },
+                        }
+                },
+                upsert=False, multi=True)
+
+    if ctr_res['updatedExisting']: # and ctr_res['nModified']:
+        print "\n Added 'assessment' field to " + ctr_res['n'].__str__() + " Counter instances."
+
 
     # adding 'if_file' in GSystem instances:
     # 'if_file': {
@@ -878,31 +924,59 @@ class Command(BaseCommand):
             i.save()
             print "Updated",i.name,"'s modified by feild from null to 1"
 
-    all_grelations = triple_collection.find({'_type': 'GRelation'})
-    all_gattributes = triple_collection.find({'_type': 'GAttribute'})
-    print "\n Working on Triples data. \n Total GRelations found: ", all_grelations.count()
-    print " Total GAttributes found: ", all_gattributes.count()
-    print "\n This will take few minutes. Please wait.."
-    for each_grelation in all_grelations:
-        # print each_grelation
-        print '.',
-        rt_node = each_grelation.relation_type
-        if not isinstance(rt_node, ObjectId):
-            rt_obj = RelationType(db.dereference(rt_node))
-            each_grelation.relation_type = rt_obj._id
-            # print each_grelation
-            try:
-                each_grelation.save(triple_node=rt_obj,triple_id=rt_obj._id)
-            except Exception as er:
-                print "Error Occurred while updating Triples data. ", er
-                pass
+    
 
-    for each_gattribute in all_gattributes:
-        print '.',
-        at_node = each_gattribute.attribute_type
-        if not isinstance(at_node, ObjectId):
-            at_obj = AttributeType(db.dereference(at_node))
-            each_gattribute.attribute_type = at_obj._id
-            each_gattribute.save(triple_node=at_obj,triple_id=at_obj._id)
+    # Adding default st. -katkamrachana
 
-    print "\nTriples data updated successfully."
+    default_st_cur = node_collection.find({'_type': 'GSystemType',
+                    'name': {'$in': GSTUDIO_DEFAULT_SYSTEM_TYPES_LIST}})
+    default_st_ids = [st._id for st in default_st_cur]
+
+
+    print "\n RelationTypes and AttributeTypes to add GSTUDIO_DEFAULT_SYSTEM_TYPES_LIST."
+    rt_res_default_st = node_collection.collection.update({'_type': 'RelationType',
+        '$or': [{'subject_type': {'$nin': default_st_ids}}, {'object_type': {'$nin': default_st_ids}}]}, \
+        {'$addToSet': {'subject_type': {'$each': default_st_ids}, 'object_type': {'$each': default_st_ids},\
+        }}, upsert=False, multi=True)
+
+    if rt_res_default_st['updatedExisting']: # and res['nModified']:
+        print "\n Added 'GSTUDIO_DEFAULT_SYSTEM_TYPES_LIST' ids to " + rt_res_default_st['n'].__str__() + " RelationType instances."
+
+    at_res_default_st = node_collection.collection.update({'_type': 'AttributeType',
+        'subject_type': {'$nin': default_st_ids}}, \
+     {'$addToSet': {'subject_type': {'$each': default_st_ids}}}, upsert=False, multi=True)
+
+    if at_res_default_st['updatedExisting']: # and res['nModified']:
+        print "\n Added 'GSTUDIO_DEFAULT_SYSTEM_TYPES_LIST' ids to " + at_res_default_st['n'].__str__() + " AttributeType instances."
+
+    # For all right_subject nodes of 'translation_of' GRelations,
+    # add member_of of 'trans_node' GST
+    trans_node_gst_name, trans_node_gst_id = GSystemType.get_gst_name_id("trans_node")
+
+    rt_translation_of = Node.get_name_id_from_type('translation_of', 'RelationType', get_obj=True)
+
+    all_translations_grels = triple_collection.find({
+                            '_type': u'GRelation',
+                            'relation_type': rt_translation_of._id
+                        },{'right_subject': 1})
+    right_subj_ids = [each_rs.right_subject for each_rs in all_translations_grels]
+    right_subj_update_res = node_collection.collection.update(
+                                {'_id': {'$in': right_subj_ids}, 'member_of': {'$nin': [trans_node_gst_id]}},
+                                {'$set': {'member_of': [trans_node_gst_id]}},
+                                upsert=False, multi=True)
+    if right_subj_update_res['updatedExisting']: # and res['nModified']:
+        print "\n Added 'trans_node' _id in " + right_subj_update_res['n'].__str__() + " 'translation_of' right_subject instances."
+
+
+    # changing member_of from `activity` to `Page`
+    print "\nReplacing member_of field from 'activity' to'Page'"
+
+    activity_gst = node_collection.one({'_type': 'GSystemType', 'name': 'activity'})
+    activity_cur = node_collection.find({'member_of': activity_gst._id})
+    print "\n Activities found: ", activity_cur.count()
+    page_gst = node_collection.one({'_type': 'GSystemType', 'name': 'Page'})
+    wiki_page_gst = node_collection.one({'_type': 'GSystemType', 'name': 'Wiki page'})
+    activity_gs_mem_update_res = node_collection.collection.update({'member_of': activity_gst._id},
+        {'$set': {'member_of': [page_gst._id], 'type_of': [wiki_page_gst._id]}} ,upsert=False, multi=True)
+    if activity_gs_mem_update_res['updatedExisting']: # and res['nModified']:
+        print "\n Replaced member_of field from 'activity' to'Page' in " + activity_gs_mem_update_res['n'].__str__() + " instances."

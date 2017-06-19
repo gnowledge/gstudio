@@ -1,7 +1,17 @@
 {% load i18n %}
 {% load ndf_tags %}
 
-<div id="scstyle">
+
+
+	<script>
+         
+
+         function togglerTranscript(a){
+                $(a).next(".transcript-data").toggleClass("hide");
+            };         
+           
+      </script>
+
 	 {% if 'audio' in audio_obj.if_file.mime_type %}
 	 <audio controls="" width="100px" id="audio-player-{{audio_obj.pk}}">
 	 <source src="{{MEDIA_URL}}{{audio_obj.if_file.original.relurl}}" type="audio/mp3"/>
@@ -10,13 +20,16 @@
     {% get_relation_value audio_obj.pk 'has_transcript' as transcript_rel %}
 	{% if transcript_rel %}
 
-	<form class="trans-form">
-		<input align="right" id="toggler" type="checkbox" />
-			<label class="toggle-me" for="toggler">Transcript</label>
-		<div class="transcript">
-			<object type="text/html" data="{{MEDIA_URL}}{{transcript_rel.grel_node.if_file.original.relurl}}" style="width:99%!important; height:auto!important;word-wrap: break-word;">
-			</object>
-		</div>
+	<div>	
+      {# <button type = "button" class="small radius transcript-toggler" onclick="togglerTranscript(this)">Transcript</button> #}
+      <input type="button" class="small radius transcript-toggler" onclick="togglerTranscript(this)" value="Transcript">
+      <div class="transcript-data hide">
+      	<object type="text/html" data="{{MEDIA_URL}}{{transcript_rel.grel_node.if_file.original.relurl}}"></object>
+      </div>
+    </div>
 	{% endif %}
 	{% endif %}
-</div>
+
+
+
+

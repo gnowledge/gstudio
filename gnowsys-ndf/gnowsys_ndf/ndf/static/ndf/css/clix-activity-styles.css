@@ -207,6 +207,7 @@
 
 #scstyle section{
   margin-left: auto;
+  width:auto;
 }
 
 #scstyle audio {
@@ -341,7 +342,7 @@
 /*Art boxes */
 /* line 338, ../sass/styles.scss */
 #scstyle .art-box {
-  height: 170px;
+  height: 200px;
   margin: 0;
   background-color: #ffffff;
   border-top: 3px solid #750f5a;
@@ -726,3 +727,25 @@
 #scstyle bttn:hover, bttn:focus, .bttn:hover, .bttn:focus {
     background-color: radial-gradient(#412e6b,#2c1f47);
     color: white; }
+
+#scstyle input[type="button"] {
+    -webkit-appearance: button;
+    cursor: pointer;
+    margin-top:15px;
+    width:8%;
+}    
+
+#scstyle .transcript-toggler{
+        display: block;
+        width: 155px !important;
+        height: 30px;
+        margin-top: -14px !important;
+        padding: 9px 16px 2px;
+        background: radial-gradient(hsla(259, 40%, 40%, 1), hsla(259, 40%,30%, 1));
+        border-radius: 0 0 5px 5px;
+        color: #fff;
+        cursor: pointer;
+        font-size: .75rem;
+        padding-top:7px !important;
+        text-transform: uppercase;
+}

@@ -1,3 +1,4 @@
+import datetime
 try:
     from bson import ObjectId
 except ImportError:  # old pymongo
@@ -5,10 +6,10 @@ except ImportError:  # old pymongo
 
 from django.http import HttpRequest
 
-from gnowsys_ndf.ndf.models import Node, GSystemType
+from gnowsys_ndf.ndf.models import Node, GSystemType, Buddy, Counter
 from gnowsys_ndf.ndf.models import node_collection, triple_collection
 from gnowsys_ndf.ndf.views.methods import get_group_name_id, get_language_tuple, create_grelation
-from gnowsys_ndf.settings import GSTUDIO_DEFAULT_LANGUAGE
+from gnowsys_ndf.settings import GSTUDIO_BUDDY_LOGIN, GSTUDIO_DEFAULT_LANGUAGE, GSTUDIO_FILE_UPLOAD_POINTS
 
 # gst_asset = node_collection.one({'_type': u'GSystemType', 'name': u'Asset'})
 gst_asset_name, gst_asset_id = GSystemType.get_gst_name_id(u'Asset')
@@ -142,5 +143,17 @@ def create_assetcontent(asset_id,
 		asset_contents_list.append(each_asset['right_subject'])
 	
 	create_grelation(asset_obj._id, rt_has_asset_content, asset_contents_list)
+	active_user_ids_list = [request.user.id]
+	if GSTUDIO_BUDDY_LOGIN:
+		active_user_ids_list += Buddy.get_buddy_userids_list_within_datetime(request.user.id, datetime.datetime.now())
+		# removing redundancy of user ids:
+		active_user_ids_list = dict.fromkeys(active_user_ids_list).keys()
 
+	counter_objs_cur = Counter.get_counter_objs_cur(active_user_ids_list, group_id)
+	# counter_obj = Counter.get_counter_obj(request.user.id, group_id)
+	for each_counter_obj in counter_objs_cur:
+		each_counter_obj['file']['created'] += 1
+		each_counter_obj['group_points'] += GSTUDIO_FILE_UPLOAD_POINTS
+		each_counter_obj.last_update = datetime.datetime.now()
+		each_counter_obj.save()
 	return asset_content_obj

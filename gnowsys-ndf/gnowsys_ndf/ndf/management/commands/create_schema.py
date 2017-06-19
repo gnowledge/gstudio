@@ -20,6 +20,7 @@ except ImportError:  # old pymongo
 from gnowsys_ndf.ndf.models import DATA_TYPE_CHOICES
 from gnowsys_ndf.ndf.models import node_collection, triple_collection
 from gnowsys_ndf.ndf.models import Node, GSystemType, AttributeType, RelationType
+from gnowsys_ndf.settings import GSTUDIO_DEFAULT_SYSTEM_TYPES_LIST
 
 ####################################################################################################################
 
@@ -221,9 +222,13 @@ def parse_data_create_gtype(json_file_path):
           log_list.append(error_message)
           raise Exception(error_message)
 
+
         perform_eval_type("complex_data_type", json_document, type_name, "AttributeType")
         perform_eval_type("subject_type", json_document, type_name, "GSystemType")
         perform_eval_type("validators", json_document, type_name, "AttributeType")
+
+        # if GSTUDIO_DEFAULT_SYSTEM_TYPES_LIST:
+        #   json_document["subject_type"] = update_default_st(json_document["subject_type"])
 
       except Exception as e:
         error_message = "\n While parsing "+type_name+"(" + json_document['name'] + ") got following error...\n " + str(e)
@@ -262,9 +267,18 @@ def parse_data_create_gtype(json_file_path):
         if json_document["object_scope"]:
           json_document["object_scope"] = map(unicode,json_document["object_scope"])
 
+        json_document["is_reflexive"] = ast.literal_eval(json_document['is_reflexive'].title())
+        json_document["is_transitive"] = ast.literal_eval(json_document['is_transitive'].title())
+        json_document["is_symmetric"] = ast.literal_eval(json_document['is_symmetric'].title())
+
         perform_eval_type("subject_type", json_document, type_name, "GSystemType")
         perform_eval_type("object_type", json_document, type_name, "GSystemType")
         perform_eval_type("member_of", json_document, type_name, "MetaType")
+
+        # if GSTUDIO_DEFAULT_SYSTEM_TYPES_LIST:
+        #   json_document["subject_type"] = update_default_st(json_document["subject_type"])
+        #   json_document["object_type"] = update_default_st(json_document["object_type"])
+
       except Exception as e:
         error_message = "\n While parsing "+type_name+"(" + json_document['name'] + ") got following error at line #" + str(exc_info()[-1].tb_lineno) + "...\n " + str(e)
         log_list.append(error_message)
@@ -280,6 +294,15 @@ def parse_data_create_gtype(json_file_path):
       except Exception as e:
         error_message = "\n While creating "+type_name+" ("+json_document['name']+") got following error at line #" + str(exc_info()[-1].tb_lineno) + "...\n " + str(e)
         print error_message # Keep it!
+
+
+def update_default_st(field):
+  default_st_cur = node_collection.find({'_type': 'GSystemType',
+                    'name': {'$in': GSTUDIO_DEFAULT_SYSTEM_TYPES_LIST}})
+  default_st_ids = [st._id for st in default_st_cur]
+  if default_st_ids:
+    field.extend(default_st_ids)
+  return field
 
 def perform_eval_type(eval_field, json_document, type_to_create, type_convert_objectid):
   """Converts eval_field's data in json-type to it's corresponding python-type, and
@@ -389,7 +412,25 @@ def create_edit_type(type_name, json_document, user_id):
               if type(old_data[0]) == list:
                   old_data = list(chain.from_iterable(old_data))
                   new_data = list(chain.from_iterable(new_data))
+          if [] in old_data:
+            old_data.remove([])
+          if [] in new_data:
+            new_data.remove([])
 
+          old_data_refined = []
+          new_data_refined = []
+          for each_odata in old_data:
+              if isinstance(each_odata,list):
+                  old_data_refined.extend(each_odata)
+              else:
+                  old_data_refined.append(each_odata)
+          for each_ndata in new_data:
+              if isinstance(each_ndata,list):
+                  new_data_refined.extend(each_ndata)
+              else:
+                  new_data_refined.append(each_ndata)
+          old_data = old_data_refined
+          new_data = new_data_refined
           if set(old_data) != set(new_data):
             # node[key].extend(json_document[key])
             # Avoiding extend's use

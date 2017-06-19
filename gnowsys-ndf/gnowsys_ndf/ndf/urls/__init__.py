@@ -143,7 +143,7 @@ urlpatterns = patterns('',
     url(r'^(?P<group_id>[^/]+)/visualize', include('gnowsys_ndf.ndf.urls.visualise_urls')),
 
     (r'^explore/', include('gnowsys_ndf.ndf.urls.explore')),
-
+    url(r'^help-page/(?P<page_name>[^/]+)$', 'gnowsys_ndf.ndf.views.home.help_page_view', name='help_page_view'),
     url(r'^(?P<group_id>[^/]+)/$', 'gnowsys_ndf.ndf.views.group.group_dashboard', name='groupchange'),
     # ---listing sub partners---
     url(r'^(?P<group_id>[^/]+)/partners$', 'gnowsys_ndf.ndf.views.partner.partner_list', name='partnerlist'),

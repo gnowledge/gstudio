@@ -449,10 +449,10 @@ def group_dashboard(request, group_id):
                         profile_pic_image = node_collection.one(
                             {'_type': {"$in": ["GSystem", "File"]}, '_id': each["has_profile_pic"][0]}
                         )
-                if "has_Banner_pic" in each:
-                    if each["has_Banner_pic"]:
+                if "has_banner_pic" in each:
+                    if each["has_banner_pic"]:
                         banner_pic = node_collection.one(
-                            {'_type': {"$in": ["GSystem", "File"]}, '_id': each["has_Banner_pic"][0]}
+                            {'_type': {"$in": ["GSystem", "File"]}, '_id': each["has_banner_pic"][0]}
                         )
                 if ("has_thumbnail" in each) and each["has_thumbnail"]:
                         banner_pic = node_collection.one(
@@ -711,39 +711,39 @@ def my_desk(request, group_id):
 
     auth_id = auth_obj._id
     title = 'my desk'
-    modules_cur = node_collection.find({'member_of': gst_module_id  }).sort('last_update', -1)
-
-    my_course_objs = get_user_course_groups(user_id)
-    module_unit_ids = [val for each_module in modules_cur for val in each_module.collection_set ]
-
-    modules_cur.rewind()
-        # print my_course_objs
-    base_unit_cur = node_collection.find({'member_of': {'$in': [ce_gst._id, announced_unit_gst._id]},
-                                          'author_set': request.user.id,
-                                        }).sort('last_update', -1)
-    my_list_unit = []
-    for each in base_unit_cur:
-        my_list_unit.append(each._id)
-
-    base_unit_cur.rewind()
-    my_modules_cur = node_collection.find({'member_of': gst_module_id ,'collection_set':{'$in':my_list_unit } }).sort('last_update', -1)
     
-    my_modules = []
-    for each in my_modules_cur:
-        my_modules.append(each._id)
+    # modules_cur = node_collection.find({'member_of': gst_module_id  }).sort('last_update', -1)
+
+    # my_course_objs = get_user_course_groups(user_id)
+    # module_unit_ids = [val for each_module in modules_cur for val in each_module.collection_set ]
+
+    # modules_cur.rewind()
+        # print my_course_objs
+    # base_unit_cur = node_collection.find({'member_of': {'$in': [ce_gst._id, announced_unit_gst._id]},
+    #                                       'author_set': request.user.id,
+    #                                     }).sort('last_update', -1)
+    # my_list_unit = []
+    # for each in base_unit_cur:
+    #     my_list_unit.append(each._id)
+
+    # base_unit_cur.rewind()
+    # my_modules_cur = node_collection.find({'member_of': gst_module_id ,'collection_set':{'$in':my_list_unit } }).sort('last_update', -1)
+    
+    # my_modules = []
+    # for each in my_modules_cur:
+    #     my_modules.append(each._id)
 
     my_units = node_collection.find({'member_of': {'$in': [ce_gst._id, announced_unit_gst._id]},
                                           'author_set': request.user.id,
-                                          'prior_node': {'$nin': my_modules},
                                         }).sort('last_update', -1)
-    my_modules_cur.rewind()
+    # my_modules_cur.rewind()
     return render_to_response('ndf/lms_dashboard.html',
                 {
                     'group_id': auth_id, 'groupid': auth_id,
                     'node': auth_obj, 'title': title,
-                    'my_course_objs': my_course_objs,
+                    # 'my_course_objs': my_course_objs,
                     'units_cur':my_units,
-                    'modules_cur': my_modules_cur
+                    # 'modules_cur': my_modules_cur
                 },
                 context_instance=RequestContext(request)
         )
@@ -826,6 +826,38 @@ def my_dashboard(request, group_id):
                     'cmnts_rcvd_by_user':cmnts_rcvd_by_user,
                     'groups_cur':groups_cur,
                     'my_course_objs': my_course_objs
+                },
+                context_instance=RequestContext(request)
+        )
+
+
+def my_performance(request, group_id):
+
+    if str(request.user) == 'AnonymousUser':
+        raise Http404("You don't have an authority for this page!")
+
+    try:
+        auth_obj = get_group_name_id(group_id, get_obj=True)
+        user_id = auth_obj.created_by
+
+    except:
+        user_id = eval(group_id)
+        auth_obj = node_collection.one({'_type': "Author", 'created_by': user_id})
+
+    auth_id = auth_obj._id
+    title = 'my performance'
+
+    my_units = node_collection.find({'member_of': {'$in': [ce_gst._id, announced_unit_gst._id]},
+                                          'author_set': request.user.id,
+                                        }).sort('last_update', -1)
+    # my_modules_cur.rewind()
+    return render_to_response('ndf/lms_dashboard.html',
+                {
+                    'group_id': auth_id, 'groupid': auth_id,
+                    'node': auth_obj, 'title': title,
+                    # 'my_course_objs': my_course_objs,
+                    'units_cur':my_units,
+                    # 'modules_cur': my_modules_cur
                 },
                 context_instance=RequestContext(request)
         )

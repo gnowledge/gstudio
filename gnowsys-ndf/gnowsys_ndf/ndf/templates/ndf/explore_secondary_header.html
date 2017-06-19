@@ -1,23 +1,27 @@
 {% load i18n %}
-{% load check_is_gstaff from ndf_tags %}
+{% load check_is_gstaff user_groups from ndf_tags %}
 {% check_is_gstaff group_id request.user as is_gstaff %}
-
+{% user_groups request.user.is_superuser request.user.id as user_grp_count %}
 <nav class="top-bar-second" data-topbar role="navigation" id="top-bar-second">
 		<div class="small-12 medium-12 columns expore-type">
 			<!--<div class="toggleButtons">-->
 			<div class="title-area">
 
 				<a href="{% url 'explore_courses' %}" class="secondary-header-tabs  {%if title == 'courses'%} active{% endif %}">
-					Courses
+					{% trans "Courses" %}
 				</a>
+
+				{% if request.user.is_superuser or user_grp_count.projects > 0  %}
 				<a href="{% url 'explore_groups' %}" class="secondary-header-tabs {%if title == 'groups'%} active{% endif %}">
-					Projects
-				</a>
-				{% if is_gstaff %}
-				<a href="{% url 'explore_drafts' %}" class="secondary-header-tabs {%if title == 'drafts'%} active{% endif %}">
-					Drafts
+					{% trans "Projects" %}
 				</a>
 				{% endif %}
+				{% if request.user.is_superuser or user_grp_count.drafts > 0  %}
+				<a href="{% url 'explore_drafts' %}" class="secondary-header-tabs {%if title == 'drafts'%} active{% endif %}">
+					{% trans "Drafts Courses" %}
+				</a>
+				{% endif %}
+
 			</div>
 		</div>
 	</nav>

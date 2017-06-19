@@ -14,7 +14,7 @@ from gnowsys_ndf.ndf.views.filehive import *
 from gnowsys_ndf.ndf.views.methods import create_grelation
 
 # if not os.path.isdir(GSTUDIO_LOGS_DIR_PATH):
-# 	os.makedirs(GSTUDIO_LOGS_DIR_PATH)
+#   os.makedirs(GSTUDIO_LOGS_DIR_PATH)
 
 warehouse_grp = node_collection.one({'_type': "Group", 'name': "warehouse"})
 file_gst = node_collection.one({'_type': "GSystemType", 'name': "File"})
@@ -28,7 +28,7 @@ auth_gst_id = auth_gst._id
 # csv_log_list = []
 
 user_icons_dir_path = '/home/docker/code/display-pics/'
-tc_elem_names_list = ['carbon', 'chlorine', 'copper', 'helium', 'iron', 'nitrogen', 'oxygen', 'silver', 'sodium', 'zinc']
+
 
 class Command(BaseCommand):
     help = "Creating user, author and attaching profile pics from CSV's.\n\t- CSV file schema: user_id, school_code, username, password, oid\n\t- CSV file-name-path needs to be passed either as argument or can be passed on demand/asked by script.\n\t- Please keep user-display-pics folder at following location:\n\t\t/home/docker/code/display-pics/"
@@ -39,6 +39,8 @@ class Command(BaseCommand):
 
         if not file_input or not os.path.exists(file_input):
             file_input = raw_input("\nEnter below file path to be used:\n")
+
+        techer_element_set = {'carbon', 'chlorine', 'copper', 'helium', 'iron', 'nitrogen', 'oxygen', 'silver', 'sodium', 'zinc'}
 
         if os.path.exists(file_input):
 
@@ -82,13 +84,11 @@ class Command(BaseCommand):
                         auth['modified_by'] = user_id
                         auth['contributors'] = [user_id]
                         auth['group_admin'] = [user_id]
-                        auth['agency_type'] = "Student"
+                        auth['agency_type'] = 'Student'
                         try:
-                            if username.split('-')[1] in tc_elem_names_list:
-                                # overwrite agency_type if teacher
-                                auth['agency_type'] = "Teacher"
+                            auth['agency_type'] = 'Teacher' if (username.split('-')[1] in techer_element_set) else 'Student'
                         except Exception, e:
-                            print e
+                            auth['agency_type'] = 'Student'
                         oid = ObjectId(oid)
                         auth['_id'] = oid
                         auth.save(groupid=oid)

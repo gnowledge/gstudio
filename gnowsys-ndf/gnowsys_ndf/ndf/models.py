@@ -330,7 +330,7 @@ class Node(DjangoDocument):
                         # 'comment_enabled': bool,
                         # 'login_required': bool,
                         # 'password': basestring,
-                        'status': u'DRAFT',
+                        'status': u'PUBLISHED',
                         'rating':[],
                         'snapshot':{}
                     }
@@ -1017,7 +1017,7 @@ class Node(DjangoDocument):
             fp = history_manager.get_file_path(self)
 
             try:
-                rcs_obj.checkout(fp)
+                rcs_obj.checkout(fp, otherflags="-f")
             except Exception as err:
                 try:
                     if history_manager.create_or_replace_json_file(self):
@@ -2353,7 +2353,7 @@ class Filehive(DjangoDocument):
             fp = history_manager.get_file_path(self)
 
             try:
-                rcs_obj.checkout(fp)
+                rcs_obj.checkout(fp, otherflags="-f")
 
             except Exception as err:
                 try:
@@ -2424,7 +2424,8 @@ class Group(GSystem):
         'encryption_policy': basestring,     # Encryption - yes or no
         'agency_type': basestring,           # A choice field such as Pratner,Govt.Agency, NGO etc.
         'group_admin': [int],		     # ObjectId of Author class
-        'moderation_level': int              # range from 0 till any integer level
+        'moderation_level': int,              # range from 0 till any integer level
+        'project_config': dict
     }
 
     use_dot_notation = True
@@ -2702,6 +2703,7 @@ class Group(GSystem):
 
             for each in grp_res:
                 del_status, del_status_msg = delete_node(node_id=each._id, deletion_type=1 )
+                # print del_status, del_status_msg
                 if not del_status:
                     print "*"*80
                     print "\n Error node: _id: ", each._id, " , name: ", each.name, " type: ", each.member_of_names_list
@@ -2709,6 +2711,7 @@ class Group(GSystem):
 
             print "\n Purging group: "
             del_status, del_status_msg = delete_node(node_id=group_id, deletion_type=1)
+            print del_status, del_status_msg
 
             # poping group_id from each of shared nodes under group
             all_nodes_under_gr.rewind()
@@ -2773,6 +2776,10 @@ class Author(Group):
 
     def is_authenticated(self):
         return True
+
+    @staticmethod
+    def get_author_by_userid(user_id):
+        return node_collection.one({'_type': 'Author', 'created_by': user_id})
 
     @staticmethod
     def get_user_id_list_from_author_oid_list(author_oids_list=[]):
@@ -3085,7 +3092,7 @@ class HistoryManager():
 
         fp = self.get_file_path(document_object)
         rcs = RCS()
-        rcs.checkout((fp, version_no))
+        rcs.checkout((fp, version_no), otherflags="-f")
 
         json_data = ""
         with open(fp, 'r') as version_file:
@@ -3134,7 +3141,7 @@ class HistoryManager():
                         doc_obj[k] = oid_ObjectId_list
 
                 except Exception as e:
-                    print "\n Exception for document's ("+doc_obj.name+") key ("+k+") -- ", str(e), "\n"
+                    print "\n Exception for document's ("+str(doc_obj._id)+") key ("+k+") -- ", str(e), "\n"
 
         return doc_obj
 
@@ -3425,15 +3432,17 @@ class Triple(DjangoDocument):
     subject_type_list = []
     subject_member_of_list = []
     name_value = u""
-    if (self._type == "GAttribute") and ('triple_node' in kwargs):
-      self.attribute_type = kwargs['triple_node']
-      attribute_type_name = self.attribute_type['name']
+    # if (self._type == "GAttribute") and ('triple_node' in kwargs):
+    if (self._type == "GAttribute"):
+      # self.attribute_type = kwargs['triple_node']
+      at_node = node_collection.one({'_id': ObjectId(self.attribute_type)})
+      attribute_type_name = at_node.name
       attribute_object_value = unicode(self.object_value)
 
       self.name = "%(subject_name)s -- %(attribute_type_name)s -- %(attribute_object_value)s" % locals()
       name_value = self.name
 
-      subject_type_list = self.attribute_type['subject_type']
+      subject_type_list = at_node.subject_type
       subject_member_of_list = subject_document.member_of
 
       intersection = set(subject_member_of_list) & set(subject_type_list)
@@ -3448,16 +3457,17 @@ class Triple(DjangoDocument):
           if set(gst_node.type_of) & set(subject_type_list):
             subject_system_flag = True
             break
-      self.attribute_type = kwargs['triple_id']
+      # self.attribute_type = kwargs['triple_id']
 
-    elif self._type == "GRelation" and ('triple_node' in kwargs):
-      self.relation_type = kwargs['triple_node']
-      subject_type_list = self.relation_type['subject_type']
-      object_type_list = self.relation_type['object_type']
+    elif self._type == "GRelation":
+      rt_node = node_collection.one({'_id': ObjectId(self.relation_type)})
+      # self.relation_type = kwargs['triple_node']
+      subject_type_list = rt_node.subject_type
+      object_type_list = rt_node.object_type
 
       left_subject_member_of_list = subject_document.member_of
-      relation_type_name = self.relation_type['name']
-      if META_TYPE[4] in self.relation_type.member_of_names_list:
+      relation_type_name = rt_node.name
+      if META_TYPE[4] in rt_node.member_of_names_list:
         #  print META_TYPE[3], self.relation_type.member_of_names_list,"!!!!!!!!!!!!!!!!!!!!!"
         # Relationship Other than Binary one found; e.g, Triadic
         # Single relation: [ObjectId(), ObjectId(), ...]
@@ -3489,8 +3499,6 @@ class Triple(DjangoDocument):
         # with other comma-separated values from another list(s)
         object_type_list = list(chain.from_iterable(object_type_list))
         right_subject_member_of_list = list(chain.from_iterable(right_subject_member_of_list))
-
-
       else:
           #META_TYPE[3] in self.relation_type.member_of_names_list:
           # If Binary relationship found
@@ -3499,7 +3507,6 @@ class Triple(DjangoDocument):
 
           right_subject_list = self.right_subject if isinstance(self.right_subject, list) else [self.right_subject]
           right_subject_document = node_collection.find_one({'_id': {'$in': right_subject_list} })
-
           if right_subject_document:
               right_subject_member_of_list = right_subject_document.member_of
               right_subject_name = right_subject_document.name
@@ -3512,12 +3519,10 @@ class Triple(DjangoDocument):
       right_intersection = set(object_type_list) & set(right_subject_member_of_list)
       if left_intersection and right_intersection:
         subject_system_flag = True
-
       else:
         left_subject_system_flag = False
         if left_intersection:
           left_subject_system_flag = True
-
         else:
           for gst_id in left_subject_member_of_list:
             gst_node = node_collection.one({'_id': gst_id}, {'type_of': 1})
@@ -3540,7 +3545,7 @@ class Triple(DjangoDocument):
         if left_subject_system_flag and right_subject_system_flag:
           subject_system_flag = True
 
-      self.relation_type = kwargs['triple_id']
+      # self.relation_type = kwargs['triple_id']
 
     if self._type =="GRelation" and subject_system_flag == False:
       # print "The 2 lists do not have any common element"
@@ -3581,7 +3586,7 @@ class Triple(DjangoDocument):
       fp = history_manager.get_file_path(self)
 
       try:
-          rcs_obj.checkout(fp)
+          rcs_obj.checkout(fp, otherflags="-f")
       except Exception as err:
           try:
               if history_manager.create_or_replace_json_file(self):
@@ -4042,7 +4047,7 @@ class Buddy(DjangoDocument):
             fp = history_manager.get_file_path(self)
 
             try:
-                rcs_obj.checkout(fp)
+                rcs_obj.checkout(fp, otherflags="-f")
 
             except Exception as err:
                 try:
@@ -4163,7 +4168,14 @@ class Counter(DjangoDocument):
 
         # Total fields should be updated on enroll action
         # On module/unit add/delete, update 'total' fields for all users in celery
-        'course':{'modules':{'completed':int, 'total':int}, 'units':{'completed':int, 'total':int}}
+        
+        'course':{'modules':{'completed':int, 'total':int}, 'units':{'completed':int, 'total':int}},
+
+        # 'visited_nodes' = {str(ObjectId): int(count_of_visits)}
+        'visited_nodes': {basestring: int},
+        'assessment': {
+                    'offered_id': {'total': int, 'correct': int, 'incorrect_attempts': int}
+                    }
     }
 
     default_values = {
@@ -4211,7 +4223,10 @@ class Counter(DjangoDocument):
 
         # ideally, member_of field should be used to check resource_type. But it may cause performance hit.
         # hence using 'if_file.mime_type'
-        if resource_obj.if_file.mime_type or (u'File' in resource_obj.member_of_names_list) or (u'Asset' in resource_obj.member_of_names_list):
+        if resource_obj.if_file.mime_type or \
+         u'File' in resource_obj.member_of_names_list or \
+         u'Asset' in resource_obj.member_of_names_list or \
+         u'AssetContent' in resource_obj.member_of_names_list:
             resource_type = 'file'
 
         elif u'Page' in resource_obj.member_of_names_list:
@@ -4251,7 +4266,7 @@ class Counter(DjangoDocument):
         group_id = ObjectId(group_id)
 
         # query and check for existing counter obj:
-        counter_obj = counter_collection.one({'user_id': user_id, 'group_id': group_id})
+        counter_obj = counter_collection.find_one({'user_id': user_id, 'group_id': group_id})
 
         # create one if not exists:
         if not counter_obj :
@@ -4351,7 +4366,9 @@ class Counter(DjangoDocument):
         resource_obj = Node.get_node_obj_from_id_or_obj(resource_obj_or_id, GSystem)
         resource_oid = resource_obj._id
         resource_type, resource_type_of = Counter._get_resource_type_tuple(resource_obj)
-        if resource_type and resource_type_of:
+
+        # if resource_type and resource_type_of:
+        if resource_type:
             # get resource's creator:
             resource_created_by_user_id = resource_obj.created_by
             resource_contributors_user_ids_list = resource_obj.contributors
@@ -4365,20 +4382,22 @@ class Counter(DjangoDocument):
             # counter object of resource contributor
             # ------- creator counter update: done ---------
             for each_resource_contributor in resource_contributors_user_ids_list:
-                counter_obj_each_contributor = Counter.get_counter_obj(each_resource_contributor, current_group_id)
-                # update counter obj
-                for each_active_user_id in active_user_id_list:
-                    existing_user_comment_cnt = eval(key_str).get(str(each_active_user_id), 0)
-                    eval(key_str).update({str(each_active_user_id): (existing_user_comment_cnt + 1) })
+                if each_resource_contributor not in active_user_id_list:
+                    counter_obj_each_contributor = Counter.get_counter_obj(each_resource_contributor, current_group_id)
 
-                # update comments gained:
-                key_str_comments_gained = "counter_obj_each_contributor" \
-                                          + key_str_resource_type
-                comments_gained = eval(key_str_comments_gained + '["comments_gained"]')
-                eval(key_str_comments_gained).update({"comments_gained": (comments_gained + 1)})
+                    # update counter obj
+                    for each_active_user_id in active_user_id_list:
+                        existing_user_comment_cnt = eval(key_str).get(str(each_active_user_id), 0)
+                        eval(key_str).update({str(each_active_user_id): (existing_user_comment_cnt + 1) })
 
-                counter_obj_each_contributor.last_update = datetime.datetime.now()
-                counter_obj_each_contributor.save()
+                    # update comments gained:
+                    key_str_comments_gained = "counter_obj_each_contributor" \
+                                              + key_str_resource_type
+                    comments_gained = eval(key_str_comments_gained + '["comments_gained"]')
+                    eval(key_str_comments_gained).update({"comments_gained": (comments_gained + 1)})
+
+                    counter_obj_each_contributor.last_update = datetime.datetime.now()
+                    counter_obj_each_contributor.save()
             # ------- creator counter update: done ---------
 
             # processing analytics for (one) active user.
@@ -4402,8 +4421,9 @@ class Counter(DjangoDocument):
 
                     counter_obj.last_update = datetime.datetime.now()
                     counter_obj.save()
+
     @staticmethod
-    @task
+    # @task
     def add_visit_count(resource_obj_or_id, current_group_id, loggedin_userid):
 
         active_user_ids_list = [loggedin_userid]
@@ -4474,6 +4494,9 @@ class Counter(DjangoDocument):
         # creating {user_id: score}
         # e.g: {162: 5, 163: 3, 164: 4}
         userid_score_rating_dict = {d['user_id']: d['score'] for d in resource_obj.rating}
+        for user_id_val in active_user_id_list:
+            if user_id_val in userid_score_rating_dict.keys():
+                userid_score_rating_dict.pop(user_id_val)
 
         user_counter_cur = Counter.get_counter_objs_cur(resource_contributors_user_ids_list, current_group_id)
 
@@ -4488,35 +4511,32 @@ class Counter(DjangoDocument):
         # iterating over each user id in contributors
         # uc: user counter
         for each_uc in user_counter_cur:
-
             for each_active_user_id in active_user_id_list:
+                if each_active_user_id not in resource_contributors_user_ids_list:
+                    userid_score_rating_dict_copy = userid_score_rating_dict.copy()
 
-                userid_score_rating_dict_copy = userid_score_rating_dict.copy()
+                    rating_count_received = eval(key_str_counter_resource_type_rating_count_received)
+                    avg_rating_gained = eval(key_str_counter_resource_type_avg_rating_gained)
+                    total_rating = sum(userid_score_rating_dict_copy.values())
+                    # total_rating = rating_count_received * avg_rating_gained
 
-                rating_count_received = eval(key_str_counter_resource_type_rating_count_received)
-                avg_rating_gained = eval(key_str_counter_resource_type_avg_rating_gained)
+                    # first time rating giving user:
+                    if each_active_user_id not in userid_score_rating_dict_copy:
+                        # add new key: value in dict to avoid errors
+                        userid_score_rating_dict_copy.update({each_active_user_id: 0})
+                        eval(key_str_counter_resource_type).update( \
+                                            {'rating_count_received': (rating_count_received + 1)} )
+                    total_rating = total_rating - userid_score_rating_dict_copy[each_active_user_id]
+                    total_rating = total_rating + int(rating_given)
 
-                total_rating = rating_count_received * avg_rating_gained
-
-                # first time rating giving user:
-                if each_active_user_id not in userid_score_rating_dict_copy:
-                    # add new key: value in dict to avoid errors
-                    userid_score_rating_dict_copy.update({each_active_user_id: 0})
+                    # getting value from updated 'rating_count_received'. hence repeated.
+                    rating_count_received = eval(key_str_counter_resource_type_rating_count_received) or 1
+                    # storing float result to get more accurate avg.
+                    avg_rating_gained = float(format(total_rating / float(len(userid_score_rating_dict_copy.keys())), '.2f'))
                     eval(key_str_counter_resource_type).update( \
-                                        {'rating_count_received': (rating_count_received + 1)} )
+                                            {'avg_rating_gained': avg_rating_gained})
 
-                total_rating = total_rating - userid_score_rating_dict_copy[each_active_user_id]
-                total_rating = total_rating + int(rating_given)
-
-                # getting value from updated 'rating_count_received'. hence repeated.
-                rating_count_received = eval(key_str_counter_resource_type_rating_count_received) or 1
-                # storing float result to get more accurate avg.
-                avg_rating_gained = float(format(total_rating / float(rating_count_received), '.2f'))
-
-                eval(key_str_counter_resource_type).update( \
-                                        {'avg_rating_gained': avg_rating_gained})
-
-                each_uc.save()
+                    each_uc.save()
 
 
     def save(self, *args, **kwargs):
@@ -4542,7 +4562,7 @@ class Counter(DjangoDocument):
             fp = history_manager.get_file_path(self)
 
             try:
-                rcs_obj.checkout(fp)
+                rcs_obj.checkout(fp, otherflags="-f")
 
             except Exception as err:
                 try:

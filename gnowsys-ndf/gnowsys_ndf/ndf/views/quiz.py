@@ -82,8 +82,8 @@ def create_edit_quiz_item(request, group_id, node_id=None):
     quiz_item_node = None
 
     gst_quiz_item = node_collection.one({'_type': u'GSystemType', 'name': u'QuizItem'})
-    # if "CourseEventGroup" in group_object.member_of_names_list:
-    #     gst_quiz_item = node_collection.one({'_type': u'GSystemType', 'name': u'QuizItemEvent'})
+    if "CourseEventGroup" in group_object.member_of_names_list:
+        gst_quiz_item = node_collection.one({'_type': u'GSystemType', 'name': u'QuizItemEvent'})
 
     # if node_id:
     #     quiz_item_node = node_collection.one({'_id': ObjectId(node_id)})

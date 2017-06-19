@@ -80,9 +80,10 @@ def create_discussion(request, group_id, node_id):
         thread = node
 
     if not thread:
-        thread_id = get_thread_node(node_id)
-        if thread_id:
-            thread = node_collection.one({'_id': ObjectId(thread_id)})
+        thread = get_thread_node(node_id)
+        # thread_id = get_thread_node(node_id)
+        # if thread_id:
+        #     thread = node_collection.one({'_id': ObjectId(thread_id)})
     # group = node_collection.one({'_id':ObjectId(group_id)})
     # thread = node_collection.one({"member_of": ObjectId(twist_st._id),"relation_set.thread_of.0": ObjectId(node._id)})
     # print "\n thread is ---", thread
@@ -329,9 +330,12 @@ def discussion_reply(request, group_id, node_id):
                 files.append(temp_list)
 
             # print files
-
+            user_names = reply_obj.user_details_dict["contributors"]
+            is_grp_admin = False
+            if request.user.id in group_object.group_admin:
+                is_grp_admin = True
             # ["status_info", "reply_id", "prior_node", "html_content", "org_content", "user_id", "user_name", "created_at" ]
-            reply = json.dumps( [ "reply_saved", str(reply_obj._id), str(reply_obj.prior_node[0]), reply_obj.content, reply_obj.content_org, user_id, user_name, formated_time, files], cls=DjangoJSONEncoder )
+            reply = json.dumps( [ "reply_saved", str(reply_obj._id), str(reply_obj.prior_node[0]), reply_obj.content, reply_obj.content_org, user_id, user_names, formated_time, files,is_grp_admin], cls=DjangoJSONEncoder )
 
             # print "===========", reply
 

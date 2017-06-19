@@ -1,5 +1,5 @@
-{% load ndf_tags %}
 {% load i18n %}
+{% load ndf_tags %}
 {% load cache %}
 
 {% get_group_name group_id as group_name_tag %}
@@ -55,11 +55,17 @@
 
 </head>
 <body>
+    {% if site.BUDDY_LOGIN and user.is_authenticated and request.author.agency_type == 'Student'%}
+        {% include "ndf/buddy.html" %}
+    {% endif %}
+
     {% include "ndf/header_clix.html" %}
     {% block extended_header %}{% endblock %}
 
     {% block body_content %} {% endblock %}
-
+{% if not no_footer %}
+    {% include 'ndf/footer_clix.html' %}
+{% endif %}
   <!-- JS -->
   <!--<script src="/static/ndf/js/app.js"></script>-->
   <script src="/static/ndf/bower_components/foundation/js/foundation.min.js"></script>
@@ -185,7 +191,6 @@
     //   });
 
     {% block script %} {% endblock %}
-
   </script>
 </body>
 </html>
