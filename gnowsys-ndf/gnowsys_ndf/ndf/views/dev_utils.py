@@ -1,11 +1,12 @@
 ''' -- imports from python libraries -- '''
 # import os -- Keep such imports here
 import json
+import subprocess
 
 ''' -- imports from installed packages -- '''
 from django.shortcuts import render_to_response  # , render
 from django.template import RequestContext
-from django.http import Http404
+from django.http import Http404, HttpResponse
 
 try:
     from bson import ObjectId
@@ -45,4 +46,16 @@ def render_test_template(request):
         {"node":test_node},
         context_instance=RequestContext(request)
     )
+
+
+def git_branch(request):
+	return HttpResponse(subprocess.check_output(['git', 'rev-parse', '--abbrev-ref', 'HEAD']),
+		content_type="text/plain")
+	
+def git_misc(request, git_command):
+	response = "Unsupported"
+	if git_command in ['log', 'branch', 'status', 'tag', 'show']:
+		response = subprocess.check_output(['git', git_command])
+	return HttpResponse(response, content_type="text/plain")
+
 	
