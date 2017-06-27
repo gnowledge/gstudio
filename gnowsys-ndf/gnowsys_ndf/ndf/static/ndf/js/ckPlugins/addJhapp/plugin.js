@@ -67,10 +67,28 @@ CKEDITOR.plugins.add('addJhapp',
                             $('#group_imgs_on_modal').foundation('reveal', 'close');
                           });
 
-                            $("#insert_runkittyrun").click(function(event){
+                            $("#insert_runkittyrun_en").click(function(event){
                             //ost_text_gallery = $('#paste-ost-gallery').val();
                             //ost_text_file = $('#paste-ost-captions').val();
-                            tool_val = "<a href='/runkittyrun/' target='_blank'><img src='/static/ndf/images/RKR.jpg' alt='Run Kitty Run' height='1000px' width='1000px' >"
+                            tool_val = "<a href='/runkittyrun/en/' target='_blank'><img src='/static/ndf/images/RKR.jpg' alt='Run Kitty Run' height='1000px' width='1000px' >"
+                            // split_word = ost_text_val.slice(0, 18) + "gallery=" + ost_text_gallery + "&amp;file=/ost/" + ost_text_file+"'"+ ost_text_val.slice(18);
+                            // alert(split_word)
+                             CKEDITOR.instances[textAreaId].insertHtml(tool_val);
+                            $('#group_imgs_on_modal').foundation('reveal', 'close');
+                          });
+                            $("#insert_runkittyrun_hi").click(function(event){
+                            //ost_text_gallery = $('#paste-ost-gallery').val();
+                            //ost_text_file = $('#paste-ost-captions').val();
+                            tool_val = "<a href='/runkittyrun/hi/' target='_blank'><img src='/static/ndf/images/RKR.jpg' alt='Run Kitty Run' height='1000px' width='1000px' >"
+                            // split_word = ost_text_val.slice(0, 18) + "gallery=" + ost_text_gallery + "&amp;file=/ost/" + ost_text_file+"'"+ ost_text_val.slice(18);
+                            // alert(split_word)
+                             CKEDITOR.instances[textAreaId].insertHtml(tool_val);
+                            $('#group_imgs_on_modal').foundation('reveal', 'close');
+                          });
+                            $("#insert_runkittyrun_te").click(function(event){
+                            //ost_text_gallery = $('#paste-ost-gallery').val();
+                            //ost_text_file = $('#paste-ost-captions').val();
+                            tool_val = "<a href='/runkittyrun/te/' target='_blank'><img src='/static/ndf/images/RKR.jpg' alt='Run Kitty Run' height='1000px' width='1000px' >"
                             // split_word = ost_text_val.slice(0, 18) + "gallery=" + ost_text_gallery + "&amp;file=/ost/" + ost_text_file+"'"+ ost_text_val.slice(18);
                             // alert(split_word)
                              CKEDITOR.instances[textAreaId].insertHtml(tool_val);
@@ -262,67 +280,67 @@ CKEDITOR.plugins.add('addJhapp',
                             $('#group_imgs_on_modal').foundation('reveal', 'close');
                           });
                              $("#insert_fst_l1_a1_te").click(function(event){
-                                tool_val = "<a href='/FoodSharingTool/te/L1A1/' target='_blank'><img src='/static/ndf/images/fst_te.png' alt='Food Sharing Tool' height='1000px' width='1000px' >"
+                                tool_val = "<a href='/FoodSharingTool/te/L1A1/' target='_blank'><img src='/static/ndf/images/fst_en.png' alt='Food Sharing Tool' height='1000px' width='1000px' >"
                             
                              CKEDITOR.instances[textAreaId].insertHtml(tool_val);
                             $('#group_imgs_on_modal').foundation('reveal', 'close');
                           });
                             $("#insert_fst_l1_a2_te").click(function(event){
-                                tool_val = "<a href='/FoodSharingTool/te/L1A2/' target='_blank'><img src='/static/ndf/images/fst_te.png' alt='Food Sharing Tool' height='1000px' width='1000px' >"
+                                tool_val = "<a href='/FoodSharingTool/te/L1A2/' target='_blank'><img src='/static/ndf/images/fst_en.png' alt='Food Sharing Tool' height='1000px' width='1000px' >"
                             
                              CKEDITOR.instances[textAreaId].insertHtml(tool_val);
                             $('#group_imgs_on_modal').foundation('reveal', 'close');
                           });
                             $("#insert_fst_l1_a3_te").click(function(event){
-                                tool_val = "<a href='/FoodSharingTool/te/L1A3/' target='_blank'><img src='/static/ndf/images/fst_te.png' alt='Food Sharing Tool' height='1000px' width='1000px' >"
+                                tool_val = "<a href='/FoodSharingTool/te/L1A3/' target='_blank'><img src='/static/ndf/images/fst_en.png' alt='Food Sharing Tool' height='1000px' width='1000px' >"
                             
                              CKEDITOR.instances[textAreaId].insertHtml(tool_val);
                             $('#group_imgs_on_modal').foundation('reveal', 'close');
                           });
                             $("#insert_fst_l1_a4_te").click(function(event){
-                                tool_val = "<a href='/FoodSharingTool/te/L1A4/' target='_blank'><img src='/static/ndf/images/fst_te.png' alt='Food Sharing Tool' height='1000px' width='1000px' >"
+                                tool_val = "<a href='/FoodSharingTool/te/L1A4/' target='_blank'><img src='/static/ndf/images/fst_en.png' alt='Food Sharing Tool' height='1000px' width='1000px' >"
                             
                              CKEDITOR.instances[textAreaId].insertHtml(tool_val);
                             $('#group_imgs_on_modal').foundation('reveal', 'close');
                           });
                             $("#insert_fst_l2_a1_te").click(function(event){
-                                tool_val = "<a href='/FoodSharingTool/te/L2A1/' target='_blank'><img src='/static/ndf/images/fst_te.png' alt='Food Sharing Tool' height='1000px' width='1000px' >"
+                                tool_val = "<a href='/FoodSharingTool/te/L2A1/' target='_blank'><img src='/static/ndf/images/fst_en.png' alt='Food Sharing Tool' height='1000px' width='1000px' >"
                             
                              CKEDITOR.instances[textAreaId].insertHtml(tool_val);
                             $('#group_imgs_on_modal').foundation('reveal', 'close');
                           });
                             $("#insert_fst_l2_a2_te").click(function(event){
-                                tool_val = "<a href='/FoodSharingTool/te/L2A2/' target='_blank'><img src='/static/ndf/images/fst_te.png' alt='Food Sharing Tool' height='1000px' width='1000px' >"
+                                tool_val = "<a href='/FoodSharingTool/te/L2A2/' target='_blank'><img src='/static/ndf/images/fst_en.png' alt='Food Sharing Tool' height='1000px' width='1000px' >"
                             
                              CKEDITOR.instances[textAreaId].insertHtml(tool_val);
                             $('#group_imgs_on_modal').foundation('reveal', 'close');
                           });
                             $("#insert_fst_l2_a3_te").click(function(event){
-                                tool_val = "<a href='/FoodSharingTool/te/L2A3/' target='_blank'><img src='/static/ndf/images/fst_te.png' alt='Food Sharing Tool' height='1000px' width='1000px' >"
+                                tool_val = "<a href='/FoodSharingTool/te/L2A3/' target='_blank'><img src='/static/ndf/images/fst_en.png' alt='Food Sharing Tool' height='1000px' width='1000px' >"
                             
                              CKEDITOR.instances[textAreaId].insertHtml(tool_val);
                             $('#group_imgs_on_modal').foundation('reveal', 'close');
                           });
                             $("#insert_fst_l2_a4_te").click(function(event){
-                                tool_val = "<a href='/FoodSharingTool/te/L2A4/' target='_blank'><img src='/static/ndf/images/fst_te.png' alt='Food Sharing Tool' height='1000px' width='1000px' >"
+                                tool_val = "<a href='/FoodSharingTool/te/L2A4/' target='_blank'><img src='/static/ndf/images/fst_en.png' alt='Food Sharing Tool' height='1000px' width='1000px' >"
                             
                              CKEDITOR.instances[textAreaId].insertHtml(tool_val);
                             $('#group_imgs_on_modal').foundation('reveal', 'close');
                           });
                             $("#insert_fst_l3_a1_te").click(function(event){
-                                tool_val = "<a href='/FoodSharingTool/te/L3A1/' target='_blank'><img src='/static/ndf/images/fst_te.png' alt='Food Sharing Tool' height='1000px' width='1000px' >"
+                                tool_val = "<a href='/FoodSharingTool/te/L3A1/' target='_blank'><img src='/static/ndf/images/fst_en.png' alt='Food Sharing Tool' height='1000px' width='1000px' >"
                             
                              CKEDITOR.instances[textAreaId].insertHtml(tool_val);
                             $('#group_imgs_on_modal').foundation('reveal', 'close');
                           });
                             $("#insert_fst_l3_a2_te").click(function(event){
-                                tool_val = "<a href='/FoodSharingTool/te/L3A2/' target='_blank'><img src='/static/ndf/images/fst_te.png' alt='Food Sharing Tool' height='1000px' width='1000px' >"
+                                tool_val = "<a href='/FoodSharingTool/te/L3A2/' target='_blank'><img src='/static/ndf/images/fst_en.png' alt='Food Sharing Tool' height='1000px' width='1000px' >"
                             
                              CKEDITOR.instances[textAreaId].insertHtml(tool_val);
                             $('#group_imgs_on_modal').foundation('reveal', 'close');
                           });
                             $("#insert_fst_l3_a3_te").click(function(event){
-                                tool_val = "<a href='/FoodSharingTool/te/L3A3/' target='_blank'><img src='/static/ndf/images/fst_te.png' alt='Food Sharing Tool' height='1000px' width='1000px' >"
+                                tool_val = "<a href='/FoodSharingTool/te/L3A3/' target='_blank'><img src='/static/ndf/images/fst_en.png' alt='Food Sharing Tool' height='1000px' width='1000px' >"
                             
                              CKEDITOR.instances[textAreaId].insertHtml(tool_val);
                             $('#group_imgs_on_modal').foundation('reveal', 'close');
