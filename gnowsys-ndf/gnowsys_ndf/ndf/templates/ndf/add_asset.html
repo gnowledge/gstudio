@@ -580,4 +580,21 @@ $( ".edit-metadata" ).click(function(event) {
                     'slow');
         });
     {% endif %}
+   $( ".createAsset" ).click(function() {
+                   var asset_id = $(this).attr('data-asset_id');
+                   
+                   $.ajax({
+                             type: "GET",
+                             url: "{% url 'add_asset' group_id %}",
+                             data: {
+                               node_id: asset_id,
+                               'title' : "{{title}}"
+                             },
+                             datatype: "html",
+                             success: function(data) {
+                               $('#addAsset').foundation('reveal', 'open');
+                               $('#addAsset').html(data);
+                           }
+                     });
+           });
 </script>
