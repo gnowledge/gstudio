@@ -3949,7 +3949,7 @@ def get_relation_node(node_id,rel_name):
 		data_dict.update({'file_name': file_node.name})
 		data_dict.update({'file_id': ObjectId(file_node.pk)})
 	 	data_list.append(data_dict)
-	print data_list
+	# print data_list
 	return data_list
 
 @register.assignment_tag
