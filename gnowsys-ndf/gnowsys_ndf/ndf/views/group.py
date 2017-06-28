@@ -170,16 +170,17 @@ class CreateGroup(object):
             agency_type = self.request.POST.get('agency_type', u'Other')
 
         if kwargs.get('content_org', ''):
-            content_org = kwargs.get('content_org', '')
+            content_org = kwargs.get('content_org', u'')
         elif self.request:
-            content_org = self.request.POST.get('content_org', '')
+            content_org = self.request.POST.get('content_org', u'')
 
         if kwargs.get('content', ''):
-            content = kwargs.get('content', '')
+            content = kwargs.get('content', u'')
         elif self.request:
-            content = self.request.POST.get('content', '')
-        if not content or not content_org:
-            content = content_org = u""
+            content = self.request.POST.get('content', u'')
+
+        # if not content or not content_org:
+        #     content = content_org = u""
 
         if kwargs.get('language', ''):
             language = kwargs.get('language', '')
@@ -244,6 +245,13 @@ class CreateGroup(object):
         if language:
             language_val = get_language_tuple(unicode(language))
             group_obj.language = language_val
+
+
+        '''
+        Use of content_org field is deprecated.
+        Instead using value from content_org variable adding to content field
+         -katkamrachana 28June2017
+
         #  org-content
         if group_obj.content_org != content_org:
             group_obj.content_org = content_org
@@ -253,11 +261,12 @@ class CreateGroup(object):
             # usrname = self.request.user.username
             # filename = slugify(name) + "-" + slugify(usrname) + "-" + ObjectId().__str__()
             # group_obj.content = org2html(content_org, file_prefix=filename)
-
-
         if group_obj.content != content:
             group_obj.content = content
             is_changed = True
+        '''
+        if group_obj.content != content_org:
+            group_obj.content = content_org
 
         # decision for adding moderation_level
         if group_obj.edit_policy == "EDITABLE_MODERATED":
