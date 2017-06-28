@@ -38,8 +38,8 @@
             </div>
 
             <div class="small-7 columns">
-            {% if not edit and asset_obj.name %}
-                <h4 class="page-name">{{asset_obj.name}}</h4>
+            {% if not edit and asset_obj %}
+                <h4 class="page-name">{% firstof asset_obj.altnames|truncatechars:25  asset_obj.name|truncatechars:25 %} </h4>
 
             </div>
             
@@ -146,7 +146,7 @@
                        <input type="text" placeholder="" class="required" id = "asset-name" name="asset_unique_name" value="{% if asset_obj %} {{asset_obj.name}}{% endif %}"/>
 
                         {% trans "Display Name:" %}  <h9 style="color: red;">*</h9>
-                       <input type="text" placeholder="" class="required" id = "asset-disp-name" name="asset_display_name" value="{% if asset_obj %} {{asset_obj.name}}{% endif %}"/>                       
+                       <input type="text" placeholder="" class="required" id = "asset-disp-name" name="asset_display_name" value="{% if asset_obj %} {{asset_obj.altnames}}{% endif %}"/>                       
 
 
                     {% endif %}
