@@ -144,7 +144,7 @@ def unit_create_edit(request, group_id, unit_group_id=None):
         else:
             tags = []
         # unit_node.tags = tags
-        unit_node.fill_gstystem_values(tags=tags)
+        unit_node.fill_gstystem_values(tags=tags,author_set=unit_node.author_set)
         unit_node.content = content
         tab_name = request.POST.get('tab_name', '')
         section_name = request.POST.get('section_name', '')
