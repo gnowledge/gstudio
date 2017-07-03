@@ -40,6 +40,8 @@ class Command(BaseCommand):
         if not file_input or not os.path.exists(file_input):
             file_input = raw_input("\nEnter below file path to be used:\n")
 
+        techer_element_set = {'carbon', 'chlorine', 'copper', 'helium', 'iron', 'nitrogen', 'oxygen', 'silver', 'sodium', 'zinc'}
+
         if os.path.exists(file_input):
 
             msg = '\nFound file: "' + str(file_input) + '"\n\n'
@@ -82,7 +84,11 @@ class Command(BaseCommand):
                         auth['modified_by'] = user_id
                         auth['contributors'] = [user_id]
                         auth['group_admin'] = [user_id]
-                        auth['agency_type'] = "Student"
+                        auth['agency_type'] = 'Student'
+                        try:
+                            auth['agency_type'] = 'Teacher' if (username.split('-')[1] in techer_element_set) else 'Student'
+                        except Exception, e:
+                            auth['agency_type'] = 'Student'
                         oid = ObjectId(oid)
                         auth['_id'] = oid
                         auth.save(groupid=oid)

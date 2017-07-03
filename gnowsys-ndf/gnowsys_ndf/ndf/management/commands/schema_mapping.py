@@ -49,4 +49,5 @@ def update_factory_schema_mapper(path):
             schema_file_out.close()
         return SCHEMA_ID_MAP
     else:
+        return SCHEMA_ID_MAP
         print "\n No factory_schema.json file found."

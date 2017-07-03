@@ -23,10 +23,10 @@ except ImportError:  # old pymongo
 
 ''' -- imports from application folders/files -- '''
 from gnowsys_ndf.settings import GAPPS, MEDIA_ROOT, GSTUDIO_TASK_TYPES,GSTUDIO_DEFAULT_GROUPS_LIST
-from gnowsys_ndf.settings import GSTUDIO_SITE_NAME, GSTUDIO_NO_OF_OBJS_PP
+from gnowsys_ndf.settings import GSTUDIO_SITE_NAME, GSTUDIO_NO_OF_OBJS_PP, GSTUDIO_PRIMARY_COURSE_LANGUAGE
 from gnowsys_ndf.ndf.models import Node, Group, GSystemType,  AttributeType, RelationType
 from gnowsys_ndf.ndf.models import node_collection, triple_collection
-from gnowsys_ndf.ndf.views.methods import get_execution_time
+from gnowsys_ndf.ndf.views.methods import get_execution_time, get_language_tuple
 from gnowsys_ndf.ndf.templatetags.ndf_tags import check_is_gstaff
 # from gnowsys_ndf.ndf.views.methods import get_group_name_id
 # from gnowsys_ndf.ndf.views.methods import get_node_common_fields, parse_template_data, get_execution_time, delete_node, replicate_resource
@@ -215,6 +215,7 @@ def explore_basecourses(request,page_no=1):
 
 @get_execution_time
 def explore_courses(request,page_no=1):
+
     # this will be announced tab
     title = 'courses'
     modules_cur = node_collection.find({'member_of': gst_module_id }).sort('last_update', -1)
@@ -224,14 +225,70 @@ def explore_courses(request,page_no=1):
 
     modules_page_cur = paginator.Paginator(modules_cur, page_no, GSTUDIO_NO_OF_OBJS_PP)
 
-    base_unit_cur = node_collection.find({'member_of': {'$in': [ce_gst._id, announced_unit_gst._id]},
-                                          '_id': {'$nin': module_unit_ids},
-                                        '$or': [
-                                          {'created_by': request.user.id},
-                                          {'group_admin': request.user.id},
-                                          {'author_set': request.user.id},
-                                          {'group_type': 'PUBLIC'}
-                                          ]}).sort('last_update', -1)
+    primary_lang_tuple = get_language_tuple(GSTUDIO_PRIMARY_COURSE_LANGUAGE)
+
+    '''
+    katkamrachana - 14June2017
+    About following query:
+
+        [A]. Finding CourseEventGroup instances(First $and in $or):
+                    Find CourseEventGroup instances, that are published.
+                    Get courses that are linked to the request.user
+                    Also find courses, that are "PUBLIC AND LANGUAGE falls under
+                    GSTUDIO_PRIMARY_COURSE_LANGUAGE"
+                    Hence, Apply language constraint. Introduced to display concerned
+                    course for i2c(in 3 languages)
+        [B]. Finding announced_unit instances(Second $and in $or):
+                    Find announced_unit instances, that are published.
+                    Get courses that are linked to the request.user
+                    Also find courses, that are "PUBLIC"
+                    No check on language
+        [C]. Check using _type field in case conditions A and B fail, only Groups are
+                 to be listed and not GSystems
+        [D]. Check using name field in case conditions A and B fail,
+                executing condition C then do not display factory Groups.
+
+    '''
+    base_unit_cur = node_collection.find({
+                                            '$or': [
+                                                {
+                                                    '$and': [
+                                                                {'member_of': ce_gst._id},
+                                                                {'status':'PUBLISHED'},
+                                                                {'$or':
+                                                                    [
+                                                                        {'created_by': request.user.id},
+                                                                        {'group_admin': request.user.id},
+                                                                        {'author_set': request.user.id},
+                                                                        {
+                                                                            '$and': [
+                                                                                {'group_type': 'PUBLIC'},
+                                                                                {'language': primary_lang_tuple},
+                                                                            ]
+                                                                        }
+                                                                    ]
+                                                                }
+                                                            ]
+                                                },
+                                                {
+                                                    '$and': [
+                                                                {'member_of': announced_unit_gst._id},
+                                                                {'status':'PUBLISHED'},
+                                                                {'$or':
+                                                                    [
+                                                                        {'created_by': request.user.id},
+                                                                        {'group_admin': request.user.id},
+                                                                        {'author_set': request.user.id},
+                                                                        {'group_type': 'PUBLIC'}
+                                                                    ]
+                                                                }
+                                                            ]
+                                                }
+                                            ],
+                                            '_type': 'Group',
+                                            'name': {'$nin': GSTUDIO_DEFAULT_GROUPS_LIST},
+                                            '_id': {'$nin': module_unit_ids},
+                                              }).sort('last_update', -1)
     base_unit_page_cur = paginator.Paginator(base_unit_cur, page_no, GSTUDIO_NO_OF_OBJS_PP)
 
     context_variable = {
@@ -260,6 +317,7 @@ def explore_drafts(request,page_no=1):
 
     base_unit_cur = node_collection.find({'member_of': gst_base_unit_id,
                                           '_id': {'$nin': module_unit_ids},
+                                          'status':'PUBLISHED',
                                         '$or': [
                                           {'created_by': request.user.id},
                                           {'group_admin': request.user.id},

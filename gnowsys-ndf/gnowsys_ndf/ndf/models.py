@@ -1017,7 +1017,7 @@ class Node(DjangoDocument):
             fp = history_manager.get_file_path(self)
 
             try:
-                rcs_obj.checkout(fp)
+                rcs_obj.checkout(fp, otherflags="-f")
             except Exception as err:
                 try:
                     if history_manager.create_or_replace_json_file(self):
@@ -2353,7 +2353,7 @@ class Filehive(DjangoDocument):
             fp = history_manager.get_file_path(self)
 
             try:
-                rcs_obj.checkout(fp)
+                rcs_obj.checkout(fp, otherflags="-f")
 
             except Exception as err:
                 try:
@@ -2424,7 +2424,8 @@ class Group(GSystem):
         'encryption_policy': basestring,     # Encryption - yes or no
         'agency_type': basestring,           # A choice field such as Pratner,Govt.Agency, NGO etc.
         'group_admin': [int],		     # ObjectId of Author class
-        'moderation_level': int              # range from 0 till any integer level
+        'moderation_level': int,              # range from 0 till any integer level
+        'project_config': dict
     }
 
     use_dot_notation = True
@@ -2702,6 +2703,7 @@ class Group(GSystem):
 
             for each in grp_res:
                 del_status, del_status_msg = delete_node(node_id=each._id, deletion_type=1 )
+                # print del_status, del_status_msg
                 if not del_status:
                     print "*"*80
                     print "\n Error node: _id: ", each._id, " , name: ", each.name, " type: ", each.member_of_names_list
@@ -2709,6 +2711,7 @@ class Group(GSystem):
 
             print "\n Purging group: "
             del_status, del_status_msg = delete_node(node_id=group_id, deletion_type=1)
+            print del_status, del_status_msg
 
             # poping group_id from each of shared nodes under group
             all_nodes_under_gr.rewind()
@@ -3089,7 +3092,7 @@ class HistoryManager():
 
         fp = self.get_file_path(document_object)
         rcs = RCS()
-        rcs.checkout((fp, version_no))
+        rcs.checkout((fp, version_no), otherflags="-f")
 
         json_data = ""
         with open(fp, 'r') as version_file:
@@ -3138,7 +3141,7 @@ class HistoryManager():
                         doc_obj[k] = oid_ObjectId_list
 
                 except Exception as e:
-                    print "\n Exception for document's ("+doc_obj.name+") key ("+k+") -- ", str(e), "\n"
+                    print "\n Exception for document's ("+str(doc_obj._id)+") key ("+k+") -- ", str(e), "\n"
 
         return doc_obj
 
@@ -3583,7 +3586,7 @@ class Triple(DjangoDocument):
       fp = history_manager.get_file_path(self)
 
       try:
-          rcs_obj.checkout(fp)
+          rcs_obj.checkout(fp, otherflags="-f")
       except Exception as err:
           try:
               if history_manager.create_or_replace_json_file(self):
@@ -4044,7 +4047,7 @@ class Buddy(DjangoDocument):
             fp = history_manager.get_file_path(self)
 
             try:
-                rcs_obj.checkout(fp)
+                rcs_obj.checkout(fp, otherflags="-f")
 
             except Exception as err:
                 try:
@@ -4559,7 +4562,7 @@ class Counter(DjangoDocument):
             fp = history_manager.get_file_path(self)
 
             try:
-                rcs_obj.checkout(fp)
+                rcs_obj.checkout(fp, otherflags="-f")
 
             except Exception as err:
                 try:

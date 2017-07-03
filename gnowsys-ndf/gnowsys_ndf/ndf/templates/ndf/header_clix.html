@@ -36,8 +36,27 @@
  -->             
 
                 {% if help_oid %}
-                <li class=""><a {% if title == 'Help Page'  %} class="active" {% endif %} target="_blank" href="{% url 'help_page_view' help_oid %}"> <i class="fa fa-info-circle"></i> Help </a></li>
+                <li class=""><a {% if title == 'Help Page'  %} class="active" {% endif %} target="_blank" href="{% url 'course_content' help_oid %}"> <i class="fa fa-info-circle"></i> Help </a></li>
                 {% endif %}
+                <ul class="">
+          <li class="has-dropdown">
+            <a>{% trans "Language" %} &nbsp; | &nbsp; {{request.LANGUAGE_CODE}}</a>
+            <ul class="dropdown">
+
+              {% for lang in LANGUAGES %}
+                <li>
+                  <form action="/i18n/setlang/" method="POST">
+                    {% csrf_token %}
+                    <input name="url" type="hidden" value="{{request.get_full_path}}"/>
+                    <input type="hidden"  name="language" value="{{ lang.0 }}">
+                    <input type="submit" class="button expand secondary" value="{{ lang.1 }}"/>
+                  </form>
+                </li>
+              {% endfor %}
+
+            </ul>
+          </li>
+        </ul>
             {% if user.is_authenticated %}
                 <li class="has-dropdown buddy_margin">
                     {% get_profile_pic request.user.pk as prof_pic %}

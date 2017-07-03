@@ -3,24 +3,34 @@
 <head>
 	<title></title>
 	<style type="text/css">
-		body { white-space: pre; font-family: monospace; }
+		body { white-space: pre; font-family: monospace; background-color: #fafafa; color: #1a1a1a}
 	</style>
 </head>
 <body>
-	{% for each_doc in result %}
-		<div class="json-obj">{{each_doc}}</div>
-		<br/>
-	{% endfor %}
-
-
 	<script type="text/javascript">
-
-		allJSONObjs = document.getElementsByClassName('json-obj');
-		obj = JSON.parse(allJSONObjs[0].textContent);
-
 		document.body.innerHTML = "";
-		document.body.appendChild(document.createTextNode(JSON.stringify(obj, null, 4)));
+		var allJSONObjs = {{result|safe}};
+		for (var i = allJSONObjs.length - 1; i >= 0; i--) {
+			var obj = JSON.parse(allJSONObjs[i]);
 
+			var ObjectIdList = ['group_set', 'member_of', 'type_of', 'prior_node', 'post_node', 'collection_set'];
+			for (e in obj){
+				if (ObjectIdList.indexOf(e) != -1) {
+
+					var urlList = [];
+					obj[e].forEach(function(n){
+						urlList.push("<a href='/admin/query-doc/"+n+"' target='_blank'>"+n+"</a>")
+					});
+					obj[e] = urlList;
+				};
+			}
+			var e = document.createElement('div');
+			e.innerHTML = JSON.stringify(obj, null, 4);
+
+			document.body.append(e);
+			document.body.appendChild(document.createElement('hr'))
+		};
 	</script>
+
 </body>
 </html>

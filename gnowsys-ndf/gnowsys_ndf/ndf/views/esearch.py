@@ -3,8 +3,13 @@ from django.http import HttpResponseRedirect
 from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 from elasticsearch import Elasticsearch     
 import re
+from bson import json_util
 import json
 from gnowsys_ndf.ndf.forms import SearchForm
+from gnowsys_ndf.ndf.models import *
+name_index = "clix"
+
+
 
 es = Elasticsearch(['http://elsearch:changeit@gsearch:9200'])
 author_map = {}
@@ -87,7 +92,7 @@ def get_search(request):
                     query_body += ('{"multi_match": {"query": "%s", "fields": ["name^3", "altnames", "content^2", "tags"], "type": "best_fields"}},' % (q))
                 query_body += (']}}, "from": 0, "size": 100}')
                 query_body = eval(query_body)
-                #res = es.search(index='nroer_pro', doc_type=select, body=eval(query_body)) 
+                #res = es.search(index=name_index, doc_type=select, body=eval(query_body)) 
                 query_display = query
 
             else:
@@ -160,7 +165,7 @@ def get_search(request):
                                     "size": 100
                                 }
 
-            resultSet = optimized_get_contributions("nroer_pro", select, group, query_body)
+            resultSet = optimized_get_contributions(name_index, select, group, query_body)
             hits = "<h3>No of docs found: <b>%d</b></h3>" % len(resultSet)
             if(group=="all"):
                 res_list = ['<h3>Showing results for <b>%s</b> :</h3' % query_display, hits]
@@ -224,7 +229,7 @@ def get_suggestion_body(query,field_value,slop_value,field_name_value):
     return phrase_suggest
 
 def get_suggestion(suggestion_body, queryInfo, doc_types, query,field):
-    res = es.suggest(body=suggestion_body, index='nroer_pro')                       #first we search for suggestion in the name field as it has the highest priority
+    res = es.suggest(body=suggestion_body, index=name_index)                       #first we search for suggestion in the name field as it has the highest priority
     print(res)                                                                                  
     if(len(res['suggest'][0]['options'])>0):                                    #if we get a suggestion means the phrase doesnt exist in the index
         for sugitem in res['suggest'][0]['options']:
@@ -236,25 +241,38 @@ def get_suggestion(suggestion_body, queryInfo, doc_types, query,field):
                 break
     else:                       #should slop be included in the search part here?
         query_body = {"query":{"match_phrase":{field: query,}}}
-        if(es.search(index='nroer_pro',doc_type=doc_types,body=query_body)['hits']['total']>0):
+        if(es.search(index=name_index,doc_type=doc_types,body=query_body)['hits']['total']>0):
             queryInfo[0] = 1                            #set queryNameInfo[0] = 1 when we found a suggestion or we found a hit in the indexed data
             queryInfo[2] = query
 
 
+# def get_search_results(resultArray):
+#     med_list = []
+#     for doc in resultArray:                 
+#         if('if_file' in doc['_source'].keys()):
+#             s = doc['_source']['name']
+#             if '.' in s:
+#                 l = s.index('.')
+#             else:
+#                 l = len(s)
+#             med_list.append([doc['_id'],s[0:l],doc['_source']['if_file']['original']['relurl'],doc['_score'],doc['_source']['content']])    #printing only the id for the time being along with the node name
+#         else:
+#             med_list.append([doc['_id'],doc['_source']['name'],None,doc['_score'],doc['_source']['content']])
+#     return med_list
+
 def get_search_results(resultArray):
     med_list = []
     for doc in resultArray:                 
-        if('if_file' in doc['_source'].keys()):
-            s = doc['_source']['name']
-            if '.' in s:
-                l = s.index('.')
-            else:
-                l = len(s)
-            med_list.append([doc['_id'],s[0:l],doc['_source']['if_file']['original']['relurl'],doc['_score'],doc['_source']['content']])    #printing only the id for the time being along with the node name
-        else:
-            med_list.append([doc['_id'],doc['_source']['name'],None,doc['_score'],doc['_source']['content']])
+            document = doc['_source']
+            # k = document.pop('id')
+            # print(k)
+            # document['_type'] = document.pop('type')
+            # document['_id'] = k
+            docu = json.dumps(document)
+            mongoObj = json.loads(docu,object_hook=json_util.object_hook)
+            # print(mongoObj)
+            med_list.append(document)    #printing only the id for the time being along with the node name
     return med_list
-
 def resources_in_group(res,group):
     results = []
     group_id = str(group)
@@ -283,7 +301,7 @@ def optimized_get_contributions(index_name, select, group, query):
                         "size": siz
                     } 
 
-    elif(index_name == "nroer_pro"):
+    elif(index_name == name_index):
         doctype = select
         body = query
     
@@ -336,7 +354,7 @@ def get_contributions(select,group,author_name):
                 "from":i,
                 "size":100
             }
-            res = es.search(index = "nroer_pro",body = body)
+            res = es.search(index = name_index,body = body)
             l = len(res["hits"]["hits"])
             if l > 0:
                 for doc in (res['hits']['hits']):

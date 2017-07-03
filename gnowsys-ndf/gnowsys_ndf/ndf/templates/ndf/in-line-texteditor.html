@@ -32,7 +32,7 @@
 
 <div >
 {% user_access_policy groupid request.user as user_access_priv %}
-  
+{% get_group_object groupid as group_object %}
     {% if allow_to_comment %}
       <div data-alert class="alert-box new_comments hide info radius">
         <div class="new_cmnts_lbl">New comment(s) added. Please refresh to see.</div>
@@ -75,7 +75,8 @@
           <div clas="discussion-title row " >
              <div class="discussion-title-username">
               <a  href="{% url 'dashboard' each_reply.userid %}" style="color:#ADABAB !important" title=" {{ each_reply.username }}">
-                {{ each_reply.username }} 
+                {# {{ each_reply.username }} #}
+                {{ each_reply.contributors|join:', ' }} 
               </a>
                 <small style="float:right;color:#999999">{{ each_reply.last_update }}</small>
             </div>
@@ -109,7 +110,7 @@
               <i class="fa fa-reply"></i>
               {% trans "Reply" %} 
             </a>
-            {% if request.user.id == each_reply.userid or is_gstaff %}
+            {% if request.user.id == each_reply.userid or is_gstaff  or request.user.id in group_object.group_admin %}
               <a class="reply-btn delete_res" data-id='{{ each_reply.oid }}' data-userid="{{each_reply.userid}}" onclick="deleteReply($(this))" style="float:right">
                 <i class="fa fa-trash-o"></i>
                 {% trans "Delete" %}
@@ -293,7 +294,7 @@
                 + "<a class='reply-btn reply_res'  data-id='" + data[1] + "' onclick='openCKEditor($(this))' data-org-content='"+data[3]+"'>"
                + "<i class='fa fa-reply'></i> Reply"
                + "</a>"
-              if (request_user_id == reply_user_id){
+              if (request_user_id == reply_user_id || is_grp_admin ){
                   htmlReply +="<a class='reply-btn delete_res' data-id='" + data[1]+ "'data-userid='"+ data[5] +"' onclick='deleteReply($(this))' style='float:right'><i class='fa fa-trash-o'></i> Delete"
                   htmlReply +="<a class='reply-btn edit_res' data-id='"+ data[1] +"' data-userid='{{each_reply.userid}}' data-userid='"+ data[5] +"' onclick='editreply($(this))' style='float:right;margin-right:10px!important'><i class='fa fa-pencil-square-o'></i> Edit |"
                   }

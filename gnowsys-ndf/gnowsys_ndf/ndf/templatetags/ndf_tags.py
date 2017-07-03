@@ -37,7 +37,7 @@ from django.core.cache import cache
 from mongokit import IS
 
 ''' -- imports from application folders/files -- '''
-from gnowsys_ndf.settings import GAPPS as setting_gapps, GSTUDIO_DEFAULT_GAPPS_LIST, META_TYPE, CREATE_GROUP_VISIBILITY, GSTUDIO_SITE_DEFAULT_LANGUAGE,GSTUDIO_DEFAULT_EXPLORE_URL
+from gnowsys_ndf.settings import GAPPS as setting_gapps, GSTUDIO_DEFAULT_GAPPS_LIST, META_TYPE, CREATE_GROUP_VISIBILITY, GSTUDIO_SITE_DEFAULT_LANGUAGE,GSTUDIO_DEFAULT_EXPLORE_URL,GSTUDIO_EDIT_LMS_COURSE_STRUCTURE
 # from gnowsys_ndf.settings import GSTUDIO_SITE_LOGO,GSTUDIO_COPYRIGHT,GSTUDIO_GIT_REPO,GSTUDIO_SITE_PRIVACY_POLICY, GSTUDIO_SITE_TERMS_OF_SERVICE,GSTUDIO_ORG_NAME,GSTUDIO_SITE_ABOUT,GSTUDIO_SITE_POWEREDBY,GSTUDIO_SITE_PARTNERS,GSTUDIO_SITE_GROUPS,GSTUDIO_SITE_CONTACT,GSTUDIO_ORG_LOGO,GSTUDIO_SITE_CONTRIBUTE,GSTUDIO_SITE_VIDEO,GSTUDIO_SITE_LANDING_PAGE
 from gnowsys_ndf.settings import *
 try:
@@ -586,20 +586,17 @@ def get_attribute_value(node_id, attr_name, get_data_type=False):
     attr_val = ""
     node_attr = data_type = None
     if node_id:
-    	# node = node_collection.one({'_id': ObjectId(node_id) })
-    	gattr = node_collection.one({'_type': 'AttributeType', 'name': unicode(attr_name) })
-
-    	if get_data_type:
-    		data_type = gattr.data_type
-    	if gattr: # and node  :
-    		node_attr = triple_collection.find_one({'_type': "GAttribute", "subject": ObjectId(node_id), 'attribute_type': gattr._id, 'status': u"PUBLISHED"})
-
+        # print "\n attr_name: ", attr_name
+        gattr = node_collection.one({'_type': 'AttributeType', 'name': unicode(attr_name) })
+        if get_data_type:
+            data_type = gattr.data_type
+        if gattr: # and node  :
+            node_attr = triple_collection.find_one({'_type': "GAttribute", "subject": ObjectId(node_id), 'attribute_type': gattr._id, 'status': u"PUBLISHED"})
     if node_attr:
-    	attr_val = node_attr.object_value
-    # print "\n here: ", attr_name, " : ", attr_val, " : ", node_id
+        attr_val = node_attr.object_value
+        # print "\n here: ", attr_name, " : ", attr_val, " : ", node_id
     if get_data_type:
         return {'value': attr_val, 'data_type': data_type}
-
     cache.set(cache_key, attr_val, 60 * 60)
     return attr_val
 
@@ -1196,7 +1193,7 @@ def get_disc_replies( oid, group_id, global_disc_all_replies, level=1 ):
 			temp_disc_reply["prior_node"] = str(each.prior_node[0])
 			temp_disc_reply["collection_set"] = [node_collection.one({'_id': ObjectId(i)}) for i in each.collection_set]
 			temp_disc_reply["level"] = level
-
+			temp_disc_reply["contributors"] = each.user_details_dict["contributors"]
 			# to avoid redundancy of dicts, it checks if any 'oid' is not equals to each._id. Then only append to list
 			if not any( d['oid'] == str(each._id) for d in global_disc_all_replies ):
 				if type(global_disc_all_replies) == str:
@@ -3373,9 +3370,12 @@ def get_thread_node(node_id):
 		node_obj = node_collection.one({'_id': ObjectId(node_id)})
 		thread_obj = None
 		has_thread_rt = node_collection.one({'_type': 'RelationType', 'name': 'has_thread'})
-		thread_rt = triple_collection.find_one({'subject': ObjectId(node_id),'relation_type': has_thread_rt._id})
+		thread_rt = triple_collection.find_one({'subject': ObjectId(node_id),
+			'relation_type': has_thread_rt._id, 'status': u'PUBLISHED'})
 		if thread_rt:
-			thread_obj = thread_rt['right_subject']
+			thread_id = thread_rt['right_subject']
+			if thread_id:
+				thread_obj = node_collection.one({'_id': ObjectId(thread_id)})
 
 		# if node_obj.relation_set:
 		# 	for rel in node_obj.relation_set:
@@ -3949,7 +3949,7 @@ def get_relation_node(node_id,rel_name):
 		data_dict.update({'file_name': file_node.name})
 		data_dict.update({'file_id': ObjectId(file_node.pk)})
 	 	data_list.append(data_dict)
-	print data_list
+	# print data_list
 	return data_list
 
 @register.assignment_tag
@@ -3985,4 +3985,61 @@ def get_gstudio_registration():
 @register.assignment_tag
 def get_unit_total_points(user_id,group_id):
 	counter_obj = Counter.get_counter_obj(user_id, ObjectId(group_id))
+
+
+@register.assignment_tag
+def get_node_hierarchy(node_obj):
+    node_structure = []
+    for each in node_obj.collection_set:
+        lesson_dict ={}
+        lesson = Node.get_node_by_id(each)
+        if lesson:
+            lesson_dict['name'] = lesson.name
+            lesson_dict['type'] = 'lesson'
+            lesson_dict['id'] = str(lesson._id)
+            lesson_dict['language'] = lesson.language[0]
+            lesson_dict['activities'] = []
+            if lesson.collection_set:
+                for each_act in lesson.collection_set:
+                    activity_dict ={}
+                    activity = Node.get_node_by_id(each_act)
+                    if activity:
+                        activity_dict['name'] = activity.name
+                        activity_dict['type'] = 'activity'
+                        activity_dict['id'] = str(activity._id)
+                        lesson_dict['activities'].append(activity_dict)
+            node_structure.append(lesson_dict)
+
+    return json.dumps(node_structure)
+
+@register.assignment_tag
+def user_groups(is_super_user,user_id):
+	user_grps_count = {}
+	gst_base_unit_name, gst_base_unit_id = GSystemType.get_gst_name_id('base_unit')
+	gst_group = node_collection.one({'_type': "GSystemType", 'name': "Group"})
+	gst_course = node_collection.one({'_type': "GSystemType", 'name': "Course"})
+	gst_basecoursegroup = node_collection.one({'_type': "GSystemType", 'name': "BaseCourseGroup"})
+	ce_gst = node_collection.one({'_type': "GSystemType", 'name': "CourseEventGroup"})
+	
+	query = {'_type': 'Group', 'status': u'PUBLISHED',
+             'member_of': {'$in': [gst_group._id],
+             '$nin': [gst_course._id, gst_basecoursegroup._id, ce_gst._id, gst_course._id, gst_base_unit_id]},
+            }
+
+	if is_super_user:
+		query.update({'group_type': {'$in': [u'PUBLIC', u'PRIVATE']}})
+	else:
+		query.update({'name': {'$nin': GSTUDIO_DEFAULT_GROUPS_LIST},
+                    'group_type': u'PUBLIC'})
+	group_cur = node_collection.find(query).sort('last_update', -1)
+	
+	user_draft_nodes = node_collection.find({'_type': "Group",'member_of':ObjectId(gst_base_unit_id),'$or': [{'group_admin': user_id}, {'author_set': user_id},{'created_by':user_id}]})
+	# user_projects_nodes = node_collection.find({'_type': "Group",'$or': [{'group_admin': user_id}, {'author_set': user_id},{'created_by':user_id}]})
+	user_grps_count['drafts'] = user_draft_nodes.count()
+	user_grps_count['projects'] = group_cur.count()
+	return user_grps_count
 	return counter_obj['group_points']
+
+@register.assignment_tag
+def if_edit_course_structure():
+	return GSTUDIO_EDIT_LMS_COURSE_STRUCTURE

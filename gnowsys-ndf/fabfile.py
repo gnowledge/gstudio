@@ -24,44 +24,49 @@ def update_data():
 	except Exception, e:
 		# exception will happen for fresh data
 		pass
-	create_schema()
-	local('python manage.py filldb')
-	local('python manage.py create_schema ATs.csv')
-	local('python manage.py sync_existing_documents')
+	finally:
+		create_schema()
+		local('python manage.py filldb')
+		local('python manage.py create_schema ATs.csv')
+		local('python manage.py sync_existing_documents')
 
 
 def update(branch):
-	local('git pull origin ' + branch)
-	local('python manage.py syncdb')
-	install_requirements()
-	local('bower install --allow-root')
-	local('python manage.py collectstatic --noinput')
-	update_data()
+	try:
+		local('git pull origin ' + branch)
+		local('python manage.py syncdb')
+		install_requirements()
+		local('python manage.py collectstatic --noinput')
+	except Exception, e:
+		print e
+	finally:
+		update_data()
 
 
 def install_requirements():
 	local('pip install -r ../requirements.txt')
+	local('bower install --allow-root')
 
 
 def purge_group():
 	local('python manage.py purge_group')
 
 
-def setup_dlkit():
-	import os
-	dirspot = os.getcwd()
-	if "/home/docker/code/gstudio/gnowsys-ndf" == dirspot:
-		if not os.path.isdir('./dlkit') and not os.path.isdir('./dlkit_runtime'):
-			local('git checkout dlkit')
-			local('git pull origin dlkit')
-			local('git clone https://bitbucket.org/cjshaw/dlkit_runtime.git')
-			local('git clone https://bitbucket.org/cjshaw/dlkit-tests.git')
-			local('git clone https://bitbucket.org/cjshaw/dlkit.git')
-			os.chdir('/home/docker/code/gstudio/gnowsys-ndf/dlkit')
-			local('git submodule update --init --recursive')
-			os.chdir('/home/docker/code/gstudio/gnowsys-ndf/')
-		else:
-			print "dlkit and dlkit_runtime are already exists."
-	else:
-		os.chdir('/home/docker/code/gstudio/gnowsys-ndf')
-		setup_dlkit()
+# def setup_dlkit():
+# 	import os
+# 	dirspot = os.getcwd()
+# 	if "/home/docker/code/gstudio/gnowsys-ndf" == dirspot:
+# 		if not os.path.isdir('./dlkit') and not os.path.isdir('./dlkit_runtime'):
+# 			local('git checkout dlkit')
+# 			local('git pull origin dlkit')
+# 			local('git clone https://bitbucket.org/cjshaw/dlkit_runtime.git')
+# 			local('git clone https://bitbucket.org/cjshaw/dlkit-tests.git')
+# 			local('git clone https://bitbucket.org/cjshaw/dlkit.git')
+# 			os.chdir('/home/docker/code/gstudio/gnowsys-ndf/dlkit')
+# 			local('git submodule update --init --recursive')
+# 			os.chdir('/home/docker/code/gstudio/gnowsys-ndf/')
+# 		else:
+# 			print "dlkit and dlkit_runtime are already exists."
+# 	else:
+# 		os.chdir('/home/docker/code/gstudio/gnowsys-ndf')
+# 		setup_dlkit()

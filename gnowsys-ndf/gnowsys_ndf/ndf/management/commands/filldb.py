@@ -581,7 +581,17 @@ def create_attribute_type(at_name, user_id, data_type, system_type_id_list, meta
     else:
       print 'AttributeType',at_name,'already created'
 
-def create_relation_type(rt_name, inverse_name, user_id, subject_type_id_list, object_type_id_list, meta_type_id=None, object_cardinality=None,member_of_type_id=bin_member_of_type._id):
+def create_relation_type(rt_name,
+                        inverse_name,
+                        user_id,
+                        subject_type_id_list,
+                        object_type_id_list,
+                        meta_type_id=None,
+                        object_cardinality=None,
+                        member_of_type_id=bin_member_of_type._id,
+                        is_reflexive=None,
+                        is_transitive=None):
+
   '''
   creating factory RelationType's
   '''
@@ -592,6 +602,8 @@ def create_relation_type(rt_name, inverse_name, user_id, subject_type_id_list, o
       rt_node.name = unicode(rt_name)
       rt_node.inverse_name = unicode(inverse_name)
       rt_node.object_cardinality = object_cardinality
+      rt_node.is_reflexive = is_reflexive
+      rt_node.is_transitive = is_transitive
 
       for st_id in subject_type_id_list:
         rt_node.subject_type.append(st_id)
@@ -638,6 +650,16 @@ def create_relation_type(rt_name, inverse_name, user_id, subject_type_id_list, o
       rt_node.object_type=object_type_id_list
       edited=True
 
+    if rt_node.is_reflexive != is_reflexive:
+      print "Edited is_reflexive of ", rt_node.name, " Earlier it was ", rt_node.is_reflexive, " now it is ", is_reflexive
+      rt_node.is_reflexive = is_reflexive
+      edited = True
+
+    if rt_node.is_transitive != is_transitive:
+      print "Edited is_transitive of ", rt_node.name, " Earlier it was ", rt_node.is_transitive, " now it is ", is_transitive
+      rt_node.is_transitive = is_transitive
+      edited = True
+
     if edited :
       rt_node.status = u"PUBLISHED"
       rt_node.save()
@@ -674,6 +696,8 @@ def create_rts(factory_relation_types,user_id):
     subject_type_id_list = []
     object_type_id_list = []
     object_cardinality = None
+    is_reflexive = None
+    is_transitive = None
 
     for key,value in each.items():
       at_name = key
@@ -717,7 +741,13 @@ def create_rts(factory_relation_types,user_id):
       if "object_cardinality" in value:
         object_cardinality = value["object_cardinality"]
 
-    create_relation_type(at_name, inverse_name, user_id, subject_type_id_list, object_type_id_list, meta_type_id, object_cardinality, member_of_type_id)
+      if "is_reflexive" in value:
+        is_reflexive = value["is_reflexive"]
+
+      if "is_transitive" in value:
+        is_transitive = value["is_transitive"]
+
+    create_relation_type(at_name, inverse_name, user_id, subject_type_id_list, object_type_id_list, meta_type_id, object_cardinality, member_of_type_id, is_reflexive, is_transitive)
 
 def create_sts(factory_gsystem_types,user_id):
   meta_type_id = ""

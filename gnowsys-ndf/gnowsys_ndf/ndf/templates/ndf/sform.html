@@ -1,3 +1,4 @@
+{% extends "ndf/gbase.html" %}
 {% block title %} Elastic Search {% endblock %}
 
 {% block body_content %}
@@ -26,17 +27,22 @@
 		<p>{{c|safe}}</p>
 	{% endfor %}
 
+	{# {% for c in content %} #}
+		{# {% for k in c %} #}
+			{# {% if k %} #}
+				{# <p>{{k}}</p> #}
+			{# {% else %} #}
+				{# <p>Media not present</p> #}
+			{# {% endif %} #}
+		{# {% endfor %} #}
+		{# <p>---------------------------------------------------------------------</p> #}
+		{# <br/> #}
+	{# {% endfor %} #}
 	{% for c in content %}
-		{% for k in c %}
-			{% if k %}
-				<p>{{k}}</p>
-			{% else %}
-				<p>Media not present</p>
-			{% endif %}
-		{% endfor %}
-		<p>---------------------------------------------------------------------</p>
-		<br/>
-	{% endfor %}
+		 <li class="card-image-wrapper">
+			{% include 'ndf/card_gsearch.html' with node=c %}
+		</li>
+{% endfor %}
 
 
 	<div class="pagination">

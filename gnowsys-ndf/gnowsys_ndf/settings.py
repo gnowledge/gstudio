@@ -645,13 +645,14 @@ GSTUDIO_SITE_NAME = "metaStudio"  # holds the name of site. e.g: "NROER, "tiss" 
 GSTUDIO_SITE_ISSUES_PAGE = ""
 GSTUDIO_EBOOKS_HELP_TEXT = "" #ebook help text page  url(page:"how to read ebooks")
 GSTUDIO_SUPPORTED_JHAPPS = ['Jsmol','Police Squad','OpenStoryTool','BioMechanics', 'TurtleBlocks']
+GSTUDIO_EDIT_LMS_COURSE_STRUCTURE = False
 # terms & conditions
 GSTUDIO_OID_TC = None
 GSTUDIO_OID_HELP = ""
 # GSTUDIO_SITE_EDITOR = "orgitdown"  #possible values are 'aloha'and 'orgitdown'
 # Visibility for 'Create Group'
 CREATE_GROUP_VISIBILITY = True
-
+GSTUDIO_DEFAULT_SYSTEM_TYPES_LIST = []
 EMACS_INIT_FILE_PATH = "~/.emacs"
 
 ###########################################################################
@@ -1019,6 +1020,7 @@ GSTUDIO_NOTE_CREATE_POINTS = 30
 GSTUDIO_QUIZ_CORRECT_POINTS = 5
 GSTUDIO_COMMENT_POINTS = 5
 GSTUDIO_ENABLE_USER_DASHBOARD = True
+GSTUDIO_PRIMARY_COURSE_LANGUAGE = u'en'
 
 # --- BUDDY Module configurations ---
 #
