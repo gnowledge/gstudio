@@ -1,10 +1,12 @@
+import re
+import json
 from django.shortcuts import render
 from django.http import HttpResponseRedirect
 from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 from elasticsearch import Elasticsearch		
-import re
-import json
 from gnowsys_ndf.ndf.forms import SearchForm
+from gnowsys_ndf.ndf.models import *
+from gnowsys_ndf.settings import GSTUDIO_SITE_NAME
 
 es = Elasticsearch(['http://elsearch:changeit@gsearch:9200'])
 author_map = {}
@@ -17,18 +19,14 @@ with open('/home/docker/code/gstudio/gnowsys-ndf/gnowsys_ndf/ndf/mappings/groupm
 	group_map = json.load(fe)
 
 hits = ""
-med_list = [] #med_list is the list which will be passed to the html file.
-res1_list = []
-res_list = []
-results = []
+med_list = []		 #contains all the search results
+res_list = []		 #contains the header of the search results
+results = []		 #contains a single page's results
+author_index = "author_" + GSTUDIO_SITE_NAME
 
 def get_search(request): 
 	
-	#if request.method == 'GET':
 	form = SearchForm(request.GET)
-	#return render(request, 'esearch/sform.html', {'form':form})
-	#if form.is_valid():
-		#retrieving the query text in search box
 	query = request.GET.get("query")
 	if(query):
 		print(query)
@@ -37,14 +35,13 @@ def get_search(request):
 		select = request.GET.get('select')
 		
 		if(select=="Author"):
-			resultSet = []
-			resultSet = optimized_get_contributions("author_index", select, group, query)
-			hits =  "<h3>  No of docs found: <b>%d</b></h3>" % len(resultSet)
+			resultSet = search_query(author_index, select, group, query)
+			hits =  "<h3> No of docs found: <b>%d</b></h3> " % len(resultSet)
 			med_list = get_search_results(resultSet)
 			if(group == "all"):
-				res_list = ['<h3>  Showing contributions of user <b>%s</b> in all groups:</h3>' % (query), hits]
+				res_list = ['<h3>  Showing contributions of user <b>%s</b> in all groups:</h3> ' % (query), hits]
 			else:
-				res_list = ['<h3>  Showing contributions of user <b>%s</b> in group <b>%s</b>":</h3>' % (query,group_map[str(group)]), hits]
+				res_list = ['<h3>  Showing contributions of user <b>%s</b> in group <b>%s</b>":</h3> ' % (query,group_map[str(group)]), hits]
 			
 		else:
 			if(select=="all"):
@@ -58,7 +55,7 @@ def get_search(request):
 			queryContentInfo = [0,0.0,"",""]
 			queryTagsInfo = [0,0.0,"",""]
 
-			dqlis = [] 			# a list conatining all the text inserted within double quotes
+			dqlis = [] 			# a list containing all the text inserted within double quotes
 			q = "" 				# a string to hold the text not enclosed within ""
 
 			#including quotes
@@ -86,17 +83,16 @@ def get_search(request):
 				if(q!=''):
 					query_body += ('{"multi_match": {"query": "%s", "fields": ["name^3", "altnames", "content^2", "tags"], "type": "best_fields"}},' % (q))
 				query_body += (']}}, "from": 0, "size": 100}')
-				query_body = eval(query_body)
-				#res = es.search(index='nroer_pro', doc_type=select, body=eval(query_body))	
+				query_body = eval(query_body)	
 				query_display = query
 
 			else:
 
-				get_suggestion(phsug_name, queryNameInfo, select, query,"name")
+				get_suggestion(phsug_name, queryNameInfo, select, query, "name")
 				if(queryNameInfo[2]!=query):
-					get_suggestion(phsug_content, queryContentInfo, select, query,"content")
+					get_suggestion(phsug_content, queryContentInfo, select, query, "content")
 				if(queryNameInfo[2]!=query and queryContentInfo[2]!=query):
-					get_suggestion(phsug_tags, queryTagsInfo, select, query,"tags")
+					get_suggestion(phsug_tags, queryTagsInfo, select, query, "tags")
 
 				print (queryNameInfo[0],queryContentInfo[0],queryTagsInfo[0])
 				query_display = ""
@@ -120,47 +116,50 @@ def get_search(request):
 						query = queryTagsInfo[2]
 						query_display = queryTagsInfo[3]
 
-				if(queryNameInfo[0]==0 and queryContentInfo[0]==0 and queryTagsInfo[0]==0):#if we didnt find any suggestion, neither did we find the query already indexed
-					query_body = {"query": {
-										"multi_match": { 											#first do a multi_match
-											"query" : query,
-											"type": "best_fields",									#when multiple words are there in the query, try to search for those words in a single field
-											"fields": ["name^3", "altnames", "content^2", "tags"],	#in which field to search the query
-											"minimum_should_match": "30%"
-											}
-										},
-									"rescore": {													#rescoring the top 50 results of multi_match
-										"window_size": 50,
-										"query": {
-											"rescore_query": {
-												"bool": {											#rescoring using match phrase
-													"should": [
-														{"match_phrase": {"name": { "query": query, "slop":2}}},
-														{"match_phrase": {"altnames": { "query": query, "slop": 2}}},
-														{"match_phrase": {"content": { "query": query, "slop": 4}}}
-													]
-												}
-											}
+
+
+			if(queryNameInfo[0]==0 and queryContentInfo[0]==0 and queryTagsInfo[0]==0):#if we didnt find any suggestion, neither did we find the query already indexed
+				query_body = {"query": {
+									"multi_match": { 											#first do a multi_match
+										"query" : query,
+										"type": "best_fields",									#when multiple words are there in the query, try to search for those words in a single field
+										"fields": ["name^3", "altnames", "content^2", "tags"],	#in which field to search the query
+										"minimum_should_match": "30%"
 										}
 									},
-									"from": 0,
-									"size": 100
-								}
-
-				else: #if we found a suggestion or if the query exists as a phrase in one of the name/content/tags field
-					query_body = {"query": {
-										"multi_match": {
-											"query": query,
-											"fields": ["name^3", "altnames", "content^2", "tags"],
-											"type": "phrase", #we are doing a match phrase on multi field.
-											"slop": 5
+								"rescore": {													#rescoring the top 50 results of multi_match
+									"window_size": 50,
+									"query": {
+										"rescore_query": {
+											"bool": {											#rescoring using match phrase
+												"should": [
+													{"match_phrase": {"name": { "query": query, "slop":2}}},
+													{"match_phrase": {"altnames": { "query": query, "slop": 2}}},
+													{"match_phrase": {"content": { "query": query, "slop": 4}}}
+												]
+											}
 										}
-									},
-									"from": 0,
-									"size": 100
-								}
+									}
+								},
+								"from": 0,
+								"size": 100
+							}
 
-			resultSet = optimized_get_contributions("nroer_pro", select, group, query_body)
+			else: #if we found a suggestion or if the query exists as a phrase in one of the name/content/tags field
+				query_body = {"query": {
+									"multi_match": {
+										"query": query,
+										"fields": ["name^3", "altnames", "content^2", "tags"],
+										"type": "phrase", #we are doing a match phrase on multi field.
+										"slop": 5
+									}
+								},
+								"from": 0,
+								"size": 100
+							}
+
+			query_display = query
+			resultSet = search_query(GSTUDIO_SITE_NAME, select, group, query_body)
 			hits = "<h3>No of docs found: <b>%d</b></h3>" % len(resultSet)
 			if(group=="all"):
 				res_list = ['<h3>Showing results for <b>%s</b> :</h3' % query_display, hits]
@@ -177,15 +176,13 @@ def get_search(request):
 		except EmptyPage:
 			results = paginator.page(paginator.num_pages)
 
-		# if(len(res1_list)>0):
-		# 	return render(request, 'esearch/sform.html', {'form': form, 'header':res_list, 'alternate': res1_list, 'content': results})
+
 		return render(request, 'ndf/sform.html', {'form': form, 'header':res_list, 'content': results})
 
-	print("going to render")
 	return render(request, 'ndf/sform.html', {'form': form})
 	
 
-def get_suggestion_body(query,field_value,slop_value,field_name_value):
+def get_suggestion_body(query, field_value, slop_value, field_name_value):
 	phrase_suggest = {												#json body of phrase suggestion in name field
 		"suggest": {
 			"text": query,										#the query for which we want to find suggestion
@@ -224,7 +221,7 @@ def get_suggestion_body(query,field_value,slop_value,field_name_value):
 	return phrase_suggest
 
 def get_suggestion(suggestion_body, queryInfo, doc_types, query,field):
-	res = es.suggest(body=suggestion_body, index='nroer_pro')						#first we search for suggestion in the name field as it has the highest priority
+	res = es.suggest(body=suggestion_body, index=GSTUDIO_SITE_NAME)						#first we search for suggestion in the name field as it has the highest priority
 	print(res)																					
 	if(len(res['suggest'][0]['options'])>0):									#if we get a suggestion means the phrase doesnt exist in the index
 		for sugitem in res['suggest'][0]['options']:
@@ -236,24 +233,13 @@ def get_suggestion(suggestion_body, queryInfo, doc_types, query,field):
 				break
 	else:						#should slop be included in the search part here?
 		query_body = {"query":{"match_phrase":{field: query,}}}
-		if(es.search(index='nroer_pro',doc_type=doc_types,body=query_body)['hits']['total']>0):
+		if(es.search(index=GSTUDIO_SITE_NAME, doc_type=doc_types, body=query_body)['hits']['total']>0):
 			queryInfo[0] = 1							#set queryNameInfo[0] = 1 when we found a suggestion or we found a hit in the indexed data
 			queryInfo[2] = query
 
 
 def get_search_results(resultArray):
 	med_list = [doc['_source'] for doc in resultArray]
-	# for doc in resultArray:	
-	# 	med_list.append(doc['_source'])				
-		# if('if_file' in doc['_source'].keys()):
-		# 	s = doc['_source']['name']
-		# 	if '.' in s:
-		# 		l = s.index('.')
-		# 	else:
-		# 		l = len(s)
-		# 	med_list.append([doc['_id'],s[0:l],doc['_source']['if_file']['original']['relurl'],doc['_score'],doc['_source']['content']])	#printing only the id for the time being along with the node name
-		# else:
-		# 	med_list.append([doc['_id'],doc['_source']['name'],None,doc['_score'],doc['_source']['content']])
 	return med_list
 
 def resources_in_group(res,group):
@@ -268,9 +254,9 @@ def resources_in_group(res,group):
 					results.append(i)
 	return results
 
-def optimized_get_contributions(index_name, select, group, query):
+def search_query(index_name, select, group, query):
 	siz = 100
-	if(index_name == "author_index"):
+	if(index_name == author_index):
 		try:
 			doctype = author_map[str(query)]
 		except:
@@ -284,7 +270,7 @@ def optimized_get_contributions(index_name, select, group, query):
 						"size": siz
 					} 
 
-	elif(index_name == "nroer_pro"):
+	elif(index_name == GSTUDIO_SITE_NAME):
 		doctype = select
 		body = query
 	
@@ -294,7 +280,7 @@ def optimized_get_contributions(index_name, select, group, query):
 	
 	while(True):
 		body['from'] = i
-		res = es.search(index = index_name, doc_type = doctype, body = body)
+		res = es.search(index = index_name, body = body)
 		l = len(res["hits"]["hits"])
 		print (body)
 		if(l==0):
@@ -311,50 +297,3 @@ def optimized_get_contributions(index_name, select, group, query):
 
 	return resultSet
 
-
-# def advanced_search(request):
-	
-# 	form = AdvancedSearchForm()
-# 	return render(request,"esearch/advanced_search.html",{'form':form})
-
-
-
-def get_contributions(select,group,author_name):
-	#author_name+='\n'
-	i = 0
-	doc_types = ['image','video','text','application','audio','NotMedia']
-	try:
-		sql_id = author_map[str(author_name)]
-	except:
-		return []
-	else:
-		resultSet = []
-		while(True):
-			body = {
-				"query":{
-					"match_all":{}
-				},
-				"from":i,
-				"size":100
-			}
-			res = es.search(index = "nroer_pro",body = body)
-			l = len(res["hits"]["hits"])
-			if l > 0:
-				for doc in (res['hits']['hits']):
-					#is it possible that an author has contributed to a paper that does not belong to any group
-					if ("group_set" in (doc["_source"]).keys()) and ("contributors" in (doc["_source"]).keys()):
-						group_set = []
-						for group_id in doc["_source"]["group_set"]:
-							group_set.append(group_id["$oid"])
-						contributors = doc["_source"]["contributors"]
-						if group == "all":
-							if sql_id in contributors: #and doc["_source"]["type"] in doc_types:
-								resultSet.append(doc)
-
-						else:
-							if (sql_id in contributors) and (group in group_set): #and doc["_source"]["type"] in doc_types:
-								resultSet.append(doc)
-			else:
-				break
-			i+=100
-		return resultSet
