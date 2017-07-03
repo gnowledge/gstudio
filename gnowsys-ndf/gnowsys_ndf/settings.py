@@ -514,7 +514,8 @@ INSTALLED_APPS = (
     'django_mailbox',
     'djcelery',
     'dlkit',
-    'dlkit_runtime'
+    'dlkit_runtime',
+    #'esearch'
 )
 
 AUTHENTICATION_BACKENDS = (
