@@ -8,7 +8,7 @@ import json
 from gnowsys_ndf.ndf.forms import SearchForm
 from gnowsys_ndf.ndf.models import *
 name_index = "clix"
-
+author_index = "author_clix"
 
 
 es = Elasticsearch(['http://elsearch:changeit@gsearch:9200'])
@@ -43,7 +43,7 @@ def get_search(request):
         
         if(select=="Author"):
             resultSet = []
-            resultSet = optimized_get_contributions("author_index", select, group, query)
+            resultSet = searchTheQuery(author_index, select, group, query)
             hits =  "<h3>  No of docs found: <b>%d</b></h3>" % len(resultSet)
             med_list = get_search_results(resultSet)
             if(group == "all"):
@@ -165,7 +165,7 @@ def get_search(request):
                                     "size": 100
                                 }
 
-            resultSet = optimized_get_contributions(name_index, select, group, query_body)
+            resultSet = searchTheQuery(name_index, select, group, query_body)
             hits = "<h3>No of docs found: <b>%d</b></h3>" % len(resultSet)
             if(group=="all"):
                 res_list = ['<h3>Showing results for <b>%s</b> :</h3' % query_display, hits]
@@ -285,9 +285,9 @@ def resources_in_group(res,group):
                     results.append(i)
     return results
 
-def optimized_get_contributions(index_name, select, group, query):
+def searchTheQuery(index_name, select, group, query):
     siz = 100
-    if(index_name == "author_index"):
+    if(index_name == author_index):
         try:
             doctype = author_map[str(query)]
         except:
@@ -327,51 +327,3 @@ def optimized_get_contributions(index_name, select, group, query):
             i+=siz  
 
     return resultSet
-
-
-# def advanced_search(request):
-    
-#   form = AdvancedSearchForm()
-#   return render(request,"esearch/advanced_search.html",{'form':form})
-
-
-
-def get_contributions(select,group,author_name):
-    #author_name+='\n'
-    i = 0
-    doc_types = ['image','video','text','application','audio','NotMedia']
-    try:
-        sql_id = author_map[str(author_name)]
-    except:
-        return []
-    else:
-        resultSet = []
-        while(True):
-            body = {
-                "query":{
-                    "match_all":{}
-                },
-                "from":i,
-                "size":100
-            }
-            res = es.search(index = name_index,body = body)
-            l = len(res["hits"]["hits"])
-            if l > 0:
-                for doc in (res['hits']['hits']):
-                    #is it possible that an author has contributed to a paper that does not belong to any group
-                    if ("group_set" in (doc["_source"]).keys()) and ("contributors" in (doc["_source"]).keys()):
-                        group_set = []
-                        for group_id in doc["_source"]["group_set"]:
-                            group_set.append(group_id["$oid"])
-                        contributors = doc["_source"]["contributors"]
-                        if group == "all":
-                            if sql_id in contributors: #and doc["_source"]["type"] in doc_types:
-                                resultSet.append(doc)
-
-                        else:
-                            if (sql_id in contributors) and (group in group_set): #and doc["_source"]["type"] in doc_types:
-                                resultSet.append(doc)
-            else:
-                break
-            i+=100
-        return resultSet

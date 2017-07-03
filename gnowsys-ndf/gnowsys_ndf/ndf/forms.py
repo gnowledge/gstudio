@@ -19,7 +19,7 @@ ATTRIBUTE_CHOICES = [("--Select--","--Select--"),("educationaluse","Educational 
 
 secondlevel_choices = []
 
-with open("/home/docker/code/gstudio/gnowsys-ndf/gnowsys_ndf/ndf/mapping_files/groupmap.json", 'r') as gm:
+with open("/home/docker/code/gstudio/gnowsys-ndf/gnowsys_ndf/ndf/mapping_files/groupmap_clix.json", 'r') as gm:
     group_map = json.load(gm)
 
 with open("/home/docker/code/gstudio/gnowsys-ndf/gnowsys_ndf/ndf/mapping_files/attribute_map.json") as am:
