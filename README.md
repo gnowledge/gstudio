@@ -7,13 +7,6 @@ knowledge representation model.
 
 The project is released under GNU AGPL v3 license.
 
-
-
-
-
-
-
-
 Features of gstudio
 -------------------
 

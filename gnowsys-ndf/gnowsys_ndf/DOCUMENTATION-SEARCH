@@ -14,6 +14,7 @@ Open the bash of elasticsearch and inside the bash
 
 (4.)    docker run -itd --link elasticsearch_container_name:alias --name=gstudio-pilani -p 80:80 -p 8000:8000 -v linking_code_directory -v linking_data_directory image_id
 
+The alias we gave was gsearch-> this alias is used while creating instance of elasticsearch in the program.
 
 (--link flag is now deprecated)
 
