@@ -8,121 +8,173 @@
     color: green;
   }
 </style>
-<div class="batch_div">
-  <div class="row" style="text-align: center;">
-    <div class="small-4 columns end" style="display: inline-block;">
-      <h5>{% trans 'Search User by name : ' %}</h5>
+<div class="widget-container">
+  <div class="search-box">
+    <div class="row" style="text-align: center;">
+      <div class="small-4 columns end" style="display: inline-block;">
+        <h5>{% trans 'Search User by name : ' %}</h5>
+      </div>
+      <div class="small-4 columns end" style="display: inline-block;">
+        <input type="text" class="student_name small-6 columns" value="" placeholder="Enter atleast 3 letters to search">
+      </div>
     </div>
-    <div class="small-4 columns end" style="display: inline-block;">
-      <input type="text" class="student_name small-6 columns" value="" placeholder="Enter atleast 3 letters to search">
+    <div class="row">
+          <input type="button" class="radius button search_stud_btn asset-save-button" style="width: 8rem;" value="Find Users" />
     </div>
   </div>
-  <div class="row">
-        <input type="button" class="radius button search_stud_btn asset-save-button" style="width: 8rem;"value="Find Students" />
+  <div class="data-box">
+    <div id="student_count_div"></div>
+    <div id="student_data_set_div"></div>
+    <div class="controls-box hide">
+      <input type="button" value="Submit" class="radius button asset-save-button">
+      <input type="button" value="Cancel" class="radius button cancel-btn asset-save-button">
+    </div>
   </div>
 </div>
-  <div id="student_count_div"></div>
-  <div id="student_data_set_div"></div>
 <script type="text/javascript">
-    var search_text_old = "";
-    $(document).on( 'click', '.search_stud_btn', function (e) {
-        var search_text = $(".student_name").val().toLowerCase();
-        var search_text_len = (search_text.length);
-        var subscription_status_val = false
-        {% if subscription_status %}
-          var subscription_status_val = "{{subscription_status}}"
-        {% endif %}
 
-        if (search_text_len > 2){
-        $.ajax({
-          type: "GET",
-          url: "{% url 'search_users' group_object.pk %}",
-          datatype: "json",
-          data:{
-            'username_str': search_text,
-            'subscription_status_val': subscription_status_val
+  var search_text_old = "";
+  $(document).on( 'click', '.search_stud_btn', function (e) {
+      var search_text = $(".student_name").val().toLowerCase();
+      var search_text_len = (search_text.length);
+      var subscription_status_val = false
+      {% if subscription_status %}
+        var subscription_status_val = "{{subscription_status}}"
+      {% endif %}
 
-          },
-          success: function(data) {
-            $("#student_data_set_div").html("")
-            data = JSON.parse(data)
-            if(data.length > 0){
-              $("#student_count_div").html("Total "+ data.length+" user(s) found.")
-              var stud_table = document.createElement('table');
-              outer_div = document.getElementById("student_data_set_div");
-              stud_table.style.width = "100%"
-              outer_div.style.height = "450px"
-              outer_div.style.overflowX = "hidden"
-              outer_div.style.overflowY = "auto"
-              var table_header = stud_table.createTHead();
-              var header_row = table_header.insertRow(0)     
-              var cell1 = header_row.insertCell(0)
-              var cell2 = header_row.insertCell(1)
-              var cell3 = header_row.insertCell(2)
-              cell1.innerHTML = "<b>No.</b>"
-              cell2.innerHTML = "<b>Name</b>"
-              {% if subscription_status %}
-                cell3.innerHTML = "<b>Member</b>"
-                var cell4 = header_row.insertCell(3)
-                cell4.innerHTML = "<b>Admin</b>"
+      if (search_text_len > 2){
+      $.ajax({
+        type: "GET",
+        url: "{% url 'search_users' group_object.pk %}",
+        datatype: "json",
+        data:{
+          'username_str': search_text,
+          'subscription_status_val': subscription_status_val
+
+        },
+        success: function(data) {
+          $("#student_data_set_div").html("")
+          data = JSON.parse(data)
+          if(data.length > 0){
+            $("#student_count_div").html("Total "+ data.length+" user(s) found.")
+            var stud_table = document.createElement('table');
+            outer_div = document.getElementById("student_data_set_div");
+            stud_table.style.width = "100%"
+            outer_div.style.height = "450px"
+            outer_div.style.overflowX = "hidden"
+            outer_div.style.overflowY = "auto"
+            var table_header = stud_table.createTHead();
+            var header_row = table_header.insertRow(0)     
+            var cell1 = header_row.insertCell(0)
+            var cell2 = header_row.insertCell(1)
+            var cell3 = header_row.insertCell(2)
+            cell1.innerHTML = "<b>No.</b>"
+            cell2.innerHTML = "<b>Name</b>"
+            {% if subscription_status %}
+              cell3.innerHTML = "<input type='checkbox' class='select-mem'> <b>Member</b>"
+              var cell4 = header_row.insertCell(3)
+              cell4.innerHTML = "<input type='checkbox' class='select-adm'> <b>Admin</b>"
+            {% else %}
+              cell3.innerHTML = "<b>Action</b>"
+            {% endif %}
+
+            var table_body = stud_table.createTBody();
+  
+            $.each(data, function(index_val,tuple_obj){
+              var data_row = table_body.insertRow(-1); 
+              data_row.id =  tuple_obj[0]
+
+              var serial_no_cell = data_row.insertCell(0);
+              serial_no_cell.innerHTML = index_val + 1
+              var data_cell = data_row.insertCell(1);
+              data_cell.innerHTML = tuple_obj[1]
+              data_cell.className = "username"
+              
+              {% if not subscription_status %}
+                var action_on_user = data_row.insertCell(2);
+                action_on_user.innerHTML = "<a>Change Password</a>"
+                action_on_user.className = "action_on_user"
+
               {% else %}
-                cell3.innerHTML = "<b>Action</b>"
+                var mem_cell = data_row.insertCell(2);
+                var admin_cell = data_row.insertCell(3);
+                if(tuple_obj[2]){
+
+                  mem_cell.innerHTML = "<input type='checkbox' class='user_mgmt_chk' name='remove-member' checked='checked' title='Click here to Remove this user' >"
+                  // mem_cell.innerHTML = "<i class='fi-x'></i><a id='unsubscribe_from_grp' title='Click here to Remove this user' data-user-id='"+tuple_obj[0]+"'> Remove</a>"
+                }
+                else{
+                  mem_cell.innerHTML = "<input type='checkbox' class='user_mgmt_chk' name='add-member' title='Click here to Add this user' >"
+                  // mem_cell.innerHTML = "<i class='fi-check'></i><a id='subscribe_to_grp'  title='Click here to Add this user' data-user-id='"+tuple_obj[0]+"'> Add</a>"
+                }
+
+                // Add as Admin
+                if(tuple_obj[3]){
+                  admin_cell.innerHTML = "<input type='checkbox' class='user_mgmt_chk' name='remove-admin' checked='checked' title='Click here to Remove this user as Admin' >"
+
+                  // admin_cell.innerHTML = "<i class='fi-x'></i><a id='unsubscribe_from_grp' title='Click here to Remove this user' data-user-id='"+tuple_obj[0]+"' data-user-admin='True'> Remove</a>"
+                }
+                else{
+                  admin_cell.innerHTML = "<input type='checkbox' class='user_mgmt_chk' name='add-admin' title='Click here to Add this user as Admin' >"
+
+                  // admin_cell.innerHTML = "<i class='fi-check'></i><a id='subscribe_to_grp' title='Click here to Add this user' data-user-id='"+tuple_obj[0]+"' data-user-admin='True'> Add</a>"
+                }
+
               {% endif %}
 
-              var table_body = stud_table.createTBody();
-    
-              $.each(data, function(index_val,tuple_obj){
-                var data_row = table_body.insertRow(-1); 
-                data_row.id =  tuple_obj[0]
+            })
 
-                var serial_no_cell = data_row.insertCell(0);
-                serial_no_cell.innerHTML = index_val + 1
-                var data_cell = data_row.insertCell(1);
-                data_cell.innerHTML = tuple_obj[1]
-                data_cell.className = "username"
-                
-                {% if not subscription_status %}
-                  var action_on_user = data_row.insertCell(2);
-                  action_on_user.innerHTML = "<a>Change Password</a>"
-                  action_on_user.className = "action_on_user"
-
-                {% else %}
-                  var mem_cell = data_row.insertCell(2);
-                  var admin_cell = data_row.insertCell(3);
-                  if(tuple_obj[2]){
-                    mem_cell.innerHTML = "<i class='fi-x'></i><a id='unsubscribe_from_grp' title='Click here to Remove this user' data-user-id='"+tuple_obj[0]+"'> Remove</a>"
-                  }
-                  else{
-                    mem_cell.innerHTML = "<i class='fi-check'></i><a id='subscribe_to_grp'  title='Click here to Add this user' data-user-id='"+tuple_obj[0]+"'> Add</a>"
-                  }
-
-                  // Add as Admin
-                  if(tuple_obj[3]){
-                    admin_cell.innerHTML = "<i class='fi-x'></i><a id='unsubscribe_from_grp' title='Click here to Remove this user' data-user-id='"+tuple_obj[0]+"' data-user-admin='True'> Remove</a>"
-                  }
-                  else{
-                    admin_cell.innerHTML = "<i class='fi-check'></i><a id='subscribe_to_grp' title='Click here to Add this user' data-user-id='"+tuple_obj[0]+"' data-user-admin='True'> Add</a>"
-                  }
-
-                {% endif %}
-  
-              })
-
-              $("#student_data_set_div").append(stud_table);
-            }
-            else{
-              $("#student_data_set_div").html("No results found")
-              $("#student_count_div").html("")
-            }
-          },
-        });
-        }
-        else{
-          alert("Please enter some text to search.")
-        }
-    })
+            $("#student_data_set_div").append(stud_table);
+            $(".search-box").hide()
+            $(".data-box").show()
+            $(".controls-box").removeClass("hide")
+          }
+          else{
+            $(".search-box").show()
+            $(".data-box").show()
+            $(".controls-box").addClass("hide")
+            $("#student_data_set_div").html("No results found")
+            $("#student_count_div").html("")
+          }
+        },
+      });
+      }
+      else{
+        alert("Please enter some text to search.")
+      }
+  })
 
 
+  $(document).on("click", ".cancel-btn", function() {
+    $(".search-box").show()
+    $(".data-box").hide()
+  })
+
+  $(document).on("click", ".select-mem", function() {
+    if($(this).is(":checked")){
+      $("input[name='add-member'").each(function () {
+       $(this).prop('checked', true)
+      })
+    }
+    else{
+      $("input[name='add-member'").each(function () {
+       $(this).prop('checked', false)
+      })
+    }
+  })
+
+  $(document).on("click", ".select-adm", function() {
+    if($(this).is(":checked")){
+      $("input[name='add-admin'").each(function () {
+       $(this).prop('checked', true)
+      })
+    }
+    else{
+      $("input[name='add-admin'").each(function () {
+       $(this).prop('checked', false)
+      })
+    }
+  })
 
   $(document).on("click", "#subscribe_to_grp", function() {
         user_id = $(this).attr('data-user-id')
@@ -168,7 +220,7 @@
         });
     });
 
-    $(document).on("click", "#unsubscribe_from_grp", function() {
+  $(document).on("click", "#unsubscribe_from_grp", function() {
         user_id = $(this).attr('data-user-id')
         asAdmin = $(this).attr('data-user-admin')
 
@@ -210,7 +262,5 @@
                     }
                 }
         });
-    });
-
-
+  });
 </script>
