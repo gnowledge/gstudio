@@ -15,28 +15,28 @@ GROUP_CHOICES=[]
 GROUP_CHOICES.append(("all","All"))
 group_map = {}
 attribute_map = {}
-ATTRIBUTE_CHOICES = [("--Select--","--Select--"),("educationaluse","Educational use"),("interactivitytype","Interactivity type"),("educationalsubject","Educational subject"),("educationallevel","Educational Level"),("source","Source"),("audience","Audience"),("educationalalignment","Educational alignment"),]
+# ATTRIBUTE_CHOICES = [("--Select--","--Select--"),("educationaluse","Educational use"),("interactivitytype","Interactivity type"),("educationalsubject","Educational subject"),("educationallevel","Educational Level"),("source","Source"),("audience","Audience"),("educationalalignment","Educational alignment"),]
 
-secondlevel_choices = []
+# secondlevel_choices = []
 
-with open("/home/docker/code/gstudio/gnowsys-ndf/gnowsys_ndf/ndf/mapping_files/groupmap_clix.json", 'r') as gm:
-    group_map = json.load(gm)
+# with open("/home/docker/code/gstudio/gnowsys-ndf/gnowsys_ndf/ndf/mapping_files/groupmap_clix.json", 'r') as gm:
+#     group_map = json.load(gm)
 
-with open("/home/docker/code/gstudio/gnowsys-ndf/gnowsys_ndf/ndf/mapping_files/attribute_map.json") as am:
-    attribute_map = json.load(am)
+# with open("/home/docker/code/gstudio/gnowsys-ndf/gnowsys_ndf/ndf/mapping_files/attribute_map.json") as am:
+#     attribute_map = json.load(am)
 
-for i in ATTRIBUTE_CHOICES:
-    if i[0] != '--Select--':
-        l = []
-        for val in attribute_map[i[0]]:
-            tup = (val,val)
-            l.append(tup)
-        secondlevel_choices.append(l)
+# for i in ATTRIBUTE_CHOICES:
+#     if i[0] != '--Select--':
+#         l = []
+#         for val in attribute_map[i[0]]:
+#             tup = (val,val)
+#             l.append(tup)
+#         secondlevel_choices.append(l)
 
-for l in group_map.keys():
-    tup = (l, group_map[l])
-    tup = tuple(tup)
-    GROUP_CHOICES.append(tup)
+# for l in group_map.keys():
+#     tup = (l, group_map[l])
+#     tup = tuple(tup)
+#     GROUP_CHOICES.append(tup)
 
 class SearchForm(forms.Form):
     query = forms.CharField(label = '', widget = forms.TextInput(attrs={'placeholder': 'Search for'}), error_messages = False)
@@ -64,3 +64,6 @@ class UserChangeform(PasswordChangeForm):
 
 class UserResetform(SetPasswordForm):
     new_password1 = PasswordField(label="New password")
+
+# class AdvancedSearchForm(forms.Form):
+#     query = forms.CharField(label = '', widget = forms.TextInput(attrs={'placeholder': 'Search for'}), error_messages = False)

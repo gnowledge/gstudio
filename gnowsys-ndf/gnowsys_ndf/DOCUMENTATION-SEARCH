@@ -8,7 +8,7 @@ curl should be installed beforehand
 
 Then create a superuser to use the elasticsearch instance(since a login is required to use the elasticsearch container)
 Open the bash of elasticsearch and inside the bash
-(3.)    curl -XPOST 'localhost:9200/_xpack/security/user/elsearch?pretty' -H 'Content-Type:application/json' -d '{"password":"changeit","roles":["superuser"]}'
+(3.)    curl -XPOST 'http://elastic:changeme@localhost:9200/_xpack/security/user/elsearch?pretty' -H 'Content-Type:application/json' -d '{"password":"changeit","roles":["superuser"]}'
 
 # Link the gstudio container with the elasticsearch container using the docker run:
 
@@ -20,7 +20,7 @@ The alias we gave was gsearch-> this alias is used while creating instance of el
 
 Then in the gstudio container bash
  
-Pip install elasticsearch : this will install the python elasticsearch client.
+pip install elasticsearch : this will install the python elasticsearch client.
 
 
 Our search url can be found in __init__.py file of urls folder. In the search form, the if filter Users is selected then the contributions of the user entered in the search box will be searched, else if any other filter is selected, normal search will happen.
