@@ -136,8 +136,8 @@ def main():
 	print("Response for index creation")
 	print(res)
 
-	all_docs = node_collection.find()
-	index_docs(all_docs).addOption(Bytes.QUERYOPTION_NOTIMEOUT)
+	all_docs = node_collection.find(TIMEOUT=False)
+	index_docs(all_docs)
 
 	f = open("/home/docker/code/gstudio/gnowsys-ndf/gnowsys_ndf/ndf/mapping_files/authormap_clix.json","w")
 	json.dump(author_map,f,indent=4)
