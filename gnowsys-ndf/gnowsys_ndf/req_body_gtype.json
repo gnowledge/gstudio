@@ -11,17 +11,9 @@
 					"stopwords": "_english_",
 					"filter": [
 						"standard",
-						"lowercase",
-						"shingle"
+						"lowercase"
 					],
 					"char_filter": ["html_strip"]
-				}
-			},
-			"filter": {
-				"shingle": {
-					"type": "shingle",
-					"min_shingle_size": 2,
-					"max_shingle_size": 3
 				}
 			}
 		}

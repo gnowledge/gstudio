@@ -8,7 +8,7 @@ from gnowsys_ndf.settings import GSTUDIO_SITE_NAME
 
 # reload(sys)  # Reload does the trick!
 # sys.setdefaultencoding('UTF8')
-es = Elasticsearch("http://elsearch:changeit@gsearch:9200")
+es = Elasticsearch("http://elsearch:changeit@gsearch:9200", TIMEOUT=False)
 
 # doc_type = ""
 author_map = {}
