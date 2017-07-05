@@ -19,7 +19,7 @@ from gnowsys_ndf.settings import GSTUDIO_BUDDY_LOGIN, GSTUDIO_NOTE_CREATE_POINTS
 from gnowsys_ndf.ndf.models import GSystemType, Group, Node, GSystem, Buddy, Counter  #, Triple
 from gnowsys_ndf.ndf.models import node_collection
 
-from gnowsys_ndf.ndf.views.methods import get_execution_time, staff_required, get_group_name_id
+from gnowsys_ndf.ndf.views.methods import get_execution_time, staff_required
 from gnowsys_ndf.ndf.views.methods import get_language_tuple, create_gattribute, create_thread_for_node
 from gnowsys_ndf.ndf.views.notify import activity_notification
 
@@ -47,7 +47,7 @@ def node_create_edit(request,
             raise ValueError('Improper node_type passed')
 
         kwargs = {}
-        group_obj = get_group_name_id(group_id, get_obj=True)
+        group_obj = Group.get_group_name_id(group_id, get_obj=True)
         group_name = group_altname = group_obj.name
         if group_obj.altnames:
             group_altname = group_obj.altnames
