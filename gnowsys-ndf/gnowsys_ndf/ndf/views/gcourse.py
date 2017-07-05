@@ -1890,9 +1890,9 @@ def enroll_to_course(request, group_id):
             else:
                 user_id = ast.literal_eval(user_id)
 
-
             if isinstance(user_id, list):
                 user_id = map(int, user_id)
+                user_id = list(set(user_id))
             else:
                 user_id = int(user_id)
             group_obj = get_group_name_id(group_id, get_obj=True)
