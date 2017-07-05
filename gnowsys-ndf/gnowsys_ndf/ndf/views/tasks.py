@@ -13,7 +13,7 @@ from celery import task
 from django.contrib.auth.models import User
 from django.template.loader import render_to_string
 from django.contrib.sites.models import Site
-from django.utils.safestring import SafeText
+
 from gnowsys_ndf.notification import models as notification
 from gnowsys_ndf.ndf.models import Node
 from gnowsys_ndf.ndf.models import node_collection, triple_collection, filehive_collection, benchmark_collection
