@@ -125,6 +125,34 @@ this template is modified. So for the fields in the template it supports -
         </div>
       </div>
     </div>
+
+    <!-- language -->
+    <div class="row">
+      <div class="small-12 medium-6 medium-centered columns">
+        <div class="row">
+          <div class="small-4 columns">
+            <label for="right-label" class="inline">{% trans "Language" %}</label>
+          </div>
+
+          <div class="small-8 columns">
+            {% get_language_info_list for LANGUAGES as languages %}
+            <select name="language" class="gtype">
+                {% for language in languages %}
+                    {% if node.language.0 == language.code %}
+                        <option selected value="{{ language.code }}" data-sub-lang="{{ language.name }}" data-sub-code="{{ language.code }}">{{ language.name }}</option>
+                    {% else %}
+                        <option value="{{ language.code }}" data-sub-lang="{{ language.name }}" data-sub-code="{{ language.code }}">{{ language.name }}</option>
+                    {% endif %}
+                {% endfor %}
+            </select> 
+            <small class="error">{% trans "Please select group type." %}</small>
+          </div>
+
+        </div>
+      </div>
+    </div>
+
+
     {% if spl_group_type == "ProgramEventGroup" %}
     <!-- moderation level -->
     <div class="row" id="moderation-level">

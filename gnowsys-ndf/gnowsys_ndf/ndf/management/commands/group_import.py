@@ -155,7 +155,6 @@ def user_objs_restoration():
     global DEFAULT_USER_SET
     global log_file
     user_json_data = None
-    # print "CONFIG_VARIABLES.RESTORE_USER_DATA"
     if CONFIG_VARIABLES.RESTORE_USER_DATA:
         user_dump_restore = raw_input("\n\tUser dump is available.  \
             Would you like to restore it (y/n) ?: ")
@@ -181,7 +180,12 @@ def user_objs_restoration():
                 log_file.write("\n Request for Default user with id=1 : No.")
                 DEFAULT_USER_ID = int(raw_input("Enter user-id: "))
                 log_file.write("\n Request for Setting Default user with id :" + str(DEFAULT_USER_SET))
-
+    else:
+        print "*"*80
+        print "\n No RESTORE_USER_DATA available. Setting Default user with id: 1"
+        DEFAULT_USER_SET = True
+        DEFAULT_USER_ID = 1
+        log_file.write("\n No RESTORE_USER_DATA available. Setting Default user with id :" + str(DEFAULT_USER_SET))
 
 
 def update_schema_id_for_triple(document_json):
@@ -194,28 +198,42 @@ def update_schema_id_for_triple(document_json):
 
 def update_group_set(document_json):
     if 'group_set' in document_json:
-        document_json['group_set'] = [ObjectId(CONFIG_VARIABLES.GROUP_ID)]
+        if ObjectId(CONFIG_VARIABLES.GROUP_ID) not in document_json['group_set']:
+            document_json['group_set'].append(ObjectId(CONFIG_VARIABLES.GROUP_ID))
     return document_json
 
+def _mapper(json_obj, key, MAP_obj, is_list=False):
+    if key in json_obj:
+        if is_list:
+            for eu in json_obj[key]:
+                if eu in MAP_obj:
+                    replace_in_list(json_obj[key],eu, MAP_obj[eu])
+        else:
+            json_obj[key] = MAP_obj[json_obj[key]]
+
 def update_schema_and_user_ids(document_json):
+    global DEFAULT_USER_SET
+    global DEFAULT_USER_ID
     if SCHEMA_ID_MAP:
-        if document_json['member_of']:
-            for each_mem_of_id in document_json['member_of']:
-                if each_mem_of_id in SCHEMA_ID_MAP:
-                    replace_in_list(document_json['member_of'], 
-                        each_mem_of_id, SCHEMA_ID_MAP[each_mem_of_id])
-        if document_json['type_of']:
-            for each_mem_of_id in document_json['type_of']:
-                if each_mem_of_id in SCHEMA_ID_MAP:
-                    replace_in_list(document_json['type_of'], 
-                        each_mem_of_id, SCHEMA_ID_MAP[each_mem_of_id])
-    if USER_ID_MAP:
-        if document_json['created_by'] in USER_ID_MAP:
-            replace_in_list(document_json['contributors'], 
-                document_json['created_by'], USER_ID_MAP[document_json['created_by']])
-            document_json['created_by'] = USER_ID_MAP[document_json['created_by']]
-        if document_json['modified_by'] in USER_ID_MAP:
-            document_json['modified_by'] = USER_ID_MAP[document_json['modified_by']]
+        _mapper(document_json, 'member_of', SCHEMA_ID_MAP, is_list=True)
+        _mapper(document_json, 'type_of', SCHEMA_ID_MAP, is_list=True)
+
+    if DEFAULT_USER_SET:
+        document_json['contributors'] = [DEFAULT_USER_ID]
+        document_json['created_by'] = DEFAULT_USER_ID
+        document_json['modified_by'] = DEFAULT_USER_ID
+        if 'group_admin' in document_json:
+            document_json['group_admin'] = [DEFAULT_USER_ID]
+        if 'author_set' in document_json:
+            document_json['author_set'] = [DEFAULT_USER_ID]
+
+    elif CONFIG_VARIABLES.RESTORE_USER_DATA and USER_ID_MAP:
+        _mapper(document_json, 'contributors', USER_ID_MAP, is_list=True)
+        _mapper(document_json, 'group_admin', USER_ID_MAP, is_list=True)
+        _mapper(document_json, 'author_set', USER_ID_MAP, is_list=True)
+        _mapper(document_json, 'created_by', USER_ID_MAP)
+        _mapper(document_json, 'modified_by', USER_ID_MAP)
+
     return document_json
 
     '''
@@ -564,12 +582,12 @@ def restore_node(filepath):
                 log_file.write("\n New post_node :\n\t "+ str(node_obj.post_node))
                 node_changed = True
 
-            if  node_obj.group_set != node_json['group_set'] and node_json['group_set']:
-                log_file.write("\n Old group_set :\n\t "+ str(node_obj.group_set))
-                node_obj.group_set = merge_lists_and_maintain_unique_ele(node_obj.group_set,
-                    node_json['group_set'])
-                log_file.write("\n New group_set :\n\t "+ str(node_obj.group_set))
-                node_changed = True
+            # if  node_obj.group_set != node_json['group_set'] and node_json['group_set']:
+            #     log_file.write("\n Old group_set :\n\t "+ str(node_obj.group_set))
+            #     node_obj.group_set = merge_lists_and_maintain_unique_ele(node_obj.group_set,
+            #         node_json['group_set'])
+            #     log_file.write("\n New group_set :\n\t "+ str(node_obj.group_set))
+            #     node_changed = True
 
             if node_obj.prior_node != node_json['prior_node'] and node_json['prior_node']:
                 log_file.write("\n Old prior_node :\n\t "+ str(node_obj.prior_node))
@@ -598,8 +616,13 @@ def restore_node(filepath):
                 node_changed = True
                 log_file.write("\n New content :\n\t "+ str(node_obj.content))
 
+
             log_file.write("\n Old group_set :\n\t "+ str(node_obj.group_set))
-            node_obj.group_set = [ObjectId(CONFIG_VARIABLES.GROUP_ID)]
+
+            if ObjectId(CONFIG_VARIABLES.GROUP_ID) not in node_obj.group_set:
+                node_obj.group_set.append(ObjectId(CONFIG_VARIABLES.GROUP_ID))
+
+            # node_obj.group_set = [ObjectId(CONFIG_VARIABLES.GROUP_ID)]
             log_file.write("\n New group_set :\n\t "+ str(node_obj.group_set))
             node_obj.access_policy = u'PUBLIC'
             log_file.write("\n Setting access_policy: u'PUBLIC'")

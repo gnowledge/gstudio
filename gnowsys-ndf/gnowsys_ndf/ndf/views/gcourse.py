@@ -2075,7 +2075,8 @@ def activity_player_detail(request, group_id, lesson_id, activity_id):
         # 'unit_resources_list_of_dict': unit_resources_list_of_dict,
         'trans_node':trans_node,
         'act_list':trans_act_list,
-        'trans_lesson_name':lesson_name
+        'trans_lesson_name':lesson_name,
+        'no_footer': True
     })
 
     if request.user.is_authenticated():
@@ -3585,9 +3586,11 @@ def _get_unit_hierarchy(unit_group_obj,lang="en"):
                     if activity:
                         trans_act_name = get_lang_node(each_act,lang)
                         if trans_act_name:
+                            # activity_dict['label'] = trans_act_name.altnames or trans_act_name.name
                             activity_dict['label'] = trans_act_name.name
                         else:
                             activity_dict['label'] = activity.name
+                            # activity_dict['label'] = activity.altnames or activity.name
                         activity_dict['type'] = 'activity-group'
                         activity_dict['id'] = str(activity._id)
                         lesson_dict['children'].append(activity_dict)
@@ -3647,11 +3650,13 @@ def get_trans_node_list(node_list,lang):
     trans_node_list = []
     for each in node_list:
         each_node = get_lang_node(each,lang)
-        if each_node :
-            trans_node_list.append({ObjectId(each_node._id): {"name":each_node.name,"basenodeid":ObjectId(each)}})
+        if each_node :  
+            # trans_node_list.append({ObjectId(each_node._id): {"name":(each_node.altnames or each_node.name),"basenodeid":ObjectId(each)}})
+            trans_node_list.append({ObjectId(each_node._id): {"name": each_node.name, "basenodeid":ObjectId(each)}})
         else:
             node = node_collection.one({"_id":ObjectId(each)})
-            trans_node_list.append({ObjectId(node._id): {"name":node.name,"basenodeid":ObjectId(node._id)}})
+            # trans_node_list.append({ObjectId(node._id): {"name":(node.altnames or node.name),"basenodeid":ObjectId(node._id)}})
+            trans_node_list.append({ObjectId(node._id): {"name": node.name, "basenodeid":ObjectId(node._id)}})
     if trans_node_list:
         return trans_node_list
 

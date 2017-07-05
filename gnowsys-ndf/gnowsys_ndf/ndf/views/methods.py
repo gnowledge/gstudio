@@ -1316,10 +1316,9 @@ def get_node_common_fields(request, node, group_id, node_type, coll_set=None):
     #         filename = slugify(name) + "-" + slugify(usrname) + "-" + ObjectId().__str__()
     #         node.content = unicode(org2html(content_org, file_prefix=filename))
     #         is_changed = True
-    if content_org:
-        if node.content != content_org:
-            node.content = unicode(content_org)
-            is_changed = True
+    if node.content != content_org:
+        node.content = unicode(content_org)
+        is_changed = True
 
     '''
     if node.content_org != content_org:
