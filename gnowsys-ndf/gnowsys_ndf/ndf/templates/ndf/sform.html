@@ -1,61 +1,45 @@
 {% extends "ndf/gbase.html" %}
 {% block title %} Elastic Search {% endblock %}
-
 {% block body_content %}
 
-	<style>
-		ul.errorlist {display: none;}
-		h3 {text-align:center;}
-		p {text-align:center;}
-		div.pagination {display: block; width: 100px; margin: 0 auto; }
-		div.form_class {text-align: right;}
-	</style>
+<style>
+	ul.errorlist {display: none;}
+	h3 {text-align:center;}
+	p {text-align:center;}
+	div.pagination {display: block; width: 100%; margin: 0 auto; }
+	div.form_class {text-align: right;}
+	#card_row li {display: inline;}
+</style>
 
-	<div class="form_class"> 
-		<form action="" method="get">
-	    {{form}}
-		<input type="submit" value="Search" />
-		</form>
-	</div> 
+<div class="form_class"> 
+	<form action="" method="get">
+    {{form}}
+	<input type="submit" value="Search" />
+	</form>
+</div> 
 
-	<br/> <br/> <br/> 
-	{% for c in header %}
-		<p>{{c|safe}}</p>
-	{% endfor %}
-
-	{% for c in alternate %}
-		<p>{{c|safe}}</p>
-	{% endfor %}
-
-	{# {% for c in content %} #}
-		{# {% for k in c %} #}
-			{# {% if k %} #}
-				{# <p>{{k}}</p> #}
-			{# {% else %} #}
-				{# <p>Media not present</p> #}
-			{# {% endif %} #}
-		{# {% endfor %} #}
-		{# <p>---------------------------------------------------------------------</p> #}
-		{# <br/> #}
-	{# {% endfor %} #}
-	<ul class="small-block-grid-1 medium-block-grid-3 large-block-grid-4">
-	{% for c in content %}
-		 <li class="card-image-wrapper">
-			{% include 'ndf/card_gsearch.html' with node=c %}
-		</li>
+<br/> <br/> <br/> 
+{% for c in header %}
+	<p>{{c|safe}}</p>
 {% endfor %}
 
+<div>
+<ul id="card_row">
+{% for c in content %}
+	<li>{% include 'ndf/card_gsearch.html' with node=c %}</li>
+{% endfor %}
+</ul>
+</div>
 
-	<div class="pagination">
-		<span class="step-links">	
-			{% for num in content.paginator.page_range %}
-			  {% ifequal num content.number %}
-			    <span class="current"><b>{{ num }}</b></span>
-			  {% else %}
-			    <a href="?page={{ num }}&query={{ request.GET.query }}&group={{ request.GET.group }}&select={{ request.GET.select }}">{{ num }}</a>
-			  {% endifequal %} 
-			{% endfor %}
-		</span>
-	</div>
-
+<div class="pagination">
+	<span class="step-links">	
+		{% for num in content.paginator.page_range %}
+		  {% ifequal num content.number %}
+		    <span class="current"><b>{{ num }}</b></span>
+		  {% else %}
+		    <a href="?page={{ num }}&query={{ request.GET.query }}&group={{ request.GET.group }}&select={{ request.GET.select }}">{{ num }}</a>
+		  {% endifequal %} 
+		{% endfor %}
+	</span>
+</div>
 {% endblock %}
