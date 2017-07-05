@@ -26,7 +26,7 @@
     <div id="student_count_div"></div>
     <div id="student_data_set_div"></div>
     <div class="controls-box hide">
-      <input type="button" value="Submit" class="radius button asset-save-button">
+      <input type="button" value="Submit" class="radius button submit-btn asset-save-button">
       <input type="button" value="Cancel" class="radius button cancel-btn asset-save-button">
     </div>
   </div>
@@ -98,24 +98,26 @@
               {% else %}
                 var mem_cell = data_row.insertCell(2);
                 var admin_cell = data_row.insertCell(3);
+
+                // Member
                 if(tuple_obj[2]){
 
-                  mem_cell.innerHTML = "<input type='checkbox' class='user_mgmt_chk' name='remove-member' checked='checked' title='Click here to Remove this user' >"
+                  mem_cell.innerHTML = "<a id='unsubscribe_from_grp' title='Click here to Remove this user' data-user-id='"+tuple_obj[0]+"'> <input type='checkbox' class='user_mgmt_chk' id='unsubscribe_from_grp ' checked='checked'></a>"
                   // mem_cell.innerHTML = "<i class='fi-x'></i><a id='unsubscribe_from_grp' title='Click here to Remove this user' data-user-id='"+tuple_obj[0]+"'> Remove</a>"
                 }
                 else{
-                  mem_cell.innerHTML = "<input type='checkbox' class='user_mgmt_chk' name='add-member' title='Click here to Add this user' >"
+                  mem_cell.innerHTML = "<input type='checkbox' class='user_mgmt_chk' name='add-member' data-user-id= '" + tuple_obj[0] + "' title='Click here to Add this user' >"
                   // mem_cell.innerHTML = "<i class='fi-check'></i><a id='subscribe_to_grp'  title='Click here to Add this user' data-user-id='"+tuple_obj[0]+"'> Add</a>"
                 }
 
-                // Add as Admin
+                // Admin
                 if(tuple_obj[3]){
-                  admin_cell.innerHTML = "<input type='checkbox' class='user_mgmt_chk' name='remove-admin' checked='checked' title='Click here to Remove this user as Admin' >"
 
+                  admin_cell.innerHTML = "<a id='unsubscribe_from_grp' title='Click here to Remove this user' data-user-id='"+tuple_obj[0]+"' data-user-admin='True'> <input type='checkbox' class='user_mgmt_chk' id='unsubscribe_from_grp ' checked='checked' ></a>"
                   // admin_cell.innerHTML = "<i class='fi-x'></i><a id='unsubscribe_from_grp' title='Click here to Remove this user' data-user-id='"+tuple_obj[0]+"' data-user-admin='True'> Remove</a>"
                 }
                 else{
-                  admin_cell.innerHTML = "<input type='checkbox' class='user_mgmt_chk' name='add-admin' title='Click here to Add this user as Admin' >"
+                  admin_cell.innerHTML = "<input type='checkbox' class='user_mgmt_chk' name='add-admin' data-user-id= '" + tuple_obj[0] + "' title='Click here to Add this user as Admin' >"
 
                   // admin_cell.innerHTML = "<i class='fi-check'></i><a id='subscribe_to_grp' title='Click here to Add this user' data-user-id='"+tuple_obj[0]+"' data-user-admin='True'> Add</a>"
                 }
@@ -150,6 +152,26 @@
     $(".data-box").hide()
   })
 
+  $(document).on("click", ".submit-btn", function() {
+    member_ids = []
+    admin_ids = []
+    $("input[type='checkbox'][name='add-member']:checked").each(function(){
+        member_ids.push($(this).attr('data-user-id'))
+    })
+    if(admin_ids.length > 0){
+      add_users(JSON.stringify(member_ids), 'False')
+    }
+    $("input[type='checkbox'][name='add-admin']:checked").each(function(){
+        admin_ids.push($(this).attr('data-user-id'))
+    })
+
+    if(admin_ids.length > 0){
+      add_users(JSON.stringify(admin_ids), 'True')
+    }
+    location.reload()
+  })
+
+
   $(document).on("click", ".select-mem", function() {
     if($(this).is(":checked")){
       $("input[name='add-member'").each(function () {
@@ -179,16 +201,26 @@
   $(document).on("click", "#subscribe_to_grp", function() {
         user_id = $(this).attr('data-user-id')
         asAdmin = $(this).attr('data-user-admin')
-        $.ajax({
-                type: "POST",
-                url: "{% url 'enroll_to_course' group_object.pk %}",
-                datatype: "json",
-                data:{
-                        user_id: user_id,
-                        asAdmin: asAdmin,
-                       csrfmiddlewaretoken: '{{ csrf_token }}'
-                  },
-                context: this,
+        add_users(user_id, asAdmin)
+    });
+
+  $(document).on("click", "#unsubscribe_from_grp", function() {
+        user_id = $(this).attr('data-user-id')
+        asAdmin = $(this).attr('data-user-admin')
+        remove_users(user_id, asAdmin)
+  });
+
+  function add_users(user_id, asAdmin){
+      $.ajax({
+              type: "POST",
+              url: "{% url 'enroll_to_course' group_object.pk %}",
+              datatype: "json",
+              data:{
+                      'user_id': user_id,
+                      'asAdmin': asAdmin,
+                      'csrfmiddlewaretoken': '{{ csrf_token }}'
+                },
+              // context: this,
               success: function(data) {
                 data = JSON.parse(data)
                 success_state = data["success"]
@@ -209,58 +241,55 @@
                     }
                     else{
                         $(this)
-                            .attr("id", "unsubscribe_from_grp")
-                            .text("Remove")
+                            // .attr("id", "unsubscribe_from_grp")
+                            // .text("Remove")
                             .attr("title", "Click here to Remove this user")
                             .prev('i').addClass('fi-x').removeClass('fi-check')
                     }
 
                 }
               }
-        });
-    });
+      });
 
-  $(document).on("click", "#unsubscribe_from_grp", function() {
-        user_id = $(this).attr('data-user-id')
-        asAdmin = $(this).attr('data-user-admin')
-
-        $.ajax({
-                type: "POST",
-                url: "{% url 'unsubscribe_from_group' group_object.pk %}",
-                datatype: "json",
-                data:{
-                        user_id: user_id,
-                        asAdmin: asAdmin,
-                       csrfmiddlewaretoken: '{{ csrf_token }}'
-                  },
-                context: this,
-                success: function(data) {
-                    data = JSON.parse(data)
-                    success_state = data["success"]
-                    grp_mem_count = data["member_count"]
-                    if(!success_state){
-                        alert("Something went wrong. Please try again later.")
+  }
+  function remove_users(user_id, asAdmin){
+    $.ajax({
+            type: "POST",
+            url: "{% url 'unsubscribe_from_group' group_object.pk %}",
+            datatype: "json",
+            data:{
+                    user_id: user_id,
+                    asAdmin: asAdmin,
+                   csrfmiddlewaretoken: '{{ csrf_token }}'
+              },
+            context: this,
+            success: function(data) {
+                data = JSON.parse(data)
+                success_state = data["success"]
+                grp_mem_count = data["member_count"]
+                if(!success_state){
+                    alert("Something went wrong. Please try again later.")
+                }
+                else{
+                    if($(this).hasClass('subscription_policy')){
+                        $(".subscription_policy")
+                            .attr("id", "subscribe_to_grp")
+                            .attr("value", "Join")
+                            .attr("title", "Join this Group")
+                        // Update Group member count in Group-dashboard
+                        $(".grp_mem_count")
+                            .text(grp_mem_count)
+                            .attr('value',grp_mem_count)
                     }
                     else{
-                        if($(this).hasClass('subscription_policy')){
-                            $(".subscription_policy")
-                                .attr("id", "subscribe_to_grp")
-                                .attr("value", "Join")
-                                .attr("title", "Join this Group")
-                            // Update Courp member count in Group-dashboard
-                            $(".grp_mem_count")
-                                .text(grp_mem_count)
-                                .attr('value',grp_mem_count)
-                        }
-                        else{
-                            $(this)
-                                .text("Add")
-                                .attr("id", "subscribe_to_grp")
-                                .attr("title", "Click here to Add this user")
-                                .prev('i').addClass('fi-check').removeClass('fi-x')
-                        }
+                        $(this)
+                            .text("Add")
+                            .attr("id", "subscribe_to_grp")
+                            .attr("title", "Click here to Add this user")
+                            .prev('i').addClass('fi-check').removeClass('fi-x')
                     }
                 }
-        });
-  });
+            }
+    });
+  }
 </script>
