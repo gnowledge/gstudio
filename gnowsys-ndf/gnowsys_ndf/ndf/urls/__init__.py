@@ -121,6 +121,7 @@ urlpatterns = patterns('',
 
     #test url
     (r'^dev-utilities/', include('gnowsys_ndf.ndf.urls.dev_utilities')),
+    (r'^tools/', include('gnowsys_ndf.ndf.urls.tools')),
     
     # meeting app
     # (r'^online/', include('online_status.urls')),   #for online_users.
