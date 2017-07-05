@@ -1,6 +1,5 @@
-
- gstudio
-=========
+gstudio
+=======
 
 gstudio is an implementation of http://www.gnu.org/software/gnowsys/
 which is a Node Description Framework (NDF). It is a frame-based
