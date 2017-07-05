@@ -38,7 +38,7 @@
                         <li>
                             <a data-reveal-id="manage_users_modal" href="{% url 'manage_users' group_id %}"  class="fi-torsos">{% trans "Manage Users" %} </a>
                             <div id="manage_users_modal" class="reveal-modal large" data-reveal style="position:absolute;">
-                                <div id="group_drawer">
+                                <div id="user_search_widget">
                                 {% include "ndf/widget_user_search.html" with subscription_status=True %}
                                 </div>
                                 <a class="close-reveal-modal">&#215;</a>
