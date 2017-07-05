@@ -5016,12 +5016,3 @@ ul.nav_menu_1 > li > a.selected, ul.nav_menu_1 > li > a:hover {
 .enroll-act_lbl {
   color: #0c2944;
 }
-
-/* line 5216, ../../../scss/_clix2017.scss */
-.user_mgmt_chk:hover {
-  width: 30px;
-  /*Desired width*/
-  height: 30px;
-  /*Desired height*/
-  cursor: pointer;
-}
