@@ -5,7 +5,7 @@ from django.shortcuts import render
 from django.http import HttpResponseRedirect
 from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 from elasticsearch import Elasticsearch		
-from gnowsys_ndf.ndf.forms import SearchForm
+from gnowsys_ndf.ndf.forms import SearchForm, AdvancedSearchForm
 from gnowsys_ndf.ndf.models import *
 from gnowsys_ndf.settings import GSTUDIO_SITE_NAME
 name_index = GSTUDIO_SITE_NAME
@@ -273,6 +273,7 @@ def search_query(index_name, select, group, query):
 
 	elif(index_name == GSTUDIO_SITE_NAME):
 		doctype = select
+		print(doctype)
 		body = query
 	
 	resultSet = []
@@ -281,7 +282,7 @@ def search_query(index_name, select, group, query):
 	
 	while(True):
 		body['from'] = i
-		res = es.search(index = index_name, body = body)
+		res = es.search(index = index_name,doc_type = doctype ,body = body)
 		l = len(res["hits"]["hits"])
 		print (body)
 		if(l==0):
@@ -298,3 +299,10 @@ def search_query(index_name, select, group, query):
 
 	return resultSet
 
+def advanced_search(request):
+	form = AdvancedSearchForm(request.GET)
+	query = request.GET.get("query")
+	if(query):
+		pass
+	else:
+		return render(request, 'ndf/advanced_search1.html', {'form': form})

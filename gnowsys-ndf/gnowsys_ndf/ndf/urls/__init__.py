@@ -18,7 +18,7 @@ from gnowsys_ndf.ndf.views.methods import tag_info
 from gnowsys_ndf.ndf.views.custom_app_view import custom_app_view, custom_app_new_view
 from gnowsys_ndf.ndf.views import rpc_resources
 
-from gnowsys_ndf.ndf.views.esearch import get_search#, adv_search
+from gnowsys_ndf.ndf.views.esearch import get_search
 
 if GSTUDIO_SITE_NAME.lower() == 'clix':
     login_template = 'registration/login_clix.html'
@@ -48,8 +48,8 @@ urlpatterns = patterns('',
     # --end of mobwrite
 
     url(r'^esearch/?', get_search, name="get_search"),
-    #url(r'^advanced/?', adv_search, name="adv_search"),
-    # url(r'^esearch/advanced/?',advanced_search,name='advanced_search')
+    #url(r'^advanced/?', advanced_search, name="advanced_search"),
+    #url(r'^esearch//?',advanced_search,name='advanced_search')
 
     # url(r'^(?P<group_id>[^/]+)/mailclient[/]error[/](?P<error_obj>[\w-]+)$', 'gnowsys_ndf.ndf.views.mailclient.mailclient_error_display', name='mailclient_error_display'),
 
