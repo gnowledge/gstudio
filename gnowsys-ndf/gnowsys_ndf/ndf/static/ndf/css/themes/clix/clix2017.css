@@ -5016,3 +5016,9 @@ ul.nav_menu_1 > li > a.selected, ul.nav_menu_1 > li > a:hover {
 .enroll-act_lbl {
   color: #0c2944;
 }
+
+/* line 5214, ../../../scss/_clix2017.scss */
+.user-search-box-ele {
+  display: inline-block;
+  width: 30%;
+}
