@@ -204,18 +204,21 @@ table td{
     if(admin_ids.length > 0){
       add_users(JSON.stringify(admin_ids), 'True')
     }
-    location.reload()
   })
 
   function update_data_and_label(chk_ele){
+    subscription_user_type = mem_subscription_data
+    if ($(chk_ele).attr('data-user-admin') == 'True'){
+      subscription_user_type = adm_subscription_data
+    }
     if($(chk_ele).attr('data-checked-status') && !($(chk_ele).is(':checked'))){
-      mem_subscription_data["removed"][$(chk_ele).attr('data-user-name')] = $(chk_ele).attr('data-user-id')
+      subscription_user_type["removed"][$(chk_ele).attr('data-user-name')] = $(chk_ele).attr('data-user-id')
     }
     else if(!$(chk_ele).attr('data-checked-status') && ($(chk_ele).is(':checked'))){
-      mem_subscription_data["added"][$(chk_ele).attr('data-user-name')] = $(chk_ele).attr('data-user-id')
+      subscription_user_type["added"][$(chk_ele).attr('data-user-name')] = $(chk_ele).attr('data-user-id')
     }
     if (!($(chk_ele).is(':checked'))){
-      delete mem_subscription_data['added'][$(chk_ele).attr('data-user-name')]
+      delete subscription_user_type['added'][$(chk_ele).attr('data-user-name')]
     }
     update_status_lbl()
   }
@@ -282,41 +285,41 @@ table td{
   });
 
   function add_users(user_id, asAdmin){
-      $.ajax({
-              type: "POST",
-              url: "{% url 'enroll_to_course' group_id %}",
-              datatype: "json",
-              data:{
-                      'user_id': user_id,
-                      'asAdmin': asAdmin,
-                      'csrfmiddlewaretoken': '{{ csrf_token }}'
-                },
-              // context: this,
-              success: function(data) {
-                data = JSON.parse(data)
-                success_state = data["success"]
-                grp_mem_count = data["member_count"]
-                if(!success_state){
-                    alert("Something went wrong. Please try again later.")
-                }
-                else{
-                    if($(this).hasClass('subscription_policy')){
-                        $(".subscription_policy")
-                            .attr("id", "unsubscribe_from_grp")
-                            .attr("value", "Unsubscribe")
-                            .attr("title", "Unsubscribe from this group")
-                        // Update Courp member count in Group-dashboard
-                        $(".grp_mem_count")
-                            .text(grp_mem_count)
-                            .attr('value',grp_mem_count)
-                    }
-                    else{
-                        console.log("Need to workout")
-                    }
+    $.ajax({
+      type: "POST",
+      url: "{% url 'enroll_to_course' group_id %}",
+      datatype: "json",
+      data:{
+              'user_id': user_id,
+              'asAdmin': asAdmin,
+              'csrfmiddlewaretoken': '{{ csrf_token }}'
+        },
+      // context: this,
+      success: function(data) {
+        data = JSON.parse(data)
+        success_state = data["success"]
+        grp_mem_count = data["member_count"]
+        if(!success_state){
+            alert("Something went wrong. Please try again later.")
+        }
+        else{
+            if($(this).hasClass('subscription_policy')){
+                $(".subscription_policy")
+                    .attr("id", "unsubscribe_from_grp")
+                    .attr("value", "Unsubscribe")
+                    .attr("title", "Unsubscribe from this group")
+                // Update Courp member count in Group-dashboard
+                $(".grp_mem_count")
+                    .text(grp_mem_count)
+                    .attr('value',grp_mem_count)
+            }
+            else{
+                console.log("Need to workout")
+            }
 
-                }
-              }
-      });
+        }
+      }
+    });
   }
 
   function remove_users(user_id, asAdmin){
