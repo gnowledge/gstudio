@@ -127,47 +127,48 @@ def get_search(request):
 
 
 
-				if(queryNameInfo[0]==0 and queryContentInfo[0]==0 and queryTagsInfo[0]==0):#if we didnt find any suggestion, neither did we find the query already indexed
-					query_body = {"query": {
-										"multi_match": { 											#first do a multi_match
-											"query" : query,
-											"type": "best_fields",									#when multiple words are there in the query, try to search for those words in a single field
-											"fields": ["name^3", "altnames", "content^2", "tags"],	#in which field to search the query
-											"minimum_should_match": "30%"
-											}
-										},
-									"rescore": {													#rescoring the top 50 results of multi_match
-										"window_size": 50,
-										"query": {
-											"rescore_query": {
-												"bool": {											#rescoring using match phrase
-													"should": [
-														{"match_phrase": {"name": { "query": query, "slop":2}}},
-														{"match_phrase": {"altnames": { "query": query, "slop": 2}}},
-														{"match_phrase": {"content": { "query": query, "slop": 4}}}
-													]
+					if(queryNameInfo[0]==0 and queryContentInfo[0]==0 and queryTagsInfo[0]==0):#if we didnt find any suggestion, neither did we find the query already indexed
+						query_body = {"query": {
+											"multi_match": { 											#first do a multi_match
+												"query" : query,
+												"type": "best_fields",									#when multiple words are there in the query, try to search for those words in a single field
+												"fields": ["name^3", "altnames", "content^2", "tags"],	#in which field to search the query
+												"minimum_should_match": "30%"
+												}
+											},
+										"rescore": {													#rescoring the top 50 results of multi_match
+											"window_size": 50,
+											"query": {
+												"rescore_query": {
+													"bool": {											#rescoring using match phrase
+														"should": [
+															{"match_phrase": {"name": { "query": query, "slop":2}}},
+															{"match_phrase": {"altnames": { "query": query, "slop": 2}}},
+															{"match_phrase": {"content": { "query": query, "slop": 4}}}
+														]
+													}
 												}
 											}
-										}
-									},
-									"from": 0,
-									"size": 100
-								}
+										},
+										"from": 0,
+										"size": 100
+									}
 
-				else: #if we found a suggestion or if the query exists as a phrase in one of the name/content/tags field
-					query_body = {"query": {
-										"multi_match": {
-											"query": query,
-											"fields": ["name^3", "altnames", "content^2", "tags"],
-											"type": "phrase", #we are doing a match phrase on multi field.
-											"slop": 5
-										}
-									},
-									"from": 0,
-									"size": 100
-								}
+					else: #if we found a suggestion or if the query exists as a phrase in one of the name/content/tags field
+						query_body = {"query": {
+											"multi_match": {
+												"query": query,
+												"fields": ["name^3", "altnames", "content^2", "tags"],
+												"type": "phrase", #we are doing a match phrase on multi field.
+												"slop": 5
+											}
+										},
+										"from": 0,
+										"size": 100
+									}
 
-				query_display = query
+					query_display = query
+					
 				resultSet = search_query(GSTUDIO_SITE_NAME, select, group, query_body)
 				hits = "<h3>No of docs found: <b>%d</b></h3>" % len(resultSet)
 				if(group=="all"):
