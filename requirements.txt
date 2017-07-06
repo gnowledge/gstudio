@@ -13,8 +13,8 @@ django-passwords==0.2.0
 # gunicorn==19.0.0
 # markdown==2.4.1
 django-json-rpc==0.6.3
-https://bitbucket.org/zalew/django-online-status/get/tip.zip
-git+https://github.com/anujag/django-registration-email.git
+#https://bitbucket.org/zalew/django-online-status/get/tip.zip
+#git+https://github.com/anujag/django-registration-email.git
 stemming==1.0.1
 numpy==1.9.0
 python-memcached==1.58
@@ -59,6 +59,7 @@ waitress==0.8.10
 bs4==0.0.1
 html==1.16
 checksumdir==1.1.0
-
 # version needed to overwrite on all above intermediate installs
 pymongo==2.8
+elasticsearch==5.4.0
+

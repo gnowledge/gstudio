@@ -1,0 +1,247 @@
+{
+    "5752ad552e01310a05dca4c3": [
+        "event_organised_by", 
+        "event_coordinator", 
+        "has_attendees", 
+        "has_attended"
+    ], 
+    "5752ad552e01310a05dca4c1": [], 
+    "5752ad552e01310a05dca4c5": [], 
+    "58bc50655a162d332b5d6f7a": [], 
+    "58bc50415a162d3263863bf4": [], 
+    "58bc50415a162d3263863bf6": [], 
+    "58bc50415a162d3263863bf0": [], 
+    "58bc50415a162d3263863bf2": [], 
+    "5752ad562e01310a05dca4ef": [], 
+    "5752ad562e01310a05dca4ed": [], 
+    "5752ad562e01310a05dca4eb": [], 
+    "5752ad552e01310a05dca4a9": [], 
+    "5752ad562e01310a05dca4f9": [], 
+    "5752ad552e01310a05dca4a1": [], 
+    "5752ad552e01310a05dca4a3": [], 
+    "5752ad552e01310a05dca4a5": [], 
+    "5752ad552e01310a05dca4a7": [], 
+    "5752ad8a2e01310f17fd0b7b": [
+        "organization_belongs_to_district", 
+        "organization_belongs_to_state", 
+        "organization_belongs_to_country", 
+        "affiliated_college"
+    ], 
+    "5752ad8a2e01310f17fd0b7f": [
+        "announced_for", 
+        "acourse_for_college"
+    ], 
+    "5752ad8a2e01310f17fd0b7d": [
+        "organization_belongs_to_district", 
+        "organization_belongs_to_state", 
+        "organization_belongs_to_country"
+    ], 
+    "5752ad552e01310a05dca4ab": [], 
+    "5752ad552e01310a05dca4ad": [], 
+    "5752ad552e01310a05dca4af": [], 
+    "5752ad562e01310a05dca4e9": [], 
+    "5752ad562e01310a05dca4e7": [], 
+    "5752ad562e01310a05dca4e5": [], 
+    "5752ad562e01310a05dca4e3": [], 
+    "5752ad562e01310a05dca4e1": [], 
+    "5752ad8a2e01310f17fd0b73": [], 
+    "5752ad8a2e01310f17fd0b71": [], 
+    "5752ad8a2e01310f17fd0b77": [
+        "district_of"
+    ], 
+    "5752ad8a2e01310f17fd0b75": [], 
+    "5752ad8a2e01310f17fd0b79": [], 
+    "5752ad562e01310a05dca4cd": [], 
+    "5752ad562e01310a05dca4cf": [], 
+    "5752ad562e01310a05dca4cb": [], 
+    "58bc50415a162d3263863bee": [], 
+    "5752ad8a2e01310f17fd0b8b": [
+        "person_belongs_to_district", 
+        "person_belongs_to_state", 
+        "person_belongs_to_country", 
+        "faculty_incharge_of_university", 
+        "faculty_incharge_of_college"
+    ], 
+    "58bc50415a162d3263863bea": [
+        "has_assetcontent"
+    ], 
+    "5752ad8a2e01310f17fd0b8f": [
+        "person_belongs_to_district", 
+        "person_belongs_to_state", 
+        "person_belongs_to_country", 
+        "developer_of_course"
+    ], 
+    "58bc50415a162d3263863bec": [], 
+    "5752ad8a2e01310f17fd0b8d": [
+        "person_belongs_to_district", 
+        "person_belongs_to_state", 
+        "person_belongs_to_country"
+    ], 
+    "5752ad562e01310a05dca4d1": [], 
+    "5752ad8a2e01310f17fd0b99": [
+        "event_organised_by", 
+        "event_coordinator", 
+        "has_attendees", 
+        "has_attended"
+    ], 
+    "5752ad562e01310a05dca4d3": [], 
+    "5752ad562e01310a05dca4d5": [], 
+    "5752ad562e01310a05dca4d7": [], 
+    "5752ad562e01310a05dca4d9": [], 
+    "5752ad8a2e01310f17fd0b91": [
+        "person_belongs_to_district", 
+        "person_belongs_to_state", 
+        "person_belongs_to_country"
+    ], 
+    "5752ad8a2e01310f17fd0b93": [
+        "person_belongs_to_district", 
+        "person_belongs_to_state", 
+        "person_belongs_to_country", 
+        "officer_incharge_of"
+    ], 
+    "5752ad8a2e01310f17fd0b95": [
+        "person_belongs_to_district", 
+        "person_belongs_to_state", 
+        "person_belongs_to_country"
+    ], 
+    "5752ad8a2e01310f17fd0b97": [
+        "person_belongs_to_district", 
+        "person_belongs_to_state", 
+        "person_belongs_to_country"
+    ], 
+    "5752ad8b2e01310f17fd0bbb": [], 
+    "5752ad8b2e01310f17fd0bbf": [], 
+    "5752ad8b2e01310f17fd0bbd": [], 
+    "58fe09b7a31c740222797f7a": [], 
+    "5752ad8b2e01310f17fd0ba9": [
+        "event_organised_by", 
+        "event_coordinator", 
+        "has_attendees", 
+        "has_attended"
+    ], 
+    "5752ad8b2e01310f17fd0ba7": [
+        "event_organised_by", 
+        "event_coordinator", 
+        "has_attendees", 
+        "has_attended", 
+        "event_has_batch", 
+        "session_of"
+    ], 
+    "5752ad8b2e01310f17fd0ba5": [
+        "event_organised_by", 
+        "event_coordinator", 
+        "has_attendees", 
+        "has_attended"
+    ], 
+    "5752ad8b2e01310f17fd0ba3": [
+        "event_organised_by", 
+        "event_coordinator", 
+        "has_attendees", 
+        "has_attended"
+    ], 
+    "5752ad8b2e01310f17fd0ba1": [
+        "event_organised_by", 
+        "event_coordinator", 
+        "has_attendees", 
+        "has_attended"
+    ], 
+    "5752ad562e01310a05dca4db": [], 
+    "5752ad562e01310a05dca4dd": [], 
+    "5752ad562e01310a05dca4df": [], 
+    "5752ad572e01310a05dca4ff": [], 
+    "58bc50415a162d3263863bf8": [], 
+    "5752ad8a2e01310f17fd0b9b": [
+        "event_organised_by", 
+        "event_coordinator", 
+        "has_attendees", 
+        "has_attended"
+    ], 
+    "5752ad572e01310a05dca4fb": [], 
+    "5752ad8a2e01310f17fd0b89": [
+        "person_belongs_to_state", 
+        "person_belongs_to_district", 
+        "master_trainer_of_course", 
+        "master_trainer_of_university"
+    ], 
+    "5752ad562e01310a05dca4c7": [], 
+    "58bc50415a162d3263863be8": [], 
+    "5752ad8a2e01310f17fd0b83": [], 
+    "5752ad8a2e01310f17fd0b81": [], 
+    "5752ad8a2e01310f17fd0b87": [
+        "person_belongs_to_state", 
+        "person_belongs_to_district", 
+        "trainer_teaches_course_in_college"
+    ], 
+    "5752ad562e01310a05dca4c9": [], 
+    "5752ad8a2e01310f17fd0b85": [
+        "student_of_caste_category", 
+        "person_belongs_to_state", 
+        "person_belongs_to_district", 
+        "student_belongs_to_university", 
+        "student_belongs_to_college", 
+        "selected_course"
+    ], 
+    "5752ad8b2e01310f17fd0baf": [
+        "for_acourse", 
+        "for_college", 
+        "for_university", 
+        "has_current_approval_task"
+    ], 
+    "5752ad8b2e01310f17fd0bad": [], 
+    "5752ad8b2e01310f17fd0bab": [
+        "event_organised_by", 
+        "event_coordinator", 
+        "has_attendees", 
+        "has_attended", 
+        "event_has_batch", 
+        "session_of"
+    ], 
+    "5752ad8b2e01310f17fd0bb3": [], 
+    "5752ad8b2e01310f17fd0bb1": [], 
+    "5752ad8b2e01310f17fd0bb7": [], 
+    "5752ad8b2e01310f17fd0bb5": [], 
+    "5752ad8b2e01310f17fd0bb9": [], 
+    "5752ad562e01310a05dca4f3": [], 
+    "5752ad552e01310a05dca4bb": [], 
+    "5752ad552e01310a05dca4bd": [
+        "event_organised_by", 
+        "event_coordinator", 
+        "has_attendees", 
+        "has_attended"
+    ], 
+    "5752ad552e01310a05dca4bf": [], 
+    "5752ad562e01310a05dca4f1": [], 
+    "5752ad562e01310a05dca4f7": [], 
+    "5752ad572e01310a05dca50b": [], 
+    "5752ad8b2e01310f17fd0bc1": [
+        "clone_of"
+    ], 
+    "5752ad562e01310a05dca4f5": [], 
+    "5752ad8b2e01310f17fd0bc3": [], 
+    "5752ad572e01310a05dca4fd": [], 
+    "5752ad552e01310a05dca4b1": [], 
+    "5752ad552e01310a05dca4b3": [], 
+    "5752ad552e01310a05dca4b5": [], 
+    "5752ad552e01310a05dca4b7": [], 
+    "5752ad552e01310a05dca4b9": [], 
+    "5943a745cc5dd107d889aadb": [], 
+    "58bc50405a162d3263863be4": [], 
+    "58bc50405a162d3263863be6": [], 
+    "5752ad8b2e01310f17fd0b9f": [
+        "event_organised_by", 
+        "event_coordinator", 
+        "has_attendees", 
+        "has_attended"
+    ], 
+    "5752ad8b2e01310f17fd0b9d": [
+        "event_organised_by", 
+        "event_coordinator", 
+        "has_attendees", 
+        "has_attended"
+    ], 
+    "5752ad572e01310a05dca509": [], 
+    "5752ad572e01310a05dca505": [], 
+    "5752ad572e01310a05dca507": [], 
+    "5752ad572e01310a05dca501": [], 
+    "5752ad572e01310a05dca503": []
+}
