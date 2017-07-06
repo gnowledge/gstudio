@@ -8,6 +8,7 @@ from elasticsearch import Elasticsearch
 from gnowsys_ndf.ndf.forms import SearchForm
 from gnowsys_ndf.ndf.models import *
 from gnowsys_ndf.settings import GSTUDIO_SITE_NAME
+from gnowsys_ndf.local_settings import GSTUDIO_NO_OF_OBJS_PP
 
 es = Elasticsearch(['http://elsearch:changeit@gsearch:9200'])
 author_map = {}
@@ -176,7 +177,7 @@ def get_search(request):
 					res_list = ['<h3>Showing results for <b>%s</b> in group <b>"%s"</b>:</h3>' % (query_display,group_map[str(group)]), hits]
 				med_list = get_search_results(resultSet)
 				
-		paginator = Paginator(med_list, 10)
+		paginator = Paginator(med_list, GSTUDIO_NO_OF_OBJS_PP)
 		page = request.GET.get('page')
 		print(page)
 		try:
