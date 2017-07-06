@@ -16,31 +16,29 @@ except ImportError:  # old pymongo
 
 
 ''' -- imports from application folders/files -- '''
-from gnowsys_ndf.ndf.models import node_collection, triple_collection, gridfs_collection, NodeJSONEncoder
+from gnowsys_ndf.ndf.models import node_collection, triple_collection, gridfs_collection, NodeJSONEncoder,Author, Buddy
 
 def tools_logging(request):
 
 	#test method for tools logging
 	userdata = json.loads(request.GET.get('user_data',' '))
-	print "userdata++++++++++++++++",userdata
 	app_name = request.GET.get('app_name',' ')
 	old_data = []
-	new_data = []
-	if userdata['user_id']:
+	buddies_authid_list = request.session.get('buddies_authid_list', [])
+	buddy_id_list = Author.get_user_id_list_from_author_oid_list(buddies_authid_list)
+	if not buddy_id_list:
+		buddy_id_list = []
+		buddy_id_list.append(userdata['user_id'])
+	if userdata['user_id'] and userdata['user_id']!= "None":
 		if not os.path.exists('/data/gstudio_tools_logs/'+app_name+'/'+userdata['params']['language']):
 			os.makedirs('/data/gstudio_tools_logs/'+app_name+'/'+userdata['params']['language'])
 		
-		if os.path.exists('/data/gstudio_tools_logs/'+app_name+'/'+userdata['params']['language']+'/'+userdata['user_id']+'.json'):
-			with open('/data/gstudio_tools_logs/'+app_name+'/'+userdata['params']['language']+'/'+userdata['user_id']+'.json') as rfile:
-				if os.stat('/data/gstudio_tools_logs/'+app_name+'/'+userdata['params']['language']+'/'+userdata['user_id']+'.json').st_size != 0:
-					old_data = json.load(rfile)
-					print "old_data--------------------",old_data,type(old_data)
-		with open('/data/gstudio_tools_logs/'+app_name+'/'+userdata['params']['language']+'/'+userdata['user_id']+'.json', 'w') as wrfile:
-			new_data = old_data.append(userdata)
-			print "new_data--------------------",new_data,type(new_data),old_data
-			json.dump(old_data, wrfile)
-			# if not old_data:
-			# 	json.dump(userdata, wrfile)
-			# else:
-	
+		for each_id in buddy_id_list:
+			if os.path.exists('/data/gstudio_tools_logs/'+app_name+'/'+userdata['params']['language']+'/'+str(each_id)+'.json'):
+				with open('/data/gstudio_tools_logs/'+app_name+'/'+userdata['params']['language']+'/'+str(each_id)+'.json') as rfile:
+					if os.stat('/data/gstudio_tools_logs/'+app_name+'/'+userdata['params']['language']+'/'+str(each_id)+'.json').st_size != 0:
+						old_data = json.load(rfile)
+			with open('/data/gstudio_tools_logs/'+app_name+'/'+userdata['params']['language']+'/'+str(each_id)+'.json', 'w') as wrfile:
+				old_data.append(userdata)
+				json.dump(old_data, wrfile)	
 	return StreamingHttpResponse("Success")	
