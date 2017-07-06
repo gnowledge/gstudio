@@ -27984,3 +27984,8 @@ h5 {
   font-size: 23px;
   color: #6153AE;
 }
+
+/* line 4662, ../../../scss/_app_styles.scss */
+.text-center {
+  text-align: center !important;
+}

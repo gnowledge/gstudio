@@ -27962,6 +27962,11 @@ h5 {
   color: #6153AE;
 }
 
+/* line 4662, ../../../scss/_app_styles.scss */
+.text-center {
+  text-align: center !important;
+}
+
 /*
 *  CLIx Platform Stylesheet
 */
