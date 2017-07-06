@@ -8,7 +8,6 @@
 	p {text-align:center;}
 	div.pagination {display: block; width: 100%; margin: 0 auto; }
 	div.form_class {text-align: right;}
-	#card_row li {display: inline;}
 </style>
 
 <div class="form_class"> 
@@ -24,9 +23,11 @@
 {% endfor %}
 
 <div>
-<ul id="card_row">
+<ul class="small-block-grid-1 medium-block-grid-3 large-block-grid-4">
 {% for c in content %}
-	<li>{% include 'ndf/card_group.html' with node=c %}</li>
+	<li class="card-image-wrapper">
+	{% include 'ndf/card_gsearch.html' with node=c %}
+	</li>
 {% endfor %}
 </ul>
 </div>
