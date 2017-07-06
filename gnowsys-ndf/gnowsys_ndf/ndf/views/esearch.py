@@ -7,8 +7,7 @@ from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 from elasticsearch import Elasticsearch		
 from gnowsys_ndf.ndf.forms import SearchForm
 from gnowsys_ndf.ndf.models import *
-from gnowsys_ndf.settings import GSTUDIO_SITE_NAME
-from gnowsys_ndf.local_settings import GSTUDIO_NO_OF_OBJS_PP
+from gnowsys_ndf.settings import GSTUDIO_SITE_NAME,GSTUDIO_NO_OF_OBJS_PP
 
 es = Elasticsearch(['http://elsearch:changeit@gsearch:9200'])
 author_map = {}
