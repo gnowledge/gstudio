@@ -21,7 +21,9 @@ GROUP_CHOICES.append(("all","All"))
 group_map = {}
 gsystem_map = {}
 attribute_map = {}
+
 relation_map = {}
+
 
 with open("/home/docker/code/gstudio/gnowsys-ndf/gnowsys_ndf/ndf/mappings/groupmap_clix.json", 'r') as gm:
     group_map = json.load(gm)
