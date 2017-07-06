@@ -136,7 +136,7 @@ def main():
 	print("Response for index creation")
 	print(res)
 
-	all_docs = node_collection.find(TIMEOUT=False)
+	all_docs = node_collection.find(no_cursor_timeout=True).batch_size(5)
 	index_docs(all_docs)
 
 	f = open("/home/docker/code/gstudio/gnowsys-ndf/gnowsys_ndf/ndf/mapping_files/authormap_clix.json","w")
