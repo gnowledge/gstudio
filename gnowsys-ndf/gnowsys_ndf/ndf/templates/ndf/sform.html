@@ -1,0 +1,50 @@
+{% extends "ndf/gbase.html" %}
+{% block title %} Elastic Search {% endblock %}
+{% block body_content %}
+
+<style>
+	ul.errorlist {display: none;}
+	h3 {text-align:center;}
+	p {text-align:center;}
+	div.pagination {display: block; width: 10%; margin: 0 auto; }
+</style>
+
+<div class="form_class"> 
+	<form action="" method="get">
+	<ul class="small-block-grid-1 medium-block-grid-3 large-block-grid-4">
+    <li>{{form.query}}</li>
+    <li>{{form.group}}</li>
+    <li>{{form.select}}</li>
+    <li><input type="submit" value="Search" /></li>
+    </ul>
+    </form>
+</div> 
+
+<br/> 
+{% for c in header %}
+	<p>{{c|safe}}</p>
+{% endfor %}
+
+<div>
+<ul class="small-block-grid-1 medium-block-grid-3 large-block-grid-4">
+{% for c in content %}
+	<li class="card-image-wrapper">
+	{% include 'ndf/card_gsearch.html' with node=c %}
+	</li>
+{% endfor %}
+</ul>
+</div>
+
+<div class="pagination">
+	<span class="step-links">	
+		{% for num in content.paginator.page_range %}
+		  {% ifequal num content.number %}
+		    <span class="current"><b>{{ num }}</b></span>
+		  {% else %}
+		    <a href="?page={{ num }}&query={{ request.GET.query }}&group={{ request.GET.group }}&select={{ request.GET.select }}">{{ num }}</a>
+		  {% endifequal %} 
+		{% endfor %}
+	</span>
+</div>
+
+{% endblock %}
