@@ -1,5 +1,6 @@
 import re
 import json
+import os
 from django.shortcuts import render
 from django.http import HttpResponseRedirect
 from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
@@ -12,11 +13,15 @@ es = Elasticsearch(['http://elsearch:changeit@gsearch:9200'])
 author_map = {}
 group_map = {}
 
-with open('/home/docker/code/gstudio/gnowsys-ndf/gnowsys_ndf/ndf/mappings/authormap.json') as fe:
-	author_map = json.load(fe)
+if(os.path.isdir('/home/docker/code/gstudio/gnowsys-ndf/gnowsys_ndf/ndf/mappings')):
+	with open('/home/docker/code/gstudio/gnowsys-ndf/gnowsys_ndf/ndf/mappings/authormap_clix.json') as fe:
+		author_map = json.load(fe)
 
-with open('/home/docker/code/gstudio/gnowsys-ndf/gnowsys_ndf/ndf/mappings/groupmap.json') as fe:
-	group_map = json.load(fe)
+	with open('/home/docker/code/gstudio/gnowsys-ndf/gnowsys_ndf/ndf/mappings/groupmap_clix.json') as fe:
+		group_map = json.load(fe)
+
+else:
+	print("No mapping found!")
 
 hits = ""
 med_list = []		 #contains all the search results
@@ -25,150 +30,155 @@ results = []		 #contains a single page's results
 author_index = "author_" + GSTUDIO_SITE_NAME
 
 def get_search(request): 
-	
+	global med_list
+	global res_list
+	global results
 	form = SearchForm(request.GET)
 	query = request.GET.get("query")
 	if(query):
-		print(query)
-		query_display = ""
-		group = request.GET.get('group')
-		select = request.GET.get('select')
-		
-		if(select=="Author"):
-			resultSet = search_query(author_index, select, group, query)
-			hits =  "<h3> No of docs found: <b>%d</b></h3> " % len(resultSet)
-			med_list = get_search_results(resultSet)
-			if(group == "all"):
-				res_list = ['<h3>  Showing contributions of user <b>%s</b> in all groups:</h3> ' % (query), hits]
-			else:
-				res_list = ['<h3>  Showing contributions of user <b>%s</b> in group <b>%s</b>":</h3> ' % (query,group_map[str(group)]), hits]
+		page = request.GET.get("page")
+		if(page is None):
+			print(query)
+			query_display = ""
+			group = request.GET.get('group')
+			select = request.GET.get('select')
 			
-		else:
-			if(select=="all"):
-				select = "Author,image,video,text,application,audio,NotMedia"
-
-			phsug_name = get_suggestion_body(query,field_value = "name.trigram",slop_value = 2,field_name_value = "name")
-			phsug_content = get_suggestion_body(query,field_value = "content.trigram",slop_value = 3,field_name_value = "content")
-			phsug_tags = get_suggestion_body(query,field_value = "tags.trigram",slop_value = 2,field_name_value = "tags")
-
-			queryNameInfo = [0,0.0,"",""] #[queryNameInfo[0],queryNameInfo[1],queryNameInfo[2],query_display_name]
-			queryContentInfo = [0,0.0,"",""]
-			queryTagsInfo = [0,0.0,"",""]
-
-			dqlis = [] 			# a list containing all the text inserted within double quotes
-			q = "" 				# a string to hold the text not enclosed within ""
-
-			#including quotes
-			if('"' in query):
-				l = re.split('(")', query) # this will split the query into tokens where delemiter is " and the delimiter is itself a token 
-				qlist = list(filter(lambda a: a!='', l))
+			if(select=="Author"):
+				resultSet = search_query(author_index, select, group, query)
+				hits =  "<h3> No of docs found: <b>%d</b></h3> " % len(resultSet)
+				med_list = get_search_results(resultSet)
+				if(group == "all"):
+					res_list = ['<h3>  Showing contributions of user <b>%s</b> in all groups:</h3> ' % (query), hits]
+				else:
+					res_list = ['<h3>  Showing contributions of user <b>%s</b> in group <b>%s</b>":</h3> ' % (query,group_map[str(group)]), hits]
 				
-				itr = 0
-				while(itr<len(qlist)):
-					if(qlist[itr]=='"'):
-						if(itr+2<len(qlist) and qlist[itr+2]=='"'):
-							dqlis.append(qlist[itr+1])
-							itr+=2
-					else:
-						q += qlist[itr]
-					itr += 1
-
-			print(dqlis, q)
-
-			#dealing with the case when the user has given "" in the query
-			if(len(dqlis)>0):
-				query_body = '{ "query": {"bool": { "should": ['
-				for quot in dqlis:
-					query_body += ('{"multi_match": {"query": "%s", "fields": ["name^3", "altnames", "content^2", "tags"], "type": "phrase"}},' % (quot))
-				if(q!=''):
-					query_body += ('{"multi_match": {"query": "%s", "fields": ["name^3", "altnames", "content^2", "tags"], "type": "best_fields"}},' % (q))
-				query_body += (']}}, "from": 0, "size": 100}')
-				query_body = eval(query_body)	
-				query_display = query
-
 			else:
+				if(select=="all"):
+					select = "Author,image,video,text,application,audio,NotMedia"
 
-				get_suggestion(phsug_name, queryNameInfo, select, query, "name")
-				if(queryNameInfo[2]!=query):
-					get_suggestion(phsug_content, queryContentInfo, select, query, "content")
-				if(queryNameInfo[2]!=query and queryContentInfo[2]!=query):
-					get_suggestion(phsug_tags, queryTagsInfo, select, query, "tags")
+				phsug_name = get_suggestion_body(query, field_value = "name.trigram", slop_value = 2, field_name_value = "name")
+				phsug_content = get_suggestion_body(query, field_value = "content.trigram", slop_value = 3, field_name_value = "content")
+				phsug_tags = get_suggestion_body(query, field_value = "tags.trigram", slop_value = 2, field_name_value = "tags")
 
-				print (queryNameInfo[0],queryContentInfo[0],queryTagsInfo[0])
-				query_display = ""
+				queryNameInfo = [0, 0.0, "", ""] #[queryNameInfo[0],queryNameInfo[1],queryNameInfo[2],query_display_name]
+				queryContentInfo = [0, 0.0, "", ""]
+				queryTagsInfo = [0, 0.0, "", ""]
 
-				#what if all are 1 and 2/3 names are same but the third one has higher score
-				if((queryNameInfo[0]==1 and queryNameInfo[2]==query) or (queryContentInfo[0]==1 and queryContentInfo[2]==query) or (queryTagsInfo[0]==1 and queryTagsInfo[2]==query)): 
-					#if the original query is the query to be searched
+				dqlis = [] 			# a list containing all the text inserted within double quotes
+				q = "" 				# a string to hold the text not enclosed within ""
+
+				#including quotes
+				if('"' in query):
+					l = re.split('(")', query) # this will split the query into tokens where delemiter is " and the delimiter is itself a token 
+					qlist = list(filter(lambda a: a!='', l))
+					
+					itr = 0
+					while(itr<len(qlist)):
+						if(qlist[itr]=='"'):
+							if(itr+2<len(qlist) and qlist[itr+2]=='"'):
+								dqlis.append(qlist[itr+1])
+								itr+=2
+						else:
+							q += qlist[itr]
+						itr += 1
+
+				print(dqlis, q)
+
+				#dealing with the case when the user has given "" in the query
+				if(len(dqlis)>0):
+					query_body = '{ "query": {"bool": { "should": ['
+					for quot in dqlis:
+						query_body += ('{"multi_match": {"query": "%s", "fields": ["name^3", "altnames", "content^2", "tags"], "type": "phrase"}},' % (quot))
+					if(q!=''):
+						query_body += ('{"multi_match": {"query": "%s", "fields": ["name^3", "altnames", "content^2", "tags"], "type": "best_fields"}},' % (q))
+					query_body += (']}}, "from": 0, "size": 100}')
+					query_body = eval(query_body)	
 					query_display = query
-				elif(queryNameInfo[0]==0 and queryContentInfo[0]==0 and queryTagsInfo[0]==0):																		
-					#if we didnt find any suggestion, neither did we find the query already indexed->query remains same
-					query_display = query
-				else: #if we found a suggestion 
-					res1_list = ['Search instead for <a href="">%s</a>'%(query)] #if the user still wants to search for the original query he asked for
-					if(queryNameInfo[1]>=queryContentInfo[1] and queryNameInfo[1]>=queryTagsInfo[1]):						 #comparing the scores of name,content,tags suggestions and finding the max of the three
-						query = queryNameInfo[2]
-						query_display = queryNameInfo[3]					 #what query to display on the search result screen
-					if(queryContentInfo[1]>queryNameInfo[1] and queryContentInfo[1]>=queryTagsInfo[1]):
-						query = queryContentInfo[2]
-						query_display = queryContentInfo[3]
-					if(queryTagsInfo[1]>queryContentInfo[1] and queryTagsInfo[1]>queryNameInfo[1]):
-						query = queryTagsInfo[2]
-						query_display = queryTagsInfo[3]
+
+				else:
+
+					get_suggestion(phsug_name, queryNameInfo, select, query, "name")
+					if(queryNameInfo[2]!=query):
+						get_suggestion(phsug_content, queryContentInfo, select, query, "content")
+					if(queryNameInfo[2]!=query and queryContentInfo[2]!=query):
+						get_suggestion(phsug_tags, queryTagsInfo, select, query, "tags")
+
+					print (queryNameInfo[0],queryContentInfo[0],queryTagsInfo[0])
+					query_display = ""
+
+					#what if all are 1 and 2/3 names are same but the third one has higher score
+					if((queryNameInfo[0]==1 and queryNameInfo[2]==query) or (queryContentInfo[0]==1 and queryContentInfo[2]==query) or (queryTagsInfo[0]==1 and queryTagsInfo[2]==query)): 
+						#if the original query is the query to be searched
+						query_display = query
+					elif(queryNameInfo[0]==0 and queryContentInfo[0]==0 and queryTagsInfo[0]==0):																		
+						#if we didnt find any suggestion, neither did we find the query already indexed->query remains same
+						query_display = query
+					else: #if we found a suggestion 
+						res1_list = ['Search instead for <a href="">%s</a>'%(query)] #if the user still wants to search for the original query he asked for
+						if(queryNameInfo[1]>=queryContentInfo[1] and queryNameInfo[1]>=queryTagsInfo[1]):						 #comparing the scores of name,content,tags suggestions and finding the max of the three
+							query = queryNameInfo[2]
+							query_display = queryNameInfo[3]					 #what query to display on the search result screen
+						if(queryContentInfo[1]>queryNameInfo[1] and queryContentInfo[1]>=queryTagsInfo[1]):
+							query = queryContentInfo[2]
+							query_display = queryContentInfo[3]
+						if(queryTagsInfo[1]>queryContentInfo[1] and queryTagsInfo[1]>queryNameInfo[1]):
+							query = queryTagsInfo[2]
+							query_display = queryTagsInfo[3]
 
 
 
-			if(queryNameInfo[0]==0 and queryContentInfo[0]==0 and queryTagsInfo[0]==0):#if we didnt find any suggestion, neither did we find the query already indexed
-				query_body = {"query": {
-									"multi_match": { 											#first do a multi_match
-										"query" : query,
-										"type": "best_fields",									#when multiple words are there in the query, try to search for those words in a single field
-										"fields": ["name^3", "altnames", "content^2", "tags"],	#in which field to search the query
-										"minimum_should_match": "30%"
-										}
-									},
-								"rescore": {													#rescoring the top 50 results of multi_match
-									"window_size": 50,
-									"query": {
-										"rescore_query": {
-											"bool": {											#rescoring using match phrase
-												"should": [
-													{"match_phrase": {"name": { "query": query, "slop":2}}},
-													{"match_phrase": {"altnames": { "query": query, "slop": 2}}},
-													{"match_phrase": {"content": { "query": query, "slop": 4}}}
-												]
+				if(queryNameInfo[0]==0 and queryContentInfo[0]==0 and queryTagsInfo[0]==0):#if we didnt find any suggestion, neither did we find the query already indexed
+					query_body = {"query": {
+										"multi_match": { 											#first do a multi_match
+											"query" : query,
+											"type": "best_fields",									#when multiple words are there in the query, try to search for those words in a single field
+											"fields": ["name^3", "altnames", "content^2", "tags"],	#in which field to search the query
+											"minimum_should_match": "30%"
+											}
+										},
+									"rescore": {													#rescoring the top 50 results of multi_match
+										"window_size": 50,
+										"query": {
+											"rescore_query": {
+												"bool": {											#rescoring using match phrase
+													"should": [
+														{"match_phrase": {"name": { "query": query, "slop":2}}},
+														{"match_phrase": {"altnames": { "query": query, "slop": 2}}},
+														{"match_phrase": {"content": { "query": query, "slop": 4}}}
+													]
+												}
 											}
 										}
-									}
-								},
-								"from": 0,
-								"size": 100
-							}
+									},
+									"from": 0,
+									"size": 100
+								}
 
-			else: #if we found a suggestion or if the query exists as a phrase in one of the name/content/tags field
-				query_body = {"query": {
-									"multi_match": {
-										"query": query,
-										"fields": ["name^3", "altnames", "content^2", "tags"],
-										"type": "phrase", #we are doing a match phrase on multi field.
-										"slop": 5
-									}
-								},
-								"from": 0,
-								"size": 100
-							}
+				else: #if we found a suggestion or if the query exists as a phrase in one of the name/content/tags field
+					query_body = {"query": {
+										"multi_match": {
+											"query": query,
+											"fields": ["name^3", "altnames", "content^2", "tags"],
+											"type": "phrase", #we are doing a match phrase on multi field.
+											"slop": 5
+										}
+									},
+									"from": 0,
+									"size": 100
+								}
 
-			query_display = query
-			resultSet = search_query(GSTUDIO_SITE_NAME, select, group, query_body)
-			hits = "<h3>No of docs found: <b>%d</b></h3>" % len(resultSet)
-			if(group=="all"):
-				res_list = ['<h3>Showing results for <b>%s</b> :</h3' % query_display, hits]
-			else:
-				res_list = ['<h3>Showing results for <b>%s</b> in group <b>"%s"</b>:</h3>' % (query_display,group_map[str(group)]), hits]
-			med_list = get_search_results(resultSet)
-
+				query_display = query
+				resultSet = search_query(GSTUDIO_SITE_NAME, select, group, query_body)
+				hits = "<h3>No of docs found: <b>%d</b></h3>" % len(resultSet)
+				if(group=="all"):
+					res_list = ['<h3>Showing results for <b>%s</b> :</h3' % query_display, hits]
+				else:
+					res_list = ['<h3>Showing results for <b>%s</b> in group <b>"%s"</b>:</h3>' % (query_display,group_map[str(group)]), hits]
+				med_list = get_search_results(resultSet)
+				
 		paginator = Paginator(med_list, 10)
 		page = request.GET.get('page')
+		print(page)
 		try:
 			results = paginator.page(page)
 		except PageNotAnInteger:
@@ -239,8 +249,8 @@ def get_suggestion(suggestion_body, queryInfo, doc_types, query,field):
 
 
 def get_search_results(resultArray):
-	med_list = [doc['_source'] for doc in resultArray]
-	return med_list
+	reslist = [doc['_source'] for doc in resultArray]
+	return reslist
 
 def resources_in_group(res,group):
 	results = []
@@ -272,6 +282,7 @@ def search_query(index_name, select, group, query):
 
 	elif(index_name == GSTUDIO_SITE_NAME):
 		doctype = select
+		print(doctype)
 		body = query
 	
 	resultSet = []
@@ -280,7 +291,7 @@ def search_query(index_name, select, group, query):
 	
 	while(True):
 		body['from'] = i
-		res = es.search(index = index_name, body = body)
+		res = es.search(index = index_name, doc_type=doctype, body = body)
 		l = len(res["hits"]["hits"])
 		print (body)
 		if(l==0):
