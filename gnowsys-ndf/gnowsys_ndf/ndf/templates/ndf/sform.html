@@ -6,18 +6,21 @@
 	ul.errorlist {display: none;}
 	h3 {text-align:center;}
 	p {text-align:center;}
-	div.pagination {display: block; width: 100%; margin: 0 auto; }
-	div.form_class {text-align: right;}
+	div.pagination {display: block; width: 10%; margin: 0 auto; }
 </style>
 
 <div class="form_class"> 
 	<form action="" method="get">
-    {{form}}
-	<input type="submit" value="Search" />
-	</form>
+	<ul class="small-block-grid-1 medium-block-grid-3 large-block-grid-4">
+    <li>{{form.query}}</li>
+    <li>{{form.group}}</li>
+    <li>{{form.select}}</li>
+    <li><input type="submit" value="Search" /></li>
+    </ul>
+    </form>
 </div> 
 
-<br/> <br/> <br/> 
+<br/> 
 {% for c in header %}
 	<p>{{c|safe}}</p>
 {% endfor %}
