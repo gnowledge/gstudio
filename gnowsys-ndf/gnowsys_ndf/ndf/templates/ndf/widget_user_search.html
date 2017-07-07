@@ -434,6 +434,30 @@ table td{
     update_data_and_label($(this))
   })
 
+    // Handle link visibility
+    // If detail box is open, update the data
+
+  function detail_link_visibility(added_cnt, removed_cnt, link_ele_class, info_box_class){
+    if(added_cnt || removed_cnt){
+      $(link_ele_class)
+        .removeClass("hide")
+        .addClass("show-details")
+        .removeClass("hide_details_box");
+        if ($(info_box_class).find(".add-details").hasClass("hide")){
+          $(link_ele_class).text("[Show Details]")
+        }
+        else{
+          $(link_ele_class).text("[Hide Details]")
+        }
+    }
+    else{
+      $(link_ele_class).addClass("hide")
+      // No need to add show-hide classes since the element itself is hidden
+      $(info_box_class).find(".add-details").addClass("hide")
+      $(info_box_class).find(".removed-details").addClass("hide")
+    }
+  }
+
   // Generic function to update count labels
   function update_status_lbl(){
     users_added_cnt = get_users_info(mem_subscription_data, false, true, true)
@@ -441,27 +465,9 @@ table td{
     adm_added_cnt = get_users_info(adm_subscription_data, false, true, true)
     adm_removed_cnt = get_users_info(adm_subscription_data, false, false, true)
 
-    // Handle link visibility
-    // If detail box is open, update the data
-    if(users_added_cnt || users_removed_cnt){
-      $(".show-mem-link").removeClass("hide").addClass("show-details").removeClass("hide_details_box").text("[Show Details]")
-    }
-    else{
-      $(".show-mem-link").addClass("hide")
-      // No need to add show-hide classes since the element itself is hidden
-      $(".member_info").find(".add-details").addClass("hide")
-      $(".member_info").find(".removed-details").addClass("hide")
-    }
-    if(adm_added_cnt || adm_removed_cnt){
-      $(".show-adm-link").removeClass("hide").addClass("show-details").removeClass("hide_details_box").text("[Show Details]")
-    }
-    else{
-      $(".show-adm-link").addClass("hide")
-      // No need to add show-hide classes since the element itself is hidden
-      $(".admin_info").find(".add-details").addClass("hide")
-      $(".admin_info").find(".removed-details").addClass("hide")
+    detail_link_visibility(users_added_cnt, users_removed_cnt, ".show-mem-link", ".member_info")
+    detail_link_visibility(adm_added_cnt, adm_removed_cnt, ".show-adm-link", ".admin_info")
 
-    }
     $(".mem-added-cnt").html(users_added_cnt)
     $(".mem-removed-cnt").html(users_removed_cnt)
     $(".adm-added-cnt").html(adm_added_cnt)
