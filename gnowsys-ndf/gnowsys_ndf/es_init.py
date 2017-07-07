@@ -102,7 +102,6 @@ def create_map(document):
 		if document["type"]=="Group":
 			group_map[document["id"]["$oid"]]=document["name"]
 
-
 def main():
 	print("Starting the indexing process")
 
@@ -139,23 +138,23 @@ def main():
 	all_docs = node_collection.find(no_cursor_timeout=True).batch_size(5)
 	index_docs(all_docs)
 
-	f = open("/home/docker/code/gstudio/gnowsys-ndf/gnowsys_ndf/ndf/mapping_files/authormap_clix.json","w")
+	f = open("/home/docker/code/gstudio/gnowsys-ndf/gnowsys_ndf/ndf/mappings/authormap_clix.json","w")
 	json.dump(author_map,f,indent=4)
 	f.close()
 
-	f = open("/home/docker/code/gstudio/gnowsys-ndf/gnowsys_ndf/ndf/mapping_files/groupmap_clix.json","w")
+	f = open("/home/docker/code/gstudio/gnowsys-ndf/gnowsys_ndf/ndf/mappings/groupmap_clix.json","w")
 	json.dump(group_map,f,indent=4)
 	f.close()
 
-	f = open("/home/docker/code/gstudio/gnowsys-ndf/gnowsys_ndf/ndf/mapping_files/gsystemtype_map.json","w")
+	f = open("/home/docker/code/gstudio/gnowsys-ndf/gnowsys_ndf/ndf/mappings/gsystemtype_map.json","w")
 	json.dump(system_type_map,f,indent=4)
 	f.close()
 
-	f = open("/home/docker/code/gstudio/gnowsys-ndf/gnowsys_ndf/ndf/mapping_files/attribute_map.json","w")
+	f = open("/home/docker/code/gstudio/gnowsys-ndf/gnowsys_ndf/ndf/mappings/attribute_map.json","w")
 	json.dump(id_attribute_map,f,indent=4)
 	f.close()
 
-	f = open("/home/docker/code/gstudio/gnowsys-ndf/gnowsys_ndf/ndf/mapping_files/relation_map.json","w")
+	f = open("/home/docker/code/gstudio/gnowsys-ndf/gnowsys_ndf/ndf/mappings/relation_map.json","w")
 	json.dump(id_relation_map,f,indent=4)
 	f.close()
 
