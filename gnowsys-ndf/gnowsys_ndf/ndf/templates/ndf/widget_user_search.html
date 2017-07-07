@@ -16,14 +16,14 @@ table td{
 
 </style>
   <!-- Confirmation Seek Modal on Submit click -->
-  <div id="confirmUserSubscriptionModal" class="reveal-modal medium alert-box radius" data-reveal data-alert>
+  <div id="confirmUserSubscriptionModal" class="reveal-modal large radius" data-reveal data-alert>
     <p id="confirmUserSubscriptionModalLabel"></p>
     <div class="row feeds_proceed">
       <div class="small-3 small-offset-3 columns">
-        <input type="button" id="btnConfirmUserSubYes" class="button tiny expand" value={% trans "Yes" %}>
+        <input type="button" id="btnConfirmUserSubYes" class="orange-button auto-width" value={% trans "Yes" %}>
       </div>
       <div class="small-3 columns end">
-        <input type="button" id="btnConfirmUserSubNo" class="button tiny expand " value={% trans "No" %}>
+        <input type="button" id="btnConfirmUserSubNo" class="orange-button auto-width " value={% trans "No" %}>
       </div>
     </div>
     <a class="close-reveal-modal">&#215;</a>
@@ -36,19 +36,31 @@ table td{
   <div class="small-6 large-3 columns" style="margin-left: -6%">
     <div class="info-box hide" >
       <div class="row" >
-        <div class="member_info">Members:
-          <div class="push-to-right">
+        <div class="member_info">Members <a onclick="show_admin_details(false)" class="fs13 hide show-mem-link">[Show Details]</a>:
+          <div class="push-to-right fs13">
             <h3 class="mem-added-cnt inline-block-display ">0</h3> to be Added.<br/>
+            <div class="mem-details hide">
+              <small>Your are requesting to add: </small> <br/><i class="mem-added-names"></i><br/>
+            </div>
             <h3 class="mem-removed-cnt inline-block-display">0</h3> to be Removed.
+            <div class="mem-details hide">
+              <small>Your are requesting to remove: </small><br/><i class="mem-removed-names"></i>
+            </div>
           </div>
         </div>
       </div>
       <hr/>
       <div class="row">
-        <div class="admin_info">Admins:
-          <div class="push-to-right">
+        <div class="admin_info">Admins <a onclick="show_admin_details(true)" class="fs13 hide show-adm-link">[Show Details]</a>:
+          <div class="push-to-right fs13">
             <h3 class="adm-added-cnt inline-block-display">0</h3> to be Added.<br/>
+            <div class="adm-details hide">
+              <small>Your are requesting to add: </small> <br/><i class="adm-added-names"></i><br/>
+            </div>
             <h3 class="adm-removed-cnt inline-block-display">0</h3> to be Removed.
+            <div class="adm-details hide">
+              <small>Your are requesting to remove: </small> <br/><i class="adm-removed-names"></i>
+            </div>
           </div>
         </div>
       </div>
@@ -85,6 +97,26 @@ table td{
   var search_text_old = "";
   var mem_subscription_data = {'added': {}, 'removed': {}}
   var adm_subscription_data = {'added': {}, 'removed': {}}
+
+  function show_admin_details(admin_flag){
+    console.log(admin_flag)
+    if(admin_flag){
+      $(".adm-details").removeClass("hide")
+      users_to_be_adm = get_users_info(adm_subscription_data, true, true)
+      $(".adm-added-names").html(users_to_be_adm.join(', '))
+      users_not_to_be_adm = get_users_info(adm_subscription_data, true, false)
+      $(".adm-removed-names").html(users_not_to_be_adm.join(', '))
+      console.log("YES")
+    }
+    else{
+      users_to_be_mem = get_users_info(mem_subscription_data, true, true)
+      $(".mem-added-names").html(users_to_be_mem.join(', '))
+      users_not_to_be_mem = get_users_info(mem_subscription_data, true, false)
+      $(".mem-removed-names").html(users_not_to_be_mem.join(', '))
+      $(".mem-details").removeClass("hide")
+
+    }
+  }
 
   function create_users_table(){
       stud_table = document.createElement('table');
@@ -202,34 +234,45 @@ table td{
 
   $(document).on("click", ".submit-btn", function() {
       lbl_msg = "Are you sure you want to proceed?"
-      $("#confirmUserSubscriptionModalLabel").text(lbl_msg);
+      info_html = $(".info-box")[0].innerHTML
+      $("#confirmUserSubscriptionModalLabel").html(lbl_msg + info_html);
+
       $("#confirmUserSubscriptionModal")
         .removeClass("medium").addClass("small")
         .addClass("alert")
-      $("#confirmUserSubscriptionModal").foundation('reveal', 'open');
+        .foundation('reveal', 'open');
   })
 
 
-  function get_added_user_ids(data_dict){
-        return (Object.keys(data_dict['added']).map(function(key){
-                    return data_dict['added'][key];
+  function get_users_info(data_dict, fetch_key_only, fetch_added_info, fetch_length_only){
+        add_or_remove = "removed"
+        if(fetch_added_info){
+          add_or_remove = "added"
+        }
+        if (fetch_length_only){
+          return (Object.keys(data_dict[add_or_remove]).length)
+        }
+        return (Object.keys(data_dict[add_or_remove]).map(function(key){
+                    if(fetch_key_only){
+                      return key;
+                    }
+                    else{
+                      return data_dict[add_or_remove][key];
+                    }
                 }))
   }
+    $(".mem-added-cnt").html(Object.keys(mem_subscription_data['added']).length)
 
-  function get_removed_user_ids(data_dict){
-        return (Object.keys(data_dict['removed']).map(function(key){
-                    return data_dict['removed'][key];
-                }))
-  }
+
 
   //Confirm or Cancel Deletion
     $(document).on("click", "#btnConfirmUserSubYes", function() {
 
-        users_to_be_mem = get_added_user_ids(mem_subscription_data)
-        users_to_be_adm = get_added_user_ids(adm_subscription_data)
+        users_to_be_mem = get_users_info(mem_subscription_data, false, true, false)
+        users_to_be_adm = get_users_info(adm_subscription_data, false, true, false)
 
-        users_not_to_be_mem = get_removed_user_ids(mem_subscription_data)
-        users_not_to_be_adm = get_removed_user_ids(adm_subscription_data)
+        users_not_to_be_mem = get_users_info(mem_subscription_data, false, false, false)
+        users_not_to_be_adm = get_users_info(adm_subscription_data, false, false, false)
         // console.log("users_to_be_mem: "+ JSON.stringify(users_to_be_mem))
         // console.log("users_to_be_adm: "+ JSON.stringify(users_to_be_adm))
         // console.log("users_not_to_be_mem: "+ JSON.stringify(users_not_to_be_mem))
@@ -364,10 +407,26 @@ table td{
 
   // Generic function to update count labels
   function update_status_lbl(){
-    $(".mem-added-cnt").html(Object.keys(mem_subscription_data['added']).length)
-    $(".mem-removed-cnt").html(Object.keys(mem_subscription_data['removed']).length)
-    $(".adm-added-cnt").html(Object.keys(adm_subscription_data['added']).length)
-    $(".adm-removed-cnt").html(Object.keys(adm_subscription_data['removed']).length)
+    users_added_cnt = get_users_info(mem_subscription_data, false, true, true)
+    users_removed_cnt = get_users_info(mem_subscription_data, false, false, true)
+    adm_added_cnt = get_users_info(adm_subscription_data, false, true, true)
+    adm_removed_cnt = get_users_info(adm_subscription_data, false, false, true)
+    if(users_added_cnt || users_removed_cnt){
+      $(".show-mem-link").removeClass("hide")
+    }
+    else{
+      $(".show-mem-link").addClass("hide")
+    }
+    if(adm_added_cnt || adm_added_cnt){
+      $(".show-adm-link").removeClass("hide")
+    }
+    else{
+      $(".show-adm-link").addClass("hide")
+    }
+    $(".mem-added-cnt").html(users_added_cnt)
+    $(".mem-removed-cnt").html(users_removed_cnt)
+    $(".adm-added-cnt").html(adm_added_cnt)
+    $(".adm-removed-cnt").html(adm_removed_cnt)
   }
 
   $(document).on("click", "#subscribe_to_grp", function() {
