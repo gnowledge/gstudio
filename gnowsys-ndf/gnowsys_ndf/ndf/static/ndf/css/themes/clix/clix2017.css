@@ -5045,7 +5045,7 @@ ul.nav_menu_1 > li > a.selected, ul.nav_menu_1 > li > a:hover {
 /* line 5235, ../../../scss/_clix2017.scss */
 .add-details, .removed-details {
   overflow-y: auto;
-  height: 100px;
+  max-height: 100px;
 }
 
 /* line 5240, ../../../scss/_clix2017.scss */
