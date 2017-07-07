@@ -10,7 +10,7 @@ from models import GSystemType
 from registration.forms import RegistrationForm
 from passwords.fields import PasswordField
 
-CHOICES=[("all",'All'),("Author",'Users'),("image",'Images'),("video",'Video'),("text",'Text'),("audio","Audio")]
+CHOICES=[("all",'All'),("Author",'Users'),("image",'Images'),("video",'Video'),("text",'Text'),("audio","Audio"),("Page",'Page'),("Group",'Courses')]
 GROUP_CHOICES=[]
 GROUP_CHOICES.append(("all","All"))
 group_map = {}
