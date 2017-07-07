@@ -1828,31 +1828,76 @@ def unsubscribe_from_group(request, group_id):
     Returns:
      * success (i.e True/False)
     '''
+    def _update_user_counter(userid, group_id):
+        counter_obj = Counter.get_counter_obj(userid, ObjectId(group_id))
+        counter_obj['is_group_member'] = False
+        counter_obj.save()
+    def _send_notif(userid, group_obj):
+        activ = "Subscription with " + group_obj.name +"."
+        mail_content = "'This is to inform you that "+ \
+        "you have been unsubscribed from group: '" + group_obj.name+ "'"
+        user_obj = User.objects.get(id=userid)
+        set_notif_val(request, group_obj._id, mail_content, activ, user_obj)
+
     response_dict = {"success": False}
     if request.is_ajax() and request.method == "POST":
-        user_id = request.POST.get("user_id", "")
-        remove_admin = eval(request.POST.get("asAdmin", 'False'))
-        if not user_id:
-            user_id = request.user.id
-        user_id = int(user_id)
-        group_obj = node_collection.one({'_id': ObjectId(group_id)})
-        if remove_admin:
-            if user_id in group_obj.group_admin:
-                group_obj.group_admin.remove(user_id)
-        else:
-            if user_id in group_obj.author_set:
-                group_obj.author_set.remove(user_id)
-        group_obj.save()
-        response_dict["success"] = True
-        response_dict["member_count"] = len(group_obj.author_set)
         try:
-            activ = "Subscription with " + group_obj.name +"."
-            mail_content = "'This is to inform you that "+ \
-            "you have been unsubscribed from group: '" + group_obj.name+ "'"
-            user_obj = User.objects.get(id=user_id)
-            set_notif_val(request, group_obj._id, mail_content, activ, user_obj)
-        except Exception as e:
-            print "\n Unable to send notifications ",e
+
+            user_id = request.POST.get("user_id", "")
+            remove_admin = eval(request.POST.get("asAdmin", 'False'))
+            if not user_id:
+                user_id = request.user.id
+            else:
+                user_id = ast.literal_eval(user_id)
+            if isinstance(user_id, list):
+                user_id = map(int, user_id)
+            else:
+                user_id = int(user_id)
+            group_obj = get_group_name_id(group_id, get_obj=True)
+            if remove_admin:
+                if isinstance(user_id, list):
+                    for each_user_id in user_id:
+                        if each_user_id in group_obj.group_admin:
+                            group_obj.group_admin.remove(each_user_id)
+                else:
+                    if user_id in group_obj.group_admin:
+                        group_obj.group_admin.remove(user_id)
+
+
+            else:
+                if isinstance(user_id, list):
+                    for each_user_id in user_id:
+                        if each_user_id in group_obj.author_set:
+                            group_obj.author_set.remove(each_user_id)
+                else:
+                    if user_id in group_obj.author_set:
+                        group_obj.author_set.remove(user_id)
+
+            group_obj.save()
+            response_dict["success"] = True
+            response_dict["member_count"] = len(group_obj.author_set)
+
+            if 'Group' not in group_obj.member_of_names_list:
+                # get new/existing counter document for a user for a given course for the purpose of analytics
+                if isinstance(user_id, list):
+                    for each_user_id in user_id:
+                        _update_user_counter(each_user_id, group_obj._id)
+                else:
+                    _update_user_counter(user_id, group_obj._id)
+            try:
+                if isinstance(user_id, list):
+                    for each_user_id in user_id:
+                        _send_notif(each_user_id, group_obj)
+                else:
+                    _send_notif(user_id, group_obj)
+            except Exception as e:
+                print "\n Unable to send notifications ",e
+
+        except Exception as er:
+            print "\n ERROR!!!! ",er
+            pass
+
+
         return HttpResponse(json.dumps(response_dict))
 
 @login_required
