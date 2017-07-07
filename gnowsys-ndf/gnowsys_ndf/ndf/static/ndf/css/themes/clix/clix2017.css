@@ -5017,8 +5017,22 @@ ul.nav_menu_1 > li > a.selected, ul.nav_menu_1 > li > a:hover {
   color: #0c2944;
 }
 
-/* line 5214, ../../../scss/_clix2017.scss */
-.user-search-box-ele {
+/* line 5215, ../../../scss/_clix2017.scss */
+.inline-block-display {
   display: inline-block;
-  width: 30%;
+}
+
+/* line 5219, ../../../scss/_clix2017.scss */
+.push-to-right {
+  margin-left: 10%;
+}
+
+/* line 5223, ../../../scss/_clix2017.scss */
+.auto-width {
+  width: auto !important;
+}
+
+/* line 5227, ../../../scss/_clix2017.scss */
+.widget-container {
+  width: 80%;
 }
