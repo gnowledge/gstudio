@@ -5036,3 +5036,8 @@ ul.nav_menu_1 > li > a.selected, ul.nav_menu_1 > li > a:hover {
 .widget-container {
   width: 80%;
 }
+
+/* line 5231, ../../../scss/_clix2017.scss */
+.fs13 {
+  font-size: 13px !important;
+}
