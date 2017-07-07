@@ -36,30 +36,30 @@ table td{
   <div class="small-6 large-3 columns" style="margin-left: -6%">
     <div class="info-box hide" >
       <div class="row" >
-        <div class="member_info">Members <a onclick="show_admin_details(false)" class="fs13 hide show-mem-link">[Show Details]</a>:
+        <div class="member_info">Members <a class="fs13 hide show-details show-mem-link">[Show Details]</a>:
           <div class="push-to-right fs13">
             <h3 class="mem-added-cnt inline-block-display ">0</h3> to be Added.<br/>
-            <div class="mem-details hide">
-              <small>Your are requesting to add: </small> <br/><i class="mem-added-names"></i><br/>
+            <div class="add-details hide">
+              <small>Your are requesting to add: </small> <br/><i class="added-names"></i><br/>
             </div>
             <h3 class="mem-removed-cnt inline-block-display">0</h3> to be Removed.
-            <div class="mem-details hide">
-              <small>Your are requesting to remove: </small><br/><i class="mem-removed-names"></i>
+            <div class="removed-details hide">
+              <small>Your are requesting to remove: </small><br/><i class="removed-names"></i>
             </div>
           </div>
         </div>
       </div>
       <hr/>
       <div class="row">
-        <div class="admin_info">Admins <a onclick="show_admin_details(true)" class="fs13 hide show-adm-link">[Show Details]</a>:
+        <div class="admin_info">Admins <a class="fs13 hide show-details show-adm-link">[Show Details]</a>:
           <div class="push-to-right fs13">
             <h3 class="adm-added-cnt inline-block-display">0</h3> to be Added.<br/>
-            <div class="adm-details hide">
-              <small>Your are requesting to add: </small> <br/><i class="adm-added-names"></i><br/>
+            <div class="add-details hide">
+              <small>Your are requesting to add: </small> <br/><i class="added-names"></i><br/>
             </div>
             <h3 class="adm-removed-cnt inline-block-display">0</h3> to be Removed.
-            <div class="adm-details hide">
-              <small>Your are requesting to remove: </small> <br/><i class="adm-removed-names"></i>
+            <div class="removed-details hide">
+              <small>Your are requesting to remove: </small> <br/><i class="removed-names"></i>
             </div>
           </div>
         </div>
@@ -98,25 +98,57 @@ table td{
   var mem_subscription_data = {'added': {}, 'removed': {}}
   var adm_subscription_data = {'added': {}, 'removed': {}}
 
-  function show_admin_details(admin_flag){
-    console.log(admin_flag)
-    if(admin_flag){
-      $(".adm-details").removeClass("hide")
-      users_to_be_adm = get_users_info(adm_subscription_data, true, true)
-      $(".adm-added-names").html(users_to_be_adm.join(', '))
-      users_not_to_be_adm = get_users_info(adm_subscription_data, true, false)
-      $(".adm-removed-names").html(users_not_to_be_adm.join(', '))
-      console.log("YES")
+  function toggle_details_box(dict_obj, classname){
+    console.log(classname)
+      users_to_be_added = get_users_info(dict_obj, true, true)
+
+      if(users_to_be_added.length){
+        $(classname).find(".add-details").removeClass("hide")
+        $(classname).find(".added-names").html(users_to_be_added.join(', '))
+      }
+      else{
+        $(classname).find(".add-details").addClass("hide")
+      }
+
+      users_not_to_be_added = get_users_info(dict_obj, true, false)
+      if(users_not_to_be_added.length){
+        $(".adm-added-names").html(users_not_to_be_added.join(', '))
+        $(classname).find(".removed-names").html(users_not_to_be_added.join(', '))
+        $(classname).find(".removed-details").removeClass("hide")
+      }
+      else{
+        $(classname).find(".removed-details").addClass("hide")
+      }
+
+  }
+
+  $(document).on( 'click', '.hide_details_box', function (e){
+
+    $(this).addClass("show-details").removeClass("hide_details_box")
+    $(this).text('[Show Details]')
+    if($(this).hasClass("show-adm-link")){
+      $(".admin_info").find(".add-details").addClass("hide")
+      $(".admin_info").find(".removed-details").addClass("hide")
     }
     else{
-      users_to_be_mem = get_users_info(mem_subscription_data, true, true)
-      $(".mem-added-names").html(users_to_be_mem.join(', '))
-      users_not_to_be_mem = get_users_info(mem_subscription_data, true, false)
-      $(".mem-removed-names").html(users_not_to_be_mem.join(', '))
-      $(".mem-details").removeClass("hide")
-
+      $(".member_info").find(".add-details").addClass("hide")
+      $(".member_info").find(".removed-details").addClass("hide")
     }
-  }
+
+  })
+
+  $(document).on( 'click', '.show-details', function (e){
+
+    $(this).text('[Hide Details]')
+    $(this).removeClass("show-details").addClass("hide_details_box")
+
+    if($(this).hasClass("show-adm-link")){
+      toggle_details_box(adm_subscription_data, ".admin_info")
+    }
+    else{
+      toggle_details_box(mem_subscription_data, ".member_info")
+    }
+  })
 
   function create_users_table(){
       stud_table = document.createElement('table');
@@ -261,9 +293,6 @@ table td{
                     }
                 }))
   }
-    $(".mem-added-cnt").html(Object.keys(mem_subscription_data['added']).length)
-
-
 
   //Confirm or Cancel Deletion
     $(document).on("click", "#btnConfirmUserSubYes", function() {
@@ -411,17 +440,27 @@ table td{
     users_removed_cnt = get_users_info(mem_subscription_data, false, false, true)
     adm_added_cnt = get_users_info(adm_subscription_data, false, true, true)
     adm_removed_cnt = get_users_info(adm_subscription_data, false, false, true)
+
+    // Handle link visibility
+    // If detail box is open, update the data
     if(users_added_cnt || users_removed_cnt){
-      $(".show-mem-link").removeClass("hide")
+      $(".show-mem-link").removeClass("hide").addClass("show-details").removeClass("hide_details_box").text("[Show Details]")
     }
     else{
       $(".show-mem-link").addClass("hide")
+      // No need to add show-hide classes since the element itself is hidden
+      $(".member_info").find(".add-details").addClass("hide")
+      $(".member_info").find(".removed-details").addClass("hide")
     }
-    if(adm_added_cnt || adm_added_cnt){
-      $(".show-adm-link").removeClass("hide")
+    if(adm_added_cnt || adm_removed_cnt){
+      $(".show-adm-link").removeClass("hide").addClass("show-details").removeClass("hide_details_box").text("[Show Details]")
     }
     else{
       $(".show-adm-link").addClass("hide")
+      // No need to add show-hide classes since the element itself is hidden
+      $(".admin_info").find(".add-details").addClass("hide")
+      $(".admin_info").find(".removed-details").addClass("hide")
+
     }
     $(".mem-added-cnt").html(users_added_cnt)
     $(".mem-removed-cnt").html(users_removed_cnt)
