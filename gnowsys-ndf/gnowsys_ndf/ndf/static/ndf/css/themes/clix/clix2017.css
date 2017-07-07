@@ -5041,3 +5041,32 @@ ul.nav_menu_1 > li > a.selected, ul.nav_menu_1 > li > a:hover {
 .fs13 {
   font-size: 13px !important;
 }
+
+/* line 5235, ../../../scss/_clix2017.scss */
+.add-details, .removed-details {
+  overflow-y: auto;
+  height: 100px;
+}
+
+/* line 5240, ../../../scss/_clix2017.scss */
+#student_data_set_div {
+  overflowX: hidden;
+}
+
+/* line 5244, ../../../scss/_clix2017.scss */
+.user_search_result_table {
+  width: 100%;
+}
+/* line 5246, ../../../scss/_clix2017.scss */
+.user_search_result_table tbody, .user_search_result_table thead {
+  display: block;
+}
+/* line 5250, ../../../scss/_clix2017.scss */
+.user_search_result_table tbody {
+  overflow-y: auto;
+  height: 390px;
+}
+/* line 5255, ../../../scss/_clix2017.scss */
+.user_search_result_table td {
+  width: 10%;
+}
