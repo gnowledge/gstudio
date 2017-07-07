@@ -35,6 +35,9 @@ def get_search(request):
 	global results
 	form = SearchForm(request.GET)
 	query = request.GET.get("query")
+
+	######### Drank #########	
+
 	if(query):
 		page = request.GET.get("page")
 		if(page is None):
@@ -54,7 +57,7 @@ def get_search(request):
 				
 			else:
 				if(select=="all"):
-					select = "Author,image,video,text,application,audio,NotMedia"
+					select = "Author,image,video,text,application,audio,Page,NotMedia,Group"
 
 				phsug_name = get_suggestion_body(query, field_value = "name.trigram", slop_value = 2, field_name_value = "name")
 				phsug_content = get_suggestion_body(query, field_value = "content.trigram", slop_value = 3, field_name_value = "content")
@@ -168,7 +171,7 @@ def get_search(request):
 									}
 
 					query_display = query
-					
+
 				resultSet = search_query(GSTUDIO_SITE_NAME, select, group, query_body)
 				hits = "<h3>No of docs found: <b>%d</b></h3>" % len(resultSet)
 				if(group=="all"):
