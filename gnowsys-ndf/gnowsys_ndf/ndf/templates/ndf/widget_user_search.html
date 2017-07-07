@@ -1,20 +1,5 @@
 {% load i18n %}
 {% load cache %}
-<style type="text/css">
-table tbody, table thead
-{
-    display: block;
-}
-table tbody 
-{
-   overflow-y: auto;
-   height: 390px;
-}
-table td{
-  width: 10%;
-}
-
-</style>
   <!-- Confirmation Seek Modal on Submit click -->
   <div id="confirmUserSubscriptionModal" class="reveal-modal large radius" data-reveal data-alert>
     <p id="confirmUserSubscriptionModalLabel"></p>
@@ -153,8 +138,7 @@ table td{
   function create_users_table(){
       stud_table = document.createElement('table');
       outer_div = document.getElementById("student_data_set_div");
-      stud_table.style.width = "100%"
-      outer_div.style.overflowX = "hidden"
+      stud_table.className = 'user_search_result_table'
       var table_header = stud_table.createTHead();
       var header_row = table_header.insertRow(0)     
       var cell1 = header_row.insertCell(0)
@@ -266,9 +250,12 @@ table td{
 
   $(document).on("click", ".submit-btn", function() {
       lbl_msg = "Are you sure you want to proceed?"
-      info_html = $(".info-box")[0].innerHTML
-      $("#confirmUserSubscriptionModalLabel").html(lbl_msg + info_html);
 
+      // Open all details and hide links
+      $(".info-box").find('div').removeClass("hide").find('a').addClass("hide")
+      info_html = $(".info-box")[0].innerHTML
+      $(".info-box").addClass("hide")
+      $("#confirmUserSubscriptionModalLabel").html(lbl_msg + info_html);
       $("#confirmUserSubscriptionModal")
         .removeClass("medium").addClass("small")
         .addClass("alert")
@@ -347,6 +334,7 @@ table td{
 
     $(document).on("click", "#btnConfirmUserSubNo", function() {
         $("#confirmUserSubscriptionModal").foundation('reveal', 'close');
+        $(".info-box").removeClass("hide")
     });
 
   // [Tricky] Method to handle change events of all checkboxes
@@ -460,6 +448,7 @@ table td{
 
   // Generic function to update count labels
   function update_status_lbl(){
+
     users_added_cnt = get_users_info(mem_subscription_data, false, true, true)
     users_removed_cnt = get_users_info(mem_subscription_data, false, false, true)
     adm_added_cnt = get_users_info(adm_subscription_data, false, true, true)
@@ -472,6 +461,7 @@ table td{
     $(".mem-removed-cnt").html(users_removed_cnt)
     $(".adm-added-cnt").html(adm_added_cnt)
     $(".adm-removed-cnt").html(adm_removed_cnt)
+    $(".info-box").removeClass("hide")
   }
 
   $(document).on("click", "#subscribe_to_grp", function() {
