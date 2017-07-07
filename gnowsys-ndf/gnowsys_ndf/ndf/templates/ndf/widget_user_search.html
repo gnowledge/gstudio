@@ -211,15 +211,15 @@ table td{
 
 
   function get_added_user_ids(data_dict){
-        return Object.keys(data_dict['added']).map(function(key){
-            return data_dict['added'][key];
-        });
+        return (Object.keys(data_dict['added']).map(function(key){
+                    return data_dict['added'][key];
+                }))
   }
 
   function get_removed_user_ids(data_dict){
-        return Object.keys(data_dict['removed']).map(function(key){
-            return data_dict['removed'][key];
-        });
+        return (Object.keys(data_dict['removed']).map(function(key){
+                    return data_dict['removed'][key];
+                }))
   }
 
   //Confirm or Cancel Deletion
@@ -264,10 +264,11 @@ table td{
       data_dicts = [mem_subscription_data, adm_subscription_data]
       $.each(data_dicts, function(ind, dict_obj){
         $.each(dict_obj["added"], function(i,v){
-          $("input[data-user-id=" + v + "]").setAttribute("data-checked-status", true)
+          console.log("This is v: "+ v)
+          $("input[data-user-id='" + v + "']").attr("data-checked-status", true)
         })
         $.each(dict_obj["removed"], function(i,v){
-          $("input[data-user-id=" + v + "]").removeAttr("data-checked-status")
+          $("input[data-user-id='" + v + "']").attr("data-checked-status", false)
         })
       })
     }
@@ -276,19 +277,41 @@ table td{
         $("#confirmUserSubscriptionModal").foundation('reveal', 'close');
     });
 
+  // [Tricky] Method to handle change events of all checkboxes
   function update_data_and_label(chk_ele){
+
+    // based on attribute 'data-user-admin', 
+    // define on which dict object to alter
     subscription_user_type = mem_subscription_data
+
+
     if ($(chk_ele).attr('data-user-admin') == 'True'){
       subscription_user_type = adm_subscription_data
     }
-    if($(chk_ele).attr('data-checked-status') && !($(chk_ele).is(':checked'))){
-      subscription_user_type["removed"][$(chk_ele).attr('data-user-name')] = $(chk_ele).attr('data-user-id')
+    checked_val = $(chk_ele).attr('data-checked-status')
+    username_val = $(chk_ele).attr('data-user-name')
+    user_id_val = $(chk_ele).attr('data-user-id')
+
+    if(checked_val){
+      if(!($(chk_ele).is(':checked'))){
+        // If user is ALREADY member/admin, and we are removing him/her
+        subscription_user_type["removed"][username_val] = user_id_val
+      }
+      else{
+        // On state reset
+        delete subscription_user_type['removed'][username_val]
+      }
     }
-    else if(!$(chk_ele).attr('data-checked-status') && ($(chk_ele).is(':checked'))){
-      subscription_user_type["added"][$(chk_ele).attr('data-user-name')] = $(chk_ele).attr('data-user-id')
-    }
-    if (!($(chk_ele).is(':checked'))){
-      delete subscription_user_type['added'][$(chk_ele).attr('data-user-name')]
+
+    else{
+      if($(chk_ele).is(':checked')){
+        // If user is NOT member/admin, and we are adding him/her
+        subscription_user_type["added"][username_val] = user_id_val
+      }
+      else{
+        // On state reset, i.e an non-member/admin, was added and then unchecked by user before submit
+        delete subscription_user_type['added'][username_val]
+      }
     }
     update_status_lbl()
   }
