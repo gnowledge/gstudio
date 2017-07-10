@@ -21,9 +21,6 @@
     <div class="info-box hide" >
       <div class="row" >
         <div class="member_info">Members <a class="fs13 hide show-details show-mem-link">[Show Details]</a>: 
-          <a class="fs13 hide flush" onclick='request_user_confirmation(false)'>
-            <u>Flush</u>
-          </a>
           <div class="push-to-right fs13">
             <h3 class="mem-added-cnt inline-block-display ">0</h3> to be Added.<br/>
             <div class="add-details hide">
@@ -39,9 +36,6 @@
       <hr/>
       <div class="row">
         <div class="admin_info">Admins <a class="fs13 hide show-details show-adm-link">[Show Details]</a>: 
-          <a class="fs13 hide flush" onclick='request_user_confirmation(false)'>
-            <u>Flush</u>
-          </a>
           <div class="push-to-right fs13">
             <h3 class="adm-added-cnt inline-block-display">0</h3> to be Added.<br/>
             <div class="add-details hide">
@@ -73,10 +67,11 @@
 
       <!-- Search Result Box -->
       <div class="data-box">
+        <input type="button" class="radius button auto-width hide asset-save-button reset-btn" onclick='request_user_confirmation(false)' value="Reset" / >
         <div id="student_count_div"></div>
         <div id="student_data_set_div"></div>
         <div class="controls-box hide">
-          <input type="button" value="Submit" class="radius button submit-btn asset-save-button">
+          <input type="button" value="Submit" class="radius button submit-btn asset-save-button" onclick="request_user_confirmation(true)">
           <input type="button" value="Cancel" class="radius button cancel-btn asset-save-button">
         </div>
       </div>
@@ -94,16 +89,15 @@
 
 
   function toggle_details_box(dict_obj, classname){
-    console.log(classname)
       users_to_be_added = get_users_info(dict_obj, true, true)
 
       if(users_to_be_added.length){
         $(classname).find(".add-details").removeClass("hide")
-        console.log("comingcoming" + users_to_be_added.join(', '))
         $(classname).find(".added-names").html(users_to_be_added.join(', '))
       }
       else{
         $(classname).find(".add-details").addClass("hide")
+        $(classname).find(".added-names").html("")
       }
 
       users_not_to_be_added = get_users_info(dict_obj, true, false)
@@ -114,6 +108,8 @@
       }
       else{
         $(classname).find(".removed-details").addClass("hide")
+        $(classname).find(".removed-names").html("")
+
       }
 
   }
@@ -234,6 +230,8 @@
             $(".data-box").show()
             $(".controls-box").removeClass("hide")
             $(".info-box").removeClass("hide")
+            $(".reset-btn").removeClass("hide")
+
           }
           else{
             $(".search-box").show()
@@ -260,35 +258,30 @@
 
 
   function request_user_confirmation(submit_call){
-
-    msg = "Are you sure you want to Cancel the following requests ?"
-    if(submit_call){
-      msg = "Are you sure you want to Proceed with the following requests ?"
-      $("#btnConfirmUserSubYes").attr("data-submit", true);
-    }
-
-    $(".show-details").trigger('click')
-    // Open all details and hide links
-    $(".info-box").find('div').removeClass("hide").find('a').addClass("hide")
-    info_html = $(".info-box").html()
-    $(".info-box").addClass("hide")
-    $("#confirmUserSubscriptionModalLabel").html(msg + info_html);
-    $("#confirmUserSubscriptionModal")
-      .removeClass("medium").addClass("small")
-      .addClass("alert")
-      .foundation('reveal', 'open');
-
-  }
-
-
-  $(document).on("click", ".submit-btn", function() {
     if(users_added_cnt || users_removed_cnt || adm_added_cnt || adm_removed_cnt){
-      request_user_confirmation(true)
+
+      msg = "Are you sure you want to Cancel the following requests ?"
+      if(submit_call){
+        msg = "Are you sure you want to Proceed with the following requests ?"
+        $("#btnConfirmUserSubYes").attr("data-submit", true);
+      }
+
+      $(".show-details").trigger('click')
+      // Open all details and hide links
+      $(".info-box").find('div').removeClass("hide").find('a').addClass("hide")
+      info_html = $(".info-box").html()
+      $(".info-box").addClass("hide")
+      $("#confirmUserSubscriptionModalLabel").html(msg + info_html);
+      $("#confirmUserSubscriptionModal")
+        .removeClass("medium").addClass("small")
+        .addClass("alert")
+        .foundation('reveal', 'open');
     }
     else{
       alert("Please Add and/or Remove any Users.")
     }
-  })
+
+  }
 
   function get_users_info(data_dict, fetch_key_only, fetch_added_info, fetch_length_only){
         add_or_remove = "removed"
@@ -364,7 +357,7 @@
         })
         $.each(dict_obj["removed"], function(i,v){
           if(maintain_checks){
-            $("input[data-user-id='" + v + "']").attr("data-checked-status", false)
+            $("input[data-user-id='" + v + "']").removeAttr("data-checked-status")
           }
           else{
             $("input[data-user-id='" + v + "']").prop("checked", true)
@@ -374,10 +367,8 @@
     }
 
     $(document).on("click", "#btnConfirmUserSubNo", function() {
-        $(".info-box")
-          .removeClass("hide")
-          .find('div').removeClass("hide")
-          .find('a').removeClass("hide")
+        $(".info-box").removeClass("hide")
+        update_status_lbl()
         $("#confirmUserSubscriptionModal").foundation('reveal', 'close');
     });
 
@@ -405,11 +396,9 @@
     if(checked_val){
       if(!($(chk_ele).is(':checked'))){
         // If user is ALREADY member/admin, and we are removing him/her
-        console.log("1")
         subscription_user_type["removed"][username_val] = user_id_val
       }
       else{
-        console.log("2")
         // On state reset
         delete subscription_user_type['removed'][username_val]
       }
@@ -418,17 +407,14 @@
     else{
       if($(chk_ele).is(':checked')){
         // If user is NOT member/admin, and we are adding him/her
-        console.log("3")
         subscription_user_type["added"][username_val] = user_id_val
       }
       else{
         // On state reset, i.e an non-member/admin, was added and then unchecked by user before submit
-        console.log("4")
         delete subscription_user_type['added'][username_val]
       }
     }
     toggle_details_box(subscription_user_type, detail_box_class)
-
     update_status_lbl()
   }
 
@@ -478,29 +464,32 @@
     update_data_and_label($(this))
   })
 
+  function show_details_visibility(info_box_class, link_ele_class){
+    $(info_box_class).find(".add-details").addClass("hide")
+    $(info_box_class).find(".removed-details").addClass("hide")
+    $(link_ele_class)
+      .text("[Show Details]")
+      .addClass("show-details")
+      .removeClass("hide_details_box");
+  }
+
+
     // Handle link visibility
     // If detail box is open, update the data
 
   function detail_link_visibility(added_cnt, removed_cnt, link_ele_class, info_box_class){
     if(added_cnt || removed_cnt){
-      $(link_ele_class)
-        .removeClass("hide")
-        .next(".flush").removeClass("hide");
-        if ($(info_box_class).find(".add-details").hasClass("hide") && $(info_box_class).find(".removed-details").hasClass("hide")){
-          $(link_ele_class).text("[Show Details]").addClass("show-details").removeClass("hide_details_box")
-
-        }
-        else{
-          $(link_ele_class).text("[Hide Details]").removeClass("show-details").addClass("hide_details_box")
-        }
+      $(link_ele_class).removeClass("hide")
+      if($(info_box_class).find(".show-details").hasClass("show-details")){
+        show_details_visibility(info_box_class, link_ele_class)
+      }
+      else{
+        $(link_ele_class).text("[Hide Details]").removeClass("show-details").addClass("hide_details_box")
+      }
     }
     else{
-      $(link_ele_class)
-        .addClass("hide")
-        .next(".flush").addClass("hide")
-      // No need to add show-hide classes since the element itself is hidden
-      $(info_box_class).find(".add-details").addClass("hide")
-      $(info_box_class).find(".removed-details").addClass("hide")
+      $(link_ele_class).addClass("hide")
+      show_details_visibility(info_box_class, link_ele_class)
     }
   }
 
@@ -511,7 +500,6 @@
     users_removed_cnt = get_users_info(mem_subscription_data, false, false, true)
     adm_added_cnt = get_users_info(adm_subscription_data, false, true, true)
     adm_removed_cnt = get_users_info(adm_subscription_data, false, false, true)
-
     detail_link_visibility(users_added_cnt, users_removed_cnt, ".show-mem-link", ".member_info")
     detail_link_visibility(adm_added_cnt, adm_removed_cnt, ".show-adm-link", ".admin_info")
 
