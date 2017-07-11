@@ -28,7 +28,7 @@ hits = ""
 med_list = []		 #contains all the search results
 res_list = []		 #contains the header of the search results
 results = []		 #contains a single page's results
-GSTUDIO_SITE_NAME = "nroer_pro"
+
 append_to_url = ""
 author_index = "author_" + GSTUDIO_SITE_NAME
 gsystemtype_index = "node_type_" + GSTUDIO_SITE_NAME
@@ -377,19 +377,3 @@ def advanced_search(request):
 	med_list = get_search_results(res)
 	print len(med_list)
 	return HttpResponse(json.dumps({"results": med_list}), content_type="application/json")
-
-	
-
-
-	# global med_list
-
-	# resultSet = search_query(index_name=gsystemtype_index, select=node_type, group="all",query="") # get all the docs in the gsystem index with type = node_type	
-	# for doc in resultSet:
-	# 	src = doc['_source']
-	# 	flag = True
-	# 	attribute_keys = {}
-	# 	for dictio in src['attribute_set']:
-	# 		attribute_keys[dictio.keys()[0]] = dictio[dictio.keys()[0]]
-	# 	print(attribute_keys)
-	# 	# for attr in arr_attributes.keys():
-	# 	# 	if(attr in src['attribute_set'])
