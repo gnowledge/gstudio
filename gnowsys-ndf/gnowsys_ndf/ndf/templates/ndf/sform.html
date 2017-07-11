@@ -33,7 +33,18 @@
     	{% endfor %}
     </select>
     </li>
-    <li id="selid">{{form.select}}</li>
+     <li>{{form.search_select}}</li>
+     <br />
+     <div id="filter">
+	    <input type="checkbox" name="checks[]" value="all" /> All
+		<input type="checkbox" name="checks[]" value="Author" /> Users
+		<input type="checkbox" name="checks[]" value="image" /> Images
+		<input type="checkbox" name="checks[]" value="video" /> Video
+	    <input type="checkbox" name="checks[]" value="text" /> Text
+	    <input type="checkbox" name="checks[]" value="audio" /> Audio
+	    <input type="checkbox" name="checks[]" value="Page" /> Page
+	    <input type="checkbox" name="checks[]" value="Group" /> Courses
+    </div>
     <checkbox> 
     <li id="but"><input type="submit" value="Search" /></li>
     </ul>
@@ -61,7 +72,7 @@
 		  {% ifequal num content.number %}
 		    <span class="current"><b>{{ num }}</b></span>
 		  {% else %}
-		    <a href="?page={{ num }}&query={{ request.GET.query }}&group={{ request.GET.group }}&select={{ request.GET.select }}">{{ num }}</a>
+		    <a href="?page={{ num }}&query={{ request.GET.query }}&group={{ request.GET.group }}&select={{ request.GET.select }}&search_select={{ request.GET.search_select }}{{ append_to_url }}">{{ num }}</a>
 		  {% endifequal %} 
 		{% endfor %}
 	</span>

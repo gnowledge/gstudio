@@ -6,7 +6,7 @@ from django.shortcuts import render
 from django.http import HttpResponseRedirect
 from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 from elasticsearch import Elasticsearch		
-from gnowsys_ndf.ndf.forms import SearchForm, AdvancedSearchForm
+from gnowsys_ndf.ndf.forms import SearchForm
 from gnowsys_ndf.ndf.models import *
 from gnowsys_ndf.settings import GSTUDIO_SITE_NAME,GSTUDIO_NO_OF_OBJS_PP
 
@@ -14,12 +14,12 @@ es = Elasticsearch(['http://elsearch:changeit@gsearch:9200'])
 author_map = {}
 group_map = {}
 
-
-if(os.path.isdir('/home/docker/code/gstudio/gnowsys-ndf/gnowsys_ndf/ndf/mappings')):
-	with open('/home/docker/code/gstudio/gnowsys-ndf/gnowsys_ndf/ndf/mappings/authormap_clix.json') as fe:
+mapping_directory = '/home/docker/code/gstudio/gnowsys-ndf/gnowsys_ndf/ndf/mappings'
+if(os.path.isdir(mapping_directory)):
+	with open(mapping_directory+'/authormap.json') as fe:
 		author_map = json.load(fe)
 
-	with open('/home/docker/code/gstudio/gnowsys-ndf/gnowsys_ndf/ndf/mappings/groupmap_clix.json') as fe:
+	with open(mapping_directory+'/groupmap_clix.json') as fe:
 		group_map = json.load(fe)
 
 else:
@@ -30,17 +30,16 @@ med_list = []		 #contains all the search results
 res_list = []		 #contains the header of the search results
 results = []		 #contains a single page's results
 GSTUDIO_SITE_NAME = "nroer_pro"
-
+append_to_url = ""
 author_index = "author_" + GSTUDIO_SITE_NAME
 GROUP_CHOICES=["All"]
 for name in group_map.keys():
     GROUP_CHOICES.append(name)
-
 def get_search(request): 
 	global med_list
 	global res_list
 	global results
-
+	global append_to_url
 	form = SearchForm(request.GET)
 	query = request.GET.get("query")
 	form.query = query
@@ -58,12 +57,11 @@ def get_search(request):
 			print(query)
 			query_display = ""
 			#group = request.GET.get('group')
-			select = request.GET.get('select')
-			print select
-			if(select is None):
-				select = "all"
-				
-			if(select=="Author"):
+			search_select = request.GET.get('search_select')
+			search_filter = request.GET.getlist('checks[]')
+			if(str(search_select) == '1'):
+				append_to_url = ""
+				select = "Author"
 				resultSet = search_query(author_index, select, group, query)
 				hits =  "<h3> No of docs found: <b>%d</b></h3> " % len(resultSet)
 				med_list = get_search_results(resultSet)
@@ -73,8 +71,18 @@ def get_search(request):
 					res_list = ['<h3>  Showing contributions of user <b>%s</b> in group <b>%s</b>":</h3> ' % (query, group), hits]
 				
 			else:
-				if(select=="all"):
+				append_to_url = ""
+				if(len(search_filter) == 0 or str(search_filter[0])=="all"):
 					select = "Author,image,video,text,application,audio,Page,NotMedia,Group"
+					append_to_url += "&checks%5B%5D=all"
+				else:
+					select = ""
+					for i in range(0,len(search_filter)-1):
+						select += search_filter[i]+"," 
+						append_to_url += "&checks%5B%5D="+search_filter[i]
+					append_to_url  += "&checks%5B%5D="+search_filter[len(search_filter) - 1]
+					select += search_filter[len(search_filter) - 1]
+				print(select)
 
 				phsug_name = get_suggestion_body(query, field_value = "name.trigram", slop_value = 2, field_name_value = "name")
 				phsug_content = get_suggestion_body(query, field_value = "content.trigram", slop_value = 3, field_name_value = "content")
@@ -207,7 +215,7 @@ def get_search(request):
 		except EmptyPage:
 			results = paginator.page(paginator.num_pages)
 
-		return render(request, 'ndf/sform.html', {'form': form, 'grpnam': group, 'grp': GROUP_CHOICES, 'header':res_list, 'content': results})
+		return render(request, 'ndf/sform.html', {'form': form, 'grpnam': group, 'grp': GROUP_CHOICES, 'header':res_list, 'content': results, 'append_to_url':append_to_url})
 
 	return render(request, 'ndf/sform.html', {'form': form, 'grp': GROUP_CHOICES})
 	

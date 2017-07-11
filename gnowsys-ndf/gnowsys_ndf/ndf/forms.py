@@ -11,6 +11,7 @@ from registration.forms import RegistrationForm
 from passwords.fields import PasswordField
 
 CHOICES=[("all",'All'),("Author",'Users'),("image",'Images'),("video",'Video'),("text",'Text'),("audio","Audio"),("Page",'Page'),("Group",'Courses')]
+SEARCH_CHOICE = [(0,'Search for data'),(1,'Contributions of Author')]
 GROUP_CHOICES=[]
 NODE_TYPE_CHOICES = []
 ATTRIBUTE_CHOICES = {}
@@ -28,35 +29,6 @@ relation_map = {}
 with open("/home/docker/code/gstudio/gnowsys-ndf/gnowsys_ndf/ndf/mappings/groupmap_clix.json", 'r') as gm:
     group_map = json.load(gm)
 
-# with open("/home/docker/code/gstudio/gnowsys-ndf/gnowsys_ndf/ndf/mappings/gsystemtype_map.json") as gstm:
-#     gsystem_map = json.load(gstm)
-
-
-# with open("/home/docker/code/gstudio/gnowsys-ndf/gnowsys_ndf/ndf/mappings/attribute_map.json") as attrm:
-#     attribute_map = json.load(attrm)
-
-
-# with open("/home/docker/code/gstudio/gnowsys-ndf/gnowsys_ndf/ndf/mappings/gsystemtype_map.json") as rm:
-#     relation_map = json.load(rm)
-
-
-# for i in gsystem_map.keys():
-#     tup = (gsystem_map[i],i)
-#     NODE_TYPE_CHOICES.append(tup)
-
-
-# for at_id in attribute_map.keys():
-#     att_array = []
-#     for attr in attribute_map[at_id]:
-#         tup = (attr,attr)
-#         att_array.append(tup)
-#     ATTRIBUTE_CHOICES[at_id] = att_array
-
-# for rt_id in relation_map.keys():
-#     rt_array = []
-#     for relation in relation_map[rt_id]:
-#         rt_array.append(relation)
-#     RELATION_CHOICES[at_id] = rt_array
 
 
 for l in group_map.keys():
@@ -69,6 +41,7 @@ class SearchForm(forms.Form):
     query = forms.CharField(label = '', widget = forms.TextInput(attrs={'placeholder': 'Search for'}), error_messages = False)
     group = forms.ChoiceField(label = "Group", widget = forms.Select, choices = GROUP_CHOICES)
     select = forms.ChoiceField(label = "Filter", widget = forms.Select, choices = CHOICES)
+    search_select = forms.ChoiceField(label = "Search for", widget= forms.Select, choices= SEARCH_CHOICE)
 
 
 class NodeForm(DocumentForm):
@@ -91,16 +64,3 @@ class UserChangeform(PasswordChangeForm):
 
 class UserResetform(SetPasswordForm):
     new_password1 = PasswordField(label="New password")
-
-# class AdvancedSearchForm(forms.Form):
-
-#     query = forms.CharField(label = '', widget = forms.TextInput(attrs={'placeholder': 'Search for'}), error_messages = False)
-#     ntype_choice = forms.ChoiceField(label = "Node Type", widget = forms.Select, choices = NODE_TYPE_CHOICES)
-#     at_choice = {}
-#     for at_id in ATTRIBUTE_CHOICES.keys():
-#         at_choice[at_id] = forms.ChoiceField(label = "Attribute Type", widget = forms.Select, choices = ATTRIBUTE_CHOICES[at_id])
-#     rt_choice = {}
-#     for rt_id in RELATION_CHOICES.keys():
-#         rt_choice[rt_id] = forms.ChoiceField(label = "Relation Type", widget = forms.Select, choices = RELATION_CHOICES[at_id])
-
-
