@@ -154,3 +154,49 @@ First the drop down list of GSystem types is rendered. When the user selects a G
 Then when the user selects any attribute or relation, text boxes appear for that attribute which the user has to fill in to search for the left subject/object which belongs to the selected node type and has the attribute/relation selected and the right predicate/object as given in the text box.
 
 On clicking the submit button, the input is validated(checking if all text boxes are filled or not) and then data is sent using an ajax call. The data is sent to url 'advanced_search'. The data that is sent is 2 dictionaries and the node type selected. Key is the selected attribute and value is the value provided for that attribute in the text box.
+
+--------------------------------------------------------------------------UPDATE FUNCTIONALITY TO BE INCLUDED
+As of now, there are five mapping present in the mappings folder.
+1] groupmap.json 
+2] gsystemtype_map.json
+3] attribute_map.json
+4] relation_map.json
+5] authormap.json
+
+
+In the case of update:
+Check the node._type;
+
+1] if node._type == "Author":
+	if author is not present in authormap.json:
+		add author to authormap.json
+	for each contributors in node:
+		index node in author index( es.index(index="author_"+GSTUDIO_SITE_NAME, doc_type= postgres_ID of author, body = json body of the node) ).
+	index node in GSTUDIO_SITE_NAME index( ( es.index(index=GSTUDIO_SITE_NAME, doc_type= "Author", body = json body of the node) ).
+
+
+2] if node.type == "GSystemType":
+	if not present in gsystemtype_map.json:
+		add GSystemType to gsystemtype_map.json.
+		add all attributes in attribute_set to attribute_map.json
+		add all relation in attribute_set to relation_map.json
+	index node in GSTUDIO_SITE_NAME index( ( es.index(index=GSTUDIO_SITE_NAME, doc_type= "GSystemType", body = json body of the node) ).
+
+3] if node._type == "GSystem":
+	if node."member_of" is "PageID":
+		index node into GSTUDIO_SITE_NAME index( ( es.index(index=GSTUDIO_SITE_NAME, doc_type= "Page", body = json body of the node) ).
+	else
+		index node in GSTUDIO_SITE_NAME index (according to es_init.py including calling the getNBH function)
+
+	for each group in the "member_of":
+		from the gsystemtype_map get all the possible attributes. = set A
+	from the attribute_set of the node, get all the attributes not in set A and add those attributes in each gsystem type in member_of
+	for each contributor in "contributors":
+		index into author index( ( es.index(index="author_"+GSTUDIO_SITE_NAME, doc_type= postgresID of contributor, body = json body of the node) ).
+	for each gsystemtype in "member_of":
+		index into gsystem index( ( es.index(index="node_type_"+GSTUDIO_SITE_NAME, doc_type= UUID of gsystemtype(i.e. the vale of the key "member_of"), body = json body of the node) )
+
+4] for all other node."_type"(=type)
+	index into GSTUDIO_SITE_NAME index( ( es.index(index=GSTUDIO_SITE_NAME, doc_type= [according to es_init.py], body = json body of the node) ) 
+
+
