@@ -14,9 +14,13 @@ from gnowsys_ndf.settings import GSTUDIO_SITE_NAME
 from gnowsys_ndf.ndf.views.email_registration import password_reset_email, password_reset_error, GstudioEmailRegistrationForm
 from gnowsys_ndf.ndf.forms import UserChangeform, UserResetform
 from gnowsys_ndf.ndf.views.home import homepage, landing_page
+from gnowsys_ndf.ndf.views.esearch import get_search, get_advanced_search_form, advanced_search
+
 from gnowsys_ndf.ndf.views.methods import tag_info
 from gnowsys_ndf.ndf.views.custom_app_view import custom_app_view, custom_app_new_view
 from gnowsys_ndf.ndf.views import rpc_resources
+
+from gnowsys_ndf.ndf.views.esearch import get_search, advanced_search
 
 if GSTUDIO_SITE_NAME.lower() == 'clix':
     login_template = 'registration/login_clix.html'
@@ -36,6 +40,9 @@ urlpatterns = patterns('',
     # django's admin site url's
     (r'^admin/', include(admin.site.urls)),
 
+
+    #integrating esearch application in gstudio
+    
     url(r'^esearch/?', get_search, name="get_search"),
     url(r'^advanced_form/?', get_advanced_search_form, name="advanced_search_form"),
     url(r'^advanced_search/?', advanced_search, name="advanced_search"),
@@ -49,11 +56,15 @@ urlpatterns = patterns('',
     # (r'^mobwrite/', 'gnowsys_ndf.mobwrite.views.mobwrite'),
     # --end of mobwrite
 
+    url(r'^esearch/?', get_search, name="get_search"),
+    #url(r'^esearch//?',advanced_search,name='advanced_search')
+
     # url(r'^(?P<group_id>[^/]+)/mailclient[/]error[/](?P<error_obj>[\w-]+)$', 'gnowsys_ndf.ndf.views.mailclient.mailclient_error_display', name='mailclient_error_display'),
 
     url(r'^$', homepage, {"group_id": "home"}, name="homepage"),
     url(r'^welcome/?', landing_page, name="landing_page"),
-
+    #url(r'^esearch/advanced/?', get_triples, name="get_triples"),
+    url(r'^esearch/?', get_search, name="get_search"),
     url(r'^captcha/', include('captcha.urls')),
     (r'^', include('gnowsys_ndf.ndf.urls.captcha')),
 
