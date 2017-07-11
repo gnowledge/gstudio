@@ -40,7 +40,6 @@ urlpatterns = patterns('',
     # django's admin site url's
     (r'^admin/', include(admin.site.urls)),
 
-
     #integrating esearch application in gstudio
     
     url(r'^esearch/?', get_search, name="get_search"),
@@ -55,9 +54,6 @@ urlpatterns = patterns('',
     # (r'^new/$', 'gnowsys_ndf.mobwrite.views.new'),
     # (r'^mobwrite/', 'gnowsys_ndf.mobwrite.views.mobwrite'),
     # --end of mobwrite
-
-    url(r'^esearch/?', get_search, name="get_search"),
-    #url(r'^esearch//?',advanced_search,name='advanced_search')
 
     # url(r'^(?P<group_id>[^/]+)/mailclient[/]error[/](?P<error_obj>[\w-]+)$', 'gnowsys_ndf.ndf.views.mailclient.mailclient_error_display', name='mailclient_error_display'),
 
