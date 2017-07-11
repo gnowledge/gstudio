@@ -1,4 +1,3 @@
-
 {% extends "ndf/gbase.html" %}
 {% block body_content %}	
 	<style type="text/css">
@@ -22,7 +21,9 @@
 		}
 		
 	</style>
-	<script type="text/javascript"></script>
+	<script type="text/javascript">
+		
+	</script>
 	<script type="text/javascript">
 		// the three maps sent from python esearch.py get_advanced_search_form function
 		var node_types_ch = {{ gsystemtype_map | safe }};
@@ -74,7 +75,7 @@
 					}
 					else
 					{
-						checkbox_attr += "<p>No attributes for this GSsystemType</p>";
+						checkbox_attr += "<p>No attributes for this GSystemType</p>";
 					}
 					if(possible_relations.length != 0)
 					{
@@ -86,7 +87,7 @@
 					}
 					else
 					{
-						checkbox_reln += "<p>No relations for this GSsystemType</p>";
+						checkbox_reln += "<p>No relations for this GSystemType</p>";
 					}
 				}
 				$('#attribute_types_col').append(checkbox_attr);
@@ -173,6 +174,31 @@
 							node_type:$('#nt_drop_down').val(),
 							arr_attributes:attr,
 							arr_relations:reln
+						},
+						success:function(res){
+							// var res_str ='<ul class="small-block-grid-1 medium-block-grid-3 large-block-grid-4">'
+							$('#result').empty();
+							console.log(res);
+							alert(res["results"].length)
+							var res_str = '<ul class="small-block-grid-1 medium-block-grid-3 large-block-grid-4">';
+							//alert(med_list[0]['id']['$oid'])
+							var i;
+							for(i = 0; i < res["results"].length; i++){	
+								res_str += '<li class="card-image-wrapper">';
+								// res_str += '{% include "ndf/card_group.html" with ';
+								// res_str += eval('node=res["results"][i]');
+								// res_str += ' %}';
+								res_str += '<p>';
+								res_str += res["results"][i]["name"];
+								res_str += "</p";
+								res_str += '</li>';
+								//console.log(res_str);
+								console.log(res["results"][i]);
+								//alert(c);
+								// console.log(c['_source']["id"]["$oid"]);
+							}
+							res_str += '</ul>';
+							$('#result').append(res_str);
 						}
 					});
 				}
@@ -188,4 +214,7 @@
 		<div id="input_relations"></div>
 		<input id="submit_btn" type="submit" value="Search">
 	</form>
+
+	<div id="result" margin-top="100dp">
+	</div>
 {% endblock %}
