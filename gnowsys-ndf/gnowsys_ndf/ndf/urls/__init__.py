@@ -36,6 +36,10 @@ urlpatterns = patterns('',
     # django's admin site url's
     (r'^admin/', include(admin.site.urls)),
 
+    url(r'^esearch/?', get_search, name="get_search"),
+    url(r'^advanced_form/?', get_advanced_search_form, name="advanced_search_form"),
+    url(r'^advanced_search/?', advanced_search, name="advanced_search"),
+
     # --mobwrite-- commented for time being
     # (r'^raw/(?P<name>.+)/', 'gnowsys_ndf.mobwrite.views.raw'),
     # (r'^r/(?P<name>.+)/', 'gnowsys_ndf.mobwrite.views.raw'),

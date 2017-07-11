@@ -312,3 +312,36 @@ def search_query(index_name, select, group, query):
 
 	return resultSet
 
+def get_advanced_search_form(request):
+	with open(mapping_directory+"/gsystemtype_map.json") as gm:
+		gsystemtype_map = json.load(gm)
+
+	with open(mapping_directory+"/attribute_map.json") as am:
+		attribute_map = json.load(am)
+
+	with open(mapping_directory+"/relation_map.json") as rm:
+		relation_map = json.load(rm)
+
+	gsystemtype_map_str = json.dumps(gsystemtype_map)
+	attribute_map_str = json.dumps(attribute_map)
+	relation_map_str = json.dumps(relation_map)
+	return render(request, 'ndf/advanced_search.html',{"gsystemtype_map":gsystemtype_map_str,'attribute_map':attribute_map_str,'relation_map':relation_map_str})
+
+def advanced_search(request):
+	node_type = request.GET.get("node_type")
+	arr_attributes = json.loads(request.GET["arr_attributes"])
+	arr_relations = json.loads(request.GET["arr_relations"])
+
+	# global med_list
+
+	# resultSet = search_query(index_name=gsystemtype_index, select=node_type, group="all",query="") # get all the docs in the gsystem index with type = node_type	
+	# for doc in resultSet:
+	# 	src = doc['_source']
+	# 	flag = True
+	# 	attribute_keys = {}
+	# 	for dictio in src['attribute_set']:
+	# 		attribute_keys[dictio.keys()[0]] = dictio[dictio.keys()[0]]
+	# 	print(attribute_keys)
+	# 	# for attr in arr_attributes.keys():
+	# 	# 	if(attr in src['attribute_set'])
+
