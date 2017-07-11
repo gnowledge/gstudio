@@ -16,10 +16,33 @@ id_relation_map = {}
 def create_map(all_docs):
 	for node in all_docs:
 		if("name" in node):		#only docs with names will be considered for mapping
-			if(node._type=="Author"):
+			if(node._type == "Author"):
 				author_map[node.name] = node.created_by
-			if(node._type=="Group"):
-				group_map[str(node._id)] = node.name
+			if(node._type == "Group"):
+				group_map[node.name] = str(node._id)
+			if(node._type == "GSystem"):
+				attr = []; rel = [];
+				for grid in node.member_of:
+					gid = str(grid)
+					if(gid not in system_type_map.values()):
+						id_attribute_map[gid] = []
+						id_relation_map[gid] = []
+					attr += id_attribute_map[gid]
+					rel += id_relation_map[gid]
+
+				attr = list(set(attr))
+				rel = list(set(rel))
+				for grid in node.member_of:
+					gid = str(grid)
+					for attr_dict in node.attribute_set:
+						for key in attr_dict.keys():
+							if(key not in attr):
+								id_attribute_map[gid].append(key)
+					for rel_dict in node.relation_set:
+						for key in rel_dict.keys():
+							if(key not in rel):
+								id_relation_map[gid].append(key)
+
 			if(node._type == "GSystemType"):
 				create_advanced_map(node)
 
@@ -31,23 +54,32 @@ def create_advanced_map(node):
 	relation_type_set = []
 	for relation in node.relation_type_set:
 		relation_type_set.append(relation["name"])
-	id_attribute_map[str(node._id)] = attribute_type_set
-	id_relation_map[str(node._id)] = relation_type_set		
+	if(str(node._id) not in id_attribute_map.keys()):
+		id_attribute_map[str(node._id)] = []
+	if(str(node._id) not in id_relation_map.keys()):
+		id_relation_map[str(node._id)] = []
+	id_attribute_map[str(node._id)] += attribute_type_set
+	id_relation_map[str(node._id)] += relation_type_set		
 
 def main():
 	print("Starting the map creation process")
 	all_docs = node_collection.find(no_cursor_timeout=True).batch_size(5)
 	create_map(all_docs)
 
-	f = open("/home/docker/code/gstudio/gnowsys-ndf/gnowsys_ndf/ndf/mappings/authormap_clix.json","w")
+	for key,val in id_attribute_map.iteritems():
+		id_attribute_map[key] = list(set(val))
+	for key,val in id_relation_map.iteritems():
+		id_relation_map[key] = list(set(val))
+
+	f = open("/home/docker/code/gstudio/gnowsys-ndf/gnowsys_ndf/ndf/mappings/authormap.json","w")
 	json.dump(author_map,f,indent=4)
 	f.close()
 
-	f = open("/home/docker/code/gstudio/gnowsys-ndf/gnowsys_ndf/ndf/mappings/groupmap_clix.json","w")
+	f = open("/home/docker/code/gstudio/gnowsys-ndf/gnowsys_ndf/ndf/mappings/groupmap.json","w")
 	json.dump(group_map,f,indent=4)
 	f.close()
 
-	f = open("/home/docker/code/gstudio/gnowsys-ndf/gnowsys_ndf/ndf/mappings/gsystemtype_map.json","w")
+	f = open("/home/docker/code/gstudio/gnowsys-ndf/gnowsys_ndf/ndf/mappings/gsystemtype.json","w")
 	json.dump(system_type_map,f,indent=4)
 	f.close()
 
