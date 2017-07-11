@@ -27,7 +27,7 @@ Our search url can be found in __init__.py file of urls folder. In the search fo
 
 If group is also selected with Users filter, the contributions of that user in a particular group will be searched.
 ***********************************************************************************************************************************
-First run the es_initialize.py script in /home/docker/code/gstudio/gnowsys-ndf/gnowsys_ndf, which will index all documents into elasticsearch. 
+First run the esinit_map.py script which creates all the necessary mappings then run the es_init.py script which will index all documents into elasticsearch. 
 
 index→ analogous to database
 Type → analogous to table in database
@@ -35,6 +35,14 @@ Body → analogous to a record in a table
  
 ******Documentation for initializing the index i.e. indexing all the documents into elasticsearch******
  
+MAPPINGS:
+Attribute Map : Mapping from GSystemType ID to possible attribute names for that GSystemType
+Author Map : Mapping from author name to PostGRESQL ID of that author
+Group Map : Mapping from Group ID to Group name.
+Gsystem Type Map : Mapping from GSystemType name to ID.
+Relation Map : Mapping from GSystemType ID to possible relation names for that GSystemType
+
+
 #main(): 
  
 es.indices.exists(index_name) -> checks if the index already exists in elasticsearch, if it exists already then, es.indices.delete(index_name) will delete the index for creating a fresh index and re indexing all the documents. The delete function returns the response if the index has been successfully deleted.
@@ -88,9 +96,10 @@ index_docs(all_docs)
  
 	**If the document has “contributors” as a key then we are indexing the document into another index (author_index) with the type as author post greSQL ID. This is necessary if the user wants to search for the contributions of a particular author in a particular group or across all groups. 
 ***********************************************************************************************************************************
+******Documentation for esearch.py in views folder******
+create_map(document): This function is used to create 2 maps. One is an author_map and other is a group_map. Author map is used to search for the contributions of some author. Group map is used in forms.py to show the group filter. 
 
-create_map(document): This function is used to create 2 maps. One is an author_map and other is a group_map. Author_map is a mapping between author name and author post greSQL ID. This is used to search for the contributions of some author. Group map is a mapping between group id and group name. This map is used in forms.py to show the group filter. 
-
+create_advanced_map(document) : This function is used to create the gsystem type map, attribute map, relation map. All these 3 maps are used in advanced search.
 
 ******Documentation for esearch.py in views folder******(get_search documentation remains to be written)
 
@@ -134,3 +143,14 @@ create_map(document): This function is used to create 2 maps. One is an author_m
 	 
  
 Res = es.search returns a json body. Res[“hits”][“hits”] is an array of search results.  
+
+
+******Documentation for advanced_search.html in templates/ndf folder******
+
+This file is used for rendering the advanced search form. The gsystem type map, attribute map and relation map is passed by python get_advanced_form function in esearch.py.
+
+First the drop down list of GSystem types is rendered. When the user selects a GSystem type, the possible attributes and possible relations are shown to the user in the form of check boxes. 
+
+Then when the user selects any attribute or relation, text boxes appear for that attribute which the user has to fill in to search for the left subject/object which belongs to the selected node type and has the attribute/relation selected and the right predicate/object as given in the text box.
+
+On clicking the submit button, the input is validated(checking if all text boxes are filled or not) and then data is sent using an ajax call. The data is sent to url 'advanced_search'. The data that is sent is 2 dictionaries and the node type selected. Key is the selected attribute and value is the value provided for that attribute in the text box.
