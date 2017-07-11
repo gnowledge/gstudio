@@ -10,7 +10,7 @@ from gnowsys_ndf.settings import GSTUDIO_SITE_NAME
 # reload(sys)  
 # sys.setdefaultencoding('UTF8')
 
-es = Elasticsearch("http://elsearch:changeit@gsearch:9200", TIMEOUT=False)
+es = Elasticsearch("http://elsearch:changeit@gsearch:9200", timeout=30)
 
 author_index = "author_" + GSTUDIO_SITE_NAME
 index = GSTUDIO_SITE_NAME
