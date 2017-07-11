@@ -14,7 +14,7 @@ from gnowsys_ndf.settings import GSTUDIO_SITE_NAME
 from gnowsys_ndf.ndf.views.email_registration import password_reset_email, password_reset_error, GstudioEmailRegistrationForm
 from gnowsys_ndf.ndf.forms import UserChangeform, UserResetform
 from gnowsys_ndf.ndf.views.home import homepage, landing_page
-from gnowsys_ndf.ndf.views.esearch import get_search
+from gnowsys_ndf.ndf.views.esearch import get_search, get_advanced_search_form, advanced_search
 
 from gnowsys_ndf.ndf.views.methods import tag_info
 from gnowsys_ndf.ndf.views.custom_app_view import custom_app_view, custom_app_new_view
@@ -38,8 +38,12 @@ urlpatterns = patterns('',
     # django's admin site url's
     (r'^admin/', include(admin.site.urls)),
 
+
     #integrating esearch application in gstudio
     
+    url(r'^esearch/?', get_search, name="get_search"),
+    url(r'^advanced_form/?', get_advanced_search_form, name="advanced_search_form"),
+    url(r'^advanced_search/?', advanced_search, name="advanced_search"),
 
     # --mobwrite-- commented for time being
     # (r'^raw/(?P<name>.+)/', 'gnowsys_ndf.mobwrite.views.raw'),

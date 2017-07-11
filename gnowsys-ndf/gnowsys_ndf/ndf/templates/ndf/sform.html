@@ -2,20 +2,40 @@
 {% block title %} Elastic Search {% endblock %}
 {% block body_content %}
 
+<script type="text/javascript">
+	document.getElementById("search_text").style.display = "none";
+	document.getElementById("groupbox").style.display = "none";
+	document.getElementById("search-submit").style.display = "none";
+</script>
+
 <style>
 	ul.errorlist {display: none;}
 	h3 {text-align:center;}
 	p {text-align:center;}
 	div.pagination {display: block; width: 10%; margin: 0 auto; }
+	#grid {width: 200px; padding-top: 5px;}
+	#selid {width: 200px; padding-top: 5px}
+	#but {padding-top: 10px; margin-right: 0}
 </style>
 
 <div class="form_class"> 
 	<form action="" method="get">
 	<ul class="small-block-grid-1 medium-block-grid-3 large-block-grid-4">
     <li>{{form.query}}</li>
-    <li>{{form.group}}</li>
-    <li>{{form.select}}</li>
-    <li><input type="submit" value="Search" /></li>
+    <li id="grid">
+    <select name="group">
+    	{% for grname in grp %}
+    		{% ifequal grname grpnam %}
+    			<option value="{{grname}}" selected="selected">{{grpnam}}</option>
+    		{% else %}
+    			<option value="{{grname}}">{{grname}}</option>
+    		{% endifequal %}
+    	{% endfor %}
+    </select>
+    </li>
+    <li id="selid">{{form.select}}</li>
+    <checkbox> 
+    <li id="but"><input type="submit" value="Search" /></li>
     </ul>
     </form>
 </div> 
@@ -29,7 +49,7 @@
 <ul class="small-block-grid-1 medium-block-grid-3 large-block-grid-4">
 {% for c in content %}
 	<li class="card-image-wrapper">
-	{% include 'ndf/card_gsearch.html' with node=c %}
+	{% include 'ndf/card_group.html' with node=c %}
 	</li>
 {% endfor %}
 </ul>
