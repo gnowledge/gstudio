@@ -1,3 +1,4 @@
+from bson import json_util
 import re
 import json
 import os
@@ -5,13 +6,14 @@ from django.shortcuts import render
 from django.http import HttpResponseRedirect
 from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 from elasticsearch import Elasticsearch		
-from gnowsys_ndf.ndf.forms import SearchForm
+from gnowsys_ndf.ndf.forms import SearchForm, AdvancedSearchForm
 from gnowsys_ndf.ndf.models import *
 from gnowsys_ndf.settings import GSTUDIO_SITE_NAME,GSTUDIO_NO_OF_OBJS_PP
 
 es = Elasticsearch(['http://elsearch:changeit@gsearch:9200'])
 author_map = {}
 group_map = {}
+
 
 if(os.path.isdir('/home/docker/code/gstudio/gnowsys-ndf/gnowsys_ndf/ndf/mappings')):
 	with open('/home/docker/code/gstudio/gnowsys-ndf/gnowsys_ndf/ndf/mappings/authormap_clix.json') as fe:
@@ -309,3 +311,10 @@ def search_query(index_name, select, group, query):
 
 	return resultSet
 
+def advanced_search(request):
+	form = AdvancedSearchForm(request.GET)
+	query = request.GET.get("query")
+	if(query):
+		pass
+	else:
+		return render(request, 'ndf/advanced_search1.html', {'form': form})

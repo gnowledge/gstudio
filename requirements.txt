@@ -13,8 +13,8 @@ django-passwords==0.2.0
 # gunicorn==19.0.0
 # markdown==2.4.1
 django-json-rpc==0.6.3
-https://bitbucket.org/zalew/django-online-status/get/tip.zip
-git+https://github.com/anujag/django-registration-email.git
+#https://bitbucket.org/zalew/django-online-status/get/tip.zip
+#git+https://github.com/anujag/django-registration-email.git
 stemming==1.0.1
 numpy==1.9.0
 python-memcached==1.58
