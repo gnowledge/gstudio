@@ -29,34 +29,52 @@ hits = ""
 med_list = []		 #contains all the search results
 res_list = []		 #contains the header of the search results
 results = []		 #contains a single page's results
+GSTUDIO_SITE_NAME = "nroer_pro"
+
 author_index = "author_" + GSTUDIO_SITE_NAME
+GROUP_CHOICES=["All"]
+for name in group_map.keys():
+    GROUP_CHOICES.append(name)
 
 def get_search(request): 
 	global med_list
 	global res_list
 	global results
+
 	form = SearchForm(request.GET)
 	query = request.GET.get("query")
+	form.query = query
+
 	if(query):
+		print(query)
+		group = request.GET.get("group")
+		chkl = request.GET.getlist("groupspec")
+		print chkl
+		if(len(chkl)>0):
+			group = "All"
+		print "query in group ", group
 		page = request.GET.get("page")
 		if(page is None):
 			print(query)
 			query_display = ""
-			group = request.GET.get('group')
+			#group = request.GET.get('group')
 			select = request.GET.get('select')
-			
+			print select
+			if(select is None):
+				select = "all"
+				
 			if(select=="Author"):
 				resultSet = search_query(author_index, select, group, query)
 				hits =  "<h3> No of docs found: <b>%d</b></h3> " % len(resultSet)
 				med_list = get_search_results(resultSet)
-				if(group == "all"):
+				if(group == "All"):
 					res_list = ['<h3>  Showing contributions of user <b>%s</b> in all groups:</h3> ' % (query), hits]
 				else:
-					res_list = ['<h3>  Showing contributions of user <b>%s</b> in group <b>%s</b>":</h3> ' % (query,group_map[str(group)]), hits]
+					res_list = ['<h3>  Showing contributions of user <b>%s</b> in group <b>%s</b>":</h3> ' % (query, group), hits]
 				
 			else:
 				if(select=="all"):
-					select = "Author,image,video,text,application,audio,NotMedia"
+					select = "Author,image,video,text,application,audio,Page,NotMedia,Group"
 
 				phsug_name = get_suggestion_body(query, field_value = "name.trigram", slop_value = 2, field_name_value = "name")
 				phsug_content = get_suggestion_body(query, field_value = "content.trigram", slop_value = 3, field_name_value = "content")
@@ -170,13 +188,13 @@ def get_search(request):
 									}
 
 					query_display = query
-					
+
 				resultSet = search_query(GSTUDIO_SITE_NAME, select, group, query_body)
 				hits = "<h3>No of docs found: <b>%d</b></h3>" % len(resultSet)
-				if(group=="all"):
+				if(group=="All"):
 					res_list = ['<h3>Showing results for <b>%s</b> :</h3' % query_display, hits]
 				else:
-					res_list = ['<h3>Showing results for <b>%s</b> in group <b>"%s"</b>:</h3>' % (query_display,group_map[str(group)]), hits]
+					res_list = ['<h3>Showing results for <b>%s</b> in group <b>"%s"</b>:</h3>' % (query_display, group), hits]
 				med_list = get_search_results(resultSet)
 				
 		paginator = Paginator(med_list, GSTUDIO_NO_OF_OBJS_PP)
@@ -189,10 +207,9 @@ def get_search(request):
 		except EmptyPage:
 			results = paginator.page(paginator.num_pages)
 
+		return render(request, 'ndf/sform.html', {'form': form, 'grpnam': group, 'grp': GROUP_CHOICES, 'header':res_list, 'content': results})
 
-		return render(request, 'ndf/sform.html', {'form': form, 'header':res_list, 'content': results})
-
-	return render(request, 'ndf/sform.html', {'form': form})
+	return render(request, 'ndf/sform.html', {'form': form, 'grp': GROUP_CHOICES})
 	
 
 def get_suggestion_body(query, field_value, slop_value, field_name_value):
@@ -233,7 +250,7 @@ def get_suggestion_body(query, field_value, slop_value, field_name_value):
 		}
 	return phrase_suggest
 
-def get_suggestion(suggestion_body, queryInfo, doc_types, query,field):
+def get_suggestion(suggestion_body, queryInfo, doc_types, query, field):
 	res = es.suggest(body=suggestion_body, index=GSTUDIO_SITE_NAME)						#first we search for suggestion in the name field as it has the highest priority
 	print(res)																					
 	if(len(res['suggest'][0]['options'])>0):									#if we get a suggestion means the phrase doesnt exist in the index
@@ -257,14 +274,14 @@ def get_search_results(resultArray):
 
 def resources_in_group(res,group):
 	results = []
-	group_id = str(group)
+	group_id = group_map[group]
 	for i in res["hits"]["hits"]:
 		if "group_set" in i["_source"].keys():
 			k = []
 			for g_id in (i["_source"]["group_set"]):
 				k.append(g_id["$oid"]) 
 			if group_id in k:
-					results.append(i)
+				results.append(i)
 	return results
 
 def search_query(index_name, select, group, query):
@@ -285,7 +302,6 @@ def search_query(index_name, select, group, query):
 
 	elif(index_name == GSTUDIO_SITE_NAME):
 		doctype = select
-		print(doctype)
 		body = query
 	
 	resultSet = []
@@ -300,7 +316,7 @@ def search_query(index_name, select, group, query):
 		if(l==0):
 			return []
 		if l > 0 and l <= siz:
-			if(group == "all"):
+			if(group == "All"):
 				resultSet.extend(res["hits"]["hits"])
 			else:
 				temp = resources_in_group(res,group)
@@ -311,10 +327,36 @@ def search_query(index_name, select, group, query):
 
 	return resultSet
 
+
+def get_advanced_search_form(request):
+	with open(mapping_directory+"/gsystemtype_map.json") as gm:
+		gsystemtype_map = json.load(gm)
+
+	with open(mapping_directory+"/attribute_map.json") as am:
+		attribute_map = json.load(am)
+
+	with open(mapping_directory+"/relation_map.json") as rm:
+		relation_map = json.load(rm)
+
+	gsystemtype_map_str = json.dumps(gsystemtype_map)
+	attribute_map_str = json.dumps(attribute_map)
+	relation_map_str = json.dumps(relation_map)
+	return render(request, 'ndf/advanced_search.html',{"gsystemtype_map":gsystemtype_map_str,'attribute_map':attribute_map_str,'relation_map':relation_map_str})
+
 def advanced_search(request):
-	form = AdvancedSearchForm(request.GET)
-	query = request.GET.get("query")
-	if(query):
-		pass
-	else:
-		return render(request, 'ndf/advanced_search1.html', {'form': form})
+	node_type = request.GET.get("node_type")
+	arr_attributes = json.loads(request.GET["arr_attributes"])
+	arr_relations = json.loads(request.GET["arr_relations"])
+
+	# global med_list
+
+	# resultSet = search_query(index_name=gsystemtype_index, select=node_type, group="all",query="") # get all the docs in the gsystem index with type = node_type	
+	# for doc in resultSet:
+	# 	src = doc['_source']
+	# 	flag = True
+	# 	attribute_keys = {}
+	# 	for dictio in src['attribute_set']:
+	# 		attribute_keys[dictio.keys()[0]] = dictio[dictio.keys()[0]]
+	# 	print(attribute_keys)
+	# 	# for attr in arr_attributes.keys():
+	# 	# 	if(attr in src['attribute_set'])

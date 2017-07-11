@@ -6,21 +6,16 @@ from elasticsearch import Elasticsearch
 from gnowsys_ndf.ndf.models import *
 from gnowsys_ndf.settings import GSTUDIO_SITE_NAME
 
-# reload(sys)  # Reload does the trick!
+##### use the below commented lines if you are working with Python 2.x   #####
+# reload(sys)  
 # sys.setdefaultencoding('UTF8')
+
 es = Elasticsearch("http://elsearch:changeit@gsearch:9200", TIMEOUT=False)
 
-# doc_type = ""
-author_map = {}
-group_map = {}
 author_index = "author_" + GSTUDIO_SITE_NAME
 index = GSTUDIO_SITE_NAME
 gsystemtype_index = "node_type_" + GSTUDIO_SITE_NAME
-
-system_type_map  = {}
-id_attribute_map = {}
-id_relation_map = {}
-
+page_id = 0 
 
 def index_docs(all_docs):
 	k = 0
@@ -33,10 +28,12 @@ def index_docs(all_docs):
 			else:
 				pass
 			
-		doc = json.dumps(node, default=json_util.default) #convert mongoDB objectt to a JSON string
+		doc = json.dumps(node, default=json_util.default) #convert mongoDB object to a JSON string
 		#doc = json.loads(doc,object_hook=json_util.object_hook) ->get back mongoDB object from JSON string
+
 		document = json.loads(doc) #convert JSON string to a python dictionary
 		#doc = json.dumps(document) #convert python dictionary to JSON string
+
 		if("name" in document.keys()):
 			document["id"] = document.pop("_id")
 			document["type"] = document.pop("_type")
@@ -47,9 +44,6 @@ def index_docs(all_docs):
 			if("object_value" in document.keys()):
 				document["object_value"] = str(document["object_value"])	#for consistent mapping 
 
-			create_map(document)
-			if(document["type"] == "GSystemType"):
-				create_advanced_map(document)
 			doc_type = get_document_type(document)
 			print("indexing document %d with id: %s" % (k,document["id"]["$oid"]))
 			es.index(index=index, doc_type=doc_type, id=document["id"]["$oid"], body=document)
@@ -61,47 +55,29 @@ def index_docs(all_docs):
 			if(document["type"] == "GSystem"):
 				for type_ids in document['member_of']:
 					es.index(index = gsystemtype_index, doc_type = type_ids["$oid"], id = document["id"]["$oid"], body = document)
+
 			print("indexed document %d with id: %s" % (k,document["id"]["$oid"]))
 			k+=1
 
 def get_document_type(document):
-	types_arr = ["Author", "GAttribute", "GRelation", "AttributeType", "Filehive", "RelationType", "Group","GSystemType"]	
+	types_arr = ["Author", "GAttribute", "GRelation", "AttributeType", "Filehive", "RelationType", "Group", "GSystemType"]	
 	if document["type"]=="GSystem":
+		for ids in document['member_of']:  #document is a member of the Page GSystemType
+			if(ids['$oid'] == page_id):
+				return "Page"
 		if('if_file' in document.keys()):
-			if document["if_file"]["mime_type"] is not None:
+			if(document["if_file"]["mime_type"] is not None):
 				data = document["if_file"]["mime_type"].split("/")
 				doc_type = data[0]
 			else:
 				doc_type = "NotMedia"
 		else:
 			doc_type = "NotMedia"
-		#doc_type = "GSystem"		
 	elif (document["type"] in types_arr):
 		doc_type = document["type"]
 	else:
 		doc_type = "DontCare"
 	return doc_type
-
-
-def create_advanced_map(document):
-	system_type_map[document["name"]] = document["id"]["$oid"]
-
-	attribute_type_set = []
-	for attribute in document["attribute_type_set"]:
-		attribute_type_set.append(attribute["name"])
-	relation_type_set = []
-	for relation in document["relation_type_set"]:
-		relation_type_set.append(relation["name"])
-	id_attribute_map[document["id"]["$oid"]] = attribute_type_set
-	id_relation_map[document["id"]["$oid"]] = relation_type_set
-
-def create_map(document):
-	if "name" in document.keys():
-		if document["type"]=="Author":
-			author_map[document["name"]] = document["created_by"]
-		if document["type"]=="Group":
-			group_map[document["id"]["$oid"]]=document["name"]
-
 
 def main():
 	print("Starting the indexing process")
@@ -123,6 +99,9 @@ def main():
 		request_body = json.load(req_body)
 	with open("/home/docker/code/gstudio/gnowsys-ndf/gnowsys_ndf/req_body_gtype.json") as req_body_type:
 		request_body_gtype = json.load(req_body_type)
+	with open("/home/docker/code/gstudio/gnowsys-ndf/gnowsys_ndf/ndf/mappings/gsystemtype_map.json") as gtypemap:
+		gtype_map = json.load(gtypemap)
+	page_id = gtype_map["Page"]
 
 	res = es.indices.create(index=index, body=request_body)
 	print("Response for index creation")
@@ -138,26 +117,5 @@ def main():
 
 	all_docs = node_collection.find(no_cursor_timeout=True).batch_size(5)
 	index_docs(all_docs)
-
-	f = open("/home/docker/code/gstudio/gnowsys-ndf/gnowsys_ndf/ndf/mapping_files/authormap_clix.json","w")
-	json.dump(author_map,f,indent=4)
-	f.close()
-
-	f = open("/home/docker/code/gstudio/gnowsys-ndf/gnowsys_ndf/ndf/mapping_files/groupmap_clix.json","w")
-	json.dump(group_map,f,indent=4)
-	f.close()
-
-	f = open("/home/docker/code/gstudio/gnowsys-ndf/gnowsys_ndf/ndf/mapping_files/gsystemtype_map.json","w")
-	json.dump(system_type_map,f,indent=4)
-	f.close()
-
-	f = open("/home/docker/code/gstudio/gnowsys-ndf/gnowsys_ndf/ndf/mapping_files/attribute_map.json","w")
-	json.dump(id_attribute_map,f,indent=4)
-	f.close()
-
-	f = open("/home/docker/code/gstudio/gnowsys-ndf/gnowsys_ndf/ndf/mapping_files/relation_map.json","w")
-	json.dump(id_relation_map,f,indent=4)
-	f.close()
-
 
 main()
