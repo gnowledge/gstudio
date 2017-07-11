@@ -28,7 +28,8 @@ hits = ""
 med_list = []		 #contains all the search results
 res_list = []		 #contains the header of the search results
 results = []		 #contains a single page's results
-
+altinfo_list = []
+#GSTUDIO_SITE_NAME = "nroer_pro"
 append_to_url = ""
 author_index = "author_" + GSTUDIO_SITE_NAME
 gsystemtype_index = "node_type_" + GSTUDIO_SITE_NAME
@@ -42,6 +43,7 @@ def get_search(request):
 	global res_list
 	global results
 	global append_to_url
+	global altinfo_list
 
 	form = SearchForm(request.GET)
 	query = request.GET.get("query")
@@ -137,6 +139,7 @@ def get_search(request):
 					print (queryNameInfo[0],queryContentInfo[0],queryTagsInfo[0])
 					query_display = ""
 
+					altinfo_list = []
 					#what if all are 1 and 2/3 names are same but the third one has higher score
 					if((queryNameInfo[0]==1 and queryNameInfo[2]==query) or (queryContentInfo[0]==1 and queryContentInfo[2]==query) or (queryTagsInfo[0]==1 and queryTagsInfo[2]==query)): 
 						#if the original query is the query to be searched
@@ -145,6 +148,7 @@ def get_search(request):
 						#if we didnt find any suggestion, neither did we find the query already indexed->query remains same
 						query_display = query
 					else: #if we found a suggestion 
+						altinfo_list = ["<h3>No results found for <b>%s</b></h3>" % (query)]
 						res1_list = ['Search instead for <a href="">%s</a>'%(query)] #if the user still wants to search for the original query he asked for
 						if(queryNameInfo[1]>=queryContentInfo[1] and queryNameInfo[1]>=queryTagsInfo[1]):						 #comparing the scores of name,content,tags suggestions and finding the max of the three
 							query = queryNameInfo[2]
@@ -155,7 +159,9 @@ def get_search(request):
 						if(queryTagsInfo[1]>queryContentInfo[1] and queryTagsInfo[1]>queryNameInfo[1]):
 							query = queryTagsInfo[2]
 							query_display = queryTagsInfo[3]
-
+						
+						#if(es.search(index=GSTUDIO_SITE_NAME, doc_type=select, body=query_body)['hits']['total']>0):
+						altinfo_list.append("<h3>Showing results for <b>%s</b></h3>" % query_display)
 
 
 					if(queryNameInfo[0]==0 and queryContentInfo[0]==0 and queryTagsInfo[0]==0):#if we didnt find any suggestion, neither did we find the query already indexed
@@ -198,7 +204,7 @@ def get_search(request):
 										"size": 100
 									}
 
-					query_display = query
+					# query_display = query
 
 				resultSet = search_query(GSTUDIO_SITE_NAME, select, group, query_body)
 				hits = "<h3>No of docs found: <b>%d</b></h3>" % len(resultSet)
@@ -207,6 +213,8 @@ def get_search(request):
 				else:
 					res_list = ['<h3>Showing results for <b>%s</b> in group <b>"%s"</b>:</h3>' % (query_display, group), hits]
 				med_list = get_search_results(resultSet)
+				if(len(altinfo_list)>0):
+					res_list = [hits]
 				
 		paginator = Paginator(med_list, GSTUDIO_NO_OF_OBJS_PP)
 		page = request.GET.get('page')
@@ -218,7 +226,7 @@ def get_search(request):
 		except EmptyPage:
 			results = paginator.page(paginator.num_pages)
 
-		return render(request, 'ndf/sform.html', {'form': form, 'grpnam': group, 'grp': GROUP_CHOICES, 'header':res_list, 'content': results, 'append_to_url':append_to_url})
+		return render(request, 'ndf/sform.html', {'form': form, 'grpnam': group, 'grp': GROUP_CHOICES, 'header':res_list, 'alternate': altinfo_list ,'content': results, 'append_to_url':append_to_url})
 
 	return render(request, 'ndf/sform.html', {'form': form, 'grp': GROUP_CHOICES})
 	
@@ -262,8 +270,7 @@ def get_suggestion_body(query, field_value, slop_value, field_name_value):
 	return phrase_suggest
 
 def get_suggestion(suggestion_body, queryInfo, doc_types, query, field):
-	res = es.suggest(body=suggestion_body, index=GSTUDIO_SITE_NAME)						#first we search for suggestion in the name field as it has the highest priority
-	print(res)																					
+	res = es.suggest(body=suggestion_body, index=GSTUDIO_SITE_NAME)						#first we search for suggestion in the name field as it has the highest priority																				
 	if(len(res['suggest'][0]['options'])>0):									#if we get a suggestion means the phrase doesnt exist in the index
 		for sugitem in res['suggest'][0]['options']:
 			if sugitem['collate_match'] == True:								#we find the suggestion with collate_match = True
@@ -286,6 +293,7 @@ def get_search_results(resultArray):
 def resources_in_group(res,group):
 	results = []
 	group_id = group_map[group]
+	print group_id
 	for i in res["hits"]["hits"]:
 		if "group_set" in i["_source"].keys():
 			k = []
@@ -377,3 +385,19 @@ def advanced_search(request):
 	med_list = get_search_results(res)
 	print len(med_list)
 	return HttpResponse(json.dumps({"results": med_list}), content_type="application/json")
+
+	
+
+
+	# global med_list
+
+	# resultSet = search_query(index_name=gsystemtype_index, select=node_type, group="all",query="") # get all the docs in the gsystem index with type = node_type	
+	# for doc in resultSet:
+	# 	src = doc['_source']
+	# 	flag = True
+	# 	attribute_keys = {}
+	# 	for dictio in src['attribute_set']:
+	# 		attribute_keys[dictio.keys()[0]] = dictio[dictio.keys()[0]]
+	# 	print(attribute_keys)
+	# 	# for attr in arr_attributes.keys():
+	# 	# 	if(attr in src['attribute_set'])
