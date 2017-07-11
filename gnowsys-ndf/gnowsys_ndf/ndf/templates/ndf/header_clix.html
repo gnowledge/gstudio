@@ -159,11 +159,30 @@
             <!-- Left Nav Section -->
             <ul class="left show-for-medium-up">
                 {% if request.user.id %}
-                <li class=""><a href="{% url 'my_desk' request.user.id %}" {% if title == "my desk" %} class="active" {% endif %}>My Desk</a></li>
+                <li class=""><a href="{% url 'my_desk' request.user.id %}" {% if title == "my desk" %} class="active" {% endif %}>My Desk</a></li>  
                 {% endif %}
                 <li><a href="{% url explore_url %}" {% if title == 'base courses' or title == "courses" or title == "drafts" %} class="active" {% endif %} > Explore</a>
                 </li>
-                
+                <li class="has-form">
+                    <form {% if groupid %} action="{% url 'get_search' %}" {% else %} action="" {% endif %}
+                      name="search_form" method="GET" >
+
+                      <div class="row collapse">
+                        <div class="large-7 small-8 columns">
+                          <input type="text" name="query" id="search_text" placeholder='{% trans "Search" %} {{group_object.name|truncatechars:15}}' autocomplete="off" required/>
+                        </div>
+
+                        <div class="large-5 small-6 columns">
+                          <input type="checkbox" name="groupspec" id="groupbox" value="1">
+                          <input type="hidden"  name="group" value="{{ group_object.name }}">
+                          <button type="submit" class="tiny button" value="" id="search-submit">
+                            <i class="fi-magnifying-glass"></i>
+                          </button>
+                        </div>
+                      </div>
+
+                    </form>
+                  </li>
             </ul>
           </section>
     </nav>
@@ -186,6 +205,7 @@
                 $('.top-bar .toggle-topbar').trigger('click');
             })
         })
+
     </script>
   
 
