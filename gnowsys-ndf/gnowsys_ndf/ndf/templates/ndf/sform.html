@@ -52,6 +52,11 @@
 </div> 
 
 <br/> 
+
+{% for c in alternate %}
+	<p>{{c|safe}}</p>
+{% endfor %}
+
 {% for c in header %}
 	<p>{{c|safe}}</p>
 {% endfor %}
@@ -60,7 +65,7 @@
 <ul class="small-block-grid-1 medium-block-grid-3 large-block-grid-4">
 {% for c in content %}
 	<li class="card-image-wrapper">
-	{% include "ndf/card_group.html" with node=c %}
+	{% include "ndf/card_gsearch.html" with node=c %}
 	</li>
 {% endfor %}
 </ul>
@@ -72,7 +77,7 @@
 		  {% ifequal num content.number %}
 		    <span class="current"><b>{{ num }}</b></span>
 		  {% else %}
-		    <a href="?page={{ num }}&query={{ request.GET.query }}&group={{ request.GET.group }}&select={{ request.GET.select }}&search_select={{ request.GET.search_select }}{{ append_to_url }}">{{ num }}</a>
+		    <a href="?page={{ num }}&query={{ request.GET.query }}&group={{ request.GET.group }}&search_select={{ request.GET.search_select }}{{ append_to_url }}">{{ num }}</a>
 		  {% endifequal %} 
 		{% endfor %}
 	</span>
