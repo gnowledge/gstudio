@@ -1,0 +1,90 @@
+{% extends "ndf/gbase.html" %}
+{% block title %} Elastic Search {% endblock %}
+{% block body_content %}
+
+<script type="text/javascript">
+	document.getElementById("search_text").style.display = "none";
+	document.getElementById("groupbox").style.display = "none";
+	document.getElementById("search-submit").style.display = "none";
+</script>
+
+<style>
+	ul.errorlist {display: none;}
+	h3 {text-align:center;}
+	p {text-align:center;}
+	div.pagination {display: block; width: 10%; margin: 0 auto; }
+	#grid {width: 200px; padding-top: 5px;}
+	#selid {width: 200px; padding-top: 5px}
+	#but {padding-top: 10px; float: right;}
+	#filter {
+		/*float: left;*/
+		padding-top: 5px;
+	}
+	#ss {
+		padding-top: 5px; width:200px;
+	}
+</style>
+<div class="form_class"> 
+	<form action="" method="get">
+	<ul class="small-block-grid-1 medium-block-grid-3 large-block-grid-4">
+    <li>{{form.query}}</li>
+    <li id="grid">
+    <select name="group">
+    	{% for grname in grp %}
+    		{% ifequal grname grpnam %}
+    			<option value="{{grname}}" selected="selected">{{grpnam}}</option>
+    		{% else %}
+    			<option value="{{grname}}">{{grname}}</option>
+    		{% endifequal %}
+    	{% endfor %}
+    </select>
+    </li>
+    <li id="ss">{{form.search_select}}</li>
+    <div id="filter">
+	    <input type="checkbox" name="checks[]" value="all" /> All
+	    <input type="checkbox" name="checks[]" value="Author" /> Users
+		<input type="checkbox" name="checks[]" value="image" /> Images
+		<input type="checkbox" name="checks[]" value="video" /> Video
+	    <input type="checkbox" name="checks[]" value="text" /> Text
+	    <input type="checkbox" name="checks[]" value="audio" /> Audio
+	    <input type="checkbox" name="checks[]" value="Page" /> Page
+	    <input type="checkbox" name="checks[]" value="Group" /> Courses
+    </div>
+    <li id="but"><input type="submit" value="Search" /></li>
+    </ul>
+    </form>
+</div> 
+
+<br/> 
+
+{% for c in alternate %}
+	<p>{{c|safe}}</p>
+{% endfor %}
+
+{% for c in header %}
+	<p>{{c|safe}}</p>
+{% endfor %}
+
+<div>
+<ul class="small-block-grid-1 medium-block-grid-3 large-block-grid-4">
+{% for each in content %}
+	<li class="card-image-wrapper">
+	{% include "ndf/card_gsearch.html" with node=each url_name="node_detail" first_arg=each.group_set.0 second_arg=each.id %}
+	</li> 
+{% endfor %}
+</ul>
+
+</div>
+
+<div class="pagination">
+	<span class="step-links">	
+		{% for num in content.paginator.page_range %}
+		  {% ifequal num content.number %}
+		    <span class="current"><b>{{ num }}</b></span>
+		  {% else %}
+		    <a href="?page={{ num }}&query={{ request.GET.query }}&group={{ request.GET.group }}&search_select={{ request.GET.search_select }}{{ append_to_url }}">{{ num }}</a>
+		  {% endifequal %} 
+		{% endfor %}
+	</span>
+</div>
+{% endblock %}

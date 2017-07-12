@@ -1,0 +1,41 @@
+{% load static %}
+{% load i18n %}
+
+<a href="{% url 'node_detail' first_arg second_arg %}">
+<div class="unit_card">
+    {% comment %}
+    <div class="unit_status in-progress-status">
+        In-progress
+    </div>
+    {% endcomment %}
+    <div class="status-draft">DRAFT</div>
+
+    <div class="unit_header">
+        <img class="unit_banner" src="{% static node.if_file.thumbnail.relurl %}" style="height:50px ;width:50px"/>
+        <span class="unit_title">{{node.name|truncatechars:20}}</span>
+    </div>
+    <div class="unit_desc">
+        {{node.content}}
+    </div>
+    {% comment %}
+    <div class="unit_breif">
+        <div class="unit_breif_row">
+            <i class="fa fa-list-ul"></i>
+                3 of 6 lessons Complete
+        </div>
+        <div class="unit_breif_row">
+            <i class="fa fa-calendar"></i>
+                2 Weeks
+        </div>
+        <div class="unit_breif_row">
+            <i class="fa fa-user"></i>
+                5 Students Enrolled
+        </div>
+    </div>
+    {% endcomment %}
+
+     <div class="unit_actions">
+            <span>{{node.id}}</span></a>
+    </div> 
+ </div>
+ </a>

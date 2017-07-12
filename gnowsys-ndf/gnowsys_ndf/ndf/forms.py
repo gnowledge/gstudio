@@ -1,5 +1,5 @@
 import datetime
-
+import json
 from django import forms
 from django_mongokit.forms import DocumentForm
 from django.contrib.auth.forms import PasswordChangeForm, SetPasswordForm
@@ -9,6 +9,34 @@ from models import GSystemType
 
 from registration.forms import RegistrationForm
 from passwords.fields import PasswordField
+
+CHOICES=[("all",'All'),("Author",'Users'),("image",'Images'),("video",'Video'),("text",'Text'),("audio","Audio"),("Page",'Page'),("Group",'Courses')]
+SEARCH_CHOICE = [(0,'Search for data'),(1,'Contributions of Author')]
+GROUP_CHOICES=[]
+NODE_TYPE_CHOICES = []
+ATTRIBUTE_CHOICES = {}
+RELATION_CHOICES = {}
+
+GROUP_CHOICES.append(("all","All"))
+SEARCH_CHOICE = [(0,'Search for Data'),(1,'Contributions of an Author')]
+group_map = {}
+mapping_directory = '/home/docker/code/gstudio/gnowsys-ndf/gnowsys_ndf/ndf/mappings'
+
+with open(mapping_directory+"/groupmap.json", 'r') as gm:
+    group_map = json.load(gm)
+with open("/home/docker/code/gstudio/gnowsys-ndf/gnowsys_ndf/ndf/mappings/groupmap.json", 'r') as gm:
+    group_map = json.load(gm)
+
+for name,gid in group_map.iteritems():
+    tup = (gid, name)
+    tup = tuple(tup)
+    GROUP_CHOICES.append(tup)
+
+
+class SearchForm(forms.Form):
+    query = forms.CharField(label = '', widget = forms.TextInput(attrs={'placeholder': 'Search for'}))
+    group = forms.ChoiceField(label = "Group", widget = forms.Select, choices = GROUP_CHOICES)
+    search_select = forms.ChoiceField(label = "Search for", widget= forms.Select, choices= SEARCH_CHOICE)
 
 class NodeForm(DocumentForm):
 
