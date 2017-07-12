@@ -35,6 +35,7 @@ historyMgr = HistoryManager()
 DUMP_NODES_LIST = []
 DUMPED_NODE_IDS = set()
 DUMP_NODE_ID = None
+MULTI_DUMP = False
 
 def create_log_file(dump_node_id):
     '''
@@ -80,6 +81,7 @@ def create_configs_file(group_id):
         configs_file_out.write("\nGSTUDIO_INSTITUTE_ID='" + str(GSTUDIO_INSTITUTE_ID) + "'")
         configs_file_out.write("\nGROUP_ID='" + str(group_id) + "'")
         configs_file_out.write("\nDUMP_NODE_ID='" + str(DUMP_NODE_ID) + "'")
+        configs_file_out.write("\nMULTI_DUMP='" + str(MULTI_DUMP) + "'")
         configs_file_out.write("\nGIT_COMMIT_HASH='" + str(get_latest_git_hash()) + "'")
         configs_file_out.write("\nGIT_BRANCH_NAME='" + str(get_active_branch_name()) + "'")
         configs_file_out.write('\nSYSTEM_DETAILS="' + str(os.uname()) + '"')
@@ -525,6 +527,7 @@ class Command(BaseCommand):
         global SCHEMA_MAP_PATH
         global DUMP_PATH
         global DUMP_NODE_ID
+        global MULTI_DUMP
         input_name_or_id = raw_input("\n\tPlease enter ObjectID of the Group: ")
         dump_node_obj = node_collection.one({'_id': ObjectId(input_name_or_id)})
         group_node = None
@@ -537,7 +540,6 @@ class Command(BaseCommand):
             if dump_node_obj._type == 'Group':
                 core_export(dump_node_obj)
                 SCHEMA_MAP_PATH = DUMP_PATH
-
             else:
                 global DUMP_NODE_objS_LIST
                 global TOP_PATH
@@ -547,6 +549,7 @@ class Command(BaseCommand):
                 print "\n********REQUEST DUMP NODE IS NOT GROUP.*********\n"
                 confirm_non_grp_exp = raw_input("\n\tDo you want to continue? Enter y/n:\t ")
                 if confirm_non_grp_exp in ['y', 'Y']:
+                    MULTI_DUMP = True
                     # Based on the request dump_node_obj member_of and type fields, query for the field contents.
                     # if "module" in dump_node_obj.member_of_names_list:
                     module_units_cur = node_collection.find({
@@ -562,6 +565,7 @@ class Command(BaseCommand):
                         if dump_grp_list_confirm in ['y', 'Y']:
                             for each_unit in DUMP_NODES_LIST:
                                 core_export(each_unit)
+
                     dump_node(node=dump_node_obj,collection_name=node_collection)
             create_factory_schema_mapper(SCHEMA_MAP_PATH)
             print "*"*70
