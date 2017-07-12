@@ -51,6 +51,7 @@
 	    <input type="checkbox" name="checks[]" value="Group" /> Courses
     </div>
     <li id="but"><input type="submit" value="Search" /></li>
+    <a href="{% url 'get_advanced_search_form' %}">Advanced Search</a>
     </ul>
     </form>
 </div> 
@@ -68,9 +69,11 @@
 <div>
 <ul class="small-block-grid-1 medium-block-grid-3 large-block-grid-4">
 {% for each in content %}
+	{% if each.group_set.0 %}
 	<li class="card-image-wrapper">
 	{% include "ndf/card_gsearch.html" with node=each url_name="node_detail" first_arg=each.group_set.0 second_arg=each.id %}
-	</li> 
+	</li>
+	{% endif %}
 {% endfor %}
 </ul>
 
