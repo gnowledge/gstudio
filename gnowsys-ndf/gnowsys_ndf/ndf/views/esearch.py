@@ -29,7 +29,7 @@ med_list = []		 #contains all the search results
 res_list = []		 #contains the header of the search results
 results = []		 #contains a single page's results
 altinfo_list = []
-#GSTUDIO_SITE_NAME = "nroer_pro"
+
 append_to_url = ""
 author_index = "author_" + GSTUDIO_SITE_NAME
 gsystemtype_index = "node_type_" + GSTUDIO_SITE_NAME
@@ -50,18 +50,15 @@ def get_search(request):
 	form.query = query
 
 	if(query):
-		print(query)
+		
 		group = request.GET.get("group")
 		chkl = request.GET.getlist("groupspec")
-		print chkl
 		if(len(chkl)>0):
 			group = "All"
-		print "query in group ", group
 		page = request.GET.get("page")
+
 		if(page is None):
-			print(query)
 			query_display = ""
-			#group = request.GET.get('group')
 			search_select = request.GET.get('search_select')
 			search_filter = request.GET.getlist('checks[]')
 			if(str(search_select) == '1'):
@@ -87,7 +84,6 @@ def get_search(request):
 						append_to_url += "&checks%5B%5D="+search_filter[i]
 					append_to_url  += "&checks%5B%5D="+search_filter[len(search_filter) - 1]
 					select += search_filter[len(search_filter) - 1]
-				print(select)
 
 				phsug_name = get_suggestion_body(query, field_value = "name.trigram", slop_value = 2, field_name_value = "name")
 				phsug_content = get_suggestion_body(query, field_value = "content.trigram", slop_value = 3, field_name_value = "content")
@@ -115,8 +111,6 @@ def get_search(request):
 							q += qlist[itr]
 						itr += 1
 
-				print(dqlis, q)
-
 				#dealing with the case when the user has given "" in the query
 				if(len(dqlis)>0):
 					query_body = '{ "query": {"bool": { "should": ['
@@ -136,7 +130,6 @@ def get_search(request):
 					if(queryNameInfo[2]!=query and queryContentInfo[2]!=query):
 						get_suggestion(phsug_tags, queryTagsInfo, select, query, "tags")
 
-					print (queryNameInfo[0],queryContentInfo[0],queryTagsInfo[0])
 					query_display = ""
 
 					altinfo_list = []
@@ -204,10 +197,8 @@ def get_search(request):
 										"size": 100
 									}
 
-					# query_display = query
 
 				resultSet = search_query(GSTUDIO_SITE_NAME, select, group, query_body)
-				#print "111111111111111111111",resultSet
 				hits = "<h3>No of docs found: <b>%d</b></h3>" % len(resultSet)
 				if(group=="All"):
 					res_list = ['<h3>Showing results for <b>%s</b> :</h3' % query_display, hits]
@@ -219,7 +210,6 @@ def get_search(request):
 				
 		paginator = Paginator(med_list, GSTUDIO_NO_OF_OBJS_PP)
 		page = request.GET.get('page')
-		print(page)
 		try:
 			results = paginator.page(page)
 		except PageNotAnInteger:
@@ -271,7 +261,7 @@ def get_suggestion_body(query, field_value, slop_value, field_name_value):
 	return phrase_suggest
 
 def get_suggestion(suggestion_body, queryInfo, doc_types, query, field):
-	res = es.suggest(body=suggestion_body, index=GSTUDIO_SITE_NAME)						#first we search for suggestion in the name field as it has the highest priority																				
+	res = es.suggest(body=suggestion_body, index=GSTUDIO_SITE_NAME)						#first we search for suggestion in the name field as it has the highest priority
 	if(len(res['suggest'][0]['options'])>0):									#if we get a suggestion means the phrase doesnt exist in the index
 		for sugitem in res['suggest'][0]['options']:
 			if sugitem['collate_match'] == True:								#we find the suggestion with collate_match = True
@@ -294,7 +284,6 @@ def get_search_results(resultArray):
 def resources_in_group(res,group):
 	results = []
 	group_id = group_map[group]
-	print group_id
 	for i in res["hits"]["hits"]:
 		if "group_set" in i["_source"].keys():
 			k = []
@@ -336,7 +325,6 @@ def search_query(index_name, select, group, query):
 		body['from'] = i
 		res = es.search(index = index_name, doc_type=doctype, body = body)
 		l = len(res["hits"]["hits"])
-		print (body)
 		if(l==0):
 			return []
 		if l > 0 and l <= siz:
@@ -415,7 +403,6 @@ def advanced_search(request):
 					rsub = es.get(index=GSTUDIO_SITE_NAME, id=rightid)
 				except Exception as e:
 					continue
-				print rsub["_source"]["name"]
 				if(rsub["_source"]["name"] == rel_value):
 					fl = 1
 					break
@@ -425,6 +412,5 @@ def advanced_search(request):
 		if(flag==0):
 			med_list1.append(result)
 
-	print len(med_list1)
 	return HttpResponse(json.dumps({"results": med_list1}), content_type="application/json")
 
