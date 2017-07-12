@@ -45,7 +45,6 @@ def index_docs(all_docs):
 				document["object_value"] = str(document["object_value"])	#for consistent mapping 
 
 			doc_type = get_document_type(document)
-			print("indexing document %d with id: %s" % (k,document["id"]))
 			es.index(index=index, doc_type=doc_type, id=document["id"], body=document)
 			if "contributors" in document.keys():
 				contributors = document["contributors"]
@@ -56,7 +55,6 @@ def index_docs(all_docs):
 				for type_ids in document['member_of']:
 					es.index(index = gsystemtype_index, doc_type = type_ids, id = document["id"], body = document)
 
-			print("indexed document %d with id: %s" % (k,document["id"]))
 			k+=1
 
 def get_document_type(document):
@@ -93,7 +91,6 @@ def main():
 	if(es.indices.exists(gsystemtype_index)):
 		print("Deleting the existing gtype index: "+ index+ "for reindexing")
 		res = es.indices.delete(index=gsystemtype_index)
-		print(res)
 
 	with open("/home/docker/code/gstudio/gnowsys-ndf/gnowsys_ndf/req_body.json") as req_body:
 		request_body = json.load(req_body)
