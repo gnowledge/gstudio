@@ -24,24 +24,24 @@ from gnowsys_ndf.ndf.templatetags.simple_filters import get_latest_git_hash, get
 # global variables declaration
 GROUP_CONTRIBUTORS = []
 DUMP_PATH = None
+TOP_PATH = os.path.join(GSTUDIO_DATA_ROOT, 'data_export')
 GROUP_ID = None
 DATA_EXPORT_PATH = None
 MEDIA_EXPORT_PATH = None
-IS_FORK = False
-IS_CLONE = False
 RESTORE_USER_DATA = False
+SCHEMA_MAP_PATH = None
 log_file = None
 historyMgr = HistoryManager()
+DUMP_NODES_LIST = []
 DUMPED_NODE_IDS = set()
+DUMP_NODE_ID = None
 
-def create_log_file():
+def create_log_file(dump_node_id):
     '''
         Creates log file in gstudio-logs/ with 
         the name of the dump folder
     '''
-    global DUMP_PATH
-    dump_path = DUMP_PATH.split("/")[-1]
-    log_file_name = 'group_dump_' + str(dump_path)+ '.log'
+    log_file_name = 'group_dump_' + str(dump_node_id)+ '.log'
     if not os.path.exists(GSTUDIO_LOGS_DIR_PATH):
         os.makedirs(GSTUDIO_LOGS_DIR_PATH)
 
@@ -52,16 +52,17 @@ def create_log_file():
     log_file.write("\n######### Script ran on : " + str(datetime.datetime.now()) + " #########\n\n")
     return log_file_path
 
-def setup_dump_path(group_name):
+def setup_dump_path(node_name):
     '''
         Creates factory_schema.json which will hold basic info
         like ObjectId, name, type of TYPES_LIST and GSTUDIO_DEFAULT_GROUPS
     '''
     global DUMP_PATH
+    global TOP_PATH
     global DATA_EXPORT_PATH
     global MEDIA_EXPORT_PATH
     datetimestamp = datetime.datetime.now().isoformat()
-    DUMP_PATH = os.path.join(GSTUDIO_DATA_ROOT, 'data_export', group_name + "_" + str(datetimestamp))
+    DUMP_PATH = os.path.join(TOP_PATH, node_name + "_" + str(datetimestamp))
     DATA_EXPORT_PATH = os.path.join(DUMP_PATH, 'dump')
     MEDIA_EXPORT_PATH = os.path.join(DATA_EXPORT_PATH, 'media_files')
     if not os.path.exists(DATA_EXPORT_PATH):
@@ -71,17 +72,14 @@ def setup_dump_path(group_name):
     return DATA_EXPORT_PATH
 
 def create_configs_file(group_id):
-    global IS_FORK
-    global IS_CLONE
     global RESTORE_USER_DATA
     global DUMP_PATH
     configs_file_path = os.path.join(DUMP_PATH, "migration_configs.py")
     with open(configs_file_path, 'w+') as configs_file_out:
-        configs_file_out.write("\nFORK=" + str(IS_FORK))
-        configs_file_out.write("\nCLONE=" + str(IS_CLONE))
         configs_file_out.write("\nRESTORE_USER_DATA=" + str(RESTORE_USER_DATA))
         configs_file_out.write("\nGSTUDIO_INSTITUTE_ID='" + str(GSTUDIO_INSTITUTE_ID) + "'")
         configs_file_out.write("\nGROUP_ID='" + str(group_id) + "'")
+        configs_file_out.write("\nDUMP_NODE_ID='" + str(DUMP_NODE_ID) + "'")
         configs_file_out.write("\nGIT_COMMIT_HASH='" + str(get_latest_git_hash()) + "'")
         configs_file_out.write("\nGIT_BRANCH_NAME='" + str(get_active_branch_name()) + "'")
         configs_file_out.write('\nSYSTEM_DETAILS="' + str(os.uname()) + '"')
@@ -141,94 +139,52 @@ def get_triple_data(node_id):
         print error_log
         pass
 
-class Command(BaseCommand):
-    def handle(self, *args, **options):
-        group_name_or_id = raw_input("\n\tPlease enter Name or ObjectID of the Group: ")
-        group_node   = get_group_name_id(group_name_or_id.strip(), get_obj=True)
 
-        if group_node:
-            print "\tRequest received for Export of : ", group_node.name , ' | ObjectId: ', group_node._id
-            # fork_clone_opt = "\n\tExport Options:"
-            # fork_clone_opt += "\n\t\t 1. Fork (What is Fork?"
-            # fork_clone_opt += " Restore will create instances with NEW Ids)"
-            # fork_clone_opt += "\n\t\t 2. Clone (What is Clone?"
-            # fork_clone_opt += " Restore will create instances with OLD Ids)"
-            # fork_clone_opt += "\n\tEnter options 1 or 2 or any other key to cancel: \t"
-
-            # fork_clone_confirm = raw_input(fork_clone_opt)
-            global IS_FORK
-            global IS_CLONE
-            global RESTORE_USER_DATA
-            IS_FORK = True
-            IS_CLONE = False
-            
-            # if fork_clone_confirm == '1':
-            #     print "\n\t!!! Chosen FORK option !!!"
-            #     IS_FORK = True
-            #     IS_CLONE = False
-            # elif fork_clone_confirm == '2':
-            #     print "\n\t!!! Chosen CLONE option !!!"
-            #     IS_FORK = False
-            #     IS_CLONE = True
-            # else:
-            #     call_exit()
-            user_data_dump = raw_input("\n\tDo you want to include Users in this export ? Enter y/n:\t ")
-            if user_data_dump == 'y' or user_data_dump == 'Y':
-                RESTORE_USER_DATA = True
-            else:
-                RESTORE_USER_DATA = False
-
-            nodes_falling_under_grp = node_collection.find({"group_set":ObjectId(group_node._id), '_type': {'$nin': ['Group', 'Author']}})
-            print "\n\tTotal objects found: ", nodes_falling_under_grp.count()
-            confirm_export = raw_input("\n\tDo you want to continue? Enter y/n:\t ")
-            if confirm_export is 'y' or confirm_export is 'Y':
-                print "START : ", str(datetime.datetime.now())
-                group_dump_path = setup_dump_path(slugify(group_node.name))
-                create_factory_schema_mapper(group_dump_path)
-                configs_file_path = create_configs_file(group_node._id)
-                log_file_path = create_log_file()
-
-                print "*"*70
-                # print "\n Export will be found at: ", DATA_EXPORT_PATH
-                print "\n Export will be found at: ", DUMP_PATH
-                print "\n Log will be found at: ", log_file_path
-
-                print "\n This will take few minutes. Please be patient.\n"
-                print "*"*70
-                # import ipdb; ipdb.set_trace()
-                global GROUP_ID
-                GROUP_ID = group_node._id
-                call_group_export(group_node, nodes_falling_under_grp)
-                get_counter_ids(group_node._id)
-                # import ipdb; ipdb.set_trace()
-                global GROUP_CONTRIBUTORS
-                if RESTORE_USER_DATA:
-                    GROUP_CONTRIBUTORS = list(set(GROUP_CONTRIBUTORS))
-                    create_users_dump(group_dump_path, GROUP_CONTRIBUTORS)
-
-                write_md5_of_dump(group_dump_path, configs_file_path)
-                global log_file
-                print "*"*70
-                print "\n Export will be found at: ", DUMP_PATH
-                print "\n Log will be found at: ", log_file_path
-                print "*"*70
-
-
-                log_file.write("\n*************************************************************")
-                log_file.write("\n######### Script Completed at : " + str(datetime.datetime.now()) + " #########\n\n")
-                print "END : ", str(datetime.datetime.now())
-                log_file.close()
-            else:
-                call_exit()
+def core_export(group_node):
+    if group_node:
+        print "\tRequest received for Export of : ", group_node.name , ' | ObjectId: ', group_node._id
+        global RESTORE_USER_DATA
+        user_data_dump = raw_input("\n\tDo you want to include Users in this export ? Enter y/Y to continue:\t ")
+        if user_data_dump in ['y', 'Y']:
+            RESTORE_USER_DATA = True
         else:
-            print "\n Node not found with provided Name or ObjectID"
-            call_exit()
+            RESTORE_USER_DATA = False
 
+        nodes_falling_under_grp = node_collection.find({
+                "group_set":ObjectId(group_node._id),
+                "_type": {'$nin': ['Group', 'Author']}})
+        print "\n\tTotal objects found: ", nodes_falling_under_grp.count()
+        confirm_export = raw_input("\n\tEnter y/Y to Continue or any other key to Abort:\t ")
+        if confirm_export in ['y', 'Y']:
+            print "START : ", str(datetime.datetime.now())
+            group_dump_path = setup_dump_path(slugify(group_node.name))
+
+            global GROUP_ID
+            GROUP_ID = group_node._id
+            call_group_export(group_node, nodes_falling_under_grp)
+            get_counter_ids(group_node._id)
+            # import ipdb; ipdb.set_trace()
+            global GROUP_CONTRIBUTORS
+            if RESTORE_USER_DATA:
+                GROUP_CONTRIBUTORS = list(set(GROUP_CONTRIBUTORS))
+                create_users_dump(group_dump_path, GROUP_CONTRIBUTORS)
+
+            configs_file_path = create_configs_file(group_node._id)
+            write_md5_of_dump(group_dump_path, configs_file_path)
+            global log_file
+
+            log_file.write("\n*************************************************************")
+            log_file.write("\n######### Script Completed at : " + str(datetime.datetime.now()) + " #########\n\n")
+            print "END : ", str(datetime.datetime.now())
+        else:
+            call_exit()
+    else:
+        print "\n Node not found with provided Name or ObjectID"
+        call_exit()
 
 
 def call_exit():
     print "\n Exiting..."
-    log_file.close()
     os._exit(0)
 
 def worker_export(nodes_cur):
@@ -563,3 +519,54 @@ def get_counter_ids(group_id):
     if counter_collection_cur :
         for each_obj in counter_collection_cur :
             dump_node(node=each_obj,collection_name=counter_collection)
+
+class Command(BaseCommand):
+    def handle(self, *args, **options):
+        global SCHEMA_MAP_PATH
+        global DUMP_PATH
+        global DUMP_NODE_ID
+        input_name_or_id = raw_input("\n\tPlease enter ObjectID of the Group: ")
+        dump_node_obj = node_collection.one({'_id': ObjectId(input_name_or_id)})
+        group_node = None
+
+        if dump_node_obj:
+            # import ipdb; ipdb.set_trace()
+            log_file_path = create_log_file(dump_node_obj._id)
+            DUMP_NODE_ID = dump_node_obj._id
+
+            if dump_node_obj._type == 'Group':
+                core_export(dump_node_obj)
+                SCHEMA_MAP_PATH = DUMP_PATH
+
+            else:
+                global DUMP_NODE_objS_LIST
+                global TOP_PATH
+                datetimestamp = datetime.datetime.now().isoformat()
+                TOP_PATH = os.path.join(GSTUDIO_DATA_ROOT, 'data_export', slugify(dump_node_obj.name) + "_"+ str(datetimestamp))
+                SCHEMA_MAP_PATH = TOP_PATH
+                print "\n********REQUEST DUMP NODE IS NOT GROUP.*********\n"
+                confirm_non_grp_exp = raw_input("\n\tDo you want to continue? Enter y/n:\t ")
+                if confirm_non_grp_exp in ['y', 'Y']:
+                    # Based on the request dump_node_obj member_of and type fields, query for the field contents.
+                    # if "module" in dump_node_obj.member_of_names_list:
+                    module_units_cur = node_collection.find({
+                                        '_id': {'$in': dump_node_obj.collection_set},
+                                        '_type': 'Group'})
+                    if module_units_cur.count():
+                        print "\nFollowing are the Groups part of request dump. \n\tEnter y/Y to select or any other key to skip the group:\t "
+                        for each_unit in module_units_cur:
+                            select_grp = raw_input(each_unit.name + "("+ each_unit.member_of_names_list[0]+  ") :\t")
+                            if select_grp in ['y', 'Y']:
+                                DUMP_NODES_LIST.append(each_unit)
+                        dump_grp_list_confirm = raw_input("\n\n\t\tEnter y/Y to continue:\t ")
+                        if dump_grp_list_confirm in ['y', 'Y']:
+                            for each_unit in DUMP_NODES_LIST:
+                                core_export(each_unit)
+                    dump_node(node=dump_node_obj,collection_name=node_collection)
+            create_factory_schema_mapper(SCHEMA_MAP_PATH)
+            print "*"*70
+            print "\n This will take few minutes. Please be patient.\n"
+            print "\n Log will be found at: ", log_file_path
+            print "*"*70
+            log_file.close()
+            call_exit()
