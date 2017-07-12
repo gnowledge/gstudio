@@ -18,12 +18,12 @@ ATTRIBUTE_CHOICES = {}
 RELATION_CHOICES = {}
 
 GROUP_CHOICES.append(("all","All"))
+SEARCH_CHOICE = [(0,'Search for Data'),(1,'Contributions of an Author')]
 group_map = {}
-gsystem_map = {}
-attribute_map = {}
+mapping_directory = '/home/docker/code/gstudio/gnowsys-ndf/gnowsys_ndf/ndf/mappings'
 
-relation_map = {}
-
+with open(mapping_directory+"/groupmap.json", 'r') as gm:
+    group_map = json.load(gm)
 with open("/home/docker/code/gstudio/gnowsys-ndf/gnowsys_ndf/ndf/mappings/groupmap.json", 'r') as gm:
     group_map = json.load(gm)
 
@@ -32,12 +32,11 @@ for name,gid in group_map.iteritems():
     tup = tuple(tup)
     GROUP_CHOICES.append(tup)
 
+
 class SearchForm(forms.Form):
     query = forms.CharField(label = '', widget = forms.TextInput(attrs={'placeholder': 'Search for'}))
     group = forms.ChoiceField(label = "Group", widget = forms.Select, choices = GROUP_CHOICES)
-    select = forms.ChoiceField(label = "Filter", widget = forms.Select, choices = CHOICES)
     search_select = forms.ChoiceField(label = "Search for", widget= forms.Select, choices= SEARCH_CHOICE)
-
 
 class NodeForm(DocumentForm):
 

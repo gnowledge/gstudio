@@ -207,6 +207,7 @@ def get_search(request):
 					# query_display = query
 
 				resultSet = search_query(GSTUDIO_SITE_NAME, select, group, query_body)
+				#print "111111111111111111111",resultSet
 				hits = "<h3>No of docs found: <b>%d</b></h3>" % len(resultSet)
 				if(group=="All"):
 					res_list = ['<h3>Showing results for <b>%s</b> :</h3' % query_display, hits]
@@ -298,7 +299,7 @@ def resources_in_group(res,group):
 		if "group_set" in i["_source"].keys():
 			k = []
 			for g_id in (i["_source"]["group_set"]):
-				k.append(g_id["$oid"]) 
+				k.append(g_id) 
 			if group_id in k:
 				results.append(i)
 	return results
@@ -352,7 +353,7 @@ def search_query(index_name, select, group, query):
 
 
 def get_advanced_search_form(request):
-	with open(mapping_directory+"/gsystemtype.json") as gm:
+	with open(mapping_directory+"/gsystemtype_map.json") as gm:
 		gsystemtype_map = json.load(gm)
 
 	with open(mapping_directory+"/attribute_map.json") as am:
@@ -367,37 +368,63 @@ def get_advanced_search_form(request):
 	return render(request, 'ndf/advanced_search.html',{"gsystemtype_map":gsystemtype_map_str,'attribute_map':attribute_map_str,'relation_map':relation_map_str})
 
 def advanced_search(request):
+	global med_list
+
 	node_type = request.GET.get("node_type")
 	arr_attributes = json.loads(request.GET["arr_attributes"])
 	arr_relations = json.loads(request.GET["arr_relations"])
 
 	query_body = ""
-	if(len(arr_attributes)>0 or len(arr_relations)>0):
+	if(len(arr_attributes.keys())>0):
 		query_body = '{ "query": {"bool": { "must": ['
-	for attr_name, atr_value in arr_attributes.iteritems():
-		query_body += ('{"match": { "%s": "%s"}},' % (attr_name, atr_value))
-	for rel_name, rel_value in arr_relations.iteritems():
-		query_body += ('{"match": { "%s": "%s" }},' % (rel_name, rel_value))
-	query_body += (']}}, "from": 0, "size": 100}')
-	query_body = eval(query_body)
+		for attr_name, atr_value in arr_attributes.iteritems():
+			query_body += ('{"match": { "%s": "%s"}},' % (attr_name, atr_value))
+		query_body += (']}}, "from": 0, "size": 100}')
+		query_body = eval(query_body)
+		res = search_query(gsystemtype_index, node_type, "All", query_body)
+		med_list = get_search_results(res)
 
-	res = search_query(gsystemtype_index, node_type, "All", query_body)
-	med_list = get_search_results(res)
-	print len(med_list)
-	return HttpResponse(json.dumps({"results": med_list}), content_type="application/json")
+	#for relation check -> the user value entered for a relation must be exactly same as the relation value present in the doc
+	if(len(arr_attributes.keys())==0):
+		body = {
+						"query":{
+							"match_all":{}
+						},
+						"from": 0,
+						"size": 100
+					} 
+		res = search_query(gsystemtype_index, node_type, "All", body)
+		med_list = get_search_results(res)
 
-	
+	#print med_list
+	med_list1 = [];
+	for result in med_list:
+		flag = 0
+		for reldict in result["relation_set"]:
+			for k in reldict.keys():
+				result[k] = reldict[k]
 
+		for rel_name, rel_value in arr_relations.iteritems():
+			fl = 0
+			if(rel_name not in result.keys() or len(result[rel_name])==0):
+				flag = 1
+				break
 
-	# global med_list
+			for rightid in result[rel_name]:
+				try:
+					rsub = es.get(index=GSTUDIO_SITE_NAME, id=rightid)
+				except Exception as e:
+					continue
+				print rsub["_source"]["name"]
+				if(rsub["_source"]["name"] == rel_value):
+					fl = 1
+					break
+			if(fl==0):
+				flag = 1
+				break				
+		if(flag==0):
+			med_list1.append(result)
 
-	# resultSet = search_query(index_name=gsystemtype_index, select=node_type, group="all",query="") # get all the docs in the gsystem index with type = node_type	
-	# for doc in resultSet:
-	# 	src = doc['_source']
-	# 	flag = True
-	# 	attribute_keys = {}
-	# 	for dictio in src['attribute_set']:
-	# 		attribute_keys[dictio.keys()[0]] = dictio[dictio.keys()[0]]
-	# 	print(attribute_keys)
-	# 	# for attr in arr_attributes.keys():
-	# 	# 	if(attr in src['attribute_set'])
+	print len(med_list1)
+	return HttpResponse(json.dumps({"results": med_list1}), content_type="application/json")
+

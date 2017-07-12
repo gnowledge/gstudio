@@ -28,7 +28,7 @@ def index_docs(all_docs):
 			else:
 				pass
 			
-		doc = json.dumps(node, default=json_util.default) #convert mongoDB object to a JSON string
+		doc = json.dumps(node, cls=NodeJSONEncoder) #convert mongoDB object to a JSON string
 		#doc = json.loads(doc,object_hook=json_util.object_hook) ->get back mongoDB object from JSON string
 
 		document = json.loads(doc) #convert JSON string to a python dictionary
@@ -45,25 +45,25 @@ def index_docs(all_docs):
 				document["object_value"] = str(document["object_value"])	#for consistent mapping 
 
 			doc_type = get_document_type(document)
-			print("indexing document %d with id: %s" % (k,document["id"]["$oid"]))
-			es.index(index=index, doc_type=doc_type, id=document["id"]["$oid"], body=document)
+			print("indexing document %d with id: %s" % (k,document["id"]))
+			es.index(index=index, doc_type=doc_type, id=document["id"], body=document)
 			if "contributors" in document.keys():
 				contributors = document["contributors"]
 				for contributor_id in contributors:
-					es.index(index = author_index, doc_type = contributor_id, id=document["id"]["$oid"], body = document)
+					es.index(index = author_index, doc_type = contributor_id, id=document["id"], body = document)
 
 			if(document["type"] == "GSystem"):
 				for type_ids in document['member_of']:
-					es.index(index = gsystemtype_index, doc_type = type_ids["$oid"], id = document["id"]["$oid"], body = document)
+					es.index(index = gsystemtype_index, doc_type = type_ids, id = document["id"], body = document)
 
-			print("indexed document %d with id: %s" % (k,document["id"]["$oid"]))
+			print("indexed document %d with id: %s" % (k,document["id"]))
 			k+=1
 
 def get_document_type(document):
 	types_arr = ["Author", "GAttribute", "GRelation", "AttributeType", "Filehive", "RelationType", "Group", "GSystemType"]	
 	if document["type"]=="GSystem":
 		for ids in document['member_of']:  #document is a member of the Page GSystemType
-			if(ids['$oid'] == page_id):
+			if(ids == page_id):
 				return "Page"
 		if('if_file' in document.keys()):
 			if(document["if_file"]["mime_type"] is not None):
