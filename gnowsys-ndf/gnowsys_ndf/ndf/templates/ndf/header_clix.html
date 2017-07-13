@@ -164,9 +164,8 @@
                 <li><a href="{% url explore_url %}" {% if title == 'base courses' or title == "courses" or title == "drafts" %} class="active" {% endif %} > Explore</a>
                 </li>
                 <li class="has-form">
-                    <form {% if groupid %} action="{% url 'get_search' %}" {% else %} action="" {% endif %}
+                    <form action="{% url 'get_search' %}"
                       name="search_form" method="GET" >
-
                       <div class="row collapse">
                         <div class="large-7 small-8 columns">
                           <input type="text" name="query" id="search_text" placeholder='{% trans "Search" %} {{group_object.name|truncatechars:15}}' autocomplete="off" required/>
