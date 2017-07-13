@@ -8,13 +8,13 @@ from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 from elasticsearch import Elasticsearch		
 from gnowsys_ndf.ndf.forms import SearchForm
 from gnowsys_ndf.ndf.models import *
-from gnowsys_ndf.settings import GSTUDIO_SITE_NAME,GSTUDIO_NO_OF_OBJS_PP
+from gnowsys_ndf.settings import GSTUDIO_SITE_NAME,GSTUDIO_NO_OF_OBJS_PP,GSTUDIO_DOCUMENT_MAPPING
 
 es = Elasticsearch(['http://elsearch:changeit@gsearch:9200'])
 author_map = {}
 group_map = {}
 
-mapping_directory = '/home/docker/code/gstudio/gnowsys-ndf/gnowsys_ndf/ndf/mappings'
+mapping_directory = GSTUDIO_DOCUMENT_MAPPING
 if(os.path.isdir(mapping_directory)):
 	with open(mapping_directory+'/authormap.json') as fe:
 		author_map = json.load(fe)
@@ -217,9 +217,9 @@ def get_search(request):
 		except EmptyPage:
 			results = paginator.page(paginator.num_pages)
 
-		return render(request, 'ndf/sform.html', {'form': form, 'grpnam': group, 'grp': GROUP_CHOICES, 'header':res_list, 'alternate': altinfo_list ,'content': results, 'append_to_url':append_to_url})
+		return render(request, 'ndf/sform.html', {'form': form, 'grpnam': group, 'grp': GROUP_CHOICES, 'searchop': search_filter, 'header':res_list, 'alternate': altinfo_list ,'content': results, 'append_to_url':append_to_url})
 
-	return render(request, 'ndf/sform.html', {'form': form, 'grp': GROUP_CHOICES})
+	return render(request, 'ndf/sform.html', {'form': form, 'grp': GROUP_CHOICES, 'searchop': []})
 	
 
 def get_suggestion_body(query, field_value, slop_value, field_name_value):
