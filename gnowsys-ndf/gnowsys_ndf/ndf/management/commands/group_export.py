@@ -34,7 +34,8 @@ log_file = None
 historyMgr = HistoryManager()
 DUMP_NODES_LIST = []
 DUMPED_NODE_IDS = set()
-DUMP_NODE_ID = None
+ROOT_DUMP_NODE_ID = None
+ROOT_DUMP_NODE_NAME = None
 MULTI_DUMP = False
 
 def create_log_file(dump_node_id):
@@ -80,7 +81,8 @@ def create_configs_file(group_id):
         configs_file_out.write("\nRESTORE_USER_DATA=" + str(RESTORE_USER_DATA))
         configs_file_out.write("\nGSTUDIO_INSTITUTE_ID='" + str(GSTUDIO_INSTITUTE_ID) + "'")
         configs_file_out.write("\nGROUP_ID='" + str(group_id) + "'")
-        configs_file_out.write("\nDUMP_NODE_ID='" + str(DUMP_NODE_ID) + "'")
+        configs_file_out.write("\nROOT_DUMP_NODE_ID='" + str(ROOT_DUMP_NODE_ID) + "'")
+        configs_file_out.write("\nROOT_DUMP_NODE_NAME='" + str(ROOT_DUMP_NODE_NAME) + "'")
         configs_file_out.write("\nMULTI_DUMP='" + str(MULTI_DUMP) + "'")
         configs_file_out.write("\nGIT_COMMIT_HASH='" + str(get_latest_git_hash()) + "'")
         configs_file_out.write("\nGIT_BRANCH_NAME='" + str(get_active_branch_name()) + "'")
@@ -526,7 +528,8 @@ class Command(BaseCommand):
     def handle(self, *args, **options):
         global SCHEMA_MAP_PATH
         global DUMP_PATH
-        global DUMP_NODE_ID
+        global ROOT_DUMP_NODE_ID
+        global ROOT_DUMP_NODE_NAME
         global MULTI_DUMP
         input_name_or_id = raw_input("\n\tPlease enter ObjectID of the Group: ")
         dump_node_obj = node_collection.one({'_id': ObjectId(input_name_or_id)})
@@ -535,7 +538,8 @@ class Command(BaseCommand):
         if dump_node_obj:
             # import ipdb; ipdb.set_trace()
             log_file_path = create_log_file(dump_node_obj._id)
-            DUMP_NODE_ID = dump_node_obj._id
+            ROOT_DUMP_NODE_ID = dump_node_obj._id
+            ROOT_DUMP_NODE_NAME = dump_node_obj.name
 
             if dump_node_obj._type == 'Group':
                 core_export(dump_node_obj)
