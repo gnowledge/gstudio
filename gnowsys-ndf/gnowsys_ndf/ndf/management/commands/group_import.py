@@ -594,6 +594,12 @@ def restore_node(filepath, non_grp_root_node=None):
     print node_json
     try:
         if non_grp_root_node:
+            root_node_obj = node_collection.one({'_type': 'GSystem',
+                '_id': ObjectId(non_grp_root_node[0]),
+                'name': non_grp_root_node[1]})
+            root_node_obj.collection_set = merge_lists_and_maintain_unique_ele(root_node_obj.collection_set,
+                node_json['collection_set'])
+            root_node_obj.save()
 
         node_obj = node_collection.one({'_id': ObjectId(node_json['_id'])})
         if node_obj:
