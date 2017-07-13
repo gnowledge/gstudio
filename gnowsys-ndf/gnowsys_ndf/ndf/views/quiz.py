@@ -46,14 +46,17 @@ app = gst_quiz
 def quiz(request, group_id):
     """Renders a list of all 'Quiz-type-GSystems' available within the database.
     """
-    try:
-        group_id = ObjectId(group_id)
-    except:
-        group_name, group_id = get_group_name_id(group_id)
+    group_obj = get_group_name_id(group_id, get_obj=True)
+    group_id = group_obj._id
+    group_name = group_obj.name
     title = gst_quiz.name
     quiz_nodes = node_collection.find({'member_of': gst_quiz._id, 'group_set': ObjectId(group_id)}).sort('last_update', -1)
-    gst_quiz_item_id = node_collection.one({'_type': 'GSystemType', 'name': u'QuizItem'})._id
-    quiz_item_nodes = node_collection.find({'member_of': {'$all': [gst_quiz_item_id]}, 'group_set': {'$all': [ObjectId(group_id)]}}).sort('last_update', -1)
+    gst_quiz_names = ['QuizItem']
+    if "CourseEventGroup" in group_obj.member_of_names_list:
+        gst_quiz_names.append('QuizItemEvent')
+    gst_quiz_item = node_collection.find({'_type': 'GSystemType', 'name': {'$in': gst_quiz_names}})
+    gst_quiz_item_ids = [each_quiz_gst._id for each_quiz_gst in gst_quiz_item]
+    quiz_item_nodes = node_collection.find({'member_of': {'$in': gst_quiz_item_ids}, 'group_set': ObjectId(group_id)}).sort('last_update', -1)
     return render_to_response("ndf/quiz.html",
                               {'title': title,
                                'quiz_nodes': quiz_nodes,
@@ -303,7 +306,6 @@ def quiz_details(request, group_id, node_id):
         group_id = ObjectId(group_id)
     except:
         group_name, group_id = get_group_name_id(group_id)
-
     title = gst_quiz.name
     gst_quiz_item = node_collection.one({'_type': 'GSystemType', 'name': u'QuizItem'})
 

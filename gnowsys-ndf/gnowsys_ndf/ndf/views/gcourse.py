@@ -30,11 +30,11 @@ from gnowsys_ndf.ndf.models import NodeJSONEncoder
 from gnowsys_ndf.settings import GSTUDIO_SITE_NAME
 from gnowsys_ndf.ndf.models import Node, AttributeType, RelationType
 from gnowsys_ndf.ndf.models import node_collection, triple_collection
+from gnowsys_ndf.ndf.views.group import *
 from gnowsys_ndf.ndf.views.file import *
 from gnowsys_ndf.ndf.templatetags.ndf_tags import edit_drawer_widget, get_disc_replies, get_all_replies,user_access_policy, get_relation_value, check_is_gstaff, get_attribute_value
 from gnowsys_ndf.ndf.views.methods import get_node_common_fields, parse_template_data, get_execution_time, delete_node, get_filter_querydict, update_notes_or_files_visited
 from gnowsys_ndf.ndf.views.notify import set_notif_val
-from gnowsys_ndf.ndf.views.group import *
 from gnowsys_ndf.ndf.views.methods import get_property_order_with_value, get_group_name_id, get_course_completetion_status, replicate_resource
 from gnowsys_ndf.ndf.views.ajax_views import *
 from gnowsys_ndf.ndf.views.analytics_methods import *
@@ -1437,11 +1437,12 @@ def get_resources(request, group_id):
             except:
                 unit_node = None
             if resource_type:
-                if resource_type == "Pandora":
+                if "Pandora" in resource_type :
                     resource_type = "Pandora_video"
-                if resource_type == "Quiz":
-                    resource_type = "QuizItem"
-                if resource_type == "File":
+                elif "Quiz" in resource_type:
+                    resource_type = ["QuizItem", "QuizItemEvent"]
+                    resource_gst_id = [GSystemType.get_gst_name_id(each_gst)[1] for each_gst in resource_type]
+                elif "File" in resource_type:
                     resource_type = ["File", "Jsmol", "PoliceSquad", "OpenStoryTool", "TurtleBlocks", "BioMechanics"]
                     resource_gst_id = [GSystemType.get_gst_name_id(each_gst)[1] for each_gst in resource_type]
                 else:
