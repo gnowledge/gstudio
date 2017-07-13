@@ -188,6 +188,8 @@ def create_edit(request, group_id, node_id=None):
         # get_node_common_fields(request, course_node, group_id, GST_COURSE)
         basecoursegroup_gst = node_collection.one({'_type': "GSystemType", 'name': u"BaseCourseGroup"})
         if not course_node:
+            from gnowsys_ndf.ndf.views.group import CreateGroup
+
             base_course_group_name = request.POST.get('name','')
             group = CreateGroup(request)
             result = group.create_group(base_course_group_name)
