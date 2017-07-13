@@ -545,7 +545,9 @@ class Command(BaseCommand):
                 # Multi Group Dump
                 # Get the dumps of Groups and loop over each dump to import
                 # gd == group-dump
+                print "\n***** NON Group Dump found. *****\n"
                 dump_dir = [os.path.join(DATA_RESTORE_PATH,gd) for gd in os.listdir(DATA_RESTORE_PATH) if os.path.isdir(os.path.join(DATA_RESTORE_PATH,gd))]
+                print "\n Total Groups to be Restored: ", len(dump_dir)
                 for each_gd_abs_path in dump_dir:
                     # Call this tmw
                     # SCHEMA_ID_MAP = update_factory_schema_mapper(DATA_DUMP_PATH)
@@ -571,7 +573,7 @@ class Command(BaseCommand):
                     else:
                         core_import()
 
-                    print "\n each_gd: ", os.path.join(DATA_RESTORE_PATH,each_gd)
+                    print "\n each_gd_abs_path: ", os.path.join(DATA_RESTORE_PATH,each_gd_abs_path)
             print "*"*70
             # print "\n Export will be found at: ", DATA_EXPORT_PATH
             print "\n This will take few minutes. Please be patient.\n"
@@ -595,6 +597,7 @@ def restore_node(filepath, non_grp_root_node=None):
     print node_json
     try:
         if non_grp_root_node:
+            log_file.write("\n non_grp_root_node: " +  str(non_grp_root_node))
             root_node_obj = node_collection.one({'_type': 'GSystem',
                 '_id': ObjectId(non_grp_root_node[0]),
                 'name': non_grp_root_node[1]})
