@@ -4,7 +4,7 @@ import sys
 import json
 from elasticsearch import Elasticsearch
 from gnowsys_ndf.ndf.models import *
-from gnowsys_ndf.settings import GSTUDIO_SITE_NAME
+from gnowsys_ndf.settings import GSTUDIO_SITE_NAME, GSTUDIO_DOCUMENT_MAPPING
 
 ##### use the below commented lines if you are working with Python 2.x   #####
 # reload(sys)  
@@ -96,7 +96,7 @@ def main():
 		request_body = json.load(req_body)
 	with open("/home/docker/code/gstudio/gnowsys-ndf/gnowsys_ndf/req_body_gtype.json") as req_body_type:
 		request_body_gtype = json.load(req_body_type)
-	with open("/home/docker/code/gstudio/gnowsys-ndf/gnowsys_ndf/ndf/mappings/gsystemtype_map.json") as gtypemap:
+	with open(GSTUDIO_DOCUMENT_MAPPING+"/gsystemtype_map.json") as gtypemap:
 		gtype_map = json.load(gtypemap)
 	page_id = gtype_map["Page"]
 

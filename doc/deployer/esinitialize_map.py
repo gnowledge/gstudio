@@ -4,6 +4,7 @@ import sys
 import json
 from elasticsearch import Elasticsearch
 from gnowsys_ndf.ndf.models import *
+from gnowsys_ndf.settings import GSTUDIO_DOCUMENT_MAPPING
 
 es = Elasticsearch("http://elsearch:changeit@gsearch:9200")
 
@@ -75,7 +76,7 @@ def main():
 	for key,val in id_relation_map.iteritems():
 		id_relation_map[key] = list(set(val))
 
-	mapping_directory = "/home/docker/code/gstudio/gnowsys-ndf/gnowsys_ndf/ndf/mappings"
+	mapping_directory = GSTUDIO_DOCUMENT_MAPPING
 	if not os.path.exists(mapping_directory):
 		print("creating mapping directory")
 		os.makedirs(mapping_directory)
