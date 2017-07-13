@@ -596,7 +596,7 @@ def restore_node(filepath, non_grp_root_node=None):
     node_json = get_json_file(filepath)
     print node_json
     try:
-        if non_grp_root_node:
+        if non_grp_root_node and non_grp_root_node[0] == node_json['_id']:
             log_file.write("\n non_grp_root_node: " +  str(non_grp_root_node))
             root_node_obj = node_collection.one({'_type': 'GSystem',
                 '_id': {'$ne': ObjectId(non_grp_root_node[0])},
