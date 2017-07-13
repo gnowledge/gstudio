@@ -3,6 +3,7 @@ import json
 from django import forms
 from django_mongokit.forms import DocumentForm
 from django.contrib.auth.forms import PasswordChangeForm, SetPasswordForm
+from gnowsys_ndf.settings import GSTUDIO_DOCUMENT_MAPPING
 
 from models import Node
 from models import GSystemType
@@ -20,11 +21,11 @@ RELATION_CHOICES = {}
 GROUP_CHOICES.append(("all","All"))
 SEARCH_CHOICE = [(0,'Search for Data'),(1,'Contributions of an Author')]
 group_map = {}
-mapping_directory = '/home/docker/code/gstudio/gnowsys-ndf/gnowsys_ndf/ndf/mappings'
+mapping_directory = GSTUDIO_DOCUMENT_MAPPING
 
 with open(mapping_directory+"/groupmap.json", 'r') as gm:
     group_map = json.load(gm)
-with open("/home/docker/code/gstudio/gnowsys-ndf/gnowsys_ndf/ndf/mappings/groupmap.json", 'r') as gm:
+with open(mapping_directory+"/groupmap.json", 'r') as gm:
     group_map = json.load(gm)
 
 for name,gid in group_map.iteritems():
