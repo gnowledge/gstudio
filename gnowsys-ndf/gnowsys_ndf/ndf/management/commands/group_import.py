@@ -549,8 +549,9 @@ class Command(BaseCommand):
                 for each_gd_abs_path in dump_dir:
                     # Call this tmw
                     # SCHEMA_ID_MAP = update_factory_schema_mapper(DATA_DUMP_PATH)
-                    DATA_DUMP_PATH = os.path.join(each_gd_abs_path, 'dump')
                     SCHEMA_ID_MAP = update_factory_schema_mapper(DATA_RESTORE_PATH)
+                    DATA_DUMP_PATH = os.path.join(each_gd_abs_path, 'dump')
+                    DATA_RESTORE_PATH = each_gd_abs_path
                     read_config_file()
 
 
