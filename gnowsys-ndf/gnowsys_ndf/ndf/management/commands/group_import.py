@@ -95,7 +95,7 @@ def validate_data_dump():
         print "\n MD5 NOT matching."
         proceed_without_validation = raw_input("MD5 not matching. Restoration not recommended.\n \
                         Would you still like to continue ?")
-        if proceed_without_validation != 'y' and proceed_without_validation != 'Y':
+        if proceed_without_validation not in ['y', 'Y']:
             log_file.write("\n Checksum validation Failed on dump data")
             call_exit()
     else:
@@ -137,7 +137,7 @@ def check_group_availability():
     # group_node = node_collection.one({'_id': ObjectId(CONFIG_VARIABLES.GROUP_ID)})
     if group_node:
         confirm_grp_data_merge = raw_input("Dump Group already exists here. Would you like to merge the data ?")
-        if confirm_grp_data_merge != 'y' and confirm_grp_data_merge != 'Y':
+        if confirm_grp_data_merge not in ['y', 'Y']:
             log_file.write("\n Group with Restore Group ID is FOUND on Target system.")
             print "\n Group with restoration ID already exists."
             call_exit()
@@ -158,7 +158,7 @@ def user_objs_restoration():
     if CONFIG_VARIABLES.RESTORE_USER_DATA:
         user_dump_restore = raw_input("\n\tUser dump is available.  \
             Would you like to restore it (y/n) ?: ")
-        if user_dump_restore == 'y' or user_dump_restore == 'Y':
+        if user_dump_restore in ['y', 'Y']:
             log_file.write("\n Request for users restoration : Yes.")
 
             user_json_file_path = os.path.join(DATA_DUMP_PATH, 'users_dump.json')
@@ -173,7 +173,7 @@ def user_objs_restoration():
             DEFAULT_USER_SET = True
             default_user_confirmation = raw_input("\n\tRestoration will use default user-id=1. \
             \n\tEnter y to continue, or n if you want to use some other id?: ")
-            if default_user_confirmation == 'y' or default_user_confirmation == 'Y':
+            if default_user_confirmation in ['y', 'Y']:
                 log_file.write("\n Request for Default user with id=1 : Yes.")
                 DEFAULT_USER_ID = 1
             else:
@@ -282,14 +282,14 @@ def restore_filehive_objects(rcs_filehives_path):
                 log_file.write("\nFound Existing Filehive Object : \n\tFound-obj: " + \
                     str(fh_obj) + "\n\tExiting-obj: "+str(fh_json))
 
-def restore_node_objects(rcs_nodes_path):
+def restore_node_objects(rcs_nodes_path, non_grp_root_node=None):
     print "\nRestoring Nodes.."
     global log_file
     log_file.write("\nRestoring Nodes. ")
     for dir_, _, files in os.walk(rcs_nodes_path):
         for filename in files:
             filepath =  os.path.join(dir_, filename)
-            restore_node(filepath)
+            restore_node(filepath,non_grp_root_node)
 
 def restore_triple_objects(rcs_triples_path):
     print "\nRestoring Triples.."
@@ -483,7 +483,7 @@ def restore_counter_objects(rcs_counters_path):
                     log_file.write("\nError while inserting Counter obj" + str(counter_insert_err))
                     pass
 
-def call_group_import(rcs_repo_path):
+def call_group_import(rcs_repo_path,non_grp_root_node=None):
 
     rcs_filehives_path = os.path.join(rcs_repo_path, "Filehives")
     rcs_nodes_path = os.path.join(rcs_repo_path, "Nodes")
@@ -492,7 +492,7 @@ def call_group_import(rcs_repo_path):
 
     # Following sequence is IMPORTANT
     # restore_filehive_objects(rcs_filehives_path)
-    restore_node_objects(rcs_nodes_path)
+    restore_node_objects(rcs_nodes_path, non_grp_root_node)
     restore_triple_objects(rcs_triples_path)
 
     # skip foll. command katkamrachana 21Apr2017
@@ -508,6 +508,24 @@ def copy_media_data(media_path):
         subprocess.Popen(media_copy_cmd,stderr=subprocess.STDOUT,shell=True)
         log_file.write("\n Media Copied:  " + str(media_path) )
 
+def core_import(non_grp_root_node=None):
+    global log_file
+
+    log_file_path = create_log_file(DATA_RESTORE_PATH)
+    print "\n Log will be found at: ", log_file_path
+
+    log_file.write("\nUpdated CONFIG_VARIABLES: "+ str(CONFIG_VARIABLES))
+    print "\n Validating the data-dump"
+    validate_data_dump()
+    print "\n Checking the dump Group-id availability."
+    check_group_availability()
+    print "\n User Restoration."
+    user_objs_restoration()
+    print "\n Factory Schema Restoration. Please wait.."
+    # print "\n SCHEMA: ", SCHEMA_ID_MAP
+    call_group_import(os.path.join(DATA_DUMP_PATH, 'data', 'rcs-repo'),non_grp_root_node)
+    copy_media_data(os.path.join(DATA_DUMP_PATH, 'media_files', 'data', 'media'))
+
 class Command(BaseCommand):
     def handle(self, *args, **options):
 
@@ -516,40 +534,67 @@ class Command(BaseCommand):
         global SCHEMA_ID_MAP
         DATA_RESTORE_PATH = raw_input("\n\tEnter absolute path of data-dump folder to restore:")
         if os.path.exists(DATA_RESTORE_PATH):
-            DATA_DUMP_PATH = os.path.join(DATA_RESTORE_PATH, 'dump')
+            # Check if DATA_DUMP_PATH has dump, if not then its dump of Node holding Groups.
+            if os.path.exists(os.path.join(DATA_RESTORE_PATH, 'dump')):
+                # Single Group Dump
+                DATA_DUMP_PATH = os.path.join(DATA_RESTORE_PATH, 'dump')
+                SCHEMA_ID_MAP = update_factory_schema_mapper(DATA_DUMP_PATH)
+                read_config_file()
+                core_import()
+            else:
+                # Multi Group Dump
+                # Get the dumps of Groups and loop over each dump to import
+                # gd == group-dump
+                dump_dir = [os.path.join(DATA_RESTORE_PATH,gd) for gd in os.listdir(DATA_RESTORE_PATH) if os.path.isdir(os.path.join(DATA_RESTORE_PATH,gd))]
+                for each_gd_abs_path in dump_dir:
+                    # Call this tmw
+                    # SCHEMA_ID_MAP = update_factory_schema_mapper(DATA_DUMP_PATH)
+                    DATA_DUMP_PATH = os.path.join(each_gd_abs_path, 'dump')
+                    SCHEMA_ID_MAP = update_factory_schema_mapper(DATA_RESTORE_PATH)
+                    read_config_file()
+
+
+                    non_grp_root_node_obj = node_collection.one({
+                            'name': CONFIG_VARIABLES.ROOT_DUMP_NODE_NAME})
+                    if non_grp_root_node_obj:
+                        if non_grp_root_node_obj._id != ObjectId(CONFIG_VARIABLES.ROOT_DUMP_NODE_ID):
+                            # Module exists, but ID is different
+                            core_import(
+                                        non_grp_root_node=(
+                                                CONFIG_VARIABLES.ROOT_DUMP_NODE_ID,
+                                                CONFIG_VARIABLES.ROOT_DUMP_NODE_NAME
+                                                )
+                                        )
+                        else:
+                            core_import()
+                    else:
+                        core_import()
+
+                    print "\n each_gd: ", os.path.join(DATA_RESTORE_PATH,each_gd)
             print "*"*70
             # print "\n Export will be found at: ", DATA_EXPORT_PATH
             print "\n This will take few minutes. Please be patient.\n"
             print "*"*70
-            read_config_file()
             
-            log_file_path = create_log_file(DATA_RESTORE_PATH)
-            global log_file
-            log_file.write("\nUpdated CONFIG_VARIABLES: "+ str(CONFIG_VARIABLES))
-            print "\n Validating the data-dump"
-            validate_data_dump()
-            print "\n Checking the dump Group-id availability."
-            check_group_availability()
-            print "\n User Restoration."
-            user_objs_restoration()
-
-            print "\n Factory Schema Restoration. Please wait.."
-            SCHEMA_ID_MAP = update_factory_schema_mapper(DATA_DUMP_PATH)
-            print "\n SCHEMA: ", SCHEMA_ID_MAP
-            print "\n Log will be found at: ", log_file_path
-            call_group_import(os.path.join(DATA_DUMP_PATH, 'data', 'rcs-repo'))
-            copy_media_data(os.path.join(DATA_DUMP_PATH, 'media_files', 'data', 'media'))
         else:
             print "\n No dump found at entered path."
             call_exit()
 
-def restore_node(filepath):
+def restore_node(filepath, non_grp_root_node=None):
+    '''
+    non_grp_root_node tuple (ObjectId, name) is used if the GSystem existing on target 
+    and we intend to skip the dumped-node-id having the name 
+    and member_of same but that differ in ObjectId.
+    (dumped_node_id, exisiting_node_id)
+    '''
     global log_file
     log_file.write("\nRestoring Node: " +  str(filepath))
 
     node_json = get_json_file(filepath)
     print node_json
     try:
+        if non_grp_root_node:
+
         node_obj = node_collection.one({'_id': ObjectId(node_json['_id'])})
         if node_obj:
             log_file.write("\nFound Existing Node : " + str(node_obj._id))
