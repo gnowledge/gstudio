@@ -29,6 +29,7 @@ med_list = []		 #contains all the search results
 res_list = []		 #contains the header of the search results
 results = []		 #contains a single page's results
 altinfo_list = []
+search_filter = []
 
 append_to_url = ""
 author_index = "author_" + GSTUDIO_SITE_NAME
@@ -44,6 +45,7 @@ def get_search(request):
 	global results
 	global append_to_url
 	global altinfo_list
+	global search_filter
 
 	form = SearchForm(request.GET)
 	query = request.GET.get("query")
