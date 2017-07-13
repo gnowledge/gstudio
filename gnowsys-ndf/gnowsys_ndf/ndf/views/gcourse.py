@@ -191,11 +191,18 @@ def create_edit(request, group_id, node_id=None):
             from gnowsys_ndf.ndf.views.group import CreateGroup
 
             base_course_group_name = request.POST.get('name','')
+            group_access_type = request.POST.get('login-mode','PUBLIC')
+            if isinstance(group_access_type, list):
+                group_access_type = unicode(group_access_type[0])
+            else:
+                group_access_type = unicode(group_access_type)
             group = CreateGroup(request)
             result = group.create_group(base_course_group_name)
             if result[0]:
                 course_node = result[1]
                 course_node.member_of = [basecoursegroup_gst._id]
+                course_node.group_type = group_access_type
+                course_node.status = u'PUBLISHED'
                 course_node.save()
                 # course_node.save(is_changed=get_node_common_fields(request, course_node, group_id, GST_COURSE),groupid=group_id)
                 # create_gattribute(course_node._id, at_course_type, u"General")
