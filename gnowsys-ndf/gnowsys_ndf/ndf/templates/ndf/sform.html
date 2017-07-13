@@ -12,7 +12,7 @@
 	ul.errorlist {display: none;}
 	h3 {text-align:center;}
 	p {text-align:center;}
-	div.pagination {display: block; width: 10%; margin: 0 auto; }
+	div.pagination {display: block; width: 40%; margin: 0 auto; }
 	#grid {width: 200px; padding-top: 5px;}
 	#selid {width: 200px; padding-top: 5px}
 	#but {padding-top: 10px; float: right;}
@@ -41,14 +41,14 @@
     </li>
     <li id="ss">{{form.search_select}}</li>
     <div id="filter">
-	    <input type="checkbox" name="checks[]" value="all" /> All
-	    <input type="checkbox" name="checks[]" value="Author" /> Users
-		<input type="checkbox" name="checks[]" value="image" /> Images
-		<input type="checkbox" name="checks[]" value="video" /> Video
-	    <input type="checkbox" name="checks[]" value="text" /> Text
-	    <input type="checkbox" name="checks[]" value="audio" /> Audio
-	    <input type="checkbox" name="checks[]" value="Page" /> Page
-	    <input type="checkbox" name="checks[]" value="Group" /> Courses
+	    <input type="checkbox" name="checks[]" value="all" {% if "all" in searchop %} checked {% endif %}/> All
+	    <input type="checkbox" name="checks[]" value="Author" {% if "Author" in searchop %} checked {% endif %} /> Users
+		<input type="checkbox" name="checks[]" value="image" {% if "image" in searchop %} checked {% endif %}/> Images
+		<input type="checkbox" name="checks[]" value="video" {% if "video" in searchop %} checked {% endif %}/> Video
+	    <input type="checkbox" name="checks[]" value="text" {% if "text" in searchop %} checked {% endif %}/> Text
+	    <input type="checkbox" name="checks[]" value="audio" {% if "audio" in searchop %} checked {% endif %}/> Audio
+	    <input type="checkbox" name="checks[]" value="Page" {% if "Page" in searchop %} checked {% endif %}/> Page
+	    <input type="checkbox" name="checks[]" value="Group" {% if "Group" in searchop %} checked {% endif %}/> Courses
     </div>
     <li id="but"><input type="submit" value="Search" /></li>
     <a href="{% url 'get_advanced_search_form' %}">Advanced Search</a>
@@ -72,6 +72,10 @@
 	{% if each.group_set.0 %}
 	<li class="card-image-wrapper">
 	{% include "ndf/card_gsearch.html" with node=each url_name="node_detail" first_arg=each.group_set.0 second_arg=each.id %}
+	</li>
+	{% else %}			<!-- sending the id of home as group id if group-set is empty-->
+	<li class="card-image-wrapper">
+	{% include "ndf/card_gsearch.html" with node=each url_name="node_detail" first_arg="5752ad5a2e01310a05dca583" second_arg=each.id %}
 	</li>
 	{% endif %}
 {% endfor %}
