@@ -21,8 +21,8 @@ from gnowsys_ndf.ndf.models import node_collection, triple_collection, gridfs_co
 def tools_logging(request):
 
 	#test method for tools logging
-	userdata = json.loads(request.GET.get('user_data',' '))
-	app_name = request.GET.get('app_name',' ')
+	userdata = json.loads(request.POST.get('user_data',' '))
+	app_name = request.POST.get('app_name',' ')
 	old_data = []
 	buddies_authid_list = request.session.get('buddies_authid_list', [])
 	buddy_id_list = Author.get_user_id_list_from_author_oid_list(buddies_authid_list)
