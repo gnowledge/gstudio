@@ -3,11 +3,9 @@
 
 <a href="{% url 'node_detail' first_arg second_arg %}">
 <div class="unit_card">
-    
-    <div class="status-draft">DRAFT</div>
 
     <div class="unit_header">
-        <img class="unit_banner" src="{% static node.if_file.thumbnail.relurl %}" style="height:50px ;width:50px"/>
+        <img class="unit_banner" {% if node.if_file.thumbnail.relurl %} src="{{MEDIA_URL}}{{node.if_file.thumbnail.relurl}}" {% else %} src="/static/ndf/images/module_banner.png" {% endif %} style="height:50px ;width:50px"/>
         <span class="unit_title">{{node.name|truncatechars:20}}</span>
     </div>
     <div class="unit_desc">
