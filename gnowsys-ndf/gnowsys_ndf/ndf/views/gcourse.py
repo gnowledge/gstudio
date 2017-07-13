@@ -207,7 +207,11 @@ def create_edit(request, group_id, node_id=None):
                 # create_gattribute(course_node._id, at_course_type, u"General")
                 # print "\n course_node ---- ", course_node
         if course_node:
+
             course_node.save(is_changed=get_node_common_fields(request, course_node, group_id, basecoursegroup_gst),groupid=group_id)
+            course_node.group_type = group_access_type
+            course_node.status = u'PUBLISHED'
+            course_node.save()
 
             # adding thumbnail
             f = request.FILES.get("doc", "")
@@ -247,8 +251,6 @@ def create_edit(request, group_id, node_id=None):
                     rt_has_logo = node_collection.one({'_type': "RelationType", 'name': "has_logo"})
                     # print "\n creating GRelation has_logo\n"
                     create_grelation(course_node._id, rt_has_logo, ObjectId(fileobj))
-            course_node.group_type = group_access_type
-            course_node.status = u'PUBLISHED'
 
         return HttpResponseRedirect(reverse('groupchange', kwargs={'group_id': course_node._id}))
     else:
