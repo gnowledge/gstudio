@@ -186,23 +186,22 @@ def create_edit(request, group_id, node_id=None):
 
     if request.method == "POST":
         # get_node_common_fields(request, course_node, group_id, GST_COURSE)
+        group_access_type = request.POST.get('login-mode','PUBLIC')
+        if isinstance(group_access_type, list):
+            group_access_type = unicode(group_access_type[0])
+        else:
+            group_access_type = unicode(group_access_type)
+
         basecoursegroup_gst = node_collection.one({'_type': "GSystemType", 'name': u"BaseCourseGroup"})
         if not course_node:
             from gnowsys_ndf.ndf.views.group import CreateGroup
 
             base_course_group_name = request.POST.get('name','')
-            group_access_type = request.POST.get('login-mode','PUBLIC')
-            if isinstance(group_access_type, list):
-                group_access_type = unicode(group_access_type[0])
-            else:
-                group_access_type = unicode(group_access_type)
             group = CreateGroup(request)
             result = group.create_group(base_course_group_name)
             if result[0]:
                 course_node = result[1]
                 course_node.member_of = [basecoursegroup_gst._id]
-                course_node.group_type = group_access_type
-                course_node.status = u'PUBLISHED'
                 course_node.save()
                 # course_node.save(is_changed=get_node_common_fields(request, course_node, group_id, GST_COURSE),groupid=group_id)
                 # create_gattribute(course_node._id, at_course_type, u"General")
@@ -248,6 +247,9 @@ def create_edit(request, group_id, node_id=None):
                     rt_has_logo = node_collection.one({'_type': "RelationType", 'name': "has_logo"})
                     # print "\n creating GRelation has_logo\n"
                     create_grelation(course_node._id, rt_has_logo, ObjectId(fileobj))
+            course_node.group_type = group_access_type
+            course_node.status = u'PUBLISHED'
+
         return HttpResponseRedirect(reverse('groupchange', kwargs={'group_id': course_node._id}))
     else:
         if node_id:
