@@ -4,10 +4,10 @@ import sys
 import json
 from elasticsearch import Elasticsearch
 from gnowsys_ndf.ndf.models import *
-from gnowsys_ndf.settings import GSTUDIO_SITE_NAME
+from gnowsys_ndf.settings import GSTUDIO_SITE_NAME,GSTUDIO_DOCUMENT_MAPPING
 
 es = Elasticsearch("http://elsearch:changeit@gsearch:9200")
-mapping_directory = '/home/docker/code/gstudio/gnowsys-ndf/gnowsys_ndf/ndf/mappings'
+mapping_directory = GSTUDIO_DOCUMENT_MAPPING
 
 #during deleting or updating do we need need to set refresh=true to make the document available for search
 
