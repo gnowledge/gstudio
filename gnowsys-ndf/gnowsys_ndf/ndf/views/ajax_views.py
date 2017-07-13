@@ -884,7 +884,7 @@ def get_inner_collection(collection_list, node, no_res=False):
   inner_list_append_temp=inner_list.append #a temp. variable which stores the lookup for append method
 
   # if not no_res or not res_flag:
-  if not no_res or (not "CourseUnitEvent" in node.member_of_names_list):
+  if not no_res or (not "CourseUnitEvent" in node.member_of_names_list or not "CourseUnit" in node.member_of_names_list):
     if node.collection_set:
       for each in node.collection_set:
         col_obj = node_collection.one({'_id': ObjectId(each)})
