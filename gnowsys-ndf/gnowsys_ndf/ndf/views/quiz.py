@@ -29,7 +29,7 @@ from gnowsys_ndf.ndf.rcslib import RCS
 from gnowsys_ndf.ndf.views.methods import get_node_common_fields,create_grelation_list,get_execution_time
 from gnowsys_ndf.ndf.management.commands.data_entry import create_gattribute
 from gnowsys_ndf.ndf.views.methods import get_node_metadata, set_all_urls, get_group_name_id, create_thread_for_node
-from gnowsys_ndf.ndf.templatetags.ndf_tags import get_relation_value, get_attribute_value
+from gnowsys_ndf.ndf.templatetags.ndf_tags import get_relation_value, get_attribute_value, get_thread_node
 
 
 #######################################################################################################################################
@@ -358,11 +358,13 @@ def save_quizitem_answer(request, group_id):
             except:
                 pass
             '''
-            grel_dict = get_relation_value(node_obj._id,"has_thread", True)
-            is_cursor = grel_dict.get("cursor",False)
-            if not is_cursor:
-                thread_obj = grel_dict.get("grel_node")
-                # print "\n thread_obj: ", thread_obj
+
+            thread_obj = get_thread_node(node_obj._id)
+            # grel_dict = get_relation_value(node_obj._id,"has_thread", True)
+            # is_cursor = grel_dict.get("cursor",False)
+            # if not is_cursor:
+            #     thread_obj = grel_dict.get("grel_node")
+            #     # print "\n thread_obj: ", thread_obj
 
             user_action = request.POST.get("user_action", '')
 

@@ -5706,7 +5706,10 @@ def replicate_resource(request, node, group_id, mem_of_node_id=None):
         #         has_thread_rt = node_collection.one({"_type": "RelationType", "name": u"has_thread"})
         #         gr = create_grelation(new_gsystem._id, has_thread_rt, thread_obj._id)
 
-
+        if "QuizItem" in node.member_of_names_list or "QuizItemEvent" in node.member_of_names_list:
+            thread_obj = get_thread_node(new_gsystem._id)
+            if not thread_obj:
+                thread_obj = create_thread_for_node(request,group_id, new_gsystem)
         # if "QuizItem" in node.member_of_names_list or "QuizItemEvent" in node.member_of_names_list:
         #     # from gnowsys_ndf.ndf.templatetags.ndf_tags import get_relation_value
 
