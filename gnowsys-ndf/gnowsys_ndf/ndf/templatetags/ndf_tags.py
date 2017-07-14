@@ -3693,10 +3693,13 @@ def get_user_quiz_resp(node_obj, user_obj):
 	thread_obj = None
 	if node_obj and user_obj:
 		try:
-			grel_dict = get_relation_value(node_obj._id,"has_thread", True)
-			is_cursor = grel_dict.get("cursor",False)
-			if not is_cursor:
-				thread_obj = grel_dict.get("grel_node")
+			from gnowsys_ndf.ndf.templatetags.ndf_tags import get_thread_node
+			thread_obj = get_thread_node(node_obj._id)
+
+			# grel_dict = get_relation_value(node_obj._id,"has_thread", True)
+			# is_cursor = grel_dict.get("cursor",False)
+			# if not is_cursor:
+			# 	thread_obj = grel_dict.get("grel_node")
 
 			# for each_rel in node_obj.relation_set:
 			# 	if each_rel and "has_thread" in each_rel:
