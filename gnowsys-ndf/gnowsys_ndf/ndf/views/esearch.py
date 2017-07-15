@@ -40,6 +40,12 @@ for name in group_map.keys():
     GROUP_CHOICES.append(name)
 
 def get_search(request): 
+	'''
+	This function retrieves the search query from the search form and performs
+	the search with the help of other functions defined below and then sends the
+	results to sform.html for rendering. See the end of this function for
+	the control flow of how rendering is done
+	'''
 	global med_list
 	global res_list
 	global results
@@ -91,7 +97,7 @@ def get_search(request):
 				phsug_content = get_suggestion_body(query, field_value = "content.trigram", slop_value = 3, field_name_value = "content")
 				phsug_tags = get_suggestion_body(query, field_value = "tags.trigram", slop_value = 2, field_name_value = "tags")
 
-				queryNameInfo = [0, 0.0, "", ""] #[queryNameInfo[0],queryNameInfo[1],queryNameInfo[2],query_display_name]
+				queryNameInfo = [0, 0.0, "", ""] #[flag,score,query_to_search,query_display_name]
 				queryContentInfo = [0, 0.0, "", ""]
 				queryTagsInfo = [0, 0.0, "", ""]
 
@@ -219,12 +225,24 @@ def get_search(request):
 		except EmptyPage:
 			results = paginator.page(paginator.num_pages)
 
+		#for rendering we pass the group name selected, the different groups possible(GROUP_CHOICES), 
+		#the search_filter(what filters are applied), the header(for what search query results are shown and how many results)
+		#alternate text(if suggestion is provided), the results array, the search_filter which has to be appended to url
+		# esearch.py sends results to -> sform.html sends one result at a time to -> card_gsearch.html for rendering of cards
+		#if a card is clicked, the result's group id and node id is sent to -> node.py(node_detail function) which renders the media
+		# by sending mongoDB node to ->result_detailed_view.html
 		return render(request, 'ndf/sform.html', {'form': form, 'grpnam': group, 'grp': GROUP_CHOICES, 'searchop': search_filter, 'header':res_list, 'alternate': altinfo_list ,'content': results, 'append_to_url':append_to_url})
 
 	return render(request, 'ndf/sform.html', {'form': form, 'grp': GROUP_CHOICES, 'searchop': []})
 	
 
 def get_suggestion_body(query, field_value, slop_value, field_name_value):
+	'''
+	This function is used to return the suggestion json body that will be passed to the suggest function of elasticsearch query DSL. 
+	Arguments: query, field in which suggestion is to be found + “.trigram” to use trigram analyzer, 
+	slop value, field in which suggestion is to be found
+	Returns:  the suggestion body
+	'''
 	phrase_suggest = {												#json body of phrase suggestion in name field
 		"suggest": {
 			"text": query,										#the query for which we want to find suggestion
@@ -263,6 +281,13 @@ def get_suggestion_body(query, field_value, slop_value, field_name_value):
 	return phrase_suggest
 
 def get_suggestion(suggestion_body, queryInfo, doc_types, query, field):
+	'''
+	Arguments: suggestion_body, queryInfo is an array which has flag(to check if we got a query to search for or not), 
+	score(how close is the first suggestion to the query), doc_types(the type in which to search), 
+	query, the field in which query is to be searched. 
+	This function searches for suggestion and if suggestion is not found, it may mean that the query is already indexed 
+	and if query is also not indexed, then the flag remains 0. If we find a suggestion or if the query is indexed, the flag is set to 1.
+	'''
 	res = es.suggest(body=suggestion_body, index=GSTUDIO_SITE_NAME)						#first we search for suggestion in the name field as it has the highest priority
 	if(len(res['suggest'][0]['options'])>0):									#if we get a suggestion means the phrase doesnt exist in the index
 		for sugitem in res['suggest'][0]['options']:
@@ -280,10 +305,20 @@ def get_suggestion(suggestion_body, queryInfo, doc_types, query, field):
 
 
 def get_search_results(resultArray):
+	'''
+	Arguments: the results array which contains all the search results along with id, type, 
+	index name. We need to extract only the json source of the search results.
+	Returns: Array of json objects which will be passed to the html template for rendering.
+	'''
 	reslist = [doc['_source'] for doc in resultArray]
 	return reslist
 
 def resources_in_group(res,group):
+	'''
+	Arguments: the results json body which is returned by the es.search function. 
+	The group filter(i.e. Get results from a particular group)
+	Returns: the search results pertaining to a group.
+	'''
 	results = []
 	group_id = group_map[group]
 	for i in res["hits"]["hits"]:
@@ -296,6 +331,15 @@ def resources_in_group(res,group):
 	return results
 
 def search_query(index_name, select, group, query):
+	'''
+	Arguments: name of the index in which to search the query,what type of results to show
+	(filter-images,audio,video,etc), in which groups to search, query
+	Returns: an array of json bodies(search results)
+	 
+	This is the main function which does the search. If index_name passed to it is author_index, 
+	the function searches for the contributions of a particular author and if the index name is 
+	gsystemtype_index then the function returns all the GSystem nodes of that GSystemType
+	'''
 	siz = 100
 	if(index_name == author_index):
 		try:
@@ -343,6 +387,10 @@ def search_query(index_name, select, group, query):
 
 
 def get_advanced_search_form(request):
+	'''
+	This function passes the 3 maps-> gsystemtype_map, attribute_map, relation_map to the
+	html template advanced_search.html for the rendering of the advanced search form
+	'''
 	with open(mapping_directory+"/gsystemtype_map.json") as gm:
 		gsystemtype_map = json.load(gm)
 
