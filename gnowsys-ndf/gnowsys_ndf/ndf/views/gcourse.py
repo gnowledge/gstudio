@@ -3690,6 +3690,9 @@ def course_quiz_data(request, group_id):
     group_id    = group_obj._id
     group_name  = group_obj.name
 
+    if not request.user.is_superuser:
+        return HttpResponseRedirect(reverse('course_content', kwargs={'group_id': ObjectId(group_id)}))
+
     allow_to_join = get_group_join_status(group_obj)
     template = 'ndf/gcourse_event_group.html'
     context_variables = {
