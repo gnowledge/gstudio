@@ -5442,7 +5442,7 @@ def get_course_units_tree(data,list_ele):
                     if "children" in each_dict:
                         get_course_units_tree(each_dict['children'],list_ele)
 
-def create_clone(user_id, node, group_id, mem_of_node=None):
+def create_clone(user_id, node, group_id, mem_of_node_id=None):
     try:
         # if "Page" in node.member_of_names_list or "QuizItem" in node.member_of_names_list or "QuizItemEvent" in node.member_of_names_list:
         #     cloned_copy = node_collection.collection.GSystem()
@@ -5503,8 +5503,8 @@ def create_clone(user_id, node, group_id, mem_of_node=None):
         if "QuizItem" in node.member_of_names_list:
             quiz_item_event_gst = node_collection.one({'_type': "GSystemType", 'name': "QuizItemEvent"})
             cloned_copy['member_of'] = [quiz_item_event_gst._id]
-        if mem_of_node:
-            cloned_copy['member_of'] = [mem_of_node]
+        if mem_of_node_id:
+            cloned_copy['member_of'] = [ObjectId(mem_of_node_id)]
         cloned_obj_id = node_collection.collection.insert(cloned_copy)
         cloned_obj = node_collection.one({'_id': ObjectId(cloned_obj_id)})
         cloned_obj.save(groupid=group_id, validate=False)
@@ -5635,14 +5635,14 @@ def pull_triples(source_node, target_node, group_id, user_id):
     '''
 
 @get_execution_time
-def replicate_resource(request, node, group_id, mem_of_node=None):
+def replicate_resource(request, node, group_id, mem_of_node_id=None):
     try:
         create_thread_for_node_flag = True
         if request:
             user_id = request.user.id
         else:
             user_id = 1
-        new_gsystem = create_clone(user_id, node, group_id, mem_of_node=mem_of_node)
+        new_gsystem = create_clone(user_id, node, group_id, mem_of_node_id=mem_of_node_id)
         thread_created = False
 
         if new_gsystem:
@@ -5706,7 +5706,11 @@ def replicate_resource(request, node, group_id, mem_of_node=None):
         #         has_thread_rt = node_collection.one({"_type": "RelationType", "name": u"has_thread"})
         #         gr = create_grelation(new_gsystem._id, has_thread_rt, thread_obj._id)
 
-
+        if "QuizItem" in node.member_of_names_list or "QuizItemEvent" in node.member_of_names_list:
+            from gnowsys_ndf.ndf.templatetags.ndf_tags import get_thread_node
+            thread_obj = get_thread_node(new_gsystem._id)
+            if not thread_obj:
+                thread_obj = create_thread_for_node(request,group_id, new_gsystem)
         # if "QuizItem" in node.member_of_names_list or "QuizItemEvent" in node.member_of_names_list:
         #     # from gnowsys_ndf.ndf.templatetags.ndf_tags import get_relation_value
 

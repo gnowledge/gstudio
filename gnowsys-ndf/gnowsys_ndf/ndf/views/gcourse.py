@@ -30,11 +30,11 @@ from gnowsys_ndf.ndf.models import NodeJSONEncoder
 from gnowsys_ndf.settings import GSTUDIO_SITE_NAME
 from gnowsys_ndf.ndf.models import Node, AttributeType, RelationType
 from gnowsys_ndf.ndf.models import node_collection, triple_collection
+from gnowsys_ndf.ndf.views.group import *
 from gnowsys_ndf.ndf.views.file import *
 from gnowsys_ndf.ndf.templatetags.ndf_tags import edit_drawer_widget, get_disc_replies, get_all_replies,user_access_policy, get_relation_value, check_is_gstaff, get_attribute_value
 from gnowsys_ndf.ndf.views.methods import get_node_common_fields, parse_template_data, get_execution_time, delete_node, get_filter_querydict, update_notes_or_files_visited
 from gnowsys_ndf.ndf.views.notify import set_notif_val
-from gnowsys_ndf.ndf.views.group import *
 from gnowsys_ndf.ndf.views.methods import get_property_order_with_value, get_group_name_id, get_course_completetion_status, replicate_resource
 from gnowsys_ndf.ndf.views.ajax_views import *
 from gnowsys_ndf.ndf.views.analytics_methods import *
@@ -186,8 +186,16 @@ def create_edit(request, group_id, node_id=None):
 
     if request.method == "POST":
         # get_node_common_fields(request, course_node, group_id, GST_COURSE)
+        group_access_type = request.POST.get('login-mode','PUBLIC')
+        if isinstance(group_access_type, list):
+            group_access_type = unicode(group_access_type[0])
+        else:
+            group_access_type = unicode(group_access_type)
+
         basecoursegroup_gst = node_collection.one({'_type': "GSystemType", 'name': u"BaseCourseGroup"})
         if not course_node:
+            from gnowsys_ndf.ndf.views.group import CreateGroup
+
             base_course_group_name = request.POST.get('name','')
             group = CreateGroup(request)
             result = group.create_group(base_course_group_name)
@@ -199,7 +207,11 @@ def create_edit(request, group_id, node_id=None):
                 # create_gattribute(course_node._id, at_course_type, u"General")
                 # print "\n course_node ---- ", course_node
         if course_node:
+
             course_node.save(is_changed=get_node_common_fields(request, course_node, group_id, basecoursegroup_gst),groupid=group_id)
+            course_node.group_type = group_access_type
+            course_node.status = u'PUBLISHED'
+            course_node.save()
 
             # adding thumbnail
             f = request.FILES.get("doc", "")
@@ -239,6 +251,7 @@ def create_edit(request, group_id, node_id=None):
                     rt_has_logo = node_collection.one({'_type': "RelationType", 'name': "has_logo"})
                     # print "\n creating GRelation has_logo\n"
                     create_grelation(course_node._id, rt_has_logo, ObjectId(fileobj))
+
         return HttpResponseRedirect(reverse('groupchange', kwargs={'group_id': course_node._id}))
     else:
         if node_id:
@@ -1437,11 +1450,12 @@ def get_resources(request, group_id):
             except:
                 unit_node = None
             if resource_type:
-                if resource_type == "Pandora":
+                if "Pandora" in resource_type :
                     resource_type = "Pandora_video"
-                if resource_type == "Quiz":
-                    resource_type = "QuizItem"
-                if resource_type == "File":
+                elif "Quiz" in resource_type:
+                    resource_type = ["QuizItem", "QuizItemEvent"]
+                    resource_gst_id = [GSystemType.get_gst_name_id(each_gst)[1] for each_gst in resource_type]
+                elif "File" in resource_type:
                     resource_type = ["File", "Jsmol", "PoliceSquad", "OpenStoryTool", "TurtleBlocks", "BioMechanics"]
                     resource_gst_id = [GSystemType.get_gst_name_id(each_gst)[1] for each_gst in resource_type]
                 else:
@@ -3675,6 +3689,9 @@ def course_quiz_data(request, group_id):
     group_obj   = Group.get_group_name_id(group_id, get_obj=True)
     group_id    = group_obj._id
     group_name  = group_obj.name
+
+    if not request.user.is_superuser:
+        return HttpResponseRedirect(reverse('course_content', kwargs={'group_id': ObjectId(group_id)}))
 
     allow_to_join = get_group_join_status(group_obj)
     template = 'ndf/gcourse_event_group.html'

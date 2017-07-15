@@ -1364,7 +1364,7 @@ class CreateCourseEventGroup(CreateEventGroup):
         if node.collection_set:
             try:
                 for each_res in node.collection_set:
-                    gst_node = None
+                    gst_node_id = None
                     each_res_node = node_collection.one({'_id': ObjectId(each_res)})
                     each_res_node_mem_list = each_res_node.member_of_names_list
                     if any(base_gs_mem in ["CourseSection", "CourseSectionEvent"] for base_gs_mem in each_res_node_mem_list):
@@ -1377,7 +1377,7 @@ class CreateCourseEventGroup(CreateEventGroup):
                         gst_node_id = self.lesson_gst._id
 
                     new_res = replicate_resource(request, each_res_node, 
-                        group_obj._id, mem_of_node=gst_node)
+                        group_obj._id, mem_of_node_id=gst_node_id)
                     # new_res = self.replicate_resource(request, each_res_node, group_obj)
                     prior_node_obj.collection_set.append(new_res._id)
                     new_res.prior_node.append(prior_node_obj._id)
@@ -1399,7 +1399,7 @@ class CreateCourseEventGroup(CreateEventGroup):
                     #             new_node = self.create_corresponding_gsystem(each_node, prior_node_obj, group_obj)
                     #             self.call_setup(request, each_node, new_node, group_obj)
             except Exception as call_set_err:
-                # print "\n !!!Error while creating Course Structure!!!"
+                print "\n !!!Error while creating Course Structure!!!", call_set_err
                 pass
 
 

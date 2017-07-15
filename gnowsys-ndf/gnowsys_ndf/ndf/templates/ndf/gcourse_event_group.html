@@ -241,7 +241,7 @@
                 <i class="fi-photo "></i> <span>{% trans "Gallery" %}</span>
               </a>
             </li>
-            {% if 'CourseEventGroup' in group_obj.member_of_names_list %}
+            {% if 'CourseEventGroup' in group_obj.member_of_names_list and request.user.is_superuser %}
               <li class="tab-title {% ifequal title 'course_quiz_data' %}active{% endifequal %}">
                 <a href="{% url 'course_quiz_data' group_id %}">
                   <i class="fi-photo "></i> <span>{% trans "Quiz" %}</span>
