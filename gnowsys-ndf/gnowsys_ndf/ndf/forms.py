@@ -22,9 +22,7 @@ GROUP_CHOICES.append(("all","All"))
 SEARCH_CHOICE = [(0,'Search for Data'),(1,'Contributions of an Author')]
 group_map = {}
 mapping_directory = GSTUDIO_DOCUMENT_MAPPING
-
-with open(mapping_directory+"/groupmap.json", 'r') as gm:
-    group_map = json.load(gm)
+#group_map for letting users search for data in some group
 with open(mapping_directory+"/groupmap.json", 'r') as gm:
     group_map = json.load(gm)
 

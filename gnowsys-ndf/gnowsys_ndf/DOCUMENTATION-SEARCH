@@ -96,7 +96,7 @@ index_docs(all_docs)
  
 	**If the document has “contributors” as a key then we are indexing the document into another index (author_index) with the type as author post greSQL ID. This is necessary if the user wants to search for the contributions of a particular author in a particular group or across all groups. 
 ***********************************************************************************************************************************
-******Documentation for esearch.py in views folder******
+******Documentation for esinitialize_map in views folder******
 create_map(document): This function is used to create 2 maps. One is an author_map and other is a group_map. Author map is used to search for the contributions of some author. Group map is used in forms.py to show the group filter. 
 
 create_advanced_map(document) : This function is used to create the gsystem type map, attribute map, relation map. All these 3 maps are used in advanced search.

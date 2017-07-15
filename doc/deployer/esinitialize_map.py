@@ -15,6 +15,11 @@ id_attribute_map = {}
 id_relation_map = {}
 
 def create_map(all_docs):
+	'''
+	This function is used to create 4 maps author_map, group_map,attribute map, relation map
+	Author map is used to search for the contributions of some author. Group map is used in forms.py to show the group filter.
+
+	'''
 	for node in all_docs:
 		if("name" in node):		#only docs with names will be considered for mapping
 			if(node._type == "Author"):
@@ -23,6 +28,12 @@ def create_map(all_docs):
 				group_map[node.name] = str(node._id)
 			if(node._type == "GSystem"):
 				attr = []; rel = [];
+				#here what we are doing is: if a GSystem node has member_of set as [A,B,C]
+				#suppose the possible attributes of A are x,y
+				#suppose the possible attributes of B are z
+				#suppose the possible attributes of C are w
+				#if the GSystem node contains any other attribute (p), then that has to be added to the attribute_map
+				#i.e. it will be added to attribute_set of A,B,C 
 				for grid in node.member_of:
 					gid = str(grid)
 					if(gid not in system_type_map.values()):
@@ -52,6 +63,11 @@ def create_map(all_docs):
 		
 
 def create_advanced_map(node):
+	'''
+	This function is used for creating the gsystemtype_map, attribute_map and relation_map
+	attribute and relation map are a mapping between the gsystem type id and the possible attributes/relations
+	of that gsystem type.
+	'''
 	system_type_map[node.name] = str(node._id)
 	attribute_type_set = []
 	for attribute in node.attribute_type_set:
