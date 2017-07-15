@@ -3659,3 +3659,129 @@ def get_trans_node_list(node_list,lang):
             trans_node_list.append({ObjectId(node._id): {"name": node.name, "basenodeid":ObjectId(node._id)}})
     if trans_node_list:
         return trans_node_list
+
+@get_execution_time
+def course_quiz_data(request, group_id):
+    def _merged_to_from(min_list, max_list, na_index):
+        # max list contains more num of list
+        # min list contains less num of list
+        partly_max_list = max_list[:len(min_list)]
+        exception_list = max_list[len(min_list):]
+        for min_list_ele,mod_max_list_ele in zip(min_list, partly_max_list):
+            for ind in na_index:
+                partly_max_list_ele[ind] = min_list_ele[ind]
+        return partly_max_list + exception_list
+
+    group_obj   = Group.get_group_name_id(group_id, get_obj=True)
+    group_id    = group_obj._id
+    group_name  = group_obj.name
+
+    allow_to_join = get_group_join_status(group_obj)
+    template = 'ndf/gcourse_event_group.html'
+    context_variables = {
+            'group_id': group_id, 'groupid': group_id, 'group_name':group_name,
+            'group_obj': group_obj, 'title': 'course_quiz_data', 'allow_to_join': allow_to_join
+        }
+
+    admin_analytics_data_list = []
+    admin_analytics_data_append = admin_analytics_data_list.append
+    qip_gst = node_collection.one({ '_type': 'GSystemType', 'name': 'QuizItemPost'})
+
+    query = {'member_of': qip_gst._id, 'group_set': group_id}
+
+    record_set = node_collection.collection.aggregate([
+        {
+            '$match': query
+        }, {
+            '$project': {
+                '_id': 0,
+                'name': '$name',
+                'check': '$attribute_set.quizitempost_user_checked_ans',
+                'submit': '$attribute_set.quizitempost_user_submitted_ans',
+                'user_id': '$created_by',
+                'thread_node': '$prior_node'
+            }
+        },
+        {
+            '$sort': {'created_at': 1}
+        }
+    ])
+
+    l = []
+    # print "rec['result']", rec['result']
+    for each_record in record_set['result']:
+        for record_key,record_val in each_record.items():
+            if record_key == "user_id":
+                # To prevent in error in case where 
+                # User object does not exist, return user-id
+                user_obj = User.objects.get(pk=int(record_val))
+                if user_obj:
+                    username = user_obj.username
+                else:
+                    username = record_val                    
+                each_record['user_id'] = username
+
+            if record_key == "thread_node" and record_val:
+                # QuizItemPost's prior_node list contains ObjectId
+                # of its Thread node and QuizItemEvent node
+                qie_node = node_collection.find_one({'_id': {'$in': record_val}, 
+                    'name': {'$regex': '^(?!Thread of).*'}})
+                each_record['name'] = qie_node.content
+
+            if record_key == "check" and record_val:
+                for checked_ans_dict in record_val[0]:
+                    for k,v in checked_ans_dict.items():
+                        l2 = []
+                        l2.append(each_record['name'])
+                        l2.append(each_record['user_id'])
+                        l2.append(k)
+                        l2.append(','.join(v))
+                        l2.append("--")
+                        l2.append("--")
+                        l.append(l2)
+
+            if record_key == "submit" and record_val:
+                for submitted_ans_dict in record_val[0]:
+                    for k,v in submitted_ans_dict.items():
+                        l1 = []
+                        l1.append(each_record['name'])
+                        l1.append(each_record['user_id'])
+                        l1.append("--")
+                        l1.append("--")
+                        l1.append(k)
+                        l1.append(','.join(v))
+                        l.append(l1)
+
+
+    # print "\nadmin_analytics_data: ", l
+    checked_ans_list = []
+    submitted_ans_list = []
+    user_dict_list = []
+    user_dict = {}
+    for e in l:
+        # print "\n this is e: ", e, any(e[1] not in euu for euu in user_dict_list)
+        if any(e[1] in euu.keys() for euu in user_dict_list):
+            for en in user_dict_list:
+                if e[1] in en.keys():
+                    user_dict = en
+        else:
+            user_dict = {e[1]: {'check': [], 'submit': []}}
+            user_dict_list.append(user_dict)
+        if e.index('--') in [2,3]:
+            user_dict[e[1]]['submit'].append(e)
+        elif e.index('--') in [4,5]:
+            user_dict[e[1]]['check'].append(e)
+
+    return_list = []
+    for each_user_dict in user_dict_list:
+        for ked, ved in each_user_dict.items():
+            if len(ved['check'])< len(ved['submit']):
+                return_list.extend(_merged_to_from(ved['check'],ved['submit'], na_index=[2,3]))
+            elif len(ved['submit'])< len(ved['check']):
+                return_list.extend(_merged_to_from(ved['submit'],ved['check'], na_index=[4,5]))
+
+    banner_pic_obj,old_profile_pics = _get_current_and_old_display_pics(group_obj)
+    context_variables.update({'old_profile_pics':old_profile_pics,
+                        "prof_pic_obj": banner_pic_obj, 'data': json.dumps(return_list)})
+    return render_to_response(template, context_variables,
+            context_instance=RequestContext(request))
