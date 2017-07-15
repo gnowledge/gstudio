@@ -39,6 +39,11 @@ doc_type = ""
 page_id = gsystemtype_map["Page"]
 
 def update_doc(node):
+	'''
+	This function should be called from models.py whenever
+	a new node is created or an existing node is updated(not deleted)
+	Arguments: the mongoDB object
+	'''
 	global doc_type
 	if(node._type == "GSystem"):
 			try:
@@ -73,7 +78,35 @@ def update_doc(node):
 	else:
 		indexDoc(document)
 
+	f = open(mapping_directory+"/authormap.json","w")
+	json.dump(author_map,f,indent=4)
+	f.close()
+
+	f = open(mapping_directory+"/groupmap.json","w")
+	json.dump(group_map,f,indent=4)
+	f.close()
+
+	f = open(mapping_directory+"/gsystemtype_map.json","w")
+	json.dump(gsystem_type_map,f,indent=4)
+	f.close()
+
+	f = open(mapping_directory+"/attribute_map.json","w")
+	json.dump(id_attribute_map,f,indent=4)
+	f.close()
+
+	f = open(mapping_directory+"/relation_map.json","w")
+	json.dump(id_relation_map,f,indent=4)
+	f.close()
+
+
 def update_author_index(document):
+	'''
+	This function updates the author index, i.e. it 
+	first gets the old document from elasticsearch index,
+	deletes that document from each contributor_id doc_type and indexes the
+	new updated document into every contributor doc_type in the new contributors list
+	Argument: the json file to be indexed
+	'''
 	if("contributors" in document.keys()):
 		res = es.get(index=index,doc_type=doc_type,id=document["id"]["$oid"])
 		if(len(res["hits"]["hits"]) != 0): #check the syntax
@@ -91,20 +124,32 @@ def update_author_index(document):
 
 
 def indexGroup(document):
-	if(document["name"] not in group_map):
+	'''
+	This function indexes/updates those documents whose doc_type is Group.
+	It also updates the group_map
+	Argument: the json file to be indexed
+	'''
+	if(document["name"] not in group_map.keys()):
 		group_map[document["name"]] = document["id"]["$oid"]
 	es.index(index=index, doc_type=doc_type, id=document["id"]["$oid"], body=document)
 
 def indexAuthor(document):
+	'''
+	This function indexes/updates those documents whose doc_type is Group.
+	It also updates the author_map
+	Argument: the json file to be indexed
+	'''
 	if(document["name"] not in author_map.keys()):
 		author_map[document["name"]] = document["created_by"]
 
-	contributors = document["contributors"]
-	for contributor_id in contributors:
-		es.index(index=author_index, doc_type=contributor_id,id=document["id"]["$oid"], body = document)
 	es.index(index=index, doc_type=doc_type, id=document["id"]["$oid"], body=document)
 
 def indexGSystemType(document):
+	'''
+	This function indexes/updates those documents whose doc_type is GSystemType
+	It updates the attribute map and relation map
+	 Argument: the json file to be indexed
+	'''
 	if(document["name"] not in gsystemtype_map.keys()):
 		gsystemtype_map[document["name"]] = document["id"]["$oid"]
 	for attribute in document["attribute_type_set"]:
@@ -116,6 +161,13 @@ def indexGSystemType(document):
 	es.index(index=index, doc_type=doc_type, id=document["id"]["$oid"], body=document)
 	
 def indexGSystem(document):
+	'''
+	This function indexes/updates those documents whose type is GSystem
+	It also updates the attribute map and relation map
+	It also updates the GSystemType_index, i.e. the
+	 index used for advanced search
+	 Argument: the json file to be indexed
+	'''
 	es.index(index=index, doc_type=doc_type, id=document["id"]["$oid"], body=document)
 	attr_set = []
 	reln_set = []
@@ -142,9 +194,15 @@ def indexGSystem(document):
 		es.index(index = gsystemtype_index, doc_type = type_ids["$oid"], id = document["id"]["$oid"], body = document)
 
 def indexDoc(document):
+	'''
+	For any other type of document, this function will index/update the document in the main index
+	'''
 	es.index(index=index, doc_type=doc_type, id=document["id"]["$oid"], body=document)
 
 def get_document_type(document):
+	'''
+	This function is used to return the document type of a document
+	'''
 	types_arr = ["Author", "GAttribute", "GRelation", "AttributeType", "Filehive", "RelationType", "Group", "GSystemType"]	
 	if document["type"]=="GSystem":
 		for ids in document['member_of']:  #document is a member of the Page GSystemType
