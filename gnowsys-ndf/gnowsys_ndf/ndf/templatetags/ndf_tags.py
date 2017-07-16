@@ -4046,3 +4046,7 @@ def user_groups(is_super_user,user_id):
 @register.assignment_tag
 def if_edit_course_structure():
 	return GSTUDIO_EDIT_LMS_COURSE_STRUCTURE
+
+@register.assignment_tag
+def get_default_discussion_lbl():
+	return DEFAULT_DISCUSSION_LABEL
