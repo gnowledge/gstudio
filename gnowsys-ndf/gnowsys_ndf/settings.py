@@ -783,7 +783,6 @@ GSTUDIO_COURSE_EVENT_MOD_GROUP_ALTNAMES = ['Screening House', 'Selection House']
 
 GSTUDIO_PROGRAM_EVENT_MOD_GROUP_ALTNAMES = ['Screening House', 'Selection House']
 
-GSTUDIO_INTERACTION_TYPES = ['Comment', 'Discuss', 'Reply', 'Discuss', 'Submit', 'Voice-Response', 'Answer', 'Feedback']
 
 GSTUDIO_HELP_TIP = {
    "name":"Title of the object",
@@ -986,6 +985,7 @@ OPTIONLIST = [
 GSYSTEM_LIST = [{'name':'Name '} ,{'altnames':'Alternate Name '}]
 
 GSTUDIO_INTERACTION_TYPES = ['Comment', 'Discuss', 'Reply', 'Post', 'Submit', 'Voice-Response', 'Answer', 'Feedback']
+DEFAULT_DISCUSSION_LABEL = 'Feedback'
 # #textb
 # import warnings
 # warnings.filterwarnings(
