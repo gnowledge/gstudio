@@ -107,6 +107,7 @@ def get_site_variables():
 	site_var = {}
 	site_var['ORG_NAME'] = GSTUDIO_ORG_NAME
 	site_var['LOGO'] = GSTUDIO_SITE_LOGO
+	site_var['SECONDARY_LOGO'] = GSTUDIO_SITE_SECONDARY_LOGO
 	site_var['FAVICON'] = GSTUDIO_SITE_FAVICON
 	site_var['COPYRIGHT'] = GSTUDIO_DEFAULT_COPYRIGHT
 	site_var['GIT_REPO'] = GSTUDIO_GIT_REPO
