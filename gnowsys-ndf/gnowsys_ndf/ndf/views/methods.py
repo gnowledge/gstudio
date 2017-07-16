@@ -43,7 +43,7 @@ from django.core.exceptions import PermissionDenied
 ''' -- imports from application folders/files -- '''
 from gnowsys_ndf.settings import META_TYPE, GSTUDIO_NROER_GAPPS
 from gnowsys_ndf.settings import GSTUDIO_DEFAULT_GAPPS_LIST, GSTUDIO_WORKING_GAPPS, BENCHMARK, GSTUDIO_DEFAULT_LANGUAGE
-from gnowsys_ndf.settings import LANGUAGES, OTHER_COMMON_LANGUAGES, GSTUDIO_BUDDY_LOGIN
+from gnowsys_ndf.settings import LANGUAGES, OTHER_COMMON_LANGUAGES, GSTUDIO_BUDDY_LOGIN, DEFAULT_DISCUSSION_LABEL
 # from gnowsys_ndf.ndf.models import db, node_collection, triple_collection, counter_collection
 from gnowsys_ndf.ndf.models import *
 # from gnowsys_ndf.ndf.org2any import org2html
@@ -5137,7 +5137,7 @@ def create_thread_for_node(request, group_id, node):
 
 			# attributes for thread_node
 			release_response_val = unicode(request.POST.get("release_resp_sel",'True'))
-			interaction_type_val = unicode(request.POST.get("interaction_type_sel",'Feedback'))
+			interaction_type_val = unicode(request.POST.get("interaction_type_sel", DEFAULT_DISCUSSION_LABEL))
 			start_time = request.POST.get("thread_start_date", '')
 			if start_time:
 				start_time = datetime.strptime(start_time, "%d/%m/%Y")

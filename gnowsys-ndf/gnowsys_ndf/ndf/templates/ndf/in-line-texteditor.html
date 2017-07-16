@@ -6,6 +6,7 @@
 {% get_attribute_value node.pk 'release_response' as resp_val %}
 {% get_attribute_value node.pk 'thread_interaction_type' as thr_int_type %}
 {% check_is_gstaff groupid request.user as is_gstaff %}
+{% get_default_discussion_lbl as default_discussion_lbl %}
 
 {% block head %}
   <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
@@ -46,7 +47,7 @@
         {% if thr_int_type %}
           {{thr_int_type}} {% if all_replies|length > 0 %}({{all_replies|length }}) {% endif %}
         {% else %}
-          Feedback  {% if all_replies|length > 0 %} ({{all_replies|length }}) {% endif %}
+          {{default_discussion_lbl}}  {% if all_replies|length > 0 %} ({{all_replies|length }}) {% endif %}
         {% endif %}
       </div>
     {% endif %}
@@ -153,6 +154,11 @@
   var user_access = "{{ user_access }}"; // "allow" or "disallow"
   var edit_policy = "allow"; // "allow" or "disallow"
   var is_user_authenticated = {{ request.user.is_authenticated|lower }};
+  {% if thr_int_type %}
+    thr_int_type_var = "{{thr_int_type}}"
+  {% else %}
+    thr_int_type_var = "{{default_discussion_lbl}}"
+  {% endif %}
 
   function createDiscussion()
   {
@@ -270,11 +276,11 @@
     if(totalReplies == 0)
     {
       $(".view-discussion span").fadeOut().fadeIn().html(" {% trans 'Begin Discussion' %}");
-      $("#create-discussion").text("{% trans 'Feedback' %}" + $("h1 span.node[itemprop]").text().trim());
+      $("#create-discussion").text(thr_int_type_var + $("h1 span.node[itemprop]").text().trim());
     }
     else
     {
-      $("#create-discussion").fadeOut().fadeIn().html("{{thr_int_type}} ("+totalReplies+")");
+      $("#create-discussion").fadeOut().fadeIn().html(thr_int_type_var + " ("+totalReplies+")");
     }
   }
   function createReplyHTML(replyStyle, data,child_reply_level)
@@ -307,7 +313,7 @@
   function addReply(sourceObj)
   {
 
-    $("create-discussion").show();
+    $("#create-discussion").show();
     var value = CKEDITOR.instances['ckeditor_textarea'].getData();
     var priorNodeId = $("#prior-node").val(),
         replyContent = value.trim();
