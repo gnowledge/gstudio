@@ -1706,6 +1706,7 @@ class EventGroupCreateEditHandler(View):
                 language_val = get_language_tuple(unicode(language))
                 group_obj.language = language_val
 
+            date_result = mod_group.set_event_and_enrollment_dates(request, group_obj._id, parent_group_obj)
             if sg_type == "CourseEventGroup":
                 if ("base_unit" in parent_group_obj.member_of_names_list or 
                     "announced_unit" in parent_group_obj.member_of_names_list):
@@ -1725,7 +1726,6 @@ class EventGroupCreateEditHandler(View):
             # group_obj.save()
             # parent_group_obj.save()
             if not node_id:
-                date_result = mod_group.set_event_and_enrollment_dates(request, group_obj._id, parent_group_obj)
                 if date_result[0]:
                     # Successfully had set dates to EventGroup
                     if sg_type == "CourseEventGroup":
