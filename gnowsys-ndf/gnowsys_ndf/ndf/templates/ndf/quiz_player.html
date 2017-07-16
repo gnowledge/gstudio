@@ -49,7 +49,7 @@
 
 		<div class="row">
 			<div class="quiz_qtn">
-				<b>{{node.content}}</b>
+				<b>{{node.content|safe}}</b>
 				<div class="quiz_qtn quiz-box">
 					{% if node.quiz_type == "Single-Choice" %}
 						{% for each_opt in node_options %}
