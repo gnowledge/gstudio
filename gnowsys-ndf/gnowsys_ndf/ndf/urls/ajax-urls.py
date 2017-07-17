@@ -129,4 +129,6 @@ urlpatterns = patterns('gnowsys_ndf.ndf.views.ajax_views',
 
     # url for graph display
     url(r'^graph/adminRenderGraph/(?P<node_id>[^/]+)/fetch/(?P<graph_type>[^/]+)$', 'adminRenderGraph', name='adminRenderGraph'),
+    url(r'^replies/(?P<user_name_or_id>[\w-]+)$', 'get_user_replies', name='get_user_replies'),
+
 )
