@@ -7030,3 +7030,4 @@ def get_translated_node(request, group_id):
       return HttpResponse(json.dumps(trans_node, cls=NodeJSONEncoder))
     else:
       return HttpResponse(json.dumps(node_obj, cls=NodeJSONEncoder))
+
