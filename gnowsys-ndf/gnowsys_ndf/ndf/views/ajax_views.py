@@ -7044,7 +7044,7 @@ def get_user_replies(request, group_id, user_name_or_id):
     if user_obj:
         gst_reply = node_collection.one({ '_type':'GSystemType', 'name':'Reply'})
         user_replies = node_collection.find({ 'member_of': gst_reply._id,
-            'group_set': ObjectId(group_id), 'contributors': user_obj.pk})
+            'group_set': ObjectId(group_id), 'contributors': user_obj.pk}).sort('last_update',-1)
 
         return render_to_response('ndf/user_interactions.html',
                 {
