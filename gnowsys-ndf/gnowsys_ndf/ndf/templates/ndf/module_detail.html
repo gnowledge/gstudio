@@ -12,7 +12,25 @@
 			{% trans "Module Description:" %}<h7 class="text-button-blue">{{node.content|safe}}</h7>
 			
 			{% if is_gstaff or node.created_by == request.user.id  %}
-			<a  class="buddy_margin right" href="{% url 'module_edit' group_id node.pk %}"><i class="fa fa-pencil"></i> {% trans "Edit" %}</a>
+			<div class="row">
+				
+			<a  class="right tiny button secondary" href="{% url 'module_edit' group_id node.pk %}"><i class="fa fa-pencil"></i> {% trans "Edit" %}</a>
+			{% if node.collection_set %}
+			 	<a data-reveal-id="delete-unit" class="tiny button secondary " title="Please delete all units associated with this module." disabled ><i class="fa fa-trash"></i> {% trans "Delete" %} </a>
+		 	 {% else %}
+			 	<a data-reveal-id="delete-unit" class="tiny button secondary"><i class="fa fa-trash"></i> {% trans "Delete" %} </a>
+			{% endif %}
+              <div id="delete-unit" class="reveal-modal tiny text-center" data-reveal>
+                    <h3>{% trans "Delete Unit:" %} {% firstof group_object.altnames group_object.name  %} ?</h3>
+                        <br/>
+                        {% trans "Are you sure want to delete this module?" %}
+                        <br/>
+                        <a href="#" class="button tiny success">{% trans "Cancel" %}</a>
+                        <a href="{% url 'delete_group_url_redirect' node.pk 'explore_courses' %}" class="button tiny alert">{% trans "Yes" %}</a>
+                        <a class="close-reveal-modal" aria-label="Close">&#215;</a>
+                    </div>
+
+			</div>
 			{% endif %}
 		</div>
 
