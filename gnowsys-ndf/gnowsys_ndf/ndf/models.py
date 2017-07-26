@@ -1956,6 +1956,7 @@ class GSystem(Node):
 
         return node_collection.find({
                             '_type': 'GSystem',
+                            'status': 'PUBLISHED',
                             'group_set': {'$in': [group_id]},
                             'member_of': {'$in': [gst_id]},
                             '$or':[
