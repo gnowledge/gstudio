@@ -135,11 +135,8 @@
           <h5>No. of Members</h5>
           <div class="course-highlight">
         <span>
-        {% if 'base_unit' in group_object.member_of_names_list %}
-          {{group_object.author_set|length}} member{{group_object.author_set|length|pluralize}}
-        {% else %}
-        {{group_object.author_set|length}} student{{group_object.author_set|length|pluralize}} enrolled
-        {% endif %}</span>
+          {{group_object.author_set|length}} 
+        </span>
 
           </div>
         </div>

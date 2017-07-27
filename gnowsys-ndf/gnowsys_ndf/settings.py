@@ -624,6 +624,7 @@ A project of <a href="http://lab.gnowledge.org/" target="_blank">{% trans "Gnowl
 </p>'''
 GSTUDIO_SITE_FAVICON = "/static/ndf/images/favicon/logo.png"
 GSTUDIO_SITE_LOGO = "/static/ndf/css/themes/metastudio/logo.svg"
+GSTUDIO_SITE_SECONDARY_LOGO = "/static/ndf/css/themes/metastudio/logo.svg"
 GSTUDIO_GIT_REPO = "https://github.com/gnowledge/gstudio"
 GSTUDIO_SITE_PRIVACY_POLICY = ""
 GSTUDIO_SITE_TERMS_OF_SERVICE = ""
@@ -783,7 +784,6 @@ GSTUDIO_COURSE_EVENT_MOD_GROUP_ALTNAMES = ['Screening House', 'Selection House']
 
 GSTUDIO_PROGRAM_EVENT_MOD_GROUP_ALTNAMES = ['Screening House', 'Selection House']
 
-GSTUDIO_INTERACTION_TYPES = ['Comment', 'Discuss', 'Reply', 'Discuss', 'Submit', 'Voice-Response', 'Answer', 'Feedback']
 
 GSTUDIO_HELP_TIP = {
    "name":"Title of the object",
@@ -986,6 +986,7 @@ OPTIONLIST = [
 GSYSTEM_LIST = [{'name':'Name '} ,{'altnames':'Alternate Name '}]
 
 GSTUDIO_INTERACTION_TYPES = ['Comment', 'Discuss', 'Reply', 'Post', 'Submit', 'Voice-Response', 'Answer', 'Feedback']
+DEFAULT_DISCUSSION_LABEL = 'Feedback'
 # #textb
 # import warnings
 # warnings.filterwarnings(

@@ -170,16 +170,17 @@ class CreateGroup(object):
             agency_type = self.request.POST.get('agency_type', u'Other')
 
         if kwargs.get('content_org', ''):
-            content_org = kwargs.get('content_org', '')
+            content_org = kwargs.get('content_org', u'')
         elif self.request:
-            content_org = self.request.POST.get('content_org', '')
+            content_org = self.request.POST.get('content_org', u'')
 
         if kwargs.get('content', ''):
-            content = kwargs.get('content', '')
+            content = kwargs.get('content', u'')
         elif self.request:
-            content = self.request.POST.get('content', '')
-        if not content or not content_org:
-            content = content_org = u""
+            content = self.request.POST.get('content', u'')
+
+        # if not content or not content_org:
+        #     content = content_org = u""
 
         if kwargs.get('language', ''):
             language = kwargs.get('language', '')
@@ -244,6 +245,13 @@ class CreateGroup(object):
         if language:
             language_val = get_language_tuple(unicode(language))
             group_obj.language = language_val
+
+
+        '''
+        Use of content_org field is deprecated.
+        Instead using value from content_org variable adding to content field
+         -katkamrachana 28June2017
+
         #  org-content
         if group_obj.content_org != content_org:
             group_obj.content_org = content_org
@@ -253,11 +261,12 @@ class CreateGroup(object):
             # usrname = self.request.user.username
             # filename = slugify(name) + "-" + slugify(usrname) + "-" + ObjectId().__str__()
             # group_obj.content = org2html(content_org, file_prefix=filename)
-
-
         if group_obj.content != content:
             group_obj.content = content
             is_changed = True
+        '''
+        if group_obj.content != content_org:
+            group_obj.content = content_org
 
         # decision for adding moderation_level
         if group_obj.edit_policy == "EDITABLE_MODERATED":
@@ -1355,7 +1364,7 @@ class CreateCourseEventGroup(CreateEventGroup):
         if node.collection_set:
             try:
                 for each_res in node.collection_set:
-                    gst_node = None
+                    gst_node_id = None
                     each_res_node = node_collection.one({'_id': ObjectId(each_res)})
                     each_res_node_mem_list = each_res_node.member_of_names_list
                     if any(base_gs_mem in ["CourseSection", "CourseSectionEvent"] for base_gs_mem in each_res_node_mem_list):
@@ -1368,7 +1377,7 @@ class CreateCourseEventGroup(CreateEventGroup):
                         gst_node_id = self.lesson_gst._id
 
                     new_res = replicate_resource(request, each_res_node, 
-                        group_obj._id, mem_of_node=gst_node)
+                        group_obj._id, mem_of_node_id=gst_node_id)
                     # new_res = self.replicate_resource(request, each_res_node, group_obj)
                     prior_node_obj.collection_set.append(new_res._id)
                     new_res.prior_node.append(prior_node_obj._id)
@@ -1390,7 +1399,7 @@ class CreateCourseEventGroup(CreateEventGroup):
                     #             new_node = self.create_corresponding_gsystem(each_node, prior_node_obj, group_obj)
                     #             self.call_setup(request, each_node, new_node, group_obj)
             except Exception as call_set_err:
-                # print "\n !!!Error while creating Course Structure!!!"
+                print "\n !!!Error while creating Course Structure!!!", call_set_err
                 pass
 
 
@@ -1697,6 +1706,7 @@ class EventGroupCreateEditHandler(View):
                 language_val = get_language_tuple(unicode(language))
                 group_obj.language = language_val
 
+            date_result = mod_group.set_event_and_enrollment_dates(request, group_obj._id, parent_group_obj)
             if sg_type == "CourseEventGroup":
                 if ("base_unit" in parent_group_obj.member_of_names_list or 
                     "announced_unit" in parent_group_obj.member_of_names_list):
@@ -1716,7 +1726,6 @@ class EventGroupCreateEditHandler(View):
             # group_obj.save()
             # parent_group_obj.save()
             if not node_id:
-                date_result = mod_group.set_event_and_enrollment_dates(request, group_obj._id, parent_group_obj)
                 if date_result[0]:
                     # Successfully had set dates to EventGroup
                     if sg_type == "CourseEventGroup":
