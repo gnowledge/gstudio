@@ -2177,7 +2177,8 @@ def group_dashboard(request, group_id=None):
       alternate_template = "ndf/gcourse_event_group.html"
       # course_collection_data = get_collection(request,group_obj._id,group_obj._id)
       # course_collection_data = json.loads(course_collection_data.content)
-
+  if 'Group' in group_obj.member_of_names_list:
+    alternate_template = "ndf/lms.html"
   # The line below is commented in order to:
   #     Fetch files_cur - resources under moderation in groupdahsboard.html
   # if  u"ProgramEventGroup" not in group_obj.member_of_names_list:
