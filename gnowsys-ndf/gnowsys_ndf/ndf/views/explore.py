@@ -104,7 +104,7 @@ def explore_courses(request,page_no=1):
 
 @get_execution_time
 def explore_groups(request,page_no=1):
-    title = 'groups'
+    title = 'workspaces'
     gstaff_access = check_is_gstaff(group_id,request.user)
 
     query = {'_type': 'Group', 'status': u'PUBLISHED',
