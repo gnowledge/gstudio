@@ -12,7 +12,7 @@
 	        <ul class="small-block-grid-1 medium-block-grid-3 large-block-grid-4">
 			{% for each_obj in groups_cur %}
 		        <li class="card-image-wrapper">
-					{% include card with node=each_obj has_logo=True no_footer=True url_name="groupchange" first_arg=each_obj.pk %}
+					{% include card with node=each_obj has_logo=True no_footer=True url_name="course_about" first_arg=each_obj.pk %}
 				</li>
 			{% endfor %}
 			</ul>
