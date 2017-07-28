@@ -697,6 +697,7 @@ def my_courses(request, group_id):
         )
 
 def my_desk(request, group_id):
+    from gnowsys_ndf.settings import GSTUDIO_WORKSPACE_INSTANCE
 
     if str(request.user) == 'AnonymousUser':
         raise Http404("You don't have an authority for this page!")
@@ -733,9 +734,15 @@ def my_desk(request, group_id):
     # for each in my_modules_cur:
     #     my_modules.append(each._id)
 
-    my_units = node_collection.find({'member_of': {'$in': [ce_gst._id, announced_unit_gst._id]},
+    if GSTUDIO_WORKSPACE_INSTANCE:
+        my_units = node_collection.find({'member_of': gst_group._id,
                                           'author_set': request.user.id,
                                         }).sort('last_update', -1)
+    else:
+        my_units = node_collection.find({'member_of': {'$in': [ce_gst._id, announced_unit_gst._id]},
+                                          'author_set': request.user.id,
+                                        }).sort('last_update', -1)
+
     # my_modules_cur.rewind()
     return render_to_response('ndf/lms_dashboard.html',
                 {
@@ -832,6 +839,7 @@ def my_dashboard(request, group_id):
 
 
 def my_performance(request, group_id):
+    from gnowsys_ndf.settings import GSTUDIO_WORKSPACE_INSTANCE
 
     if str(request.user) == 'AnonymousUser':
         raise Http404("You don't have an authority for this page!")
@@ -846,8 +854,12 @@ def my_performance(request, group_id):
 
     auth_id = auth_obj._id
     title = 'my performance'
-
-    my_units = node_collection.find({'member_of': {'$in': [ce_gst._id, announced_unit_gst._id]},
+    if GSTUDIO_WORKSPACE_INSTANCE:
+        my_units = node_collection.find({'member_of': gst_group._id,
+                                          'author_set': request.user.id,
+                                        }).sort('last_update', -1)
+    else:
+        my_units = node_collection.find({'member_of': {'$in': [ce_gst._id, announced_unit_gst._id]},
                                           'author_set': request.user.id,
                                         }).sort('last_update', -1)
     # my_modules_cur.rewind()

@@ -8,6 +8,7 @@
 
 {% block body_content %}
 {% load ndf_tags %}
+  {% get_gstudio_workspace_instance as is_workspace_instance %}
 
 <div class="mydesk_page">
         <div class="page_banner">
@@ -29,7 +30,7 @@
         <div class="page_menu">
             <ul class="nav_menu_1">
                 <li class="">
-                <a href="{% url 'my_desk' request.user.id  %}" {% if title == "my desk" %} class="selected" {% endif %}>{% trans "My Courses" %} </a>
+                <a href="{% url 'my_desk' request.user.id  %}" {% if title == "my desk" %} class="selected" {% endif %}> {% if  is_workspace_instance %} {% trans "My Workspaces" %} {% else %} {% trans "My Courses" %} {% endif %} </a>
                 </li>
                 
                 <li class=""><a {% if title == "my performance" %} class="selected" {% endif %} href="{% url 'my_performance' request.user.id  %}">{% trans "My Performance" %}</a> </li>

@@ -43,7 +43,9 @@
               {% if_edit_course_structure as edit_course_struct %}
               {% if edit_course_struct %}
               <li>
-                  <a href="{% url 'unit_detail' groupid  %}" target="_blank" class="fi-pencil"> {% trans "Edit Course Structure" %}</a>
+                  
+                  <a href="{% url 'unit_detail' groupid  %}" target="_blank" class="fi-pencil"> {% if 'Group' in group_object.member_of_names_list %}{% trans "Edit WorkSpace Structure" %} {% else  %} {% trans "Edit Course Structure" %}  {% endif %} </a>
+
               </li>
               {% endif %}
               <li>
@@ -114,7 +116,7 @@
     <li>  <a href="{% url 'course_raw_material' group_id %}" {% if title == 'raw material' or title == "raw_material_detail"  %}class="selected"{% endif %}>{% trans "Resources" %}</a> </li>
     {% endif %}
     <li>
-    <li>  <a  href="{% url 'course_gallery' group_id %}" {% if title == 'gallery' or title == "asset_gallery_detail" %} class="selected" {% endif %} >{% trans "Gallery" %}</a> </li>
+    <li>  <a  href="{% url 'course_gallery' group_id %}" {% if title == 'gallery' or title == "asset_gallery_detail" %} class="selected" {% endif %} > {% if 'Group'  in group_object.member_of_names_list %} {% trans "E-Library" %} {% else %} {% trans "Gallery" %}{% endif %}</a> </li>
     <li>
       <a href="{% url 'course_notebook' group_id %}" {% if title == 'notebook' %}class="selected"{% endif %}>
       {% if 'Group' in group_object.member_of_names_list %}
