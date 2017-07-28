@@ -2416,7 +2416,7 @@ def course_raw_material(request, group_id, node_id=None,page_no=1):
         allow_to_upload = True
     template = 'ndf/gcourse_event_group.html'
     
-    if "announced_unit" in group_obj.member_of_names_list:
+    if "announced_unit" in group_obj.member_of_names_list or "Group" in group_obj.member_of_names_list:
         template = 'ndf/lms.html'
 
     if 'BaseCourseGroup' in group_obj.member_of_names_list:
@@ -2500,7 +2500,7 @@ def course_gallery(request, group_id,node_id=None,page_no=1):
             'group_set': {'$all': [ObjectId(group_id)]},'tags': "asset@gallery"}).sort('last_update', -1)
     
     template = 'ndf/gcourse_event_group.html'
-    if "announced_unit" in group_obj.member_of_names_list:
+    if "announced_unit" in group_obj.member_of_names_list or "Group" in group_obj.member_of_names_list:
         template = 'ndf/lms.html'
     
     context_variables.update({'asset_nodes': asset_nodes})
