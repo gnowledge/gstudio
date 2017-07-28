@@ -10,14 +10,16 @@
             <input type="hidden" name="node_id" value="{{unit_node.pk}}">
                 <div class="course_creator_header">
                     <div class="left course_heading">
-                    <h5>{% trans "Enter Unit Name" %}</h5>
+                    <h5> {% if 'Group' in unit_node.member_of_names_list %} {% trans "Enter Group Name" %} {% else %} {% trans "Enter Unit Name" %} {% endif %} </h5>
                     </div>
                     <div class="right course_heading">
                         {% if unit_node %}
-                        <input id="unit-name" name="name" type="text" placeholder="Enter unit name"
+                        <input id="unit-name" name="name" type="text"  "{% if 'Group' in unit_node.member_of_names_list %}" placeholder="Enter group name"
+                        "{% else %}" placeholder="Enter unit name" "{% endif %}"
                         value="{% if unit_node %}{{unit_node.name}}{% endif %}" disabled="disabled" />
                         {% else %}
-                        <input id="unit-name" name="name" type="text" placeholder="Enter unit name"
+                        <input id="unit-name" name="name" type="text" "{% if 'Group' in unit_node.member_of_names_list %}" placeholder="Enter group name"
+                        "{% else %}" placeholder="Enter unit name" "{% endif %}"
                          autofocus onfocus="this.value = this.value;"/>
                         {% endif %}
                     </div>
@@ -38,6 +40,7 @@
                 {% endif %}
 
                 <hr/>
+                {% if 'Group' not in unit_node.member_of_names_list %}
                 <div class="course_creator_header">
                     <div class="left course_heading">
                     <h5>{% trans "Select Module" %}</h5>
@@ -83,7 +86,7 @@
                         </select>
                     </div>
                 </div>
-
+                {% endif %}
                 <div class="course_creator_header">
                     <div class="left course_heading">
                     <h5>{% trans "Select Language" %}</h5>
