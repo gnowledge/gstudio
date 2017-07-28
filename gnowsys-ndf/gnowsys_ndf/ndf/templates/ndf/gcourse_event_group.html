@@ -110,8 +110,8 @@
 
       <div class="medium-12 course-page-header">
       <div class="row " >
-        <div class="course-header-background">
-          {% include 'ndf/widget_photo_upload.html' with url_name='course_about' widget_for="group_banner" is_banner=True is_profile=False no_update_btn=True%}
+        <div class="course-header-background" style="background-color: #000080;">
+          {% include 'ndf/widget_photo_upload.html' with url_name='course_about' widget_for="group_banner" is_banner=True is_profile=False no_update_btn=True node=group_obj %}
           <div class="course-header-background-layer"></div>
         </div>
         {% if is_gstaff %}
@@ -209,7 +209,7 @@
 
 
         <div class="row" style="line-height: 0.7em;">
-          <ul class="tabs course-tabs show-for-medium-up">
+          <ul class="tabs course-tabs show-for-medium-up"  style="background-color: #cccce6;">
 
             <li class="tab-title {% ifequal title 'about' %}active{% endifequal %}">
               <a href="{% url 'course_about' group_id %}">
