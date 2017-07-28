@@ -12,7 +12,7 @@
 				</a>
 
 				{% if request.user.is_superuser or user_grp_count.projects > 0  %}
-				<a href="{% url 'explore_groups' %}" class="secondary-header-tabs {%if title == 'groups'%} active{% endif %}">
+				<a href="{% url 'explore_groups' %}" class="secondary-header-tabs {%if title == 'workspaces'%} active{% endif %}">
 					{% trans "Workspaces" %}
 				</a>
 				{% endif %}
