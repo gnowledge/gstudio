@@ -1,14 +1,18 @@
 {% extends "ndf/gbase.html" %}
-{% load check_is_gstaff from ndf_tags %}
+{% load check_is_gstaff get_group_object from ndf_tags %}
 {% load i18n %}
 
 {% block title %} {{title|capfirst}} {% endblock title %}
 
 {% block body_content %}
+{% get_group_object as group_object %}
 {% check_is_gstaff group_id request.user as is_gstaff %}
 		{% include 'ndf/explore_secondary_header.html' %}
+		
 		<!--section role="tabpanel" aria-hidden="true" class="content active " style="border-style:none;"-->
-		{% if title == "groups" %}
+		{% if title == "workspaces" %}
+	        <a class="button tiny radius right" href="{% url 'create_group' group_object.pk %}" title="Create New Workspace">{% trans "New Workspace" %} </a>		
+			</a>
 	        <ul class="small-block-grid-1 medium-block-grid-3 large-block-grid-4">
 			{% for each_obj in groups_cur %}
 		        <li class="card-image-wrapper">
