@@ -1,10 +1,10 @@
 {% load i18n %}
 {% load simple_filters %}
 {% load ndf_tags %}
-<input type="button" data-reveal-id="enrollBuddiesModal" class="enrollBtn" value="Enrollment" />
+<input type="button" data-reveal-id="enrollBuddiesModal" class="enrollBtn" "{% if 'Group' in group_object.member_of_names_list %}" value="Join" "{% else %}" value="Enrollment" "{%  endif %}" />
 
 <div id="enrollBuddiesModal" class="reveal-modal medium radius" data-reveal data-alert>
-    <h4 id="enrollBuddiesModalLabel">{% trans "Enrollment Status:" %}</h4><br/>
+    <h4 id="enrollBuddiesModalLabel"> {% if 'Group' in group_object.member_of_names_list %} {% trans "Join Status:" %}  {% else %} {% trans "Enrollment Status:" %} {% endif %}  </h4><br/>
     <div class="small-12 medium-12 columns buddiesList center">
     <div class="row">
       <div class="small-8 medium-8 columns">
@@ -12,9 +12,9 @@
       </div>
       <div class="small-4 medium-4 columns">
       {% if request.user.pk in group_object.author_set %}
-          <input id="enrollchk_{{request.user.pk}}" type="checkbox" class="enroll_chkbox" checked disabled><label for="enrollchk_{{request.user.pk}}">{% trans  "Enrolled" %} </label>
+          <input id="enrollchk_{{request.user.pk}}" type="checkbox" class="enroll_chkbox" checked disabled><label for="enrollchk_{{request.user.pk}}"> {% if 'Group' in group_object.member_of_names_list %} {% trans  "Joined" %} {% else %} {% trans  "Enrolled" %} {% endif %} </label>
       {% else %}
-          <input id="enrollchk_{{request.user.pk}}" type="checkbox" class="enroll_chkbox" onclick="enroll_user('{{request.user.pk}}')" data-user-id='{{request.user.pk}}'><label for="enrollchk_{{request.user.pk}}" class="enroll-act_lbl">{% trans "Enroll" %} </label>
+          <input id="enrollchk_{{request.user.pk}}" type="checkbox" class="enroll_chkbox" onclick="enroll_user('{{request.user.pk}}')" data-user-id='{{request.user.pk}}'><label for="enrollchk_{{request.user.pk}}" class="enroll-act_lbl"> {% if 'Group' in group_object.member_of_names_list %} {% trans "Join" %} {% else %} {% trans "Enroll" %} {% endif %} </label>
       {% endif %}
       </div>
       <hr>
@@ -27,15 +27,16 @@
             </div>
             <div class="small-4 medium-4 columns">
             {% if userid in group_object.author_set %}
-                <input id="enrollchk_{{userid}}" type="checkbox" class="enroll_chkbox" checked disabled><label for="enrollchk_{{userid}}" >{% trans "Enrolled" %} </label>
+                <input id="enrollchk_{{userid}}" type="checkbox" class="enroll_chkbox" checked disabled><label for="enrollchk_{{userid}}" > {% if 'Group' in group_object.member_of_names_list %} {% trans "Joined" %}{% else %}  {% trans "Enrolled" %} {% endif %} 
+                </label>
             {% else %}
-              <input id="enrollchk_{{userid}}" type="checkbox" class="enroll_chkbox" onclick="enroll_user('{{userid}}')" data-user-id='{{userid}}'><label for="enrollchk_{{userid}}" class="enroll-act_lbl"> {% trans "Enroll" %}</label>
+              <input id="enrollchk_{{userid}}" type="checkbox" class="enroll_chkbox" onclick="enroll_user('{{userid}}')" data-user-id='{{userid}}'><label for="enrollchk_{{userid}}" class="enroll-act_lbl"> {% if 'Group' in group_object.member_of_names_list %} {% trans "Join" %} {% else %} {% trans "Join" %} {% endif %} </label>
             {% endif %}
             </div>
             <hr>
         {% endfor %}
       {% endwith %}
-    <input type="button" class="orange-button right enroll_all_users" onclick="enroll_all_users()" value="Enroll All">
+    <input type="button" class="orange-button right enroll_all_users" onclick="enroll_all_users()" "{% if 'Group' in group_object.member_of_names_list %}" value="Join All"  "{% else %}" value="Enroll All" "{% endif %}" >
     {% endif %}
     </div>
     </div>
