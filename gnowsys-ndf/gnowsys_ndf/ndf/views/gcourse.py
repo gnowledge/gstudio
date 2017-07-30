@@ -2192,7 +2192,7 @@ def course_content(request, group_id):
         template = 'ndf/basecourse_group.html'
     if 'base_unit' in group_obj.member_of_names_list:
         template = 'ndf/gevent_base.html'
-    if 'announced_unit' in group_obj.member_of_names_list or 'Group' in group_obj.member_of_names_list:
+    if 'announced_unit' in group_obj.member_of_names_list or 'Group' in group_obj.member_of_names_list and 'base_unit' not in group_obj.member_of_names_list:
         template = 'ndf/lms.html'
     banner_pic_obj,old_profile_pics = _get_current_and_old_display_pics(group_obj)
     if request.user.is_authenticated():
@@ -2224,7 +2224,7 @@ def course_notebook(request, group_id, node_id=None, tab="my-notes"):
     if 'base_unit' in group_obj.member_of_names_list:
         template = 'ndf/gevent_base.html'
 
-    if 'announced_unit' in group_obj.member_of_names_list or 'Group' in group_obj.member_of_names_list:
+    if 'announced_unit' in group_obj.member_of_names_list or 'Group' in group_obj.member_of_names_list and 'base_unit' not in group_obj.member_of_names_list:
         template = 'ndf/lms.html'
 
     # page_gst = node_collection.one({'_type': "GSystemType", 'name': "Page"})
@@ -2500,7 +2500,7 @@ def course_gallery(request, group_id,node_id=None,page_no=1):
             'group_set': {'$all': [ObjectId(group_id)]},'tags': "asset@gallery"}).sort('last_update', -1)
     
     template = 'ndf/gcourse_event_group.html'
-    if "announced_unit" in group_obj.member_of_names_list or "Group" in group_obj.member_of_names_list:
+    if "announced_unit" in group_obj.member_of_names_list or "Group" in group_obj.member_of_names_list and 'base_unit' not in group_obj.member_of_names_list:
         template = 'ndf/lms.html'
     
     context_variables.update({'asset_nodes': asset_nodes})
@@ -2551,7 +2551,7 @@ def course_about(request, group_id):
         context_variables.update({'educationalsubject_val': educationalsubject,
             "educationallevel_val": educationallevel})
     
-    if 'announced_unit' in group_obj.member_of_names_list or 'Group' in group_obj.member_of_names_list:
+    if 'announced_unit' in group_obj.member_of_names_list or 'Group' in group_obj.member_of_names_list and 'base_unit' not in group_obj.member_of_names_list:
         template = 'ndf/lms.html'
     
     banner_pic_obj,old_profile_pics = _get_current_and_old_display_pics(group_obj)

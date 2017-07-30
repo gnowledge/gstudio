@@ -75,7 +75,7 @@
         <div class="small-12 medium-4 large-3 columns notebook-index panel">
             <div class="row">
                 <div class="small-12 columns">
-                    <span style="font-size: 17px;margin: 7px 19px;display: inline-block;color: #6153AE;"> {% if 'Group' in group_object.member_of_names_list %} Blogs {% else %} Notes {% endif %}</span>
+                    <span style="font-size: 17px;margin: 7px 19px;display: inline-block;color: #6153AE;"> {% if 'Group' in group_object.member_of_names_list and 'base_unit' not in group_object.member_of_names_list %} Blogs {% else %} Notes {% endif %}</span>
                     {% if request.user.is_authenticated %}
                     {% comment %}
                     <a href="#" data-reveal-id="newNoteModal" class="button expand radius" style="margin: 0em 0em 1em;"><i class="fi-plus"></i> </a>
@@ -93,9 +93,9 @@
 
             <ul class="tabs" data-tab style="">
                 <li class="tab-title {% ifequal tab 'all-notes' %} active{% endifequal %}"><a href="#all-notes">
-                {% if 'Group' in group_object.member_of_names_list %}All Blogs {% else %} All Notes {% endif %} ({{blog_pages.count}})</a></li>
+                {% if 'Group' in group_object.member_of_names_list and 'base_unit' not in group_object.member_of_names_list %}All Blogs {% else %} All Notes {% endif %} ({{blog_pages.count}})</a></li>
                 {% if user.is_authenticated %}
-                    <li class="tab-title {% ifequal tab 'my-notes' %} active{% endifequal %}"><a href="#my-notes"> {% if 'Group' in group_object.member_of_names_list %}My Blogs {% else %} My Blogs {% endif %} ({{user_blogs.count}})</a></li>
+                    <li class="tab-title {% ifequal tab 'my-notes' %} active{% endifequal %}"><a href="#my-notes"> {% if 'Group' in group_object.member_of_names_list and 'base_unit' not in group_object.member_of_names_list %}My Blogs {% else %} My Notes {% endif %} ({{user_blogs.count}})</a></li>
                 {% endif %}
                 {% comment %}
                     <li class="tab-title"><a href="#my-drafts">My Drafts</a></li>
