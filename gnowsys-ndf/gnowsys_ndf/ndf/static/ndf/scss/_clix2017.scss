@@ -3275,7 +3275,7 @@ $activity-border-color: #e0e0e0;
 $activity-header-height: 45px;
 $activity-header-icon-block-width: 70px;
 body {
-    background-color: rgba(0, 0, 0, 0.04);
+    background-color: #fff;
 }
 
 /*
@@ -5212,5 +5212,7 @@ ul.nav_menu_1 {
 }
 
 
-
+.wrkspace{
+    margin-right:80px;
+}
 

@@ -3086,7 +3086,7 @@ ul.jqtree-tree .jqtree-toggler:hover {
 
 /* line 3277, ../../../scss/_clix2017.scss */
 body {
-  background-color: rgba(0, 0, 0, 0.04);
+  background-color: #fff;
 }
 
 /*
@@ -5015,4 +5015,9 @@ ul.nav_menu_1 > li > a.selected, ul.nav_menu_1 > li > a:hover {
 /* line 5210, ../../../scss/_clix2017.scss */
 .enroll-act_lbl {
   color: #0c2944;
+}
+
+/* line 5215, ../../../scss/_clix2017.scss */
+.wrkspace {
+  margin-right: 80px;
 }
