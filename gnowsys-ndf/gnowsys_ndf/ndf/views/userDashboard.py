@@ -734,12 +734,8 @@ def my_desk(request, group_id):
     # for each in my_modules_cur:
     #     my_modules.append(each._id)
 
-    if GSTUDIO_WORKSPACE_INSTANCE:
-        my_units = node_collection.find({'member_of': gst_group._id,
-                                          'author_set': request.user.id,
-                                        }).sort('last_update', -1)
-    else:
-        my_units = node_collection.find({'member_of': {'$in': [ce_gst._id, announced_unit_gst._id]},
+    
+    my_units = node_collection.find({'member_of': {'$in': [ce_gst._id, announced_unit_gst._id,gst_group._id]},
                                           'author_set': request.user.id,
                                         }).sort('last_update', -1)
 
@@ -854,12 +850,8 @@ def my_performance(request, group_id):
 
     auth_id = auth_obj._id
     title = 'my performance'
-    if GSTUDIO_WORKSPACE_INSTANCE:
-        my_units = node_collection.find({'member_of': gst_group._id,
-                                          'author_set': request.user.id,
-                                        }).sort('last_update', -1)
-    else:
-        my_units = node_collection.find({'member_of': {'$in': [ce_gst._id, announced_unit_gst._id]},
+    
+    my_units = node_collection.find({'member_of': {'$in': [ce_gst._id, announced_unit_gst._id,gst_group._id]},
                                           'author_set': request.user.id,
                                         }).sort('last_update', -1)
     # my_modules_cur.rewind()
