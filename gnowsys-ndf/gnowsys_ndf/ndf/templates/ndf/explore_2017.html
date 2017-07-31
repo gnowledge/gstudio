@@ -22,7 +22,7 @@
 			</ul>
 		{% else %}
 			{% if title == "drafts" and  is_gstaff  %}
-		        <a href="{% url 'unit_create_edit' group_id %}" class="right text_button"><i class="fa fa-plus"> New Unit</i></a>
+		        <a href="{% url 'unit_create_edit' group_id %}" class="right text_button wrkspace"><i class="fa fa-plus"> New Unit</i></a>
                 <a href="{% url 'module_create' group_id %}" class="right text_button"><i class="fa fa-plus"> New Module</i></a>
 			{% endif %}
 			{% include "ndf/lms_explore.html"  %}

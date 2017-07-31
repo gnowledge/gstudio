@@ -1357,7 +1357,12 @@ input[type="button"] {
 }
 
 
-
+.disab-button{
+    margin-right: 10px;
+    background-color: #fff;
+    text-transform: none;
+    font-size: 14px;
+}
 
 
 .save-asset{
@@ -3581,6 +3586,22 @@ $primary-button-background-color: #00a9ee;
     line-height: 25px;
 }
 
+.edit_button{
+    background-color: #fff;
+    color:#717171;
+    border-radius: 4px;
+    font-size: 16px;
+    letter-spacing: 0.7px;
+    line-height: 25px;
+    text-transform: none;
+    margin-top: 10px;
+    margin-right: -50px;
+    &:hover{
+        color: $primary-orange;
+
+    }
+}
+
 $nav_menu_1_color: #ce7869;
 $nav_menu_1_bg_color: #fff;
 $nav_menu_1_tab_border: #ffc14e;
@@ -4065,8 +4086,11 @@ $inCompleteBgColor: #fd9e29;
         padding-right: 18px;
         text-transform: uppercase;
         color: #007095;
+    
+        
     }
 }
+
 
 
 .activity-slides-container {
@@ -4782,7 +4806,8 @@ ul.nav_menu_1 {
 .delete-note-btn{
     float:right;
     border: 1px solid #CFCFCF;
-    padding: 1px 8px;
+    padding: 1px 6px;
+    margin-right: 25px;
     border-radius: 3px;
     color:#A2A2A2;
     background-color: #f7f7f7;
@@ -5216,3 +5241,18 @@ ul.nav_menu_1 {
     margin-right:80px;
 }
 
+.status-btn{
+    background-color: #fff;
+    margin-right: auto;
+    padding-bottom: 0px;
+    text-transform: none;
+    .disabled{
+        background-color: #008cba;
+        border-color: #007095;
+        color: white;
+        cursor: default;
+        opacity: 0.7;
+        box-shadow: none; 
+    }
+    
+}
