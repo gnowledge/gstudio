@@ -41,6 +41,7 @@ SCHEMA_ID_MAP = {}
 log_file = None
 CONFIG_VARIABLES = None
 DATE_AT_IDS = []
+GROUP_CONTAINERS = ['module']
 date_related_at_cur = node_collection.find({'_type': 'AttributeType', 
     'name': {'$in': ["start_time", "end_time", "start_enroll", "end_enroll"]}})
 for each_date_related_at in date_related_at_cur:
@@ -552,10 +553,8 @@ def copy_media_data(media_path):
 
 def core_import(non_grp_root_node=None, *args):
     global log_file
-
     log_file_path = create_log_file(DATA_RESTORE_PATH)
     print "\n Log will be found at: ", log_file_path
-
     log_file.write("\nUpdated CONFIG_VARIABLES: "+ str(CONFIG_VARIABLES))
     print "\n Validating the data-dump"
     validate_data_dump(*args)
@@ -591,6 +590,10 @@ class Command(BaseCommand):
                 # Get the dumps of Groups and loop over each dump to import
                 # gd == group-dump
                 print "\n***** NON Group Dump found. *****\n"
+                global GROUP_CONTAINERS
+                grp_containers_cur = node_collection.find({'name': {'$in': GROUP_CONTAINERS},
+                    '_type': 'GSystemType'})
+                grp_containers_ids = [cont._id for cont in grp_containers_cur]
                 SCHEMA_ID_MAP = update_factory_schema_mapper(DATA_RESTORE_PATH)
                 dump_dir = [os.path.join(DATA_RESTORE_PATH,gd) for gd in os.listdir(DATA_RESTORE_PATH) if os.path.isdir(os.path.join(DATA_RESTORE_PATH,gd))]
                 print "\n Total Groups to be Restored: ", len(dump_dir)
@@ -602,7 +605,8 @@ class Command(BaseCommand):
                     read_config_file()
 
                     non_grp_root_node_obj = node_collection.one({
-                            'name': CONFIG_VARIABLES.ROOT_DUMP_NODE_NAME})
+                            'name': CONFIG_VARIABLES.ROOT_DUMP_NODE_NAME,
+                            'member_of': {'$in': grp_containers_ids}})
                     if non_grp_root_node_obj:
                         if non_grp_root_node_obj._id != ObjectId(CONFIG_VARIABLES.ROOT_DUMP_NODE_ID):
                             # Module exists, but ID is different
@@ -646,8 +650,9 @@ def restore_node(filepath, non_grp_root_node=None):
             root_node_obj = node_collection.one({'_type': 'GSystem',
                 '_id': {'$ne': ObjectId(non_grp_root_node[0])},
                 'name': non_grp_root_node[1]})
-            root_node_obj.collection_set = merge_lists_and_maintain_unique_ele(root_node_obj.collection_set,
-                node_json['collection_set'])
+            root_node_obj.collection_set = node_json['collection_set']
+            # root_node_obj.collection_set = merge_lists_and_maintain_unique_ele(root_node_obj.collection_set,
+            #     node_json['collection_set'])
             root_node_obj.save()
 
         node_obj = node_collection.one({'_id': ObjectId(node_json['_id'])})
@@ -705,8 +710,11 @@ def restore_node(filepath, non_grp_root_node=None):
 
             if node_obj.collection_set != node_json['collection_set'] and node_json['collection_set']:
                 log_file.write("\n Old collection_set :\n\t "+ str(node_obj.collection_set))
-                node_obj.collection_set = merge_lists_and_maintain_unique_ele(node_obj.collection_set,
-                    node_json['collection_set'])
+                log_file.write("\n Requested collection_set :\n\t "+ str(node_json['collection_set']))
+
+                # node_obj.collection_set = merge_lists_and_maintain_unique_ele(node_obj.collection_set,
+                #     node_json['collection_set'])
+                node_obj.collection_set = node_json['collection_set']
                 log_file.write("\n New collection_set :\n\t "+ str(node_obj.collection_set))
                 node_changed = True
 
