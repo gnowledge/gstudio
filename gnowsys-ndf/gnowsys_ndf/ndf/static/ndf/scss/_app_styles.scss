@@ -1141,6 +1141,7 @@ aside#help{
 // discussion
 .create-discussion {
     position: relative;
+    margin-bottom:20px;
 
     >div {
       display: inline-block;
@@ -4636,6 +4637,18 @@ h5{
         margin-right: 5px;
     }
 }
+.delete-note-btn{
+    float:right;
+    border: 1px solid #CFCFCF;
+    padding: 1px 8px;
+    border-radius: 3px;
+    color:#A2A2A2;
+    background-color: #f7f7f7;
+    i{
+        margin-right: 5px;
+    }
+}
+
 
 .bef-note-btn{
     padding: 3px 11px;
@@ -4657,4 +4670,20 @@ h5{
     background: #fff;
     font-size: 23px;
     color: #6153AE;
+}
+
+.explore-button {
+      // //font-size: 25px;
+    border-radius: 5px;
+    text-transform: uppercase;
+    margin-left: 150px;
+    color: #6153ae;
+    padding: 5px 17px;
+    width: inherit;
+    font-family: "OpenSans-Semibold", sans-serif;
+    border: 2px solid #6153ae;
+    background-color: #dbd4e1;
+    &:hover{
+        cursor:pointer;
+    }
 }

@@ -107,6 +107,7 @@ def get_site_variables():
 	site_var = {}
 	site_var['ORG_NAME'] = GSTUDIO_ORG_NAME
 	site_var['LOGO'] = GSTUDIO_SITE_LOGO
+	site_var['SECONDARY_LOGO'] = GSTUDIO_SITE_SECONDARY_LOGO
 	site_var['FAVICON'] = GSTUDIO_SITE_FAVICON
 	site_var['COPYRIGHT'] = GSTUDIO_DEFAULT_COPYRIGHT
 	site_var['GIT_REPO'] = GSTUDIO_GIT_REPO
@@ -3693,10 +3694,13 @@ def get_user_quiz_resp(node_obj, user_obj):
 	thread_obj = None
 	if node_obj and user_obj:
 		try:
-			grel_dict = get_relation_value(node_obj._id,"has_thread", True)
-			is_cursor = grel_dict.get("cursor",False)
-			if not is_cursor:
-				thread_obj = grel_dict.get("grel_node")
+			from gnowsys_ndf.ndf.templatetags.ndf_tags import get_thread_node
+			thread_obj = get_thread_node(node_obj._id)
+
+			# grel_dict = get_relation_value(node_obj._id,"has_thread", True)
+			# is_cursor = grel_dict.get("cursor",False)
+			# if not is_cursor:
+			# 	thread_obj = grel_dict.get("grel_node")
 
 			# for each_rel in node_obj.relation_set:
 			# 	if each_rel and "has_thread" in each_rel:
@@ -4043,3 +4047,7 @@ def user_groups(is_super_user,user_id):
 @register.assignment_tag
 def if_edit_course_structure():
 	return GSTUDIO_EDIT_LMS_COURSE_STRUCTURE
+
+@register.assignment_tag
+def get_default_discussion_lbl():
+	return DEFAULT_DISCUSSION_LABEL
