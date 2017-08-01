@@ -1,3 +1,12 @@
+'''
+Import can also be called using command line args as following:
+    python manage.py group_import <dump_path> <md5-check> <group-availability> <user-objs-restoration>
+    like:
+        python manage.py group_import <dump_path> y y y
+'''
+
+
+
 import os
 import json
 import imp
@@ -80,7 +89,7 @@ def read_config_file():
     CONFIG_VARIABLES = imp.load_source('config_variables',
             os.path.join(DATA_RESTORE_PATH,'migration_configs.py'))
 
-def validate_data_dump():
+def validate_data_dump(*args):
     """
     For validation of the exported dump and the 
      importing data-dump, calculate MD5 and
@@ -93,14 +102,24 @@ def validate_data_dump():
     md5hash = dirhash(DATA_DUMP_PATH, 'md5')
     if CONFIG_VARIABLES.MD5 != md5hash:
         print "\n MD5 NOT matching."
-        proceed_without_validation = raw_input("MD5 not matching. Restoration not recommended.\n \
-                        Would you still like to continue ?")
+        if args and len(args) == 3:
+            proceed_without_validation = args[0]
+        else:
+            proceed_without_validation = raw_input("MD5 not matching. Restoration not recommended.\n \
+                            Enter (y/Y) to continue ?")
         if proceed_without_validation not in ['y', 'Y']:
             log_file.write("\n Checksum validation Failed on dump data")
             call_exit()
     else:
-        log_file.write("\n Checksum validation Success on dump data")
         print "\nValidation Success..!"
+        proceed_with_validation = ''
+        if args and len(args) == 3:
+            proceed_without_validation = args[0]
+        else:
+            proceed_with_validation = raw_input("MD5 Matching.\n \
+                            Enter (y/Y) to proceed to restoration")
+        if proceed_with_validation in ['y', 'Y']:
+            log_file.write("\n Checksum validation Success on dump data")
 
 def get_file_path_with_id(node_id):
     file_name = (node_id + '.json')
@@ -123,7 +142,7 @@ def get_file_path_with_id(node_id):
     print "\n\nfilepath: ", file_path
     return file_path
 
-def check_group_availability():
+def check_group_availability(*args):
     group_node = node_collection.one({'_id': ObjectId(CONFIG_VARIABLES.GROUP_ID)})
     global log_file
     print '\n\n Restoring Group'
@@ -136,7 +155,11 @@ def check_group_availability():
     #     restore_node(fp)
     # group_node = node_collection.one({'_id': ObjectId(CONFIG_VARIABLES.GROUP_ID)})
     if group_node:
-        confirm_grp_data_merge = raw_input("Dump Group already exists here. Would you like to merge the data ?")
+        confirm_grp_data_merge = ''
+        if args and len(args) == 3:
+            confirm_grp_data_merge = args[1]
+        else:
+            confirm_grp_data_merge = raw_input("Dump Group already exists here. Would you like to merge the data ?")
         if confirm_grp_data_merge not in ['y', 'Y']:
             log_file.write("\n Group with Restore Group ID is FOUND on Target system.")
             print "\n Group with restoration ID already exists."
@@ -145,11 +168,22 @@ def check_group_availability():
             log_file.write("\n Group Merge confirmed.")
             print " Proceeding to restore."
     else:
-        log_file.write("\n Group with Restore Group ID NOT found on Target system.")
-        print "\n Group with restoration ID does not exists."
-        print " Proceeding to restore."
+        confirm_grp_data_restore = ''
+        if args and len(args) == 3:
+            confirm_grp_data_merge = args[1]
+        else:
+            confirm_grp_data_restore = raw_input("Proceed to restore ?")
+        if confirm_grp_data_restore not in ['y', 'Y']:
+            log_file.write("\n Group with Restore Group ID is NOT FOUND on Target system.")
+            print "\n Group with restoration ID DOES NOT exists."
+            print " Cancelling to restore."
+            call_exit()
+        else:
+            log_file.write("\n Group Merge confirmed.")
+            print " Proceeding to restore."
 
-def user_objs_restoration():
+
+def user_objs_restoration(*args):
     global USER_ID_MAP
     global DEFAULT_USER_ID
     global DEFAULT_USER_SET
@@ -181,10 +215,18 @@ def user_objs_restoration():
                 DEFAULT_USER_ID = int(raw_input("Enter user-id: "))
                 log_file.write("\n Request for Setting Default user with id :" + str(DEFAULT_USER_SET))
     else:
+
         print "*"*80
+        user_dump_restore_default = ''
+        if args and len(args) == 3:
+            user_dump_restore_default = args[2]
+        else:
+            user_dump_restore_default = raw_input("\n\tUser dump is NOT available.  \
+            Would you like to use USER_ID=1 for restoration(y/n) ?: ")
+        if user_dump_restore_default in ['y', 'Y']:
+            DEFAULT_USER_SET = True
+            DEFAULT_USER_ID = 1
         print "\n No RESTORE_USER_DATA available. Setting Default user with id: 1"
-        DEFAULT_USER_SET = True
-        DEFAULT_USER_ID = 1
         log_file.write("\n No RESTORE_USER_DATA available. Setting Default user with id :" + str(DEFAULT_USER_SET))
 
 
@@ -508,7 +550,7 @@ def copy_media_data(media_path):
         subprocess.Popen(media_copy_cmd,stderr=subprocess.STDOUT,shell=True)
         log_file.write("\n Media Copied:  " + str(media_path) )
 
-def core_import(non_grp_root_node=None):
+def core_import(non_grp_root_node=None, *args):
     global log_file
 
     log_file_path = create_log_file(DATA_RESTORE_PATH)
@@ -516,11 +558,11 @@ def core_import(non_grp_root_node=None):
 
     log_file.write("\nUpdated CONFIG_VARIABLES: "+ str(CONFIG_VARIABLES))
     print "\n Validating the data-dump"
-    validate_data_dump()
+    validate_data_dump(*args)
     print "\n Checking the dump Group-id availability."
-    check_group_availability()
+    check_group_availability(*args)
     print "\n User Restoration."
-    user_objs_restoration()
+    user_objs_restoration(*args)
     print "\n Factory Schema Restoration. Please wait.."
     # print "\n SCHEMA: ", SCHEMA_ID_MAP
     call_group_import(os.path.join(DATA_DUMP_PATH, 'data', 'rcs-repo'),non_grp_root_node)
@@ -532,7 +574,10 @@ class Command(BaseCommand):
         global DATA_RESTORE_PATH
         global DATA_DUMP_PATH
         global SCHEMA_ID_MAP
-        DATA_RESTORE_PATH = raw_input("\n\tEnter absolute path of data-dump folder to restore:")
+        if args and len(args) == 4:
+            DATA_RESTORE_PATH = args[0]
+        else:
+            DATA_RESTORE_PATH = raw_input("\n\tEnter absolute path of data-dump folder to restore:")
         if os.path.exists(DATA_RESTORE_PATH):
             # Check if DATA_DUMP_PATH has dump, if not then its dump of Node holding Groups.
             if os.path.exists(os.path.join(DATA_RESTORE_PATH, 'dump')):
@@ -540,7 +585,7 @@ class Command(BaseCommand):
                 DATA_DUMP_PATH = os.path.join(DATA_RESTORE_PATH, 'dump')
                 SCHEMA_ID_MAP = update_factory_schema_mapper(DATA_DUMP_PATH)
                 read_config_file()
-                core_import()
+                core_import(*args)
             else:
                 # Multi Group Dump
                 # Get the dumps of Groups and loop over each dump to import
