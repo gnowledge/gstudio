@@ -544,12 +544,14 @@ class Command(BaseCommand):
             if dump_node_obj._type == 'Group':
                 core_export(dump_node_obj)
                 SCHEMA_MAP_PATH = DUMP_PATH
+                create_factory_schema_mapper(SCHEMA_MAP_PATH)
             else:
                 global DUMP_NODE_objS_LIST
                 global TOP_PATH
                 datetimestamp = datetime.datetime.now().isoformat()
                 TOP_PATH = os.path.join(GSTUDIO_DATA_ROOT, 'data_export', slugify(dump_node_obj.name) + "_"+ str(datetimestamp))
                 SCHEMA_MAP_PATH = TOP_PATH
+                UNIT_NAMES = []
                 print "\n********REQUEST DUMP NODE IS NOT GROUP.*********\n"
                 confirm_non_grp_exp = raw_input("\n\tDo you want to continue? Enter y/n:\t ")
                 if confirm_non_grp_exp in ['y', 'Y']:
@@ -565,13 +567,15 @@ class Command(BaseCommand):
                             select_grp = raw_input(each_unit.name + "("+ each_unit.member_of_names_list[0]+  ") :\t")
                             if select_grp in ['y', 'Y']:
                                 DUMP_NODES_LIST.append(each_unit)
-                        dump_grp_list_confirm = raw_input("\n\n\t\tEnter y/Y to continue:\t ")
+                                UNIT_NAMES.append(each_unit.name)
+                        dump_grp_list_confirm = raw_input("\n\n\t\tFollowing are the selected Units to be dumped:\n\t\t\t "+ ','.join(UNIT_NAMES)+"\n\n\t\tEnter y/Y to continue:\t ")
                         if dump_grp_list_confirm in ['y', 'Y']:
                             for each_unit in DUMP_NODES_LIST:
                                 core_export(each_unit)
-
-                    dump_node(node=dump_node_obj,collection_name=node_collection)
-            create_factory_schema_mapper(SCHEMA_MAP_PATH)
+                        else:
+                            call_exit()
+                        dump_node(node=dump_node_obj,collection_name=node_collection)
+                        create_factory_schema_mapper(SCHEMA_MAP_PATH)
             print "*"*70
             print "\n This will take few minutes. Please be patient.\n"
             print "\n Log will be found at: ", log_file_path
