@@ -601,7 +601,6 @@ class Command(BaseCommand):
                     DATA_RESTORE_PATH = each_gd_abs_path
                     read_config_file()
 
-
                     non_grp_root_node_obj = node_collection.one({
                             'name': CONFIG_VARIABLES.ROOT_DUMP_NODE_NAME})
                     if non_grp_root_node_obj:
@@ -611,12 +610,13 @@ class Command(BaseCommand):
                                         non_grp_root_node=(
                                                 CONFIG_VARIABLES.ROOT_DUMP_NODE_ID,
                                                 CONFIG_VARIABLES.ROOT_DUMP_NODE_NAME
-                                                )
+                                                ),
+                                        *args
                                         )
                         else:
-                            core_import()
+                            core_import(*args)
                     else:
-                        core_import()
+                        core_import(*args)
 
                     print "\n each_gd_abs_path: ", os.path.join(DATA_RESTORE_PATH,each_gd_abs_path)
             print "*"*70
