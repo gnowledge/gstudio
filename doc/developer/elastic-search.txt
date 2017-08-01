@@ -1,29 +1,42 @@
-# To install elsticsearch container ->
+# INSTALLING ELASTIC SEARCH CONTAINER:
 
-curl should be installed beforehand
+1. GETTING DOCKER IMAGE:
+	$ docker pull docker.elastic.co/elasticsearch/elasticsearch:5.4.0
 
-(1.)    docker pull docker.elastic.co/elasticsearch/elasticsearch:5.4.0
 
-(2.)    docker run -p 9200:9200 -e "http.host=0.0.0.0" -e "transport.host=127.0.0.1" docker.elastic.co/elasticsearch/elasticsearch:5.4.0
+2. CREATEING CONTAINER:
+	$ docker run -p 9200:9200 -e "http.host=0.0.0.0" -e "transport.host=127.0.0.1" docker.elastic.co/elasticsearch/elasticsearch:5.4.0
 
-Then create a superuser to use the elasticsearch instance(since a login is required to use the elasticsearch container)
-Open the bash of elasticsearch and inside the bash
-(3.)    curl -XPOST 'http://elastic:changeme@localhost:9200/_xpack/security/user/elsearch?pretty' -H 'Content-Type:application/json' -d '{"password":"changeit","roles":["superuser"]}'
 
-# Link the gstudio container with the elasticsearch container using the docker run:
+3. CREATE A SUPERUSER TO USE THE ELASTIC SEARCH:
+	- A login is required to use the elasticsearch container.
+	- Open the bash of elasticsearch and run following inside the bash
+		$ curl -XPOST 'http://elastic:changeme@localhost:9200/_xpack/security/user/elsearch?pretty' -H 'Content-Type:application/json' -d '{"password": "<GSTUDIO_ELASTIC_SEARCH_PASSWORD in local_settings.py of gstudio container>", "roles": ["superuser"]}'
+		- NOTE: Make sure same passowrd is used at both places:
+			1. GSTUDIO_ELASTIC_SEARCH_PASSWORD
+			2. 
 
-(4.)    docker run -itd --link elasticsearch_container_name:alias --name=gstudio-pilani -p 80:80 -p 8000:8000 -v linking_code_directory -v linking_data_directory image_id
 
-The alias we gave was gsearch-> this alias is used while creating instance of elasticsearch in the program.
+4. LINK THE GSTUDIO CONTAINER WITH THE ELASTICSEARCH CONTAINER (using the docker run):
+
+	$ docker run -itd --link <elasticsearch_container_name>:alias --name=<gstudio-container-name> -p 80:80 -p 8000:8000 -v <linking_code_directory> -v <linking_data_directory image_id>
+
+- NOTE: The alias we gave was gsearch -> this alias is used while creating instance of elasticsearch in the program.
 
 (--link flag is now deprecated)
 
-Then in the gstudio container bash
- 
-pip install elasticsearch : this will install the python elasticsearch client.
+5. INSTALL THE PYTHON ELASTICSEARCH CLIENT (in the gstudio container):
+	$ pip install elasticsearch
 
 
-Our search url can be found in __init__.py file of urls folder. In the search form, the if filter Users is selected then the contributions of the user entered in the search box will be searched, else if any other filter is selected, normal search will happen.
+
+------------------------------------------------------------------------------------------
+
+
+
+# IMPLEMENTATION:
+
+- Our search url can be found in __init__.py file of urls folder. In the search form, the if filter Users is selected then the contributions of the user entered in the search box will be searched, else if any other filter is selected, normal search will happen.
 
 If group is also selected with Users filter, the contributions of that user in a particular group will be searched.
 ***********************************************************************************************************************************
