@@ -171,7 +171,7 @@ def check_group_availability(*args):
     else:
         confirm_grp_data_restore = ''
         if args and len(args) == 3:
-            confirm_grp_data_merge = args[1]
+            confirm_grp_data_restore = args[1]
         else:
             confirm_grp_data_restore = raw_input("Proceed to restore ?")
         if confirm_grp_data_restore not in ['y', 'Y']:
@@ -708,15 +708,15 @@ def restore_node(filepath, non_grp_root_node=None):
                 log_file.write("\n New origin :\n\t "+ str(node_obj.origin))
                 node_changed = True
 
-            if node_obj.collection_set != node_json['collection_set'] and node_json['collection_set']:
-                log_file.write("\n Old collection_set :\n\t "+ str(node_obj.collection_set))
-                log_file.write("\n Requested collection_set :\n\t "+ str(node_json['collection_set']))
+            # if node_obj.collection_set != node_json['collection_set'] and node_json['collection_set']:
+            #     log_file.write("\n Old collection_set :\n\t "+ str(node_obj.collection_set))
+            #     log_file.write("\n Requested collection_set :\n\t "+ str(node_json['collection_set']))
 
-                # node_obj.collection_set = merge_lists_and_maintain_unique_ele(node_obj.collection_set,
-                #     node_json['collection_set'])
-                node_obj.collection_set = node_json['collection_set']
-                log_file.write("\n New collection_set :\n\t "+ str(node_obj.collection_set))
-                node_changed = True
+            #     # node_obj.collection_set = merge_lists_and_maintain_unique_ele(node_obj.collection_set,
+            #     #     node_json['collection_set'])
+            #     node_obj.collection_set = node_json['collection_set']
+            #     log_file.write("\n New collection_set :\n\t "+ str(node_obj.collection_set))
+            #     node_changed = True
 
             if node_obj.content != node_json['content'] and node_json['content']:
                 log_file.write("\n Old content :\n\t "+ str(node_obj.content))
@@ -724,6 +724,14 @@ def restore_node(filepath, non_grp_root_node=None):
                 node_changed = True
                 log_file.write("\n New content :\n\t "+ str(node_obj.content))
 
+            log_file.write("\n Old collection_set :\n\t "+ str(node_obj.collection_set))
+            log_file.write("\n Requested collection_set :\n\t "+ str(node_json['collection_set']))
+
+            # node_obj.collection_set = merge_lists_and_maintain_unique_ele(node_obj.collection_set,
+            #     node_json['collection_set'])
+            node_obj.collection_set = node_json['collection_set']
+            log_file.write("\n New collection_set :\n\t "+ str(node_obj.collection_set))
+            node_changed = True
 
             log_file.write("\n Old group_set :\n\t "+ str(node_obj.group_set))
 
