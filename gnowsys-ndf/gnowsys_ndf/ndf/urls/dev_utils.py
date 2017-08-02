@@ -7,7 +7,7 @@ urlpatterns = patterns('gnowsys_ndf.ndf.views.dev_utils',
 		url(r'^git/(?P<git_command>[\w-]+)$', 'git_misc', name='git_misc'),
 )
 
-urlpatterns = patterns('',
+urlpatterns += patterns('',
 	    url(r'^query/(?P<doc_id_or_name>[^/]+)?$', 'gnowsys_ndf.ndf.views.dev_utils.query_doc'),
 	    url(r'^query/(?P<doc_id_or_name>[\w-]+)/(?P<option>[^/]+)?$', 'gnowsys_ndf.ndf.views.dev_utils.query_doc'),
 )

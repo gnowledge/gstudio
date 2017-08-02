@@ -56,7 +56,7 @@ def git_branch(request):
 	
 def git_misc(request, git_command):
 	response = "Unsupported"
-	if git_command in ['log', 'branch', 'status', 'tag', 'show']:
+	if git_command in ['log', 'branch', 'status', 'tag', 'show', 'diff']:
 		response = subprocess.check_output(['git', git_command])
 	return HttpResponse(response, content_type="text/plain")
 
