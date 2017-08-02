@@ -5016,3 +5016,57 @@ ul.nav_menu_1 > li > a.selected, ul.nav_menu_1 > li > a:hover {
 .enroll-act_lbl {
   color: #0c2944;
 }
+
+/* line 5215, ../../../scss/_clix2017.scss */
+.inline-block-display {
+  display: inline-block;
+}
+
+/* line 5219, ../../../scss/_clix2017.scss */
+.push-to-right {
+  margin-left: 10%;
+}
+
+/* line 5223, ../../../scss/_clix2017.scss */
+.auto-width {
+  width: auto !important;
+}
+
+/* line 5227, ../../../scss/_clix2017.scss */
+.widget-container {
+  width: 80%;
+}
+
+/* line 5231, ../../../scss/_clix2017.scss */
+.fs13 {
+  font-size: 13px !important;
+}
+
+/* line 5235, ../../../scss/_clix2017.scss */
+.add-details, .removed-details {
+  overflow-y: auto;
+  max-height: 100px;
+}
+
+/* line 5240, ../../../scss/_clix2017.scss */
+#student_data_set_div {
+  overflowX: hidden;
+}
+
+/* line 5244, ../../../scss/_clix2017.scss */
+.user_search_result_table {
+  width: 100%;
+}
+/* line 5246, ../../../scss/_clix2017.scss */
+.user_search_result_table tbody, .user_search_result_table thead {
+  display: block;
+}
+/* line 5250, ../../../scss/_clix2017.scss */
+.user_search_result_table tbody {
+  overflow-y: auto;
+  height: 390px;
+}
+/* line 5255, ../../../scss/_clix2017.scss */
+.user_search_result_table td {
+  width: 10%;
+}

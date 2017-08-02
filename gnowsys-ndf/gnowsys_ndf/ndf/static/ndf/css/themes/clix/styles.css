@@ -27977,7 +27977,7 @@ h5 {
   color: #6153AE;
 }
 
-/* line 4675, ../../../scss/_app_styles.scss */
+/* line 4676, ../../../scss/_app_styles.scss */
 .explore-button {
   border-radius: 5px;
   text-transform: uppercase;
@@ -27989,9 +27989,14 @@ h5 {
   border: 2px solid #6153ae;
   background-color: #dbd4e1;
 }
-/* line 4686, ../../../scss/_app_styles.scss */
+/* line 4687, ../../../scss/_app_styles.scss */
 .explore-button:hover {
   cursor: pointer;
+}
+
+/* line 4692, ../../../scss/_app_styles.scss */
+.text-center {
+  text-align: center !important;
 }
 
 /*

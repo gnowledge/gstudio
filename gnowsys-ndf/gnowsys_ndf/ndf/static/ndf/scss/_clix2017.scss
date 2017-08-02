@@ -5212,5 +5212,47 @@ ul.nav_menu_1 {
 }
 
 
+.inline-block-display{
+    display: inline-block;
+}
 
+.push-to-right{
+  margin-left:10%;
+}
 
+.auto-width{
+    width: auto !important;
+}
+
+.widget-container{
+    width: 80%;
+}
+
+.fs13{
+    font-size:13px !important;
+}
+
+.add-details, .removed-details{
+   overflow-y: auto;
+   max-height: 100px;
+}
+
+#student_data_set_div{
+    overflowX: hidden;
+}
+
+.user_search_result_table{
+    width: 100%;
+    tbody, thead
+    {
+        display: block;
+    }
+    tbody
+    {
+       overflow-y: auto;
+       height: 390px;
+    }
+    td{
+      width: 10%;
+    }
+}

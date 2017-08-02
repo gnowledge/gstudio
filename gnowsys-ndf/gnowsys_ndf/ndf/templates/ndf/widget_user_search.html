@@ -1,143 +1,573 @@
 {% load i18n %}
 {% load cache %}
-<style type="text/css">
-  .fi-x{
-    color: red;
-  }
-  .fi-check{
-    color: green;
-  }
-</style>
-<div class="batch_div">
-  <div class="row" style="text-align: center;">
-    <div class="small-4 columns end" style="display: inline-block;">
-      <h5>{% trans 'Search User by name : ' %}</h5>
-    </div>
-    <div class="small-4 columns end" style="display: inline-block;">
-      <input type="text" class="student_name small-6 columns" value="" placeholder="Enter atleast 3 letters to search">
+  <!-- Confirmation Seek Modal on Submit click -->
+  <div id="confirmUserSubscriptionModal" class="reveal-modal large radius" data-options="close_on_background_click:false;close_on_esc:false;" data-reveal data-alert>
+    <p id="confirmUserSubscriptionModalLabel"></p>
+    <div class="row feeds_proceed">
+      <div class="small-3 small-offset-3 columns">
+        <input type="button" id="btnConfirmUserSubYes" class="orange-button auto-width" value={% trans "Yes" %}>
+      </div>
+      <div class="small-3 columns end">
+        <input type="button" id="btnConfirmUserSubNo" class="orange-button auto-width " value={% trans "No" %}>
+      </div>
     </div>
   </div>
-  <div class="row">
-        <input type="button" class="radius button search_stud_btn asset-save-button" style="width: 8rem;"value="Find Students" />
+
+
+<div class="row">
+
+  <!-- Info Box -->
+  <div class="small-6 large-3 columns" style="margin-left: -6%">
+    <div class="info-box hide" >
+      <div class="row" >
+        <div class="member_info">Members <a class="fs13 hide show-details show-mem-link">[Show Details]</a>: 
+          <div class="push-to-right fs13">
+            <h3 class="mem-added-cnt inline-block-display ">0</h3> to be Added.<br/>
+            <div class="add-details hide">
+              <small>Request to add: </small> <br/><i class="added-names"></i><br/>
+            </div>
+            <h3 class="mem-removed-cnt inline-block-display">0</h3> to be Removed.
+            <div class="removed-details hide">
+              <small>Request to remove: </small><br/><i class="removed-names"></i>
+            </div>
+          </div>
+        </div>
+      </div>
+      <hr/>
+      <div class="row">
+        <div class="admin_info">Admins <a class="fs13 hide show-details show-adm-link">[Show Details]</a>: 
+          <div class="push-to-right fs13">
+            <h3 class="adm-added-cnt inline-block-display">0</h3> to be Added.<br/>
+            <div class="add-details hide">
+              <small>Request to add: </small> <br/><i class="added-names"></i><br/>
+            </div>
+            <h3 class="adm-removed-cnt inline-block-display">0</h3> to be Removed.
+            <div class="removed-details hide">
+              <small>Request to remove: </small> <br/><i class="removed-names"></i>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="small-6 large-9 columns widget-container">
+      <!-- Search Box -->
+      <div class="search-box">
+          <div class="inline-block-display auto-width" >
+            <h4>{% trans 'Search User by name : ' %}</h4>
+          </div>
+          <div class="inline-block-display auto-width" >
+            <input type="text" class="student_name" value="" placeholder="Enter atleast 3 letters">
+          </div>
+          <div class="inline-block-display auto-width" >
+              <input type="button" class="auto-width radius button search_stud_btn orange-button" value="Find Users" />
+          </div>
+      </div>
+
+      <!-- Search Result Box -->
+      <div class="data-box">
+        <input type="button" class="radius button auto-width hide asset-save-button reset-btn" onclick='request_user_confirmation(false)' value="Reset" / >
+        <div id="student_count_div"></div>
+        <div id="student_data_set_div"></div>
+        <div class="controls-box hide">
+          <input type="button" value="Submit" class="radius button submit-btn asset-save-button" onclick="request_user_confirmation(true)">
+          <input type="button" value="Cancel" class="radius button cancel-btn asset-save-button">
+        </div>
+      </div>
   </div>
 </div>
-  <div id="student_count_div"></div>
-  <div id="student_data_set_div"></div>
+
 <script type="text/javascript">
-    var search_text_old = "";
-    $(document).on( 'click', '.search_stud_btn', function (e) {
-        var search_text = $(".student_name").val().toLowerCase();
-        var search_text_len = (search_text.length);
-        var subscription_status_val = false
-        {% if subscription_status %}
-          var subscription_status_val = "{{subscription_status}}"
-        {% endif %}
+  var search_text_old = "";
+  var mem_subscription_data = {'added': {}, 'removed': {}}
+  var adm_subscription_data = {'added': {}, 'removed': {}}
+  var users_added_cnt;
+  var users_removed_cnt;
+  var adm_added_cnt;
+  var adm_removed_cnt;
 
-        if (search_text_len > 2){
-        $.ajax({
-          type: "GET",
-          url: "{% url 'search_users' group_object.pk %}",
-          datatype: "json",
-          data:{
-            'username_str': search_text,
-            'subscription_status_val': subscription_status_val
 
-          },
-          success: function(data) {
-            $("#student_data_set_div").html("")
-            data = JSON.parse(data)
-            if(data.length > 0){
-              $("#student_count_div").html("Total "+ data.length+" user(s) found.")
-              var stud_table = document.createElement('table');
-              outer_div = document.getElementById("student_data_set_div");
-              stud_table.style.width = "100%"
-              outer_div.style.height = "450px"
-              outer_div.style.overflowX = "hidden"
-              outer_div.style.overflowY = "auto"
-              var table_header = stud_table.createTHead();
-              var header_row = table_header.insertRow(0)     
-              var cell1 = header_row.insertCell(0)
-              var cell2 = header_row.insertCell(1)
-              var cell3 = header_row.insertCell(2)
-              cell1.innerHTML = "<b>No.</b>"
-              cell2.innerHTML = "<b>Name</b>"
-              {% if subscription_status %}
-                cell3.innerHTML = "<b>Member</b>"
-                var cell4 = header_row.insertCell(3)
-                cell4.innerHTML = "<b>Admin</b>"
-              {% else %}
-                cell3.innerHTML = "<b>Action</b>"
-              {% endif %}
+  function toggle_details_box(dict_obj, classname){
+      users_to_be_added = get_users_info(dict_obj, true, true)
 
-              var table_body = stud_table.createTBody();
-    
-              $.each(data, function(index_val,tuple_obj){
-                var data_row = table_body.insertRow(-1); 
-                data_row.id =  tuple_obj[0]
+      if(users_to_be_added.length){
+        $(classname).find(".add-details").removeClass("hide")
+        $(classname).find(".added-names").html(users_to_be_added.join(', '))
+      }
+      else{
+        $(classname).find(".add-details").addClass("hide")
+        $(classname).find(".added-names").html("")
+      }
 
-                var serial_no_cell = data_row.insertCell(0);
-                serial_no_cell.innerHTML = index_val + 1
-                var data_cell = data_row.insertCell(1);
-                data_cell.innerHTML = tuple_obj[1]
-                data_cell.className = "username"
-                
-                {% if not subscription_status %}
-                  var action_on_user = data_row.insertCell(2);
-                  action_on_user.innerHTML = "<a>Change Password</a>"
-                  action_on_user.className = "action_on_user"
+      users_not_to_be_added = get_users_info(dict_obj, true, false)
+      if(users_not_to_be_added.length){
+        $(".adm-added-names").html(users_not_to_be_added.join(', '))
+        $(classname).find(".removed-names").html(users_not_to_be_added.join(', '))
+        $(classname).find(".removed-details").removeClass("hide")
+      }
+      else{
+        $(classname).find(".removed-details").addClass("hide")
+        $(classname).find(".removed-names").html("")
 
-                {% else %}
-                  var mem_cell = data_row.insertCell(2);
-                  var admin_cell = data_row.insertCell(3);
-                  if(tuple_obj[2]){
-                    mem_cell.innerHTML = "<i class='fi-x'></i><a id='unsubscribe_from_grp' title='Click here to Remove this user' data-user-id='"+tuple_obj[0]+"'> Remove</a>"
-                  }
-                  else{
-                    mem_cell.innerHTML = "<i class='fi-check'></i><a id='subscribe_to_grp'  title='Click here to Add this user' data-user-id='"+tuple_obj[0]+"'> Add</a>"
-                  }
+      }
 
-                  // Add as Admin
-                  if(tuple_obj[3]){
-                    admin_cell.innerHTML = "<i class='fi-x'></i><a id='unsubscribe_from_grp' title='Click here to Remove this user' data-user-id='"+tuple_obj[0]+"' data-user-admin='True'> Remove</a>"
-                  }
-                  else{
-                    admin_cell.innerHTML = "<i class='fi-check'></i><a id='subscribe_to_grp' title='Click here to Add this user' data-user-id='"+tuple_obj[0]+"' data-user-admin='True'> Add</a>"
-                  }
+  }
 
-                {% endif %}
+  $(document).on( 'click', '.hide_details_box', function (e){
+
+    $(this).addClass("show-details").removeClass("hide_details_box")
+    $(this).text('[Show Details]')
+    if($(this).hasClass("show-adm-link")){
+      $(".admin_info").find(".add-details").addClass("hide")
+      $(".admin_info").find(".removed-details").addClass("hide")
+    }
+    else{
+      $(".member_info").find(".add-details").addClass("hide")
+      $(".member_info").find(".removed-details").addClass("hide")
+    }
+
+  })
+
+  $(document).on( 'click', '.show-details', function (e){
+
+    $(this).text('[Hide Details]')
+    $(this).removeClass("show-details").addClass("hide_details_box")
+
+    if($(this).hasClass("show-adm-link")){
+      toggle_details_box(adm_subscription_data, ".admin_info")
+    }
+    else{
+      toggle_details_box(mem_subscription_data, ".member_info")
+    }
+  })
+
+  function create_users_table(){
+      stud_table = document.createElement('table');
+      outer_div = document.getElementById("student_data_set_div");
+      stud_table.className = 'user_search_result_table'
+      var table_header = stud_table.createTHead();
+      var header_row = table_header.insertRow(0)     
+      var cell1 = header_row.insertCell(0)
+      var cell2 = header_row.insertCell(1)
+      var cell3 = header_row.insertCell(2)
+      var cell4 = header_row.insertCell(3)
+      var cell5 = header_row.insertCell(4)
+      cell1.innerHTML = "<b>No.</b>"
+      cell2.innerHTML = "<b>Name</b>"
+      cell3.innerHTML = "<b>Member</b><br/> <input type='checkbox' class='select-mem'> Select All "
+      cell4.innerHTML = "<b>Admin</b><br/> <input type='checkbox' class='select-adm'> Select All"
+      cell5.innerHTML = "<b>Action</b>"
+      return stud_table
+  }
+
+
+  function create_checkbox(user_id, username, chk_flag){
+    chkbox_ele = document.createElement("input")
+    chkbox_ele.type = "checkbox"
+    chkbox_ele.className = "user_mgmt_chk"
+    chkbox_ele.setAttribute('data-user-id',user_id)
+    chkbox_ele.setAttribute('data-user-name',username)
+    if(chk_flag){
+      chkbox_ele.setAttribute('checked',true)
+      chkbox_ele.setAttribute('data-checked-status',true)
+    }
+    return chkbox_ele
+  }
+
+  $(document).on( 'click', '.search_stud_btn', function (e) {
+      var search_text = $(".student_name").val().toLowerCase();
+      var search_text_len = (search_text.length);
+
+      if (search_text_len > 2){
+      $.ajax({
+        type: "GET",
+        url: "{% url 'search_users' group_id %}",
+        datatype: "json",
+        data:{
+          'username_str': search_text
+        },
+        success: function(data) {
+          $("#student_data_set_div").html("")
+          data = JSON.parse(data)
+          if(data.length > 0){
+            $("#student_count_div").html("Total "+ data.length+" user(s) found.")
+            stud_table = create_users_table()
+
+            var table_body = stud_table.createTBody();
   
-              })
+            $.each(data, function(index_val,tuple_obj){
+              var data_row = table_body.insertRow(-1); 
 
-              $("#student_data_set_div").append(stud_table);
-            }
-            else{
-              $("#student_data_set_div").html("No results found")
-              $("#student_count_div").html("")
-            }
-          },
-        });
+              var serial_no_cell = data_row.insertCell(0);
+              var data_cell = data_row.insertCell(1);
+              var mem_cell = data_row.insertCell(2);
+              var admin_cell = data_row.insertCell(3);
+              var action_on_user = data_row.insertCell(4);
+
+              data_row.id =  tuple_obj[0]
+              serial_no_cell.innerHTML = index_val + 1
+              data_cell.innerHTML = tuple_obj[1]
+              data_cell.className = "username"
+              action_on_user.innerHTML = "<a>Change Password</a>"
+              action_on_user.className = "action_on_user"
+
+              // Member
+              mem_chk = create_checkbox(tuple_obj[0], tuple_obj[1], tuple_obj[2])
+              mem_chk.name = "member-chk"
+              mem_cell.innerHTML = mem_chk.outerHTML;
+
+              // Admin
+              admin_chk = create_checkbox(tuple_obj[0], tuple_obj[1], tuple_obj[3])
+              admin_chk.setAttribute('data-user-admin','True')
+              admin_chk.name = "admin-chk"
+              admin_cell.innerHTML = admin_chk.outerHTML;
+
+            })
+
+            $("#student_data_set_div").append(stud_table);
+            $(".search-box").hide()
+            $(".data-box").show()
+            $(".controls-box").removeClass("hide")
+            $(".info-box").removeClass("hide")
+            $(".reset-btn").removeClass("hide")
+
+          }
+          else{
+            $(".search-box").show()
+            $(".data-box").show()
+            $(".info-box").addClass("hide")
+            $(".controls-box").addClass("hide")
+            $("#student_data_set_div").html("")
+            $("#student_count_div").html("No results found")
+          }
+        },
+      });
+      }
+      else{
+        alert("Please enter some text to search.")
+      }
+  })
+
+  $(document).on("click", ".cancel-btn", function() {
+    $(".search-box").show()
+    $(".data-box").hide()
+    $(".info-box").addClass("hide")
+    $(".controls-box").addClass("hide")
+  })
+
+
+  function request_user_confirmation(submit_call){
+    if(users_added_cnt || users_removed_cnt || adm_added_cnt || adm_removed_cnt){
+
+      msg = "Are you sure you want to Cancel the following requests ?"
+      if(submit_call){
+        msg = "Are you sure you want to Proceed with the following requests ?"
+        $("#btnConfirmUserSubYes").attr("data-submit", true);
+      }
+
+      $(".show-details").trigger('click')
+      // Open all details and hide links
+      $(".info-box").find('div').removeClass("hide").find('a').addClass("hide")
+      info_html = $(".info-box").html()
+      $(".info-box").addClass("hide")
+      $("#confirmUserSubscriptionModalLabel").html(msg + info_html);
+      $("#confirmUserSubscriptionModal")
+        .removeClass("medium").addClass("small")
+        .addClass("alert")
+        .foundation('reveal', 'open');
+    }
+    else{
+      alert("Please Add and/or Remove any Users.")
+    }
+
+  }
+
+  function get_users_info(data_dict, fetch_key_only, fetch_added_info, fetch_length_only){
+        add_or_remove = "removed"
+        if(fetch_added_info){
+          add_or_remove = "added"
         }
-        else{
-          alert("Please enter some text to search.")
+        if (fetch_length_only){
+          return (Object.keys(data_dict[add_or_remove]).length)
         }
+        return (Object.keys(data_dict[add_or_remove]).map(function(key){
+                    if(fetch_key_only){
+                      return key;
+                    }
+                    else{
+                      return data_dict[add_or_remove][key];
+                    }
+                }))
+  }
+
+  //Confirm or Cancel Deletion
+    $(document).on("click", "#btnConfirmUserSubYes", function() {
+      submit_call = $("#btnConfirmUserSubYes").attr("data-submit")
+      if(submit_call){
+        users_to_be_mem = get_users_info(mem_subscription_data, false, true, false)
+        users_to_be_adm = get_users_info(adm_subscription_data, false, true, false)
+
+        users_not_to_be_mem = get_users_info(mem_subscription_data, false, false, false)
+        users_not_to_be_adm = get_users_info(adm_subscription_data, false, false, false)
+        // console.log("users_to_be_mem: "+ JSON.stringify(users_to_be_mem))
+        // console.log("users_to_be_adm: "+ JSON.stringify(users_to_be_adm))
+        // console.log("users_not_to_be_mem: "+ JSON.stringify(users_not_to_be_mem))
+        // console.log("users_not_to_be_adm: "+ JSON.stringify(users_not_to_be_adm))
+
+        // Handling Members
+        if(users_to_be_mem.length > 0){
+          add_users(JSON.stringify(users_to_be_mem), 'False')
+        }
+        if(users_not_to_be_mem.length > 0){
+          remove_users(JSON.stringify(users_not_to_be_mem), 'False')
+        }
+
+        // Handling Admins
+
+        if(users_to_be_adm.length > 0){
+          add_users(JSON.stringify(users_to_be_adm), 'True')
+        }
+        if(users_not_to_be_adm.length > 0){
+          remove_users(JSON.stringify(users_not_to_be_adm), 'True')
+        }
+        update_checkbox_attrs(true)
+      }
+      else{
+        update_checkbox_attrs(false)
+      }
+      mem_subscription_data = {'added': {}, 'removed': {}}
+      adm_subscription_data = {'added': {}, 'removed': {}}
+      update_status_lbl()
+      $("#confirmUserSubscriptionModal").foundation('reveal', 'close');
+
+    });
+
+
+    function update_checkbox_attrs(maintain_checks){
+      data_dicts = [mem_subscription_data, adm_subscription_data]
+      $.each(data_dicts, function(ind, dict_obj){
+        $.each(dict_obj["added"], function(i,v){
+          if(maintain_checks){
+            $("input[data-user-id='" + v + "']").attr("data-checked-status", true)
+          }
+          else{
+            $("input[data-user-id='" + v + "']").prop("checked", false)
+          }
+        })
+        $.each(dict_obj["removed"], function(i,v){
+          if(maintain_checks){
+            $("input[data-user-id='" + v + "']").removeAttr("data-checked-status")
+          }
+          else{
+            $("input[data-user-id='" + v + "']").prop("checked", true)
+          }
+        })
+      })
+    }
+
+    $(document).on("click", "#btnConfirmUserSubNo", function() {
+        $(".info-box").removeClass("hide")
+        update_status_lbl()
+        $("#confirmUserSubscriptionModal").foundation('reveal', 'close');
+    });
+
+  // [Tricky] Method to handle change events of all checkboxes
+  function update_data_and_label(chk_ele){
+
+    // based on attribute 'data-user-admin', 
+    // define on which dict object to alter
+    // Its open
+    // if($(detail_box_type).find("hide_details_box")){
+    // }
+
+    if ($(chk_ele).attr('data-user-admin') == 'True'){
+      subscription_user_type = adm_subscription_data
+      detail_box_class = ".admin_info"
+    }
+    else{
+      detail_box_class = ".member_info"
+      subscription_user_type = mem_subscription_data
+    }
+    checked_val = $(chk_ele).attr('data-checked-status')
+    username_val = $(chk_ele).attr('data-user-name')
+    user_id_val = $(chk_ele).attr('data-user-id')
+
+    if(checked_val){
+      if(!($(chk_ele).is(':checked'))){
+        // If user is ALREADY member/admin, and we are removing him/her
+        subscription_user_type["removed"][username_val] = user_id_val
+      }
+      else{
+        // On state reset
+        delete subscription_user_type['removed'][username_val]
+      }
+    }
+
+    else{
+      if($(chk_ele).is(':checked')){
+        // If user is NOT member/admin, and we are adding him/her
+        subscription_user_type["added"][username_val] = user_id_val
+      }
+      else{
+        // On state reset, i.e an non-member/admin, was added and then unchecked by user before submit
+        delete subscription_user_type['added'][username_val]
+      }
+    }
+    toggle_details_box(subscription_user_type, detail_box_class)
+    update_status_lbl()
+  }
+
+
+  function select_all(chk_name){
+    $("input[name=" + chk_name + "]").each(function () {
+      $(this).prop('checked', true)
+      update_data_and_label($(this))
     })
+  }
+
+  function deselect_all(chk_name){
+    $("input[name=" + chk_name + "]").each(function () {
+      $(this).prop('checked', false)
+      update_data_and_label($(this))
+    })
+  }
+
+  // Select All In Member column
+  $(document).on("click", ".select-mem", function() {
+    if($(this).is(":checked")){
+      select_all('member-chk')
+    }
+    else{
+      deselect_all('member-chk')
+    }
+  })
+
+  // Select All In Admin column
+  $(document).on("click", ".select-adm", function() {
+    if($(this).is(":checked")){
+      select_all('admin-chk')
+    }
+    else{
+      deselect_all('admin-chk')
+    }
+  })
+
+  // On change of Checkbox against Member
+  $(document).on("click", "input[type=checkbox][name='member-chk']", function() {
+    update_data_and_label($(this))
+  })
 
 
+  // On change of Checkbox against Admin
+  $(document).on("click", "input[type=checkbox][name='admin-chk']", function() {
+    update_data_and_label($(this))
+  })
+
+  function show_details_visibility(info_box_class, link_ele_class){
+    $(info_box_class).find(".add-details").addClass("hide")
+    $(info_box_class).find(".removed-details").addClass("hide")
+    $(link_ele_class)
+      .text("[Show Details]")
+      .addClass("show-details")
+      .removeClass("hide_details_box");
+  }
+
+
+    // Handle link visibility
+    // If detail box is open, update the data
+
+  function detail_link_visibility(added_cnt, removed_cnt, link_ele_class, info_box_class){
+    if(added_cnt || removed_cnt){
+      $(link_ele_class).removeClass("hide")
+      if($(info_box_class).find(".show-details").hasClass("show-details")){
+        show_details_visibility(info_box_class, link_ele_class)
+      }
+      else{
+        $(link_ele_class).text("[Hide Details]").removeClass("show-details").addClass("hide_details_box")
+      }
+    }
+    else{
+      $(link_ele_class).addClass("hide")
+      show_details_visibility(info_box_class, link_ele_class)
+    }
+  }
+
+  // Generic function to update count labels
+  function update_status_lbl(){
+
+    users_added_cnt = get_users_info(mem_subscription_data, false, true, true)
+    users_removed_cnt = get_users_info(mem_subscription_data, false, false, true)
+    adm_added_cnt = get_users_info(adm_subscription_data, false, true, true)
+    adm_removed_cnt = get_users_info(adm_subscription_data, false, false, true)
+    detail_link_visibility(users_added_cnt, users_removed_cnt, ".show-mem-link", ".member_info")
+    detail_link_visibility(adm_added_cnt, adm_removed_cnt, ".show-adm-link", ".admin_info")
+
+    $(".mem-added-cnt").html(users_added_cnt)
+    $(".mem-removed-cnt").html(users_removed_cnt)
+    $(".adm-added-cnt").html(adm_added_cnt)
+    $(".adm-removed-cnt").html(adm_removed_cnt)
+    $(".info-box").removeClass("hide")
+  }
 
   $(document).on("click", "#subscribe_to_grp", function() {
         user_id = $(this).attr('data-user-id')
         asAdmin = $(this).attr('data-user-admin')
-        $.ajax({
-                type: "POST",
-                url: "{% url 'enroll_to_course' group_object.pk %}",
-                datatype: "json",
-                data:{
-                        user_id: user_id,
-                        asAdmin: asAdmin,
-                       csrfmiddlewaretoken: '{{ csrf_token }}'
-                  },
-                context: this,
-              success: function(data) {
+        add_users(user_id, asAdmin)
+  });
+
+  $(document).on("click", "#unsubscribe_from_grp", function() {
+        user_id = $(this).attr('data-user-id')
+        asAdmin = $(this).attr('data-user-admin')
+        remove_users(user_id, asAdmin)
+  });
+
+  function add_users(user_id, asAdmin){
+    $.ajax({
+      type: "POST",
+      url: "{% url 'enroll_to_course' group_id %}",
+      datatype: "json",
+      data:{
+              'user_id': user_id,
+              'asAdmin': asAdmin,
+              'csrfmiddlewaretoken': '{{ csrf_token }}'
+        },
+      // context: this,
+      success: function(data) {
+        data = JSON.parse(data)
+        success_state = data["success"]
+        grp_mem_count = data["member_count"]
+        if(!success_state){
+            alert("Something went wrong. Please try again later.")
+        }
+        else{
+            if($(this).hasClass('subscription_policy')){
+                $(".subscription_policy")
+                    .attr("id", "unsubscribe_from_grp")
+                    .attr("value", "Unsubscribe")
+                    .attr("title", "Unsubscribe from this group")
+                // Update Courp member count in Group-dashboard
+                $(".grp_mem_count")
+                    .text(grp_mem_count)
+                    .attr('value',grp_mem_count)
+            }
+        }
+      }
+    });
+  }
+
+  function remove_users(user_id, asAdmin){
+    $.ajax({
+            type: "POST",
+            url: "{% url 'unsubscribe_from_group' group_id %}",
+            datatype: "json",
+            data:{
+                    user_id: user_id,
+                    asAdmin: asAdmin,
+                    csrfmiddlewaretoken: '{{ csrf_token }}'
+              },
+            context: this,
+            success: function(data) {
                 data = JSON.parse(data)
                 success_state = data["success"]
                 grp_mem_count = data["member_count"]
@@ -147,70 +577,16 @@
                 else{
                     if($(this).hasClass('subscription_policy')){
                         $(".subscription_policy")
-                            .attr("id", "unsubscribe_from_grp")
-                            .attr("value", "Unsubscribe")
-                            .attr("title", "Unsubscribe from this group")
-                        // Update Courp member count in Group-dashboard
+                            .attr("id", "subscribe_to_grp")
+                            .attr("value", "Join")
+                            .attr("title", "Join this Group")
+                        // Update Group member count in Group-dashboard
                         $(".grp_mem_count")
                             .text(grp_mem_count)
                             .attr('value',grp_mem_count)
                     }
-                    else{
-                        $(this)
-                            .attr("id", "unsubscribe_from_grp")
-                            .text("Remove")
-                            .attr("title", "Click here to Remove this user")
-                            .prev('i').addClass('fi-x').removeClass('fi-check')
-                    }
-
                 }
-              }
-        });
+            }
     });
-
-    $(document).on("click", "#unsubscribe_from_grp", function() {
-        user_id = $(this).attr('data-user-id')
-        asAdmin = $(this).attr('data-user-admin')
-
-        $.ajax({
-                type: "POST",
-                url: "{% url 'unsubscribe_from_group' group_object.pk %}",
-                datatype: "json",
-                data:{
-                        user_id: user_id,
-                        asAdmin: asAdmin,
-                       csrfmiddlewaretoken: '{{ csrf_token }}'
-                  },
-                context: this,
-                success: function(data) {
-                    data = JSON.parse(data)
-                    success_state = data["success"]
-                    grp_mem_count = data["member_count"]
-                    if(!success_state){
-                        alert("Something went wrong. Please try again later.")
-                    }
-                    else{
-                        if($(this).hasClass('subscription_policy')){
-                            $(".subscription_policy")
-                                .attr("id", "subscribe_to_grp")
-                                .attr("value", "Join")
-                                .attr("title", "Join this Group")
-                            // Update Courp member count in Group-dashboard
-                            $(".grp_mem_count")
-                                .text(grp_mem_count)
-                                .attr('value',grp_mem_count)
-                        }
-                        else{
-                            $(this)
-                                .text("Add")
-                                .attr("id", "subscribe_to_grp")
-                                .attr("title", "Click here to Add this user")
-                                .prev('i').addClass('fi-check').removeClass('fi-x')
-                        }
-                    }
-                }
-        });
-    });
-
-
+  }
 </script>

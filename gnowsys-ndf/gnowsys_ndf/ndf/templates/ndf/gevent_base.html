@@ -36,13 +36,7 @@
                             <a href="{% url 'unit_edit' groupid group_object.pk %}" class="fi-pencil">{% trans "Edit" %} </a>
                         </li>
                         <li>
-                            <a data-reveal-id="manage_users_modal" href="{% url 'manage_users' group_id %}"  class="fi-torsos">{% trans "Manage Users" %} </a>
-                            <div id="manage_users_modal" class="reveal-modal large" data-reveal style="position:absolute;">
-                                <div id="group_drawer">
-                                {% include "ndf/widget_user_search.html" with subscription_status=True %}
-                                </div>
-                                <a class="close-reveal-modal">&#215;</a>
-                            </div>
+                            <a href="{% url 'manage_users' group_id %}"  class="fi-torsos">{% trans "Manage Users" %} </a>
                         </li>
                         <li>
                             <a href="{% url 'create_event_group' group_id 'CourseEventGroup' %}" class="fi-volume"> {% trans "Announce" %}</a>

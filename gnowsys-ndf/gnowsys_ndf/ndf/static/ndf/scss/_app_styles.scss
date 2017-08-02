@@ -4672,6 +4672,7 @@ h5{
     color: #6153AE;
 }
 
+
 .explore-button {
       // //font-size: 25px;
     border-radius: 5px;
@@ -4686,4 +4687,8 @@ h5{
     &:hover{
         cursor:pointer;
     }
+  }
+
+.text-center {
+  text-align: center !important;
 }
