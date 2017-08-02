@@ -610,24 +610,31 @@ class Command(BaseCommand):
                     read_config_file()
 
                     non_grp_root_node_obj = node_collection.one({
-                            'name': CONFIG_VARIABLES.ROOT_DUMP_NODE_NAME,
-                            'member_of': {'$in': grp_containers_ids}})
+                        '_id': ObjectId(CONFIG_VARIABLES.ROOT_DUMP_NODE_ID)
+                    })
                     if non_grp_root_node_obj:
-                        if non_grp_root_node_obj._id != ObjectId(CONFIG_VARIABLES.ROOT_DUMP_NODE_ID):
-                            # Module exists, but ID is different
-                            core_import(
-                                        non_grp_root_node=(
-                                                CONFIG_VARIABLES.ROOT_DUMP_NODE_ID,
-                                                CONFIG_VARIABLES.ROOT_DUMP_NODE_NAME
-                                                ),
-                                        *args
-                                        )
-                        else:
                             core_import(*args)
                     else:
-                        core_import(*args)
+                        non_grp_root_node_obj = node_collection.one({
+                                'name': CONFIG_VARIABLES.ROOT_DUMP_NODE_NAME,
+                                'member_of': {'$in': grp_containers_ids}})
 
-                    print "\n each_gd_abs_path: ", os.path.join(DATA_RESTORE_PATH,each_gd_abs_path)
+                        if non_grp_root_node_obj:
+                            if non_grp_root_node_obj._id != ObjectId(CONFIG_VARIABLES.ROOT_DUMP_NODE_ID):
+                                # Module exists, but ID is different
+                                core_import(
+                                            non_grp_root_node=(
+                                                    CONFIG_VARIABLES.ROOT_DUMP_NODE_ID,
+                                                    CONFIG_VARIABLES.ROOT_DUMP_NODE_NAME
+                                                    ),
+                                            *args
+                                            )
+                            else:
+                                core_import(*args)
+                        else:
+                            core_import(*args)
+
+                    # print "\n each_gd_abs_path: ", os.path.join(DATA_RESTORE_PATH,each_gd_abs_path)
             print "*"*70
             # print "\n Export will be found at: ", DATA_EXPORT_PATH
             print "\n This will take few minutes. Please be patient.\n"
