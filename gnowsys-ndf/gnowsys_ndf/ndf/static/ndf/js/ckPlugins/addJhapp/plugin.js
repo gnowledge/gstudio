@@ -503,7 +503,41 @@ CKEDITOR.plugins.add('addJhapp',
                              CKEDITOR.instances[textAreaId].insertHtml(tool_val);
                             $('#group_imgs_on_modal').foundation('reveal', 'close');
                           });
+                          
+                          $("#insert_starlogo_model1_en").click(function(event){
                             
+
+                            tool_val = "<a href='/starlogonova/en/model1/' target='_blank'><img src='/static/ndf/images/starlogo-english.png' alt='Star Logo Thumbnail'  height='1000px' width='1000px' >"
+                            
+                             CKEDITOR.instances[textAreaId].insertHtml(tool_val);
+                            $('#group_imgs_on_modal').foundation('reveal', 'close');
+                          });
+                          
+                          $("#insert_starlogo_model2_en").click(function(event){
+                            
+
+                            tool_val = "<a href='/starlogonova/en/model2/' target='_blank'><img src='/static/ndf/images/starlogo-english.png' alt='Star Logo Thumbnail'  height='1000px' width='1000px' >"
+                            
+                             CKEDITOR.instances[textAreaId].insertHtml(tool_val);
+                            $('#group_imgs_on_modal').foundation('reveal', 'close');
+                          });
+                          $("#insert_starlogo_model1_hi").click(function(event){
+                            
+
+                            tool_val = "<a href='/starlogonova/hi/model1/' target='_blank'><img src='/static/ndf/images/starlogo-hindi.png' alt='Star Logo Thumbnail'  height='1000px' width='1000px' >"
+                            
+                             CKEDITOR.instances[textAreaId].insertHtml(tool_val);
+                            $('#group_imgs_on_modal').foundation('reveal', 'close');
+                          });
+
+                          $("#insert_starlogo_model2_hi").click(function(event){
+                            
+
+                            tool_val = "<a href='/starlogonova/hi/model2/' target='_blank'><img src='/static/ndf/images/starlogo-hindi.png' alt='Star Logo Thumbnail'  height='1000px' width='1000px' >"
+                            
+                             CKEDITOR.instances[textAreaId].insertHtml(tool_val);
+                            $('#group_imgs_on_modal').foundation('reveal', 'close');
+                          });
 
                         }
                     });
