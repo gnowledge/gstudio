@@ -34,7 +34,7 @@ from gnowsys_ndf.ndf.views.utils import replace_in_list, merge_lists_and_maintai
 # global variables declaration
 DATA_RESTORE_PATH = None
 DATA_DUMP_PATH = None
-DEFAULT_USER_ID = None
+DEFAULT_USER_ID = 1
 DEFAULT_USER_SET = False
 USER_ID_MAP = {}
 SCHEMA_ID_MAP = {}
@@ -145,6 +145,8 @@ def get_file_path_with_id(node_id):
 def check_group_availability(*args):
     group_node = node_collection.one({'_id': ObjectId(CONFIG_VARIABLES.GROUP_ID)})
     global log_file
+    global DEFAULT_USER_ID
+
     print '\n\n Restoring Group'
     log_file.write("\n Restoring Group")
     if group_node:
@@ -164,7 +166,9 @@ def check_group_availability(*args):
                     fp = fp + ',v'
                 log_file.write("\n Restoring Group: " + str(fp))
                 restore_node(fp)
-            # group_node = node_collection.one({'_id': ObjectId(CONFIG_VARIABLES.GROUP_ID)})
+            group_node = node_collection.one({'_id': ObjectId(CONFIG_VARIABLES.GROUP_ID)})
+            group_node.group_admin = [DEFAULT_USER_ID]
+            group_node.save()
             log_file.write("\n Group Merge confirmed.")
             print " Proceeding to restore."
     else:
@@ -185,7 +189,9 @@ def check_group_availability(*args):
                     fp = fp + ',v'
                 log_file.write("\n Restoring Group: " + str(fp))
                 restore_node(fp)
-            # group_node = node_collection.one({'_id': ObjectId(CONFIG_VARIABLES.GROUP_ID)})
+            group_node = node_collection.one({'_id': ObjectId(CONFIG_VARIABLES.GROUP_ID)})
+            group_node.group_admin = [DEFAULT_USER_ID]
+            group_node.save()
             log_file.write("\n Group Merge confirmed.")
             print " Proceeding to restore."
 
@@ -587,7 +593,7 @@ class Command(BaseCommand):
             if os.path.exists(os.path.join(DATA_RESTORE_PATH, 'dump')):
                 # Single Group Dump
                 DATA_DUMP_PATH = os.path.join(DATA_RESTORE_PATH, 'dump')
-                SCHEMA_ID_MAP = update_factory_schema_mapper(DATA_DUMP_PATH)
+                SCHEMA_ID_MAP = update_factory_schema_mapper(DATA_RESTORE_PATH)
                 read_config_file()
                 core_import(*args)
             else:
