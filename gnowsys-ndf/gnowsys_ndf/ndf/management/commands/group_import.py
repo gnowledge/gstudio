@@ -156,6 +156,7 @@ def check_group_availability(*args):
     #     restore_node(fp)
     # group_node = node_collection.one({'_id': ObjectId(CONFIG_VARIABLES.GROUP_ID)})
     if group_node:
+        print "\n Group with restoration ID already exists."
         confirm_grp_data_merge = ''
         if args and len(args) == 3:
             confirm_grp_data_merge = args[1]
@@ -163,12 +164,12 @@ def check_group_availability(*args):
             confirm_grp_data_merge = raw_input("Dump Group already exists here. Would you like to merge the data ?")
         if confirm_grp_data_merge not in ['y', 'Y']:
             log_file.write("\n Group with Restore Group ID is FOUND on Target system.")
-            print "\n Group with restoration ID already exists."
             call_exit()
         else:
             log_file.write("\n Group Merge confirmed.")
             print " Proceeding to restore."
     else:
+        print "\n Group with restoration ID DOES NOT exists."
         confirm_grp_data_restore = ''
         if args and len(args) == 3:
             confirm_grp_data_restore = args[1]
@@ -176,7 +177,6 @@ def check_group_availability(*args):
             confirm_grp_data_restore = raw_input("Proceed to restore ?")
         if confirm_grp_data_restore not in ['y', 'Y']:
             log_file.write("\n Group with Restore Group ID is NOT FOUND on Target system.")
-            print "\n Group with restoration ID DOES NOT exists."
             print " Cancelling to restore."
             call_exit()
         else:
