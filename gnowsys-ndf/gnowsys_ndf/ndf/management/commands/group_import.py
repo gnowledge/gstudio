@@ -136,11 +136,10 @@ def get_file_path_with_id(node_id):
     for pos in range(0, RCS_REPO_DIR_HASH_LEVEL):
         collection_hash_dirs += \
             (node_id[-2**pos] + "/")
-
     file_path = \
         os.path.join(collection_dir, \
                          (collection_hash_dirs + file_name))
-    print "\n\nfilepath: ", file_path
+    # print "\n\nfilepath: ", file_path
     return file_path
 
 def check_group_availability(*args):
@@ -148,13 +147,6 @@ def check_group_availability(*args):
     global log_file
     print '\n\n Restoring Group'
     log_file.write("\n Restoring Group")
-    # fp = get_file_path_with_id(CONFIG_VARIABLES.GROUP_ID)
-    # if fp:
-    #     if not fp.endswith(',v'):
-    #         fp = fp + ',v'
-    #     log_file.write("\n Restoring Group: " + str(fp))
-    #     restore_node(fp)
-    # group_node = node_collection.one({'_id': ObjectId(CONFIG_VARIABLES.GROUP_ID)})
     if group_node:
         print "\n Group with restoration ID already exists."
         confirm_grp_data_merge = ''
@@ -166,6 +158,13 @@ def check_group_availability(*args):
             log_file.write("\n Group with Restore Group ID is FOUND on Target system.")
             call_exit()
         else:
+            fp = get_file_path_with_id(CONFIG_VARIABLES.GROUP_ID)
+            if fp:
+                if not fp.endswith(',v'):
+                    fp = fp + ',v'
+                log_file.write("\n Restoring Group: " + str(fp))
+                restore_node(fp)
+            # group_node = node_collection.one({'_id': ObjectId(CONFIG_VARIABLES.GROUP_ID)})
             log_file.write("\n Group Merge confirmed.")
             print " Proceeding to restore."
     else:
@@ -180,6 +179,13 @@ def check_group_availability(*args):
             print " Cancelling to restore."
             call_exit()
         else:
+            fp = get_file_path_with_id(CONFIG_VARIABLES.GROUP_ID)
+            if fp:
+                if not fp.endswith(',v'):
+                    fp = fp + ',v'
+                log_file.write("\n Restoring Group: " + str(fp))
+                restore_node(fp)
+            # group_node = node_collection.one({'_id': ObjectId(CONFIG_VARIABLES.GROUP_ID)})
             log_file.write("\n Group Merge confirmed.")
             print " Proceeding to restore."
 
@@ -229,7 +235,6 @@ def user_objs_restoration(*args):
             DEFAULT_USER_ID = 1
         print "\n No RESTORE_USER_DATA available. Setting Default user with id: 1"
         log_file.write("\n No RESTORE_USER_DATA available. Setting Default user with id :" + str(DEFAULT_USER_SET))
-
 
 def update_schema_id_for_triple(document_json):
     if SCHEMA_ID_MAP:
