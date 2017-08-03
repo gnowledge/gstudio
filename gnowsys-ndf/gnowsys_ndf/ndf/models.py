@@ -2495,7 +2495,8 @@ class Group(GSystem):
         # case-1: argument - "group_name_or_id" is ObjectId
         if ObjectId.is_valid(group_name_or_id):
 
-            group_obj = node_collection.one({"_id": ObjectId(group_name_or_id)})
+            group_obj = node_collection.one({"_id": ObjectId(group_name_or_id),
+                "_type": {"$in": ["Group", "Author"]}})
 
             # checking if group_obj is valid
             if group_obj:
@@ -2723,10 +2724,10 @@ class Group(GSystem):
                     each_shared_node.group_set.remove(group_id)
                     each_shared_node.save()
 
-            return
+            return True
 
         print "\nAborting group deletion."
-        return
+        return True
 
 
 @connection.register
