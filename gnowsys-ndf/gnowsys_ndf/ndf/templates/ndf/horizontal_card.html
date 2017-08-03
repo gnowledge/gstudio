@@ -10,7 +10,12 @@
 
 <div class="module_card">
     <div class="card_banner">
-        <span class="card_title">{{node.name}}</span>
+        {% if not grel_dict.cursor and grel_dict.grel_node and grel_dict.grel_node.if_file.thumbnail.relurl %}
+            <img class="card_title" src="{{MEDIA_URL}}{{grel_dict.grel_node.if_file.mid.relurl}}" alt=""/>{{node.name}}
+        {% else %}
+            <img class="card_title" src="/static/ndf/images/module-card.png"/>{{node.name}}</img>
+        {% endif %}
+        
     {% get_dict_from_list_of_dicts node.attribute_set as node_attrs %}
     </div>
     <div class="card_summary">
