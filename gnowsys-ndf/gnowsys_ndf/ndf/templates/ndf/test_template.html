@@ -3,5 +3,114 @@
 {% load ndf_tags %}
 {% block body_content %}
 {% get_node_hierarchy node as node_hierarchy %}
-{% include "ndf/section_subsection.html" with unit_structure=node_hierarchy unit_obj=node group_id=node.pk section_name="Topic" sub_section_name="Activity"  %}
+
+<div class="row">
+<h3 style="margin-left:465px;">Create Workspace</h3>
+</div>
+
+
+<div class="row">
+    <div class="large-3 columns">
+        <label class="form_label">
+            <b>Workspace Name</b>
+        </label>
+    </div>
+    <div class="large-8 columns">
+        <input type="text" placeholder="Enter the Unique Workspace Name">
+    </div>
+</div>
+
+<div class="row">
+    <div class="large-3 columns">
+        <label class="form_label">
+            <b>Alternate Workspace Name</b>
+        </label>
+    </div>
+    <div class="large-8 columns">
+        <input type="text" placeholder="Enter the display Name">
+    </div>
+</div>
+
+<div class="row">
+    <div class="large-3 columns">
+    	<label class="form_label">
+            <b> Workspace Type </b>
+        </label>
+    </div>
+    <div class="large-8 columns">
+                <select class="glossary_select">
+                    <option value="">Public</option>
+                    <option value="">Private</option>
+                    <option value="">Anonymous</option>
+                </select>
+    </div>
+</div>
+<br/>
+
+<div class="row">
+    <div class="large-3 columns">
+    	<label class="form_label">
+            <b> Workspace Editing Policy</b>
+        </label>
+    </div>
+    <div class="large-8 columns">
+                <select class="glossary_select">
+                    <option value="">Editable_Non_Moderated</option>
+                    <option value="">Editable_Moderated</option>
+                    <option value="">Non_Editable</option>
+                </select>
+    </div>
+</div>
+<br/>
+<div class="row">
+    <div class="large-3 columns">
+    	<label class="form_label">
+            <b> Workspace Agency Types</b>
+        </label>
+    </div>
+    <div class="large-8 columns">
+                <select class="glossary_select">
+                    <option value="">Other</option>
+                    <option value="">Patrner</option>
+                    <option value="">NGO</option>
+                    <option value="">University</option>
+                    <option value="">School</option>
+                    <option value="">Project</option>
+                </select>
+    </div>
+</div>
+<br/>
+
+<div class="row">
+	<div class="large-3 columns">
+    	<label class="form_label">
+            <b> Description </b>
+        </label>
+    </div>
+    <dl class="accordion row" title="Click to Add/Edit Description" data-accordion>
+      <dd class="accordion-navigation large-8 columns">
+
+        <a href="#content_org">
+          <label for="right-label" class="">
+            {% if node.content_org %}Edit{% else %}Add{% endif %} {% trans "Description" %}
+          </label>
+        </a>
+
+        <div id="content_org" class="content">
+          {% include "ndf/html_editor.html" with var_name="content_org" var_placeholder="Enter the content here" var_value=node.content|default_if_none:"" ckeditor_toolbar="GeneralToolbar" node_id=node.pk %}
+        </div>
+
+      </dd>
+    </dl>
+
+</div>
+<br/>
+
+<div class="row">
+      <div class="small-12 medium-11 columns">
+          <input type="submit" value="Create Workspace" id="group-submit" class="button expand">
+      </div>
+</div>
+
+
 {% endblock body_content %}
