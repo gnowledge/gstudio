@@ -1024,7 +1024,7 @@ GSTUDIO_PRIMARY_COURSE_LANGUAGE = u'en'
 
 # --- BUDDY Module configurations ---
 #
-GSTUDIO_BUDDY_LOGIN = False
+GSTUDIO_BUDDY_LOGIN = True
 GSTUDIO_INSTITUTE_ID = ''
 #
 # --- End of BUDDY Module ---
