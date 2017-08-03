@@ -2558,9 +2558,11 @@ class Group(GSystem):
 
         if (user.is_superuser) or (user.id == self.created_by) or (user.id in self.group_admin):
             return True
-
         else:
-            return False
+            auth_obj = node_collection.one({'_type': 'Author', 'created_by': user.id})
+            if auth_obj and auth_obj.agency_type == 'Teacher':
+                return True
+        return False
 
 
     @staticmethod
