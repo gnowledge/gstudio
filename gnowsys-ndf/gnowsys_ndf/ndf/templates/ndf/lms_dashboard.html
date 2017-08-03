@@ -1,5 +1,6 @@
 {# lms_dashboard.html lms My Desk screen #}
 {% extends "ndf/gbase.html" %}
+{% load i18n %}
 
 
 {% block title %} My Desk {% endblock%}
@@ -28,10 +29,10 @@
         <div class="page_menu">
             <ul class="nav_menu_1">
                 <li class="">
-                <a href="{% url 'my_desk' request.user.id  %}" {% if title == "my desk" %} class="selected" {% endif %}>My Courses </a>
+                <a href="{% url 'my_desk' request.user.id  %}" {% if title == "my desk" %} class="selected" {% endif %}>{% trans "My Courses" %} </a>
                 </li>
                 
-                <li class=""><a {% if title == "my performance" %} class="selected" {% endif %} href="{% url 'my_performance' request.user.id  %}">My Performance</a> </li>
+                <li class=""><a {% if title == "my performance" %} class="selected" {% endif %} href="{% url 'my_performance' request.user.id  %}">{% trans "My Performance" %}</a> </li>
 
             </ul>
         </div>
@@ -79,6 +80,7 @@
 
     </div>
     <div id="show-overlay" class="reveal-modal reveal-modal-overlay" data-reveal aria-labelledby="modalTitle" aria-hidden="true" role="dialog">
+
     <script type="text/javascript">
         
         function show_my_performance(this_obj){

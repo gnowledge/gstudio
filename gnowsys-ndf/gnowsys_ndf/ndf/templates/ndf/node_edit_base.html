@@ -446,7 +446,7 @@
 			</div>
 
 			<div class="small-12 large-4 columns">
-				<label><h5>Copyright</h5></label>
+				<label><h5>{% trans "Copyright" %}</h5></label>
 				<!-- <input id="copyright_id" name="Copyright" type="text" placeholder="Enter source name"/> -->
 				{% get_copyright as copyright %}
 				<select name="copyright"  required>
@@ -459,7 +459,7 @@
 	        			{% endif %}>
 					{% endfor %}
 				</select>
-				<small class="error">Please select resource Subject</small>
+				<small class="error">{% trans "Please select resource Subject" %}</small>
 
 			</div>
 
@@ -474,29 +474,32 @@
 		  	<h7>{% trans "Add properties to the discussion feature of this " %}{{title}}{% trans " node "%} </h7>
 		</div>
 
+
+		{% get_attribute_value node.pk 'discussion_enable' as disc_enable_val %}
+
 	    <div class="row yes_no_disc_div">
 	      <div class="large-2 medium-4 columns"><h5>{% trans "Interaction : " %}</h5>
 	      </div>
 	      <div class="large-pull-4 large-6 medium-8 columns">
-			<input type="radio" name="thread_create" value="Yes">Yes &nbsp;&nbsp;
-			<input type="radio" name="thread_create" value="No" checked="checked">No
+			<input type="radio" name="thread_create" value="Yes" {% if disc_enable_val %}checked="checked"{% endif %}>Yes &nbsp;&nbsp;
+			<input type="radio" name="thread_create" value="No" {% if not node or not disc_enable_val %}checked="checked"{% endif %}>No
 	      </div>
 	    </div>
+        {% get_thread_node node.pk as thread_node %}
+		{% if thread_node %}
+			{% get_attribute_value thread_node.pk 'release_response' as resp_val %}
+			{% get_attribute_value thread_node.pk 'thread_interaction_type' as thr_int_type %}
+			{% get_attribute_value thread_node.pk 'start_time' as thr_start_time %}
+			{% get_attribute_value thread_node.pk 'end_time' as thr_end_time %}
+		{% endif %}
 	    <div class="thread-settings-div {% if not node.discussion_enable %} hide {% endif %}">
-            {% get_thread_node node.pk as thread_node %}
-			{% if thread_node %}
-				{% get_attribute_value thread_node.pk 'release_response' as resp_val %}
-				{% get_attribute_value thread_node.pk 'thread_interaction_type' as thr_int_type %}
-				{% get_attribute_value thread_node.pk 'start_time' as thr_start_time %}
-				{% get_attribute_value thread_node.pk 'end_time' as thr_end_time %}
-			{% endif %}
 		    <div class="row">
 		      <div class="large-2 medium-4 columns "><h5>{% trans "Release Option:" %}</h5>
 		      </div>
 		      <div class="large-pull-4 large-6 medium-8 columns">
 		        <select id="release_resp_sel" name="release_resp_sel">
-		          <option value="True" {% if resp_val or not grel_dict %} selected{% endif %}>Show Replies to All</option>
-		          <option value="False" {% if grel_dict and not resp_val %} selected{% endif %}>Hide Replies from All</option>
+		          <option value="True" {% if resp_val or not thread_node %} selected{% endif %}>{% trans "Show Replies to All" %}</option>
+		          <option value="False" {% if thread_node and not resp_val %} selected{% endif %}>{% trans "Hide Replies from All" %}</option>
 		        </select>
 		      </div>
 		    </div>
@@ -864,14 +867,6 @@
 		    // $("select#type_of").prop("disabled", true)
 			{% if is_auth_node %}
 				$("#name_id").attr("disabled",true)
-			{% endif %}
-            {% get_thread_node node.pk as thread_node %}
-			{% if node.discussion_enable %}
-				$("input[name='thread_create'][value='Yes']").attr("checked","checked");
-				$("input[name='thread_create']").trigger("change");
-				// $("input[name='thread_create']").attr("disabled",true);
-			{% else %}
-				$("input[name='thread_create'][value='No']").attr("checked","checked");
 			{% endif %}
 
 		{% endif %}

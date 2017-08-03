@@ -1,26 +1,7 @@
 {% extends "ndf/gbase.html" %}
 {% load i18n %}
+{% load ndf_tags %}
 {% block body_content %}
-
-
-{% comment %}
-{# lms_dashboard.html lms My Desk screen #}
-  
-{% include "ndf/lms_dashboard.html" %}
-{% endcomment %}
-
-
-
-
-{# lms_explore.html - for lms Explore Screen #}
-
-{% include "ndf/lms_explore.html" %}
-
-
-{% comment %}
-  
-buddy.html - for buddy pannel and logins 
-{% include "ndf/buddy.html" %}
-{% endcomment %}
-  
+{% get_node_hierarchy node as node_hierarchy %}
+{% include "ndf/section_subsection.html" with unit_structure=node_hierarchy unit_obj=node group_id=node.pk section_name="Topic" sub_section_name="Activity"  %}
 {% endblock body_content %}

@@ -5,8 +5,8 @@
 	{% get_attribute_value node.pk 'player_discussion_enable' as player_discussion_enable_attr %}
   {% get_thread_node node.pk as thread_node %}
   {% if thread_node %}
-      {% get_attribute_value thread_node 'release_response' as resp_val %}
-      {% get_attribute_value thread_node 'thread_interaction_type' as thr_int_type %}
+      {% get_attribute_value thread_node.pk 'release_response' as resp_val %}
+      {% get_attribute_value thread_node.pk 'thread_interaction_type' as thr_int_type %}
   {% endif %}
 	{% csrf_token %}
 	<input type="hidden" name="node_id" class="form_node_id" value="{{node.pk}}">

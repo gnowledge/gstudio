@@ -3,6 +3,7 @@
 {% load i18n %}
 {% get_group_name groupid as group_name_tag %}
 {% get_user_quiz_resp node request.user as total_and_curr_ans_dict %}
+
 <style type="text/css">
 	.quiz_qtn{
 		margin-left:20px !important;
@@ -35,7 +36,8 @@
 {% with node.correct_answer|re_format as node_correct_answer %}
 
 <div class="row">
-<label class="attempts_count right fi-info">You attempted this question {{total_and_curr_ans_dict.count}} times </label>
+
+<label class="attempts_count right fi-info"></label>
 	<fieldset>
 	    <legend >
 	    	<span>Question</span>
@@ -47,8 +49,8 @@
 
 		<div class="row">
 			<div class="quiz_qtn">
-				<b>{{node.content}}</b>
-				<div class="quiz_qtn">
+				<b>{{node.content|safe}}</b>
+				<div class="quiz_qtn quiz-box">
 					{% if node.quiz_type == "Single-Choice" %}
 						{% for each_opt in node_options %}
 							<input type="radio" name="quiz_ans"  value="{{each_opt}}"
@@ -90,21 +92,18 @@
 						<textarea rows="4" cols="50" name="quiz_ans" class="choice" placeholder="Enter answer here" class="short_ans_txt" >{{total_and_curr_ans_dict.recent_ans|default_if_none:""}}</textarea>
 						<!-- <input type="button" value="Submit" class="button tiny radius short-ans_chk"> -->
 					{% endif %}
-					<div class="row">
-						{% if node.quizitem_check_answer and node.quiz_type != "Short-Response"  %}
-							<input type="button" value="Check" class="button tiny check-ans radius check-btn">
-						{% endif %}
-						{% if node.quizitem_show_correct_ans %}
-							<input type="button" value="Show Answer" class="button tiny radius show-ans-btn hide">
-						{% endif %}
-						<input type="button" value="Submit" class="tiny button radius submit-btn">
-						{% comment %}
-						{% if not node.quizitem_show_correct_ans %}
-						<input type="button" value="Submit" class="tiny button radius submit-btn">
-						{% endif %}
-						{% endcomment %}
-					</div>
 
+					{% if total_and_curr_ans_dict.count != node.quizitem_max_attempts %}
+						<div class="row controls-box hide">
+							{% if node.quizitem_check_answer and node.quiz_type != "Short-Response"  %}
+								<input type="button" value="Check" class="button tiny check-ans radius check-btn">
+							{% endif %}
+							{% if node.quizitem_show_correct_ans %}
+								<input type="button" value="Show Answer" class="button tiny radius show-ans-btn hide">
+							{% endif %}
+							<input type="button" value="Submit" class="tiny button radius submit-btn">
+						</div>
+					{% endif %}
 				</div>
 			</div>
 		</div>
@@ -116,9 +115,12 @@
 <script type="text/javascript">
 	user_submitted_ans_list = {{total_and_curr_ans_dict.recent_ans|jsonify|safe}}
 
+
+
 	// On load ---------------------------------------------------------------
 		$(document).ready(function() {
 			display_sub_ans()
+			display_sub_status_msg({{total_and_curr_ans_dict.count}})
 		})
 
 	// Toggle Check to Clear btn after some actions --------------------------
@@ -180,14 +182,38 @@
 			{% endif %}
 		}
 
+		function display_sub_status_msg(attempt_count_val){
+			attempt_count_val = parseInt(attempt_count_val)
+			max_attempts_var = parseInt({{node.quizitem_max_attempts}})
+			if(attempt_count_val){
+				if(attempt_count_val < max_attempts_var){
+					$(".attempts_count").text("You attempted this question "+attempt_count_val+ " time(s) ")
+					$(".controls-box").removeClass("hide")
+				}
+				else if(attempt_count_val == max_attempts_var){
+					$(".attempts_count").text("You have reached Maximum attempts allowed for this question")
+					$(".controls-box").remove()
+				}
+			}
+			else{
+				$(".attempts_count").text("You have NOT attempted this question yet.")
+				$(".controls-box").removeClass("hide")
+			}
+		}
+
+
+
+
 	// Fecth user's selected answer ------------------------------------------
 
 		function user_ans(){
 			list_name = []
 			$.each($('.choice:checked'), function(a,b){
 				list_name.push(b.id)
-				n = b.nextSibling.nextSibling
-				n.classList.remove("hide")
+				{% if node.quizitem_show_correct_ans %}
+					n = b.nextSibling.nextSibling
+					n.classList.remove("hide")
+				{% endif %}
 			})
 			return list_name;
 
@@ -280,8 +306,14 @@
 								submit_btn_status("hide")
 								user_submitted_ans_list = user_given_ans;
 								if(data['count']){
-									$(".attempts_count").text("You attempted this question "+ data['count']+" times")
+									attempt_cnt = parseInt(data['count'])
+									display_sub_status_msg(attempt_cnt)
+									if(attempt_cnt == parseInt({{node.quizitem_max_attempts}})){
+										$('.controls-box').addClass('hide')
+										location.reload()
+									}
 								}
+
 							}
 						}
 						else{

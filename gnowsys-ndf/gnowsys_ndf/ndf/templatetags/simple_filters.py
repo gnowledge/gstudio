@@ -85,6 +85,13 @@ def get_dict_from_list_of_dicts(list_of_dicts,convert_objid_to_str=False):
 def split(str, delimiter):
     return str.split(delimiter)
 
+@get_execution_time
+@register.filter
+def apply_eval(arg):
+    import ast
+    return ast.literal_eval(arg)
+
+
 @register.filter
 def joinby(delimiter, arg):
     return arg.join(delimiter)

@@ -2424,7 +2424,8 @@ class Group(GSystem):
         'encryption_policy': basestring,     # Encryption - yes or no
         'agency_type': basestring,           # A choice field such as Pratner,Govt.Agency, NGO etc.
         'group_admin': [int],		     # ObjectId of Author class
-        'moderation_level': int              # range from 0 till any integer level
+        'moderation_level': int,              # range from 0 till any integer level
+        'project_config': dict
     }
 
     use_dot_notation = True
@@ -3140,7 +3141,7 @@ class HistoryManager():
                         doc_obj[k] = oid_ObjectId_list
 
                 except Exception as e:
-                    print "\n Exception for document's ("+doc_obj.name+") key ("+k+") -- ", str(e), "\n"
+                    print "\n Exception for document's ("+str(doc_obj._id)+") key ("+k+") -- ", str(e), "\n"
 
         return doc_obj
 

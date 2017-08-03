@@ -38,6 +38,7 @@ from gnowsys_ndf.ndf.models import NodeJSONEncoder
 from gnowsys_ndf.ndf.models import node_collection, triple_collection
 from gnowsys_ndf.ndf.models import *
 from gnowsys_ndf.ndf.views.file import *
+from gnowsys_ndf.ndf.views.gcourse import *
 from gnowsys_ndf.ndf.views.methods import check_existing_group, get_drawers, get_course_completed_ids,create_thread_for_node, delete_gattribute
 from gnowsys_ndf.ndf.views.methods import get_node_common_fields, get_node_metadata, create_grelation,create_gattribute
 from gnowsys_ndf.ndf.views.methods import create_task,parse_template_data,get_execution_time,get_group_name_id, dig_nodes_field
@@ -73,9 +74,13 @@ def get_node_json_from_id(request, group_id, node_id=None):
         node_id = request.GET.get('node_id')
     node_obj = Node.get_node_by_id(node_id)
     if node_obj:
+      trans_node = get_lang_node(node_obj._id,request.LANGUAGE_CODE)
+      if trans_node:
+        return HttpResponse(json.dumps(trans_node, cls=NodeJSONEncoder))
+      else:
         return HttpResponse(json.dumps(node_obj, cls=NodeJSONEncoder))
     else:
-        return HttpResponse(0)
+      return HttpResponse(0)
 
 
 def save_node(request, group_id, node_id=None):
@@ -131,6 +136,11 @@ def remove_from_nodelist(request, group_id):
 def ajax_delete_node(request, group_id):
     node_to_delete = request.POST.get('node_to_delete', None)
     deletion_type = eval(request.POST.get('deletion_type', 0))
+    right_subject = eval(request.POST.get('right_subject', None))
+    if right_subject in [0, 1]:
+        all_grels = triple_collection.find({'_type': 'GRelation', 'subject': ObjectId(node_to_delete)})
+        for each_grel in all_grels:
+            delete_node(node_id=each_grel['right_subject'], deletion_type=right_subject)
     return HttpResponse(json.dumps(delete_node(node_id=node_to_delete, deletion_type=deletion_type)))
 
 
@@ -874,7 +884,8 @@ def get_inner_collection(collection_list, node, no_res=False):
   inner_list_append_temp=inner_list.append #a temp. variable which stores the lookup for append method
 
   # if not no_res or not res_flag:
-  if not no_res or (not "CourseUnitEvent" in node.member_of_names_list):
+  is_unit = any(mem_of_name in ["CourseUnit", "CourseUnitEvent"] for mem_of_name in node.member_of_names_list)
+  if not no_res or not is_unit:
     if node.collection_set:
       for each in node.collection_set:
         col_obj = node_collection.one({'_id': ObjectId(each)})
@@ -919,7 +930,7 @@ def get_inner_collection(collection_list, node, no_res=False):
       return collection_list
     else:
       return collection_list
-  elif "CourseUnitEvent" in node.member_of_names_list:
+  elif is_unit:
     for cl in collection_list:
       if cl['id'] == node.pk:
         col_set = node.collection_set
@@ -948,6 +959,8 @@ def get_collection(request, group_id, node_id, no_res=False):
         node_type = node_collection.one({'_id': ObjectId(obj.member_of[0])}).name
         collection_list.append({'name':obj.name,'id':obj.pk,'node_type':node_type})
         # collection_list = get_inner_collection(collection_list, obj, gstaff_access, completed_ids_list, incompleted_ids_list)
+        if "BaseCourseGroup" in node.member_of_names_list:
+          no_res = True
         collection_list = get_inner_collection(collection_list, obj, no_res)
     data = collection_list
     updated_data = []
@@ -6585,7 +6598,7 @@ def get_group_templates_page(request, group_id):
   variable = RequestContext(request, {'templates_cur':templates_cur })
   return render_to_response(template, variable)
 
-
+@login_required
 def get_group_pages(request, group_id):
     except_collection_set_of_id = request.GET.get('except_collection_set_of_id', None)
     except_collection_set_of_obj = Node.get_node_by_id(except_collection_set_of_id)
@@ -6716,6 +6729,7 @@ def create_edit_asset(request,group_id):
   
   if request.method == "POST":
     asset_name =  str(request.POST.get("asset_name", '')).strip()
+    asset_disp_name =  str(request.POST.get("asset_disp_name", '')).strip()
     asset_desc =  str(request.POST.get("asset_description", '')).strip()
     title =  request.POST.get("title", '')
     tags =  request.POST.get("sel_tags", [])
@@ -6754,6 +6768,8 @@ def create_edit_asset(request,group_id):
     if asset_lang:
       language = get_language_tuple(asset_lang)
       asset_obj.language = language
+    if asset_disp_name:
+      asset_obj.altnames = unicode(asset_disp_name)
     asset_obj.save()
     thread_node = create_thread_for_node(request,group_id, asset_obj)
 
@@ -7004,3 +7020,14 @@ def remove_related_doc(request, group_id):
     rel_node = triple_collection.one({'right_subject':ObjectId(selected_obj),'subject':ObjectId(node_obj.pk)})
     delete_grelation(subject_id=ObjectId(node_obj.pk), deletion_type=1, **{'node_id': ObjectId(rel_node._id)})
     return HttpResponse('success')
+
+def get_translated_node(request, group_id):
+    node_id = request.GET.get('node_id', None)
+    language = request.GET.get('language', None)
+    node_obj = Node.get_node_by_id(node_id)
+    trans_node = get_lang_node(node_obj._id,language)
+    if trans_node:
+      return HttpResponse(json.dumps(trans_node, cls=NodeJSONEncoder))
+    else:
+      return HttpResponse(json.dumps(node_obj, cls=NodeJSONEncoder))
+

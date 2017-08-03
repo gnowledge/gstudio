@@ -106,15 +106,34 @@ def module_detail(request, group_id, node_id):
     group_name, group_id = Group.get_group_name_id(group_id)
 
     module_obj = Node.get_node_by_id(node_id)
-    module_detail_query = {'_id': {'$in': module_obj.collection_set}}
+    module_detail_query = {'_id': {'$in': module_obj.collection_set},
+    'status':'PUBLISHED',
+    '$or': [
+        {'$and': [
+            {'member_of': gst_base_unit_id},
+            {'$or': [
+              {'created_by': request.user.id},
+              {'group_admin': request.user.id},
+              {'author_set': request.user.id},
+            ]}
+        ]},
+
+        {'member_of': gst_announced_unit_id}
+      ]}
+
+
+
     # units_under_module = Node.get_nodes_by_ids_list(module_obj.collection_set)
+    '''
     gstaff_access = check_is_gstaff(group_id, request.user)
+
     if gstaff_access:
         module_detail_query.update({'member_of': {'$in': [gst_announced_unit_id, gst_base_unit_id]}})
     else:
         module_detail_query.update({'member_of': gst_announced_unit_id})
+    '''
 
-    units_under_module = node_collection.find(module_detail_query)
+    units_under_module = node_collection.find(module_detail_query).sort('last_update', -1)
     template = 'ndf/module_detail.html'
 
     req_context = RequestContext(request, {

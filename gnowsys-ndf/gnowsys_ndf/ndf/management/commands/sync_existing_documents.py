@@ -10,8 +10,9 @@ except ImportError:  # old pymongo
 
 ''' imports from application folders/files '''
 from gnowsys_ndf.ndf.models import node_collection, triple_collection, counter_collection
-from gnowsys_ndf.ndf.models import Node, db, AttributeType, RelationType, GSystem
-from gnowsys_ndf.settings import GSTUDIO_AUTHOR_AGENCY_TYPES, LANGUAGES, OTHER_COMMON_LANGUAGES, GSTUDIO_DEFAULT_LICENSE, GSTUDIO_DEFAULT_LANGUAGE, GSTUDIO_DEFAULT_COPYRIGHT
+from gnowsys_ndf.ndf.models import Node, db, AttributeType, RelationType, GSystem, GSystemType
+from gnowsys_ndf.settings import GSTUDIO_AUTHOR_AGENCY_TYPES, LANGUAGES, OTHER_COMMON_LANGUAGES, GSTUDIO_DEFAULT_SYSTEM_TYPES_LIST
+from gnowsys_ndf.settings import GSTUDIO_DEFAULT_LICENSE, GSTUDIO_DEFAULT_LANGUAGE, GSTUDIO_DEFAULT_COPYRIGHT
 from gnowsys_ndf.ndf.views.methods import create_gattribute, create_grelation
 from gnowsys_ndf.ndf.templatetags.ndf_tags import get_relation_value, get_attribute_value
 
@@ -25,6 +26,8 @@ class Command(BaseCommand):
 
     # Keep latest changes in field(s) to be added at top
 
+    # updating project_config for Groups
+    proj_config = node_collection.collection.update({'_type':{'$in': [u'Author', u'Group']},'project_config': {'$exists': False} },{'$set': {'project_config': {} }}, upsert=False, multi=True)
 
     # updating visited_nodes for Counter instances
     counter_objs = counter_collection.collection.update({'_type': 'Counter',
@@ -921,3 +924,60 @@ class Command(BaseCommand):
             i.save()
             print "Updated",i.name,"'s modified by feild from null to 1"
 
+    
+
+    # Adding default st. -katkamrachana
+
+    default_st_cur = node_collection.find({'_type': 'GSystemType',
+                    'name': {'$in': GSTUDIO_DEFAULT_SYSTEM_TYPES_LIST}})
+    default_st_ids = [st._id for st in default_st_cur]
+
+
+    print "\n RelationTypes and AttributeTypes to add GSTUDIO_DEFAULT_SYSTEM_TYPES_LIST."
+    rt_res_default_st = node_collection.collection.update({'_type': 'RelationType',
+        '$or': [{'subject_type': {'$nin': default_st_ids}}, {'object_type': {'$nin': default_st_ids}}]}, \
+        {'$addToSet': {'subject_type': {'$each': default_st_ids}, 'object_type': {'$each': default_st_ids},\
+        }}, upsert=False, multi=True)
+
+    if rt_res_default_st['updatedExisting']: # and res['nModified']:
+        print "\n Added 'GSTUDIO_DEFAULT_SYSTEM_TYPES_LIST' ids to " + rt_res_default_st['n'].__str__() + " RelationType instances."
+
+    at_res_default_st = node_collection.collection.update({'_type': 'AttributeType',
+        'subject_type': {'$nin': default_st_ids}}, \
+     {'$addToSet': {'subject_type': {'$each': default_st_ids}}}, upsert=False, multi=True)
+
+    if at_res_default_st['updatedExisting']: # and res['nModified']:
+        print "\n Added 'GSTUDIO_DEFAULT_SYSTEM_TYPES_LIST' ids to " + at_res_default_st['n'].__str__() + " AttributeType instances."
+
+    # For all right_subject nodes of 'translation_of' GRelations,
+    # add member_of of 'trans_node' GST
+    trans_node_gst_name, trans_node_gst_id = GSystemType.get_gst_name_id("trans_node")
+
+    rt_translation_of = Node.get_name_id_from_type('translation_of', 'RelationType', get_obj=True)
+
+    all_translations_grels = triple_collection.find({
+                            '_type': u'GRelation',
+                            'relation_type': rt_translation_of._id
+                        },{'right_subject': 1})
+    right_subj_ids = [each_rs.right_subject for each_rs in all_translations_grels]
+    right_subj_update_res = node_collection.collection.update(
+                                {'_id': {'$in': right_subj_ids}, 'member_of': {'$nin': [trans_node_gst_id]}},
+                                {'$set': {'member_of': [trans_node_gst_id]}},
+                                upsert=False, multi=True)
+    if right_subj_update_res['updatedExisting']: # and res['nModified']:
+        print "\n Added 'trans_node' _id in " + right_subj_update_res['n'].__str__() + " 'translation_of' right_subject instances."
+
+
+    # changing member_of from `activity` to `Page`
+    print "\nReplacing member_of field from 'activity' to'Page'"
+
+    activity_gst = node_collection.one({'_type': 'GSystemType', 'name': 'activity'})
+    if activity_gst:
+      activity_cur = node_collection.find({'member_of': activity_gst._id})
+      print "\n Activities found: ", activity_cur.count()
+      page_gst = node_collection.one({'_type': 'GSystemType', 'name': 'Page'})
+      wiki_page_gst = node_collection.one({'_type': 'GSystemType', 'name': 'Wiki page'})
+      activity_gs_mem_update_res = node_collection.collection.update({'member_of': activity_gst._id},
+        {'$set': {'member_of': [page_gst._id], 'type_of': [wiki_page_gst._id]}} ,upsert=False, multi=True)
+      if activity_gs_mem_update_res['updatedExisting']: # and res['nModified']:
+          print "\n Replaced member_of field from 'activity' to'Page' in " + activity_gs_mem_update_res['n'].__str__() + " instances."
