@@ -2088,7 +2088,7 @@ def activity_player_detail(request, group_id, lesson_id, activity_id):
         'resource_index': resource_index, 'resource_next_id': resource_next_id,
         'resource_prev_id': resource_prev_id, 'resource_count': resource_count,
 
-        'translation': translation_obj, 'unit_resources_list_of_dict': unit_resources_list_of_dict
+        'translation': translation_obj, 'unit_resources_list_of_dict': unit_resources_list_of_dict,
 
         # 'unit_resources_list_of_dict': unit_resources_list_of_dict,
         'trans_node':trans_node,
