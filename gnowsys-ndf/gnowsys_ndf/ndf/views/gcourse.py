@@ -2056,6 +2056,7 @@ def activity_player_detail(request, group_id, lesson_id, activity_id):
     else:
         lesson_name  = lesson_node.name 
     # all metadata reg position and next prev of resource
+    translation_obj = node_obj.get_relation('translation_of')
 
     resource_index = resource_next_id = resource_prev_id = None
     resource_count = len(lesson_obj_collection_set)
@@ -2086,6 +2087,9 @@ def activity_player_detail(request, group_id, lesson_id, activity_id):
         'node': node_obj, 'lesson_node': lesson_node, 'activityid': ObjectId(activity_id),
         'resource_index': resource_index, 'resource_next_id': resource_next_id,
         'resource_prev_id': resource_prev_id, 'resource_count': resource_count,
+
+        'translation': translation_obj, 'unit_resources_list_of_dict': unit_resources_list_of_dict,
+
         # 'unit_resources_list_of_dict': unit_resources_list_of_dict,
         'trans_node':trans_node,
         'act_list':trans_act_list,
