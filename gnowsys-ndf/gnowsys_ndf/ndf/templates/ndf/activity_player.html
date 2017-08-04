@@ -133,8 +133,8 @@
       </div>
 </div>             
 
-<script type="text/javascript">
 
+<script type="text/javascript">
    function onMessage(message) {
     // Inconveniently, we don't seem to be able to locate the
     // assessment-player's iframe inside the content's iframe.  Conventiently,
@@ -188,6 +188,17 @@
                 hostname = src_split.slice(0, 3).join("/")
                 new_source = source_attr.replace(hostname, new_url)
                 $(iframes[i]).attr('src', new_source)
+                var currentIframe = iframes[i];
+
+                window.addEventListener("message", function(event){
+                  var player = currentIframe;//document.getElementById('openassessments_container')
+                  var payload = JSON.parse(event.data);
+                  if(payload.height) {
+                    player.style.height = payload.height + 10 + 'px';
+                  }
+
+                }, false);
+
             }
             else {
                 src_split = source_attr.split('/');

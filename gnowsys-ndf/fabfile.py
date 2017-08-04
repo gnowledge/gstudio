@@ -48,8 +48,8 @@ def install_requirements():
 	local('bower install --allow-root')
 
 
-def purge_group():
-	local('python manage.py purge_group')
+def purge_node():
+	local('python manage.py purge_node')
 
 
 # def setup_dlkit():
