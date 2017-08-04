@@ -14,7 +14,7 @@ from gnowsys_ndf.ndf.views.filehive import *
 from gnowsys_ndf.ndf.views.methods import create_grelation
 
 # if not os.path.isdir(GSTUDIO_LOGS_DIR_PATH):
-# 	os.makedirs(GSTUDIO_LOGS_DIR_PATH)
+#   os.makedirs(GSTUDIO_LOGS_DIR_PATH)
 
 warehouse_grp = node_collection.one({'_type': "Group", 'name': "warehouse"})
 file_gst = node_collection.one({'_type': "GSystemType", 'name': "File"})

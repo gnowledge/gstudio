@@ -1,6 +1,5 @@
 from django.conf import settings
 from django.conf.urls import patterns, include, url
-from django.contrib import admin
 from django.contrib.auth import views as auth_views
 from django.views.generic import TemplateView
 # from django.views.generic import RedirectView
@@ -24,17 +23,12 @@ else:
     login_template = 'registration/login.html'
 
 
-admin.autodiscover()
-
 urlpatterns = patterns('',
     (r'^i18n/', include('django.conf.urls.i18n')),
     (r'^pref_lang/$', include('gnowsys_ndf.ndf.urls.languagepref')),
 
     # gstudio admin url's
     (r'^admin/', include('gnowsys_ndf.ndf.urls.gstudio_admin')),
-
-    # django's admin site url's
-    (r'^admin/', include(admin.site.urls)),
 
     # --mobwrite-- commented for time being
     # (r'^raw/(?P<name>.+)/', 'gnowsys_ndf.mobwrite.views.raw'),
@@ -119,9 +113,9 @@ urlpatterns = patterns('',
     (r'^(?P<group_id>[^/]+)/mis-po', include('gnowsys_ndf.ndf.urls.mis', namespace='mis-po'), {'app_name': "MIS-PO"}),
     # ---end of mis
 
-    #test url
-    (r'^dev-utilities/', include('gnowsys_ndf.ndf.urls.dev_utilities')),
+    (r'^dev/', include('gnowsys_ndf.ndf.urls.dev_utils')),
     (r'^tools/', include('gnowsys_ndf.ndf.urls.tools')),
+    
     # meeting app
     # (r'^online/', include('online_status.urls')),   #for online_users.
     # url(r'^(?P<group_id>[^/]+)/inviteusers/(?P<meetingid>[^/]+)','gnowsys_ndf.ndf.views.meeting.invite_meeting', name='invite_meeting'),

@@ -5,7 +5,7 @@ from gnowsys_ndf.ndf.views.methods import delete_node
 class Command(BaseCommand):
     def handle(self, *args, **options):
         '''
-        python manage.py purge_group <objectId> <proceed_flag y/Y>
+        python manage.py purge_node <objectId> <proceed_flag y/Y>
         '''
         proceed_flag = False
         group_id = None
