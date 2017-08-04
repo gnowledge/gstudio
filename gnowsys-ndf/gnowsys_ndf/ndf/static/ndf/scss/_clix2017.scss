@@ -370,9 +370,9 @@ h5{
     border: 2px solid #6a0054;
     background-color: #6a0054;
     &:hover{
-        background-color:#ffffff;
+        background-color:#ffffff;;
         cursor:pointer;
-        color:#6a0054;
+        color: #6a0054;
     }
 }
 
@@ -972,6 +972,7 @@ ul.horizontal_tabs_gstudio {
               margin: 0px 10px 0px 0px;
               cursor: pointer;
               border-radius: 3px;
+              margin-right:80px;
     }
 }
 
@@ -4409,7 +4410,7 @@ $module-card-lines-to-show: 3;
             }
 
             .right-margin{
-                    margin-right: 56px;
+                    margin-right: 46px;
             }
 
 
@@ -4425,7 +4426,6 @@ $module-card-lines-to-show: 3;
               border-radius: 3px;
               opacity:0.8;
               margin-top:90px;
-              //margin-right:65px;
         
             }
 

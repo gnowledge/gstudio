@@ -244,10 +244,16 @@ def user_objs_restoration(*args):
 
 def update_schema_id_for_triple(document_json):
     if SCHEMA_ID_MAP:
+        global log_file
+        log_file.write("\nUpdating schema_id for triple.")
         if u'relation_type' in document_json and document_json[u'relation_type'] in SCHEMA_ID_MAP:
+            log_file.write("\nOLD relation_type id " + str(document_json[u'relation_type']))
             document_json[u'relation_type'] = SCHEMA_ID_MAP[document_json[u'relation_type']]
+            log_file.write("\nNEW relation_type id " + str(document_json[u'relation_type']))
         if u'attribute_type' in document_json and document_json[u'attribute_type'] in SCHEMA_ID_MAP:
+            log_file.write("\nOLD attribute_type id " + str(document_json[u'attribute_type']))
             document_json[u'attribute_type'] = SCHEMA_ID_MAP[document_json[u'attribute_type']]
+            log_file.write("\nNEW attribute_type id " + str(document_json[u'attribute_type']))
     return document_json
 
 def update_group_set(document_json):
@@ -360,7 +366,8 @@ def restore_triple_objects(rcs_triples_path):
 
             if triple_obj:
                 log_file.write("\n Found Existing Triple : \n\t " + str(triple_obj))
-
+                triple_obj = update_schema_id_for_triple(triple_obj)
+                triple_obj.save()
                 if triple_obj._type == "GRelation":
                     if triple_obj.right_subject != triple_json['right_subject']:
                         if type(triple_obj.right_subject) == list:
@@ -588,6 +595,7 @@ class Command(BaseCommand):
             DATA_RESTORE_PATH = args[0]
         else:
             DATA_RESTORE_PATH = raw_input("\n\tEnter absolute path of data-dump folder to restore:")
+        print "\nDATA_RESTORE_PATH: ", DATA_RESTORE_PATH
         if os.path.exists(DATA_RESTORE_PATH):
             # Check if DATA_DUMP_PATH has dump, if not then its dump of Node holding Groups.
             if os.path.exists(os.path.join(DATA_RESTORE_PATH, 'dump')):
@@ -804,7 +812,7 @@ def restore_node(filepath, non_grp_root_node=None):
 #                     each_attr_dict[each_key] = datetime.datetime.fromtimestamp(each_val/1e3)
 #     return d
 
-def parse_datetime_values(d):
+def parse_json_values(d):
     # This decoder will be moved to models next to class NodeJSONEncoder
     if u'uploaded_at' in d:
         d[u'uploaded_at'] = datetime.datetime.fromtimestamp(d[u'uploaded_at']/1e3)
@@ -838,7 +846,7 @@ def get_json_file(filepath):
             fp = fp.split(',')[0]
         with open(fp, 'r') as version_file:
             obj_as_json = json.loads(version_file.read(), object_hook=json_util.object_hook)
-            parse_datetime_values(obj_as_json)
+            parse_json_values(obj_as_json)
             rcs.checkin(fp)
             # os.remove(fp)
         return obj_as_json
