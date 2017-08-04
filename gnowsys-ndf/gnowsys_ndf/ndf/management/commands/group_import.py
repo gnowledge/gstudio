@@ -263,6 +263,8 @@ def update_group_set(document_json):
     return document_json
 
 def _mapper(json_obj, key, MAP_obj, is_list=False):
+    log_file.write("\n Calling _mapper:\n\t " + str(json_obj), str(key), str(MAP_obj), str(is_list))
+
     if key in json_obj:
         if is_list:
             for eu in json_obj[key]:
@@ -272,6 +274,7 @@ def _mapper(json_obj, key, MAP_obj, is_list=False):
             json_obj[key] = MAP_obj[json_obj[key]]
 
 def update_schema_and_user_ids(document_json):
+    log_file.write("\n Invoked update_schema_and_user_ids:\n\t " + str(document_json))
     global DEFAULT_USER_SET
     global DEFAULT_USER_ID
     if SCHEMA_ID_MAP:
@@ -294,6 +297,7 @@ def update_schema_and_user_ids(document_json):
         _mapper(document_json, 'created_by', USER_ID_MAP)
         _mapper(document_json, 'modified_by', USER_ID_MAP)
 
+    log_file.write("\n Finished update_schema_and_user_ids:\n\t " + str(document_json))
     return document_json
 
     '''
@@ -686,6 +690,11 @@ def restore_node(filepath, non_grp_root_node=None):
 
         node_obj = node_collection.one({'_id': ObjectId(node_json['_id'])})
         if node_obj:
+            node_obj = update_schema_and_user_ids(node_obj)
+            if SCHEMA_ID_MAP:
+                _mapper(document_json, 'member_of', SCHEMA_ID_MAP, is_list=True)
+                _mapper(document_json, 'type_of', SCHEMA_ID_MAP, is_list=True)
+
             log_file.write("\nFound Existing Node : " + str(node_obj._id))
             node_changed = False
             if node_obj.author_set != node_json['author_set'] and node_json['author_set']:
