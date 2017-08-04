@@ -11,8 +11,10 @@
 		
 		<!--section role="tabpanel" aria-hidden="true" class="content active " style="border-style:none;"-->
 		{% if title == "workspaces" %}
+	        {% if user.is_authenticated %}
 	        <a class="button tiny radius right" href="{% url 'create_group' group_object.pk %}" title="Create New Workspace">{% trans "New Workspace" %} </a>		
 			</a>
+			{% endif %}
 	        <ul class="small-block-grid-1 medium-block-grid-3 large-block-grid-4">
 			{% for each_obj in groups_cur %}
 		        <li class="card-image-wrapper">
