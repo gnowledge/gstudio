@@ -263,7 +263,7 @@ def update_group_set(document_json):
     return document_json
 
 def _mapper(json_obj, key, MAP_obj, is_list=False):
-    log_file.write("\n Calling _mapper:\n\t " + str(json_obj), str(key), str(MAP_obj), str(is_list))
+    log_file.write("\n Calling _mapper:\n\t " + str(json_obj)+ str(key)+ str(MAP_obj)+ str(is_list))
 
     if key in json_obj:
         if is_list:
@@ -692,8 +692,8 @@ def restore_node(filepath, non_grp_root_node=None):
         if node_obj:
             node_obj = update_schema_and_user_ids(node_obj)
             if SCHEMA_ID_MAP:
-                _mapper(document_json, 'member_of', SCHEMA_ID_MAP, is_list=True)
-                _mapper(document_json, 'type_of', SCHEMA_ID_MAP, is_list=True)
+                _mapper(node_obj, 'member_of', SCHEMA_ID_MAP, is_list=True)
+                _mapper(node_obj, 'type_of', SCHEMA_ID_MAP, is_list=True)
 
             log_file.write("\nFound Existing Node : " + str(node_obj._id))
             node_changed = False
