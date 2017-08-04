@@ -367,6 +367,7 @@ def restore_triple_objects(rcs_triples_path):
             if triple_obj:
                 log_file.write("\n Found Existing Triple : \n\t " + str(triple_obj))
                 triple_obj = update_schema_id_for_triple(triple_obj)
+                log_file.write("\n Updated Triple : \n\t " + str(triple_obj))
                 triple_obj.save()
                 if triple_obj._type == "GRelation":
                     if triple_obj.right_subject != triple_json['right_subject']:
@@ -401,6 +402,8 @@ def restore_triple_objects(rcs_triples_path):
 
                 try:
                     log_file.write("\n Inserting Triple doc : " + str(triple_json))
+                    triple_json = update_schema_id_for_triple(triple_json)
+
                     node_id = triple_collection.collection.insert(triple_json)
                     triple_obj = triple_collection.one({'_id': node_id})
                     triple_node_RT_AT_id = None
