@@ -41,13 +41,14 @@ SCHEMA_ID_MAP = {}
 log_file = None
 CONFIG_VARIABLES = None
 DATE_AT_IDS = []
-GROUP_CONTAINERS = ['module']
+GROUP_CONTAINERS = ['Module']
 date_related_at_cur = node_collection.find({'_type': 'AttributeType', 
     'name': {'$in': ["start_time", "end_time", "start_enroll", "end_enroll"]}})
 for each_date_related_at in date_related_at_cur:
     DATE_AT_IDS.append(each_date_related_at._id)
 history_manager = HistoryManager()
 rcs = RCS()
+
 
 '''
 Following will be available:
@@ -103,8 +104,9 @@ def validate_data_dump(*args):
     md5hash = dirhash(DATA_DUMP_PATH, 'md5')
     if CONFIG_VARIABLES.MD5 != md5hash:
         print "\n MD5 NOT matching."
-        if args and len(args) == 3:
-            proceed_without_validation = args[0]
+        print "\nargs: ", args
+        if args and len(args) == 4:
+            proceed_without_validation = args[1]
         else:
             proceed_without_validation = raw_input("MD5 not matching. Restoration not recommended.\n \
                             Enter (y/Y) to continue ?")
@@ -114,8 +116,8 @@ def validate_data_dump(*args):
     else:
         print "\nValidation Success..!"
         proceed_with_validation = ''
-        if args and len(args) == 3:
-            proceed_without_validation = args[0]
+        if args and len(args) == 4:
+            proceed_without_validation = args[1]
         else:
             proceed_with_validation = raw_input("MD5 Matching.\n \
                             Enter (y/Y) to proceed to restoration")
@@ -152,8 +154,8 @@ def check_group_availability(*args):
     if group_node:
         print "\n Group with restoration ID already exists."
         confirm_grp_data_merge = ''
-        if args and len(args) == 3:
-            confirm_grp_data_merge = args[1]
+        if args and len(args) == 4:
+            confirm_grp_data_merge = args[2]
         else:
             confirm_grp_data_merge = raw_input("Dump Group already exists here. Would you like to merge the data ?")
         if confirm_grp_data_merge not in ['y', 'Y']:
@@ -174,8 +176,8 @@ def check_group_availability(*args):
     else:
         print "\n Group with restoration ID DOES NOT exists."
         confirm_grp_data_restore = ''
-        if args and len(args) == 3:
-            confirm_grp_data_restore = args[1]
+        if args and len(args) == 4:
+            confirm_grp_data_restore = args[2]
         else:
             confirm_grp_data_restore = raw_input("Proceed to restore ?")
         if confirm_grp_data_restore not in ['y', 'Y']:
@@ -231,8 +233,8 @@ def user_objs_restoration(*args):
 
         print "*"*80
         user_dump_restore_default = ''
-        if args and len(args) == 3:
-            user_dump_restore_default = args[2]
+        if args and len(args) == 4:
+            user_dump_restore_default = args[3]
         else:
             user_dump_restore_default = raw_input("\n\tUser dump is NOT available.  \
             Would you like to use USER_ID=1 for restoration(y/n) ?: ")
@@ -610,16 +612,16 @@ class Command(BaseCommand):
                 DATA_DUMP_PATH = os.path.join(DATA_RESTORE_PATH, 'dump')
                 SCHEMA_ID_MAP = update_factory_schema_mapper(DATA_RESTORE_PATH)
                 read_config_file()
-                core_import(*args)
+                core_import(None,*args)
             else:
                 # Multi Group Dump
                 # Get the dumps of Groups and loop over each dump to import
                 # gd == group-dump
                 print "\n***** NON Group Dump found. *****\n"
                 global GROUP_CONTAINERS
-                grp_containers_cur = node_collection.find({'name': {'$in': GROUP_CONTAINERS},
+                GRP_CONTAINERS_CUR = node_collection.find({'name': {'$in': GROUP_CONTAINERS},
                     '_type': 'GSystemType'})
-                grp_containers_ids = [cont._id for cont in grp_containers_cur]
+                GRP_CONTAINERS_IDS = [cont._id for cont in GRP_CONTAINERS_CUR]
                 SCHEMA_ID_MAP = update_factory_schema_mapper(DATA_RESTORE_PATH)
                 dump_dir = [os.path.join(DATA_RESTORE_PATH,gd) for gd in os.listdir(DATA_RESTORE_PATH) if os.path.isdir(os.path.join(DATA_RESTORE_PATH,gd))]
                 print "\n Total Groups to be Restored: ", len(dump_dir)
@@ -634,26 +636,20 @@ class Command(BaseCommand):
                         '_id': ObjectId(CONFIG_VARIABLES.ROOT_DUMP_NODE_ID)
                     })
                     if non_grp_root_node_obj:
-                            core_import(*args)
+                        core_import((CONFIG_VARIABLES.ROOT_DUMP_NODE_ID,CONFIG_VARIABLES.ROOT_DUMP_NODE_NAME),*args)
                     else:
                         non_grp_root_node_obj = node_collection.one({
                                 'name': CONFIG_VARIABLES.ROOT_DUMP_NODE_NAME,
-                                'member_of': {'$in': grp_containers_ids}})
+                                'member_of': {'$in': GRP_CONTAINERS_IDS}})
 
                         if non_grp_root_node_obj:
-                            if non_grp_root_node_obj._id != ObjectId(CONFIG_VARIABLES.ROOT_DUMP_NODE_ID):
-                                # Module exists, but ID is different
-                                core_import(
-                                            non_grp_root_node=(
-                                                    CONFIG_VARIABLES.ROOT_DUMP_NODE_ID,
-                                                    CONFIG_VARIABLES.ROOT_DUMP_NODE_NAME
-                                                    ),
-                                            *args
-                                            )
-                            else:
-                                core_import(*args)
+                            # if non_grp_root_node_obj._id != ObjectId(CONFIG_VARIABLES.ROOT_DUMP_NODE_ID):
+                            #     # Module exists, but ID is different
+                            #     core_import(None,*args)
+                            # else:
+                            core_import((CONFIG_VARIABLES.ROOT_DUMP_NODE_ID,CONFIG_VARIABLES.ROOT_DUMP_NODE_NAME),*args)
                         else:
-                            core_import(*args)
+                            core_import(None,*args)
 
                     # print "\n each_gd_abs_path: ", os.path.join(DATA_RESTORE_PATH,each_gd_abs_path)
             print "*"*70
@@ -677,128 +673,146 @@ def restore_node(filepath, non_grp_root_node=None):
 
     node_json = get_json_file(filepath)
     print node_json
+    proceed_flag = True
     try:
-        if non_grp_root_node and non_grp_root_node[0] == node_json['_id']:
+        if non_grp_root_node:
             log_file.write("\n non_grp_root_node: " +  str(non_grp_root_node))
-            root_node_obj = node_collection.one({'_type': 'GSystem',
-                '_id': {'$ne': ObjectId(non_grp_root_node[0])},
-                'name': non_grp_root_node[1]})
-            root_node_obj.collection_set = node_json['collection_set']
-            # root_node_obj.collection_set = merge_lists_and_maintain_unique_ele(root_node_obj.collection_set,
-            #     node_json['collection_set'])
-            root_node_obj.save()
+            if non_grp_root_node[0] == node_json['_id']:
+                log_file.write("\n Found by ID non_grp_root_node: ")
+                root_node_obj = node_collection.one({'_type': 'GSystem',
+                    '_id': ObjectId(node_json['_id']),
+                })
+                root_node_obj.collection_set = node_json['collection_set']
+                # root_node_obj.collection_set = merge_lists_and_maintain_unique_ele(root_node_obj.collection_set,
+                #     node_json['collection_set'])
+                root_node_obj.save()
+            elif non_grp_root_node[1] == node_json['name']:
+                global GROUP_CONTAINERS
+                GRP_CONTAINERS_CUR = node_collection.find({'name': {'$in': GROUP_CONTAINERS},
+                    '_type': 'GSystemType'})
+                GRP_CONTAINERS_IDS = [cont._id for cont in GRP_CONTAINERS_CUR]
+                log_file.write("\n Found by Name non_grp_root_node: ")
+                root_node_obj = node_collection.one({'_type': 'GSystem',
+                    'name': non_grp_root_node[1],
+                    'member_of': {'$in': GRP_CONTAINERS_IDS}
+                })
+                root_node_obj.collection_set = node_json['collection_set']
+                # root_node_obj.collection_set = merge_lists_and_maintain_unique_ele(root_node_obj.collection_set,
+                #     node_json['collection_set'])
+                root_node_obj.save()
+                proceed_flag = False
+        if proceed_flag:
+            node_obj = node_collection.one({'_id': ObjectId(node_json['_id'])})
+            if node_obj:
+                node_obj = update_schema_and_user_ids(node_obj)
+                if SCHEMA_ID_MAP:
+                    _mapper(node_obj, 'member_of', SCHEMA_ID_MAP, is_list=True)
+                    _mapper(node_obj, 'type_of', SCHEMA_ID_MAP, is_list=True)
 
-        node_obj = node_collection.one({'_id': ObjectId(node_json['_id'])})
-        if node_obj:
-            node_obj = update_schema_and_user_ids(node_obj)
-            if SCHEMA_ID_MAP:
-                _mapper(node_obj, 'member_of', SCHEMA_ID_MAP, is_list=True)
-                _mapper(node_obj, 'type_of', SCHEMA_ID_MAP, is_list=True)
+                log_file.write("\nFound Existing Node : " + str(node_obj._id))
+                node_changed = False
+                if node_obj.author_set != node_json['author_set'] and node_json['author_set']:
+                    log_file.write("\n Old author_set :\n\t " + str(node_obj.author_set))
+                    node_obj.author_set = merge_lists_and_maintain_unique_ele(node_obj.author_set,
+                        node_json['author_set'])
+                    log_file.write("\n New author_set :\n\t "+ str(node_obj.author_set))
+                    node_changed = True
 
-            log_file.write("\nFound Existing Node : " + str(node_obj._id))
-            node_changed = False
-            if node_obj.author_set != node_json['author_set'] and node_json['author_set']:
-                log_file.write("\n Old author_set :\n\t " + str(node_obj.author_set))
-                node_obj.author_set = merge_lists_and_maintain_unique_ele(node_obj.author_set,
-                    node_json['author_set'])
-                log_file.write("\n New author_set :\n\t "+ str(node_obj.author_set))
+                if node_obj.relation_set != node_json['relation_set'] and node_json['relation_set']:
+                    log_file.write("\n Old relation_set :\n\t "+ str(node_obj.relation_set))
+                    node_obj.relation_set = merge_lists_and_maintain_unique_ele(node_obj.relation_set,
+                        node_json['relation_set'], advanced_merge=True)
+                    log_file.write("\n New relation_set :\n\t "+ str(node_obj.relation_set))
+                    node_changed = True
+
+                if node_obj.attribute_set != node_json['attribute_set'] and node_json['attribute_set']:
+                    log_file.write("\n Old attribute_set :\n\t "+ str(node_obj.attribute_set))
+                    node_obj.attribute_set = merge_lists_and_maintain_unique_ele(node_obj.attribute_set,
+                        node_json['attribute_set'], advanced_merge=True)
+                    log_file.write("\n New attribute_set :\n\t "+ str(node_obj.attribute_set))
+                    node_changed = True
+
+                if node_obj.post_node != node_json['post_node'] and node_json['post_node']:
+                    log_file.write("\n Old post_node :\n\t "+ str(node_obj.post_node))
+                    node_obj.post_node = merge_lists_and_maintain_unique_ele(node_obj.post_node,
+                        node_json['post_node'])
+                    log_file.write("\n New post_node :\n\t "+ str(node_obj.post_node))
+                    node_changed = True
+
+                # if  node_obj.group_set != node_json['group_set'] and node_json['group_set']:
+                #     log_file.write("\n Old group_set :\n\t "+ str(node_obj.group_set))
+                #     node_obj.group_set = merge_lists_and_maintain_unique_ele(node_obj.group_set,
+                #         node_json['group_set'])
+                #     log_file.write("\n New group_set :\n\t "+ str(node_obj.group_set))
+                #     node_changed = True
+
+                if node_obj.prior_node != node_json['prior_node'] and node_json['prior_node']:
+                    log_file.write("\n Old prior_node :\n\t "+ str(node_obj.prior_node))
+                    node_obj.prior_node = merge_lists_and_maintain_unique_ele(node_obj.prior_node,
+                        node_json['prior_node'])
+                    log_file.write("\n New prior_node :\n\t "+ str(node_obj.prior_node))
+                    node_changed = True
+
+                if node_obj.origin != node_json['origin'] and node_json['origin']:
+                    log_file.write("\n Old origin :\n\t "+ str(node_obj.origin))
+                    node_obj.origin = merge_lists_and_maintain_unique_ele(node_obj.origin,
+                        node_json['origin'])
+                    log_file.write("\n New origin :\n\t "+ str(node_obj.origin))
+                    node_changed = True
+
+                # if node_obj.collection_set != node_json['collection_set'] and node_json['collection_set']:
+                #     log_file.write("\n Old collection_set :\n\t "+ str(node_obj.collection_set))
+                #     log_file.write("\n Requested collection_set :\n\t "+ str(node_json['collection_set']))
+
+                #     # node_obj.collection_set = merge_lists_and_maintain_unique_ele(node_obj.collection_set,
+                #     #     node_json['collection_set'])
+                #     node_obj.collection_set = node_json['collection_set']
+                #     log_file.write("\n New collection_set :\n\t "+ str(node_obj.collection_set))
+                #     node_changed = True
+
+                if node_obj.content != node_json['content'] and node_json['content']:
+                    log_file.write("\n Old content :\n\t "+ str(node_obj.content))
+                    node_obj.content = node_json['content']
+                    node_changed = True
+                    log_file.write("\n New content :\n\t "+ str(node_obj.content))
+
+                log_file.write("\n Old collection_set :\n\t "+ str(node_obj.collection_set))
+                log_file.write("\n Requested collection_set :\n\t "+ str(node_json['collection_set']))
+
+                # node_obj.collection_set = merge_lists_and_maintain_unique_ele(node_obj.collection_set,
+                #     node_json['collection_set'])
+                node_obj.collection_set = node_json['collection_set']
+                log_file.write("\n New collection_set :\n\t "+ str(node_obj.collection_set))
                 node_changed = True
 
-            if node_obj.relation_set != node_json['relation_set'] and node_json['relation_set']:
-                log_file.write("\n Old relation_set :\n\t "+ str(node_obj.relation_set))
-                node_obj.relation_set = merge_lists_and_maintain_unique_ele(node_obj.relation_set,
-                    node_json['relation_set'], advanced_merge=True)
-                log_file.write("\n New relation_set :\n\t "+ str(node_obj.relation_set))
+                log_file.write("\n Old group_set :\n\t "+ str(node_obj.group_set))
+
+                if ObjectId(CONFIG_VARIABLES.GROUP_ID) not in node_obj.group_set:
+                    node_obj.group_set.append(ObjectId(CONFIG_VARIABLES.GROUP_ID))
+
+                # node_obj.group_set = [ObjectId(CONFIG_VARIABLES.GROUP_ID)]
+                log_file.write("\n New group_set :\n\t "+ str(node_obj.group_set))
+                node_obj.access_policy = u'PUBLIC'
+                log_file.write("\n Setting access_policy: u'PUBLIC'")
                 node_changed = True
 
-            if node_obj.attribute_set != node_json['attribute_set'] and node_json['attribute_set']:
-                log_file.write("\n Old attribute_set :\n\t "+ str(node_obj.attribute_set))
-                node_obj.attribute_set = merge_lists_and_maintain_unique_ele(node_obj.attribute_set,
-                    node_json['attribute_set'], advanced_merge=True)
-                log_file.write("\n New attribute_set :\n\t "+ str(node_obj.attribute_set))
-                node_changed = True
-
-            if node_obj.post_node != node_json['post_node'] and node_json['post_node']:
-                log_file.write("\n Old post_node :\n\t "+ str(node_obj.post_node))
-                node_obj.post_node = merge_lists_and_maintain_unique_ele(node_obj.post_node,
-                    node_json['post_node'])
-                log_file.write("\n New post_node :\n\t "+ str(node_obj.post_node))
-                node_changed = True
-
-            # if  node_obj.group_set != node_json['group_set'] and node_json['group_set']:
-            #     log_file.write("\n Old group_set :\n\t "+ str(node_obj.group_set))
-            #     node_obj.group_set = merge_lists_and_maintain_unique_ele(node_obj.group_set,
-            #         node_json['group_set'])
-            #     log_file.write("\n New group_set :\n\t "+ str(node_obj.group_set))
-            #     node_changed = True
-
-            if node_obj.prior_node != node_json['prior_node'] and node_json['prior_node']:
-                log_file.write("\n Old prior_node :\n\t "+ str(node_obj.prior_node))
-                node_obj.prior_node = merge_lists_and_maintain_unique_ele(node_obj.prior_node,
-                    node_json['prior_node'])
-                log_file.write("\n New prior_node :\n\t "+ str(node_obj.prior_node))
-                node_changed = True
-
-            if node_obj.origin != node_json['origin'] and node_json['origin']:
-                log_file.write("\n Old origin :\n\t "+ str(node_obj.origin))
-                node_obj.origin = merge_lists_and_maintain_unique_ele(node_obj.origin,
-                    node_json['origin'])
-                log_file.write("\n New origin :\n\t "+ str(node_obj.origin))
-                node_changed = True
-
-            # if node_obj.collection_set != node_json['collection_set'] and node_json['collection_set']:
-            #     log_file.write("\n Old collection_set :\n\t "+ str(node_obj.collection_set))
-            #     log_file.write("\n Requested collection_set :\n\t "+ str(node_json['collection_set']))
-
-            #     # node_obj.collection_set = merge_lists_and_maintain_unique_ele(node_obj.collection_set,
-            #     #     node_json['collection_set'])
-            #     node_obj.collection_set = node_json['collection_set']
-            #     log_file.write("\n New collection_set :\n\t "+ str(node_obj.collection_set))
-            #     node_changed = True
-
-            if node_obj.content != node_json['content'] and node_json['content']:
-                log_file.write("\n Old content :\n\t "+ str(node_obj.content))
-                node_obj.content = node_json['content']
-                node_changed = True
-                log_file.write("\n New content :\n\t "+ str(node_obj.content))
-
-            log_file.write("\n Old collection_set :\n\t "+ str(node_obj.collection_set))
-            log_file.write("\n Requested collection_set :\n\t "+ str(node_json['collection_set']))
-
-            # node_obj.collection_set = merge_lists_and_maintain_unique_ele(node_obj.collection_set,
-            #     node_json['collection_set'])
-            node_obj.collection_set = node_json['collection_set']
-            log_file.write("\n New collection_set :\n\t "+ str(node_obj.collection_set))
-            node_changed = True
-
-            log_file.write("\n Old group_set :\n\t "+ str(node_obj.group_set))
-
-            if ObjectId(CONFIG_VARIABLES.GROUP_ID) not in node_obj.group_set:
-                node_obj.group_set.append(ObjectId(CONFIG_VARIABLES.GROUP_ID))
-
-            # node_obj.group_set = [ObjectId(CONFIG_VARIABLES.GROUP_ID)]
-            log_file.write("\n New group_set :\n\t "+ str(node_obj.group_set))
-            node_obj.access_policy = u'PUBLIC'
-            log_file.write("\n Setting access_policy: u'PUBLIC'")
-            node_changed = True
-
-            if node_changed:
-                log_file.write("\n Node Updated: \n\t OLD: " + str(node_obj) + "\n\tNew: "+str(node_json))
-                node_obj.save()
-        else:
-            copy_version_file(filepath)
-            log_file.write("\n RCS file copied : \n\t" + str(filepath))
-            node_json = update_schema_and_user_ids(node_json)
-            node_json = update_group_set(node_json)
-            try:
-                log_file.write("\n Inserting Node doc : \n\t" + str(node_json))
-                node_id = node_collection.collection.insert(node_json)
-                node_obj = node_collection.one({'_id': node_id})
-                node_obj.save(groupid=ObjectId(CONFIG_VARIABLES.GROUP_ID))
-                log_file.write("\nUpdate RCS using save()")
-            except Exception as node_insert_err:
-                log_file.write("\nError while inserting Node obj" + str(node_insert_err))
-                pass
+                if node_changed:
+                    log_file.write("\n Node Updated: \n\t OLD: " + str(node_obj) + "\n\tNew: "+str(node_json))
+                    node_obj.save()
+            else:
+                copy_version_file(filepath)
+                log_file.write("\n RCS file copied : \n\t" + str(filepath))
+                node_json = update_schema_and_user_ids(node_json)
+                node_json = update_group_set(node_json)
+                try:
+                    log_file.write("\n Inserting Node doc : \n\t" + str(node_json))
+                    node_id = node_collection.collection.insert(node_json)
+                    node_obj = node_collection.one({'_id': node_id})
+                    node_obj.save(groupid=ObjectId(CONFIG_VARIABLES.GROUP_ID))
+                    log_file.write("\nUpdate RCS using save()")
+                except Exception as node_insert_err:
+                    log_file.write("\nError while inserting Node obj" + str(node_insert_err))
+                    pass
     except Exception as restore_node_obj_err:
         print "\n Error in restore_node_obj_err: ", restore_node_obj_err
         log_file.write("\nOuter Error while inserting Node obj" + str(restore_node_obj_err))
