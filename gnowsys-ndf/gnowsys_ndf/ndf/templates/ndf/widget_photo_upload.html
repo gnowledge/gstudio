@@ -70,7 +70,11 @@
                 </fieldset>
                 {% endif %}
                 <div id="{{widget_for}}_pic_div" class="hide row">
+                    {% if if_module %}
                     <form class="dropzone" id ="{{widget_for}}_docPost" enctype="multipart/form-data" method="post"  action="{% url 'upload_prof_pic' node.pk %}">
+                    {% else %}
+                    <form class="dropzone" id ="{{widget_for}}_docPost" enctype="multipart/form-data" method="post"  action="{% url 'upload_prof_pic' group_id %}">
+                    {% endif %}
                         {% csrf_token %}
                         <input type="file" name="filehive" id="{{widget_for}}_docFile" accept="image/*" class="hide" />
                         {% if is_banner and not is_profile %}
@@ -81,7 +85,6 @@
                           <input type="hidden" name="pic_rt" value="is_banner"></input>
                         {% elif  is_thumbnail and not is_banner or is_profile %}
                           <input type="hidden" name="pic_rt" value="is_thumbnail"></input>
-                          <input type="hidden" name="node_id" value="{{node_id}}"></input>
 
                         {% endif %}
 
@@ -90,7 +93,9 @@
                             <input type="submit" id="{{widget_for}}_submitpostid" value="Save" class="button tiny margin-p5 submit-btn" />
                             <input type="button" class="button tiny margin-p5" id="{{widget_for}}_btnUploadCancel" value="Cancel">
                         </div>
+                        <input type="hidden" name="group_id_for_module" value="{{groupid}}"></input>
                         <input type="hidden" name="type" value="profile_pic">
+                        <input type="hidden" name="if_module" value="{{if_module}}">
                         <input type="hidden" name="user" value="{{usr}}">
                         {% if url_name %}
                         <input type="hidden" name="url_name" value="{{url_name}}">

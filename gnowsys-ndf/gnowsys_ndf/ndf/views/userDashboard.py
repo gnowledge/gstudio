@@ -618,6 +618,9 @@ def user_data_profile(request, group_id):
 def upload_prof_pic(request, group_id):
     if request.method == "POST" :
         user = request.POST.get('user','')
+        if_module = request.POST.get('if_module','')
+        if if_module == "True":
+            group_id_for_module = request.POST.get('group_id_for_module','')
         url_name = request.POST.get('url_name','') # used for reverse
         # print "\n\n url_name", url_name
         group_obj = node_collection.one({'_id': ObjectId(group_id)})
@@ -666,7 +669,10 @@ def upload_prof_pic(request, group_id):
 
         if user:
             group_id = user
-        return HttpResponseRedirect(reverse(str(url_name), kwargs={'group_id': group_id}))
+        if if_module == "True":
+            return HttpResponseRedirect(reverse(str(url_name), kwargs={'group_id': ObjectId(group_id_for_module),'node_id':group_obj._id }))
+        else:
+            return HttpResponseRedirect(reverse(str(url_name), kwargs={'group_id': group_id}))
 
 
 def my_courses(request, group_id):
