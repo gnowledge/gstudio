@@ -63,7 +63,8 @@ def setup_dump_path(node_name):
     global TOP_PATH
     global DATA_EXPORT_PATH
     global MEDIA_EXPORT_PATH
-    datetimestamp = datetime.datetime.now().isoformat()
+    # datetimestamp = datetime.datetime.now().isoformat()
+    datetimestamp = datetime.datetime.now().strftime("%Y-%m-%d_%H-%M")
     DUMP_PATH = os.path.join(TOP_PATH, node_name + "_" + str(datetimestamp))
     DATA_EXPORT_PATH = os.path.join(DUMP_PATH, 'dump')
     MEDIA_EXPORT_PATH = os.path.join(DATA_EXPORT_PATH, 'media_files')
