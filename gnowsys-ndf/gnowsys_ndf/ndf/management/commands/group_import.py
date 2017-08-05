@@ -682,9 +682,10 @@ def restore_node(filepath, non_grp_root_node=None):
                 root_node_obj = node_collection.one({'_type': 'GSystem',
                     '_id': ObjectId(node_json['_id']),
                 })
-                root_node_obj.collection_set = node_json['collection_set']
-                # root_node_obj.collection_set = merge_lists_and_maintain_unique_ele(root_node_obj.collection_set,
-                #     node_json['collection_set'])
+                merged_collection_set_ids = map(ObjectId,list(set(root_node_obj.collection_set + node_json['collection_set'])))
+                merged_collection_set_cur = node_collection.find({'_id': {'$in': merged_collection_set_ids}})
+                valid_collection_set_id = [coll_set_node._id for coll_set_node in merged_collection_set_cur]
+                root_node_obj.collection_set = valid_collection_set_id
                 root_node_obj.save()
             elif non_grp_root_node[1] == node_json['name']:
                 global GROUP_CONTAINERS
@@ -696,9 +697,10 @@ def restore_node(filepath, non_grp_root_node=None):
                     'name': non_grp_root_node[1],
                     'member_of': {'$in': GRP_CONTAINERS_IDS}
                 })
-                root_node_obj.collection_set = node_json['collection_set']
-                # root_node_obj.collection_set = merge_lists_and_maintain_unique_ele(root_node_obj.collection_set,
-                #     node_json['collection_set'])
+                merged_collection_set_ids = map(ObjectId,list(set(root_node_obj.collection_set + node_json['collection_set'])))
+                merged_collection_set_cur = node_collection.find({'_id': {'$in': merged_collection_set_ids}})
+                valid_collection_set_id = [coll_set_node._id for coll_set_node in merged_collection_set_cur]
+                root_node_obj.collection_set = valid_collection_set_id
                 root_node_obj.save()
                 proceed_flag = False
         if proceed_flag:
