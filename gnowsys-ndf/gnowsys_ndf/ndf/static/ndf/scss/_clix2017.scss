@@ -4107,16 +4107,17 @@ $inCompleteBgColor: #fd9e29;
     }
     .course_actions>span{
        //margin-right: 5px;
-       background: rgb(46, 63, 81);
+       background: #fff;
        border: 1px solid rgba(255, 255, 255, 0.7);
        padding: 1px 8px;
-       color: #fff;
+       color: rgb(46, 63, 81);
        font-size: 12px;
        margin: 0px 10px 0px 0px;
        cursor: pointer;
        border-radius: 3px;
        opacity:0.8;
        margin-top:30px;
+       z-index:1;
  
     }
  
