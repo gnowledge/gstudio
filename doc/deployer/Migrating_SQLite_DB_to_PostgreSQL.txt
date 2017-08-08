@@ -128,3 +128,14 @@ $ echo "psql -f <path and name of dump file e.g: pg_dump_all.sql> ;" | sudo su -
 
 # links:
 http://www.thegeekstuff.com/2009/01/how-to-backup-and-restore-postgres-database-using-pg_dump-and-psql/
+
+
+# To know size of each and every table of db:
+root@mz3:/home/docker/code# su - postgres
+postgres@mz3:~$ psql
+postgres=# \c gstudio_psql 
+gstudio_psql=# SELECT
+   relname as "Table",
+   pg_size_pretty(pg_total_relation_size(relid)) As "Size",
+   pg_size_pretty(pg_total_relation_size(relid) - pg_relation_size(relid)) as "External Size"
+   FROM pg_catalog.pg_statio_user_tables ORDER BY pg_total_relation_size(relid) DESC;
