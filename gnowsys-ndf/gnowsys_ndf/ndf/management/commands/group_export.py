@@ -63,7 +63,8 @@ def setup_dump_path(node_name):
     global TOP_PATH
     global DATA_EXPORT_PATH
     global MEDIA_EXPORT_PATH
-    datetimestamp = datetime.datetime.now().isoformat()
+    # datetimestamp = datetime.datetime.now().isoformat()
+    datetimestamp = datetime.datetime.now().strftime("%Y-%m-%d_%H-%M")
     DUMP_PATH = os.path.join(TOP_PATH, node_name + "_" + str(datetimestamp))
     DATA_EXPORT_PATH = os.path.join(DUMP_PATH, 'dump')
     MEDIA_EXPORT_PATH = os.path.join(DATA_EXPORT_PATH, 'media_files')
@@ -347,6 +348,13 @@ def pick_media_from_content(content_soup):
             if data_ele:
                 if 'media' in data_ele['data']:
                     find_file_from_media_url(data_ele['data'])
+
+        all_transcript_data = content_soup.find_all(attrs={'class':'transcript-data'})
+        for each_transcript in all_transcript_data:
+            data_ele = each_transcript.findNext('object',data=True)
+            if data_ele:
+                if 'media' in data_ele['data']:
+                    find_file_from_media_url(data_ele['data'])
     except Exception as pick_media_err:
         error_log = "\n !!! Error found in pick_media_from_content()."
         error_log += "\nError: " + str(pick_media_err)
@@ -548,7 +556,7 @@ class Command(BaseCommand):
             else:
                 global DUMP_NODE_objS_LIST
                 global TOP_PATH
-                datetimestamp = datetime.datetime.now().isoformat()
+                datetimestamp = datetime.datetime.now().strftime("%Y-%m-%d_%H-%M")
                 TOP_PATH = os.path.join(GSTUDIO_DATA_ROOT, 'data_export', slugify(dump_node_obj.name) + "_"+ str(datetimestamp))
                 SCHEMA_MAP_PATH = TOP_PATH
                 UNIT_NAMES = []
