@@ -76,8 +76,7 @@
           <div clas="discussion-title row " >
              <div class="discussion-title-username">
               <a  href="{% url 'dashboard' each_reply.userid %}" style="color:#ADABAB !important" title=" {{ each_reply.username }}">
-                {# {{ each_reply.username }} #}
-                {{ each_reply.contributors|join:', ' }} 
+                {{ each_reply.username }}{% include 'ndf/rating.html' with if_comments=True nodeid=each_reply.oid %} 
               </a>
                 <small style="float:right;color:#999999">{{ each_reply.last_update }}</small>
             </div>
@@ -358,6 +357,7 @@
                 var parent_margin_level = $(sourceObj).closest("div").attr("class");
                 
                 $("#replies-area").prepend(createReplyHTML('margin-top:25px;margin-left:0px', data,1));
+                  
                 // $(".content").appendChild().(createReplyHTML('margin-top:20px;', data)).fadeIn(8000);
               }
               else  // sub-reply
@@ -594,5 +594,6 @@ function save_reply(sourceObj){
     };
   }, 10000);
 </script>
+
 
 
