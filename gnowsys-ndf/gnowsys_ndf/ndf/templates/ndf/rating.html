@@ -12,11 +12,7 @@
     {# {% get_node node.pk as node %} #}
     {% get_node_ratings request node.pk as ratings %}
 {% endif %}
-<script type="text/javascript">
-    setStars({% firstof ratings.user_rating ratings.avg  %},"{{node.pk}}")
-    
-</script>
-{% include 'ndf/widget_user_access_modal.html' %}
+
     <form style="display: inline-block" id="form-for-{{node.pk}}">
     <!-- Sets the rating values as data attributes -->
         <span datat-tooltip title="Your rating" class="lbl_tag" style="display: inline-block">
@@ -44,6 +40,10 @@
             </span>
         {% endif %}
 
-{% endblock %}
 
+<script type="text/javascript">
+ //    
+ setStars("{% firstof ratings.user_rating   %}","{{node.pk}}")
+</script>
+{% endblock %}
 

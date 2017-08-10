@@ -1,16 +1,16 @@
 
 
 function add_ratings(this_val){
-	
-	var js = document.createElement("script");
-	slected_rating_id = $(this_val).attr('data-node-id')
-	slected_rating_val = $(this_val).attr('value')
-	js.type = "text/javascript";
-	js.src = '/static/ndf/js/gstudio-functions.js';
+    
+    var js = document.createElement("script");
+    slected_rating_id = $(this_val).attr('data-node-id')
+    slected_rating_val = $(this_val).attr('value')
+    js.type = "text/javascript";
+    js.src = '/static/ndf/js/gstudio-functions.js';
 
-	document.head.appendChild(js);
-	group_id =  get_group_id()
- 	user = is_user_authenticated();
+    document.head.appendChild(js);
+    group_id =  get_group_id()
+    user = is_user_authenticated();
         if (user == "True"){
             updateRating(group_id,slected_rating_val,slected_rating_id);
         }
@@ -21,8 +21,8 @@ function add_ratings(this_val){
 }
 
 function updateRating(group_id,user_rating,rating_id) {
-	// /5943ff594975ac013d3701fc/ratings/add_ratings/598990254a82532cac8d2a5c
-		csrf_token = $(".csrf_token").val();
+    // /5943ff594975ac013d3701fc/ratings/add_ratings/598990254a82532cac8d2a5c
+        csrf_token = $(".csrf_token").val();
         var rating_url = "/" +  group_id + "/ratings/add_ratings/" + rating_id;
         $.ajax({
                 url: rating_url,
@@ -64,7 +64,10 @@ function setRating(data_dict,rating_id){
 }
 
 function setStars(stars,rating_id){
-        $(".rating-bar-"+rating_id+ "input[value="+stars+"]").prop("checked",true);
+        if(stars){
+            
+            $("#rating-"+stars+"-"+rating_id).prop("checked",true);
+        }
     
 }
 

@@ -7031,3 +7031,23 @@ def get_translated_node(request, group_id):
     else:
       return HttpResponse(json.dumps(node_obj, cls=NodeJSONEncoder))
 
+@get_execution_time
+def get_rating_template(request, group_id):
+  try:
+      group_id = ObjectId(group_id)
+  except:
+      group_name, group_id = get_group_name_id(group_id)
+    
+  node_id = request.GET.get('node_id', None)
+  node_obj = Node.get_node_by_id(ObjectId(node_id))
+  is_comments = request.GET.get('if_comments', None)
+  if is_comments == "True":
+    is_comments = True
+  else:
+    is_comments = False
+
+  return render_to_response('ndf/rating.html',
+            {
+              "group_id":group_id,"node":node_obj,"if_comments":is_comments,'nodeid':node_obj._id,
+            },
+            context_instance=RequestContext(request))

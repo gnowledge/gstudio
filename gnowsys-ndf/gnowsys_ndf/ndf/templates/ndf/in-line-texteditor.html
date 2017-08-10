@@ -355,9 +355,20 @@
                 //sample format of data = [0:"status_info", 1:"reply_id", 2:"prior_node", 3:"html_content", 4:"org_content", 5:"user_id", 6:"user_name", 7:"created_at" ]
                 // add reply text content after #replies-area
                 var parent_margin_level = $(sourceObj).closest("div").attr("class");
-                
                 $("#replies-area").prepend(createReplyHTML('margin-top:25px;margin-left:0px', data,1));
-                  
+                // alert(data[1])
+                //   $.ajax({
+                //       type: "GET",
+                //       url: "{% url 'get_rating_template' group_id %}",
+                //       datatype: "html",
+                //       data:{
+                //         "node_id":data[1],
+                //         "if_comments":"True"
+                //       },
+                //         success: function(data) {
+                //         $("#replies-area").prepend(data);
+                //       }
+                //   });
                 // $(".content").appendChild().(createReplyHTML('margin-top:20px;', data)).fadeIn(8000);
               }
               else  // sub-reply
