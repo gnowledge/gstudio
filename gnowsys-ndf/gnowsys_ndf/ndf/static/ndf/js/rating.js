@@ -10,9 +10,13 @@ function add_ratings(this_val){
 
     document.head.appendChild(js);
     group_id =  get_group_id()
+    user_access_priv = user_access_policy()
     user = is_user_authenticated();
         if (user == "True"){
-            updateRating(group_id,slected_rating_val,slected_rating_id);
+            if(user_access_priv == "allow"){
+                updateRating(group_id,slected_rating_val,slected_rating_id);
+                
+            }
         }
         else{
             alert("Please login to rate this resource");
@@ -21,28 +25,39 @@ function add_ratings(this_val){
 }
 
 function updateRating(group_id,user_rating,rating_id) {
-    // /5943ff594975ac013d3701fc/ratings/add_ratings/598990254a82532cac8d2a5c
         csrf_token = $(".csrf_token").val();
-        var rating_url = "/" +  group_id + "/ratings/add_ratings/" + rating_id;
-        $.ajax({
-                url: rating_url,
-                type: 'POST',
-                data: {
-                    rating: user_rating,
-                    node: rating_id,
-                    csrfmiddlewaretoken: csrf_token,
-                    if_comments: "True",
-                },
+        is_contributor = is_contributor_list();
+        
+        if(is_contributor == "True"){
 
-                success: function(data){
-                   //Replace rating bar with new values
-                   //'rating_template' is a div.class of parent template
-                   // $(".rating_template").html(data);
-                   // console.log(data)
-                   data = JSON.parse(data)
-                   setRating(data,rating_id);
-                }
-        });
+            alert("You cannot rate your own resource");
+            // setStars({{ratings.avg}})
+            return false;
+        }
+        else{
+
+            var rating_url = "/" +  group_id + "/ratings/add_ratings/" + rating_id;
+            
+            $.ajax({
+                    url: rating_url,
+                    type: 'POST',
+                    data: {
+                        rating: user_rating,
+                        node: rating_id,
+                        csrfmiddlewaretoken: csrf_token,
+                        if_comments: "True",
+                    },
+
+                    success: function(data){
+                       //Replace rating bar with new values
+                       //'rating_template' is a div.class of parent template
+                       // $(".rating_template").html(data);
+                       // console.log(data)
+                       data = JSON.parse(data)
+                       setRating(data,rating_id);
+                    }
+            });
+        }
 
     }
 
