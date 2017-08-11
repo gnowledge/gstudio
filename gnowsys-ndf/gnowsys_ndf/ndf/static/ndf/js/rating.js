@@ -64,9 +64,8 @@ function setRating(data_dict,rating_id){
 }
 
 function setStars(stars,rating_id){
-        if(stars){
-            
-            $("#rating-"+stars+"-"+rating_id).prop("checked",true);
+        if(stars){            
+            $("#rating-"+Math.floor(stars)+"-"+rating_id).prop("checked",true);
         }
     
 }
