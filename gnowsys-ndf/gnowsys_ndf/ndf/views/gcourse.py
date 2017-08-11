@@ -30,11 +30,11 @@ from gnowsys_ndf.ndf.models import NodeJSONEncoder
 from gnowsys_ndf.settings import GSTUDIO_SITE_NAME
 from gnowsys_ndf.ndf.models import Node, AttributeType, RelationType
 from gnowsys_ndf.ndf.models import node_collection, triple_collection
+from gnowsys_ndf.ndf.views.group import *
 from gnowsys_ndf.ndf.views.file import *
 from gnowsys_ndf.ndf.templatetags.ndf_tags import edit_drawer_widget, get_disc_replies, get_all_replies,user_access_policy, get_relation_value, check_is_gstaff, get_attribute_value
 from gnowsys_ndf.ndf.views.methods import get_node_common_fields, parse_template_data, get_execution_time, delete_node, get_filter_querydict, update_notes_or_files_visited
 from gnowsys_ndf.ndf.views.notify import set_notif_val
-from gnowsys_ndf.ndf.views.group import *
 from gnowsys_ndf.ndf.views.methods import get_property_order_with_value, get_group_name_id, get_course_completetion_status, replicate_resource
 from gnowsys_ndf.ndf.views.ajax_views import *
 from gnowsys_ndf.ndf.views.analytics_methods import *
@@ -186,8 +186,16 @@ def create_edit(request, group_id, node_id=None):
 
     if request.method == "POST":
         # get_node_common_fields(request, course_node, group_id, GST_COURSE)
+        group_access_type = request.POST.get('login-mode','PUBLIC')
+        if isinstance(group_access_type, list):
+            group_access_type = unicode(group_access_type[0])
+        else:
+            group_access_type = unicode(group_access_type)
+
         basecoursegroup_gst = node_collection.one({'_type': "GSystemType", 'name': u"BaseCourseGroup"})
         if not course_node:
+            from gnowsys_ndf.ndf.views.group import CreateGroup
+
             base_course_group_name = request.POST.get('name','')
             group = CreateGroup(request)
             result = group.create_group(base_course_group_name)
@@ -199,7 +207,11 @@ def create_edit(request, group_id, node_id=None):
                 # create_gattribute(course_node._id, at_course_type, u"General")
                 # print "\n course_node ---- ", course_node
         if course_node:
+
             course_node.save(is_changed=get_node_common_fields(request, course_node, group_id, basecoursegroup_gst),groupid=group_id)
+            course_node.group_type = group_access_type
+            course_node.status = u'PUBLISHED'
+            course_node.save()
 
             # adding thumbnail
             f = request.FILES.get("doc", "")
@@ -239,6 +251,7 @@ def create_edit(request, group_id, node_id=None):
                     rt_has_logo = node_collection.one({'_type': "RelationType", 'name': "has_logo"})
                     # print "\n creating GRelation has_logo\n"
                     create_grelation(course_node._id, rt_has_logo, ObjectId(fileobj))
+
         return HttpResponseRedirect(reverse('groupchange', kwargs={'group_id': course_node._id}))
     else:
         if node_id:
@@ -1437,11 +1450,12 @@ def get_resources(request, group_id):
             except:
                 unit_node = None
             if resource_type:
-                if resource_type == "Pandora":
+                if "Pandora" in resource_type :
                     resource_type = "Pandora_video"
-                if resource_type == "Quiz":
-                    resource_type = "QuizItem"
-                if resource_type == "File":
+                elif "Quiz" in resource_type:
+                    resource_type = ["QuizItem", "QuizItemEvent"]
+                    resource_gst_id = [GSystemType.get_gst_name_id(each_gst)[1] for each_gst in resource_type]
+                elif "File" in resource_type:
                     resource_type = ["File", "Jsmol", "PoliceSquad", "OpenStoryTool", "TurtleBlocks", "BioMechanics"]
                     resource_gst_id = [GSystemType.get_gst_name_id(each_gst)[1] for each_gst in resource_type]
                 else:
@@ -3659,3 +3673,132 @@ def get_trans_node_list(node_list,lang):
             trans_node_list.append({ObjectId(node._id): {"name": node.name, "basenodeid":ObjectId(node._id)}})
     if trans_node_list:
         return trans_node_list
+
+@get_execution_time
+def course_quiz_data(request, group_id):
+    def _merged_to_from(min_list, max_list, na_index):
+        # max list contains more num of list
+        # min list contains less num of list
+        partly_max_list = max_list[:len(min_list)]
+        exception_list = max_list[len(min_list):]
+        for min_list_ele,mod_max_list_ele in zip(min_list, partly_max_list):
+            for ind in na_index:
+                partly_max_list_ele[ind] = min_list_ele[ind]
+        return partly_max_list + exception_list
+
+    group_obj   = Group.get_group_name_id(group_id, get_obj=True)
+    group_id    = group_obj._id
+    group_name  = group_obj.name
+
+    if not request.user.is_superuser:
+        return HttpResponseRedirect(reverse('course_content', kwargs={'group_id': ObjectId(group_id)}))
+
+    allow_to_join = get_group_join_status(group_obj)
+    template = 'ndf/gcourse_event_group.html'
+    context_variables = {
+            'group_id': group_id, 'groupid': group_id, 'group_name':group_name,
+            'group_obj': group_obj, 'title': 'course_quiz_data', 'allow_to_join': allow_to_join
+        }
+
+    admin_analytics_data_list = []
+    admin_analytics_data_append = admin_analytics_data_list.append
+    qip_gst = node_collection.one({ '_type': 'GSystemType', 'name': 'QuizItemPost'})
+
+    query = {'member_of': qip_gst._id, 'group_set': group_id}
+
+    record_set = node_collection.collection.aggregate([
+        {
+            '$match': query
+        }, {
+            '$project': {
+                '_id': 0,
+                'name': '$name',
+                'check': '$attribute_set.quizitempost_user_checked_ans',
+                'submit': '$attribute_set.quizitempost_user_submitted_ans',
+                'user_id': '$created_by',
+                'thread_node': '$prior_node'
+            }
+        },
+        {
+            '$sort': {'created_at': 1}
+        }
+    ])
+
+    l = []
+    # print "rec['result']", rec['result']
+    for each_record in record_set['result']:
+        for record_key,record_val in each_record.items():
+            if record_key == "user_id":
+                # To prevent in error in case where 
+                # User object does not exist, return user-id
+                user_obj = User.objects.get(pk=int(record_val))
+                if user_obj:
+                    username = user_obj.username
+                else:
+                    username = record_val                    
+                each_record['user_id'] = username
+
+            if record_key == "thread_node" and record_val:
+                # QuizItemPost's prior_node list contains ObjectId
+                # of its Thread node and QuizItemEvent node
+                qie_node = node_collection.find_one({'_id': {'$in': record_val}, 
+                    'name': {'$regex': '^(?!Thread of).*'}})
+                each_record['name'] = qie_node.content
+
+            if record_key == "check" and record_val:
+                for checked_ans_dict in record_val[0]:
+                    for k,v in checked_ans_dict.items():
+                        l2 = []
+                        l2.append(each_record['name'])
+                        l2.append(each_record['user_id'])
+                        l2.append(k)
+                        l2.append(','.join(v))
+                        l2.append("--")
+                        l2.append("--")
+                        l.append(l2)
+
+            if record_key == "submit" and record_val:
+                for submitted_ans_dict in record_val[0]:
+                    for k,v in submitted_ans_dict.items():
+                        l1 = []
+                        l1.append(each_record['name'])
+                        l1.append(each_record['user_id'])
+                        l1.append("--")
+                        l1.append("--")
+                        l1.append(k)
+                        l1.append(','.join(v))
+                        l.append(l1)
+
+
+    # print "\nadmin_analytics_data: ", l
+    checked_ans_list = []
+    submitted_ans_list = []
+    user_dict_list = []
+    user_dict = {}
+    for e in l:
+        # print "\n this is e: ", e, any(e[1] not in euu for euu in user_dict_list)
+        if any(e[1] in euu.keys() for euu in user_dict_list):
+            for en in user_dict_list:
+                if e[1] in en.keys():
+                    user_dict = en
+        else:
+            user_dict = {e[1]: {'check': [], 'submit': []}}
+            user_dict_list.append(user_dict)
+        if e.index('--') in [2,3]:
+            user_dict[e[1]]['submit'].append(e)
+        elif e.index('--') in [4,5]:
+            user_dict[e[1]]['check'].append(e)
+
+    return_list = []
+    for each_user_dict in user_dict_list:
+        for ked, ved in each_user_dict.items():
+            if len(ved['check'])< len(ved['submit']):
+                return_list.extend(_merged_to_from(ved['check'],ved['submit'], na_index=[2,3]))
+            elif len(ved['submit'])< len(ved['check']):
+                return_list.extend(_merged_to_from(ved['submit'],ved['check'], na_index=[4,5]))
+
+    banner_pic_obj,old_profile_pics = _get_current_and_old_display_pics(group_obj)
+    context_variables.update({'old_profile_pics':old_profile_pics,
+                        "prof_pic_obj": banner_pic_obj, 'data': json.dumps(return_list)})
+    return render_to_response(template, context_variables,
+            context_instance=RequestContext(request))

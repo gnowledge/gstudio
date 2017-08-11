@@ -483,7 +483,11 @@ Still keeping for future ref (if needed).
             {% endif %}
           {% endif %}
             {% if "QuizItemEvent" in node.member_of_names_list %}
-                {% include 'ndf/quiz_player.html' %}
+                {% if request.user.is_authenticated %}
+                  {% include 'ndf/quiz_player.html' %}
+                {% else %}
+                  <label>Please <a href="{% url 'auth_login' %}?next={{request.path}}">LOGIN</a>  to view the Quiz</label>
+                {% endif %}
             {% endif %}
 
           {% block add_fields %} {% endblock %}
@@ -949,7 +953,11 @@ Still keeping for future ref (if needed).
     var iframeBodyHt = $("iframe").contents().find("body").height();
     var docHeight = $(window).height();
     docHeight -= docHeight * 0.20;
-    $("iframe").not('.twitter-share-button').height(docHeight + 50);
+    // console.log(iframeBodyHt);
+    // console.log(docHeight);
+    if (iframeBodyHt < docHeight) {
+      $("iframe").not('.twitter-share-button').height(docHeight + 50);
+    }
 
     var changedHt;
 

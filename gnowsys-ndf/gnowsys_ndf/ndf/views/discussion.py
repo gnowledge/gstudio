@@ -457,3 +457,29 @@ def get_thread_comments_count(request, group_id, thread_node_id):
     return HttpResponse(node_collection.find({'group_set': ObjectId(group_id),
                          'member_of': reply_st._id,
                          'origin' : { '$elemMatch' : {'thread_id':ObjectId(thread_node_id)}}}).count())
+
+@get_execution_time
+def get_user_replies(request, group_id, user_name_or_id):
+
+    group_obj = get_group_name_id(group_id, get_obj=True)
+    group_id  = group_obj._id
+
+    user_obj = None
+    try:
+        if user_name_or_id.isdigit():
+            user_obj = User.objects.get(pk=int(user_name_or_id))
+        else:
+            user_obj = User.objects.get(username=(user_name_or_id).strip())
+        if user_obj:
+            gst_reply = node_collection.one({ '_type':'GSystemType', 'name':'Reply'})
+            user_replies = node_collection.find({ 'member_of': gst_reply._id,
+                'group_set': ObjectId(group_id), 'contributors': user_obj.pk}).sort('last_update',-1)
+
+            return render_to_response('ndf/user_interactions.html',
+                    {
+                        'group_id': group_id, 'groupid': group_id, 'group_name': group_obj.name,
+                        'user_replies':user_replies,'user_obj': user_obj
+                    },
+                    context_instance=RequestContext(request))
+    except Exception as no_user:
+        return HttpResponse('No such User found')

@@ -884,7 +884,8 @@ def get_inner_collection(collection_list, node, no_res=False):
   inner_list_append_temp=inner_list.append #a temp. variable which stores the lookup for append method
 
   # if not no_res or not res_flag:
-  if not no_res or (not "CourseUnitEvent" in node.member_of_names_list):
+  is_unit = any(mem_of_name in ["CourseUnit", "CourseUnitEvent"] for mem_of_name in node.member_of_names_list)
+  if not no_res or not is_unit:
     if node.collection_set:
       for each in node.collection_set:
         col_obj = node_collection.one({'_id': ObjectId(each)})
@@ -929,7 +930,7 @@ def get_inner_collection(collection_list, node, no_res=False):
       return collection_list
     else:
       return collection_list
-  elif "CourseUnitEvent" in node.member_of_names_list:
+  elif is_unit:
     for cl in collection_list:
       if cl['id'] == node.pk:
         col_set = node.collection_set
@@ -958,6 +959,8 @@ def get_collection(request, group_id, node_id, no_res=False):
         node_type = node_collection.one({'_id': ObjectId(obj.member_of[0])}).name
         collection_list.append({'name':obj.name,'id':obj.pk,'node_type':node_type})
         # collection_list = get_inner_collection(collection_list, obj, gstaff_access, completed_ids_list, incompleted_ids_list)
+        if "BaseCourseGroup" in node.member_of_names_list:
+          no_res = True
         collection_list = get_inner_collection(collection_list, obj, no_res)
     data = collection_list
     updated_data = []
@@ -7027,3 +7030,4 @@ def get_translated_node(request, group_id):
       return HttpResponse(json.dumps(trans_node, cls=NodeJSONEncoder))
     else:
       return HttpResponse(json.dumps(node_obj, cls=NodeJSONEncoder))
+

@@ -27,7 +27,7 @@ CKEDITOR.plugins.add('addJhapp',
                           $('#group_imgs_on_modal').foundation('reveal', 'open');
                             $("#insert_assessment").click(function(event){
                             assessment_text_val = $('#paste-area-assessment').val();
-                            split_word = assessment_text_val.slice(0, 7) + ' style="height:100vh;width:100%" ' + assessment_text_val.slice(7);
+                            split_word = assessment_text_val.slice(0, 7) + ' style="min-height:100vh; min-width:100%" ' + assessment_text_val.slice(7);
                              CKEDITOR.instances[textAreaId].insertHtml(split_word);
                             $('#group_imgs_on_modal').foundation('reveal', 'close');
                           });
@@ -503,7 +503,41 @@ CKEDITOR.plugins.add('addJhapp',
                              CKEDITOR.instances[textAreaId].insertHtml(tool_val);
                             $('#group_imgs_on_modal').foundation('reveal', 'close');
                           });
+                          
+                          $("#insert_starlogo_model1_en").click(function(event){
                             
+
+                            tool_val = "<a href='/starlogonova/en/model1/' target='_blank'><img src='/static/ndf/images/starlogo-english.png' alt='Star Logo Thumbnail'  height='1000px' width='1000px' >"
+                            
+                             CKEDITOR.instances[textAreaId].insertHtml(tool_val);
+                            $('#group_imgs_on_modal').foundation('reveal', 'close');
+                          });
+                          
+                          $("#insert_starlogo_model2_en").click(function(event){
+                            
+
+                            tool_val = "<a href='/starlogonova/en/model2/' target='_blank'><img src='/static/ndf/images/starlogo-english.png' alt='Star Logo Thumbnail'  height='1000px' width='1000px' >"
+                            
+                             CKEDITOR.instances[textAreaId].insertHtml(tool_val);
+                            $('#group_imgs_on_modal').foundation('reveal', 'close');
+                          });
+                          $("#insert_starlogo_model1_hi").click(function(event){
+                            
+
+                            tool_val = "<a href='/starlogonova/hi/model1/' target='_blank'><img src='/static/ndf/images/starlogo-hindi.png' alt='Star Logo Thumbnail'  height='1000px' width='1000px' >"
+                            
+                             CKEDITOR.instances[textAreaId].insertHtml(tool_val);
+                            $('#group_imgs_on_modal').foundation('reveal', 'close');
+                          });
+
+                          $("#insert_starlogo_model2_hi").click(function(event){
+                            
+
+                            tool_val = "<a href='/starlogonova/hi/model2/' target='_blank'><img src='/static/ndf/images/starlogo-hindi.png' alt='Star Logo Thumbnail'  height='1000px' width='1000px' >"
+                            
+                             CKEDITOR.instances[textAreaId].insertHtml(tool_val);
+                            $('#group_imgs_on_modal').foundation('reveal', 'close');
+                          });
 
                         }
                     });
