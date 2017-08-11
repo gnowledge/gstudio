@@ -4330,8 +4330,11 @@ $module-card-lines-to-show: 3;
 
     }
     .card_title_font{
-        font-size: 20px;
-        color: #164a7b;
+        font-size: 18px;
+        color: #a61680;
+        padding: 0px 0px 0px 10px;
+        margin-top: 10px;
+        font-weight: 600;
     }
 
     &.animated_card {
