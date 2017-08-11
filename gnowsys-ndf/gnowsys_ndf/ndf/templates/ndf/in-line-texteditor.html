@@ -76,7 +76,7 @@
           <div clas="discussion-title row " >
              <div class="discussion-title-username">
               <a  href="{% url 'dashboard' each_reply.userid %}" style="color:#ADABAB !important" title=" {{ each_reply.username }}">
-                {{ each_reply.username }}{% include 'ndf/rating.html' with if_comments=True nodeid=each_reply.oid %} 
+                {{ each_reply.contributors|join:', ' }}{% include 'ndf/rating.html' with if_comments=True nodeid=each_reply.oid %} 
               </a>
                 <small style="float:right;color:#999999">{{ each_reply.last_update }}</small>
             </div>
