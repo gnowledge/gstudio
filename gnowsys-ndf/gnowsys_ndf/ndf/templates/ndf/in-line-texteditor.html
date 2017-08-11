@@ -356,20 +356,7 @@
                 // add reply text content after #replies-area
                 var parent_margin_level = $(sourceObj).closest("div").attr("class");
                 $("#replies-area").prepend(createReplyHTML('margin-top:25px;margin-left:0px', data,1));
-                // alert(data[1])
-                //   $.ajax({
-                //       type: "GET",
-                //       url: "{% url 'get_rating_template' group_id %}",
-                //       datatype: "html",
-                //       data:{
-                //         "node_id":data[1],
-                //         "if_comments":"True"
-                //       },
-                //         success: function(data) {
-                //         $("#replies-area").prepend(data);
-                //       }
-                //   });
-                // $(".content").appendChild().(createReplyHTML('margin-top:20px;', data)).fadeIn(8000);
+                                // $(".content").appendChild().(createReplyHTML('margin-top:20px;', data)).fadeIn(8000);
               }
               else  // sub-reply
               {
