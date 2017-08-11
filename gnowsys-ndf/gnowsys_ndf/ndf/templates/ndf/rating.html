@@ -42,8 +42,7 @@
 
 
 <script type="text/javascript">
- //    
- setStars("{% firstof ratings.user_rating   %}","{{node.pk}}")
+ setStars("{% firstof ratings.user_rating  ratings.avg %}","{{node.pk}}")
 </script>
 {% endblock %}
 
