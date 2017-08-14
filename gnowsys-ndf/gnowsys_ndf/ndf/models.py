@@ -3194,10 +3194,10 @@ class ActiveUsers(object):
         for session in sessions:
             data = session.get_decoded()
             user_id = data.get('_auth_user_id', 0)
-            # if user_id:
+            if user_id:
+                userid_session_key_dict[user_id] = session.session_key
             # uid_list_append(user_id)
             # session_key_list.append(session.session_key)
-            userid_session_key_dict[user_id] = session.session_key
 
         return userid_session_key_dict
 
