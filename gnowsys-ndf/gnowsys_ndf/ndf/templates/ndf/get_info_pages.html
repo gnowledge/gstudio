@@ -2,8 +2,7 @@
 {% load ndf_tags %}
 <div class="activity-slides-container" >
         {# <i class="fa fa-graduation-cap large"></i> #}
-      {% get_help_pages_of_node node page_type as help_page_list %}
-
+      {% get_help_pages_of_node node page_type request.LANGUAGE_CODE as help_page_list %}
       <div class="small-12-columns activity-slides">
           {% if help_page_list %}
           {% for each_help_page in help_page_list %}
