@@ -1297,7 +1297,9 @@ class CreateCourseEventGroup(CreateEventGroup):
         # rm_files_cur = node_collection.find({'tags': 'raw@material', 'member_of': file_gst._id, 'group_set': old_group_obj._id})
 
         # June 17 2016. Importing files uploaded by user 'administrator' in old_group_obj
-        administrator_user = User.objects.get(username='administrator')
+        # administrator_user = User.objects.get(username='administrator')
+        # Commented fetching 'administrator_user '
+
         # raw_material_fetch_query = {'group_set': old_group_obj._id,
         #  '$or':[{'tags': 'raw@material'}, {'created_by': administrator_user.id}]}
         raw_material_fetch_query = {'group_set': old_group_obj._id,
