@@ -34,6 +34,8 @@
 </div>
 <div class="row listing-row"> 
       {% for each in asset_nodes %}
+      {% get_relation_value each.pk 'has_assetcontent' as grel_asstcontent %}
+      
       <a href="{% url 'asset_detail' group_id each.pk %}"  title="{{each.name}}">
       <div class="small-12 medium-6 large-3 columns ">
         <div class="asset_tile">
@@ -41,7 +43,14 @@
             {% if "raw@material" in each.tags and title == "asset_list" %}
                 <div class="raw_material_asset">{% trans "Raw Material" %}</div>
             {% endif %}
-                {% if each.if_file.mid.relurl and 'video' not in each.if_file.mime_type %}
+                {% if  grel_asstcontent.grel_id %}
+                {# {{grel_asstcontent.grel_id|length}} #}
+                    {% for each_rel in grel_asstcontent.grel_node %}
+                        {% if each_rel.if_file.original.relurl %}
+                            <img src="{{MEDIA_URL}}{{each_rel.if_file.mid.relurl}}"> 
+                        {% endif %}
+                    {% endfor %}
+                {% elif each.if_file.mid.relurl and 'video' not in each.if_file.mime_type %}
                     <img src="{{MEDIA_URL}}{{each.if_file.mid.relurl}}">
                 {% elif 'video' not in each.if_file.mime_type and each.if_file.thumbnail.relurl %}
                     <img src="{{MEDIA_URL}}{{each.if_file.thumbnail.relurl}}">
