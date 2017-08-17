@@ -39,6 +39,7 @@ from gnowsys_ndf.ndf.models import node_collection, triple_collection
 from gnowsys_ndf.ndf.models import *
 from gnowsys_ndf.ndf.views.file import *
 from gnowsys_ndf.ndf.views.gcourse import *
+from gnowsys_ndf.ndf.views.translation import get_lang_node
 from gnowsys_ndf.ndf.views.methods import check_existing_group, get_drawers, get_course_completed_ids,create_thread_for_node, delete_gattribute
 from gnowsys_ndf.ndf.views.methods import get_node_common_fields, get_node_metadata, create_grelation,create_gattribute
 from gnowsys_ndf.ndf.views.methods import create_task,parse_template_data,get_execution_time,get_group_name_id, dig_nodes_field

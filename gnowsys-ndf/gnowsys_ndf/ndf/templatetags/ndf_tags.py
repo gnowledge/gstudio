@@ -3880,7 +3880,7 @@ def get_file_obj(node):
 @register.assignment_tag
 def get_help_pages_of_node(node_obj,rel_name="has_help",language="en"):
 	all_help_page_node_list = []
-	from gnowsys_ndf.ndf.views.gcourse import get_lang_node
+	from gnowsys_ndf.ndf.views.translation import get_lang_node
 	try:
 		has_help_rt = node_collection.one({'_type': 'RelationType', 'name': rel_name})
 		help_rt = triple_collection.find({'subject':node_obj._id,'relation_type': has_help_rt._id, 'status': u'PUBLISHED'})
