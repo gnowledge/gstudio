@@ -133,6 +133,21 @@
                          <input id="subsection-name" name="subsection_name" value="{{unit_node.project_config.subsection_name}}" type="text" placeholder="Enter Sub Section name"/>
                     </div>
                 </div>
+                <div class="course_creator_header">
+                    <div class="left course_heading">
+                    <h5>{% trans "Group Type" %}</h5>
+                    </div>
+                    <div class="right course_heading_unit">
+                         {% get_possible_group_type_values as poss_gr_type %}
+                            <select name="group_type" class="gtype">
+                              {% for each_gtype in poss_gr_type %}
+                                <option {% if each_gtype == node.group_type %}selected=selected{% endif %}>
+                                  {{each_gtype}}
+                                </option>
+                              {% endfor %}
+                            </select>
+                    </div>
+                </div>
                 
                 <div class=" course_heading_unit tags-container">
                  {% include 'ndf/widget_tags.html' with node=unit_node %}

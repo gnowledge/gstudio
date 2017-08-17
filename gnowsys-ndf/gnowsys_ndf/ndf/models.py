@@ -2640,6 +2640,8 @@ class Group(GSystem):
             finally:
                 self[field_key] = default_val
 
+        if group_type:
+            self.group_type = group_type
         self.fill_gstystem_values(request=request, **kwargs)
 
         # explicit: group's should not have draft stage. So publish them:
