@@ -2,7 +2,7 @@ import os
 import json
 from bson import json_util
 from gnowsys_ndf.ndf.models import node_collection, TYPES_LIST
-from gnowsys_ndf.settings import GSTUDIO_DEFAULT_GROUPS
+from gnowsys_ndf.settings import GSTUDIO_DEFAULT_GROUPS_LIST
 type_json = {"_type": None, "name": None, "source_id": None, "target_id": None }
 
 def create_factory_schema_mapper(path):
@@ -14,7 +14,7 @@ def create_factory_schema_mapper(path):
                                                     {'_type': {'$in': TYPES_LIST }},
                                                     {
                                                         '_type': u'Group',
-                                                        'name': {'$in': GSTUDIO_DEFAULT_GROUPS }
+                                                        'name': {'$in': GSTUDIO_DEFAULT_GROUPS_LIST }
                                                     }
                                                 ]
                                             })
@@ -39,13 +39,15 @@ def update_factory_schema_mapper(path):
             updated_factory_json_list = []
             for each_type in factory_json_list:
                 type_node = node_collection.one({'_type': each_type['_type'], 'name':each_type['name']},{'_id':1})
-                each_type['target_id'] = type_node._id
-                updated_factory_json_list.append(each_type)
-                if each_type['target_id'] != each_type['source_id']:
-                    SCHEMA_ID_MAP[each_type['source_id']] = each_type['target_id']
+                if type_node:
+                    each_type['target_id'] = type_node._id
+                    updated_factory_json_list.append(each_type)
+                    if each_type['target_id'] != each_type['source_id']:
+                        SCHEMA_ID_MAP[each_type['source_id']] = each_type['target_id']
         with open(schema_dump_path, 'w+') as schema_file_out:
             schema_file_out.write(json_util.dumps(updated_factory_json_list))
             schema_file_out.close()
         return SCHEMA_ID_MAP
     else:
+        return SCHEMA_ID_MAP
         print "\n No factory_schema.json file found."

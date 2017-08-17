@@ -102,7 +102,6 @@
 			<!-- Edit and Publish -->
 				<div class="row btn-row">
 					<!-- Edit button -->
-						{% edit_policy groupid node request.user as status %}
 						{% if is_user_authenticated %}
 							{% get_edit_url node.pk as edit_url %}
 							{% if is_group %}
@@ -175,6 +174,7 @@
 							<!-- If resource is already under moderation, don't show cross-publish button -->
 
 								<span  title="{% trans 'Publish this resource in other group/s' %}" class="has-tip tip-bottom"><a id="switch_group" class="tiny button radius mod-btn" data-reveal-id="publish_resource"> {% trans "Cross Publish" %}</a></span>
+								
 								<div id="publish_resource" class="reveal-modal" data-reveal style="position:absolute;"> 
 									<h4>{% trans "Select Groups" %}</h4>
 									<div id="switchgrp" class="content">
@@ -188,6 +188,7 @@
 								<input type="button" class="tiny button radius mod-btn secondary disabled" title="{% trans 'You are not authorized for this action' %}" value="{% trans 'Cross Publish' %}">
 							{% endif %}
 						{% endif %}
+						
 
 				</div>
 				{% endif %}
@@ -553,91 +554,6 @@
     $(document).on("click", "#btnConfirmNo", function() {
         set_href = false;
         $("#deleteModal").foundation('reveal', 'close');
-    });
-
-
-	$(document).on("click", "#subscribe_to_grp", function() {
-        user_id = $(this).attr('data-user-id')
-        asAdmin = $(this).attr('data-user-admin')
-        $.ajax({
-                type: "POST",
-                url: "{% url 'enroll_to_course' group_object.pk %}",
-                datatype: "json",
-                data:{
-                        user_id: user_id,
-                        asAdmin: asAdmin,
-                       csrfmiddlewaretoken: '{{ csrf_token }}'
-                  },
-                context: this,
-              success: function(data) {
-                data = JSON.parse(data)
-                success_state = data["success"]
-                grp_mem_count = data["member_count"]
-                if(!success_state){
-                    alert("Something went wrong. Please try again later.")
-                }
-                else{
-                    if($(this).hasClass('subscription_policy')){
-                        $(".subscription_policy")
-                            .attr("id", "unsubscribe_from_grp")
-                            .attr("value", "Unsubscribe")
-                            .attr("title", "Unsubscribe from this group")
-                        // Update Courp member count in Group-dashboard
-                        $(".grp_mem_count")
-                            .text(grp_mem_count)
-                            .attr('value',grp_mem_count)
-                    }
-                    else{
-                        $(this)
-                            .attr("id", "unsubscribe_from_grp")
-                            .text("Remove")
-                    }
-
-                }
-              }
-        });
-    });
-
-    $(document).on("click", "#unsubscribe_from_grp", function() {
-        user_id = $(this).attr('data-user-id')
-        asAdmin = $(this).attr('data-user-admin')
-
-        $.ajax({
-                type: "POST",
-                url: "{% url 'unsubscribe_from_group' group_object.pk %}",
-                datatype: "json",
-                data:{
-                        user_id: user_id,
-                        asAdmin: asAdmin,
-                       csrfmiddlewaretoken: '{{ csrf_token }}'
-                  },
-                context: this,
-                success: function(data) {
-                    data = JSON.parse(data)
-                    success_state = data["success"]
-                    grp_mem_count = data["member_count"]
-                    if(!success_state){
-                        alert("Something went wrong. Please try again later.")
-                    }
-                    else{
-                        if($(this).hasClass('subscription_policy')){
-                            $(".subscription_policy")
-                                .attr("id", "subscribe_to_grp")
-                                .attr("value", "Join")
-                                .attr("title", "Join this Group")
-                            // Update Courp member count in Group-dashboard
-                            $(".grp_mem_count")
-                                .text(grp_mem_count)
-                                .attr('value',grp_mem_count)
-                        }
-                        else{
-                            $(this)
-                                .text("Add")
-                                .attr("id", "subscribe_to_grp")
-                        }
-                    }
-                }
-        });
     });
 
 

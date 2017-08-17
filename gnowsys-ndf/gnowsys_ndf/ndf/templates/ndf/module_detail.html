@@ -1,74 +1,42 @@
-{% extends "ndf/node_details_base.html" %}
+{% extends "ndf/gbase.html" %}
 {% load i18n %}
+
 {% block title %} {{title}} {% endblock %}
-{% block url %}{% url 'create_edit' groupid node %}{% endblock %}
 
-<!-- overide head block from base.html -->
-{% block head %}
-<!-- <script src="/static/ndf/js/tree.jquery.js"></script> -->
-<script src="/static/ndf/bower_components/jqtree/tree.jquery.js"></script> <!-- checked -->
-<script type="text/javascript">
-  $(document).ready(function()
-  {
-  $(function() {
-  $('.tree').tree({
-   autoOpen: 0
-  });
-  });
-  });
-</script>
-{% endblock %}
-
-<!-- overiding block from node_detail_base.html -->
-{% block meta_content %}
-
-{% endblock %}
-
-<!-- overiding block_related content -->
-{% block related_content %}
-<section class="medium-6 large-12 columns">
-  <h3>{% trans "Modules " %}</h3>
-  <div class ="row">
-    <!-- bellow div for making tree from json data -->
-    <div class="tree" data-url="{% url 'get_module_json' groupid %}?_id={{node.pk}}"></div>
-  </div>
-</section>
-{% endblock %}
-
-<!-- overiding block from node_detail_base.html -->
-{% block collection_content %}
-{% endblock %}
-
-<!-- overiding block from node_detail_base.html -->
 {% block body_content %}
-<header class="row page">
-  <section class="medium-2 columns">
-    
-    <div class="label-list"> 
-      {% for tag in node.tags %}
-      <span class="radius label">{{tag}}</span> 
-      {% endfor %}
-    </div>
-  </section>
-  <section class="medium-10 columns" >
-    <h2>
-      <span class='node'>{{node.name}}</span>
-      <!--<span><a class="button" href="{% url 'create_edit' groupid node.pk %}">Edit</a></span>-->
-    </h2>
-    <h3 class="subheader"></h3>
-      <small> 
-	{{ node.last_update|timesince }} {% trans "ago edited by  " %}<a class="user">{% trans "User " %}</a> <a href="#view-changes"><i class="fi-clock"></i> View history</a>
-      </small>
+{% include 'ndf/explore_secondary_header.html' %}
 
-  </section>
-</header>
 
-<div class="row">
-  {% with node.html_content|safe as description %}
-  {% if description != "None" %}
-  {{ description }}
-  {% endif %}
-  {% endwith %}
-</div>
+		<div class="title-strip">
+			{% trans "Showing all Units in" %}<h7 class="text-button-blue">{{node.name}} </h7><br/>
+			{% trans "Module Description:" %}<h7 class="text-button-blue">{{node.content|safe}}</h7>
+			
+			{% if is_gstaff or node.created_by == request.user.id  %}
+			<a  class="buddy_margin right" href="{% url 'module_edit' group_id node.pk %}"><i class="fa fa-pencil"></i> {% trans "Edit" %}</a>
+			{% endif %}
+		</div>
+
+
+
+{# {% include 'ndf/card_group.html' with node %} #}
+
+
+<!-- Existing card list-->
+
+
+
+<ul class="small-block-grid-1 medium-block-grid-2 large-block-grid-4" >
+<!-- Existing card list-->
+	{% for each_node in units_under_module  %}
+    <li class="card-image-wrapper" >
+			{% include 'ndf/card_group.html' with node=each_node  url_name='groupchange' first_arg=each_node.pk  %}	
+	</li>
+	{% endfor %}
+</ul>
+
 
 {% endblock %}
+
+
+
+

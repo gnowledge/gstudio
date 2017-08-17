@@ -1,0 +1,11 @@
+	<ul class="small-block-grid-1 medium-block-grid-3 large-block-grid-3" >
+    {% for each in templates_cur %}
+
+    <li class="template-list">
+            <div class="templates-div" data-content="{{each.content}}">
+             {{each.name}}
+            </div>
+
+    </li>
+    {% endfor %}
+  </ul>

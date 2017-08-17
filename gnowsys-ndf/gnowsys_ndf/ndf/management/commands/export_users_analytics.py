@@ -12,7 +12,7 @@ from django.core.management.base import BaseCommand, CommandError
 # from django.contrib.auth.models import User
 
 ''' imports from application folders/files '''
-from gnowsys_ndf.ndf.models import Group, node_collection
+from gnowsys_ndf.ndf.models import Group, GSystemType, node_collection
 from gnowsys_ndf.settings import GSTUDIO_LOGS_DIR_PATH, GSTUDIO_DATA_ROOT
 from gnowsys_ndf.ndf.views.gcourse import course_analytics
 # from gnowsys_ndf.ndf.views.methods import get_group_name_id
@@ -36,11 +36,12 @@ log_file.write(str(script_start_str))
 class Command(BaseCommand):
 
     def handle(self, *args, **options):
+        gst_base_unit_name, gst_base_unit_id = GSystemType.get_gst_name_id('announced_unit')
         gst_course_ev_gr = node_collection.one({'_type': 'GSystemType', 'name': 'CourseEventGroup'})
-        all_course_groups = node_collection.find({'_type': 'Group', 'member_of': {'$in': [gst_course_ev_gr._id]}})
+        all_course_groups = node_collection.find({'_type': 'Group', 'member_of': {'$in': [gst_course_ev_gr._id, gst_base_unit_id]}})
 
         for each_group_obj in all_course_groups:
-            print "\n\n Exporting CSV for: ", each_group_obj.name, "(", each_group_obj.altnames, ")\n"
+            print "\n\n Exporting CSV for :", each_group_obj.name, "(Altnames:", each_group_obj.altnames, ")\n"
             export_group_analytics(each_group_obj)
 
 
@@ -62,7 +63,7 @@ def export_group_analytics(group_obj):
             group_name = slugify(group_obj['name'])
         except Exception, e:
             print e
-            group_name = 'i2c'
+            group_name = str(group_obj['_id'])
 
         # dt: date time
         # e.g: '21-November-2016-19h-08m-10s'
@@ -81,19 +82,48 @@ def export_group_analytics(group_obj):
         for index, each_user in enumerate(group_users):
             try:
                 analytics_data = course_analytics(None, group_obj._id, each_user, get_result_dict=True)
+                analytics_data['school_id'] = GSTUDIO_INSTITUTE_ID
+                analytics_data['unit_name'] = group_name
+                if not analytics_data:
+                    continue
+
                 # refactor dict:
                 analytics_data.pop('users_points_breakup')
                 analytics_data.pop('users_points')
 
-                temp_units_stat_str = analytics_data['units_progress_stmt']
-                analytics_data['units_completed'] = int(temp_units_stat_str.split(' ')[0])
-                analytics_data['total_units'] = int(temp_units_stat_str.split(' ')[3])
-                analytics_data.pop('units_progress_stmt')
+                try:
+                    temp_units_stat_str = analytics_data['units_progress_stmt']
+                    temp_units_stat_str = analytics_data['units_progress_stmt']
+                    analytics_data['units_completed'] = int(temp_units_stat_str.split(' ')[0])
+                    analytics_data['total_units'] = int(temp_units_stat_str.split(' ')[3])
+                    analytics_data.pop('units_progress_stmt')
 
-                temp_modules_stat_str = analytics_data['module_progress_stmt']
-                analytics_data['modules_completed'] = int(temp_modules_stat_str.split(' ')[0])
-                analytics_data['total_modules'] = int(temp_modules_stat_str.split(' ')[3])
-                analytics_data.pop('module_progress_stmt')
+                    temp_modules_stat_str = analytics_data['module_progress_stmt']
+                    analytics_data['modules_completed'] = int(temp_modules_stat_str.split(' ')[0])
+                    analytics_data['total_modules'] = int(temp_modules_stat_str.split(' ')[3])
+                    analytics_data.pop('module_progress_stmt')
+
+                except Exception, e:
+                    temp_lessons_stat_str = analytics_data['level1_progress_stmt']
+                    temp_lessons_stat_str = analytics_data['level1_progress_stmt']
+                    analytics_data['lessons_completed'] = int(temp_lessons_stat_str.split(' ')[0])
+                    analytics_data['total_lessons'] = int(temp_lessons_stat_str.split(' ')[3])
+                    analytics_data.pop('level1_progress_stmt')
+
+                    temp_activities_stat_str = analytics_data['level2_progress_stmt']
+                    analytics_data['activities_completed'] = int(temp_activities_stat_str.split(' ')[0])
+                    analytics_data['total_activities'] = int(temp_activities_stat_str.split(' ')[3])
+                    analytics_data.pop('level2_progress_stmt')
+
+                    # remove non required fields
+                    analytics_data.pop('level1_lbl')
+                    analytics_data.pop('level2_lbl')
+
+                    analytics_data['percentage_lessons_completed'] = analytics_data['level1_progress_meter']
+                    analytics_data['percentage_activities_completed'] = analytics_data['level2_progress_meter']
+                    analytics_data.pop('level1_progress_meter')
+                    analytics_data.pop('level2_progress_meter')
+
                 # print analytics_data
 
                 with open(file_name_path, 'a') as f:  # Just use 'w' mode in 3.x
@@ -103,6 +133,7 @@ def export_group_analytics(group_obj):
                     w.writerow(analytics_data)
 
             except Exception, e:
+                print e
                 print "\nUser with id: " + str(each_user) + " does not exists!!"
                 continue
                 

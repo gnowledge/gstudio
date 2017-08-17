@@ -12,15 +12,14 @@
 <style type="text/css">
     #group_imgs_on_modal{
         overflow-y: auto;
-        height:600px;        
+        height:600px;
     }
 </style>
-
 {% trans var_placeholder as content %}
 
 <textarea id="ckeditor_textarea"  class="ckeditor_textarea" name="{{var_name}}" placeholder="{% blocktrans %}  {{content}} {% endblocktrans %}" value="{{var_value}}" rows="10" cols="80"> {{var_value}} </textarea>
 
-<div id="group_imgs_on_modal" class="reveal-modal" data-reveal aria-labelledby="modalTitle" aria-hidden="true" role="dialog" >
+<div id="group_imgs_on_modal" class="reveal-modal editor_modal" data-reveal aria-labelledby="modalTitle" aria-hidden="true" role="dialog" >
 </div>
 <script>
     if("{{ckeditor_toolbar}}" == "GgallaryCommentsToolbar"){
@@ -32,6 +31,7 @@
     }
     // Replace the <textarea id="editor1"> with a CKEditor
     // instance, using default configuration.
+
     CKEDITOR.replace( 'ckeditor_textarea',{
         enterMode : Number(2), //override default behaviour that adds <p></p> in ck editor
         toolbar:'{{ckeditor_toolbar}}',
@@ -41,6 +41,8 @@
         textarea_id: 'ckeditor_textarea',
         customConfig : '/static/ndf/js/ckeditor-config.js',
         height : ckeditor_height,
+        contentsCss : '/static/ndf/css/clix-activity-styles.css',
+
         // toolbar :
         //                                     [
         //                                         { name: 'basicstyles', items : [ 'Bold','Italic' ] },
@@ -48,4 +50,10 @@
         //                                         { name: 'tools', items : [ 'Maximize','-','About' ,'addImage'] }
         //                                     ]
     });
+
+    function setCurrNodeEdit(oid)
+    {
+        // document.getElementById("currently-edited-row").setAttribute("data-edited-row-id", oid);
+    }
+
 </script>

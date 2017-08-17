@@ -1,0 +1,158 @@
+{% load i18n %}
+{% load ndf_tags %}
+    <div id="addActivityPage" >
+        <form id ="course_page_form" enctype="multipart/form-data" method="post" action="{% url 'save_course_page' group_id %}">{% csrf_token %}
+            <div>
+                <div class="small-12 columns">
+                    <!-- <div class="small-4 columns name-div"> -->
+                    <label style="margin-left:5px">{% trans "Unique Name:" %}</label>
+                        <input type="text" class="node_name" name="name" placeholder="Enter name of Page" value="{{activity_node.name}}" style="border-radius: 5px; margin-top: 11px;">
+                        <label class="node_name_empty hide" style="color:red">{% trans "Please enter Name" %}</label>
+                        <label style="margin-left:5px" >{% trans "Display Name:" %}</label>
+                        <input type="text" class="node_altname" name="alt_name" placeholder="Enter display name of Page"  value="{{activity_node.altnames}}" style="border-radius: 5px; margin-top: 11px;">
+                        <label class="node_altname_empty hide" style="color:red">{% trans "Please enter display Name" %}</label>
+                    <!-- </div> -->
+                </div>
+                    
+                    <div class="small-5 columns">
+                            <select class="activity-lang" name="lan" id="activity_lang" >
+                                {% get_language_info_list for LANGUAGES as languages %}
+                                {% for language in languages %}
+                                    {% if activity_node.language.0 == language.code %}
+                                        <option selected data-sub-lang="{{ language.name }}" data-sub-code="{{ language.code }}">
+                                          {{ language.name }}
+                                    {% else %}
+                                        <option data-sub-lang="{{ language.name }}" data-sub-code="{{ language.code }}">
+                                          {{ language.name }}
+                                        </option>
+                                    {% endif %}
+                                {% endfor %}
+                              </select>
+                    </div>
+
+                    <div class="small-4 columns">
+                        <a class="right orange-button-template existing-template">{% trans "Create page from existing template" %}</a>
+                    </div>
+                    {% if activity_node %}
+                    <div class="small-3 columns ">
+                        <button type="button" class="orange-button edit-activity-metadata right">{% trans "Edit Metadata" %}</button>
+                    </div>
+                    {% endif %}
+
+
+                <hr/>
+                
+                <input type="hidden" name="node_id" class="form_node_id" value="{{activity_node.pk}}">
+                <input type="hidden" name="page_type" class="form_node_id" value="{{page_type}}">
+                <div class="row">
+                    <div class="asset-tags-container">
+                        <label>
+                        {% trans "Add Tags:" %}    
+                        </label>
+                         {% include 'ndf/widget_tags.html' with node=activity_node hide_lbl=True %}
+                    </div>
+                </div>
+
+                
+                <div class="small-12 columns editor-div">
+                    {% include "ndf/html_editor.html" with var_name="content_org" var_placeholder="Enter the content here" ckeditor_toolbar="GeneralToolbar" var_value=activity_node.content %}
+                </div>
+
+
+                <div class="row">
+
+                <input type="submit" class="orange-button" style="margin-left: 21px" class="saveActivityPage" value="Save">
+
+                <a href="{{cancel_activity_url}}" class="orange-button cancel-page-create">{% trans "Cancel" %}</a>
+
+                </div>
+            </div>
+        </form>
+    </div>
+    <div id="templates-div" class="reveal-modal medium" data-reveal aria-hidden="true" role="dialog">
+        <div class="templates-content"></div>
+        <a class="close-reveal-modal" >&#215;</a>
+    </div>
+
+<script type="text/javascript">
+
+
+    $(document).on('submit','#course_page_form',function(event){
+        node_name_val = $(".node_name").val()
+        node_altname_val = $(".node_altname").val()
+        updateAllTags();
+        var tagsStr = tags.value.trim();
+        if(checkTag())
+        {
+            $("input:hidden[name='tags']").val($("input:hidden[name='tags']").val() + ', ' + tagsStr);
+        }
+        else if(tagsStr)
+        {
+            event.preventDefault();
+        }
+        if(!node_name_val){
+            event.preventDefault()
+            $('.node_name_empty').removeClass('hide')
+        }
+        else{
+            $('.node_name_empty').addClass('hide')
+        }
+
+        if(!node_altname_val){
+            event.preventDefault()
+            $('.node_altname_empty').removeClass('hide')
+        }
+        else{
+            $('.node_altname_empty').addClass('hide')
+        }
+    
+    })
+
+
+
+    $( ".existing-template" ).click(function() {
+        $.ajax({
+            type: "GET",
+            url: "{% url 'get_templates_page' groupid %}",
+            datatype: "html",
+            data:{
+
+            },
+            success: function(data) {
+                $(".templates-content").html(data);
+                $('#templates-div').foundation('reveal', 'open');
+            }
+        });
+    });
+
+    $( ".edit-activity-metadata" ).click(function(event) {
+        $.ajax({
+                  type: "POST",
+                  data:{
+                        'csrfmiddlewaretoken': "{{csrf_token}}",
+                        "node_id":'{{activity_node.pk}}',
+                    },
+                  url: "{% url 'get_metadata_page' groupid  %}",
+                  datatype: "html",
+                  success: function(data) {
+                  $('#addAsset').foundation('reveal', 'open');
+                  $('#addAsset').html(data);
+                }
+            });
+    });
+
+    $( ".saveActivityPage" ).click(function(event) {
+        updateAllTags();
+        var tagsStr = tags.value.trim();
+        if(checkTag())
+        {
+            $("input:hidden[name='tags']").val($("input:hidden[name='tags']").val() + ', ' + tagsStr);
+        }
+        else if(tagsStr)
+        {
+            event.preventDefault();
+        }
+    });
+
+
+</script>

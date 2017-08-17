@@ -20,10 +20,10 @@ from gnowsys_ndf.ndf.templatetags.ndf_tags import get_relation_value
 from gnowsys_ndf.ndf.views.methods import get_execution_time, create_grelation_list, node_thread_access, get_group_name_id
 gapp_mt = node_collection.one({'_type': "MetaType", 'name': META_TYPE[0]})
 GST_VIDEO = node_collection.one({'member_of': gapp_mt._id, 'name': GAPPS[4]})
-
+file_gst = node_collection.find_one( { "_type" : "GSystemType","name":"File" } )
 
 @get_execution_time
-def videoDashboard(request, group_id, video_id):
+def videoDashboard(request, group_id):
     # ins_objectid  = ObjectId()
     # if ins_objectid.is_valid(group_id) is False :
     #     group_ins = node_collection.find_one({'_type': "Group","name": group_id})
@@ -40,15 +40,41 @@ def videoDashboard(request, group_id, video_id):
         group_id = ObjectId(group_id)
     except:
         group_name, group_id = get_group_name_id(group_id)
+    files_cur = node_collection.find({
+                                        '_type': {'$in': ["GSystem"]},
+                                        'member_of': file_gst._id,
+                                        'group_set': {'$all': [ObjectId(group_id)]},
+                                        'if_file.mime_type': {'$regex': 'video'},
+                                        'status' : { '$ne': u"DELETED" }
 
-    if video_id is None:
-        video_ins = node_collection.find_one({'_type':"GSystemType", "name":"Video"})
-        if video_ins:
-            video_id = str(video_ins._id)
-    vid_col = node_collection.find({'member_of': {'$all': [ObjectId(video_id)]},'_type':'File', 'group_set': {'$all': [group_id]}})
+                                        # 'created_by': {'$in': gstaff_users},
+                            # '$or': [
+                                    # {
+                                    # },
+                                    # {
+                                    #     '$or': [
+                                    #             {'access_policy': u"PUBLIC"},
+                                    #             {
+                                    #                 '$and': [
+                                    #                         {'access_policy': u"PRIVATE"},
+                                    #                         {'created_by': request.user.id}
+                                    #                     ]
+                                    #             }
+                                    #         ],
+                                    # }
+                                    # {    'collection_set': {'$exists': "true", '$not': {'$size': 0} }}
+                                # ]
+                        },
+                        {
+                            'name': 1,
+                            '_id': 1,
+                            'fs_file_ids': 1,
+                            'member_of': 1,
+                            'mime_type': 1,
+                            'if_file':1
+                        }).sort("last_update", -1)
     template = "ndf/videoDashboard.html"
-    already_uploaded=request.GET.getlist('var',"")
-    variable = RequestContext(request, {'videoCollection':vid_col, 'already_uploaded':already_uploaded, 'newgroup':group_id})
+    variable = RequestContext(request, {'group_id':group_id,'groupid':group_id,'files_cur':files_cur})
     return render_to_response(template, variable)
 @get_execution_time
 def getvideoThumbnail(request, group_id, _id):

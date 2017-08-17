@@ -53,7 +53,10 @@
     "jquery": "#2.2.1",
     "blueimp-canvas-to-blob": "#3.3.0",
     "jsmol": "#1.1.0",
-    "rubik-googlefont": "#a23ec91574"
+    "rubik-googlefont": "#a23ec91574",
+    "MathJax": "2.7.0",
+    "jquery-backstretch": "^2.1.15",
+    "datatables-rowsgroup": "1.0.0"
   },
   "resolutions": {
     "jquery": "2.2.1"

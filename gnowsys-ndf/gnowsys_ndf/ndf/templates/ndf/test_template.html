@@ -1,0 +1,7 @@
+{% extends "ndf/gbase.html" %}
+{% load i18n %}
+{% load ndf_tags %}
+{% block body_content %}
+{% get_node_hierarchy node as node_hierarchy %}
+{% include "ndf/section_subsection.html" with unit_structure=node_hierarchy unit_obj=node group_id=node.pk section_name="Topic" sub_section_name="Activity"  %}
+{% endblock body_content %}

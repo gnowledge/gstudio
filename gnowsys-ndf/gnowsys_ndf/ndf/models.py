@@ -19,6 +19,8 @@ from django.contrib.sessions.models import Session
 from django.db import models
 from django.http import HttpRequest
 from celery import task
+from django.template.defaultfilters import slugify
+from django.core.cache import cache
 
 from django_mongokit import connection
 from django_mongokit import get_database
@@ -45,7 +47,7 @@ from gnowsys_ndf.settings import GSTUDIO_DEFAULT_COPYRIGHT, GSTUDIO_DEFAULT_LICE
 from gnowsys_ndf.settings import META_TYPE
 from gnowsys_ndf.settings import GSTUDIO_BUDDY_LOGIN
 from gnowsys_ndf.ndf.rcslib import RCS
-from gnowsys_ndf.ndf.views.utils import add_to_list
+from gnowsys_ndf.ndf.views.utils import add_to_list, cast_to_data_type
 
 
 NODE_TYPE_CHOICES = (
@@ -66,6 +68,10 @@ NODE_TYPE_CHOICES = (
     ('Process')
 )
 
+NODE_ACCESS_POLICY = (
+    ('PUBLIC'),
+    ('PRIVATE')
+)
 
 TYPES_OF_GROUP = (
     ('PUBLIC'),
@@ -305,7 +311,7 @@ class Node(DjangoDocument):
                         'language': ('en', 'English'),
                         'type_of': [],
                         'member_of': [],
-                        'access_policy': u'',
+                        'access_policy': u'PUBLIC',
                         'created_at': datetime.datetime.now,
                         # 'created_by': int,
                         'last_update': datetime.datetime.now,
@@ -324,10 +330,17 @@ class Node(DjangoDocument):
                         # 'comment_enabled': bool,
                         # 'login_required': bool,
                         # 'password': basestring,
-                        'status': u'DRAFT',
+                        'status': u'PUBLISHED',
                         'rating':[],
                         'snapshot':{}
                     }
+
+    validators = {
+        'name': lambda x: x.strip() not in [None, ''],
+        'created_by': lambda x: isinstance(x, int) and (x != 0),
+        'access_policy': lambda x: x in (list(NODE_ACCESS_POLICY) + [None])
+    }
+
     use_dot_notation = True
 
 
@@ -346,208 +359,248 @@ class Node(DjangoDocument):
     # custom methods provided for Node class
     def fill_node_values(self, request=HttpRequest(), **kwargs):
 
-        # 'name': unicode,
-        if kwargs.has_key('name'):
-            self.name = kwargs.get('name', '')
-        elif request:
-            self.name = request.POST.get('name', '').strip()
-        self.name = unicode(self.name)
+        user_id = kwargs.get('created_by', None)
+        # dict to sum both dicts, kwargs and request.POST
+        values_dict = {}
+        if request:
+            if request.POST:
+                values_dict.update(request.POST.dict())
+            if (not user_id) and request.user:
+                user_id = request.user.id
+        # adding kwargs dict later to give more priority to values passed via kwargs.
+        values_dict.update(kwargs)
 
-        # 'altnames': unicode,
-        if kwargs.has_key('altnames'):
-            self.altnames = kwargs.get('altnames', self.name)
-        elif request:
-            self.altnames = request.POST.get('altnames', self.name).strip()
-        self.altnames = unicode(self.altnames)
+        # handling storing user id values.
+        if user_id:
+            if not self['created_by'] and ('created_by' not in values_dict):
+                # if `created_by` field is blank i.e: it's new node and add/fill user_id in it.
+                # otherwise escape it (for subsequent update/node-modification).
+                values_dict.update({'created_by': user_id})
+            if 'modified_by' not in values_dict:
+                values_dict.update({'modified_by': user_id})
+            if 'contributors' not in values_dict:
+                values_dict.update({'contributors': add_to_list(self.contributors, user_id)})
 
-        # 'plural': unicode,
-        if kwargs.has_key('plural'):
-            self.plural = kwargs.get('plural', None)
-        elif request:
-            self.plural = request.POST.get('plural', None)
-        # self.plural = unicode(plural)
+        # filter keys from values dict there in node structure.
+        node_str = Node.structure
+        node_str_keys_set = set(node_str.keys())
+        values_dict_keys_set = set(values_dict.keys())
 
-        # 'prior_node': [ObjectId],
-        if kwargs.has_key('prior_node'):
-            self.prior_node = kwargs.get('prior_node', [])
-        elif request:
-            self.prior_node = request.POST.get('prior_node', [])
-        # self.prior_node = prior_node
-        if self.prior_node and not isinstance(self.prior_node, list):
-            self.prior_node = [ObjectId(each) for each in self.prior_node]
+        for each_key in values_dict_keys_set.intersection(node_str_keys_set):
+            temp_prev_val = self[each_key]
+            # checking for proper casting for each field
+            if isinstance(node_str[each_key], type):
+                node_str_data_type = node_str[each_key].__name__
+            else:
+                node_str_data_type = node_str[each_key]
+            casted_new_val = cast_to_data_type(values_dict[each_key], node_str_data_type)
+            # check for uniqueness and addition of prev values for dict, list datatype values
+            self[each_key] = casted_new_val
 
-        # 'post_node': [ObjectId]
-        if kwargs.has_key('post_node'):
-            self.post_node = kwargs.get('post_node', [])
-        elif request:
-            self.post_node = request.POST.get('post_node', [])
-        # self.post_node = post_node
-        if self.post_node and not isinstance(self.post_node, list):
-            self.post_node = [ObjectId(each) for each in self.post_node]
 
-        # 'language': (basestring, basestring)
-        if kwargs.has_key('language'):
-            self.language = kwargs.get('language', ('en', 'English'))
-        elif request:
-            self.language = request.POST.get('language', ('en', 'English'))
-        # self.language = language
+        # # 'name': unicode,
+        # name = self.name
+        # if kwargs.has_key('name'):
+        #     name = kwargs.get('name', '')
+        # elif request:
+        #     name = request.POST.get('name', '').strip()
+        # self.name = unicode(name) if name else self.name
 
-        # 'type_of': [ObjectId]
-        if kwargs.has_key('type_of'):
-            self.type_of = kwargs.get('type_of', [])
-        elif request:
-            self.type_of = request.POST.get('type_of', [])
-        # self.type_of = type_of
-        if self.type_of and not isinstance(self.type_of, list):
-            self.type_of = [ObjectId(each) for each in self.type_of]
+        # # 'altnames': unicode,
+        # if kwargs.has_key('altnames'):
+        #     self.altnames = kwargs.get('altnames', self.name)
+        # elif request:
+        #     self.altnames = request.POST.get('altnames', self.name).strip()
+        # self.altnames = unicode(self.altnames)
 
-        # 'member_of': [ObjectId]
-        if kwargs.has_key('member_of'):
-            self.member_of = kwargs.get('member_of', [])
-        elif request:
-            self.member_of = request.POST.get('member_of', [])
-        self.member_of = [ObjectId(self.member_of)] if self.member_of and not isinstance(self.member_of, list) else self.member_of
-        # if member_of and not isinstance(member_of, list):
-        #     self.member_of = [ObjectId(each) for each in member_of]
+        # # 'plural': unicode,
+        # if kwargs.has_key('plural'):
+        #     self.plural = kwargs.get('plural', None)
+        # elif request:
+        #     self.plural = request.POST.get('plural', None)
+        # # self.plural = unicode(plural)
 
-        # 'access_policy': unicode
-        if kwargs.has_key('access_policy'):
-            self.access_policy = kwargs.get('access_policy', u'PUBLIC')
-        elif request:
-            self.access_policy = request.POST.get('access_policy', u'PUBLIC')
-        # self.access_policy = unicode(access_policy)
+        # # 'prior_node': [ObjectId],
+        # if kwargs.has_key('prior_node'):
+        #     self.prior_node = kwargs.get('prior_node', [])
+        # elif request:
+        #     self.prior_node = request.POST.get('prior_node', [])
+        # # self.prior_node = prior_node
+        # if self.prior_node and not isinstance(self.prior_node, list):
+        #     self.prior_node = [ObjectId(each) for each in self.prior_node]
 
-        # 'created_at': datetime.datetime
-        #   - this will be system generated (while instantiation time), always.
+        # # 'post_node': [ObjectId]
+        # if kwargs.has_key('post_node'):
+        #     self.post_node = kwargs.get('post_node', [])
+        # elif request:
+        #     self.post_node = request.POST.get('post_node', [])
+        # # self.post_node = post_node
+        # if self.post_node and not isinstance(self.post_node, list):
+        #     self.post_node = [ObjectId(each) for each in self.post_node]
 
-        # 'last_update': datetime.datetime,
-        #   - this will be system generated (from save method), always.
+        # # 'language': (basestring, basestring)
+        # if kwargs.has_key('language'):
+        #     self.language = kwargs.get('language', ('en', 'English'))
+        # elif request:
+        #     self.language = request.POST.get('language', ('en', 'English'))
+        # # self.language = language
 
-        created_by = 0
-        # 'created_by': int
-        if not self.created_by:
-            if kwargs.has_key('created_by'):
-                self.created_by = kwargs.get('created_by', '')
-            elif request and ('user' in request):
-                self.created_by = request.user.id
-            self.created_by = int(self.created_by) if self.created_by else 0
+        # # 'type_of': [ObjectId]
+        # if kwargs.has_key('type_of'):
+        #     self.type_of = kwargs.get('type_of', [])
+        # elif request:
+        #     self.type_of = request.POST.get('type_of', [])
+        # # self.type_of = type_of
+        # if self.type_of and not isinstance(self.type_of, list):
+        #     self.type_of = [ObjectId(each) for each in self.type_of]
 
-        modified_by = 0
-        # 'modified_by': int, # test required: only ids of Users
-        if kwargs.has_key('modified_by'):
-            self.modified_by = kwargs.get('modified_by', None)
-        elif request:
-            if hasattr(request, 'user'):
-                self.modified_by = request.user.id
-            elif kwargs.has_key('created_by'):
-                self.modified_by = self.created_by
-        self.modified_by = int(self.modified_by) if self.modified_by else self.created_by
+        # # 'member_of': [ObjectId]
+        # if kwargs.has_key('member_of'):
+        #     self.member_of = kwargs.get('member_of', [])
+        # elif request:
+        #     self.member_of = request.POST.get('member_of', [])
+        # self.member_of = [ObjectId(self.member_of)] if self.member_of and not isinstance(self.member_of, list) else self.member_of
+        # # if member_of and not isinstance(member_of, list):
+        # #     self.member_of = [ObjectId(each) for each in member_of]
 
-        contributors = []
-        # 'contributors': [int]
-        if kwargs.has_key('contributors'):
-            self.contributors = kwargs.get('contributors', [self.created_by])
-        elif request:
-            self.contributors = request.POST.get('contributors', [self.created_by])
-        self.contributors = contributors
-        if self.contributors and not isinstance(self.contributors, list):
-            self.contributors = [int(each) for each in self.contributors]
+        # # 'access_policy': unicode
+        # if kwargs.has_key('access_policy'):
+        #     self.access_policy = kwargs.get('access_policy', u'PUBLIC')
+        # elif request:
+        #     self.access_policy = request.POST.get('access_policy', u'PUBLIC')
+        # # self.access_policy = unicode(access_policy)
 
-        # 'location': [dict]
-        if kwargs.has_key('location'):
-            self.location = kwargs.get('location', [])
-        elif request:
-            self.location = request.POST.get('location', [])
-            self.location = list(self.location) if not isinstance(self.location, list) else self.location
+        # # 'created_at': datetime.datetime
+        # #   - this will be system generated (while instantiation time), always.
 
-        # 'content': unicode
-        if kwargs.has_key('content'):
-            self.content = kwargs.get('content', '')
-        elif request:
-            self.content = request.POST.get('content', '')
-        self.content = unicode(self.content)
+        # # 'last_update': datetime.datetime,
+        # #   - this will be system generated (from save method), always.
 
-        # 'content_org': unicode
-        if kwargs.has_key('content_org'):
-            self.content_org = kwargs.get('content_org', '')
-        elif request:
-            self.content_org = request.POST.get('content_org', '')
-        self.content_org = unicode(self.content_org)
+        # created_by = 0
+        # # 'created_by': int
+        # if not self.created_by:
+        #     if kwargs.has_key('created_by'):
+        #         self.created_by = kwargs.get('created_by', '')
+        #     elif request and request.user.is_authenticated():
+        #         self.created_by = request.user.id
+        #     self.created_by = int(self.created_by) if self.created_by else 0
 
-        # 'group_set': [ObjectId]
-        if kwargs.has_key('group_set'):
-            self.group_set = kwargs.get('group_set', [])
-        elif request:
-            self.group_set = request.POST.get('group_set', [])
-        if self.group_set and not isinstance(self.group_set, list):
-            self.group_set = [ObjectId(each) for each in self.group_set]
+        # modified_by = 0
+        # # 'modified_by': int, # test required: only ids of Users
+        # if kwargs.has_key('modified_by'):
+        #     self.modified_by = kwargs.get('modified_by', None)
+        # elif request:
+        #     if hasattr(request, 'user'):
+        #         self.modified_by = request.user.id
+        #     elif kwargs.has_key('created_by'):
+        #         self.modified_by = self.created_by
+        # self.modified_by = int(self.modified_by) if self.modified_by else self.created_by
 
-        # 'collection_set': [ObjectId]
-        if kwargs.has_key('collection_set'):
-            self.collection_set = kwargs.get('collection_set', [])
-        elif request:
-            self.collection_set = request.POST.get('collection_set', [])
-        if self.collection_set and not isinstance(self.collection_set, list):
-            self.collection_set = [ObjectId(each) for each in self.collection_set]
+        # contributors = []
+        # self.contributors = contributors
+        # # 'contributors': [int]
+        # if kwargs.has_key('contributors'):
+        #     self.contributors = kwargs.get('contributors', [self.created_by])
+        # elif request:
+        #     self.contributors = request.POST.get('contributors', [self.created_by])
+        # if self.contributors and not isinstance(self.contributors, list):
+        #     self.contributors = [int(each) for each in self.contributors]
 
-        # 'property_order': []
-        if kwargs.has_key('property_order'):
-            self.property_order = kwargs.get('property_order', [])
-        elif request:
-            self.property_order = request.POST.get('property_order', [])
-        self.property_order = list(self.property_order) if not isinstance(self.property_order, list) else self.property_order
+        # # 'location': [dict]
+        # if kwargs.has_key('location'):
+        #     self.location = kwargs.get('location', [])
+        # elif request:
+        #     self.location = request.POST.get('location', [])
+        #     self.location = list(self.location) if not isinstance(self.location, list) else self.location
 
-        # 'start_publication': datetime.datetime,
-        if kwargs.has_key('start_publication'):
-            self.start_publication = kwargs.get('start_publication', None)
-        elif request:
-            self.start_publication = request.POST.get('start_publication', None)
+        # # 'content': unicode
+        # if kwargs.has_key('content'):
+        #     self.content = kwargs.get('content', '')
+        # elif request:
+        #     self.content = request.POST.get('content', '')
+        # self.content = unicode(self.content)
 
-        # self.start_publication = datetime.datetime(start_publication) if not isinstance(start_publication, datetime.datetime) elif request start_publication
+        # # 'content_org': unicode
+        # if kwargs.has_key('content_org'):
+        #     self.content_org = kwargs.get('content_org', '')
+        # elif request:
+        #     self.content_org = request.POST.get('content_org', '')
+        # self.content_org = unicode(self.content_org)
 
-        # 'tags': [unicode],
-        if kwargs.has_key('tags'):
-            self.tags = kwargs.get('tags', [])
-        elif request:
-            self.tags = request.POST.get('tags', [])
-        if self.tags and not isinstance(self.tags, list):
-            self.tags = [unicode(each.strip()) for each in self.tags.split(',')]
+        # # 'group_set': [ObjectId]
+        # if kwargs.has_key('group_set'):
+        #     self.group_set = kwargs.get('group_set', [])
+        # elif request:
+        #     self.group_set = request.POST.get('group_set', [])
+        # if self.group_set and not isinstance(self.group_set, list):
+        #     self.group_set = [self.group_set]
+        #     self.group_set = [ObjectId(each) for each in self.group_set]
 
-        # 'featured': bool,
-        if kwargs.has_key('featured'):
-            self.featured = kwargs.get('featured', None)
-        elif request:
-            self.featured = request.POST.get('featured', None)
-        self.featured = bool(self.featured)
+        # # 'collection_set': [ObjectId]
+        # if kwargs.has_key('collection_set'):
+        #     self.collection_set = kwargs.get('collection_set', [])
+        # elif request:
+        #     self.collection_set = request.POST.get('collection_set', [])
+        # if self.collection_set and not isinstance(self.collection_set, list):
+        #     self.collection_set = [ObjectId(each) for each in self.collection_set]
 
-        # 'url': unicode,
-        if kwargs.has_key('url'):
-            self.url = kwargs.get('url', None)
-        elif request:
-            self.url = request.POST.get('url', None)
-        self.url = unicode(self.url)
+        # # 'property_order': []
+        # if kwargs.has_key('property_order'):
+        #     self.property_order = kwargs.get('property_order', [])
+        # elif request:
+        #     self.property_order = request.POST.get('property_order', [])
+        # self.property_order = list(self.property_order) if not isinstance(self.property_order, list) else self.property_order
 
-        # 'comment_enabled': bool,
-        if kwargs.has_key('comment_enabled'):
-            self.comment_enabled = kwargs.get('comment_enabled', None)
-        elif request:
-            self.comment_enabled = request.POST.get('comment_enabled', None)
-        self.comment_enabled = bool(self.comment_enabled)
+        # # 'start_publication': datetime.datetime,
+        # if kwargs.has_key('start_publication'):
+        #     self.start_publication = kwargs.get('start_publication', None)
+        # elif request:
+        #     self.start_publication = request.POST.get('start_publication', None)
 
-        # 'login_required': bool,
-        if kwargs.has_key('login_required'):
-            self.login_required = kwargs.get('login_required', None)
-        elif request:
-            self.login_required = request.POST.get('login_required', None)
-        self.login_required = bool(self.login_required)
+        # # self.start_publication = datetime.datetime(start_publication) if not isinstance(start_publication, datetime.datetime) elif request start_publication
 
-        # 'status': STATUS_CHOICES_TU,
-        if kwargs.has_key('status'):
-            self.status = kwargs.get('status', u'DRAFT')
-        elif request:
-            self.status = request.POST.get('status', u'DRAFT')
-        self.status = unicode(self.status)
+        # # 'tags': [unicode],
+        # if kwargs.has_key('tags'):
+        #     self.tags = kwargs.get('tags', [])
+        # elif request:
+        #     self.tags = request.POST.get('tags', [])
+        # if self.tags and not isinstance(self.tags, list):
+        #     self.tags = [unicode(each.strip()) for each in self.tags.split(',')]
 
+        # # 'featured': bool,
+        # if kwargs.has_key('featured'):
+        #     self.featured = kwargs.get('featured', None)
+        # elif request:
+        #     self.featured = request.POST.get('featured', None)
+        # self.featured = bool(self.featured)
+
+        # # 'url': unicode,
+        # if kwargs.has_key('url'):
+        #     self.url = kwargs.get('url', None)
+        # elif request:
+        #     self.url = request.POST.get('url', None)
+        # self.url = unicode(self.url)
+
+        # # 'comment_enabled': bool,
+        # if kwargs.has_key('comment_enabled'):
+        #     self.comment_enabled = kwargs.get('comment_enabled', None)
+        # elif request:
+        #     self.comment_enabled = request.POST.get('comment_enabled', None)
+        # self.comment_enabled = bool(self.comment_enabled)
+
+        # # 'login_required': bool,
+        # if kwargs.has_key('login_required'):
+        #     self.login_required = kwargs.get('login_required', None)
+        # elif request:
+        #     self.login_required = request.POST.get('login_required', None)
+        # self.login_required = bool(self.login_required)
+
+        # # 'status': STATUS_CHOICES_TU,
+        # if kwargs.has_key('status'):
+        #     status = kwargs.get('status', u'DRAFT')
+        # else:
+        #     status = request.POST.get('status', u'DRAFT')
+        # self.status = unicode(status)
         # 'rating':[{'score':int, 'user_id':int, 'ip_address':basestring}],
         #       - mostly, it's on detail view and by AJAX and not in/within forms.
 
@@ -555,6 +608,33 @@ class Node(DjangoDocument):
         #       - needs to think on this.
 
         return self
+
+    @staticmethod
+    def get_node_by_id(node_id):
+        '''
+            Takes ObjectId or objectId as string as arg
+                and return object
+        '''
+        if node_id and (isinstance(node_id, ObjectId) or ObjectId.is_valid(node_id)):
+            return node_collection.one({'_id': ObjectId(node_id)})
+        else:
+            # raise ValueError('No object found with id: ' + str(node_id))
+            return None
+
+    @staticmethod
+    def get_nodes_by_ids_list(node_id_list):
+        '''
+            Takes list of ObjectIds or objectIds as string as arg
+                and return list of object
+        '''
+        try:
+            node_id_list = map(ObjectId, node_id_list)
+        except:
+            node_id_list = [ObjectId(nid) for nid in node_id_list if nid]
+        if node_id_list:
+            return node_collection.find({'_id': {'$in': node_id_list}})
+        else:
+            return None
 
 
     @staticmethod
@@ -574,6 +654,7 @@ class Node(DjangoDocument):
         return node_obj
 
 
+
     def type_of_names_list(self, smallcase=False):
         """Returns a list having names of each type_of (GSystemType, i.e Wiki page,
         Blog page, etc.), built from 'type_of' field (list of ObjectIds)
@@ -589,6 +670,65 @@ class Node(DjangoDocument):
         return type_of_names
 
 
+    @staticmethod
+    def get_name_id_from_type(node_name_or_id, node_type, get_obj=False):
+        '''
+        e.g:
+            Node.get_name_id_from_type('pink-bunny', 'Author')
+        '''
+        if not get_obj:
+            # if cached result exists return it
+
+            slug = slugify(node_name_or_id)
+            cache_key = node_type + '_name_id' + str(slug)
+            cache_result = cache.get(cache_key)
+
+            if cache_result:
+                # todo:  return OID after casting
+                return (cache_result[0], ObjectId(cache_result[1]))
+            # ---------------------------------
+
+        node_id = ObjectId(node_name_or_id) if ObjectId.is_valid(node_name_or_id) else None
+        node_obj = node_collection.one({
+                                        "_type": {"$in": [
+                                                # "GSystemType",
+                                                # "MetaType",
+                                                # "RelationType",
+                                                # "AttributeType",
+                                                # "Group",
+                                                # "Author",
+                                                node_type
+                                            ]},
+                                        "$or":[
+                                            {"_id": node_id},
+                                            {"name": unicode(node_name_or_id)}
+                                        ]
+                                    })
+
+        if node_obj:
+            node_name = node_obj.name
+            node_id = node_obj._id
+
+            # setting cache with ObjectId
+            cache_key = node_type + '_name_id' + str(slugify(node_id))
+            cache.set(cache_key, (node_name, node_id), 60 * 60)
+
+            # setting cache with node_name
+            cache_key = node_type + '_name_id' + str(slugify(node_name))
+            cache.set(cache_key, (node_name, node_id), 60 * 60)
+
+            if get_obj:
+                return node_obj
+            else:
+                return node_name, node_id
+
+        if get_obj:
+            return None
+        else:
+            return None, None
+
+
+
     ########## Setter(@x.setter) & Getter(@property) ##########
     @property
     def member_of_names_list(self):
@@ -596,31 +736,16 @@ class Node(DjangoDocument):
         File, etc.), built from 'member_of' field (list of ObjectIds)
 
         """
-        # member_of_names = []
-
-        # if self.member_of:
-        #     for each_member_id in self.member_of:
-        #         if type(each_member_id) == ObjectId:
-        #             _id = each_member_id
-        #         else:
-        #             _id = each_member_id['$oid']
-        #         if _id:
-        #             mem = node_collection.one({'_id': ObjectId(_id)})
-        #             if mem:
-        #                 member_of_names.append(mem.name)
-        # else:
-        #     if "gsystem_type" in self:
-        #         for each_member_id in self.gsystem_type:
-        #             if type(each_member_id) == ObjectId:
-        #                 _id = each_member_id
-        #             else:
-        #                 _id = each_member_id['$oid']
-        #             if _id:
-        #                 mem = node_collection.one({'_id': ObjectId(_id)})
-        #                 if mem:
-        #                     member_of_names.append(mem.name)
-        # return member_of_names
         return [GSystemType.get_gst_name_id(gst_id)[0] for gst_id in self.member_of]
+
+
+    @property
+    def group_set_names_list(self):
+        """Returns a list having names of each member (Group name),
+        built from 'group_set' field (list of ObjectIds)
+
+        """
+        return [Group.get_group_name_id(gr_id)[0] for gr_id in self.group_set]
 
 
     @property
@@ -762,7 +887,7 @@ class Node(DjangoDocument):
                 for each_invalid_field in invalid_struct_fields:
                     if each_invalid_field in self.structure:
                         self.structure.pop(each_invalid_field)
-                        # print "=== removed from structure", each_invalid_field, ' : ', 
+                        # print "=== removed from structure", each_invalid_field, ' : ',
 
 
             keys_list = self.structure.keys()
@@ -773,7 +898,7 @@ class Node(DjangoDocument):
                 for each_invalid_field in invalid_struct_fields_list:
                     if each_invalid_field in self:
                         self.pop(each_invalid_field)
-                        # print "=== removed ", each_invalid_field, ' : ', 
+                        # print "=== removed ", each_invalid_field, ' : ',
 
 
         except Exception, e:
@@ -896,7 +1021,7 @@ class Node(DjangoDocument):
             fp = history_manager.get_file_path(self)
 
             try:
-                rcs_obj.checkout(fp)
+                rcs_obj.checkout(fp, otherflags="-f")
             except Exception as err:
                 try:
                     if history_manager.create_or_replace_json_file(self):
@@ -1154,6 +1279,21 @@ class Node(DjangoDocument):
 
         return possible_relations
 
+
+    def get_attribute(self, attribute_type_name, status=None):
+        return GAttribute.get_triples_from_sub_type(self._id, attribute_type_name, status)
+
+    def get_attributes_from_names_list(self, attribute_type_name_list, status=None, get_obj=False):
+        return GAttribute.get_triples_from_sub_type_list(self._id, attribute_type_name_list, status, get_obj)
+
+    def get_relation(self, relation_type_name, status=None):
+        return GRelation.get_triples_from_sub_type(self._id, relation_type_name, status)
+
+
+    def get_relation_right_subject_nodes(self, relation_type_name, status=None):
+        return node_collection.find({'_id': {'$in': [r.right_subject for r in self.get_relation(relation_type_name)]} })
+
+
     def get_neighbourhood(self, member_of):
         """Attaches attributes and relations of the node to itself;
         i.e. key's types to it's structure and key's values to itself
@@ -1179,39 +1319,46 @@ class AttributeType(Node):
     '''
 
     structure = {
-	'data_type': basestring, # check required: only of the DATA_TYPE_CHOICES
-        'complex_data_type': [unicode], # can be a list or a dictionary
-        'subject_type': [ObjectId], # check required: only one of Type
+    'data_type': basestring, # check required: only of the DATA_TYPE_CHOICES
+    'complex_data_type': [unicode], # can be a list or a dictionary
+    'subject_type': [ObjectId], # check required: only one of Type
                                     # Nodes. GSystems cannot be set as
                                     # subject_types
-	'applicable_node_type': [basestring],	# can be one or more
+    'subject_scope': list,
+    'object_scope': list,
+    'attribute_type_scope': list,
+    'applicable_node_type': [basestring],	# can be one or more
                                                 # than one of
                                                 # NODE_TYPE_CHOICES
-
-	'verbose_name': basestring,
-	'null': bool,
-	'blank': bool,
-	'help_text': unicode,
-	'max_digits': int, # applicable if the datatype is a number
-	'decimal_places': int, # applicable if the datatype is a float
-	'auto_now': bool,
-	'auto_now_add': bool,
-	'upload_to': unicode,
-	'path': unicode,
-	'verify_exist': bool,
+    'verbose_name': basestring,
+    'null': bool,
+    'blank': bool,
+    'help_text': unicode,
+    'max_digits': int, # applicable if the datatype is a number
+    'decimal_places': int, # applicable if the datatype is a float
+    'auto_now': bool,
+    'auto_now_add': bool,
+    'upload_to': unicode,
+    'path': unicode,
+    'verify_exist': bool,
 
     #   raise issue y used
-	'min_length': int,
-	'required': bool,
-	'label': unicode,
-	'unique': bool,
-	'validators': list,
-	'default': unicode,
-	'editable': bool
+    'min_length': int,
+    'required': bool,
+    'label': unicode,
+    'unique': bool,
+    'validators': list,
+    'default': unicode,
+    'editable': bool
     }
 
     required_fields = ['data_type', 'subject_type']
     use_dot_notation = True
+    default_values = {
+                        'subject_scope': [],
+                        'object_scope': [],
+                        'attribute_type_scope': [],
+                    }
 
     # validators={
     # 'data_type':x in DATA_TYPE_CHOICES
@@ -1350,6 +1497,9 @@ class RelationType(Node):
         'inverse_name': unicode,
         'subject_type': [ObjectId],  # ObjectId's of Any Class
         'object_type': [OR(ObjectId, list)],  # ObjectId's of Any Class
+        'subject_scope': list,
+        'object_scope': list,
+        'relation_type_scope': list,
         'subject_cardinality': int,
         'object_cardinality': int,
         'subject_applicable_nodetype': basestring,  # NODE_TYPE_CHOICES [default (GST)]
@@ -1362,6 +1512,11 @@ class RelationType(Node):
 
     required_fields = ['inverse_name', 'subject_type', 'object_type']
     use_dot_notation = True
+    default_values = {
+                        'subject_scope': [],
+                        'object_scope': [],
+                        'relation_type_scope': [],
+                    }
 
     # User-Defined Functions ##########
     @staticmethod
@@ -1486,6 +1641,7 @@ class RelationType(Node):
         return rel_dict
 
 
+
 @connection.register
 class MetaType(Node):
     """MetaType class: Its members are any of GSystemType, AttributeType,
@@ -1538,38 +1694,15 @@ class GSystemType(Node):
     use_autorefs = True                         # To support Embedding of Documents
 
 
-    # @staticmethod
-    # def get_id_from_name(gst_name):
-    #     from django.template.defaultfilters import slugify
-    #     from django.core.cache import cache
-
-    #     slug = slugify(gst_name)
-    #     cache_key = 'gst_name_' + str(gst_name) if slug else str(abs(hash(gst_name)))
-    #     cache_result = cache.get(cache_key)
-
-    #     if cache_result:
-    #         return cache_result
-
-    #     # setting cache with both ObjectId and group_name
-    #     gst_id = node_collection.one(
-    #                                 {'_type': u'GSystemType', 'name': unicode(gst_name)},
-    #                                 {'_id': True}
-    #                             ).get('_id')
-    #     cache.set(cache_key, gst_id, 60 * 60)
-    #     return gst_id
-
     @staticmethod
     def get_gst_name_id(gst_name_or_id):
         # if cached result exists return it
-        from django.template.defaultfilters import slugify
-        from django.core.cache import cache
-
         slug = slugify(gst_name_or_id)
         cache_key = 'gst_name_id' + str(slug)
         cache_result = cache.get(cache_key)
 
         if cache_result:
-            return cache_result
+            return (cache_result[0], ObjectId(cache_result[1]))
         # ---------------------------------
 
         gst_id = ObjectId(gst_name_or_id) if ObjectId.is_valid(gst_name_or_id) else None
@@ -1628,7 +1761,7 @@ class GSystem(Node):
                                         #   {"csv-import": <fn name>},
                                         #   {"sync_source": "<system-pub-key>"}
                                         # ]
-        # Replace field 'license': basestring with 
+        # Replace field 'license': basestring with
         # legal: dict
         'legal': {
                     'copyright': basestring,
@@ -1651,7 +1784,6 @@ class GSystem(Node):
                             attribute_set=[],
                             relation_set=[],
                             author_set=[],
-                            legal={},
                             origin=[],
                             uploaded_file=None,
                             **kwargs):
@@ -1662,7 +1794,7 @@ class GSystem(Node):
         existing_file_gs = None
         existing_file_gs_if_file = None
 
-        if uploaded_file:
+        if "_id" not in self and uploaded_file:
 
             fh_obj = filehive_collection.collection.Filehive()
             existing_fh_obj = fh_obj.check_if_file_exists(uploaded_file)
@@ -1676,6 +1808,7 @@ class GSystem(Node):
             if kwargs.has_key('unique_gs_per_file') and kwargs['unique_gs_per_file']:
 
                 if existing_file_gs:
+                    print "Returning:: "
                     return existing_file_gs
 
         self.fill_node_values(request, **kwargs)
@@ -1712,12 +1845,13 @@ class GSystem(Node):
             self['if_file'] = existing_file_gs_if_file
 
         elif uploaded_file and not existing_file_gs:
-
             original_filehive_obj   = filehive_collection.collection.Filehive()
             original_file           = uploaded_file
 
-            mime_type = original_filehive_obj.get_file_mimetype(original_file)
             file_name = original_filehive_obj.get_file_name(original_file)
+            if not file_name:
+                file_name = self.name
+            mime_type = original_filehive_obj.get_file_mimetype(original_file, file_name)
             original_file_extension = original_filehive_obj.get_file_extension(file_name, mime_type)
 
             file_exists, original_filehive_obj = original_filehive_obj.save_file_in_filehive(
@@ -1773,6 +1907,22 @@ class GSystem(Node):
                             self.if_file[each_image_size]['id']    = each_image_size_id_url['id']
                             self.if_file[each_image_size]['relurl'] = each_image_size_id_url['relurl']
 
+        # Add legal information[copyright and license] to GSystem node
+        license = kwargs.get('license', None)
+        copyright = kwargs.get('copyright', None)
+
+        if license:
+            if self.legal['license'] is not license:
+                self.legal['license'] = license
+        else:
+            self.legal['license'] = GSTUDIO_DEFAULT_LICENSE
+
+        if copyright:
+            if self.legal['copyright'] is not copyright:
+                self.legal['copyright'] = copyright
+        else:
+            self.legal['copyright'] = GSTUDIO_DEFAULT_COPYRIGHT
+
         return self
 
 
@@ -1800,6 +1950,39 @@ class GSystem(Node):
 
         return file_blob
 
+
+    # static query methods
+    @staticmethod
+    def query_list(group_id, member_of_name, user_id=None):
+
+        group_name, group_id = Group.get_group_name_id(group_id)
+        gst_name, gst_id = GSystemType.get_gst_name_id(member_of_name)
+
+        return node_collection.find({
+                            '_type': 'GSystem',
+                            'group_set': {'$in': [group_id]},
+                            'member_of': {'$in': [gst_id]},
+                            '$or':[
+                                    {'access_policy': {'$in': [u'Public', u'PUBLIC']}},
+                                    # {'$and': [
+                                    #     {'access_policy': u"PRIVATE"},
+                                    #     {'created_by': user_id}
+                                    #     ]
+                                    # },
+                                    {'created_by': user_id}
+                                ]
+                        }).sort('last_update', -1)
+
+    @staticmethod
+    def child_class_names():
+        '''
+        Currently, this is hardcoded but it should be dynamic.
+        Try following:
+        import inspect
+        inspect.getmro(GSystem)
+        '''
+        return ['Group', 'Author', 'File']
+    # --- END of static query methods
 
 
 @connection.register
@@ -1987,6 +2170,7 @@ class Filehive(DjangoDocument):
         }
 
         file_name = file_name if file_name else file_blob.name if hasattr(file_blob, 'name') else ''
+
         file_metadata_dict['file_name'] = file_name
 
         file_mime_type = mime_type if mime_type else self.get_file_mimetype(file_blob)
@@ -2032,11 +2216,14 @@ class Filehive(DjangoDocument):
         return file_metadata_dict
 
 
-    def get_file_mimetype(self, file_blob):
-
+    def get_file_mimetype(self, file_blob, file_name=None):
         file_mime_type = ''
-        file_content_type = file_blob.content_type if hasattr(file_blob, 'content_type') else None
 
+        file_content_type = file_blob.content_type if hasattr(file_blob, 'content_type') else None
+        if file_name and "vtt" in file_name:
+            return "text/vtt"
+        if file_name and "srt" in file_name:
+            return "text/srt"
         if file_content_type and file_content_type != 'application/octet-stream':
             file_mime_type = file_blob.content_type
         else:
@@ -2051,7 +2238,6 @@ class Filehive(DjangoDocument):
 
         file_name = file_blob.name if hasattr(file_blob, 'name') else ''
         return file_name
-
 
     def get_file_extension(self, file_name, file_mime_type):
         # if uploaded file is of mimetype: 'text/plain':
@@ -2070,6 +2256,14 @@ class Filehive(DjangoDocument):
 
         if poss_ext in all_poss_ext:
             file_extension = poss_ext
+
+        elif poss_ext == '.vtt':
+            file_mime_type = 'text/vtt'
+            file_extension = '.vtt'
+
+        elif poss_ext == '.srt':
+            file_mime_type = 'text/srt'
+            file_extension = '.srt'
 
         elif file_mime_type == 'text/plain':
             file_extension = '.txt'
@@ -2137,7 +2331,6 @@ class Filehive(DjangoDocument):
             print "Exception in converting image to mid size: ", e
             return None
 
-
     def save(self, *args, **kwargs):
 
         is_new = False if ('_id' in self) else True
@@ -2164,7 +2357,7 @@ class Filehive(DjangoDocument):
             fp = history_manager.get_file_path(self)
 
             try:
-                rcs_obj.checkout(fp)
+                rcs_obj.checkout(fp, otherflags="-f")
 
             except Exception as err:
                 try:
@@ -2234,9 +2427,9 @@ class Group(GSystem):
         'disclosure_policy': basestring,     # Members of this group - disclosed or not
         'encryption_policy': basestring,     # Encryption - yes or no
         'agency_type': basestring,           # A choice field such as Pratner,Govt.Agency, NGO etc.
-
         'group_admin': [int],		     # ObjectId of Author class
-        'moderation_level': int              # range from 0 till any integer level
+        'moderation_level': int,              # range from 0 till any integer level
+        'project_config': dict
     }
 
     use_dot_notation = True
@@ -2293,8 +2486,6 @@ class Group(GSystem):
         '''
         # if cached result exists return it
         if not get_obj:
-            from django.template.defaultfilters import slugify
-            from django.core.cache import cache
 
             slug = slugify(group_name_or_id)
             # for unicode strings like hindi-text slugify doesn't works
@@ -2302,18 +2493,19 @@ class Group(GSystem):
             cache_result = cache.get(cache_key)
 
             if cache_result:
-                return cache_result
+                return (cache_result[0], ObjectId(cache_result[1]))
         # ---------------------------------
 
         # case-1: argument - "group_name_or_id" is ObjectId
         if ObjectId.is_valid(group_name_or_id):
 
-            group_obj = node_collection.one({"_id": ObjectId(group_name_or_id)})
+            group_obj = node_collection.one({"_id": ObjectId(group_name_or_id),
+                "_type": {"$in": ["Group", "Author"]}})
 
             # checking if group_obj is valid
             if group_obj:
                 # if (group_name_or_id == group_obj._id):
-                group_id = group_name_or_id
+                group_id = ObjectId(group_name_or_id)
                 group_name = group_obj.name
 
                 if get_obj:
@@ -2371,9 +2563,11 @@ class Group(GSystem):
 
         if (user.is_superuser) or (user.id == self.created_by) or (user.id in self.group_admin):
             return True
-
         else:
-            return False
+            auth_obj = node_collection.one({'_type': 'Author', 'created_by': user.id})
+            if auth_obj and auth_obj.agency_type == 'Teacher':
+                return True
+        return False
 
 
     @staticmethod
@@ -2516,6 +2710,7 @@ class Group(GSystem):
 
             for each in grp_res:
                 del_status, del_status_msg = delete_node(node_id=each._id, deletion_type=1 )
+                # print del_status, del_status_msg
                 if not del_status:
                     print "*"*80
                     print "\n Error node: _id: ", each._id, " , name: ", each.name, " type: ", each.member_of_names_list
@@ -2523,6 +2718,7 @@ class Group(GSystem):
 
             print "\n Purging group: "
             del_status, del_status_msg = delete_node(node_id=group_id, deletion_type=1)
+            print del_status, del_status_msg
 
             # poping group_id from each of shared nodes under group
             all_nodes_under_gr.rewind()
@@ -2532,10 +2728,10 @@ class Group(GSystem):
                     each_shared_node.group_set.remove(group_id)
                     each_shared_node.save()
 
-            return
+            return True
 
         print "\nAborting group deletion."
-        return
+        return True
 
 
 @connection.register
@@ -2587,6 +2783,10 @@ class Author(Group):
 
     def is_authenticated(self):
         return True
+
+    @staticmethod
+    def get_author_by_userid(user_id):
+        return node_collection.one({'_type': 'Author', 'created_by': user_id})
 
     @staticmethod
     def get_user_id_list_from_author_oid_list(author_oids_list=[]):
@@ -2899,7 +3099,7 @@ class HistoryManager():
 
         fp = self.get_file_path(document_object)
         rcs = RCS()
-        rcs.checkout((fp, version_no))
+        rcs.checkout((fp, version_no), otherflags="-f")
 
         json_data = ""
         with open(fp, 'r') as version_file:
@@ -2998,10 +3198,10 @@ class ActiveUsers(object):
         for session in sessions:
             data = session.get_decoded()
             user_id = data.get('_auth_user_id', 0)
-            # if user_id:
+            if user_id:
+                userid_session_key_dict[user_id] = session.session_key
             # uid_list_append(user_id)
             # session_key_list.append(session.session_key)
-            userid_session_key_dict[user_id] = session.session_key
 
         return userid_session_key_dict
 
@@ -3010,6 +3210,45 @@ class ActiveUsers(object):
         #     return User.objects.filter(id__in=uid_list).values_list('id', flat=True)
         # else:
         #     return User.objects.filter(id__in=uid_list)
+
+    @staticmethod
+    def logout_all_users():
+        """
+        Read all available users and all available not expired sessions. Then
+        logout from each session. This method also releases all buddies with each user session.
+        """
+        from django.utils.importlib import import_module
+        from django.conf import settings
+        from django.contrib.auth import logout
+        
+        request = HttpRequest()
+
+        # sessions = Session.objects.filter(expire_date__gte=timezone.now())
+        sessions = Session.objects.filter(expire_date__gte=timezone.now()).distinct('session_data')
+
+        # Experimental trial (aggregate query):
+        # unique_sessions_list = Session.objects.filter(expire_date__gte=timezone.now()).values('session_data').annotate(Count('session_data')).filter(session_data__count__lte=1)
+        
+        print('Found %d non-expired session(s).' % len(sessions))
+
+        for session in sessions:
+            try:
+                user_id = session.get_decoded().get('_auth_user_id')
+                engine = import_module(settings.SESSION_ENGINE)
+                request.session = engine.SessionStore(session.session_key)
+
+                request.user = User.objects.get(id=user_id)
+                print ('\nProcessing session of [ %d : "%s" ]\n' % (request.user.id, request.user.username))
+
+                logout(request)
+                print('- Successfully logout user with id: %r ' % user_id)
+
+            except Exception as e:
+                # print "Exception: ", e
+                pass
+
+        Buddy.sitewide_remove_all_buddies()
+
 
 
 # class DjangoActiveUsersGroup(object):
@@ -3130,14 +3369,87 @@ class Triple(DjangoDocument):
     '_type': unicode,
     'name': unicode,
     'subject_scope': basestring,
+    'object_scope': basestring,
     'subject': ObjectId,  # ObjectId's of GSystem Class
-    'lang': basestring,  # Put validation for standard language codes
+    'language': (basestring, basestring),  # e.g: ('en', 'English') or ['en', 'English']
     'status': STATUS_CHOICES_TU
   }
 
   required_fields = ['name', 'subject']
   use_dot_notation = True
   use_autorefs = True
+  default_values = {
+                      'subject_scope': None,
+                      'object_scope': None
+                  }
+
+  @classmethod
+  def get_triples_from_sub_type(cls, subject_id, gt_or_rt_name_or_id, status=None):
+        '''
+        getting triples from SUBject and TYPE (attribute_type or relation_type)
+        '''
+        triple_node_mapping_dict = {
+            'GAttribute': 'AttributeType',
+            'GRelation': 'RelationType'
+        }
+        triple_class_field_mapping_dict = {
+            'GAttribute': 'attribute_type',
+            'GRelation': 'relation_type'
+        }
+        gr_or_rt_name, gr_or_rt_id = Node.get_name_id_from_type(gt_or_rt_name_or_id,
+            triple_node_mapping_dict[cls._meta.verbose_name])
+
+        status = [status] if status else ['PUBLISHED', 'DELETED']
+
+        return triple_collection.find({
+                                    '_type': cls._meta.verbose_name,
+                                    'subject': ObjectId(subject_id),
+                                    triple_class_field_mapping_dict[cls._meta.verbose_name]: gr_or_rt_id,
+                                    'status': {'$in': status}
+                                })
+
+
+  @classmethod
+  def get_triples_from_sub_type_list(cls, subject_id, gt_or_rt_name_or_id_list, status=None, get_obj=True):
+        '''
+        getting triples from SUBject and TYPE (attribute_type or relation_type)
+        '''
+        triple_node_mapping_dict = {
+            'GAttribute': 'AttributeType',
+            'GRelation': 'RelationType'
+        }
+        triple_class_field_mapping_dict = {
+            'GAttribute': 'attribute_type',
+            'GRelation': 'relation_type'
+        }
+        triple_class_field_mapping_key_dict = {
+            'GAttribute': 'object_value',
+            'GRelation': 'right_subject'
+        }
+
+        if not isinstance(gt_or_rt_name_or_id_list, list):
+            gt_or_rt_name_or_id_list = [gt_or_rt_name_or_id_list]
+
+        gt_or_rt_id_name_dict = {}
+        for each_gr_or_rt in gt_or_rt_name_or_id_list:
+            gr_or_rt_name, gr_or_rt_id = Node.get_name_id_from_type(each_gr_or_rt,
+                triple_node_mapping_dict[cls._meta.verbose_name])
+            gt_or_rt_id_name_dict.update({gr_or_rt_id: gr_or_rt_name})
+
+        status = [status] if status else ['PUBLISHED', 'DELETED']
+
+        tr_cur = triple_collection.find({
+                                    '_type': cls._meta.verbose_name,
+                                    'subject': ObjectId(subject_id),
+                                    triple_class_field_mapping_dict[cls._meta.verbose_name]: {'$in': gt_or_rt_id_name_dict.keys()},
+                                    'status': {'$in': status}
+                                })
+
+        gt_or_rt_name_value_or_obj_dict = {gt_or_rt: '' for gt_or_rt in gt_or_rt_name_or_id_list}
+        for each_tr in tr_cur:
+            gt_or_rt_name_value_or_obj_dict[gt_or_rt_id_name_dict[each_tr[triple_class_field_mapping_dict[cls._meta.verbose_name]]]] = each_tr if get_obj else each_tr[triple_class_field_mapping_key_dict[cls._meta.verbose_name]]
+        return gt_or_rt_name_value_or_obj_dict
+
 
   ########## Built-in Functions (Overridden) ##########
   def __unicode__(self):
@@ -3166,15 +3478,17 @@ class Triple(DjangoDocument):
     subject_type_list = []
     subject_member_of_list = []
     name_value = u""
-    if (self._type == "GAttribute") and ('triple_node' in kwargs):
-      self.attribute_type = kwargs['triple_node']
-      attribute_type_name = self.attribute_type['name']
+    # if (self._type == "GAttribute") and ('triple_node' in kwargs):
+    if (self._type == "GAttribute"):
+      # self.attribute_type = kwargs['triple_node']
+      at_node = node_collection.one({'_id': ObjectId(self.attribute_type)})
+      attribute_type_name = at_node.name
       attribute_object_value = unicode(self.object_value)
 
       self.name = "%(subject_name)s -- %(attribute_type_name)s -- %(attribute_object_value)s" % locals()
       name_value = self.name
 
-      subject_type_list = self.attribute_type['subject_type']
+      subject_type_list = at_node.subject_type
       subject_member_of_list = subject_document.member_of
 
       intersection = set(subject_member_of_list) & set(subject_type_list)
@@ -3189,16 +3503,17 @@ class Triple(DjangoDocument):
           if set(gst_node.type_of) & set(subject_type_list):
             subject_system_flag = True
             break
-      self.attribute_type = kwargs['triple_id']
+      # self.attribute_type = kwargs['triple_id']
 
-    elif self._type == "GRelation" and ('triple_node' in kwargs):
-      self.relation_type = kwargs['triple_node']
-      subject_type_list = self.relation_type['subject_type']
-      object_type_list = self.relation_type['object_type']
+    elif self._type == "GRelation":
+      rt_node = node_collection.one({'_id': ObjectId(self.relation_type)})
+      # self.relation_type = kwargs['triple_node']
+      subject_type_list = rt_node.subject_type
+      object_type_list = rt_node.object_type
 
       left_subject_member_of_list = subject_document.member_of
-      relation_type_name = self.relation_type['name']
-      if META_TYPE[4] in self.relation_type.member_of_names_list:
+      relation_type_name = rt_node.name
+      if META_TYPE[4] in rt_node.member_of_names_list:
         #  print META_TYPE[3], self.relation_type.member_of_names_list,"!!!!!!!!!!!!!!!!!!!!!"
         # Relationship Other than Binary one found; e.g, Triadic
         # Single relation: [ObjectId(), ObjectId(), ...]
@@ -3230,8 +3545,6 @@ class Triple(DjangoDocument):
         # with other comma-separated values from another list(s)
         object_type_list = list(chain.from_iterable(object_type_list))
         right_subject_member_of_list = list(chain.from_iterable(right_subject_member_of_list))
-
-
       else:
           #META_TYPE[3] in self.relation_type.member_of_names_list:
           # If Binary relationship found
@@ -3240,7 +3553,6 @@ class Triple(DjangoDocument):
 
           right_subject_list = self.right_subject if isinstance(self.right_subject, list) else [self.right_subject]
           right_subject_document = node_collection.find_one({'_id': {'$in': right_subject_list} })
-
           if right_subject_document:
               right_subject_member_of_list = right_subject_document.member_of
               right_subject_name = right_subject_document.name
@@ -3253,12 +3565,10 @@ class Triple(DjangoDocument):
       right_intersection = set(object_type_list) & set(right_subject_member_of_list)
       if left_intersection and right_intersection:
         subject_system_flag = True
-
       else:
         left_subject_system_flag = False
         if left_intersection:
           left_subject_system_flag = True
-
         else:
           for gst_id in left_subject_member_of_list:
             gst_node = node_collection.one({'_id': gst_id}, {'type_of': 1})
@@ -3281,7 +3591,7 @@ class Triple(DjangoDocument):
         if left_subject_system_flag and right_subject_system_flag:
           subject_system_flag = True
 
-      self.relation_type = kwargs['triple_id']
+      # self.relation_type = kwargs['triple_id']
 
     if self._type =="GRelation" and subject_system_flag == False:
       # print "The 2 lists do not have any common element"
@@ -3322,7 +3632,7 @@ class Triple(DjangoDocument):
       fp = history_manager.get_file_path(self)
 
       try:
-          rcs_obj.checkout(fp)
+          rcs_obj.checkout(fp, otherflags="-f")
       except Exception as err:
           try:
               if history_manager.create_or_replace_json_file(self):
@@ -3348,10 +3658,10 @@ class Triple(DjangoDocument):
 @connection.register
 class GAttribute(Triple):
     structure = {
-        'attribute_type_scope': basestring,
+        'attribute_type_scope': dict,
         # 'attribute_type': AttributeType,  # Embedded document of AttributeType Class
         'attribute_type': ObjectId,  # ObjectId of AttributeType node
-        'object_value_scope': basestring,
+        # 'object_value_scope': basestring,
         'object_value': None  # value -- it's data-type, is determined by attribute_type field
     }
 
@@ -3369,18 +3679,24 @@ class GAttribute(Triple):
     required_fields = ['attribute_type', 'object_value']
     use_dot_notation = True
     use_autorefs = True                   # To support Embedding of Documents
+    default_values = {
+                        'attribute_type_scope': {}
+                    }
 
 
 @connection.register
 class GRelation(Triple):
     structure = {
-        'relation_type_scope': basestring,
+        'relation_type_scope': dict,
         # 'relation_type': RelationType,  # DBRef of RelationType Class
         'relation_type': ObjectId,  # ObjectId of RelationType node
-        'right_subject_scope': basestring,
+        # 'right_subject_scope': basestring,
         # ObjectId's of GSystems Class / List of list of ObjectId's of GSystem Class
         'right_subject': OR(ObjectId, list)
     }
+    default_values = {
+                        'relation_type_scope': {}
+                    }
 
     indexes = [{
         # 1: Compound index
@@ -3532,6 +3848,7 @@ class Buddy(DjangoDocument):
         active_buddy_authid_list = self.get_active_authid_list_from_single_buddy()
 
         for each_buddy_authid in active_buddy_authid_list:
+            print "- Released Buddy: ", Node.get_name_id_from_type(each_buddy_authid, u'Author')[0]
             self.get_latest_in_out_dict(self.buddy_in_out[each_buddy_authid])['out'] = datetime.datetime.now()
 
         return self
@@ -3777,7 +4094,7 @@ class Buddy(DjangoDocument):
             fp = history_manager.get_file_path(self)
 
             try:
-                rcs_obj.checkout(fp)
+                rcs_obj.checkout(fp, otherflags="-f")
 
             except Exception as err:
                 try:
@@ -3898,7 +4215,14 @@ class Counter(DjangoDocument):
 
         # Total fields should be updated on enroll action
         # On module/unit add/delete, update 'total' fields for all users in celery
-        'course':{'modules':{'completed':int, 'total':int}, 'units':{'completed':int, 'total':int}}
+        
+        'course':{'modules':{'completed':int, 'total':int}, 'units':{'completed':int, 'total':int}},
+
+        # 'visited_nodes' = {str(ObjectId): int(count_of_visits)}
+        'visited_nodes': {basestring: int},
+        'assessment': {
+                    'offered_id': {'total': int, 'correct': int, 'incorrect_attempts': int}
+                    }
     }
 
     default_values = {
@@ -3946,7 +4270,10 @@ class Counter(DjangoDocument):
 
         # ideally, member_of field should be used to check resource_type. But it may cause performance hit.
         # hence using 'if_file.mime_type'
-        if resource_obj.if_file.mime_type or (u'File' in resource_obj.member_of_names_list):
+        if resource_obj.if_file.mime_type or \
+         u'File' in resource_obj.member_of_names_list or \
+         u'Asset' in resource_obj.member_of_names_list or \
+         u'AssetContent' in resource_obj.member_of_names_list:
             resource_type = 'file'
 
         elif u'Page' in resource_obj.member_of_names_list:
@@ -3986,7 +4313,7 @@ class Counter(DjangoDocument):
         group_id = ObjectId(group_id)
 
         # query and check for existing counter obj:
-        counter_obj = counter_collection.one({'user_id': user_id, 'group_id': group_id})
+        counter_obj = counter_collection.find_one({'user_id': user_id, 'group_id': group_id})
 
         # create one if not exists:
         if not counter_obj :
@@ -4078,7 +4405,6 @@ class Counter(DjangoDocument):
 
     @staticmethod
     def add_comment_pt(resource_obj_or_id, current_group_id, active_user_id_or_list=[]):
-
         if not isinstance(active_user_id_or_list, list):
             active_user_id_list = [active_user_id_or_list]
         else:
@@ -4088,60 +4414,63 @@ class Counter(DjangoDocument):
         resource_oid = resource_obj._id
         resource_type, resource_type_of = Counter._get_resource_type_tuple(resource_obj)
 
-        # get resource's creator:
-        resource_created_by_user_id = resource_obj.created_by
-        resource_contributors_user_ids_list = resource_obj.contributors
+        # if resource_type and resource_type_of:
+        if resource_type:
+            # get resource's creator:
+            resource_created_by_user_id = resource_obj.created_by
+            resource_contributors_user_ids_list = resource_obj.contributors
 
-        key_str_resource_type = '["' + resource_type + '"]'\
-                                + (('["' + resource_type_of + '"]') if resource_type_of else '')
-        key_str = 'counter_obj_each_contributor' \
-                  + key_str_resource_type \
-                  + '["comments_by_others_on_res"]'
+            key_str_resource_type = '["' + resource_type + '"]'\
+                                    + (('["' + resource_type_of + '"]') if resource_type_of else '')
+            key_str = 'counter_obj_each_contributor' \
+                      + key_str_resource_type \
+                      + '["comments_by_others_on_res"]'
 
-        # counter object of resource contributor
-        # ------- creator counter update: done ---------
-        for each_resource_contributor in resource_contributors_user_ids_list:
-            counter_obj_each_contributor = Counter.get_counter_obj(each_resource_contributor, current_group_id)
+            # counter object of resource contributor
+            # ------- creator counter update: done ---------
+            for each_resource_contributor in resource_contributors_user_ids_list:
+                if each_resource_contributor not in active_user_id_list:
+                    counter_obj_each_contributor = Counter.get_counter_obj(each_resource_contributor, current_group_id)
 
-            # update counter obj
+                    # update counter obj
+                    for each_active_user_id in active_user_id_list:
+                        existing_user_comment_cnt = eval(key_str).get(str(each_active_user_id), 0)
+                        eval(key_str).update({str(each_active_user_id): (existing_user_comment_cnt + 1) })
+
+                    # update comments gained:
+                    key_str_comments_gained = "counter_obj_each_contributor" \
+                                              + key_str_resource_type
+                    comments_gained = eval(key_str_comments_gained + '["comments_gained"]')
+                    eval(key_str_comments_gained).update({"comments_gained": (comments_gained + 1)})
+
+                    counter_obj_each_contributor.last_update = datetime.datetime.now()
+                    counter_obj_each_contributor.save()
+            # ------- creator counter update: done ---------
+
+            # processing analytics for (one) active user.
+            # NOTE: [Only if active user is other than resource creator]
+            from gnowsys_ndf.settings import GSTUDIO_COMMENT_POINTS
             for each_active_user_id in active_user_id_list:
-                existing_user_comment_cnt = eval(key_str).get(str(each_active_user_id), 0)
-                eval(key_str).update({str(each_active_user_id): (existing_user_comment_cnt + 1) })
+                if each_active_user_id not in resource_contributors_user_ids_list:
 
-            # update comments gained:
-            key_str_comments_gained = "counter_obj_each_contributor" \
-                                      + key_str_resource_type
-            comments_gained = eval(key_str_comments_gained + '["comments_gained"]')
-            eval(key_str_comments_gained).update({"comments_gained": (comments_gained + 1)})
+                    counter_obj = Counter.get_counter_obj(each_active_user_id, current_group_id)
 
-            counter_obj_each_contributor.last_update = datetime.datetime.now()
-            counter_obj_each_contributor.save()
-        # ------- creator counter update: done ---------
+                    # counter_obj['file']['commented_on_others_res'] += 1
+                    key_str = 'counter_obj' \
+                              + key_str_resource_type \
+                              + '["commented_on_others_res"]'
+                    existing_commented_on_others_res = eval(key_str)
+                    eval('counter_obj' + key_str_resource_type).update( \
+                        { 'commented_on_others_res': (existing_commented_on_others_res + 1) })
 
-        # processing analytics for (one) active user.
-        # NOTE: [Only if active user is other than resource creator]
-        from gnowsys_ndf.settings import GSTUDIO_COMMENT_POINTS
-        for each_active_user_id in active_user_id_list:
-            if each_active_user_id not in resource_contributors_user_ids_list:
+                    counter_obj['total_comments_by_user'] += 1
+                    counter_obj['group_points'] += GSTUDIO_COMMENT_POINTS
 
-                counter_obj = Counter.get_counter_obj(each_active_user_id, current_group_id)
-
-                # counter_obj['file']['commented_on_others_res'] += 1
-                key_str = 'counter_obj' \
-                          + key_str_resource_type \
-                          + '["commented_on_others_res"]'
-                existing_commented_on_others_res = eval(key_str)
-                eval('counter_obj' + key_str_resource_type).update( \
-                    { 'commented_on_others_res': (existing_commented_on_others_res + 1) })
-
-                counter_obj['total_comments_by_user'] += 1
-                counter_obj['group_points'] += GSTUDIO_COMMENT_POINTS
-
-                counter_obj.last_update = datetime.datetime.now()
-                counter_obj.save()
+                    counter_obj.last_update = datetime.datetime.now()
+                    counter_obj.save()
 
     @staticmethod
-    @task
+    # @task
     def add_visit_count(resource_obj_or_id, current_group_id, loggedin_userid):
 
         active_user_ids_list = [loggedin_userid]
@@ -4205,7 +4534,6 @@ class Counter(DjangoDocument):
         resource_obj = Node.get_node_obj_from_id_or_obj(resource_obj_or_id, GSystem)
         resource_oid = resource_obj._id
         resource_type, resource_type_of = Counter._get_resource_type_tuple(resource_obj)
-
         # get resource's creator:
         # resource_created_by_user_id = resource_obj.created_by
         resource_contributors_user_ids_list = resource_obj.contributors
@@ -4213,6 +4541,9 @@ class Counter(DjangoDocument):
         # creating {user_id: score}
         # e.g: {162: 5, 163: 3, 164: 4}
         userid_score_rating_dict = {d['user_id']: d['score'] for d in resource_obj.rating}
+        for user_id_val in active_user_id_list:
+            if user_id_val in userid_score_rating_dict.keys():
+                userid_score_rating_dict.pop(user_id_val)
 
         user_counter_cur = Counter.get_counter_objs_cur(resource_contributors_user_ids_list, current_group_id)
 
@@ -4227,35 +4558,32 @@ class Counter(DjangoDocument):
         # iterating over each user id in contributors
         # uc: user counter
         for each_uc in user_counter_cur:
-
             for each_active_user_id in active_user_id_list:
+                if each_active_user_id not in resource_contributors_user_ids_list:
+                    userid_score_rating_dict_copy = userid_score_rating_dict.copy()
 
-                userid_score_rating_dict_copy = userid_score_rating_dict.copy()
+                    rating_count_received = eval(key_str_counter_resource_type_rating_count_received)
+                    avg_rating_gained = eval(key_str_counter_resource_type_avg_rating_gained)
+                    total_rating = sum(userid_score_rating_dict_copy.values())
+                    # total_rating = rating_count_received * avg_rating_gained
 
-                rating_count_received = eval(key_str_counter_resource_type_rating_count_received)
-                avg_rating_gained = eval(key_str_counter_resource_type_avg_rating_gained)
+                    # first time rating giving user:
+                    if each_active_user_id not in userid_score_rating_dict_copy:
+                        # add new key: value in dict to avoid errors
+                        userid_score_rating_dict_copy.update({each_active_user_id: 0})
+                        eval(key_str_counter_resource_type).update( \
+                                            {'rating_count_received': (rating_count_received + 1)} )
+                    total_rating = total_rating - userid_score_rating_dict_copy[each_active_user_id]
+                    total_rating = total_rating + int(rating_given)
 
-                total_rating = rating_count_received * avg_rating_gained
-
-                # first time rating giving user:
-                if each_active_user_id not in userid_score_rating_dict_copy:
-                    # add new key: value in dict to avoid errors
-                    userid_score_rating_dict_copy.update({each_active_user_id: 0})
+                    # getting value from updated 'rating_count_received'. hence repeated.
+                    rating_count_received = eval(key_str_counter_resource_type_rating_count_received) or 1
+                    # storing float result to get more accurate avg.
+                    avg_rating_gained = float(format(total_rating / float(len(userid_score_rating_dict_copy.keys())), '.2f'))
                     eval(key_str_counter_resource_type).update( \
-                                        {'rating_count_received': (rating_count_received + 1)} )
+                                            {'avg_rating_gained': avg_rating_gained})
 
-                total_rating = total_rating - userid_score_rating_dict_copy[each_active_user_id]
-                total_rating = total_rating + int(rating_given)
-
-                # getting value from updated 'rating_count_received'. hence repeated.
-                rating_count_received = eval(key_str_counter_resource_type_rating_count_received) or 1
-                # storing float result to get more accurate avg.
-                avg_rating_gained = float(format(total_rating / float(rating_count_received), '.2f'))
-
-                eval(key_str_counter_resource_type).update( \
-                                        {'avg_rating_gained': avg_rating_gained})
-
-                each_uc.save()
+                    each_uc.save()
 
 
     def save(self, *args, **kwargs):
@@ -4281,7 +4609,7 @@ class Counter(DjangoDocument):
             fp = history_manager.get_file_path(self)
 
             try:
-                rcs_obj.checkout(fp)
+                rcs_obj.checkout(fp, otherflags="-f")
 
             except Exception as err:
                 try:

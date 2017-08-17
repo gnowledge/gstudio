@@ -37,7 +37,7 @@ from django.core.cache import cache
 from mongokit import IS
 
 ''' -- imports from application folders/files -- '''
-from gnowsys_ndf.settings import GAPPS as setting_gapps, GSTUDIO_DEFAULT_GAPPS_LIST, META_TYPE, CREATE_GROUP_VISIBILITY, GSTUDIO_SITE_DEFAULT_LANGUAGE,GSTUDIO_DEFAULT_EXPLORE_URL
+from gnowsys_ndf.settings import GAPPS as setting_gapps, GSTUDIO_DEFAULT_GAPPS_LIST, META_TYPE, CREATE_GROUP_VISIBILITY, GSTUDIO_SITE_DEFAULT_LANGUAGE,GSTUDIO_DEFAULT_EXPLORE_URL,GSTUDIO_EDIT_LMS_COURSE_STRUCTURE
 # from gnowsys_ndf.settings import GSTUDIO_SITE_LOGO,GSTUDIO_COPYRIGHT,GSTUDIO_GIT_REPO,GSTUDIO_SITE_PRIVACY_POLICY, GSTUDIO_SITE_TERMS_OF_SERVICE,GSTUDIO_ORG_NAME,GSTUDIO_SITE_ABOUT,GSTUDIO_SITE_POWEREDBY,GSTUDIO_SITE_PARTNERS,GSTUDIO_SITE_GROUPS,GSTUDIO_SITE_CONTACT,GSTUDIO_ORG_LOGO,GSTUDIO_SITE_CONTRIBUTE,GSTUDIO_SITE_VIDEO,GSTUDIO_SITE_LANDING_PAGE
 from gnowsys_ndf.settings import *
 try:
@@ -48,7 +48,7 @@ except ImportError:
 from gnowsys_ndf.ndf.models import *
 from gnowsys_ndf.ndf.views.methods import check_existing_group, get_gapps, get_all_resources_for_group, get_execution_time, get_language_tuple
 from gnowsys_ndf.ndf.views.methods import get_drawers, get_group_name_id, cast_to_data_type, get_prior_node_hierarchy, get_course_completetion_status
-from gnowsys_ndf.mobwrite.models import TextObj
+# from gnowsys_ndf.mobwrite.models import TextObj
 
 from pymongo.errors import InvalidId as invalid_id
 from django.contrib.sites.models import Site
@@ -107,6 +107,7 @@ def get_site_variables():
 	site_var = {}
 	site_var['ORG_NAME'] = GSTUDIO_ORG_NAME
 	site_var['LOGO'] = GSTUDIO_SITE_LOGO
+	site_var['SECONDARY_LOGO'] = GSTUDIO_SITE_SECONDARY_LOGO
 	site_var['FAVICON'] = GSTUDIO_SITE_FAVICON
 	site_var['COPYRIGHT'] = GSTUDIO_DEFAULT_COPYRIGHT
 	site_var['GIT_REPO'] = GSTUDIO_GIT_REPO
@@ -131,6 +132,7 @@ def get_site_variables():
 	site_var['ISSUES_PAGE'] = GSTUDIO_SITE_ISSUES_PAGE
 	site_var['ENABLE_USER_DASHBOARD'] = GSTUDIO_ENABLE_USER_DASHBOARD
 	site_var['BUDDY_LOGIN'] = GSTUDIO_BUDDY_LOGIN
+	site_var['INSTITUTE_ID'] = GSTUDIO_INSTITUTE_ID
 
 	cache.set('site_var', site_var, 60 * 30)
 
@@ -561,13 +563,15 @@ def get_all_possible_languages():
 
 @get_execution_time
 @register.assignment_tag
-def get_metadata_values():
+def get_metadata_values(metadata_type=None):
 
 	metadata = {"educationaluse": GSTUDIO_RESOURCES_EDUCATIONAL_USE, "interactivitytype": GSTUDIO_RESOURCES_INTERACTIVITY_TYPE, "curricular": GSTUDIO_RESOURCES_CURRICULAR,
 				"educationallevel": GSTUDIO_RESOURCES_EDUCATIONAL_LEVEL, "educationalsubject": GSTUDIO_RESOURCES_EDUCATIONAL_SUBJECT,
 				# "language": GSTUDIO_RESOURCES_LANGUAGES,
 				"timerequired": GSTUDIO_RESOURCES_TIME_REQUIRED, "audience": GSTUDIO_RESOURCES_AUDIENCE , "textcomplexity": GSTUDIO_RESOURCES_TEXT_COMPLEXITY,
 				"age_range": GSTUDIO_RESOURCES_AGE_RANGE ,"readinglevel": GSTUDIO_RESOURCES_READING_LEVEL, "educationalalignment": GSTUDIO_RESOURCES_EDUCATIONAL_ALIGNMENT}
+	if metadata_type and metadata_type in metadata:
+		return metadata[metadata_type]
 	return metadata
 
 
@@ -583,22 +587,17 @@ def get_attribute_value(node_id, attr_name, get_data_type=False):
     attr_val = ""
     node_attr = data_type = None
     if node_id:
-    	# node = node_collection.one({'_id': ObjectId(node_id) })
-    	gattr = node_collection.one({'_type': 'AttributeType', 'name': unicode(attr_name) })
-
-    	# print "node: ",node.name,"\n"
-    	# print "attr: ",gattr.name,"\n"
-    	if get_data_type:
-    		data_type = gattr.data_type
-    	if gattr: # and node  :
-    		node_attr = triple_collection.find_one({'_type': "GAttribute", "subject": ObjectId(node_id), 'attribute_type': gattr._id, 'status':"PUBLISHED"})
-
+        # print "\n attr_name: ", attr_name
+        gattr = node_collection.one({'_type': 'AttributeType', 'name': unicode(attr_name) })
+        if get_data_type:
+            data_type = gattr.data_type
+        if gattr: # and node  :
+            node_attr = triple_collection.find_one({'_type': "GAttribute", "subject": ObjectId(node_id), 'attribute_type': gattr._id, 'status': u"PUBLISHED"})
     if node_attr:
-    	attr_val = node_attr.object_value
-
+        attr_val = node_attr.object_value
+        # print "\n here: ", attr_name, " : ", attr_val, " : ", node_id
     if get_data_type:
         return {'value': attr_val, 'data_type': data_type}
-
     cache.set(cache_key, attr_val, 60 * 60)
     return attr_val
 
@@ -1195,7 +1194,7 @@ def get_disc_replies( oid, group_id, global_disc_all_replies, level=1 ):
 			temp_disc_reply["prior_node"] = str(each.prior_node[0])
 			temp_disc_reply["collection_set"] = [node_collection.one({'_id': ObjectId(i)}) for i in each.collection_set]
 			temp_disc_reply["level"] = level
-
+			temp_disc_reply["contributors"] = each.user_details_dict["contributors"]
 			# to avoid redundancy of dicts, it checks if any 'oid' is not equals to each._id. Then only append to list
 			if not any( d['oid'] == str(each._id) for d in global_disc_all_replies ):
 				if type(global_disc_all_replies) == str:
@@ -2245,19 +2244,19 @@ def resource_info(node):
 @register.assignment_tag
 def edit_policy(groupid,node,user):
 	groupnode = node_collection.find_one({"_id":ObjectId(groupid)})
-	resource_infor=resource_info(node)
+	# node=resource_info(node)
 	#code for public Groups and its Resources
-	resource_type = node_collection.find_one({"_id": {"$in":resource_infor.member_of}})
+	resource_type = node_collection.find_one({"_id": {"$in":node.member_of}})
 	if resource_type.name == 'Page':
-		if resource_infor.type_of:
-			resource_type_name = get_objectid_name(resource_infor.type_of[0])
+		if node.type_of:
+			resource_type_name = get_objectid_name(node.type_of[0])
 			if resource_type_name == 'Info page':
 				if user.id in groupnode.group_admin:
 					return "allow"
 			elif resource_type_name == 'Wiki page':
 				return "allow"
 			elif resource_type_name == 'Blog page':
-				if user.id ==  resource_infor.created_by:
+				if user.id ==  node.created_by:
 					return "allow"
 		else:
 			return "allow"
@@ -2775,13 +2774,12 @@ def mongo_id(value):
 		# Return value
 		return unicode(str(value))
 
+'''
 @get_execution_time
 @register.simple_tag
 def check_existence_textObj_mobwrite(node_id):
-		'''
-	to check object already created or not, if not then create
-	input nodeid
-		'''
+	# to check object already created or not, if not then create
+	# input nodeid
 		check = ""
 		system = node_collection.find_one({"_id":ObjectId(node_id)})
 		filename = TextObj.safe_name(str(system._id))
@@ -2799,6 +2797,7 @@ def check_existence_textObj_mobwrite(node_id):
 		check = textobj.filename
 		return check
 #textb
+'''
 
 @get_execution_time
 @register.assignment_tag
@@ -3372,9 +3371,12 @@ def get_thread_node(node_id):
 		node_obj = node_collection.one({'_id': ObjectId(node_id)})
 		thread_obj = None
 		has_thread_rt = node_collection.one({'_type': 'RelationType', 'name': 'has_thread'})
-		thread_rt = triple_collection.find_one({'subject': ObjectId(node_id),'relation_type': has_thread_rt._id})
+		thread_rt = triple_collection.find_one({'subject': ObjectId(node_id),
+			'relation_type': has_thread_rt._id, 'status': u'PUBLISHED'})
 		if thread_rt:
-			thread_obj = thread_rt['right_subject']
+			thread_id = thread_rt['right_subject']
+			if thread_id:
+				thread_obj = node_collection.one({'_id': ObjectId(thread_id)})
 
 		# if node_obj.relation_set:
 		# 	for rel in node_obj.relation_set:
@@ -3604,13 +3606,15 @@ def get_user_course_groups(user_id):
 						}
 
 	for each_course in all_user_groups:
-		each_course.course_status_field = get_event_status(each_course)
-		all_courses_obj_grouped[each_course.course_status_field].append(each_course)
-		# all_courses_obj_grouped['all'].append(each_course)
+		status_val = get_event_status(each_course)
+		if status_val:
+			each_course.course_status_field = status_val
+			all_courses_obj_grouped[each_course.course_status_field].append(each_course)
+			# all_courses_obj_grouped['all'].append(each_course)
 
-		courses_status_count_dict[each_course.course_status_field] += 1
+			courses_status_count_dict[each_course.course_status_field] += 1
 
-		# all_courses.append(each_course)
+			# all_courses.append(each_course)
 
 	# print "::: ", courses_status_count_dict
 	# print "::: ", all_courses_obj_grouped
@@ -3690,10 +3694,13 @@ def get_user_quiz_resp(node_obj, user_obj):
 	thread_obj = None
 	if node_obj and user_obj:
 		try:
-			grel_dict = get_relation_value(node_obj._id,"has_thread", True)
-			is_cursor = grel_dict.get("cursor",False)
-			if not is_cursor:
-				thread_obj = grel_dict.get("grel_node")
+			from gnowsys_ndf.ndf.templatetags.ndf_tags import get_thread_node
+			thread_obj = get_thread_node(node_obj._id)
+
+			# grel_dict = get_relation_value(node_obj._id,"has_thread", True)
+			# is_cursor = grel_dict.get("cursor",False)
+			# if not is_cursor:
+			# 	thread_obj = grel_dict.get("grel_node")
 
 			# for each_rel in node_obj.relation_set:
 			# 	if each_rel and "has_thread" in each_rel:
@@ -3871,10 +3878,10 @@ def get_file_obj(node):
 
 @get_execution_time
 @register.assignment_tag
-def get_help_pages_of_node(node_obj):
+def get_help_pages_of_node(node_obj,rel_name="has_help"):
 	all_help_page_node_list = []
 	try:
-		has_help_rt = node_collection.one({'_type': 'RelationType', 'name': 'has_help'})
+		has_help_rt = node_collection.one({'_type': 'RelationType', 'name': rel_name})
 		help_rt = triple_collection.find({'subject':node_obj._id,'relation_type': has_help_rt._id, 'status': u'PUBLISHED'})
 		if help_rt:
 			for each_help_rt in help_rt:
@@ -3929,3 +3936,118 @@ def get_pages(page_type):
 	page_type_gst = node_collection.one({'_type': "GSystemType", 'name': page_type})
 	page_nodes = node_collection.find({'member_of': page_gst._id, 'type_of': page_type_gst._id, 'group_set': help_page._id})
 	return page_nodes
+
+@register.assignment_tag
+def get_relation_node(node_id,rel_name):
+	node = node_collection.one({'_id':ObjectId(node_id)})
+	rt_subtitle = node_collection.one({'_type':'RelationType', 'name':unicode(rel_name)})
+	grel_nodes = triple_collection.find({'relation_type': rt_subtitle._id, 'subject': node._id},
+              {'right_subject':1, 'relation_type_scope': 1, '_id': 0})
+	
+	data_list = []
+	for each_grel in grel_nodes:
+		data_dict = {}
+		file_node = node_collection.one({'_id': ObjectId(each_grel['right_subject'])})
+		data_dict.update({'file_path': file_node['if_file']['original']['relurl']})
+		data_dict.update({'relation_type_scope': each_grel['relation_type_scope']})
+		data_dict.update({'file_name': file_node.name})
+		data_dict.update({'file_id': ObjectId(file_node.pk)})
+	 	data_list.append(data_dict)
+	# print data_list
+	return data_list
+
+@register.assignment_tag
+def get_lessons(unit_node):
+	# return list of ObjectIds of all lessons
+	# lesson_gst_name, lesson_gst_id = GSystemType.get_gst_name_id('lesson')
+	# all_lessons_for_unit = node_collection.find({'member_of': lesson_gst_id,
+	# 						'group_set': unit_node})
+	lesson_nodes = node_collection.find({'_id': {'$in': unit_node.collection_set}})
+	return lesson_nodes
+
+
+@register.assignment_tag
+def get_gstudio_alt_file_formats(mime_type):
+ 	return GSTUDIO_ALTERNATE_FORMATS[mime_type]
+
+@register.assignment_tag
+def get_gstudio_alt_size(mime_type):
+ 	return GSTUDIO_ALTERNATE_SIZE[mime_type]
+
+@register.assignment_tag
+def get_gstudio_alt_opts():
+ 	return GSTUDIO_ALTERNATE_OPTS
+
+@register.assignment_tag
+def get_test_page_oid():
+ 	return GSTUDIO_OID_HELP
+
+@register.assignment_tag
+def get_gstudio_registration():
+ 	return GSTUDIO_REGISTRATION
+
+@register.assignment_tag
+def get_unit_total_points(user_id,group_id):
+	counter_obj = Counter.get_counter_obj(user_id, ObjectId(group_id))
+
+
+@register.assignment_tag
+def get_node_hierarchy(node_obj):
+    node_structure = []
+    for each in node_obj.collection_set:
+        lesson_dict ={}
+        lesson = Node.get_node_by_id(each)
+        if lesson:
+            lesson_dict['name'] = lesson.name
+            lesson_dict['type'] = 'lesson'
+            lesson_dict['id'] = str(lesson._id)
+            lesson_dict['language'] = lesson.language[0]
+            lesson_dict['activities'] = []
+            if lesson.collection_set:
+                for each_act in lesson.collection_set:
+                    activity_dict ={}
+                    activity = Node.get_node_by_id(each_act)
+                    if activity:
+                        activity_dict['name'] = activity.name
+                        activity_dict['type'] = 'activity'
+                        activity_dict['id'] = str(activity._id)
+                        lesson_dict['activities'].append(activity_dict)
+            node_structure.append(lesson_dict)
+
+    return json.dumps(node_structure)
+
+@register.assignment_tag
+def user_groups(is_super_user,user_id):
+	user_grps_count = {}
+	gst_base_unit_name, gst_base_unit_id = GSystemType.get_gst_name_id('base_unit')
+	gst_group = node_collection.one({'_type': "GSystemType", 'name': "Group"})
+	gst_course = node_collection.one({'_type': "GSystemType", 'name': "Course"})
+	gst_basecoursegroup = node_collection.one({'_type': "GSystemType", 'name': "BaseCourseGroup"})
+	ce_gst = node_collection.one({'_type': "GSystemType", 'name': "CourseEventGroup"})
+	
+	query = {'_type': 'Group', 'status': u'PUBLISHED',
+             'member_of': {'$in': [gst_group._id],
+             '$nin': [gst_course._id, gst_basecoursegroup._id, ce_gst._id, gst_course._id, gst_base_unit_id]},
+            }
+
+	if is_super_user:
+		query.update({'group_type': {'$in': [u'PUBLIC', u'PRIVATE']}})
+	else:
+		query.update({'name': {'$nin': GSTUDIO_DEFAULT_GROUPS_LIST},
+                    'group_type': u'PUBLIC'})
+	group_cur = node_collection.find(query).sort('last_update', -1)
+	
+	user_draft_nodes = node_collection.find({'_type': "Group",'member_of':ObjectId(gst_base_unit_id),'$or': [{'group_admin': user_id}, {'author_set': user_id},{'created_by':user_id}]})
+	# user_projects_nodes = node_collection.find({'_type': "Group",'$or': [{'group_admin': user_id}, {'author_set': user_id},{'created_by':user_id}]})
+	user_grps_count['drafts'] = user_draft_nodes.count()
+	user_grps_count['projects'] = group_cur.count()
+	return user_grps_count
+	return counter_obj['group_points']
+
+@register.assignment_tag
+def if_edit_course_structure():
+	return GSTUDIO_EDIT_LMS_COURSE_STRUCTURE
+
+@register.assignment_tag
+def get_default_discussion_lbl():
+	return DEFAULT_DISCUSSION_LABEL

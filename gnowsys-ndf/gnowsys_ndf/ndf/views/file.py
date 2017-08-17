@@ -10,7 +10,7 @@ import tempfile
 # import re
 import ast
 import ox
-import pandora_client
+# import pandora_client
 import threading
 
 from PIL import Image, ImageDraw
@@ -46,7 +46,6 @@ try:
 except ImportError:  # old pymongo
     from pymongo.objectid import ObjectId
 
-from gnowsys_ndf.ndf.views.moderation import create_moderator_task, get_moderator_group_set
 
 from gnowsys_ndf.ndf.views.tasks import convertVideo
 
@@ -760,6 +759,8 @@ def uploadDoc(request, group_id):
         group_name, group_id = get_group_name_id(group_id)
 
     if request.method == "GET":
+        topic_gst = node_collection.one({'_type': 'GSystemType', 'name': 'Topic'})
+        topic_nodes = node_collection.find({'member_of': {'$in': [topic_gst._id]}})
         program_res = request.GET.get("program_res", "")
         if program_res:
           program_res = eval(program_res)
@@ -772,9 +773,9 @@ def uploadDoc(request, group_id):
             template = "ndf/Uploader_Form.html"
 
     if  page_url:
-        variable = RequestContext(request, {'page_url': page_url,'groupid':group_id,'group_id':group_id, 'program_res':program_res})
+        variable = RequestContext(request, {'page_url': page_url,'groupid':group_id,'group_id':group_id, 'program_res':program_res,'topic_nodes':topic_nodes})
     else:
-        variable = RequestContext(request, {'groupid':group_id,'group_id':group_id,'program_res':program_res})
+        variable = RequestContext(request, {'groupid':group_id,'group_id':group_id,'program_res':program_res,'topic_nodes':topic_nodes})
     return render_to_response(template, variable)
 
 
@@ -944,6 +945,8 @@ def submitDoc(request, group_id):
                     # print "----------4-----------"
                     fileobj = node_collection.one({'_id': ObjectId(f)})
                     # newly appended group id in group_set is at last
+                    from gnowsys_ndf.ndf.views.moderation import create_moderator_task
+
                     t = create_moderator_task(request, fileobj.group_set[0], fileobj._id,on_upload=True)
                     # return HttpResponseRedirect(reverse('moderation_status', kwargs={'group_id': fileobj.group_set[1], 'node_id': f }))
                     return HttpResponseRedirect(reverse('moderation_status', kwargs={'group_id': group_object.name, 'node_id': f }))
@@ -1053,6 +1056,7 @@ def save_file(files,title, userid, group_id, content_org, tags, img_type=None, l
             if "CourseEventGroup" not in group_object.member_of_names_list:
                 # if group is of EDITABLE_MODERATED, update group_set accordingly
                 if group_object.edit_policy == "EDITABLE_MODERATED":
+                    from gnowsys_ndf.ndf.views.moderation import get_moderator_group_set
                     fileobj.group_set = get_moderator_group_set(fileobj.group_set, group_object._id)
                     fileobj.status = u'MODERATION'
 
