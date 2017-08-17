@@ -141,7 +141,7 @@
                          {% get_possible_group_type_values as poss_gr_type %}
                             <select name="group_type" class="gtype">
                               {% for each_gtype in poss_gr_type %}
-                                <option {% if each_gtype == node.group_type %}selected=selected{% endif %}>
+                                <option {% if each_gtype == unit_node.group_type %}selected=selected{% endif %}>
                                   {{each_gtype}}
                                 </option>
                               {% endfor %}

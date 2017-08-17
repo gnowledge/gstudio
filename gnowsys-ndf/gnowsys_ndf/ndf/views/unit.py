@@ -31,7 +31,6 @@ rt_translation_of = Node.get_name_id_from_type('translation_of', 'RelationType',
 @login_required
 @get_execution_time
 def unit_create_edit(request, group_id, unit_group_id=None):
-    print "000000000000000000000000000000000000000000000000000000000"
     '''
     creation as well as eit of units
     '''

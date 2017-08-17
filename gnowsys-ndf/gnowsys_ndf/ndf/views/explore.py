@@ -108,6 +108,14 @@ def explore_groups(request,page_no=1):
     gstaff_access = check_is_gstaff(group_id,request.user)
 
     query = {'_type': 'Group', 'status': u'PUBLISHED',
+            '$or': [
+                        {'access_policy': u"PUBLIC"},
+                        {'$and': [
+                                {'access_policy': u"PRIVATE"},
+                                {'created_by': request.user.id}
+                            ]
+                        }
+                    ],
              'member_of': {'$in': [gst_group._id],
              '$nin': [gst_course._id, gst_basecoursegroup._id, ce_gst._id, gst_course._id, gst_base_unit_id]},
             }
