@@ -6,11 +6,11 @@
 <div class="row">
   <div class="medium 12 columns">
 	    <div class="left small-12 medium-6 columns">
-	                <label>File name: <b> {{node.name}} </b>
+	                <label>{% trans "File name:" %} <b> {{node.name}} </b>
                   	                    
 	                    <!--<input type="text" placeholder="" name="resource_name" />-->
 	                </label>
-                    <label>Created By: <b> {{ node.user_details_dict.contributors|join:', ' }} </b>
+                    <label>{% trans "Created By:" %} <b> {{ node.user_details_dict.contributors|join:', ' }} </b>
                       <!--<input type="text" placeholder="" name="resource_name" />-->
                   </label>
 
@@ -29,16 +29,16 @@
           </a>
           {% if node.created_by == request.user.id or is_gstaff  %}
                 <span data-dropdown="assetcontent-settings-drop" aria-controls="assetcontent-settings-drop" aria-expanded="false" class="orange-button right">
-                    Link/Add Related File <i class="fa fa-chevron-down"></i>
+                   {% trans "Link/Add Related File" %}  <i class="fa fa-chevron-down"></i>
                 </span>
                 <ul id="assetcontent-settings-drop" class="f-dropdown" data-dropdown-content aria-hidden="true" tabindex="-1">
  
-                  <li><a onclick="load_file_upload_modal(1)">Add Alternate File</a> </li>
+                  <li><a onclick="load_file_upload_modal(1)">{% trans "Add Alternate File" %}</a> </li>
                 {% if 'video' in node.if_file.mime_type or 'audio' in node.if_file.mime_type %}
-                  <li><a onclick="load_file_upload_modal(2)">Add Transcript</a></li>
+                  <li><a onclick="load_file_upload_modal(2)">{% trans "Add Transcript" %}</a></li>
                 {%  endif %}
                 {% if 'video' in node.if_file.mime_type %}
-                  <li><a onclick="load_file_upload_modal(3)">Add Subtitle</a></li>
+                  <li><a onclick="load_file_upload_modal(3)">{% trans "Add Subtitle" %}</a></li>
                 {%  endif %}
             {%  endif %}
             </div>
@@ -72,7 +72,7 @@
             </div>
              <div class="small-4 columns right" >
               {% if node.created_by == request.user.id or is_gstaff %}
-              <button type="button" data-sub-id = "{{each.pk}}" class="right orange-button-subtitle delete-subtitle" onclick="delete_rel_files('{{each.pk}}','has_subtitle')">Delete subtitle</button> <br>
+              <button type="button" data-sub-id = "{{each.pk}}" class="right orange-button-subtitle delete-subtitle" onclick="delete_rel_files('{{each.pk}}','has_subtitle')">{% trans "Delete subtitle" %}</button> <br>
               {% endif %}
              </div>
            {% endfor %}
@@ -86,7 +86,7 @@
           {{grel_trans.grel_node.name}}
         </div>
         <div class="small-4 columns right " >
-           <button type="button"  class="right orange-button-subtitle delete-transcript" onclick="delete_rel_files('{{grel_trans.grel_node.pk}}','has_transcript')" >Delete transcript</button>
+           <button type="button"  class="right orange-button-subtitle delete-transcript" onclick="delete_rel_files('{{grel_trans.grel_node.pk}}','has_transcript')" >{% trans "Delete transcript" %}</button>
         </div> 
           {% endif %}
         <br>
@@ -97,7 +97,7 @@
             {% get_relation_node node.pk  'has_alt_content' as alt_lang_rel_node %}
               {% if alt_lang_rel_node %}
               	<div class="small-4 columns asset_list">
-                  Alternate Files : 
+                  {% trans "Alternate Files :" %} 
                 {% for each in  alt_lang_rel_node %} 
                   <a href="{% url 'assetcontent_detail' group_id asset_obj.pk each.file_id %}" >
                       {{each.file_name}} &nbsp; &nbsp;
@@ -113,12 +113,12 @@
         {% if 'video' in node.if_file.mime_type or 'audio' in node.if_file.mime_type %}
         <a class="right close-reveal-modal reveal-modal-overlay" aria-label="Close">&#215;</a>
           <div class="video-related transcript-upload hide">
-              <label><u>Upload Transcript</u></label>
+              <label><u>{% trans "Upload Transcript" %}</u></label>
               <div class="transcript_files">
                 <form class="dropzone" id ="doctranscript" enctype="multipart/form-data" method="post" action="{% url 'add_assetcontent' group_id %}" > 
                     <input class="trans-sub" type="file" placeholder="" id="doctranscriptfile" name="transcript_file" />
                     <!-- <a class="right orange-button  save-transcript">Save Asset</a> -->
-                    <button type="button" class="right orange-button save-transcript" style="display: none;" >Upload </button>
+                    <button type="button" class="right orange-button save-transcript" style="display: none;" >{% trans "Upload" %} </button>
                 </form>
               </div>
           </div>
@@ -128,7 +128,7 @@
             <div class="subtitle-upload hide">
               <a class="right close-reveal-modal reveal-modal-overlay" aria-label="Close">&#215;</a>
               <div class="subtitle_files ">
-                <label><u style="margin-left: -17px; font-weight: normal;">Upload Subtitle</u></label>
+                <label><u style="margin-left: -17px; font-weight: normal;">{% trans "Upload Subtitle" %}</u></label>
                   <form class="dropzone" id ="docsubtitle" enctype="multipart/form-data" method="post" action="{% url 'add_assetcontent' group_id %}" style="margin-left: -19px;" >
                       <input class="trans-sub" type="file" id="docsubtitlefile" placeholder="" name="doc_f" />
                       <br>
@@ -136,7 +136,7 @@
               </div>
 
               <select  style=" display: block;height: 51px;border-radius: 5px;" class="select-subtitle-langauge" name="lan" id="sub_languageid" tabindex=3 >
-                <option value="">--- Select Language ---</option>
+                <option value="">{% trans "--- Select Language ---" %}</option>
                 {% get_language_info_list for LANGUAGES as languages %}
                 {% for language in languages %}
                 <option data-sub-lang="{{ language.name }}" data-sub-code="{{ language.code }}">
@@ -145,7 +145,7 @@
                 {% endfor %}
               </select>
               <div class="row">
-                <button type="button" class="right orange-button-subtitle save-subtitle" style="display: none;" onclick="save_subtitle()">Upload</button></div>
+                <button type="button" class="right orange-button-subtitle save-subtitle" style="display: none;" onclick="save_subtitle()">{% trans "Upload" %}</button></div>
               </div>
         {%  endif %}
 
@@ -153,7 +153,7 @@
         <div class="alt-file-upload hide">
         	<a class="right close-reveal-modal reveal-modal-overlay" aria-label="Close">&#215;</a>
                <select   class="select-language" name="lan" id="alt_types" >
-                    <option value="">--- Select Alternate Type ---</option>
+                    <option value="">{% trans "--- Select Alternate Type ---" %}</option>
                     {% for each_alt_types in alt_opts %}
 
                     <option data-opts="{{each_alt_types}}" >
@@ -171,7 +171,7 @@
               <hr/>
 
               <div class="row">
-                <button type="button" style="display: none" class="right orange-button-subtitle save-altfile" onclick="save_alternate_file()">Upload</button>
+                <button type="button" style="display: none" class="right orange-button-subtitle save-altfile" onclick="save_alternate_file()">{% trans "Upload" %}</button>
               </div>
         </div>
     </div>

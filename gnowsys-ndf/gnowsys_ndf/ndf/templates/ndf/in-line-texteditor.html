@@ -6,6 +6,7 @@
 {% get_attribute_value node.pk 'release_response' as resp_val %}
 {% get_attribute_value node.pk 'thread_interaction_type' as thr_int_type %}
 {% check_is_gstaff groupid request.user as is_gstaff %}
+{% get_default_discussion_lbl as default_discussion_lbl %}
 
 {% block head %}
   <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
@@ -32,7 +33,7 @@
 
 <div >
 {% user_access_policy groupid request.user as user_access_priv %}
-  
+{% get_group_object groupid as group_object %}
     {% if allow_to_comment %}
       <div data-alert class="alert-box new_comments hide info radius">
         <div class="new_cmnts_lbl">New comment(s) added. Please refresh to see.</div>
@@ -46,7 +47,7 @@
         {% if thr_int_type %}
           {{thr_int_type}} {% if all_replies|length > 0 %}({{all_replies|length }}) {% endif %}
         {% else %}
-          Feedback  {% if all_replies|length > 0 %} ({{all_replies|length }}) {% endif %}
+          {{default_discussion_lbl}}  {% if all_replies|length > 0 %} ({{all_replies|length }}) {% endif %}
         {% endif %}
       </div>
     {% endif %}
@@ -110,7 +111,7 @@
               <i class="fa fa-reply"></i>
               {% trans "Reply" %} 
             </a>
-            {% if request.user.id == each_reply.userid or is_gstaff %}
+            {% if request.user.id == each_reply.userid or is_gstaff  or request.user.id in group_object.group_admin %}
               <a class="reply-btn delete_res" data-id='{{ each_reply.oid }}' data-userid="{{each_reply.userid}}" onclick="deleteReply($(this))" style="float:right">
                 <i class="fa fa-trash-o"></i>
                 {% trans "Delete" %}
@@ -153,6 +154,11 @@
   var user_access = "{{ user_access }}"; // "allow" or "disallow"
   var edit_policy = "allow"; // "allow" or "disallow"
   var is_user_authenticated = {{ request.user.is_authenticated|lower }};
+  {% if thr_int_type %}
+    thr_int_type_var = "{{thr_int_type}}"
+  {% else %}
+    thr_int_type_var = "{{default_discussion_lbl}}"
+  {% endif %}
 
   function createDiscussion()
   {
@@ -270,11 +276,11 @@
     if(totalReplies == 0)
     {
       $(".view-discussion span").fadeOut().fadeIn().html(" {% trans 'Begin Discussion' %}");
-      $("#create-discussion").text("{% trans 'Feedback' %}" + $("h1 span.node[itemprop]").text().trim());
+      $("#create-discussion").text(thr_int_type_var + $("h1 span.node[itemprop]").text().trim());
     }
     else
     {
-      $("#create-discussion").fadeOut().fadeIn().html("{{thr_int_type}} ("+totalReplies+")");
+      $("#create-discussion").fadeOut().fadeIn().html(thr_int_type_var + " ("+totalReplies+")");
     }
   }
   function createReplyHTML(replyStyle, data,child_reply_level)
@@ -294,7 +300,7 @@
                 + "<a class='reply-btn reply_res'  data-id='" + data[1] + "' onclick='openCKEditor($(this))' data-org-content='"+data[3]+"'>"
                + "<i class='fa fa-reply'></i> Reply"
                + "</a>"
-              if (request_user_id == reply_user_id){
+              if (request_user_id == reply_user_id || is_grp_admin ){
                   htmlReply +="<a class='reply-btn delete_res' data-id='" + data[1]+ "'data-userid='"+ data[5] +"' onclick='deleteReply($(this))' style='float:right'><i class='fa fa-trash-o'></i> Delete"
                   htmlReply +="<a class='reply-btn edit_res' data-id='"+ data[1] +"' data-userid='{{each_reply.userid}}' data-userid='"+ data[5] +"' onclick='editreply($(this))' style='float:right;margin-right:10px!important'><i class='fa fa-pencil-square-o'></i> Edit |"
                   }
@@ -307,7 +313,7 @@
   function addReply(sourceObj)
   {
 
-    $("create-discussion").show();
+    $("#create-discussion").show();
     var value = CKEDITOR.instances['ckeditor_textarea'].getData();
     var priorNodeId = $("#prior-node").val(),
         replyContent = value.trim();

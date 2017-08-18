@@ -624,6 +624,7 @@ A project of <a href="http://lab.gnowledge.org/" target="_blank">{% trans "Gnowl
 </p>'''
 GSTUDIO_SITE_FAVICON = "/static/ndf/images/favicon/logo.png"
 GSTUDIO_SITE_LOGO = "/static/ndf/css/themes/metastudio/logo.svg"
+GSTUDIO_SITE_SECONDARY_LOGO = "/static/ndf/css/themes/metastudio/logo.svg"
 GSTUDIO_GIT_REPO = "https://github.com/gnowledge/gstudio"
 GSTUDIO_SITE_PRIVACY_POLICY = ""
 GSTUDIO_SITE_TERMS_OF_SERVICE = ""
@@ -644,13 +645,14 @@ GSTUDIO_SITE_NAME = "metaStudio"  # holds the name of site. e.g: "NROER, "tiss" 
 GSTUDIO_SITE_ISSUES_PAGE = ""
 GSTUDIO_EBOOKS_HELP_TEXT = "" #ebook help text page  url(page:"how to read ebooks")
 GSTUDIO_SUPPORTED_JHAPPS = ['Jsmol','Police Squad','OpenStoryTool','BioMechanics', 'TurtleBlocks']
+GSTUDIO_EDIT_LMS_COURSE_STRUCTURE = False
 # terms & conditions
 GSTUDIO_OID_TC = None
 GSTUDIO_OID_HELP = ""
 # GSTUDIO_SITE_EDITOR = "orgitdown"  #possible values are 'aloha'and 'orgitdown'
 # Visibility for 'Create Group'
 CREATE_GROUP_VISIBILITY = True
-
+GSTUDIO_DEFAULT_SYSTEM_TYPES_LIST = []
 EMACS_INIT_FILE_PATH = "~/.emacs"
 
 ###########################################################################
@@ -782,7 +784,6 @@ GSTUDIO_COURSE_EVENT_MOD_GROUP_ALTNAMES = ['Screening House', 'Selection House']
 
 GSTUDIO_PROGRAM_EVENT_MOD_GROUP_ALTNAMES = ['Screening House', 'Selection House']
 
-GSTUDIO_INTERACTION_TYPES = ['Comment', 'Discuss', 'Reply', 'Discuss', 'Submit', 'Voice-Response', 'Answer', 'Feedback']
 
 GSTUDIO_HELP_TIP = {
    "name":"Title of the object",
@@ -985,6 +986,7 @@ OPTIONLIST = [
 GSYSTEM_LIST = [{'name':'Name '} ,{'altnames':'Alternate Name '}]
 
 GSTUDIO_INTERACTION_TYPES = ['Comment', 'Discuss', 'Reply', 'Post', 'Submit', 'Voice-Response', 'Answer', 'Feedback']
+DEFAULT_DISCUSSION_LABEL = 'Feedback'
 # #textb
 # import warnings
 # warnings.filterwarnings(
@@ -1018,6 +1020,7 @@ GSTUDIO_NOTE_CREATE_POINTS = 30
 GSTUDIO_QUIZ_CORRECT_POINTS = 5
 GSTUDIO_COMMENT_POINTS = 5
 GSTUDIO_ENABLE_USER_DASHBOARD = True
+GSTUDIO_PRIMARY_COURSE_LANGUAGE = u'en'
 
 # --- BUDDY Module configurations ---
 #

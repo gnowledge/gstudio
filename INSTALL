@@ -74,11 +74,16 @@
               (b) sudo apt-get update
               (c) sudo apt-get install python-software-properties python g++ make nodejs
           * For latest nodejs version:
-              - Removing existing nodejs and npm (if installed previously):
-                - sudo apt-get purge nodejs
-                - sudo apt-get purge npm
+              - Removing existing node, nodejs and npm (if installed previously):
+                - apt-get remove nodejs npm node
+                - sudo apt-get purge nodejs npm node
+                - sudo rm -rvf /usr/local/bin/npm /usr/local/share/man/man1/node* /usr/local/lib/dtrace/node.d ~/.npm ~/.node-gyp /opt/local/bin/node opt/local/include/node /opt/local/lib/node_modules 
+                - sudo rm -rfv /usr/local/lib/node*
+                - sudo rm -rfv /usr/local/include/node*
+                - sudo rm -rfv /usr/local/bin/node*
+
               (a) sudo apt-get install npm
-              (b) sudo npm cache clean
+              (b) sudo npm cache clean  OR  sudo npm cache vefify
               (c) sudo npm install -g n
               (d) sudo n latest
               (e) ln -sf /usr/local/n/versions/node/<version no from above step>/bin/node /usr/bin/node

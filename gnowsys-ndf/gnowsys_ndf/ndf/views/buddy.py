@@ -113,14 +113,17 @@ def update_buddies(request, group_id):
                                                         '$in': [ObjectId(ab) for ab in active_buddy_auth_list]
                                                     }
                                                 },
-                                                {'name': 1})
+                                                {'name': 1, 'created_by': 1}).sort('name', 1)
 
         updated_buddies_authid_name_dict = { str(b['_id']): b['name'] for b in updated_buddies_cur}
-        # print "\n\nupdated_buddies : ", updated_buddies_authid_name_dict
+        updated_buddies_cur.rewind()
+        buddies_username_id_dict = { str(b['name']): b['created_by'] for b in updated_buddies_cur}
+        updated_buddies_cur.rewind()
 
         request.session['buddies_userid_list']      = [ b['created_by'] for b in updated_buddies_cur]
         request.session['buddies_authid_list']      = active_buddy_auth_list
         request.session['buddies_authid_name_dict'] = json.dumps(updated_buddies_authid_name_dict)
+        request.session['buddies_username_id_dict'] = json.dumps(buddies_username_id_dict)
         # print "\n\nrequest.session['buddies_authid_name_dict'] : ", request.session['buddies_authid_name_dict']
 
     result_dict = {

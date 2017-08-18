@@ -1,3 +1,12 @@
+'''
+Import can also be called using command line args as following:
+    python manage.py group_import <dump_path> <md5-check> <group-availability> <user-objs-restoration>
+    like:
+        python manage.py group_import <dump_path> y y y
+'''
+
+
+
 import os
 import json
 import imp
@@ -25,19 +34,21 @@ from gnowsys_ndf.ndf.views.utils import replace_in_list, merge_lists_and_maintai
 # global variables declaration
 DATA_RESTORE_PATH = None
 DATA_DUMP_PATH = None
-DEFAULT_USER_ID = None
+DEFAULT_USER_ID = 1
 DEFAULT_USER_SET = False
 USER_ID_MAP = {}
 SCHEMA_ID_MAP = {}
 log_file = None
 CONFIG_VARIABLES = None
 DATE_AT_IDS = []
+GROUP_CONTAINERS = ['Module']
 date_related_at_cur = node_collection.find({'_type': 'AttributeType', 
     'name': {'$in': ["start_time", "end_time", "start_enroll", "end_enroll"]}})
 for each_date_related_at in date_related_at_cur:
     DATE_AT_IDS.append(each_date_related_at._id)
 history_manager = HistoryManager()
 rcs = RCS()
+
 
 '''
 Following will be available:
@@ -80,7 +91,7 @@ def read_config_file():
     CONFIG_VARIABLES = imp.load_source('config_variables',
             os.path.join(DATA_RESTORE_PATH,'migration_configs.py'))
 
-def validate_data_dump():
+def validate_data_dump(*args):
     """
     For validation of the exported dump and the 
      importing data-dump, calculate MD5 and
@@ -93,14 +104,25 @@ def validate_data_dump():
     md5hash = dirhash(DATA_DUMP_PATH, 'md5')
     if CONFIG_VARIABLES.MD5 != md5hash:
         print "\n MD5 NOT matching."
-        proceed_without_validation = raw_input("MD5 not matching. Restoration not recommended.\n \
-                        Would you still like to continue ?")
-        if proceed_without_validation != 'y' and proceed_without_validation != 'Y':
+        print "\nargs: ", args
+        if args and len(args) == 4:
+            proceed_without_validation = args[1]
+        else:
+            proceed_without_validation = raw_input("MD5 not matching. Restoration not recommended.\n \
+                            Enter (y/Y) to continue ?")
+        if proceed_without_validation not in ['y', 'Y']:
             log_file.write("\n Checksum validation Failed on dump data")
             call_exit()
     else:
-        log_file.write("\n Checksum validation Success on dump data")
         print "\nValidation Success..!"
+        proceed_with_validation = ''
+        if args and len(args) == 4:
+            proceed_without_validation = args[1]
+        else:
+            proceed_with_validation = raw_input("MD5 Matching.\n \
+                            Enter (y/Y) to proceed to restoration")
+        if proceed_with_validation in ['y', 'Y']:
+            log_file.write("\n Checksum validation Success on dump data")
 
 def get_file_path_with_id(node_id):
     file_name = (node_id + '.json')
@@ -116,50 +138,76 @@ def get_file_path_with_id(node_id):
     for pos in range(0, RCS_REPO_DIR_HASH_LEVEL):
         collection_hash_dirs += \
             (node_id[-2**pos] + "/")
-
     file_path = \
         os.path.join(collection_dir, \
                          (collection_hash_dirs + file_name))
-    print "\n\nfilepath: ", file_path
+    # print "\n\nfilepath: ", file_path
     return file_path
 
-def check_group_availability():
+def check_group_availability(*args):
     group_node = node_collection.one({'_id': ObjectId(CONFIG_VARIABLES.GROUP_ID)})
     global log_file
+    global DEFAULT_USER_ID
+
     print '\n\n Restoring Group'
     log_file.write("\n Restoring Group")
-    # fp = get_file_path_with_id(CONFIG_VARIABLES.GROUP_ID)
-    # if fp:
-    #     if not fp.endswith(',v'):
-    #         fp = fp + ',v'
-    #     log_file.write("\n Restoring Group: " + str(fp))
-    #     restore_node(fp)
-    # group_node = node_collection.one({'_id': ObjectId(CONFIG_VARIABLES.GROUP_ID)})
     if group_node:
-        confirm_grp_data_merge = raw_input("Dump Group already exists here. Would you like to merge the data ?")
-        if confirm_grp_data_merge != 'y' and confirm_grp_data_merge != 'Y':
+        print "\n Group with restoration ID already exists."
+        confirm_grp_data_merge = ''
+        if args and len(args) == 4:
+            confirm_grp_data_merge = args[2]
+        else:
+            confirm_grp_data_merge = raw_input("Dump Group already exists here. Would you like to merge the data ?")
+        if confirm_grp_data_merge not in ['y', 'Y']:
             log_file.write("\n Group with Restore Group ID is FOUND on Target system.")
-            print "\n Group with restoration ID already exists."
             call_exit()
         else:
+            fp = get_file_path_with_id(CONFIG_VARIABLES.GROUP_ID)
+            if fp:
+                if not fp.endswith(',v'):
+                    fp = fp + ',v'
+                log_file.write("\n Restoring Group: " + str(fp))
+                restore_node(fp)
+            group_node = node_collection.one({'_id': ObjectId(CONFIG_VARIABLES.GROUP_ID)})
+            group_node.group_admin = [DEFAULT_USER_ID]
+            group_node.save()
             log_file.write("\n Group Merge confirmed.")
             print " Proceeding to restore."
     else:
-        log_file.write("\n Group with Restore Group ID NOT found on Target system.")
-        print "\n Group with restoration ID does not exists."
-        print " Proceeding to restore."
+        print "\n Group with restoration ID DOES NOT exists."
+        confirm_grp_data_restore = ''
+        if args and len(args) == 4:
+            confirm_grp_data_restore = args[2]
+        else:
+            confirm_grp_data_restore = raw_input("Proceed to restore ?")
+        if confirm_grp_data_restore not in ['y', 'Y']:
+            log_file.write("\n Group with Restore Group ID is NOT FOUND on Target system.")
+            print " Cancelling to restore."
+            call_exit()
+        else:
+            fp = get_file_path_with_id(CONFIG_VARIABLES.GROUP_ID)
+            if fp:
+                if not fp.endswith(',v'):
+                    fp = fp + ',v'
+                log_file.write("\n Restoring Group: " + str(fp))
+                restore_node(fp)
+            group_node = node_collection.one({'_id': ObjectId(CONFIG_VARIABLES.GROUP_ID)})
+            group_node.group_admin = [DEFAULT_USER_ID]
+            group_node.save()
+            log_file.write("\n Group Merge confirmed.")
+            print " Proceeding to restore."
 
-def user_objs_restoration():
+
+def user_objs_restoration(*args):
     global USER_ID_MAP
     global DEFAULT_USER_ID
     global DEFAULT_USER_SET
     global log_file
     user_json_data = None
-    # print "CONFIG_VARIABLES.RESTORE_USER_DATA"
     if CONFIG_VARIABLES.RESTORE_USER_DATA:
         user_dump_restore = raw_input("\n\tUser dump is available.  \
             Would you like to restore it (y/n) ?: ")
-        if user_dump_restore == 'y' or user_dump_restore == 'Y':
+        if user_dump_restore in ['y', 'Y']:
             log_file.write("\n Request for users restoration : Yes.")
 
             user_json_file_path = os.path.join(DATA_DUMP_PATH, 'users_dump.json')
@@ -174,48 +222,84 @@ def user_objs_restoration():
             DEFAULT_USER_SET = True
             default_user_confirmation = raw_input("\n\tRestoration will use default user-id=1. \
             \n\tEnter y to continue, or n if you want to use some other id?: ")
-            if default_user_confirmation == 'y' or default_user_confirmation == 'Y':
+            if default_user_confirmation in ['y', 'Y']:
                 log_file.write("\n Request for Default user with id=1 : Yes.")
                 DEFAULT_USER_ID = 1
             else:
                 log_file.write("\n Request for Default user with id=1 : No.")
                 DEFAULT_USER_ID = int(raw_input("Enter user-id: "))
                 log_file.write("\n Request for Setting Default user with id :" + str(DEFAULT_USER_SET))
+    else:
 
-
+        print "*"*80
+        user_dump_restore_default = ''
+        if args and len(args) == 4:
+            user_dump_restore_default = args[3]
+        else:
+            user_dump_restore_default = raw_input("\n\tUser dump is NOT available.  \
+            Would you like to use USER_ID=1 for restoration(y/n) ?: ")
+        if user_dump_restore_default in ['y', 'Y']:
+            DEFAULT_USER_SET = True
+            DEFAULT_USER_ID = 1
+        print "\n No RESTORE_USER_DATA available. Setting Default user with id: 1"
+        log_file.write("\n No RESTORE_USER_DATA available. Setting Default user with id :" + str(DEFAULT_USER_SET))
 
 def update_schema_id_for_triple(document_json):
     if SCHEMA_ID_MAP:
+        global log_file
+        log_file.write("\nUpdating schema_id for triple.")
         if u'relation_type' in document_json and document_json[u'relation_type'] in SCHEMA_ID_MAP:
+            log_file.write("\nOLD relation_type id " + str(document_json[u'relation_type']))
             document_json[u'relation_type'] = SCHEMA_ID_MAP[document_json[u'relation_type']]
+            log_file.write("\nNEW relation_type id " + str(document_json[u'relation_type']))
         if u'attribute_type' in document_json and document_json[u'attribute_type'] in SCHEMA_ID_MAP:
+            log_file.write("\nOLD attribute_type id " + str(document_json[u'attribute_type']))
             document_json[u'attribute_type'] = SCHEMA_ID_MAP[document_json[u'attribute_type']]
+            log_file.write("\nNEW attribute_type id " + str(document_json[u'attribute_type']))
     return document_json
 
 def update_group_set(document_json):
     if 'group_set' in document_json:
-        document_json['group_set'] = [ObjectId(CONFIG_VARIABLES.GROUP_ID)]
+        if ObjectId(CONFIG_VARIABLES.GROUP_ID) not in document_json['group_set']:
+            document_json['group_set'].append(ObjectId(CONFIG_VARIABLES.GROUP_ID))
     return document_json
 
+def _mapper(json_obj, key, MAP_obj, is_list=False):
+    log_file.write("\n Calling _mapper:\n\t " + str(json_obj)+ str(key)+ str(MAP_obj)+ str(is_list))
+
+    if key in json_obj:
+        if is_list:
+            for eu in json_obj[key]:
+                if eu in MAP_obj:
+                    replace_in_list(json_obj[key],eu, MAP_obj[eu])
+        else:
+            json_obj[key] = MAP_obj[json_obj[key]]
+
 def update_schema_and_user_ids(document_json):
+    log_file.write("\n Invoked update_schema_and_user_ids:\n\t " + str(document_json))
+    global DEFAULT_USER_SET
+    global DEFAULT_USER_ID
     if SCHEMA_ID_MAP:
-        if document_json['member_of']:
-            for each_mem_of_id in document_json['member_of']:
-                if each_mem_of_id in SCHEMA_ID_MAP:
-                    replace_in_list(document_json['member_of'], 
-                        each_mem_of_id, SCHEMA_ID_MAP[each_mem_of_id])
-        if document_json['type_of']:
-            for each_mem_of_id in document_json['type_of']:
-                if each_mem_of_id in SCHEMA_ID_MAP:
-                    replace_in_list(document_json['type_of'], 
-                        each_mem_of_id, SCHEMA_ID_MAP[each_mem_of_id])
-    if USER_ID_MAP:
-        if document_json['created_by'] in USER_ID_MAP:
-            replace_in_list(document_json['contributors'], 
-                document_json['created_by'], USER_ID_MAP[document_json['created_by']])
-            document_json['created_by'] = USER_ID_MAP[document_json['created_by']]
-        if document_json['modified_by'] in USER_ID_MAP:
-            document_json['modified_by'] = USER_ID_MAP[document_json['modified_by']]
+        _mapper(document_json, 'member_of', SCHEMA_ID_MAP, is_list=True)
+        _mapper(document_json, 'type_of', SCHEMA_ID_MAP, is_list=True)
+
+    if DEFAULT_USER_SET:
+        document_json['contributors'] = [DEFAULT_USER_ID]
+        document_json['created_by'] = DEFAULT_USER_ID
+        document_json['modified_by'] = DEFAULT_USER_ID
+        if 'group_admin' in document_json:
+            document_json['group_admin'] = [DEFAULT_USER_ID]
+        if 'author_set' in document_json:
+            document_json['author_set'] = [DEFAULT_USER_ID]
+
+    elif CONFIG_VARIABLES.RESTORE_USER_DATA and USER_ID_MAP:
+        _mapper(document_json, 'contributors', USER_ID_MAP, is_list=True)
+        _mapper(document_json, 'group_admin', USER_ID_MAP, is_list=True)
+        _mapper(document_json, 'author_set', USER_ID_MAP, is_list=True)
+        _mapper(document_json, 'created_by', USER_ID_MAP)
+        _mapper(document_json, 'modified_by', USER_ID_MAP)
+
+    log_file.write("\n Finished update_schema_and_user_ids:\n\t " + str(document_json))
     return document_json
 
     '''
@@ -264,14 +348,14 @@ def restore_filehive_objects(rcs_filehives_path):
                 log_file.write("\nFound Existing Filehive Object : \n\tFound-obj: " + \
                     str(fh_obj) + "\n\tExiting-obj: "+str(fh_json))
 
-def restore_node_objects(rcs_nodes_path):
+def restore_node_objects(rcs_nodes_path, non_grp_root_node=None):
     print "\nRestoring Nodes.."
     global log_file
     log_file.write("\nRestoring Nodes. ")
     for dir_, _, files in os.walk(rcs_nodes_path):
         for filename in files:
             filepath =  os.path.join(dir_, filename)
-            restore_node(filepath)
+            restore_node(filepath,non_grp_root_node)
 
 def restore_triple_objects(rcs_triples_path):
     print "\nRestoring Triples.."
@@ -288,7 +372,9 @@ def restore_triple_objects(rcs_triples_path):
 
             if triple_obj:
                 log_file.write("\n Found Existing Triple : \n\t " + str(triple_obj))
-
+                triple_obj = update_schema_id_for_triple(triple_obj)
+                log_file.write("\n Updated Triple : \n\t " + str(triple_obj))
+                triple_obj.save()
                 if triple_obj._type == "GRelation":
                     if triple_obj.right_subject != triple_json['right_subject']:
                         if type(triple_obj.right_subject) == list:
@@ -322,6 +408,8 @@ def restore_triple_objects(rcs_triples_path):
 
                 try:
                     log_file.write("\n Inserting Triple doc : " + str(triple_json))
+                    triple_json = update_schema_id_for_triple(triple_json)
+
                     node_id = triple_collection.collection.insert(triple_json)
                     triple_obj = triple_collection.one({'_id': node_id})
                     triple_node_RT_AT_id = None
@@ -465,7 +553,7 @@ def restore_counter_objects(rcs_counters_path):
                     log_file.write("\nError while inserting Counter obj" + str(counter_insert_err))
                     pass
 
-def call_group_import(rcs_repo_path):
+def call_group_import(rcs_repo_path,non_grp_root_node=None):
 
     rcs_filehives_path = os.path.join(rcs_repo_path, "Filehives")
     rcs_nodes_path = os.path.join(rcs_repo_path, "Nodes")
@@ -474,7 +562,7 @@ def call_group_import(rcs_repo_path):
 
     # Following sequence is IMPORTANT
     # restore_filehive_objects(rcs_filehives_path)
-    restore_node_objects(rcs_nodes_path)
+    restore_node_objects(rcs_nodes_path, non_grp_root_node)
     restore_triple_objects(rcs_triples_path)
 
     # skip foll. command katkamrachana 21Apr2017
@@ -490,138 +578,243 @@ def copy_media_data(media_path):
         subprocess.Popen(media_copy_cmd,stderr=subprocess.STDOUT,shell=True)
         log_file.write("\n Media Copied:  " + str(media_path) )
 
+def core_import(non_grp_root_node=None, *args):
+    global log_file
+    log_file_path = create_log_file(DATA_RESTORE_PATH)
+    print "\n Log will be found at: ", log_file_path
+    log_file.write("\nUpdated CONFIG_VARIABLES: "+ str(CONFIG_VARIABLES))
+    print "\n Validating the data-dump"
+    validate_data_dump(*args)
+    print "\n Checking the dump Group-id availability."
+    check_group_availability(*args)
+    print "\n User Restoration."
+    user_objs_restoration(*args)
+    print "\n Factory Schema Restoration. Please wait.."
+    # print "\n SCHEMA: ", SCHEMA_ID_MAP
+    call_group_import(os.path.join(DATA_DUMP_PATH, 'data', 'rcs-repo'),non_grp_root_node)
+    copy_media_data(os.path.join(DATA_DUMP_PATH, 'media_files', 'data', 'media'))
+
 class Command(BaseCommand):
     def handle(self, *args, **options):
 
         global DATA_RESTORE_PATH
         global DATA_DUMP_PATH
         global SCHEMA_ID_MAP
-        DATA_RESTORE_PATH = raw_input("\n\tEnter absolute path of data-dump folder to restore:")
+        if args and len(args) == 4:
+            DATA_RESTORE_PATH = args[0]
+        else:
+            DATA_RESTORE_PATH = raw_input("\n\tEnter absolute path of data-dump folder to restore:")
+        print "\nDATA_RESTORE_PATH: ", DATA_RESTORE_PATH
         if os.path.exists(DATA_RESTORE_PATH):
-            DATA_DUMP_PATH = os.path.join(DATA_RESTORE_PATH, 'dump')
+            # Check if DATA_DUMP_PATH has dump, if not then its dump of Node holding Groups.
+            if os.path.exists(os.path.join(DATA_RESTORE_PATH, 'dump')):
+                # Single Group Dump
+                DATA_DUMP_PATH = os.path.join(DATA_RESTORE_PATH, 'dump')
+                SCHEMA_ID_MAP = update_factory_schema_mapper(DATA_RESTORE_PATH)
+                read_config_file()
+                core_import(None,*args)
+            else:
+                # Multi Group Dump
+                # Get the dumps of Groups and loop over each dump to import
+                # gd == group-dump
+                print "\n***** NON Group Dump found. *****\n"
+                global GROUP_CONTAINERS
+                GRP_CONTAINERS_CUR = node_collection.find({'name': {'$in': GROUP_CONTAINERS},
+                    '_type': 'GSystemType'})
+                GRP_CONTAINERS_IDS = [cont._id for cont in GRP_CONTAINERS_CUR]
+                SCHEMA_ID_MAP = update_factory_schema_mapper(DATA_RESTORE_PATH)
+                dump_dir = [os.path.join(DATA_RESTORE_PATH,gd) for gd in os.listdir(DATA_RESTORE_PATH) if os.path.isdir(os.path.join(DATA_RESTORE_PATH,gd))]
+                print "\n Total Groups to be Restored: ", len(dump_dir)
+                for each_gd_abs_path in dump_dir:
+                    # Call this tmw
+                    # SCHEMA_ID_MAP = update_factory_schema_mapper(DATA_DUMP_PATH)
+                    DATA_DUMP_PATH = os.path.join(each_gd_abs_path, 'dump')
+                    DATA_RESTORE_PATH = each_gd_abs_path
+                    read_config_file()
+
+                    non_grp_root_node_obj = node_collection.one({
+                        '_id': ObjectId(CONFIG_VARIABLES.ROOT_DUMP_NODE_ID)
+                    })
+                    if non_grp_root_node_obj:
+                        core_import((CONFIG_VARIABLES.ROOT_DUMP_NODE_ID,CONFIG_VARIABLES.ROOT_DUMP_NODE_NAME),*args)
+                    else:
+                        non_grp_root_node_obj = node_collection.one({
+                                'name': CONFIG_VARIABLES.ROOT_DUMP_NODE_NAME,
+                                'member_of': {'$in': GRP_CONTAINERS_IDS}})
+
+                        if non_grp_root_node_obj:
+                            # if non_grp_root_node_obj._id != ObjectId(CONFIG_VARIABLES.ROOT_DUMP_NODE_ID):
+                            #     # Module exists, but ID is different
+                            #     core_import(None,*args)
+                            # else:
+                            core_import((CONFIG_VARIABLES.ROOT_DUMP_NODE_ID,CONFIG_VARIABLES.ROOT_DUMP_NODE_NAME),*args)
+                        else:
+                            core_import(None,*args)
+
+                    # print "\n each_gd_abs_path: ", os.path.join(DATA_RESTORE_PATH,each_gd_abs_path)
             print "*"*70
             # print "\n Export will be found at: ", DATA_EXPORT_PATH
             print "\n This will take few minutes. Please be patient.\n"
             print "*"*70
-            read_config_file()
             
-            log_file_path = create_log_file(DATA_RESTORE_PATH)
-            global log_file
-            log_file.write("\nUpdated CONFIG_VARIABLES: "+ str(CONFIG_VARIABLES))
-            print "\n Validating the data-dump"
-            validate_data_dump()
-            print "\n Checking the dump Group-id availability."
-            check_group_availability()
-            print "\n User Restoration."
-            user_objs_restoration()
-
-            print "\n Factory Schema Restoration. Please wait.."
-            SCHEMA_ID_MAP = update_factory_schema_mapper(DATA_DUMP_PATH)
-            print "\n SCHEMA: ", SCHEMA_ID_MAP
-            print "\n Log will be found at: ", log_file_path
-            call_group_import(os.path.join(DATA_DUMP_PATH, 'data', 'rcs-repo'))
-            copy_media_data(os.path.join(DATA_DUMP_PATH, 'media_files', 'data', 'media'))
         else:
             print "\n No dump found at entered path."
             call_exit()
 
-def restore_node(filepath):
+def restore_node(filepath, non_grp_root_node=None):
+    '''
+    non_grp_root_node tuple (ObjectId, name) is used if the GSystem existing on target 
+    and we intend to skip the dumped-node-id having the name 
+    and member_of same but that differ in ObjectId.
+    (dumped_node_id, exisiting_node_id)
+    '''
     global log_file
     log_file.write("\nRestoring Node: " +  str(filepath))
 
     node_json = get_json_file(filepath)
     print node_json
+    proceed_flag = True
     try:
-        node_obj = node_collection.one({'_id': ObjectId(node_json['_id'])})
-        if node_obj:
-            log_file.write("\nFound Existing Node : " + str(node_obj._id))
-            node_changed = False
-            if node_obj.author_set != node_json['author_set'] and node_json['author_set']:
-                log_file.write("\n Old author_set :\n\t " + str(node_obj.author_set))
-                node_obj.author_set = merge_lists_and_maintain_unique_ele(node_obj.author_set,
-                    node_json['author_set'])
-                log_file.write("\n New author_set :\n\t "+ str(node_obj.author_set))
-                node_changed = True
+        if non_grp_root_node:
+            log_file.write("\n non_grp_root_node: " +  str(non_grp_root_node))
+            if non_grp_root_node[0] == node_json['_id']:
+                log_file.write("\n Found by ID non_grp_root_node: ")
+                root_node_obj = node_collection.one({'_type': 'GSystem',
+                    '_id': ObjectId(node_json['_id']),
+                })
+                merged_collection_set_ids = map(ObjectId,list(set(root_node_obj.collection_set + node_json['collection_set'])))
+                merged_collection_set_cur = node_collection.find({'_id': {'$in': merged_collection_set_ids}})
+                valid_collection_set_id = [coll_set_node._id for coll_set_node in merged_collection_set_cur]
+                root_node_obj.collection_set = valid_collection_set_id
+                root_node_obj.save()
+            elif non_grp_root_node[1] == node_json['name']:
+                global GROUP_CONTAINERS
+                GRP_CONTAINERS_CUR = node_collection.find({'name': {'$in': GROUP_CONTAINERS},
+                    '_type': 'GSystemType'})
+                GRP_CONTAINERS_IDS = [cont._id for cont in GRP_CONTAINERS_CUR]
+                log_file.write("\n Found by Name non_grp_root_node: ")
+                root_node_obj = node_collection.one({'_type': 'GSystem',
+                    'name': non_grp_root_node[1],
+                    'member_of': {'$in': GRP_CONTAINERS_IDS}
+                })
+                merged_collection_set_ids = map(ObjectId,list(set(root_node_obj.collection_set + node_json['collection_set'])))
+                merged_collection_set_cur = node_collection.find({'_id': {'$in': merged_collection_set_ids}})
+                valid_collection_set_id = [coll_set_node._id for coll_set_node in merged_collection_set_cur]
+                root_node_obj.collection_set = valid_collection_set_id
+                root_node_obj.save()
+                proceed_flag = False
+        if proceed_flag:
+            node_obj = node_collection.one({'_id': ObjectId(node_json['_id'])})
+            if node_obj:
+                node_obj = update_schema_and_user_ids(node_obj)
+                if SCHEMA_ID_MAP:
+                    _mapper(node_obj, 'member_of', SCHEMA_ID_MAP, is_list=True)
+                    _mapper(node_obj, 'type_of', SCHEMA_ID_MAP, is_list=True)
 
-            if node_obj.relation_set != node_json['relation_set'] and node_json['relation_set']:
-                log_file.write("\n Old relation_set :\n\t "+ str(node_obj.relation_set))
-                node_obj.relation_set = merge_lists_and_maintain_unique_ele(node_obj.relation_set,
-                    node_json['relation_set'], advanced_merge=True)
-                log_file.write("\n New relation_set :\n\t "+ str(node_obj.relation_set))
-                node_changed = True
+                log_file.write("\nFound Existing Node : " + str(node_obj._id))
+                node_changed = False
+                if node_obj.author_set != node_json['author_set'] and node_json['author_set']:
+                    log_file.write("\n Old author_set :\n\t " + str(node_obj.author_set))
+                    node_obj.author_set = merge_lists_and_maintain_unique_ele(node_obj.author_set,
+                        node_json['author_set'])
+                    log_file.write("\n New author_set :\n\t "+ str(node_obj.author_set))
+                    node_changed = True
 
-            if node_obj.attribute_set != node_json['attribute_set'] and node_json['attribute_set']:
-                log_file.write("\n Old attribute_set :\n\t "+ str(node_obj.attribute_set))
-                node_obj.attribute_set = merge_lists_and_maintain_unique_ele(node_obj.attribute_set,
-                    node_json['attribute_set'], advanced_merge=True)
-                log_file.write("\n New attribute_set :\n\t "+ str(node_obj.attribute_set))
-                node_changed = True
+                if node_obj.relation_set != node_json['relation_set'] and node_json['relation_set']:
+                    log_file.write("\n Old relation_set :\n\t "+ str(node_obj.relation_set))
+                    node_obj.relation_set = merge_lists_and_maintain_unique_ele(node_obj.relation_set,
+                        node_json['relation_set'], advanced_merge=True)
+                    log_file.write("\n New relation_set :\n\t "+ str(node_obj.relation_set))
+                    node_changed = True
 
-            if node_obj.post_node != node_json['post_node'] and node_json['post_node']:
-                log_file.write("\n Old post_node :\n\t "+ str(node_obj.post_node))
-                node_obj.post_node = merge_lists_and_maintain_unique_ele(node_obj.post_node,
-                    node_json['post_node'])
-                log_file.write("\n New post_node :\n\t "+ str(node_obj.post_node))
-                node_changed = True
+                if node_obj.attribute_set != node_json['attribute_set'] and node_json['attribute_set']:
+                    log_file.write("\n Old attribute_set :\n\t "+ str(node_obj.attribute_set))
+                    node_obj.attribute_set = merge_lists_and_maintain_unique_ele(node_obj.attribute_set,
+                        node_json['attribute_set'], advanced_merge=True)
+                    log_file.write("\n New attribute_set :\n\t "+ str(node_obj.attribute_set))
+                    node_changed = True
 
-            if  node_obj.group_set != node_json['group_set'] and node_json['group_set']:
-                log_file.write("\n Old group_set :\n\t "+ str(node_obj.group_set))
-                node_obj.group_set = merge_lists_and_maintain_unique_ele(node_obj.group_set,
-                    node_json['group_set'])
-                log_file.write("\n New group_set :\n\t "+ str(node_obj.group_set))
-                node_changed = True
+                if node_obj.post_node != node_json['post_node'] and node_json['post_node']:
+                    log_file.write("\n Old post_node :\n\t "+ str(node_obj.post_node))
+                    node_obj.post_node = merge_lists_and_maintain_unique_ele(node_obj.post_node,
+                        node_json['post_node'])
+                    log_file.write("\n New post_node :\n\t "+ str(node_obj.post_node))
+                    node_changed = True
 
-            if node_obj.prior_node != node_json['prior_node'] and node_json['prior_node']:
-                log_file.write("\n Old prior_node :\n\t "+ str(node_obj.prior_node))
-                node_obj.prior_node = merge_lists_and_maintain_unique_ele(node_obj.prior_node,
-                    node_json['prior_node'])
-                log_file.write("\n New prior_node :\n\t "+ str(node_obj.prior_node))
-                node_changed = True
+                # if  node_obj.group_set != node_json['group_set'] and node_json['group_set']:
+                #     log_file.write("\n Old group_set :\n\t "+ str(node_obj.group_set))
+                #     node_obj.group_set = merge_lists_and_maintain_unique_ele(node_obj.group_set,
+                #         node_json['group_set'])
+                #     log_file.write("\n New group_set :\n\t "+ str(node_obj.group_set))
+                #     node_changed = True
 
-            if node_obj.origin != node_json['origin'] and node_json['origin']:
-                log_file.write("\n Old origin :\n\t "+ str(node_obj.origin))
-                node_obj.origin = merge_lists_and_maintain_unique_ele(node_obj.origin,
-                    node_json['origin'])
-                log_file.write("\n New origin :\n\t "+ str(node_obj.origin))
-                node_changed = True
+                if node_obj.prior_node != node_json['prior_node'] and node_json['prior_node']:
+                    log_file.write("\n Old prior_node :\n\t "+ str(node_obj.prior_node))
+                    node_obj.prior_node = merge_lists_and_maintain_unique_ele(node_obj.prior_node,
+                        node_json['prior_node'])
+                    log_file.write("\n New prior_node :\n\t "+ str(node_obj.prior_node))
+                    node_changed = True
 
-            if node_obj.collection_set != node_json['collection_set'] and node_json['collection_set']:
+                if node_obj.origin != node_json['origin'] and node_json['origin']:
+                    log_file.write("\n Old origin :\n\t "+ str(node_obj.origin))
+                    node_obj.origin = merge_lists_and_maintain_unique_ele(node_obj.origin,
+                        node_json['origin'])
+                    log_file.write("\n New origin :\n\t "+ str(node_obj.origin))
+                    node_changed = True
+
+                # if node_obj.collection_set != node_json['collection_set'] and node_json['collection_set']:
+                #     log_file.write("\n Old collection_set :\n\t "+ str(node_obj.collection_set))
+                #     log_file.write("\n Requested collection_set :\n\t "+ str(node_json['collection_set']))
+
+                #     # node_obj.collection_set = merge_lists_and_maintain_unique_ele(node_obj.collection_set,
+                #     #     node_json['collection_set'])
+                #     node_obj.collection_set = node_json['collection_set']
+                #     log_file.write("\n New collection_set :\n\t "+ str(node_obj.collection_set))
+                #     node_changed = True
+
+                if node_obj.content != node_json['content'] and node_json['content']:
+                    log_file.write("\n Old content :\n\t "+ str(node_obj.content))
+                    node_obj.content = node_json['content']
+                    node_changed = True
+                    log_file.write("\n New content :\n\t "+ str(node_obj.content))
+
                 log_file.write("\n Old collection_set :\n\t "+ str(node_obj.collection_set))
-                node_obj.collection_set = merge_lists_and_maintain_unique_ele(node_obj.collection_set,
-                    node_json['collection_set'])
+                log_file.write("\n Requested collection_set :\n\t "+ str(node_json['collection_set']))
+
+                # node_obj.collection_set = merge_lists_and_maintain_unique_ele(node_obj.collection_set,
+                #     node_json['collection_set'])
+                node_obj.collection_set = node_json['collection_set']
                 log_file.write("\n New collection_set :\n\t "+ str(node_obj.collection_set))
                 node_changed = True
 
-            if node_obj.content != node_json['content'] and node_json['content']:
-                log_file.write("\n Old content :\n\t "+ str(node_obj.content))
-                node_obj.content = node_json['content']
+                log_file.write("\n Old group_set :\n\t "+ str(node_obj.group_set))
+
+                if ObjectId(CONFIG_VARIABLES.GROUP_ID) not in node_obj.group_set:
+                    node_obj.group_set.append(ObjectId(CONFIG_VARIABLES.GROUP_ID))
+
+                # node_obj.group_set = [ObjectId(CONFIG_VARIABLES.GROUP_ID)]
+                log_file.write("\n New group_set :\n\t "+ str(node_obj.group_set))
+                node_obj.access_policy = u'PUBLIC'
+                log_file.write("\n Setting access_policy: u'PUBLIC'")
                 node_changed = True
-                log_file.write("\n New content :\n\t "+ str(node_obj.content))
 
-            log_file.write("\n Old group_set :\n\t "+ str(node_obj.group_set))
-            node_obj.group_set = [ObjectId(CONFIG_VARIABLES.GROUP_ID)]
-            log_file.write("\n New group_set :\n\t "+ str(node_obj.group_set))
-            node_obj.access_policy = u'PUBLIC'
-            log_file.write("\n Setting access_policy: u'PUBLIC'")
-            node_changed = True
-
-            if node_changed:
-                log_file.write("\n Node Updated: \n\t OLD: " + str(node_obj) + "\n\tNew: "+str(node_json))
-                node_obj.save()
-        else:
-            copy_version_file(filepath)
-            log_file.write("\n RCS file copied : \n\t" + str(filepath))
-            node_json = update_schema_and_user_ids(node_json)
-            node_json = update_group_set(node_json)
-            try:
-                log_file.write("\n Inserting Node doc : \n\t" + str(node_json))
-                node_id = node_collection.collection.insert(node_json)
-                node_obj = node_collection.one({'_id': node_id})
-                node_obj.save(groupid=ObjectId(CONFIG_VARIABLES.GROUP_ID))
-                log_file.write("\nUpdate RCS using save()")
-            except Exception as node_insert_err:
-                log_file.write("\nError while inserting Node obj" + str(node_insert_err))
-                pass
+                if node_changed:
+                    log_file.write("\n Node Updated: \n\t OLD: " + str(node_obj) + "\n\tNew: "+str(node_json))
+                    node_obj.save()
+            else:
+                copy_version_file(filepath)
+                log_file.write("\n RCS file copied : \n\t" + str(filepath))
+                node_json = update_schema_and_user_ids(node_json)
+                node_json = update_group_set(node_json)
+                try:
+                    log_file.write("\n Inserting Node doc : \n\t" + str(node_json))
+                    node_id = node_collection.collection.insert(node_json)
+                    node_obj = node_collection.one({'_id': node_id})
+                    node_obj.save(groupid=ObjectId(CONFIG_VARIABLES.GROUP_ID))
+                    log_file.write("\nUpdate RCS using save()")
+                except Exception as node_insert_err:
+                    log_file.write("\nError while inserting Node obj" + str(node_insert_err))
+                    pass
     except Exception as restore_node_obj_err:
         print "\n Error in restore_node_obj_err: ", restore_node_obj_err
         log_file.write("\nOuter Error while inserting Node obj" + str(restore_node_obj_err))
@@ -647,7 +840,7 @@ def restore_node(filepath):
 #                     each_attr_dict[each_key] = datetime.datetime.fromtimestamp(each_val/1e3)
 #     return d
 
-def parse_datetime_values(d):
+def parse_json_values(d):
     # This decoder will be moved to models next to class NodeJSONEncoder
     if u'uploaded_at' in d:
         d[u'uploaded_at'] = datetime.datetime.fromtimestamp(d[u'uploaded_at']/1e3)
@@ -681,7 +874,7 @@ def get_json_file(filepath):
             fp = fp.split(',')[0]
         with open(fp, 'r') as version_file:
             obj_as_json = json.loads(version_file.read(), object_hook=json_util.object_hook)
-            parse_datetime_values(obj_as_json)
+            parse_json_values(obj_as_json)
             rcs.checkin(fp)
             # os.remove(fp)
         return obj_as_json
