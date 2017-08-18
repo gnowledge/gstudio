@@ -24,6 +24,7 @@ if os.path.exists(file_input):
     with open(file_input, 'rb') as csvfile:
         users = csv.reader(csvfile, delimiter=',')
         for school_code, username, password in users:
+        # for school_code, username, password, user_id, first_name, last_name in users:
 
             # email validation from username
             email = ''
@@ -33,6 +34,7 @@ if os.path.exists(file_input):
 
             temp_csv_log_list = [school_code, username, password]
             user_obj = User.objects.create_user(username=username, email=email, password=password)
+            # user_obj = User.objects.create_user(username=username, email=email, password=password, first_name=first_name, last_name=last_name)
             user_id = user_obj.id
 
             temp_csv_log_list.append(str(user_id))
@@ -43,10 +45,10 @@ if os.path.exists(file_input):
             auth['member_of'] = [auth_gst_id]
             auth['group_type'] = u"PUBLIC"
             auth['edit_policy'] = u"NON_EDITABLE"
-            auth['created_by'] = user_id
-            auth['modified_by'] = user_id
-            auth['contributors'] = [user_id]
-            auth['group_admin'] = [user_id]
+            auth['created_by'] = int(user_id)
+            auth['modified_by'] = int(user_id)
+            auth['contributors'] = [int(user_id)]
+            auth['group_admin'] = [int(user_id)]
             auth['agency_type'] = "Student"
             auth['_id'] = ObjectId()
             auth.save(groupid=auth['_id'])
