@@ -2360,11 +2360,26 @@ def course_raw_material(request, group_id, node_id=None,page_no=1):
     asset_gst_name, asset_gst_id = GSystemType.get_gst_name_id("Asset")
     asset_nodes = node_collection.find({'member_of': {'$in': [asset_gst_id]},
             'group_set': {'$all': [ObjectId(group_id)]},'tags': "raw@material"}).sort('last_update', -1)
+    
+    from collections import defaultdict
+    asset_thumbnail = defaultdict(list)
+    
+    data_list = []
+    for each in asset_nodes:
+        grel_asstcontent = get_relation_value (each.pk, 'has_assetcontent')
+        if grel_asstcontent['grel_id']:
+            for each_rel in grel_asstcontent['grel_node']:
+                asset_thumbnail[each._id].append(each_rel['if_file']['original']['relurl'])  
+                data_list.append(asset_thumbnail)
+    
+    # print "000000",dict(asset_thumbnail),"\n"
+
+    asset_nodes.rewind()
     context_variables = {
             'group_id': group_id, 'groupid': group_id, 'group_name':group_name,
             'group_obj': group_obj, 'title': 'raw material',
             'old_profile_pics':old_profile_pics, "prof_pic_obj": banner_pic_obj,
-            'asset_nodes':asset_nodes
+            'asset_nodes':asset_nodes,'thumbnails_dict':dict(asset_thumbnail),
         }
     if node_id:
         file_obj = node_collection.one({'_id': ObjectId(node_id)})

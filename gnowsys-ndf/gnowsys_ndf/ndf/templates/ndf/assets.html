@@ -40,23 +40,9 @@
       <div class="small-12 medium-6 large-3 columns ">
         <div class="asset_tile">
             <div class="asset_preview">
-            {% if "raw@material" in each.tags and title == "asset_list" %}
-                <div class="raw_material_asset">{% trans "Raw Material" %}</div>
-            {% endif %}
-                {% if  grel_asstcontent.grel_id %}
-                {# {{grel_asstcontent.grel_id|length}} #}
-                    {% for each_rel in grel_asstcontent.grel_node %}
-                        {% if each_rel.if_file.original.relurl %}
-                            <img src="{{MEDIA_URL}}{{each_rel.if_file.mid.relurl}}"> 
-                        {% endif %}
-                    {% endfor %}
-                {% elif each.if_file.mid.relurl and 'video' not in each.if_file.mime_type %}
-                    <img src="{{MEDIA_URL}}{{each.if_file.mid.relurl}}">
-                {% elif 'video' not in each.if_file.mime_type and each.if_file.thumbnail.relurl %}
-                    <img src="{{MEDIA_URL}}{{each.if_file.thumbnail.relurl}}">
-                {% else %}
-                    <img src="/static/ndf/images/asset.png">
-                {% endif %}
+              <section class="photos-{{each.pk}} photos">
+                 
+              </section>
             </div>
             <div class="asset_text">
                 <div class="asset_title" title="{% firstof each.altnames each.name %}">{% firstof each.altnames|truncatechars:25  each.name|truncatechars:25 %}</div>
@@ -85,4 +71,23 @@
                            }
                      });
            });
+function getRandomSize(min, max) {
+  return Math.round(Math.random() * (max - min) + min);
+}
+
+var allImages = "";
+var allImages1 = "";
+
+{% for k,v in thumbnails_dict.items %}
+    {% for each in v %}
+        var width = getRandomSize(208, 218);
+        var height =  getRandomSize(240, 220);
+        allImages1 += '<img src="/media/{{each}}" style="width='+width+' height='+height+'" alt="pretty kitty">';
+    {% endfor %}
+{% endfor %}
+{% for k,v in thumbnails_dict.items %}
+    $('.photos-{{k}}').append(allImages1);
+
+{% endfor %}
+
 </script> 
