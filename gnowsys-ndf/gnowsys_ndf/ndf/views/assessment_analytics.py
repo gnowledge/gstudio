@@ -3,12 +3,18 @@ import requests
 print "\n In assessment Analytics"
 def userSpecificData(domain,bankId,offeredId,guserId=None):
     url = str(domain) + ":8080/api/v1/assessment/banks/"+str(bankId)+"/assessmentsoffered/"+str(offeredId)+"/results"
-    if guserId:
-        url = url + "?agentId="+guserId
-    # print "\n\nurl: ", url
-    r =  requests.get(url,verify = False)
-    status = r.status_code
-    data = r.json()
+    data = []
+    try:
+        if guserId:
+            url = url + "?agentId="+guserId
+        print "\n\nurl: ", url
+        r =  requests.get(url,verify = False)
+        status = r.status_code
+        # print "r.text, ", r.text
+        data = r.json()
+    except Exception as userSpecificData_err:
+        print "\nError Occurred in userSpecificData()", userSpecificData_err
+        pass
     return data
 
 def questionCount(domain, guserId,bankId,offeredId):

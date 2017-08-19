@@ -5996,51 +5996,99 @@ def get_all_iframes_of_unit(group_obj, domain):
     result_set = []
     assessment_str = "assessment.Bank"
     group_id  = group_obj._id
-    gst_page_name, gst_page_id = GSystemType.get_gst_name_id("Page")
-    gst_wiki_page_name, gst_wiki_page_id = GSystemType.get_gst_name_id("Wiki page")
-    pages_holding_assessments_cur = node_collection.find({'group_set': ObjectId(group_id), 'content': {'$regex': assessment_str, '$options': "i"}})
-    for each_node in pages_holding_assessments_cur:
-        all_iframes = BeautifulSoup(each_node.content, 'html.parser').find_all('iframe',src=re.compile(assessment_str))
-        for each_iframe in all_iframes:
-            src_attr = each_iframe["src"]
-            bank_offered_id = parse_assessment_url(src_attr)
-            if bank_offered_id not in result_set:
-                result_set.append(bank_offered_id)
-    create_gattribute(group_id, "assessment_list", result_set)
-    group_obj.reload()
-    update_total_assessment_items(group_id, result_set, domain)
-    group_obj.reload()
+    try:
+        gst_page_name, gst_page_id = GSystemType.get_gst_name_id("Page")
+        gst_wiki_page_name, gst_wiki_page_id = GSystemType.get_gst_name_id("Wiki page")
+
+        # Fech all pages having assessments embedded into it
+        pages_holding_assessments_cur = node_collection.find({
+                    'group_set': ObjectId(group_id),
+                    'member_of': gst_page_id,
+                    'type_of': {'$ne': gst_wiki_page_id},
+                    'content': {'$regex': assessment_str, '$options': "i"}
+            })
+
+
+        # From each page's content collect the assessment iframe
+        for each_node in pages_holding_assessments_cur:
+            all_iframes = BeautifulSoup(
+                each_node.content, 'html.parser').find_all(
+                'iframe',src=re.compile(assessment_str)
+            )
+            for each_iframe in all_iframes:
+                try:
+                    bank_offered_id = parse_assessment_url(each_iframe["src"])
+                    if bank_offered_id not in result_set:
+                        result_set.append(bank_offered_id)
+                except Exception as iframe_update_err:
+                    print "\nError Occurred in calling parse_assessment_url() {0}".format(
+                        iframe_update_err)
+                    pass
+        '''
+        AT: "assessment_list" will hold `result_set = [[a,b], [x,y]]`
+            where 'a' and 'x' represent bank id &
+            where 'b' and 'y' represent assessment_offered_id
+        '''
+        create_gattribute(group_id, "assessment_list", result_set)
+        group_obj.reload()
+        print "\nresult_set: ", result_set
+        update_total_assessment_items(group_id, result_set, domain)
+        group_obj.reload()
+    except Exception as get_all_iframes_of_unit_err:
+        print "\nError Occurred in get_all_iframes_of_unit() {0}".format(
+            get_all_iframes_of_unit_err)
+        pass
+
     return group_obj
 
 def parse_assessment_url(url_as_str):
     import urlparse
     bank_offered_id = [None,None]
-    parsed_src = urlparse.urlparse(url_as_str)
-    get_params = urlparse.parse_qsl(parsed_src.query)
-    for param in get_params:
-        if 'bank' in param[0]:
-            bank_offered_id[0] = param[1]
-        if 'assessment_offered_id' in param[0]:
-            bank_offered_id[1] = param[1]
-    return bank_offered_id
+    try:
+        parsed_src = urlparse.urlparse(url_as_str)
+        get_params = urlparse.parse_qsl(parsed_src.query)
+        # print "\nget_params: ", get_params
+        for param in get_params:
+            if 'bank' in param[0]:
+                bank_offered_id[0] = param[1]
+            if 'assessment_offered_id' in param[0]:
+                bank_offered_id[1] = param[1]
+        return bank_offered_id
+    except Exception as iframe_update_err:
+        print "\nError Occurred in parse_assessment_url() {0}".format(
+            iframe_update_err)
+        return bank_offered_id
 
 def update_total_assessment_items(group_id, assessment_list, domain):
     from gnowsys_ndf.ndf.views.assessment_analytics import userSpecificData
     import urllib
-    questionCount = 0
-    for each_assessment_list in assessment_list:
-        result_data_set = userSpecificData(domain,each_assessment_list[0],each_assessment_list[1])
-        for each_dict in result_data_set:
-            qtn_found = False
-            if 'sections' in each_dict:
-                # get questions dict from each_dict['sections'] list
-                for section in each_dict['sections']:
-                    if 'questions' in section:
-                        questionCount = questionCount + len(section['questions'])
-                        qtn_found = True
-                        break
-            if qtn_found:
-                break
-        # print "\nAC: ", questionCount
-    create_gattribute(group_id, "total_assessment_items", questionCount)
-    return questionCount
+    questionCount_val = 0
+    try:
+        for each_assessment_list in assessment_list:
+            result_data_set = userSpecificData(domain,each_assessment_list[0],each_assessment_list[1])
+            for each_dict in result_data_set:
+                qtn_found = False
+                if 'sections' in each_dict:
+                    # get questions dict from each_dict['sections'] list
+                    for section in each_dict['sections']:
+                        if 'questions' in section:
+                            questionCount_val = questionCount_val + len(section['questions'])
+                            print "\nquestionCount_val: ", questionCount_val
+                            print "\neach_assessment_list: ", each_assessment_list
+                            qtn_found = True
+                            break
+                if qtn_found:
+                    break
+
+        '''
+        AT: "total_assessment_items" will hold `questionCount_val = x`
+            where 'x' represent count of questions
+        '''
+
+        print "\nAC: ", questionCount_val
+        create_gattribute(group_id, "total_assessment_items", questionCount_val)
+        return questionCount_val
+    except Exception as update_total_assessment_items_err:
+        print "\nError Occurred in update_total_assessment_items() {0}".format(
+            update_total_assessment_items_err)
+        return questionCount_val
