@@ -36,7 +36,6 @@ pathlib2==2.2.1
 dlkit==0.5.2
 beautifulsoup4==4.4.1
 cffi==1.7.0
-cryptography==1.4
 enum34==1.1.6
 html5lib==0.9999999
 idna==2.1
@@ -59,6 +58,7 @@ waitress==0.8.10
 bs4==0.0.1
 html==1.16
 checksumdir==1.1.0
+cryptography==1.4
 # version needed to overwrite on all above intermediate installs
 pymongo==2.8
 elasticsearch==5.4.0

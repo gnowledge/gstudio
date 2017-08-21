@@ -2,14 +2,15 @@
 {% load ndf_tags %}
 
   <form data-abide id="form-edit-node" method="POST"   action="{% url 'save_interactions' group_id %}" enctype="multipart/form-data">
-	{% get_attribute_value node.pk 'player_discussion_enable' as player_discussion_enable_attr %}
+  {% get_attribute_value node.pk 'player_discussion_enable' as player_discussion_enable_attr %}
+  {% get_attribute_value node.pk 'discussion_enable' as discussion_enable_attr %}
   {% get_thread_node node.pk as thread_node %}
   {% if thread_node %}
       {% get_attribute_value thread_node.pk 'release_response' as resp_val %}
       {% get_attribute_value thread_node.pk 'thread_interaction_type' as thr_int_type %}
   {% endif %}
-	{% csrf_token %}
-	<input type="hidden" name="node_id" class="form_node_id" value="{{node.pk}}">
+  {% csrf_token %}
+  <input type="hidden" name="node_id" class="form_node_id" value="{{node.pk}}">
 
         <div class="interaction-settings-div">
           <div class="row">
@@ -62,7 +63,7 @@
   </form>
 
     <script type="text/javascript">
-    	$("input[name=thread_create]").change(function(){
+      $("input[name=thread_create]").change(function(){
             var radio_sel = $('input[name=thread_create]:checked').val()
             if(radio_sel=="Yes"){
                 $(".thread-settings-div").removeClass("hide");
@@ -77,17 +78,17 @@
         })
 
         $(document).ready(function(){
-					{% if player_discussion_enable_attr %} 
-						$("input[name='thread_create'][value='Yes']").attr("checked","checked");
-						$("input[name='thread_create'][value='No']").removeAttr("checked");
+          {% if player_discussion_enable_attr or discussion_enable_attr %} 
+            $("input[name='thread_create'][value='Yes']").attr("checked","checked");
+            $("input[name='thread_create'][value='No']").removeAttr("checked");
             $(".thread-settings-div").removeClass("hide");
 
-					{% endif %}
+          {% endif %}
 
         });
         
         $( ".cancel-interaction_settings" ).click(function(event) {
-					$('#addAsset').foundation('reveal', 'close');     
+          $('#addAsset').foundation('reveal', 'close');     
         });
 
 

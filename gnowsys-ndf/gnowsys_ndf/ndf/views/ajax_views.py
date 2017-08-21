@@ -6944,18 +6944,23 @@ def get_interaction_widget(request, group_id):
             context_instance=RequestContext(request)) 
 
 def save_interactions(request, group_id):
+  group_obj = get_group_name_id(group_id, get_obj=True)
   node_id = request.POST.get('node_id', None)
   node  = node_collection.one({"_id":ObjectId(node_id)})
 
   thread_create_val = request.POST.get("thread_create",'')
 
   # print "\n\n help_info_page  === ", help_info_page
-  player_discussion_enable_at = node_collection.one({"_type": "AttributeType", "name": "player_discussion_enable"})
+  group_obj_member_of_names_list= group_obj.member_of_names_list
+  if "base_unit" in group_obj_member_of_names_list:
+    discussion_enable_at = node_collection.one({"_type": "AttributeType", "name": "player_discussion_enable"})
+  else:
+    discussion_enable_at = node_collection.one({"_type": "AttributeType", "name": "discussion_enable"})
   if thread_create_val == "Yes":
-    create_gattribute(node._id, player_discussion_enable_at, True)
+    create_gattribute(node._id, discussion_enable_at, True)
     return_status = create_thread_for_node(request,group_id, node)
   else:
-    create_gattribute(node._id, player_discussion_enable_at, False)
+    create_gattribute(node._id, discussion_enable_at, False)
   return HttpResponseRedirect(reverse('view_course_page', kwargs={'group_id':ObjectId(group_id),'page_id': ObjectId(node._id)}))
   
 

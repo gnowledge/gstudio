@@ -127,13 +127,18 @@ def logged_out(sender, user, request, **kwargs):
         # print "userid", request.user.id
         # print "session val: ", request.session.get('buddies_authid_list', [])
 
-        user_id = request.user.id
-        if user_id and request.session.session_key:
-            buddy_obj = Buddy.query_buddy_obj(loggedin_userid=user_id,
-                                            session_key=request.session.session_key)
 
-            if buddy_obj:
-                buddy_obj.end_buddy_session()
+        try:
+            user_id = request.user.id
+            if user_id and request.session.session_key:
+                buddy_obj = Buddy.query_buddy_obj(loggedin_userid=user_id,
+                                                session_key=request.session.session_key)
+
+                if buddy_obj:
+                    buddy_obj.end_buddy_session()
+        except Exception as e:
+            print e
+            pass
 
         # DjangoActiveUsersGroup.removefrom_user_set(user_id)
 
