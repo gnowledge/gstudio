@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 from bson import json_util
 import re
 import json
@@ -239,7 +240,7 @@ def get_search(request):
 def get_suggestion_body(query, field_value, slop_value, field_name_value):
 	'''
 	This function is used to return the suggestion json body that will be passed to the suggest function of elasticsearch query DSL. 
-	Arguments: query, field in which suggestion is to be found + “.trigram” to use trigram analyzer, 
+	Arguments: query, field in which suggestion is to be found + "trigram" to use trigram analyzer,
 	slop value, field in which suggestion is to be found
 	Returns:  the suggestion body
 	'''
