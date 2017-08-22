@@ -9,11 +9,16 @@
     /* no vertical space*/
     line-height: 0;
     -webkit-column-count: 1;
-    -webkit-column-gap:   0px;
     -moz-column-count:    1;
+    -webkit-column-gap:   0px;
     -moz-column-gap:      0px;
     column-count:         1;
-    column-gap:           1px; 
+    column-gap:           1px;
+    -moz-row-count: 3;
+    row-count: 3;
+    -webkit-row-gap:   0px;
+    -moz-row-gap:      0px;
+
   }
 
   .photos-02 img {
@@ -23,34 +28,46 @@
   }
 
   @media (max-width: 1200px) {
-      .photos-02 {
-      -moz-column-count:    1;
+      .photos-03 {
+      -moz-row-count:    3;
       -webkit-column-count: 1;
       column-count:         1;
+      row-count: 3;
+      -webkit-row-gap:   0px;
+      -moz-row-gap:      0px;
       }
   }
 
   @media (max-width: 1000px) {
-      .photos-02 {
-      -moz-column-count:    1;
+      .photos-03 {
+      -moz-row-count:    3;
       -webkit-column-count: 1;
       column-count:         1;
+      row-count: 3;
+      -webkit-row-gap:   0px;
+      -moz-row-gap:      0px;
       }
   }
 
   @media (max-width: 800px) {
-    .photos-02 {
-    -moz-column-count:    1;
-    -webkit-column-count: 1;
-    column-count:         1;
+    .photos-03 {
+      -moz-row-count:    3;
+      -webkit-column-count: 0;
+      column-count:         1;
+      row-count: 3;
+      -webkit-row-gap:   0px;
+      -moz-row-gap:      0px;
     }
   }
 
   @media (max-width: 400px) {
-    .photos-02 {
-    -moz-column-count:    1;
-    -webkit-column-count: 1;
-    column-count:         1;
+    .photos-03 {
+      -moz-row-count:    3;
+      -webkit-column-count: 1;
+      column-count:         1;
+      row-count: 3;
+      -webkit-row-gap:   0px;
+      -moz-row-gap:      0px;
     }
   }
 
@@ -64,7 +81,7 @@
       <div class="small-12 medium-6 large-3 columns ">
         <div class="asset_tile">
             <div class="">
-              <section class="photos-02">
+              <section class="photos-03">
               </section>
             </div>
             <div class="asset_text">
@@ -84,13 +101,13 @@
 
 var allImages = "";
 
-for (var i = 0; i < 2; i++) {
-  var width = getRandomSize(220, 231);
-  var height =  getRandomSize(100, 103);
+for (var i = 0; i < 3; i++) {
+  var width = getRandomSize(340, 351);
+  var height =  getRandomSize(100, 102);
   allImages += '<img src="https://placekitten.com/'+width+'/'+height+'" alt="pretty kitty">';
 }
 
-$('.photos-02').append(allImages);
+$('.photos-03').append(allImages);
 </script>
 
 
