@@ -5,49 +5,49 @@
 
 {% get_node_hierarchy node as node_hierarchy %}
 <style type="text/css">
-  #photos{
+  .photos-02{
     /* no vertical space*/
     line-height: 0;
-      -webkit-column-count: 2;
+    -webkit-column-count: 1;
     -webkit-column-gap:   0px;
-    -moz-column-count:    2;
+    -moz-column-count:    1;
     -moz-column-gap:      0px;
-    column-count:         2;
-    column-gap:           0px; 
+    column-count:         1;
+    column-gap:           1px; 
   }
 
-  #photos img {
+  .photos-02 img {
   /* Just in case there are inline attributes */
-      width: 100% !important;
+      /*width: 100% !important; */
       height: auto !important;
   }
 
   @media (max-width: 1200px) {
-      #photos {
-      -moz-column-count:    2;
-      -webkit-column-count: 2;
-      column-count:         2;
+      .photos-02 {
+      -moz-column-count:    1;
+      -webkit-column-count: 1;
+      column-count:         1;
       }
   }
 
   @media (max-width: 1000px) {
-      #photos {
-      -moz-column-count:    2;
-      -webkit-column-count: 2;
-      column-count:         2;
+      .photos-02 {
+      -moz-column-count:    1;
+      -webkit-column-count: 1;
+      column-count:         1;
       }
   }
 
   @media (max-width: 800px) {
-    #photos {
-    -moz-column-count:    2;
-    -webkit-column-count: 2;
-    column-count:         2;
+    .photos-02 {
+    -moz-column-count:    1;
+    -webkit-column-count: 1;
+    column-count:         1;
     }
   }
 
   @media (max-width: 400px) {
-    #photos {
+    .photos-02 {
     -moz-column-count:    1;
     -webkit-column-count: 1;
     column-count:         1;
@@ -59,16 +59,13 @@
 
 
 
+
 <div class="row listing-row"> 
       <div class="small-12 medium-6 large-3 columns ">
         <div class="asset_tile">
             <div class="">
-              <section id="photos">
-                    <img src="/static/ndf/images/asset.png">
-                    <img src="/static/ndf/images/asset.png">
-                    <img src="/static/ndf/images/asset.png">
-                    <img src="/static/ndf/images/asset.png">
-        </section>
+              <section class="photos-02">
+              </section>
             </div>
             <div class="asset_text">
                 <div class="asset_title" title="">Title</div>
@@ -78,6 +75,23 @@
     </div>
 </div>
 
+
+
+<script type="text/javascript">
+  function getRandomSize(min, max) {
+  return Math.round(Math.random() * (max - min) + min);
+}
+
+var allImages = "";
+
+for (var i = 0; i < 2; i++) {
+  var width = getRandomSize(220, 231);
+  var height =  getRandomSize(100, 103);
+  allImages += '<img src="https://placekitten.com/'+width+'/'+height+'" alt="pretty kitty">';
+}
+
+$('.photos-02').append(allImages);
+</script>
 
 
 {% endblock body_content %}
