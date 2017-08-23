@@ -3,77 +3,7 @@
 {% user_access_policy groupid request.user as user_access_priv %}
 {% check_is_gstaff groupid request.user as is_gstaff %}
 
-<style type="text/css">
-  .photos-02{
-    /* no vertical space*/
-    line-height: 0;
-    -webkit-column-count: 1;
-    -moz-column-count:    1;
-    -webkit-column-gap:   0px;
-    -moz-column-gap:      0px;
-    column-count:         1;
-    column-gap:           1px;
-    -moz-row-count: 3;
-    row-count: 3;
-    -webkit-row-gap:   0px;
-    -moz-row-gap:      0px;
 
-  }
-
-  .photos-02 img {
-  /* Just in case there are inline attributes */
-      /*width: 100% !important; */
-
-      width: 351px !important;
-      height: 102px !important;
-  }
-
-  @media (max-width: 1200px) {
-      .photos-03 {
-      -moz-row-count:    3;
-      -webkit-column-count: 1;
-      column-count:         1;
-      row-count: 3;
-      -webkit-row-gap:   0px;
-      -moz-row-gap:      0px;
-      }
-  }
-
-  @media (max-width: 1000px) {
-      .photos-03 {
-      -moz-row-count:    3;
-      -webkit-column-count: 1;
-      column-count:         1;
-      row-count: 3;
-      -webkit-row-gap:   0px;
-      -moz-row-gap:      0px;
-      }
-  }
-
-  @media (max-width: 800px) {
-    .photos-03 {
-      -moz-row-count:    3;
-      -webkit-column-count: 0;
-      column-count:         1;
-      row-count: 3;
-      -webkit-row-gap:   0px;
-      -moz-row-gap:      0px;
-    }
-  }
-
-  @media (max-width: 400px) {
-    .photos-03 {
-      -moz-row-count:    3;
-      -webkit-column-count: 1;
-      column-count:         1;
-      row-count: 3;
-      -webkit-row-gap:   0px;
-      -moz-row-gap:      0px;
-    }
-  }
-
-
-</style>
 
 <div class="elibrary-actions">
 <!--     <button type="button" class="orange-button">
@@ -150,6 +80,22 @@
                              <section class="photos-{{each_asset.pk}} photos-02">
                             {% for each in v %}
                                 {% if forloop.counter <= 2 %}
+                                {% get_node each as asst_cont_obj %}
+                                    {%  if asst_cont_obj.if_file.mid.relurl %}
+                                        <img src="/media/{{asst_cont_obj.if_file.mid.relurl}}"  alt="{{asst_cont_obj.name}}">
+                                    {% elif "audio" in asst_cont_obj.if_file.mime_type %}
+                                        <img src="/static/ndf/images/audio.png"/>
+                                    {% elif "video" in asst_cont_obj.if_file.mime_type %}
+                                        <img src="/static/ndf/images/video.png"/>
+                                    {% endif %}
+                                {% endif %}
+                            {% endfor %}
+                        </section>
+                        {% endif %}
+                        {% if k == "has_assetcontent" and v|length == 3  %}
+                             <section class="photos-{{each_asset.pk}} photos-03">
+                            {% for each in v %}
+                                {% if forloop.counter <= 3 %}
                                 {% get_node each as asst_cont_obj %}
                                     {%  if asst_cont_obj.if_file.mid.relurl %}
                                         <img src="/media/{{asst_cont_obj.if_file.mid.relurl}}"  alt="{{asst_cont_obj.name}}">
