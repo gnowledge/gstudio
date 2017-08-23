@@ -288,7 +288,7 @@
             {% endfor %}
         </div>
         <!-- </div> -->
-    
+    {% include 'ndf/pagination.html' with urlname="asset_details_paged" first_arg=group_id second_arg=asset_obj.pk page_info=assetcontent_page_info %}
     
         <div class="row asset-content-detail">
               {% if node %}

@@ -3328,12 +3328,12 @@ def assets(request, group_id, asset_id=None,page_no=1):
         asset_nodes = node_collection.find({'member_of': {'$in': [asset_gst_id]},
             'group_set': {'$all': [ObjectId(group_id)]}}).sort('last_update', -1)
         # topic_nodes = node_collection.find({'member_of': {'$in': [topic_gst_id]}})
-        
+        assetcontent_page_info = paginator.Paginator(asset_content_list['grel_node'], page_no, GSTUDIO_NO_OF_OBJS_PP)
         context_variables = {
             'group_id': group_id, 'groupid': group_id,
             'title':'c','asset_obj':asset_obj,
             'asset_nodes':asset_nodes,'asset_content_list':asset_content_list,
-            'group_obj':group_obj
+            'group_obj':group_obj,'assetcontent_page_info':assetcontent_page_info
         }
         if 'announced_unit' in group_obj.member_of_names_list:
             template = 'ndf/lms.html'     
@@ -3366,17 +3366,19 @@ def assets(request, group_id, asset_id=None,page_no=1):
 
 
 @get_execution_time
-def assetcontent_detail(request, group_id, asset_id,asst_content_id):
+def assetcontent_detail(request, group_id, asset_id,asst_content_id,page_no=1):
+    from gnowsys_ndf.settings import GSTUDIO_NO_OF_OBJS_PP
     assetcontent_obj = node_collection.one({'_id': ObjectId(asst_content_id)})
     asset_obj = node_collection.one({'_id': ObjectId(asset_id)})
     group_obj = get_group_name_id(group_id, get_obj=True)
     # print group_id,asset_id,asst_content_id
     asset_content_list = get_relation_value(ObjectId(asset_obj._id),'has_assetcontent')
     template = 'ndf/gevent_base.html'
+    assetcontent_page_info = paginator.Paginator(asset_content_list['grel_node'], page_no, GSTUDIO_NO_OF_OBJS_PP)
     context_variables = {
             'asset_content_list':asset_content_list,'group_id':group_id,
             'groupid':group_id,'node':assetcontent_obj,'asset_obj':asset_obj,
-            'title':"asset_content_detail",'group_obj':group_obj
+            'title':"asset_content_detail",'group_obj':group_obj,'assetcontent_page_info':assetcontent_page_info
         }
     if request.user.is_authenticated():
         # Counter.add_visit_count.delay(resource_obj_or_id=file_obj._id.__str__(),
