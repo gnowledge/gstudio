@@ -957,8 +957,8 @@ ul.horizontal_tabs_gstudio > li.sub_group_action:hover ul {
 /* line 1064, ../../../scss/_clix2017.scss */
 .asset_tile .asset_preview .photos-03 img {
   /* Just in case there are inline attributes */
-  width: 100% !important;
-  height: auto !important;
+  width: 35px !important;
+  height: 70px !important;
 }
 @media (max-width: 1200px) {
   /* line 1071, ../../../scss/_clix2017.scss */
