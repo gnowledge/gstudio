@@ -1,11 +1,14 @@
 <div class="course-content">
-    <div id="tree1"></div>
+    <div id="tree1">
+    </div>
 </div>
 <script type="text/javascript">
     iconMapping = {
         'COMPLETED': 'fa-check',
         'INPROGRESS': 'fa-clock-o',
     }
+
+
 
     $(function(){
         // var data = [
@@ -67,6 +70,7 @@
                                     activity_ids.push(child_val)
                                 }
                             })
+                            $('div').addClass('jqtree-toggler')
                         }
                         isLessonComplete = activity_ids.every(function(val) {
                             return visited_nodes_ids.indexOf(val) >= 0;
