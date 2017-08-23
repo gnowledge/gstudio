@@ -672,6 +672,10 @@ class Node(DjangoDocument):
 
     @staticmethod
     def get_name_id_from_type(node_name_or_id, node_type, get_obj=False):
+        '''
+        e.g:
+            Node.get_name_id_from_type('pink-bunny', 'Author')
+        '''
         if not get_obj:
             # if cached result exists return it
 
@@ -3197,10 +3201,10 @@ class ActiveUsers(object):
         for session in sessions:
             data = session.get_decoded()
             user_id = data.get('_auth_user_id', 0)
-            # if user_id:
+            if user_id:
+                userid_session_key_dict[user_id] = session.session_key
             # uid_list_append(user_id)
             # session_key_list.append(session.session_key)
-            userid_session_key_dict[user_id] = session.session_key
 
         return userid_session_key_dict
 
@@ -3209,6 +3213,45 @@ class ActiveUsers(object):
         #     return User.objects.filter(id__in=uid_list).values_list('id', flat=True)
         # else:
         #     return User.objects.filter(id__in=uid_list)
+
+    @staticmethod
+    def logout_all_users():
+        """
+        Read all available users and all available not expired sessions. Then
+        logout from each session. This method also releases all buddies with each user session.
+        """
+        from django.utils.importlib import import_module
+        from django.conf import settings
+        from django.contrib.auth import logout
+        
+        request = HttpRequest()
+
+        # sessions = Session.objects.filter(expire_date__gte=timezone.now())
+        sessions = Session.objects.filter(expire_date__gte=timezone.now()).distinct('session_data')
+
+        # Experimental trial (aggregate query):
+        # unique_sessions_list = Session.objects.filter(expire_date__gte=timezone.now()).values('session_data').annotate(Count('session_data')).filter(session_data__count__lte=1)
+        
+        print('Found %d non-expired session(s).' % len(sessions))
+
+        for session in sessions:
+            try:
+                user_id = session.get_decoded().get('_auth_user_id')
+                engine = import_module(settings.SESSION_ENGINE)
+                request.session = engine.SessionStore(session.session_key)
+
+                request.user = User.objects.get(id=user_id)
+                print ('\nProcessing session of [ %d : "%s" ]\n' % (request.user.id, request.user.username))
+
+                logout(request)
+                print('- Successfully logout user with id: %r ' % user_id)
+
+            except Exception as e:
+                # print "Exception: ", e
+                pass
+
+        Buddy.sitewide_remove_all_buddies()
+
 
 
 # class DjangoActiveUsersGroup(object):
@@ -3808,6 +3851,7 @@ class Buddy(DjangoDocument):
         active_buddy_authid_list = self.get_active_authid_list_from_single_buddy()
 
         for each_buddy_authid in active_buddy_authid_list:
+            print "- Released Buddy: ", Node.get_name_id_from_type(each_buddy_authid, u'Author')[0]
             self.get_latest_in_out_dict(self.buddy_in_out[each_buddy_authid])['out'] = datetime.datetime.now()
 
         return self
