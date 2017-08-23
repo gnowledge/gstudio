@@ -26,12 +26,11 @@ function add_ratings(this_val){
 
 function updateRating(group_id,user_rating,rating_id) {
         csrf_token = $(".csrf_token").val();
-        is_contributor = is_contributor_list();
+        is_contributor = is_contributor_list(rating_id);
         
         if(is_contributor == "True"){
 
             alert("You cannot rate your own resource");
-            // setStars({{ratings.avg}})
             return false;
         }
         else{

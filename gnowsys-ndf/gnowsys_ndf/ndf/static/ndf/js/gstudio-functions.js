@@ -13,10 +13,10 @@ function is_user_authenticated()
 	 return  is_authenticated        
 }
 
-function is_contributor_list()
+function is_contributor_list(node_id)
 {
 	
-	 is_contributor = $(".is_contributor").val();
+	 is_contributor = $(".is-contributor-"+node_id).val();
 	 return  is_contributor        
 }
 
