@@ -4,10 +4,10 @@
 {% block title %} {{trans_lesson_name}}  {% endblock %}
 
 {% load ndf_tags %}
-{% check_is_gstaff group_id request.user as is_gstaff %}
 
 
 {% block body_content %}
+{% check_is_gstaff group_id request.user as is_gstaff %}
 {% user_access_policy groupid request.user as user_access_priv %}
     {% get_group_object groupid as group_object %}
 
