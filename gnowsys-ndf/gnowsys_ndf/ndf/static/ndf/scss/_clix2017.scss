@@ -975,6 +975,58 @@ ul.horizontal_tabs_gstudio {
     }
 }
 
+.activity_tile {
+    margin-top: 10px;
+    margin-bottom: 25px;
+    padding-bottom: 10px;
+    cursor: pointer;
+    //height:7rem;
+    //margin-left: 3px;
+    height:260px;
+    border: 1px solid $primary-blue;
+    .activity_preview {
+        height: 200px;
+        //margin-left: 5px;
+        width:100%;
+        //background-color: #eee;
+        //background: url(/static/ndf/images/asset_thumbnail.png)no-repeat;
+        border-width: 5px;
+        img{
+            width:100%;
+            height:210px;
+        }
+    }
+
+    .activity_text {
+        padding: 7px 0px 0px 0px;
+        .activity_title {
+            letter-spacing: 0.2px;
+            overflow: hidden;
+            font-size: 13px;
+            color:$primary-blue;
+            padding-top: 10px;
+            padding-left: 6px;
+                &>a{
+                    margin-right:0px !important;
+                }
+
+            .filenode {
+                z-index: -1;
+
+            }
+        
+        }
+        .activity_desc {
+            // //font-size: 13px;
+            letter-spacing: 0.3px;
+            overflow: hidden;
+            padding-left: 6px;
+            font-size: 11px;
+            color: grey;
+        }
+    }
+}   
+
 .asset_tile {
     margin-top: 10px;
     margin-bottom: 25px;
@@ -3110,12 +3162,12 @@ ul.jqtree-tree .jqtree-toggler {
             vertical-align: top;
         }
         .post-btn{
-            background-color: white;
+            background-color: #720f5e;
             width: 77px;
             margin-left: 17px;
             &:hover{
-                color: #FFC151;
-                background-color: rgba(206, 120, 105, 0.25);
+                color: #720f5e;
+                background-color: #ffffff;
             }
 
 
@@ -5247,12 +5299,7 @@ ul.nav_menu_1 {
 .clr6 {color: #39B5A1;}
 .clr7 {color: #D45245;}
 
-a {color: #ce7869; text-decoration: none; margin-right: 10px;}
-a:hover {color: #ffc14e; }
-a:visited{}
-a.img{
 
-}
 
 /*##### Footer Structure #####*/
 .bo-wrap {clear:both; width: auto;}
