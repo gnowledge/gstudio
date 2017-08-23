@@ -58,12 +58,14 @@ urlpatterns = patterns('gnowsys_ndf.ndf.views.gcourse',
                         url(r'^/manage_users/$', 'manage_users', name='manage_users'),
                         #Asset URLS
                         url(r'^/asset_list/$','assets', name='asset_list'),
+                        url(r'^/asset_list/page-no=(?P<page_no>\d+)/$', 'assets', name='course_assets_paged'),
                         url(r'^/asset_detail/(?P<asset_id>[\w-]+)$', 'assets', name='asset_detail'),
                         url(r'^/asset_detail/(?P<asset_id>[\w-]+)/asset_content/(?P<asst_content_id>[\w-]+)$', 'assetcontent_detail', name='assetcontent_detail'),
                         
                         url(r'^/activity_player/(?P<lesson_id>[\w-]+)/(?P<activity_id>[\w-]+)/$', 'activity_player_detail', name='activity_player_detail'),
                         
                         url(r'^/activities/$', 'course_pages', name='course_pages'),
+                        url(r'^/activities/page-no=(?P<page_no>\d+)/$', 'course_pages', name='course_pages_paged'),
                         url(r'^/activity/detail/(?P<page_id>[\w-]+)$', 'course_pages', name='view_course_page'),
                         url(r'^/activity/create$', 'create_edit_course_page', name='create_course_page'),
                         url(r'^/activity/create/(?P<page_type>[\w-]+)$', 'create_edit_course_page', name='create_course_page_info'),

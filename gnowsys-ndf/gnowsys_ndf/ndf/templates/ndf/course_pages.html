@@ -146,6 +146,7 @@
 
 
 {% endif %}
+{% include 'ndf/pagination.html' with urlname="course_pages_paged" first_arg=group_id page_info=course_pages_info %}
 
 <script type="text/javascript">
     $(".delete-activity").click(function(){

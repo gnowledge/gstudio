@@ -179,7 +179,13 @@
     </a>
     {% endfor %}
 </div>
-
+{% if title == "gallery" %}
+{% include 'ndf/pagination.html' with urlname="course_gallery_paged" first_arg=group_id page_info=assets_page_info %}
+{% elif title == "raw material" %}
+{% include 'ndf/pagination.html' with urlname="course_raw_material_paged" first_arg=group_id page_info=assets_page_info %}
+{% elif title == "asset_list"  %}
+{% include 'ndf/pagination.html' with urlname="course_assets_paged" first_arg=group_id page_info=assets_page_info %}
+{% endif %}
 <script type="text/javascript">
    $( ".createAsset" ).click(function() {
                    var asset_id = $(this).attr('data-asset_id');

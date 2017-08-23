@@ -2437,9 +2437,12 @@ def course_raw_material(request, group_id, node_id=None,page_no=1):
     
     if "announced_unit" in group_obj.member_of_names_list:
         template = 'ndf/lms.html'
-
+        assets_page_info = paginator.Paginator(asset_nodes, page_no, GSTUDIO_NO_OF_OBJS_PP)
+        context_variables.update({'assets_page_info':assets_page_info})
     if 'BaseCourseGroup' in group_obj.member_of_names_list:
         template = 'ndf/basecourse_group.html'
+    
+    
 
     context_variables.update({'title':'raw material' ,'files_cur': files_cur,'raw_material_page_info':raw_material_page_info ,'allow_to_upload': allow_to_upload,'allow_to_join': allow_to_join})
     return render_to_response(template,
@@ -2510,7 +2513,7 @@ def course_gallery(request, group_id,node_id=None,page_no=1):
                                             'if_file':1,
                                         }).sort("last_update", -1)
         context_variables.update({'files_cur': files_cur})
-        gallery_page_info = paginator.Paginator(files_cur, page_no, 25)
+        gallery_page_info = paginator.Paginator(files_cur, page_no, GSTUDIO_NO_OF_OBJS_PP)
         context_variables.update({'gallery_page_info':gallery_page_info,'coll_cur':files_cur})
     
     asset_gst_name, asset_gst_id = GSystemType.get_gst_name_id("Asset")
@@ -2520,7 +2523,9 @@ def course_gallery(request, group_id,node_id=None,page_no=1):
     
     template = 'ndf/gcourse_event_group.html'
     if "announced_unit" in group_obj.member_of_names_list:
+        assets_page_info = paginator.Paginator(asset_nodes, page_no, GSTUDIO_NO_OF_OBJS_PP)
         template = 'ndf/lms.html'
+        context_variables.update({'assets_page_info':assets_page_info})
     
     context_variables.update({'asset_nodes': asset_nodes})
 
@@ -3306,28 +3311,29 @@ def manage_users(request, group_id):
 
 
 @get_execution_time
-def assets(request, group_id, asset_id=None):
+def assets(request, group_id, asset_id=None,page_no=1):
     try:
         group_id = ObjectId(group_id)
     except:
         group_name, group_id = get_group_name_id(group_id)
     group_obj = get_group_name_id(group_id, get_obj=True)
     asset_gst_name, asset_gst_id = GSystemType.get_gst_name_id("Asset")
+    from gnowsys_ndf.settings import GSTUDIO_NO_OF_OBJS_PP
     template = 'ndf/gevent_base.html'
     if asset_id:
         asset_obj = node_collection.one({'_id': ObjectId(asset_id)})
         asset_content_list = get_relation_value(ObjectId(asset_obj._id),'has_assetcontent')
-        topic_gst_name, topic_gst_id = GSystemType.get_gst_name_id("Topic")
+        # topic_gst_name, topic_gst_id = GSystemType.get_gst_name_id("Topic")
 
         asset_nodes = node_collection.find({'member_of': {'$in': [asset_gst_id]},
             'group_set': {'$all': [ObjectId(group_id)]}}).sort('last_update', -1)
-        topic_nodes = node_collection.find({'member_of': {'$in': [topic_gst_id]}})
-
+        # topic_nodes = node_collection.find({'member_of': {'$in': [topic_gst_id]}})
+        
         context_variables = {
             'group_id': group_id, 'groupid': group_id,
-            'title':'asset_detail','asset_obj':asset_obj,
+            'title':'c','asset_obj':asset_obj,
             'asset_nodes':asset_nodes,'asset_content_list':asset_content_list,
-            'topic_nodes':topic_nodes,'group_obj':group_obj
+            'group_obj':group_obj
         }
         if 'announced_unit' in group_obj.member_of_names_list:
             template = 'ndf/lms.html'     
@@ -3344,10 +3350,11 @@ def assets(request, group_id, asset_id=None):
 
     asset_nodes = node_collection.find({'member_of': {'$in': [asset_gst_id]},
         'group_set': {'$all': [ObjectId(group_id)]}}).sort('last_update', -1)
+    assets_page_info = paginator.Paginator(asset_nodes, page_no, GSTUDIO_NO_OF_OBJS_PP)
     context_variables = {
             'group_id': group_id, 'groupid': group_id,
             'asset_nodes': asset_nodes,'title':'asset_list',
-            'group_obj':group_obj
+            'group_obj':group_obj,'assets_page_info':assets_page_info
         }
     
     if 'announced_unit' in group_obj.member_of_names_list:
@@ -3421,7 +3428,8 @@ def create_edit_course_page(request, group_id, page_id=None,page_type=None):
     )
 
 @get_execution_time
-def course_pages(request, group_id, page_id=None):
+def course_pages(request, group_id, page_id=None,page_no=1):
+    from gnowsys_ndf.settings import GSTUDIO_NO_OF_OBJS_PP
     group_obj = get_group_name_id(group_id, get_obj=True)
     group_id = group_obj._id
     group_name = group_obj.name
@@ -3455,7 +3463,8 @@ def course_pages(request, group_id, page_id=None):
                     'type_of': {'$ne': [blog_page_gst_id]}
                     # 'content': {'$regex': 'clix-activity-styles.css', '$options': 'i'}
                     }).sort('last_update',-1)
-        context_variables.update({'editor_view': False, 'all_pages': all_pages})
+        course_pages_info = paginator.Paginator(all_pages, page_no, GSTUDIO_NO_OF_OBJS_PP)
+        context_variables.update({'editor_view': False, 'all_pages': all_pages,'course_pages_info':course_pages_info})
     return render_to_response(template,
                                 context_variables,
                                 context_instance = RequestContext(request)
