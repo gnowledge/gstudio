@@ -18,7 +18,7 @@ from gnowsys_ndf.ndf.models import GSystemType, Group, Node, GSystem  #, Triple
 from gnowsys_ndf.ndf.models import node_collection,triple_collection
 
 from gnowsys_ndf.ndf.views.group import CreateGroup
-from gnowsys_ndf.ndf.views.gcourse import get_lang_node
+from gnowsys_ndf.ndf.views.translation import get_lang_node,get_unit_hierarchy
 from gnowsys_ndf.ndf.views.methods import get_execution_time, staff_required, create_gattribute,get_language_tuple,create_grelation
 from gnowsys_ndf.ndf.views.ajax_views import get_collection
 
@@ -183,7 +183,7 @@ def unit_detail(request, group_id):
     # parent_group_name, parent_group_id = Group.get_group_name_id(group_id)
     unit_group_obj = Group.get_group_name_id(group_id, get_obj=True)
 
-    unit_structure = _get_unit_hierarchy(unit_group_obj, request.LANGUAGE_CODE)
+    unit_structure = get_unit_hierarchy(unit_group_obj, request.LANGUAGE_CODE)
     # template = "ndf/unit_structure.html"
     template = 'ndf/gevent_base.html'
 
@@ -343,11 +343,11 @@ def lesson_create_edit(request, group_id, unit_group_id=None):
                 #     lesson_obj.language = language
                 lesson_obj.save(group_id=group_id)
 
-                unit_structure = _get_unit_hierarchy(unit_group_obj, request.LANGUAGE_CODE)
+                unit_structure = get_unit_hierarchy(unit_group_obj, request.LANGUAGE_CODE)
                 msg = u'Lesson name updated.'
                 result_dict = {'success': 1, 'unit_hierarchy': unit_structure, 'msg': str(lesson_obj._id)}
             else:
-                unit_structure = _get_unit_hierarchy(unit_group_obj, request.LANGUAGE_CODE)
+                unit_structure = get_unit_hierarchy(unit_group_obj, request.LANGUAGE_CODE)
                 msg = u'Nothing to update.'
                 result_dict = {'success': 1, 'unit_hierarchy': unit_structure, 'msg': msg}
 
@@ -368,7 +368,7 @@ def lesson_create_edit(request, group_id, unit_group_id=None):
             unit_group_obj.collection_set.append(new_lesson_obj._id)
             unit_group_obj.save(groupid=group_id)
 
-            unit_structure = _get_unit_hierarchy(unit_group_obj, request.LANGUAGE_CODE)
+            unit_structure = get_unit_hierarchy(unit_group_obj, request.LANGUAGE_CODE)
 
             msg = u'Added lesson under lesson: ' + unit_group_obj.name
             result_dict = {'success': 1, 'unit_hierarchy': unit_structure, 'msg': str(new_lesson_obj._id)}
@@ -428,7 +428,7 @@ def activity_create_edit(request, group_id, lesson_id=None):
 
             lesson_obj.collection_set.append(new_activity_obj._id)
             lesson_obj.save(groupid=group_id)
-            unit_structure = _get_unit_hierarchy(unit_group_obj, request.LANGUAGE_CODE)
+            unit_structure = get_unit_hierarchy(unit_group_obj, request.LANGUAGE_CODE)
 
             msg = u'Added activity under lesson: ' + lesson_obj.name
             result_dict = {'success': 1, 'unit_hierarchy': unit_structure, 'msg': str(new_activity_obj._id)}
@@ -437,68 +437,3 @@ def activity_create_edit(request, group_id, lesson_id=None):
     return HttpResponse(json.dumps(result_dict))
 
 
-def _get_unit_hierarchy(unit_group_obj,lang="en"):
-    '''
-    ARGS: unit_group_obj
-    Result will be of following form:
-    {
-        name: 'Lesson1',
-        type: 'lesson',
-        id: 'l1',
-        activities: [
-            {
-                name: 'Activity 1',
-                type: 'activity',
-                id: 'a1'
-            },
-            {
-                name: 'Activity 1',
-                type: 'activity',
-                id: 'a2'
-            }
-        ]
-    }, {
-        name: 'Lesson2',
-        type: 'lesson',
-        id: 'l2',
-        activities: [
-            {
-                name: 'Activity 1',
-                type: 'activity',
-                id: 'a1'
-            }
-        ]
-    }
-    '''
-    unit_structure = []
-    for each in unit_group_obj.collection_set:
-        lesson_dict ={}
-        lesson = Node.get_node_by_id(each)
-        trans_lesson = get_lang_node(lesson._id,lang)
-        if lesson:
-            if trans_lesson:
-                lesson_dict['name'] = trans_lesson.name
-            else:
-                lesson_dict['name'] = lesson.name
-            lesson_dict['type'] = 'lesson'
-            lesson_dict['id'] = str(lesson._id)
-            lesson_dict['language'] = lesson.language[0]
-            lesson_dict['activities'] = []
-            if lesson.collection_set:
-                for each_act in lesson.collection_set:
-                    activity_dict ={}
-                    activity = Node.get_node_by_id(each_act)
-                    trans_act = get_lang_node(activity._id,lang)
-                    if activity:
-                        if trans_act:
-                            activity_dict['name'] = trans_act.name
-                            # activity_dict['name'] = trans_act.altnames or trans_act.name
-                        else:
-                            activity_dict['name'] = activity.name
-                            # activity_dict['name'] = activity.altnames or activity.name
-                        activity_dict['type'] = 'activity'
-                        activity_dict['id'] = str(activity._id)
-                        lesson_dict['activities'].append(activity_dict)
-            unit_structure.append(lesson_dict)
-
-    return unit_structure

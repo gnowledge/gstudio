@@ -3878,8 +3878,9 @@ def get_file_obj(node):
 
 @get_execution_time
 @register.assignment_tag
-def get_help_pages_of_node(node_obj,rel_name="has_help"):
+def get_help_pages_of_node(node_obj,rel_name="has_help",language="en"):
 	all_help_page_node_list = []
+	from gnowsys_ndf.ndf.views.translation import get_lang_node
 	try:
 		has_help_rt = node_collection.one({'_type': 'RelationType', 'name': rel_name})
 		help_rt = triple_collection.find({'subject':node_obj._id,'relation_type': has_help_rt._id, 'status': u'PUBLISHED'})
@@ -3887,6 +3888,8 @@ def get_help_pages_of_node(node_obj,rel_name="has_help"):
 			for each_help_rt in help_rt:
 				# print each_help_rt.right_subject
 				help_pg_node = node_collection.one({'_id':ObjectId(each_help_rt.right_subject)})
+				trans_node =   get_lang_node(help_pg_node._id,language)
+				help_pg_node =  trans_node or help_pg_node 
 				if help_pg_node:
 					all_help_page_node_list.append(help_pg_node)
 
@@ -3990,31 +3993,31 @@ def get_gstudio_registration():
 def get_unit_total_points(user_id,group_id):
 	counter_obj = Counter.get_counter_obj(user_id, ObjectId(group_id))
 
+"""  commented for section subsection template """
+# @register.assignment_tag
+# def get_node_hierarchy(node_obj):
+#     node_structure = []
+#     for each in node_obj.collection_set:
+#         lesson_dict ={}
+#         lesson = Node.get_node_by_id(each)
+#         if lesson:
+#             lesson_dict['name'] = lesson.name
+#             lesson_dict['type'] = 'lesson'
+#             lesson_dict['id'] = str(lesson._id)
+#             lesson_dict['language'] = lesson.language[0]
+#             lesson_dict['activities'] = []
+#             if lesson.collection_set:
+#                 for each_act in lesson.collection_set:
+#                     activity_dict ={}
+#                     activity = Node.get_node_by_id(each_act)
+#                     if activity:
+#                         activity_dict['name'] = activity.name
+#                         activity_dict['type'] = 'activity'
+#                         activity_dict['id'] = str(activity._id)
+#                         lesson_dict['activities'].append(activity_dict)
+#             node_structure.append(lesson_dict)
 
-@register.assignment_tag
-def get_node_hierarchy(node_obj):
-    node_structure = []
-    for each in node_obj.collection_set:
-        lesson_dict ={}
-        lesson = Node.get_node_by_id(each)
-        if lesson:
-            lesson_dict['name'] = lesson.name
-            lesson_dict['type'] = 'lesson'
-            lesson_dict['id'] = str(lesson._id)
-            lesson_dict['language'] = lesson.language[0]
-            lesson_dict['activities'] = []
-            if lesson.collection_set:
-                for each_act in lesson.collection_set:
-                    activity_dict ={}
-                    activity = Node.get_node_by_id(each_act)
-                    if activity:
-                        activity_dict['name'] = activity.name
-                        activity_dict['type'] = 'activity'
-                        activity_dict['id'] = str(activity._id)
-                        lesson_dict['activities'].append(activity_dict)
-            node_structure.append(lesson_dict)
-
-    return json.dumps(node_structure)
+#     return json.dumps(node_structure)
 
 @register.assignment_tag
 def user_groups(is_super_user,user_id):

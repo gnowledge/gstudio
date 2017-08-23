@@ -3,6 +3,78 @@
 {% user_access_policy groupid request.user as user_access_priv %}
 {% check_is_gstaff groupid request.user as is_gstaff %}
 
+<style type="text/css">
+  .photos-02{
+    /* no vertical space*/
+    line-height: 0;
+    -webkit-column-count: 1;
+    -moz-column-count:    1;
+    -webkit-column-gap:   0px;
+    -moz-column-gap:      0px;
+    column-count:         1;
+    column-gap:           1px;
+    -moz-row-count: 3;
+    row-count: 3;
+    -webkit-row-gap:   0px;
+    -moz-row-gap:      0px;
+
+  }
+
+  .photos-02 img {
+  /* Just in case there are inline attributes */
+      /*width: 100% !important; */
+
+      width: 351px !important;
+      height: 102px !important;
+  }
+
+  @media (max-width: 1200px) {
+      .photos-03 {
+      -moz-row-count:    3;
+      -webkit-column-count: 1;
+      column-count:         1;
+      row-count: 3;
+      -webkit-row-gap:   0px;
+      -moz-row-gap:      0px;
+      }
+  }
+
+  @media (max-width: 1000px) {
+      .photos-03 {
+      -moz-row-count:    3;
+      -webkit-column-count: 1;
+      column-count:         1;
+      row-count: 3;
+      -webkit-row-gap:   0px;
+      -moz-row-gap:      0px;
+      }
+  }
+
+  @media (max-width: 800px) {
+    .photos-03 {
+      -moz-row-count:    3;
+      -webkit-column-count: 0;
+      column-count:         1;
+      row-count: 3;
+      -webkit-row-gap:   0px;
+      -moz-row-gap:      0px;
+    }
+  }
+
+  @media (max-width: 400px) {
+    .photos-03 {
+      -moz-row-count:    3;
+      -webkit-column-count: 1;
+      column-count:         1;
+      row-count: 3;
+      -webkit-row-gap:   0px;
+      -moz-row-gap:      0px;
+    }
+  }
+
+
+</style>
+
 <div class="elibrary-actions">
 <!--     <button type="button" class="orange-button">
         <i class="fi-filter"> </i>
@@ -33,25 +105,74 @@
         </div>
 </div>
 <div class="row listing-row"> 
-      {% for each in asset_nodes %}
-      <a href="{% url 'asset_detail' group_id each.pk %}"  title="{{each.name}}">
+      {% for each_asset in asset_nodes %}
+      {% get_relation_value each_asset.pk 'has_assetcontent' as grel_asstcontent %}
+
+      <a href="{% url 'asset_detail' group_id each_asset.pk %}"  title="{{each.name}}">
       <div class="small-12 medium-6 large-3 columns ">
         <div class="asset_tile">
             <div class="asset_preview">
-            {% if "raw@material" in each.tags and title == "asset_list" %}
-                <div class="raw_material_asset">{% trans "Raw Material" %}</div>
-            {% endif %}
-                {% if each.if_file.mid.relurl and 'video' not in each.if_file.mime_type %}
-                    <img src="{{MEDIA_URL}}{{each.if_file.mid.relurl}}">
-                {% elif 'video' not in each.if_file.mime_type and each.if_file.thumbnail.relurl %}
-                    <img src="{{MEDIA_URL}}{{each.if_file.thumbnail.relurl}}">
+                {% if grel_asstcontent.grel_id %}
+                {% for each_asset_rel_set in each_asset.relation_set %}
+                    {% for k,v in each_asset_rel_set.items %}
+                        {% if k == "has_assetcontent" and v|length >= 4  %}
+                        <section class="photos-{{each_asset.pk}} photos">
+                            {% for each in v %}
+                                {% if forloop.counter <= 4 %}
+                                {% get_node each as asst_cont_obj %}
+                                    {%  if asst_cont_obj.if_file.mid.relurl %}
+                                        <img src="/media/{{asst_cont_obj.if_file.mid.relurl}}" style="width='width()' height='height()'" alt="{{asst_cont_obj.name}}">
+                                    {% elif "audio" in asst_cont_obj.if_file.mime_type %}
+                                        <img src="/static/ndf/images/audio.png"/>
+                                    {% elif "video" in asst_cont_obj.if_file.mime_type %}
+                                        <img src="/static/ndf/images/video.png"/>
+                                    {% endif %}
+                                {% endif %}
+                            {% endfor %}
+                         <br>
+                        </section>
+                        {% endif %}
+                        {% if k == "has_assetcontent" and v|length == 1  %}
+                             <section class="photos-{{each_asset.pk}} photos-1">
+                            {% for each in v %}                                
+                                {% get_node each as asst_cont_obj %}
+                                    {%  if asst_cont_obj.if_file.mid.relurl %}
+                                        <img src="/media/{{asst_cont_obj.if_file.mid.relurl}}" style="width='width()' height='height()'" alt="{{asst_cont_obj.name}}">
+                                    {% elif "audio" in asst_cont_obj.if_file.mime_type %}
+                                        <img src="/static/ndf/images/audio.png"/>
+                                    {% elif "video" in asst_cont_obj.if_file.mime_type %}
+                                        <img src="/static/ndf/images/video.png"/>
+                                    {% endif %}
+                            {% endfor %}
+                        </section>
+                        {% endif %}
+                        {% if k == "has_assetcontent" and v|length == 2  %}
+                             <section class="photos-{{each_asset.pk}} photos-02">
+                            {% for each in v %}
+                                {% if forloop.counter <= 2 %}
+                                {% get_node each as asst_cont_obj %}
+                                    {%  if asst_cont_obj.if_file.mid.relurl %}
+                                        <img src="/media/{{asst_cont_obj.if_file.mid.relurl}}"  alt="{{asst_cont_obj.name}}">
+                                    {% elif "audio" in asst_cont_obj.if_file.mime_type %}
+                                        <img src="/static/ndf/images/audio.png"/>
+                                    {% elif "video" in asst_cont_obj.if_file.mime_type %}
+                                        <img src="/static/ndf/images/video.png"/>
+                                    {% endif %}
+                                {% endif %}
+                            {% endfor %}
+                        </section>
+                        {% endif %}
+                    {% endfor %}
+                {% endfor %}
                 {% else %}
-                    <img src="/static/ndf/images/asset.png">
+                <section class="photos-{{each_asset.pk}} photos-1">
+                   <img src="/static/ndf/images/asset.png">
+               </section>
                 {% endif %}
             </div>
             <div class="asset_text">
-                <div class="asset_title" title="{% firstof each.altnames each.name %}">{% firstof each.altnames|truncatechars:25  each.name|truncatechars:25 %}</div>
-                <div class="asset_desc">{{each.content|striptags|truncatechars:25}}</div>
+                <div class="asset_title" title="{% firstof each_asset.altnames each_asset.name %}">{% firstof each_asset.altnames|truncatechars:25  each_asset.name|truncatechars:25 %}</div>
+                <div class="asset_desc">{{each_asset.content|striptags|truncatechars:25}}</div>
             </div>
         </div>
     </div>
@@ -76,4 +197,22 @@
                            }
                      });
            });
+function getRandomSize(min, max) {
+  return Math.round(Math.random() * (max - min) + min);
+}
+{% comment %}
+var allImages1 = "";
+
+{% for k,v in thumbnails_dict.items %} 
+    alert("{{k}}")
+    {% for each in v %}
+        var width = getRandomSize(208, 218);
+        var height =  getRandomSize(240, 220);
+        allImagesfor+"_"+"{{k}}" = allImagesfor+"_"+"{{k}}" +  '<img src="/media/{{each}}" style="width='+width+' height='+height+'" alt="pretty kitty">';
+    {% endfor %}
+{% endfor %}
+{% for k,v in thumbnails_dict.items %}
+    alert(allImagesfor+"_"+"{{k}}");
+{% endfor %}
+{% endcomment %}
 </script> 
