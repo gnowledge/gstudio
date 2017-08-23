@@ -6060,25 +6060,14 @@ def parse_assessment_url(url_as_str):
         return bank_offered_id
 
 def update_total_assessment_items(group_id, assessment_list, domain):
-    from gnowsys_ndf.ndf.views.assessment_analytics import userSpecificData
+    from gnowsys_ndf.ndf.views.assessment_analytics import items_count_from_asessment_offered
     import urllib
     questionCount_val = 0
     try:
         for each_assessment_list in assessment_list:
-            result_data_set = userSpecificData(domain,each_assessment_list[0],each_assessment_list[1])
-            for each_dict in result_data_set:
-                qtn_found = False
-                if 'sections' in each_dict:
-                    # get questions dict from each_dict['sections'] list
-                    for section in each_dict['sections']:
-                        if 'questions' in section:
-                            questionCount_val = questionCount_val + len(section['questions'])
-                            print "\nquestionCount_val: ", questionCount_val
-                            print "\neach_assessment_list: ", each_assessment_list
-                            qtn_found = True
-                            break
-                if qtn_found:
-                    break
+            items_count = items_count_from_asessment_offered(domain,each_assessment_list[0],each_assessment_list[1])
+            questionCount_val = questionCount_val + items_count
+            print "\nquestionCount_val: ", questionCount_val
 
         '''
         AT: "total_assessment_items" will hold `questionCount_val = x`
