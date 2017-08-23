@@ -2,11 +2,11 @@ from bson import json_util
 import os, errno
 import sys
 import json
-from elasticsearch import Elasticsearch
+# from elasticsearch import Elasticsearch
 from gnowsys_ndf.ndf.models import *
 from gnowsys_ndf.settings import GSTUDIO_DOCUMENT_MAPPING
 
-es = Elasticsearch("http://elsearch:changeit@gsearch:9200")
+# es = Elasticsearch("http://elsearch:changeit@gsearch:9200")
 
 author_map = {}
 group_map = {}

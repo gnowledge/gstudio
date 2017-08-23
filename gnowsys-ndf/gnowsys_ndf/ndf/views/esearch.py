@@ -6,12 +6,16 @@ import os
 from django.shortcuts import render
 from django.http import HttpResponseRedirect, HttpResponse, StreamingHttpResponse
 from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
-from elasticsearch import Elasticsearch		
 from gnowsys_ndf.ndf.forms import SearchForm
 from gnowsys_ndf.ndf.models import *
 from gnowsys_ndf.settings import GSTUDIO_SITE_NAME,GSTUDIO_NO_OF_OBJS_PP,GSTUDIO_DOCUMENT_MAPPING
 
-es = Elasticsearch(['http://elsearch:changeit@gsearch:9200'])
+try:
+	from elasticsearch import Elasticsearch		
+	es = Elasticsearch(['http://elsearch:changeit@gsearch:9200'])
+except Exception as e:
+	pass
+
 author_map = {}
 group_map = {}
 
@@ -47,6 +51,7 @@ def get_search(request):
 	results to sform.html for rendering. See the end of this function for
 	the control flow of how rendering is done
 	'''
+	
 	global med_list
 	global res_list
 	global results
@@ -370,7 +375,7 @@ def search_query(index_name, select, group, query):
 	
 	while(True):
 		body['from'] = i
-		res = es.search(index = index_name, doc_type=doctype, body = body)
+		res = es.search(index=index_name, doc_type=doctype, body=body)
 		l = len(res["hits"]["hits"])
 		if(l==0):
 			return []
