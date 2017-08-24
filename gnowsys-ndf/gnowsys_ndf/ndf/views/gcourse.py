@@ -3688,6 +3688,8 @@ def load_assessment_analytics(request, group_id):
     # print "\n domain: ", domain
     # domain = "staging-clix.tiss.edu"
     user_id = request.GET.get('user_id')
+    print "\ndomain: ", domain
+    print "\nuser_id", user_id
     group_obj = get_group_name_id(group_id, get_obj=True)
     group_id = group_obj._id
     group_name = group_obj.name
@@ -3698,7 +3700,7 @@ def load_assessment_analytics(request, group_id):
         for each_sublist in assessment_list:
             # each_sublist[0] -- bankID
             # each_sublist[1] -- OfferedId
-            correctAttempt = questionCount("https://"+domain, user_id, each_sublist[0], each_sublist[1])
+            correctAttempt = questionCount(domain, user_id, each_sublist[0], each_sublist[1])
             correctAttemptCount = correctAttemptCount + correctAttempt['Correct']
 
     if correctAttemptCount:

@@ -64,7 +64,6 @@
     </div>
 </div>
 <div class="row">
-    {% if  "announced_unit" not in group_member_of %}
     <div class="columns small-12 medium-6">
       <div class="course-quiz-perf course-section">
         <span class="course-section-heading">Assessment Performance  <small><u><a class="fetch-assessment-analytics" data-user-id={{user_id}}>Update</a></u></small></span>
@@ -96,7 +95,6 @@
         {% endif %}
       </div>
     </div>
-    {% endif %}
     <div class="columns small-12 medium-6">
       <div class="course-interactions course-section">
         <span class="course-section-heading">{% trans "Interactions" %}</span>
@@ -376,7 +374,7 @@
 
         type: "GET",
         data:{
-          domain: window.location.hostname,
+          domain: window.location.origin,
           user_id: user_id
         },
         dataType: "json",
