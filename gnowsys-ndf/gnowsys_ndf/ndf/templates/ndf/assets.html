@@ -34,97 +34,13 @@
         {% endif %}
         </div>
 </div>
-<div class="row listing-row"> 
-      {% for each_asset in asset_nodes %}
-      {% get_relation_value each_asset.pk 'has_assetcontent' as grel_asstcontent %}
-
-      <a href="{% url 'asset_detail' group_id each_asset.pk %}"  title="{{each.name}}">
-      <div class="small-12 medium-6 large-3 columns ">
-        <div class="asset_tile">
-            <div class="asset_preview">
-                {% if grel_asstcontent.grel_id %}
-                {% for each_asset_rel_set in each_asset.relation_set %}
-                    {% for k,v in each_asset_rel_set.items %}
-                        {% if k == "has_assetcontent" and v|length >= 4  %}
-                        <section class="photos-{{each_asset.pk}} photos">
-                            {% for each in v %}
-                                {% if forloop.counter <= 4 %}
-                                {% get_node each as asst_cont_obj %}
-                                    {%  if asst_cont_obj.if_file.mid.relurl %}
-                                        <img src="/media/{{asst_cont_obj.if_file.mid.relurl}}" style="width='width()' height='height()'" alt="{{asst_cont_obj.name}}">
-                                    {% elif "audio" in asst_cont_obj.if_file.mime_type %}
-                                        <img src="/static/ndf/images/audio.png"/>
-                                    {% elif "video" in asst_cont_obj.if_file.mime_type %}
-                                        <img src="/static/ndf/images/video.png"/>
-                                    {% endif %}
-                                {% endif %}
-                            {% endfor %}
-                         <br>
-                        </section>
-                        {% endif %}
-                        {% if k == "has_assetcontent" and v|length == 1  %}
-                             <section class="photos-{{each_asset.pk}} photos-1">
-                            {% for each in v %}                                
-                                {% get_node each as asst_cont_obj %}
-                                    {%  if asst_cont_obj.if_file.mid.relurl %}
-                                        <img src="/media/{{asst_cont_obj.if_file.mid.relurl}}" style="width='width()' height='height()'" alt="{{asst_cont_obj.name}}">
-                                    {% elif "audio" in asst_cont_obj.if_file.mime_type %}
-                                        <img src="/static/ndf/images/audio.png"/>
-                                    {% elif "video" in asst_cont_obj.if_file.mime_type %}
-                                        <img src="/static/ndf/images/video.png"/>
-                                    {% endif %}
-                            {% endfor %}
-                        </section>
-                        {% endif %}
-                        {% if k == "has_assetcontent" and v|length == 2  %}
-                             <section class="photos-{{each_asset.pk}} photos-02">
-                            {% for each in v %}
-                                {% if forloop.counter <= 2 %}
-                                {% get_node each as asst_cont_obj %}
-                                    {%  if asst_cont_obj.if_file.mid.relurl %}
-                                        <img src="/media/{{asst_cont_obj.if_file.mid.relurl}}"  alt="{{asst_cont_obj.name}}">
-                                    {% elif "audio" in asst_cont_obj.if_file.mime_type %}
-                                        <img src="/static/ndf/images/audio.png"/>
-                                    {% elif "video" in asst_cont_obj.if_file.mime_type %}
-                                        <img src="/static/ndf/images/video.png"/>
-                                    {% endif %}
-                                {% endif %}
-                            {% endfor %}
-                        </section>
-                        {% endif %}
-                        {% if k == "has_assetcontent" and v|length == 3  %}
-                             <section class="photos-{{each_asset.pk}} photos-03">
-                            {% for each in v %}
-                                {% if forloop.counter <= 3 %}
-                                {% get_node each as asst_cont_obj %}
-                                    {%  if asst_cont_obj.if_file.mid.relurl %}
-                                        <img src="/media/{{asst_cont_obj.if_file.mid.relurl}}"  alt="{{asst_cont_obj.name}}">
-                                    {% elif "audio" in asst_cont_obj.if_file.mime_type %}
-                                        <img src="/static/ndf/images/audio.png"/>
-                                    {% elif "video" in asst_cont_obj.if_file.mime_type %}
-                                        <img src="/static/ndf/images/video.png"/>
-                                    {% endif %}
-                                {% endif %}
-                            {% endfor %}
-                        </section>
-                        {% endif %}
-                    {% endfor %}
-                {% endfor %}
-                {% else %}
-                <section class="photos-{{each_asset.pk}} photos-1">
-                   <img src="/static/ndf/images/asset.png">
-               </section>
-                {% endif %}
-            </div>
-            <div class="asset_text">
-                <div class="asset_title" title="{% firstof each_asset.altnames each_asset.name %}">{% firstof each_asset.altnames|truncatechars:25  each_asset.name|truncatechars:25 %}</div>
-                <div class="asset_desc">{{each_asset.content|striptags|truncatechars:25}}</div>
-            </div>
-        </div>
-    </div>
-    </a>
-    {% endfor %}
+<div class="row listing-row">
+  {% for each_asset in asset_nodes %}
+    
+    {% include 'ndf/asset_card.html' with url_name="asset_detail" first_arg=group_id second_arg=each_asset.pk each=each_asset %}    
+  {% endfor %}
 </div>
+
 {% if title == "gallery" %}
 {% include 'ndf/pagination.html' with urlname="course_gallery_paged" first_arg=group_id page_info=assets_page_info %}
 {% elif title == "raw material" %}

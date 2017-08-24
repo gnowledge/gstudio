@@ -257,35 +257,13 @@
             </div>
             {% endif %}
 
+        <div class="row listing-row">
             {% for each in asset_content_list.grel_node %}
                 {% if  'DELETED' != each.status %}
-                <div class="small-12 medium-6 large-3 columns">
-                    <div class="asset_tile">
-                        <div class="asset_preview">
-                            <a href="{% url 'assetcontent_detail' group_id asset_obj.pk each.pk %}" title="{{each.name}}" >
-                                {% if each.if_file.mid.relurl and 'video' not in each.if_file.mime_type %}
-                                <img src="{{MEDIA_URL}}{{each.if_file.mid.relurl}}"/>
-                                {% elif  each.if_file.thumbnail.relurl %}
-                                <img src="{{MEDIA_URL}}{{each.if_file.thumbnail.relurl}}"/>
-                                {% elif  'audio' in each.if_file.mime_type %}
-                                <img src="/static/ndf/images/audio.png"/>
-                                {% else %}
-                                <img src="/static/ndf/images/file.png"/>
-                                {% endif %}
-                            </a>
-                        </div>
-                        <div class="asset_text">
-                            <div class="asset_title" style="color: #2e3f51">{{each.name|truncatechars:35}}
-                            {% if user.is_authenticated  and not group_object.edit_policy == "NON_EDITABLE"  or gstaff_access %}
-                                <input type="checkbox" class="filenode" name="filenode" value="{{each.pk}}" style="margin-top:6px; margin-right: 2px; float:right;" class="asset_content_checkbox"/>
-                            {% endif %}
-                                <div title="{{each.content}}"class="asset_desc">{{each.content|truncatechars:35}}</div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
+                   {% include "ndf/asset_card.html" with url_name="assetcontent_detail" each_asset=each first_arg=group_id second_arg=asset_obj.pk third_arg=each.pk no_asset=True %} 
                 {% endif %}
             {% endfor %}
+        </div>
         </div>
         <!-- </div> -->
     {% include 'ndf/pagination.html' with urlname="asset_details_paged" first_arg=group_id second_arg=asset_obj.pk page_info=assetcontent_page_info %}
@@ -329,12 +307,12 @@
     });
 
     $(".delete-asset-content").click(function(){
-        var checked = $('.filenode:checked').length;
+        var checked = $('.select-chkbox:checked').length;
         if (checked > 0){
 
             if (confirm("Do you want to delete selected files?.") == true) {
                 coll_arr = []
-                $('.filenode:checked').each(function() {
+                $('.select-chkbox:checked').each(function() {
                     coll_arr.push($(this).val());
                 });
 

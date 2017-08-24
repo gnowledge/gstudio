@@ -3331,7 +3331,7 @@ def assets(request, group_id, asset_id=None,page_no=1):
         assetcontent_page_info = paginator.Paginator(asset_content_list['grel_node'], page_no, GSTUDIO_NO_OF_OBJS_PP)
         context_variables = {
             'group_id': group_id, 'groupid': group_id,
-            'title':'c','asset_obj':asset_obj,
+            'title':'asset_detail','asset_obj':asset_obj,
             'asset_nodes':asset_nodes,'asset_content_list':asset_content_list,
             'group_obj':group_obj,'assetcontent_page_info':assetcontent_page_info
         }
