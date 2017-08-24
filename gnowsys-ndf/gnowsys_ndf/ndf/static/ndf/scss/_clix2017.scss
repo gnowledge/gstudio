@@ -2129,6 +2129,7 @@ ul.jqtree-tree .jqtree-toggler {
 
     .note-page {
       // display: none;
+      margin-left: 25px;
       background-color: #fff;
       padding-bottom: 30px;
       .group_sections_content{
@@ -5245,4 +5246,14 @@ ul.nav_menu_1 {
 
 .margin-right-50{
     margin-right:50px;
+}
+
+.color-btn{
+    background-color: #720f5e;
+    width: 77px;
+    margin-left: 17px;
+    &:hover{
+        color: #720f5e;
+        background-color: #ffffff;
+    }
 }
