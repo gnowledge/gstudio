@@ -66,6 +66,7 @@
                                 if (child_key === 'id'){
                                     activity_ids.push(child_val)
                                 }
+                                $li.children('div').addClass('jqtree-toggler')
                             })
                         }
                         isLessonComplete = activity_ids.every(function(val) {
