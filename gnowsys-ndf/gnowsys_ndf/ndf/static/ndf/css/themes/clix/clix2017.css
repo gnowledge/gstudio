@@ -2807,14 +2807,14 @@ ul.jqtree-tree .jqtree-toggler:hover {
 }
 /* line 2997, ../../../scss/_clix2017.scss */
 #replies-area .ckeditor-content-reply .post-btn {
-  background-color: white;
+  background-color: #720f5e;
   width: 77px;
   margin-left: 17px;
 }
 /* line 3001, ../../../scss/_clix2017.scss */
 #replies-area .ckeditor-content-reply .post-btn:hover {
-  color: #FFC151;
-  background-color: rgba(206, 120, 105, 0.25);
+  color: #720f5e;
+  background-color: #ffffff;
 }
 /* line 3010, ../../../scss/_clix2017.scss */
 #replies-area .disc-replies {
