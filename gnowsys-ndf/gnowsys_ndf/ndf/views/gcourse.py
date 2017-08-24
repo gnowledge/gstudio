@@ -3600,11 +3600,11 @@ def _get_unit_hierarchy(unit_group_obj,lang="en"):
                     if activity:
                         trans_act_name = get_lang_node(each_act,lang)
                         if trans_act_name:
-                            # activity_dict['label'] = trans_act_name.altnames or trans_act_name.name
-                            activity_dict['label'] = trans_act_name.name
+                            activity_dict['label'] = trans_act_name.altnames or trans_act_name.name
+                            # activity_dict['label'] = trans_act_name.name
                         else:
-                            activity_dict['label'] = activity.name
-                            # activity_dict['label'] = activity.altnames or activity.name
+                            # activity_dict['label'] = activity.name
+                            activity_dict['label'] = activity.altnames or activity.name
                         activity_dict['type'] = 'activity-group'
                         activity_dict['id'] = str(activity._id)
                         lesson_dict['children'].append(activity_dict)
