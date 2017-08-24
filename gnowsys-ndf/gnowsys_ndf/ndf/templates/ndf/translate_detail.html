@@ -7,7 +7,7 @@
 {% block body_content %}
 <div class="row group_content translation-detail-top-margin">
     <div class="small-12 columns  top-bar-secondions_content" id="scstyle">
-	<h1 class="text-center"> {{node.name}}
+	<h1 class="text-center"> {% firstof node.altnames node.name %}
 		<small>
 			<a href="{% url 'translated' group_id source_node_id node.language.0 node.pk %}"> <i>{% trans "EDIT" %} </i></a>
 		</small>

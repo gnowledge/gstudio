@@ -195,7 +195,7 @@ HOW TO USE
           <div class="row">
             <div class="small-12 columns">
               <div class="item-title">
-                {{each_opt.name}}
+              {% firstof each_opt.altnames each_opt.name %}
               </div>
               <div class="item-description">
                 {{each_opt.content_org|default_if_none:''|safe|truncatewords:5}}
