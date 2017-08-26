@@ -63,13 +63,29 @@
 
     </div>
 </div>
+{% with group_obj.member_of_names_list as group_member_of_name %}
 <div class="row">
     <div class="columns small-12 medium-6">
       <div class="course-quiz-perf course-section">
-        <span class="course-section-heading">Assessment Performance  <small><u><a class="fetch-assessment-analytics" data-user-id={{user_id}}>Update</a></u></small></span>
+        <span class="course-section-heading">Assessment Performance  
+
+        {% if "announced_unit" in group_member_of_name %}
+        <small><u><a class="fetch-assessment-analytics" data-user-id={{user_id}}>Update</a></u></small></span>
         <span class="course-section-icon">
           <i class="fa fa-question-circle"></i>
         </span>
+
+        <div class="row">
+          <div class="columns small-12 medium-6">
+            <span class="course-metric-heading">Visited</span>
+            <span class="course-metric-count correct-count visited_quizitems">{{visited_quizitems}}</span>
+          </div>
+          <div class="columns small-12 medium-6">
+            <span class="course-metric-heading">{% trans "Not Attempted" %}</span>
+            <span class="course-metric-count unattempted_quizitems">{{unattempted_quizitems}}</span>
+          </div>
+        </div>
+        {% endif %}
         <div class="row">
           <div class="columns small-12 medium-6">
             <span class="course-metric-heading">Correct Answers</span>
@@ -80,7 +96,6 @@
             <span class="course-metric-count total_quizitems">{{total_quizitems}}</span>
           </div>
         </div>
-        {% if "announced_unit" not in group_obj.member_of_names_list %}
         <div class="row">
           <div class="columns small-12 medium-6">
             <span class="course-metric-heading">Questions Attempted</span>
@@ -92,6 +107,16 @@
             <span class="course-metric-count incorrect-count incorrect_attempted_quizitems">{{incorrect_attempted_quizitems}}</span>
           </div>
         </div>
+        {% if "announced_unit" in group_member_of_name %}
+        <div class="row">
+          <div class="columns small-12 medium-6">
+            <span class="course-metric-heading">Not Applicable</span>
+            <span class="course-metric-count notapplicable_quizitems">{{notapplicable_quizitems}}</span>
+          </div>
+
+        </div>
+
+
         {% endif %}
       </div>
     </div>
@@ -139,6 +164,7 @@
       </div>
     </div>
 </div>
+{% endwith %}
 <div class="row">
     <div class="columns small-12 medium-6">
 
@@ -374,7 +400,7 @@
 
         type: "GET",
         data:{
-          domain: window.location.origin,
+          domain: window.location.hostname,
           user_id: user_id
         },
         dataType: "json",
