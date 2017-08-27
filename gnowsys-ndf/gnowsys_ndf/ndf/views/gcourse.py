@@ -2886,24 +2886,34 @@ def course_analytics(request, group_id, user_id, render_template=False, get_resu
         # if assessment_list_cur.count():
         #     assessment_list_cur = assessment_list_cur[0]
         total_quiz_points = 0
+        analytics_data.update({
+                    'correct_attempted_quizitems' : 0,
+                    'unattempted_quizitems': 0,
+                    'visited_quizitems': 0,
+                    'notapplicable_quizitems': 0,
+                    'incorrect_quizitems': 0,
+                    'attempted_quizitems': 0
+                })
+        '''
         analytics_data['correct_attempted_quizitems'] = 0
         analytics_data['unattempted_quizitems'] = 0
         analytics_data['visited_quizitems'] = 0
         analytics_data['notapplicable_quizitems'] = 0
         analytics_data['incorrect_quizitems'] = 0
         analytics_data['attempted_quizitems'] = 0
-        assessment_data_list = counter_obj['assessment']
-        for each_dict in assessment_data_list:
-            try:
+        '''
+        try:
+            assessment_data_list = counter_obj['assessment']
+            for each_dict in assessment_data_list:
                 analytics_data['correct_attempted_quizitems'] += each_dict['correct']
                 analytics_data['unattempted_quizitems'] += each_dict['unattempted']
                 analytics_data['visited_quizitems'] += each_dict['visited']
                 analytics_data['notapplicable_quizitems'] += each_dict['notapplicable']
                 analytics_data['incorrect_attempted_quizitems'] += each_dict['incorrect']
                 analytics_data['attempted_quizitems'] += each_dict['attempted']
-            except Exception as assessment_analytics_err:
-                print "\nIgnore if KeyError. Error: {0}".format(assessment_analytics_err)
-                pass
+        except Exception as assessment_analytics_err:
+            print "\nIgnore if KeyError. Error: {0}".format(assessment_analytics_err)
+            pass
 
     # Notes Section
     # analytics_data['total_notes'] = analytics_instance.get_total_notes_count()
@@ -3700,21 +3710,14 @@ def load_assessment_analytics(request, group_id):
     result_set = {'correct_attempted_quizitems': 0, 'visited_quizitems': 0, 
     'unattempted_quizitems': 0, 'attempted_quizitems': 0, 
     'incorrect_attempted_quizitems': 0, 'notapplicable_quizitems': 0}
-    # print "\n domain: ", domain
-    # domain = "staging-clix.tiss.edu"
     user_id = request.GET.get('user_id')
-    # print "\ndomain: ", domain
-    # print "\nuser_id", user_id
     group_obj = get_group_name_id(group_id, get_obj=True)
     group_id = group_obj._id
     group_name = group_obj.name
+    # Variable Decalarations
     update_counter_obj = False
-    correctAttemptCount = 0
-    visitedCount = 0
-    unattemptedCount = 0
-    notapplicableCount = 0
-    incorrectCount = 0
-    attemptedCount = 0
+    correctAttemptCount = visitedCount = unattemptedCount = 0
+    notapplicableCount = incorrectCount = attemptedCount = 0
     try:
         assessment_list_cur = group_obj.get_attribute("assessment_list")
         if assessment_list_cur.count():

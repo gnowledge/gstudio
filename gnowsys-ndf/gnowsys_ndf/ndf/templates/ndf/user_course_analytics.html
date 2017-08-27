@@ -97,7 +97,7 @@
         </div>
         <div class="row">
           <div class="columns small-12 medium-6">
-            <span class="course-metric-heading">Questions Attempted</span>
+            <span class="course-metric-heading">Attempted</span>
             <span class="course-metric-count attempted_quizitems">{{attempted_quizitems}}</span>
           </div>
 
@@ -107,15 +107,13 @@
           </div>
         </div>
         {% if "announced_unit" in group_member_of_name %}
-        <div class="row">
-          <div class="columns small-12 medium-6">
-            <span class="course-metric-heading">Not Applicable</span>
-            <span class="course-metric-count notapplicable_quizitems">{{notapplicable_quizitems}}</span>
+          <div class="row">
+            <div class="columns small-12 medium-6">
+              <span title="This included Questions that require uploads" class="course-metric-heading">Not Applicable 
+              </span>
+              <span class="course-metric-count notapplicable_quizitems">{{notapplicable_quizitems}}</span>
+            </div>
           </div>
-
-        </div>
-
-
         {% endif %}
       </div>
     </div>

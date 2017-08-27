@@ -5,7 +5,7 @@ print "\n In assessment Analytics"
 def hit_qbank_request(url):
     result_set = []
     try:
-        print "\n\nurl: ",url
+        # print "\n\nurl: ",url
         req_obj =  requests.get(url,verify = False)
         status = req_obj.status_code
         result_set = req_obj.json()
@@ -16,7 +16,7 @@ def hit_qbank_request(url):
 
 
 def get_assessment_id(domain,bankId,assessmentsoffered_id):
-    print "\nassessmentsoffered_id: ", assessmentsoffered_id
+    # print "\nassessmentsoffered_id: ", assessmentsoffered_id
     url = str(domain) + ":8080/api/v1/assessment/banks/"+str(bankId)+\
     "/assessmentsoffered/"+str(assessmentsoffered_id)
     assessmentId = None
@@ -112,7 +112,7 @@ def user_assessment_results(domain, guserId,bankId,offeredId):
         except Exception as failed_to_fetch_user_data:
             print "Error: {0}".format(failed_to_fetch_user_data)
             pass
-        print "\ncountDict: {0}".format(countDict)
+        # print "\ncountDict: {0}".format(countDict)
         return countDict
 
 # d = questionCount('https://103.36.84.149', '2','assessment.Bank%3A57e26c92b3fcec4c84a63f27%40ODL.MIT.EDU','assessment.AssessmentOffered%3A58f46bdbd09eca03d7364f1b%40ODL.MIT.EDU')
