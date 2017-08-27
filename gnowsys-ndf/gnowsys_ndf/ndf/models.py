@@ -4371,7 +4371,10 @@ class Counter(DjangoDocument):
         from gnowsys_ndf.settings import GSTUDIO_QUIZ_CORRECT_POINTS
         total_correct = 0
         for each_dict in self['assessment']:
-            total_correct = each_dict['correct']
+            try:
+                total_correct = each_dict['correct']
+            except Exception as possible_key_err:
+                print "Ignore if KeyError. Error: {0}".forma
         return total_correct * GSTUDIO_QUIZ_CORRECT_POINTS
 
     def get_interaction_points(self):
