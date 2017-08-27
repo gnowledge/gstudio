@@ -21,7 +21,7 @@ except ImportError:  # old pymongo
 ''' -- imports from application folders/files -- '''
 from gnowsys_ndf.settings import LANGUAGES
 from gnowsys_ndf.ndf.models import Node, Triple
-from gnowsys_ndf.ndf.models import node_collection, triple_collection
+from gnowsys_ndf.ndf.models import node_collection, triple_collection,NodeJSONEncoder
 from gnowsys_ndf.ndf.views.methods import get_node_common_fields, get_drawers,create_grelation_list,get_execution_time, get_group_name_id, get_node_metadata,create_grelation, get_language_tuple
 from gnowsys_ndf.ndf.views.methods import get_filter_querydict
 from gnowsys_ndf.ndf.templatetags.simple_filters import get_dict_from_list_of_dicts
@@ -159,6 +159,63 @@ def list_themes(request, group_id):
                                 'group_id': group_id,
                                 'nodes': nodes,
                                 'theme_GST': theme_GST
+                            },
+                            context_instance = RequestContext(request) )
+
+
+def curriculum_list(request, group_id):
+
+    try:
+        group_id = ObjectId(group_id)
+    except:
+        group_name, group_id = get_group_name_id(group_id)
+
+    title = theme_GST.name
+    
+    nodes = node_collection.find({
+        'member_of': {'$all': [theme_GST._id]},
+        'group_set':{'$all': [ObjectId(group_id)]}
+        })
+    
+    return render_to_response("ndf/curriculum_listing.html",
+                            { 
+                                'groupid': group_id,
+                                'group_id': group_id,
+                                'nodes': nodes,
+                                'theme_GST': theme_GST
+                            },
+                            context_instance = RequestContext(request) )
+
+def curriculum_create_edit(request, group_id,curriculum_id=None):
+
+    try:
+        group_id = ObjectId(group_id)
+    except:
+        group_name, group_id = get_group_name_id(group_id)
+    curriculum_obj = node_collection.one({"_id" : ObjectId(curriculum_id)})
+    if request.method == "POST":
+        if curriculum_id:
+          
+            print "curriculum_id",curriculum_id
+        
+        else:
+            curr_name = request.POST.get('curr_name', '')
+            curr_desc = request.POST.get('curr_desc', '')
+
+            theme_gs_obj = node_collection.collection.GSystem()
+            theme_gs_obj.fill_gstystem_values(request=request,
+                                    name=str(curr_name),
+                                    group_set=group_id,content_org=unicode(curr_desc),member_of=theme_GST._id) 
+            theme_gs_obj.save(group_id=group_id)           
+            return HttpResponse(theme_gs_obj._id)
+    else:
+        curr_hierarchy = get_curriculum_hierarchy(curriculum_obj)
+        return render_to_response("ndf/curriculum_hierarchy.html",
+                            { 
+                                'groupid': group_id,
+                                'group_id': group_id,
+                                'curriculum_obj':curriculum_obj,
+                                'curriculum_structure':json.dumps(curr_hierarchy,cls=NodeJSONEncoder)
                             },
                             context_instance = RequestContext(request) )
 
@@ -600,7 +657,6 @@ def theme_topic_create_edit(request, group_id, app_set_id=None):
         if app_GST:
             # For adding new Theme & Topic
             if app_GST.name == "Theme" or app_GST.name == "Topic" or translate == True:
-                print "22222"
                 title = app_GST.name
                 node = ""
                 root_themes = []
@@ -903,3 +959,37 @@ def get_filtered_topic_resources(request, group_id, node_id):
                                     },
                                     context_instance = RequestContext(request)
                             )
+
+
+def get_curriculum_hierarchy(currciculum_obj):
+    
+    curriculum_structure = []
+    if currciculum_obj:
+        for each in currciculum_obj.collection_set:
+            section_dict ={}
+            section = Node.get_node_by_id(each)
+            if section:
+                section_dict['name'] = section.name
+                section_dict['id'] = str(section._id)
+                section_dict['type'] = 'branch'
+                section_dict['children'] = [] 
+                if section.collection_set:
+                    for each_section in section.collection_set:
+                        subsection_dict ={}
+                        subsection = Node.get_node_by_id(each_section)
+                        if subsection:
+                            subsection_dict['children'] = []
+                            subsection_dict['name'] = subsection.name
+                            subsection_dict['type'] = 'division'
+                            subsection_dict['id'] = str(subsection._id)
+                            if "Topic" in subsection.member_of_names_list: 
+                                # subsection_dict['children'].append({"name":"Add Division","class":"create_division","type":"division"})
+                                subsection_dict['isLeaf'] = True
+                            else:
+                                subsection_dict['children'].append({"name":"Add Division","class":"create_division","type":"division"})
+
+                            section_dict['children'].append(subsection_dict)
+                section_dict['children'].append({"name":"Add Division","class":"create_division","type":"division"})
+                curriculum_structure.append(section_dict)
+        curriculum_structure.append({"name":"Add Branch","class":"create_branch"})
+    return curriculum_structure

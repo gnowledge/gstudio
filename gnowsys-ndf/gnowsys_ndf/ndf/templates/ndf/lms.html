@@ -40,6 +40,9 @@
               <li>
                   <a href="{% url 'unit_edit' groupid group_object.pk %}" class="fi-pencil"> {% trans "Edit" %}</a>
               </li>
+              <li>
+                  <a href="{% url 'curriculum_list' groupid  %}" class="fi-pencil"> {% trans "Add Curriculum" %}</a>
+              </li>
               {% if_edit_course_structure as edit_course_struct %}
               {% if edit_course_struct %}
               <li>

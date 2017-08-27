@@ -1010,6 +1010,8 @@ def add_theme_item(request, group_id):
 
     context_theme_id = request.POST.get("context_theme", '')
     name =request.POST.get('name','')
+    parent_node_id =request.POST.get('parent_id','')
+    is_topic =request.POST.get('is_topic','')
 
     context_theme = node_collection.one({'_id': ObjectId(context_theme_id) })
 
@@ -1022,12 +1024,17 @@ def add_theme_item(request, group_id):
           return HttpResponse("failure")
 
       theme_item_node = node_collection.collection.GSystem()
-
-      theme_item_node.save(is_changed=get_node_common_fields(request, theme_item_node, group_id, theme_item_GST),groupid=group_id)
+      if is_topic == "True":
+        theme_item_node.save(is_changed=get_node_common_fields(request, theme_item_node, group_id, topic_GST),groupid=group_id)
+      else:
+        theme_item_node.save(is_changed=get_node_common_fields(request, theme_item_node, group_id, theme_item_GST),groupid=group_id)
       theme_item_node.reload()
 
       # Add this theme item into context theme's collection_set
-      node_collection.collection.update({'_id': context_theme._id}, {'$push': {'collection_set': ObjectId(theme_item_node._id) }}, upsert=False, multi=False)
+      if parent_node_id:
+        node_collection.collection.update({'_id': ObjectId(parent_node_id)}, {'$push': {'collection_set': ObjectId(theme_item_node._id) }}, upsert=False, multi=False)
+      else:
+        node_collection.collection.update({'_id': context_theme._id}, {'$push': {'collection_set': ObjectId(theme_item_node._id) }}, upsert=False, multi=False)
       context_theme.reload()
 
     return HttpResponse("success")
