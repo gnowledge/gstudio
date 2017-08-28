@@ -177,21 +177,20 @@
             <label>
                     {% if asset_obj %}
                         {% get_relation_value asset_obj.pk "teaches" as teaches_rel %}
+                        {% get_selected_topics asset_obj.pk  as selecte_topics %}
                     {%  endif %}                    
                     choose topic :
-                        <select name="topics" id = "topic_list" tabindex=3 required>
-                                <option value="">--- Select Topic ---</option>
-                                {% for each_topic in topic_nodes %}
-                                {% if teaches_rel.grel_node.0.pk  == each_topic.pk %}
-                                <option selected value="{{ teaches_rel.grel_node.0.pk }}" data-topic="{{ teaches_rel.grel_node.0.pk }}">
-                                    {{ teaches_rel.grel_node.0.name }}
-                                {% else %}
-                                <option  value="{{ each_topic }}" data-topic="{{ each_topic.pk }}">
-                                    {{ each_topic.name }}
-                                {% endif %}
-                                </option>
-                                {% endfor %}
-                        </select>
+                    {%  for each_l in teaches_rel.grel_node %}
+                        {% for each in topic_nodes %}
+                            {%  if each.pk == each_l.pk %}
+                                    YES
+                                  {{each_l.name}}
+                            {% else %}
+                                   
+                                   NO {{each.name}}
+                            {% endif %}
+                        {% endfor %}
+                    {% endfor %}
             </label>
             </div>
         </div>
@@ -438,6 +437,12 @@
     })
     $( ".save-asset" ).click(function(event) {
         updateAllTags();
+        coll_arr = []
+        
+        $('#topic_list :selected').each(function(){
+            coll_arr.push($(this).val())
+        });
+        
         var tagsStr = tags.value.trim();
         if(checkTag())
         {
@@ -473,7 +478,9 @@
                         "sel_asset_lang":sel_asset_lang,
                         "is_raw_material": is_raw_material,
                         'topic_list':topic_list,
-                        title :"{{title}}",
+                        'coll_arr':coll_arr,
+                        'title' :"{{title}}",
+
                         // "asset_objective":asset_objective
                     },
                   url: "{% url 'create_edit_asset' group_id %}",
