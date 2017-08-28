@@ -2135,6 +2135,7 @@ ul.jqtree-tree .jqtree-toggler {
 
     .note-page {
       // display: none;
+      margin-left: 25px;
       background-color: #fff;
       padding-bottom: 30px;
       .group_sections_content{
@@ -2176,7 +2177,7 @@ ul.jqtree-tree .jqtree-toggler {
         padding: 2em 2em 1em;
         background: #fff;
         margin: 0em;
-
+        color: #000000;
         .note-header {
 
           >div {
@@ -3001,12 +3002,12 @@ ul.jqtree-tree .jqtree-toggler {
             vertical-align: top;
         }
         .post-btn{
-            background-color: white;
+            background-color: #720f5e;
             width: 77px;
             margin-left: 17px;
             &:hover{
-                color: #FFC151;
-                background-color: rgba(206, 120, 105, 0.25);
+                color: #720f5e;
+                background-color: #ffffff;
             }
 
 
@@ -4825,7 +4826,7 @@ ul.nav_menu_1 {
 
 
 .input_links{
-    margin-right: 50px;
+    margin-left: 10px;
     a{
         margin-right: 35px;
         margin-top: 5px;
@@ -5326,4 +5327,15 @@ ul.nav_menu_1 {
 .margin-right-50{
     margin-right:50px;
 }
+
+}
+
+.color-btn{
+    background-color: #720f5e;
+    width: 77px;
+    margin-left: 17px;
+    &:hover{
+        color: #720f5e;
+        background-color: #ffffff;
+    }
 }

@@ -72,7 +72,7 @@
         </div>
         <div class="row listing-row"> 
           {% for each in other_translations %}
-            <a href="{% url 'view_course_page' group_id each.pk %}"  title="{{each.name}}">
+            <a href="{% url 'view_course_page' group_id each.pk %}"  title="{% firstof each.altnames each.name %}">
               <div class="small-12 medium-6 large-3 columns ">
                 <div class="asset_tile">
                   <div class="asset_preview">
@@ -80,7 +80,7 @@
                       <img src="/static/ndf/images/asset.png">
                   </div>
                   <div class="asset_text">
-                      <div class="asset_title">{{each.name|truncatechars:25}}</div>
+                      <div class="asset_title">{% firstof each.altnames|truncatechars:25 each.name|truncatechars:25 %}</div>
                       <div class="asset_desc">{{each.content|striptags|truncatechars:25}}</div>
                   </div>
                 </div>
@@ -129,7 +129,7 @@
                                 {% endif %}
                             </div>
                             <div class="asset_text">
-                                <div class="asset_title" title="{{each.name}}">{% firstof each.altnames|truncatechars:25 each.name|truncatechars:25 %}</div>
+                                <div class="asset_title" title="{% firstof each.altnames each.name %}">{% firstof each.altnames|truncatechars:25 each.name|truncatechars:25 %}</div>
                                     {% if user.is_authenticated  and not group_object.edit_policy == "NON_EDITABLE"  or gstaff_access %}
                                     </a>
                                     <input type="checkbox" class="activitynode" name="activitynode" value="{{each.pk}}" style="margin:0; float:right;" class="asset_content_checkbox">
