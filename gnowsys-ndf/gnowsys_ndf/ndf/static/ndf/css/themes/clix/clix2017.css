@@ -1977,54 +1977,54 @@ ul.jqtree-tree .jqtree-toggler:hover {
 }
 /* line 2130, ../../../scss/_clix2017.scss */
 .notebook .notebook-body .note-page {
+  color: #000000;
   margin-left: 25px;
   background-color: #fff;
   padding-bottom: 30px;
 }
-/* line 2135, ../../../scss/_clix2017.scss */
+/* line 2136, ../../../scss/_clix2017.scss */
 .notebook .notebook-body .note-page .group_sections_content {
   margin-top: 5px;
 }
-/* line 2139, ../../../scss/_clix2017.scss */
+/* line 2140, ../../../scss/_clix2017.scss */
 .notebook .notebook-body .note-page > div {
   background-color: #fff;
 }
-/* line 2143, ../../../scss/_clix2017.scss */
+/* line 2144, ../../../scss/_clix2017.scss */
 .notebook .notebook-body .note-page .note-toolbar {
   padding: 1.8em 1.2em 0em;
   margin: 0em;
   background-color: #FFF;
 }
-/* line 2148, ../../../scss/_clix2017.scss */
+/* line 2149, ../../../scss/_clix2017.scss */
 .notebook .notebook-body .note-page .note-toolbar .note-creator {
   font-weight: bold;
 }
-/* line 2151, ../../../scss/_clix2017.scss */
+/* line 2152, ../../../scss/_clix2017.scss */
 .notebook .notebook-body .note-page .note-toolbar .creator-title {
   text-align: left;
   color: #C3C3C3;
   letter-spacing: 0.3px;
   margin-top: 5px;
 }
-/* line 2158, ../../../scss/_clix2017.scss */
+/* line 2159, ../../../scss/_clix2017.scss */
 .notebook .notebook-body .note-page .note-toolbar .creator-rating {
   text-align: right;
 }
-/* line 2160, ../../../scss/_clix2017.scss */
+/* line 2161, ../../../scss/_clix2017.scss */
 .notebook .notebook-body .note-page .note-toolbar .creator-rating > div {
   display: inline-block;
 }
-/* line 2165, ../../../scss/_clix2017.scss */
+/* line 2166, ../../../scss/_clix2017.scss */
 .notebook .notebook-body .note-page .note-title {
   font-weight: 500;
   margin-right: 1em;
 }
-/* line 2170, ../../../scss/_clix2017.scss */
+/* line 2171, ../../../scss/_clix2017.scss */
 .notebook .notebook-body .note-page .note-content {
   padding: 2em 2em 1em;
   background: #fff;
   margin: 0em;
-  color: #000000;
 }
 /* line 2177, ../../../scss/_clix2017.scss */
 .notebook .notebook-body .note-page .note-content .note-header > div {
