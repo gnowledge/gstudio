@@ -172,6 +172,29 @@
             </label>
             </div>
         </div>
+        <div class="row">
+            <div class="small-12 medium-10 large-10 columns">
+            <label>
+                    {% if asset_obj %}
+                        {% get_relation_value asset_obj.pk "teaches" as teaches_rel %}
+                    {%  endif %}                    
+                    choose topic :
+                        <select name="topics" id = "topic_list" tabindex=3 required>
+                                <option value="">--- Select Topic ---</option>
+                                {% for each_topic in topic_nodes %}
+                                {% if teaches_rel.grel_node.0.pk  == each_topic.pk %}
+                                <option selected value="{{ teaches_rel.grel_node.0.pk }}" data-topic="{{ teaches_rel.grel_node.0.pk }}">
+                                    {{ teaches_rel.grel_node.0.name }}
+                                {% else %}
+                                <option  value="{{ each_topic }}" data-topic="{{ each_topic.pk }}">
+                                    {{ each_topic.name }}
+                                {% endif %}
+                                </option>
+                                {% endfor %}
+                        </select>
+            </label>
+            </div>
+        </div>
 
 
         <div class="row">
@@ -432,6 +455,8 @@
         sel_tags = $("input:hidden[name='tags']").val()
         sel_asset_lang =  $('#asset_lang').find(':selected').attr('data-sub-code');
         asset_name = $("#asset-name").val();
+        topic_list = $("#topic_list").find(':selected').attr('data-topic');
+        alert(topic_list);
         asset_disp_name = $("#asset-disp-name").val();
         asset_description = $("#asset-descid").val();
         var asset_id = $(this).attr('data-asset_id');
@@ -447,7 +472,8 @@
                         "sel_tags":sel_tags,
                         "sel_asset_lang":sel_asset_lang,
                         "is_raw_material": is_raw_material,
-                        title :"{{title}}"
+                        'topic_list':topic_list,
+                        title :"{{title}}",
                         // "asset_objective":asset_objective
                     },
                   url: "{% url 'create_edit_asset' group_id %}",

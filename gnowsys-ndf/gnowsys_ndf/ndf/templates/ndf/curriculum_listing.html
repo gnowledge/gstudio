@@ -1,0 +1,11 @@
+{% extends "ndf/gbase.html" %}
+{% load i18n %}
+{% load ndf_tags %}
+{% block body_content %}
+        <a href="{% url  'create_edit_curriculum' group_id %}">
+        Create new curriculum
+        </a>
+        {%  for each in nodes %}
+            {% include "ndf/asset_card.html" with each_asset=each first_arg=group_id  second_arg=each.pk url_name="curriculum_detail" %}
+        {% endfor %}
+{% endblock body_content %}

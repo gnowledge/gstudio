@@ -2,9 +2,11 @@
 {% load i18n %}
 {% load ndf_tags %}
 {% block body_content %}
-
-        <div class="small-12 columns curriculum_creator">
-            <h3>Create Curriculum Tree Structure</h3>
+        {{curriculum_obj.name}}
+        {% if not curriculum_obj %}
+        <h3 data-reveal-id="create-edit-curriculum-reveal" >Create Curriculum Tree Structure</h3>
+        {% endif %}
+        <div class="small-12 columns curriculum_creator" >
             <div id="curriculum_tree"></div>
             <!--button type="button" class="blue-white-button" id="create_first_branch">Create Branch</button-->
         </div>
@@ -33,10 +35,10 @@
         <div>
             <h4>Create new Sub-Section</h4>
             <label>Sub-Section Name
-                <input type="text" placeholder="Sub-Section Name" />
+                <input type="text" placeholder="Sub-Section Name" name="sub-section-name" />
             </label>
             <label>Topic
-                <input type="checkbox" name="isLeafNode" value="leafNode"/>
+                <input type="checkbox"  class="topic-checkbox" name="isLeafNode" value="leafNode"/>
             </label>
             <br />
 
@@ -55,8 +57,21 @@
 
 
 
-
-
+<div id="create-edit-curriculum-reveal" class="reveal-modal" data-reveal aria-labelledby="modalTitle" aria-hidden="true" role="dialog">
+    <div>
+        <div class="small-3 columns left curriculum-form-name"><h3>{% trans "Curriculum Name" %} <h9 style="color:red">*</h9></h3></div>
+        <div class="small-9 columns right"><input type="text" class="curriculum-disp-name" id="lesson-name"></div>
+    </div>
+        <div class="small-3 columns left curriculum-form-desc"><h3>{% trans "Curriculum Description" %}<h9 style="color: rgba(128, 128, 128, 0.48);font-style: italic;font-size: 15px;"> {% trans "optional" %}</h9></h3></div>
+        <div class="small-9 columns right"><textarea rows="3" cols="50" class="curriculum-disp-desc" id="lesson-desc"></textarea></div>
+    <div class="double-buttons">
+        <button type="button" class="button-hollow-grey save-curriculum add-lesson-top-margin" data-node-id=""> {% trans "Save Curriculum" %} </button>
+        {% comment %}
+        <button type="button" class="button-hollow-grey save-lesson add-lesson-top-margin" data-node-id=""> {% trans "Cancel" %} </button>
+        {% endcomment %}
+    </div>
+    <a class="close-reveal-modal" aria-label="Close">&#215;</a>
+</div>
 
 
 
@@ -68,7 +83,8 @@
         //     class: 'create_branch',
         //     type: 'branch'
         // }];
-        var baseTree = [{"name":"asdasd","description":"","is_open":true,"children":[{"name":"asdasd","isLeaf":false,"is_open":true,"children":[{"name":"Add Division","class":"create_division"}]},{"name":"Add Division","class":"create_division"}]},{"name":"Add Branch","class":"create_branch"}];
+        // var baseTree = [{"name":"asdasd","description":"","is_open":true,"children":[{"name":"asdasd","isLeaf":false,"is_open":true,"children":[{"name":"Add Division","class":"create_division"}]},{"name":"Add Division","class":"create_division"}]},{"name":"Add Branch","class":"create_branch"}];
+        var baseTree = {{curriculum_structure|safe}};
         var selectedBranch;
         var selectedDivison;
         var isUpdateOperation;
@@ -85,6 +101,7 @@
             $('#curriculum_tree').tree({
                 data: baseTree,
                 onCreateLi: function(node, $li) {
+                    $li.attr('id', node.id);
                     var leafClass = node.isLeaf ? 'leaf_node' : '';
 
                     // Classes are there for only butons
@@ -256,6 +273,66 @@
                 console.log(JSON.parse(jsonTree));
             })
         })
+            $( ".save-curriculum" ).click(function(event) {
+                curr_name = $(".curriculum-disp-name").val();
+                curr_desc = $(".curriculum-disp-desc").val();                        
+                        $.ajax({
+                              type: "POST",
+                              data:{
+                                    'csrfmiddlewaretoken': "{{csrf_token}}",
+                                    'curr_name':curr_name,
+                                    'curr_desc':curr_desc
+                                },
+                              url: "{% url 'create_edit_curriculum' group_id  %}",
+                              datatype: "html",
+                              success: function(data) {
+                              redirect_url ="/"+"{{group_id}}"+"/curriculum/curriculum-detail/"+data 
+                              window.location.replace(redirect_url);
+                            }
+                        });
+                    });
+            $( ".create_branch" ).click(function(event) {
+                branch_name = $("input[name='branch_name']").val();
+                $.ajax({
+                          type: "POST",
+                          data:{
+                                'csrfmiddlewaretoken': "{{csrf_token}}",
+                                'name':branch_name,
+                                'context_theme':"{{curriculum_obj.pk}}"
+                            },
+                          url: "{% url 'add_theme_item' group_id  %}",
+                          datatype: "html",
+                          success: function(data) {
+                          alert(data);
+                        }
+                    });    
+            });
+            
+            $( ".create_division" ).click(function(event) {
+                subsection_name = $("input[name='sub-section-name']").val();
+                sel_row = $(".jqtree-selected").parent().parent().attr("id");
+                var checked = $('.topic-checkbox:checked').length;
+                topic_checked = "False"
+                if(checked > 0){
+                    topic_checked = "True"
+                }
+                $.ajax({
+                          type: "POST",
+                          data:{
+                                'csrfmiddlewaretoken': "{{csrf_token}}",
+                                'name':subsection_name,
+                                'context_theme':"{{curriculum_obj.pk}}",
+                                'parent_id':sel_row,
+                                'is_topic':topic_checked
+                            },
+                          url: "{% url 'add_theme_item' group_id  %}",
+                          datatype: "html",
+                          success: function(data) {
+                          alert(data);
+                        }
+                    });
+
+            });
     </script>
 
 
