@@ -2,7 +2,8 @@
 {% load i18n %}
 {% load ndf_tags %}
 {% block body_content %}
-    <div class="curriculum_list_header">
+
+   <div class="curriculum_list_header">
     	<span class="title-curriculum">Your courses</span>
     	<div class="add-curriculum">
     		<a href="{% url  'create_edit_curriculum' group_id %}">
@@ -10,28 +11,11 @@
         	</a>
     	</div>
     </div>
-    <div class="curriculum_listing">
-    	<div class="curriculum_content">
-    		<div class="curriculum_content_left">
-    			<a href="#"><img src="/static/ndf/images/curr-curriculum.png" style="height: 100px;"></a>
-    			<div class="curriculum_content_details">
-            		<a href="#" class="hyperlink-style">Title: </a>
-        			<a href="#" class="hyperlink-info"> No. of Sections: </a>
-        			<a href="#" class="hyperlink-info"> Created on: </a>
-    			</div>
-    		</div>
-    	</div>
-    	<div class="curriculum_content">
-    		<div class="curriculum_content_left">
-    			<a href="#"><img src="/static/ndf/images/curr-curriculum.png" style="height: 100px;"></a>
-    			<div class="curriculum_content_details">
-            		<a href="#" class="hyperlink-style">Title: </a>
-        			<a href="#" class="hyperlink-info"> No. of Sections: </a>
-        			<a href="#" class="hyperlink-info"> Created on: </a>
-    			</div>
-    		</div>
-    	</div>
-    </div>
+
+	        {%  for each in nodes %}
+    	        {% include "ndf/curriculum_list.html" with node=each first_arg=group_id  second_arg=each.pk url_name="curriculum_detail" %}
+        	{% endfor %}
+
 
 
 
