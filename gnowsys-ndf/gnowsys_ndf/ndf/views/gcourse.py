@@ -2891,7 +2891,7 @@ def course_analytics(request, group_id, user_id, render_template=False, get_resu
                     'unattempted_quizitems': 0,
                     'visited_quizitems': 0,
                     'notapplicable_quizitems': 0,
-                    'incorrect_quizitems': 0,
+                    'incorrect_attempted_quizitems': 0,
                     'attempted_quizitems': 0
                 })
         '''
@@ -2912,7 +2912,7 @@ def course_analytics(request, group_id, user_id, render_template=False, get_resu
                 analytics_data['incorrect_attempted_quizitems'] += each_dict['incorrect']
                 analytics_data['attempted_quizitems'] += each_dict['attempted']
         except Exception as assessment_analytics_err:
-            print "\nIgnore if KeyError. Error: {0}".format(assessment_analytics_err)
+            print "\nIn User analytics. Ignore if KeyError. Error: {0}".format(assessment_analytics_err)
             pass
 
     # Notes Section
@@ -3765,13 +3765,13 @@ def load_assessment_analytics(request, group_id):
                         break
                 if not reattempt:
                     assessment_dict = {'id': each_sublist[1], 'correct': correctAttemptCount,
-                    'visited': visitedCount, 'unattempted': unattemptedCount, 
-                    'notapplicable': notapplicableCount, 'attempted': unattemptedCount, 
+                    'visited': visitedCount, 'unattempted': unattemptedCount,
+                    'notapplicable': notapplicableCount, 'attempted': attemptedCount,
                     'incorrect': incorrect}
                     counter_obj['assessment'].append(assessment_dict)
                     counter_obj['group_points'] = (correctAttemptCount * GSTUDIO_QUIZ_CORRECT_POINTS)
-                counter_obj.last_update = datetime.datetime.now()
-                counter_obj.save()
+            counter_obj.last_update = datetime.datetime.now()
+            counter_obj.save()
 
             assessment_data_list = counter_obj['assessment']
             for each_dict in assessment_data_list:
@@ -3783,10 +3783,10 @@ def load_assessment_analytics(request, group_id):
                     result_set['notapplicable_quizitems'] += each_dict['notapplicable']
                     result_set['attempted_quizitems'] += each_dict['attempted']
                 except Exception as key_err:
-                    print "\nIgnore if KeyError. Error: {0}".format(key_err)                
+                    print "\nIn load_assessment_analytics() Ignore if KeyError. Error: {0}".format(key_err)
     except Exception as e:
         print "\nError: ",e
-
+    # print "\nRS: ", result_set
     return HttpResponse(json.dumps(result_set))
 
 def get_lang_node(node_id,lang):
