@@ -4,7 +4,9 @@
 {% block body_content %}
         {{curriculum_obj.name}}
         {% if not curriculum_obj %}
-        <h3 data-reveal-id="create-edit-curriculum-reveal" >Create Curriculum Tree Structure</h3>
+        <h3 data-reveal-id="create-edit-curriculum-reveal" class="hyperlink-tag">
+            <i class="fi fi-plus"></i> Create Curriculum Tree Structure
+        </h3>
         {% endif %}
         <div class="small-12 columns curriculum_creator" >
             <div id="curriculum_tree"></div>
