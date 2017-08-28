@@ -322,7 +322,8 @@ def explore_drafts(request,page_no=1):
                                           {'created_by': request.user.id},
                                           {'group_admin': request.user.id},
                                           {'author_set': request.user.id},
-                                          {'group_type': 'PUBLIC'}
+                                          # No check on group-type PUBLIC for DraftUnits.
+                                          # {'group_type': 'PUBLIC'}
                                           ]}).sort('last_update', -1)
     base_unit_page_cur = paginator.Paginator(base_unit_cur, page_no, GSTUDIO_NO_OF_OBJS_PP)
 
