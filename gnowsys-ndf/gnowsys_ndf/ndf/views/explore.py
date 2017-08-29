@@ -331,7 +331,7 @@ def explore_drafts(request,page_no=1):
               ]})
 
     base_unit_cur = node_collection.find(draft_query).sort('last_update', -1)
-    print "\nbase: ", base_unit_cur.count()
+    # print "\nbase: ", base_unit_cur.count()
 
     '''
     base_unit_cur = node_collection.find({'member_of': gst_base_unit_id,
