@@ -4067,10 +4067,9 @@ def get_topic_nodes(node_id):
 
 @register.assignment_tag
 def get_selected_topics(node_id):
-	RT_teaches = node_collection.one({'_type':'RelationType', 'name': 'teaches'})
-	teaches_grelations = triple_collection.find({'_type': 'GRelation', 'right_subject': ObjectId(node_id), 'relation_type': RT_teaches._id })
+	rel_val = get_relation_value(ObjectId(node_id),'teaches')
 	teaches_grelations_id_list = []
-	for each in teaches_grelations:
-		teaches_grelations_id_list.append(each.subject)
-	teaches_nodes = node_collection.find({"_id":{'$in' : teaches_grelations_id_list } })
-	return teaches_nodes
+	for each in rel_val['grel_node']:
+		teaches_grelations_id_list.append(str(each._id))
+		# teaches_grelations_id_list = map(ObjectId,teaches_grelations_id_list)
+	return teaches_grelations_id_list

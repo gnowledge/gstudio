@@ -209,8 +209,31 @@ def curriculum_create_edit(request, group_id,curriculum_id=None):
             theme_gs_obj.save(group_id=group_id)           
             return HttpResponse(theme_gs_obj._id)
     else:
-        curr_hierarchy = get_curriculum_hierarchy(curriculum_obj)
-        return render_to_response("ndf/curriculum_hierarchy.html",
+
+        data = ""
+        collection_list = []
+        themes_list = []
+
+        theme_node = node_collection.one({'_id': ObjectId(curriculum_obj._id) })
+        # print "\ntheme_node: ",theme_node.name,"\n"
+        if theme_node.collection_set:
+            for e in theme_node.collection_set:
+                objs = node_collection.one({'_id': ObjectId(e) })
+                for l in objs.collection_set:
+                    themes_list.append(l)
+
+
+            for each in theme_node.collection_set:
+                obj = node_collection.one({'_id': ObjectId(each) })
+                if obj._id not in themes_list:
+                    if theme_item_GST._id in obj.member_of or topic_GST._id in obj.member_of:
+                        node_type = node_collection.one({'_id': ObjectId(obj.member_of[0])}).name
+                        collection_list.append({'name': obj.name, 'id': obj.pk, 'type': 'branch'})
+                        collection_list = get_collection_list(collection_list, obj)
+            collection_list.append({"name":"Add Branch","class":"create_branch","type":"branch"})
+
+            curr_hierarchy = get_curriculum_hierarchy(curriculum_obj)
+            return render_to_response("ndf/curriculum_hierarchy.html",
                             { 
                                 'groupid': group_id,
                                 'group_id': group_id,
@@ -987,9 +1010,60 @@ def get_curriculum_hierarchy(currciculum_obj):
                                 subsection_dict['isLeaf'] = True
                             else:
                                 subsection_dict['children'].append({"name":"Add Division","class":"create_division","type":"division"})
+                            
+                            if subsection.collection_set:
+                                for each_subsection in subsection.collection_set:   
+                                    subsection_1_dict = {}
+                                    subsection_1 = Node.get_node_by_id(each_subsection)
+                                    if subsection_1:
+                                        subsection_1_dict['children'] = []
+                                        subsection_1_dict['name'] = subsection_1.name
+                                        subsection_1_dict['type'] = 'division'
+                                        subsection_1_dict['id'] = str(subsection_1._id)
+                                        if "Topic" in subsection_1.member_of_names_list: 
+                                            # subsection_1_dict['children'].append({"name":"Add Division","class":"create_division","type":"division"})
+                                            subsection_1_dict['isLeaf'] = True
+                                        else:
+                                            subsection_1_dict['children'].append({"name":"Add Division","class":"create_division","type":"division"})
+
+                                    subsection_dict['children'].append(subsection_1_dict)
 
                             section_dict['children'].append(subsection_dict)
                 section_dict['children'].append({"name":"Add Division","class":"create_division","type":"division"})
                 curriculum_structure.append(section_dict)
         curriculum_structure.append({"name":"Add Branch","class":"create_branch"})
     return curriculum_structure
+
+
+@get_execution_time
+def get_collection_list(collection_list, node):
+    inner_list = []
+    error_list = []
+    inner_list_append_temp=inner_list.append #a temp. variable which stores the lookup for append method
+    if node.collection_set:
+        for each in node.collection_set:
+            col_obj = node_collection.one({'_id': ObjectId(each)})
+            if col_obj:
+                if theme_item_GST._id in col_obj.member_of or topic_GST._id in col_obj.member_of:
+                    for cl in collection_list:
+                        if cl.has_key('id') and cl['id'] == node.pk:
+                            node_type = node_collection.one({'_id': ObjectId(col_obj.member_of[0])}).name
+                            inner_sub_dict = {'name': col_obj.name, 'id': col_obj.pk , 'type': 'division'}
+                            inner_sub_list = [inner_sub_dict]
+                            inner_sub_list = get_collection_list(inner_sub_list, col_obj)
+
+                            if inner_sub_list:
+                                inner_list_append_temp(inner_sub_list[0])
+                            else:
+                                inner_list_append_temp(inner_sub_dict)
+
+                            cl.update({'children': inner_list })                        
+            else:        
+                error_message = "\n TreeHierarchyError: Node with given ObjectId ("+ str(each) +") not found!!!\n"
+                print "\n " + error_message
+        inner_list.append({"name":"Add Division","class":"create_division","type":"division"})
+        return collection_list
+
+    else:
+        print "00000000000000000000000000"
+        return collection_list

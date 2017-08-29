@@ -303,7 +303,7 @@
                           url: "{% url 'add_theme_item' group_id  %}",
                           datatype: "html",
                           success: function(data) {
-                          alert(data);
+                          window.reload();
                         }
                     });    
             });
@@ -328,7 +328,7 @@
                           url: "{% url 'add_theme_item' group_id  %}",
                           datatype: "html",
                           success: function(data) {
-                          alert(data);
+                          location.reload();
                         }
                     });
 
