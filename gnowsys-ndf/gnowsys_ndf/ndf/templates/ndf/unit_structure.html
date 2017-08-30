@@ -14,7 +14,7 @@
                 <dl class="accordion course-lessons" data-accordion role="tablist">
                 </dl>
                 <a class="button-hollow-grey add-lesson add-lesson-top-margin" data-reveal-id="add-lesson-reveal">
-                    {% if not unit_obj.project_config.section_name %}{% trans "Add Lesson" %}{% else %}{% trans 'add' %} {{unit_obj.project_config.section_name}} {% endif %}
+                    {% if not unit_obj.project_config.section_name %}{% trans "Add Lesson" %}{% else %}{% trans 'Add' %} {{unit_obj.project_config.section_name}} {% endif %}
                 </a>
             </div>
             <!-- END of LEFT PANEL -->
@@ -327,7 +327,7 @@ This will not be used because now only existing activities will be added.
 
 
 <div id="select-activity-page" class="reveal-modal" data-reveal aria-labelledby="modalTitle" aria-hidden="true" role="dialog" data-lesson-id="">
-    <h3>{% trans "Choose Activity Page" %}</h3>
+    <h3>{% trans "Choose Activity" %}</h3>
     <div id="activity-container"></div>
     <a class="close-reveal-modal" aria-label="Close">&#215;</a>
 </div>
@@ -374,7 +374,9 @@ This will not be used because now only existing activities will be added.
                 {{/each}}
                 <li>
                     <div class="custom_dropdown">
-                        <a data-reveal-id="select-activity-page" class="add_existing_activity"><u>Add from Activities</u></a>
+                        <a data-reveal-id="select-activity-page" class="add_existing_activity inner"><u>Add from Activities</u></a> | 
+                        <a data-reveal-id="select-activity-page" class="add_quizitem inner"><u>Add Question</u></a>
+
                         <!--
                         <a class="button-hollow-grey add_activity">Add Activity</a>
                          <ul class="dropdown_content left_align" >
@@ -885,25 +887,43 @@ This will not be used because now only existing activities will be added.
 
         // Add a existing activity
         $('.course-lessons').on('click', '.add_existing_activity', function(){
-            var lesson_id = $(this).closest('div.content').attr('id').replace('lesson-', '');
             // console.log('Adding existing activity for lessson ' + lesson_id);
-
-            $('#select-activity-page').attr('data-lesson-id', lesson_id);
+            $('#select-activity-page').attr('data-activity-selection', true);
+            $('#select-activity-page').attr('data-quiz-selection', false);
+            update_attr(this)
             //Send the query and update the course_data and call 'renderCourseTree(course_data)'
             //To select the newly created activity run this $('#activity-' + newid).trigger('click');
         });
 
+        $('.course-lessons').on('click', '.add_quizitem', function(){
+            // matches above call .add_existing_activity click option
+            $('#select-activity-page').attr('data-activity-selection', false);
+            $('#select-activity-page').attr('data-quiz-selection', true);
+            update_attr(this)
+        });
+
+        function update_attr(this_ele){
+            var lesson_id = $(this_ele).closest('div.content').attr('id').replace('lesson-', '');
+            $('#select-activity-page').attr('data-lesson-id', lesson_id);
+            $("#activity-container").html('');
+            getActivityPages();
+
+        }
 
         function getActivityPages() {
             var lessonId = $("#select-activity-page").attr("data-lesson-id");
+            url_to_fetch_resources = "{% url 'get_group_resources' group_id 'Page' %}"
+            data =  {'except_collection_set_of_id': lessonId}
+            if ($("#select-activity-page").attr('data-quiz-selection') == "true"){
+                url_to_fetch_resources = "{% url 'get_group_resources' group_id 'Quiz' %}"
+                data =  {'except_collection_set_of_id': lessonId}
+            }
             $.ajax({
                       type: "GET",
-                      url: "{% url 'get_group_pages' group_id %}",
+                      url: url_to_fetch_resources,
                       datatype: "html",
-                      data:{
-                        'except_collection_set_of_id': lessonId
-                      },
-                        success: function(data) {
+                      data: data,
+                      success: function(data) {
                       $("#activity-container").html(data);
                             // $('#existing_template_modal').foundation('reveal', 'open');
 
@@ -963,10 +983,8 @@ This will not be used because now only existing activities will be added.
         //   getTemplates();
         // });
 
-        $(document).on('opened.fndtn.reveal', '#select-activity-page[data-reveal]', function () {
-            $("#activity-container").html('');
-            getActivityPages();
-        });
+        // $(document).on('opened.fndtn.reveal', '#select-activity-page[data-reveal]', function () {
+        // });
 
         $(document).on('closed.fndtn.reveal', '#add-lesson-reveal', function () {
             $("#lesson-name").val('');
