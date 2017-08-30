@@ -2714,6 +2714,8 @@ def upload_using_save_file(request,group_id):
 
     group_obj = node_collection.one({'_id': ObjectId(group_id)})
     title = request.POST.get('context_name','')
+    sel_topic = request.POST.get('topic_list','')
+    
     usrid = request.user.id
     name  = request.POST.get('name')
     # print "\n\n\nusrid",usrid
@@ -2840,7 +2842,8 @@ def upload_using_save_file(request,group_id):
             # # print "++++++++++++++++++++++++++++++++++++++++",asset_node._id
             # asset_content_node = create_assetcontent(ObjectId('58a3dd4cc6bd690400016ae5'),file_node.name,group_id,file_node.created_by)
             # print "---------------------------------------",asset_content_node
-
+            rt_teaches = node_collection.one({'_type': "RelationType", 'name': unicode("teaches")})
+            create_grelation(file_node._id,rt_teaches,ObjectId(sel_topic))
             file_node.save(groupid=group_id,validate=False)
 
             return HttpResponseRedirect( reverse('file_detail', kwargs={"group_id": group_id,'_id':file_node._id}) )
