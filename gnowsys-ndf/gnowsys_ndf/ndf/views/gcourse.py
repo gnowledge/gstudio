@@ -3378,10 +3378,16 @@ def create_edit_course_page(request, group_id, page_id=None,page_type=None):
     group_id = group_obj._id
     group_name = group_obj.name
     template = 'ndf/gevent_base.html'
+    # templates_gst = node_collection.one({"_type":"GSystemType","name":"Template"})
+    # if templates_gst._id:
+    #   # templates_cur = node_collection.find({"member_of":ObjectId(GST_PAGE._id),"type_of":ObjectId(templates_gst._id)})
+    #   templates_cur = node_collection.find({"type_of":ObjectId(templates_gst._id)})
+
     context_variables = {
             'group_id': group_id, 'groupid': group_id, 'group_name':group_name,'page_type':page_type,
             'group_obj': group_obj, 'title': 'create_course_pages',
-            'activity_node': None, 'cancel_activity_url': reverse('course_pages',
+            'activity_node': None, #'templates_cur': templates_cur,
+            'cancel_activity_url': reverse('course_pages',
                                         kwargs={
                                         'group_id': group_id
                                         })}

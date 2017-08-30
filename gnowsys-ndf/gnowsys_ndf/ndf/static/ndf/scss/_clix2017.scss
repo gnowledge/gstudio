@@ -3176,7 +3176,6 @@ ul.jqtree-tree .jqtree-toggler {
         }
 
     }
-    
 }
 
 .tags-container {
@@ -3234,6 +3233,8 @@ ul.jqtree-tree .jqtree-toggler {
     border-radius: 5px;
     // margin-top: 7px;
     height: 38px;
+    width: 45%;
+    font-size: 14px;
 }
 
 /*
@@ -5258,4 +5259,26 @@ ul.nav_menu_1 {
         color: #720f5e;
         background-color: #ffffff;
     }
+}
+
+.mid_label{
+    margin-top: 15px;
+    font-size: 15px;    
+}
+
+.compulsory{
+    color: red;
+    font-size: smaller;
+}
+
+.select-drop{
+    height: auto;
+}
+
+.template-select{
+    border: 1px solid #cccccc;
+    border-radius: 5px;
+    height: 38px;
+    width: 40%;
+    font-size: 14px;
 }
