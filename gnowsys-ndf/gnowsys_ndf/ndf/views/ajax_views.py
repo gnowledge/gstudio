@@ -6734,7 +6734,7 @@ def create_edit_asset(request,group_id):
   
   group_obj = Group.get_group_name_id(group_id, get_obj=True)
   selected_topic =  request.POST.get("topic_list", '')
-  selected_topic_list =  request.POST.getlist("coll_arr[]", '')
+  # selected_topic_list =  request.POST.getlist("coll_arr[]", '')
   
   if request.method == "POST":
     asset_name =  str(request.POST.get("asset_name", '')).strip()
@@ -6762,9 +6762,9 @@ def create_edit_asset(request,group_id):
     
     rt_teaches = node_collection.one({'_type': "RelationType", 'name': unicode("teaches")})
     
-    if selected_topic_list:
-      selected_topic_list = map(ObjectId,selected_topic_list)
-      create_grelation(asset_obj._id,rt_teaches,selected_topic_list)
+    if selected_topic:
+      # selected_topic_list = map(ObjectId,selected_topic_list)
+      create_grelation(asset_obj._id,rt_teaches,ObjectId(selected_topic))
     
     if "asset@asset" not in asset_obj.tags and "base_unit" in group_obj.member_of_names_list:
       asset_obj.tags.append(u'asset@asset')

@@ -210,27 +210,27 @@ def curriculum_create_edit(request, group_id,curriculum_id=None):
             return HttpResponse(theme_gs_obj._id)
     else:
 
-        data = ""
-        collection_list = []
-        themes_list = []
+        # data = ""
+        # collection_list = []
+        # themes_list = []
 
-        theme_node = node_collection.one({'_id': ObjectId(curriculum_obj._id) })
-        # print "\ntheme_node: ",theme_node.name,"\n"
-        if theme_node.collection_set:
-            for e in theme_node.collection_set:
-                objs = node_collection.one({'_id': ObjectId(e) })
-                for l in objs.collection_set:
-                    themes_list.append(l)
+        # theme_node = node_collection.one({'_id': ObjectId(curriculum_obj._id) })
+        # # print "\ntheme_node: ",theme_node.name,"\n"
+        # if theme_node.collection_set:
+        #     for e in theme_node.collection_set:
+        #         objs = node_collection.one({'_id': ObjectId(e) })
+        #         for l in objs.collection_set:
+        #             themes_list.append(l)
 
 
-            for each in theme_node.collection_set:
-                obj = node_collection.one({'_id': ObjectId(each) })
-                if obj._id not in themes_list:
-                    if theme_item_GST._id in obj.member_of or topic_GST._id in obj.member_of:
-                        node_type = node_collection.one({'_id': ObjectId(obj.member_of[0])}).name
-                        collection_list.append({'name': obj.name, 'id': obj.pk, 'type': 'branch'})
-                        collection_list = get_collection_list(collection_list, obj)
-            collection_list.append({"name":"Add Branch","class":"create_branch","type":"branch"})
+        #     for each in theme_node.collection_set:
+        #         obj = node_collection.one({'_id': ObjectId(each) })
+        #         if obj._id not in themes_list:
+        #             if theme_item_GST._id in obj.member_of or topic_GST._id in obj.member_of:
+        #                 node_type = node_collection.one({'_id': ObjectId(obj.member_of[0])}).name
+        #                 collection_list.append({'name': obj.name, 'id': obj.pk, 'type': 'branch'})
+        #                 collection_list = get_collection_list(collection_list, obj)
+        #     collection_list.append({"name":"Add Branch","class":"create_branch","type":"branch"})
 
             curr_hierarchy = get_curriculum_hierarchy(curriculum_obj)
             return render_to_response("ndf/curriculum_hierarchy.html",
