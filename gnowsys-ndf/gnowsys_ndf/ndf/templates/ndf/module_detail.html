@@ -1,9 +1,12 @@
 {% extends "ndf/gbase.html" %}
 {% load i18n %}
+{% load check_is_gstaff from ndf_tags %}
 
 {% block title %} {{title}} {% endblock %}
 
 {% block body_content %}
+{% check_is_gstaff group_id request.user as is_gstaff %}
+
 {% include 'ndf/explore_secondary_header.html' %}
 <div class="medium-12 columns">
 	<div class="medium-2 columns thumbnail_style">
