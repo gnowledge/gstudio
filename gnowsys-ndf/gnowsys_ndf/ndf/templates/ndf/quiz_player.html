@@ -3,45 +3,16 @@
 {% load i18n %}
 {% get_group_name groupid as group_name_tag %}
 {% get_user_quiz_resp node request.user as total_and_curr_ans_dict %}
+{% check_is_gstaff groupid request.user as is_gstaff %}
 
-<style type="text/css">
-	.quiz_qtn{
-		margin-left:20px !important;
-		font-size: 20px;
-	}
-	.question_edit{
-		margin-left: 20px !important;
-	}
-
-	input[type=checkbox], input[type=radio]{
-	    margin-right: 10px;
-	    width: 15px;
-		height: 15px;
-	}
-
-	.chk_ans_lbl, .rad_ans_lbl{
-		font-size: 22px;
-		margin-left: 5px;
-	}
-
-	.fi-check{
-		color: green;
-	}
-
-	.fi-x{
-		color: red;
-	}
-</style>
 {% with node.options|re_format as node_options %}
 {% with node.correct_answer|re_format as node_correct_answer %}
 
-<div class="row">
-
-<label class="attempts_count right fi-info"></label>
+<div class="row quiz-player">
+	<label class="attempts_count right fi-info"></label>
 	<fieldset>
 	    <legend >
 	    	<span>Question</span>
-			{% check_is_gstaff groupid request.user as is_gstaff %}
 			{% if is_gstaff %}
 		    	<a href="{% url 'quiz_item_edit' group_id node.pk %}?return_url={{ request.META.HTTP_REFERER }}" class="right question_edit" target="_blank" >Edit</a>
 		    {% endif %}
