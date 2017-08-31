@@ -8,7 +8,7 @@
     			<a href="{% url 'curriculum_detail' group_id node.pk %}"><img src="/static/ndf/images/curr-curriculum.png" style="height: 100px;"></a>
     			<div class="curriculum_content_details">
             		<a href="{% url 'curriculum_detail' group_id node.pk %}" class="hyperlink-style">Title: {{node.name}} </a>
-        			<a href="{% url 'curriculum_detail' group_id node.pk %}" class="hyperlink-info"> No. of Sections: </a>
+        			<a href="{% url 'curriculum_detail' group_id node.pk %}" class="hyperlink-info"> No. of Sections:{{node.collection_set|length}} </a>
         			<a href="{% url 'curriculum_detail' group_id node.pk %}" class="hyperlink-info"> Created on: </a>
     			</div>
     		</div>
