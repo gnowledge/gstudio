@@ -24,6 +24,7 @@ from gnowsys_ndf.ndf.models import Node, Triple
 from gnowsys_ndf.ndf.models import node_collection, triple_collection,NodeJSONEncoder
 from gnowsys_ndf.ndf.views.methods import get_node_common_fields, get_drawers,create_grelation_list,get_execution_time, get_group_name_id, get_node_metadata,create_grelation, get_language_tuple
 from gnowsys_ndf.ndf.views.methods import get_filter_querydict
+from gnowsys_ndf.ndf.views.ajax_views import get_collection
 from gnowsys_ndf.ndf.templatetags.simple_filters import get_dict_from_list_of_dicts
 #######################################################################################################################################
 theme_GST = node_collection.one({'_type': 'GSystemType', 'name': 'Theme'})
@@ -187,18 +188,38 @@ def curriculum_list(request, group_id):
                             context_instance = RequestContext(request) )
 
 def curriculum_create_edit(request, group_id,curriculum_id=None):
+    def _update_curr_hierarchy(hierarchy_obj):
+        # d is list fo dict
+        for hierarchy in hierarchy_obj:
+            if isinstance(hierarchy,dict):
+                if 'node_type' in hierarchy and hierarchy['node_type'] != "Topic":
+                    if 'children' in hierarchy:
+                        hierarchy['children'].append({'class': 'create_division', 'name': 'Add Division', 'type': 'division'})
+                    else:
+                        hierarchy.update({'children':[{'class': 'create_division', 'name': 'Add Division', 'type': 'division'}]})
+                    _update_curr_hierarchy(hierarchy['children'])
 
     try:
         group_id = ObjectId(group_id)
     except:
         group_name, group_id = get_group_name_id(group_id)
     curriculum_obj = node_collection.one({"_id" : ObjectId(curriculum_id)})
+    context_variables = {
+                        'groupid': group_id,
+                        'group_id': group_id,
+                        'curriculum_structure': []
+                    }
+
+    if curriculum_obj:
+        context_variables.update({'curriculum_obj':curriculum_obj})
+        curr_hierarchy = get_collection(request, group_id, curriculum_obj._id, False, )
+        if curr_hierarchy:
+            curr_hierarchy = json.loads(curr_hierarchy.content)
+            _update_curr_hierarchy(curr_hierarchy)
+            curr_hierarchy.append({'class': 'create_branch', 'name': 'Add Branch'})
+            context_variables.update({'curriculum_structure':json.dumps(curr_hierarchy)})
     if request.method == "POST":
-        if curriculum_id:
-          
-            print "curriculum_id",curriculum_id
-        
-        else:
+        if not curriculum_id:
             curr_name = request.POST.get('curr_name', '')
             curr_desc = request.POST.get('curr_desc', '')
 
@@ -209,38 +230,31 @@ def curriculum_create_edit(request, group_id,curriculum_id=None):
             theme_gs_obj.save(group_id=group_id)           
             return HttpResponse(theme_gs_obj._id)
     else:
+            # data = ""
+            # collection_list = []
+            # themes_list = []
 
-        # data = ""
-        # collection_list = []
-        # themes_list = []
-
-        # theme_node = node_collection.one({'_id': ObjectId(curriculum_obj._id) })
-        # # print "\ntheme_node: ",theme_node.name,"\n"
-        # if theme_node.collection_set:
-        #     for e in theme_node.collection_set:
-        #         objs = node_collection.one({'_id': ObjectId(e) })
-        #         for l in objs.collection_set:
-        #             themes_list.append(l)
+            # theme_node = node_collection.one({'_id': ObjectId(curriculum_obj._id) })
+            # # print "\ntheme_node: ",theme_node.name,"\n"
+            # if theme_node.collection_set:
+            #     for e in theme_node.collection_set:
+            #         objs = node_collection.one({'_id': ObjectId(e) })
+            #         for l in objs.collection_set:
+            #             themes_list.append(l)
 
 
-        #     for each in theme_node.collection_set:
-        #         obj = node_collection.one({'_id': ObjectId(each) })
-        #         if obj._id not in themes_list:
-        #             if theme_item_GST._id in obj.member_of or topic_GST._id in obj.member_of:
-        #                 node_type = node_collection.one({'_id': ObjectId(obj.member_of[0])}).name
-        #                 collection_list.append({'name': obj.name, 'id': obj.pk, 'type': 'branch'})
-        #                 collection_list = get_collection_list(collection_list, obj)
-        #     collection_list.append({"name":"Add Branch","class":"create_branch","type":"branch"})
-
-            curr_hierarchy = get_curriculum_hierarchy(curriculum_obj)
+            #     for each in theme_node.collection_set:
+            #         obj = node_collection.one({'_id': ObjectId(each) })
+            #         if obj._id not in themes_list:
+            #             if theme_item_GST._id in obj.member_of or topic_GST._id in obj.member_of:
+            #                 node_type = node_collection.one({'_id': ObjectId(obj.member_of[0])}).name
+            #                 collection_list.append({'name': obj.name, 'id': obj.pk, 'type': 'branch'})
+            #                 collection_list = get_collection_list(collection_list, obj)
+            #     collection_list.append({"name":"Add Branch","class":"create_branch","type":"branch"})
+            # print "\n context_variables: ", context_variables
             return render_to_response("ndf/curriculum_hierarchy.html",
-                            { 
-                                'groupid': group_id,
-                                'group_id': group_id,
-                                'curriculum_obj':curriculum_obj,
-                                'curriculum_structure':json.dumps(curr_hierarchy,cls=NodeJSONEncoder)
-                            },
-                            context_instance = RequestContext(request) )
+                                  context_variables,
+                                  context_instance=RequestContext(request))
 
 
 def delete_theme(request, group_id, theme_id):
