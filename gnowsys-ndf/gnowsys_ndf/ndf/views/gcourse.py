@@ -2268,12 +2268,12 @@ def course_notebook(request, group_id, node_id=None, tab="my-notes"):
         user_id = request.user.id
 
     blog_pages = node_collection.find({'member_of':page_gst_id, 'type_of': blog_page_gst_id,
-     'group_set': group_obj._id, 'created_by': {'$ne': user_id}},{'_id': 1, 'created_at': 1, 'created_by': 1, 'name': 1, 'content': 1}).sort('created_at', -1)
+     'group_set': group_obj._id, 'created_by': {'$ne': user_id}}).sort('created_at', -1)
     # print "\n -- blog --",blog_pages.count()
 
     if user_id:
         user_blogs = node_collection.find({'member_of':page_gst_id, 'type_of': blog_page_gst_id,
-         'group_set': group_obj._id, 'created_by': user_id },{'_id': 1, 'created_at': 1, 'created_by': 1, 'name': 1, 'content': 1}).sort('created_at', -1)
+         'group_set': group_obj._id, 'created_by': user_id }).sort('created_at', -1)
         # print "\n -- user --",user_blogs.count()
 
     if node_id:
