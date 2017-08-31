@@ -7051,3 +7051,11 @@ def get_translated_node(request, group_id):
     else:
       return HttpResponse(json.dumps(node_obj, cls=NodeJSONEncoder))
 
+def delete_curriculum_node(request, group_id):
+    node_id = request.POST.get('node_id', None)
+    node_obj = Node.get_node_by_id(node_id)
+    if node_obj:
+      trash_resource(request,ObjectId(group_id),ObjectId(node_id))
+      trash_resource(request,ObjectId(group_id),ObjectId(node_id))
+      return HttpResponse("Success")
+

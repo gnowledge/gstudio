@@ -337,6 +337,26 @@
                     });
 
             });
+            
+            $( ".delete_division" ).click(function(event) {
+                sel_node_id = $(".jqtree-selected").attr("id");
+                if (confirm("Do you want to delete selected files?.") == true){
+                $.ajax({
+                          type: "POST",
+                          data:{
+                                'csrfmiddlewaretoken': "{{csrf_token}}",
+                                'node_id':sel_node_id,
+                            },
+                          url: "{% url 'delete_curriculum_node' group_id  %}",
+                          datatype: "html",
+                          success: function(data) {
+                          location.reload();
+                        }
+                    });
+                    
+                }
+
+            });
     </script>
 
 
