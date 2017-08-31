@@ -5329,3 +5329,199 @@ ul.nav_menu_1 > li > a.selected, ul.nav_menu_1 > li > a:hover {
   font-size: 24px;
   color: #164A7B;
 }
+
+/* line 5429, ../../../scss/_clix2017.scss */
+.scard {
+  background: #FFF;
+  border: 1px solid #AAA;
+  border-bottom: 3px solid #BBB;
+  padding: 0px;
+  margin: 5px;
+  overflow: hidden;
+  width: 11rem;
+  height: 9rem;
+  /*float:left;*/
+}
+/* line 5438, ../../../scss/_clix2017.scss */
+.scard:hover {
+  box-shadow: 0 2px 5px 2px rgba(0, 0, 0, 0.16), 0 2px 10px 1px rgba(0, 0, 0, 0.12);
+  transition: box-shadow 0.5s ease;
+}
+/* line 5444, ../../../scss/_clix2017.scss */
+.scard .scard_header {
+  text-align: center;
+  position: fixed;
+  height: 20rem;
+  border: 1px solid #AAA;
+  border-bottom: 3px solid #BBB;
+  padding: 0px;
+  margin: 5px;
+  left: 0px;
+  right: 0px;
+  background: #FFF;
+  padding: 25px 0px 5px 0px;
+  border-bottom: 5px solid #CCC;
+  font-size: 20px;
+  font-weight: bold;
+}
+
+/* line 5461, ../../../scss/_clix2017.scss */
+.scard-content {
+  height: 2.7em;
+  padding: 0.5rem;
+  margin: 5px;
+  padding-top: 0.5cm;
+  border-radius: 0 0 2px 2px;
+  overflow: hidden;
+  width: 11rem;
+  margin-top: -0.3em;
+  /*height: 8.25rem;*/
+  background-color: #3e3e3e;
+}
+/* line 5472, ../../../scss/_clix2017.scss */
+.scard-content .scard-title {
+  font-size: 0.8em;
+  margin-top: -1em;
+  float: left;
+  color: #ececec;
+  display: inline-block;
+  text-align: center;
+}
+
+/* line 5485, ../../../scss/_clix2017.scss */
+.scard-action {
+  height: height;
+  font-size: 0.6em;
+  padding: 0.5rem;
+  margin: 5px;
+  padding-top: 0.1cm;
+  margin-top: -0.25em;
+  border-radius: 0 0 2px 2px;
+  overflow: hidden;
+  width: 11rem;
+  background-color: #CCCCCC;
+}
+
+/* line 5500, ../../../scss/_clix2017.scss */
+.scard-desc {
+  font-size: 0.7em;
+  color: #333333;
+  height: 40px;
+  padding: 0.5rem;
+  margin: 5px;
+  padding-top: 0.1cm;
+  margin-top: -0.25em;
+  border-radius: 0 0 2px 2px;
+  overflow: hidden;
+  width: 11rem;
+  background-color: #E6E6E6;
+  display-inline: block;
+}
+
+/* line 5515, ../../../scss/_clix2017.scss */
+p {
+  margin: 0px;
+  padding: 10px;
+}
+
+/* line 5520, ../../../scss/_clix2017.scss */
+.scard-image {
+  padding: 0px;
+  margin: 0px;
+  height: 100%;
+  background-position: center;
+  background-repeat: no-repeat;
+  position: relative;
+  overflow: hidden;
+  background-color: #f2f2f2;
+}
+/* line 5529, ../../../scss/_clix2017.scss */
+.scard-image img {
+  border-radius: 2px 2px 0 0;
+  display: block;
+  margin: 0 auto;
+  opacity: 0.9;
+  height: 100%;
+}
+/* line 5538, ../../../scss/_clix2017.scss */
+.scard-image i {
+  font-size: 7rem;
+  opacity: 0.75;
+  display: block;
+  margin: -15px auto;
+  text-align: center;
+  color: gray;
+  font-family: "foundation-icons";
+  font-style: normal;
+  font-variant: normal;
+  text-transform: none;
+  text-decoration: inherit;
+}
+/* line 5552, ../../../scss/_clix2017.scss */
+.scard-image i.common-icon:before {
+  content: "\f1fb";
+}
+/* line 5555, ../../../scss/_clix2017.scss */
+.scard-image i.file:before {
+  content: "\f18e";
+}
+/* line 5558, ../../../scss/_clix2017.scss */
+.scard-image i.page:before {
+  content: "\f18e";
+}
+/* line 5561, ../../../scss/_clix2017.scss */
+.scard-image i.collection:before {
+  content: "\f18a";
+}
+/* line 5564, ../../../scss/_clix2017.scss */
+.scard-image i.documents:before {
+  content: "\f18b";
+}
+/* line 5567, ../../../scss/_clix2017.scss */
+.scard-image i.pdf:before {
+  content: "\f18b";
+}
+/* line 5570, ../../../scss/_clix2017.scss */
+.scard-image i.text:before {
+  content: "\f18e";
+}
+/* line 5573, ../../../scss/_clix2017.scss */
+.scard-image i.interactives:before {
+  content: "\f1b2";
+}
+/* line 5576, ../../../scss/_clix2017.scss */
+.scard-image i.ebooks:before {
+  content: "\f11e";
+}
+/* line 5579, ../../../scss/_clix2017.scss */
+.scard-image i.images:before {
+  content: "\f125";
+}
+/* line 5582, ../../../scss/_clix2017.scss */
+.scard-image i.audios:before, .scard-image i.audio:before {
+  content: "\f17b";
+}
+/* line 5585, ../../../scss/_clix2017.scss */
+.scard-image i.videos:before, .scard-image i.video:before {
+  content: "\f20e";
+}
+
+/* line 5591, ../../../scss/_clix2017.scss */
+.published.scard-action {
+  background: #A6D9CB;
+}
+
+/* line 5595, ../../../scss/_clix2017.scss */
+.draft.scard-action {
+  content: "Draft";
+  background: #DCDCDC;
+}
+
+/* line 5604, ../../../scss/_clix2017.scss */
+.scard_footer {
+  border-top: 1px solid rgba(160, 160, 160, 0.2);
+  padding: 0.25rem 0.5rem;
+  color: gray;
+  font-size: small;
+  height: 2rem;
+}

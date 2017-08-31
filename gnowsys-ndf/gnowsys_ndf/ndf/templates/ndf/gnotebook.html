@@ -10,11 +10,11 @@
 {% include 'ndf/widget_user_access_modal.html' %}
 
 <div class="notebook">
-    {% comment %}
     <div class="row notebook-header collapse">
         {% get_course_filters group_id title as filter_dict %}
         {% include "ndf/filters.html" with filter_dict=filter_dict %}
     </div>
+    {% comment %}
 
     <div class="row notebook-header collapse">
         <div class="medium-6 columns filters">
