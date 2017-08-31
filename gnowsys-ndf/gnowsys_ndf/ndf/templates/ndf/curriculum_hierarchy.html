@@ -4,7 +4,7 @@
 {% block title %} {% trans "Topic Map" %} {{curriculum_obj.name }}  {% endblock %}
 
 {% block body_content %}
-        {{curriculum_obj.name}}
+        {{curriculum_obj.name}} 
         {% if not curriculum_obj %}
         <h3 data-reveal-id="create-edit-curriculum-reveal" class="hyperlink-tag">
             <i class="fi fi-plus"></i> Create Curriculum Tree Structure
@@ -64,10 +64,10 @@
 <div id="create-edit-curriculum-reveal" class="reveal-modal" data-reveal aria-labelledby="modalTitle" aria-hidden="true" role="dialog">
     <div>
         <div class="small-3 columns left curriculum-form-name"><h3>{% trans "Curriculum Name" %} <h9 style="color:red">*</h9></h3></div>
-        <div class="small-9 columns right"><input type="text" class="curriculum-disp-name" id="lesson-name"></div>
+        <div class="small-9 columns right"><input type="text" class="curriculum-disp-name" value="{{curriculum_obj.name}}" id="lesson-name"></div>
     </div>
         <div class="small-3 columns left curriculum-form-desc"><h3>{% trans "Curriculum Description" %}<h9 style="color: rgba(128, 128, 128, 0.48);font-style: italic;font-size: 15px;"> {% trans "optional" %}</h9></h3></div>
-        <div class="small-9 columns right"><textarea rows="3" cols="50" class="curriculum-disp-desc" id="lesson-desc"></textarea></div>
+        <div class="small-9 columns right"><textarea rows="3" cols="50" class="curriculum-disp-desc" id="lesson-desc">{{curriculum_obj.content_org}}</textarea></div>
     <div class="double-buttons">
         <button type="button" class="button-hollow-grey save-curriculum add-lesson-top-margin" data-node-id=""> {% trans "Save Curriculum" %} </button>
         {% comment %}
@@ -156,6 +156,7 @@
                         if(node.type === 'branch') {
                             selectedBranch = node;
                             $('#addBranch').find('.create_branch').html('Update Section');
+                            $('#addBranch').find('.create_branch').attr("id",node.id);
                             $('#addBranch').find('.delete_branch').show();
                             $('#addBranch').find('input').val(node.name);
                             $('#addBranch').find('textarea').val(node.description);
@@ -166,8 +167,10 @@
                                 $('#addDivision').find('.add_asset').show();
                             }
                             $('#addDivision').find('.create_division').html('Update Sub-Section');
+                            $('#addDivision').find('.create_division').attr("id",node.id);
                             $('#addDivision').find('.delete_division').show();
                             $('#addDivision').find('input[type=text][name="branch_name"]').val(node.name);
+                            $('#addDivision').find('input').val(node.name);
                             //$('#addDivision').find('input[type=checkbox]').val(node.isLeaf);
                             $('#addDivision').find('input[type=checkbox][name="isLeafNode"]').closest('label').hide();
                             $('#addDivision').foundation('reveal', 'open');
@@ -254,14 +257,12 @@
 
             //Deleting a Branch
             $('.delete_branch').on('click', function(){
-                $('.close-reveal-modal').trigger('click');
-                curriculum_tree.tree('removeNode', selectedBranch);
+                
             });
 
             //Deleting a division
             $('.delete_division').on('click', function(){
-                $('.close-reveal-modal').trigger('click');
-                curriculum_tree.tree('removeNode', selectedDivison);
+                
             });
 
             // Save and close handled
@@ -297,12 +298,14 @@
                     });
             $( ".create_branch" ).click(function(event) {
                 branch_name = $("input[name='branch_name']").val();
+                existing_id = $(this).attr("id");
                 $.ajax({
                           type: "POST",
                           data:{
                                 'csrfmiddlewaretoken': "{{csrf_token}}",
                                 'name':branch_name,
-                                'context_theme':"{{curriculum_obj.pk}}"
+                                'context_theme':"{{curriculum_obj.pk}}",
+                                'existing_id':existing_id
                             },
                           url: "{% url 'add_theme_item' group_id  %}",
                           datatype: "html",
@@ -313,6 +316,7 @@
             });
             
             $( ".create_division" ).click(function(event) {
+                existing_id = $(this).attr("id");
                 subsection_name = $("input[name='sub-section-name']").val();
                 sel_row = $(".jqtree-selected").parent().parent().attr("id");
                 var checked = $('.topic-checkbox:checked').length;
@@ -327,7 +331,8 @@
                                 'name':subsection_name,
                                 'context_theme':"{{curriculum_obj.pk}}",
                                 'parent_id':sel_row,
-                                'is_topic':topic_checked
+                                'is_topic':topic_checked,
+                                'existing_id':existing_id
                             },
                           url: "{% url 'add_theme_item' group_id  %}",
                           datatype: "html",
@@ -340,7 +345,7 @@
             
             $( ".delete_division" ).click(function(event) {
                 sel_node_id = $(".jqtree-selected").attr("id");
-                if (confirm("Do you want to delete selected files?.") == true){
+                if (confirm("Do you want to delete selected Sub-Section?.") == true){
                 $.ajax({
                           type: "POST",
                           data:{
@@ -351,6 +356,31 @@
                           datatype: "html",
                           success: function(data) {
                           location.reload();
+                          $('.close-reveal-modal').trigger('click');
+                          curriculum_tree.tree('removeNode', selectedDivison);
+                        }
+                    });
+                    
+                }
+
+            });
+
+            $( ".delete_branch" ).click(function(event) {
+                sel_node_id = $(".jqtree-selected").attr("id");
+                if (confirm("Do you want to delete selected Section?.") == true){
+                
+                $.ajax({
+                          type: "POST",
+                          data:{
+                                'csrfmiddlewaretoken': "{{csrf_token}}",
+                                'node_id':sel_node_id,
+                            },
+                          url: "{% url 'delete_curriculum_node' group_id  %}",
+                          datatype: "html",
+                          success: function(data) {
+                          location.reload();
+                          $('.close-reveal-modal').trigger('click');
+                          curriculum_tree.tree('removeNode', selectedBranch);
                         }
                     });
                     
