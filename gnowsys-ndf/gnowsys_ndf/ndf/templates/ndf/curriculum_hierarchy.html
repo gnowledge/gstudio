@@ -1,6 +1,8 @@
 {% extends "ndf/gbase.html" %}
 {% load i18n %}
 {% load ndf_tags %}
+{% block title %} {% trans "Topic Map" %} {{curriculum_obj.name }}  {% endblock %}
+
 {% block body_content %}
         {{curriculum_obj.name}}
         {% if not curriculum_obj %}
@@ -305,7 +307,7 @@
                           url: "{% url 'add_theme_item' group_id  %}",
                           datatype: "html",
                           success: function(data) {
-                          window.reload();
+                          location.reload();
                         }
                     });    
             });
