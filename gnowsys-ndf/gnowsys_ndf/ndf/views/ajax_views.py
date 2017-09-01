@@ -902,7 +902,7 @@ def get_inner_collection(collection_list, node, no_res=False):
               #   # print "\n completed_ids -- ",completed_ids
               #   # print "\n\n col_obj ---- ", col_obj.name, " - - ",col_obj.member_of_names_list, " -- ", col_obj._id
               # else:
-              inner_sub_dict = {'name': col_obj.name, 'id': col_obj.pk,'node_type': node_type}
+              inner_sub_dict = {'name': col_obj.name, 'id': col_obj.pk,'node_type': node_type,"type":"division"}
               inner_sub_list = [inner_sub_dict]
               inner_sub_list = get_inner_collection(inner_sub_list, col_obj, no_res)
               # if "CourseSubSectionEvent" == node_type:
@@ -942,22 +942,23 @@ def get_inner_collection(collection_list, node, no_res=False):
 @get_execution_time
 def get_collection(request, group_id, node_id, no_res=False):
   try:
-    cache_key = u'get_collection' + unicode(group_id) + "_" + unicode(node_id)
-    cache_result = cache.get(cache_key)
-    if cache_result:
-      return HttpResponse(cache_result)
+    # cache_key = u'get_collection' + unicode(group_id) + "_" + unicode(node_id)
+    # cache_result = cache.get(cache_key)
+    # if cache_result:
+    #   return HttpResponse(cache_result)
 
     node = node_collection.one({'_id':ObjectId(node_id)})
     # print "\nnode: ",node.name,"\n"
     collection_list = []
     gstaff_access = False
     gstaff_access = check_is_gstaff(group_id,request.user)
-
     for each in node.collection_set:
       obj = node_collection.one({'_id': ObjectId(each) })
       if obj:
         node_type = node_collection.one({'_id': ObjectId(obj.member_of[0])}).name
-        collection_list.append({'name':obj.name,'id':obj.pk,'node_type':node_type})
+        # print "000000000000000000000",node.name
+        
+        collection_list.append({'name':obj.name,'id':obj.pk,'node_type':node_type,'type' : "branch"})
         # collection_list = get_inner_collection(collection_list, obj, gstaff_access, completed_ids_list, incompleted_ids_list)
         if "BaseCourseGroup" in node.member_of_names_list:
           no_res = True
@@ -965,7 +966,7 @@ def get_collection(request, group_id, node_id, no_res=False):
     data = collection_list
     updated_data = []
     # print data
-    cache.set(cache_key, json.dumps(data), 60*15)
+    # cache.set(cache_key, json.dumps(data), 60*15)
 
     return HttpResponse(json.dumps(data))
 
@@ -1008,13 +1009,20 @@ def add_sub_themes(request, group_id):
 def add_theme_item(request, group_id):
   if request.is_ajax() and request.method == "POST":
 
+    existing_id = request.POST.get("existing_id", '')
+      
     context_theme_id = request.POST.get("context_theme", '')
     name =request.POST.get('name','')
     parent_node_id =request.POST.get('parent_id','')
     is_topic =request.POST.get('is_topic','')
 
     context_theme = node_collection.one({'_id': ObjectId(context_theme_id) })
-
+    if existing_id:
+      existing_node = Node.get_node_by_id(ObjectId(existing_id))
+      if existing_node:
+        existing_node.name = unicode(name)
+        existing_node.save()
+        return HttpResponse("success")
     list_theme_items = []
     if name and context_theme:
 
