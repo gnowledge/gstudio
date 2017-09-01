@@ -2628,7 +2628,7 @@ def create_gattribute(subject_id, attribute_type_node, object_value=None, **kwar
         attribute_type_node = Node.get_node_obj_from_id_or_obj(attribute_type_node, AttributeType)
     except Exception:
         attribute_type_node = Node.get_name_id_from_type(attribute_type_node, 'AttributeType', get_obj=True)
-
+    print "\nattribute_type_node: ", attribute_type_node.name
     ga_node = triple_collection.one(
         {'_type': "GAttribute", 'subject': subject_id, 'attribute_type': attribute_type_node._id})
 
@@ -5090,9 +5090,57 @@ def repository(request, group_id):
                               context_instance=RequestContext(request)
                               )
 
+def create_thread(group_id, node, user_id, release_response_val, interaction_type_val, start_time, end_time):
+    user_id = node.created_by
+    thread_node = None
+    from gnowsys_ndf.ndf.templatetags.ndf_tags import get_relation_value, get_attribute_value
+    has_thread_rt = node_collection.one({"_type": "RelationType", 
+        "name": u"has_thread"})
+    has_thread_triple_of_node = triple_collection.find_one({'subject': node._id, 
+        'relation_type': has_thread_rt._id, 'status': u'PUBLISHED'})
+    if has_thread_triple_of_node:
+        thread_node_id = has_thread_triple_of_node.right_subject
+        thread_node = node_collection.one({'_id': ObjectId(thread_node_id)})
+
+    if not thread_node:
+
+        twist_gst = node_collection.one({'_type': 'GSystemType',
+                     'name': 'Twist'})
+        thread_node = node_collection.collection.GSystem()
+        thread_node.name = u"Thread of " + unicode(node.name)
+        thread_node.status = u"PUBLISHED"
+        thread_node.created_by = user_id
+        thread_node.modified_by = user_id
+        thread_node.contributors = [user_id]
+        thread_node.prior_node = [node._id]
+        thread_node.member_of = [ObjectId(twist_gst._id)]
+        thread_node.group_set = [ObjectId(group_id)]
+        thread_node.save()
+        has_thread_gr = create_grelation(node._id, has_thread_rt, thread_node._id)
+
+    # attributes for thread_node
+    if start_time:
+        start_time = datetime.strptime(start_time, "%d/%m/%Y")
+    if end_time:
+        end_time = datetime.strptime(end_time, "%d/%m/%Y")
+    if release_response_val:
+        release_response_val = eval(release_response_val)
+        create_gattribute(thread_node._id, 'release_response', release_response_val)
+    if not interaction_type_val:
+        interaction_type_val = unicode(DEFAULT_DISCUSSION_LABEL)
+        print "\n inte: ", interaction_type_val
+        create_gattribute(thread_node._id, 'thread_interaction_type', interaction_type_val)
+
+    if start_time and end_time:
+        create_gattribute(thread_node._id, 'start_time', start_time)
+        create_gattribute(thread_node._id, 'end_time', end_time)
+    thread_node.reload()
+    print "\n\n thread_obj", thread_node.attribute_set, "\n---\n"
+    return thread_node
+
 
 def create_thread_for_node(request, group_id, node):
-        """
+    """
       Accepts:
        * ObjectId of group.
        * node - Page/File GSystem
@@ -5105,160 +5153,17 @@ def create_thread_for_node(request, group_id, node):
 
       Returns:
         * Success - True/False
-
-	"""
-	try:
-		if request.method == "POST":
-			thread_node = None
-			user_id = node.created_by
-			from gnowsys_ndf.ndf.templatetags.ndf_tags import get_relation_value, get_attribute_value
-			has_thread_rt = node_collection.one({"_type": "RelationType", 
-				"name": u"has_thread"})
-			has_thread_triple_of_node = triple_collection.find_one({'subject': node._id, 
-				'relation_type': has_thread_rt._id, 'status': u'PUBLISHED'})
-			if has_thread_triple_of_node:
-				thread_node_id = has_thread_triple_of_node.right_subject
-				thread_node = node_collection.one({'_id': ObjectId(thread_node_id)})
-
-			if not thread_node:
-				twist_gst = node_collection.one({'_type': 'GSystemType',
-							 'name': 'Twist'})
-				thread_node = node_collection.collection.GSystem()
-				thread_node.name = u"Thread of " + unicode(node.name)
-				thread_node.status = u"PUBLISHED"
-				thread_node.created_by = user_id
-				thread_node.modified_by = user_id
-				thread_node.contributors = [user_id]
-				thread_node.prior_node = [node._id]
-				thread_node.member_of = [ObjectId(twist_gst._id)]
-				thread_node.group_set = [ObjectId(group_id)]
-				thread_node.save()
-				has_thread_gr = create_grelation(node._id, has_thread_rt, thread_node._id)
-
-			# attributes for thread_node
-			release_response_val = unicode(request.POST.get("release_resp_sel",'True'))
-			interaction_type_val = unicode(request.POST.get("interaction_type_sel", DEFAULT_DISCUSSION_LABEL))
-			start_time = request.POST.get("thread_start_date", '')
-			if start_time:
-				start_time = datetime.strptime(start_time, "%d/%m/%Y")
-			end_time = request.POST.get("thread_close_date", '')
-			if end_time:
-				end_time = datetime.strptime(end_time, "%d/%m/%Y")
-
-
-
-			# release_response_status = False
-			# thread_interaction_type_status = False
-			# thread_start_time_status = False
-			# thread_end_time_status = False
-			# if get_relation_value(node._id,"has_thread") != None:
-			# 	has_thread_status = True
-			'''
-			has_thread_status = False
-			grel_dict = get_relation_value(node._id,"has_thread")
-			is_cursor = grel_dict.get("cursor",False)
-			if not is_cursor:
-				thread_node_status = grel_dict.get("grel_node", None)
-				if thread_node_status:
-					has_thread_status = True
-
-			release_response_val = unicode(request.POST.get("release_resp_sel",'True'))
-			interaction_type_val = unicode(request.POST.get("interaction_type_sel",'Feedback'))
-			start_time = request.POST.get("thread_start_date", '')
-			if start_time:
-				start_time = datetime.strptime(start_time, "%d/%m/%Y")
-			end_time = request.POST.get("thread_close_date", '')
-			if end_time:
-				end_time = datetime.strptime(end_time, "%d/%m/%Y")
-			has_thread_rt = node_collection.one({"_type": "RelationType", "name": u"has_thread"})
-			twist_gst = node_collection.one({'_type': 'GSystemType', 'name': 'Twist'})
-			thread_obj = node_collection.find_one({"_type": "GSystem", "member_of": ObjectId(twist_gst._id), "prior_node": ObjectId(node._id) })
-			# updating name of thread_node 
-			if thread_obj:
-				node_collection.collection.update({'_id': thread_obj._id},{'$set':{'name': u"Thread of " + unicode(node.name), 'prior_node': [node._id]}}, upsert = False, multi = False)
-				thread_obj.reload()
-				# print "\n\n Found old model thread node existing"
-			else:
-				thread_obj = node_collection.find_one({"_type": "GSystem", "member_of": ObjectId(twist_gst._id),"relation_set.thread_of": ObjectId(node._id)})
-				# print "\n\n Found updated thread node existing"
-
-			if thread_obj:
-				if thread_obj.name != u"Thread of "+ unicode(node.name):
-					node_collection.collection.update({'_id': thread_obj._id},{'$set':{'name': u"Thread of " + unicode(node.name)}}, upsert = False, multi = False)
-					thread_obj.reload()
-					# print "\n\n thread_obj found -- name update if needed"
-			else:
-				# print "\n\n Creating new thread node"
-				thread_obj = node_collection.collection.GSystem()
-
-				thread_obj.name = u"Thread of " + unicode(node.name)
-				thread_obj.status = u"PUBLISHED"
-
-				thread_obj.created_by = int(request.user.id)
-				thread_obj.modified_by = int(request.user.id)
-				thread_obj.contributors.append(int(request.user.id))
-				thread_obj.prior_node.append(node._id)
-				thread_obj.member_of.append(ObjectId(twist_gst._id))
-				# thread_obj.prior_node.append(ObjectId(node._id))
-				thread_obj.group_set.append(ObjectId(group_id))
-				thread_obj.save()
-			'''
-
-
-			'''
-			if thread_obj:
-				if get_attribute_value(thread_obj._id,"release_response") != "":
-					release_response_status = True
-				if get_attribute_value(thread_obj._id,"thread_interaction_type") != "":
-					thread_interaction_type_status = True
-				if get_attribute_value(thread_obj._id,"start_time") != "":
-					thread_start_time_status = True
-				if get_attribute_value(thread_obj._id,"end_time") != "":
-					thread_end_time_status = True
-			print "\n thread_end_time_status---",thread_end_time_status
-			print "\n thread_start_time_status---",thread_start_time_status
-			print "\n release_response_status---",release_response_status
-			print "\n thread_interaction_type_status---",thread_interaction_type_status
-			print "\n has_thread_status---",has_thread_status
-			'''
-			'''
-			if not has_thread_status:
-				# creating GRelation
-				gr = create_grelation(node._id, has_thread_rt, thread_obj._id)
-				node.reload()
-				thread_obj.reload()
-				# print "\n\n thread", thread_obj._id, "--", thread_obj.relation_set
-				# print "\n\n node", node._id, "--", node.relation_set
-			'''
-			# print "\nrelease_response_val: ",release_response_val
-			# print "\ninteraction_type_val: ", interaction_type_val
-			if release_response_val:
-				# rel_resp_at = node_collection.one({'_type': 'AttributeType', 
-				# 				'name': 'release_response'})
-				release_response_val = eval(release_response_val)
-				# create_gattribute(thread_obj._id, rel_resp_at, release_response_val)
-				create_gattribute(thread_node._id, 'release_response', release_response_val)
-			if interaction_type_val:
-				# thr_inter_type_at = node_collection.one({'_type': 'AttributeType', 
-				# 				'name': 'thread_interaction_type'})
-				# create_gattribute(thread_obj._id, thr_inter_type_at, interaction_type_val)
-				create_gattribute(thread_node._id, 'thread_interaction_type', interaction_type_val)
-
-			if start_time and end_time:
-				create_gattribute(thread_node._id, 'start_time', start_time)
-				create_gattribute(thread_node._id, 'end_time', end_time)
-				# start_time_at = node_collection.one({'_type': 'AttributeType', 
-				# 					'name': 'start_time'})
-				# end_time_at = node_collection.one({'_type': 'AttributeType', 
-				# 					'name': 'end_time'})
-				# create_gattribute(thread_obj._id, start_time_at, start_time)
-				# create_gattribute(thread_obj._id, end_time_at, end_time)
-
-			thread_node.reload()
-			print "\n\n thread_obj", thread_node.attribute_set, "\n---\n"
-			return thread_node
-	except Exception as e:
-		print "Something went wrong while creating thread node. ",e
+    """
+    try:
+        if request.method == "POST":
+            release_response_val = unicode(request.POST.get("release_resp_sel",'True'))
+            interaction_type_val = unicode(request.POST.get("interaction_type_sel", None))
+            start_time = request.POST.get("thread_start_date", None)
+            end_time = request.POST.get("thread_close_date", None)
+            thread_node = create_thread(group_id, node._id, node.created_by, release_response_val, interaction_type_val, start_time, end_time)
+            return thread_node
+    except Exception as e:
+        print "Something went wrong while creating thread node. ",e
 
 def node_thread_access(group_id, node):
     """
@@ -5979,3 +5884,4 @@ def get_course_completetion_status(group_obj, user_id,ids_list=False):
     except Exception as error_in_get_course_completion_status:
       # print "\n ERROR in get_course_completetion_status", error_in_get_course_completion_status
       return result_dict
+

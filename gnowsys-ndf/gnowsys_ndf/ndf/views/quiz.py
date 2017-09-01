@@ -53,7 +53,7 @@ def quiz(request, group_id):
     quiz_nodes = node_collection.find({'member_of': gst_quiz._id, 'group_set': ObjectId(group_id)}).sort('last_update', -1)
     gst_quiz_names = ['QuizItem']
     supported_languages = ['Hindi', 'Telugu']
-    if "CourseEventGroup" in group_obj.member_of_names_list:
+    if "CourseEventGroup" in group_obj.member_of_names_list or "announced_unit" in group_obj.member_of_names_list:
         gst_quiz_names.append('QuizItemEvent')
     gst_quiz_item = node_collection.find({'_type': 'GSystemType', 'name': {'$in': gst_quiz_names}})
     gst_quiz_item_ids = [each_quiz_gst._id for each_quiz_gst in gst_quiz_item]
