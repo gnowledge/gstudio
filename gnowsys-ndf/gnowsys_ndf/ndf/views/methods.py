@@ -5160,7 +5160,7 @@ def create_thread_for_node(request, group_id, node):
             interaction_type_val = unicode(request.POST.get("interaction_type_sel", None))
             start_time = request.POST.get("thread_start_date", None)
             end_time = request.POST.get("thread_close_date", None)
-            thread_node = create_thread(group_id, node._id, node.created_by, release_response_val, interaction_type_val, start_time, end_time)
+            thread_node = create_thread(group_id, node, node.created_by, release_response_val, interaction_type_val, start_time, end_time)
             return thread_node
     except Exception as e:
         print "Something went wrong while creating thread node. ",e
