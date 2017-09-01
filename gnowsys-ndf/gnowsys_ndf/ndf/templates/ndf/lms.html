@@ -12,7 +12,6 @@
 {% endblock head %}
 
 {% block body_content %}
-{% get_group_object groupid as group_object %}
 {% check_is_gstaff group_id request.user as is_gstaff %}
 
  
@@ -21,7 +20,7 @@
  {% include "ndf/buddy.html" %}
 {% endcomment %}
 {% include 'ndf/widget_user_access_modal.html' %}
-
+{% get_group_object group_id as group_object %}
 <div class="lms_page">
      <div class="lms_banner">
         
@@ -39,11 +38,9 @@
               <li>
                   <a href="{% url 'unit_edit' groupid group_object.pk %}" class="fi-pencil"> {% trans "Edit" %}</a>
               </li>
-              {% if if_edit_course_structure %}
               <li>
                   <a href="{% url 'unit_detail' groupid  %}" target="_blank" class="fi-pencil"> {% if 'Group' in group_object.member_of_names_list %}{% trans "Edit Structure" %} {% else  %} {% trans "Edit Course Structure" %}  {% endif %} </a>
               </li>
-              {% endif %}
               <li>
                     <a class="fi-photo" style="position: relative;top: -3px;left: 2px;" data-reveal-id="group_banner_prof_pic_prop">
                     {% trans "Change image" %}</a>

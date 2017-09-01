@@ -942,10 +942,10 @@ def get_inner_collection(collection_list, node, no_res=False):
 @get_execution_time
 def get_collection(request, group_id, node_id, no_res=False):
   try:
-    cache_key = u'get_collection' + unicode(group_id) + "_" + unicode(node_id)
-    cache_result = cache.get(cache_key)
-    if cache_result:
-      return HttpResponse(cache_result)
+    # cache_key = u'get_collection' + unicode(group_id) + "_" + unicode(node_id)
+    # cache_result = cache.get(cache_key)
+    # if cache_result:
+    #   return HttpResponse(cache_result)
 
     node = node_collection.one({'_id':ObjectId(node_id)})
     # print "\nnode: ",node.name,"\n"
@@ -966,7 +966,7 @@ def get_collection(request, group_id, node_id, no_res=False):
     data = collection_list
     updated_data = []
     # print data
-    cache.set(cache_key, json.dumps(data), 60*15)
+    # cache.set(cache_key, json.dumps(data), 60*15)
 
     return HttpResponse(json.dumps(data))
 
