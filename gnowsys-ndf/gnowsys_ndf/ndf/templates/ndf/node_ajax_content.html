@@ -526,7 +526,7 @@ Still keeping for future ref (if needed).
           {% endfor %}
 
           <!-- <div id="commentable-area"> -->
-          {% if "QuizItemEvent" not in node.member_of_names_list %}
+          {% if "QuizItemEvent" not in node.member_of_names_list and "QuizItem" not in node.member_of_names_list%}
           <div class="node-content-div">
             {% with node.content|safe as description %}
             {% if description != "None" %}

@@ -7,7 +7,16 @@
 
 {% with node.options|re_format as node_options %}
 {% with node.correct_answer|re_format as node_correct_answer %}
-
+<style type="text/css">
+	.quiz-box {
+	    font-size: 15px !important;
+	}
+	.choice{
+	    margin-right: 5px !important;
+	    margin-top: 3px !important;
+        margin-left: 10px !important;
+	}
+</style>
 <div class="row quiz-player">
 	<label class="attempts_count right fi-info"></label>
 	<fieldset>
@@ -21,7 +30,7 @@
 		<div class="row">
 			<div class="quiz_qtn">
 				<b>{{node.content|safe}}</b>
-				<div class="quiz_qtn quiz-box">
+				<div class="quiz-box quiz_qtn">
 					{% if node.quiz_type == "Single-Choice" %}
 						{% for each_opt in node_options %}
 							<input type="radio" name="quiz_ans"  value="{{each_opt}}"
@@ -34,7 +43,6 @@
 							{% else %}
 								class="choice" id="{{each_opt}}">{{each_opt}}<span class='fi-x hide chk_ans_lbl'></span>
 							{% endif %}
-							<br/>
 						{% endfor %}
 						{% comment %}
 						<div class="row">
@@ -64,18 +72,18 @@
 						<!-- <input type="button" value="Submit" class="button tiny radius short-ans_chk"> -->
 					{% endif %}
 
-					{% if total_and_curr_ans_dict.count != node.quizitem_max_attempts %}
-						<div class="row controls-box hide">
-							{% if node.quizitem_check_answer and node.quiz_type != "Short-Response"  %}
-								<input type="button" value="Check" class="button tiny check-ans radius check-btn">
-							{% endif %}
-							{% if node.quizitem_show_correct_ans %}
-								<input type="button" value="Show Answer" class="button tiny radius show-ans-btn hide">
-							{% endif %}
-							<input type="button" value="Submit" class="tiny button radius submit-btn">
-						</div>
-					{% endif %}
 				</div>
+				{% if total_and_curr_ans_dict.count != node.quizitem_max_attempts %}
+					<div class="row controls-box quiz_qtn hide">
+						{% if node.quizitem_check_answer and node.quiz_type != "Short-Response"  %}
+							<input type="button" value="Check" class="button tiny check-ans radius check-btn">
+						{% endif %}
+						{% if node.quizitem_show_correct_ans %}
+							<input type="button" value="Show Answer" class="button tiny radius show-ans-btn hide">
+						{% endif %}
+						<input type="button" value="Submit" class="tiny button radius submit-btn">
+					</div>
+				{% endif %}
 			</div>
 		</div>
 	</fieldset>
