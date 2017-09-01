@@ -539,6 +539,52 @@ CKEDITOR.plugins.add('addJhapp',
                             $('#group_imgs_on_modal').foundation('reveal', 'close');
                           });
 
+                            $("#insert_starlogo_model1_te").click(function(event){
+                            
+
+                            tool_val = "<a href='/starlogonova/te/model1' target='_blank'><img src='/static/ndf/images/starlogo-english.png' alt='Star Logo Thumbnail'  height='1000px' width='1000px' >"
+                            
+                             CKEDITOR.instances[textAreaId].insertHtml(tool_val);
+                            $('#group_imgs_on_modal').foundation('reveal', 'close');
+                          });
+
+                            $("#insert_starlogo_model2_te").click(function(event){
+                            
+
+                            tool_val = "<a href='/starlogonova/te/model2' target='_blank'><img src='/static/ndf/images/starlogo-english.png' alt='Star Logo Thumbnail'  height='1000px' width='1000px' >"
+                            
+                             CKEDITOR.instances[textAreaId].insertHtml(tool_val);
+                            $('#group_imgs_on_modal').foundation('reveal', 'close');
+                          });
+
+                            $("#insert_starlogo_model3_en").click(function(event){
+                            
+
+                            tool_val = "<a href='/starlogonova/en/model3' target='_blank'><img src='/static/ndf/images/starlogo-english.png' alt='Star Logo Thumbnail'  height='1000px' width='1000px' >"
+                            
+                             CKEDITOR.instances[textAreaId].insertHtml(tool_val);
+                            $('#group_imgs_on_modal').foundation('reveal', 'close');
+                          });
+
+
+                            $("#insert_starlogo_model3_hi").click(function(event){
+                            
+
+                            tool_val = "<a href='/starlogonova/hi/model3' target='_blank'><img src='/static/ndf/images/starlogo-hindi.png' alt='Star Logo Thumbnail'  height='1000px' width='1000px' >"
+                            
+                             CKEDITOR.instances[textAreaId].insertHtml(tool_val);
+                            $('#group_imgs_on_modal').foundation('reveal', 'close');
+                          });
+
+                            $("#insert_starlogo_model3_te").click(function(event){
+                            
+
+                            tool_val = "<a href='/starlogonova/te/model3' target='_blank'><img src='/static/ndf/images/starlogo-english.png' alt='Star Logo Thumbnail'  height='1000px' width='1000px' >"
+                            
+                             CKEDITOR.instances[textAreaId].insertHtml(tool_val);
+                            $('#group_imgs_on_modal').foundation('reveal', 'close');
+                          });
+
 
 
 

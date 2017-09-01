@@ -39,17 +39,9 @@
               <li>
                   <a href="{% url 'unit_edit' groupid group_object.pk %}" class="fi-pencil"> {% trans "Edit" %}</a>
               </li>
+              {% if if_edit_course_structure %}
               <li>
-                  <a href="{% url 'curriculum_list' groupid  %}"><img src="/static/ndf/images/lesson_planning.png" style="height:20px;"/> {% trans "Add Curriculum" %}</a>
-              </li>
-              {% if_edit_course_structure as edit_course_struct %}
-              {% if edit_course_struct %}
-              <li>
-                  
-                  <a href="{% url 'unit_detail' groupid  %}" target="_blank" class="fi-pencil"> {% if 'Group' in group_object.member_of_names_list %}{% trans "Edit WorkSpace Structure" %} {% else  %} {% trans "Edit Course Structure" %}  {% endif %} </a>
-              </li>
-              <li>
-                  <a href="{% url 'unit_detail' groupid  %}" target="_blank"><img src="/static/ndf/images/lesson_planning.png"/> {% trans "Edit Course Structure" %}</a>
+                  <a href="{% url 'unit_detail' groupid  %}" target="_blank" class="fi-pencil"> {% if 'Group' in group_object.member_of_names_list %}{% trans "Edit Structure" %} {% else  %} {% trans "Edit Course Structure" %}  {% endif %} </a>
               </li>
               {% endif %}
               <li>
@@ -129,6 +121,9 @@
         {% trans "Notebook" %} 
       {% endif %}
       </a>
+    </li>
+    <li>
+      <a href="{% url 'curriculum_list' groupid  %}"> {% trans "Topic Map" %}</a>
     </li>
   </ul>
 </div>
