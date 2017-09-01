@@ -1,8 +1,8 @@
 {% load i18n %}
 {% load ndf_tags %}
 {% block head %}
-    <script src="/static/ndf/bower_components/handlebars/handlebars.js"></script>
-    <script type="text/javascript" src="/static/ndf/bower_components/MathJax/MathJax.js?config=TeX-AMS-MML_HTMLorMML" async></script>
+<script src="/static/ndf/bower_components/handlebars/handlebars.js"></script>
+<script type="text/javascript" src="/static/ndf/bower_components/MathJax/MathJax.js?config=TeX-AMS-MML_HTMLorMML" async></script>
 {% endblock head %}
 
 <div class="row course_creator">
@@ -27,15 +27,15 @@
                         <div class="left header-left activity-name-label row">
                             <span class="activity-name"><!-- Activity Name --></span>
                         </div>
-                    <div class="row">
-                        {% comment %}
-                        <a  class="view-admin-page right orange-button-template" data-current-activity-id="" > View Teacher's page</a>
-                        <a  class="view-help-page right orange-button-template" data-current-activity-id="" > View Help page</a>
-                        {% endcomment %}
-                        <a style="margin-top:10px!important; margin-right:27px;" class="save_edit_activity right orange-button-template" data-current-activity-id="" > {% trans "Edit" %} </a>
-                    </div>   
+                        <div class="row">
+                            {% comment %}
+                            <a  class="view-admin-page right orange-button-template" data-current-activity-id="" > View Teacher's page</a>
+                            <a  class="view-help-page right orange-button-template" data-current-activity-id="" > View Help page</a>
+                            {% endcomment %}
+                            <a style="margin-top:10px!important; margin-right:27px;" class="save_edit_activity right orange-button-template" data-current-activity-id="" > {% trans "Edit" %} </a>
+                        </div>   
                      <!-- commenting following as activities now will be created/edited
-                        from activity area -->
+                     from activity area -->
                         <!--
                         <div class="right custom_dropdown">
                             <a href="">More</a>
@@ -45,12 +45,12 @@
                                 <li> <a class="delete_entity">Delete</a> </li>
                             </ul>
                         </div>
-                        -->
-                    </div>
-                    <!-- END of Right panel Header -->
+                    -->
+                </div>
+                <!-- END of Right panel Header -->
 
-                    <!-- commenting following as activities now will be created/edited from activity area-->
-                    <!-- editor we are using is ck Editor -->
+                <!-- commenting following as activities now will be created/edited from activity area-->
+                <!-- editor we are using is ck Editor -->
                     <!--
                     <div class="editor-tool hide">
                         <div class="editor_actions">
@@ -74,22 +74,22 @@
                         </div>
                         Editor tool will come here. //CK Editor
                     </div>
-                     -->
+                -->
 
-                    <div id="scstyle">
-                        <div id="activity-content">
-                            <!-- selected activities content will go here (JS) -->
-                        </div>
+                <div id="scstyle">
+                    <div id="activity-content">
+                        <!-- selected activities content will go here (JS) -->
                     </div>
                 </div>
-                <div id="info-page-area">
-                    
-                </div>
-
             </div>
-            <!-- END of Right panel -->
+            <div id="info-page-area">
+                
+            </div>
 
-            <!-- commented following because we are not using lesson editor -->
+        </div>
+        <!-- END of Right panel -->
+
+        <!-- commented following because we are not using lesson editor -->
             <!--
             <div class="lesson-editor hide">
                 <div class="lesson-editor-header editor-header">
@@ -113,9 +113,9 @@
                     </div>
                 </div>
             </div>
-            -->
-        </div>
+        -->
     </div>
+</div>
 </div>
 
 
@@ -272,18 +272,18 @@ This will not be used because now only existing activities will be added.
 
 <!-- overlay/reveal to delete lesson -->
 
-  <div id="deleteLessonModal" class="reveal-modal medium radius" data-reveal data-alert>
+<div id="deleteLessonModal" class="reveal-modal medium radius" data-reveal data-alert>
     <p id="deleteLessonModalLabel"></p>
     <div class="row">
       <div class="small-3 small-offset-3 columns">
         <button id="delLessonbtnConfirmYes" class="orange-button">{% trans "Yes" %}</button>
-      </div>
-      <div class="small-3 columns end">
-        <button id="delLessonbtnConfirmNo" class="orange-button">{% trans "No" %}</button>
-      </div>
     </div>
-    <a class="close-reveal-modal">&#215;</a>
-  </div>
+    <div class="small-3 columns end">
+        <button id="delLessonbtnConfirmNo" class="orange-button">{% trans "No" %}</button>
+    </div>
+</div>
+<a class="close-reveal-modal">&#215;</a>
+</div>
 
 
 
@@ -291,37 +291,37 @@ This will not be used because now only existing activities will be added.
 
 <!-- overlay/reveal to add lesson -->
 <div id="add-lesson-reveal" class="reveal-modal" data-reveal aria-labelledby="modalTitle" aria-hidden="true" role="dialog">
-   <div>
-        <div class="small-3 columns left"><h3>{% trans "Language Selection" %}<h9 style="color:red">*</h9></h3></div>
-        <div class="small-9 columns right">
-               <select disabled class="lesson-lang" name="lan" id="lesson_lang" onchange="myLang()" style="height: 42px;">
-                    {% get_language_info_list for LANGUAGES as languages %}
-                                        
-                        {% for language in languages %}
-                            {% if lesson_language == language.code %}
-                                <option selected value="{{ language.code }}" data-sub-lang="{{ language.name }}" data-sub-code="{{ language.code }}">{{ language.name }}</option>
-                            {% else %}
-                                <option value="{{ language.code }}" data-sub-lang="{{ language.name }}" data-sub-code="{{ language.code }}">{{ language.name }}</option>
-                            {% endif %}
-                        {% endfor %}
-                </select><br/>
-        </div>
-    </div>
-    <div>
-        <div class="small-3 columns left lesson-form-name"><h3>{% if not unit_obj.project_config.section_name %}{% trans "Lesson Name" %}{% else %} {{unit_obj.project_config.section_name}} {% endif %} <h9 style="color:red">*</h9></h3></div>
-        <div class="small-9 columns right lesson_disp_name"><input type="text" id="lesson-name"></div>
-    </div>
-    <div class="hide">
-        <div class="small-3 columns left lesson-form-desc"><h3>{% trans "Lesson Description" %}<h9 style="color: rgba(128, 128, 128, 0.48);font-style: italic;font-size: 15px;"> {% trans "optional" %}</h9></h3></div>
-        <div class="small-9 columns right lesson_disp_desc"><textarea rows="3" cols="50" id="lesson-desc"></textarea></div>
-    </div> 
-    <div class="double-buttons">
-        <button type="button" class="button-hollow-grey save-lesson add-lesson-top-margin" data-node-id=""> {% if not unit_obj.project_config.section_name %}{% trans "Save Lesson" %}{% else %} {% trans 'Save' %} {{unit_obj.project_config.section_name}}  {% endif %} </button>
-        {% comment %}
-        <button type="button" class="button-hollow-grey save-lesson add-lesson-top-margin" data-node-id=""> {% trans "Cancel" %} </button>
-        {% endcomment %}
-    </div>
-    <a class="close-reveal-modal" aria-label="Close">&#215;</a>
+ <div>
+    <div class="small-3 columns left"><h3>{% trans "Language Selection" %}<h9 style="color:red">*</h9></h3></div>
+    <div class="small-9 columns right">
+     <select disabled class="lesson-lang" name="lan" id="lesson_lang" onchange="myLang()" style="height: 42px;">
+        {% get_language_info_list for LANGUAGES as languages %}
+        
+        {% for language in languages %}
+        {% if lesson_language == language.code %}
+        <option selected value="{{ language.code }}" data-sub-lang="{{ language.name }}" data-sub-code="{{ language.code }}">{{ language.name }}</option>
+        {% else %}
+        <option value="{{ language.code }}" data-sub-lang="{{ language.name }}" data-sub-code="{{ language.code }}">{{ language.name }}</option>
+        {% endif %}
+        {% endfor %}
+    </select><br/>
+</div>
+</div>
+<div>
+    <div class="small-3 columns left lesson-form-name"><h3>{% if not unit_obj.project_config.section_name %}{% trans "Lesson Name" %}{% else %} {{unit_obj.project_config.section_name}} {% endif %} <h9 style="color:red">*</h9></h3></div>
+    <div class="small-9 columns right lesson_disp_name"><input type="text" id="lesson-name"></div>
+</div>
+<div class="hide">
+    <div class="small-3 columns left lesson-form-desc"><h3>{% trans "Lesson Description" %}<h9 style="color: rgba(128, 128, 128, 0.48);font-style: italic;font-size: 15px;"> {% trans "optional" %}</h9></h3></div>
+    <div class="small-9 columns right lesson_disp_desc"><textarea rows="3" cols="50" id="lesson-desc"></textarea></div>
+</div> 
+<div class="double-buttons">
+    <button type="button" class="button-hollow-grey save-lesson add-lesson-top-margin" data-node-id=""> {% if not unit_obj.project_config.section_name %}{% trans "Save Lesson" %}{% else %} {% trans 'Save' %} {{unit_obj.project_config.section_name}}  {% endif %} </button>
+    {% comment %}
+    <button type="button" class="button-hollow-grey save-lesson add-lesson-top-margin" data-node-id=""> {% trans "Cancel" %} </button>
+    {% endcomment %}
+</div>
+<a class="close-reveal-modal" aria-label="Close">&#215;</a>
 </div>
 <!-- END of overlay/reveal to add lesson -->
 
@@ -356,21 +356,21 @@ This will not be used because now only existing activities will be added.
         <div id="lesson-{{id}}" class="content lesson-container">
             <ul class="course-activities">
                 {{#each activities}}
-                    <li id="activity-{{id}}" data-name="{{name}}">
-                        <a class="entity-title">{{name}}
-                            <div class="right edit_entity buddy_margin">
-                                <i class="fi-list right"></i>
-                                <ul class="entity_actions">
-                                    <li class="activity_move_up">Move up</li>
-                                    <li class="activity_move_down">Move down</li>
-                                    <li class="activity_remove">Remove</li>
+                <li id="activity-{{id}}" data-name="{{name}}">
+                    <a class="entity-title">{{name}}
+                        <div class="right edit_entity buddy_margin">
+                            <i class="fi-list right"></i>
+                            <ul class="entity_actions">
+                                <li class="activity_move_up">Move up</li>
+                                <li class="activity_move_down">Move down</li>
+                                <li class="activity_remove">Remove</li>
                                     <!--
                                     <li class="activity_edit">Edit</li>
-                                    -->
-                                </ul>
-                            </div>
-                        </a>
-                    </li>
+                                -->
+                            </ul>
+                        </div>
+                    </a>
+                </li>
                 {{/each}}
                 <li>
                     <div class="custom_dropdown">
@@ -387,12 +387,12 @@ This will not be used because now only existing activities will be added.
                                 <a data-reveal-id="select-activity-page" class="add_existing_activity">Select from Activity Pages</a>
                             </li>
                         </ul>
-                        -->
-                    </div>
-                </li>
-            </ul>
-        </div>
-    </dd>
+                    -->
+                </div>
+            </li>
+        </ul>
+    </div>
+</dd>
 </script>
 {% endverbatim %}
 
@@ -477,16 +477,16 @@ This will not be used because now only existing activities will be added.
                   if (data == "0"){
                     alert('Unable to load data... Something went wrong :(')
                     return false
-                  }
-                  data_dict = JSON.parse(data);
-                  $('#activity-content').html(data_dict.content);
-                   MathJax.Hub.Queue(["Typeset",MathJax.Hub,'activity-content']);
-                    $("#info-page-area").html("");
+                }
+                data_dict = JSON.parse(data);
+                $('#activity-content').html(data_dict.content);
+                MathJax.Hub.Queue(["Typeset",MathJax.Hub,'activity-content']);
+                $("#info-page-area").html("");
 
-                  return true
-              }
-          });
-        }
+                return true
+            }
+        });
+      }
 
         /*
         * Handlers and actions for the Activity
@@ -524,43 +524,43 @@ This will not be used because now only existing activities will be added.
             MathJax.Hub.Queue(["Typeset",MathJax.Hub,'actvity-editor-headerid']);
 
             getNodeData(activity_id);
-     
-              $.ajax({
-                      type: "POST",
+            
+            $.ajax({
+              type: "POST",
 
-                      url: "{% url 'get_info_pages' group_id %}",
-                      datatype: "html",
-                      data:{
-                        'csrfmiddlewaretoken': "{{csrf_token}}",
-                        'node_id':activity_id,
-                        'page_type':'has_admin_page'
+              url: "{% url 'get_info_pages' group_id %}",
+              datatype: "html",
+              data:{
+                'csrfmiddlewaretoken': "{{csrf_token}}",
+                'node_id':activity_id,
+                'page_type':'has_admin_page'
 
-                      },
-                        success: function(data) {
+            },
+            success: function(data) {
                         // $('#info-page-area').html(data);
                         parent = $("#info-page-area");
                         parent.append(data);
-                      }
-                    });
+                    }
+                });
 
-                          
-                $.ajax({
-                      type: "POST",
+            
+            $.ajax({
+              type: "POST",
 
-                      url: "{% url 'get_info_pages' group_id %}",
-                      datatype: "html",
-                      data:{
-                        'csrfmiddlewaretoken': "{{csrf_token}}",
-                        'node_id':activity_id,
-                        'page_type':'has_help'
+              url: "{% url 'get_info_pages' group_id %}",
+              datatype: "html",
+              data:{
+                'csrfmiddlewaretoken': "{{csrf_token}}",
+                'node_id':activity_id,
+                'page_type':'has_help'
 
-                      },
-                        success: function(data) {
+            },
+            success: function(data) {
                         // $('#info-page-area').html(data);
                         parent = $("#info-page-area");
                         parent.append(data);
-                      }
-                    });
+                    }
+                });
             
             $('.save_edit_activity').attr('href', "{% url 'edit_course_page' group_id 'activity_id' %}".replace('activity_id', activity_id))
             $('.save_edit_activity').attr('data-current-activity-id', activity_id);
@@ -576,18 +576,18 @@ This will not be used because now only existing activities will be added.
             var lang_val = document.getElementById("lesson_lang").value;
             lesson_id =  $('.save-lesson').attr('data-node-id');
             $.ajax({
-                      type: "GET",
-                      data:{
-                            'node_id':lesson_id,
-                            'language':lang_val
-                        },
-                      url: "{% url 'get_translated_node' group_id %}",
-                      datatype: "html",
-                      success: function(data) {
-                            data_dict = JSON.parse(data);
-                            $('#lesson-name').val(data_dict.name);   
-                    }
-            });
+              type: "GET",
+              data:{
+                'node_id':lesson_id,
+                'language':lang_val
+            },
+            url: "{% url 'get_translated_node' group_id %}",
+            datatype: "html",
+            success: function(data) {
+                data_dict = JSON.parse(data);
+                $('#lesson-name').val(data_dict.name);   
+            }
+        });
 
         }
 
@@ -661,7 +661,7 @@ This will not be used because now only existing activities will be added.
         //Activity Move Up
         $('.course-lessons').on('click', '.activity_move_down' ,function(e){
             lesson_id = $(this).parents('div.lesson-container')
-                            .attr('id').replace('lesson-', '');
+            .attr('id').replace('lesson-', '');
             $current = $(this).parents('li');
             $next = $current.next('li');
             var curr_act_id = $current.attr('id').replace('activity-', '');
@@ -675,7 +675,7 @@ This will not be used because now only existing activities will be added.
         //Activity Move Up
         $('.course-lessons').on('click', '.activity_move_up' ,function(e){
             lesson_id = $(this).parents('div.lesson-container')
-                            .attr('id').replace('lesson-', '');
+            .attr('id').replace('lesson-', '');
             $current = $(this).parents('li');
             $previous = $current.prev('li');
             var curr_act_id = $current.attr('id').replace('activity-', '');
@@ -704,16 +704,16 @@ This will not be used because now only existing activities will be added.
                   // console.log(data);
                   if(data){
                     $el_to_remove.remove();
-                  }
-                  else{
-                      return false;
-                  }
+                }
+                else{
+                  return false;
               }
-          });
-        }
+          }
+      });
+      }
 
 
-        function deleteNode(node_to_delete, $el_to_remove, deletion_type=0){
+      function deleteNode(node_to_delete, $el_to_remove, deletion_type=0){
           $.ajax({
               type: "POST",
               data:{
@@ -729,17 +729,17 @@ This will not be used because now only existing activities will be added.
                   data_list = JSON.parse(data);
                   if(data_list[0]){
                     $el_to_remove.remove();
-                  }
+                }
                   // alert(data_list[1])
               }
           });
 
-        }
+      }
 
         // remove activity
         $('.course-lessons').on('click', '.activity_remove' ,function(e){
             lesson_id = $(this).parents('div.lesson-container')
-                            .attr('id').replace('lesson-', '');
+            .attr('id').replace('lesson-', '');
             $current = $(this).parents('li');
             $current.remove();
             var curr_act_id = $current.attr('id').replace('activity-', '');
@@ -770,7 +770,7 @@ This will not be used because now only existing activities will be added.
                 lbl_msg = "Are you sure you want to delete this lesson ?"
                 $("#deleteLessonModalLabel").text(lbl_msg);
                 $("#deleteLessonModal")
-                  .removeClass("medium").addClass("small")
+                .removeClass("medium").addClass("small")
                 lesson_id_hidden_ele = document.createElement("input");
                 lesson_id_hidden_ele.setAttribute("type", "hidden");
                 lesson_id_hidden_ele.setAttribute("name", "hidden_lesson_id");
@@ -823,22 +823,22 @@ This will not be used because now only existing activities will be added.
           if (!lessonName) {
             alert('Name can not be empty. Please provide one.');
             return;
-          };
-          result = undefined;
-          sel_lesson_lang =  $('#lesson_lang').find(':selected').attr('data-sub-code');
-          lesson_desc = document.getElementById('lesson-desc').value;
-          console.log(sel_lesson_lang)
-          $.ajax({
-              type: "POST",
-              data:{
-                  'csrfmiddlewaretoken': "{{csrf_token}}",
-                  "name": lessonName,
-                  "lesson_id": lessonId,
-                  "lesson_desc": lesson_desc,
-                  "unit_id": "{{unit_obj.pk}}",
-                  "sel_lesson_lang":sel_lesson_lang
-              },
-              url: "{% url 'lesson_create_edit' group_id %}",
+        };
+        result = undefined;
+        sel_lesson_lang =  $('#lesson_lang').find(':selected').attr('data-sub-code');
+        lesson_desc = document.getElementById('lesson-desc').value;
+        console.log(sel_lesson_lang)
+        $.ajax({
+          type: "POST",
+          data:{
+              'csrfmiddlewaretoken': "{{csrf_token}}",
+              "name": lessonName,
+              "lesson_id": lessonId,
+              "lesson_desc": lesson_desc,
+              "unit_id": "{{unit_obj.pk}}",
+              "sel_lesson_lang":sel_lesson_lang
+          },
+          url: "{% url 'lesson_create_edit' group_id %}",
               // datatype: "",
               success: function(data) {
                   // console.log(typeof(data));
@@ -860,7 +860,7 @@ This will not be used because now only existing activities will be added.
           });
           // console.log(result)
           return result;
-        }
+      }
 
 
         //Add a lesson
@@ -919,16 +919,16 @@ This will not be used because now only existing activities will be added.
                 data =  {'except_collection_set_of_id': lessonId}
             }
             $.ajax({
-                      type: "GET",
-                      url: url_to_fetch_resources,
-                      datatype: "html",
-                      data: data,
-                      success: function(data) {
-                      $("#activity-container").html(data);
+              type: "GET",
+              url: url_to_fetch_resources,
+              datatype: "html",
+              data: data,
+              success: function(data) {
+                  $("#activity-container").html(data);
                             // $('#existing_template_modal').foundation('reveal', 'open');
 
-                      $(".activity-page").click(function(event){
-                          event.preventDefault();
+                            $(".activity-page").click(function(event){
+                              event.preventDefault();
                           // get html content in var
                           var activityPgId = $(this).attr("data-id");
                           var activityContent = $(this).attr("data-name");
@@ -946,8 +946,8 @@ This will not be used because now only existing activities will be added.
                           // openCkEditor('#activity-content', "BasicToolbar", nodeContent);
 
                           // $('#select-activity-page').foundation('reveal', 'close');
-                        });
-                      }
+                      });
+                        }
                     });
         }
 
@@ -967,14 +967,14 @@ This will not be used because now only existing activities will be added.
                     $('#select-activity-page').foundation('reveal', 'close');
                     alert('Same activity exists in concern lesson.');
                     return 0;
-                  }
-                  data_dict = JSON.parse(data);
-                  renderCourseTree(data_dict);
+                }
+                data_dict = JSON.parse(data);
+                renderCourseTree(data_dict);
                   // handle opening of tree till recently added node with data_dict.msg
                   $('#select-activity-page').foundation('reveal', 'close');
-                  }
+              }
           });
-          return 1;
+            return 1;
         }
 
 
@@ -1231,8 +1231,8 @@ This will not be used because now only existing activities will be added.
         */
     })
 
-    
-   function onMessage(message) {
+
+function onMessage(message) {
     // Inconveniently, we don't seem to be able to locate the
     // assessment-player's iframe inside the content's iframe.  Conventiently,
     // the assessment-player sends a message up to us to indicate its available
@@ -1241,22 +1241,22 @@ This will not be used because now only existing activities will be added.
     var data = message.data;
     if(typeof(message.data) == "string"){
       data = JSON.parse(message.data);
-    }
-    const type = data.open_assessments_msg;
+  }
+  const type = data.open_assessments_msg;
 
-    switch(type) {
+  switch(type) {
       case "open_assessments_available_locales":
-        message.source.postMessage({
+      message.source.postMessage({
           open_assessments_msg: "open_assessments_set_locale",
           locale: '{{LANGUAGE_CODE}}'
-        }, "*");
-        break;
-    }
+      }, "*");
+      break;
   }
+}
 
-  function componentDidMount() {
+function componentDidMount() {
     window.addEventListener("message", (e) => this.onMessage(e), false);
-  }
-  componentDidMount()
+}
+componentDidMount()
 
 </script>

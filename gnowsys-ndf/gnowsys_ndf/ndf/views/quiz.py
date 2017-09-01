@@ -52,6 +52,7 @@ def quiz(request, group_id):
     title = gst_quiz.name
     quiz_nodes = node_collection.find({'member_of': gst_quiz._id, 'group_set': ObjectId(group_id)}).sort('last_update', -1)
     gst_quiz_names = ['QuizItem']
+    supported_languages = ['Hindi', 'Telugu']
     if "CourseEventGroup" in group_obj.member_of_names_list:
         gst_quiz_names.append('QuizItemEvent')
     gst_quiz_item = node_collection.find({'_type': 'GSystemType', 'name': {'$in': gst_quiz_names}})
@@ -62,14 +63,30 @@ def quiz(request, group_id):
                                'quiz_nodes': quiz_nodes,
                                'quiz_item_nodes': quiz_item_nodes,
                                'groupid':group_id,
-                               'group_id':group_id
+                               'group_id':group_id,
+                               'supported_languages': supported_languages
                               },
                               context_instance=RequestContext(request)
     )
 
+@get_execution_time
+def quiz_item_detail(request, group_id, node_id=None):
+    try:
+        group_id = ObjectId(group_id)
+    except:
+        group_name, group_id = get_group_name_id(group_id)
+    quiz_item_node = node_collection.one({'_id': ObjectId(node_id)})
+    template = "ndf/node_details_base.html"
+    print "\nLeaving"
+    quiz_item_node.get_neighbourhood(quiz_item_node.member_of)
+    variable = RequestContext(request, {'node': quiz_item_node, 'groupid': group_id,
+     'group_id': group_id})
+    return render_to_response(template,
+                              variable,
+                              context_instance=RequestContext(request))
+
 
 @login_required
-@get_execution_time
 def create_edit_quiz_item(request, group_id, node_id=None):
     """Creates/Modifies details about the given quiz-item.
     """
@@ -83,9 +100,9 @@ def create_edit_quiz_item(request, group_id, node_id=None):
     quiz_node = None
     quiz_node_id = None
     quiz_item_node = None
-
+    group_object_member_of_names_list = group_object.member_of_names_list
     gst_quiz_item = node_collection.one({'_type': u'GSystemType', 'name': u'QuizItem'})
-    if "CourseEventGroup" in group_object.member_of_names_list:
+    if "CourseEventGroup" in group_object_member_of_names_list or "announced_unit" in group_object_member_of_names_list:
         gst_quiz_item = node_collection.one({'_type': u'GSystemType', 'name': u'QuizItemEvent'})
 
     # if node_id:
@@ -215,25 +232,22 @@ def create_edit_quiz_item(request, group_id, node_id=None):
         quiz_item_node.status = u"PUBLISHED"
 
         quiz_item_node.save(groupid=group_id)
-        if "QuizItemEvent" in quiz_item_node.member_of_names_list:
-            # Create thread node
-            create_thread_for_node_flag = True
-            if quiz_item_node.relation_set:
-                for eachrel in quiz_item_node.relation_set:
-                    if eachrel and "has_thread" in eachrel:
-                        create_thread_for_node_flag = False
-            if create_thread_for_node_flag:
-                return_status = create_thread_for_node(request,group_id, quiz_item_node)
-                print "\n\n return_status === ", return_status
 
+        # Create a thread for QuizItem also. Can be used in preview
+        # Create thread node
+        create_thread_for_node_flag = True
+        if quiz_item_node.relation_set:
+            for eachrel in quiz_item_node.relation_set:
+                if eachrel and "has_thread" in eachrel:
+                    create_thread_for_node_flag = False
+        if create_thread_for_node_flag:
+            return_status = create_thread_for_node(request,group_id, quiz_item_node)
+        if "QuizItemEvent" in quiz_item_node.member_of_names_list:
             return_url = request.POST.get("return_url")
             # print "\n\n return_url", return_url, type(return_url)
             if return_url:
-                if return_url == "groupchange":
-                    return HttpResponseRedirect(reverse('groupchange', kwargs={'group_id': group_id}))
-                elif return_url == "course_content":
-                    return HttpResponseRedirect(reverse('course_content', kwargs={'group_id': group_id}))
-                return HttpResponseRedirect(return_url)
+                return HttpResponseRedirect(reverse(return_url, kwargs={'group_id': group_id}))
+            return HttpResponseRedirect(return_url)
         if quiz_node:
             quiz_node.collection_set.append(quiz_item_node._id)
             quiz_node.save(groupid=group_id)
@@ -310,7 +324,8 @@ def quiz_details(request, group_id, node_id):
     gst_quiz_item = node_collection.one({'_type': 'GSystemType', 'name': u'QuizItem'})
 
     quiz_node = node_collection.one({'_id': ObjectId(node_id)})
-    quiz_item_nodes = node_collection.find({'_id': {'$in': quiz_node.collection_set}, 'member_of': gst_quiz_item._id }).sort('last_update', -1)
+    quiz_item_nodes = None
+    # quiz_item_nodes = node_collection.find({'_id': {'$in': quiz_node.collection_set}, 'member_of': gst_quiz_item._id }).sort('last_update', -1)
     # quiz_node.get_neighbourhood(quiz_node.member_of)
 
     context_variables = {'groupid': group_id,
@@ -364,7 +379,7 @@ def save_quizitem_answer(request, group_id):
             # is_cursor = grel_dict.get("cursor",False)
             # if not is_cursor:
             #     thread_obj = grel_dict.get("grel_node")
-            #     # print "\n thread_obj: ", thread_obj
+            print "\n thread_obj: ", thread_obj
 
             user_action = request.POST.get("user_action", '')
 
