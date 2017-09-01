@@ -4,9 +4,6 @@
 {% get_group_name groupid as group_name_tag %}
 {% get_user_quiz_resp node request.user as total_and_curr_ans_dict %}
 {% check_is_gstaff groupid request.user as is_gstaff %}
-
-{% with node.options|re_format as node_options %}
-{% with node.correct_answer|re_format as node_correct_answer %}
 <div class="row quiz-player">
 	<label class="attempts_count right fi-info"></label>
 	<fieldset>
@@ -20,15 +17,16 @@
 		<div class="row">
 			<div class="quiz_qtn">
 				<b>{{node.content|safe}}</b>
+
 				<div class="quiz-box quiz_qtn">
 					{% if node.quiz_type == "Single-Choice" %}
-						{% for each_opt in node_options %}
+						{% for each_opt in node.options %}
 							<input type="radio" name="quiz_ans"  value="{{each_opt}}"
 							{% if each_opt in total_and_curr_ans_dict.recent_ans  %}
 							checked
 							{% endif %}
 
-							{% if each_opt in node_correct_answer %}
+							{% if each_opt in node.correct_answer %}
 								class="choice" id="{{each_opt}}">{{each_opt}}<span class='fi-check hide chk_ans_lbl'></span>
 							{% else %}
 								class="choice" id="{{each_opt}}">{{each_opt}}<span class='fi-x hide chk_ans_lbl'></span>
@@ -45,12 +43,12 @@
 						</div>
 						{% endcomment %}
 					{% elif node.quiz_type == "Multiple-Choice" %}
-						{% for each_opt in node_options %}
+						{% for each_opt in node.options %}
 							<input type="checkbox" name="quiz_ans" value="{{each_opt}}"
 							{% if each_opt in total_and_curr_ans_dict.recent_ans %}
 							checked
 							{% endif %}
-							{% if each_opt in node_correct_answer %}
+							{% if each_opt in node.correct_answer %}
 								class="choice" id="{{each_opt}}">{{each_opt}}<span class='fi-check hide chk_ans_lbl'></span>
 							{% else %}
 								class="choice"  id="{{each_opt}}">{{each_opt}}<span class='fi-x hide chk_ans_lbl'></span>
@@ -78,8 +76,6 @@
 		</div>
 	</fieldset>
 </div>
-{% endwith %}
-{% endwith %}
 
 <script type="text/javascript">
 	user_submitted_ans_list = {{total_and_curr_ans_dict.recent_ans|jsonify|safe}}
