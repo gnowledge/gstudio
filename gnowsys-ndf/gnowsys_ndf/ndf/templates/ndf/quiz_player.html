@@ -7,16 +7,6 @@
 
 {% with node.options|re_format as node_options %}
 {% with node.correct_answer|re_format as node_correct_answer %}
-<style type="text/css">
-	.quiz-box {
-	    font-size: 15px !important;
-	}
-	.choice{
-	    margin-right: 5px !important;
-	    margin-top: 3px !important;
-        margin-left: 10px !important;
-	}
-</style>
 <div class="row quiz-player">
 	<label class="attempts_count right fi-info"></label>
 	<fieldset>
@@ -42,7 +32,7 @@
 								class="choice" id="{{each_opt}}">{{each_opt}}<span class='fi-check hide chk_ans_lbl'></span>
 							{% else %}
 								class="choice" id="{{each_opt}}">{{each_opt}}<span class='fi-x hide chk_ans_lbl'></span>
-							{% endif %}
+							{% endif %}<br/>
 						{% endfor %}
 						{% comment %}
 						<div class="row">

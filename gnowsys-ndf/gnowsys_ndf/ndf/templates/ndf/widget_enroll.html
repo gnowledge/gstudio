@@ -2,6 +2,8 @@
 {% load simple_filters %}
 {% load ndf_tags %}
 {% get_gstudio_workspace_instance as is_workspace %}
+{% get_group_object groupid as group_object %}
+
 <input type="button" data-reveal-id="enrollBuddiesModal" class="enrollBtn"  "{% if is_workspace %}" "{% if request.user.pk in group_object.author_set %}" value="Joined" "{% else %}"  value="Join" "{% endif %}" "{% else %}" value="Enrollment" "{%  endif %}" />
 
 <div id="enrollBuddiesModal" class="reveal-modal medium radius" data-reveal data-alert>
