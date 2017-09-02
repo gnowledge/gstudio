@@ -82,18 +82,18 @@ def api_get_group_gst_nodes(request, group_name_or_id, gst_name_or_id, username_
     get_parameters_dict = request.GET.dict()
 
     for key, val in get_parameters_dict.iteritems():
-        if ('gs_' in key):
-            stripped_key = key.lstrip('gs_').split('.')[0]
-            if stripped_key in gsystem_keys:
-                query_dict.update({key.lstrip('gs_'): {'$regex': val, '$options': 'i'}})
+        # if ('gs_' in key):
+            # stripped_key = key.lstrip('gs_').split('.')[0]
+        stripped_key = key.split('.')[0]
+        if stripped_key in gsystem_keys:
+            query_dict.update({key: {'$regex': val, '$options': 'i'}})
 
-            elif stripped_key in gst_attributes(gst_id):
-                query_dict.update({('attribute_set.' + stripped_key): {'$regex': val, '$options': 'i'}})
+        elif stripped_key in gst_attributes(gst_id):
+            query_dict.update({('attribute_set.' + stripped_key): {'$regex': val, '$options': 'i'}})
 
             # print query_dict
 
-
-    human = eval(request.GET.get('human', '0'))
+    human = eval(request.GET.get('human', '1'))
 
     gst_fields = gst_api_fields_dict if human else gst_all_fields_dict
 
