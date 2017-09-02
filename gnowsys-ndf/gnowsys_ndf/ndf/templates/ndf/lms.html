@@ -119,9 +119,11 @@
       {% endif %}
       </a>
     </li>
+    {% if 'Group'  in group_object.member_of_names_list %}
     <li>
       <a href="{% url 'curriculum_list' groupid  %}"> {% trans "Topic Map" %}</a>
     </li>
+    {% endif %}
   </ul>
 </div>
 

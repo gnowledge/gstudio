@@ -3,45 +3,12 @@
 {% load i18n %}
 {% get_group_name groupid as group_name_tag %}
 {% get_user_quiz_resp node request.user as total_and_curr_ans_dict %}
-
-<style type="text/css">
-	.quiz_qtn{
-		margin-left:20px !important;
-		font-size: 20px;
-	}
-	.question_edit{
-		margin-left: 20px !important;
-	}
-
-	input[type=checkbox], input[type=radio]{
-	    margin-right: 10px;
-	    width: 15px;
-		height: 15px;
-	}
-
-	.chk_ans_lbl, .rad_ans_lbl{
-		font-size: 22px;
-		margin-left: 5px;
-	}
-
-	.fi-check{
-		color: green;
-	}
-
-	.fi-x{
-		color: red;
-	}
-</style>
-{% with node.options|re_format as node_options %}
-{% with node.correct_answer|re_format as node_correct_answer %}
-
-<div class="row">
-
-<label class="attempts_count right fi-info"></label>
+{% check_is_gstaff groupid request.user as is_gstaff %}
+<div class="row quiz-player">
+	<label class="attempts_count right fi-info"></label>
 	<fieldset>
 	    <legend >
 	    	<span>Question</span>
-			{% check_is_gstaff groupid request.user as is_gstaff %}
 			{% if is_gstaff %}
 		    	<a href="{% url 'quiz_item_edit' group_id node.pk %}?return_url={{ request.META.HTTP_REFERER }}" class="right question_edit" target="_blank" >Edit</a>
 		    {% endif %}
@@ -50,20 +17,20 @@
 		<div class="row">
 			<div class="quiz_qtn">
 				<b>{{node.content|safe}}</b>
-				<div class="quiz_qtn quiz-box">
+
+				<div class="quiz-box quiz_qtn">
 					{% if node.quiz_type == "Single-Choice" %}
-						{% for each_opt in node_options %}
+						{% for each_opt in node.options %}
 							<input type="radio" name="quiz_ans"  value="{{each_opt}}"
 							{% if each_opt in total_and_curr_ans_dict.recent_ans  %}
 							checked
 							{% endif %}
 
-							{% if each_opt in node_correct_answer %}
+							{% if each_opt in node.correct_answer %}
 								class="choice" id="{{each_opt}}">{{each_opt}}<span class='fi-check hide chk_ans_lbl'></span>
 							{% else %}
 								class="choice" id="{{each_opt}}">{{each_opt}}<span class='fi-x hide chk_ans_lbl'></span>
-							{% endif %}
-							<br/>
+							{% endif %}<br/>
 						{% endfor %}
 						{% comment %}
 						<div class="row">
@@ -76,12 +43,12 @@
 						</div>
 						{% endcomment %}
 					{% elif node.quiz_type == "Multiple-Choice" %}
-						{% for each_opt in node_options %}
+						{% for each_opt in node.options %}
 							<input type="checkbox" name="quiz_ans" value="{{each_opt}}"
 							{% if each_opt in total_and_curr_ans_dict.recent_ans %}
 							checked
 							{% endif %}
-							{% if each_opt in node_correct_answer %}
+							{% if each_opt in node.correct_answer %}
 								class="choice" id="{{each_opt}}">{{each_opt}}<span class='fi-check hide chk_ans_lbl'></span>
 							{% else %}
 								class="choice"  id="{{each_opt}}">{{each_opt}}<span class='fi-x hide chk_ans_lbl'></span>
@@ -93,24 +60,22 @@
 						<!-- <input type="button" value="Submit" class="button tiny radius short-ans_chk"> -->
 					{% endif %}
 
-					{% if total_and_curr_ans_dict.count != node.quizitem_max_attempts %}
-						<div class="row controls-box hide">
-							{% if node.quizitem_check_answer and node.quiz_type != "Short-Response"  %}
-								<input type="button" value="Check" class="button tiny check-ans radius check-btn">
-							{% endif %}
-							{% if node.quizitem_show_correct_ans %}
-								<input type="button" value="Show Answer" class="button tiny radius show-ans-btn hide">
-							{% endif %}
-							<input type="button" value="Submit" class="tiny button radius submit-btn">
-						</div>
-					{% endif %}
 				</div>
+				{% if total_and_curr_ans_dict.count != node.quizitem_max_attempts %}
+					<div class="row controls-box quiz_qtn hide">
+						{% if node.quizitem_check_answer and node.quiz_type != "Short-Response"  %}
+							<input type="button" value="Check" class="button tiny check-ans radius check-btn">
+						{% endif %}
+						{% if node.quizitem_show_correct_ans %}
+							<input type="button" value="Show Answer" class="button tiny radius show-ans-btn hide">
+						{% endif %}
+						<input type="button" value="Submit" class="tiny button radius submit-btn">
+					</div>
+				{% endif %}
 			</div>
 		</div>
 	</fieldset>
 </div>
-{% endwith %}
-{% endwith %}
 
 <script type="text/javascript">
 	user_submitted_ans_list = {{total_and_curr_ans_dict.recent_ans|jsonify|safe}}

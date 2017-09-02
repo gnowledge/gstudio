@@ -6613,6 +6613,7 @@ def get_group_templates_page(request, group_id):
   variable = RequestContext(request, {'templates_cur':templates_cur })
   return render_to_response(template, variable)
 
+'''
 @login_required
 def get_group_pages(request, group_id):
     except_collection_set_of_id = request.GET.get('except_collection_set_of_id', None)
@@ -6633,6 +6634,42 @@ def get_group_pages(request, group_id):
     template = "ndf/group_pages.html"
     card_class = 'activity-page'
     variable = RequestContext(request, {'cursor': pages_cur, 'groupid': group_id, 'group_id': group_id, 'card_class': card_class })
+    return render_to_response(template, variable)
+'''
+
+@login_required
+def get_group_resources(request, group_id, res_type="Page"):
+    except_collection_set = []
+    res_cur = None
+    template = "ndf/group_pages.html"
+    card_class = 'activity-page'
+
+    try:
+        res_query = {'_type': 'GSystem', 'group_set': ObjectId(group_id)}
+        except_collection_set_of_id = request.GET.get('except_collection_set_of_id', None)
+
+        except_collection_set_of_obj = Node.get_node_by_id(except_collection_set_of_id)
+        if except_collection_set_of_obj:
+            except_collection_set = except_collection_set_of_obj.collection_set
+            if except_collection_set:
+                res_query.update({'_id': {'$nin': except_collection_set}})
+        if res_type.lower() == "page":
+            gst_page_name, gst_page_id = GSystemType.get_gst_name_id('Page')
+            gst_blog_type_name, gst_blog_type_id = GSystemType.get_gst_name_id("Blog page")
+            gst_info_type_name, gst_info_type_id = GSystemType.get_gst_name_id("Info page")
+            res_query.update({'type_of': {'$nin': [gst_blog_type_id, gst_info_type_id]}})
+            res_query.update({'member_of': gst_page_id})
+
+        elif res_type.lower() == "quiz":
+            gst_quizitem_name, gst_quizitem_id = GSystemType.get_gst_name_id('QuizItem')
+            gst_quizitemevent_name, gst_quizitemevent_id = GSystemType.get_gst_name_id('QuizItemEvent')
+            res_query.update({'member_of': {"$in": [gst_quizitem_id, gst_quizitemevent_id]}})
+        res_cur = node_collection.find(res_query).sort('last_update', -1)
+    except Exception as get_group_resources_err:
+      print "\n Error occurred in get_group_resources(). Error: {0}".format(str(get_group_resources_err))
+      pass
+
+    variable = RequestContext(request, {'cursor': res_cur, 'groupid': group_id, 'group_id': group_id, 'card_class': card_class })
     return render_to_response(template, variable)
 
 def get_info_pages(request, group_id):

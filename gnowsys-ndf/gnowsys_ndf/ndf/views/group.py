@@ -2057,6 +2057,18 @@ def group_dashboard(request, group_id=None):
     old_profile_pics = []
     selected = request.GET.get('selected','')
     group_obj = get_group_name_id(group_id, get_obj=True)
+
+    if "announced_unit" in group_obj.member_of_names_list and group_obj.project_config['tab_name'].lower() == "questions":
+        try:
+            if group_obj.collection_set:
+                lesson_id = group_obj.collection_set[0]
+                lesson_node = node_collection.one({'_id': ObjectId(lesson_id)})
+                activity_id = lesson_node.collection_set[0]
+            return HttpResponseRedirect(reverse('activity_player_detail', kwargs={'group_id': group_id,
+                'lesson_id': lesson_id, 'activity_id': activity_id}))
+        except Exception as e:
+            pass
+
     if ("base_unit" in group_obj.member_of_names_list or
         "CourseEventGroup" in group_obj.member_of_names_list or
         "BaseCourseGroup" in group_obj.member_of_names_list or 
