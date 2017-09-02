@@ -6,10 +6,11 @@ from django.contrib.auth.decorators import login_required
 # from django.contrib.auth.models import User
 from django.http import HttpResponseRedirect
 from django.http import HttpResponse
-from django.core.urlresolvers import reverse
+from django.core.urlresolvers import reverse, resolve
 from django.shortcuts import render_to_response  # , render
 from django.template import RequestContext
 from django.template.defaultfilters import slugify
+
 import json
 try:
     from bson import ObjectId
@@ -55,9 +56,12 @@ def quiz(request, group_id):
     supported_languages = ['Hindi', 'Telugu']
     if "CourseEventGroup" in group_obj.member_of_names_list or "announced_unit" in group_obj.member_of_names_list:
         gst_quiz_names.append('QuizItemEvent')
+    home_group = node_collection.one({'_type': "Group", 'name': "home"})
     gst_quiz_item = node_collection.find({'_type': 'GSystemType', 'name': {'$in': gst_quiz_names}})
     gst_quiz_item_ids = [each_quiz_gst._id for each_quiz_gst in gst_quiz_item]
-    quiz_item_nodes = node_collection.find({'member_of': {'$in': gst_quiz_item_ids}, 'group_set': ObjectId(group_id)}).sort('last_update', -1)
+    quiz_item_nodes = node_collection.find({'member_of': {'$in': gst_quiz_item_ids},
+     'group_set': home_group._id}).sort('last_update', -1)
+    print "\nquiz_item_nodes: ", quiz_item_nodes.count()
     return render_to_response("ndf/quiz.html",
                               {'title': title,
                                'quiz_nodes': quiz_nodes,
@@ -87,7 +91,7 @@ def quiz_item_detail(request, group_id, node_id=None):
 
 
 @login_required
-def create_edit_quiz_item(request, group_id, node_id=None):
+def create_edit_quiz_item(request, group_id, node_id=None, lang='en'):
     """Creates/Modifies details about the given quiz-item.
     """
     try:
@@ -105,16 +109,22 @@ def create_edit_quiz_item(request, group_id, node_id=None):
     if "CourseEventGroup" in group_object_member_of_names_list or "announced_unit" in group_object_member_of_names_list:
         gst_quiz_item = node_collection.one({'_type': u'GSystemType', 'name': u'QuizItemEvent'})
 
-    # if node_id:
-    #     quiz_item_node = node_collection.one({'_id': ObjectId(node_id)})
-    quiz_node_id = request.GET.get('quiznode','')
-    return_url = request.GET.get('return_url','')
+    current_url = resolve(request.path_info).url_name
     context_variables = { 'title': gst_quiz_item.name,
                           'quiz_type_choices': QUIZ_TYPE_CHOICES,
                           'group_id': group_id,
                           'groupid': group_id,
 
                         }
+
+    print "\ncurrent_url: ", current_url
+    if "translate" in current_url:
+        context_variables.update({'translate': True})
+
+    # if node_id:
+    #     quiz_item_node = node_collection.one({'_id': ObjectId(node_id)})
+    quiz_node_id = request.GET.get('quiznode','')
+    return_url = request.GET.get('return_url','')
     if return_url:
         context_variables['return_url'] = return_url
     if quiz_node_id:
@@ -128,11 +138,38 @@ def create_edit_quiz_item(request, group_id, node_id=None):
         else:
             # Edit a question
             quiz_item_node = node
-
-
+    existing_grel = None
     if request.method == "POST":
         usrid = int(request.user.id)
         usrname = unicode(request.user.username)
+        print "req1: ", request.POST.get('translate')
+        print "req: ", request.POST.get('translate', False)
+        if translate:
+            rt_translation_of = Node.get_name_id_from_type('translation_of', 'RelationType', get_obj=True)
+            trans_node_gst_name, trans_node_gst_id = GSystemType.get_gst_name_id("trans_node")
+
+            existing_grel = triple_collection.one({
+                                                '_type': 'GRelation',
+                                                'subject': ObjectId(node_id),
+                                                'relation_type': rt_translation_of._id,
+                                                'language': language
+                                            })
+
+            if existing_grel:
+                # get existing translated_node
+                translated_node = Node.get_node_by_id(existing_grel.right_subject)
+                translate_grel = existing_grel
+
+        translated_node.member_of = [ObjectId(trans_node_gst_id)]
+        translated_node.save(group_id=group_id)
+        if not existing_grel:
+            trans_grel_list = [ObjectId(translated_node._id)]
+            trans_grels = triple_collection.find({'_type': 'GRelation', \
+                            'relation_type': rt_translation_of._id,'subject': ObjectId(node_id)},{'_id': 0, 'right_subject': 1})
+            for each_rel in trans_grels:
+                trans_grel_list.append(each_rel['right_subject'])
+            translate_grel = create_grelation(node_id, rt_translation_of, trans_grel_list, language=language)
+
 
         # if node_id:
         #     quiz_item_node = node_collection.one({'_id': ObjectId(node_id)})
@@ -247,7 +284,6 @@ def create_edit_quiz_item(request, group_id, node_id=None):
             # print "\n\n return_url", return_url, type(return_url)
             if return_url:
                 return HttpResponseRedirect(reverse(return_url, kwargs={'group_id': group_id}))
-            return HttpResponseRedirect(return_url)
         if quiz_node:
             quiz_node.collection_set.append(quiz_item_node._id)
             quiz_node.save(groupid=group_id)

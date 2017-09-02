@@ -82,8 +82,16 @@ margin-left:1.5em;
         <div>
           {% if is_gstaff or node.created_by == request.user.id %}
             <a href="{% url 'quiz_item_edit' group_id node.pk %}" class="quizitem_act">{% trans 'Edit' %}</a> | 
+            <a href="#" data-dropdown="drop1" aria-controls="drop1" aria-expanded="false" class="inner" >{% trans "Translate" %} <i class="fa fa-chevron-down"></i></a> | 
+            
+            <ul id="drop1" data-dropdown-content class="f-dropdown" aria-hidden="true">
+            {% for each_lang in supported_languages %}
+                    <li><a href="{% url 'quiz_item_translate' group_id node.pk each_lang %}">{{each_lang}}</a></li>
+            {% endfor %}
+            </ul>
+
           {% endif %}
-          <a href="{% url 'quiz_item_detail' group_id node.pk %}"y>{% trans 'Preview' %}</a>
+          <a href="{% url 'quiz_item_detail' group_id node.pk %}">{% trans 'Preview' %}</a>
           <br/>
           <small class="quizitem_act"><i>{% trans 'Created by: ' %}
             <a href="{% url 'dashboard' node.created_by %}" title="{{node.created_by|get_username}}" target="_blank" >{{node.created_by|get_username}}</a></i>

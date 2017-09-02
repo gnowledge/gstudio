@@ -6657,7 +6657,7 @@ def get_group_resources(request, group_id, res_type="Page"):
     card_class = 'activity-page'
 
     try:
-        res_query = {'_type': 'GSystem', 'group_set': ObjectId(group_id)}
+        res_query = {'_type': 'GSystem'}
         except_collection_set_of_id = request.GET.get('except_collection_set_of_id', None)
 
         except_collection_set_of_obj = Node.get_node_by_id(except_collection_set_of_id)
