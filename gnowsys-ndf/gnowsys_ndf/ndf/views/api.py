@@ -24,7 +24,7 @@ from gnowsys_ndf.ndf.models import node_collection,triple_collection
 from gnowsys_ndf.ndf.views.methods import get_group_name_id
 
 
-def api_get_group_gst_nodes(request, group_name_or_id, gst_name_or_id, username_or_id):
+def api_get_group_gst_nodes(request, group_name_or_id, gst_name_or_id):
     # GET: api/v1/<group_id>/<files>/<nroer_team>/
     # import ipdb; ipdb.set_trace()
     exception_occured = ''
@@ -41,22 +41,6 @@ def api_get_group_gst_nodes(request, group_name_or_id, gst_name_or_id, username_
         gst_name, gst_id = GSystemType.get_gst_name_id(gst_name_or_id)
         oid_name_dict[gst_id] = gst_name
 
-    # import ipdb; ipdb.set_trace()
-    username_or_id_int = 0
-    try:
-        username_or_id_int = int(username_or_id)
-    except Exception as e:
-        pass
-
-    # user_id = User.objects.get(username=unicode(username_or_id)).id
-    
-    auth_obj = node_collection.one({'_type': u'Author', '$or': [{'name': unicode(username_or_id)}, {'created_by': username_or_id_int} ] })
-    if auth_obj:
-        oid_name_dict[auth_obj._id] = auth_obj.name
-        user_id = auth_obj.created_by
-    else:
-        return HttpResponse('Requested user does not exists.', content_type='text/plain')
-
     gsystem_structure_dict = GSystem.structure
     gsystem_keys = gsystem_structure_dict.keys()
 
@@ -72,7 +56,7 @@ def api_get_group_gst_nodes(request, group_name_or_id, gst_name_or_id, username_
                     '_type': 'GSystem',
                     'group_set': ObjectId(group_id),
                     'member_of': ObjectId(gst_id),
-                    'created_by': user_id,
+                    # 'created_by': user_id,
                     'status': u'PUBLISHED',
                     'access_policy': 'PUBLIC',
                     # 'if_file.mime_type': {'$regex': 'video', '$options': 'i'}
@@ -80,18 +64,37 @@ def api_get_group_gst_nodes(request, group_name_or_id, gst_name_or_id, username_
 
     # GET parameters:
     get_parameters_dict = request.GET.dict()
+    
+    get_created_by = request.GET.get('created_by', None)
+    if get_created_by:
+        username_or_id_int = 0
+        try:
+            username_or_id_int = int(get_created_by)
+        except Exception as e:
+            pass
+
+        auth_obj = node_collection.one({'_type': u'Author', '$or': [{'name': unicode(get_created_by)}, {'created_by': username_or_id_int} ] })
+        if auth_obj:
+            oid_name_dict[auth_obj._id] = auth_obj.name
+            # user_id = auth_obj.created_by
+            get_parameters_dict['created_by'] = auth_obj.created_by
+        else:
+            return HttpResponse('Requested user does not exists.', content_type='text/plain')
+
+    # get_resource_type = request.GET.get('resource_type', None)
 
     for key, val in get_parameters_dict.iteritems():
         # if ('gs_' in key):
             # stripped_key = key.lstrip('gs_').split('.')[0]
         stripped_key = key.split('.')[0]
         if stripped_key in gsystem_keys:
-            query_dict.update({key: {'$regex': val, '$options': 'i'}})
+            # query_dict.update({key: {'$regex': val, '$options': 'i'}})
+            query_dict.update({key: (val if isinstance(val, int) else {'$regex': val, '$options': 'i'}) })
 
         elif stripped_key in gst_attributes(gst_id):
             query_dict.update({('attribute_set.' + stripped_key): {'$regex': val, '$options': 'i'}})
 
-            # print query_dict
+    print query_dict
 
     human = eval(request.GET.get('human', '1'))
 
