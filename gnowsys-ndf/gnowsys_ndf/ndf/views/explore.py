@@ -104,10 +104,18 @@ def explore_courses(request,page_no=1):
 
 @get_execution_time
 def explore_groups(request,page_no=1):
-    title = 'groups'
+    title = 'workspaces'
     gstaff_access = check_is_gstaff(group_id,request.user)
 
     query = {'_type': 'Group', 'status': u'PUBLISHED',
+            '$or': [
+                        {'access_policy': u"PUBLIC"},
+                        {'$and': [
+                                {'access_policy': u"PRIVATE"},
+                                {'created_by': request.user.id}
+                            ]
+                        }
+                    ],
              'member_of': {'$in': [gst_group._id],
              '$nin': [gst_course._id, gst_basecoursegroup._id, ce_gst._id, gst_course._id, gst_base_unit_id]},
             }
@@ -218,7 +226,7 @@ def explore_courses(request):
 
     # this will be announced tab
     title = 'courses'
-    modules_cur = node_collection.find({'member_of': gst_module_id }).sort('last_update', -1)
+    modules_cur = node_collection.find({'member_of': gst_module_id,'status':'PUBLISHED' }).sort('last_update', -1)
 
     module_unit_ids = [val for each_module in modules_cur for val in each_module.collection_set ]
     modules_cur.rewind()
@@ -308,13 +316,32 @@ def explore_courses(request):
 @get_execution_time
 def explore_drafts(request):
     title = 'drafts'
-    modules_cur = node_collection.find({'member_of': gst_module_id }).sort('last_update', -1)
+    modules_cur = node_collection.find({'member_of': gst_module_id ,'status':'PUBLISHED'}).sort('last_update', -1)
 
     module_unit_ids = [val for each_module in modules_cur for val in each_module.collection_set ]
 
     modules_cur.rewind()
     # modules_page_cur = paginator.Paginator(modules_cur, page_no, GSTUDIO_NO_OF_OBJS_PP)
 
+
+    gstaff_access = check_is_gstaff(group_id,request.user)
+    draft_query = {'member_of': gst_base_unit_id,
+              '_id': {'$nin': module_unit_ids},
+              'status':'PUBLISHED',
+                }
+    if not gstaff_access:
+        draft_query.update({'$or': [
+              {'created_by': request.user.id},
+              {'group_admin': request.user.id},
+              {'author_set': request.user.id},
+              # No check on group-type PUBLIC for DraftUnits.
+              # {'group_type': 'PUBLIC'}
+              ]})
+
+    base_unit_cur = node_collection.find(draft_query).sort('last_update', -1)
+    # print "\nbase: ", base_unit_cur.count()
+
+    '''
     base_unit_cur = node_collection.find({'member_of': gst_base_unit_id,
                                           '_id': {'$nin': module_unit_ids},
                                           'status':'PUBLISHED',
@@ -322,9 +349,14 @@ def explore_drafts(request):
                                           {'created_by': request.user.id},
                                           {'group_admin': request.user.id},
                                           {'author_set': request.user.id},
-                                          {'group_type': 'PUBLIC'}
+                                          # {'group_type': 'PUBLIC'}
                                           ]}).sort('last_update', -1)
+<<<<<<< HEAD
     # base_unit_page_cur = paginator.Paginator(base_unit_cur, page_no, GSTUDIO_NO_OF_OBJS_PP)
+=======
+    '''
+    base_unit_page_cur = paginator.Paginator(base_unit_cur, page_no, GSTUDIO_NO_OF_OBJS_PP)
+>>>>>>> 01dc04a36f65bc88020d25871f48c2bad9710e45
 
     context_variable = {
                         'title': title, 'modules_cur': modules_cur,

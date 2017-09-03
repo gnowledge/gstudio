@@ -2057,6 +2057,7 @@ def activity_player_detail(request, group_id, lesson_id, activity_id):
     else:
         lesson_name  = lesson_node.name 
     # all metadata reg position and next prev of resource
+    translation_obj = node_obj.get_relation('translation_of')
 
     resource_index = resource_next_id = resource_prev_id = None
     resource_count = len(lesson_obj_collection_set)
@@ -2087,6 +2088,9 @@ def activity_player_detail(request, group_id, lesson_id, activity_id):
         'node': node_obj, 'lesson_node': lesson_node, 'activityid': ObjectId(activity_id),
         'resource_index': resource_index, 'resource_next_id': resource_next_id,
         'resource_prev_id': resource_prev_id, 'resource_count': resource_count,
+
+        'translation': translation_obj, 'unit_resources_list_of_dict': unit_resources_list_of_dict,
+
         # 'unit_resources_list_of_dict': unit_resources_list_of_dict,
         'trans_node':trans_node,
         'act_list':trans_act_list,
@@ -2193,7 +2197,7 @@ def course_content(request, group_id):
         template = 'ndf/basecourse_group.html'
     if 'base_unit' in group_obj.member_of_names_list:
         template = 'ndf/gevent_base.html'
-    if 'announced_unit' in group_obj.member_of_names_list:
+    if 'announced_unit' in group_obj.member_of_names_list or 'Group' in group_obj.member_of_names_list and 'base_unit' not in group_obj.member_of_names_list:
         template = 'ndf/lms.html'
     banner_pic_obj,old_profile_pics = _get_current_and_old_display_pics(group_obj)
     if request.user.is_authenticated():
@@ -2225,7 +2229,7 @@ def course_notebook(request, group_id, node_id=None, tab="my-notes"):
     if 'base_unit' in group_obj.member_of_names_list:
         template = 'ndf/gevent_base.html'
 
-    if 'announced_unit' in group_obj.member_of_names_list:
+    if 'announced_unit' in group_obj.member_of_names_list or 'Group' in group_obj.member_of_names_list and 'base_unit' not in group_obj.member_of_names_list:
         template = 'ndf/lms.html'
 
     # page_gst = node_collection.one({'_type': "GSystemType", 'name': "Page"})
@@ -2265,12 +2269,12 @@ def course_notebook(request, group_id, node_id=None, tab="my-notes"):
         user_id = request.user.id
 
     blog_pages = node_collection.find({'member_of':page_gst_id, 'type_of': blog_page_gst_id,
-     'group_set': group_obj._id, 'created_by': {'$ne': user_id}},{'_id': 1, 'created_at': 1, 'created_by': 1, 'name': 1, 'content': 1}).sort('created_at', -1)
+     'group_set': group_obj._id, 'created_by': {'$ne': user_id}}).sort('created_at', -1)
     # print "\n -- blog --",blog_pages.count()
 
     if user_id:
         user_blogs = node_collection.find({'member_of':page_gst_id, 'type_of': blog_page_gst_id,
-         'group_set': group_obj._id, 'created_by': user_id },{'_id': 1, 'created_at': 1, 'created_by': 1, 'name': 1, 'content': 1}).sort('created_at', -1)
+         'group_set': group_obj._id, 'created_by': user_id }).sort('created_at', -1)
         # print "\n -- user --",user_blogs.count()
 
     if node_id:
@@ -2435,7 +2439,7 @@ def course_raw_material(request, group_id, node_id=None,page_no=1):
         allow_to_upload = True
     template = 'ndf/gcourse_event_group.html'
     
-    if "announced_unit" in group_obj.member_of_names_list:
+    if "announced_unit" in group_obj.member_of_names_list or "Group" in group_obj.member_of_names_list:
         template = 'ndf/lms.html'
         assets_page_info = paginator.Paginator(asset_nodes, page_no, GSTUDIO_NO_OF_OBJS_PP)
         context_variables.update({'assets_page_info':assets_page_info})
@@ -2522,8 +2526,8 @@ def course_gallery(request, group_id,node_id=None,page_no=1):
             'group_set': {'$all': [ObjectId(group_id)]},'tags': "asset@gallery"}).sort('last_update', -1)
     
     template = 'ndf/gcourse_event_group.html'
-    if "announced_unit" in group_obj.member_of_names_list:
-        assets_page_info = paginator.Paginator(asset_nodes, page_no, GSTUDIO_NO_OF_OBJS_PP)
+    
+    if "announced_unit" in group_obj.member_of_names_list or "Group" in group_obj.member_of_names_list and 'base_unit' not in group_obj.member_of_names_list:
         template = 'ndf/lms.html'
         context_variables.update({'assets_page_info':assets_page_info})
     
@@ -2575,7 +2579,7 @@ def course_about(request, group_id):
         context_variables.update({'educationalsubject_val': educationalsubject,
             "educationallevel_val": educationallevel})
     
-    if 'announced_unit' in group_obj.member_of_names_list:
+    if 'announced_unit' in group_obj.member_of_names_list or 'Group' in group_obj.member_of_names_list and 'base_unit' not in group_obj.member_of_names_list:
         template = 'ndf/lms.html'
     
     banner_pic_obj,old_profile_pics = _get_current_and_old_display_pics(group_obj)
@@ -3570,7 +3574,80 @@ def delete_activity_page(request, group_id):
     return HttpResponse('fail')
 
 
+<<<<<<< HEAD
 
+=======
+def _get_unit_hierarchy(unit_group_obj,lang="en"):
+    '''
+    ARGS: unit_group_obj
+    Result will be of following form:
+    {
+        name: 'Lesson1',
+        type: 'lesson',
+        id: 'l1',
+        activities: [
+            {
+                name: 'Activity 1',
+                type: 'activity',
+                id: 'a1'
+            },
+            {
+                name: 'Activity 1',
+                type: 'activity',
+                id: 'a2'
+            }
+        ]
+    }, {
+        name: 'Lesson2',
+        type: 'lesson',
+        id: 'l2',
+        activities: [
+            {
+                name: 'Activity 1',
+                type: 'activity',
+                id: 'a1'
+            }
+        ]
+    }
+    '''
+    # n = node_collection.one({'_id': ObjectId('593043c64a82533fc27b78f8')})
+    # trans_act_list = get_lang_node(n._id,request.LANGUAGE_CODE)
+    # for each in trans_act_list:
+    #     for k,v in trans_act_list.iteritems():
+    #         lesson_dict = {}
+    #         lesson
+
+    unit_structure = []
+    for each in unit_group_obj.collection_set:
+        lesson_dict ={}
+        lesson = Node.get_node_by_id(each)
+        if lesson:
+            trans_lesson = get_lang_node(lesson._id,lang)
+            if trans_lesson:
+                lesson_dict['label'] = trans_lesson.name
+            else:
+                lesson_dict['label'] = lesson.name
+            lesson_dict['id'] = lesson._id
+            lesson_dict['type'] = 'unit-name'
+            lesson_dict['children'] = []
+            if lesson.collection_set:
+                for each_act in lesson.collection_set:
+                    activity_dict ={}
+                    activity = Node.get_node_by_id(each_act)
+                    if activity:
+                        trans_act_name = get_lang_node(each_act,lang)
+                        if trans_act_name:
+                            activity_dict['label'] = trans_act_name.altnames or trans_act_name.name
+                            # activity_dict['label'] = trans_act_name.name
+                        else:
+                            # activity_dict['label'] = activity.name
+                            activity_dict['label'] = activity.altnames or activity.name
+                        activity_dict['type'] = 'activity-group'
+                        activity_dict['id'] = str(activity._id)
+                        lesson_dict['children'].append(activity_dict)
+            unit_structure.append(lesson_dict)
+    return unit_structure
+>>>>>>> 01dc04a36f65bc88020d25871f48c2bad9710e45
 
 def widget_page_create_edit(request, group_id, node_id=None):
     node_id = request.GET.get('node_id', None)
@@ -3614,6 +3691,7 @@ def widget_page_create_edit(request, group_id, node_id=None):
     return render_to_response(template, req_context)
 
 
+<<<<<<< HEAD
 # def get_lang_node(node_id,lang):
 #     rel_value = get_relation_value(ObjectId(node_id),"translation_of")
 #     for each in rel_value['grel_node']:
@@ -3634,6 +3712,28 @@ def widget_page_create_edit(request, group_id, node_id=None):
 #             trans_node_list.append({ObjectId(node._id): {"name": node.name, "basenodeid":ObjectId(node._id)}})
 #     if trans_node_list:
 #         return trans_node_list
+=======
+def get_lang_node(node_id,lang):
+    rel_value = get_relation_value(ObjectId(node_id),"translation_of")
+    for each in rel_value['grel_node']:
+        if each.language[0] ==  get_language_tuple(lang)[0]:
+            trans_node = each
+            return trans_node
+
+def get_trans_node_list(node_list,lang):
+    trans_node_list = []
+    for each in node_list:
+        each_node = get_lang_node(each,lang)
+        if each_node :  
+            # trans_node_list.append({ObjectId(each_node._id): {"name":(each_node.altnames or each_node.name),"basenodeid":ObjectId(each)}})
+            trans_node_list.append({ObjectId(each_node._id): {"name": each_node.name, "altnames": each_node.altnames, "basenodeid":ObjectId(each)}})
+        else:
+            node = node_collection.one({"_id":ObjectId(each)})
+            # trans_node_list.append({ObjectId(node._id): {"name":(node.altnames or node.name),"basenodeid":ObjectId(node._id)}})
+            trans_node_list.append({ObjectId(node._id): {"name": node.name,"altnames": node.altnames, "basenodeid":ObjectId(node._id)}})
+    if trans_node_list:
+        return trans_node_list
+>>>>>>> 01dc04a36f65bc88020d25871f48c2bad9710e45
 
 @get_execution_time
 def course_quiz_data(request, group_id):

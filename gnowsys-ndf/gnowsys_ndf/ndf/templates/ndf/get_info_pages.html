@@ -17,7 +17,7 @@
               Help Topic {% endif %}
               </span>
                 <span class="related-content-title">
-                  <i class="fa fa-caret-right"></i>&nbsp;{{each_help_page.name}}
+                  <i class="fa fa-caret-right"></i>&nbsp;{% firstof each_help_page.altnames each_help_page.name %}
                   <div class="related-content-close">&times;</div>
                 </span>
                 
