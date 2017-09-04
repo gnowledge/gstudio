@@ -21,21 +21,22 @@
 - "language"*: Language code in ISO 639-2 standard. (e.g: ["hi", "Hindi"])
 - "content": Description/content of resource.
 - "if_file": Contains information of media urls in nested dictionary. Following is schema of if_file:
-        ```
-        {
+       <PRE>
+        {
             'mime_type': <MIME type of resource>,
             'original': {'id': <Id>, 'relurl': <relative url of media file>},
             'mid': {'id': <Id>, 'relurl': <relative url of media file>},
             'thumbnail': {'id': <Id>, 'relurl': <relative url of media file>}
         }
-        ```
+        </PRE>
 - mime_type: Indicates MIME type of resource.
 - original: URL of original/uploaded file.
 - mid: URL of mid/converted form of original file. This can be mid-size image for images and `.webm` for videos. Blank for other resource types. 
 - thumbnail: Thumbnail of uploaded resource (mostly it's available for images and videos).
   - e.g: 
-        ```
-        {
+        
+      <PRE>
+      {
             "mime_type": "video/mp4",
             "original": {
                     "id": "59a90dd2738242080c921465",
@@ -50,7 +51,7 @@
                     "relurl": "6/8/5/d331ff73b657ccd2326354aff03be08d692b0a26ba92ef22295144a49abdc.png"
                 }
         }
-        ```
+        <PRE>
 - "tags": Tokens of concerned informative identifiers to describe resource.
 - "location": List of GeoJson format JSON.
 - "legal": Dictionary of "copyright" and "License".
