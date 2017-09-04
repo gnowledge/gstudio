@@ -24,7 +24,7 @@ from gnowsys_ndf.ndf.models import node_collection,triple_collection
 from gnowsys_ndf.ndf.views.methods import get_group_name_id
 
 
-def api_get_group_gst_nodes(request, group_name_or_id, gst_name_or_id):
+def api_get_group_gst_nodes(request, group_name_or_id):
     # GET: api/v1/<group_id>/<files>/<nroer_team>/
     # import ipdb; ipdb.set_trace()
     exception_occured = ''
@@ -35,12 +35,6 @@ def api_get_group_gst_nodes(request, group_name_or_id, gst_name_or_id):
         group_name, group_id = get_group_name_id(group_name_or_id)
         oid_name_dict[group_id] = group_name
 
-    try:
-        gst_id = ObjectId(gst_name_or_id)
-    except Exception as e:
-        gst_name, gst_id = GSystemType.get_gst_name_id(gst_name_or_id)
-        oid_name_dict[gst_id] = gst_name
-
     gsystem_structure_dict = GSystem.structure
     gsystem_keys = gsystem_structure_dict.keys()
 
@@ -49,18 +43,17 @@ def api_get_group_gst_nodes(request, group_name_or_id, gst_name_or_id):
     # "relation_set": 1, "attribute_set": 1, 
      }
 
-    sample_gs = GSystem()
-    attributes = sample_gs.get_possible_attributes([gst_id]) 
-
     query_dict = {
                     '_type': 'GSystem',
                     'group_set': ObjectId(group_id),
-                    'member_of': ObjectId(gst_id),
-                    # 'created_by': user_id,
                     'status': u'PUBLISHED',
                     'access_policy': 'PUBLIC',
-                    # 'if_file.mime_type': {'$regex': 'video', '$options': 'i'}
+                    # 'member_of': ObjectId(gst_id),
+                    # 'created_by': user_id,
                 }
+
+    sample_gs = GSystem()
+    attributes = {}
 
     # GET parameters:
     get_parameters_dict = request.GET.dict()
@@ -81,7 +74,15 @@ def api_get_group_gst_nodes(request, group_name_or_id, gst_name_or_id):
         else:
             return HttpResponse('Requested user does not exists.', content_type='text/plain')
 
-    # get_resource_type = request.GET.get('resource_type', None)
+    get_resource_type = request.GET.get('resource_type', None)
+    if get_resource_type:
+        try:
+            gst_id = ObjectId(get_resource_type)
+        except Exception as e:
+            gst_name, gst_id = GSystemType.get_gst_name_id(get_resource_type)
+            oid_name_dict[gst_id] = gst_name
+            get_parameters_dict['member_of'] = gst_id
+            attributes = sample_gs.get_possible_attributes([gst_id]) 
 
     for key, val in get_parameters_dict.iteritems():
         # if ('gs_' in key):
@@ -89,12 +90,12 @@ def api_get_group_gst_nodes(request, group_name_or_id, gst_name_or_id):
         stripped_key = key.split('.')[0]
         if stripped_key in gsystem_keys:
             # query_dict.update({key: {'$regex': val, '$options': 'i'}})
-            query_dict.update({key: (val if isinstance(val, int) else {'$regex': val, '$options': 'i'}) })
+            query_dict.update({key: ({'$regex': val, '$options': 'i'} if isinstance(val, basestring or unicode) else val) })
 
         elif stripped_key in gst_attributes(gst_id):
             query_dict.update({('attribute_set.' + stripped_key): {'$regex': val, '$options': 'i'}})
 
-    print query_dict
+    print "query_dict: ", query_dict
 
     human = eval(request.GET.get('human', '1'))
 
