@@ -7,7 +7,7 @@
 <div class="row group_content">
     <div class="small-12 columns group_sections_content top-margin-translation">
 
-        <h2> {{node.name}} </h2>
+        <h2> {% firstof node.altnames node.name %}</h2>
 
         {% include 'ndf/node_ajax_content.html' %}
         <hr/>

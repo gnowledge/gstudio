@@ -902,7 +902,7 @@ def get_inner_collection(collection_list, node, no_res=False):
               #   # print "\n completed_ids -- ",completed_ids
               #   # print "\n\n col_obj ---- ", col_obj.name, " - - ",col_obj.member_of_names_list, " -- ", col_obj._id
               # else:
-              inner_sub_dict = {'name': col_obj.name, 'id': col_obj.pk,'node_type': node_type}
+              inner_sub_dict = {'name': col_obj.name, 'id': col_obj.pk,'node_type': node_type,"type":"division"}
               inner_sub_list = [inner_sub_dict]
               inner_sub_list = get_inner_collection(inner_sub_list, col_obj, no_res)
               # if "CourseSubSectionEvent" == node_type:
@@ -942,22 +942,23 @@ def get_inner_collection(collection_list, node, no_res=False):
 @get_execution_time
 def get_collection(request, group_id, node_id, no_res=False):
   try:
-    cache_key = u'get_collection' + unicode(group_id) + "_" + unicode(node_id)
-    cache_result = cache.get(cache_key)
-    if cache_result:
-      return HttpResponse(cache_result)
+    # cache_key = u'get_collection' + unicode(group_id) + "_" + unicode(node_id)
+    # cache_result = cache.get(cache_key)
+    # if cache_result:
+    #   return HttpResponse(cache_result)
 
     node = node_collection.one({'_id':ObjectId(node_id)})
     # print "\nnode: ",node.name,"\n"
     collection_list = []
     gstaff_access = False
     gstaff_access = check_is_gstaff(group_id,request.user)
-
     for each in node.collection_set:
       obj = node_collection.one({'_id': ObjectId(each) })
       if obj:
         node_type = node_collection.one({'_id': ObjectId(obj.member_of[0])}).name
-        collection_list.append({'name':obj.name,'id':obj.pk,'node_type':node_type})
+        # print "000000000000000000000",node.name
+        
+        collection_list.append({'name':obj.name,'id':obj.pk,'node_type':node_type,'type' : "branch"})
         # collection_list = get_inner_collection(collection_list, obj, gstaff_access, completed_ids_list, incompleted_ids_list)
         if "BaseCourseGroup" in node.member_of_names_list:
           no_res = True
@@ -965,7 +966,7 @@ def get_collection(request, group_id, node_id, no_res=False):
     data = collection_list
     updated_data = []
     # print data
-    cache.set(cache_key, json.dumps(data), 60*15)
+    # cache.set(cache_key, json.dumps(data), 60*15)
 
     return HttpResponse(json.dumps(data))
 
@@ -1008,11 +1009,20 @@ def add_sub_themes(request, group_id):
 def add_theme_item(request, group_id):
   if request.is_ajax() and request.method == "POST":
 
+    existing_id = request.POST.get("existing_id", '')
+      
     context_theme_id = request.POST.get("context_theme", '')
     name =request.POST.get('name','')
+    parent_node_id =request.POST.get('parent_id','')
+    is_topic =request.POST.get('is_topic','')
 
     context_theme = node_collection.one({'_id': ObjectId(context_theme_id) })
-
+    if existing_id:
+      existing_node = Node.get_node_by_id(ObjectId(existing_id))
+      if existing_node:
+        existing_node.name = unicode(name)
+        existing_node.save()
+        return HttpResponse("success")
     list_theme_items = []
     if name and context_theme:
 
@@ -1022,12 +1032,17 @@ def add_theme_item(request, group_id):
           return HttpResponse("failure")
 
       theme_item_node = node_collection.collection.GSystem()
-
-      theme_item_node.save(is_changed=get_node_common_fields(request, theme_item_node, group_id, theme_item_GST),groupid=group_id)
+      if is_topic == "True":
+        theme_item_node.save(is_changed=get_node_common_fields(request, theme_item_node, group_id, topic_GST),groupid=group_id)
+      else:
+        theme_item_node.save(is_changed=get_node_common_fields(request, theme_item_node, group_id, theme_item_GST),groupid=group_id)
       theme_item_node.reload()
 
       # Add this theme item into context theme's collection_set
-      node_collection.collection.update({'_id': context_theme._id}, {'$push': {'collection_set': ObjectId(theme_item_node._id) }}, upsert=False, multi=False)
+      if parent_node_id:
+        node_collection.collection.update({'_id': ObjectId(parent_node_id)}, {'$push': {'collection_set': ObjectId(theme_item_node._id) }}, upsert=False, multi=False)
+      else:
+        node_collection.collection.update({'_id': context_theme._id}, {'$push': {'collection_set': ObjectId(theme_item_node._id) }}, upsert=False, multi=False)
       context_theme.reload()
 
     return HttpResponse("success")
@@ -6598,6 +6613,7 @@ def get_group_templates_page(request, group_id):
   variable = RequestContext(request, {'templates_cur':templates_cur })
   return render_to_response(template, variable)
 
+'''
 @login_required
 def get_group_pages(request, group_id):
     except_collection_set_of_id = request.GET.get('except_collection_set_of_id', None)
@@ -6618,6 +6634,42 @@ def get_group_pages(request, group_id):
     template = "ndf/group_pages.html"
     card_class = 'activity-page'
     variable = RequestContext(request, {'cursor': pages_cur, 'groupid': group_id, 'group_id': group_id, 'card_class': card_class })
+    return render_to_response(template, variable)
+'''
+
+@login_required
+def get_group_resources(request, group_id, res_type="Page"):
+    except_collection_set = []
+    res_cur = None
+    template = "ndf/group_pages.html"
+    card_class = 'activity-page'
+
+    try:
+        res_query = {'_type': 'GSystem', 'group_set': ObjectId(group_id)}
+        except_collection_set_of_id = request.GET.get('except_collection_set_of_id', None)
+
+        except_collection_set_of_obj = Node.get_node_by_id(except_collection_set_of_id)
+        if except_collection_set_of_obj:
+            except_collection_set = except_collection_set_of_obj.collection_set
+            if except_collection_set:
+                res_query.update({'_id': {'$nin': except_collection_set}})
+        if res_type.lower() == "page":
+            gst_page_name, gst_page_id = GSystemType.get_gst_name_id('Page')
+            gst_blog_type_name, gst_blog_type_id = GSystemType.get_gst_name_id("Blog page")
+            gst_info_type_name, gst_info_type_id = GSystemType.get_gst_name_id("Info page")
+            res_query.update({'type_of': {'$nin': [gst_blog_type_id, gst_info_type_id]}})
+            res_query.update({'member_of': gst_page_id})
+
+        elif res_type.lower() == "quiz":
+            gst_quizitem_name, gst_quizitem_id = GSystemType.get_gst_name_id('QuizItem')
+            gst_quizitemevent_name, gst_quizitemevent_id = GSystemType.get_gst_name_id('QuizItemEvent')
+            res_query.update({'member_of': {"$in": [gst_quizitem_id, gst_quizitemevent_id]}})
+        res_cur = node_collection.find(res_query).sort('last_update', -1)
+    except Exception as get_group_resources_err:
+      print "\n Error occurred in get_group_resources(). Error: {0}".format(str(get_group_resources_err))
+      pass
+
+    variable = RequestContext(request, {'cursor': res_cur, 'groupid': group_id, 'group_id': group_id, 'card_class': card_class })
     return render_to_response(template, variable)
 
 def get_info_pages(request, group_id):
@@ -6703,16 +6755,16 @@ def add_asset(request,group_id):
       group_name, group_id = get_group_name_id(group_id)
   group_obj = Group.get_group_name_id(group_id, get_obj=True)
 
-  # topic_gst = node_collection.one({'_type': 'GSystemType', 'name': 'Topic'})
-  # topic_nodes = node_collection.find({'member_of': {'$in': [topic_gst._id]}})
+  topic_gst = node_collection.one({'_type': 'GSystemType', 'name': 'Topic'})
+  topic_nodes = node_collection.find({'member_of': {'$in': [topic_gst._id]}})
   context_variables = {'group_id':group_id, 'groupid':group_id,'edit': False}
   node_id = request.GET.get('node_id', None)
   title = request.GET.get('title', None)
   node_obj = node_collection.one({'_id': ObjectId(node_id)})
   if node_obj:
-    context_variables.update({'asset_obj': node_obj})
+    context_variables.update({'asset_obj': node_obj,'topic_nodes':topic_nodes})
     context_variables.update({'edit': True})
-  context_variables.update({'group_obj': group_obj,'title':title})
+  context_variables.update({'group_obj': group_obj,'title':title,'topic_nodes':topic_nodes})
   return render_to_response("ndf/add_asset.html",RequestContext(request,
     context_variables))
 
@@ -6726,6 +6778,8 @@ def create_edit_asset(request,group_id):
       group_name, group_id = get_group_name_id(group_id)
   
   group_obj = Group.get_group_name_id(group_id, get_obj=True)
+  selected_topic =  request.POST.get("topic_list", '')
+  # selected_topic_list =  request.POST.getlist("coll_arr[]", '')
   
   if request.method == "POST":
     asset_name =  str(request.POST.get("asset_name", '')).strip()
@@ -6750,6 +6804,12 @@ def create_edit_asset(request,group_id):
 
 
     asset_obj.fill_gstystem_values(tags=tags)
+    
+    rt_teaches = node_collection.one({'_type': "RelationType", 'name': unicode("teaches")})
+    
+    if selected_topic:
+      # selected_topic_list = map(ObjectId,selected_topic_list)
+      create_grelation(asset_obj._id,rt_teaches,ObjectId(selected_topic))
     
     if "asset@asset" not in asset_obj.tags and "base_unit" in group_obj.member_of_names_list:
       asset_obj.tags.append(u'asset@asset')
@@ -6944,18 +7004,23 @@ def get_interaction_widget(request, group_id):
             context_instance=RequestContext(request)) 
 
 def save_interactions(request, group_id):
+  group_obj = get_group_name_id(group_id, get_obj=True)
   node_id = request.POST.get('node_id', None)
   node  = node_collection.one({"_id":ObjectId(node_id)})
 
   thread_create_val = request.POST.get("thread_create",'')
 
   # print "\n\n help_info_page  === ", help_info_page
-  player_discussion_enable_at = node_collection.one({"_type": "AttributeType", "name": "player_discussion_enable"})
+  group_obj_member_of_names_list= group_obj.member_of_names_list
+  if "base_unit" in group_obj_member_of_names_list:
+    discussion_enable_at = node_collection.one({"_type": "AttributeType", "name": "player_discussion_enable"})
+  else:
+    discussion_enable_at = node_collection.one({"_type": "AttributeType", "name": "discussion_enable"})
   if thread_create_val == "Yes":
-    create_gattribute(node._id, player_discussion_enable_at, True)
+    create_gattribute(node._id, discussion_enable_at, True)
     return_status = create_thread_for_node(request,group_id, node)
   else:
-    create_gattribute(node._id, player_discussion_enable_at, False)
+    create_gattribute(node._id, discussion_enable_at, False)
   return HttpResponseRedirect(reverse('view_course_page', kwargs={'group_id':ObjectId(group_id),'page_id': ObjectId(node._id)}))
   
 
@@ -7051,3 +7116,13 @@ def get_rating_template(request, group_id):
               "group_id":group_id,"node":node_obj,"if_comments":is_comments,'nodeid':node_obj._id,
             },
             context_instance=RequestContext(request))
+
+@get_execution_time
+def delete_curriculum_node(request, group_id):
+    node_id = request.POST.get('node_id', None)
+    node_obj = Node.get_node_by_id(node_id)
+    if node_obj:
+      trash_resource(request,ObjectId(group_id),ObjectId(node_id))
+      trash_resource(request,ObjectId(group_id),ObjectId(node_id))
+      return HttpResponse("Success")
+

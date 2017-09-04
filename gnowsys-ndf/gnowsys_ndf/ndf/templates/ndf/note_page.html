@@ -8,7 +8,7 @@
 {% include 'ndf/widget_user_access_modal.html' %}
 
     <div class="row note-toolbar">
-        <div class="small-12 medium-10 columns">
+        <div class="small-10 medium-9 columns">
 
             <div class="row">
                 <div class="small-12 columns">
@@ -72,7 +72,7 @@
                 </div>
             </div>
         </div>
-        <div class="small-12 medium-2 columns creator-rating">
+        <div class="small-12 medium-11 columns creator-rating">
             {% if is_gstaff or node.created_by == request.user.id %}
 
                <a class="edit-note-btn" data-note-id="{{node.pk}}"><i class ="fi-pencil"></i>{% trans "Edit" %}</a> 

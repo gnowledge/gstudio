@@ -9,7 +9,7 @@
 {% block body_content %}
 {% check_is_gstaff group_id request.user as is_gstaff %}
 {% user_access_policy groupid request.user as user_access_priv %}
-    {% get_group_object groupid as group_object %}
+{% get_group_object groupid as group_object %}
 
 
 <style type="text/css">
@@ -74,7 +74,7 @@
               <div class="activity-title">
               {% for each in act_list %}
                   {% for k,v in each.items  %}
-                    <li  {% if v.basenodeid == activityid %} class="active" {% endif %}> <a href="{% url 'activity_player_detail' group_id lesson_node.pk v.basenodeid %}"> {{v.name}} </a></li>
+                    <li  {% if v.basenodeid == activityid %} class="active" {% endif %}> <a href="{% url 'activity_player_detail' group_id lesson_node.pk v.basenodeid %}"> {% firstof v.altnames v.name %} </a></li>
                   {% endfor %}
               {% endfor %}
               </div>
@@ -84,10 +84,8 @@
           <div class="small-8 columns">
 
             <div class="course_editor_section">
-             <div class="small-4 columns left">
+              <div class="input_links row" style="margin-left:10px;">
               {% include 'ndf/rating.html'%}
-            </div>
-              <div class="input_links row">
               {% get_relation_value node.pk 'has_help' as grel_help %}
               {% get_relation_value node.pk 'has_admin_page' as grel_admin_page %}
                 {% if grel_help.grel_id  %}
@@ -104,9 +102,37 @@
               {% comment %}
               <a class="translate right"> Translate</a>
               {% endcomment %}
+              
+              {# Adding alternate Language, if present #}
+              {% if translation.count %}
+                  
+            <div>
+                <button href="#" data-dropdown="alt-lang-dd" aria-controls="alt-lang-dd" aria-expanded="false" class="orange-button right" tiny>Alternate Language <i class="fa fa-chevron-down"></i></button><br/>
+
+                <ul id="alt-lang-dd" class="f-dropdown" data-dropdown-content aria-hidden="true" tabindex="-1">
+                {% for  each_trans in translation  %}
+                    <li><a href="#">{{each_trans.language.1}}</a></li>
+                {% endfor %}
+                  </ul>
+
+                {% comment %}
+                  
+            
+                <ul id="drop1" data-dropdown-content class="f-dropdown" aria-hidden="true">
+                {% for each_lang in supported_languages %}
+                    <li><a href="{% url 'translate' group_id source_node_id each_lang %}">{{each_lang}}</a></li>
+                {% endfor %}
+                </ul>
+                {% endcomment %}
+            </div>
+              {% endif %}
+      
+                
+              
+
 
               </div>
-              <div class="activity_page_rendered">
+              <div class="activity_page_rendered buddy_margin">
                 {# {{node.content|safe}} #}
                 {% include "ndf/node_ajax_content.html" with node=trans_node expand_content=True  no_discussion=True hide_breadcrumbs=True %}
               </div>
@@ -132,6 +158,7 @@
         </div>
       </div>
 </div>             
+
 
 
 <script type="text/javascript">
@@ -269,5 +296,14 @@
                     'slow'); }, 1000);
           
       });
+
+  $( "#alt-lang-dd li" ).click(function() {
+
+       
+       $( "#alt-lang-dd" ).foundation('reveal','open');
+       
+      });
+
+  
 </script>
 {% endblock %}

@@ -166,7 +166,10 @@
 						{% else %}
 							<input type="button" class="tiny button radius right-btn secondary disabled" value="{% trans 'Delete' %} {{node.member_of_names_list.0}}" title="{% trans 'You are not authorized for this action' %}">
 						{% endif %}
-
+						
+						<a href="{% url 'uploadDoc' groupid %}" class="tiny expand button radius">
+            				{% trans "Upload File" %}
+      					</a>
 						<!-- Cross Publish -->
 						{% if 'CourseEventGroup' not in group_object.member_of_names_list %}
 							{% if node.created_by == request.user.id or is_gstaff %}
