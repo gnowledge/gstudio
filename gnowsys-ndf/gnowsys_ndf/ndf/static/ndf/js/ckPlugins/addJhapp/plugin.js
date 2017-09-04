@@ -754,7 +754,7 @@ CKEDITOR.plugins.add('addJhapp',
                           $("#insert_Build_An_Atom_en").click(function(event){
                             
 
-                            tool_val = "<a href='/PhET-customized/Build_An_Atom/en/Build_An_Atom.html' target='_blank'><img src='/static/ndf/images/Build an Atom_en.png' alt='Build an Atom_en'  height='1000px' width='1000px' >"
+                            tool_val = "<a href='/PhET-customized/Build_An_Atom/en/Build_An_Atom.html' target='_blank'><img src='/static/ndf/images/BuildanAtom_en.png' alt='Build an Atom_en'  height='1000px' width='1000px' >"
                             
                              CKEDITOR.instances[textAreaId].insertHtml(tool_val);
                             $('#group_imgs_on_modal').foundation('reveal', 'close');
@@ -763,7 +763,7 @@ CKEDITOR.plugins.add('addJhapp',
                           $("#insert_Build_An_Atom_hi").click(function(event){
                             
 
-                            tool_val = "<a href='/PhET-customized/Build_An_Atom/hi/Build_An_Atom.html' target='_blank'><img src='/static/ndf/images/Build an Atom_en.png' alt='Build an Atom_en'  height='1000px' width='1000px' >"
+                            tool_val = "<a href='/PhET-customized/Build_An_Atom/hi/Build_An_Atom.html' target='_blank'><img src='/static/ndf/images/BuildanAtom_en.png' alt='Build an Atom_en'  height='1000px' width='1000px' >"
                             
                              CKEDITOR.instances[textAreaId].insertHtml(tool_val);
                             $('#group_imgs_on_modal').foundation('reveal', 'close');
@@ -772,7 +772,7 @@ CKEDITOR.plugins.add('addJhapp',
                           $("#insert_Build_An_Atom_te").click(function(event){
                             
 
-                            tool_val = "<a href='/PhET-customized/Build_An_Atom/te/Build_An_Atom.html' target='_blank'><img src='/static/ndf/images/Build an Atom_en.png' alt='Build an Atom_en'  height='1000px' width='1000px' >"
+                            tool_val = "<a href='/PhET-customized/Build_An_Atom/te/Build_An_Atom.html' target='_blank'><img src='/static/ndf/images/BuildanAtom_en.png' alt='Build an Atom_en'  height='1000px' width='1000px' >"
                             
                              CKEDITOR.instances[textAreaId].insertHtml(tool_val);
                             $('#group_imgs_on_modal').foundation('reveal', 'close');
@@ -781,7 +781,7 @@ CKEDITOR.plugins.add('addJhapp',
                           $("#insert_Build_A_Molecule_en").click(function(event){
                             
 
-                            tool_val = "<a href='/PhET-customized/Build_An_Molecule/en/Build_An_Molecule.html' target='_blank'><img src='/static/ndf/images/Build a Molecule_en.png' alt='Build an Atom_en'  height='1000px' width='1000px' >"
+                            tool_val = "<a href='/PhET-customized/Build_An_Molecule/en/Build_An_Molecule.html' target='_blank'><img src='/static/ndf/images/BuildaMolecule_en.png' alt='Build an Atom_en'  height='1000px' width='1000px' >"
                             
                              CKEDITOR.instances[textAreaId].insertHtml(tool_val);
                             $('#group_imgs_on_modal').foundation('reveal', 'close');
@@ -790,7 +790,7 @@ CKEDITOR.plugins.add('addJhapp',
                           $("#insert_Build_A_Molecule_hi").click(function(event){
                             
 
-                            tool_val = "<a href='/PhET-customized/Build_An_Molecule/hi/Build_An_Molecule.html' target='_blank'><img src='/static/ndf/images/Build a Molecule_en.png' alt='Build an Atom_en'  height='1000px' width='1000px' >"
+                            tool_val = "<a href='/PhET-customized/Build_An_Molecule/hi/Build_An_Molecule.html' target='_blank'><img src='/static/ndf/images/BuildaMolecule_en.png' alt='Build an Atom_en'  height='1000px' width='1000px' >"
                             
                              CKEDITOR.instances[textAreaId].insertHtml(tool_val);
                             $('#group_imgs_on_modal').foundation('reveal', 'close');
@@ -799,7 +799,7 @@ CKEDITOR.plugins.add('addJhapp',
                           $("#insert_Build_A_Molecule_te").click(function(event){
                             
 
-                            tool_val = "<a href='/PhET-customized/Build_An_Molecule/te/Build_An_Molecule.html' target='_blank'><img src='/static/ndf/images/Build a Molecule_en.png' alt='Build an Atom_en'  height='1000px' width='1000px' >"
+                            tool_val = "<a href='/PhET-customized/Build_An_Molecule/te/Build_An_Molecule.html' target='_blank'><img src='/static/ndf/images/BuildaMolecule_en.png' alt='Build an Atom_en'  height='1000px' width='1000px' >"
                             
                              CKEDITOR.instances[textAreaId].insertHtml(tool_val);
                             $('#group_imgs_on_modal').foundation('reveal', 'close');
