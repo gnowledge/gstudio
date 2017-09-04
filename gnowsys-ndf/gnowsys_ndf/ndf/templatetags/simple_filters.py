@@ -100,10 +100,11 @@ def joinby(delimiter, arg):
 @stringfilter
 def re_format(value):
     import re
-    value = eval(value)
     l = []
-    for e in value:
-        l.append(re.sub(r'[\r]', '', e))
+    if value:
+        value = eval(value)
+        for e in value:
+            l.append(re.sub(r'[\r]', '', e))
     return l
 
 @get_execution_time
