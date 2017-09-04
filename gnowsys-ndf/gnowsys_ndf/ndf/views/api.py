@@ -18,22 +18,23 @@ from django.contrib.auth.admin import User
 # from django.core.urlresolvers import reverse
 
 ''' -- imports from application folders/files -- '''
-from gnowsys_ndf.ndf.models import GSystemType, GSystem #, Group, Node, GSystem  #, Triple
+from gnowsys_ndf.ndf.models import GSystemType, GSystem , Group  #, Node, GSystem  #, Triple
 from gnowsys_ndf.ndf.models import NodeJSONEncoder
 from gnowsys_ndf.ndf.models import node_collection,triple_collection
 from gnowsys_ndf.ndf.views.methods import get_group_name_id
 
 
-def api_get_group_gst_nodes(request, group_name_or_id):
+def api_get_group_gst_nodes(request):
     # GET: api/v1/<group_id>/<files>/<nroer_team>/
     # import ipdb; ipdb.set_trace()
     exception_occured = ''
     oid_name_dict = {}
-    try:
-        group_id = ObjectId(group_name_or_id)
-    except Exception as e:
-        group_name, group_id = get_group_name_id(group_name_or_id)
-        oid_name_dict[group_id] = group_name
+    gst_id = None
+    # try:
+    #     group_id = ObjectId(group_name_or_id)
+    # except Exception as e:
+    #     group_name, group_id = get_group_name_id(group_name_or_id)
+    #     oid_name_dict[group_id] = group_name
 
     gsystem_structure_dict = GSystem.structure
     gsystem_keys = gsystem_structure_dict.keys()
@@ -45,7 +46,7 @@ def api_get_group_gst_nodes(request, group_name_or_id):
 
     query_dict = {
                     '_type': 'GSystem',
-                    'group_set': ObjectId(group_id),
+                    # 'group_set': ObjectId(group_id),
                     'status': u'PUBLISHED',
                     'access_policy': 'PUBLIC',
                     # 'member_of': ObjectId(gst_id),
@@ -76,13 +77,16 @@ def api_get_group_gst_nodes(request, group_name_or_id):
 
     get_resource_type = request.GET.get('resource_type', None)
     if get_resource_type:
-        try:
-            gst_id = ObjectId(get_resource_type)
-        except Exception as e:
-            gst_name, gst_id = GSystemType.get_gst_name_id(get_resource_type)
-            oid_name_dict[gst_id] = gst_name
-            get_parameters_dict['member_of'] = gst_id
-            attributes = sample_gs.get_possible_attributes([gst_id]) 
+        gst_name, gst_id = GSystemType.get_gst_name_id(get_resource_type)
+        oid_name_dict[gst_id] = gst_name
+        get_parameters_dict['member_of'] = [gst_id]
+        attributes = sample_gs.get_possible_attributes([gst_id]) 
+
+    get_workspace = request.GET.get('workspace', None)
+    if get_workspace:
+        group_name, group_id = Group.get_group_name_id(get_workspace)
+        oid_name_dict[group_id] = group_name
+        get_parameters_dict['group_set'] = [group_id]
 
     for key, val in get_parameters_dict.iteritems():
         # if ('gs_' in key):
@@ -92,10 +96,10 @@ def api_get_group_gst_nodes(request, group_name_or_id):
             # query_dict.update({key: {'$regex': val, '$options': 'i'}})
             query_dict.update({key: ({'$regex': val, '$options': 'i'} if isinstance(val, basestring or unicode) else val) })
 
-        elif stripped_key in gst_attributes(gst_id):
+        elif gst_id and stripped_key in gst_attributes(gst_id):
             query_dict.update({('attribute_set.' + stripped_key): {'$regex': val, '$options': 'i'}})
 
-    print "query_dict: ", query_dict
+    # print "query_dict: ", query_dict
 
     human = eval(request.GET.get('human', '1'))
 
@@ -129,29 +133,25 @@ def api_get_group_gst_nodes(request, group_name_or_id):
         oid_name_dict_cur = node_collection.find({'_id': {'$in': all_oid_list}}, {'name': 1})
         oid_name_dict = {i['_id']: i['name'] for i in oid_name_dict_cur}
 
-
-
         python_cur_list = []
         python_cur_list_append = python_cur_list.append
-        for each_gst in all_resources:
+        for each_gs in all_resources:
 
             # attaching attributes:
             # NEEDS to optimize.
-            for key, value in each_gst.get_possible_attributes(each_gst.member_of).iteritems():
-                each_gst[key] = value['data_type']
-                each_gst[key] = value['object_value']
+            for key, value in each_gs.get_possible_attributes(each_gs.member_of).iteritems():
+                each_gs[key] = value['data_type']
+                each_gs[key] = value['object_value']
 
             # mapping user id to username.
             for each_field in user_fields:
-                each_gst[each_field] = [userid_name_dict[i] for i in each_gst[each_field]] if isinstance(each_gst[each_field], list) else userid_name_dict[each_gst[each_field]]
-
+                each_gs[each_field] = [userid_name_dict.get(i, i) for i in each_gs[each_field]] if isinstance(each_gs[each_field], list) else userid_name_dict.get(each_gs[each_field], each_gs[each_field])
 
             # mapping mongo _id to name.
             for each_field in oid_fields:
-                each_gst[each_field] = [oid_name_dict[i] for i in each_gst[each_field]] if isinstance(each_gst[each_field], list) else oid_name_dict[each_gst[each_field]]
+                each_gs[each_field] = [oid_name_dict.get(i, i) for i in each_gs[each_field]] if isinstance(each_gs[each_field], list) else oid_name_dict[each_gs[each_field]]
 
-
-            python_cur_list_append(each_gst)
+            python_cur_list_append(each_gs)
 
         json_result = json.dumps(python_cur_list, cls=NodeJSONEncoder)
 
