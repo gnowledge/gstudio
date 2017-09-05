@@ -16,11 +16,11 @@
 
 		<div class="row">
 			<div class="quiz_qtn">
-				<b>{{node.content|safe}}</b>
+				<b>{{question_content|safe}}</b>
 
 				<div class="quiz-box quiz_qtn">
 					{% if node.quiz_type == "Single-Choice" %}
-						{% for each_opt in node.options %}
+						{% for each_opt in options_list %}
 							<input type="radio" name="quiz_ans"  value="{{each_opt}}"
 							{% if each_opt in total_and_curr_ans_dict.recent_ans  %}
 							checked
@@ -43,7 +43,7 @@
 						</div>
 						{% endcomment %}
 					{% elif node.quiz_type == "Multiple-Choice" %}
-						{% for each_opt in node.options %}
+						{% for each_opt in options_list %}
 							<input type="checkbox" name="quiz_ans" value="{{each_opt}}"
 							{% if each_opt in total_and_curr_ans_dict.recent_ans %}
 							checked

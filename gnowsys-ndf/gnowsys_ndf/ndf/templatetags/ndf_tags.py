@@ -4077,3 +4077,27 @@ def get_selected_topics(node_id):
 		teaches_grelations_id_list.append(str(each._id))
 		# teaches_grelations_id_list = map(ObjectId,teaches_grelations_id_list)
 	return teaches_grelations_id_list
+
+@register.assignment_tag
+def get_trans_node(node_id,lang):
+    rel_value = get_relation_value(ObjectId(node_id),"translation_of")
+    for each in rel_value['grel_node']:
+        if each.language[0] ==  get_language_tuple(lang)[0]:
+            trans_node = each
+            print "\n\ntrans_node", trans_node
+            return trans_node
+
+@register.assignment_tag
+# @register.inclusion_tag('ndf/quiz_player.html')
+def load_quiz_player(node, lang):
+    from gnowsys_ndf.ndf.views.quiz import render_quiz_player
+    if "QuizItem" in node_obj.member_of_names_list:
+        return render_quiz_player(request, group_id, node_obj)
+    # rel_value = get_relation_value(ObjectId(node._id),"translation_of")
+    # for each in rel_value['grel_node']:
+    #     if each.language[0] ==  get_language_tuple(lang)[0]:
+    #         node = each
+    #         print "\n\nnode", node
+    # return {'template': 'ndf/quiz_player.html',
+    #                 'group_id': group_id, 'groupid': group_id, 'node': node
+    #             }
