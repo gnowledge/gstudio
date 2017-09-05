@@ -2058,6 +2058,7 @@ def activity_player_detail(request, group_id, lesson_id, activity_id):
     else:
         lesson_name  = lesson_node.name 
     # all metadata reg position and next prev of resource
+    translation_obj = node_obj.get_relation('translation_of')
 
     resource_index = resource_next_id = resource_prev_id = None
     resource_count = len(lesson_obj_collection_set)
@@ -2088,6 +2089,9 @@ def activity_player_detail(request, group_id, lesson_id, activity_id):
         'node': node_obj, 'lesson_node': lesson_node, 'activityid': ObjectId(activity_id),
         'resource_index': resource_index, 'resource_next_id': resource_next_id,
         'resource_prev_id': resource_prev_id, 'resource_count': resource_count,
+
+        'translation': translation_obj, 'unit_resources_list_of_dict': unit_resources_list_of_dict,
+
         # 'unit_resources_list_of_dict': unit_resources_list_of_dict,
         'trans_node':trans_node,
         'act_list':trans_act_list,
@@ -2194,7 +2198,7 @@ def course_content(request, group_id):
         template = 'ndf/basecourse_group.html'
     if 'base_unit' in group_obj.member_of_names_list:
         template = 'ndf/gevent_base.html'
-    if 'announced_unit' in group_obj.member_of_names_list:
+    if 'announced_unit' in group_obj.member_of_names_list or 'Group' in group_obj.member_of_names_list and 'base_unit' not in group_obj.member_of_names_list:
         template = 'ndf/lms.html'
     banner_pic_obj,old_profile_pics = _get_current_and_old_display_pics(group_obj)
     if request.user.is_authenticated():
@@ -2226,7 +2230,7 @@ def course_notebook(request, group_id, node_id=None, tab="my-notes"):
     if 'base_unit' in group_obj.member_of_names_list:
         template = 'ndf/gevent_base.html'
 
-    if 'announced_unit' in group_obj.member_of_names_list:
+    if 'announced_unit' in group_obj.member_of_names_list or 'Group' in group_obj.member_of_names_list and 'base_unit' not in group_obj.member_of_names_list:
         template = 'ndf/lms.html'
 
     # page_gst = node_collection.one({'_type': "GSystemType", 'name': "Page"})
@@ -2266,12 +2270,12 @@ def course_notebook(request, group_id, node_id=None, tab="my-notes"):
         user_id = request.user.id
 
     blog_pages = node_collection.find({'member_of':page_gst_id, 'type_of': blog_page_gst_id,
-     'group_set': group_obj._id, 'created_by': {'$ne': user_id}},{'_id': 1, 'created_at': 1, 'created_by': 1, 'name': 1, 'content': 1}).sort('created_at', -1)
+     'group_set': group_obj._id, 'created_by': {'$ne': user_id}}).sort('created_at', -1)
     # print "\n -- blog --",blog_pages.count()
 
     if user_id:
         user_blogs = node_collection.find({'member_of':page_gst_id, 'type_of': blog_page_gst_id,
-         'group_set': group_obj._id, 'created_by': user_id },{'_id': 1, 'created_at': 1, 'created_by': 1, 'name': 1, 'content': 1}).sort('created_at', -1)
+         'group_set': group_obj._id, 'created_by': user_id }).sort('created_at', -1)
         # print "\n -- user --",user_blogs.count()
 
     if node_id:
@@ -2418,7 +2422,7 @@ def course_raw_material(request, group_id, node_id=None,page_no=1):
         allow_to_upload = True
     template = 'ndf/gcourse_event_group.html'
     
-    if "announced_unit" in group_obj.member_of_names_list:
+    if "announced_unit" in group_obj.member_of_names_list or "Group" in group_obj.member_of_names_list:
         template = 'ndf/lms.html'
 
     if 'BaseCourseGroup' in group_obj.member_of_names_list:
@@ -2502,7 +2506,7 @@ def course_gallery(request, group_id,node_id=None,page_no=1):
             'group_set': {'$all': [ObjectId(group_id)]},'tags': "asset@gallery"}).sort('last_update', -1)
     
     template = 'ndf/gcourse_event_group.html'
-    if "announced_unit" in group_obj.member_of_names_list:
+    if "announced_unit" in group_obj.member_of_names_list or "Group" in group_obj.member_of_names_list and 'base_unit' not in group_obj.member_of_names_list:
         template = 'ndf/lms.html'
     
     context_variables.update({'asset_nodes': asset_nodes})
@@ -2553,7 +2557,7 @@ def course_about(request, group_id):
         context_variables.update({'educationalsubject_val': educationalsubject,
             "educationallevel_val": educationallevel})
     
-    if 'announced_unit' in group_obj.member_of_names_list:
+    if 'announced_unit' in group_obj.member_of_names_list or 'Group' in group_obj.member_of_names_list and 'base_unit' not in group_obj.member_of_names_list:
         template = 'ndf/lms.html'
     
     banner_pic_obj,old_profile_pics = _get_current_and_old_display_pics(group_obj)

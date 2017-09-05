@@ -65,6 +65,7 @@ def unit_create_edit(request, group_id, unit_group_id=None):
         content = request.POST.get('content', '')
         tags = request.POST.get('tags', [])
         language = request.POST.get('lan', '')
+        group_type = request.POST.get('group_type', u'PUBLIC')
 
         educationallevel_val = request.POST.get('educationallevel', '')
         educationalsubject_val = request.POST.get('educationalsubject', '')
@@ -144,7 +145,7 @@ def unit_create_edit(request, group_id, unit_group_id=None):
         else:
             tags = []
         # unit_node.tags = tags
-        unit_node.fill_gstystem_values(tags=tags,author_set=unit_node.author_set)
+        unit_node.fill_group_values(group_type=group_type,tags=tags,author_set=unit_node.author_set)
         unit_node.content = content
         tab_name = request.POST.get('tab_name', '')
         section_name = request.POST.get('section_name', '')
@@ -488,8 +489,8 @@ def _get_unit_hierarchy(unit_group_obj,lang="en"):
                 for each_act in lesson.collection_set:
                     activity_dict ={}
                     activity = Node.get_node_by_id(each_act)
-                    trans_act = get_lang_node(activity._id,lang)
                     if activity:
+                        trans_act = get_lang_node(activity._id,lang)
                         if trans_act:
                             # activity_dict['name'] = trans_act.name
                             activity_dict['name'] = trans_act.altnames or trans_act.name

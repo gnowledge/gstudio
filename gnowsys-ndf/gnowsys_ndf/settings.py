@@ -36,6 +36,7 @@ GSTUDIO_EDUCATIONAL_SUBJECTS_AS_GROUPS = False
 
 LANGUAGES = (('en', 'English'), ('hi', u'Hindi'),('te','Telugu'))
 GSTUDIO_DEFAULT_LANGUAGE = ('en', 'English')
+GSTUDIO_WORKSPACE_INSTANCE = False
 OTHER_COMMON_LANGUAGES = [
     ('mr', 'Marathi'), ('mni','Manipuri'), ('ori','Oriya'),
     ('pi','Pali'), ('raj','Rajasthani'), ('gu','Gujarati'),

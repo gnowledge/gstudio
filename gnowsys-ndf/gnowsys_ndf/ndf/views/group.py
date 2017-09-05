@@ -2058,6 +2058,18 @@ def group_dashboard(request, group_id=None):
     old_profile_pics = []
     selected = request.GET.get('selected','')
     group_obj = get_group_name_id(group_id, get_obj=True)
+
+    if "announced_unit" in group_obj.member_of_names_list and group_obj.project_config['tab_name'].lower() == "questions":
+        try:
+            if group_obj.collection_set:
+                lesson_id = group_obj.collection_set[0]
+                lesson_node = node_collection.one({'_id': ObjectId(lesson_id)})
+                activity_id = lesson_node.collection_set[0]
+            return HttpResponseRedirect(reverse('activity_player_detail', kwargs={'group_id': group_id,
+                'lesson_id': lesson_id, 'activity_id': activity_id}))
+        except Exception as e:
+            pass
+
     if ("base_unit" in group_obj.member_of_names_list or
         "CourseEventGroup" in group_obj.member_of_names_list or
         "BaseCourseGroup" in group_obj.member_of_names_list or 
@@ -2180,7 +2192,8 @@ def group_dashboard(request, group_id=None):
       alternate_template = "ndf/gcourse_event_group.html"
       # course_collection_data = get_collection(request,group_obj._id,group_obj._id)
       # course_collection_data = json.loads(course_collection_data.content)
-
+  if 'Group' in group_obj.member_of_names_list:
+    alternate_template = "ndf/lms.html"
   # The line below is commented in order to:
   #     Fetch files_cur - resources under moderation in groupdahsboard.html
   # if  u"ProgramEventGroup" not in group_obj.member_of_names_list:
@@ -2714,6 +2727,8 @@ def upload_using_save_file(request,group_id):
 
     group_obj = node_collection.one({'_id': ObjectId(group_id)})
     title = request.POST.get('context_name','')
+    sel_topic = request.POST.get('topic_list','')
+    
     usrid = request.user.id
     name  = request.POST.get('name')
     # print "\n\n\nusrid",usrid
@@ -2840,7 +2855,8 @@ def upload_using_save_file(request,group_id):
             # # print "++++++++++++++++++++++++++++++++++++++++",asset_node._id
             # asset_content_node = create_assetcontent(ObjectId('58a3dd4cc6bd690400016ae5'),file_node.name,group_id,file_node.created_by)
             # print "---------------------------------------",asset_content_node
-
+            rt_teaches = node_collection.one({'_type': "RelationType", 'name': unicode("teaches")})
+            create_grelation(file_node._id,rt_teaches,ObjectId(sel_topic))
             file_node.save(groupid=group_id,validate=False)
 
             return HttpResponseRedirect( reverse('file_detail', kwargs={"group_id": group_id,'_id':file_node._id}) )
