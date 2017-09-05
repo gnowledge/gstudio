@@ -13,8 +13,23 @@
 
  -->    
     {% include 'ndf/widget_user_access_modal.html' %}
-       {% get_course_filters group_id "assets" as filter_dict %}
-        {% include "ndf/filters.html" with filter_dict=filter_dict %}
+       
+        {% if user.is_authenticated  %}
+            {% if title == "raw material" and is_gstaff %}
+                {% get_course_filters group_id "raw_material_lms" as filter_dict %}
+                {% include "ndf/filters.html" with filter_dict=filter_dict %}
+            {% endif %}
+            {% if title == "gallery"  %}
+                {% get_course_filters group_id "gallery_lms" as filter_dict %}
+                {% include "ndf/filters.html" with filter_dict=filter_dict %}
+            {% endif %}
+            {% if title == "asset_list"  %}
+                {% get_course_filters group_id "assets_lms" as filter_dict %}
+                {% include "ndf/filters.html" with filter_dict=filter_dict %}
+            {% endif %}
+        
+        {% endif %}
+       
         <div class="row">
         {% if user.is_authenticated  %}
             {% if title == "raw material" and is_gstaff %}
@@ -94,7 +109,7 @@ var allImages1 = "";
           data: {
             filter_dict: filtersObjArr,
             'filter_applied': 'True',
-            'title': 'assets'
+            'title': 'raw_material_lms'
           },
           type: "GET",
           dataType: "html",

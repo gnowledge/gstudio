@@ -2732,9 +2732,9 @@ def course_filters(request, group_id):
         query.update({'created_by': {'$in': gstaff_users}})
         no_url_flag = False
         detail_urlname = "course_raw_material_detail"
-    elif title.lower() == "assets":
+    elif title.lower() == "raw_material_lms":
         asset_gst_name, asset_gst_id = GSystemType.get_gst_name_id("Asset")
-        query.update({'member_of':asset_gst_id })
+        query.update({'member_of':asset_gst_id,'tags':'raw@material' })
         no_url_flag = False
         detail_urlname = "course_raw_material_detail"
         template = "ndf/widget_card_list.html"
