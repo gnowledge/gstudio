@@ -66,7 +66,7 @@
 				</div>
 
 				<div class="small-8 large-8 columns left ck-editor-div">
-			  		{% include "ndf/html_editor.html" with var_name="content_org" var_placeholder="Enter the content here" var_value=node.content|default_if_none:"" node_id=node.pk ckeditor_toolbar="GeneralToolbar" %}		  
+			  		{% include "ndf/html_editor.html" with var_name="content_org" var_placeholder="Enter the content here"  var_value=question_content|default_if_none:"" node_id=node.pk ckeditor_toolbar="GeneralToolbar" %}		  
 				</div>
 			</div>
 
@@ -76,7 +76,7 @@
 				</div>
 
 				<div class="small-8 large-8 columns left">
-				{% for option in node.options %}
+				{% for option in options_list %}
 					<div class="row" id="option_div{% if not forloop.first %}_{{forloop.counter}}{% endif %}">
 						<div class="small-1 large-1 columns">
 						<label for="option" class="right inline">{{forloop.counter}}.</label>
@@ -108,7 +108,7 @@
 					<input id="add_option" name="add_option" type="button" class="button small" style="float:right;" value="+ Add Option"/>
 
 				{% endif %}
-				<input id="no_of_options" name="no_of_options" type="hidden" value="{% if node%}{{node.options|length}}{% else %}2{% endif %}" />
+				<input id="no_of_options" name="no_of_options" type="hidden" value="{% if node%}{{options_list|length}}{% else %}2{% endif %}" />
 
 				</div>
 			</div>
@@ -128,7 +128,7 @@
 
 				<div class="quiz-type-based-div small-8 large-8 columns left" id="Single-Choice" style="display:{% if node.quiz_type == "Single-Choice" %}block{% else %}none{% endif %};">
 					<select id="correct_answer_single" name="correct_answer_single" {% if translate %}disabled {% endif %}>
-					{% for option in node.options %}
+					{% for option in options_list %}
 						<option value="{{forloop.counter}}" {% ifequal node.correct_answer.0 option %}selected{% endifequal %} >{{forloop.counter}}</option>
 						{% empty %}
 						<option value="1">1</option>
@@ -140,7 +140,7 @@
 				<div class="quiz-type-based-div small-8 large-8 columns left" id="Multiple-Choice" style="display:{% if node.quiz_type == "Multiple-Choice" %}block{% else %}none{% endif %};">
 					<small>(Press Ctrl to select multiple answers)</small></label>
 					<select id="correct_answer_multiple" name="correct_answer_multiple" {% if translate %}disabled {% endif %} multiple style="height:75px;">
-					{% for option in node.options %}
+					{% for option in options_list %}
 						<option value="{{forloop.counter}}" {% if option in node.correct_answer %}selected{% endif %} >{{forloop.counter}}</option>
 						{% empty %}
 						<option value="1" selected>1</option>

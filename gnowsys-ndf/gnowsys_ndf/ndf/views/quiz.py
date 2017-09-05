@@ -159,12 +159,13 @@ def create_edit_quiz_item(request, group_id, node_id=None, trans_node_id=None, l
     group_object = node_collection.one({'_id': ObjectId(group_id)})
     rt_translation_of = Node.get_name_id_from_type('translation_of', 'RelationType', get_obj=True)
 
-    node = None
-    quiz_node = None
-    quiz_node_id = None
-    quiz_item_node = None
-    existing_grel = translate_grel = translated_node = None
+    node = quiz_node = quiz_node_id = quiz_item_node = None
+    existing_grel = translate_grel = None
 
+    translated_node = Node.get_node_by_id(ObjectId(trans_node_id))
+    print "\ntranslated_node: ", translated_node
+    question_content = None
+    options_list = []
     group_object_member_of_names_list = group_object.member_of_names_list
     gst_quiz_item_node = node_collection.one({'_type': u'GSystemType', 'name': u'QuizItem'})
     if "CourseEventGroup" in group_object_member_of_names_list or "announced_unit" in group_object_member_of_names_list:
@@ -187,7 +188,6 @@ def create_edit_quiz_item(request, group_id, node_id=None, trans_node_id=None, l
     #     quiz_item_node = node_collection.one({'_id': ObjectId(node_id)})
     quiz_node_id = request.GET.get('quiznode','')
     return_url = request.GET.get('return_url','')
-    trans_node_id = None
     if return_url:
         context_variables['return_url'] = return_url
     if quiz_node_id:
@@ -201,19 +201,26 @@ def create_edit_quiz_item(request, group_id, node_id=None, trans_node_id=None, l
         else:
             # Edit a question
             quiz_item_node = node
-    if quiz_item_node:
-        existing_grel = triple_collection.one({
-                                            '_type': 'GRelation',
-                                            'subject': ObjectId(quiz_item_node._id),
-                                            'relation_type': rt_translation_of._id,
-                                            'language': language
-                                        })
+    if translated_node:
+        question_content = translated_node.name
+        options_list = get_quiz_item_options(translated_node)
+        print "\noptions_listRTR: ", options_list
+    else:
+        if quiz_item_node:
+            question_content = quiz_item_node.name
+            options_list = get_quiz_item_options(quiz_item_node)
+            existing_grel = triple_collection.one({
+                                                '_type': 'GRelation',
+                                                'subject': ObjectId(quiz_item_node._id),
+                                                'relation_type': rt_translation_of._id,
+                                                'language': language
+                                            })
 
-        if existing_grel:
-            # get existing translated_node
-            translated_node = Node.get_node_by_id(existing_grel.right_subject)
-            if translated_node:
-                trans_node_id = translated_node._id
+            if existing_grel:
+                # get existing translated_node
+                translated_node = Node.get_node_by_id(existing_grel.right_subject)
+                if translated_node:
+                    trans_node_id = translated_node._id
     if request.method == "POST":
         usrid = int(request.user.id)
         usrname = unicode(request.user.username)
@@ -331,10 +338,11 @@ def create_edit_quiz_item(request, group_id, node_id=None, trans_node_id=None, l
         if node_id:
             if quiz_item_node:
                 quiz_item_node.get_neighbourhood(quiz_item_node.member_of)
-                context_variables['node'] = quiz_item_node
-            context_variables['groupid'] = group_id
-            context_variables['group_id'] = group_id
-            context_variables['translated_node'] = translated_node
+                context_variables.update({'node': quiz_item_node,
+                    'groupid':group_id, 'group_id': group_id,
+                    'translated_node': translated_node,
+                    'question_content': question_content, 
+                    'options_list': options_list })
         return render_to_response("ndf/quiz_item_create_edit.html",
                                   context_variables,
                                   context_instance=RequestContext(request)
@@ -671,6 +679,22 @@ def save_quizitem_answer(request, group_id):
         print "\n Something went wrong while saving quiz answer!!! ", str(e)
         return response_dict
 
+def get_quiz_item_options(node):
+    options_list = []
+    try:
+        for each_attr in node.attribute_set:
+            if 'options' in each_attr:
+                options_list = each_attr['options']
+        if not options_list:
+            triple_obj = triple_collection.one({'subject': node._id, 
+                'attribute_type': options_AT._id})
+            options_list = triple_obj.object_value
+
+    except Exception as no_opt_attr:
+        pass
+        print "\n\nno_opt_attr: ", no_opt_attr
+    # print "\noptions_list: ", options_list
+    return options_list 
 
 def render_quiz_player(request, group_id, node, get_context=False):
     print "\nIN render_quiz_player", node
@@ -680,28 +704,15 @@ def render_quiz_player(request, group_id, node, get_context=False):
             trans_node = get_lang_node(node._id,lang)
             # print "\ntrans_node: ", trans_node
             node.get_neighbourhood(node.member_of)
-            trans_options_list = []
             question_content = node.content
             options_list = node.options
 
             if trans_node:
                 question_content = trans_node.content
-                try:
-                    for each_attr in trans_node.attribute_set:
-                        if 'options' in each_attr:
-                            trans_options_list = each_attr['options']
-                            print "\nTRNAS: ", trans_options_list
-                    if not trans_options_list:
-                        triple_obj = triple_collection.one({'subject': trans_node._id, 
-                            'attribute_type': options_AT._id})
-                        trans_options_list = triple_obj.object_value
-                        print "\nTRNAS 2: ", trans_options_list
-                    print "\ntrans_options_list: ", trans_options_list
-                    if trans_options_list: 
-                        options_list = trans_options_list
+                trans_options_list = get_quiz_item_options(trans_node)
+                if trans_options_list: 
+                    options_list = trans_options_list
 
-                except Exception as no_opt_attr:
-                    print "\n\nno_opt_attr: ", no_opt_attr
             print "\noptions_list: ", options_list
             context_variables = {'node': node, 'question_content': question_content, 
             'options_list': options_list, 'groupid': group_id, 'group_id': group_id}
