@@ -41,7 +41,13 @@ def api_get_gs_nodes(request):
         aggregated_dict = gst_api_fields_dict.copy()
         aggregated_dict.update(api_name_model_name_dict)
         aggregated_dict.pop('_id')
-        return HttpResponse(json.dumps(aggregated_dict.keys()), content_type='application/json')
+
+        query_parameters_dict = {
+                                    'Fields': aggregated_dict.keys(),
+                                    'Attributes': node_collection.find({'_type': 'AttributeType'}).distinct('name'),
+                                    'Relations': node_collection.find({'_type': 'RelationType'}).distinct('name')
+                                }
+        return HttpResponse(json.dumps(query_parameters_dict), content_type='application/json')
 
 
     # GET: api/v1/<group_id>/<files>/<nroer_team>/
