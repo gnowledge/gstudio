@@ -5,35 +5,34 @@
 {% user_groups request.user.is_superuser request.user.id as user_grp_count %}
 {% get_gstudio_workspace_instance as is_workspace_instance %}
 {% if modules_is_cur %}
-	{% rewind_cursor modules_cur as modules_cur %}
+{% rewind_cursor modules_cur as modules_cur %}
 {% endif %}
 {% get_attribute_value group_id 'items_sort_list' as modules_sort_list %}
 {% cast_to_node modules_sort_list as modules_node_sort_list %}
 
 
 <nav class="top-bar-second" data-topbar role="navigation" id="top-bar-second">
-		<div class="small-12 medium-12 columns expore-type">
-			<!--<div class="toggleButtons">-->
-			<div class="title-area">
-				<a href="{% url 'explore_courses' %}" class="secondary-header-tabs  {%if title == 'courses'%} active{% endif %}">
-					{% trans "Courses" %}
-				</a>
-				{% if request.user.is_superuser or user_grp_count.projects > 0  %}
-				<a href="{% url 'explore_groups' %}" class="secondary-header-tabs {%if title == 'workspaces'%} active{% endif %}">
-					{% trans "Workspaces" %}
-				</a>
-				{% endif %}
-				{% if request.user.is_superuser or user_grp_count.drafts > 0  %}
-				<a href="{% url 'explore_drafts' %}" class="secondary-header-tabs {%if title == 'drafts'%} active{% endif %}">
-					{% trans "Drafts Courses" %}
-				</a>
-				{% endif %}
-				
+	<div class="small-12 medium-12 columns expore-type">
+		<!--<div class="toggleButtons">-->
+		<div class="title-area">
+			<a href="{% url 'explore_courses' %}" class="secondary-header-tabs  {%if title == 'courses'%} active{% endif %}">
+				{% trans "Courses" %}
+			</a>
+			{% if request.user.is_superuser or user_grp_count.projects > 0  %}
+			<a href="{% url 'explore_groups' %}" class="secondary-header-tabs {%if title == 'workspaces'%} active{% endif %}">
+				{% trans "Workspaces" %}
+			</a>
+			{% endif %}
+			{% if request.user.is_superuser or user_grp_count.drafts > 0  %}
+			<a href="{% url 'explore_drafts' %}" class="secondary-header-tabs {%if title == 'drafts'%} active{% endif %}">
+				{% trans "Drafts Courses" %}
+			</a>
+			{% endif %}
 
-				{% if is_gstaff  %}
-	            <div class="explore-settings-drop">
-	                <button href="#" data-dropdown="explore-settings" aria-controls="explore-settings" aria-expanded="false" data-options="is_hover:true;align:bottom">{% trans " Options " %}<i class="fa fa-chevron-down"></i></button><br/>
-	                <ul id="explore-settings" data-dropdown-content class="f-dropdown" aria-hidden="true">
+			{% if is_gstaff  %}
+			<div class="explore-settings-drop">
+				<button href="#" data-dropdown="explore-settings" aria-controls="explore-settings" aria-expanded="false" data-options="is_hover:true;align:bottom">{% trans " Options " %}<i class="fa fa-chevron-down"></i></button><br/>
+				<ul id="explore-settings" data-dropdown-content class="f-dropdown" aria-hidden="true">
 					<li>
 						<a href="{% url 'unit_create_edit' group_id %}"> New Unit</i></a>
 					</li>
@@ -44,47 +43,47 @@
 						<a data-reveal-id="sort-module-reveal"> Sort Modules</i></a>
 						<div id="sort-module-reveal" class="reveal-modal large" data-reveal > 
 							<div class="content">
-							<h4>{% trans "Module Display Ordering: " %}</h4>
-							<div>
-								{% include "ndf/widget_selector.html" with for='module_list' all_options=modules_cur selected_options=modules_node_sort_list oneline_element='true' %}
-							</div><br/>
-							<input type="button" id="save_module_order_list" class="right orange-button" value="{% trans 'SAVE' %}">
+								<h4>{% trans "Module Display Ordering: " %}</h4>
+								<div>
+									{% include "ndf/widget_selector.html" with for='module_list' all_options=modules_cur selected_options=modules_node_sort_list oneline_element='true' %}
+								</div><br/>
+								<input type="button" id="save_module_order_list" class="right orange-button" value="{% trans 'SAVE' %}">
 							</div>
 							<a class="close-reveal-modal">&#215;</a>
 						</div>          
 
 					</li>
-	                </ul>
+				</ul>
 
 
-	            </div>    
-				{% endif %}
-				
 			</div>
+			{% endif %}
+
 		</div>
-	</nav>
+	</div>
+</nav>
 <script type="text/javascript">
 	$(document).on('click', '#save_module_order_list', function(e){
-	    getSelValuesHiddenElement('module_list', 'sort-module-reveal')
+		getSelValuesHiddenElement('module_list', 'sort-module-reveal')
 		module_list_ids = $("input[name=module_list]").val()
-        $.ajax({
-          type: "POST",
+		$.ajax({
+			type: "POST",
 
-          url: "{% url 'module_order_list' %}",
-          datatype: "html",
-          data:{
-            'csrfmiddlewaretoken': "{{csrf_token}}",
-            'module_list': module_list_ids
-	        },
-            success: function(data) {
-            	data = JSON.parse(data)
-            	if (!data['success']){
-            		alert("Something went wrrong. Please try again later.")
-            	}
-            	$('#sort-module-reveal').foundation('reveal', 'close');
-            	location.reload()
-            }
-        });
+			url: "{% url 'module_order_list' %}",
+			datatype: "html",
+			data:{
+				'csrfmiddlewaretoken': "{{csrf_token}}",
+				'module_list': module_list_ids
+			},
+			success: function(data) {
+				data = JSON.parse(data)
+				if (!data['success']){
+					alert("Something went wrrong. Please try again later.")
+				}
+				$('#sort-module-reveal').foundation('reveal', 'close');
+				location.reload()
+			}
+		});
 
 	})
 
