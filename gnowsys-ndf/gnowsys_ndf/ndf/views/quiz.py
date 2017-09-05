@@ -672,10 +672,11 @@ def save_quizitem_answer(request, group_id):
         return response_dict
 
 
-def render_quiz_player(request, group_id, node, lang):
+def render_quiz_player(request, group_id, node, get_context=False):
     print "\nIN render_quiz_player", node
     try:
         if gst_quiz_item._id not in node.member_of or gst_quiz_item_event._id not in node.member_of:
+            lang = request.LANGUAGE_CODE
             trans_node = get_lang_node(node._id,lang)
             # print "\ntrans_node: ", trans_node
             node.get_neighbourhood(node.member_of)
@@ -704,6 +705,8 @@ def render_quiz_player(request, group_id, node, lang):
             print "\noptions_list: ", options_list
             context_variables = {'node': node, 'question_content': question_content, 
             'options_list': options_list, 'groupid': group_id, 'group_id': group_id}
+            if get_context:
+                return context_variables
             return render_to_response("ndf/quiz_player.html",
                                     context_variables,
                                     context_instance=RequestContext(request)
