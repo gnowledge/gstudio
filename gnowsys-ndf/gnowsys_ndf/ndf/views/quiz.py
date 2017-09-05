@@ -27,15 +27,20 @@ from gnowsys_ndf.ndf.models import HistoryManager
 from gnowsys_ndf.ndf.models import node_collection
 from gnowsys_ndf.ndf.rcslib import RCS
 # from gnowsys_ndf.ndf.org2any import org2html
-from gnowsys_ndf.ndf.views.methods import get_node_common_fields,create_grelation_list,get_execution_time
+from gnowsys_ndf.ndf.views.methods import get_node_common_fields, create_grelation, create_grelation_list,get_execution_time
 from gnowsys_ndf.ndf.management.commands.data_entry import create_gattribute
-from gnowsys_ndf.ndf.views.methods import get_node_metadata, set_all_urls, get_group_name_id, create_thread_for_node
+from gnowsys_ndf.ndf.views.methods import get_node_metadata, set_all_urls, get_group_name_id, create_thread_for_node, get_language_tuple
+from gnowsys_ndf.ndf.views.gcourse import get_lang_node
 from gnowsys_ndf.ndf.templatetags.ndf_tags import get_relation_value, get_attribute_value, get_thread_node
 
 
 #######################################################################################################################################
 
 gst_quiz = node_collection.one({'_type': u'GSystemType', 'name': "Quiz"})
+gst_quiz_item = node_collection.one({'_type': u'GSystemType', 'name': u'QuizItem'})
+gst_quiz_item_event = node_collection.one({'_type': u'GSystemType', 'name': u'QuizItemEvent'})
+options_AT = node_collection.one({'_type': "AttributeType", 'name': "options"})
+
 history_manager = HistoryManager()
 rcs = RCS()
 app = gst_quiz
@@ -52,15 +57,13 @@ def quiz(request, group_id):
     group_name = group_obj.name
     title = gst_quiz.name
     quiz_nodes = node_collection.find({'member_of': gst_quiz._id, 'group_set': ObjectId(group_id)}).sort('last_update', -1)
-    gst_quiz_names = ['QuizItem']
-    supported_languages = ['Hindi', 'Telugu']
+    gst_quiz_item_ids = [gst_quiz_item._id]
     if "CourseEventGroup" in group_obj.member_of_names_list or "announced_unit" in group_obj.member_of_names_list:
-        gst_quiz_names.append('QuizItemEvent')
-    home_group = node_collection.one({'_type': "Group", 'name': "home"})
-    gst_quiz_item = node_collection.find({'_type': 'GSystemType', 'name': {'$in': gst_quiz_names}})
-    gst_quiz_item_ids = [each_quiz_gst._id for each_quiz_gst in gst_quiz_item]
+        gst_quiz_item_ids = [gst_quiz_item_event._id]
     quiz_item_nodes = node_collection.find({'member_of': {'$in': gst_quiz_item_ids},
-     'group_set': home_group._id}).sort('last_update', -1)
+     'group_set': ObjectId(group_id)}).sort('last_update', -1)
+    supported_languages = ['Hindi', 'Telugu']
+
     print "\nquiz_item_nodes: ", quiz_item_nodes.count()
     return render_to_response("ndf/quiz.html",
                               {'title': title,
@@ -81,7 +84,6 @@ def quiz_item_detail(request, group_id, node_id=None):
         group_name, group_id = get_group_name_id(group_id)
     quiz_item_node = node_collection.one({'_id': ObjectId(node_id)})
     template = "ndf/node_details_base.html"
-    print "\nLeaving"
     quiz_item_node.get_neighbourhood(quiz_item_node.member_of)
     variable = RequestContext(request, {'node': quiz_item_node, 'groupid': group_id,
      'group_id': group_id})
@@ -90,41 +92,102 @@ def quiz_item_detail(request, group_id, node_id=None):
                               context_instance=RequestContext(request))
 
 
+def created_trans_node(request, group_id, node_id, trans_node_id, language):
+    rt_translation_of = Node.get_name_id_from_type('translation_of', 'RelationType', get_obj=True)
+    trans_node_gst_name, trans_node_gst_id = GSystemType.get_gst_name_id("trans_node")
+    print "trans_node_id", type(trans_node_id), " -- ", trans_node_id
+    if trans_node_id:
+        translated_node = Node.get_node_by_id(trans_node_id)
+    else:
+        translated_node = node_collection.collection.GSystem()
+    name,content = get_quiz_item_name_content(request)
+    translated_node.name = name
+    translated_node.content = content
+    translated_node.member_of = [trans_node_gst_id]
+    translated_node.group_set = [group_id]
+    translated_node.created_by = translated_node.modified_by = request.user.id
+    translated_node.contributors = [request.user.id]
+    translated_node.language = language
+    translated_node.save()
+    print "\nHELO", translated_node
+    if not trans_node_id:
+        trans_grel_list = [ObjectId(translated_node._id)]
+        trans_grels = triple_collection.find({'_type': 'GRelation', \
+                        'relation_type': rt_translation_of._id, \
+                        'subject': ObjectId(node_id)},{'_id': 0, 'right_subject': 1})
+        for each_rel in trans_grels:
+            trans_grel_list.append(each_rel['right_subject'])
+        translate_grel = create_grelation(node_id, rt_translation_of, trans_grel_list, language=language)
+    return translated_node
+
+
+def get_quiz_item_name_content(request):
+    question_name = request.POST.get('quiz_item_name','Untitled')
+    question_content = request.POST.get('content_org','Untitled')
+    question_name = question_name.split(' ')
+    question_name = question_name[:4]
+    question_name = ' '.join(question_name)
+    # print "\n\n question_name---",question_name
+    question_name = re.sub('<[^>]*>', ' ', question_name)
+    return (question_name, question_content)
+
+def options_attachment(request, quiz_item_node, language):
+
+    options = []
+    no_of_options = int(request.POST.get('no_of_options',''))
+    print "\n\n no_of_options",no_of_options
+    i = 1
+    while i <= no_of_options:
+        options.append(request.POST.get("option" if i == 1 else "option_"+str(i)))
+        i = i + 1
+    at_node = create_gattribute(quiz_item_node._id, options_AT, options, 
+        **{'triple_scope':{'attribute_type_scope':{u'alt_language': unicode(language)}}})
+    print "\n\nat_node: ", at_node
+    return options
+
+
 @login_required
-def create_edit_quiz_item(request, group_id, node_id=None, lang='en'):
+def create_edit_quiz_item(request, group_id, node_id=None, trans_node_id=None, lang='en'):
     """Creates/Modifies details about the given quiz-item.
     """
+    print "\ntrans_node_id: ", trans_node_id
+    print "\nnode_id: ", node_id
     try:
         group_id = ObjectId(group_id)
     except:
         group_name, group_id = get_group_name_id(group_id)
     group_object = node_collection.one({'_id': ObjectId(group_id)})
+    rt_translation_of = Node.get_name_id_from_type('translation_of', 'RelationType', get_obj=True)
 
     node = None
     quiz_node = None
     quiz_node_id = None
     quiz_item_node = None
+    existing_grel = translate_grel = translated_node = None
+
     group_object_member_of_names_list = group_object.member_of_names_list
-    gst_quiz_item = node_collection.one({'_type': u'GSystemType', 'name': u'QuizItem'})
+    gst_quiz_item_node = node_collection.one({'_type': u'GSystemType', 'name': u'QuizItem'})
     if "CourseEventGroup" in group_object_member_of_names_list or "announced_unit" in group_object_member_of_names_list:
-        gst_quiz_item = node_collection.one({'_type': u'GSystemType', 'name': u'QuizItemEvent'})
+        gst_quiz_item_node = gst_quiz_item_event
 
     current_url = resolve(request.path_info).url_name
-    context_variables = { 'title': gst_quiz_item.name,
+    context_variables = { 'title': gst_quiz_item_node.name,
                           'quiz_type_choices': QUIZ_TYPE_CHOICES,
                           'group_id': group_id,
                           'groupid': group_id,
-
                         }
 
     print "\ncurrent_url: ", current_url
     if "translate" in current_url:
         context_variables.update({'translate': True})
+    language = get_language_tuple(lang)
+    print "\nlanguage: ", language
 
     # if node_id:
     #     quiz_item_node = node_collection.one({'_id': ObjectId(node_id)})
     quiz_node_id = request.GET.get('quiznode','')
     return_url = request.GET.get('return_url','')
+    trans_node_id = None
     if return_url:
         context_variables['return_url'] = return_url
     if quiz_node_id:
@@ -138,38 +201,42 @@ def create_edit_quiz_item(request, group_id, node_id=None, lang='en'):
         else:
             # Edit a question
             quiz_item_node = node
-    existing_grel = None
+    if quiz_item_node:
+        existing_grel = triple_collection.one({
+                                            '_type': 'GRelation',
+                                            'subject': ObjectId(quiz_item_node._id),
+                                            'relation_type': rt_translation_of._id,
+                                            'language': language
+                                        })
+
+        if existing_grel:
+            # get existing translated_node
+            translated_node = Node.get_node_by_id(existing_grel.right_subject)
+            if translated_node:
+                trans_node_id = translated_node._id
     if request.method == "POST":
         usrid = int(request.user.id)
         usrname = unicode(request.user.username)
-        print "req1: ", request.POST.get('translate')
         print "req: ", request.POST.get('translate', False)
+        translate = request.POST.get('translate', False)
+        quiz_node_id = request.POST.get('quiz_node_id','')
+        maximum_attempts_val = request.POST.get('maximum_attempts','1')
+        problem_weight_val = request.POST.get('problem_weight','1')
+        show_correct_ans_val = request.POST.get('show_correct_ans','False')
+        check_ans_val = request.POST.get('check_ans','False')
+        quiz_type = request.POST.get('quiz_type_val','')
+
+        # print "\n\n maximum_attempts",maximum_attempts_val
+
+        # print "\n problem_weight",problem_weight_val
+        # print "\n show_correct_ans",show_correct_ans_val
+
+
+        # trans_node_id = request.POST.get('trans_node_id', None)
         if translate:
-            rt_translation_of = Node.get_name_id_from_type('translation_of', 'RelationType', get_obj=True)
-            trans_node_gst_name, trans_node_gst_id = GSystemType.get_gst_name_id("trans_node")
-
-            existing_grel = triple_collection.one({
-                                                '_type': 'GRelation',
-                                                'subject': ObjectId(node_id),
-                                                'relation_type': rt_translation_of._id,
-                                                'language': language
-                                            })
-
-            if existing_grel:
-                # get existing translated_node
-                translated_node = Node.get_node_by_id(existing_grel.right_subject)
-                translate_grel = existing_grel
-
-        translated_node.member_of = [ObjectId(trans_node_gst_id)]
-        translated_node.save(group_id=group_id)
-        if not existing_grel:
-            trans_grel_list = [ObjectId(translated_node._id)]
-            trans_grels = triple_collection.find({'_type': 'GRelation', \
-                            'relation_type': rt_translation_of._id,'subject': ObjectId(node_id)},{'_id': 0, 'right_subject': 1})
-            for each_rel in trans_grels:
-                trans_grel_list.append(each_rel['right_subject'])
-            translate_grel = create_grelation(node_id, rt_translation_of, trans_grel_list, language=language)
-
+            translated_node = created_trans_node(request, group_id, node_id, trans_node_id, language)
+            if quiz_type == QUIZ_TYPE_CHOICES[1] or quiz_type == QUIZ_TYPE_CHOICES[2]:
+                    options = options_attachment(request, translated_node, language)
 
         # if node_id:
         #     quiz_item_node = node_collection.one({'_id': ObjectId(node_id)})
@@ -177,7 +244,7 @@ def create_edit_quiz_item(request, group_id, node_id=None, lang='en'):
         #     # Add miscellaneous question
         #     quiz_item_node = node_collection.collection.GSystem()
 
-        if node_id:
+        elif node_id:
             node = node_collection.one({'_id': ObjectId(node_id)})
 
             if gst_quiz._id in node.member_of:
@@ -193,100 +260,72 @@ def create_edit_quiz_item(request, group_id, node_id=None, lang='en'):
             quiz_item_node = node_collection.collection.GSystem()
             # quiz_item_node = node_collection.one({'_id': ObjectId(node_id)})
         # question_content = request.POST.get('content_org','')
-        question_content = request.POST.get('quiz_item_name','Untitled')
-        question_content = question_content.split(' ')
-        question_content = question_content[:4]
-        question_content = ' '.join(question_content)
-        # print "\n\n question_content---",question_content
-        question_content = re.sub('<[^>]*>', ' ', question_content)
-        quiz_item_node.name = unicode(question_content)
-        quiz_type_AT = node_collection.one({'_type': "AttributeType", 'name': "quiz_type"})
-        options_AT = node_collection.one({'_type': "AttributeType", 'name': "options"})
-        correct_answer_AT = node_collection.one({'_type': "AttributeType", 'name': "correct_answer"})
-        quizitem_show_correct_ans_AT = node_collection.one({'_type': "AttributeType", 'name': "quizitem_show_correct_ans"})
-        quizitem_problem_weight_AT = node_collection.one({'_type': "AttributeType", 'name': "quizitem_problem_weight"})
-        quizitem_max_attempts_AT = node_collection.one({'_type': "AttributeType", 'name': "quizitem_max_attempts"})
-        quizitem_check_ans_AT = node_collection.one({'_type': "AttributeType", 'name': "quizitem_check_answer"})
+
+        if not translate:
+
+            name,content = get_quiz_item_name_content(request)
+            quiz_item_node.name = unicode(name)
+
+            quiz_type_AT = node_collection.one({'_type': "AttributeType", 'name': "quiz_type"})
+            correct_answer_AT = node_collection.one({'_type': "AttributeType", 'name': "correct_answer"})
+            quizitem_show_correct_ans_AT = node_collection.one({'_type': "AttributeType", 'name': "quizitem_show_correct_ans"})
+            quizitem_problem_weight_AT = node_collection.one({'_type': "AttributeType", 'name': "quizitem_problem_weight"})
+            quizitem_max_attempts_AT = node_collection.one({'_type': "AttributeType", 'name': "quizitem_max_attempts"})
+            quizitem_check_ans_AT = node_collection.one({'_type': "AttributeType", 'name': "quizitem_check_answer"})
 
 
-        quiz_node_id = request.POST.get('quiz_node_id','')
-        maximum_attempts_val = request.POST.get('maximum_attempts','1')
-        problem_weight_val = request.POST.get('problem_weight','1')
-        show_correct_ans_val = request.POST.get('show_correct_ans','False')
-        check_ans_val = request.POST.get('check_ans','False')
-        # print "\n\n maximum_attempts",maximum_attempts_val
+            quiz_item_node.save(is_changed=get_node_common_fields(request, quiz_item_node, group_id, gst_quiz_item_node),groupid=group_id)
+            # quiz_item_node.language = language
+            if quiz_node_id:
+                quiz_node = node_collection.one({'_id': ObjectId(quiz_node_id)})
 
-        # print "\n problem_weight",problem_weight_val
-        # print "\n show_correct_ans",show_correct_ans_val
+            # create gattribute quiz_type,options, correct_answer
+            # quiz_item_node['quiz_type'] = unicode(quiz_type)
+            create_gattribute(quiz_item_node._id, quizitem_max_attempts_AT, int(maximum_attempts_val))
+            create_gattribute(quiz_item_node._id, quizitem_problem_weight_AT, float(problem_weight_val))
+            create_gattribute(quiz_item_node._id, quizitem_show_correct_ans_AT, eval(show_correct_ans_val))
+            create_gattribute(quiz_item_node._id, quiz_type_AT, unicode(quiz_type))
+            create_gattribute(quiz_item_node._id, quizitem_check_ans_AT, eval(check_ans_val))
 
-        quiz_item_node.save(is_changed=get_node_common_fields(request, quiz_item_node, group_id, gst_quiz_item),groupid=group_id)
-        if quiz_node_id:
-            quiz_node = node_collection.one({'_id': ObjectId(quiz_node_id)})
-        quiz_type = request.POST.get('quiz_type_val','')
+            # If "quiz_type" is either 'Single-Choice' or 'Multiple-Choice', then only extract options
+            if quiz_type == QUIZ_TYPE_CHOICES[1] or quiz_type == QUIZ_TYPE_CHOICES[2]:
+                options = options_attachment(request, quiz_item_node, language)
 
-        # create gattribute quiz_type,options, correct_answer
-        # quiz_item_node['quiz_type'] = unicode(quiz_type)
-        create_gattribute(quiz_item_node._id, quizitem_max_attempts_AT, int(maximum_attempts_val))
-        create_gattribute(quiz_item_node._id, quizitem_problem_weight_AT, float(problem_weight_val))
-        create_gattribute(quiz_item_node._id, quizitem_show_correct_ans_AT, eval(show_correct_ans_val))
-        create_gattribute(quiz_item_node._id, quiz_type_AT, unicode(quiz_type))
-        create_gattribute(quiz_item_node._id, quizitem_check_ans_AT, eval(check_ans_val))
+            # Extracting correct-answer, depending upon 'Multiple-Choice' / 'Single-Choice'
+            qt_initial = quiz_type[:quiz_type.find("-")].lower()
+            # quiz_item_node['correct_answer'] = []
 
-        # If "quiz_type" is either 'Single-Choice' or 'Multiple-Choice', then only extract options
-        options = []
-        if quiz_type != QUIZ_TYPE_CHOICES[0]:
-            no_of_options = int(request.POST.get('no_of_options',''))
-            # quiz_item_node['options'] = []
-            # print "\n\n no_of_options",no_of_options
-            i = 1
-            while i <= no_of_options:
-                options.append(request.POST.get("option" if i == 1 else "option_"+str(i)))
-                i = i + 1
+            correct_ans_val = None
+            if quiz_type == QUIZ_TYPE_CHOICES[1]: # Single Choice
+                correct_ans_val = request.POST.getlist('correct_answer_' + qt_initial)
+                # quiz_item_node['correct_answer'].append(correct_answer)
+            elif quiz_type == QUIZ_TYPE_CHOICES[2]: # Multiple Choice
+                correct_ans_val = request.POST.getlist('correct_answer_' + qt_initial)
+                # quiz_item_node['correct_answer'] = correct_answer
 
-            # quiz_item_node['options'] = options
-            create_gattribute(quiz_item_node._id, options_AT, options)
+            if correct_ans_val: # To handle if Quiz-type is Short-Response
+                correct_answer = map(int,correct_ans_val) # Convert list of unicode ele to list of int ele
+                correct_ans_val_list = [options[each_val-1] for each_val in correct_answer]
+                create_gattribute(quiz_item_node._id, correct_answer_AT, correct_ans_val_list)
 
-        # Extracting correct-answer, depending upon 'Multiple-Choice' / 'Single-Choice'
-        qt_initial = quiz_type[:quiz_type.find("-")].lower()
-        # quiz_item_node['correct_answer'] = []
+            # thread_obj = create_thread_for_node(request,group_id, quiz_item_node)
 
-        correct_ans_val = None
-        if quiz_type == QUIZ_TYPE_CHOICES[1]: # Single Choice
-            correct_ans_val = request.POST.getlist('correct_answer_' + qt_initial)
-            # quiz_item_node['correct_answer'].append(correct_answer)
-        elif quiz_type == QUIZ_TYPE_CHOICES[2]: # Multiple Choice
-            correct_ans_val = request.POST.getlist('correct_answer_' + qt_initial)
-            # quiz_item_node['correct_answer'] = correct_answer
+            quiz_item_node.reload()
+            quiz_item_node.status = u"PUBLISHED"
 
-        if correct_ans_val: # To handle if Quiz-type is Short-Response
-            correct_answer = map(int,correct_ans_val) # Convert list of unicode ele to list of int ele
-            correct_ans_val_list = [options[each_val-1] for each_val in correct_answer]
-            create_gattribute(quiz_item_node._id, correct_answer_AT, correct_ans_val_list)
+            quiz_item_node.save(groupid=group_id)
 
-        # thread_obj = create_thread_for_node(request,group_id, quiz_item_node)
-
-        quiz_item_node.reload()
-        quiz_item_node.status = u"PUBLISHED"
-
-        quiz_item_node.save(groupid=group_id)
-
-        # Create a thread for QuizItem also. Can be used in preview
-        # Create thread node
-        create_thread_for_node_flag = True
-        if quiz_item_node.relation_set:
-            for eachrel in quiz_item_node.relation_set:
-                if eachrel and "has_thread" in eachrel:
-                    create_thread_for_node_flag = False
-        if create_thread_for_node_flag:
-            return_status = create_thread_for_node(request,group_id, quiz_item_node)
-        if "QuizItemEvent" in quiz_item_node.member_of_names_list:
-            return_url = request.POST.get("return_url")
-            # print "\n\n return_url", return_url, type(return_url)
-            if return_url:
-                return HttpResponseRedirect(reverse(return_url, kwargs={'group_id': group_id}))
-        if quiz_node:
-            quiz_node.collection_set.append(quiz_item_node._id)
-            quiz_node.save(groupid=group_id)
+            # Create a thread for QuizItem also. Can be used in preview
+            # Create thread node
+            thread_node = create_thread_for_node(request,group_id, quiz_item_node)
+            if "QuizItemEvent" in quiz_item_node.member_of_names_list:
+                return_url = request.POST.get("return_url")
+                # print "\n\n return_url", return_url, type(return_url)
+                if return_url:
+                    return HttpResponseRedirect(reverse(return_url, kwargs={'group_id': group_id}))
+            if quiz_node:
+                quiz_node.collection_set.append(quiz_item_node._id)
+                quiz_node.save(groupid=group_id)
         return HttpResponseRedirect(reverse('quiz', kwargs={'group_id': group_id}))
     else:
         if node_id:
@@ -295,7 +334,7 @@ def create_edit_quiz_item(request, group_id, node_id=None, lang='en'):
                 context_variables['node'] = quiz_item_node
             context_variables['groupid'] = group_id
             context_variables['group_id'] = group_id
-            # context_variables['quiz_node']=quiz_node
+            context_variables['translated_node'] = translated_node
         return render_to_response("ndf/quiz_item_create_edit.html",
                                   context_variables,
                                   context_instance=RequestContext(request)
@@ -357,8 +396,6 @@ def quiz_details(request, group_id, node_id):
     except:
         group_name, group_id = get_group_name_id(group_id)
     title = gst_quiz.name
-    gst_quiz_item = node_collection.one({'_type': 'GSystemType', 'name': u'QuizItem'})
-
     quiz_node = node_collection.one({'_id': ObjectId(node_id)})
     quiz_item_nodes = None
     # quiz_item_nodes = node_collection.find({'_id': {'$in': quiz_node.collection_set}, 'member_of': gst_quiz_item._id }).sort('last_update', -1)
@@ -633,3 +670,43 @@ def save_quizitem_answer(request, group_id):
     except Exception as e:
         print "\n Something went wrong while saving quiz answer!!! ", str(e)
         return response_dict
+
+
+def render_quiz_player(request, group_id, node, lang):
+    print "\nIN render_quiz_player", node
+    try:
+        if gst_quiz_item._id not in node.member_of or gst_quiz_item_event._id not in node.member_of:
+            trans_node = get_lang_node(node._id,lang)
+            # print "\ntrans_node: ", trans_node
+            node.get_neighbourhood(node.member_of)
+            trans_options_list = []
+            question_content = node.content
+            options_list = node.options
+
+            if trans_node:
+                question_content = trans_node.content
+                try:
+                    for each_attr in trans_node.attribute_set:
+                        if 'options' in each_attr:
+                            trans_options_list = each_attr['options']
+                            print "\nTRNAS: ", trans_options_list
+                    if not trans_options_list:
+                        triple_obj = triple_collection.one({'subject': trans_node._id, 
+                            'attribute_type': options_AT._id})
+                        trans_options_list = triple_obj.object_value
+                        print "\nTRNAS 2: ", trans_options_list
+                    print "\ntrans_options_list: ", trans_options_list
+                    if trans_options_list: 
+                        options_list = trans_options_list
+
+                except Exception as no_opt_attr:
+                    print "\n\nno_opt_attr: ", no_opt_attr
+            print "\noptions_list: ", options_list
+            context_variables = {'node': node, 'question_content': question_content, 
+            'options_list': options_list, 'groupid': group_id, 'group_id': group_id}
+            return render_to_response("ndf/quiz_player.html",
+                                    context_variables,
+                                    context_instance=RequestContext(request)
+            )
+    except Exception as e:
+        print "\nErr: ",e
