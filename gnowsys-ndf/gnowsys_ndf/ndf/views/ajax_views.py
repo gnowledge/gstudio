@@ -39,6 +39,7 @@ from gnowsys_ndf.ndf.models import node_collection, triple_collection
 from gnowsys_ndf.ndf.models import *
 from gnowsys_ndf.ndf.views.file import *
 from gnowsys_ndf.ndf.views.gcourse import *
+from gnowsys_ndf.ndf.views.translation import get_lang_node
 from gnowsys_ndf.ndf.views.methods import check_existing_group, get_drawers, get_course_completed_ids,create_thread_for_node, delete_gattribute
 from gnowsys_ndf.ndf.views.methods import get_node_common_fields, get_node_metadata, create_grelation,create_gattribute
 from gnowsys_ndf.ndf.views.methods import create_task,parse_template_data,get_execution_time,get_group_name_id, dig_nodes_field
@@ -7108,6 +7109,7 @@ def get_translated_node(request, group_id):
     else:
       return HttpResponse(json.dumps(node_obj, cls=NodeJSONEncoder))
 
+
 def delete_curriculum_node(request, group_id):
     node_id = request.POST.get('node_id', None)
     node_obj = Node.get_node_by_id(node_id)
@@ -7116,3 +7118,23 @@ def delete_curriculum_node(request, group_id):
       trash_resource(request,ObjectId(group_id),ObjectId(node_id))
       return HttpResponse("Success")
 
+@get_execution_time
+def get_rating_template(request, group_id):
+  try:
+      group_id = ObjectId(group_id)
+  except:
+      group_name, group_id = get_group_name_id(group_id)
+    
+  node_id = request.GET.get('node_id', None)
+  node_obj = Node.get_node_by_id(ObjectId(node_id))
+  is_comments = request.GET.get('if_comments', None)
+  if is_comments == "True":
+    is_comments = True
+  else:
+    is_comments = False
+
+  return render_to_response('ndf/rating.html',
+            {
+              "group_id":group_id,"node":node_obj,"if_comments":is_comments,'nodeid':node_obj._id,
+            },
+            context_instance=RequestContext(request))

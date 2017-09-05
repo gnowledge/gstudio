@@ -222,7 +222,7 @@ def explore_basecourses(request,page_no=1):
     #     context_instance=RequestContext(request))
 
 @get_execution_time
-def explore_courses(request,page_no=1):
+def explore_courses(request):
 
     # this will be announced tab
     title = 'courses'
@@ -231,7 +231,7 @@ def explore_courses(request,page_no=1):
     module_unit_ids = [val for each_module in modules_cur for val in each_module.collection_set ]
     modules_cur.rewind()
 
-    modules_page_cur = paginator.Paginator(modules_cur, page_no, GSTUDIO_NO_OF_OBJS_PP)
+    # modules_page_cur = paginator.Paginator(modules_cur, page_no, GSTUDIO_NO_OF_OBJS_PP)
 
     primary_lang_tuple = get_language_tuple(GSTUDIO_PRIMARY_COURSE_LANGUAGE)
 
@@ -314,7 +314,7 @@ def explore_courses(request,page_no=1):
 
 @login_required
 @get_execution_time
-def explore_drafts(request,page_no=1):
+def explore_drafts(request):
     title = 'drafts'
     modules_cur = node_collection.find({'member_of': gst_module_id ,'status':'PUBLISHED'}).sort('last_update', -1)
 
@@ -322,7 +322,6 @@ def explore_drafts(request,page_no=1):
 
     modules_cur.rewind()
     # modules_page_cur = paginator.Paginator(modules_cur, page_no, GSTUDIO_NO_OF_OBJS_PP)
-
 
     gstaff_access = check_is_gstaff(group_id,request.user)
     draft_query = {'member_of': gst_base_unit_id,
@@ -340,19 +339,8 @@ def explore_drafts(request,page_no=1):
 
     base_unit_cur = node_collection.find(draft_query).sort('last_update', -1)
     # print "\nbase: ", base_unit_cur.count()
-
-    '''
-    base_unit_cur = node_collection.find({'member_of': gst_base_unit_id,
-                                          '_id': {'$nin': module_unit_ids},
-                                          'status':'PUBLISHED',
-                                        '$or': [
-                                          {'created_by': request.user.id},
-                                          {'group_admin': request.user.id},
-                                          {'author_set': request.user.id},
-                                          # {'group_type': 'PUBLIC'}
-                                          ]}).sort('last_update', -1)
-    '''
-    base_unit_page_cur = paginator.Paginator(base_unit_cur, page_no, GSTUDIO_NO_OF_OBJS_PP)
+    # base_unit_page_cur = paginator.Paginator(base_unit_cur, page_no, GSTUDIO_NO_OF_OBJS_PP)
+    # base_unit_page_cur = paginator.Paginator(base_unit_cur, page_no, GSTUDIO_NO_OF_OBJS_PP)
 
     context_variable = {
                         'title': title, 'modules_cur': modules_cur,
