@@ -1960,6 +1960,7 @@ class GSystem(Node):
 
         return node_collection.find({
                             '_type': 'GSystem',
+                            'status': 'PUBLISHED',
                             'group_set': {'$in': [group_id]},
                             'member_of': {'$in': [gst_id]},
                             '$or':[
@@ -2643,6 +2644,8 @@ class Group(GSystem):
             finally:
                 self[field_key] = default_val
 
+        if group_type:
+            self.group_type = group_type
         self.fill_gstystem_values(request=request, **kwargs)
 
         # explicit: group's should not have draft stage. So publish them:

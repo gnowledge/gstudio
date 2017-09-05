@@ -163,18 +163,20 @@
       
       <br/>
       
+        {% if 'Group' not in  group_obj.member_of_names_list %}
       <div class="medium-3 rows">
         <div class="left">
           <i class="icon-wid fa fa-clock-o"></i>
         </div>
         <div class="left">
-          <h5>Course Duration</h5>
+          <h5>  Course Duration</h5>
           <div class="course-highlight">
             <span>{{weeks_count}} week{{weeks_count|pluralize}}</span>
           </div>
         </div>
       </div>
       <br/>
+        {% endif %}
       {% endif %}
     </div>
 

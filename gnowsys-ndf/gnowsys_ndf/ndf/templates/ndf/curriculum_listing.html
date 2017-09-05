@@ -1,0 +1,22 @@
+{% extends "ndf/gbase.html" %}
+{% load i18n %}
+{% load ndf_tags %}
+{% block body_content %}
+
+   <div class="curriculum_list_header">
+    	<span class="title-curriculum"></span>
+    	<div class="add-curriculum">
+    		<a href="{% url  'create_edit_curriculum' group_id %}">
+    	    	<i class="fa fa-pencil-square-o" aria-hidden="true"></i> Create new topic map
+        	</a>
+    	</div>
+    </div>
+
+	        {%  for each in nodes %}
+    	        {% include "ndf/curriculum_list.html" with node=each first_arg=group_id  second_arg=each.pk url_name="curriculum_detail" %}
+        	{% endfor %}
+
+
+
+
+{% endblock body_content %}

@@ -4,12 +4,12 @@
 {% block title %} {{trans_lesson_name}}  {% endblock %}
 
 {% load ndf_tags %}
-{% check_is_gstaff group_id request.user as is_gstaff %}
 
 
 {% block body_content %}
+{% check_is_gstaff group_id request.user as is_gstaff %}
 {% user_access_policy groupid request.user as user_access_priv %}
-    {% get_group_object groupid as group_object %}
+{% get_group_object groupid as group_object %}
 
 
 <style type="text/css">
@@ -74,7 +74,7 @@
               <div class="activity-title">
               {% for each in act_list %}
                   {% for k,v in each.items  %}
-                    <li  {% if v.basenodeid == activityid %} class="active" {% endif %}> <a href="{% url 'activity_player_detail' group_id lesson_node.pk v.basenodeid %}"> {{v.name}} </a></li>
+                    <li  {% if v.basenodeid == activityid %} class="active" {% endif %}> <a href="{% url 'activity_player_detail' group_id lesson_node.pk v.basenodeid %}"> {% firstof v.altnames v.name %} </a></li>
                   {% endfor %}
               {% endfor %}
               </div>
@@ -84,10 +84,8 @@
           <div class="small-8 columns">
 
             <div class="course_editor_section">
-             <div class="small-4 columns left">
+              <div class="input_links row" style="margin-left:10px;">
               {% include 'ndf/rating.html'%}
-            </div>
-              <div class="input_links row">
               {% get_relation_value node.pk 'has_help' as grel_help %}
               {% get_relation_value node.pk 'has_admin_page' as grel_admin_page %}
                 {% if grel_help.grel_id  %}
@@ -104,9 +102,16 @@
               {% comment %}
               <a class="translate right"> Translate</a>
               {% endcomment %}
+              
+              {# Adding alternate Language, if present #}
+              
+      
+                
+              
+
 
               </div>
-              <div class="activity_page_rendered">
+              <div class="activity_page_rendered buddy_margin">
                 {# {{node.content|safe}} #}
                 {% include "ndf/node_ajax_content.html" with node=trans_node expand_content=True  no_discussion=True hide_breadcrumbs=True %}
               </div>
@@ -132,6 +137,7 @@
         </div>
       </div>
 </div>             
+
 
 
 <script type="text/javascript">
@@ -269,5 +275,14 @@
                     'slow'); }, 1000);
           
       });
+
+  $( "#alt-lang-dd li" ).click(function() {
+
+       
+       $( "#alt-lang-dd" ).foundation('reveal','open');
+       
+      });
+
+  
 </script>
 {% endblock %}

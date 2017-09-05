@@ -19,7 +19,7 @@
                     <label class="node_name_empty hide" style="color:red">{% trans "Please enter Name" %}</label>
 
                 </div>
-                <br>
+                <br><br><br>
                 {% if not no_altnames %}
                 <div class="left">
                 <h5>{% trans "Display Name" %}</h5>
@@ -40,7 +40,7 @@
                 <div class="left">
                 <h5>{% trans "Description" %}</h5>
                 </div><br/> 
-                <div class="left" style="width:980px;">
+                <div class="left" style="width:100%;">
                     {% include "ndf/html_editor.html" with var_name="content" var_value=node_obj.content node_id=node_obj.pk ckeditor_toolbar=editor_type %}
                     <br/>
                 </div>

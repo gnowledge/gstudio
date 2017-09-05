@@ -37,7 +37,7 @@ from django.core.cache import cache
 from mongokit import IS
 
 ''' -- imports from application folders/files -- '''
-from gnowsys_ndf.settings import GAPPS as setting_gapps, GSTUDIO_DEFAULT_GAPPS_LIST, META_TYPE, CREATE_GROUP_VISIBILITY, GSTUDIO_SITE_DEFAULT_LANGUAGE,GSTUDIO_DEFAULT_EXPLORE_URL,GSTUDIO_EDIT_LMS_COURSE_STRUCTURE
+from gnowsys_ndf.settings import GAPPS as setting_gapps, GSTUDIO_DEFAULT_GAPPS_LIST, META_TYPE, CREATE_GROUP_VISIBILITY, GSTUDIO_SITE_DEFAULT_LANGUAGE,GSTUDIO_DEFAULT_EXPLORE_URL,GSTUDIO_EDIT_LMS_COURSE_STRUCTURE,GSTUDIO_WORKSPACE_INSTANCE
 # from gnowsys_ndf.settings import GSTUDIO_SITE_LOGO,GSTUDIO_COPYRIGHT,GSTUDIO_GIT_REPO,GSTUDIO_SITE_PRIVACY_POLICY, GSTUDIO_SITE_TERMS_OF_SERVICE,GSTUDIO_ORG_NAME,GSTUDIO_SITE_ABOUT,GSTUDIO_SITE_POWEREDBY,GSTUDIO_SITE_PARTNERS,GSTUDIO_SITE_GROUPS,GSTUDIO_SITE_CONTACT,GSTUDIO_ORG_LOGO,GSTUDIO_SITE_CONTRIBUTE,GSTUDIO_SITE_VIDEO,GSTUDIO_SITE_LANDING_PAGE
 from gnowsys_ndf.settings import *
 try:
@@ -3879,8 +3879,9 @@ def get_file_obj(node):
 
 @get_execution_time
 @register.assignment_tag
-def get_help_pages_of_node(node_obj,rel_name="has_help"):
+def get_help_pages_of_node(node_obj,rel_name="has_help",language="en"):
 	all_help_page_node_list = []
+	from gnowsys_ndf.ndf.views.gcourse import get_lang_node
 	try:
 		has_help_rt = node_collection.one({'_type': 'RelationType', 'name': rel_name})
 		help_rt = triple_collection.find({'subject':node_obj._id,'relation_type': has_help_rt._id, 'status': u'PUBLISHED'})
@@ -3888,6 +3889,8 @@ def get_help_pages_of_node(node_obj,rel_name="has_help"):
 			for each_help_rt in help_rt:
 				# print each_help_rt.right_subject
 				help_pg_node = node_collection.one({'_id':ObjectId(each_help_rt.right_subject)})
+				trans_node =   get_lang_node(help_pg_node._id,language)
+				help_pg_node =  trans_node or help_pg_node 
 				if help_pg_node:
 					all_help_page_node_list.append(help_pg_node)
 
@@ -3990,7 +3993,7 @@ def get_gstudio_registration():
 @register.assignment_tag
 def get_unit_total_points(user_id,group_id):
 	counter_obj = Counter.get_counter_obj(user_id, ObjectId(group_id))
-
+	return counter_obj['group_points']
 
 @register.assignment_tag
 def get_node_hierarchy(node_obj):
@@ -4052,3 +4055,26 @@ def if_edit_course_structure():
 @register.assignment_tag
 def get_default_discussion_lbl():
 	return DEFAULT_DISCUSSION_LABEL
+
+@register.assignment_tag
+def get_gstudio_workspace_instance():
+	return GSTUDIO_WORKSPACE_INSTANCE
+
+@register.assignment_tag
+def get_topic_nodes(node_id):
+	RT_teaches = node_collection.one({'_type':'RelationType', 'name': 'teaches'})
+	teaches_grelations = triple_collection.find({'_type': 'GRelation', 'right_subject': ObjectId(node_id), 'relation_type': RT_teaches._id })
+	teaches_grelations_id_list = []
+	for each in teaches_grelations:
+		teaches_grelations_id_list.append(each.subject)
+	teaches_nodes = node_collection.find({"_id":{'$in' : teaches_grelations_id_list } })
+	return teaches_nodes
+
+@register.assignment_tag
+def get_selected_topics(node_id):
+	rel_val = get_relation_value(ObjectId(node_id),'teaches')
+	teaches_grelations_id_list = []
+	for each in rel_val['grel_node']:
+		teaches_grelations_id_list.append(str(each._id))
+		# teaches_grelations_id_list = map(ObjectId,teaches_grelations_id_list)
+	return teaches_grelations_id_list
