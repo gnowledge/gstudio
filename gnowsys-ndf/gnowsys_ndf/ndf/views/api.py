@@ -24,7 +24,7 @@ from gnowsys_ndf.ndf.models import node_collection,triple_collection
 from gnowsys_ndf.ndf.views.methods import get_group_name_id
 
 
-def api_get_group_gst_nodes(request):
+def api_get_gs_nodes(request):
     # GET: api/v1/<group_id>/<files>/<nroer_team>/
     # import ipdb; ipdb.set_trace()
     exception_occured = ''
@@ -89,12 +89,9 @@ def api_get_group_gst_nodes(request):
         get_parameters_dict['group_set'] = [group_id]
 
     for key, val in get_parameters_dict.iteritems():
-        # if ('gs_' in key):
-            # stripped_key = key.lstrip('gs_').split('.')[0]
         stripped_key = key.split('.')[0]
         if stripped_key in gsystem_keys:
-            # query_dict.update({key: {'$regex': val, '$options': 'i'}})
-            query_dict.update({key: ({'$regex': val, '$options': 'i'} if isinstance(val, basestring or unicode) else val) })
+            query_dict.update({ key: ({'$regex': val, '$options': 'i'} if isinstance(gsystem_structure_dict[stripped_key], basestring or unicode) else val) })
 
         elif gst_id and stripped_key in gst_attributes(gst_id):
             query_dict.update({('attribute_set.' + stripped_key): {'$regex': val, '$options': 'i'}})
@@ -106,7 +103,6 @@ def api_get_group_gst_nodes(request):
     gst_fields = gst_api_fields_dict if human else gst_all_fields_dict
 
     all_resources = node_collection.find(query_dict, gst_fields)
-
 
     if human:
         gst_fields = gst_api_fields_dict
@@ -121,7 +117,6 @@ def api_get_group_gst_nodes(request):
 
         userid_name_dict_cur = node_collection.find({'_type': u'Author', 'created_by': {'$in': all_users}}, {'name': 1, 'created_by': 1, '_id': 0})
         userid_name_dict = {i['created_by']: i['name'] for i in userid_name_dict_cur}
-
 
         # Mongo ids
         oid_fields = [ k for k, v in gsystem_structure_dict.iteritems() if v in [bson.objectid.ObjectId, [bson.objectid.ObjectId]] ]
@@ -170,3 +165,38 @@ def gst_attributes(gst_name_or_id):
         gst_name, gst_id = GSystemType.get_gst_name_id(gst_name_or_id)
 
     return [at.name for at in node_collection.find({'_type': 'AttributeType', 'subject_type': gst_id})]
+
+
+api_name_model_name_dict = {
+    'workspace': 'group_set',
+    'resource_type': 'member_of'
+}
+
+def api_get_field_values(request, field_name):
+
+    field_name = api_name_model_name_dict.get(field_name, field_name)
+    gsystem_structure_dict = GSystem.structure
+    gsystem_keys = gsystem_structure_dict.keys()
+
+    if field_name in gsystem_keys:
+        json_result = '[]'
+        oid_fields = [ k for k, v in gsystem_structure_dict.iteritems() if v in [bson.objectid.ObjectId, [bson.objectid.ObjectId]] ]
+        user_fields = ['created_by', 'modified_by', 'contributors']
+
+        # MONGO
+        if field_name in oid_fields:
+            result_list = node_collection.find({ '_id': {'$in': node_collection.find({}).distinct(field_name) } }).distinct('name')
+        # USER
+        elif field_name in user_fields:
+            # mapping user id to username.
+            result_list = node_collection.find({'_type': 'Author', 'created_by': {'$in': node_collection.find({}).distinct(field_name) } }).distinct('name')
+        # OTHER
+        else:
+            # overriden from settings
+            GSTUDIO_WORKING_GAPPS = [u'Page', u'File']
+            gstudio_working_gapps_mof_list = node_collection.find({'_type': 'GSystemType', 'name': {'$in': GSTUDIO_WORKING_GAPPS} }).distinct('_id')
+            result_list = node_collection.find({'_type': 'GSystem', 'status': u'PUBLISHED', 'access_policy': 'PUBLIC', 'member_of': {'$in': gstudio_working_gapps_mof_list}}).distinct(field_name)
+
+        return HttpResponse(json.dumps(result_list, ensure_ascii=False, cls=NodeJSONEncoder).encode('utf16'), content_type='application/json')
+
+    return HttpResponse(["Invalid Field"], content_type='application/json')
