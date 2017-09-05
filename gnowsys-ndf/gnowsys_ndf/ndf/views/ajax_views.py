@@ -77,7 +77,7 @@ def get_node_json_from_id(request, group_id, node_id=None):
     if node_obj:
       if "QuizItem" in node_obj.member_of_names_list:
         from gnowsys_ndf.ndf.views.quiz import render_quiz_player
-        return render_quiz_player(request, group_id, node_obj, request.LANGUAGE_CODE)
+        return render_quiz_player(request, group_id, node_obj)
       trans_node = get_lang_node(node_obj._id,request.LANGUAGE_CODE)
       if trans_node:
         return HttpResponse(json.dumps(trans_node, cls=NodeJSONEncoder))

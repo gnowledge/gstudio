@@ -4097,7 +4097,7 @@ def load_quiz_player(request, group_id, node):
         print "\nHI 1"
         con_var = render_quiz_player(request, group_id, node, get_context=True)
         print "\ncon_var: ", con_var
-        con_var.update({'template': 'ndf/quiz_player.html'})
+        con_var.update({'template': 'ndf/quiz_player.html', 'request': request})
     # rel_value = get_relation_value(ObjectId(node._id),"translation_of")
     # for each in rel_value['grel_node']:
     #     if each.language[0] ==  get_language_tuple(lang)[0]:
