@@ -1,6 +1,5 @@
 {% load i18n %}
-{% load ndf_tags %}
-{% load check_is_gstaff user_groups get_gstudio_workspace_instance cast_to_node get_attribute_value get_node_by_member_of_name from ndf_tags %}
+{% load check_is_gstaff user_groups get_gstudio_workspace_instance cast_to_node get_attribute_value rewind_cursor from ndf_tags %}
 {% check_is_gstaff group_id request.user as is_gstaff %}
 {% user_groups request.user.is_superuser request.user.id as user_grp_count %}
 {% get_gstudio_workspace_instance as is_workspace_instance %}
