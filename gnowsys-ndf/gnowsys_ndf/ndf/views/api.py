@@ -51,7 +51,6 @@ def api_get_gs_nodes(request):
 
 
     # GET: api/v1/<group_id>/<files>/<nroer_team>/
-    # import ipdb; ipdb.set_trace()
     exception_occured = ''
     oid_name_dict = {}
     gst_id = None
@@ -79,7 +78,6 @@ def api_get_gs_nodes(request):
     attributes = {}
 
     # GET parameters:
-    
     get_created_by = request.GET.get('created_by', None)
     if get_created_by:
         username_or_id_int = 0
@@ -114,7 +112,7 @@ def api_get_gs_nodes(request):
         if stripped_key in gsystem_keys:
             query_dict.update({ key: ({'$regex': val, '$options': 'i'} if isinstance(gsystem_structure_dict[stripped_key], basestring or unicode) else val) })
 
-        elif gst_id and stripped_key in gst_attributes(gst_id):
+        elif stripped_key in gst_attributes(gst_id):
             query_dict.update({('attribute_set.' + stripped_key): {'$regex': val, '$options': 'i'}})
 
     # print "query_dict: ", query_dict
@@ -180,6 +178,9 @@ def api_get_gs_nodes(request):
 # helper methods:
 def gst_attributes(gst_name_or_id):
 
+    if not gst_name_or_id:
+        return node_collection.find({'_type': 'AttributeType'}).distinct('name')
+
     try:
         gst_id = ObjectId(gst_name_or_id)
     except Exception as e:
@@ -215,5 +216,8 @@ def api_get_field_values(request, field_name):
             result_list = node_collection.find({'_type': 'GSystem', 'status': u'PUBLISHED', 'access_policy': 'PUBLIC', 'member_of': {'$in': gstudio_working_gapps_mof_list}}).distinct(field_name)
 
         return HttpResponse(json.dumps(result_list, ensure_ascii=False, cls=NodeJSONEncoder).encode('utf16'), content_type='application/json')
+
+    elif field_name in node_collection.find({'_type': 'AttributeType'}).distinct('name'):
+        return HttpResponse( json.dumps(node_collection.find().distinct('attribute_set.' + field_name)), content_type='application/json')
 
     return HttpResponse(["Invalid Field"], content_type='application/json')
