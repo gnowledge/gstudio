@@ -24,7 +24,26 @@ from gnowsys_ndf.ndf.models import node_collection,triple_collection
 from gnowsys_ndf.ndf.views.methods import get_group_name_id
 
 
+gst_api_fields_dict = { "_id": 1, "name": 1, "altnames": 1, "language": 1, "content": 1, "if_file": 1, "tags": 1, "location": 1, "created_by": 1, "modified_by": 1, "contributors": 1, "legal": 1, "rating": 1, "created_at": 1, "last_update": 1, "collection_set": 1, "post_node": 1, "prior_node": 1, "access_policy": 1, "status": 1, "group_set": 1, "member_of": 1, "type_of": 1,
+    # "relation_set": 1, "attribute_set": 1, 
+}
+
+api_name_model_name_dict = {
+    'workspace': 'group_set',
+    'resource_type': 'member_of'
+}
+
+
 def api_get_gs_nodes(request):
+
+    get_parameters_dict = request.GET.dict()
+    if not get_parameters_dict:
+        aggregated_dict = gst_api_fields_dict.copy()
+        aggregated_dict.update(api_name_model_name_dict)
+        aggregated_dict.pop('_id')
+        return HttpResponse(json.dumps(aggregated_dict.keys()), content_type='application/json')
+
+
     # GET: api/v1/<group_id>/<files>/<nroer_team>/
     # import ipdb; ipdb.set_trace()
     exception_occured = ''
@@ -40,15 +59,12 @@ def api_get_gs_nodes(request):
     gsystem_keys = gsystem_structure_dict.keys()
 
     gst_all_fields_dict = {i: 1 for i in gsystem_keys}
-    gst_api_fields_dict = { "_id": 1, "name": 1, "altnames": 1, "language": 1, "content": 1, "if_file": 1, "tags": 1, "location": 1, "created_by": 1, "modified_by": 1, "contributors": 1, "legal": 1, "rating": 1, "created_at": 1, "last_update": 1, "collection_set": 1, "post_node": 1, "prior_node": 1, "access_policy": 1, "status": 1, "group_set": 1, "member_of": 1, "type_of": 1,
-    # "relation_set": 1, "attribute_set": 1, 
-     }
 
     query_dict = {
                     '_type': 'GSystem',
-                    # 'group_set': ObjectId(group_id),
                     'status': u'PUBLISHED',
                     'access_policy': 'PUBLIC',
+                    # 'group_set': ObjectId(group_id),
                     # 'member_of': ObjectId(gst_id),
                     # 'created_by': user_id,
                 }
@@ -57,7 +73,6 @@ def api_get_gs_nodes(request):
     attributes = {}
 
     # GET parameters:
-    get_parameters_dict = request.GET.dict()
     
     get_created_by = request.GET.get('created_by', None)
     if get_created_by:
@@ -167,10 +182,6 @@ def gst_attributes(gst_name_or_id):
     return [at.name for at in node_collection.find({'_type': 'AttributeType', 'subject_type': gst_id})]
 
 
-api_name_model_name_dict = {
-    'workspace': 'group_set',
-    'resource_type': 'member_of'
-}
 
 def api_get_field_values(request, field_name):
 
