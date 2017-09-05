@@ -13,6 +13,8 @@
 
  -->    
     {% include 'ndf/widget_user_access_modal.html' %}
+       {% get_course_filters group_id "assets" as filter_dict %}
+        {% include "ndf/filters.html" with filter_dict=filter_dict %}
         <div class="row">
         {% if user.is_authenticated  %}
             {% if title == "raw material" and is_gstaff %}
@@ -65,6 +67,7 @@
                            }
                      });
            });
+
 function getRandomSize(min, max) {
   return Math.round(Math.random() * (max - min) + min);
 }
@@ -83,4 +86,26 @@ var allImages1 = "";
     alert(allImagesfor+"_"+"{{k}}");
 {% endfor %}
 {% endcomment %}
+
+   function applyFilter(filtersObjArr){
+        filtersObjArr = JSON.stringify(getFiltersObjsInAndOrFormat());
+        $.ajax({
+          url: "{% url 'course_filters' group_id %}",
+          data: {
+            filter_dict: filtersObjArr,
+            'filter_applied': 'True',
+            'title': 'assets'
+          },
+          type: "GET",
+          dataType: "html",
+          success: function(data){
+            if(data == "reload"){
+                location.reload()
+            }
+            else{
+                $(".listing-row").html(data)
+            }
+          },
+        });//end of ajax
+    }
 </script> 

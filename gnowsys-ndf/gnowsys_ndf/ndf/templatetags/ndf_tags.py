@@ -3805,6 +3805,12 @@ def get_course_filters(group_id, filter_context):
 							'created_by': {'$in': gstaff_users}
 							},{'tags': 1, '_id': False})
 
+			elif filter_context.lower() == "assets":
+				# all_user_objs_id = [eachuser.id for eachuser in all_user_objs if check_is_gstaff(group_obj._id,eachuser)]
+				asset_gst_name, asset_gst_id = GSystemType.get_gst_name_id("Asset")
+				result_cur = node_collection.find({'member_of': {'$in': [asset_gst_id]},
+            'group_set': {'$all': [ObjectId(group_id)]}}).sort('last_update', -1)
+
 			# print "\n\n result_cur.count()--",result_cur.count()
 			all_tags_from_cursor = map(lambda x: x['tags'], result_cur)
 			# all_tags_from_cursor is a list having nested list
