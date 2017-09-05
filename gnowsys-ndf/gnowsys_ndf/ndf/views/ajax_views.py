@@ -74,7 +74,19 @@ def get_node_json_from_id(request, group_id, node_id=None):
     if not node_id:
         node_id = request.GET.get('node_id')
     node_obj = Node.get_node_by_id(node_id)
+
     if node_obj:
+      if "QuizItem" in node_obj.member_of_names_list:
+          node_obj.get_neighbourhood(node_obj.member_of)
+          context_variables = {}
+          context_variables['node'] = node_obj
+          context_variables['groupid'] = group_id
+          context_variables['group_id']=group_id
+          return render_to_response("ndf/quiz_player.html",
+                                    context_variables,
+                                    context_instance=RequestContext(request)
+          )
+
       trans_node = get_lang_node(node_obj._id,request.LANGUAGE_CODE)
       if trans_node:
         return HttpResponse(json.dumps(trans_node, cls=NodeJSONEncoder))
@@ -6823,7 +6835,7 @@ def create_edit_asset(request,group_id):
     if "announced_unit" in group_obj.member_of_names_list and title == "raw material":
       asset_obj.tags.append(u'raw@material')
     
-    if "announced_unit" in group_obj.member_of_names_list and "gallery" == title:
+    if "announced_unit" in group_obj.member_of_names_list  or "Group" in group_obj.member_of_names_list and "gallery" == title:
       asset_obj.tags.append(u'asset@gallery')    
     
     if asset_lang:
