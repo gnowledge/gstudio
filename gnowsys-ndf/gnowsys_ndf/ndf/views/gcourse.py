@@ -3574,9 +3574,6 @@ def delete_activity_page(request, group_id):
     return HttpResponse('fail')
 
 
-<<<<<<< HEAD
-
-=======
 def _get_unit_hierarchy(unit_group_obj,lang="en"):
     '''
     ARGS: unit_group_obj
@@ -3647,7 +3644,6 @@ def _get_unit_hierarchy(unit_group_obj,lang="en"):
                         lesson_dict['children'].append(activity_dict)
             unit_structure.append(lesson_dict)
     return unit_structure
->>>>>>> 01dc04a36f65bc88020d25871f48c2bad9710e45
 
 def widget_page_create_edit(request, group_id, node_id=None):
     node_id = request.GET.get('node_id', None)
@@ -3691,7 +3687,7 @@ def widget_page_create_edit(request, group_id, node_id=None):
     return render_to_response(template, req_context)
 
 
-<<<<<<< HEAD
+
 # def get_lang_node(node_id,lang):
 #     rel_value = get_relation_value(ObjectId(node_id),"translation_of")
 #     for each in rel_value['grel_node']:
@@ -3712,7 +3708,7 @@ def widget_page_create_edit(request, group_id, node_id=None):
 #             trans_node_list.append({ObjectId(node._id): {"name": node.name, "basenodeid":ObjectId(node._id)}})
 #     if trans_node_list:
 #         return trans_node_list
-=======
+
 def get_lang_node(node_id,lang):
     rel_value = get_relation_value(ObjectId(node_id),"translation_of")
     for each in rel_value['grel_node']:
@@ -3733,7 +3729,6 @@ def get_trans_node_list(node_list,lang):
             trans_node_list.append({ObjectId(node._id): {"name": node.name,"altnames": node.altnames, "basenodeid":ObjectId(node._id)}})
     if trans_node_list:
         return trans_node_list
->>>>>>> 01dc04a36f65bc88020d25871f48c2bad9710e45
 
 @get_execution_time
 def course_quiz_data(request, group_id):

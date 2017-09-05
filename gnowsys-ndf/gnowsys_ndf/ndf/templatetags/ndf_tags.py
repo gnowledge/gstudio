@@ -3993,6 +3993,7 @@ def get_gstudio_registration():
 @register.assignment_tag
 def get_unit_total_points(user_id,group_id):
 	counter_obj = Counter.get_counter_obj(user_id, ObjectId(group_id))
+	return counter_obj['group_points']
 
 """  commented for section subsection template """
 # @register.assignment_tag
@@ -4019,7 +4020,6 @@ def get_unit_total_points(user_id,group_id):
 #             node_structure.append(lesson_dict)
 
 #     return json.dumps(node_structure)
-	return counter_obj['group_points']
 
 @register.assignment_tag
 def get_node_hierarchy(node_obj):

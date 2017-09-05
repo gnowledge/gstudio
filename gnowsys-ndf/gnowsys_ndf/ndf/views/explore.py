@@ -351,12 +351,10 @@ def explore_drafts(request):
                                           {'author_set': request.user.id},
                                           # {'group_type': 'PUBLIC'}
                                           ]}).sort('last_update', -1)
-<<<<<<< HEAD
     # base_unit_page_cur = paginator.Paginator(base_unit_cur, page_no, GSTUDIO_NO_OF_OBJS_PP)
 =======
     '''
-    base_unit_page_cur = paginator.Paginator(base_unit_cur, page_no, GSTUDIO_NO_OF_OBJS_PP)
->>>>>>> 01dc04a36f65bc88020d25871f48c2bad9710e45
+#     base_unit_page_cur = paginator.Paginator(base_unit_cur, page_no, GSTUDIO_NO_OF_OBJS_PP)
 
     context_variable = {
                         'title': title, 'modules_cur': modules_cur,
