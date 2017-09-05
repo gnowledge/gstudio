@@ -503,11 +503,15 @@ CKEDITOR.plugins.add('addJhapp',
                              CKEDITOR.instances[textAreaId].insertHtml(tool_val);
                             $('#group_imgs_on_modal').foundation('reveal', 'close');
                           });
+
+
+
+                            
                           
                           $("#insert_starlogo_model1_en").click(function(event){
                             
 
-                            tool_val = "<a href='/starlogonova/en/model1/' target='_blank'><img src='/static/ndf/images/Anemia_english.png' alt='Star Logo Thumbnail'  height='1000px' width='1000px' >"
+                            tool_val = "<a href='/starlogonova/en/Anemia1' target='_blank'><img src='/static/ndf/images/Anemia_english.png' alt='Star Logo Thumbnail'  height='1000px' width='1000px' >"
                             
                              CKEDITOR.instances[textAreaId].insertHtml(tool_val);
                             $('#group_imgs_on_modal').foundation('reveal', 'close');
@@ -516,7 +520,7 @@ CKEDITOR.plugins.add('addJhapp',
                           $("#insert_starlogo_model2_en").click(function(event){
                             
 
-                            tool_val = "<a href='/starlogonova/en/model2/' target='_blank'><img src='/static/ndf/images/Anemia_english.png' alt='Star Logo Thumbnail'  height='1000px' width='1000px' >"
+                            tool_val = "<a href='/starlogonova/en/Anemia2/' target='_blank'><img src='/static/ndf/images/Anemia_english.png' alt='Star Logo Thumbnail'  height='1000px' width='1000px' >"
                             
                              CKEDITOR.instances[textAreaId].insertHtml(tool_val);
                             $('#group_imgs_on_modal').foundation('reveal', 'close');
@@ -524,7 +528,7 @@ CKEDITOR.plugins.add('addJhapp',
                           $("#insert_starlogo_model1_hi").click(function(event){
                             
 
-                            tool_val = "<a href='/starlogonova/hi/model1/' target='_blank'><img src='/static/ndf/images/Anemia_hindi.png' alt='Star Logo Thumbnail'  height='1000px' width='1000px' >"
+                            tool_val = "<a href='/starlogonova/hi/Anemia1/' target='_blank'><img src='/static/ndf/images/Anemia_hindi.png' alt='Star Logo Thumbnail'  height='1000px' width='1000px' >"
                             
                              CKEDITOR.instances[textAreaId].insertHtml(tool_val);
                             $('#group_imgs_on_modal').foundation('reveal', 'close');
@@ -533,7 +537,7 @@ CKEDITOR.plugins.add('addJhapp',
                           $("#insert_starlogo_model2_hi").click(function(event){
                             
 
-                            tool_val = "<a href='/starlogonova/hi/model2/' target='_blank'><img src='/static/ndf/images/Anemia_hindi.png' alt='Star Logo Thumbnail'  height='1000px' width='1000px' >"
+                            tool_val = "<a href='/starlogonova/hi/Anemia2/' target='_blank'><img src='/static/ndf/images/Anemia_hindi.png' alt='Star Logo Thumbnail'  height='1000px' width='1000px' >"
                             
                              CKEDITOR.instances[textAreaId].insertHtml(tool_val);
                             $('#group_imgs_on_modal').foundation('reveal', 'close');
@@ -542,7 +546,7 @@ CKEDITOR.plugins.add('addJhapp',
                             $("#insert_starlogo_model1_te").click(function(event){
                             
 
-                            tool_val = "<a href='/starlogonova/te/model1' target='_blank'><img src='/static/ndf/images/AnemeaTelugu.png' alt='Star Logo Thumbnail'  height='1000px' width='1000px' >"
+                            tool_val = "<a href='/starlogonova/te/Anemia1' target='_blank'><img src='/static/ndf/images/AnemeaTelugu.png' alt='Star Logo Thumbnail'  height='1000px' width='1000px' >"
                             
                              CKEDITOR.instances[textAreaId].insertHtml(tool_val);
                             $('#group_imgs_on_modal').foundation('reveal', 'close');
@@ -551,7 +555,7 @@ CKEDITOR.plugins.add('addJhapp',
                             $("#insert_starlogo_model2_te").click(function(event){
                             
 
-                            tool_val = "<a href='/starlogonova/te/model2' target='_blank'><img src='/static/ndf/images/AnemeaTelugu.png' alt='Star Logo Thumbnail'  height='1000px' width='1000px' >"
+                            tool_val = "<a href='/starlogonova/te/Anemia2' target='_blank'><img src='/static/ndf/images/AnemeaTelugu.png' alt='Star Logo Thumbnail'  height='1000px' width='1000px' >"
                             
                              CKEDITOR.instances[textAreaId].insertHtml(tool_val);
                             $('#group_imgs_on_modal').foundation('reveal', 'close');
@@ -560,7 +564,7 @@ CKEDITOR.plugins.add('addJhapp',
                             $("#insert_starlogo_model3_en").click(function(event){
                             
 
-                            tool_val = "<a href='/starlogonova/en/model3' target='_blank'><img src='/static/ndf/images/FishAlgae-English.jpg' alt='Star Logo Thumbnail'  height='1000px' width='1000px' >"
+                            tool_val = "<a href='/starlogonova/en/FishAlgae' target='_blank'><img src='/static/ndf/images/FishAlgae-English.jpg' alt='Star Logo Thumbnail'  height='1000px' width='1000px' >"
                             
                              CKEDITOR.instances[textAreaId].insertHtml(tool_val);
                             $('#group_imgs_on_modal').foundation('reveal', 'close');
@@ -570,7 +574,7 @@ CKEDITOR.plugins.add('addJhapp',
                             $("#insert_starlogo_model3_hi").click(function(event){
                             
 
-                            tool_val = "<a href='/starlogonova/hi/model3' target='_blank'><img src='/static/ndf/images/FishAlgae-Hindi.jpg' alt='Star Logo Thumbnail'  height='1000px' width='1000px' >"
+                            tool_val = "<a href='/starlogonova/hi/FishAlgae' target='_blank'><img src='/static/ndf/images/FishAlgae-Hindi.jpg' alt='Star Logo Thumbnail'  height='1000px' width='1000px' >"
                             
                              CKEDITOR.instances[textAreaId].insertHtml(tool_val);
                             $('#group_imgs_on_modal').foundation('reveal', 'close');
@@ -579,7 +583,7 @@ CKEDITOR.plugins.add('addJhapp',
                             $("#insert_starlogo_model3_te").click(function(event){
                             
 
-                            tool_val = "<a href='/starlogonova/te/model3' target='_blank'><img src='/static/ndf/images/FishAlgae-Telugu.jpg' alt='Star Logo Thumbnail'  height='1000px' width='1000px' >"
+                            tool_val = "<a href='/starlogonova/te/FishAlgae' target='_blank'><img src='/static/ndf/images/FishAlgae-Telugu.jpg' alt='Star Logo Thumbnail'  height='1000px' width='1000px' >"
                             
                              CKEDITOR.instances[textAreaId].insertHtml(tool_val);
                             $('#group_imgs_on_modal').foundation('reveal', 'close');
