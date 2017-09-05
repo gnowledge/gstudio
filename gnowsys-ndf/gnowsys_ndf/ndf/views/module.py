@@ -160,4 +160,3 @@ def module_detail(request, group_id, node_id):
                                 'card': 'ndf/event_card.html', 'card_url_name': 'groupchange'
                             })
     return render_to_response(template, req_context)
-

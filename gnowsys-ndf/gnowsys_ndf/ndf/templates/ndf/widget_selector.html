@@ -240,7 +240,7 @@ HOW TO USE
   // making list of all selected items data
   
   var selected_options = [ {% for each_opt in selected_options %}"{{each_opt|safe}}"{% if not forloop.last %},{% endif %}{% endfor %} ];
-  console.log(selected_options)
+  // console.log(selected_options)
 
   {% if ajax_search %}
     {% if url_first_arg and url_second_arg %}
