@@ -102,6 +102,7 @@ def created_trans_node(request, group_id, node_id, trans_node_id, language):
         translated_node = node_collection.collection.GSystem()
     name,content = get_quiz_item_name_content(request)
     translated_node.name = name
+    translated_node.altnames = content
     translated_node.content = content
     translated_node.member_of = [trans_node_gst_id]
     translated_node.group_set = [group_id]
@@ -280,7 +281,7 @@ def create_edit_quiz_item(request, group_id, node_id=None, trans_node_id=None, l
             quizitem_max_attempts_AT = node_collection.one({'_type': "AttributeType", 'name': "quizitem_max_attempts"})
             quizitem_check_ans_AT = node_collection.one({'_type': "AttributeType", 'name': "quizitem_check_answer"})
 
-
+            quiz_item_node.altnames = quiz_item_node.content
             quiz_item_node.save(is_changed=get_node_common_fields(request, quiz_item_node, group_id, gst_quiz_item_node),groupid=group_id)
             # quiz_item_node.language = language
             if quiz_node_id:
