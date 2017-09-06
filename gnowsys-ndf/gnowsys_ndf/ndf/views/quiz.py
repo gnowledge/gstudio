@@ -202,12 +202,12 @@ def create_edit_quiz_item(request, group_id, node_id=None, trans_node_id=None, l
             # Edit a question
             quiz_item_node = node
     if translated_node:
-        question_content = translated_node.name
+        question_content = translated_node.content
         options_list = get_quiz_item_options(translated_node)
         print "\noptions_listRTR: ", options_list
     else:
         if quiz_item_node:
-            question_content = quiz_item_node.name
+            question_content = quiz_item_node.content
             options_list = get_quiz_item_options(quiz_item_node)
             existing_grel = triple_collection.one({
                                                 '_type': 'GRelation',
