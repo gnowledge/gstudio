@@ -5815,8 +5815,6 @@ ul.nav_menu_1 {
 
     }
 
-
-
 .scard_footer {
   border-top: 1px solid rgba(160, 160, 160, 0.2);
   padding: 0.25rem 0.5rem;
@@ -5825,6 +5823,19 @@ ul.nav_menu_1 {
   height: 2rem;
   }
 
+.finish-lesson{
+    border-radius: 5px;
+    text-transform: uppercase;
+    color: #ffffff !important;
+    width: inherit;
+    font-family: "OpenSans-Semibold", sans-serif;
+    border: 2px solid #6a0054;
+    background-color: #6a0054;    
+}
+
+.auto_width{
+    width: auto !important;
+}
 
 /* responsive footer */
 .clearfix {clear: both;}
@@ -5962,4 +5973,8 @@ ul.nav_menu_1 {
     a{
         font-size:16px;
     }
+}
+
+.attempts_count{
+    color: #000000 !important;
 }
