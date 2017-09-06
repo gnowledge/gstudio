@@ -75,18 +75,30 @@ margin-left:1.5em;
   <div class="content" id="all_questions">
     <div class="repository-title large-4 columns" >All Questions </div><hr>
     <section class="small-block-grid-1 medium-block-grid-2 large-block-grid-5" style="background-color:#fafafa;border-style:none">
-      {% for node in quiz_item_nodes %}
+      {% for quizitem_node in quiz_item_nodes %}
       <div>
-        {{forloop.counter}}. {{node.name}} 
+        {{forloop.counter}}. {{quizitem_node.name}} .
         <br/>
         <div>
-          {% if is_gstaff or node.created_by == request.user.id %}
-            <a href="{% url 'quiz_item_edit' group_id node.pk %}" class="quizitem_act">{% trans 'Edit' %}</a> | 
+          {% if is_gstaff or quizitem_node.created_by == request.user.id %}
+            <a href="{% url 'quiz_item_edit' group_id quizitem_node.pk %}" class="quizitem_act">{% trans 'Edit' %}</a> | 
+            <a href="#" data-dropdown="quiz_drop-{{quizitem_node.pk}}" aria-controls="quiz_drop-{{quizitem_node.pk}}" aria-expanded="false" class="inner" >{% trans "Translate" %} <i class="fa fa-chevron-down"></i></a> | 
+
+            <ul id="quiz_drop-{{quizitem_node.pk}}" data-dropdown-content class="f-dropdown" aria-hidden="true">
+            {% for each_lang in supported_languages %}
+            {% get_trans_node quizitem_node.pk each_lang as trans_node %}
+            {% if trans_node %}
+              <li><a href="{% url 'quiz_item_translate_edit' group_id quizitem_node.pk trans_node.pk each_lang %}" target="_blank">{{each_lang}}</a></li>
+            {% else %}
+              <li><a href="{% url 'quiz_item_translate_create' group_id quizitem_node.pk each_lang %}" target="_blank">{{each_lang}}</a></li>
+            {% endif %}
+            {% endfor %}
+            </ul>
           {% endif %}
-          <a href="{% url 'quiz_item_detail' group_id node.pk %}"y>{% trans 'Preview' %}</a>
+          <a href="{% url 'quiz_item_detail' group_id quizitem_node.pk %}">{% trans 'Preview' %}</a>
           <br/>
           <small class="quizitem_act"><i>{% trans 'Created by: ' %}
-            <a href="{% url 'dashboard' node.created_by %}" title="{{node.created_by|get_username}}" target="_blank" >{{node.created_by|get_username}}</a></i>
+            <a href="{% url 'dashboard' quizitem_node.created_by %}" title="{{quizitem_node.created_by|get_username}}" target="_blank" >{{quizitem_node.created_by|get_username}}</a></i>
           </small>
         </div>
       </div>

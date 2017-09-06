@@ -4096,3 +4096,29 @@ def cast_to_node(node_or_node_list):
 		return map(Node,node_or_node_list)
 	else:
 		return Node(node_or_node_list)
+
+def get_trans_node(node_id,lang):
+    rel_value = get_relation_value(ObjectId(node_id),"translation_of")
+    for each in rel_value['grel_node']:
+        if each.language[0] ==  get_language_tuple(lang)[0]:
+            trans_node = each
+            print "\n\ntrans_node", trans_node
+            return trans_node
+
+# @register.assignment_tag
+@register.inclusion_tag('ndf/quiz_player.html')
+def load_quiz_player(request, group_id, node):
+    from gnowsys_ndf.ndf.views.quiz import render_quiz_player
+    node_member_of_names_list = node.member_of_names_list
+    print "\nnode_member_of_names_list: ", node_member_of_names_list
+    if "QuizItem" in node_member_of_names_list or "QuizItemEvent" in node_member_of_names_list:
+        print "\nHI 1"
+        con_var = render_quiz_player(request, group_id, node, get_context=True)
+        print "\ncon_var: ", con_var
+        con_var.update({'template': 'ndf/quiz_player.html', 'request': request})
+    # rel_value = get_relation_value(ObjectId(node._id),"translation_of")
+    # for each in rel_value['grel_node']:
+    #     if each.language[0] ==  get_language_tuple(lang)[0]:
+    #         node = each
+    #         print "\n\nnode", node
+    return con_var

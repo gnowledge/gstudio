@@ -57,6 +57,6 @@ base_unit,[],"[""factory_types""]","[""educationalsubject"", ""educationallevel"
 lesson,[],"[""factory_types""]",[],[],[]
 activity,[],"[""factory_types""]",[],[],[]
 announced_unit,[],"[""factory_types""]","[""educationalsubject"", ""educationallevel"", ""start_time"", ""end_time"", ""start_enroll"", ""end_enroll""]",[],[]
-trans_node,[],"[""factory_types""]",[],[],[]
+trans_node,[],"[""factory_types""]","[""options""]",[],[]
 base_survey,[],"[""factory_types""]",[],[],[]
 announced_survey,[],"[""factory_types""]","[""start_time"", ""end_time"", ""start_enroll"", ""end_enroll""]",[],[]

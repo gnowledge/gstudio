@@ -76,16 +76,8 @@ def get_node_json_from_id(request, group_id, node_id=None):
 
     if node_obj:
       if "QuizItem" in node_obj.member_of_names_list:
-          node_obj.get_neighbourhood(node_obj.member_of)
-          context_variables = {}
-          context_variables['node'] = node_obj
-          context_variables['groupid'] = group_id
-          context_variables['group_id']=group_id
-          return render_to_response("ndf/quiz_player.html",
-                                    context_variables,
-                                    context_instance=RequestContext(request)
-          )
-
+        from gnowsys_ndf.ndf.views.quiz import render_quiz_player
+        return render_quiz_player(request, group_id, node_obj)
       trans_node = get_lang_node(node_obj._id,request.LANGUAGE_CODE)
       if trans_node:
         return HttpResponse(json.dumps(trans_node, cls=NodeJSONEncoder))
@@ -6657,7 +6649,7 @@ def get_group_resources(request, group_id, res_type="Page"):
     card_class = 'activity-page'
 
     try:
-        res_query = {'_type': 'GSystem', 'group_set': ObjectId(group_id)}
+        res_query = {'_type': 'GSystem'}
         except_collection_set_of_id = request.GET.get('except_collection_set_of_id', None)
 
         except_collection_set_of_obj = Node.get_node_by_id(except_collection_set_of_id)
