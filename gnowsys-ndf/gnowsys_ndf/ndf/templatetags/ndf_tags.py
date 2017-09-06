@@ -4129,6 +4129,7 @@ def cast_to_node(node_or_node_list):
 	else:
 		return Node(node_or_node_list)
 
+@register.assignment_tag
 def get_trans_node(node_id,lang):
     rel_value = get_relation_value(ObjectId(node_id),"translation_of")
     for each in rel_value['grel_node']:
