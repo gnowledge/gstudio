@@ -377,13 +377,18 @@
                   url: "{% url 'delete_asset' group_id %}",
                   datatype: "html",
                   success: function(data) {
-                        if("{{title}}" = "asset_detail"){
+                        
+                        if("{{title}}" == "asset_detail"){
 
                             location.href = "{% url 'course_gallery' group_id  %}";
                         }
-                        else{
+                        else if ("{{title}}" == "asset_gallery_detail") {
                             
+                            location.href = "{% url 'course_gallery' group_id  %}";
+                        }
+                        else if ("{{title}}" == "raw_material_detail"){
                             location.href = "{% url 'course_raw_material' group_id  %}";
+
                         }
                         
                 }
