@@ -2628,7 +2628,7 @@ def create_gattribute(subject_id, attribute_type_node, object_value=None, **kwar
         attribute_type_node = Node.get_node_obj_from_id_or_obj(attribute_type_node, AttributeType)
     except Exception:
         attribute_type_node = Node.get_name_id_from_type(attribute_type_node, 'AttributeType', get_obj=True)
-    print "\nattribute_type_node: ", attribute_type_node.name
+    # print "\nattribute_type_node: ", attribute_type_node.name
     ga_node = triple_collection.one(
         {'_type': "GAttribute", 'subject': subject_id, 'attribute_type': attribute_type_node._id})
 

@@ -105,11 +105,14 @@
               
               {# Adding alternate Language, if present #}
 
-
               </div>
               <div class="activity_page_rendered buddy_margin">
+                {% if "QuizItemEvent" in node.member_of_names_list or "QuizItem" in node.member_of_names_list%}
+                  {% load_quiz_player request group_id node %}
+                {% else %}
                 {# {{node.content|safe}} #}
                 {% include "ndf/node_ajax_content.html" with node=trans_node expand_content=True  no_discussion=True hide_breadcrumbs=True %}
+                {% endif %}
               </div>
               <div class="discussion-area activity_page_rendered" style="">
                 

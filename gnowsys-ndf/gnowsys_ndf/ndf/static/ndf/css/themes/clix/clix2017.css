@@ -5774,3 +5774,30 @@ p {
   }
 }
 /* for 480px or less */
+/* line 5873, ../../../scss/_clix2017.scss */
+.explore-settings-drop {
+  margin-left: 57%;
+  display: inline-block;
+}
+/* line 5876, ../../../scss/_clix2017.scss */
+.explore-settings-drop > button {
+  color: #164a7b;
+  font-weight: 400;
+  padding: 14px 10px 3px 10px;
+  cursor: pointer;
+  margin-top: 4px;
+  background-color: #ddeff9;
+  border: 1px solid #719dc8;
+  border-radius: 5px !important;
+  display: inline-block;
+}
+/* line 5886, ../../../scss/_clix2017.scss */
+.explore-settings-drop > button:hover {
+  border-radius: 10px;
+  background-color: #ddeff9;
+  color: #164a7b;
+}
+/* line 5892, ../../../scss/_clix2017.scss */
+.explore-settings-drop a {
+  font-size: 16px;
+}

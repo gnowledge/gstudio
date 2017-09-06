@@ -77,7 +77,7 @@ event_date_task,Event Date Reschedule Task,dict,[],"[""Classroom Session"", ""Ex
 event_status,Event Status,basestring,[],"[""Event""]",TRUE,TRUE,[],,,[],[],[]
 aadhar_id,Aadhar Card No.,long,[],"[""Person""]",FALSE,TRUE,"[""tel"", ""input_only_num"", ""[0-9]{12}""]",Enter 12-digit mobile number,12,[],[],[]
 quiz_type,QuizItem Type,IS(),"[""Short-Response"", ""Single-Choice"",""Multiple-Choice""]","[""QuizItem"",""QuizItemEvent""]",TRUE,TRUE,[],[],,[],[],[]
-options,QuizItem Options,list,[],"[""QuizItem"",""QuizItemEvent""]",TRUE,TRUE,[],[],,[],[],[]
+options,QuizItem Options,list,[],"[""QuizItem"",""QuizItemEvent"", ""trans_node""]",TRUE,TRUE,[],[],,"[""alt_language""]",[],[]
 correct_answer,QuizItem Correct Answer,list,[],"[""QuizItem"",""QuizItemEvent""]",TRUE,TRUE,[],[],,[],[],[]
 quizitem_show_correct_ans,QuizItem Show Correct Answer,bool,[],"[""QuizItem"",""QuizItemEvent""]",FALSE,TRUE,[],[],,[],[],[]
 quizitem_problem_weight,QuizItem Problem Weight,float,[],"[""QuizItem"",""QuizItemEvent""]",FALSE,TRUE,[],[],,[],[],[]
@@ -89,3 +89,4 @@ discussion_enable,Discussion Enable,bool,[],"[""Page"", ""File"",""E-Book"",""Qu
 is_bigbluebutton,Online Meeting,bool,[],"[""Event""]",TRUE,TRUE,[],[],,[],[],[]
 open_event,Open Event (All group members can join the event),bool,[],"[""Event""]",TRUE,TRUE,[],[],,[],[],[]
 player_discussion_enable,Player Discussion Enable,bool,[],"[""Page"", ""File"",""E-Book"",""QuizItemEvent"", ""Jsmol"", ""TurtleBlocks"", ""PoliceSquad"", ""OpenStoryTool"", ""BioMechanics"",""Asset""]",TRUE,TRUE,[],[],,[],[],[]
+items_sort_list,Items Sort List,list,[],"[""Group""]",TRUE,TRUE,[],[],,[],[],[]
