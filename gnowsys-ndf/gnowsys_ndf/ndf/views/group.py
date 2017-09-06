@@ -2058,7 +2058,6 @@ def group_dashboard(request, group_id=None):
     old_profile_pics = []
     selected = request.GET.get('selected','')
     group_obj = get_group_name_id(group_id, get_obj=True)
-    print "\ngroup_obj.member_of_names_list: ", group_obj.member_of_names_list
     if 'tab_name' in group_obj.project_config and group_obj.project_config['tab_name'].lower() == "questions":
         try:
             if group_obj.collection_set:

@@ -461,7 +461,7 @@ def save_quizitem_answer(request, group_id):
             # is_cursor = grel_dict.get("cursor",False)
             # if not is_cursor:
             #     thread_obj = grel_dict.get("grel_node")
-            print "\n thread_obj: ", thread_obj
+            # print "\n thread_obj: ", thread_obj
 
             user_action = request.POST.get("user_action", '')
 
@@ -698,7 +698,6 @@ def get_quiz_item_options(node):
     return options_list 
 
 def render_quiz_player(request, group_id, node, get_context=False):
-    print "\nIN render_quiz_player", node
     try:
         if gst_quiz_item._id not in node.member_of or gst_quiz_item_event._id not in node.member_of:
             lang = request.LANGUAGE_CODE
@@ -714,9 +713,9 @@ def render_quiz_player(request, group_id, node, get_context=False):
                 if trans_options_list: 
                     options_list = trans_options_list
 
-            print "\noptions_list: ", options_list
             context_variables = {'node': node, 'question_content': question_content, 
-            'options_list': options_list, 'groupid': group_id, 'group_id': group_id}
+            'options_list': options_list, 'groupid': group_id, 'group_id': group_id, 
+            'allow_attempt': True}
             if get_context:
                 return context_variables
             return render_to_response("ndf/quiz_player.html",
