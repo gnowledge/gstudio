@@ -5551,7 +5551,7 @@ p {
   background: #DCDCDC;
 }
 
-/* line 5712, ../../../scss/_clix2017.scss */
+/* line 5710, ../../../scss/_clix2017.scss */
 .scard_footer {
   border-top: 1px solid rgba(160, 160, 160, 0.2);
   padding: 0.25rem 0.5rem;
@@ -5560,7 +5560,7 @@ p {
   height: 2rem;
 }
 
-/* line 5720, ../../../scss/_clix2017.scss */
+/* line 5718, ../../../scss/_clix2017.scss */
 .finish-lesson {
   border-radius: 5px;
   text-transform: uppercase;
@@ -5571,7 +5571,35 @@ p {
   background-color: #6a0054;
 }
 
-/* line 5730, ../../../scss/_clix2017.scss */
+/* line 5728, ../../../scss/_clix2017.scss */
 .auto_width {
   width: auto !important;
+}
+
+/* line 5732, ../../../scss/_clix2017.scss */
+.explore-settings-drop {
+  margin-left: 57%;
+  display: inline-block;
+}
+/* line 5735, ../../../scss/_clix2017.scss */
+.explore-settings-drop > button {
+  color: #164a7b;
+  font-weight: 400;
+  padding: 14px 10px 3px 10px;
+  cursor: pointer;
+  margin-top: 4px;
+  background-color: #ddeff9;
+  border: 1px solid #719dc8;
+  border-radius: 5px !important;
+  display: inline-block;
+}
+/* line 5745, ../../../scss/_clix2017.scss */
+.explore-settings-drop > button:hover {
+  border-radius: 10px;
+  background-color: #ddeff9;
+  color: #164a7b;
+}
+/* line 5751, ../../../scss/_clix2017.scss */
+.explore-settings-drop a {
+  font-size: 16px;
 }

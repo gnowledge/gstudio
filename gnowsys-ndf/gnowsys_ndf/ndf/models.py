@@ -3487,8 +3487,8 @@ class Triple(DjangoDocument):
       at_node = node_collection.one({'_id': ObjectId(self.attribute_type)})
       attribute_type_name = at_node.name
       attribute_object_value = unicode(self.object_value)
-
-      self.name = "%(subject_name)s -- %(attribute_type_name)s -- %(attribute_object_value)s" % locals()
+      attribute_object_value_for_name = attribute_object_value[:20]
+      self.name = "%(subject_name)s -- %(attribute_type_name)s -- %(attribute_object_value_for_name)s" % locals()
       name_value = self.name
 
       subject_type_list = at_node.subject_type
