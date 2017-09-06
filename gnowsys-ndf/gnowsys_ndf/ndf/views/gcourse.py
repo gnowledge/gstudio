@@ -42,7 +42,7 @@ from gnowsys_ndf.ndf.views.methods import create_gattribute, create_grelation, c
 from gnowsys_ndf.notification import models as notification
 from gnowsys_ndf.settings import GSTUDIO_NOTE_CREATE_POINTS, GSTUDIO_QUIZ_CORRECT_POINTS, GSTUDIO_COMMENT_POINTS, GSTUDIO_FILE_UPLOAD_POINTS
 from gnowsys_ndf.ndf.views.trash import trash_resource 
-from gnowsys_ndf.ndf.views.translation import get_lang_node,get_trans_node_list,get_course_content_hierarchy 
+from gnowsys_ndf.ndf.views.translation import get_lang_node,get_trans_node_list,get_course_content_hierarchy, get_unit_hierarchy
 from gnowsys_ndf.ndf.views.assessment_analytics import user_assessment_results
 
 
@@ -2896,7 +2896,7 @@ def course_analytics(request, group_id, user_id, render_template=False, get_resu
         visited_nodes = []
         if counter_obj:
             visited_nodes = counter_obj['visited_nodes'].keys()
-        unit_structure = _get_unit_hierarchy(group_obj)
+        unit_structure = get_unit_hierarchy(group_obj)
         all_lessons = len(unit_structure)
         all_activities = 0
         completed_activities = 0
