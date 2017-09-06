@@ -220,7 +220,7 @@ def explore_basecourses(request,page_no=1):
     #     context_instance=RequestContext(request))
 
 @get_execution_time
-def explore_courses(request,page_no=1):
+def explore_courses(request):
 
     # this will be announced tab
     title = 'courses'
@@ -317,7 +317,7 @@ def explore_courses(request,page_no=1):
 
 @login_required
 @get_execution_time
-def explore_drafts(request,page_no=1):
+def explore_drafts(request):
     title = 'drafts'
     module_sort_list = None
     module_sort_list = get_attribute_value(group_id, 'items_sort_list')
@@ -334,6 +334,7 @@ def explore_drafts(request,page_no=1):
 
     module_unit_ids = [val for each_module in modules_cur for val in each_module.collection_set ]
 
+    # modules_cur.rewind()
     gstaff_access = check_is_gstaff(group_id,request.user)
     draft_query = {'member_of': gst_base_unit_id,
               '_id': {'$nin': module_unit_ids},
@@ -350,6 +351,7 @@ def explore_drafts(request,page_no=1):
 
     base_unit_cur = node_collection.find(draft_query).sort('last_update', -1)
     # print "\nbase: ", base_unit_cur.count()
+    # base_unit_page_cur = paginator.Paginator(base_unit_cur, page_no, GSTUDIO_NO_OF_OBJS_PP)
 
     '''
     base_unit_cur = node_collection.find({'member_of': gst_base_unit_id,
@@ -362,6 +364,7 @@ def explore_drafts(request,page_no=1):
                                           # {'group_type': 'PUBLIC'}
                                           ]}).sort('last_update', -1)
     '''
+
     # base_unit_page_cur = paginator.Paginator(base_unit_cur, page_no, GSTUDIO_NO_OF_OBJS_PP)
 
     context_variable.update({'modules_cur': modules_cur,'units_cur': base_unit_cur})
