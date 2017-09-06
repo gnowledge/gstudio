@@ -54,7 +54,7 @@ end_enroll,End Enroll,datetime.datetime,[],"[""StudentCourseEnrollment"",""Group
 has_enrolled,Enrolled,list,"[""ObjectId""]","[""StudentCourseEnrollment""]",TRUE,TRUE,[],,,[],[],[]
 has_approved,Approved,list,"[""ObjectId""]","[""StudentCourseEnrollment""]",TRUE,FALSE,[],,,[],[],[]
 has_rejected,Rejected,list,"[""ObjectId""]","[""StudentCourseEnrollment""]",TRUE,FALSE,[],,,[],[],[]
-completed_on,Date of Completion,datetime.datetime,[],"[""StudentCourseEnrollment""]",TRUE,FALSE,"[""d/m/Y H:i"", ""date_month_day_year""]",DD/MM/YYYY HH:MM,,[],[],[]
+completed_on,Date of Completion,datetime.datetime,[],"[""StudentCourseEnrollment"", ""lesson""]",TRUE,FALSE,"[""d/m/Y H:i"", ""date_month_day_year""]",DD/MM/YYYY HH:MM,,[],[],[]
 course_structure_minutes,Minutes,int,[],"[""CourseSubSection"",""CourseSubSectionEvent""]",TRUE,TRUE,"[""tel"", ""input_only_num"", ""[0-9]{2,3}""]",MMM (Minutes),3,[],[],[]
 course_structure_assignment,Assignment,bool,[],"[""CourseSubSection"",""CourseSubSectionEvent""]",FALSE,TRUE,[],,,[],[],[]
 course_structure_assessment,Assessment,bool,[],"[""CourseSubSection"",""CourseSubSectionEvent""]",FALSE,TRUE,[],,,[],[],[]

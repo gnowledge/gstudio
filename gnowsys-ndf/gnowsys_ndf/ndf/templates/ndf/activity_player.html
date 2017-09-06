@@ -70,6 +70,7 @@
             <div class="course_tree">
               <div class="lesson-title" title="{{trans_lesson_name}}">
                   <b>{{trans_lesson_name}}</b>
+                  <a data-reveal-id="confirm-finish-lesson-reveal" class="finish-lesson right">Finish</a>
               </div>
               <div class="activity-title">
               {% for each in act_list %}
@@ -104,7 +105,6 @@
               {% endcomment %}
               
               {# Adding alternate Language, if present #}
-
               </div>
               <div class="activity_page_rendered buddy_margin">
                 {% if "QuizItemEvent" in node.member_of_names_list or "QuizItem" in node.member_of_names_list%}
@@ -138,6 +138,18 @@
 </div>             
 
 
+<div id="confirm-finish-lesson-reveal" class="reveal-modal medium radius" data-reveal data-alert>
+    <p id="finishLessonModalLabel"></p>
+    <div class="row">
+      <div class="small-3 columns">
+        <button id="finishLessonbtnConfirmYes" class="explore-button auto_width ">{% trans "Yes" %}</button>
+    </div>
+    <div class="small-3 columns end">
+        <button id="finishLessonbtnConfirmNo" class="explore-button auto_width">{% trans "No" %}</button>
+    </div>
+</div>
+<a class="close-reveal-modal">&#215;</a>
+</div>
 
 <script type="text/javascript">
    function onMessage(message) {
@@ -282,6 +294,33 @@
        
       });
 
+  $(document).on('click', '.finish-lesson', function(e){
+      confirm_lesson_completion()
+  })
   
+  var lesson_finish_confirm_flag = false;
+  function confirm_lesson_completion(){
+      if(!lesson_finish_confirm_flag){
+          lbl_msg = "Finish Lesson: {% firstof lesson_node.altnames lesson_node.name %}?"
+          $("#finishLessonModalLabel").text(lbl_msg);
+          $("#confirm-finish-lesson-reveal")
+            .removeClass("medium").addClass("small")
+          lesson_id_hidden_ele = document.createElement("input");
+          lesson_id_hidden_ele.setAttribute("type", "hidden");
+          lesson_id_hidden_ele.setAttribute("name", "hidden_lesson_id");
+          lesson_id_hidden_ele.setAttribute("value", lesson_id);
+          dom_ele_hidden_ele = document.createElement("input");
+          dom_ele_hidden_ele.setAttribute("type", "hidden");
+          dom_ele_hidden_ele.setAttribute("name", "hidden_dom_ele");
+          dom_ele_hidden_ele.setAttribute("value", dom_element.attr('data-lesson-ele'));
+          del_type_hidden_ele = document.createElement("input");
+          del_type_hidden_ele.setAttribute("type", "hidden");
+          del_type_hidden_ele.setAttribute("name", "hidden_del_type");
+          del_type_hidden_ele.setAttribute("value", deletion_type);
+          $("#deleteLessonModal").append(lesson_id_hidden_ele, dom_ele_hidden_ele,del_type_hidden_ele)
+          $("#deleteLessonModal").foundation('reveal', 'open');
+      }
+
+  }
 </script>
 {% endblock %}

@@ -5559,3 +5559,19 @@ p {
   font-size: small;
   height: 2rem;
 }
+
+/* line 5720, ../../../scss/_clix2017.scss */
+.finish-lesson {
+  border-radius: 5px;
+  text-transform: uppercase;
+  color: #ffffff !important;
+  width: inherit;
+  font-family: "OpenSans-Semibold", sans-serif;
+  border: 2px solid #6a0054;
+  background-color: #6a0054;
+}
+
+/* line 5730, ../../../scss/_clix2017.scss */
+.auto_width {
+  width: auto !important;
+}
