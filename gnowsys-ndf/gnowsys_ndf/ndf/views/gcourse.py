@@ -3806,3 +3806,19 @@ def course_quiz_data(request, group_id):
                         "prof_pic_obj": banner_pic_obj, 'data': json.dumps(return_list)})
     return render_to_response(template, context_variables,
             context_instance=RequestContext(request))
+
+def finish_lesson(request, group_id, node_id):
+    response_dict = {'success': False}
+    try:
+        if request.method == "POST":
+            user_id = request.POST.get('user_id', None)
+            lesson_node = Node.get_node_by_id(node_id)
+            if lesson_node and user_id:
+                user_id = int(user_id)
+                if user_id not in lesson_node.author_set:
+                    lesson_node.author_set.append(user_id)
+                    lesson_node.save(groupid=group_id)
+    except Exception as complete_node_err:
+      pass
+      print "\nError occurred in complete_node(). ", complete_node_err 
+    return HttpResponse(json.dumps(response_dict))

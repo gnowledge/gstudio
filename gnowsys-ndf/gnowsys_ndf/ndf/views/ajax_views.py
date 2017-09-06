@@ -7107,17 +7107,3 @@ def delete_curriculum_node(request, group_id):
       trash_resource(request,ObjectId(group_id),ObjectId(node_id))
       trash_resource(request,ObjectId(group_id),ObjectId(node_id))
       return HttpResponse("Success")
-
-def complete_node(request, group_id, node_id):
-    response_dict = {'success': False}
-    try:
-      if node_id:
-          completed_on_datetime = datetime.now()
-          completed_on_at = node_collection.one({'_type': 'AttributeType',
-            'name': 'completed_on'})
-          create_gattribute(ObjectId(node_id), completed_on_at, completed_on_datetime)
-
-    except Exception as complete_node_err:
-      pass
-      print "\nError occurred in complete_node(). ", complete_node_err 
-    return HttpResponse(json.dumps(response_dict))

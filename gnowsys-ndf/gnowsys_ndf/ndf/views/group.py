@@ -2057,8 +2057,8 @@ def group_dashboard(request, group_id=None):
     old_profile_pics = []
     selected = request.GET.get('selected','')
     group_obj = get_group_name_id(group_id, get_obj=True)
-
-    if "announced_unit" in group_obj.member_of_names_list and group_obj.project_config['tab_name'].lower() == "questions":
+    print "\ngroup_obj.member_of_names_list: ", group_obj.member_of_names_list
+    if 'tab_name' in group_obj.project_config and group_obj.project_config['tab_name'].lower() == "questions":
         try:
             if group_obj.collection_set:
                 lesson_id = group_obj.collection_set[0]
@@ -2146,6 +2146,7 @@ def group_dashboard(request, group_id=None):
           shelves = []
     '''
   except Exception as e:
+    print "\nError: ", e
     group_obj=node_collection.one({'$and':[{'_type':u'Group'},{'name':u'home'}]})
     group_id=group_obj['_id']
     pass

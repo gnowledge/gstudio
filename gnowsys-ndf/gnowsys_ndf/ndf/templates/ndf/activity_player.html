@@ -70,7 +70,9 @@
             <div class="course_tree">
               <div class="lesson-title" title="{{trans_lesson_name}}">
                   <b>{{trans_lesson_name}}</b>
-                  <a href="#" class="finish-lesson right">Finish</a>
+                  {% if group_object.project_config.tab_name == "Questions" and request.user.is_authenticated %}
+                    <a href="#" class="finish-lesson right">Finish</a>
+                  {% endif %}
               </div>
               <div class="activity-title">
               {% for each in act_list %}
@@ -85,35 +87,39 @@
           <div class="small-8 columns">
 
             <div class="course_editor_section">
+              {% with node.member_of_names_list as node_member_of_names_list %}
+              {% if "QuizItemEvent" not in node_member_of_names_list and "QuizItem" not in node_member_of_names_list%}
               <div class="input_links row" style="margin-left:10px;">
-              {% include 'ndf/rating.html'%}
-              {% get_relation_value node.pk 'has_help' as grel_help %}
-              {% get_relation_value node.pk 'has_admin_page' as grel_admin_page %}
-                {% if grel_help.grel_id  %}
-                  <a class="student-page right"> {% trans "Student Help" %}</a>
-                {% endif %}
-                {% if  is_gstaff or user.is_superuser %}
-                  {% if grel_admin_page.grel_id %}<a class="admin-page right"> {% trans "Teacher's Help" %}</a>{% endif %}
-                {% endif  %}
+                {% include 'ndf/rating.html'%}
+                {% get_relation_value node.pk 'has_help' as grel_help %}
+                {% get_relation_value node.pk 'has_admin_page' as grel_admin_page %}
+                  {% if grel_help.grel_id  %}
+                    <a class="student-page right"> {% trans "Student Help" %}</a>
+                  {% endif %}
+                  {% if  is_gstaff or user.is_superuser %}
+                    {% if grel_admin_page.grel_id %}<a class="admin-page right"> {% trans "Teacher's Help" %}</a>{% endif %}
+                  {% endif  %}
 
-              {% get_attribute_value node.pk 'discussion_enable' as node_discussion %}
-              {% if node_discussion %}
-              <a class="discuss right">{% trans "Discuss" %} </a>
-              {% endif %}
-              {% comment %}
-              <a class="translate right"> Translate</a>
-              {% endcomment %}
-              
-              {# Adding alternate Language, if present #}
+                {% get_attribute_value node.pk 'discussion_enable' as node_discussion %}
+                {% if node_discussion %}
+                <a class="discuss right">{% trans "Discuss" %} </a>
+                {% endif %}
+                {% comment %}
+                <a class="translate right"> Translate</a>
+                {% endcomment %}
+                
+                {# Adding alternate Language, if present #}
               </div>
+              {% endif %}
               <div class="activity_page_rendered buddy_margin">
-                {% if "QuizItemEvent" in node.member_of_names_list or "QuizItem" in node.member_of_names_list%}
+                {% if "QuizItemEvent" in node_member_of_names_list or "QuizItem" in node_member_of_names_list%}
                   {% load_quiz_player request group_id node %}
                 {% else %}
                 {# {{node.content|safe}} #}
                 {% include "ndf/node_ajax_content.html" with node=trans_node expand_content=True  no_discussion=True hide_breadcrumbs=True %}
                 {% endif %}
               </div>
+              {% endwith %}
               <div class="discussion-area activity_page_rendered" style="">
                 
                 {% if node_discussion %}
@@ -323,8 +329,9 @@
         type: "POST",
         data:{
             'csrfmiddlewaretoken': "{{csrf_token}}",
+            'user_id': '{{request.user.id}}'
         },
-        url: "{% url 'complete_node' group_id lesson_node.pk %}",
+        url: "{% url 'finish_lesson' group_id lesson_node.pk %}",
             // datatype: "",
             success: function(data) {
                 data_dict = JSON.parse(data);

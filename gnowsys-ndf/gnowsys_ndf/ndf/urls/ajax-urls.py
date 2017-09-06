@@ -130,7 +130,6 @@ urlpatterns = patterns('gnowsys_ndf.ndf.views.ajax_views',
     url(r'^delete_curriculum_node/$', 'delete_curriculum_node', name='delete_curriculum_node'),
     # url for graph display
     url(r'^graph/adminRenderGraph/(?P<node_id>[^/]+)/fetch/(?P<graph_type>[^/]+)$', 'adminRenderGraph', name='adminRenderGraph'),
-    url(r'^complete_node/(?P<node_id>[\w-]+)$', 'complete_node', name='complete_node'),
 
 
 
