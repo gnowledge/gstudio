@@ -92,8 +92,6 @@ margin-left:1.5em;
               {% else %}
                 <li><a href="{% url 'quiz_item_translate_create' group_id quizitem_node.pk each_lang %}" target="_blank">{{each_lang}}</a></li>
               {% endif %}
-            {% empty %}
-            Do nothing
             {% endfor %}
             </ul>
           {% endif %}
