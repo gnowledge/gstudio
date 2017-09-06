@@ -86,12 +86,14 @@ margin-left:1.5em;
 
             <ul id="quiz_drop-{{quizitem_node.pk}}" data-dropdown-content class="f-dropdown" aria-hidden="true">
             {% for each_lang in supported_languages %}
-            {% get_trans_node quizitem_node.pk each_lang as trans_node %}
-            {% if trans_node %}
-              <li><a href="{% url 'quiz_item_translate_edit' group_id quizitem_node.pk trans_node.pk each_lang %}" target="_blank">{{each_lang}}</a></li>
-            {% else %}
-              <li><a href="{% url 'quiz_item_translate_create' group_id quizitem_node.pk each_lang %}" target="_blank">{{each_lang}}</a></li>
-            {% endif %}
+              {% get_trans_node quizitem_node.pk each_lang as trans_node %}
+              {% if trans_node %}
+                <li><a href="{% url 'quiz_item_translate_edit' group_id quizitem_node.pk trans_node.pk each_lang %}" target="_blank">{{each_lang}}</a></li>
+              {% else %}
+                <li><a href="{% url 'quiz_item_translate_create' group_id quizitem_node.pk each_lang %}" target="_blank">{{each_lang}}</a></li>
+              {% endif %}
+            {% empty %}
+            Do nothing
             {% endfor %}
             </ul>
           {% endif %}

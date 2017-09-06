@@ -70,7 +70,7 @@
             <div class="course_tree">
               <div class="lesson-title" title="{{trans_lesson_name}}">
                   <b>{{trans_lesson_name}}</b>
-                  <a data-reveal-id="confirm-finish-lesson-reveal" class="finish-lesson right">Finish</a>
+                  <a href="#" class="finish-lesson right">Finish</a>
               </div>
               <div class="activity-title">
               {% for each in act_list %}
@@ -301,26 +301,45 @@
   var lesson_finish_confirm_flag = false;
   function confirm_lesson_completion(){
       if(!lesson_finish_confirm_flag){
-          lbl_msg = "Finish Lesson: {% firstof lesson_node.altnames lesson_node.name %}?"
+          lbl_msg = "Confirm Finish Lesson: {% firstof lesson_node.altnames lesson_node.name %}?"
           $("#finishLessonModalLabel").text(lbl_msg);
-          $("#confirm-finish-lesson-reveal")
-            .removeClass("medium").addClass("small")
-          lesson_id_hidden_ele = document.createElement("input");
-          lesson_id_hidden_ele.setAttribute("type", "hidden");
-          lesson_id_hidden_ele.setAttribute("name", "hidden_lesson_id");
-          lesson_id_hidden_ele.setAttribute("value", lesson_id);
-          dom_ele_hidden_ele = document.createElement("input");
-          dom_ele_hidden_ele.setAttribute("type", "hidden");
-          dom_ele_hidden_ele.setAttribute("name", "hidden_dom_ele");
-          dom_ele_hidden_ele.setAttribute("value", dom_element.attr('data-lesson-ele'));
-          del_type_hidden_ele = document.createElement("input");
-          del_type_hidden_ele.setAttribute("type", "hidden");
-          del_type_hidden_ele.setAttribute("name", "hidden_del_type");
-          del_type_hidden_ele.setAttribute("value", deletion_type);
-          $("#deleteLessonModal").append(lesson_id_hidden_ele, dom_ele_hidden_ele,del_type_hidden_ele)
-          $("#deleteLessonModal").foundation('reveal', 'open');
+          $("#confirm-finish-lesson-reveal").foundation('reveal', 'open');
       }
-
   }
+
+  //Confirm Lesson Completion
+  $("#confirm-finish-lesson-reveal").on("click", "#finishLessonbtnConfirmYes", function() {
+      lesson_finish_confirm_flag = true;
+      complete_lesson()
+      $("#confirm-finish-lesson-reveal").foundation('reveal', 'close');
+  });
+
+  $("#confirm-finish-lesson-reveal").on("click", "#finishLessonbtnConfirmNo", function() {
+      $("#confirm-finish-lesson-reveal").foundation('reveal', 'close');
+  });
+
+  function complete_lesson(){
+      $.ajax({
+        type: "POST",
+        data:{
+            'csrfmiddlewaretoken': "{{csrf_token}}",
+        },
+        url: "{% url 'complete_node' group_id lesson_node.pk %}",
+            // datatype: "",
+            success: function(data) {
+                data_dict = JSON.parse(data);
+                // console.log(data);
+                if(data_dict['success']){
+                    $('#confirm-finish-lesson-reveal').foundation('reveal', 'close');
+                    lesson_finish_confirm_flag = true;
+                }
+                else{
+                    lesson_finish_confirm_flag = false;
+                }
+
+            }
+        });
+  }
+
 </script>
 {% endblock %}
