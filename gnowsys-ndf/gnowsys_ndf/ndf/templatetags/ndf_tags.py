@@ -3830,12 +3830,19 @@ def get_course_filters(group_id, filter_context):
 				'group_set': {'$all': [ObjectId(group_id)]},'tags':'asset@asset'}).sort('last_update', -1)
 
 			# print "\n\n result_cur.count()--",result_cur.count()
-			all_tags_from_cursor = map(lambda x: x['tags'], result_cur)
-			# all_tags_from_cursor is a list having nested list
-			all_tags_list = list(itertools.chain(*all_tags_from_cursor))
-			if all_tags_list:
-				all_tags_list = json.dumps(all_tags_list)
-			filters_dict[each_course_filter_key].update({'value': all_tags_list})
+			# all_tags_from_cursor = map(lambda x: x['tags'], result_cur)
+			# # # all_tags_from_cursor is a list having nested list
+			# all_tags_list = list(itertools.chain(*all_tags_from_cursor))
+			# if all_tags_list:
+			# 	all_tags_list = json.dumps(all_tags_list)
+			distinct_res_cur = result_cur.distinct('tags')
+			if 'raw@material' in distinct_res_cur:
+				distinct_res_cur.remove('raw@material')
+			if 'asset@gallery' in distinct_res_cur:
+				distinct_res_cur.remove('asset@gallery')
+			if 'asset@asset' in distinct_res_cur:
+				distinct_res_cur.remove('asset@asset')
+			filters_dict[each_course_filter_key].update({'value': json.dumps(distinct_res_cur)})
 	return filters_dict
 
 

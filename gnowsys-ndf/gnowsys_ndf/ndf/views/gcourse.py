@@ -3358,12 +3358,12 @@ def assets(request, group_id, asset_id=None,page_no=1):
         asset_nodes = node_collection.find({'member_of': {'$in': [asset_gst_id]},
             'group_set': {'$all': [ObjectId(group_id)]}}).sort('last_update', -1)
         # topic_nodes = node_collection.find({'member_of': {'$in': [topic_gst_id]}})
-        assetcontent_page_info = paginator.Paginator(asset_content_list['grel_node'], page_no, GSTUDIO_NO_OF_OBJS_PP)
+        # assetcontent_page_info = paginator.Paginator(asset_content_list['grel_node'], page_no, GSTUDIO_NO_OF_OBJS_PP)
         context_variables = {
             'group_id': group_id, 'groupid': group_id,
             'title':'asset_detail','asset_obj':asset_obj,
             'asset_nodes':asset_nodes,'asset_content_list':asset_content_list,
-            'group_obj':group_obj,'assetcontent_page_info':assetcontent_page_info
+            'group_obj':group_obj
         }
         if 'announced_unit' in group_obj.member_of_names_list or 'Group' in group_obj.member_of_names_list and 'base_unit' not in group_obj.member_of_names_list :
             template = 'ndf/lms.html'     
