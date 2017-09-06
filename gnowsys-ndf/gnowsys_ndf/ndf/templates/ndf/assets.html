@@ -16,14 +16,18 @@
        
         {% if user.is_authenticated  %}
             {% if title == "raw material" and is_gstaff %}
+                <input type="hidden"  class="title-for-filters" value="raw_material_lms">
                 {% get_course_filters group_id "raw_material_lms" as filter_dict %}
                 {% include "ndf/filters.html" with filter_dict=filter_dict %}
+
             {% endif %}
             {% if title == "gallery"  %}
+                <input type="hidden"  class="title-for-filters" value="gallery_lms">
                 {% get_course_filters group_id "gallery_lms" as filter_dict %}
                 {% include "ndf/filters.html" with filter_dict=filter_dict %}
             {% endif %}
             {% if title == "asset_list"  %}
+                <input type="hidden"  class="title-for-filters" value="assets_lms">
                 {% get_course_filters group_id "assets_lms" as filter_dict %}
                 {% include "ndf/filters.html" with filter_dict=filter_dict %}
             {% endif %}
@@ -104,12 +108,13 @@ var allImages1 = "";
 
    function applyFilter(filtersObjArr){
         filtersObjArr = JSON.stringify(getFiltersObjsInAndOrFormat());
+        title = $(".title-for-filters").val();
         $.ajax({
           url: "{% url 'course_filters' group_id %}",
           data: {
             filter_dict: filtersObjArr,
             'filter_applied': 'True',
-            'title': 'raw_material_lms'
+            'title': title
           },
           type: "GET",
           dataType: "html",

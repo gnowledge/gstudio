@@ -3790,6 +3790,12 @@ def get_course_filters(group_id, filter_context):
 				result_cur = node_collection.find({'member_of':page_gst._id, 'type_of': blogpage_gst._id,
 							'group_set': group_obj._id, 'tags':{'$exists': True, '$not': {'$size': 0}} #'tags':{'$exists': True, '$ne': []}}
 							},{'tags': 1, '_id': False})
+			elif filter_context.lower() == "notebook_lms":
+				page_gst = node_collection.one({'_type': "GSystemType", 'name': "Page"})
+				blogpage_gst = node_collection.one({'_type': "GSystemType", 'name': "Blog page"})
+				result_cur = node_collection.find({'member_of':page_gst._id, 'type_of': blogpage_gst._id,
+							'group_set': group_obj._id, 'tags':{'$exists': True, '$not': {'$size': 0}} #'tags':{'$exists': True, '$ne': []}}
+							},{'tags': 1, '_id': False})
 
 			elif filter_context.lower() == "gallery":
 				# all_user_objs_id = [eachuser.id for eachuser in all_user_objs]
@@ -3810,6 +3816,18 @@ def get_course_filters(group_id, filter_context):
 				asset_gst_name, asset_gst_id = GSystemType.get_gst_name_id("Asset")
 				result_cur = node_collection.find({'member_of': {'$in': [asset_gst_id]},
             'group_set': {'$all': [ObjectId(group_id)]},'tags':'raw@material'}).sort('last_update', -1)
+
+			elif filter_context.lower() == "gallery_lms":
+				# all_user_objs_id = [eachuser.id for eachuser in all_user_objs if check_is_gstaff(group_obj._id,eachuser)]
+				asset_gst_name, asset_gst_id = GSystemType.get_gst_name_id("Asset")
+				result_cur = node_collection.find({'member_of': {'$in': [asset_gst_id]},
+				'group_set': {'$all': [ObjectId(group_id)]},'tags':'asset@gallery'}).sort('last_update', -1)
+
+			elif filter_context.lower() == "assets_lms":
+				# all_user_objs_id = [eachuser.id for eachuser in all_user_objs if check_is_gstaff(group_obj._id,eachuser)]
+				asset_gst_name, asset_gst_id = GSystemType.get_gst_name_id("Asset")
+				result_cur = node_collection.find({'member_of': {'$in': [asset_gst_id]},
+				'group_set': {'$all': [ObjectId(group_id)]},'tags':'asset@asset'}).sort('last_update', -1)
 
 			# print "\n\n result_cur.count()--",result_cur.count()
 			all_tags_from_cursor = map(lambda x: x['tags'], result_cur)

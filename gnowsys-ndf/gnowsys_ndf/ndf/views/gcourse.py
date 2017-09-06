@@ -2724,6 +2724,15 @@ def course_filters(request, group_id):
         no_url_flag = False
         # detail_urlname = "course_notebook_tab_note"
         detail_urlname = "course_notebook_note"
+    elif title.lower() == "notebook_lms":
+        # page_gst = node_collection.one({'_type': "GSystemType", 'name': "Page"})
+        # blogpage_gst = node_collection.one({'_type': "GSystemType", 'name': "Blog page"})
+        query.update({'member_of':page_gst_id, 'type_of': blog_page_gst_id})
+        notebook_filter = True
+        no_url_flag = False
+        # detail_urlname = "course_notebook_tab_note"
+        detail_urlname = "course_notebook_note"
+        template = "ndf/widget_card_list.html"
     if title.lower() == "gallery":
         query.update({'created_by': {'$nin': gstaff_users}})
         no_url_flag = False
@@ -2736,7 +2745,19 @@ def course_filters(request, group_id):
         asset_gst_name, asset_gst_id = GSystemType.get_gst_name_id("Asset")
         query.update({'member_of':asset_gst_id,'tags':'raw@material' })
         no_url_flag = False
-        detail_urlname = "course_raw_material_detail"
+        detail_urlname = "asset_detail"
+        template = "ndf/widget_card_list.html"
+    elif title.lower() == "gallery_lms":
+        asset_gst_name, asset_gst_id = GSystemType.get_gst_name_id("Asset")
+        query.update({'member_of':asset_gst_id,'tags':'asset@gallery' })
+        no_url_flag = False
+        detail_urlname = "asset_detail"
+        template = "ndf/widget_card_list.html"
+    elif title.lower() == "assets_lms":
+        asset_gst_name, asset_gst_id = GSystemType.get_gst_name_id("Asset")
+        query.update({'member_of':asset_gst_id,'tags':'asset@asset' })
+        no_url_flag = False
+        detail_urlname = "asset_detail"
         template = "ndf/widget_card_list.html"
     if filter_applied:
         filter_dict = json.loads(filter_dict)
