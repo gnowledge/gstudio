@@ -42,3 +42,9 @@ def tools_logging(request):
 				old_data.append(userdata)
 				json.dump(old_data, wrfile)	
 	return StreamingHttpResponse("Success")	
+
+def tools_temp(request):
+	return render_to_response(
+        'ndf/tools_list.html',
+        context_instance=RequestContext(request)
+    )
