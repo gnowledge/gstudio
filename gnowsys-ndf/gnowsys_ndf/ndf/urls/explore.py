@@ -9,8 +9,8 @@ urlpatterns = patterns('gnowsys_ndf.ndf.views.explore',
 						url(r'^courses/page-no=(?P<page_no>\d+)/$', 'explore_courses', name='courses_paged'),
 						url(r'^basecourses/page-no=(?P<page_no>\d+)/$', 'explore_basecourses', name='basecourses_paged'),
 						url(r'^groups/page-no=(?P<page_no>\d+)/$', 'explore_groups', name='groups_paged'),
-
 						url(r'^drafts$', 'explore_drafts', name='explore_drafts'),
+                        url(r'^reorder$', 'module_order_list', name='module_order_list'),
  )
 
 
