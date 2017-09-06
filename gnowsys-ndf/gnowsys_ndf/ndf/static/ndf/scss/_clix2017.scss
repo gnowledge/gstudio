@@ -5727,8 +5727,8 @@ ul.nav_menu_1 {
     cursor: pointer;
     margin-top: 4px;
     background-color: #ddeff9;
-    border-radius: 10px;
-    border: 2px solid #719dc8;
+    border: 1px solid #719dc8;
+    border-radius: 5px !important;
     display: inline-block;
         &:hover{
             border-radius: 10px;
