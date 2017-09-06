@@ -2045,7 +2045,11 @@ def course_resource_detail(request, group_id, course_sub_section, course_unit, r
 
 @get_execution_time
 def activity_player_detail(request, group_id, lesson_id, activity_id):
-    group_name, group_id = get_group_name_id(group_id)
+
+    group_obj   = get_group_name_id(group_id, get_obj=True)
+    group_id    = group_obj._id
+    group_name  = group_obj.name
+
     parent_node_id = activity_id
     node_obj = node_collection.one({'_id': ObjectId(activity_id)})
     trans_node = get_lang_node(node_obj._id,request.LANGUAGE_CODE)
@@ -2084,21 +2088,18 @@ def activity_player_detail(request, group_id, lesson_id, activity_id):
     thread_node = allow_to_comment = None
     thread_node, allow_to_comment = node_thread_access(group_id, node_obj)
 
-    variable = RequestContext(request, {
+    context_variables = {
         'group_id': group_id, 'groupid': group_id, 'group_name':group_name,
         'allow_to_comment': True,
         'node': node_obj, 'lesson_node': lesson_node, 'activityid': ObjectId(activity_id),
         'resource_index': resource_index, 'resource_next_id': resource_next_id,
         'resource_prev_id': resource_prev_id, 'resource_count': resource_count,
-
         'translation': translation_obj, 'unit_resources_list_of_dict': unit_resources_list_of_dict,
-
-        # 'unit_resources_list_of_dict': unit_resources_list_of_dict,
         'trans_node':trans_node,
         'act_list':trans_act_list,
         'trans_lesson_name':lesson_name,
-        'no_footer': True
-    })
+        'no_footer': True, 'allow_finish_lesson': False
+    }
 
     if request.user.is_authenticated():
         active_user_ids_list = [request.user.id]
@@ -2117,9 +2118,14 @@ def activity_player_detail(request, group_id, lesson_id, activity_id):
             each_counter_obj.last_update = datetime.datetime.now()
             each_counter_obj.save()
             # print "\n updated counter_obj: ", each_counter_obj['visited_nodes']
+        if 'tab_name' in group_obj.project_config and group_obj.project_config['tab_name'].lower() == "questions":
+            if request.user.id not in lesson_node.author_set:
+                context_variables.update({'allow_finish_lesson': True})
     template = "ndf/activity_player.html"
-
-    return render_to_response(template, variable)
+    return render_to_response(template,
+                                context_variables,
+                                context_instance = RequestContext(request)
+    )
 
 
 # def course_resource_detail(request, group_id, course_section, course_sub_section, course_unit, resource_id):
@@ -3908,3 +3914,20 @@ def course_quiz_data(request, group_id):
                         "prof_pic_obj": banner_pic_obj, 'data': json.dumps(return_list)})
     return render_to_response(template, context_variables,
             context_instance=RequestContext(request))
+
+def finish_lesson(request, group_id, node_id):
+    response_dict = {'success': False}
+    try:
+        if request.method == "POST":
+            user_id = request.POST.get('user_id', None)
+            lesson_node = Node.get_node_by_id(node_id)
+            if lesson_node and user_id:
+                user_id = int(user_id)
+                if user_id not in lesson_node.author_set:
+                    lesson_node.author_set.append(user_id)
+                    lesson_node.save(groupid=group_id)
+                    response_dict.update({'success': True})
+    except Exception as complete_node_err:
+      print "\nError occurred in complete_node(). ", complete_node_err 
+      pass
+    return HttpResponse(json.dumps(response_dict))
