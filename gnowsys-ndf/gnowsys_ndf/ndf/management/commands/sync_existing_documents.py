@@ -164,7 +164,7 @@ class Command(BaseCommand):
 
     ctr_res = counter_collection.collection.update({
                     '_type': 'Counter',
-                    'assessment': {'$exists': False}
+                    '$or': [{'assessment': {'$exists': False}}, {'assessment': {'$not': {'$type': "array"}}}]
                 },
                 {
                     '$set': {
