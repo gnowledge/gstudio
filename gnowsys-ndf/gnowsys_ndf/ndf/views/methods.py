@@ -5412,11 +5412,11 @@ def create_clone(user_id, node, group_id, mem_of_node_id=None):
         cloned_copy['relation_set'] = []
         cloned_copy['attribute_set'] = []
         cloned_copy['origin'] = [{'fork_of': node._id}]
+        if mem_of_node_id:
+            cloned_copy['member_of'] = [ObjectId(mem_of_node_id)]
         if "QuizItem" in node.member_of_names_list:
             quiz_item_event_gst = node_collection.one({'_type': "GSystemType", 'name': "QuizItemEvent"})
             cloned_copy['member_of'] = [quiz_item_event_gst._id]
-        if mem_of_node_id:
-            cloned_copy['member_of'] = [ObjectId(mem_of_node_id)]
         cloned_obj_id = node_collection.collection.insert(cloned_copy)
         cloned_obj = node_collection.one({'_id': ObjectId(cloned_obj_id)})
         cloned_obj.save(groupid=group_id, validate=False)
