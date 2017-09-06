@@ -484,11 +484,7 @@ Still keeping for future ref (if needed).
           {% endif %}
 
           {% if "QuizItemEvent" in node.member_of_names_list or "QuizItem" in node.member_of_names_list%}
-            {% if request.user.is_authenticated %}
-                {% include 'ndf/quiz_player.html' %}
-            {% else %}
-              <label>Please <a href="{% url 'auth_login' %}?next={{request.path}}">LOGIN</a>  to view the Quiz</label>
-            {% endif %}
+              {% load_quiz_player request group_id node %}
           {% endif %}
 
           {% block add_fields %} {% endblock %}

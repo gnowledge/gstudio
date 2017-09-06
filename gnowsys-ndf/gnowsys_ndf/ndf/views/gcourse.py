@@ -3366,7 +3366,7 @@ def assets(request, group_id, asset_id=None):
             'asset_nodes':asset_nodes,'asset_content_list':asset_content_list,
             'topic_nodes':topic_nodes,'group_obj':group_obj
         }
-        if 'announced_unit' in group_obj.member_of_names_list:
+        if 'announced_unit' in group_obj.member_of_names_list or 'Group' in group_obj.member_of_names_list and 'base_unit' not in group_obj.member_of_names_list :
             template = 'ndf/lms.html'     
             if 'raw@material' in asset_obj.tags:
                 context_variables.update({'title':'raw_material_detail'})
@@ -3414,7 +3414,7 @@ def assetcontent_detail(request, group_id, asset_id,asst_content_id):
                                 current_group_id=group_obj._id.__str__(),
                                 loggedin_userid=request.user.id)
 
-    if "announced_unit" in group_obj.member_of_names_list and  "raw@material" in asset_obj.tags or "asset@gallery" in asset_obj.tags:
+    if ("announced_unit" in group_obj.member_of_names_list or "Group" in group_obj.member_of_names_list) and  ("raw@material" in asset_obj.tags or "asset@gallery" in asset_obj.tags) :
         template = 'ndf/lms.html'
         if "raw@material" in asset_obj.tags:
             context_variables.update( {'title':"raw_material_detail"})
