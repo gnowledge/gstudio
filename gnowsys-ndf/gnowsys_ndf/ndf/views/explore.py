@@ -334,7 +334,7 @@ def explore_drafts(request):
 
     module_unit_ids = [val for each_module in modules_cur for val in each_module.collection_set ]
 
-    modules_cur.rewind()
+    # modules_cur.rewind()
     gstaff_access = check_is_gstaff(group_id,request.user)
     draft_query = {'member_of': gst_base_unit_id,
               '_id': {'$nin': module_unit_ids},
