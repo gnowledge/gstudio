@@ -70,7 +70,7 @@
             <div class="course_tree">
               <div class="lesson-title" title="{{trans_lesson_name}}">
                   <b>{{trans_lesson_name}}</b>
-                  {% if group_object.project_config.tab_name == "Questions" and request.user.is_authenticated %}
+                  {% if allow_finish_lesson %}
                     <a href="#" class="finish-lesson right">Finish</a>
                   {% endif %}
               </div>
@@ -113,7 +113,7 @@
               {% endif %}
               <div class="activity_page_rendered buddy_margin">
                 {% if "QuizItemEvent" in node_member_of_names_list or "QuizItem" in node_member_of_names_list%}
-                  {% load_quiz_player request group_id node %}
+                  {% load_quiz_player request group_id node allow_finish_lesson %}
                 {% else %}
                 {# {{node.content|safe}} #}
                 {% include "ndf/node_ajax_content.html" with node=trans_node expand_content=True  no_discussion=True hide_breadcrumbs=True %}
@@ -147,13 +147,9 @@
 <div id="confirm-finish-lesson-reveal" class="reveal-modal medium radius" data-reveal data-alert>
     <p id="finishLessonModalLabel"></p>
     <div class="row">
-      <div class="small-3 columns">
         <button id="finishLessonbtnConfirmYes" class="explore-button auto_width ">{% trans "Yes" %}</button>
-    </div>
-    <div class="small-3 columns end">
         <button id="finishLessonbtnConfirmNo" class="explore-button auto_width">{% trans "No" %}</button>
     </div>
-</div>
 <a class="close-reveal-modal">&#215;</a>
 </div>
 
@@ -324,25 +320,34 @@
   });
 
   function complete_lesson(){
-      $.ajax({
-        type: "POST",
-        data:{
-            'csrfmiddlewaretoken': "{{csrf_token}}",
-            'user_id': '{{request.user.id}}'
-        },
-        url: "{% url 'finish_lesson' group_id lesson_node.pk %}",
+        $.ajax({
+            type: "POST",
+            data:{
+                'csrfmiddlewaretoken': "{{csrf_token}}",
+                'user_id': '{{request.user.id}}'
+            },
+            url: "{% url 'finish_lesson' group_id lesson_node.pk %}",
             // datatype: "",
+            global: false,
+            beforeSend: function(){
+                $(".controls-box").append("<label class='loading_lbl'>Processing.. Please wait!</label>");
+            },
+
             success: function(data) {
                 data_dict = JSON.parse(data);
-                // console.log(data);
                 if(data_dict['success']){
+                    $(".loading_lbl").remove()
                     $('#confirm-finish-lesson-reveal').foundation('reveal', 'close');
+                    $(".finish-lesson").addClass('hide')
+                    $('.controls-box').addClass('hide')
                     lesson_finish_confirm_flag = true;
+                    location.reload()
                 }
                 else{
+                    $(".loading_lbl").text("Something went wrong. Click on ")
+                    $(".loading_lbl").append('<a href="#" onclick="window.location.reload(true);">Regresh Page</a>')
                     lesson_finish_confirm_flag = false;
                 }
-
             }
         });
   }
