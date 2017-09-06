@@ -320,6 +320,7 @@
   });
 
   function complete_lesson(){
+        $('.controls-box').addClass('hide')
         $.ajax({
             type: "POST",
             data:{
@@ -339,12 +340,10 @@
                     $(".loading_lbl").remove()
                     $('#confirm-finish-lesson-reveal').foundation('reveal', 'close');
                     $(".finish-lesson").addClass('hide')
-                    $('.controls-box').addClass('hide')
                     lesson_finish_confirm_flag = true;
                     location.reload()
                 }
                 else{
-                    $('.controls-box').addClass('hide')
                     $(".loading_lbl").text("Something went wrong. Click on ")
                     $(".loading_lbl").append('<a href="#" onclick="window.location.reload(true);">Regresh Page</a>')
                     lesson_finish_confirm_flag = false;
