@@ -581,24 +581,7 @@ This will not be used because now only existing activities will be added.
 
         {% if request.user.is_authenticated %}
         // Write events
-        function myLang(){
-            var lang_val = document.getElementById("lesson_lang").value;
-            lesson_id =  $('.save-lesson').attr('data-node-id');
-            $.ajax({
-              type: "GET",
-              data:{
-                'node_id':lesson_id,
-                'language':lang_val
-            },
-            url: "{% url 'get_translated_node' group_id %}",
-            datatype: "html",
-            success: function(data) {
-                data_dict = JSON.parse(data);
-                $('#lesson-name').val(data_dict.name);   
-            }
-        });
-
-        }
+        
 
         /*
         * Handlers and actions for the lesson
@@ -1268,4 +1251,22 @@ function componentDidMount() {
 }
 componentDidMount()
 
+function myLang(){
+            var lang_val = document.getElementById("lesson_lang").value;
+            lesson_id =  $('.save-lesson').attr('data-node-id');
+            $.ajax({
+              type: "GET",
+              data:{
+                'node_id':lesson_id,
+                'language':lang_val
+            },
+            url: "{% url 'get_translated_node' group_id %}",
+            datatype: "html",
+            success: function(data) {
+                data_dict = JSON.parse(data);
+                $('#lesson-name').val(data_dict.name);   
+            }
+        });
+
+        }
 </script>

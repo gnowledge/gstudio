@@ -13,6 +13,27 @@
 
  -->    
     {% include 'ndf/widget_user_access_modal.html' %}
+       
+        {% if user.is_authenticated  %}
+            {% if title == "raw material" and is_gstaff %}
+                <input type="hidden"  class="title-for-filters" value="raw_material_lms">
+                {% get_course_filters group_id "raw_material_lms" as filter_dict %}
+                {% include "ndf/filters.html" with filter_dict=filter_dict %}
+
+            {% endif %}
+            {% if title == "gallery"  %}
+                <input type="hidden"  class="title-for-filters" value="gallery_lms">
+                {% get_course_filters group_id "gallery_lms" as filter_dict %}
+                {% include "ndf/filters.html" with filter_dict=filter_dict %}
+            {% endif %}
+            {% if title == "asset_list"  %}
+                <input type="hidden"  class="title-for-filters" value="assets_lms">
+                {% get_course_filters group_id "assets_lms" as filter_dict %}
+                {% include "ndf/filters.html" with filter_dict=filter_dict %}
+            {% endif %}
+        
+        {% endif %}
+       
         <div class="row">
         {% if user.is_authenticated  %}
             {% if title == "raw material" and is_gstaff %}
@@ -40,7 +61,7 @@
     {% include 'ndf/asset_card.html' with url_name="asset_detail" first_arg=group_id second_arg=each_asset.pk each=each_asset %}    
   {% endfor %}
 </div>
-
+{% comment %}
 {% if title == "gallery" %}
 {% include 'ndf/pagination.html' with urlname="course_gallery_paged" first_arg=group_id page_info=assets_page_info %}
 {% elif title == "raw material" %}
@@ -48,6 +69,7 @@
 {% elif title == "asset_list"  %}
 {% include 'ndf/pagination.html' with urlname="course_assets_paged" first_arg=group_id page_info=assets_page_info %}
 {% endif %}
+{% endcomment %}
 <script type="text/javascript">
    $( ".createAsset" ).click(function() {
                    var asset_id = $(this).attr('data-asset_id');
@@ -65,6 +87,7 @@
                            }
                      });
            });
+
 function getRandomSize(min, max) {
   return Math.round(Math.random() * (max - min) + min);
 }
@@ -83,4 +106,27 @@ var allImages1 = "";
     alert(allImagesfor+"_"+"{{k}}");
 {% endfor %}
 {% endcomment %}
+
+   function applyFilter(filtersObjArr){
+        filtersObjArr = JSON.stringify(getFiltersObjsInAndOrFormat());
+        title = $(".title-for-filters").val();
+        $.ajax({
+          url: "{% url 'course_filters' group_id %}",
+          data: {
+            filter_dict: filtersObjArr,
+            'filter_applied': 'True',
+            'title': title
+          },
+          type: "GET",
+          dataType: "html",
+          success: function(data){
+            if(data == "reload"){
+                location.reload()
+            }
+            else{
+                $(".listing-row").html(data)
+            }
+          },
+        });//end of ajax
+    }
 </script> 

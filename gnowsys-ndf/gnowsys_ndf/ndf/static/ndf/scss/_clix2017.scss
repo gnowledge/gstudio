@@ -5942,3 +5942,26 @@ ul.nav_menu_1 {
   
 }
 
+.explore-settings-drop{
+    margin-left: 57%;
+    display: inline-block;
+    &> button {
+    color: #164a7b;
+    font-weight: 400;
+    padding: 14px 10px 3px 10px;
+    cursor: pointer;
+    margin-top: 4px;
+    background-color: #ddeff9;
+    border: 1px solid #719dc8;
+    border-radius: 5px !important;
+    display: inline-block;
+        &:hover{
+            border-radius: 10px;
+            background-color: #ddeff9;
+            color: #164a7b;
+        }
+    }
+    a{
+        font-size:16px;
+    }
+}
