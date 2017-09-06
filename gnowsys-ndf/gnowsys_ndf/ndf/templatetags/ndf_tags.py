@@ -595,7 +595,7 @@ def get_attribute_value(node_id, attr_name, get_data_type=False):
             node_attr = triple_collection.find_one({'_type': "GAttribute", "subject": ObjectId(node_id), 'attribute_type': gattr._id, 'status': u"PUBLISHED"})
     if node_attr:
         attr_val = node_attr.object_value
-        # print "\n here: ", attr_name, " : ", attr_val, " : ", node_id
+        # print "\n here: ", attr_name, " : ", type(attr_val), " : ", node_id
     if get_data_type:
         return {'value': attr_val, 'data_type': data_type}
     cache.set(cache_key, attr_val, 60 * 60)
@@ -4079,6 +4079,24 @@ def get_selected_topics(node_id):
 	return teaches_grelations_id_list
 
 @register.assignment_tag
+def rewind_cursor(cursor_obj):
+	cursor_obj.rewind()
+	return cursor_obj
+
+@register.assignment_tag
+def get_node_by_member_of_name(group_id, member_of_name):
+	member_of_gst_name, member_of_gst_id = GSystemType.get_gst_name_id(member_of_name)
+	return list(node_collection.find({'group_set': group_id, 'member_of': member_of_gst_id}))
+
+@get_execution_time
+@register.assignment_tag
+def cast_to_node(node_or_node_list):
+	# print "\nInput type: ", type(node_or_node_list)
+	if isinstance(node_or_node_list, list):
+		return map(Node,node_or_node_list)
+	else:
+		return Node(node_or_node_list)
+
 def get_trans_node(node_id,lang):
     rel_value = get_relation_value(ObjectId(node_id),"translation_of")
     for each in rel_value['grel_node']:
