@@ -20,8 +20,6 @@ rt_translation_of = Node.get_name_id_from_type('translation_of', 'RelationType',
 supported_languages = ['Hindi', 'Telugu']
 trans_node_gst_name, trans_node_gst_id = GSystemType.get_gst_name_id("trans_node")
 
-
-
 def all_translations(request, group_id, node_id):
     '''
     returns all translated nodes of provided node.
