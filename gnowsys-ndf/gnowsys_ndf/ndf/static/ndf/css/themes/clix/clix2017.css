@@ -5603,3 +5603,8 @@ p {
 .explore-settings-drop a {
   font-size: 16px;
 }
+
+/* line 5756, ../../../scss/_clix2017.scss */
+.attempts_count {
+  color: #000000 !important;
+}
