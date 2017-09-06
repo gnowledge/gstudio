@@ -186,7 +186,7 @@
   componentDidMount()
 
   // start of document.ready()
-  $(document).ready(function() {
+  $(document).ready(function(event) {
     var iframes = document.getElementsByTagName('iframe');
     var key = 'assessment.Bank';
 
@@ -202,7 +202,6 @@
             if (source_attr.indexOf("://") > -1) {
                 src_split = source_attr.split('/');
                 if (src_split.indexOf(oac_url) > -1 ){
-
                   new_url = domain_prefix + '//'+ window.location.host
                 }
                 else{
@@ -349,4 +348,5 @@
   }
 
 </script>
+
 {% endblock %}
