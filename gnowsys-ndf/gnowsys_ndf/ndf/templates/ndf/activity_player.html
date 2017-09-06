@@ -344,6 +344,7 @@
                     location.reload()
                 }
                 else{
+                    $('.controls-box').addClass('hide')
                     $(".loading_lbl").text("Something went wrong. Click on ")
                     $(".loading_lbl").append('<a href="#" onclick="window.location.reload(true);">Regresh Page</a>')
                     lesson_finish_confirm_flag = false;
