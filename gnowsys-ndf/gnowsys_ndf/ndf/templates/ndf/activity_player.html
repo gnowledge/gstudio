@@ -145,7 +145,10 @@
 
 
 <div id="confirm-finish-lesson-reveal" class="reveal-modal medium radius" data-reveal data-alert>
-    <p id="finishLessonModalLabel"></p>
+    <p id="finishLessonModalLabel">
+      Confirm Finish Lesson: {% firstof lesson_node.altnames lesson_node.name %}?<br/>
+      You will NOT be allowed to attempt Question again.
+    </p>
     <div class="row">
         <button id="finishLessonbtnConfirmYes" class="explore-button auto_width ">{% trans "Yes" %}</button>
         <button id="finishLessonbtnConfirmNo" class="explore-button auto_width">{% trans "No" %}</button>
@@ -302,8 +305,6 @@
   var lesson_finish_confirm_flag = false;
   function confirm_lesson_completion(){
       if(!lesson_finish_confirm_flag){
-          lbl_msg = "Confirm Finish Lesson: {% firstof lesson_node.altnames lesson_node.name %}?"
-          $("#finishLessonModalLabel").text(lbl_msg);
           $("#confirm-finish-lesson-reveal").foundation('reveal', 'open');
       }
   }
