@@ -1,5 +1,5 @@
 ''' -- imports from python libraries -- '''
-# import json
+import json
 
 ''' -- imports from installed packages -- '''
 from django.http import HttpResponseRedirect  # , HttpResponse uncomment when to use
@@ -26,8 +26,8 @@ from gnowsys_ndf.settings import GAPPS, MEDIA_ROOT, GSTUDIO_TASK_TYPES,GSTUDIO_D
 from gnowsys_ndf.settings import GSTUDIO_SITE_NAME, GSTUDIO_NO_OF_OBJS_PP, GSTUDIO_PRIMARY_COURSE_LANGUAGE
 from gnowsys_ndf.ndf.models import Node, Group, GSystemType,  AttributeType, RelationType
 from gnowsys_ndf.ndf.models import node_collection, triple_collection
-from gnowsys_ndf.ndf.views.methods import get_execution_time, get_language_tuple
-from gnowsys_ndf.ndf.templatetags.ndf_tags import check_is_gstaff
+from gnowsys_ndf.ndf.views.methods import get_execution_time, get_language_tuple, create_gattribute
+from gnowsys_ndf.ndf.templatetags.ndf_tags import check_is_gstaff, get_attribute_value
 # from gnowsys_ndf.ndf.views.methods import get_group_name_id
 # from gnowsys_ndf.ndf.views.methods import get_node_common_fields, parse_template_data, get_execution_time, delete_node, replicate_resource
 
@@ -53,7 +53,6 @@ def explore(request):
         "ndf/explore.html",
         context_variable,
         context_instance=RequestContext(request))
-
 
 '''
 Depricated as on 15 Apr 2017 - katkamrachana
@@ -135,7 +134,6 @@ def explore_groups(request,page_no=1):
         "ndf/explore_2017.html",
         context_variable,
         context_instance=RequestContext(request))
-
 
 @login_required
 @get_execution_time
@@ -222,16 +220,25 @@ def explore_basecourses(request,page_no=1):
     #     context_instance=RequestContext(request))
 
 @get_execution_time
-def explore_courses(request,page_no=1):
+def explore_courses(request):
 
     # this will be announced tab
     title = 'courses'
-    modules_cur = node_collection.find({'member_of': gst_module_id,'status':'PUBLISHED' }).sort('last_update', -1)
+    context_variable = {
+                        'title': title, 
+                        'group_id': group_id, 'groupid': group_id,
+                    }
+    module_sort_list = get_attribute_value(group_id, 'items_sort_list')
+
+    if module_sort_list:
+        modules_cur = map(Node,module_sort_list)
+        context_variable.update({'modules_is_cur': False})
+    else:
+        modules_cur = node_collection.find({'member_of': gst_module_id ,'status':'PUBLISHED'}).sort('last_update', -1)
+        context_variable.update({'modules_is_cur': True})
 
     module_unit_ids = [val for each_module in modules_cur for val in each_module.collection_set ]
-    modules_cur.rewind()
 
-    modules_page_cur = paginator.Paginator(modules_cur, page_no, GSTUDIO_NO_OF_OBJS_PP)
 
     primary_lang_tuple = get_language_tuple(GSTUDIO_PRIMARY_COURSE_LANGUAGE)
 
@@ -299,11 +306,7 @@ def explore_courses(request,page_no=1):
                                               }).sort('last_update', -1)
     # base_unit_page_cur = paginator.Paginator(base_unit_cur, page_no, GSTUDIO_NO_OF_OBJS_PP)
 
-    context_variable = {
-                        'title': title, 'modules_cur': modules_cur,
-                        'units_cur': base_unit_cur, 
-                        'group_id': group_id, 'groupid': group_id,
-                    }
+    context_variable.update({'modules_cur': modules_cur,'units_cur': base_unit_cur})
 
     return render_to_response(
         # "ndf/explore.html", changed as per new Clix UI
@@ -314,16 +317,24 @@ def explore_courses(request,page_no=1):
 
 @login_required
 @get_execution_time
-def explore_drafts(request,page_no=1):
+def explore_drafts(request):
     title = 'drafts'
-    modules_cur = node_collection.find({'member_of': gst_module_id ,'status':'PUBLISHED'}).sort('last_update', -1)
+    module_sort_list = None
+    module_sort_list = get_attribute_value(group_id, 'items_sort_list')
+    context_variable = {
+                        'title': title, 
+                        'group_id': group_id, 'groupid': group_id,
+                    }
+    if module_sort_list:
+        modules_cur = map(Node,module_sort_list)
+        context_variable.update({'modules_is_cur': False})
+    else:
+        modules_cur = node_collection.find({'member_of': gst_module_id ,'status':'PUBLISHED'}).sort('last_update', -1)
+        context_variable.update({'modules_is_cur': True})
 
     module_unit_ids = [val for each_module in modules_cur for val in each_module.collection_set ]
 
-    modules_cur.rewind()
-    # modules_page_cur = paginator.Paginator(modules_cur, page_no, GSTUDIO_NO_OF_OBJS_PP)
-
-
+    # modules_cur.rewind()
     gstaff_access = check_is_gstaff(group_id,request.user)
     draft_query = {'member_of': gst_base_unit_id,
               '_id': {'$nin': module_unit_ids},
@@ -340,6 +351,7 @@ def explore_drafts(request,page_no=1):
 
     base_unit_cur = node_collection.find(draft_query).sort('last_update', -1)
     # print "\nbase: ", base_unit_cur.count()
+    # base_unit_page_cur = paginator.Paginator(base_unit_cur, page_no, GSTUDIO_NO_OF_OBJS_PP)
 
     '''
     base_unit_cur = node_collection.find({'member_of': gst_base_unit_id,
@@ -352,13 +364,10 @@ def explore_drafts(request,page_no=1):
                                           # {'group_type': 'PUBLIC'}
                                           ]}).sort('last_update', -1)
     '''
-    base_unit_page_cur = paginator.Paginator(base_unit_cur, page_no, GSTUDIO_NO_OF_OBJS_PP)
 
-    context_variable = {
-                        'title': title, 'modules_cur': modules_cur,
-                        'units_cur': base_unit_cur, 
-                        'group_id': group_id, 'groupid': group_id,
-                    }
+    # base_unit_page_cur = paginator.Paginator(base_unit_cur, page_no, GSTUDIO_NO_OF_OBJS_PP)
+
+    context_variable.update({'modules_cur': modules_cur,'units_cur': base_unit_cur})
 
     return render_to_response(
         # "ndf/explore.html", changed as per new Clix UI
@@ -366,3 +375,18 @@ def explore_drafts(request,page_no=1):
         # "ndf/lms_explore.html",
         context_variable,
         context_instance=RequestContext(request))
+
+def module_order_list(request):
+    response_dict = {"success": False}
+    module_id_list = request.POST.get('module_list', [])
+    try:
+        if module_id_list:
+            module_id_list = json.loads(module_id_list)
+            module_obj_list = map(lambda each_id: Node.get_node_by_id(ObjectId(each_id)), module_id_list)
+            ga_node = create_gattribute(ObjectId(group_id), 'items_sort_list', module_obj_list)
+            # print ga_node
+            response_dict["success"] = True
+    except Exception as module_order_list_err:
+        print "\nError Occurred in module_order_list(). ", module_order_list_err
+        pass
+    return HttpResponse(json.dumps(response_dict))

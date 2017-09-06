@@ -164,13 +164,11 @@ class Command(BaseCommand):
 
     ctr_res = counter_collection.collection.update({
                     '_type': 'Counter',
-                    'assessment': {'$exists': False}
+                    '$or': [{'assessment': {'$exists': False}}, {'assessment': {'$not': {'$type': "array"}}}]
                 },
                 {
                     '$set': {
-                            'assessment': {
-                                'offered_id': {'total': None, 'correct': None, 'incorrect_attempts': None},
-                            },
+                            'assessment': [],
                         }
                 },
                 upsert=False, multi=True)

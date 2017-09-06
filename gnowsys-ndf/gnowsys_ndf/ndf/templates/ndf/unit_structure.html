@@ -478,8 +478,17 @@ This will not be used because now only existing activities will be added.
                     alert('Unable to load data... Something went wrong :(')
                     return false
                 }
-                data_dict = JSON.parse(data);
-                $('#activity-content').html(data_dict.content);
+                display_data = "<p>Unable to process your request at this moment. Please try after some time</p>"
+                try {
+                    data_dict = JSON.parse(data);
+                    display_data = data_dict.content
+                }
+                catch(err) {
+                    display_data = data
+                }
+                finally {
+                    $('#activity-content').html(display_data);
+                }
                 MathJax.Hub.Queue(["Typeset",MathJax.Hub,'activity-content']);
                 $("#info-page-area").html("");
 
@@ -572,24 +581,7 @@ This will not be used because now only existing activities will be added.
 
         {% if request.user.is_authenticated %}
         // Write events
-        function myLang(){
-            var lang_val = document.getElementById("lesson_lang").value;
-            lesson_id =  $('.save-lesson').attr('data-node-id');
-            $.ajax({
-              type: "GET",
-              data:{
-                'node_id':lesson_id,
-                'language':lang_val
-            },
-            url: "{% url 'get_translated_node' group_id %}",
-            datatype: "html",
-            success: function(data) {
-                data_dict = JSON.parse(data);
-                $('#lesson-name').val(data_dict.name);   
-            }
-        });
-
-        }
+        
 
         /*
         * Handlers and actions for the lesson
@@ -1259,4 +1251,22 @@ function componentDidMount() {
 }
 componentDidMount()
 
+function myLang(){
+            var lang_val = document.getElementById("lesson_lang").value;
+            lesson_id =  $('.save-lesson').attr('data-node-id');
+            $.ajax({
+              type: "GET",
+              data:{
+                'node_id':lesson_id,
+                'language':lang_val
+            },
+            url: "{% url 'get_translated_node' group_id %}",
+            datatype: "html",
+            success: function(data) {
+                data_dict = JSON.parse(data);
+                $('#lesson-name').val(data_dict.name);   
+            }
+        });
+
+        }
 </script>

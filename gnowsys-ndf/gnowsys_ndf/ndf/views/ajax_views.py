@@ -39,6 +39,7 @@ from gnowsys_ndf.ndf.models import node_collection, triple_collection
 from gnowsys_ndf.ndf.models import *
 from gnowsys_ndf.ndf.views.file import *
 from gnowsys_ndf.ndf.views.gcourse import *
+from gnowsys_ndf.ndf.views.translation import get_lang_node
 from gnowsys_ndf.ndf.views.methods import check_existing_group, get_drawers, get_course_completed_ids,create_thread_for_node, delete_gattribute
 from gnowsys_ndf.ndf.views.methods import get_node_common_fields, get_node_metadata, create_grelation,create_gattribute
 from gnowsys_ndf.ndf.views.methods import create_task,parse_template_data,get_execution_time,get_group_name_id, dig_nodes_field
@@ -73,7 +74,11 @@ def get_node_json_from_id(request, group_id, node_id=None):
     if not node_id:
         node_id = request.GET.get('node_id')
     node_obj = Node.get_node_by_id(node_id)
+
     if node_obj:
+      if "QuizItem" in node_obj.member_of_names_list:
+        from gnowsys_ndf.ndf.views.quiz import render_quiz_player
+        return render_quiz_player(request, group_id, node_obj)
       trans_node = get_lang_node(node_obj._id,request.LANGUAGE_CODE)
       if trans_node:
         return HttpResponse(json.dumps(trans_node, cls=NodeJSONEncoder))
@@ -6645,7 +6650,7 @@ def get_group_resources(request, group_id, res_type="Page"):
     card_class = 'activity-page'
 
     try:
-        res_query = {'_type': 'GSystem', 'group_set': ObjectId(group_id)}
+        res_query = {'_type': 'GSystem'}
         except_collection_set_of_id = request.GET.get('except_collection_set_of_id', None)
 
         except_collection_set_of_obj = Node.get_node_by_id(except_collection_set_of_id)
@@ -6822,7 +6827,7 @@ def create_edit_asset(request,group_id):
     if "announced_unit" in group_obj.member_of_names_list and title == "raw material":
       asset_obj.tags.append(u'raw@material')
     
-    if "announced_unit" in group_obj.member_of_names_list and "gallery" == title:
+    if "announced_unit" in group_obj.member_of_names_list  or "Group" in group_obj.member_of_names_list and "gallery" == title:
       asset_obj.tags.append(u'asset@gallery')    
     
     if asset_lang:
@@ -7096,6 +7101,7 @@ def get_translated_node(request, group_id):
     else:
       return HttpResponse(json.dumps(node_obj, cls=NodeJSONEncoder))
 
+
 @get_execution_time
 def get_rating_template(request, group_id):
   try:
@@ -7125,4 +7131,3 @@ def delete_curriculum_node(request, group_id):
       trash_resource(request,ObjectId(group_id),ObjectId(node_id))
       trash_resource(request,ObjectId(group_id),ObjectId(node_id))
       return HttpResponse("Success")
-
