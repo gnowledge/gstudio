@@ -13,8 +13,8 @@
 
  -->    
     {% include 'ndf/widget_user_access_modal.html' %}
-       
-        {% if user.is_authenticated  %}
+       <div class ="row">
+           
             {% if title == "raw material" and is_gstaff %}
                 <input type="hidden"  class="title-for-filters" value="raw_material_lms">
                 {% get_course_filters group_id "raw_material_lms" as filter_dict %}
@@ -32,7 +32,7 @@
                 {% include "ndf/filters.html" with filter_dict=filter_dict %}
             {% endif %}
         
-        {% endif %}
+       </div>
        
         <div class="row">
         {% if user.is_authenticated  %}
