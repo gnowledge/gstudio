@@ -50,7 +50,7 @@
                                 {% csrf_token %}
                                 <input name="url" type="hidden" value="{{request.get_full_path}}"/>
                                 <input type="hidden"  name="language" value="{{ lang.0 }}">
-                                <input type="submit" class="button expand secondary" value="{{ lang.1 }}"/>
+                                <input type="submit"   class="button expand secondary" value="{{ lang.1 }}" style="background-color:#164a7b; color: #74b3dc;"/>
                                 </form>
                             </li>
                         {% endfor %}
@@ -159,12 +159,15 @@
             <!-- Left Nav Section -->
             <ul class="left show-for-medium-up">
                 {% if request.user.id %}
-                <li class=""><a href="{% url 'my_desk' request.user.id %}" {% if title == "my desk" %} class="active" {% endif %}>My Desk</a></li>
+                <li class="">
+                    <a href="{% url 'my_desk' request.user.id %}" {% if title == "my desk" %} class="active" {% endif %}>My Desk</a>
+                </li>
                 {% endif %}
                 <li><a href="{% url explore_url %}" {% if title == 'base courses' or title == "courses" or title == "drafts" %} class="active" {% endif %} > Explore</a>
                 </li>
-                <!--<li><a href="#">Interactives</a>
-                </li>-->
+                <li>
+                    <a href="{% url 'tools_temp' %}" {% if title == 'tools' %} class="active" {% endif %}>Interactives</a>
+                </li>
                 
             </ul>
           </section>

@@ -6,11 +6,12 @@
 .workspace{
 
     min-height:100%;
+    background: linear-gradient(to right, $theme-orange, $theme-pink);
     // group level menu bar
     .app.button-bar {
         height: 45px;
     }
-    
+
     /*&:after{
         //Hack for setting div height to the height of the browser window
     content:"";
@@ -29,22 +30,24 @@ body>footer {
 
   #first-header.top-bar {
 
-    background-color: #fff !important;
+    background-color: $primary-blue !important;
     margin: 0px auto;
     box-shadow: 0px 2px 5px rgba(0, 0, 0 , 0.4);
 
     &.expanded {
       .title-area {
-        background: $ghost;
+        background: $primary-blue;
       }
     }
 
     .title-area {
-      height: auto;
+      height: 50px;
 
       a{
         &:hover{
-          // background-color: scale-color($topbar-bg-color, $lightness: 5%);
+
+           background-color: $primary-blue;
+           color: $secondary-orange;
           //box-shadow: inset 0px 100px 50px #fff;
           // box-shadow: inset 0px 100px 50px scale-color($theme-color-invert, $lightness: 10%);
           // transition: 0.8s all;
@@ -56,7 +59,7 @@ body>footer {
     .top-bar-section {
       #login-button-medium {
         text-decoration: underline;
-        color: blue !important;
+        color: $secondary-blue !important;
       }
 
       .app-menus li a{
@@ -68,7 +71,7 @@ body>footer {
       }
 
       ul.dropdown {
-        background: #fff !important;
+        background: $primary-blue !important;
         li input[type=submit] {
           height: 3em;
         }
@@ -101,13 +104,13 @@ body>footer {
 
     .top-bar-section li a:not(.button), .top-bar-section li {
         // background-color: scale-color($topbar-bg-color, $lightness: 10%);
-        background-color: #fff !important;
-        color: #333 !important;
-        font-weight: 600;
+        background-color: $primary-blue !important;
+        color: $secondary-blue !important;
+        font-weight: normal;;
 
         &:hover {
-            background: $theme-color;
-            color: white !important;
+            background: $primary-blue;
+            color: $secondary-orange !important;
         }
     }
 
@@ -118,6 +121,14 @@ body>footer {
         // background-color: #E1E1E1;
     }*/
   }
+
+
+
+
+
+
+
+
 
 
   #group-level-header{
@@ -165,12 +176,13 @@ body>footer {
       }
 
       .top-bar-section li.active a:not(.button):hover, .top-bar-section li.active:hover{
-        background-color: scale-color($theme-color-invert, $lightness: 10%) !important;
+        background-color: $primary-blue!important;
+        color: $secondary-orange;
       }
 
       .top-bar-section li.active:not(.has-form) > a:not(.button){
-          background-color: scale-color($theme-color-invert, $lightness: 15%);
-          // background-color: #fafafa
+        background-color: $primary-blue!important;
+        color: $secondary-blue;
       }
 
       .top-bar-section li a:not(.button), .top-bar-section li {
@@ -181,8 +193,8 @@ body>footer {
       }
 
       .top-bar-section li a:not(.button):hover, .top-bar-section li:not(.has-form):hover {
-          background-color: scale-color($theme-color-invert, $lightness: 10%);
-          color: #fff;
+        background-color: $primary-blue!important;
+        color: $secondary-orange;
           // background-color: #E1E1E1;
       }
     }
@@ -371,4 +383,192 @@ body>footer {
           }
         }
     }
+}
+
+
+@media only screen and (min-width: 40.063em) {
+  .top-bar {
+    background: $primary-blue;
+    overflow: visible;
+    font-family: Rubik-Medium;
+    font-size: 14px;}
+
+    .top-bar:before, .top-bar:after {
+      content: " ";
+      display: table; }
+    .top-bar:after {
+      clear: both; }
+    .top-bar .toggle-topbar {
+      display: none; }
+    .top-bar .title-area {
+      float: left; }
+    .top-bar .name h1 a {
+      width: auto; }
+    .top-bar input,
+    .top-bar .button,
+    .top-bar button {
+      font-size: 0.875rem;
+      position: relative;
+      top: 7px; }
+    .top-bar.expanded {
+      background: $primary-blue; }
+
+  .contain-to-grid .top-bar {
+    max-width: 62.5rem;
+    margin: 0 auto;
+    margin-bottom: 0; }
+
+  .top-bar-section {
+    transition: none 0 0;
+    left: 0 !important; }
+    .top-bar-section ul {
+      width: auto;
+      height: auto !important;
+      display: inline; }
+      .top-bar-section ul li {
+        float: left; }
+        .top-bar-section ul li .js-generated {
+          display: none; }
+    .top-bar-section li.hover > a:not(.button) {
+      background-color: $primary-blue;
+      background: $primary-blue;
+      color: $primary-blue;
+      border-bottom: 3px solid $secondary-orange;}
+    .top-bar-section li:not(.has-form) a:not(.button) {
+      padding: 0 15px;
+      line-height: 48px;
+      background: $primary-blue;
+      color: $secondary-blue;
+
+      }
+      .top-bar-section li:not(.has-form) a:not(.button):hover {
+        background-color: $primary-blue;
+        background: $primary-blue;
+        color: $secondary-orange;
+        line-height: 48px;
+        border-bottom: 3px solid $secondary-orange;
+         }
+    .top-bar-section li.active:not(.has-form) a:not(.button) {
+      padding: 0 15px;
+      line-height: 45px;
+      color: $secondary-blue;
+      background:$primary-blue; }
+      .top-bar-section li.active:not(.has-form) a:not(.button):hover {
+        background: $primary-blue;
+        color: $secondary-orange; }
+    .top-bar-section .has-dropdown > a {
+      padding-right: 35px !important; }
+      .top-bar-section .has-dropdown > a:after {
+        content: "";
+        display: block;
+        width: 0;
+        height: 0;
+        border: inset 5px;
+        border-color: rgba(255, 255, 255, 0.4) transparent transparent transparent;
+        border-top-style: solid;
+        margin-top: -2.5px;
+        top: 22.5px;
+        background: $primary-blue;
+        color: $secondary-blue;}
+    .top-bar-section .has-dropdown.moved {
+      position: relative; }
+      .top-bar-section .has-dropdown.moved > .dropdown {
+        display: block;
+        position: absolute !important;
+        height: 1px;
+        width: 1px;
+        overflow: hidden;
+        clip: rect(1px, 1px, 1px, 1px); }
+    .top-bar-section .has-dropdown.hover > .dropdown, .top-bar-section .has-dropdown.not-click:hover > .dropdown {
+      display: block;
+      position: static !important;
+      height: auto;
+      width: auto;
+      overflow: visible;
+      clip: auto;
+      position: absolute !important;
+     background: $primary-blue;
+     color: $secondary-orange;}
+    .top-bar-section .has-dropdown > a:focus + .dropdown {
+      display: block;
+      position: static !important;
+      height: auto;
+      width: auto;
+      overflow: visible;
+      clip: auto;
+      position: absolute !important; }
+    .top-bar-section .has-dropdown .dropdown li.has-dropdown > a:after {
+      border: none;
+      content: "\00bb";
+      top: 1rem;
+      margin-top: -1px;
+      right: 5px;
+      line-height: 1.2; }
+    .top-bar-section .dropdown {
+      left: 0;
+      top: auto;
+      background: transparent;
+      min-width: 100%; }
+      .top-bar-section .dropdown li a {
+        color: $secondary-blue;
+        line-height: 45px;
+        white-space: nowrap;
+        padding: 12px 15px;
+        background: $primary-blue; }
+      .top-bar-section .dropdown li:not(.has-form):not(.active) > a:not(.button) {
+        color: $secondary-blue;
+        background: $primary-blue; }
+      .top-bar-section .dropdown li:not(.has-form):not(.active):hover > a:not(.button) {
+        color: $secondary-blue;
+        background-color: $primary-blue;
+        background: $primary-blue; }
+      .top-bar-section .dropdown li label {
+        white-space: nowrap;
+        background: $primary-blue; }
+      .top-bar-section .dropdown li .dropdown {
+        left: 100%;
+        top: 0; }
+    .top-bar-section > ul > .divider, .top-bar-section > ul > [role="separator"] {
+      border-bottom: none;
+      border-top: none;
+      border-right: solid 1px #4e4e4e;
+      clear: none;
+      height: 45px;
+      width: 0; }
+    .top-bar-section .has-form {
+      background:$primary-blue;
+      padding: 0 15px;
+      height: 45px; }
+    .top-bar-section .right li .dropdown {
+      left: auto;
+      right: 0; }
+      .top-bar-section .right li .dropdown li .dropdown {
+        right: 100%; }
+    .top-bar-section .left li .dropdown {
+      right: auto;
+      left: 0; }
+      .top-bar-section .left li .dropdown li .dropdown {
+        left: 100%; }
+      }
+
+
+.banner-image{
+  padding-top:-50px;
+    padding-left: 10px;
+    margin:0px;
+    height:100%;
+    background-position:center;
+    background-repeat:no-repeat;
+    position:relative;
+    overflow:hidden;
+    background-color:#f2f2f2;
+    img  {
+    border-radius: 2px 2px 0 0;
+    display: block;
+    margin: 0 auto;
+    opacity: 0.9;
+    //width:100%;
+    //height:50%;
+    width: 50%;
+  }
 }
