@@ -3,56 +3,52 @@
 {% load ndf_tags %}
 {% block body_content %}
 
-<style type="text/css">
-.polaroid {
-  width: 30%;
-  background-color: white;
-  box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);
-  margin-bottom: 25px;
-  margin-top: 25px;
-  padding: 10px 10px 10px 10px;
-  -moz-transition: all 0.3s;
-  -webkit-transition: all 0.3s;
-  transition: all 0.3s;
-  cursor: pointer;
-}
-
-.polaroid:hover img {
-	  -moz-transform: scale(1.1);
-	  -webkit-transform: scale(1.1);
-	  transform: scale(1.1);
-}
-.container {
-  text-align: center;
-  padding: 10px 20px;
-
-}
 
 
-</style>
-
-
-<div class="row">
-
-
-
-	<div class="polaroid">
-	  <img src="/static/ndf/images/Motions_of_Moon.jpg" alt="Norway" style="width:100%">
-	  <div class="container">
-	    <p>The Troll's tongue in Hardanger, Norway</p>
-	  </div>
-	</div>
-
-	<div class="polaroid">
-	  <img src="/static/ndf/images/Motions_of_Moon.jpg" alt="Norway" style="width:100%">
-	  <div class="container">
-	    <p>Northern Lights in Norway</p>
-	  </div>
-	</div>
-
+<div class="small-12 columns tool-bg">
+  		<ul class="small-block-grid-1 medium-block-grid-3 large-block-grid-3">
+	        <li class="card-image-wrapper">
+	        	<div class="polaroid">
+	        		<a href="/phet/" title="phet" target="_blank">
+					  <img src="/static/ndf/images/phet-logo-tm.svg" alt="Norway" style="width: 310px;
+    height: 222px;
+    border: 2px solid #164a7b;
+    padding: 10px 10px 10px 10px;" />
+					  <div class="container">
+					    <p>Phet- Interactive Simulations</p>
+					  </div>
+					</a>
+				</div>
+        	</li>
+        	<li>   
+        		<div class="polaroid">
+        			<a href="/sugar/" title="Sugar Labs" target="_blank">
+						<img src="/static/ndf/images/snap-logo.png" alt="Norway" style="width: 310px;
+    height: 222px;
+    border: 2px solid #164a7b;
+    padding: 10px 10px 10px 10px;" />
+							<div class="container">
+					    	<p>Sugar Labs</p>
+					  		</div>
+					</a>
+				</div>
+        	</li>
+        	<li>   
+        		<div class="polaroid">
+        		<a href="/turtle/" title="turtle blocks" target="_blank">
+					<img src="/static/ndf/images/turtle-blocks.svg" alt="Norway" style="width: 310px;
+    height: 222px;
+    border: 2px solid #164a7b;
+    padding: 10px 10px 10px 10px;" />
+						<div class="container">
+					    	<p>Turtle Blocks</p>
+					  	</div>
+				</a>
+				</div>
+        	</li>
+        </ul>
+    </div>
 </div>
-
-
 </body>
 </html>
 
