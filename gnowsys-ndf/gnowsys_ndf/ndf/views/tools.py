@@ -44,7 +44,10 @@ def tools_logging(request):
 	return StreamingHttpResponse("Success")	
 
 def tools_temp(request):
-	return render_to_response(
+    context_variables = {'title' : "tools"}
+    return render_to_response(
         'ndf/tools_list.html',
+                                  context_variables,
         context_instance=RequestContext(request)
     )
+
