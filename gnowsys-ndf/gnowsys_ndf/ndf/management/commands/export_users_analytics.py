@@ -1,9 +1,9 @@
 ''' -- imports from python libraries -- '''
 import os
-# import json
 import time
 import datetime
 import csv
+# import json
 
 
 ''' imports from installed packages '''
@@ -15,13 +15,13 @@ from django.core.management.base import BaseCommand, CommandError
 from gnowsys_ndf.ndf.models import Group, GSystemType, node_collection
 from gnowsys_ndf.settings import GSTUDIO_LOGS_DIR_PATH, GSTUDIO_DATA_ROOT
 from gnowsys_ndf.ndf.views.gcourse import course_analytics
-# from gnowsys_ndf.ndf.views.methods import get_group_name_id
+# from gnowsys_ndf.ndf.views.methods import get_group_name_id   
 # from gnowsys_ndf.ndf.views.analytics_methods import *
 
 try:
-    from gnowsys_ndf.server_settings import GSTUDIO_INSTITUTE_ID
+    from gnowsys_ndf.server_settings import GSTUDIO_INSTITUTE_ID, GSTUDIO_INSTITUTE_ID_SECONDARY, GSTUDIO_INSTITUTE_NAME
 except Exception, e:
-    from gnowsys_ndf.settings import GSTUDIO_INSTITUTE_ID
+    from gnowsys_ndf.settings import GSTUDIO_INSTITUTE_ID, GSTUDIO_INSTITUTE_ID_SECONDARY, GSTUDIO_INSTITUTE_NAME
 
 if not os.path.exists(GSTUDIO_LOGS_DIR_PATH):
     os.makedirs(GSTUDIO_LOGS_DIR_PATH)
@@ -67,9 +67,10 @@ def export_group_analytics(group_obj):
 
         # dt: date time
         # e.g: '21-November-2016-19h-08m-10s'
-        dt = "{:%d-%B-%Y-%Hh-%Mm-%Ss}".format(datetime.datetime.now())
+        # dt = "{:%d-%B-%Y-%Hh-%Mm-%Ss}".format(datetime.datetime.now())
+        dt = "{:%Y%m%d-%Hh%Mm}".format(datetime.datetime.now())
 
-        file_name = GSTUDIO_INSTITUTE_ID + '-' + group_name + '-' + dt + '.csv'
+        file_name = GSTUDIO_INSTITUTE_ID_SECONDARY + '-' + GSTUDIO_INSTITUTE_ID + '-' + group_name + '-' + dt + '.csv'
 
         GSTUDIO_EXPORTED_CSVS_DIRNAME = 'gstudio-exported-users-analytics-csvs'
         GSTUDIO_EXPORTED_CSVS_DIR_PATH = os.path.join('/data/', GSTUDIO_EXPORTED_CSVS_DIRNAME)

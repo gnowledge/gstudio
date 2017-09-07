@@ -1286,6 +1286,7 @@ class CreateCourseEventGroup(CreateEventGroup):
 
             self.update_raw_material_group_set(existing_course_obj, new_course_obj)
             self.call_setup(request, existing_course_obj, new_course_obj, new_course_obj)
+            new_course_obj = get_all_iframes_of_unit(new_course_obj, request.META['HTTP_HOST'])
             return True
 
         except Exception as e:
@@ -2057,17 +2058,17 @@ def group_dashboard(request, group_id=None):
     old_profile_pics = []
     selected = request.GET.get('selected','')
     group_obj = get_group_name_id(group_id, get_obj=True)
-
-    if "announced_unit" in group_obj.member_of_names_list and group_obj.project_config['tab_name'].lower() == "questions":
-        try:
-            if group_obj.collection_set:
-                lesson_id = group_obj.collection_set[0]
-                lesson_node = node_collection.one({'_id': ObjectId(lesson_id)})
-                activity_id = lesson_node.collection_set[0]
-            return HttpResponseRedirect(reverse('activity_player_detail', kwargs={'group_id': group_id,
-                'lesson_id': lesson_id, 'activity_id': activity_id}))
-        except Exception as e:
-            pass
+    try:
+        if 'tab_name' in group_obj.project_config and group_obj.project_config['tab_name'].lower() == "questions":
+            if "announced_unit" in group_obj.member_of_names_list:
+                if group_obj.collection_set:
+                    lesson_id = group_obj.collection_set[0]
+                    lesson_node = node_collection.one({'_id': ObjectId(lesson_id)})
+                    activity_id = lesson_node.collection_set[0]
+                return HttpResponseRedirect(reverse('activity_player_detail', kwargs={'group_id': group_id,
+                    'lesson_id': lesson_id, 'activity_id': activity_id}))
+    except Exception as e:
+        pass
 
     if ("base_unit" in group_obj.member_of_names_list or
         "CourseEventGroup" in group_obj.member_of_names_list or
@@ -2146,6 +2147,7 @@ def group_dashboard(request, group_id=None):
           shelves = []
     '''
   except Exception as e:
+    print "\nError: ", e
     group_obj=node_collection.one({'$and':[{'_type':u'Group'},{'name':u'home'}]})
     group_id=group_obj['_id']
     pass
