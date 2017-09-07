@@ -334,7 +334,7 @@ def explore_drafts(request):
 
     module_unit_ids = [val for each_module in modules_cur for val in each_module.collection_set ]
 
-    # modules_cur.rewind()
+
     gstaff_access = check_is_gstaff(group_id,request.user)
     draft_query = {'member_of': gst_base_unit_id,
               '_id': {'$nin': module_unit_ids},
@@ -351,7 +351,7 @@ def explore_drafts(request):
 
     base_unit_cur = node_collection.find(draft_query).sort('last_update', -1)
     # print "\nbase: ", base_unit_cur.count()
-    # base_unit_page_cur = paginator.Paginator(base_unit_cur, page_no, GSTUDIO_NO_OF_OBJS_PP)
+
 
     '''
     base_unit_cur = node_collection.find({'member_of': gst_base_unit_id,
@@ -363,7 +363,9 @@ def explore_drafts(request):
                                           {'author_set': request.user.id},
                                           # {'group_type': 'PUBLIC'}
                                           ]}).sort('last_update', -1)
+
     '''
+#     base_unit_page_cur = paginator.Paginator(base_unit_cur, page_no, GSTUDIO_NO_OF_OBJS_PP)
 
     # base_unit_page_cur = paginator.Paginator(base_unit_cur, page_no, GSTUDIO_NO_OF_OBJS_PP)
 

@@ -58,7 +58,7 @@
 							<br/>
 						{% endfor %}
 					{% elif node.quiz_type == "Short-Response" %}
-						<textarea rows="4" cols="50" name="quiz_ans" class="choice" placeholder="Enter answer here" class="short_ans_txt" >{{total_and_curr_ans_dict.recent_ans|default_if_none:""}}</textarea>
+						<textarea rows="4" cols="50" name="quiz_ans" class="choice" placeholder="Enter answer here" class="short_ans_txt" ></textarea>
 						<!-- <input type="button" value="Submit" class="button tiny radius short-ans_chk"> -->
 					{% endif %}
 
@@ -131,10 +131,10 @@
 
 	// Select user's recent submitted answer ---------------------------------
 		function display_sub_ans(){
-			{% if node.quiz_type != "Short-Response" %}
 			user_ans_list = user_submitted_ans_list
 			if(user_ans_list){
 				$.each(user_ans_list,function(ind,each_opt_val){
+					{% if node.quiz_type != "Short-Response" %}
 					var re = /[.*+=~`<>;:'"_?^${}()!%\^|[\]\\\/#]/g;
 					if(re.test(each_opt_val)){
 						each_opt_val = each_opt_val.replace(re,"\\$&")
@@ -143,10 +143,12 @@
 					else{
 						$("#"+each_opt_val).prop("checked", true)
 					}
+					{% else %}
+						$(".choice").val(each_opt_val)
+					{% endif %}
 				})
 				submit_btn_status("hide")
 			}
-			{% endif %}
 		}
 
 		function display_sub_status_msg(attempt_count_val){
@@ -240,15 +242,22 @@
 		})
 
 	// Submit user selected answer -------------------------------------------
-		$(".submit-btn").click(function(){
+		$(".submit-btn").click(function(e){
 			{% if node.quiz_type == "Short-Response" %}
-				var user_given_ans = $(".choice").val()
-				user_given_ans = [user_given_ans]
+				var user_given_ans = $(".choice").val().trim()
+				if (user_given_ans.length > 0){
+					user_given_ans = [user_given_ans]
+				} 
 			{% else %}
 				var user_given_ans = user_ans()
 			{% endif %}
 			save_user_action("submit",user_given_ans)
 		})
+
+	// Short-response keydown event binding
+	$(".choice").keydown(function(e){
+		submit_btn_status("show")
+	})
 
 	// Ajax call to save user's answer ---------------------------------------
 		function save_user_action(user_action, user_given_ans){
@@ -290,7 +299,7 @@
 				});//end of ajax
 			}
 			else if(user_given_ans.length == 0 ){
-				alert("Please select an answer.")
+				alert("Please answer and click Submit.")
 			}
 			else{
 				alert("This answer is already submitted.")

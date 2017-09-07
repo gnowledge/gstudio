@@ -10,6 +10,7 @@
 {% check_is_gstaff group_id request.user as is_gstaff %}
 {% user_access_policy groupid request.user as user_access_priv %}
 {% get_group_object groupid as group_object %}
+{% get_attribute_value node.pk 'discussion_enable' as node_discussion %}
 
 
 <style type="text/css">
@@ -100,7 +101,7 @@
                     {% if grel_admin_page.grel_id %}<a class="admin-page right"> {% trans "Teacher's Help" %}</a>{% endif %}
                   {% endif  %}
 
-                {% get_attribute_value node.pk 'discussion_enable' as node_discussion %}
+                
                 {% if node_discussion %}
                 <a class="discuss right">{% trans "Discuss" %} </a>
                 {% endif %}
