@@ -242,10 +242,12 @@
 		})
 
 	// Submit user selected answer -------------------------------------------
-		$(".submit-btn").click(function(){
+		$(".submit-btn").click(function(e){
 			{% if node.quiz_type == "Short-Response" %}
-				var user_given_ans = $(".choice").val()
-				user_given_ans = [user_given_ans]
+				var user_given_ans = $(".choice").val().trim()
+				if (user_given_ans.length > 0){
+					user_given_ans = [user_given_ans]
+				} 
 			{% else %}
 				var user_given_ans = user_ans()
 			{% endif %}
@@ -297,7 +299,7 @@
 				});//end of ajax
 			}
 			else if(user_given_ans.length == 0 ){
-				alert("Please select an answer.")
+				alert("Please answer and click Submit.")
 			}
 			else{
 				alert("This answer is already submitted.")
