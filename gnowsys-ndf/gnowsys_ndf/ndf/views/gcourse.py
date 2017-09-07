@@ -2118,7 +2118,8 @@ def activity_player_detail(request, group_id, lesson_id, activity_id):
             each_counter_obj.last_update = datetime.datetime.now()
             each_counter_obj.save()
             # print "\n updated counter_obj: ", each_counter_obj['visited_nodes']
-        if 'tab_name' in group_obj.project_config and group_obj.project_config['tab_name'].lower() == "questions":
+        # if 'tab_name' in group_obj.project_config and group_obj.project_config['tab_name'].lower() == "questions":
+        if "QuizItemEvent" in node_obj.member_of_names_list:
             if request.user.id not in lesson_node.author_set:
                 context_variables.update({'allow_finish_lesson': True})
     template = "ndf/activity_player.html"
