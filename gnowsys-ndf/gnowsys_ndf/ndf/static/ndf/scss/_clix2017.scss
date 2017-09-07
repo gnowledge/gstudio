@@ -1509,6 +1509,7 @@ input[type="button"] {
         color: $primary-blue;
         border-bottom: 2px solid $primary-blue;
         padding-bottom: 14px;
+        font-weight: 600;
 
     }
 }
@@ -5986,13 +5987,14 @@ ul.nav_menu_1 {
     &> button {
     color: #164a7b;
     font-weight: 400;
-    padding: 14px 10px 3px 10px;
     cursor: pointer;
-    margin-top: 4px;
     background-color: #ddeff9;
-    border: 1px solid #719dc8;
+    border: 2px solid #719dc8;
     border-radius: 5px !important;
     display: inline-block;
+    padding: 3px 8px 4px 8px;
+    margin-top: 10px;
+    margin-left: 20px;
         &:hover{
             border-radius: 10px;
             background-color: #ddeff9;
@@ -6001,6 +6003,23 @@ ul.nav_menu_1 {
     }
     a{
         font-size:16px;
+    }
+    .f-dropdown li {
+
+        font-size: 0.875rem;
+        cursor: pointer;
+        line-height: 1.125rem;
+        margin: 0;
+        background-color: $primary-blue;
+
+            a{
+                color: $secondry-blue;
+            }
+
+            &:hover{
+                border-left: 4px solid $secondary-orange;
+            }
+
     }
 }
 
