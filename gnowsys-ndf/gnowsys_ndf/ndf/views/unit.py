@@ -438,6 +438,7 @@ def activity_create_edit(request, group_id, lesson_id=None):
     return HttpResponse(json.dumps(result_dict))
 
 
+
 def _get_unit_hierarchy(unit_group_obj,lang="en"):
     '''
     ARGS: unit_group_obj
@@ -503,4 +504,3 @@ def _get_unit_hierarchy(unit_group_obj,lang="en"):
             unit_structure.append(lesson_dict)
 
     return unit_structure
-
