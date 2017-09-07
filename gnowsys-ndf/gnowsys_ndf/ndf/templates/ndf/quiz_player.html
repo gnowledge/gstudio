@@ -66,12 +66,12 @@
 				{% if total_and_curr_ans_dict.count != node.quizitem_max_attempts and allow_attempt %}
 					<div class="row controls-box quiz_qtn hide">
 						{% if node.quizitem_check_answer and node.quiz_type != "Short-Response"  %}
-							<input type="button" value="Check" class="button tiny check-ans radius check-btn">
+							<input type="button" value="Check" class="purple-btn check-ans check-btn">
 						{% endif %}
 						{% if node.quizitem_show_correct_ans %}
-							<input type="button" value="Show Answer" class="button tiny radius show-ans-btn hide">
+							<input type="button" value="Show Answer" class="purple-btn show-ans-btn hide">
 						{% endif %}
-						<input type="button" value="Submit" class="tiny button radius submit-btn">
+						<input type="button" value="Submit" class="purple-btn auto_width submit-btn">
 					</div>
 				{% endif %}
 			</div>
