@@ -7102,14 +7102,6 @@ def get_translated_node(request, group_id):
       return HttpResponse(json.dumps(node_obj, cls=NodeJSONEncoder))
 
 
-def delete_curriculum_node(request, group_id):
-    node_id = request.POST.get('node_id', None)
-    node_obj = Node.get_node_by_id(node_id)
-    if node_obj:
-      trash_resource(request,ObjectId(group_id),ObjectId(node_id))
-      trash_resource(request,ObjectId(group_id),ObjectId(node_id))
-      return HttpResponse("Success")
-
 @get_execution_time
 def get_rating_template(request, group_id):
   try:
@@ -7130,3 +7122,12 @@ def get_rating_template(request, group_id):
               "group_id":group_id,"node":node_obj,"if_comments":is_comments,'nodeid':node_obj._id,
             },
             context_instance=RequestContext(request))
+
+def delete_curriculum_node(request, group_id):
+    node_id = request.POST.get('node_id', None)
+    node_obj = Node.get_node_by_id(node_id)
+    if node_obj:
+      trash_resource(request,ObjectId(group_id),ObjectId(node_id))
+      trash_resource(request,ObjectId(group_id),ObjectId(node_id))
+      return HttpResponse("Success")
+

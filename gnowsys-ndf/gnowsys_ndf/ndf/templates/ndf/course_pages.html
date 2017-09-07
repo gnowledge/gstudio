@@ -82,6 +82,7 @@
                   <div class="asset_text">
                       <div class="asset_title">{% firstof each.altnames|truncatechars:25 each.name|truncatechars:25 %}</div>
                       <div class="asset_desc">{{each.content|striptags|truncatechars:25}}</div>
+
                   </div>
                 </div>
               </div>
@@ -113,14 +114,14 @@
         <div class="row listing-row">
             {% for each in all_pages %}
 
-                   {% include "ndf/asset_card.html" with url_name="view_course_page" each_asset=each first_arg=group_id second_arg=each.pk  no_asset=True %} 
+                   {% include "ndf/asset_card.html" with url_name="view_course_page" each_asset=each first_arg=group_id second_arg=each.pk  no_asset=True if_activities=True %} 
             {% endfor %}
         </div>
 
 
 
 {% endif %}
-{% include 'ndf/pagination.html' with urlname="course_pages_paged" first_arg=group_id page_info=course_pages_info %}
+{% include 'ndf/pagination.html' with urlname="course_pages_paged" first_arg=group_id page_info=course_pages_info  %}
 
 <script type="text/javascript">
     $(".delete-activity").click(function(){
