@@ -3717,13 +3717,11 @@ def get_user_quiz_resp(node_obj, user_obj):
 				if qip_sub:
 					result['count'] = len(qip_sub)
 					recent_ans = qip_sub[-1]
-					if node_obj.quiz_type == "Short-Response":
-						result['recent_ans'] = recent_ans
-					else:
-						user_ans = recent_ans.values()[0]
-						# result['recent_ans'] = (map(unicode,[re.sub(r'[\t\n\r]', '', u_ans) for u_ans in user_ans]))
-						# result['recent_ans'] = [u_ans.decode('utf-8').decode('utf-8') for u_ans in user_ans]
-						result['recent_ans'] = user_ans
+					result['recent_ans'] = recent_ans
+					user_ans = recent_ans.values()[0]
+					# result['recent_ans'] = (map(unicode,[re.sub(r'[\t\n\r]', '', u_ans) for u_ans in user_ans]))
+					# result['recent_ans'] = [u_ans.decode('utf-8').decode('utf-8') for u_ans in user_ans]
+					result['recent_ans'] = user_ans
 		# return json.dumps(result,ensure_ascii=False)
 		return result
 
