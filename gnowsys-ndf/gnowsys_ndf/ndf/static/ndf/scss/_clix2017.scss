@@ -86,9 +86,7 @@ h5{
 
 }
 
-.module_text{
-    margin-left: -7px;
-}
+
 /* Landing page */
 .landing_page {
   position: relative;
@@ -4671,16 +4669,15 @@ $module-card-lines-to-show: 3;
 
 .module_card {
     display: table;
-    height: 200px;
-    //width:500px;
-    // width: 630px;
+    height: 250px;
+    box-shadow: 0px 0px 15px rgb(193, 227, 238);
+    cursor: pointer;
     margin: 10px;
     border-radius: 5px;
     position: relative;
-    box-shadow: 0px 0px 15px rgb(193, 227, 238);
 
     &:hover {
-        box-shadow: 0px 0px 15px black;
+        box-shadow: 0px 0px 15px rgba(0, 0, 0, 0.2);
     }
 
     &>div {
@@ -4689,22 +4686,20 @@ $module-card-lines-to-show: 3;
     }
     .card_banner {
         width: 250px;
-        vertical-align: middle;
         overflow: hidden;
         background-size: 100% 100%;
+        padding-top: 25px;
         border-radius: 8px 0px 0px 8px;
-        box-shadow: inset 0 0 5px 0px;
-        //background-image: url('/static/ndf/images/module-card.png');
+        box-shadow: inset 0 0 5px 2px;
         position: relative;
         z-index: 3;
         -webkit-transition: border-radius .2s;
         transition: border-radius .2s;
         background-color:#f9f9f9;
-
     }
     .card_title {
         display: block;
-        width: 200px;
+        width: 230px;
         color: #fff;
         font-size: 20px;
         font-weight: 600;
@@ -4714,11 +4709,10 @@ $module-card-lines-to-show: 3;
     }
     .card_photo_widget{
         width: 248px;
-        min-height: 236px;
-        margin-top: -26px;
+        min-height: 245px;
+        margin-top: -24px;
         margin-left: 1px;
-        width: 250px;
-        vertical-align: middle;
+        width: 247px;
         overflow: hidden;
         background-size: 100% 100%;
         border-radius: 8px 0px 0px 8px;
@@ -4727,14 +4721,12 @@ $module-card-lines-to-show: 3;
         z-index: 3;
         -webkit-transition: border-radius .2s;
         transition: border-radius .2s;
-
-
     }
     .card_title_font{
         font-size: 18px;
         color: #a61680;
         padding: 0px 0px 0px 10px;
-        margin-top: 10px;
+        margin-top: 4px;
         font-weight: 600;
     }
 
@@ -4759,14 +4751,14 @@ $module-card-lines-to-show: 3;
     }
 
     .card_summary{
-        width: 230px;
+        width: 290px;
         padding: 0px 15px;
         vertical-align: middle;
         border-style: solid;
         border-width: 1px 1px 1px 0px;
         border-radius: 0px 7px 7px 0px;
         border-color: #d5d5d5;
-        // box-shadow: inset 6px 0px 13px -5px;
+        box-shadow: inset 6px 0px 13px -5px;
         -webkit-transition: left .4s ease-in-out;
         transition: left .4s ease-in-out;
         -webkit-transition-property: left; /* Safari */
@@ -4774,10 +4766,9 @@ $module-card-lines-to-show: 3;
         background-color:rgba(231, 231, 231, 0.25);
 
         .card_label {
-            font-weight: 500;
+            font-weight: 600;
             font-size: $module-card-font-size;
             letter-spacing: 1px;
-            color: black;
         }
         .card_section {
             margin: 5px 0px;
@@ -4787,7 +4778,8 @@ $module-card-lines-to-show: 3;
                 border-bottom: 1px solid #ccc;
             }
             p {
-                margin-bottom: 7px;
+                margin-bottom: -14px;
+                margin-top: 11px;
                 font-size: $module-card-font-size;
             }
             .ellipsis {
@@ -4810,10 +4802,15 @@ $module-card-lines-to-show: 3;
             -webkit-line-clamp: $module-card-lines-to-show;
             -webkit-box-orient: vertical;
             margin-bottom: 10px;
-            color: black;
+
         }
     }
 }
+
+
+
+
+
 //LMS Page: Unit detail of LMS
 
 .lms_page{
@@ -5108,7 +5105,7 @@ ul.nav_menu_1 {
 
 .lms_explore_head{
     width: 100%;
-    height: 40px;
+    height: 45px;
     background-color:#fff;
     color: $primary-blue;
     margin-top:-30px;
@@ -5124,7 +5121,7 @@ ul.nav_menu_1 {
 }
 .lms_explore_head_unit{
     width: 100%;
-    height: 40px;
+    height: 50px;
     background-color:#fff;
     color: $primary-blue;
     >p{
@@ -5867,114 +5864,114 @@ ul.nav_menu_1 {
     width: auto !important;
 }
 
-/* responsive footer */
-.clearfix {clear: both;}
-.center {text-align: center;}
-.left {text-align: left;}
-.right {text-align: right;}
+    /* responsive footer */
+    .clearfix {clear: both;}
+    .center {text-align: center;}
+    .left {text-align: left;}
+    .right {text-align: right;}
 
-.clr1 {background: #FFFFFF; color: #333743;}
-.clr2 {background: #F1F3F5; color: #8F94A3;}
-.clr3 {background: rgba(221, 221, 221, 0.18); color: #BDC3CF;}
-.clr4 {background: rgba(221, 221, 221, 0.18); color: #E3E7F2;}
-.clr5 {color: #F1F3F5;}
-.clr6 {color: #39B5A1;}
-.clr7 {color: #D45245;}
-
-
-
-/*##### Footer Structure #####*/
-.bo-wrap {clear:both; width: auto;}
-.bo-footer {
-  clear:both;
-  width: auto;
-  padding: 5px;
-  width: 960px;
-  margin: 0 auto;
-}
-
-.bo-footer-social {
-  text-align: left; 
-  line-height: 1px;
-  padding: 10px 10px 10px 10px;
-        
-}
-
-.bo-footer-smap {
-  width: 600px;
-  float: left;
-  padding: 5px 10px;
-  text-align: left;
-  font-size: 18px;
-}
-
-.bo-footer-uonline {
-  width: 300px; /* Account for margins + border values */
-  float: left;
-  padding: 5px 10px;
-  text-align: center;
-}
-
-.bo-footer-power {
-  width: 300px;
-  padding: 5px 10px;
-  float: left;
-  text-align: right;
-  font-size: 14px;
-  color: #636A7D;
-  vertical-align: middle;
-}
+    .clr1 {background: #FFFFFF; color: #333743;}
+    .clr2 {background: #F1F3F5; color: #8F94A3;}
+    .clr3 {background: rgba(221, 221, 221, 0.18); color: #BDC3CF;}
+    .clr4 {background: rgba(221, 221, 221, 0.18); color: #E3E7F2;}
+    .clr5 {color: #F1F3F5;}
+    .clr6 {color: #39B5A1;}
+    .clr7 {color: #D45245;}
 
 
-/*##### Footer Responsive #####*/
-/* for 980px or less */
-@media screen and (max-width: 980px) {
-  
-  .bo-footer {
-    width: 95%;
-    padding: 1% 2%;
-  }
-  .bo-footer-smap {
-    width: 33%;
-    padding: 1% 2%;
-  }
-  .bo-footer-uonline {
-    width: 46%;
-    padding: 1% 2%;
-    float: right;
-    text-align: right;
-  }
-  
-  .bo-footer-power {
-    clear: both;
-    padding: 1% 2%;
-    width: auto;
-    float: none;
-    text-align: center;
-  }
-}
-/* for 700px or less */
-@media screen and (max-width: 600px) {
 
-  .bo-footer-smap {
-    width: auto; 
-    float: none;
-    text-align: center;
-  }
-  
-  .bo-footer-uonline {
-    width: auto;
-    float: none;
-    text-align: center;
-  }
-  
-  .bo-footer-power {
-    width: auto;
-    float: none;
-    text-align: center;
-  }
+    /*##### Footer Structure #####*/
+    .bo-wrap {clear:both; width: auto;}
+    .bo-footer {
+      clear:both;
+      width: auto;
+      padding: 5px;
+      width: 960px;
+      margin: 0 auto;
+    }
 
-}
+    .bo-footer-social {
+      text-align: left; 
+      line-height: 1px;
+      padding: 10px 10px 10px 10px;
+            
+    }
+
+    .bo-footer-smap {
+      width: 600px;
+      float: left;
+      padding: 5px 10px;
+      text-align: left;
+      font-size: 18px;
+    }
+
+    .bo-footer-uonline {
+      width: 300px; /* Account for margins + border values */
+      float: left;
+      padding: 5px 10px;
+      text-align: center;
+    }
+
+    .bo-footer-power {
+      width: 300px;
+      padding: 5px 10px;
+      float: left;
+      text-align: right;
+      font-size: 14px;
+      color: #636A7D;
+      vertical-align: middle;
+    }
+
+
+    /*##### Footer Responsive #####*/
+    /* for 980px or less */
+    @media screen and (max-width: 980px) {
+      
+      .bo-footer {
+        width: 95%;
+        padding: 1% 2%;
+      }
+      .bo-footer-smap {
+        width: 33%;
+        padding: 1% 2%;
+      }
+      .bo-footer-uonline {
+        width: 46%;
+        padding: 1% 2%;
+        float: right;
+        text-align: right;
+      }
+      
+      .bo-footer-power {
+        clear: both;
+        padding: 1% 2%;
+        width: auto;
+        float: none;
+        text-align: center;
+      }
+    }
+    /* for 700px or less */
+    @media screen and (max-width: 600px) {
+
+      .bo-footer-smap {
+        width: auto; 
+        float: none;
+        text-align: center;
+      }
+      
+      .bo-footer-uonline {
+        width: auto;
+        float: none;
+        text-align: center;
+      }
+      
+      .bo-footer-power {
+        width: auto;
+        float: none;
+        text-align: center;
+      }
+
+    }
 
 /* for 480px or less */
 @media screen and (max-width: 480px) {
