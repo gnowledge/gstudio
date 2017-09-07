@@ -6145,8 +6145,9 @@ p {
 .tool-bg {
   background-color: rgba(87, 198, 250, 0.07);
 }
-/* line 6197, ../../../scss/_clix2017.scss */
-.tool-bg .purple-btn {
+
+/* line 6198, ../../../scss/_clix2017.scss */
+.purple-btn {
   width: inherit;
   text-transform: uppercase;
   border-radius: 5px;
@@ -6155,8 +6156,9 @@ p {
   color: #ffffff !important;
   border: 2px solid #6a0054;
 }
-/* line 6207, ../../../scss/_clix2017.scss */
-.tool-bg .disable-purple-btn {
+
+/* line 6208, ../../../scss/_clix2017.scss */
+.disable-purple-btn {
   width: inherit;
   text-transform: uppercase !important;
   border-radius: 5px;
