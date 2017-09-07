@@ -516,8 +516,7 @@ h5{
                         background: transparent;
                     }
                 }
-
-                
+              
             }
 
             .dropdown {
@@ -591,7 +590,7 @@ h5{
 
 
                 &>a {
-                    color: $secondry-blue;
+                    color: #ffffff;
                     line-height: 40px;
                     font-weight: 500;
                     letter-spacing: 1px;
@@ -621,12 +620,12 @@ h5{
 
                 &.active{
                     color:#fff;
+                    
                 }
                 &.active {
                     &>a {
-                        //border-left-color: $secondary-orange;
                         color: #fff;
-                        //border-bottom: 3px solid $secondary-orange;
+                        
                     }
                 }
             }
@@ -663,6 +662,8 @@ h5{
                     color:#fff;
                     font-size: 18px;
                     font-family: OpenSans-Bold;
+                    margin-top: -3px;
+                    border-bottom: 3px solid $secondary-orange;
                     }
             }
             li {
@@ -1450,6 +1451,11 @@ input[type="button"] {
     margin-top:15px;
     width:8%;
 }
+
+
+
+
+
 .select-language{
     display: block;
     border: 1px solid #999;
@@ -6000,4 +6006,8 @@ ul.nav_menu_1 {
 
 .attempts_count{
     color: #000000 !important;
+}
+
+.button-bg{
+    background-color: $secondry-blue;
 }
