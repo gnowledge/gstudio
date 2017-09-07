@@ -6088,13 +6088,23 @@ p {
   color: #000000 !important;
 }
 
-/* line 6135, ../../../scss/_clix2017.scss */
+/* line 6136, ../../../scss/_clix2017.scss */
+#course-settings-drop li a {
+  text-align: left;
+}
+
+/* line 6144, ../../../scss/_clix2017.scss */
+#asset-settings-drop li a {
+  text-align: left;
+}
+
+/* line 6151, ../../../scss/_clix2017.scss */
 .button-bg {
   background-color: #74b3dc;
 }
 
 /* Tools page css listing*/
-/* line 6142, ../../../scss/_clix2017.scss */
+/* line 6158, ../../../scss/_clix2017.scss */
 .polaroid {
   width: 330px;
   background-color: white;
@@ -6108,7 +6118,7 @@ p {
   cursor: pointer;
 }
 
-/* line 6155, ../../../scss/_clix2017.scss */
+/* line 6171, ../../../scss/_clix2017.scss */
 .polaroid:hover img {
   -webkit-transform: scale(1.05);
   -moz-transform: scale(1.05);
@@ -6117,25 +6127,25 @@ p {
   transform: scale(1.05);
 }
 
-/* line 6164, ../../../scss/_clix2017.scss */
+/* line 6180, ../../../scss/_clix2017.scss */
 .container {
   text-align: center;
   padding: 10px 20px;
   border-top: 5px solid #164a7b;
   margin-top: 0px;
 }
-/* line 6170, ../../../scss/_clix2017.scss */
+/* line 6186, ../../../scss/_clix2017.scss */
 .container > p {
   color: black;
   font-size: 16px;
   font-weight: 500;
 }
 
-/* line 6179, ../../../scss/_clix2017.scss */
+/* line 6195, ../../../scss/_clix2017.scss */
 .tool-bg {
   background-color: rgba(87, 198, 250, 0.07);
 }
-/* line 6181, ../../../scss/_clix2017.scss */
+/* line 6197, ../../../scss/_clix2017.scss */
 .tool-bg .purple-btn {
   width: inherit;
   text-transform: uppercase;
@@ -6145,7 +6155,7 @@ p {
   color: #ffffff !important;
   border: 2px solid #6a0054;
 }
-/* line 6191, ../../../scss/_clix2017.scss */
+/* line 6207, ../../../scss/_clix2017.scss */
 .tool-bg .disable-purple-btn {
   width: inherit;
   text-transform: uppercase !important;
