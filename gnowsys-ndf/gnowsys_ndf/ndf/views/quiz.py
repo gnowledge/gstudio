@@ -513,11 +513,18 @@ def save_quizitem_answer(request, group_id):
 
 
                 # print "\n get_attribute_value--", get_attribute_value
+                curr_datetime = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
                 if user_given_ans and user_ans:
                     if quiz_type_val == "Short-Response":
-                        create_gattribute(user_ans._id, qip_user_submitted_ans_AT, user_given_ans)
+                        if already_ans_obj:
+                            old_submitted_ans = get_attribute_value(user_ans._id,"quizitempost_user_submitted_ans")
+                            if old_submitted_ans != "None" and old_submitted_ans != "" and old_submitted_ans:
+                                new_list = old_submitted_ans
+                        new_list.append({str(curr_datetime):user_given_ans})
+                        if new_list:
+                            create_gattribute(user_ans._id, qip_user_submitted_ans_AT, new_list)
+
                     else:
-                        curr_datetime = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
                         if user_given_ans:
                             if user_action == "check":
                                 if already_ans_obj:
