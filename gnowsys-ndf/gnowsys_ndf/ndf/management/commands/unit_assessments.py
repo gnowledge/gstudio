@@ -1,6 +1,5 @@
 '''
-Import can also be called using command line args as following:
-    python manage.py group_import <dump_path> <md5-check> <group-availability> <user-objs-restoration>
+Units can be linked with the assessments details using command line args as following:
     like:
         python manage.py unit_assessments <domain_name> y
         E.g
