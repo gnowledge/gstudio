@@ -2790,7 +2790,7 @@ def course_filters(request, group_id):
 
 # @login_required
 # @get_execution_time
-def course_analytics(request, group_id, user_id, render_template=False, get_result_dict=False):
+def course_analytics(request, group_id, user_id, render_template=False, get_result_dict=False, **kwargs):
     # set get_result_dict=True to get only raw data in dict format,
     # without being redirected to template. So that this method can
     # use to get dict result data in shell or for any command.
@@ -2805,10 +2805,20 @@ def course_analytics(request, group_id, user_id, render_template=False, get_resu
     #                             )
 
     analytics_data = {'user_id': user_id}
+    analytics_data.update({
+                'correct_attempted_quizitems' : 0,
+                'unattempted_quizitems': 0,
+                'visited_quizitems': 0,
+                'notapplicable_quizitems': 0,
+                'incorrect_attempted_quizitems': 0,
+                'attempted_quizitems': 0
+            })
     data_points_dict = {}
+    assessment_and_quiz_data = kwargs.get('assessment_and_quiz_data', False)
     
     try:
-        user_obj = User.objects.get(pk=int(user_id))
+        # user_obj = User.objects.get(pk=int(user_id))
+        author_obj = node_collection.one({ '_type': u'Author', 'created_by': int(user_id) })
     except Exception, e:
         print e
         return analytics_data
@@ -2838,7 +2848,7 @@ def course_analytics(request, group_id, user_id, render_template=False, get_resu
         analytics_data['users_points'] = data_points_dict['users_points']
 
     counter_obj = Counter.get_counter_obj(user_id, ObjectId(group_id))
-    analytics_instance = AnalyticsMethods(user_obj.id,user_obj.username, group_id)
+    analytics_instance = AnalyticsMethods(author_obj.created_by, author_obj.name, group_id)
 
     analytics_data['total_quizitems'] = 0
 
@@ -2887,10 +2897,8 @@ def course_analytics(request, group_id, user_id, render_template=False, get_resu
     # analytics_data['completed_res'] = analytics_instance.get_completed_resources_count()
     # print "\n Completed Resources === ", completed_res, "\n\n"
 
-    analytics_data['username'] = user_obj.username
+    analytics_data['username'] = author_obj.name
     # QuizItem Section
-
-
 
     if "announced_unit" in group_obj_member_of_names_list:
         visited_nodes = []
@@ -2938,22 +2946,29 @@ def course_analytics(request, group_id, user_id, render_template=False, get_resu
         # analytics_data['completed_res'] = analytics_instance.get_completed_resources_count()
         # print "\n Completed Resources === ", completed_res, "\n\n"
 
+        # following code will override (gstudio quiz) counters:
+        if assessment_and_quiz_data:
+            analytics_data.update({
+                'correct_attempted_assessments': 0,
+                'unattempted_assessments': 0,
+                'visited_assessments': 0,
+                'notapplicable_assessments': 0,
+                'incorrect_attempted_assessments': 0,
+                'attempted_assessments': 0,
+                'total_assessment_items': 0
+                })
+
         items_count_cur = group_obj.get_attribute("total_assessment_items")
         if items_count_cur.count():
-            analytics_data['total_quizitems'] = items_count_cur[0].object_value
+            if assessment_and_quiz_data:
+                analytics_data['total_assessment_items'] = items_count_cur[0].object_value
+            else:
+                analytics_data['total_quizitems'] = items_count_cur[0].object_value
 
+        # total_quiz_points = 0  # not used anywhere
         # assessment_list_cur = group_obj.get_attribute("assessment_list")
         # if assessment_list_cur.count():
         #     assessment_list_cur = assessment_list_cur[0]
-        total_quiz_points = 0
-        analytics_data.update({
-                    'correct_attempted_quizitems' : 0,
-                    'unattempted_quizitems': 0,
-                    'visited_quizitems': 0,
-                    'notapplicable_quizitems': 0,
-                    'incorrect_attempted_quizitems': 0,
-                    'attempted_quizitems': 0
-                })
         '''
         analytics_data['correct_attempted_quizitems'] = 0
         analytics_data['unattempted_quizitems'] = 0
@@ -2965,12 +2980,20 @@ def course_analytics(request, group_id, user_id, render_template=False, get_resu
         try:
             assessment_data_list = counter_obj['assessment']
             for each_dict in assessment_data_list:
-                analytics_data['correct_attempted_quizitems'] += each_dict['correct']
-                analytics_data['unattempted_quizitems'] += each_dict['unattempted']
-                analytics_data['visited_quizitems'] += each_dict['visited']
-                analytics_data['notapplicable_quizitems'] += each_dict['notapplicable']
-                analytics_data['incorrect_attempted_quizitems'] += each_dict['incorrect']
-                analytics_data['attempted_quizitems'] += each_dict['attempted']
+                if assessment_and_quiz_data:
+                    analytics_data['correct_attempted_assessments'] += each_dict['correct']
+                    analytics_data['unattempted_assessments'] += each_dict['unattempted']
+                    analytics_data['visited_assessments'] += each_dict['visited']
+                    analytics_data['notapplicable_assessments'] += each_dict['notapplicable']
+                    analytics_data['incorrect_attempted_assessments'] += each_dict['incorrect']
+                    analytics_data['attempted_assessments'] += each_dict['attempted']
+                else:
+                    analytics_data['correct_attempted_quizitems'] += each_dict['correct']
+                    analytics_data['unattempted_quizitems'] += each_dict['unattempted']
+                    analytics_data['visited_quizitems'] += each_dict['visited']
+                    analytics_data['notapplicable_quizitems'] += each_dict['notapplicable']
+                    analytics_data['incorrect_attempted_quizitems'] += each_dict['incorrect']
+                    analytics_data['attempted_quizitems'] += each_dict['attempted']
         except Exception as assessment_analytics_err:
             print "\nIn User analytics. Ignore if KeyError. Error: {0}".format(assessment_analytics_err)
             pass
