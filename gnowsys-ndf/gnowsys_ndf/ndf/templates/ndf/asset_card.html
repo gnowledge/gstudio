@@ -97,8 +97,10 @@
                     <img src="{{MEDIA_URL}}{{each_asset.if_file.thumbnail.relurl}}"/>
                     {% elif  'audio' in each_asset.if_file.mime_type %}
                     <img src="/static/ndf/images/audio.png"/>
+                    {% elif if_activities %}
+                        <img src="/static/ndf/images/resource.png"/>
                     {% else %}
-                    <img src="/static/ndf/images/file.png"/>
+                        <img src="/static/ndf/images/file.png"/>
                 {% endif %}
             {% endif %}
             </div>
