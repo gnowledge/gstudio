@@ -6110,11 +6110,21 @@ ul.nav_menu_1 {
 }
 
 .purple-btn{
-    border-radius: 5px;
-    text-transform: uppercase;
-    color: #ffffff !important;
     width: inherit;
+    text-transform: uppercase;
+    border-radius: 5px;
     font-family: "OpenSans-Semibold", sans-serif;
-    border: 2px solid #6a0054;
     background-color: #6a0054;
+    color: #ffffff !important;
+    border: 2px solid #6a0054;
+}
+
+.disable-purple-btn{
+    width: inherit;
+    text-transform: uppercase !important;
+    border-radius: 5px;
+    font-family: "OpenSans-Semibold", sans-serif;
+    background: #4b4852;
+    color: #ffffff !important;
+    border: 2px solid #4b4852;
 }

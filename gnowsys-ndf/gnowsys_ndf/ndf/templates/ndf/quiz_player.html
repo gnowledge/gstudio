@@ -121,11 +121,17 @@
 				$(".submit-btn")
 					.removeAttr("disabled")
 					.removeClass("secondary")
+					.removeClass("disable-purple-btn")
+					.addClass("purple-btn")
+					.attr('title', 'Click to submit your answer.')
 			}
 			else{
 				$(".submit-btn")
 					.attr("disabled","disabled")
 					.addClass("secondary")
+					.addClass("disable-purple-btn")
+					.removeClass("purple-btn")
+					.attr('title', 'Your answer is already sbubmitted. Please change to submit again.')
 			}
 		}
 
