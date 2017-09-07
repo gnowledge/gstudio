@@ -6119,27 +6119,30 @@ p {
   cursor: pointer;
 }
 
-/*
+/* line 6168, ../../../scss/_clix2017.scss */
 .polaroid:hover img {
-      -moz-transform: scale(1.1);
-      -webkit-transform: scale(1.1);
-      transform: scale(1.1);
-}*/
-/* line 6174, ../../../scss/_clix2017.scss */
+  -webkit-transform: scale(1.05);
+  -moz-transform: scale(1.05);
+  -ms-transform: scale(1.05);
+  -o-transform: scale(1.05);
+  transform: scale(1.05);
+}
+
+/* line 6177, ../../../scss/_clix2017.scss */
 .container {
   text-align: center;
   padding: 10px 20px;
   border-top: 5px solid #164a7b;
   margin-top: 0px;
 }
-/* line 6180, ../../../scss/_clix2017.scss */
+/* line 6183, ../../../scss/_clix2017.scss */
 .container > p {
   color: black;
   font-size: 16px;
   font-weight: 500;
 }
 
-/* line 6189, ../../../scss/_clix2017.scss */
+/* line 6192, ../../../scss/_clix2017.scss */
 .tool-bg {
   background-color: rgba(87, 198, 250, 0.07);
 }

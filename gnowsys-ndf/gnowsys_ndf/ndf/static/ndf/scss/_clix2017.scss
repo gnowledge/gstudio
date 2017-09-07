@@ -6164,12 +6164,15 @@ ul.nav_menu_1 {
  
 
 }
-/*
+
 .polaroid:hover img {
-      -moz-transform: scale(1.1);
-      -webkit-transform: scale(1.1);
-      transform: scale(1.1);
-}*/
+  -webkit-transform: scale(1.05);
+  -moz-transform: scale(1.05);
+  -ms-transform: scale(1.05);
+  -o-transform: scale(1.05);
+  transform: scale(1.05);
+}
+
 
 .container {
   text-align: center;
