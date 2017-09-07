@@ -109,6 +109,7 @@ def created_trans_node(request, group_id, node_id, trans_node_id, language):
     translated_node.created_by = translated_node.modified_by = request.user.id
     translated_node.contributors = [request.user.id]
     translated_node.language = language
+    translated_node.status = u"PUBLISHED"
     translated_node.save()
     print "\nHELO", translated_node
     if not trans_node_id:
