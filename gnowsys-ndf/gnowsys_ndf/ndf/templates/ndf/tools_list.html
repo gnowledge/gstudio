@@ -3,105 +3,54 @@
 {% load ndf_tags %}
 {% block body_content %}
 
-<style type="text/css">
-.tool-outer-div{
 
-    position: relative !important;
-    width: 100% !important;
-    background-color: #F0F1F2 !important;
-}
-	.tool-inner-div{
-		padding-left: 20px !important;
-	    padding-right: 20px !important;
-	    padding-top: 24px !important;
-	    padding-bottom: 24px !important;
-	    display: -moz-box !important;
-	    display: -ms-flexbox !important;
-	    display: -webkit-box !important;
-	    display: -webkit-flex !important;
-	    display: flex !important;
-	    flex-direction: row !important;
-	    justify-content: center !important;
-	    margin: auto !important;
-	    max-width: 1200px !important;
-	    -webkit-flex-direction: row !important;
-	    -ms-flex-direction: row !important;
-	    -webkit-justify-content: center !important;
-	    -webkit-box-orient: horizontal !important;
-	    -webkit-box-direction: normal !important;
-	    -ms-flex-pack: center !important;
-	    -webkit-box-pack: center !important;
-	}
 
-	    .tool-list{
-	    	min-height: 300px !important;
-	    	max-width: 268px !important;
-		    flex: 1 1 0 !important;
-		    -webkit-flex: 1 1 0 !important;
-		    display: -moz-box !important;
-		    display: -ms-flexbox !important;
-		    display: -webkit-box !important;
-		    display: -webkit-flex !important;
-		    display: flex !important;
-		    flex-direction: row !important;
-		    flex-grow: 1 !important;
-		    border-style: solid !important;
-		    border-width: 1px !important;
-		    border-radius: 4px !important;
-		    border-color: #D6D8DA !important;
-		    text-decoration: none !important;
-		    background-color: #FFFFFF !important;
-		    color: inherit !important;
-		    padding: 24px 20px !important;
-		    max-height: 146px !important;
-		    -webkit-flex-direction: row !important;
-		    -ms-flex-direction: row !important;
-		    -webkit-flex-grow: 1 !important;
-		    -webkit-box-orient: horizontal !important;
-		    -webkit-box-direction: normal !important;
-	    }
-
-	    .tool-icon{
-	    	flex-shrink: 0 !important;
-		    flex-grow: 0 !important;
-		    width: 100% !important;
-		    height: 200px !important;
-		    -webkit-flex-shrink: 0 !important;
-		    -webkit-flex-grow: 0 !important;
-
-	    }
-</style>
-
-<div class="row">
-	<div class="small-12 large-10 columns">
-
-		<div class="tool-outer-div">
-			<div class="tool-inner-div">
-				<div class="tool-list">
-					<div class="tool-icon">
-						<img src="/static/ndf/images/PoliceQuad_pt33x.png"/>
-					</div>
+<div class="small-12 columns tool-bg">
+  		<ul class="small-block-grid-1 medium-block-grid-3 large-block-grid-3">
+	        <li class="card-image-wrapper">
+	        	<div class="polaroid">
+	        		<a href="/phet/" title="phet" target="_blank">
+					  <img src="/static/ndf/images/phet-logo-tm.svg" alt="Norway" style="width: 310px;
+    height: 222px;
+    border: 2px solid #164a7b;
+    padding: 10px 10px 10px 10px;" />
+					  <div class="container">
+					    <p>Phet- Interactive Simulations</p>
+					  </div>
+					</a>
 				</div>
-
-			</div>
-		</div>
-		<div class="tool-outer-div">
-			<div class="tool-inner-div">
-				<div class="tool-list">
+        	</li>
+        	<li>   
+        		<div class="polaroid">
+        			<a href="/sugar/" title="Sugar Labs" target="_blank">
+						<img src="/static/ndf/images/sugar-xo-logo.svg" alt="Norway" style="width: 310px;
+    height: 222px;
+    border: 2px solid #164a7b;
+    padding: 10px 10px 10px 10px;" />
+							<div class="container">
+					    	<p>Sugar Labs</p>
+					  		</div>
+					</a>
 				</div>
-
-			</div>
-		</div>
-		<div class="tool-outer-div">
-			<div class="tool-inner-div">
-				<div class="tool-list">
+        	</li>
+        	<li>   
+        		<div class="polaroid">
+        		<a href="/turtle/" title="turtle blocks" target="_blank">
+					<img src="/static/ndf/images/turtle-blocks.svg" alt="Norway" style="width: 310px;
+    height: 222px;
+    border: 2px solid #164a7b;
+    padding: 10px 10px 10px 10px;" />
+						<div class="container">
+					    	<p>Turtle Blocks</p>
+					  	</div>
+				</a>
 				</div>
-
-			</div>
-		</div>
-	</div>
-
+        	</li>
+        </ul>
+    </div>
 </div>
+</body>
+</html>
 
 
 {% endblock body_content %}

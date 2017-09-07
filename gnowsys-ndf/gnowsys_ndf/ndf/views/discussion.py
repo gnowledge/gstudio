@@ -151,31 +151,28 @@ def discussion_reply(request, group_id, node_id):
         gs_type_node_id = None
 
         if u'Twist' not in node.member_of_names_list:
-            grel_dict = get_relation_value(node_id,'thread_of', True)
+            # grel_dict = get_relation_value(node_id,'thread_of', True)
+            grel_dict = get_relation_value(node._id,'has_thread', True)
             node = grel_dict['grel_node']
+
         if node.prior_node:
             gs_type_node_id = node.prior_node[0]
-
-        # if node and node.relation_set:
-        #     for each_rel in node.relation_set:
-        #         if each_rel and "thread_of" in each_rel:
-        #             gs_type_node_id = each_rel['thread_of'][0]
-        #             break
-
-        # grel_dict = get_relation_value(node_id,'thread_of')
-        # is_cursor = grel_dict.get("cursor",False)
-        # if not is_cursor:
-        #     gs_type_node_id = grel_dict.get("grel_node")
-        #     # grel_id = grel_dict.get("grel_id")
-
-        # print "\n\n node.name === ", node.member_of_names_list, node._id, node.name
+        else:
+            try:
+                has_thread_at = node_collection.one({'_type': 'RelationType', 'name': 'has_thread'})
+                has_thread_grel = triple_collection.find_one({'_type': 'GRelation',
+                    'relation_type': has_thread_at._id, 'right_subject': node._id,
+                    'status': 'PUBLISHED'})
+                gs_type_node_id = has_thread_grel.subject
+            except Exception as e:
+                print "\n Node asssociated with Thread node NOT found.", e
+                pass
 
         # process and save node if it reply has content
         if content_org:
 
             user_id = int(request.user.id)
             user_name = unicode(request.user.username)
-
             # auth = node_collection.one({'_type': 'Author', 'name': user_name })
 
             # creating empty GST and saving it
