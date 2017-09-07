@@ -11,5 +11,9 @@ urlpatterns = patterns('gnowsys_ndf.ndf.views.quiz',
                        url(r'^/question/edit/(?P<node_id>[\w-]+)$', 'create_edit_quiz_item', name='quiz_item_edit'),
                        url(r'^/edit/(?P<node_id>[\w-]+)$', 'create_edit_quiz', name='quiz_edit'),
                        url(r'^/save_quizitem_answer/', 'save_quizitem_answer', name='save_quizitem_answer'),
+                       url(r'^/question/detail/(?P<node_id>[\w-]+)$', 'quiz_item_detail', name='quiz_item_detail'),
+                       url(r'^/question/(?P<node_id>[\w-]+)/translate/(?P<lang>[\w-]+)/?$', 'create_edit_quiz_item', name='quiz_item_translate_create'),
+                       url(r'^/question/(?P<node_id>[\w-]+)/translate/(?P<trans_node_id>[\w-]+)/(?P<lang>[\w-]+)/?$', 'create_edit_quiz_item', name='quiz_item_translate_edit'),
+
                        # url(r'^(?P<node_id>[\w-]+)/version/(?P<version_no>\d+\.\d+)$', 'version_node', name='node_version'),
 )

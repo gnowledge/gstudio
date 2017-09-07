@@ -20,7 +20,7 @@ from gnowsys_ndf.settings import GSTUDIO_DEFAULT_GAPPS_LIST, GSTUDIO_WORKING_GAP
 from gnowsys_ndf.ndf.models import db, node_collection, triple_collection
 from gnowsys_ndf.ndf.models import *
 # from gnowsys_ndf.ndf.org2any import org2html
-from gnowsys_ndf.mobwrite.models import TextObj
+# from gnowsys_ndf.mobwrite.models import TextObj
 from gnowsys_ndf.ndf.models import HistoryManager, Benchmark
 from gnowsys_ndf.ndf.views.methods import get_execution_time, get_group_name_id
 from gnowsys_ndf.ndf.views.file import save_file
@@ -73,7 +73,6 @@ def create_discussion(request, group_id, node_id):
         group_name, group_id = get_group_name_id(group_id)
 
     twist_st = node_collection.one({'_type':'GSystemType', 'name':'Twist'})
-
     node = node_collection.one({'_id': ObjectId(node_id)})
     thread = None
 
@@ -81,9 +80,10 @@ def create_discussion(request, group_id, node_id):
         thread = node
 
     if not thread:
-        thread_id = get_thread_node(node_id)
-        if thread_id:
-            thread = node_collection.one({'_id': ObjectId(thread_id)})
+        thread = get_thread_node(node_id)
+        # thread_id = get_thread_node(node_id)
+        # if thread_id:
+        #     thread = node_collection.one({'_id': ObjectId(thread_id)})
     # group = node_collection.one({'_id':ObjectId(group_id)})
     # thread = node_collection.one({"member_of": ObjectId(twist_st._id),"relation_set.thread_of.0": ObjectId(node._id)})
     # print "\n thread is ---", thread
@@ -330,9 +330,12 @@ def discussion_reply(request, group_id, node_id):
                 files.append(temp_list)
 
             # print files
-
+            user_names = reply_obj.user_details_dict["contributors"]
+            is_grp_admin = False
+            if request.user.id in group_object.group_admin:
+                is_grp_admin = True
             # ["status_info", "reply_id", "prior_node", "html_content", "org_content", "user_id", "user_name", "created_at" ]
-            reply = json.dumps( [ "reply_saved", str(reply_obj._id), str(reply_obj.prior_node[0]), reply_obj.content, reply_obj.content_org, user_id, user_name, formated_time, files], cls=DjangoJSONEncoder )
+            reply = json.dumps( [ "reply_saved", str(reply_obj._id), str(reply_obj.prior_node[0]), reply_obj.content, reply_obj.content_org, user_id, user_names, formated_time, files,is_grp_admin], cls=DjangoJSONEncoder )
 
             # print "===========", reply
 
@@ -451,6 +454,32 @@ def edit_comment(request, group_id, node_id=None,call_from_discussion=None):
 
 @get_execution_time
 def get_thread_comments_count(request, group_id, thread_node_id):
-    return HttpResponse(node_collection.find({'group_set': group_id,
+    return HttpResponse(node_collection.find({'group_set': ObjectId(group_id),
                          'member_of': reply_st._id,
-                         'origin.thread_id':ObjectId(thread_node_id)}).count())
+                         'origin' : { '$elemMatch' : {'thread_id':ObjectId(thread_node_id)}}}).count())
+
+@get_execution_time
+def get_user_replies(request, group_id, user_name_or_id):
+
+    group_obj = get_group_name_id(group_id, get_obj=True)
+    group_id  = group_obj._id
+
+    user_obj = None
+    try:
+        if user_name_or_id.isdigit():
+            user_obj = User.objects.get(pk=int(user_name_or_id))
+        else:
+            user_obj = User.objects.get(username=(user_name_or_id).strip())
+        if user_obj:
+            gst_reply = node_collection.one({ '_type':'GSystemType', 'name':'Reply'})
+            user_replies = node_collection.find({ 'member_of': gst_reply._id,
+                'group_set': ObjectId(group_id), 'contributors': user_obj.pk}).sort('last_update',-1)
+
+            return render_to_response('ndf/user_interactions.html',
+                    {
+                        'group_id': group_id, 'groupid': group_id, 'group_name': group_obj.name,
+                        'user_replies':user_replies,'user_obj': user_obj
+                    },
+                    context_instance=RequestContext(request))
+    except Exception as no_user:
+        return HttpResponse('No such User found')

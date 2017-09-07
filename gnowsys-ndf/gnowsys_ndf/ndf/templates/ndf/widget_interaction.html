@@ -1,0 +1,96 @@
+{% load i18n %}
+{% load ndf_tags %}
+
+  <form data-abide id="form-edit-node" method="POST"   action="{% url 'save_interactions' group_id %}" enctype="multipart/form-data">
+  {% get_attribute_value node.pk 'player_discussion_enable' as player_discussion_enable_attr %}
+  {% get_attribute_value node.pk 'discussion_enable' as discussion_enable_attr %}
+  {% get_thread_node node.pk as thread_node %}
+  {% if thread_node %}
+      {% get_attribute_value thread_node.pk 'release_response' as resp_val %}
+      {% get_attribute_value thread_node.pk 'thread_interaction_type' as thr_int_type %}
+  {% endif %}
+  {% csrf_token %}
+  <input type="hidden" name="node_id" class="form_node_id" value="{{node.pk}}">
+
+        <div class="interaction-settings-div">
+          <div class="row">
+          <h3> Interaction Settings </h3>
+          </div>
+          <div class="small-12 columns">
+              <h4> {% trans "Do you want to enable Comments/Discussion on this Activity for Students ? " %} </h4>
+          </div>
+
+        <div class="row yes_no_disc_div">
+          <!-- <div class="large-2 medium-4 columns"><h5>{% trans "Interaction : " %}</h5>
+          </div> -->
+          <!-- <div class="large-6 medium-8 columns"> -->
+            <input type="radio" name="thread_create" value="Yes"/>Yes &nbsp;&nbsp;
+            <input type="radio" name="thread_create" value="No" checked="checked" />No
+         <!--  </div> -->
+        </div>
+        <div class="thread-settings-div  hide">
+            <div class="row">
+
+              <div class="large-2 medium-4 columns "><h5>{% trans "Release Option:" %}</h5>
+              </div>
+              <div class="large-6 medium-8 columns">
+                <select id="release_resp_sel" name="release_resp_sel">
+                  <option value="True" {% if resp_val  %} selected{% endif %}>Show Replies to All</option>
+                  <option value="False" {% if not resp_val %} selected{% endif %}>Hide Replies from All</option>
+                </select>
+              </div>
+            </div>
+            <br/>
+
+            <div class="row">
+              <div class="large-2 medium-4 columns "><h5>{% trans "Interaction Type:" %}</h5>
+              </div>
+              {% get_gstudio_interaction_types as all_interaction_values %}
+              <div class="large-6 medium-8 columns">
+                <select id="interaction_type_sel" name="interaction_type_sel">
+                {% for each_int in all_interaction_values %}
+                  <option value="{{each_int}}" {% if thr_int_type == each_int %} selected {% endif %}>{{each_int}}</option>
+                {% endfor %}
+
+                </select>
+              </div>
+            </div>
+
+        </div>
+    </div>      
+    <button type="submit" class="right blue-white-button">Save Changes</button>
+    <button type="button" class="right blue-white-button cancel-interaction_settings">Cancel</button>
+  </form>
+
+    <script type="text/javascript">
+      $("input[name=thread_create]").change(function(){
+            var radio_sel = $('input[name=thread_create]:checked').val()
+            if(radio_sel=="Yes"){
+                $(".thread-settings-div").removeClass("hide");
+            }
+            else{
+                $(".thread-settings-div").addClass("hide");
+            }
+        })
+
+        $("select#release_resp_sel").change(function() {
+          $("select#interaction_type_sel").removeAttr("disabled");
+        })
+
+        $(document).ready(function(){
+          {% if player_discussion_enable_attr or discussion_enable_attr %} 
+            $("input[name='thread_create'][value='Yes']").attr("checked","checked");
+            $("input[name='thread_create'][value='No']").removeAttr("checked");
+            $(".thread-settings-div").removeClass("hide");
+
+          {% endif %}
+
+        });
+        
+        $( ".cancel-interaction_settings" ).click(function(event) {
+          $('#addAsset').foundation('reveal', 'close');     
+        });
+
+
+
+    </script>

@@ -1,0 +1,754 @@
+{% extends "ndf/base.html" %}
+{% load i18n %}
+{% load cache %}
+
+{% load ndf_tags %}
+{% load pagination_tags %}
+
+{% get_group_name groupid as group_name_tag %}
+
+{% block title %} {{ title  }} {% endblock %}
+ {% block style %}
+
+
+ @media screen and (max-width: 600px) {
+  .collapsible_tree {
+    visibility: hidden;
+    display: none;
+  
+  }
+	.themes {
+  	margin: 0;
+  }  
+}
+{% endblock %}
+
+{% block head %}  
+
+	<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+
+	<!-- Scripts required for D3 graph -->
+	<script type="text/javascript" src="/static/ndf/bower_components/d3/d3.min.js"></script>
+	<script type="text/javascript" src="/static/ndf/bower_components/underscore/underscore.js"></script>
+	<script sync="text/javascript" src="/static/ndf/bower_components/FileSaver/FileSaver.js" ></script>
+
+	<link href="/static/ndf/bower_components/jqtree/jqtree.css" rel="stylesheet"> 
+	<script src="/static/ndf/bower_components/jqtree/tree.jquery.js"></script>
+
+  <style>
+
+  #theme-drag-zoom-tree-container{
+  	border: thin solid #D8BFD8;
+  	border-radius: 5px;
+  }
+
+  .download-graph{
+  	color: gray
+  }
+
+  .download-graph:hover {
+  	color: black;
+  	background-color: #e5e5e5;
+  	font-size: large;
+  	cursor: pointer;
+  	padding: 0.5em;
+  	transition: all 1s;
+  }
+
+  .themes {
+  	margin: 2rem 5rem;
+  }
+
+  .highlight {
+  	background-color: #efefef;
+	padding: 0 1em;
+	border: solid #e5e5e5;
+  }
+
+  #hover1.f-dropdown {
+  	width: 10em;
+  }
+.panel a
+{
+coolor:#4c4c4c !important;
+}
+.panel
+{
+border:0px solid red;
+}
+.theme-panel
+{
+background-color:#ddd; padding: 0.85rem;margin-top:1em;
+border:1px solid #c3ecfe;
+}
+.panel a.button
+{
+color:#fff !important;
+}
+.top-gap
+{
+margin-top:15px;
+}
+  </style>
+{% endblock%}
+
+<!-- 
+{% comment %}
+	{% block shelf_content %}
+	  {% if user.is_authenticated %}
+	    {% include "ndf/shelf.html" %}
+	  {% else %}
+	  <h4>Please Login to create your shelf</h4>
+	  {% endif %}  
+	{% endblock %}
+{% endcomment %}
+ -->
+
+
+
+
+{% block collection_content %}  
+
+{% endblock %}
+
+
+{% block related_content %}
+	{% if user.is_authenticated %}
+	{% user_access_policy groupid request.user as user_access %}
+<div class="panel theme-panel">
+	<div>
+	<ul class="no-bullet" id="app-set-item"> 
+
+		<!--
+		There is no need of following ndf_tag - 'get_memberof_objects_count'.
+		because, nodes from back-end are according to selected language.
+		Still this needs to be checked for future use-cases.
+		-->
+	    {# {% get_memberof_objects_count request theme_GST.pk groupid as count %} #}
+
+	      <li class="selected-app-set-item"> 
+	        <div>
+	  		  {% if user_access == "allow" %}
+	          <a href="{% url "theme_topic_create" groupid theme_GST.pk %}" style="float:right;" title="Add Theme" class="button tiny expand radius">
+	            +&nbsp;Add new curriculum
+	          </a>
+	          {% endif %}
+
+	          {# <a href="{% url "theme_list" groupid app_id theme_GST.pk %}" style="color:#0b8a91;"> #}
+	          <a href="{% url "list_themes" group_name_tag %}" class="button tiny expand radius">
+	            Existing Curriculums ({{nodes.count}})
+	          </a> 
+
+	        </div>
+	      </li>
+	  
+		</ul>
+	</div>
+
+	{% endif %}
+
+    <div>
+    {% if tree == "hierarchical" and user_access == "allow" and user.is_authenticated %}
+		{# {% if user.is_authenticated %} #}
+    		{# {% if user_access == "allow" %} #}
+    		
+				<div>
+
+					<a class="button tiny expand radius" data-reveal-id="view_add_page" title="Add Theme Item">
+						+ Add Theme Item
+					</a>
+
+					<div id="view_add_page" class="reveal-modal" data-reveal style="height:300px;"> 
+
+						<h3>Add New Specific LO:</h3>
+						<!-- To enter name of theme item -->
+						<div>
+							<input class="name_id" name="name" type="text" placeholder="Enter name...">
+						</div>
+						<br/>           
+
+						<input type="submit" id="add_theme_items" value="Save Theme Item" class="medium round button"/>
+
+						<a class="close-reveal-modal">&#215;</a>
+</div>
+					</div>          
+
+			    
+
+    			<span><input class="checkedAll" type="checkbox"> Select All</span>
+    			<input class="button tiny deleteObjects right" type="button" value="Delete">
+
+    			<div id="myModal" class="reveal-modal" data-reveal style="height:500px;overflow:scroll;"> 
+        
+			        <h3>{% trans "Are you sure you want to delete? All of the related items for the following themes also will be deleted:" %}</h3> 
+			        
+			        <input class="button confirmDeleteObjects" type="button" value="Confirm">
+			        <input class="button cancelDeleteObjects" type="button" value="Cancel">
+			        <div id="deletion_results"></div>
+			        <a class="close-reveal-modal">&#215;</a>
+
+		      	</div>		
+
+    		{# {% endif %} #}
+		{# {% endif %} #}
+
+	{% elif tree == "collapsible" %}
+		<h4>Using the Theme Tree:</h4>
+			
+		<ul>
+			<small>
+				<li>Expand or Collapse the map by clicking on the node(circle). </li>
+				<br/>
+				<li>Pan the map by dragging an empty part around.</li>
+				<br/>
+				<li>Zoom the map by either double clicking on an empty part or by scrolling.</li>
+				<br/>
+				<li>To zoom out hold shift when double clicking.</li>
+				<br/>
+				<li>The last node in expanded branch is a topic. Click on it to view topic details.</li>
+			</small>
+		</ul>
+
+	{% endif %}
+	</div>
+</div>
+	<div class="topic_stats panel" style="display:none; position:fixed; background-color:#ddd; right:20%;"> </div>
+
+{% endblock %}
+{% block meta_content %}
+	<div class="large-4 columns repository-title">
+
+
+
+	</div>
+{% endblock %}
+
+{% block body_content %}
+		<div class="large-4 columns repository-title top-gap">
+
+
+ {% if theme_GST.altnames and theme_GST.altnames != "None" and not node.name %}
+{{theme_GST.altnames}}
+ {% endif %}
+
+
+
+
+			{% if node.name %}
+					{{node.name}}
+				{% endif%}
+		</div>
+
+	<div class="large-8 columns repository-desc top-gap">
+				{% if node.content_org %}
+					{{node.content_org}}
+				{% elif theme_GST.content_org and theme_GST.content_org != "None" %}
+					{{theme_GST.content_org}}
+				{% endif%}
+	</div>
+
+
+
+	{% user_access_policy groupid request.user as user_access %}
+
+	{% if themes_hierarchy and node %}
+
+<!-- 		<div class="large-4 columns repository-title"> {{node.name}}</div> 
+ -->
+        <div style="float:right; margin:0 4em; font-size:0.8em" >
+
+			<a class="collapsible_tree {% if tree == 'collapsible' or not tree %} highlight {% endif %}" style="">
+				{% trans "Theme" %} {% trans "Graph" %}
+			</a>
+			
+			<a data-dropdown="hover1" data-options="is_hover:true; hover_timeout:5000" class="tree_browser {% if tree == 'hierarchical' %} highlight {% endif %}" style="margin-left:2em;">
+				{% trans "Theme" %} {% trans "Tree" %}
+			</a>
+			
+			<ul id="hover1" class="f-dropdown" data-dropdown-content style="width: 7em;">
+				<li><a class="unfold"><i class="fi-minus"></i> {% trans "Open" %} </a></li>  
+				<li><a class="fold"><i class="fi-plus"></i> {% trans "Close" %} </a></li> 
+			</ul> 
+
+		</div>
+
+		<br/>
+		<br/>
+		{% cache 300 theme_tree node.pk request.LANGUAGE_CODE tree unfold selected %}
+
+			{% include "ndf/hierarchy_tree.html" with topic_url="curriculum" %}
+			<div id="app-set-item" class="themes hide" data-url="{% url 'get_tree_hierarchy' groupid node.pk %}">
+			</div>
+
+			<div id="theme-drag-zoom-tree-container" class="hide">
+		    	<div id="theme-drag-zoom-tree"></div>
+		    	<div class="row">
+			    	<div class="small-6 small-centered text-center columns download-graph" onclick='downloadCollapsibleGraph("{{node.name}}");'>
+			    		Download {{node.name}} Graph
+			    	</div>
+		    	</div>
+			</div>
+			{% include 'ndf/theme_drag_zoom_d3tree.html' %}
+		{% endcache %}
+		
+	{% endif %}
+
+	
+
+
+	<!-- For displaying themes items -->
+
+	{% if themes_cards  %}
+
+		{% cache 300 theme_card_listing request.LANGUAGE_CODE %}
+			
+  		<!-- following ndf_tag is commented for time being. which is fetching the themes from relation and current selected language.
+  		Now by changing query at backend, it shows resources related to selected language.
+  		Still this needs to be checked. So do not deletethis commented ndf_tag - 'get_preferred_lang' -->
+
+		{{ each.name }}
+        {# {% get_preferred_lang request group_id nodes "Theme" as nodes %} #}
+
+		{% group_type_info groupid request.user as grouptype %}
+  		<!-- Existing card list-->
+	
+
+
+
+<ul class="small-block-grid-2 medium-block-grid-3 large-block-grid-5" style="margin-top:50px" >
+
+  	{% for each in nodes %}
+     <li class="card-image-wrapper"> 
+
+ 		{% include 'ndf/simple_card.html' with  resource=each url_name="theme_page" first_arg=group_id second_arg=each.pk %}
+	     
+	{% endfor %}
+
+</li>
+</ul>
+		
+	{% endcache %}
+	
+	{% endif %}
+
+	{% if themes_list_items %}
+		{% if nodes %}
+      	{% autopaginate nodes 25 %}
+    
+      		<div id="myModal" class="reveal-modal" data-reveal style="height:500px;overflow:scroll;"> 
+        
+		        <h3>{% trans "Are you sure you want to delete? All of the related items for the following themes also will be deleted:" %}</h3> 
+		        
+		        <input class="button confirmDeleteObjects" type="button" value="Confirm">
+		        <input class="button cancelDeleteObjects" type="button" value="Cancel">
+		        <div id="deletion_results"></div>
+		        <a class="close-reveal-modal">&#215;</a>
+
+	      	</div>
+
+      		{% if user.is_authenticated %}
+      			{% if user_access == "allow" %}
+        		<input class="button deleteObjects" type="button" value="Delete">
+        		{% endif %}
+      		{% endif %}
+      
+      		<form method="POST" style="float:right; margin-top:15px;padding-top:10px;">
+
+		        {% csrf_token %}
+		        <input name="search" type="textbox" value="" style="width:300px;">
+		        <input type="hidden" name="class" value="{{class_name}}">
+		        <input type="submit" value="search" style="width:100px;">
+
+      		</form>
+  		{% endif %}
+
+	    <table >
+	   		<thead>
+	        <tr>
+	    	
+	       	{% if nodes %}
+
+	            <th width="20">
+	            	{% if user_access == "allow" %}
+	            		<input class="checkedAll" type="checkbox">
+	            	{% endif %}
+	            </th>
+
+	            <th width="150">{% trans "Title" %}</th>
+	            <th width="150">{% trans "Created by" %}</th>
+	            <th width="150">{% trans "Creation date" %}</th>
+  		  		{% if user_access == "allow" %}
+	            <th width="150">{% trans "Edit" %}</th>
+	      		{% endif %}
+	       	{% endif %}
+	    
+	       	</tr>
+	      	</thead>
+      
+	      	<tbody>
+	        {% for each in nodes %}
+	       		<tr>
+	        
+	            <td  id="{{each.id}}" class="objectsCheckbox"> 
+	            	{% if user_access == "allow" %}
+	            		<input type="checkbox"> 
+	            	{% endif %}
+	            </td>
+	            <td  class="name" style="font-size:11px;"><a href="">{{each.name}}</a></td>
+	            <td  class="created_by" style="font-size:11px;">{{each.created_by}}</td>
+	            <td  class="created_at" style="font-size:11px;">{{each.created_at}}</td>
+  		  		{% if user_access == "allow" %}
+	            <td  class="name" style="font-size:11px;"><a href="{% url "theme_topic_create" groupid each.id %}" class="button medium">Edit</a></td>
+
+		    	<td  class="name" style="font-size:11px;">
+			    	<a href="{% url "theme_topic_create" groupid each.id %}?translate=true" class="button medium">{% trans "Translate" %}</a>
+			    	<!-- <a href="#" class="button medium" disabled>Translate</a> -->
+		    	</td>	        
+	        	{% endif %}     	       	       
+ 	
+	          	</tr>
+	          
+	       	{% empty %}
+
+	       		<h3>{% trans "No data to display" %}</h3>
+
+	        {% endfor %}
+
+	      	</tbody>
+	  	</table>
+
+    	{% paginate %}
+	
+	{% endif %}
+
+	{% if create_edit %}
+		{% if title == "Theme" or title == "Theme Item" %}
+			{% include "ndf/curriculum_create_edit.html" %}
+		{% else %}
+			<!-- {#% include "ndf/topic_create_edit.html" %#} -->
+		{% endif %}
+	{% endif %}
+
+
+	<script type="text/javascript">
+
+// ------ jqtree tree ------
+		// script for fold themes_cards hierarchy
+
+	// being the common template for all, to distinguish between the tree landing using following condition:
+    {% if node and tree %}
+
+	    {% if tree == "hierarchical" %}
+
+    		// $("article").block({message: '<h4>Building the theme tree...</h4>'});
+			$("#theme-drag-zoom-tree-container").addClass("hide")
+	    	$(".themes").removeClass("hide");
+
+	    	if({{unfold}})
+	    	{
+		    	plotHierarchyTree(true);
+	    	}
+	    	else
+	    	{
+		    	plotHierarchyTree(false);
+	    	}
+
+
+	    {% else %}
+	        
+			$(".themes").addClass("hide");
+
+    		{% if node %}
+
+    		// $("article").block({message: '<h4>Building the theme graph...</h4>'});
+			    $.getJSON("{% url 'get_tree_hierarchy' group_id node.pk %}?collapsible=true", function(data){ treeData = data;})
+			    .done(function(){
+			    	plotDragZoomTree(treeData);
+			    	// $('article').unblock(); 
+			    });
+
+		    {% endif %}
+
+			$("#theme-drag-zoom-tree-container").removeClass("hide");
+
+		{% endif %}
+
+    {% endif %}
+
+
+
+		$(".fold").click(function() {
+
+			// $("#theme-drag-zoom-tree-container").addClass("hide")
+	  //   	$(".themes").removeClass("hide");
+	    	// plotHierarchyTree(false);
+			// $(function() {				
+				location.href = "{% url 'theme_page' group_name_tag app_id %}?tree=hierarchical";
+			// });
+		});
+
+		// script for unfold themes hierarchy
+	    $(".unfold").click(function() {
+
+			// $("#theme-drag-zoom-tree-container").addClass("hide")
+	  //   	$(".themes").removeClass("hide");
+	  //   	plotHierarchyTree(true);
+	    	// $(function() {
+	    		location.href = "{% url 'theme_page' group_name_tag app_id %}?tree=hierarchical&unfold=true";	
+	    	// });
+	    });	
+
+	    $(".tree_browser").click(function() {
+
+			// $("#theme-drag-zoom-tree-container").addClass("hide")
+	  //   	$(".themes").removeClass("hide");
+	  //   	plotHierarchyTree()
+			// $(function() {				
+				location.href = "{% url 'theme_page' group_name_tag app_id %}?tree=hierarchical";
+			// });
+		});
+
+
+	    $(".collapsible_tree").click(function() {
+			location.href = "{% url 'theme_page' group_name_tag app_id %}?tree=collapsible";
+
+			// $(".themes").addClass("hide");
+
+   //  		{% if node %}
+
+			//     $.getJSON("{% url 'get_tree_hierarchy' group_id node.pk %}?collapsible=true", function(data){ treeData = data;})
+			//     .done(function(){plotDragZoomTree(treeData)});
+
+		 //    {% endif %}
+
+			// $("#theme-drag-zoom-tree-container").removeClass("hide")
+		});
+
+		// 	$("#theme-drag-zoom-container").removeClass("hide");
+
+		// 	// calling function plotDragZoomTree defined in theme_drag_zoom_d3tree.html 
+		// 	}	
+
+
+		$("#add_theme_items").click(function() {
+		    $.ajax({
+	        type: "POST",
+	        url: "{% url 'add_theme_item' groupid %}",
+	        datatype: "html",
+	        data:{
+	          context_theme: "{{node.pk}}",
+	          name: $(".name_id").val(),
+	          csrfmiddlewaretoken: '{{ csrf_token }}'
+	        },
+	        success: function(data) {
+
+	          var item = $(".name_id").val();
+
+	          if ($.trim(data) === "failure") {
+	            alert("Theme item "+ item +" already available, Please choose different name");
+	          }
+
+	          if ($.trim(data) === "success") {
+	            location.reload(true);
+	          }
+
+	          $(".name_id").val("");
+	        }
+	      });
+
+		});
+
+// ------END of jqtree tree ------
+
+// --- start of D3 collapsible tree ---
+
+	 //    treeData = ""
+
+	 //    $(".collapsible_tree").click(function() {
+
+	 //    	if(treeData.length != 0)
+	 //    	{
+		// 		plotCollapsibleTree(treeData)	    			
+	 //    	}
+	 //    	else{
+	 //    		{% if node %}
+
+		// 		    $.getJSON("{% url 'get_tree_hierarchy' group_id node.pk %}?collapsible=true", function(data){ treeData = data;})
+		// 		    .done(function(){plotCollapsibleTree(treeData)});
+
+		// 	    {% endif %}
+	 //    	}
+		// });
+		
+		// function plotCollapsibleTree (treeData) {
+		// 	$(".themes").html("");
+
+		// 	var margin = {top: 20, right: 40, bottom: 20, left: 40},
+		// 	    width = Math.max($(".themes").width(), 960) - margin.right - margin.left,
+		// 	    height = Math.max($(".themes").height(), 800) - margin.top - margin.bottom;
+			    
+		// 	var i = 0,
+		// 	    duration = 750,
+		// 	    root;
+
+		// 	var tree = d3.layout.tree()
+		// 	    .size([height, width]);
+
+		// 	var diagonal = d3.svg.diagonal()
+		// 	    .projection(function(d) { return [d.y, d.x]; });
+
+		// 	var svg = d3.select(".themes").append("svg")
+		// 	    .attr("width", width + margin.right + margin.left)
+		// 	    .attr("height", height + margin.top + margin.bottom)
+		// 	  	.append("g")
+		// 	    .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
+
+		// 	{% if node %}
+
+		// 		  root = treeData;
+		// 		  root.x0 = height / 2; // the point from where it starts it's animation.
+		// 		  root.y0 = 0;
+
+		// 		  function collapse(d) {
+		// 		    if (d.children) {
+		// 		      d._children = d.children;
+		// 		      d._children.forEach(collapse);
+		// 		      d.children = null;
+		// 		    }
+		// 		  }
+
+		// 		  root.children.forEach(collapse);
+		// 		  update(root);
+		// 		// });
+		// 	{% endif %}
+
+		// 	// d3.select(self.frameElement).style("height", "800px");
+
+		// 	function update(source) {
+
+		// 	  // Compute the new tree layout.
+		// 	  var nodes = tree.nodes(root).reverse(),
+		// 	      links = tree.links(nodes);
+
+		// 	  // Normalize for fixed-depth.
+		// 	  nodes.forEach(function(d) { d.y = d.depth * 150;});
+
+		// 	  // Update the nodes
+		// 	  var node = svg.selectAll("g.node")
+		// 	      .data(nodes, function(d) { return d.id || (d.id = ++i); });
+
+		// 	  // Enter any new nodes at the parent's previous position.
+		// 	  var nodeEnter = node.enter().append("g")
+		// 	      .attr("class", "node")
+		// 	      .attr("transform", function(d) { return "translate(" + source.y0 + "," + source.x0 + ")"; })
+		// 	      .attr("title", function(d) { return d.name; })
+		// 	      .on("click", click);
+
+		// 	  nodeEnter.append("circle")
+		// 	      .attr("r", 1e-6)
+		// 	      .style("fill", function(d) { return d._children ? "#10c1cb" : "#fff"; });
+
+		// 	  nodeEnter.append("text")
+		// 	      .attr("x", function(d) { return d.children || d._children ? -10 : 10; })
+		// 	      .attr("dy", "0.35em")
+		// 	      .attr("text-anchor", function(d) { return d.children || d._children ? "end" : "start"; })
+		// 	      .text(function(d) { return d.name; })
+		// 	      .style("fill-opacity", 1e-6);
+
+		// 	  // Transition nodes to their new position.
+		// 	  var nodeUpdate = node.transition()
+		// 	      .duration(duration)
+		// 	      .attr("transform", function(d) { return "translate(" + d.y + "," + d.x + ")"; });
+
+		// 	  nodeUpdate.select("circle")
+		// 	      .attr("r", 6.5)
+		// 	      .style("fill", function(d) { return d._children ? "#10c1cb" : "#fff"; });
+
+		// 	  nodeUpdate.select("text")
+		// 	      .style("fill-opacity", 1);
+
+		// 	  // Transition exiting nodes to the parent's new position.
+		// 	  var nodeExit = node.exit().transition()
+		// 	      .duration(duration)
+		// 	      .attr("transform", function(d) { return "translate(" + source.y + "," + source.x + ")"; })
+		// 	      .remove();
+
+		// 	  nodeExit.select("circle")
+		// 	      .attr("r", 1e-6);
+
+		// 	  nodeExit.select("text")
+		// 	      .style("fill-opacity", 1e-6);
+
+		// 	  // Update the links
+		// 	  var link = svg.selectAll("path.link")
+		// 	      .data(links, function(d) { return d.target.id; });
+
+		// 	  // Enter any new links at the parent's previous position.
+		// 	  link.enter().insert("path", "g")
+		// 	      .attr("class", "link")
+		// 	      .attr("d", function(d) {
+		// 	        var o = {x: source.x0, y: source.y0};
+		// 	        return diagonal({source: o, target: o});
+		// 	      });
+
+		// 	  // Transition links to their new position.
+		// 	  link.transition()
+		// 	      .duration(duration)
+		// 	      .attr("d", diagonal);
+
+		// 	  // Transition exiting nodes to the parent's new position.
+		// 	  link.exit().transition()
+		// 	      .duration(duration)
+		// 	      .attr("d", function(d) {
+		// 	        var o = {x: source.x, y: source.y};
+		// 	        return diagonal({source: o, target: o});
+		// 	      })
+		// 	      .remove();
+
+		// 	  // Stash the old positions for transition.
+		// 	  nodes.forEach(function(d) {
+		// 	    d.x0 = d.x;
+		// 	    d.y0 = d.y;
+		// 	  });
+		// 	}
+
+		// 	// Toggle children on click.
+		// 	function click(d) {
+		// 	  if (d.children) {
+		// 	    d._children = d.children;
+		// 	    d.children = null;
+		// 	        // console.log("non-leaf 1");
+		// 	  } 
+		// 	  else {
+		// 	    if(d._children){
+		// 	        d.children = d._children;
+		// 	        d._children = null;
+		// 	        // console.log("non-leaf 2");
+		// 		}
+		// 		else if (d.node_type == "Topic"){
+		// 	        // console.log("Leaf!");
+		// 	        var a = document.createElement('a');
+		// 			a.setAttribute('href', "/{{group_name_tag}}/topic_details/"+d.id+"");
+		// 			// a.setAttribute('target', '_blank');
+		// 			document.body.appendChild(a);
+		// 			a.click();
+		// 			a.remove();
+		// 	        // location.href = "/{{group_name_tag}}/topic_details/"+d.id+"";
+		// 			// $('#collaps_topic_details').foundation('reveal', 'open');     
+		// 	    }
+		// 	  }
+		// 	  update(d);
+		// 	}
+
+		// 	$("#theme-drag-zoom-container").removeClass("hide");
+
+		// 	// calling function plotDragZoomTree defined in theme_drag_zoom_d3tree.html 
+		// 	plotDragZoomTree(treeData);
+		// 	}	
+
+// ---END of D3 collapsible tree
+
+
+</script>
+
+{% endblock %}

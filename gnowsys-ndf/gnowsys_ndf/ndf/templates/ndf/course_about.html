@@ -1,14 +1,82 @@
-{% load check_is_gstaff from ndf_tags %}
+{% load i18n %}
+{% load ndf_tags %}
 {% block head %}
-  <script src="/static/ndf/bower_components/pace/pace.js"></script>
-  <link href="/static/ndf/bower_components/pace/themes/blue/pace-theme-loading-bar.css" rel="stylesheet" />
+{% if show_analytics_notifications %}
 
   <!-- DataTables -->
   <script src="/static/ndf/bower_components/DataTables/media/js/jquery.dataTables.js"></script>
   <script src="/static/ndf/bower_components/datatables-plugins/integration/foundation/dataTables.foundation.js"></script>
+
+  <script src="/static/ndf/bower_components/pace/pace.js"></script>
+  <link href="/static/ndf/bower_components/pace/themes/blue/pace-theme-loading-bar.css" rel="stylesheet" />
   <!-- DataTables CSS -->
   <link href="/static/ndf/bower_components/datatables-plugins/integration/foundation/dataTables.foundation.css" rel="stylesheet" type="text/css" />
+{% endif %}
+<style type="text/css">
+    .right-btn, .left-btn{
+        /*float: left;*/
+        /*margin-left: 1rem;*/
+        width: 40%;
+        font-size: 0.85em !important;
+        margin-top: 0.1rem !important;
+        text-align: center;
+    }
+    .tag-rating-div{
+        margin-left: 0.6rem !important;
+        margin-top: 0.3rem !important;
+    }
+    /*  
+    .right-btn{
+        float: right;
+        margin-right: 1rem;
+        width: 8rem;
+        font-size: 0.75rem !important
+    }
+    */
+    .rating-lbl{
+        display: inline-block;
+        font-size: 1rem !important;
+        /*font-style: italic;*/
+        /*margin-left: 3rem;*/
 
+    }
+    .rating_template{
+        display: inline-table;
+    }
+    .mod-btn{
+        width: 80% !important;
+        font-size: 0.75rem !important;
+    }
+    .btn-row{
+        /*margin-left: 1rem !important;*/
+        text-align: center;
+        margin-bottom: -1rem !important;
+    }
+    .lbl_tag{
+        display: inline-block;
+        font-size: 0.80rem !important;
+    }
+    .lbl_field{
+        width: 20%;
+        color: #194d6f;
+        /*font-weight: bold;*/
+        margin-top: 1rem;
+        font-size: 1rem !important;
+    }
+    .label > a{
+        color: white !important;
+    }
+
+    .graph_btn{
+        margin-left: 3rem;
+    }
+
+    #group_drawer{
+        height: 400px;
+        overflow-y: auto;
+        margin-left: 2em;
+    }
+</style>
 <style type="text/css">
 
   .short-text {
@@ -36,47 +104,172 @@
 <input type="hidden" class="admin_analytics_fetched" value="False">
 
 <div id="course-about">
-<div class="row">
-<div class="small-12 columns about-course">
-  <h5>About</h5>
-  <div class="row">
-    <div class="small-12 medium-8 columns">
-      <div class="course-desc">
+
+  <div class="about-course">
+    <h5>Description:</h5>
+      <div class="course-desc" id="scstyle">
           {{group_object.content|default:'No description added yet.'|safe}}
       </div>
       <div>
         <u><a class="show-more hide">Show more</a></u>
       </div>
-    </div>
+      <br/>
+      {% if group_object.tags %}
+          <h5>Tags:</h5>
+          {% for tag in group_object.tags %}
+                  <small><label class="tag-ele">
+              <a href="{% url 'tag_info' group_id tag %}">{{tag}} </a></label></small>
+          {% endfor %} 
+      {% else %}
+          <!-- <i><small><label class="tag-ele">{% trans "No tags defined yet!" %}</label></small></i> -->
+      {% endif %}
+  </div>
 
+  <div class="about-course">
 
-    <div class="small-12 medium-4 columns">
-      <div class="course-highlight">
-        <i class="fa fa-list"></i>
-        <span>{{group_object.collection_set|length}} Module{{group_object.collection_set|length|pluralize}}</span>
+      <div class="medium-3 rows">
+        <div class="left">
+          <i class="icon-wid fa fa-user"></i>
+        </div>
+        <div class="left">
+          <h5>No. of Members</h5>
+          <div class="course-highlight">
+        <span>
+          {{group_object.author_set|length}} 
+        </span>
+
+          </div>
+        </div>
       </div>
+      <br/>
+      <br/>
+     
+
       {% if show_analytics_notifications %}
-      <div class="course-highlight">
-        <i class="fa fa-clock-o"></i>
-        <span>{{weeks_count}} week{{weeks_count|pluralize}}</span>
+      <div class="medium-3 rows">
+        <div class="left">
+          <i class="icon-wid fa fa-list"></i>
+        </div>
+        <div class="left module_text">
+          <h5>No. of {% firstof group_object.project_config.tab_name 'Lessons' %}</h5>
+          <div class="course-highlight">
+             <span>{{group_object.collection_set|length}}</span>
+          </div>
+        </div>
       </div>
+      <br/>
 
-      <div class="course-highlight">
-        <i class="fa fa-user"></i>
-        <span>{{group_object.author_set|length}} student{{group_object.author_set|length|pluralize}} enrolled</span>
+     
+      
+      <br/>
+      
+        {% if 'Group' not in  group_obj.member_of_names_list %}
+      <div class="medium-3 rows">
+        <div class="left">
+          <i class="icon-wid fa fa-clock-o"></i>
+        </div>
+        <div class="left">
+          <h5>  Course Duration</h5>
+          <div class="course-highlight">
+            <span>{{weeks_count}} week{{weeks_count|pluralize}}</span>
+          </div>
+        </div>
       </div>
+      <br/>
+        {% endif %}
       {% endif %}
     </div>
+
+
+
+
+{% if educationallevel_val %}
+ 
+    <div class="about-course">
+    <div class="medium-3 rows">
+        <div class="left">
+          <i class="icon-wid fi-results-demographics"></i>
+        </div>
+        <div class="left">
+          <h5>Grade</h5>
+          <div class="course-highlight">
+             <span> {{educationallevel_val}}</span>
+          </div>
+        </div>
+      </div>
+      <br/>
+
+     
+      
+      <br/>
+      
+    </div>
+ 
+{% endif %}
+
+{% if educationalsubject_val %}
+  
+    <div class="about-course">
+    <div class="medium-3 rows">
+        <div class="left">
+          <i class="icon-wid fa fa-book"></i>
+        </div>
+        <div class="left">
+          <h5>Subject</h5>
+          <div class="course-highlight">
+              <span>{{educationalsubject_val}}</span>
+          </div>
+        </div>
+      </div>
+      <br/>
+
+     
+      
+      <br/>
+
+      
+        {# </div> #}
+    </div>
+  
+{% endif %}
+
+{# <div class="row"> #}
+  <div class="about-course">
+    <div class="medium-3 rows">
+        <div class="left">
+          <i class="icon-wid fa fa-calendar"></i>
+        </div>
+        <div class="left">
+          <h5>Created On</h5>
+          <div class="course-highlight">
+              <span> {{group_obj.created_at}}</span>
+          </div>
+        </div>
+      </div>
+      <br/>
+
+     
+      
+      <br/>
+  
+      {# </div> #}
   </div>
-</div>
-</div>
+{# </div> #}
+
 <br/>
+<br/>
+
+
+
+
+
+
 {% if show_analytics_notifications %}
 {% check_is_gstaff group_id request.user as gstaff_access %}
   <div class="course-overview-container">
-    <div class="row collapse course-overview">
-      <div class="columns small-12 medium-12">
-      {% comment %}
+    <div class="collapse course-overview">
+      {# <div class="columns small-12 medium-12"> #}
+        {% comment %}
         <div class="ongoing-session">
           <h5>ONGOING SESSION </h5>
           <h3>Taking Screenshots of the work and doing something</h3>
@@ -88,36 +281,37 @@
             <li class="tab-title active" ><a href="#course-notification" role="tab" tabindex="0" aria-selected="true" aria-controls="panel2-1">Notifications</a></li>
 
             {% if request.user.is_authenticated and not gstaff_access %}
+            {# {% if request.user.is_authenticated and not gstaff_access and request.user.id in group_obj.author_set %} #}
               <li class="tab-title" title="Click here to refresh">
                 <a role="tab" href="#analytics-content" class="fetch-analytics" tabindex="1" aria-selected="false" aria-controls="panel2-2" data-id={{request.user.id}}>
                   Progress Report
                 </a>
               </li>
               <input type="hidden" class="is_admin" value="False" />
-            {% elif gstaff_access %}
+            {% elif gstaff_access or request.user.id in group_object.group_admin %}
               <input type="hidden" class="is_admin" value="True" />
               <li class="tab-title" ><a role="tab" href="#analytics-content" tabindex="1" aria-selected="false" class="fetch-group-analytics" aria-controls="panel2-2" data-id={{request.user.id}}>Group Analytics</a></li>
             {% endif %}
 
           </ul>
           <div class="tabs-content">
-            <section role="tabpanel" aria-hidden="false" class="content active" id="course-notification">
+            <section role="tabpanel" aria-hidden="true" class="content active" id="course-notification">
             </section>
             <section role="tabpanel" aria-hidden="false" class="content active" id="analytics-content">
               {% if gstaff_access %}
                 <div class="group-analytics hide">
                   <div class="row course-students-data">
-                    <div class="small-12 medium-4 columns">
+                    <div class="small-12 medium-3 columns">
                       Points table for students
                     </div>
-                    <div class="small-12 medium-8 columns students-table-legends">
-                      <span class=" badge green">&nbsp;</span>
+                    <div class="small-12 medium-10 columns students-table-legends">
+                      <span class=" badge_ex green">&nbsp;</span>
                       <span>Gallery uploads</span>
-                      <span class=" badge">&nbsp;</span>
+                      <span class=" badge_ex">&nbsp;</span>
                       <span>Note Making</span>
-                      <span class=" badge red">&nbsp;</span>
+                      <span class=" badge_ex red">&nbsp;</span>
                       <span>Quiz Performance</span>
-                      <span class=" badge yellow">&nbsp;</span>
+                      <span class=" badge_ex yellow">&nbsp;</span>
                       <span>Interactions</span>
                     </div>
                   </div>
@@ -137,7 +331,7 @@
             </section>
           </div>
         </div>
-      </div>
+      {# </div> #}
     </div>
   </div>
   <script type="text/javascript">

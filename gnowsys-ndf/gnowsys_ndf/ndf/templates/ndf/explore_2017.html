@@ -1,0 +1,27 @@
+{% extends "ndf/gbase.html" %}
+{% load check_is_gstaff get_group_object rewind_cursor from ndf_tags %}
+{% load i18n %}
+
+{% block title %} {{title|capfirst}} {% endblock title %}
+
+{% block body_content %}
+{% get_group_object as group_object %}
+{% check_is_gstaff group_id request.user as is_gstaff %}
+		{% include 'ndf/explore_secondary_header.html' %}
+		
+	<!--section role="tabpanel" aria-hidden="true" class="content active " style="border-style:none;"-->
+	{% if title == "workspaces" %}
+		<ul class="small-block-grid-1 medium-block-grid-3 large-block-grid-4">
+			{% for each_obj in groups_cur %}
+			<li class="card-image-wrapper">
+				{% include card with node=each_obj has_logo=True no_footer=True url_name="course_about" first_arg=each_obj.pk %}
+			</li>
+			{% endfor %}
+		</ul>
+	{% else %}
+		{% if modules_is_cur %}
+			{% rewind_cursor modules_cur as modules_cur %}
+		{% endif %}
+		{% include "ndf/lms_explore.html"  %}
+	{% endif %}
+{% endblock body_content %}

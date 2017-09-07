@@ -102,7 +102,6 @@
 			<!-- Edit and Publish -->
 				<div class="row btn-row">
 					<!-- Edit button -->
-						{% edit_policy groupid node request.user as status %}
 						{% if is_user_authenticated %}
 							{% get_edit_url node.pk as edit_url %}
 							{% if is_group %}
@@ -167,7 +166,10 @@
 						{% else %}
 							<input type="button" class="tiny button radius right-btn secondary disabled" value="{% trans 'Delete' %} {{node.member_of_names_list.0}}" title="{% trans 'You are not authorized for this action' %}">
 						{% endif %}
-
+						
+						<a href="{% url 'uploadDoc' groupid %}" class="tiny expand button radius">
+            				{% trans "Upload File" %}
+      					</a>
 						<!-- Cross Publish -->
 						{% if 'CourseEventGroup' not in group_object.member_of_names_list %}
 							{% if node.created_by == request.user.id or is_gstaff %}
@@ -175,6 +177,7 @@
 							<!-- If resource is already under moderation, don't show cross-publish button -->
 
 								<span  title="{% trans 'Publish this resource in other group/s' %}" class="has-tip tip-bottom"><a id="switch_group" class="tiny button radius mod-btn" data-reveal-id="publish_resource"> {% trans "Cross Publish" %}</a></span>
+								
 								<div id="publish_resource" class="reveal-modal" data-reveal style="position:absolute;"> 
 									<h4>{% trans "Select Groups" %}</h4>
 									<div id="switchgrp" class="content">
@@ -188,6 +191,7 @@
 								<input type="button" class="tiny button radius mod-btn secondary disabled" title="{% trans 'You are not authorized for this action' %}" value="{% trans 'Cross Publish' %}">
 							{% endif %}
 						{% endif %}
+						
 
 				</div>
 				{% endif %}
@@ -248,7 +252,7 @@
 			<!-- Views row -->
 				<div class="row tag-rating-div">
 					<span title="{% trans 'Click to see no. of view ' %}"><label class="lbl_tag lbl_field">{% trans "Views" %}</label></span>
-					{% include "ndf/analytics_views.html" %}
+					{% include "ndf/widget_analytics_views.html" %}
 				</div>
 
 			<!-- Ratings -->
@@ -449,7 +453,7 @@
 
                 <div id="manage_users_modal" class="reveal-modal large" data-reveal style="position:absolute;"> 
                     <div id="group_drawer">
-                    {% include "ndf/user_search_widget.html" with subscription_status=True %}
+                    {% include "ndf/widget_user_search.html" with subscription_status=True %}
                     </div>
                     <a class="close-reveal-modal">&#215;</a>
                 </div>          
@@ -553,91 +557,6 @@
     $(document).on("click", "#btnConfirmNo", function() {
         set_href = false;
         $("#deleteModal").foundation('reveal', 'close');
-    });
-
-
-	$(document).on("click", "#subscribe_to_grp", function() {
-        user_id = $(this).attr('data-user-id')
-        asAdmin = $(this).attr('data-user-admin')
-        $.ajax({
-                type: "POST",
-                url: "{% url 'enroll_to_course' group_object.pk %}",
-                datatype: "json",
-                data:{
-                        user_id: user_id,
-                        asAdmin: asAdmin,
-                       csrfmiddlewaretoken: '{{ csrf_token }}'
-                  },
-                context: this,
-              success: function(data) {
-                data = JSON.parse(data)
-                success_state = data["success"]
-                grp_mem_count = data["member_count"]
-                if(!success_state){
-                    alert("Something went wrong. Please try again later.")
-                }
-                else{
-                    if($(this).hasClass('subscription_policy')){
-                        $(".subscription_policy")
-                            .attr("id", "unsubscribe_from_grp")
-                            .attr("value", "Unsubscribe")
-                            .attr("title", "Unsubscribe from this group")
-                        // Update Courp member count in Group-dashboard
-                        $(".grp_mem_count")
-                            .text(grp_mem_count)
-                            .attr('value',grp_mem_count)
-                    }
-                    else{
-                        $(this)
-                            .attr("id", "unsubscribe_from_grp")
-                            .text("Remove")
-                    }
-
-                }
-              }
-        });
-    });
-
-    $(document).on("click", "#unsubscribe_from_grp", function() {
-        user_id = $(this).attr('data-user-id')
-        asAdmin = $(this).attr('data-user-admin')
-
-        $.ajax({
-                type: "POST",
-                url: "{% url 'unsubscribe_from_group' group_object.pk %}",
-                datatype: "json",
-                data:{
-                        user_id: user_id,
-                        asAdmin: asAdmin,
-                       csrfmiddlewaretoken: '{{ csrf_token }}'
-                  },
-                context: this,
-                success: function(data) {
-                    data = JSON.parse(data)
-                    success_state = data["success"]
-                    grp_mem_count = data["member_count"]
-                    if(!success_state){
-                        alert("Something went wrong. Please try again later.")
-                    }
-                    else{
-                        if($(this).hasClass('subscription_policy')){
-                            $(".subscription_policy")
-                                .attr("id", "subscribe_to_grp")
-                                .attr("value", "Join")
-                                .attr("title", "Join this Group")
-                            // Update Courp member count in Group-dashboard
-                            $(".grp_mem_count")
-                                .text(grp_mem_count)
-                                .attr('value',grp_mem_count)
-                        }
-                        else{
-                            $(this)
-                                .text("Add")
-                                .attr("id", "subscribe_to_grp")
-                        }
-                    }
-                }
-        });
     });
 
 

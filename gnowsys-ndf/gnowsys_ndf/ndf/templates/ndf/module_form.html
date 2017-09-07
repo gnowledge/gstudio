@@ -1,0 +1,12 @@
+{% extends "ndf/gbase.html" %}
+
+{% block title %} {{title}} {% endblock %}
+
+{% block head %}
+	{# <script type="text/javascript" src="/static/ndf/bower_components/MathJax/MathJax.js?config=TeX-AMS-MML_HTMLorMML" async></script> #}
+{% endblock %}
+
+{% block body_content %}
+	{# <h4 class="text-center">{{title}}</h4> #}
+    {% include 'ndf/widget_node_form.html' with editor_type="GeneralToolbar" post_url=post_url node_obj=node_obj additional_form_fields=additional_form_fields %}
+{% endblock %}

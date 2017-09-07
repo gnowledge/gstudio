@@ -19,7 +19,7 @@
 
 
 
-{% block title %} Course: {{group_name}} > Activity: {% firstof node.altnames node.name %}  {% endblock %}
+{% block title %} {% trans "Course" %}: {{group_name}} > {% trans "Activity" %}: {% firstof node.altnames node.name %}  {% endblock %}
 
 
 
@@ -34,7 +34,7 @@
               {% if resource_prev_id %}
               <a href="{% url 'course_resource_detail' group_name course_sub_section course_unit resource_prev_id %}" class="prev-activity" title="Click here to view previous resource">
                   <i class="fa fa-hand-o-left"></i>
-                  Previous Activity
+                  {% trans "Previous Activity" %}
               </a>
               {% comment %}
               {% else %}
@@ -81,7 +81,7 @@
               <div style="float: right;">
                   {% if resource_next_id %}
                   <a href="{% url 'course_resource_detail' group_name course_sub_section course_unit resource_next_id %}" class="next-activity" title="Click here to view next resource">
-                      Next Activity
+                      {% trans "Next Activity" %}
                       <i class="fa fa-hand-o-right"></i>
                   </a>
                   {% comment %}
@@ -101,20 +101,20 @@
           <div class="columns small-12 activity-slides">
               <div class="row activity-slide node_details" >
                   {% if help_page_list %}
-                    <a id="related-content-button" href="#related-content" class="view-related-content"><i class="fa fa-arrow-circle-down"></i>&nbsp;View related contents</a>
+                    <a id="related-content-button" href="#related-content" class="view-related-content"><i class="fa fa-arrow-circle-down"></i>&nbsp;{% trans "View related contents" %}</a>
                   {% endif %}
                   {# {{node.content|safe}} #}
-                  {% include 'ndf/node_ajax_content.html' with no_discussion=True %}
+                  {% include 'ndf/node_ajax_content.html' with no_discussion=True hide_breadcrumbs=True %}
               </div>
               {% if help_page_list %}
               {% for each_help_page in help_page_list %}
               <div id="related-content">
                 <i class="fa fa-info-circle"></i>
                 <div class="related-content-header">
-                  <span>Related Help Topic</span>
+                  <span>{% trans "Related Help Topic" %}</span>
                     <span class="related-content-title">
                       <i class="fa fa-caret-right"></i>&nbsp;{{each_help_page.name}}
-                      <a href="#related-content-button" class="back-to-activity"><i class="fa fa-arrow-circle-up"></i>&nbsp;Go back to activity</a>
+                      <a href="#related-content-button" class="back-to-activity"><i class="fa fa-arrow-circle-up"></i>&nbsp;{% trans "Go back to activity" %}</a>
                       <div class="related-content-close">&times;</div>
                     </span>
                   </div>
@@ -129,10 +129,9 @@
               <div class="row activity-comments-section">
                   <div class="columns small-12 " id="view-discussion">
                         <!-- discussion content area -->
-                        {% get_thread_node node.pk as thread_node %}
-                        {% if thread_node and "QuizItemEvent" not in node.member_of_names_list %}
-                            {% get_disc_replies thread_node group_id global_disc_all_replies as all_replies %}
-                            {% get_node thread_node as thread_node_obj %}
+                        {% get_thread_node node.pk as thread_node_obj %}
+                        {% if thread_node_obj and "QuizItemEvent" not in node.member_of_names_list %}
+                            {% get_disc_replies thread_node_obj.pk group_id global_disc_all_replies as all_replies %}
                             {% include 'ndf/gin-line-texteditor.html' with node=thread_node_obj var_name="content_org" allow_to_comment=allow_to_comment %}
                         {% endif %}
 
@@ -178,10 +177,15 @@
 
     $(document).on('click',".edit_res_unit",function(){
         $.ajax({
-          url: "{% url 'inline_edit_res' group_id node.pk %}",
+          url: "{% url 'inline_edit_res' group_id %}",
 
-          type: "GET",
+          type: "POST",
 
+          data: {
+            node_id: "{{node.pk}}",
+            "type": "edit",
+            'csrfmiddlewaretoken': "{{csrf_token}}"
+          },
           dataType: "html",
 
           success: function(data){
@@ -199,11 +203,14 @@
         // console.log(content_val)
         // console.log("calling ajax")
         $.ajax({
-          url: "{% url 'inline_edit_res' group_id node.pk %}",
+          url: "{% url 'inline_edit_res' group_id %}",
 
           data: {
             content_val: content_val,
-            'csrfmiddlewaretoken': "{{csrf_token}}"
+            node_id: "{{node.pk}}",
+            'csrfmiddlewaretoken': "{{csrf_token}}",
+            'type': "save"
+
           },
 
           type: "POST",
@@ -212,7 +219,7 @@
 
           success: function(data){
             $(".node_details").html(data);
-            $(".save_res_unit").text("Edit")
+            $(".save_res_unit").text("Edit Content")
                           .addClass("edit_res_unit")
                           .removeClass("save_res_unit")
           },

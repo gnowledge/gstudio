@@ -12,7 +12,7 @@
 
   [1] Installing required following packages and its dependencies:
 
-      > sudo apt-get install python-setuptools git build-essential python-dev rcs mongodb python-virtualenv ipython libjpeg-dev memcached libevent-dev libfreetype6-dev zlib1g-dev ffmpeg2theora rabbitmq-server
+      > sudo apt-get install python-setuptools git build-essential python-dev rcs mongodb python-virtualenv ipython libjpeg-dev memcached libevent-dev libfreetype6-dev zlib1g-dev ffmpeg2theora rabbitmq-server libssl-dev libffi-dev libxml2-dev libxslt1-dev apt-transport-https
 
   [2] Get latest version of gstudio using one of the following commands:
 
@@ -69,9 +69,24 @@
 
           If above step gives an error, install NodeJS at root level with
           following commands:
-          (a) sudo add-apt-repository ppa:chris-lea/node.js
-          (b) sudo apt-get update
-          (c) sudo apt-get install python-software-properties python g++ make nodejs
+          * For stable nodejs version in ubuntu: 0.10.* 
+              (a) sudo add-apt-repository ppa:chris-lea/node.js
+              (b) sudo apt-get update
+              (c) sudo apt-get install python-software-properties python g++ make nodejs
+          * For latest nodejs version:
+              - Removing existing node, nodejs and npm (if installed previously):
+                - apt-get remove nodejs npm node
+                - sudo apt-get purge nodejs npm node
+                - sudo rm -rvf /usr/local/bin/npm /usr/local/share/man/man1/node* /usr/local/lib/dtrace/node.d ~/.npm ~/.node-gyp /opt/local/bin/node opt/local/include/node /opt/local/lib/node_modules 
+                - sudo rm -rfv /usr/local/lib/node*
+                - sudo rm -rfv /usr/local/include/node*
+                - sudo rm -rfv /usr/local/bin/node*
+
+              (a) sudo apt-get install npm
+              (b) sudo npm cache clean  OR  sudo npm cache vefify
+              (c) sudo npm install -g n
+              (d) sudo n latest
+              (e) ln -sf /usr/local/n/versions/node/<version no from above step>/bin/node /usr/bin/node
 
       (4) Installing Bower:
           > sudo npm install -g bower
@@ -176,3 +191,17 @@
 
   - http://gnowledge.org/cgi-bin/mailman/listinfo/gnowsys-dev
 
+
+* Installing yarn:
+  (a) curl -sS https://dl.yarnpkg.com/debian/pubkey.gpg | sudo apt-key add -
+  (b) echo "deb https://dl.yarnpkg.com/debian/ stable main" | sudo tee /etc/apt/sources.list.d/yarn.list
+  (c) sudo apt-get update && sudo apt-get install yarn
+
+
+* Installing mongodb#3.2.4
+  (a) > sudo apt-key adv --keyserver hkp://keyserver.ubuntu.com:80 --recv 7F0CEB10
+  (b) > echo "deb http://repo.mongodb.org/apt/ubuntu trusty/mongodb-org/3.0 multiverse" | sudo tee /etc/apt/sources.list.d/mongodb-org-3.0.list
+  (c) > sudo apt-get update
+  (d) > sudo apt-get install -y mongodb-org=3.2.4 mongodb-org-server=3.2.4 mongodb-org-shell=3.2.4 mongodb-org-mongos=3.2.4 mongodb-org-tools=3.2.4
+  === OR ===
+  > sudo apt-get install -y --force-yes mongodb-org=3.2.4 mongodb-org-server=3.2.4 mongodb-org-shell=3.2.4 mongodb-org-mongos=3.2.4 mongodb-org-tools=3.2.4

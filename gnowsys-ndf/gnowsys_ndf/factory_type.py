@@ -1,4 +1,4 @@
-from gnowsys_ndf.settings import GSTUDIO_DEFAULT_GROUPS
+from gnowsys_ndf.settings import GSTUDIO_DEFAULT_GROUPS_LIST
 # factory data to create in database for gnowsys-ndf project
 
 
@@ -80,49 +80,49 @@ factory_attribute_types = [{'start_time':{'gsystem_names_list':['QuizItem','Foru
                            {'Estimated_time':{'gsystem_names_list':['Task'],
                                               'data_type':'float',
                                               'meta_type':'factory_types'}},
-                           {'age_range':{'gsystem_names_list':['Quiz','Topic','File','Page','Pandora_video', 'E-Book','Jsmol'],
+                           {'age_range':{'gsystem_names_list':['Quiz','Topic','File','Page','Pandora_video', 'E-Book','Jsmol','Asset'],
                                          'data_type':'basestring',
                                          'meta_type':'factory_types'}},
-                           {'audience':{'gsystem_names_list':['Quiz','Topic','File','Page','Pandora_video', 'E-Book','Jsmol'],
+                           {'audience':{'gsystem_names_list':['Quiz','Topic','File','Page','Pandora_video', 'E-Book','Jsmol','Asset'],
                                         'data_type':'list',
                                         'meta_type':'factory_types'}},
                            {'creator':{'gsystem_names_list':['Quiz','Topic','File','Page','Pandora_video', 'E-Book','Jsmol'],
                                         'data_type':'basestring',
                                         'meta_type':'factory_types'}},
-                           {'other_contributors':{'gsystem_names_list':['Quiz','Topic','File','Page','Pandora_video', 'E-Book','Jsmol'],
+                           {'other_contributors':{'gsystem_names_list':['Quiz','Topic','File','Page','Pandora_video', 'E-Book','Jsmol','Asset'],
                                         'data_type':'list',
                                         'meta_type':'factory_types'}},
-                           {'timerequired':{'gsystem_names_list':['Quiz','Topic','File','Page','Pandora_video', 'E-Book','Jsmol'],
+                           {'timerequired':{'gsystem_names_list':['Quiz','Topic','File','Page','Pandora_video', 'E-Book','Jsmol','Asset'],
                                             'data_type':'basestring',
                                             'meta_type':'factory_types'}},
-                           {'interactivitytype':{'gsystem_names_list':['Quiz','Topic','File','Page','Pandora_video','Jsmol'],
+                           {'interactivitytype':{'gsystem_names_list':['Quiz','Topic','File','Page','Pandora_video','Jsmol','Asset'],
                                                  'data_type':'basestring',
                                                  'meta_type':'factory_types'}},
-                           {'basedonurl':{'gsystem_names_list':['Quiz','Topic','File','Page','Pandora_video', 'E-Book','Jsmol'],
+                           {'basedonurl':{'gsystem_names_list':['Quiz','Topic','File','Page','Pandora_video', 'E-Book','Jsmol','Asset'],
                                           'data_type':'basestring',
                                           'meta_type':'factory_types'}},
-                           {'educationaluse':{'gsystem_names_list':['Quiz','Topic','File','Page','Pandora_video', 'E-Book','Jsmol'],
+                           {'educationaluse':{'gsystem_names_list':['Quiz','Topic','File','Page','Pandora_video', 'E-Book','Jsmol','Asset'],
                                               'data_type':'basestring',
                                               'meta_type':'factory_types'}},
-                           {'textcomplexity':{'gsystem_names_list':['Quiz','Topic','File','Page','Pandora_video', 'E-Book','Jsmol'],
+                           {'textcomplexity':{'gsystem_names_list':['Quiz','Topic','File','Page','Pandora_video', 'E-Book','Jsmol','Asset'],
                                               'data_type':'basestring',
                                               'meta_type':'factory_types'}},
-                           {'readinglevel':{'gsystem_names_list':['Quiz','Topic','File','Page','Pandora_video', 'E-Book','Jsmol'],
+                           {'readinglevel':{'gsystem_names_list':['Quiz','Topic','File','Page','Pandora_video', 'E-Book','Jsmol','Asset'],
                                             'data_type':'basestring',
                                             'meta_type':'factory_types'}},
-                           {'educationalsubject':{'gsystem_names_list':['Quiz','Topic','File','Page','Pandora_video', 'E-Book','Jsmol'],
+                           {'educationalsubject':{'gsystem_names_list':['Quiz','Topic','File','Page','Pandora_video', 'E-Book','Jsmol', 'base_unit','Asset', 'announced_unit', 'Module'],
                                                   'data_type':'basestring',
                                                   'meta_type':'factory_types'}},
-                           {'educationallevel':{'gsystem_names_list':['Quiz','Topic','File','Page','Pandora_video', 'E-Book','Jsmol'],
+                           {'educationallevel':{'gsystem_names_list':['Quiz','Topic','File','Page','Pandora_video', 'E-Book','Jsmol', 'base_unit','Asset', 'announced_unit', 'Module'],
                                                 'data_type':'list',
                                                 'meta_type':'factory_types'}},
-                           {'educationalalignment':{'gsystem_names_list':['Quiz','QuizItem','Topic','File','Page','NUSSD Course', 'Pandora_video', 'Theme', 'E-Book','Jsmol'],
+                           {'educationalalignment':{'gsystem_names_list':['Quiz','QuizItem','Topic','File','Page','NUSSD Course', 'Pandora_video', 'Theme', 'E-Book','Jsmol','Asset'],
                                                     'data_type':'basestring',
                                                     'meta_type':'factory_types'}},
-                           {'curricular':{'gsystem_names_list':['File','Page', 'Pandora_video', 'Theme', 'E-Book','Jsmol'],
+                           {'curricular':{'gsystem_names_list':['File','Page', 'Pandora_video', 'Theme', 'E-Book','Jsmol','Asset'],
                                          'data_type':'bool',
                                          'meta_type':'factory_types'}},
-                           {'source':{'gsystem_names_list':['File', 'Page', 'Pandora_video', 'E-Book','Jsmol'],
+                           {'source':{'gsystem_names_list':['File', 'Page', 'Pandora_video', 'E-Book','Jsmol','Asset'],
                                       'data_type':'basestring',
                                       'meta_type':'factory_types'}},
                            {'adaptation_of':{'gsystem_names_list':['File','Page', 'Pandora_video', 'E-Book','Jsmol'],
@@ -189,10 +189,15 @@ factory_relation_types = [
     },
 
     {'translation_of': {
-            'subject_type':['Page','Topic','Theme','theme_item','File','GAPP','factory_types','Binary'],
-            'object_type':['Page','Topic','Theme','theme_item','File','GAPP','factory_types','Binary'],
+            'subject_type':['*'],
+            'object_type':['*'],
+            # 'subject_type':['Page','Topic','Theme','theme_item','File','GAPP','factory_types','Binary'],
+            # 'object_type':['Page','Topic','Theme','theme_item','File','GAPP','factory_types','Binary'],
             'inverse_name':'translation_of',
-            'meta_type':'factory_types'
+            'meta_type':'factory_types',
+            'object_cardinality': 100,
+            'is_reflexive': True,
+            'is_transitive': True
         }
     },
 
@@ -205,7 +210,7 @@ factory_relation_types = [
     },
 
     {'has_profile_pic': {
-            'subject_type':['Author','Group','ModeratingGroup','CourseEventGroup','ProgramEventGroup','PartnerGroup', 'BaseCourseGroup'],
+            'subject_type':['Author','Group','ModeratingGroup','CourseEventGroup','ProgramEventGroup','PartnerGroup', 'BaseCourseGroup','Module'],
             'object_type':['Image','File'],
             'inverse_name':'profile_pic_of',
             'meta_type':'factory_types'
@@ -213,7 +218,7 @@ factory_relation_types = [
     },
 
     {'has_banner_pic': {
-            'subject_type':['Author','Group','ModeratingGroup','CourseEventGroup','ProgramEventGroup','PartnerGroup', 'BaseCourseGroup'],
+            'subject_type':['Author','Group','ModeratingGroup','CourseEventGroup','ProgramEventGroup','PartnerGroup', 'BaseCourseGroup', 'announced_unit','Module'],
             'object_type':['Image','File'],
             'inverse_name':'banner_pic_of',
             'meta_type':'factory_types'
@@ -221,7 +226,7 @@ factory_relation_types = [
     },
 
     {'teaches': {
-            'subject_type':['Page','File', 'Topic','Pandora_video'],
+            'subject_type':['Page','File', 'Topic','Pandora_video','Asset'],
             'object_type':['Page','Concept','Topic', 'File', 'Pandora_video'],
             'inverse_name':'taught_by',
             'meta_type':'factory_types',
@@ -283,7 +288,17 @@ factory_relation_types = [
         }
     },
 
+    {'has_admin_page': {
+            'subject_type':['*'],
+            'object_type':['*'],
+            'inverse_name':'admin_page_of',
+            'meta_type':'factory_types',
+            'member_of': 'Binary',
+            'object_cardinality': 100
+        }
+    },
+
 ]
 
 
-factory_default_groups = GSTUDIO_DEFAULT_GROUPS
+factory_default_groups = GSTUDIO_DEFAULT_GROUPS_LIST

@@ -22,7 +22,7 @@ from gnowsys_ndf.ndf.models import db, node_collection, triple_collection
 # from gnowsys_ndf.ndf.models import Node, GSystemType, ToReduceDocs, ReducedDocs, IndexedWordList
 # from gnowsys_ndf.ndf.models import Group
 # from gnowsys_ndf.ndf.models import DATA_TYPE_CHOICES, QUIZ_TYPE_CHOICES_TU
-from gnowsys_ndf.settings import GSTUDIO_DATA_ROOT, GAPPS
+from gnowsys_ndf.settings import GSTUDIO_DATA_ROOT, GAPPS, GSTUDIO_DEFAULT_FACTORY_GROUPS, GSTUDIO_RESOURCES_EDUCATIONAL_SUBJECT, GSTUDIO_EDUCATIONAL_SUBJECTS_AS_GROUPS
 from gnowsys_ndf.settings import META_TYPE
 from gnowsys_ndf.settings import GSTUDIO_TASK_TYPES
 from gnowsys_ndf.factory_type import factory_gsystem_types, factory_attribute_types, factory_relation_types
@@ -119,6 +119,7 @@ class Command(BaseCommand):
             node_doc.status = u"PUBLISHED"
             node_doc.save()
 
+        # Create GSTUDIO_DEFAULT_GROUPS_LIST
         # Creating factory GSystemType's
         create_sts(factory_gsystem_types,user_id)
 
@@ -284,7 +285,7 @@ class Command(BaseCommand):
 		else:
 			print "Page " + ""+ i.name + "" +" instance already updated."
 
-
+        '''
         Group_node = node_collection.collection.Group();
         trash_grp =node_collection.one({'$and':[{'_type': u'Group'},{'name': u'Trash'}]})
         if trash_grp is None:
@@ -432,8 +433,9 @@ class Command(BaseCommand):
           help_grp.altnames = u'help'
           help_grp.save()
           print "\nAltnames changed to help"
+        '''
 
-
+        create_factory_groups()
 
         info_message = " Structure updated succesfully.\n"
         print info_message
@@ -579,7 +581,17 @@ def create_attribute_type(at_name, user_id, data_type, system_type_id_list, meta
     else:
       print 'AttributeType',at_name,'already created'
 
-def create_relation_type(rt_name, inverse_name, user_id, subject_type_id_list, object_type_id_list, meta_type_id=None, object_cardinality=None,member_of_type_id=bin_member_of_type._id):
+def create_relation_type(rt_name,
+                        inverse_name,
+                        user_id,
+                        subject_type_id_list,
+                        object_type_id_list,
+                        meta_type_id=None,
+                        object_cardinality=None,
+                        member_of_type_id=bin_member_of_type._id,
+                        is_reflexive=None,
+                        is_transitive=None):
+
   '''
   creating factory RelationType's
   '''
@@ -590,6 +602,8 @@ def create_relation_type(rt_name, inverse_name, user_id, subject_type_id_list, o
       rt_node.name = unicode(rt_name)
       rt_node.inverse_name = unicode(inverse_name)
       rt_node.object_cardinality = object_cardinality
+      rt_node.is_reflexive = is_reflexive
+      rt_node.is_transitive = is_transitive
 
       for st_id in subject_type_id_list:
         rt_node.subject_type.append(st_id)
@@ -636,6 +650,16 @@ def create_relation_type(rt_name, inverse_name, user_id, subject_type_id_list, o
       rt_node.object_type=object_type_id_list
       edited=True
 
+    if rt_node.is_reflexive != is_reflexive:
+      print "Edited is_reflexive of ", rt_node.name, " Earlier it was ", rt_node.is_reflexive, " now it is ", is_reflexive
+      rt_node.is_reflexive = is_reflexive
+      edited = True
+
+    if rt_node.is_transitive != is_transitive:
+      print "Edited is_transitive of ", rt_node.name, " Earlier it was ", rt_node.is_transitive, " now it is ", is_transitive
+      rt_node.is_transitive = is_transitive
+      edited = True
+
     if edited :
       rt_node.status = u"PUBLISHED"
       rt_node.save()
@@ -672,6 +696,8 @@ def create_rts(factory_relation_types,user_id):
     subject_type_id_list = []
     object_type_id_list = []
     object_cardinality = None
+    is_reflexive = None
+    is_transitive = None
 
     for key,value in each.items():
       at_name = key
@@ -715,7 +741,13 @@ def create_rts(factory_relation_types,user_id):
       if "object_cardinality" in value:
         object_cardinality = value["object_cardinality"]
 
-    create_relation_type(at_name, inverse_name, user_id, subject_type_id_list, object_type_id_list, meta_type_id, object_cardinality, member_of_type_id)
+      if "is_reflexive" in value:
+        is_reflexive = value["is_reflexive"]
+
+      if "is_transitive" in value:
+        is_transitive = value["is_transitive"]
+
+    create_relation_type(at_name, inverse_name, user_id, subject_type_id_list, object_type_id_list, meta_type_id, object_cardinality, member_of_type_id, is_reflexive, is_transitive)
 
 def create_sts(factory_gsystem_types,user_id):
   meta_type_id = ""
@@ -1105,3 +1137,39 @@ def clean_structure():
         end_time.subject_type.append(task._id)
         end_time.save()
 
+def create_factory_groups():
+    '''
+    Create Groups with names mentioned in GSTUDIO_FACTORY_GROUPS
+    '''
+    gst_group_id = node_collection.one({'_type': 'GSystemType', 'name': 'Group'})._id
+
+    GROUP_DICT = GSTUDIO_DEFAULT_FACTORY_GROUPS
+    if GSTUDIO_EDUCATIONAL_SUBJECTS_AS_GROUPS:
+      for each_edu in GSTUDIO_RESOURCES_EDUCATIONAL_SUBJECT:
+        GROUP_DICT.update({each_edu: {'edit_policy': 'EDITABLE_NON_MODERATED'}})
+
+    for group_name,group_data in GROUP_DICT.items():
+      group_obj = node_collection.one({'_type': 'Group', 'name': unicode(group_name)})
+      if not group_obj:
+        group_obj = node_collection.collection.Group()
+        group_obj.name = unicode(group_name.strip())
+        group_obj.access_policy = u"PRIVATE"
+        group_obj.subscription_policy=u"OPEN"
+        group_obj.group_type = u"PUBLIC"
+        group_obj.created_by = 1
+        group_obj.modified_by = 1
+        group_obj.contributors = [1]
+        group_obj.encryption_policy = u"NOT_ENCRYPTED"
+        group_obj.disclosure_policy = u"DISCLOSED_TO_MEM"
+        group_obj.edit_policy = group_data['edit_policy']
+        group_obj.status = u"PUBLISHED"
+        group_obj.visibility_policy = u"ANNOUNCED"
+        group_obj.origin.append({'source': 'filldb'})
+        group_obj.member_of = [gst_group_id]
+        group_obj.save()
+        print "\nGroup : {0} created successfully!!!".format(group_name)
+      else:
+        if gst_group_id not in group_obj.member_of:
+          group_obj.member_of = [gst_group_id]
+          group_obj.save()
+        print "\n Already exists Group: ", group_name

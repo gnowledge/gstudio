@@ -1,0 +1,35 @@
+{% load i18n %}
+{% load ndf_tags %}
+
+
+
+	<script>
+         
+
+         function togglerTranscript(a){
+                $(a).next(".transcript-data").toggleClass("hide");
+            };         
+           
+      </script>
+
+	 {% if 'audio' in audio_obj.if_file.mime_type %}
+	 <audio controls="" width="100px" id="audio-player-{{audio_obj.pk}}">
+	 <source src="{{MEDIA_URL}}{{audio_obj.if_file.original.relurl}}" type="audio/mp3"/>
+	 </audio>
+ 	<!-- Transcript -->
+    {% get_relation_value audio_obj.pk 'has_transcript' as transcript_rel %}
+	{% if transcript_rel %}
+
+	<div>	
+      {# <button type = "button" class="small radius transcript-toggler" onclick="togglerTranscript(this)">Transcript</button> #}
+      <input type="button" class="small radius transcript-toggler" onclick="togglerTranscript(this)" value="Transcript">
+      <div class="transcript-data hide">
+      	<object type="text/html" data="{{MEDIA_URL}}{{transcript_rel.grel_node.if_file.original.relurl}}"></object>
+      </div>
+    </div>
+	{% endif %}
+	{% endif %}
+
+
+
+

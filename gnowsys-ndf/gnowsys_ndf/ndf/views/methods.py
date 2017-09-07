@@ -42,12 +42,12 @@ from django.core.exceptions import PermissionDenied
 
 ''' -- imports from application folders/files -- '''
 from gnowsys_ndf.settings import META_TYPE, GSTUDIO_NROER_GAPPS
-from gnowsys_ndf.settings import GSTUDIO_DEFAULT_GAPPS_LIST, GSTUDIO_WORKING_GAPPS, BENCHMARK
-from gnowsys_ndf.settings import LANGUAGES, OTHER_COMMON_LANGUAGES, GSTUDIO_BUDDY_LOGIN
+from gnowsys_ndf.settings import GSTUDIO_DEFAULT_GAPPS_LIST, GSTUDIO_WORKING_GAPPS, BENCHMARK, GSTUDIO_DEFAULT_LANGUAGE
+from gnowsys_ndf.settings import LANGUAGES, OTHER_COMMON_LANGUAGES, GSTUDIO_BUDDY_LOGIN, DEFAULT_DISCUSSION_LABEL
 # from gnowsys_ndf.ndf.models import db, node_collection, triple_collection, counter_collection
 from gnowsys_ndf.ndf.models import *
 # from gnowsys_ndf.ndf.org2any import org2html
-from gnowsys_ndf.mobwrite.models import TextObj
+# from gnowsys_ndf.mobwrite.models import TextObj
 from gnowsys_ndf.ndf.models import HistoryManager, Benchmark
 from gnowsys_ndf.notification import models as notification
 # get pub of gpg key with which to sign syncdata attachments
@@ -62,7 +62,7 @@ theme_item_GST = node_collection.one({'_type': 'GSystemType', 'name': 'theme_ite
 topic_GST = node_collection.one({'_type': 'GSystemType', 'name': 'Topic'})
 grp_st = node_collection.one({'$and': [{'_type': 'GSystemType'}, {'name': 'Group'}]})
 ins_objectid = ObjectId()
-
+player_disc_enable_at_name, player_disc_enable_at_id = Node.get_name_id_from_type('player_discussion_enable', 'AttributeType')
 
 # C O M M O N   M E T H O D S   D E F I N E D   F O R   V I E W S
 
@@ -114,7 +114,7 @@ def get_execution_time(f):
             # except :
             #     pass
 
-        record_in_benchmark.delay(kwargs_len=len(kwargs),
+        record_in_benchmark(kwargs_len=len(kwargs),
                             # total_param_size=sum([getsizeof(each_kwarg) for each_kwarg in kwargs.values()]),
                             total_param_size=None,
                             post_bool=post_bool,
@@ -346,7 +346,7 @@ def get_group_name_id(group_name_or_id, get_obj=False):
         cache_result = cache.get(cache_key)
 
         if cache_result:
-            return cache_result
+            return (cache_result[0], ObjectId(cache_result[1]))
     # ---------------------------------
 
     # case-1: argument - "group_name_or_id" is ObjectId
@@ -1141,9 +1141,12 @@ def get_node_common_fields(request, node, group_id, node_type, coll_set=None):
         name = request.POST.get('name', '').strip()
         content_org = request.POST.get('content_org')
         # print "\n\n\n content_org",content_org
-        tags = request.POST.get('tags','')
+        tags = request.POST.get('tags',[])
+        if tags:
+            tags = json.loads(tags)
+
     language = request.POST.get('lan')
-    license = request.POST.get('license')
+    copyright = request.POST.get('copyright')
     sub_theme_name = request.POST.get("sub_theme_name", '')
     add_topic_name = request.POST.get("add_topic_name", '')
     is_changed = False
@@ -1267,16 +1270,19 @@ def get_node_common_fields(request, node, group_id, node_type, coll_set=None):
 
     # tags
     # if tags:
-    tags_list = []
+
+    # tags_list = []
     if tags != node.tags:
-        for tag in tags.split(","):
-            tag = unicode(tag.strip())
+        # for tag in tags.split(","):
+        #     tag = unicode(tag.strip())
 
-            if tag:
-                tags_list.append(tag)
+        #     if tag:
+        #         tags_list.append(tag)
 
-        if set(node.tags) != set(tags_list):
-            node.tags = tags_list
+        # if set(node.tags) != set(tags_list):
+            # node.tags = tags_list
+        if set(node.tags) != tags:
+            node.tags = tags
             is_changed = True
 
     #  Build collection, prior node, teaches and assesses lists
@@ -1310,10 +1316,9 @@ def get_node_common_fields(request, node, group_id, node_type, coll_set=None):
     #         filename = slugify(name) + "-" + slugify(usrname) + "-" + ObjectId().__str__()
     #         node.content = unicode(org2html(content_org, file_prefix=filename))
     #         is_changed = True
-    if content_org:
-        if node.content != content_org:
-            node.content = unicode(content_org)
-            is_changed = True
+    if node.content != content_org:
+        node.content = unicode(content_org)
+        is_changed = True
 
     '''
     if node.content_org != content_org:
@@ -1352,8 +1357,8 @@ def get_node_common_fields(request, node, group_id, node_type, coll_set=None):
         node.location = map_geojson_data  # Storing location data
         is_changed = True
 
-    if node.license != license:
-        node.license = license
+    if node.legal['copyright'] != copyright:
+        node.legal['copyright'] = copyright
         is_changed = True
 
     if user_last_visited_location:
@@ -2047,14 +2052,12 @@ def _split_with_maintain(value, treat_trailing_spaces_as_sentence=True, split_ch
 
     return result
 
-
+'''
 @get_execution_time
 def update_mobwrite_content_org(node_system):
-    '''
-          on revert or merge of nodes,a content_org is synced to mobwrite object
-          input :
-                  node
-    '''
+          # on revert or merge of nodes,a content_org is synced to mobwrite object
+          # input :
+          #         node
     system = node_system
     filename = TextObj.safe_name(str(system._id))
     textobj = TextObj.objects.filter(filename=filename)
@@ -2067,7 +2070,7 @@ def update_mobwrite_content_org(node_system):
         textobj = TextObj(filename=filename, text=content_org)
         textobj.save()
     return textobj
-
+'''
 
 @get_execution_time
 def cast_to_data_type(value, data_type):
@@ -2209,7 +2212,8 @@ def create_grelation_list(subject_id, relation_type_name, right_subject_id_list)
             gr_node.relation_type = relationtype._id
             gr_node.right_subject = ObjectId(relation_id)
             gr_node.status = u"PUBLISHED"
-            gr_node.save(triple_node=relationtype, triple_id=relationtype._id)
+            gr_node.save()
+            # gr_node.save(triple_node=relationtype, triple_id=relationtype._id)
 
 
 @get_execution_time
@@ -2551,6 +2555,63 @@ def parse_template_data(field_data_type, field_value, **kwargs):
 
 
 
+def validate_scope_values(rt_at_type_node, req_triple_scope):
+    # check if req_scope_values keys are present
+    # in rt_at_type_node scope list
+    # req_triple_scope:
+    #   {
+    #     'relation_type_scope' : {'alt_format': 'mp4', 'alt_size': '720p', 'alt_language': 'hi'},
+    #     'attribute_type_scope' : {'alt_format': 'mp4', 'alt_size': '720p', 'alt_language': 'hi'},
+    #     'object_scope' : unicode,
+    #     'subject_scope' : unicode
+    #   }
+    validated_scope_val = {}
+    for each_scope_dict_key,each_scope_dict_val in req_triple_scope.items():
+        # type(each_scope_dict_val): dict
+        if each_scope_dict_key == "relation_type_scope":
+            if isinstance(each_scope_dict_val, dict):
+                for each_scope_alt_key, each_scope_alt_val in each_scope_dict_val.items():
+                    if each_scope_alt_key in rt_at_type_node['relation_type_scope']:
+                        if 'relation_type_scope' in validated_scope_val:
+                            old_rt_scope_val = validated_scope_val['relation_type_scope']
+                        else:
+                            old_rt_scope_val = {}
+                        old_rt_scope_val.update({each_scope_alt_key: each_scope_alt_val})
+                        validated_scope_val.update({each_scope_dict_key: old_rt_scope_val})
+        if each_scope_dict_key == "attribute_type_scope":
+            if isinstance(each_scope_dict_val, dict):
+                for each_scope_alt_key, each_scope_alt_val in each_scope_dict_val.items():
+                    if each_scope_alt_key in rt_at_type_node['attribute_type_scope']:
+                        if 'attribute_type_scope' in validated_scope_val:
+                            old_at_scope_val = validated_scope_val['attribute_type_scope']
+                        else:
+                            old_at_scope_val = {}
+                        old_at_scope_val.update({each_scope_alt_key: each_scope_alt_val})
+                        validated_scope_val.update({each_scope_dict_key: old_at_scope_val})
+        if each_scope_dict_key == "object_scope":
+            if unicode(each_scope_dict_val.strip()) in rt_at_type_node['object_scope']:
+                validated_scope_val.update({each_scope_dict_key: unicode(each_scope_dict_val)})
+        if each_scope_dict_key == "subject_scope":
+            if unicode(each_scope_dict_val.strip()) in rt_at_type_node['subject_scope']:
+                validated_scope_val.update({each_scope_dict_key: unicode(each_scope_dict_val)})
+    return validated_scope_val
+
+
+def update_scope_of_triple(triple_node, rt_at_type_node, req_scope_values, is_grel=True):
+    if req_scope_values:
+        validated_scope_values = validate_scope_values(rt_at_type_node, req_scope_values)
+        if 'object_scope' in validated_scope_values:
+            triple_node.object_scope = validated_scope_values['object_scope']
+        if 'subject_scope' in validated_scope_values:
+            triple_node.subject_scope = validated_scope_values['subject_scope']
+        if is_grel and 'relation_type_scope' in validated_scope_values:
+            triple_node.relation_type_scope = validated_scope_values['relation_type_scope']
+        elif 'attribute_type_scope' in validated_scope_values:
+            triple_node.attribute_type_scope = validated_scope_values['attribute_type_scope']
+        triple_node.save()
+        # triple_node.save(triple_node=rt_at_type_node, triple_id=rt_at_type_node._id)
+        return triple_node
+
 @get_execution_time
 def create_gattribute(subject_id, attribute_type_node, object_value=None, **kwargs):
 
@@ -2562,10 +2623,26 @@ def create_gattribute(subject_id, attribute_type_node, object_value=None, **kwar
     ga_node = None
     info_message = ""
     old_object_value = None
-    attribute_type_node = Node.get_node_obj_from_id_or_obj(attribute_type_node, AttributeType)
-
+    triple_scope_val = kwargs.get('triple_scope', None)
+    try:
+        attribute_type_node = Node.get_node_obj_from_id_or_obj(attribute_type_node, AttributeType)
+    except Exception:
+        attribute_type_node = Node.get_name_id_from_type(attribute_type_node, 'AttributeType', get_obj=True)
+    # print "\nattribute_type_node: ", attribute_type_node.name
     ga_node = triple_collection.one(
         {'_type': "GAttribute", 'subject': subject_id, 'attribute_type': attribute_type_node._id})
+
+    '''
+    Example:
+    triple_scope:
+      {
+        attribute_type_scope : {'alt_format': 'mp4', 'alt_size': '720p', 'alt_language': 'hi'},
+        object_scope : unicode,
+        subject_scope : unicode
+      }
+
+    '''
+
     if ga_node is None:
         # Code for creation
         try:
@@ -2584,7 +2661,10 @@ def create_gattribute(subject_id, attribute_type_node, object_value=None, **kwar
                 ga_node.status = u"PUBLISHED"
 
             ga_node.object_value = object_value
-            ga_node.save(triple_node=attribute_type_node, triple_id=attribute_type_node._id)
+            # ga_node.save(triple_node=attribute_type_node, triple_id=attribute_type_node._id)
+            ga_node.save()
+            if triple_scope_val:
+                ga_node = update_scope_of_triple(ga_node,attribute_type_node, triple_scope_val, is_grel=False)
 
             if ga_node.status == u"DELETED":
                 info_message = " GAttribute (" + ga_node.name + \
@@ -2617,7 +2697,10 @@ def create_gattribute(subject_id, attribute_type_node, object_value=None, **kwar
                 old_object_value = ga_node.object_value
 
                 ga_node.status = u"DELETED"
-                ga_node.save(triple_node=attribute_type_node, triple_id=attribute_type_node._id)
+                ga_node.save()
+                # ga_node.save(triple_node=attribute_type_node, triple_id=attribute_type_node._id)
+                if triple_scope_val:
+                    ga_node = update_scope_of_triple(ga_node,attribute_type_node, triple_scope_val, is_grel=False)
 
                 info_message = " GAttribute (" + ga_node.name + \
                     ") status updated from 'PUBLISHED' to 'DELETED' successfully.\n"
@@ -2641,10 +2724,17 @@ def create_gattribute(subject_id, attribute_type_node, object_value=None, **kwar
                                 ga_node.object_value = object_value
                                 is_ga_node_changed = True
 
-                    elif set(ga_node.object_value) != set(object_value):
-                        old_object_value = ga_node.object_value
-                        ga_node.object_value = object_value
-                        is_ga_node_changed = True
+                    elif type(ga_node.object_value[0]) == list:
+                        if ga_node.object_value != object_value:
+                            old_object_value = ga_node.object_value
+                            ga_node.object_value = object_value
+                            is_ga_node_changed = True
+
+                    else:
+                        if set(ga_node.object_value) != set(object_value):
+                            old_object_value = ga_node.object_value
+                            ga_node.object_value = object_value
+                            is_ga_node_changed = True
 
                 elif type(ga_node.object_value) == dict:
                     if cmp(ga_node.object_value, object_value) != 0:
@@ -2661,7 +2751,10 @@ def create_gattribute(subject_id, attribute_type_node, object_value=None, **kwar
                 if is_ga_node_changed or ga_node.status == u"DELETED":
                     if ga_node.status == u"DELETED":
                         ga_node.status = u"PUBLISHED"
-                        ga_node.save(triple_node=attribute_type_node, triple_id=attribute_type_node._id)
+                        ga_node.save()
+                        # ga_node.save(triple_node=attribute_type_node, triple_id=attribute_type_node._id)
+                        if triple_scope_val:
+                            ga_node = update_scope_of_triple(ga_node,attribute_type_node, triple_scope_val, is_grel=False)
 
 
                         info_message = " GAttribute (" + ga_node.name + \
@@ -2684,7 +2777,10 @@ def create_gattribute(subject_id, attribute_type_node, object_value=None, **kwar
 
                     else:
                         ga_node.status = u"PUBLISHED"
-                        ga_node.save(triple_node=attribute_type_node, triple_id=attribute_type_node._id)
+                        ga_node.save()
+                        # ga_node.save(triple_node=attribute_type_node, triple_id=attribute_type_node._id)
+                        if triple_scope_val:
+                            ga_node = update_scope_of_triple(ga_node,attribute_type_node, triple_scope_val, is_grel=False)
 
                         info_message = " GAttribute (" + \
                             ga_node.name + ") updated successfully.\n"
@@ -2740,29 +2836,49 @@ def create_grelation(subject_id, relation_type_node, right_subject_id_or_list, *
     Returns:
     - When one to one relationship: Created/Updated/Existed document.
     - When one to many relationship: Created/Updated/Existed list of documents.
+
+    kwargs -- can hold the scope value
     """
     gr_node = None
     multi_relations = False
+    triple_scope_val = kwargs.get('triple_scope', None)
+    language = get_language_tuple(kwargs.get('language', None))
+    '''
+    Example:
+    triple_scope:
+      {
+        relation_type_scope : {'alt_format': 'mp4', 'alt_size': '720p', 'alt_language': 'hi'},
+        object_scope : unicode,
+        subject_scope : unicode
+      }
 
+    In next phase, validate the scope values by adding:
+        GSTUDIO_FORMAT_SCOPE_VALUES
+        GSTUDIO_SIZE_SCOPE_VALUES
+        GSTUDIO_LANGUAGE_SCOPE_VALUES
+        in settings.py
+        - katkamrachana, 23-12-2016
+    '''
     try:
         subject_id = ObjectId(subject_id)
 
-        def _create_grelation_node(subject_id, relation_type_node, right_subject_id_or_list, relation_type_text):
+        def _create_grelation_node(subject_id, relation_type_node, right_subject_id_or_list, relation_type_text, triple_scope_val=None):
             # Code for creating GRelation node
             gr_node = triple_collection.collection.GRelation()
 
             gr_node.subject = subject_id
             gr_node.relation_type = relation_type_node._id
             gr_node.right_subject = right_subject_id_or_list
-
+            # gr_node.relation_type_scope = relation_type_scope
+            gr_node.language = language
             gr_node.status = u"PUBLISHED"
-            gr_node.save(triple_node=relation_type_node, triple_id=relation_type_node._id)
-
+            gr_node.save()
+            # gr_node.save(triple_node=relation_type_node, triple_id=relation_type_node._id)
 
             gr_node_name = gr_node.name
             info_message = "%(relation_type_text)s: GRelation (%(gr_node_name)s) " % locals() \
                 + "created successfully.\n"
-            # print "\n",info_message
+
             relation_type_node_name = relation_type_node.name
             relation_type_node_inverse_name = relation_type_node.inverse_name
 
@@ -2770,6 +2886,8 @@ def create_grelation(subject_id, relation_type_node, right_subject_id_or_list, *
                 "_id": subject_id,
                 "relation_set." + relation_type_node_name: {"$exists": True}
             })
+            if triple_scope_val:
+                gr_node = update_scope_of_triple(gr_node,relation_type_node, triple_scope_val, is_grel=True)
 
             if left_subject:
                                 # Update value of grelation in existing as key-value pair value in
@@ -2825,9 +2943,11 @@ def create_grelation(subject_id, relation_type_node, right_subject_id_or_list, *
 
             return gr_node
 
-        def _update_deleted_to_published(gr_node, relation_type_node, relation_type_text):
+        def _update_deleted_to_published(gr_node, relation_type_node, relation_type_text, triple_scope_val=None):
             gr_node.status = u"PUBLISHED"
-            gr_node.save(triple_node=relation_type_node, triple_id=relation_type_node._id)
+            # gr_node.language = language
+            gr_node.save()
+            # gr_node.save(triple_node=relation_type_node, triple_id=relation_type_node._id)
 
             gr_node_name = gr_node.name
             relation_type_node_name = relation_type_node.name
@@ -2857,6 +2977,7 @@ def create_grelation(subject_id, relation_type_node, right_subject_id_or_list, *
             )
 
             return gr_node
+
 
         if relation_type_node["object_cardinality"]:
             # If object_cardinality value exists and greater than 1 (or eaqual to 100)
@@ -2937,6 +3058,8 @@ def create_grelation(subject_id, relation_type_node, right_subject_id_or_list, *
                         # is PUBLISHED)
                         right_subject_id_or_list.remove(n.right_subject)
                         gr_node_list.append(n)
+                        # if triple_scope_val:
+                        #     n = update_scope_of_triple(n, relation_type_node, triple_scope_val, is_grel=True)
 
                         node_collection.collection.update(
                             {'_id': subject_id, 'relation_set.' +
@@ -2953,12 +3076,14 @@ def create_grelation(subject_id, relation_type_node, right_subject_id_or_list, *
                                 'relation_set.$.' + relation_type_node.inverse_name: subject_id}},
                             upsert=False, multi=False
                         )
+                        n.reload()
 
                 else:
                     # Case: When already existing entry doesn't exists in newly come list of right_subject(s)
                     # So change their status from PUBLISHED to DELETED
                     n.status = u"DELETED"
-                    n.save(triple_node=relation_type_node, triple_id=relation_type_node._id)
+                    n.save()
+                    # n.save(triple_node=relation_type_node, triple_id=relation_type_node._id)
 
                     info_message = " MultipleGRelation: GRelation (" + n.name + \
                         ") status updated from 'PUBLISHED' to 'DELETED' successfully.\n"
@@ -2992,8 +3117,9 @@ def create_grelation(subject_id, relation_type_node, right_subject_id_or_list, *
 
                     if gr_node is None:
                         # New one found so create it
+                        # check for relation_type_scope variable in kwargs and pass
                         gr_node = _create_grelation_node(
-                            subject_id, relation_type_node, nid, "MultipleGRelation")
+                            subject_id, relation_type_node, nid, "MultipleGRelation", triple_scope_val)
                         gr_node_list.append(gr_node)
 
                     else:
@@ -3023,7 +3149,6 @@ def create_grelation(subject_id, relation_type_node, right_subject_id_or_list, *
                 "_type": "GRelation", "subject": subject_id,
                 "relation_type": relation_type_node_id
             })
-
             for node in gr_node_cur:
                 node_name = node.name
                 node_status = node.status
@@ -3037,9 +3162,12 @@ def create_grelation(subject_id, relation_type_node, right_subject_id_or_list, *
                         # If deleted, change it's status back to Published from
                         # Deleted
                         node = _update_deleted_to_published(
-                            node, relation_type_node, "SingleGRelation")
+                            node, relation_type_node, "SingleGRelation", triple_scope_val)
 
                     elif node_status == u"PUBLISHED":
+                        if triple_scope_val:
+                            node = update_scope_of_triple(node, relation_type_node, triple_scope_val, is_grel=True)
+
                         node_collection.collection.update({
                             "_id": subject_id, "relation_set." + relation_type_node_name: {'$exists': True}
                         }, {
@@ -3068,7 +3196,8 @@ def create_grelation(subject_id, relation_type_node, right_subject_id_or_list, *
                     # to DELETED
                     if node.status == u'PUBLISHED':
                         node.status = u"DELETED"
-                        node.save(triple_node=relation_type_node, triple_id=relation_type_node._id)
+                        node.save()
+                        # node.save(triple_node=relation_type_node, triple_id=relation_type_node._id)
 
                         node_collection.collection.update({
                             '_id': subject_id, 'relation_set.' + relation_type_node_name: {'$exists': True}
@@ -3092,7 +3221,7 @@ def create_grelation(subject_id, relation_type_node, right_subject_id_or_list, *
             if gr_node is None:
                 # Code for creation
                 gr_node = _create_grelation_node(
-                    subject_id, relation_type_node, right_subject_id_or_list, "SingleGRelation")
+                    subject_id, relation_type_node, right_subject_id_or_list, "SingleGRelation", triple_scope_val)
 
             return gr_node
 
@@ -4151,12 +4280,13 @@ def delete_gattribute(subject_id=None, deletion_type=0, **kwargs):
         # print "\n 4 >> gattributes.count()... ", gattributes.count()
 
         # Perform normal delete operation (i.e. deletion_type == 0)
-        for each_ga in gattributes:
-            gattribute_deleted_id.append(each_ga._id.__str__())
+        if deletion_type == 1:
+            for each_ga in gattributes:
+                gattribute_deleted_id.append(each_ga._id.__str__())
 
-            if each_ga.status != u"DELETED":
-                create_gattribute(each_ga.subject, each_ga.attribute_type)
-                # print "\t 4 >> each_ga (0) ... ", each_ga._id
+                if each_ga.status != u"DELETED":
+                    create_gattribute(each_ga.subject, each_ga.attribute_type)
+                    # print "\t 4 >> each_ga (0) ... ", each_ga._id
 
         # print "\n 5 >> gattribute_deleted_id... " + ",
         # ".join(gattribute_deleted_id)
@@ -4343,7 +4473,8 @@ def delete_grelation(subject_id=None, deletion_type=0, **kwargs):
         # relation_set field updated -- \n", res
 
         gr_node.status = u"DELETED"
-        gr_node.save(triple_node=rt_node, triple_id=rt_node._id)
+        gr_node.save()
+        # gr_node.save(triple_node=rt_node, triple_id=rt_node._id)
 
 
     try:
@@ -4718,7 +4849,7 @@ def delete_node(
                 # Search deleting-node's ObjectId in collection_set field and
                 # remove from it, if found any
                 res = node_collection.collection.update({
-                    "_type": "GSystem",
+                    "_type": {'$in': ['GSystem', 'Group']},
                     "collection_set": node_to_be_deleted._id
                 }, {
                     "$pull": {"collection_set": node_to_be_deleted._id}
@@ -4966,9 +5097,57 @@ def repository(request, group_id):
                               context_instance=RequestContext(request)
                               )
 
+def create_thread(group_id, node, user_id, release_response_val, interaction_type_val, start_time, end_time):
+    user_id = node.created_by
+    thread_node = None
+    from gnowsys_ndf.ndf.templatetags.ndf_tags import get_relation_value, get_attribute_value
+    has_thread_rt = node_collection.one({"_type": "RelationType", 
+        "name": u"has_thread"})
+    has_thread_triple_of_node = triple_collection.find_one({'subject': node._id, 
+        'relation_type': has_thread_rt._id, 'status': u'PUBLISHED'})
+    if has_thread_triple_of_node:
+        thread_node_id = has_thread_triple_of_node.right_subject
+        thread_node = node_collection.one({'_id': ObjectId(thread_node_id)})
+
+    if not thread_node:
+
+        twist_gst = node_collection.one({'_type': 'GSystemType',
+                     'name': 'Twist'})
+        thread_node = node_collection.collection.GSystem()
+        thread_node.name = u"Thread of " + unicode(node.name)
+        thread_node.status = u"PUBLISHED"
+        thread_node.created_by = user_id
+        thread_node.modified_by = user_id
+        thread_node.contributors = [user_id]
+        thread_node.prior_node = [node._id]
+        thread_node.member_of = [ObjectId(twist_gst._id)]
+        thread_node.group_set = [ObjectId(group_id)]
+        thread_node.save()
+        has_thread_gr = create_grelation(node._id, has_thread_rt, thread_node._id)
+
+    # attributes for thread_node
+    if start_time:
+        start_time = datetime.strptime(start_time, "%d/%m/%Y")
+    if end_time:
+        end_time = datetime.strptime(end_time, "%d/%m/%Y")
+    if release_response_val:
+        release_response_val = eval(release_response_val)
+        create_gattribute(thread_node._id, 'release_response', release_response_val)
+    if not interaction_type_val:
+        interaction_type_val = unicode(DEFAULT_DISCUSSION_LABEL)
+        print "\n inte: ", interaction_type_val
+        create_gattribute(thread_node._id, 'thread_interaction_type', interaction_type_val)
+
+    if start_time and end_time:
+        create_gattribute(thread_node._id, 'start_time', start_time)
+        create_gattribute(thread_node._id, 'end_time', end_time)
+    thread_node.reload()
+    print "\n\n thread_obj", thread_node.attribute_set, "\n---\n"
+    return thread_node
+
 
 def create_thread_for_node(request, group_id, node):
-        """
+    """
       Accepts:
        * ObjectId of group.
        * node - Page/File GSystem
@@ -4981,107 +5160,17 @@ def create_thread_for_node(request, group_id, node):
 
       Returns:
         * Success - True/False
-
-	"""
-	try:
-		if request.method == "POST":
-			from gnowsys_ndf.ndf.templatetags.ndf_tags import get_relation_value, get_attribute_value
-			# release_response_status = False
-			# thread_interaction_type_status = False
-			# thread_start_time_status = False
-			# thread_end_time_status = False
-			has_thread_status = False
-			# if get_relation_value(node._id,"has_thread") != None:
-			# 	has_thread_status = True
-			grel_dict = get_relation_value(node._id,"has_thread")
-			is_cursor = grel_dict.get("cursor",False)
-			if not is_cursor:
-				thread_node_status = grel_dict.get("grel_node", None)
-				if thread_node_status:
-					has_thread_status = True
-
-			release_response_val = unicode(request.POST.get("release_resp_sel",'True'))
-			interaction_type_val = unicode(request.POST.get("interaction_type_sel",'Comment'))
-			start_time = request.POST.get("thread_start_date", '')
-			if start_time:
-				start_time = datetime.strptime(start_time, "%d/%m/%Y")
-			end_time = request.POST.get("thread_close_date", '')
-			if end_time:
-				end_time = datetime.strptime(end_time, "%d/%m/%Y")
-
-
-			twist_gst = node_collection.one({'_type': 'GSystemType', 'name': 'Twist'})
-			thread_obj = node_collection.find_one({"_type": "GSystem", "member_of": ObjectId(twist_gst._id), "prior_node": ObjectId(node._id) })
-			has_thread_rt = node_collection.one({"_type": "RelationType", "name": u"has_thread"})
-			if thread_obj:
-				node_collection.collection.update({'_id': thread_obj._id},{'$set':{'name': u"Thread of " + unicode(node.name), 'prior_node': [node._id]}}, upsert = False, multi = False)
-				thread_obj.reload()
-				# print "\n\n Found old model thread node existing"
-			else:
-				thread_obj = node_collection.find_one({"_type": "GSystem", "member_of": ObjectId(twist_gst._id),"relation_set.thread_of": ObjectId(node._id)})
-				# print "\n\n Found updated thread node existing"
-			if thread_obj:
-				if thread_obj.name != u"Thread of "+ unicode(node.name):
-					node_collection.collection.update({'_id': thread_obj._id},{'$set':{'name': u"Thread of " + unicode(node.name)}}, upsert = False, multi = False)
-					thread_obj.reload()
-					# print "\n\n thread_obj found -- name update if needed"
-			else:
-				# print "\n\n Creating new thread node"
-				thread_obj = node_collection.collection.GSystem()
-
-				thread_obj.name = u"Thread of " + unicode(node.name)
-				thread_obj.status = u"PUBLISHED"
-
-				thread_obj.created_by = int(request.user.id)
-				thread_obj.modified_by = int(request.user.id)
-				thread_obj.contributors.append(int(request.user.id))
-				thread_obj.prior_node.append(node._id)
-				thread_obj.member_of.append(ObjectId(twist_gst._id))
-				# thread_obj.prior_node.append(ObjectId(node._id))
-				thread_obj.group_set.append(ObjectId(group_id))
-				thread_obj.save()
-			'''
-			if thread_obj:
-				if get_attribute_value(thread_obj._id,"release_response") != "":
-					release_response_status = True
-				if get_attribute_value(thread_obj._id,"thread_interaction_type") != "":
-					thread_interaction_type_status = True
-				if get_attribute_value(thread_obj._id,"start_time") != "":
-					thread_start_time_status = True
-				if get_attribute_value(thread_obj._id,"end_time") != "":
-					thread_end_time_status = True
-			print "\n thread_end_time_status---",thread_end_time_status
-			print "\n thread_start_time_status---",thread_start_time_status
-			print "\n release_response_status---",release_response_status
-			print "\n thread_interaction_type_status---",thread_interaction_type_status
-			print "\n has_thread_status---",has_thread_status
-			'''
-			if not has_thread_status:
-				# creating GRelation
-				gr = create_grelation(node._id, has_thread_rt, thread_obj._id)
-				node.reload()
-				thread_obj.reload()
-				# print "\n\n thread", thread_obj._id, "--", thread_obj.relation_set
-				# print "\n\n node", node._id, "--", node.relation_set
-			if release_response_val:
-				rel_resp_at = node_collection.one({'_type': 'AttributeType', 'name': 'release_response'})
-				release_response_val = eval(release_response_val)
-				create_gattribute(thread_obj._id, rel_resp_at, release_response_val)
-			if interaction_type_val:
-				thr_inter_type_at = node_collection.one({'_type': 'AttributeType', 'name': 'thread_interaction_type'})
-				create_gattribute(thread_obj._id, thr_inter_type_at, interaction_type_val)
-
-			if start_time and end_time:
-				start_time_at = node_collection.one({'_type': 'AttributeType', 'name': 'start_time'})
-				end_time_at = node_collection.one({'_type': 'AttributeType', 'name': 'end_time'})
-				create_gattribute(thread_obj._id, start_time_at, start_time)
-				create_gattribute(thread_obj._id, end_time_at, end_time)
-
-			thread_obj.reload()
-			# print "\n\n thread_obj", thread_obj.attribute_set, "\n---\n"
-			return thread_obj
-	except Exception as e:
-		print "Something went wrong while creating thread node. ",e
+    """
+    try:
+        if request.method == "POST":
+            release_response_val = unicode(request.POST.get("release_resp_sel",'True'))
+            interaction_type_val = unicode(request.POST.get("interaction_type_sel", None))
+            start_time = request.POST.get("thread_start_date", None)
+            end_time = request.POST.get("thread_close_date", None)
+            thread_node = create_thread(group_id, node, node.created_by, release_response_val, interaction_type_val, start_time, end_time)
+            return thread_node
+    except Exception as e:
+        print "Something went wrong while creating thread node. ",e
 
 def node_thread_access(group_id, node):
     """
@@ -5265,7 +5354,7 @@ def get_course_units_tree(data,list_ele):
                     if "children" in each_dict:
                         get_course_units_tree(each_dict['children'],list_ele)
 
-def create_clone(user_id, node, group_id):
+def create_clone(user_id, node, group_id, mem_of_node_id=None):
     try:
         # if "Page" in node.member_of_names_list or "QuizItem" in node.member_of_names_list or "QuizItemEvent" in node.member_of_names_list:
         #     cloned_copy = node_collection.collection.GSystem()
@@ -5318,10 +5407,13 @@ def create_clone(user_id, node, group_id):
         # cloned_copy['prior_node'] = node.prior_node
         cloned_copy['contributors'] = [int(user_id)]
         cloned_copy['post_node'] = []
+        cloned_copy['collection_set'] = []
         cloned_copy['prior_node'] = []
         cloned_copy['relation_set'] = []
         cloned_copy['attribute_set'] = []
         cloned_copy['origin'] = [{'fork_of': node._id}]
+        if mem_of_node_id:
+            cloned_copy['member_of'] = [ObjectId(mem_of_node_id)]
         if "QuizItem" in node.member_of_names_list:
             quiz_item_event_gst = node_collection.one({'_type': "GSystemType", 'name': "QuizItemEvent"})
             cloned_copy['member_of'] = [quiz_item_event_gst._id]
@@ -5335,80 +5427,149 @@ def create_clone(user_id, node, group_id):
         print "Failed cloning resource"
         return None
 
+@get_execution_time
+def clone_triple(node_obj, triple_obj, group_id, user_id, override_AT_with=None, grelation=False):
+    try:
+        cloned_copy = triple_obj.copy()
+        cloned_copy['_id'] = ObjectId()
+        cloned_copy['subject'] = node_obj._id
+        if grelation:
+            if isinstance(triple_obj.right_subject, ObjectId):
+                right_subj_node = node_collection.one({'_id': ObjectId(triple_obj.right_subject)})
+                right_sub_new_node = create_clone(user_id, right_subj_node, group_id)
+                pull_triples(source_node=right_subj_node, target_node=right_sub_new_node, 
+                                group_id=group_id, user_id=user_id)
+                cloned_copy['right_subject'] = right_sub_new_node._id
 
+            if isinstance(triple_obj.right_subject, list):
+                cloned_rs_ids = []
+                for rs_id in triple_obj.right_subject:
+                    right_subj_node = node_collection.one({'_id': ObjectId(rs_id)})
+                    right_sub_new_node = create_clone(user_id, right_subj_node, group_id)
+                    pull_triples(source_node=right_subj_node, target_node=right_sub_new_node, 
+                                group_id=group_id, user_id=user_id)
+                    cloned_rs_ids.append(right_sub_new_node._id)
+                if cloned_rs_ids:
+                    cloned_copy['right_subject'] = cloned_rs_ids
+        else:
+            if override_AT_with:
+                cloned_copy['attribute_type'] = node_collection.one({
+                    '_type': 'AttributeType', 'name': override_AT_with})._id
+        cloned_obj_id = triple_collection.collection.insert(cloned_copy)
+        cloned_obj = triple_collection.one({'_id': ObjectId(cloned_obj_id)})
+        cloned_obj.save(groupid=group_id, validate=False)
+    except Exception as clone_triple_err:
+        # print "\n!!!Error while cloning Triple instance.!!!"
+        pass
 
 @get_execution_time
-def replicate_resource(request, node, group_id):
+def pull_triples(source_node, target_node, group_id, user_id):
+    # - katkamrachana , 18May2017.
+    # Fetching triples irrespective of status, 
+    # since we will create a clone of triple object.
+    # GAttributes
+    # print "\n Pulling Triples---------"
+    node_gattr_cur = triple_collection.find({'_type': 'GAttribute', 'subject': source_node._id})
+    # print "\n GA: ", node_gattr_cur.count()
+    for each_gattr in node_gattr_cur:
+        override_AT_with = None
+        if each_gattr.attribute_type == player_disc_enable_at_id:
+            override_AT_with = "discussion_enable" 
+        cloned_gattr = clone_triple(node_obj=target_node, triple_obj=each_gattr,
+                            group_id=group_id, user_id=user_id, override_AT_with=override_AT_with)
+
+    # GRelations
+    node_grel_cur = triple_collection.find({'_type': 'GRelation', 'subject': source_node._id})
+    # print "\n GR: ", node_grel_cur.count()
+    for each_grel in node_grel_cur:
+        cloned_grel = clone_triple(node_obj=target_node, triple_obj=each_grel,
+                            group_id=group_id, user_id=user_id, grelation=True)
+    '''
+    relation_dict_rt_key_rs_val = {}
+    for each_rel in node_grel_cur:
+        rt_id = each_rel['relation_type']
+        right_subj = each_rel['right_subject']
+        if rt_id in relation_dict_rt_key_rs_val.keys() :
+            val_list = relation_dict_rt_key_rs_val[rt_id]
+            if not isinstance(val_list,list):
+                rs_list = []
+                rs_list.append(val_list)
+                rs_list.append(right_subj)
+                relation_dict_rt_key_rs_val[rt_id] = rs_list
+            else:
+                relation_dict_rt_key_rs_val[rt_id].append(right_subj)
+        else:
+            relation_dict_rt_key_rs_val[rt_id] = right_subj
+    # print "\n\n relation_dict_rt_key_rs_val === ",relation_dict_rt_key_rs_val
+
+    for eachrtid, eachrsval in relation_dict_rt_key_rs_val.items():
+        right_subj_node = None
+        rt_node = node_collection.one({'_id': ObjectId(eachrtid)})
+        if isinstance(eachrsval, ObjectId):
+            right_subj_node = node_collection.one({'_id': ObjectId(eachrsval)})
+            right_sub_new_node = create_clone(user_id, right_subj_node, group_id)
+            create_grelation(new_gsystem._id,rt_node,right_sub_new_node._id,language=right_subj_node.language)
+            # To maintain the thread-node relation using prior_node field
+            if rt_node.name == u'has_thread':
+                thread_created = True
+                if right_sub_new_node:
+                    right_sub_new_node.prior_node = [new_gsystem._id]
+                    right_sub_new_node.save()
+
+                thread_node_gattr_cur = triple_collection.find({'_type': 'GAttribute',
+                 'subject': right_subj_node._id})
+
+                for each_gattr in thread_node_gattr_cur:
+                    at_id = each_gattr['attribute_type']
+                    obj_val = each_gattr['object_value']
+                    at_node = node_collection.one({'_id': ObjectId(at_id)})
+                    create_gattribute(right_sub_new_node._id,at_node,obj_val)
+
+        else:
+            cloned_rs_ids = []
+            for eachrsval_id in eachrsval:
+                right_subj_node = node_collection.one({'_id': ObjectId(eachrsval_id)})
+                right_sub_new_node = create_clone(user_id, right_subj_node, group_id)
+                cloned_rs_ids.append(right_sub_new_node._id)
+            create_grelation(new_gsystem._id,rt_node,cloned_rs_ids)
+
+    if "QuizItemEvent" in new_gsystem.member_of_names_list:
+        if not thread_created and request:
+            thread_obj = create_thread_for_node(request,group_id, new_gsystem)
+            # To maintain the thread-node relation using prior_node field
+
+    if "raw@material" in new_gsystem.tags and request and "File" in new_gsystem.member_of_names_list:
+        if not thread_created:
+            thread_obj = create_thread_for_node(request,group_id, new_gsystem)
+            if thread_obj:
+                thread_obj.prior_node = [new_gsystem._id]
+                thread_obj.save()
+    '''
+
+@get_execution_time
+def replicate_resource(request, node, group_id, mem_of_node_id=None):
     try:
         create_thread_for_node_flag = True
         if request:
             user_id = request.user.id
         else:
             user_id = 1
-        new_gsystem = create_clone(user_id, node, group_id)
+        new_gsystem = create_clone(user_id, node, group_id, mem_of_node_id=mem_of_node_id)
         thread_created = False
 
         if new_gsystem:
             # FORKING TRIPLES
 
             ##### TRIPLES GATTRIBUTES
-            node_gattr_cur = triple_collection.find({'_type': 'GAttribute', 'subject': node._id})
-
-            for each_gattr in node_gattr_cur:
-                at_id = each_gattr['attribute_type']
-                obj_val = each_gattr['object_value']
-                at_node = node_collection.one({'_id': ObjectId(at_id)})
-                create_gattribute(new_gsystem._id,at_node,obj_val)
-
-            ##### TRIPLES GRELATIONS
-            node_grel_cur = triple_collection.find({'_type': 'GRelation', 'subject': node._id, 'status': u'PUBLISHED'})
+            # commented below line fetching only PUBLISHED triple objects. 
+            # node_grel_cur = triple_collection.find({'_type': 'GRelation', 'subject': node._id, 'status': u'PUBLISHED'})
             # To handle multiple GRelations of same RT i.e of object_cardinality  > 1
             # If looped over the list and called create_grelation multiple time, this will create
             # all grelations but will set PUBLISHED status for ONLY the last one and mark as DELETED the earlier ones
             # Hence making use of following dictionary
 
-
-            relation_dict_rt_key_rs_val = {}
-            for each_rel in node_grel_cur:
-                rt_id = each_rel['relation_type']
-                right_subj = each_rel['right_subject']
-                if rt_id in relation_dict_rt_key_rs_val.keys() :
-                    val_list = relation_dict_rt_key_rs_val[rt_id]
-                    if not isinstance(val_list,list):
-                        rs_list = []
-                        rs_list.append(val_list)
-                        rs_list.append(right_subj)
-                        relation_dict_rt_key_rs_val[rt_id] = rs_list
-                    else:
-                        relation_dict_rt_key_rs_val[rt_id].append(right_subj)
-                else:
-                    relation_dict_rt_key_rs_val[rt_id] = right_subj
-            # print "\n\n relation_dict_rt_key_rs_val === ",relation_dict_rt_key_rs_val
-
-            for eachrtid, eachrsval in relation_dict_rt_key_rs_val.items():
-                rt_node = node_collection.one({'_id': ObjectId(eachrtid)})
-                if isinstance(eachrsval, ObjectId):
-                    right_subj_node = node_collection.one({'_id': ObjectId(eachrsval)})
-                    right_sub_new_node = create_clone(user_id, right_subj_node, group_id)
-                    create_grelation(new_gsystem._id,rt_node,right_sub_new_node._id)
-                else:
-                    cloned_rs_ids = []
-                    for eachrsval_id in eachrsval:
-                        right_subj_node = node_collection.one({'_id': ObjectId(eachrsval_id)})
-                        right_sub_new_node = create_clone(user_id, right_subj_node, group_id)
-                        cloned_rs_ids.append(right_sub_new_node._id)
-                    create_grelation(new_gsystem._id,rt_node,cloned_rs_ids)
-
-                # To maintain the thread-node relation using prior_node field
-                if rt_node.name == 'has_thread':
-                    thread_created = True
-                    if right_sub_new_node:
-                        right_sub_new_node.prior_node = [new_gsystem._id]
-                        right_sub_new_node.save()
-
-            if "QuizItemEvent" in new_gsystem.member_of_names_list:
-                if not thread_created and request:
-                    thread_obj = create_thread_for_node(request,group_id, new_gsystem)
+            pull_triples(source_node=node, target_node=new_gsystem, 
+                            group_id=group_id, user_id=user_id)
 
         # clone_of_RT = node_collection.one({'_type': "RelationType", 'name': "clone_of"})
         # create_grelation(new_gsystem._id, clone_of_RT, node._id)
@@ -5457,7 +5618,11 @@ def replicate_resource(request, node, group_id):
         #         has_thread_rt = node_collection.one({"_type": "RelationType", "name": u"has_thread"})
         #         gr = create_grelation(new_gsystem._id, has_thread_rt, thread_obj._id)
 
-
+        if "QuizItem" in node.member_of_names_list or "QuizItemEvent" in node.member_of_names_list:
+            from gnowsys_ndf.ndf.templatetags.ndf_tags import get_thread_node
+            thread_obj = get_thread_node(new_gsystem._id)
+            if not thread_obj:
+                thread_obj = create_thread_for_node(request,group_id, new_gsystem)
         # if "QuizItem" in node.member_of_names_list or "QuizItemEvent" in node.member_of_names_list:
         #     # from gnowsys_ndf.ndf.templatetags.ndf_tags import get_relation_value
 
@@ -5726,3 +5891,97 @@ def get_course_completetion_status(group_obj, user_id,ids_list=False):
     except Exception as error_in_get_course_completion_status:
       # print "\n ERROR in get_course_completetion_status", error_in_get_course_completion_status
       return result_dict
+
+def get_all_iframes_of_unit(group_obj, domain):
+    # tuple : [[assessment.Bank<id>, assessment.Offered<id>],
+    # [assessment.Bank<id>, assessment.Offered<id>]]
+    # ref: https://docs.python.org/2.7/library/urlparse.html#urlparse.parse_qsl
+    from bs4 import BeautifulSoup
+    result_set = []
+    assessment_str = "assessment.Bank"
+    group_id  = group_obj._id
+    try:
+        gst_page_name, gst_page_id = GSystemType.get_gst_name_id("Page")
+        gst_wiki_page_name, gst_wiki_page_id = GSystemType.get_gst_name_id("Wiki page")
+
+        # Fech all pages having assessments embedded into it
+        pages_holding_assessments_cur = node_collection.find({
+                    'group_set': ObjectId(group_id),
+                    'member_of': gst_page_id,
+                    'type_of': {'$ne': gst_wiki_page_id},
+                    'content': {'$regex': assessment_str, '$options': "i"}
+            })
+
+
+        # From each page's content collect the assessment iframe
+        for each_node in pages_holding_assessments_cur:
+            all_iframes = BeautifulSoup(
+                each_node.content, 'html.parser').find_all(
+                'iframe',src=re.compile(assessment_str)
+            )
+            for each_iframe in all_iframes:
+                try:
+                    bank_offered_id = parse_assessment_url(each_iframe["src"])
+                    if bank_offered_id not in result_set:
+                        result_set.append(bank_offered_id)
+                except Exception as iframe_update_err:
+                    print "\nError Occurred in calling parse_assessment_url() {0}".format(
+                        iframe_update_err)
+                    pass
+        '''
+        AT: "assessment_list" will hold `result_set = [[a,b], [x,y]]`
+            where 'a' and 'x' represent bank id &
+            where 'b' and 'y' represent assessment_offered_id
+        '''
+        create_gattribute(group_id, "assessment_list", result_set)
+        group_obj.reload()
+        print "\nresult_set: ", result_set
+        update_total_assessment_items(group_id, result_set, domain)
+        group_obj.reload()
+    except Exception as get_all_iframes_of_unit_err:
+        print "\nError Occurred in get_all_iframes_of_unit() {0}".format(
+            get_all_iframes_of_unit_err)
+        pass
+
+    return group_obj
+
+def parse_assessment_url(url_as_str):
+    import urlparse
+    bank_offered_id = [None,None]
+    try:
+        parsed_src = urlparse.urlparse(url_as_str)
+        get_params = urlparse.parse_qsl(parsed_src.query)
+        # print "\nget_params: ", get_params
+        for param in get_params:
+            if 'bank' in param[0]:
+                bank_offered_id[0] = param[1]
+            if 'assessment_offered_id' in param[0]:
+                bank_offered_id[1] = param[1]
+        return bank_offered_id
+    except Exception as iframe_update_err:
+        print "\nError Occurred in parse_assessment_url() {0}".format(
+            iframe_update_err)
+        return bank_offered_id
+
+def update_total_assessment_items(group_id, assessment_list, domain):
+    from gnowsys_ndf.ndf.views.assessment_analytics import items_count_from_asessment_offered
+    import urllib
+    questionCount_val = 0
+    try:
+        for each_assessment_list in assessment_list:
+            items_count = items_count_from_asessment_offered(domain,each_assessment_list[0],each_assessment_list[1])
+            questionCount_val = questionCount_val + items_count
+            print "\nquestionCount_val: ", questionCount_val
+
+        '''
+        AT: "total_assessment_items" will hold `questionCount_val = x`
+            where 'x' represent count of questions
+        '''
+
+        print "\nAC: ", questionCount_val
+        create_gattribute(group_id, "total_assessment_items", questionCount_val)
+        return questionCount_val
+    except Exception as update_total_assessment_items_err:
+        print "\nError Occurred in update_total_assessment_items() {0}".format(
+            update_total_assessment_items_err)
+        return questionCount_val

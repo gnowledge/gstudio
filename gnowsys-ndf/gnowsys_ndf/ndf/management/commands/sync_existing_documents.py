@@ -9,9 +9,10 @@ except ImportError:  # old pymongo
   from pymongo.objectid import ObjectId
 
 ''' imports from application folders/files '''
-from gnowsys_ndf.ndf.models import node_collection, triple_collection
-from gnowsys_ndf.ndf.models import Node, db, AttributeType, RelationType
-from gnowsys_ndf.settings import GSTUDIO_AUTHOR_AGENCY_TYPES, LANGUAGES, OTHER_COMMON_LANGUAGES
+from gnowsys_ndf.ndf.models import node_collection, triple_collection, counter_collection
+from gnowsys_ndf.ndf.models import Node, db, AttributeType, RelationType, GSystem, GSystemType
+from gnowsys_ndf.settings import GSTUDIO_AUTHOR_AGENCY_TYPES, LANGUAGES, OTHER_COMMON_LANGUAGES, GSTUDIO_DEFAULT_SYSTEM_TYPES_LIST
+from gnowsys_ndf.settings import GSTUDIO_DEFAULT_LICENSE, GSTUDIO_DEFAULT_LANGUAGE, GSTUDIO_DEFAULT_COPYRIGHT
 from gnowsys_ndf.ndf.views.methods import create_gattribute, create_grelation
 from gnowsys_ndf.ndf.templatetags.ndf_tags import get_relation_value, get_attribute_value
 
@@ -22,10 +23,99 @@ class Command(BaseCommand):
       + "(only if they doesn't exists) in your database."
 
   def handle(self, *args, **options):
+
     # Keep latest changes in field(s) to be added at top
 
+    # updating project_config for Groups
+    proj_config = node_collection.collection.update({'_type':{'$in': [u'Author', u'Group']},'project_config': {'$exists': False} },{'$set': {'project_config': {} }}, upsert=False, multi=True)
+
+    # updating visited_nodes for Counter instances
+    counter_objs = counter_collection.collection.update({'_type': 'Counter',
+        'visited_nodes': {'$exists': False}},
+        {'$set': {'visited_nodes': {}}},upsert=False, multi=True)  
+    if counter_objs['nModified']:
+        print "\n Updated Counters adding field: visited_nodes for " + counter_objs['nModified'].__str__() + " instances."
+          
+
+    # updating access_policy from inconsistent values like 'public', 'Public' to 'PUBLIC'
+    all_ap = node_collection.collection.update({'_type': {'$nin': [u'ToReduceDocs']},
+     'access_policy': {'$in': [u'public', u'Public', '', None]}},
+      {'$set':{'access_policy': u'PUBLIC'} }, upsert=False, multi=True)
+    if all_ap['nModified']:
+        print "\n `access_policy`: Replaced non u'PUBLIC' values of public nodes to u'PUBLIC' for : " + all_ap['nModified'].__str__() + " instances."
+
+    # --------------------------------------------------------------------------
+    # All Triples - Replacing <'lang': ''> field to <'language': []>
+    # i.e: removing first 'lang' then adding 'language' with data type: (basestring, basestring)
+    all_tr = triple_collection.collection.update({'lang': {'$exists': True}}, {'$unset':{'lang': None}, '$set':{'language': GSTUDIO_DEFAULT_LANGUAGE} }, upsert=False, multi=True)
+    if all_tr["updatedExisting"] and all_tr["nModified"]:
+        print "\n Replaced 'lang' fields to 'language' for : " + all_tr['nModified'].__str__() + " Triples (AttributeType and RelationType) instances."
+
+
+    # Adds "legal" field (with default values) to all documents belonging to GSystems.
+    all_gs = node_collection.collection.update({'_type': {'$in' : ['GSystem', 'Group', 'Author', 'File']},
+                 '$or': [{'legal': {'$exists': False}}, {'license': {'$exists': True}}],
+                },
+        {'$set': {'legal': {'copyright': GSTUDIO_DEFAULT_COPYRIGHT, 'license': GSTUDIO_DEFAULT_LICENSE}}, 
+        '$unset': {'license': None}},upsert=False, multi=True)  
+
+
+    # all_gs = node_collection.find({'_type': {'$in' : ['GSystem', 'Group', 'Author', 'File']},
+    #              '$or': [{'legal': {'$exists': False}}, {'license': {'$exists': True}}],
+    #             })
+    # all_gs_count = all_gs.count()
+    # if all_gs:
+    #     print "\n Total GSystems found to update 'legal' field: ", all_gs.count()
+    #     for index, each_gs in enumerate(all_gs):
+    #         try:
+    #             print "\n GSystem: ", index, ' of ', all_gs_count
+    #             each_gs.legal = {'copyright': each_gs.license, 'license': GSTUDIO_DEFAULT_LICENSE}
+    #             each_gs.pop('license')
+    #             each_gs.save()
+    #         except AttributeError as noLicense:
+    #             print "\n No license found for: ", each_gs._id
+    #             pass
+
+    # --------------------------------------------------------------------------
+    # Adding <'relation_type_scope': []> field to all RelationType objects
+    print "\nUpdating RelationTypes and AttributeTypes."
+    rt_res = node_collection.collection.update({'_type': 'RelationType', \
+        'relation_type_scope': {'$exists': False} }, \
+        {'$set': {'relation_type_scope': [], 'object_scope': [],\
+         'subject_scope': [] }}, upsert=False, multi=True)
+
+    if rt_res['updatedExisting']: # and res['nModified']:
+        print "\n Added 'scope' fields to " + rt_res['n'].__str__() + " RelationType instances."
+
+    at_res = node_collection.collection.update({'_type': 'AttributeType',\
+     'attribute_type_scope': {'$exists': False} }, \
+     {'$set': {'attribute_type_scope': [], 'object_scope': [],\
+      'subject_scope': [] }}, upsert=False, multi=True)
+    if at_res['updatedExisting']: # and res['nModified']:
+        print "\n Added 'scope' fields to " + at_res['n'].__str__() + " AttributeType instances."
+
+    print "\nUpdating GRelations and GAttributes."
+    grel_res = triple_collection.collection.update({'_type': 'GRelation',\
+     '$or': [{'relation_type_scope': {'$eq': None}}, {'subject_scope': \
+     {'$exists': False}}, {'object_scope': {'$exists': False}}]},\
+     {'$unset': { 'right_subject_scope': ""} , '$set': \
+     {'relation_type_scope': {}, 'object_scope': None,\
+     'subject_scope': None }}, upsert=False, multi=True)
+    if grel_res['updatedExisting']: # and grel_res['nModified']:
+        print "\n Added 'scope' fields to " + grel_res['n'].__str__() + " GRelation instances."
+
+    gattr_res = triple_collection.collection.update({'_type': 'GAttribute',\
+     '$or': [{'attribute_type_scope': {'$eq': None}}, {'subject_scope': \
+     {'$exists': False}}, {'object_scope': {'$exists': False}}]}, \
+     {'$unset': { 'object_value_scope': ""} , '$set': \
+     {'attribute_type_scope': {}, 'object_scope': None, \
+     'subject_scope': None }}, upsert=False, multi=True)
+    if gattr_res['updatedExisting']: # and gattr_res['nModified']:
+        print "\n Added 'scope' fields to " + gattr_res['n'].__str__() + " GAttribute instances."
+    # --------------------------------------------------------------------------
+
     # updating GRelation nodes to replace relation_type's data of DBRef with ObjectId.
-    # 
+    #
     # all_grelations = triple_collection.find({'_type': 'GRelation'}, time_out=False)
     # all_grelations = triple_collection.find({'_type': 'GRelation','relation_type': {'$type': 'object'}})
     all_grelations = triple_collection.find({
@@ -41,13 +131,14 @@ class Command(BaseCommand):
         rt_obj = RelationType(db.dereference(each_grelation.relation_type))
         each_grelation.relation_type = rt_obj._id
         try:
-            each_grelation.save(triple_node=rt_obj,triple_id=rt_obj._id)
+            # each_grelation.save(triple_node=rt_obj,triple_id=rt_obj._id)
+            each_grelation.save()
         except Exception as er:
             print "\n Error Occurred while updating Triples data. ", er
             pass
-                
+
     # updating GRelation nodes to replace relation_type's data of DBRef with ObjectId.
-    # 
+    #
     # all_gattributes = triple_collection.find({'_type': 'GAttribute'}, time_out=False)
     # all_gattributes = triple_collection.find({'_type': 'GAttribute', 'attribute_type': {'$type': 'object'}})
     all_gattributes = triple_collection.find({
@@ -61,7 +152,30 @@ class Command(BaseCommand):
         print '.',
         at_obj = AttributeType(db.dereference(each_gattribute.attribute_type))
         each_gattribute.attribute_type = at_obj._id
-        each_gattribute.save(triple_node=at_obj,triple_id=at_obj._id)
+        # each_gattribute.save(triple_node=at_obj,triple_id=at_obj._id)
+        each_gattribute.save()
+    # --------------------------------------------------------------------------
+
+    # adding 'assessments' in Counter instances:
+    # 'assessment': {
+    #             'offered_id': {'total': int, 'correct': int, 'incorrect': int}
+    #             }
+
+
+    ctr_res = counter_collection.collection.update({
+                    '_type': 'Counter',
+                    '$or': [{'assessment': {'$exists': False}}, {'assessment': {'$not': {'$type': "array"}}}]
+                },
+                {
+                    '$set': {
+                            'assessment': [],
+                        }
+                },
+                upsert=False, multi=True)
+
+    if ctr_res['updatedExisting']: # and ctr_res['nModified']:
+        print "\n Added 'assessment' field to " + ctr_res['n'].__str__() + " Counter instances."
+
 
     # adding 'if_file' in GSystem instances:
     # 'if_file': {
@@ -71,7 +185,7 @@ class Command(BaseCommand):
     #         'thumbnail': {'_id': None, 'relurl': None}
     #     },
     gsres = node_collection.collection.update({
-                    '_type': {'$in': [u'GSystem', u'File', u'Group']},
+                    '_type': {'$in': [u'GSystem'] + GSystem.child_class_names()},
                     'if_file': {'$exists': False}
                 },
                 {
@@ -90,6 +204,24 @@ class Command(BaseCommand):
         print "\n Added 'if_file' field to " + gsres['n'].__str__() + " GSystem instances."
 
 
+    # Adds "legal" field (with default values) to all documents belonging to GSystems.
+    all_gs = node_collection.find({'_type': {'$in' : ['GSystem', 'Group', 'Author', 'File']},
+                 '$or': [{'legal': {'$exists': False}}, {'license': {'$exists': True}}],
+                })
+    all_gs_count = all_gs.count()
+    print "\n Total GSystems found to update 'legal' field: ", all_gs_count
+    for index, each_gs in enumerate(all_gs):
+        try:
+            print "\n GSystem: ", index, ' of ', all_gs_count
+            each_gs.legal = {'copyright': each_gs.license, 'license': GSTUDIO_DEFAULT_LICENSE}
+            each_gs.pop('license')
+            each_gs.save()
+        except AttributeError as noLicense:
+            print "\n No license found for: ", each_gs._id
+            pass
+
+
+
     # --------------------------------------------------------------------------
     # Adding <'origin': []> field to all objects and inheritance of GSystem class
     # fetching all GSystem and it's inheritance class objects
@@ -104,9 +236,15 @@ class Command(BaseCommand):
 
     # Updating language fields data type:
     # - Firstly, replacing None to ('en', 'English')
-    node_collection.collection.update({ '_type': {'$in': ['AttributeType', 'RelationType', 'MetaType', 'ProcessType', 'GSystemType', 'GSystem', 'File', 'Group', 'Author']}, 'language': {'$in': [None, '', u'']} }, {"$set": {"language": ('en', 'English')}}, upsert=False, multi=True)
+    node_collection.collection.update({ '_type': {'$in': ['AttributeType',\
+     'RelationType', 'MetaType', 'ProcessType', 'GSystemType', 'GSystem',\
+      'File', 'Group', 'Author']}, 'language': {'$in': [None, '', u'']} },\
+       {"$set": {"language": ('en', 'English')}}, upsert=False, multi=True)
 
-    all_nodes = node_collection.find({'_type': {'$in': ['AttributeType', 'RelationType', 'MetaType', 'ProcessType', 'GSystemType', 'GSystem', 'File', 'Group', 'Author']} }, time_out=False)
+    # language tuple gets save as list type.
+    all_nodes = node_collection.find({'_type': {'$in': ['AttributeType',\
+     'RelationType', 'MetaType', 'ProcessType', 'GSystemType', 'GSystem',\
+      'File', 'Group', 'Author']}, 'language': {'$ne': ['en', 'English']} })
 
     all_languages = list(LANGUAGES) + OTHER_COMMON_LANGUAGES
     all_languages_concanated = reduce(lambda x, y: x+y, all_languages)
@@ -131,16 +269,17 @@ class Command(BaseCommand):
 
     # updating author_set of desk and home group w.ref. to home group's author_set
     home_group = node_collection.one({"_type":"Group", "name": "home"})
-    prev_home_author_set = home_group.author_set
-    total_author_set = list(set(authors_list + home_group.author_set))
+    if home_group:
+        prev_home_author_set = home_group.author_set
+        total_author_set = list(set(authors_list + home_group.author_set))
 
-    result = node_collection.collection.update({"_type": "Group", "name": {"$in": [u"home", u"desk"]}, "author_set": {"$ne": total_author_set} }, {"$set": {"author_set": total_author_set}}, upsert=False, multi=True )
+        result = node_collection.collection.update({"_type": "Group", "name": {"$in": [u"home", u"desk"]}, "author_set": {"$ne": total_author_set} }, {"$set": {"author_set": total_author_set}}, upsert=False, multi=True )
 
-    if result['updatedExisting']: # and result['nModified']:
-        home_group.reload()
-        print "\n Updated author_set of 'home' and 'desk' group:" + \
-            "\n\t - Previously it was   : " + str(len(prev_home_author_set)) + " users."\
-            "\n\t - Now it's updated to : " + str(len(home_group.author_set)) + " users."
+        if result['updatedExisting']: # and result['nModified']:
+            home_group.reload()
+            print "\n Updated author_set of 'home' and 'desk' group:" + \
+                "\n\t - Previously it was   : " + str(len(prev_home_author_set)) + " users."\
+                "\n\t - Now it's updated to : " + str(len(home_group.author_set)) + " users."
 
 
     # --------------------------------------------------------------------------
@@ -204,7 +343,7 @@ class Command(BaseCommand):
     # Replacing object_type of "trainer_of_course" & "master_trainer_of_course"
     # relationship from "Announced Course" to "NUSSD Course"
     nussd_course = node_collection.one({
-        '_type': "GSystemType", 'name': "NUSSD Course"
+        '_type': "GSystemType", 'name': "NUSSDCourse"
     })
     if nussd_course:
         nussd_course_id = nussd_course._id
@@ -406,59 +545,61 @@ class Command(BaseCommand):
 
     # Updates already created has_profile_pic grelations' status - Except latest one (PUBLISHED) others' are set to DELETED
     has_profile_pic = node_collection.one({'_type': "RelationType", 'name': u"has_profile_pic"})
-    op = triple_collection.collection.aggregate([
-        {'$match': {
-        '_type': "GRelation",
-        'relation_type': has_profile_pic._id
-        }},
-        {'$group': {
-        '_id': {'auth_id': "$subject"},
-        'pp_data': {'$addToSet': {'gr_id': "$_id", 'status': "$status"}}
-        }}
-    ])
+    if has_profile_pic:
+        op = triple_collection.collection.aggregate([
+            {'$match': {
+            '_type': "GRelation",
+            'relation_type': has_profile_pic._id
+            }},
+            {'$group': {
+            '_id': {'auth_id': "$subject"},
+            'pp_data': {'$addToSet': {'gr_id': "$_id", 'status': "$status"}}
+            }}
+        ])
 
-    res = 0
-    for each in op["result"]:
-        auth_id = each["_id"]["auth_id"]
-        pub_id = None
-        pub_res = 0
-        del_id = []
-        del_res = 0
+        res = 0
+        for each in op["result"]:
+            auth_id = each["_id"]["auth_id"]
+            pub_id = None
+            pub_res = 0
+            del_id = []
+            del_res = 0
 
-        for l in each["pp_data"]:
-            if l["status"] == u"PUBLISHED":
-                pub_id = l["gr_id"]
+            for l in each["pp_data"]:
+                if l["status"] == u"PUBLISHED":
+                    pub_id = l["gr_id"]
 
-            else:
-                del_id.append(l["gr_id"])
+                else:
+                    del_id.append(l["gr_id"])
 
-        if not pub_id:
-            pub_id = each["pp_data"][len(each["pp_data"])-1]["gr_id"]
-            pub_res = node_collection.collection.update({'_id': pub_id}, {'$set': {'status': u"PUBLISHED"}}, upsert=False, multi=False)
-            pub_res = pub_res['n']
-            del_id.pop()
+            if not pub_id:
+                pub_id = each["pp_data"][len(each["pp_data"])-1]["gr_id"]
+                pub_res = node_collection.collection.update({'_id': pub_id}, {'$set': {'status': u"PUBLISHED"}}, upsert=False, multi=False)
+                pub_res = pub_res['n']
+                del_id.pop()
 
-        del_res = node_collection.collection.update({'_id': {'$in': del_id}}, {'$set': {'status': u"DELETED"}}, upsert=False, multi=True)
+            del_res = node_collection.collection.update({'_id': {'$in': del_id}}, {'$set': {'status': u"DELETED"}}, upsert=False, multi=True)
 
-        if pub_res or del_res['n']:
-            res += 1
+            if pub_res or del_res['n']:
+                res += 1
 
-    if res:
-        print "\n Updated following no. of has_profile_pic GRelation document(s): ", res
+        if res:
+            print "\n Updated following no. of has_profile_pic GRelation document(s): ", res
 
     # Updates the value of object_cardinality to 100. So that teaches will behave as 1:M (one-to-many) relation.
     teaches = node_collection.one({'_type': "RelationType", 'name': "teaches"})
-    res = node_collection.collection.update({'_id': teaches._id, 'object_cardinality': {'$ne': 100}},
-            {'$set': {'object_cardinality': 100}},
-            upsert=False, multi=False
-        )
-    if res["updatedExisting"]:
-        print "\n 'teaches' RelationType updated with object_cardinality: 100. Changed document: ", res['n']
-    else:
-        print "\n 'teaches' RelationType: no need to update."
+    if teaches:
+        res = node_collection.collection.update({'_id': teaches._id, 'object_cardinality': {'$ne': 100}},
+                {'$set': {'object_cardinality': 100}},
+                upsert=False, multi=False
+            )
+        if res["updatedExisting"]:
+            print "\n 'teaches' RelationType updated with object_cardinality: 100. Changed document: ", res['n']
+        else:
+            print "\n 'teaches' RelationType: no need to update."
 
     # Replacing object_type of "has_course" relationship from "NUSSD Course" to "Announced Course"
-    ann_course = node_collection.one({'_type': "GSystemType", 'name': "Announced Course"})
+    ann_course = node_collection.one({'_type': "GSystemType", 'name': "AnnouncedCourse"})
     if ann_course:
         res = node_collection.collection.update({'_type': "RelationType", 'name': "has_course"},
                 {'$set': {'object_type': [ann_course._id]}},
@@ -483,6 +624,8 @@ class Command(BaseCommand):
     if res['updatedExisting']: # and res['nModified']:
         print "\n 'attribute_set' field added to following no. of documents: ", res['n']
 
+    '''
+    Replace foll. with legal field update code - katkamrachana
     # Adds "license" field (with default value as "") to all documents belonging to GSystems.
     res = node_collection.collection.update({'_type': {'$nin': ["MetaType", "GSystemType", "RelationType", "AttributeType", "GRelation", "GAttribute", "ReducedDocs", "ToReduceDocs", "IndexedWordList", "node_holder"]}, 'license': {'$exists': False}},
                             {'$set': {'license': None}},
@@ -490,6 +633,7 @@ class Command(BaseCommand):
     )
     if res['updatedExisting']: # and res['nModified']:
         print "\n 'license' field added to following no. of documents: ", res['n']
+    '''
 
     # Adding "Agency_type" field adding to group documents with default values
     res = node_collection.collection.update({'_type': {'$in': ['Group']}, 'agency_type': {'$exists': False}},
@@ -681,10 +825,10 @@ class Command(BaseCommand):
     #         print i.name,"Page already Updated"
 
     nodes = node_collection.find({"_type":"Author",
-			'$or':[{'language_proficiency':{'$exists':False}},{'subject_proficiency':{'$exists':False}}]})
+            '$or':[{'language_proficiency':{'$exists':False}},{'subject_proficiency':{'$exists':False}}]})
     for i in nodes:
-		    node_collection.collection.update({'_id':ObjectId(i._id)}, {'$set':{'language_proficiency': '','subject_proficiency':'' }},upsert=False, multi=False)
-		    print i.name, "Updated !!"
+            node_collection.collection.update({'_id':ObjectId(i._id)}, {'$set':{'language_proficiency': '','subject_proficiency':'' }},upsert=False, multi=False)
+            print i.name, "Updated !!"
 
 
 
@@ -771,9 +915,67 @@ class Command(BaseCommand):
     '''
     # Correct Eventype and CollegeEventtype Node  by setting their modified by field
     glist = node_collection.one({'_type': "GSystemType", 'name': "GList"})
-    node = node_collection.find({'member_of':ObjectId(glist._id),"name":{'$in':['Eventtype','CollegeEvents']}})
-    for i in node:
-        i.modified_by = 1
-        i.save()
-        print "Updated",i.name,"'s modified by feild from null to 1"
+    if glist:
+        event_type_node_cur = node_collection.find({'member_of':ObjectId(glist._id),"name":{'$in':['Eventtype','CollegeEvents']}})
+        for i in event_type_node_cur:
+            i.modified_by = 1
+            i.save()
+            print "Updated",i.name,"'s modified by feild from null to 1"
 
+    
+
+    # Adding default st. -katkamrachana
+
+    default_st_cur = node_collection.find({'_type': 'GSystemType',
+                    'name': {'$in': GSTUDIO_DEFAULT_SYSTEM_TYPES_LIST}})
+    default_st_ids = [st._id for st in default_st_cur]
+
+
+    print "\n RelationTypes and AttributeTypes to add GSTUDIO_DEFAULT_SYSTEM_TYPES_LIST."
+    rt_res_default_st = node_collection.collection.update({'_type': 'RelationType',
+        '$or': [{'subject_type': {'$nin': default_st_ids}}, {'object_type': {'$nin': default_st_ids}}]}, \
+        {'$addToSet': {'subject_type': {'$each': default_st_ids}, 'object_type': {'$each': default_st_ids},\
+        }}, upsert=False, multi=True)
+
+    if rt_res_default_st['updatedExisting']: # and res['nModified']:
+        print "\n Added 'GSTUDIO_DEFAULT_SYSTEM_TYPES_LIST' ids to " + rt_res_default_st['n'].__str__() + " RelationType instances."
+
+    at_res_default_st = node_collection.collection.update({'_type': 'AttributeType',
+        'subject_type': {'$nin': default_st_ids}}, \
+     {'$addToSet': {'subject_type': {'$each': default_st_ids}}}, upsert=False, multi=True)
+
+    if at_res_default_st['updatedExisting']: # and res['nModified']:
+        print "\n Added 'GSTUDIO_DEFAULT_SYSTEM_TYPES_LIST' ids to " + at_res_default_st['n'].__str__() + " AttributeType instances."
+
+    # For all right_subject nodes of 'translation_of' GRelations,
+    # add member_of of 'trans_node' GST
+    trans_node_gst_name, trans_node_gst_id = GSystemType.get_gst_name_id("trans_node")
+
+    rt_translation_of = Node.get_name_id_from_type('translation_of', 'RelationType', get_obj=True)
+
+    all_translations_grels = triple_collection.find({
+                            '_type': u'GRelation',
+                            'relation_type': rt_translation_of._id
+                        },{'right_subject': 1})
+    right_subj_ids = [each_rs.right_subject for each_rs in all_translations_grels]
+    right_subj_update_res = node_collection.collection.update(
+                                {'_id': {'$in': right_subj_ids}, 'member_of': {'$nin': [trans_node_gst_id]}},
+                                {'$set': {'member_of': [trans_node_gst_id]}},
+                                upsert=False, multi=True)
+    if right_subj_update_res['updatedExisting']: # and res['nModified']:
+        print "\n Added 'trans_node' _id in " + right_subj_update_res['n'].__str__() + " 'translation_of' right_subject instances."
+
+
+    # changing member_of from `activity` to `Page`
+    print "\nReplacing member_of field from 'activity' to'Page'"
+
+    activity_gst = node_collection.one({'_type': 'GSystemType', 'name': 'activity'})
+    if activity_gst:
+      activity_cur = node_collection.find({'member_of': activity_gst._id})
+      print "\n Activities found: ", activity_cur.count()
+      page_gst = node_collection.one({'_type': 'GSystemType', 'name': 'Page'})
+      wiki_page_gst = node_collection.one({'_type': 'GSystemType', 'name': 'Wiki page'})
+      activity_gs_mem_update_res = node_collection.collection.update({'member_of': activity_gst._id},
+        {'$set': {'member_of': [page_gst._id], 'type_of': [wiki_page_gst._id]}} ,upsert=False, multi=True)
+      if activity_gs_mem_update_res['updatedExisting']: # and res['nModified']:
+          print "\n Replaced member_of field from 'activity' to'Page' in " + activity_gs_mem_update_res['n'].__str__() + " instances."

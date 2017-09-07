@@ -115,7 +115,7 @@
 
                 <div class="row image-brief">
                     <div class="small-12 columns">
-                        {% include "ndf/analytics_views.html" %}
+                        {% include "ndf/widget_analytics_views.html" %}
                         {% comment %}
                         <i class="fi-eye"></i>
                         <span>Avg&nbsp;</span>
@@ -170,10 +170,9 @@
                             <div class="content active" id="image-comments">
                                 <div class="row comments-area">
                                     <div class="small-12 columns" >
-                                        {% get_thread_node node.pk as thread_node %}
-                                            {% if thread_node %}
-                                                {% get_disc_replies thread_node group_id global_disc_all_replies as all_replies %}
-                                                {% get_node thread_node as thread_node_obj %}
+                                        {% get_thread_node node.pk as thread_node_obj %}
+                                        {% if thread_node_obj %}
+                                            {% get_disc_replies thread_node_obj.pk group_id global_disc_all_replies as all_replies %}
                                                 {% include 'ndf/ggallery-discussion.html' with node=thread_node_obj var_name="content_org" ckeditor_toolbar="GgallaryCommentsToolbar" %}
                                             {% else %}
                                                 {% get_disc_replies node.pk group_id global_disc_all_replies as all_replies %}

@@ -1,0 +1,207 @@
+{% extends "ndf/gbase.html" %}
+{% load i18n %}
+{% load ndf_tags %}
+
+{% block title %} {{title}} {% endblock %}
+{% block body_content %}
+    <div class="row create_unit">
+        <div class="small-12 columns">
+            <form id ="course_page_form" enctype="multipart/form-data" method="post" action="{% url 'unit_create_edit' group_id %}">{% csrf_token %}
+            <input type="hidden" name="node_id" value="{{unit_node.pk}}">
+                <div class="course_creator_header">
+                    <div class="left course_heading">
+                    <h5> {% if 'Group' in unit_node.member_of_names_list and 'base_unit' not in unit_node.member_of_names_list %} {% trans "Enter Group Name" %} {% else %} {% trans "Enter Unit Name" %} {% endif %} </h5>
+                    </div>
+                    <div class="right course_heading">
+                        {% if unit_node %}
+                        <input id="unit-name" name="name" type="text"  "{% if 'Group' in unit_node.member_of_names_list and 'base_unit' not in unit_node.member_of_names_list %}" placeholder="Enter group name"
+                        "{% else %}" placeholder="Enter unit name" "{% endif %}"
+                        value="{% if unit_node %}{{unit_node.name}}{% endif %}" disabled="disabled" />
+                        {% else %}
+                        <input id="unit-name" name="name" type="text" "{% if 'Group' in unit_node.member_of_names_list and 'base_unit' not in unit_node.member_of_names_list %}" placeholder="Enter group name"
+                        "{% else %}" placeholder="Enter unit name" "{% endif %}"
+                         autofocus onfocus="this.value = this.value;"/>
+                        {% endif %}
+                    </div>
+                </div>
+
+
+                {% if unit_node %}
+                <div class="course_creator_header">
+                    <div class="left course_heading">
+                    <h5>{% trans "Enter alternate Name" %}</h5>
+                    </div>
+                    <div class="right course_heading">
+                        <input id="unit-altname" name="altnames" type="text" placeholder="Enter alternate name"
+                        value="{% firstof unit_node.altnames unit_node.name %}" autofocus onfocus="this.value = this.value;"/>
+
+                    </div>
+                </div>
+                {% endif %}
+
+                <hr/>
+                {% if 'Group' not in unit_node.member_of_names_list or 'base_unit' in unit_node.member_of_names_list or 'announced_unit' in unit_node.member_of_names_list %}
+                <div class="course_creator_header">
+                    <div class="left course_heading">
+                    <h5>{% trans "Select Module" %}</h5>
+                    </div>
+                    <div class="right course_heading_unit" style="height:49px;">
+                         <select name="module" multiple style="height:46px;">
+                            <option value="">{% trans "Choose Module" %}</option>
+                            {% for opts in modules %}
+                                <option value="{{opts.pk}}" {% if opts.pk in module_val_list %} selected {% endif %}>{{opts.name}}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                </div>
+
+                {% get_metadata_values "educationallevel" as metadata_educationallevel %}
+                {% get_attribute_value unit_node.pk 'educationallevel' as educationallevel_val %}
+                <div class="course_creator_header">
+                    <div class="left course_heading">
+                    <h5>{% trans "Select Grade" %}</h5>
+                    </div>
+                    <div class="right course_heading_unit">
+                         <select name="educationallevel">
+                            <option selected>{% trans "Choose Grade" %}</option>
+                            {% for opts in metadata_educationallevel %}
+                                <option {% if educationallevel_val == opts %} selected {% endif %}>{{opts}}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                </div>
+
+                {% get_metadata_values "educationalsubject" as metadata_educationalsubject %}
+                {% get_attribute_value unit_node.pk 'educationalsubject' as educationalsubject_val %}
+                <div class="course_creator_header">
+                    <div class="left course_heading">
+                    <h5>{% trans "Select Subject" %}</h5>
+                    </div>
+                    <div class="right course_heading_unit">
+                         <select name="educationalsubject">
+                            <option selected>{% trans "Choose Subject" %}</option>
+                            {% for opts in metadata_educationalsubject %}
+                                <option {% if educationalsubject_val == opts %} selected {% endif %}>{{opts}}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                </div>
+                {% endif %}
+                <div class="course_creator_header">
+                    <div class="left course_heading">
+                    <h5>{% trans "Select Language" %}</h5>
+                    </div>
+                    <div class="right course_heading_unit">
+                         <select class="activity-lang" name="lan" id="activity_lang" >
+                            {% get_language_info_list for LANGUAGES as languages %}
+
+                            {% for language in languages %}
+                                {% if unit_node.language.0 == language.code %}
+                                    <option selected value="{{ language.code }}" data-sub-lang="{{ language.name }}" data-sub-code="{{ language.code }}">
+                                      {{ language.name }}
+                                {% else %}
+                                    <option value="{{ language.code }}" data-sub-lang="{{ language.name }}" data-sub-code="{{ language.code }}">
+                                      {{ language.name }}
+                                    </option>
+                                {% endif %}
+                            {% endfor %}
+                          </select>
+                    </div>
+                </div>
+                
+                <div class="course_creator_header">
+                    <div class="left course_heading">
+                    <h5>Enter tab name</h5>
+                    </div>
+                    <div class="right course_heading_unit">
+                         <input id="tab-name" name="tab_name" value="{{unit_node.project_config.tab_name}}" type="text" placeholder="Enter tab name"/>
+                    </div>
+                </div>
+                <div class="course_creator_header">
+                    <div class="left course_heading">
+                    <h5>Enter Section Name</h5>
+                    </div>
+                    <div class="right course_heading_unit">
+                         <input id="section-name" name="section_name" value="{{unit_node.project_config.section_name}}"  type="text" placeholder="Enter Section name"/>
+                    </div>
+                </div>
+                <div class="course_creator_header">
+                    <div class="left course_heading">
+                    <h5>Enter Sub Section name</h5>
+                    </div>
+                    <div class="right course_heading_unit">
+                         <input id="subsection-name" name="subsection_name" value="{{unit_node.project_config.subsection_name}}" type="text" placeholder="Enter Sub Section name"/>
+                    </div>
+                </div>
+                <div class="course_creator_header">
+                    <div class="left course_heading">
+                    <h5>{% trans "Group Type" %}</h5>
+                    </div>
+                    <div class="right course_heading_unit">
+                         {% get_possible_group_type_values as poss_gr_type %}
+                            <select name="group_type" class="gtype">
+                              {% for each_gtype in poss_gr_type %}
+                                <option {% if each_gtype == unit_node.group_type %}selected=selected{% endif %}>
+                                  {{each_gtype}}
+                                </option>
+                              {% endfor %}
+                            </select>
+                    </div>
+                </div>
+                
+                <div class=" course_heading_unit tags-container">
+                 {% include 'ndf/widget_tags.html' with node=unit_node %}
+
+                </div>
+
+                <hr/>
+                <label style="color:red;" class="right hide duplicate_unit_name">{% trans "Unit with same name exists" %}. {% trans "Please choose another name" %}.</label>
+                <div class="course_creator_header unit_editor">
+                    <div class="left course_heading">
+                    <h5>{% trans "Enter Description" %}</h5>
+                    </div>
+                    <div class="right course_heading_unit">
+                        {% include "ndf/html_editor.html" with var_name="content" var_placeholder="Enter the content here" var_value=unit_node.content|default_if_none:"" node_id=unit_node.pk ckeditor_toolbar="GeneralToolbar" %}
+                    </div>
+                </div>
+                <br/>
+                <div class="row">
+                    {% comment %}
+                        <button type="button" class ="right asset-unit-button" id="save_unit">Save</button>
+                    {% endcomment %}
+                    <!-- <input type="button" class="asset-unit-button right" value="Cancel"/> -->
+                    <a href="{% if unit_node %} {% url 'groupchange' unit_node.pk %}{% else %} {% url 'explore_basecourses' %}{% endif %} " class="asset-unit-button right" value="Cancel"/>{% trans "Cancel" %}</a>
+                    <input type="submit" class="asset-unit-button right" id="save_unit" value="Save"/>
+                </div>
+            </form>
+        </div>
+    </div>
+    <script type="text/javascript">
+        var group_names_list = {{all_groups_names|safe}}
+        $("#save_unit").click(function(event) {
+            updateAllTags();
+
+        var tagsStr = tags.value.trim();
+        if(checkTag())
+        {
+            $("input:hidden[name='tags']").val($("input:hidden[name='tags']").val() + ', ' + tagsStr);
+        }
+        else if(tagsStr)
+        {
+            event.preventDefault();
+        }
+        {% if not unit_node %}
+            unit_name = $("#unit-name").val()
+            if (group_names_list.indexOf(unit_name) != -1){
+                $(".duplicate_unit_name").removeClass("hide")
+                event.preventDefault();
+            }
+            else{
+                $(".duplicate_unit_name").addClass("hide")
+            }
+        {% endif %}
+        })
+
+    </script>
+{% endblock %}
+

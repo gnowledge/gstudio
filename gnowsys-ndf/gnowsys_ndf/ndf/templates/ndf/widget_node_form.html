@@ -1,0 +1,96 @@
+{% load i18n %}
+
+<div class="row group_content">
+    <div class="small-12 columns  group_sections_content">
+        <form enctype="multipart/form-data" method="post" action="{{post_url}}" class="node-create-edit-form">
+            {% csrf_token %}
+            <!-- _id -->
+            <input type="hidden" name="_id" value="{{node_obj.pk}}">
+
+            <!-- name -->
+            <div>
+                <div class="left">
+                <h5>{% trans "Name" %}</h5>
+                <div class="gray-text"></div>
+                </div>
+                <div class="small-11 medium-11 large-11 columns">
+                    <input name="name" type="text" class="orange-button node_name" style="margin-top:11px;margin-left:40px" placeholder="Enter Name"  
+                    value="{{node_obj.name|safe}}"/>
+                    <label class="node_name_empty hide" style="color:red">{% trans "Please enter Name" %}</label>
+
+                </div>
+                <br><br><br>
+                {% if not no_altnames %}
+                <div class="left">
+                <h5>{% trans "Display Name" %}</h5>
+                <div class="gray-text"></div>
+                </div>
+                <div class="small-11 medium-11 large-11 columns">
+                    <input name="altnames" type="text" class="orange-button node_altnames" style="margin-top:11px;margin-left:40px" placeholder="Enter Display Name"  
+                    value="{{node_obj.altnames}}"/>
+
+                </div>
+                {% endif %}
+                {{source_obj.name}}
+            </div>
+
+
+            <!-- content -->
+            <div>
+                <div class="left">
+                <h5>{% trans "Description" %}</h5>
+                </div><br/> 
+                <div class="left" style="width:100%;">
+                    {% include "ndf/html_editor.html" with var_name="content" var_value=node_obj.content node_id=node_obj.pk ckeditor_toolbar=editor_type %}
+                    <br/>
+                </div>
+            </div>
+            <hr/>
+            <div>
+                {{source_obj.content|safe}}
+            </div>
+            {% for k, v in additional_form_fields.fields.iteritems %}
+                <{{v.widget}} type="{{v.widget_attr}}" name="{{v.name}}" value="{{v.value}}">
+            {% endfor %}
+            {% for k, v in additional_form_fields.attribute.iteritems %}
+                <div class="course_creator_header">
+                    <div class="left course_heading">
+                    <h5>{{k}}</h5>
+                    </div>
+                    <div class="right course_heading_unit">
+                         <select name="attribute_{{v.name}}" {{v.widget_attr}}>
+                            <option value=''>{% trans "Choose" %} {{k}}</option>
+                            {% for each_opt in v.all_options %}
+                                    <option {% if each_opt in v.value %} selected {% endif %}>
+                                        {{each_opt}}
+                                    </option>
+                                
+                            {% endfor %}
+                        </select>
+                    </div>
+                </div>
+
+            {% endfor %}
+            <div class="row">
+                <input type="submit" class="small-2 columns right orange-button" id="" value="Save"/>
+
+                {% if cancel_url %}
+                    <a class="small-2 small-push-1 columns text-center orange-button" href="{{cancel_url}}">{% trans "Cancel" %}</a>
+                {% endif %}
+            </div>
+        </form>
+    </div>
+</div>
+<script type="text/javascript">
+    $(document).on('submit','.node-create-edit-form',function(event){
+        node_name_val = $(".node_name").val()
+        if(!node_name_val.replace(/\s/g, '').length){
+            event.preventDefault()
+            $('.node_name_empty').removeClass('hide')
+        }
+        else{
+            $('.node_name_empty').addClass('hide')
+        }
+    })
+    
+</script>

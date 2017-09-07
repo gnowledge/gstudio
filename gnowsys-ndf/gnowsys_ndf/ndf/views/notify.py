@@ -8,7 +8,6 @@ from django.contrib.sites.models import Site
 
 from gnowsys_ndf.ndf.models import Node, Counter
 from gnowsys_ndf.ndf.models import node_collection, triple_collection
-from gnowsys_ndf.ndf.views.ajax_views import set_drawer_widget_for_users
 from gnowsys_ndf.ndf.templatetags.ndf_tags import get_all_user_groups
 from gnowsys_ndf.ndf.views.methods import get_execution_time, get_all_subscribed_users, get_group_name_id
 from gnowsys_ndf.ndf.views.tasks import task_set_notify_val
@@ -185,6 +184,7 @@ def invite_users(request,group_id):
                 else:
                     if each.id !=owner:
                         coll_obj_list.append(each)
+            from gnowsys_ndf.ndf.views.ajax_views import set_drawer_widget_for_users
 
             data_list=set_drawer_widget_for_users(st,coll_obj_list)
             return HttpResponse(json.dumps(data_list))
@@ -267,6 +267,7 @@ def invite_admins(request,group_id):
                 else:
                     if each.id !=owner and each.id in usergrps:
                         coll_obj_list.append(each)
+            from gnowsys_ndf.ndf.views.ajax_views import set_drawer_widget_for_users
 
             data_list=set_drawer_widget_for_users(st,coll_obj_list)
             return HttpResponse(json.dumps(data_list))

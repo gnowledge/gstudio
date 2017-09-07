@@ -1,0 +1,35 @@
+{% extends "ndf/gbase.html" %}
+{% load i18n %}
+{# {% load get_metadata_values get_attribute_value from ndf_tags %} #}
+
+{% block title %} {{title}} {% endblock %}
+
+{% block body_content %}
+<div class="row group_content translation-detail-top-margin">
+    <div class="small-12 columns  top-bar-secondions_content" id="scstyle">
+	<h1 class="text-center"> {% firstof node.altnames node.name %}
+		<small>
+			<a href="{% url 'translated' group_id source_node_id node.language.0 node.pk %}"> <i>{% trans "EDIT" %} </i></a>
+		</small>
+	</h1>
+
+    {% include 'ndf/node_ajax_content.html' %}
+
+    {% if other_translations %}
+	    <hr/>
+	    {% trans "Other Translations:" %}
+	    <br/>
+	    {% for each_node in other_translations %}
+	        {% include "ndf/widget_card.html" with node=each_node url_name=card_url_name url_first_arg=group_id url_second_arg=source_node_id url_third_arg=each_node.language.0 %}
+	    {% endfor %}
+    {% endif %}
+
+    <hr/>
+    {% trans "Original Resource:" %}
+    <br/>
+    {% include "ndf/widget_card.html" with node=source_node_obj url_name='all_translations' url_first_arg=group_id url_second_arg=source_node_id %}
+    </div>
+</div>
+
+{% endblock %}
+

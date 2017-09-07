@@ -1,0 +1,22 @@
+{% for each in cursor %}
+    <a href="#" class="{{card_class}}" data-id="{{each.pk}}" data-name="{{each.name}}" title="{{each.name}}">
+    <div class="small-12 medium-6 large-3 columns">
+
+        <div class="asset_tile">
+            <div class="asset_preview">
+                {% if each.if_file.mid.relurl and 'video' not in each.if_file.mime_type %}
+                <img src="{{MEDIA_URL}}{{each.if_file.mid.relurl}}">
+                {% elif 'video' not in each.if_file.mime_type and each.if_file.thumbnail.relurl %}
+                <img src="{{MEDIA_URL}}{{each.if_file.thumbnail.relurl}}">
+                {% else %}
+                <img src="/static/ndf/images/asset_thumbnail.png">
+                {% endif %}
+            </div>
+            <div class="asset_text">
+                <div class="asset_title" title="{% firstof each.altnames each.name %}">{% firstof each.altnames|truncatechars:25 each.name|truncatechars:25 %}</div>
+                <!-- <div class="asset_desc">{{each.content|safe|truncatechars:25}}</div> -->
+            </div>
+        </div>
+    </div>
+    </a>
+{% endfor %}

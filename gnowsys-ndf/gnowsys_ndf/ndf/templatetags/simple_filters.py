@@ -82,18 +82,29 @@ def get_dict_from_list_of_dicts(list_of_dicts,convert_objid_to_str=False):
 
 @get_execution_time
 @register.filter
-def split(str, splitter):
-    return str.split(splitter)
+def split(str, delimiter):
+    return str.split(delimiter)
 
+@get_execution_time
+@register.filter
+def apply_eval(arg):
+    import ast
+    return ast.literal_eval(arg)
+
+
+@register.filter
+def joinby(delimiter, arg):
+    return arg.join(delimiter)
 
 @register.filter
 @stringfilter
 def re_format(value):
     import re
-    value = eval(value)
     l = []
-    for e in value:
-        l.append(re.sub(r'[\r]', '', e))
+    if value:
+        value = eval(value)
+        for e in value:
+            l.append(re.sub(r'[\r]', '', e))
     return l
 
 @get_execution_time
@@ -114,6 +125,19 @@ def get_latest_git_hash():
 	git_commit_hash = os.popen("git rev-parse --short HEAD").read().strip()
 	return git_commit_hash
 
+@get_execution_time
+@register.assignment_tag
+def get_active_branch_name():
+    """
+    Template tag that returns current active git branch.
+
+    Returns:
+        str: branch-name
+    """
+
+    import os
+    git_branch_name = os.popen("git rev-parse --abbrev-ref HEAD").read().strip()
+    return git_branch_name
 
 @get_execution_time
 @register.filter

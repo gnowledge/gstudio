@@ -43,7 +43,7 @@
     "blockui": "#316f6e5d76",
     "datatables-plugins": "#1.0.1",
     "DataTables": "#1.10.7",
-    "videojs": "#4.11.4",
+    "videojs": "#5.10.2",
     "epub.js": "#0.2.5",
     "font-awesome": "#4.4.0",
     "ckeditor": "#4.5.6",
@@ -51,8 +51,12 @@
     "handlebars": "#4.0.5",
     "pace": "#1.0.2",
     "jquery": "#2.2.1",
-    "blueimp-canvas-to-blob" :"#3.3.0",
-    "jsmol" :"#1.1.0"
+    "blueimp-canvas-to-blob": "#3.3.0",
+    "jsmol": "#1.1.0",
+    "rubik-googlefont": "#a23ec91574",
+    "MathJax": "2.7.0",
+    "jquery-backstretch": "^2.1.15",
+    "datatables-rowsgroup": "1.0.0"
   },
   "resolutions": {
     "jquery": "2.2.1"

@@ -1,0 +1,52 @@
+How to take DUMP?
+
+1. Go to manage.py level
+2. Run fab update_data
+3. python manage.py group_export
+	3.1. A prompt will be asked whether you want to take User objects that are linked with Group-data as contributors or creators.
+	3.2 A final confirmation prompt which displays total number of nodes.
+4. After completion of dump, the path of data-dump and log file will be displayed.
+	We need this data-dump to restore.
+
+How to take RESTORE?
+
+1. Go to manage.py level
+2. python manage.py group_import
+	3.1. This will prompt absolute path of data-dump [ref. DUMP pt.4]:
+			Enter Path
+	3.2. Next prompt will be whether you want to use User objects that are part of dump.
+		[if DUMP 3.1 is yes]
+		If you do not wish to use the users from the dump, say 'no', and the program will 
+		give another prompt that, the default user-id [as creator or contributor] used wille be 1
+		.Enter yes to proceed or say no to provide a default user-id in the next prompt.
+3. Run fab update_data
+4. After completion of dump, the path of log file will be displayed.
+
+
+Note:
+Remember, the import script generates bunch of json files at manage.py level
+Run `rm 5*` to get rid of them
+
+If the dump or restore breaks at any point or if the restore does not reflect properly,
+make sure you have the log files generated at dump and restore actions, and send them on 
+gnowsys-dev@gnowledge.org.
+
+
+Update on 12-May-2017 - katkamrachana
+
+The dump-restore(Phase2) implementation is refined with following features:
+1. Pick the nodes that belong to right_subject of any triple that is part of dump.
+2. Pick triples data for such right_subject nodes as well.
+3. Make list of ids that are dumped to check and prevent dump of a node more than once.
+4. Parsing content of node to pick the embedded file nodes.
+5. Update logs at every internal function call.
+6. Exclude Group node's prior_node and post_node fields in dump, to prevent taking dump of parent and child(sub) groups
+7. Modify `save()` call for `class Triple`, reducing additional queries and improving performance.
+8. Check if node to be dumped has `Filehive` objects, if yes dump them too.
+9. Final and major issue was in getting updated json of node in dump. Though the RCS file was getting updated, we were unable to get the json of node's latest version.
+This was because, the RCS checkout() (function which emits a json file from rcs file), checks if the node's json file already exists, if yes, the checkout call is aborted and we are left with the json of older version of node, and the restore does its job of blindly inserting into mongodb.
+To prevent this, we have 2 options:
+[a]. Remove the node's json file
+[b]. Force RCS to override the existing node's json file.
+We are following the 2nd approach by passing respective RCS flag. [-f for forcefully checkout]
+To achieve this, we have modified the respective `save()` calls in `models.py`

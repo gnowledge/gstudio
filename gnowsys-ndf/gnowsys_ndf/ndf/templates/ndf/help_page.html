@@ -1,0 +1,10 @@
+{% extends "ndf/gbase.html" %}
+{% load i18n %}
+{% block title %}
+ {{title}}
+{% endblock  %}
+{% block body_content %}
+   <div id="scstyle">
+   {{page_obj.content|safe}}
+   </div>
+{% endblock body_content %}

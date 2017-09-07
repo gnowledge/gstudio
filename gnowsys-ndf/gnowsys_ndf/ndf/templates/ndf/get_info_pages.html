@@ -1,0 +1,44 @@
+{% load i18n %}
+{% load ndf_tags %}
+<div class="activity-slides-container" >
+        {# <i class="fa fa-graduation-cap large"></i> #}
+      {% get_help_pages_of_node node page_type request.LANGUAGE_CODE as help_page_list %}
+      <div class="small-12-columns activity-slides">
+          {% if help_page_list %}
+          {% for each_help_page in help_page_list %}
+          <div id="related-content">
+            {% if page_type == "has_admin_page" %}<i class="icon-color fa fa-graduation-cap"></i>
+                
+              {% elif  page_type == "has_help" %} <i class="icon-color fa fa-info-circle" ></i>
+                
+              {% endif %}
+            <div class="related-content-header">
+              <span> &nbsp;&nbsp;&nbsp;Related {% if page_type == "has_admin_page" %}Teacher's Page {% elif  page_type == "has_help" %}
+              Help Topic {% endif %}
+              </span>
+                <span class="related-content-title">
+                  <i class="fa fa-caret-right"></i>&nbsp;{% firstof each_help_page.altnames each_help_page.name %}
+                  <div class="related-content-close">&times;</div>
+                </span>
+                
+              </div>
+              <div class="related-content-body">
+              {{each_help_page.content|safe}}
+              </div>
+
+          </div>
+
+          {% endfor %}
+          {% endif %}
+      </div>
+  </div>
+
+  <script type="text/javascript">
+    $(".related-content-title").on('click', function(){
+      $(this).closest('#related-content').addClass('content-expanded');
+    });
+    $('.related-content-close').on('click', function(e){
+      e.stopPropagation();
+      $(this).closest('#related-content').removeClass('content-expanded');
+    })
+  </script>

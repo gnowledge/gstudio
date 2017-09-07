@@ -1,15 +1,14 @@
-{% load get_username get_thread_node get_disc_replies get_node check_is_gstaff from ndf_tags %}
+{% load get_username get_thread_node get_disc_replies get_node check_is_gstaff user_access_policy from ndf_tags %}
 {% load i18n %}
 
 {% check_is_gstaff group_id request.user as is_gstaff %}
-<style type="text/css">
-    .lbl_of_tag{
-        background-color: gold !important;
-    }
+{% user_access_policy groupid request.user as user_access_priv %}
 
-</style>
+
+{% include 'ndf/widget_user_access_modal.html' %}
+
     <div class="row note-toolbar">
-        <div class="small-12 medium-10 columns">
+        <div class="small-10 medium-9 columns">
 
             <div class="row">
                 <div class="small-12 columns">
@@ -17,19 +16,20 @@
                    {% if node.tags %}
                         <div class="tag-rating-div">
                                 {% for tag in node.tags %}
-                                    {% if forloop.counter < 3 %}
-                                        <small><label class="lbl_of_tag label">
+                                    {% if forloop.counter < 5 %}
+                                        <small><label class="tag-ele" style="margin-top: 13px;">
                                     {% else %}
-                                        <small><label class="lbl_of_tag label tag_ele hide">
+                                        <small><label class="tag-ele toggle-tag hide" style="margin-top: 13px;">
+                                        <!-- <small><label class="lbl_of_tag label tag_ele hide"> -->
                                     {% endif %}
-                                    <a href="{% url 'tag_info' groupid tag %}">{{tag}} </a></label></small>
+
+                                    <a href="{% url 'tag_info' group_id tag %}">{{tag}} </a></label></small>
+                                    <!-- <a href="{% url 'tag_info' groupid tag %}">{{tag}} </a></label></small> -->
                                 {% endfor %}
                                 {% if node.tags|length > 2 %}
-                                    <small><label class="view-more-tags" style="display:inline-block;">More</label></small>
+                                    <small><label class="view-more-tags" style="display:inline-block;">{% trans "More" %}</label></small>
                                 {% endif %}
                         </div>
-                    {% else %}
-                        <i><small><label>{% trans "No tags defined yet!" %}</label></small></i>
                     {% endif %}
                 </div>
             </div>
@@ -37,7 +37,7 @@
                 <div class="small-12 columns creator-title">
                     <i class="fi-torso"></i>
 
-                    <span class="note-creator" title="{{node.created_by|get_username}}">{{node.created_by|get_username}}</span>
+                    <span class="note-creator" title="{{ node.user_details_dict.contributors|join:', ' }}">{{ node.user_details_dict.contributors|join:', ' }}</span>
                     &nbsp;
                     &#8226;
                     &nbsp;
@@ -50,6 +50,7 @@
                     {# <div>Your rating</div> #}
 
                         <div>
+
                         {% include 'ndf/rating.html'%}
                         {% comment %}
                             <i class="fi-like"></i>
@@ -63,18 +64,21 @@
                     &nbsp;
                         &#8226;
                         &nbsp;
+                    {% comment %}
                     <div style="display: inline-block;">
-
-                        {% include "ndf/analytics_views.html" %}
+                        {% include "ndf/widget_analytics_views.html" %}
                     </div>
+                    {% endcomment %}
                 </div>
             </div>
         </div>
-        <div class="small-12 medium-2 columns creator-rating">
+        <div class="small-12 medium-11 columns creator-rating">
             {% if is_gstaff or node.created_by == request.user.id %}
-                <a href="{% url 'page_create_edit' group_id node.pk %}?course_event_id={{group_id}}&blog_type=True"
-                    style="float:right;     border: 1px solid #CFCFCF; padding: 5px 10px; border-radius: 3px;color:#A2A2A2;background-color: #f7f7f7;"><i class="fi-pencil" style="margin-right: 5px;"></i>Edit</a>
+
+               <a class="edit-note-btn" data-note-id="{{node.pk}}"><i class ="fi-pencil"></i>{% trans "Edit" %}</a> 
+               <a class="delete-note-btn" data-note-id="{{node.pk}}"><i class ="fi-trash"></i>{% trans "Delete" %}</a> 
             {% endif %}
+
         </div>
     </div>
     <div class="row note-content">
@@ -88,16 +92,16 @@
             </div>
         </div>
     </div>
-    <div class="comment-sections">
-        {% get_thread_node node.pk as thread_node %}
-            {% if thread_node %}
-                {% get_disc_replies thread_node group_id global_disc_all_replies as all_replies %}
-                {% get_node thread_node as thread_node_obj %}
-                {% include 'ndf/gin-line-texteditor.html' with node=thread_node_obj var_name="content_org" ckeditor_toolbar="BasicToolbar" %}
-            {% else %}
-                {% get_disc_replies node.pk group_id global_disc_all_replies as all_replies %}
-                {% include 'ndf/gin-line-texteditor.html' with var_name="content_org" ckeditor_toolbar="BasicToolbar" %}
-            {% endif %}
+    <div class="comment-sections" style="overflow-x:auto;overflow-y:hidden">
+        {% get_thread_node node.pk as thread_node_obj %}
+        {% if thread_node_obj %}
+            {% get_disc_replies thread_node_obj.pk group_id global_disc_all_replies as all_replies %}
+            {% include 'ndf/in-line-texteditor.html' with node=thread_node_obj var_name="content_org" ckeditor_toolbar="LMSStudentsToolbar" %}
+        {% else %}
+            {% get_disc_replies node.pk group_id global_disc_all_replies as all_replies %}
+            {% include 'ndf/in-line-texteditor.html' with var_name="content_org" ckeditor_toolbar="LMSStudentsToolbar" %}
+
+        {% endif %}
     </div>
     {% comment %}
         <div class="comments-header">
@@ -130,13 +134,44 @@
 <script type="text/javascript">
 $(document).on('click','.view-more-tags',function(){
     if($(this).text()=="Less"){
-        $(".tag_ele").addClass("hide")
+        $(".toggle-tag").addClass("hide")
         $(this).text("More")
     }
     else{
-        $(".tag_ele").removeClass("hide")
+        $(".toggle-tag").removeClass("hide")
         $(this).text("Less")
     }
 })
+
+    $(document).on('click', '.edit-note-btn', function() {
+        node_id = $(this).attr('data-note-id')
+        load_page_create_edit(node_id)
+    });
+    $(".delete-note-btn").click(function(){
+            if (confirm("Do you want to delete this note?.") == true) {
+                $.ajax({
+                          type: "POST",
+                          data:{
+                                'csrfmiddlewaretoken': "{{csrf_token}}",
+                                'activity_id' : "{{node.pk}}",
+                            },
+                          url: "{% url 'delete_activity_page' group_id %}",
+                          datatype: "json",
+                          success: function(data) {
+                            console.log(data)
+                            if (data=="success"){
+                                // $.each(coll_arr, function(ind,activity_id){
+                                //     $("a[data-del-activity-page-id='"+activity_id+"']").addClass('hide')
+                                // })
+                                location.href = "{% url 'course_notebook' group_id %}"
+                            }
+                            else{
+                                alert("Something went wrong. Please try again later.")
+                            }
+                        }
+                    });
+                }
+
+    });
 
 </script>

@@ -108,7 +108,7 @@
     <div class="medium-12 course-page-header">
     <div class="row " >
       <div class="course-header-background">
-        {% include 'ndf/upload_pic_widget.html' with url_name='course_about' widget_for="group_banner" is_banner=True is_profile=False no_update_btn=True%}
+        {% include 'ndf/widget_photo_upload.html' with url_name='course_about' widget_for="group_banner" is_banner=True is_profile=False no_update_btn=True%}
         <div class="course-header-background-layer"></div>
       </div>
       {% if is_gstaff %}
@@ -127,9 +127,15 @@
                 {% comment %}
                 <li><a class="tiny radius settings" ><i class="fi-clock"></i> {% trans " Plan Release Dates" %}</a></li>
                 {% endcomment %}
+ 
                 <li>
                   <a href="{% url 'create_event_group' group_id 'CourseEventGroup' %}?cnode_id={{group_id}}" class="fi-volume"> Announce</a>
                 </li>
+                <li>
+                  <a id="subscr_users" class="fi-torsos" data-reveal-id="inviteusers" title="View/Subscribe Users">{% if sg_type == "CourseEventGroup" %}{% trans ' Add Students' %} {% else %} {% trans ' Add Members' %} {% endif %} </a>
+                  {% include "ndf/invite_users.html" with no_subscribe_btn=True node=group_obj%}
+                </li>
+
                 <li>
                   <a id="subscr_admins" data-reveal-id="inviteadmins" title="View/Subscribe Admins" class="fi-torsos">{% trans ' Add Admins' %}</a>
                   {% include "ndf/invite_admins.html" with no_subscribe_btn=True node=group_obj %}
