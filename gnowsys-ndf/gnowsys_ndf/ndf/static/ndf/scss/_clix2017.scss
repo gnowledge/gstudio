@@ -5963,17 +5963,6 @@ ul.nav_menu_1 {
   height: 2rem;
   }
 
-
-.finish-lesson{
-    border-radius: 5px;
-    text-transform: uppercase;
-    color: #ffffff !important;
-    width: inherit;
-    font-family: "OpenSans-Semibold", sans-serif;
-    border: 2px solid #6a0054;
-    background-color: #6a0054;    
-}
-
 .auto_width{
     width: auto !important;
 }
@@ -6118,4 +6107,24 @@ ul.nav_menu_1 {
 
 .attempts_count{
     color: #000000 !important;
+}
+
+.purple-btn{
+    width: inherit;
+    text-transform: uppercase;
+    border-radius: 5px;
+    font-family: "OpenSans-Semibold", sans-serif;
+    background-color: #6a0054;
+    color: #ffffff !important;
+    border: 2px solid #6a0054;
+}
+
+.disable-purple-btn{
+    width: inherit;
+    text-transform: uppercase !important;
+    border-radius: 5px;
+    font-family: "OpenSans-Semibold", sans-serif;
+    background: #4b4852;
+    color: #ffffff !important;
+    border: 2px solid #4b4852;
 }

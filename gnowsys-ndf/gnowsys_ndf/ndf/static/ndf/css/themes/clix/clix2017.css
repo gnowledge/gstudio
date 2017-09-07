@@ -5867,90 +5867,79 @@ p {
   height: 2rem;
 }
 
-/* line 5967, ../../../scss/_clix2017.scss */
-.finish-lesson {
-  border-radius: 5px;
-  text-transform: uppercase;
-  color: #ffffff !important;
-  width: inherit;
-  font-family: "OpenSans-Semibold", sans-serif;
-  border: 2px solid #6a0054;
-  background-color: #6a0054;
-}
-
-/* line 5977, ../../../scss/_clix2017.scss */
+/* line 5966, ../../../scss/_clix2017.scss */
 .auto_width {
   width: auto !important;
 }
 
 /* responsive footer */
-/* line 5982, ../../../scss/_clix2017.scss */
+/* line 5971, ../../../scss/_clix2017.scss */
 .clearfix {
   clear: both;
 }
 
-/* line 5983, ../../../scss/_clix2017.scss */
+/* line 5972, ../../../scss/_clix2017.scss */
 .center {
   text-align: center;
 }
 
-/* line 5984, ../../../scss/_clix2017.scss */
+/* line 5973, ../../../scss/_clix2017.scss */
 .left {
   text-align: left;
 }
 
-/* line 5985, ../../../scss/_clix2017.scss */
+/* line 5974, ../../../scss/_clix2017.scss */
 .right {
   text-align: right;
 }
 
-/* line 5987, ../../../scss/_clix2017.scss */
+/* line 5976, ../../../scss/_clix2017.scss */
 .clr1 {
   background: #FFFFFF;
   color: #333743;
 }
 
-/* line 5988, ../../../scss/_clix2017.scss */
+/* line 5977, ../../../scss/_clix2017.scss */
 .clr2 {
   background: #F1F3F5;
   color: #8F94A3;
 }
 
-/* line 5989, ../../../scss/_clix2017.scss */
+/* line 5978, ../../../scss/_clix2017.scss */
 .clr3 {
   background: rgba(221, 221, 221, 0.18);
   color: #BDC3CF;
 }
 
-/* line 5990, ../../../scss/_clix2017.scss */
+/* line 5979, ../../../scss/_clix2017.scss */
 .clr4 {
   background: rgba(221, 221, 221, 0.18);
   color: #E3E7F2;
 }
 
-/* line 5991, ../../../scss/_clix2017.scss */
+/* line 5980, ../../../scss/_clix2017.scss */
 .clr5 {
   color: #F1F3F5;
 }
 
-/* line 5992, ../../../scss/_clix2017.scss */
+/* line 5981, ../../../scss/_clix2017.scss */
 .clr6 {
   color: #39B5A1;
 }
 
-/* line 5993, ../../../scss/_clix2017.scss */
+/* line 5982, ../../../scss/_clix2017.scss */
 .clr7 {
   color: #D45245;
 }
 
 /*##### Footer Structure #####*/
-/* line 5998, ../../../scss/_clix2017.scss */
+/* line 5987, ../../../scss/_clix2017.scss */
 .bo-wrap {
   clear: both;
   width: auto;
 }
 
-/* line 5999, ../../../scss/_clix2017.scss */
+/* line 5988, ../../../scss/_clix2017.scss */
 .bo-footer {
   clear: both;
   width: auto;
@@ -5959,14 +5948,14 @@ p {
   margin: 0 auto;
 }
 
-/* line 6007, ../../../scss/_clix2017.scss */
+/* line 5996, ../../../scss/_clix2017.scss */
 .bo-footer-social {
   text-align: left;
   line-height: 1px;
   padding: 10px 10px 10px 10px;
 }
 
-/* line 6014, ../../../scss/_clix2017.scss */
+/* line 6003, ../../../scss/_clix2017.scss */
 .bo-footer-smap {
   width: 600px;
   float: left;
@@ -5975,7 +5964,7 @@ p {
   font-size: 18px;
 }
 
-/* line 6022, ../../../scss/_clix2017.scss */
+/* line 6011, ../../../scss/_clix2017.scss */
 .bo-footer-uonline {
   width: 300px;
   /* Account for margins + border values */
@@ -5984,7 +5973,7 @@ p {
   text-align: center;
 }
 
-/* line 6029, ../../../scss/_clix2017.scss */
+/* line 6018, ../../../scss/_clix2017.scss */
 .bo-footer-power {
   width: 300px;
   padding: 5px 10px;
@@ -5998,19 +5987,19 @@ p {
 /*##### Footer Responsive #####*/
 /* for 980px or less */
 @media screen and (max-width: 980px) {
-  /* line 6044, ../../../scss/_clix2017.scss */
+  /* line 6033, ../../../scss/_clix2017.scss */
   .bo-footer {
     width: 95%;
     padding: 1% 2%;
   }
 
-  /* line 6048, ../../../scss/_clix2017.scss */
+  /* line 6037, ../../../scss/_clix2017.scss */
   .bo-footer-smap {
     width: 33%;
     padding: 1% 2%;
   }
 
-  /* line 6052, ../../../scss/_clix2017.scss */
+  /* line 6041, ../../../scss/_clix2017.scss */
   .bo-footer-uonline {
     width: 46%;
     padding: 1% 2%;
@@ -6018,7 +6007,7 @@ p {
     text-align: right;
   }
 
-  /* line 6059, ../../../scss/_clix2017.scss */
+  /* line 6048, ../../../scss/_clix2017.scss */
   .bo-footer-power {
     clear: both;
     padding: 1% 2%;
@@ -6029,21 +6018,21 @@ p {
 }
 /* for 700px or less */
 @media screen and (max-width: 600px) {
-  /* line 6070, ../../../scss/_clix2017.scss */
+  /* line 6059, ../../../scss/_clix2017.scss */
   .bo-footer-smap {
     width: auto;
     float: none;
     text-align: center;
   }
 
-  /* line 6076, ../../../scss/_clix2017.scss */
+  /* line 6065, ../../../scss/_clix2017.scss */
   .bo-footer-uonline {
     width: auto;
     float: none;
     text-align: center;
   }
 
-  /* line 6082, ../../../scss/_clix2017.scss */
+  /* line 6071, ../../../scss/_clix2017.scss */
   .bo-footer-power {
     width: auto;
     float: none;
@@ -6051,12 +6040,12 @@ p {
   }
 }
 /* for 480px or less */
-/* line 6095, ../../../scss/_clix2017.scss */
+/* line 6084, ../../../scss/_clix2017.scss */
 .explore-settings-drop {
   margin-left: 57%;
   display: inline-block;
 }
-/* line 6098, ../../../scss/_clix2017.scss */
+/* line 6087, ../../../scss/_clix2017.scss */
 .explore-settings-drop > button {
   color: #164a7b;
   font-weight: 400;
@@ -6068,18 +6057,40 @@ p {
   border-radius: 5px !important;
   display: inline-block;
 }
-/* line 6108, ../../../scss/_clix2017.scss */
+/* line 6097, ../../../scss/_clix2017.scss */
 .explore-settings-drop > button:hover {
   border-radius: 10px;
   background-color: #ddeff9;
   color: #164a7b;
 }
-/* line 6114, ../../../scss/_clix2017.scss */
+/* line 6103, ../../../scss/_clix2017.scss */
 .explore-settings-drop a {
   font-size: 16px;
 }
 
-/* line 6119, ../../../scss/_clix2017.scss */
+/* line 6108, ../../../scss/_clix2017.scss */
 .attempts_count {
   color: #000000 !important;
+}
+
+/* line 6112, ../../../scss/_clix2017.scss */
+.purple-btn {
+  width: inherit;
+  text-transform: uppercase;
+  border-radius: 5px;
+  font-family: "OpenSans-Semibold", sans-serif;
+  background-color: #6a0054;
+  color: #ffffff !important;
+  border: 2px solid #6a0054;
+}
+
+/* line 6122, ../../../scss/_clix2017.scss */
+.disable-purple-btn {
+  width: inherit;
+  text-transform: uppercase !important;
+  border-radius: 5px;
+  font-family: "OpenSans-Semibold", sans-serif;
+  background: #4b4852;
+  color: #ffffff !important;
+  border: 2px solid #4b4852;
 }
