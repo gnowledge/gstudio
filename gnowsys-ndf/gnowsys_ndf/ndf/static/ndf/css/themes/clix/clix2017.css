@@ -5887,3 +5887,8 @@ p {
 .attempts_count {
   color: #000000 !important;
 }
+
+/* line 5984, ../../../scss/_clix2017.scss */
+#course-settings-drop li a {
+  text-align: left;
+}
