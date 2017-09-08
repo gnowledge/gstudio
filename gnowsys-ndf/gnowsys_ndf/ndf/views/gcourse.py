@@ -2917,7 +2917,7 @@ def course_analytics(request, group_id, user_id, render_template=False, get_resu
                 if each_lesson_key == 'id':
                     lesson_id = each_lesson_dict[each_lesson_key]
                     
-                if each_lesson_key == 'children':
+                if each_lesson_key == 'activities':
                     all_activities = all_activities + len(each_lesson_dict[each_lesson_key])
                     for each_act_dict in each_lesson_dict[each_lesson_key]:
                         for each_act_key, each_act_val in each_act_dict.iteritems():
