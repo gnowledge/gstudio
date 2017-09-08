@@ -4701,6 +4701,14 @@ $module-card-lines-to-show: 3;
             height:100%;
             width:100%;
             border-radius:4px;
+            &:hover {
+                -webkit-transform: scale(1.03);
+                -moz-transform: scale(1.03);
+                -ms-transform: scale(1.03);
+                -o-transform: scale(1.03);
+                transform: scale(1.03);
+            
+            }
         }
 
         >h4 { 
