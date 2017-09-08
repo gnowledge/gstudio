@@ -1,6 +1,5 @@
 import json
 import requests
-print "\n In assessment Analytics"
 
 def hit_qbank_request(url):
     result_set = []
@@ -73,7 +72,7 @@ def user_assessment_results(domain, guserId,bankId,offeredId):
 
                 try:
                     responded_flag = assessmentItem['responded']
-                    if isinstance(responded_flag, bool):
+                    if isinstance(responded_flag, bool) and responded_flag:
                         visitedCount += 1
 
                     # Check whether the user has attempted the question or not
