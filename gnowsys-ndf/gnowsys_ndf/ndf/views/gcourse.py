@@ -2917,7 +2917,7 @@ def course_analytics(request, group_id, user_id, render_template=False, get_resu
                 if each_lesson_key == 'id':
                     lesson_id = each_lesson_dict[each_lesson_key]
                     
-                if each_lesson_key == 'children':
+                if each_lesson_key == 'activities':
                     all_activities = all_activities + len(each_lesson_dict[each_lesson_key])
                     for each_act_dict in each_lesson_dict[each_lesson_key]:
                         for each_act_key, each_act_val in each_act_dict.iteritems():
@@ -3881,6 +3881,7 @@ def load_assessment_analytics(request, group_id):
                     result_set['attempted_quizitems'] += each_dict['attempted']
                 except Exception as key_err:
                     print "\nIn load_assessment_analytics() Ignore if KeyError. Error: {0}".format(key_err)
+            result_set['users_points'] = counter_obj['group_points']
     except Exception as e:
         print "\nError: ",e
     # print "\nRS: ", result_set
