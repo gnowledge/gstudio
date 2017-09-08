@@ -4701,22 +4701,28 @@ $module-card-lines-to-show: 3;
             height:100%;
             width:100%;
             border-radius:4px;
+            -webkit-filter: drop-shadow(16px 16px 10px rgba(0,0,0,0.9));
             &:hover {
                 -webkit-transform: scale(1.03);
                 -moz-transform: scale(1.03);
                 -ms-transform: scale(1.03);
                 -o-transform: scale(1.03);
                 transform: scale(1.03);
+
             
             }
         }
 
         >h4 { 
                position: absolute; 
-               top: 145px; 
+               top: 100px; 
                left: 0; 
                width: 100%; 
+               //color: #ffedda !important;
                color: #ffffff !important;
+               //text-shadow: 2px 2px #a61680;
+               text-shadow: 2px 0px 8px black;
+
             }
 
     }
@@ -4724,8 +4730,8 @@ $module-card-lines-to-show: 3;
 
     .card_title {
         display: block;
-        font-size: 20px;
-        font-weight: 600;
+        font-size: 32px;
+        font-weight: 800;
         text-align: center;
         margin: 0px auto;
         letter-spacing: 1px;
