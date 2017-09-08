@@ -248,11 +248,11 @@ def get_course_content_hierarchy(unit_group_obj,lang="en"):
                         trans_act_name = get_lang_node(each_act,lang)
                         # activity_dict['label'] = trans_act_name.name or activity.name  
                         if trans_act_name:
-                            # activity_dict['label'] = trans_act_name.altnames or trans_act_name.name
-                            activity_dict['label'] = trans_act_name.name
+                            activity_dict['label'] = trans_act_name.altnames or trans_act_name.name
+                            # activity_dict['label'] = trans_act_name.name
                         else:
-                            activity_dict['label'] = activity.name
-                            # activity_dict['label'] = activity.altnames or activity.name
+                            # activity_dict['label'] = activity.name
+                            activity_dict['label'] = activity.altnames or activity.name
                         activity_dict['type'] = 'activity-group'
                         activity_dict['id'] = str(activity._id)
                         lesson_dict['children'].append(activity_dict)
@@ -316,11 +316,11 @@ def get_unit_hierarchy(unit_group_obj,lang="en"):
                     if activity:
                         trans_act = get_lang_node(activity._id,lang)
                         if trans_act:
-                            activity_dict['name'] = trans_act.name
-                            # activity_dict['name'] = trans_act.altnames or trans_act.name
+                            # activity_dict['name'] = trans_act.name
+                            activity_dict['name'] = trans_act.altnames or trans_act.name
                         else:
-                            activity_dict['name'] = activity.name
-                            # activity_dict['name'] = activity.altnames or activity.name
+                            # activity_dict['name'] = activity.name
+                            activity_dict['name'] = activity.altnames or activity.name
                         activity_dict['type'] = 'activity'
                         activity_dict['id'] = str(activity._id)
                         lesson_dict['activities'].append(activity_dict)

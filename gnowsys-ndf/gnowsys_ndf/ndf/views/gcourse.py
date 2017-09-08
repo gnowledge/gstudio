@@ -2450,8 +2450,8 @@ def course_raw_material(request, group_id, node_id=None,page_no=1):
     
     if "announced_unit" in group_obj.member_of_names_list or "Group" in group_obj.member_of_names_list:
         template = 'ndf/lms.html'
-        assets_page_info = paginator.Paginator(asset_nodes, page_no, GSTUDIO_NO_OF_OBJS_PP)
-        context_variables.update({'assets_page_info':assets_page_info})
+        # assets_page_info = paginator.Paginator(asset_nodes, page_no, GSTUDIO_NO_OF_OBJS_PP)
+        # context_variables.update({'assets_page_info':assets_page_info})
     if 'BaseCourseGroup' in group_obj.member_of_names_list:
         template = 'ndf/basecourse_group.html'
     
@@ -2538,7 +2538,8 @@ def course_gallery(request, group_id,node_id=None,page_no=1):
     
     if "announced_unit" in group_obj.member_of_names_list or "Group" in group_obj.member_of_names_list and 'base_unit' not in group_obj.member_of_names_list:
         template = 'ndf/lms.html'
-        context_variables.update({'assets_page_info':assets_page_info})
+        # assets_page_info = paginator.Paginator(asset_nodes, page_no, GSTUDIO_NO_OF_OBJS_PP)
+        # context_variables.update({'assets_page_info':assets_page_info})
     
     context_variables.update({'asset_nodes': asset_nodes})
 
