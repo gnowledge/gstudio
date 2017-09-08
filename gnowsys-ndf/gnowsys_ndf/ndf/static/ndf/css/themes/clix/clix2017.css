@@ -6167,3 +6167,18 @@ p {
   color: #ffffff !important;
   border: 2px solid #4b4852;
 }
+
+/* line 6219, ../../../scss/_clix2017.scss */
+.user-analytics-data {
+  margin: 42px 37px 37px 37px;
+  border: 2px solid #aaaaaa;
+}
+/* line 6222, ../../../scss/_clix2017.scss */
+.user-analytics-data .close-reveal-modal {
+  font-size: 20px;
+}
+
+/* line 6227, ../../../scss/_clix2017.scss */
+.left-space {
+  margin-left: 0.5em;
+}
