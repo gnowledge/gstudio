@@ -4663,21 +4663,22 @@ $inCompleteBgColor: #fd9e29;
 /**
  * Sass styles related to module cards
  */
+ 
 $module-card-font-size: 12.5px;
 $module-card-line-height: 1.4;
 $module-card-lines-to-show: 3;
 
 .module_card {
     display: table;
-    height: 250px;
-    box-shadow: 0px 0px 15px rgb(193, 227, 238);
+    height: 290px;
+    width: 526px;
     cursor: pointer;
     margin: 10px;
     border-radius: 5px;
     position: relative;
 
     &:hover {
-        box-shadow: 0px 0px 15px rgba(0, 0, 0, 0.2);
+        box-shadow: 0px 0px 17px rgba(0, 0, 0, 0.68);
     }
 
     &>div {
@@ -4685,49 +4686,41 @@ $module-card-lines-to-show: 3;
         height: 290px;
     }
     .card_banner {
-        width: 250px;
+        width: 300px;
+        vertical-align: middle;
         overflow: hidden;
         background-size: 100% 100%;
-        padding-top: 25px;
         border-radius: 8px 0px 0px 8px;
         box-shadow: inset 0 0 5px 2px;
         position: relative;
         z-index: 3;
         -webkit-transition: border-radius .2s;
         transition: border-radius .2s;
-        background-color:#f9f9f9;
+
+        >img{
+            height:100%;
+            width:100%;
+            border-radius:4px;
+        }
+
+        >h4 { 
+               position: absolute; 
+               top: 145px; 
+               left: 0; 
+               width: 100%; 
+               color: #ffffff !important;
+            }
+
     }
+
+
     .card_title {
         display: block;
-        width: 230px;
-        color: #fff;
         font-size: 20px;
         font-weight: 600;
         text-align: center;
         margin: 0px auto;
         letter-spacing: 1px;
-    }
-    .card_photo_widget{
-        width: 248px;
-        min-height: 245px;
-        margin-top: -24px;
-        margin-left: 1px;
-        width: 247px;
-        overflow: hidden;
-        background-size: 100% 100%;
-        border-radius: 8px 0px 0px 8px;
-        box-shadow: inset 0 0 5px 0px;
-        position: relative;
-        z-index: 3;
-        -webkit-transition: border-radius .2s;
-        transition: border-radius .2s;
-    }
-    .card_title_font{
-        font-size: 18px;
-        color: #a61680;
-        padding: 0px 0px 0px 10px;
-        margin-top: 4px;
-        font-weight: 600;
     }
 
     &.animated_card {
@@ -4758,17 +4751,17 @@ $module-card-lines-to-show: 3;
         border-width: 1px 1px 1px 0px;
         border-radius: 0px 7px 7px 0px;
         border-color: #d5d5d5;
-        box-shadow: inset 6px 0px 13px -5px;
+        box-shadow: inset 2px 0px 13px -5px;
         -webkit-transition: left .4s ease-in-out;
         transition: left .4s ease-in-out;
         -webkit-transition-property: left; /* Safari */
         transition-property: left;
-        background-color:rgba(231, 231, 231, 0.25);
 
         .card_label {
-            font-weight: 600;
+            font-weight: 500;
             font-size: $module-card-font-size;
             letter-spacing: 1px;
+            color: black;
         }
         .card_section {
             margin: 5px 0px;
@@ -4778,8 +4771,7 @@ $module-card-lines-to-show: 3;
                 border-bottom: 1px solid #ccc;
             }
             p {
-                margin-bottom: -14px;
-                margin-top: 11px;
+                margin-bottom: 7px;
                 font-size: $module-card-font-size;
             }
             .ellipsis {
@@ -4793,20 +4785,18 @@ $module-card-lines-to-show: 3;
         .module_brief {
             display: block; /* Fallback for non-webkit */
             display: -webkit-box;
-            //height: $module-card-font-size*$module-card-line-height*$module-card-lines-to-show; /* Fallback for non-webkit */
+            height: $module-card-font-size*$module-card-line-height*$module-card-lines-to-show; /* Fallback for non-webkit */
             max-width: 400px;
             overflow: hidden;
             text-overflow: ellipsis;
-            font-size: 13px;;
+            font-size: $module-card-font-size;
             line-height: $module-card-line-height;
             -webkit-line-clamp: $module-card-lines-to-show;
             -webkit-box-orient: vertical;
-            margin-bottom: 10px;
-
+            color: black;
         }
     }
 }
-
 
 
 
@@ -5597,9 +5587,7 @@ ul.nav_menu_1 {
 
 /* responsive footer */
 .clearfix {clear: both;}
-.center {text-align: center;}
-.left {text-align: left;}
-.right {text-align: right;}
+
 
 .clr1 {background: #FFFFFF; color: #333743;}
 .clr2 {background: #F1F3F5; color: #8F94A3;}
@@ -5873,10 +5861,7 @@ ul.nav_menu_1 {
     display-inline:block;
 }
 
- p {
-    margin:0px;
-    padding:10px;
-  }
+ 
 
 .scard-image {
     padding:0px;
@@ -5896,56 +5881,6 @@ ul.nav_menu_1 {
     height:100%;
   }
 
-  i {
-  font-size: 7rem;
-  opacity: 0.75;
-  display: block;
-  margin: -15px auto;
-  text-align: center;
-  color: gray;
-  font-family: "foundation-icons";
-  font-style: normal;
-  font-variant: normal;
-  text-transform: none;
-  text-decoration: inherit;
-  }
-
-  i.common-icon:before{
-  content: "\f1fb";
-  }
-  i.file:before {
-  content: "\f18e";
-  }
-  i.page:before {
-  content: "\f18e";
-  }
-  i.collection:before {
-  content: "\f18a";
-  }
-  i.documents:before {
-  content: "\f18b";
-  }
-  i.pdf:before {
-  content: "\f18b";
-  }
-  i.text:before {
-  content: "\f18e";
-  }
-  i.interactives:before {
-  content: "\f1b2";
-  }
-  i.ebooks:before {
-  content: "\f11e";
-  }
-  i.images:before {
-  content: "\f125";
-  }
-  i.audios:before, i.audio:before {
-  content: "\f17b";
-  }
-  i.videos:before, i.video:before {
-  content: "\f20e";
-  }
 
 
 }
@@ -5969,120 +5904,6 @@ ul.nav_menu_1 {
 
 .auto_width{
     width: auto !important;
-}
-
-    /* responsive footer */
-    .clearfix {clear: both;}
-    .center {text-align: center;}
-    .left {text-align: left;}
-    .right {text-align: right;}
-
-    .clr1 {background: #FFFFFF; color: #333743;}
-    .clr2 {background: #F1F3F5; color: #8F94A3;}
-    .clr3 {background: rgba(221, 221, 221, 0.18); color: #BDC3CF;}
-    .clr4 {background: rgba(221, 221, 221, 0.18); color: #E3E7F2;}
-    .clr5 {color: #F1F3F5;}
-    .clr6 {color: #39B5A1;}
-    .clr7 {color: #D45245;}
-
-
-
-    /*##### Footer Structure #####*/
-    .bo-wrap {clear:both; width: auto;}
-    .bo-footer {
-      clear:both;
-      width: auto;
-      padding: 5px;
-      width: 960px;
-      margin: 0 auto;
-    }
-
-    .bo-footer-social {
-      text-align: left; 
-      line-height: 1px;
-      padding: 10px 10px 10px 10px;
-            
-    }
-
-    .bo-footer-smap {
-      width: 600px;
-      float: left;
-      padding: 5px 10px;
-      text-align: left;
-      font-size: 18px;
-    }
-
-    .bo-footer-uonline {
-      width: 300px; /* Account for margins + border values */
-      float: left;
-      padding: 5px 10px;
-      text-align: center;
-    }
-
-    .bo-footer-power {
-      width: 300px;
-      padding: 5px 10px;
-      float: left;
-      text-align: right;
-      font-size: 14px;
-      color: #636A7D;
-      vertical-align: middle;
-    }
-
-
-    /*##### Footer Responsive #####*/
-    /* for 980px or less */
-    @media screen and (max-width: 980px) {
-      
-      .bo-footer {
-        width: 95%;
-        padding: 1% 2%;
-      }
-      .bo-footer-smap {
-        width: 33%;
-        padding: 1% 2%;
-      }
-      .bo-footer-uonline {
-        width: 46%;
-        padding: 1% 2%;
-        float: right;
-        text-align: right;
-      }
-      
-      .bo-footer-power {
-        clear: both;
-        padding: 1% 2%;
-        width: auto;
-        float: none;
-        text-align: center;
-      }
-    }
-    /* for 700px or less */
-    @media screen and (max-width: 600px) {
-
-      .bo-footer-smap {
-        width: auto; 
-        float: none;
-        text-align: center;
-      }
-      
-      .bo-footer-uonline {
-        width: auto;
-        float: none;
-        text-align: center;
-      }
-      
-      .bo-footer-power {
-        width: auto;
-        float: none;
-        text-align: center;
-      }
-
-    }
-
-/* for 480px or less */
-@media screen and (max-width: 480px) {
-  
 }
 
 .explore-settings-drop{
