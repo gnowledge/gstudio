@@ -106,7 +106,7 @@
 
           </div>
           <div class="discussion-footer">
-            <a class="reply-btn reply_res"  data-id='{{ each_reply.oid }}' onclick='openCKEditor($(this),"{{each_reply.oid}}")' data-org-content='{{ each_reply.content }}'>
+            <a  data-id='{{ each_reply.oid }}' {% if user_access_priv == "allow" %} class="reply-btn reply_res" onclick='openCKEditor($(this),"{{each_reply.oid}}")'  {% else %} class="user_not_enrolled reply-btn reply_res" {% endif %} data-org-content='{{ each_reply.content }}'>
               <i class="fa fa-reply"></i>
               {% trans "Reply" %} 
             </a>
