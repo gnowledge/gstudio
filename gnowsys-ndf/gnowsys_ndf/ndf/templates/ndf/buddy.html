@@ -1334,7 +1334,7 @@
             function saveBuddies (selectedBuddiesArr) {
                                       
               $.ajax({
-                url: "{% url 'update_buddies' group_id %}",
+                url: "{% url 'update_buddies' group_id|default:'home' %}",
                 type: 'POST',
                 data: {
                   selected_buddies_list: JSON.stringify(selectedBuddiesArr),
@@ -1389,7 +1389,7 @@
               var buddyName = colorName.trim() + "-" + animalName.trim() + "-" + buddyInstCodeName;
               var auth_id = 0;
               $.ajax({
-                url: "{% url 'get_buddy_auth_id_from_name' group_id %}",
+                url: "{% url 'get_buddy_auth_id_from_name' group_id|default:'home' %}",
                 type: 'GET',
                 data: {selected_buddy_username: buddyName},
                 success: function (data) {
