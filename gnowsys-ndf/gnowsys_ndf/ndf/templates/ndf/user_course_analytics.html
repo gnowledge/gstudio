@@ -23,7 +23,7 @@
     <h4 class="inner"> User:  <h3 class="inner left-space"> {{username}} </h3></h4>
   </div>
   <div class="small-6 columns">
-    <h3 class="course-metric-count users_points">Total points gained:  {{users_points}}</h3>
+    <h4>Total points gained:  <h3 class="course-metric-count users_points inner left-space">{{users_points}}</h3></h4>
   </div>
 </div><hr/>
 <div class="course-overview-container">
@@ -408,6 +408,7 @@
           $(".notapplicable_quizitems").html(data['notapplicable_quizitems'])
           $(".incorrect_attempted_quizitems").html(data['incorrect_attempted_quizitems'])
           $(".attempted_quizitems").html(data['attempted_quizitems'])
+          $(".users_points").html(data['users_points'])
         },
       });//end of ajax
 

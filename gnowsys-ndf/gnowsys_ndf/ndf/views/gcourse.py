@@ -3881,6 +3881,7 @@ def load_assessment_analytics(request, group_id):
                     result_set['attempted_quizitems'] += each_dict['attempted']
                 except Exception as key_err:
                     print "\nIn load_assessment_analytics() Ignore if KeyError. Error: {0}".format(key_err)
+            result_set['users_points'] = counter_obj['group_points']
     except Exception as e:
         print "\nError: ",e
     # print "\nRS: ", result_set
