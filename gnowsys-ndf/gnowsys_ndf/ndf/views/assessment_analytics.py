@@ -51,8 +51,8 @@ def user_results(domain,bankId,offeredId,guserId=None):
 def user_assessment_results(domain, guserId,bankId,offeredId):
 
     # Declarations
-    questionCount = visitedCount = attemptedCount = unattemptedCount  = 0
-    correctCount = incorrectCount = notapplicableCount = 0
+    attemptedCount = notapplicableCount = 0
+    correctCount = incorrectCount =  0
     not_applicable_qtn_type_list = [
         "question-type%3Aqti-extended-text-interaction%40ODL.MIT.EDU",
         "question-type%3Aqti-choice-interaction-multi-select-survey%40ODL.MIT.EDU",
@@ -67,40 +67,24 @@ def user_assessment_results(domain, guserId,bankId,offeredId):
         try:
             # questions['questions'] is a list of dicts
             for assessmentItem in questions['questions']:
-                # itemID is a single question, AssessmentItem
-                questionCount += 1
-
                 try:
                     responded_flag = assessmentItem['responded']
-                    if isinstance(responded_flag, bool) and responded_flag:
-                        visitedCount += 1
-
-                    # Check whether the user has attempted the question or not
-                    if responded_flag:
-                        attemptedCount += 1
-                except Exception as responded_err:
-                    print "'responded' field not found. Error: {0}".format(responded_err)
-                    pass
-
-                # Check whether the attempted is correct or not
-                try:
-                    if assessmentItem['genusTypeId'] in not_applicable_qtn_type_list:
-                        notapplicableCount += 1
-                        # if responded_flag:
-                        #     correctCount += 1
-                    else:
-                        if assessmentItem['isCorrect']:
-                            correctCount += 1
-                        elif assessmentItem['isCorrect'] is None:
-                            unattemptedCount +=1
-                        elif not assessmentItem['isCorrect']:
-                            incorrectCount += 1
+                    if isinstance(responded_flag, bool):
+                        # Check whether the user has attempted the question or not
+                        if responded_flag:
+                            attemptedCount += 1
+                            if assessmentItem['genusTypeId'] in not_applicable_qtn_type_list:
+                                notapplicableCount += 1
+                                correctCount += 1
+                            else:
+                                if assessmentItem['isCorrect']:
+                                    correctCount += 1
+                                elif not assessmentItem['isCorrect']:
+                                    incorrectCount += 1
                 except Exception as correctness_err:
                     print "Error: {0}".format(correctness_err)
                     pass
                 countDict = {
-                                "Question": questionCount,
-                                "Visited" : visitedCount,
                                 "Attempted": attemptedCount,
                                 "Correct": correctCount,
                                 "Incorrect" : incorrectCount,
