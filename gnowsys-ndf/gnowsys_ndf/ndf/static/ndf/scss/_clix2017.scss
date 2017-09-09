@@ -2062,15 +2062,17 @@ ul.jqtree-tree .jqtree-toggler {
     text-transform: uppercase;
     // //font-size: 12px;
     letter-spacing: 0.9px;
-    font-weight: 600;
-    color: #8E8E8E;
+    font-weight: 500;
+    color: #000000;
     display: block;
   }
   .course-metric-count {
     // //font-size: 30px;
-    font-weight: 500;
+    font-weight: 600;
     letter-spacing: 0.5px;
     display: block;
+    color: #000000;
+    font-size: 17px;
   }
   .ongoing-session {
     border-bottom: 1px solid #ccc;
@@ -2144,12 +2146,13 @@ ul.jqtree-tree .jqtree-toggler {
     }
 
     .course-section-icon {
-      position: absolute;
-      // //font-size: 40px;
+      //position: absolute;
+      font-size: 20px;
       top: -35px;
-      right: 5px;
-      color: #aaa;
-      background: #fff;
+      //right: 5px;
+      color: #000000;
+      background: #ffffff;
+      margin-left: 22px;
     }
   }
   .course-points-breakup {
@@ -6061,3 +6064,4 @@ ul.nav_menu_1 {
 .left-space {
     margin-left: 0.5em;
 }
+
