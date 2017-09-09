@@ -88,8 +88,7 @@ def user_assessment_results(domain, guserId,bankId,offeredId):
                                 "Attempted": attemptedCount,
                                 "Correct": correctCount,
                                 "Incorrect" : incorrectCount,
-                                "NotApplicable":notapplicableCount,
-                                "Unattempted" : unattemptedCount
+                                "NotApplicable":notapplicableCount
                             }
 
         except Exception as failed_to_fetch_user_data:

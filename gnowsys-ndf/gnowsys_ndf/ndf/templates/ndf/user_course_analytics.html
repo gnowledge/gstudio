@@ -19,7 +19,9 @@
 </div>
 <div class="row">
 <h4 class="text-center"><u><b>PROGRESS REPORT</b></u></h4>
-  <a class="close-reveal-modal" aria-label="Close">Close [&#215;]</a>
+  {% if close_opt %}
+    <a class="close-reveal-modal" aria-label="Close">Close [&#215;]</a>
+  {% endif %}
   <div class="small-6 columns">
     <h4 class="inner"> User:  <h3 class="inner left-space"> {{username}} </h3></h4>
   </div>
@@ -406,8 +408,8 @@
         success: function(data){
           $(".correct_attempted_quizitems").html(data['correct_attempted_quizitems'])
           $(".unattempted_quizitems").html(data['unattempted_quizitems'])
-          $(".visited_quizitems").html(data['visited_quizitems'])
-          $(".notapplicable_quizitems").html(data['notapplicable_quizitems'])
+          // $(".visited_quizitems").html(data['visited_quizitems'])
+          // $(".notapplicable_quizitems").html(data['notapplicable_quizitems'])
           $(".incorrect_attempted_quizitems").html(data['incorrect_attempted_quizitems'])
           $(".attempted_quizitems").html(data['attempted_quizitems'])
           $(".users_points").html(data['users_points'])
