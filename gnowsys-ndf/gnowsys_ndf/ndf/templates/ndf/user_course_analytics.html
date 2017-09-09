@@ -18,6 +18,7 @@
    {% trans "Your analytics is loading. Please wait." %} 
 </div>
 <div class="row">
+<h4 class="text-center"><u><b>PROGRESS REPORT</b></u></h4>
   <a class="close-reveal-modal" aria-label="Close">Close [&#215;]</a>
   <div class="small-6 columns">
     <h4 class="inner"> User:  <h3 class="inner left-space"> {{username}} </h3></h4>
@@ -59,38 +60,33 @@
       </div>
     </div>
   </div>
+  <div class="analytics-panels">
   {% with group_obj.member_of_names_list as group_member_of_name %}
+  <!-- Assessment/Quiz Performance and Inetractions -->
   <div class="row">
     <div class="columns small-12 medium-6">
       <div class="course-quiz-perf course-section">
-        <span class="course-section-heading">Assessment Performance  </span>
-
-        {% if "announced_unit" in group_member_of_name %}
-        <small><u><a class="fetch-assessment-analytics" data-user-id={{user_id}}>Update</a></u></small></span>
-        <span class="course-section-icon">
-          <i class="fa fa-question-circle"></i>
+        <span class="course-section-heading inner">Assessment Performance  </span>
+          {% if "announced_unit" in group_member_of_name %}
+          <a class="fetch-assessment-analytics inner left-space" data-user-id={{user_id}}>Update</a>
+          <span class="course-section-icon">
+            <i class="fa fa-question-circle"></i>
+          </span>
         </span>
-        <div class="row">
-          <div class="columns small-12 medium-6">
-            <span class="course-metric-heading">Visited</span>
-            <span class="course-metric-count correct-count visited_quizitems">{{visited_quizitems}}</span>
-          </div>
-          <div class="columns small-12 medium-6">
-            <span class="course-metric-heading">{% trans "Not Attempted" %}</span>
-            <span class="course-metric-count unattempted_quizitems">{{unattempted_quizitems}}</span>
-          </div>
-        </div>
         {% endif %}
+        <!-- Total Questions and Correct Answers -->
         <div class="row">
-          <div class="columns small-12 medium-6">
-            <span class="course-metric-heading">Correct Answers</span>
-            <span class="course-metric-count correct-count correct_attempted_quizitems">{{correct_attempted_quizitems}}</span>
-          </div>
           <div class="columns small-12 medium-6">
             <span class="course-metric-heading">{% trans "Total Questions" %}</span>
             <span class="course-metric-count total_quizitems">{{total_quizitems}}</span>
           </div>
+          <div class="columns small-12 medium-6">
+            <span class="course-metric-heading">Correct Answers</span>
+            <span class="course-metric-count correct-count correct_attempted_quizitems">{{correct_attempted_quizitems}}</span>
+          </div>
         </div>
+
+        <!-- Attempted Questions and Incorrect Answers -->
         <div class="row">
           <div class="columns small-12 medium-6">
             <span class="course-metric-heading">Attempted</span>
@@ -102,12 +98,12 @@
             <span class="course-metric-count incorrect-count incorrect_attempted_quizitems">{{incorrect_attempted_quizitems}}</span>
           </div>
         </div>
+
         {% if "announced_unit" in group_member_of_name %}
         <div class="row">
           <div class="columns small-12 medium-6">
-            <span title="This included Questions that require uploads" class="course-metric-heading">Not Applicable 
-            </span>
-            <span class="course-metric-count notapplicable_quizitems">{{notapplicable_quizitems}}</span>
+            <span class="course-metric-heading">{% trans "Not Attempted" %}</span>
+            <span class="course-metric-count unattempted_quizitems">{{unattempted_quizitems}}</span>
           </div>
         </div>
         {% endif %}
@@ -115,9 +111,10 @@
     </div>
     <div class="columns small-12 medium-6">
       <div class="course-interactions course-section">
-        <span class="course-section-heading">{% trans "Interactions" %}</span>
+        <span class="course-section-heading">{% trans "Interactions" %}
         <span class="course-section-icon">
-          <i class="fa fa-users"></i>
+          <i class="fa fa-comments"></i>
+        </span>
         </span>
         <div class="row">
           <div class="columns small-12 medium-6">
@@ -158,13 +155,16 @@
     </div>
   </div>
   {% endwith %}
+
+  <!-- Gallery and Notes -->
   <div class="row">
     <div class="columns small-12 medium-6">
 
       <div class="course-gallery-uploads course-section">
-        <span class="course-section-heading">{% trans "Gallery uploads" %}</span>
-        <span class="course-section-icon">
-          <i class="fa fa-file-text"></i>
+        <span class="course-section-heading">{% trans "Gallery uploads" %}
+          <span class="course-section-icon">
+            <i class="fa fa-file-image-o"></i>
+          </span>
         </span>
         <div class="row">
           <div class="columns small-12 medium-4">
@@ -210,9 +210,10 @@
     <div class="columns small-12 medium-6">
 
       <div class="course-notes course-section">
-        <span class="course-section-heading">{% trans "Note Making" %}</span>
+        <span class="course-section-heading">{% trans "Note Making" %}
         <span class="course-section-icon">
-          <i class="fa fa-file-text"></i>
+          <i class="fi-clipboard-pencil"></i>
+        </span>
         </span>
         <div class="row">
           <div class="columns small-12 medium-4">
@@ -252,6 +253,7 @@
       </div>
     </div>  
   </div>
+  </div>  
   {% comment %}
   <div class="course-warning course-section">
       <h5>WAITING FOR YOUR FEEDBACK</h5>
