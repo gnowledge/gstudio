@@ -5740,11 +5740,12 @@ def get_all_iframes_of_unit(group_obj, domain):
             where 'a' and 'x' represent bank id &
             where 'b' and 'y' represent assessment_offered_id
         '''
-        create_gattribute(group_id, "assessment_list", result_set)
-        group_obj.reload()
-        print "\nresult_set: ", result_set
-        update_total_assessment_items(group_id, result_set, domain)
-        group_obj.reload()
+        if result_set:
+            create_gattribute(group_id, "assessment_list", result_set)
+            group_obj.reload()
+            # print "\nresult_set: ", result_set
+            update_total_assessment_items(group_id, result_set, domain)
+            group_obj.reload()
     except Exception as get_all_iframes_of_unit_err:
         print "\nError Occurred in get_all_iframes_of_unit() {0}".format(
             get_all_iframes_of_unit_err)
