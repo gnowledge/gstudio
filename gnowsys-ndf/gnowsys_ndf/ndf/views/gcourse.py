@@ -3874,7 +3874,7 @@ def load_assessment_analytics(request, group_id):
                     'notapplicable': notapplicableCount, 'attempted': attemptedCount,
                     'incorrect': incorrect}
                     counter_obj['assessment'].append(assessment_dict)
-                    counter_obj['group_points'] = (correctAttemptCount * GSTUDIO_QUIZ_CORRECT_POINTS)
+                    counter_obj['group_points'] += (correctAttemptCount * GSTUDIO_QUIZ_CORRECT_POINTS)
             counter_obj.last_update = datetime.datetime.now()
             counter_obj.save()
 
