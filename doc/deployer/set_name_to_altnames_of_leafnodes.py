@@ -4,7 +4,7 @@ from gnowsys_ndf.ndf.views.methods import dig_nodes_field
 group_id_str = raw_input("Enter Group_id: ")
 group_obj = node_collection.one({'_id': ObjectId(group_id_str)})
 if group_obj:
-	all_leaf_node_ids = dig_nodes_field(parent_node=group_obj, member_of=['Page'], only_leaf_nodes=True)
+	all_leaf_node_ids = dig_nodes_field(parent_node=group_obj, only_leaf_nodes=True)
 	all_leaf_node_cur = node_collection.find({'_id': {'$in': all_leaf_node_ids}})
 	print "\nLeaf nodes found: ", all_leaf_node_cur.count()
 	for each_node in all_leaf_node_cur:
