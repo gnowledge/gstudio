@@ -5510,10 +5510,11 @@ def dig_nodes_field(parent_node, field_name="collection_set",
         if only_leaf_nodes:
           if not each_obj[field_name]:
             list_of_node_ids.append(each_id)
+          else:
+            dig_nodes_field(each_obj, field_name,only_leaf_nodes, member_of, list_of_node_ids)
         else:
             list_of_node_ids.append(each_id)
 
-      dig_nodes_field(each_obj, field_name,only_leaf_nodes, member_of, list_of_node_ids)
 
   # print "\n len(list_of_node_ids) -- ",len(list_of_node_ids)
   return list_of_node_ids
