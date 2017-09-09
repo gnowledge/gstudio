@@ -4390,7 +4390,10 @@ class Counter(DjangoDocument):
 
         point_breakup_dict['Files'] = self.get_file_points()
         point_breakup_dict['Notes'] = self.get_page_points(page_type='blog')
-        point_breakup_dict['Quiz']  = self.get_quiz_points()
+        if 'assessment' in self and self['assessment']:
+            point_breakup_dict['Assessment']  = self.get_assessment_points()
+        else:
+            point_breakup_dict['Quiz']  = self.get_quiz_points()
         point_breakup_dict['Interactions'] = self.get_interaction_points()
 
         return point_breakup_dict
