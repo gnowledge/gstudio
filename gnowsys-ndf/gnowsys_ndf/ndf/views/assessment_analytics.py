@@ -4,7 +4,7 @@ import requests
 def hit_qbank_request(url):
     result_set = []
     try:
-        print "\n\nurl: ",url
+        # print "\n\nurl: ",url
         req_obj =  requests.get(url,verify = False)
         status = req_obj.status_code
         result_set = req_obj.json()
