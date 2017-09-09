@@ -58,7 +58,9 @@ def user_assessment_results(domain, guserId,bankId,offeredId):
         "question-type%3Aqti-choice-interaction-multi-select-survey%40ODL.MIT.EDU",
         "question-type%3Aqti-choice-interaction-survey%40ODL.MIT.EDU",
         "question-type%3Aqti-upload-interaction-audio%40ODL.MIT.EDU",
-        "question-type%3Aqti-upload-interaction-generic%40ODL.MIT.EDU"]
+        "question-type%3Aqti-upload-interaction-generic%40ODL.MIT.EDU",
+        "question-type%3Aqti-inline-choice-interaction-mw-fill-in-the-blank%40ODL.MIT.EDU",
+        ]
 
     data_set = user_results(domain,bankId,offeredId,guserId)
     # print "\ndata_set: {0} ".format(data_set)
