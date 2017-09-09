@@ -1,5 +1,6 @@
-from fabric.api import local
+import os
 
+from fabric.api import local
 # from django.conf import settings
 # settings.configure()
 # from gnowsys_ndf.settings import PROJECT_ROOT
@@ -50,6 +51,21 @@ def install_requirements():
 
 def purge_node():
 	local('python manage.py purge_node')
+
+
+def group_import(dump_path):
+    # Example Usage: 
+    # fab group_import:/data/data_export/test-module_2017-09-09_13-11
+    local('python manage.py group_import %s y y y' % dump_path)
+
+
+def group_import_all(dump_folder):
+    # Example Usage: 
+    # fab group_import_all:/data/data_export
+    dump_folder_list = filter( lambda f: not f.startswith('.'), os.listdir(dump_folder))
+    for each_dump in dump_folder_list:
+        print "\n\n\nRestoring dump of : ", each_dump
+        group_import(os.path.join(dump_folder, each_dump))
 
 
 # def setup_dlkit():
