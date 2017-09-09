@@ -2814,7 +2814,6 @@ def course_analytics(request, group_id, user_id, render_template=False, get_resu
                 'notapplicable_quizitems': 0,
                 'incorrect_attempted_quizitems': 0,
                 'attempted_quizitems': 0,
-                'close_opt': True
             })
     data_points_dict = {}
     assessment_and_quiz_data = kwargs.get('assessment_and_quiz_data', False)
@@ -2842,7 +2841,6 @@ def course_analytics(request, group_id, user_id, render_template=False, get_resu
     group_obj_member_of_names_list = group_obj.member_of_names_list
 
     if data_points_dict and not isinstance(data_points_dict, dict):
-        analytics_data['close_opt'] = False
         data_points_dict = json.loads(data_points_dict)
         analytics_data['correct_attempted_quizitems'] = (data_points_dict['quiz_points'] / GSTUDIO_QUIZ_CORRECT_POINTS)
         analytics_data['user_notes'] = (data_points_dict['notes_points'] / GSTUDIO_NOTE_CREATE_POINTS)
