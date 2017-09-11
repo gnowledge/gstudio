@@ -5510,10 +5510,11 @@ def dig_nodes_field(parent_node, field_name="collection_set",
         if only_leaf_nodes:
           if not each_obj[field_name]:
             list_of_node_ids.append(each_id)
+          else:
+            dig_nodes_field(each_obj, field_name,only_leaf_nodes, member_of, list_of_node_ids)
         else:
             list_of_node_ids.append(each_id)
 
-      dig_nodes_field(each_obj, field_name,only_leaf_nodes, member_of, list_of_node_ids)
 
   # print "\n len(list_of_node_ids) -- ",len(list_of_node_ids)
   return list_of_node_ids
@@ -5740,11 +5741,12 @@ def get_all_iframes_of_unit(group_obj, domain):
             where 'a' and 'x' represent bank id &
             where 'b' and 'y' represent assessment_offered_id
         '''
-        create_gattribute(group_id, "assessment_list", result_set)
-        group_obj.reload()
-        print "\nresult_set: ", result_set
-        update_total_assessment_items(group_id, result_set, domain)
-        group_obj.reload()
+        if result_set:
+            create_gattribute(group_id, "assessment_list", result_set)
+            group_obj.reload()
+            # print "\nresult_set: ", result_set
+            update_total_assessment_items(group_id, result_set, domain)
+            group_obj.reload()
     except Exception as get_all_iframes_of_unit_err:
         print "\nError Occurred in get_all_iframes_of_unit() {0}".format(
             get_all_iframes_of_unit_err)

@@ -2813,7 +2813,7 @@ def course_analytics(request, group_id, user_id, render_template=False, get_resu
                 'visited_quizitems': 0,
                 'notapplicable_quizitems': 0,
                 'incorrect_attempted_quizitems': 0,
-                'attempted_quizitems': 0
+                'attempted_quizitems': 0,
             })
     data_points_dict = {}
     assessment_and_quiz_data = kwargs.get('assessment_and_quiz_data', False)
@@ -2841,7 +2841,6 @@ def course_analytics(request, group_id, user_id, render_template=False, get_resu
     group_obj_member_of_names_list = group_obj.member_of_names_list
 
     if data_points_dict and not isinstance(data_points_dict, dict):
-
         data_points_dict = json.loads(data_points_dict)
         analytics_data['correct_attempted_quizitems'] = (data_points_dict['quiz_points'] / GSTUDIO_QUIZ_CORRECT_POINTS)
         analytics_data['user_notes'] = (data_points_dict['notes_points'] / GSTUDIO_NOTE_CREATE_POINTS)
@@ -2984,18 +2983,22 @@ def course_analytics(request, group_id, user_id, render_template=False, get_resu
             for each_dict in assessment_data_list:
                 if assessment_and_quiz_data:
                     analytics_data['correct_attempted_assessments'] += each_dict['correct']
-                    analytics_data['unattempted_assessments'] += each_dict['unattempted']
-                    analytics_data['visited_assessments'] += each_dict['visited']
+                    # analytics_data['unattempted_assessments'] += each_dict['unattempted']
+                    # analytics_data['visited_assessments'] += each_dict['visited']
                     analytics_data['notapplicable_assessments'] += each_dict['notapplicable']
                     analytics_data['incorrect_attempted_assessments'] += each_dict['incorrect']
                     analytics_data['attempted_assessments'] += each_dict['attempted']
                 else:
                     analytics_data['correct_attempted_quizitems'] += each_dict['correct']
-                    analytics_data['unattempted_quizitems'] += each_dict['unattempted']
-                    analytics_data['visited_quizitems'] += each_dict['visited']
+                    # analytics_data['unattempted_quizitems'] += each_dict['unattempted']
+                    # analytics_data['visited_quizitems'] += each_dict['visited']
                     analytics_data['notapplicable_quizitems'] += each_dict['notapplicable']
                     analytics_data['incorrect_attempted_quizitems'] += each_dict['incorrect']
                     analytics_data['attempted_quizitems'] += each_dict['attempted']
+            if assessment_and_quiz_data:
+                analytics_data['unattempted_assessments'] = analytics_data['total_assessment_items'] - analytics_data['attempted_assessments']
+            else:
+                analytics_data['unattempted_quizitems'] = analytics_data['total_quizitems'] - analytics_data['attempted_quizitems']
         except Exception as assessment_analytics_err:
             print "\nIn User analytics. Ignore if KeyError. Error: {0}".format(assessment_analytics_err)
             pass
@@ -3813,10 +3816,15 @@ def load_assessment_analytics(request, group_id):
     group_name = group_obj.name
     # Variable Decalarations
     update_counter_obj = False
-    correctAttemptCount = visitedCount = unattemptedCount = 0
+    correctAttemptCount = unattemptedCount = 0
     notapplicableCount = incorrectCount = attemptedCount = 0
+    total_items = 0
     try:
         assessment_list_cur = group_obj.get_attribute("assessment_list")
+        total_assessment_items_cur = group_obj.get_attribute("total_assessment_items")
+        if total_assessment_items_cur.count():
+            total_items = total_assessment_items_cur[0].object_value
+
         if assessment_list_cur.count():
             assessment_list = assessment_list_cur[0].object_value
             for each_sublist in assessment_list:
@@ -3827,22 +3835,22 @@ def load_assessment_analytics(request, group_id):
                      each_sublist[0], each_sublist[1])
                     if user_data_set:
                         correctAttemptCount += user_data_set['Correct']
-                        visitedCount += user_data_set['Visited']
-                        unattemptedCount += user_data_set['Unattempted']
                         notapplicableCount += user_data_set['NotApplicable']
                         incorrectCount += user_data_set['Incorrect']
                         attemptedCount += user_data_set['Attempted']
                         update_counter_obj = True
+
                 except Exception as no_result_found_err:
                     print "Unable to fetch Results for Assessment: {0} attempted by \
                     User: {1}. \n Error: {2}".format(each_sublist[1], user_id, no_result_found_err)
                     pass
+        unattemptedCount = total_items - attemptedCount
         if update_counter_obj:
             counter_obj = Counter.get_counter_obj(user_id, group_id)
             #create
             if not counter_obj['assessment']:
                 assessment_dict = {'id': each_sublist[1], 'correct': correctAttemptCount,
-                'visited': visitedCount, 'unattempted': unattemptedCount, 
+                'unattempted': unattemptedCount, 
                 'notapplicable': notapplicableCount, 'attempted': attemptedCount, 
                 'incorrect': incorrectCount}
                 counter_obj['assessment'].append(assessment_dict)
@@ -3853,20 +3861,20 @@ def load_assessment_analytics(request, group_id):
                 for each_dict in counter_obj['assessment']:
                     # check if AssessmentOffered Id exists in the values list
                     if each_sublist[1] in each_dict.values():
-                        # counter_obj['group_points'] -= (each_dict['correct']) * GSTUDIO_QUIZ_CORRECT_POINTS
-                        counter_obj['group_points'] = (correctAttemptCount * GSTUDIO_QUIZ_CORRECT_POINTS)
-                        each_dict.update({'correct': correctAttemptCount, 'visited': visitedCount,
+                        counter_obj['group_points'] -= (each_dict['correct'] * GSTUDIO_QUIZ_CORRECT_POINTS)
+                        counter_obj['group_points'] += (correctAttemptCount * GSTUDIO_QUIZ_CORRECT_POINTS)
+                        each_dict.update({'correct': correctAttemptCount,
                          'unattempted': unattemptedCount, 'notapplicable': notapplicableCount,
                          'attempted': attemptedCount, 'incorrect': incorrectCount})
                         reattempt = True
                         break
                 if not reattempt:
                     assessment_dict = {'id': each_sublist[1], 'correct': correctAttemptCount,
-                    'visited': visitedCount, 'unattempted': unattemptedCount,
+                    'unattempted': unattemptedCount,
                     'notapplicable': notapplicableCount, 'attempted': attemptedCount,
                     'incorrect': incorrect}
                     counter_obj['assessment'].append(assessment_dict)
-                    counter_obj['group_points'] = (correctAttemptCount * GSTUDIO_QUIZ_CORRECT_POINTS)
+                    counter_obj['group_points'] += (correctAttemptCount * GSTUDIO_QUIZ_CORRECT_POINTS)
             counter_obj.last_update = datetime.datetime.now()
             counter_obj.save()
 
@@ -3874,10 +3882,10 @@ def load_assessment_analytics(request, group_id):
             for each_dict in assessment_data_list:
                 try:
                     result_set['correct_attempted_quizitems'] += each_dict['correct']
-                    result_set['visited_quizitems'] += each_dict['visited']
+                    # result_set['visited_quizitems'] += each_dict['visited']
                     result_set['unattempted_quizitems'] += each_dict['unattempted']
                     result_set['incorrect_attempted_quizitems'] += each_dict['incorrect']
-                    result_set['notapplicable_quizitems'] += each_dict['notapplicable']
+                    # result_set['notapplicable_quizitems'] += each_dict['notapplicable']
                     result_set['attempted_quizitems'] += each_dict['attempted']
                 except Exception as key_err:
                     print "\nIn load_assessment_analytics() Ignore if KeyError. Error: {0}".format(key_err)
