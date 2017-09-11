@@ -18,7 +18,7 @@
 			{% trans "Module Description:" %}<h7 class="text-button-blue">{{node.content|safe}}</h7>
 
 		         <div class="right course_actions" style="margin-top:37px;">
-          		{% if is_gstaff or node.created_by == request.user.id  %}
+          		{% if is_gstaff   %}
 		            <span data-dropdown="course-settings-drop" aria-controls="course-settings-drop" aria-expanded="false" class="tiny radius right" data-options="align:left">
 		                  <i class="icon-widget fi-widget"></i>
 		            </span>
