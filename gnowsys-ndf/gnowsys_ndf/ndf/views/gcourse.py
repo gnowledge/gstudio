@@ -3861,7 +3861,7 @@ def load_assessment_analytics(request, group_id):
                 for each_dict in counter_obj['assessment']:
                     # check if AssessmentOffered Id exists in the values list
                     if each_sublist[1] in each_dict.values():
-                        counter_obj['group_points'] -= (each_dict['correct']) * GSTUDIO_QUIZ_CORRECT_POINTS
+                        counter_obj['group_points'] -= (each_dict['correct'] * GSTUDIO_QUIZ_CORRECT_POINTS)
                         counter_obj['group_points'] += (correctAttemptCount * GSTUDIO_QUIZ_CORRECT_POINTS)
                         each_dict.update({'correct': correctAttemptCount,
                          'unattempted': unattemptedCount, 'notapplicable': notapplicableCount,
