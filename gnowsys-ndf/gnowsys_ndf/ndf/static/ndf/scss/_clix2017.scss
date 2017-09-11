@@ -673,7 +673,7 @@ h5{
                 padding: 0px 30px;
                     &.active{
                     color:#fff;
-                    font-size: 18px;
+                    font-size: 17px;
                     font-family: OpenSans-Bold;
                     margin-top: -3px;
                     border-bottom: 3px solid $secondary-orange;
@@ -4519,6 +4519,12 @@ $inCompleteBgColor: #fd9e29;
     
         
     }
+
+    .position-actions{
+            margin-top: -60px;
+            margin-left: 760px;
+    }
+
     .right-margin{
         margin-right: 46px;
     }
@@ -4535,6 +4541,7 @@ $inCompleteBgColor: #fd9e29;
        opacity:0.8;
        margin-top:30px;
        z-index:1;
+
  
     }
  
@@ -6015,6 +6022,23 @@ ul.nav_menu_1 {
 }
 
 #course-settings-drop{
+
+    .f-dropdown li {
+        position: absolute;
+        left: -9999px;
+        list-style: none;
+        margin-left: 0;
+        outline: none;
+        width: 100%;
+        max-height: none;
+        height: auto;
+        background: white;
+        border: solid 1px #cccccc;
+        font-size: 0.875rem;
+        z-index: 89;
+        margin-top: 2px;
+        max-width: 200px;
+    }
     li{
             a{
 
