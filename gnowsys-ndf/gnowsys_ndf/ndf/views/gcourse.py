@@ -3836,7 +3836,7 @@ def load_assessment_analytics(request, group_id):
             for each_sublist in assessment_list:
                 # each_sublist[0] -- bankID & each_sublist[1] -- OfferedId
                 try:
-                    user_data_set = user_assessment_results("https://" + domain, user_id,
+                    user_data_set = user_assessment_results("https://" + domain, int(user_id),
                      each_sublist[0], each_sublist[1])
                     if user_data_set:
                         try:
@@ -3875,13 +3875,9 @@ def load_assessment_analytics(request, group_id):
                             pass
                             succes_update = False
                             print "\nError occurred in update_assessment_analytics_for_buddies(). ", update_asmnt_anlytcs_for_buddies_err
-
-                        print "\nsuccess_flag: ", success_flag
-                        result_set['success_flag'] = success_flag
-
                 except Exception as no_result_found_err:
                     print "Unable to fetch Results for Assessment: {0} attempted by \
-                    User: {1}. \n Error: {2}".format(each_sublist[1], user_id, no_result_found_err)
+                    User: {1}. \n Error: {2}".format(each_sublist[1], str(user_id), no_result_found_err)
                     pass
             counter_obj = Counter.get_counter_obj(request.user.id, group_id)
             assessment_data_list = counter_obj['assessment']
@@ -3896,6 +3892,7 @@ def load_assessment_analytics(request, group_id):
                     result_set['attempted_quizitems'] += each_dict['attempted']
                 except Exception as key_err:
                     print "\nIn load_assessment_analytics() Ignore if KeyError. Error: {0}".format(key_err)
+            result_set['unattempted_quizitems'] = total_items - result_set['attempted_quizitems']
             result_set['users_points'] = counter_obj['group_points']
     except Exception as e:
         print "\nError: ",e
