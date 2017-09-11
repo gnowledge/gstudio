@@ -17,10 +17,12 @@
 			<a href="{% url 'explore_courses' %}" class="secondary-header-tabs  {%if title == 'courses'%} active{% endif %}">
 				{% trans "Courses" %}
 			</a>
-			{% if request.user.is_superuser or user_grp_count.projects > 0  %}
-			<a href="{% url 'explore_groups' %}" class="secondary-header-tabs {%if title == 'workspaces'%} active{% endif %}">
-				{% trans "Workspaces" %}
-			</a>
+			{% if is_workspace_instance %}	
+				{% if request.user.is_superuser or user_grp_count.projects > 0  %}
+				<a href="{% url 'explore_groups' %}" class="secondary-header-tabs {%if title == 'workspaces'%} active{% endif %}">
+					{% trans "Workspaces" %}
+				</a>
+				{% endif %}
 			{% endif %}
 			{% if request.user.is_superuser or user_grp_count.drafts > 0  %}
 			<a href="{% url 'explore_drafts' %}" class="secondary-header-tabs {%if title == 'drafts'%} active{% endif %}">
