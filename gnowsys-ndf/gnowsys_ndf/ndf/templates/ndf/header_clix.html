@@ -50,7 +50,7 @@
                                 {% csrf_token %}
                                 <input name="url" type="hidden" value="{{request.get_full_path}}"/>
                                 <input type="hidden"  name="language" value="{{ lang.0 }}">
-                                <input type="submit"   class="button expand secondary" value="{{ lang.1 }}" style="color: #74b3dc;"/>
+                                <input type="submit"   class="button expand secondary" value="{{ lang.1 }}"/>
                                 </form>
                             </li>
                         {% endfor %}

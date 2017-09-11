@@ -609,6 +609,21 @@ h5{
                 
                 }
 
+                input{
+                    color: $secondry-blue;
+                    background: $primary-blue;
+                    font-family: OpenSans-Regular;
+                    font-size: 15px;
+                    letter-spacing: 1.4px;
+                    
+
+                    &:hover{
+                        color: white;
+                        border-left: 4px solid $secondary-orange;
+                        background: $primary-blue;
+                    }
+                }
+
                 .lang-font{
                         
                             font-family: "OpenSans-Light";
