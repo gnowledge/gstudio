@@ -4556,9 +4556,22 @@ $inCompleteBgColor: #fd9e29;
        cursor: pointer;
        border-radius: 3px;
     }
+
 }
 
-
+.dropdown-settings{
+    text-align: left;
+    text-transform: none;
+    margin-top: 0px;
+    margin-right: 0px;
+    width: 198px;
+    background: white;
+    border-radius: 1px;
+    &:hover{
+        color: $primary-orange;
+        border-left:2px solid $secondary-orange;
+    }
+}
 
 .activity-slides-container {
     //border: 1px solid black;
@@ -6023,22 +6036,6 @@ ul.nav_menu_1 {
 
 #course-settings-drop{
 
-    .f-dropdown li {
-        position: absolute;
-        left: -9999px;
-        list-style: none;
-        margin-left: 0;
-        outline: none;
-        width: 100%;
-        max-height: none;
-        height: auto;
-        background: white;
-        border: solid 1px #cccccc;
-        font-size: 0.875rem;
-        z-index: 89;
-        margin-top: 2px;
-        max-width: 200px;
-    }
     li{
             a{
 
