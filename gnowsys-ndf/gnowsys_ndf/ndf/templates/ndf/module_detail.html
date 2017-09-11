@@ -18,12 +18,12 @@
 			{% trans "Module Description:" %}<h7 class="text-button-blue">{{node.content|safe}}</h7>
 
 		         <div class="right course_actions" style="margin-top:37px;">
+          		{% if is_gstaff or node.created_by == request.user.id  %}
 		            <span data-dropdown="course-settings-drop" aria-controls="course-settings-drop" aria-expanded="false" class="tiny radius right" data-options="align:left">
 		                  <i class="icon-widget fi-widget"></i>
 		            </span>
 		            <ul id="course-settings-drop" class="f-dropdown" data-dropdown-content aria-hidden="true" tabindex="-1">
 		                <li>
-		              		{% if is_gstaff or node.created_by == request.user.id  %}
 									<a  class="buddy_margin right edit_button" href="{% url 'module_edit' group_id node.pk %}" style="text-transform: none;"><i class="fa fa-pencil"></i> {% trans "Edit" %}</a>
 						</li>
 						<li>
@@ -41,12 +41,12 @@
 					                        <a href="{% url 'delete_group_url_redirect' node.pk 'explore_courses' %}" class="button tiny alert">{% trans "Yes" %}</a>
 					                        <a class="close-reveal-modal" aria-label="Close">&#215;</a>
 					                </div>
-							{% endif %}
 					    </li>
 		              	<li>
 		                    <a class="fi-photo" style="position: relative;top: -3px;left: 2px;" data-reveal-id="group_banner_prof_pic_prop">
 		                    {% trans "Change image" %} </a>
 		              	</li>
+							{% endif %}
 		            </ul>
 		        </div>
 		</div>
