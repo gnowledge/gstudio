@@ -4164,13 +4164,13 @@ def get_trans_node(node_id,lang):
 
 # @register.assignment_tag
 @register.inclusion_tag('ndf/quiz_player.html')
-def load_quiz_player(request, group_id, node, allow_attempt=True):
+def load_quiz_player(request, group_id, node, allow_attempt=True, hide_edit_opt=False):
     from gnowsys_ndf.ndf.views.quiz import render_quiz_player
     node_member_of_names_list = node.member_of_names_list
     if "QuizItem" in node_member_of_names_list or "QuizItemEvent" in node_member_of_names_list:
         con_var = render_quiz_player(request, group_id, node, get_context=True)
         con_var.update({'template': 'ndf/quiz_player.html', 'request': request,
-        	'allow_attempt': allow_attempt })
+        	'allow_attempt': allow_attempt , 'hide_edit_opt': hide_edit_opt})
     # rel_value = get_relation_value(ObjectId(node._id),"translation_of")
     # for each in rel_value['grel_node']:
     #     if each.language[0] ==  get_language_tuple(lang)[0]:
