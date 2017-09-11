@@ -19,7 +19,7 @@
             <img  src="/static/ndf/images/module-card.png"/></img>
         {% endif %}
             <h4 class="card_title" title="{% firstof node.altnames node.name %} ">
-                {% firstof node.altnames|truncatechars:60 node.name|truncatechars:60  %}
+                {% firstof node.altnames|truncatechars:50 node.name|truncatechars:50  %}
             </h4>
     {% get_dict_from_list_of_dicts node.attribute_set as node_attrs %}
     </div>

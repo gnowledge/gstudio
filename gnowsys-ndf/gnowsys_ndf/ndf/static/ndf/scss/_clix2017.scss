@@ -609,6 +609,21 @@ h5{
                 
                 }
 
+                input{
+                    color: $secondry-blue;
+                    background: $primary-blue;
+                    font-family: OpenSans-Regular;
+                    font-size: 15px;
+                    letter-spacing: 1.4px;
+                    
+
+                    &:hover{
+                        color: white;
+                        border-left: 4px solid $secondary-orange;
+                        background: $primary-blue;
+                    }
+                }
+
                 .lang-font{
                         
                             font-family: "OpenSans-Light";
@@ -658,7 +673,7 @@ h5{
                 padding: 0px 30px;
                     &.active{
                     color:#fff;
-                    font-size: 18px;
+                    font-size: 17px;
                     font-family: OpenSans-Bold;
                     margin-top: -3px;
                     border-bottom: 3px solid $secondary-orange;
@@ -4504,6 +4519,12 @@ $inCompleteBgColor: #fd9e29;
     
         
     }
+
+    .position-actions{
+            margin-top: -60px;
+            margin-left: 760px;
+    }
+
     .right-margin{
         margin-right: 46px;
     }
@@ -4520,6 +4541,7 @@ $inCompleteBgColor: #fd9e29;
        opacity:0.8;
        margin-top:30px;
        z-index:1;
+
  
     }
  
@@ -4534,9 +4556,22 @@ $inCompleteBgColor: #fd9e29;
        cursor: pointer;
        border-radius: 3px;
     }
+
 }
 
-
+.dropdown-settings{
+    text-align: left;
+    text-transform: none;
+    margin-top: 0px;
+    margin-right: 0px;
+    width: 198px;
+    background: white;
+    border-radius: 1px;
+    &:hover{
+        color: $primary-orange;
+        border-left:2px solid $secondary-orange;
+    }
+}
 
 .activity-slides-container {
     //border: 1px solid black;
@@ -4679,6 +4714,7 @@ $module-card-lines-to-show: 3;
     margin: 10px;
     border-radius: 5px;
     position: relative;
+    box-shadow: 0px 0px 5px 1px rgba(0, 0, 0, 0.15);
 
     &:hover {
         box-shadow: 0px 0px 17px rgba(0, 0, 0, 0.68);
@@ -4735,7 +4771,7 @@ $module-card-lines-to-show: 3;
     .card_title {
         display: block;
         font-size: 32px;
-        font-weight: 800;
+        font-weight: 600;
         text-align: center;
         margin: 0px auto;
         letter-spacing: 1px;
@@ -5618,7 +5654,10 @@ ul.nav_menu_1 {
 
 
 /*##### Footer Structure #####*/
-.bo-wrap {clear:both; width: auto;}
+.bo-wrap {
+    clear:both; 
+    width: auto;
+}
 .bo-footer {
   clear:both;
   width: auto;
@@ -5631,7 +5670,31 @@ ul.nav_menu_1 {
   text-align: left; 
   line-height: 1px;
   padding: 10px 10px 10px 10px;
-        
+
+      &>a{
+            color:$primary-orange;
+            word-spacing:8px;
+            &:hover {
+            color: $primary-orange;
+            border-bottom: 3px solid $secondary-orange;
+
+        }
+    }
+            
+}
+
+.bo-footer-copyright{
+    &>a{
+            transition: link-color 0.15s ease-in-out 0s,border 0.15s ease-in-out 0s;
+            border-bottom: none;
+            color: #777;
+            text-decoration: none !important;
+            word-spacing:3px;
+            &:hover {
+            color:#777;
+            border-bottom: 3px solid hsla(316, 88%, 42%, 1);
+        }
+    }
 }
 
 .bo-footer-smap {
@@ -5640,6 +5703,7 @@ ul.nav_menu_1 {
   padding: 5px 10px;
   text-align: left;
   font-size: 18px;
+  word-spacing:20px;
 }
 
 .bo-footer-uonline {
@@ -5971,6 +6035,7 @@ ul.nav_menu_1 {
 }
 
 #course-settings-drop{
+
     li{
             a{
 
