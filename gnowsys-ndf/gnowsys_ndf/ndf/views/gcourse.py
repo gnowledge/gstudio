@@ -3839,8 +3839,45 @@ def load_assessment_analytics(request, group_id):
                     user_data_set = user_assessment_results("https://" + domain, user_id,
                      each_sublist[0], each_sublist[1])
                     if user_data_set:
-                        success_flag = update_assessment_analytics_for_buddies(each_sublist[1], active_user_ids_list, request.user.id, user_data_set)
-                        # print "\nsuccess_flag: ", success_flag
+                        try:
+                            for user_id in active_user_ids_list:
+                                counter_obj = Counter.get_counter_obj(user_id, group_id)
+                                #create
+                                if not counter_obj['assessment']:
+                                    assessment_dict = {'id': each_sublist[1], 'correct': user_data_set['Correct'],
+                                    'notapplicable': user_data_set['NotApplicable'], 'attempted': user_data_set['Attempted'], 
+                                    'incorrect': user_data_set['Incorrect']}
+                                    counter_obj['assessment'].append(assessment_dict)
+                                    counter_obj['group_points'] += (user_data_set['Correct'] * GSTUDIO_QUIZ_CORRECT_POINTS)
+                                else:
+                                    #edit
+                                    reattempt = False
+                                    for each_dict in counter_obj['assessment']:
+                                        # check if AssessmentOffered Id exists in the values list
+                                        if each_sublist[1] in each_dict.values():
+                                            counter_obj['group_points'] -= (each_dict['correct'] * GSTUDIO_QUIZ_CORRECT_POINTS)
+                                            counter_obj['group_points'] += (user_data_set['Correct'] * GSTUDIO_QUIZ_CORRECT_POINTS)
+                                            each_dict.update({'correct': user_data_set['Correct'],
+                                             'notapplicable': user_data_set['NotApplicable'],
+                                             'attempted': user_data_set['Attempted'],
+                                             'incorrect': user_data_set['Incorrect']})
+                                            reattempt = True
+                                            break
+                                    if not reattempt:
+                                        assessment_dict = {'id': each_sublist[1], 'correct': user_data_set['Correct'],
+                                        'notapplicable': user_data_set['NotApplicable'], 'attempted': user_data_set['Attempted'],
+                                        'incorrect': user_data_set['Incorrect']}
+                                        counter_obj['assessment'].append(assessment_dict)
+                                        counter_obj['group_points'] += (user_data_set['Correct'] * GSTUDIO_QUIZ_CORRECT_POINTS)
+                                counter_obj.last_update = datetime.datetime.now()
+                                counter_obj.save()
+                        except Exception as update_asmnt_anlytcs_for_buddies_err:
+                            pass
+                            succes_update = False
+                            print "\nError occurred in update_assessment_analytics_for_buddies(). ", update_asmnt_anlytcs_for_buddies_err
+
+                        print "\nsuccess_flag: ", success_flag
+                        result_set['success_flag'] = success_flag
 
                 except Exception as no_result_found_err:
                     print "Unable to fetch Results for Assessment: {0} attempted by \
@@ -3853,7 +3890,7 @@ def load_assessment_analytics(request, group_id):
                 try:
                     result_set['correct_attempted_quizitems'] += each_dict['correct']
                     # result_set['visited_quizitems'] += each_dict['visited']
-                    result_set['unattempted_quizitems'] += each_dict['unattempted']
+                    # result_set['unattempted_quizitems'] += each_dict['unattempted']
                     result_set['incorrect_attempted_quizitems'] += each_dict['incorrect']
                     # result_set['notapplicable_quizitems'] += each_dict['notapplicable']
                     result_set['attempted_quizitems'] += each_dict['attempted']
