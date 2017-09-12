@@ -683,8 +683,7 @@ def render_quiz_player(request, group_id, node, get_context=False):
                     options_list = trans_options_list
 
             context_variables = {'node': node, 'question_content': question_content, 
-            'options_list': options_list, 'groupid': group_id, 'group_id': group_id, 
-            'allow_attempt': True}
+            'options_list': options_list, 'groupid': group_id, 'group_id': group_id}
             if get_context:
                 return context_variables
             return render_to_response("ndf/quiz_player.html",
