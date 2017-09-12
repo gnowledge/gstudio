@@ -1,7 +1,24 @@
 from gnowsys_ndf.ndf.models import *
 from gnowsys_ndf.ndf.views.methods import dig_nodes_field, create_gattribute
 
-units_for_renaming_leaf_nodes = []
+units_for_renaming_leaf_nodes = [ObjectId('5944c6954975ac013e9ee760'),
+ ObjectId('5943f3f94975ac013d36fa53'),
+ ObjectId('5943ff594975ac013d3701fc'),
+ ObjectId('5943fd564975ac013d36fdae'),
+ ObjectId('59425be44975ac013cccb909'),
+ ObjectId('5943d4a54975ac013f4ddce0'),
+ ObjectId('59425c964975ac013cccba9d'),
+ ObjectId('5942605d4975ac013cccbe52'),
+ ObjectId('59425cc54975ac013cccbae4'),
+ ObjectId('59425d1a4975ac013cccbb8b'),
+ ObjectId('594260214975ac013d976c55'),
+ ObjectId('59425de84975ac013bf0f46e'),
+ ObjectId('59425e464975ac013cccbc4d'),
+ ObjectId('59425fc64975ac013d976b32'),
+ ObjectId('59425f864975ac013d976ac6'),
+ ObjectId('59425ead4975ac013bf0f54b'),
+ ObjectId('594260a54975ac013d976dc3')]
+
 module_sort_order_ids = []
 
 try:
