@@ -32,7 +32,7 @@ def update_data():
 		local('python manage.py sync_existing_documents')
 
 
-def update(branch):
+def update(branch='master'):
 	try:
 		local('git pull origin ' + branch)
 		local('python manage.py syncdb')
