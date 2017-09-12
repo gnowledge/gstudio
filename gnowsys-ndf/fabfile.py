@@ -56,6 +56,7 @@ def purge_node():
 def group_import(dump_path):
     # Example Usage: 
     # fab group_import:/data/data_export/test-module_2017-09-09_13-11
+    print "\n Path of node/group to restore: ", dump_path
     local('python manage.py group_import %s y y y' % dump_path)
     local('rm 5*')
 
