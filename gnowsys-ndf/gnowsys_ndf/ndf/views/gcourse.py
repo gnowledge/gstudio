@@ -2098,7 +2098,7 @@ def activity_player_detail(request, group_id, lesson_id, activity_id):
         'trans_node':trans_node,
         'act_list':trans_act_list,
         'trans_lesson_name':lesson_name,
-        'no_footer': True, 'allow_finish_lesson': False
+        'no_footer': True
     }
 
     if request.user.is_authenticated():
@@ -2119,9 +2119,6 @@ def activity_player_detail(request, group_id, lesson_id, activity_id):
             each_counter_obj.save()
             # print "\n updated counter_obj: ", each_counter_obj['visited_nodes']
         # if 'tab_name' in group_obj.project_config and group_obj.project_config['tab_name'].lower() == "questions":
-        if "QuizItemEvent" in node_obj.member_of_names_list:
-            if request.user.id not in lesson_node.author_set:
-                context_variables.update({'allow_finish_lesson': True})
     template = "ndf/activity_player.html"
     return render_to_response(template,
                                 context_variables,
