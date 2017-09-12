@@ -63,7 +63,7 @@
 					{% endif %}
 
 				</div>
-				{% if total_and_curr_ans_dict.count != node.quizitem_max_attempts and allow_attempt %}
+				{% if total_and_curr_ans_dict.count != node.quizitem_max_attempts %}
 					<div class="row controls-box quiz_qtn hide">
 						{% if node.quizitem_check_answer and node.quiz_type != "Short-Response"  %}
 							<input type="button" value="Check" class="purple-btn check-ans check-btn">
