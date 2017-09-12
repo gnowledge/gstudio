@@ -44,7 +44,7 @@ def user_results(domain,bankId,offeredId,guserId=None):
     "/assessmentsoffered/"+str(offeredId)+"/results"
     result_set = []
     if guserId:
-        url = url + "?agentId=" + guserId
+        url = url + "?agentId=" + str(guserId)
     result_set = hit_qbank_request(url)
     return result_set
 

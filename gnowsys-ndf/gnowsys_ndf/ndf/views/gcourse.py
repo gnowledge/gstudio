@@ -3815,80 +3815,84 @@ def load_assessment_analytics(request, group_id):
     group_id = group_obj._id
     group_name = group_obj.name
     # Variable Decalarations
-    update_counter_obj = False
     correctAttemptCount = unattemptedCount = 0
     notapplicableCount = incorrectCount = attemptedCount = 0
+    count_dict = {'correctAttemptCount': correctAttemptCount, 
+        'unattemptedCount': unattemptedCount, 'notapplicableCount': notapplicableCount,
+        'incorrectCount': incorrectCount, 'attemptedCount': attemptedCount}
     total_items = 0
+    offeredId_list = []
     try:
         assessment_list_cur = group_obj.get_attribute("assessment_list")
         total_assessment_items_cur = group_obj.get_attribute("total_assessment_items")
         if total_assessment_items_cur.count():
             total_items = total_assessment_items_cur[0].object_value
 
+        active_user_ids_list = [request.user.id]
+        if GSTUDIO_BUDDY_LOGIN:
+            active_user_ids_list += Buddy.get_buddy_userids_list_within_datetime(request.user.id, datetime.datetime.now())
         if assessment_list_cur.count():
             assessment_list = assessment_list_cur[0].object_value
             for each_sublist in assessment_list:
-                # each_sublist[0] -- bankID
-                # each_sublist[1] -- OfferedId
+                # each_sublist[0] -- bankID & each_sublist[1] -- OfferedId
                 try:
-                    user_data_set = user_assessment_results("https://" + domain, user_id,
+                    user_data_set = user_assessment_results("https://" + domain, int(user_id),
                      each_sublist[0], each_sublist[1])
                     if user_data_set:
-                        correctAttemptCount += user_data_set['Correct']
-                        notapplicableCount += user_data_set['NotApplicable']
-                        incorrectCount += user_data_set['Incorrect']
-                        attemptedCount += user_data_set['Attempted']
-                        update_counter_obj = True
-
+                        try:
+                            for user_id in active_user_ids_list:
+                                counter_obj = Counter.get_counter_obj(user_id, group_id)
+                                #create
+                                if not counter_obj['assessment']:
+                                    assessment_dict = {'id': each_sublist[1], 'correct': user_data_set['Correct'],
+                                    'notapplicable': user_data_set['NotApplicable'], 'attempted': user_data_set['Attempted'], 
+                                    'incorrect': user_data_set['Incorrect']}
+                                    counter_obj['assessment'].append(assessment_dict)
+                                    counter_obj['group_points'] += (user_data_set['Correct'] * GSTUDIO_QUIZ_CORRECT_POINTS)
+                                else:
+                                    #edit
+                                    reattempt = False
+                                    for each_dict in counter_obj['assessment']:
+                                        # check if AssessmentOffered Id exists in the values list
+                                        if each_sublist[1] in each_dict.values():
+                                            counter_obj['group_points'] -= (each_dict['correct'] * GSTUDIO_QUIZ_CORRECT_POINTS)
+                                            counter_obj['group_points'] += (user_data_set['Correct'] * GSTUDIO_QUIZ_CORRECT_POINTS)
+                                            each_dict.update({'correct': user_data_set['Correct'],
+                                             'notapplicable': user_data_set['NotApplicable'],
+                                             'attempted': user_data_set['Attempted'],
+                                             'incorrect': user_data_set['Incorrect']})
+                                            reattempt = True
+                                            break
+                                    if not reattempt:
+                                        assessment_dict = {'id': each_sublist[1], 'correct': user_data_set['Correct'],
+                                        'notapplicable': user_data_set['NotApplicable'], 'attempted': user_data_set['Attempted'],
+                                        'incorrect': user_data_set['Incorrect']}
+                                        counter_obj['assessment'].append(assessment_dict)
+                                        counter_obj['group_points'] += (user_data_set['Correct'] * GSTUDIO_QUIZ_CORRECT_POINTS)
+                                counter_obj.last_update = datetime.datetime.now()
+                                counter_obj.save()
+                        except Exception as update_asmnt_anlytcs_for_buddies_err:
+                            pass
+                            succes_update = False
+                            print "\nError occurred in update_assessment_analytics_for_buddies(). ", update_asmnt_anlytcs_for_buddies_err
                 except Exception as no_result_found_err:
                     print "Unable to fetch Results for Assessment: {0} attempted by \
-                    User: {1}. \n Error: {2}".format(each_sublist[1], user_id, no_result_found_err)
+                    User: {1}. \n Error: {2}".format(each_sublist[1], str(user_id), no_result_found_err)
                     pass
-        unattemptedCount = total_items - attemptedCount
-        if update_counter_obj:
-            counter_obj = Counter.get_counter_obj(user_id, group_id)
-            #create
-            if not counter_obj['assessment']:
-                assessment_dict = {'id': each_sublist[1], 'correct': correctAttemptCount,
-                'unattempted': unattemptedCount, 
-                'notapplicable': notapplicableCount, 'attempted': attemptedCount, 
-                'incorrect': incorrectCount}
-                counter_obj['assessment'].append(assessment_dict)
-                counter_obj['group_points'] += (correctAttemptCount * GSTUDIO_QUIZ_CORRECT_POINTS)
-            else:
-                #edit
-                reattempt = False
-                for each_dict in counter_obj['assessment']:
-                    # check if AssessmentOffered Id exists in the values list
-                    if each_sublist[1] in each_dict.values():
-                        counter_obj['group_points'] -= (each_dict['correct'] * GSTUDIO_QUIZ_CORRECT_POINTS)
-                        counter_obj['group_points'] += (correctAttemptCount * GSTUDIO_QUIZ_CORRECT_POINTS)
-                        each_dict.update({'correct': correctAttemptCount,
-                         'unattempted': unattemptedCount, 'notapplicable': notapplicableCount,
-                         'attempted': attemptedCount, 'incorrect': incorrectCount})
-                        reattempt = True
-                        break
-                if not reattempt:
-                    assessment_dict = {'id': each_sublist[1], 'correct': correctAttemptCount,
-                    'unattempted': unattemptedCount,
-                    'notapplicable': notapplicableCount, 'attempted': attemptedCount,
-                    'incorrect': incorrect}
-                    counter_obj['assessment'].append(assessment_dict)
-                    counter_obj['group_points'] += (correctAttemptCount * GSTUDIO_QUIZ_CORRECT_POINTS)
-            counter_obj.last_update = datetime.datetime.now()
-            counter_obj.save()
-
+            counter_obj = Counter.get_counter_obj(request.user.id, group_id)
             assessment_data_list = counter_obj['assessment']
+
             for each_dict in assessment_data_list:
                 try:
                     result_set['correct_attempted_quizitems'] += each_dict['correct']
                     # result_set['visited_quizitems'] += each_dict['visited']
-                    result_set['unattempted_quizitems'] += each_dict['unattempted']
+                    # result_set['unattempted_quizitems'] += each_dict['unattempted']
                     result_set['incorrect_attempted_quizitems'] += each_dict['incorrect']
                     # result_set['notapplicable_quizitems'] += each_dict['notapplicable']
                     result_set['attempted_quizitems'] += each_dict['attempted']
                 except Exception as key_err:
                     print "\nIn load_assessment_analytics() Ignore if KeyError. Error: {0}".format(key_err)
+            result_set['unattempted_quizitems'] = total_items - result_set['attempted_quizitems']
             result_set['users_points'] = counter_obj['group_points']
     except Exception as e:
         print "\nError: ",e
@@ -3896,7 +3900,45 @@ def load_assessment_analytics(request, group_id):
     return HttpResponse(json.dumps(result_set))
 
 
-
+def update_assessment_analytics_for_buddies(offeredId, user_ids, logged_in_user_id, user_data_set):
+    succes_update = True
+    try:
+        for user_id in user_ids:
+            counter_obj = Counter.get_counter_obj(user_id, group_id)
+            #create
+            if not counter_obj['assessment']:
+                assessment_dict = {'id': offeredId, 'correct': user_data_set['Correct'],
+                'notapplicable': user_data_set['NotApplicable'], 'attempted': user_data_set['Attempted'], 
+                'incorrect': user_data_set['Incorrect']}
+                counter_obj['assessment'].append(assessment_dict)
+                counter_obj['group_points'] += (user_data_set['Correct'] * GSTUDIO_QUIZ_CORRECT_POINTS)
+            else:
+                #edit
+                reattempt = False
+                for each_dict in counter_obj['assessment']:
+                    # check if AssessmentOffered Id exists in the values list
+                    if offeredId in each_dict.values():
+                        counter_obj['group_points'] -= (each_dict['correct'] * GSTUDIO_QUIZ_CORRECT_POINTS)
+                        counter_obj['group_points'] += (user_data_set['Correct'] * GSTUDIO_QUIZ_CORRECT_POINTS)
+                        each_dict.update({'correct': user_data_set['Correct'],
+                         'notapplicable': user_data_set['NotApplicable'],
+                         'attempted': user_data_set['Attempted'],
+                         'incorrect': user_data_set['Incorrect']})
+                        reattempt = True
+                        break
+                if not reattempt:
+                    assessment_dict = {'id': offeredId, 'correct': user_data_set['Correct'],
+                    'notapplicable': user_data_set['NotApplicable'], 'attempted': user_data_set['Attempted'],
+                    'incorrect': user_data_set['Incorrect']}
+                    counter_obj['assessment'].append(assessment_dict)
+                    counter_obj['group_points'] += (user_data_set['Correct'] * GSTUDIO_QUIZ_CORRECT_POINTS)
+            counter_obj.last_update = datetime.datetime.now()
+            counter_obj.save()
+    except Exception as update_asmnt_anlytcs_for_buddies_err:
+        pass
+        succes_update = False
+        print "\nError occurred in update_assessment_analytics_for_buddies(). ", update_asmnt_anlytcs_for_buddies_err
+    return succes_update
 
 # def get_lang_node(node_id,lang):
 #     rel_value = get_relation_value(ObjectId(node_id),"translation_of")

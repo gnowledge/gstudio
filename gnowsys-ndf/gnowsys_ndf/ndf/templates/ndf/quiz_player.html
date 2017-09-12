@@ -11,7 +11,7 @@
 	<fieldset>
 	    <legend >
 	    	<span>Question</span>
-			{% if is_gstaff %}
+			{% if is_gstaff and not hide_edit_opt %}
 		    	<a href="{% url 'quiz_item_edit' group_id node.pk %}?return_url={{ request.META.HTTP_REFERER }}" class="right question_edit" target="_blank" >Edit</a>
 		    {% endif %}
 	    </legend>

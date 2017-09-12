@@ -114,7 +114,7 @@
               {% endif %}
               <div class="activity_page_rendered buddy_margin">
                 {% if "QuizItemEvent" in node_member_of_names_list or "QuizItem" in node_member_of_names_list%}
-                  {% load_quiz_player request group_id node allow_finish_lesson %}
+                  {% load_quiz_player request group_id node allow_finish_lesson True %}
                 {% else %}
                 {# {{node.content|safe}} #}
                 {% include "ndf/node_ajax_content.html" with node=trans_node expand_content=True  no_discussion=True hide_breadcrumbs=True %}
