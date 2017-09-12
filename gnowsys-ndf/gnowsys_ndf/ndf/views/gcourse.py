@@ -3879,7 +3879,7 @@ def load_assessment_analytics(request, group_id):
                     print "Unable to fetch Results for Assessment: {0} attempted by \
                     User: {1}. \n Error: {2}".format(each_sublist[1], str(user_id), no_result_found_err)
                     pass
-            counter_obj = Counter.get_counter_obj(request.user.id, group_id)
+            counter_obj = Counter.get_counter_obj(int(user_id), group_id)
             assessment_data_list = counter_obj['assessment']
 
             for each_dict in assessment_data_list:
