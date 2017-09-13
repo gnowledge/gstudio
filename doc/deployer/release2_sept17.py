@@ -20,14 +20,14 @@ units_for_renaming_leaf_nodes = [ObjectId('5944c6954975ac013e9ee760'),
  ObjectId('594260a54975ac013d976dc3')]
 
 module_sort_order_ids = []
-
+'''
 try:
     home_grp_id = node_collection.one({'_type': 'Group', 'name': 'home'})._id
     create_gattribute(home_grp_id, 'items_sort_list', module_sort_order_ids)
 except Exception as module_sort_order_ids_err:
     pass
     print "\nError in module_sort_order_ids. ", module_sort_order_ids_err
-
+'''
 units_cur = node_collection.find({'_type': 'Group', '_id': {'$in': units_for_renaming_leaf_nodes}})
 
 for each_unit in units_cur:
@@ -39,9 +39,12 @@ for each_unit in units_cur:
             print "\nLeaf nodes found: ", all_leaf_node_cur.count()
             for each_node in all_leaf_node_cur:
                 name_val = each_node.name
-                print "\n ", each_node.altnames , " --->", name_val
                 each_node.altnames = name_val # Unique name --> Display name
                 each_node.save()
+                try:
+                    print "\n ", each_node.altnames , " --->", each_node.name
+                except Exception as e:
+                    pass
         else:
             print "\nNo Group found!!"
     except Exception as units_for_renaming_leaf_nodes_err:
