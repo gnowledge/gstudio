@@ -907,7 +907,7 @@ def get_inner_collection(collection_list, node, no_res=False):
               #   # print "\n completed_ids -- ",completed_ids
               #   # print "\n\n col_obj ---- ", col_obj.name, " - - ",col_obj.member_of_names_list, " -- ", col_obj._id
               # else:
-              inner_sub_dict = {'name': col_obj.name, 'id': col_obj.pk,'node_type': node_type,"type":"division"}
+              inner_sub_dict = {'name': col_obj.name, 'id': col_obj.pk,'node_type': node_type,"type":"division",'description':col_obj.content_org}
               inner_sub_list = [inner_sub_dict]
               inner_sub_list = get_inner_collection(inner_sub_list, col_obj, no_res)
               # if "CourseSubSectionEvent" == node_type:
@@ -963,7 +963,7 @@ def get_collection(request, group_id, node_id, no_res=False):
         node_type = node_collection.one({'_id': ObjectId(obj.member_of[0])}).name
         # print "000000000000000000000",node.name
         
-        collection_list.append({'name':obj.name,'id':obj.pk,'node_type':node_type,'type' : "branch"})
+        collection_list.append({'name':obj.name,'id':obj.pk,'node_type':node_type,'type' : "branch",'description':obj.content_org})
         # collection_list = get_inner_collection(collection_list, obj, gstaff_access, completed_ids_list, incompleted_ids_list)
         if "BaseCourseGroup" in node.member_of_names_list:
           no_res = True
@@ -1018,6 +1018,7 @@ def add_theme_item(request, group_id):
       
     context_theme_id = request.POST.get("context_theme", '')
     name =request.POST.get('name','')
+    content_org = request.POST.get('content_org')
     parent_node_id =request.POST.get('parent_id','')
     is_topic =request.POST.get('is_topic','')
 
@@ -1026,6 +1027,7 @@ def add_theme_item(request, group_id):
       existing_node = Node.get_node_by_id(ObjectId(existing_id))
       if existing_node:
         existing_node.name = unicode(name)
+        existing_node.content_org = unicode(content_org)
         existing_node.save()
         return HttpResponse("success")
     list_theme_items = []
@@ -7123,11 +7125,4 @@ def get_rating_template(request, group_id):
             },
             context_instance=RequestContext(request))
 
-def delete_curriculum_node(request, group_id):
-    node_id = request.POST.get('node_id', None)
-    node_obj = Node.get_node_by_id(node_id)
-    if node_obj:
-      trash_resource(request,ObjectId(group_id),ObjectId(node_id))
-      trash_resource(request,ObjectId(group_id),ObjectId(node_id))
-      return HttpResponse("Success")
 
