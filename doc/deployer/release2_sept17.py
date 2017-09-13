@@ -59,10 +59,10 @@ for each_unit in units_cur:
                 if name_val != each_node.altnames:
                     each_node.altnames = name_val # Unique name --> Display name
                     each_node.save()
-                try:
-                    print "\n ", each_node.altnames , " --->", each_node.name
-                except Exception as e:
-                    pass
+                    try:
+                        print "\n ", each_node.altnames , " --->", each_node.name
+                    except Exception as e:
+                        pass
         else:
             print "\nNo Group found!!"
     except Exception as units_for_renaming_leaf_nodes_err:
