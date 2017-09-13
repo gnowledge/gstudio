@@ -2808,8 +2808,8 @@ def create_gattribute(subject_id, attribute_type_node, object_value=None, **kwar
 
     # print "\n\t is_ga_node_changed: ", is_ga_node_changed
 
-    cache_key = str(subject_id) + 'attribute_value' + str(attribute_type_node.name)
-    cache.set(cache_key, object_value, 60 * 60)
+    # cache_key = str(subject_id) + 'attribute_value' + str(attribute_type_node.name)
+    # cache.set(cache_key, object_value, 60 * 60)
 
     if "is_changed" in kwargs:
         ga_dict = {}
