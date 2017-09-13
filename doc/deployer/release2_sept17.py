@@ -47,7 +47,6 @@ except Exception as module_sort_order_ids_err:
     pass
     print "\nError in module_sort_order_ids. ", module_sort_order_ids_err
 units_cur = node_collection.find({'_type': 'Group', '_id': {'$in': units_for_renaming_leaf_nodes}})
-'''
 for each_unit in units_cur:
     try:
         if each_unit:
@@ -68,4 +67,3 @@ for each_unit in units_cur:
     except Exception as units_for_renaming_leaf_nodes_err:
         pass
         print "\nError in units_for_renaming_leaf_nodes. ", units_for_renaming_leaf_nodes_err
-'''
