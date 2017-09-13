@@ -56,8 +56,9 @@ for each_unit in units_cur:
             print "\nLeaf nodes found: ", all_leaf_node_cur.count()
             for each_node in all_leaf_node_cur:
                 name_val = each_node.name
-                each_node.altnames = name_val # Unique name --> Display name
-                each_node.save()
+                if name_val != each_node.altnames:
+                    each_node.altnames = name_val # Unique name --> Display name
+                    each_node.save()
                 try:
                     print "\n ", each_node.altnames , " --->", each_node.name
                 except Exception as e:
