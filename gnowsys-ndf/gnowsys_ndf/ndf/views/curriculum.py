@@ -163,7 +163,7 @@ def list_themes(request, group_id):
                             },
                             context_instance = RequestContext(request) )
 
-
+@get_execution_time
 def curriculum_list(request, group_id):
 
     try:
@@ -186,7 +186,8 @@ def curriculum_list(request, group_id):
                                 'theme_GST': theme_GST
                             },
                             context_instance = RequestContext(request) )
-
+@get_execution_time
+@login_required
 def curriculum_create_edit(request, group_id,curriculum_id=None):
     def _update_curr_hierarchy(hierarchy_obj):
         # d is list fo dict
@@ -203,6 +204,7 @@ def curriculum_create_edit(request, group_id,curriculum_id=None):
         group_id = ObjectId(group_id)
     except:
         group_name, group_id = get_group_name_id(group_id)
+    curr_id = request.POST.get('curriculum_obj','')
     curriculum_obj = node_collection.one({"_id" : ObjectId(curriculum_id)})
     context_variables = {
                         'groupid': group_id,
@@ -218,8 +220,19 @@ def curriculum_create_edit(request, group_id,curriculum_id=None):
             _update_curr_hierarchy(curr_hierarchy)
             curr_hierarchy.append({'class': 'create_branch', 'name': 'Add Branch'})
             context_variables.update({'curriculum_structure':json.dumps(curr_hierarchy)})
+    
     if request.method == "POST":
-        if not curriculum_id:
+        if curr_id:
+            if curr_id:
+                curr_name = request.POST.get('curr_name', '')
+                curr_desc = request.POST.get('curr_desc', '')
+                curriculum_obj = node_collection.one({"_id" : ObjectId(curr_id)})
+                curriculum_obj.fill_gstystem_values(request=request,
+                                    name=str(curr_name),
+                                    group_set=group_id,content_org=unicode(curr_desc))
+                curriculum_obj.save()
+                return HttpResponse(curriculum_obj._id)
+        else:
             curr_name = request.POST.get('curr_name', '')
             curr_desc = request.POST.get('curr_desc', '')
 
