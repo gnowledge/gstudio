@@ -1092,5 +1092,4 @@ def get_collection_list(collection_list, node):
         return collection_list
 
     else:
-        print "00000000000000000000000000"
         return collection_list
