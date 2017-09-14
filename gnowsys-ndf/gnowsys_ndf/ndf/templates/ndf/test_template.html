@@ -4,7 +4,69 @@
 {% load ndf_tags %}
 {% block body_content %}
 
-<div class="dashboard">
-</div>
+<style type="text/css">
+
+#progressive-validation {
+  width:400px;
+  margin:100px auto 0 auto;
+    input {
+        display:block;
+        border-radius:5px;
+        border:none;
+        background:white;
+        font-family:OpenSans-regular;
+        font-size:16px;
+        line-height:16px;
+        font-weight:200;
+        width:100%;
+        padding:15px;
+        margin:0 0 10px 0;
+        opacity:.2;
+        outline:none;
+        box-shadow:0 0 0 1px rgba(0,0,0,.0);
+        background-size: 0px 0px;
+        background-position:right 23px;
+        background-repeat:no-repeat;
+        &[type="submit"],&[type="submit"]:valid{
+        background-color:#1a3e4c;
+        color:white;
+        background-image:none;
+      }
+      &:focus {
+        box-shadow:0 0 0 1px #00aeef;
+        opacity:1 !important;
+      }
+      &:enabled {
+        opacity:.8;
+      }
+      &:valid {
+        background-size: 46px 46px;
+        background-position:right 0px;
+        background-repeat:no-repeat;
+      }
+    }
+}
+</style>
+
+<form id="progressive-validation">
+  <input type="text" id="field1" name="Name" placeholder="Name" required />  
+  <input type="email" id="field2" name="Email" placeholder="email" required disabled />
+  <input type="tel" pattern="[0-9]{10}" id="field3" name="Phone Number" placeholder="Phone" required disabled />
+  <input type="submit" id="submit" value="Submit" disabled/>
+</form>
+
+
+<script type="text/javascript">
+$(document).ready(function(){
+  var Form = $('#progressive-validation');
+  Form.on('keyup',function(){
+    $('input:valid ~ input').attr('disabled',false);
+    $('input:invalid ~ input').attr('disabled',true);
+  });
+});
+
+</script>
+
+
 
 {% endblock body_content %}
