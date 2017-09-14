@@ -378,6 +378,7 @@ def explore_drafts(request):
         context_variable,
         context_instance=RequestContext(request))
 
+@get_execution_time
 def module_order_list(request):
     response_dict = {"success": False}
     module_id_list = request.POST.get('module_list', [])
@@ -386,7 +387,6 @@ def module_order_list(request):
             module_id_list = json.loads(module_id_list)
             module_obj_list = map(lambda each_id: Node.get_node_by_id(ObjectId(each_id)), module_id_list)
             ga_node = create_gattribute(ObjectId(group_id), 'items_sort_list', module_obj_list)
-            # print ga_node
             response_dict["success"] = True
     except Exception as module_order_list_err:
         print "\nError Occurred in module_order_list(). ", module_order_list_err
