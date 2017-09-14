@@ -5,7 +5,7 @@
 
 {% block body_content %}
         {% check_is_gstaff group_id request.user as is_gstaff %} 
-        <div class="curriculum-name-desc" {% if is_gstaff %} data-reveal-id="create-edit-curriculum-reveal" {% endif %}>
+        <div class="curriculum-name-desc" {% if is_gstaff or curriculum_obj.created_by == request.user.id %} data-reveal-id="create-edit-curriculum-reveal" {% endif %}>
             {{curriculum_obj.name}} : 
             {{curriculum_obj.content_org}}  
             
@@ -21,27 +21,28 @@
             <!--button type="button" class="blue-white-button" id="create_first_branch">Create Branch</button-->
         </div>
 
+    {% if is_gstaff or curriculum_obj.created_by == request.user.id %}
         <div id="addBranch" class="reveal-modal" data-reveal aria-labelledby="modalTitle" aria-hidden="true" role="dialog">
-        	<div>
-	            <h4>Create new Section</h4>
-	            <label>Section Name
-	                <input type="text" placeholder="Section Name" name="branch_name"/>
-	            </label>
-	            <label>Section Description
-	                <textarea type="text"  class="branch_desc" placeholder="Section description" ></textarea>
-	            </label>
-	            <br />
-	            <button type="button" class="blue-white-button create_branch">
+            <div>
+                <h4>Create new Section</h4>
+                <label>Section Name
+                    <input type="text" placeholder="Section Name" name="branch_name"/>
+                </label>
+                <label>Section Description
+                    <textarea type="text"  class="branch_desc" placeholder="Section description" ></textarea>
+                </label>
+                <br />
+                <button type="button" class="blue-white-button create_branch">
 	                Add
 	            </button>
-	            <button type="button" class="blue-white-button delete_branch" style="display: none;">
-	                Delete
-	            </button>
-        	</div>
-      		<a class="close-reveal-modal" aria-label="Close">&#215;</a>
-    	</div>
+                <button type="button" class="blue-white-button delete_branch" style="display: none;">
+                    Delete
+                </button>
+            </div>
+            <a class="close-reveal-modal" aria-label="Close">&#215;</a>
+        </div>
 
-    	    <div id="addDivision" class="reveal-modal" data-reveal aria-labelledby="modalTitle" aria-hidden="true" role="dialog">
+            <div id="addDivision" class="reveal-modal" data-reveal aria-labelledby="modalTitle" aria-hidden="true" role="dialog">
         <div>
             <h4>Create new Sub-Section</h4>
             <label>Sub-Section Name
@@ -63,6 +64,7 @@
       <a class="close-reveal-modal" aria-label="Close">&#215;</a>
     </div>
 
+    {% endif %}
 
 
 
