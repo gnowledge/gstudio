@@ -104,7 +104,7 @@ def landing_page(request):
                             )
 
     elif GSTUDIO_SITE_LANDING_TEMPLATE:
-        if GSTUDIO_SITE_NAME == "clix":
+        if GSTUDIO_SITE_NAME == "clix" or  GSTUDIO_SITE_NAME == "abcde":
             if request.META['QUERY_STRING']  == "True":
                 return render_to_response(
                                         GSTUDIO_SITE_LANDING_TEMPLATE,
