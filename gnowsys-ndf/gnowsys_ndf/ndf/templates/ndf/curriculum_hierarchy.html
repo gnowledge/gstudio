@@ -4,19 +4,13 @@
 {% block title %} {% trans "Topic Map" %} {{curriculum_obj.name }}  {% endblock %}
 
 {% block body_content %}
-        {{curriculum_obj.name}} : 
-        {{curriculum_obj.content_org}}  
-        <div class="right course_actions margin-right-50">
-              <span data-dropdown="course-settings-drop" aria-controls="course-settings-drop" aria-expanded="false" class="tiny radius right" data-options="align:left" style="margin-top: -25px;position:absolute;margin-left:-100px;">
-                  <i class="icon-widget fi-widget"></i>
-              </span>
-              <ul id="course-settings-drop" class="f-dropdown"  data-dropdown-content aria-hidden="true" tabindex="-1">
-              <li>
-                  <a href="" class="fi-pencil" data-reveal-id="create-edit-curriculum-reveal"> {% trans "Edit" %}</a>
-              </li>
-              </ul>
-          </div>
         {% check_is_gstaff group_id request.user as is_gstaff %} 
+        <div class="curriculum-name-desc" {% if is_gstaff %} data-reveal-id="create-edit-curriculum-reveal" {% endif %}>
+            {{curriculum_obj.name}} : 
+            {{curriculum_obj.content_org}}  
+            
+        </div>
+        
         {% if not curriculum_obj %}
         <h3 data-reveal-id="create-edit-curriculum-reveal" class="hyperlink-tag">
             <i class="fi fi-plus"></i> Create Curriculum Tree Structure
@@ -34,7 +28,7 @@
 	                <input type="text" placeholder="Section Name" name="branch_name"/>
 	            </label>
 	            <label>Section Description
-	                <textarea type="text" placeholder="Section description" ></textarea>
+	                <textarea type="text"  class="branch_desc" placeholder="Section description" ></textarea>
 	            </label>
 	            <br />
 	            <button type="button" class="blue-white-button create_branch">
@@ -312,12 +306,14 @@
 
             $( ".create_branch" ).click(function(event) {
                 branch_name = $("input[name='branch_name']").val();
+                branch_desc = $(".branch_desc").val();
                 existing_id = $(this).attr("id");
                 $.ajax({
                           type: "POST",
                           data:{
                                 'csrfmiddlewaretoken': "{{csrf_token}}",
                                 'name':branch_name,
+                                'content_org': branch_desc,
                                 'context_theme':"{{curriculum_obj.pk}}",
                                 'existing_id':existing_id
                             },
@@ -364,9 +360,11 @@
                           type: "POST",
                           data:{
                                 'csrfmiddlewaretoken': "{{csrf_token}}",
-                                'node_id':sel_node_id,
+                                "node_to_delete": sel_node_id,
+                                "deletion_type": 0,
+                                "right_subject": 1
                             },
-                          url: "{% url 'delete_curriculum_node' group_id  %}",
+                          url: "{% url 'ajax_delete_node' group_id  %}",
                           datatype: "html",
                           success: function(data) {
                           location.reload();
@@ -387,9 +385,11 @@
                           type: "POST",
                           data:{
                                 'csrfmiddlewaretoken': "{{csrf_token}}",
-                                'node_id':sel_node_id,
+                                'node_to_delete':sel_node_id,
+                                "deletion_type": 0,
+                                "right_subject": 1
                             },
-                          url: "{% url 'delete_curriculum_node' group_id  %}",
+                          url: "{% url 'ajax_delete_node' group_id  %}",
                           datatype: "html",
                           success: function(data) {
                           location.reload();

@@ -187,7 +187,6 @@ def curriculum_list(request, group_id):
                             },
                             context_instance = RequestContext(request) )
 @get_execution_time
-@login_required
 def curriculum_create_edit(request, group_id,curriculum_id=None):
     def _update_curr_hierarchy(hierarchy_obj):
         # d is list fo dict
