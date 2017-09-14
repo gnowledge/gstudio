@@ -5993,3 +5993,10 @@ ul.nav_menu_1 > li > a.selected, ul.nav_menu_1 > li > a:hover {
 .left-space {
   margin-left: 0.5em;
 }
+
+/*  User Dashboard Implementation */
+/* line 6137, ../../../scss/_clix2017.scss */
+.dashboard {
+  width: 990px;
+  background-color: #164A7B;
+}
