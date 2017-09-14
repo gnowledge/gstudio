@@ -17,10 +17,12 @@
 		<div class="bo-wrap clr3">
 		  <div class="bo-footer">
 		    <div class="bo-footer-smap">
-	  		{% for path,link in footer_links.iteritems %}
-		        <a href="{{link}}" target="_blank">
-		            <img src="{{path}}" class="bo-footer-images" />
-		        </a>
+  	    	{% for each in footer_links %}
+		        {% for path, link in each.items %}
+					<a href="{{link}}" target="_blank">
+			            <img src="{{path}}" class="bo-footer-images" />
+			        </a>		          
+  	    	{% endfor %}
   	    	{% endfor %}
 		    </div>
 
