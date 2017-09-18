@@ -91,7 +91,7 @@
 
 ---
 
-**Sample API calls:**
+**Example API calls:**
 Examples can be used live on nroer.gov.in. 
 
 List possible query keys:
