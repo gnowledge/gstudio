@@ -841,9 +841,10 @@ def my_dashboard(request, group_id):
         )
 
 
-def my_performance(request, group_id):
-    from gnowsys_ndf.settings import GSTUDIO_WORKSPACE_INSTANCE
+def my_performance(request, group_id, page_no=1):
 
+    from gnowsys_ndf.settings import GSTUDIO_NO_OF_OBJS_PP
+    
     if str(request.user) == 'AnonymousUser':
         raise Http404("You don't have an authority for this page!")
 
@@ -861,6 +862,7 @@ def my_performance(request, group_id):
     my_units = node_collection.find({'member_of': {'$in': [ce_gst._id, announced_unit_gst._id,gst_group._id]},
                                           'author_set': request.user.id,
                                         }).sort('last_update', -1)
+    group_page_cur = paginator.Paginator(my_units, page_no, GSTUDIO_NO_OF_OBJS_PP)
     # my_modules_cur.rewind()
     return render_to_response('ndf/lms_dashboard.html',
                 {
@@ -868,6 +870,7 @@ def my_performance(request, group_id):
                     'node': auth_obj, 'title': title,
                     # 'my_course_objs': my_course_objs,
                     'units_cur':my_units,
+                    'my_perf_page_cur':group_page_cur
                     # 'modules_cur': my_modules_cur
                 },
                 context_instance=RequestContext(request)
