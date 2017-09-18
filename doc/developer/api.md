@@ -74,7 +74,7 @@
 - "prior_node": List of pre-requisites of concern resource.
 
 - curricular: Boolean value either true or false. Specifies resource is curricular or not.
-- educationalalignment: E.g: ?
+- educationalalignment: E.g: NCF
 - educationalsubject: Subjects. 
 - educationallevel: Five levels primary to tertiary. E.g: Upper Primary, Secondary, Senior Secondary
 - audience: E.g: Teachers, Students
@@ -93,11 +93,20 @@
 **Sample API calls:**
 Examples can be used live on nroer.gov.in. 
 
-- nroer.gov.in/api/v1?workspace=home&resource_type=file&tag=creative
-- nroer.gov.in/api/v1?tags=creative
-- nroer.gov.in/api/v1/?workspace=home&resource_type=file&created_by=nroer_team&educationaluse=Images
-- nroer.gov.in/api/v1/?workspace=home&resource_type=file&educationalsubject=history
-- nroer.gov.in/api/v1/?workspace=home&resource_type=file&source=CIET,%20NCERT
-- nroer.gov.in/api/v1/?workspace=home&resource_type=file&created_by=nroer_team&legal.copyright=CC-BY-SA%204.0%20unported&interactivitytype=expositive&educationaluse=image
+List possible query keys:
+- http://nroer.gov.in/api/v1
+
+List possible values for query keys
+- http://nroer.gov.in/api/v1/tags
+- http://nroer.gov.in/api/v1/status
+
+List json objects with various key and value combination:
+- http://nroer.gov.in/api/v1?tags=creative
+- http://nroer.gov.in/api/v1?resource_type=File&tags=creative
+- http://nroer.gov.in/api/v1?workspace=home&resource_type=file&tag=creative
+- http://nroer.gov.in/api/v1/?workspace=home&resource_type=file&created_by=nroer_team&educationaluse=Images
+- http://nroer.gov.in/api/v1/?workspace=home&resource_type=file&educationalsubject=history
+- http://nroer.gov.in/api/v1/?workspace=home&resource_type=file&source=CIET,%20NCERT
+- http://nroer.gov.in/api/v1/?workspace=home&resource_type=file&created_by=nroer_team&legal.copyright=CC-BY-SA%204.0%20unported&interactivitytype=expositive&educationaluse=image
 
 If you need more specific help, contact the developers on the mailing list, or file an issue at the git repo. 
