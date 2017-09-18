@@ -21,22 +21,23 @@
 - "language"*: Language code in ISO 639-2 standard. (e.g: ["hi", "Hindi"])
 - "content": Description/content of resource.
 - "if_file": Contains information of media urls in nested dictionary. Following is schema of if_file:
-       <PRE>
-        {
-            'mime_type': <MIME type of resource>,
-            'original': {'id': <Id>, 'relurl': <relative url of media file>},
-            'mid': {'id': <Id>, 'relurl': <relative url of media file>},
-            'thumbnail': {'id': <Id>, 'relurl': <relative url of media file>}
-        }
-        </PRE>
-- mime_type: Indicates MIME type of resource, mostly filled if the resource is a file.
-- original: URL of original/uploaded file resource.
-- mid: URL of mid/converted form of original file. This can be mid-size image for images and `.webm` for videos. Blank for other resource types. 
-- thumbnail: Thumbnail of uploaded resource (mostly it's available for images and videos).
-  - e.g: 
-        
-      <PRE>
-      {
+    <PRE>
+    {
+        'mime_type': <MIME type of resource>,
+        'original': {'id': <Id>, 'relurl': <relative url of media file>},
+        'mid': {'id': <Id>, 'relurl': <relative url of media file>},
+        'thumbnail': {'id': <Id>, 'relurl': <relative url of media file>}
+    }
+    </PRE>
+    - mime_type: Indicates MIME type of resource, mostly filled if the resource is a file.
+    - original: URL of original/uploaded file resource.
+    - mid: URL of mid/converted form of original file. This can be mid-size image for images and `.webm` for videos. Blank for other resource types. 
+    - thumbnail: Thumbnail of uploaded resource (mostly it's available for images and videos).
+    - *NOTE: URL's are relative urls of site. Prepend relative value with `<domain>/media/`*
+
+    - e.g:
+        <PRE>
+        {
             "mime_type": "video/mp4",
             "original": {
                     "id": "59a90dd2738242080c921465",
@@ -51,7 +52,7 @@
                     "relurl": "6/8/5/d331ff73b657ccd2326354aff03be08d692b0a26ba92ef22295144a49abdc.png"
                 }
         }
-        <PRE>
+        <PRE>
 - "tags": Tokens of concerned informative identifiers to describe resource, similar to keywords.
 - "location": List of GeoJson format JSON.
 - "legal": Dictionary of "copyright" and "License".
@@ -103,10 +104,10 @@ List possible values for query keys
 List json objects with various key and value combination:
 - http://nroer.gov.in/api/v1?tags=creative
 - http://nroer.gov.in/api/v1?resource_type=File&tags=creative
-- http://nroer.gov.in/api/v1?workspace=home&resource_type=file&tag=creative
-- http://nroer.gov.in/api/v1/?workspace=home&resource_type=file&created_by=nroer_team&educationaluse=Images
-- http://nroer.gov.in/api/v1/?workspace=home&resource_type=file&educationalsubject=history
-- http://nroer.gov.in/api/v1/?workspace=home&resource_type=file&source=CIET,%20NCERT
-- http://nroer.gov.in/api/v1/?workspace=home&resource_type=file&created_by=nroer_team&legal.copyright=CC-BY-SA%204.0%20unported&interactivitytype=expositive&educationaluse=image
+- http://nroer.gov.in/api/v1?workspace=home&resource_type=File&tag=creative
+- http://nroer.gov.in/api/v1/?workspace=home&resource_type=File&created_by=nroer_team&educationaluse=Images
+- http://nroer.gov.in/api/v1/?workspace=home&resource_type=File&educationalsubject=history
+- http://nroer.gov.in/api/v1/?workspace=home&resource_type=File&source=CIET,%20NCERT
+- http://nroer.gov.in/api/v1/?workspace=home&resource_type=File&created_by=nroer_team&legal.copyright=CC-BY-SA%204.0%20unported&interactivitytype=expositive&educationaluse=image
 
 If you need more specific help, contact the developers on the mailing list, or file an issue at the git repo. 
