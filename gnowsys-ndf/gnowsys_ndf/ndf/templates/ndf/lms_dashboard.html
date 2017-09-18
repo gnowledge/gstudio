@@ -54,18 +54,21 @@
         {% endcomment %}
           </br>
     <div class="small-12 columns group_sections_content">
-                {% if title == "my desk" %}
-                    <div class="small-12 columns lms_explore_back_unit">
-        <ul class="small-block-grid-1 medium-block-grid-3 large-block-grid-3">
-        {% for each_obj in units_cur %}
-          <li class="card-image-wrapper">
-            {% include "ndf/card_group.html" with node=each_obj url_name="groupchange" first_arg=each_obj.pk %}
-          </li>
-        {% endfor %}
-        </ul>
-      </div>
-                {% endif %}
-        </div>
+        {% if title == "my desk" %}
+          <div class="small-12 columns lms_explore_back_unit">
+            <ul class="small-block-grid-1 medium-block-grid-3 large-block-grid-3">
+              {% for each_obj in units_cur %}
+                <li class="card-image-wrapper">
+                  {% include "ndf/card_group.html" with node=each_obj url_name="groupchange" first_arg=each_obj.pk %}
+                </li>
+              {% endfor %}
+            </ul>
+          </div>
+          
+          {% include 'ndf/pagination.html' with urlname="my_desk_paged" first_arg=group_id  page_info=my_units_page_cur %}
+
+        {% endif %}
+    </div>
 
         <div class="small-12 columns group_sections_content">
     {% if title == "my performance" %}
