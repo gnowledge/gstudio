@@ -34,6 +34,7 @@
                 </li>
                 
                 <li class=""><a {% if title == "my performance" %} class="selected" {% endif %} href="{% url 'my_performance' request.user.id  %}">{% trans "My Performance" %}</a> </li>
+                <li class=""><a {% if title == "my workspace" %} class="selected" {% endif %} href="{% url 'course_about' request.user.username  %}">{% trans "My WorkSpace" %}</a> </li>
 
             </ul>
         </div>
