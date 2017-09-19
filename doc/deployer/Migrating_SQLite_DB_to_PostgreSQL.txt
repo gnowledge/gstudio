@@ -112,6 +112,12 @@ alter sequence auth_user_id_seq restart
 # Tabing BACKUP/DUMP of all DBs and table
 pg_dumpall > file-name.sql
 
+-- OR --
+echo "pg_dumpall > /tmp/file-name.sql" | sudo su - postgres
+# In above case, permission denied exception might gets raised to create file under `/tmp/`
+-- OR --
+echo "pg_dumpall > file-name.sql" | sudo su - postgres
+# In above case file-name.sql will be created under `/var/lib/postgresql/` folder
 
 # DROP database
 $ sudo su - postgres
