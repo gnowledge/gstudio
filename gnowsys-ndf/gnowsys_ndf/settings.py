@@ -488,7 +488,7 @@ BROKER_URL = 'amqp://'
 
 INSTALLED_APPS = (
     'gnowsys_ndf.ndf',
-    'dlkit',
+    # 'dlkit',
     'django.contrib.auth',
     'django.contrib.admin',
     'django.contrib.contenttypes',
@@ -1024,13 +1024,19 @@ GSTUDIO_ENABLE_USER_DASHBOARD = True
 GSTUDIO_PRIMARY_COURSE_LANGUAGE = u'en'
 
 # --- BUDDY Module configurations ---
-#
 GSTUDIO_BUDDY_LOGIN = False
+# --- End of BUDDY Module ---
+
+# Institute ID, name configs
 GSTUDIO_INSTITUTE_ID = ''
+GSTUDIO_INSTITUTE_ID_SECONDARY = ''
+GSTUDIO_INSTITUTE_NAME = ''
+# --- End of Institute ID, name configs
+
+# Elastic Search
 GSTUDIO_DOCUMENT_MAPPING = ''
 GSTUDIO_ELASTIC_SEARCH = False
-#
-# --- End of BUDDY Module ---
+# --- End of Elastic Search
 
 
 # # textb

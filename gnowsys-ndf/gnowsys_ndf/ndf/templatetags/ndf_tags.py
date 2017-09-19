@@ -596,7 +596,7 @@ def get_attribute_value(node_id, attr_name, get_data_type=False):
             node_attr = triple_collection.find_one({'_type': "GAttribute", "subject": ObjectId(node_id), 'attribute_type': gattr._id, 'status': u"PUBLISHED"})
     if node_attr:
         attr_val = node_attr.object_value
-        # print "\n here: ", attr_name, " : ", attr_val, " : ", node_id
+        # print "\n here: ", attr_name, " : ", type(attr_val), " : ", node_id
     if get_data_type:
         return {'value': attr_val, 'data_type': data_type}
     cache.set(cache_key, attr_val, 60 * 60)
@@ -3718,13 +3718,11 @@ def get_user_quiz_resp(node_obj, user_obj):
 				if qip_sub:
 					result['count'] = len(qip_sub)
 					recent_ans = qip_sub[-1]
-					if node_obj.quiz_type == "Short-Response":
-						result['recent_ans'] = recent_ans
-					else:
-						user_ans = recent_ans.values()[0]
-						# result['recent_ans'] = (map(unicode,[re.sub(r'[\t\n\r]', '', u_ans) for u_ans in user_ans]))
-						# result['recent_ans'] = [u_ans.decode('utf-8').decode('utf-8') for u_ans in user_ans]
-						result['recent_ans'] = user_ans
+					result['recent_ans'] = recent_ans
+					user_ans = recent_ans.values()[0]
+					# result['recent_ans'] = (map(unicode,[re.sub(r'[\t\n\r]', '', u_ans) for u_ans in user_ans]))
+					# result['recent_ans'] = [u_ans.decode('utf-8').decode('utf-8') for u_ans in user_ans]
+					result['recent_ans'] = user_ans
 		# return json.dumps(result,ensure_ascii=False)
 		return result
 
@@ -3791,6 +3789,12 @@ def get_course_filters(group_id, filter_context):
 				result_cur = node_collection.find({'member_of':page_gst._id, 'type_of': blogpage_gst._id,
 							'group_set': group_obj._id, 'tags':{'$exists': True, '$not': {'$size': 0}} #'tags':{'$exists': True, '$ne': []}}
 							},{'tags': 1, '_id': False})
+			elif filter_context.lower() == "notebook_lms":
+				page_gst = node_collection.one({'_type': "GSystemType", 'name': "Page"})
+				blogpage_gst = node_collection.one({'_type': "GSystemType", 'name': "Blog page"})
+				result_cur = node_collection.find({'member_of':page_gst._id, 'type_of': blogpage_gst._id,
+							'group_set': group_obj._id, 'tags':{'$exists': True, '$not': {'$size': 0}} #'tags':{'$exists': True, '$ne': []}}
+							},{'tags': 1, '_id': False})
 
 			elif filter_context.lower() == "gallery":
 				# all_user_objs_id = [eachuser.id for eachuser in all_user_objs]
@@ -3806,13 +3810,38 @@ def get_course_filters(group_id, filter_context):
 							'created_by': {'$in': gstaff_users}
 							},{'tags': 1, '_id': False})
 
+			elif filter_context.lower() == "raw_material_lms":
+				# all_user_objs_id = [eachuser.id for eachuser in all_user_objs if check_is_gstaff(group_obj._id,eachuser)]
+				asset_gst_name, asset_gst_id = GSystemType.get_gst_name_id("Asset")
+				result_cur = node_collection.find({'member_of': {'$in': [asset_gst_id]},
+            'group_set': {'$all': [ObjectId(group_id)]},'tags':'raw@material'}).sort('last_update', -1)
+
+			elif filter_context.lower() == "gallery_lms":
+				# all_user_objs_id = [eachuser.id for eachuser in all_user_objs if check_is_gstaff(group_obj._id,eachuser)]
+				asset_gst_name, asset_gst_id = GSystemType.get_gst_name_id("Asset")
+				result_cur = node_collection.find({'member_of': {'$in': [asset_gst_id]},
+				'group_set': {'$all': [ObjectId(group_id)]},'tags':'asset@gallery'}).sort('last_update', -1)
+
+			elif filter_context.lower() == "assets_lms":
+				# all_user_objs_id = [eachuser.id for eachuser in all_user_objs if check_is_gstaff(group_obj._id,eachuser)]
+				asset_gst_name, asset_gst_id = GSystemType.get_gst_name_id("Asset")
+				result_cur = node_collection.find({'member_of': {'$in': [asset_gst_id]},
+				'group_set': {'$all': [ObjectId(group_id)]},'tags':'asset@asset'}).sort('last_update', -1)
+
 			# print "\n\n result_cur.count()--",result_cur.count()
-			all_tags_from_cursor = map(lambda x: x['tags'], result_cur)
-			# all_tags_from_cursor is a list having nested list
-			all_tags_list = list(itertools.chain(*all_tags_from_cursor))
-			if all_tags_list:
-				all_tags_list = json.dumps(all_tags_list)
-			filters_dict[each_course_filter_key].update({'value': all_tags_list})
+			# all_tags_from_cursor = map(lambda x: x['tags'], result_cur)
+			# # # all_tags_from_cursor is a list having nested list
+			# all_tags_list = list(itertools.chain(*all_tags_from_cursor))
+			# if all_tags_list:
+			# 	all_tags_list = json.dumps(all_tags_list)
+			distinct_res_cur = result_cur.distinct('tags')
+			if 'raw@material' in distinct_res_cur:
+				distinct_res_cur.remove('raw@material')
+			if 'asset@gallery' in distinct_res_cur:
+				distinct_res_cur.remove('asset@gallery')
+			if 'asset@asset' in distinct_res_cur:
+				distinct_res_cur.remove('asset@asset')
+			filters_dict[each_course_filter_key].update({'value': json.dumps(distinct_res_cur)})
 	return filters_dict
 
 
@@ -3881,7 +3910,7 @@ def get_file_obj(node):
 @register.assignment_tag
 def get_help_pages_of_node(node_obj,rel_name="has_help",language="en"):
 	all_help_page_node_list = []
-	from gnowsys_ndf.ndf.views.gcourse import get_lang_node
+	from gnowsys_ndf.ndf.views.translation import get_lang_node
 	try:
 		has_help_rt = node_collection.one({'_type': 'RelationType', 'name': rel_name})
 		help_rt = triple_collection.find({'subject':node_obj._id,'relation_type': has_help_rt._id, 'status': u'PUBLISHED'})
@@ -3995,6 +4024,33 @@ def get_unit_total_points(user_id,group_id):
 	counter_obj = Counter.get_counter_obj(user_id, ObjectId(group_id))
 	return counter_obj['group_points']
 
+"""  commented for section subsection template """
+# @register.assignment_tag
+# def get_node_hierarchy(node_obj):
+#     node_structure = []
+#     for each in node_obj.collection_set:
+#         lesson_dict ={}
+#         lesson = Node.get_node_by_id(each)
+#         if lesson:
+#             lesson_dict['name'] = lesson.name
+#             lesson_dict['type'] = 'lesson'
+#             lesson_dict['id'] = str(lesson._id)
+#             lesson_dict['language'] = lesson.language[0]
+#             lesson_dict['activities'] = []
+#             if lesson.collection_set:
+#                 for each_act in lesson.collection_set:
+#                     activity_dict ={}
+#                     activity = Node.get_node_by_id(each_act)
+#                     if activity:
+#                         activity_dict['name'] = activity.name
+#                         activity_dict['type'] = 'activity'
+#                         activity_dict['id'] = str(activity._id)
+#                         lesson_dict['activities'].append(activity_dict)
+#             node_structure.append(lesson_dict)
+
+#     return json.dumps(node_structure)
+
+
 @register.assignment_tag
 def get_node_hierarchy(node_obj):
     node_structure = []
@@ -4078,3 +4134,47 @@ def get_selected_topics(node_id):
 		teaches_grelations_id_list.append(str(each._id))
 		# teaches_grelations_id_list = map(ObjectId,teaches_grelations_id_list)
 	return teaches_grelations_id_list
+
+@register.assignment_tag
+def rewind_cursor(cursor_obj):
+	cursor_obj.rewind()
+	return cursor_obj
+
+@register.assignment_tag
+def get_node_by_member_of_name(group_id, member_of_name):
+	member_of_gst_name, member_of_gst_id = GSystemType.get_gst_name_id(member_of_name)
+	return list(node_collection.find({'group_set': group_id, 'member_of': member_of_gst_id}))
+
+@get_execution_time
+@register.assignment_tag
+def cast_to_node(node_or_node_list):
+	# print "\nInput type: ", type(node_or_node_list)
+	if isinstance(node_or_node_list, list):
+		return map(Node,node_or_node_list)
+	else:
+		return Node(node_or_node_list)
+
+@register.assignment_tag
+def get_trans_node(node_id,lang):
+    rel_value = get_relation_value(ObjectId(node_id),"translation_of")
+    for each in rel_value['grel_node']:
+        if each.language[0] ==  get_language_tuple(lang)[0]:
+            trans_node = each
+            print "\n\ntrans_node", trans_node
+            return trans_node
+
+# @register.assignment_tag
+@register.inclusion_tag('ndf/quiz_player.html')
+def load_quiz_player(request, group_id, node, hide_edit_opt=False):
+    from gnowsys_ndf.ndf.views.quiz import render_quiz_player
+    node_member_of_names_list = node.member_of_names_list
+    if "QuizItem" in node_member_of_names_list or "QuizItemEvent" in node_member_of_names_list:
+        con_var = render_quiz_player(request, group_id, node, get_context=True)
+        con_var.update({'template': 'ndf/quiz_player.html', 'request': request,
+			'hide_edit_opt': hide_edit_opt})
+    # rel_value = get_relation_value(ObjectId(node._id),"translation_of")
+    # for each in rel_value['grel_node']:
+    #     if each.language[0] ==  get_language_tuple(lang)[0]:
+    #         node = each
+    #         print "\n\nnode", node
+    return con_var

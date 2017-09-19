@@ -10,6 +10,7 @@
 {% check_is_gstaff group_id request.user as is_gstaff %}
 {% user_access_policy groupid request.user as user_access_priv %}
 {% get_group_object groupid as group_object %}
+{% get_attribute_value node.pk 'discussion_enable' as node_discussion %}
 
 
 <style type="text/css">
@@ -70,6 +71,11 @@
             <div class="course_tree">
               <div class="lesson-title" title="{{trans_lesson_name}}">
                   <b>{{trans_lesson_name}}</b>
+                  {% comment %}
+                  {% if allow_finish_lesson %}
+                    <a href="#" class="purple-btn finish-lesson right">Finish</a>
+                  {% endif %}
+                  {% endcomment %}
               </div>
               <div class="activity-title">
               {% for each in act_list %}
@@ -84,37 +90,39 @@
           <div class="small-8 columns">
 
             <div class="course_editor_section">
+              {% with node.member_of_names_list as node_member_of_names_list %}
+              {% if "QuizItemEvent" not in node_member_of_names_list and "QuizItem" not in node_member_of_names_list%}
               <div class="input_links row" style="margin-left:10px;">
-              {% include 'ndf/rating.html'%}
-              {% get_relation_value node.pk 'has_help' as grel_help %}
-              {% get_relation_value node.pk 'has_admin_page' as grel_admin_page %}
-                {% if grel_help.grel_id  %}
-                  <a class="student-page right"> {% trans "Student Help" %}</a>
-                {% endif %}
-                {% if  is_gstaff or user.is_superuser %}
-                  {% if grel_admin_page.grel_id %}<a class="admin-page right"> {% trans "Teacher's Help" %}</a>{% endif %}
-                {% endif  %}
+                {% include 'ndf/rating.html'%}
+                {% get_relation_value node.pk 'has_help' as grel_help %}
+                {% get_relation_value node.pk 'has_admin_page' as grel_admin_page %}
+                  {% if grel_help.grel_id  %}
+                    <a class="student-page right"> {% trans "Student Help" %}</a>
+                  {% endif %}
+                  {% if  is_gstaff or user.is_superuser %}
+                    {% if grel_admin_page.grel_id %}<a class="admin-page right"> {% trans "Teacher's Help" %}</a>{% endif %}
+                  {% endif  %}
 
-              {% get_attribute_value node.pk 'discussion_enable' as node_discussion %}
-              {% if node_discussion %}
-              <a class="discuss right">{% trans "Discuss" %} </a>
-              {% endif %}
-              {% comment %}
-              <a class="translate right"> Translate</a>
-              {% endcomment %}
-              
-              {# Adding alternate Language, if present #}
-              
-      
                 
-              
-
-
+                {% if node_discussion %}
+                <a class="discuss right">{% trans "Discuss" %} </a>
+                {% endif %}
+                {% comment %}
+                <a class="translate right"> Translate</a>
+                {% endcomment %}
+                
+                {# Adding alternate Language, if present #}
               </div>
+              {% endif %}
               <div class="activity_page_rendered buddy_margin">
+                {% if "QuizItemEvent" in node_member_of_names_list or "QuizItem" in node_member_of_names_list%}
+                  {% load_quiz_player request group_id node True %}
+                {% else %}
                 {# {{node.content|safe}} #}
                 {% include "ndf/node_ajax_content.html" with node=trans_node expand_content=True  no_discussion=True hide_breadcrumbs=True %}
+                {% endif %}
               </div>
+              {% endwith %}
               <div class="discussion-area activity_page_rendered" style="">
                 
                 {% if node_discussion %}
@@ -139,6 +147,17 @@
 </div>             
 
 
+<div id="confirm-finish-lesson-reveal" class="reveal-modal medium radius" data-reveal data-alert>
+    <p id="finishLessonModalLabel">
+      Confirm Finish Lesson: {% firstof lesson_node.altnames lesson_node.name %}?<br/>
+      You will NOT be allowed to attempt Question again.
+    </p>
+    <div class="row">
+        <button id="finishLessonbtnConfirmYes" class="explore-button auto_width ">{% trans "Yes" %}</button>
+        <button id="finishLessonbtnConfirmNo" class="explore-button auto_width">{% trans "No" %}</button>
+    </div>
+<a class="close-reveal-modal">&#215;</a>
+</div>
 
 <script type="text/javascript">
    function onMessage(message) {
@@ -169,7 +188,7 @@
   componentDidMount()
 
   // start of document.ready()
-  $(document).ready(function() {
+  $(document).ready(function(event) {
     var iframes = document.getElementsByTagName('iframe');
     var key = 'assessment.Bank';
 
@@ -185,7 +204,6 @@
             if (source_attr.indexOf("://") > -1) {
                 src_split = source_attr.split('/');
                 if (src_split.indexOf(oac_url) > -1 ){
-
                   new_url = domain_prefix + '//'+ window.location.host
                 }
                 else{
@@ -283,6 +301,63 @@
        
       });
 
+  /*
+  $(document).on('click', '.finish-lesson', function(e){
+      confirm_lesson_completion()
+  })
   
+  var lesson_finish_confirm_flag = false;
+  function confirm_lesson_completion(){
+      if(!lesson_finish_confirm_flag){
+          $("#confirm-finish-lesson-reveal").foundation('reveal', 'open');
+      }
+  }
+
+  //Confirm Lesson Completion
+  $("#confirm-finish-lesson-reveal").on("click", "#finishLessonbtnConfirmYes", function() {
+      lesson_finish_confirm_flag = true;
+      complete_lesson()
+      $("#confirm-finish-lesson-reveal").foundation('reveal', 'close');
+  });
+
+  $("#confirm-finish-lesson-reveal").on("click", "#finishLessonbtnConfirmNo", function() {
+      $("#confirm-finish-lesson-reveal").foundation('reveal', 'close');
+  });
+
+  function complete_lesson(){
+        $('.controls-box').addClass('hide')
+        $.ajax({
+            type: "POST",
+            data:{
+                'csrfmiddlewaretoken': "{{csrf_token}}",
+                'user_id': '{{request.user.id}}'
+            },
+            url: "{% url 'finish_lesson' group_id lesson_node.pk %}",
+            // datatype: "",
+            global: false,
+            beforeSend: function(){
+                $(".controls-box").append("<label class='loading_lbl'>Processing.. Please wait!</label>");
+            },
+
+            success: function(data) {
+                data_dict = JSON.parse(data);
+                if(data_dict['success']){
+                    $(".loading_lbl").remove()
+                    $('#confirm-finish-lesson-reveal').foundation('reveal', 'close');
+                    $(".finish-lesson").addClass('hide')
+                    lesson_finish_confirm_flag = true;
+                    location.reload()
+                }
+                else{
+                    $(".loading_lbl").text("Something went wrong. Click on ")
+                    $(".loading_lbl").append('<a href="#" onclick="window.location.reload(true);">Regresh Page</a>')
+                    lesson_finish_confirm_flag = false;
+                }
+            }
+        });
+  }
+  */
+
 </script>
+
 {% endblock %}

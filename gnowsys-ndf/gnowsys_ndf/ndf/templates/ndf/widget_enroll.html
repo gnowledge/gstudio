@@ -30,10 +30,10 @@
             </div>
             <div class="small-4 medium-4 columns">
             {% if userid in group_object.author_set %}
-                <input id="enrollchk_{{userid}}" type="checkbox" class="enroll_chkbox" checked disabled><label for="enrollchk_{{userid}}" > {% if 'Group' in group_object.member_of_names_list %} {% trans "Joined" %}{% else %}  {% trans "Enrolled" %} {% endif %} 
+                <input id="enrollchk_{{userid}}" type="checkbox" class="enroll_chkbox" checked disabled><label for="enrollchk_{{userid}}" > {% if 'announced_unit' in group_object.member_of_names_list %} {% trans "Enrolled" %} {% else %}  {% trans "Joined" %} {% endif %} 
                 </label>
             {% else %}
-              <input id="enrollchk_{{userid}}" type="checkbox" class="enroll_chkbox" onclick="enroll_user('{{userid}}')" data-user-id='{{userid}}'><label for="enrollchk_{{userid}}" class="enroll-act_lbl"> {% if 'Group' in group_object.member_of_names_list %} {% trans "Join" %} {% else %} {% trans "Join" %} {% endif %} </label>
+              <input id="enrollchk_{{userid}}" type="checkbox" class="enroll_chkbox" onclick="enroll_user('{{userid}}')" data-user-id='{{userid}}'><label for="enrollchk_{{userid}}" class="enroll-act_lbl"> {% if 'announced_unit' in group_object.member_of_names_list %} {% trans "Enroll" %} {% else %} {% trans "Join" %} {% endif %} </label>
             {% endif %}
             </div>
             <hr>

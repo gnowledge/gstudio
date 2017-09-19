@@ -11,7 +11,7 @@
 <nav class="top-bar" data-topbar role="navigation" id="menu_bar_gstudio">
         <ul class="title-area">
             <li class="name show-for-medium-up">
-                <a class="loggedin-user" href="{% url 'landing_page' %}">
+                <a class="loggedin-user" href="{% url 'landing_page'  %}?True">
                 
                 <img src="{{site.SECONDARY_LOGO}}">
                 </a>
@@ -39,25 +39,24 @@
                 {% if help_oid %}
                 <li class=""><a {% if title == 'Help Page'  %} class="active" {% endif %} target="_blank" href="{% url 'course_content' help_oid %}"> <i class="fa fa-info-circle"></i> Help </a></li>
                 {% endif %}
-                <ul class="">
-          <li class="has-dropdown">
-            <a>{% trans "Language" %} &nbsp; | &nbsp; {{request.LANGUAGE_CODE}}</a>
-            <ul class="dropdown">
-
-              {% for lang in LANGUAGES %}
-                <li>
-                  <form action="/i18n/setlang/" method="POST">
-                    {% csrf_token %}
-                    <input name="url" type="hidden" value="{{request.get_full_path}}"/>
-                    <input type="hidden"  name="language" value="{{ lang.0 }}">
-                    <input type="submit" class="button expand secondary" value="{{ lang.1 }}"/>
-                  </form>
+                <li class="has-dropdown not-click">
+                    <a href="#">
+                    {% trans "Language" %}&nbsp; | &nbsp; {{request.LANGUAGE_CODE}}
+                    </a>
+                    <ul class="dropdown">
+                        {% for lang in LANGUAGES %}
+                            <li>
+                                <form action="/i18n/setlang/" method="POST">
+                                {% csrf_token %}
+                                <input name="url" type="hidden" value="{{request.get_full_path}}"/>
+                                <input type="hidden"  name="language" value="{{ lang.0 }}">
+                                <input type="submit"   class="button expand secondary" value="{{ lang.1 }}"/>
+                                </form>
+                            </li>
+                        {% endfor %}
+                    </ul>
                 </li>
-              {% endfor %}
-
-            </ul>
-          </li>
-        </ul>
+          
             {% if user.is_authenticated %}
                 <li class="has-dropdown buddy_margin white-text">
                     {% get_profile_pic request.user.pk as prof_pic %}
@@ -163,6 +162,9 @@
                 <li class=""><a href="{% url 'my_desk' request.user.id %}" {% if title == "my desk" %} class="active" {% endif %}>My Desk</a></li>  
                 {% endif %}
                 <li><a href="{% url explore_url %}" {% if title == 'base courses' or title == "courses" or title == "drafts" %} class="active" {% endif %} > Explore</a>
+                </li>
+                <li>
+                    <a  target="_blank" href="{% url 'tools_temp' %}" {% if title == 'tools' %} class="active" {% endif %}>Interactives</a>
                 </li>
                     
                 {% if site.ELASTIC_SEARCH %}

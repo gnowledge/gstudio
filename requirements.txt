@@ -33,7 +33,7 @@ pathlib2==2.2.1
 
 # QBANK-LITE REQ: https://github.com/CLIxIndia-Dev/qbank-lite/blob/master/requirements.txt
 # also make sure following are updated w.r.t qbank repo
-dlkit==0.5.2
+dlkit==0.5.13
 beautifulsoup4==4.4.1
 cffi==1.7.0
 enum34==1.1.6
