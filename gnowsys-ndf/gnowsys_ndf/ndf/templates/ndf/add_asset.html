@@ -80,6 +80,7 @@
                 {% if title == 'asset_detail'  %}
                 <button type="button" class="orange-button add-asset-content right"><i class="fi-plus"></i> {% trans "Add File" %}</button>
                 {% endif %}
+                <a class="right orange-button-template" href="{% url 'create_edit_asset_page' group_id asset_obj.pk %}"><i class="fi-plus"></i> {% trans "Add  page" %}</a>
 
             {% endif %}
             </div>

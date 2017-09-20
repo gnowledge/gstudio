@@ -1,7 +1,7 @@
 {% load i18n %}
 {% load ndf_tags %}
     <div id="addActivityPage" >
-        <form id ="course_page_form" enctype="multipart/form-data" method="post" action="{% url 'save_course_page' group_id %}">{% csrf_token %}
+        <form id ="course_page_form" enctype="multipart/form-data" method="post"  {%  if title == "create_asset_pages" %} action="{% url 'save_asset_page' group_id asset_id %}" {% else %} action="{% url 'save_course_page' group_id %}"  {% endif %} >{% csrf_token %}
             <div>
                 <div class="small-12 columns">
                     <div class="row">

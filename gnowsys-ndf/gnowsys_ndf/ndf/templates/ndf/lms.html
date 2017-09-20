@@ -162,6 +162,9 @@
         {% if title == "asset_detail" or title == "asset_content_detail" or  title == "raw_material_detail" or title == "asset_gallery_detail"  %}
             {% include "ndf/add_asset.html"  with title=title %}
         {% endif %}
+        {% if title == "create_asset_pages" %}
+            {% include "ndf/course_page_create_edit.html" %}
+      {% endif %}
     </div>
   </div>
 

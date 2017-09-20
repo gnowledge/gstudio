@@ -3584,6 +3584,34 @@ def create_edit_course_page(request, group_id, page_id=None,page_type=None):
     )
 
 @get_execution_time
+def create_edit_asset_page(request, group_id, asset_id ):
+    print "3666666666666666666666666666666666666"
+    group_obj = get_group_name_id(group_id, get_obj=True)
+    group_id = group_obj._id
+    group_name = group_obj.name
+    template = 'ndf/lms.html'
+    # templates_gst = node_collection.one({"_type":"GSystemType","name":"Template"})
+    # if templates_gst._id:
+    #   # templates_cur = node_collection.find({"member_of":ObjectId(GST_PAGE._id),"type_of":ObjectId(templates_gst._id)})
+    #   templates_cur = node_collection.find({"type_of":ObjectId(templates_gst._id)})
+
+    context_variables = {
+            'group_id': group_id, 'groupid': group_id, 'group_name':group_name,
+            'group_obj': group_obj, 'title': 'create_asset_pages','asset_id':asset_id,
+            'activity_node': None, #'templates_cur': templates_cur,
+            'cancel_activity_url': reverse('course_pages',
+                                        kwargs={
+                                        'group_id': group_id,
+                                        
+                                        })}
+
+
+    return render_to_response(template,
+                                context_variables,
+                                context_instance = RequestContext(request)
+    )
+
+@get_execution_time
 def course_pages(request, group_id, page_id=None,page_no=1):
     from gnowsys_ndf.settings import GSTUDIO_NO_OF_OBJS_PP
     group_obj = get_group_name_id(group_id, get_obj=True)
@@ -3691,6 +3719,66 @@ def save_course_page(request, group_id):
         page_obj.content = unicode(content)
         page_obj.created_by = request.user.id
         page_obj.save(groupid=group_id)
+        return HttpResponseRedirect(reverse("view_course_page",
+         kwargs={'group_id': group_id, 'page_id': page_obj._id}))
+
+@login_required
+def save_asset_page(request, group_id, asset_id):
+    print "111111111111111111111111111",asset_id
+    group_obj = get_group_name_id(group_id, get_obj=True)
+    group_id = group_obj._id
+    group_name = group_obj.name
+    tags = request.POST.get("tags",[])
+    if tags:
+        tags = json.loads(tags)
+    else:
+        tags = []    
+    template = 'ndf/gevent_base.html'
+    page_gst_name, page_gst_id = GSystemType.get_gst_name_id("Page")
+    page_obj = None
+    activity_lang =  request.POST.get("lan", '')
+    if request.method == "POST":
+        name = request.POST.get("name", "")
+        alt_name = request.POST.get("alt_name", "")
+        content = request.POST.get("content_org", None)
+        node_id = request.POST.get("node_id", "")
+        if node_id:
+            page_obj = node_collection.one({'_id': ObjectId(node_id)})
+            if page_obj.altnames != alt_name:
+                page_obj.altnames = unicode(alt_name)
+        else:
+            is_info_page = request.POST.get("page_type", "")
+            page_obj = node_collection.collection.GSystem()
+            page_obj.fill_gstystem_values(request=request)
+            page_obj.member_of = [page_gst_id]
+            page_obj.group_set = [group_id]
+            page_obj.altnames = unicode(alt_name)
+            if is_info_page == "Info":
+                info_page_gst_name, info_page_gst_id = GSystemType.get_gst_name_id('Info page')
+                page_obj.type_of = [info_page_gst_id]
+        
+        if activity_lang:
+            language = get_language_tuple(activity_lang)
+            page_obj.language = language
+        
+        page_obj.fill_gstystem_values(tags=tags)
+        page_obj.name = unicode(name)
+        page_obj.content = unicode(content)
+        page_obj.created_by = request.user.id
+        page_obj.save(groupid=group_id)
+        asset_obj = Node.get_node_by_id(asset_id)
+        asset_contents_list = [page_obj._id]
+        rt_has_asset_content = node_collection.one({'_type': 'RelationType',
+        'name': 'has_assetcontent'})
+        asset_grels = triple_collection.find({'_type': 'GRelation', \
+        'relation_type': rt_has_asset_content._id,'subject': asset_obj._id},
+        {'_id': 0, 'right_subject': 1})
+        
+        for each_asset in asset_grels:
+            asset_contents_list.append(each_asset['right_subject'])
+        
+        create_grelation(asset_obj._id, rt_has_asset_content, asset_contents_list)
+        
         return HttpResponseRedirect(reverse("view_course_page",
          kwargs={'group_id': group_id, 'page_id': page_obj._id}))
 
