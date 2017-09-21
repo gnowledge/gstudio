@@ -3585,7 +3585,6 @@ def create_edit_course_page(request, group_id, page_id=None,page_type=None):
 
 @get_execution_time
 def create_edit_asset_page(request, group_id, asset_id ):
-    print "3666666666666666666666666666666666666"
     group_obj = get_group_name_id(group_id, get_obj=True)
     group_id = group_obj._id
     group_name = group_obj.name
@@ -3724,7 +3723,6 @@ def save_course_page(request, group_id):
 
 @login_required
 def save_asset_page(request, group_id, asset_id):
-    print "111111111111111111111111111",asset_id
     group_obj = get_group_name_id(group_id, get_obj=True)
     group_id = group_obj._id
     group_name = group_obj.name
@@ -3779,8 +3777,8 @@ def save_asset_page(request, group_id, asset_id):
         
         create_grelation(asset_obj._id, rt_has_asset_content, asset_contents_list)
         
-        return HttpResponseRedirect(reverse("view_course_page",
-         kwargs={'group_id': group_id, 'page_id': page_obj._id}))
+        return HttpResponseRedirect(reverse("assetcontent_detail",
+         kwargs={'group_id': group_id, 'asset_id': asset_id,'asst_content_id':page_obj._id}))
 
 def load_content_data(request, group_id):
     node_id = request.GET.get("node_id", "")
