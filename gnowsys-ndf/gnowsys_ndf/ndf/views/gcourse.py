@@ -3584,7 +3584,7 @@ def create_edit_course_page(request, group_id, page_id=None,page_type=None):
     )
 
 @get_execution_time
-def create_edit_asset_page(request, group_id, asset_id ):
+def create_edit_asset_page(request, group_id, asset_id, page_id=None ):
     group_obj = get_group_name_id(group_id, get_obj=True)
     group_id = group_obj._id
     group_name = group_obj.name
@@ -3603,6 +3603,14 @@ def create_edit_asset_page(request, group_id, asset_id ):
                                         'group_id': group_id,
                                         
                                         })}
+    if page_id:
+        node_obj = node_collection.one({'_id': ObjectId(page_id)})
+        context_variables.update({'activity_node': node_obj, 'hide_breadcrumbs': True,
+            'cancel_activity_url': reverse('view_course_page',
+                                        kwargs={
+                                        'group_id': group_id,
+                                        'page_id': node_obj._id
+                                        })})
 
 
     return render_to_response(template,

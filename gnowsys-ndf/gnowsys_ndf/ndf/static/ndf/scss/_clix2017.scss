@@ -1352,7 +1352,14 @@ ul.horizontal_tabs_gstudio {
 }
 
 
-
+.preview_asset_page {
+    //background: #ccc;
+    //border: 2px solid #999;
+    word-wrap: break-word;
+    width: 200%;
+    min-height: 350px;
+    margin-left: 14px;
+}
 
 .preview_asset {
     background: #ccc;
