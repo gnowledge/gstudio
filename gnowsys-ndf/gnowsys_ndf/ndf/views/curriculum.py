@@ -26,6 +26,7 @@ from gnowsys_ndf.ndf.views.methods import get_node_common_fields, get_drawers,cr
 from gnowsys_ndf.ndf.views.methods import get_filter_querydict
 from gnowsys_ndf.ndf.views.ajax_views import get_collection
 from gnowsys_ndf.ndf.templatetags.simple_filters import get_dict_from_list_of_dicts
+from gnowsys_ndf.ndf.templatetags.ndf_tags import get_topic_nodes
 #######################################################################################################################################
 theme_GST = node_collection.one({'_type': 'GSystemType', 'name': 'Theme'})
 topic_GST = node_collection.one({'_type': 'GSystemType', 'name': 'Topic'})
@@ -1008,6 +1009,21 @@ def get_filtered_topic_resources(request, group_id, node_id):
                                     },
                                     context_instance = RequestContext(request)
                             )
+def topic_resources(request, group_id, curriculum_id , topic_id):
+    # res_list = get_help_pages_of_node(topic_obj,rel_name="has_help",language="en")
+    resources = get_topic_nodes (ObjectId(topic_id))  
+
+    print "0000000000000000000000000000",resources
+
+    return render_to_response('ndf/widget_card_list.html', 
+                                    { 
+                                        'files_cur':resources,
+                                         'detail_urlname':'asset_detail',
+                                         'group_id':group_id                                    
+                                    },
+                                    context_instance = RequestContext(request)
+                            )
+    
 
 
 def get_curriculum_hierarchy(currciculum_obj):

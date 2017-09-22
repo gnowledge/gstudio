@@ -42,7 +42,7 @@
             <a class="close-reveal-modal" aria-label="Close">&#215;</a>
         </div>
 
-            <div id="addDivision" class="reveal-modal" data-reveal aria-labelledby="modalTitle" aria-hidden="true" role="dialog">
+    <div id="addDivision" class="reveal-modal" data-reveal aria-labelledby="modalTitle" aria-hidden="true" role="dialog">
         <div>
             <h4>Create new Sub-Section</h4>
             <label>Sub-Section Name
@@ -60,6 +60,8 @@
             <button type="button" class="blue-white-button delete_division" style="display: none;">
                 Delete
             </button>
+        </div>
+        <div class="row listing-row">
         </div>
       <a class="close-reveal-modal" aria-label="Close">&#215;</a>
     </div>
@@ -182,6 +184,18 @@
                             //$('#addDivision').find('input[type=checkbox]').val(node.isLeaf);
                             $('#addDivision').find('input[type=checkbox][name="isLeafNode"]').closest('label').hide();
                             $('#addDivision').foundation('reveal', 'open');
+                            url = "/{{group_id}}" +"/curriculum/topic-resources/" + "{{curriculum_obj.pk}}" + "/" + node.id;
+                            $.ajax({
+                                  type: "GET",
+                                  data:{
+
+                                    },
+                                  url: url,
+                                  datatype: "html",
+                                  success: function(data) {
+                                $('.listing-row').append(data);
+                                }
+                            });
                         }
                     break;
                 }
@@ -402,6 +416,10 @@
                     
                 }
 
+            });
+            $('.close-reveal-modal').click(function(event) {
+
+                $(".listing-row").html("")
             });
     </script>
 
