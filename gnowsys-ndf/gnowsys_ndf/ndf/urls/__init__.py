@@ -22,7 +22,6 @@ if GSTUDIO_SITE_NAME.lower() == 'clix':
 else:
     login_template = 'registration/login.html'
 
-
 urlpatterns = patterns('',
     (r'^i18n/', include('django.conf.urls.i18n')),
     (r'^pref_lang/$', include('gnowsys_ndf.ndf.urls.languagepref')),
@@ -226,3 +225,7 @@ if settings.DEBUG:
             'document_root': settings.STATIC_ROOT,
         }),
 )
+
+handler404 = 'gnowsys_ndf.ndf.views.errors.handler404'
+handlerPermissionDenied = 'gnowsys_ndf.ndf.views.errors.handler403'
+handler500 = 'gnowsys_ndf.ndf.views.errors.handler500'
