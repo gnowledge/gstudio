@@ -4,7 +4,13 @@
 {% block title %} {% trans "Topic Map" %} {{curriculum_obj.name }}  {% endblock %}
 
 {% block body_content %}
-        {{curriculum_obj.name}} 
+        {% check_is_gstaff group_id request.user as is_gstaff %} 
+        <div class="curriculum-name-desc" {% if is_gstaff or curriculum_obj.created_by == request.user.id %} data-reveal-id="create-edit-curriculum-reveal" {% endif %}>
+            {{curriculum_obj.name}} : 
+            {{curriculum_obj.content_org}}  
+            
+        </div>
+        
         {% if not curriculum_obj %}
         <h3 data-reveal-id="create-edit-curriculum-reveal" class="hyperlink-tag">
             <i class="fi fi-plus"></i> Create Curriculum Tree Structure
@@ -15,27 +21,28 @@
             <!--button type="button" class="blue-white-button" id="create_first_branch">Create Branch</button-->
         </div>
 
+    {% if is_gstaff or curriculum_obj.created_by == request.user.id %}
         <div id="addBranch" class="reveal-modal" data-reveal aria-labelledby="modalTitle" aria-hidden="true" role="dialog">
-        	<div>
-	            <h4>Create new Section</h4>
-	            <label>Section Name
-	                <input type="text" placeholder="Section Name" name="branch_name"/>
-	            </label>
-	            <label>Section Description
-	                <textarea type="text" placeholder="Section description" ></textarea>
-	            </label>
-	            <br />
-	            <button type="button" class="blue-white-button create_branch">
+            <div>
+                <h4>Create new Section</h4>
+                <label>Section Name
+                    <input type="text" placeholder="Section Name" name="branch_name"/>
+                </label>
+                <label>Section Description
+                    <textarea type="text"  class="branch_desc" placeholder="Section description" ></textarea>
+                </label>
+                <br />
+                <button type="button" class="blue-white-button create_branch">
 	                Add
 	            </button>
-	            <button type="button" class="blue-white-button delete_branch" style="display: none;">
-	                Delete
-	            </button>
-        	</div>
-      		<a class="close-reveal-modal" aria-label="Close">&#215;</a>
-    	</div>
+                <button type="button" class="blue-white-button delete_branch" style="display: none;">
+                    Delete
+                </button>
+            </div>
+            <a class="close-reveal-modal" aria-label="Close">&#215;</a>
+        </div>
 
-    	    <div id="addDivision" class="reveal-modal" data-reveal aria-labelledby="modalTitle" aria-hidden="true" role="dialog">
+    <div id="addDivision" class="reveal-modal" data-reveal aria-labelledby="modalTitle" aria-hidden="true" role="dialog">
         <div>
             <h4>Create new Sub-Section</h4>
             <label>Sub-Section Name
@@ -54,9 +61,12 @@
                 Delete
             </button>
         </div>
+        <div class="row listing-row">
+        </div>
       <a class="close-reveal-modal" aria-label="Close">&#215;</a>
     </div>
 
+    {% endif %}
 
 
 
@@ -174,6 +184,18 @@
                             //$('#addDivision').find('input[type=checkbox]').val(node.isLeaf);
                             $('#addDivision').find('input[type=checkbox][name="isLeafNode"]').closest('label').hide();
                             $('#addDivision').foundation('reveal', 'open');
+                            url = "/{{group_id}}" +"/curriculum/topic-resources/" + "{{curriculum_obj.pk}}" + "/" + node.id;
+                            $.ajax({
+                                  type: "GET",
+                                  data:{
+
+                                    },
+                                  url: url,
+                                  datatype: "html",
+                                  success: function(data) {
+                                $('.listing-row').append(data);
+                                }
+                            });
                         }
                     break;
                 }
@@ -286,7 +308,8 @@
                               data:{
                                     'csrfmiddlewaretoken': "{{csrf_token}}",
                                     'curr_name':curr_name,
-                                    'curr_desc':curr_desc
+                                    'curr_desc':curr_desc,
+                                    'curriculum_obj':'{{curriculum_obj.pk}}'
                                 },
                               url: "{% url 'create_edit_curriculum' group_id  %}",
                               datatype: "html",
@@ -296,14 +319,17 @@
                             }
                         });
                     });
+
             $( ".create_branch" ).click(function(event) {
                 branch_name = $("input[name='branch_name']").val();
+                branch_desc = $(".branch_desc").val();
                 existing_id = $(this).attr("id");
                 $.ajax({
                           type: "POST",
                           data:{
                                 'csrfmiddlewaretoken': "{{csrf_token}}",
                                 'name':branch_name,
+                                'content_org': branch_desc,
                                 'context_theme':"{{curriculum_obj.pk}}",
                                 'existing_id':existing_id
                             },
@@ -350,9 +376,11 @@
                           type: "POST",
                           data:{
                                 'csrfmiddlewaretoken': "{{csrf_token}}",
-                                'node_id':sel_node_id,
+                                "node_to_delete": sel_node_id,
+                                "deletion_type": 0,
+                                "right_subject": 1
                             },
-                          url: "{% url 'delete_curriculum_node' group_id  %}",
+                          url: "{% url 'ajax_delete_node' group_id  %}",
                           datatype: "html",
                           success: function(data) {
                           location.reload();
@@ -373,9 +401,11 @@
                           type: "POST",
                           data:{
                                 'csrfmiddlewaretoken': "{{csrf_token}}",
-                                'node_id':sel_node_id,
+                                'node_to_delete':sel_node_id,
+                                "deletion_type": 0,
+                                "right_subject": 1
                             },
-                          url: "{% url 'delete_curriculum_node' group_id  %}",
+                          url: "{% url 'ajax_delete_node' group_id  %}",
                           datatype: "html",
                           success: function(data) {
                           location.reload();
@@ -386,6 +416,10 @@
                     
                 }
 
+            });
+            $('.close-reveal-modal').click(function(event) {
+
+                $(".listing-row").html("")
             });
     </script>
 

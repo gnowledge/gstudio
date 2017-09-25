@@ -6,7 +6,7 @@
 <div class="row">
   <div class="medium 12 columns">
 	    <div class="left small-12 medium-6 columns">
-	                <label>{% trans "File name:" %} <b> {{node.name}} </b>
+	                <label >{% trans "File name:" %} <b> <a href="{% url 'read_file' group_name_tag node download_filename %}" download="{{ download_filename }}"> {{node.name}} </a> </b>
                   	                    
 	                    <!--<input type="text" placeholder="" name="resource_name" />-->
 	                </label>
