@@ -21,8 +21,8 @@
             <!--button type="button" class="blue-white-button" id="create_first_branch">Create Branch</button-->
         </div>
 
-    {% if is_gstaff or curriculum_obj.created_by == request.user.id %}
         <div id="addBranch" class="reveal-modal" data-reveal aria-labelledby="modalTitle" aria-hidden="true" role="dialog">
+            {% if is_gstaff or curriculum_obj.created_by == request.user.id %}
             <div>
                 <h4 class="section-label-heading">Create new Section</h4>
                 <label class="section-label">Section Name
@@ -39,11 +39,20 @@
                     Delete
                 </button>
             </div>
+            {% else %}
+                <label class="section-label">Section Name
+                    <input type="text" placeholder="Section Name" name="branch_name"/>
+                </label>
+                <label class="section-label-desc">Section Description
+                    <textarea type="text"  class="branch_desc" placeholder="Section description" ></textarea>
+                </label>
+            {% endif %} 
             <a class="close-reveal-modal" aria-label="Close">&#215;</a>
         </div>
 
     <div id="addDivision" class="reveal-modal" data-reveal aria-labelledby="modalTitle" aria-hidden="true" role="dialog">
         <div>
+            {% if is_gstaff or curriculum_obj.created_by == request.user.id %}
             <h4 class="subsection-label-heading" >Create new Sub-Section</h4>
             <label>Sub-Section Name
                 <input type="text" placeholder="Sub-Section Name" name="sub-section-name" />
@@ -60,13 +69,20 @@
             <button type="button" class="blue-white-button delete_division" style="display: none;">
                 Delete
             </button>
+            {% else %}
+                <label>Sub-Section Name
+                <input type="text" placeholder="Sub-Section Name" name="sub-section-name" />
+            </label>
+            <label>Topic
+                <input type="checkbox"  class="topic-checkbox" name="isLeafNode" value="leafNode"/>
+            </label>
+            {% endif %}
         </div>
         <div class="row listing-row">
         </div>
       <a class="close-reveal-modal" aria-label="Close">&#215;</a>
     </div>
 
-    {% endif %}
 
 
 
