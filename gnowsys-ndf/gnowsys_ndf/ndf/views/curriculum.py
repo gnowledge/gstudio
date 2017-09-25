@@ -9,6 +9,7 @@ from django.http import HttpResponse
 from django.core.urlresolvers import reverse
 from django.shortcuts import render_to_response, render
 from django.template import RequestContext
+from django.core.exceptions import PermissionDenied
 
 from mongokit import paginator
 
@@ -26,7 +27,7 @@ from gnowsys_ndf.ndf.views.methods import get_node_common_fields, get_drawers,cr
 from gnowsys_ndf.ndf.views.methods import get_filter_querydict
 from gnowsys_ndf.ndf.views.ajax_views import get_collection
 from gnowsys_ndf.ndf.templatetags.simple_filters import get_dict_from_list_of_dicts
-from gnowsys_ndf.ndf.templatetags.ndf_tags import get_topic_nodes
+from gnowsys_ndf.ndf.templatetags.ndf_tags import get_topic_nodes, check_is_gstaff
 #######################################################################################################################################
 theme_GST = node_collection.one({'_type': 'GSystemType', 'name': 'Theme'})
 topic_GST = node_collection.one({'_type': 'GSystemType', 'name': 'Topic'})
@@ -173,12 +174,18 @@ def curriculum_list(request, group_id):
         group_name, group_id = get_group_name_id(group_id)
 
     title = theme_GST.name
-    
+    group_obj   = get_group_name_id(group_id, get_obj=True)
     nodes = node_collection.find({
         'member_of': {'$all': [theme_GST._id]},
         'group_set':{'$all': [ObjectId(group_id)]}
         })
     
+    gstaff_access = check_is_gstaff(group_id,request.user)
+    if 'Author' in group_obj.member_of_names_list:
+        if gstaff_access:
+            template = 'ndf/lms.html'
+        else:
+            raise PermissionDenied
     return render_to_response("ndf/curriculum_listing.html",
                             { 
                                 'groupid': group_id,
