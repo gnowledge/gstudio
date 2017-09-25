@@ -79,12 +79,13 @@ def backup_psql_data(location='/data/postgres-dump/'):
     # fab backup_psql_data:/data/
 
     import datetime
-    backup_file_name = "{:%Y%m%d%H%M%S}".format(datetime.datetime.now()) + ".sql"
+    backup_file_name = "pgdump-{:%Y%m%d%H-%M%S}".format(datetime.datetime.now()) + ".sql"
     local('echo "pg_dumpall > %s" | sudo su - postgres' % backup_file_name)
     try:
         local('mv /var/lib/postgresql/%s %s' % (backup_file_name, location))
     except Exception as e:
         raise e
+    print "\nBackup file would be found at: ", os.path.join(location, backup_file_name)
 
 
 def restore_psql_data(backup_file_path_name):
