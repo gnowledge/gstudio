@@ -35,10 +35,10 @@ from gnowsys_ndf.ndf.views.file import *
 from gnowsys_ndf.ndf.templatetags.ndf_tags import edit_drawer_widget, get_disc_replies, get_all_replies,user_access_policy, get_relation_value, check_is_gstaff, get_attribute_value
 from gnowsys_ndf.ndf.views.methods import get_node_common_fields, parse_template_data, get_execution_time, delete_node, get_filter_querydict, update_notes_or_files_visited
 from gnowsys_ndf.ndf.views.notify import set_notif_val
-from gnowsys_ndf.ndf.views.methods import get_property_order_with_value, get_group_name_id, get_course_completetion_status, replicate_resource
+from gnowsys_ndf.ndf.views.methods import get_property_order_with_value, get_group_name_id, get_course_completetion_status, replicate_resource, get_current_and_old_display_pics
 from gnowsys_ndf.ndf.views.ajax_views import *
 from gnowsys_ndf.ndf.views.analytics_methods import *
-from gnowsys_ndf.ndf.views.methods import create_gattribute, create_grelation, create_task, delete_grelation, node_thread_access, get_group_join_status, delete_node
+from gnowsys_ndf.ndf.views.methods import create_gattribute, create_grelation, create_task, delete_grelation, node_thread_access, get_group_join_status, delete_node, forbid_private_group
 from gnowsys_ndf.notification import models as notification
 from gnowsys_ndf.settings import GSTUDIO_NOTE_CREATE_POINTS, GSTUDIO_QUIZ_CORRECT_POINTS, GSTUDIO_COMMENT_POINTS, GSTUDIO_FILE_UPLOAD_POINTS
 from gnowsys_ndf.ndf.views.trash import trash_resource 
@@ -59,7 +59,6 @@ file_gst_name, file_gst_id = GSystemType.get_gst_name_id("File")
 page_gst_name, page_gst_id = GSystemType.get_gst_name_id("Page")
 blog_page_gst_name, blog_page_gst_id = GSystemType.get_gst_name_id('Blog page')
 
-has_banner_pic_rt = node_collection.one({'_type': 'RelationType', 'name': unicode('has_banner_pic') })
 
 app = GST_COURSE
 
@@ -2168,31 +2167,11 @@ def course_dashboard(request, group_id):
         })
     return render_to_response(template, context_variables)
 
-
-
-def _get_current_and_old_display_pics(group_obj):
-    banner_pic_obj = None
-    old_profile_pics = []
-    for each in group_obj.relation_set:
-        if "has_banner_pic" in each:
-            banner_pic_obj = node_collection.one(
-                {'_type': {'$in': ["GSystem", "File"]}, '_id': each["has_banner_pic"]}
-            )
-            break
-
-    all_old_prof_pics = triple_collection.find({'_type': "GRelation", "subject": group_obj._id, 'relation_type': has_banner_pic_rt._id, 'status': u"DELETED"})
-    if all_old_prof_pics:
-        for each_grel in all_old_prof_pics:
-            n = node_collection.one({'_id': ObjectId(each_grel.right_subject)})
-            if n not in old_profile_pics:
-                old_profile_pics.append(n)
-
-    return banner_pic_obj, old_profile_pics
-
 @get_execution_time
 def course_content(request, group_id):
 
     group_obj   = get_group_name_id(group_id, get_obj=True)
+    forbid_private_group(request, group_obj)
     group_id    = group_obj._id
     group_name  = group_obj.name
     allow_to_join = get_group_join_status(group_obj)
@@ -2205,7 +2184,7 @@ def course_content(request, group_id):
         template = 'ndf/gevent_base.html'
     if 'announced_unit' in group_obj.member_of_names_list or 'Group' in group_obj.member_of_names_list and 'base_unit' not in group_obj.member_of_names_list:
         template = 'ndf/lms.html'
-    banner_pic_obj,old_profile_pics = _get_current_and_old_display_pics(group_obj)
+    banner_pic_obj,old_profile_pics = get_current_and_old_display_pics(group_obj)
     if request.user.is_authenticated():
         counter_obj = Counter.get_counter_obj(request.user.id, ObjectId(group_id))
         if counter_obj:
@@ -2224,6 +2203,7 @@ def course_content(request, group_id):
 @get_execution_time
 def course_notebook(request, group_id, node_id=None, tab="my-notes"):
     group_obj = get_group_name_id(group_id, get_obj=True)
+    forbid_private_group(request, group_obj)
     group_id = group_obj._id
     group_name = group_obj.name
 
@@ -2243,7 +2223,7 @@ def course_notebook(request, group_id, node_id=None, tab="my-notes"):
     # blog_page_gst_name, blog_page_gst_id = GSystemType.get_gst_name_id('Blog page')
 
     thread_node = None
-    banner_pic_obj,old_profile_pics = _get_current_and_old_display_pics(group_obj)
+    banner_pic_obj,old_profile_pics = get_current_and_old_display_pics(group_obj)
     '''
     banner_pic_obj = None
     old_profile_pics = []
@@ -2335,6 +2315,7 @@ def course_raw_material(request, group_id, node_id=None,page_no=1):
 
     coll_file_cur = []
     group_obj   = get_group_name_id(group_id, get_obj=True)
+    forbid_private_group(request, group_obj)
     group_id    = group_obj._id
     allow_to_upload = False
     group_name  = group_obj.name
@@ -2347,7 +2328,7 @@ def course_raw_material(request, group_id, node_id=None,page_no=1):
     allow_to_join = None
     files_cur = None
     allow_to_join = get_group_join_status(group_obj)
-    banner_pic_obj,old_profile_pics = _get_current_and_old_display_pics(group_obj)
+    banner_pic_obj,old_profile_pics = get_current_and_old_display_pics(group_obj)
     '''
     banner_pic_obj = None
     old_profile_pics = []
@@ -2466,6 +2447,7 @@ def course_gallery(request, group_id,node_id=None,page_no=1):
     from gnowsys_ndf.settings import GSTUDIO_NO_OF_OBJS_PP
 
     group_obj   = get_group_name_id(group_id, get_obj=True)
+    forbid_private_group(request, group_obj)
     group_id    = group_obj._id
     group_name  = group_obj.name
     gstaff_users = []
@@ -2473,7 +2455,7 @@ def course_gallery(request, group_id,node_id=None,page_no=1):
     allow_to_upload = True
     allow_to_join = query_dict = None
     allow_to_join = get_group_join_status(group_obj)
-    banner_pic_obj,old_profile_pics = _get_current_and_old_display_pics(group_obj)
+    banner_pic_obj,old_profile_pics = get_current_and_old_display_pics(group_obj)
 
     context_variables = {
             'group_id': group_id, 'groupid': group_id, 'group_name':group_name,
@@ -2548,6 +2530,7 @@ def course_gallery(request, group_id,node_id=None,page_no=1):
 @get_execution_time
 def course_about(request, group_id):
     group_obj   = Group.get_group_name_id(group_id, get_obj=True)
+    forbid_private_group(request, group_obj)
     group_id    = group_obj._id
     group_name  = group_obj.name
 
@@ -2589,7 +2572,7 @@ def course_about(request, group_id):
     if 'announced_unit' in group_obj.member_of_names_list or 'Group' in group_obj.member_of_names_list and 'base_unit' not in group_obj.member_of_names_list:
         template = 'ndf/lms.html'
     
-    banner_pic_obj,old_profile_pics = _get_current_and_old_display_pics(group_obj)
+    banner_pic_obj,old_profile_pics = get_current_and_old_display_pics(group_obj)
     context_variables.update({'old_profile_pics':old_profile_pics,
                         "prof_pic_obj": banner_pic_obj,
                         'show_analytics_notifications':show_analytics_notifications})
@@ -2600,6 +2583,7 @@ def course_about(request, group_id):
 @get_execution_time
 def course_gallerymodal(request, group_id, node_id):
     group_obj   = get_group_name_id(group_id, get_obj=True)
+    forbid_private_group(request, group_obj)
     group_id    = group_obj._id
     group_name  = group_obj.name
     # node_id = request.GET.get("node_id", "")
@@ -2627,6 +2611,7 @@ def course_gallerymodal(request, group_id, node_id):
 def course_note_page(request, group_id):
 
     group_obj   = get_group_name_id(group_id, get_obj=True)
+    forbid_private_group(request, group_obj)
     group_id    = group_obj._id
     group_name  = group_obj.name
 
@@ -3409,6 +3394,7 @@ def get_resource_completion_status(request, group_id):
 @login_required
 def manage_users(request, group_id):
     group_obj   = get_group_name_id(group_id, get_obj=True)
+    forbid_private_group(request, group_obj)
     group_id    = group_obj._id
     group_name  = group_obj.name
     context_variables = {
@@ -3516,6 +3502,7 @@ def assetcontent_detail(request, group_id, asset_id,asst_content_id,page_no=1):
 @get_execution_time
 def create_edit_course_page(request, group_id, page_id=None,page_type=None):
     group_obj = get_group_name_id(group_id, get_obj=True)
+    forbid_private_group(request, group_obj)
     group_id = group_obj._id
     group_name = group_obj.name
     template = 'ndf/gevent_base.html'
@@ -3552,6 +3539,7 @@ def create_edit_course_page(request, group_id, page_id=None,page_type=None):
 def course_pages(request, group_id, page_id=None,page_no=1):
     from gnowsys_ndf.settings import GSTUDIO_NO_OF_OBJS_PP
     group_obj = get_group_name_id(group_id, get_obj=True)
+    forbid_private_group(request, group_obj)
     group_id = group_obj._id
     group_name = group_obj.name
     template = 'ndf/gevent_base.html'
@@ -3992,6 +3980,7 @@ def course_quiz_data(request, group_id):
         return partly_max_list + exception_list
 
     group_obj   = Group.get_group_name_id(group_id, get_obj=True)
+    forbid_private_group(request, group_obj)
     group_id    = group_obj._id
     group_name  = group_obj.name
 
@@ -4102,7 +4091,7 @@ def course_quiz_data(request, group_id):
             elif len(ved['submit'])< len(ved['check']):
                 return_list.extend(_merged_to_from(ved['submit'],ved['check'], na_index=[4,5]))
 
-    banner_pic_obj,old_profile_pics = _get_current_and_old_display_pics(group_obj)
+    banner_pic_obj,old_profile_pics = get_current_and_old_display_pics(group_obj)
     context_variables.update({'old_profile_pics':old_profile_pics,
                         "prof_pic_obj": banner_pic_obj, 'data': json.dumps(return_list)})
     return render_to_response(template, context_variables,

@@ -56,6 +56,7 @@ from gnowsys_ndf.ndf.views.tasks import record_in_benchmark
 from datetime import datetime, timedelta, date
 from gnowsys_ndf.ndf.views.utils import get_dict_from_list_of_dicts
 
+
 history_manager = HistoryManager()
 theme_GST = node_collection.one({'_type': 'GSystemType', 'name': 'Theme'})
 theme_item_GST = node_collection.one({'_type': 'GSystemType', 'name': 'theme_item'})
@@ -5794,3 +5795,31 @@ def update_total_assessment_items(group_id, assessment_list, domain):
         print "\nError Occurred in update_total_assessment_items() {0}".format(
             update_total_assessment_items_err)
         return questionCount_val
+
+def get_current_and_old_display_pics(group_obj, rt_name="has_banner_pic"):
+    pic_rt = node_collection.one({'_type': 'RelationType', 'name': unicode(rt_name) })
+    current_pic_obj = None
+    old_pics = []
+    for each in group_obj.relation_set:
+        if rt_name in each:
+            current_pic_obj = node_collection.one(
+                {'_type': {'$in': ["GSystem", "File"]}, '_id': each[rt_name]}
+            )
+            break
+
+    all_old_prof_pics = triple_collection.find({'_type': "GRelation", \
+        "subject": group_obj._id, 'relation_type': pic_rt._id, \
+        'status': u"DELETED"})
+    if all_old_prof_pics:
+        for each_grel in all_old_prof_pics:
+            n = node_collection.one({'_id': ObjectId(each_grel.right_subject)})
+            if n not in old_pics:
+                old_pics.append(n)
+
+    return current_pic_obj, old_pics
+
+def forbid_private_group(request, group_obj):
+    from gnowsys_ndf.ndf.templatetags.ndf_tags import user_access_policy
+    access_flag = user_access_policy(group_obj, request.user)
+    if access_flag == "disallow":
+        raise PermissionDenied()
