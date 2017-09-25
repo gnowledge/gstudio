@@ -17,8 +17,9 @@ except ImportError:  # old pymongo
 
 
 ''' -- imports from application folders/files -- '''
-from gnowsys_ndf.settings import META_TYPE, GAPPS, GSTUDIO_SITE_DEFAULT_LANGUAGE, GSTUDIO_SITE_NAME, GSTUDIO_USER_GAPPS_LIST
-from gnowsys_ndf.settings import GSTUDIO_RESOURCES_CREATION_RATING, GSTUDIO_RESOURCES_REGISTRATION_RATING, GSTUDIO_RESOURCES_REPLY_RATING
+# Commented below imports from settings file, because of the wild-import from models
+# from gnowsys_ndf.settings import META_TYPE, GAPPS, GSTUDIO_SITE_DEFAULT_LANGUAGE, GSTUDIO_SITE_NAME, GSTUDIO_USER_GAPPS_LIST
+# from gnowsys_ndf.settings import GSTUDIO_RESOURCES_CREATION_RATING, GSTUDIO_RESOURCES_REGISTRATION_RATING, GSTUDIO_RESOURCES_REPLY_RATING
 from mongokit import paginator
 
 # from gnowsys_ndf.ndf.models import *
@@ -859,11 +860,13 @@ def my_performance(request, group_id):
 
     auth_id = auth_obj._id
     title = 'my performance'
-    
-    my_units = node_collection.find({'member_of': {'$in': [ce_gst._id, announced_unit_gst._id,gst_group._id]},
-                                          'author_set': request.user.id,
-                                        }).sort('last_update', -1)
-    # my_modules_cur.rewind()
+
+    my_units = node_collection.find(
+                {'member_of':
+                    {'$in': [ce_gst._id, announced_unit_gst._id, gst_group._id]
+                },
+                'name': {'$nin': GSTUDIO_DEFAULT_GROUPS_LIST },
+                'author_set': request.user.id}).sort('last_update', -1)
     return render_to_response('ndf/lms_dashboard.html',
                 {
                     'group_id': auth_id, 'groupid': auth_id,
