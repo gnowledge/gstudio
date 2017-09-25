@@ -2240,13 +2240,13 @@ def course_notebook(request, group_id, node_id=None, tab="my-notes"):
 
     gstaff_access = check_is_gstaff(group_obj._id,request.user)
 
-
-    if gstaff_access:
-        template = 'ndf/lms.html'
-        show_analytics_notifications = False
-    else:
-        raise PermissionDenied
-  
+    if 'Author' in group_obj.member_of_names_list:
+        if gstaff_access:
+            template = 'ndf/lms.html'
+            show_analytics_notifications = False
+        else:
+            raise PermissionDenied
+      
 
     # page_gst = node_collection.one({'_type': "GSystemType", 'name': "Page"})
     # blogpage_gst = node_collection.one({'_type': "GSystemType", 'name': "Blog page"})
@@ -2464,12 +2464,12 @@ def course_raw_material(request, group_id, node_id=None,page_no=1):
 
     gstaff_access = check_is_gstaff(group_obj._id,request.user)
 
-
-    if gstaff_access:
-        template = 'ndf/lms.html'
-        show_analytics_notifications = False
-    else:
-        raise PermissionDenied
+    if 'Author' in group_obj.member_of_names_list:
+        if gstaff_access:
+            template = 'ndf/lms.html'
+            show_analytics_notifications = False
+        else:
+            raise PermissionDenied
     
 
     context_variables.update({'title':'raw material' ,'files_cur': files_cur,'raw_material_page_info':raw_material_page_info ,'allow_to_upload': allow_to_upload,'allow_to_join': allow_to_join})
@@ -2557,12 +2557,12 @@ def course_gallery(request, group_id,node_id=None,page_no=1):
         # context_variables.update({'assets_page_info':assets_page_info})
     
     gstaff_access = check_is_gstaff(group_obj._id,request.user)
-
-    if gstaff_access:
-        template = 'ndf/lms.html'
-        show_analytics_notifications = False
-    else:
-        raise PermissionDenied
+    if 'Author' in group_obj.member_of_names_list:
+        if gstaff_access:
+            template = 'ndf/lms.html'
+            show_analytics_notifications = False
+        else:
+            raise PermissionDenied
     context_variables.update({'asset_nodes': asset_nodes})
 
     return render_to_response(template,
