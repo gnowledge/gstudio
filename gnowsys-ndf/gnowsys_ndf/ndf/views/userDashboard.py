@@ -741,9 +741,12 @@ def my_desk(request, group_id):
     #     my_modules.append(each._id)
 
     
-    my_units = node_collection.find({'member_of': {'$in': [ce_gst._id, announced_unit_gst._id,gst_group._id]},
-                                          'author_set': request.user.id,
-                                        }).sort('last_update', -1)
+    my_units = node_collection.find(
+                {'member_of':
+                    {'$in': [ce_gst._id, announced_unit_gst._id, gst_group._id]
+                },
+                'name': {'$nin': GSTUDIO_DEFAULT_GROUPS_LIST },
+                'author_set': request.user.id}).sort('last_update', -1)
 
     # my_modules_cur.rewind()
     return render_to_response('ndf/lms_dashboard.html',
