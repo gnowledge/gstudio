@@ -863,11 +863,15 @@ def my_performance(request, group_id, page_no=1):
     auth_id = auth_obj._id
     title = 'my performance'
     
-    my_units = node_collection.find({'member_of': {'$in': [ce_gst._id, announced_unit_gst._id,gst_group._id]},
-                                          'author_set': request.user.id,
-                                        }).sort('last_update', -1)
-    group_page_cur = paginator.Paginator(my_units, page_no, GSTUDIO_NO_OF_OBJS_PP)
     # my_modules_cur.rewind()
+
+    my_units = node_collection.find(
+                {'member_of':
+                    {'$in': [ce_gst._id, announced_unit_gst._id, gst_group._id]
+                },
+                'name': {'$nin': GSTUDIO_DEFAULT_GROUPS_LIST },
+                'author_set': request.user.id}).sort('last_update', -1)
+    group_page_cur = paginator.Paginator(my_units, page_no, GSTUDIO_NO_OF_OBJS_PP)
     return render_to_response('ndf/lms_dashboard.html',
                 {
                     'group_id': auth_id, 'groupid': auth_id,
