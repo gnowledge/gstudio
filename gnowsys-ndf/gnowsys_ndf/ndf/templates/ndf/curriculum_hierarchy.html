@@ -24,11 +24,11 @@
     {% if is_gstaff or curriculum_obj.created_by == request.user.id %}
         <div id="addBranch" class="reveal-modal" data-reveal aria-labelledby="modalTitle" aria-hidden="true" role="dialog">
             <div>
-                <h4>Create new Section</h4>
-                <label>Section Name
+                <h4 class="section-label-heading">Create new Section</h4>
+                <label class="section-label">Section Name
                     <input type="text" placeholder="Section Name" name="branch_name"/>
                 </label>
-                <label>Section Description
+                <label class="section-label-desc">Section Description
                     <textarea type="text"  class="branch_desc" placeholder="Section description" ></textarea>
                 </label>
                 <br />
@@ -44,7 +44,7 @@
 
     <div id="addDivision" class="reveal-modal" data-reveal aria-labelledby="modalTitle" aria-hidden="true" role="dialog">
         <div>
-            <h4>Create new Sub-Section</h4>
+            <h4 class="subsection-label-heading" >Create new Sub-Section</h4>
             <label>Sub-Section Name
                 <input type="text" placeholder="Sub-Section Name" name="sub-section-name" />
             </label>
@@ -148,6 +148,7 @@
                         $('#addBranch').find('input, textarea').val('');
                         $('#addBranch').find('.create_branch').html('Add Section');
                         $('#addBranch').find('.delete_branch').hide();
+                        $('.section-label-heading').html("Create new Section");
                         $('#addBranch').foundation('reveal', 'open');
                     break;
                     case 'create_division' :
@@ -158,7 +159,10 @@
                         $('#addDivision').find('label').show();
                         $('#addDivision').find('.create_division').html('Add Sub-Section');
                         $('#addDivision').find('.delete_division').hide();
+                        $('.subsection-label-heading').html("Create new Sub-Section");
                         $('#addDivision').find('.add_asset').hide();
+                        
+                        
                         $('#addDivision').foundation('reveal', 'open');
                     break;
                     default:
@@ -170,6 +174,7 @@
                             $('#addBranch').find('.delete_branch').show();
                             $('#addBranch').find('input').val(node.name);
                             $('#addBranch').find('textarea').val(node.description);
+                            $('.section-label-heading').html("Update Section");
                             $('#addBranch').foundation('reveal', 'open');
                         } else if(node.type === 'division') {
                             selectedDivison = node;
@@ -183,6 +188,7 @@
                             $('#addDivision').find('input').val(node.name);
                             //$('#addDivision').find('input[type=checkbox]').val(node.isLeaf);
                             $('#addDivision').find('input[type=checkbox][name="isLeafNode"]').closest('label').hide();
+                            $('.subsection-label-heading').html("Update Sub-Section");
                             $('#addDivision').foundation('reveal', 'open');
                             url = "/{{group_id}}" +"/curriculum/topic-resources/" + "{{curriculum_obj.pk}}" + "/" + node.id;
                             $.ajax({

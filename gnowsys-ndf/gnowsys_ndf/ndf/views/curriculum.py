@@ -1013,7 +1013,6 @@ def topic_resources(request, group_id, curriculum_id , topic_id):
     # res_list = get_help_pages_of_node(topic_obj,rel_name="has_help",language="en")
     resources = get_topic_nodes (ObjectId(topic_id))  
 
-    print "0000000000000000000000000000",resources
 
     return render_to_response('ndf/widget_card_list.html', 
                                     { 
