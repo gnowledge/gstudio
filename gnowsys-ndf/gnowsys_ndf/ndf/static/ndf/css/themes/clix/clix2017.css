@@ -4716,7 +4716,7 @@ ul.nav_menu_1 > li > a.selected, ul.nav_menu_1 > li > a:hover {
   cursor: pointer;
   border-radius: 3px;
   opacity: 0.8;
-  margin-top: 90px;
+  margin-top: 100px;
 }
 /* line 4943, ../../../scss/_clix2017.scss */
 .lms_page .lms_banner .lms_heading .course_actions > i {
@@ -6012,7 +6012,7 @@ ul.nav_menu_1 > li > a.selected, ul.nav_menu_1 > li > a:hover {
 }
 
 /*  User Dashboard Implementation */
-/* line 6137, ../../../scss/_clix2017.scss */
+/* line 6155, ../../../scss/_clix2017.scss */
 .left_column {
   float: left;
   width: 625px;
@@ -6022,7 +6022,7 @@ ul.nav_menu_1 > li > a.selected, ul.nav_menu_1 > li > a:hover {
   color: #444;
 }
 
-/* line 6146, ../../../scss/_clix2017.scss */
+/* line 6164, ../../../scss/_clix2017.scss */
 .dashboard {
   background: #fafafa;
   border: none;
@@ -6033,7 +6033,7 @@ ul.nav_menu_1 > li > a.selected, ul.nav_menu_1 > li > a:hover {
   box-shadow: none;
 }
 
-/* line 6156, ../../../scss/_clix2017.scss */
+/* line 6174, ../../../scss/_clix2017.scss */
 .account_heading {
   border-bottom: 2px solid #E5E5E5;
   color: #444;
@@ -6044,13 +6044,13 @@ ul.nav_menu_1 > li > a.selected, ul.nav_menu_1 > li > a:hover {
   padding-bottom: 28px;
 }
 
-/* line 6166, ../../../scss/_clix2017.scss */
+/* line 6184, ../../../scss/_clix2017.scss */
 .account_group {
   display: table;
   padding: 20px 0;
   width: 100%;
 }
-/* line 6171, ../../../scss/_clix2017.scss */
+/* line 6189, ../../../scss/_clix2017.scss */
 .account_group .group_label {
   font-weight: bold;
   display: table-cell;
@@ -6058,36 +6058,36 @@ ul.nav_menu_1 > li > a.selected, ul.nav_menu_1 > li > a:hover {
   vertical-align: top;
   width: 145px;
 }
-/* line 6177, ../../../scss/_clix2017.scss */
+/* line 6195, ../../../scss/_clix2017.scss */
 .account_group .group_label > h3 {
   font-weight: bold;
   margin: 0;
 }
-/* line 6180, ../../../scss/_clix2017.scss */
+/* line 6198, ../../../scss/_clix2017.scss */
 .account_group .group_label > h3 .account_subheading {
   font-size: 14px;
   line-height: 1.2;
 }
-/* line 6186, ../../../scss/_clix2017.scss */
+/* line 6204, ../../../scss/_clix2017.scss */
 .account_group .group_content {
   display: table-cell;
   padding: 0 10px;
   vertical-align: top;
 }
-/* line 6192, ../../../scss/_clix2017.scss */
+/* line 6210, ../../../scss/_clix2017.scss */
 .account_group .account {
   margin: 0 0 10px;
   display: block;
   position: relative;
 }
-/* line 6198, ../../../scss/_clix2017.scss */
+/* line 6216, ../../../scss/_clix2017.scss */
 .account_group .account .accordion_trigger_wrapper .accordion_label {
   color: #444;
   float: left;
   font-size: 14px;
   margin: 0;
 }
-/* line 6204, ../../../scss/_clix2017.scss */
+/* line 6222, ../../../scss/_clix2017.scss */
 .account_group .account .accordion_trigger_wrapper .pencil_edit_button {
   position: absolute;
   top: 50%;
@@ -6108,7 +6108,7 @@ ul.nav_menu_1 > li > a.selected, ul.nav_menu_1 > li > a:hover {
   text-align: center;
   cursor: pointer;
 }
-/* line 6226, ../../../scss/_clix2017.scss */
+/* line 6244, ../../../scss/_clix2017.scss */
 .account_group .account .accordion_trigger_wrapper .accordion_content .input-setting input.text_field[type="text"] {
   background: transparent;
   border: 1px solid #D9D9D9;
@@ -6121,23 +6121,23 @@ ul.nav_menu_1 > li > a.selected, ul.nav_menu_1 > li > a:hover {
   width: 330px;
   border-radius: 2px;
 }
-/* line 6240, ../../../scss/_clix2017.scss */
+/* line 6258, ../../../scss/_clix2017.scss */
 .account_group .account .accordion_trigger_wrapper .accordion_content .password-wrapper input.password_placeholder[type="text"] {
   color: rgba(68, 68, 68, 0.45) !important;
 }
-/* line 6243, ../../../scss/_clix2017.scss */
+/* line 6261, ../../../scss/_clix2017.scss */
 .account_group .account .accordion_trigger_wrapper .accordion_content .password-wrapper input.password_field[type="password"] {
   position: relative;
   z-index: 2;
 }
 
 /* ---------------------- */
-/* line 6260, ../../../scss/_clix2017.scss */
+/* line 6278, ../../../scss/_clix2017.scss */
 #progressive-validation {
   width: 400px;
   margin: 100px auto 0 auto;
 }
-/* line 6263, ../../../scss/_clix2017.scss */
+/* line 6281, ../../../scss/_clix2017.scss */
 #progressive-validation input {
   display: block;
   border-radius: 5px;
@@ -6157,22 +6157,22 @@ ul.nav_menu_1 > li > a.selected, ul.nav_menu_1 > li > a:hover {
   background-position: right 23px;
   background-repeat: no-repeat;
 }
-/* line 6281, ../../../scss/_clix2017.scss */
+/* line 6299, ../../../scss/_clix2017.scss */
 #progressive-validation input[type="submit"], #progressive-validation input[type="submit"]:valid {
   background-color: #1a3e4c;
   color: white;
   background-image: none;
 }
-/* line 6286, ../../../scss/_clix2017.scss */
+/* line 6304, ../../../scss/_clix2017.scss */
 #progressive-validation input:focus {
   box-shadow: 0 0 0 1px #00aeef;
   opacity: 1 !important;
 }
-/* line 6290, ../../../scss/_clix2017.scss */
+/* line 6308, ../../../scss/_clix2017.scss */
 #progressive-validation input:enabled {
   opacity: .8;
 }
-/* line 6293, ../../../scss/_clix2017.scss */
+/* line 6311, ../../../scss/_clix2017.scss */
 #progressive-validation input:valid {
   background-size: 46px 46px;
   background-position: right 0px;

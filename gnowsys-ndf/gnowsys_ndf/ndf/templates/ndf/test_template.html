@@ -5,74 +5,298 @@
 {% block body_content %}
 
 <style type="text/css">
-
-#progressive-validation {
-  width:400px;
-  margin:100px auto 0 auto;
-    input {
-        display:block;
-        border-radius:5px;
-        border:none;
-        background:white;
-        font-family:OpenSans-regular;
-        font-size:16px;
-        line-height:16px;
-        font-weight:200;
-        width:100%;
-        padding:15px;
-        margin:0 0 10px 0;
-        opacity:.2;
-        outline:none;
-        box-shadow:0 0 0 1px rgba(0,0,0,.0);
-        background-size: 0px 0px;
-        background-position:right 23px;
-        background-repeat:no-repeat;
-        &[type="submit"],&[type="submit"]:valid{
-        background-color:#1a3e4c;
-        color:white;
-        background-image:none;
-      }
-      &:focus {
-        box-shadow:0 0 0 1px #00aeef;
-        opacity:1 !important;
-      }
-      &:enabled {
-        opacity:.8;
-      }
-      &:valid {
-        background-size: 46px 46px;
-        background-position:right 0px;
-        background-repeat:no-repeat;
-      }
+    
+#noti
+    {list-style:none;margin: 0px;padding: 0px;}
+#noti li {
+    float: right;
+    margin-right: 20px;
+    font-family: Arial;
+    font-size: 14px;
+    /* font-weight: bold; */
+    background: #2e3f51;
+    border: 1px solid rgba(255, 255, 255, 0.7);
+    padding: 8px 8px;
+    color: #fff;
+    font-size: 12px;
+    margin: 0px -38px 0px 0px;
+    cursor: pointer;
+    border-radius: 3px;
+    opacity: 0.8;
+    margin-top: 57px;
     }
+#noti 
+    li a{color:#333333;text-decoration:none}
+#noti 
+    li a:hover{color:#006699;text-decoration:none}
+
+
+#notification_li
+    {
+        position:relative
+    }
+#notificationContainer 
+{
+    background-color: #fff;
+    border: 1px solid rgba(100, 100, 100, .4);
+    -webkit-box-shadow: 0 3px 8px rgba(0, 0, 0, .25);
+    overflow: visible;
+    position: absolute;
+    top: 30px;
+    margin-left: -373px;
+    width: 400px;
+    z-index: -1;
+    display: none; // Enable this after jquery implementation 
+}
+#notificationContainer:before {
+    content: '';
+    display: block;
+    position: absolute;
+    width: 0;
+    height: 0;
+    color: transparent;
+    border: 10px solid black;
+    border-color: transparent transparent white;
+    margin-top: -20px;
+    margin-left: 360px;
+}
+#notificationTitle
+{
+    font-weight: bold;
+    padding: 8px;
+    font-size: 13px;
+    background-color: #ffffff;
+    position: fixed;
+    z-index: 1000;
+    width: 384px;
+    border-bottom: 1px solid #dddddd;
+}
+#notificationsBody
+{
+    padding: 33px 0px 0px 0px !important;
+    min-height:300px;
+}
+#notificationFooter
+{
+    background-color: #e9eaed;
+    text-align: center;
+    font-weight: bold;
+    padding: 8px;
+    font-size: 12px;
+    border-top: 1px solid #dddddd;
+}
+
+
+
+
+#notification_count 
+{
+    padding: 3px 7px 3px 7px;
+    background: #cc0000;
+    color: #ffffff;
+    font-weight: bold;
+    margin-left: 16px;
+    border-radius: 9px;
+    -moz-border-radius: 9px;
+    -webkit-border-radius: 9px;
+    position: absolute;
+    margin-top: -36px;
+    font-size: 9px;
+}
+
+
+
+#analytics
+    {list-style:none;margin: 0px;padding: 0px;}
+#analytics li {
+    float: right;
+    margin-right: 20px;
+    font-family: Arial;
+    font-size: 14px;
+    /* font-weight: bold; */
+    background: #2e3f51;
+    border: 1px solid rgba(255, 255, 255, 0.7);
+    padding: 8px 8px;
+    color: #fff;
+    font-size: 12px;
+    margin: 0px -38px 0px 0px;
+    cursor: pointer;
+    border-radius: 3px;
+    opacity: 0.8;
+    margin-top: 14px;
+    }
+#analytics 
+    li a{color:#333333;text-decoration:none}
+#analytics 
+    li a:hover{color:#006699;text-decoration:none}
+
+
+#analytics_li
+    {
+        position:relative
+    }
+#analyticsContainer 
+{
+    background-color: #fff;
+    border: 1px solid rgba(100, 100, 100, .4);
+    -webkit-box-shadow: 0 3px 8px rgba(0, 0, 0, .25);
+    overflow: visible;
+    position: absolute;
+    top: 30px;
+    margin-left: -373px;
+    width: 400px;
+    z-index: -1;
+    display: none; // Enable this after jquery implementation 
+}
+#analyticsContainer:before {
+    content: '';
+    display: block;
+    position: absolute;
+    width: 0;
+    height: 0;
+    color: transparent;
+    border: 10px solid black;
+    border-color: transparent transparent white;
+    margin-top: -20px;
+    margin-left: 360px;
+}
+#analyticsTitle
+{
+    font-weight: bold;
+    padding: 8px;
+    font-size: 13px;
+    background-color: #ffffff;
+    position: fixed;
+    z-index: 1000;
+    width: 384px;
+    border-bottom: 1px solid #dddddd;
+}
+#analyticsBody
+{
+    padding: 33px 0px 0px 0px !important;
+    min-height:300px;
+}
+#analyticsFooter
+{
+    background-color: #e9eaed;
+    text-align: center;
+    font-weight: bold;
+    padding: 8px;
+    font-size: 12px;
+    border-top: 1px solid #dddddd;
+}
+
+
+
+
+#analytics_count 
+{
+    padding: 3px 7px 3px 7px;
+    background: #cc0000;
+    color: #ffffff;
+    font-weight: bold;
+    margin-left: 16px;
+    border-radius: 9px;
+    -moz-border-radius: 9px;
+    -webkit-border-radius: 9px;
+    position: absolute;
+    margin-top: -36px;
+    font-size: 9px;
 }
 </style>
 
-<form id="progressive-validation">
-  <input type="text" id="field1" name="First Name" placeholder="First Name" required />  
-  <input type="text" id="field2" name="last Name" placeholder="last Name" required />  
-  <input type="text" id="field3" name="Username" placeholder="Username" required />  
-  <input type="email" id="field4" name="Email" placeholder="email"/>
-  <input type="tel" pattern="[0-9]{10}" id="field5" name="Phone Number" placeholder="Phone"  />
-  <input type="text" id="field6" name="Roll Number" placeholder="Roll Number"  />
-  <input type="text" id="field7" name="Mother tongue" placeholder="Mother Tongue"  />
-  <input type="text" id="field8" name="Location" placeholder="Location" required  />
-  <input type="textarea" maxlength="160" id="field9" name="Bio" placeholder="Bio" required  />
-  <input type="submit" id="submit" value="Submit" disabled/>
-</form>
+<div class="lms_page">
+     <div class="lms_banner">
+        <div class="small-12 columns lms_heading">
+            <div class="left unit_name"> 
+            </div>
+              <div class="right course_actions margin-right-50">
+                  <span data-dropdown="course-settings-drop" aria-controls="course-settings-drop" aria-expanded="false" class="tiny radius right" data-options="align:left">
+                      <i class="icon-widget fi-widget"></i>
+                  </span>
+                  <ul id="course-settings-drop" class="f-dropdown" data-dropdown-content aria-hidden="true" tabindex="-1">
+                      <li>
+                          <a href="#" class="fi-pencil"> {% trans "Edit" %}</a>
+                      </li>
+                  </ul>
+              </div>
+              <ul id="noti">
+                <li id="notification_li">
+                    <a href="#" id="notificationLink"><i class="fa fa-bell-o" style="font-size:1.7em; color:white;"></i></a>
+                    <span id="notification_count">3</span>
+                    <div id="notificationContainer">
+                        <div id="notificationsBody" class="notifications">
+                                <p style="color:black;"> notification 3</p>
+                        </div>
+                        <div id="notificationFooter"><a href="#">See All</a></div>
+                    </div>
+                </li>
+            </ul>
+            <ul id="analytics">
+                <li id="analytics_li">
+                    <a href="#" id="analyticsLink"><i class="fa fa-line-chart" style="font-size:1.5em; color:white;"></i></a>
+                    <span id="analytics_count">3</span>
+                    <div id="analyticsContainer">
+                        <div id="analyticsTitle">Analytics</div>
+                        <div id="analyticsBody" class="analytics"></div>
+                        <div id="analyticsFooter"><a href="#">See All</a></div>
+                    </div>
+                </li>
+            </ul>
+            <div class="right enroll-unit">
+
+            </div>
+       </div>
+     </div>
+</div>
 
 
 <script type="text/javascript">
-$(document).ready(function(){
-  var Form = $('#progressive-validation');
-  Form.on('keyup',function(){
-    $('input:valid ~ input').attr('disabled',false);
-    $('input:invalid ~ input').attr('disabled',true);
-  });
+$(document).ready(function()
+{
+    $("#notificationLink").click(function()
+{
+    $("#notificationContainer").fadeToggle(300);
+    $("#notification_count").fadeOut("slow");
+    return false;
 });
 
+//Document Click hiding the popup 
+$(document).click(function()
+{
+    $("#notificationContainer").hide();
+});
+
+//Popup on click
+$("#notificationContainer").click(function()
+{
+    return false;
+});
+
+});
+
+$(document).ready(function()
+{
+    $("#analyticsLink").click(function()
+{
+    $("#analyticsContainer").fadeToggle(300);
+    $("#analytics_count").fadeOut("slow");
+    return false;
+});
+
+//Document Click hiding the popup 
+$(document).click(function()
+{
+    $("#analyticsContainer").hide();
+});
+
+//Popup on click
+$("#analyticsContainer").click(function()
+{
+    return false;
+});
+
+});
 </script>
-
-
 
 {% endblock body_content %}
