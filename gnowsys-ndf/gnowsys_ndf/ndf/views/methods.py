@@ -5819,7 +5819,12 @@ def get_current_and_old_display_pics(group_obj, rt_name="has_banner_pic"):
     return current_pic_obj, old_pics
 
 def forbid_private_group(request, group_obj):
-    from gnowsys_ndf.ndf.templatetags.ndf_tags import user_access_policy
-    access_flag = user_access_policy(group_obj, request.user)
-    if access_flag == "disallow":
-        raise PermissionDenied()
+    try:
+        if group_obj.access_policy == u'PRIVATE' or  group_obj.group_type == u'PRIVATE':
+            from gnowsys_ndf.ndf.templatetags.ndf_tags import user_access_policy
+            access_flag = user_access_policy(group_obj, request.user)
+            if access_flag == "disallow":
+                raise PermissionDenied()
+    except Exception as failed_to_check_forbid_status:
+        print "\nError in forbid_private_group()", failed_to_check_forbid_status
+        pass
