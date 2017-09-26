@@ -213,6 +213,7 @@
                         $('#addDivision').find('.delete_division').hide();
                         $('.subsection-label-heading').html("Create new Sub-Section");
                         $('.subsection-edit-area').css('display','block');
+                        $(".listing-row").html("")
                         $('.subsection-view-area').css('display','none');
                         {% if is_gstaff or curriculum_obj.created_by == request.user.id %}
                             $('#addDivision').foundation('reveal', 'open');
@@ -250,6 +251,9 @@
                             //$('#addDivision').find('input[type=checkbox]').val(node.isLeaf);
                             $('#addDivision').find('input[type=checkbox][name="isLeafNode"]').closest('label').hide();
                             $('.subsection-label-heading').html("Update Sub-Section");
+                            $('.subsection-view-area').css('display','block');
+                            $('.subsection-edit-area').css('display','none');
+                            
                             $('#addDivision').foundation('reveal', 'open');
                             $(".listing-row").html("")
                             url = "/{{group_id}}" +"/curriculum/topic-resources/" + "{{curriculum_obj.pk}}" + "/" + node.id;
@@ -487,7 +491,7 @@
             });
             $('.close-reveal-modal').click(function(event) {
 
-                $(".listing-row").html("")
+                $(".listing-row").html("");
                 $(".section-edit-area").css('display', 'none')
                 $('.section-view-area').css('display', 'block')
 
@@ -499,6 +503,7 @@
                 
             });
             $('.edit_subsection').click(function(event) {
+                $(".listing-row").html("");
                 $('.subsection-edit-area').css('display', 'block')
                 $('.subsection-view-area').css('display', 'none')
                 
