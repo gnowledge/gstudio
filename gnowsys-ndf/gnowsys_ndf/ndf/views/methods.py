@@ -5824,7 +5824,10 @@ def forbid_private_group(request, group_obj):
             from gnowsys_ndf.ndf.templatetags.ndf_tags import user_access_policy
             access_flag = user_access_policy(group_obj, request.user)
             if access_flag == "disallow":
+                # print "\naccess_flag: ", access_flag, len(access_flag)
                 raise PermissionDenied()
-    except Exception as failed_to_check_forbid_status:
-        print "\nError in forbid_private_group()", failed_to_check_forbid_status
+    except PermissionDenied as perm_forbid_status_err:
+        raise PermissionDenied()
+    except Exception as forbid_status_err:
+        print "\nError in forbid_private_group()", forbid_status_err
         pass

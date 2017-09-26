@@ -16,7 +16,7 @@ def handler500(request):
     response.status_code = 500
     return response
 
-def handler403(request):
+def handlerPermissionDenied(request):
     response = render_to_response('403.html', {},
                                   context_instance=RequestContext(request))
     response.status_code = 403

@@ -227,5 +227,5 @@ if settings.DEBUG:
 )
 
 handler404 = 'gnowsys_ndf.ndf.views.errors.handler404'
-handlerPermissionDenied = 'gnowsys_ndf.ndf.views.errors.handler403'
+handlerPermissionDenied = 'gnowsys_ndf.ndf.views.errors.handlerPermissionDenied'
 handler500 = 'gnowsys_ndf.ndf.views.errors.handler500'

@@ -2068,12 +2068,8 @@ def group_dashboard(request, group_id=None):
     group_obj = get_group_name_id(group_id, get_obj=True)
     try:
         if not group_obj:
-            print "\nNUN0"
-            # import ipdb; ipdb.set_trace()
             raise Http404("Group Not Found")
-        access_flag = user_access_policy(group_obj, request.user)
-        if access_flag == "disallow":
-            raise PermissionDenied()
+        forbid_private_group(request, group_obj)
         group_id = group_obj._id
         group_member_of = group_obj.member_of_names_list
 
