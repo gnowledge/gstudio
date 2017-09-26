@@ -37,7 +37,7 @@ from django.core.cache import cache
 from mongokit import IS
 
 ''' -- imports from application folders/files -- '''
-from gnowsys_ndf.settings import GAPPS as setting_gapps, GSTUDIO_DEFAULT_GAPPS_LIST, META_TYPE, CREATE_GROUP_VISIBILITY, GSTUDIO_SITE_DEFAULT_LANGUAGE,GSTUDIO_DEFAULT_EXPLORE_URL,GSTUDIO_EDIT_LMS_COURSE_STRUCTURE,GSTUDIO_WORKSPACE_INSTANCE
+from gnowsys_ndf.settings import GAPPS as setting_gapps, GSTUDIO_DEFAULT_GAPPS_LIST, META_TYPE, CREATE_GROUP_VISIBILITY, GSTUDIO_SITE_DEFAULT_LANGUAGE,GSTUDIO_DEFAULT_EXPLORE_URL,GSTUDIO_EDIT_LMS_COURSE_STRUCTURE,GSTUDIO_WORKSPACE_INSTANCE,GSTUDIO_SITE_LANDING_PAGE_LOGO,GSTUDIO_SITE_LANDING_PAGE_TEXT, GSTUDIO_SITE_LANDING_PAGE_BG, GSTUDIO_SITE_LOGIN_PAGE_LOGO
 # from gnowsys_ndf.settings import GSTUDIO_SITE_LOGO,GSTUDIO_COPYRIGHT,GSTUDIO_GIT_REPO,GSTUDIO_SITE_PRIVACY_POLICY, GSTUDIO_SITE_TERMS_OF_SERVICE,GSTUDIO_ORG_NAME,GSTUDIO_SITE_ABOUT,GSTUDIO_SITE_POWEREDBY,GSTUDIO_SITE_PARTNERS,GSTUDIO_SITE_GROUPS,GSTUDIO_SITE_CONTACT,GSTUDIO_ORG_LOGO,GSTUDIO_SITE_CONTRIBUTE,GSTUDIO_SITE_VIDEO,GSTUDIO_SITE_LANDING_PAGE
 from gnowsys_ndf.settings import *
 try:
@@ -4114,6 +4114,18 @@ def get_default_discussion_lbl():
 @register.assignment_tag
 def get_gstudio_workspace_instance():
 	return GSTUDIO_WORKSPACE_INSTANCE
+@register.assignment_tag
+def get_gstudio_landing_page_logo():
+	return GSTUDIO_SITE_LANDING_PAGE_LOGO
+@register.assignment_tag
+def get_gstudio_landing_page_text():
+	return GSTUDIO_SITE_LANDING_PAGE_TEXT
+@register.assignment_tag
+def get_gstudio_landing_page_bg():
+	return GSTUDIO_SITE_LANDING_PAGE_BG
+@register.assignment_tag
+def get_gstudio_login_page_logo():
+	return GSTUDIO_SITE_LOGIN_PAGE_LOGO
 
 @register.assignment_tag
 def get_topic_nodes(node_id):

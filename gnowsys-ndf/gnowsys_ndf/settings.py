@@ -625,6 +625,10 @@ A project of <a href="http://lab.gnowledge.org/" target="_blank">{% trans "Gnowl
 </p>'''
 GSTUDIO_SITE_FAVICON = "/static/ndf/images/favicon/logo.png"
 GSTUDIO_SITE_LOGO = "/static/ndf/css/themes/metastudio/logo.svg"
+GSTUDIO_SITE_LANDING_PAGE_LOGO = "/static/ndf/images/abcde-logo.png"
+GSTUDIO_SITE_LANDING_PAGE_TEXT = "/static/ndf/images/abcde-text.png" 
+GSTUDIO_SITE_LANDING_PAGE_BG = "/static/ndf/images/abcde-background.png"
+GSTUDIO_SITE_LOGIN_PAGE_LOGO = "/static/ndf/images/abcde-metastudio.svg"
 GSTUDIO_SITE_SECONDARY_LOGO = "/static/ndf/css/themes/metastudio/logo.svg"
 GSTUDIO_GIT_REPO = "https://github.com/gnowledge/gstudio"
 GSTUDIO_SITE_PRIVACY_POLICY = ""
