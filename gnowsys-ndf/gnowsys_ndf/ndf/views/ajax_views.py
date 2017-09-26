@@ -1033,10 +1033,10 @@ def add_theme_item(request, group_id):
     list_theme_items = []
     if name and context_theme:
 
-      for each in context_theme.collection_set:
-        obj = node_collection.one({'_id': ObjectId(each) })
-        if obj.name == name:
-          return HttpResponse("failure")
+      # for each in context_theme.collection_set:
+      #   obj = node_collection.one({'_id': ObjectId(each) })
+      #   if obj.name == name:
+      #     return HttpResponse("failure")
 
       theme_item_node = node_collection.collection.GSystem()
       if is_topic == "True":
