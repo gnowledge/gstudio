@@ -1,15 +1,16 @@
 {% extends "ndf/gbase.html" %}
 {% load i18n %}
 {% load ndf_tags %}
-{% block title %} {% trans "Topic Map" %} {{curriculum_obj.name }}  {% endblock %}
+{% block title %} {% trans "Topic Map" %} -- {{curriculum_obj.name }}  {% endblock %}
 
 {% block body_content %}
         {% check_is_gstaff group_id request.user as is_gstaff %} 
+        {% if curriculum_obj %}
         <div class="curriculum-name-desc" >
             <div class="curriculum_listing">
                 <div class="curriculum_content">
                     <div class="curriculum_content_left">
-                        <a href="{% url 'curriculum_detail' group_id curriculum_obj.pk %}"><i class="fa fa-book fa-5x" style="color:#164a7b; margin-left:5px;"></i></a>
+                        <a href=""><i class="fa fa-book fa-5x" style="color:#164a7b; margin-left:5px;"></i></a>
                         <div class="curriculum_content_details">
                             <a href="" class="hyperlink-style">Title: {{curriculum_obj.name}} </a>
                             <a href="" class="hyperlink-info"> No. of Sections:{{curriculum_obj.collection_set|length}} </a>
@@ -29,7 +30,7 @@
   
             
         </div>
-        
+        {% endif %}
         {% if not curriculum_obj %}
         <h3 data-reveal-id="create-edit-curriculum-reveal" class="hyperlink-tag">
             <i class="fi fi-plus"></i> Create Curriculum Tree Structure
