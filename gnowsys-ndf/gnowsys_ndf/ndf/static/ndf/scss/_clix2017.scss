@@ -5713,6 +5713,15 @@ ul.nav_menu_1 {
   word-spacing:20px;
 }
 
+.bo-footer-images{
+    display: inline;
+    max-width:120px;
+    max-height:95px;
+    width: auto;
+    height: auto; 
+    vertical-align: bottom;
+}
+
 .bo-footer-uonline {
   width: 300px; /* Account for margins + border values */
   float: left;
@@ -5729,6 +5738,8 @@ ul.nav_menu_1 {
   color: #636A7D;
   vertical-align: middle;
 }
+
+
 
 
 /*##### Footer Responsive #####*/

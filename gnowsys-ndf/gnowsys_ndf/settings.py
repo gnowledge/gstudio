@@ -37,6 +37,7 @@ GSTUDIO_EDUCATIONAL_SUBJECTS_AS_GROUPS = False
 LANGUAGES = (('en', 'English'), ('hi', u'Hindi'),('te','Telugu'))
 GSTUDIO_DEFAULT_LANGUAGE = ('en', 'English')
 GSTUDIO_WORKSPACE_INSTANCE = False
+GSTUDIO_FOOTER_LINKS = [{'/static/ndf/images/tata-trusts-logo.svg':'http://tatatrusts.org/'},{'/static/ndf/images/mit-logo.svg':'http://www.mit.edu/'},{'/static/ndf/images/logos/tiss-logo-text.svg':'http://www.tiss.edu/'},{'/static/ndf/images/logos/tifr.png':'http://www.hbcse.tifr.res.in/'}]
 OTHER_COMMON_LANGUAGES = [
     ('mr', 'Marathi'), ('mni','Manipuri'), ('ori','Oriya'),
     ('pi','Pali'), ('raj','Rajasthani'), ('gu','Gujarati'),
