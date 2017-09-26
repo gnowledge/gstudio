@@ -4,7 +4,7 @@ All the CLIx schools are running either of the platforms:
 
 ### GENERIC STRUCTURE:
 
-The directory/folder structure of collected data is maintained as LEVEL 0/.../LEVEL N
+The directory/folder structure of collected data is maintained as `LEVEL 0/.../LEVEL N`
 Read below for description of LEVELs.
 
 ```
@@ -23,7 +23,7 @@ Year (YYYY)                                         [ LEVEL 0 ]
 ```
 
 **[ LEVEL 0 ] : Year (YYYY)**
-- Year when Data is collected.
+- Year when data is collected.
 - Example: 
     - 2016
     - 2017
@@ -67,25 +67,27 @@ we have a provision to collect data from the said platforms and both may reside 
 ### EXAMPLE STRUCTURE:
 ```
 Example-data-collection-dir-str/
-├── ct
-│   └── 1011011-ct11
-│       ├── gstudio
-│       │   ├── db
-│       │   ├── git-commit.log
-│       │   ├── local_settings.py
-│       │   ├── media
-│       │   ├── pgdump-20170921-1305.sql
-│       │   ├── rcs-repo
-│       │   └── server_settings.py
-│       └── unplatform
-└── mz
-    └── 2031001-mz1
-        └── gstudio
-            ├── db
-            ├── git-commit.log
-            ├── local_settings.py
-            ├── media
-            ├── pgdump-20170921-1305.sql
-            ├── rcs-repo
-            └── server_settings.py
+└── 2017
+    ├── ct
+    │   └── 1011011-ct11
+    │       ├── gstudio
+    │       │   ├── db
+    │       │   ├── git-commit.log
+    │       │   ├── local_settings.py
+    │       │   ├── media
+    │       │   ├── pgdump-20170921-1305.sql
+    │       │   ├── rcs-repo
+    │       │   └── server_settings.py
+    │       └── unplatform
+    └── mz
+        └── 2031001-mz1
+            ├── gstudio
+            │   ├── db
+            │   ├── git-commit.log
+            │   ├── local_settings.py
+            │   ├── media
+            │   ├── pgdump-20170921-1305.sql
+            │   ├── rcs-repo
+            │   └── server_settings.py
+            └── unplatform
 ```
