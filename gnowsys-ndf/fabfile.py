@@ -45,8 +45,12 @@ def update(branch='master'):
 
 
 def install_requirements():
-	local('pip install -r ../requirements.txt')
-	local('bower install --allow-root')
+    try:
+        local('pip install -r ../requirements.txt')
+    except Exception as e:
+        print e
+    finally:
+        local('bower install --allow-root')
 
 
 def purge_node():
