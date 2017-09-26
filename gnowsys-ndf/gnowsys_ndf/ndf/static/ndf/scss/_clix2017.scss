@@ -1352,7 +1352,14 @@ ul.horizontal_tabs_gstudio {
 }
 
 
-
+.preview_asset_page {
+    //background: #ccc;
+    //border: 2px solid #999;
+    word-wrap: break-word;
+    width: 200%;
+    min-height: 350px;
+    margin-left: 14px;
+}
 
 .preview_asset {
     background: #ccc;
@@ -3484,7 +3491,7 @@ ul.jqtree-tree .jqtree-toggler {
 
     .bg-img{
     //background: url(/static/ndf/images/group-tile.png) no-repeat;
-    background: url(/static/ndf/images/i2c-bg.png);
+    //background: url(/static/ndf/images/i2c-bg.png);
     height:100%;
     background-size: 100%;
     background-repeat: no-repeat;
