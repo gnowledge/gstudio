@@ -201,6 +201,8 @@
                         $('.section-label-heading').html("Create new Section");
                         {% if is_gstaff or curriculum_obj.created_by == request.user.id %}
                             $('#addBranch').foundation('reveal', 'open');
+                        {% else %}
+                            alert("You are not authorized for this action");
                         {% endif %}
                     break;
                     case 'create_division' :
@@ -213,10 +215,12 @@
                         $('#addDivision').find('.delete_division').hide();
                         $('.subsection-label-heading').html("Create new Sub-Section");
                         $('.subsection-edit-area').css('display','block');
-                        $(".listing-row").html("")
+                        $(".listing-row").html("");
                         $('.subsection-view-area').css('display','none');
                         {% if is_gstaff or curriculum_obj.created_by == request.user.id %}
                             $('#addDivision').foundation('reveal', 'open');
+                        {% else %}
+                            alert("You are not authorized for this action");
                         {% endif %}
                         $('#addDivision').find('.add_asset').hide();
                         
