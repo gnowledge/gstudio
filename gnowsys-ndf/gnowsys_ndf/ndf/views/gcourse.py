@@ -2378,8 +2378,10 @@ def course_raw_material(request, group_id, node_id=None,page_no=1):
                 old_profile_pics.append(n)
     '''
     asset_gst_name, asset_gst_id = GSystemType.get_gst_name_id("Asset")
-    asset_nodes = node_collection.find({'member_of': {'$in': [asset_gst_id]},
-            'group_set': {'$all': [ObjectId(group_id)]},'tags': "raw@material"}).sort('last_update', -1)
+    # asset_nodes = node_collection.find({'member_of': {'$in': [asset_gst_id]},
+    #         'group_set': {'$all': [ObjectId(group_id)]},'tags': "raw@material"}).sort('last_update', -1)
+    
+    asset_nodes = GSystem.query_list(group_id, 'Asset', request.user.id,tags="raw@material")
     
     # from collections import defaultdict
     # asset_thumbnail = defaultdict(list)
@@ -2546,9 +2548,9 @@ def course_gallery(request, group_id,node_id=None,page_no=1):
     
     asset_gst_name, asset_gst_id = GSystemType.get_gst_name_id("Asset")
     
-    asset_nodes = node_collection.find({'member_of': {'$in': [asset_gst_id]},
-            'group_set': {'$all': [ObjectId(group_id)]},'tags': "asset@gallery"}).sort('last_update', -1)
-    
+    # asset_nodes = node_collection.find({'member_of': {'$in': [asset_gst_id]},
+    #         'group_set': {'$all': [ObjectId(group_id)]},'tags': "asset@gallery"}).sort('last_update', -1)
+    asset_nodes = GSystem.query_list(group_id, 'Asset', request.user.id,tags="asset@gallery")
     template = 'ndf/gcourse_event_group.html'
     
     if "announced_unit" in group_obj.member_of_names_list or "Group" in group_obj.member_of_names_list and 'base_unit' not in group_obj.member_of_names_list:
@@ -2606,12 +2608,8 @@ def course_about(request, group_id):
         show_analytics_notifications = False
 
     if 'Author' in group_obj.member_of_names_list:
-        gstaff_access = check_is_gstaff(group_obj._id,request.user)
-        if gstaff_access:
-            template = 'ndf/lms.html'
-            show_analytics_notifications = False
-        else:
-            raise PermissionDenied
+        template = 'ndf/lms.html'
+        show_analytics_notifications = False
     
     if 'base_unit' in group_obj.member_of_names_list :
         template = 'ndf/gevent_base.html'
@@ -3495,9 +3493,18 @@ def assets(request, group_id, asset_id=None,page_no=1):
                                     context_variables,
                                     context_instance = RequestContext(request)
         )
-
+    print "000000000000000000"
     asset_nodes = node_collection.find({'member_of': {'$in': [asset_gst_id]},
-        'group_set': {'$all': [ObjectId(group_id)]}}).sort('last_update', -1)
+        'group_set': {'$all': [ObjectId(group_id)]},
+        '$and': [
+          {'access_policy': 'PUBLIC'},
+          {'$or': [
+            {'created_by': request.user.id},
+            {'access_policy': 'PRIVATE'}
+            ]
+          }
+        ]
+})
     assets_page_info = paginator.Paginator(asset_nodes, page_no, GSTUDIO_NO_OF_OBJS_PP)
     context_variables = {
             'group_id': group_id, 'groupid': group_id,
