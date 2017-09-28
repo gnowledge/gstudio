@@ -5810,7 +5810,7 @@ ul.nav_menu_1 {
 
 .enrollBtn{
     width: 124px !important;
-    background: #4b4852;
+    background: rgba(75, 72, 82, 0.8);
     border: 1px solid rgba(255, 255, 255, 0.7);
     padding: 5px 8px;
     color: #fff;
@@ -5819,11 +5819,10 @@ ul.nav_menu_1 {
     cursor: pointer;
     border-radius: 3px;
     //opacity: 0.8;
-    margin-top: 90px !important;
+    margin-top: 101px !important;
     margin-right: 15px;
     &:hover {
-        opacity: 1;
-        background: #ffffff;
+        background: rgba(75, 72, 82, 0.8);
         color: #000000;
     }
 }
