@@ -2238,15 +2238,10 @@ def course_notebook(request, group_id, node_id=None, tab="my-notes"):
     if 'announced_unit' in group_obj.member_of_names_list or 'Group' in group_obj.member_of_names_list and 'base_unit' not in group_obj.member_of_names_list:
         template = 'ndf/lms.html'
 
-    gstaff_access = check_is_gstaff(group_obj._id,request.user)
-
     if 'Author' in group_obj.member_of_names_list:
-        if gstaff_access:
             template = 'ndf/lms.html'
             show_analytics_notifications = False
-        else:
-            raise PermissionDenied
-      
+          
 
     # page_gst = node_collection.one({'_type': "GSystemType", 'name': "Page"})
     # blogpage_gst = node_collection.one({'_type': "GSystemType", 'name': "Blog page"})
@@ -2464,14 +2459,9 @@ def course_raw_material(request, group_id, node_id=None,page_no=1):
     if 'BaseCourseGroup' in group_obj.member_of_names_list:
         template = 'ndf/basecourse_group.html'
 
-    gstaff_access = check_is_gstaff(group_obj._id,request.user)
-
     if 'Author' in group_obj.member_of_names_list:
-        if gstaff_access:
-            template = 'ndf/lms.html'
-            show_analytics_notifications = False
-        else:
-            raise PermissionDenied
+        template = 'ndf/lms.html'
+
     
 
     context_variables.update({'title':'raw material' ,'files_cur': files_cur,'raw_material_page_info':raw_material_page_info ,'allow_to_upload': allow_to_upload,'allow_to_join': allow_to_join})
@@ -2558,13 +2548,10 @@ def course_gallery(request, group_id,node_id=None,page_no=1):
         # assets_page_info = paginator.Paginator(asset_nodes, page_no, GSTUDIO_NO_OF_OBJS_PP)
         # context_variables.update({'assets_page_info':assets_page_info})
     
-    gstaff_access = check_is_gstaff(group_obj._id,request.user)
+    
     if 'Author' in group_obj.member_of_names_list:
-        if gstaff_access:
-            template = 'ndf/lms.html'
-            show_analytics_notifications = False
-        else:
-            raise PermissionDenied
+        template = 'ndf/lms.html'
+
     context_variables.update({'asset_nodes': asset_nodes})
 
     return render_to_response(template,
