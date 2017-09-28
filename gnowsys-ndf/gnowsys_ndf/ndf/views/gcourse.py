@@ -3802,7 +3802,7 @@ def delete_activity_page(request, group_id):
             if activity_page_node:
                 trash_resource(request,ObjectId(group_id),ObjectId(activity_page_node._id))
                 del_status  = delete_node(node_id=activity_page_node._id, deletion_type=0)
-                return HttpResponse('success')
+        return HttpResponse('success')
     if activity_id:
         activity_page_node = node_collection.one({'_id':ObjectId(activity_id)})
         if activity_page_node:
