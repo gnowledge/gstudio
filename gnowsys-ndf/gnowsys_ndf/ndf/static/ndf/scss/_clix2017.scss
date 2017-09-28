@@ -2033,7 +2033,6 @@ ul.jqtree-tree .jqtree-toggler {
 .about-course {
   background-color: #fff;;
   padding: 10px 23px ;
-  z-index:-1;
   > h5 {
     text-transform: uppercase;
     font-weight: 600;
@@ -5179,7 +5178,6 @@ $module-card-lines-to-show: 3;
     color: #fff;
     box-shadow: 0 0 2px 0 rgba(0, 0, 0, 0.2);
     border-bottom: 1px solid rgba(0, 0, 0, 0.25);
-    z-index:-1;
 }
 $nav_menu_1_color: #ce7869;
 $nav_menu_1_bg_color: #fff;
