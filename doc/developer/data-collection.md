@@ -19,6 +19,9 @@ Year (YYYY)                                         [ LEVEL 0 ]
                 - local_settings.py                 [ LEVEL 4 ]
                 - server_settings.py                [ LEVEL 4 ]
                 - git-commit.log                    [ LEVEL 4 ]
+                - assessment-media                  [ LEVEL 4 ]
+                    - repository                    [ LEVEL 5 ]
+                    - studentResponseFiles          [ LEVEL 5 ]
             - unplatform (Optional)                 [ LEVEL 3 ]
 ```
 
@@ -49,17 +52,20 @@ we have a provision to collect data from the said platforms and both may reside 
 **[ LEVEL 3 ] : gstudio**
 - A CLIx Platform, clixserver.
 - gstudio Folder will have following [LEVEL 4] items:
-    - `db`: mongoDB data.
-    - `media`: Files uploaded on clixserver.
-    - `rcs-repo`: rcs, versioned json files.
-    - `pgdump-YYYYMMDD-HHMM.sql`: Postgres DB dump with specified naming convention.
-    - `local_settings.py`: Copy of file in deployed instance.
-    - `server_settings.py`: Copy of file in deployed instance.
-    - `git-commit.log`: Snapshot of git records at time of backup. It will have output of following git commands:
+    - `db`: mongoDB data *(gStudio + qbank)*.
+    - `media`: Files uploaded on clixserver *(gStudio)*.
+    - `rcs-repo`: rcs, versioned json files *(gStudio)*.
+    - `pgdump-YYYYMMDD-HHMM.sql`: Postgres DB dump with specified naming convention *(gStudio)*.
+    - `local_settings.py`: Copy of file in deployed instance *(gStudio)*.
+    - `server_settings.py`: Copy of file in deployed instance *(gStudio)*.
+    - `git-commit.log`: Snapshot of git records at time of backup. It will have output of following git commands  *(gStudio + qbank)*:
         - `git status`
         - `git diff`
         - `git log -5`
         - `git branch`
+    - `assessment-media`: Assessment files and user uploaded files in assessments. This folder will have following [LEVEL 5] directories *(qbank)*
+        - `repository`: Files/Media used in assessments.
+        - `studentResponseFiles`: User uploaded files in assessments e.g: recorded-audio, images etc. 
 
 
 ---
@@ -67,27 +73,34 @@ we have a provision to collect data from the said platforms and both may reside 
 ### EXAMPLE STRUCTURE:
 ```
 Example-data-collection-dir-str/
+├── 2016
 └── 2017
     ├── ct
     │   └── 1011011-ct11
     │       ├── gstudio
     │       │   ├── db
-    │       │   ├── git-commit.log
-    │       │   ├── local_settings.py
     │       │   ├── media
-    │       │   ├── pgdump-20170921-1305.sql
     │       │   ├── rcs-repo
-    │       │   └── server_settings.py
+    │       │   ├── pgdump-20170921-1305.sql
+    │       │   ├── local_settings.py
+    │       │   ├── server_settings.py
+    │       │   ├── git-commit.log
+    │       │   └── assessment-media
+    │       │       ├── repository
+    │       │       └── studentResponseFiles
     │       └── unplatform
     └── mz
         └── 2031001-mz1
             ├── gstudio
             │   ├── db
-            │   ├── git-commit.log
-            │   ├── local_settings.py
             │   ├── media
-            │   ├── pgdump-20170921-1305.sql
             │   ├── rcs-repo
-            │   └── server_settings.py
+            │   ├── pgdump-20170921-1305.sql
+            │   ├── local_settings.py
+            │   ├── server_settings.py
+            │   ├── git-commit.log
+            │   └── assessment-media
+            │       ├── repository
+            │       └── studentResponseFiles
             └── unplatform
 ```
