@@ -21,7 +21,7 @@
 
 * Design of the Platform
 
-    The platform is designed around Users, Groups and Apps to construct and work with digital resources. 
+    The platform is designed around Users, Workspaces and Apps to make and publish  digital resources. 
 
 ** Users
     As a platform for collaboration, the most essential resource is a group of users called *collaborators*. 
