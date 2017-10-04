@@ -67,17 +67,20 @@
     - Notifications
     - Basic Quiz Builder 
     
-    Upcoming Apps:
+*** Upcoming Apps:
     - Task Manager
     - Event Scheduler 
     - Glossary
     - Concept mapping
+    - Admin Studio
     
-    Deprecated Apps:
+*** Deprecated Apps:
     - Email Client   
     - Local Messages   
     - Meetings App linked to BigBlueButton
     - Collaborative editing using mobwrite
+    - Bib_App
+    - MIS
 
 ** Generic Features
     The following features are inherited from the information architecture of GStudio to all the Apps:
@@ -91,10 +94,41 @@
     - Metadata
     - Translation
     - Notifications
-    - API 
+    - API (for Read-only) 
     - Responsive UI
     - Support for skins for UI
     - Data exchange (Import and Export)
     - csv processing for bulk uploads
     - Collection export into epub3 format
+    - Benchmark for profiling Functions
+    - d3 graphs
+    - Email notifications
+    - RSS feeds
+    
+    
+*** Upcoming Generic Features:
+    - CRUD API
+    - Elastic Search
+    - Telegram Bot
+    - chat dB
+    - Single Sign-on plugin
+    - Data aggregation from offline sites
+    - Aggregated analytics
+    - OSM support
+    - Annotation
+    - OSID compliance
+    - LTI compliance 
+    - Accessibility compliance
+    - Adaptive Assessment
+    - H5P support
+    - OAT, OAC
+        - UI provision to add Folders in OAT.
+        - Authentication in OAT
+        - Assessment Analytics functions + UI
+        - New Assessment types
+    - Badges implementation
+    - Test cases
+    - UI for History/Version
+    
+    
     
