@@ -80,21 +80,21 @@ def update_teaches(file_name, teaches):
   file_obj = collection.Node.one({'_type': 'File', 'group_set': ObjectId(group_id) ,'name':unicode(file_name), 'created_by': auth_id})
   if file_obj:
 
-    rel_objs = collection.Triple.find({'_type':'GRelation','subject': ObjectId(file_obj._id), 'relation_type.$id': RT_teaches._id})
+    rel_objs = collection.Triple.find({'_type':'GRelation','subject': ObjectId(file_obj._id), 'relation_type': RT_teaches._id})
 
     if rel_objs.count() > 0:
       for rel_obj in rel_objs:
         rel_obj.delete()
         print "\n Relation ",rel_obj.name," deleted !!!\n"
 
-    
+
     topic = teaches[len(teaches) - 1]
-    topic_obj = collection.Node.find({'name':unicode(topic), 'group_set': ObjectId(group_id),'member_of': topic_GST._id }) 
+    topic_obj = collection.Node.find({'name':unicode(topic), 'group_set': ObjectId(group_id),'member_of': topic_GST._id })
     if topic_obj.count() > 0:
       for k in topic_obj:
         if k.prior_node:
           for each in k.prior_node:
-            obj = collection.Node.one({'_id': ObjectId(each) }) 
+            obj = collection.Node.one({'_id': ObjectId(each) })
             if obj.name == teaches[len(teaches) - 2]:
               create_grelation(file_obj._id, RT_teaches, k._id)
               print "\n Grelation created for ",file_obj.name,"\n"

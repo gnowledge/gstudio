@@ -68,7 +68,27 @@
   #hover1.f-dropdown {
   	width: 10em;
   }
-
+.panel a
+{
+coolor:#4c4c4c !important;
+}
+.panel
+{
+border:0px solid red;
+}
+.theme-panel
+{
+background-color:#ddd; padding: 0.85rem;margin-top:1em;
+border:1px solid #c3ecfe;
+}
+.panel a.button
+{
+color:#fff !important;
+}
+.top-gap
+{
+margin-top:15px;
+}
   </style>
 {% endblock%}
 
@@ -95,8 +115,8 @@
 {% block related_content %}
 	{% if user.is_authenticated %}
 	{% user_access_policy groupid request.user as user_access %}
-
-	<div class="panel" style="background-color:#ddd;margin-top:1em">
+<div class="panel theme-panel">
+	<div>
 	<ul class="no-bullet" id="app-set-item"> 
 
 		<!--
@@ -134,7 +154,7 @@
     		
 				<div>
 
-					<a class="button tiny expand" data-reveal-id="view_add_page" title="Add Theme Item">
+					<a class="button tiny expand radius" data-reveal-id="view_add_page" title="Add Theme Item">
 						+ Add Theme Item
 					</a>
 
@@ -150,10 +170,10 @@
 						<input type="submit" id="add_theme_item" value="Save Theme Item" class="medium round button"/>
 
 						<a class="close-reveal-modal">&#215;</a>
-
+</div>
 					</div>          
 
-			    </div>
+			    
 
     			<span><input class="checkedAll" type="checkbox"> Select All</span>
     			<input class="button tiny deleteObjects right" type="button" value="Delete">
@@ -191,26 +211,35 @@
 
 	{% endif %}
 	</div>
-
-	<div class="topic_stats panel" style="display:none; position:fixed; background-color:#ddd;border: 1px solid #1a1a1a;"> </div>
+</div>
+	<div class="topic_stats panel" style="display:none; position:fixed; background-color:#ddd; right:20%;"> </div>
 
 {% endblock %}
 {% block meta_content %}
-	<div class="large-4 columns repository-title" style="width:100%">
-		{% if theme_GST.altnames and theme_GST.altnames != "None" and not node.name %}
-			{{theme_GST.altnames}}		
-		{% endif %}
+	<div class="large-4 columns repository-title">
+
+
+
 	</div>
 {% endblock %}
 
 {% block body_content %}
-		<div class="large-4 columns repository-title">
-				{% if node.name %}
+		<div class="large-4 columns repository-title top-gap">
+
+
+ {% if theme_GST.altnames and theme_GST.altnames != "None" and not node.name %}
+{{theme_GST.altnames}}
+ {% endif %}
+
+
+
+
+			{% if node.name %}
 					{{node.name}}
 				{% endif%}
 		</div>
 
-	<div class="large-8 columns repository-desc">
+	<div class="large-8 columns repository-desc top-gap">
 				{% if node.content_org %}
 					{{node.content_org}}
 				{% elif theme_GST.content_org and theme_GST.content_org != "None" %}
@@ -247,7 +276,7 @@
 		<br/>
 		{% cache 300 theme_tree node.pk request.LANGUAGE_CODE tree unfold selected %}
 
-			{% include "ndf/hierarchy_tree.html" %}
+			{% include "ndf/hierarchy_tree.html" with topic_url="topics" %}
 			<div id="app-set-item" class="themes hide" data-url="{% url 'get_tree_hierarchy' groupid node.pk %}">
 			</div>
 
@@ -286,7 +315,7 @@
 
 
 
-<ul class="small-block-grid-2 medium-block-grid-3 large-block-grid-5" style="margin-top:40px" >
+<ul class="small-block-grid-2 medium-block-grid-3 large-block-grid-5" style="margin-top:50px" >
 
   	{% for each in nodes %}
      <li class="card-image-wrapper"> 
@@ -411,7 +440,7 @@
 
 	    {% if tree == "hierarchical" %}
 
-    		$("article").block({message: '<h4>Building the theme tree...</h4>'});
+    		// $("article").block({message: '<h4>Building the theme tree...</h4>'});
 			$("#theme-drag-zoom-tree-container").addClass("hide")
 	    	$(".themes").removeClass("hide");
 
@@ -431,11 +460,11 @@
 
     		{% if node %}
 
-    		$("article").block({message: '<h4>Building the theme graph...</h4>'});
+    		// $("article").block({message: '<h4>Building the theme graph...</h4>'});
 			    $.getJSON("{% url 'get_tree_hierarchy' group_id node.pk %}?collapsible=true", function(data){ treeData = data;})
 			    .done(function(){
 			    	plotDragZoomTree(treeData);
-			    	$('article').unblock(); 
+			    	// $('article').unblock(); 
 			    });
 
 		    {% endif %}

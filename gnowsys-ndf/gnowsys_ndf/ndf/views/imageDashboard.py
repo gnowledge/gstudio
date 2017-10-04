@@ -59,8 +59,8 @@ def imageDashboard(request, group_id, image_id=None,page_no=1):
                                         '_type': {'$in': ["GSystem"]},
                                         'member_of': file_gst._id,
                                         'group_set': {'$all': [ObjectId(group_id)]},
-                                        'if_file.mime_type': {'$regex': 'image'}
-
+                                        'if_file.mime_type': {'$regex': 'image'},
+                                        'status' : { '$ne': u"DELETED" },
                                         # 'created_by': {'$in': gstaff_users},
                             # '$or': [
                                     # {

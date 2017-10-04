@@ -93,7 +93,6 @@ def landing_page(request):
     '''
     Method to render landing page after checking variables in local_settings/settings file.
     '''
-
     if (GSTUDIO_SITE_LANDING_PAGE == "home") and (GSTUDIO_SITE_NAME == "NROER"):
         return render_to_response(
                                 "ndf/landing_page_nroer.html",
@@ -105,14 +104,28 @@ def landing_page(request):
                             )
 
     elif GSTUDIO_SITE_LANDING_TEMPLATE:
-        return render_to_response(
-                                GSTUDIO_SITE_LANDING_TEMPLATE,
-                                {
-                                    "group_id": "home", 'groupid':"home",
-                                    'title': 'CLIx'
-                                },
-                                context_instance=RequestContext(request)
-                            )
+        if GSTUDIO_SITE_NAME == "clix":
+            if request.META['QUERY_STRING']  == "True":
+                return render_to_response(
+                                        GSTUDIO_SITE_LANDING_TEMPLATE,
+                                        {
+                                            "group_id": "home", 'groupid':"home",
+                                            'title': 'CLIx'
+                                        },
+                                        context_instance=RequestContext(request)
+                                    )
+            elif request.user.id:
+                return HttpResponseRedirect( reverse('my_desk', kwargs={"group_id": request.user.id}) )        
+            else:
+        
+                return render_to_response(
+                                        GSTUDIO_SITE_LANDING_TEMPLATE,
+                                        {
+                                            "group_id": "home", 'groupid':"home",
+                                            'title': 'CLIx'
+                                        },
+                                        context_instance=RequestContext(request)
+                                    )
     else:
         return HttpResponseRedirect( reverse('groupchange', kwargs={"group_id": "home"}) )
 
@@ -122,7 +135,7 @@ def landing_page(request):
 #     pattern_name = 'home'
 
 #     def get_redirect_url(self, *args, **kwargs):
-#     	if self.request.user.is_authenticated():
+#       if self.request.user.is_authenticated():
 #             auth_obj = node_collection.one({'_type': u'GSystemType', 'name': u'Author'})
 #             if auth_obj:
 #                 auth_type = auth_obj._id
@@ -166,3 +179,19 @@ def landing_page(request):
 #             # If user is not loggedin it will redirect to home as our base group.
 #             #return "/home/dashboard/group"
 #             return "/home/"
+
+@get_execution_time
+def help_page_view(request,page_name):
+    # page_obj = Node.get_node_by_id(page_id)
+    help_grp = node_collection.one({'$and':[{'_type': u'Group'}, {'name': u'help'}]})
+    
+    page_obj = node_collection.one({"name":unicode(page_name),"group_set":ObjectId(help_grp._id)})
+    return render_to_response(
+                                        "ndf/help_page.html",
+                                        {
+                                            "group_id": page_obj._id,
+                                            'title': 'Help Page',
+                                            'page_obj':page_obj
+                                        },
+                                        context_instance=RequestContext(request)
+                                    )

@@ -102,7 +102,6 @@
 			<!-- Edit and Publish -->
 				<div class="row btn-row">
 					<!-- Edit button -->
-						{% edit_policy groupid node request.user as status %}
 						{% if is_user_authenticated %}
 							{% get_edit_url node.pk as edit_url %}
 							{% if is_group %}
@@ -167,7 +166,10 @@
 						{% else %}
 							<input type="button" class="tiny button radius right-btn secondary disabled" value="{% trans 'Delete' %} {{node.member_of_names_list.0}}" title="{% trans 'You are not authorized for this action' %}">
 						{% endif %}
-
+						
+						<a href="{% url 'uploadDoc' groupid %}" class="tiny expand button radius">
+            				{% trans "Upload File" %}
+      					</a>
 						<!-- Cross Publish -->
 						{% if 'CourseEventGroup' not in group_object.member_of_names_list %}
 							{% if node.created_by == request.user.id or is_gstaff %}
@@ -175,6 +177,7 @@
 							<!-- If resource is already under moderation, don't show cross-publish button -->
 
 								<span  title="{% trans 'Publish this resource in other group/s' %}" class="has-tip tip-bottom"><a id="switch_group" class="tiny button radius mod-btn" data-reveal-id="publish_resource"> {% trans "Cross Publish" %}</a></span>
+								
 								<div id="publish_resource" class="reveal-modal" data-reveal style="position:absolute;"> 
 									<h4>{% trans "Select Groups" %}</h4>
 									<div id="switchgrp" class="content">
@@ -188,6 +191,7 @@
 								<input type="button" class="tiny button radius mod-btn secondary disabled" title="{% trans 'You are not authorized for this action' %}" value="{% trans 'Cross Publish' %}">
 							{% endif %}
 						{% endif %}
+						
 
 				</div>
 				{% endif %}
@@ -248,7 +252,7 @@
 			<!-- Views row -->
 				<div class="row tag-rating-div">
 					<span title="{% trans 'Click to see no. of view ' %}"><label class="lbl_tag lbl_field">{% trans "Views" %}</label></span>
-					{% include "ndf/analytics_views.html" %}
+					{% include "ndf/widget_analytics_views.html" %}
 				</div>
 
 			<!-- Ratings -->
@@ -331,13 +335,22 @@
 							{% if is_gstaff %}
 							<!-- Prevent creating New group from context of top mod group -->
 							{% if group_object.edit_policy != "EDITABLE_MODERATED" and is_gstaff %}
-								<a href="{% url create_url group_object.name %}" class="tiny button radius expand mod-btn" title="{% trans 'Create New' %}">
+								<a href="{% url create_url group_object.name %}" class="tiny button radius left-btn" title="{% trans 'Create New' %}">
 									{% if group_object.agency_type == 'Partner' %}
 										{% trans 'New Partner' %}
 									{% else %}
 										{% trans 'New Group' %}
 									{% endif %}
 								</a>
+								{% if node %}
+									<a class="tiny button radius delete-btn grp_delete right-btn" title="{% trans 'Delete' %}">
+										{% if group_object.agency_type == 'Partner' %}
+											{% trans 'Delete Partner' %}
+										{% else %}
+											{% trans 'Delete Group' %}
+										{% endif %}
+									</a>
+								{% endif %}
 							{% endif %}								
 							{% endif %}								
 						{% else %}
@@ -409,19 +422,19 @@
 						{% if user.is_authenticated %}
 							{% if not is_gstaff %}
 								{% if user_is_joined == "joined" %}
-									<input class="tiny button radius right-btn" title="Unsubscribe from this group" type="submit" id="notify" value="{% trans 'Unsubscribe' %}"
+									<input data-user-admin='False' data-user-id={{request.user.id}} class="tiny button radius subscription_policy right-btn" title="Unsubscribe from this group" type="button" id="unsubscribe_from_grp" value="{% trans 'Unsubscribe' %}"
 									{% if group_object.name == "home" %}
 										disabled="disabled" 
 									{% endif %}
 									>
 									{% comment %}
-										<input class="tiny button radius right-btn" type="submit" id="notify" value="{% trans 'Stop following' %}">
+										<input class="tiny button radius right-btn" type="button" value="{% trans 'Stop following' %}">
 									{% endcomment %}
 
 								{% elif user_is_joined == "not" %}
-									<input class="tiny button radius right-btn" type="submit" id="notify" value="{% trans 'Join' %}" title="Join this Group">
+									<input data-user-admin='False' data-user-id={{request.user.id}} class="tiny button radius right-btn subscription_policy" type="button" id="subscribe_to_grp" value="{% trans 'Join' %}" title="Join this Group">
 									{% comment %}
-										<input class="tiny button radius right-btn" type="submit" id="notify" value="{% trans 'Follow' %}">
+										<input class="tiny button radius right-btn" type="button" value="{% trans 'Follow' %}">
 									{% endcomment %}
 								{% endif %}
 							{% else %}
@@ -436,8 +449,15 @@
             {% if is_gstaff %}
 				<!-- Subscribe Users and Subscribe Admins buttons-->
 				<div class="row btn-row">
-					{% include "ndf/invite_users.html" with node=group_object %}
-					{% include "ndf/invite_admins.html" with node=group_object %}
+                   <a data-reveal-id="manage_users_modal" class="tiny expand button radius mod-btn" href="{% url 'manage_users' group_id %}">Manage Members</a>                    
+
+                <div id="manage_users_modal" class="reveal-modal large" data-reveal style="position:absolute;"> 
+                    <div id="group_drawer">
+                    {% include "ndf/widget_user_search.html" with subscription_status=True %}
+                    </div>
+                    <a class="close-reveal-modal">&#215;</a>
+                </div>          
+
 				</div>
 
 				<!-- Moderate Resources or Moderation Status button -->
@@ -525,16 +545,19 @@
                   }
 
             });
-			// alert("term_delete")
+		{% elif "Group" in node.member_of_names_list %}
+			$(".grp_delete").attr('href', "{% url 'delete_group' group_object.pk %}")
+			$(".grp_delete")[0].click()
 		{% endif %}
-       
+
+
+
     });
 
     $(document).on("click", "#btnConfirmNo", function() {
         set_href = false;
         $("#deleteModal").foundation('reveal', 'close');
     });
-
 
 
 </script>

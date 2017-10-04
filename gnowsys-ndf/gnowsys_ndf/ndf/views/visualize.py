@@ -28,7 +28,7 @@ from gnowsys_ndf.ndf.models import *
 from gnowsys_ndf.ndf.views.methods import *
 from gnowsys_ndf.ndf.views.file import *
 from gnowsys_ndf.ndf.rcslib import RCS
-from gnowsys_ndf.ndf.org2any import org2html
+# from gnowsys_ndf.ndf.org2any import org2html
 from gnowsys_ndf.ndf.templatetags.ndf_tags import group_type_info
 
 #######################################################################################################################################
@@ -41,7 +41,7 @@ def graphs(request,group_id):
 		# 					 	{
 		# 					 		'groupid':group_id, 'group_id':group_id,
 		# 					 	},
-		# 					 	# context_instance=RequestContext(request) 
+		# 					 	# context_instance=RequestContext(request)
 		# 					 )
 	ins_objectid  = ObjectId()
 	if ins_objectid.is_valid(group_id) is False :

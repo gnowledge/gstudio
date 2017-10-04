@@ -2,66 +2,37 @@
 {% load re_format from simple_filters %}
 {% load i18n %}
 {% get_group_name groupid as group_name_tag %}
+{% if request.user.is_authenticated %}
 {% get_user_quiz_resp node request.user as total_and_curr_ans_dict %}
-<style type="text/css">
-	.quiz_qtn{
-		margin-left:20px !important;
-		font-size: 20px;
-	}
-	.question_edit{
-		margin-left: 20px !important;
-	}
+{% check_is_gstaff groupid request.user as is_gstaff %}
 
-	input[type=checkbox], input[type=radio]{
-	    margin-right: 10px;
-	    width: 15px;
-		height: 15px;
-	}
-
-	.chk_ans_lbl, .rad_ans_lbl{
-		font-size: 22px;
-		margin-left: 5px;
-	}
-
-	.fi-check{
-		color: green;
-	}
-
-	.fi-x{
-		color: red;
-	}
-</style>
-{% with node.options|re_format as node_options %}
-{% with node.correct_answer|re_format as node_correct_answer %}
-
-<div class="row">
-<label class="attempts_count right fi-info">You attempted this question {{total_and_curr_ans_dict.count}} times </label>
+<div class="row quiz-player">
+	<label class="attempts_count right fi-info"></label>
 	<fieldset>
 	    <legend >
 	    	<span>Question</span>
-			{% check_is_gstaff groupid request.user as is_gstaff %}
-			{% if is_gstaff %}
+			{% if is_gstaff and not hide_edit_opt %}
 		    	<a href="{% url 'quiz_item_edit' group_id node.pk %}?return_url={{ request.META.HTTP_REFERER }}" class="right question_edit" target="_blank" >Edit</a>
 		    {% endif %}
 	    </legend>
 
 		<div class="row">
 			<div class="quiz_qtn">
-				<b>{{node.content}}</b>
-				<div class="quiz_qtn">
+				<b>{{question_content|safe}}</b>
+
+				<div class="quiz-box quiz_qtn">
 					{% if node.quiz_type == "Single-Choice" %}
-						{% for each_opt in node_options %}
+						{% for each_opt in options_list %}
 							<input type="radio" name="quiz_ans"  value="{{each_opt}}"
 							{% if each_opt in total_and_curr_ans_dict.recent_ans  %}
 							checked
 							{% endif %}
 
-							{% if each_opt in node_correct_answer %}
+							{% if each_opt in node.correct_answer %}
 								class="choice" id="{{each_opt}}">{{each_opt}}<span class='fi-check hide chk_ans_lbl'></span>
 							{% else %}
 								class="choice" id="{{each_opt}}">{{each_opt}}<span class='fi-x hide chk_ans_lbl'></span>
-							{% endif %}
-							<br/>
+							{% endif %}<br/>
 						{% endfor %}
 						{% comment %}
 						<div class="row">
@@ -74,12 +45,12 @@
 						</div>
 						{% endcomment %}
 					{% elif node.quiz_type == "Multiple-Choice" %}
-						{% for each_opt in node_options %}
+						{% for each_opt in options_list %}
 							<input type="checkbox" name="quiz_ans" value="{{each_opt}}"
 							{% if each_opt in total_and_curr_ans_dict.recent_ans %}
 							checked
 							{% endif %}
-							{% if each_opt in node_correct_answer %}
+							{% if each_opt in node.correct_answer %}
 								class="choice" id="{{each_opt}}">{{each_opt}}<span class='fi-check hide chk_ans_lbl'></span>
 							{% else %}
 								class="choice"  id="{{each_opt}}">{{each_opt}}<span class='fi-x hide chk_ans_lbl'></span>
@@ -87,38 +58,36 @@
 							<br/>
 						{% endfor %}
 					{% elif node.quiz_type == "Short-Response" %}
-						<textarea rows="4" cols="50" name="quiz_ans" class="choice" placeholder="Enter answer here" class="short_ans_txt" >{{total_and_curr_ans_dict.recent_ans|default_if_none:""}}</textarea>
+						<textarea rows="4" cols="50" name="quiz_ans" class="choice" placeholder="Enter answer here" class="short_ans_txt" ></textarea>
 						<!-- <input type="button" value="Submit" class="button tiny radius short-ans_chk"> -->
 					{% endif %}
-					<div class="row">
-						{% if node.quizitem_check_answer and node.quiz_type != "Short-Response"  %}
-							<input type="button" value="Check" class="button tiny check-ans radius check-btn">
-						{% endif %}
-						{% if node.quizitem_show_correct_ans %}
-							<input type="button" value="Show Answer" class="button tiny radius show-ans-btn hide">
-						{% endif %}
-						<input type="button" value="Submit" class="tiny button radius submit-btn">
-						{% comment %}
-						{% if not node.quizitem_show_correct_ans %}
-						<input type="button" value="Submit" class="tiny button radius submit-btn">
-						{% endif %}
-						{% endcomment %}
-					</div>
 
 				</div>
+				{% if total_and_curr_ans_dict.count != node.quizitem_max_attempts %}
+					<div class="row controls-box quiz_qtn hide">
+						{% if node.quizitem_check_answer and node.quiz_type != "Short-Response"  %}
+							<input type="button" value="Check" class="purple-btn check-ans check-btn">
+						{% endif %}
+						{% if node.quizitem_show_correct_ans %}
+							<input type="button" value="Show Answer" class="purple-btn show-ans-btn hide">
+						{% endif %}
+						<input type="button" value="Submit" class="purple-btn auto_width submit-btn">
+					</div>
+				{% endif %}
 			</div>
 		</div>
 	</fieldset>
 </div>
-{% endwith %}
-{% endwith %}
 
 <script type="text/javascript">
 	user_submitted_ans_list = {{total_and_curr_ans_dict.recent_ans|jsonify|safe}}
 
+
+
 	// On load ---------------------------------------------------------------
 		$(document).ready(function() {
 			display_sub_ans()
+			display_sub_status_msg({{total_and_curr_ans_dict.count}})
 		})
 
 	// Toggle Check to Clear btn after some actions --------------------------
@@ -152,20 +121,26 @@
 				$(".submit-btn")
 					.removeAttr("disabled")
 					.removeClass("secondary")
+					.removeClass("disable-purple-btn")
+					.addClass("purple-btn")
+					.attr('title', 'Click to submit your answer.')
 			}
 			else{
 				$(".submit-btn")
 					.attr("disabled","disabled")
 					.addClass("secondary")
+					.addClass("disable-purple-btn")
+					.removeClass("purple-btn")
+					.attr('title', 'Your answer is already sbubmitted. Please change to submit again.')
 			}
 		}
 
 	// Select user's recent submitted answer ---------------------------------
 		function display_sub_ans(){
-			{% if node.quiz_type != "Short-Response" %}
 			user_ans_list = user_submitted_ans_list
 			if(user_ans_list){
 				$.each(user_ans_list,function(ind,each_opt_val){
+					{% if node.quiz_type != "Short-Response" %}
 					var re = /[.*+=~`<>;:'"_?^${}()!%\^|[\]\\\/#]/g;
 					if(re.test(each_opt_val)){
 						each_opt_val = each_opt_val.replace(re,"\\$&")
@@ -174,11 +149,35 @@
 					else{
 						$("#"+each_opt_val).prop("checked", true)
 					}
+					{% else %}
+						$(".choice").val(each_opt_val)
+					{% endif %}
 				})
 				submit_btn_status("hide")
 			}
-			{% endif %}
 		}
+
+		function display_sub_status_msg(attempt_count_val){
+			attempt_count_val = parseInt(attempt_count_val)
+			max_attempts_var = parseInt({{node.quizitem_max_attempts}})
+			if(attempt_count_val){
+				if(attempt_count_val < max_attempts_var){
+					$(".attempts_count").text("You attempted this question "+attempt_count_val+ " time(s) ")
+					$(".controls-box").removeClass("hide")
+				}
+				else if(attempt_count_val == max_attempts_var){
+					$(".attempts_count").text("You have reached Maximum attempts allowed for this question")
+					$(".controls-box").remove()
+				}
+			}
+			else{
+				$(".attempts_count").text("You have NOT attempted this question yet.")
+				$(".controls-box").removeClass("hide")
+			}
+		}
+
+
+
 
 	// Fecth user's selected answer ------------------------------------------
 
@@ -186,8 +185,10 @@
 			list_name = []
 			$.each($('.choice:checked'), function(a,b){
 				list_name.push(b.id)
-				n = b.nextSibling.nextSibling
-				n.classList.remove("hide")
+				{% if node.quizitem_show_correct_ans %}
+					n = b.nextSibling.nextSibling
+					n.classList.remove("hide")
+				{% endif %}
 			})
 			return list_name;
 
@@ -247,15 +248,22 @@
 		})
 
 	// Submit user selected answer -------------------------------------------
-		$(".submit-btn").click(function(){
+		$(".submit-btn").click(function(e){
 			{% if node.quiz_type == "Short-Response" %}
-				var user_given_ans = $(".choice").val()
-				user_given_ans = [user_given_ans]
+				var user_given_ans = $(".choice").val().trim()
+				if (user_given_ans.length > 0){
+					user_given_ans = [user_given_ans]
+				} 
 			{% else %}
 				var user_given_ans = user_ans()
 			{% endif %}
 			save_user_action("submit",user_given_ans)
 		})
+
+	// Short-response keydown event binding
+	$(".choice").keydown(function(e){
+		submit_btn_status("show")
+	})
 
 	// Ajax call to save user's answer ---------------------------------------
 		function save_user_action(user_action, user_given_ans){
@@ -280,8 +288,14 @@
 								submit_btn_status("hide")
 								user_submitted_ans_list = user_given_ans;
 								if(data['count']){
-									$(".attempts_count").text("You attempted this question "+ data['count']+" times")
+									attempt_cnt = parseInt(data['count'])
+									display_sub_status_msg(attempt_cnt)
+									if(attempt_cnt == parseInt({{node.quizitem_max_attempts}})){
+										$('.controls-box').addClass('hide')
+										location.reload()
+									}
 								}
+
 							}
 						}
 						else{
@@ -291,7 +305,7 @@
 				});//end of ajax
 			}
 			else if(user_given_ans.length == 0 ){
-				alert("Please select an answer.")
+				alert("Please answer and click Submit.")
 			}
 			else{
 				alert("This answer is already submitted.")
@@ -299,3 +313,6 @@
 		}
 
 </script>
+{% else %}
+  <label>Please <a href="{% url 'auth_login' %}?next={{request.path}}">LOGIN</a>  to view the Quiz</label>
+{% endif %}

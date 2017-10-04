@@ -1,3 +1,4 @@
+{% load i18n %}
 {% load multiply from simple_filters %}
 <style type="text/css">
   .reveal-modal{
@@ -11,57 +12,113 @@
   }
 
 </style>
-
+<script src="/static/ndf/bower_components/d3/d3.js"></script>
+<div class="user-analytics-data">
 <div class="pre-analytics-msg-div text-center hide">
-    Your analytics is loading. Please wait.
+   {% trans "Your analytics is loading. Please wait." %} 
 </div>
 <div class="row">
-  <h3>Analytics of user '{{username}}'</h3>
-</div>
+<h4 class="text-center"><u><b>PROGRESS REPORT</b></u></h4>
+    <a class="close-reveal-modal" aria-label="Close">Close [&#215;]</a>
+  <div class="small-6 columns">
+    <h4 class="inner"> User:  <h3 class="inner left-space"> {{username}} </h3></h4>
+  </div>
+  <div class="small-6 columns">
+    <h4 class="inner">Total points gained:  <h3 class="course-metric-count users_points inner left-space">{{users_points}}</h3></h4>
+  </div>
+</div><hr/>
 <div class="course-overview-container">
-
   <div class="row collapse course-overview">
     <div class="columns small-12 medium-6">
       <div class="course-status">
-        <h5>Course status</h5>
+        {% comment %}
+        <h4>{% trans "Course status" %}</h4>
+        {% endcomment %}
         <div class="row">
           <div class="small-12 columns">
-            <span class="course-metric-heading">Module's Completion</span>
-            <h4 class="module_progress_stmt">{{module_progress_stmt}}</h4>
+            <span class="course-metric-heading">{{level1_lbl}}</span>
+            <h4 class="module_progress_stmt">{{level1_progress_stmt}}</h4>
             <div class="progress success round">
-                <div class="module_progress_meter meter" style="width:{{module_progress_meter}}%"></div>
+              <div class="module_progress_meter meter" style="width:{{level1_progress_meter}}%"></div>
             </div>
           </div>
         </div>
         <div class="row">
           <div class="small-12 columns">
-            <span class="course-metric-heading">Unit's Completion</span>
-            <h4 class='units_progress_stmt'>{{units_progress_stmt}}</h4>
+            <span class="course-metric-heading">{{level2_lbl}}</span>
+            <h4 class='units_progress_stmt'>{{level2_progress_stmt}}</h4>
             <div class="progress success round">
-                <div class="unit_progress_meter meter" style="width:{{unit_progress_meter}}%"></div>
+              <div class="unit_progress_meter meter" style="width:{{level2_progress_meter}}%"></div>
             </div>
 
           </div>
         </div>
       </div>
     </div>
-
-
     <div class="columns small-12 medium-6 points-data">
-      <h5>Total points gained</h5>
-      <span class="course-metric-count users_points">{{users_points}}</span>
-
       <div class="course-points-breakup">
-
       </div>
+    </div>
+  </div>
+  <div class="analytics-panels">
+  {% with group_obj.member_of_names_list as group_member_of_name %}
+  <!-- Assessment/Quiz Performance and Inetractions -->
+  <div class="row">
+    <div class="columns small-12 medium-6">
+      <div class="course-quiz-perf course-section">
+        <span class="course-section-heading inner">Assessment Performance  </span>
+          {% if "announced_unit" in group_member_of_name %}
+          <a class="fetch-assessment-analytics inner left-space" data-user-id={{user_id}}>Update</a>
+          <span class="course-section-icon">
+            <i class="fa fa-question-circle"></i>
+          </span>
+        </span>
+        {% endif %}
+        <!-- Total Questions and Correct Answers -->
+        <div class="row">
+          <div class="columns small-12 medium-6">
+            <span class="course-metric-heading">{% trans "Total Questions" %}</span>
+            <span class="course-metric-count total_quizitems">{{total_quizitems}}</span>
+          </div>
+          <div class="columns small-12 medium-6">
+            <span class="course-metric-heading">Correct Answers</span>
+            <span class="course-metric-count correct-count correct_attempted_quizitems">{{correct_attempted_quizitems}}</span>
+          </div>
+        </div>
+
+        <!-- Attempted Questions and Incorrect Answers -->
+        <div class="row">
+          <div class="columns small-12 medium-6">
+            <span class="course-metric-heading">Attempted</span>
+            <span class="course-metric-count attempted_quizitems">{{attempted_quizitems}}</span>
+          </div>
+
+          <div class="columns small-12 medium-6">
+            <span class="course-metric-heading">{% trans "Incorrect answers" %}</span>
+            <span class="course-metric-count incorrect-count incorrect_attempted_quizitems">{{incorrect_attempted_quizitems}}</span>
+          </div>
+        </div>
+
+        {% if "announced_unit" in group_member_of_name %}
+        <div class="row">
+          <div class="columns small-12 medium-6">
+            <span class="course-metric-heading">{% trans "Not Attempted" %}</span>
+            <span class="course-metric-count unattempted_quizitems">{{unattempted_quizitems}}</span>
+          </div>
+        </div>
+        {% endif %}
+      </div>
+    </div>
+    <div class="columns small-12 medium-6">
       <div class="course-interactions course-section">
-        <span class="course-section-heading">Interactions</span>
+        <span class="course-section-heading">{% trans "Interactions" %}
         <span class="course-section-icon">
-          <i class="fa fa-users"></i>
+          <i class="fa fa-comments"></i>
+        </span>
         </span>
         <div class="row">
           <div class="columns small-12 medium-6">
-            <span class="course-metric-heading">Comments By me</span>
+            <span class="course-metric-heading">{% trans "Comments By me" %}</span>
             <span class="course-metric-count total_cmnts_by_user">{{total_cmnts_by_user}}</span>
           </div>
           {% comment %}
@@ -78,7 +135,7 @@
         </div>
         <div class="row">
           <div class="columns small-12 medium-6">
-            <span class="course-metric-heading">Comments for me</span>
+            <span class="course-metric-heading">{% trans "Comments for me" %}</span>
             <span class="course-metric-count cmnts_rcvd_by_user">{{cmnts_rcvd_by_user}}</span>
           </div>
           {% comment %}
@@ -95,42 +152,51 @@
           {% endcomment %}
         </div>
       </div>
+    </div>
+  </div>
+  {% endwith %}
+
+  <!-- Gallery and Notes -->
+  <div class="row">
+    <div class="columns small-12 medium-6">
+
       <div class="course-gallery-uploads course-section">
-        <span class="course-section-heading">Gallery uploads</span>
-        <span class="course-section-icon">
-          <i class="fa fa-file-text"></i>
+        <span class="course-section-heading">{% trans "Gallery uploads" %}
+          <span class="course-section-icon">
+            <i class="fa fa-file-image-o"></i>
+          </span>
         </span>
         <div class="row">
           <div class="columns small-12 medium-4">
-            <span class="course-metric-heading">Files Created</span>
+            <span class="course-metric-heading">{% trans "Files Uploaded" %}</span>
             <span class="course-metric-count user_files">{{user_files}}</span>
           </div>
           <div class="columns small-12 medium-4">
-            <span class="course-metric-heading">Visits gained</span>
+            <span class="course-metric-heading">{% trans "Visits gained" %}</span>
             <span class="course-metric-count other_viewing_my_files">{{other_viewing_my_files}}</span>
           </div>
           <div class="columns small-12 medium-4">
-            <span class="course-metric-heading">Comments recieved</span>
+            <span class="course-metric-heading">{% trans "Comments recieved" %}</span>
             <span class="course-metric-count cmts_on_user_files">{{cmts_on_user_files}}</span>
           </div>
         </div>
         <div class="row">
           <div class="columns small-12 medium-4">
-            <span class="course-metric-heading">Others File Visited</span>
+            <span class="course-metric-heading">{% trans "Visits on Other Files" %}</span>
             <span class="course-metric-count total_files_viewed_by_user">{{total_files_viewed_by_user}}</span>
           </div>
           <div class="columns small-12 medium-4">
-            <span class="course-metric-heading">Comments on other files</span>
+            <span class="course-metric-heading">{% trans "Comments on other files" %}</span>
             <span class="course-metric-count commented_on_others_files">{{commented_on_others_files}}</span>
           </div>
           <div class="columns small-12 medium-4">
-            <span class="course-metric-heading">Comments by unique users</span>
+            <span class="course-metric-heading">{% trans "Comments by unique users" %}</span>
             <span class="course-metric-count unique_users_commented_on_user_files">{{unique_users_commented_on_user_files}}</span>
           </div>
         </div>
         <div class="row">
           <div class="columns small-12">
-            <span class="course-metric-heading">Avg. Rating Awarded</span>
+            <span class="course-metric-heading">{% trans "Avg. Rating Awarded" %}</span>
             <span class="course-metric-count">
               <div class="row total_rating_rcvd_on_files">
                 <div class="columns small-6 medium-6 rating-stars" style="width:{{total_rating_rcvd_on_files|multiply:16}}px; {% if total_rating_rcvd_on_files > 0 %}display:block !important;{% endif %}"></div>
@@ -140,54 +206,42 @@
           </div>
         </div>
       </div>
-      <div class="course-quiz-perf course-section">
-        <span class="course-section-heading">Quiz Performance</span>
-        <span class="course-section-icon">
-          <i class="fa fa-question-circle"></i>
-        </span>
-        <div class="row">
-          <div class="columns small-12 medium-6">
-            <span class="course-metric-heading">Questions Attempted</span>
-            <span class="course-metric-count attempted_quizitems">{{attempted_quizitems}}</span>
-          </div>
-          <div class="columns small-12 medium-6">
-            <span class="course-metric-heading">Total Questions</span>
-            <span class="course-metric-count total_quizitems">{{total_quizitems}}</span>
-          </div>
-        </div>
-        <div class="row">
-          <div class="columns small-12 medium-6">
-            <span class="course-metric-heading">Correct Answers</span>
-            <span class="course-metric-count correct-count correct_attempted_quizitems">{{correct_attempted_quizitems}}</span>
-          </div>
-          <div class="columns small-12 medium-6">
-            <span class="course-metric-heading">Incorrect answers</span>
-            <span class="course-metric-count incorrect-count incorrect_attempted_quizitems">{{incorrect_attempted_quizitems}}</span>
-          </div>
-        </div>
-      </div>
+    </div>
+    <div class="columns small-12 medium-6">
+
       <div class="course-notes course-section">
-        <span class="course-section-heading">Note Making</span>
+        <span class="course-section-heading">{% trans "Note Making" %}
         <span class="course-section-icon">
-          <i class="fa fa-book"></i>
+          <i class="fi-clipboard-pencil"></i>
+        </span>
         </span>
         <div class="row">
-          <div class="columns small-12 medium-6">
-            <span class="course-metric-heading">Notes Written</span>
+          <div class="columns small-12 medium-4">
+            <span class="course-metric-heading">{% trans "Notes Written" %}</span>
             <span class="course-metric-count user_notes">{{user_notes}}</span>
           </div>
-          <div class="columns small-12 medium-6">
-            <span class="course-metric-heading">Views Gained</span>
+          <div class="columns small-12 medium-4">
+            <span class="course-metric-heading">{% trans "Views Gained" %}</span>
             <span class="course-metric-count others_reading_my_notes">{{others_reading_my_notes}}</span>
+          </div>
+          <div class="columns small-12 medium-4">
+            <span class="course-metric-heading">{% trans "Comments recieved" %}</span>
+            <span class="course-metric-count cmts_on_user_notes">{{cmts_on_user_notes}}</span>
           </div>
         </div>
         <div class="row">
-          <div class="columns small-12 medium-6">
-            <span class="course-metric-heading">Others notes visited</span>
+          <div class="columns small-12 medium-4">
+            <span class="course-metric-heading">{% trans "Visits on Other Notes" %}</span>
             <span class="course-metric-count total_notes_read_by_user">{{total_notes_read_by_user}}</span>
           </div>
-          <div class="columns small-12 medium-6">
-            <span class="course-metric-heading">Avg. Rating Awarded</span>
+          <div class="columns small-12 medium-4">
+            <span class="course-metric-heading">{% trans "Comments on other notes" %}</span>
+            <span class="course-metric-count commented_on_others_notes">{{commented_on_others_notes}}</span>
+          </div>
+        </div>
+        <div class="row">
+          <div class="columns small-12">
+            <span class="course-metric-heading">{% trans "Avg. Rating Awarded" %}</span>
             <span class="course-metric-count">
               <div class="row total_rating_rcvd_on_notes">
                 <div class="columns small-6 medium-6 rating-stars" style="width:{{total_rating_rcvd_on_notes|multiply:16}}px;{% if total_rating_rcvd_on_notes > 0 %}display:block !important;{% endif %}"></div>
@@ -197,25 +251,170 @@
           </div>
         </div>
       </div>
-      {% comment %}
-      <div class="course-warning course-section">
-          <h5>WAITING FOR YOUR FEEDBACK</h5>
-          <div><i class="fa fa-sign-in"></i><a>3 New notes added</a></div>
-          <div><i class="fa fa-file-image-o"></i><a>36 New files uploaded in the gallery</a></div>
-          <div></div>
-      </div>
-      {% endcomment %}
-    </div>
+    </div>  
   </div>
+  </div>  
+  {% comment %}
+  <div class="course-warning course-section">
+      <h5>WAITING FOR YOUR FEEDBACK</h5>
+      <div><i class="fa fa-sign-in"></i><a>3 New notes added</a></div>
+      <div><i class="fa fa-file-image-o"></i><a>36 New files uploaded in the gallery</a></div>
+      <div></div>
+  </div>
+  {% endcomment %}
+</div>
 </div>
 
 
 <script type="text/javascript">
+    // pi chart for score points
+    function generateGraph(data){
+        var dataSet = []
+          $.each(data,function(i,v){
+            dataSet.push({'legendLabel':i,'magnitude':v})
+          })
+        var canvasWidth = 600, //width
+          canvasHeight = 300,   //height
+          outerRadius = 100,   //radius
+          color = d3.scale.category20(); //builtin range of colors
+
+        // var dataSet = [
+        //   {"legendLabel":"One", "magnitude":20},
+        //   {"legendLabel":"Two", "magnitude":40},
+        //   {"legendLabel":"Three", "magnitude":50},
+        //   {"legendLabel":"Four", "magnitude":16},
+        //   {"legendLabel":"Five", "magnitude":50},
+        //   {"legendLabel":"Six", "magnitude":8},
+        //   {"legendLabel":"Six", "magnitude":8},
+        //   {"legendLabel":"Seven", "magnitude":30}];
+
+        var vis = d3.select(".course-points-breakup")
+          .append("svg:svg") //create the SVG element inside the <body>
+            .data([dataSet]) //associate our data with the document
+            .attr("width", canvasWidth) //set the width of the canvas
+            .attr("height", canvasHeight) //set the height of the canvas
+            .append("svg:g") //make a group to hold our pie chart
+              // .attr("transform", "translate(" + 1.5*outerRadius + "," + 1.5*outerRadius + ")") // relocate center of pie to 'outerRadius,outerRadius'
+              .attr("transform", "translate(" + 200 + "," + 150 + ")") // relocate center of pie to 'outerRadius,outerRadius'
+
+        // This will create <path> elements for us using arc data...
+        var arc = d3.svg.arc()
+          .outerRadius(outerRadius);
+
+        var pie = d3.layout.pie() //this will create arc data for us given a list of values
+          .value(function(d) { return d.magnitude; }) // Binding each value to the pie
+          .sort( function(d) { return null; } );
+
+        // Select all <g> elements with class slice (there aren't any yet)
+        var arcs = vis.selectAll("g.slice")
+          // Associate the generated pie data (an array of arcs, each having startAngle,
+          // endAngle and value properties)
+          .data(pie)
+          // This will create <g> elements for every "extra" data element that should be associated
+          // with a selection. The result is creating a <g> for every object in the data array
+          .enter()
+          // Create a group to hold each slice (we will have a <path> and a <text>
+          // element associated with each slice)
+          .append("svg:g")
+          .attr("class", "slice");    //allow us to style things in the slices (like text)
+
+        arcs.append("svg:path")
+          //set the color for each slice to be chosen from the color function defined above
+          .attr("fill", function(d, i) { return color(i); } )
+          //this creates the actual SVG path using the associated data (pie) with the arc drawing function
+          .attr("d", arc);
+
+        // Add a legendLabel to each arc slice...
+        arcs.append("svg:text")
+          .attr("transform", function(d) { //set the label's origin to the center of the arc
+            //we have to make sure to set these before calling arc.centroid
+            d.outerRadius = outerRadius + 50; // Set Outer Coordinate
+            d.innerRadius = outerRadius + 45; // Set Inner Coordinate
+            return "translate(" + arc.centroid(d) + ")";
+          })
+          .attr("text-anchor", "middle") //center the text on it's origin
+          .style("fill", "Black")
+          .style("font", "18px Arial")
+          .text(function(d, i) { return dataSet[i].legendLabel + "(" + dataSet[i].magnitude + ")"; }); //get the label from our original data array
+
+        // Add a magnitude value to the larger arcs, translated to the arc centroid and rotated.
+        var quant = arcs.filter(function(d) { return d.endAngle - d.startAngle > .2; })
+            .append('g')
+          var temp = quant.append("svg:text")
+              .style("fill", "Black")
+              .style("font", "20px Arial")
+              .style("font-weight", "bold")
+              .text(function(d) { return d.data.magnitude; })
+
+          quant.attr("dy", ".35em")
+          .attr("text-anchor", "middle")
+          //.attr("transform", function(d) { return "translate(" + arc.centroid(d) + ")rotate(" + angle(d) + ")"; })
+          .attr("transform", function(d) { //set the label's origin to the center of the arc
+            //we have to make sure to set these before calling arc.centroid
+            d.outerRadius = outerRadius; // Set Outer Coordinate
+            d.innerRadius = outerRadius/2; // Set Inner Coordinate
+            return "translate(" + arc.centroid(d) + ")rotate(" + angle(d) + ")";
+          })
+
+        // Computes the angle of an arc, converting from radians to degrees.
+        function angle(d) {
+          var a = (d.startAngle + d.endAngle) * 90 / Math.PI - 90;
+          return a > 90 ? a - 180 : a;
+        }
+        // Converts from degrees to radians.
+        Math.radians = function(degrees) {
+          return degrees * Math.PI / 180;
+        };
+
+        // Converts from radians to degrees.
+        Math.degrees = function(radians) {
+          return radians * 180 / Math.PI;
+        };
+    }
+
     $(document).ready(function() {
       var points_dict = {{users_points_breakup|safe}}
-      if (points_dict.hasOwnProperty('Total')){
-        delete points_dict['Total']
-      }
-      generateGraph(points_dict)
+        if({{users_points}} >  0){
+          if (points_dict.hasOwnProperty('Total')){
+            delete points_dict['Total']
+          }
+          $.each(points_dict, function(e,v){
+            if(v==0){
+              delete points_dict[e]
+            }
+          })
+          generateGraph(points_dict)
+        }
+        else{
+          $(".course-points-breakup").html("<i>No points to show Pie Chart</i>")
+        }
+      })
+
+    $(document).on('click', '.fetch-assessment-analytics', function(){
+      user_id = $(this).attr('data-user-id')
+      $.ajax({
+
+        url: "{% url 'load_assessment_analytics' group_obj.pk %}",
+
+        type: "GET",
+        data:{
+          domain: window.location.hostname,
+          user_id: user_id
+        },
+        dataType: "json",
+
+        success: function(data){
+          console.log(data)
+          $(".correct_attempted_quizitems").html(data['correct_attempted_quizitems'])
+          $(".unattempted_quizitems").html(data['unattempted_quizitems'])
+          // $(".visited_quizitems").html(data['visited_quizitems'])
+          // $(".notapplicable_quizitems").html(data['notapplicable_quizitems'])
+          $(".incorrect_attempted_quizitems").html(data['incorrect_attempted_quizitems'])
+          $(".attempted_quizitems").html(data['attempted_quizitems'])
+          $(".users_points").html(data['users_points'])
+        },
+      });//end of ajax
+
     })
+
 </script>

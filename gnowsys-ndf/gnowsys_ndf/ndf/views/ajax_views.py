@@ -32,23 +32,25 @@ except ImportError:  # old pymongo
 
 
 ''' -- imports from application folders/files -- '''
-from gnowsys_ndf.settings import GAPPS
+from gnowsys_ndf.settings import GAPPS,GSTUDIO_SUPPORTED_JHAPPS
 from gnowsys_ndf.settings import STATIC_ROOT, STATIC_URL
 from gnowsys_ndf.ndf.models import NodeJSONEncoder
 from gnowsys_ndf.ndf.models import node_collection, triple_collection
 from gnowsys_ndf.ndf.models import *
-from gnowsys_ndf.ndf.org2any import org2html
 from gnowsys_ndf.ndf.views.file import *
-from gnowsys_ndf.ndf.views.methods import check_existing_group, get_drawers, get_course_completed_ids,create_thread_for_node
+from gnowsys_ndf.ndf.views.gcourse import *
+from gnowsys_ndf.ndf.views.translation import get_lang_node
+from gnowsys_ndf.ndf.views.methods import check_existing_group, get_drawers, get_course_completed_ids,create_thread_for_node, delete_gattribute
 from gnowsys_ndf.ndf.views.methods import get_node_common_fields, get_node_metadata, create_grelation,create_gattribute
 from gnowsys_ndf.ndf.views.methods import create_task,parse_template_data,get_execution_time,get_group_name_id, dig_nodes_field
-from gnowsys_ndf.ndf.views.methods import get_widget_built_up_data, parse_template_data, get_prior_node_hierarchy
-from gnowsys_ndf.ndf.views.methods import create_grelation, create_gattribute, create_task, node_thread_access, get_course_units_tree
+from gnowsys_ndf.ndf.views.methods import get_widget_built_up_data, parse_template_data, get_prior_node_hierarchy, create_clone
+from gnowsys_ndf.ndf.views.methods import create_grelation, create_gattribute, create_task, node_thread_access, get_course_units_tree, delete_node
 from gnowsys_ndf.ndf.templatetags.ndf_tags import get_profile_pic, edit_drawer_widget, get_contents, get_sg_member_of, get_attribute_value, check_is_gstaff
 from gnowsys_ndf.settings import GSTUDIO_SITE_NAME
-from gnowsys_ndf.mobwrite.models import ViewObj
+# from gnowsys_ndf.mobwrite.models import ViewObj
 from gnowsys_ndf.notification import models as notification
-from gnowsys_ndf.ndf.views.moderation import *
+from gnowsys_ndf.ndf.views.asset import *
+from gnowsys_ndf.ndf.views.trash import * 
 
 theme_GST = node_collection.one({'_type': 'GSystemType', 'name': 'Theme'})
 topic_GST = node_collection.one({'_type': 'GSystemType', 'name': 'Topic'})
@@ -66,6 +68,85 @@ class Encoder(json.JSONEncoder):
             return str(obj)
         else:
             return obj
+
+
+def get_node_json_from_id(request, group_id, node_id=None):
+    if not node_id:
+        node_id = request.GET.get('node_id')
+    node_obj = Node.get_node_by_id(node_id)
+
+    if node_obj:
+      if "QuizItem" in node_obj.member_of_names_list:
+        from gnowsys_ndf.ndf.views.quiz import render_quiz_player
+        return render_quiz_player(request, group_id, node_obj)
+      trans_node = get_lang_node(node_obj._id,request.LANGUAGE_CODE)
+      if trans_node:
+        return HttpResponse(json.dumps(trans_node, cls=NodeJSONEncoder))
+      else:
+        return HttpResponse(json.dumps(node_obj, cls=NodeJSONEncoder))
+    else:
+      return HttpResponse(0)
+
+
+def save_node(request, group_id, node_id=None):
+    try:
+        group_id = ObjectId(group_id)
+    except:
+        group_name, group_id = get_group_name_id(group_id)
+
+    if not node_id:
+        node_id = request.POST.get('node_id')
+    type_of_gst_name = request.POST.get('type_of_gst_name', '')
+    member_of_gst_name = request.POST.get('member_of_gst_name', '')
+    replicate_resource = request.POST.get('replicate_resource', 'False')
+    node_obj = Node.get_node_by_id(node_id)
+    type_of_gst_name, type_of_gst_id = GSystemType.get_gst_name_id(type_of_gst_name)
+    member_of_gst_name, member_of_gst_id = GSystemType.get_gst_name_id(member_of_gst_name)
+    if node_obj:
+        if eval(replicate_resource):
+            new_node_obj = create_clone(request.user.id, node_obj, group_id)
+            new_node_obj.type_of = [type_of_gst_id]
+            new_node_obj.member_of = [member_of_gst_id]
+            node_obj = new_node_obj
+            new_node_obj.origin = [{'template_from': node_obj._id}]
+        else:
+            node_obj.fill_gstystem_values(request=request)
+            node_obj.member_of = [member_of_gst_id]
+        node_obj.save(group_id=group_id)
+        return HttpResponse(json.dumps(node_obj, cls=NodeJSONEncoder))
+    else:
+        return HttpResponse(0)
+
+
+@login_required
+def remove_from_nodelist(request, group_id):
+    parent_node_id = request.POST.get('parent_node_id', None)
+    child_node_id = request.POST.get('child_node_id', None)
+    node_field = request.POST.get('node_field', None)
+    result = 0
+
+    if (parent_node_id and child_node_id) and (node_field in Node.structure):
+        node_obj = Node.get_node_by_id(parent_node_id)
+        try:
+            node_obj[node_field].pop(node_obj[node_field].index(ObjectId(child_node_id)))
+            node_obj.save(group_id=group_id)
+        except Exception, e:
+            print e
+        result = 1
+
+    return HttpResponse(result)
+
+
+@login_required
+def ajax_delete_node(request, group_id):
+    node_to_delete = request.POST.get('node_to_delete', None)
+    deletion_type = eval(request.POST.get('deletion_type', 0))
+    right_subject = eval(request.POST.get('right_subject', None))
+    if right_subject in [0, 1]:
+        all_grels = triple_collection.find({'_type': 'GRelation', 'subject': ObjectId(node_to_delete)})
+        for each_grel in all_grels:
+            delete_node(node_id=each_grel['right_subject'], deletion_type=right_subject)
+    return HttpResponse(json.dumps(delete_node(node_id=node_to_delete, deletion_type=deletion_type)))
 
 
 def checkgroup(request, group_name):
@@ -115,6 +196,7 @@ def collection_create(request, group_id):
   '''
   existing_collection = request.POST.get("existing_collection")
   # print "\n\n\n here",existing_collection
+  coll_redir = request.POST.get('coll_redir',"")
   if existing_collection == "True":
     Collections = request.POST.getlist("collection[]", '')
     cur_collection_id = request.POST.get("cur_collection_id")
@@ -136,15 +218,17 @@ def collection_create(request, group_id):
     create_gattribute(page_node._id, discussion_enable_at, True)
     return_status = create_thread_for_node(request,group_id, page_node)
     group_object = node_collection.one({'_id': ObjectId(group_id)})
-    if group_object.edit_policy == "EDITABLE_MODERATED":
-                    # print "\n\n\n\ninside editable moderated block"
-                    page_node.group_set = get_moderator_group_set(page_node.group_set, group_object._id)
-                    # print "\n\n\npage_node._id",page_node._id
-                    page_node.status = u'MODERATION'
-                    # print "\n\n\n page_node.status",page_node.status
 
+    # if group_object.edit_policy == "EDITABLE_MODERATED":
+    #                 # print "\n\n\n\ninside editable moderated block"
+    #                 page_node.group_set = get_moderator_group_set(page_node.group_set, group_object._id)
+    #                 # print "\n\n\npage_node._id",page_node._id
+    #                 page_node.status = u'MODERATION'
+    #                 # print "\n\n\n page_node.status",page_node.status
+
+    if coll_redir == "raw-material":
+      page_node.tags.append(u'raw@material')
     page_node.save()
-
     for each in Collections:
       node_collection.collection.update({'_id': page_node._id}, {'$push': {'collection_set': ObjectId(each) }}, upsert=False, multi=False)
 
@@ -323,7 +407,7 @@ def shelf(request, group_id):
 
           shelf_R = triple_collection.collection.GRelation()
           shelf_R.subject = ObjectId(auth._id)
-          shelf_R.relation_type = has_shelf_RT
+          shelf_R.relation_type = has_shelf_RT._id
           shelf_R.right_subject = ObjectId(shelf_gs._id)
           shelf_R.save(groupid=group_id)
         else:
@@ -361,7 +445,7 @@ def shelf(request, group_id):
       shelf_list = {}
 
       if auth:
-        shelf = triple_collection.find({'_type': 'GRelation', 'subject': ObjectId(auth._id), 'relation_type.$id': has_shelf_RT._id})
+        shelf = triple_collection.find({'_type': 'GRelation', 'subject': ObjectId(auth._id), 'relation_type': has_shelf_RT._id})
 
         if shelf:
           for each in shelf:
@@ -410,7 +494,7 @@ def drawer_widget(request, group_id):
       elif field == "teaches":
         app = None
         relationtype = node_collection.one({"_type": "RelationType", "name": "teaches"})
-        list_grelations = triple_collection.find({"_type": "GRelation", "subject": node._id, "relation_type.$id": relationtype._id})
+        list_grelations = triple_collection.find({"_type": "GRelation", "subject": node._id, "relation_type": relationtype._id})
         for relation in list_grelations:
           nlist.append(ObjectId(relation.right_subject))
 
@@ -419,7 +503,7 @@ def drawer_widget(request, group_id):
       elif field == "assesses":
         app = field
         relationtype = node_collection.one({"_type": "RelationType", "name": "assesses"})
-        list_grelations = triple_collection.find({"_type": "GRelation", "subject": node._id, "relation_type.$id": relationtype._id})
+        list_grelations = triple_collection.find({"_type": "GRelation", "subject": node._id, "relation_type": relationtype._id})
         for relation in list_grelations:
           nlist.append(ObjectId(relation.right_subject))
 
@@ -623,7 +707,7 @@ def search_drawer(request, group_id):
           if field == "teaches":
             relationtype = node_collection.one({"_type": "RelationType", "name": "teaches"})
             list_grelations = triple_collection.find({
-                "_type": "GRelation", "subject": node._id, "relation_type.$id": relationtype._id
+                "_type": "GRelation", "subject": node._id, "relation_type": relationtype._id
             })
             for relation in list_grelations:
               nlist.append(ObjectId(relation.right_subject))
@@ -631,7 +715,7 @@ def search_drawer(request, group_id):
           elif field == "assesses":
             relationtype = node_collection.one({"_type": "RelationType", "name": "assesses"})
             list_grelations = triple_collection.find({
-                "_type": "GRelation", "subject": node._id, "relation_type.$id": relationtype._id
+                "_type": "GRelation", "subject": node._id, "relation_type": relationtype._id
             })
             for relation in list_grelations:
               nlist.append(ObjectId(relation.right_subject))
@@ -696,21 +780,19 @@ def search_drawer(request, group_id):
                                  "groupid": group_id, 'node_id': node_id
                                 },
                                 context_instance=RequestContext(request)
-
       )
-
 
 @get_execution_time
 def get_topic_contents(request, group_id):
-  if request.is_ajax() and request.method == "POST":
-    node_id = request.POST.get("node_id", '')
-    selected = request.POST.get("selected", '')
-    choice = request.POST.get("choice", '')
-    # node = node_collection.one({'_id': ObjectId(node_id) })
+  # if request.is_ajax() and request.method == "POST":
+  node_id = request.GET.get("node_id", '')
+  selected = request.GET.get("selected", '')
+  choice = request.GET.get("choice", '')
+  # node = node_collection.one({'_id': ObjectId(node_id) })
 
-    contents = get_contents(node_id, selected, choice)
+  contents = get_contents(node_id, selected, choice)
 
-    return HttpResponse(json.dumps(contents))
+  return HttpResponse(json.dumps(contents))
 
 
 ####Bellow part is for manipulating theme topic hierarchy####
@@ -807,7 +889,8 @@ def get_inner_collection(collection_list, node, no_res=False):
   inner_list_append_temp=inner_list.append #a temp. variable which stores the lookup for append method
 
   # if not no_res or not res_flag:
-  if not no_res or (not "CourseUnitEvent" in node.member_of_names_list):
+  is_unit = any(mem_of_name in ["CourseUnit", "CourseUnitEvent"] for mem_of_name in node.member_of_names_list)
+  if not no_res or not is_unit:
     if node.collection_set:
       for each in node.collection_set:
         col_obj = node_collection.one({'_id': ObjectId(each)})
@@ -824,7 +907,7 @@ def get_inner_collection(collection_list, node, no_res=False):
               #   # print "\n completed_ids -- ",completed_ids
               #   # print "\n\n col_obj ---- ", col_obj.name, " - - ",col_obj.member_of_names_list, " -- ", col_obj._id
               # else:
-              inner_sub_dict = {'name': col_obj.name, 'id': col_obj.pk,'node_type': node_type}
+              inner_sub_dict = {'name': col_obj.name, 'id': col_obj.pk,'node_type': node_type,"type":"division"}
               inner_sub_list = [inner_sub_dict]
               inner_sub_list = get_inner_collection(inner_sub_list, col_obj, no_res)
               # if "CourseSubSectionEvent" == node_type:
@@ -852,7 +935,7 @@ def get_inner_collection(collection_list, node, no_res=False):
       return collection_list
     else:
       return collection_list
-  elif "CourseUnitEvent" in node.member_of_names_list:
+  elif is_unit:
     for cl in collection_list:
       if cl['id'] == node.pk:
         col_set = node.collection_set
@@ -864,28 +947,31 @@ def get_inner_collection(collection_list, node, no_res=False):
 @get_execution_time
 def get_collection(request, group_id, node_id, no_res=False):
   try:
-    cache_key = u'get_collection' + unicode(group_id) + "_" + unicode(node_id)
-    cache_result = cache.get(cache_key)
-    if cache_result:
-      return HttpResponse(cache_result)
+    # cache_key = u'get_collection' + unicode(group_id) + "_" + unicode(node_id)
+    # cache_result = cache.get(cache_key)
+    # if cache_result:
+    #   return HttpResponse(cache_result)
 
     node = node_collection.one({'_id':ObjectId(node_id)})
     # print "\nnode: ",node.name,"\n"
     collection_list = []
     gstaff_access = False
     gstaff_access = check_is_gstaff(group_id,request.user)
-
     for each in node.collection_set:
       obj = node_collection.one({'_id': ObjectId(each) })
       if obj:
         node_type = node_collection.one({'_id': ObjectId(obj.member_of[0])}).name
-        collection_list.append({'name':obj.name,'id':obj.pk,'node_type':node_type})
+        # print "000000000000000000000",node.name
+        
+        collection_list.append({'name':obj.name,'id':obj.pk,'node_type':node_type,'type' : "branch"})
         # collection_list = get_inner_collection(collection_list, obj, gstaff_access, completed_ids_list, incompleted_ids_list)
+        if "BaseCourseGroup" in node.member_of_names_list:
+          no_res = True
         collection_list = get_inner_collection(collection_list, obj, no_res)
     data = collection_list
     updated_data = []
     # print data
-    cache.set(cache_key, json.dumps(data), 60*15)
+    # cache.set(cache_key, json.dumps(data), 60*15)
 
     return HttpResponse(json.dumps(data))
 
@@ -928,11 +1014,20 @@ def add_sub_themes(request, group_id):
 def add_theme_item(request, group_id):
   if request.is_ajax() and request.method == "POST":
 
+    existing_id = request.POST.get("existing_id", '')
+      
     context_theme_id = request.POST.get("context_theme", '')
     name =request.POST.get('name','')
+    parent_node_id =request.POST.get('parent_id','')
+    is_topic =request.POST.get('is_topic','')
 
     context_theme = node_collection.one({'_id': ObjectId(context_theme_id) })
-
+    if existing_id:
+      existing_node = Node.get_node_by_id(ObjectId(existing_id))
+      if existing_node:
+        existing_node.name = unicode(name)
+        existing_node.save()
+        return HttpResponse("success")
     list_theme_items = []
     if name and context_theme:
 
@@ -942,12 +1037,17 @@ def add_theme_item(request, group_id):
           return HttpResponse("failure")
 
       theme_item_node = node_collection.collection.GSystem()
-
-      theme_item_node.save(is_changed=get_node_common_fields(request, theme_item_node, group_id, theme_item_GST),groupid=group_id)
+      if is_topic == "True":
+        theme_item_node.save(is_changed=get_node_common_fields(request, theme_item_node, group_id, topic_GST),groupid=group_id)
+      else:
+        theme_item_node.save(is_changed=get_node_common_fields(request, theme_item_node, group_id, theme_item_GST),groupid=group_id)
       theme_item_node.reload()
 
       # Add this theme item into context theme's collection_set
-      node_collection.collection.update({'_id': context_theme._id}, {'$push': {'collection_set': ObjectId(theme_item_node._id) }}, upsert=False, multi=False)
+      if parent_node_id:
+        node_collection.collection.update({'_id': ObjectId(parent_node_id)}, {'$push': {'collection_set': ObjectId(theme_item_node._id) }}, upsert=False, multi=False)
+      else:
+        node_collection.collection.update({'_id': context_theme._id}, {'$push': {'collection_set': ObjectId(theme_item_node._id) }}, upsert=False, multi=False)
       context_theme.reload()
 
     return HttpResponse("success")
@@ -988,7 +1088,6 @@ def add_topics(request, group_id):
 def add_page(request, group_id):
   is_create_note = request.POST.get("is_create_note", '')
   tags = request.POST.get("tags", '')
-  print "\ninside add_page",request
   if request.is_ajax() and request.method == "POST" and  is_create_note == "True":
       blog_type = request.POST.get("blog_type", '')
       # return HttpResponseRedirect(reverse('page_create_edit', kwargs={'group_id': group_id}))
@@ -1004,11 +1103,11 @@ def add_page(request, group_id):
         create_gattribute(page_node._id, discussion_enable_at, True)
         return_status = create_thread_for_node(request,group_id, page_node)
       page_node.save()
-      return HttpResponseRedirect(reverse('course_notebook_tab_note',
+      return HttpResponseRedirect(reverse('course_notebook_note',
                                     kwargs={
                                             'group_id': group_id,
-                                            'tab': 'my-notes',
-                                            'notebook_id': page_node._id
+                                            'node_id': page_node._id,
+                                            # 'tab': 'my-notes'
                                             })
                                       )
 
@@ -1377,7 +1476,7 @@ def sotore_md5_module_set(object_id, module_set_md5):
     if node_at is not None:
         try:
             attr_obj = triple_collection.collection.GAttribute()                #created instance of attribute class
-            attr_obj.attribute_type = node_at
+            attr_obj.attribute_type = node_at._id
             attr_obj.subject = object_id
             attr_obj.object_value = unicode(module_set_md5)
             attr_obj.save()
@@ -1398,7 +1497,7 @@ def create_version_of_module(subject_id, node_id):
     This method will create attribute version_no of module with at type version
     '''
     rt_has_module = node_collection.one({'_type':'RelationType', 'name':'has_module'})
-    relation = triple_collection.find({'_type': 'GRelation', 'subject': node_id, 'relation_type.$id':rt_has_module._id})
+    relation = triple_collection.find({'_type': 'GRelation', 'subject': node_id, 'relation_type':rt_has_module._id})
     at_version = node_collection.one({'_type':'AttributeType', 'name':'version'})
     attr_versions = []
     if relation.count() > 0:
@@ -1407,7 +1506,7 @@ def create_version_of_module(subject_id, node_id):
             if module_id:
                 attr = triple_collection.one({
                     '_type': 'GAttribute', 'subject': ObjectId(module_id.right_subject),
-                    'attribute_type.$id': at_version._id
+                    'attribute_type': at_version._id
                 })
             if attr:
                 attr_versions.append(attr.object_value)
@@ -1416,13 +1515,13 @@ def create_version_of_module(subject_id, node_id):
         attr_versions.sort()
         attr_ver = float(attr_versions[-1])
         attr = triple_collection.collection.GAttribute()
-        attr.attribute_type = at_version
+        attr.attribute_type = at_version._id
         attr.subject = subject_id
         attr.object_value = round((attr_ver+0.1),1)
         attr.save()
     else:
         attr = triple_collection.collection.GAttribute()
-        attr.attribute_type = at_version
+        attr.attribute_type = at_version._id
         attr.subject = ObjectId(subject_id)
         attr.object_value = 1
         attr.save()
@@ -1433,7 +1532,7 @@ def create_relation_of_module(subject_id, right_subject_id):
     rt_has_module = node_collection.one({'_type': 'RelationType', 'name': 'has_module'})
     if rt_has_module and subject_id and right_subject_id:
         relation = triple_collection.collection.GRelation()                         #instance of GRelation class
-        relation.relation_type = rt_has_module
+        relation.relation_type = rt_has_module._id
         relation.right_subject = right_subject_id
         relation.subject = subject_id
         relation.save()
@@ -1445,7 +1544,7 @@ def check_module_exits(module_set_md5):
     This method will check is module already exits ?
     '''
     node_at = node_collection.one({'$and':[{'_type': 'AttributeType'},{'name': 'module_set_md5'}]})
-    attribute = triple_collection.one({'_type':'GAttribute', 'attribute_type.$id': node_at._id, 'object_value': module_set_md5})
+    attribute = triple_collection.one({'_type':'GAttribute', 'attribute_type': node_at._id, 'object_value': module_set_md5})
     if attribute is not None:
         return 'True'
     else:
@@ -1530,7 +1629,7 @@ def graph_nodes(request, group_id):
                       "_type", "contributors", "created_by", "modified_by", "last_update", "url", "featured", "relation_set", "access_policy", "snapshot",
                       "created_at", "group_set", "type_of", "content_org", "author_set",
                       "fs_file_ids", "file_size", "mime_type", "location", "language",
-                      "property_order", "rating", "apps_list", "annotations", "instance of"
+                      "property_order", "rating", "apps_list", "annotations", "instance of","if_file"
                     ]
 
   # username = User.objects.get(id=page_node.created_by).username
@@ -1767,7 +1866,7 @@ def get_data_for_batch_drawer(request, group_id):
     batch_coll = node_collection.find({"_type": "GSystem", 'member_of':st._id, 'group_set': {'$all': [ObjectId(group_id)]}})
     if node_id:
         rt_has_batch_member = node_collection.one({'_type':'RelationType','name':'has_batch_member'})
-        relation_coll = triple_collection.find({'_type':'GRelation', 'right_subject':ObjectId(node_id), 'relation_type.$id':rt_has_batch_member._id})
+        relation_coll = triple_collection.find({'_type':'GRelation', 'right_subject':ObjectId(node_id), 'relation_type':rt_has_batch_member._id})
         for each in relation_coll:
             dic = {}
             n = triple_collection.one({'_id':ObjectId(each.subject)})
@@ -1861,7 +1960,7 @@ def get_data_for_event_task(request, group_id):
     year = request.GET.get('start','')[0:4]
     start = datetime.datetime(int(currentYear), int(month), 1)
     task_start = str(int(month))+"/"+"01"+"/"+str(int(year))
-    
+
     now = datetime.datetime.now()
     e_status = node_collection.one({'_type' : 'AttributeType' , 'name': 'event_status'})
 
@@ -1871,7 +1970,7 @@ def get_data_for_event_task(request, group_id):
     elif int(month) in list30:
      end=datetime.datetime(int(currentYear),int(month), 30)
      task_end=str(int(month))+"/"+"30"+"/"+str(int(year))
-    # Check for leap year 
+    # Check for leap year
     elif currentYear%4 == 0:
       if currentYear%100 == 0:
         if currentYear%400 == 0:
@@ -1885,12 +1984,12 @@ def get_data_for_event_task(request, group_id):
         task_end=str(int(month))+"/"+"29"+"/"+str(int(year))
     else:
        end=datetime.datetime(int(currentYear),int(month), 28)
-       task_end=str(int(month))+"/"+"28"+"/"+str(int(year))       
+       task_end=str(int(month))+"/"+"28"+"/"+str(int(year))
 
     #day_list of events
 
     # For including events on the last date of the month uptill 00:00:00 of first date of next month
-    end = end + datetime.timedelta(days = 1)   
+    end = end + datetime.timedelta(days = 1)
 
     if no == '1' or no == '2':
        #condition to search events only in case of above condition so that it
@@ -1916,10 +2015,10 @@ def get_data_for_event_task(request, group_id):
             if unicode('end_time') in j.keys():
               end_time = j['end_time']
             elif unicode('event_status') in j.keys():
-              status = j['event_status']  
+              status = j['event_status']
 
           if now > end_time and status == "Scheduled":
-            create_gattribute(i._id , e_status , unicode("Completed")) 
+            create_gattribute(i._id , e_status , unicode("Completed"))
             status = "Completed"
 
           if status == "Rescheduled":
@@ -1927,7 +2026,7 @@ def get_data_for_event_task(request, group_id):
           if status == "Completed":
             update({'backgroundColor':'green'})
           if status == "Incomplete":
-            update({'backgroundColor':'red'})       
+            update({'backgroundColor':'red'})
 
           append(dict(attr_value))
 
@@ -1965,7 +2064,7 @@ def get_data_for_event_task(request, group_id):
                 GST_TASK = node_collection.one({'_type': "GSystemType", 'name': 'Task'})
                 task_nodes = node_collection.find({"_type": "GSystem", 'member_of':GST_TASK._id, 'group_set': ObjectId(group_id)})
           if groupname._type == "Author":
-                task_nodes = triple_collection.find({"_type":"GAttribute", "attribute_type.$id":attributetype_assignee._id, "object_value":request.user.id}).sort('last_update',-1)
+                task_nodes = triple_collection.find({"_type":"GAttribute", "attribute_type":attributetype_assignee._id, "object_value":request.user.id}).sort('last_update',-1)
           for attr in task_nodes:
            if groupname._type == "Group":
                task_node = node_collection.one({'_id':attr._id})
@@ -1973,7 +2072,7 @@ def get_data_for_event_task(request, group_id):
                task_node = node_collection.one({'_id':attr.subject})
            if task_node:
                         attr1=triple_collection.find_one({
-                            "_type":"GAttribute", "subject":task_node._id, "attribute_type.$id":attributetype_key1._id,
+                            "_type":"GAttribute", "subject":task_node._id, "attribute_type":attributetype_key1._id,
                             'object_value':{'$gte':task_start,'$lte':task_end}
                          })
                         attr_value={}
@@ -2198,12 +2297,11 @@ def get_visited_location(request, group_id):
   return StreamingHttpResponse(json.dumps(visited_location))
 
 
+'''
 @login_required
 @get_execution_time
 def get_online_editing_user(request, group_id):
-    '''
-    get user who is currently online and editing the node
-    '''
+    #get user who is currently online and editing the node
     if request.is_ajax() and request.method == "POST":
         editorid = request.POST.get('editorid', "")
     viewobj = ViewObj.objects.filter(filename=editorid)
@@ -2225,6 +2323,7 @@ def get_online_editing_user(request, group_id):
         userslist.append("No users")
 
     return StreamingHttpResponse(json.dumps(userslist).encode('utf-8'),content_type="text/json")
+'''
 
 @get_execution_time
 def view_articles(request, group_id):
@@ -2244,7 +2343,7 @@ def view_articles(request, group_id):
       for every in ref_entry:
 
         id=every._id
-        gst_attribute=triple_collection.one({"_type": "GAttribute", 'subject': ObjectId(every._id), 'attribute_type.$id':ObjectId(GST_one._id)})
+        gst_attribute=triple_collection.one({"_type": "GAttribute", 'subject': ObjectId(every._id), 'attribute_type':ObjectId(GST_one._id)})
         cite=gst_attribute.object_value
         dict1 = {'name': every.name, 'cite': cite}
         list_entry.append(dict1)
@@ -2267,7 +2366,7 @@ def get_author_set_users(request, group_id):
         # course_name = ""
         # rt_has_course = node_collection.one({'_type':'RelationType', 'name':'has_course'})
         # if rt_has_course and node._id:
-        #     course = triple_collection.one({"_type": "GRelation", 'right_subject':node._id, 'relation_type.$id':rt_has_course._id})
+        #     course = triple_collection.one({"_type": "GRelation", 'right_subject':node._id, 'relation_type':rt_has_course._id})
         #     if course:
         #         course_name = node_collection.one({'_id':ObjectId(course.subject)}).name
         if node.created_by == request.user.id:
@@ -3058,20 +3157,20 @@ def set_user_link(request, group_id):
 
           colleges = triple_collection.find({
               '_type': "GRelation", 'subject': node._id,
-              'relation_type.$id': student_belonds_to_college._id
+              'relation_type': student_belonds_to_college._id
           })
 
           for each in colleges:
-            g = triple_collection.one({'_type': "GRelation", 'subject': each.right_subject, 'relation_type.$id': has_group._id})
+            g = triple_collection.one({'_type': "GRelation", 'subject': each.right_subject, 'relation_type': has_group._id})
             node_collection.collection.update({'_id': g.right_subject}, {'$addToSet': {'author_set': author.created_by}}, upsert=False, multi=False)
 
         elif "Voluntary Teacher" in node_type:
           trainer_of_college = node_collection.one({'_type': "RelationType", 'name': "trainer_of_college"}, {'_id': 1})
 
-          colleges = triple_collection.find({'_type': "GRelation", 'subject': node._id, 'relation_type.$id': trainer_of_college._id})
+          colleges = triple_collection.find({'_type': "GRelation", 'subject': node._id, 'relation_type': trainer_of_college._id})
 
           for each in colleges:
-            g = triple_collection.one({'_type': "GRelation", 'subject': each.right_subject, 'relation_type.$id': has_group._id})
+            g = triple_collection.one({'_type': "GRelation", 'subject': each.right_subject, 'relation_type': has_group._id})
             node_collection.collection.update({'_id': g.right_subject}, {'$addToSet': {'author_set': author.created_by}}, upsert=False, multi=False)
 
 
@@ -3260,7 +3359,7 @@ def get_districts(request, group_id):
       if rt_district_of:
         cur_districts = triple_collection.find({
             '_type': "GRelation", 'right_subject': ObjectId(state_id),
-            'relation_type.$id': rt_district_of._id
+            'relation_type': rt_district_of._id
         }).sort('name', 1)
 
         if cur_districts.count():
@@ -5601,11 +5700,11 @@ def page_scroll(request,group_id,page):
     paged_resources = Paginator(group_obj,group_obj.count())
   files_list = []
   user_activity = []
-  tot_page=paged_resources.num_pages
-  if int(page) <= int(tot_page):
+  # tot_page=paged_resources.num_pages
+  if paged_resources.count and (int(page) <= int(paged_resources.num_pages)):
     if int(page)==1:
       page='1'
-    if int(page) != int(tot_page) and int(page) != int(1):
+    if int(page) != int(paged_resources.num_pages) and int(page) != int(1):
       page=int(page)+1
     # temp. variables which stores the lookup for append method
     user_activity_append_temp=user_activity.append
@@ -6277,6 +6376,12 @@ def get_gin_line_template(request,group_id,node_id):
 def course_create_collection(request, group_id):
   is_create_collection =  request.GET.get('is_create_collection','')
   is_add_to_collection =  request.GET.get('is_add_to_collection','')
+  is_raw_material =  request.GET.get('is_raw_material','')
+  is_gallery =  request.GET.get('is_gallery','')
+  if is_raw_material == "true":
+    coll_redir = "raw-material"
+  else:
+    coll_redir = "gallery"
   result_cur = node_collection.find({
                           'member_of': {'$in': [GST_FILE._id, GST_PAGE._id]},
                                             'group_set': {'$all': [ObjectId(group_id)]},
@@ -6295,7 +6400,7 @@ def course_create_collection(request, group_id):
 
   return render_to_response('ndf/course_create_collection.html',
     {
-      "group_id":group_id,"result_cur":result_cur,"is_create_collection":is_create_collection,"is_add_to_collection":is_add_to_collection
+     "coll_redir" :coll_redir ,"group_id":group_id,"result_cur":result_cur,"is_create_collection":is_create_collection,"is_add_to_collection":is_add_to_collection
     },context_instance=RequestContext(request))
 
 @get_execution_time
@@ -6314,6 +6419,21 @@ def course_create_note(request, group_id):
         "group_id":group_id,"img_res":img_res,"audio_res":audio_res,"video_res":video_res
       },context_instance=RequestContext(request))
 
+@get_execution_time
+def adminRenderGraph(request,group_id,node_id=None,graph_type="concept"):
+  '''
+  Renders the Concept Graph, Collection Graph, Dependency Graph
+  '''
+  try :
+    if request.is_ajax() and request.method == "GET":
+      if node_id:
+          req_node = node_collection.one({'_type':'GSystem','_id':ObjectId(node_id)})
+      template = "ndf/graph_"+graph_type+".html"
+      variable = RequestContext(request, { 'group_id':group_id,'groupid':group_id , 'node':req_node })
+      return render_to_response(template, { 'group_id':group_id,'groupid':group_id , 'node':req_node })
+  except Exception as e :
+    print "from "+ graph_type +" Graph, exception",e,"\n\n"
+
 @login_required
 @get_execution_time
 def upload_file_ckeditor(request,group_id):
@@ -6330,7 +6450,7 @@ def upload_file_ckeditor(request,group_id):
 
     gs_obj_list = write_files(request, group_id)
     gs_obj_id = gs_obj_list[0]['if_file']['original']['relurl']
-    # print "gs_obj_list: ", gs_obj_list
+    print "gs_obj_list: ", gs_obj_id
 
     discussion_enable_at = node_collection.one({"_type": "AttributeType", "name": "discussion_enable"})
     for each_gs_file in gs_obj_list:
@@ -6377,8 +6497,24 @@ def search_users(request, group_id):
     if request.is_ajax() and request.method == "GET":
         from bson import json_util
         username_str = request.GET.get("username_str", '')
-        filtered_users = User.objects.filter(username__icontains=str(username_str)).values_list('id', 'username')
-        # print "filtered_users ;; ", len(filtered_users)
+        subscription_status_val = request.GET.get("subscription_status_val", '')
+        if subscription_status_val:
+            filtered_users = []
+            users_data = User.objects.filter(username__icontains=str(username_str)).values_list('id', 'username')
+            group_object = node_collection.one({'_id': ObjectId(group_id)})
+            for each_filtered_user in users_data:
+                if each_filtered_user[0] in group_object.author_set:
+                    if each_filtered_user[0] in group_object.group_admin:
+                        filtered_users.append(each_filtered_user+(True,True))
+                    else:
+                        filtered_users.append(each_filtered_user+(True,False))
+                else:
+                    if each_filtered_user[0] in group_object.group_admin:
+                        filtered_users.append(each_filtered_user+(False,True))
+                    else:
+                        filtered_users.append(each_filtered_user+(False,False))
+        else:
+            filtered_users = User.objects.filter(username__icontains=str(username_str)).values_list('id', 'username')
         return HttpResponse(json_util.dumps(filtered_users, cls=NodeJSONEncoder))
 
 
@@ -6415,12 +6551,583 @@ def upload_video_thumbnail(request,group_id):
     if gs_obj_id:
       gs_obj_node = node_collection.one({'_id':ObjectId(gs_obj_id)})
       pr_obj_node = node_collection.one({'_id':ObjectId(parent_node)})
-      
+
       has_thumbnail_rt = node_collection.one({'_type': 'RelationType', 'name': unicode('has_thumbnail') })
-      
+
       gr_node = create_grelation(pr_obj_node._id, has_thumbnail_rt, gs_obj_id)
       # print "\n\n\ngr_node",gr_node
       warehouse_grp_obj = node_collection.one({'_type': "Group", 'name': "warehouse"})
       node_collection.collection.update({'_id': ObjectId(gs_obj_id)}, {'$set': {'group_set': [warehouse_grp_obj._id] }}, upsert=False, multi=False)
 
     return StreamingHttpResponse(str(gs_obj_id))
+
+
+@get_execution_time
+def get_paged_images(request, group_id):
+  is_create_collection =  request.GET.get('is_create_collection','')
+  is_add_to_collection =  request.GET.get('is_add_to_collection','')
+  result_cur = node_collection.find({
+                          'member_of': {'$in': [GST_FILE._id, GST_PAGE._id]},
+                                            'group_set': {'$all': [ObjectId(group_id)]},
+                                            '$or': [
+                                                {'access_policy': u"PUBLIC"},
+                                                {'$and': [
+                                                    {'access_policy': u"PRIVATE"},
+                                                    {'created_by': request.user.id}
+                                                ]
+                                             }
+                                            ],
+                                            'collection_set': {'$exists': "true", '$not': {'$size': 0} }
+                                        }).sort("last_update", -1)
+  # print "\n\n\n result",result_cur.count()
+
+
+  return render_to_response('ndf/course_create_collection.html',
+    {
+      "group_id":group_id,"result_cur":result_cur,"is_create_collection":is_create_collection,"is_add_to_collection":is_add_to_collection
+    },context_instance=RequestContext(request))
+
+
+@get_execution_time
+def get_templates_page(request, group_id):
+  try:
+      group_id = ObjectId(group_id)
+  except:
+      group_name, group_id = get_group_name_id(group_id)
+  templates_gst = node_collection.one({"_type":"GSystemType","name":"Template"})
+  if templates_gst._id:
+    # templates_cur = node_collection.find({"member_of":ObjectId(GST_PAGE._id),"type_of":ObjectId(templates_gst._id)})
+    templates_cur = node_collection.find({"type_of":ObjectId(templates_gst._id)})
+  template = "ndf/templates_list.html"
+  already_uploaded=request.GET.getlist('var',"")
+  variable = RequestContext(request, {'groupid':group_id,'group_id':group_id,'templates_cur':templates_cur })
+  return render_to_response(template, variable)
+
+
+@get_execution_time
+def get_group_templates_page(request, group_id):
+  # try:
+  #     group_id = ObjectId(group_id)
+  # except:
+  #     group_name, group_id = get_group_name_id(group_id)
+  templates_gst = node_collection.one({"_type":"GSystemType","name":"Template"})
+  if templates_gst:
+    templates_cur = node_collection.find({"member_of":ObjectId(GST_PAGE._id),"type_of":ObjectId(templates_gst._id)})
+  template = "ndf/group_templates_list.html"
+  # already_uploaded=request.GET.getlist('var',"")
+  variable = RequestContext(request, {'templates_cur':templates_cur })
+  return render_to_response(template, variable)
+
+'''
+@login_required
+def get_group_pages(request, group_id):
+    except_collection_set_of_id = request.GET.get('except_collection_set_of_id', None)
+    except_collection_set_of_obj = Node.get_node_by_id(except_collection_set_of_id)
+    except_collection_set = []
+    if except_collection_set_of_obj:
+        except_collection_set = except_collection_set_of_obj.collection_set
+    gst_page_name, gst_page_id = GSystemType.get_gst_name_id('Page')
+    gst_blog_page_name, gst_blog_page_id = GSystemType.get_gst_name_id('Blog page')
+    gst_info_page_name, gst_info_page_id = GSystemType.get_gst_name_id('Info page')
+    pages_cur = node_collection.find({
+                                      '_type': 'GSystem',
+                                      'member_of': ObjectId(gst_page_id),
+                                      'type_of': {'$nin': [gst_blog_page_id, gst_info_page_id]},
+                                      'group_set': ObjectId(group_id),
+                                      '_id': {'$nin': except_collection_set}
+                                    }).sort('last_update', -1)
+    template = "ndf/group_pages.html"
+    card_class = 'activity-page'
+    variable = RequestContext(request, {'cursor': pages_cur, 'groupid': group_id, 'group_id': group_id, 'card_class': card_class })
+    return render_to_response(template, variable)
+'''
+
+@login_required
+def get_group_resources(request, group_id, res_type="Page"):
+    except_collection_set = []
+    res_cur = None
+    template = "ndf/group_pages.html"
+    card_class = 'activity-page'
+
+    try:
+        res_query = {'_type': 'GSystem'}
+        except_collection_set_of_id = request.GET.get('except_collection_set_of_id', None)
+
+        except_collection_set_of_obj = Node.get_node_by_id(except_collection_set_of_id)
+        if except_collection_set_of_obj:
+            except_collection_set = except_collection_set_of_obj.collection_set
+            if except_collection_set:
+                res_query.update({'_id': {'$nin': except_collection_set}})
+        if res_type.lower() == "page":
+            gst_page_name, gst_page_id = GSystemType.get_gst_name_id('Page')
+            gst_blog_type_name, gst_blog_type_id = GSystemType.get_gst_name_id("Blog page")
+            gst_info_type_name, gst_info_type_id = GSystemType.get_gst_name_id("Info page")
+            res_query.update({'type_of': {'$nin': [gst_blog_type_id, gst_info_type_id]}})
+            res_query.update({'member_of': gst_page_id})
+
+        elif res_type.lower() == "quiz":
+            gst_quizitem_name, gst_quizitem_id = GSystemType.get_gst_name_id('QuizItem')
+            gst_quizitemevent_name, gst_quizitemevent_id = GSystemType.get_gst_name_id('QuizItemEvent')
+            res_query.update({'member_of': {"$in": [gst_quizitem_id, gst_quizitemevent_id]}})
+        res_cur = node_collection.find(res_query).sort('last_update', -1)
+    except Exception as get_group_resources_err:
+      print "\n Error occurred in get_group_resources(). Error: {0}".format(str(get_group_resources_err))
+      pass
+
+    variable = RequestContext(request, {'cursor': res_cur, 'groupid': group_id, 'group_id': group_id, 'card_class': card_class })
+    return render_to_response(template, variable)
+
+def get_info_pages(request, group_id):
+    node_id = request.POST.get("node_id", '')
+    page_type = request.POST.get("page_type", '')
+    node  = Node.get_node_obj_from_id_or_obj(node_id, GSystem)
+    template = "ndf/get_info_pages.html"
+    variable = RequestContext(request, {'node': node, 'groupid': group_id, 'group_id': group_id,'page_type':unicode(page_type) })
+    return render_to_response(template, variable)
+
+
+@get_execution_time
+def add_transcript(request, group_id):
+  try:
+      group_id = ObjectId(group_id)
+  except:
+      group_name, group_id = get_group_name_id(group_id)
+  if request.is_ajax() and request.method == "POST":
+    node_id = request.POST.get("nodeid", '')
+    trans_text = request.POST.get("transcript_text", '')
+    trans_of  = node_collection.one({'$and':[{'name':'has_transcript'},{'_type':'AttributeType'}]})
+    if node_id and trans_of:
+      create_gattribute(ObjectId(node_id), trans_of,unicode(trans_text))
+
+  return HttpResponse(json.dumps("success"))
+
+
+@get_execution_time
+def get_video_player(request, group_id):
+  try:
+      group_id = ObjectId(group_id)
+  except:
+      group_name, group_id = get_group_name_id(group_id)
+  node_id = request.GET.get("datasrc", '')
+  if node_id:
+    node_obj = node_collection.one({'_id': ObjectId(node_id) })
+  return render_to_response('ndf/widget_video_player.html',
+            {
+                'group_id': group_id, 'groupid': group_id,'video_obj':node_obj
+            },
+            context_instance=RequestContext(request))
+
+@get_execution_time
+def get_audio_player(request, group_id):
+  try:
+      group_id = ObjectId(group_id)
+  except:
+      group_name, group_id = get_group_name_id(group_id)
+  node_id = request.GET.get("datasrc", '')
+  if node_id:
+    node_obj = node_collection.one({'_id': ObjectId(node_id) })
+
+  return render_to_response('ndf/widget_audio_player.html',
+            {
+                'group_id': group_id, 'groupid': group_id,'audio_obj':node_obj
+            },
+            context_instance=RequestContext(request))
+
+@login_required
+@get_execution_time
+def get_jhapps(request,group_id):
+  try:
+      group_id = ObjectId(group_id)
+  except:
+      group_name, group_id = get_group_name_id(group_id)
+
+  group_obj = node_collection.one({'_id': ObjectId(group_id)})
+  jhapp_list = []
+  for each in GSTUDIO_SUPPORTED_JHAPPS:
+    each_node = node_collection.one({'name':unicode(each)})
+    if each_node:
+      jhapp_list.append(ObjectId(each_node._id))
+  jhapp_res = node_collection.find({'member_of': {'$in': jhapp_list}})
+
+  return render_to_response("ndf/jhapp_list.html",RequestContext(request, {"groupid":group_id, "group_id":group_id,'jhapp_res':jhapp_res}))
+
+@login_required
+@get_execution_time
+def add_asset(request,group_id):
+  try:
+      group_id = ObjectId(group_id)
+  except:
+      group_name, group_id = get_group_name_id(group_id)
+  group_obj = Group.get_group_name_id(group_id, get_obj=True)
+
+  topic_gst = node_collection.one({'_type': 'GSystemType', 'name': 'Topic'})
+  topic_nodes = node_collection.find({'member_of': {'$in': [topic_gst._id]}})
+  context_variables = {'group_id':group_id, 'groupid':group_id,'edit': False}
+  node_id = request.GET.get('node_id', None)
+  title = request.GET.get('title', None)
+  node_obj = node_collection.one({'_id': ObjectId(node_id)})
+  if node_obj:
+    context_variables.update({'asset_obj': node_obj,'topic_nodes':topic_nodes})
+    context_variables.update({'edit': True})
+  context_variables.update({'group_obj': group_obj,'title':title,'topic_nodes':topic_nodes})
+  return render_to_response("ndf/add_asset.html",RequestContext(request,
+    context_variables))
+
+@login_required
+@get_execution_time
+def create_edit_asset(request,group_id):
+  
+  try:
+      group_id = ObjectId(group_id)
+  except:
+      group_name, group_id = get_group_name_id(group_id)
+  
+  group_obj = Group.get_group_name_id(group_id, get_obj=True)
+  selected_topic =  request.POST.get("topic_list", '')
+  # selected_topic_list =  request.POST.getlist("coll_arr[]", '')
+  
+  if request.method == "POST":
+    asset_name =  str(request.POST.get("asset_name", '')).strip()
+    asset_disp_name =  str(request.POST.get("asset_disp_name", '')).strip()
+    asset_desc =  str(request.POST.get("asset_description", '')).strip()
+    title =  request.POST.get("title", '')
+    tags =  request.POST.get("sel_tags", [])
+
+    if tags:
+        tags = json.loads(tags)
+    else:
+        tags = []
+    
+    asset_lang =  request.POST.get("sel_asset_lang", '')
+    
+    is_raw_material = eval(request.POST.get('is_raw_material', "False"))
+    # print "\nis_raw_material: ", is_raw_material, " type: ", type(is_raw_material)
+
+    node_id = request.POST.get('node_id', None)
+    asset_obj = create_asset(name=asset_name, group_id=group_id,
+      created_by=request.user.id, content=unicode(asset_desc), node_id=node_id)
+
+
+    asset_obj.fill_gstystem_values(tags=tags)
+    
+    rt_teaches = node_collection.one({'_type': "RelationType", 'name': unicode("teaches")})
+    
+    if selected_topic:
+      # selected_topic_list = map(ObjectId,selected_topic_list)
+      create_grelation(asset_obj._id,rt_teaches,ObjectId(selected_topic))
+    
+    if "asset@asset" not in asset_obj.tags and "base_unit" in group_obj.member_of_names_list:
+      asset_obj.tags.append(u'asset@asset')
+
+    if is_raw_material and u'raw@material' not in asset_obj.tags and "base_unit" in group_obj.member_of_names_list:
+      asset_obj.tags.append(u'raw@material')
+    elif not is_raw_material and u'raw@material' in asset_obj.tags and "base_unit" in group_obj.member_of_names_list:
+      asset_obj.tags.remove(u'raw@material')
+    
+    if "announced_unit" in group_obj.member_of_names_list and title == "raw material":
+      asset_obj.tags.append(u'raw@material')
+    
+    if "announced_unit" in group_obj.member_of_names_list  or "Group" in group_obj.member_of_names_list and "gallery" == title:
+      asset_obj.tags.append(u'asset@gallery')    
+    
+    if asset_lang:
+      language = get_language_tuple(asset_lang)
+      asset_obj.language = language
+    if asset_disp_name:
+      asset_obj.altnames = unicode(asset_disp_name)
+    asset_obj.save()
+    thread_node = create_thread_for_node(request,group_id, asset_obj)
+
+    return HttpResponse("success")
+
+
+@login_required
+@get_execution_time
+def add_assetcontent(request,group_id):
+  asset_obj = request.POST.get('asset_obj','')
+  if_subtitle = request.POST.get('if_subtitle','')
+  if_transcript = request.POST.get('if_transcript','')
+  if_alt_lang_file = request.POST.get('if_alt_file','')
+  if_alt_format_file = request.POST.get('if_alt_format_file','')
+  assetcontentid = request.POST.get('assetcontentid','')
+
+  uploaded_files = request.FILES.getlist('filehive', [])
+  uploaded_transcript = request.FILES.getlist('uploaded_transcript', [])
+  uploaded_subtitle = request.FILES.getlist('uploaded_subtitle', [])
+  uploaded_alt_lang_file = request.FILES.getlist('uploaded_alt_lang_file', [])
+
+  subtitle_lang = request.POST.get('sel_sub_lang','')
+  # sel_alt_value = request.POST.get('sel_alt_value','')
+  alt_file_format = request.POST.get('sel_alt_fr_type','')
+
+  asset_cont_desc = request.POST.get('asset_cont_desc','')
+  asset_cont_name = request.POST.get('asset_cont_name','')
+  node_id = request.POST.get('node_id',None)
+  if if_subtitle == "True":
+    file_name = uploaded_subtitle[0].name
+    if not file_name:
+      file_name = asset_cont_name
+    subtitle_obj = create_assetcontent(asset_id=ObjectId(asset_obj),
+      name=file_name, group_name_or_id=group_id, created_by=request.user.id, 
+      files=uploaded_subtitle,resource_type='File', request=request)
+
+    rt_subtitle = node_collection.one({'_type':'RelationType', 'name':'has_subtitle'})
+    subtitle_list = [ObjectId(subtitle_obj._id)]
+
+    subtitle_grels = triple_collection.find({'_type': 'GRelation', \
+    'relation_type': rt_subtitle._id,'subject': ObjectId(assetcontentid)},
+    {'_id': 0, 'right_subject': 1})
+    for each_asset in subtitle_grels:
+      subtitle_list.append(each_asset['right_subject'])
+    #   sub_grel = create_grelation(ObjectId(assetcontentid), rt_subtitle, subtitle_list)
+
+    altlang_node = create_grelation(ObjectId(assetcontentid), rt_subtitle, subtitle_list, **{'triple_scope':{'relation_type_scope':{u'alt_language': unicode(subtitle_lang)}, 'subject_scope': "many"}})
+
+    return StreamingHttpResponse("success")
+
+
+  if if_transcript == "True":
+    file_name = uploaded_transcript[0].name
+    if not file_name:
+      file_name = asset_cont_name
+
+    rt_transcript = node_collection.one({'_type':'RelationType', 'name':'has_transcript'})
+    transcript_obj = create_assetcontent(asset_id=ObjectId(asset_obj),
+      name=file_name,  group_name_or_id=group_id, created_by=request.user.id, 
+      files=uploaded_transcript, resource_type='File', request=request)
+    transcript_list = [ObjectId(transcript_obj._id)]
+
+    transcript_grels = triple_collection.find({'_type': 'GRelation', \
+    'relation_type': rt_transcript._id,'subject': ObjectId(assetcontentid)},
+    {'_id': 0, 'right_subject': 1})
+    for each_trans in transcript_grels:
+      transcript_list.append(each_trans['right_subject'])
+    trans_grel = create_grelation(ObjectId(assetcontentid), rt_transcript, transcript_list)
+    return StreamingHttpResponse("success")
+
+  if if_alt_lang_file == "True":
+    file_name = uploaded_alt_lang_file[0].name
+    if not file_name:
+      file_name = asset_cont_name
+    alt_file_type = request.POST.get('alt_file_type','')
+    alt_lang_file_obj = create_assetcontent(asset_id=ObjectId(asset_obj), 
+      name=file_name, group_name_or_id=group_id, created_by=request.user.id,
+      files=uploaded_alt_lang_file,resource_type='File', request=request)
+    rt_alt_content = node_collection.one({'_type':'RelationType', 'name':'has_alt_content'})
+    alt_lang_file_list = [ObjectId(alt_lang_file_obj._id)]
+
+    alt_lang_file_grels = triple_collection.find({'_type': 'GRelation', \
+    'relation_type': rt_alt_content._id,'subject': ObjectId(assetcontentid)},
+    {'_id': 0, 'right_subject': 1})
+    for each_asset in alt_lang_file_grels:
+      alt_lang_file_list.append(each_asset['right_subject'])
+
+    alt_lang_file_node = create_grelation(ObjectId(assetcontentid), rt_alt_content, alt_lang_file_list, **{'triple_scope':{'relation_type_scope':{ alt_file_type : '' }, 'subject_scope': "many"}})
+
+    return StreamingHttpResponse("success")
+
+  create_assetcontent(ObjectId(asset_obj),asset_cont_name,group_id,
+    request.user.id,content=asset_cont_desc,files=uploaded_files,
+    resource_type='File', request=request)
+  return StreamingHttpResponse("success")
+
+
+def add_to_collection_set(request, group_id):
+    child_node_id = request.POST.get('child_node_id', None)
+    parent_node_id = request.POST.get('parent_node_id', None)
+
+    parent_node_obj = Node.get_node_by_id(parent_node_id)
+    if parent_node_obj and (ObjectId(child_node_id) not in parent_node_obj.collection_set):
+        parent_node_obj.collection_set.append(ObjectId(child_node_id))
+        parent_node_obj.save(group_id=group_id)
+        from gnowsys_ndf.ndf.views.unit import _get_unit_hierarchy
+        group_obj = Group.get_group_name_id(group_id, get_obj=True)
+        return HttpResponse(json.dumps(_get_unit_hierarchy(group_obj)))
+    else:
+        return HttpResponse(0)
+
+
+def delete_asset(request, group_id):
+    if_delete_asset = request.POST.get('delete_asset', '')
+    if_delete_asset_content = request.POST.get('delete_asset_content', '')
+    if if_delete_asset == "True":
+      asset_id = request.POST.get('asset_id', '')
+      asset_obj = node_collection.one({'_id':ObjectId(asset_id)})
+      if asset_obj:
+        trash_resource(request,ObjectId(group_id),asset_obj._id)
+      return HttpResponse('success')
+
+    if if_delete_asset_content:
+      file_list = request.POST.getlist('delete_files_list[]', '')
+      for each_file in file_list:
+        asset_cont_node = node_collection.one({'_id':ObjectId(each_file)})
+        if asset_cont_node:
+          trash_resource(request,ObjectId(group_id),ObjectId(asset_cont_node._id))
+          del_rel = delete_grelation(subject_id=ObjectId(asset_cont_node._id),deletion_type=0)
+          print '\nDeleted Node',del_rel
+      return HttpResponse('success')
+
+
+def get_metadata_page(request, group_id):
+  node_id = request.POST.get('node_id', None)
+  node_obj = node_collection.one({'_id':ObjectId(node_id)})
+  return render_to_response('ndf/widget_metadata.html',
+            {
+                'group_id': group_id, 'groupid': group_id,
+                'node_id':node_id,'node':node_obj
+            },
+            context_instance=RequestContext(request))
+
+def get_admin_page_form(request, group_id):
+  node_id = request.POST.get('node_id', None)
+  node_obj = node_collection.one({'_id':ObjectId(node_id)})
+  return render_to_response('ndf/widget_admin_page.html',
+           {
+              'group_id': group_id, 'groupid': group_id,
+              'node_id':node_id,'node':node_obj
+            },
+            context_instance=RequestContext(request))
+
+def get_help_page_form(request, group_id):
+  node_id = request.POST.get('node_id', None)
+  node_obj = node_collection.one({'_id':ObjectId(node_id)})
+  return render_to_response('ndf/widget_help_page.html',
+           {
+              'group_id': group_id, 'groupid': group_id,
+              'node_id':node_id,'node':node_obj
+            },
+            context_instance=RequestContext(request))
+
+def get_interaction_widget(request, group_id):
+  node_id = request.POST.get('node_id', None)
+  node_obj = node_collection.one({'_id':ObjectId(node_id)})
+  return render_to_response('ndf/widget_interaction.html',
+            {
+                'group_id': group_id, 'groupid': group_id,
+                'node_id':node_id,'node':node_obj
+            },
+            context_instance=RequestContext(request)) 
+
+def save_interactions(request, group_id):
+  group_obj = get_group_name_id(group_id, get_obj=True)
+  node_id = request.POST.get('node_id', None)
+  node  = node_collection.one({"_id":ObjectId(node_id)})
+
+  thread_create_val = request.POST.get("thread_create",'')
+
+  # print "\n\n help_info_page  === ", help_info_page
+  group_obj_member_of_names_list= group_obj.member_of_names_list
+  if "base_unit" in group_obj_member_of_names_list:
+    discussion_enable_at = node_collection.one({"_type": "AttributeType", "name": "player_discussion_enable"})
+  else:
+    discussion_enable_at = node_collection.one({"_type": "AttributeType", "name": "discussion_enable"})
+  if thread_create_val == "Yes":
+    create_gattribute(node._id, discussion_enable_at, True)
+    return_status = create_thread_for_node(request,group_id, node)
+  else:
+    create_gattribute(node._id, discussion_enable_at, False)
+  return HttpResponseRedirect(reverse('view_course_page', kwargs={'group_id':ObjectId(group_id),'page_id': ObjectId(node._id)}))
+  
+
+def save_metadata(request, group_id):
+  node_id = request.POST.get('node_id', None)
+  node  = node_collection.one({"_id":ObjectId(node_id)})
+  source = request.POST.get("source_val", "")
+  copyright = request.POST.get("copyright_val", "")
+  Based_url = request.POST.get("basedonurl_val", "")
+  obj_list = request.POST.get("obj_list", "")
+
+  if obj_list :
+    for k, v in json.loads(obj_list).iteritems():
+      attr_node = node_collection.one({'_type':'AttributeType','name':unicode(k)})
+      if v is not None and (not isinstance(v,list) and "select" not in v.lower()) or (isinstance(v,list) and "select" not in v[0].lower() ):
+        if attr_node:
+          create_gattribute(ObjectId(node_id), attr_node, v)
+      else:
+          ga_node = triple_collection.find_one({'_type': "GAttribute",
+               "subject": ObjectId(node_id), 'attribute_type': attr_node._id, 'status':"PUBLISHED"})
+          if ga_node:
+              d,dd = delete_gattribute(subject_id=None, deletion_type=1, **{'node_id': ga_node._id})
+  if source:
+    source_attr = node_collection.one({'_type':'AttributeType','name':'source'})
+    create_gattribute(ObjectId(node_id), source_attr, source)
+
+  if copyright:
+    node.legal.copyright = unicode(copyright)
+    node.save()
+
+  if Based_url:
+    basedurl_attr = node_collection.one({'_type':'AttributeType','name':'basedonurl'})
+    create_gattribute(ObjectId(node_id), basedurl_attr, Based_url)
+  if "Page" in node.member_of_names_list:
+    return HttpResponseRedirect(reverse('view_course_page', kwargs={'group_id':ObjectId(group_id),'page_id': ObjectId(node._id)}))
+  else:
+    return HttpResponseRedirect(reverse('asset_detail', kwargs={'group_id':ObjectId(group_id),'asset_id': ObjectId(node._id)}))
+  # return HttpResponse('success')
+
+def export_to_epub(request, group_id, node_id):
+    from gnowsys_ndf.ndf.views.export_to_epub import *
+    response_dict = {'success': False}
+    try:
+        node_obj = node_collection.one({'_id': ObjectId(node_id)})
+        epub_loc = create_epub(node_obj)
+        zip_file = open(epub_loc, 'rb')
+        response = HttpResponse(zip_file.read(), content_type="application/epub+zip")
+        response['Content-Disposition'] = 'attachment; filename="'+ slugify(node_obj.name) + '.epub"'
+        return response
+    except Exception as export_fail:
+        # print "\n export_fail: ", export_fail
+        pass
+    return HttpResponseRedirect(reverse('unit_detail', kwargs={'group_id': group_id}))
+
+def remove_related_doc(request, group_id):
+    node = request.POST.get('node', None)
+    selected_obj = request.POST.get('sel_file', None)
+    node_obj = node_collection.one({'_id': ObjectId(node)})
+
+    grel_name = request.POST.get('grel_name', None)
+    asset_obj = request.POST.get('asset_obj', None)
+    rel_node = triple_collection.one({'right_subject':ObjectId(selected_obj),'subject':ObjectId(node_obj.pk)})
+    delete_grelation(subject_id=ObjectId(node_obj.pk), deletion_type=1, **{'node_id': ObjectId(rel_node._id)})
+    return HttpResponse('success')
+
+def get_translated_node(request, group_id):
+    node_id = request.GET.get('node_id', None)
+    language = request.GET.get('language', None)
+    node_obj = Node.get_node_by_id(node_id)
+    trans_node = get_lang_node(node_obj._id,language)
+    if trans_node:
+      return HttpResponse(json.dumps(trans_node, cls=NodeJSONEncoder))
+    else:
+      return HttpResponse(json.dumps(node_obj, cls=NodeJSONEncoder))
+
+
+@get_execution_time
+def get_rating_template(request, group_id):
+  try:
+      group_id = ObjectId(group_id)
+  except:
+      group_name, group_id = get_group_name_id(group_id)
+    
+  node_id = request.GET.get('node_id', None)
+  node_obj = Node.get_node_by_id(ObjectId(node_id))
+  is_comments = request.GET.get('if_comments', None)
+  if is_comments == "True":
+    is_comments = True
+  else:
+    is_comments = False
+
+  return render_to_response('ndf/rating.html',
+            {
+              "group_id":group_id,"node":node_obj,"if_comments":is_comments,'nodeid':node_obj._id,
+            },
+            context_instance=RequestContext(request))
+
+def delete_curriculum_node(request, group_id):
+    node_id = request.POST.get('node_id', None)
+    node_obj = Node.get_node_by_id(node_id)
+    if node_obj:
+      trash_resource(request,ObjectId(group_id),ObjectId(node_id))
+      trash_resource(request,ObjectId(group_id),ObjectId(node_id))
+      return HttpResponse("Success")
+

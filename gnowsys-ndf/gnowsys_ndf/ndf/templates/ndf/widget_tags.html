@@ -1,0 +1,188 @@
+{% load i18n %}
+{% load ndf_tags %}
+{% load simple_filters %}
+<style type="text/css">
+	
+	#tags_error, #duplicate_tag{
+		color: red;
+	}
+
+	div.tags{
+		/*padding: 5px 10px; */
+		margin: 2px 5px;
+		/*color: white;*/
+		font-size: 1em;
+		border: solid thin #FFD400;
+	}
+
+	i.remove-tag{
+		padding-left: 8px;
+		font-size: 1.1em;
+		cursor: pointer;
+	}
+
+</style>
+
+	<div class="row">
+			<span>
+
+				<div class="row">
+					{% if not hide_lbl %}
+					<div class="small-3 columns add-tag-heading">
+						<h3>
+						<span  class="subheader small-3 columns"  data-tooltip class="has-tip" title="{% trans 'Tags help identify similiar work easily. Just add tag text and click Add Tag button' %}"> {% trans "Add Tag" %}:
+						</span>
+						</h3>
+					</div>
+					{% endif %}
+					<div class="small-8 columns tag-input-ele">
+						<div class="row collapse">
+							<div class="small-9 columns">
+						    	<input id="tags_id" tabindex="2" type="text" value="" placeholder="{% trans 'Add tag text and click on [Add Tag] button' %}">
+						    	<input type="hidden" value="{{node.tags|join:', '|default_if_none:""}}" name="tags">
+					        </div>
+					        <div class="small-3 columns">
+					          <span tabindex="3" id="add-tag-btn" class="tiny button radius orange-button add-tag-btn">{% trans 'Add Tag' %}</span>
+					        </div>
+						</div>
+
+					</div>
+				</div>
+
+				<!-- show tags error msg -->
+				<div class="row hide" id="tags_error">
+					<div class="small-10 columns small-push-2"></div>
+				</div>
+
+				<!-- show added tags -->
+				<div class="row added-tags-div">
+					<div id="added_tags" class="small-9 small-push-3 columns">
+						{% for each_tag in node.tags %}
+							
+								<div {% if each_tag == "asset@asset" or each_tag == "raw@material" or each_tag == "asset@gallery" %} style="display:none"{% endif %} class="tags label radius info">{{each_tag}}<i title="Remove this tag" class="fi-x-circle remove-tag"></i></div>
+						{% endfor %}
+					</div>
+				</div>
+
+	    	</span>
+	</div>
+<script type="text/javascript">
+	var tags = document.getElementById("tags_id");
+	var addedTags = document.getElementById("added_tags");
+	tags.onchange = checkTag;
+	tags.onmouseup = checkTag;
+	tags.onkeyup = checkTag;
+
+	var addTagBtn = document.getElementById("add-tag-btn");
+	addTagBtn.onclick = addTag;
+	addTagBtn.onkeypress = addTag;
+	
+
+	function checkTag()
+	{
+		var textValue = tags.value.trim();
+		// console.log(textValue.length);
+
+		if(textValue.length < 1){ return false; }
+
+		// re expression containing special characters
+		var re = /[.*+=~`<>;:'"_?^${}()!%\^|[\]\\\/#]/g;
+
+		if(re.test(textValue))
+		{	// having special characters
+			$('#tags_error').removeClass("hide")
+			$('#tags_error div').text("{% trans 'Non empty tags can have only alphanumeric characters, dash(-) and spaces.' %}");
+			return false;
+		}
+		else
+		{	// passed the test and now add tag label
+			$('#tags_error').addClass("hide") // fadeout fastly ongoing fadeout event
+			var tagsArr = new Array();
+
+			$("#added_tags").children("div.tags.label").each(function(){
+				tagsArr.push(this.textContent.trim());
+				// tagsArr.push(this.textContent.trim().toLowerCase());
+			});
+
+			if(tagsArr.indexOf(textValue) != -1){
+				$('#tags_error').removeClass("hide")
+				$('#tags_error div').text("{% trans 'Tag already exists.' %}");
+
+				return false;
+			}
+			return true;
+		}
+	}
+
+	function updateAllTags() {
+
+		var tagsArr = new Array();
+
+		$("#added_tags").children("div.tags.label").each(function(){
+			tagsArr.push(this.textContent.trim());
+			// tagsArr.push(this.textContent.trim().toLowerCase());
+		});
+
+		$("input:hidden[name='tags']").val(JSON.stringify(tagsArr));
+		// console.log(tagsArr)
+	}
+
+
+    $(document).on('click','.remove-tag',function(){
+
+		$(this).parent().fadeOut("slow", function(){
+			$(this).detach();
+			updateAllTags();
+		});
+
+	});
+
+	// $(".remove-tag").click(removeTag);
+
+	$(".remove-tag").mouseenter(function(){
+		$(this).parent("div.tags").css("text-decoration", "line-through");
+	});
+
+	$(".remove-tag").mouseleave(function(){
+		$(this).parent("div.tags").css("text-decoration", "none");
+	});
+
+	function addTag() {
+		if(checkTag())
+		{
+			var textValue = tags.value.trim();
+			// var textValue = tags.value.trim().toLowerCase();
+			tags.value = '';
+
+			var tagDiv = document.createElement("div");
+			tagDiv.className = "tags label radius info";
+			tagDiv.appendChild(document.createTextNode(textValue));
+			// tagDiv.setAttribute("data-primary-type", selFieldPrimaryType);
+
+			var closeBtn = document.createElement("i");
+			closeBtn.className = "fi-x-circle remove-tag";
+			closeBtn.title = "{% trans 'Remove this tag' %}";
+			// closeBtn.onclick = removeTag;
+
+			$(closeBtn).mouseenter(function(){
+				$(this).parent("div.tags").css("text-decoration", "line-through");
+			});
+
+			$(closeBtn).mouseleave(function(){
+				$(this).parent("div.tags").css("text-decoration", "none");
+			});
+
+			tagDiv.appendChild(closeBtn);
+
+			addedTags.appendChild(tagDiv);
+
+			updateAllTags();
+		}
+		else
+		{
+			$('#tags_error').removeClass("hide");
+		}
+		tags.focus();
+	}
+
+</script>

@@ -38,7 +38,8 @@ def audioDashboard(request, group_id, audio_id=None):
                                     '_type': {'$in': ["GSystem"]},
                                     'member_of': file_gst._id,
                                     'group_set': {'$all': [ObjectId(group_id)]},
-                                    'if_file.mime_type': {'$regex': 'audio'} 
+                                    'if_file.mime_type': {'$regex': 'audio'},
+                                    'status' : { '$ne': u"DELETED" } 
 
                                     # 'created_by': {'$in': gstaff_users},
                         # '$or': [

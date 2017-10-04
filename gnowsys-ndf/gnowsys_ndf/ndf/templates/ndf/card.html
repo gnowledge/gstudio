@@ -40,7 +40,7 @@
     <!-- description -->
     {% if resource.content_org %}
       <div title="{{resource.content_org}}">
-        <h4 class="text-center card-content-title"><small>Description</small></h4>
+        <h4 class="text-center card-content-title"><small>{% trans "Description" %}</small></h4>
         {{resource.content_org|truncatechars:75}}
       </div>
     {% endif %}
@@ -48,7 +48,7 @@
     <!-- tags -->
     {% if resource.tags %}
       <div>
-        <h4 class="text-center card-content-title"><small>Tags</small></h4>
+        <h4 class="text-center card-content-title"><small>{% trans "Tags" %}</small></h4>
         <div>
         
           {% for each_tag in resource.tags %}
@@ -58,7 +58,7 @@
             {% endif %}
           {% endfor %}
           {% if resource.tags|length > 6 %}
-            <small>+{{ resource.tags|length|add:"-6"}} more...</small>
+            <small>+{{ resource.tags|length|add:"-6"}} {% trans "more..." %}</small>
           {% endif %}
         
         </div>

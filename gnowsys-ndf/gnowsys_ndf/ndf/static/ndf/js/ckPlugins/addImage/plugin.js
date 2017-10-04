@@ -28,6 +28,7 @@ CKEDITOR.plugins.add('addImage',
 
                           $(".card-image-wrapper").click(function(event){
                             var imageURL = $(this).children('img').attr("data-image-src");
+                            var imageTitle = $(this).attr("title");
                             // var locationURL = 'http://' + location.host;
                             var locationURL = window.location.origin
                             var completeURL = imageURL
@@ -36,7 +37,7 @@ CKEDITOR.plugins.add('addImage',
                             {
                                 return false;
                             }
-                            CKEDITOR.instances[textAreaId].insertHtml('<img width="'+  width + '"src=' + completeURL +  '>' + '</img>');
+                            CKEDITOR.instances[textAreaId].insertHtml('<img width="'+  width + '"src=' + completeURL + ' '+ 'alt=' + imageTitle + '>' + '</img>');
                             $('#group_imgs_on_modal').foundation('reveal', 'close');
                         
 

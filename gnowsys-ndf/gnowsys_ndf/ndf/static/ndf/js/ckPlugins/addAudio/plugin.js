@@ -26,13 +26,24 @@ CKEDITOR.plugins.add('addAudio',
                             $("#group_imgs_on_modal").html(data);
                             $('#group_imgs_on_modal').foundation('reveal', 'open');
                             $(".audio-caption").click(function(event){
-                                var audioURL = $(this).children('audio').attr("data-audio-src");
-                                // var locationURL = 'http://' + location.host;
-                                var locationURL = window.location.origin
-                                var completeURL = audioURL
-                                CKEDITOR.instances[textAreaId].insertHtml('<audio controls loop src=' + completeURL +  '>' + '</audio>');
-                                $('#group_imgs_on_modal').foundation('reveal', 'close');
-                        
+                               var audio_player_url = "/" + groupId + "/ajax/get_audio_player";
+                               this_obj  = this;
+                               var datasrc = this_obj.attributes['data-audio-id'].value
+
+                            $.ajax({
+                                        type: "GET",
+                                        url: audio_player_url,
+                                        datatype: "html",
+                                        data:{
+                                            datasrc:datasrc
+                                        },
+                                        success: function(data) {
+                                            CKEDITOR.instances[textAreaId].insertHtml(data);
+                                            $('#group_imgs_on_modal').foundation('reveal', 'close');
+
+                                        }
+                                });
+
 
                           });
 

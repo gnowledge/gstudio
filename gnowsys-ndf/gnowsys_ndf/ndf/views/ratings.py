@@ -27,6 +27,7 @@ except ImportError:  # old pymongo
 def ratings(request, group_id, node_id):
 
 	rating_given = request.POST.get('rating', '')
+	if_comments = request.POST.get('if_comments', '')
 	node_obj = node_collection.one({'_id': ObjectId(node_id)})
 	ratedict = {}
 
@@ -99,7 +100,8 @@ def ratings(request, group_id, node_id):
 		active_user_ids_list = dict.fromkeys(active_user_ids_list).keys()
 
 	# print "active_user_ids_list: ", active_user_ids_list
-	Counter.update_ratings(node_obj, group_id, rating_given, active_user_id_or_list=active_user_ids_list)
+	if not if_comments == "True": 
+		Counter.update_ratings(node_obj, group_id, rating_given, active_user_id_or_list=active_user_ids_list)
 
 	if rating_given:
 		for each_active_user_id in active_user_ids_list:
@@ -126,3 +128,4 @@ def ratings(request, group_id, node_id):
 	# template="ndf/rating.html"
 	# return render_to_response(template, vars)
 	return HttpResponse(json.dumps(result))
+

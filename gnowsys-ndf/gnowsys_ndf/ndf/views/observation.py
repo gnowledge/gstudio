@@ -25,7 +25,6 @@ from gnowsys_ndf.ndf.models import *
 from gnowsys_ndf.ndf.views.methods import *
 from gnowsys_ndf.ndf.views.file import *
 from gnowsys_ndf.ndf.rcslib import RCS
-from gnowsys_ndf.ndf.org2any import org2html
 from gnowsys_ndf.ndf.templatetags.ndf_tags import group_type_info
 
 #######################################################################################################################################
@@ -60,10 +59,10 @@ def all_observations(request, group_id, app_id=None):
 	file_metadata = []
 
 	# retriving each GSystemType in Observation e.g.Plant Obs.., Rain Fall etc.
-	for each in app.collection_set: 
+	for each in app.collection_set:
 
 		app_set_element = node_collection.find_one({'_id': ObjectId(each), 'group_set': {'$all': [ObjectId(group_id)]}})
-		
+
 		# Individual observations e.g. Rain Fall
 		if app_set_element:
 
@@ -71,20 +70,20 @@ def all_observations(request, group_id, app_id=None):
 			locations = app_set_element.location
 
 			for loc in locations:
-				
+
 				# creating list of ObjectId's of file GSystem.
 				files_list = ast.literal_eval(loc["properties"].get("attached_files", '[]'))
-				
-				for file_id in files_list: # executes only if files_list has at least ObjectId 
+
+				for file_id in files_list: # executes only if files_list has at least ObjectId
 
 					if ObjectId.is_valid(file_id) and file_id:
-					
+
 						# for preventing duplicate dict forming
 						if not file_id in [d['id'] for d in file_metadata]:
 
 							file_obj = node_collection.one({'_type': 'File', "_id": ObjectId(file_id)})
 							# print file_id, "===", type(file_id)
-							
+
 							temp_dict = {}
 							temp_dict['id'] = file_obj._id.__str__()
 							temp_dict['name'] = file_obj.name
@@ -94,8 +93,8 @@ def all_observations(request, group_id, app_id=None):
 
 			# app_element_content_objects = node_collection.find({'member_of':ObjectId(each), 'group_set':{'$all': [ObjectId(group_id)]}})
 			# obj_count = app_element_content_objects.count()
-				
-			app_collection_set.append({ 
+
+			app_collection_set.append({
 									"id":str(app_set_element._id),
 									"name":app_set_element.name,
 									"locations": json.dumps(locations),
@@ -113,7 +112,7 @@ def all_observations(request, group_id, app_id=None):
 							 		'map_type': 'all_app_markers',
 									'file_metadata':json.dumps(file_metadata)
 							 	},
-							 	context_instance=RequestContext(request) 
+							 	context_instance=RequestContext(request)
 							 )
 @get_execution_time
 def observations_app(request, group_id, app_id=None, app_name=None, app_set_id=None, slug=None):
@@ -142,7 +141,7 @@ def observations_app(request, group_id, app_id=None, app_name=None, app_set_id=N
 	# getting django user id
 	user_id = int(request.user.id)  if request.user.id 	else request.session.set_expiry(0)
 	user_name = unicode(request.user.username) if request.user.username  else "" # getting django user name
-	
+
 
 	app = node_collection.find_one({"_id":ObjectId(app_id)})
 	app_name = app.name
@@ -152,7 +151,7 @@ def observations_app(request, group_id, app_id=None, app_name=None, app_set_id=N
 	for each in app.collection_set:
 
 		app_set_element = node_collection.find_one({'_id':ObjectId(each), 'group_set':{'$all': [ObjectId(group_id)]}})
-		
+
 		# app_element = node_collection.find_one({"_id":each})
 		if app_set_element:
 
@@ -166,21 +165,21 @@ def observations_app(request, group_id, app_id=None, app_name=None, app_set_id=N
 				# file_metadata = []
 
 				for loc in locations:
-				
+
 					# creating list of ObjectId's of file GSystem.
 					files_list = ast.literal_eval(loc["properties"].get("attached_files", '[]'))
-					
-					for file_id in files_list: # executes only if files_list has at least ObjectId 
+
+					for file_id in files_list: # executes only if files_list has at least ObjectId
 
 						# check if file_id is valid ObjectId or not
-						if ObjectId.is_valid(file_id) and file_id: 
-							
+						if ObjectId.is_valid(file_id) and file_id:
+
 							# for preventing duplicate dict forming
 							if not file_id in [d['id'] for d in file_metadata]:
 
 								file_obj = node_collection.one({'_type': 'File', "_id": ObjectId(file_id)})
 								# print file_id, "===", type(file_id)
-								
+
 								temp_dict = {}
 								temp_dict['id'] = file_obj._id.__str__()
 								temp_dict['name'] = file_obj.name
@@ -188,8 +187,8 @@ def observations_app(request, group_id, app_id=None, app_name=None, app_set_id=N
 
 								file_metadata.append(temp_dict)
 
-			
-			app_collection_set.append({ 
+
+			app_collection_set.append({
 									"id":str(app_set_element._id),
 									"name":app_set_element.name,
 									"locations": json.dumps(locations),
@@ -206,7 +205,7 @@ def observations_app(request, group_id, app_id=None, app_name=None, app_set_id=N
 							 		'template_view': 'app_set_view',
 							 		"file_metadata":json.dumps(file_metadata)
 							 	},
-							 	context_instance=RequestContext(request) 
+							 	context_instance=RequestContext(request)
 							 )
 
 @get_execution_time
@@ -222,7 +221,7 @@ def save_observation(request, group_id, app_id=None, app_name=None, app_set_id=N
         cookie_added_markers = ""
 
 	app_set_element = node_collection.find_one({'_id': ObjectId(app_set_id), 'group_set': {'$all': [ObjectId(group_id)]}})
-	
+
 	# to update existing location
 	if "ref" in marker_geojson['properties']:
 		marker_ref = marker_geojson['properties']['ref']
@@ -248,9 +247,9 @@ def save_observation(request, group_id, app_id=None, app_name=None, app_set_id=N
 
 
 			if (user_type == "authenticated") or anonymous_flag:
-			
+
 				for each in app_set_element.location:
-					
+
 					if each['properties']['ref'] == marker_ref:
 						app_set_element.location.remove(each)
 						app_set_element.location.append(marker_geojson)
@@ -258,7 +257,7 @@ def save_observation(request, group_id, app_id=None, app_name=None, app_set_id=N
 						unique_token = marker_ref
 						operation_performed = "edit"
 
-	
+
 	# to create/add new location
 	else:
 
@@ -268,22 +267,22 @@ def save_observation(request, group_id, app_id=None, app_name=None, app_set_id=N
 			app_set_element.location.append(marker_geojson)
 			app_set_element.save(groupid=group_id)
 			operation_performed = "create_new"
-			
+
 		# for anonymous user
 		if user_type == "anonymous" and is_cookie_supported:
 			cookie_added_markers = request.session.get('anonymous_added_markers', "")
 
 			if cookie_added_markers == None or cookie_added_markers[:cookie_added_markers.find(",")] != user_session_id:
-				cookie_added_markers = user_session_id + "," + unique_token 
+				cookie_added_markers = user_session_id + "," + unique_token
 
 			elif cookie_added_markers[:cookie_added_markers.find(",")] == user_session_id:
 				cookie_added_markers += "," + unique_token
 
 			request.session['anonymous_added_markers'] = cookie_added_markers
 			# HttpResponse.set_cookie('anonymous_added_markers', value=cookie_added_markers)
-	
+
 	# print "\n create/save :  ", request.session.items()
-			
+
 	response_data = [len(app_set_element.location), unique_token, operation_performed, str(cookie_added_markers)]
 	response_data = json.dumps(response_data)
 
@@ -328,14 +327,14 @@ def delete_observation(request, group_id, app_id=None, app_name=None, app_set_id
 
 
 	if (user_type == "authenticated") or anonymous_flag:
-			
+
 		for each in app_set_element.location:
-			
+
 			if each['properties']['ref'] == marker_ref:
 				app_set_element.location.remove(each)
 				app_set_element.save(groupid=group_id)
 
-				operation_performed = "marker_deleted"	
+				operation_performed = "marker_deleted"
 
 	response_data = [len(app_set_element.location), operation_performed]
 	response_data = json.dumps(response_data)
@@ -346,7 +345,7 @@ def delete_observation(request, group_id, app_id=None, app_name=None, app_set_id
 def save_image(request, group_id, app_id=None, app_name=None, app_set_id=None, slug=None):
 
     if request.method == "POST" :
-        
+
         for index, each in enumerate(request.FILES.getlist("doc[]", "")):
 
             title = each.name
@@ -360,19 +359,19 @@ def save_image(request, group_id, app_id=None, app_name=None, app_set_id=None, s
             access_policy = request.POST.get("login-mode", '') # To add access policy(public or private) to file object
 
             # for storing location in the file
-            
+
             # location = []
             # location.append(json.loads(request.POST.get("location", "{}")))
             # obs_image = save_file(each,title,userid,group_id, content_org, tags, img_type, language, usrname, access_policy, oid=True, location=location)
 
             obs_image = save_file(each,title,userid,group_id, content_org, tags, img_type, language, usrname, access_policy, oid=True)
-            # Sample output of (type tuple) obs_image: (ObjectId('5357634675daa23a7a5c2900'), 'True') 
+            # Sample output of (type tuple) obs_image: (ObjectId('5357634675daa23a7a5c2900'), 'True')
 
             # if image sucessfully get uploaded then it's valid ObjectId
             if obs_image[0] and ObjectId.is_valid(obs_image[0]):
 
             	return StreamingHttpResponse(str(obs_image[0]))
-            
+
             else: # file is not uploaded sucessfully or uploaded with error
-            	
-            	return StreamingHttpResponse("UploadError")	
+
+            	return StreamingHttpResponse("UploadError")

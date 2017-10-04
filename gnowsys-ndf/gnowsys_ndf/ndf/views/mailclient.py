@@ -513,9 +513,9 @@ def server_sync(mail):
                                         for key,values in json_data.items():
                                                         if key in ['attribute_type','relation_type','relation_type_set','attribute_type_set']:
                                                                 if key == 'attribute_type':
-                                                                        node = node_collection.one({"_id":ObjectId(json_data['attribute_type']['_id'])})
+                                                                        node = node_collection.one({"_id":ObjectId(json_data['attribute_type'])})
                                                                 elif key == 'relation_type':
-                                                                        node = node_collection.one({"_id":ObjectId(json_data['relation_type']['_id'])})
+                                                                        node = node_collection.one({"_id":ObjectId(json_data['relation_type'])})
                                                                 elif key == 'relation_type_set':
                                                                         values = json_data['relation_type_set']
                                                                         if values is not None:

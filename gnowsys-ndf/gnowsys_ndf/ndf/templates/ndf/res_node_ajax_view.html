@@ -72,7 +72,7 @@
         {% get_grid_fs_object node as grid_fs_obj %}
 
         <!-- New Implementation -->
-        Resource Type: {{node.mime_type}}<br/><br/>          
+        {% trans "Resource Type" %}: {{node.mime_type}}<br/><br/>          
         
         {% if node.collection_set %} 
 
@@ -142,16 +142,16 @@
           {% else %}
               {% if 'audio' in node.mime_type %}
                 <audio src="{% url 'read_file' group_object.name node grid_fs_obj.filename %}" controls loop>
-                  <p>Your browser does not support the audio element </p>
+                  <p>{% trans "Your browser does not support the audio element" %} </p>
                 </audio>
               {% elif 'html' in node.mime_type %}
                 <iframe id="html-res-iframe" width="100%" seamless="seamless" src="{% url 'read_file' group_object.name node grid_fs_obj.filename %}">
-                  <p>Your browser does not support the audio element </p>
+                  <p>{% trans "Your browser does not support the audio element" %} </p>
                 </iframe>
                 {% elif 'pdf' in node.mime_type %}
                     <iframe width="100%" style="height:90vh;" src="/static/ndf/bower_components/pdfjs-build/generic/web/viewer.html?file={% url 'read_file' group_object.name node grid_fs_obj.filename %}"></iframe>
                     <br/>
-                    <a target="_blank" href="/static/ndf/bower_components/pdfjs-build/generic/web/viewer.html?file={% url 'read_file' group_object.name node grid_fs_obj.filename %}">Full screen view</a>
+                    <a target="_blank" href="/static/ndf/bower_components/pdfjs-build/generic/web/viewer.html?file={% url 'read_file' group_object.name node grid_fs_obj.filename %}">{% trans "Full screen view" %}</a>
               {% else %}
                 <a href="{% url 'read_file' group_object.name node grid_fs_obj.filename %}">
                   {{ grid_fs_obj.filename }}
@@ -183,16 +183,16 @@
             </video>
           {% elif 'audio' in node.mime_type %}
             <audio src="{% url 'read_file' group_object.name node grid_fs_obj.filename %}" controls loop>
-              <p>Your browser does not support the audio element </p>
+              <p>{% trans "Your browser does not support the audio element" %} </p>
             </audio>
           {% elif 'html' in node.mime_type %}
             <iframe id="html-res-iframe" width="100%" seamless="seamless" src="{% url 'read_file' group_object.name node grid_fs_obj.filename %}">
-              <p>Your browser does not support the audio element </p>
+              <p>{% trans "Your browser does not support the audio element" %} </p>
             </iframe>
           {% elif 'pdf' in node.mime_type %}
             <iframe width="100%" style="height:90vh;" src="/static/ndf/bower_components/pdfjs-build/generic/web/viewer.html?file={% url 'read_file' group_object.name node grid_fs_obj.filename %}"></iframe>
             <br/>
-            <a target="_blank" href="/static/ndf/bower_components/pdfjs-build/generic/web/viewer.html?file={% url 'read_file' group_object.name node grid_fs_obj.filename %}">Full screen view</a>
+            <a target="_blank" href="/static/ndf/bower_components/pdfjs-build/generic/web/viewer.html?file={% url 'read_file' group_object.name node grid_fs_obj.filename %}">{% trans "Full screen view" %}</a>
           {% elif 'epub' in node.mime_type %}
             <script type="text/javascript" src="/static/ndf/bower_components/epub.js/build/epub.js"></script>
             <script type="text/javascript" src="/static/ndf/bower_components/epub.js/build/libs/zip.min.js"></script>
@@ -200,11 +200,11 @@
 
             <div class="row">
               <h2 class="small-4 columns redirection" onclick="Book.prevPage();">
-                <small class="fi-arrow-left"> Previous</small>
+                <small class="fi-arrow-left"> {% trans "Previous" %}</small>
               </h2>
               <div class="small-8 columns text-center"></div>
               <h2 class="text-right small-4 columns redirection" onclick="Book.nextPage();">
-                <small>Next <i class="fi-arrow-right"></i></small>
+                <small>{% trans "Next" %} <i class="fi-arrow-right"></i></small>
               </h2>
             </div>
             
@@ -214,14 +214,14 @@
             
             <div class="row">
               <h2 class="small-4 columns redirection" onclick="Book.prevPage();">
-                <small class="fi-arrow-left"> Previous</small>
+                <small class="fi-arrow-left"> {% trans "Previous" %}</small>
               </h2>
 
               <a class="small-4 columns button tiny text-center" style="margin-top: 1em;" href="{% url 'read_file' group_object.name node grid_fs_obj.filename %}">
-                Download "{{ grid_fs_obj.filename }}"
+                {% trans "Download" %} "{{ grid_fs_obj.filename }}"
               </a>
               <h2 class="text-right small-4 columns redirection" onclick="Book.nextPage();">
-                <small>Next <i class="fi-arrow-right"></i></small>
+                <small>{% trans "Next" %} <i class="fi-arrow-right"></i></small>
               </h2>
             </div>
             
@@ -270,12 +270,12 @@
               {% get_attribute_value group_object.pk 'end_enroll' as event_end_enroll %}
               <div class="row">
               <section class="medium-4 columns">
-                  <label>Event duration</label>
-                   From <i>{{event_start_time|date:"d-M-Y"}}</i> to <i> {{event_end_time|date:"d-M-Y"}}</i>
+                  <label>{% trans "Event duration" %}</label>
+                   {% trans "Fromw" %} <i>{{event_start_time|date:"d-M-Y"}}</i> to <i> {{event_end_time|date:"d-M-Y"}}</i>
               </section>
               <section  class="medium-4 columns end">
-                  <label>Enrollment duration</label>
-                   From <i>{{event_start_enroll|date:"d-M-Y"}}</i> to <i> {{event_end_enroll|date:"d-M-Y"}}</i>
+                  <label>{% trans "Enrollment duration" %}</label>
+                   {% trans "From" %} <i>{{event_start_enroll|date:"d-M-Y"}}</i> to <i> {{event_end_enroll|date:"d-M-Y"}}</i>
               </section>
               </div><hr>
           {% endif %}
@@ -302,16 +302,17 @@
 
       <div class="content small-12 columns"  id="view-discussion">
   
-          {% get_node group_id as group_obj %}
-          {% get_thread_node node.pk as thread_node %}
-          {% if thread_node %}
-              {% get_disc_replies thread_node group_id global_disc_all_replies as all_replies %}
-              {% get_node thread_node as thread_node_obj %}
-              {% include 'ndf/in-line-texteditor.html' with node=thread_node_obj %}
-          {% else %}            
-              {% get_disc_replies node.pk group_id global_disc_all_replies as all_replies %}
-              {% include 'ndf/in-line-texteditor.html' %}
-          {% endif %}
+        {% get_node group_id as group_obj %}
+
+        {% get_thread_node node.pk as thread_node_obj %}
+        {% if thread_node_obj %}
+            {% get_disc_replies thread_node_obj.pk group_id global_disc_all_replies as all_replies %}
+            {% include 'ndf/in-line-texteditor.html' with node=thread_node_obj %}
+        {% else %}
+            {% get_disc_replies node.pk group_id global_disc_all_replies as all_replies %}
+            {% include 'ndf/in-line-texteditor.html' %}
+        {% endif %}
+
           {% comment %}
           {% else %}
             {% if node.discussion_enable == True %}
@@ -353,6 +354,6 @@
   {% if not is_group %}
     <br/>
     <div class="right">
-      {% include "ndf/analytics_views.html" with event_player_flag=True %}
+      {% include "ndf/widget_analytics_views.html" with event_player_flag=True %}
     </div>
   {% endif %}

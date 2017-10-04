@@ -42,24 +42,6 @@
 	background-repeat:no-repeat; background-size: 48px 48px
 	}
 
-	#tags_error{
-		color: red;
-	}
-
-	div.tags{
-		/*padding: 5px 10px; */
-		margin: 2px 5px;
-		/*color: white;*/
-		font-size: 1em;
-		border: solid thin #FFD400;
-	}
-
-	i.remove-tag{
-		padding-left: 8px;
-		font-size: 1.1em;
-		cursor: pointer;
-	}
-
 	#type_of{
 		height:36px;
 	}
@@ -94,8 +76,12 @@
 							{% trans "Create New " %} {{title}} :
 						{% endif  %}
 					{% endif %}
+				{% if not blog_type %}
+					<span class="right">
+						<a  class="tiny button radius existing-template">{% trans "Create page from existing template" %}</a>
+					</span>
+				{% endif %}
 				</span></h3>
-
 
 			    <input tabindex="1" id="name_id" name="name" type="text" value="{{node.name}}" placeholder="Give the {{title}} a name.." {% if node.group_type %}disabled=disabled{% endif %} required>
 		  		<label id="message" style="display:none; color:red"></label>
@@ -319,50 +305,7 @@
 			<div class="row">
 				{% block upload_logo %} {% endblock %}
 			</div>
-
-			<div class="row">
-				<div class="small-8 columns">
-					<span>
-
-						<div class="row">
-							<h3 >
-							<span  class="subheader small-3 columns"  data-tooltip class="has-tip" title="{% trans 'Tags help identify similiar work easily. Just add tag text and click Add Tag button' %}"> {% trans "Add Tag" %}:
-							</span>
-
-							</h3>
-							<div class="small-9 columns">
-							<div class="row collapse">
-
-							<div class="small-10 columns">
-						    	<input id="tags_id" tabindex="2" type="text" value="" placeholder="{% trans 'Add tag text and click on [Add Tag] button' %}">
-						    	<input type="hidden" value="{{node.tags|join:', '|default_if_none:""}}" name="tags">
-					        </div>
-					        <div class="small-2 columns">
-					          <span tabindex="3" id="add-tag-btn" class="tiny button radius">{% trans 'Add Tag' %}</span>
-					        </div>
-							</div>
-
-							</div>
-						</div>
-
-						<!-- show tags error msg -->
-						<div class="row hide" id="tags_error">
-							<div class="small-10 columns small-push-2">{% trans 'Non empty tags can have only alphanumeric characters, dash(-) and spaces.' %}</div>
-						</div>
-
-						<!-- show added tags -->
-						<div class="row">
-							<div id="added_tags" class="small-9 small-push-3 columns">
-								{% for each_tag in node.tags %}
-									<div class="tags label radius info">{{each_tag}}<i title="Remove this tag" class="fi-x-circle remove-tag"></i></div>
-								{% endfor %}
-							</div>
-						</div>
-
-			    	</span>
-		    	</div>
-	    	</div>
-
+			{% include 'ndf/widget_tags.html' %}
     	</div>
 
     {% block prior_node %}
@@ -436,14 +379,12 @@
 
     {% endblock %}
 
-	{% cache 300 node_edit_base_metadata request.LANGUAGE_CODE %}
     <div class="content contents panel" id="panel-metadata" style="width:100%; display:none;" >
       	<div class="row">
 		  	<div class="small-12 large-12 columns"><h4>{% trans "Please add or edit Metadata" %} </h4></div>
 		  	<!-- Educational Language is Removed from ndf tags and here  __ Saurabh -->
 		  	{% get_metadata_values as metadata %}
 	  		{% for k,v in metadata.items %}
-
 
 	  			<div class="small-12 large-6 columns">
 			  		<label>
@@ -505,20 +446,20 @@
 			</div>
 
 			<div class="small-12 large-4 columns">
-				<label><h5>License</h5></label>
-				<!-- <input id="license_id" name="License" type="text" placeholder="Enter source name"/> -->
-				{% get_license as license %}
-				<select name="license"  required>
-						{% for each_license in license %}
-	        			{# <option value="{{each_license}}"  #}
-	        			{% if each_license == node.license %}
-	        				<option selected>{% trans each_license %}</option>
+				<label><h5>{% trans "Copyright" %}</h5></label>
+				<!-- <input id="copyright_id" name="Copyright" type="text" placeholder="Enter source name"/> -->
+				{% get_copyright as copyright %}
+				<select name="copyright"  required>
+						{% for each_copyright in copyright %}
+	        			{# <option value="{{each_copyright}}"  #}
+	        			{% if each_copyright == node.copyright %}
+	        				<option selected>{% trans each_copyright %}</option>
 	        			{% else %}>
-	        			 	<option>{% trans each_license %}</option>
+	        			 	<option>{% trans each_copyright %}</option>
 	        			{% endif %}>
 					{% endfor %}
 				</select>
-				<small class="error">Please select resource Subject</small>
+				<small class="error">{% trans "Please select resource Subject" %}</small>
 
 			</div>
 
@@ -527,36 +468,38 @@
 
 	<div id="metadata_info"></div>
 	</div>
-	{% endcache %}
 
     <div class="content contents" id="panel-thread" style="width:95%; display:none;" >
       	<div class="row">
 		  	<h7>{% trans "Add properties to the discussion feature of this " %}{{title}}{% trans " node "%} </h7>
 		</div>
 
+
+		{% get_attribute_value node.pk 'discussion_enable' as disc_enable_val %}
+
 	    <div class="row yes_no_disc_div">
 	      <div class="large-2 medium-4 columns"><h5>{% trans "Interaction : " %}</h5>
 	      </div>
 	      <div class="large-pull-4 large-6 medium-8 columns">
-			<input type="radio" name="thread_create" value="Yes">Yes &nbsp;&nbsp;
-			<input type="radio" name="thread_create" value="No" checked="checked">No
+			<input type="radio" name="thread_create" value="Yes" {% if disc_enable_val %}checked="checked"{% endif %}>Yes &nbsp;&nbsp;
+			<input type="radio" name="thread_create" value="No" {% if not node or not disc_enable_val %}checked="checked"{% endif %}>No
 	      </div>
 	    </div>
+        {% get_thread_node node.pk as thread_node %}
+		{% if thread_node %}
+			{% get_attribute_value thread_node.pk 'release_response' as resp_val %}
+			{% get_attribute_value thread_node.pk 'thread_interaction_type' as thr_int_type %}
+			{% get_attribute_value thread_node.pk 'start_time' as thr_start_time %}
+			{% get_attribute_value thread_node.pk 'end_time' as thr_end_time %}
+		{% endif %}
 	    <div class="thread-settings-div {% if not node.discussion_enable %} hide {% endif %}">
-            {% get_thread_node node.pk as thread_node %}
-			{% if thread_node %}
-				{% get_attribute_value thread_node.pk 'release_response' as resp_val %}
-				{% get_attribute_value thread_node.pk 'thread_interaction_type' as thr_int_type %}
-				{% get_attribute_value thread_node.pk 'start_time' as thr_start_time %}
-				{% get_attribute_value thread_node.pk 'end_time' as thr_end_time %}
-			{% endif %}
 		    <div class="row">
 		      <div class="large-2 medium-4 columns "><h5>{% trans "Release Option:" %}</h5>
 		      </div>
 		      <div class="large-pull-4 large-6 medium-8 columns">
 		        <select id="release_resp_sel" name="release_resp_sel">
-		          <option value="True" {% if resp_val or not grel_dict %} selected{% endif %}>Show Replies to All</option>
-		          <option value="False" {% if grel_dict and not resp_val %} selected{% endif %}>Hide Replies from All</option>
+		          <option value="True" {% if resp_val or not thread_node %} selected{% endif %}>{% trans "Show Replies to All" %}</option>
+		          <option value="False" {% if thread_node and not resp_val %} selected{% endif %}>{% trans "Hide Replies from All" %}</option>
 		        </select>
 		      </div>
 		    </div>
@@ -696,6 +639,24 @@
 <!-- Reveal Modals begin -->
 
 <script type="text/javascript">
+	$( ".existing-template" ).click(function() {
+		$.ajax({
+                        type: "GET",
+                    	url: "{% url 'get_templates_page' groupid %}",
+                        datatype: "html",
+                        data:{
+
+                        },
+                        success: function(data) {
+                         
+                			$("#group_imgs_on_modal").html(data);
+                          	$('#group_imgs_on_modal').foundation('reveal', 'open');
+
+                        }
+                    });
+	
+	});
+	
 
 	{% if title == "Page" or "File" in node.member_of_names_list %}
 
@@ -880,7 +841,7 @@
 		$(".assesses_tab").hide();
 		$(".teaches_tab").hide();
 		$(".prior_node_tab").hide();
-		
+
 
 
 
@@ -906,14 +867,6 @@
 		    // $("select#type_of").prop("disabled", true)
 			{% if is_auth_node %}
 				$("#name_id").attr("disabled",true)
-			{% endif %}
-            {% get_thread_node node.pk as thread_node %}
-			{% if node.discussion_enable %}
-				$("input[name='thread_create'][value='Yes']").attr("checked","checked");
-				$("input[name='thread_create']").trigger("change");
-				// $("input[name='thread_create']").attr("disabled",true);
-			{% else %}
-				$("input[name='thread_create'][value='No']").attr("checked","checked");
 			{% endif %}
 
 		{% endif %}
@@ -1300,106 +1253,6 @@
 
 	});
 
-	var tags = document.getElementById("tags_id");
-	var addedTags = document.getElementById("added_tags");
-
-	function checkTag()
-	{
-		var textValue = tags.value.trim();
-		// console.log(textValue.length);
-
-		if(textValue.length < 1){ return false; }
-
-		// re expression containing special characters
-		var re = /[.*+=~`<>;:'"_?^${}()!%\^|[\]\\\/#]/g;
-
-		if(re.test(textValue))
-		{	// having special characters
-			$('#tags_error').removeClass("hide");
-			return false;
-		}
-		else
-		{	// passed the test and now add tag label
-			$('#tags_error').addClass("hide") // fadeout fastly ongoing fadeout event
-			return true;
-		}
-	}
-
-	tags.onchange = checkTag;
-	tags.onmouseup = checkTag;
-	tags.onkeyup = checkTag;
-
-	function updateAllTags() {
-
-		var tagsArr = new Array();
-
-		$("#added_tags").children("div.tags.label").each(function(){
-			tagsArr.push(this.textContent.trim().toLowerCase());
-		});
-
-		$("input:hidden[name='tags']").val(tagsArr.toString());
-		// console.log(tagsArr)
-	}
-
-
-	function removeTag(){
-		$(this).parent().fadeOut("slow", function(){
-			$(this).detach();
-		});
-
-		updateAllTags();
-	};
-
-	$(".remove-tag").click(removeTag);
-
-	$(".remove-tag").mouseenter(function(){
-		$(this).parent("div.tags").css("text-decoration", "line-through");
-	});
-
-	$(".remove-tag").mouseleave(function(){
-		$(this).parent("div.tags").css("text-decoration", "none");
-	});
-
-	function addTag() {
-		if(checkTag())
-		{
-			var textValue = tags.value.trim().toLowerCase();
-			tags.value = '';
-
-			var tagDiv = document.createElement("div");
-			tagDiv.className = "tags label radius info";
-			tagDiv.appendChild(document.createTextNode(textValue));
-			// tagDiv.setAttribute("data-primary-type", selFieldPrimaryType);
-
-			var closeBtn = document.createElement("i");
-			closeBtn.className = "fi-x-circle remove-tag";
-			closeBtn.title = "{% trans 'Remove this tag' %}";
-			closeBtn.onclick = removeTag;
-
-			$(closeBtn).mouseenter(function(){
-				$(this).parent("div.tags").css("text-decoration", "line-through");
-			});
-
-			$(closeBtn).mouseleave(function(){
-				$(this).parent("div.tags").css("text-decoration", "none");
-			});
-
-			tagDiv.appendChild(closeBtn);
-
-			addedTags.appendChild(tagDiv);
-
-			updateAllTags();
-		}
-		else
-		{
-			$('#tags_error').removeClass("hide");
-		}
-		tags.focus();
-	}
-
-	var addTagBtn = document.getElementById("add-tag-btn");
-	addTagBtn.onclick = addTag;
-	addTagBtn.onkeypress = addTag;
 
 	$("#save-node").click(function(event) {
 
@@ -1518,7 +1371,7 @@
     	var tagsStr = tags.value.trim();
 	    if(checkTag())
 	    {
-	    	$("input:hidden[name='tags']").val($("input:hidden[name='tags']").val() + ', ' + tagsStr);
+			$("input:hidden[name='tags']").val($("input:hidden[name='tags']").val() + ', ' + tagsStr);
 	    }
 	    else if(tagsStr)
 	    {

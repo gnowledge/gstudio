@@ -60,73 +60,7 @@
             <img src="{% url 'get_gridfs_resource' node.fs_file_ids.2 %}" class="img-mid-size" alt="" />
           {% endif %}
           {% else %}
-            <li class="card">
-              {% if grouptype == "Moderated" %}
-                {% if node.status == "DRAFT" %}
-                  <div class="draft">
-                {% elif node.status == "PUBLISHED" %}
-                  <div class="published">
-                {% endif %}
-              {% else %}
-                <div class='{% if node.status == "PUBLISHED" %}published{% endif %}'>
-              {% endif %} 
-                <div class="row">
-                  <div class="small-8 column">
-                    <b>
-                      {{ node.name }} {% if node.collection_set %} <i class="fi-page-multiple"></i> {% endif %}
-                    </b>
-                  </div>
-                  <div class="small-4 column">
-                    {% if "image" in node.mime_type %}
-                      <img src="{% url 'getFileThumbnail' group_id node.pk %}" alt="No thumbnail available!" />
-                    {% elif "audio" in node.mime_type %}
-                      <span class="fi-music" style="font-size:40px"></span>
-                    {% elif "Pandora_video" in node.member_of_names_list and "video" in node.mime_type %}
-                    {% get_source_id node.pk as source_id %}
-                      <img src="http://wetube.gnowledge.org/{{source_id}}/icon128.jpg"/>
-                    {% elif "video" in node.mime_type and node.member_of_names_list|join:', ' != "Pandora_video" %}
-                      {% get_source_id node.pk as source_id %}
-                      {% if source_id %}
-                            <img src="http://wetube.gnowledge.org/{{source_id}}/icon128.jpg"/>
-                      {% endif %}
-                      <img src="{% url 'getFileThumbnail' group_id node.pk %}" alt="No thumbnail available!"/>
-                     {% comment %}
-                     <!--
-                      <video width="100px" src="{% url 'getFileThumbnail' group_id node.pk %}">
-                       No thumbnail available!
-                      </video>
-                     -->
-                     {% endcomment %}
-                    {% else %}
-                      <span class="fi-page-filled" style="font-size:40px"></span>
-                    {% endif %}
-                  </div>
-                </div>
-                <hr/>
-                <span style="font-size:12px;">{{ node.html_content|default_if_none:"Add some description."|safe|striptags|truncatechars:75 }}</span></br>
-                
-
-                <footer>
-                  <div class="small-6 columns">{{node.mime_type|truncatechars:15}}</div>
-                  <div class="small-6 columns"><div class="right"><strong>{{node.file_size.size}}</strong> {{node.file_size.unit}}</div></div>
-                </footer>
-                <footer>
-                    <div class="age">
-                      {{ node.member_of_names_list|join:', ' }} created {{node.created_at|timesince}} ago 
-                      <br/>
-                    <span><strong>{{node.contributors|length}}</strong> Contributor{{node.contributors|pluralize}} | </span>
-                      by <span class="user" href="{% url 'dashboard' node.created_by %}" data-gnow="">{{node.user_details_dict.created_by}}</span> &nbsp;&nbsp;&nbsp;
-                    </div>
-                  </footer>
-
-                  <div class="label-list small-12 columns">
-                    {% for tag in node.tags|slice:":3" %}
-                    <a href="{% url 'tag_info' group_name_tag tag %}">
-                      <span class="label" style="background-color:yellow">{{tag}}</span>
-                    </a>{% endfor %}
-                  </div>
-              </div>
-            </li>
+           {% include 'ndf/node_ajax_content.html' with no_discussion=True is_course=True %}
           {% endif %}
             <!-- end new -->      
         </ul>

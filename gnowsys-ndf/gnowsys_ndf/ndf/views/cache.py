@@ -55,7 +55,7 @@ def cache_status(request):
 
     shell_cmd_stats_items_output, error = shell_cmd_stats_items.communicate()
     shell_cmd_stats_items_output = shell_cmd_stats_items_output.splitlines()[:-1]
-    
+
     shell_cmd_stats_item_no_list = list(set([x.replace(' ', '').split(':')[1] for x in shell_cmd_stats_items_output]))
     # print shell_cmd_stats_item_no_list
 
@@ -68,11 +68,12 @@ def cache_status(request):
         all_items_list += [x.split(":")[2] for x in shell_cmd_stats_each_item_output]
 
     # print all_items_list
+    stats_cmd_get = stats.cmd_get | 1
 
     return render_to_response(
         'ndf/memcached_status.html', dict(
             stats=stats,
-            hit_rate=100 * stats.get_hits / stats.cmd_get,
+            hit_rate=100 * (stats.get_hits / stats_cmd_get),
             time=datetime.datetime.now(), # server time
             all_cached_items=all_items_list,
         ))
@@ -80,7 +81,7 @@ def cache_status(request):
 
 def invalidate_cache_page(view_name, args=[], namespace=None, key_prefix=None):
     """
-        This function allows you to invalidate any view-level cache which is implemented 
+        This function allows you to invalidate any view-level cache which is implemented
         with @cache_page.
         view_name: view function you wish to invalidate or it's named url pattern
         args: any arguments passed to the view function
@@ -90,7 +91,7 @@ def invalidate_cache_page(view_name, args=[], namespace=None, key_prefix=None):
     from django.core.urlresolvers import reverse
     from django.http import HttpRequest
     from django.utils.cache import get_cache_key
-    
+
     # create a fake request object
     request = HttpRequest()
     # Loookup the request path:
@@ -102,12 +103,12 @@ def invalidate_cache_page(view_name, args=[], namespace=None, key_prefix=None):
     if key:
         if cache.get(key):
             # print key
-            # Delete the cache entry.  
+            # Delete the cache entry.
             #
-            # Note that there is a possible race condition here, as another 
+            # Note that there is a possible race condition here, as another
             # process / thread may have refreshed the cache between
-            # the call to cache.get() above, and the cache.set(key, None) 
-            # below.  This may lead to unexpected performance problems under 
+            # the call to cache.get() above, and the cache.set(key, None)
+            # below.  This may lead to unexpected performance problems under
             # severe load.
             cache.set(key, None, 0)
         return True
@@ -119,7 +120,7 @@ def invalidate_set_cache(cache_key):
         Invalidates cache set by cache.set() method.
         Returns True with key value set to NULL, if key found else returns False.
     '''
-    
+
     cache_result = cache.get(cache_key)
 
     if cache_result:

@@ -2,13 +2,20 @@
 {% load i18n %}
 {% load ndf_tags %}
 {% get_group_name groupid as group_name_tag %}
-
-
+{% check_is_gstaff groupid request.user as is_gstaff %}
+{% get_node groupid as group_obj %}
 {% block title %} {{title}} {% endblock %}
 
 
 {% block style %}
-
+.top-gap
+{
+margin-top:15px !important;
+}
+.filter-body
+{
+margin-top:5px !important;
+}
   .first-load { display: none; }
 
   .tabs dd.active a, .tabs .tab-title.active a { background-color: #f7f7f7; color: black; }
@@ -25,6 +32,7 @@
   .tabs-content > .content.active{
   margin-left:-1px !important;
   }
+
 
 {% endblock %}
 
@@ -244,6 +252,13 @@
       <div class="coll_label row" style="display:none;">
         <span class="small-12 columns">Create Collection</span>
         <div class="small-11 columns"><input type="text" class="coll_value" placeholder="Enter collection name" name="coll_name"/></div><a class="create_coll"><span class="fi-check" style="color:green;"></span></a>
+
+        {% if group_obj.created_by == request.user.id or user.is_superuser %}
+        <div class="small-11 columns">
+                <a class="tiny button radius right-btn delete-multiple-files" title="Delete  {{node.member_of_names_list.0}}">{% trans 'Delete Files' %}</a>
+        </div>
+        {% endif %}
+        
       </div>
     </ul>
   </div>
@@ -252,20 +267,18 @@
 
 
 {% block body_content %}
-  <div class="large-4 columns repository-title">
+  <div class="large-4 columns repository-title top-gap">
       {% if app_gst.altnames and app_gst.altnames != "None" %}
          {% trans app_gst.altnames %}
       {% else %}
         {% trans app_gst.name %}
       {% endif%}
   </div>
-    
-    <div class="large-8 columns repository-desc">{{app_gst.content_org|default_if_none:""|safe}}</div>
+    <div class="large-8 columns repository-desc top-gap">{{app_gst.content_org|default_if_none:""|safe}}</div>
   {% if title == "E-Library" %}
-    {% get_filters_data "File" as filter_dict %}
+    {% get_filters_data "File" groupid as filter_dict %}
     {% include "ndf/filters.html" with filter_dict=filter_dict %}
   {% endif %}
-
   <div class="tabs-content gallery">
 
     {% if already_uploaded %} 
@@ -732,6 +745,41 @@
   {% if is_video %}
     alert("Your video file uploaded succesfully, But still in process, play video about 1 hour after");
   {% endif %}
+
+  $(".delete-multiple-files").click(function(){
+   // var coll_node = $(".coll_value").val()
+      var coll_arr = []
+      $('.filenode:checked').each(function() {
+        coll_arr.push($(this).val());
+      });
+      // alert(coll_arr);
+
+      var r = confirm("Do you want to save the collection of selected elements");
+      if (r == true) {
+          x = "Your collection is saved successfully";
+          $.ajax({
+            type: "POST",
+            url: "{% url 'delete_multiple_resources' group_id %}",
+            datatype: "html",
+            data:{
+              collection: coll_arr,
+              csrfmiddlewaretoken: '{{ csrf_token }}'
+            },
+            success: function(data) {
+              alert("File(s) deleted successfully");
+              location.reload();
+
+            }
+          });
+
+          
+      } else {
+          x = "Cancelled";
+      }
+  })
+
+
+
 
 // </script>
 

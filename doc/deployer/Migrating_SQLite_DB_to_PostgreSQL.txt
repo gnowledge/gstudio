@@ -76,27 +76,66 @@ TRANSFERRING DATA FROM OLD/sqlite TO PostgreSQL
 
 =======================================================
 
-# Misc: commands tried:
+# Misc commands:
 
 # dumps data with traceback on terminal:
-# 	$ python manage.py dumpdata --indent=2 -v 2 --traceback
+$ python manage.py dumpdata --indent=2 -v 2 --traceback
+
 
 # Dump data excluding above specified excluded apps:
-# 	$ ./manage.py dumpdata --exclude auth.permission --exclude contenttypes --exclude memcache_admin > db.json
+$ ./manage.py dumpdata --exclude auth.permission --exclude contenttypes --exclude memcache_admin > db.json
+
 
 # to inspect DB:
-# 	$ python manage.py inspectdb
+$ python manage.py inspectdb
+
 
 # list all table names from django project shell:
-# 	from django.db import connections
-# 	connection = connections['default']
-# 	connection.introspection.table_names()
+>>> from django.db import connections
+>>> connection = connections['default']
+>>> connection.introspection.table_names()
 
-Updating size of notification columns.
 
+# Updating size of notification columns.
 alter table notification_noticetype alter COLUMN display TYPE varchar(1024);
 alter table notification_noticetype alter COLUMN label TYPE varchar(1024);
 alter table notification_noticetype alter COLUMN description TYPE varchar(1024);
 
+
 # to reset last author id
+select max(id) from auth_user;
+select max_value from auth_user_id_seq;
+ALTER SEQUENCE auth_user_id_seq RESTART WITH 1261000;
 alter sequence auth_user_id_seq restart
+
+
+# Tabing BACKUP/DUMP of all DBs and table
+pg_dumpall > file-name.sql
+
+
+# DROP database
+$ sudo su - postgres
+# getting into psql
+postgres@62ea0453f8a2:~$ psql
+# listing of tables
+postgres=# \l
+postgres=# drop database gstudio_psql ;
+
+
+# RESTORE SQL table:
+$ echo "psql -f <path and name of dump file e.g: pg_dump_all.sql> ;" | sudo su - postgres
+
+
+# links:
+http://www.thegeekstuff.com/2009/01/how-to-backup-and-restore-postgres-database-using-pg_dump-and-psql/
+
+
+# To know size of each and every table of db:
+root@mz3:/home/docker/code# su - postgres
+postgres@mz3:~$ psql
+postgres=# \c gstudio_psql 
+gstudio_psql=# SELECT
+   relname as "Table",
+   pg_size_pretty(pg_total_relation_size(relid)) As "Size",
+   pg_size_pretty(pg_total_relation_size(relid) - pg_relation_size(relid)) as "External Size"
+   FROM pg_catalog.pg_statio_user_tables ORDER BY pg_total_relation_size(relid) DESC;

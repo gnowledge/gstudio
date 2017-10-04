@@ -21,23 +21,22 @@ this template is modified. So for the fields in the template it supports -
  -->
 
 {% block meta_content %}
-  {% blocktrans %}
-    <h3>Types of Groups</h3>
-    <hr/>
-    <h5>Open Groups</h5>
-    <p class="subheader">Open groups are ideal for projects that require a high level of collaboration and participation. Any metastudio user can join this group without prior approval</p>
-    <h5>Closed Groups</h5>
-    <p class="subheader">Closed groups are ideal for projects that require restricted access to content and documents. Users can only join after their membership request is approved or have been invited.</p>
-  {% endblocktrans %}
 {% endblock %}
 
 
 {% block body_content %}
   <h2 class="text-center">
     <small>
-      {% if node %} Edit | {{node.name}}
+      {% if node %}
+        Edit | {{node.name}}
+
       {% else %} 
-        {% trans "Create " %}{{spl_group_type}}
+        {% trans "Create " %}
+        {% if spl_group_type == "CourseEventGroup" %}
+          Course
+        {% elif spl_group_type == "ProgramEventGroup" %}
+          Program
+        {% endif %}
       {% endif %}
     </small>
   </h2>
@@ -126,6 +125,34 @@ this template is modified. So for the fields in the template it supports -
         </div>
       </div>
     </div>
+
+    <!-- language -->
+    <div class="row">
+      <div class="small-12 medium-6 medium-centered columns">
+        <div class="row">
+          <div class="small-4 columns">
+            <label for="right-label" class="inline">{% trans "Language" %}</label>
+          </div>
+
+          <div class="small-8 columns">
+            {% get_language_info_list for LANGUAGES as languages %}
+            <select name="language" class="gtype">
+                {% for language in languages %}
+                    {% if node.language.0 == language.code %}
+                        <option selected value="{{ language.code }}" data-sub-lang="{{ language.name }}" data-sub-code="{{ language.code }}">{{ language.name }}</option>
+                    {% else %}
+                        <option value="{{ language.code }}" data-sub-lang="{{ language.name }}" data-sub-code="{{ language.code }}">{{ language.name }}</option>
+                    {% endif %}
+                {% endfor %}
+            </select> 
+            <small class="error">{% trans "Please select group type." %}</small>
+          </div>
+
+        </div>
+      </div>
+    </div>
+
+
     {% if spl_group_type == "ProgramEventGroup" %}
     <!-- moderation level -->
     <div class="row" id="moderation-level">
@@ -331,16 +358,15 @@ this template is modified. So for the fields in the template it supports -
               
           <div class="small-4 columns">
             <label for="right-label" class="inline">{% trans "Upload thumbnail" %}</label>
-            <small><i>(.svg images are currently not supported)</i></small>
           </div>
           <div class="small-8 columns">
           {% if logo_img_node %}
             <a target="_blank" href="{% url 'read_file' group_id logo_img_node.pk %}">{% trans "View existing thumbnail " %}</a>
             <input type="button" class="button tiny" id="change_logo" value="Edit">
             <input type="button" class="button tiny hide" id="cancel_change_logo" value="Cancel">
-            <input type="file" name="docFile" id="docFile" class="hide" accept="image/*"/>
+            <input type="file" name="filehive" id="filehive" class="hide" accept="image/*"/>
           {% else %}
-          <input type="file" name="docFile" id="docFile" accept="image/*"/>
+          <input type="file" name="filehive" id="filehive" accept="image/*"/>
           {% endif %}
 
           </div>
@@ -354,13 +380,13 @@ this template is modified. So for the fields in the template it supports -
       <!-- <div class="small-12 medium-6 medium-centered columns"> -->
     <dl class="accordion row" title="Click to Add/Edit Description" data-accordion>
       <dd class="accordion-navigation small-12 medium-6 medium-centered columns">
-        <a href="#content_org">
+        <a href="#content">
           <label for="right-label" class="">
-            {% if node.content_org %}Edit{% else %}Add{% endif %} {% trans "Description" %}
+            {% if node.content %}Edit{% else %}Add{% endif %} {% trans "Description" %}
           </label>
         </a>
-        <div id="content_org" class="content">
-          {% include "ndf/html_editor.html" with var_name="content_org" var_placeholder="Enter the content here" var_value=node.content|default_if_none:"" ckeditor_toolbar="GeneralToolbar" node_id=node.pk %}
+        <div id="content" class="content">
+          {% include "ndf/html_editor.html" with var_name="content" var_placeholder="Enter the content here" var_value=node.content|default_if_none:"" ckeditor_toolbar="GeneralToolbar" node_id=node.pk %}
         </div>
       </dd>
     </dl>
@@ -425,24 +451,14 @@ this template is modified. So for the fields in the template it supports -
   });
   $(document).on('click',"#change_logo",function(){
     $("#cancel_change_logo").removeClass("hide");
-    $("#docFile").removeClass("hide");
+    $("#filehive").removeClass("hide");
   })
 
   $(document).on('click',"#cancel_change_logo",function(){
     $("#cancel_change_logo").addClass("hide");
-    $("#docFile").addClass("hide");
-    $("#docFile").val("")
+    $("#filehive").addClass("hide");
+    $("#filehive").val("")
   })
-
-  $("#docFile").change(function(event) {
-    file_mime_type = this.files[0].type;
-    if(file_mime_type.indexOf("svg") >= 0 ){
-      alert("{% trans '.svg images are currently not supported' %}")
-      $("#docFile").val("");
-      event.preventDefault();
-    }
-  });
-
 
 // </script>
 {% endblock %}

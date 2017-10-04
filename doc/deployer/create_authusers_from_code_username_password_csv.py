@@ -1,13 +1,14 @@
 import os
 import csv
 import time
+import re
 from bson import ObjectId
 from django.contrib.auth.models import User
 from gnowsys_ndf.settings import GSTUDIO_LOGS_DIR_PATH
 from gnowsys_ndf.ndf.models import Author, node_collection
 
 if not os.path.isdir(GSTUDIO_LOGS_DIR_PATH):
-	os.makedirs(GSTUDIO_LOGS_DIR_PATH)
+    os.makedirs(GSTUDIO_LOGS_DIR_PATH)
 
 auth_gst = node_collection.one({'_type': u'GSystemType', 'name': u'Author'})
 auth_gst_id = auth_gst._id
@@ -21,21 +22,33 @@ if os.path.exists(file_input):
     msg = '\nFound file: "' + str(file_input) + '"\n\n'
     print msg
     with open(file_input, 'rb') as csvfile:
-        users = csv.reader(csvfile, delimiter=';')
+        users = csv.reader(csvfile, delimiter=',')
         for school_code, username, password in users:
+        # for school_code, username, password, user_id, first_name, last_name in users:
+
+            # email validation from username
+            email = ''
+            match = re.match('^[_a-z0-9-]+(\.[_a-z0-9-]+)*@[a-z0-9-]+(\.[a-z0-9-]+)*(\.[a-z]{2,4})$', username)
+            if match:
+                email = username
+
             temp_csv_log_list = [school_code, username, password]
-            user_obj = User.objects.create_user(username=username, password=password)
+            user_obj = User.objects.create_user(username=username, email=email, password=password)
+            # user_obj = User.objects.create_user(username=username, email=email, password=password, first_name=first_name, last_name=last_name)
             user_id = user_obj.id
+
             temp_csv_log_list.append(str(user_id))
+
             auth = node_collection.collection.Author()
             auth['name'] = unicode(username)
+            auth['email'] = unicode(email)
             auth['member_of'] = [auth_gst_id]
             auth['group_type'] = u"PUBLIC"
             auth['edit_policy'] = u"NON_EDITABLE"
-            auth['created_by'] = user_id
-            auth['modified_by'] = user_id
-            auth['contributors'] = [user_id]
-            auth['group_admin'] = [user_id]
+            auth['created_by'] = int(user_id)
+            auth['modified_by'] = int(user_id)
+            auth['contributors'] = [int(user_id)]
+            auth['group_admin'] = [int(user_id)]
             auth['agency_type'] = "Student"
             auth['_id'] = ObjectId()
             auth.save(groupid=auth['_id'])

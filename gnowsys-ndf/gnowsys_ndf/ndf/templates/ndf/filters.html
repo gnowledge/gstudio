@@ -1,3 +1,4 @@
+{% load i18n %}
 <!-- {# /**
 	===: Instructions :===
 
@@ -28,7 +29,6 @@
 	applyFilter(filtersObjArr).
 **/ } -->
 
-{% load i18n %}
 <style type="text/css">
 
 	div#filter-area {
@@ -141,8 +141,8 @@
 							<option value=""> -- {% trans 'Select' %} -- </option>
 
 						</select>
-						<input type="button" class="button radius tiny" value="{% trans 'Filter' %}" id="filter-btn">
-						<input type="button" class="button radius tiny" value="Clear" id="filter-clear-btn">
+						<input type="button" class="button radius tiny" value="{% trans 'Filter' %}"  style="width:65px!important" id="filter-btn">
+						<input type="button" class="button radius tiny" value="Clear" id="filter-clear-btn" style="width:65px!important">
 					</div>
 				</div>
 			</div>

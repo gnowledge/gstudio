@@ -1,0 +1,49 @@
+
+<small>
+	<label class="lbl_tag">
+		<a class="visits_count visits_info" title="Show no. of views" style="color: black">Show no. of views</a>
+	</label>
+</small>
+
+<script type="text/javascript">
+
+    $(document).on("click", ".visits_count", function() {
+		var get_params = ""
+		{% if event_player_flag %}
+			get_params = window.location.search;
+		{% endif %}
+		current_url = window.location.pathname;
+		$.ajax({
+			url: "{% url 'get_visits_count' group_id %}",
+			data: {
+				curr_url: current_url,
+				get_params: get_params,
+			},
+
+			type: "GET",
+			global: false,
+
+			dataType: "json",
+
+			beforeSend: function(){
+				$(".visits_count").text("Loading...")
+			},
+
+			success: function(data){
+				if(data['success']){
+					display_views = ""
+					tooltip = "Total visits"
+					if(data['user_views']){
+						tooltip = "Your visits/Total visits"
+						display_views = data['user_views'] + "/"
+					}
+					display_views += data['total_views'] + " visits"
+					$(".visits_count").text(display_views)
+									 .attr("title", tooltip)
+									 .removeClass("visits_count")
+									 //removing class to prevent consecutive ajax call
+				}
+			},
+		});//end of ajax
+    });
+</script>

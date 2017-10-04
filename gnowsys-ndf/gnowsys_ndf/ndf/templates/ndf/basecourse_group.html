@@ -1,0 +1,232 @@
+{% load simple_filters %}
+{% xextends "ndf/base.html" with first_body_column=0 %}
+
+{# {% extends "ndf/base.html" %} #}
+
+{% load i18n %}
+{% load cache %}
+{% load ndf_tags %}
+{% block title %}{% trans 'Events' %} {% endblock %}
+
+{% block style %}
+  .course_outline_table, tr {
+    border: 2px solid #0b8a91;
+    border-collapse: collapse;
+  }
+
+  .gray-text{
+    color: gray;
+  }
+
+  #content > p {
+    color: #6F6F6F !important;
+    /*font-size: inherit;*/
+  }
+
+  tr:hover{
+    cursor:pointer;
+  }
+
+  .tab{
+    padding-left: 2em;
+    background-color:yellow !important;
+  }
+
+  .tab2{
+    padding-left: 4em;
+  }
+
+  #eventModal > label {
+    color: white;
+    font-weight: bold;
+    font-size: 1rem;
+  }
+
+  .all_blogs{
+    overflow-y: auto;
+    height:500px;
+  }
+
+  .jqtree-tree .jqtree-title {
+    margin: 5px;
+    font-size: 15px;
+    color: black !important;
+    /*Change the color here to change font color of tree*/
+  }
+
+  li.remove-dot{
+    list-style: none;
+  }
+
+  .div-height {
+    margin-bottom: 0px !important;
+    height: 258px !important;
+  }
+
+  .course-banner{
+    text-shadow: 2px 2px black !important;
+    background: none !important;
+  }
+
+  #status{
+    width: 100% !important;
+  }
+{% endblock %}
+
+{% block head %}
+<script type="text/javascript" src="/static/ndf/orgitdown/jquery.orgitdown-foundation.js"></script>
+<!-- orgitdown! toolbar settings -->
+<script type="text/javascript" src="/static/ndf/orgitdown/skins/gstudio/set.js"></script>
+<!-- orgitdown! skin -->
+<link rel="stylesheet" type="text/css" href="/static/ndf/orgitdown/skins/gstudio/style.css" />
+
+<script src="/static/ndf/bower_components/jquery-ui/jquery-ui.min.js"></script>
+<link rel="stylesheet" href="/static/ndf/bower_components/jquery-ui/themes/smoothness/jquery-ui.css">
+
+{% endblock %}
+
+{% block extended_header %}
+{% endblock %}
+{% block body_content %}
+{% check_is_gstaff groupid request.user as is_gstaff %}
+{% user_access_policy groupid request.user as user_access %}
+{% get_course_session_status group_obj True as next_session_in_course %}
+
+<div id="eventModal" class="reveal-modal medium alert-box radius" data-reveal data-alert>
+  <label id="eventModalLabel"></label>
+  <a class="close-reveal-modal">&#215;</a>
+</div>
+<div class="course-page-opacity"></div>
+{% comment %}
+<div id="view-page" class="small-12 large-12 columns"></div>
+{% endcomment %}
+<div class="course-page">
+
+  <div class="container">
+  <div id="envelop-cover">
+
+    <div class="medium-12 course-page-header">
+    <div class="row " >
+      <div class="course-header-background">
+        {% include 'ndf/widget_photo_upload.html' with url_name='course_about' widget_for="group_banner" is_banner=True is_profile=False no_update_btn=True%}
+        <div class="course-header-background-layer"></div>
+      </div>
+      {% if is_gstaff %}
+        <div class="row" style="z-index: 2;">
+            <div class="course-settings">
+              <span data-dropdown="course-settings-drop" aria-controls="course-settings-drop" aria-expanded="false" class="tiny radius right">
+                <i class="fi-widget"></i>
+              </span>
+              <span data-reveal-id="group_banner_prof_pic_prop" id="group_banner_btnUploadProfilePic" class="right">
+                <i class="fi-photo"></i>
+                <span style="position: relative;top: -3px;left: 2px;">Change image</span>
+              </span>
+              <ul id="course-settings-drop" class="f-dropdown" data-dropdown-content aria-hidden="true" tabindex="-1">
+                <li><a href="{% url 'create_edit' group_id group_obj.pk %}" class="tiny radius"><i class="fi-page-edit"></i> {% trans "Edit Course" %}</a></li>
+                <li><a class="tiny radius" href="{% url 'create_course_struct' group_id group_obj.pk %}"> <i class="fi-clipboard-notes"></i> {% if group_obj.collection_set %}{% trans "Edit Course Structure" %}{% else %}{% trans "Add  Course Structure" %}{% endif %}</a></li>
+                {% comment %}
+                <li><a class="tiny radius settings" ><i class="fi-clock"></i> {% trans " Plan Release Dates" %}</a></li>
+                {% endcomment %}
+ 
+                <li>
+                  <a href="{% url 'create_event_group' group_id 'CourseEventGroup' %}?cnode_id={{group_id}}" class="fi-volume"> Announce</a>
+                </li>
+                <li>
+                  <a id="subscr_users" class="fi-torsos" data-reveal-id="inviteusers" title="View/Subscribe Users">{% if sg_type == "CourseEventGroup" %}{% trans ' Add Students' %} {% else %} {% trans ' Add Members' %} {% endif %} </a>
+                  {% include "ndf/invite_users.html" with no_subscribe_btn=True node=group_obj%}
+                </li>
+
+                <li>
+                  <a id="subscr_admins" data-reveal-id="inviteadmins" title="View/Subscribe Admins" class="fi-torsos">{% trans ' Add Admins' %}</a>
+                  {% include "ndf/invite_admins.html" with no_subscribe_btn=True node=group_obj %}
+                </li>
+              </ul>
+            </div>
+        </div>
+
+      {% endif %}
+
+
+      <div class="row">
+        <div class="columns small-3 small-centered course-title">
+          {% firstof group_obj.altnames group_obj.name  %}
+        </div>
+      </div>
+      <div class="row" style="line-height: 0.7em;">
+        <ul class="tabs course-tabs show-for-medium-up">
+
+          <li class="tab-title {% ifequal title 'about' %}active{% endifequal %}">
+            <a href="{% url 'course_about' group_id %}">
+              <i class="fi-eye "></i>
+              <span>{% trans "Overview" %}</span>
+            </a>
+          </li>
+
+          <li class="tab-title {% ifequal title 'course content' %}active{% endifequal %}">
+            <a href="{% url 'course_content' group_id %}">
+              <i class="fi-list-thumbnails"></i><span>{% trans "Course Content" %}</span>
+            </a>
+          </li>
+
+          <li class="tab-title {% ifequal title 'raw material' %}active{% endifequal %}">
+            <a href="{% url 'course_raw_material' group_id %}">
+              <i class="fi-paint-bucket "></i><span>{% trans "Raw Material" %}</span>
+            </a>
+          </li>
+
+        </ul>
+      </div>
+    </div>
+    </div>
+    </div>
+
+
+
+  <!-- Tabs -->
+  <div id="envelop-content" >
+    <div class="row">
+    <!-- Envelop box-->
+    <div class="small-12 large-12 columns">
+      <div class="row show-for-small-only">
+        <div class="large-12 columns">
+          <label>
+            <select id="selectCourseTab">
+              <option value="about_course" {% ifequal title 'about' %}selected{% endifequal %}>{% trans "About the course" %}</option>
+              <option value="course_content" {% ifequal title 'course content' %}selected{% endifequal %}>{% trans "Course Content" %}</option>
+              <option value="raw_material" {% ifequal title 'raw material' %}selected{% endifequal %}>{% trans "Raw Material" %}g</option>
+            </select>
+          </label>
+        </div>
+      </div>
+      <!-- Load tab contents dynamically -->
+      <div class="tabs-content course-book">
+        <div class="content active" id="course-dashboard">
+          {% if title == 'course content' %}
+            {% include "ndf/gcollection_ajax_view.html" %}
+
+          {% elif title == 'raw material' %}
+            {% include "ndf/ggallerypage.html" with file_detail_url='course_raw_material_detail' redirect_tab_url='course_raw_material'%}
+
+          {% elif title == 'about' %}
+            {% include "ndf/course_about.html" %}
+            {% comment %}
+            <div class="row collapse">
+              <div class="about-course-details">
+                <p>{{group_object.content_org|safe}}
+                </p>
+              </div>
+            </div>
+            {% endcomment %}
+          {% endif %}
+        </div>
+      </div>
+      <!-- tab-content ends here -->
+    </div>
+    </div>
+    </div>
+      {% if title == "raw material" %}
+        {% include 'ndf/pagination.html' with urlname="course_raw_material_paged" first_arg=group_name_tag page_info=raw_material_page_info %}
+      {% endif  %}
+  </div>
+</div>
+{% endblock %}

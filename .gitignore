@@ -1,42 +1,55 @@
 # Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[cod]
+*.py[co]
+
 
 # C extensions
 *.so
 
-# Distribution / packaging
+
+# Distribution / packaging / Packages
 .Python
 env/
-bin/
-build/
-develop-eggs/
-dist/
-eggs/
+bin
+build
+develop-eggs
+dist
+eggs
+*.egg
+*.egg-info
 lib/
 lib64/
-parts/
-sdist/
-var/
+parts
+sdist
+var
 *.egg-info/
 .installed.cfg
 *.egg
+
 
 # Installer logs
 pip-log.txt
 pip-delete-this-directory.txt
 
+
 # Unit test / coverage reports
 htmlcov/
-.tox/
+.tox
 .coverage
 .cache
 nosetests.xml
 coverage.xml
 
+
+# IDE cruft
+.idea
+
+
 # Translations
 *.mo
 *.po
+
 
 # Mr Developer
 .mr.developer.cfg
@@ -46,20 +59,30 @@ coverage.xml
 # Rope
 .ropeproject
 
+
 # Django stuff:
 *.log
 *.pot
 
+
 # Sphinx documentation
 docs/_build/
+
 
 # emacs tags
 TAGS
 
+
 # Temporary cache files
 .sass-cache
 
-# others
+
+stupid_authz_impls
+.DS_Store
+.gitmodules~
+
+
+# others / gstudio
 local/
 include/
 rcs-repo/
@@ -71,3 +94,9 @@ wikidata/
 *local_settings.py
 img/
 media/
+
+
+# dlkit
+dlkit
+dlkit_runtime
+qbank-lite

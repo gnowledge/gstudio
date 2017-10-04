@@ -31,7 +31,6 @@ from gnowsys_ndf.ndf.templatetags.ndf_tags import get_relation_value  # get_exis
 from gnowsys_ndf.ndf.views.methods import *
 from gnowsys_ndf.ndf.views.data_review import data_review
 from gnowsys_ndf.ndf.templatetags.ndf_tags import get_sg_member_of
-from gnowsys_ndf.ndf.views.group import CreateModeratedGroup, CreateEventGroup, CreateGroup
 from gnowsys_ndf.ndf.views.notify import *
 
 
@@ -44,6 +43,7 @@ def moderation_status(request, group_id, node_id, get_only_response_dict=False):
 		group_name, group_id = get_group_name_id(group_id)
 
 	node = node_collection.one({'_id': ObjectId(node_id)})
+	from gnowsys_ndf.ndf.views.group import CreateModeratedGroup, CreateEventGroup, CreateGroup
 
 	if not node:  # invalid ObjectId
 		return render_to_response('ndf/under_moderation.html', {
@@ -152,6 +152,7 @@ def moderation_status(request, group_id, node_id, get_only_response_dict=False):
 	return render_to_response('ndf/under_moderation.html', response_dict, RequestContext(request))
 
 def all_under_moderation(request, group_id):
+	from gnowsys_ndf.ndf.views.group import CreateModeratedGroup, CreateEventGroup, CreateGroup
 
 	group_obj = get_group_name_id(group_id, get_obj=True)
 	if not group_obj.edit_policy == 'EDITABLE_MODERATED':
@@ -216,6 +217,8 @@ def approve_resource(request, group_id):
 	Method to approve resorce.
 	Means resource will get published by moderator to next moderated or parent group.
 	'''
+	from gnowsys_ndf.ndf.views.group import CreateModeratedGroup
+
 	group_obj = get_group_name_id(group_id, get_obj=True)
 	node_id = request.POST.get('node_oid', '')
 	node_obj = node_collection.one({'_id': ObjectId(node_id)})
@@ -527,6 +530,7 @@ def get_moderator_group_set(node_group_set, curr_group_id, get_details=False):
 		"is_new_group_top_group": is_new_group_top_group
 	}
 	'''
+	from gnowsys_ndf.ndf.views.group import CreateModeratedGroup
 
 	curr_group_obj = node_collection.one({'_id': ObjectId(curr_group_id)})
 	group_set = node_group_set[:]

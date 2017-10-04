@@ -15,81 +15,64 @@
 
 </style>
 <div class="content" id="status" align="left" {% if not hyperlinks %} style="width:500px"{% endif %}>
-<div style="background-color: white; height:auto; width:auto;" >
+<div style="background-color: white; width:auto" >
 
 {% for i in activity_list %}
   {% get_url i.pk as res_type %}
    {% if res_type != "None" or "Reply" in i.member_of_names_list %}
 
-   <div class="container-div selFile course-notif" title="{{i.created_at|timesince}} ago">
+   <div class="container-div selFile course-notif">
       <div class="row">
-      {% comment %}
-        <div class="medium-2 columns">
-          <div class="notif-type">
-            <img src="/static/ndf/css/themes/metastudio/logo.svg">
-            <div class="notif-rating">
-              <i class="fa fa-star" aria-hidden="true"></i>
-              <span>3.5</span>
-            </div>
-          </div>
-        </div>
-        {% endcomment %}
-        <div class="medium-10 columns">
-            <span class="notif-from">
-              {% if hyperlinks %}
-              <a href="{% url 'dashboard' i.created_by %}"> {{i.user_details_dict.created_by}} </a>
-              {% else %}
-              {{i.user_details_dict.created_by}}
+        <div class="large-12 columns" style="margin-left:10px">
+            
+                {% if hyperlinks %}
+                  <a href="{% url 'dashboard' i.created_by %}"> {{i.user_details_dict.created_by}} </a>
+                {% else %}
+                {{i.user_details_dict.created_by}}
               {% endif %}
-            </span>
-            has  <b>
-            {% if "Reply" in i.member_of_names_list %}
-              {% trans "commented" %}
-              {% if i.origin %}
-                {% for each_origin_field in i.origin %}
-                  {% if "prior_node_id_of_thread" in each_origin_field %}
-                    {% get_node each_origin_field.prior_node_id_of_thread as prior_node_obj %}
-                    {% if prior_node_obj %}
-                      {% trans " on " %}{{prior_node_obj.name}}
+              
+              has  <b>
+              {% if "Reply" in i.member_of_names_list %}
+                {% trans "commented" %}
+                {% if i.origin %}
+                  {% for each_origin_field in i.origin %}
+                    {% if "prior_node_id_of_thread" in each_origin_field %}
+                      {% get_node each_origin_field.prior_node_id_of_thread as prior_node_obj %}
+                      {% if prior_node_obj %}
+                        {% trans " on " %}{{prior_node_obj.name}}
+                      {% endif %}
                     {% endif %}
-                  {% endif %}
-                {% endfor %}
-              {% endif %}
-            {% elif "File" in i.member_of_names_list %}
-              {% if i.activity == "created" %}
-                {% trans "uploaded" %}
+                  {% endfor %}
+                {% endif %}
+              {% elif "File" in i.member_of_names_list %}
+                {% if i.activity == "created" %}
+                  {% trans "uploaded" %}
+                {% else %}
+                  {{i.activity}}
+                {% endif %}
               {% else %}
                 {{i.activity}}
-              {% endif %}
-            {% else %}
-              {{i.activity}}
-            {% endif %}</b>
+              {% endif %}</b>
 
         {% if hyperlinks %}
-        <div id="create_type"  style="display: inline-block;" >
-          {% if res_type != "event_app_instance_detail" %}
-                <a href="{% url res_type groupid i.pk   %}"> {{i.name}} </a>
+            {% if res_type != "event_app_instance_detail" %}
+                  <a href="{% url res_type groupid i.pk   %}" title="{{i.name}}"> {{i.name|truncatechars:50}} </a>
 
-          {% else %}
-              {% get_event_type i as app_set_id %}
-                 <a href="{% url res_type groupid app_set_id i.pk  %}">{{i.name}} </a>
+            {% else %}
+                {% get_event_type i as app_set_id %}
+                   <a href="{% url res_type groupid app_set_id i.pk  %}">{{i.name}} </a>
           {% endif %}
-        </div>
 
       {% else %}
-        <div id="create_type"  style="display: inline-block;" >
           {% if "Reply" not in i.member_of_names_list %} {{i.name}}{% endif %}
-        </div>
 
       {% endif %}
 
       {% if hyperlinks %}
-        <div id="performed on" class="small-2 column"  style=" position:relative; word-wrap: break-word; width:auto; left:42%;" >
               {{i.created_at|timesince}} ago
-        </div>
         <div  align="right" style="position:relative; right:4%; top:-15px;" >
-        {% if 'image' in i.mime_type %}
-        <a href="{% url res_type groupid i.pk   %}"> <div> <img src="{% url 'getFileThumbnail' group_id i.pk %}" style="height:50px; width:50px;"> </div>
+        {% if 'image' in i.if_file.mime_type %}
+         <a href="{% url res_type groupid i.pk   %}"> <div> <img src="{{MEDIA_URL}}{{i.if_file.thumbnail.relurl}}" style="height:50px; width:50px;"> </div>
         </a>
         {% endif %}
 
@@ -99,10 +82,10 @@
         {% if res_type == 'event_app_instance_detail' %}
           <i class="fi-calendar largesize"></i>
         {% endif %}
-        {% if i.mime_type == 'application/zip' %}
+        {% if i.if_file.mime_type == 'application/zip' %}
           <i class="fi-archive largesize" ></i>
         {% endif %}
-        {% if i.mime_type == 'application/pdf' %}
+        {% if i.if_file.mime_type == 'application/pdf' %}
           <i class="fi-page-pdf largesize"></i>
         {% endif %}
         {% if i.mime_type == 'application/octet-stream' %}

@@ -12,12 +12,12 @@
 
   [1] Installing required following packages and its dependencies:
 
-      > sudo apt-get install python-setuptools git build-essential python-dev rcs mongodb emacs24 python-virtualenv ipython libjpeg-dev memcached libevent-dev libfreetype6-dev zlib1g-dev ffmpeg2theora rabbitmq-server
+      > sudo apt-get install python-setuptools git build-essential python-dev rcs mongodb python-virtualenv ipython libjpeg-dev memcached libevent-dev libfreetype6-dev zlib1g-dev ffmpeg2theora rabbitmq-server libssl-dev libffi-dev libxml2-dev libxslt1-dev apt-transport-https
 
-  [2] Get latest version of gstudio-mongokit using one of the following commands:
+  [2] Get latest version of gstudio using one of the following commands:
 
       (1) git clone https://github.com/gnowledge/gstudio.git
-      (2) git clone git@github.com:gnowledge/gstudio.git  
+      (2) git clone git@github.com:gnowledge/gstudio.git
 
   [3] Use following commands to install ffmpeg package:
 
@@ -25,48 +25,15 @@
       (2) sudo apt-get update
       (3) sudo apt-get install ffmpeg gstreamer0.10-ffmpeg
 
-  [4] In case your distribution of GNU/Linux is not latest, you may not
-      find emacs24 in your repositories. In that case, satisfy the requirement
-      by following these instructions:
-
-      (1) sudo add-apt-repository ppa:cassou/emacs
-      (2) sudo apt-get update
-      (3) sudo apt-get install emacs24 emacs24-el emacs24-common-non-dfsg
-
-  [5] Setting up Emacs working environment:
-
-      Create an init file in your user directory with filename as '.emacs'
-      (i.e., /home/<username>/.emacs) to store default settings for emacs
-      , which includes following lines of code:
-
-      NOTE: How to get org-version?
-      (1) Open emacs editor
-      (2) Press Alt+X
-      (3) Enter following command: org-version [Then Press Enter]
-
-      (a) For org-version < 8.0: Copy following lines of code in above specified file and save it
-          (custom-set-variables
-            '(inhibit-startup-screen t)
-            '(org-export-html-preamble nil)
-            '(org-export-html-postamble nil)
-          )
-
-      (b) For org-version >= 8.0: : Copy following lines of code in above specified file and save it
-          (custom-set-variables
-            '(inhibit-startup-screen t)
-            '(org-html-preamble nil)
-            '(org-html-postamble nil)
-          )
-
-  [6] Set up virtual environment for gstudio-mongokit:
+  [4] Set up virtual environment for gstudio:
 
       (1) cd gstudio
       (2) virtualenv --system-site-packages .      # NOTE: Here '.' indicates current directory
       (3) source bin/activate                      # Activates virtual environment
       (4) ./bin/pip install -r requirements.txt    # NOTE: Here '.' indicates current directory
 
-  [7] SMTP configuration for notifications:
-   
+  [5] SMTP configuration for notifications:
+
       To make SMTP server ready for sending mail (development purpose only), you can use
       either of the following methods:
 
@@ -79,20 +46,20 @@
 
           (a) Go to settings.py file and search for "#SMTP setting for
               sending mail" and uncomment gmail smtp setting and comment
-              default python smtp settings.  
+              default python smtp settings.
 
           (b) Edit following with your gmail credentials and save
               settings.py file:-
               EMAIL_HOST_USER = 'yourcompleteemailid'
               EMAIL_HOST_PASSWORD = 'yourpassword'
 
-  [8] Install JS/CSS dependencies using Bower:
+  [6] Install JS/CSS dependencies using Bower:
 
-      (1) Activate your virtual environment: 
+      (1) Activate your virtual environment:
           > source bin/activate
 
-      (2) A tool to create isolated node.js environment which is integrated 
-          with environment built by python virtualenv: 
+      (2) A tool to create isolated node.js environment which is integrated
+          with environment built by python virtualenv:
           > sudo apt-get install curl
           > pip install nodeenv
 
@@ -101,10 +68,25 @@
           > nodeenv --python-virtualenv
 
           If above step gives an error, install NodeJS at root level with
-          following commands:  
-          (a) sudo add-apt-repository ppa:chris-lea/node.js
-          (b) sudo apt-get update
-          (c) sudo apt-get install python-software-properties python g++ make nodejs
+          following commands:
+          * For stable nodejs version in ubuntu: 0.10.* 
+              (a) sudo add-apt-repository ppa:chris-lea/node.js
+              (b) sudo apt-get update
+              (c) sudo apt-get install python-software-properties python g++ make nodejs
+          * For latest nodejs version:
+              - Removing existing node, nodejs and npm (if installed previously):
+                - apt-get remove nodejs npm node
+                - sudo apt-get purge nodejs npm node
+                - sudo rm -rvf /usr/local/bin/npm /usr/local/share/man/man1/node* /usr/local/lib/dtrace/node.d ~/.npm ~/.node-gyp /opt/local/bin/node opt/local/include/node /opt/local/lib/node_modules 
+                - sudo rm -rfv /usr/local/lib/node*
+                - sudo rm -rfv /usr/local/include/node*
+                - sudo rm -rfv /usr/local/bin/node*
+
+              (a) sudo apt-get install npm
+              (b) sudo npm cache clean  OR  sudo npm cache vefify
+              (c) sudo npm install -g n
+              (d) sudo n latest
+              (e) ln -sf /usr/local/n/versions/node/<version no from above step>/bin/node /usr/bin/node
 
       (4) Installing Bower:
           > sudo npm install -g bower
@@ -113,7 +95,7 @@
           > cd gstudio/gnowsys-ndf  # Navigate to project-root
           > bower install           # Install depenedencies
 
-  [9] Install Search Dependencies:
+  [7] Install Search Dependencies:
       (1) Run following command:
       > pip install -U pyyaml nltk
 
@@ -156,7 +138,7 @@
       > cd gstudio/gnowsys-ndf
 
   (3) Start mongodb server:
-      > sudo service mongodb start 
+      > sudo service mongodb start
 
   (4) Run following management commands:
 
@@ -170,7 +152,7 @@
       refer following file: gstudio/doc/schema_setup.og
 
   (5) Now point your browser to http://localhost:8000 to see
-      gstudio on your browser. Enjoy.  
+      gstudio on your browser. Enjoy.
 
 
 * Follow gstudio UPDATE(s)
@@ -179,8 +161,8 @@
   from project's git repository. After each update run above specified
   management commands in the given order.
 
-  > git pull https://github.com/gnowledge/gstudio.git mongokit
-  > git pull origin mongokit  # Or Simply
+  > git pull https://github.com/gnowledge/gstudio.git master
+  > git pull origin master  # Or Simply
 
 
 * For 'Replication' and 'mail-client' features refer: doc/Mailclient
@@ -196,7 +178,7 @@
   (b) Running compass:
 
       (1) Navigate to project-root directory (where your "manage.py" file resides), i.e.
-          > cd gstudio/gnowsys-ndf 
+          > cd gstudio/gnowsys-ndf
 
       (2) Run following command (to start compass) and then edit scss stylesheets:
           > compass watch
@@ -209,3 +191,17 @@
 
   - http://gnowledge.org/cgi-bin/mailman/listinfo/gnowsys-dev
 
+
+* Installing yarn:
+  (a) curl -sS https://dl.yarnpkg.com/debian/pubkey.gpg | sudo apt-key add -
+  (b) echo "deb https://dl.yarnpkg.com/debian/ stable main" | sudo tee /etc/apt/sources.list.d/yarn.list
+  (c) sudo apt-get update && sudo apt-get install yarn
+
+
+* Installing mongodb#3.2.4
+  (a) > sudo apt-key adv --keyserver hkp://keyserver.ubuntu.com:80 --recv 7F0CEB10
+  (b) > echo "deb http://repo.mongodb.org/apt/ubuntu trusty/mongodb-org/3.0 multiverse" | sudo tee /etc/apt/sources.list.d/mongodb-org-3.0.list
+  (c) > sudo apt-get update
+  (d) > sudo apt-get install -y mongodb-org=3.2.4 mongodb-org-server=3.2.4 mongodb-org-shell=3.2.4 mongodb-org-mongos=3.2.4 mongodb-org-tools=3.2.4
+  === OR ===
+  > sudo apt-get install -y --force-yes mongodb-org=3.2.4 mongodb-org-server=3.2.4 mongodb-org-shell=3.2.4 mongodb-org-mongos=3.2.4 mongodb-org-tools=3.2.4

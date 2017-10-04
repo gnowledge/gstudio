@@ -46,7 +46,6 @@ Choose From existing collection:
       $('.filenode:checked').each(function() {
         coll_arr.push($(this).val());
       });
-
       var r = confirm("Do you want to save the collection of selected elements");
       if (r == true) {
           x = "Your collection is saved successfully";
@@ -57,12 +56,17 @@ Choose From existing collection:
             data:{
               collection: coll_arr,
               name: coll_node,
-              csrfmiddlewaretoken: '{{ csrf_token }}'
+              csrfmiddlewaretoken: '{{ csrf_token }}',
+              coll_redir : "{{coll_redir}}"
             },
             success: function(data) {
-              
-              location.href = "{% url 'course_raw_material' group_id %}";
+              if("{{coll_redir}}" == "raw-material"){
 
+                location.href = "{% url 'course_raw_material' group_id %}";
+              }
+              else if("{{coll_redir}}" == "gallery"){
+                location.href = "{% url 'course_gallery' group_id %}"; 
+              }
             }
           });
 
@@ -75,43 +79,6 @@ Choose From existing collection:
           
     });
 
-	 $('.card-image-wrapper').click(function(){
-	 	cur_collection_id = $(this).attr('id');
-	 	var coll_arr = []
-      	var coll_node = $(".coll_value").val()
-		$('.filenode:checked').each(function() {
-			coll_arr.push($(this).val());
-		});
 
-		var r = confirm("Do you want to save the collection of selected elements");
-		if (r == true) {
-		  x = "Your collection is saved successfully";
-		  $.ajax({
-		    type: "POST",
-		    url: "{% url 'collection_create' group_id %}",
-		    datatype: "html",
-		    data:{
-		      collection: coll_arr,
-		      name: coll_node,
-		      csrfmiddlewaretoken: '{{ csrf_token }}',
-		      existing_collection:'True',
-		      cur_collection_id:cur_collection_id
-		    },
-		    success: function(data) {
-		      
-		      location.href = "{% url 'course_raw_material' group_id %}";
-
-		    }
-		  });
-
-		  
-		} 
-		else {
-			x = "Cancelled";
-		}
-      
-				 
-	 
-	 });
 
 </script>

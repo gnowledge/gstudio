@@ -20,8 +20,10 @@ if not os.path.exists(csvs_folder_path):
 # statecode_cum_range_dict = {'mz': (1, 200), 'rj': (201, 500), 'ct': (501, 800), 'tg': (801, 1100), 'sp': (1100, 1300)}
 
 statecode_range_dict = {'mz': (1, 200), 'rj': (1, 300), 'ct': (1, 300), 'tg': (1, 300), 'sp': (1, 300)}
+# statecode_range_dict = {'dl': (1, 50)}
 
 state_startwith_dict = {'mz': 0, 'rj': 200, 'ct': 500, 'tg': 800, 'sp': 1100}
+# state_startwith_dict = {'dl': 1400}
 
 
 # ------ for generating school codes ------
@@ -112,6 +114,7 @@ def create_users_csv(csv_file_name_path, code, start_user_id, last_user_id, user
         # print complete_data_list
 
 user_id_creation_order = ['cc', 'mz', 'rj', 'ct', 'tg', 'sp']
+# user_id_creation_order = ['dl']
 # user_id_creation_order = ['cc', 'mz']
 
 create_users_csv(st_usernames, 'cc', start_user_id=2, last_user_id=1000, user_type='users')

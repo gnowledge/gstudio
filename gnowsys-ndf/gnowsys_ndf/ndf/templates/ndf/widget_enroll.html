@@ -1,0 +1,110 @@
+{% load i18n %}
+{% load simple_filters %}
+{% load ndf_tags %}
+{% get_gstudio_workspace_instance as is_workspace %}
+{% get_group_object groupid as group_object %}
+
+<input type="button" data-reveal-id="enrollBuddiesModal" class="enrollBtn"  "{% if is_workspace %}" "{% if request.user.pk in group_object.author_set %}" value="Joined" "{% else %}"  value="Join" "{% endif %}" "{% else %}" value="Enrollment" "{%  endif %}" />
+
+<div id="enrollBuddiesModal" class="reveal-modal medium radius" data-reveal data-alert>
+    <h4 id="enrollBuddiesModalLabel"> {% if 'Group' in group_object.member_of_names_list %} {% trans "Join Status:" %}  {% else %} {% trans "Enrollment Status:" %} {% endif %}  </h4><br/>
+    <div class="small-12 medium-12 columns buddiesList center">
+    <div class="row">
+      <div class="small-8 medium-8 columns">
+      {{request.user.username}}
+      </div>
+      <div class="small-4 medium-4 columns">
+      {% if request.user.pk in group_object.author_set %}
+          <input id="enrollchk_{{request.user.pk}}" type="checkbox" class="enroll_chkbox" checked disabled><label for="enrollchk_{{request.user.pk}}"> {% if 'Group' in group_object.member_of_names_list %} {% trans  "Joined" %} {% else %} {% trans  "Enrolled" %} {% endif %} </label>
+      {% else %}
+          <input id="enrollchk_{{request.user.pk}}" type="checkbox" class="enroll_chkbox" onclick="enroll_user('{{request.user.pk}}')" data-user-id='{{request.user.pk}}'><label for="enrollchk_{{request.user.pk}}" class="enroll-act_lbl"> {% if 'Group' in group_object.member_of_names_list %} {% trans "Join" %} {% else %} {% trans "Enroll" %} {% endif %} </label>
+      {% endif %}
+      </div>
+      <hr>
+
+    {% if request.session.buddies_userid_list %}
+      {% with request.session.buddies_username_id_dict|apply_eval as buddies_dict %}
+        {% for username,userid in buddies_dict.items %}
+            <div class="small-8 medium-8 columns">
+              {{forloop.counter}}. {{username}} :
+            </div>
+            <div class="small-4 medium-4 columns">
+            {% if userid in group_object.author_set %}
+                <input id="enrollchk_{{userid}}" type="checkbox" class="enroll_chkbox" checked disabled><label for="enrollchk_{{userid}}" > {% if 'announced_unit' in group_object.member_of_names_list %} {% trans "Enrolled" %} {% else %}  {% trans "Joined" %} {% endif %} 
+                </label>
+            {% else %}
+              <input id="enrollchk_{{userid}}" type="checkbox" class="enroll_chkbox" onclick="enroll_user('{{userid}}')" data-user-id='{{userid}}'><label for="enrollchk_{{userid}}" class="enroll-act_lbl"> {% if 'announced_unit' in group_object.member_of_names_list %} {% trans "Enroll" %} {% else %} {% trans "Join" %} {% endif %} </label>
+            {% endif %}
+            </div>
+            <hr>
+        {% endfor %}
+      {% endwith %}
+    <input type="button" class="orange-button right enroll_all_users" onclick="enroll_all_users()" "{% if 'Group' in group_object.member_of_names_list %}" value="Join All"  "{% else %}" value="Enroll All" "{% endif %}" >
+    {% endif %}
+    </div>
+    </div>
+
+    <a class="close-reveal-modal">&#215;</a>
+</div>
+
+
+<script type="text/javascript">
+  function enroll_user(user_id){
+    if (!user_id){
+      user_id = {{request.user.id}}
+    }
+    //trigger the ajax call to enroll
+    $.ajax({
+      url: "{% url 'enroll_to_course' group_id %}",
+
+      data: {
+        'csrfmiddlewaretoken': "{{csrf_token}}",
+        'user_id': JSON.stringify(user_id)
+      },
+
+      type: "POST",
+
+      dataType: "json",
+
+      success: function(data){
+        success_state = data["success"]
+        if(success_state){
+          location.reload();
+        }
+      },
+    });//end of ajax
+  }
+
+  $(document).on('click','.enroll-btn',function(){
+    user_id = $(this).attr('data-user-id')
+    enroll_user(user_id)
+  })
+
+  function enroll_all_users(){
+    var user_id_list = []
+    {% if request.session.buddies_userid_list %}
+      user_id_list = {{request.session.buddies_userid_list}}
+      user_id_list.push({{request.user.pk}})
+    {% endif %}
+    enroll_user(user_id_list)
+  }
+
+  {% if request.session.buddies_userid_list %}
+    $(document).ready(function(){
+
+      user_id_list = {{request.session.buddies_userid_list}}
+      group_member_ids = {{group_object.author_set}}
+      isSuperset = user_id_list.every(function(val) {
+        return group_member_ids.indexOf(val) >= 0; 
+      });
+
+      if (isSuperset){
+        $(".enroll_all_users").addClass("hide")
+      }
+    })
+  {% endif %}
+
+
+
+
+</script>

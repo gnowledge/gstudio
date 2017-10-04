@@ -133,7 +133,7 @@
           <li><a onclick="open_div('File',this)" class="File button tiny res-btn">File </a></li>
           <li><a onclick="open_div('Image',this)" class="Image button tiny res-btn">Image </a></li>
           <li><a onclick="open_div('Video',this)" class="Video button tiny res-btn">Video </a></li>
-          <li><a onclick="open_div('QuizItem',this)" class="QuizItem button tiny res-btn">QuizItem</a></li>
+          <li><a onclick="open_div('Quiz',this)" class="Quiz button tiny res-btn">Quiz</a></li>
 
         </ul>
       </div>
@@ -323,12 +323,12 @@
           $(".res-opt-btns").removeClass("hide")
           $(".res-opt-btns #new_res").removeClass("hide")
         }
-        else if(res_name_flag!="QuizItem" && res_name_flag!="Page"){
+        else if(res_name_flag!="Quiz" && res_name_flag!="Page"){
           $("#new_res").val("Upload File")
           $(".res-opt-btns").removeClass("hide")
           $(".res-opt-btns #new_res").removeClass("hide")
         }
-        else if(res_name_flag=="QuizItem"){
+        else if(res_name_flag=="Quiz"){
           $(".res-opt-btns").removeClass("hide")
           $(".res-opt-btns #new_res").addClass("hide")
           // $(".res-opt-btns").addClass("hide");
@@ -531,7 +531,7 @@
       {% get_group_object groupid as group_object %}
       {% if "CourseEventGroup" in group_object.member_of_names_list %}
         // $(this).attr('href', '/{{group_id}}/course/structure/create/{{group_id}}')
-        $(this).attr('href', '/{{group_id}}/gcourse/structure/create/{{group_id}}')
+        $(this).attr('href', '/{{group_id}}/course/structure/create/{{group_id}}')
       {% else %}
         turl = "{% url 'create_course_struct' groupid course_node.pk %}"
         if("{{app_id}}"!= ""){

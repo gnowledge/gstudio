@@ -63,26 +63,26 @@ def main():
       theme_elements=collection.Node.find({'name':k})
       for each in list(theme_elements):
         get_node=collection.Node.one({'_id':ObjectId(each._id)})
-        if get_node:        
+        if get_node:
           member_of=get_node.member_of_names_list
           if "Theme" in member_of:
             app_obj = theme_GST
           else:
             if "theme_item" in member_of:
-              app_obj = theme_item_GST              
-            else:        
+              app_obj = theme_item_GST
+            else:
               app_obj = topic_GST
-                  
+
           name=v.decode('utf-8')
           #print name,"name"
-          theme_node_rt = collection.Node.find({'$and':[{'_type':"GRelation"},{'relation_type.$id':get_translation_rt._id},{'subject':get_node._id}]})               
+          theme_node_rt = collection.Node.find({'$and':[{'_type':"GRelation"},{'relation_type':get_translation_rt._id},{'subject':get_node._id}]})
           if theme_node_rt.count() > 0:
-            theme_node = collection.Node.one({'_id': ObjectId(theme_node_rt[0].right_subject) })  
+            theme_node = collection.Node.one({'_id': ObjectId(theme_node_rt[0].right_subject) })
           else:
             theme_node = None
             theme_node_rt = None
 
-          if theme_node is None:        
+          if theme_node is None:
             theme_node = collection.GSystem()
             theme_node.name = unicode(name)
             theme_node.access_policy = u"PUBLIC"
@@ -95,12 +95,12 @@ def main():
             theme_node.status = u"DRAFT"
             theme_node.save()
             print "\nTranslated Node ",theme_node.name," created successfully\n"
-          else:            
+          else:
             print "\nTranslated node ",theme_node.name," already exists\n"
 
           if theme_node_rt is None:
-            
-            relation_type=collection.Node.one({'$and':[{'name':'translation_of'},{'_type':'RelationType'}]})            
+
+            relation_type=collection.Node.one({'$and':[{'name':'translation_of'},{'_type':'RelationType'}]})
             grelation=collection.GRelation()
             grelation.relation_type=relation_type
             grelation.subject=each._id
@@ -108,29 +108,29 @@ def main():
             grelation.name=u""
             grelation.save()
             print "\nGRelation for node ",theme_node.name," created sucessfully!!"
-          else:            
+          else:
             print "\nGRelation for node ",theme_node.name," already exists\n"
-          
+
     for k, v in translation_dict.items():
       theme_elements=collection.Node.find({'name':k})
       for each in list(theme_elements):
-        theme_node_rt=collection.Node.find({'$and':[{'_type':"GRelation"},{'relation_type.$id':get_translation_rt._id},{'subject':each._id}]})
+        theme_node_rt=collection.Node.find({'$and':[{'_type':"GRelation"},{'relation_type':get_translation_rt._id},{'subject':each._id}]})
         t_node=collection.Node.one({'_id':ObjectId(each._id)})
-        if theme_node_rt:   
+        if theme_node_rt:
           for node in list(theme_node_rt):
             theme_node=collection.Node.one({'_id':node.right_subject})
             if t_node.collection_set:
               trans_list=[]
               for rt in t_node.collection_set:
-                get_rt=collection.Node.find({'$and':[{'_type':"GRelation"},{'relation_type.$id':get_translation_rt._id},{'subject':rt}]})            
+                get_rt=collection.Node.find({'$and':[{'_type':"GRelation"},{'relation_type':get_translation_rt._id},{'subject':rt}]})
                 if get_rt:
                   for each in list(get_rt):
                     trans_list.append(each.right_subject)
-              
+
               print "\nProcessing the translated collection_set for node ",theme_node.name," ...\n"
               if trans_list != theme_node.collection_set:
                 theme_node.collection_set=trans_list
-                theme_node.save()               
+                theme_node.save()
                 print "Translated collection_set for node ",theme_node.name," updated successfully\n"
               else:
                 print "Translated collection_set for node ",theme_node.name," already exists"

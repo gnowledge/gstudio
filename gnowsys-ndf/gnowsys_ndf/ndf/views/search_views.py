@@ -19,9 +19,9 @@ import itertools
 import nltk
 import multiprocessing as mp
 
+from mongokit import paginator
 from gnowsys_ndf.ndf.models import node_collection, triple_collection
 from gnowsys_ndf.ndf.models import *
-
 my_doc_requirement = u'storing_orignal_doc'
 reduced_doc_requirement = u'storing_reduced_doc'
 to_reduce_doc_requirement = u'storing_to_be_reduced_doc'
@@ -150,7 +150,7 @@ def search_query(request, group_id):
 
 
 @get_execution_time
-def results_search(request, group_id, return_only_dict = None):
+def results_search(request, group_id, page_no=1, return_only_dict = None):
 	"""
 	This view returns the results for global search on all GSystems by name, tags and contents.
 	Only publicly accessible GSystems are returned in results.
@@ -489,7 +489,25 @@ def results_search(request, group_id, return_only_dict = None):
 
 	# print "search_results:", search_results
 
+	GST_FILE = node_collection.one({'_type':'GSystemType', 'name': 'File'})
+	GST_PAGE = node_collection.one({'_type':'GSystemType', 'name': 'Page'})
+	GST_THREAD = node_collection.one({'_type':'GSystemType', 'name': 'Twist'})
+	GST_REPLY = node_collection.one({'_type':'GSystemType', 'name': 'Reply'})
+	json_results = json.loads(search_results)
+	stemmed_values = json_results["stemmed"]["name"]
+	exact_values = json_results["exact"]["name"]
+	stemmed_results = []
+	
+	for each in stemmed_values:
+		stemmed_results.append(ObjectId(each["_id"]))
+	
+	for each in exact_values:
+		stemmed_results.append(ObjectId(each["_id"]))
+	getcurr = node_collection.find({'$and':[{'_id':{'$in' : stemmed_results }},{'member_of':{'$nin':[GST_THREAD._id,GST_REPLY._id]}}]}).sort("last_update", -1)
 
+	# from gnowsys_ndf.settings import GSTUDIO_NO_OF_OBJS_PP
+	# search_pagination_curr = paginator.Paginator(getcurr, page_no, GSTUDIO_NO_OF_OBJS_PP)
+	
 	if return_only_dict:
 		return search_results
 	else:
@@ -497,6 +515,8 @@ def results_search(request, group_id, return_only_dict = None):
 		context_to_return['search_results'] = search_results 		# ADD SEARCH RESULTS TO CONTEXT
 		context_to_return['processed'] = "1" 							
 		context_to_return['search_type'] = KEYWORD_SEARCH			# TYPE OF SEARCH IS KEYWORD SEARCH
+		context_to_return['search_curr'] = getcurr			# TYPE OF SEARCH IS KEYWORD SEARCH
+		# context_to_return['search_pagination_curr'] = search_pagination_curr			# TYPE OF SEARCH IS KEYWORD SEARCH
 
 		return render(request, 'ndf/search_page.html', context_to_return)
 
@@ -902,7 +922,7 @@ def advanced_search_results(request, group_id):
 			# CASE 2 -- SEARCH THE GATTRIBUTES
 			try:
 				attr_id = node_collection.one({"_type":"AttributeType", "name":at_name}, {"_id":1})
-				res = triple_collection.find({"_type":"GAttribute", "attribute_type.$id":ObjectId(attr_id._id), "object_value":{"$regex":word, "$options":"i"}}, {"name":1, "object_value":1, "subject":1})
+				res = triple_collection.find({"_type":"GAttribute", "attribute_type":ObjectId(attr_id._id), "object_value":{"$regex":word, "$options":"i"}}, {"name":1, "object_value":1, "subject":1})
 				#print "Sttr type: ", attr_id
 				for obj in res: 
 					if all_users == 0:
@@ -1121,7 +1141,7 @@ def get_node_info(request, group_id, node_name):
 			obj = node_collection.one({"_id": ObjectId(GSType)})
 
 			for attr in obj.attribute_type_set:
-				custom_attrs = triple_collection.find({"_type": "GAttribute", "subject": ObjectId(sg_node._id), "attribute_type.$id": ObjectId(attr._id)}, {"name":1, "object_value":1})
+				custom_attrs = triple_collection.find({"_type": "GAttribute", "subject": ObjectId(sg_node._id), "attribute_type": ObjectId(attr._id)}, {"name":1, "object_value":1})
 				for sg_attr in custom_attrs:
 					temp = sg_attr.name
 					i1 = temp.index('--') + 3
@@ -1172,7 +1192,7 @@ def get_node_info2(request, group_id, node_id):
 		obj = node_collection.one({"_id": ObjectId(GSType)})
 
 		for attr in obj.attribute_type_set:
-			custom_attrs = triple_collection.find({"_type": "GAttribute", "subject": ObjectId(sg_node._id), "attribute_type.$id": ObjectId(attr._id)}, {"name":1, "object_value":1})
+			custom_attrs = triple_collection.find({"_type": "GAttribute", "subject": ObjectId(sg_node._id), "attribute_type": ObjectId(attr._id)}, {"name":1, "object_value":1})
 			for sg_attr in custom_attrs:
 				temp = sg_attr.name
 				i1 = temp.index('--') + 3
@@ -1301,7 +1321,7 @@ def ra_search_results(request, group_id):
 	try:
 		relationType_obj = node_collection.one({"_type": "RelationType", "$or": [{"name": max_match_rel}, {"inverse_name": max_match_rel} ] }, {"_id": 1, "name": 1})
 
-		GRelation_objs = triple_collection.find({"_type": "GRelation", "relation_type.$id": relationType_obj._id})
+		GRelation_objs = triple_collection.find({"_type": "GRelation", "relation_type": relationType_obj._id})
 
 		#subjects = []
 		#right_subjects = []

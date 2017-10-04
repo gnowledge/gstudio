@@ -1,6 +1,6 @@
 {% extends "ndf/node_details_base.html" %}
-{% load ndf_tags %}
 {% load i18n %}
+{% load ndf_tags %}
 <!-- ///////////////////////////////////////////////////////////////////////////////////////// -->
 
 {% block title %} {{ node.name }} {% endblock %}
@@ -73,7 +73,7 @@
         <div class="medium-8 columns">
           {% if "Theme" not in node.member_of_names_list %}
 
-          <b>Description:</b> </br></br>
+          <b>{% trans "Description" %}:</b> </br></br>
           <div name="content" class="field left" >{{node.content_org|default_if_none:""}}</div>
         </div></div></br>
         <div class="row">
@@ -151,18 +151,18 @@
             <div class= "right">{% trans "Theme" %} </div>  {{each.name}}
             <input type="hidden" id="name_id" name="name" value="{{node.name}}">
             <input id="name_id" name="name_{{each}}" type="text" value="{{each.name}}" placeholder="Enter name..." required>
-            <small class="error">Please give your page a descriptive name. It's helpful for others and for yourself.</small>
+            <small class="error">{% trans "Please give your page a descriptive name" %}. {% trans "It's helpful for others and for yourself" %}.</small>
             {% else %}
             {% if "theme_item" in each.member_of_names_list %}
             <div class="right">{% trans "Theme Item" %}</div>   {{each.name}}
             <input type="hidden" id="name_id" name="name" value="{{node.name}}">
             <input id="name_id" name="name_{{each}}" type="text" value="{{each.name}}" placeholder="Enter name..." required>
-            <small class="error">Please give your page a descriptive name. It's helpful for others and for yourself.</small>
+            <small class="error">{% trans "Please give your page a descriptive name" %}. {% trans "It's helpful for others and for yourself" %}.</small>
             {% else %}
             <div class="right">{% trans "Topic" %}</div>  {{each.name}}
             <input type="hidden" id="name_id" name="name" value="{{node.name}}">
             <input id="name_id" name="name_{{each}}" type="text" value="{{each.name}}" placeholder="Enter name..." required>
-            <small class="error">Please give your page a descriptive name. It's helpful for others and for yourself.</small>
+            <small class="error">{% trans "Please give your page a descriptive name" %}.{% trans "It's helpful for others and for yourself" %} .</small>
             {% endif %}
             {% endif %}     
           </div>
@@ -172,7 +172,7 @@
         {% if "Theme" not in each.member_of_names_list and "theme_item" not in each.member_of_names_list and "Topic" not in each.member_of_names_list %}
 
         <div class="medium-8 columns">
-         Description: </br></br>
+         {% trans "Description" %}: </br></br>
          <div name="content" class="field left">{{each.content_org|default_if_none:""}</div>
        </div></br>
        {% endif %}

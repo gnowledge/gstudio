@@ -39,7 +39,7 @@ wiki_base_url="http://en.wikipedia.org/wiki/"
 
 def create_WikiData_Theme_Topic():
 	"""
-	creates GSystemType: WikiData(a member_of GAPP), GSystemType Theme and Topic(a member_of factory_settings) 
+	creates GSystemType: WikiData(a member_of GAPP), GSystemType Theme and Topic(a member_of factory_settings)
 	"""
 	GAPP = collection.Node.one({"name": u"GAPP"})
 	cursor = collection.Node.one({"_type":u"GSystemType", "name":u"WikiData"}) #change -am
@@ -47,7 +47,7 @@ def create_WikiData_Theme_Topic():
 		print "Wikidata already exists"
 		wiki_id = cursor._id
 	else:
-		
+
 		GAPP_id = GAPP._id
 		wiki = collection.GSystemType()
 		wiki.name = u"WikiData"
@@ -56,11 +56,11 @@ def create_WikiData_Theme_Topic():
 		wiki.save()
 		wiki_id = wiki._id
 		print "Created a GSystemType for----> WikiData \n"
-	
+
 	cursor = collection.Node.one({"_type": u"GSystemType", "name": u"Theme"})
 	if (cursor!=None):
 		print "Theme already exists"
-		
+
 	else:
 		factory = collection.Node.one({"name": u"factory_types"})
 		factory_id = factory._id
@@ -71,11 +71,11 @@ def create_WikiData_Theme_Topic():
 		obj.member_of.append(factory_id)
 		obj.save()
 		print "Created an object of GSystem Type --> Theme \n"
-	
+
 	cursor = collection.Node.one({"_type":u"GSystemType", "name": u"Topic"}) #change -am
 	if(cursor!=None):
 		print "Topic already exists"
-	else:	
+	else:
 		factory = collection.Node.one({"name": u"factory_types"})
                 factory_id = factory._id
 		obj1 = collection.GSystemType()
@@ -86,12 +86,12 @@ def create_WikiData_Theme_Topic():
 		obj1.save()
 		print "Created an object of GSystemtype"
 
-	
+
 def create_Topic(label, description, alias_list, topic_title, last_update_datetime, user_id):
 	"""
 	Creates a topic if it does not exist
 	"""
-	
+
 	print "Creating a GSystem Topic"
 	cursor = collection.Node.one({"name": u"Topic"})
 	topic_type = cursor
@@ -113,7 +113,7 @@ def create_Topic(label, description, alias_list, topic_title, last_update_dateti
 		#topic.altnames = unicode(topic_title)
 		topic.created_by = int(user_id)
 		topic.member_of.append(topic_type_id)
-		
+
 		string_alias=""
 		for alias in alias_list:
 			string_alias = string_alias + alias + "," #altnames is a comma separated list of english aliases
@@ -124,9 +124,9 @@ def create_Topic(label, description, alias_list, topic_title, last_update_dateti
 		topic.access_policy = unicode('PUBLIC')
 
 		topic.save()
-		
+
 		print "Created a topic -->" + label + "\n"
-		
+
 def create_AttributeType(name, data_type, system_name, user_id):
 	"""
 	This method creates an attribute type of given name and which will be for the given system_type(Topic GSystemType)
@@ -151,10 +151,10 @@ def create_AttributeType(name, data_type, system_name, user_id):
 
 	"""
 	Checking if the AttributeType already exists or not
-	Alternate Check: 
+	Alternate Check:
 		Check the attribute_type_set of the Topic GSystemType. But the problem is that it consists of objectId's so processing is expensive. A simple name search seems to be more efficient.
 	"""
-	
+
 	cursor = collection.Node.one({"name":unicode(name), "_type":u"AttributeType"})
 
 	if (cursor != None):
@@ -172,13 +172,13 @@ def create_AttributeType(name, data_type, system_name, user_id):
 		factory_id = collection.Node.one({"name":u"factory_types"})._id
 		attribute_type.member_of.append(factory_id)
 		attribute_type.save()
-		"""	
+		"""
 		Adding the attribute type to the Topic GSytemType attribute_set"
 		"""
 		system_type.attribute_type_set.append(attribute_type._id)
 		print "Created the Attribute_Type " + str(name)
-		
-		
+
+
 
 def create_Attribute(subject_name, attribute_type_name, object_value):
 	"""
@@ -191,7 +191,7 @@ def create_Attribute(subject_name, attribute_type_name, object_value):
 
 	#print attribute_type
 	#changed
-	cursor = collection.Node.one({"_type":u"GAttribute", "subject":subject._id, "attribute_type.$id": attribute_type._id})
+	cursor = collection.Node.one({"_type":u"GAttribute", "subject":subject._id, "attribute_type": attribute_type._id})
 	#end of change
 	if cursor!= None: #change-am
 		print "The attribute " + str(attribute_type_name) + " already exists for the topic " + str(subject_name) + "."
@@ -207,10 +207,10 @@ def create_Attribute(subject_name, attribute_type_name, object_value):
 		att.save()
 		print "Created attribute " + str(att.name)
 
-	
-	
+
+
 def create_RelationType(name, inverse_name, object_type_name, user_id):
-	"""	
+	"""
 	Creating a RelationType with the following parameters.
 	1. name - inherits Node class.
 	2. inverse_name  - This is the name of the inverse of the relation.
@@ -234,12 +234,12 @@ def create_RelationType(name, inverse_name, object_type_name, user_id):
                 factory_id = collection.Node.one({"name":u"factory_types"})._id
                 relation_type.member_of.append(factory_id)
                 relation_type.save()
-                """     
+                """
                 Adding the attribute type to the WikiData GSytemType attribute_set"
                 """
                 system_type.relation_type_set.append(ObjectId(relation_type._id))
                 print "Created the Relation_Type " + str(name)
- 
+
 
 def create_Relation(name, subject_name, relation_type_name, right_subject_name):
 	"""
@@ -272,7 +272,7 @@ def display_objects():
 	cursor = collection.Node.find()
 	for a in cursor:
 		print a.name
-		
+
 
 class Command(BaseCommand):
 	def handle(self, *args, **options):
@@ -281,7 +281,7 @@ class Command(BaseCommand):
 		create_Topic(u"topic2", u"topic2desc", [], u"http://www.google.com", "Test2", None, user_id)
 		create_AttributeType("wiki_attr2", "unicode", "WikiData", user_id)
 		create_Attribute("attr1", "topic1", "wiki_attr2", "This is the value of the wiki_attr1 field")
-		create_RelationType("same_theme1", "same_theme1", "topic1", user_id) 
+		create_RelationType("same_theme1", "same_theme1", "topic1", user_id)
 		create_Relation("theme1", "topic1", "same_theme1", "topic2")
 		print "All objects\n"
                 display_objects()

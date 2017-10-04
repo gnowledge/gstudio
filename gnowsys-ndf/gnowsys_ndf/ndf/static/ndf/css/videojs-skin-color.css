@@ -1,0 +1,61 @@
+.vjs-skin-colors-clix {
+  color: #fff;
+}
+.vjs-skin-colors-clix .vjs-control-bar {
+  background-color: hsla(316, 88%, 26%, 1);
+}
+.vjs-skin-colors-clix .vjs-big-play-button{
+  text-align: center;
+  position: absolute;
+  left: 40%;
+  top: 50%;
+}
+.vjs-skin-colors-clix .vjs-big-play-button,
+.vjs-skin-colors-clix .vjs-menu-content {
+  background-color: hsla(316, 88%, 26%, .7);
+}
+.vjs-skin-colors-clix .vjs-load-progress {
+  background-color: hsla(327, 100%, 45%, 1);
+}
+.vjs-skin-colors-clix .vjs-play-progress {
+  background-color: hsla(327, 100%, 45%, 1);
+}
+.vjs-skin-colors-clix .vjs-slider {
+  background-color: hsla(327, 100%, 45%, 1);
+}
+.vjs-skin-colors-clix .vjs-volume-level {
+  background-color: hsla(327, 100%, 45%, 1);
+}
+.vjs-skin-colors-clix .vjs-big-play-button,
+.vjs-skin-colors-clix .vjs-big-play-button:focus,
+.vjs-skin-colors-clix:hover .vjs-big-play-button {
+  border-color: hsla(316, 88%, 42%, 1);
+}
+.vjs-skin-colors-clix:hover .vjs-big-play-button {
+  background: radial-gradient(hsla(316, 77%, 37%, 1), hsla(316, 88%, 26%, 1));
+}
+.vjs-skin-colors-clix .vjs-menu-button ul li {
+  background-color: hsla(316, 88%, 26%, .3);
+  color: #fff;
+  font-family: 'open_sansregular', Arial, sans-serif;
+}
+.vjs-skin-colors-clix .vjs-menu-button ul li.vjs-selected {
+  background: radial-gradient(hsla(316, 77%, 37%, 1), hsla(316, 88%, 26%, 1));
+  color: #fff;
+}
+.vjs-skin-colors-clix .vjs-menu-button ul li:focus,
+.vjs-skin-colors-clix .vjs-menu-button ul li:hover,
+.vjs-skin-colors-clix .vjs-menu-button ul li.vjs-selected:focus,
+.vjs-skin-colors-clix .vjs-menu-button ul li.vjs-selected:hover {
+  background: radial-gradient(hsla(327, 100%, 45%, 1), hsla(327, 100%, 35%, 1));
+}
+.vjs-skin-colors-clix .vjs-menu-button ul li:active,
+.vjs-skin-colors-clix .vjs-menu-button ul li.vjs-selected:active {
+  background: radial-gradient(hsla(327, 100%, 38%, 1), hsla(327, 100%, 23%, 1));
+}
+
+::cue {
+  font-size: 1.5em;
+  line-height: 1.8;
+}
+io

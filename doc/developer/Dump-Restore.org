@@ -1,3 +1,4 @@
+DEPRICATED AS ON 12 APRIL 2017 - katkamrachana
 *Merging of 2 different instance's data.*
 
 How to Restore ?

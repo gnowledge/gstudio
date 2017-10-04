@@ -1,0 +1,76 @@
+@font-face {
+    font-family: 'Rubik-Black';
+    src: url('/static/ndf/bower_components/rubik-googlefont/Rubik-Black.ttf') format('truetype');
+    font-weight: normal;
+    font-style: normal;
+
+}
+
+@font-face {
+    font-family: 'Rubik-BlackItalic';
+    src: url('/static/ndf/bower_components/rubik-googlefont/Rubik-BlackItalic.ttf') format('truetype');
+    font-weight: normal;
+    font-style: normal;
+
+}
+
+@font-face {
+	font-family: 'Rubik-Bold';
+    src: url('/static/ndf/bower_components/rubik-googlefont/Rubik-Bold.ttf') format('truetype');
+    font-weight: normal;
+    font-style: normal;
+
+}
+
+@font-face {
+    font-family: 'Rubik-BoldItalic';
+    src: url('/static/ndf/bower_components/rubik-googlefont/Rubik-BoldItalic.ttf') format('truetype');
+    font-weight: normal;
+    font-style: normal;
+
+}
+
+@font-face {
+    font-family: 'Rubik-Italic';
+    src: url('/static/ndf/bower_components/rubik-googlefont/Rubik-Italic.ttf') format('truetype');
+    font-weight: normal;
+    font-style: normal;
+
+}
+
+@font-face {
+    font-family: 'Rubik-Light';
+    src: url('/static/ndf/bower_components/rubik-googlefont/Rubik-Light.ttf') format('truetype');
+    font-weight: normal;
+    font-style: normal;
+
+}
+
+@font-face {
+  font-family: 'Rubik-LightItalic';
+  src: url('/static/ndf/bower_components/rubik-googlefont/Rubik-LightItalic.ttf') format('truetype');
+  font-weight: normal;
+  font-style: normal;
+}
+
+@font-face {
+  font-family: 'Rubik-Medium';
+  src: url('/static/ndf/bower_components/rubik-googlefont/Rubik-Medium.ttf') format('truetype');
+  font-weight: normal;
+  font-style: normal;
+}
+
+@font-face {
+  font-family: 'Rubik-MediumItalic';
+  src: url('/static/ndf/bower_components/rubik-googlefont/Rubik-MediumItalic.ttf') format('truetype');
+  font-weight: normal;
+  font-style: normal;
+}
+
+@font-face {
+  font-family: 'Rubik-Regular';
+  src: url('/static/ndf/bower_components/rubik-googlefont/Rubik-Regular.ttf') format('truetype');
+  font-weight: normal;
+  font-style: normal;
+}
+

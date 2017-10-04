@@ -57,7 +57,7 @@ def themes(request, group_id, app_id=None, app_set_id=None):
     # 
     # if auth:
     #   has_shelf_RT = node_collection.one({'_type': 'RelationType', 'name': u'has_shelf' })
-    #   shelf = triple_collection.find({'_type': 'GRelation', 'subject': ObjectId(auth._id), 'relation_type.$id': has_shelf_RT._id})
+    #   shelf = triple_collection.find({'_type': 'GRelation', 'subject': ObjectId(auth._id), 'relation_type': has_shelf_RT._id})
     #   shelf_list = {}
 
     #   if shelf:
@@ -238,7 +238,7 @@ def theme_topic_create_edit(request, group_id, app_set_id=None):
     
     if auth:
       has_shelf_RT = node_collection.one({'_type': 'RelationType', 'name': u'has_shelf' })
-      shelf = triple_collection.find({'_type': 'GRelation', 'subject': ObjectId(auth._id), 'relation_type.$id': has_shelf_RT._id})
+      shelf = triple_collection.find({'_type': 'GRelation', 'subject': ObjectId(auth._id), 'relation_type': has_shelf_RT._id})
       shelf_list = {}
 
       if shelf:
@@ -803,7 +803,7 @@ def topic_detail_view(request, group_id, app_Id=None):
 
   if auth:
 	  has_shelf_RT = node_collection.one({'_type': 'RelationType', 'name': u'has_shelf' })
-	  shelf = triple_collection.find({'_type': 'GRelation', 'subject': ObjectId(auth._id), 'relation_type.$id': has_shelf_RT._id})
+	  shelf = triple_collection.find({'_type': 'GRelation', 'subject': ObjectId(auth._id), 'relation_type': has_shelf_RT._id})
 	  shelf_list = {}
 
 	  if shelf:

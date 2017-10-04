@@ -1,9 +1,7 @@
 from django.conf.urls import patterns, url
 
 urlpatterns = patterns('gnowsys_ndf.ndf.views.videoDashboard',
-                        url(r'^[/]$', 'videoDashboard', name='video'),
-#                        url(r'^(?P<video_id>[\w-]+)$', 'videoDashboard', name='video'),
-                        #url(r'^videos/', 'videoDashboard', name='videoDashboard'),              
+                        url(r'^[/]$', 'videoDashboard', name='video'),   
                         url(r'^/thumbnail/(?P<_id>[\w-]+)$', 'getvideoThumbnail', name='getvideoThumbnail'),
                         url(r'^/fullvideo/(?P<_id>[\w-]+)$', 'getFullvideo', name='getFullvideo'),
                         url(r'^/video_search/$', 'video_search', name='video_search'),

@@ -1,0 +1,220 @@
+{% load i18n %}
+{% load ndf_tags %}
+{% block head %}
+
+  <!-- DataTables -->
+  <script src="/static/ndf/bower_components/DataTables/media/js/jquery.dataTables.js"></script>
+  <script src="/static/ndf/bower_components/datatables-plugins/integration/foundation/dataTables.foundation.js"></script>
+
+  <script src="/static/ndf/bower_components/pace/pace.js"></script>
+  <link href="/static/ndf/bower_components/pace/themes/blue/pace-theme-loading-bar.css" rel="stylesheet" />
+  <!-- DataTables CSS -->
+  <link href="/static/ndf/bower_components/datatables-plugins/integration/foundation/dataTables.foundation.css" rel="stylesheet" type="text/css" />
+  <script src="/static/ndf/bower_components/datatables-rowsgroup/dataTables.rowsGroup.js"></script>
+<style type="text/css">
+    .right-btn, .left-btn{
+        /*float: left;*/
+        /*margin-left: 1rem;*/
+        width: 40%;
+        font-size: 0.85em !important;
+        margin-top: 0.1rem !important;
+        text-align: center;
+    }
+    .tag-rating-div{
+        margin-left: 0.6rem !important;
+        margin-top: 0.3rem !important;
+    }
+    /*  
+    .right-btn{
+        float: right;
+        margin-right: 1rem;
+        width: 8rem;
+        font-size: 0.75rem !important
+    }
+    */
+    .rating-lbl{
+        display: inline-block;
+        font-size: 1rem !important;
+        /*font-style: italic;*/
+        /*margin-left: 3rem;*/
+
+    }
+    .rating_template{
+        display: inline-table;
+    }
+    .mod-btn{
+        width: 80% !important;
+        font-size: 0.75rem !important;
+    }
+    .btn-row{
+        /*margin-left: 1rem !important;*/
+        text-align: center;
+        margin-bottom: -1rem !important;
+    }
+    .lbl_tag{
+        display: inline-block;
+        font-size: 0.80rem !important;
+    }
+    .lbl_field{
+        width: 20%;
+        color: #194d6f;
+        /*font-weight: bold;*/
+        margin-top: 1rem;
+        font-size: 1rem !important;
+    }
+    .label > a{
+        color: white !important;
+    }
+
+    .graph_btn{
+        margin-left: 3rem;
+    }
+
+    #group_drawer{
+        height: 400px;
+        overflow-y: auto;
+        margin-left: 2em;
+    }
+</style>
+<style type="text/css">
+
+  .short-text {
+    overflow: hidden;
+    height: 6em;
+  }
+  .full-text{
+    height: auto;
+  }
+
+  #course-notification{
+    overflow-y:scroll !important;
+    height: 400px !important;
+  }
+
+  .selFile{
+    margin-left: 2% !important;
+    margin-right: 2% !important;
+    padding: 15px 5px;
+  }
+</style>
+{% endblock %}
+<script src="/static/ndf/bower_components/d3/d3.js"></script>
+                    <div class="small-12 columns table-container">
+                    </div>
+
+<br/>
+<br/>
+<br/>
+<br/>
+
+
+
+
+
+
+  <script type="text/javascript">
+      // Student analytics view
+      $(document).ready(function(){
+
+          data = {{data|safe}}
+          check_length = 0
+          submit_length = 0
+          // console.log(data)
+          column_headers = data["column_headers"];
+          students_data_set = data["students_data_set"];
+          dataTable_columns_set = [];
+
+          var students_points_table = '<table cellpadding="0" cellspacing="0" border="0" class="display" id="quiz-details-table-tbody">' + '</table>';
+          $(".table-container").html(students_points_table)
+          // Prepare title & data headers used in dataTable
+          $.each(column_headers, function(index, v) {
+            d = {};
+            d["data"] = v[0];
+            d["title"] = v[1];
+            dataTable_columns_set.push(d);
+          });
+          // Set defintion dataTable
+          sce_dt_var = $("#quiz-details-table-tbody").dataTable({
+            "data": data,
+
+
+
+            "columns": dataTable_columns_set,
+            "columns": [
+                    {
+                        'name': 'first',
+                        'title': 'Question',
+                    },
+                    {
+                        'name': 'second',
+                        'title': 'User',
+                    },
+                    {
+                        'title': 'Datetime',
+                    },
+                    {
+                        'title': 'Answer',
+                    },
+                    {
+                        'title': 'Datetime',
+                    },
+                    {
+                        'title': 'Answer',
+                    },
+            ],
+            "rowsGroup": [
+                'second:name',
+                0
+            ],
+
+            "autoWidth": false,
+            "createdRow": function (row, data, index) {
+              console.log(data)
+              /*
+              $.each(data, function(key, quiz_dict){
+                $(row).find("td:nth-child(1)").html(key.toString());
+                $.each(quiz_dict, function(k,v){
+                  if(k === "check"){
+                    check_length = Object.keys(v).length
+                    $.each(v, function(checked_ans,checked_time){
+                        $(row).find("td:nth-child(3)").html(checked_ans);
+                        $(row).find("td:nth-child(4)").html(checked_time);
+
+                    })
+                  }
+                  else if(k === "submit"){
+                    submit_length = Object.keys(v).length
+                    $.each(v, function(submitted_ans,submitted_time){
+                        $(row).find("td:nth-child(5)").html(submitted_ans);
+                        $(row).find("td:nth-child(6)").html(submitted_time);
+                    })
+                  }
+
+                  // $(row).find("td:nth-child(2)").html(v.join(','));
+                })
+                alert(Math.max(check_length, submit_length))
+                $(row).attr('rowspan',Math.max(check_length, submit_length));
+
+              })
+              */
+
+            }
+          });
+          $(".group-analytics").removeClass("hide")
+          old_thead = $("#quiz-details-table-tbody").find("thead");
+          tr_ele = document.createElement("tr")
+          tr_list = ["", "","Checked", "Submitted"]
+          $.each(tr_list, function(ind,val){
+            th_ele = document.createElement("th")
+            th_ele.textContent = val
+            if (val){
+              th_ele.colSpan = 2;
+            }
+            tr_ele.appendChild(th_ele)
+
+          })
+          $(old_thead).prepend(tr_ele)
+    })
+
+
+</script>

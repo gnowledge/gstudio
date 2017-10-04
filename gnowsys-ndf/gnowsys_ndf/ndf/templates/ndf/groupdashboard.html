@@ -4,7 +4,7 @@
 {% load ndf_tags %}
 
 <!-- from django.contrib.auth.decorators import login_required -->
-{% block title %} Group Dashboard {% endblock %}
+{% block title %} {{group_name_tag}} Group Dashboard {% endblock %}
 
 {% block head %}
 
@@ -18,10 +18,12 @@
 <!-- Ajax for getting user List  -->
 <script type="text/javascript">
   jQuery(document).ready(function($) {
+
   {% get_sg_member_of groupid as list_of_sg_member_of %}
   {% if "ProgramEventGroup" in node.member_of_names_list or "ProgramEventGroup" in list_of_sg_member_of %}
     $("#group-level-header").addClass("hide");
   {% endif %}
+
   });
   /*
   $('#btn_list_member').on("click",function() {
@@ -145,6 +147,9 @@ $(document).ready(function()
     display: block;
     margin: 0px auto;
   }
+  .grp_mem_count{
+    display: inline-block;
+  }
 
 {% endblock %}
 
@@ -152,12 +157,12 @@ $(document).ready(function()
 {% cache 300 groupdashboard_meta_content %}
 {% block meta_content %}
 <div class="repository-title large-4 columns" style="width:100%">{% firstof  node.altnames node.name %}</div>
-  <h4>
-  <i class="fi-torsos"></i> {{node.author_set|length}}{% blocktrans %} <span>Group members </span> {% endblocktrans %}
+  <i class="fi-torsos" title="Group member{{node.author_set|length|pluralize }}"></i> <h4 class="grp_mem_count" value="{{node.author_set|length}}">
+  {{node.author_set|length}} 
   </h4>
 
   <div id="group_picture">
-  {% include "ndf/upload_pic_widget.html" with url_name='groupchange'  widget_for="Group_about" is_banner=False is_profile=True %}
+  {% include "ndf/widget_photo_upload.html" with url_name='groupchange'  widget_for="Group_about" is_banner=False is_profile=True %}
   </div>
 
 </br>

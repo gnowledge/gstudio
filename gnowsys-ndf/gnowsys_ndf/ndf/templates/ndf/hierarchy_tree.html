@@ -84,7 +84,7 @@
 				if (node.node_type == "Topic"){        					
 					$li.find('.jqtree-element').append(
 
-            				'&nbsp;&nbsp;<a id='+node.id+' name='+node.name+' class="topic" href="/{{groupid}}/topics/'+node.id+'/"> </a>' 
+            				'&nbsp;&nbsp;<a id='+node.id+' name='+node.name+' class="topic" href="/{{groupid}}/{{topic_url}}/'+node.id+'/"> </a>' 
         			);	            			
 				}
 				else{
@@ -94,7 +94,7 @@
         					{% user_access_policy groupid request.user as user_access %}
         					{% if user_access == "allow" %}
 
-                				'&nbsp;&nbsp;<a href="/{{groupid}}/topics/'+node.id+'/"> <i class="fa fa-pencil" style="color:#4c4c4c"></i></a> &nbsp;&nbsp; <a id='+node.id+' class="objectsCheckbox"> <input type="checkbox"> </a>' 
+                				'&nbsp;&nbsp;<a href="/{{groupid}}/{{topic_url}}/'+node.id+'/"> <i class="fa fa-pencil" style="color:#4c4c4c"></i></a> &nbsp;&nbsp; <a id='+node.id+' class="objectsCheckbox"> <input type="checkbox"> </a>' 
                 			
                 			{% endif %}
         				);
@@ -186,10 +186,10 @@
 
 				$.ajax({
 	            	url: "{% url 'get_topic_contents' groupid %}",
-	             	type: 'POST',
+					// type: 'POST',
 	             	data:{
 	             		node_id: topic_id,
-	             		csrfmiddlewaretoken: '{{ csrf_token }}'
+						// csrfmiddlewaretoken: '{{ csrf_token }}'
 	             	},
 	             	success: function(data){
 	             		
@@ -266,33 +266,7 @@
 			alert($(this).siblings("a").attr("id"));
 		});
 
-		$("#add_theme_item").click(function() {
-			      $.ajax({
-		        type: "POST",
-		        url: "{% url 'add_theme_item' groupid %}",
-		        datatype: "html",
-		        data:{
-		          context_theme: "{{node.pk}}",
-		          name: $(".name_id").val(),
-		          csrfmiddlewaretoken: '{{ csrf_token }}'
-		        },
-		        success: function(data) {
-
-		          var item = $(".name_id").val();
-
-		          if ($.trim(data) === "failure") {
-		            alert("Theme item "+ item +" already available, Please choose different name");
-		          }
-
-		          if ($.trim(data) === "success") {
-		            location.reload(true);
-		          }
-
-		          $(".name_id").val("");
-		        }
-		      });
-
-		});
+	
 
 		// script for fold themes_cards hierarchy
 		$(".fold").click(function() {

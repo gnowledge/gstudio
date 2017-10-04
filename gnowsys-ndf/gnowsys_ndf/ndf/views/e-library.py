@@ -19,7 +19,6 @@ from gnowsys_ndf.ndf.models import node_collection
 from gnowsys_ndf.ndf.views.file import *
 from gnowsys_ndf.ndf.views.methods import get_group_name_id, cast_to_data_type, get_execution_time
 from gnowsys_ndf.ndf.views.methods import get_filter_querydict
-# from gnowsys_ndf.ndf.org2any import org2html
 
 ##############################################################################
 
@@ -31,6 +30,7 @@ e_library_GST = node_collection.one({'_type':'GSystemType', 'name': 'E-Library'}
 pandora_video_st = node_collection.one({'_type':'GSystemType', 'name': 'Pandora_video'})
 app = node_collection.one({'_type':'GSystemType', 'name': 'E-Library'})
 wiki_page = node_collection.one({'_type': 'GSystemType', 'name': 'Wiki page'})
+GST_JSMOL = node_collection.one({"_type":"GSystemType","name":"Jsmol"})
 
 ##############################################################################
 
@@ -119,7 +119,7 @@ def resource_list(request, group_id, app_id=None, page_no=1):
 
 	files = node_collection.find({
 									# 'member_of': {'$in': [GST_FILE._id, GST_PAGE._id]},
-									'member_of': {'$in': [GST_FILE._id]},
+									'member_of': {'$in': [GST_FILE._id,GST_JSMOL._id]},
 									# '_type': 'File',
 									# 'fs_file_ids': {'$ne': []},
 									'group_set': {'$all': [ObjectId(group_id)]},
@@ -165,7 +165,7 @@ def resource_list(request, group_id, app_id=None, page_no=1):
 			elif len(set(eu_list)) == 1:
 				educationaluse_stats = { eu_list[0]: eu_list.count(eu_list[0])}
 			educationaluse_stats["all"] = files.count()
-
+		
 
 		# print educationaluse_stats
 		result_paginated_cur = files
@@ -188,7 +188,6 @@ def resource_list(request, group_id, app_id=None, page_no=1):
 
 	coll_page_count = collection_pages_cur.count() if collection_pages_cur else 0
 	collection_pages = paginator.Paginator(collection_pages_cur, page_no, no_of_objs_pp)
-
 	datavisual.append({"name":"Doc", "count": educationaluse_stats.get("Documents", 0)})
 	datavisual.append({"name":"Page", "count": educationaluse_stats.get("Pages", 0)})
 	datavisual.append({"name":"Image","count": educationaluse_stats.get("Images", 0)})
@@ -324,8 +323,9 @@ def elib_paged_file_objs(request, group_id, filetype, page_no):
 
 		# print "query_dict : ", query_dict
 
+		
 		files = node_collection.find({
-										'member_of': {'$in': [GST_FILE._id]},
+										'member_of': {'$in': [GST_FILE._id,GST_JSMOL._id]},
 										# 'member_of': {'$in': [GST_FILE._id, GST_PAGE._id]},
 										# '_type': 'File',
 										# 'fs_file_ids': {'$ne': []},
@@ -400,7 +400,7 @@ def elib_paged_file_objs(request, group_id, filetype, page_no):
 
 		# # else:
 		# elif filetype == "Documents":
-		#     d_Collection = node_collection.find({'_type': "GAttribute", 'attribute_type.$id': gattr._id,"subject": {'$in': coll} ,"object_value": "Documents"}).sort("last_update", -1)
+		#     d_Collection = node_collection.find({'_type': "GAttribute", 'attribute_type': gattr._id,"subject": {'$in': coll} ,"object_value": "Documents"}).sort("last_update", -1)
 
 		#     doc = []
 		#     for e in d_Collection:

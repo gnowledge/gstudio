@@ -27,7 +27,6 @@ from gnowsys_ndf.ndf.views.methods import get_node_common_fields,get_execution_t
 from gnowsys_ndf.ndf.views.methods import create_grelation
 # from gnowsys_ndf.ndf.views.methods import create_gattribute
 from gnowsys_ndf.ndf.views.methods import get_node_metadata, get_page, get_group_name_id
-# from gnowsys_ndf.ndf.org2any import org2html
 from gnowsys_ndf.ndf.views.search_views import results_search
 
 # from gnowsys_ndf.settings import GSTUDIO_SITE_VIDEO
@@ -48,6 +47,7 @@ pandora_video_st = node_collection.one({'$and': [{'_type': 'GSystemType'}, {'nam
 file_id = node_collection.find_one({'_type': "GSystemType", "name": "File"}, {"_id": 1})
 page_id = node_collection.find_one({'_type': "GSystemType", "name": "Page"}, {"_id": 1})
 theme_gst_id = node_collection.find_one({'_type': "GSystemType", "name": "Theme"}, {"_id": 1})
+group_gst_id = node_collection.find_one({'_type': "GSystemType", "name": "Group"}, {"_id": 1})
 
 
 # data review in File app
@@ -63,17 +63,18 @@ def data_review(request, group_id, page_no=1, **kwargs):
     e.g:
     context_variables = data_review(request, group_id, page_no, get_paged_resources=True)
     '''
-    
+
     try:
         group_id = ObjectId(group_id)
     except:
         group_name, group_id = get_group_name_id(group_id)
-    
+
     files_obj = node_collection.find({
                                     'member_of': {'$in': [
                                         ObjectId(file_id._id),
                                         ObjectId(page_id._id),
-                                        ObjectId(theme_gst_id._id)
+                                        ObjectId(theme_gst_id._id),
+                                        ObjectId(group_gst_id._id)
                                         ]},
                                     # '_type': 'File', 'fs_file_ids': {'$ne': []},
                                     'group_set': {'$in': [ObjectId(group_id)]},
@@ -96,7 +97,7 @@ def data_review(request, group_id, page_no=1, **kwargs):
     files_list = []
 
     for each_resource in paged_resources.items:
-        # each_resource, ver = get_page(request, each_resource) 
+        # each_resource, ver = get_page(request, each_resource)
         each_resource.get_neighbourhood(each_resource.member_of)
         files_list.append(node_collection.collection.GSystem(each_resource))
         # print "==============", each_resource.name, " : ", each_resource.group_set
@@ -143,7 +144,7 @@ def get_dr_search_result_dict(request, group_id, search_text=None, page_no=1):
         group_id = ObjectId(group_id)
     except:
         group_name, group_id = get_group_name_id(group_id)
-    
+
     # check if request is from form or from next page
     if request.GET.has_key("search_text"):
         search_text = request.GET.get("search_text", "")
@@ -170,7 +171,7 @@ def get_dr_search_result_dict(request, group_id, search_text=None, page_no=1):
     files_list = []
 
     for each_resource in paged_resources.items:
-        each_resource, ver = get_page(request, each_resource) 
+        each_resource, ver = get_page(request, each_resource)
         each_resource.get_neighbourhood(each_resource.member_of)
         files_list.append(node_collection.collection.GSystem(each_resource))
 
@@ -230,7 +231,7 @@ def data_review_save(request, group_id):
 
     # removing node_details dict from req
     post_req.pop('node_details')
-    
+
     # adding values to post req
     post_req.update(node_details)
 
@@ -238,14 +239,14 @@ def data_review_save(request, group_id):
     request.POST = post_req
     # print "\n---\n", request.POST, "\n---\n"
 
-    license = request.POST.get('license', '')
-    
+    copyright = request.POST.get('copyright', '')
+
     file_node = node_collection.one({"_id": ObjectId(node_oid)})
 
     if request.method == "POST":
 
         edit_summary = []
-        
+
         file_node_before = file_node.copy()  # copying before it is getting modified
         is_changed = get_node_common_fields(request, file_node, group_id, GST_FILE)
 
@@ -260,7 +261,7 @@ def data_review_save(request, group_id):
 
         # to fill/update attributes of the node and get updated attrs as return
         ga_nodes = get_node_metadata(request, file_node, is_changed=True)
-        
+
         if len(ga_nodes):
             is_changed = True
 
@@ -272,7 +273,7 @@ def data_review_save(request, group_id):
                 temp_edit_summ["after"] = each_ga["node"]["object_value"]
 
                 edit_summary.append(temp_edit_summ)
-        
+
         teaches_list = request.POST.get('teaches', '')  # get the teaches list
         prev_teaches_list = request.POST.get("teaches_prev", "")  # get the before-edit teaches list
 
@@ -294,11 +295,11 @@ def data_review_save(request, group_id):
             if len(gr_nodes_oid_list) == len(prev_teaches_list) and set(gr_nodes_oid_list) == set(prev_teaches_list):
                 pass
             else:
-                rel_nodes = triple_collection.find({'_type': "GRelation", 
-                                      'subject': file_node._id, 
-                                      'relation_type.$id': relation_type_node._id
+                rel_nodes = triple_collection.find({'_type': "GRelation",
+                                      'subject': file_node._id,
+                                      'relation_type': relation_type_node._id
                                     })
-                
+
                 rel_oid_name = {}
 
                 for each in rel_nodes:
@@ -312,7 +313,7 @@ def data_review_save(request, group_id):
                 temp_edit_summ["before"] = [rel_oid_name[each_oid].split(" -- ")[2] for each_oid in prev_teaches_list]
                 temp_edit_summ["after"] = [rel_oid_name[each_oid].split(" -- ")[2] for each_oid in  gr_nodes_oid_list]
                 edit_summary.append(temp_edit_summ)
-                
+
         assesses_list = request.POST.get('assesses_list','')
         if assesses_list != '':
             assesses_list = assesses_list.split(",")

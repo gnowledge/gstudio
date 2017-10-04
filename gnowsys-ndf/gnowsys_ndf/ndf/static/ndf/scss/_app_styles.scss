@@ -18,6 +18,8 @@
 
 /*
 /* Protects reflowing elements on error */
+$primary-blue : #164A7B;
+$primary-orange : #ce7869;
 [data-abide] span.error, [data-abide] small.error{
     position: absolute;
 }
@@ -830,11 +832,7 @@ article{
   header{
       overflow: hidden;
   }
-  h5{
-      white-space: nowrap;
-      text-overflow: ellipsis;
-      margin-bottom: 0;
-  }
+  
   .label{
       opacity:0.5;
   }
@@ -1143,6 +1141,7 @@ aside#help{
 // discussion
 .create-discussion {
     position: relative;
+    margin-bottom:20px;
 
     >div {
       display: inline-block;
@@ -2623,28 +2622,50 @@ $course-envelop-color: #fff;
   }*/
 }
 .about-course {
-  border: 1px solid #666;
+  background-color: #fff;;
   padding: 10px 23px ;
-  >h5 {
+  > h5 {
     text-transform: uppercase;
     font-weight: 600;
     letter-spacing: 1.5px;
-    font-size: 14px;
+    // //font-size: 14px;
     display: block;
     margin: 2px 0px 0px;
-    color: #888;
-  }
-  .course-desc {
-    font-size: 19px;
-    letter-spacing: 0.7px;
-  }
-  .course-highlight {
-    color: #aaa;
-    font-weight: 600;
-    font-size: 20px;
-    margin-bottom: 5px;
+    color: #99aaba;
+    margin-left:5px;
   }
 }
+  .course-desc {
+    letter-spacing: 0.7px;
+    font-weight: 400;
+    color: $primary-blue;
+    font-size:14px;
+    margin-left: 4px 0px 0px;
+    margin-top: 5px;
+}
+  .course-highlight {
+    
+    letter-spacing: 0.7px;
+    font-weight: 400;
+    color: #164A7B;
+    font-size: 14px;
+    margin-top: -11px;
+    margin-left: 4px 0px 0px;
+    margin-left: 4px;
+    margin-bottom: 5px;
+    >span{
+        color: $primary-orange;
+    }
+}
+
+
+.icon-wid{
+    font-size: 34px !important;
+    color: #a2b1be;
+    margin-right: 10px;
+
+}
+
 
   .notifications-analytics-tabs{
     .tabs {
@@ -3058,6 +3079,13 @@ $course-envelop-color: #fff;
       // display: none;
       background-color: #fff;
       padding-bottom: 30px;
+      //.group_sections_content{
+      //  margin-top:5px;
+      //}
+      .group_content{
+        margin-top:5px;
+        margin-left:0px;
+      }
 
       >div{
         background-color: #fff;
@@ -4195,6 +4223,9 @@ course-title{
     &.forthcoming{
       background-color: #F2910D;
     }
+    &.upcoming{
+      background-color: #F2910D;
+    }
 
     &.completed{
       background-color: #4d4d4d;
@@ -4572,4 +4603,87 @@ course-title{
     position:relative;
     text-align:center;
     border: 1px solid #eee;
+}
+.processing-screen{
+  background-color:$theme-color !important;
+}
+
+.processing-screen-label{
+  width:500px !important;
+  font-style: normal !important;
+}
+h3{
+    font-size: 20px;
+    color: $primary-blue;
+    font-family: 'OpenSans-Semibold';
+}
+
+h5{
+    color:#99aaba;
+    font-size:10px;
+    text-transform:uppercase;
+    letter-spacing:2px;
+    margin-left:5px;
+}
+
+.edit-note-btn{
+    float:right;
+    border: 1px solid #CFCFCF;
+    padding: 5px 10px;
+    border-radius: 3px;
+    color:#A2A2A2;
+    background-color: #f7f7f7;
+    i{
+        margin-right: 5px;
+    }
+}
+.delete-note-btn{
+    float:right;
+    border: 1px solid #CFCFCF;
+    padding: 1px 8px;
+    border-radius: 3px;
+    color:#A2A2A2;
+    background-color: #f7f7f7;
+    i{
+        margin-right: 5px;
+    }
+}
+
+
+.bef-note-btn{
+    padding: 3px 11px;
+    border-radius: 100%;
+    float: right;
+    margin: 5px 5px 8px 0px;
+    border: 1px solid #6153AE;
+    background: #fff;
+    font-size: 23px;
+    color: #6153AE;
+}
+
+.add-note-btn{
+    padding: 3px 11px;
+    border-radius: 100%;
+    float: right;
+    margin: 5px 5px 8px 0px;
+    border: 1px solid #6153AE;
+    background: #fff;
+    font-size: 23px;
+    color: #6153AE;
+}
+
+.explore-button {
+      // //font-size: 25px;
+    border-radius: 5px;
+    text-transform: uppercase;
+    margin-left: 150px;
+    color: #6153ae;
+    padding: 5px 17px;
+    width: inherit;
+    font-family: "OpenSans-Semibold", sans-serif;
+    border: 2px solid #6153ae;
+    background-color: #dbd4e1;
+    &:hover{
+        cursor:pointer;
+    }
 }

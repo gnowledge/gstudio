@@ -163,10 +163,11 @@ class RCS:
         """
         name, rev = self.checkfile(name_rev)
 
+        lockflag = "-q"
         if withlock: 
-            lockflag = "-l"
+            lockflag += " -l"
         else: 
-            lockflag = "-u"
+            lockflag += " -u"
 
         cmd = 'co %s%s %s %s' % \
             (lockflag, rev, otherflags, name)
@@ -189,10 +190,9 @@ class RCS:
         name, rev = self._unmangle(name_rev)
         new = not self.isvalid(name)
 
-        if delworkfile: 
-            lockflag = ""
-        else: 
-            lockflag = "-u" 
+        lockflag = "-q"
+        if not delworkfile:
+            lockflag += "-u"
 
         if not message: 
             message = "<none>"

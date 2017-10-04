@@ -1,8 +1,9 @@
-{% load get_course_filters get_group_name from ndf_tags %}
+{% load get_course_filters get_group_name  check_is_gstaff from ndf_tags %}
 {% load i18n %}
+{% load simple_filters %}
+
 {% get_group_name groupid as group_name_tag %}
 
-{% load simple_filters %}
 <div class="gallery-page">
     <div class="row gallery-header">
         {% get_course_filters group_id title as filter_dict %}
@@ -44,14 +45,19 @@
                             <span> Create note</span>
                         </a>
                         </div>
+                        {% check_is_gstaff group_id request.user as gstaff_access %}
+                        {% if gstaff_access %}
                         <div class="create-collection " id="create-collection">
                             <i class="fi-folder"></i>
                             <span> Create new collection</span>
                         </div>
+                        {% endif %}
+                        {% comment %}
                         <div class ="add-to-collection " id="add-to-collection">
                             <i class="fa fa-plus"></i>
                             <span>Add to collection</span>
                         </div>
+                        {% endcomment %}
                         <!-- <div class="download-file hide">
                             <i class="fi-download"></i>
                             <span> Download</span>
@@ -103,6 +109,7 @@
     </div>
 
 </div>
+</div>
 <div class="reveal-container">
     {% if file_obj %}
         {% include "ndf/ggallerymodal.html" with node=file_obj %}
@@ -123,7 +130,7 @@
         {% endif %}
     })
 
-    // On close event of reveal-modal ----------------------------------------------
+    // On close event of reveal-modal
     $(document).on('close', '.file-detail-modal', function () {
         $('.file-detail-modal-close')[0].click()
     });
@@ -187,6 +194,8 @@
 
     $('.create-collection').click(function() {
         var checked = $('.filenode:checked').length;
+        is_raw_material =  window.location.href.indexOf("raw-material") > -1;
+        is_gallery = window.location.href.indexOf("gallery") > -1;
         var is_create_collection = "True";
         if (checked){
           $.ajax({
@@ -195,6 +204,8 @@
             datatype: "html",
             data:{
               'is_create_collection':is_create_collection,
+              'is_raw_material':is_raw_material,
+              'is_gallery':is_gallery
             },
             success: function(data) {
                 $("#create_collection_model").html(data);
@@ -204,15 +215,10 @@
             }
           });
         }
-
         else{
           alert("Select atleast 1 resource");
-
-
         }
-
     });
-
 
 
     $('.add-to-collection').click(function() {
@@ -234,10 +240,8 @@
             }
           });
         }
-
         else{
           alert("Select atleast 1 resource");
-
 
         }
 
@@ -286,8 +290,6 @@
                 $("#create_collection_model").foundation('reveal', 'open');
             }
           });
-
-
   })
 
 </script>

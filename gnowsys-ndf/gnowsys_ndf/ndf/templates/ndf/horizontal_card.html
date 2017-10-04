@@ -1,111 +1,57 @@
 {% load i18n %}
-{% load ndf_tags %}
-{% load simple_filters %}
-<style type="text/css">
+{% load get_dict_from_list_of_dicts from simple_filters %}
+{% load get_relation_value  from ndf_tags %}
 
-  .rating-stars > div {
-      background-image:url("/static/ndf/images/stars.png");
-      height: 17px;
-    }
-    .event-status{
-      font-size: 0.8em;
-      font-weight: bold;
-    }
-    .closed{
-      color: red;
-    }
-    .forthcoming{
-      color: #03a9f4;
-    }
-    .open{
-      color: green;
-    }
-
-  </style>
-
-
-
- <div class="hr-card large-12 ">
-
-{% check_is_gstaff groupid request.user as gstaff_access %}
 {% if first_arg and second_arg and third_arg %}
-  <a href="{% url url_name first_arg second_arg third_arg %}{{search_url_text|safe}}">
+    <a href="{% url url_name first_arg second_arg third_arg %}{{search_url_text|safe}}"/>
 {% elif first_arg and second_arg %}
-  <a href="{% url url_name first_arg second_arg %}{{search_url_text|safe}}">
+    <a href="{% url url_name first_arg second_arg %}{{search_url_text|safe}}"/>
 {% elif first_arg %}
-  <a href='{% url url_name first_arg %}{{search_url_text|safe}}'>
+    <a href='{% url url_name first_arg %}{{search_url_text|safe}}'/>
 {% endif %}
 
-<div class="hr-card-image center large-6 columns" title="{% firstof resource.altnames resource.name %}">
-    {% get_dict_from_list_of_dicts resource.attribute_set as attr_set_dict %}
-    {% if resource.fs_file_ids.2 and not 'video' in resource.mime_type %}
-    <img src="{% url 'get_mid_size_img' first_arg second_arg %}" alt="">
-    {% elif resource.fs_file_ids.1 %}
-    <img src="{% url 'getImageThumbnail' first_arg second_arg %}" alt="">
-    {% elif "File" in resource.member_of_names_list or "Page" in resource.member_of_names_list%}
-      {% if attr_set_dict.educationaluse and attr_set_dict.educationaluse != "Documents" %}
-        <i class="{{attr_set_dict.educationaluse|lower}}"></i>
-      {% elif resource.fs_file_ids.0 and 'image' in resource.mime_type %}
-      <img src="{% url 'get_mid_size_img' first_arg second_arg %}" alt="">
-      {% elif resource.mime_type %}
-        <i class="{{resource.mime_type|lower|split:'/'|join:' '}}"></i>
-      {% else  %}
-        <i class="{{resource.member_of_names_list.0|lower }}"></i>
-      {% endif %}
-
-    {% elif "Group" in resource.member_of_names_list or has_logo == True or has_prof_pic == True %}
-      {% if "Course" in resource.member_of_names_list or has_logo == True %}
-
-        {% get_relation_value resource.pk 'has_logo' as grel_dict %}
-        {% if not grel_dict.cursor and grel_dict.grel_node and grel_dict.grel_node.fs_file_ids.1 %}
-                  <img src="{% url 'get_gridfs_resource' grel_dict.grel_node.fs_file_ids.2 %}" alt="" />
-          {% else %}
-                  <img src="/static/ndf/images/metaStudio-profile.svg" alt="Profile picture for this group."  class="img-height">
+<div class="module_card">
+    <div class="card_banner">
+        {% get_relation_value node.pk 'has_banner_pic' as grel_dict %}
+        {% if not grel_dict.cursor and grel_dict.grel_node and grel_dict.grel_node.if_file.thumbnail.relurl %}
+            <img  src="{{MEDIA_URL}}{{grel_dict.grel_node.if_file.mid.relurl}}" alt="" />
+        {% else %}
+            <img  src="/static/ndf/images/module-card.png"/></img>
         {% endif %}
-
-      {% else %}
-
-        {% get_relation_value resource.pk 'has_profile_pic' as grel_dict %}
-        {% if not grel_dict.cursor and grel_dict.grel_node and grel_dict.grel_node.fs_file_ids.1 %}
-                  <img src="{% url 'get_gridfs_resource' grel_dict.grel_node.fs_file_ids.2 %}" alt="" />
-          {% else %}
-                  <img src="/static/ndf/images/metaStudio-profile.svg" alt="Profile picture for this group."  class="img-height">
-        {% endif %}
-
-      {% endif %}
-
-    {% elif resource.collection_set %}
-        <i class="collection"></i>
-
-    {% else %}
-        <img src="/static/ndf/images/metaStudio-profile.svg"  class="img-height">
-    {% endif %}
-
-    <div class="hr-card-title" title="{% firstof resource.altnames resource.name %}">
-    {% firstof resource.name|capfirst %}
-    <!-- {% get_node_ratings request resource.pk as ratings %} -->
-            <!-- <div class="rating-stars center" style="width:{{ratings.avg|multiply:16}}px;"> <!-- 16px = 1 star -->
-              <!-- <div></div>
-            </div> -->
+            <h4 class="card_title" title="{% firstof node.altnames node.name %} ">
+                {% firstof node.altnames|truncatechars:50 node.name|truncatechars:50  %}
+            </h4>
+    {% get_dict_from_list_of_dicts node.attribute_set as node_attrs %}
     </div>
-
-  </div>
-  <!-- End Card  Image -->
-   <div class="large-6 columns">
-
-    <!-- Card Description -->
-
-    <!-- suppy no_description=True for not having description -->
-    {% if not no_description %}
-      <div class="hr-card-desc large-12 columns" title="{{resource.content_org}}">
-       {{resource.content_org|default_if_none:"Add some description."|truncatechars:75}}
-      </div>
-    {% endif %}
-     <!-- {{resource.author_set|length}} -->
-    <!-- End Card Description  -->
-  </div>
+    <div class="card_summary">
+        <div class="card_section">
+            <p class="module_brief">
+                {{node.content|safe|striptags|truncatechars:100}}
+            </p>
+        </div>
+        <div class="card_section">
+            <span class="card_label">
+                {% trans "Subject" %}: {{node_attrs.educationalsubject}}
+            </span class="card_label">
+            <p class="ellipsis"></p>
+            <span class="card_label">
+                {% trans "No. of Units" %}: {{node.collection_set|length}}
+            </span class="card_label">
+            <p class="ellipsis"></p>
+                <span class="card_label">
+                   {% trans "Grade" %} : {{node_attrs.educationallevel|join:', '}}
+                </span class="card_label">
+            <p class="ellipsis"></p>
+                <!-- <span class="card_label">
+                    Units
+                </span class="card_label"> -->
+            <p class="ellipsis"></p>
+        </div>
+        <div class="card_section">
+                <i class="fa fa-book"></i>
+                <span>{% trans "Explore" %}</span>
+        </div>
+    </div>
 </div>
-
-
-</a>
+    </a>
 

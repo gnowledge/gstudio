@@ -1,4 +1,4 @@
-{% load ndf_tags %}
+ {% load ndf_tags %}
 {% load i18n %}
 
 {% block head %}
@@ -69,13 +69,12 @@
             css_ids.push(node.id)
           }
           $li.find('.jqtree-title').attr('data-id',node.id);
-          if (node.node_type == "CourseUnitEvent"){
-          // if (node.node_type == "Page" || node.node_type == "File"  || node.node_type == "QuizItemEvent" ) {
+          if (node.node_type == "CourseUnit" ||  node.node_type == "CourseUnitEvent" || node.node_type == "lesson"){
             cu_ids.push(node.id)
             if (node.collection_set && node.collection_set.length > 0 ){
               cr_ids = cr_ids.concat(node.collection_set)
               $li.find('.jqtree-title').addClass('module-page');
-              url = '/{{group_name_tag}}/gcourse/course_section/' + node.parent.id + '/' + node.id + '/' + node.collection_set[0]
+              url = '/{{group_name_tag}}/course/course_section/' + node.parent.id + '/' + node.id + '/' + node.collection_set[0]
               $li.find('.jqtree-title')
                 .html('<a href="'+url+'" id='+node.collection_set[0]+' class="redirect_to_unitplayer"><span>' + $li.find('.jqtree-title').html() + ' </a></span>');
             }
@@ -133,7 +132,7 @@
             }
             // collapse_tree(node);
             var nav_list = parent_arr.reverse();
-            if(node['node_type']!="CourseSectionEvent" && node['node_type']!="CourseSubSectionEvent" && node['node_type']!="CourseUnitEvent" && node['node_type']!="CourseSection" && node['node_type']!="CourseSubSection" && node['node_type']!="CourseUnit" && update_url){
+            if(node['node_type']!="CourseSectionEvent" && node['node_type']!="CourseSubSectionEvent" && node['node_type']!="CourseUnitEvent" && node['node_type']!="CourseSection" && node['node_type']!="CourseSubSection" && node['node_type']!="CourseUnit" && update_url && node['node_type'] != "CourseEventGroup"){
             // alert(nav_list);
             // alert("node_type");
             $.ajax({
@@ -171,7 +170,6 @@
                   $("#view_page").html(data);
                 }
             });
-            $('article').unblock()
             }
             else if(node['node_type']=="CourseUnitEvent"){
               $(".view_page_link").trigger('click')

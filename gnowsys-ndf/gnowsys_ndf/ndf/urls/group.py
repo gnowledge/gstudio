@@ -1,5 +1,6 @@
 from django.conf.urls import patterns, url
 from gnowsys_ndf.ndf.views.group import GroupCreateEditHandler,EventGroupCreateEditHandler
+from django.views.generic import TemplateView
 
 urlpatterns = patterns('gnowsys_ndf.ndf.views.group',
                         url(r'^[/]$', 'group', name='group'),

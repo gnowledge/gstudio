@@ -1,0 +1,1161 @@
+{% load i18n %}
+{% load ndf_tags %}
+{% block head %}
+    <script src="/static/ndf/bower_components/handlebars/handlebars.js"></script>
+    <script type="text/javascript" src="/static/ndf/bower_components/MathJax/MathJax.js?config=TeX-AMS-MML_HTMLorMML" async></script>
+{% endblock head %}
+
+<div class="row course_creator">
+    <div class="small-12 columns">
+        <div class="course_editor ">
+
+            <!-- Left PANEL -->
+            <div class="course_tree">
+                <dl class="accordion course-lessons" data-accordion role="tablist">
+                </dl>
+                <a class="button-hollow-grey add-lesson" data-reveal-id="add-lesson-reveal">Add {{section_name}}</a>
+            </div>
+            <!-- END of LEFT PANEL -->
+
+            <!-- Right panel -->
+            <div class="course-editor-section hide">
+                <div class="activity-editor hide">
+                    <!-- Right panel Header -->
+                    <div class="actvity-editor-header editor-header" id="actvity-editor-headerid">
+                        <div class="left header-left activity-name-label row">
+                            <span class="activity-name"><!-- Activity Name --></span>
+                        </div>
+                    <div class="row">
+                        {% comment %}
+                        <a  class="view-admin-page right orange-button-template" data-current-activity-id="" > View Teacher's page</a>
+                        <a  class="view-help-page right orange-button-template" data-current-activity-id="" > View Help page</a>
+                        {% endcomment %}
+                        <a style="margin-top:10px!important" class="save_edit_activity right orange-button-template" data-current-activity-id="" > Edit </a>
+                    </div>   
+                     <!-- commenting following as activities now will be created/edited
+                        from activity area -->
+                        <!--
+                        <div class="right custom_dropdown">
+                            <a href="">More</a>
+                            <ul class="dropdown_content right_align">
+                                <li> <a class="save_template">Save as template</a> </li>
+                                <li> <a data-reveal-id="existing_template_modal">Create from existing template</a> </li>
+                                <li> <a class="delete_entity">Delete</a> </li>
+                            </ul>
+                        </div>
+                        -->
+                    </div>
+                    <!-- END of Right panel Header -->
+
+                    <!-- commenting following as activities now will be created/edited from activity area-->
+                    <!-- editor we are using is ck Editor -->
+                    <!--
+                    <div class="editor-tool hide">
+                        <div class="editor_actions">
+                            <ul>
+                                <li style="float: left;">
+                                    <span>Bold</span>
+                                    <span>Italics</span>
+                                    <span>OL</span>
+                                    <span>UL</span>
+                                </li><li style="float: right;">
+                                    <span>+ Assessment</span>
+                                </li><li style="float: right;">
+                                    <span data-reveal-id="imageModal">+ Image</span>
+                                    <span data-reveal-id="videoModal">+ Video</span>
+                                    <span>+ Sound</span>
+                                </li>
+                                <li style="width: 11%; float: right;">
+                                    <span data-reveal-id="appModal">+ App</span>
+                                </li>
+                            </ul>
+                        </div>
+                        Editor tool will come here. //CK Editor
+                    </div>
+                     -->
+
+                    <div id="scstyle">
+                        <div id="activity-content">
+                            <!-- selected activities content will go here (JS) -->
+                        </div>
+                    </div>
+                </div>
+                <div id="info-page-area">
+                    
+                </div>
+
+            </div>
+            <!-- END of Right panel -->
+
+            <!-- commented following because we are not using lesson editor -->
+            <!--
+            <div class="lesson-editor hide">
+                <div class="lesson-editor-header editor-header">
+                    <span class="header-title left">Lesson Name</span>
+                    <div class="right custom_dropdown">
+                        <a href="">More</a>
+                        <ul class="dropdown_content right_align">
+                            <li>
+                                <a href="#">Delete</a>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+                <div class="editor-tool">
+                    <div class="row">
+                        <div class="large-12 columns">
+                            <label>Description
+                                <textarea placeholder="Lesson brief description"></textarea>
+                            </label>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            -->
+        </div>
+    </div>
+</div>
+
+
+<!-- OVERLAY / REVEAL-MODALS -->
+
+<!-- commented following because edit/create of activity will happen from activities area -->
+
+<!--
+VIDEO
+<div id="videoModal" class="reveal-modal editor_modal tile_modal" data-reveal aria-labelledby="modalTitle" aria-hidden="true" role="dialog">
+    <div style="width: 100%; height: 50px;">
+        <div class="editor_modal_title left">Select an video to add it</div>
+        <div class="editor_modal_actions right">
+            <a class="button-hollow-purple close-reveal-modal" aria-label="Close">Cancel</a>
+            <a class="button-hollow-purple">Add selected video</a>
+        </div>
+    </div>
+    <div class="editor_modal_content">
+        <div class="row">
+            <div class="large-3 medium-6 small-12 columns modal_tile">
+                <a class="th" href="#">
+                    <img src="">
+                    <span>Image </span>
+                </a>
+            </div>
+            <div class="large-3 medium-6 small-12 columns modal_tile">
+                <a class="th" href="#">
+                    <img src="">
+                    <span>Image </span>
+                </a>
+            </div>
+            <div class="large-3 medium-6 small-12 columns modal_tile">
+                <a class="th" href="#">
+                    <img src="">
+                    <span>Image </span>
+                </a>
+            </div>
+            <div class="large-3 medium-6 small-12 columns modal_tile">
+                <a class="th" href="#">
+                    <img src="">
+                    <span>Image </span>
+                </a>
+            </div>
+        </div>
+        <div class="row">
+            <div class="large-3 medium-6 small-12 columns modal_tile">
+                <a class="th" href="#">
+                    <img src="">
+                    <span>Image </span>
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+
+IMAGE
+<div id="imageModal" class="reveal-modal editor_modal tile_modal" data-reveal aria-labelledby="modalTitle" aria-hidden="true" role="dialog">
+    <div style="width: 100%; height: 50px;">
+        <div class="editor_modal_title left">Select an image to add it</div>
+        <div class="editor_modal_actions right">
+            <a class="button-hollow-purple close-reveal-modal" aria-label="Close">Cancel</a>
+            <a class="button-hollow-purple">Add selected image</a>
+        </div>
+    </div>
+    <div class="editor_modal_content">
+        <div class="row">
+            <div class="large-3 medium-6 small-12 columns modal_tile">
+                <a class="th" href="#">
+                    <img src="">
+                    <span>Image </span>
+                </a>
+            </div>
+            <div class="large-3 medium-6 small-12 columns modal_tile">
+                <a class="th" href="#">
+                    <img src="">
+                    <span>Image </span>
+                </a>
+            </div>
+            <div class="large-3 medium-6 small-12 columns modal_tile">
+                <a class="th" href="#">
+                    <img src="">
+                    <span>Image </span>
+                </a>
+            </div>
+            <div class="large-3 medium-6 small-12 columns modal_tile">
+                <a class="th" href="#">
+                    <img src="">
+                    <span>Image </span>
+                </a>
+            </div>
+        </div>
+        <div class="row">
+            <div class="large-3 medium-6 small-12 columns modal_tile">
+                <a class="th" href="#">
+                    <img src="">
+                    <span>Image </span>
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+
+APP
+<div id="appModal" class="reveal-modal editor_modal" data-reveal aria-labelledby="modalTitle" aria-hidden="true" role="dialog">
+    <div style="width: 100%; height: 50px;">
+        <div class="editor_modal_title left">Select an app to add it</div>
+        <div class="editor_modal_actions right">
+            <a class="button-hollow-purple close-reveal-modal" aria-label="Close">Cancel</a>
+            <a class="button-hollow-purple">Add selected app</a>
+        </div>
+    </div>
+    <div class="editor_modal_content">
+        <div class="app_row">
+            <div style="width: 30%" class="app_image">
+                <div>
+                    <img src=""/>
+                </div>
+            </div>
+            <div style="width: 65%" class="app_desc">
+                <h3>App name 1</h3>
+                <p>
+                    Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do
+                    eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim
+                    ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut
+                    aliquip ex ea commodo consequat. Duis aute irure dolor in
+                    reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla
+                    pariatur. Excepteur sint occaecat cupidatat non proident, sunt in
+                </p>
+                <button type="button" class="button-hollow-purple">Select this app</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+OVERLAY div's for adding activity
+This will not be used because now only existing activities will be added.
+<div id="add-activity-modal" class="reveal-modal" data-reveal aria-labelledby="modalTitle" aria-hidden="true" role="dialog">
+    <h3>Activity Name</h3>
+    <input type="text" id="activity-name">
+    <button type="button" class="button-hollow-grey save-activity" data-lesson-id="">
+    Save Activity
+    </button>
+    <a class="close-reveal-modal" aria-label="Close">&#215;</a>
+</div>
+
+TEMPLATE selection for authoring activity
+This will not be used because now only existing activities will be added.
+<div id="existing_template_modal" class="reveal-modal" data-reveal aria-labelledby="modalTitle" aria-hidden="true" role="dialog">
+    <h3>Choose Templates</h3>
+    <div id="template-container"></div>
+    <a class="close-reveal-modal" aria-label="Close">&#215;</a>
+</div>
+-->
+
+<!-- overlay/reveal to delete lesson -->
+
+  <div id="deleteLessonModal" class="reveal-modal medium radius" data-reveal data-alert>
+    <p id="deleteLessonModalLabel"></p>
+    <div class="row">
+      <div class="small-3 small-offset-3 columns">
+        <button id="delLessonbtnConfirmYes" class="orange-button">Yes</button>
+      </div>
+      <div class="small-3 columns end">
+        <button id="delLessonbtnConfirmNo" class="orange-button">No</button>
+      </div>
+    </div>
+    <a class="close-reveal-modal">&#215;</a>
+  </div>
+
+
+
+
+<!-- overlay/reveal to add lesson -->
+<div id="add-lesson-reveal" class="reveal-modal" data-reveal aria-labelledby="modalTitle" aria-hidden="true" role="dialog">
+    <h3>{{section_name}} Name</h3>
+    <input type="text" id="lesson-name">
+    <select class="lesson-lang" name="lan" id="lesson_lang" >
+                            {% get_language_info_list for LANGUAGES as languages %}
+                            
+                            {% for language in languages %}
+                                {% if lesson_language == language.code %}
+                                    <option selected value="{{ language.code }}" data-sub-lang="{{ language.name }}" data-sub-code="{{ language.code }}">
+                                      {{ language.name }}
+                                {% else %}
+                                    <option value="{{ language.code }}" data-sub-lang="{{ language.name }}" data-sub-code="{{ language.code }}">
+                                      {{ language.name }}
+                                    </option>
+                                {% endif %}
+                            {% endfor %}
+                          </select><br/>
+    <button type="button" class="button-hollow-grey save-lesson" data-node-id=""> Save {{section_name}} </button>
+    <a class="close-reveal-modal" aria-label="Close">&#215;</a>
+</div>
+<!-- END of overlay/reveal to add lesson -->
+
+
+<div id="select-activity-page" class="reveal-modal" data-reveal aria-labelledby="modalTitle" aria-hidden="true" role="dialog" data-lesson-id="">
+    <h3>Choose Activity Page</h3>
+    <div id="activity-container"></div>
+    <a class="close-reveal-modal" aria-label="Close">&#215;</a>
+</div>
+
+<!-- END of OVERLAY div's for adding activity -->
+<!-- END of all modals div's -->
+
+
+
+{% verbatim %}
+<!-- Handlebar Templates for the course tree -->
+<script id="lesson-template" type="text/x-handlebars-template">
+    <dd class="accordion-navigation active" data-lesson-ele="lesson-accordion-{{id}}">
+        <a href="#lesson-{{id}}" class="entity-title" id="lesson-accordion" data_lesson_name="{{name}}"  data_lesson_language="{{language}}">
+            {{name}}
+            <div class="right edit_entity">
+                <i class="fi-list right"></i>
+                <ul class="entity_actions">
+                    <li class="lesson_move_up">Move up</li>
+                    <li class="lesson_move_down">Move down</li>
+                    <li class="lesson_edit">Edit</li>
+                    <li class="lesson_delete">Delete</li>
+                </ul>
+            </div>
+        </a>
+        <div id="lesson-{{id}}" class="content lesson-container">
+            <ul class="course-activities">
+                {{#each activities}}
+                    <li id="activity-{{id}}" data-name="{{name}}">
+                        <a class="entity-title">{{name}}
+                            <div class="right edit_entity">
+                                <i class="fi-list right"></i>
+                                <ul class="entity_actions">
+                                    <li class="activity_move_up">Move up</li>
+                                    <li class="activity_move_down">Move down</li>
+                                    <li class="activity_remove">Remove</li>
+                                    <!--
+                                    <li class="activity_edit">Edit</li>
+                                    -->
+                                </ul>
+                            </div>
+                        </a>
+                    </li>
+                {{/each}}
+                <li>
+                    <div class="custom_dropdown">
+                        <a data-reveal-id="select-activity-page" class="add_existing_activity"><u>Add {{sub_section_name}}Activity</u></a>
+                        <!--
+                        <a class="button-hollow-grey add_activity">Add Activity</a>
+                         <ul class="dropdown_content left_align" >
+                            <li>
+                                <a data-reveal-id="add-activity-modal" class="add_activity">Create new</a>
+                            </li>
+                            <li>
+                                <a data-reveal-id="select-activity-page" class="add_existing_activity">Select from Activity Pages</a>
+                            </li>
+                        </ul>
+                        -->
+                    </div>
+                </li>
+            </ul>
+        </div>
+    </dd>
+</script>
+{% endverbatim %}
+
+
+
+<!-- Javascript operations -->
+<script type="text/javascript">
+    // Example JSON data req schema/format:
+    // var course_data = [
+    //     {
+    //         name: 'Lesson1',
+    //         type: 'lesson',
+    //         id: 'l1',
+    //         activities: [
+    //             {
+    //                 name: 'Activity 1',
+    //                 type: 'activity',
+    //                 id: 'a1'
+    //             },
+    //             {
+    //                 name: 'Activity 1',
+    //                 type: 'activity',
+    //                 id: 'a2'
+    //             }
+    //         ]
+    //     }
+    // ];
+
+    var course_data = {{unit_structure|safe}};
+
+    $(function(){
+        /**
+        *    Tree related javascript
+        *
+        */
+
+        // Initializing foundation accordian
+        $(document).foundation({
+            accordion: {
+                multi_expand: true
+            }
+        });
+
+        // Rendering function for the course tree
+        var course_source = $("#lesson-template").html();
+        var course_template = Handlebars.compile(course_source);
+
+        function renderCourseTree(data) {
+            var courseHtml = '';
+            $.each(data, function(ind, lesson){
+                courseHtml += course_template(lesson);
+            });
+            $('.course_editor .course-lessons').html(courseHtml);
+
+            assignEvents();
+        }
+
+        //Managing states and events on the tree.
+        var lastClickedActivity;
+        var selectedEntity;
+        var selectedEntityId;
+        var editorMode = 'view';
+
+        function assignEvents() {
+            lastClickedActivity = undefined;
+            $(document).foundation('accordion', 'reflow');
+        }
+
+        /*
+        * Handlers and actions for the lesson
+        */
+
+        $('.course-lessons').on('click', '.edit_lesson' ,function(e){
+            e.stopPropagation();
+            e.preventDefault();
+        });
+
+        // Edit a lesson
+        $('.course-lessons').on('click', '.lesson_edit' ,function(e){
+            e.stopPropagation();
+            e.preventDefault();
+            var lesson_id = $(this).closest('a').attr('href').replace('#lesson-', '');
+            var lesson_name = $(this).closest('a').attr('data_lesson_name');
+            var lesson_language = $(this).closest('a').attr('data_lesson_language');
+
+            selectedEntity = 'lesson';
+            selectedEntityid = lesson_id;
+
+            // no need to show or collapse to left panel
+            // $('.course_editor').addClass('edit_mode');
+            // setTimeout(function(){
+            //     $('.course-editor-section').removeClass('hide');
+            // }, 1000);
+            // $('.lesson-editor').removeClass('hide');
+            // $('.activity-editor').addClass('hide');
+
+            //Ajax to get data for activity
+            console.log("editing lesson: " + lesson_id);
+            $('.save-lesson').attr('data-node-id', lesson_id);
+            $(".lesson-lang").val(lesson_language);
+            $('#lesson-name').val(lesson_name);
+
+            $('#add-lesson-reveal').foundation('reveal', 'open');
+            // addLesson(node_id, name)
+        });
+
+
+        // Move a lesson down
+        $('.course-lessons').on('click', '.lesson_move_down' ,function(e){
+            var $current = $(this).closest('a#lesson-accordion')
+            var $next = $current.parent('dd').next('dd')
+            var parent_node = "{{group_id}}"; // unit_node in this case
+            var curr_lesson_id = $current.attr('href').replace('#lesson-', '');
+            var next_lesson_id = $next.find('a#lesson-accordion').attr('href').replace('#lesson-', '');
+            var return_status = change_order_api(next_lesson_id, curr_lesson_id, parent_node)
+            if (return_status){
+                $current.parent('dd').insertAfter($next);
+            }
+        });
+
+        // Move a lesson up
+        $('.course-lessons').on('click', '.lesson_move_up' ,function(e){
+            var $current = $(this).closest('a#lesson-accordion')
+            var $previous = $current.parent('dd').prev('dd')
+            var parent_node = "{{group_id}}"; // unit_node in this case
+            var curr_lesson_id = $current.attr('href').replace('#lesson-', '');
+            var prev_lesson_id = $previous.find('a#lesson-accordion').attr('href').replace('#lesson-', '');
+            var return_status = change_order_api(curr_lesson_id, prev_lesson_id, parent_node)
+            if (return_status){
+                $current.parent('dd').insertBefore($previous);
+            }
+        });
+
+        //Activity Move Up
+        $('.course-lessons').on('click', '.activity_move_down' ,function(e){
+            lesson_id = $(this).parents('div.lesson-container')
+                            .attr('id').replace('lesson-', '');
+            $current = $(this).parents('li');
+            $next = $current.next('li');
+            var curr_act_id = $current.attr('id').replace('activity-', '');
+            var next_act_id = $next.attr('id').replace('activity-', '');
+            var return_status = change_order_api(next_act_id, curr_act_id, lesson_id)
+            if (return_status) {
+                $current.insertAfter($next);
+            }
+        })
+
+        //Activity Move Up
+        $('.course-lessons').on('click', '.activity_move_up' ,function(e){
+            lesson_id = $(this).parents('div.lesson-container')
+                            .attr('id').replace('lesson-', '');
+            $current = $(this).parents('li');
+            $previous = $current.prev('li');
+            var curr_act_id = $current.attr('id').replace('activity-', '');
+            var prev_act_id = $previous.attr('id').replace('activity-', '');
+            var return_status = change_order_api(curr_act_id, prev_act_id, lesson_id)
+            if (return_status) {
+                $current.insertBefore($previous);
+            }
+        })
+
+        function removeFromCollectionSet(parent_node_id, child_node_id, $el_to_remove){
+          $.ajax({
+              type: "POST",
+              data:{
+                  'csrfmiddlewaretoken': "{{csrf_token}}",
+                  "parent_node_id": parent_node_id,
+                  "child_node_id": child_node_id,
+                  "node_field": "collection_set"
+              },
+              url: "{% url 'remove_from_nodelist' group_id %}",
+              // datatype: "",
+              async: true,
+              success: function(data) {
+                  // console.log(typeof(data));
+                  data = JSON.parse(data);
+                  // console.log(data);
+                  if(data){
+                    $el_to_remove.remove();
+                  }
+                  else{
+                      return false;
+                  }
+              }
+          });
+        }
+
+
+        function deleteNode(node_to_delete, $el_to_remove, deletion_type=0){
+          $.ajax({
+              type: "POST",
+              data:{
+                  'csrfmiddlewaretoken': "{{csrf_token}}",
+                  "node_to_delete": node_to_delete,
+                  "deletion_type": deletion_type,
+              },
+              url: "{% url 'ajax_delete_node' group_id %}",
+              success: function(data) {
+                  // console.log(typeof(data));
+                  // console.log(data);
+                  data_list = JSON.parse(data);
+                  if(data_list[0]){
+                    $el_to_remove.remove();
+                  }
+                  // alert(data_list[1])
+              }
+          });
+
+        }
+
+        // remove activity
+        $('.course-lessons').on('click', '.activity_remove' ,function(e){
+            lesson_id = $(this).parents('div.lesson-container')
+                            .attr('id').replace('lesson-', '');
+            $current = $(this).parents('li');
+            $current.remove();
+            var curr_act_id = $current.attr('id').replace('activity-', '');
+            var return_status = removeFromCollectionSet(lesson_id, curr_act_id, $current);
+            // NEED TO DO:
+            // after removing activity, content area showing activity's content on RHS should be clear.
+        })
+
+
+        // Delete a lesson
+        $('.course-lessons').on('click', '.lesson_delete' ,function(e){
+            e.stopPropagation();
+            e.preventDefault();
+
+            var lesson_id = $(this).closest('a').attr('href').replace('#lesson-', '');
+            var activitiesLength = $(this).closest('a').parent('dd.accordion-navigation').find('ul.course-activities').children().length;
+            if(activitiesLength > 1){
+                alert('You have to remove ' + String(activitiesLength - 1) + ' activities first which are falling under this lesson!');
+            }
+            else if(activitiesLength == 1){
+                confirm_delete_lesson(lesson_id,$(this, delete_mode=0).closest('a').parent('dd.accordion-navigation'), deletion_type=1)
+            }
+        });
+
+        var set_href = false;
+        function confirm_delete_lesson(lesson_id, dom_element, deletion_type){
+            if(!set_href){
+                lbl_msg = "Are you sure you want to delete this lesson ?"
+                $("#deleteLessonModalLabel").text(lbl_msg);
+                $("#deleteLessonModal")
+                  .removeClass("medium").addClass("small")
+                lesson_id_hidden_ele = document.createElement("input");
+                lesson_id_hidden_ele.setAttribute("type", "hidden");
+                lesson_id_hidden_ele.setAttribute("name", "hidden_lesson_id");
+                lesson_id_hidden_ele.setAttribute("value", lesson_id);
+                dom_ele_hidden_ele = document.createElement("input");
+                dom_ele_hidden_ele.setAttribute("type", "hidden");
+                dom_ele_hidden_ele.setAttribute("name", "hidden_dom_ele");
+                dom_ele_hidden_ele.setAttribute("value", dom_element.attr('data-lesson-ele'));
+                del_type_hidden_ele = document.createElement("input");
+                del_type_hidden_ele.setAttribute("type", "hidden");
+                del_type_hidden_ele.setAttribute("name", "hidden_del_type");
+                del_type_hidden_ele.setAttribute("value", deletion_type);
+                $("#deleteLessonModal").append(lesson_id_hidden_ele, dom_ele_hidden_ele,del_type_hidden_ele)
+                $("#deleteLessonModal").foundation('reveal', 'open');
+            }
+
+        }
+
+        //Confirm or Cancel Deletion
+        $("#deleteLessonModal").on("click", "#delLessonbtnConfirmYes", function() {
+            set_href = true;
+            var node_to_delete = $("#deleteLessonModal").find("input[name='hidden_lesson_id']").attr('value')
+            var del_type = $("#deleteLessonModal").find("input[name='hidden_del_type']").attr('value')
+            var dom_ele_value = $("#deleteLessonModal").find("input[name='hidden_dom_ele']").attr('value')
+            dom_ele = $("[data-lesson-ele='" + dom_ele_value + "'");
+            deleteNode(node_to_delete, dom_ele, del_type);
+            $("#deleteLessonModal").find("input[name='hidden_del_type']")
+            $("#deleteLessonModal").foundation('reveal', 'close');
+
+        });
+
+        $("#deleteLessonModal").on("click", "#delLessonbtnConfirmNo", function() {
+            $("#deleteLessonModal").foundation('reveal', 'close');
+        });
+
+        $(document).on('closed.fndtn.reveal', '#deleteLessonModal', function () {
+            set_href = false;
+            $("#deleteLessonModal").find("input[name='hidden_lesson_id']").remove()
+            $("#deleteLessonModal").find("input[name='hidden_dom_ele']").remove()
+            $("#deleteLessonModal").find("input[name='hidden_del_type']").remove()
+        });
+
+
+        function addLesson(lessonName, lessonId) {
+          /*
+          addLesson()
+          - to add lesson of unit.
+          */
+          if (!lessonName) {
+            alert('Name can not be empty. Please provide one.');
+            return;
+          };
+          result = undefined;
+          sel_lesson_lang =  $('#lesson_lang').find(':selected').attr('data-sub-code');
+          $.ajax({
+              type: "POST",
+              data:{
+                  'csrfmiddlewaretoken': "{{csrf_token}}",
+                  "name": lessonName,
+                  "lesson_id": lessonId,
+                  "unit_id": "{{unit_obj.pk}}",
+                  "sel_lesson_lang":sel_lesson_lang
+              },
+              url: "{% url 'lesson_create_edit' group_id %}",
+              // datatype: "",
+              success: function(data) {
+                  // console.log(typeof(data));
+                  data_dict = JSON.parse(data);
+                  // console.log(data);
+                  if(data_dict.success){
+                      renderCourseTree(data_dict.unit_hierarchy);
+                      // handle opening of tree till recently added node with data_dict.msg
+                      $('#add-lesson-reveal').foundation('reveal', 'close');
+                      result = true;
+                  }
+                  else{
+                      alert(data_dict.msg);
+                      result = false;
+                  }
+
+              }
+          });
+          // console.log(result)
+          return result;
+        }
+
+
+        //Add a lesson
+        $('.save-lesson').on('click', function(){
+            // console.log('Adding another lessson');
+            var node_id = $('.save-lesson').attr('data-node-id');
+            addLesson($('#lesson-name').val().trim(), node_id)
+
+            //Send the query and update the course_data and call 'renderCourseTree(course_data)'
+            //To edit the newly created lesson run this $('a[href="#lesson-'+newid+'"] .edit_lesson').trigger('click');
+        })
+
+        function getNodeData(node_id)
+        {
+          var result = undefined;
+          $.ajax({
+              type: "GET",
+              data:{
+                  "node_id": node_id,
+              },
+              url: "{% url 'get_node_json_from_id' group_id %}",
+              datatype: "JSON",
+              success: function(data) {
+                  if (data == "0"){
+                    alert('Unable to load data... Something went wrong :(')
+                    return false
+                  }
+                  data_dict = JSON.parse(data);
+                  $('#activity-content').html(data_dict.content);
+                   MathJax.Hub.Queue(["Typeset",MathJax.Hub,'activity-content']);
+                    $("#info-page-area").html("");
+
+                  return true
+              }
+          });
+        }
+
+
+
+        /*
+        * Handlers and actions for the Activity
+        */
+        // Selecting a activity.
+        $('.course-lessons').on('click', '.course-activities>li:not(:last-child) a', function(e){
+            e.preventDefault();
+
+            if(!document.getElementById($(this).parent().attr('id'))){
+                return 1;
+            }
+            $('.course-lessons li[id^="activity-"]').removeClass('active');
+
+            $(this).closest('li').addClass('active');
+            // e.g: activity-58bbaf0a5e35e40049f128ee
+            var activity_id = $(this).closest('li').attr('id').replace('activity-', '');
+            selectedEntity = 'activity';
+            selectedEntityid = activity_id;
+            lastClickedActivity = activity_id;
+
+            setTimeout(function(){
+                $('.course-editor-section').removeClass('hide');
+            }, 1000);
+
+            //Ajax to get the data for this activity.
+            $('.lesson-editor').addClass('hide');
+            $('.activity-editor').removeClass('hide');
+            $('.course_editor').addClass('edit_mode');
+            // $('#course_creator')
+
+            // update content: name and description of activity.
+            var activityName = $('#activity-' + activity_id).attr('data-name');
+            // update name field of editor section
+            $('.course-editor-section .activity-name').text(activityName);
+            MathJax.Hub.Queue(["Typeset",MathJax.Hub,'actvity-editor-headerid']);
+
+            getNodeData(activity_id);
+     
+              $.ajax({
+                      type: "POST",
+
+                      url: "{% url 'get_info_pages' group_id %}",
+                      datatype: "html",
+                      data:{
+                        'csrfmiddlewaretoken': "{{csrf_token}}",
+                        'node_id':activity_id,
+                        'page_type':'has_admin_page'
+
+                      },
+                        success: function(data) {
+                        // $('#info-page-area').html(data);
+                        parent = $("#info-page-area");
+                        parent.append(data);
+                      }
+                    });
+
+                          
+                $.ajax({
+                      type: "POST",
+
+                      url: "{% url 'get_info_pages' group_id %}",
+                      datatype: "html",
+                      data:{
+                        'csrfmiddlewaretoken': "{{csrf_token}}",
+                        'node_id':activity_id,
+                        'page_type':'has_help'
+
+                      },
+                        success: function(data) {
+                        // $('#info-page-area').html(data);
+                        parent = $("#info-page-area");
+                        parent.append(data);
+                      }
+                    });
+            
+            $('.save_edit_activity').attr('href', "{% url 'edit_course_page' group_id 'activity_id' %}".replace('activity_id', activity_id))
+            $('.save_edit_activity').attr('data-current-activity-id', activity_id);
+        });
+
+        /*
+        // Add a new activity
+        $('.course-lessons').on('click', '.add_activity', function(){
+            var lesson_id = $(this).closest('div.content').attr('id').replace('lesson-', '');
+            // console.log('Adding another activity for lessson ' + lesson_id);
+
+            $('#add-activity-modal button.save-activity').attr('lesson_id', lesson_id);
+            //Send the query and update the course_data and call 'renderCourseTree(course_data)'
+            //To select the newly created activity run this $('#activity-' + newid).trigger('click');
+        });
+        */
+
+        // Add a existing activity
+        $('.course-lessons').on('click', '.add_existing_activity', function(){
+            var lesson_id = $(this).closest('div.content').attr('id').replace('lesson-', '');
+            // console.log('Adding existing activity for lessson ' + lesson_id);
+
+            $('#select-activity-page').attr('data-lesson-id', lesson_id);
+            //Send the query and update the course_data and call 'renderCourseTree(course_data)'
+            //To select the newly created activity run this $('#activity-' + newid).trigger('click');
+        });
+
+        renderCourseTree(course_data);
+
+        function getActivityPages() {
+            var lessonId = $("#select-activity-page").attr("data-lesson-id");
+            $.ajax({
+                      type: "GET",
+                      url: "{% url 'get_group_pages' group_id %}",
+                      datatype: "html",
+                      data:{
+                        'except_collection_set_of_id': lessonId
+                      },
+                        success: function(data) {
+                      $("#activity-container").html(data);
+                            // $('#existing_template_modal').foundation('reveal', 'open');
+
+                      $(".activity-page").click(function(event){
+                          event.preventDefault();
+                          // get html content in var
+                          var activityPgId = $(this).attr("data-id");
+                          var activityContent = $(this).attr("data-name");
+
+                          addExistingActivityPage(lessonId, activityPgId);
+                          // addActivity($('#activity-name').val().trim(), lesson_id);
+
+                          // if (editorMode != "edit"){
+                          //   editNode(nodeContent);
+                          // }
+                          // else{
+                          //   CKEDITOR.instances['ckeditor_textarea'].setData(nodeContent);
+                          // }
+                          // Open ckeditor and append content of node in ckeditor
+                          // openCkEditor('#activity-content', "BasicToolbar", nodeContent);
+
+                          // $('#select-activity-page').foundation('reveal', 'close');
+                        });
+                      }
+                    });
+        }
+
+        function addExistingActivityPage(lessonId, activityPgId)
+        {
+            $.ajax({
+              type: "POST",
+              data:{
+                  'csrfmiddlewaretoken': "{{csrf_token}}",
+                  "child_node_id": activityPgId,
+                  "parent_node_id": lessonId
+              },
+              url: "{% url 'add_to_collection_set' group_id %}",
+              // datatype: "",
+              success: function(data) {
+                  if (data == "0") {
+                    $('#select-activity-page').foundation('reveal', 'close');
+                    alert('Same activity exists in concern lesson.');
+                    return 0;
+                  }
+                  data_dict = JSON.parse(data);
+                  renderCourseTree(data_dict);
+                  // handle opening of tree till recently added node with data_dict.msg
+                  $('#select-activity-page').foundation('reveal', 'close');
+                  }
+          });
+          return 1;
+        }
+
+
+        // foundation reveal modal events handling
+        // $(document).on('opened.fndtn.reveal', '#existing_template_modal[data-reveal]', function () {
+        //   getTemplates();
+        // });
+
+        $(document).on('opened.fndtn.reveal', '#select-activity-page[data-reveal]', function () {
+            $("#activity-container").html('');
+            getActivityPages();
+        });
+
+        $(document).on('closed.fndtn.reveal', '#add-lesson-reveal', function () {
+            $("#lesson-name").val('');
+            $('.save-lesson').attr('data-node-id', '');
+        });
+        // END of foundation reveal modal events handling
+
+
+        /**
+        *    Editor area related javascript
+        *   selectedEntity has the selected Entity type
+        *   selectedEntityId has the selected Entity Id.
+        */
+
+        // Add the jquery specific to the editor area such as the modal button handlers.
+
+        $('.course-editor-section').on('click', '.delete_entity', function(){
+            // Call ajax
+        });
+
+
+        // $('.course-editor-section').on('click', '.save_edit_activity', function(){
+        //     if (editorMode === 'view') {
+        //         console.log('Editing the activity');
+        //         // editNode(false);
+        //     }
+        //     else {
+        //         editorMode = 'view';
+        //         // var nodeContent = CKEDITOR.instances['ckeditor_textarea'].getData();
+        //         // var nodeId = $('.save_edit_activity').attr('data-current-activity-id');
+        //         // var nodeName = $('#activity-' + nodeId).attr('data-name');
+        //         // saveNode(nodeId, nodeName, nodeContent);
+        //         // //Do the ajax to save the activity and then following command;
+        //         $('.save_edit_activity').html('Edit');
+        //     }
+        // })
+
+        function change_order_api(node_to_up, node_to_down, parent_id){
+            var success_state = false
+            $.ajax({
+                url: "{% url 'change_order' group_id %}",
+
+                data: {
+                    node_id_up: node_to_up,
+                    node_id_down: node_to_down,
+                    parent_node: parent_id,
+                    'csrfmiddlewaretoken': "{{csrf_token}}"
+                },
+
+                type: "POST",
+                async: false,
+                dataType: "json",
+
+                success: function(data){
+                    success_state = data["success"]
+                },
+            });//end of ajax
+            return success_state
+        }
+
+
+        /*
+        $('.course-editor-section').on('click', '.save_template', function(){
+            //Call ajax
+                if (Object.keys(CKEDITOR.instances).length > 0 ){
+                    var nodeContent = CKEDITOR.instances['ckeditor_textarea'].getData();
+                }
+                else{
+                    var nodeContent = $("#activity-content").text()
+                }
+                var nodeId = $('.save_edit_activity').attr('data-current-activity-id');
+                var nodeName = $('#activity-' + nodeId).attr('data-name');
+
+                $.ajax({
+                    type: "POST",
+                    url: "{% url 'save_node' group_id %}",
+                    data:{
+                        'node_id' : nodeId,
+                        'name' : nodeName,
+                        'content' : nodeContent,
+                        'type_of_gst_name': 'Template',
+                        'replicate_resource': 'True',
+                        'member_of_gst_name': 'Page',
+                        'csrfmiddlewaretoken': '{{csrf_token}}'
+                    },
+                    success: function(data) {
+                        if (data == '0'){
+                            alert('Failed to save data. Please try again.');
+                            return 0;
+                        }
+                        // console.log(data)
+                    }
+                });
+        });
+
+        function openCkEditor(editorContainerIdOrEl, toolbarType, content)
+        {
+          $.ajax({
+            type: "GET",
+            // url: "{% url 'get_ckeditor' group_id %}",
+            url: "/home/ajax/get_ckeditor",
+            datatype: "html",
+            data:{
+                    'ckeditor_toolbar' : toolbarType
+              },
+            success: function(data) {
+                $(editorContainerIdOrEl).html(data);
+                CKEDITOR.instances['ckeditor_textarea'].setData(content);
+                }
+            });
+        }
+
+        function closeCkEditor()
+        {
+          $(".cke_button__closebtn_label").trigger( "click" );
+        }
+
+
+        function saveNode(nodeId, nodeName, nodeContent) {
+          $.ajax({
+            type: "POST",
+            url: "{% url 'save_node' group_id %}",
+            // datatype: "JSON",
+            data:{
+                    'node_id' : nodeId,
+                    'name' : nodeName,
+                    'content' : nodeContent,
+                    'member_of_gst_name': "activity",
+                    'csrfmiddlewaretoken': '{{csrf_token}}'
+              },
+              success: function(data) {
+                  if (data == '0'){
+                    alert('Failed to save data. Please try again.');
+                    return 0;
+                  }
+                  data_dict = JSON.parse(data);
+                  closeCkEditor();
+                  $("#activity-content").html(data_dict.content);
+                }
+            });
+        }
+
+        function editNode(nodeContent) {
+          editorMode = 'edit';
+          $('.save_edit_activity').html('Save');
+          // get html content from #activity-content
+          if(!nodeContent){
+            var nodeContent = $("#activity-content").html();
+          }
+          // Open ckeditor and append content of node in ckeditor
+          openCkEditor('#activity-content', "GeneralToolbar", nodeContent);
+        }
+        */
+
+
+        /*
+        // add/save activity
+        function addActivity(activityName, lessonId) {
+          // addActivity()
+          // - to add activity of lesson of unit.
+          if (!activityName) {
+            alert('Name can not be empty. Please provide one.');
+            return;
+          };
+          result = undefined;
+          $.ajax({
+              type: "POST",
+              data:{
+                  'csrfmiddlewaretoken': "{{csrf_token}}",
+                  "unit_id": "{{unit_obj.pk}}",
+                  "name": activityName,
+                  "lesson_id": lessonId
+              },
+              url: "{% url 'activity_create_edit' group_id %}",
+              // datatype: "",
+              success: function(data) {
+                  data_dict = JSON.parse(data);
+                  if(data_dict.success){
+                      renderCourseTree(data_dict.unit_hierarchy);
+                      // handle opening of tree till recently added node with data_dict.msg
+                      $('#add-activity-modal').foundation('reveal', 'close');
+                      result = true;
+                  }
+                  else{
+                      alert(data_dict.msg);
+                      result = false;
+                  }
+              }
+          });
+
+          return result;
+        }
+
+        //Add a activity
+        $('.save-activity').on('click', function(){
+            var lesson_id = $('#add-activity-modal button.save-activity').attr('lesson_id');
+            // console.log(lesson_id);
+            addActivity($('#activity-name').val().trim(), lesson_id);
+
+            //Send the query and update the course_data and call 'renderCourseTree(course_data)'
+            //To edit the newly created lesson run this $('a[href="#lesson-'+newid+'"] .edit_lesson').trigger('click');
+        })
+        **/
+
+
+        /*
+        function getTemplates() {
+            $.ajax({
+                      type: "GET",
+                      url: "{% url 'get_group_templates_page' group_id %}",
+                      datatype: "html",
+                      data:{
+
+                      },
+                        success: function(data) {
+                      $("#template-container").html(data);
+                        // $('#existing_template_modal').foundation('reveal', 'open');
+
+                      $(".template-list").click(function(event){
+                          // get html content in var
+                          var nodeContent = $(this).children('div').attr("data-content");
+                          if (editorMode != "edit"){
+                            editNode(nodeContent);
+                          }
+                          else{
+                            CKEDITOR.instances['ckeditor_textarea'].setData(nodeContent);
+                          }
+                          // Open ckeditor and append content of node in ckeditor
+                          // openCkEditor('#activity-content', "BasicToolbar", nodeContent);
+                          $('#existing_template_modal').foundation('reveal', 'close');
+                        });
+                      }
+                    });
+        }
+        */
+
+
+
+    })
+</script>

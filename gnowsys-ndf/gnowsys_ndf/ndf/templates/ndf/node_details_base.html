@@ -8,18 +8,6 @@
 {% block title %} {{ node.member_of_names_list|join:", " }} - {{ node.name }}  {% endblock %}
 {% block head %}
 
-<!-- <script type="text/javascript" src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script> -->
-<script type="text/javascript" src="/static/ndf/bower_components/MathJax/MathJax.js?config=TeX-AMS-MML_HTMLorMML" async></script> <!-- checked -->
-
-<!-- MathJax-In-Line-Configuration: Specifying the configuration settings -->
-<script type="text/x-mathjax-config">
-  MathJax.Hub.Config({
-    tex2jax: {
-      inlineMath: [['$','$'], ['\\(','\\)']],
-      displayMath: [['\\[','\\]'], ['$$','$$']]
-    }
-  });
-</script>
 <!-- script to call ajax function for converting collection into module <script>
 
   $(document).ready(function()
@@ -57,8 +45,8 @@
 
 {% block meta_content %}
 {{block.super }}
-<div class="repository-title" itemprop="{{schema.1.name}}" style="font-size:1.2em !important;width:100%;margin-top:8px"> 
-      {% firstof node.name node.altnames node.name %} 
+<div class="repository-title" itemprop="{{schema.1.name}}" style="font-size:1.2em !important;width:100%;margin-top:8px">
+      {% firstof node.name node.altnames node.name %}
   </div>
 
   <br>
@@ -72,26 +60,29 @@
 
 {% block collection_content %}
   {% check_group node.pk as is_group %}
+  {% comment %}
   {% if node.collection_set and not node.if_file.original.relurl and not is_group %}
-      <div class="show-collection">    
+      <div class="show-collection">
         <a class=" {% if node.collection_set %}collection-exists{% endif %}"  style="width:100%" data-oid="{{node.pk|safe}}">
          Show Collection
         </a>
      </div>
   {% endif %}
-  <div id="view_collection">
-    
-    {% include "ndf/collection_ajax_view.html" %}  
-  </div>
+  {% endcomment %}
+  {% if node.collection_set %}
+    <div id="view_collection">
+      {% include "ndf/collection_ajax_view.html" %}
+    </div>
+  {% endif %}
   {% if not 'video' in node.if_file.mime_type and not is_group  %}
     <dl class="accordion" data-accordion>
         <dd class="accordion-navigation" data-options="deep_linking:true">
               <a href="#panel1" style="background-color: #2980B9; color:#FFF;width:70%!important">
                 <div style="font-size:13px">Change Thumbnail <i  style="float:right;font-size:13px" class= "fi-pencil"></i></div></a>
               <div id="panel1" class="content">
-                          {% include "ndf/upload_pic_widget.html" with  node_id=node.pk url_name="file" widget_for="file_detail_view" is_banner=False is_profile=False is_thumbnail=True %}
+                          {% include "ndf/widget_photo_upload.html" with  node_id=node.pk url_name="file" widget_for="file_detail_view" is_banner=False is_profile=False is_thumbnail=True %}
               </div>
-        
+
         </dd>
     </dl>
 
@@ -101,11 +92,11 @@
     <div class="teaches-block">
       <div class="repository-title large-4 columns" style="width:100%;font-size:1.2em">Teaches</div><br><br>
       <ul style="list-style: none; border-bottom: solid thin #ddd;">
-        {% for each_topic in node.teaches %}
-            {% get_topic_breadcrumb_hierarchy each_topic.pk as topic_prior_hier %}
-          <li style="border-bottom: solid thin #ddd;">
-            <a href="{% url 'topic_details' group_name_tag each_topic.pk %}?nav_li={{topic_prior_hier}}" >{% trans each_topic.name %}</a>
-          </li>
+        {% for each_teaches in node.teaches %}
+            {% get_topic_breadcrumb_hierarchy each_teaches.pk as topic_prior_hier %}
+            <li style="border-bottom: solid thin #ddd;">
+              <a href="{% url 'topic_details' group_name_tag each_teaches.pk %}?nav_li={{topic_prior_hier}}" >{% trans each_teaches.name %}</a>
+            </li>
         {% endfor %}
       </ul>
     </div>
@@ -114,7 +105,7 @@
 {% endblock %}
 
 
-{% block add_resource_content %}  
+{% block add_resource_content %}
 
 {% comment %}
 {% user_access_policy groupid request.user as user_access %}
@@ -123,31 +114,31 @@
 {% if user_access == "allow" %}
 
 
-  
+
 {% if topic %}
   <br/>
   <dl class="accordion topic" data-accordion>
     <dd>
       <a href="#add_resources"> <b>{% trans "Add resources in this topic " %}</b> </a>
       <div id="add_resources" class="content">
-        <div> 
+        <div>
 
-            <a class="tiny button" data-reveal-id="view_add_page"> 
+            <a class="tiny button" data-reveal-id="view_add_page">
               <span class="fi-plus">&nbsp;&nbsp;{% trans "Add Page " %} </span>&nbsp;&nbsp; <i class="fi-page"></i>
             </a>
-            <div id="view_add_page" class="reveal-modal" data-reveal style="height:500px;overflow:scroll;"> 
+            <div id="view_add_page" class="reveal-modal" data-reveal style="height:500px;overflow:scroll;">
 
               <h3>{% trans "Add New Page: " %}</h3>
               <!-- To enter name of the page -->
               <div>
                 <input class="name_id" name="name" type="text" placeholder="Enter name...">
-              </div>              
+              </div>
               <!-- To enter tags -->
               <div>
                 <span data-tooltip class="has-tip" title="Tags help identify similiar work easily. You can add as many labels as you wish using a comma ','"><label>Tag{{node.tags|pluralize|default_if_none:"s"}}</label>
                 </span>
                 <input class="tags_id" name="tags" type="text" value="{{node.tags|join:', '|default_if_none:""}}" placeholder="{% trans 'Separate tags with commas...' %}">
-              </div>  
+              </div>
               <!-- To enter description(org content) -->
               <div class="row">
                 <div class="medium-12 columns">
@@ -159,12 +150,12 @@
 
               <a class="close-reveal-modal">&#215;</a>
 
-            </div>          
+            </div>
 
         </div>
 
-        <div> 
-          <a class="tiny button" data-reveal-id="view_add_file"> 
+        <div>
+          <a class="tiny button" data-reveal-id="view_add_file">
             <span class="fi-plus">&nbsp;&nbsp;{% trans "Add File " %} </span>&nbsp;&nbsp; <i class="fi-play"></i>
           </a>
 
@@ -193,13 +184,13 @@
 
         </div>
 
-        <div> 
-          <a class="tiny button" data-reveal-id="view_add_event"> 
+        <div>
+          <a class="tiny button" data-reveal-id="view_add_event">
            <span class="fi-plus">&nbsp;&nbsp;{% trans "Add Events " %} </span>&nbsp;&nbsp; <i class=""></i>
           </a>
 
-          <div id="view_add_event" class="reveal-modal" data-reveal style="height:500px;overflow:scroll;"> 
-        
+          <div id="view_add_event" class="reveal-modal" data-reveal style="height:500px;overflow:scroll;">
+
             <b>{% trans "Add events feature will be coming soon " %}</b>
 
             <a class="close-reveal-modal">&#215;</a>
@@ -257,33 +248,33 @@ $("#add_page").click(function() {
 
 
 {% comment %}
-    
+
   {% block shelf_content %}
     {% if user.is_authenticated %}
       {% shelf_allowed node as allowed %}
-    
+
       {% include "ndf/shelf.html" %}
     {% else %}
     <h4>{% trans 'Please Login to create your shelf' %}</h4>
-    {% endif %}  
+    {% endif %}
   {% endblock %}
 
 {% endcomment %}
 
 
-{% block breadcrumb %} 
+{% block breadcrumb %}
 {% endblock breadcrumb %}
 
 {% block body_content %}
 <div id="view_page">
-  {% include "ndf/node_ajax_view.html" %}  
+  {% include "ndf/node_ajax_view.html" %}
 </div>
 {% endblock %}
 
 {% block script%}
 
 {% comment %}
-  
+
 function addNewShelf(shelfName)
 {
   shelfNameList = [];

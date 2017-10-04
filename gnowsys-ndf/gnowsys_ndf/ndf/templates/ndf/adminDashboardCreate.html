@@ -12,6 +12,9 @@
 
 {% block body_content %} 
 <link rel="stylesheet" type="text/css" href="/static/ndf/orgitdown/skins/gstudio/style.css" />
+<script type="text/javascript" src="/static/ndf/bower_components/jquery-ui/jquery-ui.min.js"></script>
+<script type="text/javascript" src="/static/ndf/bower_components/jquery-ui/jquery-ui.js"></script>
+
 <form method="post" action="" name="{{class_name}}" id="{{class_name}}">
 {% csrf_token %}
 {% if translate %}
@@ -41,7 +44,6 @@
 			<div style="display:table-cell;"> 
 			<font size="3"> {{list}} </font> 
 			</div>
-
 {% get_input_fields class_structure|get_dict_item:list list translate  %}
 </div>
 {% endif %}
@@ -60,49 +62,60 @@
 	<dd class="accordion-navigation">
 		<a href="#definitionlist">Definition</a>
 		<div id="definitionlist" class="content active">
-		{% for list in definitionlist %}
-			{% if translate and list != "language" %}
+		{% for dl in definitionlist %}
+		{% for key,list in dl.iteritems %}
+		{# {% for key,list in definitionlist %} #}
+			{% if translate and key != "language" %}
 			<div style="display:table-row;">
 				<div style="display:table-cell;"> 
 					<font size="3"> {{list}} </font> 
 				</div>
-	{% get_input_fields class_structure|get_dict_item:list list translate  %}
+	{% get_input_fields class_structure|get_dict_item:key key translate  %}
 
-	{% if list in  required_fields %}
+	{% if key in  required_fields %}
 	<div style="display:table-cell;">
 					<font size="3" color="red"> * </font>
-					<font id="{{list}}_required" style="display:none" color="red">This field required</font>
+					<font id="{{key}}_required" style="display:none" color="red">This field required</font>
 				</div>
 				{% endif %}
 			</div>
 			{% endif %}
 			
-			{% if not translate %}
-			<div style="display:table-row;">
-				<div style="display:table-cell;"> 
-					<font size="3"> {{list}} </font> 
+			{% if not translate %} <!--Used when the page is not translated -->
+			<div class='boxes' style="display:table-row;">
+				<!--
+				<div style="display:table-cell;" title="{% for key,value in help_tip.iteritems %}{% if list == key %}{{value}}{% endif %}{% endfor %} " class='box' > 
+					<span><font size="3"> {{list}} </font> </span> -->
+				{# <div style="display:table-cell;" title="{% for key2,value in help_tip.iteritems %}{% if key == key2 %}{{value}}{% endif %}{% endfor %} "  class="scard-image" > #}
+				<div style="display:table-cell;" >
+					<span data-tooltip aria-haspopup="true" class="has-tip" data-disable-hover="false" tabindex="1" title="{% for key2,value in help_tip.iteritems %}{% if key == key2 %}{{value}}{% endif %}{% endfor %}">
+					<font size="3"> {{list}} </font> </span>
 				</div>
-				{% get_input_fields class_structure|get_dict_item:list list translate  %}
-				{% if list in  required_fields %}
+				{% get_input_fields class_structure|get_dict_item:key key translate  %}
+				{% if key in  required_fields %}
 				<div style="display:table-cell;">
 					<font size="3" color="red"> * </font>
-					<font id="{{list}}_required" style="display:none" color="red">This field required</font>
+					<font id="{{key}}_required" style="display:none" color="red">This field required</font>
 				</div>
 				{% endif %}
 			</div>
 			{% endif %}
 			{% endfor %}
+			{% endfor %}
 		</div>
 	</dd>
 	<dd class="accordion-navigation">
 		<a href="#contentlist">Content</a>
-		<div id="contentlist" class="content">
-			{% for list in contentlist %}
+		<div id="contentlist" class="content" >
+			{% for cl in contentlist %}
+			{% for key,list in cl.iteritems %}
 			<div class="medium-12 columns">
-	{% include "ndf/add_editor.html" with var_name="content_org" var_placeholder="Enter the content here" var_value=node.content_org|default_if_none:"" node_id=node.pk %}
+				{% include "ndf/html_editor.html" with var_name="content_org" var_placeholder="Enter the content here" var_value=node.content|default_if_none:"" node_id=node.pk ckeditor_toolbar="GeneralToolbar" %}
 			</div>
 			{% endfor %}
-			<script type="text/javascript">
+			{% endfor %}
+	{# <!--{% include "ndf/add_editor.html" with var_name="content_org" var_placeholder="Enter the content here" var_value=node.content_org|default_if_none:"" node_id=node.pk %} --> #}
+<!--			<script type="text/javascript">
 	$(".orgitdown .orgitdownButton1 a").css({"background-image":'url("/static/ndf/orgitdown/skins/gstudio/images/bold.png")','background-color':'#EEEEEE','background-position':'center center','background-repeat':'no-repeat'});
 	$(".orgitdown .orgitdownButton2 a").css({"background-image":'url("/static/ndf/orgitdown/skins/gstudio/images/italic.png")','background-color':'#EEEEEE','background-position':'center center','background-repeat':'no-repeat'});
 	$(".orgitdown .orgitdownButton3 a").css({"background-image":'url("/static/ndf/orgitdown/skins/gstudio/images/stroke.png")','background-color':'#EEEEEE','background-position':'center center','background-repeat':'no-repeat'});
@@ -124,32 +137,40 @@
 	{% endfor %}
 	{% endif %}
 	});
-			</script>
+			</script> -->
 		</div>
 	</dd>
 	<dd class="accordion-navigation">
 		<a href="#dependencylist">Dependency</a>
 		<div id="dependencylist" class="content">
-			{% for list in dependencylist %}
-			<div style="display:table-row;">
-	<div style="display:table-cell;"> 
-		<font size="3"> {{list}}</font> 
+			{% for dplt in dependencylist %}
+			{% for key,list in dplt.iteritems %}
+			<div style="display:table-row;" class='boxes' >
+	<!--<div style="display:table-cell;" title="{% for key2,value in help_tip.iteritems %}{% if key == key2 %}{{value}}{% endif %}{% endfor %} " class='box' > -->
+	<div style="display:table-cell;" >
+		<span data-tooltip aria-haspopup="true" class="has-tip" data-disable-hover="false" tabindex="1" title="{% for key2,value in help_tip.iteritems %}{% if key == key2 %}{{value}}{% endif %}{% endfor %}" >
+		<font size="3"> {{list}}</font></span>  
 	</div>
-	{% get_input_fields class_structure|get_dict_item:list list translate  %}
+	{% get_input_fields class_structure|get_dict_item:key key translate  %}
 			</div>
+			{% endfor %}
 			{% endfor %}
 		</div>
 	</dd>
 	<dd class="accordion-navigation">
 		<a href="#options">Options</a>
 		<div id="options" class="content">
-			{% for list in options %}
-			<div style="display:table-row;">
-				<div style="display:table-cell;"> 
-					<font size="3"> {{list}}</font> 
+			{% for op in options %}
+			{% for key,list in op.iteritems %}
+			<div style="display:table-row;" class='boxes' >
+				<!-- <div style="display:table-cell;" title="{% for key2,value in help_tip.iteritems %}{% if key == key2 %}{{value}}{% endif %}{% endfor %} " class='box' > -->
+				<div style="display:table-cell;"  > 
+					<span data-tooltip aria-haspopup="true" class="has-tip" data-disable-hover="false" tabindex="1" title="{% for key2,value in help_tip.iteritems %}{% if key == key2 %}{{value}}{% endif %}{% endfor %}" >
+					<font size="3"> {{list}}</font> </span>
 				</div>
-				{% get_input_fields class_structure|get_dict_item:list list translate  %}
+				{% get_input_fields class_structure|get_dict_item:key key translate  %}
 			</div>
+			{% endfor %}
 			{% endfor %}
 		</div>
 	</dd>
@@ -181,6 +202,7 @@
 {% autoescape off %}
 	var required_fields = [];
 	required_fields = {{ required_fields }}
+
 	var index = required_fields.indexOf('_type');
 	if(index>-1){
 		 required_fields.splice(index, 1);
@@ -212,11 +234,11 @@
 				$("#"+required_fields[reqfields]+"_required").show();
 			}
 		}
-		<!-- if(flag == 1) -->
-		<!-- { -->
-		<!--   alert("* mandatory fields requiredss"); -->
-		<!--   event.preventDefault(); -->
-		<!-- } -->
+		if(flag == 1)
+		{ 
+			alert( "* Mandatory fields. Please fill them, inorder to proceed. "); 
+			event.preventDefault();
+		}
 	});
 
 {% endblock %}	

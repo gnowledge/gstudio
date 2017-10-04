@@ -25,8 +25,14 @@
   background-repeat:no-repeat; background-size: 48px 48px
   }
 
-  #list_widget {
+  .list_drawer_list {
     width: 500px;
+    height: 45px;
+  }
+
+  .list_drawer {
+    width: 500px;
+    height: 45px;
   }
   
 </style>
@@ -63,18 +69,23 @@
 </select>
 
 {% elif fields_type == "list" %}
-<div id="list_drawer" style="border-spacing:0px" class="list_drawer">
+<div id="list_drawer_list" style="border-spacing:0px" class="list_drawer_list">
 
+  {% if fields_name == "subject_type"   %}
+    {% get_selected_drawer_items_single_dropdown fields_name fields_value as drawer_items %} 
+
+    {% get_all_drawer_items_single_dropdown fields_name fields_value as all_items %} 
+
+    {% include 'ndf/widget_selector.html' with for=fields_name all_options=all_items selected_options=drawer_items %}
   
-  {% if fields_name == "subject_type" or fields_name == "language" or fields_name == "object_type" or fields_name == "applicable_node_type" or fields_name == "subject_applicable_nodetype" or fields_name == "object_applicable_nodetype" or fields_name == "data_type" %}
+    {# {% list_widget fields_name fields_type fields_value  %} #}
 
-    {% list_widget fields_name fields_type fields_value  %}
 
   {% elif fields_name == "relation_type_set" or fields_name == "attribute_type_set" or fields_name == "meta_type_set" or fields_name == "member_of" or fields_name == "type_of" %}  
 
   {% get_selected_drawer_items fields_name fields_value as drawer_items %}
 
-  {% get_all_drawer_items fields_name fields_value as all_items %}
+  {% get_all_drawer_items fields_name fields_value as all_items %} 
 
     <!-- The tags fetch selected items as drawer_items and rest all the items as all_items -->
   
@@ -88,6 +99,11 @@
     <!-- The tags fetch selected items as drawer_items and rest all the items as all_prior_items specifically for prior_node -->
 
     {% include 'ndf/widget_selector.html' with for=fields_name all_options=all_prior_items selected_options=drawer_items %}
+
+  {% elif fields_name == "validators" %}
+    <div style="display:table-cell;">
+    <font size="3"> <input type="textbox" name="{{fields_name}}" value="{{fields_value|default_if_none:''}}"></font>
+    </div>
 
   {% endif %}
 
@@ -120,11 +136,12 @@
   <font size="3"> <input type="number" name="{{fields_name}}" value="{{fields_value|default_if_none:''}}"></font>
 </div>
 
-{% elif fields_name == "subject_applicable_nodetype" or fields_name == "object_applicable_nodetype" or fields_name == "data_type" %}
-<div id="list_drawer" >
-  {#% edit_drawer_widget fields_name groupid node %#}
-  {% list_widget fields_name fields_type fields_value  %}
-</div>
+{% elif fields_name == "subject_applicable_nodetype" or fields_name == "object_applicable_nodetype" or fields_name == "data_type" or fields_name == "applicable_node_type"  %}
+
+  <div id="list_drawer" class="list_drawer" >
+    {#% edit_drawer_widget fields_name groupid node %#}
+    {% list_widget fields_name fields_type fields_value  %}
+  </div>
 
 {% else %}
 <div style="display:table-cell;">

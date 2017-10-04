@@ -55,16 +55,16 @@ def main():
         app_items = node_collection.find({'name':k})
         for each in list(app_items):
             get_node = node_collection.one({'_id': ObjectId(each._id), 'member_of': gapp._id})
-            if get_node:        
+            if get_node:
                 name=v.decode('utf-8')
                 print get_node.name
-                node_rt = triple_collection.find({'_type': "GRelation", 'subject': get_node._id, 'relation_type.$id': get_translation_rt._id})
+                node_rt = triple_collection.find({'_type': "GRelation", 'subject': get_node._id, 'relation_type': get_translation_rt._id})
                 if node_rt.count() > 0:
-                    node = node_collection.one({'_id': ObjectId(node_rt[0].right_subject) })  
+                    node = node_collection.one({'_id': ObjectId(node_rt[0].right_subject) })
                 else:
                     node = None
                     node_rt = None
-               
+
                 if node is None:
                     node = node_collection.collection.GSystem()
                     node.name = unicode(name)
@@ -78,7 +78,7 @@ def main():
                     node.status = u"DRAFT"
                     node.save()
                     print "\nTranslated Node ",node.name," created successfully\n"
-                else:            
+                else:
                     print "\nTranslated node ",node.name," already exists\n"
 
                 if node_rt is None:
@@ -91,7 +91,7 @@ def main():
                     # grelation.name=u""
                     # grelation.save()
                     print "\nGRelation for node ",node.name," created sucessfully!!"
-                else:            
+                else:
                     print "\nGRelation for node ",node.name," already exists\n"
 
-                    
+

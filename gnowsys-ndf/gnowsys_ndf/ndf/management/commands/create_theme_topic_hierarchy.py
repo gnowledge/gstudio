@@ -11,7 +11,7 @@ from django.core.management.base import BaseCommand, CommandError
 
 # from django_mongokit import get_database
 from django.template.defaultfilters import slugify
-from gnowsys_ndf.ndf.org2any import org2html
+# from gnowsys_ndf.ndf.org2any import org2html
 from gnowsys_ndf.ndf.views.methods import create_gattribute
 # from mongokit import IS
 
@@ -51,13 +51,13 @@ def create_user_nroer_team():
 
     if User.objects.filter(username="nroer_team"):
         nroer_team_id = get_user_id("nroer_team")
-    
+
     else:
         info_message = "\n- Creating super user: 'nroer_team': "
         user = User.objects.create_superuser(username='nroer_team', password='nroer_team', email='nroer_team@example.com')
-    
+
         nroer_team_id = user.id
-    
+
         info_message += "\n- Created super user with following creadentials: "
         info_message += "\n\n\tusername = 'nroer_team', \n\tpassword = 'nroer_team', \n\temail = 'nroer_team@example.com', \n\tid = '" + str(nroer_team_id) + "'"
         print info_message
@@ -67,7 +67,7 @@ def create_user_nroer_team():
 def get_user_id(user_name):
     '''
     Takes the "user name" as an argument and returns:
-    - django "use id" as a response. 
+    - django "use id" as a response.
     else
     - returns False.
     '''
@@ -108,8 +108,8 @@ class Command(BaseCommand):
 
                 else:
                     info_message = "\n- CSV File (" + file_path + ") not found!!!"
-                    print info_message 
-                    log_list.append(str(info_message)) 
+                    print info_message
+                    log_list.append(str(info_message))
                     raise Exception(info_message)
 
                 with open(file_path, 'rb') as f:
@@ -137,7 +137,7 @@ class Command(BaseCommand):
                             # if (i == 3):
                                 # break
                     except csv.Error as e:
-                        sys.exit('file %s, line %d: %s' % (filename, reader.line_num, e)) 
+                        sys.exit('file %s, line %d: %s' % (filename, reader.line_num, e))
 
         except Exception as e:
             print str(e)
@@ -155,14 +155,14 @@ class Command(BaseCommand):
                 with open(log_file_path, 'a') as log_file:
                     log_file.writelines(log_list)
 
-            
+
 def create_theme_topic_hierarchy(row):
     """
-    
+
     Args:
         row (list): each row of CSV
         e.g: ["CR/XCR", "featured", "alignment", "content_org", "Theme name", "theme item name", .., .., .... , "topic"]
-    
+
     Returns:
         TYPE: Description
     """
@@ -190,7 +190,7 @@ def create_theme_topic_hierarchy(row):
         theme_node = create_object(name=theme_name, member_of_id=theme_gst._id, featured=bool(featured), language=language)
 
         info_message = "- Created New Object : "+ str(theme_node.name) + "\n"
-        print info_message 
+        print info_message
         log_list.append(str(info_message))
 
 
@@ -207,21 +207,21 @@ def create_theme_topic_hierarchy(row):
     ga_node = create_gattribute(theme_node._id, curricular_at, curricular)
 
     info_message = "- Created ga_node : "+ str(ga_node.name) + "\n"
-    print info_message 
+    print info_message
     log_list.append(str(info_message))
 
     ga_node = create_gattribute(theme_node._id, alignment_at, unicode(alignment))
 
     info_message = "- Created ga_node : "+ str(ga_node.name) + "\n"
-    print info_message 
+    print info_message
     log_list.append(str(info_message))
 
     # --- END of Theme processing ---
-    
+
     # --- theme-item and topic processing ---
     # from 5th item or 4rd index of row there will be start of theme-item and topic(at last)
     theme_item_topic_list = row[6:]
-    
+
     # do not entertain any blank values here:
     theme_item_topic_list = [i for i in theme_item_topic_list if i]
     # print theme_item_topic_list
@@ -245,20 +245,20 @@ def create_theme_topic_hierarchy(row):
                             })
 
         if not theme_item_node:
-            
+
             theme_item_node = create_object(name=each_theme_item, member_of_id=theme_item_gst._id, prior_node_id=parent_node._id, language=language)
-            
+
             info_message = "\n- Created theme-item : "+ str(theme_item_node.name) + "\n"
-            print info_message 
+            print info_message
             log_list.append(str(info_message))
 
-        else: 
+        else:
             info_message = "\n!! Theme Item : "+ str(theme_item_node.name) + " already exists!\n"
-            print info_message 
+            print info_message
             log_list.append(str(info_message))
-        
+
         # cheking for current theme-item's _id in collection_set of parent_node
-        if not theme_item_node._id in parent_node.collection_set: 
+        if not theme_item_node._id in parent_node.collection_set:
             add_to_collection_set(node_object=parent_node, id_to_be_added=theme_item_node._id)
 
         parent_node = theme_item_node
@@ -291,7 +291,7 @@ def create_theme_topic_hierarchy(row):
         info_message = "\n!! Topic : "+ str(topic_node.name) + " already exists!\n"
         print info_message
         log_list.append(str(info_message))
-        
+
     # cheking for current theme-item's _id in collection_set of parent_node
     if not topic_node._id in parent_node.collection_set:
         add_to_collection_set(node_object=parent_node, id_to_be_added=topic_node._id)
@@ -316,20 +316,21 @@ def create_object(name, member_of_id, prior_node_id=None, content_org=None, grou
 
     if content_org:
         node.content_org = unicode(content_org)
-        node.content = org2html(content_org, file_prefix=ObjectId().__str__())
+        # node.content = org2html(content_org, file_prefix=ObjectId().__str__())
+        node.content = unicode(content_org)
 
     node.save()
 
     return node
-        
+
 
 def add_to_collection_set(node_object, id_to_be_added):
     """Adds/updates a collection_set of object with provided object and id.
-    
+
     Args:
         node_object (mongodb object)
         id_to_be_added (mongodb _id)
-    
+
     Returns:
         updates an object but returns nothing
     """

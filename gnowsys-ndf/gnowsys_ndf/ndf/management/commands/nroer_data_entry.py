@@ -400,7 +400,7 @@ def parse_data_create_gsystem(json_file_path):
         json_documents_list = json.loads(json_file_content)
 
         # Initiating empty node obj and other related data variables
-        node = node_collection.collection.File()
+        node = node_collection.collection.GSystem()
         node_keys = node.keys()
         node_structure = node.structure
         # print "\n\n---------------", node_keys
@@ -499,31 +499,30 @@ def parse_data_create_gsystem(json_file_path):
             # print "nodeid : ", nodeid
 
             # ----- for updating language -----
-            node_lang = get_language_tuple(eval(parsed_json_document['language']))
+            # node_lang = get_language_tuple(eval(parsed_json_document['language']))
             # print "============= :", node_lang
             # print "============= lang :", node_obj.language
 
-            if node_obj and node_obj.language != node_lang:
+            # if node_obj and node_obj.language != node_lang:
 
-                update_res = node_collection.collection.update(
-                                    {'_id': ObjectId(nodeid), 'language': {'$ne': node_lang}},
-                                    {'$set': {'language': node_lang}},
-                                    upsert=False,
-                                    multi=False
-                                )
+            #     update_res = node_collection.collection.update(
+            #                         {'_id': ObjectId(nodeid), 'language': {'$ne': node_lang}},
+            #                         {'$set': {'language': node_lang}},
+            #                         upsert=False,
+            #                         multi=False
+            #                     )
 
-                if update_res['updatedExisting']:
-                    node_obj.reload()
+            #     if update_res['updatedExisting']:
+            #         node_obj.reload()
 
-                    info_message = "\n\n- Update to language of resource: " + str(update_res)
-                    log_print(info_message)
+            #         info_message = "\n\n- Update to language of resource: " + str(update_res)
+            #         log_print(info_message)
 
-                    info_message = "\n\n- Now language of resource updates to: " + str(node_obj.language)
-                    log_print(info_message)
+            #         info_message = "\n\n- Now language of resource updates to: " + str(node_obj.language)
+            #         log_print(info_message)
                 # print "============= lang :", node_obj.language
 
             # ----- END of updating language -----
-
 
             collection_name = parsed_json_document.get('collection', '')
 
@@ -542,7 +541,7 @@ def parse_data_create_gsystem(json_file_path):
             thumbnail_url = parsed_json_document.get('thumbnail')
             # print "thumbnail_url : ", thumbnail_url
 
-            if thumbnail_url and nodeid:
+            if (thumbnail_url and nodeid) and (thumbnail_url != parsed_json_document.get('thumbnail') ):
                 try:
                     info_message = "\n\n- Attaching thumbnail to resource\n"
                     log_print(info_message)
@@ -552,8 +551,15 @@ def parse_data_create_gsystem(json_file_path):
                     print e
 
             # print type(nodeid), "-------", nodeid, "\n"
+            if (thumbnail_url == parsed_json_document.get('resource_link')) and (warehouse_group._id in node_obj.group_set) :
+                for i,each_groupid in enumerate(node_obj.group_set):
+                    if each_groupid == warehouse_group._id:
+                        node_obj.group_set.pop(i)
+                if home_group._id not in node_obj.group_set:
+                    node_obj.group_set.append(home_group._id)
+                node_obj.save()
 
-            # create thread node
+        # create thread node
             if isinstance(nodeid, ObjectId):
                 thread_result = create_thread_obj(nodeid)
 
@@ -655,7 +661,6 @@ def parse_data_create_gsystem(json_file_path):
 
                 gst_possible_relations_dict = node.get_possible_relations(file_gst._id)
 
-
                 # processing each entry in relation_list
                 # print "=== relation_list : ", relation_list
 
@@ -739,7 +744,7 @@ def parse_data_create_gsystem(json_file_path):
 
                                 nodes = triple_collection.find({'_type': "GRelation",
                                             'subject': subject_id,
-                                            'relation_type.$id': relation_type_node._id
+                                            'relation_type': relation_type_node._id
                                           })
 
                                 # sending list of all the possible right subject to relation
@@ -829,8 +834,8 @@ def create_thread_obj(node_id):
 
 
 def create_resource_gsystem(resource_data, row_no='', group_set_id=None):
-
     # fetching resource from url
+
     resource_link = resource_data.get("resource_link")  # actual download file link
     resource_link = resource_link.replace(' ', '%20')
 
@@ -863,15 +868,17 @@ def create_resource_gsystem(resource_data, row_no='', group_set_id=None):
         log_file_not_found.append(file_not_found_msg)
         return None
 
-    # print "======", type(files)
     files = io.BytesIO(files.read())
     files.name = filename
 
     name = unicode(resource_data["name"])  # name to be given to gsystem
     userid = resource_data["created_by"]
-    content_org = resource_data["content_org"]
+    # content_org = resource_data["content_org"]
     tags = resource_data["tags"]
-    language = get_language_tuple(eval(resource_data['language']))
+    if resource_data['language']:
+        language = get_language_tuple(eval(resource_data['language']))
+    else:
+        language = ('en', 'English')
     group_set_id = ObjectId(group_set_id) if group_set_id else home_group._id
 
     img_type = None
@@ -881,12 +888,6 @@ def create_resource_gsystem(resource_data, row_no='', group_set_id=None):
     files.seek(0)
 
     fh_obj = filehive_collection.collection.Filehive()
-
-    # file_md5 = fh_obj.get_file_md5(files)
-    # # print "file_md5 : ", file_md5
-
-    # filehive_obj = filehive_collection.find_one({'md5': unicode(file_md5)})
-    # # print 'filehive\n', filehive_obj, "\n\n"
 
     filehive_obj_exists = fh_obj.check_if_file_exists(files)
 
@@ -910,7 +911,6 @@ def create_resource_gsystem(resource_data, row_no='', group_set_id=None):
 
         return None
 
-
     else:  # creating new resource/file-gsystem
 
         info_message = "\n- Creating resource: " + str(resource_data["name"])
@@ -923,7 +923,7 @@ def create_resource_gsystem(resource_data, row_no='', group_set_id=None):
 
         file_gs_obj.fill_gstystem_values(
                                     request=HttpRequest(),
-                                    name=resource_data["file_name"],
+                                    name=resource_data["name"],
                                     group_set=[home_group._id],
                                     language=language,
                                     uploaded_file=files,
@@ -932,21 +932,15 @@ def create_resource_gsystem(resource_data, row_no='', group_set_id=None):
                                     origin={'csv-import':csv_file_name},
                                     unique_gs_per_file=True
                                 )
-
+        # print "+++++++++++++++++++++++++++++++++++++",file_gs_obj.content_org,file_gs_obj
+        file_gs_obj.content_org = resource_data['content_org']
+        file_gs_obj.tags = resource_data["tags"]
+        file_gs_obj.content = resource_data['content_org']
+        file_gs_obj.status = u"PUBLISHED"
         file_gs_obj.save(groupid=home_group._id)
 
         if 'video' in file_gs_obj.if_file.mime_type:
-            convertVideo.delay(user_id, str(gs_obj._id), file_name)
-
-        # fileobj_oid, video = save_file(files, name, userid, group_set_id, content_org, tags, img_type, language, usrname, access_policy=u"PUBLIC", count=0, first_object="")
-        # print "\n------------ fileobj_oid : ", fileobj_oid, "--- ", video
-
-        # node_collection.collection.update(
-        #                         {'_id': ObjectId(fileobj_oid)},
-        #                         {'$push': {'origin': {'csv-import': csv_file_name} }},
-        #                         upsert=False,
-        #                         multi=False
-        #                     )
+            convertVideo.delay(nroer_team_id, str(file_gs_obj._id), resource_data["name"])
 
         print "\n\n =================| Printing newly created object |=================\n", file_gs_obj
         print "\n ===================================================================\n\n"
@@ -958,85 +952,6 @@ def create_resource_gsystem(resource_data, row_no='', group_set_id=None):
         return file_gs_obj
 
 
-    # gs_obj = node_collection.collection.GSystem()
-
-    # gs_obj.fill_gstystem_values(request=HttpRequest(),
-    #                                 name=resource_data["file_name"],
-    #                                 group_set=[home_group._id],
-    #                                 language=language,
-    #                                 uploaded_file=files,
-    #                                 created_by=nroer_team_id)
-    # print gs_obj.if_file
-    # return None
-
-    # # filemd5 = hashlib.md5(files.read()).hexdigest()
-    # # print "filemd5 : ", filemd5
-
-    # check_file_in_gridfs = gridfs_collection.find_one({"md5": filemd5})
-    # # even though file resource exists as a GSystem or in gridfs return None
-    # # if fileobj.fs.files.exists({"md5": filemd5})  # or check_obj_by_name:
-    # if check_file_in_gridfs:
-
-    #     # coll_oid = get_database()['fs.files']
-    #     # cur_oid = gridfs_collection.find_one({"md5": filemd5})
-
-    #     # printing appropriate error message
-    #     # if check_obj_by_name:
-    #     #     info_message = "\n- Resource with same name of '"+ str(resource_data["name"]) +"' and _type 'File' exist in the home group. (Ref _id: '"+ str(check_obj_by_name._id) + "' )"
-    #     #     print info_message
-    #     #     log_list.append(str(info_message))
-    #     #     return check_obj_by_name._id
-
-    #     # elif cur_oid:
-    #     info_message = "\n- Resource file exists in gridfs having id: '" + \
-    #     str(check_file_in_gridfs["_id"]) + "'"
-    #     log_print(info_message)
-
-    #     if update_file_exists_in_filehive:
-    #         file_obj = node_collection.one({'_type': 'File', 'fs_file_ids': {'$in': [ObjectId(check_file_in_gridfs['_id'])]} })
-
-    #         if file_obj:
-    #             info_message = "\n- Returning file _id despite of having in gridfs"
-    #             log_print(info_message)
-
-    #             return file_obj._id
-
-    #     return None
-
-    #     # else:
-    #     #     info_message = "\n- Resource file does not exists in database"
-    #     #     print info_message
-    #     #     log_list.append(str(info_message))
-    #     #     return None
-
-    # else:  # creating new resource
-
-    #     info_message = "\n- Creating resource: " + str(resource_data["name"])
-    #     log_list.append(str(info_message))
-    #     print info_message
-
-    #     files.seek(0)
-
-    #     fileobj_oid, video = save_file(files, name, userid, group_set_id, content_org, tags, img_type, language, usrname, access_policy=u"PUBLIC", count=0, first_object="")
-    #     # print "\n------------ fileobj_oid : ", fileobj_oid, "--- ", video
-
-    #     node_collection.collection.update(
-    #                             {'_id': ObjectId(fileobj_oid)},
-    #                             {'$push': {'origin': {'csv-import': csv_file_name} }},
-    #                             upsert=False,
-    #                             multi=False
-    #                         )
-
-    #     print "\n\n Printing newly created object:\n", node_collection.one({'_id': ObjectId(fileobj_oid)})
-    #     print "\n ===================================\n\n"
-
-    #     info_message = "\n- Created resource/GSystem object of name: '" + unicode(name) + "' having ObjectId: " + unicode(fileobj_oid) + "\n- Saved resource into gridfs. \n"
-    #     log_print(info_message)
-
-    #     # print "\n----------", fileobj
-    #     return fileobj_oid
-
-
 def attach_resource_thumbnail(thumbnail_url, node_id, resource_data, row_no):
 
     updated_res_data = resource_data.copy()
@@ -1044,12 +959,11 @@ def attach_resource_thumbnail(thumbnail_url, node_id, resource_data, row_no):
     updated_res_data['resource_link'] = thumbnail_url
     updated_res_data['name'] = u'Thumbnail: ' + thumbnail_url.split('/')[-1]
 
-    updated_res_data['content_org'] = ''
-    updated_res_data['tags'] = []
+    # updated_res_data['content_org'] = ''
+    # updated_res_data['tags'] = []
 
     # th_id: thumbnail id
     th_obj = create_resource_gsystem(updated_res_data, row_no, group_set_id=warehouse_group._id)
-
     th_id = th_obj._id
 
     # th_obj = node_collection.one({'_id': ObjectId(th_id)})
@@ -1069,7 +983,7 @@ def attach_resource_thumbnail(thumbnail_url, node_id, resource_data, row_no):
     log_print(info_message)
 
     print '\n Created/Updated GRelation Object:\n'
-    print create_grelation(ObjectId(node_id), has_thumbnail_rt, ObjectId(th_id))
+    create_grelation(ObjectId(node_id), has_thumbnail_rt, ObjectId(th_id))
     print '\n\n'
 
     info_message = "\n- Grelation processing done for has_thumbnail.\n"
@@ -1079,6 +993,12 @@ def attach_resource_thumbnail(thumbnail_url, node_id, resource_data, row_no):
     # node_fs_file_ids = node_obj.fs_file_ids
 
     # if len(node_fs_file_ids) == 1:
+    th_obj.group_set.append(ObjectId(warehouse_group._id))
+    if ObjectId(home_group._id) in th_obj.group_set:
+        th_obj.group_set.remove(ObjectId(home_group._id))
+    # print "**********************************",th_obj.group_set
+
+    th_obj.save()
     #     node_fs_file_ids.append(ObjectId(th_gridfs_id))
     # elif len(node_fs_file_ids) > 1:
     #     node_fs_file_ids[1] = ObjectId(th_gridfs_id)

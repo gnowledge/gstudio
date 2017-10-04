@@ -157,12 +157,11 @@ HOW TO USE
   }
 
 </style>
-
-
 <!-- start of selector widget -->
 <div class="selector-widget" id="{{for}}-selector-widget">
 
   <!-- search text box -->
+
   <div class="row">
     <div class="small-10 medium-12 columns">
       <div class="select-search-container" data-selector-widget-for="{{for}}">
@@ -196,7 +195,7 @@ HOW TO USE
           <div class="row">
             <div class="small-12 columns">
               <div class="item-title">
-                {{each_opt.name}}
+              {% firstof each_opt.altnames each_opt.name %}
               </div>
               <div class="item-description">
                 {{each_opt.content_org|default_if_none:''|safe|truncatewords:5}}
@@ -239,6 +238,7 @@ HOW TO USE
   var oneline_element = "{{oneline_element}}";
 
   // making list of all selected items data
+  
   var selected_options = [ {% for each_opt in selected_options %}"{{each_opt|safe}}"{% if not forloop.last %},{% endif %}{% endfor %} ];
   // console.log(selected_options)
 
@@ -359,6 +359,7 @@ HOW TO USE
     this.classList.remove('traversing-el');
     this.querySelector('.item-description').classList.add('hide');
     selDiv.appendChild(this);
+    // selDiv.replaceChild(this,this);
 
     var closeBtn = document.createElement("i");
     closeBtn.className = "fi-x-circle remove-tag";
@@ -373,6 +374,7 @@ HOW TO USE
     var selectedItems = $s('.selected-items[data-selector-widget-for="'+ selectorWidgetFor +'"]');
 
     if (selectedItems) { selectedItems.appendChild(selDiv); };
+    // if (selectedItems) { selectedItems.replaceChild(selDiv,selDiv); };
   }
 
   // attaching onclick event on items to be selected / drop-down items

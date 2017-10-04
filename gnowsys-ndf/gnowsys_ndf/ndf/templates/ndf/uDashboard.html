@@ -7,18 +7,18 @@
   <h3>{% trans "About" %}</h3>
 
   {% blocktrans %}<b>Dashboard</b> shows users' own activities on the site.{% endblocktrans %}<br><br>
-  <b>{% trans "Total Activity Rating" %}: &nbsp;{{total_activity_rating}}</b><br> 
-  
+  <b>{% trans "Total Activity Rating" %}: &nbsp;{{total_activity_rating}}</b><br>
+
      {% if site_name == "NROER" %}
-     <button data-dropdown="drop1" aria-controls="drop1" aria-expanded="false" class="small button dropdown"> {% trans 'Become Partner' %} </button><br> 
-     <ul id="drop1" data-dropdown-content class="f-dropdown" aria-hidden="true"> 
+     <button data-dropdown="drop1" aria-controls="drop1" aria-expanded="false" class="small button dropdown"> {% trans 'Become Partner' %} </button><br>
+     <ul id="drop1" data-dropdown-content class="f-dropdown" aria-hidden="true">
        <li><a href="/home/partner/create_partner/"> {% trans 'State' %} </a> </li>
-       <li><a href="/home/partner/create_partner/"> {% trans 'Institutional' %} </a> </li> 
+       <li><a href="/home/partner/create_partner/"> {% trans 'Institutional' %} </a> </li>
        <li><a href="/home/partner/create_partner/"> {% trans 'Individuals' %} </a></li>
      </ul>
   {% endif %}
   {% endcomment %}
-      {% include "ndf/upload_pic_widget.html" with url_name='dashboard' widget_for="userDashboard" is_banner=False is_profile=True %}
+      {% include "ndf/widget_photo_upload.html" with url_name='dashboard' widget_for="userDashboard" is_banner=False is_profile=True %}
       <hr/>
     <div class="action-btn-div">
     <span class="fi-graph-bar">
@@ -36,17 +36,17 @@
         <a href="/Trash/data-review">Trash</a>
       </span>
     </div>
-  {% endif %}  
+  {% endif %}
   {% endblock %}
 
 {% block style %}
-  .resource-drawer { 
+  .resource-drawer {
     max-height: 202px;
     overflow-y: auto;
   }
 
   .style2 {
-    color: #10c1cb; 
+    color: #10c1cb;
     font-size: 10em;
     text-shadow: 0 1px 0 #0092b3, 0 2px 0 #0087a6;
   }
@@ -84,10 +84,10 @@
     {% get_group_name groupid as group_name_tag %}
     <div class="row"  id="new" >
 
-              
+
         <div class="small-12 large-10 columns">
       <h3>
-      {{username}}'s  Dashboard 
+      {{username}}'s  Dashboard
         <!-- {% trans "Welcome "%} {% firstof current_user_obj.first_name current_user_obj.email %} ! -->
       </h3>
 
@@ -95,14 +95,14 @@
                 <dd class="active"><a href="#view-profile" id='p5' class="fi-torso"> Profile </a> </dd>
                 <dd ><a href="#group" id="p1" class="fi-torsos-all"> Groups </a></dd>
                 {% if user_task %}<dd><a href="#AssignedTasks" id="p2" class="fi-checkbox"> Assigned Tasks </a></dd> {% endif %}
-                <dd ><a href="#Activity" id="p3" class="fi-info"> My Activities </a></dd>      
+                <dd ><a href="#Activity" id="p3" class="fi-info"> My Activities </a></dd>
                 <dd ><a href="#view-scheduler-calendar" id="p4" class="fi-calendar"> Events </a></dd>
             </dl>
             <div class="tabs-content">
                 <div class="content" id="view-scheduler-calendar">
                       {% include "ndf/scheduler_calender.html"  %}
                 </div>
-                
+
                 <div class = "content active" id="view-profile">
                     {% include "ndf/user_profile_form.html"  %}
                 </div>
@@ -112,7 +112,7 @@
                         {% for node in user_groups %}
                             {% get_version_of_module node.pk as version %}
                             <li class="card">
-                            
+
                                 <div id="groups">
                                     <header>
                                         <a href="/{{node.pk}}">
@@ -121,21 +121,21 @@
                                           <div>
                                               <hr/>
                                               <small class="subheader">
-                                                {{ node.member_of_names_list|join:', ' }} created {{node.created_at|timesince}} ago 
+                                                {{ node.member_of_names_list|join:', ' }} created {{node.created_at|timesince}} ago
                                                 <br/>
                                                 by <span href="#" class="user" data-gnow="">{{node.user_details_dict.created_by}}</span>
                                               </small>
                                           </div>
                                     </header>
-                        
+
                                     <p>{{ node.html_content|default_if_none:"Add some description."|safe|striptags|truncatechars:75 }}</p>
                                     </a>
-                                
+
                                     <div class="label-list">
                                         {% for tag in node.tags|slice:":3" %}
                                              <a href="{% url 'tag_info' group_name_tag tag %}"> <span    class="label"> <mark> {{tag}} </mark> </span> </a>
                                         {% endfor %}
-                                    </div>  
+                                    </div>
                                 </div>
                             </li>
                         {% empty %}
@@ -172,17 +172,17 @@
                                                   <a href="/{{node.pk}}">
                                                 {% elif res_type %}
                                                   {% if res_type != "event_app_instance_detail" %}
-                                                          <a href="{% url res_type groupid node.pk   %}">{{i.url}} 
+                                                          <a href="{% url res_type groupid node.pk   %}">{{i.url}}
                                                   {% else %}
                                                         {% get_event_type node as app_set_id %}
-                                                        <a href="{% url res_type groupid app_set_id node.pk  %}">{{i.url}}          
+                                                        <a href="{% url res_type groupid app_set_id node.pk  %}">{{i.url}}
                                                   {% endif %}
                                                 {% endif %}
                                                 <h4>{{ node.name|truncatechars:20 }}</h4>
                                                 <div>
-                                                    <small class="subheader">{{ node.member_of_names_list|join:', ' }} {% trans 'created' %} {{node.created_at|timesince}} {% trans 'ago' %} 
+                                                    <small class="subheader">{{ node.member_of_names_list|join:', ' }} {% trans 'created' %} {{node.created_at|timesince}} {% trans 'ago' %}
                                                     <br/>
-                                                    by <span href="#" class="user" data-gnow="">{{node.user_details_dict.created_by}}</span> 
+                                                    by <span href="#" class="user" data-gnow="">{{node.user_details_dict.created_by}}</span>
                                                     </small>
                                                 </div>
                                         </header>
@@ -194,7 +194,7 @@
                                             {% endfor %}
                                         </div>
                                     </div>
-                                </li>  
+                                </li>
                             {% endif %}
                         {% empty %}
                             {% if not searching %}
@@ -205,7 +205,7 @@
                               </div>
                             {% endif %}
                         {% endfor %}
-                        
+
                         {% if dashboard_count.activity > 10 %}
                             <div class="row">
                               <div class="small-12 columns" align="right">
@@ -239,9 +239,9 @@
                                         <div class="th"><img src="/static/ndf/scss/metastudio/logo.svg"></div>
                                         <h4 title="{{ node.name }}">{{ node.name|truncatechars:20 }}</h4>
                                         <div>
-                                            <small class="subheader">{{ node.member_of_names_list|join:', ' }} created {{node.created_at|timesince}} ago 
+                                            <small class="subheader">{{ node.member_of_names_list|join:', ' }} created {{node.created_at|timesince}} ago
                                               <br/>
-                                              by <span href="#" class="user" data-gnow="">{{node.user_details_dict.created_by}}</span> 
+                                              by <span href="#" class="user" data-gnow="">{{node.user_details_dict.created_by}}</span>
                                             </small>
                                         </div>
                                     </header>
@@ -253,7 +253,7 @@
                                         {% endfor %}
                                     </div>
                                 </div>
-                            </li>  
+                            </li>
 
                         {% empty %}
                             {% if not searching %}
@@ -274,11 +274,11 @@
                         {% endif %}
                     </ul>
                 </div>
-            </div>      
-        </div> 
-    </div>    
+            </div>
+        </div>
+    </div>
 
-    <!-- 
+    <!--
       <div class="row">
         <div class="small-12 columns" style="padding-top:10px;">
           <b><a>{{username}}'s {% trans "Dashboard" %}</a></b>
@@ -291,14 +291,14 @@
 {% endblock %}
 
 {% block script %}
-  
+
   $("input:not('#docFile')").each(function() {
     $(this).bind('keydown keypress keyup change', function() {
-      var search = (this.value).toLowerCase();      
-      var resource = (this.name); 
-      var $li = $("#"+resource+"_drawer li.bullet-item").hide();  
+      var search = (this.value).toLowerCase();
+      var resource = (this.name);
+      var $li = $("#"+resource+"_drawer li.bullet-item").hide();
 
-      $li.filter(function() {               
+      $li.filter(function() {
         return $(this).text().toLowerCase().indexOf(search) >= 0;
       }).show();
     });
@@ -324,5 +324,5 @@
     $("#uDashboardModal").foundation('reveal', 'open');
   {% endif %}
   {% endcomment %}
-  
+
 {% endblock %}

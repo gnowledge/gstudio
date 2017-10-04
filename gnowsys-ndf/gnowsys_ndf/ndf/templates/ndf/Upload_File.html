@@ -80,7 +80,15 @@
 						        </div>
 
 							</div>
-
+						choose topic :
+						<select name="topic_list" tabindex=3 required>
+								<option value="">--- Select Topic ---</option>
+								{% for each_topic in topic_nodes %}
+								<option value="{{ each_topic.pk }}">
+									{{ each_topic.name }}
+								</option>
+								{% endfor %}
+						</select>
 							<!-- show tags error msg -->
 							<div class="row hide" id="tags_error">
 								<div class="small-10 columns">{% trans 'Non empty tags can have only alphanumeric characters, dash(-) and spaces.' %}</div>
@@ -216,16 +224,16 @@
 					
 					<div class ="row">
 						<div class="large-2 columns">
-							<b>License</b>
+							<b>Copyright</b>
 						</div>
 						<div class="large-10 columns">
-							<!-- <input id="license_id" name="License" type="text" placeholder="Enter source name"/> -->
-							{% get_license as license %}
-							<select name="License" tabindex="8" required>
-		  						{% for each_license in license %}
-				        			<option value="{{each_license}}" 
-				        			{% if each_license == "CC BY-SA"%}selected{% endif %}>
-				        				{% trans each_license %}
+							<!-- <input id="copyright_id" name="copyright" type="text" placeholder="Enter source name"/> -->
+							{% get_copyright as copyright %}
+							<select name="Copyright" tabindex="8" required>
+		  						{% for each_copyright in copyright %}
+				        			<option value="{{each_copyright}}" 
+				        			{% if each_copyright == "CC BY-SA" %}selected{% endif %}>
+				        				{% trans each_copyright %}
 				        			</option>
 								{% endfor %}
 							</select>

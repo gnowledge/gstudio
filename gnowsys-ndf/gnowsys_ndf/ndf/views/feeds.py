@@ -14,7 +14,6 @@ from django.template.loader import render_to_string
 from django.core.urlresolvers import reverse
 from django.contrib.auth.decorators import login_required
 from mongokit import paginator
-from gnowsys_ndf.ndf.org2any import org2html
 from gnowsys_ndf.ndf.models import *
 from pymongo import Connection
 
@@ -84,4 +83,3 @@ class activity_feed(Feed):
 	def item_guid(self, item) :
 		return item['_id']
 
-		

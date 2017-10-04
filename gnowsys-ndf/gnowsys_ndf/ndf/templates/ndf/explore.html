@@ -13,7 +13,7 @@
 
 	<div class="row explore-header">
 		<div class="small-12 medium-2 columns heading"><a href="{% url 'explore' %}">Explore</a></div>
-		<div class="small-12 medium-10 columns expore-type">
+		<div class="small-12 medium-3 columns expore-type">
 			<div class="toggleButtons">
 				<a href="{% url 'explore_courses' %}" class="button {%if title == 'courses'%} active{% endif %}">
 					Courses
@@ -30,10 +30,6 @@
 
 
 			</div>
-				{% if title == "base courses" and is_gstaff %}
-					<a class="tiny button radius right" href="{% url 'create_edit' groupid %}"><i class="fi-plus"></i>{% trans " New Course" %}</a>
-				{% endif %}
-		</div>
 		{% comment %}
 		<div class="medium-3 columns explore-search small-12">
 			<input type="text" placeholder="Search">
@@ -47,6 +43,15 @@
 		</div>
 		{% endcomment %}
 	</div>
+	{% if title == "base courses" and is_gstaff %}
+		<div class="small-12 medium-7 columns">
+			<div style="display: inline-block;">
+					<a class="tiny button radius right" href="{% url 'create_edit' groupid %}"><i class="fi-plus"></i>{% trans " Create Course" %}</a>
+			</div>
+		</div>
+	{% endif %}
+
+
 	{% if title == 'explore' %}
 		Please select course or a group.
 	{% else %}
@@ -54,7 +59,11 @@
 			{% for each_obj in doc_cur %}
 				<li class="card-image-wrapper" style="margin-top:13px;">
 				{% if title == "base courses" %}
-					{% include card with resource=each_obj has_logo=True no_footer=True url_name="course_detail" first_arg=groupid second_arg=each_obj.pk  %}
+					{% if "Course" in each_obj.member_of_names_list %}
+						{% include card with resource=each_obj has_logo=True no_footer=True url_name="course_detail" first_arg=groupid second_arg=each_obj.pk  %}
+					{% elif "BaseCourseGroup" in each_obj.member_of_names_list %}
+						{% include card with resource=each_obj has_logo=True no_footer=True url_name="groupchange" first_arg=each_obj.pk  %}
+					{% endif %}
 				{% else %}
 					{% include card with resource=each_obj is_event=True no_footer=True has_prof_pic=True url_name="groupchange" first_arg=each_obj.pk  next_session=True %}
 				{% endif %}

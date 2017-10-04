@@ -5,30 +5,45 @@ import os
 import djcelery
 
 # imports from core django libraries
-from django.conf import global_settings
-from django.utils.translation import ugettext
+# from django.conf import global_settings
+# from django.utils.translation import ugettext
 # from django.conf.global_settings import TEMPLATE_CONTEXT_PROCESSORS
 
 # imports from third-party app(s)
 
-from gnowsys_ndf.ndf.utils import (is_dir_exists, ensure_dir, get_current_dbs_path,
-    move_file_or_dirctory)
+# from gnowsys_ndf.ndf.utils import (is_dir_exists, ensure_dir, get_current_dbs_path,
+#     move_file_or_dirctory)
 
-DEBUG = True
-# ALLOWED_HOSTS = ["127.0.0.1"]
+DEBUG = False
+ALLOWED_HOSTS = ["*"]
 
 TEMPLATE_DEBUG = DEBUG
 DEBUG_PROPAGATE_EXCEPTIONS = DEBUG
 BENCHMARK = "ON"
-GSTUDIO_DEFAULT_GROUPS = ['home','Trash','desk','help','warehouse']
-LANGUAGES = (('en', 'English'), ('hi', u'\u0939\u093f\u0902\u0926\u0940'))
+GSTUDIO_DEFAULT_GROUPS_LIST = ['home', 'Trash', 'desk', 'help', 'warehouse']
+GROUP_SETTING_1 = {'edit_policy': 'NON_EDITABLE'}
+GROUP_SETTING_2 = {'edit_policy': 'EDITABLE_NON_MODERATED'}
+
+GSTUDIO_DEFAULT_FACTORY_GROUPS = {'home': GROUP_SETTING_1,
+             'warehouse':GROUP_SETTING_2, 'Trash': GROUP_SETTING_1,
+             'desk': GROUP_SETTING_2, 'help': GROUP_SETTING_2}
+
+GSTUDIO_ALTERNATE_OPTS = ['Size', 'Format', 'Language','Content','Other']
+GSTUDIO_ALTERNATE_FORMATS = {'image':['png','jpeg'],'video':['mkv','webm'],'audio':['mp3']}
+GSTUDIO_ALTERNATE_SIZE = {'image':['100px','1048px'],'video':['144px','720px'],'audio':['128kbps']}
+GSTUDIO_DEFAULT_GROUP = u'desk'
+GSTUDIO_EDUCATIONAL_SUBJECTS_AS_GROUPS = False
+
+LANGUAGES = (('en', 'English'), ('hi', u'Hindi'),('te','Telugu'))
+GSTUDIO_DEFAULT_LANGUAGE = ('en', 'English')
+GSTUDIO_WORKSPACE_INSTANCE = False
 OTHER_COMMON_LANGUAGES = [
     ('mr', 'Marathi'), ('mni','Manipuri'), ('ori','Oriya'),
     ('pi','Pali'), ('raj','Rajasthani'), ('gu','Gujarati'),
     ('ks','Kashmiri'), ('kok','Konkani'), ('kha','Khasi'),
     ('dra','Dravidian'), ('gon','Gondi'), ('bra','Braj'),
     ('mi','Malayalam'), ('mai','Maithili'), ('mag','Magahi'),
-    ('lus','Lushai'), ('bh','Bihari'), ('kru','Kurukh'),
+    ('lus','Lushai'), ('bho','Bhojpuri'), ('kru','Kurukh'),
     ('awa','Awadhi'), ('sa','Sanskrit'), ('sat','Santali'),
     ('him','Himachali'), ('sd','Sindhi'), ('as','Assamese'),
     ('ar', 'Arabic'), ('bn', 'Bengali'), ('ca', 'Catalan'),
@@ -428,8 +443,13 @@ MIDDLEWARE_CLASSES = (
     # 'django.middleware.clickjacking.XFrameOptionsMiddleware',
 
     # gstudio custom middleware(s):
+    'gnowsys_ndf.ndf.middleware.SetCookie.UserId',
+    'gnowsys_ndf.ndf.middleware.SetData.Author',
     # 'gnowsys_ndf.ndf.middleware.Buddy.BuddySession',
     # 'gnowsys_ndf.ndf.middleware.UserRestrictMiddleware.UserRestrictMiddleware',
+
+    # for profiling methods:
+    # 'gnowsys_ndf.ndf.middleware.ProfileMiddleware.ProfileMiddleware',
 )
 
 # AUTH_PROFILE_MODULE = 'gnowsys_ndf.ndf.models.UserProfile'
@@ -468,6 +488,7 @@ BROKER_URL = 'amqp://'
 
 INSTALLED_APPS = (
     'gnowsys_ndf.ndf',
+    # 'dlkit',
     'django.contrib.auth',
     'django.contrib.admin',
     'django.contrib.contenttypes',
@@ -475,24 +496,26 @@ INSTALLED_APPS = (
     'django.contrib.sites',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-    'gnowsys_ndf.benchmarker',
     'registration',
-    'djangoratings',
     'notification',
     'pagination',
     'captcha',
+    # 'gnowsys_ndf.benchmarker',
+    # 'django.contrib.flatpages',   #textb
+    # 'django_extensions',          #textb
+    # 'djangoratings',
     # 'gnowsys_ndf.mobwrite',       #textb
     # 'south',                      #textb
-    # 'django_extensions',          #textb
     # 'reversion',                  #textb
-    # 'django.contrib.flatpages',   #textb
     # 'online_status',              #for online_users
     # 'endless_pagination',
-    'jsonrpc',
+    # 'jsonrpc',
     'registration_email',
     'memcache_admin',
     'django_mailbox',
     'djcelery',
+    #'dlkit',
+    #'dlkit_runtime'
 )
 
 AUTHENTICATION_BACKENDS = (
@@ -545,6 +568,7 @@ GSTUDIO_GROUP_AGENCY_TYPES = [
     "Other", "Partner", "GovernmentAgency", "NGO", "College", "University",
     "School", "Institution", "Project", "SpecialInterestGroup"
 ]
+GSTUDIO_GROUP_AGENCY_TYPES_DEFAULT = 'Other'
 
 GSTUDIO_AUTHOR_AGENCY_TYPES = [
     "Student", "Teacher", "Teacher Educator", "Faculty", "Researcher", "Other"
@@ -575,6 +599,8 @@ GSTUDIO_WORKING_GAPPS = [
     u"Course", u"Observation", u"Event", u"Quiz"
 ]
 
+GSTUDIO_REGISTRATION = True
+
 GSTUDIO_SECOND_LEVEL_HEADER = True
 GSTUDIO_MY_GROUPS_IN_HEADER = True
 GSTUDIO_MY_COURSES_IN_HEADER = False
@@ -599,7 +625,7 @@ A project of <a href="http://lab.gnowledge.org/" target="_blank">{% trans "Gnowl
 </p>'''
 GSTUDIO_SITE_FAVICON = "/static/ndf/images/favicon/logo.png"
 GSTUDIO_SITE_LOGO = "/static/ndf/css/themes/metastudio/logo.svg"
-GSTUDIO_COPYRIGHT = ""
+GSTUDIO_SITE_SECONDARY_LOGO = "/static/ndf/css/themes/metastudio/logo.svg"
 GSTUDIO_GIT_REPO = "https://github.com/gnowledge/gstudio"
 GSTUDIO_SITE_PRIVACY_POLICY = ""
 GSTUDIO_SITE_TERMS_OF_SERVICE = ""
@@ -619,14 +645,15 @@ GSTUDIO_SITE_HOME_PAGE = None  # it is url rendered on template. e.g: "/welcome"
 GSTUDIO_SITE_NAME = "metaStudio"  # holds the name of site. e.g: "NROER, "tiss" etc. (Override it in local_settings)
 GSTUDIO_SITE_ISSUES_PAGE = ""
 GSTUDIO_EBOOKS_HELP_TEXT = "" #ebook help text page  url(page:"how to read ebooks")
-
+GSTUDIO_SUPPORTED_JHAPPS = ['Jsmol','Police Squad','OpenStoryTool','BioMechanics', 'TurtleBlocks']
+GSTUDIO_EDIT_LMS_COURSE_STRUCTURE = False
 # terms & conditions
 GSTUDIO_OID_TC = None
-
+GSTUDIO_OID_HELP = ""
 # GSTUDIO_SITE_EDITOR = "orgitdown"  #possible values are 'aloha'and 'orgitdown'
 # Visibility for 'Create Group'
 CREATE_GROUP_VISIBILITY = True
-
+GSTUDIO_DEFAULT_SYSTEM_TYPES_LIST = []
 EMACS_INIT_FILE_PATH = "~/.emacs"
 
 ###########################################################################
@@ -675,6 +702,9 @@ RCS_REPO_DIR = os.path.join(GSTUDIO_DATA_ROOT, RCS_REPO_DIRNAME)
 GSTUDIO_LOGS_DIRNAME = 'gstudio-logs'
 GSTUDIO_LOGS_DIR_PATH = os.path.join(GSTUDIO_DATA_ROOT, GSTUDIO_LOGS_DIRNAME)
 
+GSTUDIO_EPUBS_LOC_NAME = 'gstudio-epubs'
+GSTUDIO_EPUBS_LOC_PATH = os.path.join(GSTUDIO_DATA_ROOT, GSTUDIO_EPUBS_LOC_NAME)
+
 GSTUDIO_MAIL_DIRNAME = 'MailClient'
 GSTUDIO_MAIL_DIR_PATH = os.path.join(GSTUDIO_DATA_ROOT, GSTUDIO_MAIL_DIRNAME)
 
@@ -691,7 +721,7 @@ GSTUDIO_RESOURCES_EDUCATIONAL_ALIGNMENT = ["NCF", "State", "All"]
 
 GSTUDIO_RESOURCES_EDUCATIONAL_LEVEL = ["Primary", "Upper Primary", "Secondary", "Senior Secondary", "Tertiary"]
 
-GSTUDIO_RESOURCES_EDUCATIONAL_SUBJECT = ["Language", "Mathematics", "Environmental Studies", "Science", "Chemistry", "Physics", "Biology", "Social Science", "History", "Geography", "Political Science", "Economics", "Sociology", "Psychology", "Commerce", "Business Studies", "Accountancy"]
+GSTUDIO_RESOURCES_EDUCATIONAL_SUBJECT = ["Language", "Mathematics", "Environmental Studies", "Science", "Chemistry", "Physics", "Biology", "Social Science", "History", "Geography", "Political Science", "Economics", "Sociology", "Psychology", "Commerce", "Business Studies", "Accountancy", "Art", "Education"]
 
 GSTUDIO_RESOURCES_CURRICULAR = ["True", "False"]
 
@@ -741,9 +771,11 @@ GSTUDIO_GROUP_MODERATION_LEVEL = 1
 # allowed moderation levels
 GSTUDIO_ALLOWED_GROUP_MODERATION_LEVELS = [1, 2, 3]
 
-GSTUDIO_LICENSE = ["CC BY-SA", "CC BY", "CC BY-NC-SA", "CC BY-NC-ND", "CC BY-ND", "PUBLIC-DOMAIN", "FDL (FREE DOCUMENTATION LICENSE)", "NCERT License", "OTHERS"]
+GSTUDIO_COPYRIGHT = ["CC BY-SA", "CC BY", "CC BY-NC-SA", "CC BY-NC-ND", "CC BY-ND", "PUBLIC-DOMAIN", "FDL (FREE DOCUMENTATION LICENSE)", "NCERT License", "OTHERS"]
 
-GSTUDIO_DEFAULT_LICENSE = 'CC-BY-SA 4.0 unported'
+GSTUDIO_DEFAULT_COPYRIGHT = 'CC-BY-SA 4.0 unported'
+
+GSTUDIO_DEFAULT_LICENSE = 'HBCSE'
 
 GSTUDIO_FILE_UPLOAD_FORM = 'simple'  # possible values are 'simple' or 'detail'
 
@@ -753,7 +785,209 @@ GSTUDIO_COURSE_EVENT_MOD_GROUP_ALTNAMES = ['Screening House', 'Selection House']
 
 GSTUDIO_PROGRAM_EVENT_MOD_GROUP_ALTNAMES = ['Screening House', 'Selection House']
 
+
+GSTUDIO_HELP_TIP = {
+   "name":"Title of the object",
+   "altnames":"Alternate title",
+   "language":"Language of the title",
+   "subject_type":"The system types that can hold this property",
+   "data_type":"Data Type",
+   "applicable_node_type":"Applicable Node Type",
+   "member_of":"Member of MetaType ",
+   "verbose_name":"Verbose Name",
+   "null":"Value can be null",
+   "blank":"Value can be blank",
+   "max_digits":"Maximum length of digits applicable if the data type is any type of numbers ",
+   "decimal_places":" Number of decimal places if the data type is float",
+   # "auto_now":"The value is automatically filled by the computer",
+   "auto_now_add":"Auto now would insert time only if the auto now field is true",
+   "path":"Path",
+   "verify_exist":"Verify Exist",
+   "status":"Status",
+   "content_org":"Description",
+   "validators":"Regular Expressions required for Validation",
+   "help_text":"The help text to be displayed on the Tooltip for GSystem ",
+   "prior_node":"This node depends on",
+   "featured":"Featured",
+   "created_at":"Time of creation",
+   "start_publication":"Published from the date",
+   "tags":"Tags are keywords",
+   "url":"URL",
+   "last_update":"The time of modification ",
+   "login_required":"Login required",
+   "meta_type_set":"N/A",
+   "attribute_type_set":"N/A",
+   "relation_type_set":"N/A",
+   "type_of":"Sub Attribute type of"
+ }
+
+GSYSTEMTYPE_DEFINITIONLIST = [
+   {
+      "name":"Name "
+   },
+   {
+      "altnames":"Alternate Name "
+   },
+   {
+      "language":"Language "
+   },
+   {
+      "status":"Status "
+   },
+   {
+      "member_of":"Member of MetaType "
+   },
+   {
+      "meta_type_set":"Select the MetaType "
+   },
+   {
+      "attribute_type_set":"Select the AttributeType "
+   },
+   {
+      "relation_type_set":"Select the RelationType "
+   },
+   {
+      "type_of":"Type Of "
+   }
+]
+
+ATTRIBUTETYPE_DEFINITIONLIST = [
+   {
+      "name":"Name "
+   },
+   {
+      "altnames":"Alternate Name "
+   },
+   {
+      "language":"Language "
+   },
+   {
+      "subject_type":"Subject Type "
+   },
+   {
+      "data_type":"Data Type "
+   },
+   {
+      "member_of":"Member of MetaType "
+   },
+   {
+      "verbose_name":"Verbose Name "
+   },
+   {
+      "null":"Null "
+   },
+   {
+      "blank":"Blank "
+   },
+   {
+      "help_text":"Help Text "
+   },
+   {
+      "max_digits":"Maximum Digits "
+   },
+   {
+      "decimal_places":"Decimal Places "
+   },
+   # {
+      # "auto_now":"Auto Now "
+   # },
+   {
+      "auto_now_add":"Auto Now Add "
+   },
+   {
+      "path":"Path "
+   },
+   {
+      "verify_exist":"Verify Existence "
+   },
+   {
+      "validators":"Validators"
+   },
+   {
+      "status":"Status "
+   }
+]
+
+RELATIONTYPE_DEFINITIONLIST = [
+   {
+      "name":"Name "
+   },
+   {
+      "inverse_name":"Inverse Name "
+   },
+   {
+      "altnames":"Alternate Name "
+   },
+   {
+      "language":"Language "
+   },
+   {
+      "subject_type":"Subject Type "
+   },
+   {
+      "object_type":"Object Type "
+   },
+   {
+      "subject_cardinality":"Subject Cardinality "
+   },
+   {
+      "object_cardinality":"Object Cardinality "
+   },
+   {
+      "subject_applicable_nodetype":"Subject Applicable Node Type "
+   },
+   {
+      "object_applicable_nodetype":"Object Applicable Node Type "
+   },
+   {
+      "is_symmetric":"Is Symmetric "
+   },
+   {
+      "is_reflexive":"Is Reflexive "
+   },
+   {
+      "is_transitive":"Is Transitive "
+   },
+   {
+      "status":"Status "
+   },
+   {
+      "member_of":"Member of MetaType "
+   }
+]
+
+CONTENTLIST = [{'content_org':'content organization' }]
+
+DEPENDENCYLIST = [{'prior_node':'Prior Node ' }]
+
+OPTIONLIST = [
+   {
+      "featured":"Featured "
+   },
+   {
+      "created_at":"Created At "
+   },
+   {
+      "start_publication":"Start Publication "
+   },
+   {
+      "tags":"Tags "
+   },
+   {
+      "url":"URL "
+   },
+   {
+      "last_update":"Last Update "
+   },
+   {
+      "login_required":"Login Required "
+   }
+]
+
+GSYSTEM_LIST = [{'name':'Name '} ,{'altnames':'Alternate Name '}]
+
 GSTUDIO_INTERACTION_TYPES = ['Comment', 'Discuss', 'Reply', 'Post', 'Submit', 'Voice-Response', 'Answer', 'Feedback']
+DEFAULT_DISCUSSION_LABEL = 'Feedback'
 # #textb
 # import warnings
 # warnings.filterwarnings(
@@ -770,8 +1004,6 @@ CACHES = {
     }
 }
 
-WETUBE_USERNAME = "glab"
-WETUBE_PASSWORD = "gl@b$@)we!ube"
 
 # Captcha settings
 CAPTCHA_CHALLENGE_FUNCT =  'captcha.helpers.random_char_challenge'
@@ -779,8 +1011,9 @@ CAPTCHA_NOISE_FUNCTIONS = ('captcha.helpers.noise_arcs','captcha.helpers.noise_d
 
 GSTUDIO_HELP_SIDEBAR = False
 GSTUDIO_SOCIAL_SHARE_RESOURCE = False
+GSTUDIO_TWITTER_VIA = "atMetaStudio"
 GSTUDIO_CAPTCHA_VISIBLE = False
-
+GSTUDIO_FACEBOOK_APP_ID = ""
 # the no of cards/objects/instances to be render of app (listing view).
 GSTUDIO_NO_OF_OBJS_PP = 24
 GSTUDIO_FILE_UPLOAD_POINTS = 25
@@ -788,11 +1021,14 @@ GSTUDIO_NOTE_CREATE_POINTS = 30
 GSTUDIO_QUIZ_CORRECT_POINTS = 5
 GSTUDIO_COMMENT_POINTS = 5
 GSTUDIO_ENABLE_USER_DASHBOARD = True
+GSTUDIO_PRIMARY_COURSE_LANGUAGE = u'en'
 
 # --- BUDDY Module configurations ---
 #
 GSTUDIO_BUDDY_LOGIN = False
 GSTUDIO_INSTITUTE_ID = ''
+GSTUDIO_INSTITUTE_ID_SECONDARY = ''
+GSTUDIO_INSTITUTE_NAME = ''
 #
 # --- End of BUDDY Module ---
 

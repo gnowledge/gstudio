@@ -1,0 +1,29 @@
+<a href=
+	{% if url_third_arg %}
+		"{% url url_name url_first_arg url_second_arg url_third_arg %}"
+	{% elif url_second_arg %}
+		"{% url url_name url_first_arg url_second_arg %}"
+	{% elif url_first_arg %}
+		"{% url url_name url_first_arg %}"
+	{% else %}
+		"{% url url_name %}"
+	{% endif %}
+	title="{{node.name}}">
+	<div class="small-12 medium-6 large-3 columns">
+		<div class="asset_tile">
+			<div class="asset_preview">
+				{% if node.if_file.mid.relurl and 'video' not in node.if_file.mime_type %}
+				<img src="{{MEDIA_URL}}{{node.if_file.mid.relurl}}">
+				{% elif 'video' not in node.if_file.mime_type and node.if_file.thumbnail.relurl %}
+				<img src="{{MEDIA_URL}}{{node.if_file.thumbnail.relurl}}">
+				{% else %}
+				<img src="/static/ndf/images/asset_thumbnail.png">
+				{% endif %}
+			</div>
+			<div class="asset_text">
+				<div class="asset_title">{% firstof node.altnames|truncatechars:35 node.name|truncatechars:35 %}</div>
+				<div class="asset_desc">{{node.content|striptags|truncatechars:35}}</div>
+			</div>
+		</div>
+	</div>
+</a>

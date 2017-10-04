@@ -1,0 +1,62 @@
+{% load i18n %}
+{% load cache %}
+
+{% load ndf_tags %}
+{% block head %}
+<style type="text/css">
+	.box{
+    display: none;
+    width: 10%!important;
+    height: 10%!important;
+}
+
+a:hover + .box,.box:hover{
+    display: block;
+    position: relative;
+    z-index: 100;
+}
+
+</style>
+{% endblock %}
+{% block related_content %}
+
+{% endblock %}
+{% block body_content %}
+<h4>{% trans "Select Template" %}</h4>
+    <div class="row"> 
+        {% for each in templates_cur %}
+            <div class="small-12 medium-6 large-2 columns template-list" data-content="{{each.content}}">
+                <div class="template_tile">
+                    <div class="template_preview">
+                        <img src="/static/ndf/images/template-icon.png">
+                    </div>
+                    <div class="template_text">
+                        <div class="template_title" title="{{each.name}}">
+                            {{each.name|truncatechars:20}}
+                        </div>
+                    </div>
+                </div>
+            </div>
+        {% endfor %}
+    </div>
+
+    <!--
+    <ul class="small-block-grid-1 medium-block-grid-3 large-block-grid-3" >
+        {% for each in templates_cur %}
+            <li class="template-list">
+                <div class="templates-div" data-content="{{each.content}}">
+                    {{each.name}}
+                </div>
+            </li>
+        {% endfor %}
+    </ul>
+    -->
+{% endblock %}
+
+<script type="text/javascript">
+    $(".template-list").click(function(event){
+        var content = $(this).attr("data-content");
+        CKEDITOR.instances['ckeditor_textarea'].insertHtml(content);
+        $('#group_imgs_on_modal').foundation('reveal', 'close');
+    });
+</script>

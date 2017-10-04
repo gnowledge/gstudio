@@ -1,33 +1,4 @@
-{% load i18n %}
-{% load ndf_tags %}
-{% load simple_filters %}
-
-<style type="text/css">
-
-  .rating-stars > div {
-      background-image:url("/static/ndf/images/stars.png");
-      height: 17px;
-    }
-    .event-status{
-      font-size: 0.8em;
-      font-weight: bold;
-    }
-    .closed{
-      color: red;
-    }
-    .forthcoming{
-      color: #03a9f4;
-    }
-    .open{
-      color: green;
-    }
-
-</style>
-
-
-<div class="event-card">
-
-  {# {% check_is_gstaff groupid request.user as gstaff_access %} #}
+<div class="large-4 medium-6 small-12 columns">
   {% if first_arg and second_arg and third_arg %}
     <a href="{% url url_name first_arg second_arg third_arg %}{{search_url_text|safe}}">
   {% elif first_arg and second_arg %}
@@ -36,138 +7,17 @@
     <a href='{% url url_name first_arg %}{{search_url_text|safe}}'>
   {% endif %}
 
-  <div class="event-card-image" title="{% firstof resource.altnames resource.name %}">
-    {% get_dict_from_list_of_dicts resource.attribute_set as attr_set_dict %}
-    {% if resource.fs_file_ids.2 and not 'video' in resource.mime_type %}
-    <img src="{% url 'get_mid_size_img' first_arg second_arg %}" alt="">
-    {% elif resource.fs_file_ids.1 %}
-    <img src="{% url 'getImageThumbnail' first_arg second_arg %}" alt="">
-    {% elif "File" in resource.member_of_names_list or "Page" in resource.member_of_names_list%}
-      {% if attr_set_dict.educationaluse and attr_set_dict.educationaluse != "Documents" %}
-        <i class="{{attr_set_dict.educationaluse|lower}}"></i>
-      {% elif resource.fs_file_ids.0 and 'image' in resource.mime_type %}
-        <img src="{% url 'get_mid_size_img' first_arg second_arg %}" alt="">
-      {% elif resource.mime_type %}
-        <i class="{{resource.mime_type|lower|split:'/'|join:' '}}"></i>
-      {% else  %}
-        <i class="{{resource.member_of_names_list.0|lower }}"></i>
-      {% endif %}
+      <div class="group_tile">
 
-    {% elif "Group" in resource.member_of_names_list or has_logo == True or has_prof_pic == True %}
-      {% if "Course" in resource.member_of_names_list or has_logo == True %}
+        <span class="group-name">
+          {% firstof resource.altnames resource.name  %}
+        </span>
 
-        {% get_relation_value resource.pk 'has_logo' as grel_dict %}
-        {% if not grel_dict.cursor and grel_dict.grel_node and grel_dict.grel_node.fs_file_ids.2  %}
-                  <img src="{% url 'get_gridfs_resource' grel_dict.grel_node.fs_file_ids.2 %}" alt="" />
-        {% else %}
-                  <img src="/static/ndf/images/metaStudio-profile.svg" alt="Profile picture for this group."  class="img-height" >
-        {% endif %}
+        <p class="group_desc" title="{{resource.content}}">
+          {{resource.content|safe|striptags|truncatechars:150}}
+        </p>
 
-      {% else %}
-        {% get_relation_value resource.pk 'has_profile_pic' as grel_dict %}
-        {% if not grel_dict.cursor and grel_dict.grel_node and grel_dict.grel_node.fs_file_ids.2 %}
-          <img src="{% url 'get_gridfs_resource' grel_dict.grel_node.fs_file_ids.2 %}" alt="" />
-        {% else %}
-          <img src="/static/ndf/images/metaStudio-profile.svg" alt="Profile picture for this group."  class="img-height">
-        {% endif %}
-
-      {% endif %}
-
-    {% elif resource.collection_set %}
-        <i class="collection"></i>
-
-    {% else %}
-        <img src="/static/ndf/images/metaStudio-profile.svg"  class="img-height">
-    {% endif %}
-
-    <!-- Card Title -->
-    <div class="event-card-title" title="{% firstof resource.altnames resource.name %}">
-      {% firstof resource.altnames resource.name %}
-    </div>
-    <!-- End Card Title -->
-
-  </div>
-    <!-- End Card  Image -->
-    {% get_event_status resource as event_status_msg %}
-
-    <div class="event-card-status {{event_status_msg|lower}}">
-      {% if is_event %}
-        {% if event_status_msg %}
-            {{event_status_msg}}
-        {% endif%}
-      {% endif%}
-    </div>
-
-    {% comment %}
-    <!-- Card Notification -->
-      <!-- <div class="event-card-notifications">
-        <span class="badge red" > 2 </span>
-      </div> -->
-    <!-- End Card Notification -->
-
-      <!-- Card Description -->
-
-      <!-- suppy no_description=True for not having description -->
-      {% if not no_description %}
-        <!--div class="event-card-desc" title="{{resource.content_org}}">
-         {#resource.content_org|default_if_none:"Add some description."|truncatechars:75#}
-        </div-->
-      {% endif %}
-    {% endcomment %}
-
-      <!-- End Card Description  -->
-      <!-- Card Next Session -->
-      {# {% get_course_session_status resource as event_session_status %} #}
-      <div class="event-card-session-status {{event_status_msg|lower}}">
-      {% if event_status_msg == "CLOSED"%}
-        No Sessions
-
-        {% comment %}
-          {% elif next_session %}
-          {% get_course_session_status resource as event_session_status %}
-           {% if event_session_status.1 == True %}
-            First
-           {% else %}
-            Next
-           {% endif %}
-           Session
-          <b class="event-time">{{event_session_status.0|date:"d-m-Y"}}</b>
-        {% endcomment %}
-
-      {% endif %}
       </div>
-      <!-- {{resource.author_set|length}}<i class="fa fa-users"></i> -->
-      <!--Event card footer-->
-      <div class="event-card-session-footer">
 
-        {% comment %}
-        <div class="date"><i class="fa fa-calendar-o"></i> Jan 5th,2016 - Mar 4, 2016</div>
-        {% endcomment %}
-        <div class="row collapse">
-          <div class="small-12 columns footer-label">Course Duration</div>
-          <div class="small-12 columns date">
-          {% get_attribute_value resource.pk 'start_time' as course_start_date %}
-          {% get_attribute_value resource.pk 'end_time' as course_end_date %}
-            <i class="fa fa-calendar-o"></i> {{course_start_date|date:"d M Y"}} - {{course_end_date|date:"d M Y"}}
-            {% comment %}
-              <i class="fa fa-pencil-square-o edit-course-duration"></i>
-            {% endcomment %}
-          </div>
-        </div>
-        <div class="row collapse">
-          <div class="small-12 columns footer-label">Enrolment Dates</div>
-          <div class="small-12 columns date">
-          {% get_attribute_value resource.pk 'start_enroll' as course_start_enroll %}
-          {% get_attribute_value resource.pk 'end_enroll' as course_end_enroll %}
-
-            <i class="fa fa-calendar-o "></i> {{course_start_enroll|date:"d M Y"}} - {{course_end_enroll|date:"d M Y"}}
-            {% comment %}
-              <i class="fa fa-pencil-square-o edit-course-enrollment"></i>
-            {% endcomment %}
-          </div>
-        </div>
-      </div>
-      <!--End event card footer-->
-      <!-- End Next Session -->
+    </a>
 </div>
-</a>

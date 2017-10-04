@@ -6,6 +6,7 @@ import datetime
 ''' -- imports from installed packages -- '''
 from django.http import HttpResponseRedirect
 from django.http import HttpResponse
+from django.http.request import HttpRequest
 from django.core.urlresolvers import reverse
 from django.shortcuts import render_to_response  # , render
 from django.template import RequestContext
@@ -26,11 +27,13 @@ from gnowsys_ndf.settings import GSTUDIO_MODERATING_GROUP_ALTNAMES, GSTUDIO_PROG
 from gnowsys_ndf.settings import GSTUDIO_SITE_NAME
 from gnowsys_ndf.ndf.models import NodeJSONEncoder, node_collection, triple_collection, Counter, counter_collection
 from gnowsys_ndf.ndf.views.methods import *
+from gnowsys_ndf.ndf.views.asset import *
+
 # from gnowsys_ndf.ndf.models import GSystemType, GSystem, Group, Triple
 # from gnowsys_ndf.ndf.models import c
 from gnowsys_ndf.ndf.views.ajax_views import *
 from gnowsys_ndf.ndf.templatetags.ndf_tags import get_all_user_groups, get_sg_member_of, get_relation_value, get_attribute_value, check_is_gstaff # get_existing_groups
-from gnowsys_ndf.ndf.org2any import org2html
+# from gnowsys_ndf.ndf.org2any import org2html
 from gnowsys_ndf.ndf.views.moderation import *
 # from gnowsys_ndf.ndf.views.moderation import moderation_status, get_moderator_group_set, create_moderator_task
 # ######################################################################################################################################
@@ -42,6 +45,7 @@ app = gst_group
 moderating_group_gst = node_collection.one({'_type': 'GSystemType', 'name': u'ModeratingGroup'})
 programevent_group_gst = node_collection.one({'_type': 'GSystemType', 'name': u'ProgramEventGroup'})
 courseevent_group_gst = node_collection.one({'_type': 'GSystemType', 'name': u'CourseEventGroup'})
+announced_unit_gst = node_collection.one({'_type': 'GSystemType', 'name': u'announced_unit'})
 partner_group_gst = node_collection.one({'_type': 'GSystemType', 'name': u'PartnerGroup'})
 
 file_gst = node_collection.one({'_type': 'GSystemType', 'name': 'File'})
@@ -57,7 +61,7 @@ class CreateGroup(object):
     Creates group.
     Instantiate group with request as argument
     """
-    def __init__(self, request):
+    def __init__(self, request=HttpRequest()):
         super(CreateGroup, self).__init__()
         self.request = request
         self.moderated_groups_member_of = ['ProgramEventGroup',\
@@ -74,7 +78,6 @@ class CreateGroup(object):
 
         # explicitely using "find_one" query
         group = node_collection.find_one({'_type': 'Group', 'name': unicode(group_name)})
-
         if group:
             return True
 
@@ -99,7 +102,6 @@ class CreateGroup(object):
         class_instance_var.get_group_fields(group_name, **group_fields)
         (NOTE: use ** before dict variables, in above case it's group_fields so it's: **group_fields)
         '''
-
         # getting the data into variables
         name = group_name
 
@@ -108,59 +110,88 @@ class CreateGroup(object):
 
         if kwargs.get('altnames', ''):
             altnames = kwargs.get('altnames', name)
-        else:
+        elif self.request:
             altnames = self.request.POST.get('altnames', name).strip()
+
+        group_set = []
+        if kwargs.get('group_set', ''):
+            group_set = kwargs.get('group_set', [])
+        else:
+            group_set = self.request.POST.get('group_set', [])
+        group_set = [group_set] if not isinstance(group_set, list) else group_set
+        group_set = [ObjectId(g) for g in group_set]
+
+        member_of = []
+        if kwargs.get('member_of', ''):
+            member_of = kwargs.get('member_of', [])
+        else:
+            member_of = self.request.POST.get('member_of', [])
+        member_of = [member_of] if not isinstance(member_of, list) else member_of
+        member_of = [ObjectId(m) for m in member_of]
 
         if kwargs.get('group_type', ''):
             group_type = kwargs.get('group_type', u'PUBLIC')
-        else:
+        elif self.request:
             group_type = self.request.POST.get('group_type', u'PUBLIC')
 
         if kwargs.get('access_policy', ''):
             access_policy = kwargs.get('access_policy', group_type)
-        else:
+        elif self.request:
             access_policy = self.request.POST.get('access_policy', group_type)
 
         if kwargs.get('edit_policy', ''):
             edit_policy = kwargs.get('edit_policy', u'EDITABLE_NON_MODERATED')
-        else:
+        elif self.request:
             edit_policy = self.request.POST.get('edit_policy', u'EDITABLE_NON_MODERATED')
 
         if kwargs.get('subscription_policy', ''):
             subscription_policy = kwargs.get('subscription_policy', u'OPEN')
-        else:
+        elif self.request:
             subscription_policy = self.request.POST.get('subscription_policy', u"OPEN")
 
         if kwargs.get('visibility_policy', ''):
             visibility_policy = kwargs.get('visibility_policy', u'ANNOUNCED')
-        else:
+        elif self.request:
             visibility_policy = self.request.POST.get('visibility_policy', u'ANNOUNCED')
 
         if kwargs.get('disclosure_policy', ''):
             disclosure_policy = kwargs.get('disclosure_policy', u'DISCLOSED_TO_MEM')
-        else:
+        elif self.request:
             disclosure_policy = self.request.POST.get('disclosure_policy', u'DISCLOSED_TO_MEM')
 
         if kwargs.get('encryption_policy', ''):
             encryption_policy = kwargs.get('encryption_policy', u'NOT_ENCRYPTED')
-        else:
+        elif self.request:
             encryption_policy = self.request.POST.get('encryption_policy', u'NOT_ENCRYPTED')
 
         if kwargs.get('agency_type', ''):
             agency_type = kwargs.get('agency_type', u'Other')
-        else:
+        elif self.request:
             agency_type = self.request.POST.get('agency_type', u'Other')
 
         if kwargs.get('content_org', ''):
-            content_org = kwargs.get('content_org', '')
-        else:
-            content_org = self.request.POST.get('content_org', '')
+            content_org = kwargs.get('content_org', u'')
+        elif self.request:
+            content_org = self.request.POST.get('content_org', u'')
+
+        if kwargs.get('content', ''):
+            content = kwargs.get('content', u'')
+        elif self.request:
+            content = self.request.POST.get('content', u'')
+
+        # if not content or not content_org:
+        #     content = content_org = u""
+
+        if kwargs.get('language', ''):
+            language = kwargs.get('language', '')
+        elif self.request:
+            language = self.request.POST.get('language', ('en', 'English'))
 
         # whenever we are passing int: 0, condition gets false
         # therefor casting to str
         if str(kwargs.get('moderation_level', '')):
             moderation_level = kwargs.get('moderation_level', '-1')
-        else:
+        elif self.request:
             moderation_level = self.request.POST.get('moderation_level', '-1')
 
         if node_id:
@@ -175,12 +206,21 @@ class CreateGroup(object):
         group_obj.name = unicode(name)
         group_obj.altnames = unicode(altnames)
 
+        for each_gset in group_set:
+            if each_gset not in group_obj.group_set:
+                group_obj.group_set.append(each_gset)
+
+        for each_mof in member_of:
+            if each_mof not in group_obj.member_of:
+                group_obj.member_of.append(each_mof)
+
         # while doing append operation make sure to-be-append is not in the list
         if gst_group._id not in group_obj.member_of:
             group_obj.member_of.append(gst_group._id)
 
         if gst_group._id not in group_obj.type_of:
             group_obj.type_of.append(gst_group._id)
+
         # user related fields:
         user_id = int(self.request.user.id)
         group_obj.created_by = user_id
@@ -202,16 +242,31 @@ class CreateGroup(object):
         group_obj.encryption_policy = encryption_policy
         group_obj.agency_type = agency_type
 
+        if language:
+            language_val = get_language_tuple(unicode(language))
+            group_obj.language = language_val
+
+
+        '''
+        Use of content_org field is deprecated.
+        Instead using value from content_org variable adding to content field
+         -katkamrachana 28June2017
+
         #  org-content
         if group_obj.content_org != content_org:
             group_obj.content_org = content_org
+            is_changed = True
 
             # Required to link temporary files with the current user who is:
             # usrname = self.request.user.username
             # filename = slugify(name) + "-" + slugify(usrname) + "-" + ObjectId().__str__()
             # group_obj.content = org2html(content_org, file_prefix=filename)
-            group_obj.content = content_org
+        if group_obj.content != content:
+            group_obj.content = content
             is_changed = True
+        '''
+        if group_obj.content != content_org:
+            group_obj.content = content_org
 
         # decision for adding moderation_level
         if group_obj.edit_policy == "EDITABLE_MODERATED":
@@ -234,7 +289,6 @@ class CreateGroup(object):
         - Takes group name as compulsory argument.
         - Returns tuple containing: (True/False, sub_group_object/error)
         '''
-
         # for editing already existing group
         node_id = kwargs.get('node_id', None)
         # print "node_id : ", node_id
@@ -345,7 +399,7 @@ class CreateGroup(object):
         # if logo_img_node_grel_id:
         #     logo_img_node = logo_img_node_grel_id[0]
         #     grel_id = logo_img_node_grel_id[1]
-        f = request.FILES.get("docFile", "")
+        f = request.FILES.get("filehive", "")
         # print "\nf is ",f
 
         if f:
@@ -356,7 +410,7 @@ class CreateGroup(object):
                 # check whether it appears in any other node's grelation
                 rel_obj = None
                 rel_obj = triple_collection.find({"_type": "GRelation", 'subject': {'$ne': ObjectId(group_obj._id)}, 'right_subject': logo_img_node._id})
-                file_cur = node_collection.find({'_type':"File",'fs_file_ids':logo_img_node.fs_file_ids,'_id': {'$ne': logo_img_node._id}})
+                file_cur = node_collection.find({'_type':"GSystem",'_id': {'$ne': logo_img_node._id}})
                 # print "\nrel_obj--",rel_obj.count()
                 # print "\nfile_cur.count()--",file_cur.count()
                 if rel_obj.count() > 0 or file_cur.count() > 0:
@@ -375,13 +429,23 @@ class CreateGroup(object):
                         node_id=logo_img_node._id,
                         deletion_type=1
                     )
-                    # print del_status, "--", del_status_msg
+                    print del_status, "--", del_status_msg
 
-            fileobj,fs = save_file(f,f.name,request.user.id,group_obj._id, "", "", username=unicode(request.user.username), access_policy="PUBLIC", count=0, first_object="", oid=True)
+            from gnowsys_ndf.ndf.views.filehive import write_files
+            is_user_gstaff = check_is_gstaff(group_obj._id, request.user)
+
+            # gs_obj_list = write_files(request, group_id)
+            fileobj_list = write_files(request, group_obj._id)
+            # print "request&&&&&&&&&&&&&&&&&&&&&&",request
+            fileobj_id = fileobj_list[0]['_id']
+            # print "fileobj_id****************************",fileobj_list
+            fileobj = node_collection.one({'_id': ObjectId(fileobj_id) })
+            # print "fileobj_id-------------------",fileobj
+            # fileobj,fs = save_file(f,f.name,request.user.id,group_obj._id, "", "", username=unicode(request.user.username), access_policy="PUBLIC", count=0, first_object="", oid=True)
             if fileobj:
                 rt_has_logo = node_collection.one({'_type': "RelationType", 'name': unicode(logo_rt)})
                 # print "\n creating GRelation has_logo\n"
-                create_grelation(group_obj._id, rt_has_logo, ObjectId(fileobj))
+                create_grelation(group_obj._id, rt_has_logo, ObjectId(fileobj._id))
 
 # --- END of class CreateGroup ---
 # --------------------------------
@@ -574,7 +638,9 @@ class CreateModeratedGroup(CreateSubGroup):
         }
 
 
-    def create_edit_moderated_group(self, group_name, moderation_level=1, sg_member_of="ModeratingGroup", top_mod_groups_parent=None, **kwargs):
+    def create_edit_moderated_group(self, group_name, moderation_level=1,
+             sg_member_of="ModeratingGroup", top_mod_groups_parent=None,
+             perform_checks=True, **kwargs):
         '''
         Creates/Edits top level group as well as underlying sub-mod groups.
         - Takes group_name as compulsory argument and optional kwargs.
@@ -590,49 +656,49 @@ class CreateModeratedGroup(CreateSubGroup):
 
             # values will be taken from POST form fields
             group_obj = self.get_group_fields(group_name, node_id=node_id)
-            # print group_obj
+            group_obj.save()
+            if perform_checks:
+                try:
+                    if top_mod_groups_parent:
+                        # check if group object's prior_node has _id of parent group,
+                        # otherwise add one.
+                        if ObjectId(top_mod_groups_parent) not in group_obj.prior_node:
+                            group_obj.prior_node.append(ObjectId(top_mod_groups_parent))
 
-            try:
-                if top_mod_groups_parent:
-                    # check if group object's prior_node has _id of parent group,
-                    # otherwise add one.
-                    if ObjectId(top_mod_groups_parent) not in group_obj.prior_node:
-                        group_obj.prior_node.append(ObjectId(top_mod_groups_parent))
+                    group_obj.save()
 
-                group_obj.save()
+                    if top_mod_groups_parent:
+                        # equivalently, adding newly created top moderated group's _id
+                        # in post node of it's immediate parent group
+                        self.add_subgroup_to_parents_postnode(top_mod_groups_parent, group_obj._id, sg_member_of=sg_member_of)
 
-                if top_mod_groups_parent:
-                    # equivalently, adding newly created top moderated group's _id
-                    # in post node of it's immediate parent group
-                    self.add_subgroup_to_parents_postnode(top_mod_groups_parent, group_obj._id, sg_member_of=sg_member_of)
+                except Exception, e:
+                    # if any errors return tuple with False and error
+                    # print e
+                    return False, e
+                if node_id:
+                    # i.e: Editing already existed group object.
+                    # method modifies the underlying mod-sub-group structure and doesn't return anything.
+                    self.check_reset_mod_group_hierarchy(sg_member_of=sg_member_of, top_group_obj=group_obj)
 
-            except Exception, e:
-                # if any errors return tuple with False and error
-                # print e
-                return False, e
-            if node_id:
-                # i.e: Editing already existed group object.
-                # method modifies the underlying mod-sub-group structure and doesn't return anything.
-                self.check_reset_mod_group_hierarchy(sg_member_of=sg_member_of, top_group_obj=group_obj)
+                else:
+                    # i.e: New group is created and following code will create
+                    # sub-mod-groups as per specified in the form.
+                    parent_group_id = group_obj._id
 
-            else:
-                # i.e: New group is created and following code will create
-                # sub-mod-groups as per specified in the form.
-                parent_group_id = group_obj._id
+                    for each_sg_iter in range(0, int(moderation_level)):
 
-                for each_sg_iter in range(0, int(moderation_level)):
+                        result = self.add_moderation_level(parent_group_id, sg_member_of=sg_member_of)
 
-                    result = self.add_moderation_level(parent_group_id, sg_member_of=sg_member_of)
+                        # result is tuple of (bool, newly-created-sub-group-obj)
+                        if result[0]:
+                            # overwritting parent's group_id with currently/newly-created group object
+                            parent_group_id = result[1]._id
 
-                    # result is tuple of (bool, newly-created-sub-group-obj)
-                    if result[0]:
-                        # overwritting parent's group_id with currently/newly-created group object
-                        parent_group_id = result[1]._id
-
-                    else:
-                        # if result is False, means sub-group is not created.
-                        # In this case, there is no point to go ahead and create subsequent sub-group.
-                        break
+                        else:
+                            # if result is False, means sub-group is not created.
+                            # In this case, there is no point to go ahead and create subsequent sub-group.
+                            break
 
             return True, group_obj
 
@@ -1103,9 +1169,6 @@ class CreateEventGroup(CreateModeratedGroup):
         '''
 
         # retrieves node_id. means it's edit operation of existing group.
-        group_obj = node_collection.one({'_id': ObjectId(group_id)})
-        if parent_group_obj._id != group_obj._id:
-            self.add_subgroup_to_parents_postnode(parent_group_obj._id, group_obj._id, "Event")
         # group_obj.prior_node.append(parent_group_obj._id)
         # group_obj.save()
 
@@ -1114,6 +1177,9 @@ class CreateEventGroup(CreateModeratedGroup):
         #         {'$push': {'member_of': ObjectId(programevent_group_gst._id)}}, upsert=False, multi=False)
         #     group_obj.reload()
         try:
+            group_obj = node_collection.one({'_id': ObjectId(group_id)})
+            if parent_group_obj._id != group_obj._id:
+                self.add_subgroup_to_parents_postnode(parent_group_obj._id, group_obj._id, "Event")
             start_date_val = self.request.POST.get('event_start_date','')
             if start_date_val:
                 start_date_val = datetime.strptime(start_date_val, "%d/%m/%Y")
@@ -1143,6 +1209,7 @@ class CreateEventGroup(CreateModeratedGroup):
             return True, group_obj
 
         except Exception as e:
+            # print "\n ", 'Cannot Set Dates to EventGroup.' + str(e)
             return False, 'Cannot Set Dates to EventGroup.' + str(e)
 
 
@@ -1167,27 +1234,40 @@ class CreateCourseEventGroup(CreateEventGroup):
         Creates CourseEvent sub-groups.
         Instantiate with request.
     """
-
     def __init__(self, request):
         super(CreateCourseEventGroup, self).__init__(request)
         self.request = request
-        self.section_event_gst = node_collection.one({'_type': "GSystemType", 'name': "CourseSectionEvent"})
-        self.subsection_event_gst = node_collection.one({'_type': "GSystemType", 'name': "CourseSubSectionEvent"})
-        self.courseunit_event_gst = node_collection.one({'_type': "GSystemType", 'name': "CourseUnitEvent"})
         self.user_id = request.user.id
 
+        self.section_event_gst = node_collection.one({'_type': "GSystemType",
+                                'name': "CourseSectionEvent"}, {"_id":1})
+        self.subsection_event_gst = node_collection.one({'_type': "GSystemType",
+                                'name': "CourseSubSectionEvent"}, {"_id":1})
+        self.courseunit_event_gst = node_collection.one({'_type': "GSystemType",
+                                'name': "CourseUnitEvent"}, {"_id": 1})
 
-    def initialize_course_event_structure(self, request, group_id):
-        course_node_id = request.POST.get('course_node_id', '')
-        if course_node_id:
-            course_node = node_collection.one({'_id': ObjectId(course_node_id)})
-            group_obj = node_collection.one({'_id': ObjectId(group_id)})
-            if "Course" in course_node:
-                rt_group_has_course_event = node_collection.one({'_type': "RelationType", 'name': "group_has_course_event"})
-                create_grelation(group_obj._id, rt_group_has_course_event, course_node._id)
-            self.ce_set_up(request, course_node, group_obj)
+        self.base_unit_gst = node_collection.one({'_type': "GSystemType",
+                                'name': "base_unit"}, {"_id": 1})
+        self.announced_unit_gst = node_collection.one({'_type': "GSystemType",
+                                'name': "announced_unit"}, {"_id": 1})
+        self.lesson_gst = node_collection.one({'_type': "GSystemType",
+                                'name': "lesson"}, {"_id": 1})
 
-    def ce_set_up(self, request, existing_course_obj, new_course_obj):
+    def initialize_course_event_structure(self, request, group_obj, parent_group_obj):
+        # After BaseCourseGroup impl, course_node_id is
+        # same as group_id
+
+        # course_node_id = request.POST.get('course_node_id', '')
+        # if course_node_id:
+        #     course_node = node_collection.one({'_id': ObjectId(course_node_id)})
+        #     group_obj = node_collection.one({'_id': ObjectId(group_id)})
+        #     if "Course" in course_node:
+        #         rt_group_has_course_event = node_collection.one({'_type': "RelationType", 'name': "group_has_course_event"})
+        #         create_grelation(group_obj._id, rt_group_has_course_event, course_node._id)
+        #     self.ce_set_up(request, course_node, group_obj)
+        self.ce_set_up(request, group_obj, parent_group_obj)
+
+    def ce_set_up(self, request, new_course_obj, existing_course_obj):
         """
             Will build into Recursive function
             To fetch from Course'collection_set
@@ -1200,11 +1280,13 @@ class CreateCourseEventGroup(CreateEventGroup):
         try:
             if not new_course_obj.content:
                 new_course_obj.content = existing_course_obj.content
-                new_course_obj.content_org = existing_course_obj.content_org
+                # No longer using field content_org
+                # new_course_obj.content_org = existing_course_obj.content_org
                 new_course_obj.save()
 
-            self.call_setup(request, existing_course_obj, new_course_obj, new_course_obj)
             self.update_raw_material_group_set(existing_course_obj, new_course_obj)
+            self.call_setup(request, existing_course_obj, new_course_obj, new_course_obj)
+            new_course_obj = get_all_iframes_of_unit(new_course_obj, request.META['HTTP_HOST'])
             return True
 
         except Exception as e:
@@ -1216,11 +1298,21 @@ class CreateCourseEventGroup(CreateEventGroup):
         # rm_files_cur = node_collection.find({'tags': 'raw@material', 'member_of': file_gst._id, 'group_set': old_group_obj._id})
 
         # June 17 2016. Importing files uploaded by user 'administrator' in old_group_obj
-        administrator_user = User.objects.get(username='administrator')
+        # administrator_user = User.objects.get(username='administrator')
+        # Commented fetching 'administrator_user '
 
-        rm_files_cur = node_collection.find({'member_of': file_gst._id, 'group_set': old_group_obj._id, \
-            '$or':[{'tags': 'raw@material'}, {'created_by': administrator_user.id}]})
+        # raw_material_fetch_query = {'group_set': old_group_obj._id,
+        #  '$or':[{'tags': 'raw@material'}, {'created_by': administrator_user.id}]}
+        raw_material_fetch_query = {'group_set': old_group_obj._id,
+         'tags': 'raw@material'}
 
+        if "announced_unit" in new_group_obj.member_of_names_list:
+            asset_gst = node_collection.one({'_type': 'GSystemType', 'name': 'Asset'})
+            raw_material_fetch_query.update({'member_of': asset_gst._id})
+        else:
+            raw_material_fetch_query.update({'member_of': file_gst._id})
+
+        rm_files_cur = node_collection.find(raw_material_fetch_query)
         if rm_files_cur.count():
             for each_rm_file in rm_files_cur:
                 each_rm_file.group_set.append(new_group_obj._id)
@@ -1230,25 +1322,38 @@ class CreateCourseEventGroup(CreateEventGroup):
                 each_rm_file.save(groupid=new_group_obj._id)
 
 
-    def create_corresponding_gsystem(self,gs_name,gs_member_of,gs_under_coll_set_of_obj, group_obj):
-
+    def create_corresponding_gsystem(self,base_gsystem,gs_under_coll_set_of_obj, group_obj):
+        '''
+        Depricated this method. katkamrachana - 02June2017
+        'replicate_resource' will be used for resources and hierarchy nodes.
+        '''
         try:
-            new_gsystem = node_collection.collection.GSystem()
-            new_gsystem.name = unicode(gs_name)
-            if gs_member_of == "CourseSection" or gs_member_of == "CourseSectionEvent":
+            user_id = base_gsystem.created_by
+            new_gsystem = create_clone(user_id, base_gsystem, group_obj._id)
+            base_gsystem_mem_list = base_gsystem.member_of_names_list
+            if any(base_gs_mem in ["CourseSection", "CourseSectionEvent"] for base_gs_mem in base_gsystem_mem_list):
                 gst_node = self.section_event_gst
-            elif gs_member_of == "CourseSubSection" or gs_member_of == "CourseSubSectionEvent":
+            if any(base_gs_mem in ["CourseSubSection", "CourseSubSectionEvent"] for base_gs_mem in base_gsystem_mem_list):
                 gst_node = self.subsection_event_gst
-            elif gs_member_of == "CourseUnit" or gs_member_of == "CourseUnitEvent":
+            if any(base_gs_mem in ["CourseUnit", "CourseUnitEvent"] for base_gs_mem in base_gsystem_mem_list):
                 gst_node = self.courseunit_event_gst
+            if any(base_gs_mem in ["lesson"] for base_gs_mem in base_gsystem_mem_list):
+                gst_node = self.lesson_gst
 
+            # new_gsystem = node_collection.collection.GSystem()
+            # new_gsystem.name = unicode(gs_name)
+            # if gs_member_of == "CourseSection" or gs_member_of == "CourseSectionEvent":
+            #     gst_node = self.section_event_gst
+            # elif gs_member_of == "CourseSubSection" or gs_member_of == "CourseSubSectionEvent":
+            #     gst_node = self.subsection_event_gst
+            # elif gs_member_of == "CourseUnit" or gs_member_of == "CourseUnitEvent":
+            #     gst_node = self.courseunit_event_gst
+            # elif gs_member_of == "lesson" or gs_member_of == "lesson":
+            #     gst_node = self.lesson_gst
+            # new_gsystem.modified_by = int(self.user_id)
+            # new_gsystem.save()
             new_gsystem.member_of.append(gst_node._id)
             new_gsystem.group_set.append(group_obj._id)
-            new_gsystem.modified_by = int(self.user_id)
-            new_gsystem.status = u"PUBLISHED"
-            new_gsystem.created_by = int(self.user_id)
-            new_gsystem.contributors.append(int(self.user_id))
-            new_gsystem.save()
             gs_under_coll_set_of_obj.collection_set.append(new_gsystem._id)
             gs_under_coll_set_of_obj.save()
             new_gsystem.prior_node.append(gs_under_coll_set_of_obj._id)
@@ -1260,10 +1365,22 @@ class CreateCourseEventGroup(CreateEventGroup):
 
     def call_setup(self, request, node, prior_node_obj, group_obj):
         if node.collection_set:
-            if "CourseUnit" in node.member_of_names_list or "CourseUnitEvent" in node.member_of_names_list:
+            try:
                 for each_res in node.collection_set:
+                    gst_node_id = None
                     each_res_node = node_collection.one({'_id': ObjectId(each_res)})
-                    new_res = replicate_resource(request, each_res_node, group_obj._id)
+                    each_res_node_mem_list = each_res_node.member_of_names_list
+                    if any(base_gs_mem in ["CourseSection", "CourseSectionEvent"] for base_gs_mem in each_res_node_mem_list):
+                        gst_node_id = self.section_event_gst._id
+                    if any(base_gs_mem in ["CourseSubSection", "CourseSubSectionEvent"] for base_gs_mem in each_res_node_mem_list):
+                        gst_node_id = self.subsection_event_gst._id
+                    if any(base_gs_mem in ["CourseUnit", "CourseUnitEvent"] for base_gs_mem in each_res_node_mem_list):
+                        gst_node_id = self.courseunit_event_gst._id
+                    if any(base_gs_mem in ["lesson"] for base_gs_mem in each_res_node_mem_list):
+                        gst_node_id = self.lesson_gst._id
+
+                    new_res = replicate_resource(request, each_res_node, 
+                        group_obj._id, mem_of_node_id=gst_node_id)
                     # new_res = self.replicate_resource(request, each_res_node, group_obj)
                     prior_node_obj.collection_set.append(new_res._id)
                     new_res.prior_node.append(prior_node_obj._id)
@@ -1274,14 +1391,19 @@ class CreateCourseEventGroup(CreateEventGroup):
                     # prior_node_obj.collection_set.append(each_res_node._id)
                     # node.save()
                     prior_node_obj.save()
-            else:
-                for each in node.collection_set:
-                    each_node = node_collection.one({'_id': ObjectId(each)})
-                    name_arg = each_node.name
-                    member_of_name_str = each_node.member_of_names_list[0]
-                    new_node = self.create_corresponding_gsystem(name_arg,member_of_name_str, prior_node_obj, group_obj)
-                    self.call_setup(request, each_node, new_node, group_obj)
-
+                    if each_res_node.collection_set:
+                        self.call_setup(request, each_res_node, new_res, group_obj)
+                    # else:
+                    #     for each in node.collection_set:
+                    #         each_node = node_collection.one({'_id': ObjectId(each)})
+                    #         if each_node:
+                    #             # name_arg = each_node.name
+                    #             # member_of_name_str = each_node.member_of_names_list[0]
+                    #             new_node = self.create_corresponding_gsystem(each_node, prior_node_obj, group_obj)
+                    #             self.call_setup(request, each_node, new_node, group_obj)
+            except Exception as call_set_err:
+                print "\n !!!Error while creating Course Structure!!!", call_set_err
+                pass
 
 
 # --- END of class CreateCourseEventGroup ---
@@ -1300,7 +1422,9 @@ class GroupCreateEditHandler(View):
             -- CourseEvent Group
             -- ProgramEvent Group
     """
+
     @method_decorator(login_required)
+    @method_decorator(staff_required)
     @method_decorator(get_execution_time)
     def get(self, request, group_id, action):
         """
@@ -1311,7 +1435,6 @@ class GroupCreateEditHandler(View):
             group_id = ObjectId(group_id)
         except:
             group_name, group_id = get_group_name_id(group_id)
-
         group_obj = None
         nodes_list = []
         logo_img_node = None
@@ -1387,6 +1510,7 @@ class GroupCreateEditHandler(View):
     # --- END of get() ---
 
     @method_decorator(login_required)
+    @method_decorator(staff_required)
     @method_decorator(get_execution_time)
     def post(self, request, group_id, action):
         '''
@@ -1442,7 +1566,7 @@ class GroupCreateEditHandler(View):
             # calling method to create new group
             result = group.create_group(group_name, node_id=node_id)
 
-        # print result[0], "\n=== result : ", result[1].name, "\n\n"
+        # print result[0], "\n=== result : "
         if result[0]:
             # operation success: redirect to group-detail page
             group_obj = result[1]
@@ -1470,6 +1594,7 @@ class GroupCreateEditHandler(View):
             else:
                 partner_grp_result = sub_group.set_partnergroup(request, group_obj)
                 sub_group.set_logo(request, group_obj, logo_rt = "has_profile_pic")
+                # print "-------------------------------------------------",group_obj
         return HttpResponseRedirect( reverse( url_name, kwargs={'group_id': group_name} ) )
 # ===END of class EditGroup() ===
 # -----------------------------------------
@@ -1482,6 +1607,7 @@ class EventGroupCreateEditHandler(View):
         - ProgramEvent Group
     """
     @method_decorator(login_required)
+    @method_decorator(staff_required)
     @method_decorator(get_execution_time)
     def get(self, request, group_id, action, sg_type):
         """
@@ -1492,7 +1618,7 @@ class EventGroupCreateEditHandler(View):
             group_id = ObjectId(group_id)
         except:
             group_name, group_id = get_group_name_id(group_id)
-        course_node_id = request.GET.get('cnode_id', '')
+        # course_node_id = request.GET.get('cnode_id', '')
         group_obj = None
         nodes_list = []
         spl_group_type = sg_type
@@ -1536,7 +1662,7 @@ class EventGroupCreateEditHandler(View):
                                         'node': group_obj, 'title': title,
                                         'nodes_list': nodes_list,
                                         'spl_group_type': spl_group_type,
-                                        'course_node_id': course_node_id,
+                                        # 'course_node_id': course_node_id,
                                         'groupid': group_id, 'group_id': group_id,
                                         'logo_img_node':logo_img_node
 
@@ -1545,23 +1671,24 @@ class EventGroupCreateEditHandler(View):
     # --- END of get() ---
 
     @method_decorator(login_required)
+    @method_decorator(staff_required)
     @method_decorator(get_execution_time)
     def post(self, request, group_id, action, sg_type):
         '''
         To handle post request of group form.
         To save edited or newly-created group's data.
         '''
-        group_obj = get_group_name_id(group_id, get_obj=True)
+        parent_group_obj = get_group_name_id(group_id, get_obj=True)
 
         # getting field values from form:
         group_name = request.POST.get('name', '').strip()  # hidden-form-field
         node_id = request.POST.get('node_id', '').strip()  # hidden-form-field
         edit_policy = request.POST.get('edit_policy', '')
-        course_node_id = request.POST.get('course_node_id', '')
+        # course_node_id = request.POST.get('course_node_id', '')
         # check if group's editing policy is already 'EDITABLE_MODERATED' or
         # it was not and now it's changed to 'EDITABLE_MODERATED' or vice-versa.
         # import ipdb; ipdb.set_trace()
-        if (edit_policy == "EDITABLE_MODERATED") or (group_obj.edit_policy == "EDITABLE_MODERATED"):
+        if (edit_policy == "EDITABLE_MODERATED") or (parent_group_obj.edit_policy == "EDITABLE_MODERATED"):
 
             moderation_level = request.POST.get('moderation_level', '')
             # instantiate moderated group
@@ -1570,56 +1697,102 @@ class EventGroupCreateEditHandler(View):
             elif sg_type == "CourseEventGroup":
                 moderation_level = -1
                 mod_group = CreateCourseEventGroup(request)
-            parent_group_obj = group_obj
 
             # calling method to create new group
-            result = mod_group.create_edit_moderated_group(group_name, moderation_level, sg_type, node_id=node_id)
+            result = mod_group.create_edit_moderated_group(group_name, moderation_level, sg_type, node_id=node_id, perform_checks=False)
         if result[0]:
             # operation success: create ATs
             group_obj = result[1]
+            group_obj.fill_node_values(request)
+            language = request.POST.get('language', ('en', 'English'))
+            if language:
+                language_val = get_language_tuple(unicode(language))
+                group_obj.language = language_val
+
+            date_result = mod_group.set_event_and_enrollment_dates(request, group_obj._id, parent_group_obj)
             if sg_type == "CourseEventGroup":
-                group_obj.member_of = [ObjectId(courseevent_group_gst._id)]
+                if ("base_unit" in parent_group_obj.member_of_names_list or 
+                    "announced_unit" in parent_group_obj.member_of_names_list):
+                    group_obj.member_of = [ObjectId(announced_unit_gst._id)]
+                else:
+                    group_obj.member_of = [ObjectId(courseevent_group_gst._id)]
+                # group_obj.language = parent_group_obj.language
+                if parent_group_obj.project_config:
+                    group_obj.project_config = parent_group_obj.project_config
                 group_obj.save()
+                if node_id:
+                    return HttpResponseRedirect(reverse('groupchange',
+                     kwargs={'group_id': group_name}))
             # to make PE/CE as sub groups of the grp from which it is created.
             # parent_group_obj.post_node.append(group_obj._id)
             # group_obj.prior_node.append(parent_group_obj._id)
             # group_obj.save()
             # parent_group_obj.save()
-            date_result = mod_group.set_event_and_enrollment_dates(request, group_obj._id, parent_group_obj)
-            if date_result[0]:
-                # Successfully had set dates to EventGroup
-                if sg_type == "CourseEventGroup":
-                    mod_group.initialize_course_event_structure(request, group_obj._id)
-                    # creating a new counter document for a user for a given course for the purpose of analytics
+            if not node_id:
+                if date_result[0]:
+                    # Successfully had set dates to EventGroup
+                    if sg_type == "CourseEventGroup":
+                        mod_group.initialize_course_event_structure(request, group_obj, parent_group_obj)
+                        # creating a new counter document for a user for a given course for the purpose of analytics
 
-                    # counter_obj = Counter.get_counter_obj(userid, group_id)
-                    # print "===========================", counter_obj
+                        # counter_obj = Counter.get_counter_obj(userid, group_id)
+                        # print "===========================", counter_obj
 
-                    # auth_obj= node_collection.one({'_type':'Author','created_by':request.user.id})
+                        # auth_obj= node_collection.one({'_type':'Author','created_by':request.user.id})
 
-                    # counter_obj = counter_collection.collection.Counter()
-                    # counter_obj.fill_counter_values(
-                    #                                 user_id=request.user.id,
-                    #                                 auth_id=auth_obj._id,
-                    #                                 group_id=group_obj._id,
-                    #                                 is_group_member=True
-                    #                             )
-                    # counter_obj.save()
+                        # counter_obj = counter_collection.collection.Counter()
+                        # counter_obj.fill_counter_values(
+                        #                                 user_id=request.user.id,
+                        #                                 auth_id=auth_obj._id,
+                        #                                 group_id=group_obj._id,
+                        #                                 is_group_member=True
+                        #                             )
+                        # counter_obj.save()
 
-                # elif sg_type == "ProgramEventGroup":
-                    # mod_group.set_logo(request,group_obj,logo_rt = "has_logo")
-                mod_group.set_logo(request,group_obj,logo_rt = "has_profile_pic")
-                group_name = group_obj.name
-                url_name = 'groupchange'
-            else:
-                # operation fail: redirect to group-listing
-                group_name = 'home'
-                url_name = 'group'
+                    # elif sg_type == "ProgramEventGroup":
+                        # mod_group.set_logo(request,group_obj,logo_rt = "has_logo")
+                    # mod_group.set_logo(request,group_obj,logo_rt = "has_profile_pic")
+                    mod_group.set_logo(request,group_obj,logo_rt = "has_banner_pic")
+                    group_name = group_obj.name
+                    if "announced_unit" in group_obj.member_of_names_list:
+                        # check if base_unit is assigned to any module
+                        gst_module_name, gst_module_id = GSystemType.get_gst_name_id('Module')
+                        parent_modules = node_collection.find({
+                            '_type': 'GSystem',
+                            'member_of': gst_module_id,
+                            'collection_set': {'$in': [parent_group_obj._id]}
+                        })
+                        for each_parent_module in parent_modules:
+                            each_parent_module.collection_set.append(group_obj._id)
+                            each_parent_module.save()
+                        # check if base_unit has attr assigned
+                        # Add attr  educationallevel_val and educationalsubject
+                        educationalsubject_val = get_attribute_value(parent_group_obj._id,"educationalsubject")
+                        educationallevel_val = get_attribute_value(parent_group_obj._id,"educationallevel")
+                        # print "\n educationalsubject_val: ", educationalsubject_val
+                        # print "\n educationallevel_val: ", educationallevel_val
+                        if educationalsubject_val:
+                            educationalsubject_at = node_collection.one({
+                                '_type': 'AttributeType',
+                                'name': "educationalsubject"
+                            })
+                            create_gattribute(group_obj._id, educationalsubject_at, unicode(educationalsubject_val))
+                        if educationallevel_val:
+                            educationallevel_at = node_collection.one({
+                                '_type': 'AttributeType',
+                                'name': "educationallevel"
+                            })
+                            create_gattribute(group_obj._id, educationallevel_at, unicode(educationallevel_val))
+                        group_obj.reload()
+                    url_name = 'groupchange'
+                else:
+                    # operation fail: redirect to group-listing
+                    group_name = 'home'
+                    url_name = 'group'
         else:
             # operation fail: redirect to group-listing
             group_name = 'home'
             url_name = 'group'
-
         return HttpResponseRedirect(reverse(url_name, kwargs={'group_id': group_name}))
 
 # ===END of class EventGroupCreateEditHandler() ===
@@ -1808,7 +1981,7 @@ def group(request, group_id, app_id=None, agency_type=None):
 #     shelf_list = {}
 
 #     # if auth:
-#     #   shelf = triple_collection.find({'_type': 'GRelation', 'subject': ObjectId(auth._id), 'relation_type.$id': has_shelf_RT._id })
+#     #   shelf = triple_collection.find({'_type': 'GRelation', 'subject': ObjectId(auth._id), 'relation_type': has_shelf_RT._id })
 
 #     #   if shelf:
 #     #     for each in shelf:
@@ -1885,7 +2058,22 @@ def group_dashboard(request, group_id=None):
     old_profile_pics = []
     selected = request.GET.get('selected','')
     group_obj = get_group_name_id(group_id, get_obj=True)
-    if "CourseEventGroup" in group_obj.member_of_names_list:
+    try:
+        if 'tab_name' in group_obj.project_config and group_obj.project_config['tab_name'].lower() == "questions":
+            if "announced_unit" in group_obj.member_of_names_list:
+                if group_obj.collection_set:
+                    lesson_id = group_obj.collection_set[0]
+                    lesson_node = node_collection.one({'_id': ObjectId(lesson_id)})
+                    activity_id = lesson_node.collection_set[0]
+                return HttpResponseRedirect(reverse('activity_player_detail', kwargs={'group_id': group_id,
+                    'lesson_id': lesson_id, 'activity_id': activity_id}))
+    except Exception as e:
+        pass
+
+    if ("base_unit" in group_obj.member_of_names_list or
+        "CourseEventGroup" in group_obj.member_of_names_list or
+        "BaseCourseGroup" in group_obj.member_of_names_list or 
+        "announced_unit" in group_obj.member_of_names_list):
         return HttpResponseRedirect(reverse('course_about', kwargs={'group_id': group_id}))
 
     if group_obj and group_obj.post_node:
@@ -1938,7 +2126,7 @@ def group_dashboard(request, group_id=None):
 
       has_shelf_RT = node_collection.one({'_type': 'RelationType', 'name': u'has_shelf' })
 
-      shelf = triple_collection.find({'_type': 'GRelation', 'subject': ObjectId(auth._id), 'relation_type.$id': has_shelf_RT._id })
+      shelf = triple_collection.find({'_type': 'GRelation', 'subject': ObjectId(auth._id), 'relation_type': has_shelf_RT._id })
       shelf_list = {}
 
       if shelf:
@@ -1959,6 +2147,7 @@ def group_dashboard(request, group_id=None):
           shelves = []
     '''
   except Exception as e:
+    print "\nError: ", e
     group_obj=node_collection.one({'$and':[{'_type':u'Group'},{'name':u'home'}]})
     group_id=group_obj['_id']
     pass
@@ -1974,7 +2163,7 @@ def group_dashboard(request, group_id=None):
       # grel_id = grel_dict.get("grel_id")
 
   has_profile_pic_rt = node_collection.one({'_type': 'RelationType', 'name': unicode('has_profile_pic') })
-  all_old_prof_pics = triple_collection.find({'_type': "GRelation", "subject": group_obj._id, 'relation_type.$id': has_profile_pic_rt._id, 'status': u"DELETED"})
+  all_old_prof_pics = triple_collection.find({'_type': "GRelation", "subject": group_obj._id, 'relation_type': has_profile_pic_rt._id, 'status': u"DELETED"})
   if all_old_prof_pics:
     for each_grel in all_old_prof_pics:
       n = node_collection.one({'_id': ObjectId(each_grel.right_subject)})
@@ -2002,9 +2191,10 @@ def group_dashboard(request, group_id=None):
   if "CourseEventGroup" in group_obj.member_of_names_list:
       sg_type = "CourseEventGroup"
       alternate_template = "ndf/gcourse_event_group.html"
-      course_collection_data = get_collection(request,group_obj._id,group_obj._id)
-      course_collection_data = json.loads(course_collection_data.content)
-
+      # course_collection_data = get_collection(request,group_obj._id,group_obj._id)
+      # course_collection_data = json.loads(course_collection_data.content)
+  if 'Group' in group_obj.member_of_names_list:
+    alternate_template = "ndf/lms.html"
   # The line below is commented in order to:
   #     Fetch files_cur - resources under moderation in groupdahsboard.html
   # if  u"ProgramEventGroup" not in group_obj.member_of_names_list:
@@ -2049,7 +2239,7 @@ def group_dashboard(request, group_id=None):
         else:
             allow_to_join = "Open"
   if group_obj.edit_policy == "EDITABLE_MODERATED":# and group_obj._type != "Group":
-      files_cur = node_collection.find({'group_set': ObjectId(group_obj._id), '_type': "File"})
+      files_cur = node_collection.find({'group_set': ObjectId(group_obj._id), '_type': {'$in': ["File","GSystem"]}})
   '''
   property_order_list = []
   if "group_of" in group_obj:
@@ -2066,7 +2256,10 @@ def group_dashboard(request, group_id=None):
   '''
   default_template = "ndf/groupdashboard.html"
   # print "\n\n blog_pages.count------",blog_pages
-  return render_to_response([alternate_template,default_template] ,{'node': group_obj, 'groupid':group_id,
+  if alternate_template:
+    return HttpResponseRedirect( reverse('course_about', kwargs={"group_id": group_id}) )
+  else:
+    return render_to_response([alternate_template,default_template] ,{'node': group_obj, 'groupid':group_id,
                                                        'group_id':group_id, 'user':request.user,
                                                        # 'shelf_list': shelf_list,
                                                        'list_of_unit_events': list_of_unit_events,
@@ -2083,7 +2276,8 @@ def group_dashboard(request, group_id=None):
                                                        'subgroups_cur':subgroups_cur,
                                                        # 'annotations' : annotations, 'shelves': shelves,
                                                        'prof_pic_obj': profile_pic_image,
-                                                       'old_profile_pics':old_profile_pics
+                                                       'old_profile_pics':old_profile_pics,
+                                                       'group_obj': group_obj,
                                                       },context_instance=RequestContext(request)
                           )
 
@@ -2494,7 +2688,7 @@ def create_sub_group(request,group_id):
           shelf_list = {}
 
           if auth:
-              shelf = triple_collection.find({'_type': 'GRelation', 'subject': ObjectId(auth._id), 'relation_type.$id': has_shelf_RT._id })
+              shelf = triple_collection.find({'_type': 'GRelation', 'subject': ObjectId(auth._id), 'relation_type': has_shelf_RT._id })
 
               if shelf:
                   for each in shelf:
@@ -2534,7 +2728,10 @@ def upload_using_save_file(request,group_id):
 
     group_obj = node_collection.one({'_id': ObjectId(group_id)})
     title = request.POST.get('context_name','')
+    sel_topic = request.POST.get('topic_list','')
+    
     usrid = request.user.id
+    name  = request.POST.get('name')
     # print "\n\n\nusrid",usrid
     # # url_name = "/"+str(group_id)
     # for key,value in request.FILES.items():
@@ -2553,13 +2750,18 @@ def upload_using_save_file(request,group_id):
 
     from gnowsys_ndf.ndf.views.filehive import write_files
     is_user_gstaff = check_is_gstaff(group_obj._id, request.user)
-
+    content_org = request.POST.get('content_org', '')
+    uploaded_files = request.FILES.getlist('filehive', [])
     # gs_obj_list = write_files(request, group_id)
-    fileobj_list = write_files(request, group_id)
+    # fileobj_list = write_files(request, group_id)
+    # fileobj_id = fileobj_list[0]['_id']
+    fileobj_list = write_files(request, group_id,unique_gs_per_file=False)
+    # fileobj_list = write_files(request, group_id)
     fileobj_id = fileobj_list[0]['_id']
     file_node = node_collection.one({'_id': ObjectId(fileobj_id) })
 
-    if GSTUDIO_FILE_UPLOAD_FORM == 'detail' and GSTUDIO_SITE_NAME == "NROER" and title != "raw material" and title != "gallery":
+    # if GSTUDIO_FILE_UPLOAD_FORM == 'detail' and GSTUDIO_SITE_NAME == "NROER" and title != "raw material" and title != "gallery":
+    if GSTUDIO_FILE_UPLOAD_FORM == 'detail' and title != "raw material" and title != "gallery":
         if request.POST:
             # mtitle = request.POST.get("docTitle", "")
             # userid = request.POST.get("user", "")
@@ -2569,10 +2771,9 @@ def upload_using_save_file(request,group_id):
             # doc = request.POST.get("doc", "")
             usrname = request.user.username
             page_url = request.POST.get("page_url", "")
-            content_org = request.POST.get('content_org', '')
             access_policy = request.POST.get("login-mode", '') # To add access policy(public or private) to file object
             tags = request.POST.get('tags', "")
-            license = request.POST.get("License", "")
+            copyright = request.POST.get("Copyright", "")
             source = request.POST.get("Source", "")
             Audience = request.POST.getlist("audience", "")
             fileType = request.POST.get("FileType", "")
@@ -2595,7 +2796,7 @@ def upload_using_save_file(request,group_id):
             else:
                 map_geojson_data = []
 
-            file_node.license = unicode(license)
+            file_node.legal['copyright'] = unicode(copyright)
 
             file_node.location = map_geojson_data
             # file_node.save(groupid=group_id)
@@ -2648,8 +2849,18 @@ def upload_using_save_file(request,group_id):
                 if not type(tags) is list:
                     tags = [unicode(t.strip()) for t in tags.split(",") if t != ""]
                 file_node.tags = tags
+            # rt_has_asset_content = node_collection.one({'_type': 'RelationType','name': 'has_assetcontent'})
+            # gr = create_grelation(ObjectId('58a3dd4cc6bd690400016ae5'), rt_has_asset_content, ObjectId(file_node._id))
+            # print gr
+            # # asset_node = create_asset(file_node.name,group_id,file_node.created_by,request)
+            # # print "++++++++++++++++++++++++++++++++++++++++",asset_node._id
+            # asset_content_node = create_assetcontent(ObjectId('58a3dd4cc6bd690400016ae5'),file_node.name,group_id,file_node.created_by)
+            # print "---------------------------------------",asset_content_node
+            rt_teaches = node_collection.one({'_type': "RelationType", 'name': unicode("teaches")})
+            create_grelation(file_node._id,rt_teaches,ObjectId(sel_topic))
             file_node.save(groupid=group_id,validate=False)
-            return HttpResponseRedirect( reverse('file_detail', kwargs={"group_id": group_id,'_id':fileobj_id}) )
+
+            return HttpResponseRedirect( reverse('file_detail', kwargs={"group_id": group_id,'_id':file_node._id}) )
     # print "\n\nretirn gs_obj_list",gs_obj_list
     # gs_obj_id = gs_obj_list[0]['_id']
     # print "\n\n\ngs_obj_id: ",gs_obj_id
@@ -2662,7 +2873,8 @@ def upload_using_save_file(request,group_id):
             each_gs_file.contributors.append(usrid)
 
         if title == "raw material" or (title == "gallery" and is_user_gstaff):
-            each_gs_file.tags =  [u'raw@material']
+            if u'raw@material' not in each_gs_file.tags:
+                each_gs_file.tags.append(u'raw@material')
 
         group_object = node_collection.one({'_id': ObjectId(group_id)})
         if (group_object.edit_policy == "EDITABLE_MODERATED") and (group_object.moderation_level > 0):

@@ -1,9 +1,15 @@
 from django.conf.urls import patterns, url
 
 urlpatterns = patterns('gnowsys_ndf.ndf.views.module',
-                       url(r'^[/]$', 'module', name='module'),
-#                       url(r'^(?P<module_id>[\w-]+)$', 'module', name='module'),
-		       url(r'^/delete_module/(?P<_id>[\w-]+)$', 'delete_module', name='delete_module'),
-                       url(r'^/module_detail/(?P<_id>[\w-]+)$', 'module_detail', name='module_detail'),
-                       url(r'^/(?P<_id>[\w-]+)$', 'module_detail', name='module_detail'),
+
+                        # list
+                        url(r'^[/]?$', 'list_modules', name='list_modules'),
+
+						# create
+                        url(r'^/create/?$', 'module_create_edit', {'cancel_url': 'landing_page'}, name='module_create'),
+                        # edit
+                        url(r'^/edit/(?P<module_id>[\w-]+)/?$', 'module_create_edit', name='module_edit'),
+
+                        # detail
+                        url(r'^/(?P<node_id>[\w-]+)/?$', 'module_detail', name='module_detail'),
                        )

@@ -82,11 +82,10 @@ def create_or_update_counter(user_obj, group_id):
 
     ## FILES ##
     counter_obj['file']['rating_count_received'] = analytics_instance.get_ratings_counts_received_on_files()
-    counter_obj['page']['blog']['rating_count_received'] = analytics_instance.get_ratings_counts_received_on_notes()
     # Get all files uploaded by user
     counter_obj['file']['created'] = analytics_instance.get_user_files_count()
     # Get all comments posted on files uploaded by user
-    counter_obj['page']['blog']['comments_gained'] = analytics_instance.get_comments_counts_on_users_files()
+    counter_obj['file']['comments_gained'] = analytics_instance.get_comments_counts_on_users_files()
     # Get all files on which the user has posted a comment
     counter_obj['file']['commented_on_others_res'] = analytics_instance.get_other_files_commented_by_user_count()
     # Get all unique users who visited files uploaded by user
@@ -102,6 +101,7 @@ def create_or_update_counter(user_obj, group_id):
 
     ## NOTES ##
     # Get all notes/blog pages created by user
+    counter_obj['page']['blog']['rating_count_received'] = analytics_instance.get_ratings_counts_received_on_notes()
     counter_obj['page']['blog']['created'] = analytics_instance.get_user_notes_count()
     # Get all comments posted on notes created by user
     # counter_obj['no_comments_received_on_notes'] = analytics_instance.get_comments_counts_on_users_notes()

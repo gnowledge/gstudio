@@ -52,7 +52,7 @@ class Command(BaseCommand):
         log_list.append(info_message)
         info_message = ""
         link_login_ac()
-      
+
       except Exception as e:
         error_message = "\n LoginLinkError: " + str(e) + " !!!\n"
         log_list.append(error_message)
@@ -67,7 +67,7 @@ class Command(BaseCommand):
 
           with open(log_file_path, 'a') as log_file:
             log_file.writelines(log_list)
-    
+
     # Renames registration_year to registration_date & updates existing value(s) ------------------------------------
     if options['ren_regYear']:
       try:
@@ -75,7 +75,7 @@ class Command(BaseCommand):
         log_list.append(info_message)
         info_message = ""
         update_registration_year()
-      
+
       except Exception as e:
         error_message = "\n RegistrationDateError: " + str(e) + " !!!\n"
         log_list.append(error_message)
@@ -182,7 +182,7 @@ class Command(BaseCommand):
             with open(log_file_path, 'a') as log_file:
               log_file.writelines(log_list)
 
-	# ------------------------ End of handle() --------------------------------    
+	# ------------------------ End of handle() --------------------------------
 
 
 def link_login_ac():
@@ -222,12 +222,12 @@ def update_registration_year():
 
   info_message = "\n Before update: " + str(ryat._id) + " -- " + ryat.name + " -- " + str(ryat["validators"])
   log_list.append(info_message)
-  
-  res = node_collection.collection.update({'_id': ryat._id}, 
-                          {'$set': {'name': u"registration_date", 
-                                    'altnames': u"Date of Registration", 
+
+  res = node_collection.collection.update({'_id': ryat._id},
+                          {'$set': {'name': u"registration_date",
+                                    'altnames': u"Date of Registration",
                                     'validators': [u"m/d/Y", u"date_month_day_year", u"MM/DD/YYYY"]
-                          }}, 
+                          }},
                           upsert=False, multi=False
                         )
 
@@ -235,14 +235,14 @@ def update_registration_year():
     ryat.reload()
     info_message = "\n After update: " + str(ryat._id) + " -- " + ryat.name + " -- " + str(ryat["validators"]) + "\n"
     log_list.append(info_message)
-  
+
     # If AttributeType is updated successfully, then look out for any existing value(s)
     # With value as datetime.datetime(2014, 1, 1, 0, 0)
     # If found, replace it with datetime.datetime(2014, 1, 1, 0, 0)
 
-    ry_cur = triple_collection.find({'_type': "GAttribute", 'attribute_type.$id': ryat._id})
+    ry_cur = triple_collection.find({'_type': "GAttribute", 'attribute_type': ryat._id})
 
-    c = ry_cur.count() 
+    c = ry_cur.count()
     if c:
       info_message = "\n No. of existing value(s) found: " + str(c)
       log_list.append(info_message)
@@ -250,10 +250,10 @@ def update_registration_year():
       for each in ry_cur:
         if each.object_value == datetime.datetime(2014, 1, 1, 0, 0):
           d = datetime.datetime(2014, 9, 2, 0, 0)
-          res = triple_collection.collection.update({'_id': each._id}, 
-                                  {'$set': {'object_value': d, 
+          res = triple_collection.collection.update({'_id': each._id},
+                                  {'$set': {'object_value': d,
                                             'name': each.name.replace("2014-01-01 00:00:00", str(d))
-                                  }}, 
+                                  }},
                                   upsert=False, multi=False
                                 )
           if res['n']:
@@ -313,8 +313,8 @@ def setup_default_gapps():
   log_list.append(info_message)
 
   # Fetch MIS_admin group - required for fetching GSystems of College GSystemType
-  mis_admin = node_collection.one({'_type': "Group", 
-                                   '$or': [{'name': {'$regex': u"MIS_admin", '$options': 'i'}}, 
+  mis_admin = node_collection.one({'_type': "Group",
+                                   '$or': [{'name': {'$regex': u"MIS_admin", '$options': 'i'}},
                                            {'altnames': {'$regex': u"MIS_admin", '$options': 'i'}}],
                                    'group_type': "PRIVATE"
                                   },
@@ -344,7 +344,7 @@ def setup_default_gapps():
       info_message = "\n "+str(i+1)+") Setting GAPPS for this college group ("+g.name+" -- "+str(g._id)+")\n"
       log_list.append(info_message)
 
-      is_apps_list = triple_collection.one({'_type': "GAttribute", 'subject': g._id, 'attribute_type.$id': at_apps_list._id})
+      is_apps_list = triple_collection.one({'_type': "GAttribute", 'subject': g._id, 'attribute_type': at_apps_list._id})
       if is_apps_list:
         info_message = " Default GAPPs list already exists for Group ("+g.name+" -- "+str(g._id)+"), so overriding it..."
         log_list.append(info_message)
@@ -363,7 +363,7 @@ def setup_default_gapps():
         ga = create_gattribute(g._id, at_apps_list, default_gapps_list)
         info_message = "\n Successfully created: " + str(ga._id) + "\n"
         log_list.append(info_message)
-    
+
     else:
       error_message = "\n GAPPSSetupError: This college group ("+each.name+") doesn't exists.. please create explicitly!!!\n"
       log_list.append(error_message)
@@ -374,8 +374,8 @@ def setup_mis_data():
   This sets up group(s) with MIS-data.
   '''
   # Fetch MIS_admin group details
-  mis_admin = node_collection.one({'_type': "Group", 
-                                 '$or': [{'name': {'$regex': u"MIS_admin", '$options': 'i'}}, 
+  mis_admin = node_collection.one({'_type': "Group",
+                                 '$or': [{'name': {'$regex': u"MIS_admin", '$options': 'i'}},
                                          {'altnames': {'$regex': u"MIS_admin", '$options': 'i'}}],
                                  'group_type': "PRIVATE"
                                 },
@@ -390,7 +390,7 @@ def setup_mis_data():
   # Set groups_name_list with values
   groups_name_list = []
   # groups_name_list = ["Platform Development"]
-  # or ----- 
+  # or -----
   college = node_collection.one({'_type': "GSystemType", 'name': u"College"}, {'name': 1})
   college_cur = node_collection.find({'_type': "GSystem", 'member_of': college._id, 'group_set': mis_admin._id}, {'name': 1})
 
@@ -400,7 +400,7 @@ def setup_mis_data():
   def setup_groups(groups_name_list, cur):
     info_message = "\n groups_name_list: " + str(groups_name_list)
     log_list.append(info_message)
-    
+
     # Creating list of ObjectId(s) of group(s)
     groups_list = [] # Holds ObjectId of groups listed in groups_name_list
     for each in groups_name_list:
@@ -410,7 +410,7 @@ def setup_mis_data():
 
     info_message = "\n groups_list: " + str(groups_list)
     log_list.append(info_message)
-    
+
     # Creating list of ObjectId(s) of GSystem(s) passed in as cur (cursor-object)
     gs_oid_list = []
     info_message = "\n Appending:"
@@ -456,7 +456,7 @@ def setup_mis_data():
   setup_groups(groups_name_list, district_cur)
   info_message = "\n Updated District data sucessfully !\n"
   log_list.append(info_message)
-  
+
   # Setup University
   university = node_collection.one({'_type': "GSystemType", 'name': u"University"}, {'name': 1})
   info_message = "\n university: " + str(university._id) + " -- " + university.name
@@ -555,12 +555,12 @@ def assign_groupid(system_type):
 
     for n in system_type_cur:
       possible_relations = n.get_possible_relations(n.member_of)
-      
+
       if system_type == "Student":
         colg_list = possible_relations["student_belongs_to_college"]["subject_or_right_subject_list"]
       else:
         colg_list = possible_relations["trainer_of_college"]["subject_or_right_subject_list"]
-      
+
       group_set_updated = False
 
       for colg in colg_list:

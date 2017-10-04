@@ -10,7 +10,7 @@ import tempfile
 # import re
 import ast
 import ox
-import pandora_client
+# import pandora_client
 import threading
 
 from PIL import Image, ImageDraw
@@ -32,9 +32,10 @@ from django.contrib.sites.models import Site
 
 from mongokit import paginator
 
-from gnowsys_ndf.settings import GSTUDIO_SITE_VIDEO, EXTRA_LANG_INFO, GAPPS, MEDIA_ROOT, WETUBE_USERNAME, WETUBE_PASSWORD, GSTUDIO_FILE_UPLOAD_FORM
+from gnowsys_ndf.settings import GSTUDIO_SITE_VIDEO, EXTRA_LANG_INFO, GAPPS, MEDIA_ROOT, GSTUDIO_FILE_UPLOAD_FORM
+# from gnowsys_ndf.settings import WETUBE_USERNAME, WETUBE_PASSWORD
 from gnowsys_ndf.ndf.views.notify import set_notif_val
-from gnowsys_ndf.ndf.org2any import org2html
+# from gnowsys_ndf.ndf.org2any import org2html
 from gnowsys_ndf.ndf.models import Node, GSystemType, File, GRelation, STATUS_CHOICES, Triple, node_collection, triple_collection, gridfs_collection
 from gnowsys_ndf.ndf.views.methods import get_node_metadata, get_node_common_fields, create_gattribute, get_page, get_execution_time,set_all_urls,get_group_name_id, get_language_tuple  # , get_page
 from gnowsys_ndf.ndf.views.methods import node_thread_access, create_thread_for_node, create_grelation, delete_grelation
@@ -45,8 +46,6 @@ try:
 except ImportError:  # old pymongo
     from pymongo.objectid import ObjectId
 
-from gnowsys_ndf.ndf.org2any import org2html
-from gnowsys_ndf.ndf.views.moderation import create_moderator_task, get_moderator_group_set
 
 from gnowsys_ndf.ndf.views.tasks import convertVideo
 
@@ -393,7 +392,7 @@ def file(request, group_id, file_id=None, page_no=1):
 
        #  pandora_video_id.append(each['_id'])
       # for each in get_member_set:
-      #     att_set=triple_collection.one({'$and':[{'subject':each['_id']},{'_type':'GAttribute'},{'attribute_type.$id':source_id_at._id}]})
+      #     att_set=triple_collection.one({'$and':[{'subject':each['_id']},{'_type':'GAttribute'},{'attribute_type':source_id_at._id}]})
       #     if att_set:
       #         obj_set={}
       #         obj_set['id']=att_set.object_value
@@ -482,6 +481,23 @@ def get_query_cursor_filetype(operator, member_of_list, group_id, userid, page_n
                                      }
                                     ]
                                 }).sort("last_update", -1)
+
+
+    elif tab_type == "Documents":
+        result_cur = node_collection.find({'member_of': {'$nin':[ObjectId(GST_IMAGE._id), ObjectId(GST_VIDEO._id)]},
+                                            '_type': {'$in': ['File', 'GSystem']},
+                                            'group_set': {'$all': [ObjectId(group_id)]},
+
+                                            'if_file.mime_type': {'$ne': None},
+                                            '$or': [
+                                                {'access_policy': u"PUBLIC"},
+                                                {'$and': [
+                                                    {'access_policy': u"PRIVATE"},
+                                                    {'created_by': userid}
+                                                ]
+                                             }
+                                            ]
+                                        }).sort("last_update", -1)
 
 
     else:
@@ -576,10 +592,10 @@ def paged_file_objs(request, group_id, filetype, page_no):
 
         elif filetype == "Documents":
             if app == "File":
-                result_dict = get_query_cursor_filetype('$nin', [ObjectId(GST_IMAGE._id), ObjectId(GST_VIDEO._id)], group_id, request.user.id, page_no, no_of_objs_pp)
+                result_dict = get_query_cursor_filetype('$nin', [ObjectId(GST_IMAGE._id), ObjectId(GST_VIDEO._id)], group_id, request.user.id, page_no, no_of_objs_pp,"Documents")
 
             # elif app == "E-Library":
-            #     d_Collection = triple_collection.find({'_type': "GAttribute", 'attribute_type.$id': gattr._id,"subject": {'$in': coll} ,"object_value": "Documents"}).sort("last_update", -1)
+            #     d_Collection = triple_collection.find({'_type': "GAttribute", 'attribute_type': gattr._id,"subject": {'$in': coll} ,"object_value": "Documents"}).sort("last_update", -1)
 
             #     doc = []
             #     for e in d_Collection:
@@ -610,7 +626,7 @@ def paged_file_objs(request, group_id, filetype, page_no):
             if app == "File":
                 result_dict = get_query_cursor_filetype('$all', [ObjectId(GST_IMAGE._id), GST_FILE._id], group_id, request.user.id, page_no, no_of_objs_pp)
             # elif app == "E-Library":
-            #     img_Collection = triple_collection.find({'_type': "GAttribute", 'attribute_type.$id': gattr._id,"subject": {'$in': coll} ,"object_value": "Images"}).sort("last_update", -1)
+            #     img_Collection = triple_collection.find({'_type': "GAttribute", 'attribute_type': gattr._id,"subject": {'$in': coll} ,"object_value": "Images"}).sort("last_update", -1)
             #     image = []
             #     for e in img_Collection:
             #         image.append(e.subject)
@@ -659,7 +675,7 @@ def paged_file_objs(request, group_id, filetype, page_no):
 
 
             # elif app == "E-Library":
-            #     vid_Collection = node_collection.find({'_type': "GAttribute", 'attribute_type.$id': gattr._id,"subject": {'$in': coll} ,"object_value": "Videos"}).sort("last_update", -1)
+            #     vid_Collection = node_collection.find({'_type': "GAttribute", 'attribute_type': gattr._id,"subject": {'$in': coll} ,"object_value": "Videos"}).sort("last_update", -1)
             #     video = []
             #     for e in vid_Collection:
             #         video.append(e.subject)
@@ -680,7 +696,7 @@ def paged_file_objs(request, group_id, filetype, page_no):
             #     result_pages = paginator.Paginator(result_paginated_cur, page_no, no_of_objs_pp)
 
         # elif filetype == "interactives" and app == "E-Library":
-        #     interCollection = triple_collection.find({'_type': "GAttribute", 'attribute_type.$id': gattr._id, "subject": {'$in': coll} ,"object_value": "Interactives"}).sort("last_update", -1)
+        #     interCollection = triple_collection.find({'_type': "GAttribute", 'attribute_type': gattr._id, "subject": {'$in': coll} ,"object_value": "Interactives"}).sort("last_update", -1)
         #     interactive = []
         #     for e in interCollection:
         #         interactive.append(e.subject)
@@ -689,7 +705,7 @@ def paged_file_objs(request, group_id, filetype, page_no):
         #     result_pages = paginator.Paginator(result_paginated_cur, page_no, no_of_objs_pp)
 
         # elif filetype == "audio" and app == "E-Library":
-        #     aud_Collection = triple_collection.find({'_type': "GAttribute", 'attribute_type.$id': gattr._id,"subject": {'$in': coll} ,"object_value": "Audios"}).sort("last_update", -1)
+        #     aud_Collection = triple_collection.find({'_type': "GAttribute", 'attribute_type': gattr._id,"subject": {'$in': coll} ,"object_value": "Audios"}).sort("last_update", -1)
 
         #     audio = []
         #     for e in aud_Collection:
@@ -743,6 +759,8 @@ def uploadDoc(request, group_id):
         group_name, group_id = get_group_name_id(group_id)
 
     if request.method == "GET":
+        topic_gst = node_collection.one({'_type': 'GSystemType', 'name': 'Topic'})
+        topic_nodes = node_collection.find({'member_of': {'$in': [topic_gst._id]}})
         program_res = request.GET.get("program_res", "")
         if program_res:
           program_res = eval(program_res)
@@ -755,9 +773,9 @@ def uploadDoc(request, group_id):
             template = "ndf/Uploader_Form.html"
 
     if  page_url:
-        variable = RequestContext(request, {'page_url': page_url,'groupid':group_id,'group_id':group_id, 'program_res':program_res})
+        variable = RequestContext(request, {'page_url': page_url,'groupid':group_id,'group_id':group_id, 'program_res':program_res,'topic_nodes':topic_nodes})
     else:
-        variable = RequestContext(request, {'groupid':group_id,'group_id':group_id,'program_res':program_res})
+        variable = RequestContext(request, {'groupid':group_id,'group_id':group_id,'program_res':program_res,'topic_nodes':topic_nodes})
     return render_to_response(template, variable)
 
 
@@ -794,7 +812,7 @@ def submitDoc(request, group_id):
         content_org = request.POST.get('content_org', '')
         access_policy = request.POST.get("login-mode", '') # To add access policy(public or private) to file object
         tags = request.POST.get('tags', "")
-        license = request.POST.get("License", "")
+        copyright = request.POST.get("Copyright", "")
         source = request.POST.get("Source", "")
         Audience = request.POST.getlist("audience", "")
         fileType = request.POST.get("FileType", "")
@@ -822,11 +840,11 @@ def submitDoc(request, group_id):
                 if index == 0:
                     # f, is_video = save_file(each, mtitle, userid, group_id, content_org, tags, img_type, language, usrname, access_policy, oid=True)
 
-                    f, is_video = save_file(each, mtitle, userid, group_id, content_org, tags, img_type, language, usrname, access_policy, license, source, Audience, fileType, subject, level, Based_url, co_contributors, request, map_geojson_data)
+                    f, is_video = save_file(each, mtitle, userid, group_id, content_org, tags, img_type, language, usrname, access_policy, copyright, source, Audience, fileType, subject, level, Based_url, co_contributors, request, map_geojson_data)
 
                 else:
                     title = mtitle + "_" + str(i)  # increament title
-                    f, is_video = save_file(each, title, userid, group_id, content_org, tags, img_type, language, usrname, access_policy, license, source, Audience, fileType, subject, level, Based_url, co_contributors, request, map_geojson_data)
+                    f, is_video = save_file(each, title, userid, group_id, content_org, tags, img_type, language, usrname, access_policy, copyright, source, Audience, fileType, subject, level, Based_url, co_contributors, request, map_geojson_data)
                     i = i + 1
             else:
                 title = each.name
@@ -836,7 +854,7 @@ def submitDoc(request, group_id):
             # if not obj_id_instance.is_valid(f):
             # check if file is already uploaded file
             # if isinstance(f, list):
-                f, is_video = save_file(each,title,userid,group_id, content_org, tags, img_type, language, usrname, access_policy, license, source, Audience, fileType, subject, level, Based_url, co_contributors, request, map_geojson_data)
+                f, is_video = save_file(each,title,userid,group_id, content_org, tags, img_type, language, usrname, access_policy, copyright, source, Audience, fileType, subject, level, Based_url, co_contributors, request, map_geojson_data)
                 try:
                     ObjectId(f)
                 except:
@@ -927,6 +945,8 @@ def submitDoc(request, group_id):
                     # print "----------4-----------"
                     fileobj = node_collection.one({'_id': ObjectId(f)})
                     # newly appended group id in group_set is at last
+                    from gnowsys_ndf.ndf.views.moderation import create_moderator_task
+
                     t = create_moderator_task(request, fileobj.group_set[0], fileobj._id,on_upload=True)
                     # return HttpResponseRedirect(reverse('moderation_status', kwargs={'group_id': fileobj.group_set[1], 'node_id': f }))
                     return HttpResponseRedirect(reverse('moderation_status', kwargs={'group_id': group_object.name, 'node_id': f }))
@@ -947,7 +967,7 @@ def submitDoc(request, group_id):
 
 first_object = ''
 @get_execution_time
-def save_file(files,title, userid, group_id, content_org, tags, img_type=None, language=None, usrname=None, access_policy=None, license=None, source=None, Audience=None, fileType=None, subject=None, level=None, Based_url=None, co_contributors="", request=None, map_geojson_data=[], **kwargs):
+def save_file(files,title, userid, group_id, content_org, tags, img_type=None, language=None, usrname=None, access_policy=None, copyright=None, source=None, Audience=None, fileType=None, subject=None, level=None, Based_url=None, co_contributors="", request=None, map_geojson_data=[], **kwargs):
     """
       this will create file object and save files in gridfs collection
     """
@@ -1036,6 +1056,7 @@ def save_file(files,title, userid, group_id, content_org, tags, img_type=None, l
             if "CourseEventGroup" not in group_object.member_of_names_list:
                 # if group is of EDITABLE_MODERATED, update group_set accordingly
                 if group_object.edit_policy == "EDITABLE_MODERATED":
+                    from gnowsys_ndf.ndf.views.moderation import get_moderator_group_set
                     fileobj.group_set = get_moderator_group_set(fileobj.group_set, group_object._id)
                     fileobj.status = u'MODERATION'
 
@@ -1071,7 +1092,7 @@ def save_file(files,title, userid, group_id, content_org, tags, img_type=None, l
                     fileobj.tags = tags
 
             # new fields added
-            fileobj.license = unicode(license)
+            fileobj.legal['copyright'] = unicode(copyright)
 
             fileobj.location = map_geojson_data
             fileobj.save(groupid=group_id)
@@ -1511,7 +1532,7 @@ def file_detail(request, group_id, _id):
 
     if auth:
         has_shelf_RT = node_collection.one({'_type': 'RelationType', 'name': u'has_shelf' })
-        shelf = triple_collection.find({'_type': 'GRelation', 'subject': ObjectId(auth._id), 'relation_type.$id': has_shelf_RT._id })
+        shelf = triple_collection.find({'_type': 'GRelation', 'subject': ObjectId(auth._id), 'relation_type': has_shelf_RT._id })
         #a temp. variable which stores the lookup for append method
         shelves_append_temp=shelves.append
         if shelf:

@@ -23,7 +23,7 @@ from gnowsys_ndf.settings import GAPPS
 from gnowsys_ndf.ndf.models import GSystemType, GSystem,Node
 from gnowsys_ndf.ndf.views.notify import set_notif_val
 import datetime
-from gnowsys_ndf.ndf.org2any import org2html
+# from gnowsys_ndf.ndf.org2any import org2html
 try:
     from bson import ObjectId
 except ImportError:  # old pymongo
@@ -64,7 +64,7 @@ def output(request, group_id, meetingid):
             group_ins = node_collection.find_one({'_type': "Group", "_id": ObjectId(group_id)})
             pass
             #template = "https://chatb/#"+meetingid
-	
+
 	return render_to_response("ndf/newmeeting.html",{'group_id': group_id, 'appId':app._id, 'groupid':group_id,'newmeetingid':newmeetingid},context_instance=RequestContext(request))
 
 
@@ -89,13 +89,13 @@ def dashb(request, group_id):                                                   
         group_id = ObjectId(group_id)
     except:
         group_name, group_id = get_group_name_id(group_id)
-        
+
     online_users = cache.get(CACHE_USERS)
-    online_users = simplejson.dumps(online_users, default=encode_json)	
+    online_users = simplejson.dumps(online_users, default=encode_json)
     #print "\n inside meeting \n"
     # print "\ngroup_id: ", group_id,"\n"
-    
-    
+
+
 
     return render_to_response("ndf/meeting.html",{'group_id': group_id,'appId':app._id,'groupid':group_id,'online_users':online_users,'meetingid':ins_objectid},context_instance=RequestContext(request))
 
@@ -128,7 +128,7 @@ def invite_meeting(request, group_id, meetingid):                               
             #print "\n\nmsg : ", msg
 
             ret=""
-            
+
             bx=User.objects.get(username=recipient)
             ret = set_notif_val(request,group_id,msg,activ,bx)
             if bx.id not in colg.author_set:

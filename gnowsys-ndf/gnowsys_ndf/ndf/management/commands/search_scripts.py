@@ -43,14 +43,14 @@ def update_structure():
   '''
 
   # For ReducedDocs
-  rd_cur = collection.ReducedDocs.find({'is_indexed': {'$exists': True}, 'license': {'$exists': True}})
+  rd_cur = collection.ReducedDocs.find({'is_indexed': {'$exists': True}, 'legal': {'$exists': True}})
   print "\n No. of ReducedDocs document(s) with invalid structure found: ", rd_cur.count()
   if rd_cur.count():
     c = 0
     print " Updating:"
     for i, each in enumerate(rd_cur):
       res = collection.update({'_id': each._id}, 
-                              {'$unset': {'access_policy': "", 'annotations': "", 'collection_set': "", 'group_set': "", 'language': "", 'license': "", 'location': "", 'modified_by': "", 'post_node': "", 'property_order': "", 'rating': ""},
+                              {'$unset': {'access_policy': "", 'annotations': "", 'collection_set': "", 'group_set': "", 'language': "", 'legal': "", 'location': "", 'modified_by': "", 'post_node': "", 'property_order': "", 'rating': ""},
                                 '$set': {'_type': u'ReducedDocs'}
                               },
                               upsert=False, multi=False
@@ -62,14 +62,14 @@ def update_structure():
     print "\n No. of ReducedDocs documents' structure cleaned (& added _type field): ", c, "\n"
 
   # For ToReduceDocs
-  trd_cur = collection.ToReduceDocs.find({'doc_id': {'$exists': True}, 'license': {'$exists': True}})
+  trd_cur = collection.ToReduceDocs.find({'doc_id': {'$exists': True}, 'legal': {'$exists': True}})
   print "\n No. of ToReduceDocs document(s) with invalid structure found: ", trd_cur.count()
   if trd_cur.count():
     c = 0
     print " Updating:"
     for i, each in enumerate(trd_cur):
       res = collection.update({'_id': each._id}, 
-                              {'$unset': {'access_policy': "", 'annotations': "", 'collection_set': "", 'group_set': "", 'language': "", 'license': "", 'location': "", 'modified_by': "", 'post_node': "", 'property_order': "", 'rating': ""},
+                              {'$unset': {'access_policy': "", 'annotations': "", 'collection_set': "", 'group_set': "", 'language': "", 'legal': "", 'location': "", 'modified_by': "", 'post_node': "", 'property_order': "", 'rating': ""},
                                 '$set': {'_type': u'ToReduceDocs'}
                               },
                               upsert=False, multi=False
@@ -81,14 +81,14 @@ def update_structure():
     print "\n No. of ToReduceDocs document(s)' structure cleaned (& added _type field): ", c, "\n"
 
   # For IndexedWordList
-  iwl_cur = collection.IndexedWordList.find({'word_start_id': {'$exists': True}, 'license': {'$exists': True}})
+  iwl_cur = collection.IndexedWordList.find({'word_start_id': {'$exists': True}, 'legal': {'$exists': True}})
   print "\n No. of IndexedWordList document(s) with invalid structure found: ", iwl_cur.count()
   if iwl_cur.count():
     c = 0
     print " Updating:"
     for i, each in enumerate(iwl_cur):
       res = collection.update({'_id': each._id}, 
-                              {'$unset': {'access_policy': "", 'annotations': "", 'collection_set': "", 'group_set': "", 'language': "", 'license': "", 'location': "", 'modified_by': "", 'post_node': "", 'property_order': "", 'rating': ""},
+                              {'$unset': {'access_policy': "", 'annotations': "", 'collection_set': "", 'group_set': "", 'language': "", 'legal': "", 'location': "", 'modified_by': "", 'post_node': "", 'property_order': "", 'rating': ""},
                                 '$set': {'_type': u'IndexedWordList'}
                               },
                               upsert=False, multi=False

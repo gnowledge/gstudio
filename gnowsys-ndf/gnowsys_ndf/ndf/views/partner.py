@@ -106,7 +106,7 @@ def create_partner(request,group_id):
       # shelf_list = {}
 
       # if auth:
-      #   shelf = triple_collection.find({'_type': 'GRelation', 'subject': ObjectId(auth._id), 'relation_type.$id': has_shelf_RT._id })
+      #   shelf = triple_collection.find({'_type': 'GRelation', 'subject': ObjectId(auth._id), 'relation_type': has_shelf_RT._id })
 
       #   if shelf:
       #     for each in shelf:
