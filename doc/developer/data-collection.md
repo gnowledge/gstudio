@@ -67,25 +67,34 @@ we have a provision to collect data from the said platforms and both may reside 
 ### EXAMPLE STRUCTURE:
 ```
 Example-data-collection-dir-str/
-├── ct
-│   └── 1011011-ct11
-│       ├── gstudio
-│       │   ├── db
-│       │   ├── git-commit.log
-│       │   ├── local_settings.py
-│       │   ├── media
-│       │   ├── pgdump-20170921-1305.sql
-│       │   ├── rcs-repo
-│       │   └── server_settings.py
-│       └── unplatform
-└── mz
-    └── 2031001-mz1
-        └── gstudio
-            ├── db
-            ├── git-commit.log
-            ├── local_settings.py
-            ├── media
-            ├── pgdump-20170921-1305.sql
-            ├── rcs-repo
-            └── server_settings.py
+├── 2016
+└── 2017
+    ├── ct
+    │   └── 01011011-ct11
+    │       ├── gstudio
+    │       │   ├── db
+    │       │   ├── media
+    │       │   ├── rcs-repo
+    │       │   ├── pgdump-20170921-1305.sql
+    │       │   ├── local_settings.py
+    │       │   ├── server_settings.py
+    │       │   ├── git-commit.log
+    │       │   └── assessment-media
+    │       │       ├── repository
+    │       │       └── studentResponseFiles
+    │       └── unplatform
+    └── mz
+        └── 02031001-mz1
+            ├── gstudio
+            │   ├── db
+            │   ├── media
+            │   ├── rcs-repo
+            │   ├── pgdump-20170921-1305.sql
+            │   ├── local_settings.py
+            │   ├── server_settings.py
+            │   ├── git-commit.log
+            │   └── assessment-media
+            │       ├── repository
+            │       └── studentResponseFiles
+            └── unplatform
 ```
