@@ -12,6 +12,8 @@
     - https://staging-clix.tiss.edu: Used as a online Course maker (CMS), Course player (LMS) with analytics, Formative and Summative Assessments, Survey, Buddy login (multiple users at each terminal) and embeddable HTML5 Apps (Interactives, Games and Simulations). Suitable for offline and online use for computer based education.
     - https://abcde.metastudio.org: used as a Personal and a Collaborative Workspaces with Topic Map creator, Activity organizer, Forum/Blog and Digital Library with rating, feedback and feeds.
     
+    Deppending on the need, it is possible to configure an instance with all the three above uses in a single site.
+    
     Gnowledge lab of Homi Bhabha Centre for Science Education, TIFR develops and 
     maintains gStudio as its flagship software development project for supporting online education in collaboration with TISS, MIT and CIET, NCERT.
     
