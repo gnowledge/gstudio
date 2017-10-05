@@ -41,7 +41,7 @@ from gnowsys_ndf.ndf.views.analytics_methods import *
 from gnowsys_ndf.ndf.views.methods import create_gattribute, create_grelation, create_task, delete_grelation, node_thread_access, get_group_join_status, delete_node
 from gnowsys_ndf.notification import models as notification
 from gnowsys_ndf.settings import GSTUDIO_NOTE_CREATE_POINTS, GSTUDIO_QUIZ_CORRECT_POINTS, GSTUDIO_COMMENT_POINTS, GSTUDIO_FILE_UPLOAD_POINTS
-from gnowsys_ndf.ndf.views.trash import trash_resource 
+from gnowsys_ndf.ndf.views.trash import trash_resource
 from gnowsys_ndf.ndf.views.translation import get_lang_node,get_trans_node_list,get_course_content_hierarchy, get_unit_hierarchy
 from gnowsys_ndf.ndf.views.assessment_analytics import user_assessment_results
 
@@ -2061,7 +2061,7 @@ def activity_player_detail(request, group_id, lesson_id, activity_id):
     if trans_lesson_node:
         lesson_name = trans_lesson_node.name
     else:
-        lesson_name  = lesson_node.name 
+        lesson_name  = lesson_node.name
     # all metadata reg position and next prev of resource
     translation_obj = node_obj.get_relation('translation_of')
 
@@ -2074,7 +2074,7 @@ def activity_player_detail(request, group_id, lesson_id, activity_id):
     trans_act_list = get_trans_node_list(lesson_node.collection_set,request.LANGUAGE_CODE)
 
     resource_index = lesson_obj_collection_set.index(node_obj._id)
- 
+
     if (resource_index + 1) < resource_count:
         resource_next_id = lesson_node.collection_set[resource_index + 1]
 
@@ -2241,7 +2241,7 @@ def course_notebook(request, group_id, node_id=None, tab="my-notes"):
     if 'Author' in group_obj.member_of_names_list:
             template = 'ndf/lms.html'
             show_analytics_notifications = False
-          
+
 
     # page_gst = node_collection.one({'_type': "GSystemType", 'name': "Page"})
     # blogpage_gst = node_collection.one({'_type': "GSystemType", 'name': "Blog page"})
@@ -2317,9 +2317,9 @@ def course_notebook(request, group_id, node_id=None, tab="my-notes"):
             tab = 'all-notes'
 
         if notebook_obj:
-            # return HttpResponseRedirect(reverse('course_notebook_tab_note', 
+            # return HttpResponseRedirect(reverse('course_notebook_tab_note',
                 # kwargs={'group_id': group_id, "node_id": notebook_obj.pk, 'tab': tab}))
-            return HttpResponseRedirect(reverse('course_notebook_note', 
+            return HttpResponseRedirect(reverse('course_notebook_note',
                 kwargs={'group_id': group_id, "node_id": notebook_obj.pk}))
 
     context_variables.update({'allow_to_comment': allow_to_comment})
@@ -2375,12 +2375,12 @@ def course_raw_material(request, group_id, node_id=None,page_no=1):
     asset_gst_name, asset_gst_id = GSystemType.get_gst_name_id("Asset")
     # asset_nodes = node_collection.find({'member_of': {'$in': [asset_gst_id]},
     #         'group_set': {'$all': [ObjectId(group_id)]},'tags': "raw@material"}).sort('last_update', -1)
-    
+
     asset_nodes = GSystem.query_list(group_id, 'Asset', request.user.id,tags="raw@material")
-    
+
     # from collections import defaultdict
     # asset_thumbnail = defaultdict(list)
-    
+
     # data_list = []
     # for each in asset_nodes:
     #     grel_asstcontent = get_relation_value (each.pk, 'has_assetcontent')
@@ -2389,7 +2389,7 @@ def course_raw_material(request, group_id, node_id=None,page_no=1):
     #             if each_rel['if_file']['original']['relurl']:
     #                 asset_thumbnail[each._id].append(each_rel['if_file']['original']['relurl'])
     #             data_list.append(asset_thumbnail)
-    
+
 
     for each in asset_nodes:
         each.get_neighbourhood(each.member_of)
@@ -2451,7 +2451,7 @@ def course_raw_material(request, group_id, node_id=None,page_no=1):
     if gstaff_access:
         allow_to_upload = True
     template = 'ndf/gcourse_event_group.html'
-    
+
     if "announced_unit" in group_obj.member_of_names_list or "Group" in group_obj.member_of_names_list:
         template = 'ndf/lms.html'
         # assets_page_info = paginator.Paginator(asset_nodes, page_no, GSTUDIO_NO_OF_OBJS_PP)
@@ -2462,7 +2462,7 @@ def course_raw_material(request, group_id, node_id=None,page_no=1):
     if 'Author' in group_obj.member_of_names_list:
         template = 'ndf/lms.html'
 
-    
+
 
     context_variables.update({'title':'raw material' ,'files_cur': files_cur,'raw_material_page_info':raw_material_page_info ,'allow_to_upload': allow_to_upload,'allow_to_join': allow_to_join})
     return render_to_response(template,
@@ -2535,20 +2535,20 @@ def course_gallery(request, group_id,node_id=None,page_no=1):
         context_variables.update({'files_cur': files_cur})
         gallery_page_info = paginator.Paginator(files_cur, page_no, GSTUDIO_NO_OF_OBJS_PP)
         context_variables.update({'gallery_page_info':gallery_page_info,'coll_cur':files_cur})
-    
+
     asset_gst_name, asset_gst_id = GSystemType.get_gst_name_id("Asset")
-    
+
     # asset_nodes = node_collection.find({'member_of': {'$in': [asset_gst_id]},
     #         'group_set': {'$all': [ObjectId(group_id)]},'tags': "asset@gallery"}).sort('last_update', -1)
     asset_nodes = GSystem.query_list(group_id, 'Asset', request.user.id,tags="asset@gallery")
     template = 'ndf/gcourse_event_group.html'
-    
+
     if "announced_unit" in group_obj.member_of_names_list or "Group" in group_obj.member_of_names_list and 'base_unit' not in group_obj.member_of_names_list:
         template = 'ndf/lms.html'
         # assets_page_info = paginator.Paginator(asset_nodes, page_no, GSTUDIO_NO_OF_OBJS_PP)
         # context_variables.update({'assets_page_info':assets_page_info})
-    
-    
+
+
     if 'Author' in group_obj.member_of_names_list:
         template = 'ndf/lms.html'
 
@@ -2581,7 +2581,7 @@ def course_about(request, group_id):
 
       # print 'Weeks:', (end_day - start_day).days / 7
       weeks_count = (end_day - start_day).days / 7
-    
+
     show_analytics_notifications = True
     template = 'ndf/gcourse_event_group.html'
     context_variables = {
@@ -2589,7 +2589,7 @@ def course_about(request, group_id):
             'group_obj': group_obj, 'title': 'about', 'allow_to_join': allow_to_join,
             'weeks_count': weeks_count
         }
-    
+
     if 'BaseCourseGroup' in group_obj.member_of_names_list:
         template = 'ndf/basecourse_group.html'
         show_analytics_notifications = False
@@ -2597,7 +2597,7 @@ def course_about(request, group_id):
     if 'Author' in group_obj.member_of_names_list:
         template = 'ndf/lms.html'
         show_analytics_notifications = False
-    
+
     if 'base_unit' in group_obj.member_of_names_list :
         template = 'ndf/gevent_base.html'
         show_analytics_notifications = False
@@ -2605,10 +2605,10 @@ def course_about(request, group_id):
         educationallevel = get_attribute_value(group_obj._id,"educationallevel")
         context_variables.update({'educationalsubject_val': educationalsubject,
             "educationallevel_val": educationallevel})
-    
+
     if 'announced_unit' in group_obj.member_of_names_list or 'Group' in group_obj.member_of_names_list and 'base_unit' not in group_obj.member_of_names_list:
         template = 'ndf/lms.html'
-    
+
     banner_pic_obj,old_profile_pics = _get_current_and_old_display_pics(group_obj)
     context_variables.update({'old_profile_pics':old_profile_pics,
                         "prof_pic_obj": banner_pic_obj,
@@ -2834,7 +2834,7 @@ def course_analytics(request, group_id, user_id, render_template=False, get_resu
             })
     data_points_dict = {}
     assessment_and_quiz_data = kwargs.get('assessment_and_quiz_data', False)
-    
+
     try:
         # user_obj = User.objects.get(pk=int(user_id))
         author_obj = node_collection.one({ '_type': u'Author', 'created_by': int(user_id) })
@@ -2932,7 +2932,7 @@ def course_analytics(request, group_id, user_id, render_template=False, get_resu
             for each_lesson_key, each_lesson_val in each_lesson_dict.iteritems():
                 if each_lesson_key == 'id':
                     lesson_id = each_lesson_dict[each_lesson_key]
-                    
+
                 if each_lesson_key == 'activities':
                     all_activities = all_activities + len(each_lesson_dict[each_lesson_key])
                     for each_act_dict in each_lesson_dict[each_lesson_key]:
@@ -3468,19 +3468,18 @@ def assets(request, group_id, asset_id=None,page_no=1):
             'asset_nodes':asset_nodes,'asset_content_list':asset_content_list,
             'group_obj':group_obj
         }
-        if 'announced_unit' in group_obj.member_of_names_list or 'Group' in group_obj.member_of_names_list and 'base_unit' not in group_obj.member_of_names_list :
-            template = 'ndf/lms.html'     
+        if ('announced_unit' in group_obj.member_of_names_list or 'Group' in group_obj.member_of_names_list or 'Author' in group_obj.member_of_names_list ) and 'base_unit' not in group_obj.member_of_names_list :
+            template = 'ndf/lms.html'
             if 'raw@material' in asset_obj.tags:
                 context_variables.update({'title':'raw_material_detail'})
             if 'asset@gallery' in asset_obj.tags:
                 context_variables.update({'title':'asset_gallery_detail'})
-            
-        
+
+
         return render_to_response(template,
                                     context_variables,
                                     context_instance = RequestContext(request)
         )
-    print "000000000000000000"
     asset_nodes = node_collection.find({'member_of': {'$in': [asset_gst_id]},
         'group_set': {'$all': [ObjectId(group_id)]},
         '$and': [
@@ -3498,7 +3497,7 @@ def assets(request, group_id, asset_id=None,page_no=1):
             'asset_nodes': asset_nodes,'title':'asset_list',
             'group_obj':group_obj,'assets_page_info':assets_page_info
         }
-    
+
     if 'announced_unit' in group_obj.member_of_names_list:
             template = 'ndf/lms.html'
     return render_to_response(template,
@@ -3528,14 +3527,14 @@ def assetcontent_detail(request, group_id, asset_id,asst_content_id,page_no=1):
                                 current_group_id=group_obj._id.__str__(),
                                 loggedin_userid=request.user.id)
 
-    if ("announced_unit" in group_obj.member_of_names_list or "Group" in group_obj.member_of_names_list) and  ("raw@material" in asset_obj.tags or "asset@gallery" in asset_obj.tags) :
+    if ("announced_unit" in group_obj.member_of_names_list or "Group" in group_obj.member_of_names_list or 'Author' in group_obj.member_of_names_list ) and  ("raw@material" in asset_obj.tags or "asset@gallery" in asset_obj.tags) :
         template = 'ndf/lms.html'
         if "raw@material" in asset_obj.tags:
             context_variables.update( {'title':"raw_material_detail"})
         if "asset@gallery" in asset_obj.tags:
             context_variables.update( {'title':"asset_gallery_detail"})
-            
-    
+
+
     return render_to_response(template,
                                 context_variables,
                                 context_instance = RequestContext(request)
@@ -3595,7 +3594,7 @@ def create_edit_asset_page(request, group_id, asset_id, page_id=None ):
             'cancel_activity_url': reverse('course_pages',
                                         kwargs={
                                         'group_id': group_id,
-                                        
+
                                         })}
     if page_id:
         node_obj = node_collection.one({'_id': ObjectId(page_id)})
@@ -3626,7 +3625,7 @@ def course_pages(request, group_id, page_id=None,page_no=1):
 
     if page_id:
         node_obj = node_collection.one({'_id': ObjectId(page_id)})
-        
+
         rt_translation_of = Node.get_name_id_from_type('translation_of', 'RelationType', get_obj=True)
 
         other_translations_grels = triple_collection.find({
@@ -3636,7 +3635,7 @@ def course_pages(request, group_id, page_id=None,page_no=1):
                             'right_subject': {'$nin': [node_obj._id]}
                         })
         other_translations = node_collection.find({'_id': {'$in': [r.right_subject for r in other_translations_grels]} })
-        
+
         context_variables.update({'activity_node': node_obj, 'hide_breadcrumbs': True,'other_translations':other_translations})
         context_variables.update({'editor_view': False})
 
@@ -3664,7 +3663,7 @@ def save_course_page(request, group_id):
     if tags:
         tags = json.loads(tags)
     else:
-        tags = []    
+        tags = []
     template = 'ndf/gevent_base.html'
     page_gst_name, page_gst_id = GSystemType.get_gst_name_id("Page")
     page_obj = None
@@ -3688,7 +3687,7 @@ def save_course_page(request, group_id):
             if is_info_page == "Info":
                 info_page_gst_name, info_page_gst_id = GSystemType.get_gst_name_id('Info page')
                 page_obj.type_of = [info_page_gst_id]
-        
+
         if activity_lang:
             language = get_language_tuple(activity_lang)
             page_obj.language = language
@@ -3732,7 +3731,7 @@ def save_asset_page(request, group_id, asset_id):
     if tags:
         tags = json.loads(tags)
     else:
-        tags = []    
+        tags = []
     template = 'ndf/gevent_base.html'
     page_gst_name, page_gst_id = GSystemType.get_gst_name_id("Page")
     page_obj = None
@@ -3756,11 +3755,11 @@ def save_asset_page(request, group_id, asset_id):
             if is_info_page == "Info":
                 info_page_gst_name, info_page_gst_id = GSystemType.get_gst_name_id('Info page')
                 page_obj.type_of = [info_page_gst_id]
-        
+
         if activity_lang:
             language = get_language_tuple(activity_lang)
             page_obj.language = language
-        
+
         page_obj.fill_gstystem_values(tags=tags)
         page_obj.name = unicode(name)
         page_obj.content = unicode(content)
@@ -3773,12 +3772,12 @@ def save_asset_page(request, group_id, asset_id):
         asset_grels = triple_collection.find({'_type': 'GRelation', \
         'relation_type': rt_has_asset_content._id,'subject': asset_obj._id},
         {'_id': 0, 'right_subject': 1})
-        
+
         for each_asset in asset_grels:
             asset_contents_list.append(each_asset['right_subject'])
-        
+
         create_grelation(asset_obj._id, rt_has_asset_content, asset_contents_list)
-        
+
         return HttpResponseRedirect(reverse("assetcontent_detail",
          kwargs={'group_id': group_id, 'asset_id': asset_id,'asst_content_id':page_obj._id}))
 
@@ -3927,8 +3926,8 @@ def widget_page_create_edit(request, group_id, node_id=None):
 @login_required
 def load_assessment_analytics(request, group_id):
     domain = request.GET.get('domain')
-    result_set = {'correct_attempted_quizitems': 0, 'visited_quizitems': 0, 
-    'unattempted_quizitems': 0, 'attempted_quizitems': 0, 
+    result_set = {'correct_attempted_quizitems': 0, 'visited_quizitems': 0,
+    'unattempted_quizitems': 0, 'attempted_quizitems': 0,
     'incorrect_attempted_quizitems': 0, 'notapplicable_quizitems': 0}
     user_id = request.GET.get('user_id')
     group_obj = get_group_name_id(group_id, get_obj=True)
@@ -3937,7 +3936,7 @@ def load_assessment_analytics(request, group_id):
     # Variable Decalarations
     correctAttemptCount = unattemptedCount = 0
     notapplicableCount = incorrectCount = attemptedCount = 0
-    count_dict = {'correctAttemptCount': correctAttemptCount, 
+    count_dict = {'correctAttemptCount': correctAttemptCount,
         'unattemptedCount': unattemptedCount, 'notapplicableCount': notapplicableCount,
         'incorrectCount': incorrectCount, 'attemptedCount': attemptedCount}
     total_items = 0
@@ -3965,7 +3964,7 @@ def load_assessment_analytics(request, group_id):
                                 #create
                                 if not counter_obj['assessment']:
                                     assessment_dict = {'id': each_sublist[1], 'correct': user_data_set['Correct'],
-                                    'notapplicable': user_data_set['NotApplicable'], 'attempted': user_data_set['Attempted'], 
+                                    'notapplicable': user_data_set['NotApplicable'], 'attempted': user_data_set['Attempted'],
                                     'incorrect': user_data_set['Incorrect']}
                                     counter_obj['assessment'].append(assessment_dict)
                                     counter_obj['group_points'] += (user_data_set['Correct'] * GSTUDIO_QUIZ_CORRECT_POINTS)
@@ -4028,7 +4027,7 @@ def update_assessment_analytics_for_buddies(offeredId, user_ids, logged_in_user_
             #create
             if not counter_obj['assessment']:
                 assessment_dict = {'id': offeredId, 'correct': user_data_set['Correct'],
-                'notapplicable': user_data_set['NotApplicable'], 'attempted': user_data_set['Attempted'], 
+                'notapplicable': user_data_set['NotApplicable'], 'attempted': user_data_set['Attempted'],
                 'incorrect': user_data_set['Incorrect']}
                 counter_obj['assessment'].append(assessment_dict)
                 counter_obj['group_points'] += (user_data_set['Correct'] * GSTUDIO_QUIZ_CORRECT_POINTS)
@@ -4071,7 +4070,7 @@ def update_assessment_analytics_for_buddies(offeredId, user_ids, logged_in_user_
 #     trans_node_list = []
 #     for each in node_list:
 #         each_node = get_lang_node(each,lang)
-#         if each_node :  
+#         if each_node :
 #             # trans_node_list.append({ObjectId(each_node._id): {"name":(each_node.altnames or each_node.name),"basenodeid":ObjectId(each)}})
 #             trans_node_list.append({ObjectId(each_node._id): {"name": each_node.name, "basenodeid":ObjectId(each)}})
 #         else:
@@ -4092,7 +4091,7 @@ def get_trans_node_list(node_list,lang):
     trans_node_list = []
     for each in node_list:
         each_node = get_lang_node(each,lang)
-        if each_node :  
+        if each_node :
             # trans_node_list.append({ObjectId(each_node._id): {"name":(each_node.altnames or each_node.name),"basenodeid":ObjectId(each)}})
             trans_node_list.append({ObjectId(each_node._id): {"name": each_node.name, "altnames": each_node.altnames, "basenodeid":ObjectId(each)}})
         else:
@@ -4157,19 +4156,19 @@ def course_quiz_data(request, group_id):
     for each_record in record_set['result']:
         for record_key,record_val in each_record.items():
             if record_key == "user_id":
-                # To prevent in error in case where 
+                # To prevent in error in case where
                 # User object does not exist, return user-id
                 user_obj = User.objects.get(pk=int(record_val))
                 if user_obj:
                     username = user_obj.username
                 else:
-                    username = record_val                    
+                    username = record_val
                 each_record['user_id'] = username
 
             if record_key == "thread_node" and record_val:
                 # QuizItemPost's prior_node list contains ObjectId
                 # of its Thread node and QuizItemEvent node
-                qie_node = node_collection.find_one({'_id': {'$in': record_val}, 
+                qie_node = node_collection.find_one({'_id': {'$in': record_val},
                     'name': {'$regex': '^(?!Thread of).*'}})
                 each_record['name'] = qie_node.content
 
@@ -4244,6 +4243,6 @@ def finish_lesson(request, group_id, node_id):
                     lesson_node.save(groupid=group_id)
                     response_dict.update({'success': True})
     except Exception as complete_node_err:
-      print "\nError occurred in complete_node(). ", complete_node_err 
+      print "\nError occurred in complete_node(). ", complete_node_err
       pass
     return HttpResponse(json.dumps(response_dict))
