@@ -17,6 +17,7 @@ from django.contrib.auth.decorators import login_required
 from django.contrib.sites.models import Site
 from django.core.cache import cache
 from mongokit import IS
+from django.core.exceptions import PermissionDenied
 from mongokit import paginator
 try:
     from bson import ObjectId
@@ -3462,6 +3463,9 @@ def assets(request, group_id, asset_id=None,page_no=1):
             'group_set': {'$all': [ObjectId(group_id)]}}).sort('last_update', -1)
         # topic_nodes = node_collection.find({'member_of': {'$in': [topic_gst_id]}})
         # assetcontent_page_info = paginator.Paginator(asset_content_list['grel_node'], page_no, GSTUDIO_NO_OF_OBJS_PP)
+        if asset_obj.access_policy == "PRIVATE" and asset_obj.created_by != request.user.id:
+            print "55555555555555555555555"
+            raise PermissionDenied
         context_variables = {
             'group_id': group_id, 'groupid': group_id,
             'title':'asset_detail','asset_obj':asset_obj,
