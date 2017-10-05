@@ -4,25 +4,28 @@
 
 {# {% extends "ndf/base.html" %} #}
 
-{% load get_nroer_menu  get_user_group  get_group_object  get_existing_groups_excluded  get_profile_pic  get_gapps_iconbar user_access_policy get_user_object check_is_gstaff get_attribute_value get_sg_member_of get_relation_value get_explore_url from ndf_tags %}
+{% load get_nroer_menu  get_user_group  get_group_object  get_existing_groups_excluded  get_profile_pic  get_gapps_iconbar user_access_policy get_user_object check_is_gstaff get_attribute_value get_sg_member_of get_relation_value get_explore_url get_gstudio_landing_page_logo get_gstudio_landing_page_text get_gstudio_landing_page_bg from ndf_tags %}
 
 
 {% get_explore_url as explore_url %}
 
 {% block title %} {{title}} {% endblock title %}
 
-
 {% block body_content %}
+{% get_gstudio_landing_page_logo as landing_page_logo %}
+{% get_gstudio_landing_page_text as landing_page_text %}
+{% get_gstudio_landing_page_bg as landing_page_bg %}
+
 <div class="land_page">
-  <div class='bg-img'>
+  <div class='bg-img' style="background-image : url('{{landing_page_bg}}');">
       <div class="landing_page_background" style="height: 100vh;">
             <div class="row" data-equalizer>
                 <div class="small-6 medium-6 columns clix_brief panel-mod" data-equalizer-watch>
-                  <img src="/static/ndf/images/Clix_logo.png" style='margin: 40px 0px;' title="Invitation to clix."/>
+                  <img src="{{landing_page_logo}}" style='margin: 40px 0px;' title="Invitation to clix."/>
                 </div>
             </div>
             <div class="small-3 medium-4 large-6 columns">
-                <img class="img-style-land" src="/static/ndf/images/Diamonte_simpleText_32-27-april.png" style="margin-left:50px;">
+                <img class="img-style-land" src="{{landing_page_text}}" style="margin-left:50px;">
             </div>
                 {# <div class="small-5 columns"> #}
                 {# <img src="/static/ndf/images/landing_page/bees.svg" class="bees"/> #}
