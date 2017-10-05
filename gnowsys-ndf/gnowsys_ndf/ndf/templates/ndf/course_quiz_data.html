@@ -155,12 +155,12 @@
                     {
                         'title': 'Answer',
                     },
-                    {
-                        'title': 'Datetime',
-                    },
-                    {
-                        'title': 'Answer',
-                    },
+                    // {
+                    //     'title': 'Datetime',
+                    // },
+                    // {
+                    //     'title': 'Answer',
+                    // },
             ],
             "rowsGroup": [
                 'second:name',
@@ -203,7 +203,8 @@
           $(".group-analytics").removeClass("hide")
           old_thead = $("#quiz-details-table-tbody").find("thead");
           tr_ele = document.createElement("tr")
-          tr_list = ["", "","Checked", "Submitted"]
+          // tr_list = ["", "","Checked", "Submitted"]
+          tr_list = ["", "","Submitted"]
           $.each(tr_list, function(ind,val){
             th_ele = document.createElement("th")
             th_ele.textContent = val
