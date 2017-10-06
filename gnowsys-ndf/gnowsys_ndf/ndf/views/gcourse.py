@@ -2354,6 +2354,7 @@ def course_raw_material(request, group_id, node_id=None,page_no=1):
     files_cur = None
     allow_to_join = get_group_join_status(group_obj)
     banner_pic_obj,old_profile_pics = _get_current_and_old_display_pics(group_obj)
+    gstaff_access = check_is_gstaff(group_id,request.user)
     '''
     banner_pic_obj = None
     old_profile_pics = []
@@ -2377,19 +2378,11 @@ def course_raw_material(request, group_id, node_id=None,page_no=1):
     # asset_nodes = node_collection.find({'member_of': {'$in': [asset_gst_id]},
     #         'group_set': {'$all': [ObjectId(group_id)]},'tags': "raw@material"}).sort('last_update', -1)
 
-    asset_nodes = GSystem.query_list(group_id, 'Asset', request.user.id,tags="raw@material")
 
-    # from collections import defaultdict
-    # asset_thumbnail = defaultdict(list)
-
-    # data_list = []
-    # for each in asset_nodes:
-    #     grel_asstcontent = get_relation_value (each.pk, 'has_assetcontent')
-    #     if grel_asstcontent['grel_id']:
-    #         for each_rel in grel_asstcontent['grel_node']:
-    #             if each_rel['if_file']['original']['relurl']:
-    #                 asset_thumbnail[each._id].append(each_rel['if_file']['original']['relurl'])
-    #             data_list.append(asset_thumbnail)
+    if gstaff_access:
+        asset_nodes = GSystem.query_list(group_id, 'Asset', request.user.id,if_gstaff=True,tags="raw@material")
+    else:
+        asset_nodes = GSystem.query_list(group_id, 'Asset', request.user.id,tags="raw@material")
 
 
     for each in asset_nodes:
@@ -2485,7 +2478,7 @@ def course_gallery(request, group_id,node_id=None,page_no=1):
     allow_to_join = query_dict = None
     allow_to_join = get_group_join_status(group_obj)
     banner_pic_obj,old_profile_pics = _get_current_and_old_display_pics(group_obj)
-
+    gstaff_access = check_is_gstaff(group_id,request.user)
     context_variables = {
             'group_id': group_id, 'groupid': group_id, 'group_name':group_name,
             'group_obj': group_obj, 'title': 'gallery', 'allow_to_upload':allow_to_upload,
@@ -2539,9 +2532,11 @@ def course_gallery(request, group_id,node_id=None,page_no=1):
 
     asset_gst_name, asset_gst_id = GSystemType.get_gst_name_id("Asset")
 
-    # asset_nodes = node_collection.find({'member_of': {'$in': [asset_gst_id]},
-    #         'group_set': {'$all': [ObjectId(group_id)]},'tags': "asset@gallery"}).sort('last_update', -1)
-    asset_nodes = GSystem.query_list(group_id, 'Asset', request.user.id,tags="asset@gallery")
+
+    if gstaff_access:
+        asset_nodes = GSystem.query_list(group_id, 'Asset', request.user.id,if_gstaff=True,tags="asset@gallery")
+    else:
+        asset_nodes = GSystem.query_list(group_id, 'Asset', request.user.id,tags="asset@gallery")
     template = 'ndf/gcourse_event_group.html'
 
     if "announced_unit" in group_obj.member_of_names_list or "Group" in group_obj.member_of_names_list and 'base_unit' not in group_obj.member_of_names_list:
@@ -3454,6 +3449,7 @@ def assets(request, group_id, asset_id=None,page_no=1):
     asset_gst_name, asset_gst_id = GSystemType.get_gst_name_id("Asset")
     from gnowsys_ndf.settings import GSTUDIO_NO_OF_OBJS_PP
     template = 'ndf/gevent_base.html'
+    gstaff_access = check_is_gstaff(group_id,request.user)
     if asset_id:
         asset_obj = node_collection.one({'_id': ObjectId(asset_id)})
         asset_content_list = get_relation_value(ObjectId(asset_obj._id),'has_assetcontent')
@@ -3463,8 +3459,7 @@ def assets(request, group_id, asset_id=None,page_no=1):
             'group_set': {'$all': [ObjectId(group_id)]}}).sort('last_update', -1)
         # topic_nodes = node_collection.find({'member_of': {'$in': [topic_gst_id]}})
         # assetcontent_page_info = paginator.Paginator(asset_content_list['grel_node'], page_no, GSTUDIO_NO_OF_OBJS_PP)
-        if asset_obj.access_policy == "PRIVATE" and asset_obj.created_by != request.user.id:
-            print "55555555555555555555555"
+        if asset_obj.access_policy == "PRIVATE" and asset_obj.created_by != request.user.id and not gstaff_access:
             raise PermissionDenied
         context_variables = {
             'group_id': group_id, 'groupid': group_id,
@@ -3484,17 +3479,22 @@ def assets(request, group_id, asset_id=None,page_no=1):
                                     context_variables,
                                     context_instance = RequestContext(request)
         )
-    asset_nodes = node_collection.find({'member_of': {'$in': [asset_gst_id]},
-        'group_set': {'$all': [ObjectId(group_id)]},
-        '$and': [
-          {'access_policy': 'PUBLIC'},
-          {'$or': [
-            {'created_by': request.user.id},
-            {'access_policy': 'PRIVATE'}
-            ]
-          }
-        ]
-})
+    
+    if gstaff_access:
+        asset_nodes = node_collection.find({'member_of': {'$in': [asset_gst_id]},'group_set': {'$all': [ObjectId(group_id)]},'access_policy': {'$in': ['PRIVATE','PUBLIC']  } })
+    
+    else:
+        asset_nodes = node_collection.find({'member_of': {'$in': [asset_gst_id]},
+            'group_set': {'$all': [ObjectId(group_id)]},
+            '$and': [
+              {'access_policy': 'PUBLIC'},
+              {'$or': [
+                {'created_by': request.user.id},
+                {'access_policy': 'PRIVATE'}
+                ]
+              }
+            ]})
+    
     assets_page_info = paginator.Paginator(asset_nodes, page_no, GSTUDIO_NO_OF_OBJS_PP)
     context_variables = {
             'group_id': group_id, 'groupid': group_id,
