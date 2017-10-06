@@ -6,6 +6,7 @@
 {% block body_content %}
         {% check_is_gstaff group_id request.user as is_gstaff %} 
         {% if curriculum_obj %}
+
         <div class="curriculum-name-desc" >
             <div class="curriculum_listing">
                 <div class="curriculum_content">
@@ -18,7 +19,11 @@
                         </div>
                     </div>
                     {% if is_gstaff or curriculum_obj.created_by == request.user.id %}
-                        <a  class="fi-pencil"  data-reveal-id="create-edit-curriculum-reveal" > {% trans "Edit" %}</a>
+                        <div class="small-1 columns">
+                            <div class="right">
+                                <i class="symbol-wid fa fa-pencil" data-reveal-id="create-edit-curriculum-reveal"></i>
+                            </div>
+                        </div>
                     {% endif %}
         <!--             <div class="curriculum_content_right" style="margin-top: 52px;">
                     <a data-reveal-id="delete-unit"><i class="fa fa-trash"></i>{% trans "Delete" %}</a>
@@ -52,22 +57,22 @@
                     <textarea type="text"  class="branch_desc" placeholder="Section description" ></textarea>
                 </label>
                 <br />
-                <button type="button" class="blue-white-button create_branch">
+                <button type="button" class="button-hollow-grey create_branch">
 	                Add
 	            </button>
-                <button type="button" class="blue-white-button delete_branch" style="display: none;">
+                <button type="button" class="button-hollow-grey delete_branch" style="display: none;">
                     Delete
                 </button>
             </div>
                 <div class="section-view-area">
-                    <label class="section-label-view">Section Name
+                    <label class="section-label-view">Section Name:
                         
                     </label>
-                    <label class="section-label-desc-view">Section Description
+                    <label class="section-label-desc-view">Section Description: 
 
                     </label>
                     {% if is_gstaff or curriculum_obj.created_by == request.user.id %}
-                    <button type="button" class="blue-white-button edit_section">
+                    <button type="button" class="button-hollow-grey edit_section">
                         Edit
                     </button>
                     {% endif %}
@@ -89,10 +94,10 @@
                 <br />
 
                 <br />
-                <button type="button" class="blue-white-button create_division">
+                <button type="button" class="button-hollow-grey create_division">
                     Add
                 </button>
-                <button type="button" class="blue-white-button delete_division" style="display: none;">
+                <button type="button" class="button-hollow-grey delete_division" style="display: none;">
                     Delete
                 </button>
             </div>
@@ -104,7 +109,7 @@
                     <label>Topic
                         <input type="checkbox"  class="topic-checkbox" name="isLeafNode" value="leafNode"/>
                     </label>
-                    <button type="button" class="blue-white-button edit_subsection">
+                    <button type="button" class="button-hollow-grey edit_subsection">
                         Edit
                     </button>
                     {% endif %}   
@@ -171,10 +176,10 @@
                     var delete_edit_icons = '';
                     switch (node.class) {
                         case 'create_branch':
-                            $li.find('.jqtree-title').html('<button type="button" class="button-small blue-white-button add_branch '+leafClass+'">Add Section</button>');
+                            $li.find('.jqtree-title').html('<button type="button" class="button-small button-hollow-grey add_branch '+leafClass+'">Add Section</button>');
                         break;
                         case 'create_division':
-                            $li.find('.jqtree-title').html('<button type="button" class="button-small blue-white-button add_branch'+leafClass+'">Add Sub-Section</button>');
+                            $li.find('.jqtree-title').html('<button type="button" class="button-small button-hollow-grey add_branch'+leafClass+'">Add Sub-Section</button>');
                         break;
                         default:
                             $li.find('.jqtree-element').addClass(leafClass);
