@@ -16,5 +16,7 @@ urlpatterns = patterns('gnowsys_ndf.ndf.views.userDashboard',
 						url(r'^my-groups/page-no=(?P<page_no>\d+)/$', 'my_groups', name='my-groups_paged'),
 						url(r'^my-dashboard/$', 'my_dashboard', name='my_dashboard'),
 						url(r'^my-desk/$', 'my_desk', name='my_desk'),
+						url(r'^my-desk/page-no=(?P<page_no>\d+)/$', 'my_desk', name='my_desk_paged'),
 						url(r'^my-performance/$', 'my_performance', name='my_performance'),
+						url(r'^my-performance/page-no=(?P<page_no>\d+)/$', 'my_performance', name='my_performance_paged'),
 			)

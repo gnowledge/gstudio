@@ -9,6 +9,7 @@ from django.http import HttpResponse
 from django.core.urlresolvers import reverse
 from django.shortcuts import render_to_response, render
 from django.template import RequestContext
+from django.core.exceptions import PermissionDenied
 
 from mongokit import paginator
 
@@ -26,6 +27,7 @@ from gnowsys_ndf.ndf.views.methods import get_node_common_fields, get_drawers,cr
 from gnowsys_ndf.ndf.views.methods import get_filter_querydict
 from gnowsys_ndf.ndf.views.ajax_views import get_collection
 from gnowsys_ndf.ndf.templatetags.simple_filters import get_dict_from_list_of_dicts
+from gnowsys_ndf.ndf.templatetags.ndf_tags import get_topic_nodes, check_is_gstaff
 #######################################################################################################################################
 theme_GST = node_collection.one({'_type': 'GSystemType', 'name': 'Theme'})
 topic_GST = node_collection.one({'_type': 'GSystemType', 'name': 'Topic'})
@@ -163,7 +165,7 @@ def list_themes(request, group_id):
                             },
                             context_instance = RequestContext(request) )
 
-
+@get_execution_time
 def curriculum_list(request, group_id):
 
     try:
@@ -172,12 +174,18 @@ def curriculum_list(request, group_id):
         group_name, group_id = get_group_name_id(group_id)
 
     title = theme_GST.name
-    
+    group_obj   = get_group_name_id(group_id, get_obj=True)
     nodes = node_collection.find({
         'member_of': {'$all': [theme_GST._id]},
         'group_set':{'$all': [ObjectId(group_id)]}
         })
     
+    gstaff_access = check_is_gstaff(group_id,request.user)
+    if 'Author' in group_obj.member_of_names_list:
+        if gstaff_access:
+            template = 'ndf/lms.html'
+        else:
+            raise PermissionDenied
     return render_to_response("ndf/curriculum_listing.html",
                             { 
                                 'groupid': group_id,
@@ -186,7 +194,7 @@ def curriculum_list(request, group_id):
                                 'theme_GST': theme_GST
                             },
                             context_instance = RequestContext(request) )
-
+@get_execution_time
 def curriculum_create_edit(request, group_id,curriculum_id=None):
     def _update_curr_hierarchy(hierarchy_obj):
         # d is list fo dict
@@ -203,6 +211,7 @@ def curriculum_create_edit(request, group_id,curriculum_id=None):
         group_id = ObjectId(group_id)
     except:
         group_name, group_id = get_group_name_id(group_id)
+    curr_id = request.POST.get('curriculum_obj','')
     curriculum_obj = node_collection.one({"_id" : ObjectId(curriculum_id)})
     context_variables = {
                         'groupid': group_id,
@@ -218,8 +227,19 @@ def curriculum_create_edit(request, group_id,curriculum_id=None):
             _update_curr_hierarchy(curr_hierarchy)
             curr_hierarchy.append({'class': 'create_branch', 'name': 'Add Branch'})
             context_variables.update({'curriculum_structure':json.dumps(curr_hierarchy)})
+    
     if request.method == "POST":
-        if not curriculum_id:
+        if curr_id:
+            if curr_id:
+                curr_name = request.POST.get('curr_name', '')
+                curr_desc = request.POST.get('curr_desc', '')
+                curriculum_obj = node_collection.one({"_id" : ObjectId(curr_id)})
+                curriculum_obj.fill_gstystem_values(request=request,
+                                    name=str(curr_name),
+                                    group_set=group_id,content_org=unicode(curr_desc))
+                curriculum_obj.save()
+                return HttpResponse(curriculum_obj._id)
+        else:
             curr_name = request.POST.get('curr_name', '')
             curr_desc = request.POST.get('curr_desc', '')
 
@@ -996,6 +1016,20 @@ def get_filtered_topic_resources(request, group_id, node_id):
                                     },
                                     context_instance = RequestContext(request)
                             )
+def topic_resources(request, group_id, curriculum_id , topic_id):
+    # res_list = get_help_pages_of_node(topic_obj,rel_name="has_help",language="en")
+    resources = get_topic_nodes (ObjectId(topic_id))  
+
+
+    return render_to_response('ndf/widget_card_list.html', 
+                                    { 
+                                        'files_cur':resources,
+                                         'detail_urlname':'asset_detail',
+                                         'group_id':group_id                                    
+                                    },
+                                    context_instance = RequestContext(request)
+                            )
+    
 
 
 def get_curriculum_hierarchy(currciculum_obj):
@@ -1079,5 +1113,4 @@ def get_collection_list(collection_list, node):
         return collection_list
 
     else:
-        print "00000000000000000000000000"
         return collection_list
