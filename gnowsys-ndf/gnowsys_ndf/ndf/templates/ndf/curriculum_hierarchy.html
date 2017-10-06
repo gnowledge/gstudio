@@ -234,8 +234,10 @@
                             $('#addBranch').find('.create_branch').attr("id",node.id);
                             $('#addBranch').find('.delete_branch').show();
                             $('#addBranch').find('input').val(node.name);
-                            $('.section-label-view').append(node.name);
-                            $('.section-label-desc-view').append(node.description);
+                            $('.section-label-view').html("");
+                            $('.section-label-view').append("Section Name  " + ":  " + node.name);
+                            $('.section-label-desc-view').html("");
+                            $('.section-label-desc-view').append("Section Description " + ": " +node.description);
                             $('.section-view-area').css('display','block');
                             $('.section-edit-area').css('display','none');
                             $('#addBranch').find('textarea').val(node.description);
@@ -246,7 +248,8 @@
                             if(node.isLeaf) {
                                 $('#addDivision').find('.add_asset').show();
                             }
-                            $('.subsection-label-view').append(node.name);
+                            $('.subsection-label-view').html("");
+                            $('.subsection-label-view').append("Sub-Section Name " + ": " +node.name);
                             $('#addDivision').find('.create_division').html('Update Sub-Section');
                             $('#addDivision').find('.create_division').attr("id",node.id);
                             $('#addDivision').find('.delete_division').show();
