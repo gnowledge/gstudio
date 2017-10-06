@@ -369,7 +369,7 @@ h5{
     border: 2px solid #6a0054;
     background-color: #6a0054;
     &:hover{
-        background-color:#ffffff;;
+        background-color:#ffffff;
         cursor:pointer;
         color: #6a0054;
     }
@@ -4557,6 +4557,38 @@ $inCompleteBgColor: #fd9e29;
        border-radius: 3px;
     }
 
+    .right-margin{
+                    margin-right: 46px;
+            }
+
+
+            .course_actions>span{
+              //margin-right: 5px;
+              background: rgb(46, 63, 81);
+              border: 1px solid rgba(255, 255, 255, 0.7);
+              padding: 1px 8px;
+              color: #fff;
+              font-size: 12px;
+              margin: 0px 10px 0px 0px;
+              cursor: pointer;
+              border-radius: 3px;
+              opacity:0.8;
+              margin-top:90px;
+        
+            }
+
+            .course_actions>i{
+              margin-right: 3px;
+              background: rgba(0, 0, 0, 0.6);
+              border: 1px solid rgba(255, 255, 255, 0.7);
+              padding: 1px 8px;
+              color: #fff;
+              font-size: 12px;
+              margin: 0px 10px 0px 0px;
+              cursor: pointer;
+              border-radius: 3px;
+            }
+
 }
 
 .dropdown-settings{
@@ -4730,7 +4762,8 @@ $module-card-lines-to-show: 3;
         overflow: hidden;
         background-size: 100% 100%;
         border-radius: 8px 0px 0px 8px;
-        box-shadow: inset 0 0 5px 2px;
+        box-shadow: inset 0 0 5px 0px;
+        //background-image: url('/static/ndf/images/module-card.png');
         position: relative;
         z-index: 3;
         -webkit-transition: border-radius .2s;
