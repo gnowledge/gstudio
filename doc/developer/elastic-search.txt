@@ -40,7 +40,12 @@
 
 If group is also selected with Users filter, the contributions of that user in a particular group will be searched.
 ***********************************************************************************************************************************
-First run the esinit_map.py script which creates all the necessary mappings then run the es_init.py script which will index all documents into elasticsearch. 
+First run the `esinitialize_map.py` script which creates all the necessary mappings then run the es_init.py script which will index all documents into elasticsearch.
+Go to project shell (`python manage.py shell`) and run following commands in specified order:
+```
+>>> execfile('../doc/deployer/esinitialize_map.py')
+>>> execfile('../doc/deployer/es_initialize.py')
+```
 
 index→ analogous to database
 Type → analogous to table in database
