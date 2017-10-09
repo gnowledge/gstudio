@@ -41,8 +41,8 @@
     "mousetrap": "#1.5.3",
     "pdfjs-build": "#87e7aef6e8",
     "blockui": "#316f6e5d76",
-    "datatables-plugins": "#1.0.1",
-    "DataTables": "#1.10.7",
+    "datatables-plugins": "#1.10.16",
+    "DataTables": "#1.10.16",
     "videojs": "#5.10.2",
     "epub.js": "#0.2.5",
     "font-awesome": "#4.4.0",
@@ -56,7 +56,7 @@
     "rubik-googlefont": "#a23ec91574",
     "MathJax": "2.7.0",
     "jquery-backstretch": "^2.1.15",
-    "datatables-rowsgroup": "1.0.0"
+    "datatables-rowsgroup": "#2.0.0"
   },
   "resolutions": {
     "jquery": "2.2.1"
