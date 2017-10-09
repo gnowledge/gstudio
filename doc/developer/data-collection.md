@@ -4,7 +4,7 @@ All the CLIx schools are running either of the platforms:
 
 ### GENERIC STRUCTURE:
 
-The directory/folder structure of collected data is maintained as LEVEL 0/.../LEVEL N
+The directory/folder structure of collected data is maintained as `LEVEL 0/.../LEVEL N`
 Read below for description of LEVELs.
 
 ```
@@ -19,11 +19,14 @@ Year (YYYY)                                         [ LEVEL 0 ]
                 - local_settings.py                 [ LEVEL 4 ]
                 - server_settings.py                [ LEVEL 4 ]
                 - git-commit.log                    [ LEVEL 4 ]
+                - assessment-media                  [ LEVEL 4 ]
+                    - repository                    [ LEVEL 5 ]
+                    - studentResponseFiles          [ LEVEL 5 ]
             - unplatform (Optional)                 [ LEVEL 3 ]
 ```
 
 **[ LEVEL 0 ] : Year (YYYY)**
-- Year when Data is collected.
+- Year when data is collected.
 - Example: 
     - 2016
     - 2017
@@ -49,17 +52,20 @@ we have a provision to collect data from the said platforms and both may reside 
 **[ LEVEL 3 ] : gstudio**
 - A CLIx Platform, clixserver.
 - gstudio Folder will have following [LEVEL 4] items:
-    - `db`: mongoDB data.
-    - `media`: Files uploaded on clixserver.
-    - `rcs-repo`: rcs, versioned json files.
-    - `pgdump-YYYYMMDD-HHMM.sql`: Postgres DB dump with specified naming convention.
-    - `local_settings.py`: Copy of file in deployed instance.
-    - `server_settings.py`: Copy of file in deployed instance.
-    - `git-commit.log`: Snapshot of git records at time of backup. It will have output of following git commands:
+    - `db`: mongoDB data *(gStudio + qbank)*.
+    - `media`: Files uploaded on clixserver *(gStudio)*.
+    - `rcs-repo`: rcs, versioned json files *(gStudio)*.
+    - `pgdump-YYYYMMDD-HHMM.sql`: Postgres DB dump with specified naming convention *(gStudio)*.
+    - `local_settings.py`: Copy of file in deployed instance *(gStudio)*.
+    - `server_settings.py`: Copy of file in deployed instance *(gStudio)*.
+    - `git-commit.log`: Snapshot of git records at time of backup. It will have output of following git commands  *(gStudio + qbank)*:
         - `git status`
         - `git diff`
         - `git log -5`
         - `git branch`
+    - `assessment-media`: Assessment files and user uploaded files in assessments. This folder will have following [LEVEL 5] directories *(qbank)*
+        - `repository`: Files/Media used in assessments.
+        - `studentResponseFiles`: User uploaded files in assessments e.g: recorded-audio, images etc. 
 
 
 ---
