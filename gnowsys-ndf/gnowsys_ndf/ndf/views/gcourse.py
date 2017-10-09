@@ -3837,8 +3837,8 @@ def load_assessment_analytics(request, group_id):
                      each_sublist[0], each_sublist[1])
                     if user_data_set:
                         try:
-                            for user_id in active_user_ids_list:
-                                counter_obj = Counter.get_counter_obj(user_id, group_id)
+                            for buser_id in active_user_ids_list:
+                                counter_obj = Counter.get_counter_obj(buser_id, group_id)
                                 #create
                                 if not counter_obj['assessment']:
                                     assessment_dict = {'id': each_sublist[1], 'correct': user_data_set['Correct'],
