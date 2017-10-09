@@ -163,14 +163,14 @@ def task_details(request, group_name, task_id):
 
   history.reverse()
   var = {
-    'title': task_node.name,
+    'title': 'task_detail',
     'group_id': group_id, 'appId': app._id, 'groupid': group_id, 'group_name': group_name,
     'node': task_node, 'history':history, 'subtask': subtask
   }
   var.update(blank_dict)
 
   variables = RequestContext(request, var)
-  template = "ndf/task_details.html"
+  template = "ndf/lms.html"
   return render_to_response(template, variables)
 @get_execution_time
 def save_image(request, group_name, app_id=None, app_name=None, app_set_id=None, slug=None):
@@ -213,7 +213,7 @@ def save_image(request, group_name, app_id=None, app_name=None, app_set_id=None,
 
 @login_required
 @get_execution_time
-def create_edit_task(request, group_name, task_id=None, task=None, count=0):
+def gcreate_edit_task(request, group_name, task_id=None, task=None, count=0):
   """Creates/Modifies details about the given Task.
 
   """
@@ -355,7 +355,7 @@ def create_edit_task(request, group_name, task_id=None, task=None, count=0):
   var.update(blank_dict)
   context_variables = var
 
-  return render_to_response("ndf/task_create_edit.html",
+  return render_to_response("ndf/gtask_create_edit.html",
           context_variables,
           context_instance=RequestContext(request)
         )
@@ -766,7 +766,8 @@ def delete_task(request, group_name, _id):
 
 
 @get_execution_time
-def check_filter(request,group_name,choice=1,status='New',each_page=1):
+def gcheck_filter(request,group_name,choice=1,status='New',each_page=1):
+    print "8888888888888888"
     at_list = ["Status", "start_time", "Priority", "end_time", "Assignee", "Estimated_time"]
     blank_dict = {}
     history = []
@@ -895,7 +896,7 @@ def check_filter(request,group_name,choice=1,status='New',each_page=1):
     TASK_inst.rewind()
     count=len(task_list)
 
-    template = "ndf/task_list_view.html"
+    template = "ndf/gtask_list_view.html"
     variable = RequestContext(request, {'TASK_inst':files_list,'group_name':group_name, 'appId':app._id, 'group_id': group_id, 'groupid': group_id,'send':message,'count':count,'TASK_obj':TASK_inst,"page_info":paged_resources,'page_no':each_page,'choice':choice,'status':status})
     return render_to_response(template, variable)
     #return HttpResponse(json.dumps(self_task,cls=NodeJSONEncoder))
