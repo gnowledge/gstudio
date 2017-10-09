@@ -2,8 +2,7 @@ gstudio
 =======
 
 gstudio is an implementation of http://www.gnu.org/software/gnowsys/
-which is a Node Description Framework (NDF). It is a frame-based
-knowledge representation model. 
+which is a Node Description Framework (NDF). It is uses the framework of a graph database for developing user friendly apps for teachers, students and citizens. 
 
 The project is released under GNU AGPL v3 license.
 
@@ -22,7 +21,7 @@ Live sites using gstudio
 - http://nroer.gov.in/
 - http://i2c-clix.tiss.edu/ and several offline instances running in schools (as school servers)
 - http://studio.tiss.edu/ (archived)
-- 
+
 Mailing list
 ------------
 
