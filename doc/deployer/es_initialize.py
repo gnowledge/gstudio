@@ -19,7 +19,9 @@ page_id = 0
 
 def index_docs(all_docs):
 	k = 0
+	all_docs_count = all_docs.count()
 	for node in all_docs:
+		print "[ %s/%s ] : %s " % (k, all_docs_count, node._id)
 		if(node._type == "GSystem"):
 			try:
 				node.get_neighbourhood(node.member_of)
@@ -35,8 +37,11 @@ def index_docs(all_docs):
 		#doc = json.dumps(document) #convert python dictionary to JSON string
 
 		if("name" in document.keys()):
+
+			# replacing "_" starting keys:
 			document["id"] = document.pop("_id")
 			document["type"] = document.pop("_type")
+
 			if("object_type" in document.keys()):
 				document["object_type"] = str(document["object_type"])
 			if("property_order" in document.keys()):
@@ -77,20 +82,25 @@ def get_document_type(document):
 		doc_type = "DontCare"
 	return doc_type
 
-def main():
-	print("Starting the indexing process")
 
+def main():
+
+	print("Starting the indexing process...")
+	# DELETING existing/old indexes
 	if(es.indices.exists(index)):
-		print("Deleting the existing index:"+index+" for reindexing")
+		print("Deleting the existing index: "+index+" for reindexing")
 		res = es.indices.delete(index=index)
 		print("The delete response is %s " % res)
+
 	if(es.indices.exists(author_index)):
-		print("Deleting the existing author_index:"+author_index +" for reindexing")
+		print("Deleting the existing author_index: "+author_index +" for reindexing")
 		res = es.indices.delete(index=author_index)
 		print("The delete response is %s " % res)
+
 	if(es.indices.exists(gsystemtype_index)):
 		print("Deleting the existing gtype index: "+ index+ "for reindexing")
 		res = es.indices.delete(index=gsystemtype_index)
+	# --- END of DELETING existing/old indexes
 
 	with open("/home/docker/code/gstudio/gnowsys-ndf/gnowsys_ndf/req_body.json") as req_body:
 		request_body = json.load(req_body)
