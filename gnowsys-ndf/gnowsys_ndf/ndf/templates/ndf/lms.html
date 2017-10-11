@@ -125,7 +125,7 @@
     </li>
     {% endif %}
     <li>
-      <a href="{% url 'gtask' groupid  %}" {% if title == 'Task' or title = "task_detail" %} class="selected"> {% endif %} {% trans "Tasks" %}</a>
+      <a href="{% url 'gtask' groupid  %}" {% if title == "Task" or title == "task_detail" %} class="selected" {% endif %} >  {% trans "Tasks" %} </a>
     </li>
   </ul>
 </div>
