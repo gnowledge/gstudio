@@ -21,6 +21,61 @@
 {% endcomment %}
 {% include 'ndf/widget_user_access_modal.html' %}
 {% get_group_object group_id as group_object %}
+
+<style type="text/css">
+  
+.topnav {
+  overflow: hidden;
+  background-color: #fff;
+}
+
+.topnav a {
+  float: left;
+  display: block;
+  color: #ce7869;
+  text-align: center;
+  padding: 14px 16px;
+  text-decoration: none;
+  font-size: 17px;
+}
+
+.topnav a:hover {
+  border-bottom: 3px solid #ffc14e;
+  color: #ce7869;
+}
+.selected {
+  border-bottom: 3px solid #ffc14e;
+ }
+
+.topnav .icon {
+  display: none;
+}
+
+@media screen and (max-width: 600px) {
+  .topnav a:not(:first-child) {display: none;}
+  .topnav a.icon {
+    float: right;
+    display: block;
+  }
+}
+
+@media screen and (max-width: 600px) {
+  .topnav.responsive {position: relative;}
+  .topnav.responsive .icon {
+    position: absolute;
+    right: 0;
+    top: 0;
+  }
+.topnav.responsive a {
+    float: none;
+    display: block;
+    text-align: left;
+}
+}
+
+</style>
+
+
 <div class="lms_page">
      <div class="lms_banner">
         
@@ -94,38 +149,28 @@
      </div>
 </div>
 
-<div class="lms_secondary_header">
- 
-  <ul class="nav_menu_1">
-    <li>
-      <a href="{% url 'course_about' group_id %}" {% if title == 'about' %}class="selected"{% endif %}>
-      {% trans "Overview" %}</a> 
-    </li>
-    <li>
-      <a href="{% url 'course_content' group_id %}" {% if title == 'course content' %}class="selected"{% endif %}>
-      {% if not group_object.project_config.tab_name %}{% trans "Lessons" %}{% else %}{{group_object.project_config.tab_name}} {% endif %}</a> 
-     </li>
-    {% if 'Group' not in group_object.member_of_names_list %}
-    <li>  <a href="{% url 'course_raw_material' group_id %}" {% if title == 'raw material' or title == "raw_material_detail"  %}class="selected"{% endif %}>{% trans "Resources" %}</a> </li>
-    {% endif %}
-    <li>
-    <li>  <a  href="{% url 'course_gallery' group_id %}" {% if title == 'gallery' or title == "asset_gallery_detail" %} class="selected" {% endif %} > {% if 'Group'  in group_object.member_of_names_list %} {% trans "E-Library" %} {% else %} {% trans "Gallery" %}{% endif %}</a> </li>
-    <li>
-      <a href="{% url 'course_notebook' group_id %}" {% if title == 'notebook' %}class="selected"{% endif %}>
-      {% if 'Group' in group_object.member_of_names_list %}
-        {% trans "Blog" %} 
-      {% else %}
-        {% trans "Notebook" %} 
-      {% endif %}
-      </a>
-    </li>
-    {% if 'Group'  in group_object.member_of_names_list %}
-    <li>
-      <a href="{% url 'curriculum_list' groupid  %}"> {% trans "Topic Map" %}</a>
-    </li>
-    {% endif %}
-  </ul>
-</div>
+
+    <div class="lms_secondary_header">
+        <div class="topnav" id="myTopnav">
+            <a href="{% url 'course_about' group_id %}" {% if title == 'about' %}class="selected"{% endif %}>{% trans "Overview" %}</a> 
+            <a href="{% url 'course_content' group_id %}" {% if title == 'course content' %}class="selected"{% endif %}>{% if not group_object.project_config.tab_name %}{% trans "Lessons" %}{% else %}{{group_object.project_config.tab_name}} {% endif %}</a> 
+            {% if 'Group' not in group_object.member_of_names_list %}<a href="{% url 'course_raw_material' group_id %}" {% if title == 'raw material' or title == "raw_material_detail"  %}class="selected"{% endif %}>{% trans "Resources" %}</a>{% endif %} 
+            <a  href="{% url 'course_gallery' group_id %}" {% if title == 'gallery' or title == "asset_gallery_detail" %} class="selected" {% endif %} > {% if 'Group'  in group_object.member_of_names_list %} {% trans "E-Library" %} {% else %} {% trans "Gallery" %}{% endif %}</a> 
+            <a href="{% url 'course_notebook' group_id %}" {% if title == 'notebook' %}class="selected"{% endif %}>
+              {% if 'Group' in group_object.member_of_names_list %}
+                {% trans "Blog" %} 
+              {% else %} 
+                {% trans "Notebook" %} 
+              {% endif %}
+            </a> 
+            {% if 'Group'  in group_object.member_of_names_list %}
+              <a href="{% url 'curriculum_list' groupid  %}"> {% trans "Topic Map" %}</a>
+            {% endif %}
+            <a href="javascript:void(0);" class="icon" onclick="myFunction()">
+              <i class="fa fa-chevron-down" aria-hidden="true"></i>
+            </a>
+        </div>
+    </div>
 
 
 <div id="addAsset" class="reveal-modal reveal-modal-overlay" data-reveal aria-labelledby="modalTitle" aria-hidden="true" role="dialog">
@@ -244,6 +289,17 @@
   $('.lms_banner .div-height img').attr('src', '');
   $('.lms_banner .div-height img').attr('alt', '');
   $('.lms_banner .div-height').backstretch(imgSrc);
+
+
+  function myFunction() {
+            var x = document.getElementById("myTopnav");
+            if (x.className === "topnav") {
+                x.className += " responsive";
+            } else {
+                x.className = "topnav";
+            }
+        }
+
 </script>
 
 {% endblock %}
