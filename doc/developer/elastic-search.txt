@@ -61,26 +61,32 @@ Gsystem Type Map : Mapping from GSystemType name to ID.
 Relation Map : Mapping from GSystemType ID to possible relation names for that GSystemType
 
 
-#main(): 
+
+# main():
  
-es.indices.exists(index_name) -> checks if the index already exists in elasticsearch, if it exists already then, es.indices.delete(index_name) will delete the index for creating a fresh index and re indexing all the documents. The delete function returns the response if the index has been successfully deleted.
+* Deleting existing indexes to re-create new ones:
+	es.indices.exists(index_name) -> checks if the index already exists in elasticsearch, if it exists already then, es.indices.delete(index_name) will delete the index for creating a fresh index and re indexing all the documents. The delete function returns the response if the index has been successfully deleted.
  
-The json body request_body has the mapping settings and the index settings. Mapping is the process of defining how a document, and the fields it contains, are stored and indexed.
+* Mapping Configs:
+	The json body request_body has the mapping settings and the index settings. Mapping is the process of defining how a document, and the fields it contains, are stored and indexed.
+
  
 SETTINGS:
-	->number _of_shards: An index can potentially store a large amount of data that can exceed the hardware limits of a single node. For example, a single index of a billion documents taking up 1TB of disk space may not fit on the disk of a single node or may be too slow to serve search requests from a single node alone. To solve this problem, Elasticsearch provides the ability to subdivide your index into multiple pieces called shards. When you create an index, you can simply define the number of shards that you want. 
+	* `number_of_shards`: An index can potentially store a large amount of data that can exceed the hardware limits of a single node. For example, a single index of a billion documents taking up 1TB of disk space may not fit on the disk of a single node or may be too slow to serve search requests from a single node alone. To solve this problem, Elasticsearch provides the ability to subdivide your index into multiple pieces called shards. When you create an index, you can simply define the number of shards that you want. 
 	 
-	->Analysis is the part which tells about how to analyze the search query which is provided by the user. We have used a trigram analyzer. While creating the inverted index(indexing of words inside name, content and tags field), trigram analyzer indexes the values as phrases(of size = min 1 word and max 3 words). This helps in phrase search and also phrase suggester(discussed in esearch.py documentation). Trigram analyzer uses shingles filter to do this.
+	* `analysis` is the part which tells about how to analyze the search query which is provided by the user. We have used a `trigram analyzer. While creating the inverted index(indexing of words inside name, content and tags field), trigram analyzer indexes the values as phrases(of size = min 1 word and max 3 words). This helps in phrase search and also phrase suggester(discussed in esearch.py documentation). Trigram analyzer uses shingles filter to do this.
 	 
-	->Shingles:  it creates combinations of tokens as a single token. For example, the sentence "please divide this sentence into shingles" might be tokenized into shingles "please divide", "divide this", "this sentence", "sentence into", and "into shingles".
+	* `shingles`:  it creates combinations of tokens as a single token. For example, the sentence "please divide this sentence into shingles" might be tokenized into shingles "please divide", "divide this", "this sentence", "sentence into", and "into shingles".
 	 
-	->Lowercase filter: is used to convert all the letters in the words while indexing documents also convert the search query to lowercase. This useful in the sense that if the query is “Ram” and the word “ram” is indexed in then that document will be retrieved in the search results.  
+	* `lowercase` filter: is used to convert all the letters in the words while indexing documents also convert the search query to lowercase. This useful in the sense that if the query is “Ram” and the word “ram” is indexed in then that document will be retrieved in the search results.  
 	 
-	->Char filter: “html_strip” -> this filter is used to remove the html tags if given in the search query. 
+	* `char_filter`: “html_strip” *  this filter is used to remove the html tags if given in the search query. 
 	 
-	->Stopwords: remove the stopwords(like a, an, the) from the search query 
----------------------------------------------------------------------------------------------------------------------------------------
-Mappings:  Mapping is the process of defining how a document, and the fields it contains, are stored and indexed.
+	* `stopwords`: remove the stopwords(like a, an, the) from the search query 
+
+	---------------------------------------------------------------------------------------------------------------------------------------
+
+	* `mappings`:  Mapping is the process of defining how a document, and the fields it contains, are stored and indexed.
 
 	->We have defined Author type, Filehive, RelationType, Group, AttributeType, GAttribute, GRelation.
 	GSystem is broken down to different media types which will help in filter search(if user wants to search only for images/videos/audio, etc) - image, video, text, application, audio, NotMedia(all those Gsystem docs that have mime_type as null)
