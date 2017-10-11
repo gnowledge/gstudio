@@ -1,5 +1,6 @@
 {% load i18n %}
 {% load ndf_tags %}
+
 {% block head %}
 <style type="text/css">
   .right-btn, .left-btn{
@@ -22,6 +23,9 @@
       font-size: 0.75rem !important
   }
   */
+  .table-container{
+    margin-top: 15px;
+  }
   .rating-lbl{
       display: inline-block;
       font-size: 1rem !important;
@@ -88,14 +92,24 @@
   <script src="/static/ndf/bower_components/pace/pace.js"></script>
   <link href="/static/ndf/bower_components/pace/themes/blue/pace-theme-loading-bar.css" rel="stylesheet" />
 
+
   <!-- DataTables -->
   <!-- Foundation theme for datatables and datatables-rowsgroup disables pagination -->
-  <link href="/static/ndf/bower_components/DataTables/media/css/jquery.dataTables.css" rel="stylesheet" type="text/css" />
   <script src="/static/ndf/bower_components/DataTables/media/js/jquery.dataTables.js"></script>
+  <script src="/static/ndf/bower_components/DataTables/media/js/jquery.dataTables.min.js"></script>
   <script src="/static/ndf/bower_components/datatables-rowsgroup/dataTables.rowsGroup.js"></script>
+  <script src="/static/ndf/bower_components/datatables.net-buttons/js/dataTables.buttons.js"></script>
+  <script src="/static/ndf/bower_components/datatables.net-buttons/js/buttons.html5.js"></script>
+  <script src="/static/ndf/bower_components/datatables.net-buttons/js/buttons.print.min.js"></script>
+  <link href="/static/ndf/bower_components/datatables.net-buttons-dt/css/buttons.dataTables.min.css" rel="stylesheet" type="text/css" />
+  <link href="/static/ndf/bower_components/DataTables/media/css/jquery.dataTables.css" rel="stylesheet" type="text/css" />
+  <script src="/static/ndf/bower_components/pdfmake/build/pdfmake.min.js"></script>
+  <script src="/static/ndf/bower_components/pdfmake/build/vfs_fonts.js"></script>
+  <script src="/static/ndf/bower_components/jszip/dist/jszip.min.js"></script>
 
-  <!-- <script src=""></script> -->
-
+  <!-- <link href="/static/ndf/bower_components/datatables-plugins/integration/foundation/dataTables.foundation.css" rel="stylesheet" type="text/css" />
+  <script src="/static/ndf/bower_components/datatables-plugins/integration/foundation/dataTables.foundation.js"></script>
+ -->
 {% endblock %}
 
   <div class="small-12 columns table-container">
@@ -104,6 +118,21 @@
   <script type="text/javascript">
       // Student analytics view
       $(document).ready(function(){
+          var buttonCommon = {
+              exportOptions: {
+                  format: {
+                      body: function ( data, row, column, node ) {
+                          // Format options
+                          if (column==3){
+                            console.log(data)
+                            data = JSON.stringify(data)
+                            console.log(data + "====")
+                          }
+                          return data
+                      }
+                  }
+              }
+          };
 
           data = {{data|safe}}
           check_length = 0
@@ -126,6 +155,22 @@
           sce_dt_var = $("#quiz-details-table-tbody").dataTable({
             "data": data,
             "columns": dataTable_columns_set,
+            "dom": 'Bfrtip',
+            "buttons": [
+              'pageLength', 
+
+            $.extend( true, {}, buttonCommon, {
+                extend: 'copyHtml5'
+            } ),
+            $.extend( true, {}, buttonCommon, {
+                extend: 'excelHtml5'
+            } ),
+            $.extend( true, {}, buttonCommon, {
+                extend: 'pdfHtml5'
+            } )
+
+
+            ],
             "columns": [
                     {
                         'name': 'first',
