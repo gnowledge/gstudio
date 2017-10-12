@@ -18,8 +18,6 @@
     color:gray !important;
   }
   .course_editor_section{
-    min-width:930px;
-    margin-left: -15px;
   }
   .node-content-div{
     
@@ -172,9 +170,8 @@
               </div>
           </div>
           
-          <div class="small-8 columns">
-
-            <div class="small-12 columns course_editor_section">
+          <div class="small-12 medium-12 large-8 columns">
+            <div class="small-12 medium-12 large-12 columns course_editor_section">
               {% with node.member_of_names_list as node_member_of_names_list %}
               {% if "QuizItemEvent" not in node_member_of_names_list and "QuizItem" not in node_member_of_names_list%}
               <div class="input_links row" style="margin-left:10px;">
@@ -227,6 +224,7 @@
               </div>
             </div>
           </div>
+        </div>
         </div>
       </div>
 </div>             
