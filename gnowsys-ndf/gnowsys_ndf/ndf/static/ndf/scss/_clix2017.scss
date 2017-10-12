@@ -4244,7 +4244,6 @@ ul.nav_menu_1 {
 .course_editor_section{
     background:#fff;
     min-height: 100vh;
-    min-width:910px;
     margin-bottom:10px;
     padding-right:4px;
     #scstyle{
@@ -4965,6 +4964,7 @@ $module-card-lines-to-show: 3;
     border-bottom: 1px solid rgba(0, 0, 0, 0.25);
     margin-top:150px;
 }
+
 @media screen and (max-width: 480px) {
     .lms_secondary_header{
         width: 100%;
@@ -4972,7 +4972,7 @@ $module-card-lines-to-show: 3;
         color: #fff;
         box-shadow: 0 0 2px 0 rgba(0, 0, 0, 0.2);
         border-bottom: 1px solid rgba(0, 0, 0, 0.25);
-        margin-top:330px;
+        margin-top:382px;
         font-size: 18px;
         letter-spacing: 0.8px;
     }
@@ -4984,19 +4984,19 @@ $module-card-lines-to-show: 3;
         color: #fff;
         box-shadow: 0 0 2px 0 rgba(0, 0, 0, 0.2);
         border-bottom: 1px solid rgba(0, 0, 0, 0.25);
-        margin-top:200px;
+        margin-top:382px;
         font-size: 18px;
         letter-spacing: 0.8px;
     }
 }
-@media screen and (max-width: 960px) {
+@media screen and (max-width: 800px) {
     .lms_secondary_header{
         width: 100%;
         position: relative;
         color: #fff;
         box-shadow: 0 0 2px 0 rgba(0, 0, 0, 0.2);
         border-bottom: 1px solid rgba(0, 0, 0, 0.25);
-        margin-top:330px;
+        margin-top:382px;
         font-size: 18px;
         letter-spacing: 0.8px;
     }
