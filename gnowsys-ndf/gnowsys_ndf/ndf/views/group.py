@@ -4,10 +4,10 @@ import json
 import datetime
 
 ''' -- imports from installed packages -- '''
-from django.http import HttpResponseRedirect
-from django.http import HttpResponse
+from django.http import HttpResponse, Http404, HttpResponseRedirect
 from django.http.request import HttpRequest
 from django.core.urlresolvers import reverse
+from django.core.exceptions import PermissionDenied
 from django.shortcuts import render_to_response  # , render
 from django.template import RequestContext
 from django.template.defaultfilters import slugify
@@ -32,7 +32,7 @@ from gnowsys_ndf.ndf.views.asset import *
 # from gnowsys_ndf.ndf.models import GSystemType, GSystem, Group, Triple
 # from gnowsys_ndf.ndf.models import c
 from gnowsys_ndf.ndf.views.ajax_views import *
-from gnowsys_ndf.ndf.templatetags.ndf_tags import get_all_user_groups, get_sg_member_of, get_relation_value, get_attribute_value, check_is_gstaff # get_existing_groups
+from gnowsys_ndf.ndf.templatetags.ndf_tags import get_all_user_groups, get_sg_member_of, get_relation_value, get_attribute_value, check_is_gstaff, user_access_policy # get_existing_groups
 # from gnowsys_ndf.ndf.org2any import org2html
 from gnowsys_ndf.ndf.views.moderation import *
 # from gnowsys_ndf.ndf.views.moderation import moderation_status, get_moderator_group_set, create_moderator_task
@@ -2041,245 +2041,176 @@ def populate_list_of_group_members(group_id):
         return []
 
 
-@get_execution_time
 def group_dashboard(request, group_id=None):
+    '''
+      This view handles redirection to Group Dashboard
+      based on the type of Group.
+      Available Group types: base_unit, announced_unit,
+      CourseEventGroup, Group, ProgramEventGroup.
+    '''
 
-  try:
-    group_obj = ""
-    # shelf_list = {}
-    # shelves = []
-    alternate_template = ""
-    profile_pic_image = None
-    list_of_unit_events = []
-    all_blogs = None
-    blog_pages = None
-    user_blogs = None
-    subgroups_cur = None
+    # Variable declarations
+    group_obj = profile_pic_image = subgroups_cur = None
+    all_blogs = blog_pages = user_blogs = None
+    course_structure_exists = False
+    files_cur = parent_groupid_of_pe = sg_type = None
+    # allow_to_join = "" Remove this line
+    # Do not make list datatype variables into single line of assignment.
+    course_collection_data = []
     old_profile_pics = []
+    list_of_unit_events = []
+
+    # Default landing_page template name should be defined in local_settings.py
+    # which can be used for `alternate_template`
+    alternate_template = None 
+
     selected = request.GET.get('selected','')
     group_obj = get_group_name_id(group_id, get_obj=True)
     try:
-        if 'tab_name' in group_obj.project_config and group_obj.project_config['tab_name'].lower() == "questions":
-            if "announced_unit" in group_obj.member_of_names_list:
-                if group_obj.collection_set:
-                    lesson_id = group_obj.collection_set[0]
-                    lesson_node = node_collection.one({'_id': ObjectId(lesson_id)})
-                    activity_id = lesson_node.collection_set[0]
-                return HttpResponseRedirect(reverse('activity_player_detail', kwargs={'group_id': group_id,
-                    'lesson_id': lesson_id, 'activity_id': activity_id}))
-    except Exception as e:
+        if not group_obj:
+            raise Http404("Group Not Found")
+        forbid_private_group(request, group_obj)
+        group_id = group_obj._id
+        group_member_of = group_obj.member_of_names_list
+
+        # Redirection based on Group type
+        # case for Survey type Groups
+        try:
+            if 'tab_name' in group_obj.project_config and group_obj.project_config['tab_name'].lower() == "questions":
+                if "announced_unit" in group_member_of:
+                    if group_obj.collection_set:
+                        lesson_id = group_obj.collection_set[0]
+                        lesson_node = node_collection.one({'_id': ObjectId(lesson_id)})
+                        activity_id = lesson_node.collection_set[0]
+                    return HttpResponseRedirect(reverse('activity_player_detail', kwargs={'group_id': group_id,
+                        'lesson_id': lesson_id, 'activity_id': activity_id}))
+        except Exception as survey_redir_err:
+            print "\nError in Survey Group redirection. ", survey_redir_err
+            pass
+
+        redir_groups_type = ["base_unit", "CourseEventGroup", \
+                    "BaseCourseGroup", "announced_unit", "Group"]
+        if any(group_type in group_member_of for group_type in redir_groups_type):
+            return HttpResponseRedirect(reverse('course_about', kwargs={'group_id': group_id}))
+
+        # Subgroups listing
+        if group_obj and group_obj.post_node:
+            # now we are showing moderating group too:
+            subgroups_cur = node_collection.find({
+                    '_type': u'Group',
+                    '_id': {'$in': group_obj.post_node},
+                    '$or': [
+                                {'created_by': request.user.id},
+                                {'group_admin': request.user.id},
+                                {'author_set': request.user.id},
+                                {'group_type': 'PUBLIC'}
+                            ]
+                    }).sort("last_update",-1)
+
+        '''
+        --------- Shelf related Code block starts here --------
+        # shelf_list = {}
+        # shelves = []
+        auth = node_collection.one({'_type': 'Author', 'name': unicode(request.user.username) })
+
+        if auth:
+
+          has_shelf_RT = node_collection.one({'_type': 'RelationType', 'name': u'has_shelf' })
+
+          shelf = triple_collection.find({'_type': 'GRelation', 'subject': ObjectId(auth._id), 'relation_type': has_shelf_RT._id })
+          shelf_list = {}
+
+          if shelf:
+            #a temp. variable which stores the lookup for append method
+            shelves_append_temp=shelves.append
+            for each in shelf:
+              shelf_name = node_collection.one({'_id': ObjectId(each.right_subject)})
+              shelves_append_temp(shelf_name)
+
+              shelf_list[shelf_name.name] = []
+              #a temp. variable which stores the lookup for append method
+              shelf_lst_shelfname_append=shelf_list[shelf_name.name].append
+              for ID in shelf_name.collection_set:
+                shelf_item = node_collection.one({'_id': ObjectId(ID) })
+                shelf_lst_shelfname_append(shelf_item.name)
+
+          else:
+              shelves = []
+        --------- Shelf related Code block ends here --------
+        '''
+
+        profile_pic_image, old_profile_pics = get_current_and_old_display_pics(group_obj,\
+                                                       rt_name="has_profile_pic")
+
+        # Call to get_neighbourhood() is required for setting-up property_order_list
+        # group_obj.get_neighbourhood(group_obj.member_of)
+
+        list_of_sg_member_of = get_sg_member_of(group_obj._id)
+        if  u"ProgramEventGroup" in list_of_sg_member_of and \
+                  u"ProgramEventGroup" not in group_member_of:
+            return HttpResponseRedirect( reverse('course_about', kwargs={"group_id": group_id}) )
+            # This code block is never executed because of the above return statement
+            # sg_type = "ProgramEventGroup"
+            # # files_cur = node_collection.find({'group_set': ObjectId(group_obj._id), '_type': "File"})
+            # parent_groupid_of_pe = node_collection.find_one({'_type':"Group", \
+            #   "post_node": group_obj._id})
+            # if parent_groupid_of_pe:
+            #   parent_groupid_of_pe = parent_groupid_of_pe._id
+
+            # alternate_template = "ndf/gprogram_event_group.html"
+
+        # The line below is commented in order to:
+        #     Fetch files_cur - resources under moderation in groupdahsboard.html
+        if group_obj.edit_policy == "EDITABLE_MODERATED":# and group_obj._type != "Group":
+            files_cur = node_collection.find({'group_set': ObjectId(group_obj._id), 
+              '_type': {'$in': ["File","GSystem"]}})
+
+        '''
+        property_order_list = []
+        if "group_of" in group_obj:
+          if group_obj['group_of']:
+            college = node_collection.one({'_type': "GSystemType", 'name': "College"}, {'_id': 1})
+
+            if college:
+              if college._id in group_obj['group_of'][0]['member_of']:
+                alternate_template = "ndf/college_group_details.html"
+
+            property_order_list = get_property_order_with_value(group_obj['group_of'][0])
+
+        annotations = json.dumps(group_obj.annotations)
+        '''
+        default_template = "ndf/groupdashboard.html"
+        return render_to_response([alternate_template,default_template] ,{'node': group_obj, 'groupid':group_id,
+                                                             'group_id':group_id, 'user':request.user,
+                                                             # 'shelf_list': shelf_list,
+                                                             'list_of_unit_events': list_of_unit_events,
+                                                             'blog_pages':blog_pages,
+                                                             'user_blogs': user_blogs,
+                                                             'selected': selected,
+                                                             'files_cur': files_cur,
+                                                             'sg_type': sg_type,
+                                                             'course_collection_data':course_collection_data,
+                                                             'parent_groupid_of_pe':parent_groupid_of_pe,
+                                                             'course_structure_exists':course_structure_exists,
+                                                             'allow_to_join': allow_to_join,
+                                                             'appId':app._id, 'app_gst': group_gst,
+                                                             'subgroups_cur':subgroups_cur,
+                                                             # 'annotations' : annotations, 'shelves': shelves,
+                                                             'prof_pic_obj': profile_pic_image,
+                                                             'old_profile_pics':old_profile_pics,
+                                                             'group_obj': group_obj,
+                                                            },context_instance=RequestContext(request)
+                                )
+
+    except Http404 as ne:
+        raise Http404("Test123")
         pass
 
-    if ("base_unit" in group_obj.member_of_names_list or
-        "CourseEventGroup" in group_obj.member_of_names_list or
-        "BaseCourseGroup" in group_obj.member_of_names_list or 
-        "announced_unit" in group_obj.member_of_names_list):
-        return HttpResponseRedirect(reverse('course_about', kwargs={'group_id': group_id}))
+    except PermissionDenied as pe:
+        raise PermissionDenied("pe")
 
-    if group_obj and group_obj.post_node:
-        # subgroups_cur = node_collection.find({'_id': {'$in': group_obj.post_node}, 'edit_policy': {'$ne': "EDITABLE_MODERATED"},
-        # now we are showing moderating group too:
-        subgroups_cur = node_collection.find({
-                '_type': u'Group',
-                '_id': {'$in': group_obj.post_node},
-                # 'member_of': {'$in': [group_gst._id]}, #Listing all types of sub groups
-                '$or': [
-                            {'created_by': request.user.id},
-                            {'group_admin': request.user.id},
-                            {'author_set': request.user.id},
-                            {'group_type': 'PUBLIC'}
-                        ]
-                }).sort("last_update",-1)
-
-
-
-    if not group_obj:
-      group_obj=node_collection.one({'$and':[{'_type':u'Group'},{'name':u'home'}]})
-      group_id=group_obj['_id']
-    else:
-      # group_obj=node_collection.one({'_id':ObjectId(group_id)})
-      group_id = group_obj._id
-
-      # getting the profile pic File object
-      # profile_pic_image, grelation_node = get_relation_value(group_obj._id,"has_profile_pic")
-      # profile_pic_image = get_relation_value(group_obj._id,"has_profile_pic")
-      # if profile_pic_image:
-      #   profile_pic_image =  profile_pic_image[0]
-
-      grel_dict = get_relation_value(group_obj._id, "has_profile_pic")
-      is_cursor = grel_dict.get("cursor",False)
-      if not is_cursor:
-          profile_pic_image = grel_dict.get("grel_node")
-          # grel_id = grel_dict.get("grel_id")
-
-
-      # for each in group_obj.relation_set:
-      #     if "has_profile_pic" in each:
-      #         profile_pic_image = node_collection.one(
-      #             {'_type': "File", '_id': each["has_profile_pic"][0]}
-      #         )
-      #         break
-    '''
-    auth = node_collection.one({'_type': 'Author', 'name': unicode(request.user.username) })
-
-    if auth:
-
-      has_shelf_RT = node_collection.one({'_type': 'RelationType', 'name': u'has_shelf' })
-
-      shelf = triple_collection.find({'_type': 'GRelation', 'subject': ObjectId(auth._id), 'relation_type': has_shelf_RT._id })
-      shelf_list = {}
-
-      if shelf:
-        #a temp. variable which stores the lookup for append method
-        shelves_append_temp=shelves.append
-        for each in shelf:
-          shelf_name = node_collection.one({'_id': ObjectId(each.right_subject)})
-          shelves_append_temp(shelf_name)
-
-          shelf_list[shelf_name.name] = []
-          #a temp. variable which stores the lookup for append method
-          shelf_lst_shelfname_append=shelf_list[shelf_name.name].append
-          for ID in shelf_name.collection_set:
-            shelf_item = node_collection.one({'_id': ObjectId(ID) })
-            shelf_lst_shelfname_append(shelf_item.name)
-
-      else:
-          shelves = []
-    '''
-  except Exception as e:
-    print "\nError: ", e
-    group_obj=node_collection.one({'$and':[{'_type':u'Group'},{'name':u'home'}]})
-    group_id=group_obj['_id']
-    pass
-
-  # profile_pic_image, grelation_node = get_relation_value(group_obj._id,"has_profile_pic")
-  # profile_pic_image = get_relation_value(group_obj._id,"has_profile_pic")
-  # if profile_pic_image:
-  #   profile_pic_image = profile_pic_image[0]
-  grel_dict = get_relation_value(group_obj._id, "has_profile_pic")
-  is_cursor = grel_dict.get("cursor",False)
-  if not is_cursor:
-      profile_pic_image = grel_dict.get("grel_node")
-      # grel_id = grel_dict.get("grel_id")
-
-  has_profile_pic_rt = node_collection.one({'_type': 'RelationType', 'name': unicode('has_profile_pic') })
-  all_old_prof_pics = triple_collection.find({'_type': "GRelation", "subject": group_obj._id, 'relation_type': has_profile_pic_rt._id, 'status': u"DELETED"})
-  if all_old_prof_pics:
-    for each_grel in all_old_prof_pics:
-      n = node_collection.one({'_id': ObjectId(each_grel.right_subject)})
-      old_profile_pics.append(n)
-
-  # Call to get_neighbourhood() is required for setting-up property_order_list
-  # group_obj.get_neighbourhood(group_obj.member_of)
-  course_structure_exists = False
-  files_cur = None
-  parent_groupid_of_pe = None
-  list_of_sg_member_of = get_sg_member_of(group_obj._id)
-  # print "\n\n list_of_sg_member_of", list_of_sg_member_of
-  files_cur = None
-  allow_to_join = ""
-  sg_type = None
-  course_collection_data = []
-  if  u"ProgramEventGroup" in list_of_sg_member_of and u"ProgramEventGroup" not in group_obj.member_of_names_list:
-      sg_type = "ProgramEventGroup"
-      # files_cur = node_collection.find({'group_set': ObjectId(group_obj._id), '_type': "File"})
-      parent_groupid_of_pe = node_collection.find_one({'_type':"Group","post_node": group_obj._id})
-      if parent_groupid_of_pe:
-        parent_groupid_of_pe = parent_groupid_of_pe._id
-
-      alternate_template = "ndf/gprogram_event_group.html"
-  if "CourseEventGroup" in group_obj.member_of_names_list:
-      sg_type = "CourseEventGroup"
-      alternate_template = "ndf/gcourse_event_group.html"
-      # course_collection_data = get_collection(request,group_obj._id,group_obj._id)
-      # course_collection_data = json.loads(course_collection_data.content)
-  if 'Group' in group_obj.member_of_names_list:
-    alternate_template = "ndf/lms.html"
-  # The line below is commented in order to:
-  #     Fetch files_cur - resources under moderation in groupdahsboard.html
-  # if  u"ProgramEventGroup" not in group_obj.member_of_names_list:
-  if "CourseEventGroup" in group_obj.member_of_names_list or u"ProgramEventGroup" in list_of_sg_member_of and u"ProgramEventGroup" not in group_obj.member_of_names_list:
-      page_gst = node_collection.one({'_type': "GSystemType", 'name': "Page"})
-      blogpage_gst = node_collection.one({'_type': "GSystemType", 'name': "Blog page"})
-      # files_cur = node_collection.find({'group_set': ObjectId(group_obj._id), '_type': "File"}).sort("last_update",-1)
-      if group_obj.collection_set:
-          course_structure_exists = True
-      if request.user.id:
-          all_blogs = node_collection.find({
-                'member_of':page_gst._id,
-                'type_of': blogpage_gst._id,
-                'group_set': group_obj._id
-            }).sort('created_at', -1)
-          if all_blogs:
-              blog_pages = all_blogs.clone()
-              blog_pages = blog_pages.where("this.created_by!=" + str(request.user.id))
-              user_blogs = all_blogs.where("this.created_by==" + str(request.user.id))
-      start_enrollment_date = get_attribute_value(group_obj._id,"start_enroll")
-      # if 'start_enroll' in group_obj:
-      #     if group_obj.start_enroll:
-      #         start_enrollment_date = group_obj.start_enroll
-      #         # print "\n\nstart_enrollment_date", start_enrollment_dates
-      if start_enrollment_date:
-        start_enrollment_date = start_enrollment_date.date()
-        curr_date_time = datetime.now().date()
-        if start_enrollment_date > curr_date_time:
-            allow_to_join = "Forthcoming"
-        else:
-            allow_to_join = "Open"
-
-      last_enrollment_date = get_attribute_value(group_obj._id,"end_enroll")
-      # if 'end_enroll' in group_obj:
-      #     if group_obj.end_enroll:
-      #         last_enrollment_date = group_obj.end_enroll
-      if last_enrollment_date:
-        last_enrollment_date = last_enrollment_date.date()
-        curr_date_time = datetime.now().date()
-        if last_enrollment_date < curr_date_time:
-            allow_to_join = "Closed"
-        else:
-            allow_to_join = "Open"
-  if group_obj.edit_policy == "EDITABLE_MODERATED":# and group_obj._type != "Group":
-      files_cur = node_collection.find({'group_set': ObjectId(group_obj._id), '_type': {'$in': ["File","GSystem"]}})
-  '''
-  property_order_list = []
-  if "group_of" in group_obj:
-    if group_obj['group_of']:
-      college = node_collection.one({'_type': "GSystemType", 'name': "College"}, {'_id': 1})
-
-      if college:
-        if college._id in group_obj['group_of'][0]['member_of']:
-          alternate_template = "ndf/college_group_details.html"
-
-      property_order_list = get_property_order_with_value(group_obj['group_of'][0])
-
-  annotations = json.dumps(group_obj.annotations)
-  '''
-  default_template = "ndf/groupdashboard.html"
-  # print "\n\n blog_pages.count------",blog_pages
-  if alternate_template:
-    return HttpResponseRedirect( reverse('course_about', kwargs={"group_id": group_id}) )
-  else:
-    return render_to_response([alternate_template,default_template] ,{'node': group_obj, 'groupid':group_id,
-                                                       'group_id':group_id, 'user':request.user,
-                                                       # 'shelf_list': shelf_list,
-                                                       'list_of_unit_events': list_of_unit_events,
-                                                       'blog_pages':blog_pages,
-                                                       'user_blogs': user_blogs,
-                                                       'selected': selected,
-                                                       'files_cur': files_cur,
-                                                       'sg_type': sg_type,
-                                                       'course_collection_data':course_collection_data,
-                                                       'parent_groupid_of_pe':parent_groupid_of_pe,
-                                                       'course_structure_exists':course_structure_exists,
-                                                       'allow_to_join': allow_to_join,
-                                                       'appId':app._id, 'app_gst': group_gst,
-                                                       'subgroups_cur':subgroups_cur,
-                                                       # 'annotations' : annotations, 'shelves': shelves,
-                                                       'prof_pic_obj': profile_pic_image,
-                                                       'old_profile_pics':old_profile_pics,
-                                                       'group_obj': group_obj,
-                                                      },context_instance=RequestContext(request)
-                          )
+    except Exception as e:
+        pass
 
 
 # @login_required
