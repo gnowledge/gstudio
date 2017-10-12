@@ -99,6 +99,7 @@
   <script src="/static/ndf/bower_components/DataTables/media/js/jquery.dataTables.min.js"></script>
   <script src="/static/ndf/bower_components/datatables-rowsgroup/dataTables.rowsGroup.js"></script>
   <script src="/static/ndf/bower_components/datatables.net-buttons/js/dataTables.buttons.js"></script>
+  <script src="/static/ndf/bower_components/datatables.net-buttons/js/dataTables.buttons.min.js"></script>
   <script src="/static/ndf/bower_components/datatables.net-buttons/js/buttons.html5.js"></script>
   <script src="/static/ndf/bower_components/datatables.net-buttons/js/buttons.print.min.js"></script>
   <link href="/static/ndf/bower_components/datatables.net-buttons-dt/css/buttons.dataTables.min.css" rel="stylesheet" type="text/css" />
@@ -111,6 +112,7 @@
   <script src="/static/ndf/bower_components/datatables-plugins/integration/foundation/dataTables.foundation.js"></script>
  -->
 {% endblock %}
+{% get_group_name group_id as group_name %}
 
   <div class="small-12 columns table-container">
   </div>
@@ -118,20 +120,43 @@
   <script type="text/javascript">
       // Student analytics view
       $(document).ready(function(){
+          // Image embedding in pdf
+          // var image = new Image();
+          // // image.src = '/static/ndf/images/Clix_logo.png',
+          // image.src = '{{site.LOGO}}',
+          // console.log(image.src)
+          // image.crossOrigin = 'anonymous';
+
+          // var canvas = document.createElement("canvas"),
+          // canvasContext = canvas.getContext("2d");
+          // canvasContext.drawImage(image, 0, 0, 60, 50);
+          // // var dataURL = canvas.toDataURL();
+          // var dataURL = canvas.toDataURL('image/png');
+          // console.log(dataURL )
+          // console.log(dataURL.length)
+          // console.log(img_dataURL)
+
+
           var buttonCommon = {
               exportOptions: {
+                stripHtml: false,
                   format: {
                       body: function ( data, row, column, node ) {
                           // Format options
-                          if (column==3){
-                            console.log(data)
-                            data = JSON.stringify(data)
-                            console.log(data + "====")
-                          }
+                          // if (column==3){
+                            // console.log(data)
+                            // data = JSON.stringify(data)
+                            // console.log(data + "====")
+                          // }
                           return data
                       }
-                  }
-              }
+                  },
+              },
+                title: function(){
+                  return "{{group_name|slugify  }}"
+                },
+
+
           };
 
           data = {{data|safe}}
@@ -158,18 +183,50 @@
             "dom": 'Bfrtip',
             "buttons": [
               'pageLength', 
+                {
+                    extend: 'csvHtml5',
+                    title: function(){
+                      return "{{group_name|slugify}}" 
+                    } 
+                },
+                {
+                    extend: 'pdfHtml5',
+                    header : true,
+                    footer: true,
 
-            $.extend( true, {}, buttonCommon, {
-                extend: 'copyHtml5'
-            } ),
-            $.extend( true, {}, buttonCommon, {
-                extend: 'excelHtml5'
-            } ),
-            $.extend( true, {}, buttonCommon, {
-                extend: 'pdfHtml5'
-            } )
+                    customize: function ( doc ) {
+                        doc.pageMargins = [30,30,30,30];
+                        doc['footer']=(function(page, pages) {
+                            return {
+                                columns: [
+                                    'CLIx, Tata Institute of Social Sciences\nPowered by gStudio',
+                                    {
+                                        alignment: 'right',
+                                        text: ['Page ', { text: page.toString() },  ' of ', { text: pages.toString() }]
+                                    }
+                                ],
+                                margin: [10, 0]
+                            }
+                        });
+                        // doc.content.splice( 1, 0, {
+                        //     margin: [ 0, 0, 0, 5 ],
+                        //     alignment: 'left',
+                        //     image: dataURL
+                        // }),
 
+                        doc.styles.title = {
+                          margin: [ 20, 0, 0, 5 ],
+                          color: '#6e3254',
+                          fontSize: '22',
+                          fontWeight: 'bold',
+                          alignment: 'center'
+                        }
+                    },
+                    title: function(){
+                      return "{{group_name|slugify}}" 
+                    } 
 
+                }
             ],
             "columns": [
                     {
@@ -200,7 +257,7 @@
 
             "autoWidth": false,
             "createdRow": function (row, data, index) {
-              console.log(data)
+              // console.log(data)
               /*
               $.each(data, function(key, quiz_dict){
                 $(row).find("td:nth-child(1)").html(key.toString());

@@ -3986,6 +3986,7 @@ def course_quiz_data(request, group_id, all_data=False):
         all_data = false, will return only subimitted data
 
     '''
+
     def _merged_to_from(min_list, max_list, na_index):
         # max list contains more num of list
         # min list contains less num of list
@@ -3998,8 +3999,8 @@ def course_quiz_data(request, group_id, all_data=False):
     group_obj   = Group.get_group_name_id(group_id, get_obj=True)
     group_id    = group_obj._id
     group_name  = group_obj.name
-
-    if not request.user.is_superuser:
+    gstaff_access = check_is_gstaff(group_id, request.user)
+    if not gstaff_access:
         return HttpResponseRedirect(reverse('course_content', kwargs={'group_id': ObjectId(group_id)}))
 
     allow_to_join = get_group_join_status(group_obj)
