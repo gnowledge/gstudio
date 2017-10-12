@@ -2203,16 +2203,13 @@ def group_dashboard(request, group_id=None):
                                 )
 
     except Http404 as ne:
-        print "\nNUN0"
         raise Http404("Test123")
         pass
 
     except PermissionDenied as pe:
-        print "\nNUN1"
         raise PermissionDenied("pe")
 
     except Exception as e:
-        print "\nNUN2"
         pass
 
 
