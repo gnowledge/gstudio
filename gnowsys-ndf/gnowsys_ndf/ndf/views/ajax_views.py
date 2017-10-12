@@ -7129,3 +7129,17 @@ def get_rating_template(request, group_id):
               "group_id":group_id,"node":node_obj,"if_comments":is_comments,'nodeid':node_obj._id,
             },
             context_instance=RequestContext(request))
+
+@get_execution_time
+def get_telegram_content(request, group_id):
+  try:
+      group_id = ObjectId(group_id)
+  except:
+      group_name, group_id = get_group_name_id(group_id)
+  
+  import telepot
+  token = '402840205:AAHyxQfL_OeXiVwNSQkV2v1dJvQcmhlir5g'
+  TelegramBot = telepot.Bot(token)
+  print TelegramBot.getMe()
+
+  return HttpResponse("success")
