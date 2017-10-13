@@ -77,6 +77,14 @@ h5{
     margin-right: 10px;
 }
 
+.symbol-wid{
+    cursor: pointer;
+    font-size: 29px;
+    color: #a2b1be;
+    margin-right: 0px;
+    margin-top: 40px;
+}
+
 .buddy-wid{
     font-size: 34px;
     color: #a2b1be;
@@ -1352,7 +1360,14 @@ ul.horizontal_tabs_gstudio {
 }
 
 
-
+.preview_asset_page {
+    //background: #ccc;
+    //border: 2px solid #999;
+    word-wrap: break-word;
+    width: 200%;
+    min-height: 350px;
+    margin-left: 14px;
+}
 
 .preview_asset {
     background: #ccc;
@@ -1419,11 +1434,11 @@ input[type="text"], input[type="file"] {
     margin-top: 5px;
 }
 label {
-    font-size: 12px;
-    text-transform: uppercase;
-    color: #99aaba;
-    margin-bottom: 7px;
-    margin-left: 20px;
+    font-size: 15px;
+    text-transform: initial;
+    color: rgba(43, 51, 63, 0.75);
+    margin-bottom: 15px;
+    margin-left: 0px;
 }
 
 
@@ -3484,7 +3499,7 @@ ul.jqtree-tree .jqtree-toggler {
 
     .bg-img{
     //background: url(/static/ndf/images/group-tile.png) no-repeat;
-    background: url(/static/ndf/images/i2c-bg.png);
+    //background: url(/static/ndf/images/i2c-bg.png);
     height:100%;
     background-size: 100%;
     background-repeat: no-repeat;
@@ -5816,6 +5831,15 @@ ul.nav_menu_1 {
   word-spacing:20px;
 }
 
+.bo-footer-images{
+    display: inline;
+    max-width:120px;
+    max-height:95px;
+    width: auto;
+    height: auto; 
+    vertical-align: bottom;
+}
+
 .bo-footer-uonline {
   width: 300px; /* Account for margins + border values */
   float: left;
@@ -5832,6 +5856,8 @@ ul.nav_menu_1 {
   color: #636A7D;
   vertical-align: middle;
 }
+
+
 
 
 /*##### Footer Responsive #####*/
