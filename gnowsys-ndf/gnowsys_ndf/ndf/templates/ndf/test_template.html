@@ -3,6 +3,7 @@
 {% load i18n %}
 {% load ndf_tags %}
 {% block body_content %}
+<input type="button" name="btn" class="btn" value="Get messages">
 
 <style type="text/css">
   
@@ -207,5 +208,19 @@
 
 
 
+
+
+
+<script type="text/javascript">
+    $(".btn").click(function(){
+    $.ajax({
+                 url: "{% url 'get_telegram_content' node.pk %}",
+                 type:"GET",
+                 success: function(data) {
+                        alert(data);
+                   }
+          })
+    })
+</script>
 
 {% endblock body_content %}

@@ -77,6 +77,14 @@ h5{
     margin-right: 10px;
 }
 
+.symbol-wid{
+    cursor: pointer;
+    font-size: 29px;
+    color: #a2b1be;
+    margin-right: 0px;
+    margin-top: 40px;
+}
+
 .buddy-wid{
     font-size: 34px;
     color: #a2b1be;
@@ -1435,11 +1443,11 @@ input[type="text"], input[type="file"] {
     margin-top: 5px;
 }
 label {
-    font-size: 12px;
-    text-transform: uppercase;
-    color: #99aaba;
-    margin-bottom: 7px;
-    margin-left: 20px;
+    font-size: 15px;
+    text-transform: initial;
+    color: rgba(43, 51, 63, 0.75);
+    margin-bottom: 15px;
+    margin-left: 0px;
 }
 
 

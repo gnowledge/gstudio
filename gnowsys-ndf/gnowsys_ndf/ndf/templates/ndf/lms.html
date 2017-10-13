@@ -175,6 +175,9 @@
       <a href="{% url 'curriculum_list' groupid  %}"> {% trans "Topic Map" %}</a>
     </li>
     {% endif %}
+    <li>
+      <a href="{% url 'gtask' groupid  %}" {% if title == "Task" or title == "task_detail" %} class="selected" {% endif %} >  {% trans "Tasks" %} </a>
+    </li>
   </ul>
 </div>
 
@@ -218,6 +221,16 @@
       {% endif %}
     </div>
   </div>
+  <div id="group_task">
+      {% if title == "Task" %}
+        {% include "ndf/gtask.html" %}
+      {% endif %}
+    </div>
+    <div id="group_task">
+      {% if title == "task_detail" %}
+        {% include "ndf/gtask_details.html" %}
+      {% endif %}
+    </div>
 
 
 
