@@ -2050,6 +2050,19 @@ def activity_player_detail(request, group_id, lesson_id, activity_id):
     group_id    = group_obj._id
     group_name  = group_obj.name
 
+    unit_structure = get_unit_hierarchy(group_obj)
+    all_lessons = len(unit_structure)
+    lesson_list = []
+    lesson_list_id = []
+    
+    # trans_lesson_list = get_trans_node_list(group_obj.collection_set)
+    
+    for each in group_obj.collection_set:
+        node = node_collection.one({"_id":ObjectId(each)})
+        lesson_list.append(node.name)
+
+
+
     parent_node_id = activity_id
     node_obj = node_collection.one({'_id': ObjectId(activity_id)})
     trans_node = get_lang_node(node_obj._id,request.LANGUAGE_CODE)
@@ -2090,13 +2103,16 @@ def activity_player_detail(request, group_id, lesson_id, activity_id):
 
     context_variables = {
         'group_id': group_id, 'groupid': group_id, 'group_name':group_name,
+        'group_obj': group_obj,'node': group_obj, 'title': 'course content',
         'allow_to_comment': True,
         'node': node_obj, 'lesson_node': lesson_node, 'activityid': ObjectId(activity_id),
         'resource_index': resource_index, 'resource_next_id': resource_next_id,
         'resource_prev_id': resource_prev_id, 'resource_count': resource_count,
         'translation': translation_obj, 'unit_resources_list_of_dict': unit_resources_list_of_dict,
+        'unit_structure': json.dumps(unit_structure,cls=NodeJSONEncoder),
         'trans_node':trans_node,
         'act_list':trans_act_list,
+        'lesson_list':lesson_list,
         'trans_lesson_name':lesson_name,
         'no_footer': True
     }
