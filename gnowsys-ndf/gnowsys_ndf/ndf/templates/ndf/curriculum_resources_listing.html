@@ -1,4 +1,112 @@
-{% load ndf_tags %}
-{% load simple_filters %}
+{% extends "ndf/gbase.html" %}
 {% load i18n %}
-  
+{% load ndf_tags %}
+{% block title %}   {% endblock %}
+{% block body_content %}
+
+
+
+<div class="lms_page">
+     <div class="lms_banner">
+        <div class="small-12 columns lms_heading">
+              <div class="left unit_name"> 
+              </div>
+              <div class="right course_actions margin-right-50">
+                  <span data-dropdown="course-settings-drop" aria-controls="course-settings-drop" aria-expanded="false" class="tiny radius right" data-options="align:left">
+                      <i class="icon-widget fi-widget"></i>
+                  </span>
+                  <ul id="course-settings-drop" class="f-dropdown" data-dropdown-content aria-hidden="true" tabindex="-1">
+                      <li>
+                          <a href="#" class="fi-pencil"> {% trans "Edit" %}</a>
+                      </li>
+                  </ul>
+              </div>
+              <ul id="noti">
+                <li id="notification_li">
+                    <a href="#" id="notificationLink"><i class="fa fa-bell-o" style="font-size:1.7em; color:white;"></i></a>
+                    <span id="notification_count">3</span>
+                    <div id="notificationContainer">
+                        <div id="notificationsBody" class="notifications">
+                            <div class="notifications_listing">
+                                <div class="notifications_content">
+                                    <div class="notifications_content_left">
+                                        <a href="#" class="hyperlink-user"><i class="fa fa-user fa-4x" style="color:#164a7b;border: 2px solid #b9b9b9;height: 50px;width: 50px;padding: 1px 1px 1px 5px;"></i></a>
+                                        <div class="notifications_content_details">
+                                            <a href="#" class="hyperlink-style" style="text-overflow:ellipsis;">user 1 created a new blog user 1 created a new blog user 1 created a new blog user 1 created a new blog user 1 created a new blog user 1 created a new created a new blog u </a>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div id="notificationFooter"><a href="#">See All</a></div>
+                    </div>
+                </li>
+            </ul>
+            <ul id="analytics">
+                <li id="analytics_li">
+                    <a href="#" id="analyticsLink"><i class="fa fa-line-chart" style="font-size:1.5em; color:white;"></i></a>
+                    <span id="analytics_count">3</span>
+                    <div id="analyticsContainer">
+                        <div id="analyticsTitle">Analytics</div>
+                        <div id="analyticsBody" class="analytics"></div>
+                        <div id="analyticsFooter"><a href="#">See All</a></div>
+                    </div>
+                </li>
+            </ul>
+            <div class="right enroll-unit">
+
+            </div>
+       </div>
+     </div>
+</div>
+
+
+<script type="text/javascript">
+$(document).ready(function()
+{
+    $("#notificationLink").click(function()
+{
+    $("#notificationContainer").fadeToggle(300);
+    $("#notification_count").fadeOut("slow");
+    return false;
+});
+
+//Document Click hiding the popup 
+$(document).click(function()
+{
+    $("#notificationContainer").hide();
+});
+
+//Popup on click
+$("#notificationContainer").click(function()
+{
+    return false;
+});
+
+});
+
+$(document).ready(function()
+{
+    $("#analyticsLink").click(function()
+{
+    $("#analyticsContainer").fadeToggle(300);
+    $("#analytics_count").fadeOut("slow");
+    return false;
+});
+
+//Document Click hiding the popup 
+$(document).click(function()
+{
+    $("#analyticsContainer").hide();
+});
+
+//Popup on click
+$("#analyticsContainer").click(function()
+{
+    return false;
+});
+
+});
+</script>
+
+{% endblock body_content %}
