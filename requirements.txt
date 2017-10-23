@@ -30,6 +30,7 @@ Fabric==1.12.0
 pathlib2==2.2.1
 # pycrypto may need sometimes for Fabric
 # pycrypto
+sphinx==1.6.5
 
 # QBANK-LITE REQ: https://github.com/CLIxIndia-Dev/qbank-lite/blob/master/requirements.txt
 # also make sure following are updated w.r.t qbank repo
