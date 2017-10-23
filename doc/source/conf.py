@@ -25,7 +25,7 @@
 
 # If your documentation needs a minimal Sphinx version, state it here.
 #
-# needs_sphinx = '1.0'
+needs_sphinx = '1.6'
 
 # Add any Sphinx extension module names here, as strings. They can be
 # extensions coming with Sphinx (named 'sphinx.ext.*') or your custom
@@ -37,7 +37,7 @@ source_parsers = {
     '.md': CommonMarkParser,
 }
 
-source_suffix = ['.rst', '.md']
+source_suffix = ['.rst', '.md', '.org']
 
 extensions = ['sphinx.ext.autodoc',
     'sphinx.ext.doctest',
@@ -62,7 +62,7 @@ master_doc = 'index'
 
 # General information about the project.
 project = u'gstudio'
-copyright = u'2017, GN, Kedar A., Rachana K.'
+copyright = u'2017, GN, Kedar A, Rachana K'
 author = u'GN, Kedar A., Rachana K.'
 
 # The version info for the project you're documenting, acts as replacement for
