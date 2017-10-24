@@ -1,18 +1,25 @@
 # -*- coding: utf-8 -*-
-from bson import json_util
 import re
 import json
 import os
+
+from bson import json_util
 from django.shortcuts import render
 from django.http import HttpResponseRedirect, HttpResponse, StreamingHttpResponse
 from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 from gnowsys_ndf.ndf.forms import SearchForm
 from gnowsys_ndf.ndf.models import *
-from gnowsys_ndf.settings import GSTUDIO_SITE_NAME,GSTUDIO_NO_OF_OBJS_PP,GSTUDIO_DOCUMENT_MAPPING
+from gnowsys_ndf.settings import GSTUDIO_SITE_NAME, GSTUDIO_NO_OF_OBJS_PP, GSTUDIO_DOCUMENT_MAPPING
+from gnowsys_ndf.settings import GSTUDIO_ELASTIC_SEARCH_ALIAS, GSTUDIO_ELASTIC_SEARCH_SUPERUSER, \
+	GSTUDIO_ELASTIC_SEARCH_PORT, GSTUDIO_ELASTIC_SEARCH_SUPERUSER_PASSWORD
 
 try:
 	from elasticsearch import Elasticsearch		
-	es = Elasticsearch(['http://elsearch:changeit@gsearch:9200'])
+	es_connection_string = 'http://' + GSTUDIO_ELASTIC_SEARCH_SUPERUSER + ':' \
+							+ GSTUDIO_ELASTIC_SEARCH_SUPERUSER_PASSWORD + '@' \
+							+ GSTUDIO_ELASTIC_SEARCH_ALIAS + ':' + \
+							GSTUDIO_ELASTIC_SEARCH_PORT
+	es = Elasticsearch([es_connection_string])
 except Exception as e:
 	pass
 
