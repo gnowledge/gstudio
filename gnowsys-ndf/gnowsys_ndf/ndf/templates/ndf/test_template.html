@@ -58,6 +58,198 @@
 
 </style>
 
+<!--Notebook New UI-->
+
+
+<div class="activity_player_secondary_header activity_player_header sticky">
+  <nav class="activity_player_secondary_header activity_player_header hide-for-small hide-for-medium" data-topbar role="navigation" data-options="sticky_on: large">
+      <div class="small-1 columns end">
+        <a href="#">Note title
+        <div class="header_icon_block prev_button">
+            <i class="fa fa-angle-left header_icon"></i>
+        </div>
+        </a>
+      </div>
+        <div class="header_title header_text_block">
+             Note title 2
+        </div>
+        <div class="new_note header_text_block">
+            <a href="#" ><i class="fa fa-edit header_icon"></i>&nbsp;
+               WRITE A NEW NOTE
+            </a>
+        </div>
+        <div class="pagination prev_button header_text_block">
+            
+              <a href="#"> 
+                  <i class="fa fa-angle-left header_icon"></i> prev
+              </a>
+            
+        </div>
+        <div class="pagination page_count header_text_block">
+            of
+        </div>
+        <div class="pagination page_count header_text_block">
+              <a href="#">
+                  Next <i class="fa fa-angle-right header_icon"></i>
+              </a>
+            
+        </div>
+</nav>
+</div>
+
+
+<div class="off-canvas-wrap" data-offcanvas>
+  <div class="inner-wrap">
+    <nav class="tab-bar show-for-medium">
+      <section class="left-small">
+        <a class="left-off-canvas-toggle menu-icon" ></a>
+      </section>
+
+      <section class="middle tab-bar-section">
+        <h1 class="title">Note title</h1>
+      </section>
+
+      <section class="right-small">
+        <a class="right-off-canvas-toggle menu-icon" ></a>
+      </section>
+    </nav>
+
+    <aside class="left-off-canvas-menu">
+      <ul class="off-canvas-list">
+        <li><label>Lesson name </label></li>
+                    <li> <a href="#">Activity1 </a></li>
+        <li class="has-submenu"><a href="#" style="background-color:#444444;">Unit Structure</a>
+            <ul class="left-submenu">
+                <li class="back"><a href="#">Back</a></li>
+                        <li class="has-submenu"> <a href="#"></a></li>
+                    <li class="has-submenu"><a href="#">Lesson Name</a>
+                        <ul class="left-submenu">
+                            <li class="back"><a href="#">Back</a></li>
+                                <li> <a href="#"> Name </a></li>
+                        </ul>
+                    </li>
+            </ul>
+        </li>
+      </ul>
+    </aside>
+
+    <!--
+
+        <aside class="right-off-canvas-menu">
+      <ul class="off-canvas-list">
+        <li><label>Navigation</label></li>
+        <li><a href="#"><i class="fa fa-fast-backward"></i>  {% trans "Previous Lesson" %}</a></li>
+        <li><a {% if resource_prev_id %} href="{% url 'activity_player_detail' group_id lesson_node.pk resource_prev_id %}" {% else %} class = "disabled"{% endif %}> 
+                  <i class="fa fa-angle-left header_icon"></i> {% trans "Previous Activity" %}</a>
+        </li>
+        <li><a {% if resource_next_id %}  href="{% url 'activity_player_detail' group_id lesson_node.pk resource_next_id %}" {% else %} class = "disabled" {% endif %}>
+                  {% trans "Next Activity" %} <i class="fa fa-angle-right header_icon"></i>
+              </a></li>
+        <li><a href="#"><i class="fa fa-fast-forward"></i>  {% trans "Next Lesson" %}</a></li>
+
+        <li class="has-submenu"><a href="#" style="background-color:#444444">More..</a>
+            <ul class="right-submenu">
+                <li class="back"><a href="#">Back</a></li>
+                <li><a {% if user_access_priv == "allow" %} href="{% url 'course_notebook' group_id %}?create=True" {% else %} class="user_not_enrolled" {% endif %}><i class="fa fa-edit header_icon"></i>{% trans "Write a new Note" %}</a>
+                </li>
+                <li><a href="#">View Gallery</a></li>
+                <li><a href="#">Upload a Image</a></li>
+                
+            </ul>
+        </li>
+      </ul>
+    </aside>
+-->
+
+
+<div class="off-canvas-wrap" data-offcanvas>
+  <div class="inner-wrap">
+    <nav class="tab-bar show-for-small">
+      <section class="left-small">
+        <a class="left-off-canvas-toggle menu-icon" ></a>
+      </section>
+
+      <section class="middle tab-bar-section">
+        <h1 class="title">title</h1>
+      </section>
+
+      <section class="right-small">
+        <a class="right-off-canvas-toggle menu-icon" ></a>
+      </section>
+    </nav>
+
+    <aside class="left-off-canvas-menu">
+      <ul class="off-canvas-list">
+        <li><label>lesson name</label></li>
+                    <li> <a href="#"> act name </a></li>
+        <li class="has-submenu"><a href="#" style="background-color:#444444;">Unit Structure</a>
+            <ul class="left-submenu">
+                <li class="back"><a href="#">Back</a></li>
+                        <li class="has-submenu"> <a href="#"></a></li>
+                    <li class="has-submenu"><a href="#">Lesson Name</a>
+                        <ul class="left-submenu">
+                            <li class="back"><a href="#">Back</a></li>
+                                <li> <a href="#"> name </a></li>
+                        </ul>
+                    </li>
+            </ul>
+        </li>
+      </ul>
+    </aside>
+    <!--
+
+        <aside class="right-off-canvas-menu">
+      <ul class="off-canvas-list">
+        <li><label>Navigation</label></li>
+        <li><a href="#"><i class="fa fa-fast-backward"></i>  {% trans "Previous Lesson" %}</a></li>
+        <li><a {% if resource_prev_id %} href="{% url 'activity_player_detail' group_id lesson_node.pk resource_prev_id %}" {% else %} class = "disabled"{% endif %}> 
+                  <i class="fa fa-angle-left header_icon"></i> {% trans "Previous Activity" %}</a>
+        </li>
+        <li><a {% if resource_next_id %}  href="{% url 'activity_player_detail' group_id lesson_node.pk resource_next_id %}" {% else %} class = "disabled" {% endif %}>
+                  {% trans "Next Activity" %} <i class="fa fa-angle-right header_icon"></i>
+              </a></li>
+        <li><a href="#"><i class="fa fa-fast-forward"></i>  {% trans "Next Lesson" %}</a></li>
+
+        <li class="has-submenu"><a href="#" style="background-color:#444444">More..</a>
+            <ul class="right-submenu">
+                <li class="back"><a href="#">Back</a></li>
+                <li><a {% if user_access_priv == "allow" %} href="{% url 'course_notebook' group_id %}?create=True" {% else %} class="user_not_enrolled" {% endif %}><i class="fa fa-edit header_icon"></i>{% trans "Write a new Note" %}</a>
+                </li>
+                <li><a href="#">View Gallery</a></li>
+                <li><a href="#">Upload a Image</a></li>
+                
+            </ul>
+        </li>
+      </ul>
+    </aside>-->
+
+
+<div class="row activity_sheet ">
+    <div class="small-12 columns">
+        <div class="course_editor ">
+          <div class="small-3 columns hide-for-small hide-for-medium">
+            <div class="course_tree">
+              <div class="lesson-title" title="">
+                  <b>Lesson Name</b>
+              </div>
+              <div class="activity-title">
+                    <li> <a href="#"> Act Name  </a></li>
+              </div>
+              </div>
+          </div>
+          
+          <div class="small-12 medium-12 large-8 columns">
+            <div class="small-12 medium-12 large-12 columns course_editor_section">
+              <div class="input_links row" style="margin-left:10px;">
+                Rating
+              </div>
+            </div>
+          </div>
+        </div>
+        </div>
+      </div>
+</div>             
+
 
 <!-- LMS secondary header mobile UI -->
 
@@ -129,6 +321,7 @@
     </div>
 </div>-->
 
+<!--
 
 <div class="activity_player_secondary_header activity_player_header sticky">
   <nav class="activity_player_secondary_header activity_player_header hide-for-small" data-topbar role="navigation" data-options="sticky_on: large">
@@ -225,6 +418,9 @@
 
   </div>
 </div>
+-->
+
+
 
 
 
