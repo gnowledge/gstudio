@@ -73,7 +73,9 @@
                               <a href="#" class="close">&times;</a>
                             </div>
                         </li>
-                        <div id="analyticsFooter"><a href="#">See All</a></div>
+                        {% if groupid %}
+                            <div id="analyticsFooter"><a href="{% url 'notification_details' groupid  %}">See All</a></div>
+                        {% endif %}
                     </ul>
 
                 {% if help_oid %}
