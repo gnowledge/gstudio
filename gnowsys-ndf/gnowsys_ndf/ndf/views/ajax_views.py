@@ -5687,8 +5687,9 @@ def attendees_relations(request,group_id,node):
  return HttpResponse(json.dumps(column_list))
 
 
+
 @get_execution_time
-def page_scroll(request,group_id,page):
+def page_scroll(request,group_id,page=1):
   hyperlinks = request.GET.get("links")
   if hyperlinks:
     hyperlinks = json.loads(hyperlinks)
@@ -5696,6 +5697,7 @@ def page_scroll(request,group_id,page):
     hyperlinks = True
 
   group_obj = node_collection.find({'group_set':ObjectId(group_id)}).sort('last_update', -1)
+
   if group_obj.count() >=10:
     paged_resources = Paginator(group_obj,10)
   else:
@@ -5726,7 +5728,7 @@ def page_scroll(request,group_id,page):
   else:
     page=0
 
-  return render_to_response('ndf/scrolldata.html',
+  return render_to_response('ndf/notifications_detail.html',
                                 { 'activity_list': files_list,
                                   'group_id': group_id,
                                   'groupid':group_id,

@@ -2842,3 +2842,32 @@ def upload_using_save_file(request,group_id):
     else:
         return HttpResponseRedirect( reverse('file_detail', kwargs={"group_id": group_id,'_id':fileobj_id}))
     # return HttpResponseRedirect(url_name)
+
+@get_execution_time
+def notification_details(request,group_id):
+    group_obj = node_collection.find({'group_set':ObjectId(group_id)}).sort('last_update', -1)
+    files_list = []
+    user_activity = []
+    user_activity_append_temp=user_activity.append
+    files_list_append_temp=files_list.append
+    for each in group_obj:
+      if each.created_by == each.modified_by :
+        if each.last_update == each.created_at:
+          activity =  'created'
+        else:
+          activity =  'modified'
+      else:
+        activity =  'created'
+      if each._type == 'Group':
+        user_activity_append_temp(each)
+      each.update({'activity':activity})
+      files_list_append_temp(each)
+    print "00000000000000000",files_list
+    return render_to_response('ndf/notifications_detail.html',
+                                { 
+                                  'group_id': group_id,
+                                  'groupid':group_id,
+                                  'activity_list' : files_list
+                                },
+                                context_instance = RequestContext(request)
+                            )
