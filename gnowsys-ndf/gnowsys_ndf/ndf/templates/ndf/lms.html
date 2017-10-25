@@ -241,9 +241,14 @@
 
 <script type="text/javascript">
   var imgSrc = $('.lms_banner .div-height img').attr('src');
+  $('.lms_banner').css('z-index','99');
   $('.lms_banner .div-height img').attr('src', '');
   $('.lms_banner .div-height img').attr('alt', '');
   $('.lms_banner').backstretch(imgSrc);
+
+  // setTimeout(function(){
+    
+  // }, 1000);
 </script>
 
 {% endblock %}
