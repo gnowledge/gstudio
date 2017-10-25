@@ -3795,6 +3795,24 @@ $ah_2_background_color_hover: rgba(244, 244, 244, 0.3);;
 
 }
 
+
+/*  Overriding off-canvas class of foundation for responsive activity player header*/
+.tab-bar{
+            background: $ah_2_background_color;
+            
+        }
+
+        .left-off-canvas-menu{
+            background: $ah_2_background_color;
+        }
+
+        .right-off-canvas-menu{
+            background: $ah_2_background_color;
+        }
+
+
+    
+
 /*
 Buddy Vertical Bar Css
 */
@@ -4259,13 +4277,14 @@ ul.nav_menu_1 {
 .course_editor_section{
     background:#fff;
     min-height: 100vh;
-    min-width:910px;
     margin-bottom:10px;
     padding-right:4px;
     #scstyle{
         margin-top:-10px;
     }
 }
+
+
 
 .lesson-title{
     font-size: 18px;
@@ -4976,7 +4995,98 @@ $module-card-lines-to-show: 3;
     color: #fff;
     box-shadow: 0 0 2px 0 rgba(0, 0, 0, 0.2);
     border-bottom: 1px solid rgba(0, 0, 0, 0.25);
+    margin-top:150px;
 }
+
+@media screen and (max-width: 480px) {
+    .lms_secondary_header{
+        width: 100%;
+        position: relative;
+        color: #fff;
+        box-shadow: 0 0 2px 0 rgba(0, 0, 0, 0.2);
+        border-bottom: 1px solid rgba(0, 0, 0, 0.25);
+        margin-top:382px;
+        font-size: 18px;
+        letter-spacing: 0.8px;
+    }
+}
+@media screen and (max-width: 640px) {
+    .lms_secondary_header{
+        width: 100%;
+        position: relative;
+        color: #fff;
+        box-shadow: 0 0 2px 0 rgba(0, 0, 0, 0.2);
+        border-bottom: 1px solid rgba(0, 0, 0, 0.25);
+        margin-top:382px;
+        font-size: 18px;
+        letter-spacing: 0.8px;
+    }
+}
+@media screen and (max-width: 800px) {
+    .lms_secondary_header{
+        width: 100%;
+        position: relative;
+        color: #fff;
+        box-shadow: 0 0 2px 0 rgba(0, 0, 0, 0.2);
+        border-bottom: 1px solid rgba(0, 0, 0, 0.25);
+        margin-top:382px;
+        font-size: 18px;
+        letter-spacing: 0.8px;
+    }
+}
+
+  
+.topnav {
+  overflow: hidden;
+  background-color: #fff;
+}
+
+.topnav a {
+  float: left;
+  display: block;
+  color: #ce7869;
+  text-align: center;
+  padding: 14px 16px;
+  text-decoration: none;
+  font-size: 18px;
+  letter-spacing: 0.8px;
+}
+
+.topnav a:hover {
+  border-bottom: 3px solid #ffc14e;
+  color: #ce7869;
+}
+.selected {
+  border-bottom: 3px solid #ffc14e;
+ }
+
+.topnav .icon {
+  display: none;
+}
+
+@media screen and (max-width: 600px) {
+  .topnav a:not(:first-child) {display: none;}
+  .topnav a.icon {
+    float: right;
+    display: block;
+  }
+}
+
+@media screen and (max-width: 600px) {
+  .topnav.responsive {position: relative;}
+  .topnav.responsive .icon {
+    position: absolute;
+    right: 0;
+    top: 0;
+  }
+.topnav.responsive a {
+    float: none;
+    display: block;
+    text-align: left;
+}
+}
+
+
 $nav_menu_1_color: #ce7869;
 $nav_menu_1_bg_color: #fff;
 $nav_menu_1_tab_border: #ffc14e;
@@ -6155,4 +6265,5 @@ ul.nav_menu_1 {
 .left-space {
     margin-left: 0.5em;
 }
+
 

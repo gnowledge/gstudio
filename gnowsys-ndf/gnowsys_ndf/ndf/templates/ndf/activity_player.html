@@ -18,8 +18,6 @@
     color:gray !important;
   }
   .course_editor_section{
-    min-width:930px;
-    margin-left: -15px;
   }
   .node-content-div{
     
@@ -30,7 +28,7 @@
 {% include 'ndf/widget_user_access_modal.html' %}
 
 <div class="activity_player_secondary_header activity_player_header sticky">
-  <nav class="activity_player_secondary_header activity_player_header" data-topbar role="navigation" data-options="sticky_on: large">
+  <nav class="activity_player_secondary_header activity_player_header hide-for-small hide-for-medium" data-topbar role="navigation" data-options="sticky_on: large">
       <div class="small-1 columns end">
         <a href="{% url 'course_content' group_id  %}">
         <div class="header_icon_block prev_button">
@@ -64,10 +62,155 @@
         </div>
 </nav>
 </div>
-<div class="row activity_sheet">
+
+
+<div class="off-canvas-wrap" data-offcanvas>
+  <div class="inner-wrap">
+    <nav class="tab-bar show-for-medium">
+      <section class="left-small">
+        <a class="left-off-canvas-toggle menu-icon" ></a>
+      </section>
+
+      <section class="middle tab-bar-section">
+        <h1 class="title">{% firstof group_object.altnames group_object.name  %}</h1>
+      </section>
+
+      <section class="right-small">
+        <a class="right-off-canvas-toggle menu-icon" ></a>
+      </section>
+    </nav>
+
+    <aside class="left-off-canvas-menu">
+      <ul class="off-canvas-list">
+        <li><label>{{trans_lesson_name}}</label></li>
+              {% for each in act_list %}
+                  {% for k,v in each.items  %}
+                    <li  {% if v.basenodeid == activityid %} class="active" {% endif %}> <a href="{% url 'activity_player_detail' group_id lesson_node.pk v.basenodeid %}"> {% firstof v.altnames v.name %} </a></li>
+                  {% endfor %}
+              {% endfor %}
+        <li class="has-submenu"><a href="#" style="background-color:#444444;">Unit Structure</a>
+            <ul class="left-submenu">
+                <li class="back"><a href="#">Back</a></li>
+                    {% for each in lesson_list %}
+                        <li class="has-submenu"> <a href="#">{{each}}</a></li>
+                    {% endfor %}
+                    <li class="has-submenu"><a href="#">Lesson Name</a>
+                        <ul class="left-submenu">
+                            <li class="back"><a href="#">Back</a></li>
+                            {% for each in act_list %}
+                              {% for k,v in each.items  %}
+                                <li  {% if v.basenodeid == activityid %} class="active" {% endif %}> <a href="#"> {% firstof v.altnames v.name %} </a></li>
+                              {% endfor %}
+                          {% endfor %}
+                        </ul>
+                    </li>
+            </ul>
+        </li>
+      </ul>
+    </aside>
+
+        <aside class="right-off-canvas-menu">
+      <ul class="off-canvas-list">
+        <li><label>Navigation</label></li>
+        <li><a href="#"><i class="fa fa-fast-backward"></i>  {% trans "Previous Lesson" %}</a></li>
+        <li><a {% if resource_prev_id %} href="{% url 'activity_player_detail' group_id lesson_node.pk resource_prev_id %}" {% else %} class = "disabled"{% endif %}> 
+                  <i class="fa fa-angle-left header_icon"></i> {% trans "Previous Activity" %}</a>
+        </li>
+        <li><a {% if resource_next_id %}  href="{% url 'activity_player_detail' group_id lesson_node.pk resource_next_id %}" {% else %} class = "disabled" {% endif %}>
+                  {% trans "Next Activity" %} <i class="fa fa-angle-right header_icon"></i>
+              </a></li>
+        <li><a href="#"><i class="fa fa-fast-forward"></i>  {% trans "Next Lesson" %}</a></li>
+
+        <li class="has-submenu"><a href="#" style="background-color:#444444">More..</a>
+            <ul class="right-submenu">
+                <li class="back"><a href="#">Back</a></li>
+                <li><a {% if user_access_priv == "allow" %} href="{% url 'course_notebook' group_id %}?create=True" {% else %} class="user_not_enrolled" {% endif %}><i class="fa fa-edit header_icon"></i>{% trans "Write a new Note" %}</a>
+                </li>
+                <li><a href="#">View Gallery</a></li>
+                <li><a href="#">Upload a Image</a></li>
+                
+            </ul>
+        </li>
+      </ul>
+    </aside>
+
+
+
+<div class="off-canvas-wrap" data-offcanvas>
+  <div class="inner-wrap">
+    <nav class="tab-bar show-for-small">
+      <section class="left-small">
+        <a class="left-off-canvas-toggle menu-icon" ></a>
+      </section>
+
+      <section class="middle tab-bar-section">
+        <h1 class="title">{% firstof group_object.altnames group_object.name  %}</h1>
+      </section>
+
+      <section class="right-small">
+        <a class="right-off-canvas-toggle menu-icon" ></a>
+      </section>
+    </nav>
+
+    <aside class="left-off-canvas-menu">
+      <ul class="off-canvas-list">
+        <li><label>{{trans_lesson_name}}</label></li>
+              {% for each in act_list %}
+                  {% for k,v in each.items  %}
+                    <li  {% if v.basenodeid == activityid %} class="active" {% endif %}> <a href="{% url 'activity_player_detail' group_id lesson_node.pk v.basenodeid %}"> {% firstof v.altnames v.name %} </a></li>
+                  {% endfor %}
+              {% endfor %}
+        <li class="has-submenu"><a href="#" style="background-color:#444444;">Unit Structure</a>
+            <ul class="left-submenu">
+                <li class="back"><a href="#">Back</a></li>
+                    {% for each in lesson_list %}
+                        <li class="has-submenu"> <a href="#">{{each}}</a></li>
+                    {% endfor %}
+                    <li class="has-submenu"><a href="#">Lesson Name</a>
+                        <ul class="left-submenu">
+                            <li class="back"><a href="#">Back</a></li>
+                            {% for each in act_list %}
+                              {% for k,v in each.items  %}
+                                <li  {% if v.basenodeid == activityid %} class="active" {% endif %}> <a href="#"> {% firstof v.altnames v.name %} </a></li>
+                              {% endfor %}
+                          {% endfor %}
+                        </ul>
+                    </li>
+            </ul>
+        </li>
+      </ul>
+    </aside>
+
+        <aside class="right-off-canvas-menu">
+      <ul class="off-canvas-list">
+        <li><label>Navigation</label></li>
+        <li><a href="#"><i class="fa fa-fast-backward"></i>  {% trans "Previous Lesson" %}</a></li>
+        <li><a {% if resource_prev_id %} href="{% url 'activity_player_detail' group_id lesson_node.pk resource_prev_id %}" {% else %} class = "disabled"{% endif %}> 
+                  <i class="fa fa-angle-left header_icon"></i> {% trans "Previous Activity" %}</a>
+        </li>
+        <li><a {% if resource_next_id %}  href="{% url 'activity_player_detail' group_id lesson_node.pk resource_next_id %}" {% else %} class = "disabled" {% endif %}>
+                  {% trans "Next Activity" %} <i class="fa fa-angle-right header_icon"></i>
+              </a></li>
+        <li><a href="#"><i class="fa fa-fast-forward"></i>  {% trans "Next Lesson" %}</a></li>
+
+        <li class="has-submenu"><a href="#" style="background-color:#444444">More..</a>
+            <ul class="right-submenu">
+                <li class="back"><a href="#">Back</a></li>
+                <li><a {% if user_access_priv == "allow" %} href="{% url 'course_notebook' group_id %}?create=True" {% else %} class="user_not_enrolled" {% endif %}><i class="fa fa-edit header_icon"></i>{% trans "Write a new Note" %}</a>
+                </li>
+                <li><a href="#">View Gallery</a></li>
+                <li><a href="#">Upload a Image</a></li>
+                
+            </ul>
+        </li>
+      </ul>
+    </aside>
+
+
+<div class="row activity_sheet ">
     <div class="small-12 columns">
         <div class="course_editor ">
-          <div class="small-3 columns">
+          <div class="small-3 columns hide-for-small hide-for-medium">
             <div class="course_tree">
               <div class="lesson-title" title="{{trans_lesson_name}}">
                   <b>{{trans_lesson_name}}</b>
@@ -87,9 +230,8 @@
               </div>
           </div>
           
-          <div class="small-8 columns">
-
-            <div class="course_editor_section">
+          <div class="small-12 medium-12 large-8 columns">
+            <div class="small-12 medium-12 large-12 columns course_editor_section">
               {% with node.member_of_names_list as node_member_of_names_list %}
               {% if "QuizItemEvent" not in node_member_of_names_list and "QuizItem" not in node_member_of_names_list%}
               <div class="input_links row" style="margin-left:10px;">
@@ -142,6 +284,7 @@
               </div>
             </div>
           </div>
+        </div>
         </div>
       </div>
 </div>             
