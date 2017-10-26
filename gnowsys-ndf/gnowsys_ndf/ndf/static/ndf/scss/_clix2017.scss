@@ -45,9 +45,9 @@ h3{
 
 h5{
     color: #99aaba;
-    font-size: 12px;
+    font-size: 10px;
     text-transform: uppercase;
-    letter-spacing: 1.4px;
+    letter-spacing: 2px;
     margin-left: 5px;
 }
 
@@ -3727,7 +3727,7 @@ $ah_2_background_color_hover: rgba(244, 244, 244, 0.3);;
     }
 
     .header_icon {
-        font-size: 20px;
+        font-size: 16px;
         line-height: $activity-header-height;
         color: $ah_2_icon_color;
     }
@@ -3770,7 +3770,8 @@ $ah_2_background_color_hover: rgba(244, 244, 244, 0.3);;
         font-weight: 500;
         font-size: 18px;
         letter-spacing: 0.6px;
-        width: calc(100% - 676px);
+        //width: calc(100% - 676px);
+        //width:880px;
     }
     .pagination {
         &:not(i) {
@@ -3778,8 +3779,17 @@ $ah_2_background_color_hover: rgba(244, 244, 244, 0.3);;
         }
     }
 
+
+
 }
 
+.float-right{
+    float:right;
+}
+
+.float-left{
+    float:left;
+}
 /*
 Buddy Vertical Bar Css
 */

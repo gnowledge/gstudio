@@ -47,7 +47,12 @@
         <div class="new_note header_text_block">
 
             <a {% if user_access_priv == "allow" %} href="{% url 'course_notebook' group_id %}?create=True" {% else %} class="user_not_enrolled" {% endif %}><i class="fa fa-edit header_icon"></i>&nbsp;
-               {% trans "WRITE A NEW NOTE" %} 
+               {% trans "Write Note" %} 
+            </a>
+        </div>
+        <div class="new_note header_text_block">
+            <a   {% if prev_lesson_id and lesson_act_prev_id %} href="{% url 'activity_player_detail' group_id prev_lesson_id lesson_act_prev_id %}" {% else %} class = "disabled" {% endif %} ><i class="fa fa-angle-double-left header_icon"></i>&nbsp;
+               {% trans "Previous Lesson" %}  
             </a>
         </div>
         <div class="pagination prev_button header_text_block">
@@ -66,9 +71,17 @@
               </a>
             
         </div>
+        <div class="new_note header_text_block">
+            <a  {% if next_lesson_id  and lesson_next_act_id %} href="{% url 'activity_player_detail' group_id next_lesson_id lesson_next_act_id %}" {% else %} class = "disabled" {% endif %} ><i class="fa fa-angle-double-right header_icon"></i>&nbsp;
+               {% trans "Next Lesson" %}    
+            </a>
+        </div>
 </nav>
 </div>
-<div class="row activity_sheet">
+
+
+<div class="row activity_sheet ">
+
     <div class="small-12 columns">
         <div class="course_editor ">
           <div class="small-3 columns">
