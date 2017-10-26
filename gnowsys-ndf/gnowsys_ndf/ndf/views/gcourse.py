@@ -2070,6 +2070,7 @@ def activity_player_detail(request, group_id, lesson_id, activity_id):
         trans_node = node_obj
     lesson_node = node_collection.one({'_id': ObjectId(lesson_id)})
     lesson_obj_collection_set = lesson_node.collection_set
+    group_obj_collection_set = group_obj.collection_set
     trans_lesson_node = get_lang_node(lesson_node._id,request.LANGUAGE_CODE)
     if trans_lesson_node:
         lesson_name = trans_lesson_node.name
@@ -2079,12 +2080,16 @@ def activity_player_detail(request, group_id, lesson_id, activity_id):
     translation_obj = node_obj.get_relation('translation_of')
 
     resource_index = resource_next_id = resource_prev_id = None
+    lesson_index = lesson_next_id = lesson_prev_id = None
     resource_count = len(lesson_obj_collection_set)
+    lesson_count = len(group_obj.collection_set)
     unit_resources_list_of_dict = node_collection.find({
                                     '_id': {'$in': lesson_obj_collection_set}},
                                     {'name': 1, 'altnames': 1,'_id':1})
     act_list = []
     trans_act_list = get_trans_node_list(lesson_node.collection_set,request.LANGUAGE_CODE)
+    
+    lesson_index = group_obj_collection_set.index(lesson_node._id) 
 
     resource_index = lesson_obj_collection_set.index(node_obj._id)
 
@@ -2094,8 +2099,18 @@ def activity_player_detail(request, group_id, lesson_id, activity_id):
     if resource_index > 0:
         resource_prev_id = lesson_node.collection_set[resource_index - 1]
 
-    # --- END of all metadata reg position and next prev of resource ---
+    if (lesson_index + 1) < lesson_count:
+        lesson_next_id = group_obj.collection_set[lesson_index + 1]
 
+    if lesson_index > 0:
+        lesson_prev_id = group_obj.collection_set[lesson_index - 1]
+
+    # --- END of all metadata reg position and next prev of resource ---
+    prev_lesson_obj = next_lesson_obj  = None
+    if lesson_next_id:
+        next_lesson_obj = Node.get_node_by_id(lesson_next_id)
+    if lesson_prev_id:
+        prev_lesson_obj = Node.get_node_by_id(lesson_prev_id)
     node_obj.get_neighbourhood(node_obj.member_of)
 
     thread_node = allow_to_comment = None
@@ -2108,6 +2123,8 @@ def activity_player_detail(request, group_id, lesson_id, activity_id):
         'node': node_obj, 'lesson_node': lesson_node, 'activityid': ObjectId(activity_id),
         'resource_index': resource_index, 'resource_next_id': resource_next_id,
         'resource_prev_id': resource_prev_id, 'resource_count': resource_count,
+
+        'lesson_index': lesson_index,'lesson_count': lesson_count,
         'translation': translation_obj, 'unit_resources_list_of_dict': unit_resources_list_of_dict,
         'unit_structure': json.dumps(unit_structure,cls=NodeJSONEncoder),
         'trans_node':trans_node,
@@ -2116,7 +2133,14 @@ def activity_player_detail(request, group_id, lesson_id, activity_id):
         'trans_lesson_name':lesson_name,
         'no_footer': True
     }
-
+    
+    
+    if prev_lesson_obj:
+        context_variables.update({ 'lesson_act_prev_id': prev_lesson_obj.collection_set[0],'prev_lesson_id':prev_lesson_obj._id })
+    if next_lesson_obj:
+        context_variables.update({ 'next_lesson_id':next_lesson_obj._id,'lesson_next_act_id': next_lesson_obj.collection_set[0] })
+    
+    
     if request.user.is_authenticated():
         active_user_ids_list = [request.user.id]
         if GSTUDIO_BUDDY_LOGIN:
