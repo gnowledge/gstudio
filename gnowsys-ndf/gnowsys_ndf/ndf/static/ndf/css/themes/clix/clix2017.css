@@ -3597,7 +3597,7 @@ body {
   font-weight: 500;
   font-size: 18px;
   letter-spacing: 0.6px;
-  width: calc(100% - 676px);
+  width: calc(100% - 1024px);
 }
 /* line 3791, ../../../scss/_clix2017.scss */
 .activity_player_header .pagination:not(i) {

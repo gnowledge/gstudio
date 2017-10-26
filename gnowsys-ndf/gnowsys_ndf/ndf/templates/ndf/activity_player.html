@@ -45,12 +45,7 @@
             </a>
         </div>
         <div class="new_note header_text_block">
-            <a  {% if next_lesson_id  and lesson_next_act_id %} href="{% url 'activity_player_detail' group_id next_lesson_id lesson_next_act_id %}" {% endif %} ><i class="fa fa-edit header_icon"></i>&nbsp;
-               {% trans "Next Lesson" %}    
-            </a>
-        </div>
-        <div class="new_note header_text_block">
-            <a   {% if prev_lesson_id and lesson_act_prev_id %} href="{% url 'activity_player_detail' group_id prev_lesson_id lesson_act_prev_id %}" {% endif %} ><i class="fa fa-edit header_icon"></i>&nbsp;
+            <a   {% if prev_lesson_id and lesson_act_prev_id %} href="{% url 'activity_player_detail' group_id prev_lesson_id lesson_act_prev_id %}" {% else %} class = "disabled" {% endif %} ><i class="fa fa-fast-backward header_icon"></i>&nbsp;
                {% trans "Previous Lesson" %}  
             </a>
         </div>
@@ -69,6 +64,11 @@
                   {% trans "NEXT" %} <i class="fa fa-angle-right header_icon"></i>
               </a>
             
+        </div>
+        <div class="new_note header_text_block">
+            <a  {% if next_lesson_id  and lesson_next_act_id %} href="{% url 'activity_player_detail' group_id next_lesson_id lesson_next_act_id %}"  {% else %} class = "disabled" {% endif %} ><i class="fa fa-fast-forward header_icon"></i>&nbsp;
+               {% trans "Next Lesson" %}    
+            </a>
         </div>
 </nav>
 </div>
@@ -122,14 +122,18 @@
         <aside class="right-off-canvas-menu">
       <ul class="off-canvas-list">
         <li><label>Navigation</label></li>
-        <li><a href="#"><i class="fa fa-fast-backward"></i>  {% trans "Previous Lesson" %}</a></li>
+        <li><a   {% if prev_lesson_id and lesson_act_prev_id %} href="{% url 'activity_player_detail' group_id prev_lesson_id lesson_act_prev_id %}" {% else %} class = "disabled" {% endif %} ><i class="fa fa-fast-backward header_icon"></i>&nbsp;
+               {% trans "Previous Lesson" %}  
+            </a></li>
         <li><a {% if resource_prev_id %} href="{% url 'activity_player_detail' group_id lesson_node.pk resource_prev_id %}" {% else %} class = "disabled"{% endif %}> 
                   <i class="fa fa-angle-left header_icon"></i> {% trans "Previous Activity" %}</a>
         </li>
         <li><a {% if resource_next_id %}  href="{% url 'activity_player_detail' group_id lesson_node.pk resource_next_id %}" {% else %} class = "disabled" {% endif %}>
                   {% trans "Next Activity" %} <i class="fa fa-angle-right header_icon"></i>
               </a></li>
-        <li><a href="#"><i class="fa fa-fast-forward"></i>  {% trans "Next Lesson" %}</a></li>
+        <li> <a  {% if next_lesson_id  and lesson_next_act_id %} href="{% url 'activity_player_detail' group_id next_lesson_id lesson_next_act_id %}"  {% else %} class = "disabled" {% endif %} ><i class="fa fa-fast-forward header_icon"></i>&nbsp;
+               {% trans "Next Lesson" %}    
+            </a></li>
 
         <li class="has-submenu"><a href="#" style="background-color:#444444">More..</a>
             <ul class="right-submenu">
@@ -194,14 +198,18 @@
         <aside class="right-off-canvas-menu">
       <ul class="off-canvas-list">
         <li><label>Navigation</label></li>
-        <li><a {% if prev_lesson_id and lesson_act_prev_id %} href="{% url 'activity_player_detail' group_id prev_lesson_id lesson_act_prev_id %}" {% endif %}><i class="fa fa-fast-backward"></i>  {% trans "Previous Lesson" %}</a></li>
+        <li><a   {% if prev_lesson_id and lesson_act_prev_id %} href="{% url 'activity_player_detail' group_id prev_lesson_id lesson_act_prev_id %}" {% else %} class = "disabled" {% endif %} ><i class="fa fa-fast-backward header_icon"></i>&nbsp;
+               {% trans "Previous Lesson" %}  
+            </a></li>
         <li><a {% if resource_prev_id %} href="{% url 'activity_player_detail' group_id lesson_node.pk resource_prev_id %}" {% else %} class = "disabled"{% endif %}> 
                   <i class="fa fa-angle-left header_icon"></i> {% trans "Previous Activity" %}</a>
         </li>
         <li><a {% if resource_next_id %}  href="{% url 'activity_player_detail' group_id lesson_node.pk resource_next_id %}" {% else %} class = "disabled" {% endif %}>
                   {% trans "Next Activity" %} <i class="fa fa-angle-right header_icon"></i>
               </a></li>
-        <li><a {% if next_lesson_id  and lesson_next_act_id %} href="{% url 'activity_player_detail' group_id next_lesson_id lesson_next_act_id %}" {% endif %} ><i class="fa fa-fast-forward"></i>  {% trans "Next Lesson" %}</a></li>
+        <li> <a  {% if next_lesson_id  and lesson_next_act_id %} href="{% url 'activity_player_detail' group_id next_lesson_id lesson_next_act_id %}"  {% else %} class = "disabled" {% endif %} ><i class="fa fa-fast-forward header_icon"></i>&nbsp;
+               {% trans "Next Lesson" %}    
+            </a></li>
 
         <li class="has-submenu"><a href="#" style="background-color:#444444">More..</a>
             <ul class="right-submenu">
