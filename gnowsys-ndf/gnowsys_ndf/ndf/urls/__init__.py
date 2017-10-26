@@ -22,7 +22,6 @@ if GSTUDIO_SITE_NAME.lower() == 'clix':
 else:
     login_template = 'registration/login.html'
 
-
 urlpatterns = patterns('',
     (r'^i18n/', include('django.conf.urls.i18n')),
     (r'^pref_lang/$', include('gnowsys_ndf.ndf.urls.languagepref')),
@@ -74,6 +73,7 @@ urlpatterns = patterns('',
     (r'^(?P<group_id>[^/]+)/module', include('gnowsys_ndf.ndf.urls.module')),
     (r'^(?P<group_id>[^/]+)/search', include('gnowsys_ndf.ndf.urls.search_urls')),
     (r'^(?P<group_name>[^/]+)/task', include('gnowsys_ndf.ndf.urls.task')),
+    (r'^(?P<group_name>[^/]+)/gtask', include('gnowsys_ndf.ndf.urls.gtask')),
     (r'^(?P<group_id>[^/]+)/batch', include('gnowsys_ndf.ndf.urls.batch')),
     (r'^(?P<group_id>[^/]+)/ajax/', include('gnowsys_ndf.ndf.urls.ajax-urls')),
     (r'^(?P<group_id>[^/]+)/bib_app', include('gnowsys_ndf.ndf.urls.Bib_App')),
@@ -226,3 +226,7 @@ if settings.DEBUG:
             'document_root': settings.STATIC_ROOT,
         }),
 )
+
+handler404 = 'gnowsys_ndf.ndf.views.errors.handler404'
+handlerPermissionDenied = 'gnowsys_ndf.ndf.views.errors.handlerPermissionDenied'
+handler500 = 'gnowsys_ndf.ndf.views.errors.handler500'

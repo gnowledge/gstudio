@@ -3,7 +3,6 @@
 {% load i18n %}
 {% load get_site_variables from ndf_tags %}
 {% get_site_variables as site %}
-
 <html>
 <head>
 
@@ -14,17 +13,17 @@
 
 	<title>{% block error_title %}{% endblock %}</title>
 	
-	<script src="/static/ndf/js/app.js"></script> 
+	<!-- <script src="/static/ndf/js/app.js"></script>  -->
 
-	<link rel="shortcut icon" href="/static/ndf/images/favicon/logo.png"> 
+	<link rel="shortcut icon" href={{site.FAVICON}}> 
 	
 	<!-- Foundation 5 - Responsive CSS Framework http://foundation.zurb.com/docs/css.html-->
 	<link rel="stylesheet" href="/static/ndf/bower_components/foundation/css/normalize.css"> 
-	<link rel="stylesheet" href="/static/ndf/css/themes/metastudio/styles.css"> 
-
-	<!-- Foundation Icon Font http://zurb.com/playground/foundation-icon-fonts-3 -->
-	<link rel="stylesheet" href="/static/ndf/bower_components/foundation-icon-fonts/foundation-icons.css"> 
-
+	<link rel="stylesheet" type="text/css" href="/static/ndf/bower_components/foundation-icon-fonts/foundation-icons.css">
+	<link rel="stylesheet" type="text/css" href="/static/ndf/css/opensans-fonts.css">
+	<link rel="stylesheet" type="text/css" href="/static/ndf/bower_components/foundation/css/foundation.css">
+	<link rel="stylesheet" href="/static/ndf/bower_components/font-awesome/css/font-awesome.css">
+	<link rel="stylesheet" href="/static/ndf/bower_components/font-awesome/css/font-awesome.min.css">
 	<style type="text/css">
 
 		body > footer{
@@ -34,31 +33,44 @@
 		}
 
 		.bk-image {
-		    position: absolute;
-		    top: 0%;
-		    left: 12%;
-		    color: gray;
-		    font-size: 20em;
-		    z-index: -1;
-		    opacity: 0.5;
-		    -ms-transform: rotate(25deg); /* IE 9 */
-		    -webkit-transform: rotate(25deg); /* Chrome, Safari, Opera */
-		    transform: rotate(-25deg);
+			position: absolute;
+			top: 0%;
+			left: 12%;
+			color: gray;
+			font-size: 20em;
+			z-index: -1;
+			opacity: 0.3;
+			-ms-transform: rotate(25deg); /* IE 9 */
+			-webkit-transform: rotate(25deg); /* Chrome, Safari, Opera */
+			transform: rotate(-25deg);
 		}
 
 	</style>
 
+	{% if site.SITE_NAME == 'clix' %}
+	<link rel="stylesheet" type="text/css" href="/static/ndf/css/themes/clix/clix2017.css">
+	{% include "ndf/header_clix.html" %}
+	<!-- <link rel="stylesheet" href="/static/ndf/css/themes/{{site.SITE_NAME|lower}}/styles.css"> -->
+	{% else %}
+	<link rel="stylesheet" href="/static/ndf/css/themes/metastudio/styles.css"> 
+	{% include "ndf/header.html" %}
+	{% endif %}
+
+	<!-- Foundation Icon Font http://zurb.com/playground/foundation-icon-fonts-3 -->
+	<link rel="stylesheet" href="/static/ndf/bower_components/foundation-icon-fonts/foundation-icons.css"> 
+
+
 </head>
 <body>
 
-    <nav class="top-bar drop-shadow row" data-topbar role="navigation">
+<!--     <nav class="top-bar drop-shadow row" data-topbar role="navigation">
 
 		<ul class="title-area ">
 
 		<li class="name">
 		    <h1>
 		      <a href="/home/" class="group" accesskey="q" id="home-group">
-		      	<img src="{{site.LOGO}}" style="height:45px;">
+		      	<img src="{{site.SECONDARY_LOGO}}" style="height:45px;">
 		      </a>
 		    </h1>
 		</li>
@@ -70,35 +82,36 @@
 		</ul>
     </nav>
 
-    <div class="bk-image">
-    	<i class="fi-paw"></i>
-    </div>
+-->    <div class="bk-image">
+<i class="fi-paw"></i>
+</div>
 
-    <br/>
-    <br/>
+<br/>
+<br/>
 
-	<div class="text-center">
-		{% block error_body_text %}	
-			{% if message %}
-				<h2>{{message}}</h2>
-				<br/>
-				<a href="javascript:window.history.back();">
-					{% trans "Click here to go back" %}
-				</a>
-			{% endif %}
-		{% endblock %}
-	</div>
+<div class="text-center">
+	{% block error_body_text %}	
+	{% if message %}
+	<h2>{{message}}</h2>
+	<br/>
+	<a href="javascript:window.history.back();">
+		{% trans "Click here to go back" %}
+	</a>
+	{% endif %}
+	{% endblock %}
+</div>
+{% comment %}
+{% include "ndf/footer.html" with site=site %} 
+{% endcomment %}
 
-	{% include "ndf/footer.html" with site=site %} 
+<script type="text/javascript">
 
-	<script type="text/javascript">
-
-        try{
+	try{
 			// function defined in app.js to check the font and load it asynchronously.
 			checkOpenSansFont();
-        }
-        finally{
-        }
+		}
+		finally{
+		}
 
 	</script>
 

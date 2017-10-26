@@ -50,7 +50,7 @@ from gnowsys_ndf.settings import GSTUDIO_SITE_NAME
 # from gnowsys_ndf.mobwrite.models import ViewObj
 from gnowsys_ndf.notification import models as notification
 from gnowsys_ndf.ndf.views.asset import *
-from gnowsys_ndf.ndf.views.trash import * 
+from gnowsys_ndf.ndf.views.trash import *
 
 theme_GST = node_collection.one({'_type': 'GSystemType', 'name': 'Theme'})
 topic_GST = node_collection.one({'_type': 'GSystemType', 'name': 'Topic'})
@@ -907,7 +907,7 @@ def get_inner_collection(collection_list, node, no_res=False):
               #   # print "\n completed_ids -- ",completed_ids
               #   # print "\n\n col_obj ---- ", col_obj.name, " - - ",col_obj.member_of_names_list, " -- ", col_obj._id
               # else:
-              inner_sub_dict = {'name': col_obj.name, 'id': col_obj.pk,'node_type': node_type,"type":"division"}
+              inner_sub_dict = {'name': col_obj.name, 'id': col_obj.pk,'node_type': node_type,"type":"division",'description':col_obj.content_org}
               inner_sub_list = [inner_sub_dict]
               inner_sub_list = get_inner_collection(inner_sub_list, col_obj, no_res)
               # if "CourseSubSectionEvent" == node_type:
@@ -962,8 +962,8 @@ def get_collection(request, group_id, node_id, no_res=False):
       if obj:
         node_type = node_collection.one({'_id': ObjectId(obj.member_of[0])}).name
         # print "000000000000000000000",node.name
-        
-        collection_list.append({'name':obj.name,'id':obj.pk,'node_type':node_type,'type' : "branch"})
+
+        collection_list.append({'name':obj.name,'id':obj.pk,'node_type':node_type,'type' : "branch",'description':obj.content_org})
         # collection_list = get_inner_collection(collection_list, obj, gstaff_access, completed_ids_list, incompleted_ids_list)
         if "BaseCourseGroup" in node.member_of_names_list:
           no_res = True
@@ -1015,9 +1015,10 @@ def add_theme_item(request, group_id):
   if request.is_ajax() and request.method == "POST":
 
     existing_id = request.POST.get("existing_id", '')
-      
+
     context_theme_id = request.POST.get("context_theme", '')
     name =request.POST.get('name','')
+    content_org = request.POST.get('content_org')
     parent_node_id =request.POST.get('parent_id','')
     is_topic =request.POST.get('is_topic','')
 
@@ -1026,15 +1027,16 @@ def add_theme_item(request, group_id):
       existing_node = Node.get_node_by_id(ObjectId(existing_id))
       if existing_node:
         existing_node.name = unicode(name)
+        existing_node.content_org = unicode(content_org)
         existing_node.save()
         return HttpResponse("success")
     list_theme_items = []
     if name and context_theme:
 
-      for each in context_theme.collection_set:
-        obj = node_collection.one({'_id': ObjectId(each) })
-        if obj.name == name:
-          return HttpResponse("failure")
+      # for each in context_theme.collection_set:
+      #   obj = node_collection.one({'_id': ObjectId(each) })
+      #   if obj.name == name:
+      #     return HttpResponse("failure")
 
       theme_item_node = node_collection.collection.GSystem()
       if is_topic == "True":
@@ -6776,16 +6778,16 @@ def add_asset(request,group_id):
 @login_required
 @get_execution_time
 def create_edit_asset(request,group_id):
-  
+
   try:
       group_id = ObjectId(group_id)
   except:
       group_name, group_id = get_group_name_id(group_id)
-  
+
   group_obj = Group.get_group_name_id(group_id, get_obj=True)
   selected_topic =  request.POST.get("topic_list", '')
   # selected_topic_list =  request.POST.getlist("coll_arr[]", '')
-  
+
   if request.method == "POST":
     asset_name =  str(request.POST.get("asset_name", '')).strip()
     asset_disp_name =  str(request.POST.get("asset_disp_name", '')).strip()
@@ -6797,9 +6799,9 @@ def create_edit_asset(request,group_id):
         tags = json.loads(tags)
     else:
         tags = []
-    
+
     asset_lang =  request.POST.get("sel_asset_lang", '')
-    
+
     is_raw_material = eval(request.POST.get('is_raw_material', "False"))
     # print "\nis_raw_material: ", is_raw_material, " type: ", type(is_raw_material)
 
@@ -6809,13 +6811,18 @@ def create_edit_asset(request,group_id):
 
 
     asset_obj.fill_gstystem_values(tags=tags)
-    
+    access_check =  request.POST.get("access_check", '')
+    if access_check == "True":
+        asset_obj.access_policy = u"PRIVATE"
+    else:
+        asset_obj.access_policy = u"PUBLIC"
+
     rt_teaches = node_collection.one({'_type': "RelationType", 'name': unicode("teaches")})
-    
+
     if selected_topic:
       # selected_topic_list = map(ObjectId,selected_topic_list)
       create_grelation(asset_obj._id,rt_teaches,ObjectId(selected_topic))
-    
+
     if "asset@asset" not in asset_obj.tags and "base_unit" in group_obj.member_of_names_list:
       asset_obj.tags.append(u'asset@asset')
 
@@ -6823,13 +6830,13 @@ def create_edit_asset(request,group_id):
       asset_obj.tags.append(u'raw@material')
     elif not is_raw_material and u'raw@material' in asset_obj.tags and "base_unit" in group_obj.member_of_names_list:
       asset_obj.tags.remove(u'raw@material')
-    
+
     if "announced_unit" in group_obj.member_of_names_list and title == "raw material":
       asset_obj.tags.append(u'raw@material')
-    
-    if "announced_unit" in group_obj.member_of_names_list  or "Group" in group_obj.member_of_names_list and "gallery" == title:
-      asset_obj.tags.append(u'asset@gallery')    
-    
+
+    if ("announced_unit" in group_obj.member_of_names_list  or "Group" in group_obj.member_of_names_list or "Author" in group_obj.member_of_names_list ) and "gallery" == title:
+      asset_obj.tags.append(u'asset@gallery')
+
     if asset_lang:
       language = get_language_tuple(asset_lang)
       asset_obj.language = language
@@ -6868,7 +6875,7 @@ def add_assetcontent(request,group_id):
     if not file_name:
       file_name = asset_cont_name
     subtitle_obj = create_assetcontent(asset_id=ObjectId(asset_obj),
-      name=file_name, group_name_or_id=group_id, created_by=request.user.id, 
+      name=file_name, group_name_or_id=group_id, created_by=request.user.id,
       files=uploaded_subtitle,resource_type='File', request=request)
 
     rt_subtitle = node_collection.one({'_type':'RelationType', 'name':'has_subtitle'})
@@ -6893,7 +6900,7 @@ def add_assetcontent(request,group_id):
 
     rt_transcript = node_collection.one({'_type':'RelationType', 'name':'has_transcript'})
     transcript_obj = create_assetcontent(asset_id=ObjectId(asset_obj),
-      name=file_name,  group_name_or_id=group_id, created_by=request.user.id, 
+      name=file_name,  group_name_or_id=group_id, created_by=request.user.id,
       files=uploaded_transcript, resource_type='File', request=request)
     transcript_list = [ObjectId(transcript_obj._id)]
 
@@ -6910,7 +6917,7 @@ def add_assetcontent(request,group_id):
     if not file_name:
       file_name = asset_cont_name
     alt_file_type = request.POST.get('alt_file_type','')
-    alt_lang_file_obj = create_assetcontent(asset_id=ObjectId(asset_obj), 
+    alt_lang_file_obj = create_assetcontent(asset_id=ObjectId(asset_obj),
       name=file_name, group_name_or_id=group_id, created_by=request.user.id,
       files=uploaded_alt_lang_file,resource_type='File', request=request)
     rt_alt_content = node_collection.one({'_type':'RelationType', 'name':'has_alt_content'})
@@ -7006,7 +7013,7 @@ def get_interaction_widget(request, group_id):
                 'group_id': group_id, 'groupid': group_id,
                 'node_id':node_id,'node':node_obj
             },
-            context_instance=RequestContext(request)) 
+            context_instance=RequestContext(request))
 
 def save_interactions(request, group_id):
   group_obj = get_group_name_id(group_id, get_obj=True)
@@ -7027,7 +7034,7 @@ def save_interactions(request, group_id):
   else:
     create_gattribute(node._id, discussion_enable_at, False)
   return HttpResponseRedirect(reverse('view_course_page', kwargs={'group_id':ObjectId(group_id),'page_id': ObjectId(node._id)}))
-  
+
 
 def save_metadata(request, group_id):
   node_id = request.POST.get('node_id', None)
@@ -7108,7 +7115,7 @@ def get_rating_template(request, group_id):
       group_id = ObjectId(group_id)
   except:
       group_name, group_id = get_group_name_id(group_id)
-    
+
   node_id = request.GET.get('node_id', None)
   node_obj = Node.get_node_by_id(ObjectId(node_id))
   is_comments = request.GET.get('if_comments', None)
@@ -7123,11 +7130,16 @@ def get_rating_template(request, group_id):
             },
             context_instance=RequestContext(request))
 
-def delete_curriculum_node(request, group_id):
-    node_id = request.POST.get('node_id', None)
-    node_obj = Node.get_node_by_id(node_id)
-    if node_obj:
-      trash_resource(request,ObjectId(group_id),ObjectId(node_id))
-      trash_resource(request,ObjectId(group_id),ObjectId(node_id))
-      return HttpResponse("Success")
+@get_execution_time
+def get_telegram_content(request, group_id):
+  try:
+      group_id = ObjectId(group_id)
+  except:
+      group_name, group_id = get_group_name_id(group_id)
+  
+  import telepot
+  token = '402840205:AAHyxQfL_OeXiVwNSQkV2v1dJvQcmhlir5g'
+  TelegramBot = telepot.Bot(token)
+  print TelegramBot.getMe()
 
+  return HttpResponse("success")
