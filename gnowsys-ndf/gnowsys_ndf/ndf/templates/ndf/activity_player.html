@@ -78,7 +78,7 @@
   <div class="inner-wrap">
     <nav class="tab-bar show-for-medium">
       <section class="left-small">
-        <a class="left-off-canvas-toggle menu-icon" ></a>
+        <a class="left-off-canvas-toggle fi-list" style="color:white; margin-left:15px;" ></a>
       </section>
 
       <section class="middle tab-bar-section">
@@ -86,7 +86,7 @@
       </section>
 
       <section class="right-small">
-        <a class="right-off-canvas-toggle menu-icon" ></a>
+        <a class="right-off-canvas-toggle fi-list" style="color:white; margin-left:15px;"></a>
       </section>
     </nav>
 
@@ -147,6 +147,8 @@
         </li>
       </ul>
     </aside>
+
+
 
 
 
@@ -154,15 +156,16 @@
   <div class="inner-wrap">
     <nav class="tab-bar show-for-small">
       <section class="left-small">
-        <a class="left-off-canvas-toggle menu-icon" ></a>
+        <a class="left-off-canvas-toggle fi-list" style="color:white; margin-left:15px;"></a>
       </section>
 
       <section class="middle tab-bar-section">
         <h1 class="title">{% firstof group_object.altnames group_object.name  %}</h1>
       </section>
 
+
       <section class="right-small">
-        <a class="right-off-canvas-toggle menu-icon" ></a>
+          <a class="right-off-canvas-toggle fi-list" style="color:white; margin-left:15px;"></a>
       </section>
     </nav>
 
@@ -195,7 +198,7 @@
       </ul>
     </aside>
 <!--  mobile view  -->
-        <aside class="right-off-canvas-menu">
+    <aside class="right-off-canvas-menu">
       <ul class="off-canvas-list">
         <li><label>Navigation</label></li>
         <li><a   {% if prev_lesson_id and lesson_act_prev_id %} href="{% url 'activity_player_detail' group_id prev_lesson_id lesson_act_prev_id %}" {% else %} class = "disabled" {% endif %} ><i class="fa fa-fast-backward header_icon"></i>&nbsp;
@@ -226,7 +229,8 @@
 
 <!--  mobile view  -->
 
-<div class="row activity_sheet ">
+  
+  <div class="row activity_sheet ">
     <div class="small-12 columns">
         <div class="course_editor ">
           <div class="small-3 columns hide-for-small hide-for-medium">
@@ -248,6 +252,9 @@
               </div>
               </div>
           </div>
+  
+
+
           
           <div class="small-12 medium-12 large-8 columns">
             <div class="small-12 medium-12 large-12 columns course_editor_section">
