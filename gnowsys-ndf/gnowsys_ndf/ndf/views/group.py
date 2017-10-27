@@ -2842,3 +2842,46 @@ def upload_using_save_file(request,group_id):
     else:
         return HttpResponseRedirect( reverse('file_detail', kwargs={"group_id": group_id,'_id':fileobj_id}))
     # return HttpResponseRedirect(url_name)
+
+@get_execution_time
+def notification_details(request,group_id):
+    group_obj = node_collection.find({'group_set':ObjectId(group_id)}).sort('last_update', -1)
+    files_list = []
+    user_activity = []
+    user_activity_append_temp=user_activity.append
+    files_list_append_temp=files_list.append
+    for each in group_obj:
+      if each.created_by == each.modified_by :
+        if each.last_update == each.created_at:
+          if each.if_file.mime_type:
+            activity =  'created in asset'
+          else:
+            activity =  'created ' + each.name 
+              
+        else:
+          if each.if_file.mime_type:
+            node_obj = Node.get_node_by_id(each.relation_set[0]['assetcontent_of'][0])
+            activity =  'uploaded ' + each.name +  ' in ' + node_obj.name
+          elif 'Asset' in each.member_of_names_list and 'asset@gallery' in each.tags:
+            activity =  'Modified Folder ' + each.name
+          elif 'Asset' in each.member_of_names_list and 'raw@material' in each.tags:
+            activity =  'Modified Resource ' + each.name
+          elif 'Asset' in each.member_of_names_list:
+            activity =  'Modified Asset ' + each.name
+          else:
+            activity =  'Modified ' + each.name
+
+      else:
+        activity =  'created ' + each.name
+      if each._type == 'Group':
+        user_activity_append_temp(each)
+      each.update({'activity':activity})
+      files_list_append_temp(each)
+    return render_to_response('ndf/notifications_detail.html',
+                                { 
+                                  'group_id': group_id,
+                                  'groupid':group_id,
+                                  'activity_list' : files_list
+                                },
+                                context_instance = RequestContext(request)
+                            )

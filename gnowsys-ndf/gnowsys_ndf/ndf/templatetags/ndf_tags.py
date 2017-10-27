@@ -1530,6 +1530,10 @@ def get_url(groupid):
 			return 'show'
 		elif type_name.name == 'Task' or type_name.name == 'task_update_history':
 			return 'task_details'
+		elif type_name.name == 'Topic':
+			return 'topic_details'
+		elif type_name.name == 'Asset':
+			return 'asset_details'
 		elif type_name.name == 'File':
 			if (node.if_file.mime_type) == ("application/octet-stream"):
 				return 'video_detail'

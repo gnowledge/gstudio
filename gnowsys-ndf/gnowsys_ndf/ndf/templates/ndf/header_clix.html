@@ -34,7 +34,49 @@
             <ul class="right show-for-medium-up">
 <!--                 <li class=""><a href="#">Blog</a></li>
                 <li class=""><a href="#"><i class="icons-medium fi-info"></i>&nbsp;Help Topics</a></li>
- -->             
+ -->             <li>
+                    <a data-dropdown="autoCloseExample" aria-controls="autoCloseExample" aria-expanded="false">
+                        <i class="fa fa-bell-o" style="font-size:1.3em; color:white;"></i>
+                    </a>
+                </li>
+                    <ul id="autoCloseExample" class="f-dropdown noti" data-dropdown-content tabindex="-1" aria-hidden="true" aria-autoclose="false" tabindex="-1">
+                        <li>
+                            <div data-alert class="alert-box info radius" style="height:60px;margin-bottom: 0.25rem;">
+                              <div class="small-3 columns" style="text-align:center;">
+                                <img class="img-circle" src="/static/ndf/images/gnu-head.png" style="margin-top:-12px;"/>
+                              </div>
+                              <div class="small-9 columns">
+                                This is an info alert with a radius.
+                              </div>
+                              <a href="#" class="close">&times;</a>
+                            </div>
+                        </li>
+                         <li>
+                            <div data-alert class="alert-box info radius" style="height:60px;margin-bottom: 0.25rem;">
+                              <div class="small-3 columns" style="text-align:center;">
+                                <img class="img-circle" src="/static/ndf/images/gnu-head.png" style="margin-top:-12px;"/>
+                              </div>
+                              <div class="small-9 columns">
+                                This is an info alert with a radius.
+                              </div>
+                              <a href="#" class="close">&times;</a>
+                            </div>
+                        </li>
+                         <li>
+                            <div data-alert class="alert-box info radius" style="height:65px;margin-bottom: 0.25rem;">
+                              <div class="small-3 columns" style="text-align:center;">
+                                <img class="img-circle" src="/static/ndf/images/gnu-head.png" style="margin-top:-12px;"/>
+                              </div>
+                              <div class="small-9 columns">
+                                This is an info alert with a radius.
+                              </div>
+                              <a href="#" class="close">&times;</a>
+                            </div>
+                        </li>
+                        {% if groupid %}
+                            <div id="analyticsFooter"><a href="{% url 'notification_details' groupid  %}">See All</a></div>
+                        {% endif %}
+                    </ul>
 
                 {% if help_oid %}
                 <li class=""><a {% if title == 'Help Page'  %} class="active" {% endif %} target="_blank" href="{% url 'course_content' help_oid %}"> <i class="fa fa-info-circle"></i> Help </a></li>
@@ -96,6 +138,8 @@
                 <li><a  class="{%if title == 'courses'%}active{%endif%}" href="{% url explore_url %}">Explore </a></li>
                 <li class=""><a href="#"> Blog</a></li>
                 <li class=""><a href="#"><i class="fi-info"></i> Help Topics</a></li>
+                
+
                 <!--li class="has-dropdown not-click">
                     <ul class="dropdown">
                         <!--li class="title back js-generated">
