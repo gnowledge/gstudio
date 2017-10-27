@@ -2853,16 +2853,30 @@ def notification_details(request,group_id):
     for each in group_obj:
       if each.created_by == each.modified_by :
         if each.last_update == each.created_at:
-          activity =  'created'
+          if each.if_file.mime_type:
+            activity =  'created in asset'
+          else:
+            activity =  'created ' + each.name 
+              
         else:
-          activity =  'modified'
+          if each.if_file.mime_type:
+            node_obj = Node.get_node_by_id(each.relation_set[0]['assetcontent_of'][0])
+            activity =  'uploaded ' + each.name +  ' in ' + node_obj.name
+          elif 'Asset' in each.member_of_names_list and 'asset@gallery' in each.tags:
+            activity =  'Modified Folder ' + each.name
+          elif 'Asset' in each.member_of_names_list and 'raw@material' in each.tags:
+            activity =  'Modified Resource ' + each.name
+          elif 'Asset' in each.member_of_names_list:
+            activity =  'Modified Asset ' + each.name
+          else:
+            activity =  'Modified ' + each.name
+
       else:
-        activity =  'created'
+        activity =  'created ' + each.name
       if each._type == 'Group':
         user_activity_append_temp(each)
       each.update({'activity':activity})
       files_list_append_temp(each)
-    print "00000000000000000",files_list
     return render_to_response('ndf/notifications_detail.html',
                                 { 
                                   'group_id': group_id,

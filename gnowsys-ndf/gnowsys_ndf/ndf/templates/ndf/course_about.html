@@ -259,11 +259,6 @@
 <br/>
 <br/>
 
-
-
-
-
-
 {% if show_analytics_notifications %}
 {% check_is_gstaff group_id request.user as gstaff_access %}
   <div class="course-overview-container">
@@ -278,12 +273,11 @@
         {% endcomment %}
         <div class="notifications-analytics-tabs">
           <ul class="tabs" data-tab role="tablist">
-            <li class="tab-title active" ><a href="#course-notification" role="tab" tabindex="0" aria-selected="true" aria-controls="panel2-1">Notifications</a></li>
 
             {% if request.user.is_authenticated and not gstaff_access %}
             {# {% if request.user.is_authenticated and not gstaff_access and request.user.id in group_obj.author_set %} #}
               <li class="tab-title" title="Click here to refresh">
-                <a role="tab" href="#analytics-content" class="fetch-analytics" tabindex="1" aria-selected="false" aria-controls="panel2-2" data-id={{request.user.id}}>
+                <a role="tab" href="#analytics-content" class="fetch-analytics" tabindex="1" aria-selected="true" aria-controls="panel2-2" data-id={{request.user.id}}>
                   Progress Report
                 </a>
               </li>
@@ -579,42 +573,12 @@
       })
 
       // Fetch notifications ajax call with function
-      function loaddata() {
-        $.ajax({
-            url: "{% url 'page_scroll' groupid 'counter' %}".replace("counter", counter),
-            type: "GET",
-            data:{'links': false},
-            datatype: "json",
-            global: false,
-            beforeSend: function(){
-                $("#course-notification").append("<label class='loading_lbl'>Loading...</label>");
-            },
-            success:function(data){
-                if(String(data)) {
-                    $(".loading_lbl").remove()
-                    $("#course-notification").append(data);
-                    counter = counter+1;
-                }
-
-                else{
-                    if(morecount ==0) {
-                        $("#course-notification").append("<h6>  No more data to show </h6>");
-                        morecount = morecount+1;
-                        counter = 2;
-                    }
-                }
-            }
-        });
-      }
   </script>
 {% endif %}
 <script type="text/javascript">
 
     // ready function
     $(document).ready(function() {
-        {% if show_analytics_notifications %}
-          loaddata();
-        {% endif %}
         var course_about_panel = $('.course-desc')
         if(course_about_panel.height() > 90 ){
           $(".show-more").removeClass("hide")
