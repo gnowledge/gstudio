@@ -37,6 +37,7 @@ GSTUDIO_EDUCATIONAL_SUBJECTS_AS_GROUPS = False
 LANGUAGES = (('en', 'English'), ('hi', u'Hindi'),('te','Telugu'))
 GSTUDIO_DEFAULT_LANGUAGE = ('en', 'English')
 GSTUDIO_WORKSPACE_INSTANCE = False
+GSTUDIO_FOOTER_LINKS = [{'/static/ndf/images/tata-trusts-logo.svg':'http://tatatrusts.org/'},{'/static/ndf/images/mit-logo.svg':'http://www.mit.edu/'},{'/static/ndf/images/logos/tiss-logo-text.svg':'http://www.tiss.edu/'},{'/static/ndf/images/logos/tifr.png':'http://www.hbcse.tifr.res.in/'}]
 OTHER_COMMON_LANGUAGES = [
     ('mr', 'Marathi'), ('mni','Manipuri'), ('ori','Oriya'),
     ('pi','Pali'), ('raj','Rajasthani'), ('gu','Gujarati'),
@@ -625,6 +626,10 @@ A project of <a href="http://lab.gnowledge.org/" target="_blank">{% trans "Gnowl
 </p>'''
 GSTUDIO_SITE_FAVICON = "/static/ndf/images/favicon/logo.png"
 GSTUDIO_SITE_LOGO = "/static/ndf/css/themes/metastudio/logo.svg"
+GSTUDIO_SITE_LANDING_PAGE_LOGO = "/static/ndf/images/abcde-logo.png"
+GSTUDIO_SITE_LANDING_PAGE_TEXT = "/static/ndf/images/abcde-text.png" 
+GSTUDIO_SITE_LANDING_PAGE_BG = "/static/ndf/images/abcde-background.png"
+GSTUDIO_SITE_LOGIN_PAGE_LOGO = "/static/ndf/images/abcde-metastudio.svg"
 GSTUDIO_SITE_SECONDARY_LOGO = "/static/ndf/css/themes/metastudio/logo.svg"
 GSTUDIO_GIT_REPO = "https://github.com/gnowledge/gstudio"
 GSTUDIO_SITE_PRIVACY_POLICY = ""

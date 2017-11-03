@@ -1319,6 +1319,9 @@ def get_node_common_fields(request, node, group_id, node_type, coll_set=None):
     if node.content != content_org:
         node.content = unicode(content_org)
         is_changed = True
+    if node.content_org != content_org:
+        node.content_org = unicode(content_org)
+        is_changed = True
 
     '''
     if node.content_org != content_org:

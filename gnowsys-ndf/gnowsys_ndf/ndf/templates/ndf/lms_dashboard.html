@@ -11,6 +11,7 @@
 {% get_gstudio_workspace_instance as is_workspace_instance %}
 
 <div class="mydesk_page">
+
   <div class="page_banner">
     <div class="banner_overlay"></div>
     <div class="banner_profile">
@@ -34,9 +35,11 @@
       </li>
 
       <li class=""><a {% if title == "my performance" %} class="selected" {% endif %} href="{% url 'my_performance' request.user.id  %}">{% trans "My Performance" %}</a> </li>
+      <li class=""><a {% if title == "my workspace" %} class="selected" {% endif %} href="{% url 'course_about' request.user.username  %}">{% trans "My WorkSpace" %}</a> </li>
 
     </ul>
   </div>
+
 
   <ul class="small-block-grid-1 medium-block-grid-2 large-block-grid-2" >
     {% comment %}
