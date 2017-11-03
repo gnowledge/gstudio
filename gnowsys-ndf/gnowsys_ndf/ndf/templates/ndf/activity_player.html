@@ -102,18 +102,8 @@
             <ul class="left-submenu">
                 <li class="back"><a href="#">Back</a></li>
                     {% for each in lesson_list %}
-                        <li class="has-submenu"> <a href="#">{{each}}</a></li>
+                    <a href="{% url 'activity_player_detail' group_id each.id each.first_act %}"><li class="has-submenu"> {{each.name}}</li></a>
                     {% endfor %}
-                    <li class="has-submenu"><a href="#">Lesson Name</a>
-                        <ul class="left-submenu">
-                            <li class="back"><a href="#">Back</a></li>
-                            {% for each in act_list %}
-                              {% for k,v in each.items  %}
-                                <li  {% if v.basenodeid == activityid %} class="active" {% endif %}> <a href="#"> {% firstof v.altnames v.name %} </a></li>
-                              {% endfor %}
-                          {% endfor %}
-                        </ul>
-                    </li>
             </ul>
         </li>
       </ul>
@@ -177,24 +167,17 @@
                     <li  {% if v.basenodeid == activityid %} class="active" {% endif %}> <a href="{% url 'activity_player_detail' group_id lesson_node.pk v.basenodeid %}"> {% firstof v.altnames v.name %} </a></li>
                   {% endfor %}
               {% endfor %}
+        <!-- mobile view -->
         <li class="has-submenu"><a href="#" style="background-color:#444444;">Unit Structure</a>
             <ul class="left-submenu">
                 <li class="back"><a href="#">Back</a></li>
                     {% for each in lesson_list %}
-                        <li class="has-submenu"> <a href="#">{{each}}</a></li>
+                        <a href="{% url 'activity_player_detail' group_id each.id each.first_act %}"><li class="has-submenu"> {{each.name}}</li></a>
                     {% endfor %}
-                    <li class="has-submenu"><a href="#">Lesson Name</a>
-                        <ul class="left-submenu">
-                            <li class="back"><a href="#">Back</a></li>
-                            {% for each in act_list %}
-                              {% for k,v in each.items  %}
-                                <li  {% if v.basenodeid == activityid %} class="active" {% endif %}> <a href="#"> {% firstof v.altnames v.name %} </a></li>
-                              {% endfor %}
-                          {% endfor %}
-                        </ul>
-                    </li>
+                    
             </ul>
         </li>
+        <!-- mobile view -->
       </ul>
     </aside>
 <!--  mobile view  -->
