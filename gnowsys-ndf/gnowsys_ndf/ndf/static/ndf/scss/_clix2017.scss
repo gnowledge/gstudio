@@ -4913,13 +4913,15 @@ $module-card-lines-to-show: 3;
         //background-image: url('/static/ndf/images/maths-cover.png');
         background-size:100% 100%;
         position:relative;
+        background-repeat:no-repeat;
+        min-width:100%;
         //opacity:0.9;
 
         &:before {
             content: ' ';
             background-color: rgba(0,0,0,.1);
             opacity: .5;
-            width: 100%;
+            width: 100%!important;
             position: absolute;
             top: 0;
             left: 0;
@@ -4938,6 +4940,7 @@ $module-card-lines-to-show: 3;
             height:150px!important;
             background-size:100% 100%;
             position:absolute!important; 
+            min-width: 100% !importantl
 
         }
 
@@ -5677,10 +5680,10 @@ ul.nav_menu_1 {
     font-size: 20px;
     margin-right: 5px;
 }
-.img-height{
-    height:150px;
-    width:1351px;
-}
+// .img-height{
+//     height:150px;
+//     width:1351px;
+// }
 
 .wrapper-footer{
     box-shadow: 0 -1px 5px 0 rgba(0,0,0,0.1);
