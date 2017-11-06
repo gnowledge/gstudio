@@ -76,7 +76,7 @@ Example-data-collection-dir-str/
 ├── 2016
 └── 2017
     ├── ct
-    │   └── 1011011-ct11
+    │   └── 01011011-ct11
     │       ├── gstudio
     │       │   ├── db
     │       │   ├── media
@@ -90,7 +90,7 @@ Example-data-collection-dir-str/
     │       │       └── studentResponseFiles
     │       └── unplatform
     └── mz
-        └── 2031001-mz1
+        └── 02031001-mz1
             ├── gstudio
             │   ├── db
             │   ├── media
