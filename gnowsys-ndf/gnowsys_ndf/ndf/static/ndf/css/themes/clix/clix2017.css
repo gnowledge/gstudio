@@ -6794,24 +6794,161 @@ ul.nav_menu_1 > li > a.selected, ul.nav_menu_1 > li > a:hover {
 
 /* line 6926, ../../../scss/_clix2017.scss */
 .task_editor_section {
-  background: #fff;
+  background: white;
   min-height: 100vh;
   margin-bottom: 10px;
   padding-right: 4px;
+  border: 1px solid rgba(128, 128, 128, 0.23);
+  width: 79%;
+  box-shadow: 0px 0px 5px #73859f;
 }
-/* line 6931, ../../../scss/_clix2017.scss */
+/* line 6934, ../../../scss/_clix2017.scss */
 .task_editor_section #scstyle {
   margin-top: -10px;
 }
+/* line 6937, ../../../scss/_clix2017.scss */
+.task_editor_section .task_editor_top {
+  border-top: 4px solid #74b3dc;
+  width: 101.3%;
+  margin-left: -15px;
+  margin-top: -1px;
+}
+/* line 6944, ../../../scss/_clix2017.scss */
+.task_editor_section .task_head {
+  height: 65px;
+  font-size: 22px;
+  padding: 16px 5px 5px 57px;
+  color: black;
+  border-bottom: 2px solid rgba(128, 128, 128, 0.23);
+}
+/* line 6953, ../../../scss/_clix2017.scss */
+.task_editor_section form {
+  font-size: 17px;
+  padding: 10px 0px 0px 10px;
+}
+/* line 6958, ../../../scss/_clix2017.scss */
+.task_editor_section .task_ex {
+  border-bottom: 2px solid rgba(128, 128, 128, 0.23);
+}
+/* line 6960, ../../../scss/_clix2017.scss */
+.task_editor_section .task_ex.active {
+  border: 2px solid #74b3dc;
+  margin-left: -16px;
+  width: 101.5%;
+  margin-top: -2px;
+}
+/* line 6969, ../../../scss/_clix2017.scss */
+.task_editor_section .task_listing {
+  max-width: 1176px !important;
+  margin: 0 auto !important;
+  display: -moz-box !important;
+  display: -ms-flexbox !important;
+  display: -webkit-box !important;
+  display: -webkit-flex !important;
+  display: flex !important;
+  flex-direction: column !important;
+  padding-bottom: 32px !important;
+  -webkit-flex-direction: column !important;
+  -ms-flex-direction: column !important;
+  -webkit-box-orient: vertical !important;
+  -webkit-box-direction: normal !important;
+  background: #fff;
+  box-shadow: 0px 2px 6px #000;
+}
+/* line 6986, ../../../scss/_clix2017.scss */
+.task_editor_section .task_listing .task_content {
+  display: -moz-box !important;
+  display: -ms-flexbox !important;
+  display: -webkit-box !important;
+  display: -webkit-flex !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: space-between !important;
+  width: 100% !important;
+  box-sizing: border-box !important;
+  border-bottom: 1px solid #D6D8DA !important;
+  padding: 16px 8px !important;
+  -webkit-align-items: center !important;
+  -webkit-justify-content: space-between !important;
+  -moz-box-sizing: border-box !important;
+  -ms-flex-align: center !important;
+  -webkit-box-align: center !important;
+  -ms-flex-pack: justify !important;
+  -webkit-box-pack: justify !important;
+}
+/* line 7005, ../../../scss/_clix2017.scss */
+.task_editor_section .task_listing .task_content:hover {
+  background: #F0F1F2 !important;
+}
+/* line 7008, ../../../scss/_clix2017.scss */
+.task_editor_section .task_listing .task_content .task_content_left {
+  display: -moz-box !important;
+  display: -ms-flexbox !important;
+  display: -webkit-box !important;
+  display: -webkit-flex !important;
+  display: flex !important;
+  align-items: center !important;
+  width: 80% !important;
+  -webkit-align-items: center !important;
+  -ms-flex-align: center !important;
+  -webkit-box-align: center !important;
+}
+/* line 7019, ../../../scss/_clix2017.scss */
+.task_editor_section .task_listing .task_content .task_content_left .task_content_details {
+  display: -moz-box !important;
+  display: -ms-flexbox !important;
+  display: -webkit-box !important;
+  display: -webkit-flex !important;
+  display: flex !important;
+  align-items: flex-start !important;
+  flex-direction: column !important;
+  padding-left: 15px !important;
+  width: 85% !important;
+  -webkit-align-items: flex-start !important;
+  -webkit-flex-direction: column !important;
+  -ms-flex-direction: column !important;
+  -ms-flex-align: start !important;
+  -webkit-box-align: start !important;
+  -webkit-box-orient: vertical !important;
+  -webkit-box-direction: normal !important;
+}
+/* line 7036, ../../../scss/_clix2017.scss */
+.task_editor_section .task_listing .task_content .task_content_left .task_content_details .hyperlink-user {
+  border: 2px solid #b9b9b9;
+  height: 50px;
+  width: 50px;
+}
+/* line 7041, ../../../scss/_clix2017.scss */
+.task_editor_section .task_listing .task_content .task_content_left .task_content_details .hyperlink-style {
+  text-decoration: none !important;
+  font-family: inherit !important;
+  font-size: 17px !important;
+  font-weight: bold !important;
+  line-height: 23px !important;
+  color: #164A7B !important;
+  width: 100% !important;
+  white-space: nowrap !important;
+  overflow: hidden !important;
+  text-overflow: ellipsis !important;
+}
+/* line 7054, ../../../scss/_clix2017.scss */
+.task_editor_section .task_listing .task_content .task_content_left .task_content_details .hyperlink-info {
+  text-decoration: none !important;
+  font-family: inherit !important;
+  font-size: 15px !important;
+  line-height: 22px !important;
+  color: rgba(0, 0, 0, 0.56) !important;
+  margin-top: 4px !important;
+}
 
-/* line 6938, ../../../scss/_clix2017.scss */
+/* line 7070, ../../../scss/_clix2017.scss */
 .lesson-title {
   font-size: 18px;
   padding-top: 10px;
   padding-left: 10px;
 }
 
-/* line 6944, ../../../scss/_clix2017.scss */
+/* line 7076, ../../../scss/_clix2017.scss */
 .activity-title {
   font-size: 18px;
   padding-top: 10px;
@@ -6819,7 +6956,7 @@ ul.nav_menu_1 > li > a.selected, ul.nav_menu_1 > li > a:hover {
   margin: 0px;
   border: 2px solid rgba(128, 128, 128, 0.15);
 }
-/* line 6951, ../../../scss/_clix2017.scss */
+/* line 7083, ../../../scss/_clix2017.scss */
 .activity-title > li {
   list-style: none;
   border-top: 1px solid #e9e9e9;
@@ -6831,18 +6968,18 @@ ul.nav_menu_1 > li > a.selected, ul.nav_menu_1 > li > a:hover {
   height: 150px;
   background-color: white;
 }
-/* line 6962, ../../../scss/_clix2017.scss */
+/* line 7094, ../../../scss/_clix2017.scss */
 .activity-title > li.active {
   background: rgba(0, 140, 186, 0.42);
   height: 150px;
   margin-top: -10px;
 }
-/* line 6968, ../../../scss/_clix2017.scss */
+/* line 7100, ../../../scss/_clix2017.scss */
 .activity-title > li > a {
   color: black;
 }
 
-/* line 6977, ../../../scss/_clix2017.scss */
+/* line 7109, ../../../scss/_clix2017.scss */
 .task_page_rendered {
   margin-left: 20px;
   max-width: 900px;
