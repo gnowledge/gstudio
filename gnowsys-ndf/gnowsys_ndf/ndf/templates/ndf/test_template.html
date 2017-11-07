@@ -4,9 +4,6 @@
 {% load ndf_tags %}
 {% block body_content %}
 
-
-
- 
   <div class="row task_sheet ">
     <div class="small-12 columns">
         <div class="task_editor ">
@@ -39,6 +36,12 @@
                     		<h7 style="margin-left: 65px;font-size: 26px;">Created by me</h7>
                     	</a>
                     </li>
+                    <li> 
+                    	<a href="#">
+                    		<img src="/static/ndf/images/pending_task.svg" style="height: 65px;width: 266px;align-content: center;"/>
+                    		<h7 style="margin-left: 65px;font-size: 26px;">Pending Tasks</h7>
+                    	</a>
+                    </li>
                 </div>
             </div>
           </div>
@@ -57,54 +60,101 @@
         			<a href="#"><i class="fa fa-ellipsis-h" aria-hidden="true"></i></a>
         		</div>
         	</div>
-        	<ul class="inline-list task_ex active">
-
-			  <li class="large-4 columns">
+        	
+			
+			
+			<ul class="inline-list task_ex">
+			  <li class="large-5 columns">
 			  		<form>
 				  		<input type="checkbox" name="task" value="task" style="margin-right: 5px;"> Making responsive UI
 			  		</form>
 			  </li>
-			  <li class="large-2 columns">
-			  		<a href="#" style="color: black;">Onwer</a>
+			  <li class="large-1 columns">
+			  		<a href="#" style="color: black;">black-cat-cc</a>
 			  </li>
-			  <li class="large-2 columns"><a href="#" style="color: black;">priority</a></li>
-			  <li class="large-2 columns"><a href="#" style="color: black;">status</a></li>
+			  <li class="large-2 columns">
+			  	<div class="small-2 columns">
+			  		<a href="#" style="color: black;" id="circle-medium"></a>
+			  	</div>
+			  	<div class="small-9 columns priority-margin">
+			  	 Medium priority
+			  	</div>
+			  </li>
+			  <li>
+			  	<a class="status-indication" title="completed">completed</a>
+			  </li>
+			  <li><a href="#" class="iconclr"><i class="fa fa-pencil "></i></a></li>
+			  <li><a href="#" class="iconclr"><i class="fa fa-trash " ></i></a></li>
 			</ul>
 			<ul class="inline-list task_ex">
-			  <li class="large-4 columns">
+			  <li class="large-5 columns">
 			  		<form>
 				  		<input type="checkbox" name="task" value="task" style="margin-right: 5px;"> Export ePub
 			  		</form>
 			  </li>
-			  <li class="large-2 columns">
+			  <li class="large-1 columns">
 			  		<a href="#" style="color: black;">Onwer</a>
 			  </li>
-			  <li class="large-2 columns"><a href="#" style="color: black;">priority</a></li>
-			  <li class="large-2 columns"><a href="#" style="color: black;">status</a></li>
+			  <li class="large-2 columns">
+			  	<div class="small-2 columns">
+			  		<a href="#" style="color: black;" id="circle-low"></a>
+			  	</div>
+			  	<div class="small-9 columns priority-margin">
+			  	 Low priority
+			  	</div>
+			  </li>
+				<li>
+			  	<a class="status-indication" title="Upcoming">Upcoming</a>
+			  </li>
+			  <li><a href="#" class="iconclr"><i class="fa fa-pencil "></i></a></li>
+			  <li><a href="#" class="iconclr"><i class="fa fa-trash " ></i></a></li>
 			</ul>
+			
 			<ul class="inline-list task_ex">
-			  <li class="large-4 columns">
+			  <li class="large-5 columns">
 			  		<form>
-				  		<input type="checkbox" name="task" value="task" style="margin-right: 5px;"> Task  3
+				  		<input type="checkbox" name="task" value="task" style="margin-right: 5px;"> Task 3
 			  		</form>
 			  </li>
-			  <li class="large-2 columns">
-			  		<a href="#" style="color: black;">Onwer</a>
+			  <li class="large-1 columns">
+			  		<a href="#" style="color: black;">pink-bear-cg09</a>
 			  </li>
-			  <li class="large-2 columns"><a href="#" style="color: black;">priority</a></li>
-			  <li class="large-2 columns"><a href="#" style="color: black;">status</a></li>
+			  <li class="large-2 columns">
+			  	<div class="small-2 columns">
+			  		<a href="#" style="color: black;" id="circle-high"></a>
+			  	</div>
+			  	<div class="small-9 columns priority-margin">
+			  	 High priority
+			  	</div>
+			  </li>
+			  <li>
+			  	<a class="status-indication" title="in progress">In progress</a>
+			  </li>
+			  <li><a href="#" class="iconclr"><i class="fa fa-pencil "></i></a></li>
+			  <li><a href="#" class="iconclr"><i class="fa fa-trash " ></i></a></li>
 			</ul>
 			<ul class="inline-list task_ex">
-			  <li class="large-4 columns">
+			  <li class="large-5 columns">
 			  		<form>
 				  		<input type="checkbox" name="task" value="task" style="margin-right: 5px;"> Task 4
 			  		</form>
 			  </li>
-			  <li class="large-2 columns">
-			  		<a href="#" style="color: black;">Onwer</a>
+			  <li class="large-1 columns">
+			  		<a href="#" style="color: black;">Administrator</a>
 			  </li>
-			  <li class="large-2 columns"><a href="#" style="color: black;">priority</a></li>
-			  <li class="large-2 columns"><a href="#" style="color: black;">status</a></li>
+			  <li class="large-2 columns">
+			  	<div class="small-2 columns">
+			  		<a href="#" style="color: black;" id="circle-medium"></a>
+			  	</div>
+			  	<div class="small-9 columns priority-margin">
+			  	 Medium priority
+			  	</div>
+			  </li>
+			  <li>
+			  	<a class="status-indication" title="in progress">In progress</a>
+			  </li>
+			  <li><a href="#" class="iconclr"><i class="fa fa-pencil "></i></a></li>
+			  <li><a href="#" class="iconclr"><i class="fa fa-trash " ></i></a></li>
 			</ul>
         	<!--<div class="task_listing">
 		    	<div class="task_content">
@@ -122,6 +172,10 @@
         </div>-->
     </div>
   </div>
+
+
+
+
  
 
 {% endblock body_content %}
