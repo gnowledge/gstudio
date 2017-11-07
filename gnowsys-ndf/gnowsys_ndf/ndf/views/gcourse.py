@@ -2059,9 +2059,7 @@ def activity_player_detail(request, group_id, lesson_id, activity_id):
     
     for each in group_obj.collection_set:
         node = node_collection.one({"_id":ObjectId(each)})
-        lesson_list.append(node.name)
-
-
+        lesson_list.append({'name':node.name,'id':node._id,'first_act':node.collection_set[0]})
 
     parent_node_id = activity_id
     node_obj = node_collection.one({'_id': ObjectId(activity_id)})
