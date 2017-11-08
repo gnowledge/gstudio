@@ -5,301 +5,221 @@
 {% block body_content %}
 {% check_is_user_group groupid as is_author %}
 
-  {% if user.is_authenticated %}
-  {% user_access_policy groupid request.user as user_access %}
-  {% if is_author == False %}
-  <br/>
-     <div class="task">
-      <br/>
-      <a class="button medium new-task" href="{% url 'gtask_create_edit' group_name %}"  >
-        <span class="fi-plus">&nbsp;&nbsp;{% trans "New " %}{{title}}</span>
-      </a>
-    </div>
-  {% endif %}
-  {% endif %}
-<header class="row" >
-  <dl class="tabs" data-tab data-options="deep_linking:true" >
-    <dd class="active"><a href="#panel2-1" id="p1"><i class="fi-eye"></i>{% trans 'All Task' %} {% if count %}({{ count }}){% endif %}</a></dd>
-  <dd ><a href="#panel2-2" id="p2" name="Completed" onClick="$('#example').empty()">{% trans 'Completed' %} </a></dd>
-  <dd ><a href="#panel2-3" id="p3" name="Createdbyme" onClick="$('#example').empty()">{% trans 'Created by me' %} </a></dd>
-  <dd ><a href="#panel2-4" id="p4" name="Assignedtome" onClick="$('#example').empty()"> {% trans 'Assigned to me' %} </a></dd> 
-  <dd ><a href="#panel2-5" id="p5" name="pending" onClick="$('#example').empty()">{% trans  'pending' %} </a></dd> 
-  <dd ><a href="#panel2-6" id="p6" name="Statuswise" onClick="$('#example').empty()">{% trans 'Status Wise' %} </a></dd>
+<style type="text/css">
+  .round{
+    border-radius: 1px;
+    background-color: orange;
 
+  }
 
-  </dl>
-  
-</header>
-<div class="tabs-content" id="tag">
-  <div class="content" id="panel2-1">
-
-  </div>
-  
-  <div class="content" id="panel2-6">
- 	<div class="row">
- 		<div class="small-3  rows">
- 			 <select id="filter">
-  				<option id="0" onClick="showHide()" value="New">  </option>
-  				<option id="1" onClick="showHide()" value="New"> {% trans 'New' %} </option>
-  				<option id="2" onClick="showHide()" value="In Progress">{% trans  'In Progress' %} </option>
-  				<option id="3" onClick="showHide()" value="Resolved"> {% trans 'Resolved' %} </option>
-  				<option id="4" onClick="showHide()" value="Feedback">{% trans  'Feedback' %}</option>
-  				<option id="5" onClick="showHide()" value="Closed"> {% trans 'Closed' %} </option>
-  				<option id="6" onClick="showHide()" value="Rejected">{% trans 'Rejected' %} </option>
-
-  			 </select>
-  		</div>
-  	</div>
-  </div>
-  
-
-</div>
-
-<div class="row">
-	<div  id="example">
-    	</div>
-</div>
-
-<script type="text/javascript">
-	
-
-var dyurl="{% url 'gcheck_filter' group_name 1 'None' %}"
-
-$("#document").ready(function(){
-$("#p1").ready(function (){
-location.hash='panel2-1' 
-$('#example').empty()
-$('#tag').hide() 
-$.ajax({
-      url: dyurl,
-
-      type: "GET",
-      
-      success: function(data){
-        $("#example").html(data)      
-      },
-      
-      complete: function(){
-        // $('#Student').foundation('reveal', 'open');
-      }
-    });
-});
-
-$("#p1").click(function (){
-location.hash='panel2-1' 
-$('#example').empty()
-$('#tag').hide() 
-$.ajax({
-      url: dyurl,
-
-      type: "GET",
-      
-      success: function(data){
-        $("#example").html(data)      
-      },
-      
-      complete: function(){
-        // $('#Student').foundation('reveal', 'open');
-      }
-    });
-});
-
-$("#p2").click(function (){
- $('#tag').hide();
-$('#example').empty() 
-  $.ajax({
-      url: "{% url 'gcheck_filter' group_name 2 'None' %}",
-
-      type: "GET",
-      
-      success: function(data){
-        $("#example").html(data)      
-      },
-      
-      complete: function(){
-        // $('#Student').foundation('reveal', 'open');
-      }
-    });
-});
-
-$("#p3").click(function (){
- $('#tag').hide(); 
-$('#example').empty()
-  $.ajax({
-      url: "{% url 'gcheck_filter' group_name 3 'None' %}",
-
-      type: "GET",
-      
-      success: function(data){
-        $("#example").html(data)      
-      },
-      
-      complete: function(){
-        // $('#Student').foundation('reveal', 'open');
-      }
-    });
-});
-$("#p4").click(function (){
- $('#tag').hide();
-$('#example').empty() 
-  $.ajax({
-      url: "{% url 'gcheck_filter' group_name 4 'None' %}",
-
-      type: "GET",
-      
-      success: function(data){
-        $("#example").html(data)      
-      },
-      
-      complete: function(){
-        // $('#Student').foundation('reveal', 'open');
-      }
-    });
-});
-$("#p5").click(function (){
- $('#tag').hide();
-$('#example').empty() 
-  $.ajax({
-      url: "{% url 'gcheck_filter' group_name 5 'None' %}",
-
-      type: "GET",
-      
-      success: function(data){
-        $("#example").html(data)      
-      },
-      
-      complete: function(){
-        // $('#Student').foundation('reveal', 'open');
-      }
-    });
-});
-
-$("#p6").click(function (){
-
- $('#tag').show();
-
-});
-
-});
-function showHide()
- {
-  
-  var val = document.getElementById("filter").value; 
- if (val == "New")
- {
-  
-  $.ajax({
-      url: "{% url 'gcheck_filter' group_name 6 'New' %}",
-
-      type: "GET",
-      
-      success: function(data){
-        $("#example").html(data)      
-      },
-      
-      complete: function(){
-        // $('#Student').foundation('reveal', 'open');
-      }
-    });
-
- }
-if (val == "In Progress")
- {
-  
-  $.ajax({
-      url: "{% url 'gcheck_filter' group_name 6 'InProgress' %}",
-
-      type: "GET",
-      
-      success: function(data){
-        $("#example").html(data)      
-      },
-      
-      complete: function(){
-        // $('#Student').foundation('reveal', 'open');
-      }
-    });
-
- }
-if (val == "Resolved")
- {
-  
-  $.ajax({
-      url: "{% url 'gcheck_filter' group_name 6 'Resolved' %}",
-
-      type: "GET",
-      
-      success: function(data){
-        $("#example").html(data)      
-      },
-      
-      complete: function(){
-        // $('#Student').foundation('reveal', 'open');
-      }
-    });
-
- }
-if (val == "Feedback")
- {
-  
-  $.ajax({
-      url: "{% url 'gcheck_filter' group_name 6 'Feedback' %}",
-
-      type: "GET",
-      
-      success: function(data){
-        $("#example").html(data)      
-      },
-      
-      complete: function(){
-        // $('#Student').foundation('reveal', 'open');
-      }
-    });
-
- }
-if (val == "Closed")
- {
-  
-  $.ajax({
-      url: "{% url 'gcheck_filter' group_name 6 'Closed' %}",
-
-      type: "GET",
-      
-      success: function(data){
-        $("#example").html(data)      
-      },
-      
-      complete: function(){
-        // $('#Student').foundation('reveal', 'open');
-      }
-    });
-
- }
-if (val == "Rejected")
- {
-  
-  $.ajax({
-      url: "{% url 'gcheck_filter' group_name 6 'Rejected' %}",
-
-      type: "GET",
-      
-      success: function(data){
-        $("#example").html(data)      
-      },
-      
-      complete: function(){
-        // $('#Student').foundation('reveal', 'open');
-      }
-    });
-
- }
- 
+  .circle-normal{
+    width: 15px;
+      height: 15px;
+      background: #ffc14e;
+      -moz-border-radius: 50px;
+      -webkit-border-radius: 50px;
+      border-radius: 50px;
+      margin-left: -20px;
+      padding: 0px 0px 0px 20px;
+      margin-top: 0px;
+}
+  .circle-high{
+    width: 15px;
+      height: 15px;
+      background: #f04124;
+      -moz-border-radius: 50px;
+      -webkit-border-radius: 50px;
+      border-radius: 50px;
+      margin-left: -20px;
+      padding: 0px 0px 0px 20px;
+      margin-top: 0px;
+}
+  .circle-low{
+    width: 15px;
+      height: 15px;
+      background: #008cba;
+      -moz-border-radius: 50px;
+      -webkit-border-radius: 50px;
+      border-radius: 50px;
+      margin-left: -20px;
+      padding: 0px 0px 0px 20px;
+      margin-top: 0px;
 }
 
-</script>
+.status-indication{
+  border-radius: 124px;
+    padding: 0px 8px 3px 8px;
+    line-height: 25px;
+    margin: 4px 14px 10px 0;
+    height: auto;
+    display: inline-block !important;
+    border: 2px solid rgba(115, 133, 159, 0.5);
+    color: grey;
+}
+.priority-margin{
+  margin-left: -30px;
+}
+.iconclr{
+  color:#999999;
+}
+</style>
+
 
  
+  <div class="row task_sheet ">
+    <div class="small-12 columns">
+        <div class="task_editor ">
+          <div class="small-2 columns hide-for-small hide-for-medium">
+            <div class="task_tree">
+              <div class="lesson-title" title="">
+              </div>
+                <div class="activity-title">
+                    <li class="active task-list"> 
+                      <a href="#">
+                        <img src="/static/ndf/images/task_list.svg" style="height: 65px;width: 266px;align-content: center;"/>
+                        <h7 style="margin-left: 81px;font-size: 26px;">Task List</h7>
+                      </a>
+                    </li>
+                    <li> 
+                      <a href="#">
+                        <img src="/static/ndf/images/new_task.svg" style="height: 65px;width: 266px;align-content: center;"/>
+                        <h7 style="margin-left: 65px;font-size: 26px;">Create New</h7>
+                      </a>
+                    </li>
+                    <li class="assigned-to-me"> 
+                      <a href="#">
+                        <img src="/static/ndf/images/assigned_to_me.svg" style="height: 65px;width: 266px;align-content: center;"/>
+                        <h7 style="margin-left: 65px;font-size: 26px;">Assigned to me</h7>
+                      </a>
+                    </li>
+                    <li class="created-by-me"> 
+                      <a href="#">
+                        <img src="/static/ndf/images/created_by_me.svg" style="height: 65px;width: 266px;align-content: center;"/>
+                        <h7 style="margin-left: 65px;font-size: 26px;">Created by me</h7>
+                      </a>
+                    </li>
+                    <li class="pending-tasks"> 
+                      <a href="#">
+                        <img src="/static/ndf/images/pending_task.svg" style="height: 65px;width: 266px;align-content: center;"/>
+                        <h7 style="margin-left: 65px;font-size: 26px;">Pending Tasks</h7>
+                      </a>
+                    </li>
+                </div>
+            </div>
+          </div>
+        </div>
 
+       <div class="large-10 columns task_editor_section ">
+       </div> 
+
+        
+  </div>
+
+
+
+
+ <script type="text/javascript">
+  $( document ).ready(function() {
+    $.ajax({
+        url: "{% url 'gcheck_filter' group_id 1 'None' %}",
+
+        type: "GET",
+        
+        success: function(data){
+          $(".task_editor_section").html(data)      
+        },
+        
+        complete: function(){
+          // $('#Student').foundation('reveal', 'open');
+        }
+      });
+
+});
+ $( ".task-list" ).click(function() {
+  $.ajax({
+        url: "{% url 'gcheck_filter' group_id 1 'None' %}",
+
+        type: "GET",
+        
+        success: function(data){
+          addActiveClass('task-list')  
+          
+          $(".task_editor_section").html("") 
+          $(".task_editor_section").html(data) 
+        },
+        
+        complete: function(){
+          // $('#Student').foundation('reveal', 'open');
+        }
+      });
+});
+
+
+ $( ".created-by-me" ).click(function() {
+  $.ajax({
+        url: "{% url 'gcheck_filter' group_id 3 'None' %}",
+
+        type: "GET",
+        
+        success: function(data){
+        addActiveClass('created-by-me')  
+          
+          $(".task_editor_section").html("") 
+          $(".task_editor_section").html(data) 
+        },
+        
+        complete: function(){
+          // $('#Student').foundation('reveal', 'open');
+        }
+      });
+});
+
+ $( ".assigned-to-me" ).click(function() {
+  $.ajax({
+        url: "{% url 'gcheck_filter' group_id 4 'None' %}",
+
+        type: "GET",
+        
+        success: function(data){        
+        addActiveClass('assigned-to-me')  
+          $(".task_editor_section").html("") 
+          $(".task_editor_section").html(data) 
+        },
+        
+        complete: function(){
+          // $('#Student').foundation('reveal', 'open');
+        }
+      });
+});
+
+ $( ".pending-tasks" ).click(function() {
+  $.ajax({
+        url: "{% url 'gcheck_filter' group_id 5 'None' %}",
+
+        type: "GET",
+        
+        success: function(data){
+          addActiveClass('pending-tasks')
+          $(".task_editor_section").html("") 
+          $(".task_editor_section").html(data) 
+        },
+        
+        complete: function(){
+          // $('#Student').foundation('reveal', 'open');
+        }
+      });
+});
+
+ function addActiveClass(className){
+      $('.task-list').removeClass('active')
+      $('.created-by-me').removeClass('active')
+      $('.assigned-to-me').removeClass('active')
+      $('.pending-tasks').removeClass('active')
+      $('.' + className).addClass('active')
+  
+ }
+
+ </script>
 
 
 {% endblock %}

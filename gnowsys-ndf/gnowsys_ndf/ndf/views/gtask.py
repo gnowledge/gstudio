@@ -767,7 +767,6 @@ def delete_task(request, group_name, _id):
 
 @get_execution_time
 def gcheck_filter(request,group_name,choice=1,status='New',each_page=1):
-    print "8888888888888888"
     at_list = ["Status", "start_time", "Priority", "end_time", "Assignee", "Estimated_time"]
     blank_dict = {}
     history = []
