@@ -3,7 +3,7 @@
 {% load i18n %}
 {% load ndf_tags %}
 {% block body_content %}
-<div class="off-canvas-wrap" data-offcanvas>
+<div class="off-canvas-wrap hide-for-large-up" data-offcanvas>
   <div class="inner-wrap">
     <nav class="tab-bar">
       <section class="left-small">
@@ -11,7 +11,7 @@
       </section>
 
       <section class="middle tab-bar-section">
-        <h1 class="title">Foundation</h1>
+        <h1 class="title"><i class="fa fa-info-circle"></i></h1>
       </section>
 
       <section class="right-small">
@@ -21,37 +21,29 @@
 
     <aside class="left-off-canvas-menu">
       <ul class="off-canvas-list">
-        <li><label>Foundation</label></li>
-        <li class="has-submenu"><a href="#">The Psychohistorians</a>
+        <li class="has-submenu"><a href="#">My Desk</a>
+        </li>
+        <li><a href="#">Explore</a></li>
+        <li><a href="#">Interactives</a></li>
+        <li><a href="#"><i class="fa fa-info-circle">Help</i></a></li>
+        <li><a href="#">Language</a>
             <ul class="left-submenu">
                 <li class="back"><a href="#">Back</a></li>
-                <li><label>Level 1</label></li>
-                <li><a href="#">Link 1</a></li>
-                <li class="has-submenu"><a href="#">Link 2 w/ submenu</a>
-                    <ul class="left-submenu">
-                        <li class="back"><a href="#">Back</a></li>
-                        <li><label>Level 2</label></li>
-                        <li><a href="#">...</a></li>
-                    </ul>
-                </li>
-                <li><a href="#">...</a></li>
+                <li><a href="#">English</a></li>
+                <li><a href="#">Hindi</a></li>
+                <li><a href="#">Telugu</a></li>
             </ul>
         </li>
-        <li><a href="#">The Encyclopedists</a></li>
-        <li><a href="#">The Mayors</a></li>
-        <li><a href="#">The Traders</a></li>
-        <li><a href="#">The Merchant Princes</a></li>
       </ul>
     </aside>
 
     <aside class="right-off-canvas-menu">
       <ul class="off-canvas-list">
         <li><label>Users</label></li>
-        <li><a href="#">Hari Seldon</a></li>
-        <li class="has-submenu"><a href="#">R. Giskard Reventlov</a>
+        <li><a href="#">Logged In User</a></li>
+        <li class="has-submenu"><a href="#">Buddy</a>
             <ul class="right-submenu">
                 <li class="back"><a href="#">Back</a></li>
-                <li><label>Level 1</label></li>
                 <li><a href="#">Link 1</a></li>
                 <li class="has-submenu"><a href="#">Link 2 w/ submenu</a>
                     <ul class="right-submenu">
@@ -73,6 +65,169 @@
 
   <a class="exit-off-canvas"></a>
 
-  </div>
-</div>
+
+
+
+
+<!--clix header -->
+
+
+
+<nav class="top-bar" data-topbar role="navigation" id="menu_bar_gstudio">
+        <ul class="title-area">
+            <li class="name show-for-medium-up">
+                <a class="loggedin-user" href="#">
+                
+                <img src="">
+                </a>
+            </li>
+            <li class="name hide-for-medium-up">
+                <i class="fi-list side-bar-button"></i>
+                <i class="fi-x close-menu-dropdown hide"></i>
+                <a class="loggedin-user" href="#">
+                    <div></div>
+                </a>
+            </li>
+            <!-- Remove the class "menu-icon" to 
+            get rid of menu icon. Take out "Menu" to just have icon alone -->
+            <li class="toggle-topbar"><a href="#"><i class="icons-large fi-torso"></i>&nbsp;<span class="badge badge-blue">1</span></a></li>
+        </ul>
+
+        <section class="top-bar-section">
+            <!-- Right Nav Section -->
+
+            <ul class="right show-for-medium-up">
+                <li>
+                    <a data-dropdown="autoCloseExample" aria-controls="autoCloseExample" aria-expanded="false">
+                        <i class="fa fa-bell-o" style="font-size:1.3em; color:white;"></i>
+                    </a>
+                </li>
+                    <ul id="autoCloseExample" class="f-dropdown noti" data-dropdown-content tabindex="-1" aria-hidden="true" aria-autoclose="false" tabindex="-1">
+                        <li>
+                            <div data-alert class="alert-box info radius" style="height:60px;margin-bottom: 0.25rem;">
+                              <div class="small-3 columns" style="text-align:center;">
+                                <img class="img-circle" src="/static/ndf/images/gnu-head.png" style="margin-top:-12px;"/>
+                              </div>
+                              <div class="small-9 columns">
+                                This is an info alert with a radius.
+                              </div>
+                              <a href="#" class="close">&times;</a>
+                            </div>
+                        </li>
+                         <li>
+                            <div data-alert class="alert-box info radius" style="height:60px;margin-bottom: 0.25rem;">
+                              <div class="small-3 columns" style="text-align:center;">
+                                <img class="img-circle" src="/static/ndf/images/gnu-head.png" style="margin-top:-12px;"/>
+                              </div>
+                              <div class="small-9 columns">
+                                This is an info alert with a radius.
+                              </div>
+                              <a href="#" class="close">&times;</a>
+                            </div>
+                        </li>
+                         <li>
+                            <div data-alert class="alert-box info radius" style="height:65px;margin-bottom: 0.25rem;">
+                              <div class="small-3 columns" style="text-align:center;">
+                                <img class="img-circle" src="/static/ndf/images/gnu-head.png" style="margin-top:-12px;"/>
+                              </div>
+                              <div class="small-9 columns">
+                                This is an info alert with a radius.
+                              </div>
+                              <a href="#" class="close">&times;</a>
+                            </div>
+                        </li>
+                            <div id="analyticsFooter"><a href="#">See All</a></div>
+                    </ul>
+
+                <li class=""><a  class="active"  target="_blank" href="#"> <i class="fa fa-info-circle"></i> Help </a></li>
+                <li class="has-dropdown not-click">
+                    <a href="#">
+                    Language
+                    </a>
+                    <ul class="dropdown">
+                            <li>
+                            </li>
+                    </ul>
+                </li>
+          
+                <li class="has-dropdown buddy_margin white-text">
+                            <img class="profile-img" style="background-color:rgba(0, 0, 0, 0.34);" src="/static/ndf/bower_components/foundation-icon-fonts/svgs/fi-torso.svg" >
+                                        <ul class="dropdown">
+                        <li class="text-center">
+                          <a href="#">Change pwd</a>
+                        </li>
+                        <li>
+                          <a class="logout" href="#">
+                            <i class="fi-power"></i> &nbsp;Logout
+                          </a>
+                        </li>
+                    </ul>
+                </li>
+                <li>
+                    <a class="" href="#" accesskey="l">
+                    <i class="fi-key"></i>&nbsp; Login
+                  </a>
+                </li>
+            </ul>
+            <ul class="right hide-for-medium-up dropdown-menu hide">
+                <li class=""><a href="#">My Desk</a></li>
+                <li><a  class="#" href="#">Explore </a></li>
+                <li class=""><a href="#"> Blog</a></li>
+                <li class=""><a href="#"><i class="fi-info"></i> Help Topics</a></li>
+            </ul>
+            <ul class="right hide-for-medium-up side-bar-menu hide">
+                <li class="">
+                    <a href="#">
+                        <i class="icons-medium fi-torso"></i>&nbsp;
+                        <span>LOGGED IN BUDDIES</span>&nbsp;
+                        <span class="badge badge-blue">1</span>
+                    </a>
+                </li>
+                <li class="has-dropdown not-click">
+                    <a href="#">
+                        <img src="#" class="user-profile-pic-small"/>
+                    </a>
+                    <ul class="dropdown">
+                        <li>
+                            <a href="#">Change Password
+                            </a>
+                        </li>
+                        <li>
+                            <a class="logout" href="#">
+                              <i class="fi-power"></i> &nbsp;Logout
+                            </a>
+                        </li>
+                    </ul>
+                </li>
+                <li>
+                    <a href="" class='add_buddy'>
+                        <center>
+                            <i class="fi-plus round-icon"></i>&nbsp;
+                            <span>Add Buddy</span>
+                        </center>
+                    </a>
+                </li>
+            </ul>
+              <ul class="right hide-for-medium-up side-bar-menu hide">
+                <li class="">
+                    <a class="" href="#" accesskey="l">
+                    <i class="fi-key"></i>&nbsp;Login
+                  </a>
+                </li>
+            </ul>
+
+            <!-- Left Nav Section -->
+            <ul class="left show-for-medium-up">
+                <li class="">
+                    <a href="#"   >My Desk</a>
+                </li>
+                <li><a href="#" > Explore</a>
+                </li>
+                <li>
+                    <a  target="_blank" href="#" class="active">Interactives</a>
+                </li>
+                
+            </ul>
+          </section>
+    </nav>
 {% endblock body_content %}
