@@ -3828,6 +3828,22 @@ $ah_2_background_color_hover: rgba(244, 244, 244, 0.3);;
             }
 }
 
+/*  Overriding off-canvas class of foundation for responsive activity player header*/
+.responsive-primary-header{
+
+    .tab-bar{
+                background: $primary-blue;
+                
+            }
+
+            .left-off-canvas-menu{
+                background: $primary-blue;
+            }
+
+            .right-off-canvas-menu{
+                background: $primary-blue;
+            }
+}
     
 
 /*
