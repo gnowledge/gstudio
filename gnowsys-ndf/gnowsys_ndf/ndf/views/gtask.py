@@ -56,11 +56,12 @@ def gtask(request, group_name, task_id=None):
     #       group_id = str(auth._id)
     # else :
     #     pass
+    print "7777777777777777777777777",group_name
     group_name, group_id = get_group_name_id(group_name)
 
     GST_TASK = node_collection.one({'_type': "GSystemType", 'name': 'Task'})
     title = "Task"
-    TASK_inst = node_collection.find({'member_of': {'$all': [GST_TASK._id]}, 'group_set': {'$all': [ObjectId(group_id)]}})
+    TASK_inst = node_collection.find({'member_of': {'$all': [GST_TASK._id]}, 'group_set': ObjectId(group_id) })
     template = "ndf/lms.html"
     variable = RequestContext(request, {'title': title, 'appId':app._id, 'TASK_inst': TASK_inst, 'group_id': group_id, 'groupid': group_id, 'group_name':group_name })
     return render_to_response(template, variable)
@@ -798,7 +799,7 @@ def gcheck_filter(request,group_name,choice=1,status='New',each_page=1):
 
     Completed_Status_List=['Resolved','Closed']
     title = "Task"
-    TASK_inst = node_collection.find({'member_of': {'$all': [GST_TASK._id]}})
+    TASK_inst = node_collection.find({'member_of': {'$all': [GST_TASK._id]},'group_set': {'$all': [ObjectId(group_id)]}})
     task_list=[]
     message=""
     send="This group doesn't have any files"
