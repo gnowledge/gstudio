@@ -1,3 +1,7 @@
+{% load i18n %}
+{% load ndf_tags %}
+{% check_is_gstaff group_id request.user as is_gstaff %}
+            
             <div class="task_editor_top">
             </div>
             <div class="row task_head">
@@ -31,6 +35,44 @@
                     <a class="status-indication" title="completed">{{each.Status}}</a>
                   </li>
                   <li><a href="#" class="iconclr"><i class="fa fa-pencil "></i></a></li>
-                  <li><a href="#" class="iconclr"><i class="fa fa-trash " ></i></a></li>
+                  {% if each.owner == 'owner'  or is_gstaff %}
+                  <li class="delete-task"><a  class="iconclr" onclick="deleteTask('{{each.id}}')"><i class="fa fa-trash " ></i></a></li>
+                  {% endif %}
               </ul>
             {% endfor %}
+
+
+            <script type="text/javascript">
+        
+           function deleteTask(task_id){
+
+                if (confirm("Do you want to delete this task?.") == true){
+                    //url = "/" + "{{group_id}}" + "/" + "gtask/gdelete_task/" + task_id
+                    $.ajax({
+                        url: "{% url 'ajax_delete_node' group_id  %}",
+                        type: "POST",
+                        data: {
+                          'csrfmiddlewaretoken': "{{csrf_token}}",
+                          "node_to_delete": task_id,
+                          "deletion_type": 0,
+                          "right_subject": 1,
+
+                        },
+                        
+                        success: function(data){ 
+                        alert("assasasa");
+                        
+                        },
+                        
+                        complete: function(){
+                          // $('#Student').foundation('reveal', 'open');
+                        }
+                    });
+                
+                }
+                else{
+
+                }
+            }
+
+            </script>

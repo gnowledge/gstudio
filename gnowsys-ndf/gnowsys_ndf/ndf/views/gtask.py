@@ -715,7 +715,7 @@ def task_collection(request,group_name,task_id=None,each_page=1):
 
 
 @get_execution_time
-def delete_task(request, group_name, _id):
+def gdelete_task(request, group_name, _id):
     """This method will delete task object and its Attribute and Relation
     """
     # ins_objectid  = ObjectId()
@@ -730,38 +730,38 @@ def delete_task(request, group_name, _id):
     #             group_id = str(auth._id)
     # else :
     #     pass
-
     try:
         group_id = ObjectId(group_name)
     except:
         group_name, group_id = get_group_name_id(group_name)
 
-    pageurl = request.GET.get("next", "")
-    try:
-        node = node_collection.one({'_id': ObjectId(_id)})
-        if node:
-            attributes = triple_collection.find({'_type': 'GAttribute', 'subject': node._id})
-            relations = triple_collection.find({'_type': 'GRelation', 'subject': node._id})
-            if attributes.count() > 0:
-                for each in attributes:
-                    triple_collection.one({'_id': each['_id']}).delete()
+    node = node_collection.one({'_id': ObjectId(_id)})
 
-            if relations.count() > 0:
-                for each in relations:
-                    triple_collection.one({'_id': each['_id']}).delete()
-	    if len(node.post_node) > 0 :
-		for each in node.post_node :
-		    sys_each_postnode = node_collection.find_one({'_id': each})
-		    member_of_name = node_collection.find_one({'_id': sys_each_postnode.member_of[0]}).name
-		    if member_of_name == "Task" :
-			sys_each_postnode.prior_node.remove(node._id)
-			sys_each_postnode.save(groupid=group_id)
-		    if member_of_name == "task_update_history":
-			sys_each_postnode.delete(groupid=group_id)
+    # pageurl = request.GET.get("next", "")
+    # try:
+    #     print "88888888888888888",node
+    #     if node:
+    #         attributes = triple_collection.find({'_type': 'GAttribute', 'subject': node._id})
+    #         relations = triple_collection.find({'_type': 'GRelation', 'subject': node._id})
+    #         if attributes.count() > 0:
+    #             for each in attributes:
+    #                 triple_collection.one({'_id': each['_id']}).delete()
 
-            node.delete()
-    except Exception as e:
-        print "Exception:", e
+    #         if relations.count() > 0:
+    #             for each in relations:
+    #                 triple_collection.one({'_id': each['_id']}).delete()
+    #     if len(node.post_node) > 0 :
+    #   		for each in node.post_node :
+    #         sys_each_postnode = node_collection.find_one({'_id': each})
+    #         member_of_name = node_collection.find_one({'_id': sys_each_postnode.member_of[0]}).name
+    #         if member_of_name == "Task" :
+    #           sys_each_postnode.prior_node.remove(node._id)
+    #           sys_each_postnode.save(groupid=group_id)
+    #         if member_of_name == "task_update_history":
+    #           sys_each_postnode.delete(groupid=group_id)
+    #           node.delete()
+    # except Exception as e:
+    #     print "Exception:", e
 
     return HttpResponseRedirect(reverse('task', kwargs={'group_name': group_name }))
 
@@ -799,7 +799,7 @@ def gcheck_filter(request,group_name,choice=1,status='New',each_page=1):
 
     Completed_Status_List=['Resolved','Closed']
     title = "Task"
-    TASK_inst = node_collection.find({'member_of': {'$all': [GST_TASK._id]},'group_set': {'$all': [ObjectId(group_id)]}})
+    TASK_inst = node_collection.find({'member_of': {'$all': [GST_TASK._id]},'group_set': {'$all': [ObjectId(group_id)],'status':'PUBLISHED'}})
     task_list=[]
     message=""
     send="This group doesn't have any files"
