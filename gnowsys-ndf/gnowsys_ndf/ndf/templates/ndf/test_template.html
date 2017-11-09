@@ -17,7 +17,8 @@
       </section>
 
       <section class="right-small">
-        <a class="right-off-canvas-toggle menu-icon" ><span></span></a>
+        <a class="right-off-canvas-toggle icons-large fi-torso " style="margin-left: 6px;
+    color: white;">&nbsp;<span class="badge badge-blue">1</span><span></span></a>
       </section>
     </nav>
 
@@ -33,17 +34,6 @@
             <ul class="left-submenu">
             	<li class="back"><a href="#">Back</a></li>
             	<li>
-                    <div data-alert class="alert-box info radius" style="height:60px;margin-bottom: 0.25rem;">
-                      <div class="small-3 columns" style="text-align:center;">
-                        <img class="img-circle" src="/static/ndf/images/gnu-head.png" style="margin-top:-12px;"/>
-                      </div>
-                      <div class="small-9 columns">
-                        This is an info alert with a radius.
-                      </div>
-                      <a href="#" class="close">&times;</a>
-                    </div>
-                </li>
-                <li>
                     <div data-alert class="alert-box info radius" style="height:60px;margin-bottom: 0.25rem;">
                       <div class="small-3 columns" style="text-align:center;">
                         <img class="img-circle" src="/static/ndf/images/gnu-head.png" style="margin-top:-12px;"/>
@@ -75,27 +65,41 @@
         <li><a href="#">Administrator</a></li>
         <li><a href="#">Change Password</a></li>
         <li>
-                    <a class="" href="#" accesskey="l">
-                    <i class="fi-key"></i>&nbsp; Login
-                  </a>
-                </li>
+	        <a class="" href="#" accesskey="l">
+	        <i class="fi-key"></i>&nbsp; Login
+	      </a>
+	    </li>
         <li><a class="logout" href="#"><i class="fi-power"></i>Logout</a></li>
         <li><label>Buddy</label>
+        <li><a href="#">red-cat</a></li>
+        <li><a href="#">pink-bear</a></li>
+
         <li class="has-submenu"><a href="#">Add Buddy</a>
             <ul class="right-submenu">
                 <li class="back"><a href="#">Back</a></li>
-                <li><a href="#">Add Buddy</a></li>
+                <li>
+                	<a href="" class='add_buddy'>
+                        <center>
+                            <i class="fi-plus round-icon"></i>&nbsp;
+                            <span>Add Buddy</span>
+                        </center>
+                    </a>
+                </li>
                 <li class="has-submenu"><a href="#">Buddy</a>
                     <ul class="right-submenu">
                         <li class="back"><a href="#">Back</a></li>
-                        <li><label>Level 2</label></li>
-                        <li><a href="#">...</a></li>
+                        <li>
+	                        <a href="#">
+		                        <i class="icons-medium fi-torso"></i>&nbsp;
+		                        <span>LOGGED IN BUDDIES</span>&nbsp;
+		                        <span class="badge badge-blue">1</span>
+	                    	</a>
+                		</li>
                     </ul>
                 </li>
                 <li><a href="#">...</a></li>
             </ul>
         </li>
-        <li><a href="#">...</a></li>
       </ul>
     </aside>
 
@@ -129,29 +133,8 @@
             </ul>
             
             <ul class="right hide-for-medium-up side-bar-menu hide">
-                <li class="">
-                    <a href="#">
-                        <i class="icons-medium fi-torso"></i>&nbsp;
-                        <span>LOGGED IN BUDDIES</span>&nbsp;
-                        <span class="badge badge-blue">1</span>
-                    </a>
-                </li>
-                <li class="has-dropdown not-click">
-                    <a href="#">
-                        <img src="#" class="user-profile-pic-small"/>
-                    </a>
-                    <ul class="dropdown">
-                        <li>
-                            <a href="#">Change Password
-                            </a>
-                        </li>
-                        <li>
-                            <a class="logout" href="#">
-                              <i class="fi-power"></i> &nbsp;Logout
-                            </a>
-                        </li>
-                    </ul>
-                </li>
+                
+               
                 <li>
                     <a href="" class='add_buddy'>
                         <center>
