@@ -7114,3 +7114,59 @@ ul.nav_menu_1 {
 }
 
 
+.round{
+    border-radius: 1px;
+    background-color: orange;
+
+  }
+
+  .circle-normal{
+    width: 15px;
+      height: 15px;
+      background: #ffc14e;
+      -moz-border-radius: 50px;
+      -webkit-border-radius: 50px;
+      border-radius: 50px;
+      margin-left: -20px;
+      padding: 0px 0px 0px 20px;
+      margin-top: 0px;
+}
+  .circle-high{
+    width: 15px;
+      height: 15px;
+      background: #f04124;
+      -moz-border-radius: 50px;
+      -webkit-border-radius: 50px;
+      border-radius: 50px;
+      margin-left: -20px;
+      padding: 0px 0px 0px 20px;
+      margin-top: 0px;
+}
+  .circle-low{
+    width: 15px;
+      height: 15px;
+      background: #008cba;
+      -moz-border-radius: 50px;
+      -webkit-border-radius: 50px;
+      border-radius: 50px;
+      margin-left: -20px;
+      padding: 0px 0px 0px 20px;
+      margin-top: 0px;
+}
+
+.status-indication{
+  border-radius: 124px;
+    padding: 0px 8px 3px 8px;
+    line-height: 25px;
+    margin: 4px 14px 10px 0;
+    height: auto;
+    display: inline-block !important;
+    border: 2px solid rgba(115, 133, 159, 0.5);
+    color: grey;
+}
+.priority-margin{
+  margin-left: -30px;
+}
+.iconclr{
+  color:#999999;
+}

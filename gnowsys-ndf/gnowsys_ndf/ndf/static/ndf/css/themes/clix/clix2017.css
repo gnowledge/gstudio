@@ -6984,3 +6984,70 @@ ul.nav_menu_1 > li > a.selected, ul.nav_menu_1 > li > a:hover {
   margin-left: 20px;
   max-width: 900px;
 }
+
+/* line 7117, ../../../scss/_clix2017.scss */
+.round {
+  border-radius: 1px;
+  background-color: orange;
+}
+
+/* line 7123, ../../../scss/_clix2017.scss */
+.circle-normal {
+  width: 15px;
+  height: 15px;
+  background: #ffc14e;
+  -moz-border-radius: 50px;
+  -webkit-border-radius: 50px;
+  border-radius: 50px;
+  margin-left: -20px;
+  padding: 0px 0px 0px 20px;
+  margin-top: 0px;
+}
+
+/* line 7134, ../../../scss/_clix2017.scss */
+.circle-high {
+  width: 15px;
+  height: 15px;
+  background: #f04124;
+  -moz-border-radius: 50px;
+  -webkit-border-radius: 50px;
+  border-radius: 50px;
+  margin-left: -20px;
+  padding: 0px 0px 0px 20px;
+  margin-top: 0px;
+}
+
+/* line 7145, ../../../scss/_clix2017.scss */
+.circle-low {
+  width: 15px;
+  height: 15px;
+  background: #008cba;
+  -moz-border-radius: 50px;
+  -webkit-border-radius: 50px;
+  border-radius: 50px;
+  margin-left: -20px;
+  padding: 0px 0px 0px 20px;
+  margin-top: 0px;
+}
+
+/* line 7157, ../../../scss/_clix2017.scss */
+.status-indication {
+  border-radius: 124px;
+  padding: 0px 8px 3px 8px;
+  line-height: 25px;
+  margin: 4px 14px 10px 0;
+  height: auto;
+  display: inline-block !important;
+  border: 2px solid rgba(115, 133, 159, 0.5);
+  color: grey;
+}
+
+/* line 7167, ../../../scss/_clix2017.scss */
+.priority-margin {
+  margin-left: -30px;
+}
+
+/* line 7170, ../../../scss/_clix2017.scss */
+.iconclr {
+  color: #999999;
+}
