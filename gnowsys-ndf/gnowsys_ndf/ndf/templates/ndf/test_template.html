@@ -13,12 +13,12 @@
       </section>
 
       <section class="middle tab-bar-section">
-        <h1 class="title"><i class="fa fa-info-circle"></i>Logo</h1>
+        <h1 class="title"><img src="/static/ndf/images/clix-header-icon.png"/></h1>
       </section>
 
       <section class="right-small">
-        <a class="right-off-canvas-toggle icons-large fi-torso " style="margin-left: 6px;
-    color: white;">&nbsp;<span class="badge badge-blue">1</span><span></span></a>
+        <a class="right-off-canvas-toggle icons-large fi-torso" style="margin-left: 6px;
+    color: white;">&nbsp;<span class="badge badge-blue"></span><span></span></a>
       </section>
     </nav>
 
@@ -70,37 +70,11 @@
 	      </a>
 	    </li>
         <li><a class="logout" href="#"><i class="fi-power"></i>Logout</a></li>
-        <li><label>Buddy</label>
-        <li><a href="#">red-cat</a></li>
-        <li><a href="#">pink-bear</a></li>
-
-        <li class="has-submenu"><a href="#">Add Buddy</a>
-            <ul class="right-submenu">
-                <li class="back"><a href="#">Back</a></li>
-                <li>
-                	<a href="" class='add_buddy'>
-                        <center>
-                            <i class="fi-plus round-icon"></i>&nbsp;
-                            <span>Add Buddy</span>
-                        </center>
-                    </a>
-                </li>
-                <li class="has-submenu"><a href="#">Buddy</a>
-                    <ul class="right-submenu">
-                        <li class="back"><a href="#">Back</a></li>
-                        <li>
-	                        <a href="#">
-		                        <i class="icons-medium fi-torso"></i>&nbsp;
-		                        <span>LOGGED IN BUDDIES</span>&nbsp;
-		                        <span class="badge badge-blue">1</span>
-	                    	</a>
-                		</li>
-                    </ul>
-                </li>
-                <li><a href="#">...</a></li>
-            </ul>
-        </li>
-      </ul>
+        <li>
+		    {% include "ndf/buddy.html" %}
+		</li>
+	</ul>
+ 
     </aside>
 
     <section class="main-section">
@@ -111,59 +85,4 @@
 
 
 
-
-
-<!--clix header -->
-
-
-
-<nav class="top-bar" data-topbar role="navigation" id="menu_bar_gstudio">
-        
-
-        <section class="top-bar-section">
-            <!-- Right Nav Section -->
-
-            <ul class="right show-for-medium-up">
-                
-                <li>
-                    <a class="" href="#" accesskey="l">
-                    <i class="fi-key"></i>&nbsp; Login
-                  </a>
-                </li>
-            </ul>
-            
-            <ul class="right hide-for-medium-up side-bar-menu hide">
-                
-               
-                <li>
-                    <a href="" class='add_buddy'>
-                        <center>
-                            <i class="fi-plus round-icon"></i>&nbsp;
-                            <span>Add Buddy</span>
-                        </center>
-                    </a>
-                </li>
-            </ul>
-              <ul class="right hide-for-medium-up side-bar-menu hide">
-                <li class="">
-                    <a class="" href="#" accesskey="l">
-                    <i class="fi-key"></i>&nbsp;Login
-                  </a>
-                </li>
-            </ul>
-
-            <!-- Left Nav Section -->
-            <ul class="left show-for-medium-up">
-                <li class="">
-                    <a href="#"   >My Desk</a>
-                </li>
-                <li><a href="#" > Explore</a>
-                </li>
-                <li>
-                    <a  target="_blank" href="#" class="active">Interactives</a>
-                </li>
-                
-            </ul>
-          </section>
-    </nav>
 {% endblock body_content %}

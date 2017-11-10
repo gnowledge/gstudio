@@ -8,30 +8,30 @@
   {% get_gstudio_registration as registration %}
   {% get_gstudio_workspace_instance as is_workspace_instance %}
 
-<nav class="top-bar" data-topbar role="navigation" id="menu_bar_gstudio">
+<nav class="top-bar hide-for-medium hide-for-small" data-topbar role="navigation" id="menu_bar_gstudio">
         <ul class="title-area">
-            <li class="name show-for-medium-up">
+            <li class="name show-for-large-up">
                 <a class="loggedin-user" href="{% url 'landing_page'  %}?True">
                 
                 <img src="{{site.SECONDARY_LOGO}}">
                 </a>
             </li>
-            <li class="name hide-for-medium-up">
+            <!--<li class="name hide-for-medium-up">
                 <i class="fi-list side-bar-button"></i>
                 <i class="fi-x close-menu-dropdown hide"></i>
                 <a class="loggedin-user" href="#">
                     <div></div>
                 </a>
-            </li>
+            </li>-->
             <!-- Remove the class "menu-icon" to 
             get rid of menu icon. Take out "Menu" to just have icon alone -->
-            <li class="toggle-topbar"><a href="#"><i class="icons-large fi-torso"></i>&nbsp;<span class="badge badge-blue">1</span></a></li>
+            <!--<li class="toggle-topbar"><a href="#"><i class="icons-large fi-torso"></i>&nbsp;<span class="badge badge-blue">1</span></a></li>-->
         </ul>
 
         <section class="top-bar-section">
             <!-- Right Nav Section -->
 
-            <ul class="right show-for-medium-up">
+            <ul class="right show-for-large-up">
 <!--                 <li class=""><a href="#">Blog</a></li>
                 <li class=""><a href="#"><i class="icons-medium fi-info"></i>&nbsp;Help Topics</a></li>
  -->             <li>
@@ -133,11 +133,14 @@
                 </li>
               {% endif %}
             </ul>
+          <!-- removed -->
+
+            <!--
             <ul class="right hide-for-medium-up dropdown-menu hide">
                 <li class=""><a href="#">My Desk</a></li>
                 <li><a  class="{%if title == 'courses'%}active{%endif%}" href="{% url explore_url %}">Explore </a></li>
                 <li class=""><a href="#"> Blog</a></li>
-                <li class=""><a href="#"><i class="fi-info"></i> Help Topics</a></li>
+                <li class=""><a href="#"><i class="fi-info"></i> Help Topics</a></li>-->
                 
 
                 <!--li class="has-dropdown not-click">
@@ -154,7 +157,7 @@
                         <li class="active"><a href="#">Active link in dropdown</a></li>
                     </ul>
                 </li-->
-            </ul>
+            <!--</ul>
             {% if user.is_authenticated %}
             <ul class="right hide-for-medium-up side-bar-menu hide">
                 <li class="">
@@ -198,10 +201,10 @@
                   </a>
                 </li>
             </ul>
-            {% endif %}
+            {% endif %}-->
 
             <!-- Left Nav Section -->
-            <ul class="left show-for-medium-up">
+            <ul class="left show-for-large-up">
                 {% if request.user.id %}
                 <li class="">
                     <a href="{% url 'my_desk' request.user.id %}" {% if title == "my desk" %} class="active" {% endif %}>My Desk</a>
@@ -216,6 +219,132 @@
             </ul>
           </section>
     </nav>
+
+<!-- Top Header for responsive screen to be shown for small and medium screens -->
+
+
+    <div class="responsive-primary-header">
+        <div class="off-canvas-wrap hide-for-large-up" data-offcanvas>
+          <div class="inner-wrap">
+            <nav class="tab-bar">
+              <section class="left-small">
+                <a class="left-off-canvas-toggle menu-icon" ><span></span></a>
+              </section>
+
+              <section class="middle tab-bar-section">
+                <h1 class="title">
+                    <a class="loggedin-user" href="{% url 'landing_page'  %}?True">
+                        <img src="{{site.SECONDARY_LOGO}}">
+                    </a>
+                </h1>
+              </section>
+
+              <section class="right-small">
+                <a class="right-off-canvas-toggle icons-large fi-torso" style="margin-left: 6px;
+            color: white;">&nbsp;<span class="badge badge-blue"></span><span></span></a>
+              </section>
+            </nav>
+
+            <aside class="left-off-canvas-menu">
+              <ul class="off-canvas-list">
+                <li>
+                {% if request.user.id %}
+                        <a href="{% url 'my_desk' request.user.id %}" {% if title == "my desk" %} class="active" {% endif %}>My Desk</a>
+                {% endif %}
+                </li>
+                <li>
+                    <a href="{% url explore_url %}" {% if title == 'base courses' or title == "courses" or title == "drafts" %} class="active" {% endif %} > Explore</a>
+                </li>
+                <li><a  target="_blank" href="{% url 'tools_temp' %}" {% if title == 'tools' %} class="active" {% endif %}>Interactives</a></li>
+                <li class=""><a  class="active"  target="_blank" href="#"> <i class="fa fa-info-circle"></i> Help </a></li>
+                <li class="has-submenu">
+                    <a href="#"><i class="fa fa-bell-o" style="font-size:1.3em; color:white;"></i>
+                    </a>
+                    <ul class="left-submenu">
+                        <li class="back"><a href="#">Back</a></li>
+                        <li>
+                            <div data-alert class="alert-box info radius" style="height:60px;margin-bottom: 0.25rem;">
+                              <div class="small-3 columns" style="text-align:center;">
+                                <img class="img-circle" src="/static/ndf/images/gnu-head.png" style="margin-top:-12px;"/>
+                              </div>
+                              <div class="small-9 columns">
+                                This is an info alert with a radius.
+                              </div>
+                              <a href="#" class="close">&times;</a>
+                            </div>
+                        </li>
+                        <li><div id="analyticsFooter"><a href="#">See All</a></div></li>
+                    </ul>
+                </li>
+
+                <li class="has-submenu"><a href="#">{% trans "Language" %}&nbsp; | &nbsp; {{request.LANGUAGE_CODE}}</a>
+                    <ul class="left-submenu">
+                        <li class="back"><a href="#">Back</a></li>
+                        {% for lang in LANGUAGES %}
+                            <li>
+                                <form action="/i18n/setlang/" method="POST">
+                                {% csrf_token %}
+                                <input name="url" type="hidden" value="{{request.get_full_path}}"/>
+                                <input type="hidden"  name="language" value="{{ lang.0 }}">
+                                <input type="submit"   class="button expand secondary" value="{{ lang.1 }}"/>
+                                </form>
+                            </li>
+                        {% endfor %}
+                    </ul>
+                </li>
+              </ul>
+            </aside>
+
+
+            <aside class="right-off-canvas-menu">
+              <ul class="off-canvas-list">
+                <li><label>Existing User</label></li>
+                {% if user.is_authenticated %}
+                    <li>
+                        {% if prof_pic %}
+                          <img src="{{MEDIA_URL}}{{prof_pic.if_file.original.relurl}}" id="profile-img">
+                          {{ user.username }}
+                        {% else %}
+                                <img class="profile-img" style="background-color:rgba(0, 0, 0, 0.34);" src="/static/ndf/bower_components/foundation-icon-fonts/svgs/fi-torso.svg" >
+                                {{ user.username }}
+                        {% endif %}
+                    </li>
+                    <li>
+                        {% if registration %}
+                            <a href="{% url 'auth_password_change' %}">Change Password</a>
+                        {% endif %}
+                    </li>
+                    <li>
+                        <a class="logout" href="{% url 'auth_logout' %}">
+                                <i class="fi-power"></i> &nbsp; Logout
+                        </a>
+                    </li>
+                {% else %}
+                    <li>
+                        <a class="" href="{% url 'auth_login' %}" accesskey="l">
+                        <i class="fi-key"></i>&nbsp; {% trans "Login" %}
+                      </a>
+                    </li>
+                {% endif %}
+                <li>
+                    {% include "ndf/buddy.html" %}
+                </li>
+             </ul> 
+            </aside>
+
+            <section class="main-section">
+              
+            </section>
+            <a class="exit-off-canvas"></a>
+          </div>
+        </div>
+    </div>`
+
+         
+
+
+
+
     <script type="text/javascript">
         // $(document).foundation();
         $(function(){

@@ -6535,7 +6535,7 @@ ul.nav_menu_1 > li > a.selected, ul.nav_menu_1 > li > a:hover {
 
 /* line 6677, ../../../scss/_clix2017.scss */
 #analyticsFooter {
-  background-color: #e9eaed;
+  background-color: grey;
   text-align: center;
   font-weight: bold;
   padding: 8px;
@@ -6544,25 +6544,25 @@ ul.nav_menu_1 > li > a.selected, ul.nav_menu_1 > li > a:hover {
   min-width: 400px;
 }
 
-/* line 6688, ../../../scss/_clix2017.scss */
+/* line 6689, ../../../scss/_clix2017.scss */
 .img-circle {
   border-radius: 50%;
   border: 1px solid rgba(128, 128, 128, 0.15);
 }
 
-/* line 6694, ../../../scss/_clix2017.scss */
+/* line 6695, ../../../scss/_clix2017.scss */
 .container-px {
   background-color: #fafafa;
   min-width: 600px;
   min-height: 600px;
 }
 
-/* line 6700, ../../../scss/_clix2017.scss */
+/* line 6701, ../../../scss/_clix2017.scss */
 .noti {
   max-width: 400px !important;
 }
 
-/* line 6703, ../../../scss/_clix2017.scss */
+/* line 6704, ../../../scss/_clix2017.scss */
 .notification_body {
   max-width: 1546px !important;
   margin: 0 auto !important;
@@ -6581,7 +6581,7 @@ ul.nav_menu_1 > li > a.selected, ul.nav_menu_1 > li > a:hover {
   box-shadow: 0px 2px 6px #000;
 }
 
-/* line 6721, ../../../scss/_clix2017.scss */
+/* line 6722, ../../../scss/_clix2017.scss */
 .notifications_content {
   display: -moz-box !important;
   display: -ms-flexbox !important;
@@ -6601,11 +6601,11 @@ ul.nav_menu_1 > li > a.selected, ul.nav_menu_1 > li > a:hover {
   -ms-flex-pack: justify !important;
   -webkit-box-pack: justify !important;
 }
-/* line 6739, ../../../scss/_clix2017.scss */
+/* line 6740, ../../../scss/_clix2017.scss */
 .notifications_content:hover {
   background: #F0F1F2 !important;
 }
-/* line 6742, ../../../scss/_clix2017.scss */
+/* line 6743, ../../../scss/_clix2017.scss */
 .notifications_content .content-body {
   border-bottom: 1px solid #D6D8DA !important;
 }
