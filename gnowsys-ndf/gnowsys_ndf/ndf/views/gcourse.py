@@ -1959,24 +1959,24 @@ def enroll_to_course(request, group_id):
 @login_required
 @get_execution_time
 def set_release_date_css(request, group_id):
-	response_dict = {"success": False}
-	try:
-		if request.is_ajax() and request.method == "POST":
-			css_date_dict = request.POST.get("css_date_dict", "")
-			if css_date_dict:
-				css_date_dict = json.loads(css_date_dict)
-			# print "\n\ncss_date_dict",css_date_dict,"type--",type(css_date_dict)
-			start_date_AT = node_collection.one({'_type': "AttributeType", 'name': "start_time"})
-			for each_css in css_date_dict:
-				if each_css['start_time']:
-					start_date_val = datetime.datetime.strptime(each_css['start_time'], "%d/%m/%Y")
-					create_gattribute(ObjectId(each_css['id']), start_date_AT, start_date_val)
-			response_dict["success"] = True
-			response_dict["message"] = "Release dates have been set successfully!"
-	except Exception as e:
-		response_dict["success"] = False
-		response_dict["message"] = "Something went wrong! Please try after some time"
-	return HttpResponse(json.dumps(response_dict))
+    response_dict = {"success": False}
+    try:
+        if request.is_ajax() and request.method == "POST":
+            css_date_dict = request.POST.get("css_date_dict", "")
+            if css_date_dict:
+                css_date_dict = json.loads(css_date_dict)
+            # print "\n\ncss_date_dict",css_date_dict,"type--",type(css_date_dict)
+            start_date_AT = node_collection.one({'_type': "AttributeType", 'name': "start_time"})
+            for each_css in css_date_dict:
+                if each_css['start_time']:
+                    start_date_val = datetime.datetime.strptime(each_css['start_time'], "%d/%m/%Y")
+                    create_gattribute(ObjectId(each_css['id']), start_date_AT, start_date_val)
+            response_dict["success"] = True
+            response_dict["message"] = "Release dates have been set successfully!"
+    except Exception as e:
+        response_dict["success"] = False
+        response_dict["message"] = "Something went wrong! Please try after some time"
+    return HttpResponse(json.dumps(response_dict))
 
 
 @login_required
@@ -4132,7 +4132,13 @@ def get_trans_node_list(node_list,lang):
         return trans_node_list
 
 @get_execution_time
-def course_quiz_data(request, group_id):
+def course_quiz_data(request, group_id, all_data=False):
+    '''
+        all_data = True, will return checked and subimitted data
+        all_data = false, will return only subimitted data
+
+    '''
+
     def _merged_to_from(min_list, max_list, na_index):
         # max list contains more num of list
         # min list contains less num of list
@@ -4142,13 +4148,12 @@ def course_quiz_data(request, group_id):
             for ind in na_index:
                 partly_max_list_ele[ind] = min_list_ele[ind]
         return partly_max_list + exception_list
-
     group_obj   = Group.get_group_name_id(group_id, get_obj=True)
     forbid_private_group(request, group_obj)
     group_id    = group_obj._id
     group_name  = group_obj.name
-
-    if not request.user.is_superuser:
+    gstaff_access = check_is_gstaff(group_id, request.user)
+    if not gstaff_access:
         return HttpResponseRedirect(reverse('course_content', kwargs={'group_id': ObjectId(group_id)}))
 
     allow_to_join = get_group_join_status(group_obj)
@@ -4203,34 +4208,30 @@ def course_quiz_data(request, group_id):
                     'name': {'$regex': '^(?!Thread of).*'}})
                 each_record['name'] = qie_node.content
 
-            if record_key == "check" and record_val:
-                for checked_ans_dict in record_val[0]:
-                    for k,v in checked_ans_dict.items():
-                        l2 = []
-                        l2.append(each_record['name'])
-                        l2.append(each_record['user_id'])
-                        l2.append(k)
-                        l2.append(','.join(v))
-                        l2.append("--")
-                        l2.append("--")
-                        l.append(l2)
-
             if record_key == "submit" and record_val:
                 for submitted_ans_dict in record_val[0]:
                     for k,v in submitted_ans_dict.items():
                         l1 = []
                         l1.append(each_record['name'])
                         l1.append(each_record['user_id'])
-                        l1.append("--")
-                        l1.append("--")
                         l1.append(k)
                         l1.append(','.join(v))
                         l.append(l1)
 
+            if all_data:
+                if record_key == "check" and record_val:
+                    for checked_ans_dict in record_val[0]:
+                        for k,v in checked_ans_dict.items():
+                            l2 = []
+                            l2.append(each_record['name'])
+                            l2.append(each_record['user_id'])
+                            l2.append(k)
+                            l2.append(','.join(v))
+                            l2.append("--")
+                            l2.append("--")
+                            l.append(l2)
 
     # print "\nadmin_analytics_data: ", l
-    checked_ans_list = []
-    submitted_ans_list = []
     user_dict_list = []
     user_dict = {}
     for e in l:
@@ -4240,20 +4241,27 @@ def course_quiz_data(request, group_id):
                 if e[1] in en.keys():
                     user_dict = en
         else:
-            user_dict = {e[1]: {'check': [], 'submit': []}}
+            user_dict = {e[1]: {'submit': []}}
+            # user_dict = {e[1]: {'check': [], 'submit': []}}
             user_dict_list.append(user_dict)
-        if e.index('--') in [2,3]:
+        if all_data:
+            if e.index('--') in [2,3]:
+                user_dict[e[1]]['submit'].append(e)
+            elif e.index('--') in [4,5]:
+                user_dict[e[1]]['check'].append(e)
+        else:
             user_dict[e[1]]['submit'].append(e)
-        elif e.index('--') in [4,5]:
-            user_dict[e[1]]['check'].append(e)
 
     return_list = []
     for each_user_dict in user_dict_list:
         for ked, ved in each_user_dict.items():
-            if len(ved['check'])< len(ved['submit']):
-                return_list.extend(_merged_to_from(ved['check'],ved['submit'], na_index=[2,3]))
-            elif len(ved['submit'])< len(ved['check']):
-                return_list.extend(_merged_to_from(ved['submit'],ved['check'], na_index=[4,5]))
+            if all_data:
+                if len(ved['check'])< len(ved['submit']):
+                    return_list.extend(_merged_to_from(ved['check'],ved['submit'], na_index=[2,3]))
+                elif len(ved['submit'])< len(ved['check']):
+                    return_list.extend(_merged_to_from(ved['submit'],ved['check'], na_index=[4,5]))
+            else:
+                return_list.extend(ved['submit'])
 
     banner_pic_obj,old_profile_pics = get_current_and_old_display_pics(group_obj)
     context_variables.update({'old_profile_pics':old_profile_pics,
