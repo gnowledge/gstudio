@@ -39,9 +39,13 @@
         </a>
       </div>
         <div class="header_title header_text_block">
-             {% firstof group_object.altnames group_object.name  %}
+            {% firstof group_object.altnames group_object.name  %}
+            {% if "QuizItemEvent" in node.member_of_names_list or "QuizItem" in node.member_of_names_list%}
+              <a href="{% url 'course_quiz_data' group_id %}" class="header_text_block right">RESULTS</a>
+            {% endif %}
         </div>
         <div class="new_note header_text_block">
+
             <a {% if user_access_priv == "allow" %} href="{% url 'course_notebook' group_id %}?create=True" {% else %} class="user_not_enrolled" {% endif %}><i class="fa fa-edit header_icon"></i>&nbsp;
                {% trans "WRITE A NEW NOTE" %} 
             </a>
