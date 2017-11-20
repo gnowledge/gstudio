@@ -3,12 +3,11 @@
 <div id="exportLesson" class="reveal-modal medium radius" data-reveal data-alert>
   <p id="exportLessonLabel">Click to Export into ePub: </p>
   <div style="display: inline-block;" class="right">
-    <a href="#" id="expAll" class="orange-button">Export ALL</a>
     <a href="#" id="expLessonbtnCancel" class="orange-button">Cancel</a>
   </div>
   <div class="row">
     {% for each_node in lessons_list  %}
-    <a href="{% url 'export_to_epub' group_id each_node.pk %}" class="orange-button exp_node" title="{{each_node.name}}">{{each_node.name|truncatechars:15}}</a>
+    <a href="{% url 'export_to_epub' group_id each_node.pk %}" class="orange-button exp_node" target="_blank" title="{{each_node.name}}">{{each_node.name|truncatechars:15}}</a>
     {% if forloop.counter|divisibleby:5 %}<br/><br/>{% endif %}
     {% endfor %}
   </div>
@@ -18,15 +17,4 @@
   $(document).on('click', '#expLessonbtnCancel' ,function(e){
     $('#exportLesson').foundation('reveal', 'close');
   })
-
-  $(document).on('click', '#expAll' ,function(e){
-      exp_list = $(".exp_node")
-      for (var i=0;i<exp_list.length; i++) {
-        d = exp_list[i]
-       setTimeout(function () {  
-            d.click();
-        }, 3000)
-      }
-  })
-
 </script>
