@@ -1,5 +1,6 @@
 from base_imports import *
 from node import *
+from db_utils import get_model_name
 
 #  TRIPLE CLASS DEFINITIONS
 @connection.register
@@ -40,12 +41,12 @@ class Triple(DjangoDocument):
             'GRelation': 'relation_type'
         }
         gr_or_rt_name, gr_or_rt_id = Node.get_name_id_from_type(gt_or_rt_name_or_id,
-            triple_node_mapping_dict[cls._meta.verbose_name])
+            triple_node_mapping_dict[get_model_name(cls) ])
         status = [status] if status else ['PUBLISHED', 'DELETED']
         return triple_collection.find({
-                                    '_type': cls._meta.verbose_name,
+                                    '_type': get_model_name(cls),
                                     'subject': ObjectId(subject_id),
-                                    triple_class_field_mapping_dict[cls._meta.verbose_name]: gr_or_rt_id,
+                                    triple_class_field_mapping_dict[get_model_name(cls)]: gr_or_rt_id,
                                     'status': {'$in': status}
                                 })
 
@@ -74,21 +75,21 @@ class Triple(DjangoDocument):
         gt_or_rt_id_name_dict = {}
         for each_gr_or_rt in gt_or_rt_name_or_id_list:
             gr_or_rt_name, gr_or_rt_id = Node.get_name_id_from_type(each_gr_or_rt,
-                triple_node_mapping_dict[cls._meta.verbose_name])
+                triple_node_mapping_dict[get_model_name(cls)])
             gt_or_rt_id_name_dict.update({gr_or_rt_id: gr_or_rt_name})
 
         status = [status] if status else ['PUBLISHED', 'DELETED']
 
         tr_cur = triple_collection.find({
-                                    '_type': cls._meta.verbose_name,
+                                    '_type': get_model_name(cls),
                                     'subject': ObjectId(subject_id),
-                                    triple_class_field_mapping_dict[cls._meta.verbose_name]: {'$in': gt_or_rt_id_name_dict.keys()},
+                                    triple_class_field_mapping_dict[get_model_name(cls)]: {'$in': gt_or_rt_id_name_dict.keys()},
                                     'status': {'$in': status}
                                 })
 
         gt_or_rt_name_value_or_obj_dict = {gt_or_rt: '' for gt_or_rt in gt_or_rt_name_or_id_list}
         for each_tr in tr_cur:
-            gt_or_rt_name_value_or_obj_dict[gt_or_rt_id_name_dict[each_tr[triple_class_field_mapping_dict[cls._meta.verbose_name]]]] = each_tr if get_obj else each_tr[triple_class_field_mapping_key_dict[cls._meta.verbose_name]]
+            gt_or_rt_name_value_or_obj_dict[gt_or_rt_id_name_dict[each_tr[triple_class_field_mapping_dict[get_model_name(cls)]]]] = each_tr if get_obj else each_tr[triple_class_field_mapping_key_dict[get_model_name(cls)]]
         return gt_or_rt_name_value_or_obj_dict
 
 
