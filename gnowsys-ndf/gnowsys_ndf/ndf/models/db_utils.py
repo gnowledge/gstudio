@@ -17,3 +17,7 @@ def get_collection_child_names(collection_name='Nodes'):
 def get_all_collection_child_names():
 	# [u'Filehive', u'Benchmark', u'Buddy', u'Counter', u'GAttribute', u'GRelation', u'MetaType', u'GSystemType', u'RelationType', u'AttributeType', u'GSystem', u'Group', u'ToReduceDocs', u'Author']
 	return sum([get_collection_child_names(i) for i in get_collection_names()], [])
+
+
+def get_model_name(collection_obj):
+	return collection_obj._meta.model_name
