@@ -6,6 +6,9 @@
 
 
 {% block title %}  Unit {% endblock%}
+<style type="text/css">
+ 
+</style>
 
 {% block head %}
   <script src="/static/ndf/bower_components/jquery-backstretch/jquery.backstretch.min.js"></script>
@@ -84,17 +87,18 @@
           </div>
           {% endif %}
 
-        <div class="right enroll-unit">
+        {# <div class="right enroll-unit">
  
             {% if request.user.is_authenticated %}
               {% include 'ndf/widget_enroll.html' %}
             {% endif %}
-         </div>
+         </div> #}
        </div>
      </div>
 </div>
 
 <div class="lms_secondary_header">
+<div class="small-10 medium-9 large-11 columns">
  
   <ul class="nav_menu_1">
     <li>
@@ -126,6 +130,14 @@
     {% endif %}
   </ul>
 </div>
+  <div class="small-1 medium-2 large-2 columns enroll-now">
+    Enroll Now
+  </div>
+</li>
+</ul>
+</div>
+</div>
+
 
 
 <div id="addAsset" class="reveal-modal reveal-modal-overlay" data-reveal aria-labelledby="modalTitle" aria-hidden="true" role="dialog">
