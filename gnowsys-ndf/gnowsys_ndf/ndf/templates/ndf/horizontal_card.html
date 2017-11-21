@@ -48,8 +48,12 @@
             <p class="ellipsis"></p>
         </div>
         <div class="card_section">
-                <i class="fa fa-book"></i>
-                <span>{% trans "Explore" %}</span>
+                <div class="module-card-enrol">
+                <!--{% if request.user.is_authenticated %}
+                    {% include 'ndf/widget_enroll.html' %}
+                {% endif %}-->
+                {% trans "Enroll" %}
+                </div>
         </div>
     </div>
 </div>
