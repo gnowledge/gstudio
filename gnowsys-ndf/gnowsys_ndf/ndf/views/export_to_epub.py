@@ -248,6 +248,17 @@ def parse_content(path, content_soup, epub_name):
                 if each_tool_key in iframe_src_attr:
                     new_iframe_src = iframe_src_attr.replace(each_tool_key,each_tool_val)
             each_iframe["src"] = new_iframe_src
+
+    all_img = content_soup.find_all('img',src=True)
+    for each_img in all_img:
+        img_src_attr = each_img["src"]
+        file_name = img_src_attr.split("/")[-1]
+        if "/static/ndf/images" in img_src_attr:
+            each_img["src"] = "../Images/"+ file_name
+            shutil.copyfile(img_src_attr, os.path.join(oebps_path, "Images", file_name))
+            # idnetify the mimetype and add accordingly in following line
+            create_update_content_file(file_name, "Images", "image/png", epub_name, is_non_html=True)
+
     return content_soup
 
 def build_html(path,obj, epub_name):
@@ -335,10 +346,12 @@ def epub_dump(path, ziph):
             ziph.write(absname, arcname)
 
 def create_epub(node_obj):
+    epub_disp_name = None
+    epub_name = node_obj.name
     if node_obj.altnames:
-        epub_name = node_obj.altnames
+        epub_disp_name = node_obj.altnames
     else:
-        epub_name = node_obj.name
+        epub_disp_name = node_obj.name
     content_list = node_obj.collection_dict
     if not os.path.exists(GSTUDIO_EPUBS_LOC_PATH):
         os.makedirs(GSTUDIO_EPUBS_LOC_PATH)
@@ -354,7 +367,7 @@ def create_epub(node_obj):
     create_container_file(os.path.join(epub_root, "META-INF"))
     create_subfolders(os.path.join(epub_root,"OEBPS"),oebps_files)
     build_html(os.path.join(epub_root,"OEBPS", "Text"),content_list, epub_name)
-    update_content_metadata(str(node_obj._id), datetimestamp, epub_name)
+    update_content_metadata(str(node_obj._id), datetimestamp, epub_disp_name)
     # create_content_file(os.path.join(epub_name,"OEBPS"),content_list)
     # create_ncx_file(os.path.join(epub_name,"OEBPS"),content_list)
     fill_from_static()
