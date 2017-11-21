@@ -87,18 +87,18 @@
           </div>
           {% endif %}
 
-        {# <div class="right enroll-unit">
+        <!--<div class="right enroll-unit">
  
             {% if request.user.is_authenticated %}
               {% include 'ndf/widget_enroll.html' %}
             {% endif %}
-         </div> #}
+         </div>-->
        </div>
      </div>
 </div>
 
 <div class="lms_secondary_header">
-<div class="small-10 medium-9 large-11 columns">
+<div class="small-10 medium-9 large-10 columns">
  
   <ul class="nav_menu_1">
     <li>
@@ -130,8 +130,11 @@
     {% endif %}
   </ul>
 </div>
-  <div class="small-1 medium-2 large-2 columns enroll-now">
-    Enroll Now
+  <div class="small-1 medium-2 large-2 columns enroll-unit">
+    {% if request.user.is_authenticated %}
+      {% include 'ndf/widget_enroll.html' %}
+    {% endif %}
+
   </div>
 </li>
 </ul>

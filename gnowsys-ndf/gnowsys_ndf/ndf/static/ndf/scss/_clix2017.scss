@@ -44,11 +44,11 @@ h3{
 }
 
 h5{
-    color:#99aaba;
-    font-size:10px;
-    text-transform:uppercase;
-    letter-spacing:2px;
-    margin-left:5px;
+    color: #99aaba;
+    font-size: 12px;
+    text-transform: uppercase;
+    letter-spacing: 1.4px;
+    margin-left: 5px;
 }
 
 
@@ -2052,7 +2052,7 @@ ul.jqtree-tree .jqtree-toggler {
     margin-bottom: 5px;
 
     >span{
-        color: $primary-orange;
+        color: #164a7b;
     }
 }
 
@@ -4976,9 +4976,9 @@ $module-card-lines-to-show: 3;
                 border-radius: 5px;
         }
 }
-$nav_menu_1_color: #ce7869;
+$nav_menu_1_color: #164a7b;
 $nav_menu_1_bg_color: #fff;
-$nav_menu_1_tab_border: #ffc14e;
+$nav_menu_1_tab_border: #a2238d;
 ul.nav_menu_1 {
     margin-bottom: 0px;
     background-color: $nav_menu_1_bg_color;
@@ -5535,6 +5535,8 @@ ul.nav_menu_1 {
 
 
 
+
+
     }
 
 
@@ -5604,25 +5606,37 @@ ul.nav_menu_1 {
 }
 
 .enrollBtn{
-    width: 124px !important;
-    background: $primary-orange;
-    border: 1px solid rgba(255, 255, 255, 0.7);
-    padding: 5px 8px;
-    color: #fff;
-    font-size: 20px;
-    margin: 0px 10px 0px 0px;
-    cursor: pointer;
-    border-radius: 3px;
-    // opacity: 0.8;
-    margin-top: 90px !important;
-    margin-right: 15px;
-    font-weight:bold;
-    &:hover {
-        opacity: 1;
-        background: #008100;
-        color: #ffffff;
-        font-weight:bold;
-    }
+    // width: 124px !important;
+    // background: $primary-orange;
+    // border: 1px solid rgba(255, 255, 255, 0.7);
+    // padding: 5px 8px;
+    // color: #fff;
+    // font-size: 20px;
+    // margin: 0px 10px 0px 0px;
+    // cursor: pointer;
+    // border-radius: 3px;
+    // // opacity: 0.8;
+    // margin-top: 90px !important;
+    // margin-right: 15px;
+    // font-weight:bold;
+    // &:hover {
+    //     opacity: 1;
+    //     background: #008100;
+    //     color: #ffffff;
+    //     font-weight:bold;
+    // }
+    background: rgb(162, 35, 141);
+    height: 50px;
+    text-align: center;
+    color: #ffffff;
+    /* font-weight: bold; */
+    width: 172px;
+    font-size: 28px;
+    border: 2px solid rgba(43, 51, 63, 0.42);
+    border-radius: 5px;
+    width: 164px !important;
+    margin-top: 2px !important;
+    letter-spacing: 0.4px;
 }
 
 .enroll-act_lbl{

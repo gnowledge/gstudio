@@ -4,7 +4,16 @@
 {% get_gstudio_workspace_instance as is_workspace %}
 {% get_group_object groupid as group_object %}
 
-<input type="button" data-reveal-id="enrollBuddiesModal" class="enrollBtn"  "{% if is_workspace %}" "{% if request.user.pk in group_object.author_set %}" value="Joined" "{% else %}"  value="Join" "{% endif %}" "{% else %}" value="Enrollment" "{%  endif %}" />
+<input type="button" data-reveal-id="enrollBuddiesModal" class="enrollBtn"  
+  "{% if request.user.pk in group_object.author_set %}"  
+    "{% if is_workspace %}" value="Joined"
+      "{% else %}"  value="Enrolled" 
+    "{% endif %}" 
+    "{% else %}" 
+      "{% if is_workspace %}" value="Join"
+      "{% else %}"  value="Enroll" 
+    "{% endif %}"
+  "{%  endif %}" />
 
 <div id="enrollBuddiesModal" class="reveal-modal medium radius" data-reveal data-alert>
     <h4 id="enrollBuddiesModalLabel"> {% if 'Group' in group_object.member_of_names_list %} {% trans "Join Status:" %}  {% else %} {% trans "Enrollment Status:" %} {% endif %}  </h4><br/>
