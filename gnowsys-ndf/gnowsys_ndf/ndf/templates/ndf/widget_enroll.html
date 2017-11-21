@@ -4,7 +4,7 @@
 {% get_gstudio_workspace_instance as is_workspace %}
 {% get_group_object groupid as group_object %}
 
-<input type="button" data-reveal-id="enrollBuddiesModal" class="enrollBtn module-card-enrol"  
+<input type="button" data-reveal-id="enrollBuddiesModal" class="enrollBtn module-card-enrol unit-card-enrol"  
   "{% if request.user.pk in group_object.author_set %}"  
     "{% if is_workspace %}" value="Joined"
       "{% else %}"  value="Enrolled" style="background-color:#006400;"

@@ -4460,7 +4460,26 @@ $unit-card-lines-to-show: 3;
         border-top : 1px solid #ccc;
         margin: 20px 0px 0px;
         padding: 5px 0px;
+         //enroll-button 
+        .unit-card-enrol{
+            background: rgb(162, 35, 141);
+            height: 37px;
+            text-align: center;
+            color: #ffffff;
+            width: 172px;
+            font-size: 19px;
+            border: 2px solid rgba(43, 51, 63, 0.42);
+            border-radius: 5px;
+            width: 164px !important;
+            margin-top: 2px !important;
+            letter-spacing: 0.4px;
+
+            &:hover {
+                box-shadow: 0px 0px 17px rgba(0, 0, 0, 0.68);
+            }
+        }
     }
+
 }
 
 /*
