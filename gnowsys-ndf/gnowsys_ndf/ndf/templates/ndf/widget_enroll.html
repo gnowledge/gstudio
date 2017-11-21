@@ -7,7 +7,7 @@
 <input type="button" data-reveal-id="enrollBuddiesModal" class="enrollBtn"  
   "{% if request.user.pk in group_object.author_set %}"  
     "{% if is_workspace %}" value="Joined"
-      "{% else %}"  value="Enrolled" 
+      "{% else %}"  value="Enrolled" style="background-color:#006400;"
     "{% endif %}" 
     "{% else %}" 
       "{% if is_workspace %}" value="Join"
