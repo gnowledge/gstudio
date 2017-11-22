@@ -4255,7 +4255,7 @@ ul.nav_menu_1 > li > a.selected, ul.nav_menu_1 > li > a:hover {
   font-size: 19px;
   border: 2px solid rgba(43, 51, 63, 0.42);
   border-radius: 5px;
-  width: 164px !important;
+  width: 120px !important;
   margin-top: 2px !important;
   letter-spacing: 0.4px;
 }
