@@ -25,23 +25,28 @@ def tools_logging(request):
 	app_name = request.POST.get('app_name',' ')
 	old_data = []
 	buddies_authid_list = request.session.get('buddies_authid_list', [])
-	buddy_id_list = Author.get_user_id_list_from_author_oid_list(buddies_authid_list)
-	if not buddy_id_list:
-		buddy_id_list = []
-		buddy_id_list.append(userdata['user_id'])
+	buddy_id_list = []
+	buddy_id_list.append(userdata['user_id'])
+	if buddies_authid_list:
+	    buddy_id_list = buddy_id_list +  Author.get_user_id_list_from_author_oid_list(buddies_authid_list)
 	if userdata['user_id'] and userdata['user_id']!= "None":
-		if not os.path.exists('/data/gstudio_tools_logs/'+app_name+'/'+userdata['params']['language']):
-			os.makedirs('/data/gstudio_tools_logs/'+app_name+'/'+userdata['params']['language'])
-		
-		for each_id in buddy_id_list:
-			if os.path.exists('/data/gstudio_tools_logs/'+app_name+'/'+userdata['params']['language']+'/'+str(each_id)+'.json'):
-				with open('/data/gstudio_tools_logs/'+app_name+'/'+userdata['params']['language']+'/'+str(each_id)+'.json') as rfile:
-					if os.stat('/data/gstudio_tools_logs/'+app_name+'/'+userdata['params']['language']+'/'+str(each_id)+'.json').st_size != 0:
-						old_data = json.load(rfile)
-			with open('/data/gstudio_tools_logs/'+app_name+'/'+userdata['params']['language']+'/'+str(each_id)+'.json', 'w') as wrfile:
-				old_data.append(userdata)
-				json.dump(old_data, wrfile)	
-	return StreamingHttpResponse("Success")	
+	    if not os.path.exists('/data/gstudio_tools_logs/'+app_name+'/'+userdata['params']['language']):
+	        os.makedirs('/data/gstudio_tools_logs/'+app_name+'/'+userdata['params']['language'])
+	   
+	    for each_id in buddy_id_list:
+	        old_data = []
+	        if os.path.exists('/data/gstudio_tools_logs/'+app_name+'/'+userdata['params']['language']+'/'+str(each_id)+'.json'):
+	            with open('/data/gstudio_tools_logs/'+app_name+'/'+userdata['params']['language']+'/'+str(each_id)+'.json') as rfile:
+	                if os.stat('/data/gstudio_tools_logs/'+app_name+'/'+userdata['params']['language']+'/'+str(each_id)+'.json').st_size != 0:
+	                    old_data = json.load(rfile)
+	       
+	        with open('/data/gstudio_tools_logs/'+app_name+'/'+userdata['params']['language']+'/'+str(each_id)+'.json', 'w'): pass
+	           
+	       
+	        with open('/data/gstudio_tools_logs/'+app_name+'/'+userdata['params']['language']+'/'+str(each_id)+'.json', 'w') as wrfile:
+	            old_data.append(userdata)
+	            json.dump(old_data, wrfile)   
+	return StreamingHttpResponse("Success")    	
 
 def tools_temp(request):
     context_variables = {'title' : "tools"}
