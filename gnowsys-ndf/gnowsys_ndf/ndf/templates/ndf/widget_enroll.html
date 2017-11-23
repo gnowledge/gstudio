@@ -3,9 +3,11 @@
 {% load ndf_tags %}
 {% get_gstudio_workspace_instance as is_workspace %}
 {% get_group_object groupid as group_object %}
-
-<input type="button" data-reveal-id="enrollBuddiesModal" class="enrollBtn module-card-enrol unit-card-enrol"  
-  "{% if request.user.pk in group_object.author_set %}"  
+{% if module_enrollment %}
+  {% get_module_enrollment_status group_object request.user as fully_enrolled %}
+{% endif %}
+<input type="button" data-reveal-id="enrollBuddiesModal-{{group_object.pk}}" class="enrollBtn module-card-enrol unit-card-enrol"  
+  "{% if request.user.pk in group_object.author_set and not module_enrollment or module_enrollment and fully_enrolled %}"  
     "{% if is_workspace %}" value="Joined"
       "{% else %}"  value="Enrolled" style="background-color:#006400;"
     "{% endif %}" 
@@ -15,18 +17,19 @@
     "{% endif %}"
   "{%  endif %}" />
 
-<div id="enrollBuddiesModal" class="reveal-modal medium radius" data-reveal data-alert>
-    <h4 id="enrollBuddiesModalLabel"> {% if 'Group' in group_object.member_of_names_list %} {% if is_workspace %} {% trans "Join Status:" %}  {% else %} {% trans "Enrollment Status:" %} {% endif %} {% endif %}  </h4><br/>
+<div id="enrollBuddiesModal-{{group_object.pk}}" class="reveal-modal medium radius" data-reveal data-alert>
+    <h4 id="enrollBuddiesModalLabel">{% firstof group_object.altnames group_object.name %}
+ {% if 'Group' in group_object.member_of_names_list %} {% if is_workspace %} {% trans "Join Status:" %}  {% else %} {% trans "Enrollment Status:" %} {% endif %} {% endif %}  </h4><br/>
     <div class="small-12 medium-12 columns buddiesList center">
     <div class="row">
       <div class="small-8 medium-8 columns">
       {{request.user.username}}
       </div>
       <div class="small-4 medium-4 columns">
-      {% if request.user.pk in group_object.author_set %}
+      {% if request.user.pk in group_object.author_set and not module_enrollment or module_enrollment and fully_enrolled %}
           <input id="enrollchk_{{request.user.pk}}" type="checkbox" class="enroll_chkbox" checked disabled><label for="enrollchk_{{request.user.pk}}"> {% if 'Group' in group_object.member_of_names_list %} {% if is_workspace %} {% trans  "Joined" %} {% else %} {% trans  "Enrolled" %} {% endif %} {% endif %} </label>
       {% else %}
-          <input id="enrollchk_{{request.user.pk}}" type="checkbox" class="enroll_chkbox" onclick="enroll_user('{{request.user.pk}}')" data-user-id='{{request.user.pk}}'><label for="enrollchk_{{request.user.pk}}" class="enroll-act_lbl"> {% if 'Group' in group_object.member_of_names_list %} {% if is_workspace %} {% trans "Join" %} {% else %} {% trans "Enroll" %} {% endif %} {% endif %} </label>
+          <input id="enrollchk_{{request.user.pk}}" type="checkbox" class="enroll_chkbox" onclick="enroll_user('{{userid}}', '{{group_object.pk}}')" data-user-id='{{request.user.pk}}'><label for="enrollchk_{{request.user.pk}}" class="enroll-act_lbl"> {% if 'Group' in group_object.member_of_names_list %} {% if is_workspace %} {% trans "Join" %} {% else %} {% trans "Enroll" %} {% endif %} {% endif %} </label>
       {% endif %}
       </div>
       <hr>
@@ -38,11 +41,11 @@
               {{forloop.counter}}. {{username}} :
             </div>
             <div class="small-4 medium-4 columns">
-            {% if userid in group_object.author_set %}
-                <input id="enrollchk_{{userid}}" type="checkbox" class="enroll_chkbox" checked disabled><label for="enrollchk_{{userid}}" > {% if 'announced_unit' in group_object.member_of_names_list %} {% if is_workspace %} {% trans "Joined" %} {% else %} {% trans "Enrolled" %} {% endif %} {% endif %} 
+               {% if userid in group_object.author_set and not module_enrollment or module_enrollment and fully_enrolled %}
+                <input id="enrollchk_{{group_object.pk}}_{{userid}}" type="checkbox" class="enroll_chkbox" checked disabled><label for="enrollchk_{{group_object.pk}}_{{userid}}" > {% if 'announced_unit' in group_object.member_of_names_list %} {% if is_workspace %} {% trans "Joined" %} {% else %} {% trans "Enrolled" %} {% endif %} {% endif %} 
                 </label>
             {% else %}
-              <input id="enrollchk_{{userid}}" type="checkbox" class="enroll_chkbox" onclick="enroll_user('{{userid}}')" data-user-id='{{userid}}'><label for="enrollchk_{{userid}}" class="enroll-act_lbl"> {% if 'announced_unit' in group_object.member_of_names_list %} 
+              <input id="enrollchk_{{group_object.pk}}_{{userid}}" type="checkbox" class="enroll_chkbox" onclick="enroll_user('{{userid}}', '{{group_object.pk}}')" data-user-id='{{userid}}'><label for="enrollchk_{{group_object.pk}}_{{userid}}" class="enroll-act_lbl"> {% if 'announced_unit' in group_object.member_of_names_list %} 
                 {% if is_workspace %} {% trans "Join" %} {% else %} {% trans "Enroll" %} {% endif %} {% endif %} </label>
                 }
             {% endif %}
@@ -50,7 +53,7 @@
             <hr>
         {% endfor %}
       {% endwith %}
-    <input type="button" class="orange-button right enroll_all_users" onclick="enroll_all_users()" "{% if 'Group' in group_object.member_of_names_list %}" value="Join All"  "{% else %}" value="Enroll All" "{% endif %}" >
+    <input type="button" class="orange-button right enroll_all_users" onclick="enroll_all_users('{{group_object.pk}}')" "{% if 'Group' in group_object.member_of_names_list %}" value="Join All"  "{% else %}" value="Enroll All" "{% endif %}" >
     {% endif %}
     </div>
     </div>
@@ -60,17 +63,20 @@
 
 
 <script type="text/javascript">
-  function enroll_user(user_id){
+  function enroll_user(user_id, this_group_id){
+    {% if module_enrollment %} var module_enrollment = "{{module_enrollment}}" {% else %} var module_enrollment = "False" {% endif %}
     if (!user_id){
       user_id = {{request.user.id}}
     }
     //trigger the ajax call to enroll
     $.ajax({
-      url: "{% url 'enroll_to_course' group_id %}",
+      url: "{% url 'enroll_to_course' groupid %}",
 
       data: {
         'csrfmiddlewaretoken': "{{csrf_token}}",
-        'user_id': JSON.stringify(user_id)
+        'user_id': JSON.stringify(user_id),
+        'enroll_group_id': this_group_id,
+        'module_enrollment': module_enrollment
       },
 
       type: "POST",
@@ -91,13 +97,13 @@
     enroll_user(user_id)
   })
 
-  function enroll_all_users(){
+  function enroll_all_users(groupid){
     var user_id_list = []
     {% if request.session.buddies_userid_list %}
       user_id_list = {{request.session.buddies_userid_list}}
       user_id_list.push({{request.user.pk}})
     {% endif %}
-    enroll_user(user_id_list)
+    enroll_user(user_id_list, groupid)
   }
 
   {% if request.session.buddies_userid_list %}
