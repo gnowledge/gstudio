@@ -4454,8 +4454,8 @@ $unit-card-lines-to-show: 3;
         }
     }
     .unit_actions {
-        border-top : 1px solid #ccc;
-        margin: 20px 0px 0px;
+        //border-top : 1px solid #ccc;
+        //margin: 20px 0px 0px;
         padding: 5px 0px;
          //enroll-button 
         .unit-card-enrol{
@@ -4480,7 +4480,7 @@ $unit-card-lines-to-show: 3;
             font-weight: 500;
             font-size: 14px;
             letter-spacing: 0.3px;
-           border-bottom:2px solid $secondary-orange;
+            border-bottom:2px solid #a2238d;
         }
 
         .unit-card-analytics-points{
@@ -4491,11 +4491,7 @@ $unit-card-lines-to-show: 3;
             letter-spacing: 0.4px;
             padding: 2px 3px 3px 1px;
             font-weight:bold;
-
-            &:hover {
-                box-shadow: 0px 0px 17px rgba(0, 0, 0, 0.68);
-            }
-
+            cursor: default;
         }
 
         .view_unit{
