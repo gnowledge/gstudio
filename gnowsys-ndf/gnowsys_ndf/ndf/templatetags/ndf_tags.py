@@ -4186,7 +4186,7 @@ def get_module_enrollment_status(request, module_obj):
         user_obj_list = User.object.get(pk__in=request.session.buddies_userid_list)
         for  userobj in user_obj_list:
             data_dict.update({userobj.pk : all(user_access_policy(groupid,userobj)=="allow" for groupid in module_obj.collection_set)})
-        data_dict.update('full_enrolled': all(data_dict.values()))
+        data_dict.update({'full_enrolled': all(data_dict.values())})
         return data_dict
     user_enrolled = all(user_access_policy(groupid,request.user)=="allow" for groupid in module_obj.collection_set)
     return {request.user.pk : user_enrolled, 'full_enrolled': user_enrolled}
