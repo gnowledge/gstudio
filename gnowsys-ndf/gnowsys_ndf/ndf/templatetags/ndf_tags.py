@@ -4182,8 +4182,9 @@ def load_quiz_player(request, group_id, node, hide_edit_opt=False):
 @register.assignment_tag
 def get_module_enrollment_status(request, module_obj):
     data_dict = {'full_enrolled': False}
-    if 'buddies_userid_list' in request.session:
-        user_obj_list = User.object.get(pk__in=request.session.buddies_userid_list)
+    buddies_ids = request.session.get('buddies_userid_list', [])
+    if buddies_ids:
+        user_obj_list = User.objects.get(pk__in=buddies_ids)
         for  userobj in user_obj_list:
             data_dict.update({userobj.pk : all(user_access_policy(groupid,userobj)=="allow" for groupid in module_obj.collection_set)})
         data_dict.update({'full_enrolled': all(data_dict.values())})
