@@ -4,10 +4,10 @@
 {% get_gstudio_workspace_instance as is_workspace %}
 {% get_group_object groupid as group_object %}
 {% if module_enrollment %}
-  {% get_module_enrollment_status group_object request.user as fully_enrolled %}
+  {% get_module_enrollment_status request group_object as enrolled_status_dict %}
 {% endif %}
 <input type="button" data-reveal-id="enrollBuddiesModal-{{group_object.pk}}" class="enrollBtn module-card-enrol unit-card-enrol"  
-  "{% if request.user.pk in group_object.author_set and not module_enrollment or module_enrollment and fully_enrolled %}"  
+  "{% if request.user.pk in group_object.author_set and not module_enrollment or module_enrollment and enrolled_status_dict['full_enrolled'] %}"  
     "{% if is_workspace %}" value="Joined"
       "{% else %}"  value="Enrolled" style="background-color:#006400;"
     "{% endif %}" 
@@ -26,7 +26,7 @@
       {{request.user.username}}
       </div>
       <div class="small-4 medium-4 columns">
-      {% if request.user.pk in group_object.author_set and not module_enrollment or module_enrollment and fully_enrolled %}
+      {% if request.user.pk in group_object.author_set and not module_enrollment or module_enrollment and enrolled_status_dict[request.user.pk] %}
           <input id="enrollchk_{{request.user.pk}}" type="checkbox" class="enroll_chkbox" checked disabled><label for="enrollchk_{{request.user.pk}}"> {% if 'Group' in group_object.member_of_names_list %} {% if is_workspace %} {% trans  "Joined" %} {% else %} {% trans  "Enrolled" %} {% endif %} {% endif %} </label>
       {% else %}
           <input id="enrollchk_{{request.user.pk}}" type="checkbox" class="enroll_chkbox" onclick="enroll_user('{{userid}}', '{{group_object.pk}}', '{{module_enrollment}}')" data-user-id='{{request.user.pk}}'><label for="enrollchk_{{request.user.pk}}" class="enroll-act_lbl"> {% if 'Group' in group_object.member_of_names_list %} {% if is_workspace %} {% trans "Join" %} {% else %} {% trans "Enroll" %} {% endif %} {% endif %} </label>
@@ -41,7 +41,7 @@
               {{forloop.counter}}. {{username}} :
             </div>
             <div class="small-4 medium-4 columns">
-               {% if userid in group_object.author_set and not module_enrollment or module_enrollment and fully_enrolled %}
+               {% if userid in group_object.author_set and not module_enrollment or module_enrollment and enrolled_status_dict[request.user.pk %}
                 <input id="enrollchk_{{group_object.pk}}_{{userid}}" type="checkbox" class="enroll_chkbox" checked disabled><label for="enrollchk_{{group_object.pk}}_{{userid}}" > {% if 'announced_unit' in group_object.member_of_names_list %} {% if is_workspace %} {% trans "Joined" %} {% else %} {% trans "Enrolled" %} {% endif %} {% endif %} 
                 </label>
             {% else %}
