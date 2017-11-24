@@ -55,7 +55,7 @@
 
 
 
-{# {% include 'ndf/card_group.html' with node %} #}
+{# {% include 'ndf/card_group.html' with node=node groupid=node.pk %} #}
 
 
 <!-- Existing card list-->
@@ -67,7 +67,7 @@
 <!-- Existing card list-->
 	{% for each_node in units_under_module  %}
     <li class="card-image-wrapper" >
-			{% include 'ndf/card_group.html' with node=each_node  url_name='groupchange' first_arg=each_node.pk prevent_click=True %}	
+		{% include 'ndf/card_group.html' with node=each_node  url_name='groupchange' first_arg=each_node.pk groupid=each_node.pk is_gstaff=is_gstaff %}	
 	</li>
 	{% endfor %}
 </ul>

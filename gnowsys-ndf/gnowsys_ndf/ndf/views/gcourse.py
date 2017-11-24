@@ -1897,51 +1897,69 @@ def enroll_to_course(request, group_id):
         user_obj = User.objects.get(id=userid)
         set_notif_val(request, group_obj._id, mail_content, activ, user_obj)
 
+    def add_to_author_set(group_id, add_admin, user_id):
+        group_obj = get_group_name_id(group_id, get_obj=True)
+        if group_obj:
+            try:
+                if add_admin:
+                    if isinstance(user_id, list):
+                        non_admin_user_ids = [each_userid for each_userid in user_id if each_userid not in group_obj.group_admin ]
+                        if non_admin_user_ids:
+                            group_obj.group_admin.extend(non_admin_user_ids)
+                            group_obj.group_admin = list(set(group_obj.group_admin))
+                    else:
+                        if user_id not in group_obj.group_admin:
+                            group_obj.group_admin.append(user_id)
+                else:
+                    if isinstance(user_id, list):
+                        non_member_user_ids = [each_userid for each_userid in user_id if each_userid not in group_obj.author_set ]
+                        if non_member_user_ids:
+                            group_obj.author_set.extend(non_member_user_ids)
+                            group_obj.author_set = list(set(group_obj.author_set))
+                    else:
+                        if user_id not in group_obj.author_set:
+                            group_obj.author_set.append(user_id)
+                group_obj.save()
+
+                if 'Group' not in group_obj.member_of_names_list:
+                    # get new/existing counter document for a user for a given course for the purpose of analytics
+                    if isinstance(user_id, list):
+                        for each_user_id in user_id:
+                            _update_user_counter(each_user_id, group_obj._id)
+                    else:
+                        _update_user_counter(user_id, group_obj._id)
+            except Exception as e:
+                pass
+            return group_obj
+        pass
     response_dict = {"success": False}
     if request.is_ajax() and request.method == "POST":
         try:
             user_id = request.POST.get("user_id", "")
+            enroll_group_id = request.POST.get("enroll_group_id", None)
             add_admin = eval(request.POST.get("asAdmin", 'False'))
+            is_module_enroll = eval(request.POST.get("module_enrollment", 'False'))
             if not user_id:
                 user_id = request.user.id
             else:
                 user_id = ast.literal_eval(user_id)
-
-
             if isinstance(user_id, list):
                 user_id = map(int, user_id)
             else:
                 user_id = int(user_id)
-            group_obj = get_group_name_id(group_id, get_obj=True)
-            if add_admin:
-                if isinstance(user_id, list):
-                    non_admin_user_ids = [each_userid for each_userid in user_id if each_userid not in group_obj.group_admin ]
-                    if non_admin_user_ids:
-                        group_obj.group_admin.extend(non_admin_user_ids)
-                        group_obj.group_admin = list(set(group_obj.group_admin))
-                else:
-                    if user_id not in group_obj.group_admin:
-                        group_obj.group_admin.append(user_id)
-            else:
-                if isinstance(user_id, list):
-                    non_member_user_ids = [each_userid for each_userid in user_id if each_userid not in group_obj.author_set ]
-                    if non_member_user_ids:
-                        group_obj.author_set.extend(non_member_user_ids)
-                        group_obj.author_set = list(set(group_obj.author_set))
-                else:
-                    if user_id not in group_obj.author_set:
-                        group_obj.author_set.append(user_id)
+            if enroll_group_id:
+                group_id = enroll_group_id
 
-            group_obj.save()
+            if is_module_enroll:
+                module_obj = Node.get_node_by_id(group_id)
+                # print "\n Module: ", module_obj.name, " -- ", module_obj.member_of_names_list
+                for each_group_id in module_obj.collection_set:
+                    group_obj = add_to_author_set(each_group_id, add_admin, user_id)
+            else:
+                group_obj = add_to_author_set(group_id, add_admin, user_id)
+                response_dict["member_count"] = len(group_obj.author_set)
             response_dict["success"] = True
-            response_dict["member_count"] = len(group_obj.author_set)
-            if 'Group' not in group_obj.member_of_names_list:
-                # get new/existing counter document for a user for a given course for the purpose of analytics
-                if isinstance(user_id, list):
-                    for each_user_id in user_id:
-                        _update_user_counter(each_user_id, group_obj._id)
-                else:
-                    _update_user_counter(user_id, group_obj._id)
+
             try:
                 if isinstance(user_id, list):
                     for each_user_id in user_id:
@@ -3100,6 +3118,10 @@ def course_analytics(request, group_id, user_id, render_template=False, get_resu
 
     # cache.set(cache_key, analytics_data, 60*10)
     analytics_data['group_member_of'] = group_obj.member_of_names_list
+    if group_obj.altnames:
+        analytics_data['group_name'] = group_obj.altnames
+    else:
+        analytics_data['group_name'] = group_obj.name
     return render_to_response("ndf/user_course_analytics.html",
                                 analytics_data,
                                 context_instance = RequestContext(request)

@@ -4177,3 +4177,8 @@ def load_quiz_player(request, group_id, node, hide_edit_opt=False):
     #         node = each
     #         print "\n\nnode", node
     return con_var
+
+
+@register.assignment_tag
+def get_module_enrollment_status(module_obj, user):
+	return all(user_access_policy(groupid,user)=="allow" for groupid in module_obj.collection_set) 
