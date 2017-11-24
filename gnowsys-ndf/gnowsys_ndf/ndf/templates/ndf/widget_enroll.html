@@ -29,7 +29,7 @@
       {% if request.user.pk in group_object.author_set and not module_enrollment or module_enrollment and fully_enrolled %}
           <input id="enrollchk_{{request.user.pk}}" type="checkbox" class="enroll_chkbox" checked disabled><label for="enrollchk_{{request.user.pk}}"> {% if 'Group' in group_object.member_of_names_list %} {% if is_workspace %} {% trans  "Joined" %} {% else %} {% trans  "Enrolled" %} {% endif %} {% endif %} </label>
       {% else %}
-          <input id="enrollchk_{{request.user.pk}}" type="checkbox" class="enroll_chkbox" onclick="enroll_user('{{userid}}', '{{group_object.pk}}')" data-user-id='{{request.user.pk}}'><label for="enrollchk_{{request.user.pk}}" class="enroll-act_lbl"> {% if 'Group' in group_object.member_of_names_list %} {% if is_workspace %} {% trans "Join" %} {% else %} {% trans "Enroll" %} {% endif %} {% endif %} </label>
+          <input id="enrollchk_{{request.user.pk}}" type="checkbox" class="enroll_chkbox" onclick="enroll_user('{{userid}}', '{{group_object.pk}}', '{{module_enrollment}}')" data-user-id='{{request.user.pk}}'><label for="enrollchk_{{request.user.pk}}" class="enroll-act_lbl"> {% if 'Group' in group_object.member_of_names_list %} {% if is_workspace %} {% trans "Join" %} {% else %} {% trans "Enroll" %} {% endif %} {% endif %} </label>
       {% endif %}
       </div>
       <hr>
@@ -45,7 +45,7 @@
                 <input id="enrollchk_{{group_object.pk}}_{{userid}}" type="checkbox" class="enroll_chkbox" checked disabled><label for="enrollchk_{{group_object.pk}}_{{userid}}" > {% if 'announced_unit' in group_object.member_of_names_list %} {% if is_workspace %} {% trans "Joined" %} {% else %} {% trans "Enrolled" %} {% endif %} {% endif %} 
                 </label>
             {% else %}
-              <input id="enrollchk_{{group_object.pk}}_{{userid}}" type="checkbox" class="enroll_chkbox" onclick="enroll_user('{{userid}}', '{{group_object.pk}}')" data-user-id='{{userid}}'><label for="enrollchk_{{group_object.pk}}_{{userid}}" class="enroll-act_lbl"> {% if 'announced_unit' in group_object.member_of_names_list %} 
+              <input id="enrollchk_{{group_object.pk}}_{{userid}}" type="checkbox" class="enroll_chkbox" onclick="enroll_user('{{userid}}', '{{group_object.pk}}')" data-user-id='{{userid}}', '{{module_enrollment}}'><label for="enrollchk_{{group_object.pk}}_{{userid}}" class="enroll-act_lbl"> {% if 'announced_unit' in group_object.member_of_names_list %} 
                 {% if is_workspace %} {% trans "Join" %} {% else %} {% trans "Enroll" %} {% endif %} {% endif %} </label>
                 }
             {% endif %}
@@ -63,8 +63,8 @@
 
 
 <script type="text/javascript">
-  function enroll_user(user_id, this_group_id){
-    {% if module_enrollment %} var module_enrollment = "{{module_enrollment}}" {% else %} var module_enrollment = "False" {% endif %}
+  function enroll_user(user_id, this_group_id, module_enrollment){
+    var module_enrollment = module_enrollment
     if (!user_id){
       user_id = {{request.user.id}}
     }
