@@ -1,7 +1,9 @@
-{# lms_dashboard.html lms My Desk screen #}
 {% extends "ndf/gbase.html" %}
 {% load i18n %}
+{% load cache %}
 
+
+{# lms_dashboard.html lms My Desk screen #}
 
 {% block title %} My Desk {% endblock%}
 
@@ -58,10 +60,13 @@
     <ul class="small-block-grid-1 medium-block-grid-3 large-block-grid-3">
       {% for each_obj in units_cur %}
       <li class="card-image-wrapper">
-        {% include "ndf/card_group.html" with node=each_obj url_name="groupchange" first_arg=each_obj.pk %}
+        {% include "ndf/card_group.html" with node=each_obj url_name="groupchange" first_arg=each_obj.pk no_enroll=True %}
       </li>
       {% empty %}
-      You are not enrolled in any Unit!
+      <section class="empty-dashboard-message">
+        <p>You are not enrolled in any course!</p>
+          <a class="button-explore-courses" href="{% url 'explore_courses' %}">Explore</a>
+      </section>
       {% endfor %}
     </ul>
   </div>
@@ -74,10 +79,13 @@
     <ul class="small-block-grid-1 medium-block-grid-3 large-block-grid-3">
       {% for each_obj in units_cur %}
       <li class="card-image-wrapper">
-        {% include "ndf/card_group.html" with group_counts=True node=each_obj no_url=True first_arg=each_obj.pk %}
+        {% include "ndf/card_group.html" with group_counts=True node=each_obj no_url=True first_arg=each_obj.pk  %}
       </li>
       {% empty %}
-      You are not enrolled in any Unit!
+      <section class="empty-dashboard-message">
+        <p>You are not enrolled in any course!</p>
+          <a class="button-explore-courses" href="{% url 'explore_courses' %}">Explore</a>
+      </section>
       {% endfor %}
     </ul>
   </div>
