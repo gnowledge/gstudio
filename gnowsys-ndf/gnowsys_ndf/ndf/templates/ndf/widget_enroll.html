@@ -6,7 +6,7 @@
 {% if module_enrollment %}
   {% get_module_enrollment_status request group_object as enrolled_status_dict %}
 {% endif %}
-<input type="button" data-reveal-id="enrollBuddiesModal-{{group_object.pk}}" class="fa enrollBtn-{{group_object.pk}} module-card-enrol unit-card-enrol"  
+<input type="button" data-reveal-id="enrollBuddiesModal-{{group_object.pk}}" class="fa enrollBtn enrollact-{{group_object.pk}} module-card-enrol unit-card-enrol"  
   "{% if request.user.pk in group_object.author_set and not module_enrollment or module_enrollment and enrolled_status_dict|get_dict_value_from_key:'full_enrolled' %}"  
     "{% if is_workspace %}" value="Joined"
       "{% else %}"  value="Enrolled" style="background-color:#006400;" title="You are enrolled into this Module" 
@@ -107,6 +107,7 @@
       user_id_list = {{request.session.buddies_userid_list}}
       user_id_list.push({{request.user.pk}})
     {% endif %}
+
     enroll_user(user_id_list, groupid, module_enrollment)
   }
 
@@ -115,19 +116,24 @@
 
       user_id_list = {{request.session.buddies_userid_list}}
       group_member_ids = {{group_object.author_set}}
-      console.log("user_id_list : "+ user_id_list)
-      console.log("group_member_ids : "+ group_member_ids)
       isSuperset = user_id_list.every(function(val) {
-        console.log(val)
         return group_member_ids.indexOf(val) >= 0; 
       });
-      console.log("isSuperset: "+ isSuperset)
       if (isSuperset){
         $(".enroll_all_users-{{group_object.pk}}").addClass("hide")
+        $(".enrollact-{{group_object.pk}}").val("Enrolled").attr("title", "Enroll into this Module")
       }
-    {% endif %}
-    {% if module_enrollment and not enrolled_status_dict|get_dict_value_from_key:request.user.pk %}
-      $(".enrollBtn-{{group_object.pk}}").val("Enroll").attr("title", "Enroll into this Module")
+      else{
+        {% if request.user.pk in group_object.author_set %}
+          $(".enrollact-{{group_object.pk}}").val("Enroll Buddy").attr("title", "Enroll your Buddies into this Module").css('background-color', '#a2238d')
+
+        {% elif request.user.pk not in group_object.author_set %}
+          $(".enrollact-{{group_object.pk}}").val("Enroll").attr("title", "Enroll into this Module")
+
+        {% endif %}
+
+      }
+
     {% endif %}
     })
 </script>
