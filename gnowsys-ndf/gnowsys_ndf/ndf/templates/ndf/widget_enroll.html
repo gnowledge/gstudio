@@ -122,18 +122,45 @@
       if (isSuperset){
         $(".enroll_all_users-{{group_object.pk}}").addClass("hide")
         $(".enrollact-{{group_object.pk}}").val("Enrolled").attr("title", "Enroll into this Module")
+
       }
       else{
         {% if request.user.pk in group_object.author_set %}
           $(".enrollact-{{group_object.pk}}").val("Enroll Buddy").attr("title", "Enroll your Buddies into this Module").css('background-color', '#a2238d')
+        {% endif %}
+      }
 
-        {% elif request.user.pk not in group_object.author_set %}
+      {% if module_enrollment %}
+        // Module Enroll
+        {% if not enrolled_status_dict|get_dict_value_from_key:request.user.pk %}
           $(".enrollact-{{group_object.pk}}").val("Enroll").attr("title", "Enroll into this Module")
+        {% endif %}
+      {% else %}
+        // Unit Enroll
+        {% if request.user.pk not in group_object.author_set %}
+          $(".enrollact-{{group_object.pk}}").val("Enroll").attr("title", "Enroll into this Module")
+        {% endif %}
+      {% endif %}
+
+    {% else %}
+    // No buddies
+
+        {% if module_enrollment %}
+          {% if request.user.pk not in group_object.author_set %}
+            $(".enrollact-{{group_object.pk}}").val("Enroll").attr("title", "Enroll into this Module")
+          {% endif %}
+
+        {% else %}
+
+          {% if request.user.pk not in group_object.author_set %}
+            $(".enrollact-{{group_object.pk}}").val("Enroll").attr("title", "Enroll into this Module")
+          {% endif %}
 
         {% endif %}
 
-      }
-
     {% endif %}
+
+
+
     })
 </script>
