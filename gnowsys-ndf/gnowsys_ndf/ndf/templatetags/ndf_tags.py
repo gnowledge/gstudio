@@ -4181,15 +4181,27 @@ def load_quiz_player(request, group_id, node, hide_edit_opt=False):
 
 @register.assignment_tag
 def get_module_enrollment_status(request, module_obj):
+    def _user_enrolled(userid,unit_ids_list):
+        user_data_dict = {userid: None}
+        enrolled_flag = True
+        for unit_id in unit_ids_list:
+            unit_obj = node_collection.one({'_id': ObjectId(unit_id), '_type': 'Group'})
+            if userid not in unit_obj.author_set:
+                enrolled_flag = False
+        user_data_dict[userid] = enrolled_flag
+        return user_data_dict
+
     data_dict = {}
     buddies_ids = request.session.get('buddies_userid_list', [])
     # print "\nbuddies_ids: ", buddies_ids
+
     buddies_ids.append(request.user.pk)
     if buddies_ids:
-        for  userobj in buddies_ids:
-            data_dict.update({userobj : all(userobj in groupobj.author_set for ind, groupobj in module_obj.collection_dict.items())})
+        for  userid in buddies_ids:
+            data_dict.update(_user_enrolled(userid, module_obj.collection_set))
+            # data_dict.update({userid : all(userid in groupobj.author_set for ind, groupobj in module_obj.collection_dict.items())})
             data_dict.update({'full_enrolled': all(data_dict.values())})
-            # print "\n data: ", data_dict
+        # print "\n data: ", data_dict
         return data_dict
-    user_enrolled = all(user_access_policy(groupid,request.user)=="allow" for groupid in module_obj.collection_set)
-    return {request.user.pk : user_enrolled, 'full_enrolled': user_enrolled}
+    return _user_enrolled(request.user.pk, module_obj.collection_set)
+    # return {request.user.pk : user_enrolled, 'full_enrolled': user_enrolled}

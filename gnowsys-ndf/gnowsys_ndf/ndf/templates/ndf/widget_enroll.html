@@ -123,7 +123,7 @@
         $(".enroll_all_users-{{group_object.pk}}").addClass("hide")
       }
 
-      {% if not enrolled_status_dict|get_dict_value_from_key:'full_enrolled' and not enrolled_status_dict|get_dict_value_from_key:request.user.pk %}
+      {% if not enrolled_status_dict|get_dict_value_from_key:request.user.pk %}
         $(".enrollBtn-{{group_object.pk}}").val("Enroll").attr("title", "Enroll into this Module")
       {% endif %}
     })
