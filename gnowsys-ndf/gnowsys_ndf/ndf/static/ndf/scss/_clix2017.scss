@@ -3742,6 +3742,8 @@ $ah_2_background_color_hover: rgba(244, 244, 244, 0.3);;
 
     .header_text_block {
         padding: 0px 15px;
+        margin-left: -2px;
+        border-right: 1px solid white;
         a {
             color: $ah_2_icon_color;
         }

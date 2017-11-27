@@ -44,40 +44,40 @@
               <a href="{% url 'course_quiz_data' group_id %}" class="header_text_block right">RESULTS</a>
             {% endif %}
         </div>
-        <div class="new_note header_text_block">
-
-            <a title="Go here if you want to write some notes while taking the course" {% if user_access_priv == "allow" %} href="{% url 'course_notebook' group_id %}?create=True" {% else %} class="user_not_enrolled" {% endif %}><i class="fa fa-edit header_icon"></i>&nbsp;
-               {% trans "Write Note" %} 
+        <div class="right new_note header_text_block">
+            <a  title="Click here to jump to next lesson" {% if next_lesson_id  and lesson_next_act_id %} href="{% url 'activity_player_detail' group_id next_lesson_id lesson_next_act_id %}" {% else %} class = "disabled" {% endif %} ><i class="fa fa-angle-double-right header_icon"></i>&nbsp;
+               {% trans "Next Lesson" %}    
             </a>
         </div>
-        <div class="new_note header_text_block">
-            <a title="Click here to jump to the previous lesson"  {% if prev_lesson_id and lesson_act_prev_id %} href="{% url 'activity_player_detail' group_id prev_lesson_id lesson_act_prev_id %}" {% else %} class = "disabled" {% endif %} ><i class="fa fa-angle-double-left header_icon"></i>&nbsp;
-               {% trans "Previous Lesson" %}  
-            </a>
+        <div class="right pagination page_count header_text_block">
+              <a title="Click here to go to next activity" {% if resource_next_id %}  href="{% url 'activity_player_detail' group_id lesson_node.pk resource_next_id %}" {% else %} class = "disabled" {% endif %}>
+                  {% trans "NEXT" %} <i class="fa fa-angle-right header_icon"></i>
+              </a>
+            
         </div>
-        <div class="pagination prev_button header_text_block">
+        <div class="right pagination page_count header_text_block">
+            {{resource_index|add:'1'}} {% trans "OF" %} {{lesson_node.collection_set|length}}
+        </div>
+        <div class="right pagination prev_button header_text_block">
             
               <a title="click here to go to previous activity" {% if resource_prev_id %} href="{% url 'activity_player_detail' group_id lesson_node.pk resource_prev_id %}" {% else %} class = "disabled"{% endif %}> 
                   <i class="fa fa-angle-left header_icon"></i> {% trans "PREV" %}
               </a>
             
         </div>
-        <div class="pagination page_count header_text_block">
-            {{resource_index|add:'1'}} {% trans "OF" %} {{lesson_node.collection_set|length}}
+        <div class=" right new_note header_text_block">
+            <a title="Click here to jump to the previous lesson"  {% if prev_lesson_id and lesson_act_prev_id %} href="{% url 'activity_player_detail' group_id prev_lesson_id lesson_act_prev_id %}" {% else %} class = "disabled" {% endif %} ><i class="fa fa-angle-double-left header_icon"></i>&nbsp;
+               {% trans "Previous Lesson" %}  
+            </a>
         </div>
-        <div class="pagination page_count header_text_block">
-              <a title="Click here to go to next activity" {% if resource_next_id %}  href="{% url 'activity_player_detail' group_id lesson_node.pk resource_next_id %}" {% else %} class = "disabled" {% endif %}>
-                  {% trans "NEXT" %} <i class="fa fa-angle-right header_icon"></i>
-              </a>
-            
-        </div>
-        <div class="new_note header_text_block">
-            <a  title="Click here to jump to next lesson" {% if next_lesson_id  and lesson_next_act_id %} href="{% url 'activity_player_detail' group_id next_lesson_id lesson_next_act_id %}" {% else %} class = "disabled" {% endif %} ><i class="fa fa-angle-double-right header_icon"></i>&nbsp;
-               {% trans "Next Lesson" %}    
+        <div class="right new_note header_text_block">
+            <a title="Go here if you want to write some notes while taking the course" {% if user_access_priv == "allow" %} href="{% url 'course_notebook' group_id %}?create=True" {% else %} class="user_not_enrolled" {% endif %}><i class="fa fa-edit header_icon"></i>&nbsp;
+               {% trans "Write Note" %} 
             </a>
         </div>
 </nav>
 </div>
+
 
 
 <div class="row activity_sheet ">
