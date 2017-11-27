@@ -64,8 +64,11 @@
 
 <script type="text/javascript">
   function enroll_user(user_id, this_group_id, module_enrollment_flag){
-    var module_enrollment = "False"
-    module_enrollment = module_enrollment_flag
+    module_enrollment = module_enrollment_flag.trim()
+    if (!module_enrollment){
+      module_enrollment = "False"
+    }
+
     if (!user_id){
       user_id = {{request.user.id}}
     }
@@ -108,7 +111,7 @@
   }
 
   $(document).ready(function(){
-  {% if request.session.buddies_userid_list %}
+    {% if request.session.buddies_userid_list %}
 
       user_id_list = {{request.session.buddies_userid_list}}
       group_member_ids = {{group_object.author_set}}
@@ -122,11 +125,9 @@
       if (isSuperset){
         $(".enroll_all_users-{{group_object.pk}}").addClass("hide")
       }
-      {% if not enrolled_status_dict|get_dict_value_from_key:request.user.pk %}
-        $(".enrollBtn-{{group_object.pk}}").val("Enroll").attr("title", "Enroll into this Module")
-      {% endif %}
-  {% else %}
-        $(".enrollBtn-{{group_object.pk}}").val("Enroll").attr("title", "Enroll into this Module")
-  {% endif %}
+    {% endif %}
+    {% if module_enrollment and not enrolled_status_dict|get_dict_value_from_key:request.user.pk %}
+      $(".enrollBtn-{{group_object.pk}}").val("Enroll").attr("title", "Enroll into this Module")
+    {% endif %}
     })
 </script>
