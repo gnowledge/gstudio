@@ -990,6 +990,7 @@ ul.horizontal_tabs_gstudio {
               border-radius: 3px;
               margin-right:80px;
     }
+    
 }
 
 .activity_tile {
@@ -5265,6 +5266,40 @@ ul.nav_menu_1 {
 .lms_explore_back_unit{
     background-color: #fff;
     margin-top:-23.3px;
+}
+
+.empty-dashboard-message {
+    border: 3px solid #e4e4e4;
+    background: #f8f8f8;
+    padding: 40px 0;
+    text-align: center;
+        >p{
+                font-size: 24px;
+                color: #646464;
+                margin-bottom: 20px;
+                text-shadow: 0 1px rgba(255,255,255,0.6);
+            }
+        >a{
+            background-color: #164a7b;
+            border: 1px solid #164a7b;
+            box-shadow: 0 1px 8px 0 rgba(0,0,0,0.1);
+            box-sizing: border-box;
+            color: #fff;
+            font-family: "Open Sans","Helvetica Neue",Helvetica,Arial,sans-serif;
+            display: inline-block;
+            letter-spacing: 1px;
+            margin-top: 5px;
+            margin-left: 5px;
+            padding: 15px 20px;
+        }
+        .button-explore-courses{
+            font-size: 20px;
+            font-weight: normal;
+            text-shadow: none;
+            text-transform: capitalize;
+            border-radius: 0.22rem;
+            width: 170px;
+        }
 }
 
 // My Desk customized classes

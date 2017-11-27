@@ -1,7 +1,9 @@
-{# lms_dashboard.html lms My Desk screen #}
 {% extends "ndf/gbase.html" %}
 {% load i18n %}
+{% load cache %}
 
+
+{# lms_dashboard.html lms My Desk screen #}
 
 {% block title %} My Desk {% endblock%}
 
@@ -61,7 +63,10 @@
         {% include "ndf/card_group.html" with node=each_obj url_name="groupchange" first_arg=each_obj.pk no_enroll=True %}
       </li>
       {% empty %}
-      You are not enrolled in any Unit!
+      <section class="empty-dashboard-message">
+        <p>You are not enrolled in any courses yet !</p>
+          <a class="button-explore-courses" href="{% url 'explore_courses' %}">Explore</a>
+      </section>
       {% endfor %}
     </ul>
   </div>
