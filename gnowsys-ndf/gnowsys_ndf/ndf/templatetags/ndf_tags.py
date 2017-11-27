@@ -4186,8 +4186,9 @@ def get_module_enrollment_status(request, module_obj):
         enrolled_flag = True
         for unit_id in unit_ids_list:
             unit_obj = node_collection.one({'_id': ObjectId(unit_id), '_type': 'Group'})
-            if userid not in unit_obj.author_set:
-                enrolled_flag = False
+            if unit_obj:
+	            if userid not in unit_obj.author_set:
+	                enrolled_flag = False
         user_data_dict[userid] = enrolled_flag
         return user_data_dict
 
