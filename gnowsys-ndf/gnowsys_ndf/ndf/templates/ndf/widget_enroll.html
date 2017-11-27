@@ -146,16 +146,9 @@
     // No buddies
 
         {% if module_enrollment %}
-          {% if request.user.pk not in group_object.author_set %}
-            $(".enrollact-{{group_object.pk}}").val("Enroll").attr("title", "Enroll into this Module")
+          {% if not enrolled_status_dict|get_dict_value_from_key:request.user.pk %}
+              $(".enrollact-{{group_object.pk}}").val("Enroll").attr("title", "Enroll into this Module")
           {% endif %}
-
-        {% else %}
-
-          {% if request.user.pk not in group_object.author_set %}
-            $(".enrollact-{{group_object.pk}}").val("Enroll").attr("title", "Enroll into this Module")
-          {% endif %}
-
         {% endif %}
 
     {% endif %}
