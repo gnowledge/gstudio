@@ -45,13 +45,12 @@
     [
         "apple",
         "banana",
-        "kiwi",
         "pineapple",
         "strawberry"
     ],
 
     "animals":
-	[
+    [
         "ant",
         "bat",
         "bear",
@@ -85,6 +84,7 @@
         "honeybee",
         "horse",
         "kangaroo",
+        "kiwi",
         "lion",
         "llama",
         "lobster",
