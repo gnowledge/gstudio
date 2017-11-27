@@ -64,7 +64,7 @@
       </li>
       {% empty %}
       <section class="empty-dashboard-message">
-        <p>You are not enrolled in any courses yet !</p>
+        <p>You are not enrolled in any course!</p>
           <a class="button-explore-courses" href="{% url 'explore_courses' %}">Explore</a>
       </section>
       {% endfor %}
@@ -82,7 +82,10 @@
         {% include "ndf/card_group.html" with group_counts=True node=each_obj no_url=True first_arg=each_obj.pk  %}
       </li>
       {% empty %}
-      You are not enrolled in any Unit!
+      <section class="empty-dashboard-message">
+        <p>You are not enrolled in any course!</p>
+          <a class="button-explore-courses" href="{% url 'explore_courses' %}">Explore</a>
+      </section>
       {% endfor %}
     </ul>
   </div>
