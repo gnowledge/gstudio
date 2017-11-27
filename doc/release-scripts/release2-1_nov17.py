@@ -28,23 +28,28 @@ username_existing_expected_map = {
 }
 
 
-def update_username(username_existing_expected_map={}, save_objects=True):
+def update_username(username_existing_expected_map={}):
 
-	with open('../doc/release-scripts/user-tokens.json') as tokens:
-		user_tokens_map = json.load(tokens)
+	user_tokens_map_seperator = "-"
+	# try:
+	# 	with open('../doc/release-scripts/user-tokens.json') as tokens:
+	# 		user_tokens_map = json.load(tokens)
+	# 		user_tokens_map_seperator = user_tokens_map['seperator']
+	# except Exception as e:
+	# 	print e
 
-		for existing, expected in username_existing_expected_map.iteritems():
+	for existing, expected in username_existing_expected_map.iteritems():
 
-			check_in_username = user_tokens_map['seperator'] + existing + user_tokens_map['seperator'] + GSTUDIO_INSTITUTE_ID
-			auth_cur = node_collection.find({'_type': u'Author', 'name': {'$regex': unicode(check_in_username), '$options': 'i'} })
-			for each_auth in auth_cur:
-				each_auth.name = each_auth.name.replace(existing, expected)
-				each_auth.save()
+		check_in_username = user_tokens_map_seperator + existing + user_tokens_map_seperator + GSTUDIO_INSTITUTE_ID
+		auth_cur = node_collection.find({'_type': u'Author', 'name': {'$regex': unicode(check_in_username), '$options': 'i'} })
+		for each_auth in auth_cur:
+			each_auth.name = each_auth.name.replace(existing, expected)
+			each_auth.save()
 
-			user_cur = User.objects.filter(username__endswith=unicode(check_in_username))
-			for each_user in user_cur:
-				each_user.username = each_user.username.replace(existing, expected)
-				each_user.save()
+		user_cur = User.objects.filter(username__endswith=unicode(check_in_username))
+		for each_user in user_cur:
+			each_user.username = each_user.username.replace(existing, expected)
+			each_user.save()
 
 
 if __name__ == '__main__':
