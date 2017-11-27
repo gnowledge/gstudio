@@ -32,7 +32,7 @@
 <div class="activity_player_secondary_header activity_player_header sticky">
   <nav class="activity_player_secondary_header activity_player_header" data-topbar role="navigation" data-options="sticky_on: large">
       <div class="small-1 columns end">
-        <a href="{% url 'course_content' group_id  %}">
+        <a title="Click here to see the list of all the lessons" href="{% url 'course_content' group_id  %}">
         <div class="header_icon_block prev_button">
             <i class="fa fa-angle-left header_icon">&nbsp;Lessons</i>
         </div>
@@ -46,18 +46,18 @@
         </div>
         <div class="new_note header_text_block">
 
-            <a {% if user_access_priv == "allow" %} href="{% url 'course_notebook' group_id %}?create=True" {% else %} class="user_not_enrolled" {% endif %}><i class="fa fa-edit header_icon"></i>&nbsp;
+            <a title="Go here if you want to write some notes while taking the course" {% if user_access_priv == "allow" %} href="{% url 'course_notebook' group_id %}?create=True" {% else %} class="user_not_enrolled" {% endif %}><i class="fa fa-edit header_icon"></i>&nbsp;
                {% trans "Write Note" %} 
             </a>
         </div>
         <div class="new_note header_text_block">
-            <a   {% if prev_lesson_id and lesson_act_prev_id %} href="{% url 'activity_player_detail' group_id prev_lesson_id lesson_act_prev_id %}" {% else %} class = "disabled" {% endif %} ><i class="fa fa-angle-double-left header_icon"></i>&nbsp;
+            <a title="Click here to jump to the previous lesson"  {% if prev_lesson_id and lesson_act_prev_id %} href="{% url 'activity_player_detail' group_id prev_lesson_id lesson_act_prev_id %}" {% else %} class = "disabled" {% endif %} ><i class="fa fa-angle-double-left header_icon"></i>&nbsp;
                {% trans "Previous Lesson" %}  
             </a>
         </div>
         <div class="pagination prev_button header_text_block">
             
-              <a {% if resource_prev_id %} href="{% url 'activity_player_detail' group_id lesson_node.pk resource_prev_id %}" {% else %} class = "disabled"{% endif %}> 
+              <a title="click here to go to previous activity" {% if resource_prev_id %} href="{% url 'activity_player_detail' group_id lesson_node.pk resource_prev_id %}" {% else %} class = "disabled"{% endif %}> 
                   <i class="fa fa-angle-left header_icon"></i> {% trans "PREV" %}
               </a>
             
@@ -66,13 +66,13 @@
             {{resource_index|add:'1'}} {% trans "OF" %} {{lesson_node.collection_set|length}}
         </div>
         <div class="pagination page_count header_text_block">
-              <a {% if resource_next_id %}  href="{% url 'activity_player_detail' group_id lesson_node.pk resource_next_id %}" {% else %} class = "disabled" {% endif %}>
+              <a title="Click here to go to next activity" {% if resource_next_id %}  href="{% url 'activity_player_detail' group_id lesson_node.pk resource_next_id %}" {% else %} class = "disabled" {% endif %}>
                   {% trans "NEXT" %} <i class="fa fa-angle-right header_icon"></i>
               </a>
             
         </div>
         <div class="new_note header_text_block">
-            <a  {% if next_lesson_id  and lesson_next_act_id %} href="{% url 'activity_player_detail' group_id next_lesson_id lesson_next_act_id %}" {% else %} class = "disabled" {% endif %} ><i class="fa fa-angle-double-right header_icon"></i>&nbsp;
+            <a  title="Click here to jump to next lesson" {% if next_lesson_id  and lesson_next_act_id %} href="{% url 'activity_player_detail' group_id next_lesson_id lesson_next_act_id %}" {% else %} class = "disabled" {% endif %} ><i class="fa fa-angle-double-right header_icon"></i>&nbsp;
                {% trans "Next Lesson" %}    
             </a>
         </div>
