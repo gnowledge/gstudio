@@ -42,7 +42,7 @@
 
         
         <div class="header_title" title ="{% firstof group_object.altnames group_object.name %}">
-          {% firstof group_object.altnames|truncatechars:25 group_object.name|truncatechars:25  %}
+          {% firstof group_object.altnames group_object.name  %}
 
             {% if "QuizItemEvent" in node.member_of_names_list or "QuizItem" in node.member_of_names_list%}
               <a href="{% url 'course_quiz_data' group_id %}" class="header_text_block right">RESULTS</a>
