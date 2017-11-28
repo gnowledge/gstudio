@@ -150,7 +150,11 @@
               $(".enrollact-{{group_object.pk}}").val("Enroll").attr("title", "Enroll ")
           {% endif %}
         {% else %}
-              $(".enrollact-{{group_object.pk}}").val("Enroll").attr("title", "Enroll ")
+          {% if request.user.pk not in group_object.author_set %}
+            $(".enrollact-{{group_object.pk}}").val("Enroll").attr("title", "Enroll")
+          {% else %}
+            $(".enrollact-{{group_object.pk}}").val("Enrolled").attr("title", "You are enrolled")
+          {% endif %}
         {% endif %}
 
     {% endif %}
