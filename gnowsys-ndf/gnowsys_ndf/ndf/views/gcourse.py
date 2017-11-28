@@ -2969,11 +2969,11 @@ def course_analytics(request, group_id, user_id, render_template=False, get_resu
                                     completed_activities = completed_activities + 1
             if all(each_act_id in visited_nodes for each_act_id in lesson_act_ids):
                 completed_lessons = completed_lessons + 1
-        analytics_data['level1_lbl'] = "Lesson Completion"
-        analytics_data['level2_lbl'] = "Activity Completion"
+        analytics_data['level1_lbl'] = "Lesson Visited"
+        analytics_data['level2_lbl'] = "Activity Visited"
 
-        analytics_data['level1_progress_stmt'] = str(completed_lessons) + " out of " + str(all_lessons) + " Lessons completed"
-        analytics_data['level2_progress_stmt'] = str(completed_activities) + " out of " + str(all_activities) + " Activities completed"
+        analytics_data['level1_progress_stmt'] = str(completed_lessons) + " out of " + str(all_lessons) + " Lessons Visited"
+        analytics_data['level2_progress_stmt'] = str(completed_activities) + " out of " + str(all_activities) + " Activities Visited"
         if completed_lessons and all_lessons:
             analytics_data['level1_progress_meter'] = (completed_lessons/float(all_lessons))*100
         else:
