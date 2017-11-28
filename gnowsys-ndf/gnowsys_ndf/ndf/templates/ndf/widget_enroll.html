@@ -9,11 +9,11 @@
 <input type="button" data-reveal-id="enrollBuddiesModal-{{group_object.pk}}" class="fa enrollBtn enrollact-{{group_object.pk}} module-card-enrol unit-card-enrol"  
   "{% if request.user.pk in group_object.author_set and not module_enrollment or module_enrollment and enrolled_status_dict|get_dict_value_from_key:'full_enrolled' %}"  
     "{% if is_workspace %}" value="Joined"
-      "{% else %}"  value="Enrolled" style="background-color:#006400;" title="You are enrolled into this Module" 
+      "{% else %}"  value="Enrolled" style="background-color:#006400;" title="You are enrolled " 
     "{% endif %}" 
     "{% else %}" 
       "{% if is_workspace %}" value="Join"
-      "{% else %}"  value="Enroll &#xf234;" title="Enroll your Buddies into this Module"
+      "{% else %}"  value="Enroll &#xf234;" title="Enroll your Buddies "
     "{% endif %}"
   "{%  endif %}" />
 
@@ -121,24 +121,24 @@
       });
       if (isSuperset){
         $(".enroll_all_users-{{group_object.pk}}").addClass("hide")
-        $(".enrollact-{{group_object.pk}}").val("Enrolled").attr("title", "Enroll into this Module")
+        $(".enrollact-{{group_object.pk}}").val("Enrolled").attr("title", "You are enrolled ")
 
       }
       else{
         {% if request.user.pk in group_object.author_set %}
-          $(".enrollact-{{group_object.pk}}").val("Enroll Buddy").attr("title", "Enroll your Buddies into this Module").css('background-color', '#a2238d')
+          $(".enrollact-{{group_object.pk}}").val("Enroll Buddy").attr("title", "Enroll your Buddies ").css('background-color', '#a2238d')
         {% endif %}
       }
 
       {% if module_enrollment %}
         // Module Enroll
         {% if not enrolled_status_dict|get_dict_value_from_key:request.user.pk %}
-          $(".enrollact-{{group_object.pk}}").val("Enroll").attr("title", "Enroll into this Module")
+          $(".enrollact-{{group_object.pk}}").val("Enroll").attr("title", "Enroll ")
         {% endif %}
       {% else %}
         // Unit Enroll
         {% if request.user.pk not in group_object.author_set %}
-          $(".enrollact-{{group_object.pk}}").val("Enroll").attr("title", "Enroll into this Module")
+          $(".enrollact-{{group_object.pk}}").val("Enroll").attr("title", "Enroll ")
         {% endif %}
       {% endif %}
 
@@ -147,7 +147,7 @@
 
         {% if module_enrollment %}
           {% if not enrolled_status_dict|get_dict_value_from_key:request.user.pk %}
-              $(".enrollact-{{group_object.pk}}").val("Enroll").attr("title", "Enroll into this Module")
+              $(".enrollact-{{group_object.pk}}").val("Enroll").attr("title", "Enroll ")
           {% endif %}
         {% endif %}
 
