@@ -53,7 +53,7 @@
         {% endfor %}
       {% endwith %}
 
-    <input type="button" class="orange-button right enroll_all_users-{{group_object.pk}}" onclick="enroll_all_users('{{group_object.pk}}', '{{module_enrollment}}')" "{% if 'Group' in group_object.member_of_names_list %}" value="Join All"  "{% else %}" value="Enroll ALL" "{% endif %}" >
+    <input type="button" class="pink-button right enroll_all_users-{{group_object.pk}}" title="Enroll all" onclick="enroll_all_users('{{group_object.pk}}', '{{module_enrollment}}')" "{% if 'Group' in group_object.member_of_names_list %}" value="Join All"  "{% else %}" value="Enroll All" "{% endif %}" >
     {% endif %}
     </div>
     </div>
