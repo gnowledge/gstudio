@@ -2274,6 +2274,7 @@ def course_notebook(request, group_id, node_id=None, tab="my-notes"):
     all_blogs = blog_pages = user_blogs = user_id = None
     allow_to_comment = notebook_obj = None
     create_flag = eval(request.GET.get('create', 'False'))
+    print "\ncreate_flag: ", create_flag
 
     template = 'ndf/gcourse_event_group.html'
     if 'base_unit' in group_obj.member_of_names_list:
@@ -2355,7 +2356,7 @@ def course_notebook(request, group_id, node_id=None, tab="my-notes"):
         else:
             tab = 'all-notes'
 
-        if notebook_obj:
+        if notebook_obj and not create_flag:
             # return HttpResponseRedirect(reverse('course_notebook_tab_note', 
                 # kwargs={'group_id': group_id, "node_id": notebook_obj.pk, 'tab': tab}))
             return HttpResponseRedirect(reverse('course_notebook_note', 
