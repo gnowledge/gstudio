@@ -3740,6 +3740,11 @@ $ah_2_background_color_hover: rgba(244, 244, 244, 0.3);;
         a {
             color: $ah_2_icon_color;
         }
+        @media screen and (max-width: 1024px) {
+            text-overflow:ellipsis;
+            width:267px;
+
+        }
     }
 
     .header_icon {
