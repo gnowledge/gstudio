@@ -149,6 +149,8 @@
           {% if not enrolled_status_dict|get_dict_value_from_key:request.user.pk %}
               $(".enrollact-{{group_object.pk}}").val("Enroll").attr("title", "Enroll ")
           {% endif %}
+        {% else %}
+              $(".enrollact-{{group_object.pk}}").val("Enroll").attr("title", "Enroll ")
         {% endif %}
 
     {% endif %}
