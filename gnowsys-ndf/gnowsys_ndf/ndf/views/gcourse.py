@@ -1928,6 +1928,8 @@ def enroll_to_course(request, group_id):
                             _update_user_counter(each_user_id, group_obj._id)
                     else:
                         _update_user_counter(user_id, group_obj._id)
+                response_dict["success"] = True
+
             except Exception as e:
                 pass
             return group_obj
@@ -1958,7 +1960,6 @@ def enroll_to_course(request, group_id):
             else:
                 group_obj = add_to_author_set(group_id, add_admin, user_id)
                 response_dict["member_count"] = len(group_obj.author_set)
-            response_dict["success"] = True
 
             try:
                 if isinstance(user_id, list):
@@ -1967,10 +1968,11 @@ def enroll_to_course(request, group_id):
                 else:
                     _send_notif(user_id, group_obj)
             except Exception as e:
-                print "\n Unable to send notifications ",e
+                print "\n Unable to send notifications ", e
 
         except Exception as er:
-            print "\n ERROR!!!! ",er
+            print "\n ERROR Occurred in Enrollment!! ", er
+            pass
         return HttpResponse(json.dumps(response_dict))
 
 
@@ -2272,6 +2274,7 @@ def course_notebook(request, group_id, node_id=None, tab="my-notes"):
     all_blogs = blog_pages = user_blogs = user_id = None
     allow_to_comment = notebook_obj = None
     create_flag = eval(request.GET.get('create', 'False'))
+    print "\ncreate_flag: ", create_flag
 
     template = 'ndf/gcourse_event_group.html'
     if 'base_unit' in group_obj.member_of_names_list:
@@ -2353,7 +2356,7 @@ def course_notebook(request, group_id, node_id=None, tab="my-notes"):
         else:
             tab = 'all-notes'
 
-        if notebook_obj:
+        if notebook_obj and not create_flag:
             # return HttpResponseRedirect(reverse('course_notebook_tab_note', 
                 # kwargs={'group_id': group_id, "node_id": notebook_obj.pk, 'tab': tab}))
             return HttpResponseRedirect(reverse('course_notebook_note', 
