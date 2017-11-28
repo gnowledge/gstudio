@@ -3712,6 +3712,7 @@ $ah_2_background_color_hover: rgba(244, 244, 244, 0.3);;
     background-color: $ah_2_background_color;
     box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.1);
     >div {
+
         height: $activity-header-height;
         line-height: $activity-header-height;
         display: inline-block;
@@ -3727,6 +3728,20 @@ $ah_2_background_color_hover: rgba(244, 244, 244, 0.3);;
         }
     }
 
+    .header_title {
+        position: relative;
+        color: #fff;
+        font-weight: 500;
+        font-size: 20px;
+        letter-spacing: 0.6px;
+        padding: 0px 15px;
+        margin-left: -2px;
+        border-right: 1px solid white;
+        a {
+            color: $ah_2_icon_color;
+        }
+    }
+
     .header_icon {
         font-size: 16px;
         line-height: $activity-header-height;
@@ -3739,52 +3754,86 @@ $ah_2_background_color_hover: rgba(244, 244, 244, 0.3);;
         cursor: pointer;
         text-align: center;
     }
-
-    .header_text_block {
-        padding: 0px 15px;
-        margin-left: -2px;
-        border-right: 1px solid white;
-        a {
-            color: $ah_2_icon_color;
+    .header_text_sm_block{
+        padding: 0px 10px;
+        @media screen and (min-width: 1025px) {
+            padding: 0px 15px;
         }
     }
 
-    .back_button {
-        border-color: $activity-border-color;
-        background-color: $ah_2_background_color_hover;
-        i {
-            color: #71318b;
-        }
-    }
+    .lesson-nav{
+        @media screen and (min-width: 1025px) {
+            float: right;
+            margin-right:70px;
+            background-color: $ah_2_background_color;
 
-    .settings {
-        i {
-            transition: transform .5s ease-in-out;
-            -webkit-transition: -webkit-transform .5s ease-in-out;
         }
-        &:hover i{
-            transform: rotate(90deg);
-            -webkit-transform: rotate(90deg);
+
+        @media screen and (max-width: 1024px) {
+            background-color: $ah_2_background_color;
+
         }
-    }
-    .header_title {
-        position: relative;
-        color: #fff;
-        font-weight: 500;
-        font-size: 18px;
-        letter-spacing: 0.6px;
-        //width: calc(100% - 676px);
-        //width:880px;
-    }
-    .pagination {
-        &:not(i) {
-            color: #a983b9;
+
+        div{
+            height: 45px;
+            line-height: 45px;
+            display: inline-block;
+            vertical-align: top;
         }
-    }
+        .header_text_block {
+            padding: 0px 15px;
+            margin-left: -2px;
+            border-right: 1px solid white;
+            a {
+                color: $ah_2_icon_color;
+            }
 
 
+        }
+        .header_text_lg_block{
+            padding: 0px 9px;
+            @media screen and (min-width: 1025px){
+            padding: 0px 15px;
+                
+            }
+        
+        }
+        .header_text_md_block{
+            padding: 0px 7px;
+            @media screen and (min-width: 1025px){
+            padding: 0px 15px;
+                
+            }
+        
+        }
+
+        .back_button {
+            border-color: $activity-border-color;
+            background-color: $ah_2_background_color_hover;
+            i {
+                color: #71318b;
+            }
+        }
+
+        .settings {
+            i {
+                transition: transform .5s ease-in-out;
+                -webkit-transition: -webkit-transform .5s ease-in-out;
+            }
+            &:hover i{
+                transform: rotate(90deg);
+                -webkit-transform: rotate(90deg);
+            }
+        }
+        .pagination {
+            &:not(i) {
+                color: #a983b9;
+            }
+        }
+    }
 
 }
+
 
 .float-right{
     float:right;
