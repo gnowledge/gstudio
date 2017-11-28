@@ -1564,6 +1564,22 @@ input[type="button"] {
     }
 }
 
+.pink-button{
+    background: #a2238d;
+    height: 37px;
+    text-align: center;
+    color: #ffffff;
+    font-size: 19px;
+    border: 2px solid rgba(43, 51, 63, 0.42);
+    border-radius: 5px;
+    width: 120px !important;
+    margin-top: 2px !important;
+    letter-spacing: 0.4px;
+    &:hover {
+                    box-shadow: 0px 0px 17px rgba(0, 0, 0, 0.68);
+                }
+}
+
 .orange-button-template{
     color: $primary-orange;
     padding: 7px 14px;
