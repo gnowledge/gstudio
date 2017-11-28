@@ -49,6 +49,7 @@
         var visited_nodes = {{visited_nodes|safe}}
         var visited_nodes_ids  = Object.keys(visited_nodes)
         var course_data = {{unit_structure|safe}};
+        console.log(course_data)
         $('#tree1').tree({
             data: course_data,
             autoOpen: false,
