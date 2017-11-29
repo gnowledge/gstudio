@@ -88,24 +88,24 @@
 </div>
 
 <div class="lms_secondary_header">
-<div class="small-10 medium-9 large-10 columns">
+<div class="small-10 medium-9 large-10 columns" style="border-bottom: 1px solid #00000029;">
  
   <ul class="nav_menu_1">
     <li>
-      <a href="{% url 'course_about' group_id %}" {% if title == 'about' %}class="selected"{% endif %} tabindex="1">
-      {% trans "Overview" %}</a> 
+      <a href="{% url 'course_about' group_id %}" {% if title == 'about' %}class="selected"{% endif %} tabindex="1" title="Course Summary">
+      {% trans "Overview" %} </a> 
     </li>
     <li>
-      <a href="{% url 'course_content' group_id %}" {% if title == 'course content' %}class="selected"{% endif %} tabindex="2">
+      <a href="{% url 'course_content' group_id %}" {% if title == 'course content' %}class="selected"{% endif %} tabindex="2" title="List of all the lessons">
       {% if not group_object.project_config.tab_name %}{% trans "Lessons" %}{% else %}{{group_object.project_config.tab_name}} {% endif %}</a> 
      </li>
     {% if 'Group' not in group_object.member_of_names_list %}
-    <li>  <a href="{% url 'course_raw_material' group_id %}" {% if title == 'raw material' or title == "raw_material_detail"  %}class="selected"{% endif %} tabindex="3">{% trans "Resources" %}</a> </li>
+    <li>  <a href="{% url 'course_raw_material' group_id %}" {% if title == 'raw material' or title == "raw_material_detail"  %}class="selected"{% endif %} tabindex="3" title="Contains useful files such as images, audios, videos etc.">{% trans "Resources" %}</a> </li>
     {% endif %}
     <li>
-    <li>  <a  href="{% url 'course_gallery' group_id %}" {% if title == 'gallery' or title == "asset_gallery_detail" %} class="selected" {% endif %} tabindex="4"> {% if 'Group'  in group_object.member_of_names_list %} {% trans "E-Library" %} {% else %} {% trans "Gallery" %}{% endif %}</a> </li>
+    <li>  <a  href="{% url 'course_gallery' group_id %}" {% if title == 'gallery' or title == "asset_gallery_detail" %} class="selected" {% endif %} tabindex="4" title="Upload and share your files such as images, audios, videos, spreadsheets"> {% if 'Group'  in group_object.member_of_names_list %} {% trans "E-Library" %} {% else %} {% trans "Gallery" %}{% endif %}</a> </li>
     <li>
-      <a href="{% url 'course_notebook' group_id %}" {% if title == 'notebook' %}class="selected"{% endif %} tabindex="5">
+      <a href="{% url 'course_notebook' group_id %}" {% if title == 'notebook' %}class="selected"{% endif %} tabindex="5" title="Create and share notes, read notes shared by all students">
       {% if 'Group' in group_object.member_of_names_list %}
         {% trans "Blog" %} 
       {% else %}
@@ -120,7 +120,7 @@
     {% endif %}
   </ul>
 </div>
-  <div class="small-1 medium-2 large-2 columns enroll-unit">
+  <div class="small-1 medium-2 large-2 columns enroll-unit" style="border-bottom: 1px solid #00000029;">
     {% if request.user.is_authenticated %}
       {% include 'ndf/widget_enroll.html' %}
     {% endif %}
