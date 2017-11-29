@@ -976,6 +976,7 @@ ul.horizontal_tabs_gstudio {
               margin: 0px 10px 0px 0px;
               cursor: pointer;
               border-radius: 3px;
+              margin-left:130px;
     }
 
     .course_actions>i{
@@ -2460,7 +2461,7 @@ ul.jqtree-tree .jqtree-toggler {
       border-right: 1px solid #AFAEAE;
       padding: 4px 0px;
       background-color: #F1F1F1;
-      //margin-top:-45px;
+      margin-top:-45px;
 
       .tabs-content {
         padding: 0px;
@@ -5076,7 +5077,7 @@ $module-card-lines-to-show: 3;
 
 
             .course_actions>span{
-              //margin-right: 5px;
+              margin-right: 150px;
               background: rgb(46, 63, 81);
               border: 1px solid rgba(255, 255, 255, 0.7);
               padding: 1px 8px;
@@ -5091,7 +5092,7 @@ $module-card-lines-to-show: 3;
             }
 
             .course_actions>i{
-              margin-right: 3px;
+              margin-right: 130px;
               background: rgba(0, 0, 0, 0.6);
               border: 1px solid rgba(255, 255, 255, 0.7);
               padding: 1px 8px;
@@ -6245,6 +6246,7 @@ ul.nav_menu_1 {
 }
 
 #course-settings-drop{
+    margin-left:130px;
 
     li{
             a{
