@@ -5079,36 +5079,6 @@ $module-card-lines-to-show: 3;
             .right-margin{
                     margin-right: 46px;
             }
-
-
-            .course_actions>span{
-              margin-right: 150px;
-              background: rgb(46, 63, 81);
-              border: 1px solid rgba(255, 255, 255, 0.7);
-              padding: 1px 8px;
-              color: #fff;
-              font-size: 12px;
-              margin: 0px 10px 0px 0px;
-              cursor: pointer;
-              border-radius: 3px;
-              opacity:0.8;
-              margin-top:90px;
-        
-            }
-
-            .course_actions>i{
-              margin-right: 130px;
-              background: rgba(0, 0, 0, 0.6);
-              border: 1px solid rgba(255, 255, 255, 0.7);
-              padding: 1px 8px;
-              color: #fff;
-              font-size: 12px;
-              margin: 0px 10px 0px 0px;
-              cursor: pointer;
-              border-radius: 3px;
-            }
-
-            
         }
     }
 }
@@ -5126,6 +5096,24 @@ $module-card-lines-to-show: 3;
     color: #fff;
     box-shadow: 0 0 2px 0 rgba(0, 0, 0, 0.2);
     border-bottom: 1px solid rgba(0, 0, 0, 0.25);
+    .course_actions{
+        margin-top: 8px;
+
+        >span{
+          margin-left: 130px;
+          background: rgb(46, 63, 81);
+          border: 1px solid rgba(255, 255, 255, 0.7);
+          padding: 1px 8px;
+          color: #fff;
+          font-size: 23px;
+          cursor: pointer;
+          border-radius: 3px;
+          opacity:0.8;
+
+        }
+    }
+
+
 }
 $nav_menu_1_color: #164a7b;
 $nav_menu_1_bg_color: #fff;
@@ -6251,8 +6239,6 @@ ul.nav_menu_1 {
 }
 
 #course-settings-drop{
-    margin-left:130px;
-
     li{
             a{
 
