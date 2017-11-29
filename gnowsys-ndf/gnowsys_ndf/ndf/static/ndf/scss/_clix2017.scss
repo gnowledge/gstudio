@@ -4855,8 +4855,10 @@ $module-card-lines-to-show: 3;
         display: table-cell;
         height: 290px;
     }
+
     .card_banner {
-        width: 300px;
+        width: 250px;
+        height:290px;
         vertical-align: middle;
         overflow: hidden;
         background-size: 100% 100%;
@@ -4901,6 +4903,7 @@ $module-card-lines-to-show: 3;
 
     .card_title {
         display: block;
+        width:230px;
         font-size: 32px;
         font-weight: 600;
         text-align: center;
@@ -5925,6 +5928,11 @@ ul.nav_menu_1 {
   vertical-align: middle;
 }
 
+footer {
+  
+  position: relative;
+  bottom:0
+}
 
 /*##### Footer Responsive #####*/
 /* for 980px or less */
@@ -6332,3 +6340,6 @@ ul.nav_menu_1 {
     margin-left: 0.5em;
 }
 
+
+
+// STicky bottom footer 
