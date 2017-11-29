@@ -89,9 +89,9 @@
 
       success: function(data){
         success_state = data["success"]
-        // if(success_state){
-        //   location.reload();
-        // }
+        if(success_state){
+          location.reload();
+        }
       },
     });//end of ajax
   }
@@ -148,6 +148,12 @@
         {% if module_enrollment %}
           {% if not enrolled_status_dict|get_dict_value_from_key:request.user.pk %}
               $(".enrollact-{{group_object.pk}}").val("Enroll").attr("title", "Enroll ")
+          {% endif %}
+        {% else %}
+          {% if request.user.pk not in group_object.author_set %}
+            $(".enrollact-{{group_object.pk}}").val("Enroll").attr("title", "Enroll")
+          {% else %}
+            $(".enrollact-{{group_object.pk}}").val("Enrolled").attr("title", "You are enrolled")
           {% endif %}
         {% endif %}
 
