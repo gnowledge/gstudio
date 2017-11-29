@@ -5100,7 +5100,6 @@ $module-card-lines-to-show: 3;
         margin-top: 8px;
 
         >span{
-          margin-left: 130px;
           background: rgb(46, 63, 81);
           border: 1px solid rgba(255, 255, 255, 0.7);
           padding: 1px 8px;
@@ -5111,10 +5110,29 @@ $module-card-lines-to-show: 3;
           opacity:0.8;
 
         }
+
+        @media screen and (min-width: 980px) and (max-width: 1000px){
+
+          .course_actions{
+                margin-top: 8px;
+
+                >span{
+                  margin-left: 50px;
+                  background: rgb(46, 63, 81);
+                  border: 1px solid rgba(255, 255, 255, 0.7);
+                  padding: 1px 8px;
+                  color: #fff;
+                  font-size: 23px;
+                  cursor: pointer;
+                  border-radius: 3px;
+                  opacity:0.8;
+
+                }
+            }
+        }
     }
-
-
 }
+
 $nav_menu_1_color: #164a7b;
 $nav_menu_1_bg_color: #fff;
 $nav_menu_1_tab_border: #a2238d;
