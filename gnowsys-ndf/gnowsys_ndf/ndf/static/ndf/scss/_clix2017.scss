@@ -2345,10 +2345,10 @@ ul.jqtree-tree .jqtree-toggler {
 
 .notebook {
   .notebook-header {
-    border-color: black;
-    border-style: solid;
-    border-width: 1px 0px;
-    padding-top: 1em;
+    // border-color: black;
+    // border-style: solid;
+    // border-width: 1px 0px;
+    // padding-top: 1em;
 
     a, input {
       margin: 0px;
@@ -2460,6 +2460,7 @@ ul.jqtree-tree .jqtree-toggler {
       border-right: 1px solid #AFAEAE;
       padding: 4px 0px;
       background-color: #F1F1F1;
+      margin-top:-45px;
 
       .tabs-content {
         padding: 0px;
@@ -2566,10 +2567,10 @@ ul.jqtree-tree .jqtree-toggler {
 
     .note-page {
       // display: none;
-      color: #000000;
+      //color: #000000;
       margin-left: 15px;
       background-color: #fff;
-      padding-bottom: 30px;
+      //padding-bottom: 30px;
       .group_sections_content{
         margin-top:5px;
       }
@@ -2602,6 +2603,7 @@ ul.jqtree-tree .jqtree-toggler {
       }
       .note-title {
         // //font-size: 2.3em;
+        font-size: 20px;
         font-weight: 500;
         margin-right: 1em;
       }
@@ -5107,7 +5109,9 @@ $module-card-lines-to-show: 3;
 
 
 
-            
+.border-bottom-lms-header{
+    border-bottom: 1px solid #00000029;
+}         
 
 
 .lms_secondary_header{
@@ -5928,11 +5932,7 @@ ul.nav_menu_1 {
   vertical-align: middle;
 }
 
-footer {
-  
-  position: relative;
-  bottom:0
-}
+
 
 /*##### Footer Responsive #####*/
 /* for 980px or less */
