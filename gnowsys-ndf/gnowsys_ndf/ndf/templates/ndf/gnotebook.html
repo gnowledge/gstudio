@@ -9,7 +9,7 @@
 
 {% include 'ndf/widget_user_access_modal.html' %}
 
-<div class="small-12 columns" style="border:2px solid #80808038;">
+<div class="small-12 medium-12 large-12 columns" style="border:2px solid #80808038;">
       {% if "CourseEventGroup" in node.member_of_names_list %}
         {% get_course_filters group_id title as filter_dict %}
         <input type="hidden"  class="title-for-filters" value="notebook">
@@ -18,7 +18,9 @@
         {% get_course_filters group_id "notebook_lms" as filter_dict %}
       {% endif %}
     {% include "ndf/filters.html" with filter_dict=filter_dict %}
+
 </div>
+
 
 <div class="notebook">
     {% comment %}
@@ -199,7 +201,6 @@
                {% endif %}
            </div>
         </div>
-    </div>
 </div>
 
 {# {% include "ndf/add_new_note.html" %} #}
