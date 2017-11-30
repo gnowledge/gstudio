@@ -58,7 +58,7 @@
                 </li>
           
             {% if user.is_authenticated %}
-                <li class="has-dropdown buddy_margin white-text" style="margin-right: auto;">
+                <li class="has-dropdown buddy_margin white-text" style="margin-right: auto;"  title="{{ user.username }}">
                     {% get_profile_pic request.user.pk as prof_pic %}
                     <!-- <a href="{% url 'dashboard' request.user.pk %}"> -->
                     
