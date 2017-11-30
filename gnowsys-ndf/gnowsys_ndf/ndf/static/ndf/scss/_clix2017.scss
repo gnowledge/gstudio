@@ -3758,16 +3758,77 @@ $ah_2_background_color_hover: rgba(244, 244, 244, 0.3);;
         a {
             color: $ah_2_icon_color;
         }
-        @media screen and (max-width: 1024px) and (min-width: 1000px) {
-            text-overflow:ellipsis;
-            width:267px;
+
+        @media only screen and (min-device-width : 1025px) and (max-device-width : 2130px) {
+        // /* Styles */
+                 text-overflow:ellipsis;
+                width:calc(100% - 938px);
 
         }
-        @media screen and (min-width: 1025px) and (max-width: 1440px){
-            text-overflow:ellipsis;
-            width:205px;
+
+        @media only screen and (min-device-width : 2131px) {
+        // /* Styles */
+                 text-overflow:ellipsis;
+                width:calc(100% - 970px);
 
         }
+
+        @media only screen and (max-device-width : 1024px) {
+        // /* Styles */
+                 text-overflow:ellipsis;
+                width:calc(100% - 753px);
+
+        }
+        
+
+        
+        // /* iPads (portrait and landscape) ----------- */
+        // @media only screen and (min-device-width : 768px) and (max-device-width : 1024px) {
+        // /* Styles */
+        //     text-overflow:ellipsis;
+        //     width:267px;
+
+        // }
+
+        // @media only screen and (min-device-width : 1024px) and (max-device-width : 1190px) {
+        // /* Styles */
+        //     text-overflow:ellipsis;
+        //     width:267px;
+
+        // }
+        // /* Galaxy Tab 2 (portrait and landscape) ----------- */
+        // @media only screen and (min-device-width : 1200px) and (max-device-width : 1220px) {
+        // /* Styles */
+        //         width: 341px;
+        //         text-overflow: ellipsis;
+        // }
+
+
+        // Desktops and laptops -----------
+        // @media only screen  and (min-width : 1224px) {
+        // /* Styles */
+        //         width: 363px;
+        //         text-overflow: ellipsis;
+        // }
+        // @media only screen  and (min-width : 1330px) {
+        // /* Styles */
+        //         width: 474px;
+        //         text-overflow: ellipsis;
+        // }
+        // /* Large screens ----------- */
+        // @media only screen  and (min-width : 1440px) and (max-width:1880px) {
+        // /* Styles */
+        //         width: 902px;
+        //         text-overflow: ellipsis;
+        // }
+        
+
+        // @media only screen  and (min-width : 2122px) {
+        // /* Styles */
+        //         width: 1180px;
+        //         text-overflow: ellipsis;
+        // }
+        
 
     }
 
