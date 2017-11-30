@@ -976,6 +976,7 @@ ul.horizontal_tabs_gstudio {
               margin: 0px 10px 0px 0px;
               cursor: pointer;
               border-radius: 3px;
+              margin-left:130px;
     }
 
     .course_actions>i{
@@ -2345,10 +2346,10 @@ ul.jqtree-tree .jqtree-toggler {
 
 .notebook {
   .notebook-header {
-    border-color: black;
-    border-style: solid;
-    border-width: 1px 0px;
-    padding-top: 1em;
+    // border-color: black;
+    // border-style: solid;
+    // border-width: 1px 0px;
+    // padding-top: 1em;
 
     a, input {
       margin: 0px;
@@ -2566,10 +2567,10 @@ ul.jqtree-tree .jqtree-toggler {
 
     .note-page {
       // display: none;
-      color: #000000;
+      //color: #000000;
       margin-left: 15px;
       background-color: #fff;
-      padding-bottom: 30px;
+      //padding-bottom: 30px;
       .group_sections_content{
         margin-top:5px;
       }
@@ -2602,6 +2603,7 @@ ul.jqtree-tree .jqtree-toggler {
       }
       .note-title {
         // //font-size: 2.3em;
+        font-size: 20px;
         font-weight: 500;
         margin-right: 1em;
       }
@@ -3756,11 +3758,78 @@ $ah_2_background_color_hover: rgba(244, 244, 244, 0.3);;
         a {
             color: $ah_2_icon_color;
         }
-        @media screen and (max-width: 1024px) {
-            text-overflow:ellipsis;
-            width:267px;
+
+        @media only screen and (min-device-width : 1025px) and (max-device-width : 2130px) {
+        // /* Styles */
+                 text-overflow:ellipsis;
+                width:calc(100% - 938px);
 
         }
+
+        @media only screen and (min-device-width : 2131px) {
+        // /* Styles */
+                 text-overflow:ellipsis;
+                width:calc(100% - 970px);
+
+        }
+
+        @media only screen and (max-device-width : 1024px) {
+        // /* Styles */
+                 text-overflow:ellipsis;
+                width:calc(100% - 753px);
+
+        }
+        
+
+        
+        // /* iPads (portrait and landscape) ----------- */
+        // @media only screen and (min-device-width : 768px) and (max-device-width : 1024px) {
+        // /* Styles */
+        //     text-overflow:ellipsis;
+        //     width:267px;
+
+        // }
+
+        // @media only screen and (min-device-width : 1024px) and (max-device-width : 1190px) {
+        // /* Styles */
+        //     text-overflow:ellipsis;
+        //     width:267px;
+
+        // }
+        // /* Galaxy Tab 2 (portrait and landscape) ----------- */
+        // @media only screen and (min-device-width : 1200px) and (max-device-width : 1220px) {
+        // /* Styles */
+        //         width: 341px;
+        //         text-overflow: ellipsis;
+        // }
+
+
+        // Desktops and laptops -----------
+        // @media only screen  and (min-width : 1224px) {
+        // /* Styles */
+        //         width: 363px;
+        //         text-overflow: ellipsis;
+        // }
+        // @media only screen  and (min-width : 1330px) {
+        // /* Styles */
+        //         width: 474px;
+        //         text-overflow: ellipsis;
+        // }
+        // /* Large screens ----------- */
+        // @media only screen  and (min-width : 1440px) and (max-width:1880px) {
+        // /* Styles */
+        //         width: 902px;
+        //         text-overflow: ellipsis;
+        // }
+        
+
+        // @media only screen  and (min-width : 2122px) {
+        // /* Styles */
+        //         width: 1180px;
+        //         text-overflow: ellipsis;
+        // }
+        
+
     }
 
     .header_icon {
@@ -4855,8 +4924,10 @@ $module-card-lines-to-show: 3;
         display: table-cell;
         height: 290px;
     }
+
     .card_banner {
-        width: 300px;
+        width: 250px;
+        height:290px;
         vertical-align: middle;
         overflow: hidden;
         background-size: 100% 100%;
@@ -4901,6 +4972,7 @@ $module-card-lines-to-show: 3;
 
     .card_title {
         display: block;
+        width:230px;
         font-size: 32px;
         font-weight: 600;
         text-align: center;
@@ -5068,43 +5140,15 @@ $module-card-lines-to-show: 3;
             .right-margin{
                     margin-right: 46px;
             }
-
-
-            .course_actions>span{
-              //margin-right: 5px;
-              background: rgb(46, 63, 81);
-              border: 1px solid rgba(255, 255, 255, 0.7);
-              padding: 1px 8px;
-              color: #fff;
-              font-size: 12px;
-              margin: 0px 10px 0px 0px;
-              cursor: pointer;
-              border-radius: 3px;
-              opacity:0.8;
-              margin-top:90px;
-        
-            }
-
-            .course_actions>i{
-              margin-right: 3px;
-              background: rgba(0, 0, 0, 0.6);
-              border: 1px solid rgba(255, 255, 255, 0.7);
-              padding: 1px 8px;
-              color: #fff;
-              font-size: 12px;
-              margin: 0px 10px 0px 0px;
-              cursor: pointer;
-              border-radius: 3px;
-            }
-
-            
         }
     }
 }
 
 
 
-            
+.border-bottom-lms-header{
+    border-bottom: 1px solid #00000029;
+}         
 
 
 .lms_secondary_header{
@@ -5113,7 +5157,43 @@ $module-card-lines-to-show: 3;
     color: #fff;
     box-shadow: 0 0 2px 0 rgba(0, 0, 0, 0.2);
     border-bottom: 1px solid rgba(0, 0, 0, 0.25);
+    .course_actions{
+        margin-top: 8px;
+
+        >span{
+          background: rgb(46, 63, 81);
+          border: 1px solid rgba(255, 255, 255, 0.7);
+          padding: 1px 8px;
+          color: #fff;
+          font-size: 23px;
+          cursor: pointer;
+          border-radius: 3px;
+          opacity:0.8;
+
+        }
+
+        @media screen and (min-width: 980px) and (max-width: 1000px){
+
+          .course_actions{
+                margin-top: 8px;
+
+                >span{
+                  margin-left: 50px;
+                  background: rgb(46, 63, 81);
+                  border: 1px solid rgba(255, 255, 255, 0.7);
+                  padding: 1px 8px;
+                  color: #fff;
+                  font-size: 23px;
+                  cursor: pointer;
+                  border-radius: 3px;
+                  opacity:0.8;
+
+                }
+            }
+        }
+    }
 }
+
 $nav_menu_1_color: #164a7b;
 $nav_menu_1_bg_color: #fff;
 $nav_menu_1_tab_border: #a2238d;
@@ -5926,6 +6006,7 @@ ul.nav_menu_1 {
 }
 
 
+
 /*##### Footer Responsive #####*/
 /* for 980px or less */
 @media screen and (max-width: 980px) {
@@ -6237,7 +6318,6 @@ ul.nav_menu_1 {
 }
 
 #course-settings-drop{
-
     li{
             a{
 
@@ -6332,3 +6412,6 @@ ul.nav_menu_1 {
     margin-left: 0.5em;
 }
 
+
+
+// STicky bottom footer 
