@@ -577,11 +577,11 @@ def get_metadata_values(metadata_type=None):
 
 @get_execution_time
 @register.assignment_tag
-def get_attribute_value(node_id, attr_name, get_data_type=False):
+def get_attribute_value(node_id, attr_name, get_data_type=False, use_cache=True):
     cache_key = str(node_id) + 'attribute_value' + str(attr_name)
     cache_result = cache.get(cache_key)
 
-    if (cache_key in cache) and not get_data_type:
+    if (cache_key in cache) and not get_data_type and use_cache:
         return cache_result
 
     attr_val = ""
