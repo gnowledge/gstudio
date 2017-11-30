@@ -2274,7 +2274,6 @@ def course_notebook(request, group_id, node_id=None, tab="my-notes"):
     all_blogs = blog_pages = user_blogs = user_id = None
     allow_to_comment = notebook_obj = None
     create_flag = eval(request.GET.get('create', 'False'))
-    print "\ncreate_flag: ", create_flag
 
     template = 'ndf/gcourse_event_group.html'
     if 'base_unit' in group_obj.member_of_names_list:
