@@ -71,11 +71,11 @@
                 </div>
 
             {% endfor %}
-            <div class="row">
-                <input type="submit" class="small-2 columns right orange-button" id="" value="Save"/>
+            <div class="row" style="margin-left: 2px;">
+                <input type="submit" class="small-2 columns pink-button" style="border-radius: 5px;" value="Save"/>
 
                 {% if cancel_url %}
-                    <a class="small-2 small-push-1 columns text-center orange-button" href="{{cancel_url}}">{% trans "Cancel" %}</a>
+                    <a class="small-2 small-push-1 columns pink-button" href="{{cancel_url}}" style="color:white"> <i class="fa fa-times" aria-hidden="true"></i> {% trans "Cancel" %}</a>
                 {% endif %}
             </div>
         </form>
