@@ -670,7 +670,7 @@ h5{
         }
         .top-bar-section {
             ul.left li>a {
-                padding: 0px 30px;
+                padding: 0px 20px;
                     &.active{
                     color:#fff;
                     font-size: 17px;
@@ -701,7 +701,7 @@ h5{
                         }
                     }
                     &.has-dropdown {
-                        a:not(.button) {
+                        a:not(.button) a:not(.not-click) {
                             &:hover {
                                 color: $secondry-blue;
                                 border-bottom: 0px;
@@ -4184,7 +4184,7 @@ ul.nav_menu_1 {
         >a{
             list-style-type: none;
             display: inline-block;
-            padding: 12px 12px 9px;
+            padding: 10px 10px 9px;
             color: $nav_menu_1_color;
             cursor: pointer;
             font-size: 18px;
@@ -5593,6 +5593,9 @@ ul.nav_menu_1 {
 .jqtree-title > .fa-check{
     color: green;
 }
+.jqtree-title > .fa-check-circle-o{
+    color: green;
+}
 .jqtree-title > .fa-clock-o{
     color: orange;
 }
@@ -6415,3 +6418,7 @@ ul.nav_menu_1 {
 
 
 // STicky bottom footer 
+
+.top-right-menu{
+    margin-right: 80px !important;
+}
