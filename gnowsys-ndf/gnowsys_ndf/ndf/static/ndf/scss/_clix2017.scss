@@ -303,17 +303,12 @@ h5{
         }
         .login-button {
             .button {
-              // //font-size: 15px;
-              background-color: #B1B1B1;
               font-weight: 600;
               border-bottom: 3.5px solid #DADADA;
               border-radius: 5px;
               padding: 9px;
-
-              &:hover {
-                background-color: #CC1AB5;
-                border-color: #881378;
-              }
+              background-color: #a75692;
+              border-color: #881378;
             }
         }
 
@@ -380,16 +375,15 @@ h5{
             border-radius: 5px;
             text-transform: uppercase;
             margin-left: 70px;
-            color: #ffc14e;
             padding: 6px 17px;
             font-family: "OpenSans-Semibold", sans-serif;
             margin-top: 50px;
             border: 2px solid #ffc14e;
+            color:white;
+          background-color: #a75692;
 
             &:hover{
-        background-color:rgba(255,193,78,0.3);
         cursor:pointer;
-        color:white;
     }
 
             
