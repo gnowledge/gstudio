@@ -484,6 +484,8 @@
 
           success: function(data){
             $(".note-page").html(data);
+            $("input.node_name").focus()
+            window.scrollTo(0,250);
           },
         });//end of ajax
 
