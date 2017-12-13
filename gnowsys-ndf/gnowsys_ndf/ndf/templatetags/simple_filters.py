@@ -161,9 +161,10 @@ def multiply(value,multiply_factor):
 
 
 @register.filter
-def get_dict_value_from_key(dict, key):    
+def get_dict_value_from_key(dict_obj, key):
     try:
-        return dict[key]
+        if isinstance(dict_obj, dict):
+            return dict_obj[key]
     except KeyError:
         return ''
 

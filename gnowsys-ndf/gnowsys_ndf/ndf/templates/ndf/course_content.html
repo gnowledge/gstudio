@@ -49,10 +49,12 @@
         var visited_nodes = {{visited_nodes|safe}}
         var visited_nodes_ids  = Object.keys(visited_nodes)
         var course_data = {{unit_structure|safe}};
+        console.log(course_data)
         $('#tree1').tree({
             data: course_data,
             autoOpen: false,
-            dragAndDrop: false,
+            saveState: true,
+            useContextMenu: false,
             closedIcon: $('<i class="fa fa-plus" aria-hidden="true"></i>'),
             openedIcon: $('<i class="fa fa-minus" aria-hidden="true"></i>'),
             onCreateLi: function(node, $li){
@@ -69,7 +71,7 @@
                                 if (child_key === 'id'){
                                     activity_ids.push(child_val)
                                 }
-                                $li.children('div').addClass('jqtree-toggler')
+                                $li.children('div').addClass('jqtree-toggler-lesson')
                             })
                         }
                         isLessonComplete = activity_ids.every(function(val) {
@@ -106,5 +108,9 @@
 
             }
         });
+    })
+
+    $(document).on('click', '.jqtree-toggler-lesson', function(){
+        $(this).find('.jqtree-toggler').click()
     })
 </script>

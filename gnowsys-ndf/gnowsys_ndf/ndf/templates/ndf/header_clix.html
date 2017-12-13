@@ -11,7 +11,7 @@
 <nav class="top-bar" data-topbar role="navigation" id="menu_bar_gstudio">
         <ul class="title-area">
             <li class="name show-for-medium-up">
-                <a class="loggedin-user" href="{% url 'landing_page'  %}?True">
+                <a title="About: Connected Learning Initiative (CLIx)" class="loggedin-user" href="{% url 'landing_page'  %}?True">
                 
                 <img src="{{site.SECONDARY_LOGO}}">
                 </a>
@@ -37,7 +37,7 @@
  -->             
 
                 {% if help_oid %}
-                <li class=""><a {% if title == 'Help Page'  %} class="active" {% endif %} target="_blank" href="{% url 'course_content' help_oid %}"> <i class="fa fa-info-circle"></i> Help </a></li>
+                <li class=""><a title="Click here to view FAQ Help" {% if title == 'Help Page'  %} class="active" {% endif %} target="_blank" href="{% url 'course_content' help_oid %}"> <i class="fa fa-info-circle"></i> Help </a></li>
                 {% endif %}
                 <li class="has-dropdown not-click">
                     <a href="#">
@@ -58,7 +58,7 @@
                 </li>
           
             {% if user.is_authenticated %}
-                <li class="has-dropdown buddy_margin white-text">
+                <li class="has-dropdown buddy_margin white-text" style="margin-right: auto;"  title="{{ user.username }}">
                     {% get_profile_pic request.user.pk as prof_pic %}
                     <!-- <a href="{% url 'dashboard' request.user.pk %}"> -->
                     
@@ -77,7 +77,7 @@
                         </li>
                         {% endif %}
                         <li>
-                          <a class="logout" href="{% url 'auth_logout' %}">
+                          <a title="Click here to logout" class="logout" href="{% url 'auth_logout' %}">
                             <i class="fi-power"></i> &nbsp;{% trans "Logout" %}
                           </a>
                         </li>
@@ -85,7 +85,7 @@
                 </li>
               {% else %}
                 <li>
-                    <a class="" href="{% url 'auth_login' %}" accesskey="l">
+                    <a title="Click here to login" class="" href="{% url 'auth_login' %}" accesskey="l">
                     <i class="fi-key"></i>&nbsp; {% trans "Login" %}
                   </a>
                 </li>
@@ -114,7 +114,10 @@
             {% if user.is_authenticated %}
             <ul class="right hide-for-medium-up side-bar-menu hide">
                 <li class="">
-                    <a href="{% url 'dashboard' request.user.pk %}">
+                    {% comment %}
+                    <!--<a href="{% url 'dashboard' request.user.pk %}">-->
+                        {% endcomment %}
+                    <a href="{% url 'my_desk' request.user.pk %}">
                         <i class="icons-medium fi-torso"></i>&nbsp;
                         <span>LOGGED IN BUDDIES</span>&nbsp;
                         <span class="badge badge-blue">1</span>
@@ -149,7 +152,7 @@
             {% else %}
               <ul class="right hide-for-medium-up side-bar-menu hide">
                 <li class="">
-                    <a class="" href="{% url 'auth_login' %}" accesskey="l">
+                    <a title="Click here to Login" class="" href="{% url 'auth_login' %}" accesskey="l">
                     <i class="fi-key"></i>&nbsp; {% trans "Login" %}
                   </a>
                 </li>
@@ -160,13 +163,13 @@
             <ul class="left show-for-medium-up">
                 {% if request.user.id %}
                 <li class="">
-                    <a href="{% url 'my_desk' request.user.id %}" {% if title == "my desk" %} class="active" {% endif %}>My Desk</a>
+                    <a title="Click here to view your enrolled Courses" href="{% url 'my_desk' request.user.id %}" {% if title == "my desk" %} class="active" {% endif %}>My Desk</a>
                 </li>
                 {% endif %}
-                <li><a href="{% url explore_url %}" {% if title == 'base courses' or title == "courses" or title == "drafts" %} class="active" {% endif %} > Explore</a>
+                <li><a title="Click here to view all Courses" href="{% url explore_url %}" {% if title == 'base courses' or title == "courses" or title == "drafts" %} class="active" {% endif %} > Explore</a>
                 </li>
                 <li>
-                    <a  target="_blank" href="{% url 'tools_temp' %}" {% if title == 'tools' %} class="active" {% endif %}>Interactives</a>
+                    <a  title="Click here to play games and interactives" target="_blank" href="{% url 'tools_temp' %}" {% if title == 'tools' %} class="active" {% endif %}>Interactives</a>
                 </li>
                 
             </ul>
