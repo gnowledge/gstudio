@@ -1,4 +1,4 @@
-{% load get_nroer_menu  get_user_group  get_group_object  get_existing_groups_excluded  get_profile_pic  get_gapps_iconbar user_access_policy get_user_object check_is_gstaff get_attribute_value get_sg_member_of get_relation_value get_explore_url get_test_page_oid get_gstudio_registration get_gstudio_workspace_instance from  ndf_tags %}
+{% load get_nroer_menu  get_user_group  get_group_object  get_existing_groups_excluded  get_profile_pic  get_gapps_iconbar user_access_policy get_user_object check_is_gstaff get_attribute_value get_sg_member_of get_relation_value get_explore_url get_test_page_oid get_gstudio_registration get_gstudio_workspace_instance get_unicode_lang from  ndf_tags %}
 {% load i18n %}
 {% load cache %}
 
@@ -31,7 +31,21 @@
         <section class="top-bar-section">
             <!-- Right Nav Section -->
 
-            <ul class="right show-for-medium-up">
+            <!-- Left Nav Section -->
+            <ul class="left show-for-medium-up">
+                {% if request.user.id %}
+                <li> 
+                    <a title="Click here to view your enrolled Courses" href="{% url 'my_desk' request.user.id %}" {% if title == "my desk" %} class="active" {% endif %}> <i class="fa fa-briefcase" aria-hidden="true"></i> My Desk</a>
+                </li>
+                {% endif %}
+                <li><a title="Click here to view all Courses" href="{% url explore_url %}" {% if title == 'base courses' or title == "courses" or title == "drafts" %} class="active" {% endif %} ><i class="fa fa-binoculars" aria-hidden="true"></i> Explore</a>
+                </li>
+                <li>
+                    <a  title="Click here to play games and interactives" target="_blank" href="{% url 'tools_temp' %}" {% if title == 'tools' %} class="active" {% endif %}> <i class="fi-die-three" aria-hidden="true" style="font-size:20px;"></i> Interactives</a>
+                </li>
+                
+            </ul>
+            <ul class="right show-for-medium-up top-right-menu">
 <!--                 <li class=""><a href="#">Blog</a></li>
                 <li class=""><a href="#"><i class="icons-medium fi-info"></i>&nbsp;Help Topics</a></li>
  -->             
@@ -39,9 +53,9 @@
                 {% if help_oid %}
                 <li class=""><a title="Click here to view FAQ Help" {% if title == 'Help Page'  %} class="active" {% endif %} target="_blank" href="{% url 'course_content' help_oid %}"> <i class="fa fa-info-circle"></i> Help </a></li>
                 {% endif %}
-                <li class="has-dropdown not-click">
-                    <a href="#">
-                    {% trans "Language" %}&nbsp; | &nbsp; {{request.LANGUAGE_CODE}}
+                <li class="has-dropdown not-click" title="Choose Language">
+                    <a href="#"> <i class="fa fa-globe" aria-hidden="true"></i>
+                    {{request.LANGUAGE_CODE|get_unicode_lang}}
                     </a>
                     <ul class="dropdown">
                         {% for lang in LANGUAGES %}
@@ -49,8 +63,8 @@
                                 <form action="/i18n/setlang/" method="POST">
                                 {% csrf_token %}
                                 <input name="url" type="hidden" value="{{request.get_full_path}}"/>
-                                <input type="hidden"  name="language" value="{{ lang.0 }}">
-                                <input type="submit"   class="button expand secondary" value="{{ lang.1 }}"/>
+                                <input type="hidden" name="language" value="{{ lang.0 }}">
+                                <input type="submit" class="button expand secondary" value="{{ lang.1 }}"/>
                                 </form>
                             </li>
                         {% endfor %}
@@ -92,13 +106,13 @@
               {% endif %}
             </ul>
             <ul class="right hide-for-medium-up dropdown-menu hide">
-                <li class=""><a href="#">My Desk</a></li>
-                <li><a  class="{%if title == 'courses'%}active{%endif%}" href="{% url explore_url %}">Explore </a></li>
+                <li class=""><a href="#"> <i class="fa fa-briefcase" aria-hidden="true"></i> My Desk</a></li>
+                <li><a  class="{%if title == 'courses'%}active{%endif%}" href="{% url explore_url %}"> <i class="fa fa-binoculars" aria-hidden="true"></i> Explore </a></li>
                 <li class=""><a href="#"> Blog</a></li>
                 <li class=""><a href="#"><i class="fi-info"></i> Help Topics</a></li>
                 <!--li class="has-dropdown not-click">
                     <ul class="dropdown">
-                        <!--li class="title back js-generated">
+                        <li class="title back js-generated">
                             <h5>
                                 <a href="javascript:void(0)">Back</a>
                             </h5>
@@ -159,20 +173,6 @@
             </ul>
             {% endif %}
 
-            <!-- Left Nav Section -->
-            <ul class="left show-for-medium-up">
-                {% if request.user.id %}
-                <li class="">
-                    <a title="Click here to view your enrolled Courses" href="{% url 'my_desk' request.user.id %}" {% if title == "my desk" %} class="active" {% endif %}>My Desk</a>
-                </li>
-                {% endif %}
-                <li><a title="Click here to view all Courses" href="{% url explore_url %}" {% if title == 'base courses' or title == "courses" or title == "drafts" %} class="active" {% endif %} > Explore</a>
-                </li>
-                <li>
-                    <a  title="Click here to play games and interactives" target="_blank" href="{% url 'tools_temp' %}" {% if title == 'tools' %} class="active" {% endif %}>Interactives</a>
-                </li>
-                
-            </ul>
           </section>
     </nav>
     <script type="text/javascript">
