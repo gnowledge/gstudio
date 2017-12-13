@@ -4187,6 +4187,7 @@ ul.nav_menu_1 {
         
 
             &.selected, &:hover{
+                font-weight: bold;
                 border-bottom: 3px solid $nav_menu_1_tab_border;
             }
         }

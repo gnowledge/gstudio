@@ -33,7 +33,7 @@
             <ul class="left show-for-medium-up">
                 {% if request.user.is_authenticated %}
                     <li> 
-                        <a title="Click here to view your enrolled Courses" href="{% url 'my_desk' request.user.id %}" {% if title == "my desk" %} class="active" {% endif %}> <i class="fa fa-briefcase" aria-hidden="true"></i> My Desk</a>
+                        <a title="Click here to view your enrolled Courses" href="{% url 'my_desk' request.user.id %}" {% if title == "my desk" or title == "my performance" %} class="active" {% endif %}> <i class="fa fa-briefcase" aria-hidden="true"></i> My Desk</a>
                     </li>
                 {% endif %}
             
