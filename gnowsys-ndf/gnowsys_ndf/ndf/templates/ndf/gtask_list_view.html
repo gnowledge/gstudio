@@ -13,35 +13,36 @@
                 </div>
             </div>
             
-            {% for each in TASK_inst %}
-              <ul class="inline-list task_ex">
-                 <div class="{{each.id}}">
-                  <li class="large-5 columns">
-                        <form>
-                            <input type="checkbox" name="task" value="task" style="margin-right: 5px;"> {{each.Name}} 
-                        </form>
-                  </li>
-                  <li class="large-1 columns">
-                        <a href="#" style="color: black;">{{each.Assignee.0}}</a>
-                  </li>
-                  <li class="large-2 columns">
-                    <div class="small-2 columns">
-                        <a href="#" style="color: black;" class="circle-{{each.Priority|lower}}"></a>
-                    </div>
-                    <div class="small-9 columns priority-margin">
-                    {{each.Priority}}
-                    </div>
-                  </li>
-                  <li>
-                    <a class="status-indication" title="completed">{{each.Status}}</a>
-                  </li>
-                  <li><a href="#" class="iconclr"><i class="fa fa-pencil "></i></a></li>
-                  {% if each.owner == 'owner'  or is_gstaff %}
-                  <li class="delete-task"><a  class="iconclr" onclick="deleteTask('{{each.id}}')"><i class="fa fa-trash " ></i></a></li>
-                  {% endif %}
-                  </div>
-              </ul>
-            {% endfor %}
+
+            <table style="margin-left:-5px;" class="small-12 columns">
+              <thead>
+                <tr>
+                  <th width="600">Task Name</th>
+                  <th width="150">Task Owner</th>
+                  <th width="150">Task Priority</th>
+                  <th width="150">Task status</th>
+                  <th width="150">Edit Task</th>
+                  <th width="150">Delete Task</th>
+                </tr>
+              </thead>
+              {% for each in TASK_inst %}
+                <tbody class="{{each.id}}">
+                  <tr>
+                    
+                    <td><input type="checkbox" name="task" value="task"/>{{each.Name}}</td>
+                    <td>{{each.Assignee.0}}</td>
+                    <td><i class="circle-{{each.Priority|lower}}"></i>{{each.Priority}}</td>
+                    <td><a class="status-indication" title="Upcoming">{{each.Status}}</a></td>
+                    <td><i class="fa fa-pencil iconclr"> </td>
+                      {% if each.owner == 'owner'  or is_gstaff %}
+                        <td><i class="fa fa-trash iconclr" onclick="deleteTask('{{each.id}}')"></i></td>
+                      {% endif %}
+                  </tr>
+              {% endfor %}
+              
+                </tbody>
+            </table>
+
 
 
             <script type="text/javascript">

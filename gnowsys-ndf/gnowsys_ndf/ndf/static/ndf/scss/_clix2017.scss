@@ -6946,7 +6946,7 @@ ul.nav_menu_1 {
         font-size: 22px;
         padding: 16px 5px 5px 57px;
         color: black;
-        border-bottom: 2px solid rgba(128, 128, 128, 0.23);
+       // border-bottom: 2px solid rgba(128, 128, 128, 0.23);
         
     }
 
@@ -7121,37 +7121,28 @@ ul.nav_menu_1 {
   }
 
   .circle-normal{
-    width: 15px;
-      height: 15px;
-      background: #ffc14e;
-      -moz-border-radius: 50px;
-      -webkit-border-radius: 50px;
-      border-radius: 50px;
-      margin-left: -20px;
-      padding: 0px 0px 0px 20px;
-      margin-top: 0px;
+        background: #ffc14e;
+        -moz-border-radius: 50px;
+        -webkit-border-radius: 50px;
+        border-radius: 50px;
+        padding: 0px 0px 0px 20px;
+        margin-right: 5px;
 }
   .circle-high{
-    width: 15px;
-      height: 15px;
-      background: #f04124;
-      -moz-border-radius: 50px;
-      -webkit-border-radius: 50px;
-      border-radius: 50px;
-      margin-left: -20px;
-      padding: 0px 0px 0px 20px;
-      margin-top: 0px;
+        background: #f04124;
+        -moz-border-radius: 50px;
+        -webkit-border-radius: 50px;
+        border-radius: 50px;
+        padding: 0px 0px 0px 20px;
+        margin-right: 5px;  
 }
   .circle-low{
-    width: 15px;
-      height: 15px;
-      background: #008cba;
-      -moz-border-radius: 50px;
-      -webkit-border-radius: 50px;
-      border-radius: 50px;
-      margin-left: -20px;
-      padding: 0px 0px 0px 20px;
-      margin-top: 0px;
+        background: #008cba;
+        -moz-border-radius: 50px;
+        -webkit-border-radius: 50px;
+        border-radius: 50px;
+        padding: 0px 0px 0px 20px;
+        margin-right: 5px;
 }
 
 .status-indication{
