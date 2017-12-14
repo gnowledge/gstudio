@@ -12,37 +12,29 @@
 	}
 
 	#circle-medium{
-		width: 15px;
-	    height: 15px;
 	    background: #ffc14e;
 	    -moz-border-radius: 50px;
 	    -webkit-border-radius: 50px;
 	    border-radius: 50px;
-	    margin-left: -20px;
 	    padding: 0px 0px 0px 20px;
-	    margin-top: 0px;
+	    margin-right: 5px;
+
 }
 	#circle-high{
-		width: 15px;
-	    height: 15px;
 	    background: #f04124;
 	    -moz-border-radius: 50px;
 	    -webkit-border-radius: 50px;
 	    border-radius: 50px;
-	    margin-left: -20px;
 	    padding: 0px 0px 0px 20px;
-	    margin-top: 0px;
+	    margin-right: 5px;
 }
 	#circle-low{
-		width: 15px;
-	    height: 15px;
 	    background: #008cba;
 	    -moz-border-radius: 50px;
 	    -webkit-border-radius: 50px;
 	    border-radius: 50px;
-	    margin-left: -20px;
 	    padding: 0px 0px 0px 20px;
-	    margin-top: 0px;
+	    margin-right: 5px;
 }
 
 .status-indication{
@@ -123,7 +115,7 @@
         	</div>
         	
 			
-			
+<!--			
 			<ul class="inline-list task_ex">
 			  <li class="large-5 columns">
 			  		<form>
@@ -216,7 +208,7 @@
 			  </li>
 			  <li><a href="#" class="iconclr"><i class="fa fa-pencil "></i></a></li>
 			  <li><a href="#" class="iconclr"><i class="fa fa-trash " ></i></a></li>
-			</ul>
+			</ul>-->
         	<!--<div class="task_listing">
 		    	<div class="task_content">
 		    		<div class="task_content_left">
@@ -231,8 +223,58 @@
 		    	</div>
 		    </div>
         </div>-->
+
+<table style="margin-left:-12px;">
+  <thead>
+    <tr>
+      <th width="600">Task Name</th>
+      <th width="150">Task Owner</th>
+      <th width="150">Task Priority</th>
+      <th width="150">Task status</th>
+      <th width="150">Edit Task</th>
+      <th width="150">Delete Task</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      
+      <td><input type="checkbox" name="task" value="task"/>This is longer content Donec id elit non mi porta gravida at eget metus This is longer content Donec id elit non mi porta gravida at eget metus</td>
+      <td>Black-cat-cc and black-peacock-rj78</td>
+      <td><i id="circle-medium"></i>Medium</td>
+      <td><a class="status-indication" title="Upcoming">Upcoming</a></td>
+      <td><i class="fa fa-pencil iconclr"> </td>
+      <td><i class="fa fa-trash iconclr"></td>
+    </tr>
+    <tr>
+      <td><input type="checkbox" name="task" value="task"/>  This is longer content Donec id elit non mi porta gravida at eget metus</td>
+      <td>Administrator</td>
+      <td><i id="circle-medium"></i>Medium</td>
+      <td><a class="status-indication" title="Upcoming">In Progress</a></td>
+      <td><i class="fa fa-pencil iconclr "> </td>
+      <td><i class="fa fa-trash iconclr"></td>
+    </tr>
+    <tr>
+      <td><input type="checkbox" name="task" value="task"/>  This is longer content Donec id elit non mi porta gravida at eget metus</td>
+      <td>black-peacock-rj78</td>
+      <td> <i id="circle-high"></i> high</td>
+      <td><a class="status-indication" title="Upcoming">Upcoming</a></td>
+      <td><i class="fa fa-pencil iconclr"> </td>
+      <td><i class="fa fa-trash iconclr"></td>
+    </tr>
+    <tr>
+      <td><input type="checkbox" name="task" value="task"/> This is longer content Donec id elit non mi porta gravida at eget metus This is longer content Donec id elit non mi porta gravida at eget metus</td>
+      <td>Black-cat-cc and black-peacock-rj78</td>
+      <td><i id="circle-low"></i>Low</td>
+      <td><a class="status-indication" title="Upcoming">Completed</a></td>
+      <td><i class="fa fa-pencil iconclr"> </td>
+      <td><i class="fa fa-trash iconclr"></td>
+    </tr>
+    
+  </tbody>
+</table>
     </div>
   </div>
+
 
 
 
