@@ -15,6 +15,7 @@
             
             {% for each in TASK_inst %}
               <ul class="inline-list task_ex">
+                 <div class="{{each.id}}">
                   <li class="large-5 columns">
                         <form>
                             <input type="checkbox" name="task" value="task" style="margin-right: 5px;"> {{each.Name}} 
@@ -38,6 +39,7 @@
                   {% if each.owner == 'owner'  or is_gstaff %}
                   <li class="delete-task"><a  class="iconclr" onclick="deleteTask('{{each.id}}')"><i class="fa fa-trash " ></i></a></li>
                   {% endif %}
+                  </div>
               </ul>
             {% endfor %}
 
@@ -60,7 +62,9 @@
                         },
                         
                         success: function(data){ 
-                        alert("assasasa");
+                        node_id = JSON.parse(data)
+                        alert("Deleted task successfully");
+                        $('.' +node_id['node_id'] ).remove();
                         
                         },
                         
