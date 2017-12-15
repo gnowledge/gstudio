@@ -25,8 +25,8 @@
                   <th width="150">Delete Task</th>
                 </tr>
               </thead>
-              {% for each in TASK_inst %}
                 <tbody class="{{each.id}}">
+              {% for each in TASK_inst %}
                   <tr>
                     
                     <td><input type="checkbox" name="task" value="task"/>{{each.Name}}</td>
