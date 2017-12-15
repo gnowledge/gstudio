@@ -2877,7 +2877,9 @@ def notification_details(request,group_id):
         user_activity_append_temp(each)
       each.update({'activity':activity})
       files_list_append_temp(each)
-    return render_to_response('ndf/notifications_detail.html',
+    
+
+    return render_to_response('ndf/notification_detail.html',
                                 { 
                                   'group_id': group_id,
                                   'groupid':group_id,

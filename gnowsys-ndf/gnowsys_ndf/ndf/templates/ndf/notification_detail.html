@@ -51,22 +51,40 @@
     }
 
 </style>
+    
 
 
+
+{% for each in activity_list %}
+  {% if "File" in each.member_of_names_list or "Task" in each.member_of_names_list or "Theme" in each.member_of_names_list or "Asset" in each.member_of_names_list or "Topic" in each.member_of_names_list or "theme_item" in each.member_of_names_list   %}
     <div class="notification_body">
       <div class="content-body">
         <div class="notifications_content">
             <div class="small-1 columns">
-              <a href="#">
-                <img class="img-circle" src="/static/ndf/images/gnu-head.png" style="margin-top:-12px;"/>
-              </a>
+                  {% if "File" in each.member_of_names_list and each.relation_set.0.assetcontent_of.0 %}
+                    
+                    <a href="{% url 'assetcontent_detail' group_id each.relation_set.0.assetcontent_of.0 each.pk %}">
+                      <img class="img-circle" src="{{MEDIA_URL}}{{each.if_file.original.relurl}}" style="margin-top:-12px;"/>
+                    </a>
+                  {% elif "File" in each.member_of_names_list %}
+                    <a href="">
+                      <img class="img-circle" src="{{MEDIA_URL}}{{each.if_file.original.relurl}}" style="margin-top:-12px;"/>
+                    </a>
+                  {% elif "Asset" in each.member_of_names_list %}
+                    <a href="{% url 'asset_detail' group_id each.pk %}">
+                      <img class="img-circle" src="/static/ndf/images/gnu-head.png" style="margin-top:-12px;"/>
+                    </a>
+                  {% elif "Theme" in each.member_of_names_list %}
+                    <a href="{% url 'curriculum_detail' group_id each.pk %}">
+                      <img class="img-circle" src="/static/ndf/images/gnu-head.png" style="margin-top:-12px;"/>
+                    </a>
+                  {% else %}
+                      <img class="img-circle" src="/static/ndf/images/gnu-head.png" style="margin-top:-12px;"/>
+                  
+                  {% endif %}
             </div>
             <div class="small-14 columns">
-              This is an info alert with a radius.
-              This is an info alert with a radius. Trying if the notication is big enough.
-              This is an info alert with a radius.
-              This is an info alert with a radius. Trying if the notication is big enough.
-              This is an info alert with a radius.
+            {{each.created_by|get_username}}  {{each.member_of_names_list}} {{each.relation_set.0.assetcontent_of.0}}  {{each.activity}}
             </div>
         </div>
         <div style="
@@ -74,138 +92,11 @@
         margin-left: 140px;
         margin-top: -25px;
     ">
-          <i class="fa fa-clock-o fa-1x" aria-hidden="true"></i> 8 hours ago.
+          <i class="fa fa-clock-o fa-1x" aria-hidden="true"></i> created {{each.created_at|timesince}} ago.
         </div>
       </div>
     </div>
-    <div class="notification_body">
-      <div class="content-body">
-        <div class="notifications_content">
-            <div class="small-1 columns">
-              <a href="#">
-                <img class="img-circle" src="/static/ndf/images/gnu-head.png" style="margin-top:-12px;"/>
-              </a>
-            </div>
-            <div class="small-14 columns">
-              This is an info alert with a radius.
-              This is an info alert with a radius. Trying if the notication is big enough.
-              This is an info alert with a radius.
-              This is an info alert with a radius. Trying if the notication is big enough.
-              This is an info alert with a radius.
-            </div>
-        </div>
-        <div style="
-        color: orange;
-        margin-left: 140px;
-        margin-top: -25px;
-    ">
-          <i class="fa fa-clock-o fa-1x" aria-hidden="true"></i> 8 hours ago.
-        </div>
-      </div>
-    </div>
-<div class="notification_body">
-      <div class="content-body">
-        <div class="notifications_content">
-            <div class="small-1 columns">
-              <a href="#">
-                <img class="img-circle" src="/static/ndf/images/gnu-head.png" style="margin-top:-12px;"/>
-              </a>
-            </div>
-            <div class="small-14 columns">
-              This is an info alert with a radius.
-              This is an info alert with a radius. Trying if the notication is big enough.
-              This is an info alert with a radius.
-              This is an info alert with a radius. Trying if the notication is big enough.
-              This is an info alert with a radius.
-            </div>
-        </div>
-        <div style="
-        color: orange;
-        margin-left: 140px;
-        margin-top: -25px;
-    ">
-          <i class="fa fa-clock-o fa-1x" aria-hidden="true"></i> 8 hours ago.
-        </div>
-      </div>
-    </div>
-<div class="notification_body">
-      <div class="content-body">
-        <div class="notifications_content">
-            <div class="small-1 columns">
-              <a href="#">
-                <img class="img-circle" src="/static/ndf/images/gnu-head.png" style="margin-top:-12px;"/>
-              </a>
-            </div>
-            <div class="small-14 columns">
-              This is an info alert with a radius.
-              This is an info alert with a radius. Trying if the notication is big enough.
-              This is an info alert with a radius.
-              This is an info alert with a radius. Trying if the notication is big enough.
-              This is an info alert with a radius.
-            </div>
-        </div>
-        <div style="
-        color: orange;
-        margin-left: 140px;
-        margin-top: -25px;
-    ">
-          <i class="fa fa-clock-o fa-1x" aria-hidden="true"></i> 8 hours ago.
-        </div>
-      </div>
-    </div>
-<div class="notification_body">
-      <div class="content-body">
-        <div class="notifications_content">
-            <div class="small-1 columns">
-              <a href="#">
-                <img class="img-circle" src="/static/ndf/images/gnu-head.png" style="margin-top:-12px;"/>
-              </a>
-            </div>
-            <div class="small-14 columns">
-              This is an info alert with a radius.
-              This is an info alert with a radius. Trying if the notication is big enough.
-              This is an info alert with a radius.
-              This is an info alert with a radius. Trying if the notication is big enough.
-              This is an info alert with a radius.
-            </div>
-        </div>
-        <div style="
-        color: orange;
-        margin-left: 140px;
-        margin-top: -25px;
-    ">
-          <i class="fa fa-clock-o fa-1x" aria-hidden="true"></i> 8 hours ago.
-        </div>
-      </div>
-    </div>
-<div class="notification_body">
-      <div class="content-body">
-        <div class="notifications_content">
-            <div class="small-1 columns">
-              <a href="#">
-                <img class="img-circle" src="/static/ndf/images/gnu-head.png" style="margin-top:-12px;"/>
-              </a>
-            </div>
-            <div class="small-14 columns">
-              This is an info alert with a radius.
-              This is an info alert with a radius. Trying if the notication is big enough.
-              This is an info alert with a radius.
-              This is an info alert with a radius. Trying if the notication is big enough.
-              This is an info alert with a radius.
-            </div>
-        </div>
-        <div style="
-        color: orange;
-        margin-left: 140px;
-        margin-top: -25px;
-    ">
-          <i class="fa fa-clock-o fa-1x" aria-hidden="true"></i> 8 hours ago.
-        </div>
-      </div>
-    </div>
-
-
-
-
-
+  {% endif %}
+{% endfor %}
+    
 {% endblock body_content %}
