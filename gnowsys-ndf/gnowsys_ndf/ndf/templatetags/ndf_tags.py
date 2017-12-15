@@ -4206,3 +4206,12 @@ def get_module_enrollment_status(request, module_obj):
         return data_dict
     return _user_enrolled(request.user.pk, module_obj.collection_set)
     # return {request.user.pk : user_enrolled, 'full_enrolled': user_enrolled}
+
+@get_execution_time
+@register.filter
+def get_unicode_lang(lang_code):
+	try:
+		return get_language_tuple(lang_code)[1]
+	except Exception as e:
+		return lang_code
+		pass
