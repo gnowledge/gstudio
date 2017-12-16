@@ -6,6 +6,7 @@ import re
 from datetime import datetime
 from bs4 import BeautifulSoup, CData
 from html import HTML
+import urlparse
 from django.template.defaultfilters import slugify
 from gnowsys_ndf.settings import GSTUDIO_EPUBS_LOC_PATH
 from gnowsys_ndf.ndf.models import node_collection
@@ -17,9 +18,15 @@ except ImportError:  # old pymongo
 
 oebps_files = ["Fonts", "Audios", "Images", "Videos", "Text", "Styles", "Misc"]
 oebps_path = None
-tool_mapping = {'policequad': 'modules/Tools/Police Quad/index.html',
-                'turtleblocksjs': 'modules/Tools/Turtle Blocks/index.html',
-                'biomechanic': 'modules/Tools/Bio- Mechanic/index.html'}
+tool_mapping = {}
+
+with open("/static/ndf/epub/tool_mapping.json", "r") as tool_paths:
+    global tool_mapping
+    tool_mapping = json.loads(tool_paths.read())
+
+# tool_mapping = {'policequad': 'modules/Tools/Police Quad/index.html',
+#                 'turtleblocksjs': 'modules/Tools/Turtle Blocks/index.html',
+#                 'biomechanic': 'modules/Tools/Bio- Mechanic/index.html'}
 
 def create_subfolders(root,subfolder_names_list):
     for subfolder in subfolder_names_list:
@@ -199,6 +206,8 @@ def parse_content(path, content_soup, epub_name):
     """
     # all_a = content_soup.find_all('a', href=True)
     # remove bower links
+
+    tool_mapping_keys = tool_mapping.keys()
     scoped_style = content_soup.find_all('style', {'scoped': ''})
     static_imports = content_soup.find_all('script', src=re.compile('static'))
     for each_style in scoped_style:
@@ -236,18 +245,35 @@ def parse_content(path, content_soup, epub_name):
         if file_node:
             copy_file_and_update_content_file(file_node, each_src, 'src', epub_name)
 
-    # ==== updating assessment iframes ==== 
-
-    # ==== updating App iframes ==== 
     all_iframes = content_soup.find_all('iframe',src=True)
     for each_iframe in all_iframes:
         iframe_src_attr = each_iframe["src"]
         new_iframe_src = iframe_src_attr
         if iframe_src_attr:
+            if "assessment.AssessmentOffered" in iframe_src_attr:
+                # ==== updating assessment iframes ==== 
+                new_iframe_src = iframe_src_attr
+                parsed = urlparse.urlparse(iframe_src_attr)
+                new_iframe_src = parsed._replace(netloc="localhost:8888", path="/oea/")
+                each_iframe["src"] = new_iframe_src.geturl()
+            else:
+                # ==== updating App iframes ==== 
+                for each_tool_key,each_tool_val in tool_mapping.items():
+                    if each_tool_key in iframe_src_attr:
+                        new_iframe_src = each_tool_val
+                each_iframe["src"] = new_iframe_src
+
+
+    all_tool_links = content_soup.find_all('a',href=True)
+    for each_tool_link in all_tool_links:
+        tool_href = each_tool_link["href"]
+        new_tool_link = tool_href
+        if tool_href:
             for each_tool_key,each_tool_val in tool_mapping.items():
-                if each_tool_key in iframe_src_attr:
-                    new_iframe_src = iframe_src_attr.replace(each_tool_key,each_tool_val)
-            each_iframe["src"] = new_iframe_src
+                if each_tool_key in tool_href:
+                    new_tool_link = each_tool_val
+            each_tool_link["href"] = new_tool_link
+
 
     all_img = content_soup.find_all('img',src=True)
     for each_img in all_img:
