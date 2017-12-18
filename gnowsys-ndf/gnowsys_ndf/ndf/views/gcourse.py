@@ -1897,51 +1897,70 @@ def enroll_to_course(request, group_id):
         user_obj = User.objects.get(id=userid)
         set_notif_val(request, group_obj._id, mail_content, activ, user_obj)
 
+    def add_to_author_set(group_id, add_admin, user_id):
+        group_obj = get_group_name_id(group_id, get_obj=True)
+        if group_obj:
+            try:
+                if add_admin:
+                    if isinstance(user_id, list):
+                        non_admin_user_ids = [each_userid for each_userid in user_id if each_userid not in group_obj.group_admin ]
+                        if non_admin_user_ids:
+                            group_obj.group_admin.extend(non_admin_user_ids)
+                            group_obj.group_admin = list(set(group_obj.group_admin))
+                    else:
+                        if user_id not in group_obj.group_admin:
+                            group_obj.group_admin.append(user_id)
+                else:
+                    if isinstance(user_id, list):
+                        non_member_user_ids = [each_userid for each_userid in user_id if each_userid not in group_obj.author_set ]
+                        if non_member_user_ids:
+                            group_obj.author_set.extend(non_member_user_ids)
+                            group_obj.author_set = list(set(group_obj.author_set))
+                    else:
+                        if user_id not in group_obj.author_set:
+                            group_obj.author_set.append(user_id)
+                group_obj.save()
+
+                if 'Group' not in group_obj.member_of_names_list:
+                    # get new/existing counter document for a user for a given course for the purpose of analytics
+                    if isinstance(user_id, list):
+                        for each_user_id in user_id:
+                            _update_user_counter(each_user_id, group_obj._id)
+                    else:
+                        _update_user_counter(user_id, group_obj._id)
+                response_dict["success"] = True
+
+            except Exception as e:
+                pass
+            return group_obj
+        pass
     response_dict = {"success": False}
     if request.is_ajax() and request.method == "POST":
         try:
             user_id = request.POST.get("user_id", "")
+            enroll_group_id = request.POST.get("enroll_group_id", None)
             add_admin = eval(request.POST.get("asAdmin", 'False'))
+            is_module_enroll = eval(request.POST.get("module_enrollment", 'False'))
             if not user_id:
                 user_id = request.user.id
             else:
                 user_id = ast.literal_eval(user_id)
-
-
             if isinstance(user_id, list):
                 user_id = map(int, user_id)
             else:
                 user_id = int(user_id)
-            group_obj = get_group_name_id(group_id, get_obj=True)
-            if add_admin:
-                if isinstance(user_id, list):
-                    non_admin_user_ids = [each_userid for each_userid in user_id if each_userid not in group_obj.group_admin ]
-                    if non_admin_user_ids:
-                        group_obj.group_admin.extend(non_admin_user_ids)
-                        group_obj.group_admin = list(set(group_obj.group_admin))
-                else:
-                    if user_id not in group_obj.group_admin:
-                        group_obj.group_admin.append(user_id)
-            else:
-                if isinstance(user_id, list):
-                    non_member_user_ids = [each_userid for each_userid in user_id if each_userid not in group_obj.author_set ]
-                    if non_member_user_ids:
-                        group_obj.author_set.extend(non_member_user_ids)
-                        group_obj.author_set = list(set(group_obj.author_set))
-                else:
-                    if user_id not in group_obj.author_set:
-                        group_obj.author_set.append(user_id)
+            if enroll_group_id:
+                group_id = enroll_group_id
 
-            group_obj.save()
-            response_dict["success"] = True
-            response_dict["member_count"] = len(group_obj.author_set)
-            if 'Group' not in group_obj.member_of_names_list:
-                # get new/existing counter document for a user for a given course for the purpose of analytics
-                if isinstance(user_id, list):
-                    for each_user_id in user_id:
-                        _update_user_counter(each_user_id, group_obj._id)
-                else:
-                    _update_user_counter(user_id, group_obj._id)
+            if is_module_enroll:
+                module_obj = Node.get_node_by_id(group_id)
+                # print "\n Module: ", module_obj.name, " -- ", module_obj.member_of_names_list
+                for each_group_id in module_obj.collection_set:
+                    group_obj = add_to_author_set(each_group_id, add_admin, user_id)
+            else:
+                group_obj = add_to_author_set(group_id, add_admin, user_id)
+                response_dict["member_count"] = len(group_obj.author_set)
+
             try:
                 if isinstance(user_id, list):
                     for each_user_id in user_id:
@@ -1949,10 +1968,11 @@ def enroll_to_course(request, group_id):
                 else:
                     _send_notif(user_id, group_obj)
             except Exception as e:
-                print "\n Unable to send notifications ",e
+                print "\n Unable to send notifications ", e
 
         except Exception as er:
-            print "\n ERROR!!!! ",er
+            print "\n ERROR Occurred in Enrollment!! ", er
+            pass
         return HttpResponse(json.dumps(response_dict))
 
 
@@ -2057,6 +2077,7 @@ def activity_player_detail(request, group_id, lesson_id, activity_id):
         trans_node = node_obj
     lesson_node = node_collection.one({'_id': ObjectId(lesson_id)})
     lesson_obj_collection_set = lesson_node.collection_set
+    group_obj_collection_set = group_obj.collection_set
     trans_lesson_node = get_lang_node(lesson_node._id,request.LANGUAGE_CODE)
     if trans_lesson_node:
         lesson_name = trans_lesson_node.name
@@ -2066,12 +2087,16 @@ def activity_player_detail(request, group_id, lesson_id, activity_id):
     translation_obj = node_obj.get_relation('translation_of')
 
     resource_index = resource_next_id = resource_prev_id = None
+    lesson_index = lesson_next_id = lesson_prev_id = None
     resource_count = len(lesson_obj_collection_set)
+    lesson_count = len(group_obj.collection_set)
     unit_resources_list_of_dict = node_collection.find({
                                     '_id': {'$in': lesson_obj_collection_set}},
                                     {'name': 1, 'altnames': 1,'_id':1})
     act_list = []
     trans_act_list = get_trans_node_list(lesson_node.collection_set,request.LANGUAGE_CODE)
+    
+    lesson_index = group_obj_collection_set.index(lesson_node._id) 
 
     resource_index = lesson_obj_collection_set.index(node_obj._id)
  
@@ -2081,8 +2106,18 @@ def activity_player_detail(request, group_id, lesson_id, activity_id):
     if resource_index > 0:
         resource_prev_id = lesson_node.collection_set[resource_index - 1]
 
-    # --- END of all metadata reg position and next prev of resource ---
+    if (lesson_index + 1) < lesson_count:
+        lesson_next_id = group_obj.collection_set[lesson_index + 1]
 
+    if lesson_index > 0:
+        lesson_prev_id = group_obj.collection_set[lesson_index - 1]
+
+    # --- END of all metadata reg position and next prev of resource ---
+    prev_lesson_obj = next_lesson_obj  = None
+    if lesson_next_id:
+        next_lesson_obj = Node.get_node_by_id(lesson_next_id)
+    if lesson_prev_id:
+        prev_lesson_obj = Node.get_node_by_id(lesson_prev_id)
     node_obj.get_neighbourhood(node_obj.member_of)
 
     thread_node = allow_to_comment = None
@@ -2094,13 +2129,22 @@ def activity_player_detail(request, group_id, lesson_id, activity_id):
         'node': node_obj, 'lesson_node': lesson_node, 'activityid': ObjectId(activity_id),
         'resource_index': resource_index, 'resource_next_id': resource_next_id,
         'resource_prev_id': resource_prev_id, 'resource_count': resource_count,
+
+        'lesson_index': lesson_index,'lesson_count': lesson_count,
         'translation': translation_obj, 'unit_resources_list_of_dict': unit_resources_list_of_dict,
         'trans_node':trans_node,
         'act_list':trans_act_list,
         'trans_lesson_name':lesson_name,
         'no_footer': True
     }
-
+    
+    
+    if prev_lesson_obj:
+        context_variables.update({ 'lesson_act_prev_id': prev_lesson_obj.collection_set[0],'prev_lesson_id':prev_lesson_obj._id })
+    if next_lesson_obj:
+        context_variables.update({ 'next_lesson_id':next_lesson_obj._id,'lesson_next_act_id': next_lesson_obj.collection_set[0] })
+    
+    
     if request.user.is_authenticated():
         active_user_ids_list = [request.user.id]
         if GSTUDIO_BUDDY_LOGIN:
@@ -2311,7 +2355,7 @@ def course_notebook(request, group_id, node_id=None, tab="my-notes"):
         else:
             tab = 'all-notes'
 
-        if notebook_obj:
+        if notebook_obj and not create_flag:
             # return HttpResponseRedirect(reverse('course_notebook_tab_note', 
                 # kwargs={'group_id': group_id, "node_id": notebook_obj.pk, 'tab': tab}))
             return HttpResponseRedirect(reverse('course_notebook_note', 
@@ -2924,11 +2968,11 @@ def course_analytics(request, group_id, user_id, render_template=False, get_resu
                                     completed_activities = completed_activities + 1
             if all(each_act_id in visited_nodes for each_act_id in lesson_act_ids):
                 completed_lessons = completed_lessons + 1
-        analytics_data['level1_lbl'] = "Lesson Completion"
-        analytics_data['level2_lbl'] = "Activity Completion"
+        analytics_data['level1_lbl'] = "Lesson Visited"
+        analytics_data['level2_lbl'] = "Activity Visited"
 
-        analytics_data['level1_progress_stmt'] = str(completed_lessons) + " out of " + str(all_lessons) + " Lessons completed"
-        analytics_data['level2_progress_stmt'] = str(completed_activities) + " out of " + str(all_activities) + " Activities completed"
+        analytics_data['level1_progress_stmt'] = str(completed_lessons) + " out of " + str(all_lessons) + " Lessons Visited"
+        analytics_data['level2_progress_stmt'] = str(completed_activities) + " out of " + str(all_activities) + " Activities Visited"
         if completed_lessons and all_lessons:
             analytics_data['level1_progress_meter'] = (completed_lessons/float(all_lessons))*100
         else:
@@ -3100,6 +3144,10 @@ def course_analytics(request, group_id, user_id, render_template=False, get_resu
 
     # cache.set(cache_key, analytics_data, 60*10)
     analytics_data['group_member_of'] = group_obj.member_of_names_list
+    if group_obj.altnames:
+        analytics_data['group_name'] = group_obj.altnames
+    else:
+        analytics_data['group_name'] = group_obj.name
     return render_to_response("ndf/user_course_analytics.html",
                                 analytics_data,
                                 context_instance = RequestContext(request)

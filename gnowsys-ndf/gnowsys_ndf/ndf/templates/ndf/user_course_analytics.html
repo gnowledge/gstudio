@@ -1,5 +1,7 @@
 {% load i18n %}
 {% load multiply from simple_filters %}
+{% load get_group_object from ndf_tags %}
+
 <style type="text/css">
   .reveal-modal{
     color: black !important;
@@ -21,7 +23,8 @@
 <h4 class="text-center"><u><b>PROGRESS REPORT</b></u></h4>
     <a class="close-reveal-modal" aria-label="Close">Close [&#215;]</a>
   <div class="small-6 columns">
-    <h4 class="inner"> User:  <h3 class="inner left-space"> {{username}} </h3></h4>
+    <h3 class="inner left-space"> {{ group_name }} </h3><br/>
+    <h3 class="inner left-space"> User:  <h3 class="inner left-space"> {{username}} </h3></h3>
   </div>
   <div class="small-6 columns">
     <h4 class="inner">Total points gained:  <h3 class="course-metric-count users_points inner left-space">{{users_points}}</h3></h4>
@@ -68,7 +71,7 @@
       <div class="course-quiz-perf course-section">
         <span class="course-section-heading inner">Assessment Performance  </span>
           {% if "announced_unit" in group_member_of_name %}
-          <a class="fetch-assessment-analytics inner left-space" data-user-id={{user_id}}>Update</a>
+          <a class="fetch-assessment-analytics inner left-space" data-user-id={{user_id}}>Refresh</a>
           <span class="course-section-icon">
             <i class="fa fa-question-circle"></i>
           </span>
