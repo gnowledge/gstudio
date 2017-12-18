@@ -78,8 +78,8 @@
             
         </div>
         <div class="new_note header_text_block header_text_lg_block">
-            <a {% if next_lesson_id  and lesson_next_act_id %} title="Go to next lesson"  href="{% url 'activity_player_detail' group_id next_lesson_id lesson_next_act_id %}" {% else %} class = "disabled"   title="You are on the last Lesson" {% endif %} ><i class="fa fa-angle-double-right header_icon"></i>&nbsp;
-               {% trans "Next Lesson" %}    
+            <a {% if next_lesson_id  and lesson_next_act_id %} title="Go to next lesson"  href="{% url 'activity_player_detail' group_id next_lesson_id lesson_next_act_id %}" {% else %} class = "disabled"   title="You are on the last Lesson" {% endif %} >
+               {% trans "Next Lesson" %} <i class="fa fa-angle-double-right header_icon"></i>    
             </a>
         </div>
       </div>

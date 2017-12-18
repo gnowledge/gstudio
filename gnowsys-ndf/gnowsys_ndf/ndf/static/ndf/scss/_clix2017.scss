@@ -303,17 +303,12 @@ h5{
         }
         .login-button {
             .button {
-              // //font-size: 15px;
-              background-color: #B1B1B1;
               font-weight: 600;
               border-bottom: 3.5px solid #DADADA;
               border-radius: 5px;
               padding: 9px;
-
-              &:hover {
-                background-color: #CC1AB5;
-                border-color: #881378;
-              }
+              background-color: #a75692;
+              border-color: #881378;
             }
         }
 
@@ -380,16 +375,15 @@ h5{
             border-radius: 5px;
             text-transform: uppercase;
             margin-left: 70px;
-            color: #ffc14e;
             padding: 6px 17px;
             font-family: "OpenSans-Semibold", sans-serif;
             margin-top: 50px;
             border: 2px solid #ffc14e;
+            color:white;
+          background-color: #a75692;
 
             &:hover{
-        background-color:rgba(255,193,78,0.3);
         cursor:pointer;
-        color:white;
     }
 
             
@@ -670,7 +664,7 @@ h5{
         }
         .top-bar-section {
             ul.left li>a {
-                padding: 0px 30px;
+                padding: 0px 20px;
                     &.active{
                     color:#fff;
                     font-size: 17px;
@@ -685,7 +679,7 @@ h5{
                         cursor: pointer;
                         background: transparent;
                         border-bottom: 0px;
-                        line-height: 52px;
+                        line-height: 50px;
                         border-left-width: 0px;
                         font-family: OpenSans-Regular;
 
@@ -701,7 +695,7 @@ h5{
                         }
                     }
                     &.has-dropdown {
-                        a:not(.button) {
+                        a:not(.button) a:not(.not-click) {
                             &:hover {
                                 color: $secondry-blue;
                                 border-bottom: 0px;
@@ -1577,8 +1571,8 @@ input[type="button"] {
     margin-top: 2px !important;
     letter-spacing: 0.4px;
     &:hover {
-                    box-shadow: 0px 0px 17px rgba(0, 0, 0, 0.68);
-                }
+                box-shadow: 0px 0px 17px rgba(0, 0, 0, 0.68);
+            }
 }
 
 .orange-button-template{
@@ -4184,7 +4178,7 @@ ul.nav_menu_1 {
         >a{
             list-style-type: none;
             display: inline-block;
-            padding: 12px 12px 9px;
+            padding: 10px 10px 9px;
             color: $nav_menu_1_color;
             cursor: pointer;
             font-size: 18px;
@@ -4193,6 +4187,7 @@ ul.nav_menu_1 {
         
 
             &.selected, &:hover{
+                font-weight: bold;
                 border-bottom: 3px solid $nav_menu_1_tab_border;
             }
         }
@@ -5593,6 +5588,9 @@ ul.nav_menu_1 {
 .jqtree-title > .fa-check{
     color: green;
 }
+.jqtree-title > .fa-check-circle-o{
+    color: green;
+}
 .jqtree-title > .fa-clock-o{
     color: orange;
 }
@@ -6415,3 +6413,7 @@ ul.nav_menu_1 {
 
 
 // STicky bottom footer 
+
+.top-right-menu{
+    margin-right: 80px !important;
+}

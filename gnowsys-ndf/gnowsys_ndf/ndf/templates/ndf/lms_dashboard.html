@@ -31,11 +31,11 @@
   </div>
   <div class="page_menu">
     <ul class="nav_menu_1">
-      <li class="">
-        <a href="{% url 'my_desk' request.user.id  %}" {% if title == "my desk" %} class="selected" {% endif %}> {% if  is_workspace_instance %} {% trans "My Workspaces" %} {% else %} {% trans "My Courses" %} {% endif %} </a>
+      <li>
+        <a href="{% url 'my_desk' request.user.id  %}" {% if title == "my desk" %} class="selected" {% endif %}> {% if  is_workspace_instance %} {% trans "My Workspaces" %} {% else %} <i class="fi-book-bookmark" style="font-size:20px;"></i> {% trans "My Courses" %} {% endif %} </a>
       </li>
 
-      <li class=""><a {% if title == "my performance" %} class="selected" {% endif %} href="{% url 'my_performance' request.user.id  %}">{% trans "My Performance" %}</a> </li>
+      <li class=""><a {% if title == "my performance" %} class="selected" {% endif %} href="{% url 'my_performance' request.user.id  %}"> <i class="fa fa-line-chart" aria-hidden="true"></i> {% trans "My Performance" %}</a> </li>
 
     </ul>
   </div>
@@ -65,7 +65,7 @@
       {% empty %}
       <section class="empty-dashboard-message">
         <p>You are not enrolled in any course!</p>
-          <a class="button-explore-courses" href="{% url 'explore_courses' %}">Explore</a>
+          <a class="button-explore-courses" href="{% url 'explore_courses' %}"> <i class="fa fa-binoculars" aria-hidden="true"></i>  Explore</a>
       </section>
       {% endfor %}
     </ul>
