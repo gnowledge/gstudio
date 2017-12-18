@@ -9,17 +9,25 @@
 
 {% include 'ndf/widget_user_access_modal.html' %}
 
+<div class="small-12 medium-12 large-12 columns" style="border:2px solid #80808038;">
+      {% if "CourseEventGroup" in node.member_of_names_list %}
+        {% get_course_filters group_id title as filter_dict %}
+        <input type="hidden"  class="title-for-filters" value="notebook">
+      {% else %}
+      <input type="hidden"  class="title-for-filters" value="notebook_lms">
+        {% get_course_filters group_id "notebook_lms" as filter_dict %}
+      {% endif %}
+    {% include "ndf/filters.html" with filter_dict=filter_dict %}
+
+</div>
+
+
 <div class="notebook">
+    {% comment %}
     <div class="row notebook-header collapse">
-          {% if "CourseEventGroup" in node.member_of_names_list %}
-            {% get_course_filters group_id title as filter_dict %}
-            <input type="hidden"  class="title-for-filters" value="notebook">
-          {% else %}
-          <input type="hidden"  class="title-for-filters" value="notebook_lms">
-            {% get_course_filters group_id "notebook_lms" as filter_dict %}
-          {% endif %}
-        {% include "ndf/filters.html" with filter_dict=filter_dict %}
     </div>
+    {% endcomment %}
+
     {% comment %}
 
     <div class="row notebook-header collapse">
@@ -88,7 +96,7 @@
                     <a href="#" data-reveal-id="newNoteModal" class="button expand radius" style="margin: 0em 0em 1em;"><i class="fi-plus"></i> </a>
                     {% endcomment %}
 
-                    <a {% if user_access_priv == "allow" %} class=" add-note-btn button radius"  {% else %} class="bef-note-btn button radius user_not_enrolled" {% endif %}><i class="fi-plus"></i></a>
+                    <a {% if user_access_priv == "allow" %} class=" add-note-btn button radius" title="Create Note" {% else %} class="bef-note-btn button radius user_not_enrolled" {% endif %}><i class="fi-plus"></i></a>
 
                     {# <a class="add-note-btn"><i class="fi-plus"></i></a> #}
 <!--                     <a href="{% url 'page_create_edit' group_name %}?course_event_id={{group_id}}&blog_type=True" class="button radius" style="padding: 3px 11px;border-radius: 100%;float: right;margin: 5px 5px 8px 0px;border: 1px solid #6153AE;background: #fff;font-size: 23px;color: #6153AE;"><i class="fi-plus"></i></a>
@@ -99,10 +107,10 @@
             </div>
 
             <ul class="tabs" data-tab style="">
-                <li class="tab-title {% ifequal tab 'all-notes' %} active{% endifequal %}"><a href="#all-notes">
+                <li class="tab-title {% ifequal tab 'all-notes' %} active{% endifequal %}"><a href="#all-notes" title="Notes created by all">
                 {% if 'Group' in group_object.member_of_names_list and 'base_unit' not in group_object.member_of_names_list %}All Blogs {% else %} All Notes {% endif %} ({{blog_pages.count}})</a></li>
                 {% if user.is_authenticated %}
-                    <li class="tab-title {% ifequal tab 'my-notes' %} active{% endifequal %}"><a href="#my-notes"> {% if 'Group' in group_object.member_of_names_list and 'base_unit' not in group_object.member_of_names_list %}My Blogs {% else %} My Notes {% endif %} ({{user_blogs.count}})</a></li>
+                    <li class="tab-title {% ifequal tab 'my-notes' %} active{% endifequal %}"><a href="#my-notes" title="Notes created by me"> {% if 'Group' in group_object.member_of_names_list and 'base_unit' not in group_object.member_of_names_list %}My Blogs {% else %} My Notes {% endif %} ({{user_blogs.count}})</a></li>
                 {% endif %}
                 {% comment %}
                     <li class="tab-title"><a href="#my-drafts">My Drafts</a></li>
@@ -193,7 +201,6 @@
                {% endif %}
            </div>
         </div>
-    </div>
 </div>
 
 {# {% include "ndf/add_new_note.html" %} #}
@@ -477,6 +484,8 @@
 
           success: function(data){
             $(".note-page").html(data);
+            $("input.node_name").focus()
+            window.scrollTo(0,250);
           },
         });//end of ajax
 

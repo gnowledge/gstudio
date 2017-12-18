@@ -420,7 +420,6 @@ def save_quizitem_answer(request, group_id):
             except:
                 group_name, group_id = get_group_name_id(group_id)
             import datetime
-
             recent_ans = None
             is_user_given_ans_not_in_recent_submitted_ans = False
             recent_submitted_ans_was_correct = False
@@ -577,8 +576,7 @@ def save_quizitem_response(user_id, quiz_type_val, user_action, user_given_ans, 
             'prior_node': thread_obj._id})
 
         if already_ans_obj:
-            already_submitted_ans = get_attribute_value(already_ans_obj._id,\
-                "quizitempost_user_submitted_ans")
+            already_submitted_ans = get_attribute_value(node_id=already_ans_obj._id,attr_name="quizitempost_user_submitted_ans", get_data_type=False, use_cache=False)
             # print "\n already_submitted_ans == ", already_submitted_ans
             # check whether user has already checked or submitted ans
             user_ans = already_ans_obj
@@ -614,7 +612,8 @@ def save_quizitem_response(user_id, quiz_type_val, user_action, user_given_ans, 
         if user_given_ans and user_ans:
             if quiz_type_val == "Short-Response":
                 if already_ans_obj:
-                    old_submitted_ans = get_attribute_value(user_ans._id,"quizitempost_user_submitted_ans")
+                    old_submitted_ans = get_attribute_value(node_id=user_ans._id, attr_name="quizitempost_user_submitted_ans", get_data_type=False, use_cache=False)
+                    #old_submitted_ans = get_attribute_value(user_ans._id,"quizitempost_user_submitted_ans")
                     if old_submitted_ans != "None" and old_submitted_ans != "" and old_submitted_ans:
                         new_list = old_submitted_ans
                 new_list.append({str(curr_datetime):user_given_ans})
@@ -625,7 +624,8 @@ def save_quizitem_response(user_id, quiz_type_val, user_action, user_given_ans, 
                 if user_given_ans:
                     if user_action == "check":
                         if already_ans_obj:
-                            old_checked_ans = get_attribute_value(user_ans._id,"quizitempost_user_checked_ans")
+                            old_checked_ans = get_attribute_value(node_id=user_ans._id, attr_name="quizitempost_user_checked_ans", get_data_type=False, use_cache=False)
+                            #old_checked_ans = get_attribute_value(user_ans._id,"quizitempost_user_checked_ans")
                             if old_checked_ans != "None" and old_checked_ans != "":
                                 new_list = old_checked_ans
                         new_list.append({str(curr_datetime):user_given_ans})
@@ -633,7 +633,8 @@ def save_quizitem_response(user_id, quiz_type_val, user_action, user_given_ans, 
                             create_gattribute(user_ans._id, qip_user_checked_ans_AT, new_list)
                     elif user_action == "submit":
                         if already_ans_obj:
-                            old_submitted_ans = get_attribute_value(user_ans._id,"quizitempost_user_submitted_ans")
+                            old_submitted_ans = get_attribute_value(node_id=user_ans._id, attr_name="quizitempost_user_submitted_ans", get_data_type=False, use_cache=False)
+                            #old_submitted_ans = get_attribute_value(user_ans._id,"quizitempost_user_submitted_ans")
                             if old_submitted_ans != "None" and old_submitted_ans != "" and old_submitted_ans:
                                 new_list = old_submitted_ans
                         new_list.append({str(curr_datetime):user_given_ans})

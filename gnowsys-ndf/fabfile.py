@@ -45,8 +45,12 @@ def update(branch='master'):
 
 
 def install_requirements():
-	local('pip install -r ../requirements.txt')
-	local('bower install --allow-root')
+    try:
+        local('pip install -r ../requirements.txt')
+    except Exception as e:
+        print e
+    finally:
+        local('bower install --allow-root')
 
 
 def purge_node():
@@ -68,6 +72,34 @@ def group_import_all(dump_folder):
     for each_dump in dump_folder_list:
         print "\n\n\nRestoring dump of : ", each_dump
         group_import(os.path.join(dump_folder, each_dump))
+
+
+def backup_psql_data(location='/data/postgres-dump/'):
+    # Example Usage: 
+    # fab backup_psql_data
+    # OUTPUT:
+    #   ls /data/postgres-dump/
+    #   20170925162540.sql
+    # fab backup_psql_data:/data/
+
+    import datetime
+    backup_file_name = "pgdump-{:%Y%m%d%H-%M%S}".format(datetime.datetime.now()) + ".sql"
+    local('echo "pg_dumpall > %s" | sudo su - postgres' % backup_file_name)
+    try:
+        local('mv /var/lib/postgresql/%s %s' % (backup_file_name, location))
+    except Exception as e:
+        raise e
+    print "\nBackup file would be found at: ", os.path.join(location, backup_file_name)
+
+
+def restore_psql_data(backup_file_path_name):
+    # Example Usage: 
+    # fab restore_psql_data:/data/20170925162649.sql
+    # fab restore_psql_data:/data/postgres-dump/20170925162540.sql
+    try:
+        local('echo "psql -f %s;" | sudo su - postgres' % backup_file_path_name)
+    except Exception as e:
+        raise e
 
 
 # def setup_dlkit():
