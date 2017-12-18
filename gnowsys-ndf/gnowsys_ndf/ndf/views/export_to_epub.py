@@ -304,7 +304,8 @@ def build_html(path,obj, epub_name):
     for each_obj in obj.values():
         name = each_obj['name'].strip()
         name_slugified = slugify(name)
-        content_val = (each_obj["content"]).encode('ascii', 'ignore')
+        # content_val = (each_obj["content"]).encode('ascii', 'ignore')
+        content_val = each_obj["content"]
         new_content = parse_content(path, BeautifulSoup(content_val, 'html.parser'), epub_name)
         # new_content = parse_content(content_val)
         with open("/static/ndf/epub/epub_activity_skeleton.xhtml", "r") as base_file_obj:
