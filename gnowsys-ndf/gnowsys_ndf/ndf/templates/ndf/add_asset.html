@@ -280,7 +280,7 @@
         <div class="row">
             {% if asset_content_list.grel_id and asset_obj.created_by == request.user.id  or is_gstaff and asset_obj and asset_content_list.grel_id  %}
             <div class="row">
-                <button type="button" class="orange-button delete-asset-content right icon-widget" style="margin-right: 100px;" title="Click on the checkbox on the files below to Delete"><i class="fa fa-trash"></i> {% trans "Delete Files" %}</button>
+                <button type="button" class="orange-button delete-asset-content right icon-widget" style="margin-right: 100px;display:none" title="Click on the checkbox on the files below to Delete"><i class="fa fa-trash"></i> {% trans "Delete Files" %}</button>
             </div>
             {% endif %}
 
@@ -331,6 +331,16 @@
         $("#upload_asset").removeClass("hide")
     });
 
+    $(document).on('change','.select-chkbox',function(){
+        var checked = $('.select-chkbox:checked').length;
+        if (checked){
+          $(".delete-asset-content").css("display", "block");          
+        }
+        else{
+          $(".delete-asset-content").css("display", "none");          
+        }
+        
+    });
     $(".delete-asset-content").click(function(){
         var checked = $('.select-chkbox:checked').length;
         if (checked > 0){
