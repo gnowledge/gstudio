@@ -28109,3 +28109,131 @@ h5 {
 .explore-button:hover {
   cursor: pointer;
 }
+
+/* line 4698, ../../../scss/_app_styles.scss */
+.lms_page .lms_banner {
+  width: 100%;
+  height: 150px;
+  background-size: 100% 100%;
+  position: relative;
+}
+/* line 4706, ../../../scss/_app_styles.scss */
+.lms_page .lms_banner:before {
+  content: ' ';
+  background-color: rgba(0, 0, 0, 0.1);
+  opacity: .5;
+  width: 100%;
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  box-shadow: inset 0 0 40px rgba(0, 0, 0, 0.2);
+}
+/* line 4719, ../../../scss/_app_styles.scss */
+.lms_page .lms_banner:before a {
+  cursor: pointer;
+}
+/* line 4724, ../../../scss/_app_styles.scss */
+.lms_page .lms_banner .div-height {
+  height: 150px !important;
+  background-size: 100% 100%;
+  position: absolute !important;
+}
+/* line 4732, ../../../scss/_app_styles.scss */
+.lms_page .lms_banner .enroll_unit > a {
+  cursor: pointer;
+}
+/* line 4736, ../../../scss/_app_styles.scss */
+.lms_page .lms_banner .lms_heading {
+  color: #fff;
+  display: inline-block;
+  vertical-align: top;
+}
+/* line 4742, ../../../scss/_app_styles.scss */
+.lms_page .lms_banner .lms_heading .unit_name {
+  font-size: 36px;
+  font-family: OpenSans-Semibold;
+  display: block;
+  margin-top: 90px;
+  margin-left: 40px;
+  border-radius: 8px 0px 0px 8px;
+  transition: border-radius .2s;
+  text-shadow: 3px 2px #164a7b;
+}
+/* line 4753, ../../../scss/_app_styles.scss */
+.lms_page .lms_banner .lms_heading .right-margin {
+  margin-right: 46px;
+}
+
+/* line 4762, ../../../scss/_app_styles.scss */
+.border-bottom-lms-header {
+  border-bottom: 1px solid #00000029;
+}
+
+/* line 4767, ../../../scss/_app_styles.scss */
+.lms_secondary_header {
+  width: 100%;
+  position: relative;
+  color: #fff;
+  box-shadow: 0 0 2px 0 rgba(0, 0, 0, 0.2);
+  border-bottom: 1px solid rgba(0, 0, 0, 0.25);
+}
+/* line 4773, ../../../scss/_app_styles.scss */
+.lms_secondary_header .course_actions {
+  margin-top: 8px;
+}
+/* line 4776, ../../../scss/_app_styles.scss */
+.lms_secondary_header .course_actions > span {
+  background: #2e3f51;
+  border: 1px solid rgba(255, 255, 255, 0.7);
+  padding: 1px 8px;
+  color: #fff;
+  font-size: 23px;
+  cursor: pointer;
+  border-radius: 3px;
+  opacity: 0.8;
+}
+@media screen and (min-width: 980px) and (max-width: 1000px) {
+  /* line 4790, ../../../scss/_app_styles.scss */
+  .lms_secondary_header .course_actions .course_actions {
+    margin-top: 8px;
+  }
+  /* line 4793, ../../../scss/_app_styles.scss */
+  .lms_secondary_header .course_actions .course_actions > span {
+    margin-left: 50px;
+    background: #2e3f51;
+    border: 1px solid rgba(255, 255, 255, 0.7);
+    padding: 1px 8px;
+    color: #fff;
+    font-size: 23px;
+    cursor: pointer;
+    border-radius: 3px;
+    opacity: 0.8;
+  }
+}
+
+/* line 4813, ../../../scss/_app_styles.scss */
+ul.nav_menu_1 {
+  margin-bottom: 0px;
+  background-color: #fff;
+}
+/* line 4816, ../../../scss/_app_styles.scss */
+ul.nav_menu_1 > li {
+  display: inline-block;
+}
+/* line 4819, ../../../scss/_app_styles.scss */
+ul.nav_menu_1 > li > a {
+  list-style-type: none;
+  display: inline-block;
+  padding: 12px 12px 9px;
+  color: #164a7b;
+  cursor: pointer;
+  font-size: 18px;
+  letter-spacing: 0.8px;
+  border-bottom: 3px solid transparent;
+}
+/* line 4830, ../../../scss/_app_styles.scss */
+ul.nav_menu_1 > li > a.selected, ul.nav_menu_1 > li > a:hover {
+  border-bottom: 3px solid #a2238d;
+}

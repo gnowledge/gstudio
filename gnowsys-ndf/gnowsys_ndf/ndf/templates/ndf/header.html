@@ -105,8 +105,16 @@
               </ul>
             </li>
 
+
             {% endfor %}
           {% endfor %}
+
+          <li>
+
+            <a href="{% url 'nroer_groups' 'home' 'Groups' %}" {% if nroer_menu.top_menu_selected == "Workspaces" %}class="active"{% endif %}>
+                {% trans "Workspaces" %}
+              </a>
+          </li>
 
         </ul>
         <!-- -END of NROER level one menu -->
