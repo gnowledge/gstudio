@@ -25,7 +25,8 @@
     <!--<link rel="stylesheet" href="/static/ndf/css/themes/{{site.SITE_NAME|lower}}/styles.css">-->
     <link rel="stylesheet" href="/static/ndf/bower_components/font-awesome/css/font-awesome.css">
     <link rel="stylesheet" href="/static/ndf/bower_components/font-awesome/css/font-awesome.min.css">
-    <link rel="stylesheet" type="text/css" href="/static/ndf/css/themes/clix/clix2017.css">
+    <!--<link rel="stylesheet" type="text/css" href="/static/ndf/css/themes/clix/clix2017.css">-->
+    <link rel="stylesheet" href="/static/ndf/css/themes/{{site.SITE_NAME|lower}}/styles.css">
     <!-- variables for js ussage -->
     
     <input type="hidden" name="group_id" class="group_id" value="{{group_id}}">
@@ -196,10 +197,9 @@
 
     {% block script %} {% endblock %}
   </script>
-</body>
-<footer>
+
     {% if not no_footer %}
         {% include 'ndf/footer_clix.html' %}
     {% endif %}
-</footer>
+</body>
 </html>
