@@ -1,6 +1,7 @@
 from base_imports import *
 from group import *
 
+
 @connection.register
 class Author(Group):
     """Author class to store django user instances
@@ -62,6 +63,41 @@ class Author(Group):
         return [user['created_by'] for user in all_authors_cur]
 
     @staticmethod
+    def get_author_obj_from_name_or_id(username_or_userid_or_authid):
+        try:
+            return node_collection.one({'_type': u'Author', 'created_by': int(username_or_userid_or_authid)})
+        except Exception as e:
+            return Group.get_group_name_id(username_or_userid_or_authid, get_obj=True)
+
+    @staticmethod
+    def extract_username(request, kwargs):
+        if kwargs.get('user_name'):
+            return kwargs['user_name']
+        elif kwargs.get('username'):
+            return kwargs['username']
+        elif request:
+            return request.user.username
+        else:
+            return ''
+
+    @staticmethod
+    def extract_userid(request, kwargs):
+        if kwargs.get('user_id'):
+            return kwargs['user_id']
+        elif kwargs.get('userid'):
+            return kwargs['userid']
+        elif request and request.user.id:
+            return request.user.id
+
+        try:
+            username = Author.extract_username(request, kwargs)
+            return User.objects.get(username=username).id
+        except Exception as e:
+            print e            
+        # elif:
+        #     return 0
+
+    @staticmethod
     def get_author_oid_list_from_user_id_list(user_ids_list=[], list_of_str_oids=False):
         all_authors_cur = node_collection.find(
                                         {
@@ -92,7 +128,7 @@ class Author(Group):
         if not user_obj:
             raise Exception("\nUser with provided user-id/user-obj does NOT exists!!")
 
-        auth = node_collection.find_one({'_type': u"Author", 'created_by': int(user_obj.id)})
+        auth = node_collection.find_one({'_type': u'Author', 'created_by': int(user_obj.id)})
 
         if auth:
             return auth
