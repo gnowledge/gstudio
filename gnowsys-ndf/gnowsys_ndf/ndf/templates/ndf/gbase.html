@@ -62,11 +62,16 @@
 </head>
 <body>
 
-    {% if site.BUDDY_LOGIN and user.is_authenticated and request.author.agency_type == 'Student'%}
+    {% if site.BUDDY_LOGIN and user.is_authenticated and site.SITE_NAME == 'clix' and request.author.agency_type == 'Student'%}
         {% include "ndf/buddy.html" %}
     {% endif %}
 
-    {% include "ndf/header_clix.html" %}
+    {% if site.SITE_NAME == 'NROER' %}
+        {% include "ndf/header.html" %}
+    {% else %}
+        {% include "ndf/header_clix.html" %}
+    {% endif %}
+
     {% block extended_header %}{% endblock %}
 
     {% block body_content %} {% endblock %}
