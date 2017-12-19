@@ -24,7 +24,7 @@
     {% autopaginate group_nodes 23 %}
     {% for node in group_nodes %}
       <div class="app-card-container">
-        {% include 'ndf/main_simple_card.html' with  resource=node has_prof_pic=True url_name="groupchange" first_arg=node.name %}
+        {% include 'ndf/main_simple_card.html' with  resource=node has_prof_pic=True url_name="module_detail" first_arg=group_id second_arg=node.pk %}
       </div>
     {% endfor %}
   </div>

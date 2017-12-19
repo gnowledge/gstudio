@@ -123,9 +123,15 @@ def module_detail(request, group_id, node_id):
 
 
     gstaff_access = check_is_gstaff(group_id,request.user)
-    module_detail_query = {'_id': {'$in': module_obj.collection_set},
-    'status':'PUBLISHED'
-    }
+    if module_obj.collection_set:
+        module_detail_query = {'_id': {'$in': module_obj.collection_set},
+        'status':'PUBLISHED'
+        }
+    elif module_obj.post_node:
+        module_detail_query = {'_id': {'$in': module_obj.post_node},
+        'status':'PUBLISHED'
+        }
+
     if not gstaff_access:
         module_detail_query.update({'$or': [
         {'$and': [
