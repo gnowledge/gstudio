@@ -12,6 +12,7 @@ except ImportError:
 
 from django.http import HttpResponseRedirect, HttpResponse
 from django.contrib.auth.admin import User
+from django.views.decorators.csrf import csrf_exempt
 
 ''' -- imports from application folders/files -- '''
 from gnowsys_ndf.ndf.models import GSystemType, GSystem , Group  #, Node, GSystem  #, Triple
@@ -32,21 +33,21 @@ gst_api_fields_dict = {k: 1 for k in api_configs['fields']}
 
 api_name_model_name_dict = {v: k for v, k in field_verbose_configs.iteritems()}
 
+@csrf_exempt
+def api_create_gs(request, gst_name="Page"):
+    # curl -i --form "docfile=@config.rb" -X POST http://172.17.0.3:8000/api/v2/create/File
+    # curl -i -H "Content-Type: multipart/form-data" -F "file=@fabfile.py" -X POST http://172.17.0.2:8000/api/v2/create/note
+    # curl -i -X POST -H "Content-Type: multipart/form-data" -F "filehive=@config.rb" -F "name=Test the Tiger" -F "tags=check, 1, 2, aa" http://172.17.0.3:8000/api/v2/create/File
+    # curl -i -X POST -H "Content-Type: multipart/form-data" -F "filehive=@CIET-Mix.csv" -F "content=hey, this is sample content" -F "name=Test the FAB" -F "tags=check, 1, 2, aa" -F 'user_nae=administrator'  -F 'workspace=warehouse' http://172.17.0.2:8000/api/v2/create/File
 
-def api_create_gst(request, gst_name):
-    # curl  -H "X-CSRFToken: o9g5JBdpUd63sd8VQ2dQEPaVjlWP0g6C" --cookie "csrftoken=o9g5JBdpUd63sd8VQ2dQEPaVjlWP0g6C" -d 'username=xyz&password=xyz' -X POST http://172.17.0.3:8000/api/v2/create/note
-    # print "===================:: ", request.body
-    print gst_name
-    # curl -H "Content-Type: application/json" -H "X-CSRFToken: o9g5JBdpUd63sd8VQ2dQEPaVjlWP0g6C" --cookie "csrftoken=o9g5JBdpUd63sd8VQ2dQEPaVjlWP0g6C" -d '{"username":"xyz","password":"xyz"}' -X POST http://172.17.0.3:8000/api/v2/create/note
-    print "===================:: ", request.POST
-    print "===================:: ", request.FILES
-    # curl -i --form "docfile=@config.rb" -H "X-CSRFToken:o9g5JBdpUd63sd8VQ2dQEPaVjlWP0g6C" --cookie "csrftoken=o9g5JBdpUd63sd8VQ2dQEPaVjlWP0g6C"  -X POST http://172.17.0.3:8000/api/v2/create/note
+    # print gst_name
+    # print "===================:: ", request.POST
+    # print "===================:: ", request.POST.dict()
+    # print "===================:: ", request.FILES
     
-    # curl -i -X POST -H "X-CSRFToken:o9g5JBdpUd63sd8VQ2dQEPaVjlWP0g6C" --cookie "csrftoken=o9g5JBdpUd63sd8VQ2dQEPaVjlWP0g6C" -H "Content-Type: multipart/form-data" -F "file=@test.mp3;userid=1234" http://172.17.0.3:8000/api/v2/create/note
-    
-    # curl -i -X POST -H "X-CSRFToken:o9g5JBdpUd63sd8VQ2dQEPaVjlWP0g6C" --cookie "csrftoken=o9g5JBdpUd63sd8VQ2dQEPaVjlWP0g6C" -H "Content-Type: multipart/form-data" -F "file=@config.rb" -F "name=Test the Tiger" -F "tags=check, 1, 2, aa" http://172.17.0.3:8000/api/v2/create/note
-    # write_files(request, group_id='warehouse')
+    write_files(request, group_id=request.POST.get('workspace'), unique_gs_per_file=False, kwargs=request.POST.dict())
     return HttpResponse(1)
+
 
 def api_get_gs_nodes(request):
 
