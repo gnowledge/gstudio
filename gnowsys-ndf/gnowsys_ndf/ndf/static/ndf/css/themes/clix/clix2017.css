@@ -855,7 +855,6 @@ ul.horizontal_tabs_gstudio > li.sub_group_action:hover ul {
   background-color: #fff;
   margin-bottom: 100px;
   margin-top: -1px;
-  z-index: -1;
 }
 /* line 982, ../../../scss/_clix2017.scss */
 .group_content .top-bar-secondions_content {
