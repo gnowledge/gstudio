@@ -28703,18 +28703,17 @@ ul.horizontal_tabs_gstudio > li.sub_group_action:hover ul {
   max-width: 100%;
 }
 
-/* line 5456, ../../../scss/_app_styles.scss */
+/* line 5457, ../../../scss/_app_styles.scss */
 .group_content .group_banner {
   transition: all 1s ease;
   -webkit-transition: all 1s ease;
-  height: 300px;
   overflow-y: auto;
   background: url("/static/ndf/images/course-cover.png") no-repeat;
   background-size: 100% 100%;
   margin-bottom: -70px;
   -webkit-box-shadow: 0px 0px 5px 5px #C9C9C;
 }
-/* line 5465, ../../../scss/_app_styles.scss */
+/* line 5466, ../../../scss/_app_styles.scss */
 .group_content .group_header {
   height: 45px;
   padding-bottom: 5px;
@@ -28731,7 +28730,7 @@ ul.horizontal_tabs_gstudio > li.sub_group_action:hover ul {
   filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#0049667a', endColorstr='#8049667a',GradientType=0 );
   /* IE6-9 */
 }
-/* line 5478, ../../../scss/_app_styles.scss */
+/* line 5479, ../../../scss/_app_styles.scss */
 .group_content .group_header .group_title {
   font-size: 28px;
   font-weight: 700;
@@ -28741,28 +28740,28 @@ ul.horizontal_tabs_gstudio > li.sub_group_action:hover ul {
   left: 25px;
   color: #164A7B;
 }
-/* line 5487, ../../../scss/_app_styles.scss */
+/* line 5488, ../../../scss/_app_styles.scss */
 .group_content .group_header .group_actions > button {
   display: inline-block;
   margin: 7px 10px;
 }
-/* line 5492, ../../../scss/_app_styles.scss */
+/* line 5493, ../../../scss/_app_styles.scss */
 .group_content .group_sections {
   text-align: center;
   border-bottom: 2px solid #f5f5f5;
-  background: #eefaff;
+  background-color: #ffffff;
 }
-/* line 5497, ../../../scss/_app_styles.scss */
+/* line 5498, ../../../scss/_app_styles.scss */
 .group_content .group_sections_content {
   background-color: #fff;
   margin-bottom: 100px;
   margin-top: -1px;
 }
-/* line 5503, ../../../scss/_app_styles.scss */
+/* line 5504, ../../../scss/_app_styles.scss */
 .group_content .top-bar-secondions_content {
   background-color: #fff;
 }
-/* line 5507, ../../../scss/_app_styles.scss */
+/* line 5508, ../../../scss/_app_styles.scss */
 .group_content .course_actions > span {
   margin-right: 5px;
   background: #2e3f51;
@@ -28775,7 +28774,7 @@ ul.horizontal_tabs_gstudio > li.sub_group_action:hover ul {
   border-radius: 3px;
   margin-left: 130px;
 }
-/* line 5520, ../../../scss/_app_styles.scss */
+/* line 5521, ../../../scss/_app_styles.scss */
 .group_content .course_actions > i {
   margin-right: 5px;
   background: rgba(0, 0, 0, 0.6);
@@ -28790,7 +28789,7 @@ ul.horizontal_tabs_gstudio > li.sub_group_action:hover ul {
 }
 
 /* Unit_Structure styles */
-/* line 5538, ../../../scss/_app_styles.scss */
+/* line 5539, ../../../scss/_app_styles.scss */
 .course_creator {
   background: #fff;
   box-shadow: 0px 2px 6px #000;
@@ -28798,12 +28797,12 @@ ul.horizontal_tabs_gstudio > li.sub_group_action:hover ul {
   padding: 0px 0px;
   max-width: 100vw;
 }
-/* line 5546, ../../../scss/_app_styles.scss */
+/* line 5547, ../../../scss/_app_styles.scss */
 .course_creator > .columns {
   padding: 0px;
   height: 100%;
 }
-/* line 5550, ../../../scss/_app_styles.scss */
+/* line 5551, ../../../scss/_app_styles.scss */
 .course_creator .course_editor {
   margin-bottom: 10px;
   position: relative;
@@ -28811,17 +28810,17 @@ ul.horizontal_tabs_gstudio > li.sub_group_action:hover ul {
   /*Custom css*/
   /* Course edit in the edit mode. */
 }
-/* line 5556, ../../../scss/_app_styles.scss */
+/* line 5557, ../../../scss/_app_styles.scss */
 .course_creator .course_editor .accordion .accordion-navigation > .content, .course_creator .course_editor .accordion dd > .content {
   padding: 0px;
   padding-left: 0px;
 }
-/* line 5562, ../../../scss/_app_styles.scss */
+/* line 5563, ../../../scss/_app_styles.scss */
 .course_creator .course_editor > div {
   display: inline-block;
   vertical-align: top;
 }
-/* line 5567, ../../../scss/_app_styles.scss */
+/* line 5568, ../../../scss/_app_styles.scss */
 .course_creator .course_editor .course_tree {
   transition: all 1s ease;
   -webkit-transition: all 1s ease;
@@ -28831,25 +28830,25 @@ ul.horizontal_tabs_gstudio > li.sub_group_action:hover ul {
   overflow-y: auto;
   height: 100vh;
 }
-/* line 5576, ../../../scss/_app_styles.scss */
+/* line 5577, ../../../scss/_app_styles.scss */
 .course_creator .course_editor .course_tree .course-lessons dd {
   border-bottom: 2px solid #9abfd9;
   transition: border-color 1s ease;
   -webkit-transition: border-color 1s ease;
 }
-/* line 5580, ../../../scss/_app_styles.scss */
+/* line 5581, ../../../scss/_app_styles.scss */
 .course_creator .course_editor .course_tree .course-lessons dd.accordion-navigation {
   position: relative;
   padding-left: 0px;
 }
-/* line 5585, ../../../scss/_app_styles.scss */
+/* line 5586, ../../../scss/_app_styles.scss */
 .course_creator .course_editor .course_tree .course-lessons dd.accordion-navigation > a:before {
   position: absolute;
   left: 23px;
   line-height: 20px;
   color: #74b3dc;
 }
-/* line 5594, ../../../scss/_app_styles.scss */
+/* line 5595, ../../../scss/_app_styles.scss */
 .course_creator .course_editor .course_tree .course-lessons dd.accordion-navigation a.entity-title {
   background: inherit;
   cursor: pointer;
@@ -28858,7 +28857,7 @@ ul.horizontal_tabs_gstudio > li.sub_group_action:hover ul {
   transition: color 1s ease;
   -webkit-transition: color 1s ease;
 }
-/* line 5601, ../../../scss/_app_styles.scss */
+/* line 5602, ../../../scss/_app_styles.scss */
 .course_creator .course_editor .course_tree .course-lessons dd.accordion-navigation a.entity-title .edit_entity {
   color: #c9d1d8;
   font-weight: 400;
@@ -28867,15 +28866,15 @@ ul.horizontal_tabs_gstudio > li.sub_group_action:hover ul {
   position: relative;
   display: none;
 }
-/* line 5610, ../../../scss/_app_styles.scss */
+/* line 5611, ../../../scss/_app_styles.scss */
 .course_creator .course_editor .course_tree .course-lessons dd.accordion-navigation a.entity-title .edit_entity i {
   display: none;
 }
-/* line 5615, ../../../scss/_app_styles.scss */
+/* line 5616, ../../../scss/_app_styles.scss */
 .course_creator .course_editor .course_tree .course-lessons dd.accordion-navigation a.entity-title .edit_entity > .entity_actions {
   margin-bottom: 0px;
 }
-/* line 5618, ../../../scss/_app_styles.scss */
+/* line 5619, ../../../scss/_app_styles.scss */
 .course_creator .course_editor .course_tree .course-lessons dd.accordion-navigation a.entity-title .edit_entity > .entity_actions li {
   white-space: nowrap;
   list-style: none;
@@ -28883,21 +28882,21 @@ ul.horizontal_tabs_gstudio > li.sub_group_action:hover ul {
   margin: 0px 10px;
   cursor: pointer;
 }
-/* line 5628, ../../../scss/_app_styles.scss */
+/* line 5629, ../../../scss/_app_styles.scss */
 .course_creator .course_editor .course_tree .course-lessons dd.accordion-navigation a.entity-title:hover .edit_entity {
   display: block;
 }
-/* line 5634, ../../../scss/_app_styles.scss */
+/* line 5635, ../../../scss/_app_styles.scss */
 .course_creator .course_editor .course_tree .course-lessons dd.accordion-navigation.active > a:before {
   content: '';
   line-height: 55px;
   color: #d7d7d7;
 }
-/* line 5642, ../../../scss/_app_styles.scss */
+/* line 5643, ../../../scss/_app_styles.scss */
 .course_creator .course_editor .course_tree .course-lessons dd.accordion-navigation .course-activities {
   margin: 0px;
 }
-/* line 5644, ../../../scss/_app_styles.scss */
+/* line 5645, ../../../scss/_app_styles.scss */
 .course_creator .course_editor .course_tree .course-lessons dd.accordion-navigation .course-activities > li {
   list-style: none;
   border-top: 1px solid #e9e9e9;
@@ -28906,7 +28905,7 @@ ul.horizontal_tabs_gstudio > li.sub_group_action:hover ul {
   transition: border-color 1s ease;
   -webkit-transition: border-color 1s ease;
 }
-/* line 5651, ../../../scss/_app_styles.scss */
+/* line 5652, ../../../scss/_app_styles.scss */
 .course_creator .course_editor .course_tree .course-lessons dd.accordion-navigation .course-activities > li > a {
   color: #7ca0d0;
   width: 100%;
@@ -28914,11 +28913,11 @@ ul.horizontal_tabs_gstudio > li.sub_group_action:hover ul {
   transition: color 1s ease;
   -webkit-transition: color 1s ease;
 }
-/* line 5660, ../../../scss/_app_styles.scss */
+/* line 5661, ../../../scss/_app_styles.scss */
 .course_creator .course_editor .course_tree .course-lessons dd.accordion-navigation .content {
   background: inherit;
 }
-/* line 5669, ../../../scss/_app_styles.scss */
+/* line 5670, ../../../scss/_app_styles.scss */
 .course_creator .course_editor .course-editor-section {
   width: 0%;
   display: inline-block;
@@ -28930,49 +28929,49 @@ ul.horizontal_tabs_gstudio > li.sub_group_action:hover ul {
   overflow-y: auto;
   background: #fff;
 }
-/* line 5679, ../../../scss/_app_styles.scss */
+/* line 5680, ../../../scss/_app_styles.scss */
 .course_creator .course_editor .course-editor-section .editor-header {
   height: 55px;
   background-color: #e5f1f6;
   border-bottom: 1px solid #e6e6e7;
   margin-bottom: 10px;
 }
-/* line 5685, ../../../scss/_app_styles.scss */
+/* line 5686, ../../../scss/_app_styles.scss */
 .course_creator .course_editor .course-editor-section .editor-header .header-left {
   padding: 14px 10px 10px 10px;
 }
-/* line 5688, ../../../scss/_app_styles.scss */
+/* line 5689, ../../../scss/_app_styles.scss */
 .course_creator .course_editor .course-editor-section .editor-header .header-left > span {
   color: #3c5264;
   font-weight: 600;
   margin-right: 10px;
 }
-/* line 5697, ../../../scss/_app_styles.scss */
+/* line 5698, ../../../scss/_app_styles.scss */
 .course_creator .course_editor .course-editor-section .editor-header .custom_dropdown {
   margin: 40px 35px 0px;
 }
-/* line 5702, ../../../scss/_app_styles.scss */
+/* line 5703, ../../../scss/_app_styles.scss */
 .course_creator .course_editor .course-editor-section .editor-tool .editor_actions {
   background-color: #fff;
   border-bottom: 1px solid #ccc;
   height: 55px;
 }
-/* line 5706, ../../../scss/_app_styles.scss */
+/* line 5707, ../../../scss/_app_styles.scss */
 .course_creator .course_editor .course-editor-section .editor-tool .editor_actions ul {
   margin: 0px;
 }
-/* line 5708, ../../../scss/_app_styles.scss */
+/* line 5709, ../../../scss/_app_styles.scss */
 .course_creator .course_editor .course-editor-section .editor-tool .editor_actions ul li {
   list-style: none;
   display: inline-block;
 }
-/* line 5711, ../../../scss/_app_styles.scss */
+/* line 5712, ../../../scss/_app_styles.scss */
 .course_creator .course_editor .course-editor-section .editor-tool .editor_actions ul li:not(:first-child) {
   padding: 1px 30px;
   border-left: 1px solid #ccc;
   text-align: center;
 }
-/* line 5717, ../../../scss/_app_styles.scss */
+/* line 5718, ../../../scss/_app_styles.scss */
 .course_creator .course_editor .course-editor-section .editor-tool .editor_actions ul li span {
   display: inline-block;
   letter-spacing: 0.5px;
@@ -28980,29 +28979,29 @@ ul.horizontal_tabs_gstudio > li.sub_group_action:hover ul {
   padding: 15px 5px;
   cursor: pointer;
 }
-/* line 5732, ../../../scss/_app_styles.scss */
+/* line 5733, ../../../scss/_app_styles.scss */
 .course_creator .course_editor .add-lesson {
   margin-top: 20px;
   margin-left: 20px;
   float: left;
 }
-/* line 5740, ../../../scss/_app_styles.scss */
+/* line 5741, ../../../scss/_app_styles.scss */
 .course_creator .course_editor .add_activity {
   margin-top: 3px;
 }
-/* line 5746, ../../../scss/_app_styles.scss */
+/* line 5747, ../../../scss/_app_styles.scss */
 .course_creator .course_editor .create_activity {
   margin-top: 0px;
   margin-left: -7.1px;
 }
-/* line 5755, ../../../scss/_app_styles.scss */
+/* line 5756, ../../../scss/_app_styles.scss */
 .course_creator .course_editor.edit_mode button {
   color: #5097b5;
   border-color: #5097b5;
   transition: color 1s ease, border-color 1s ease;
   -webkit-transition: color 1s ease, border-color 1s ease;
 }
-/* line 5760, ../../../scss/_app_styles.scss */
+/* line 5761, ../../../scss/_app_styles.scss */
 .course_creator .course_editor.edit_mode .course_tree {
   transition: all 1s ease;
   -webkit-transition: all 1s ease;
@@ -29010,28 +29009,28 @@ ul.horizontal_tabs_gstudio > li.sub_group_action:hover ul {
   background-color: #2a6882;
   border: 1px solid #e5f1f6;
 }
-/* line 5767, ../../../scss/_app_styles.scss */
+/* line 5768, ../../../scss/_app_styles.scss */
 .course_creator .course_editor.edit_mode .course_tree .course-lessons dd {
   border-color: #295566;
   transition: border-color 1s ease;
   -webkit-transition: border-color 1s ease;
 }
-/* line 5772, ../../../scss/_app_styles.scss */
+/* line 5773, ../../../scss/_app_styles.scss */
 .course_creator .course_editor.edit_mode .course_tree .course-lessons dd.accordion-navigation a {
   background: inherit;
   color: #8fbbd8;
   transition: color 1s ease;
   -webkit-transition: color 1s ease;
 }
-/* line 5777, ../../../scss/_app_styles.scss */
+/* line 5778, ../../../scss/_app_styles.scss */
 .course_creator .course_editor.edit_mode .course_tree .course-lessons dd.accordion-navigation a .edit_entity {
   width: 20px;
 }
-/* line 5779, ../../../scss/_app_styles.scss */
+/* line 5780, ../../../scss/_app_styles.scss */
 .course_creator .course_editor.edit_mode .course_tree .course-lessons dd.accordion-navigation a .edit_entity i {
   display: block;
 }
-/* line 5783, ../../../scss/_app_styles.scss */
+/* line 5784, ../../../scss/_app_styles.scss */
 .course_creator .course_editor.edit_mode .course_tree .course-lessons dd.accordion-navigation a .edit_entity > .entity_actions {
   display: none;
   position: absolute;
@@ -29043,21 +29042,21 @@ ul.horizontal_tabs_gstudio > li.sub_group_action:hover ul {
   color: #999999;
   border-radius: 3px;
 }
-/* line 5794, ../../../scss/_app_styles.scss */
+/* line 5795, ../../../scss/_app_styles.scss */
 .course_creator .course_editor.edit_mode .course_tree .course-lessons dd.accordion-navigation a .edit_entity > .entity_actions li {
   display: block;
   margin: 0px;
   padding: 5px 25px;
 }
-/* line 5799, ../../../scss/_app_styles.scss */
+/* line 5800, ../../../scss/_app_styles.scss */
 .course_creator .course_editor.edit_mode .course_tree .course-lessons dd.accordion-navigation a .edit_entity > .entity_actions li:hover {
   background-color: #d5f2ff;
 }
-/* line 5805, ../../../scss/_app_styles.scss */
+/* line 5806, ../../../scss/_app_styles.scss */
 .course_creator .course_editor.edit_mode .course_tree .course-lessons dd.accordion-navigation a .edit_entity:hover > .entity_actions {
   display: block;
 }
-/* line 5811, ../../../scss/_app_styles.scss */
+/* line 5812, ../../../scss/_app_styles.scss */
 .course_creator .course_editor.edit_mode .course_tree .course-lessons dd.accordion-navigation .course-activities > li {
   transition: border-color 1s ease;
   -webkit-transition: border-color 1s ease;
@@ -29065,19 +29064,19 @@ ul.horizontal_tabs_gstudio > li.sub_group_action:hover ul {
   border-color: #295566;
   border-bottom: 1px solid transparent;
 }
-/* line 5818, ../../../scss/_app_styles.scss */
+/* line 5819, ../../../scss/_app_styles.scss */
 .course_creator .course_editor.edit_mode .course_tree .course-lessons dd.accordion-navigation .course-activities > li:not(:last-child):hover, .course_creator .course_editor.edit_mode .course_tree .course-lessons dd.accordion-navigation .course-activities > li:not(:last-child).active {
   border-width: 1px 0px 1px 0px;
   border-style: solid;
   border-color: #50c0f8;
 }
-/* line 5825, ../../../scss/_app_styles.scss */
+/* line 5826, ../../../scss/_app_styles.scss */
 .course_creator .course_editor.edit_mode .course_tree .course-lessons dd.accordion-navigation .course-activities > li > a {
   color: #edf6ff;
   transition: color 1s ease;
   -webkit-transition: color 1s ease;
 }
-/* line 5836, ../../../scss/_app_styles.scss */
+/* line 5837, ../../../scss/_app_styles.scss */
 .course_creator .course_editor.edit_mode .course-editor-section {
   width: 77%;
   opacity: 1;
@@ -29088,7 +29087,7 @@ ul.horizontal_tabs_gstudio > li.sub_group_action:hover ul {
   -webkit-transition: width 1.9s ease, opacity 4s ease;
 }
 
-/* line 5853, ../../../scss/_app_styles.scss */
+/* line 5854, ../../../scss/_app_styles.scss */
 .button-hollow-grey {
   background: inherit;
   border: 2px solid #c9d1d8;
@@ -29103,66 +29102,66 @@ ul.horizontal_tabs_gstudio > li.sub_group_action:hover ul {
 }
 
 /* lesspn listing LMS */
-/* line 5869, ../../../scss/_app_styles.scss */
+/* line 5870, ../../../scss/_app_styles.scss */
 .course-content {
   background: #fff;
   margin: 20px auto;
   padding: 20px 0px;
   margin-top: 0px;
 }
-/* line 5877, ../../../scss/_app_styles.scss */
+/* line 5878, ../../../scss/_app_styles.scss */
 .course-content ul.jqtree-tree .course-tree-node.jqtree-selected .jqtree-element {
   background: #fff;
 }
-/* line 5880, ../../../scss/_app_styles.scss */
+/* line 5881, ../../../scss/_app_styles.scss */
 .course-content ul.jqtree-tree .course-tree-node > div {
   height: 35px;
 }
-/* line 5882, ../../../scss/_app_styles.scss */
+/* line 5883, ../../../scss/_app_styles.scss */
 .course-content ul.jqtree-tree .course-tree-node > div a {
   margin-right: 0.7em;
 }
-/* line 5889, ../../../scss/_app_styles.scss */
+/* line 5890, ../../../scss/_app_styles.scss */
 .course-content .course-unit-name {
   padding-left: 20px;
 }
-/* line 5891, ../../../scss/_app_styles.scss */
+/* line 5892, ../../../scss/_app_styles.scss */
 .course-content .course-unit-name:not(:last-child) {
   border-bottom: 1px solid #d2cfcf;
 }
-/* line 5896, ../../../scss/_app_styles.scss */
+/* line 5897, ../../../scss/_app_styles.scss */
 .course-content .course-unit-name > div .jqtree-title {
   color: #3c5264;
   font-size: 19px;
   font-weight: 600;
 }
-/* line 5904, ../../../scss/_app_styles.scss */
+/* line 5905, ../../../scss/_app_styles.scss */
 .course-content .course-activity-group > div .jqtree-title {
   color: #74a0c0;
   font-size: 17px;
 }
-/* line 5910, ../../../scss/_app_styles.scss */
+/* line 5911, ../../../scss/_app_styles.scss */
 .course-content .course-activity-name > div .jqtree-title {
   color: #74a0c0;
   font-size: 17px;
 }
 
-/* line 5917, ../../../scss/_app_styles.scss */
+/* line 5918, ../../../scss/_app_styles.scss */
 .jqtree-title > .fa-check {
   color: green;
 }
 
-/* line 5920, ../../../scss/_app_styles.scss */
+/* line 5921, ../../../scss/_app_styles.scss */
 .jqtree-title > .fa-check-circle-o {
   color: green;
 }
 
-/* line 5923, ../../../scss/_app_styles.scss */
+/* line 5924, ../../../scss/_app_styles.scss */
 .jqtree-title > .fa-clock-o {
   color: orange;
 }
 
-/* line 5926, ../../../scss/_app_styles.scss */
+/* line 5927, ../../../scss/_app_styles.scss */
 .course-status-icon {
   font-size: 20px;
   margin-right: 5px;
@@ -29172,23 +29171,23 @@ ul.horizontal_tabs_gstudio > li.sub_group_action:hover ul {
 /*
     Styling for the Secondary header 2
 */
-/* line 5945, ../../../scss/_app_styles.scss */
+/* line 5946, ../../../scss/_app_styles.scss */
 .activity_player_header {
   background-color: rgba(107, 0, 84, 0.97);
   box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.1);
 }
-/* line 5948, ../../../scss/_app_styles.scss */
+/* line 5949, ../../../scss/_app_styles.scss */
 .activity_player_header > div {
   height: 45px;
   line-height: 45px;
   display: inline-block;
   vertical-align: top;
 }
-/* line 5956, ../../../scss/_app_styles.scss */
+/* line 5957, ../../../scss/_app_styles.scss */
 .activity_player_header > div:not(:last-child) {
   border-right: 1px solid #fff;
 }
-/* line 5965, ../../../scss/_app_styles.scss */
+/* line 5966, ../../../scss/_app_styles.scss */
 .activity_player_header .header_title {
   position: relative;
   color: #fff;
@@ -29199,56 +29198,56 @@ ul.horizontal_tabs_gstudio > li.sub_group_action:hover ul {
   margin-left: -2px;
   border-right: 1px solid white;
 }
-/* line 5974, ../../../scss/_app_styles.scss */
+/* line 5975, ../../../scss/_app_styles.scss */
 .activity_player_header .header_title a {
   color: #ffc14f;
 }
 @media only screen and (min-device-width: 1025px) and (max-device-width: 2130px) {
-  /* line 5965, ../../../scss/_app_styles.scss */
+  /* line 5966, ../../../scss/_app_styles.scss */
   .activity_player_header .header_title {
     text-overflow: ellipsis;
     width: calc(100% - 938px);
   }
 }
 @media only screen and (min-device-width: 2131px) {
-  /* line 5965, ../../../scss/_app_styles.scss */
+  /* line 5966, ../../../scss/_app_styles.scss */
   .activity_player_header .header_title {
     text-overflow: ellipsis;
     width: calc(100% - 970px);
   }
 }
 @media only screen and (max-device-width: 1024px) {
-  /* line 5965, ../../../scss/_app_styles.scss */
+  /* line 5966, ../../../scss/_app_styles.scss */
   .activity_player_header .header_title {
     text-overflow: ellipsis;
     width: calc(100% - 753px);
   }
 }
-/* line 6051, ../../../scss/_app_styles.scss */
+/* line 6052, ../../../scss/_app_styles.scss */
 .activity_player_header .header_icon {
   font-size: 16px;
   line-height: 45px;
   color: #ffc14f;
 }
-/* line 6057, ../../../scss/_app_styles.scss */
+/* line 6058, ../../../scss/_app_styles.scss */
 .activity_player_header .header_icon_block {
   color: #ffc14f;
   width: 70px;
   cursor: pointer;
   text-align: center;
 }
-/* line 6063, ../../../scss/_app_styles.scss */
+/* line 6064, ../../../scss/_app_styles.scss */
 .activity_player_header .header_text_sm_block {
   padding: 0px 10px;
 }
 @media screen and (min-width: 1025px) {
-  /* line 6063, ../../../scss/_app_styles.scss */
+  /* line 6064, ../../../scss/_app_styles.scss */
   .activity_player_header .header_text_sm_block {
     padding: 0px 15px;
   }
 }
 @media screen and (min-width: 1025px) {
-  /* line 6070, ../../../scss/_app_styles.scss */
+  /* line 6071, ../../../scss/_app_styles.scss */
   .activity_player_header .lesson-nav {
     float: right;
     margin-right: 70px;
@@ -29256,73 +29255,73 @@ ul.horizontal_tabs_gstudio > li.sub_group_action:hover ul {
   }
 }
 @media screen and (max-width: 1024px) {
-  /* line 6070, ../../../scss/_app_styles.scss */
+  /* line 6071, ../../../scss/_app_styles.scss */
   .activity_player_header .lesson-nav {
     background-color: rgba(107, 0, 84, 0.97);
   }
 }
-/* line 6083, ../../../scss/_app_styles.scss */
+/* line 6084, ../../../scss/_app_styles.scss */
 .activity_player_header .lesson-nav div {
   height: 45px;
   line-height: 45px;
   display: inline-block;
   vertical-align: top;
 }
-/* line 6089, ../../../scss/_app_styles.scss */
+/* line 6090, ../../../scss/_app_styles.scss */
 .activity_player_header .lesson-nav .header_text_block {
   padding: 0px 15px;
   margin-left: -2px;
   border-right: 1px solid white;
 }
-/* line 6093, ../../../scss/_app_styles.scss */
+/* line 6094, ../../../scss/_app_styles.scss */
 .activity_player_header .lesson-nav .header_text_block a {
   color: #ffc14f;
 }
-/* line 6099, ../../../scss/_app_styles.scss */
+/* line 6100, ../../../scss/_app_styles.scss */
 .activity_player_header .lesson-nav .header_text_lg_block {
   padding: 0px 9px;
 }
 @media screen and (min-width: 1025px) {
-  /* line 6099, ../../../scss/_app_styles.scss */
+  /* line 6100, ../../../scss/_app_styles.scss */
   .activity_player_header .lesson-nav .header_text_lg_block {
     padding: 0px 15px;
   }
 }
-/* line 6107, ../../../scss/_app_styles.scss */
+/* line 6108, ../../../scss/_app_styles.scss */
 .activity_player_header .lesson-nav .header_text_md_block {
   padding: 0px 7px;
 }
 @media screen and (min-width: 1025px) {
-  /* line 6107, ../../../scss/_app_styles.scss */
+  /* line 6108, ../../../scss/_app_styles.scss */
   .activity_player_header .lesson-nav .header_text_md_block {
     padding: 0px 15px;
   }
 }
-/* line 6116, ../../../scss/_app_styles.scss */
+/* line 6117, ../../../scss/_app_styles.scss */
 .activity_player_header .lesson-nav .back_button {
   border-color: #e0e0e0;
   background-color: rgba(244, 244, 244, 0.3);
 }
-/* line 6119, ../../../scss/_app_styles.scss */
+/* line 6120, ../../../scss/_app_styles.scss */
 .activity_player_header .lesson-nav .back_button i {
   color: #71318b;
 }
-/* line 6125, ../../../scss/_app_styles.scss */
+/* line 6126, ../../../scss/_app_styles.scss */
 .activity_player_header .lesson-nav .settings i {
   transition: transform .5s ease-in-out;
   -webkit-transition: -webkit-transform .5s ease-in-out;
 }
-/* line 6129, ../../../scss/_app_styles.scss */
+/* line 6130, ../../../scss/_app_styles.scss */
 .activity_player_header .lesson-nav .settings:hover i {
   transform: rotate(90deg);
   -webkit-transform: rotate(90deg);
 }
-/* line 6135, ../../../scss/_app_styles.scss */
+/* line 6136, ../../../scss/_app_styles.scss */
 .activity_player_header .lesson-nav .pagination:not(i) {
   color: #a983b9;
 }
 
-/* line 6143, ../../../scss/_app_styles.scss */
+/* line 6144, ../../../scss/_app_styles.scss */
 .activity_sheet {
   background: rgba(231, 231, 231, 0.12);
   box-shadow: 0px 2px 6px #000;
@@ -29330,29 +29329,29 @@ ul.horizontal_tabs_gstudio > li.sub_group_action:hover ul {
   padding: 0px 0px;
   max-width: 100vw;
 }
-/* line 6150, ../../../scss/_app_styles.scss */
+/* line 6151, ../../../scss/_app_styles.scss */
 .activity_sheet > .columns {
   padding: 0px;
   height: 100%;
 }
-/* line 6154, ../../../scss/_app_styles.scss */
+/* line 6155, ../../../scss/_app_styles.scss */
 .activity_sheet .course_editor {
   margin-bottom: 10px;
   position: relative;
   /*Overriding default*/
   /*Custom css*/
 }
-/* line 6160, ../../../scss/_app_styles.scss */
+/* line 6161, ../../../scss/_app_styles.scss */
 .activity_sheet .course_editor .accordion .accordion-navigation > .content, .activity_sheet .course_editor .accordion dd > .content {
   padding: 0px;
   padding-left: 0px;
 }
-/* line 6166, ../../../scss/_app_styles.scss */
+/* line 6167, ../../../scss/_app_styles.scss */
 .activity_sheet .course_editor > div {
   display: inline-block;
   vertical-align: top;
 }
-/* line 6171, ../../../scss/_app_styles.scss */
+/* line 6172, ../../../scss/_app_styles.scss */
 .activity_sheet .course_editor .course_tree {
   transition: all 1s ease;
   -webkit-transition: all 1s ease;
@@ -29362,25 +29361,25 @@ ul.horizontal_tabs_gstudio > li.sub_group_action:hover ul {
   overflow-y: auto;
   height: 100vh;
 }
-/* line 6180, ../../../scss/_app_styles.scss */
+/* line 6181, ../../../scss/_app_styles.scss */
 .activity_sheet .course_editor .course_tree .course-lessons dd {
   border-bottom: 2px solid #9abfd9;
   transition: border-color 1s ease;
   -webkit-transition: border-color 1s ease;
 }
-/* line 6184, ../../../scss/_app_styles.scss */
+/* line 6185, ../../../scss/_app_styles.scss */
 .activity_sheet .course_editor .course_tree .course-lessons dd.accordion-navigation {
   position: relative;
   padding-left: 0px;
 }
-/* line 6189, ../../../scss/_app_styles.scss */
+/* line 6190, ../../../scss/_app_styles.scss */
 .activity_sheet .course_editor .course_tree .course-lessons dd.accordion-navigation > a:before {
   position: absolute;
   left: 23px;
   line-height: 20px;
   color: #74b3dc;
 }
-/* line 6198, ../../../scss/_app_styles.scss */
+/* line 6199, ../../../scss/_app_styles.scss */
 .activity_sheet .course_editor .course_tree .course-lessons dd.accordion-navigation a.entity-title {
   background: inherit;
   cursor: pointer;
@@ -29389,7 +29388,7 @@ ul.horizontal_tabs_gstudio > li.sub_group_action:hover ul {
   transition: color 1s ease;
   -webkit-transition: color 1s ease;
 }
-/* line 6205, ../../../scss/_app_styles.scss */
+/* line 6206, ../../../scss/_app_styles.scss */
 .activity_sheet .course_editor .course_tree .course-lessons dd.accordion-navigation a.entity-title .edit_entity {
   color: #c9d1d8;
   font-weight: 400;
@@ -29398,15 +29397,15 @@ ul.horizontal_tabs_gstudio > li.sub_group_action:hover ul {
   position: relative;
   display: none;
 }
-/* line 6214, ../../../scss/_app_styles.scss */
+/* line 6215, ../../../scss/_app_styles.scss */
 .activity_sheet .course_editor .course_tree .course-lessons dd.accordion-navigation a.entity-title .edit_entity i {
   display: none;
 }
-/* line 6219, ../../../scss/_app_styles.scss */
+/* line 6220, ../../../scss/_app_styles.scss */
 .activity_sheet .course_editor .course_tree .course-lessons dd.accordion-navigation a.entity-title .edit_entity > .entity_actions {
   margin-bottom: 0px;
 }
-/* line 6222, ../../../scss/_app_styles.scss */
+/* line 6223, ../../../scss/_app_styles.scss */
 .activity_sheet .course_editor .course_tree .course-lessons dd.accordion-navigation a.entity-title .edit_entity > .entity_actions li {
   white-space: nowrap;
   list-style: none;
@@ -29414,21 +29413,21 @@ ul.horizontal_tabs_gstudio > li.sub_group_action:hover ul {
   margin: 0px 10px;
   cursor: pointer;
 }
-/* line 6232, ../../../scss/_app_styles.scss */
+/* line 6233, ../../../scss/_app_styles.scss */
 .activity_sheet .course_editor .course_tree .course-lessons dd.accordion-navigation a.entity-title:hover .edit_entity {
   display: block;
 }
-/* line 6238, ../../../scss/_app_styles.scss */
+/* line 6239, ../../../scss/_app_styles.scss */
 .activity_sheet .course_editor .course_tree .course-lessons dd.accordion-navigation.active > a:before {
   content: '';
   line-height: 55px;
   color: #d7d7d7;
 }
-/* line 6246, ../../../scss/_app_styles.scss */
+/* line 6247, ../../../scss/_app_styles.scss */
 .activity_sheet .course_editor .course_tree .course-lessons dd.accordion-navigation .course-activities {
   margin: 0px;
 }
-/* line 6248, ../../../scss/_app_styles.scss */
+/* line 6249, ../../../scss/_app_styles.scss */
 .activity_sheet .course_editor .course_tree .course-lessons dd.accordion-navigation .course-activities > li {
   list-style: none;
   border-top: 1px solid #e9e9e9;
@@ -29437,7 +29436,7 @@ ul.horizontal_tabs_gstudio > li.sub_group_action:hover ul {
   transition: border-color 1s ease;
   -webkit-transition: border-color 1s ease;
 }
-/* line 6255, ../../../scss/_app_styles.scss */
+/* line 6256, ../../../scss/_app_styles.scss */
 .activity_sheet .course_editor .course_tree .course-lessons dd.accordion-navigation .course-activities > li > a {
   color: #7ca0d0;
   width: 100%;
@@ -29445,11 +29444,11 @@ ul.horizontal_tabs_gstudio > li.sub_group_action:hover ul {
   transition: color 1s ease;
   -webkit-transition: color 1s ease;
 }
-/* line 6264, ../../../scss/_app_styles.scss */
+/* line 6265, ../../../scss/_app_styles.scss */
 .activity_sheet .course_editor .course_tree .course-lessons dd.accordion-navigation .content {
   background: inherit;
 }
-/* line 6273, ../../../scss/_app_styles.scss */
+/* line 6274, ../../../scss/_app_styles.scss */
 .activity_sheet .course_editor .course-editor-section {
   width: 0%;
   display: inline-block;
@@ -29461,48 +29460,48 @@ ul.horizontal_tabs_gstudio > li.sub_group_action:hover ul {
   overflow-y: auto;
   background: #fff;
 }
-/* line 6283, ../../../scss/_app_styles.scss */
+/* line 6284, ../../../scss/_app_styles.scss */
 .activity_sheet .course_editor .course-editor-section .editor-header {
   height: 100px;
   background-color: #e5f1f6;
   border-bottom: 1px solid #e6e6e7;
 }
-/* line 6288, ../../../scss/_app_styles.scss */
+/* line 6289, ../../../scss/_app_styles.scss */
 .activity_sheet .course_editor .course-editor-section .editor-header .header-left {
   padding: 29px 0px;
 }
-/* line 6291, ../../../scss/_app_styles.scss */
+/* line 6292, ../../../scss/_app_styles.scss */
 .activity_sheet .course_editor .course-editor-section .editor-header .header-left > span {
   color: #3c5264;
   font-weight: 600;
   margin-right: 10px;
 }
-/* line 6300, ../../../scss/_app_styles.scss */
+/* line 6301, ../../../scss/_app_styles.scss */
 .activity_sheet .course_editor .course-editor-section .editor-header .custom_dropdown {
   margin: 40px 35px 0px;
 }
-/* line 6305, ../../../scss/_app_styles.scss */
+/* line 6306, ../../../scss/_app_styles.scss */
 .activity_sheet .course_editor .course-editor-section .editor-tool .editor_actions {
   background-color: #fff;
   border-bottom: 1px solid #ccc;
   height: 55px;
 }
-/* line 6309, ../../../scss/_app_styles.scss */
+/* line 6310, ../../../scss/_app_styles.scss */
 .activity_sheet .course_editor .course-editor-section .editor-tool .editor_actions ul {
   margin: 0px;
 }
-/* line 6311, ../../../scss/_app_styles.scss */
+/* line 6312, ../../../scss/_app_styles.scss */
 .activity_sheet .course_editor .course-editor-section .editor-tool .editor_actions ul li {
   list-style: none;
   display: inline-block;
 }
-/* line 6314, ../../../scss/_app_styles.scss */
+/* line 6315, ../../../scss/_app_styles.scss */
 .activity_sheet .course_editor .course-editor-section .editor-tool .editor_actions ul li:not(:first-child) {
   padding: 1px 30px;
   border-left: 1px solid #ccc;
   text-align: center;
 }
-/* line 6320, ../../../scss/_app_styles.scss */
+/* line 6321, ../../../scss/_app_styles.scss */
 .activity_sheet .course_editor .course-editor-section .editor-tool .editor_actions ul li span {
   display: inline-block;
   letter-spacing: 0.5px;
@@ -29511,7 +29510,7 @@ ul.horizontal_tabs_gstudio > li.sub_group_action:hover ul {
   cursor: pointer;
 }
 
-/* line 6338, ../../../scss/_app_styles.scss */
+/* line 6339, ../../../scss/_app_styles.scss */
 .course_editor_section {
   background: #fff;
   min-height: 100vh;
@@ -29519,26 +29518,26 @@ ul.horizontal_tabs_gstudio > li.sub_group_action:hover ul {
   margin-bottom: 10px;
   padding-right: 4px;
 }
-/* line 6344, ../../../scss/_app_styles.scss */
+/* line 6345, ../../../scss/_app_styles.scss */
 .course_editor_section #scstyle {
   margin-top: -10px;
 }
 
-/* line 6349, ../../../scss/_app_styles.scss */
+/* line 6350, ../../../scss/_app_styles.scss */
 .lesson-title {
   font-size: 18px;
   padding-top: 10px;
   padding-left: 10px;
 }
 
-/* line 6355, ../../../scss/_app_styles.scss */
+/* line 6356, ../../../scss/_app_styles.scss */
 .activity-title {
   font-size: 18px;
   padding-top: 10px;
   padding-left: 23px;
   margin: 0px;
 }
-/* line 6361, ../../../scss/_app_styles.scss */
+/* line 6362, ../../../scss/_app_styles.scss */
 .activity-title > li {
   list-style: none;
   border-top: 1px solid #e9e9e9;
@@ -29548,29 +29547,29 @@ ul.horizontal_tabs_gstudio > li.sub_group_action:hover ul {
   -webkit-transition: border-color 1s ease;
   margin-left: -23px;
 }
-/* line 6370, ../../../scss/_app_styles.scss */
+/* line 6371, ../../../scss/_app_styles.scss */
 .activity-title > li.active {
   background: rgba(116, 0, 255, 0.31);
 }
-/* line 6374, ../../../scss/_app_styles.scss */
+/* line 6375, ../../../scss/_app_styles.scss */
 .activity-title > li > a {
   color: black;
 }
 
-/* line 6383, ../../../scss/_app_styles.scss */
+/* line 6384, ../../../scss/_app_styles.scss */
 .activity_page_rendered {
   margin-left: 20px;
   max-width: 900px;
 }
 
 /* Rating css */
-/* line 6391, ../../../scss/_app_styles.scss */
+/* line 6392, ../../../scss/_app_styles.scss */
 .rating-bar {
   /* the hidden clearer */
   /* this is gross, I threw this in to override the starred
   buttons when hovering. */
 }
-/* line 6393, ../../../scss/_app_styles.scss */
+/* line 6394, ../../../scss/_app_styles.scss */
 .rating-bar > span {
   /* remove inline-block whitespace */
   font-size: 0;
@@ -29578,19 +29577,19 @@ ul.horizontal_tabs_gstudio > li.sub_group_action:hover ul {
   unicode-bidi: bidi-override;
   direction: rtl;
 }
-/* line 6401, ../../../scss/_app_styles.scss */
+/* line 6402, ../../../scss/_app_styles.scss */
 .rating-bar.unrated {
   /* If the user has not rated yet */
 }
-/* line 6403, ../../../scss/_app_styles.scss */
+/* line 6404, ../../../scss/_app_styles.scss */
 .rating-bar.unrated:checked ~ label:before {
   color: #ffc14e;
 }
-/* line 6409, ../../../scss/_app_styles.scss */
+/* line 6410, ../../../scss/_app_styles.scss */
 .rating-bar [type*="radio"] {
   display: none;
 }
-/* line 6411, ../../../scss/_app_styles.scss */
+/* line 6412, ../../../scss/_app_styles.scss */
 .rating-bar [type*="radio"] + label {
   /* only enough room for the star */
   display: inline-block;
@@ -29603,7 +29602,7 @@ ul.horizontal_tabs_gstudio > li.sub_group_action:hover ul {
   margin: 0;
   vertical-align: bottom;
 }
-/* line 6423, ../../../scss/_app_styles.scss */
+/* line 6424, ../../../scss/_app_styles.scss */
 .rating-bar [type*="radio"] + label:before {
   display: inline-block;
   text-indent: -9999px;
@@ -29611,32 +29610,32 @@ ul.horizontal_tabs_gstudio > li.sub_group_action:hover ul {
   /* WHITE STAR */
   color: #888;
 }
-/* line 6430, ../../../scss/_app_styles.scss */
+/* line 6431, ../../../scss/_app_styles.scss */
 .rating-bar [type*="radio"]:checked ~ label:before, .rating-bar [type*="radio"] + label:hover ~ label:before, .rating-bar [type*="radio"] + label:hover:before {
   content: '\2605';
   /* BLACK STAR */
   color: #FF980D;
   text-shadow: 0 0 1px #333;
 }
-/* line 6441, ../../../scss/_app_styles.scss */
+/* line 6442, ../../../scss/_app_styles.scss */
 .rating-bar .last[type*="radio"] + label {
   text-indent: -9999px;
   width: .5em;
   margin-left: -.5em;
 }
-/* line 6448, ../../../scss/_app_styles.scss */
+/* line 6449, ../../../scss/_app_styles.scss */
 .rating-bar .last[type*="radio"] + label:before {
   width: .5em;
   height: 1.4em;
 }
-/* line 6456, ../../../scss/_app_styles.scss */
+/* line 6457, ../../../scss/_app_styles.scss */
 .rating-bar:hover [type*="radio"] + label:before {
   content: '\2606';
   /* WHITE STAR */
   color: #888;
   text-shadow: none;
 }
-/* line 6461, ../../../scss/_app_styles.scss */
+/* line 6462, ../../../scss/_app_styles.scss */
 .rating-bar:hover [type*="radio"] + label:hover ~ label:before,
 .rating-bar:hover [type*="radio"] + label:hover:before {
   content: '\2605';
@@ -29645,29 +29644,29 @@ ul.horizontal_tabs_gstudio > li.sub_group_action:hover ul {
   text-shadow: 0 0 1px #333;
 }
 
-/* line 6471, ../../../scss/_app_styles.scss */
+/* line 6472, ../../../scss/_app_styles.scss */
 [class*="column"] + [class*="column"]:last-child {
   float: left;
 }
 
-/* line 6475, ../../../scss/_app_styles.scss */
+/* line 6476, ../../../scss/_app_styles.scss */
 .input_links {
   margin-left: 10px;
 }
-/* line 6477, ../../../scss/_app_styles.scss */
+/* line 6478, ../../../scss/_app_styles.scss */
 .input_links a {
   margin-right: 35px;
   margin-top: 5px;
 }
 
-/* line 6483, ../../../scss/_app_styles.scss */
+/* line 6484, ../../../scss/_app_styles.scss */
 .buddy_margin {
   margin-right: 80px;
   font-family: OpenSans-Regular;
   margin-top: 6px;
 }
 
-/* line 6491, ../../../scss/_app_styles.scss */
+/* line 6492, ../../../scss/_app_styles.scss */
 .activity-slides-container {
   height: 100%;
   width: 80%;
@@ -29676,19 +29675,19 @@ ul.horizontal_tabs_gstudio > li.sub_group_action:hover ul {
   padding: 0em 0em 0em 0em;
   margin-bottom: 15px;
 }
-/* line 6500, ../../../scss/_app_styles.scss */
+/* line 6501, ../../../scss/_app_styles.scss */
 .activity-slides-container .activity-slides {
   height: 100%;
   color: #f8f8f8;
 }
-/* line 6505, ../../../scss/_app_styles.scss */
+/* line 6506, ../../../scss/_app_styles.scss */
 .activity-slides-container .activity-slides .activity-slide {
   padding: 1em;
   height: inherit;
   background: #fff;
   position: relative;
 }
-/* line 6511, ../../../scss/_app_styles.scss */
+/* line 6512, ../../../scss/_app_styles.scss */
 .activity-slides-container .activity-slides .activity-slide .view-related-content {
   border: 1px solid #999;
   display: inline-block;
@@ -29696,12 +29695,12 @@ ul.horizontal_tabs_gstudio > li.sub_group_action:hover ul {
   color: #999999;
   margin-left: 12%;
 }
-/* line 6519, ../../../scss/_app_styles.scss */
+/* line 6520, ../../../scss/_app_styles.scss */
 .activity-slides-container .activity-slides .activity-slide .page > section {
   margin-left: 50%;
   transform: translate(-50%);
 }
-/* line 6525, ../../../scss/_app_styles.scss */
+/* line 6526, ../../../scss/_app_styles.scss */
 .activity-slides-container .activity-slides .related-content-close {
   position: absolute;
   right: -2px;
@@ -29710,21 +29709,21 @@ ul.horizontal_tabs_gstudio > li.sub_group_action:hover ul {
   display: none;
   color: #8E8E8E;
 }
-/* line 6534, ../../../scss/_app_styles.scss */
+/* line 6535, ../../../scss/_app_styles.scss */
 .activity-slides-container .activity-slides .content-expanded > i {
   font-size: 20px !important;
   color: #ccc !important;
   top: 8px !important;
 }
-/* line 6539, ../../../scss/_app_styles.scss */
+/* line 6540, ../../../scss/_app_styles.scss */
 .activity-slides-container .activity-slides .content-expanded .related-content-header {
   margin-left: 20px !important;
 }
-/* line 6541, ../../../scss/_app_styles.scss */
+/* line 6542, ../../../scss/_app_styles.scss */
 .activity-slides-container .activity-slides .content-expanded .related-content-header > span:first-child {
   display: none !important;
 }
-/* line 6544, ../../../scss/_app_styles.scss */
+/* line 6545, ../../../scss/_app_styles.scss */
 .activity-slides-container .activity-slides .content-expanded .related-content-header .back-to-activity {
   display: inline-block !important;
   float: right;
@@ -29735,24 +29734,24 @@ ul.horizontal_tabs_gstudio > li.sub_group_action:hover ul {
   color: #757575;
   margin-right: 20px;
 }
-/* line 6554, ../../../scss/_app_styles.scss */
+/* line 6555, ../../../scss/_app_styles.scss */
 .activity-slides-container .activity-slides .content-expanded .related-content-header .related-content-title {
   font-size: 15px !important;
   position: relative;
 }
-/* line 6558, ../../../scss/_app_styles.scss */
+/* line 6559, ../../../scss/_app_styles.scss */
 .activity-slides-container .activity-slides .content-expanded .related-content-header .related-content-title .related-content-close {
   display: block;
 }
-/* line 6561, ../../../scss/_app_styles.scss */
+/* line 6562, ../../../scss/_app_styles.scss */
 .activity-slides-container .activity-slides .content-expanded .related-content-header .related-content-title > i {
   display: none !important;
 }
-/* line 6566, ../../../scss/_app_styles.scss */
+/* line 6567, ../../../scss/_app_styles.scss */
 .activity-slides-container .activity-slides .content-expanded .related-content-body {
   display: block !important;
 }
-/* line 6570, ../../../scss/_app_styles.scss */
+/* line 6571, ../../../scss/_app_styles.scss */
 .activity-slides-container .activity-slides #related-content {
   width: 100%;
   margin: 0px auto;
@@ -29764,7 +29763,7 @@ ul.horizontal_tabs_gstudio > li.sub_group_action:hover ul {
   position: relative;
   color: #222222;
 }
-/* line 6581, ../../../scss/_app_styles.scss */
+/* line 6582, ../../../scss/_app_styles.scss */
 .activity-slides-container .activity-slides #related-content > i {
   color: #fff;
   font-size: 40px;
@@ -29772,15 +29771,15 @@ ul.horizontal_tabs_gstudio > li.sub_group_action:hover ul {
   left: 8px;
   top: 4px;
 }
-/* line 6589, ../../../scss/_app_styles.scss */
+/* line 6590, ../../../scss/_app_styles.scss */
 .activity-slides-container .activity-slides #related-content .related-content-header {
   margin-left: 40px;
 }
-/* line 6591, ../../../scss/_app_styles.scss */
+/* line 6592, ../../../scss/_app_styles.scss */
 .activity-slides-container .activity-slides #related-content .related-content-header .back-to-activity {
   display: none;
 }
-/* line 6594, ../../../scss/_app_styles.scss */
+/* line 6595, ../../../scss/_app_styles.scss */
 .activity-slides-container .activity-slides #related-content .related-content-header span {
   display: block;
   vertical-align: top;
@@ -29790,19 +29789,522 @@ ul.horizontal_tabs_gstudio > li.sub_group_action:hover ul {
   letter-spacing: 0.8px;
   color: #999999;
 }
-/* line 6603, ../../../scss/_app_styles.scss */
+/* line 6604, ../../../scss/_app_styles.scss */
 .activity-slides-container .activity-slides #related-content .related-content-header .related-content-title {
   font-size: 20px;
   color: #000;
   cursor: pointer;
 }
-/* line 6609, ../../../scss/_app_styles.scss */
+/* line 6610, ../../../scss/_app_styles.scss */
 .activity-slides-container .activity-slides #related-content .related-content-body {
   display: none;
 }
 
-/* line 6618, ../../../scss/_app_styles.scss */
+/* line 6619, ../../../scss/_app_styles.scss */
 .icon-color {
   color: #2e3f51 !important;
   padding: right;
+}
+
+/* The asset tile  */
+/* line 6629, ../../../scss/_app_styles.scss */
+.group_content .group_banner {
+  transition: all 1s ease;
+  -webkit-transition: all 1s ease;
+  overflow-y: auto;
+  background: url("/static/ndf/images/course-cover.png") no-repeat;
+  background-size: 100% 100%;
+  margin-bottom: -70px;
+  -webkit-box-shadow: 0px 0px 5px 5px #C9C9C;
+}
+/* line 6638, ../../../scss/_app_styles.scss */
+.group_content .group_header {
+  height: 45px;
+  padding-bottom: 5px;
+  background: transparent;
+  color: #fff;
+  width: 100%;
+  /* Permalink - use to edit and share this gradient: http://colorzilla.com/gradient-editor/#49667a+0,49667a+100&0+0,0.5+100 */
+  background: -moz-linear-gradient(top, rgba(73, 102, 122, 0) 0%, rgba(73, 102, 122, 0.8) 100%);
+  /* FF3.6-15 */
+  background: -webkit-linear-gradient(top, rgba(73, 102, 122, 0) 0%, rgba(73, 102, 122, 0.8) 100%);
+  /* Chrome10-25,Safari5.1-6 */
+  background: linear-gradient(to bottom, rgba(73, 102, 122, 0) 0%, rgba(73, 102, 122, 0.8) 100%);
+  /* W3C, IE10+, FF16+, Chrome26+, Opera12+, Safari7+ */
+  filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#0049667a', endColorstr='#8049667a',GradientType=0 );
+  /* IE6-9 */
+}
+/* line 6651, ../../../scss/_app_styles.scss */
+.group_content .group_header .group_title {
+  font-size: 28px;
+  font-weight: 700;
+  letter-spacing: 0.4px;
+  position: absolute;
+  bottom: 10px;
+  left: 25px;
+  color: #164A7B;
+}
+/* line 6660, ../../../scss/_app_styles.scss */
+.group_content .group_header .group_actions > button {
+  display: inline-block;
+  margin: 7px 10px;
+}
+/* line 6665, ../../../scss/_app_styles.scss */
+.group_content .group_sections {
+  text-align: center;
+  border-bottom: 2px solid #f5f5f5;
+  background: #eefaff;
+}
+/* line 6670, ../../../scss/_app_styles.scss */
+.group_content .group_sections_content {
+  background-color: #fff;
+  margin-bottom: 100px;
+  margin-top: -1px;
+}
+/* line 6676, ../../../scss/_app_styles.scss */
+.group_content .top-bar-secondions_content {
+  background-color: #fff;
+}
+/* line 6680, ../../../scss/_app_styles.scss */
+.group_content .course_actions > span {
+  margin-right: 5px;
+  background: #2e3f51;
+  border: 1px solid rgba(255, 255, 255, 0.7);
+  padding: 1px 8px;
+  color: #fff;
+  font-size: 12px;
+  margin: 0px 10px 0px 0px;
+  cursor: pointer;
+  border-radius: 3px;
+  margin-left: 130px;
+}
+/* line 6693, ../../../scss/_app_styles.scss */
+.group_content .course_actions > i {
+  margin-right: 5px;
+  background: rgba(0, 0, 0, 0.6);
+  border: 1px solid rgba(255, 255, 255, 0.7);
+  padding: 1px 8px;
+  color: #fff;
+  font-size: 12px;
+  margin: 0px 10px 0px 0px;
+  cursor: pointer;
+  border-radius: 3px;
+  margin-right: 80px;
+}
+
+/* line 6708, ../../../scss/_app_styles.scss */
+.activity_tile {
+  margin-top: 10px;
+  margin-bottom: 25px;
+  padding-bottom: 10px;
+  cursor: pointer;
+  height: 260px;
+  border: 1px solid #164A7B;
+}
+/* line 6717, ../../../scss/_app_styles.scss */
+.activity_tile .activity_preview {
+  height: 200px;
+  width: 100%;
+  border-width: 5px;
+}
+/* line 6724, ../../../scss/_app_styles.scss */
+.activity_tile .activity_preview img {
+  width: 100%;
+  height: 210px;
+}
+/* line 6730, ../../../scss/_app_styles.scss */
+.activity_tile .activity_text {
+  padding: 7px 0px 0px 0px;
+}
+/* line 6732, ../../../scss/_app_styles.scss */
+.activity_tile .activity_text .activity_title {
+  letter-spacing: 0.2px;
+  overflow: hidden;
+  font-size: 13px;
+  color: #164A7B;
+  padding-top: 10px;
+  padding-left: 6px;
+}
+/* line 6739, ../../../scss/_app_styles.scss */
+.activity_tile .activity_text .activity_title > a {
+  margin-right: 0px !important;
+}
+/* line 6743, ../../../scss/_app_styles.scss */
+.activity_tile .activity_text .activity_title .filenode {
+  z-index: -1;
+}
+/* line 6749, ../../../scss/_app_styles.scss */
+.activity_tile .activity_text .activity_desc {
+  letter-spacing: 0.3px;
+  overflow: hidden;
+  padding-left: 6px;
+  font-size: 11px;
+  color: grey;
+}
+
+/* line 6760, ../../../scss/_app_styles.scss */
+.asset_tile {
+  margin-top: 10px;
+  margin-bottom: 25px;
+  padding-bottom: 10px;
+  cursor: pointer;
+  height: 260px;
+  border: 1px solid #164A7B;
+}
+/* line 6769, ../../../scss/_app_styles.scss */
+.asset_tile .asset_preview {
+  height: 200px;
+  width: 100%;
+  border-width: 5px;
+}
+/* line 6776, ../../../scss/_app_styles.scss */
+.asset_tile .asset_preview .photos-1 img {
+  /* Just in case there are inline attributes */
+  width: 100% !important;
+  height: 210px !important;
+}
+/* line 6781, ../../../scss/_app_styles.scss */
+.asset_tile .asset_preview img {
+  width: 100%;
+  height: 210px;
+}
+/* line 6785, ../../../scss/_app_styles.scss */
+.asset_tile .asset_preview .photos {
+  /* Prevent vertical gaps */
+  line-height: 0;
+  -webkit-column-count: 2;
+  -webkit-column-gap: 0px;
+  -moz-column-count: 2;
+  -moz-column-gap: 0px;
+  column-count: 2;
+  column-gap: 0px;
+}
+/* line 6795, ../../../scss/_app_styles.scss */
+.asset_tile .asset_preview .photos img {
+  /* Just in case there are inline attributes */
+  width: 100% !important;
+  height: 100px !important;
+}
+@media (max-width: 1200px) {
+  /* line 6802, ../../../scss/_app_styles.scss */
+  .asset_tile .asset_preview .photos {
+    -moz-column-count: 2;
+    -webkit-column-count: 2;
+    column-count: 2;
+  }
+}
+@media (max-width: 1000px) {
+  /* line 6811, ../../../scss/_app_styles.scss */
+  .asset_tile .asset_preview .photos {
+    -moz-column-count: 2;
+    -webkit-column-count: 2;
+    column-count: 2;
+  }
+}
+@media (max-width: 800px) {
+  /* line 6818, ../../../scss/_app_styles.scss */
+  .asset_tile .asset_preview .photos {
+    -moz-column-count: 2;
+    -webkit-column-count: 2;
+    column-count: 2;
+  }
+}
+@media (max-width: 400px) {
+  /* line 6825, ../../../scss/_app_styles.scss */
+  .asset_tile .asset_preview .photos {
+    -moz-column-count: 1;
+    -webkit-column-count: 1;
+    column-count: 1;
+  }
+}
+/* line 6833, ../../../scss/_app_styles.scss */
+.asset_tile .asset_preview .photos-02 {
+  /* no vertical space*/
+  line-height: 0;
+  -webkit-column-count: 1;
+  -moz-column-count: 1;
+  -webkit-column-gap: 0px;
+  -moz-column-gap: 0px;
+  column-count: 1;
+  column-gap: 1px;
+  -moz-row-count: 2;
+  row-count: 2;
+  -webkit-row-gap: 0px;
+  -moz-row-gap: 0px;
+}
+/* line 6849, ../../../scss/_app_styles.scss */
+.asset_tile .asset_preview .photos-02 img {
+  /* Just in case there are inline attributes */
+  width: 100% !important;
+  height: 105px !important;
+}
+@media (max-width: 1200px) {
+  /* line 6856, ../../../scss/_app_styles.scss */
+  .asset_tile .asset_preview .photos-02 {
+    -moz-row-count: 2;
+    -webkit-column-count: 1;
+    column-count: 1;
+    row-count: 2;
+    -webkit-row-gap: 0px;
+    -moz-row-gap: 0px;
+  }
+}
+@media (max-width: 1000px) {
+  /* line 6867, ../../../scss/_app_styles.scss */
+  .asset_tile .asset_preview .photos-02 {
+    -moz-row-count: 2;
+    -webkit-column-count: 1;
+    column-count: 1;
+    row-count: 2;
+    -webkit-row-gap: 0px;
+    -moz-row-gap: 0px;
+  }
+}
+@media (max-width: 800px) {
+  /* line 6878, ../../../scss/_app_styles.scss */
+  .asset_tile .asset_preview .photos-02 {
+    -moz-row-count: 2;
+    -webkit-column-count: 0;
+    column-count: 1;
+    row-count: 3;
+    -webkit-row-gap: 0px;
+    -moz-row-gap: 0px;
+  }
+}
+@media (max-width: 400px) {
+  /* line 6889, ../../../scss/_app_styles.scss */
+  .asset_tile .asset_preview .photos-02 {
+    -moz-row-count: 2;
+    -webkit-column-count: 1;
+    column-count: 1;
+    row-count: 2;
+    -webkit-row-gap: 0px;
+    -moz-row-gap: 0px;
+  }
+}
+/* line 6900, ../../../scss/_app_styles.scss */
+.asset_tile .asset_preview .photos-03 {
+  /* no vertical space*/
+  line-height: 0;
+  -webkit-column-count: 1;
+  -moz-column-count: 1;
+  -webkit-column-gap: 0px;
+  -moz-column-gap: 0px;
+  column-count: 1;
+  column-gap: 1px;
+  -moz-row-count: 3;
+  row-count: 3;
+  -webkit-row-gap: 0px;
+  -moz-row-gap: 0px;
+}
+/* line 6916, ../../../scss/_app_styles.scss */
+.asset_tile .asset_preview .photos-03 img {
+  /* Just in case there are inline attributes */
+  width: 100% !important;
+  height: 70px !important;
+}
+@media (max-width: 1200px) {
+  /* line 6923, ../../../scss/_app_styles.scss */
+  .asset_tile .asset_preview .photos-03 {
+    -moz-row-count: 3;
+    -webkit-column-count: 1;
+    column-count: 1;
+    row-count: 3;
+    -webkit-row-gap: 0px;
+    -moz-row-gap: 0px;
+  }
+}
+@media (max-width: 1000px) {
+  /* line 6934, ../../../scss/_app_styles.scss */
+  .asset_tile .asset_preview .photos-03 {
+    -moz-row-count: 3;
+    -webkit-column-count: 1;
+    column-count: 1;
+    row-count: 3;
+    -webkit-row-gap: 0px;
+    -moz-row-gap: 0px;
+  }
+}
+@media (max-width: 800px) {
+  /* line 6945, ../../../scss/_app_styles.scss */
+  .asset_tile .asset_preview .photos-03 {
+    -moz-row-count: 3;
+    -webkit-column-count: 0;
+    column-count: 1;
+    row-count: 3;
+    -webkit-row-gap: 0px;
+    -moz-row-gap: 0px;
+  }
+}
+@media (max-width: 400px) {
+  /* line 6956, ../../../scss/_app_styles.scss */
+  .asset_tile .asset_preview .photos-03 {
+    -moz-row-count: 3;
+    -webkit-column-count: 1;
+    column-count: 1;
+    row-count: 3;
+    -webkit-row-gap: 0px;
+    -moz-row-gap: 0px;
+  }
+}
+/* line 6967, ../../../scss/_app_styles.scss */
+.asset_tile .asset_text {
+  padding: 7px 0px 0px 0px;
+}
+/* line 6969, ../../../scss/_app_styles.scss */
+.asset_tile .asset_text .asset_title {
+  letter-spacing: 0.2px;
+  overflow: hidden;
+  font-size: 13px;
+  color: #164A7B;
+  padding-top: 10px;
+  padding-left: 6px;
+}
+/* line 6977, ../../../scss/_app_styles.scss */
+.asset_tile .asset_text .asset_title .filenode {
+  z-index: -1;
+}
+/* line 6983, ../../../scss/_app_styles.scss */
+.asset_tile .asset_text .asset_desc {
+  letter-spacing: 0.3px;
+  overflow: hidden;
+  padding-left: 6px;
+  font-size: 11px;
+  color: grey;
+}
+
+/* line 6994, ../../../scss/_app_styles.scss */
+.audio_tile {
+  display: inline-block;
+  margin-top: 10px;
+  padding-bottom: 10px;
+  cursor: pointer;
+  height: 75px;
+  border: 1px solid #164A7B;
+  width: 270px;
+  margin-right: 15px;
+}
+/* line 7004, ../../../scss/_app_styles.scss */
+.audio_tile .audio_preview audio {
+  width: 100%;
+}
+/* line 7007, ../../../scss/_app_styles.scss */
+.audio_tile .audio_preview figcaption {
+  margin-left: 5px;
+}
+/* line 7012, ../../../scss/_app_styles.scss */
+.audio_tile:hover {
+  border-width: 2px 2px 5px 2px;
+  border-style: solid;
+  border-color: #ce7869;
+}
+
+/* line 7023, ../../../scss/_app_styles.scss */
+.template_tile {
+  display: inline-block;
+  margin-top: 10px;
+  padding-bottom: 10px;
+  cursor: pointer;
+  height: 160px;
+  border: 1px solid #164A7B;
+  width: 120px;
+  margin-right: 15px;
+}
+/* line 7033, ../../../scss/_app_styles.scss */
+.template_tile .template_preview {
+  height: 85px;
+  width: 100%;
+}
+/* line 7036, ../../../scss/_app_styles.scss */
+.template_tile .template_preview img {
+  width: 100%;
+}
+/* line 7040, ../../../scss/_app_styles.scss */
+.template_tile:hover {
+  border-width: 2px 2px 5px 2px;
+  border-style: solid;
+  border-color: #ce7869;
+}
+/* line 7046, ../../../scss/_app_styles.scss */
+.template_tile .template_text {
+  padding: 10px 0px 0px 0px;
+}
+/* line 7048, ../../../scss/_app_styles.scss */
+.template_tile .template_text .template_title {
+  letter-spacing: 0.2px;
+  overflow: hidden;
+  font-size: 12px;
+  color: #164A7B;
+  padding-top: 22px;
+  padding-left: 6px;
+}
+/* line 7057, ../../../scss/_app_styles.scss */
+.template_tile .template_text .template_desc {
+  letter-spacing: 0.3px;
+  overflow: hidden;
+  padding-left: 6px;
+  font-size: 11px;
+  color: grey;
+}
+
+/* line 7071, ../../../scss/_app_styles.scss */
+.preview_asset {
+  background: #ccc;
+  border: 2px solid #999;
+  width: 485px;
+  min-height: 350px;
+  margin-left: 14px;
+}
+
+/*  Asset detail */
+/* line 7082, ../../../scss/_app_styles.scss */
+.overlay-head {
+  background-color: #fff;
+  height: 60px;
+  margin-bottom: 20px;
+}
+
+/* line 7088, ../../../scss/_app_styles.scss */
+.listing-row {
+  margin-top: 10px !important;
+  background-color: #ffffff;
+}
+
+/* line 7093, ../../../scss/_app_styles.scss */
+.orange-button {
+  color: #ce7869;
+  padding: 7px 14px;
+  background: #fff;
+  border: 1px solid #ce7869;
+  font-size: 12px;
+  font-family: "OpenSans-Regular", serif;
+  border-radius: 5px !important;
+  margin-right: 20px;
+  margin-bottom: 8px;
+  margin-top: 8px;
+  cursor: pointer;
+}
+/* line 7105, ../../../scss/_app_styles.scss */
+.orange-button:hover {
+  background-color: rgba(206, 120, 105, 0.2);
+  color: #ce7869;
+}
+
+/* line 7112, ../../../scss/_app_styles.scss */
+.explore-button {
+  border-radius: 5px;
+  text-transform: uppercase;
+  margin-left: 150px;
+  color: #ffffff;
+  padding: 5px 17px;
+  width: inherit;
+  font-family: "OpenSans-Semibold", sans-serif;
+  border: 2px solid #6a0054;
+  background-color: #6a0054;
+}
+/* line 7123, ../../../scss/_app_styles.scss */
+.explore-button:hover {
+  background-color: #ffffff;
+  cursor: pointer;
+  color: #6a0054;
 }
