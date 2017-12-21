@@ -1,0 +1,50 @@
+{% load simple_filters %}
+{% xextends "ndf/base.html" with first_body_column=0 %}
+{% load i18n %}
+{% load ndf_tags %}
+{% block title %}{% trans 'Interactions' %} {% endblock %}
+{% block body_content %}
+<style type="text/css">
+	.replies-container{
+		border-radius: 5px;
+	    width: 80%;
+	    margin-left: 5%;
+	}
+	.user-interactions {
+	    margin-left: 5%;
+	}
+	.reply-box{
+	    border: 1px solid #0cb09e;
+	    margin-left: 3%;
+	    margin-bottom: 1%;
+	    font-size: 18px;
+	    max-height: 250px;
+	    overflow-y: scroll;
+	}
+	.reply-content{
+		margin: 1% 1% 1% 3%;
+		display: inline-block;
+	}
+</style>
+<div class="user-interactions">
+	<h4>{{user_replies.count}} Posts by {{user_obj.username}} in {{group_name}}</h4>
+	<div class="replies-container">
+	{% for each_reply in user_replies %}
+		<div class="reply-box">
+			{% comment %}
+			{{forloop.counter}}. 
+			{% endcomment %}
+			<div class="reply-content">
+				{{each_reply.content|safe}}
+			</div>
+			<div class="reply_metadata right">
+				<small>{{each_reply.last_update}}</small>
+			</div>
+		</div>
+	{% empty %}
+		<label>No Posts found!</label>
+	{% endfor %}
+		
+	</div>
+</div>
+{% endblock %}

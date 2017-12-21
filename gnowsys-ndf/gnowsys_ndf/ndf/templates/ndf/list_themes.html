@@ -1,0 +1,102 @@
+{% extends "ndf/base.html" %}
+{% load i18n %}
+{% load cache %}
+{% load ndf_tags %}
+
+
+{% block meta_content %}
+	<a class="Tp" href="{% url 'topics' group_name_tag %}" title="Click to go to themes card view">
+		<h2 class="subheader">
+			{% if theme_GST.altnames and theme_GST.altnames != "None" %}
+				{{theme_GST.altnames}}
+			{% else %}
+				{{theme_GST.name}}
+			{% endif%}
+		</h2>
+	</a>
+	{{theme_GST.content|default_if_none:""|safe}}
+{% endblock %}
+
+
+{% block body_content %}
+{% user_access_policy groupid request.user as user_access %}
+
+<table>
+	<thead>
+		<tr>
+
+			{% if nodes %}
+
+				<th width="200"><h5>{% trans "Title" %}</h5></th>
+				<th width="150"><h5>{% trans "Created by" %}</h5></th>
+				<th width="200"><h5>{% trans "Creation date" %}</h5></th>
+		
+				{% if user_access == "allow" %}
+					<th class="text-center"><h5>{% trans "Actions" %}</h5></th>
+				{% endif %}
+		
+			{% endif %}
+
+		</tr>
+	</thead>
+
+	<tbody>
+		{% for each in nodes %}
+			<tr>
+
+				<td  class="name"><a href="">{{each.name}}</a></td>
+				<td  class="created_by">{{each.created_by|get_username}}</td>
+				<td  class="created_at">{{each.created_at}}</td>
+
+				{% if user_access == "allow" %}
+					<td  class="name">
+						<a href="{% url "theme_topic_create" groupid each.pk %}" class="button tiny fi-pencil"> &nbsp;
+							Edit
+						</a>
+						<a href="{% url "theme_topic_create" groupid each.pk %}?translate=true" class="button tiny fi-refresh"> &nbsp;
+							{% trans "Translate" %}
+						</a>
+						<a href="{% url 'delete_theme' groupid each.pk %}" data-id="{{each.pk}}" data-name="{{each.name}}" class="button tiny alert fi-trash"> &nbsp;
+							{% trans "Delete" %}
+						</a>
+					</td>
+				{% endif %}     	       	       
+
+			</tr>
+
+		{% empty %}
+			<h3>{% trans "No data to display" %}</h3>
+		{% endfor %}
+
+	</tbody>
+</table>
+
+<script type="text/javascript">
+
+	function checkAndDeleteTheme (e) {
+
+		var themeNameToDelete = this.getAttribute('data-name');
+
+		if(confirm("Are you sure want to delete the theme: " + themeNameToDelete))
+		{
+
+			var themeIdToDelete = this.getAttribute('data-id');
+			alert(this);
+		
+		}
+		else
+		{
+			e.preventDefault();
+		}
+
+	}
+
+	var deleteBtn = document.querySelectorAll('table  .button.alert.fi-trash');
+
+	for (var i = deleteBtn.length - 1; i >= 0; i--) {
+		deleteBtn[i].onclick = checkAndDeleteTheme;
+	};
+
+</script>
+
+{% endblock body_content %}

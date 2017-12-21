@@ -1,0 +1,112 @@
+{% load ndf_tags %}
+{% load i18n %}
+{% if page != 0  %}
+<style>
+.largesize{
+      font-size:250%;
+      color:#0b8a91 !important;
+    }
+.selFile {
+    border-radius: 3px;
+    box-shadow:1px 1px 1px 1px rgba(1,1,1,0.2);
+    margin-bottom: 15px;
+  }
+
+
+</style>
+<div class="content" id="status" align="left" {% if not hyperlinks %} style="width:500px"{% endif %}>
+<div style="background-color: white; width:auto" >
+
+{% for i in activity_list %}
+  {% get_url i.pk as res_type %}
+   {% if res_type != "None" or "Reply" in i.member_of_names_list %}
+
+   <div class="container-div selFile course-notif">
+      <div class="row">
+        <div class="large-12 columns" style="margin-left:10px">
+            
+                {% if hyperlinks %}
+                  <a href="{% url 'dashboard' i.created_by %}"> {{i.user_details_dict.created_by}} </a>
+                {% else %}
+                {{i.user_details_dict.created_by}}
+              {% endif %}
+              
+              has  <b>
+              {% if "Reply" in i.member_of_names_list %}
+                {% trans "commented" %}
+                {% if i.origin %}
+                  {% for each_origin_field in i.origin %}
+                    {% if "prior_node_id_of_thread" in each_origin_field %}
+                      {% get_node each_origin_field.prior_node_id_of_thread as prior_node_obj %}
+                      {% if prior_node_obj %}
+                        {% trans " on " %}{{prior_node_obj.name}}
+                      {% endif %}
+                    {% endif %}
+                  {% endfor %}
+                {% endif %}
+              {% elif "File" in i.member_of_names_list %}
+                {% if i.activity == "created" %}
+                  {% trans "uploaded" %}
+                {% else %}
+                  {{i.activity}}
+                {% endif %}
+              {% else %}
+                {{i.activity}}
+              {% endif %}</b>
+
+        {% if hyperlinks %}
+            {% if res_type != "event_app_instance_detail" %}
+                  <a href="{% url res_type groupid i.pk   %}" title="{{i.name}}"> {{i.name|truncatechars:50}} </a>
+
+            {% else %}
+                {% get_event_type i as app_set_id %}
+                   <a href="{% url res_type groupid app_set_id i.pk  %}">{{i.name}} </a>
+          {% endif %}
+
+      {% else %}
+          {% if "Reply" not in i.member_of_names_list %} {{i.name}}{% endif %}
+
+      {% endif %}
+
+      {% if hyperlinks %}
+              {{i.created_at|timesince}} ago
+        <div  align="right" style="position:relative; right:4%; top:-15px;" >
+        {% if 'image' in i.if_file.mime_type %}
+         <a href="{% url res_type groupid i.pk   %}"> <div> <img src="{{MEDIA_URL}}{{i.if_file.thumbnail.relurl}}" style="height:50px; width:50px;"> </div>
+        </a>
+        {% endif %}
+
+        {% if res_type == 'Forum' %}
+          <i class="fi-calendar fi-comments"></i>
+        {% endif %}
+        {% if res_type == 'event_app_instance_detail' %}
+          <i class="fi-calendar largesize"></i>
+        {% endif %}
+        {% if i.if_file.mime_type == 'application/zip' %}
+          <i class="fi-archive largesize" ></i>
+        {% endif %}
+        {% if i.if_file.mime_type == 'application/pdf' %}
+          <i class="fi-page-pdf largesize"></i>
+        {% endif %}
+        {% if i.mime_type == 'application/octet-stream' %}
+          <i class="fi-volume largesize" ></i>
+        {% endif %}
+        {% if i.mime_type == 'application/msword'  %}
+          <i class="fi-page-doc largesize" ></i>
+        {% endif %}
+        {% if i.mime_type == 'text/plain' or res_type == 'page_details' %}
+          <i class="fi-page largesize" ></i>
+        {% endif %}
+        </div>
+      {% endif %}
+        </div>
+      </div>
+   </div>
+
+{% endif %}
+{% endfor %}
+</div>
+</div>
+
+</div>
+{% endif %}

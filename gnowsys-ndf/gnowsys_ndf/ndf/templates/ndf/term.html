@@ -1,0 +1,108 @@
+{% extends "ndf/base.html" %}
+{% load i18n %}
+{% load ndf_tags %}
+{% load pagination_tags %}
+{% get_group_name groupid as group_name_tag %}
+
+{% block title %} Topic {% endblock %}
+
+{% block meta_content %}
+
+<h2 class="subheader">{% trans "Topics" %}</h2>
+
+{% endblock %}
+
+{% block search_content %}
+  {% include "ndf/node_search_base.html" %}
+{% endblock %}
+
+{% block related_content %}
+
+<ul class="side-nav">
+
+  {% check_user_join request groupid as user_is_joined %}
+  
+  <div class="panel" style="background-color:#ddd;">
+    <b>{% trans "Visit" %}</b>
+      <dl class="tabs" data-tab data-options="deep_linking:true">      
+        <dd><a class="list_terms"><i class="fi-eye"></i> All Topics </a></dd><br/>        
+      </dl><br/>
+    <b>Actions</b><br/><br/>
+    {% if user.is_authenticated %}
+      {% user_access_policy groupid request.user as user_access %}
+      {% if user_access == "allow" %}
+        {% if user_is_joined == "joined" or user_is_joined == "author" %}
+          <a class="tiny round button" href="{% url 'term_create_edit' group_id %}">
+            <span class="fi-plus">&nbsp;&nbsp;{% trans "Create" %} {{title}}</span>
+          </a>
+        {% endif %}
+      {% endif %}
+    {% endif %}
+
+  </div>
+
+</ul>
+
+{% endblock %}
+
+{% block body_content %} 
+
+<div id="landing_page">
+<br/><br/>
+<h3> This App is to collaboratively build knowledge network between various topics. </h3><br/>
+<b>Topics Statistics</b><br/>
+Number of Topics created: {% if terms %} {{terms}} {% else %} 0 {% endif %} <br/>
+Contributors:  <br/><br/><br/>
+
+<center>
+<a class="medium button list_terms">
+  <span class="fi-eye">&nbsp;&nbsp;{% trans "Show Topics" %} </span>
+</a>
+</center>
+
+</div>
+
+<div id="terms_div" style="display:none;"> 
+</div>
+
+<script type="text/javascript">
+	$(".list_terms").click(function() {
+		
+		$.ajax({
+			type: "POST",
+			url: "{% url 'terms_list' group_id %}",
+			datatype: "html",
+			data:{
+        page_no: 1,
+				csrfmiddlewaretoken: '{{ csrf_token }}'
+			},
+			success: function cnt(data) {
+        $("#landing_page").css("display", "none");
+				$("#terms_div").css("display", "block");
+        $("#terms_div").html(data);
+
+        $(".next_prev").click(function() {
+          
+          // alert(this.name);
+          $.ajax({
+            type: "POST",
+            url: "{% url 'terms_list' group_id %}",
+            datatype: "html",
+            data:{              
+              page_no: this.name,
+              csrfmiddlewaretoken: '{{ csrf_token }}'
+            },
+            success: function(data) {                         
+              cnt(data)
+            }
+
+          });
+        });
+
+			}
+		});
+	});
+</script>
+
+{% endblock %}
+

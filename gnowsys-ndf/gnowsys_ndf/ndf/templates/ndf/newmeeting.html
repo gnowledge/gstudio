@@ -1,0 +1,31 @@
+{% extends "ndf/base.html" %}                                                                  <!-- ramkarnani -->
+{% load i18n %}
+{% load ndf_tags %}
+{% load pagination_tags %}
+{% get_group_name groupid as group_name_tag %}
+
+{% block title %} {{ title }} {% endblock %}
+
+{% block related_content %}
+  {% if user.is_authenticated %}
+  {% user_access_policy groupid request.user as user_access %}
+  {% if user_access == "allow" %}
+  <br/>
+  <div class="create card">
+    <div class="chat">
+      <br/>
+     <!-- <a class="button medium" href="https://chatb.org" target="Chatb"> --> 
+               	
+
+      	<a class="button medium" href="https://chatb.org/#{{newmeetingid}}" target="Chatb"> 
+        <span class="start">&nbsp;&nbsp; {% trans "Accept invite  " %}</span>{% endblocktrans %}
+      </a>
+    </div>
+  </div>
+  {% endif %}
+  {% endif %}
+{% endblock %}
+{% block body_content %}
+<iframe src="" name="Chatb" height="450em" width="100%" frameborder="1"> </iframe> 
+
+{% endblock %}

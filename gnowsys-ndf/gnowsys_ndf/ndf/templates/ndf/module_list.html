@@ -1,0 +1,10 @@
+{% extends "ndf/gbase.html" %}
+
+{% block title %} {{title}} {% endblock %}
+
+{% block body_content %}
+{% for each_module in all_nodes %}
+  {{each_module.name}}
+{% endfor %}
+{% endblock %}
+

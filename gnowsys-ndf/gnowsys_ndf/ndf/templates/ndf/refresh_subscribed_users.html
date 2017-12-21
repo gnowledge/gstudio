@@ -1,0 +1,30 @@
+{% load i18n %}
+
+<h3>{% trans "List Of Members. " %}</h3>
+
+  {% if course_name %}
+
+<h3> {% trans "For the course:  " %}{{course_name}}</h3>
+
+  {% endif %}
+  <table>
+    <thead>
+      <tr>
+        <th width="500">{% trans "Users" %}</th>
+        <th>{% trans "Action" %}</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for user in user_list %}
+      <tr>
+        <td>{{user.username}}</td>
+	{% if can_remove %}
+        <td><a class="button alert tiny remove" href="#" id="{{user.id}}">{% trans "Remove" %}</a></td>
+	{% endif %}
+      </tr>
+      {% endfor %}
+      <input type="hidden" value="{{node_id}}" id="node_id" />
+  </tbody>
+  </table>
+<a class="close-reveal-modal">&#215;</a>
+

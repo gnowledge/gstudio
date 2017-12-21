@@ -1,0 +1,237 @@
+{% extends "ndf/base.html" %}
+{% load i18n %}
+{% load ndf_tags %}
+{% load cache %}
+
+{% block title %} Create a sub group of {{maingroup}}{% endblock %}
+
+{% block meta_content %}
+  {% blocktrans %}
+    <h3>Types of Groups</h3>
+    <h5>Open Groups</h5>
+    <p class="subheader">Open groups are ideal for projects that require a high level of collaboration and participation. Any metastudio user can join this group without prior approval</p>
+    <h5>Closed Groups</h5>
+    <p class="subheader">Closed groups are ideal for projects that require restricted access to content and documents. Users can only join after their membership request is approved or have been invited.</p>
+  {% endblocktrans %}
+{% endblock %}
+
+{% block related_content %}
+  {% if groups %}
+   <b>{% trans " Existing Groups:" %}</b>
+
+    {% get_existing_groups_excluding_username as groups%}
+    {% for items in groups %}  
+      <br>{{items.name|truncatechars:25}}
+    {% endfor %}
+  {% endif %}
+{% endblock %}
+
+{% block body_content %} 
+
+  <h2>{% blocktrans %} Create a sub group of {{maingroup}}  {% endblocktrans %}</h2>
+
+  <form class="row" method="post" action="{% url 'create_sub_group' group_id %}" id="create_sub_group">
+    {% csrf_token %}
+    {% cache 3600 create_sub_group request.LANGUAGE_CODE %}
+
+      <div class="small-12 columns" style='display:table;  border:1px;   border-spacing:10px; '>
+        <div style='display:table-row;' >
+          <div style='display:table-cell;'> 
+            <font size="3">{% trans "Name of the Group" %}</font> 
+          </div>
+          <div style='display:table-cell;'> 
+            <input type="text"  id="group_name" name="groupname" placeholder="Enter Group Name">
+            <label id="message" style="display:none; color:red"></label>
+            <!-- <div id="message" style="display:none; color:red"></div> -->
+          </div>
+
+          <div style='display:table-cell;'> 
+            <font size="3" >{% trans "Group Type" %}</font>
+          </div>
+          <div style='display:table-cell;'> 
+            <select name="group_type" class="gtype">
+              <option id="PUBLIC">{% trans "PUBLIC" %}</option>
+              <option id="PRIVATE">{% trans "PRIVATE" %}</option>
+              <option id="ANONYMOUS">{% trans "ANONYMOUS" %}</option>
+            </select> 
+          </div>
+        </div>
+
+        <div style='display:table-row;'>
+          <div style='display:table-cell;'> 
+            <font size="3" >Group Editing policy</font>
+          </div>
+          <div style='display:table-cell;'> 
+            <select name="edit_policy" class="editp">
+              <option id="EDITABLE_NON_MODERATED">{% trans "EDITABLE_NON_MODERATED" %}</option>
+              <option id="EDITABLE_MODERATED">{% trans "EDITABLE_MODERATED" %}</option>
+              <option id="NON_EDITABLE">{% trans "NON_EDITABLE" %}</option>
+            </select> 
+          </div>
+          <div style='display:table-cell;'> 
+            <font size="3" >Group Subscription policy</font>
+          </div>
+          <div style='display:table-cell;'> 
+            <select name="subscription" class="subscptn" disabled="disabled">
+              <option id="OPEN">{% trans "OPEN" %}</option>
+              <option id="BY_REQUEST">{% trans "BY_REQUEST" %}</option>
+              <option id="BY_INVITATION">{% trans "BY_INVITATION" %}</option>
+            </select>
+          </div>
+        </div>
+
+        <div style='display:table-row;'>
+          <div style='display:table-cell;'> 
+            <font size="3" >{% trans "Group Agency Types" %}</font>
+          </div>
+          {% get_group_agency_types as agency_types %}
+          <div style='display:table-cell;'> 
+            <select name="agency_type" class="agencygrp">
+              {% for each in agency_types %}
+                <option id="{{each}}">{{each}}</option>
+              {% endfor %}
+            </select>
+          </div>
+
+          <div style='display:table-cell;'> 
+            <font size="3">{% trans "Group Member Visibility" %}</font>
+          </div>
+          <div style='display:table-cell;'> 
+            <select name="member" class="mem" disabled="disabled">
+              <option id="DISCLOSED_TO_MEM">{% trans "DISCLOSED_TO_MEM" %}</option>
+              <option id="NOT_DISCLOSED_TO_MEM">{% trans "NOT_DISCLOSED_TO_MEM" %}</option>
+            </select>
+          </div>
+        </div>
+
+        <div style='display:table-row;'>
+          <div style='display:table-cell;'> 
+            <font size="3" >{% trans "Group Encryption policy" %}</font>
+          </div>
+          <div style='display:table-cell;'> 
+            <select name="encryption" class="encr" disabled="disabled">
+              <option id="NOT_ENCRYPTED">{% trans "NOT_ENCRYPTED" %}</option>
+              <option id="ENCRYPTED">{% trans "ENCRYPTED" %}</option>
+            </select>
+          </div>  
+
+          <div style='display:table-cell;'> 
+            <font size="3" >{% trans "Group Existance visibility" %}</font>
+          </div>
+          <div style='display:table-cell;'> 
+            <select name="existance" class="existance" disabled="disabled">
+              <option id="ANNOUNCED">{% trans "ANNOUNCED" %}</option>
+              <option id="NOT_ANNOUNCED">{% trans "NOT_ANNOUNCED" %}</option>
+            </select>
+          </div>
+        </div>
+        <div style='display:table-row;'>
+          <div style='display:table-cell;' colspan='2' align="middle"> 
+            <!-- <input type="button" id="savegrp" value="Create Group"  class="button" onClick="check_values()">
+            <input type="submit" id="grpsubmit" value="Create Group" class="button" style="visibility:hidden" > -->
+            <input type="submit" value="Create Group" id="grpsubmit" class="button" >
+          </div>
+        </div>
+        <!-- <input type="hidden" id="nodes_list" value="{{nodes_list}}">            -->
+      </div>
+      {% endcache %}
+  </form>
+{% endblock %}
+
+
+{% block head %}
+<script type="text/javascript">
+  /*
+  function check_group_name()
+  {
+     var gname=$("#group_name").val();
+      $.ajax({
+        url: '/home/group/check_group/',
+        data: {gname:gname},
+        success: function(data){
+          if (data=="success"){
+           alert("group already exists");
+           $("#group_name").val("");
+           $("#group_name").focus();
+         }
+        }
+      });  //end_ajax
+  }
+
+  function check_values()
+  {
+    check_group_name();
+    var gpname = $("#group_name").val();
+    if (gpname == "")
+    {
+     alert("Group name can not be empty")
+     $("#group_name").focus();
+   }
+   else
+   {
+    $("#grpsubmit").trigger("click");
+  }
+  }
+  */
+
+  $(document).ready(function()
+  {
+    // New Form: Conditional Display 
+      $(".login-mode").change(function(){
+        /* Hide other options if anonymous login is allowed */
+        $("#closed-group").slideToggle();     
+      });
+
+      $("#member-mode").slideToggle();
+      $("[name='join-mode']").change(function(){
+        /* Hide invitation options if open membership */
+        $("#member-mode").slideToggle();     
+      });
+
+      $("[name='edit-mode']").change(function(){
+        /* Hide moderation options if editing is disabled */
+        $("#moderate-mode").slideToggle();     
+      });
+    
+      // $("#group_name").focusout(function(){
+      //    check_group_name();
+      // }); //end_focusout
+
+
+  }); //end_document_ready
+
+}); //end_document_ready
+</script>
+
+{% endblock %}
+
+{% block script %}
+
+  // method to provide autocomplete/intellisence of forum names
+
+  $("#create_sub_group").submit(function(event){
+    var name = $("#group_name").val().trim().toLowerCase();
+    var nodes = {{nodes_list|safe}} 
+
+    if (name != "")
+    {
+      if (nodes.indexOf(name) != -1)  
+      { 
+        $("#message").css("display", "block");
+        $("#message").text("Group '"+ name +"' already exist. Please choose another name");
+        event.preventDefault();
+      } 
+    }
+    else if (name == ""){
+      $("#message").css("display", "block");
+      $("#message").text("Group name cannot be empty.");
+      event.preventDefault();
+    }
+    else
+    {
+      $("#message").css("display", "none");
+    }
+  });
+
+{% endblock %}
+

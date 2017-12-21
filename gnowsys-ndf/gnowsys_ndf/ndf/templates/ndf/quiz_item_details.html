@@ -1,0 +1,116 @@
+{% extends "ndf/base.html" %}
+{% load i18n %}
+{% load ndf_tags %}
+{% block title %}{{ title }}{% endblock %}
+
+{% block head %}
+
+<!-- MathJax-In-Line-Configuration: Specifying the configuration settings -->
+<script type="text/x-mathjax-config">
+  MathJax.Hub.Config({
+  tex2jax: {
+  inlineMath: [['$','$'], ['\\(','\\)']],
+  displayMath: [['\\[','\\]'], ['$$','$$']]
+}
+});
+</script>
+
+<!-- MathJax-File-Based-Configuration: Loading MathJax with given file -->
+<!-- <script type="text/javascript" src="/static/mathjax/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script> -->
+<script type="text/javascript" src="/static/ndf/bower_components/MathJax/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script> <!-- checked -->
+
+{% endblock %}
+
+{% block meta_content %}
+{% get_group_name groupid as group_name_tag %}
+<p class="text-justify">A <b>{% trans "Quiz" %}</b> {% trans "is a sequenced collection of" %} <b>{% trans "quiz items" %}</b>. {% trans "A quiz-item can be any of the three types" %}: <strong><i>{% trans "short response, single-choice" %}</i></strong> {% trans "and" %} <strong><i>{% trans "multiple-choice" %}</i></strong>. <i>{% trans "submit response" %}</i> {% trans "and" %} <i>{% trans "match the following" %}</i> {% trans "types will be implemented very soon." %}</p>
+
+<p class="text-justify">{% trans "You can build a quiz in two ways:" %}
+  <ol  class="text-justify">
+   <li>{% trans "By editing, Quiz node (via collection-list)." %}</li>
+   <li>{% trans "By using 'Quiz-Item' button corresponding to the Quiz." %}</li>
+ </ol>    </p>
+
+ <!-- Add button -->
+ {% if user.is_authenticated %}
+
+ <p>
+  <a href="{% url 'quiz_create' group_name_tag %}" class="button small"> {% trans "+ Add" %} {{title}} </a>
+  <a href="{% url 'quiz_item_create' group_name_tag %}" class="button small right">   
+   {% trans "+ Add" %} {{title}} {% trans "Item" %}</a>
+
+ </p>
+ {% endif %}
+ 
+ {% endblock %}
+
+ {% block body_content %}
+
+ <div class="row" style="padding-top:15px">
+
+  <div class="small-12 columns">
+    <ul class="inline-list">
+     <li><h3>{% trans "Question" %}</h3></li>
+     {% if user.is_authenticated %}
+     <li><a href="{% url 'quiz_item_edit' group_name_tag node %}" class="button small"> {% trans "Edit this Question" %}</a></li>
+     {% endif %}
+   </ul>
+   <p>
+     {{ node.member_of_names_list|join:', ' }} {% trans "posted on" %} {{ node.created_at|date:"j F Y" }} {% trans "by " %} {{ node.user_details_dict.created_by }}
+   </p>
+   <p>
+     {% trans "Contributors:  " %}{{ node.user_details_dict.contributors|join:', ' }}
+   </p>
+   <p>
+     {% trans "Last update:  " %}{{ node.last_update|date:"j F Y" }}
+   </p>
+   <p>
+     Version{{ node.version_dict|length|pluralize }}: 
+     {% for seq_no, version_no in node.version_dict.items reversed %}
+     <abbr title={{version_no}}><a href="{% url 'node_version' group_name_tag node.pk version_no %}" style="padding-left:5px;">+</a></abbr> 
+     {% endfor %}
+   </p>
+   {% if node.tags|length > 0 %}
+   <p>
+     Tag{{ node.tags|length|pluralize }}: 
+     {% for tag in node.tags %}
+     <span class="radius label">{{tag}}</span>
+     {% endfor %}
+   </p>
+   {% endif %}
+   <hr style="border-width:1.4px; border-color:black;"/>
+ </div>
+ 
+ <div class="small-12 columns" id="question_fs">
+  <div class="panel">
+   {{node.html_content|safe}}
+   
+   {% if node.options %}
+   {% for option in node.options %}
+   <p style="padding-left:30px;">{{forloop.counter}}.&nbsp{{option}}</p>
+   {% endfor %}
+   {% endif %}
+ </div>
+</div>
+
+<div class="small-12 columns" id="answer_fs">
+  <h4>{% trans "Answer" %}</h4>
+  <div class="panel callout radius">
+   {% for ca in node.correct_answer %}
+   {% if node.options %}
+   {% if not forloop.last %}
+   {{ca}},&nbsp
+   {% else %}
+   {{ca}}
+   {% endif %}
+   {% else %}
+   {{ca|linebreaksbr}}
+   {% endif %}
+   {% endfor %}
+ </div>
+</div>
+
+</div>
+
+{% endblock %}
+

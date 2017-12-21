@@ -1,0 +1,568 @@
+{% extends "ndf/base.html" %}
+{% load ndf_tags %}
+{% load i18n %}
+{% load pagination_tags %}
+
+{% block title %} Admin {% endblock %}
+
+{% block meta_content %}
+     {% ifequal url 'data' %}
+	{% get_class_list groupid class_name %}
+     {% else %}
+        {% get_class_type_list groupid class_name %}
+     {% endifequal %}
+{% endblock %}
+
+{% block style %}
+.divider-line {
+    font-size: xx-large;
+    color: lightgray;
+}
+.line-height-2 {
+    line-height: 2;
+}
+.line-height-2pt5 {
+    line-height: 2.5;
+}
+.fontsize-x-large {
+    font-size: x-large;
+}
+.margin-0 {
+ margin: 0 !important;
+}
+.resource-drawer {
+    border-color: #D3D3D3;
+    border-style: solid;
+    padding: 0 !important;
+    overflow-y: auto;
+}
+.resource-drawer li.bullet-item:hover {
+    background-color: #ecf0f1;
+    cursor:pointer;
+}
+.posted-by {
+    color: #808080;
+    font-size: small;
+}
+.selected-resource {
+    background-color:lightgray !important;
+}
+.resource-type-image {
+    height:40px;
+    background-repeat:no-repeat;
+    background-size: 48px 48px;
+}
+{% endblock %}
+{% block body_content %}
+<div id="myGroup" class="reveal-modal" data-reveal style="width:30%;left:100%; overflow: auto;text-overflow: ellipsis;">
+     <p>Hold down "Control", to select more than one.</p>
+     <h2>{% trans "Select Groups" %}</h2>
+     <select id="id_groups" name="groups" multiple="multiple" style="max-width:500px;height:180px;">
+       {% for group in Groups%}
+       <option value="{{group.id}}" name="{{group.title}}">{{group.title}}</option>
+       {% endfor %}
+     </select>
+     <font style="font-size:12px;font-weight:bold;" id="viewgrouplist"></font>
+     <a class="close-reveal-modal">&#215;</a>
+</div>
+ {% if class_name == "GSystemType"  %}
+
+<div id="mySystemtype" class="reveal-modal" data-reveal >
+     <h2>{% trans "Select Collections" %}</h2>
+      <div id="module_drawer" >
+        {% include "ndf/drawer_widget.html" with widget_for="collection_set" %}
+      </div>
+     <a class="close-reveal-modal st">&#215;</a>
+</div>
+
+<div id="myAttributetype" class="reveal-modal" data-reveal >
+     <h2>Select Attributetype set</h2>
+      <div id="module_drawer" >
+        {% include "ndf/drawer_widget.html" with widget_for="attributetype_set"  %}
+      </div>
+     <a class="close-reveal-modal at">&#215;</a>
+</div>
+
+<div id="myRelationtype" class="reveal-modal" data-reveal >
+     <h2>Select Relationtype set</h2>
+      <div id="module_drawer" >
+        {% include "ndf/drawer_widget.html" with widget_for="relationtype_set"  %}
+      </div>
+     <a class="close-reveal-modal rt">&#215;</a>
+</div>
+
+<div id="my_meta_type" class="reveal-modal" data-reveal style="width:30%; overflow: auto; text-overflow: ellipsis;">
+     <p>Hold down "Control", to select more than one.</p>
+     <h2>Select MetaType</h2>
+     <select id="id_meta_type" name="meta_types" multiple="multiple" style="max-width:500px;height:180px;">
+       {% for meta_type in meta_types %}
+       <option value="{{meta_type.id}}" name="{{meta_type.title}} - {{meta_type.id}}">{{meta_type.title}} - {{meta_type.id}}</option>
+       {% endfor %}
+     </select>
+     <font style="font-size:12px;font-weight:bold;" id="view_meta_type_list"></font>
+     <a class="close-reveal-modal">&#215;</a>
+</div>
+{% endif %}
+
+ <input class="button deleteObjects" type="button" value="Delete">
+<form method="POST" style="float:right; margin-top:15px;padding-top:10px;">
+{% csrf_token %}
+<input name="search" type="textbox" value="" style="width:300px;">
+<input type="hidden" name="class" value="{{class_name}}">
+<input type="submit" value="search" style="width:100px;">
+</form>
+{% autopaginate nodes 25 %}
+<div style="display: block; width: 101%; overflow: auto;"  >
+<table>
+  <thead>
+    <tr>
+      <th width="20"> <input class="checkedAll" type="checkbox"></th>
+      <th width="140" style="display:none">Id</th>
+      <th width="140">Title</th>
+    {% if class_name == "File" or class_name ==  "GSystem"  %}
+      <th width="140">{% trans "Group(s)" %}</th>
+    {% endif %}
+      <th width="140" style="display:none">{% trans "Type(s)" %}</th>
+      <th width="140" style="display:none">{% trans "Author" %}</th>
+      <th width="140" style="display:none">{% trans "Creation date" %}</th>
+      {% if class_name == "GSystemType"  %}
+      <th width="140">{% trans "Member of" %}</th>
+      <th width="140">{% trans "Collection" %}</th>
+      <th width="140">{% trans "AttributeType_set" %}</th>
+      <th width="140">{% trans "RelationType_set" %}</th>
+      {% endif %}
+      <th></th> <!-- Table head for Edit button -->
+      {% if class_name == "GSystemType" or class_name = "AttributeType" or class_name = "RelationType" %}
+      <th></th> <!-- Table head for Edit+ button -->
+      <th></th> <!-- Table head for Translate button -->
+      {% endif %}
+    </tr>
+  </thead>
+  <tbody>
+	{% for each in nodes %}
+	<tr>
+    <td id="{{each.Id}}" class="objectsCheckbox"> <input type="checkbox"> </td>
+	  <td style="display:none" class="id" style="font-size:11px;">{{each.Id}}</td>
+	  <td class="title" style="font-size:95%">
+      {% if class_name ==  "GSystem"  %}
+      <font class="viewinput{{each.Id}}">{% firstof each.Alt_Title each.Title %}  </font><input style="display:none" class="editinput{{each.Id}}" type="text" value= "{{each.Title}}">
+      {% else %}
+      <font class="viewinput{{each.Id}}">{{each.Title}}</font><input style="display:none" class="editinput{{each.Id}}" type="text" value= "{{each.Title}}">
+      {% endif %}
+    </td>
+    {% if class_name == "File" or class_name ==  "GSystem"  %}
+    <td class="group" style="font-size:11px;">
+      <font class="viewinput{{each.Id}}">{{each.Group}}</font>
+      <input style="display:none" class="editinput{{each.Id}}" type="text" value= "{{each.Group}}">
+    </td>
+    {% endif %}
+
+	  <td style="display:none" class="type" style="font-size:11px;">
+	    <font class="viewinput{{each.Id}}">{{each.Type}}</font>
+	    <input style="display:none" class="editinput{{each.Id}} type" type="text" value= "{{each.Type}}" >
+	  </td>
+	  <td style="display:none" class="author" style="font-size:11px;">{{each.Author}}</td>
+	  <td style="display:none" class="creation" style="font-size:11px;">{{each.Creation}}</td>
+
+
+	  {% if class_name == "GSystemType"  %}
+	  <td class="member_of" style="font-size:11px;">
+	    <font class="viewinput{{each.Id}}">{{each.member_of}}</font>
+	    <input style="display:none" class="editinput{{each.Id}}" type="text" value= "{{each.member_of}}">
+	  </td>
+	  <td class="collection_set" style="font-size:11px;">
+	    <font class="viewinput{{each.Id}}">{{each.collection_list}}</font>
+	    <input class="editinput{{each.Id}} type" style="display:none" type="text" value= "{{each.collection_list}}" >
+	  </td>
+	  <td class="attribute_type_set" style="font-size:11px;">
+            <font class="viewinput{{each.Id}}">{{each.attribute_type_set}}</font>
+            <input class="editinput{{each.Id}} type" style="display:none" type="text" value= "{{each.attribute_type_set}}" >
+          </td>
+	  <td class="relation_type_set" style="font-size:11px;">
+            <font class="viewinput{{each.Id}}">{{each.relation_type_set}}</font>
+            <input class="editinput{{each.Id}} type" style="display:none" type="text" value= "{{each.relation_type_set}}" >
+          </td>
+	  {% endif %}
+	  <td style="font-size:11px;">
+	    <input class="button editobject" id="{{each.Id}}" type="button" value="Edit">
+	    <input class="button saveobject" id="save{{each.Id}}" name="{{each.Id}}" type="button" value="Save" style="display:none">
+	  </td>
+	  {% if class_name == "GSystemType" or class_name = "AttributeType" or class_name = "RelationType" %}
+    <td>
+      <a class="button medium" href="{% url 'adminDesignerDashboardClassEdit' class_name each.Id %}" style="width:115px;">
+        Edit&nbsp;&nbsp;
+        <i class="fi-plus"></i>
+      </a>
+    </td>
+    <td>
+      <a class="button medium" href="{% url 'adminDesignerDashboardClassEdit' class_name each.Id %}?translate=True">
+              {% trans "Translate" %}
+      </a>
+    </td>
+
+    {% elif class_name == "GSystem" %}
+    <td>
+      <a class="button medium" href="{% url 'basic_temp_edit' group_name each.Mem each.Id %}" style="width:115px;">
+        Edit&nbsp;&nbsp;
+        <i class="fi-plus"></i>
+      </a>
+    </td>
+
+    <td>
+     <section id="sectiondropdown-{{each.Id}}" class="medium-12 columns" >
+      <dl class="row tabs" id="dl-{{each.Id}}" data-tab data-options="deep_linking:true">
+      <dd>
+      <a href="#" class="button medium" id="graph-{{each.Id}}" style="width:150px;" data-dropdown="graph-hover-{{each.Id}}" data-options="is_hover:true"><i class="fi-share"></i>{% trans "Graph" %}</a>
+        <ul id="graph-hover-{{each.Id}}" class="f-dropdown" data-dropdown-content>
+
+        <li><a href="{% url 'adminRenderGraph' group_name each.Id 'concept' %}" id="adminRenderConceptGraph-{{each.Id}}"  class="adminRenderConceptGraph" data-id="{{each.Id}}"
+        data-reveal-id="view-concept-graph"  >{% trans "Concept Graph" %}</a></li>
+        {% if each.gs_collection_set %}
+          <li><a href="{% url 'adminRenderGraph' group_name each.Id 'collection' %}" id="adminRenderCollectionGraph-{{each.Id}}"  class="adminRenderCollectionGraph" data-id="{{each.Id}}"
+          data-reveal-id="view-collection-graph"   >{% trans "Collection Graph" %}</a></li>
+        {% endif %}
+        {% if each.gs_prior_node %}
+          <li><a href="{% url 'adminRenderGraph' group_name each.Id 'dependency' %}" id="adminRenderDependencyGraph-{{each.Id}}" class="adminRenderDependencyGraph" data-id="{{each.Id}}" data-reveal-id="view-Dependency-graph"   >{% trans "Dependency Graph" %}</a></li>
+        {% endif %}
+        </ul>
+
+      </dd>
+      </dl>
+      </section>
+    </td>
+    {% endif %}
+
+  </tr>
+  {% endfor %}
+  </tbody>
+</table>
+</div>
+
+<div class="content reveal-modal graph-div" id="view-concept-graph" name="view-concept-graph" data-reveal>
+  <a class="close-reveal-modal" id="cross" >&#215;</a>
+</div>
+<div class="content reveal-modal graph-div" id="view-collection-graph" name="view-collection-graph" data-reveal>
+  <a class="close-reveal-modal" id="cross" >&#215;</a>
+</div>
+<div class="content reveal-modal graph-div" id="view-Dependency-graph" name="view-Dependency-graph" data-reveal>
+  <a class="close-reveal-modal" id="cross" >&#215;</a>
+</div>
+
+{% paginate %}
+{% endblock %}
+{% block script %}
+
+var global_object_id;
+{% if class_name == "GSystemType"  %}
+function set_drawer_value(node_id)
+{
+ $('#mySystemtype #collection_set_drawer1').html("");
+ $('#mySystemtype #collection_set_drawer2').html("");
+ $('#mySystemtype #collection_set_drawer1').html('<li class="price"><input type="text" placeholder="Type here to search in the resources" id="collection_set_search" class="margin-0"></li>');
+  var url = '/{{groupid}}/ajax/get_data_for_drawer/?id='+node_id ;
+  $.getJSON( url, function( data ) {
+  $.each(data ,function(index , drawer_elements){
+   if(index == 0)
+    {
+     $.each(drawer_elements.drawer1, function(index, element) {
+        $('#mySystemtype #collection_set_drawer1').append("<li id='"+element.id+"' class='bullet-item text-left'>"+element.name+"</li>");
+      });
+   }
+   if(index == 1)
+    {
+    $.each(drawer_elements.drawer2, function(index, element) {
+        $('#mySystemtype #collection_set_drawer2').append("<li id='"+element.id+"' class='bullet-item text-left'>"+element.name+"</li>");
+      });
+    }
+  });
+   });
+}
+
+function attributetype_set_drawer_value(node_id)
+{
+ $('#myAttributetype #attributetype_set_drawer1').html("");
+ $('#myAttributetype #attributetype_set_drawer2').html("");
+ $('#myAttributetype #attributetype_set_drawer1').html('<li class="price"><input type="text" placeholder="Type here to search in the resources" id="attributetype_set_search" class="margin-0"></li>');
+  var url = '/{{groupid}}/ajax/get_data_for_drawer_of_attributetype_set/?id='+node_id ;
+  $.getJSON( url, function( data ) {
+  $.each(data ,function(index , drawer_elements){
+   if(index == 0)
+    {
+     $.each(drawer_elements.drawer1, function(index, element) {
+        $('#myAttributetype #attributetype_set_drawer1').append("<li id='"+element.id+"' class='bullet-item text-left'>"+element.name+"</li>");
+      });
+   }
+   if(index == 1)
+    {
+    $.each(drawer_elements.drawer2, function(index, element) {
+        $('#myAttributetype #attributetype_set_drawer2').append("<li id='"+element.id+"' class='bullet-item text-left'>"+element.name+"</li>");
+      });
+    }
+  });
+   });
+}
+
+function relationtype_set_drawer_value(node_id)
+{
+ $('#myRelationtype #relationtype_set_drawer1').html("");
+ $('#myRelationtype #relationtype_set_drawer2').html("");
+ $('#myRelationtype #relationtype_set_drawer1').html('<li class="price"><input type="text" placeholder="Type here to search in the resources" id="relationtype_set_search" class="margin-0"></li>');
+  var url = '/{{groupid}}/ajax/get_data_for_drawer_of_relationtype_set/?id='+node_id ;
+  $.getJSON( url, function( data ) {
+  $.each(data ,function(index , drawer_elements){
+   if(index == 0)
+    {
+     $.each(drawer_elements.drawer1, function(index, element) {
+        $('#myRelationtype #relationtype_set_drawer1').append("<li id='"+element.id+"' class='bullet-item text-left'>"+element.name+"</li>");
+      });
+   }
+   if(index == 1)
+    {
+$.each(drawer_elements.drawer2, function(index, element) {
+        $('#myRelationtype #relationtype_set_drawer2').append("<li id='"+element.id+"' class='bullet-item text-left'>"+element.name+"</li>");
+      });
+    }
+  });
+   });
+}
+{% endif %}
+
+var option,baseobject;
+$(document).on('click',".checkedAll",function(){
+  if($(this).is(":checked")==true){
+    $('.objectsCheckbox input').prop( "checked", true );
+  }
+  else{
+    $('.objectsCheckbox input').prop( "checked", false );
+  }
+});
+$(document).on('click',".button.editobject",function(){
+  var objectid = this.id;
+        global_object_id = objectid;
+ {% if class_name == "GSystemType"  %}
+        set_drawer_value(objectid);
+  attributetype_set_drawer_value(objectid);
+  relationtype_set_drawer_value(objectid);
+ {% endif %}
+        $(".viewinput"+objectid).hide();
+  $(".editinput"+objectid).show();
+        $(this).hide();
+        $("#save"+objectid).show();
+});
+
+
+
+$(document).on('click',".adminRenderConceptGraph",function(){
+  var atr = $(this).data("id");
+  $.ajax({
+    type: "GET",
+    url: "/home/ajax/graph/adminRenderGraph/"+ atr+"/fetch/"+"concept" ,
+    dataType: "html",
+    data:{
+      group_id : '{{groupid}}',
+      node_id : atr ,
+      graph_type : "concept"
+    },
+    global:false,
+    async: true,
+    success: function(result) {
+      $("#view-concept-graph").html(result);
+    },
+  });
+});
+
+$(document).on('click',".adminRenderCollectionGraph",function(){
+  var atr = $(this).data("id");
+  $.ajax({
+    type: "GET",
+    url: "/home/ajax/graph/adminRenderGraph/"+ atr+"/fetch/"+"collection" ,
+    dataType: "html",
+    data:{
+      group_id : '{{groupid}}',
+      node_id : atr ,
+      graph_type : "collection"
+    },
+    success: function(result) {
+      $("#view-collection-graph").html(result);
+    },
+  });
+});
+
+
+$(document).on('click',".adminRenderDependencyGraph",function(){
+  var atr = $(this).data("id");
+  $.ajax({
+    type: "GET",
+    url: "/home/ajax/graph/adminRenderGraph/"+ atr+"/fetch/"+"dependency" ,
+    dataType: "html",
+    data:{
+      group_id : '{{groupid}}',
+      node_id : atr ,
+      graph_type : "dependency"
+    },
+    success: function(result) {
+      $("#view-Dependency-graph").html(result);
+    },
+  });
+});
+
+
+$(document).on('click',".button.deleteObjects",function(){
+        var selectedobject = $(".objectsCheckbox input:checked")
+        if(selectedobject.length > 0){
+             var confirmed = confirm("Deleting "+selectedobject.length+" objects");
+             if(confirmed == true){
+             var i = 0;
+             var str = "";
+             $.map(selectedobject,function(each){
+                  if(i == 0){str = str.concat(each.parentElement.id)}
+                  else {str = str.concat(","+each.parentElement.id)}
+                  i= i+1
+             })
+
+             $.ajax({
+             url: '/admin/data/delete',
+             type: 'POST',
+             data: {deleteobjects:str,csrfmiddlewaretoken: '{{ csrf_token }}'},
+             beforeSend: function() {     },
+             success: function(result){
+             alert(result)},
+             complete: function(){   }
+             });
+
+             $.map(selectedobject,function(each){
+                  each.parentElement.parentElement.remove()
+             })
+
+             }
+        }
+        else{
+        alert("select object to delete")
+        }
+
+});
+
+$(document).on('click',".button.saveobject",function(){
+var objectid = $(this).attr("name");
+        $(this).hide();
+        var json = {};
+        var fields = {};
+        json['id']=objectid
+        $.map($(".editinput"+objectid),function(each){
+                  fields[each.parentElement.className] = each.value
+              });
+        json['fields']=fields
+        $.ajax({
+        url: '/admin/data/edit',
+        type: 'POST',
+        data: {objectjson:JSON.stringify(json),csrfmiddlewaretoken: '{{ csrf_token }}'},
+        beforeSend: function() {     },
+        success: function(result){
+        alert(result);},
+        complete: function(){   }
+        });
+	$(".editinput"+objectid).hide();
+        $(".viewinput"+objectid).show();
+        $(".title font.viewinput"+objectid).html(json['fields']['title']);
+        $(this).hide();
+        $(".button.editobject").show();
+});
+
+
+$(document).on('focus',".group input",function(){
+        baseobject = $(this);
+        fontelement = $(".group font.viewinput"+global_object_id);
+        var baseobjectval = baseobject.val();
+        var arr = baseobjectval.split(',');
+        $('#viewgrouplist').text(baseobjectval);
+        $('#id_groups option').removeAttr("selected");
+        for(var each in arr){ $('#id_groups option[name="'+arr[each]+'"]').attr('selected','selected');  }
+        $('#myGroup').foundation('reveal', 'open');
+        $('#id_groups').change(function() {
+                 option = $(this).find('option:selected');
+                 var i = 0;
+                 var str = "";
+                 var str1 = "";
+                 $.map(option, function(op){
+                          if(i == 0){
+                          str = str.concat(op.value)
+                          str1 = str1.concat(op.label)
+                              }
+                          else {
+                          str = str.concat(","+op.value)
+                          str1 = str1.concat(", "+op.label)}
+                          i= i+1
+                          return});
+                  baseobject.val(str);
+                  fontelement.html(str1);
+                  $('#viewgrouplist').text(str1);
+                  });
+});
+ {% if class_name == "GSystemType"  %}
+$(document).on('focus',".collection_set input",function(){
+      var data_list = []
+      var obj = $(this);
+      $('#mySystemtype').foundation('reveal', 'open');
+       $('.close-reveal-modal.st').click(function(){
+        $.each($('#mySystemtype #collection_set_drawer2 li'),function(index,item){
+         data_list.push(item.innerHTML+" -  "+item.id);
+         });
+      obj.val(data_list);
+   });
+});
+
+$(document).on('focus',".attribute_type_set input",function(){
+      var data_list = []
+      var obj_at = ""
+      obj_at = $(this);
+      $('#myAttributetype').foundation('reveal', 'open');
+       $('.close-reveal-modal.at').click(function(){
+        $.each($('#myAttributetype #attributetype_set_drawer2 li'),function(index,item){
+         data_list.push(item.innerHTML+" -  "+item.id);
+         });
+      obj_at.val(data_list);
+   });
+});
+
+$(document).on('focus',".relation_type_set input",function(){
+      var data_list = []
+      var obj_rt = ""
+      obj_rt = $(this);
+      $('#myRelationtype').foundation('reveal', 'open');
+       $('.close-reveal-modal.rt').click(function(){
+        $.each($('#myRelationtype #relationtype_set_drawer2 li'),function(index,item){
+         data_list.push(item.innerHTML+" -  "+item.id);
+         });
+      obj_rt.val(data_list);
+   });
+});
+
+
+$(document).on('focus',".member_of input",function(){
+        baseobject = $(this);
+        var baseobjectval = baseobject.val()
+        $('#view_meta_type_list').text(baseobjectval);
+        var arr = baseobjectval.split(',')
+        $('#id_meta_type option').removeAttr("selected");
+        for(var each in arr)
+        {
+          $('#id_meta_type option[name="'+arr[each]+'"]').attr('selected','selected');
+        }
+        $('#my_meta_type').foundation('reveal', 'open');
+        $('#id_meta_type').change(function() {
+                 option = $(this).find('option:selected');
+                 var i = 0;
+                 var str = "";
+                 $.map(option, function(op){
+                          if(i == 0){str = str.concat(op.label)}
+                          else {str = str.concat(","+op.label)}
+                          i= i+1
+                          return console.log(op.value);});
+                  baseobject.val(str);
+                  $('#view_meta_type_list').text(str);
+                  });
+
+});
+ {% endif %}
+{% endblock %}
+

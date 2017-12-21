@@ -1,0 +1,85 @@
+{% load simple_filters %}
+{% load check_is_gstaff from ndf_tags %}
+{% xextends "ndf/base.html" with first_body_column=0 %}
+
+{% load i18n %}
+
+
+{% block title %} {{title|capfirst}} {% endblock title %}
+
+
+{% block body_content %}
+	{% check_is_gstaff groupid request.user as is_gstaff %}
+
+	<div class="row explore-header">
+		<div class="small-12 medium-2 columns heading"><a href="{% url 'explore' %}">Explore</a></div>
+		<div class="small-12 medium-3 columns expore-type">
+			<div class="toggleButtons">
+				<a href="{% url 'explore_courses' %}" class="button {%if title == 'courses'%} active{% endif %}">
+					Courses
+				</a>
+				<a href="{% url 'explore_groups' %}" class="button {%if title == 'groups'%} active{% endif %}">
+					Groups
+				</a>
+				{% if is_gstaff %}
+					<a href="{% url 'explore_basecourses' %}" class="button {%if title == 'base courses'%} active{% endif %}">
+						Base Course
+					</a>
+				{% endif %}
+
+
+
+			</div>
+		{% comment %}
+		<div class="medium-3 columns explore-search small-12">
+			<input type="text" placeholder="Search">
+		</div>
+		<div class="small-3 columns {%if title == 'courses'%}label info{% endif %}">
+			<a href="{% url 'explore_courses' %}">Courses</a>
+		</div>
+
+		<div class="small-3 columns {% if title == 'groups' %}label info{% endif %}">
+			<a href="{% url 'explore_groups' %}">Groups</a>
+		</div>
+		{% endcomment %}
+	</div>
+	{% if title == "base courses" and is_gstaff %}
+		<div class="small-12 medium-7 columns">
+			<div style="display: inline-block;">
+					<a class="tiny button radius right" href="{% url 'create_edit' groupid %}"><i class="fi-plus"></i>{% trans " Create Course" %}</a>
+			</div>
+		</div>
+	{% endif %}
+
+
+	{% if title == 'explore' %}
+		Please select course or a group.
+	{% else %}
+		<section role="tabpanel" aria-hidden="true" class="content active small-block-grid-1 medium-block-grid-3 large-block-grid-4" style="background-color:#fafafa;border-style:none">
+			{% for each_obj in doc_cur %}
+				<li class="card-image-wrapper" style="margin-top:13px;">
+				{% if title == "base courses" %}
+					{% if "Course" in each_obj.member_of_names_list %}
+						{% include card with resource=each_obj has_logo=True no_footer=True url_name="course_detail" first_arg=groupid second_arg=each_obj.pk  %}
+					{% elif "BaseCourseGroup" in each_obj.member_of_names_list %}
+						{% include card with resource=each_obj has_logo=True no_footer=True url_name="groupchange" first_arg=each_obj.pk  %}
+					{% endif %}
+				{% else %}
+					{% include card with resource=each_obj is_event=True no_footer=True has_prof_pic=True url_name="groupchange" first_arg=each_obj.pk  next_session=True %}
+				{% endif %}
+	          </li>
+			{% endfor %}
+			
+		</section>
+			{% if title == "courses" %}
+				{% include 'ndf/pagination.html' with urlname="courses_paged" first_arg="" second_arg=""  third_arg="" page_info=ce_page_cur %}
+			{% elif title == "base courses"  %}
+				{% include 'ndf/pagination.html' with urlname="basecourses_paged" first_arg="" second_arg=""  third_arg="" page_info=ce_page_cur %}
+			{% elif title == "groups" %}
+				{% include 'ndf/pagination.html' with urlname="groups_paged" first_arg="" second_arg=""  third_arg="" page_info=ce_page_cur %}
+			{% endif %}
+	{% endif %}
+
+
+
+{% endblock body_content %}

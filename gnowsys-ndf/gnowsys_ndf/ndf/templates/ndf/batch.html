@@ -1,0 +1,227 @@
+{% extends "ndf/base.html" %}
+{% load pagination_tags %}
+{% load ndf_tags %}
+{% load i18n %}
+{% block title %} {% blocktrans %} {{title}}  {% endblocktrans %}
+{% endblock %}
+
+{% block style %}
+<!-- Style for drawer widget -->
+.divider-line { font-size: xx-large; color:lightgray; }
+.line-height-2 { line-height:2; }
+.line-height-2pt5 { line-height:2.5; }
+.fontsize-x-large { font-size: x-large; }
+
+.margin-0 { margin: 0 !important ;}
+
+/* Setting css-properties for reveal-modal's label */
+div.reveal-modal > label {
+  color: white;
+  font-weight: bold;
+  font-size: 1rem;
+}
+
+
+.resource-drawer {
+border-color: #D3D3D3; border-style: solid;
+padding: 0 !important;
+overflow-y: auto;
+}
+
+.resource-drawer li.bullet-item:hover{
+background-color: #ecf0f1; cursor:pointer;
+}
+
+.posted-by{ color: #808080; font-size: small; }
+
+.selected-resource { background-color:lightgray !important ; }
+
+.resource-type-image {
+height:40px;
+background-repeat:no-repeat; background-size: 48px 48px
+<!-- End -->
+{% endblock %}
+
+{% block meta_content %}
+  <h2>Batch</h2>
+{% endblock %}
+
+
+{% block related_content %}
+  <div class="create card">
+  <div class="page">
+    <h4><i class="fi-plus"></i> New</h4>
+      {% if user.is_authenticated %}
+      {% user_access_policy groupid request.user as user_access %}
+      {% if user_access == "allow" %}
+      <a id ="btn_create" class="button expand" href="{% url 'new_batch' groupid %}">
+        Create {{title}}
+      </a>
+      {% endif %}
+      {% endif %}
+  </div>
+</div>
+{% endblock %}
+
+{% block body_content %}
+{% get_group_name groupid as group_name_tag %}
+  <div id="alertModal" class="reveal-modal medium alert-box radius" data-reveal data-alert>
+    <label id="alertModalLabel"></label>
+    <a class="close-reveal-modal">&#215;</a>
+  </div>
+
+<header class="row">
+  <dl class="tabs" data-tab>
+    <dd class="active"><a href="#panel2-1"><i class="fi-eye"></i> All Batches {% if batch_coll.count %}({{ batch_coll.count }}){% endif %}</a></dd>
+  </dl>
+</header>
+<form data-abide id="form-card-batch" method="POST" action="{% url 'batch' group_id %}">{% csrf_token %}
+  <div class="row">
+    <div class="small-2 columns">
+      <label class="right inline" for="nussd_course_type">{% trans "Course Type" %}</label>
+    </div>
+    <div class="small-3 columns end">
+      {% html_widget groupid "" ATs.0 %}
+    </div>
+    <div class="small-2 columns">
+      <label class="right inline" for="acourse_list">{% trans "Name of Course" %}</label>
+    </div>
+    <div class="small-3 columns end">
+      <select id="acourse_list" name="acourse_list_name" disabled="disabled">
+      </select>
+    </div>
+    <input type="hidden" name="nussd_course_name" id="nussd_course_name">
+    <input type="hidden" name="announced_course_name" id="announced_course_name">
+    <input type="submit" value="VIEW" id="submit" class="small button  tiny">
+  </div>
+
+  <fieldset id="batches_of_acourse">
+    <ul class="small-block-grid-1 medium-block-grid-2 large-block-grid-4">
+      {% for node in batch_coll %}
+      <li class="card">
+        <span data-tooltip title="{{ node.altnames }}">
+          <div id="group">
+            <header>
+             <a href="{% url 'detail' groupid node %}">
+              <div class="label-list">
+                {% for tag in node.tags|slice:":3" %}
+                  <a href="{% url 'tag_info' groupid tag %}"><span class="label">{{tag}}</span></a>
+                {% endfor %}
+              </div>
+              <div class="th"><img src="/static/ndf/scss/metastudio/logo.svg"></div>
+              <!-- <h4>{{ node.name|truncatechars:20 }}</h4> -->
+              <h4>{{ node.altnames}}</h4>
+              
+              <div>
+                <small class="subheader">{{ node.member_of_names_list|join:', ' }} created {{node.created_at|timesince}} ago 
+                <br/>
+                by <span href="#" class="user" data-gnow="">{{node.user_details_dict.created_by}}</span> 
+                </small>
+              </div>
+            </header>
+            <p>{{ node.html_content|default_if_none:"Add some description."|safe|striptags|truncatechars:75 }}</p>
+           </a> 
+          </div>
+        </span>
+      </li>
+      {% endfor %}
+    </ul>
+  </fieldset>
+</form>
+{% endblock %}
+{% block script %}
+  var announced_course_name_v1 = ""
+  //For selecting Course type
+    $("select#nussd_course_type").change(function() {
+      var nussd_course_type = $("#nussd_course_type").val();
+      success_state = false;
+      $("#nussd_course_name").val(nussd_course_type)
+      $.ajax({
+        url: "{% url 'get_announced_courses_with_ctype' group_id %}",
+
+        data: {
+          nussd_course_type: nussd_course_type
+        },
+
+        type: "GET",
+
+        dataType: "json",
+
+        complete: function () {
+          // Enable AC field
+            if(announced_course_name_v1 != ""){
+              $("select#acourse_list option[value='{{announced_course_name_var}}']").prop("selected", true);
+              announced_course_name_v1 = "";
+            }
+
+
+          $("select#acourse_list").removeAttr('disabled')
+        },
+
+        success: function(data){
+          success_state = data["success"]
+          if (success_state){
+
+            ac_data = data["acourse_ctype_list"]
+            ac_data = JSON.parse(ac_data)
+
+            $("select#acourse_list").empty();
+              $("select#acourse_list").append(
+                $("<option></option>")
+                  .attr("value", "")
+                  .text("{% trans ' - - - Select course - - - ' %}")
+              );
+            
+            $.each(ac_data, function(i,v){
+              se = v["_id"];
+              ac_name = v["name"];
+              scount_lbl = v["enrolled_stud_count"]
+              $("select#acourse_list").append(
+                $("<option></option>")
+                  .attr("value", se)
+                  .text(ac_name)
+                  .attr("scount", scount_lbl)
+              );
+            });
+
+            $("select#acourse_list").prop("selectedIndex", 0);
+          }
+
+          else {
+            $("#alertModalLabel").text(data["message"]);
+            $("#alertModal").removeClass("success").removeClass("warning");
+            $("#alertModal").addClass("alert");
+            $("#alertModal").foundation('reveal', 'open');
+            $("select#nussd_course_type").prop("selectedIndex", 0);
+            $("select#acourse_list").prop("selectedIndex", 0);
+          }
+        },
+      });//end of ajax
+    });//end of nussd_course_type.change function
+
+  //For selecting Announced Course type
+    $("select#acourse_list").change(function() {
+        ac_id = $("#acourse_list").val();
+        $("#announced_course_name").val(ac_id)
+    });//end of acourse_list.change function
+
+
+    $("#form-batch").submit(function(event){
+      $("#batches_of_acourse").empty();
+    })
+
+
+{% endblock %}
+
+{% block document_ready %}
+
+  {% if nussd_course_name_var != "" %}
+    $("select#nussd_course_type").val("{{nussd_course_name_var}}");
+    announced_course_name_v1 = "{{announced_course_name_var}}";
+    $('select#nussd_course_type').trigger('change');
+  {% endif %}
+
+  {% if announced_course_name_var != "" %}
+    $("select#acourse_list option[value='{{announced_course_name_var}}']").prop("selected", true);
+  {% endif %}
+{% endblock %}

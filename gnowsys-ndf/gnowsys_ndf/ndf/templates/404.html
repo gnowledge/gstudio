@@ -1,0 +1,24 @@
+{% extends "error_base.html" %}
+
+{% block error_title %} 400 - Page not found {% endblock %}
+
+{% block error_body_text %}
+	<br/>
+	<h2>Sorry, You got the wrong address!</h2>
+
+	<br/>
+	<h4>
+		<small>
+			{% if site.SITE_NAME == "NROER" %}
+				Double check the URL or navigate back to:
+				<blockquote>
+					<a href="{% url 'repository' 'home' %}"> Repository </a> | 
+					<a href="{% url 'nroer_groups' 'home' 'Partners' %}"> Partners </a> | 
+					<a href="{% url 'nroer_groups' 'home' 'Groups' %}"> Groups </a>
+				</blockquote>
+			{% else %}
+				Double check the URL or head to the &nbsp; <a href="/home/"> <i class="fi-home"> </i> homepage</a>.
+			{% endif %}
+		</small>
+	</h4>
+{% endblock %}

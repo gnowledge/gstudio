@@ -1,0 +1,752 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+"http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en">
+<head>
+<title>Feature list of gStudio</title>
+<!-- 2014-04-27 Sun 00:54 -->
+<meta  http-equiv="Content-Type" content="text/html;charset=utf-8" />
+<meta  name="generator" content="Org-mode" />
+<meta  name="author" content="Nagarjuna" />
+<style type="text/css">
+ <!--/*--><![CDATA[/*><!--*/
+  .title  { text-align: center; }
+  .todo   { font-family: monospace; color: red; }
+  .done   { color: green; }
+  .tag    { background-color: #eee; font-family: monospace;
+            padding: 2px; font-size: 80%; font-weight: normal; }
+  .timestamp { color: #bebebe; }
+  .timestamp-kwd { color: #5f9ea0; }
+  .right  { margin-left: auto; margin-right: 0px;  text-align: right; }
+  .left   { margin-left: 0px;  margin-right: auto; text-align: left; }
+  .center { margin-left: auto; margin-right: auto; text-align: center; }
+  .underline { text-decoration: underline; }
+  #postamble p, #preamble p { font-size: 90%; margin: .2em; }
+  p.verse { margin-left: 3%; }
+  pre {
+    border: 1px solid #ccc;
+    box-shadow: 3px 3px 3px #eee;
+    padding: 8pt;
+    font-family: monospace;
+    overflow: auto;
+    margin: 1.2em;
+  }
+  pre.src {
+    position: relative;
+    overflow: visible;
+    padding-top: 1.2em;
+  }
+  pre.src:before {
+    display: none;
+    position: absolute;
+    background-color: white;
+    top: -10px;
+    right: 10px;
+    padding: 3px;
+    border: 1px solid black;
+  }
+  pre.src:hover:before { display: inline;}
+  pre.src-sh:before    { content: 'sh'; }
+  pre.src-bash:before  { content: 'sh'; }
+  pre.src-emacs-lisp:before { content: 'Emacs Lisp'; }
+  pre.src-R:before     { content: 'R'; }
+  pre.src-perl:before  { content: 'Perl'; }
+  pre.src-java:before  { content: 'Java'; }
+  pre.src-sql:before   { content: 'SQL'; }
+
+  table { border-collapse:collapse; }
+  td, th { vertical-align:top;  }
+  th.right  { text-align: center;  }
+  th.left   { text-align: center;   }
+  th.center { text-align: center; }
+  td.right  { text-align: right;  }
+  td.left   { text-align: left;   }
+  td.center { text-align: center; }
+  dt { font-weight: bold; }
+  .footpara:nth-child(2) { display: inline; }
+  .footpara { display: block; }
+  .footdef  { margin-bottom: 1em; }
+  .figure { padding: 1em; }
+  .figure p { text-align: center; }
+  .inlinetask {
+    padding: 10px;
+    border: 2px solid gray;
+    margin: 10px;
+    background: #ffffcc;
+  }
+  #org-div-home-and-up
+   { text-align: right; font-size: 70%; white-space: nowrap; }
+  textarea { overflow-x: auto; }
+  .linenr { font-size: smaller }
+  .code-highlighted { background-color: #ffff00; }
+  .org-info-js_info-navigation { border-style: none; }
+  #org-info-js_console-label
+    { font-size: 10px; font-weight: bold; white-space: nowrap; }
+  .org-info-js_search-highlight
+    { background-color: #ffff00; color: #000000; font-weight: bold; }
+  /*]]>*/-->
+</style>
+<script type="text/javascript">
+/*
+@licstart  The following is the entire license notice for the
+JavaScript code in this tag.
+
+Copyright (C) 2012-2013 Free Software Foundation, Inc.
+
+The JavaScript code in this tag is free software: you can
+redistribute it and/or modify it under the terms of the GNU
+General Public License (GNU GPL) as published by the Free Software
+Foundation, either version 3 of the License, or (at your option)
+any later version.  The code is distributed WITHOUT ANY WARRANTY;
+without even the implied warranty of MERCHANTABILITY or FITNESS
+FOR A PARTICULAR PURPOSE.  See the GNU GPL for more details.
+
+As additional permission under GNU GPL version 3 section 7, you
+may distribute non-source (e.g., minimized or compacted) forms of
+that code without the copy of the GNU GPL normally required by
+section 4, provided you include this license notice and a URL
+through which recipients can access the Corresponding Source.
+
+
+@licend  The above is the entire license notice
+for the JavaScript code in this tag.
+*/
+<!--/*--><![CDATA[/*><!--*/
+ function CodeHighlightOn(elem, id)
+ {
+   var target = document.getElementById(id);
+   if(null != target) {
+     elem.cacheClassElem = elem.className;
+     elem.cacheClassTarget = target.className;
+     target.className = "code-highlighted";
+     elem.className   = "code-highlighted";
+   }
+ }
+ function CodeHighlightOff(elem, id)
+ {
+   var target = document.getElementById(id);
+   if(elem.cacheClassElem)
+     elem.className = elem.cacheClassElem;
+   if(elem.cacheClassTarget)
+     target.className = elem.cacheClassTarget;
+ }
+/*]]>*///-->
+</script>
+</head>
+<body>
+<div id="content">
+<h1 class="title">Feature list of gStudio</h1>
+<div id="table-of-contents">
+<h2>Table of Contents</h2>
+<div id="text-table-of-contents">
+<ul>
+<li><a href="#sec-1">1. Pages</a>
+<ul>
+<li><a href="#sec-1-1">1.1. Collaboratively edit pages</a></li>
+<li><a href="#sec-1-2">1.2. text processing using orgmode (JS plain text editor with orgmode menu)</a></li>
+<li><a href="#sec-1-3">1.3. support for LaTeX using MathJax</a></li>
+<li><a href="#sec-1-4">1.4. simultaneous editing of the same document by more than one user</a></li>
+</ul>
+</li>
+<li><a href="#sec-2">2. File upload/download</a>
+<ul>
+<li><a href="#sec-2-1">2.1. upload and download files as resources</a></li>
+<li><a href="#sec-2-2">2.2. create collections of resources (both homogeneous and heterogeneous)</a></li>
+<li><a href="#sec-2-3">2.3. seggregate files according to mimetype</a></li>
+</ul>
+</li>
+<li><a href="#sec-3">3. Organizing resources as ordered and hierarchical collections</a></li>
+<li><a href="#sec-4">4. General Features</a>
+<ul>
+<li><a href="#sec-4-1">4.1. Users</a>
+<ul>
+<li><a href="#sec-4-1-1">4.1.1. registration</a></li>
+<li><a href="#sec-4-1-2">4.1.2. login</a></li>
+<li><a href="#sec-4-1-3">4.1.3. forgotten password</a></li>
+<li><a href="#sec-4-1-4">4.1.4. <span class="todo TODO">TODO</span> socialauth support</a></li>
+</ul>
+</li>
+<li><a href="#sec-4-2">4.2. Cross publication of pages and resources</a></li>
+<li><a href="#sec-4-3">4.3. Groups</a>
+<ul>
+<li><a href="#sec-4-3-1">4.3.1. creation of project groups for collabroation</a></li>
+<li><a href="#sec-4-3-2">4.3.2. Selection of Apps for each group</a></li>
+<li><a href="#sec-4-3-3">4.3.3. join and remove from groups by users</a></li>
+<li><a href="#sec-4-3-4">4.3.4. support for public project groups</a></li>
+<li><a href="#sec-4-3-5">4.3.5. PARTIAL-COMPLETE support for private project groups</a></li>
+<li><a href="#sec-4-3-6">4.3.6. <span class="todo TODO">TODO</span> groups and subgroups</a></li>
+<li><a href="#sec-4-3-7">4.3.7. <span class="todo TODO">TODO</span> listing members for private groups for members only</a></li>
+<li><a href="#sec-4-3-8">4.3.8. PARTIAL-COMPLETE subscribe and unsubscribe from groups by group admin/moderator</a></li>
+<li><a href="#sec-4-3-9">4.3.9. <span class="done DONE">DONE</span> support for moderated groups (public or private)</a></li>
+<li><a href="#sec-4-3-10">4.3.10. encrypted groups based on web-of-trust</a></li>
+</ul>
+</li>
+<li><a href="#sec-4-4">4.4. social networking</a>
+<ul>
+<li><a href="#sec-4-4-1">4.4.1. share (broadcast to other social media sites)</a></li>
+<li><a href="#sec-4-4-2">4.4.2. microblog (broadcast to other social media sites)</a></li>
+<li><a href="#sec-4-4-3">4.4.3. blog</a></li>
+<li><a href="#sec-4-4-4">4.4.4. online meetings (synchronous/scheduled)</a></li>
+<li><a href="#sec-4-4-5">4.4.5. one-2-one</a></li>
+<li><a href="#sec-4-4-6">4.4.6. conference with more than two</a></li>
+</ul>
+</li>
+<li><a href="#sec-4-5">4.5. Search</a>
+<ul>
+<li><a href="#sec-4-5-1">4.5.1. context based search</a></li>
+<li><a href="#sec-4-5-2">4.5.2. generic site-wide search</a></li>
+</ul>
+</li>
+<li><a href="#sec-4-6">4.6. Version Control</a>
+<ul>
+<li><a href="#sec-4-6-1">4.6.1. versioning data</a></li>
+<li><a href="#sec-4-6-2">4.6.2. versioning metadata</a></li>
+<li><a href="#sec-4-6-3">4.6.3. <span class="todo TODO">TODO</span> versioning files</a></li>
+</ul>
+</li>
+<li><a href="#sec-4-7">4.7. user dashboard</a></li>
+<li><a href="#sec-4-8">4.8. shelf: bookmarking resources from the site</a></li>
+<li><a href="#sec-4-9">4.9. context based help</a></li>
+<li><a href="#sec-4-10">4.10. Responsive frontend suitable for desktop, tablets, phones etc.</a></li>
+<li><a href="#sec-4-11">4.11. location widget using GeoJSON and open street map</a></li>
+<li><a href="#sec-4-12">4.12. discussion thread for each resource</a></li>
+<li><a href="#sec-4-13">4.13. rating of resources</a></li>
+<li><a href="#sec-4-14">4.14. intimation to collaborating users of the activity on the site</a></li>
+<li><a href="#sec-4-15">4.15. Image viewer</a></li>
+<li><a href="#sec-4-16">4.16. Video viewer</a></li>
+<li><a href="#sec-4-17">4.17. Pan.do/ra video support</a></li>
+<li><a href="#sec-4-18">4.18. admin: user management</a></li>
+<li><a href="#sec-4-19">4.19. tags</a></li>
+<li><a href="#sec-4-20">4.20. <span class="todo TODO">TODO</span> translations</a>
+<ul>
+<li><a href="#sec-4-20-1">4.20.1. of the UI interface through PO files</a></li>
+<li><a href="#sec-4-20-2">4.20.2. of the data and metadata through the user interface</a></li>
+</ul>
+</li>
+<li><a href="#sec-4-21">4.21. <span class="todo TODO">TODO</span> tag cloud</a></li>
+<li><a href="#sec-4-22">4.22. Intimation</a>
+<ul>
+<li><a href="#sec-4-22-1">4.22.1. Registration</a></li>
+<li><a href="#sec-4-22-2">4.22.2. subscription to a group</a></li>
+<li><a href="#sec-4-22-3">4.22.3. reporting changes to collaborators</a></li>
+<li><a href="#sec-4-22-4">4.22.4. moderators</a></li>
+<li><a href="#sec-4-22-5">4.22.5. members of a group based on configuration</a></li>
+<li><a href="#sec-4-22-6">4.22.6. members in a forum</a></li>
+</ul>
+</li>
+<li><a href="#sec-4-23">4.23. <span class="todo TODO">TODO</span> sms and email support for interacting with the portal</a></li>
+<li><a href="#sec-4-24">4.24. <span class="todo TODO">TODO</span> dynamic template variable support while composing text</a></li>
+<li><a href="#sec-4-25">4.25. <span class="todo TODO">TODO</span> data visualization app</a></li>
+</ul>
+</li>
+<li><a href="#sec-5">5. Custom Online Application Designer</a>
+<ul>
+<li><a href="#sec-5-1">5.1. Creation of new Systemtypes (internal name for classes)</a></li>
+<li><a href="#sec-5-2">5.2. Creation of Relation Types</a></li>
+<li><a href="#sec-5-3">5.3. Creation of Attribute Types</a></li>
+<li><a href="#sec-5-4">5.4. Application as a collection of System Types</a></li>
+<li><a href="#sec-5-5">5.5. designing new Apps (custom applications)</a></li>
+<li><a href="#sec-5-6">5.6. automatic form builder based on the design of the classes of an app</a></li>
+<li><a href="#sec-5-7">5.7. <span class="todo TODO">TODO</span> native widgets and validation of standard datatypes and regular expressions</a></li>
+<li><a href="#sec-5-8">5.8. <span class="todo ONGOING">ONGOING</span> download and upload custom app schema, with and without data.</a></li>
+<li><a href="#sec-5-9">5.9. <span class="todo TODO">TODO</span> custom templates for custom apps</a></li>
+</ul>
+</li>
+<li><a href="#sec-6">6. SVG graphs: support for three kinds of graphs:</a>
+<ul>
+<li><a href="#sec-6-1">6.1. hierarchical tree graph based on colection</a></li>
+<li><a href="#sec-6-2">6.2. dependency graph to create teaching/learning sequence based on priornode or recommended navitation</a></li>
+<li><a href="#sec-6-3">6.3. semantic network (concept mapping)</a></li>
+</ul>
+</li>
+<li><a href="#sec-7">7. Discussion Forums</a>
+<ul>
+<li><a href="#sec-7-1">7.1. threads,</a></li>
+<li><a href="#sec-7-2">7.2. messages and</a></li>
+<li><a href="#sec-7-3">7.3. replies</a></li>
+</ul>
+</li>
+<li><a href="#sec-8">8. Making Course Ware collaboratively</a>
+<ul>
+<li><a href="#sec-8-1">8.1. Collections of Resources</a></li>
+<li><a href="#sec-8-2">8.2. Authoring Quiz</a></li>
+<li><a href="#sec-8-3">8.3. Module builder: freeze a snapshot of hierarchical collection into a non**editable resource (meant for modules of a course, or finalizing collaboratively written documents)</a></li>
+<li><a href="#sec-8-4">8.4. Course builder: an ordered collection of modules</a></li>
+<li><a href="#sec-8-5">8.5. <span class="todo TODO">TODO</span> export of modules, collections and courses for download</a>
+<ul>
+<li><a href="#sec-8-5-1">8.5.1. HTML</a></li>
+<li><a href="#sec-8-5-2">8.5.2. PDF</a></li>
+<li><a href="#sec-8-5-3">8.5.3. LaTex</a></li>
+<li><a href="#sec-8-5-4">8.5.4. ODT</a></li>
+</ul>
+</li>
+<li><a href="#sec-8-6">8.6. course player</a></li>
+<li><a href="#sec-8-7">8.7. enrolement to the course</a></li>
+<li><a href="#sec-8-8">8.8. evaluation</a></li>
+<li><a href="#sec-8-9">8.9. reports</a>
+<ul>
+<li><a href="#sec-8-9-1">8.9.1. to the student</a></li>
+<li><a href="#sec-8-9-2">8.9.2. to the mentors</a></li>
+<li><a href="#sec-8-9-3">8.9.3. to the admins</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li><a href="#sec-9">9. Management of Students, Volunteers, Mentors, Fellows</a></li>
+<li><a href="#sec-10">10. distributed p2p sync between servers based on group mirroring</a></li>
+<li><a href="#sec-11">11. Application for citizen science projects</a>
+<ul>
+<li><a href="#sec-11-1">11.1. Observations app</a></li>
+</ul>
+</li>
+<li><a href="#sec-12">12. Extra feathers to be added to the cap of gstudio!</a>
+<ul>
+<li><a href="#sec-12-1">12.1. Audio, video meetings</a></li>
+<li><a href="#sec-12-2">12.2. Badges</a></li>
+<li><a href="#sec-12-3">12.3. Multi-lingual dictionary/thesaurus wordnet</a></li>
+<li><a href="#sec-12-4">12.4. Text annotation and analysis</a></li>
+<li><a href="#sec-12-5">12.5. Integrating with other popularly used applications</a>
+<ul>
+<li><a href="#sec-12-5-1">12.5.1. gnu mailman (mailing list) integration</a></li>
+<li><a href="#sec-12-5-2">12.5.2. wikimedia integration</a></li>
+<li><a href="#sec-12-5-3">12.5.3. zotero integration</a></li>
+</ul>
+</li>
+<li><a href="#sec-12-6">12.6. Custom App for Task management</a>
+<ul>
+<li><a href="#sec-12-6-1">12.6.1. creation of a task</a></li>
+<li><a href="#sec-12-6-2">12.6.2. assigning to a member of the group</a></li>
+<li><a href="#sec-12-6-3">12.6.3. status modification</a></li>
+<li><a href="#sec-12-6-4">12.6.4. discussion</a></li>
+<li><a href="#sec-12-6-5">12.6.5. tags</a></li>
+<li><a href="#sec-12-6-6">12.6.6. categories</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</div>
+</div>
+<p>
+GNOWSYS-studio (gstudio for short) is a feature rich online
+collaborative application/resource creation, curation and publication
+framework. The following is a list of such features with breif
+description of what is expected from each feature.
+</p>
+
+<div id="outline-container-sec-1" class="outline-2">
+<h2 id="sec-1"><span class="section-number-2">1</span> Pages</h2>
+<div class="outline-text-2" id="text-1">
+<p>
+A base App
+</p>
+</div>
+<div id="outline-container-sec-1-1" class="outline-3">
+<h3 id="sec-1-1"><span class="section-number-3">1.1</span> Collaboratively edit pages</h3>
+</div>
+<div id="outline-container-sec-1-2" class="outline-3">
+<h3 id="sec-1-2"><span class="section-number-3">1.2</span> text processing using orgmode (JS plain text editor with orgmode menu)</h3>
+</div>
+<div id="outline-container-sec-1-3" class="outline-3">
+<h3 id="sec-1-3"><span class="section-number-3">1.3</span> support for LaTeX using MathJax</h3>
+</div>
+<div id="outline-container-sec-1-4" class="outline-3">
+<h3 id="sec-1-4"><span class="section-number-3">1.4</span> simultaneous editing of the same document by more than one user</h3>
+</div>
+</div>
+
+<div id="outline-container-sec-2" class="outline-2">
+<h2 id="sec-2"><span class="section-number-2">2</span> File upload/download</h2>
+<div class="outline-text-2" id="text-2">
+</div><div id="outline-container-sec-2-1" class="outline-3">
+<h3 id="sec-2-1"><span class="section-number-3">2.1</span> upload and download files as resources</h3>
+</div>
+<div id="outline-container-sec-2-2" class="outline-3">
+<h3 id="sec-2-2"><span class="section-number-3">2.2</span> create collections of resources (both homogeneous and heterogeneous)</h3>
+</div>
+<div id="outline-container-sec-2-3" class="outline-3">
+<h3 id="sec-2-3"><span class="section-number-3">2.3</span> seggregate files according to mimetype</h3>
+</div>
+</div>
+
+<div id="outline-container-sec-3" class="outline-2">
+<h2 id="sec-3"><span class="section-number-2">3</span> Organizing resources as ordered and hierarchical collections</h2>
+</div>
+<div id="outline-container-sec-4" class="outline-2">
+<h2 id="sec-4"><span class="section-number-2">4</span> General Features</h2>
+<div class="outline-text-2" id="text-4">
+</div><div id="outline-container-sec-4-1" class="outline-3">
+<h3 id="sec-4-1"><span class="section-number-3">4.1</span> Users</h3>
+<div class="outline-text-3" id="text-4-1">
+</div><div id="outline-container-sec-4-1-1" class="outline-4">
+<h4 id="sec-4-1-1"><span class="section-number-4">4.1.1</span> registration</h4>
+</div>
+<div id="outline-container-sec-4-1-2" class="outline-4">
+<h4 id="sec-4-1-2"><span class="section-number-4">4.1.2</span> login</h4>
+</div>
+<div id="outline-container-sec-4-1-3" class="outline-4">
+<h4 id="sec-4-1-3"><span class="section-number-4">4.1.3</span> forgotten password</h4>
+</div>
+<div id="outline-container-sec-4-1-4" class="outline-4">
+<h4 id="sec-4-1-4"><span class="section-number-4">4.1.4</span> <span class="todo TODO">TODO</span> socialauth support</h4>
+</div>
+</div>
+
+<div id="outline-container-sec-4-2" class="outline-3">
+<h3 id="sec-4-2"><span class="section-number-3">4.2</span> Cross publication of pages and resources</h3>
+</div>
+<div id="outline-container-sec-4-3" class="outline-3">
+<h3 id="sec-4-3"><span class="section-number-3">4.3</span> Groups</h3>
+<div class="outline-text-3" id="text-4-3">
+</div><div id="outline-container-sec-4-3-1" class="outline-4">
+<h4 id="sec-4-3-1"><span class="section-number-4">4.3.1</span> creation of project groups for collabroation</h4>
+</div>
+<div id="outline-container-sec-4-3-2" class="outline-4">
+<h4 id="sec-4-3-2"><span class="section-number-4">4.3.2</span> Selection of Apps for each group</h4>
+</div>
+<div id="outline-container-sec-4-3-3" class="outline-4">
+<h4 id="sec-4-3-3"><span class="section-number-4">4.3.3</span> join and remove from groups by users</h4>
+</div>
+<div id="outline-container-sec-4-3-4" class="outline-4">
+<h4 id="sec-4-3-4"><span class="section-number-4">4.3.4</span> support for public project groups</h4>
+</div>
+<div id="outline-container-sec-4-3-5" class="outline-4">
+<h4 id="sec-4-3-5"><span class="section-number-4">4.3.5</span> PARTIAL-COMPLETE support for private project groups</h4>
+</div>
+<div id="outline-container-sec-4-3-6" class="outline-4">
+<h4 id="sec-4-3-6"><span class="section-number-4">4.3.6</span> <span class="todo TODO">TODO</span> groups and subgroups</h4>
+</div>
+<div id="outline-container-sec-4-3-7" class="outline-4">
+<h4 id="sec-4-3-7"><span class="section-number-4">4.3.7</span> <span class="todo TODO">TODO</span> listing members for private groups for members only</h4>
+</div>
+<div id="outline-container-sec-4-3-8" class="outline-4">
+<h4 id="sec-4-3-8"><span class="section-number-4">4.3.8</span> PARTIAL-COMPLETE subscribe and unsubscribe from groups by group admin/moderator</h4>
+</div>
+<div id="outline-container-sec-4-3-9" class="outline-4">
+<h4 id="sec-4-3-9"><span class="section-number-4">4.3.9</span> <span class="done DONE">DONE</span> support for moderated groups (public or private)</h4>
+</div>
+<div id="outline-container-sec-4-3-10" class="outline-4">
+<h4 id="sec-4-3-10"><span class="section-number-4">4.3.10</span> encrypted groups based on web-of-trust</h4>
+</div>
+</div>
+
+<div id="outline-container-sec-4-4" class="outline-3">
+<h3 id="sec-4-4"><span class="section-number-3">4.4</span> social networking</h3>
+<div class="outline-text-3" id="text-4-4">
+</div><div id="outline-container-sec-4-4-1" class="outline-4">
+<h4 id="sec-4-4-1"><span class="section-number-4">4.4.1</span> share (broadcast to other social media sites)</h4>
+</div>
+<div id="outline-container-sec-4-4-2" class="outline-4">
+<h4 id="sec-4-4-2"><span class="section-number-4">4.4.2</span> microblog (broadcast to other social media sites)</h4>
+</div>
+<div id="outline-container-sec-4-4-3" class="outline-4">
+<h4 id="sec-4-4-3"><span class="section-number-4">4.4.3</span> blog</h4>
+</div>
+<div id="outline-container-sec-4-4-4" class="outline-4">
+<h4 id="sec-4-4-4"><span class="section-number-4">4.4.4</span> online meetings (synchronous/scheduled)</h4>
+</div>
+<div id="outline-container-sec-4-4-5" class="outline-4">
+<h4 id="sec-4-4-5"><span class="section-number-4">4.4.5</span> one-2-one</h4>
+</div>
+<div id="outline-container-sec-4-4-6" class="outline-4">
+<h4 id="sec-4-4-6"><span class="section-number-4">4.4.6</span> conference with more than two</h4>
+</div>
+</div>
+
+<div id="outline-container-sec-4-5" class="outline-3">
+<h3 id="sec-4-5"><span class="section-number-3">4.5</span> Search</h3>
+<div class="outline-text-3" id="text-4-5">
+</div><div id="outline-container-sec-4-5-1" class="outline-4">
+<h4 id="sec-4-5-1"><span class="section-number-4">4.5.1</span> context based search</h4>
+</div>
+<div id="outline-container-sec-4-5-2" class="outline-4">
+<h4 id="sec-4-5-2"><span class="section-number-4">4.5.2</span> generic site-wide search</h4>
+</div>
+</div>
+
+<div id="outline-container-sec-4-6" class="outline-3">
+<h3 id="sec-4-6"><span class="section-number-3">4.6</span> Version Control</h3>
+<div class="outline-text-3" id="text-4-6">
+</div><div id="outline-container-sec-4-6-1" class="outline-4">
+<h4 id="sec-4-6-1"><span class="section-number-4">4.6.1</span> versioning data</h4>
+</div>
+<div id="outline-container-sec-4-6-2" class="outline-4">
+<h4 id="sec-4-6-2"><span class="section-number-4">4.6.2</span> versioning metadata</h4>
+</div>
+<div id="outline-container-sec-4-6-3" class="outline-4">
+<h4 id="sec-4-6-3"><span class="section-number-4">4.6.3</span> <span class="todo TODO">TODO</span> versioning files</h4>
+</div>
+</div>
+
+<div id="outline-container-sec-4-7" class="outline-3">
+<h3 id="sec-4-7"><span class="section-number-3">4.7</span> user dashboard</h3>
+</div>
+<div id="outline-container-sec-4-8" class="outline-3">
+<h3 id="sec-4-8"><span class="section-number-3">4.8</span> shelf: bookmarking resources from the site</h3>
+</div>
+<div id="outline-container-sec-4-9" class="outline-3">
+<h3 id="sec-4-9"><span class="section-number-3">4.9</span> context based help</h3>
+</div>
+<div id="outline-container-sec-4-10" class="outline-3">
+<h3 id="sec-4-10"><span class="section-number-3">4.10</span> Responsive frontend suitable for desktop, tablets, phones etc.</h3>
+</div>
+<div id="outline-container-sec-4-11" class="outline-3">
+<h3 id="sec-4-11"><span class="section-number-3">4.11</span> location widget using GeoJSON and open street map</h3>
+</div>
+<div id="outline-container-sec-4-12" class="outline-3">
+<h3 id="sec-4-12"><span class="section-number-3">4.12</span> discussion thread for each resource</h3>
+</div>
+<div id="outline-container-sec-4-13" class="outline-3">
+<h3 id="sec-4-13"><span class="section-number-3">4.13</span> rating of resources</h3>
+</div>
+<div id="outline-container-sec-4-14" class="outline-3">
+<h3 id="sec-4-14"><span class="section-number-3">4.14</span> intimation to collaborating users of the activity on the site</h3>
+</div>
+<div id="outline-container-sec-4-15" class="outline-3">
+<h3 id="sec-4-15"><span class="section-number-3">4.15</span> Image viewer</h3>
+</div>
+<div id="outline-container-sec-4-16" class="outline-3">
+<h3 id="sec-4-16"><span class="section-number-3">4.16</span> Video viewer</h3>
+</div>
+<div id="outline-container-sec-4-17" class="outline-3">
+<h3 id="sec-4-17"><span class="section-number-3">4.17</span> Pan.do/ra video support</h3>
+</div>
+<div id="outline-container-sec-4-18" class="outline-3">
+<h3 id="sec-4-18"><span class="section-number-3">4.18</span> admin: user management</h3>
+</div>
+<div id="outline-container-sec-4-19" class="outline-3">
+<h3 id="sec-4-19"><span class="section-number-3">4.19</span> tags</h3>
+</div>
+<div id="outline-container-sec-4-20" class="outline-3">
+<h3 id="sec-4-20"><span class="section-number-3">4.20</span> <span class="todo TODO">TODO</span> translations</h3>
+<div class="outline-text-3" id="text-4-20">
+</div><div id="outline-container-sec-4-20-1" class="outline-4">
+<h4 id="sec-4-20-1"><span class="section-number-4">4.20.1</span> of the UI interface through PO files</h4>
+</div>
+<div id="outline-container-sec-4-20-2" class="outline-4">
+<h4 id="sec-4-20-2"><span class="section-number-4">4.20.2</span> of the data and metadata through the user interface</h4>
+</div>
+</div>
+
+<div id="outline-container-sec-4-21" class="outline-3">
+<h3 id="sec-4-21"><span class="section-number-3">4.21</span> <span class="todo TODO">TODO</span> tag cloud</h3>
+</div>
+<div id="outline-container-sec-4-22" class="outline-3">
+<h3 id="sec-4-22"><span class="section-number-3">4.22</span> Intimation</h3>
+<div class="outline-text-3" id="text-4-22">
+</div><div id="outline-container-sec-4-22-1" class="outline-4">
+<h4 id="sec-4-22-1"><span class="section-number-4">4.22.1</span> Registration</h4>
+</div>
+<div id="outline-container-sec-4-22-2" class="outline-4">
+<h4 id="sec-4-22-2"><span class="section-number-4">4.22.2</span> subscription to a group</h4>
+</div>
+<div id="outline-container-sec-4-22-3" class="outline-4">
+<h4 id="sec-4-22-3"><span class="section-number-4">4.22.3</span> reporting changes to collaborators</h4>
+</div>
+<div id="outline-container-sec-4-22-4" class="outline-4">
+<h4 id="sec-4-22-4"><span class="section-number-4">4.22.4</span> moderators</h4>
+</div>
+<div id="outline-container-sec-4-22-5" class="outline-4">
+<h4 id="sec-4-22-5"><span class="section-number-4">4.22.5</span> members of a group based on configuration</h4>
+</div>
+<div id="outline-container-sec-4-22-6" class="outline-4">
+<h4 id="sec-4-22-6"><span class="section-number-4">4.22.6</span> members in a forum</h4>
+</div>
+</div>
+
+<div id="outline-container-sec-4-23" class="outline-3">
+<h3 id="sec-4-23"><span class="section-number-3">4.23</span> <span class="todo TODO">TODO</span> sms and email support for interacting with the portal</h3>
+</div>
+<div id="outline-container-sec-4-24" class="outline-3">
+<h3 id="sec-4-24"><span class="section-number-3">4.24</span> <span class="todo TODO">TODO</span> dynamic template variable support while composing text</h3>
+</div>
+<div id="outline-container-sec-4-25" class="outline-3">
+<h3 id="sec-4-25"><span class="section-number-3">4.25</span> <span class="todo TODO">TODO</span> data visualization app</h3>
+</div>
+</div>
+
+<div id="outline-container-sec-5" class="outline-2">
+<h2 id="sec-5"><span class="section-number-2">5</span> Custom Online Application Designer</h2>
+<div class="outline-text-2" id="text-5">
+</div><div id="outline-container-sec-5-1" class="outline-3">
+<h3 id="sec-5-1"><span class="section-number-3">5.1</span> Creation of new Systemtypes (internal name for classes)</h3>
+</div>
+<div id="outline-container-sec-5-2" class="outline-3">
+<h3 id="sec-5-2"><span class="section-number-3">5.2</span> Creation of Relation Types</h3>
+</div>
+<div id="outline-container-sec-5-3" class="outline-3">
+<h3 id="sec-5-3"><span class="section-number-3">5.3</span> Creation of Attribute Types</h3>
+</div>
+<div id="outline-container-sec-5-4" class="outline-3">
+<h3 id="sec-5-4"><span class="section-number-3">5.4</span> Application as a collection of System Types</h3>
+</div>
+<div id="outline-container-sec-5-5" class="outline-3">
+<h3 id="sec-5-5"><span class="section-number-3">5.5</span> designing new Apps (custom applications)</h3>
+</div>
+<div id="outline-container-sec-5-6" class="outline-3">
+<h3 id="sec-5-6"><span class="section-number-3">5.6</span> automatic form builder based on the design of the classes of an app</h3>
+</div>
+<div id="outline-container-sec-5-7" class="outline-3">
+<h3 id="sec-5-7"><span class="section-number-3">5.7</span> <span class="todo TODO">TODO</span> native widgets and validation of standard datatypes and regular expressions</h3>
+</div>
+<div id="outline-container-sec-5-8" class="outline-3">
+<h3 id="sec-5-8"><span class="section-number-3">5.8</span> <span class="todo ONGOING">ONGOING</span> download and upload custom app schema, with and without data.</h3>
+</div>
+<div id="outline-container-sec-5-9" class="outline-3">
+<h3 id="sec-5-9"><span class="section-number-3">5.9</span> <span class="todo TODO">TODO</span> custom templates for custom apps</h3>
+</div>
+</div>
+
+<div id="outline-container-sec-6" class="outline-2">
+<h2 id="sec-6"><span class="section-number-2">6</span> SVG graphs: support for three kinds of graphs:</h2>
+<div class="outline-text-2" id="text-6">
+</div><div id="outline-container-sec-6-1" class="outline-3">
+<h3 id="sec-6-1"><span class="section-number-3">6.1</span> hierarchical tree graph based on colection</h3>
+</div>
+<div id="outline-container-sec-6-2" class="outline-3">
+<h3 id="sec-6-2"><span class="section-number-3">6.2</span> dependency graph to create teaching/learning sequence based on priornode or recommended navitation</h3>
+</div>
+<div id="outline-container-sec-6-3" class="outline-3">
+<h3 id="sec-6-3"><span class="section-number-3">6.3</span> semantic network (concept mapping)</h3>
+</div>
+</div>
+
+<div id="outline-container-sec-7" class="outline-2">
+<h2 id="sec-7"><span class="section-number-2">7</span> Discussion Forums</h2>
+<div class="outline-text-2" id="text-7">
+</div><div id="outline-container-sec-7-1" class="outline-3">
+<h3 id="sec-7-1"><span class="section-number-3">7.1</span> threads,</h3>
+</div>
+<div id="outline-container-sec-7-2" class="outline-3">
+<h3 id="sec-7-2"><span class="section-number-3">7.2</span> messages and</h3>
+</div>
+<div id="outline-container-sec-7-3" class="outline-3">
+<h3 id="sec-7-3"><span class="section-number-3">7.3</span> replies</h3>
+</div>
+</div>
+
+<div id="outline-container-sec-8" class="outline-2">
+<h2 id="sec-8"><span class="section-number-2">8</span> Making Course Ware collaboratively</h2>
+<div class="outline-text-2" id="text-8">
+</div><div id="outline-container-sec-8-1" class="outline-3">
+<h3 id="sec-8-1"><span class="section-number-3">8.1</span> Collections of Resources</h3>
+</div>
+<div id="outline-container-sec-8-2" class="outline-3">
+<h3 id="sec-8-2"><span class="section-number-3">8.2</span> Authoring Quiz</h3>
+</div>
+<div id="outline-container-sec-8-3" class="outline-3">
+<h3 id="sec-8-3"><span class="section-number-3">8.3</span> Module builder: freeze a snapshot of hierarchical collection into a non**editable resource (meant for modules of a course, or finalizing collaboratively written documents)</h3>
+</div>
+<div id="outline-container-sec-8-4" class="outline-3">
+<h3 id="sec-8-4"><span class="section-number-3">8.4</span> Course builder: an ordered collection of modules</h3>
+</div>
+<div id="outline-container-sec-8-5" class="outline-3">
+<h3 id="sec-8-5"><span class="section-number-3">8.5</span> <span class="todo TODO">TODO</span> export of modules, collections and courses for download</h3>
+<div class="outline-text-3" id="text-8-5">
+</div><div id="outline-container-sec-8-5-1" class="outline-4">
+<h4 id="sec-8-5-1"><span class="section-number-4">8.5.1</span> HTML</h4>
+</div>
+<div id="outline-container-sec-8-5-2" class="outline-4">
+<h4 id="sec-8-5-2"><span class="section-number-4">8.5.2</span> PDF</h4>
+</div>
+<div id="outline-container-sec-8-5-3" class="outline-4">
+<h4 id="sec-8-5-3"><span class="section-number-4">8.5.3</span> LaTex</h4>
+</div>
+<div id="outline-container-sec-8-5-4" class="outline-4">
+<h4 id="sec-8-5-4"><span class="section-number-4">8.5.4</span> ODT</h4>
+</div>
+</div>
+
+<div id="outline-container-sec-8-6" class="outline-3">
+<h3 id="sec-8-6"><span class="section-number-3">8.6</span> course player</h3>
+</div>
+<div id="outline-container-sec-8-7" class="outline-3">
+<h3 id="sec-8-7"><span class="section-number-3">8.7</span> enrolement to the course</h3>
+</div>
+<div id="outline-container-sec-8-8" class="outline-3">
+<h3 id="sec-8-8"><span class="section-number-3">8.8</span> evaluation</h3>
+</div>
+<div id="outline-container-sec-8-9" class="outline-3">
+<h3 id="sec-8-9"><span class="section-number-3">8.9</span> reports</h3>
+<div class="outline-text-3" id="text-8-9">
+</div><div id="outline-container-sec-8-9-1" class="outline-4">
+<h4 id="sec-8-9-1"><span class="section-number-4">8.9.1</span> to the student</h4>
+</div>
+<div id="outline-container-sec-8-9-2" class="outline-4">
+<h4 id="sec-8-9-2"><span class="section-number-4">8.9.2</span> to the mentors</h4>
+</div>
+<div id="outline-container-sec-8-9-3" class="outline-4">
+<h4 id="sec-8-9-3"><span class="section-number-4">8.9.3</span> to the admins</h4>
+</div>
+</div>
+</div>
+
+<div id="outline-container-sec-9" class="outline-2">
+<h2 id="sec-9"><span class="section-number-2">9</span> Management of Students, Volunteers, Mentors, Fellows</h2>
+</div>
+<div id="outline-container-sec-10" class="outline-2">
+<h2 id="sec-10"><span class="section-number-2">10</span> distributed p2p sync between servers based on group mirroring</h2>
+</div>
+<div id="outline-container-sec-11" class="outline-2">
+<h2 id="sec-11"><span class="section-number-2">11</span> Application for citizen science projects</h2>
+<div class="outline-text-2" id="text-11">
+</div><div id="outline-container-sec-11-1" class="outline-3">
+<h3 id="sec-11-1"><span class="section-number-3">11.1</span> Observations app</h3>
+</div>
+</div>
+
+<div id="outline-container-sec-12" class="outline-2">
+<h2 id="sec-12"><span class="section-number-2">12</span> Extra feathers to be added to the cap of gstudio!</h2>
+<div class="outline-text-2" id="text-12">
+</div><div id="outline-container-sec-12-1" class="outline-3">
+<h3 id="sec-12-1"><span class="section-number-3">12.1</span> Audio, video meetings</h3>
+</div>
+<div id="outline-container-sec-12-2" class="outline-3">
+<h3 id="sec-12-2"><span class="section-number-3">12.2</span> Badges</h3>
+</div>
+<div id="outline-container-sec-12-3" class="outline-3">
+<h3 id="sec-12-3"><span class="section-number-3">12.3</span> Multi-lingual dictionary/thesaurus wordnet</h3>
+</div>
+<div id="outline-container-sec-12-4" class="outline-3">
+<h3 id="sec-12-4"><span class="section-number-3">12.4</span> Text annotation and analysis</h3>
+</div>
+<div id="outline-container-sec-12-5" class="outline-3">
+<h3 id="sec-12-5"><span class="section-number-3">12.5</span> Integrating with other popularly used applications</h3>
+<div class="outline-text-3" id="text-12-5">
+</div><div id="outline-container-sec-12-5-1" class="outline-4">
+<h4 id="sec-12-5-1"><span class="section-number-4">12.5.1</span> gnu mailman (mailing list) integration</h4>
+</div>
+<div id="outline-container-sec-12-5-2" class="outline-4">
+<h4 id="sec-12-5-2"><span class="section-number-4">12.5.2</span> wikimedia integration</h4>
+</div>
+<div id="outline-container-sec-12-5-3" class="outline-4">
+<h4 id="sec-12-5-3"><span class="section-number-4">12.5.3</span> zotero integration</h4>
+</div>
+</div>
+
+<div id="outline-container-sec-12-6" class="outline-3">
+<h3 id="sec-12-6"><span class="section-number-3">12.6</span> Custom App for Task management</h3>
+<div class="outline-text-3" id="text-12-6">
+</div><div id="outline-container-sec-12-6-1" class="outline-4">
+<h4 id="sec-12-6-1"><span class="section-number-4">12.6.1</span> creation of a task</h4>
+</div>
+<div id="outline-container-sec-12-6-2" class="outline-4">
+<h4 id="sec-12-6-2"><span class="section-number-4">12.6.2</span> assigning to a member of the group</h4>
+</div>
+<div id="outline-container-sec-12-6-3" class="outline-4">
+<h4 id="sec-12-6-3"><span class="section-number-4">12.6.3</span> status modification</h4>
+</div>
+<div id="outline-container-sec-12-6-4" class="outline-4">
+<h4 id="sec-12-6-4"><span class="section-number-4">12.6.4</span> discussion</h4>
+</div>
+<div id="outline-container-sec-12-6-5" class="outline-4">
+<h4 id="sec-12-6-5"><span class="section-number-4">12.6.5</span> tags</h4>
+</div>
+<div id="outline-container-sec-12-6-6" class="outline-4">
+<h4 id="sec-12-6-6"><span class="section-number-4">12.6.6</span> categories</h4>
+</div>
+</div>
+</div>
+</div>
+</body>
+</html>

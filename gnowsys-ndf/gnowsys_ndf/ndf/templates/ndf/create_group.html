@@ -1,0 +1,396 @@
+{% extends "ndf/base.html" %}
+{% load i18n %}
+{% load ndf_tags %}
+{% load cache %}
+
+{% block title %} {% trans title|capfirst %} {% if node.pk %} {{group_name_tag}} {% endif %} {% endblock %}
+
+<!--
+by keeping future perspective of one template for create/edit of group,
+this template is modified. So for the fields in the template it supports -
+- both create and edit of those fields.
+ -->
+
+{% block meta_content %}
+  {% blocktrans %}
+    <h3>Types of Groups</h3>
+    <hr/>
+    <h5>Open Groups</h5>
+    <p class="subheader">Open groups are ideal for projects that require a high level of collaboration and participation. Any metastudio user can join this group without prior approval</p>
+    <h5>Closed Groups</h5>
+    <p class="subheader">Closed groups are ideal for projects that require restricted access to content and documents. Users can only join after their membership request is approved or have been invited.</p>
+  {% endblocktrans %}
+{% endblock %}
+
+
+{% block body_content %}
+
+  <h2 class="text-center">
+    <small>
+      {% if node %} Edit | {{node.name}}
+        <a href="{% url 'edit_group' group_id %}?node_edit=True" title="Edit Collection/Metadata/help" class="tiny button radius">{% trans "More Edit options" %}</a>
+      {% else %}
+        {% if subgroup_flag %}
+          {% trans "Create New Sub Group" %}
+        {% else %}
+          {% trans "Create New Group" %}
+        {% endif %}
+      {% endif %}
+    </small>
+  </h2>
+  <br/>
+
+  <form id="create_group" class="" method="post"
+  {% if node %} action="{% url 'edit_group' group_id %}"
+  {% else %} action="{% url 'create_group' group_id %}"
+  {% endif %}
+  data-abide>
+    {% csrf_token %}
+
+    <!-- node_id, name -->
+    {% if node %}
+      <input type="hidden" name="node_id" value="{{node.pk}}">
+      <input type="hidden" name="name" value="{{node.name}}">
+    {% endif %}
+    {% if subgroup_flag %}
+    <input type="hidden" name="subgroup" value="{{subgroup_flag}}">
+    {% endif %}
+
+    <!-- name -->
+    <div class="row">
+      <div class="small-12 medium-6 medium-centered columns">
+        <div class="row">
+
+          <div class="small-4 columns">
+            <label for="right-label" class="inline">{% trans "Group Name" %}</label>
+          </div>
+
+          <div class="small-8 columns">
+            <input type="text" name="name" id="group_name" required placeholder="{% trans 'Enter the unique group name' %}" {% if node %}disabled=disabled title="{% trans 'Group name can not be changed' %}" {% endif %} value="{{node.name}}">
+            <label id="message" style="display:none; color:red"></label>
+            <small class="error">{% trans "Group Name is required and it must be a string." %}</small>
+          </div>
+
+        </div>
+      </div>
+    </div>
+
+    <!-- altnames -->
+    <div class="row">
+      <div class="small-12 medium-6 medium-centered columns">
+        <div class="row">
+
+          <div class="small-4 columns">
+            <label for="right-label" class="inline">{% trans "Alternate Group Name" %}</label>
+          </div>
+
+          <div class="small-8 columns">
+            <input type="text" name="altnames" id="alt_group_name" placeholder="{% trans 'Provide display/alternate group name' %}" value="{{node.altnames}}">
+            </div>
+          </div>
+
+      </div>
+    </div>
+
+    <br/>
+
+    <!-- group_type -->
+    <div class="row">
+      <div class="small-12 medium-6 medium-centered columns">
+        <div class="row">
+
+          <div class="small-4 columns">
+            <label for="right-label" class="inline">{% trans "Group Type" %}</label>
+          </div>
+
+          <div class="small-8 columns">
+            <!-- getting "TYPES_OF_GROUP" defined in models.py  -->
+            {% get_possible_group_type_values as poss_gr_type %}
+            <select name="group_type" class="gtype">
+              {% for each_gtype in poss_gr_type %}
+                <option {% if each_gtype == node.group_type %}selected=selected{% endif %}>
+                  {{each_gtype}}
+                </option>
+              {% endfor %}
+            </select>
+            <small class="error">Please select group type.</small>
+          </div>
+
+        </div>
+      </div>
+    </div>
+
+    <!-- editing policy -->
+    <div class="row">
+      <div class="small-12 medium-6 medium-centered columns">
+        <div class="row">
+
+          <div class="small-4 columns">
+            <label for="right-label" class="inline">{% trans "Group Editing Policy" %}</label>
+          </div>
+
+          <div class="small-8 columns">
+            <!-- getting "EDIT_POLICY" defined in models.py  -->
+            {% get_possible_edit_policy_values as poss_edit_policy %}
+            <select name="edit_policy" id="editp">
+              {% for each_gr_edit_policy in poss_edit_policy %}
+                <option {% if each_gr_edit_policy == node.edit_policy %}selected=selected{% endif %}>
+                  {{each_gr_edit_policy}}
+                </option>
+              {% endfor %}
+            </select>
+            <small class="error">Please select group editing policy.</small>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- moderation level -->
+    <div class="row {% if node.edit_policy != 'EDITABLE_MODERATED' %}hide{% endif%}" id="moderation-level">
+      <div class="small-12 medium-6 medium-centered columns">
+        <div class="row">
+
+          <div class="small-4 columns">
+            <label for="right-label" class="inline">{% trans "Level of moderation" %}</label>
+          </div>
+
+          <div class="small-8 columns">
+            <select name="moderation_level">
+              <!-- EDITABLE_MODERATED group cannot have moderation_level to 0 -->
+              <option value="1">--- {% trans "Select Level" %} ---</option>
+              {% get_allowed_moderation_levels as mod_levels %}
+              {% for each_level in mod_levels %}
+                <option value="{{each_level}}"
+                {% if each_level == node.moderation_level %}selected=selected{% endif %}>
+                  {{each_level}}
+                </option>
+              {% endfor %}
+            </select>
+            <small class="error">{% trans "Please select moderation level." %}</small>
+          </div>
+
+        </div>
+      </div>
+    </div>
+
+    <!-- following fields are comented because of groups are not implemented accordingly -->
+    {% comment %}
+    <br/>
+
+    <!-- subscription policy -->
+    <div class="row">
+      <div class="small-12 medium-6 medium-centered columns">
+        <div class="row">
+
+          <div class="small-4 columns">
+            <label for="right-label" class="inline">{% trans "Group Subscription Policy" %}</label>
+          </div>
+
+          <div class="small-8 columns">
+            <select name="subscription" class="subscptn" disabled="disabled">
+              <option id="OPEN">{% trans "OPEN" %}</option>
+              <option id="BY_REQUEST">{% trans "BY_REQUEST" %}</option>
+              <option id="BY_INVITATION">{% trans "BY_INVITATION" %}</option>
+            </select>
+            <small class="error">Please select subscription policy.</small>
+          </div>
+
+        </div>
+      </div>
+    </div>
+
+    <!-- member visibility -->
+    <div class="row">
+      <div class="small-12 medium-6 medium-centered columns">
+        <div class="row">
+
+          <div class="small-4 columns">
+            <label for="right-label" class="inline">{% trans "Group Member Visibility" %}</label>
+          </div>
+
+          <div class="small-8 columns">
+            <select name="disclosure_policy" class="mem" disabled="disabled">
+              <option id="DISCLOSED_TO_MEM">{% trans "DISCLOSED_TO_MEM" %}</option>
+              <option id="NOT_DISCLOSED_TO_MEM">{% trans "NOT_DISCLOSED_TO_MEM" %}</option>
+            </select>
+            <small class="error">Please select group member visibility.</small>
+          </div>
+
+        </div>
+      </div>
+    </div>
+
+    <!-- Group Encryption policy -->
+    <div class="row">
+      <div class="small-12 medium-6 medium-centered columns">
+        <div class="row">
+
+          <div class="small-4 columns">
+            <label for="right-label" class="inline">{% trans "Group Encryption policy" %}</label>
+          </div>
+
+          <div class="small-8 columns">
+            <select name="encryption_policy" class="encr" disabled="disabled">
+              <option id="NOT_ENCRYPTED">{% trans "NOT_ENCRYPTED" %}</option>
+              <option id="ENCRYPTED">{% trans "ENCRYPTED" %}</option>
+            </select>
+            <small class="error">Please select group encryption policy.</small>
+          </div>
+
+        </div>
+      </div>
+    </div>
+
+    <!-- Group Existance visibility -->
+    <div class="row">
+      <div class="small-12 medium-6 medium-centered columns">
+        <div class="row">
+
+          <div class="small-4 columns">
+            <label for="right-label" class="inline">{% trans "Group Existance visibility" %}</label>
+          </div>
+
+          <div class="small-8 columns">
+            <select name="visibility_policy" class="visibility_policy" disabled="disabled">
+              <option id="ANNOUNCED">{% trans "ANNOUNCED" %}</option>
+              <option id="NOT_ANNOUNCED">{% trans "NOT_ANNOUNCED" %}</option>
+            </select>
+            <small class="error">Please select group visibility policy.</small>
+          </div>
+
+        </div>
+      </div>
+    </div>
+    {% endcomment %}
+
+    <br/>
+
+    <!-- agency type -->
+    <div class="row">
+      <div class="small-12 medium-6 medium-centered columns">
+        <div class="row">
+          <div class="small-4 columns">
+            <label for="right-label" class="inline">{% trans "Group Agency Types" %}</label>
+          </div>
+
+          {% get_group_agency_types as agency_types %}
+          <div class="small-8 columns">
+            <select name="agency_type" class="agencygrp">
+              {% for each_agency_type in agency_types %}
+                <option {% if each_agency_type == node.agency_type %}selected=selected{% endif %}>
+                  {{each_agency_type}}
+                </option>
+              {% endfor %}
+            </select>
+            <small class="error">Please select group agency type.</small>
+          </div>
+
+        </div>
+      </div>
+    </div>
+
+    <!-- description -->
+
+      <!-- <div class="small-12 medium-6 medium-centered columns"> -->
+    <dl class="accordion row" title="Click to Add/Edit Description" data-accordion>
+      <dd class="accordion-navigation small-12 medium-6 medium-centered columns">
+
+        <a href="#content_org">
+          <label for="right-label" class="">
+            {% if node.content_org %}Edit{% else %}Add{% endif %} {% trans "Description" %}
+          </label>
+        </a>
+
+        <div id="content_org" class="content">
+          {% include "ndf/html_editor.html" with var_name="content_org" var_placeholder="Enter the content here" var_value=node.content|default_if_none:"" ckeditor_toolbar="GeneralToolbar" node_id=node.pk %}
+        </div>
+
+      </dd>
+    </dl>
+
+    <br/>
+
+    {% all_gapps as all_gapps %}
+    {% get_group_gapps node.pk|default:None as group_gapps %}
+
+
+    <div class="row">
+      <div class="small-12 medium-6 medium-centered columns">
+        <label>Select Apps:</label>
+        {% include 'ndf/widget_selector.html' with for='apps_to_set' all_options=all_gapps selected_options=group_gapps oneline_element='true' %}
+      </div>
+    </div>
+
+
+    <div class="row">
+      <div class="small-12 medium-6 medium-centered columns">
+        {% if node %}
+          <input type="submit" value="Save Changes" id="group-submit" class="button expand">
+        {% else %}
+          <input type="submit" value="Create Group" id="group-submit" class="button expand">
+        {% endif %}
+      </div>
+    </div>
+
+  </form>
+{% endblock %}
+
+{% block script %}
+// <script type="text/javascript">
+
+  document.getElementById("group_name").focus();
+
+  function moderatedEditPolicy () {
+    var selectedPolicy = this.value;
+    var moderationLevel = document.getElementById("moderation-level");
+
+    if(selectedPolicy == "EDITABLE_MODERATED")
+    {
+      moderationLevel.classList.remove("hide");
+    }
+    else
+    {
+      moderationLevel.classList.add("hide");
+    }
+  }
+
+  var editPolicy = document.getElementById("editp");
+  editPolicy.onblur = moderatedEditPolicy;
+
+  $("#create_group").submit(function(event){
+
+    var name = $("#group_name").val().trim().toLowerCase();
+    var nodes = {{nodes_list|safe}}
+    var val_chk = name.search(/mod$/gi)
+
+    $("#message").css("display", "none");
+
+    if (name != "")
+    {
+      if(val_chk == -1){
+        if (nodes.indexOf(name) >= 0)
+          {
+            $("#message").css("display", "block");
+            $("#message").text("Group '"+ name +"' {% trans ' already exist. Please choose another name' %}");
+            event.preventDefault();
+          }
+      }
+      else if (val_chk != -1){
+          $("#message").css("display", "block");
+          $("#message").text(" {% trans 'Group name cannot include 'Mod' or 'mod' text at end. ' %}");
+          event.preventDefault();
+      }
+    }
+    else if (name == ""){
+      $("#message").css("display", "block");
+      $("#message").text("{% trans 'Group name cannot be empty.' %}");
+      event.preventDefault();
+    }
+
+    getSelValuesHiddenElement('apps_to_set', 'create_group');
+
+  });
+
+
+// </script>
+{% endblock %}

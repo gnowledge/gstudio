@@ -1,0 +1,23 @@
+{% extends "registration/registration_base.html" %}
+{% load i18n %}
+
+{% block title %}{% trans "Logged out" %}{% endblock %}
+
+{% block body_content %}
+    <div class="row" style="margin: 1.2rem 0;">
+        <div class="small-12 medium-10 large-10 small-centered medium-centered large-centered columns">
+            <div class="row">
+                <div class="small-12 medium-10 large-10 columns end text-center">
+                <h3>{% trans "You have sucessfully logged out." %}</h3>
+                <h5>{% trans "Thank you for visiting our website. Please return often to take advantage of this platform." %}</h5>
+
+                <!-- after logout, show some upcoming ProgramEvents -->
+
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <br/>
+
+{% endblock %}

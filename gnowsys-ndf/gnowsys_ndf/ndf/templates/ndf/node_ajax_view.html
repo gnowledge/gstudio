@@ -1,0 +1,716 @@
+{% load ndf_tags %}
+{% load i18n %}
+{% load cache %}
+
+
+<!--
+<script src="/static/ndf/bower_components/foundation/js/foundation.min.js"></script> 
+
+<script type="text/javascript">
+  $(document).foundation();
+</script>
+-->
+{% cache 300 node_ajax_content_static %}
+{% block head %}
+
+  <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+  
+  <!-- Scripts and stylesheets for SideComments -->
+  <!-- <script type="text/javascript" src="/static/ndf/bower_components/side-comments/release/side-comments.js"></script> -->
+  <!-- <link rel="stylesheet" type"text/css" href="/static/ndf/bower_components/side-comments/release/side-comments.css"> -->
+  <!-- <link rel="stylesheet" type="text/css" href="/static/ndf/bower_components/side-comments/release/themes/default-theme.css"> -->
+
+  {% if user.is_authenticated %}
+    <!-- orgitdown! -->
+    <script type="text/javascript" src="/static/ndf/orgitdown/jquery.orgitdown-foundation.js"></script>
+    <!-- orgitdown! toolbar settings -->
+    <script type="text/javascript" src="/static/ndf/orgitdown/skins/gstudio/set.js"></script>
+    <!-- orgitdown! skin -->
+    <link rel="stylesheet" type="text/css" href="/static/ndf/orgitdown/skins/gstudio/style.css" />
+
+  {% endif %}
+
+{% endblock %}
+{% endcache %}
+
+<!-- css for drawer widget -->
+<style type = "text/css">
+
+  /*annotations*/
+  /*.movingDiv{
+    display:none; 
+    position:absolute;
+    color: green;
+    font-size: 10px; 
+    z-index:40; 
+    background-color:white; 
+    box-shadow: 0px 0px 5px #888888; 
+  }
+  .annotatedElement{
+  background-color : rgba(255,0,0,0.2);
+  font-weight:bold;
+  } 
+  .movingDivIcon{
+    font-size: 35px;
+    color: green;
+    padding-left: 5px;
+    padding-right: 5px;
+  }*/
+  /* ---END of annotations*/
+    
+  .divider-line { font-size: xx-large; color:lightgray; }
+  .line-height-2 { line-height:2; }
+  .line-height-2pt5 { line-height:2.5; }
+  .fontsize-x-large { font-size: x-large; }
+
+  .margin-0 { margin: 0 !important ;}
+
+  .posted-by{ color: #808080; font-size: small; }
+
+  ul#graph-hover.f-dropdown{
+    width: inherit !important;
+  }
+
+  #graph-hover > li > a:hover {
+    color: #555555;
+  }
+
+
+  /*orgitdown style*/
+
+  .orgitdown{
+    /*height:100px;*/
+    width: 100% !important;
+  }
+  
+  .row.orgitdownContainer{
+    /*height:100px;*/
+    background-color: #EEEEEE;
+    padding: 0 1em;
+  }
+
+  .row.orgitdownContainer > ul
+  {
+    margin-bottom: 0 !important; 
+  }
+  /*.orgitdownEditor{
+    height:60px;
+  */}
+
+  .orgitdownContainer::before {
+    background-color: #F2F2F2;
+    content: "\00a0";
+    display: block;
+    height: 16px;
+    position: absolute;
+    top: 11px;
+    transform:             rotate( 29deg ) skew( -35deg );
+        -moz-transform:    rotate( 29deg ) skew( -35deg );
+        -ms-transform:     rotate( 29deg ) skew( -35deg );
+        -o-transform:      rotate( 29deg ) skew( -35deg );
+        -webkit-transform: rotate( 29deg ) skew( -35deg );
+    width:  20px;
+    box-shadow: -2px 2px 2px 0 rgba( 178, 178, 178, .4 );
+    left: -9px; 
+  
+  }
+
+  #html-res-iframe{
+    border: none;
+  }
+
+  .orbit-container .orbit-prev,
+  .orbit-container .orbit-next {
+    background-color: tomato;    
+  }
+  
+/*Style for dropdown*/
+
+ul#navigation {
+  position:relative;
+  float:left;
+}
+
+ul#navigation li {
+  display:inline;
+  float:left;
+  position:relative;
+}
+
+ul#navigation li a {
+  padding:7px 7px;
+  text-shadow:1px 1px 0px #fff;
+  display:inline-block;  
+}
+
+ul#navigation li a:hover {
+  background:#f8f8f8;
+  color:#282828;
+}
+
+ul#navigation li:hover > a {
+  background:#fff;
+}
+
+/* Drop-Down Navigation */
+ul#navigation li:hover > ul
+{
+  visibility:visible;
+  opacity:1;
+}
+
+ul#navigation ul, ul#navigation ul li ul {
+  list-style: none;
+  margin: 0;
+  padding: 0;    
+  visibility:hidden;
+  position: absolute;
+  z-index: 99999;
+  width:180px;
+  /*width: 30em !important;*/
+  background:#f8f8f8;
+  box-shadow:1px 1px 3px #ccc;
+  opacity:0;
+  -webkit-transition:opacity 0.2s linear, visibility 0.2s linear; 
+  -moz-transition:opacity 0.2s linear, visibility 0.2s linear; 
+  -o-transition:opacity 0.2s linear, visibility 0.2s linear; 
+  transition:opacity 0.2s linear, visibility 0.2s linear;   
+}
+
+ul#navigation ul {
+    top: 43px;
+    left: 1px;
+}
+
+ul#navigation ul li ul {
+    top: 0;
+    left: 181px;
+    height:150px; 
+    width: 200px;
+    overflow:hidden; 
+    overflow-y:auto;
+}
+
+ul#navigation ul li {
+  clear:both;
+  width:100%;
+  border:0 none;
+  border-bottom:1px solid #c9c9c9;
+}
+
+ul#navigation ul li a {
+  background:none;
+  padding:7px 15px;
+  color:#616161;
+  text-shadow:1px 1px 0px #fff;
+  text-decoration:none;
+  display:inline-block;
+  border:0 none;
+  float:left;
+  clear:both;
+  width:100%;
+
+}
+
+ul#navigation li a.first {
+  border-left: 0 none;
+}
+
+ul#navigation li a.last {
+  border-right: 0 none;
+}
+
+.edu-sub-li {
+  background-color:#f8f8f8;
+  width: 30em !important;
+}
+
+/*end dropdown style*/
+.accordion .accordion-navigation > a, .accordion dd > a {
+    color: #10c1cb;
+ }
+
+ .border-thin-lightgray {
+    border: thin solid lightgray;
+ }
+
+ #ebook-area{
+  min-height: 40rem;
+  min-height: 80vh;
+ }
+
+ .redirection {
+  cursor: pointer;
+ }
+
+ .redirection:hover > small {
+  color: black;
+  transition: 0.5s all;
+ }
+
+</style>
+
+
+
+{% if user.is_authenticated %}
+<!--<a id="toggle-shelf" class="right-off-canvas-toggle right" ><i class='fi-book-bookmark'></i></a> -->
+{% endif %}
+
+<!-- Icon to add annotations -->
+<!-- <div id="moving_div" class = "movingDiv" >
+      <i title="Annotate" class ="fi-comment-quotes movingDivIcon" onclick = 'switchMode();'></i>
+      
+</div> -->
+<!-- End menu -->
+
+<!-- Reveal dialog for alerting user to select text to add annotations and for signing in-->
+<!-- <div id="alertSelText" style="display:none" class = "reveal-modal tiny" data-reveal >
+  <p> "Please select some text first! " </p>
+  <a class = "close-reveal-modal">&#215;</a>
+</div>
+
+<div id="alertSignIn" style="display:none" class = "reveal-modal tiny" data-reveal >
+  <p> "Please sign in to add comments! " </p>
+  <a class = "close-reveal-modal">&#215;</a>
+</div> -->
+<!-- end dialog -->
+
+{% get_schema node as schema %} 
+
+{% check_user_join request groupid as user_is_joined %}
+
+{% include "ndf/node_ajax_content.html" with is_collection_card_view=True %}
+{% include "ndf/action_panel.html" %}
+
+
+<!-- 
+<div id="file-resource-overlay" class="reveal-modal xlarge" data-reveal aria-labelledby="modalTitle" aria-hidden="true" role="dialog">
+  <div id="resource-details">
+    kjhkj
+  </div>
+
+  <a class="close-reveal-modal" aria-label="Close">&#215;</a>
+</div>
+ -->
+<script type="text/javascript">
+
+if($('.breadcrumbs').length == 0)
+{
+  searchStr = window.location.search.substring(1);
+
+  if(searchStr.search("nav_li=") > -1)
+  {
+    var breadcrumbElStr = searchStr.substring(7);
+
+    // var teachesLHS = $(".teaches-block a");
+    // for(i=0; i < teachesLHS.length; i++){
+    //   // console.log(teachesLHS[i])
+    //   // console.log(teachesLHS[i].href + location.search)
+    //   teachesLHS[i].href = teachesLHS[i].href + location.search;
+    // }
+
+    breadcrumbElList = breadcrumbElStr.split(',');
+    node_id = "{{node.pk}}";
+
+    breadcrumbElList.push(node_id);
+    breadcrumbElListJSON = JSON.stringify(breadcrumbElList);
+    // console.log(breadcrumbElList);
+
+    $.ajax({
+
+      url: "{% url 'get_resource_by_oid_list' group_id %}",
+      type: 'GET',
+      // datatype: ''
+      data:{
+        'oid_list': breadcrumbElListJSON
+      },
+      success: function (data) {
+        // console.log(data);
+        if(data != "false")
+        {
+          dataObj = JSON.parse(data);
+          // console.log(dataObj);
+
+          u = document.createElement("UL");
+          u.classList.add('breadcrumbs');
+
+          for (var i = 0; i < dataObj.length; i++) {
+            var li = document.createElement("li");
+            var a = document.createElement("span");
+            // a.textContent = dataObj[i].name;
+            a.id = dataObj[i]._id;
+            a.style.color = "black";
+            a.classList.add('current');
+            a.appendChild(document.createTextNode(dataObj[i].name));
+
+            li.appendChild(a);
+            u.appendChild(li);
+          };
+
+          var lastEl = u.childNodes[u.childNodes.length - 1];
+          lastEl.children[0].id = "";
+          lastEl.children[0].classList.remove("current");
+          lastEl.children[0].style.color = "inherit";
+
+          $("section.medium-9.columns").prepend(u);
+
+        }
+      }
+
+    });
+
+  }
+}
+
+{% comment %}
+  
+  // fileResources = document.querySelectorAll('.file-resource');
+  // for (var i = fileResources.length - 1; i >= 0; i--) 
+  // {
+  //   fileResources[i].onclick = function (){
+
+  //     // e.preventDefault();
+  //     // alert("hiii")
+  //     var resourceDetail = document.getElementById('resource-details');
+  //     resourceDetail.innerHTML = "";
+  //     var resourceId = this.getAttribute('data-resource-id'),
+  //       resourceGroupId = this.getAttribute('data-group-id');
+
+  //     $.ajax({
+  //       type: "GET",
+  //         url: "{% url 'file_content' group_id %}",
+  //         datatype: "html",
+  //         data:{
+  //           'id': resourceId,
+  //           'group_id': resourceGroupId
+  //         },
+  //         success:function (data) {
+  //           $('article').unblock();
+  //           resourceDetail.innerHTML = data;
+  //           resHtml = document.querySelector('#resource-details > .row > .columns');
+  //           if(resHtml) {
+  //           // console.log('kjhkj')
+  //             resHtml.classList.add('medium-10');
+  //             resHtml.classList.add('medium-centered');
+  //             resHtml.classList.remove('medium-9');
+  //           }
+  //           setTimeout(function() { adjustIframeHt() },3000);
+  //         },
+  //         complete: function () {
+
+  //           // setTimeout(function() {
+  //             document.querySelector('#resource-details  ul.breadcrumbs').remove();
+  //             document.querySelector('#resource-details  h1.subheader').remove();
+  //           // }, 10);
+
+  //         }
+          
+  //     })
+  //   }
+  // }
+{% endcomment %}
+
+  // publishing resource in other groups
+  var data_list = []
+
+  function get_new_groups(){
+    data_list = []
+    $("#group_drawer").find("input:checkbox:checked").each(
+      function(c,v){
+        data_list.push(v.value)
+        // console.log(v.value)
+      }
+    )
+    return data_list
+
+  //   $("#group_drawer").children("li").each(
+  //     function(c,v){
+  //       data_list.push($(v).attr("id"))
+  //     });
+  //   return data_list;
+  }
+
+  $(document).on('click',"#switch_group",function(){
+    $("#group_drawer").html("")
+      var url='/{{groupid}}/group/switch_group/'+'{{node}}';
+      $.getJSON( url, function( data ) {
+        $.each(data ,function(index , drawer_elements){
+         if(index == 0)
+          {
+           $.each(drawer_elements.drawer1, function(index, element) {
+
+              $('#group_drawer').append('<li><input type="checkbox" name="switch_group_ele" value="'+element.id+'"> '+element.name+'</li>')
+            });
+          }
+          if(index == 1)
+          {
+            $.each(drawer_elements.drawer2, function(index, element) {
+              if(element.moderation_level > -1)
+              {
+                $('#group_drawer').append('<li><input type="checkbox" name="switch_group_ele" value="'+element.id+'" checked disabled> '+element.name+'</li>')
+              }
+              else{
+                $('#group_drawer').append('<li><input type="checkbox" name="switch_group_ele" value="'+element.id+'" checked> '+element.name + element['moderation_level']+'</li>')
+              }
+            });
+          }
+
+        });
+      });
+  });
+
+  // $(document).on('click',"#switch_group",function(){
+  //   $('#switchgrp #collection_set_drawer1').html("");
+  //    $('#switchgrp #collection_set_drawer2').html("");
+  //    $('#switchgrp #collection_set_drawer1').html('<li class="price"><input type="text" placeholder="{% trans "Type here to search in the resources" %}" id="collection_set_search" class="margin-0"></li>');
+  //     var url='/{{groupid}}/group/switch_group/'+'{{node}}';
+  //     $.getJSON( url, function( data ) {
+  //       $.each(data ,function(index , drawer_elements){
+        
+  //        if(index == 0)
+  //         {
+  //          $.each(drawer_elements.drawer1, function(index, element) {
+  //             $('#switchgrp #collection_set_drawer1').append("<li id='"+element.id+"' class='bullet-item text-left'>"+element.name+"</li>");
+  //           });
+  //         }
+  //         if(index == 1)
+  //         {
+  //           $.each(drawer_elements.drawer2, function(index, element) {
+  //             $('#switchgrp #collection_set_drawer2').append("<li id='"+element.id+"' class='bullet-item text-left'>"+element.name+"</li>");
+  //           });
+  //         }
+
+  //       });
+  //     });
+  // });
+
+  $(".current").click(function() {
+
+    var nav_list = "{{nav_list}}";
+    {% get_node_type original_node as node_type %}  
+    var node_type = "{{node_type}}";
+    var clicked_node = this.id;
+
+    {% if topic %}
+    
+      location.href = "{% url 'theme_page' group_name_tag theme_id %}?tree=hierarchical&selected="+clicked_node+"";
+
+    {% else %}
+
+      $.ajax({
+          type: "POST",
+          url: "{% url 'collection_nav' group_id %}",
+          datatype: "html",
+          data:{
+            node_id: clicked_node,
+            curr_node:"{{original_node.pk}}",
+            nav:nav_list,
+            nod_type: node_type,
+            csrfmiddlewaretoken: '{{ csrf_token }}'
+          },
+          success: function(data) {
+
+            if (node_type == "Page"){
+             window.history.pushState("", "", "/{{group_name_tag}}/page/{{original_node.pk}}"+"?selected="+clicked_node+"");
+            }
+            else if(node_type == "File"){
+              window.history.pushState("", "", "/{{group_name_tag}}/file/{{original_node.pk}}"+"?selected="+clicked_node+"");  
+            }
+            else if (node_type == "Term"){
+              window.history.pushState("", "", "/{{group_name_tag}}/term/{{original_node.pk}}"+"?selected="+clicked_node+"");
+            }
+            else if (node_type == "Group"){
+              window.history.pushState("", "", "/{{original_node.pk}}"+"?selected="+clicked_node+"");
+            }
+            else if (node_type == "Topic"){
+              window.history.pushState("", "", "/{{group_name_tag}}/topic_details/{{original_node.pk}}"+"?selected="+clicked_node+"");
+            }
+
+            $("#view_page").html(data);
+
+          }
+      });
+
+    {% endif %}
+  });
+
+  $(document).on('click',"#save_switch_group",function(event){
+    var turl='/{{groupid}}/group/switch_group/'+'{{node}}';
+    new_groups = get_new_groups();
+    var error_grp = []
+    var msg = ""
+    success_state = false
+    $.ajax({
+            url: turl,
+            type: 'POST',
+            datatype:"json",
+            data: { new_groups_list : new_groups, csrfmiddlewaretoken: '{{ csrf_token }}'},
+            success: function(data){
+                      data = JSON.parse(data)
+                      success_state = data["success"]
+                      error_grp = data["resource_exists_in_grps"]
+                      msg = data["message"];
+            },
+            complete: function(){
+                      if(!success_state){
+                        $.each(error_grp,function(index,li_ele){
+                          apply_color_to_li(li_ele);
+                        })
+                        event.preventDefault();
+                      }
+                      else{
+                        $("#publish_resource").foundation('reveal', 'close');
+                      }
+                      alert(msg);
+            },
+    }); //end of ajax
+  }); //end of document click
+
+  function apply_color_to_li(element_id){
+    $("#group_drawer").find("input:checkbox").each(
+      function(c,v){
+        if (element_id == v.value){
+          $(v).parent("li").addClass("resource_exists");
+        }
+      });
+  }
+
+  //Overriding from drawer_widget.html
+  // To select the single as well as multiple items from list
+  $(document).on('click','input:checkbox',function(e){
+    if($(this).parent("li").hasClass("resource_exists")){
+      $(this).parent("li").removeClass("resource_exists")
+    }
+  });
+
+  // Taken value of svg data of that node globally
+  var svgdata;
+  // Commented bellow part ,not in use
+  // $(document).ready(function() {
+  //     $(function() {
+  //       // For topic node landing page concept svg graph commented for time being
+  //       // svgdata = $('#chart-concept svg');
+  //       // $('#view-graph').append(svgdata);
+
+  //     });
+  // });
+
+  // on click of concept 
+  $(document).on('click','#clickConceptGraph',function(){
+    $('#view-concept-graph #chart-concept').append(svgdata); 
+    $('#view-concept-graph').foundation('reveal', 'open'); 
+  });
+
+  $(document).on('click','.view-info',function(){
+    $(".topic_content").css("display", "none");
+    $("#view-info").css("display", "block");
+  });
+
+  $(document).on('click','.view-page',function(){
+    $(".topic_content").css("display", "block");
+    $("#view-info").css("display", "none");
+  });
+
+  $(document).on('click','.view-discussion',function(){
+    $("#view-info").css("display", "none");
+  });
+
+  $(document).on('click','.view-manage',function(){
+    $("#view-info").css("display", "none");
+  });
+
+  $(document).on('dblclick','.imgLightbox',function(){
+    var img_node = $(this).attr('name');
+    location.href = "/{{group_name_tag}}/image/details/"+img_node;
+  });
+
+  $(document).on('close', '#view-concept-graph[data-reveal]', function () {
+    
+    $('#view-graph').append(svgdata);
+  });
+
+  
+  // $(document).on('open', '#view-map-widget[data-reveal]', function () {  
+    
+  //   $.ajax({
+  //     url: "{% url 'get_visited_location' groupid %}",
+  //     success: function(data){ 
+
+  //       data = JSON.parse(data);
+
+  //       var lastVisitedLocationVal = data;
+        
+  //       if(lastVisitedLocationVal){
+
+  //         if(lastVisitedLocationVal == "[]"){
+  //           lastVisitedLocationVal = JSON.parse(lastVisitedLocationVal);
+  //         }
+
+  //         if(lastVisitedLocationVal.length > 0){
+  //               // lastVisitedLocationVal = JSON.parse(lastVisitedLocationVal);
+  //               var zoom = lastVisitedLocationVal.pop(),
+  //                   lng = lastVisitedLocationVal[1],
+  //                   lat = lastVisitedLocationVal[0];
+  //                 map.setView([lat, lng], zoom);
+  //               }
+  //       }
+  //       else if( tempArr.length )
+  //       {
+  //         var group = new L.featureGroup(tempArr)
+  //             map.fitBounds(group.getBounds());
+  //       }
+
+  //     }
+  //   });
+  // });
+
+
+  $(document).on('opened', '#view-map-widget[data-reveal]', function () {  
+      
+    map.invalidateSize();  
+
+    // var lastVisitedLocationVal = $('input:hidden[name=last_visited_location]').attr("value");
+    // if(lastVisitedLocationVal){
+
+    //   if(lastVisitedLocationVal == "[]"){
+    //     lastVisitedLocationVal = JSON.parse(lastVisitedLocationVal);
+    //   }
+
+    //   if(lastVisitedLocationVal.length > 0){
+    //         lastVisitedLocationVal = JSON.parse(lastVisitedLocationVal);
+    //         var zoom = lastVisitedLocationVal.pop(),
+    //             lng = lastVisitedLocationVal[1],
+    //             lat = lastVisitedLocationVal[0];
+    //           map.setView([lat, lng], zoom);
+    //         }
+    // }
+
+
+    // if( tempArr.length )
+    // {
+    //   var group = new L.featureGroup(tempArr)
+    //       map.fitBounds(group.getBounds());
+    // }
+
+    // map.setView([lat, lng], zoom);
+  });
+
+  $('.collection-exists').click(function (e) {
+    e.preventDefault();
+    var oid = this.getAttribute('data-oid');
+    var url = "{% url 'show_coll_cards' group_id %}" + "?node_id=" + oid
+
+    $.ajax({
+      url: url,
+      type: 'get',
+      datatype: 'html',
+      // data:,
+      success:function (data) {
+        $('#view-page').html(data);
+        
+      }
+    })
+
+  })
+  
+</script>

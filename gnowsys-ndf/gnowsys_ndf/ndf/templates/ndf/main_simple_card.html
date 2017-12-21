@@ -1,0 +1,36 @@
+{% load i18n %}
+{% load ndf_tags %}
+{% load simple_filters %}
+
+
+<ul class="small-block-grid-1 medium-block-grid-2 large-block-grid-3">
+ <li>
+{% check_is_gstaff groupid request.user as gstaff_access %}
+{% if first_arg and second_arg and third_arg %}
+  <a class="app-card text-center" href="{% url url_name first_arg second_arg third_arg %}{{search_url_text|safe}}">
+{% elif first_arg and second_arg %}
+  <a class="app-card text-center" href="{% url url_name first_arg second_arg %}{{search_url_text|safe}}">
+{% elif first_arg %}
+  <a class="app-card text-center" href='{% url url_name first_arg %}{{search_url_text|safe}}partners'>
+{% endif %}
+   <div class="app-card-title"><h4>{% firstof resource.altnames resource.name %}</h4></div>
+
+
+    <div class="app-card-icon" title="{% firstof resource.altnames resource.name %}" >
+<!--{{resource.member_of_names_list}} --> 
+    {% get_relation_value resource.pk 'has_profile_pic' as grel_dict %}
+    {% get_dict_from_list_of_dicts resource.attribute_set as attr_set_dict %}
+    {% if grel_dict.grel_node.if_file.original.relurl %}
+      <img src="{{MEDIA_URL}}{{grel_dict.grel_node.if_file.original.relurl}}" style="width:50%">
+    {% else %}
+      <img src="/static/ndf/images/metaStudio-profile.svg" alt="Profile picture for this group." style="width:50%" class="img-height" >
+    {% endif %}
+  </div>
+    <div class="app-card-content" title="{{resource.content_org}}">
+     {{resource.content_org|default_if_none:"Add some description."|truncatechars:45}}
+    </div>   
+</a>
+
+  
+</li>
+</ul>

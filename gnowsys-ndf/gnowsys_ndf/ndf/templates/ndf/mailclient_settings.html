@@ -1,0 +1,27 @@
+<!-- This template provides options to either delete or edit a specific mailbox -->
+{% extends "ndf/base.html" %}
+{% load pagination_tags %}
+{% load ndf_tags %}
+{% load i18n %}
+
+{% block title %} {{title}} {% endblock %}
+
+{% block head %}
+<script src="/static/ndf/js/mailbox.js"></script>
+{% endblock %}
+
+
+{% block meta_content %}
+  <h3 class="subheader">
+  {{title}}
+  </h3>
+{% endblock %}
+
+{% block body_content %}
+    <h2>Choose one of the following:</h2>
+    <br></br>
+    <a id="delete_box" href="{% url 'mailbox_delete' groupid mailbox_name %}" class="button small">Delete Mailbox</a>
+    <br></br>
+    <a id ="edit_box" href="{% url 'mailbox_edit' groupid mailbox_name %}" class="button small">Edit Mailbox</a>
+    
+{% endblock %}

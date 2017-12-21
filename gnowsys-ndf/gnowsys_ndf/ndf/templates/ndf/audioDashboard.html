@@ -1,0 +1,443 @@
+{% load ndf_tags %}
+{% load i18n %}
+ 
+{% get_group_name groupid as group_name_tag %}
+ <a class="close-reveal-modal" aria-label="Close">&#215;</a>
+ <!--
+> Muaz Khan     - https://github.com/muaz-khan
+> MIT License   - https://www.webrtc-experiment.com/licence/
+> Documentation - https://github.com/streamproc/MediaStreamRecorder
+> =================================================================
+> audio-recorder.html
+-->
+  <!-- <script src="https://cdn.webrtc-experiment.com/MediaStreamRecorder.js"></script> 
+   <script src="/static/ndf/bower_components/recordrtc/dev/MediaStreamRecorder.js"></script> 
+    <! for Edige/FF/Chrome/Opera/etc. getUserMedia support 
+    <!<script src="https://cdn.rawgit.com/webrtc/adapter/master/adapter.js"></script> -->
+
+
+   <!--  <h1>
+        <div id="timer">2:00</div>
+    </h1> -->
+    {% comment %}
+    <div class="upload-file small-12 medium-3 large-2 columns" id="upload_form_div">
+                        <form class="dropzone" id ="docPost" enctype="multipart/form-data" method="post" action="{% url 'upload_file_ckeditor' group_id %}">
+                            {% csrf_token %}
+                            <label class="tiny button radius expand upload-btn" style="margin: 0px;">
+                                <i class="fa fa-upload"></i>
+                                &nbsp;
+                                <span>Upload File</span>
+                                <input type="file" name="filehive" id="docFile" style="display: none;" multiple/>
+                            </label>
+                            <br><br>
+                            <div class="save_cancel" style="display:none">
+                                <img id="img_preview" alt="New file" class="hide" />
+                                <label id="file_preview" class="hide"></label>
+                                <br> <br>  
+                              <input type="submit" id="submitpostid" class="tiny button radius" value="Save"/>
+                              <input type="button" id="btnUploadCancel" class="tiny button radius" value="Cancel"/>
+                            </div>
+                            <input type="hidden" name="context_name" value="{{title}}">
+                        </form>
+                    </div>
+
+
+    
+      <i class="fi-info"></i>You can record audio for max 30 seconds.!<br>
+    
+    <div class="center btn-group">
+        <label style="display:none!important" for="time-interval hidden">Time Interval (milliseconds):</label>
+        <input  style="display:none!important" type="text" id="time-interval" value="30000 ">
+
+        <button id="start-recording">Start</button>
+        <button id="stop-recording" disabled>Stop</button>
+
+        <button style="display:none!important" id="pause-recording" disabled>Pause</button>
+        <button style="display:none!important" id="resume-recording" disabled>Resume</button>
+
+        <button id="save-recording" disabled>Save</button>
+
+        <br><br>
+
+        <input style="display:none!important"  id="left-channel" type="checkbox" checked style="width:auto;">
+        <label style="display:none!important" for="left-channel">Only Left Channel?</label>
+    </div>
+
+    <div id="audios-container"></div>
+    {% endcomment %}
+     <ul class="small-block-grid-1 medium-block-grid-3 large-block-grid-3" >
+    <h4>Select Audio: </h4>
+    <div class="row">
+    {% for each in audioCollection %}
+
+        <div class="audio_tile">
+          <div class="audio_preview">
+            <audio  controls loop  src="{{MEDIA_URL}}{{each.if_file.original.relurl}}" > </audio>
+            <figcaption title="{{each.name}}" class="audio-caption" data-audio-id="{{each.pk}}" src="{{MEDIA_URL}}{{each.if_file.original.relurl}}" data-audio-src="{{MEDIA_URL}}{{each.if_file.original.relurl}}">{{each.name|truncatechars:15}}</figcaption>
+          </div>
+        </div>
+    {% endfor %}
+    </div>
+<!--
+     <ul class="small-block-grid-1 medium-block-grid-3 large-block-grid-3" >
+     <li class="card-audio-wrapper">
+            <audio  controls loop  src="{{MEDIA_URL}}{{each.if_file.original.relurl}}" > </audio>
+            <figcaption title="{{each.name}}" class="audio-caption" data-audio-id="{{each.pk}}" src="{{MEDIA_URL}}{{each.if_file.original.relurl}}" data-audio-src="{{MEDIA_URL}}{{each.if_file.original.relurl}}">{{each.name|truncatechars:15}}</figcaption>
+    </li>
+  </ul>
+ -->   
+
+{% comment %}
+    <script>
+
+    // 
+//     function countdown(minutes) {
+//     var seconds = 32;
+//     var mins = minutes                Function for ticker timing
+//     function tick() {
+//         var counter = document.getElementById("timer");
+//         var current_minutes = mins-1
+//         seconds--;
+//         counter.innerHTML =
+//         current_minutes.toString() + ":" + (seconds < 10 ? "0" : "") + String(seconds);
+//         if( seconds > 0 ) {
+//             setTimeout(tick, 1000);
+//         } else {
+ 
+//             if(mins > 1){
+ 
+//                setTimeout(function () { countdown(mins - 1); }, 1000);
+ 
+//             }
+//         }
+//     }
+//     tick();
+// }
+ 
+
+    function captureUserMedia(mediaConstraints, successCallback, errorCallback) {
+        navigator.mediaDevices.getUserMedia(mediaConstraints).then(successCallback).catch(errorCallback);
+    }
+
+    var mediaConstraints = {
+        audio: true
+    };
+
+    document.querySelector('#start-recording').onclick = function() {
+        
+        this.disabled = true;
+        // countdown(1);
+
+        captureUserMedia(mediaConstraints, onMediaSuccess, onMediaError);
+         setTimeout(function(){
+          mediaRecorder.stop();
+          mediaRecorder.stream.stop();
+  
+         }, 30000);
+    };
+
+    document.querySelector('#stop-recording').onclick = function() {
+        this.disabled = true;
+        mediaRecorder.stop();
+        mediaRecorder.stream.stop();
+
+        document.querySelector('#pause-recording').disabled = true;
+        document.querySelector('#start-recording').disabled = false;
+    };
+
+    document.querySelector('#pause-recording').onclick = function() {
+        this.disabled = true;
+        mediaRecorder.pause();
+
+        document.querySelector('#resume-recording').disabled = false;
+    };
+
+    document.querySelector('#resume-recording').onclick = function() {
+        this.disabled = true;
+        mediaRecorder.resume();
+
+        document.querySelector('#pause-recording').disabled = false;
+    };
+
+    document.querySelector('#save-recording').onclick = function() {
+        this.disabled = true;
+
+       
+        // mediaRecorder.save();
+    };
+
+    var mediaRecorder;
+
+    function onMediaSuccess(stream) {
+        var audio = document.createElement('audio');
+
+        audio = mergeProps(audio, {
+            controls: true,
+            muted: true,
+            src: URL.createObjectURL(stream)
+        });
+        audio.play();
+
+        audiosContainer.appendChild(audio);
+        audiosContainer.appendChild(document.createElement('hr'));
+
+        mediaRecorder = new MediaStreamRecorder(stream);
+        mediaRecorder.stream = stream;
+        mediaRecorder.mimeType = 'audio/ogg';
+        mediaRecorder.audioChannels = !!document.getElementById('left-channel').checked ? 1 : 2;
+        mediaRecorder.ondataavailable = function(blob) {
+/*****************************************************************************************************************************************************/ 
+/******************************************** Saurabh's Implementation to save blob **********************************************/ 
+            
+            $("#save-recording").click(function(){
+                          var d = new Date();
+                          timeStamp = d.getTime();
+                          fileName = "Rec"+timeStamp.toString();
+                          file = blob
+
+                          //alert(timeStamp);
+                          console.log(blob);
+                          
+                         
+                      // Create a new FormData object.
+                      var formData = new FormData();
+
+
+                        // // Check the file type.
+                        // if (!file.type.match('image.*')) {  continue; }
+
+                        // Add the file to the request.
+                        formData.append('filehive', file, fileName);//passing timestamp as file name
+
+                      // appending csrfmiddlewaretoken and user-id
+                      formData.append('csrfmiddlewaretoken', '{{csrf_token}}');
+                      formData.append('user','{{request.user.id}}');
+
+                      // Set up the request.
+                      xhr = new XMLHttpRequest();
+
+                      // Open the connection.
+                      xhr.open('POST', "{% url 'upload_file_ckeditor' groupid %}", true);
+
+                      // Set up a handler for when the request finishes sucessfully.
+                      xhr.onload = function () {
+
+                        if (xhr.status === 200)
+                        {
+                          // File(s) uploaded.
+                         // if file is not uploaded sucessfully
+                          if(xhr.responseText == "UploadError")
+                          {
+                             alert("Error occurred");
+                          }
+                          // check if image is not in the list, add it.
+                          else if(xhr.responseText )
+                          {
+                              obj_id = parseInt(xhr.responseText);
+                              var completeURL = "{{MEDIA_URL}}" + xhr.responseText;
+                                          CKEDITOR.instances['ckeditor_textarea'].insertHtml('<audio controls> <source src="'+ completeURL +'" type="audio/ogg"></audio>');
+                                             $(".btn-group").remove();
+                                             $("#audios-container").remove();
+                                             $('#group_imgs_on_modal').foundation('reveal', 'close');
+
+
+                          }
+
+                          // updating metadata of files, if file is uploaded sucessfully
+                          // if(xhr.responseText != "UploadError")
+                          // {
+                          //   // alert('xhr.responseText != "UploadError"');
+                          // }
+                        }
+                        else
+                        {
+                          alert('An error occurred!');
+                        }
+                      };
+
+                      // Send the Data.
+                      xhr.send(formData);
+
+
+            });
+/*****************************************************************************************************************************************************/ 
+            a.href = URL.createObjectURL(blob);
+
+            audiosContainer.appendChild(a);
+            audiosContainer.appendChild(document.createElement('hr'));
+        };
+
+        var timeInterval = document.querySelector('#time-interval').value;
+        if (timeInterval) timeInterval = parseInt(timeInterval);
+        else timeInterval = 5 * 1000;
+
+        // get blob after specific time interval
+        mediaRecorder.start(timeInterval);
+
+        document.querySelector('#stop-recording').disabled = false;
+        document.querySelector('#pause-recording').disabled = false;
+        document.querySelector('#save-recording').disabled = false;
+    }
+
+    function onMediaError(e) {
+        console.error('media error', e);
+    }
+
+    var audiosContainer = document.getElementById('audios-container');
+    var index = 1;
+
+    // below function via: http://goo.gl/B3ae8c
+    function bytesToSize(bytes) {
+        var k = 1000;
+        var sizes = ['Bytes', 'KB', 'MB', 'GB', 'TB'];
+        if (bytes === 0) return '0 Bytes';
+        var i = parseInt(Math.floor(Math.log(bytes) / Math.log(k)), 10);
+        return (bytes / Math.pow(k, i)).toPrecision(3) + ' ' + sizes[i];
+    }
+
+    // below function via: http://goo.gl/6QNDcI
+    function getTimeLength(milliseconds) {
+        var data = new Date(milliseconds);
+        return data.getUTCHours() + " hours, " + data.getUTCMinutes() + " minutes and " + data.getUTCSeconds() + " second(s)";
+    }
+
+    window.onbeforeunload = function() {
+        document.querySelector('#start-recording').disabled = false;
+    };
+    </script>
+
+<script type="text/javascript">
+  var form = document.getElementById('docPost');
+  var fileSelect = document.getElementById('docFile');
+  var uploadButton = document.getElementById('submitpostid');
+        form.onsubmit = function(event) {
+
+        event.preventDefault();
+
+        // Update button text.
+        uploadButton.innerHTML = 'Uploading...';
+
+        // Get the selected files from the input.
+        var files = fileSelect.files;
+
+        // Create a new FormData object.
+        var formData = new FormData();
+
+        // Loop through each of the selected files.
+        for (var i = 0; i < files.length; i++) {
+          var file = files[i];
+
+          // // Check the file type.
+          // if (!file.type.match('image.*')) {  continue; }
+
+          // Add the file to the request.
+          formData.append('filehive', file, file.name);
+        }
+
+        // appending csrfmiddlewaretoken and user-id
+        formData.append('csrfmiddlewaretoken', '{{csrf_token}}');
+        formData.append('user','{{request.user.id}}');
+
+        // Set up the request.
+        xhr = new XMLHttpRequest();
+
+        // Open the connection.
+        xhr.open('POST', "{% url 'upload_file_ckeditor' group_id %}", true);
+
+        // Set up a handler for when the request finishes sucessfully.
+        xhr.onload = function () {
+          if (xhr.status === 200) 
+          {
+            // File(s) uploaded.
+           // if file is not uploaded sucessfully
+            if(xhr.responseText == "UploadError")
+            {
+               alert("Error occurred");
+            }
+            // check if image is not in the list, add it.
+            else if(xhr.responseText )
+            {
+              var imageURL = "/media/"  + xhr.responseText;
+                            var completeURL = imageURL
+                            CKEDITOR.instances['ckeditor_textarea'].insertHtml('<audio controls loop src=' + completeURL +  '>' + '</audio>');
+                            $('#group_imgs_on_modal').foundation('reveal', 'close');
+
+            }
+
+            uploadButton.innerHTML = 'Upload';
+
+            // updating metadata of files, if file is uploaded sucessfully
+            // if(xhr.responseText != "UploadError")
+            // {
+            //   // alert('xhr.responseText != "UploadError"');
+            // }
+          }
+          else
+          {
+            alert('An error occurred!');
+          }
+        };
+
+        // Send the Data.
+        xhr.send(formData);
+      }
+
+  
+</script>
+<script type="text/javascript">
+  $(function() {
+     $("input:file").change(function (){
+       $(".save_cancel").css("display","block")
+       $(".upload-btn").css("display","none")
+
+     });
+  });
+
+$(document).on('change','#docFile',function(){
+    $(".save_cancel").removeClass("hide");
+    file_mime_type = this.files[0].type;
+    file_name = this.files[0].name;
+    if(file_mime_type.indexOf("image") > -1){
+
+      var reader = new FileReader();
+      reader.onload = function (e) {
+        $('#img_preview')
+          .attr('src', e.target.result)
+          .width(150)
+          .height(200)
+          .removeClass("hide");
+      };
+      reader.readAsDataURL(this.files[0]);
+      $('#file_preview').addClass("hide")
+    }
+    else{
+      $('#img_preview').addClass("hide")
+      $('#file_preview')
+        .text(file_name)
+        .removeClass("hide");
+    }
+    /*
+    file_mime_type = this.files[0].type;
+
+    if(file_mime_type.indexOf("image/") < 0){
+      $(this).val("");
+      $(".save_cancel").addClass("hide");
+      $('#docFile').val(this.value);
+      var message = "{% trans 'Only image files can be uploaded!' %}"
+      $("#eventModalLabel").text(message);
+      $("#eventModal").addClass("alert");
+      $("#eventModal").foundation('reveal', 'open');
+    }
+    */
+
+  });
+
+$("#btnUploadCancel").click(function() {
+    $(".save_cancel").addClass("hide");
+    $("#docFile").val("");
+    $(".upload-btn").css("display","block")
+
+  });
+
+</script>
+{% endcomment %}

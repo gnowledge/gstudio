@@ -1,0 +1,59 @@
+{% load ndf_tags %}
+{% load i18n %}
+{% load cache %}
+
+{% get_group_name groupid as group_name_tag %}
+
+{% cache 3600 editor_static_files %}
+    <script type="text/javascript" src="/static/ndf/bower_components/ckeditor/ckeditor.js"></script>
+    <script type="text/javascript" src="/static/ndf/bower_components/ckeditor/config.js"></script>
+{% endcache %}
+
+<style type="text/css">
+    #group_imgs_on_modal{
+        overflow-y: auto;
+        height:600px;
+    }
+</style>
+{% trans var_placeholder as content %}
+
+<textarea id="ckeditor_textarea"  class="ckeditor_textarea" name="{{var_name}}" placeholder="{% blocktrans %}  {{content}} {% endblocktrans %}" value="{{var_value}}" rows="10" cols="80"> {{var_value}} </textarea>
+
+<div id="group_imgs_on_modal" class="reveal-modal editor_modal" data-reveal aria-labelledby="modalTitle" aria-hidden="true" role="dialog" >
+</div>
+<script>
+    if("{{ckeditor_toolbar}}" == "GgallaryCommentsToolbar"){
+        ckeditor_height = "100px";
+    }
+    else{
+
+        ckeditor_height = "200px";
+    }
+    // Replace the <textarea id="editor1"> with a CKEditor
+    // instance, using default configuration.
+
+    CKEDITOR.replace( 'ckeditor_textarea',{
+        enterMode : Number(2), //override default behaviour that adds <p></p> in ck editor
+        toolbar:'{{ckeditor_toolbar}}',
+        uiColor:'{{ckeditor_color}}',
+        groupID: {group_id:'{{group_id}}'},
+        nodeID: {node_id:'{{node_id}}'},
+        textarea_id: 'ckeditor_textarea',
+        customConfig : '/static/ndf/js/ckeditor-config.js',
+        height : ckeditor_height,
+        contentsCss : '/static/ndf/css/clix-activity-styles.css',
+
+        // toolbar :
+        //                                     [
+        //                                         { name: 'basicstyles', items : [ 'Bold','Italic' ] },
+        //                                         { name: 'paragraph', items : [ 'NumberedList','BulletedList' ] },
+        //                                         { name: 'tools', items : [ 'Maximize','-','About' ,'addImage'] }
+        //                                     ]
+    });
+
+    function setCurrNodeEdit(oid)
+    {
+        // document.getElementById("currently-edited-row").setAttribute("data-edited-row-id", oid);
+    }
+
+</script>

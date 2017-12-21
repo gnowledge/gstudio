@@ -1,0 +1,166 @@
+{% extends "ndf/base.html" %}
+{% load i18n %}
+<!-- ///////////////////////////////////////////////////////////////////////////////////////// -->
+
+{% block title %} {{ node.member_of_names_list|join:", " }} - {{ node.name }}  {% endblock %}
+
+<!-- ///////////////////////////////////////////////////////////////////////////////////////// -->
+{% block style %}
+.tagInsert
+{
+background:#b3ffb3;
+}
+.tagDelete
+ {
+ background-color:#ffb3b3;
+ }
+
+.insert
+{
+background:#b3ffb3;
+}
+.delete
+ {
+ background-color:#ffb3b3;
+ }
+
+{% endblock %}
+
+{% block body_content %}
+
+  <div style="padding-top:0.8em">
+    <h2>
+
+      {% ifequal view "single" %}
+      {% trans "View" %}
+      {% else %}
+      {% trans "Compare" %}
+      {% endifequal %}
+      {% trans "History" %} :
+      {{content.3.name|title}}
+    </h2>
+  </div>
+
+  <hr style="height:5px;background-color: #0B6580;" />
+
+  <div id="compare_versions_div" style="padding-left: 130px;">
+  <form method="POST" action="">
+    {% csrf_token %}
+
+    <table cellpadding="8">
+      <tr>
+        <td><font size="3">{% trans "Compare" %}</font></td>
+        <td valign="bottom">
+      	  <select class="" id="version_1" name="version_1">
+      	    {% for version_no in publishedversions reversed %}
+      	      {% ifequal version_no selected_versions.1 %}
+      	        <option id="{{version_no}}" name="{{version_no}}" value="{{version_no}}" selected>{{version_no}}</option>
+      	      {% else %}
+      	        <option id="{{version_no}}" name="{{version_no}}" value="{{version_no}}">{{version_no}}</option>
+      	      {% endifequal %}
+      	    {% endfor %}
+      	  </select>
+      	</td>
+        <td><font size="3">{% trans "with" %}</font></td>
+      	<td valign="bottom">
+      	  <select id="version_2" name="version_2">
+      	    {% for version_no in publishedversions  %}
+      	      {% ifequal version_no selected_versions.2 %}
+      	        <option id="{{version_no}}" name="{{version_no}}" value="{{version_no}}" selected>{{version_no}}</option>
+      	      {% else %}
+      	        <option id="{{version_no}}" name="{{version_no}}" value="{{version_no}}">{{version_no}}</option>
+      	      {% endifequal %}
+      	    {% endfor %}
+      	  </select>
+      	</td>
+        <td> 
+          <input id="compare_versions" type="submit" value="Go" class="button tiny" />
+                
+          {% if user.is_authenticated %}
+          {% if user.is_superuser or node.created_by == user.id %}
+          {% if selected_versions.1 and selected_versions.2 %}
+          {% comment %}
+          <a class="button tiny" href="{% url 'merge_doc' group_id node  selected_versions.1 selected_versions.2 %}" > Merge </a>	
+          {% endcomment %}
+          <a class="button tiny" href="{% url 'revert_doc' group_id node  selected_versions.1 %}" > Revert to {{selected_versions.1}} </a>
+          <a class="button tiny" href="{% url 'revert_doc' group_id node  selected_versions.2 %}" > Revert to {{selected_versions.2}} </a>
+          
+          {% endif %}   
+          {% endif %}   
+          {% endif %}
+        </td>
+      </tr>
+    </table>
+
+  </form>
+  </div>
+  
+  
+{% if view == "merge" or view == "revert" %}
+  <script>
+        document.location.href = '/{{group_id}}/compare/{{node}}/version/{{ver}}'</script>
+
+  {% else %}
+  {% comment %}
+ <!-- <div class="row" style = "overflow: auto; min-height: auto;max-height: 75vh;">   --> {% endcomment %}
+ <div class="medium-12 columns"> 
+    <div id="compare-view" style="padding-bottom: 20px; padding-left: 120px; width:500x;" >
+    </div>
+ </div>
+ {% comment %}
+ <!-- </div> -->
+	{% endcomment %}
+
+  {% endif %}
+{% endblock %}
+
+{% block script %}
+toggleMainSidebar()
+drawtable()
+
+function drawtable()
+{
+		left_panel = {{content|safe}}
+		if ( '{{content1}}' != 'none' )
+		    { 
+		      right_panel = {{content1|safe}}
+		      right_panel.reverse()
+		    }
+
+		$('#compare-view').append("<table id='new' </table>")
+		
+		if ( '{{content1}}' != 'none' )
+		{
+			$('#new').append("<thead> <tr> <th width='150'> Field </th>  <th width='600' > Value </th>  <th width='600' > Compared  </th> </tr> </thead>")
+        }
+        else
+        {
+        	$('#new').append("<thead> <tr> <th width='150'> Field </th>  <th width='1000' > Value </th>   </tr> </thead>")	
+        }
+		
+		h= 0
+		
+		$.each(left_panel,function(k,g)
+		{   h = h + 1
+		    $.each(g,function(c,v){
+		        $('#new').append("<tr id = " +  "rows" + k  + " >  <td style='vertical-align: top;'> " + c.toUpperCase().bold().replace('_',' ')   + "</td> <td style='vertical-align: top;'>" + v + "</td> ")
+		    });
+		    
+		    if ( '{{content1}}' != 'none' )
+		     {
+		        t = right_panel.pop(k)
+		        $.each(t,function(c,v){
+		        $('#rows' + k).append(" <td style='vertical-align: top;'> " + v + "</td> </tr>")
+		        });
+		     }
+		});
+}
+
+$("#compare_versions").click(function() {
+    if ($("#version_1").val() === $("#version_2").val()) {
+	alert ("Please select different versions!!!")
+	return false;
+    }
+});
+
+{% endblock%}

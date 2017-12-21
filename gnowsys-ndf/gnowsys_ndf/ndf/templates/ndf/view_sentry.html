@@ -1,0 +1,43 @@
+{% extends "ndf/base.html" %}
+{% load ndf_tags %}
+{% load pagination_tags %}
+{% get_group_name groupid as group_name_tag %}
+
+{% block title %} {{name}} {% endblock %}
+
+{% block help_topics %}
+<ul>
+  <li><a href="#">{{name}} Introduction</a></li>
+  <li><a href="#">Working with Books</a></li>
+  <li><a href="#">{{name}} types</a></li>
+</ul>
+{% endblock %}
+
+
+{% block help_content %}
+  <p>
+   {{name}} stores the meta data of various {{name}}s
+  </p>
+  
+  <h5>Who can make a {{name}}?</h5>
+  <p>
+    Anyone with an account can create a new article. 
+  </p>
+{% endblock %}
+
+{% block meta_content %}
+  <h2>{{name}}</h2>
+{% endblock %}
+
+
+
+
+
+{% block body_content %} 
+<h align="center"><b><u>{{name|upper}}</b></u></h>
+</br></br></br>
+<label><b>BibTex_entry</b></label>
+<p name=Bibtex><pre style="white-space:pre-wrap">{{Bibtex}}</pre></p>
+<label><b>Notes</b></label>
+<p>{{gst_note}}</p>
+{% endblock%}

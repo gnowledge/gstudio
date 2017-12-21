@@ -1,0 +1,206 @@
+{% load i18n %}
+{% load ndf_tags %}
+{% block title %} video Gallery {% endblock %}
+{% block body_content %} 
+{% get_group_name groupid as group_name_tag %}
+{% comment %}
+<script type="text/javascript">
+  var form = document.getElementById('docPost');
+  var fileSelect = document.getElementById('docFile');
+  var uploadButton = document.getElementById('submitpostid');
+        form.onsubmit = function(event) {
+
+        event.preventDefault();
+
+        // Update button text.
+        uploadButton.innerHTML = 'Uploading...';
+
+        // Get the selected files from the input.
+        var files = fileSelect.files;
+
+        // Create a new FormData object.
+        var formData = new FormData();
+
+        // Loop through each of the selected files.
+        for (var i = 0; i < files.length; i++) {
+          var file = files[i];
+
+          // // Check the file type.
+          // if (!file.type.match('image.*')) {  continue; }
+
+          // Add the file to the request.
+          formData.append('filehive', file, file.name);
+        }
+
+        // appending csrfmiddlewaretoken and user-id
+        formData.append('csrfmiddlewaretoken', '{{csrf_token}}');
+        formData.append('user','{{request.user.id}}');
+
+        // Set up the request.
+        xhr = new XMLHttpRequest();
+
+        // Open the connection.
+        xhr.open('POST', "{% url 'upload_file_ckeditor' group_id %}", true);
+
+        // Set up a handler for when the request finishes sucessfully.
+        xhr.onload = function () {
+          if (xhr.status === 200) 
+          {
+            // File(s) uploaded.
+           // if file is not uploaded sucessfully
+            if(xhr.responseText == "UploadError")
+            {
+               alert("Error occurred");
+            }
+            // check if image is not in the list, add it.
+            else if(xhr.responseText )
+            {
+              var imageURL = "/media/"  + xhr.responseText;
+                      alert(imageURL);
+                            var completeURL = imageURL
+                            var width = prompt("Please enter width in px",'600');
+                            if(width == null)
+                            {
+                                return false;
+                            }
+                            CKEDITOR.instances['ckeditor_textarea'].insertHtml('<video controls="" height="432" width="768"><source src="'+ completeURL +'" type="video/webm" />  <source src="' + completeURL + '" type="video/mp4" />  Your browser does not support the video tag.</video>');
+                            $('#group_imgs_on_modal').foundation('reveal', 'close');
+
+            }
+
+            uploadButton.innerHTML = 'Upload';
+
+            // updating metadata of files, if file is uploaded sucessfully
+            // if(xhr.responseText != "UploadError")
+            // {
+            //   // alert('xhr.responseText != "UploadError"');
+            // }
+          }
+          else
+          {
+            alert('An error occurred!');
+          }
+        };
+
+        // Send the Data.
+        xhr.send(formData);
+      }
+
+  
+</script>
+{% endcomment %}
+<script type="text/javascript">
+  $(function() {
+     $("input:file").change(function (){
+       $(".save_cancel").css("display","block")
+       $(".upload-btn").css("display","none")
+
+     });
+  });
+
+$(document).on('change','#docFile',function(){
+    $(".save_cancel").removeClass("hide");
+    file_mime_type = this.files[0].type;
+    file_name = this.files[0].name;
+    if(file_mime_type.indexOf("image") > -1){
+
+      var reader = new FileReader();
+      reader.onload = function (e) {
+        $('#img_preview')
+          .attr('src', e.target.result)
+          .width(150)
+          .height(200)
+          .removeClass("hide");
+      };
+      reader.readAsDataURL(this.files[0]);
+      $('#file_preview').addClass("hide")
+    }
+    else{
+      $('#img_preview').addClass("hide")
+      $('#file_preview')
+        .text(file_name)
+        .removeClass("hide");
+    }
+    /*
+    file_mime_type = this.files[0].type;
+
+    if(file_mime_type.indexOf("image/") < 0){
+      $(this).val("");
+      $(".save_cancel").addClass("hide");
+      $('#docFile').val(this.value);
+      var message = "{% trans 'Only image files can be uploaded!' %}"
+      $("#eventModalLabel").text(message);
+      $("#eventModal").addClass("alert");
+      $("#eventModal").foundation('reveal', 'open');
+    }
+    */
+
+  });
+
+$("#btnUploadCancel").click(function() {
+    $(".save_cancel").addClass("hide");
+    $("#docFile").val("");
+    $(".upload-btn").css("display","block")
+
+  });
+
+</script>
+   <a class="close-reveal-modal" aria-label="Close">&#215;</a>
+{% comment %}
+<script type="text/javascript" src="http://jqueryrotate.googlecode.com/svn/trunk/jQueryRotate.js"></script> <!-- required ? -->
+
+
+{% if already_uploaded %} 
+<div id="message">
+  <span style="color:red">Listed below files are already uploaded please choose different files</span>
+  <ul>
+    {% for each in already_uploaded %}
+    <li>{{each}}</li>
+    {% endfor %}
+  </ul>
+</div>
+{% endif %}
+
+
+<br>
+<br>
+
+<div class="upload-file small-12 medium-3 large-2 columns" id="upload_form_div">
+                        <form class="dropzone" id ="docPost" enctype="multipart/form-data" method="post" action="{% url 'upload_file_ckeditor' group_id %}">
+                            {% csrf_token %}
+                            <label class="tiny button radius expand upload-btn" style="margin: 0px;">
+                                <i class="fa fa-upload"></i>
+                                &nbsp;
+                                <span>Upload File</span>
+                                <input type="file" name="filehive" id="docFile" style="display: none;" multiple/>
+                            </label>
+                            <br><br>
+                            <div class="save_cancel" style="display:none">
+                                <img id="img_preview" alt="New file" class="hide" />
+                                <label id="file_preview" class="hide"></label>
+                                <br> <br>  
+                              <input type="submit" id="submitpostid" class="tiny button radius" value="Save"/>
+                              <input type="button" id="btnUploadCancel" class="tiny button radius" value="Cancel"/>
+                            </div>
+                            <input type="hidden" name="context_name" value="{{title}}">
+                        </form>
+                    </div>
+{% endcomment %}
+  <br> <br>
+ <ul class="small-block-grid-1 medium-block-grid-3 large-block-grid-4" >
+    {% for each in files_cur %}
+    
+    <li class="card-image-wrapper">
+            <img  class="gallery-image" style="" data-image-id="{{each.pk}}" 
+              "{% if 'svg' in each.if_file.mime_type   %}"
+              src="{{MEDIA_URL}}{{each.if_file.original.relurl}}"
+              "{% else %}"
+              src="{{MEDIA_URL}}{{each.if_file.thumbnail.relurl}}"
+              "{% endif %}"
+              data-thumbnail-src="{{MEDIA_URL}}{{each.if_file.original.relurl}}" >
+            <figcaption style="cursor:pointer">{{each.name|truncatechars:15}}</figcaption>
+    
+    </li>
+    {% endfor %}
+  </ul>   
+{% endblock %}

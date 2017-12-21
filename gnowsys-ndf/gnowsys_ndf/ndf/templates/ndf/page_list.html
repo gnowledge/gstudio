@@ -1,0 +1,194 @@
+{% extends "ndf/base.html" %}
+{% load i18n %}
+{% load ndf_tags %}
+{% load pagination_tags %}
+{% get_group_name groupid as group_name_tag %}
+
+{% block title %} {{title}} {% endblock %}
+
+{% block help_topics %}
+
+  <li><a href="#">{% trans 'Pages Introduction' %}</a></li>
+  <li><a href="#">{% trans 'Working with Pages' %}</a></li>
+  <li><a href="#">{% trans 'Page types' %}</a></li>
+
+{% endblock %}
+
+{% block meta_content %}
+
+
+
+{% endblock %}
+
+
+{% block help_content %}
+{% blocktrans %}  <p>  Pages are user-written articles on a range of subjects. Any contributor or a group of contributors can create (and own) new articles, and there can be multiple articles on the same topic, each written by a different author.  </p>
+  <h5>Who can make a page?</h5>
+  <p>    Anyone with an account can create a new article. When creating a new article, the initial contributor can choose to have a defined list of authors, all of whom can edit the page, or have an open, wiki-like format where anyone can contribute.  </p>
+{% endblocktrans %}
+{% endblock %}
+
+
+{% block shelf_content %}
+  {% if user.is_authenticated %}
+    {% include "ndf/shelf.html" %}
+  {% else %}
+  <h4> {% trans 'Please Login to create your shelf' %}</h4>
+  {% endif %}
+{% endblock %}
+
+
+{% block search_content %}
+  {% include "ndf/node_search_base.html" %}
+{% endblock %}
+
+
+{% block related_content %}
+
+{% get_resource_collection groupid title as page_collections %}
+
+
+<ul class="side-nav">
+{% comment %}
+  <!-- {% autopaginate page_collections 23 %}
+
+  {% for node in page_collections %}
+    <li>
+
+      <h5>
+      <a class="select" class="collection" href="{% url 'page_details' group_name_tag node %}"><i class="fi-page-multiple"></i>  {{ node.name|truncatechars:20 }}
+    </a>
+    </h5>
+
+
+    </li>
+
+
+  {% endfor %} -->
+  {% endcomment %}
+
+  {% check_user_join request groupid as user_is_joined %}
+  <div class="panel" style="background-color:#ddd;">
+    <b>{% trans "Visit" %}</b>
+      <dl class="tabs" data-tab data-options="deep_linking:true">
+        <dd class="active"><a href="#panel2-1"><i class="fi-eye"></i> {% trans 'All Pages' %} {% if page_nodes.count %}({{ page_nodes.count }}){% endif %}</a></dd><br/>
+
+        <dd><a href="#panel2-4"><i class="fi-page-multiple"></i> {% trans "Collections" %}</a></dd>
+      </dl><br/>
+    <b>Actions</b><br/><br/>
+    {% if user.is_authenticated %}
+
+      {% if user_access == "allow" %}
+        {% if user_is_joined == "joined" or user_is_joined == "author" %}
+          <a class="tiny round button" href="{% url 'page_create_edit' group_name_tag %}">
+            <span class="fi-plus">&nbsp;&nbsp;{% trans "Create" %} {{title}}</span>
+          </a>
+        {% endif %}
+      {% endif %}
+    {% endif %}
+
+  </div>
+
+</ul>
+
+{% endblock %}
+
+
+{% block body_content %}
+{% get_group_name groupid as group_name_tag %}
+
+{% comment %}
+<!-- <header class="row">
+  <dl class="tabs" data-tab data-options="deep_linking:true">
+    <dd class="active"><a href="#panel2-1"><i class="fi-eye"></i> All Pages {% if page_nodes.count %}({{ page_nodes.count }}){% endif %}</a></dd>
+    <dd><a href="#panel2-4"><i class="fi-page-multiple"></i> {% trans "Collections" %}</a></dd>
+  </dl>
+    {% if user.is_authenticated %}
+  {% user_access_policy groupid request.user as user_access %}
+  {% if user_access == "allow" %}
+
+      <a class="small button" href="{% url 'page_create_edit' group_name_tag %}">
+	<span class="fi-plus">&nbsp;&nbsp;{% trans "Create" %} {{title}}</span>
+      </a>
+
+  {% endif %}
+  {% endif %}
+</header>
+ -->
+{% endcomment %}
+
+<div class="tabs-content">
+<div class="content row active" id="panel2-1">
+
+{% if searching and page_nodes.count > 0 %}
+<div class="row">
+  <div class="small-12 columns end">
+    <p>Search Results: <span class="label success round"> {% trans 'Found' %} {{page_nodes.count}} {{title|lower}}{{page_nodes.count|pluralize}}.</span></p>
+  </div>
+</div>
+
+{% elif searching and page_nodes.count == 0 %}
+<div class="row">
+  <div class="small-12 columns">
+    <p>Search Results: <span class="label alert"> {% trans 'No' %} {{title|lower}}{{page_nodes.count|pluralize}} {% trans 'matched your search criteria!!!' %}</span></p>
+  </div>
+</div>
+
+{% endif %}
+<div class="repository-title large-4 columns">{% trans "Pages" %}</div><br>
+<ul class="small-block-grid-1 medium-block-grid-2 large-block-grid-5">
+
+<!-- {#% get_preferred_lang request page_nodes "Page" as page_nodes %#} -->
+
+
+
+  {% group_type_info groupid request.user as grouptype %}
+  
+  <!-- Existing card list-->
+  {% for node in page_nodes %}
+
+       <li class="card-image-wrapper" >
+             {% include 'ndf/simple_card.html' with  has_contributor=True resource=node url_name="page_details" first_arg=group_name_tag second_arg=node %}
+
+        </li>
+
+
+  {% endfor %}
+
+</ul>
+
+
+
+
+{% include 'ndf/pagination.html' with urlname="page_paged" first_arg=group_name_tag   %}
+</div>
+
+
+<div class="content row" id="panel2-4">
+{% get_resource_collection groupid title as page_collections %}
+
+<ul class="small-block-grid-1 medium-block-grid-2 large-block-grid-4">
+
+
+  <!-- Existing card list-->
+  {% for node in page_collections %}
+      
+       <li class="card-image-wrapper" >
+             {% include 'ndf/simple_card.html' with  has_contributor=True resource=node url_name="page_details" first_arg=group_name_tag second_arg=node %}
+
+        </li>
+
+
+    {% empty %}
+    {% if not searching %}
+     <h5>    {% blocktrans %} This group doesn't have any collections.{% endblocktrans %} </h5>
+    {% endif %}
+
+  {% endfor %}
+
+</ul>
+
+</div>
+</div>
+
+{% endblock %}

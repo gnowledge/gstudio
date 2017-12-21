@@ -1,0 +1,240 @@
+{% extends "ndf/event.html" %}
+{% load i18n %}
+
+{% load i18n %}
+{% load ndf_tags %}
+{% load pagination_tags %}
+
+{% block title %} {{ title }} {% endblock %}
+
+{% block body_content %} 
+  {% check_is_gstaff groupid request.user as gstaff_access %}
+
+  {% if nodes.count %}
+    {% autopaginate nodes 25 %}
+  
+    <div id="myModal" class="reveal-modal" data-reveal style="height:500px;overflow:scroll;"> 
+      
+      <h3>{% trans "Are you sure you want to delete? All of the following related items also will be deleted!" %}</h3>
+      
+      <input class="button confirmDeleteObjects" type="button" value="Confirm">
+      <input class="button cancelDeleteObjects" type="button" value="Cancel">
+      <div id="deletion_results"></div>
+      <a class="close-reveal-modal"> &#215;</a>
+    </div>
+
+
+    {% if gstaff_access %}
+      {% comment %}
+      <!-- <input class="button deleteObjects" type="button" value="Delete"> -->
+      {% endcomment %}
+    {% endif %}
+    
+    <form method="POST" style="float:right; margin-top:15px;padding-top:10px;">
+
+      {% csrf_token %}
+      <input name="search" type="textbox" value="" style="width:300px;">
+      <input type="hidden" name="class" value="{{class_name}}">
+      <input type="submit" value="search" style="width:100px;">
+
+    </form>
+  {% endif %}
+  <br><br><br>
+  {% if nodes.count %}
+  <table >
+    <thead>
+      <tr>
+          <th width="20"> <input class="checkedAll" type="checkbox" ></th>
+          <th>Title</th>
+          <th>Status</th>
+          <th></th>
+
+      </tr>
+    </thead>
+    
+    <tbody>
+      {% for each in nodes %}
+        <tr>
+         
+         <td  id="{{each.pk}}" class="objectsCheckbox"> <input type="checkbox" class="chkbx"> </td>
+          <td style="font-size:14px;">
+            <a href="{% url 'event_app_instance_detail' groupid  app_set_id each.pk %}">{{each.name|title}}</a>
+          </td>
+          <td style="font-size:14px;">
+            {%  if each.attribute_set.3.event_status  == 'Completed' %}
+             <svg height="20" width="25">
+                   <rect width="15" height="15" stroke="black" stroke-width="0" fill="#006600" />
+             </svg>
+            {% endif %}
+            {%  if each.attribute_set.3.event_status  == 'Scheduled' %}
+             <svg height="20" width="25">
+                   <rect width = "15" height = "15" stroke="black" stroke-width="0" fill="#00CED1" />
+             </svg>
+             
+            {% endif %}
+            {%  if each.attribute_set.3.event_status  == 'Rescheduled' %}
+             <svg height="20" width="25">
+                   <rect width = "15" height = "15" stroke="black" stroke-width="0" fill="#ffff66" />
+             </svg>
+            {% endif %}
+            {%  if each.attribute_set.3.event_status  == 'Incomplete' %}
+             <svg height="20" width="25">
+                   <rect width = "15" height = "15" stroke="black" stroke-width="0" fill="#ff3232" />
+             </svg>
+            {% endif %}
+              
+          </td>
+        </tr>
+
+      {% endfor %}
+
+    </tbody>
+  </table>
+
+  {% else %}
+  <div class="row">
+    <div class="small-12 columns">
+     <h5> {% trans "This group doesn't have a registered" %}<b> {{title}}</b>.  </h5>
+    </div>
+  </div>
+
+  {% endif %}
+
+  {% paginate %}
+{% endblock %}
+
+{% block script %}
+  {{block.super}}
+
+  $(document).on('click', ".checkedAll", function() {
+    if($(this).is(":checked")==true){
+      $('.objectsCheckbox input').prop( "checked", true );
+    }
+    else{
+      $('.objectsCheckbox input').prop( "checked", false );
+    }
+  });
+
+  $(document).on('click', ".button.confirmDeleteObjects", function() {
+    
+   
+    var selectedobject = $(".objectsCheckbox input:checked");
+    // $('#myModal').foundation('reveal', 'open');
+    // $('#myModal').foundation('reveal', 'close');
+    
+    if(selectedobject.length > 0) {
+      var i = 0;
+      var str = "";
+      
+      $.map(selectedobject, function(each) {
+        if(i == 0) {
+          str = str.concat(each.parentElement.id)
+        }
+        else {
+          str = str.concat(","+each.parentElement.id)
+        }
+        
+        i = i+1
+      })
+
+      $.ajax({
+        url: "{% url 'deletion_instances' groupid %}",
+        type: 'POST',
+        data: {deleteobjects:str,csrfmiddlewaretoken: '{{ csrf_token }}',confirm:"yes"},
+        
+        beforeSend: function() {},
+        
+        success: function(result) {
+        },
+      
+        complete: function() { 
+          $('#myModal').foundation('reveal', 'close');
+        }
+      });
+       
+      $.map(selectedobject,function(each) {
+        each.parentElement.parentElement.remove()
+      });
+      
+      $('#myModal').foundation('reveal', 'close');
+    }
+
+    else {
+      alert("select object to delete");
+    }
+  });
+
+  $(document).on('click',".button.deleteObjects",function(){
+    var selectedobject = $(".objectsCheckbox input:checked");
+    // $('#myModal').foundation('reveal', 'close');
+
+    if(selectedobject.length > 0) {
+      $('#myModal').foundation('reveal', 'open');
+
+      // var confirmed = confirm("Deleting "+selectedobject.length+" objects");
+      // if(confirmed == true){
+   
+      var i = 0;
+      var str = "";  
+   
+      $.map(selectedobject,function(each) {
+        if(i == 0) {
+          str = str.concat(each.parentElement.id)
+        }
+        else {
+          str = str.concat(","+each.parentElement.id)
+        }
+        
+        i= i+1;
+      });
+
+      $.ajax({
+        url: "{% url 'deletion_instances' groupid %}",
+        type: 'POST',
+        data: {deleteobjects:str, csrfmiddlewaretoken: '{{ csrf_token }}'},
+        
+        beforeSend: function() {},
+        
+        success: function(result) {
+          $("#deletion_results").html("");
+          
+          for(var obj in result){
+            var ulist = $("<ul>"+"</ul>")
+            .attr("id","conceptlist")
+            .appendTo($("#deletion_results"));
+            
+            var li = $("<li><b>"+result[obj].title+"</b></li>")
+            .appendTo(ulist);
+            
+            var ulist1 = $("<ul>"+"</ul>")
+            .attr("id","conceptlist")
+            .appendTo(li);
+            
+            for(var obj2 in result[obj].content) {
+              object = result[obj].content[obj2]
+              for(var obj3 in  object) {
+                for(var each in object[obj3]) {
+                  var li1 = $("<li>"+object[obj3][each]+"</li>")
+                  .appendTo(ulist1);
+                }
+              }
+            }
+          }
+        },
+
+        complete: function() {}
+      });
+      
+      // }
+    }
+    
+    else {
+      alert("select object to delete");
+    }
+  });
+
+  $(document).on('click',".button.cancelDeleteObjects",function(){
+    $('#myModal').foundation('reveal', 'close');
+  });
+
+{% endblock %}  

@@ -1,0 +1,370 @@
+{% extends "ndf/mis_base_create_edit.html" %}
+{% load i18n %}
+{% load ndf_tags %}
+{% load pagination_tags %}
+
+{% block body_content %} 
+  <form data-abide enctype="multipart/form-data" id="form-edit-node" method="POST" action="">
+
+    <header class="row" style="margin: 1rem 0 0 0 ;">
+      <h2 class="small-12 columns">
+        {% if node %}
+        {% trans "Editing" %} {{title}}: {{node.name}}
+        {% else %}
+        {% trans "Register a " %} {{title}}
+        {% endif %}
+      </h2>
+    </header>
+
+    <nav class="row" style="margin-top: 0.5rem;">
+      <dl class="tabs small-12 columns" data-tab data-options="deep_linking:true">
+        <dd>
+          <label><h4>{% trans "Fill"%}:&nbsp;&nbsp;</h4></label>
+        </dd>
+
+        {% for tab_details in property_order_list %}
+        <dd {% if forloop.counter == 1 %}class="active"{% endif %} title="STEP-{{forloop.counter}}: Fill {{tab_details.0|lower}} details...">
+          <a href="#panel_{{tab_details.0}}" class="disable">
+            {{tab_details.0}}
+          </a>
+        </dd>
+        {% endfor %}
+      </dl>
+    </nav>
+
+    {% csrf_token %}
+
+    <div id="people-details-edit-div" class="tabs-content" style="border-style: solid; border-width: 1.5px; border-color: #0eacb5; padding: 0px 5px;" >
+      {% for tab_name, tab_fields_list in property_order_list %}
+      <div class="{% if forloop.counter == 1 %}active {% endif %}content row" id="panel_{{tab_name}}">
+        <br>
+        {% for field in tab_fields_list %}
+        <div class="row">
+          <div class="small-3 columns"> 
+            <label for="{{field.name}}" class="right inline">
+              {{field.altnames}}
+            </label>
+          </div>
+          <div class="small-9 columns">
+            {% html_widget groupid node.pk field %}
+          </div>
+        </div>
+        {% endfor %}
+        <br>
+        <div class="row tab-nav">
+          <div class="small-2 columns for-prev">
+          </div>
+          <div class="small-4 small-offset-5 columns end for-save">
+          </div>
+          <div class="small-2 small-offset-2 columns for-next">
+          </div>
+        </div>    
+      </div>
+      {% endfor %}
+
+      <input type="hidden" id="name" name="name" value="">
+    </div>
+
+  </form>
+{% endblock %}
+
+{% block script %}
+  {{block.super}}
+  
+  // Default settings for date-widgets & tabs on page load ---------------------------------------------------------
+    var currentYear = (new Date()).getFullYear()
+    lowerYearLimit = currentYear - 80;
+    upperYearLimit = currentYear;
+
+  // Tabs navigation: Enable and Disable tabs in sequential manner using Next & Previous buttons -------------------
+    $(".content").on('click', '.tab_next' ,function(event){
+      event.preventDefault();
+
+      // Forcefully blur all input elements, so that mandatory fields become data-invalid if not fill
+      $(this).parents(".tab-nav").parents(".content").find(':input[required]').blur();
+
+      // Then check no. of data-invalid fields
+      // if count == 0, then only proceed to next tab
+      if($(this).parents(".tab-nav").parents(".content").find(':input[data-invalid]').length == 0) {
+        // Valid, move to next step
+        $('.active').removeClass('active').next().addClass('active');
+      }
+    });
+
+    $(".content").on('click', '.tab_prev' ,function(event){
+      event.preventDefault();
+      $('.active').removeClass('active').prev().addClass('active');
+    });
+
+  // Only keeping year's drop-down and hiding other datepicker's elements ------------------------------------------
+    $(document).on('focus click', '.date_year' ,function(){
+      $(".ui-datepicker-calendar").hide();
+      $(".ui-datepicker-month").hide();
+      $(".ui-datepicker-prev").hide();
+      $(".ui-datepicker-next").hide();
+      $("#ui-datepicker-div").position({
+        my: "center top",
+        at: "center bottom",
+        of: $(this)
+      }); 
+    });
+
+  // State-wise District selection ---------------------------------------------------------------------------------
+
+    // Disable District field, later on will be enabled after a state is selected
+    $("select#person_belongs_to_district").attr('disabled', 'disabled')
+
+    $("select#person_belongs_to_state").change(function() {
+      // Get selected State's value (ObjectId) and selected-index
+      selected_state_id = $(this).val()
+      selected_state_index = this.selectedIndex
+
+      if (selected_state_index != 0) {
+        // Perform this only when a State is selected
+        // Ajax call that fetches all Districts belonging to selected State
+        $.ajax({
+          url:"{% url 'get_districts' groupid %}",
+
+          data: {
+            state_id: selected_state_id
+          },
+
+          type: "GET",
+
+          dataType: "json",
+
+          complete: function () {
+            // Enable District field
+            $("select#person_belongs_to_district").removeAttr('disabled')
+          },
+
+          success: function (data) {
+            if (data.hasOwnProperty("message")) {
+              // Pops-up only when there is any error found during the ajax call
+              alert(data["message"])
+            }
+
+            else {
+              // First empty all values of District field (dropdown/select)
+              $("select#person_belongs_to_district").empty();
+
+              // Make very first entry as given below
+              $("select#person_belongs_to_district").append(
+                  $("<option></option>")
+                    .attr("value", "")
+                    .text("- - - Select district - - -")
+              );
+
+              // Fill returned district values based on which state is selected
+              $.each(data, function(i, value) {
+                $("select#person_belongs_to_district").append(
+                  $("<option></option>")
+                    .attr("value", value[0])
+                    .text(value[1])
+                );
+              });
+
+              // Set very first entry so that user doesn't forgets to select a value
+              $("select#person_belongs_to_district").prop("selectedIndex", 0);
+            }
+          }
+        });
+      }
+
+      else {
+        // If state is not selected or changed back to very first element from State's dropdown
+        // then set even District field's value to very first entry and disabled it until user again selects any state
+        $("select#person_belongs_to_district").prop("selectedIndex", 0);
+        $("select#person_belongs_to_district").attr('disabled', 'disabled')
+      }
+    });
+
+  // Tranferring values from multiple selection widget into outer dropdown -----------------------------------------
+    $(document).on('closed', '[data-reveal]', function () {
+      /*
+       *  On closing of reveal-modal
+       */
+      var widget_for = $(this).attr('id').replace('_modal', '')
+
+      // First empty all values of given field (dropdown/select)
+      $("select#" + widget_for).empty();
+
+      // Fetching class name of hidden input element(s) of drawer2 from corresponding drawer-widget
+      class_value = ".node_id." + widget_for + "_values"
+      right_drawer_len = $(class_value).size()
+
+      if (right_drawer_len > 0) {
+        $(class_value).each(function (){
+          // ObjectId & name of the resource inside drawer2 from corresponding drawer-widget
+          resource_id = $(this).val()
+          resource_name = $(this).attr('name')
+
+          // Make very first entry as given below
+          $("select#" + widget_for).append(
+              $("<option></option>")
+                .attr("value", resource_id)
+                .attr("selected", "selected")
+                .text(resource_name)
+          );
+        });
+      }
+
+      else {
+        // Make very first entry as given below
+        $("select#" + widget_for).append(
+            $("<option></option>")
+              .attr("value", "")
+              .text("- - - Select - - -")
+        );
+      }
+    });
+
+  // On click of Register/Update -----------------------------------------------------------------------------------
+    $(document).on("click", "#save-node", function() {
+    // Store concatenated first, middle & last name field's values into name field (hidden input field) ------------
+      name = ""
+      first_name = $("#first_name").val().trim()
+      middle_name = $("#middle_name").val().trim()
+      last_name = $("#last_name").val().trim()
+
+      name = first_name
+      if (middle_name != "") {
+        name = first_name + " " + middle_name
+      }
+
+      if (last_name != "") {
+        name = name + " " + last_name
+      }
+
+      $("#name").val(name)
+
+    // Enable any disabled field as disabled values can't be fetched in views --------------------------------------
+      $(".content").find(":input[disabled]").each(function(){
+        $(this).removeAttr('disabled');
+      });
+    });
+
+  // totWhen -------------------------------------------------------------------------------------------------------
+    var totWhen = $("#tot_when")
+
+    if(totWhen.length > 0) {
+      totWhen.datetimepicker();
+      $(totWhen).after('&nbsp;<input class="button tiny" type="button" value="Add Date"><br/>')
+      $("input.tiny").after("<div id='tot-when-date-list'></div>")
+    }
+
+    $(totWhen).change(function() { 
+
+      if($(totWhen).val().length > 0) {
+        $("input.tiny").removeClass("disabled");
+      }
+
+      else {
+        $("input.tiny").addClass("disabled");
+      }
+    });
+
+    $("input.tiny").click(function() {
+      if(!$(this).hasClass("disabled")) {
+        $("#tot-when-date-list").append('<span class="secondary label" style="margin-right:5px;"><span class="date-item">'+$(totWhen).val()+' </span><span style="font-size:large; cursor:pointer;" onclick="$(this).parent().remove();">&times;</span></span>');
+        // $(totWhen).val("");
+        // alert(getTotWhen())
+        $(totWhen).val(getTotWhen());
+        $("input.tiny").addClass("disabled");
+      }
+    });
+
+    function getTotWhen() {
+      var datesList = []
+      dts = $("#tot-when-date-list .date-item");
+      $.each(dts, function(i, val){datesList.push($(val).text().trim())});
+
+      return datesList;
+    }
+{% endblock %}
+
+{% block document_ready %}
+  {{block.super}}
+
+  // Default settings for date-widgets & tabs on page load ---------------------------------------------------------
+    // Tabs: Adding Next and Previous buttons for navigation -----------------------------------------------------
+      $(".content").each(function(i) {
+        totalTabs = $(".content").size() - 1
+
+        if (i != totalTabs) {
+          // Not in last tab
+          $(this).children(".tab-nav").children(".for-next")
+            .append("<input type='button' class='button small round tab_next' value='{% trans 'Next' %}' />");
+        }
+
+        if (i == totalTabs) {
+          // Only in last tab
+          var is_existing_person = "{{node.pk|default_if_none:''}}";
+          var submit_btn_label = '{% trans "Register" %}' // By default considering registering a new person
+          if (is_existing_person) {
+            // If value (ObjectId) found, it means updating existing person record
+            submit_btn_label = '{% trans "Update" %}'
+          }
+          $(this).children(".tab-nav").children(".for-save")
+            .append("<input type='submit' id='save-node' class='small button expand' value='"+submit_btn_label+"' style='float:right;' />");
+        }
+
+        if (i != 0) {
+          // Not in first tab
+          $(this).children(".tab-nav").children(".for-prev")
+            .append("<input type='button' class='button small round tab_prev' value='{% trans 'Previous' %}' style='float:right;' />");
+        }
+      });
+
+    // Settings for datepicker widget (with all) -----------------------------------------------------------------
+      $("#dob.date_month_day_year").datepicker({
+        changeMonth: true,
+        changeYear: true,
+        dateFormat: "dd/mm/yy",
+        yearRange: lowerYearLimit + ":" + (currentYear-14),
+        minDate: new Date(lowerYearLimit, 1 - 1, 1),
+        maxDate: new Date((currentYear-14), 1 - 1, 1),
+        defaultDate: new Date(lowerYearLimit, 1 - 1, 1)
+      });
+
+      $("#registration_date.date_month_day_year").datepicker({
+        changeMonth: true,
+        changeYear: true,
+        dateFormat: "dd/mm/yy",
+        yearRange: lowerYearLimit + ":" + currentYear,
+        minDate: new Date(lowerYearLimit, 1 - 1, 1),
+        maxDate: '0',
+        defaultDate: '0'
+      });
+
+    // Settings for datepicker widget (only for year) ------------------------------------------------------------
+      $(".date_year").datepicker({
+        changeYear: true,
+        dateFormat: 'yy',
+        yearRange: lowerYearLimit + ":" + upperYearLimit,
+        minDate: new Date(lowerYearLimit, 1 - 1, 1),
+        maxDate: '0',
+        defaultDate: new Date(lowerYearLimit, 1 - 1, 1),
+
+        onClose: function(dateText, inst) {
+          $(this).val(dateText)
+        },
+
+        beforeShow: function() {
+          var year = $(this).val();
+          if (year) {
+            $(this).datepicker('option', 'defaultDate', new Date(year, 1, 1));
+            $(this).datepicker('setDate', new Date(year, 1, 1));
+          }
+        },
+
+        onChangeMonthYear: function(year, month, inst){
+          $(this).val(year)
+        }
+      });
+
+    //Allow to register PO without selecting any College
+    $("#officer_incharge_of").removeAttr("required");
+    $("#officer_incharge_of_modal #officer_incharge_of_move_all_right").remove()
+    $("#officer_incharge_of_modal #officer_incharge_of_move_all_left").remove()
+{% endblock %}

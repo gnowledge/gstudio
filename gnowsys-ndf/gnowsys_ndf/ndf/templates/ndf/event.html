@@ -1,0 +1,94 @@
+{% extends "ndf/base.html" %}
+{% load i18n %}
+{% load ndf_tags %}
+{% block title %} {% trans "Events" %} {% endblock %}
+
+{% block style %}
+  {{block.super}}
+  
+  /* Setting css-properties for app-set in left panel */
+    .active-app-set, .active-app-set-edit, .active-app-set-view {
+      /*padding:0.5em 0 0.5em 0.5em; */
+      /*margin-left: -10px !important;*/
+      background-color:#efefef;
+    }
+
+    .active-app-set-edit {
+      border-right: 4px solid #808080;
+      font-weight: bold;
+    }
+
+    .active-app-set-view {
+      border-left: 4px solid #808080;
+      font-weight: bold;
+    }
+{% endblock %}
+
+{% block meta_content %}
+<br>
+<br>
+<br>
+<ul class="side-nav">
+<li >
+  <div class="row">
+      <a class="small-6 columns" href="{% url 'event' group_name_tag %}" title="View all">
+              View all
+        </a>
+  </div>        
+</li>
+{% for each in app_collection_set %}
+
+     {% if app_set_isd == each|safe %}
+      {% if '/new/' in request.path %}
+      <li class="active-app-set-edit">
+      {% else %}
+      <li class="active-app-set-view">
+      {% endif %}
+    {% else %}
+    <li>
+    {% endif %}   
+    {% if not  each.name == "Inauguration"  or each.name == "Master Trainer Program" %} 
+      <div class="row">
+          <a class="small-6 columns" href="{% url 'event_list' groupid each.pk %}" title="View all {{each.name}}">
+            {{each.name}}
+          </a>
+          {% if each.name == "Exam" %}
+            {% if Add == "Allow" %}
+            <a class="small-6 columns" href="{% url 'event_app_instance_create' groupid each.pk %}" title="Add {{each.name}}">
+            +&nbsp; {% trans "Add" %}
+            {% endif %}
+          </a>
+          {% else %}
+          
+             <a class="small-6 columns" href="{% url 'event_app_instance_create' groupid each.pk %}" title="Add {{each.name}}">
+            +&nbsp; {% trans "Add" %}
+          </a>
+          
+          {% endif %}
+      </div>
+      {% endif %}
+  	</li>
+    </a>
+
+{% endfor %}
+</ul>
+<table>
+	<tbody>
+		<tr> <td> Scheduled </td>  <td bgcolor="#00CED1" style="width:50%;">      </td>  </tr>
+		<tr> <td> ReScheduled </td>  <td bgcolor="#ffff66" style="width:50%;">   </td> </tr>
+		<tr> <td> InComplete </td> <td bgcolor="#ff3232" style="width:50%;">    </td> </tr>
+		<tr> <td> Completed </td> <td bgcolor="#00%6600" style="width:50%;">    </td> </tr>
+	</tbody>
+</table>	
+{% endblock %}
+
+
+
+
+{% block body_content %}
+
+<div id = 'view-scheduler-calendar'>
+   {% include "ndf/scheduler_calender.html"  %}
+</div>
+
+{% endblock %}

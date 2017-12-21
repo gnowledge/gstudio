@@ -1,0 +1,20 @@
+<!ATTLIST lbl_name course_mins CDATA #IMPLIED>
+{% extends "ndf/base.html" %}
+{% load i18n %}
+{% load ndf_tags %}
+{% block title %} {{title}} {% endblock %}
+{% load pagination_tags %}
+{% get_group_name groupid as group_name_tag %}
+
+{% block meta_content %}
+  {% if not tiss_site %}
+    <a href="{% url 'course_detail' group_name_tag cnode %}"><h3>{{cnode.name}}</h3></a>
+  {% else %}
+    <h3>{{cnode.name}}</h3>
+  {% endif %}
+
+{% endblock %}
+
+
+
+

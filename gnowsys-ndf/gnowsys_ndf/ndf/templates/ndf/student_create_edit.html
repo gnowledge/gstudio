@@ -1,0 +1,791 @@
+{% extends "ndf/mis_base_create_edit.html" %}
+{% load i18n %}
+{% load ndf_tags %}
+{% load pagination_tags %}
+
+{% block body_content %} 
+  <form data-abide enctype="multipart/form-data" id="form-edit-node" method="POST" action="">
+
+    <header class="row" style="margin: 1rem 0 0 0 ;">
+      <h2 class="small-12 columns">
+        {% if node %}
+        {% trans "Editing" %} {{title}}: {{node.name}} ({{node.enrollment_code}})
+        {% else %}
+        {% trans "Register a " %} {{title}}
+        {% endif %}
+      </h2>
+    </header>
+
+    <nav class="row" style="margin-top: 0.5rem;">
+      <dl class="tabs small-12 columns" data-tab data-options="deep_linking:true">
+        <dd>
+          <label><h4>{% trans "Fill"%}:&nbsp;&nbsp;</h4></label>
+        </dd>
+
+        {% for tab_details in property_order_list %}
+        <dd {% if forloop.counter == 1 %}class="active"{% endif %} title="STEP-{{forloop.counter}}: Fill {{tab_details.0|lower}} details...">
+          <a href="#panel_{{tab_details.0}}" class="disable">
+            {{tab_details.0}}
+          </a>
+        </dd>
+        {% endfor %}
+      </dl>
+    </nav>
+
+    {% csrf_token %}
+
+    <div id="people-details-edit-div" class="tabs-content" style="border-style: solid; border-width: 1.5px; border-color: #0eacb5; padding: 0px 5px;" >
+      <!-- Personal-Details tab /////////////////////////////////////////////////////////////////////// -->
+      <div class="active content row" id="panel_{{property_order_list.0.0}}">
+        <br>
+        <!-- For name -->
+        <div class="row">
+          <div class="small-4 columns">
+            <div class="row">
+              <div class="small-3 columns">
+                <label for="{{property_order_list.0.1.0.name}}" class="right inline"> 
+                  {% blocktrans with label_val=property_order_list.0.1.0.altnames %} {{label_val}} {% endblocktrans %}
+                </label>
+              </div>
+              <div class="small-9 columns" tabindex="1">
+                {% html_widget groupid node.pk property_order_list.0.1.0 %}
+              </div>
+            </div>
+          </div>
+          <div class="small-4 columns">
+            <div class="row">
+              <div class="small-4 columns">
+                <label for="{{property_order_list.0.1.1.name}}" class="right inline">
+                  {% blocktrans with label_val=property_order_list.0.1.1.altnames %} {{label_val}} {% endblocktrans %} 
+                </label>
+              </div>
+              <div class="small-8 columns">
+                {% html_widget groupid node.pk property_order_list.0.1.1 %}
+              </div>
+            </div>
+          </div>
+          <div class="small-4 columns">
+            <div class="row">
+              <div class="small-3 columns">
+                <label for="{{property_order_list.0.1.2.name}}" class="right inline">
+                  {% blocktrans with label_val=property_order_list.0.1.2.altnames %} {{label_val}} {% endblocktrans %} 
+                </label>
+              </div>
+              <div class="small-9 columns">
+                {% html_widget groupid node.pk property_order_list.0.1.2 %}
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- For Gender, DOB, Religion -->
+        <div class="row">
+          <div class="small-4 columns">
+            <div class="row">
+              <div class="small-3 columns">
+                <label for="{{property_order_list.0.1.3.name}}" class="right inline">
+                  {% blocktrans with label_val=property_order_list.0.1.3.altnames %} {{label_val}} {% endblocktrans %} 
+                </label>
+              </div>
+              <div class="small-9 columns">
+                {% html_widget groupid node.pk property_order_list.0.1.3 %}
+              </div>
+            </div>
+          </div>
+          <div class="small-4 columns">
+            <div class="row">
+              <div class="small-4 columns">
+                <label for="{{property_order_list.0.1.4.name}}" class="right inline">
+                  {% blocktrans with label_val=property_order_list.0.1.4.altnames %} {{label_val}} {% endblocktrans %}
+                </label>
+              </div>
+              <div class="small-8 columns">
+                {% html_widget groupid node.pk property_order_list.0.1.4 %}
+              </div>
+            </div>
+          </div>
+          <div class="small-4 columns">
+            <div class="row">
+              <div class="small-3 columns">
+                <label for="{{property_order_list.0.1.5.name}}" class="right inline">
+                  {% blocktrans with label_val=property_order_list.0.1.5.altnames %} {{label_val}} {% endblocktrans %} 
+                </label>
+              </div>
+              <div class="small-9 columns">
+                {% html_widget groupid node.pk property_order_list.0.1.5 %}
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- For Email-ID, Caste Category, Languages Known -->
+        <div class="row">
+          <div class="small-4 columns">
+            <div class="row">
+              <div class="small-3 columns">
+                <label for="{{property_order_list.0.1.6.name}}" class="right inline"> {{property_order_list.0.1.6.altnames}} </label>
+              </div>
+              <div class="small-9 columns">
+                {% html_widget groupid node.pk property_order_list.0.1.6 %}
+              </div>
+            </div>
+          </div>
+          <div class="small-4 columns">
+            <div class="row">
+              <div class="small-4 columns">
+                <label for="{{property_order_list.0.1.7.name}}" class="right inline">
+                  {% blocktrans with label_val=property_order_list.0.1.7.altnames %} {{label_val}} {% endblocktrans %} 
+                </label>
+              </div>
+              <div class="small-8 columns">
+                {% html_widget groupid node.pk property_order_list.0.1.7 %}
+              </div>
+            </div>
+          </div>
+          <div class="small-4 columns">
+            <div class="row">
+              <div class="small-3 columns">
+                <label for="{{property_order_list.0.1.8.name}}" class="right inline"> {{property_order_list.0.1.8.altnames}} </label>
+              </div>
+              <div class="small-9 columns">
+                {% html_widget groupid node.pk property_order_list.0.1.8 %}
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <br>
+        <!-- For other fields: 2 columns(6-6) -->
+        <div class="row">
+          <div class="small-6 columns">
+            <div class="row">
+              <div class="small-3 columns">
+                <label for="{{property_order_list.0.1.9.name}}" class="right inline">
+                  {% blocktrans with label_val=property_order_list.0.1.9.altnames %} {{label_val}}   (Max. Size Limit 40kb) {% endblocktrans %}
+                </label>
+              </div>
+              <div class="small-9 columns">
+                {% html_widget groupid node.pk property_order_list.0.1.9 %}
+              </div>
+            </div>
+          </div>
+          
+          <div class="small-6 columns">
+            <div class="row">
+              <div class="small-3 columns">
+                <label for="{{property_order_list.0.1.10.name}}" class="right inline">
+                  {% blocktrans with label_val=property_order_list.0.1.10.altnames %} {{label_val}}   (Max. Size Limit 200kb) {% endblocktrans %}
+                </label>
+              </div>
+              <div class="small-9 columns">
+                {% html_widget groupid node.pk property_order_list.0.1.10 %}
+              </div>
+            </div>
+          </div>
+        </div>  
+
+        <div class="row">
+          <div class="small-6 columns">
+            <div class="row">
+              <div class="small-3 columns">
+                <label for="{{property_order_list.0.1.11.name}}" class="right inline"> {{property_order_list.0.1.11.altnames}} </label>
+              </div>
+              <div class="small-9 columns">
+                {% html_widget groupid node.pk property_order_list.0.1.11 %}
+              </div>
+            </div>
+          </div>
+          
+          <div class="small-6 columns">
+            <div class="row">
+              <div class="small-3 columns">
+                <label for="{{property_order_list.0.1.12.name}}" class="right inline">
+                  {% blocktrans with label_val=property_order_list.0.1.12.altnames %} {{label_val}} {% endblocktrans %} 
+                </label>
+              </div>
+              <div class="small-9 columns">
+                {% html_widget groupid node.pk property_order_list.0.1.12 %}
+              </div>
+            </div>
+          </div>
+        </div>  
+
+
+        <!-- For Aadhar id -->
+        <div class="row">
+          <div class="small-6 columns">
+            <div class="row">
+              <div class="small-3 columns">
+                <label for="{{property_order_list.0.1.13.name}}" class="right inline"> {{property_order_list.0.1.13.altnames}} </label>
+              </div>
+              <div class="small-9 columns">
+                {% html_widget groupid node.pk property_order_list.0.1.13 %}
+              </div>
+            </div>
+          </div>
+        </div>  
+
+
+
+        <br>
+        <!-- Navigation buttons for tab -->
+        <div class="row tab-nav">
+          <div class="small-2 columns for-prev">
+          </div>
+          <div class="small-4 small-push-5 columns for-save">
+          </div>
+          <div class="small-2 small-offset-2 columns for-next">
+          </div>
+        </div>    
+      </div>
+
+      <!-- Address-Details tab //////////////////////////////////////////////////////////////////////// -->
+      <div class="content row" id="panel_{{property_order_list.1.1}}">
+        <br>
+        <!-- For fields: 2 columns(6-6) -->
+        <div class="row">
+          <div class="small-6 columns">
+            <div class="row">
+              <div class="small-3 columns">
+                <label for="{{property_order_list.1.1.0.name}}" class="right inline">
+                  {% blocktrans with label_val=property_order_list.1.1.0.altnames %} {{label_val}} {% endblocktrans %} 
+                </label>
+              </div>
+              <div class="small-9 columns">
+                {% html_widget groupid node.pk property_order_list.1.1.0 %}
+              </div>
+            </div>
+          </div>
+          
+          <div class="small-6 columns">
+            <div class="row">
+              <div class="small-3 columns">
+                <label for="{{property_order_list.1.1.1.name}}" class="right inline">
+                  {% blocktrans with label_val=property_order_list.1.1.1.altnames %} {{label_val}} {% endblocktrans %} 
+                </label>
+              </div>
+              <div class="small-9 columns">
+                {% html_widget groupid node.pk property_order_list.1.1.1 %}
+              </div>
+            </div>
+          </div>
+        </div>  
+
+        <div class="row">
+          <div class="small-6 columns">
+            <div class="row">
+              <div class="small-3 columns">
+                <label for="{{property_order_list.1.1.2.name}}" class="right inline">
+                  {% blocktrans with label_val=property_order_list.1.1.2.altnames %} {{label_val}} {% endblocktrans %} 
+                </label>
+              </div>
+              <div class="small-9 columns">
+                {% html_widget groupid node.pk property_order_list.1.1.2 %}
+              </div>
+            </div>
+          </div>
+          
+          <div class="small-6 columns">
+            <div class="row">
+              <div class="small-3 columns">
+                <label for="{{property_order_list.1.1.3.name}}" class="right inline">
+                  {% blocktrans with label_val=property_order_list.1.1.3.altnames %} {{label_val}} {% endblocktrans %} 
+                </label>
+              </div>
+              <div class="small-9 columns">
+                {% html_widget groupid node.pk property_order_list.1.1.3 %}
+              </div>
+            </div>
+          </div>
+        </div>  
+
+        <div class="row">
+          <div class="small-6 columns">
+            <div class="row">
+              <div class="small-3 columns">
+                <label for="{{property_order_list.1.1.4.name}}" class="right inline">
+                  {% blocktrans with label_val=property_order_list.1.1.4.altnames %} {{label_val}} {% endblocktrans %}
+                </label>
+              </div>
+              <div class="small-9 columns">
+                {% html_widget groupid node.pk property_order_list.1.1.4 %}
+              </div>
+            </div>
+          </div>
+          
+          <div class="small-6 columns">
+            <div class="row">
+              <div class="small-3 columns">
+                <label for="{{property_order_list.1.1.5.name}}" class="right inline">
+                  {% blocktrans with label_val=property_order_list.1.1.5.altnames %} {{label_val}} {% endblocktrans %}
+                </label>
+              </div>
+              <div class="small-9 columns">
+                {% html_widget groupid node.pk property_order_list.1.1.5 %}
+              </div>
+            </div>
+          </div>
+        </div>  
+
+        <div class="row">
+          <div class="small-6 columns end">
+            <div class="row">
+              <div class="small-3 columns">
+                <label for="{{property_order_list.1.1.6.name}}" class="right inline">
+                  {% blocktrans with label_val=property_order_list.1.1.6.altnames %} {{label_val}} {% endblocktrans %}
+                </label>
+              </div>
+              <div class="small-9 columns">
+                {% html_widget groupid node.pk property_order_list.1.1.6 %}
+              </div>
+            </div>
+          </div>
+        </div>  
+
+        <br>
+        <!-- Navigation buttons for tab -->
+        <div class="row tab-nav">
+          <div class="small-2 columns for-prev">
+          </div>
+          <div class="small-4 small-push-5 columns for-save">
+          </div>
+          <div class="small-2 small-offset-2 columns for-next">
+          </div>
+        </div>    
+      </div>
+
+      <!-- Educational-Details tab //////////////////////////////////////////////////////////////////// -->
+      <div class="content row" id="panel_{{property_order_list.0.2}}">
+        <fieldset>
+          <legend>12th details</legend>
+            <div class="row">
+              <div class="small-5 columns">
+                <div class="row">
+                  <div class="small-4 columns">
+                    <label for="{{property_order_list.2.1.0.name}}" class="right inline"> {% trans "Passing Year" %} </label>
+                  </div>
+                  <div class="small-8 columns">
+                    {% html_widget groupid node.pk property_order_list.2.1.0 %}
+                  </div>
+                </div>
+              </div>
+
+              <div class="small-7 columns">
+                <div class="row">
+                  <div class="small-3 columns">
+                    <label for="{{property_order_list.2.1.1.name}}" class="right inline"> {% trans "Passing Certificate" %} </label>
+                  </div>
+                  <div class="small-9 columns">
+                    {% html_widget groupid node.pk property_order_list.2.1.1 %}
+                  </div>
+                </div>
+              </div>
+            </div>
+        </fieldset>
+
+        <fieldset>
+          <legend>Graduation details</legend>
+            <div class="row">
+              <div class="small-5 columns">
+                <div class="row">
+                  <div class="small-4 columns">
+                    <label for="{{property_order_list.2.1.2.name}}" class="right inline"> {% trans "Degree Name" %} </label>
+                  </div>
+                  <div class="small-8 columns">
+                    {% html_widget groupid node.pk property_order_list.2.1.2 %}
+                  </div>
+                </div>
+              </div>
+
+              <div class="small-7 columns">
+                <div class="row">
+                  <div class="small-3 columns">
+                    <label for="{{property_order_list.2.1.3.name}}" class="right inline"> {% trans "Stream(Main Subject)" %} </label>
+                  </div>
+                  <div class="small-9 columns">
+                    {% html_widget groupid node.pk property_order_list.2.1.3 %}
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div class="row">
+              <div class="small-5 columns">
+                <div class="row">
+                  <div class="small-4 columns">
+                    <label for="{{property_order_list.2.1.4.name}}" class="right inline"> {% trans "Degree Year" %} </label>
+                  </div>
+                  <div class="small-8 columns">
+                    {% html_widget groupid node.pk property_order_list.2.1.4 %}
+                  </div>
+                </div>
+              </div>
+
+              <div class="small-7 columns">
+                <div class="row">
+                  <div class="small-3 columns">
+                    <label for="{{property_order_list.2.1.5.name}}" class="right inline"> {% trans "College" %} </label>
+                  </div>
+                  <div class="small-9 columns">
+                    {% html_widget groupid node.pk property_order_list.2.1.5 %}
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div class="row">
+              <div class="small-5 columns">
+                <div class="row">
+                  <div class="small-4 columns">
+                    <label for="{{property_order_list.2.1.6.name}}" class="right inline"> {% trans "Enroll. (or Roll) No." %}  </label>
+                  </div>
+                  <div class="small-8 columns">
+                    {% html_widget groupid node.pk property_order_list.2.1.6 %}
+                  </div>
+                </div>
+              </div>
+
+              <div class="small-7 columns">
+                <div class="row">
+                  <div class="small-3 columns">
+                    <label for="{{property_order_list.2.1.7.name}}" class="right inline"> {% trans "Registered for NSS?" %} </label>
+                  </div>
+                  <div class="small-9 columns">
+                    {% html_widget groupid node.pk property_order_list.2.1.7 %}
+                  </div>
+                </div>
+              </div>
+            </div>
+        </fieldset>
+
+        <fieldset>
+          <legend>Registration details</legend>
+            <div class="row">
+              <div class="small-6 small-offset-3 columns end">
+                <div class="row">
+                  <div class="small-4 columns">
+                    <label for="{{property_order_list.2.1.8.name}}" class="right inline"> {% trans "Date of Registration" %} </label>
+                  </div>
+                  <div class="small-8 columns">
+                    {% html_widget groupid node.pk property_order_list.2.1.8 %}
+                  </div>
+                </div>
+              </div>
+        </fieldset>
+
+        <br>
+        <!-- Navigation buttons for tab -->
+        <div class="row tab-nav">
+          <div class="small-2 columns for-prev">
+          </div>
+          <div class="small-4 small-push-5 columns for-save">
+          </div>
+          <div class="small-2 small-offset-2 columns for-next">
+          </div>
+        </div>    
+      </div>
+
+      <input type="hidden" id="name" name="name" value="">
+    </div>
+  </form>
+{% endblock %}
+
+{% block script %}
+  {{block.super}}
+
+  // Default settings for date-widgets on page load ----------------------------------------------------------------
+    var currentYear = (new Date()).getFullYear()
+    lowerYearLimit = currentYear - 30;
+
+  // Tabs navigation: Enable and Disable tabs in sequential manner using Next & Previous buttons -------------------
+    $(".content").on('click', '.tab_next' ,function(event){
+      event.preventDefault();
+
+      // Forcefully blur all input elements, so that mandatory fields become data-invalid if not fill
+      $(this).parents(".tab-nav").parents(".content").find(':input[required]').blur();
+
+      // Then check no. of data-invalid fields
+      // if count == 0, then only proceed to next tab
+      if($(this).parents(".tab-nav").parents(".content").find(':input[data-invalid]').length == 0) {
+        // Valid, move to next step
+        $('.active').removeClass('active').next().addClass('active');
+      }
+    });
+
+    $(".content").on('click', '.tab_prev' ,function(event){
+      event.preventDefault();
+      $('.active').removeClass('active').prev().addClass('active');
+    });
+
+  // Only keeping year's drop-down and hiding other datepicker's elements ------------------------------------------
+    $(document).on('focus click blur', '.date_year' ,function(){
+      $(".ui-datepicker-calendar").hide();
+      $(".ui-datepicker-month").hide();
+      $(".ui-datepicker-prev").hide();
+      $(".ui-datepicker-next").hide();
+      $("#ui-datepicker-div").position({
+        at: "center bottom",
+        my: "center top",
+        of: $(this)
+      }); 
+    });
+
+  // State-wise District selection ---------------------------------------------------------------------------------
+    // Disable District field, later on will be enabled after a state is selected
+    $("select#person_belongs_to_district").attr('disabled', 'disabled')
+
+    $("select#person_belongs_to_state").change(function() {
+      // Get selected State's value (ObjectId) and selected-index
+      selected_state_id = $(this).val()
+      selected_state_index = this.selectedIndex
+
+      if (selected_state_index != 0) {
+        // Perform this only when a State is selected
+        // Ajax call that fetches all Districts belonging to selected State
+        $.ajax({
+          url:"{% url 'get_districts' groupid %}",
+
+          data: {
+            state_id: selected_state_id
+          },
+
+          type: "GET",
+
+          dataType: "json",
+
+          complete: function () {
+            // Enable District field
+            $("select#person_belongs_to_district").removeAttr('disabled')
+          },
+
+          success: function (data) {
+            if (data.hasOwnProperty("message")) {
+              // Pops-up only when there is any error found during the ajax call
+              alert(data["message"])
+            }
+
+            else {
+              // First empty all values of District field (dropdown/select)
+              $("select#person_belongs_to_district").empty();
+
+              // Make very first entry as given below
+              $("select#person_belongs_to_district").append(
+                  $("<option></option>")
+                    .attr("value", "")
+                    .text("- - - Select district - - -")
+              );
+
+              // Fill returned district values based on which state is selected
+              $.each(data, function(i, value) {
+                $("select#person_belongs_to_district").append(
+                  $("<option></option>")
+                    .attr("value", value[0])
+                    .text(value[1])
+                );
+              });
+
+              // Set very first entry so that user doesn't forgets to select a value
+              $("select#person_belongs_to_district").prop("selectedIndex", 0);
+            }
+          }
+        });
+      }
+
+      else {
+        // If state is not selected or changed back to very first element from State's dropdown
+        // then set even District field's value to very first entry and disabled it until user again selects any state
+        $("select#person_belongs_to_district").prop("selectedIndex", 0);
+        $("select#person_belongs_to_district").attr('disabled', 'disabled')
+      }
+    });
+
+  // Tranferring values from multiple selection widget into outer dropdown -----------------------------------------
+    $(document).on('closed', '[data-reveal]', function () {
+      /*
+       *  On closing of reveal-modal
+       */
+      var widget_for = $(this).attr('id').replace('_modal', '')
+
+      // First empty all values of given field (dropdown/select)
+      $("select#" + widget_for).empty();
+
+      // Fetching class name of hidden input element(s) of drawer2 from corresponding drawer-widget
+      class_value = ".node_id." + widget_for + "_values"
+      right_drawer_len = $(class_value).size()
+
+      if (right_drawer_len > 0) {
+        $(class_value).each(function (){
+          // ObjectId & name of the resource inside drawer2 from corresponding drawer-widget
+          resource_id = $(this).val()
+          resource_name = $(this).attr('name')
+
+          // Make very first entry as given below
+          $("select#" + widget_for).append(
+              $("<option></option>")
+                .attr("value", resource_id)
+                .attr("selected", "selected")
+                .text(resource_name)
+          );
+        });
+      }
+
+      else {
+        // Make very first entry as given below
+        $("select#" + widget_for).append(
+            $("<option></option>")
+              .attr("value", "")
+              .text("- - - Select - - -")
+        );
+      }
+    });
+
+  // On click of Register/Update -----------------------------------------------------------------------------------
+    $(document).on("click", "#save-node", function() {
+    // Store concatenated value of first, middle & last name field's values into name field (hidden input field) ---
+      name = ""
+      first_name = $("#first_name").val().trim()
+      middle_name = $("#middle_name").val().trim()
+      last_name = $("#last_name").val().trim()
+
+      name = first_name
+      if (middle_name != "") {
+        name = first_name + " " + middle_name
+      }
+
+      if (last_name != "") {
+        name = name + " " + last_name
+      }
+
+      $("#name").val(name);
+
+    // Enable any disabled field as disabled values can't be fetched in views --------------------------------------
+      $(".content").find(":input[disabled]").each(function(){
+        $(this).removeAttr('disabled');
+      });
+    });
+{% endblock %}
+
+{% block document_ready %}
+  {{block.super}}
+
+  // Default settings for tabs, date-widgets & college-dropdown on page load ---------------------------------------
+    // upperYearLimit differs so set in respective places
+    // Tabs: Adding Next and Previous buttons for navigation -------------------------------------------------------
+      $(".content").each(function(i) {
+        totalTabs = $(".content").size() - 1
+
+        if (i != totalTabs) {
+          // Not in last tab
+          $(this).children(".tab-nav").children(".for-next")
+            .append("<input type='button' class='button small round tab_next' value='{% trans "Next" %}' />");
+        }
+
+        if (i == totalTabs) {
+          // Only in last tab
+          var is_existing_student = "{{node.pk|default_if_none:''}}";
+          var submit_btn_label = '{% trans "Register" %}' // By default considering registering a new student
+          if (is_existing_student) {
+            // If value (ObjectId) found, it means updating existing student record
+            submit_btn_label = '{% trans "Update" %}'
+          }
+          $(this).children(".tab-nav").children(".for-save")
+            .append("<input type='submit' id='save-node' class='small button expand' value='"+submit_btn_label+"' style='float:right;' />");
+        }
+
+        if (i != 0) {
+          // Not in first tab
+          $(this).children(".tab-nav").children(".for-prev")
+            .append("<input type='button' class='button small round tab_prev' value='{% trans "Previous" %}' style='float:right;' />");
+        }
+      });
+
+    // Settings for datepicker widget (with all) -------------------------------------------------------------------
+      $("#dob.date_month_day_year").datepicker({
+        changeMonth: true,
+        changeYear: true,
+        dateFormat: "dd/mm/yy",
+        yearRange: lowerYearLimit + ":" + (currentYear-14),
+        minDate: new Date(lowerYearLimit, 1 - 1, 1),
+        maxDate: new Date((currentYear-14), 11, 31),
+        defaultDate: new Date(lowerYearLimit, 1 - 1, 1)
+      });
+
+      $("#registration_date.date_month_day_year").datepicker({
+        changeMonth: true,
+        changeYear: true,
+        dateFormat: "dd/mm/yy",
+        yearRange: "" + lowerYearLimit + ":" + currentYear,
+        minDate: new Date(lowerYearLimit, 1 - 1, 1),
+        maxDate: '0',
+        defaultDate: '0'
+      });
+
+    // Signature Upload File Size Limit
+      $("#uploadBtn_signature").change(function() {
+        var max_size = 40
+        var fsize=this.files[0].size
+        fsize=fsize/1024
+        if(fsize<=max_size){
+          $('#uploadFile_signature').val(this.value);
+          }
+        else {
+          alert("Sorry. Max File Size Limit Exceeded");
+          $(this).val("")
+          $('#uploadFile_signature').val(this.value);
+        }
+      });
+    
+    // User photo Upload File Size Limit
+      $("#uploadBtn_user_photo").change(function() {
+        var max_size = 200
+        var fsize=this.files[0].size
+        fsize=fsize/1024
+        if(fsize<=max_size){
+          $('#uploadFile_user_photo').val(this.value);
+        }
+        else {
+          alert("Sorry. Max File Size Limit Exceeded");
+          $(this).val("")
+          $('#uploadFile_user_photo').val(this.value);
+        }
+      });
+
+    // Settings for datepicker widget (only for year) --------------------------------------------------------------
+      $(".date_year").datepicker({
+        changeYear: true,
+        dateFormat: 'yy',
+        yearRange: lowerYearLimit + ":" + currentYear,
+        minDate: new Date(lowerYearLimit, 1 - 1, 1),
+        maxDate: '0',
+        defaultDate: new Date(lowerYearLimit, 1 - 1, 1),
+
+        onClose: function(dateText, inst) {
+          $(this).val(dateText)
+        },
+
+        beforeShow: function() {
+          var year = $(this).val();
+          if (year) {
+            $(this).datepicker('option', 'defaultDate', new Date(year, 1, 1));
+            $(this).datepicker('setDate', new Date(year, 1, 1));
+          }
+        },
+
+        onChangeMonthYear: function(year, month, inst){
+          $(this).val(year)
+        }
+      });
+
+    // Retrieve group-name & match with list of college-names from dropdown ----------------------------------------
+      {% get_group_name groupid as group_name_tag %}
+      var group_name_str = "{{group_name_tag|safe}}";
+
+      $("#student_belongs_to_college option").each(function(){
+        // If group-name matches with that of college-name, 
+        // then select that college from drop-down and disable it
+        if (group_name_str.trim() == $(this).text().trim()) {
+          $(this).attr("selected", true);
+          $(this).parent().attr("disabled", "disabled");
+        }
+      });
+{% endblock %}

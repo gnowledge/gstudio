@@ -1,0 +1,192 @@
+{% load ndf_tags %}
+{% load i18n %}
+
+<!-- GApps Menubar -->
+
+<style type="text/css">
+/*#group-level-header li{
+background-color: red !important;
+}*/
+  /*.top-bar.app {
+    background-color: #10c1cb !important;
+    height: 45px;
+  }
+
+  .top-bar-section a.app{
+    background-color: #10c1cb !important;
+  }
+
+  .app.top-bar-section li:not(.has-form) a:not(.button) {
+    line-height: 40px;
+    margin-bottom: 5px;
+  }
+
+  .app.top-bar-section > ul.app> li > a{
+    text-transform: uppercase;
+  }
+
+  .app.top-bar-section .has-dropdown > a:after{
+    top: 20px;
+  }
+
+  .app.top-bar-section ul > li > a{
+    background-color: #10c1cb !important;
+  }
+
+  .app.top-bar-section ul > li > a:hover{
+    background-color: #0eacb5 !important;
+  }
+
+  .app.top-bar-section ul > li.active > a{
+    background-color: #0eacb5 !important;
+  }
+
+  .app.top-bar-section ul > li{
+    background-color: #0eacb5 !important;
+  }*/
+</style>
+
+<input type="hidden" value="{{newgroup}}">
+<!--
+<div class="medium-8 columns">
+  <div class="contain-to-grid">
+
+    <div class="top-bar app" data-topbar role="navigation">
+
+      <div class="top-bar-section app">
+     -->
+        <!-- <ul class="app button-group"> -->
+        <!-- <li class="divider"></li> -->
+          {% for index_key, app_dict in gapps.items %}
+
+            {% check_is_gapp_for_gstaff groupid app_dict request.user as gstaff_access_for_gapp %}
+            {% if gstaff_access_for_gapp %}
+
+              {% app_translations request app_dict as app_name %}
+
+              <!-- applying nested menu for [Page, File, Task, Event] GAPPS -->
+              {% if app_name|lower == "page" or app_name|lower == "file" or app_name|lower == "event" or app_name|lower == "task" or app_name|lower == "course" %}
+
+                <li class="has-dropdown {% comment %} Sets active class on active app{% endcomment %}
+                {% if app_dict.name|lower == selectedGapp|lower %} active
+                {% elif app_dict.id|safe == selectedGapp|safe %} active {% endif %}" style="background-color:red;">
+
+                  <a class="{{app_dict.name|title}} app" href="{% url app_dict.name|lower group_name_tag %}">
+                      {{app_name}}
+                  </a>
+                  {% if user_access == 'allow' %}
+
+                  <ul class="dropdown">
+
+                    <li>
+                      {% if app_name|lower == "page" %}
+                        <a href="{% url 'page_create_edit' group_name_tag %}">
+                      {% elif app_name|lower == "file" %}
+                        <a href="{% url 'uploadDoc' group_name_tag %}">
+                      {% elif app_name|lower == "task" %}
+                        <a href="{% url 'task_create_edit' group_name_tag %}">
+                      {% elif app_name|lower == "event" %}
+                        <a href="{% url 'event' group_name_tag %}">
+                      {% elif app_name|lower == "course" %}
+                        <a href="{% url 'create_edit' group_name_tag %}">
+                      {% endif %}
+                        {% if app_name|lower == "file"%}Upload{% else %}Create{% endif %} {{app_name}}
+                      </a>
+                    </li>
+
+                    <li>
+                      <a href="{% url app_dict.name|lower group_name_tag %}">List {{app_name}}</a>
+                    </li>
+
+                  </ul>
+                  {% endif %}
+
+                </li>
+
+              {% else %}
+
+                <li class="{% if app_dict.name|lower == selectedGapp|lower %} active {% elif app_dict.id|safe == selectedGapp|safe %} active {% endif %}">
+
+                    {% if app_name == "MIS" %}
+                      <a class="{{app_dict.name|title}} app" href="/{{group_name_tag}}/mis">
+                      {{app_name|upper}}
+                      </a>
+                    {% else %}
+                      <a class="{{app_dict.name|title}} app" href="{% url app_dict.name|lower group_name_tag %}">
+                      {% if app_name == "Term" %}
+                        Topic
+                      {% else %}
+                        {{app_name}}
+                      {% endif %}
+                      </a>
+                    {% endif %}
+
+                </li>
+
+              {% endif %}
+
+            {% endif %}
+
+          {% endfor %}
+        <!-- </ul> -->
+    <!--
+      </div>
+    </div>
+  </div>
+</div> -->
+
+<!-- ============= -->
+
+<script type="text/javascript">
+
+  function adjustGroupApps()
+  {
+
+    var $groupHeader = $("#group-level-header"),
+      groupHeaderWidth = $groupHeader.width();
+
+    var $groupRightUl = $("#group-search-update"),
+      groupRightUlWidth = $groupRightUl.width();
+
+    var $groupApps = $("#group-apps");
+
+    var availableWidth = groupHeaderWidth - groupRightUlWidth;
+    // console.log($("#group-search-update"));
+
+    var appTopBarWidth = groupHeaderWidth;
+
+    var allAppsArr = $groupApps.children("li");
+
+    var flagExtraMenu = false;
+
+    var allAppsTotWidth = 0;
+
+    allAppsArr.each(function(){
+      // console.log(this.offsetWidth)
+      allAppsTotWidth += this.offsetWidth;
+
+      if( flagExtraMenu || ((allAppsTotWidth + 150 + 150) > availableWidth))
+      {
+        if(!flagExtraMenu)
+        {
+          // extraMenuHtml = '<li class="has-dropdown not-click extra-menu"> <a class="Task app"> <b>. . .</b> </a> <ul class="dropdown"><li class="title back js-generated"><h5><a href="javascript:void(0)">Back</a></h5></li><li class="parent-link show-for-small"><a class="parent-link js-generated"> Task </a></li> </ul> </li>'
+          var extraMenuHtml = '<li class="has-dropdown extra-menu"> <a> <b>. . .</b> </a> <ul class="dropdown"></ul> </li>';
+          $(this).before(extraMenuHtml);
+          $(".extra-menu > ul.dropdown").append(this);
+        }
+        else
+        {
+          $(".extra-menu > ul.dropdown").append(this);
+        }
+
+        flagExtraMenu = true;
+      }
+
+    });
+
+    // $(document).foundation('topbar', 'reflow');
+  }
+
+  adjustGroupApps();
+
+</script>

@@ -1,0 +1,410 @@
+{% extends "ndf/mis_base.html" %}
+{% load i18n %}
+{% load ndf_tags %}
+{% load pagination_tags %}
+
+{% block head %}  
+
+  <!-- Scripts required for D3 graph -->
+  <script type="text/javascript" src="/static/ndf/bower_components/d3/d3.min.js"></script> <!-- checked -->
+  <script type="text/javascript" src="/static/ndf/bower_components/underscore/underscore.js"></script> <!-- checked -->
+  <script type="text/javascript" src="/static/ndf/bower_components/FileSaver/FileSaver.js" ></script> <!-- checked -->
+
+{% endblock %}
+
+
+{% block body_content %} 
+
+<div id="view_event">
+  {% if user.is_authenticated %}
+  <a id="toggle-shelf" class="right-off-canvas-toggle right" ><i class='fi-book-bookmark'></i></a> 
+  {% endif %}
+
+  <header class="row event">
+    <section class="medium-12 columns" >
+      <h2>
+        <span class='node'>{{node.name}}
+        {% if "Student" in node.member_of_names_list %}
+          - {{node.enrollment_code}}
+        {% endif %}
+        </span>
+<!--         <small class="label-list"> 
+        {% for tag in node.tags %}
+        <a href="{% url 'tag_info' groupid tag %}"><span class="label">{{tag}}</span></a>
+        {% endfor %}
+        </small>      
+ -->
+      </h2>
+
+      <dl class="row tabs" data-tab data-options="deep_linking:true">
+        {% for tab_details in property_order_list %}
+        <dd {% if forloop.counter == 1 %}class="active"{% endif %} title="Click here to see {{tab_details.0}} details.">
+          <a href="#panel_{{tab_details.0}}">{{tab_details.0}}</a>
+        </dd>
+        {% endfor %}
+
+        <dd><a href="#view-scheduler-calendar"><i class="fi-calendar"></i> Events </a></dd>
+
+        <!-- <dd><a href="#view-page"><i class="fi-eye"></i> Read</a></dd> -->
+
+        <dd>
+          <a href="#" data-dropdown="graph-hover" data-options="is_hover:true"><i class="fi-share"></i>{% trans "Graph " %}</a>
+          <ul id="graph-hover" class="f-dropdown" data-dropdown-content>
+            <li><a href="#view-concept-graph" data-reveal-id="view-concept-graph">{% trans "Concept Graph " %}</a></li>
+            <li><a href="#view-collection-graph" data-reveal-id="view-collection-graph">{% trans "Collection Graph " %}</a></li>
+            <li><a href="#view-dependency-graph" data-reveal-id="view-dependency-graph">{% trans "Dependency Graph " %}</a></li>
+          </ul>
+        </dd>
+
+        <dd><a href="#view-map-widget" data-reveal-id="view-map-widget"><i class="fi-marker"></i> {% trans "Location " %}</a></dd>
+
+        <dd><a href="#view-comments"><i class="fi-comment"></i> {% trans "Discuss " %}</a></dd>
+      </dl>
+
+    </section>
+  </header>
+
+  <div class="row">
+
+    <section class="medium-9 columns">
+
+      <div class="tabs-content">
+
+        {% for tab_name, tab_fields_list in property_order_list %}
+        <div class="{% if forloop.counter == 1 %}active {% endif %}content row" id="panel_{{tab_name}}">
+          {% for field in tab_fields_list %}
+          <div class="row">
+            <div class="small-4 columns"> 
+              <label>{{field.altnames}}</label>
+            </div>
+            <div class="small-7 end columns">
+              {% if field.altnames == "Caste" or field.altnames == "District" or field.altnames == "State" or field.altnames == "College ( Graduation )" %}
+                <label>{{field.value.0.name|title}}</label>
+              {% elif field.altnames == "Languages Known" %}
+                {% for each_lang in field.value %}
+                  <label>{{each_lang|title}}</label>
+                {% endfor %}
+
+              {% elif field.altnames == "College(s)" %}
+                {% for each_colg in field.value %}
+                  <label>{{each_colg.name}} </label>
+                {% endfor %}
+
+              {% elif field.altnames == "Volunteer to teach Course in College"  %}
+                {% for course_colg in field.value %}
+                  <label>{{course_colg.0.name|title}} - {{course_colg.1.name|title}}</label>
+                {% endfor %}
+
+              {% elif field.altnames == "Voluntary Teacher: Minimum qualifications requirement"  %}
+                {% for min_qual in field.value %}
+                  {% for key,val in min_qual.items %}
+                    <label>{{key|title}} 
+                    {% for reqd_qual in val %}
+                       - {{reqd_qual}}</label>
+                    {% empty %}
+                       - Not specified</label>
+                    {% endfor %}
+                  {% endfor %}
+                {% endfor %}
+              {% else %}
+                <label>{{field.value|title}}</label>
+              {% endif %}
+            </div>
+          </div>
+          <br>
+          {% endfor %}
+        </div>
+        {% endfor %}
+
+        <!-- Content for Calendar Widget -->
+        <div class="content" id="view-scheduler-calendar" >    
+        {% include "ndf/scheduler_calender.html" with app_set_instance_atlist=app_set_instance_atlist %}
+        </div>
+
+        <!-- Content for Concept Graph -->
+        <div class="content reveal-modal graph-div" id="view-concept-graph" data-reveal>
+          <a class="close-reveal-modal">&#215;</a>
+          {% include "ndf/graph_concept.html" %}
+        </div>
+        
+        <!-- Content for Collection Graph -->
+        <div class="content reveal-modal graph-div" id="view-collection-graph" data-reveal>    
+          <a class="close-reveal-modal">&#215;</a>
+          {% include "ndf/graph_collection.html" %}
+        </div>
+        
+        <!-- Content for dependency Graph -->
+        <div class="content reveal-modal graph-div" id="view-dependency-graph" data-reveal>    
+          <a class="close-reveal-modal">&#215;</a>
+          {% include "ndf/graph_dependency.html" %}
+        </div>
+        
+        <!-- Tab View Map Widget -->
+        <div class="content reveal-modal graph-div" id="view-map-widget" data-reveal>
+          <a class="close-reveal-modal" >&#215;</a>
+          {% include "ndf/map_widget.html" with mode="read" %}
+        </div>
+  
+      </div> <!-- End of class="tabs-content" -->
+  
+    </section>
+    <section class="medium-3 columns">
+    {% if "Student" in node.member_of_names_list %}
+      <div><input type="button" value="PRINT" class="print-btn small button"></div>
+    {% endif %}
+
+      <div class="panel">
+        <p>
+        {{ node.member_of_names_list.0 }} 
+        Edited {{ node.last_update|timesince }} ago by <a class="user" href="{% url 'dashboard' node.modified_by %}">{{node.user_details_dict.modified_by}}</a>
+        <br>
+
+<!--         <small>
+          <a href="#view-changes"><i class="fi-clock"></i> Versions </a>
+          {% for seq_no, version_no in node.version_dict.items|slice:"-6:" reversed %}
+          <abbr title="Version #{{version_no}}">
+            {% if forloop.last and forloop.counter > 5 %}
+            <a href="{% url 'node_version' group_name_tag node.pk version_no %}" style="padding-left:5px;">. . .</a>
+            
+            {% else %}
+            <a href="{% url 'node_version' group_name_tag node.pk version_no %}" style="padding-left:5px;">{{version_no}}</a>
+
+            {% endif %}
+          </abbr> 
+          {% endfor %}
+        </small>
+ -->
+      </p>
+      </div>
+
+      <!-- Start of Block: For listing Editing options --> 
+      {% check_is_gstaff groupid request.user as gstaff_access %}
+
+      {% edit_policy groupid node request.user as status %}
+      {% if user.is_authenticated and status == "allow" and gstaff_access %}
+
+        {% if app_name == "MIS" %}
+        <a href="{% url 'mis:mis_app_instance_edit' groupid app_id app_set_id node %}" class="small button split edit">
+        {% else %}
+        <a href="{% url 'mis-po:mis_app_instance_edit' groupid app_id app_set_id node %}" class="small button split edit">
+        {% endif %}
+          <i class="fi-pencil"></i> Edit <span data-dropdown="edit-options"></span>
+        </a>
+
+        <ul id="edit-options" class="f-dropdown">
+
+          <!-- This button publishes the drafted resource -->
+          <!-- {% comment %}
+          {% if node %}
+          {% get_publish_policy request groupid node as group_policy %}
+          {% if group_policy == "allow" %}
+          <li>
+            <a class="button small expand" href="{% url 'publish_page' group_name_tag node %}">Publish</a>
+          </li>
+          {% endif %}
+          
+          {% endif %}
+          {% endcomment %} -->
+
+          <!-- This button translates given resource -->
+          <!-- <li>
+            {% comment %}
+            <a class="button small expand" href="{% url 'node_translation' group_name_tag node %} ">Translate</a>
+            {% endcomment %}
+          </li> -->
+
+          <!--
+            * This button Adds/Uploads New resource
+            * Displayed 
+              - For Pages and Files
+              - In case of Groups/Author, only to the superuser
+          -->
+          <li>
+            {% if app_name == "MIS" %}
+            <a class="button small expand" href="{% url 'mis:mis_app_instance_create' groupid app_id app_set_id %}">
+            {% else %}
+            <a class="button small expand" href="{% url 'mis-po:mis_app_instance_create' groupid app_id app_set_id %}">
+            {% endif %}
+              <span class="fi-plus">&nbsp;&nbsp; New {{node.member_of_names_list.0}}</span>
+            </a>
+          </li>
+
+        </ul>
+
+      {% endif %}
+      <!-- End of Block: For listing Editing options --> 
+
+      <!-- <div>
+        Languages
+        <br></br>
+        {% comment %}
+        {% get_possible_translations node as tran %}
+        {% for each in tran %}
+          {% for k,v in each.items %}
+          <li><a href="{% url 'page_details' groupid k %}">{{v}}</a></li>
+          {% endfor %}
+        {% endfor %}
+        {% endcomment %}
+
+      </div> -->
+    </section>
+
+  </div>
+
+</div>
+<br>
+<div class="printable-data-div hide">
+  {% include "ndf/tiss_app_form.html" %}
+</div>
+{% endblock %}
+
+{% block script %}
+// <script type="text/javascript">
+$(document).on('click',".print-btn",function(){
+    printDiv("testing");
+    // printDiv("testing_2");
+  });
+function printDiv(divID) {
+    //Get the HTML of div
+    var divElements = document.getElementById(divID).innerHTML;
+    //Get the HTML of whole page
+    var oldPage = document.body.innerHTML;
+
+    //Reset the page's HTML with div's HTML only
+    document.body.innerHTML = "<html><body>" + divElements + "</body></html>";
+    //Print Page
+    document.body.style.marginLeft = '2rem';
+    document.body.style.marginRight = '2rem';
+    $("body table tbody tr td").css("lineHeight","0.125rem");
+    $("body .declration_td,.nss_reg_td").css("lineHeight","1.125rem");
+        
+    setTimeout(function(){
+       window.print();
+       document.body.innerHTML = oldPage;
+       document.body.style.marginLeft = '0rem';
+       document.body.style.marginRight = '0rem';
+       $("body table tbody tr td").css("lineHeight","1.125rem");
+       location.reload();
+    }, 5000);        
+}
+
+$(document).on('click',".checkedAll",function(){
+  if($(this).is(":checked")==true){
+    $('.objectsCheckbox input').prop( "checked", true );
+  }
+  else{
+    $('.objectsCheckbox input').prop( "checked", false );
+  }
+});
+
+$(document).on('click',".button.confirmDeleteObjects",function(){
+  var selectedobject = $(".objectsCheckbox input:checked")
+  $('#myModal').foundation('reveal', 'open');
+       // $('#myModal').foundation('reveal', 'close');
+       if(selectedobject.length > 0){
+         var i = 0;
+         var str = "";  
+         $.map(selectedobject,function(each){
+          if(i == 0){str = str.concat(each.parentElement.id)}
+            else {str = str.concat(","+each.parentElement.id)}
+              i= i+1
+          })
+
+         $.ajax({
+           url: "{% url 'deletion_instances' groupid %}",
+           type: 'POST',
+           data: {deleteobjects:str,csrfmiddlewaretoken: '{{ csrf_token }}',confirm:"yes"},
+           beforeSend: function() {     },
+           success: function(result){
+           },
+           complete: function(){ 
+            $('#myModal').foundation('reveal', 'close');
+          }
+        });
+         
+         $.map(selectedobject,function(each){
+          each.parentElement.parentElement.remove()
+        })
+         $('#myModal').foundation('reveal', 'close');
+
+         
+       }
+       else{
+        alert("select object to delete")
+      }
+
+    });
+
+$(document).on('click',".button.deleteObjects",function(){
+  var selectedobject = $(".objectsCheckbox input:checked")
+       // $('#myModal').foundation('reveal', 'close');
+       if(selectedobject.length > 0){
+         $('#myModal').foundation('reveal', 'open');
+
+//             var confirmed = confirm("Deleting "+selectedobject.length+" objects");
+//             if(confirmed == true){
+ var i = 0;
+ var str = "";  
+ $.map(selectedobject,function(each){
+  if(i == 0){str = str.concat(each.parentElement.id)}
+    else {str = str.concat(","+each.parentElement.id)}
+      i= i+1
+  })
+
+ $.ajax({
+   url: "{% url 'deletion_instances' groupid %}",
+   type: 'POST',
+   data: {deleteobjects:str,csrfmiddlewaretoken: '{{ csrf_token }}'},
+   beforeSend: function() {     },
+   success: function(result){
+    $("#deletion_results").html("");
+    for(var obj in result){
+      var ulist = $("<ul>"+"</ul>")
+      .attr("id","conceptlist")
+      .appendTo($("#deletion_results"));
+      var li = $("<li><b>"+result[obj].title+"</b></li>")
+      .appendTo(ulist);
+      var ulist1 = $("<ul>"+"</ul>")
+      .attr("id","conceptlist")
+      .appendTo(li);
+      for(var obj2 in result[obj].content){
+        object = result[obj].content[obj2]
+        for(var obj3 in  object){
+          for(var each in object[obj3]){
+            var li1 = $("<li>"+object[obj3][each]+"</li>")
+            .appendTo(ulist1);
+          }}
+        }
+      }
+
+    },
+    complete: function(){   }
+  });
+  //           }
+}
+else{
+  alert("select object to delete")
+}
+
+});
+
+$(document).on('click',".button.cancelDeleteObjects",function(){
+ $('#myModal').foundation('reveal', 'close');
+});
+
+$(document).foundation({
+  tab: {
+    callback : function (tab) {
+      // console.log(tab);
+    }
+  }
+});
+
+
+// script for showing map on appearance of overlay.
+$(document).on('opened', '#view-map-edit-widget[data-reveal], #view-map-widget[data-reveal]', function () {  
+  
+  map.invalidateSize();  
+});
+
+{% endblock %}	

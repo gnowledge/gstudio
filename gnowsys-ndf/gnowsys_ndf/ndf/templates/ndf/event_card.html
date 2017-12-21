@@ -1,0 +1,23 @@
+<div class="large-4 medium-6 small-12 columns">
+  {% if first_arg and second_arg and third_arg %}
+    <a href="{% url url_name first_arg second_arg third_arg %}{{search_url_text|safe}}">
+  {% elif first_arg and second_arg %}
+    <a href="{% url url_name first_arg second_arg %}{{search_url_text|safe}}">
+  {% elif first_arg %}
+    <a href='{% url url_name first_arg %}{{search_url_text|safe}}'>
+  {% endif %}
+
+      <div class="group_tile">
+
+        <span class="group-name">
+          {% firstof resource.altnames resource.name  %}
+        </span>
+
+        <p class="group_desc" title="{{resource.content}}">
+          {{resource.content|safe|striptags|truncatechars:150}}
+        </p>
+
+      </div>
+
+    </a>
+</div>

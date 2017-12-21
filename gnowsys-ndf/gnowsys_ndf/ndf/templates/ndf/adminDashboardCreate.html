@@ -1,0 +1,250 @@
+{% extends "ndf/base.html" %}
+{% load ndf_tags %}
+{% load i18n %}
+{% block title %} Admin {% endblock %}
+{% block meta_content %}
+		 {% ifequal url 'data' %}
+	{% get_class_list groupid class_name %}
+		 {% else %}
+				{% get_class_type_list groupid class_name %}
+		 {% endifequal %}
+{% endblock %}
+
+{% block body_content %} 
+<link rel="stylesheet" type="text/css" href="/static/ndf/orgitdown/skins/gstudio/style.css" />
+<script type="text/javascript" src="/static/ndf/bower_components/jquery-ui/jquery-ui.min.js"></script>
+<script type="text/javascript" src="/static/ndf/bower_components/jquery-ui/jquery-ui.js"></script>
+
+<form method="post" action="" name="{{class_name}}" id="{{class_name}}">
+{% csrf_token %}
+{% if translate %}
+<div class="large-12 columns">
+<table class="large-6 columns">
+<div class="row">
+<div class="large-6 columns text-center">{{node.language|default_if_none:"en"}}</div>
+
+<div class="large-6 columns">
+<select name="lan" id="lan">
+{% get_language_info_list for LANGUAGES as languages %}
+{% for language in languages %}
+<option value={{ language.code }}>{{ language.name }}</option>
+{% endfor %}
+</select>
+</div>
+<hr style="height:5px;background-color: #0B6580;" />
+</div>
+</table></div>
+{% endif %}
+<h2> {{node.name}}</h2>
+<div style="display:table;  border:1px;   border-spacing:15px; " class="small-12 columns">
+{% for list in definitionlist %}
+{% if translate %}
+{% if list == "name" or list == "inverse_name" %}
+<div style="display:table-row;">
+			<div style="display:table-cell;"> 
+			<font size="3"> {{list}} </font> 
+			</div>
+{% get_input_fields class_structure|get_dict_item:list list translate  %}
+</div>
+{% endif %}
+{% endif %}
+	
+{% endfor %}
+</div>
+{% if translate %}
+<div style="display:table; display:none; border:1px; border-spacing:15px;" class="small-12 columns">
+{% else %}
+<div style="display:table; border:1px; border-spacing:15px;" class="small-12 columns">
+
+{% endif %}
+
+<dl class="accordion" data-accordion>
+	<dd class="accordion-navigation">
+		<a href="#definitionlist">Definition</a>
+		<div id="definitionlist" class="content active">
+		{% for dl in definitionlist %}
+		{% for key,list in dl.iteritems %}
+		{# {% for key,list in definitionlist %} #}
+			{% if translate and key != "language" %}
+			<div style="display:table-row;">
+				<div style="display:table-cell;"> 
+					<font size="3"> {{list}} </font> 
+				</div>
+	{% get_input_fields class_structure|get_dict_item:key key translate  %}
+
+	{% if key in  required_fields %}
+	<div style="display:table-cell;">
+					<font size="3" color="red"> * </font>
+					<font id="{{key}}_required" style="display:none" color="red">This field required</font>
+				</div>
+				{% endif %}
+			</div>
+			{% endif %}
+			
+			{% if not translate %} <!--Used when the page is not translated -->
+			<div class='boxes' style="display:table-row;">
+				<!--
+				<div style="display:table-cell;" title="{% for key,value in help_tip.iteritems %}{% if list == key %}{{value}}{% endif %}{% endfor %} " class='box' > 
+					<span><font size="3"> {{list}} </font> </span> -->
+				{# <div style="display:table-cell;" title="{% for key2,value in help_tip.iteritems %}{% if key == key2 %}{{value}}{% endif %}{% endfor %} "  class="scard-image" > #}
+				<div style="display:table-cell;" >
+					<span data-tooltip aria-haspopup="true" class="has-tip" data-disable-hover="false" tabindex="1" title="{% for key2,value in help_tip.iteritems %}{% if key == key2 %}{{value}}{% endif %}{% endfor %}">
+					<font size="3"> {{list}} </font> </span>
+				</div>
+				{% get_input_fields class_structure|get_dict_item:key key translate  %}
+				{% if key in  required_fields %}
+				<div style="display:table-cell;">
+					<font size="3" color="red"> * </font>
+					<font id="{{key}}_required" style="display:none" color="red">This field required</font>
+				</div>
+				{% endif %}
+			</div>
+			{% endif %}
+			{% endfor %}
+			{% endfor %}
+		</div>
+	</dd>
+	<dd class="accordion-navigation">
+		<a href="#contentlist">Content</a>
+		<div id="contentlist" class="content" >
+			{% for cl in contentlist %}
+			{% for key,list in cl.iteritems %}
+			<div class="medium-12 columns">
+				{% include "ndf/html_editor.html" with var_name="content_org" var_placeholder="Enter the content here" var_value=node.content|default_if_none:"" node_id=node.pk ckeditor_toolbar="GeneralToolbar" %}
+			</div>
+			{% endfor %}
+			{% endfor %}
+	{# <!--{% include "ndf/add_editor.html" with var_name="content_org" var_placeholder="Enter the content here" var_value=node.content_org|default_if_none:"" node_id=node.pk %} --> #}
+<!--			<script type="text/javascript">
+	$(".orgitdown .orgitdownButton1 a").css({"background-image":'url("/static/ndf/orgitdown/skins/gstudio/images/bold.png")','background-color':'#EEEEEE','background-position':'center center','background-repeat':'no-repeat'});
+	$(".orgitdown .orgitdownButton2 a").css({"background-image":'url("/static/ndf/orgitdown/skins/gstudio/images/italic.png")','background-color':'#EEEEEE','background-position':'center center','background-repeat':'no-repeat'});
+	$(".orgitdown .orgitdownButton3 a").css({"background-image":'url("/static/ndf/orgitdown/skins/gstudio/images/stroke.png")','background-color':'#EEEEEE','background-position':'center center','background-repeat':'no-repeat'});
+	$(".orgitdown .orgitdownButton4 a").css({"background-image":'url("/static/ndf/orgitdown/skins/gstudio/images/list-bullet.png")','background-color':'#EEEEEE','background-position':'center center','background-repeat':'no-repeat'});
+	$(".orgitdown .orgitdownButton5 a").css({"background-image":'url("/static/ndf/orgitdown/skins/gstudio/images/list-numeric.png")','background-color':'#EEEEEE','background-position':'center center','background-repeat':'no-repeat'});
+	$(".orgitdown .orgitdownButton6 a").css({"background-image":'url("/static/ndf/orgitdown/skins/gstudio/images/picture.png")','background-color':'#EEEEEE','background-position':'center center','background-repeat':'no-repeat'});
+	$(".orgitdown .orgitdownButton7 a").css({"background-image":'url("/static/ndf/orgitdown/skins/gstudio/images/link.png")','background-color':'#EEEEEE','background-position':'center center','background-repeat':'no-repeat'});
+	$(".orgitdown .orgitdownButton8 a").css({"background-image":'url("/static/ndf/orgitdown/skins/gstudio/images/html.jpeg")','background-color':'#EEEEEE','background-position':'center center','background-repeat':'no-repeat'});
+	$(".orgitdown .orgitdownButton9 a").css({"background-image":'url("/static/ndf/orgitdown/skins/gstudio/images/close.jpeg")','background-color':'#EEEEEE','background-position':'center center','background-repeat':'no-repeat'});
+	$(document).ready(function(){
+		var temp_var = "{{node.language|safe}}";
+	$('#lan option[value="'+ temp_var +'"]').remove();
+	{% if node %}
+	{% get_possible_translations node as translations %}
+	{% for each in translations %}
+	{% for k,v in each.items %}
+	$("#lan option[value={{v}}]").remove();
+	{% endfor %}
+	{% endfor %}
+	{% endif %}
+	});
+			</script> -->
+		</div>
+	</dd>
+	<dd class="accordion-navigation">
+		<a href="#dependencylist">Dependency</a>
+		<div id="dependencylist" class="content">
+			{% for dplt in dependencylist %}
+			{% for key,list in dplt.iteritems %}
+			<div style="display:table-row;" class='boxes' >
+	<!--<div style="display:table-cell;" title="{% for key2,value in help_tip.iteritems %}{% if key == key2 %}{{value}}{% endif %}{% endfor %} " class='box' > -->
+	<div style="display:table-cell;" >
+		<span data-tooltip aria-haspopup="true" class="has-tip" data-disable-hover="false" tabindex="1" title="{% for key2,value in help_tip.iteritems %}{% if key == key2 %}{{value}}{% endif %}{% endfor %}" >
+		<font size="3"> {{list}}</font></span>  
+	</div>
+	{% get_input_fields class_structure|get_dict_item:key key translate  %}
+			</div>
+			{% endfor %}
+			{% endfor %}
+		</div>
+	</dd>
+	<dd class="accordion-navigation">
+		<a href="#options">Options</a>
+		<div id="options" class="content">
+			{% for op in options %}
+			{% for key,list in op.iteritems %}
+			<div style="display:table-row;" class='boxes' >
+				<!-- <div style="display:table-cell;" title="{% for key2,value in help_tip.iteritems %}{% if key == key2 %}{{value}}{% endif %}{% endfor %} " class='box' > -->
+				<div style="display:table-cell;"  > 
+					<span data-tooltip aria-haspopup="true" class="has-tip" data-disable-hover="false" tabindex="1" title="{% for key2,value in help_tip.iteritems %}{% if key == key2 %}{{value}}{% endif %}{% endfor %}" >
+					<font size="3"> {{list}}</font> </span>
+				</div>
+				{% get_input_fields class_structure|get_dict_item:key key translate  %}
+			</div>
+			{% endfor %}
+			{% endfor %}
+		</div>
+	</dd>
+</dl>
+</div>
+{# <input id="{{fields_name}}_type" type="hidden" name="{{fields_name}}" /> #}
+<!-- This input type creates hidden element for drawer_widget -->
+<input type="submit" name="submit" class="button" id="save-node-type" value="Submit">
+</form>
+<!-- {% if translate %}    -->
+<!-- <div class="text-right small-9"> -->
+<!-- {% if node %} -->
+<!--    Languages -->
+<!--       <br></br> -->
+<!--       {% get_possible_translations node as tran %} -->
+<!--       {% for each in tran %} -->
+<!--         {% for k,v in each.items %} -->
+<!--         <li><a href="{% url 'adminDesignerDashboardClassEdit' class_name k %}?translate=True">{{v}}</a></li> -->
+<!--         {% endfor %} -->
+<!--       {% endfor %} -->
+<!-- {% endif %} -->
+<!-- </div> -->
+
+<!-- {% endif %}lan -->
+
+{% endblock %}
+
+{% block script %}
+{% autoescape off %}
+	var required_fields = [];
+	required_fields = {{ required_fields }}
+
+	var index = required_fields.indexOf('_type');
+	if(index>-1){
+		 required_fields.splice(index, 1);
+	}
+	var flag = 0;
+	
+	{% endautoescape %}
+	
+	$("form").submit(function(event) {
+		flag = 0;
+		var memb = getSelValuesHiddenElement('member_of','{{class_name}}');
+		var meta = getSelValuesHiddenElement('meta_type_set','{{class_name}}');
+		var ats = getSelValuesHiddenElement('attribute_type_set','{{class_name}}');
+		var rts = getSelValuesHiddenElement('relation_type_set','{{class_name}}');
+		var typ = getSelValuesHiddenElement('type_of','{{class_name}}');
+		var prn = getSelValuesHiddenElement('prior_node','{{class_name}}');
+		<!--Above code calls widget_selector  -->
+		<!--for(each in type_list){-->
+		<!--	eval(type_list[each] + "()");-->
+		<!--} -->
+		<!-- this code was used to fetch drawer_widget code and then eval it. -->
+
+		for(reqfields in required_fields){
+			if($("#definitionlist [name = "+required_fields[reqfields]+" ]").val()){
+				$("#"+required_fields[reqfields]+"_required").hide();
+			}
+			else{
+				flag = 1;
+				$("#"+required_fields[reqfields]+"_required").show();
+			}
+		}
+		if(flag == 1)
+		{ 
+			alert( "* Mandatory fields. Please fill them, inorder to proceed. "); 
+			event.preventDefault();
+		}
+	});
+
+{% endblock %}	
+
+{% block head %} 
+<script type="text/javascript">
+var type_list = []
+</script>
+{% endblock %}

@@ -1,0 +1,90 @@
+{% extends "ndf/base.html" %}
+
+{% block body_content %} 
+<h1>Search</h1>
+<script type = "text/javascript" src = "/static/ndf/js/jquery2.js">
+</script>
+
+<form name="search_form" method="GET" action="{% url 'results' groupid %}">
+	{% csrf_token %}
+	Enter the value to be searched:
+	<input type="text" name="search_text" id="search_text">
+	<!--<input type="button" name="subButton" id="subButton" value="Submit" /> -->
+	<h5> Search by: </h5>
+	<input type="checkbox" name="search_fields" id="chk_name" value="name" />Name
+	<input type="checkbox" name="search_fields" id="chk_tags" value="tags" />Tags 
+	<input type="checkbox" name="search_fields" id="chk_content" value="contents" />Content <br>
+	Search particular user:	
+	<select name="users">
+		<option value="all">All users</option>
+		{% for mem in authors %}		
+			<option value="hello">{{ mem }} </option>
+  		{% endfor %}
+	</select>
+	<!--<input type="checkbox" name="add_filters" id="chk_tags" value="search_groups" />Search in my groups 
+	<input type="checkbox" name="add_filters" id="chk_content" value="sort_last_modified" />Sort by last modified <br>
+	-->
+	<input type="submit" name="subButton2" id="subButton2" value="Submit" />
+</form>
+<div id="results">
+
+</div>
+<script>
+	function getUrlVars() {
+	    var vars = {};
+	    var parts = window.location.href.replace(/[?&]+([^=&]+)=([^&]*)/gi, function(m,key,value) {
+		vars[key] = value;
+	    });
+	    return vars;
+	}
+
+	var search_key = getUrlVars()["search_text"];
+	$('#search_text').val(search_key);
+</script>
+<script>
+	$(document).ready(function() {
+				alert("{{ authors }}");
+				var html_div = "<h3> Search by name:<br></h3><ul>";
+				function parse_data(sData) {
+					var a = sData.name.length;
+					for (i=0; i<a; i++) {
+						html_div += "<li>";
+						html_div += sData.name[i].name;
+						html_div += "</li>";										
+					}
+					html_div += "</ul><br>";
+				
+					html_div += "<h3> Search by tags:<br></h3><ul>";
+					a = sData.tags.length;
+					for (i=0; i<a; i++) {
+						html_div += "<li>";
+						html_div += sData.tags[i].name;
+						html_div += "</li>";										
+					}
+					html_div += "</ul><br>";
+
+					html_div += "<h3> Search by content:<br></h3><ul>";
+					a = sData.content.length;
+					for (i=0; i<a; i++) {
+						html_div += "<li>";
+						html_div += sData.content[i].name;
+						html_div += "</li>";										
+					}
+					html_div += "</ul>";
+				
+					html_div += "<h3> Search by"+ author +":<br></h3><ul>";
+					a = sData.user.length;
+					for (i=0; i<a; i++) {
+						html_div += "<li>";
+						html_div += sData.user[i].name;
+						html_div += "</li>";										
+					}
+					html_div += "</ul>";
+					alert(html_div);
+					$("#results").html(html_div);			
+			}
+
+	});
+</script>
+
+{% endblock %}

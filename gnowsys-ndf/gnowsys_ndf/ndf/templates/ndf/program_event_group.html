@@ -1,0 +1,42 @@
+{% extends "ndf/event_base.html" %}
+{% load i18n %}
+{% load ndf_tags %}
+{% block title %} Event {{node.name}} {% endblock %}
+{% block style %}
+{{block.super}}
+{% endblock %}
+
+{% block meta_content %}
+  <h3 class="subheader">{{node.name}}</h3>
+  <a href="{% url 'program' parent_groupid_of_pe %}" class="tiny button radius"> {% trans "All Events" %}</a>
+
+  {% check_is_gstaff groupid request.user as is_gstaff %}
+  {% if is_gstaff %}
+    <span><a class="tiny button radius" href="{% url 'page_create_edit' node.pk %}?program_res=True">{% trans "Add Page" %}</a></span>
+
+    <a class="tiny  button radius" href="{% url 'all_under_moderation' node.pk %}">
+      {% trans 'Moderation Status' %}
+    </a>
+  {% comment %}
+  {% else %}
+  {% user_access_policy node.pk request.user as user_access %} 
+  {% if user_access == "allow" %}
+    <span data-tooltip title='Your file will go through moderation.'><a href="{% url 'uploadDoc' group_name_tag %}?program_res=True" class="tiny button radius">{% trans "Upload File" %}</a></span>
+  {% endif %}
+  {% endcomment %}
+  {% endif %}
+  
+  <div id="view_collection">
+    {% include "ndf/collection_ajax_view.html" %}  
+  </div>
+{% endblock %}
+
+
+{% block body_content %}
+{{block.super}}
+{% endblock %}
+
+{% block script %}
+{{block.super}}
+{% endblock %}
+

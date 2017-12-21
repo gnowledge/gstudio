@@ -1,0 +1,352 @@
+{% extends "ndf/base.html" %}
+{% load ndf_tags %}
+{% load i18n %}
+{% load cache %}
+
+{% cache 300 edit_forum request.LANGUAGE_CODE %}
+
+{% block title %}Edit Forum{% endblock %}
+
+{% block head %}
+    
+  <!-- <link rel="stylesheet" href="/static/ndf/css/foundation-datepicker.css"> 
+  <script src="/static/ndf/js/foundation-datepicker.js"></script>
+  -->
+  <!-- Datetimepicker  -->
+  <!-- <link rel="stylesheet" media="all" type="text/css" href="/static/ndf/css/jquery-ui.css" /> -->
+   <!--  <link rel="stylesheet" media="all" type="text/css" href="http://code.jquery.com/ui/1.10.4/themes/smoothness/jquery-ui.css" />
+    <script src="/static/ndf/js/jquery-ui.js"></script>
+    <script src="/static/ndf/js/jquery-ui-sliderAccess.js"></script>
+    <script src="/static/ndf/js/jquery-ui-timepicker-addon.js"></script>
+    <link rel="stylesheet" href="/static/ndf/css/jquery-ui-timepicker-addon.css">
+   -->
+
+    <!-- orgitdown! -->
+  <script type="text/javascript" src="/static/ndf/orgitdown/jquery.orgitdown-foundation.js"></script>
+  <!-- orgitdown! toolbar settings -->
+  <script type="text/javascript" src="/static/ndf/orgitdown/skins/gstudio/set.js"></script>
+  <!-- orgitdown! skin -->
+  <link rel="stylesheet" type="text/css" href="/static/ndf/orgitdown/skins/gstudio/style.css" />
+
+  <style type="text/css">
+    /*    #save_form{ margin-top: 2em; }
+        .startDtInput, .endDtInput {box-shadow: 0 5px 5px #808080; width: 230px; }
+
+        .ui-widget{ font-family: inherit; font-size: inherit; }
+
+        .ui-corner-all{  border-radius: 0;  }
+
+        dt.ui_tpicker_minute_label { margin-bottom: 0; }
+
+        .ui-slider-horizontal { margin-top: 1em; }
+
+        .text-align-middle {  padding: 0.6em 1em 0 2em ;  }
+    */
+  </style>
+
+
+
+<script language="javascript" >
+
+function cancel(){
+
+	if(confirm("{% trans 'Are you sure you want to cancel edit'%}?"))
+	{
+		 history.go(-1);
+	}
+}
+
+</script>
+
+    <!-- <script type="text/javascript">
+      // $(document).ready(function(){
+
+      //     $('#startdate').fdatepicker();
+      //     $('#enddate').fdatepicker();
+
+      // });
+    </script> -->
+{% endblock %}
+
+
+{% block meta_content %}
+  {% blocktrans %}  <h3 class="subheader">Existing Discussion</h3>
+    <p class="text-justify subheader">Use a relevant topic for the <b>Forum</b> so that people interested can join the discussion.</p> {% endblocktrans %}
+{% endblock %}
+
+{% block body_content %} 
+    
+  <h2>{% trans "Edit forum: " %} {{forum.name}}</h2>
+  <hr/>
+
+  <form id="edit_forum" method="POST">
+  {% csrf_token %}
+
+    <!-- forum name   -->
+    <div class="row">
+      <div class="large-2 medium-4 columns "><h5><b>{% trans "Forum name:" %} </b></h5></div>
+      <div class="large-pull-4 large-6 medium-8 columns">
+        <input type="text" placeholder="{% trans 'Forum Name' %} " 
+        name="forum_name" id="forum_name" value="{{forum.name}}">
+        <label id="message" style="display:none; color:red"></label>
+      </div>
+    </div>
+    <br/><br/>
+
+    <!-- Date time -->
+    <!-- <h5><b>Select Date and Time:</b></h5>
+    <br/>        
+    <div class="row">
+        <div class="large-1 columns text-align-middle" >Start at:</div>
+        <div class="large-2 large-pull-9 columns"><input type="text" placeholder="Click to select datetime" id="startDtInput" name="startDtInput" /></div>
+    </div>
+        
+    <div class="row">
+        <div class="large-1 columns text-align-middle">End at: </div>
+        <div class="large-2 large-pull-9 columns"><input type="text" placeholder="Click to select datetime" id="endDtInput" name="startDtInput"/></div>
+    </div>
+    <br/><br/>
+ -->
+
+    <!-- Description org editor -->
+    <h5><b>{% trans "Description:" %}</b></h5>
+    <div class="row">
+      <div class="large-8 large-pull-4 large-offset-4 columns" 
+           style="padding:0 1.65em 0 1.4em;">
+
+        {% include "ndf/html_editor.html" with var_name="content_org" var_value=forum.content_org|default_if_none:"" node_id=forum.pk %}
+        <!-- <input type="hidden" id="nodes_list" value="{{nodes_list}}">                   -->
+        <!-- <input type="button" id="save_edit_cont" class="button" value="Save"> -->
+      </div>
+      <br/><br/>
+
+      <!-- Final Create forum button -->
+      <div class="large-8 columns">
+        <!-- <input type="submit" id="forum" value="Edit Forum" style="display:none"> -->
+        <input type="submit" id="forum" class="button tiny" value="{% trans 'Save' %} {% trans 'Forum' %}">
+	<input type="button" id="cancel_edit" class="button tiny" value="{% trans 'Cancel' %}" onclick="cancel()">
+      </div>
+
+    </div>
+ 
+  </form>
+
+  {% comment %}
+    <!--   <form id="create_forum" method="POST">
+      {% csrf_token %}
+
+        <div class="row">
+
+
+            <div class="large-4 columns">
+               <label>Name of the Forum</label>
+               <input type="text" id="forum_name" name="forum_name">
+               <div id="message" style="display:none; color:red"></div>
+           </div>
+     -->
+    <!--        <div class="large-4 small-2 columns">
+              <label>Description</label>
+     -->          <!-- #{#% include "ndf/loadeditor.html" %} -->
+
+              <!-- <textarea id="forum_edit_cont" type="hidden" value="" name="content_org" style="display:none"></textarea> -->
+    <!--       </div>
+        </div>
+
+        <div class="row">
+          <div class="large-4 columns">
+            <label>Start time:</label>
+            <div class="small-2 columns">
+             <label>Date:</label></div>
+             <div class="small-9 columns">
+                 <input type="text" class="span2" value="" id="startdate" data-date-format="mm/dd/yyyy" name="sdate">
+             </div>
+         </div>
+
+         <div class="large-4 columns">
+          <label>Hours:</label>
+          <input id="starthrs" type="text" name="shrs">
+      </div>
+      <div class="large-4 columns">
+          <label>Minutes:</label>
+          <input id = "startmts" type = "text" name = "smts">
+      </div>
+      </div>
+      <div class="row">
+          <div class="large-4 columns">
+           <label> End time:  </label>
+           <div class="small-2 columns"> 
+              <label>Date: </label>
+          </div>
+          <div class="small-9 columns"> 
+
+              <input type="text" class="span2" value="" id="enddate" data-date-format="mm/dd/yyyy" name="edate">
+
+          </div>
+      </div>
+
+      <div class="large-4 columns">
+          <label>Hours:</label>
+          <input id = "endhrs"  type = "text" name = "ehrs">
+      </div>
+      <div class="large-4 columns">
+       <label>Minutes:</label>
+       <input id = "endmts"  type = "text" name = "emts">
+      </div>
+      </div>
+
+      <input type="button" id="save_forum" class="btn btn-primary btn-large btn-block" value="Create Forum" onclick="saveforum()">
+
+      <input type="submit" id="forum" value="Create Forum" class="btn btn-primary btn-large btn-block" style="display:none">
+
+      <input type="hidden" id="nodes_list" value="{{nodes_list}}">            
+
+      </form>
+     -->
+  {% endcomment %}
+{% endblock %}
+{% endcache %}
+
+{% block script %}
+  var old_forum_name;
+  $("#node_search_form").parent().hide();
+
+  // method to provide autocomplete/intellisence of forum names
+
+  // orgitdown
+  $('#orgitdown').orgitdown(mySettings);
+
+
+  // for datetimepicker
+    
+  // startDtInput.val().trim()
+   
+    // var startDtInput = $("#startDtInput"),
+    //     endDtInput = $("#endDtInput");
+
+    // startDtInput.datetimepicker({ 
+
+    //   hourGrid: 6,
+    //   minuteGrid: 15,
+
+    //   onClose: function(dateText, inst) {
+
+    //     if (endDtInput.val() != '') {
+
+    //       var testStartDate = startDtInput.datetimepicker('getDate');
+    //       var testEndDate = endDtInput.datetimepicker('getDate');
+
+    //       if (testStartDate > testEndDate)
+    //         endDtInput.datetimepicker('setDate', testStartDate);
+
+    //     }
+    //     else {
+    //       endDtInput.val(dateText);
+    //     }
+    //   },
+    //   onSelect: function (selectedDateTime){
+    //     endDtInput.datetimepicker('option', 'minDate', startDtInput.datetimepicker('getDate') );
+    //   }
+    // });
+
+
+    // endDtInput.datetimepicker({ 
+    //   hourGrid: 6,
+    //   minuteGrid: 15,
+    //   numberOfMonths: 2,
+    //   onClose: function(dateText, inst) {
+    //     if (startDtInput.val() != '') {
+    //       var testStartDate = startDtInput.datetimepicker('getDate');
+    //       var testEndDate = endDtInput.datetimepicker('getDate');
+    //       if (testStartDate > testEndDate)
+    //         startDtInput.datetimepicker('setDate', testEndDate);
+    //     }
+    //     else {
+    //       startDtInput.val(dateText);
+    //     }
+    //   },
+    //   onSelect: function (selectedDateTime){
+    //     startDtInput.datetimepicker('option', 'maxDate', endDtInput.datetimepicker('getDate') );
+    //   }
+    // });
+
+    // function checkDay(){
+    //   console.log(this)
+    //   var testStartDate = startDtInput.datetimepicker('getDate');
+    //   var testEndDate = endDtInput.datetimepicker('getDate');
+
+    //   var d = new Date();
+    //   var weekday = new Array(7);
+    //   weekday[0]=  "Sunday";
+    //   weekday[1] = "Monday";
+    //   weekday[2] = "Tuesday";
+    //   weekday[3] = "Wednesday";
+    //   weekday[4] = "Thursday";
+    //   weekday[5] = "Friday";
+    //   weekday[6] = "Saturday";
+
+    //   var n = weekday[d.getDay()];
+    // }
+
+  $("#edit_forum").submit(function(event){
+    var name = $("#forum_name").val().trim().toLowerCase();
+    var nodes = {{nodes_list|safe}} 
+
+    if (name == old_forum_name && name != "")
+    {
+      
+    }
+    else if (name == ""){
+      $("#message").css("display", "block");
+      $("#message").text("{% trans 'Forum name cannot be empty' %}.");
+      event.preventDefault();
+    }
+    else
+    {
+      $("#message").css("display", "none");
+    }
+  });
+
+{% endblock %}
+
+{% block document_ready %}
+
+  /*
+
+
+   function saveforum(){
+      var name=$("#forum_name").val();
+      if (name=="" )
+      {
+        alert("{% trans 'Please enter forum name' %}");
+      }
+      else
+      {
+        $("#forum").trigger('click');
+      }
+    }
+    var forumn=$("#forum_name").val()
+    $("#forum_name").change(function(){
+      var name = $("#forum_name").val();
+      var nodes = $("#nodes_list").val();
+      if (name != forumn)
+      {
+      if (nodes.indexOf(name) > 0)  
+      {
+        $("#message").css("display", "block");
+        $("#message").html("Name '"+ name +"' already exist .. Please choose another name");
+        $("#forum_name").val("");
+      }
+      else
+      {
+        $("#message").css("display", "none");
+      }
+      }
+    });
+
+  */
+
+  old_forum_name = $("#forum_name").val()
+
+
+{% endblock %}
+

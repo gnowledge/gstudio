@@ -1,0 +1,215 @@
+{% extends "ndf/base.html" %}
+{% load ndf_tags %}
+{% load i18n %}
+{% block title %}{{thread.name}}{% endblock %}
+
+
+{% block head %}
+
+<style type="text/css">
+
+	.forum-summary{
+		background-color: #efefef;
+		box-shadow: 0px 2px 2px 2px lightgray;
+		margin: 2em 1em !important;
+		padding: 1em;
+		border : medium gray;
+		border-radius: 4px;
+	}
+
+	#content > p { color: #6F6F6F !important; /*font-size: inherit;*/  }
+
+	/*.forum-summary > div {  padding-top: 1em; }*/
+
+	.forum-summary .user {  font-size: 1.5em;}
+	.forum-summary .user i { border-radius: 50px; }
+
+	#maindiv
+	{
+		background-color:#E8E8E8 ;
+	}
+	/*#smalldiv*/
+	/*background-color:#F4F4F4;*/
+}
+.response_change{
+	margin-bottom:1px;
+	padding-left:25px;
+	padding-right:2px;
+	-moz-border-radius: 5px;
+	-webkit-border-radius: 5px;
+	border-radius: 5px;
+} 
+
+/*#content > p:first-of-type:before {
+display: block;
+content: "\201C";
+font-size: 80px;
+position: absolute;
+left: 15px;
+top: 30px;
+color: #7a7a7a;
+}
+
+*/
+</style>
+{% endblock %}
+
+
+{% block meta_content %}
+  {% if other_threads_list %}
+    <h3> &nbsp;
+	{% trans "Other Threads" %}</h3>
+    {% for each_thread in other_threads_list %}
+      <a href="/{{groupid}}/forum/thread/{{each_thread.0}}">
+      {{each_thread.1}}</a><br>
+    {% endfor %}
+  {% endif %}
+
+{% endblock %}
+
+
+{% block help_content %}
+<p>Threads are new ideas on the topic</p>
+<p>Here you can post reply to thread.</p>
+{% endblock %}
+
+
+{% block body_content %}
+{% get_group_name groupid as group_name_tag %}
+
+	  <div class="repository-title large-4 columns" >
+		<a href="/{{groupid}}/forum/{{forum}}" title="Forum Name" style="color:#D7D7D7!important;">
+			{{forum.name}}
+		</a>
+		</div>
+{% if thread %}
+  {% get_group_name groupid as group_name_tag %}
+
+		
+		<div title="Thread Name" class="repository-desc large-8 columns">{{thread.name}}</div><br>
+	
+        {% get_edit_url thread.pk as edit_url %}
+   
+	 {% if user.is_superuser or thread.created_by == user.id %}
+
+ <a href="{% url edit_url group_name_tag forum thread.pk %}" class="small button split edit"><i class="fi-pencil"></i>{% trans "Edit now" %}<span data-dropdown="edit-options"></span></a>
+    {% endif %}
+  
+      <ul id="edit-options" data-dropdown-content class="f-dropdown">
+            <li>
+
+            {% if thread.created_by == request.user.id %}
+      <a class="tiny alert button" href="{% url 'thread_delete' group_name_tag forum thread %}"onClick="return thread_del();" >{% trans "Delete" %}</a>
+
+      {% endif %}
+
+            </li>
+
+      </ul>
+             <div class="row forum-summary">
+		<div class="small-2 columns">
+			<a class="user"></a>
+			<br/><br/>
+			{% get_user_object thread.created_by as user_obj %}
+			<i>{{user_obj.username}}</i> <br/>
+			<small>{{thread.created_at|date:"D d M Y" }}</small>
+		</div>
+		<div class="small-10 columns">
+			<font size ="5">Thread: {{thread.name}} </font>
+
+				<!-- <hr style="margin:0.5rem 0;" /> -->
+				<br/><br/>      
+				<blockquote>
+					<!-- #{#{thread.content|default_if_none:"No description !!"}} -->
+					{{ thread.content|safe}}
+
+				</blockquote>
+		</div>
+	</div>
+	<hr/>
+
+
+	<!-- <div class="row"> -->
+		<!-- <div class="large-12 columns"> -->
+			
+			{% comment %}
+			<!-- <div id="maindiv" class="large-6 columns">
+				<font size ="6"  >Forum:     <a href="/{{groupid}}/forum/show/{{forum}}">
+					{{forum.name}}</a></font> </p>
+					<font size="5" color="green">{{thread.name}}</font>
+					{% with thread.content|safe as thread_content %}
+					<font size ="2" >{{thread_content}} </font>
+					{% endwith %}
+
+					{% get_user_object thread.created_by as user_obj %}
+					<small>
+						by:<a class="user" href="#" data-gnow="#337700">{{user_obj.username}}</a>
+					</small>
+					<small>
+						on:<strong>{{thread.created_at}}</strong>
+					</small>
+
+			</div>
+ -->
+ 			{% endcomment %}
+
+			<div id="smalldiv" >
+
+				{% if user.is_authenticated %}
+					{% if thread %}
+   							{% get_disc_replies thread.pk groupid global_disc_all_replies as all_replies %}
+							{% get_node thread.pk as thread_node_obj %}
+                        	{% include 'ndf/in-line-texteditor.html' with allow_to_comment="True" node=thread_node_obj var_name="content_org" ckeditor_toolbar="BasicToolbar" %}
+                    {% else %}
+                        {% get_disc_replies thread.pk groupid global_disc_all_replies as all_replies %}
+                        {% include 'ndf/in-line-texteditor.html' with allow_to_comment="True" var_name="content_org" ckeditor_toolbar="BasicToolbar" %}
+	                
+
+	                {% endif %}
+
+				{% endif %}
+
+			</div>
+		<!-- </div> -->
+	<!-- </div> -->
+	
+
+{% else %}
+<p>“This forum dosen't have any threads. Be the first to create a thread!”</p>
+
+{% endif %}
+{% endblock %}
+
+
+{% block script %}
+
+
+	// <script type="text/javascript">
+function thread_del()
+{
+var reply_count={{reply_count}};
+if (reply_count <= 0)
+{
+if (!window.confirm("Are you sure you want to delete this ?"))
+{
+  $("edit-options").class="f-dropdown";		
+  return false;
+}
+}
+else
+{
+
+alert("This forum has "+reply_count +" existing threads.Please remove them and try again.");
+$("edit-options").hide();
+return false;
+}
+
+}
+
+	$("#node_search_form").parent().hide();
+
+	$("#refreshthread button.button.large.postfix").removeClass("large");
+	// </script>
+
+{% endblock %}
+

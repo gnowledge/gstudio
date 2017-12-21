@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="utf-8"?>
+<package version="3.0" unique-identifier="BookId" xmlns="http://www.idpf.org/2007/opf">
+  <metadata xmlns:dc="http://purl.org/dc/elements/1.1/">
+    <dc:language>en</dc:language>
+    <dc:identifier id="BookId">DefaultId</dc:identifier>
+    <meta content="github.com/gnowledge/gstudio" name="gStudio version"/>
+    <meta property="dcterms:modified"></meta>
+  </metadata>
+  <manifest>
+  <item id="ncx" href="toc.ncx" media-type="application/x-dtbncx+xml"/>
+  <item id="nav.xhtml" href="Text/nav.xhtml" media-type="application/xhtml+xml" properties="nav"/>
+  <item id="foundation.css" href="Styles/foundation.css" media-type="text/css"/>
+  <item id="styles.css" href="Styles/styles.css" media-type="text/css"/>
+  <item id="video-js.css" href="Styles/video-js.css" media-type="text/css"/>
+  <item id="videojs-skin-color.css" href="Styles/videojs-skin-color.css" media-type="text/css"/>
+
+  <item id="assess-sizer.js" href="Misc/assess-sizer.js" media-type="text/javascript" />
+  <item id="jquery.min.js" href="Misc/jquery.min.js" media-type="text/javascript" />
+  <item id="video.js" href="Misc/video.js" media-type="text/javascript" />
+  <item id="photo-zoom.js" href="Misc/photo-zoom.js" media-type="text/javascript" />
+  </manifest>
+  <spine toc="ncx">
+    <itemref idref="nav.xhtml" linear="no"/>
+  </spine>
+  <guide>
+    <reference type="toc" title="Table of Content" href="Text/nav.xhtml"/>
+  </guide>
+</package>
+
+

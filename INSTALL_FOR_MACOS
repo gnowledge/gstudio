@@ -1,0 +1,99 @@
+1. Installing required packages and its dependencies
+ For installing pip: -Use the command easy_install pip
+     1)To install mongodb:-
+      
+      I.    Type the command brew install mongodb.
+      II.Create a path : mkdir /data/db.
+      III.  Use the command chown –R <username>/data/db.
+      IV.   To start the mongodb server use the command mongod.
+
+     2) To install virtualenv: -
+      I.  Use the command sudo pip install virtualenv
+         
+     3) To install git: -  
+      I. Use the command brew install git
+      II. To give the root permission to brew use:-
+           Sudo chown root/user/local/bin/brew
+
+     4) To install rcs: -
+      I.  Use the command sudo brew install rcs.
+
+     5) To install setuptools: -
+      I.  Use the command pip install setuptools
+
+     6) To install ffmpeg: -
+      I.  Use the command sudo brew install ffmpeg
+         
+     7) To install ffmpeg2theora: -
+      I. Use the command sudo brew install ffmpeg2theora
+      
+     8) To install libjpeg: -
+      I. Use the command sudo brew install libjpeg
+        
+     9) To install libmagic: -
+      I.  Use the command sudo brew install libmagic
+
+
+
+ 2. Get latest version of gstudio-mongokit -  
+Try one of the following commands:
+
+    (1) git clone git@github.com:gnowledge/gstudio.git  
+    (2) git clone https://github.com/gnowledge/gstudio.git
+
+3. Set up virtual environment for gstudio-mongokit
+
+    (1) cd gstudio
+    (2) virtualenv --system-site-packages .
+    (3) source bin/activate
+    (4) ./bin/pip install -r requirements.txt 
+
+   3.You may not find emacs24 in your repositories. In that case, satisfy the requirement by following these instructions:
+
+    (1) sudo add-apt-repository ppa:cassou/emacs
+    (2) sudo apt-get update
+    (3) sudo apt-get install emacs24 emacs24-el emacs24-common-non-dfsg
+
+        
+
+4. Installation of MathJax (required for rendering MathML symbols)
+   
+    (1) To install MathJax on your own server, download the
+        distribution from the following link:
+        "http://www.mathjax.org/download/" 
+
+    (2) Simply unzip the downloaded archive, rename it to 'mathjax'
+        (all in smallcaps) and put it under django-application's
+        "static" directory.
+
+5. To run "gstudio-mongokit" project, perform following steps: 
+
+    (1) Make sure you are in the virtualenv-folder and it's activated
+        (source bin/activate).  
+
+    (2) Move to folder where your "manage.py" file resides: cd gstudio/gnowsys-ndf 
+
+    (3) Start mongodb server: sudo service mongodb start 
+
+    (4) Run the following commands: 
+
+        (a) python manage.py initrcsrepo 
+
+        (b) python manage.py syncdb
+
+        (c) python manage.py filldb 
+
+        (d) python manage.py runserver 
+
+
+
+
+ 
+
+
+
+
+
+
+
+

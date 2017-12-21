@@ -1,0 +1,223 @@
+{% extends "ndf/node_details_base.html" %}
+{% load i18n %}
+{% load ndf_tags %}
+<!-- ///////////////////////////////////////////////////////////////////////////////////////// -->
+
+{% block title %} {{ node.name }} {% endblock %}
+
+<!-- ///////////////////////////////////////////////////////////////////////////////////////// -->
+{%block  style%}
+
+
+{%endblock%}
+{% block body_content %}
+
+{% if title %}
+<form data-abide id="form-edit-node" method="POST" action="{% url "theme_topic_create" groupid node.pk %}?translate=true">
+  {% else %}
+  <form data-abide id="form-edit-node" method="POST" action="">
+    {% endif %}
+    {% csrf_token %}
+    <script type="text/javascript">
+      $(document).ready(function(){
+        $("#lan option[value='{{node.language}}']").remove();
+        {% if node %}
+        {% get_possible_translations node as translations %}
+        {% for each in translations %}
+        {% for k,v in each.items %}
+
+        $("#lan option[value='{{v}}']").remove();
+
+        {% endfor %}
+        {% endfor %}
+        {% endif %}
+      });
+
+    </script>
+
+    <div class="large-12 columns">
+      <table class="large-6 columns">
+        <div class="row">
+          <div class="large-6 columns text-center">{{node.language|default_if_none:""}}</div>
+          <div class="large-6 columns">
+            <select name="lan" id="lan">
+              {% get_language_info_list for LANGUAGES as languages %}
+              {% for language in languages %}
+              <option value={{ language.code }}>{{ language.name }}</option>
+              {% endfor %}
+            </select>
+
+
+
+          </div>
+          <hr style="height:5px;background-color: #0B6580;" />
+        </div>
+      </table></div>
+   
+      
+      {% if not list1 %}
+
+      <div class="large-6 columns">
+
+        <div class="row">
+          <div class="medium-8 columns">
+            {% if "Theme" in node.member_of_names_list %}
+            <b>{% trans "Theme" %} :</b> {{node.name}}</br></br>
+            {% else %}
+            <b>{% trans "Page Name" %} :</b> {{node.name}}</br></br>
+            {% endif %}
+          </div>
+        </div>
+      </br>
+      <div class="row">
+        <div class="medium-8 columns">
+          {% if "Theme" not in node.member_of_names_list %}
+
+          <b>{% trans "Description" %}:</b> </br></br>
+          <div name="content" class="field left" >{{node.content_org|default_if_none:""}}</div>
+        </div></div></br>
+        <div class="row">
+          <div class="medium-8 columns">
+            <b>{% trans "Tags: " %}</b> </br></br>
+            {{node.tags|join:', '|default_if_none:""}}
+            {% endif %}
+
+          </div>
+
+        </div>
+
+
+      </div>
+
+      <div class="large-6 columns">
+        <div class="row">
+          <div class="medium-8 columns">
+            {% if "Theme" in node.member_of_names_list %}
+            <label style="font-weight: bold">{% trans "Theme" %}</label>
+            <input id="name_id" name="name" type="text" value="{{node.name}}" placeholder="Enter name..." required>
+            <small class="error">{% trans "Please give your page a descriptive name. It's helpful for others and for yourself." %}</small>
+            {% else %}
+            <label style="font-weight: bold">{% trans "Page Name" %}</label>
+            <input id="name_id" name="name" type="text" value="{{node.name}}" placeholder="Enter name..." required>
+            <small class="error">{% trans "Please give your page a descriptive name. It's helpful for others and for yourself." %}</small>
+            {% endif %}
+          </div>
+        </div>
+
+        <div class="row">
+          <div class="large-12 columns">
+            {% if "Theme" not in node.member_of_names_list %}
+
+            <label style="font-weight: bold">{% trans "Description" %}</label>
+
+            {% include "ndf/add_editor.html" with var_name="content_org" var_placeholder="Enter the content here" var_value=node.content_org|default_if_none:"" %}
+            {% endif %}
+          </div>
+        </div>
+
+        <div class="row">
+          <div class="large-6 columns">
+            {% if "Theme" not in node.member_of_names_list %}
+
+            <span data-tooltip class="has-tip" title="Tags help identify similiar work easily. You can add as many labels as you wish using a comma ','"><label style="font-weight: bold">{% trans "Tag" %}{{node.tags|pluralize|default_if_none:"s"}}</label>
+            </span>
+            <input type = "hidden" name="access_policy" value="{{node.access_policy}}">
+            <input id="tags_id" name="tags" type="text" value="{{node.tags|join:', '|default_if_none:""}}" placeholder="Separate tags with commas...">
+            {% endif %}
+
+          </div>
+        </div>
+
+
+        <div class="row" >
+          <div class="large-6 columns">
+            <input type="submit" id="save-node" value="Save as Draft And Preview" class="round button"/>
+          </div></div></div>
+        </form>
+
+      </div>
+
+
+
+      {% endif %}
+
+      
+      <div class="large-6 columns">
+        {% if list1 %}
+        {% for each in list1 %}
+        <div class="row">
+          <div class="medium-8 columns">
+            {% if "Theme" in each.member_of_names_list %}
+            <div class= "right">{% trans "Theme" %} </div>  {{each.name}}
+            <input type="hidden" id="name_id" name="name" value="{{node.name}}">
+            <input id="name_id" name="name_{{each}}" type="text" value="{{each.name}}" placeholder="Enter name..." required>
+            <small class="error">{% trans "Please give your page a descriptive name" %}. {% trans "It's helpful for others and for yourself" %}.</small>
+            {% else %}
+            {% if "theme_item" in each.member_of_names_list %}
+            <div class="right">{% trans "Theme Item" %}</div>   {{each.name}}
+            <input type="hidden" id="name_id" name="name" value="{{node.name}}">
+            <input id="name_id" name="name_{{each}}" type="text" value="{{each.name}}" placeholder="Enter name..." required>
+            <small class="error">{% trans "Please give your page a descriptive name" %}. {% trans "It's helpful for others and for yourself" %}.</small>
+            {% else %}
+            <div class="right">{% trans "Topic" %}</div>  {{each.name}}
+            <input type="hidden" id="name_id" name="name" value="{{node.name}}">
+            <input id="name_id" name="name_{{each}}" type="text" value="{{each.name}}" placeholder="Enter name..." required>
+            <small class="error">{% trans "Please give your page a descriptive name" %}.{% trans "It's helpful for others and for yourself" %} .</small>
+            {% endif %}
+            {% endif %}     
+          </div>
+        </div>
+      </br>
+      <div class="row">
+        {% if "Theme" not in each.member_of_names_list and "theme_item" not in each.member_of_names_list and "Topic" not in each.member_of_names_list %}
+
+        <div class="medium-8 columns">
+         {% trans "Description" %}: </br></br>
+         <div name="content" class="field left">{{each.content_org|default_if_none:""}</div>
+       </div></br>
+       {% endif %}
+     </div>
+
+     {% endfor %}
+
+   </div>
+   <div class="large-6 columns">
+    {% for each in list1 %}
+    <!-- <div class="row">
+      <div class="medium-8 columns"> -->
+        <!-- <input type="hidden" id="name_id" name="name" value="{{node.name}}">
+        <input id="name_id" name="name_{{each}}" type="text" value="{{each.name}}" placeholder="Enter name..." required>
+        <small class="error">Please give your page a descriptive name. It's helpful for others and for yourself.</small> -->
+     <!--  </div>
+    </div>
+ -->
+    <div class="row">
+      {% if "Theme" not in each.member_of_names_list and "theme_item" not in each.member_of_names_list and "Topic" not in each.member_of_names_list %}
+      <div class="large-12 columns">
+        <label style="font-weight: bold">{% trans "Description" %}</label>
+        {% with each as nodeobj %}
+        {% include "ndf/add_editor.html" with var_name=each  var_placeholder="Enter the content here" var_value=each.content_org|default_if_none:"" %}
+        {% endwith %}
+      </div>
+      {% endif %}
+
+    </div>
+
+    {% endfor %}
+    {% endif %}
+  </div>
+
+  <div class="row">
+    <div class="large-6 columns">
+      {% if not list1 %}
+      <input type="hidden" id="save-node" value="Save as Draft And Preview" class="button"/>
+      {% else%}
+      <input type="submit" id="save-node" value="Save as Draft And Preview"  class="button"/>
+      {% endif %}
+    </div></div></div>
+  </form>
+
+</div>
+
+{% endblock%}
+

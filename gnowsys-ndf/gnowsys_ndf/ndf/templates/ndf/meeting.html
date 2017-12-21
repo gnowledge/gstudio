@@ -1,0 +1,196 @@
+{% extends "ndf/base.html" %}
+{% load i18n %}
+{% load ndf_tags %}
+{% load pagination_tags %}
+{% get_group_name groupid as group_name_tag %}
+
+{% block title %} {{ title }} {% endblock %}
+
+{% block help_content %}
+  <p>
+    {% trans "Video chat." %}
+  </p>
+
+{% endblock %}
+
+{% block meta_content %}
+  <h2 class="subheader">{% trans "Meeting" %}</h2>
+{% endblock %}
+
+{% block search_content %}
+
+{% endblock %}
+
+{% block related_content %}
+  {% if user.is_authenticated %}
+  {% user_access_policy groupid request.user as user_access %}
+  {% if user_access == "allow" %}
+  <br/>
+  <div class="create card">
+    <div class="chat">
+      <br/>
+     <!-- <a class="button medium" href="https://chatb.org" target="Chatb"> --> 
+               	
+           
+      	<a class="button medium" href="https://chatb.org/#{{meetingid}}" target="Chatb"> 
+        <span class="start">&nbsp;&nbsp;{% trans "Start Meeting" %}</span>
+      </a>
+    </div>
+  </div>
+<div id="res">                                                                <!-- For adding the division of online members -->
+</div>
+<script>
+	
+	var aa={{online_users|safe}}                                               <!-- ramkarnani -->
+	k=aa.length
+	//var aa=[];
+	//var name={{request.user.username}}
+	//for (i=0;i<k;i++){
+	//		test = total_list[i];
+	//		test1=total_list[i].user.username;
+	//		if (test1.match(/name/))
+	//		{
+	//			 document.getElementById("aa").appendChild(test);
+	//		}
+	//	}
+	var str = "<table>"
+	str +="<th>Online</th>"
+	for (i=0; i<k; i++) {                                                     // for adding list of online member in html template
+			if (Number(aa[i].status) ==1) {
+			str+= "<tr><td>" + aa[i].user.username + "</td><td>" + "<img src='/static/ndf/images/dot.jpg' width=30em></td><td><input type='checkbox' name='invite' id= '"+ aa[i].user.username +"' value='invite'>Invite</td></tr>";
+	//		var nam = "#" + aa[i].user.username;
+	//		prev.push($(nam).prop('checked'));
+	//		alert("hey");
+		      }
+		   }
+	str += "</table>"
+	$("#res").html(str)
+	
+</script>
+
+
+  {% endif %}
+  {% endif %}
+{% endblock %}
+
+
+
+
+{% block body_content %}                                                                      <!-- ramkarnani -->
+<script>
+	$(document).ready(function(){
+		var size = $(window).height();
+		$("#ifrm").css("height",0.9*size);
+	});
+
+	$(window).resize(function(){
+		var size = $(window).height();
+		// alert(size);
+		$("#ifrm").css("height",0.9*size);
+	});
+
+
+</script>
+
+
+<iframe src="" name="Chatb" style="position:relative" id="ifrm" height="450em" width="100%" frameborder="1"> </iframe> 
+
+
+<script>
+
+
+	$(document).ready(function(){
+
+var timer,delay = 1000*10;
+
+timer = setInterval(function(){                             // Ajax call for getting refreshed list of online users after 1 minute 
+	$.ajax({
+		url:"{% url 'get_online_users' group_id %}",
+		dataType:'json',		
+		//data: '',
+		success: function(data){                                                                  <!-- ramkarnani -->
+		//console.log(JSON.stringify(data))
+		//alert("hello")
+		var aa= data;
+		//var aa=[];
+		//var name={{request.user.username}};
+		var prev=[];
+		k=aa.length;
+		//for (i=0;i<k;i++){
+		//	test = total_list[i];
+		//	test1=total_list[i].user.username;
+		//	if (test1.match(/name/))
+		//	{
+		//		 document.getElementById("aa").appendChild(test);
+		//	}
+		
+		var str = "<table>";
+		str+="<th>Online</th>"
+		
+		for (i=0; i<k; i++) {                                                     // for adding list of online member in html template
+			if (Number(aa[i].status) ==1) {
+				str += "<tr><td>" + aa[i].user.username + "</td><td><img src='/static/ndf/images/dot.jpg' width=30em></td><td><input type='checkbox' name='invite' id='"+ aa[i].user.username +"' value='invite'>Invite</td></tr>";
+
+				//prev[i]=false;
+				var nam = "#" + aa[i].user.username;
+				prev.push($(nam).prop('checked'));
+				//alert("heya");
+
+				
+  	      }
+	   }
+		str += "</table>"
+		//console.log(str);
+		//console.log(aa, "",k);
+		$("#res").html(str)
+	
+		for (i=0;i<k;i++){
+			var nam = "#" + aa[i].user.username;
+			if (prev[i]==true){
+				$(nam).prop('checked',true);
+
+			}
+		}
+	   
+		//alert(JSON.stringify(data));		
+	  }
+		});
+		
+        }, delay); 
+
+
+        
+        //getOnlineUsers();
+        });
+	var aa ={{online_users|safe}}
+	k=aa.length
+	for (i=0;i<k;i++){
+		var usr = aa[i].user.username;
+		var nam1 = "#" + usr;
+
+		$(nam1).click(function(){
+			// alert("check");
+			//console.log(nam1);
+			aaa = nam1;                                                                            <!-- ramkarnani -->
+			$.ajax({
+				url:"{% url 'invite_meeting' group_id meetingid %}",
+				dataType:'json',
+				data : { "usr": usr},			
+				
+				success: function(data){
+					//typeof(data);
+					//console.log(JSON.stringify(data));
+					//alert("hello");
+
+					}
+				});
+			});
+	}
+
+</script>
+
+
+
+
+
+{% endblock %}

@@ -1,0 +1,66 @@
+<h2 id="modalTitle">+ Add your buddy</h2>
+
+<a class="close-reveal-modal" aria-label="Close">&#215;</a>
+
+{# {% include 'ndf/widget_selector.html' with for='select_buddies' all_options=all_inst_users selected_options=buddies_id_list oneline_element='true' %} #}
+{% include 'ndf/widget_selector.html' with for='select_buddies' all_options=all_inst_users selected_options=buddies_id_list oneline_element='true' ajax_search=True ajax_url_name='search_authors' url_first_arg='group_id' url_second_arg='' %}
+
+<div class="button tiny expand" id="add-selected-buddies">Done !</div>
+
+<script type="text/javascript">
+	addBuddies = document.getElementById('add-selected-buddies');
+	addBuddies.onclick = saveBuddies;
+
+	function saveBuddies () {
+		var selectedBuddiesArr = getSelectedValues('select_buddies');
+		// console.log(selectedBuddiesArr)
+
+		$.ajax({
+			url: "{% url 'update_buddies' group_id %}",
+			type: 'POST',
+			data: {
+				selected_buddies_list: JSON.stringify(selectedBuddiesArr),
+				csrfmiddlewaretoken: '{{ csrf_token }}'
+			},
+			success: function (data) {
+				// console.log(data);
+				resultData = JSON.parse(data)
+				buddyOidNameObj = resultData['buddies'];
+				alreadyActiveIdNameObj = resultData['already_active'];
+
+				displayMsg = buddyUserNames = alreadyActiveUserNames = '';
+
+				for(var eachUserName in buddyOidNameObj){
+					// console.log(buddyOidNameObj[eachUserName]);
+					buddyUserNames += '\n- ' + buddyOidNameObj[eachUserName]
+				}
+
+				for(var eachUserName in alreadyActiveIdNameObj){
+					// console.log(alreadyActiveIdNameObj[eachUserName]);
+					alreadyActiveUserNames += '\n- ' + alreadyActiveIdNameObj[eachUserName]
+				}
+				// console.log(alreadyActiveUserNames);
+
+				if (alreadyActiveUserNames)
+				{
+					displayMsg += 'Following can not be your buddies (because they are already active on site, either as a buddy or as a logged in user):\n'
+					displayMsg += alreadyActiveUserNames;
+				}
+
+				if (buddyUserNames)
+				{
+					displayMsg += '\n\nCurrently, following are your buddies:\n'
+					displayMsg += buddyUserNames;
+				}
+				else
+				{
+					displayMsg += '\n\nCurrently, you have NO buddies:\n'
+				};
+
+				alert(displayMsg);
+				location.reload();
+			}
+		});
+
+	}
+</script>

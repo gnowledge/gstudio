@@ -1,0 +1,59 @@
+{% load ndf_tags %}
+{% load i18n %}
+{% load cache %}
+
+{% get_download_filename node as download_filename %}
+{% get_schema node as schema %}
+{% get_group_name groupid as group_name_tag %}
+{% get_gstudio_twitter_via as twitter_via %}
+{% check_is_gstaff groupid request.user as is_gstaff %}
+{#% get_gstudio_facebook_app_id as fb_app_id %#}
+
+ {% if 'image' in node.if_file.mime_type  %}
+       <center>
+        <div class="show-image">
+            <img  src="{{MEDIA_URL}}{{node.if_file.original.relurl}}" style="min-height:200px;" />
+          <figcaption style="position:relative;top:0;left:0" title="Click Here to View Image in Full Screen">
+              <a  target="_blank" href="{% url 'read_file' group_name_tag node.pk download_filename %}">
+                 View in Full Screen
+                 <i class="fi-projection-screen"> </i>
+            </figcaption>
+              </a>
+        </div>
+        </center>
+  
+  {% elif 'video' in node.if_file.mime_type %}
+                {% get_attribute_value node.pk 'has_transcript' as node_transcript %}
+                {% include 'ndf/widget_video_player.html' with video_obj=node %}
+
+  {% elif 'audio' in node.if_file.mime_type %}
+                {% get_attribute_value node.pk 'has_transcript' as node_transcript %}
+                {% include 'ndf/widget_audio_player.html' with audio_obj=node %}
+                 
+               <!--  <a  class="tiny button radius mod-btn" data-reveal-id="add_transcript{{node.pk}}"> {% trans "Add Transcript" %}</a>
+                <div id="add_transcript{{node.pk}}" class="reveal-modal" data-reveal style="position:absolute;"> 
+                  <a class="close-reveal-modal" aria-label="Close">&#215;</a>
+                  <textarea>{{node_transcript}}</textarea> 
+                  <input onclick="add_transcript_func(this)" type="button" class="tiny button radius add-trans" data-src ="{{node}}"   value="{% trans 'Add' %}">
+                  <input type="button" class="tiny button radius "  value="{% trans 'Cancel' %}">
+                </div>-->
+  {% elif 'html' in node.if_file.mime_type %}
+    <iframe id="html-res-iframe" width="100%" seamless="seamless" src="{{MEDIA_URL}}{{node.if_file.original.relurl}}">
+      <p>{% trans 'Your browser does not support the audio element' %} </p>
+    </iframe>  
+  {% elif 'pdf' in node.if_file.mime_type %}
+                <iframe width="100%" style="height:90vh;" src="/static/ndf/bower_components/pdfjs-build/generic/web/viewer.html?file={{MEDIA_URL}}{{node.if_file.original.relurl}}"></iframe>
+                <br/>
+                <center>
+                   <figcaption style="position:relative;top:0;left:0" title="Click Here to View Image in Full Screen">
+                       <a target="_blank" href="/static/ndf/bower_components/pdfjs-build/generic/web/viewer.html?file={{MEDIA_URL}}{{node.if_file.original.relurl}}">
+                      {% trans 'View in full screen' %} <i class="fi-projection-screen"> </i><a>
+                   </figcaption>
+                </center>
+
+                </a>
+  {% else %}
+                <a href="{% url 'read_file' group_name_tag node download_filename %}" download="{{ download_filename }}">
+                  {{node.name}}
+                </a>
+  {% endif  %}

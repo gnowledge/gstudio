@@ -1,0 +1,156 @@
+{% load ndf_tags %}
+{% load i18n %}
+{% block title %} <h4>{{author.name}}'s - {% trans "Preferences" %} </h4> {% endblock %}
+<hr>
+<style type="text/css">
+.resource-drawer {
+border-color: #D3D3D3; border-style: solid;
+padding: 0 !important;
+overflow-y: auto;
+}
+
+.resource-drawer li.bullet-item:hover{
+background-color: #ecf0f1; cursor:pointer;
+}
+
+.posted-by{ color: #808080; font-size: small; }
+
+.selected-resource { background-color:lightgray !important ; }
+
+.resource-type-image {
+height:40px;
+background-repeat:no-repeat; background-size: 48px 48px
+}
+</style>
+
+{% block body_content %}
+{% all_gapps as all_apps %}
+
+<dl class="accordion" data-accordion>
+<dd>
+<a id="forum_notif_pref" href="#preference">{% trans "Click here to turn off notification preferences for groups" %}</a>
+<div id="preference" class="content">
+
+<div class="small-8 columns" style="display:table; border:1px; border-spacing:10px;left:-40px;">
+<div style="display:table-row;">
+    <div style="display:table-cell">
+           <font size="5"> {% trans "Forum Notifications" %} </font>
+    </div>
+    <div style="display:table-cell">
+             <div id="options">
+                 <input type="radio" value="On" name="forum"><font size="4">{% trans "On" %}</font> &nbsp;
+
+                 <input type="radio" value="Off" name="forum"><font size="4">{% trans "Off" %}</font>
+              </div>
+    </div>
+</div> <!-- table row closes-->
+<div style="display:table-row;">
+   <div style="display:table-cell;">
+      {% trans "Select Groups:" %}
+  </div>
+</div>
+</div> <!-- div small-10 columns closes --> 
+
+     <div class="row" id="userpref">
+        {% include "ndf/drawer_widget.html" with widget_for="collection_set" %}
+              <div class="row">
+	        <input type="button" id="save_preference" class="button medium-12 columns" value="Save preferences">
+              </div>
+     </div>
+
+</div> <!-- class content closes -->
+</dd>
+</dl>
+{% endblock %}
+
+<script type="text/javascript">
+var data_prefs = "";
+var selected = "";
+var drawer2_empty=1;
+$(document).ready(function(){
+
+var a=$('input[name=forum]')[2].checked=true;
+selected="Off";
+});
+var checkoptions = document.getElementsByName('forum');
+$(document).on('click','#options',function(){
+selected=$('input[name=forum]:checked').val();
+});
+
+$(document).on('click',"#forum_notif_pref",function(){
+$('#userpref #collection_set_drawer1').html("");
+ $('#userpref #collection_set_drawer2').html("");
+ $('#userpref #collection_set_drawer1').html('<li class="price"><input type="text" placeholder="Type here to search in the resources" id="collection_set_search" class="margin-0"></li>');
+var url='/{{groupid}}/user_preference/'+'{{author}}';
+var data = {item:'forum',csrfmiddlewaretoken:'{{ csrf_token }}'};
+ $.getJSON( url, data,function( data ) {
+  $.each(data ,function(index , drawer_elements){
+  
+   if(index == 0)
+    {
+     $.each(drawer_elements.drawer1, function(index, element) {
+        $('#userpref #collection_set_drawer1').append("<li id='"+element.id+"' class='bullet-item text-left'>"+element.name+"</li>");
+      });
+   }
+   if(index == 1)
+    {
+    $.each(drawer_elements.drawer2, function(index, element) {
+        $('#userpref #collection_set_drawer2').append("<li id='"+element.id+"' class='bullet-item text-left'>"+element.name+"</li>");
+        drawer2_empty=0;
+      });
+    }
+
+ });
+   });
+
+});
+//$(document).on('click','#selectall',function(){
+//var lst=$('ul li.bullet-item text-left');
+//alert(lst.length);
+//});
+
+
+function get_status(){
+
+}
+
+function get_all_data(){
+ $.each($('#userpref #collection_set_drawer2 li'),function(index,item){
+         data_prefs=data_prefs+String(item.id)+",";
+         });
+}
+
+$(document).on('click','#save_preference',function(){
+get_all_data();
+var pref_to_set=data_prefs;
+var vurl='/{{groupid}}/user_preference/'+'{{author}}';
+if (selected=='Off'){
+     $.ajax({
+             url: vurl,
+             type: 'POST',
+             data: {pref_to_set:pref_to_set,csrfmiddlewaretoken: '{{csrf_token}}'},
+             beforeSend: function(){
+              $("#ajax_load_image").show();
+              $("#body").css({"opacity":"0.1",})
+                              },
+             success: function(data){
+                       alert("Successfully set preferences ");
+               },
+             complete: function(){
+                    $("#ajax_load_image").hide();
+                $("#body").css({"opacity":"",})
+
+          }
+
+          }); //end of ajax
+
+    } //end_of_if_selected()
+    else
+    {
+     if (drawer2_empty){
+          alert("choose off option to turn off notifications");
+        }
+    }
+}); //end_of_click_save_gapps
+
+</script>

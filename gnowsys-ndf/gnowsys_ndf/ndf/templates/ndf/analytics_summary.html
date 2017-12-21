@@ -1,0 +1,199 @@
+{% extends "ndf/base.html" %}
+{% load i18n %}
+{% load ndf_tags %}
+
+{% block title %}
+ 
+ {{"User Summary"}}
+ 
+ {% endblock %}
+
+<!-- The StyleSheet for headings and content-->
+{% block style %}
+    .recent_activities, .overall_activities {
+        width : 100%;
+        height : auto;
+        position : relative;
+        float : left;
+        margin : 10px 0px;
+        padding : 10px;
+        font-size : 30px;
+    }
+
+	.heading{
+		font-size: 15px;
+		font-weight: 900;
+	}
+	.content{
+		font-size: 30px;
+		font-weight: normal;
+		line-height: 40px;
+		position : relative;
+		float: left;
+	}
+
+	.content-small{
+		font-size: 20px;
+		font-weight: normal;
+		line-height: 40px;
+		position : relative;
+		float: left;
+	}
+
+	.element{
+		float: left;
+		position: relative;
+		width: 30%;
+        border : 1px solid #ddd;
+        margin : 10px;
+        padding : 10px;
+        background-color : #f1f1f1;
+        border-radius : 2px;
+	}
+ 
+	.cate {
+		width: 100%;
+		border-bottom : 1px solid #ddd
+	}
+	.panel {
+        border-style: solid;
+        border-width: 1px;
+        border-color: #c6f8fb;
+        margin-bottom: 1.25rem;
+        padding: 1.25rem;
+        background: #f9feff;
+        color: #333333;
+      }
+      .tabs{
+    font-size: 18px;
+    }
+	.link-handle {
+		postion : relative;
+		float : left;
+		line-height : 48px;
+		font-size : 20px;
+	}
+
+{% endblock %}
+
+{% block meta_content%}
+    <div>
+        <header>
+            <a href="/{{group_id}}/analytics/group/list_activities/">
+                <h2 class="subheader">User Analytics</h2>
+            </a>
+        </header>
+
+        <!-- Meta content in the (main aside header)-->
+        <section>
+            <div>
+                <div class="panel" style="background-color:#ddd;">
+                    <ul class="side-nav">
+                        
+        <!-- summary -->
+        	<div class="tabs">
+            <a href="/{{group_id}}/analytics/summary/">
+                 Summary
+            </a>
+            </div>
+        
+
+        <br><br>
+
+        <!-- activities -->
+        	<div class="tabs">
+            <a href="/{{group_id}}/analytics/list_activities/">
+               
+                Activities
+          	</a>
+          	</div>
+
+        <br><br>
+ 
+        
+        </ul>
+  </div>
+
+                </div>
+              </section>
+
+              <div>
+                  
+              </div>
+            </div>
+{% endblock %}
+
+{% block body_content %}
+
+<div class="overall_activities">
+	<div class="cate">Overall Activities</div>
+
+	<div class="element">
+		<div class="heading">Total Sessions<br>
+			<div class="content">{{data.num_of_sessions}}</div>
+		</div>
+	</div>
+
+	<div class="element">
+		<div class="heading">Latest Activity<br>
+			<div class="content-small">{{data.latest_activity}}</div>
+		</div>
+	</div>
+
+	<div class="element">
+		<div class="heading">Total Activities<br>
+			<div class="content">{{data.total_activities}}</div>
+		</div>
+	</div>
+
+	<div class="element">
+		<div class="heading">Average Session Duration<br>
+			<div class="content-small">{{data.avg_session_duration}}</div>
+		</div>
+	</div>
+
+	<div class="element">
+		<div class="heading">Pages Created<br>
+			<div class="content">{{data.num_of_pages}}</div>
+			<div class="link-handle">&nbsp;&nbsp;<a href="/{{group_id}}/analytics/list_activities/page"><i class="fi-link"></i></a></div>
+		</div>
+	</div>
+
+	<div class="element">
+		<div class="heading">Files Uplaoded<br>
+			<div class="content">{{data.num_of_files}}</div>
+			<div class="link-handle">&nbsp;&nbsp;<a href="/{{group_id}}/analytics/list_activities/file"><i class="fi-link"></i></a></div>
+		</div>
+	</div>
+
+	<div class="element">
+		<div class="heading">Tasks Created<br>
+			<div class="content">{{data.num_of_tasks}}</div>
+			<div class="link-handle">&nbsp;&nbsp;<a href="/{{group_id}}/analytics/list_activities/task"><i class="fi-link"></i></a></div>
+		</div>
+	</div>
+
+	<div class="element">
+		<div class="heading">Forums Created<br>
+			<div class="content">{{data.num_of_forums_created}}</div>
+			<div class="link-handle">&nbsp;&nbsp;<a href="/{{group_id}}/analytics/list_activities/forum"><i class="fi-link"></i></a></div>
+		</div>
+	</div>
+
+	<div class="element">
+		<div class="heading">Threads Created<br>
+			<div class="content">{{data.num_of_threads_created}}</div>
+			<div class="link-handle">&nbsp;&nbsp;<a href="/{{group_id}}/analytics/list_activities/thread"><i class="fi-link"></i></a></div>
+		</div>
+	</div>
+
+	<div class="element">
+		<div class="heading">Replies to Posts<br>
+			<div class="content">{{data.num_of_replies}}</div>
+			<div class="link-handle">&nbsp;&nbsp;<a href="/{{group_id}}/analytics/list_activities/reply"><i class="fi-link"></i></a></div>
+		</div>
+	</div>
+</div>
+
+
+{% endblock %}

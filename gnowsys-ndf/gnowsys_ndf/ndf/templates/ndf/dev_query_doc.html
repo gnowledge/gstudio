@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title>{{query}} : {{count}} objects</title>
+	<style type="text/css">
+		body { white-space: pre; font-family: monospace; background-color: #fafafa; color: #1a1a1a}
+	</style>
+</head>
+<body>
+	<script type="text/javascript">
+		var allJSONObjs = {{result|safe}};
+
+		function create_toggle_button (displayText, functionToCall) {
+			var e = document.createElement('div');
+			e.innerHTML = displayText;
+			e.style.position = 'fixed';
+			e.style.top = "10px";
+			e.style.right = "10px";
+			e.style.padding = "3px";
+			e.style.cursor = "pointer";
+			e.style.border = "2px solid gray";
+			// e.style.color = "red";
+			e.onclick = functionToCall;
+			document.body.append(e);
+		}
+
+
+		function show_html () {
+			document.body.innerHTML = "";
+
+			document.body.innerHTML = "";
+			var allJSONObjs = {{result|safe}};
+			for (var i = allJSONObjs.length - 1; i >= 0; i--) {
+				var obj = JSON.parse(allJSONObjs[i]);
+
+				var ObjectIdList = ['group_set', 'member_of', 'type_of', 'prior_node', 'post_node', 'collection_set'];
+				for (e in obj){
+					if (ObjectIdList.indexOf(e) != -1) {
+
+						var urlList = [];
+						obj[e].forEach(function(n){
+							urlList.push("<a href='/dev/query/"+n+"' target='_blank'>"+n+"</a>")
+						});
+						obj[e] = urlList;
+					};
+				}
+				var e = document.createElement('div');
+				e.innerHTML = JSON.stringify(obj, null, 4);
+
+				document.body.append(e);
+				document.body.appendChild(document.createElement('hr'))
+			};
+
+			create_toggle_button ("show PLAIN TEXT", show_text);
+		}
+
+
+		function show_text() {
+			document.body.innerHTML = "";
+			for (var i = allJSONObjs.length - 1; i >= 0; i--) {
+				var obj = JSON.parse(allJSONObjs[i]);
+
+				document.body.appendChild(document.createTextNode(JSON.stringify(obj, null, 4)));
+				document.body.appendChild(document.createElement('hr'))
+
+				create_toggle_button ("show HTML", show_html);
+			};
+		}
+
+		show_text();
+	</script>
+
+</body>
+</html>

@@ -1,0 +1,466 @@
+{% load i18n %}
+{% load ndf_tags %}
+
+<style type="text/css">
+	
+
+	#tags_error{
+		color: red;
+	}
+
+	div.tags{ 
+		/*padding: 5px 10px; */
+		margin: 2px 5px;
+		/*color: white;*/
+		font-size: 1em;
+		border: solid thin #FFD400;
+	}
+
+	i.remove-tag{
+		padding-left: 8px;
+		font-size: 1.1em;
+		cursor: pointer;
+	}
+
+	.multiple-select {
+		height: 8rem;
+	}
+
+</style>
+
+{% get_group_name groupid as group_name_tag %}
+{% if user.is_authenticated %}	
+
+	<form class="dropzone" id ="docPost" enctype="multipart/form-data" method="post" action="{% url 'upload_using_save_file' groupid %}" data-abide>
+	{% csrf_token %}
+
+		<!-- file browse and name -->
+		<fieldset style="background:#ccc;">
+			<legend style="background:#10c1cb">{% trans "Upload File" %}</legend>
+			<div class ="row">
+				<div class="large-3 columns">				
+					<label>{% trans "Choose File" %}</label>
+					<input type="hidden" name="context_name" value="{{title}}">
+					<input type="file" name="filehive"  id="docFile" tabindex=1 autofocus required/>
+					<small class="error">Please select a file.</small>
+				</div>
+				<div class="large-9 columns">				
+					<label>{% trans "Title of File" %}</label>
+					<input type="text" name="name" id ="docTitle" tabindex=2  placeholder="Title of File" required>
+					<small class="error">Please provide the title of the resource.</small>
+				</div>
+			</div>
+		</fieldset>
+
+		<!-- other details -->
+		<fieldset style="background:#ccc;">
+			<legend style="background:#10c1cb">{% trans "Details" %}</legend>
+
+			<div class ="row">
+				<div class="large-5 columns">
+					<b class="compulsory">Add Description</b>
+					{% include "ndf/html_editor.html" with var_name="content_org" var_value=node.content|default_if_none:"" node_id=node.pk var_placeholder="Describe the file" ckeditor_toolbar="GgallaryCommentsToolbar" %}
+
+					<div class="row">
+					
+						<b class="small-3 columns"> {% trans "Add Tag" %}:
+						</b>
+
+						<div class="small-9 columns">
+							<div class="row collapse" data-tooltip class="has-tip" title="{% trans 'Tags help identify similiar work easily. Just add tag text and click Add Tag button' %}">
+									
+								<div class="small-9 columns">
+							    	<input id="tags_id" tabindex="11" type="text" value="" placeholder="{% trans 'Add one tag at a time' %}">
+							    	<input type="hidden" value="{{node.tags|join:', '|default_if_none:""}}" name="tags">
+						        </div>
+						        <div class="small-3 columns">
+						        	<span tabindex="12" id="add-tag-btn" class="tiny button">
+						        		{% trans 'Add' %}
+						        	</span>
+						        </div>
+
+							</div>
+						choose topic :
+						<select name="topic_list" tabindex=3 required>
+								<option value="">--- Select Topic ---</option>
+								{% for each_topic in topic_nodes %}
+								<option value="{{ each_topic.pk }}">
+									{{ each_topic.name }}
+								</option>
+								{% endfor %}
+						</select>
+							<!-- show tags error msg -->
+							<div class="row hide" id="tags_error">
+								<div class="small-10 columns">{% trans 'Non empty tags can have only alphanumeric characters, dash(-) and spaces.' %}</div>
+							</div>
+
+							<!-- show added tags -->
+							<div class="row">
+								<div id="added_tags" class="small-9 columns">
+									{% for each_tag in node.tags %}
+										<div class="tags label radius info">{{each_tag}}<i title="Remove this tag" class="fi-x-circle remove-tag"></i></div>
+									{% endfor %}
+								</div>
+							</div>
+						</div>
+					</div>
+				</div>
+
+				<div class="large-7 columns">
+					<div class ="row">
+						<div class="large-4 columns">
+							<b class="compulsory">Language</b>
+							<select name="lan" tabindex=3 required>
+								<option value="">--- Select Language ---</option>
+								{% get_language_info_list for LANGUAGES as languages %}
+								{% for language in languages %}
+								<option value="{{ language.code }}">
+									{{ language.name }}
+								</option>
+								{% endfor %}
+							</select>
+							<small class="error"> Please select language. </small>
+
+						</div>
+						<div class="large-4 columns">
+							<b>Location</b>
+							<a href="#view-map-edit-widget" data-reveal-id="view-map-edit-widget" title="Click to add location markers" class="tiny secondary button expand"> <i class="fi-marker"></i> &nbsp; {% trans "Add Location" %}
+							</a>
+						</div>
+						<!-- 
+						<div class="large-4 columns">
+							<b>Set Privacy</b><br/>
+							<input id="PUBLIC" name="login-mode" value="PUBLIC" type="radio" checked>
+							<label for="PUBLIC" onclick="">{% trans "Public" %} <i class="fi-torsos-all"></i></label>
+							<input id="PRIVATE" name="login-mode" value="PRIVATE" type="radio">
+							<label for="PRIVATE" onclick="">{% trans "Private" %} <i class="fi-lock"></i></label>
+						</div> -->
+						<input id="PUBLIC" name="login-mode" value="PUBLIC" type="hidden" >
+						
+					</div>
+					<br/>
+					<div class ="row">
+						<div class="large-4 columns">
+							<b class="compulsory">Target Audience</b>
+							{% get_metadata_values as metadata %}
+	  						{% for k,v in metadata.items %}
+	  						{% if k == "audience" %}
+							<select name="audience" class="multiple-select" multiple  tabindex=4 required>
+			         			<!-- <option>-Select from list-</option> -->
+			        			{% for opts in v %}
+									<option>{% trans opts %}</option>
+								{% endfor %}
+							</select>
+							<small class="error">Please select resource audience</small>
+							{% endif %}
+							{% endfor %}
+						</div>
+
+						{% comment %}
+						<!-- <div class="large-4 columns">
+							<b>File Type</b>
+							{% get_metadata_values as metadata %}
+	  						{% for k,v in metadata.items %}
+	  						{% if k == "educationaluse" %}
+							<select name="FileType">
+			         			<option>---Select from list---</option>
+			        			{% for opts in v %}		        					
+									<option>{% trans opts %}</option>
+								{% endfor %}
+							</select>
+							{% endif %}
+							{% endfor %}
+						</div> -->
+						{% endcomment %}
+
+						<div class="large-4 columns">
+							<b class="compulsory">Subject</b>
+							{% get_metadata_values as metadata %}
+	  						{% for k,v in metadata.items %}
+	  						{% if k == "educationalsubject" %}
+							<select name="Subject" class="multiple-select" multiple tabindex="5" required>
+			         			<!-- <option>-Select from list-</option> -->
+			        			{% for opts in v %}
+									<option>{% trans opts %}</option>
+								{% endfor %}
+								<option>< Not Sure ></option>
+							</select>
+							<small class="error">Please select resource Subject</small>
+
+							{% endif %}
+							{% endfor %}
+						</div>
+
+						<div class="large-4 columns">
+							<b class="compulsory">Educational Level</b>
+							{% get_metadata_values as metadata %}
+	  						{% for k,v in metadata.items %}
+	  						{% if k == "educationallevel" %}
+							<select name="Level" class="multiple-select" multiple tabindex="6" required>
+			         			<!-- <option>-Select from list-</option> -->
+			        			{% for opts in v %}
+									<option>{% trans opts %}</option>
+								{% endfor %}
+								<option>< Not Sure ></option>
+							</select>
+							<small class="error">Please select resource audience</small>
+
+							{% endif %}
+							{% endfor %}
+						</div>
+					</div>
+					<small>({% trans "ctrl + click to select multiple values" %})</small>
+					<br/>
+					<br/>
+
+					<div class ="row">
+						<div class="large-3 columns">
+							<b>Co-Contributors:</b>
+						</div>
+						<div class="large-9 columns">
+							<input id="co_contributors" name="co_contributors" type="text" placeholder="Names of co-creators separated by commas" tabindex="7"/>
+						</div>
+					</div>
+					
+					<div class ="row">
+						<div class="large-2 columns">
+							<b>Copyright</b>
+						</div>
+						<div class="large-10 columns">
+							<!-- <input id="copyright_id" name="copyright" type="text" placeholder="Enter source name"/> -->
+							{% get_copyright as copyright %}
+							<select name="Copyright" tabindex="8" required>
+		  						{% for each_copyright in copyright %}
+				        			<option value="{{each_copyright}}" 
+				        			{% if each_copyright == "CC BY-SA" %}selected{% endif %}>
+				        				{% trans each_copyright %}
+				        			</option>
+								{% endfor %}
+							</select>
+							<small class="error">Please select resource Subject</small>
+
+						</div>
+					</div>
+
+					<div class ="row">
+						<div class="large-2 columns">
+							<b>Source</b>
+						</div>
+						<div class="large-10 columns">
+							<input id="source_id" name="Source" type="text" placeholder="Owner of the file" tabindex="9"/>
+						</div>
+					</div>
+
+					<div class ="row">
+						<div class="large-3 columns">
+							<b>Based on url</b>
+						</div>
+						<div class="large-9 columns">
+							<input id="based_on_id" name="based_url" type="text" placeholder="Web Address (url) of the file you sourced it from" tabindex="10"/>
+						</div>
+					</div>
+
+			</div>	
+			
+
+		</fieldset>
+		
+		<input type="hidden" name="user" value="{{user.id}}">
+		<input type="hidden" name="page_url" value="{{page_url}}">
+		<input type="submit" id="submitpostid" value="Submit" class="button medium expand">
+		<p id="message" style="display:none"> 
+			{% trans "Depending on the size of file/s and your Internet speed, upload process may take time. Please do not close this window." %} <br/>
+			{% trans "Please upload videos in webm format. If you upload videos of other formats, it will take longer to publish them." %} 
+		</p>
+
+
+		<!-- Overlay : Map Widget -->
+	    <div class="content reveal-modal graph-div" id="view-map-edit-widget" data-reveal>    
+	    	<!-- #{#% #if '/edit/' in request.path  or '/image_detail/' in request.path  or '/video_detail/' in request.path%} -->
+	        <a class="close-reveal-modal" >&#215;</a>
+	        {% include "ndf/map_widget.html" with mode="edit" %}
+	        <!-- <div style="background-color:gray; width:100%; height:80%;"></div> -->
+	      <!-- #{#%# endif %} -->
+	    </div>
+
+	</form>
+
+{% else %}
+	<p><em>{% trans "You are not an authorised user. Please login to upload files." %} </em></p>
+{% endif %}
+
+<script type="text/javascript">
+
+	$("#docFile").change(function() {
+        var max_size =100000
+        var fsize=this.files[0].size
+        fsize=fsize/1024
+        {% check_is_gstaff groupid request.user as gstaff_access %}
+        if(fsize> max_size){
+          {% if gstaff_access%}
+          	$('#docFile').val(this.value);
+          {% else %}
+          	alert("Sorry. Max File Size Limit Exceeded");
+          	$(this).val("")
+          	$('#docFile').val(this.value);
+          {% endif %}
+          }
+        else{
+		$('#docFile').val(this.value);}        
+      	});
+		
+		$(document).on('submit',"form",function(){
+		if($("#docFile").val() != "")
+		{	
+
+		$("#message").show();
+		$("#submitpostid").hide();
+		$("#submitpostid").submit();
+
+		}
+		else
+		{
+		alert("select a file");
+		return false;
+		}
+	});
+
+	// --- tags ---	
+	var tags = document.getElementById("tags_id");
+	var addedTags = document.getElementById("added_tags");
+
+	function checkTag()
+	{
+		var textValue = tags.value.trim();
+		// console.log(textValue.length);
+
+		if(textValue.length < 1){ return false; }
+
+		if(textValue.match(/[^A-Za-z0-9\-\ ]/g))
+		{	// having special characters
+			$('#tags_error').removeClass("hide");
+			return false;
+		}
+		else
+		{	// passed the test and now add tag label
+			$('#tags_error').addClass("hide") // fadeout fastly ongoing fadeout event
+			return true;
+		}
+	}
+
+	tags.onchange = checkTag;
+	tags.onmouseup = checkTag;
+	tags.onkeyup = checkTag;
+
+	function updateAllTags() {
+		
+		var tagsArr = new Array();
+
+		$("#added_tags").children("div.tags.label").each(function(){
+			tagsArr.push(this.textContent.trim().toLowerCase());
+		});
+
+		$("input:hidden[name='tags']").val(tagsArr.toString());
+		// console.log(tagsArr)
+	}
+	
+
+	function removeTag(){
+		$(this).parent().fadeOut("slow", function(){
+			$(this).detach();
+		});
+
+		updateAllTags();
+	};
+
+	$(".remove-tag").click(removeTag);
+
+	$(".remove-tag").mouseenter(function(){
+		$(this).parent("div.tags").css("text-decoration", "line-through");
+	});
+
+	$(".remove-tag").mouseleave(function(){
+		$(this).parent("div.tags").css("text-decoration", "none");
+	});
+
+	function addTag() {
+		if(checkTag())
+		{
+			var textValue = tags.value.trim().toLowerCase();
+			tags.value = '';
+
+			var tagDiv = document.createElement("div");
+			tagDiv.className = "tags label radius info";
+			tagDiv.appendChild(document.createTextNode(textValue));
+			// tagDiv.setAttribute("data-primary-type", selFieldPrimaryType);
+
+			var closeBtn = document.createElement("i");
+			closeBtn.className = "fi-x-circle remove-tag";
+			closeBtn.title = "Remove this tag";
+			closeBtn.onclick = removeTag;
+
+			$(closeBtn).mouseenter(function(){
+				$(this).parent("div.tags").css("text-decoration", "line-through");
+			});
+
+			$(closeBtn).mouseleave(function(){
+				$(this).parent("div.tags").css("text-decoration", "none");
+			});
+
+			tagDiv.appendChild(closeBtn);
+
+			addedTags.appendChild(tagDiv);
+
+			updateAllTags();
+		}
+		else
+		{
+			$('#tags_error').removeClass("hide");
+		}
+		tags.focus();
+	}
+
+	var addTagBtn = document.getElementById("add-tag-btn");
+	addTagBtn.onclick = addTag;
+	addTagBtn.onkeypress = addTag;
+
+
+	// --- map ---
+  	$(document).on('open', '#view-map-edit-widget[data-reveal]', function () {  
+    
+  		$.ajax({
+  			url: "{% url 'get_visited_location' groupid %}",
+  			success: function(data){ 
+   
+			  	data = JSON.parse(data);
+
+			    var lastVisitedLocationVal = data;
+			    
+			    if(lastVisitedLocationVal){
+
+			      if(lastVisitedLocationVal == "[]"){
+			        lastVisitedLocationVal = JSON.parse(lastVisitedLocationVal);
+			      }
+
+			      if(lastVisitedLocationVal.length > 0){
+			            // lastVisitedLocationVal = JSON.parse(lastVisitedLocationVal);
+			            var zoom = lastVisitedLocationVal.pop(),
+			                lng = lastVisitedLocationVal[1],
+			                lat = lastVisitedLocationVal[0];
+			              map.setView([lat, lng], zoom);
+			            }
+			    }
+			    else if( tempArr.length )
+			    {
+			      var group = new L.featureGroup(tempArr)
+			          map.fitBounds(group.getBounds());
+			    }
+			}
+		});
+  	});
+
+	$(document).on('opened', '#view-map-edit-widget[data-reveal]', function () {  
+		map.invalidateSize();  
+	});
+
+</script>

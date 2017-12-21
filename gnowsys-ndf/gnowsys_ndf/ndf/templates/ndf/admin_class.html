@@ -1,0 +1,35 @@
+{% load ndf_tags %}
+{% load i18n %}
+{% ifequal url 'data' %}
+<ul class="side-nav"> 
+	{% for each in class_list %}
+		{% get_Object_count each as count %}
+		{% ifequal class_name each %}
+		<li class="active"> <a href="/admin/data/{{each}}">{{each}} ({{count}})</a> </li>
+		{% else %}
+		<li > <a href="/admin/data/{{each}}">{{each}} ({{count}})</a> </li>
+		{% endifequal %}
+	{% endfor %}	
+</ul>
+{% else %}
+<ul class="side-nav"> 
+	{% for each in class_list %}
+		{% get_Object_count each as count %}
+		{% ifequal class_name each %}
+			{% if each == "GSystem" %}
+				<li> <a href="/admin/designer/{{each}}" style="float:left" >{{each}}  ({{count}})</a><a href="/home/type_created">&nbsp;+</a>
+			</li>
+			{% else %}
+				<li class="active"> <a href="/admin/designer/{{each}}" style="float:left">{{each}} ({{count}})</a><a href="/admin/designer/{{each}}/create/">&nbsp;+ </a></li>
+			{% endif %}
+		{% else %}
+			{% if each == "GSystem" %}
+			<li> <a href="/admin/designer/{{each}}" style="float:left" >{{each}}  ({{count}})</a><a href="/home/type_created">&nbsp;+</a>
+			</li>
+			{% else %}
+			<li > <a href="/admin/designer/{{each}}" style="float:left">{{each}}  ({{count}})</a><a href="/admin/designer/{{each}}/create/">&nbsp;+</a></li>
+			{% endif %}
+		{% endifequal %}
+	{% endfor %}	
+</ul>
+{% endifequal %}

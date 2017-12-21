@@ -1,0 +1,42 @@
+{% extends "ndf/base.html" %}
+{% load i18n %}
+
+{% block title %} Upload Resource {% endblock %}
+
+
+{% block meta_content %} 
+	<!-- This content displayed into the left panel to display the info/hrlp document -->
+	<h3>{% trans "Contribute File" %}</h3>
+	<ul class="text-left subheader">
+		<li>
+	        {% trans "You can contribute only Open Educational Resources" %}
+			({% trans "Resources copyrighted by others must be cited including OER" %}.)
+		</li>
+		<li>
+			<a class="overlay-description-by-oid-caller" data-reveal-id="overlay-description-by-oid" data-oid="{{oids.oer}}">{% trans "What constitutes OER" %}?</a>
+			<!-- TODO: make one info page and link it with anchor, 22-09-15, kedar2a -->
+		</li>
+		<li>
+			{% trans "You can upload files of any format" %}
+		</li>
+		<li>
+		
+			 {% trans "All files get uploaded under the CC BY-SA licence (This license lets others remix, tweak, and build upon your work even for commercial purposes, as long as they credit you and license their new creations under the identical terms) unless you chose a different licence" %}
+		</li>
+		<li>
+			{% trans "Please visit" %} <a href="https://creativecommons.org/licenses/">Creative Commons</a> {% trans "and" %} <a href="http://www.gnu.org/licenses/fdl-1.3.en.html">GNU</a> {% trans "to learn more about licenses" %}.
+		</li>
+    </ul>
+
+{% endblock %} 
+
+
+{% block body_content %} 
+
+	{% include "ndf/Upload_File.html" %}
+
+{% endblock %}
+
+
+
+

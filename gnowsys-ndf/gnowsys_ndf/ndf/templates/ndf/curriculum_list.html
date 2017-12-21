@@ -1,0 +1,36 @@
+{% load i18n %}
+{% load ndf_tags %}
+{% block body_content %}
+ 
+    <div class="curriculum_listing">
+    	<div class="curriculum_content">
+    		<div class="curriculum_content_left">
+    			<a href="{% url 'curriculum_detail' group_id node.pk %}"><i class="fa fa-book fa-5x" style="color:#164a7b; margin-left:5px;"></i></a>
+    			<div class="curriculum_content_details">
+            		<a href="{% url 'curriculum_detail' group_id node.pk %}" class="hyperlink-style">Title: {{node.name}} </a>
+        			<a href="{% url 'curriculum_detail' group_id node.pk %}" class="hyperlink-info"> No. of Sections:{{node.collection_set|length}} </a>
+        			<a href="{% url 'curriculum_detail' group_id node.pk %}" class="hyperlink-info"> Created on: {{node.created_at}}</a>
+    			</div>
+    		</div>
+
+<!--             <div class="curriculum_content_right" style="margin-top: 52px;">
+            <a data-reveal-id="delete-unit"><i class="fa fa-trash"></i>{% trans "Delete" %}</a>
+            <a href="#"><i class="fa fa-pencil"></i>{% trans "Edit" %}</a>
+            </div>
+ -->
+    	</div>
+    </div>
+
+    <div id="delete-unit" class="reveal-modal tiny text-center" data-reveal>
+        <h3>{% trans "Delete Structure:" %} {% firstof node.id %} ?</h3>
+            <br/>
+            {% trans "Are you sure want to delete?" %}
+            <br/>
+            <a href="#" class="button tiny success">{% trans "Cancel" %}</a>
+            <a href="#" class="button tiny alert">{% trans "Yes" %}</a>
+            <a class="close-reveal-modal" aria-label="Close">&#215;</a>
+    </div>
+
+
+
+{% endblock body_content %}

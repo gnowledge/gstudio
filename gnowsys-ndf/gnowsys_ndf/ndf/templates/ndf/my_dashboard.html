@@ -1,0 +1,184 @@
+{% load simple_filters %}
+{% xextends "ndf/base.html" with first_body_column=0 %}
+
+{# {% extends "ndf/base.html" %} #}
+
+{% load i18n %}
+{% load cache %}
+{% load ndf_tags %}
+{% block title %}{% trans 'My Dashboard' %} {% endblock %}
+{% block body_content %}
+{% comment %}
+  {% include "ndf/course_analytics.html" %}
+{% endcomment %}
+<div class="student-dashboard-header-container">
+    <div class="container">
+        <div class="row student-dashboard-header">
+            <div class="medium-12 columns">
+                {% get_profile_pic request.user.pk as prof_pic %}
+                {% if prof_pic %}
+                  <img src="{{MEDIA_URL}}{{prof_pic.if_file.original.relurl}}">
+                {% else %}
+                  <img src = "/static/ndf/images/metaStudio-profile.svg">
+                {% endif %}
+                <div class="student-dashboard-info">
+                    <span class="student-name"> {{user_obj.username}} </span>
+                    <span> Points </span>
+                    <span class="student-overall-points"> {{users_points}} </span>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="course-overview-container student-dashboard container">
+    <div class="row collapse course-overview">
+        <!---
+        <div class="columns small-12 medium-6">
+
+          <div class="ongoing-session">
+            <h5>ONGOING SESSION </h5>
+            <h3>Taking Screenshots of the work and doing something</h3>
+            <button class="tiny button"><i class="fa fa-sign-in"></i>&nbsp;Enter Session</button>
+          </div>
+          <div class="course-status">
+            <h5>Course status</h5>
+            <div class="row">
+              <div class="small-12 columns">
+                <span class="course-metric-heading">Module's Completion</span>
+                <h4 class="module_progress_stmt"></h4>
+                <div class="progress success round">
+                    <div class="module_progress_meter meter"></div>
+                </div>
+              </div>
+            </div>
+            <div class="row">
+              <div class="small-12 columns">
+                <span class="course-metric-heading">Unit's Completion</span>
+                <h4 class='units_progress_stmt'></h4>
+                <div class="progress success round">
+                    <div class="unit_progress_meter meter"></div>
+                </div>
+
+              </div>
+            </div>
+            <ul class="tabs" data-tab role="tablist">
+              <li class="tab-title active" ><a href="#course-notification" role="tab" tabindex="0" aria-selected="true" aria-controls="panel2-1">Notifications</a></li>
+
+              <li class="tab-title" ><a href="#course-act-logs" role="tab" tabindex="0" aria-selected="false" aria-controls="panel2-2">Activity Log</a></li>
+
+            </ul>
+            <div class="tabs-content course-notif-logs">
+              <section role="tabpanel" aria-hidden="false" class="content active" id="course-notification" style="overflow-y:scroll;height:300px;">
+                <ul>
+                    <li>Coming soon...
+                    {% comment %}
+                        <span class="rating-star-number"><span>4</span><i class="fa fa-star"></i></span>
+                        <span>Text</span>
+                    {% endcomment %}
+                    </li>
+                </ul>
+              </section>
+              <section role="tabpanel" aria-hidden="true" class="content" id="course-act-logs">
+                <ul>
+                    <li>
+                        Activiy 1
+                    </li>
+                  <li>Activity log 2</li>
+                </ul>
+              </section>
+            </div>
+          </div>
+        </div>
+        -->
+        <div class="columns small-12 medium-6">
+          <div class="course-detials course-section">
+            <span class="course-section-heading">Courses</span>
+            <span class="course-section-icon">
+              <i class="fa fa-book"></i>
+            </span>
+            <div class="row">
+              <div class="columns small-12 medium-6">
+                <span class="course-metric-heading">Ongoing courses</span>
+                <span class="course-metric-count in-progress"></span>
+              </div>
+              <div class="columns small-12 medium-6">
+                <span class="course-metric-heading">Incomplete courses</span>
+                <span class="course-metric-count">0</span>
+              </div>
+            </div>
+            <div class="row">
+              <div class="columns small-12 medium-6">
+                <span class="course-metric-heading">Upcoming courses</span>
+                <span class="course-metric-count upcoming">0</span>
+              </div>
+              <div class="columns small-12 medium-6">
+                <span class="course-metric-heading">Completed courses</span>
+                <span class="course-metric-count completed">0</span>
+              </div>
+            </div>
+          </div>
+          <div class="course-interactions course-section">
+            <span class="course-section-heading">Interactions</span>
+            <span class="course-section-icon">
+              <i class="fa fa-users"></i>
+            </span>
+            <div class="row">
+              <div class="columns small-12 medium-6">
+                <span class="course-metric-heading">Comments By me</span>
+                <span class="course-metric-count total_cmnts_by_user">{{total_cmnts_by_user}}</span>
+              </div>
+              {% comment %}
+              <div class="columns small-12 medium-6">
+                <span class="course-metric-heading">Avg Rating for my comments</span>
+                <span class="course-metric-count">Star rating</span>
+              </div>
+              {% endcomment %}
+            </div>
+            <div class="row">
+              <div class="columns small-12 medium-6">
+                <span class="course-metric-heading">Comments for me</span>
+                <span class="course-metric-count">{{cmnts_rcvd_by_user}}</span>
+              </div>
+              {% comment %}
+              <div class="columns small-12 medium-6">
+                <span class="course-metric-heading">Avg Ratings to others</span>
+                <span class="course-metric-count">Star Rating</span>
+              </div>
+              {% endcomment %}
+            </div>
+          </div>
+          <div class="course-gallery-uploads course-section">
+            <span class="course-section-heading">Groups</span>
+            <span class="course-section-icon">
+              <i class="fa fa-file-text"></i>
+            </span>
+            <div class="row">
+              <div class="columns small-12 medium-6">
+                <span class="course-metric-heading">{{groups_cur.count}} Groups</span>
+                <span class="course-metric-count user_files"></span>
+              </div>
+            </div>
+          </div>
+          {% comment %}
+          <div class="course-warning course-section">
+              <h5>WAITING FOR YOUR FEEDBACK</h5>
+              <div><i class="fa fa-sign-in"></i><a>3 New notes added</a></div>
+              <div><i class="fa fa-file-image-o"></i><a>36 New files uploaded in the gallery</a></div>
+              <div></div>
+          </div>
+          {% endcomment %}
+
+        </div>
+
+      </div>
+</div>
+<script type="text/javascript">
+    $(document).ready(function() {
+    	{% for eachc,eachcv in my_course_objs.items %}
+    		$("."+ "{{eachc}}").text("{{eachcv|length}}")
+    	{% endfor %}
+    })
+	
+</script>
+{% endblock %}

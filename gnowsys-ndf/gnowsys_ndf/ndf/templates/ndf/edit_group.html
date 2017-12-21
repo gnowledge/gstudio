@@ -1,0 +1,412 @@
+{% extends "ndf/node_edit_base.html" %}
+{% load i18n %}
+{% load ndf_tags %}
+
+{% block title %} {{node.name}} - edit {% endblock %}
+
+{% block meta_content %}  
+<h3 class="subheader">{% trans "Group Editor" %}</h3>
+{% endblock %}
+
+
+{% get_user_object node.created_by as user_obj %}
+
+{% block body_content %} 
+
+<!-- css for drawer widget -->
+<style type = "text/css">
+
+  .divider-line { font-size: xx-large; color:lightgray; }
+  .line-height-2 { line-height:2; }
+  .line-height-2pt5 { line-height:2.5; }
+  .fontsize-x-large { font-size: x-large; }
+
+  .margin-0 { margin: 0 !important ;}
+
+  .resource-drawer {
+  border-color: #D3D3D3; border-style: solid;
+  padding: 0 !important;
+  overflow-y: auto;
+  }
+
+  .resource-drawer li.bullet-item:hover{
+  background-color: #ecf0f1; cursor:pointer;
+  }
+
+  .posted-by{ color: #808080; font-size: small; }
+
+  .selected-resource { background-color:lightgray !important ; }
+
+  .resource-type-image {
+  height:40px;
+  background-repeat:no-repeat; background-size: 48px 48px
+  }
+
+  ul#graph-hover.f-dropdown{
+    width: inherit !important;
+  }
+
+  #graph-hover > li > a:hover {
+    color: #555555;
+  }
+
+</style>
+
+<dl class="accordion" data-accordion>
+
+  <dd>
+    <a href="#change_settings">{% blocktrans with node.name as name %} Click here to change settings of {{name}} {% endblocktrans %}</a>
+
+    {% if node.name == request.user.username %}
+      <div id="change_settings" class="content">
+         <div class="small-12 columns" style='display:table;  border:1px;   border-spacing:10px; '>
+
+         <div style='display:table-row;'>
+
+          <div style='display:table-cell;'> 
+            <font size="3" >{% trans "Subscription policy" %}</font>
+          </div>
+
+          <div style='display:table-cell;'> 
+            <select name="subscription_policy" id="subscription_policy" disabled="disabled">
+              <option id="OPEN">{% trans "OPEN" %}</option>
+              <option id="BY_REQUEST">{% trans "BY REQUEST" %}</option>
+              <option id="BY_INVITATION">{% trans "BY INVITATION" %}</option>
+            </select>
+          </div>
+          <div style='display:table-cell;'> 
+            <font size="3" >{% trans "User policy" %}</font>
+          </div>
+
+          {% get_author_agency_types as author_agency_types %}
+          <div style='display:table-cell;'> 
+            <select name="agency_type" id="agency_type">
+              {% for each in author_agency_types %}
+                 <option id="{{each}}">{{each}}</option>
+              {% endfor %}
+            </select>
+          </div>
+         </div>
+        <div style='display:table-row;'>
+          <div style='display:table-cell;' colspan='2' align="middle"> 
+            <input type="button" id="changeButton" value="Change"  class="button">
+            <img id="ajax_search" width="50" style="display: none;" src="/static/ndf/images/ajax-wait.gif">
+            <font id="status"></font>
+          </div>
+        </div>
+      </div>
+     </div>   
+    {% else %}
+    <div id="change_settings" class="content">
+
+     <div style='display:table;  border:1px;   border-spacing:10px; '>
+
+       <div style='display:table-row;' >
+         <div style='display:table-cell;'> 
+          <font size="3" >{% trans "Group Type" %}</font>
+        </div>
+
+        <div style='display:table-cell;'> 
+          <select name="group_type" id="group_type">
+           <option id="PUBLIC">{% trans "PUBLIC" %}</option>
+           <option id="PRIVATE">{% trans "PRIVATE" %}</option>
+           <option id="ANONYMOUS">{% trans "ANONYMOUS" %}</option>
+         </select> 
+       </div>
+
+       <div style='display:table-cell;'> 
+        <font size="3" >{% trans "Group Editing policy" %}</font>
+      </div>
+
+      <div style='display:table-cell;'> 
+        <select name="edit_policy" id="edit_policy">
+         <option id="EDITABLE_NON_MODERATED">{% trans "EDITABLE amd NON_MODERATED" %}
+         </option>
+         <option id="EDITABLE_MODERATED">{% trans "EDITABLE and MODERATED" %}</option>
+         <option id="NON_EDITABLE">{% trans "NON_EDITABLE" %}</option>
+       </select> 
+     </div>
+
+   </div>
+
+   <div style='display:table-row;'>
+
+    <div style='display:table-cell;'> 
+      <font size="3" >{% trans "Group Subscription policy" %}</font>
+    </div>
+    <div style='display:table-cell;'> 
+      <select name="subscription_policy" id="subscription_policy" disabled="disabled">
+       <option id="OPEN">{% trans "OPEN" %}</option>
+       <option id="BY_REQUEST">{% trans "BY REQUEST" %}</option>
+       <option id="BY_INVITATION">{% trans "BY INVITATION" %}</option>
+     </select>
+   </div>
+
+   <div style='display:table-cell;'> 
+    <font size="3" >{% trans "Group Existance visibility" %}</font>
+  </div>
+
+  <div style='display:table-cell;'> 
+    <select name="visibility_policy" id="visibility_policy" disabled="disabled">
+     <option id="ANNOUNCED">{% trans "ANNOUNCED" %}</option>
+     <option id="NOT_ANNOUNCED">{% trans "NOT ANNOUNCED" %}</option>
+   </select>
+ </div>
+
+</div>
+
+<div style='display:table-row;'>
+
+  <div style='display:table-cell;'> 
+    <font size="3">  {% trans "Group Member Visibility" %}</font>
+  </div>
+
+  <div style='display:table-cell;'> 
+    <select name="disclosure_policy" id="disclosure_policy" disabled="disabled">
+     <option id="DISCLOSED_TO_MEM">{% trans "DISCLOSED TO MEMBERS" %}</option>
+     <option id="NOT_DISCLOSED_TO_MEM">{% trans "NOT DISCLOSED TO MEMBERS" %}</option>
+   </select>
+ </div>
+
+ <div style='display:table-cell;'> 
+  <font size="3" >{% trans "Group Encryption policy" %}</font>
+</div>
+
+<div style='display:table-cell;'> 
+  <select name="encryption_policy" id="encryption_policy" disabled="disabled">
+   <option id="NOT_ENCRYPTED">{% trans "NOT ENCRYPTED" %}</option>
+   <option id="ENCRYPTED">{% trans "ENCRYPTED" %}</option>
+ </select>
+ </div>
+</div>
+ {% get_group_agency_types as agency_types %}
+
+<div style='display:table-row;'>
+ <div style='display:table-cell;'> 
+    <font size="3" > {% trans "Group Agency Types" %} </font>
+  </div>
+  <div style='display:table-cell;'> 
+    <select name="agency_type" id="agency_type">
+     {% for each in agency_types %}
+        <option id="{{each}}">{{each}}</option>
+     {% endfor %}
+   </select>
+ </div>
+  <div style='display:table-cell;'> 
+    <input type="button" id="changeButton" value="Change"  class="button">
+   </div>
+</div> <!-- row ending -->
+</div>   <!-- table ending -->
+</div> <!-- div change settings ends -->
+{% endif %}
+</dd>
+</dl>
+
+<br/>
+
+<dl class="accordion" data-accordion>
+
+  <dd>
+
+    <a id="app_selected" href="#mySystemtype">{% blocktrans with node.name as name %} Click here to select apps for {{name}} {% endblocktrans %}</a>
+
+    <div id="mySystemtype" class="content">
+
+      <div id="app_drawer" >
+        {% include "ndf/drawer_widget.html" with widget_for="collection_set" %}
+      </div>
+
+      <input type="button" id="save_gapps" class="button small-10 small-push-1 column" value="Save">
+
+    </div>
+
+  </dd>
+
+</dl>
+
+{{ block.super }}
+{% endblock %}
+
+{% block script %}
+  {% if node %}
+    $("#form-edit-node").append('<input type="hidden" name="node_id" value="{{node.pk}}"><input type="hidden" name="name" value="{{node.name}}"><input type="hidden" name="group_page_edit" value="True">')
+  {% endif %}
+
+  $("#app_selected").click( function() {
+    var url="{% url 'app_selection' groupid %}";
+
+    left_drawer = $("#collection_set_drawer1 li:not(:first-child)");
+    if (left_drawer.length > 0) {
+      left_drawer.remove();
+    }
+
+    right_drawer = $("#collection_set_drawer2 li");
+    if (right_drawer.length > 0) {
+      right_drawer.remove();
+    }
+
+    $.getJSON( url, function( data ) {
+      $.each(data ,function(index, drawer_elements) {
+        if(index == 0) {
+          $.each(drawer_elements.drawer1, function(index, element) {
+            $('#mySystemtype #collection_set_drawer1').append("<li id='"+element.id+"' class='bullet-item text-left'>"+element.name+"</li>");
+          });
+        }
+
+        if(index == 1) {
+          $.each(drawer_elements.drawer2, function(index, element) {
+            $('#mySystemtype #collection_set_drawer2').append("<li id='"+element.id+"' class='bullet-item text-left'>"+element.name+"</li>");
+          });
+        }
+      });
+    });
+  });
+
+  function fetch_selected_apps() {
+    var selected_apps_list = [];
+    $.each($('#mySystemtype #collection_set_drawer2 li'), function(index,item) {
+      selected_apps_list.push(item.id);
+    });
+    return selected_apps_list;
+  }
+
+  $("#save_gapps").click( function() {
+    selected_apps_list = fetch_selected_apps();
+    apps_to_set = JSON.stringify(selected_apps_list);
+
+    $.ajax({
+      url:"{% url 'app_selection' groupid %}",
+
+      type: 'POST',
+
+      data: {
+        apps_to_set: apps_to_set,
+        csrfmiddlewaretoken: '{{csrf_token}}'
+      },
+
+      beforeSend: function(){
+        $("#ajax_load_image").show();
+        $("#body").css({"opacity":"0.1"})
+      },
+
+      success: function(data){
+        alert("Apps set for this group successfully.");
+        location.reload();
+      },
+
+      complete: function(){
+        $("#ajax_load_image").hide();
+        $("#body").css({"opacity":""});
+      }
+    }); //end of ajax
+  }); //end_of_click_save_gapps
+
+  // Search-Box for LHS drawer of resources
+  $('#collection_set_search').bind('keydown change', function(e) {
+    var search_text = (this.value).toLowerCase();
+    var search_text_len = (search_text.length + 1);
+
+    if (e.keyCode == 8) {
+      // If backspace pressed, then show all
+      search_text_len = 0;
+    }
+
+    var $li = $( ".collection_set.pricing-table.drawer1 li.bullet-item" );
+
+    if (search_text_len < 3) {
+      $li.filter(function() {
+        if ($(this).css("display") == "none") {
+          return true;
+        }
+
+        else {
+          return false;
+        }
+      }).show();
+    }
+
+    else if (search_text_len > 2) {
+      $(".searching").css("display", "block");
+      $li.each(function() {
+        if ($(this).text().toLowerCase().indexOf(search_text) >= 0) {
+          $(this).css("display", "block");
+        }
+
+        else{
+          $(this).css("display", "none");
+        }
+      });
+      $(".searching").css("display", "none");
+    }
+  });
+
+  {% get_user_object node.created_by as user_obj %}
+  {% ifequal user_obj.username user.username %}
+    var edit_policy  = document.getElementById("edit_policy")
+    var group_type  = document.getElementById("group_type")
+    var subscription_policy  = document.getElementById("subscription_policy")
+    var visibility_policy  = document.getElementById("visibility_policy")
+    var disclosure_policy  = document.getElementById("disclosure_policy")
+    var encryption_policy  = document.getElementById("encryption_policy")
+    var agency_type = document.getElementById("agency_type")
+
+    {% if node.edit_policy %}
+    $("select#edit_policy option[value='{{node.edit_policy}}']").prop("selected", true);
+    {% endif %}
+
+    {% if node.group_type %}
+    $("select#group_type option[value='{{node.group_type}}']").prop("selected", true);
+    {% endif %}
+
+    {% if node.subscription_policy %}
+    $("select#subscription_policy option[value='{{node.subscription_policy}}']").prop("selected", true);
+    {% endif %}
+
+    {% if node.visibility_policy %}
+    $("select#visibility_policy option[value='{{node.visibility_policy}}']").prop("selected", true);
+    {% endif %}
+
+    {% if node.disclosure_policy %}
+    $("select#disclosure_policy option[value='{{node.disclosure_policy}}']").prop("selected", true);
+    {% endif %}
+
+    {% if node.encryption_policy %}
+    $("select#encryption_policy option[value='{{node.encryption_policy}}']").prop("selected", true);
+    {% endif %}
+
+    {% if node.agency_type %}
+    $("select#agency_type option[value='{{node.agency_type}}']").prop("selected", true);
+    {% endif %}
+
+    $(document).on('click', "#changeButton", function() {
+      $.ajax({
+        url: '/{{node}}/ajax/change_group_settings/',
+
+        type: 'POST',
+
+        data: {
+          edit_policy: edit_policy.value,
+          group_type: group_type.value,
+          subscription_policy: subscription_policy.value,
+          visibility_policy: visibility_policy.value,
+          disclosure_policy: disclosure_policy.value,
+          encryption_policy: encryption_policy.value,
+          agency_type: agency_type,
+          csrfmiddlewaretoken: '{{ csrf_token }}',
+          group_id:"{{node}}"
+        },
+
+        beforeSend: function() {
+          $("#ajax_search").show();
+        },
+
+        success: function(result){
+          $("#ajax_search").hide();
+          $("#status").html(result);
+        }
+      });
+    });
+
+  {% endifequal %}
+
+{% endblock %}

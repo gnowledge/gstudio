@@ -1,0 +1,291 @@
+{% load simple_filters %}
+{% xextends "ndf/base.html" with first_body_column=0 %}
+
+{# {% extends "ndf/base.html" %} #}
+
+{% load i18n %}
+{% load cache %}
+{% load ndf_tags %}
+
+
+
+{% block head %}
+
+  {{ block.super }}
+  <script type="text/javascript" src="/static/ndf/bower_components/ckeditor/ckeditor.js"></script>
+  <script type="text/javascript" src="/static/ndf/bower_components/ckeditor/config.js"></script>
+
+{% endblock %}
+
+
+
+{% block title %} {% trans "Course" %}: {{group_name}} > {% trans "Activity" %}: {% firstof node.altnames node.name %}  {% endblock %}
+
+
+
+{% block body_content %}
+
+  {% check_is_gstaff group_id request.user as is_gstaff %}
+
+  <div class="activity-page">
+      <div class="row activity-page-header">
+          <div class="small-4 medium-4 large-3 columns activity-page-previous">
+              <a href="{% url 'course_content' group_name %}" title="Click here to go to Course Content"><i class="fa fa-home"></i></a>
+              {% if resource_prev_id %}
+              <a href="{% url 'course_resource_detail' group_name course_sub_section course_unit resource_prev_id %}" class="prev-activity" title="Click here to view previous resource">
+                  <i class="fa fa-hand-o-left"></i>
+                  {% trans "Previous Activity" %}
+              </a>
+              {% comment %}
+              {% else %}
+              <a href="#" class="prev-activity disabled" onclick="alert('This is first activity of unit!')">
+                  <i class="fa fa-hand-o-left"></i>
+                  Previous Activity
+              </a>
+              {% endcomment %}
+              {% endif %}
+          </div>
+          <div class="small-4 medium-4 large-6 columns">
+              <div class="unit-title">{{unit_node.name}}</div>
+              <div class="activity-title">
+                  {{node.name}}
+                  {% if "QuizItemEvent" not in node.member_of_names_list %}
+                  {% if is_gstaff or node.created_by == request.user.id %}
+                      {% get_edit_url node.pk as edit_url %}
+                      <small>
+                          <a title="Edit Content" class="edit_res_unit">{% trans " Edit Content" %}</a>|
+                          <a title="Edit Settings" class="edit_settings" href="{% url edit_url group_id node.pk %}">{% trans " Edit Settings" %}</a>
+                      </small>
+                  {% endif %}
+                  {% endif %}
+
+                <a data-dropdown="drop1" aria-controls="drop1" aria-expanded="false" title="List of Resources"><i class="fa fa-align-justify"></i></a>
+                <ul id="drop1" class="f-dropdown" data-dropdown-content aria-hidden="true" tabindex="-1">
+                {% for each_resource in unit_resources_list_of_dict %}
+                  <li class="text-left">
+                  {% ifequal forloop.counter resource_index|add:1 %} <b> {% endifequal %}
+                    <a href="{% url 'course_resource_detail' group_name course_sub_section course_unit each_resource.pk %}">
+                      {{each_resource.name}}
+                    </a>
+                  {% ifequal forloop.counter resource_index|add:1 %} </b> {% endifequal %}
+                  </li>
+
+                {% endfor %}
+                </ul>
+
+              </div>
+              <div class="activity-title">
+              </div>
+          </div>
+          <div class="small-4 medium-4 large-3 columns activity-create-note">
+              <div style="float: right;">
+                  {% if resource_next_id %}
+                  <a href="{% url 'course_resource_detail' group_name course_sub_section course_unit resource_next_id %}" class="next-activity" title="Click here to view next resource">
+                      {% trans "Next Activity" %}
+                      <i class="fa fa-hand-o-right"></i>
+                  </a>
+                  {% comment %}
+                  {% else %}
+                  <a href="#" class="next-activity disabled" onclick="alert('This is last activity of unit!')">
+                      Next Activity
+                      <i class="fa fa-hand-o-right"></i>
+                  </a>
+                  {% endcomment %}
+                  {% endif %}
+                  <a href="{% url 'page_create_edit' group_name %}?course_event_id={{group_id}}&blog_type=True" title="Click here to create Note"><i class="fa fa-pencil-square-o"></i></a>
+              </div>
+          </div>
+      </div>
+      <div class="activity-slides-container row" >
+          {% get_help_pages_of_node node as help_page_list %}
+          <div class="columns small-12 activity-slides">
+              <div class="row activity-slide node_details" >
+                  {% if help_page_list %}
+                    <a id="related-content-button" href="#related-content" class="view-related-content"><i class="fa fa-arrow-circle-down"></i>&nbsp;{% trans "View related contents" %}</a>
+                  {% endif %}
+                  {# {{node.content|safe}} #}
+                  {% include 'ndf/node_ajax_content.html' with no_discussion=True hide_breadcrumbs=True %}
+              </div>
+              {% if help_page_list %}
+              {% for each_help_page in help_page_list %}
+              <div id="related-content">
+                <i class="fa fa-info-circle"></i>
+                <div class="related-content-header">
+                  <span>{% trans "Related Help Topic" %}</span>
+                    <span class="related-content-title">
+                      <i class="fa fa-caret-right"></i>&nbsp;{{each_help_page.name}}
+                      <a href="#related-content-button" class="back-to-activity"><i class="fa fa-arrow-circle-up"></i>&nbsp;{% trans "Go back to activity" %}</a>
+                      <div class="related-content-close">&times;</div>
+                    </span>
+                  </div>
+                  <div class="related-content-body">
+                  {{each_help_page.content|safe}}
+                  </div>
+
+              </div>
+              {% endfor %}
+              {% endif %}
+
+              <div class="row activity-comments-section">
+                  <div class="columns small-12 " id="view-discussion">
+                        <!-- discussion content area -->
+                        {% get_thread_node node.pk as thread_node_obj %}
+                        {% if thread_node_obj and "QuizItemEvent" not in node.member_of_names_list %}
+                            {% get_disc_replies thread_node_obj.pk group_id global_disc_all_replies as all_replies %}
+                            {% include 'ndf/gin-line-texteditor.html' with node=thread_node_obj var_name="content_org" allow_to_comment=allow_to_comment %}
+                        {% endif %}
+
+                        <!-- END of discussion content area -->
+                  </div>
+              </div>
+          </div>
+      </div>
+          {% comment %}
+              <div class="row new-comment">
+                  <div class="small-1 columns user-prof-image">
+                      <i class="fi-torso"></i>
+                  </div>
+                  <div class="small-9 columns">
+                      <textarea class="add-comment textarea-add-comment" name="textarea-add-comment" ></textarea>
+                  </div>
+                  <div class="small-2 columns">
+                      <a href="#" id="postCommentBtn" class="button small radius">Post</a>
+                  </div>
+              </div>
+              <div class="activity-comments">
+
+              </div>
+          </div>
+      </div>
+      {% endcomment %}
+
+  </div>
+
+  <script type="text/javascript">
+
+    //Rating system
+    $("body .rate-scale i").hover(function(){
+        $(this).nextAll().add($(this)).addClass('hover-rating');
+    },
+    function() {
+        $(this).nextAll().add($(this)).removeClass('hover-rating');
+    });
+    $("body .rate-scale i").on('click', function() {
+        $(this).siblings().removeClass('rated');
+        $(this).nextAll().add($(this)).addClass('rated');
+    });
+
+    $(document).on('click',".edit_res_unit",function(){
+        $.ajax({
+          url: "{% url 'inline_edit_res' group_id %}",
+
+          type: "POST",
+
+          data: {
+            node_id: "{{node.pk}}",
+            "type": "edit",
+            'csrfmiddlewaretoken': "{{csrf_token}}"
+          },
+          dataType: "html",
+
+          success: function(data){
+            $(".node_details").html(data);
+            $(".edit_res_unit").text("Save")
+                          .addClass("save_res_unit")
+                          .removeClass("edit_res_unit")
+          },
+        });//end of ajax
+    });
+
+    $(document).on('click',".save_res_unit",function(){
+        var content_val = CKEDITOR.instances['ckeditor_textarea'].getData();
+        // content_val = CKEDITOR.instances.editor1.getData();
+        // console.log(content_val)
+        // console.log("calling ajax")
+        $.ajax({
+          url: "{% url 'inline_edit_res' group_id %}",
+
+          data: {
+            content_val: content_val,
+            node_id: "{{node.pk}}",
+            'csrfmiddlewaretoken': "{{csrf_token}}",
+            'type': "save"
+
+          },
+
+          type: "POST",
+
+          dataType: "html",
+
+          success: function(data){
+            $(".node_details").html(data);
+            $(".save_res_unit").text("Edit Content")
+                          .addClass("edit_res_unit")
+                          .removeClass("save_res_unit")
+          },
+        });//end of ajax
+
+    });
+
+    $(".related-content-title").on('click', function(){
+      $(this).closest('#related-content').toggleClass('content-expanded');
+    });
+    $('.related-content-close').on('click', function(e){
+      e.stopPropagation();
+      $(this).closest('#related-content').removeClass('content-expanded');
+    })
+
+
+       // $(function() {
+       //    //Activity slider initialization
+       //    var slides = [];
+       //    var currentSlide = 0;
+       //    $(".activity-slides").children().each(function(pos, activity){
+       //        slides.push(activity);
+       //    });
+       //    $(".activity-slides .activity-slide").hide();
+       //    $(".activity-slides .activity-slide:nth-child(1)").show();
+       //    $(".activity-pagination .current-slide").html(currentSlide + 1);
+       //    $(".activity-pagination .slide-count").html(slides.length);
+
+       //    $(slides[currentSlide]).animate({
+       //        left: '0%',
+       //    });
+
+       //    $(".prev-activity").on('click', function() {
+       //        if(currentSlide != 0) {
+       //            $(slides[currentSlide]).animate({
+       //                left: '100%',
+       //            } ,600 , function() {
+       //                $(this).hide();
+       //                $(slides[currentSlide - 1]).show().animate({
+       //                    left: '0',
+       //                    opacity: '1'
+       //                }, 600);
+       //                currentSlide--;
+       //                $(".activity-pagination .current-slide").html(currentSlide + 1);
+       //            });
+       //        }
+       //    });
+
+       //    $(".next-activity").on('click', function() {
+       //        if(currentSlide != slides.length-1) {
+       //            $(slides[currentSlide]).animate({
+       //                left: '-100%',
+       //            }, 600, function() {
+       //                $(this).hide();
+       //                $(slides[currentSlide + 1]).show().animate({
+       //                    left: '0',
+       //                    opacity: '1'
+       //                }, 600);
+       //                currentSlide++;
+       //                $(".activity-pagination .current-slide").html(currentSlide + 1);
+       //            });
+       //        }
+       //    });
+
+      // })
+
+  </script>
+
+{% endblock body_content %}

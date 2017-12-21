@@ -1,0 +1,6 @@
+Key-Type: 1
+Key-Length: 2048
+Name-Real: SchoolServer
+Name-Email: gstudio.ss@gmail.com
+Name-Comment: ss
+Expire-Date: 0

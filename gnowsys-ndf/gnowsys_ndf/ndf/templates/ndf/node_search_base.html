@@ -1,0 +1,11 @@
+{% load i18n %}
+<form data-abide class="search" id="node_search_form" method="POST" action="">
+<!-- Here the same url is used/applied for search url, from which this current page is accessed. -->
+{% csrf_token %}
+ 
+      <input id="search_field" name="search_field" type="text" placeholder='{% trans "Search" %} {{group_object.name}}' value="{{query|default_if_none:''}}" required />
+      <small class="error">{% trans "Please enter a keyword.. " %}</small>
+
+      <button type="submit" class="button" value="" ><i class="fi-magnifying-glass"></i></button>
+
+</form>

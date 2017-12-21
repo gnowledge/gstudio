@@ -1,0 +1,473 @@
+{% extends "ndf/base.html" %}
+{% load i18n %}
+{% load ndf_tags %}
+
+{% block title %} {{title}} - {% if node %}{% trans 'Edit' %}{% else %}{% trans 'Create' %}{% endif %}  {% endblock %}
+
+{% block style %}
+	.quiz-type-based-div{
+	    display: none;
+	}
+
+	.ck-editor-div{
+		height: 250px !important;
+	}
+
+	#cke_1_contents{
+		height: 100px !important;
+	}
+{% endblock %}
+
+{% block head %}
+	{{block.super}}
+	  <script src="/static/ndf/bower_components/jquery-ui/jquery-ui.js"></script> 
+	  <script src="/static/ndf/bower_components/jqueryui-timepicker-addon/dist/jquery-ui-timepicker-addon.min.js"></script> 
+	  <script src="/static/ndf/bower_components/jqueryui-timepicker-addon/dist/jquery-ui-sliderAccess.js"></script>
+	  <link rel="stylesheet" href="/static/ndf/bower_components/jqueryui-timepicker-addon/dist/jquery-ui-timepicker-addon.css">
+	  <link rel="stylesheet" type="text/css" href="/static/ndf/bower_components/jquery-ui/themes/smoothness/jquery-ui.css"> 
+  <script type="text/javascript" src="/static/ndf/bower_components/ckeditor/ckeditor.js"></script>
+  <script type="text/javascript" src="/static/ndf/bower_components/ckeditor/config.js"></script>
+
+{% endblock %}
+
+
+{% block body_content %}
+{% get_group_name groupid as group_name_tag %}
+<form id="quiz_item_create_form" method="POST" action="">
+{% csrf_token %}
+	{% if quiz_node_id %}
+		<input type="hidden" name="quiz_node_id" value="{{quiz_node_id}}">
+	{% endif %}
+	{% if translate %}
+		<input type="hidden" name="translate" value="{{translate}}">
+	{% endif %}
+
+	<div id="node-details-edit-div" class="tabs-content" >
+		<div class="active content row" id="panel-name-description"> 
+			<div class="row text-center">
+				<div class="small-4 large-2 columns">
+					<label for="quiz_type" class="right inline">{% trans "Select Question Type" %}</label>
+				</div>
+
+				<div class="small-5 large-5 columns left">
+					<select id="quiz_type" name="quiz_type" autofocus {% if node.quiz_type %}disabled{% endif %}>
+					<option value=""> --- Select Quiz Type --- </option>
+					{% for choice in quiz_type_choices %}
+					<option value="{{choice}}" {% ifequal node.quiz_type choice %}selected{% endifequal %}>{{choice}}</option>
+					{% endfor %}
+					</select>
+					<input id="quiz_type_val" name="quiz_type_val" type="hidden" value="{{node.quiz_type|default_if_none:""}}" />
+				</div>
+			</div>
+
+			<div class="row">
+				<div class="small-4 large-2 columns">
+					<label class="right inline">{% trans "Enter Question" %}</label>
+				</div>
+
+				<div class="small-8 large-8 columns left ck-editor-div">
+			  		{% include "ndf/html_editor.html" with var_name="content_org" var_placeholder="Enter the content here"  var_value=question_content|default_if_none:"" node_id=node.pk ckeditor_toolbar="GeneralToolbar" %}		  
+				</div>
+			</div>
+
+			<div class="row" id="options" style="display:none;">
+				<div class="small-4 large-2 columns">
+					<label for="quiz_type" class="right inline">{% trans "Options" %}</label>
+				</div>
+
+				<div class="small-8 large-8 columns left">
+				{% for option in options_list %}
+					<div class="row" id="option_div{% if not forloop.first %}_{{forloop.counter}}{% endif %}">
+						<div class="small-1 large-1 columns">
+						<label for="option" class="right inline">{{forloop.counter}}.</label>
+						</div>
+						<div class="small-11 large-11 columns">
+						<textarea id="option{% if not forloop.first %}_{{forloop.counter}}{% endif %}" name="option{% if not forloop.first %}_{{forloop.counter}}{% endif %}" rows="2" placeholder="Enter option here...">{{option}}</textarea>
+						</div>
+					</div>
+				{% empty %}
+
+					<div class="row" id="option_div">
+						<div class="small-1 large-1 columns">
+							<label for="option" class="right inline">1.</label>
+						</div>
+						<div class="small-11 large-11 columns">
+							<textarea id="option" name="option" rows="2" placeholder="Enter option here..."></textarea>
+						</div>
+					</div>
+					<div class="row" id="option_div_2">
+						<div class="small-1 large-1 columns">
+							<label for="option_2" class="right inline">2.</label>
+						</div>
+						<div class="small-11 large-11 columns">
+							<textarea id="option_2" name="option_2" rows="2" placeholder="Enter option here..."></textarea>
+						</div>
+					</div>
+				{% endfor %}
+				{% if not translate %}
+					<input id="add_option" name="add_option" type="button" class="button small" style="float:right;" value="+ Add Option"/>
+
+				{% endif %}
+				<input id="no_of_options" name="no_of_options" type="hidden" value="{% if node%}{{options_list|length}}{% else %}2{% endif %}" />
+
+				</div>
+			</div>
+
+			<div class="row hide quiz_type_based_correct_ans_div">
+
+				<div class="small-4 large-2 columns">
+					<label for="quiz_type" class="right inline">{% trans "Correct Answer" %}</label>
+				</div>
+				{% comment %}
+
+				<div class="quiz-type-based-div small-8 large-8 columns left" id="Short-Response">
+					<textarea id="correct_answer_short" name="correct_answer_short" rows="2" placeholder="Enter correct answer...">{{node.correct_answer.0|default_if_none:""}}</textarea>
+
+				</div>
+				{% endcomment %}
+
+				<div class="quiz-type-based-div small-8 large-8 columns left" id="Single-Choice" style="display:{% if node.quiz_type == "Single-Choice" %}block{% else %}none{% endif %};">
+					<select id="correct_answer_single" name="correct_answer_single" {% if translate %}disabled {% endif %}>
+					{% for option in options_list %}
+						<option value="{{forloop.counter}}" {% ifequal node.correct_answer.0 option %}selected{% endifequal %} >{{forloop.counter}}</option>
+						{% empty %}
+						<option value="1">1</option>
+						<option value="2">2</option>
+					{% endfor %}
+					</select>
+				</div>
+
+				<div class="quiz-type-based-div small-8 large-8 columns left" id="Multiple-Choice" style="display:{% if node.quiz_type == "Multiple-Choice" %}block{% else %}none{% endif %};">
+					<small>(Press Ctrl to select multiple answers)</small></label>
+					<select id="correct_answer_multiple" name="correct_answer_multiple" {% if translate %}disabled {% endif %} multiple style="height:75px;">
+					{% for option in options_list %}
+						<option value="{{forloop.counter}}" {% if option in node.correct_answer %}selected{% endif %} >{{forloop.counter}}</option>
+						{% empty %}
+						<option value="1" selected>1</option>
+						<option value="2">2</option>
+					{% endfor %}
+					</select>
+				</div>
+			</div>
+
+			<div class="row">
+				<div class="small-4 large-2 columns">
+					<label class="right inline">{% trans "Show Correct Answer " %}<br/>
+					<small>(To allow a user to see Correct Answer)</small></label>
+				</div>
+
+				<div class="small-8 large-8 columns left">
+					<select name="show_correct_ans" class="sel_show_correct_ans" {% if translate %}disabled {% endif %}>
+						<option value="True" >True</option>
+						<option value="False">False</option>
+					</select>
+				</div>
+			</div>
+
+			<div class="row">
+				<div class="small-4 large-2 columns">
+					<label class="right inline">{% trans "Check Answer " %}<br/>
+					<small>(To allow a user to see Check Answer)</small></label>
+				</div>
+
+				<div class="small-8 large-8 columns left">
+					<select name="check_ans" class="sel_check_ans" {% if translate %}disabled {% endif %}>
+						<option value="True" >True</option>
+						<option value="False">False</option>
+					</select>
+				</div>
+			</div>
+
+			<div class="row">
+				<div class="small-4 large-2 columns">
+					<label class="right inline">{% trans "Problem Weight " %}
+					</label>
+				</div>
+
+				<div class="small-8 large-8 columns left">
+					<input type="text" id="problem_weight" name="problem_weight" value="{% if node %}{{node.quizitem_problem_weight}}{% else %}1{% endif %}" {% if translate %}disabled {% endif %}>
+				</div>
+			</div>
+
+			<div class="row">
+				<div class="small-4 large-2 columns">
+					<label class="right inline">{% trans "Maximum Attempts " %}
+					</label>
+				</div>
+
+				<div class="small-8 large-8 columns left">
+					<input type="text" id="maximum_attempts" name="maximum_attempts" value="{% if node %}{{node.quizitem_max_attempts}}{% else %}1{% endif %}" {% if translate %}disabled {% endif %}>
+				</div>
+			</div>
+
+
+		</div>
+	</div>
+
+          
+      	<div class="row">
+		  	<label>{% trans "Add properties to the discussion feature " %} </label>
+		</div>
+
+
+		<div class="row">
+			<div class="small-4 large-2 columns">
+				<label class="right inline">{% trans "Release Option " %}
+				</label>
+			</div>
+
+			<div class="small-8 large-8 columns left">
+		        <select id="release_resp_sel" name="release_resp_sel" {% if translate %}disabled {% endif %}>
+		          <option value="True">Show Replies to All</option>
+		          <option value="False">Hide Replies from All</option>
+		        </select>
+			</div>
+		</div>
+
+
+
+		<div class="row">
+			<div class="small-4 large-2 columns">
+				<label class="right inline">{% trans "Interaction start date " %}
+				</label>
+			</div>
+
+			<div class="small-8 large-8 columns left">
+		      	<input type="text" id="thread_start_date" name="thread_start_date" value="" placeholder="DD/MM/YYYY" readonly="" class="date_month_day_year" style="width:15rem" {% if translate %}disabled {% endif %}> 
+			</div>
+		</div>
+
+
+		<div class="row">
+			<div class="small-4 large-2 columns">
+				<label class="right inline">{% trans "Interaction close date " %}
+				</label>
+			</div>
+
+			<div class="small-8 large-8 columns left">
+		      	<input type="text" id="thread_close_date" name="thread_close_date" value="" placeholder="DD/MM/YYYY" readonly="" class="date_month_day_year" style="width:15rem" {% if translate %}disabled {% endif %}> 
+			</div>
+		</div>
+	<input type="hidden" value="Answer" name="interaction_type_sel">
+	<div class="row">
+		<div class="small-1 columns">
+			<input id="save_quiz_item" name="save_quiz_item" type="submit" class="button small" value="Save"/>
+		</div>
+	</div>
+	{% if return_url %}
+		<input type="hidden" value="{{return_url}}" name="return_url">
+	{% endif %}
+</form>
+
+<script type="text/javascript">
+
+/*
+ * Element     : quiz_type
+ * Type        : select (Drop-down list)
+ * Event       : on change
+ * Description : 
+   (1) Based on which type of quiz is selected, it's corresponding answer-div is displayed (along with options, wherever required). 
+ */
+		 $(document).ready(function(){
+			{% if node %}
+				$(".sel_show_correct_ans").val("{{node.quizitem_show_correct_ans}}")
+				$(".sel_check_ans").val("{{node.quizitem_check_answer}}")
+				{% if node.quiz_type != "Short-Response" %}
+					$('#options').css('display', 'block');
+					$(".quiz_type_based_correct_ans_div").removeClass("hide");
+					$("#{{node.quiz_type}}").css('display', 'block');
+				{% endif %}
+
+				{% if translate %}
+
+				{% endif %}
+			{% endif %}
+		 })
+
+		$('#quiz_type').change(function (){
+		    $("#quiz_type_val").val($(this).val())
+		    var targetDivId = $(this).val();
+		    if(targetDivId == "Single-Choice" || targetDivId == "Multiple-Choice"){
+		    	$(".quiz_type_based_correct_ans_div").removeClass("hide");
+			    if ($(this).val() != $('#' + $(this).attr('id') + ' option:nth-child(1)').val()) {
+					$('#options').css('display', 'block');
+			    }
+			    else {
+					$('#options').css('display', 'none');
+			    }
+			    $('.quiz-type-based-div').hide('fast');
+			    $('div#' + targetDivId).show('fast');
+		    }
+		    else if(targetDivId == "Short-Response"){
+		    	$(".quiz_type_based_correct_ans_div").addClass("hide");
+				$('#options').css('display', 'none');
+			    $('div#' + targetDivId).hide('fast');
+		    }
+
+		});
+
+		/*
+		 * Element     : quiz_type
+		 * Type        : select (Drop-down list)
+		 * Event       : on change
+		 * Description : 
+		   (1) Based on which type of quiz is selected, it's corresponding answer-div is displayed (along with options, wherever required). 
+		 */
+
+		var no_of_options = 2;
+		/*
+		 * Element     : add_option
+		 * Type        : button
+		 * Event       : on click
+		 * Description : 
+		   (1) It clones the structure of very first option element (div) and does the necessary renaming of it's elements; and then after pastes it above 
+		       the '+ Add Option' button.
+		   (2) Also adds the corresponding option number to the correct answer's drop-down list.
+		 */
+		$('#add_option').click(function (){
+		    no_of_options = no_of_options + 1;
+
+		    // Cloneing the very first option's div
+		    var option_div_clone = $('#option_div').clone();
+
+		    // Performing renaming of it's various elements
+		    var name_val = 'option_div_' + no_of_options;
+		    option_div_clone.attr({id: name_val, name: name_val});
+
+		    option_div_clone.children().children('label').text(no_of_options + '.');
+		    option_div_clone.children().children('label').attr('for', 'option_' + no_of_options);
+
+		    option_div_clone.children().children('textarea').attr({id: 'option_' + no_of_options, name: 'option_' + no_of_options});
+
+		    // Pasting the cloned element, after modifying it, above the '+ Add Option' button
+		    $(this).before(option_div_clone);
+
+		    // Fetching the appropriate correct answer (having drop-down list) based on the option selected (Single-choice/Multiple-choice) 
+		    drop_down_answer_list_div_id = $('div#' + $('#quiz_type').val()).attr('id');
+		    
+		    // Fetching the corresponding drop-down list & appending the option number to it
+		    drop_down_answer_list = $("#" + drop_down_answer_list_div_id).children('select');
+		    drop_down_answer_list.append($('<option>', {value:no_of_options, text:no_of_options}));
+
+		    // Updating number of options value to hidden element
+		    $("#no_of_options").val(no_of_options);
+		});
+
+		var startEnrollDt = $("#thread_start_date");
+		var endEnrollDt = $("#thread_close_date");
+
+		currentDate = new Date();
+		var currentDay = currentDate.getDate();
+		var currentMonth = currentDate.getMonth();
+		var currentYear = currentDate.getFullYear();
+		lowerYearLimit = currentYear;
+		upperYearLimit = currentYear + 20;
+
+
+		$(".date_month_day_year").datepicker({ 
+			changeMonth: true,
+			changeYear: true,
+			dateFormat: 'dd/mm/yy',
+			yearRange: lowerYearLimit + ":" + upperYearLimit,
+			defaultDate: '0',
+
+			onClose: function(dateText, inst) {
+			  $(this).val(dateText);
+			  
+			  var month_year = $(this).val();
+			  day = currentDay;
+			  month = currentMonth;
+			  year = currentYear;
+			  
+			  if ($(this).attr('id') == "thread_start_date") {
+			    if (month_year) {
+			      month_year = month_year.split("/");
+			      day = parseInt(month_year[0]);
+			      month = parseInt(month_year[1]);
+			      year = parseInt(month_year[2]);
+			    }
+
+			    if (endEnrollDt.val() != '') {
+			      var testStartDate = startEnrollDt.datepicker('getDate');
+			      var testEndDate = endEnrollDt.datepicker('getDate');
+
+			      if (testStartDate > testEndDate) {
+			        endEnrollDt.datepicker('setDate', testStartDate);
+			      }
+
+			      else {
+			        $(this).val(day+"/"+month+"/"+year);
+			        $(this).datepicker('setDate', new Date(year, (month-1), day));
+			      }
+			    }
+
+			    else {
+			      endEnrollDt.val(day+"/"+month+"/"+year);
+			      $(this).datepicker('setDate', new Date(year, (month-1), day));
+			    }
+			    $("#thread_close_date").datepicker('option', 'minDate', new Date(year, (month-1), day));
+			  }
+
+			  else if ($(this).attr('id') == "thread_close_date") {
+			    if (month_year) {
+			      month_year = month_year.split("/");
+			      day = parseInt(month_year[0]);
+			      month = parseInt(month_year[1]);
+			      year = parseInt(month_year[2]);
+			    }
+
+			    if (startEnrollDt.val() != '') {
+			      var testStartDate = startEnrollDt.datepicker('getDate');
+			      var testEndDate = endEnrollDt.datepicker('getDate');
+
+			      if (testStartDate > testEndDate) {
+			        startEnrollDt.datepicker('setDate', testEndDate);
+			      }
+			      else {
+			        $(this).val(day+"/"+month+"/"+year);
+			        $(this).datepicker('setDate', new Date(year, (month-1), day));
+			      }
+			    }
+
+			    else {
+			      startEnrollDt.val(day+"/"+month+"/"+year);
+			      $(this).datepicker('setDate', new Date(year, (month-1), day));
+			    }
+			  }
+			},
+
+			beforeShow: function() {
+			  var month_year = $(this).val();
+			  day = currentDay;
+			  month = currentMonth;
+			  year = currentYear;
+
+			  if (month_year) {
+			    month_year = month_year.split("/");
+			    day = parseInt(month_year[0]);
+			    month = parseInt(month_year[1]);
+			    year = parseInt(month_year[2]);
+			  }
+			  $(this).datepicker('option', 'defaultDate', new Date(year, (month-1), day));
+			  $(this).datepicker('setDate', new Date(year, (month-1), day));
+			},
+		});
+
+		$("#save_quiz_item").click(function(event){
+			var inner_text_content = CKEDITOR.instances['ckeditor_textarea'].getData();
+			// inner_text_content = $(inner_text_content).text()
+			if(inner_text_content){
+				$("#quiz_item_create_form").append('<input type="hidden" value="'+inner_text_content+'"  name="quiz_item_name"/>')
+			}
+			else{
+				alert("Please enter question content");
+				event.preventDefault()
+			}
+
+		})
+
+
+</script>
+
+{% endblock %}
+

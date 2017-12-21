@@ -1,0 +1,172 @@
+{% load ndf_tags %}
+{% load i18n %}
+<script src="/static/ndf/bower_components/jquery-ui/jquery-ui.js"></script> <!-- checked -->
+<link href="/static/ndf/bower_components/jquery-ui/themes/smoothness/jquery-ui.css" rel="stylesheet"> <!-- checked -->
+
+<script type="text/javascript">
+var data_prefs="";
+var not_status="OFF";
+var inviting_users="";
+
+
+
+
+$(document).on('click',"#checknotif",function() {
+
+if($('#checknotif').attr('checked')) {
+not_status="ON";
+}
+else
+{
+not_status="OFF";
+}
+});
+
+
+
+function saveinvite(){
+get_all_data();
+var inviting_users=data_prefs;
+data_prefs=""
+var surl="/{{node}}/group/notify/invite_users/"
+if (not_status=="OFF")
+{
+alert("{% trans 'Notification mails sent to newly selected users' %}");
+}
+else
+{
+alert("{% trans 'Notification mails sent to all users except group owner' %}");
+}
+$.ajax({
+        url: surl,
+        type: 'POST',
+        data: {users:inviting_users,notif_status:not_status,csrfmiddlewaretoken: '{{ csrf_token }}'},
+        beforeSend: function() {
+              $("#ajax_load_image").show();
+              $("#content").css({"opacity":"0.1",})
+                              },
+       success: function(data){
+                if(data=="Success")
+                    { alert("{% trans 'Successfully applied modifications and e-mail notifications sent' %}");
+                      $('.close-reveal-modal.group').trigger('click'); 
+
+                     }
+
+                else{
+                      alert("{% trans 'failed to subscribe' %}");
+                      $('.close-reveal-modal.group').trigger('click');
+                        }
+
+                             },
+        complete: function(){
+                $("#ajax_load_image").hide();
+                $("#content").css({"opacity":"",})
+          }
+}); 
+}
+
+$(document).on('keydown',"#collection_set_search",function(e){
+      if (e.keyCode == 8) {
+        // If backspace pressed, then show all
+        search_text_len = 0;
+      }
+      var $li = $("#collection_set_search").parents("li").nextAll("li.bullet-item")
+      if(e.keyCode==13){
+        var search_text = (this.value).toLowerCase().trim();
+        var search_text_len = (search_text.length + 1);
+
+      }
+      if (search_text_len>0) {
+        // $(".searching").css("display", "block");
+        $li.each(function() {
+          val_chk = $(this).text().toLowerCase().search(search_text)  
+          if (val_chk != -1) {
+            $(this).css("display", "block");
+          }     
+          else{
+            $(this).css("display", "none");
+          }
+        });
+        // $(".searching").css("display", "none");
+      }
+      else if (search_text_len == 0) {
+        $li.filter(function() {
+          if ($(this).css("display") == "none") {
+            return true;
+          }
+          else {
+            return false;
+          }
+        }).show();
+      }
+
+})
+
+
+$(document).on('click',"#subscr_users",function() {
+
+ $('#inviteusers #collection_set_drawer1').html("");
+ $('#inviteusers #collection_set_drawer2').html("");
+ $('#inviteusers #collection_set_drawer1').html('<li class="price"><input type="text" placeholder="{% trans "Type here and press enter to search users" %}" id="collection_set_search" class="margin-0"></li>');
+
+var url="/{{node}}/group/notify/invite_users/"
+ $.getJSON( url, function( data ) {
+  $.each(data ,function(index , drawer_elements){
+   if(index == 0)
+    {
+     $.each(drawer_elements.drawer1, function(index, element) {
+        name_field1 = element.username + "<br><i>"+element.email+"</i>"
+        $('#inviteusers #collection_set_drawer1').append("<li id='"+element.id+"' class='bullet-item text-left'>"+name_field1+"</li>");
+      });
+   }
+   if(index == 1)
+    {
+    $.each(drawer_elements.drawer2, function(index, element) {
+        name_field2 = element.username + "<br><i>"+element.email+"</i>"
+        $('#inviteusers #collection_set_drawer2').append("<li id='"+element.id+"' class='bullet-item text-left'>"+name_field2+"</li>");
+      });
+    }
+
+ }); //close each
+   }); //getjson
+}); //document click
+
+
+
+
+
+function get_all_data(){
+ $.each($('#inviteusers #collection_set_drawer2 li'),function(index,item){
+         data_prefs=data_prefs+String(item.id)+",";
+         });
+}
+
+
+</script>
+<style type="text/css">
+  .subscr_users_li{
+     list-style: none;
+  }
+</style>
+{% if not no_subscribe_btn %}
+{% check_is_gstaff groupid request.user as is_gstaff %}
+{% get_sg_member_of groupid as list_of_sg_member_of %}
+{% if group_object.edit_policy != "EDITABLE_MODERATED" or 'CourseEventGroup' in group_object.member_of_names_list or 'ProgramEventGroup' in list_of_sg_member_of or is_gstaff %}
+  <a id="subscr_users" data-reveal-id="inviteusers" class="tiny button left-btn radius" title="View/Subscribe Users">{% trans 'Subscribe Users' %}</a>
+{% else %}
+  <a class="tiny button left-btn radius secondary disabled" title="You are not authorized for this action">{% trans 'Subscribe Users' %}</a>
+{% endif %}
+{% endif %}
+<div id="inviteusers" class="reveal-modal " data-reveal >
+     
+     {% blocktrans %}<h2>Select Users</h2>{% endblocktrans %}
+      <div id="module_drawer" >
+        {% include "ndf/drawer_widget.html" with widget_for="collection_set"  %}
+      </div>
+
+            <label><input type="checkbox" id="checknotif" value="ON"> {% trans "Send notification mails to all except the group owner" %}</label>
+              
+      <input type="button" id="#submitUserInvite" class="button small" value="submit" onClick="saveinvite()"> 
+     <a class="close-reveal-modal group">&#215;</a>
+</div>
+

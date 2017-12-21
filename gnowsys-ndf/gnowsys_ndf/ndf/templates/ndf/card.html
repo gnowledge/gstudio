@@ -1,0 +1,121 @@
+{% load i18n %}
+{% load ndf_tags %}
+{% load simple_filters %}
+
+<div class="rcard">
+
+{% if first_arg and second_arg and third_arg %}
+  <a href="{% url url_name first_arg second_arg third_arg %}">
+{% elif first_arg and second_arg %}
+  <a href="{% url url_name first_arg second_arg %}">
+{% elif first_arg %}
+  <a href="{% url url_name first_arg %}">
+{% endif %}
+
+  <div class="image">
+    <div class="{{resource.status|lower}} card-label">
+      <div class="label-text"></div>
+    </div>
+        {% get_dict_from_list_of_dicts resource.attribute_set as attr_set_dict %}
+    {% if resource.fs_file_ids.1 %}
+      <img src="{% url 'get_gridfs_resource' resource.fs_file_ids.1 %}" alt="">
+    {% elif resource.collection_set %}
+        <i class="collection"></i>
+    {% elif "File" in resource.member_of_names_list %}
+      {% if attr_set_dict.educationaluse and attr_set_dict.educationaluse != "Documents" %}
+        <i class="{{attr_set_dict.educationaluse|lower}}"></i>
+      {% else %}
+        <i class="{{resource.mime_type|lower|split:'/'|join:' '}}"></i>
+      {% endif %}
+    {% else %}
+      <i class="{{resource.member_of_names_list.0|lower}}"></i>
+    {% endif %}
+
+    <span class="title">{% firstof resource.altnames resource.name %}</span>
+  </div>
+</a>
+
+  <div class="content">
+
+    <!-- description -->
+    {% if resource.content_org %}
+      <div title="{{resource.content_org}}">
+        <h4 class="text-center card-content-title"><small>{% trans "Description" %}</small></h4>
+        {{resource.content_org|truncatechars:75}}
+      </div>
+    {% endif %}
+    
+    <!-- tags -->
+    {% if resource.tags %}
+      <div>
+        <h4 class="text-center card-content-title"><small>{% trans "Tags" %}</small></h4>
+        <div>
+        
+          {% for each_tag in resource.tags %}
+            {% if forloop.counter < 7 %}
+              <div class="label secondary"><a href="{% url 'tag_info' group_id each_tag %}">
+              {{each_tag}}</a></div>
+            {% endif %}
+          {% endfor %}
+          {% if resource.tags|length > 6 %}
+            <small>+{{ resource.tags|length|add:"-6"}} {% trans "more..." %}</small>
+          {% endif %}
+        
+        </div>
+      </div>
+    {% endif %}
+    
+    <!-- properties -->
+      
+    {% comment %}
+    {% if resource.attribute_set %}
+      <div>
+        <h4 class="text-center card-content-title"><small>Properties</small></h4>
+        
+          <small>
+            {% for each_attr_key, each_attr_val in attr_set_dict.items %}
+              {% if forloop.counter < 3 %}
+                <b>{{each_attr_key}}</b>: {{each_attr_val}}<br/>
+              {% endif %}
+            {% endfor %}
+            {% if resource.attribute_set|length > 2 %}
+              +{{ resource.attribute_set|length|add:"-2"}} more...
+            {% endif %}
+          </small>
+        
+      </div>
+    {% endif %}
+    {% endcomment %}
+
+    <!-- file info data -->
+    {% comment %}
+      {% if "File" in resource.member_of_names_list %}
+        <div>
+          <h4 class="text-center card-content-title"><small>Resource Metadata</small></h4>
+            <div><b>Type</b>: {{resource.mime_type}}</div>
+            <div><b>Size</b>: {{resource.file_size.size}} {{resource.file_size.unit}}</div>
+        </div>
+      {% endif %}
+    {% endcomment %}
+        
+  </div>
+  <!-- end of content -->
+
+  <div class="action">
+    By <a href="{% url 'dashboard' resource.created_by %}" title="{{resource.created_by|get_username}}">
+      {{resource.created_by|get_username|truncatechars:"10"}}
+    </a> at {{resource.created_at|date:"d M Y"}}
+    <span class="add-to-collection right" title="Add to collection">
+      <input type="checkbox" style="margin:0;" class="filenode" name="filenode" value="{{resource.pk}}">
+    </span>
+  </div>
+</div>
+
+<script type="text/javascript">
+  $(document).ready(function () {
+      $('.rcard .content').slick({
+      // dots: true, fade: true,
+      infinite: true, arrows: true, speed: 500, cssEase: 'linear'
+    });
+  })
+</script>

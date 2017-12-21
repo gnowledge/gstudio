@@ -1,0 +1,526 @@
+{% load i18n %}
+
+{% load ndf_tags %}
+{% get_group_name groupid as group_name_tag %}
+
+<style>
+
+	.jqtree-closed > .jqtree-element i.icon-folder-open:before {
+        content: "\f07b";
+    }
+
+    .jqtree-tree i {
+		margin-right: 4px;
+    }
+
+    ul.jqtree-tree ul.jqtree_common {
+    	margin-left: 36px;
+    }
+    
+    .topic_stats{
+    	margin-top: 8em;
+
+    }
+</style>
+
+
+<script type="text/javascript">
+
+  	function plotHierarchyTree() {
+		// Funtion for loading tree for showing collection list left side panel
+		doc();
+
+		// Function for manipulating tree when user visits to page directly via browser url
+		{% if selected %} TreeTillNode(); {% endif %}
+    }
+
+
+  	function TreeTillNode () {
+
+		// This gives the last hierarchy node id from browser url.
+		var url = "{{selected}}";
+
+		var tree_build = $(".themes").not(".jqtree-loading");
+		var node = tree_build.tree('getNodeById', url);
+		tree_build.tree('openNode', node);
+
+		// console.log(node)
+		// Javascript function to be used for checking objects in specific time of interval
+		setTimeout(function(){
+
+		// console.log(node)
+		if( (!node) ) { TreeTillNode() }
+		}, 1000 );
+		
+		$('article').unblock();
+    }
+
+
+	function doc() {
+		
+		var $tree = $('.themes');
+		var user = "{{user.is_authenticated}}";
+		var unfold = "{{unfold}}";
+
+		if(unfold == "true"){
+			unfold = true
+		}
+		else{
+			unfold = false
+		}
+
+		$tree.tree({
+			autoOpen: unfold,
+
+    		onCreateLi: function(node, $li) {
+					
+				if (node.node_type == "Topic"){
+					$li.find('.jqtree-title').before('&nbsp <span class="fa fa-file-o"></span> &nbsp;');				        	
+				}
+				else{
+					$li.find('.jqtree-title').before('&nbsp <span class="fa fa-folder" style="color:#4c4c4c"></span> &nbsp;');				        		
+				}
+    			   
+				if (node.node_type == "Topic"){        					
+					$li.find('.jqtree-element').append(
+
+            				'&nbsp;&nbsp;<a id='+node.id+' name='+node.name+' class="topic" href="/{{groupid}}/{{topic_url}}/'+node.id+'/"> </a>' 
+        			);	            			
+				}
+				else{
+					if (user == "True"){
+
+    					$li.find('.jqtree-element').append(
+        					{% user_access_policy groupid request.user as user_access %}
+        					{% if user_access == "allow" %}
+
+                				'&nbsp;&nbsp;<a href="/{{groupid}}/{{topic_url}}/'+node.id+'/"> <i class="fa fa-pencil" style="color:#4c4c4c"></i></a> &nbsp;&nbsp; <a id='+node.id+' class="objectsCheckbox"> <input type="checkbox"> </a>' 
+                			
+                			{% endif %}
+        				);
+					}
+				}
+    		}
+		});
+		
+		// bind 'tree.click' event
+		$tree.bind(
+		    'tree.click',
+		    function(event) {
+		        // The clicked node is 'event.node'
+		        var node = event.node;
+
+		        var parent_arr = [];
+	            var parent_node = node;
+	            parent_arr.push(node.id);
+
+	            // Bellow code manipulates the parent hierarchy of clicked node in a tree
+	            while (parent_node) {
+	                if (parent_node.name !== undefined){           
+	                  $tree.tree('openNode', parent_node);
+	                  parent_node = parent_node.parent;
+	                  if (parent_node.name !== undefined){
+	                    parent_arr.push(parent_node.id);                                          
+	                  }
+	                }
+	                else{
+	                  break;
+	                }
+	            }
+	            var nav_list = parent_arr.reverse();
+		        // alert(nav_list);
+
+		        // If its topic node i.e no children of this node then show the detail view for topic
+		  		if( node.children[0] == null ){
+
+		  			if (node.node_type == "Topic"){
+		  				location.href = "/{{group_name_tag}}/topic_details/"+node.id+"?nav_li="+nav_list+"";
+		  			}
+		  		}
+		    }
+		);
+
+		$tree.bind(
+		    'tree.contextmenu',
+		    function(event) {
+		        // The clicked node is 'event.node'
+		        var node = event.node;
+		        {% user_access_policy groupid request.user as user_access %}
+        		{% if user_access == "allow" %}
+			        var msg = confirm("Do you want to delete this topic ?");
+			        if (msg == true) {
+
+			        	$.ajax({
+			            	url: "{% url 'delete_themes' groupid %}",
+			             	type: 'POST',
+			             	data:{
+			             		deleteobj: node.id,
+			             		csrfmiddlewaretoken: '{{ csrf_token }}'
+			             	},
+			             	success: function(result){
+			             		alert("Topic "+node.name+" deleted successfully");
+			             		location.reload(true);
+			             	},
+			            });
+					}
+				{% endif %} 
+		    }
+		);
+	};
+
+
+	// method to handle hover on topics
+	function showTopicStats(){
+      // Javascript function to be used for checking objects in specific time of interval
+      setTimeout(function(){
+      	//  On hover of topic node manipulate resources only once
+
+		$(".jqtree-title.jqtree_common").hover( function(){
+
+			topic_id = $(this).siblings("a").attr("id");
+			// var topic_name = $(this).siblings("a").attr("name");
+			var data_info = $(this).attr("data-info");
+			var hover_context = this;
+			if ( ! data_info && topic_id ){
+				$(".topic_stats").css("display", "none");
+
+				$.ajax({
+	            	url: "{% url 'get_topic_contents' groupid %}",
+					// type: 'POST',
+	             	data:{
+	             		node_id: topic_id,
+						// csrfmiddlewaretoken: '{{ csrf_token }}'
+	             	},
+	             	success: function(data){
+	             		
+	             		count = display_top_res(data)
+
+	             		if (data != "{}"){
+
+	             			$(".topic_stats").html(count);
+	             			$(hover_context).attr("data-info", data)
+
+	             			$(".topic_stats").css("display", "block");
+	             			
+	             		}
+	             		else{
+	             			$(hover_context).attr("data-info", data);	             			
+	             		}
+
+	             	},
+	             	
+	            });
+
+
+			}
+			else{ 
+				
+				if (topic_id){
+					var data = $(this).attr("data-info");
+					count = display_top_res(data)
+					$(".topic_stats").html(count);
+	     			$(".topic_stats").css("display", "block");
+				}
+
+			}
+		});
+		
+        // console.log($(".jqtree-element.jqtree_common"))
+        if( ($(".jqtree-title.jqtree_common").length <= 0) ) { 
+        	showTopicStats() 
+        }
+
+      }, 1000 );
+	}
+
+
+	function display_top_res(data){
+		data_obj = JSON.parse(data);
+ 		count = ""
+
+ 		if (data != "{}"){
+ 			var k = Object.keys(data_obj); // To get the keys from incomming data
+
+ 			for (var m = 0; m < k.length; m++) { 
+ 				var key = k[m];  
+ 				var len = data_obj[key].length;  // length of list as a value of key
+ 				// alert(key+": "+len);
+ 				count += key+": "+len+"<br/>";
+ 			} 			
+
+ 		}
+ 		else{
+ 			count += "{% trans 'No Resources' %}!<br/>";
+ 		}
+
+ 		return count
+
+	}
+
+	showTopicStats();
+
+	    	$("document").on("hover", ".jqtree-title.jqtree_common", function(){
+    		setTimeout(function(){
+		      }, 1000);
+
+			alert($(this).siblings("a").attr("id"));
+		});
+
+	
+
+		// script for fold themes_cards hierarchy
+		$(".fold").click(function() {
+			$(function() {				
+				location.href = "{% url 'theme_page' group_name_tag app_id %}";
+			});
+		});
+
+		// script for unfold themes hierarchy
+	    $(".unfold").click(function() {
+	    	$(function() {
+	    		location.href = "{% url 'theme_page' group_name_tag app_id %}?unfold=true";	
+	    	});
+	    });	
+
+	    $(".tree_browser").click(function() {
+			$(function() {				
+				location.href = "{% url 'theme_page' group_name_tag app_id %}";
+			});
+		});
+
+	    // script for delete themes
+	    $(document).on('click',".button.deleteObjects",function(){
+	    	var selectedobject = $(".objectsCheckbox input:checked")
+
+	    	if(selectedobject.length > 0)
+	    	{
+           		$('#myModal').foundation('reveal', 'open');
+
+           		var i = 0;
+             	var str = "";  
+	            $.map(selectedobject,function(each){
+	                if(i == 0)
+	                {
+	                	str = str.concat(each.parentElement.id)
+	                }
+	                else 
+	                {
+	                	str = str.concat(","+each.parentElement.id)
+	                }
+	                
+	                i= i+1
+	            })
+
+           		$.ajax({
+		            url: "{% url 'delete_themes' groupid %}",
+		            type: 'POST',
+		            data:{
+		            	context_theme: "{{node.pk}}",
+		            	deleteobjects: str,
+		            	csrfmiddlewaretoken: '{{ csrf_token }}'
+		            },
+             		success: function(result){
+
+             			$("#deletion_results").html("");
+                        for(var obj in result)
+                        {
+	                  		var li = $("<ul><li><b>"+result[obj].title+"</b></li></ul>").appendTo($("#deletion_results"));
+                        }
+
+             		},
+             	});
+
+           	}
+           	else
+           	{
+        		alert("select object to delete")
+        	}
+
+	    });
+
+		// Script for delete themes after confirm delete.
+		$(document).on('click',".button.confirmDeleteObjects",function(){
+	        var selectedobject = $(".objectsCheckbox input:checked")
+
+	        if(selectedobject.length > 0)
+	        {
+	            var i = 0;
+	            var str = "";  
+
+	            $.map(selectedobject,function(each){
+	            	if(i == 0)
+	            	{
+	            		str = str.concat(each.parentElement.id)
+	            	}
+	                else 
+	                {
+	                	str = str.concat(","+each.parentElement.id)
+	                }
+
+	                i= i+1
+	            });
+
+	            $.ajax({
+	            	url: "{% url 'delete_themes' groupid %}",
+	             	type: 'POST',
+	             	data:{
+		            	context_theme: "{{node.pk}}",
+	             		deleteobjects: str,
+	             		confirm:"yes",
+	             		csrfmiddlewaretoken: '{{ csrf_token }}'
+	             	},
+	             	success: function(result){
+	             		alert("Themes deleted successfully");
+	             		$('#myModal').foundation('reveal', 'close');
+	             		location.reload(true);
+	             	},
+	             	
+	            });
+	             
+	        }
+	        else{
+	        alert("select object to delete")
+	        }
+
+		});
+
+		// Script for selecting all objects 
+		$(document).on('click',".checkedAll",function(){
+			if($(this).is(":checked")==true)
+			{
+				$('.objectsCheckbox input').prop( "checked", true );
+			}
+			else
+			{
+				$('.objectsCheckbox input').prop( "checked", false );
+			}
+		});
+
+		// Script for cancel option for deleting themes
+		$(document).on('click',".button.cancelDeleteObjects",function(){
+             $('#myModal').foundation('reveal', 'close');
+		});
+
+
+    	$("document").on("hover", ".jqtree-title.jqtree_common", function(){
+    		setTimeout(function(){
+		      }, 1000);
+
+			alert($(this).siblings("a").attr("id"));
+		});
+
+		// Script for selecting all objects 
+		$(document).on('click',".checkedAll",function(){
+			if($(this).is(":checked")==true)
+			{
+				$('.objectsCheckbox input').prop( "checked", true );
+			}
+			else
+			{
+				$('.objectsCheckbox input').prop( "checked", false );
+			}
+		});
+
+		// Script for cancel option for deleting themes
+		$(document).on('click',".button.cancelDeleteObjects",function(){
+             $('#myModal').foundation('reveal', 'close');
+		});
+
+	    // script for delete themes
+	    $(document).on('click',".button.deleteObjects",function(){
+	    	var selectedobject = $(".objectsCheckbox input:checked")
+
+	    	if(selectedobject.length > 0)
+	    	{
+           		$('#myModal').foundation('reveal', 'open');
+
+           		var i = 0;
+             	var str = "";  
+	            $.map(selectedobject,function(each){
+	                if(i == 0)
+	                {
+	                	str = str.concat(each.parentElement.id)
+	                }
+	                else 
+	                {
+	                	str = str.concat(","+each.parentElement.id)
+	                }
+	                
+	                i= i+1
+	            })
+
+           		$.ajax({
+		            url: "{% url 'delete_themes' groupid %}",
+		            type: 'POST',
+		            data:{
+		            	context_theme: "{{node.pk}}",
+		            	deleteobjects: str,
+		            	csrfmiddlewaretoken: '{{ csrf_token }}'
+		            },
+             		success: function(result){
+
+             			$("#deletion_results").html("");
+                        for(var obj in result)
+                        {
+	                  		var li = $("<ul><li><b>"+result[obj].title+"</b></li></ul>").appendTo($("#deletion_results"));
+                        }
+
+             		},
+             	});
+
+           	}
+           	else
+           	{
+        		alert("select object to delete")
+        	}
+
+	    });
+
+
+		// Script for delete themes after confirm delete.
+		$(document).on('click',".button.confirmDeleteObjects",function(){
+	        var selectedobject = $(".objectsCheckbox input:checked")
+
+	        if(selectedobject.length > 0)
+	        {
+	            var i = 0;
+	            var str = "";  
+
+	            $.map(selectedobject,function(each){
+	            	if(i == 0)
+	            	{
+	            		str = str.concat(each.parentElement.id)
+	            	}
+	                else 
+	                {
+	                	str = str.concat(","+each.parentElement.id)
+	                }
+
+	                i= i+1
+	            });
+
+	            $.ajax({
+	            	url: "{% url 'delete_themes' groupid %}",
+	             	type: 'POST',
+	             	data:{
+		            	context_theme: "{{node.pk}}",
+	             		deleteobjects: str,
+	             		confirm:"yes",
+	             		csrfmiddlewaretoken: '{{ csrf_token }}'
+	             	},
+	             	success: function(result){
+	             		alert("Themes deleted successfully");
+	             		$('#myModal').foundation('reveal', 'close');
+	             		location.reload(true);
+	             	},
+	             	
+	            });
+	             
+	        }
+	        else{
+	        alert("select object to delete")
+	        }
+
+		});
+
+</script>

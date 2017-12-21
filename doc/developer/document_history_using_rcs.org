@@ -1,0 +1,414 @@
+#+OPTIONS: ^:nil
+Documentation for developers of gstudio
+* Version Control of Resources Using Revision Control System (RCS)
+  
+  RCS is a freely available file revision control system that can be used 
+  to coordinate groups of people working on common files as well as by 
+  yourself alone in your own private projects. It allows you to:
+
+  1) get easy access to the latest version of a file that is being worked 
+     on by many people;
+  3) get easy access to all previous version of files to
+
+     - undo unfortunate modifications,
+     - reconstruct the source code of old released file versions; 
+
+  4) get easy access to a list of changes (diff) that have been made by 
+     various people to your files
+  5) avoid that two people independently make non-causal changes at the 
+     same time on the latest version of a file and thereby create two 
+     different latest versions. 
+
+  RCS consists of the four frequently used shell commands ci, co, rlog, 
+  and rcsdiff, as well as of the rarely needed commands rcs, ident, 
+  rcsclean, and rcsmerge.
+
+  Read man rcsintro now to get a quick overview of the system.
+
+  Refer follwoing link:
+
+  1) RCS Tutorial -- http://oreilly.com/perl/excerpts/system-admin-with-perl/five-minute-rcs-tutorial.html#common_rcs_operations"
+
+
+** Create RCS repository
+
+   1. Run the following command: "python manage.py initrcsrepo"
+
+   2. Necessary code to look out for:
+   
+   1) In settings.py file
+
+	 - VERSIONING_COLLECTION: list of collection-names whose 
+	   documents' history needs to be maintained
+	 - RCS_REPO_DIR : absolute filesystem path to the directory that
+	   will hold all rcs-files (history-files corresponding to every 
+	   json-file created for each document) 
+	 - RCS_REPO_DIR_HASH_LEVEL : indicates the "hash-level-number", 
+	   i.e the number of sub-directories that will be created for 
+	   the corresponding document under it's collection-directory; 
+	   in order to store json-files in an effective manner 
+	 
+      2) In models.py file
+	 - create_rcs_repo_collections() : Function of HistoryManager 
+	   class that creates RCS(named as 'rcs-repo') repository along with 
+	   sub-directories for each collection inside it
+
+      3) In initrcsrepo.py file
+
+	 - Command class : It consists of call to the above specified 
+	   create_rcs_repo_collections() function accepting 
+	   VERSIONING_COLLECTION as an argument; which gets executed on 
+	   execution of the above specified command(Step 1.).
+	      
+
+** Create/Overwrite a json-file of a document
+
+   1. create_or_replace_json_file() : Function of HistoryManager 
+      class that creates/overwrites a json-file for passed document object in 
+      its respective hashed-directory structure.
+
+   2. Code-snippet
+
+#+BEGIN_EXAMPLE
+
+      history_manager  HistoryManager()
+      
+      if not history_manager.create_or_replace_json_file(<collection-document-object>):
+          <collection-object>.remove({'_id': <collection-document-object>._id})
+
+#+END_EXAMPLE
+
+     
+
+** Insert a new document -- checkin()
+
+   1. While inserting a new document, follow the following sequence:
+   
+   1) Insert document -- using save() mongokit function,
+
+      2) Call checkin() function of RCS class from rcslib.py file
+
+   2. Syntax:
+      
+      1) <collection-object>.save()
+
+      2) RCS().checkin(<file-path>[, 1[, 'desc-message'[, '-i']]])
+
+
+** Update a document -- checkout(), update json-file and then checkin()
+
+   1. While updating a document, follow the following sequence:
+
+      1) Update document -- using update() mongokit function,
+      2) Call checkout() function of RCS class from rcslib.py file,
+      3) Update file -- using create_or_replace_json_file(), and
+      4) Call checkin() function.
+
+   2. Syntax:
+
+      1) <collection-object>.update(...)
+      2) RCS().checkout(<file-path>)
+      3) HistoryManager().create_or_replace_json_file(<collection-document-object>)
+      4) RCS().checkin(<file-path>[, 'commit-message'[, 'other-options']])
+
+
+** Difference between two revisions(history) of a json-file -- using diff()
+
+   1. Call diff() function of RCS class from rcslib.py file
+
+   2. Syntax: RCS().diff(<file-path>[, <rev-1>[, <rev-2]])
+
+
+** Code-snippet: Implementing all above functionalities together
+
+#+BEGIN_EXAMPLE
+   from gnowsys_ndf.ndf.models import *
+   from bson import ObjectId
+   from django_mongokit import get_database
+   
+   db  get_database()
+   c_aut = db[Author.collection_name]
+   
+   o_aut = c_aut.Author()
+   o_aut.username = u"demo_username"
+   o_aut.password = u"demo_password"
+   _aut.save()
+   {u'_id': ObjectId('525e5b6ac76db10c810c6c20'),
+   u'address': None,
+   u'created_at': datetime.datetime(2013, 10, 16, 14, 54, 38, 17000),
+   u'email': None,
+   u'first_name': None,
+   u'is_active': None,
+   u'is_staff': None,
+   u'is_superuser': None,
+   u'last_login': None,
+   u'last_name': None,
+   u'password': u'demo_password',
+   u'phone': None,
+   u'username': u'demo_username'}
+   
+#+END_EXAMPLE
+   
+** Creating json-file for the newly inserted document
+
+#+BEGIN_EXAMPLE
+
+   hm = HistoryManager()
+   
+   if not hm.create_or_replace_json_file(o_aut):
+        c_aut.remove({'_id': o_aut._id})
+
+#+END_EXAMPLE
+   
+   
+** Initial Check-in
+
+#+BEGIN_EXAMPLE
+   cur_aut = c_aut.Author.find()
+   objid = cur_aut[0]._id
+   
+   from gnowsys_ndf.ndf.rcslib import RCS
+   
+   rcsobj = RCS()
+   
+   fp = hm.get_file_path(c_aut.Author.one({'_id': objid}))
+   
+   rcsobj.checkin(fp, 1, "Descriptive-message...", "-i")
+
+#+END_EXAMPLE   
+
+** Update - Storing history - Check-out, update file & Check-in
+
+#+BEGIN_EXAMPLE
+
+
+   ============== 1ST UPDATE ====================
+   
+   fp = hm.get_file_path(c_aut.Author.one({'_id': objid}))
+   
+   fp
+   '.../gnowsys_ndf/ndf/static/rcs-repo/Authors/0/2/6/525e5b6ac76db10c810c6c20.json'
+
+   c_aut.update({'_id': objid}, {'$set': {'username': u'un_2', 'password': u'pwd_2'}})
+   {u'connectionId': 1,
+   u'err': None,
+   u'n': 1,
+   u'ok': 1.0,
+   u'updatedExisting': True}
+
+#+END_EXAMPLE
+
+   NOTE: After update, re-retrieve the object from the database-collection; otherwise your json-file won't get updated. Because the instance refers to (or holds) the document instance that was referring to before update command was executed, and the json-file gets created based on the document-instance that is passed to create_or_replace_json_file() function. Hence, must do the same.
+#+BEGIN_EXAMPLE
+
+   c_aut.Author.one({'_id': objid})
+   {u'_id': ObjectId('525e5b6ac76db10c810c6c20'),
+   u'address': None,
+   u'created_at': datetime.datetime(2013, 10, 16, 14, 54, 38, 17000),
+   u'email': None,
+   u'first_name': None,
+   u'is_active': None,
+   u'is_staff': None,
+   u'is_superuser': None,
+   u'last_login': None,
+   u'last_name': None,
+   u'password': u'pwd_2',
+   u'phone': None,
+   u'username': u'un_2'}
+
+   hm.create_or_replace_json_file(c_aut.Author.one({'_id': objid}))
+   
+   rcsobj.checkin(fp, 1, 'Added -- _2')
+   
+#+END_EXAMPLE
+   
+#+BEGIN_EXAMPLE
+   ============== 2ND UPDATE ====================
+
+   
+   c_aut.update({'_id': objid}, {'$unset': {'address': u''}})
+   {u'connectionId': 1,
+   u'err': None,
+   u'n': 1,
+   u'ok': 1.0,
+   u'updatedExisting': True}
+   
+   c_aut.Author.one({'_id': objid})
+   {u'_id': ObjectId('525e5b6ac76db10c810c6c20'),
+   u'created_at': datetime.datetime(2013, 10, 16, 14, 54, 38, 17000),
+   u'email': None,
+   u'first_name': None,
+   u'is_active': None,
+   u'is_staff': None,
+   u'is_superuser': None,
+   u'last_login': None,
+   u'last_name': None,
+   u'password': u'pwd_2',
+   u'phone': None,
+   u'username': u'un_2'}
+   
+   rcsobj.checkout(fp)
+
+   hm.create_or_replace_json_file(c_aut.Author.one({'_id': objid}))
+
+   rcsobj.checkin(fp, 1, 'Deleted (note: here, element not value)-- address')
+   
+#+END_EXAMPLE
+
+
+#+BEGIN_EXAMPLE
+
+
+   ============== 3RD UPDATE ====================
+   
+   c_aut.update({'_id': objid}, {'$set': {'address': None}})
+   {u'connectionId': 1,
+   u'err': None,
+   u'n': 1,
+   u'ok': 1.0,
+   u'updatedExisting': True}
+   
+   c_aut.Author.one({'_id': objid})
+   {u'_id': ObjectId('525e5b6ac76db10c810c6c20'),
+   u'address': None,
+   u'created_at': datetime.datetime(2013, 10, 16, 14, 54, 38, 17000),
+   u'email': None,
+   u'first_name': None,
+   u'is_active': None,
+   u'is_staff': None,
+   u'is_superuser': None,
+   u'last_login': None,
+   u'last_name': None,
+   u'password': u'pwd_2',
+   u'phone': None,
+   u'username': u'un_2'}
+   
+   rcsobj.checkout(fp)
+   
+   hm.create_or_replace_json_file(c_aut.Author.one({'_id': objid}))
+
+   rcsobj.checkin(fp, 1, 'Added (note: here, element not value)-- address')
+
+#+END_EXAMPLE   
+
+#+BEGIN_EXAMPLE
+
+
+
+   ============== 4TH UPDATE ====================
+   
+   c_aut.update({'_id': objid}, {'$set': {'address': u'address_new'}})
+   {u'connectionId': 1,
+   u'err': None,
+   u'n': 1,
+   u'ok': 1.0,
+   u'updatedExisting': True}
+   
+   c_aut.Author.one({'_id': objid})
+   {u'_id': ObjectId('525e5b6ac76db10c810c6c20'),
+   u'address': u'address_new',
+   u'created_at': datetime.datetime(2013, 10, 16, 14, 54, 38, 17000),
+   u'email': None,
+   u'first_name': None,
+   u'is_active': None,
+   u'is_staff': None,
+   u'is_superuser': None,
+   u'last_login': None,
+   u'last_name': None,
+   u'password': u'pwd_2',
+   u'phone': None,
+   u'username': u'un_2'}
+   
+   rcsobj.checkout(fp)
+
+   hm.create_or_replace_json_file(c_aut.Author.one({'_id': objid}))
+
+   rcsobj.checkin(fp, 1, 'Added -- address_new')
+
+#+END_EXAMPLE      
+   
+** Difference between two versions -- diff() that implemets rcsdiff() 
+
+#+BEGIN_EXAMPLE
+
+
+   ============== 1ST DIFF ====================
+   
+   rcsobj.diff(fp)
+   ===================================================================
+   RCS file: /home/avadoot/Desktop/Tissproject/TP_MK/gstudio/gnowsys-ndf/gnowsys_ndf/ndf/static/rcs-repo/Authors/0/2/6/525e5b6ac76db10c810c6c20.json,v
+   retrieving revision 1.5
+   retrieving revision 1.4
+   diff -r1.5 -r1.4
+   
+   Actual O/P returned: '5c5\n<     "address": "address_new",\n---\n>     "address": null,\n'
+   
+   After formatting: 
+   5c5
+   <     "address": "address_new",
+   ---
+   >     "address": null,
+   
+#+END_EXAMPLE X  
+
+#+BEGIN_EXAMPLE
+
+
+   ============== 2ND DIFF ====================
+   
+   rcsobj.diff(fp, '1.5', '1.4')
+   ===================================================================
+   RCS file: /home/avadoot/Desktop/Tissproject/TP_MK/gstudio/gnowsys-ndf/gnowsys_ndf/ndf/static/rcs-repo/Authors/0/2/6/525e5b6ac76db10c810c6c20.json,v
+   retrieving revision 1.5
+   retrieving revision 1.4
+   diff -r1.5 -r1.4
+   
+   Actual O/P returned: '5c5\n<     "address": "address_new",\n---\n>     "address": null,\n'
+   
+   After formatting: 
+   5c5
+   <     "address": "address_new",
+   ---
+   >     "address": null,
+   
+#+END_EXAMPLE   
+
+
+#+BEGIN_EXAMPLE
+
+
+   ============== 3RD DIFF ====================
+   
+   rcsobj.diff(fp, '1.5', '1.3')
+   ===================================================================
+   RCS file: /home/avadoot/Desktop/Tissproject/TP_MK/gstudio/gnowsys-ndf/gnowsys_ndf/ndf/static/rcs-repo/Authors/0/2/6/525e5b6ac76db10c810c6c20.json,v
+   retrieving revision 1.5
+   retrieving revision 1.3
+   diff -r1.5 -r1.3
+ 
+   Actual O/P returned: '5d4\n<     "address": "address_new",\n'
+   
+   After formatting: 
+   5d4
+   <     "address": "address_new",
+   
+#+END_EXAMPLE   
+
+
+#+BEGIN_EXAMPLE
+
+
+   ============== 4TH DIFF ====================
+   
+   rcsobj.diff(fp, '1.2', '1.4')
+   ===================================================================
+   RCS file: /home/avadoot/Desktop/Tissproject/TP_MK/gstudio/gnowsys-ndf/gnowsys_ndf/ndf/static/rcs-repo/Authors/0/2/6/525e5b6ac76db10c810c6c20.json,v
+   retrieving revision 1.2
+   retrieving revision 1.4
+   diff -r1.2 -r1.4
+
+#+END_EXAMPLE   
+
+   Actual O/P returned: ''
+   
+   After formatting: Nothing returned as there is no difference.

@@ -1,0 +1,328 @@
+{% extends "ndf/base.html" %}
+{% load ndf_tags %}
+{% load i18n %}
+{% block title %} {{username}}'s - Dashboard  {% endblock %}
+{% block meta_content %}
+  {% comment %}
+  <h3>{% trans "About" %}</h3>
+
+  {% blocktrans %}<b>Dashboard</b> shows users' own activities on the site.{% endblocktrans %}<br><br>
+  <b>{% trans "Total Activity Rating" %}: &nbsp;{{total_activity_rating}}</b><br>
+
+     {% if site_name == "NROER" %}
+     <button data-dropdown="drop1" aria-controls="drop1" aria-expanded="false" class="small button dropdown"> {% trans 'Become Partner' %} </button><br>
+     <ul id="drop1" data-dropdown-content class="f-dropdown" aria-hidden="true">
+       <li><a href="/home/partner/create_partner/"> {% trans 'State' %} </a> </li>
+       <li><a href="/home/partner/create_partner/"> {% trans 'Institutional' %} </a> </li>
+       <li><a href="/home/partner/create_partner/"> {% trans 'Individuals' %} </a></li>
+     </ul>
+  {% endif %}
+  {% endcomment %}
+      {% include "ndf/widget_photo_upload.html" with url_name='dashboard' widget_for="userDashboard" is_banner=False is_profile=True %}
+      <hr/>
+    <div class="action-btn-div">
+    <span class="fi-graph-bar">
+      <a href="#" data-reveal-id="activity-statistics">{% trans "Activity Ratings" %}</a>
+    </span>
+  </div>
+  <div class="small reveal-modal" id="activity-statistics" data-reveal>
+    {% include "ndf/file_statistics.html" %}
+    <a href="#" class="close-reveal-modal">&#215;</a>
+  </div>
+
+  {% if user.is_superuser and user_id == request.user.id %}
+    <div class="action-btn-div">
+      <span class="fi-trash">
+        <a href="/Trash/data-review">Trash</a>
+      </span>
+    </div>
+  {% endif %}
+  {% endblock %}
+
+{% block style %}
+  .resource-drawer {
+    max-height: 202px;
+    overflow-y: auto;
+  }
+
+  .style2 {
+    color: #10c1cb;
+    font-size: 10em;
+    text-shadow: 0 1px 0 #0092b3, 0 2px 0 #0087a6;
+  }
+
+  .action-btn-div{
+    font-size:15px;
+    margin-left:0.5rem;
+    margin-top:1rem;
+  }
+
+  .style-text {
+    margin: 10px 0;
+  }
+
+
+  .margin-p5 {
+    margin-bottom: 0.5em !important;
+  }
+
+  /* Setting css-properties for reveal-modal's label */
+    div.reveal-modal > label {
+      color: white;
+      font-weight: bold;
+      font-size: 1rem;
+    }
+
+{% endblock %}
+
+{% block body_content %}
+    <div id="uDashboardModal" class="reveal-modal medium alert-box radius" data-reveal data-alert>
+        <label id="uDashboardModalLabel"></label>
+        <a class="close-reveal-modal">&#215;</a>
+    </div>
+
+    {% get_group_name groupid as group_name_tag %}
+    <div class="row"  id="new" >
+
+
+        <div class="small-12 large-10 columns">
+      <h3>
+      {{username}}'s  Dashboard
+        <!-- {% trans "Welcome "%} {% firstof current_user_obj.first_name current_user_obj.email %} ! -->
+      </h3>
+
+            <dl class="tabs" data-tab >
+                <dd class="active"><a href="#view-profile" id='p5' class="fi-torso"> Profile </a> </dd>
+                <dd ><a href="#group" id="p1" class="fi-torsos-all"> Groups </a></dd>
+                {% if user_task %}<dd><a href="#AssignedTasks" id="p2" class="fi-checkbox"> Assigned Tasks </a></dd> {% endif %}
+                <dd ><a href="#Activity" id="p3" class="fi-info"> My Activities </a></dd>
+                <dd ><a href="#view-scheduler-calendar" id="p4" class="fi-calendar"> Events </a></dd>
+            </dl>
+            <div class="tabs-content">
+                <div class="content" id="view-scheduler-calendar">
+                      {% include "ndf/scheduler_calender.html"  %}
+                </div>
+
+                <div class = "content active" id="view-profile">
+                    {% include "ndf/user_profile_form.html"  %}
+                </div>
+
+                <div class="content " id="group">
+                    <ul class="small-block-grid-1 medium-block-grid-2 large-block-grid-4">
+                        {% for node in user_groups %}
+                            {% get_version_of_module node.pk as version %}
+                            <li class="card">
+
+                                <div id="groups">
+                                    <header>
+                                        <a href="/{{node.pk}}">
+                                          <div class="th"><img src="/static/ndf/scss/metastudio/logo.svg"></div>
+                                          <h4>{{ node.name|truncatechars:20 }}</h4>
+                                          <div>
+                                              <hr/>
+                                              <small class="subheader">
+                                                {{ node.member_of_names_list|join:', ' }} created {{node.created_at|timesince}} ago
+                                                <br/>
+                                                by <span href="#" class="user" data-gnow="">{{node.user_details_dict.created_by}}</span>
+                                              </small>
+                                          </div>
+                                    </header>
+
+                                    <p>{{ node.html_content|default_if_none:"Add some description."|safe|striptags|truncatechars:75 }}</p>
+                                    </a>
+
+                                    <div class="label-list">
+                                        {% for tag in node.tags|slice:":3" %}
+                                             <a href="{% url 'tag_info' group_name_tag tag %}"> <span    class="label"> <mark> {{tag}} </mark> </span> </a>
+                                        {% endfor %}
+                                    </div>
+                                </div>
+                            </li>
+                        {% empty %}
+                            {% if not searching %}
+                                <div class="row">
+                                    <div class="small-12 columns" align="left">
+                                      <h5> {% blocktrans %}No Groups </b>{% endblocktrans %} </h5>
+                                    </div>
+                                </div>
+                            {% endif %}
+                        {% endfor %}
+
+                        {% if dashboard_count.group > 10 %}
+                          <div class="row">
+                            <div class="small-12 columns" align="right">
+                              <h6> <a href="{% url 'group' group_id %}"> Show More.. </a> </h6>
+                            </div>
+                          </div>
+                        {% endif %}
+                    </ul>
+                </div>
+                <!-- Activity -->
+                <div class="content" id="Activity">
+                    <ul class="small-block-grid-1 medium-block-grid-2 large-block-grid-4">
+                        {% for node in user_activity %}
+                            {% get_version_of_module node.pk as version %}
+                            {% get_url node.pk as res_type %}
+                            {% if res_type != "None" %}
+                                <li class="card">
+                                    <div id="activity">
+                                        <header>
+                                            <div class="th"><img src="/static/ndf/scss/metastudio/logo.svg"></div>
+                                                {% if res_type == 'group' %}
+                                                  <a href="/{{node.pk}}">
+                                                {% elif res_type %}
+                                                  {% if res_type != "event_app_instance_detail" %}
+                                                          <a href="{% url res_type groupid node.pk   %}">{{i.url}}
+                                                  {% else %}
+                                                        {% get_event_type node as app_set_id %}
+                                                        <a href="{% url res_type groupid app_set_id node.pk  %}">{{i.url}}
+                                                  {% endif %}
+                                                {% endif %}
+                                                <h4>{{ node.name|truncatechars:20 }}</h4>
+                                                <div>
+                                                    <small class="subheader">{{ node.member_of_names_list|join:', ' }} {% trans 'created' %} {{node.created_at|timesince}} {% trans 'ago' %}
+                                                    <br/>
+                                                    by <span href="#" class="user" data-gnow="">{{node.user_details_dict.created_by}}</span>
+                                                    </small>
+                                                </div>
+                                        </header>
+                                        <p>{{ node.html_content|default_if_none:"Add some description."|safe|striptags|truncatechars:75 }}</p>
+                                        </a>
+                                        <div class="label-list">
+                                            {% for tag in node.tags|slice:":3" %}
+                                                 <a href="{% url 'tag_info' group_name_tag tag %}"> <span class="label"> <mark> {{tag}} </mark> </span> </a>
+                                            {% endfor %}
+                                        </div>
+                                    </div>
+                                </li>
+                            {% endif %}
+                        {% empty %}
+                            {% if not searching %}
+                              <div class="row">
+                                <div class="small-12 columns" align="left">
+                                  <h5> {% trans "No Recent Activities" %}</h5>
+                                </div>
+                              </div>
+                            {% endif %}
+                        {% endfor %}
+
+                        {% if dashboard_count.activity > 10 %}
+                            <div class="row">
+                              <div class="small-12 columns" align="right">
+                                <h6> <a href="{% url 'user_activity' group_id %}"> {% trans 'Show More..' %} </a></h6>
+                              </div>
+                            </div>
+                        {% endif %}
+                    </ul>
+                </div>
+
+                <!-- Notifications -->
+                <div id="Notification">
+                    <div>
+                        <ul class="small-block-grid-1 medium-block-grid-2 large-block-grid-4">
+                            <li class="card">
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+
+                <!-- Assigned Tasks -->
+                <div class="content" id="AssignedTasks" >
+                    <ul class="small-block-grid-1 medium-block-grid-2 large-block-grid-4">
+                        {% for node in user_task %}
+                            {% get_version_of_module node.pk as version %}
+                            {#{% get_attribute_value node.pk "Status" as task_status %}#}
+                            <li class="card">
+                                <div id="assignedTask">
+                                    <header>
+                                        <a href="{% url 'task_details' group_id node.pk %}">
+                                        <div class="th"><img src="/static/ndf/scss/metastudio/logo.svg"></div>
+                                        <h4 title="{{ node.name }}">{{ node.name|truncatechars:20 }}</h4>
+                                        <div>
+                                            <small class="subheader">{{ node.member_of_names_list|join:', ' }} created {{node.created_at|timesince}} ago
+                                              <br/>
+                                              by <span href="#" class="user" data-gnow="">{{node.user_details_dict.created_by}}</span>
+                                            </small>
+                                        </div>
+                                    </header>
+                                    <p>{{ node.html_content|default_if_none:"Add some description."|safe|striptags|truncatechars:75 }}</p>
+                                    </a>
+                                    <div class="label-list">
+                                        {% for tag in node.tags|slice:":3" %}
+                                             <a href="{% url 'tag_info' group_name_tag tag %}"> <span    class="label"> <mark> {{tag}} </mark> </span> </a>
+                                        {% endfor %}
+                                    </div>
+                                </div>
+                            </li>
+
+                        {% empty %}
+                            {% if not searching %}
+                                <div class="row">
+                                  <div class="small-2 columns" align="right">
+                                    <h5> {% trans "No Assinged Task" %} </h5>
+                                  </div>
+                                </div>
+                            {% endif %}
+                        {% endfor %}
+
+                        {% if dashboard_count.Task > 10 %}
+                            <div class="row">
+                              <div class="small-12 columns" align="right">
+                                <h6> <a href="{% url 'task' group_name %}"> Show More.. </a> </h6>
+                              </div>
+                            </div>
+                        {% endif %}
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!--
+      <div class="row">
+        <div class="small-12 columns" style="padding-top:10px;">
+          <b><a>{{username}}'s {% trans "Dashboard" %}</a></b>
+          <hr style="border-width:1.4px; border-color:black; margin-top:5px;"/>
+        </div>
+        </div>
+      </div>
+    -->
+
+{% endblock %}
+
+{% block script %}
+
+  $("input:not('#docFile')").each(function() {
+    $(this).bind('keydown keypress keyup change', function() {
+      var search = (this.value).toLowerCase();
+      var resource = (this.name);
+      var $li = $("#"+resource+"_drawer li.bullet-item").hide();
+
+      $li.filter(function() {
+        return $(this).text().toLowerCase().indexOf(search) >= 0;
+      }).show();
+    });
+  });
+
+
+{% endblock %}
+
+{% block document_ready %}
+  {% if already_set %}
+    var message = "{{already_set}} {% trans 'image is already selected, choose different image !!!' %}"
+    $("#uDashboardModalLabel").text(message);
+    $("#uDashboardModal").addClass("alert");
+    $("#uDashboardModal").foundation('reveal', 'open');
+  {% endif %}
+
+  $('#docFile').val("");
+  {% comment %}
+  {% if not success %}
+    var message = "{% trans 'Something went wrong. Please try after some time !!!' %}"
+    $("#uDashboardModalLabel").text(message);
+    $("#uDashboardModal").addClass("alert");
+    $("#uDashboardModal").foundation('reveal', 'open');
+  {% endif %}
+  {% endcomment %}
+
+{% endblock %}

@@ -1,0 +1,73 @@
+{% extends "ndf/base.html" %}
+{% load i18n %}
+{% load ndf_tags %}
+{% get_group_name groupid as group_name_tag %}
+
+{% block title %} {{title}} {% endblock %}
+{% block style %}
+{{ block.super }}
+  .info-text{
+    margin-left:2rem !important;
+  }
+  .img-mid-size, .card-thumbnail{
+        margin-left:4rem !important;
+        border:1px solid grey;
+  }
+
+{% endblock %}
+
+{% block concern_information %}
+  <span data-tooltip title='Go to {{top_group_obj.name}}'><a href="{% url 'groupchange' top_group_obj.name %}" class="small button">{{top_group_obj.name}}</a></span>
+  {% check_is_gstaff groupid request.user as is_gstaff %}
+  {% if is_gstaff and current_mod_group_obj and is_under_moderation%}
+    <span data-tooltip title='Moderate resource'><a class="small button" href="{% url 'moderation' current_mod_group_obj.name %}" >{% trans 'Moderate Resources' %}</a></span>
+  {% endif %}
+{% endblock %}
+
+{% block body_content %}
+	
+  <h5> File "{{node.name}}" - submitted by {{node.created_by|get_username}}</h5>
+
+      {% if is_under_moderation %}
+      This resource is under '{{top_group_obj.moderation_level}}-step Moderation'. 
+      {% if request.user.id == node.created_by %}
+        You will get an email notification for any update on this resource.</br>
+        However, you can access it from <a href="/{{node.created_by|get_username}}/file/{{node.pk}}" target="_blank">your work space</a>.
+      {% endif %}
+  {% else %}
+     This resource is successfully moderated and has been published to "{{top_group_obj.name}}".
+  {% endif %} <!-- is_under_moderation bool check -->
+    <br/>
+        <div class="row mod-status-info-div info-text">
+          {% if cleared_group_objs %}
+              <li>Approved in  '{{cleared_group_objs|join:", "}}'</li>
+          {% endif %}
+          {% if current_mod_group_obj %}
+              <li>Currently in '{% firstof current_mod_group_obj.altnames current_mod_group_obj.name %}' </li>
+          {% endif %}
+          {% if next_mod_group_objs %}
+              <li>Next in ' {{next_mod_group_objs|join:", "}}'</li>
+          {% endif %}
+        </div>
+        <br/>
+    {% group_type_info group_id request.user as grouptype %}
+    <div class="row">
+      <div class="small-6 columns">
+        <ul class="small-block-grid-1 medium-block-grid-1 large-block-grid-2">
+
+          {% if "image" in node.mime_type %}
+          {% if node.fs_file_ids.1 %}
+            <img src="{% url 'get_gridfs_resource' node.fs_file_ids.2 %}" class="img-mid-size" alt="" />
+          {% endif %}
+          {% else %}
+           {% include 'ndf/node_ajax_content.html' with no_discussion=True is_course=True %}
+          {% endif %}
+            <!-- end new -->      
+        </ul>
+        {% if not is_under_moderation %}
+           <a href="{% url 'file_detail' top_group_obj.name node %}">View this file</a>
+        {% endif %}
+      
+      </div>
+    </div>
+{% endblock%}

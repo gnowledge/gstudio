@@ -1,0 +1,332 @@
+{% load ndf_tags %}
+{% load i18n %}
+{% load cache %}
+
+{% get_group_name groupid as group_name_tag %}
+{% get_site_variables as site %}
+{% get_oid_variables as oids %}
+{% user_access_policy groupid request.user as user_access %}
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="description" content="">
+  <meta name="viewport" content="initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0, user-scalable=no, width=device-width" />
+
+  <link rel="shortcut icon" href="{{site.FAVICON}}">
+
+  <!-- Foundation 5 - Responsive CSS Framework http://foundation.zurb.com/docs/css.html-->
+  <link rel="stylesheet" href="/static/ndf/bower_components/foundation/css/normalize.css">
+  <link rel="stylesheet" href="/static/ndf/css/themes/{{site.SITE_NAME|lower}}/styles.css">
+
+  <!-- Foundation Icon Font http://zurb.com/playground/foundation-icon-fonts-3 -->
+  <link rel="stylesheet" href="/static/ndf/bower_components/foundation-icon-fonts/foundation-icons.css">
+
+  <!-- font-awesome icons -->
+  <link rel="stylesheet" href="/static/ndf/bower_components/font-awesome/css/font-awesome.min.css">
+
+  <!-- Handle bar for templating purpose -->
+  <!-- <script src="/static/ndf/bower_components/handlebars/handlebars.min.js"></script> -->
+
+  <!-- Modernizr - Browser detection JS http://modernizr.com/ -->
+  <script src="/static/ndf/bower_components/modernizr/modernizr.js"></script>
+
+  <!-- jQuery -->
+  <script src="/static/ndf/bower_components/jquery/dist/jquery.min.js"></script>
+
+  <script src="/static/ndf/bower_components/blockui/jquery.blockUI.js"></script>  
+  <script src="/static/ndf/js/MediaStreamRecorder.js"></script> 
+  <script src="/static/ndf/js/adapter.js"></script>
+
+  <!-- Enable HTML5 on old browsers -->
+  <!--[if lte IE 8]><script src="http://html5shiv.googlecode.com/svn/trunk/html5.js"></script><![endif]-->
+
+  <!-- External library stylesheets-->
+  <title>{{ site.SITE_NAME }} - {% block title %} {% endblock %} </title>
+
+  {% block head %}{% endblock %}
+
+  <style>
+
+    {% block style %}{% endblock %}
+
+  </style>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/Webpage">
+
+  {% get_group_object groupid as group_object %}
+  {% check_accounts_url request.path as is_ac_url %}
+
+  {% include "ndf/header.html" %}
+  {% block extended_header %}{% endblock %}
+   {% comment %}
+   {% get_gstudio_help_sidebar as gst_help_sidebar %}
+   {% if gst_help_sidebar and app or app_description%}
+
+     <div id ="help-canvas-menu" class="">
+      <a class="help-button btn" href="javascript:void(0);" >
+        <div class="help-button-text">
+          Help
+        </div>
+
+      </a>
+      <div class="mainContainer">
+             {{ app.content_org }}
+      </div>
+    </div>
+   {% endif %}
+   {% endcomment %}
+  <div class="workspace">
+    <div class="off-canvas-wrap" data-offcanvas>
+      <div class="inner-wrap">
+
+        <!-- Off Canvas Meta Map -->
+        <aside id="help" class="left-off-canvas-menu">
+          <!-- whatever you want goes here -->
+          <!-- <h4><i class='fi-info'></i> Help</h4> -->
+          <ul class="off-canvas-list">
+            <!-- Shelf content code and logic -->
+            {% block shelf_content %} {% endblock %}
+          </ul>
+        </aside>
+
+        <main class="row">
+          <!-- Start of sidebar section (main aside) -->
+          <!-- <aside class="medium-2 columns"> -->
+          <aside class='medium-{% firstof first_body_column 2 %} columns'>
+            <div>
+              <header>
+                {% block meta_content %}  {% endblock %}
+                {% block concern_information %} {% endblock %}
+              </header>
+
+              <!-- Meta content in the (main aside header)-->
+              <section>
+                <!--div style="padding-top:1.3rem;"-->
+                <div>
+                  {% block collection_content %}  {% endblock %}
+                </div>
+
+                <div>
+                  {% block related_content %}  {% endblock %}
+                </div>
+              </section>
+
+              <div>
+                {% block add_resource_content %}  {% endblock %}
+              </div>
+            </div>
+          </aside>
+          <!-- End of related content -->
+
+          <!-- Start of content section -->
+          <!-- <article class="medium-10 columns"> -->
+          <article class="medium{% firstof first_body_column|default_if_none:'2'|safe|add:'-12' %} columns" style="padding: 0px;">
+            <!-- The actual body content -->
+            <!-- Url redirection -->
+
+
+            {% block breadcrumb %}
+              {% get_breadcrumb request.path %}
+            {% endblock breadcrumb %}
+
+
+            {% get_group_type request.path request.user as group_type %}
+
+            {% if group_type %}
+              {% block body_content %} {% endblock %}
+              {% block extra_content %}  {% endblock %}
+            {% endif %}
+
+            <input type="hidden" value="{{newgroup}}">
+            <input type="hidden" value="{{groupid}}">
+
+          </article>
+          {% block data_review_pagination %}  {% endblock %}
+          <!-- End of content section -->
+        </main>
+      </div>
+    </div>
+  </div>
+
+
+  <!-- div to show description on overlay -->
+  <div id="overlay-description-by-oid" class="reveal-modal medium" data-reveal aria-hidden="true" role="dialog" style="height: 75%; overflow: auto;">
+    <div id="overlay-description-by-oid-title"></div>
+    <div id="overlay-description-by-oid-content"></div>
+    <a class="close-reveal-modal" aria-label="Close">&#215;</a>
+  </div>
+  <!-- END of div to show description on overlay -->
+
+  <!-- end of workspace -->
+
+  {% cache 360 footer request.LANGUAGE_CODE %} <!-- cache for footer -->
+  {% include "ndf/footer.html" with site=site %}
+
+  <!-- JS -->
+  <script src="/static/ndf/bower_components/foundation/js/foundation.min.js"></script>
+  <script src="/static/ndf/js/app.js"></script>
+
+  {% endcache %} <!-- end of footer cache -->
+
+  <script type="text/javascript">
+    // Initialize Foundation CSS
+      $(document).foundation();
+
+    // Register global ajax start and complete events to show ajax loader when request is in process
+      $(document).ajaxStart($.blockUI).ajaxStop($.unblockUI);
+      /*
+      $(document)
+        .ajaxStart(function() {
+          $('article').block({
+            message: '<h4>Processing... Please wait!</h4>',
+            centerX: false,
+            centerY: false,
+            css: {
+              border: 'none',
+              padding: '15px',
+              color: '#fff !important',
+              // backgroundColor: '#10c1cb !important',
+              '-webkit-border-radius': '10px',
+              '-moz-border-radius': '10px',
+              opacity: 1.0,
+              top: ($(window).height())/2 + 'px', left: '', right: '50px',
+              left: $(window).width()/2 + 'px',
+              transform: 'translate( -50%, -50%)'
+            }
+          });
+        })
+        .ajaxComplete(function(){
+          $('article').unblock();
+        })
+        .ajaxStop(function() {
+          $('article').unblock();
+        });
+        */
+
+    // Toggles the display of main sidebar for 12 col article view
+      var toggleMainSidebar = function(){
+        $("main>aside").toggle();
+        $("main>article").toggleClass("large-9 large-12");
+      };
+
+    // Hide broken image links
+      $('img').error(function(){
+        $(this).addClass("hide");
+        //$(this).attr('src', 'missing.png');
+      });
+
+    // If on the home group, change group dropdown text to "Groups"
+      if($(".group a.active").html() == "home") {
+        $(".group a.active").html("Groups").removeClass("active");
+        $("#home-group").addClass("active");
+      }
+
+    //Functions to automatically add an <i> element icon inside node spans
+
+    /* Attaches user icon with gnow level color for every user link */
+    $(".user").prepend(function(){return "<i class='fi-torso'></i>"});
+
+    /* Attaches icon for node type */
+    $(".card .course").prepend(function(){return "<i class='fi-book'></i>"});
+
+    /* Attaches icon for node type */
+    $(".card .quiz").prepend(function(){return "<i class='fi-graph-bar'></i>"});
+
+    /* Attaches icon for node type */
+    $(".card .forum").prepend(function(){return "<i class='fi-comments'></i>"});
+
+    /* Attaches icon for node type */
+    $(".card .group").prepend(function(){return "<i class='fi-torsos'></i>"});
+
+      /* Attaches icon for node type */
+    $(".card .page").prepend(function(){return "<i class='fi-page'></i>"});
+
+    /* Attaches icon for node type */
+    $(".card .ebook").prepend(function(){return "<i class='fi-book'></i>"});
+
+    /* Attaches icon for node type */
+    $("aside.page").prepend(function(){return "<i class='fi-page'></i>"});
+
+    //set language prefernce
+      $(document).on('click', "#savepref", function(){
+        var vpref=$("#pref").val();
+        var fb=$("#fallback").val();
+        var vurl='/{{group_id}}/userpreference/';
+
+        $.ajax({
+          url: vurl,
+          type: 'POST',
+          data: {pref:vpref,fallback:fb,csrfmiddlewaretoken: '{{ csrf_token }}'},
+
+          success:function(data){
+            alert("Successfully set the preferences");
+            location.reload();
+          }
+        }); //ajax closes
+      }); //document closes
+
+      // after opening overlay node'sdescription should fetch from oid
+      $('.overlay-description-by-oid-caller').click(function(){
+        // alert(this.getAttribute('data-oid'));
+        var oid = this.getAttribute('data-oid');
+        document.getElementById('overlay-description-by-oid').setAttribute('caught-data-oid', oid);
+
+        // wiping out #overlay-description-by-oid-content and overlay-description-by-oid-title
+        document.getElementById('overlay-description-by-oid-content').textContent = ""
+        document.getElementById('overlay-description-by-oid-title').textContent = ""
+      });
+
+      $(document).on('open', '#overlay-description-by-oid[data-reveal]', function () {
+        var modal = this;
+        // console.log(modal.getAttribute('caught-data-oid'));
+        var oid = modal.getAttribute('caught-data-oid');
+        // var url = "/{{group_id}}/ajax/get_resource_by_oid/" + oid;
+
+        if (!oid) {return};
+
+      });
+
+    // start of document.ready()
+      $(document).ready(function() {
+        try{
+            $("#help-canvas-menu").click(function(){
+                $("#help-canvas-menu").toggleClass("expanded");
+                // $("div").addClass("expanded");
+            });
+
+          // $('select option[value="{{request.LANGUAGE_CODE}}"]').attr("selected",true);
+
+          {% block document_ready %} {% endblock %}
+
+        }
+        finally{
+          // function defined in app.js to check the font and load it asynchronously.
+          checkOpenSansFont();
+        }
+
+
+        //function defined to inject
+        (function(win,doc,tag,script){
+          var element = doc.createElement(tag);
+          var ftag = doc.getElementsByTagName(tag)[0];
+          element.async = 1;
+          element.src = script;
+          ftag.parentNode.insertBefore(element,ftag)
+        })(window,document,'script','/static/ndf/js/analytics.js');
+
+
+      });
+
+    {% block script %} {% endblock %}
+
+  </script>
+</body>
+
+</html>
+

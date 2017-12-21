@@ -1,0 +1,27 @@
+{% load i18n %}
+
+<ul class="row">
+	<div class="small-6 medium-4 large-4 large-push-1 medium-push-1 columns">
+		{% include 'ndf/simple_card.html' with no_footer=True no_description=True resource=node url_name='page_details' first_arg=group_id second_arg=node.pk %}
+	</div>
+
+	<div class="small-6 medium-6 large-6 columns">
+		{{node.content|default_if_none:''|safe}}
+	</div>
+</ul>
+
+<hr/>
+
+<ul class="small-block-grid-1 medium-block-grid-3 large-block-grid-4" id="collection-item-cards" >
+	{% for each_coll_obj in coll_objs %}
+	<li style="display:none;">
+		{% include 'ndf/simple_card.html' with no_footer=True resource=each_coll_obj url_name='page_details' first_arg=group_id second_arg=each_coll_obj.pk %}
+	</li>
+	{% endfor %}
+</ul>
+
+<script type="text/javascript">
+	$('#collection-item-cards').children('li').each(function(i){
+		$(this).delay(i*400).fadeIn();
+	});
+</script>

@@ -1,0 +1,97 @@
+{% extends "ndf/base.html" %}
+{% load ndf_tags %}
+{% load i18n %}
+
+
+{% block title %} Tags Browser {% endblock %}
+
+
+{% block meta_content %}
+
+    <h4>Tags</h4>
+      
+    <ul>
+      <small>
+        <li>Tags are like a keyword or category label. </li>
+        <br/>
+        <li>Tags helps you to find photos, videos, files and pages which have something in common.</li>
+        <br/>
+      </small>
+    </ul>
+
+{% endblock %}
+
+{% block style %}
+{%comment%}
+   	.block{ border: 2px solid #a1a1a1;
+    		padding: 10px 40px; 
+    		background: #dddddd; 
+    		width: 400px;
+   			border-radius: 25px;
+   			height:300px;
+    		position:relative;
+    		top:200px;
+    	}
+    .pos_left{border: 2px solid #a1a1a1;
+    				padding: 10px 40px; 
+    				background: #dddddd; 
+    				width: 400px;
+   					border-radius: 25px;
+   					height: 100px;
+   					float:left;
+    			}
+   	.pos_right{border: 2px solid #a1a1a1;
+    				padding: 10px 40px; 
+    				background: #dddddd; 
+    				width: 400px;
+   					border-radius: 25px;
+   					height: 100px;
+   					float:right;
+    			}
+{%endcomment%}
+    h1{ font-size: 300%;}
+    h2{ font-size: 160%;}
+    p { font-size: 125%;}
+    p1{ font-size: 125%;}  
+    i { font-size: 110%;}
+    b { font-size: 120%;}
+{% endblock %}
+
+{% block body_content %} 
+
+  <form id ="search_result" action="{% url 'tag_info' group_id tagname %}" method="GET" >
+    <div class="row">
+      <div class="small-3 columns">
+        <input type="text" name="search" id="value" placeholder="Enter the tag">
+      </div>
+      <div class="small-2 small-pull-7 columns">
+        <input class="button tiny search_tag" type="submit" value='Find a tag'>
+      </div>
+    </div>
+  </form>
+
+  <hr></hr>
+  {% if tagname %}
+    {% if search_result %}
+        <h4><small>{{total}} result found with tag <strong>"{{tagname}}"</strong></small></h4>
+    {% elif not search_result %}
+        <h4><small>{{total_length}} result found with tag <strong>"{{tagname}}"</strong></h4>
+    {% endif %}
+  {% endif %}
+  <br/>
+  <ul class="small-block-grid-1 medium-block-grid-3 large-block-grid-5" >
+      {%  for each in search_result %}
+        <li class="card-image-wrapper" > 
+          {% include 'ndf/simple_card.html' with resource=each url_name="file_detail" first_arg=group_id second_arg=each.pk  %}
+        </li>
+      {% endfor %}
+  </ul>
+
+{% endblock %}
+
+
+{% block document_ready %}
+  {% if tagname %}
+    $("#value").val("{{tagname|safe}}")
+  {% endif %}
+{% endblock %}

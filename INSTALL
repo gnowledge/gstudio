@@ -1,0 +1,207 @@
+* Dockerfile for gstudio
+
+  Please use https://github.com/gnowledge/gstudio-docker/ for a quick & best method to
+  get a running instance of gstudio with code as well as all the dependencies satisfied.
+
+
+* Manual INSTALLATION Procedure for gstudio
+
+  If you are on a debian or Ubuntu PC install the following packages.
+  Use corresponding package names if you are using an RPM based distro
+  (fedora or centos).
+
+  [1] Installing required following packages and its dependencies:
+
+      > sudo apt-get install python-setuptools git build-essential python-dev rcs mongodb python-virtualenv ipython libjpeg-dev memcached libevent-dev libfreetype6-dev zlib1g-dev ffmpeg2theora rabbitmq-server libssl-dev libffi-dev libxml2-dev libxslt1-dev apt-transport-https
+
+  [2] Get latest version of gstudio using one of the following commands:
+
+      (1) git clone https://github.com/gnowledge/gstudio.git
+      (2) git clone git@github.com:gnowledge/gstudio.git
+
+  [3] Use following commands to install ffmpeg package:
+
+      (1) sudo add-apt-repository ppa:mc3man/trusty-media
+      (2) sudo apt-get update
+      (3) sudo apt-get install ffmpeg gstreamer0.10-ffmpeg
+
+  [4] Set up virtual environment for gstudio:
+
+      (1) cd gstudio
+      (2) virtualenv --system-site-packages .      # NOTE: Here '.' indicates current directory
+      (3) source bin/activate                      # Activates virtual environment
+      (4) ./bin/pip install -r requirements.txt    # NOTE: Here '.' indicates current directory
+
+  [5] SMTP configuration for notifications:
+
+      To make SMTP server ready for sending mail (development purpose only), you can use
+      either of the following methods:
+
+      (1) After running project, run following command:
+          > python -m smtpd -n -c DebuggingServer localhost:1025
+            # This will ready system to listen smtp messages and will print in terminal
+
+      (2) To use gmail smtp server (If you have another smarthost to
+          deliver use that instead):
+
+          (a) Go to settings.py file and search for "#SMTP setting for
+              sending mail" and uncomment gmail smtp setting and comment
+              default python smtp settings.
+
+          (b) Edit following with your gmail credentials and save
+              settings.py file:-
+              EMAIL_HOST_USER = 'yourcompleteemailid'
+              EMAIL_HOST_PASSWORD = 'yourpassword'
+
+  [6] Install JS/CSS dependencies using Bower:
+
+      (1) Activate your virtual environment:
+          > source bin/activate
+
+      (2) A tool to create isolated node.js environment which is integrated
+          with environment built by python virtualenv:
+          > sudo apt-get install curl
+          > pip install nodeenv
+
+      (3) Appending nodeenv settings to virtualenv: (This takes time.. wait
+          till it completes)
+          > nodeenv --python-virtualenv
+
+          If above step gives an error, install NodeJS at root level with
+          following commands:
+          * For stable nodejs version in ubuntu: 0.10.* 
+              (a) sudo add-apt-repository ppa:chris-lea/node.js
+              (b) sudo apt-get update
+              (c) sudo apt-get install python-software-properties python g++ make nodejs
+          * For latest nodejs version:
+              - Removing existing node, nodejs and npm (if installed previously):
+                - apt-get remove nodejs npm node
+                - sudo apt-get purge nodejs npm node
+                - sudo rm -rvf /usr/local/bin/npm /usr/local/share/man/man1/node* /usr/local/lib/dtrace/node.d ~/.npm ~/.node-gyp /opt/local/bin/node opt/local/include/node /opt/local/lib/node_modules 
+                - sudo rm -rfv /usr/local/lib/node*
+                - sudo rm -rfv /usr/local/include/node*
+                - sudo rm -rfv /usr/local/bin/node*
+
+              (a) sudo apt-get install npm
+              (b) sudo npm cache clean  OR  sudo npm cache vefify
+              (c) sudo npm install -g n
+              (d) sudo n latest
+              (e) ln -sf /usr/local/n/versions/node/<version no from above step>/bin/node /usr/bin/node
+
+      (4) Installing Bower:
+          > sudo npm install -g bower
+
+      (5) To install JS/CSS dependencies:
+          > cd gstudio/gnowsys-ndf  # Navigate to project-root
+          > bower install           # Install depenedencies
+
+  [7] Install Search Dependencies:
+      (1) Run following command:
+      > pip install -U pyyaml nltk
+
+      (2) Activate the environment:
+      > source bin/activate
+
+      (3) Go to project-root:
+      > cd gstudio/gnowsys-ndf  # directory containing manage.py
+
+      (4) Run ipython [or python] shell
+
+          In ipython [or python] shell run the following commands:-
+          >>> import nltk
+          >>> nltk.download()
+
+          CASE 1: GUI OPENS
+          -- Go to the 'Corpora' tab
+          -- Download the module with identifier - "stopwords"
+          -- Download the module with identifier - "wordnet"
+          -- Go to "Models" tab
+          -- Download the module with identifier - "maxnet_treebank_pos_tagger"
+          -- Download the module with identifier - "punkt"
+
+          Case 2: GUI Does not open
+          -- Press d
+          -- It prompts for the identifier => Enter "stopwords" => It gets downloaded
+          -- It prompts for the identifier => Enter "wordnet" => It gets downloaded
+          -- It prompts for the identifier => Enter "maxent_treebank_pos_tagger" => It gets downloaded
+          -- Download the module with identifier - "punkt"
+
+          Exit ipython [or python]
+
+
+* Procedure to RUN gstudio
+
+  (1) Make sure you are in the virtualenv-folder and it's activated, i.e.
+      > source bin/activate
+
+  (2) Move to project-root directory (where your "manage.py" file resides), i.e.
+      > cd gstudio/gnowsys-ndf
+
+  (3) Start mongodb server:
+      > sudo service mongodb start
+
+  (4) Run following management commands:
+
+      > python manage.py syncdb
+      > python manage.py filldb
+      > python manage.py sync_existing_documents
+      > python manage.py create_index
+      > python manage.py runserver
+
+      NOTE: For creating structure related to Course & MIS,
+      refer following file: gstudio/doc/schema_setup.og
+
+  (5) Now point your browser to http://localhost:8000 to see
+      gstudio on your browser. Enjoy.
+
+
+* Follow gstudio UPDATE(s)
+
+  Since gstudio is frequently updated, please obtain the latest code
+  from project's git repository. After each update run above specified
+  management commands in the given order.
+
+  > git pull https://github.com/gnowledge/gstudio.git master
+  > git pull origin master  # Or Simply
+
+
+* For 'Replication' and 'mail-client' features refer: doc/Mailclient
+
+
+* Edit SCSS/SAAS stylesheet(s)
+
+  (a) Installing Ruby and compass:
+
+      > sudo apt-get install ruby
+      > sudo gem install compass
+
+  (b) Running compass:
+
+      (1) Navigate to project-root directory (where your "manage.py" file resides), i.e.
+          > cd gstudio/gnowsys-ndf
+
+      (2) Run following command (to start compass) and then edit scss stylesheets:
+          > compass watch
+
+
+* Help query(ies) / Suggestion(s)
+
+  Any issues with this procedure or you need any further help, or to
+  file bugs etc. visit us in the mailing list:
+
+  - http://gnowledge.org/cgi-bin/mailman/listinfo/gnowsys-dev
+
+
+* Installing yarn:
+  (a) curl -sS https://dl.yarnpkg.com/debian/pubkey.gpg | sudo apt-key add -
+  (b) echo "deb https://dl.yarnpkg.com/debian/ stable main" | sudo tee /etc/apt/sources.list.d/yarn.list
+  (c) sudo apt-get update && sudo apt-get install yarn
+
+
+* Installing mongodb#3.2.4
+  (a) > sudo apt-key adv --keyserver hkp://keyserver.ubuntu.com:80 --recv 7F0CEB10
+  (b) > echo "deb http://repo.mongodb.org/apt/ubuntu trusty/mongodb-org/3.0 multiverse" | sudo tee /etc/apt/sources.list.d/mongodb-org-3.0.list
+  (c) > sudo apt-get update
+  (d) > sudo apt-get install -y mongodb-org=3.2.4 mongodb-org-server=3.2.4 mongodb-org-shell=3.2.4 mongodb-org-mongos=3.2.4 mongodb-org-tools=3.2.4
+  === OR ===
+  > sudo apt-get install -y --force-yes mongodb-org=3.2.4 mongodb-org-server=3.2.4 mongodb-org-shell=3.2.4 mongodb-org-mongos=3.2.4 mongodb-org-tools=3.2.4

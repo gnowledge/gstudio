@@ -1,0 +1,567 @@
+{% extends "ndf/mis_base_create_edit.html" %}
+{% load i18n %}
+{% load ndf_tags %}
+{% load pagination_tags %}
+
+{% block head %}
+  {{block.super}}
+
+  <!-- DataTables -->
+  <script src="/static/ndf/bower_components/DataTables/media/js/jquery.dataTables.js"></script>
+  <script src="/static/ndf/bower_components/datatables-plugins/integration/foundation/dataTables.foundation.js"></script>
+  <!-- DataTables CSS -->
+  <link href="/static/ndf/bower_components/datatables-plugins/integration/foundation/dataTables.foundation.css" rel="stylesheet" type="text/css" />
+{% endblock %}
+
+{% block style %}
+  {{block.super}}
+
+  /* Resetting css-properties for fieldset (also legend, input) */
+    /* fieldset (padding-bottom) */ 
+    fieldset {
+      padding: 0rem 1.25rem !important;
+    }
+
+    /* legend (background-color) */
+    fieldset legend {
+      background-color: transparent !important;
+    }
+
+    /* input (margin) */
+    fieldset input {
+      margin: 0 !important;
+    }
+
+  /* Setting css-properties for reveal-modal's label */
+    div.reveal-modal > label {
+      color: white;
+      font-weight: bold;
+      font-size: 1rem;
+    }
+
+    #announce-course.hide{
+      display: none;
+    }
+
+  /* DataTables css-properties */
+    .selected {
+      background-color: #D3D3D3 !important;
+    }
+
+    #lbl_displ {
+      color: #0b8a91;
+      font-weight: bold;
+      font-size: 1rem;
+    }
+{% endblock %}
+
+{% block body_content %} 
+  <div id="alertModal" class="reveal-modal medium alert-box radius" data-reveal data-alert>
+    <label id="alertModalLabel"></label>
+    <a class="close-reveal-modal">&#215;</a>
+  </div>
+
+  <form data-abide enctype="multipart/form-data" id="form-edit-node" method="POST" action="">
+
+    <header class="row" style="margin: 1rem 0 0 0 ;">
+      <h2 class="small-12 columns">
+        {% if node %}
+        {% blocktrans with title_var=title node_name=node.name %} Editing {{title_var}}: {{node_name}} {% endblocktrans %}
+        {% else %}
+        {% trans title %}
+        {% endif %}
+      </h2>
+    </header>
+
+    <nav class="row" style="margin-top: 0.5rem;">
+      <dl class="tabs small-12 columns" data-tab data-options="deep_linking:true">
+        {% for tab_details in property_order_list %}
+        <dd {% if forloop.counter == 1 %}class="active"{% endif %} title="STEP: Fill {{tab_details.0|lower}} details...">
+          <a href="#panel_{{tab_details.0}}">
+            {% blocktrans with tab_name=tab_details.0 %} {{tab_name}} {% endblocktrans %}
+          </a>
+        </dd>
+        {% endfor %}
+      </dl>
+    </nav>
+
+    {% csrf_token %}
+
+    <div id="course-enrollment-edit-div" class="tabs-content" style="border-style: solid; border-width: 1.5px; border-color: #0eacb5; padding: 0px 5px;" >
+      <div class="active content row" id="panel_{{property_order_list.0.0}}">
+        {% if node %}
+          <div class="row">
+            <div class="small-2 columns">
+              <label class="right inline"> 
+                {% trans "Announced Course" %}
+              </label>
+            </div>
+            <div class="small-3 columns end">
+              <div style="padding-top: 8px;">
+              {% for every_ac in for_acourse %}
+                {{every_ac}} <br>
+              {% endfor %}              
+              </div>
+            </div>
+          </div>
+
+          <div class="row">
+            <div class="small-2 columns">
+              <label class="right inline"> 
+                {% trans "College" %}
+              </label>
+            </div>
+            <div class="small-3 columns">
+              <div style="padding-top: 8px;">
+              {% for every_ac in for_college %}
+                {{every_ac}}
+              {% endfor %}              
+              </div>
+            </div>
+
+            <div class="small-2 columns">
+              <label class="right inline"> 
+                {% trans "University" %}
+              </label>
+            </div>
+            <div class="small-3 columns end">
+              <div style="padding-top: 8px;">
+              {% for every_ac in for_university %}
+                {{every_ac}}
+              {% endfor %}              
+              </div>
+            </div>
+          </div>
+
+          <div class="row">
+            <div class="small-2 columns">
+              <label class="right inline">Enrollment Duration</label>
+            </div>
+
+            <div class="small-1 columns">
+              <label for="{{property_order_list.0.1.1.name}}" class="right inline"> 
+                {% trans "From" %}
+              </label>
+            </div>
+
+            <div class="small-2 columns">
+              {% html_widget groupid node.pk property_order_list.0.1.1 %}
+            </div>
+
+            <div class="small-1 columns">
+              <label for="{{property_order_list.0.1.2.name}}" class="right inline"> 
+                {% trans "To" %}
+              </label>
+            </div>
+
+            <div class="small-2 columns end">
+              {% html_widget groupid node.pk property_order_list.0.1.2 %}
+            </div>
+          </div>
+
+          <div class="row">
+            <div class="small-2 small-offset-9 columns end">
+              {% if reopen_task_id %}
+                <input type="hidden" id="reopen_task_id" name="reopen_task_id" value="{{reopen_task_id}}" />
+              {% else %}
+                <input type="hidden" id="admin_update" name="admin_update" value="admin_update" />
+              {% endif %}
+
+              <input type="submit" class="button small expand" id="update_enroll" value="Update Enrollment">
+            </div>
+          </div>
+
+        {% else %}
+          <div class="row">
+            <div class="small-2 columns">
+              <label class="right inline">Enrollment Duration</label>
+            </div>
+
+            <div class="small-1 columns">
+              <label for="{{property_order_list.0.1.1.name}}" class="right inline"> 
+                {% trans "From" %}
+              </label>
+            </div>
+
+            <div class="small-2 columns">
+              {% html_widget groupid node.pk property_order_list.0.1.1 %}
+            </div>
+
+            <div class="small-1 columns">
+              <label for="{{property_order_list.0.1.2.name}}" class="right inline"> 
+                {% trans "To" %}
+              </label>
+            </div>
+
+            <div class="small-2 columns end">
+              {% html_widget groupid node.pk property_order_list.0.1.2 %}
+            </div>
+
+            <div class="small-1 columns">
+              <label for="{{property_order_list.0.1.0.name}}" class="right inline"> 
+                {% blocktrans with label_val=property_order_list.0.1.0.altnames %} {{label_val}} {% endblocktrans %}
+              </label>
+            </div>
+            <div class="small-3 columns">
+              {% html_widget groupid node.pk property_order_list.0.1.0 %}
+            </div>
+          </div>
+
+          <div class="row">
+            <div class="small-12 columns">
+              <dl class="accordion" data-accordion>
+                <dd class="accordion-navigation">
+                  <a href="#panel_announce_course">Select Announce Course(s)</a>
+                  <div id="panel_announce_course" class="content active">
+                    <p>Please select course type.</p>
+                    <table cellpadding="0" cellspacing="0" border="0" class="display" id="ac_table">
+                    </table>
+                  </div>
+                </dd>
+              </dl>
+            </div>
+          </div>
+
+          <div class="row">
+            <div class="small-4 small-centered columns">
+              <input type="hidden" id="ac_cname_cl_uv_ids" name="ac_cname_cl_uv_ids" value="" />
+              <input type="submit" class="small button expand" id="create_enroll" value="Create Enrollment">
+            </div>
+          </div>
+
+        {% endif %}
+      </div>
+    </div>
+
+  </form>
+{% endblock %}
+
+{% block script %}
+  {{block.super}}
+  var sce_dt_var;
+
+  // On close event of reveal-modal (alertModal) -------------------------------------------------------------
+    $(document).on('closed.fndtn.reveal', '#alertModal[data-reveal]', function () {
+      // Reset reveal-modal content & it's setting
+      $("#alertModalLabel").text("<p>Please select course type.</p>");
+      $("#alertModal")
+        .removeClass("success").removeClass("warning").removeClass("alert").removeClass("small")
+        .addClass("medium")
+        .find("div.row").addClass("hide");
+    });
+
+  /*
+   * Change event: "Coures Type" drop-dwon
+   * Populate Announced Courses in data-table of selected course type
+   */
+  $("select#nussd_course_type").change(function() {
+    if ($(this).prop("selectedIndex") == 0) {
+      $("#panel_announce_course").html("<p>Please select course type.</p>")
+      return;
+    }
+
+    success_state = false;
+    var nussd_course_type = $("#nussd_course_type").val();
+    var start_enroll = $("#start_enroll").val();
+    var end_enroll = $("#end_enroll").val();
+    var column_headers = {};
+    var ac_data_set = [];
+
+    $.ajax({
+      url: "{% url 'get_announced_courses_with_ctype' group_id %}",
+
+      data: {
+        nussd_course_type: nussd_course_type,
+        ann_course_type: 1,
+        start_enroll: start_enroll,
+        end_enroll: end_enroll
+      },
+
+      type: "GET",
+
+      dataType: "json",
+
+      complete: function () {
+        // Enable AC field
+        $("select#acourse_list").removeAttr('disabled')
+
+        {% if ac_node %}
+        $("select#acourse_list").val("{{ac_node.pk}}");
+        $("select#acourse_list").trigger("change");
+        {% endif %}
+      },
+
+      success: function(data){
+        success_state = data["success"]
+        if (success_state){
+          column_headers = data["column_headers"];
+          ac_data_set = data["ac_data_set"];
+          dataTable_columns_set = [];
+
+          if (ac_data_set.length > 0) {
+            // Define table
+            ac_table = '<table cellpadding="0" cellspacing="0" border="0" class="display" id="ac_table">' +
+              '<input type="button" class="button tiny select_all_rows" value="Select All" >' +
+              '&nbsp;<input type="button" class="button tiny deselect_all_rows" value="De-Select All" >' +
+              '<label id="lbl_displ"></label>' +
+              '</table>';
+
+            $("#panel_announce_course").html(ac_table);
+
+            // Prepare title & data headers used in dataTable
+            $.each(column_headers, function(index, v) {
+              d = {};
+              d["data"] = v[0];
+              d["title"] = v[1];
+              dataTable_columns_set.push(d);
+            });
+
+            // Set defintion dataTable
+            sce_dt_var = $("#ac_table").dataTable({
+              "data": ac_data_set,
+              "columns": dataTable_columns_set,
+              "createdRow": function ( row, data, index ) {
+                // Attaching Announced Course's ObjectId to each row (i.e., assigning to it's id attribute)
+                $(row).attr("id", data["ac_id"]).addClass("row_rec");
+                $(row).find("td:nth-child(3)").attr("id", data["college_id"]);
+                $(row).find("td:nth-child(4)").attr("id", data["university_id"]);
+              }
+            });
+          }
+
+          else {
+            $("select#nussd_course_type").prop("selectedIndex", 0);
+            $("#panel_announce_course").html("<p>Please select course type.</p>")
+
+            $("#alertModalLabel").text(data["message"]);
+            $("#alertModal").addClass("warning").addClass("small");
+            $("#alertModal").foundation('reveal', 'open');
+          }
+        }
+        else {
+          $("select#nussd_course_type").prop("selectedIndex", 0);
+          
+          $("#alertModalLabel").text(data["message"]);
+          $("#alertModal").addClass("alert").addClass("small");
+          $("#alertModal").foundation('reveal', 'open');
+        }
+      },
+    });//end of ajax
+  });
+
+  /* 
+   * Click event: "Announced Course" Row of DataTable
+   * Select/Deselect Announced Course
+   */
+  $(document).on( 'click', '#ac_table tbody tr', function () {
+    $(this).toggleClass('selected');
+    $("#lbl_displ").text("")
+  } );
+
+
+  //On click of select All, highlight all rows
+    $(document).on('click','.select_all_rows',function(){
+      $(sce_dt_var.fnGetNodes()).addClass('selected')
+      $("#lbl_displ").text("All " + $(sce_dt_var.fnGetNodes()).length + " Colleges are selected")
+    });
+
+  //On click of De-Select All, remove highlight from all rows
+    $(document).on('click','.deselect_all_rows',function(){
+        $("#lbl_displ").text("All Colleges are de-selected")
+        $(sce_dt_var.fnGetNodes()).removeClass("selected");
+    });
+
+  /*
+   * Click event: "Create Enrollment" button
+   */
+  $("#create_enroll").click( function (event) {
+    var ac_cname_cl_uv_ids = [];
+    
+    sce_dt_var.$("tr.selected").each(function () {
+      var ann_course_id = this.id;
+      ann_course_id = ann_course_id.split(",");
+      var ann_course_name = $(this).find("td:nth-child(1)").text();
+      var course_name = $(this).find("td:nth-child(2)").text();
+      var college_id = $(this).find("td:nth-child(3)").attr("id");
+      var university_id = $(this).find("td:nth-child(4)").attr("id");
+    
+      var combined_ids = [ann_course_id, ann_course_name, course_name, college_id, university_id];
+      
+      ac_cname_cl_uv_ids.push( combined_ids );
+    });
+
+    if (ac_cname_cl_uv_ids.length > 0) {
+      $("#ac_cname_cl_uv_ids").val(JSON.stringify(ac_cname_cl_uv_ids));
+
+      $('article').block({ 
+        message: '<h4>Processing... Please wait!</h4>',
+        css: { 
+          border: 'none', 
+          padding: '15px', 
+          color: '#fff !important', 
+          backgroundColor: '#10c1cb !important', 
+          '-webkit-border-radius': '10px', 
+          '-moz-border-radius': '10px', 
+          opacity: 1.0
+        }
+      });
+    }
+
+    else {
+      // Popup message saying Please select atleast one of the given Announced Course(s)
+      event.preventDefault();
+    }
+  } );
+
+  /*
+   * Click event: "Update Enrollment" button
+   */
+  $("#update_enroll").click( function (event) {
+    $("#start_enroll").removeAttr("disabled");
+    $("#end_enroll").removeAttr("disabled");
+    $('article').block({ 
+      message: '<h4>Processing... Please wait!</h4>',
+      css: { 
+        border: 'none', 
+        padding: '15px', 
+        color: '#fff !important', 
+        backgroundColor: '#10c1cb !important', 
+        '-webkit-border-radius': '10px', 
+        '-moz-border-radius': '10px', 
+        opacity: 1.0
+      }
+    });
+  } );
+{% endblock %}
+
+{% block document_ready %}
+  {{block.super}}
+
+  $('#start_enroll').removeClass("date_month_day_year").addClass("dmy");
+  $('#end_enroll').removeClass("date_month_day_year").addClass("dmy");
+
+  /* Change placeholders for date widgets
+     From DD/MM/YYYY HH:MM to MM/YYYY
+    */
+  $(".dmy").each(function(i) {
+    $(this).attr("placeholder", "MM/DD/YYYY");
+    if ($(this).attr("id") == "start_enroll") {
+      var st = "{{node.start_enroll|date:'d/m/Y'}}"
+      $(this).val(st)
+    }
+
+    else if ($(this).attr("id") == "end_enroll") {
+      var et = "{{node.end_enroll|date:'d/m/Y'}}"
+      $(this).val(et)
+    }
+  });
+
+  // Enroll: start & end date-widgets --------------------------------------------------------------------------
+  var startEnrollDt = $("#start_enroll");
+  var endEnrollDt = $("#end_enroll");
+  currentDate = new Date();
+  var currentDay = currentDate.getDate();
+  var currentMonth = currentDate.getMonth();
+  var currentYear = currentDate.getFullYear();
+
+  $(".dmy").datepicker({
+    changeMonth: true,
+    dateFormat: 'dd/mm/yy',
+    minDate: '0',
+    maxDate: '+2m',
+    defaultDate: '0',
+
+    onClose: function(dateText, inst) {
+      $(this).val(dateText);
+      
+      var month_year = $(this).val();
+      day = currentDay;
+      month = currentMonth;
+      year = currentYear;
+      
+      if ($(this).attr('id') == "start_enroll") {
+        if (month_year) {
+          month_year = month_year.split("/");
+          day = parseInt(month_year[0]);
+          month = parseInt(month_year[1]);
+          year = parseInt(month_year[2]);
+        }
+
+        if (endEnrollDt.val() != '') {
+          var testStartDate = startEnrollDt.datepicker('getDate');
+          var testEndDate = endEnrollDt.datepicker('getDate');
+
+          if (testStartDate > testEndDate) {
+            endEnrollDt.datepicker('setDate', testStartDate);
+          }
+
+          else {
+            $(this).val(day+"/"+month+"/"+year);
+            $(this).datepicker('setDate', new Date(year, (month-1), day));
+          }
+        }
+
+        else {
+          endEnrollDt.val(day+"/"+month+"/"+year);
+          $(this).datepicker('setDate', new Date(year, (month-1), day));
+        }
+        $("#end_enroll").datepicker('option', 'minDate', new Date(year, (month-1), day));
+      }
+
+      else if ($(this).attr('id') == "end_enroll") {
+        if (month_year) {
+          month_year = month_year.split("/");
+          day = parseInt(month_year[0]);
+          month = parseInt(month_year[1]);
+          year = parseInt(month_year[2]);
+        }
+
+        if (startEnrollDt.val() != '') {
+          var testStartDate = startEnrollDt.datepicker('getDate');
+          var testEndDate = endEnrollDt.datepicker('getDate');
+
+          if (testStartDate > testEndDate) {
+            startEnrollDt.datepicker('setDate', testEndDate);
+          }
+          else {
+            $(this).val(day+"/"+month+"/"+year);
+            $(this).datepicker('setDate', new Date(year, (month-1), day));
+          }
+        }
+
+        else {
+          startEnrollDt.val(day+"/"+month+"/"+year);
+          $(this).datepicker('setDate', new Date(year, (month-1), day));
+        }
+      }
+    },
+
+    beforeShow: function() {
+      var month_year = $(this).val();
+      day = currentDay;
+      month = currentMonth;
+      year = currentYear;
+
+      if (month_year) {
+        month_year = month_year.split("/");
+        day = parseInt(month_year[0]);
+        month = parseInt(month_year[1]);
+        year = parseInt(month_year[2]);
+      }
+      $(this).datepicker('option', 'defaultDate', new Date(year, (month-1), day));
+      $(this).datepicker('setDate', new Date(year, (month-1), day));
+    },
+  });
+  /*
+    {% if node %}
+      {% if unlock_enroll %}
+        //allow to edit end_enroll date
+        $("#end_enroll").removeAttr("disabled")
+      {% else %}
+        //don't allow to edit enrollment dates
+        $("#end_enroll").attr("disabled",true)
+      {% endif %}
+      $("#start_enroll").attr("disabled",true)
+    {% endif %}
+  */
+{% endblock %}

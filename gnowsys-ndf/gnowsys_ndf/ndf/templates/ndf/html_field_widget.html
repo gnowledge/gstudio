@@ -1,0 +1,323 @@
+{% load ndf_tags %}
+{% load i18n %}
+<script type="text/javascript" src="/static/ndf/bower_components/ckeditor/ckeditor.js"></script>
+    <script type="text/javascript" src="/static/ndf/bower_components/ckeditor/config.js"></script>
+
+<!-- Base fields / AttributeType fields -->
+{% if is_base_field or is_attribute_field %}
+  {% if is_special_field  %}
+  <!-- Intentionally put this field at the top, as below because of it's data-type different widget may come -->
+    <div style="float:left;">
+      {% include included_template_name with var_name=field.name var_placeholder="Enter the content here" var_value=field_value|default_if_none:"" node_id=node_id %}
+      {% if is_required_field and not field.altnames == "Attendees" %}
+      <i style="color:red; display:inline">*</i>
+      <small class="error">{% trans "Please select" %} {{field.altnames}}! </small>
+      {% endif %}
+    </div>
+
+  {% elif field.validators.0 == "email" %}
+    <input type="email" id="{{field.name}}" name="{{field.name}}" value="{{field_value|default_if_none:''}}" 
+          placeholder="{{field.help_text|default_if_none:''}}" 
+          {% if not field.editable %}readonly{% endif %} 
+          {% if is_required_field and not field.altnames == "Attendees" %}required{% endif %} 
+          pattern="{% if field.validators|length > 1 %}{{field.validators.1}}{% endif %}" 
+          style="float:left; width:95%"
+    />
+    {% if is_required_field or field.validators and not field.altnames == "Attendees" %}
+    {% if is_required_field and not field.altnames == "Attendees" %}
+    <i style="color:red; float:left display:inline">*</i>
+    {% endif %}
+    <small class="error{% if not is_required_field  %} non-required{% endif %}">{% trans "Please fill a valid" %} {{field.altnames}}! </small>
+    {% endif %}
+
+  {% elif field.validators.0 == "tel" %}
+    <input type="tel" id="{{field.name}}" name="{{field.name}}" value="{{field_value|default_if_none:''}}" 
+          placeholder="{{field.help_text|default_if_none:''}}" 
+          {% if not field.editable %}readonly{% endif %} 
+          {% if is_required_field and not field.altnames == "Attendees" %}required{% endif %}
+          min="{{field.max_digits|default_if_none:''}}"
+          maxlength="{{field.max_digits|default_if_none:''}}"
+          class = "{% if field.validators|length > 1 %}{{field.validators.1}}{% endif %}" 
+          style="float:left; width:95%"
+          pattern="{% if field.validators|length > 2 %}{{field.validators.2|default_if_none:''}}{% endif %}" 
+    />
+    <script type="text/javascript">
+    // Ensure that it is a number and stop the keypress while entering hours for course subsection prop
+      $(".input_only_num").keydown(function (e) {
+            // Allow ctrl+A
+        if ((e.keyCode == 65 && e.ctrlKey === true) || 
+                 // Allow: home, end, left, right, down, up and //Allow delete, backspace, tab
+                (e.keyCode >= 35 && e.keyCode <= 40) || e.keyCode==46 || e.keyCode==8 || e.keyCode==9) {
+                     // let it happen, don't do anything
+                     return;
+            }
+       // Ensure that it is a number and stop the keypress
+        if ((e.shiftKey || (e.keyCode < 48 || e.keyCode > 57)) && (e.keyCode < 96 || e.keyCode > 105)) {
+            e.preventDefault();
+        }        
+      });
+    </script>
+
+    {% if is_required_field or field.validators %}
+    {% if is_required_field %}
+    <i style="color:red; float:left display:inline">*</i>
+    {% endif %}
+    <small class="error{% if not is_required_field %} non-required{% endif %}">{% trans "Please fill a valid" %} {{field.altnames}}! </small>
+    {% endif %}
+
+  {% elif field_type == "unicode" or field_type == "basestring" %}
+    <input type="text" id="{{field.name}}" name="{{field.name}}" value="{{field_value|default_if_none:''}}" 
+          placeholder="{{field.help_text|default_if_none:''}}" 
+          {% if field.editable and not field.editable %}readonly{% endif %} 
+          {% if is_required_field and not field.altnames == "Attendees" %}required{% endif %} 
+          class="{% if field.validators|length > 1 %}{{field.validators.1}}{% endif %}"
+          style="float:left; width:95%"
+          maxlength="{{field.max_digits|default_if_none:''}}"
+          pattern="{% if field.validators|length > 2 %}{{field.validators.2|default_if_none:''}}{% endif %}" 
+
+    />
+    <script type="text/javascript">
+    // Ensure that it is a alphabet and stop the keypress while entering hours for course subsection prop
+      $(".input_only_text").keydown(function (e) {
+        if ((e.keyCode > 64 && e.keyCode < 91) || (e.keyCode == 65 && e.ctrlKey === true) || 
+                 // Allow: home, end, left, right, down, up and //Allow delete, backspace, tab
+                (e.keyCode >= 35 && e.keyCode <= 40) || e.keyCode==46 || e.keyCode==8 || e.keyCode==9){
+          return true;
+        }  
+        else{
+          return false;
+        }      
+      });
+
+      $(".text_allow_space").keydown(function (e) {
+        if ((e.keyCode > 64 && e.keyCode < 91) || (e.keyCode == 65 && e.ctrlKey === true) || 
+                 // Allow: home, end, left, right, down, up and //Allow delete, backspace, tab
+                (e.keyCode >= 35 && e.keyCode <= 40) || e.keyCode==46 || e.keyCode==8 || e.keyCode==9 || e.keyCode==32){
+          return true;
+        }  
+        else{
+          return false;
+        }      
+      });
+
+      $(".course_code_check").keydown(function (e) {
+      	//Dont allow space, special characters,special char on num pad, qoutes,brackets,colons,etc
+        if (e.keyCode == 32 || (e.shiftKey || (e.keyCode < 48 && e.keyCode > 57)) || (e.keyCode >= 106 && e.keyCode <= 111) || (e.keyCode>=144 && e.keyCode<=188) || (e.keyCode>= 190 && e.keyCode <=222)){
+          return false;
+        }  
+        else {
+          return true;
+        }      
+      });
+
+      $(".course_code_check").keyup(function (e) {
+	      this.value = this.value.toLocaleUpperCase();
+	  });
+    </script>
+
+    {% if is_required_field or field.validators %}
+    {% if is_required_field and not field.altnames == "Attendees" %}
+    <i style="color:red; float:left display:inline">*</i>
+    {% endif %}
+    <small class="error{% if not is_required_field %} non-required{% endif %}">{% trans "Please fill a valid" %} {{field.altnames}}! </small>
+    {% endif %}
+
+  {% elif field_type == "int" or field_type == "float" or field_type == "long" %}
+    <input type="text" id="{{field.name}}" name="{{field.name}}" value="{{field_value|default_if_none:''}}" 
+          placeholder="{{field.help_text|default_if_none:''}}" 
+          {% if field.editable and not field.editable %}readonly{% endif %} 
+          {% if is_required_field and not field.altnames == "Attendees" %}required{% endif %} 
+          maxlength="{{field.max_digits|default_if_none:''}}" 
+          class = "{% if field.validators|length > 1 %}{{field.validators.1}}{% endif %}"
+          style="float:left; width:95%"
+          pattern="{% if field.validators|length > 2 %}{{field.validators.2|default_if_none:''}}{% endif %}" 
+
+    />
+
+    <script type="text/javascript">
+    // Ensure that it is a number and stop the keypress while entering hours for course subsection prop
+
+
+      $(".max_100").keyup(function () {
+        attr_val = parseInt($(this).val())
+        if ( attr_val > 100) { $(this).val('100')};
+      })
+
+      $(".input_only_num").keydown(function (e) {
+            // Allow ctrl+A
+        if ((e.keyCode == 65 && e.ctrlKey === true) || 
+                 // Allow: home, end, left, right, down, up and //Allow delete, backspace, tab
+                (e.keyCode >= 35 && e.keyCode <= 40) || e.keyCode==46 || e.keyCode==8 || e.keyCode==9) {
+                     // let it happen, don't do anything
+                     return;
+            }
+       // Ensure that it is a number and stop the keypress
+        if ((e.shiftKey || (e.keyCode < 48 || e.keyCode > 57)) && (e.keyCode < 96 || e.keyCode > 105)) {
+            e.preventDefault();
+        }        
+      });
+
+    </script>
+
+
+    {% if is_required_field and not field.altnames == "Attendees" %}
+    <i style="color:red; float:left display:inline">*</i>
+    <small class="error">{% trans "Please fill valid" %} {{field.altnames}}! </small>
+    {% endif %}
+
+  {% elif field_type == "datetime" %}{{field.name}}
+  {% if field.validators %}{{field_value|date:field.validators.0|default_if_none:''}}{% endif %}
+    <input type="text" id="{{field.name}}" name="{{field.name}}" value="{% if field.validators %}{{field_value|date:field.validators.0|default_if_none:''}}{% endif %}" 
+          placeholder="{{field.help_text|default_if_none:''}}"
+          {% if not field.editable %}readonly{% endif %} 
+          {% if is_required_field and not field.altnames == "Attendees" %}required{% endif %} 
+          class="{% if field.validators|length > 1 %}{{field.validators.1|default_if_none:''}}{% endif %}" 
+          style="float:left; width:10rem" 
+    />
+    {% if is_required_field %}
+    <i style="color:red; float:left display:inline">*</i>
+    <small class="error">{% trans "Please set" %} {{field.altnames}}!</small>
+    {% endif %}
+
+  {% elif field_type == "bool" %}
+    <div style="float:left; margin-top:0.5rem;">
+    {% for value in field_value_choices %}
+    {% if forloop.counter != 1 %}
+    &nbsp;&nbsp;&nbsp;
+    {% endif %}
+    <input type="radio" name="{{field.name}}" value="{{value|yesno:'Yes,No'}}" id="{{field.name}}{{value|yesno:'Yes,No'}}" {% if value|yesno:'Yes,No' == field_value|yesno:'Yes,No' %} checked {% endif %} {% if is_required_field and not field.altnames == "Attendees" %}required{% endif %}/><label for="{{field.name}}{{value|yesno:'Yes,No'}}">{{value|yesno:'Yes,No'}}</label>
+    {% endfor %}
+    {% if is_required_field and not field.altnames == "Attendees" %}
+    <i style="color:red; float:left display:inline">*</i>
+    <small class="error">{% trans "Please select" %} {{field.altnames}}! </small>
+    {% endif %}
+    </div>
+
+  {% elif is_list_of %}
+    <input type="text" id="{{field.name}}" name="{{field.name}}" value="{{field_value|join:', '|default_if_none:''}}" placeholder="Separate {{field.altnames|lower}} by commas..." {% if is_required_field and not field.altnames == "Attendees" %}required{% endif %} style="float:left; width:95%">
+    {% if is_required_field and not field.altnames == "Attendees" %}
+    <i style="color:red; float:left display:inline">*</i>
+    <small class="error">{% trans "Please select" %} {{field.altnames}}! </small>
+    {% endif %}
+
+  {% elif field_type == "ObjectId" and field.validators.0 == "File" %}
+    {{field_type}}{{field.name}}{{field_value}}
+    {% if field_value %}
+    
+    <a target="_blank" href="{% url 'read_file' group_id field_value %}" id="{{field.name}}">{% trans "Click here to view " %}{{field.altnames|lower}}</a>
+
+    {% else %}
+    <style type="text/css">
+      .fileUpload input.upload {
+        position: absolute;
+        top: 0;
+        right: 0;
+        margin: 0;
+        padding: 0;
+        font-size: 20px;
+        cursor: pointer;
+        opacity: 0;
+        filter: alpha(opacity=0);
+      }
+    </style>
+    <div style="float:left;">
+      <input type="text" id="uploadFile_{{field.name}}" value="" placeholder="Choose {{field.altnames|lower}}" disabled="disabled" style="float:left; width:18rem; margin-right:0.5rem;" {% if is_required_field and not field.altnames == "Attendees" %}required{% endif %} />
+      <div href="#" class="fileUpload button tiny round" style="margin-top:2px;">
+          <span>{% trans "Upload" %}</span>
+          <input id="uploadBtn_{{field.name}}" type="file" name="{{field.name}}" class="upload" {% if is_required_field and not field.altnames == "Attendees" %}required{% endif %} />
+          <small class="error">{% trans "Upload! " %}</small>
+      </div>
+      {% if is_required_field and not field.altnames == "Attendees" %}
+      <i style="color:red; float:left display:inline">*</i>
+      {% endif %}
+    </div>
+    <script type="text/javascript">
+      $('#uploadBtn_{{field.name}}').change(function () {
+        // alert("coming here " + this.value)
+        $('#uploadFile_{{field.name}}').val(this.value);
+      });
+    </script>
+
+    {% endif %}
+
+  {% else %}
+
+    <!-- Special check for IS() : True (radio buttons) & False (dropdown) -->
+    {% if is_mongokit_is_radio %}
+      <div style="float:left; margin-top:0.5rem;">
+      {% for value in field_value_choices %}
+      {% if forloop.counter != 1 %}
+      &nbsp;&nbsp;&nbsp;
+      {% endif %}
+      <input type="radio" name="{{field.name}}" value="{{value}}" id="{{field.name}}{{value}}" {% if value == field_value %} checked {% endif %} {% if is_required_field and not field.altnames == "Attendees" %}required{% endif %}/><label for="{{field.name}}{{value}}">{{value}}</label>
+      {% endfor %}
+      </div>
+      {% if is_required_field and not field.altnames == "Attendees" %}
+      <i style="color:red; float:left display:inline">*</i>
+      <small class="error">{% trans "Please select" %} {{field.altnames}}! </small>
+      {% endif %}
+
+    {% else %}
+      <select id="{{field.name}}" name="{{field.name}}" {% if not field.altnames == "Attendees" %} required="" {% endif %} style="float:left; width:95%">
+        <option value="">{% blocktrans with alt=field.altnames|lower %} - - - Select {{alt}} - - - {% endblocktrans %}</option>
+        {% for choice in field_value_choices %}
+        <option value="{{choice}}" {% if choice in field_value %} selected {% endif %} >{% blocktrans %} {{choice}} {% endblocktrans %}</option>
+        {% endfor %}
+      </select>
+      {% if not field.altnames == "Attendees" %}
+      <i style="color:red; float:left display:inline">*</i>
+      <small class="error">{% trans "Please select" %} {{field.altnames}}! </small>  
+      {% endif %}
+    {% endif %}
+
+
+  {% endif %}
+
+<!-- RelationType fields -->
+{% elif is_relation_field %}
+  {% if field.object_cardinality == 1 %}
+  <select id="{{field.name}}" name="{{field.name}}" {% if not field.altnames == "Attendees" %} required="" {% endif %} style="float:left; width:95%">
+    <option value="">{% blocktrans with alt=field.altnames|lower %} - - - Select {{alt}} - - - {% endblocktrans %}</option>
+    {% for choice in field_value_choices %}
+    <option value="{{choice.pk}}" {% if choice.pk in field_value %} selected {% endif %} >{% blocktrans with alt=choice.name %} {{alt}} {% endblocktrans %}</option>
+    {% endfor %}
+  </select>
+  {% if not field.altnames == "Attendees" %}
+    <i style="color:red; float:left display:inline">*</i>
+    <small class="error">{% trans "Please select" %} {{field.altnames}}! </small>
+  {% endif %}
+  {% else %}
+  <select id="{{field.name}}" name="{{field.name}}" multiple size="2" {% if not field.altnames == "Attendees" %} required="" {% endif %} style="float:left; width:80%; height: 2.9rem;">
+    {% if not field_value %}
+    <option value="">{% blocktrans with alt=field.altnames|lower %} - - - Select {{alt}} - - - {% endblocktrans %}</option>
+    {% endif %}
+
+    {% for choice in field_value_choices %}
+    {% if choice.pk in field_value %}
+    <option value="{{choice.pk}}" selected="" >{% blocktrans with alt=choice.name %} {{alt}} {% endblocktrans %}</option>
+    {% endif %}
+    {% endfor %}
+
+  </select>
+  {% if not field.altnames == "Attendees" %}
+    <i style="color:red; float:left display:inline">*</i>
+    <small class="error">{% trans "Please select" %} {{field.altnames}}! </small>
+  {% endif %}
+  <a href="" class="button tiny round" style="float: right;" data-reveal-id="{{field.name}}_modal">
+    {% if not field_value %}{% trans "Select" %}{% else %}{% trans "Change" %}{% endif %}
+  </a>
+
+  <div id="{{field.name}}_modal" class="reveal-modal xlarge" style="height: 90% !important" data-reveal>
+    <div id="{{field.name}}_drawer">
+      <h3>{% trans "Select" %} {{field.altnames}} </h3>
+      {% edit_drawer_widget "RelationType" groupid node_dict checked=field.name left_drawer_content=field_value_choices %}
+    </div>
+    <a class="close-reveal-modal">&#215;</a>
+  </div>
+
+  {% endif %}
+  
+  {% comment %}
+  {% endcomment %}
+
+{% endif %}

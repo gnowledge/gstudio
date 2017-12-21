@@ -1,0 +1,183 @@
+{% load ndf_tags %}
+{% load i18n %}
+
+<style type="text/css">
+    .text-center {
+        text-align: center;
+    }
+
+    .counter {
+        font-weight: bold;
+        text-align: right;
+    }
+
+    .margin-0r {
+        margin: 0 !important;
+    }
+    tr {
+    cursor: pointer;
+    }
+    .selected{
+      background-color: #D5D3D3 !important;
+    }
+</style>
+
+{% if approval_nodes %}
+<table align="center" id="table_data" class="display" cellspacing="0" width="100%">
+    <caption>
+      <h4><b>{{enrollment_details.College}}</b></h4>
+      <h5>{% trans "Course Code: " %}<b>{{enrollment_details.Course}}</b></h5>
+      <h6>{% trans "Enrollment Completed On: " %}<b>{{enrollment_details.CompletedOn|date:"d-M-Y"}}</b></h6>
+    </caption>
+    <input type="button" class="button tiny select_all_rows" value="Select All" >
+    &nbsp;<input type="button" class="button tiny deselect_all_rows" value="De-Select All" >
+    <label id="lbl_displ"></label>
+    <thead>
+    <tr>
+        <th class="text-center">{% trans "Sr. #" %}</th>
+        {% for col in enrollment_columns %}
+        <th>{{col}}</th>
+        {% endfor %}
+    </tr>
+    </thead>
+
+    <tbody>
+    {% regroup approval_nodes|dictsort:"Name" by Name as approval_nodes_sort_by_name %}
+    {% for sn in approval_nodes_sort_by_name %}
+    <tr id="{{sn.list.0|get_dict_item:'_id'}}">
+        <td class="text-center">{{forloop.counter}}.</td>
+        {% for col in enrollment_columns %}
+        <td>{{sn.list.0|get_dict_item:col}}</td>
+        {% endfor %}
+    </tr>
+    {% endfor %}
+    </tbody>
+</table>
+
+<input type="hidden" id="enrollment_id" value="{{enrollment_details.pk}}">
+<input type="hidden" id="course_id" value="{{enrollment_details.CourseId}}">
+
+<div class="row">
+    <div class="medium-2 columns">
+        <input type="button" class="button small radius expand btnApproval" value="Approve">
+    </div>
+    <div class="medium-2 columns end">
+        <input type="button" class="button small radius expand btnApproval" value="Reject">
+    </div>
+</div>
+
+{% else %}
+<h4> All students has been successfully approved.</h4>
+
+{% endif %}
+
+<script type="text/javascript">
+    var appr_dt_var;
+    appr_dt_var = $('#table_data').dataTable();
+
+    $('#table_data tbody').on( 'click', 'tr', function () {
+        $(this).toggleClass('selected');
+    });
+
+  //On click of select All, highlight all rows
+    $(document).on('click','.select_all_rows',function(){
+      $(appr_dt_var.fnGetNodes()).addClass('selected');
+      $("#lbl_displ").text("All " + $(appr_dt_var.fnGetNodes()).length + " rows are selected")
+    });
+
+  //On click of De-Select All, remove highlight from all rows
+    $(document).on('click','.deselect_all_rows',function(){
+        $("#lbl_displ").text("All rows are de-selected")
+        $(appr_dt_var.fnGetNodes()).removeClass("selected");
+    });
+
+    $(document).on("click", ".btnApproval", function() {
+      students_selected = []
+      appr_dt_var.$("tr.selected").each(function() {
+        students_selected.push($(this).attr("id"));
+      });
+
+      approval_state = $(this).val();
+
+      if (students_selected.length <= 0) {
+        if (approval_state == "Approve") {
+          $("#alertModalLabel").text("Please select any students for approval !!!");
+        }
+
+        else {
+          $("#alertModalLabel").text("Please select any students for rejection !!!");
+        }
+
+        $("#alertModal").removeClass("success");
+        $("#alertModal").addClass("warning");
+        $("#alertModal").foundation('reveal', 'open');
+
+        return;
+      }
+
+      enrollment_id = $("#enrollment_id").val();
+      course_id = $("#course_id").val();
+
+      success_state = false
+      approved = ""
+      rejected = ""
+      remaining = ""
+      task_status = ""
+      $.ajax({
+        url: "{% url 'approve_students' groupid %}",
+
+        data: {
+          'approval_state': approval_state,
+          'enrollment_id': enrollment_id,
+          'course_id': course_id,
+          'students_selected': students_selected,
+          'csrfmiddlewaretoken': "{{csrf_token}}"
+        },
+
+        type: "POST",
+
+        dataType: "json",
+
+        success: function(data) {
+          success_state = data["success"];
+
+          if (success_state) {
+            approved = data["approved"];
+            rejected = data["rejected"];
+            remaining = data["remaining"];
+            task_status = data["task_status"];
+          }
+
+          else {
+            $("#alertModalLabel").text(data["message"]);
+            $("#alertModal").removeClass("success").removeClass("warning");
+            $("#alertModal").addClass("alert");
+            $("#alertModal").foundation('reveal', 'open');
+          }
+        },
+
+        complete: function() {
+          if (success_state) {
+            $("#"+enrollment_id).find(".Approved").text(approved);
+            $("#"+enrollment_id).find(".Rejected").text(rejected);
+            $("#"+enrollment_id).find(".Remaining").text(remaining);
+            $("#"+enrollment_id).find(".Status").text(task_status);
+
+            $("#approval_accordion").html("");
+            $("#approval_accordion").removeClass("active");
+            $("#enrollment_accordion").addClass("active");
+          }
+        },
+      });
+    });
+
+    $(document).foundation();
+
+    $('#loading-image')
+    .bind('ajaxStart', function(){
+      $(this).show();
+    }).
+    bind('ajaxStop', function(){
+      $(this).hide();
+    });
+</script>

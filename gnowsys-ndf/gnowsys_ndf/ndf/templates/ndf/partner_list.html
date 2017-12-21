@@ -1,0 +1,74 @@
+{% extends "ndf/base.html" %}
+{% load i18n %}
+{% load ndf_tags %}
+{% load pagination_tags %}
+{% get_group_name groupid as group_name_tag %}
+{% block title %} {{group_obj.name}} {% endblock %}
+{% block style %}
+.top-gap
+{
+margin-top:15px;
+}
+.top-gap2
+{
+margin-top:13px;
+position:relative;
+top:13px;
+}
+.theme-panel {
+    background-color: #ddd;
+    padding: 0.85rem;
+    margin-top: 1em;
+    border: 1px solid #c3ecfe;
+}
+{% endblock %}
+{% block meta_content %}  
+
+
+{% endblock %}
+
+
+{% block related_content %}
+  {% check_is_gstaff groupid request.user as is_gstaff %}
+  {% if is_gstaff %}
+   <div class="panel theme-panel" >
+      <a class="tiny expand button radius " 
+          href="{% url 'create_group' group_obj.pk %}?subgroup=True&partnergroup=True">
+          <span class="fi-plus">&nbsp;&nbsp;{% trans "New" %} {{group_obj.name}}</span>
+      </a>
+  </div>
+  {% endif %}
+{% endblock %}
+
+
+{% block body_content %}
+<div class="repository-title large-4 columns top-gap"> {{group_obj.name}}</div>
+
+<div>
+  
+<ul class="small-block-grid-1 medium-block-grid-2 large-block-grid-5 top-gap2">
+  
+  <!-- Existing card list-->
+  <!-- #{#% get_group_type request.path request.user as group_type %} -->
+  {% group_type_info groupid request.user as grouptype %}
+
+  {% autopaginate group_nodes 23 %}
+
+  {% for node in group_nodes %}
+    <li class="card-image-wrapper"> 
+      {% include 'ndf/simple_card.html' with resource=node has_prof_pic=True url_name="e-library" first_arg=node.name %}
+    </li>
+  {% empty %}
+    
+      <div class="repository-desc large-8 columns">
+       {% trans "There are no" %} {{group_obj.name}} {% trans "created yet." %} 
+      </div>
+  
+  {% endfor %}
+  
+</ul>
+</div>
+
+{% paginate %}
+
+{% endblock %}

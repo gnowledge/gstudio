@@ -1,0 +1,596 @@
+{% extends "ndf/base.html" %}
+{% load staticfiles %}
+
+{% load i18n %}
+{% load ndf_tags %}
+{% block title %} {{ title }} {% endblock %}
+
+{% block head %}
+  {{block.super}}
+
+  
+  <script src="/static/ndf/bower_components/jquery-ui/jquery-ui.js"></script> <!-- checked -->
+  <script src="/static/ndf/bower_components/jqueryui-timepicker-addon/dist/jquery-ui-sliderAccess.js"></script> <!-- checked -->
+  <script src="/static/ndf/bower_components/jqueryui-timepicker-addon/dist/jquery-ui-timepicker-addon.min.js"></script> <!-- checked -->
+
+  <link rel="stylesheet" href="/static/ndf/bower_components/jqueryui-timepicker-addon/dist/jquery-ui-timepicker-addon.css"> <!-- checked -->
+  <link rel="stylesheet" href="/static/ndf/bower_components/jquery-ui/themes/smoothness/jquery-ui.css"> <!-- checked -->
+  <script sync="text/javascript" src="/static/ndf/bower_components/FileSaver/FileSaver.js" async></script> <!-- checked -->
+
+  <!-- DataTables -->
+  <script src="/static/ndf/bower_components/DataTables/media/js/jquery.dataTables.js"></script>
+  <script src="/static/ndf/bower_components/datatables-plugins/integration/foundation/dataTables.foundation.js"></script>
+  <!-- DataTables CSS -->
+  <link href="/static/ndf/bower_components/datatables-plugins/integration/foundation/dataTables.foundation.css" rel="stylesheet" type="text/css" />
+{% endblock %}
+
+{% block style %}
+{{block.super}}
+  fieldset{
+    border: 1px solid #0b8a91 !important;
+    width: inherit;
+  }
+
+  .total_val{
+      cursor:pointer;
+  }
+
+{% endblock %}
+{% block body_content %} 
+{{block.super}}
+  <div id="alertModal" class="reveal-modal medium alert-box radius" data-reveal data-alert>
+    <label id="alertModalLabel"></label>
+    <a class="close-reveal-modal">&#215;</a>
+  </div>
+  {{app_id}}
+
+  <div class="row">
+    <div style="text-align: center;">
+      <div class="small-4 columns end" style="display: inline-block;  ">
+        <h4>{% trans 'Report of :' %}</h4>
+      </div>
+      <div class="small-4 columns end" style="display: inline-block;  ">
+        <select id="fetchDataOf">
+          <option value="">{% trans '- - - Select - - -' %}</option>
+          <option id="student">{% trans 'Student' %}</option>
+          <option id="event">{% trans 'Event' %}</option>
+          <option id="vt">{% trans 'Voluntary Teacher' %}</option>
+        </select>
+      </div>
+    </div>
+  </div>
+
+  <fieldset>
+    <legend>
+      <label>{% trans 'Filters' %}</label>
+    </legend>
+      <div class="row">
+        <div class="small-4 columns end">
+          <label>{% trans 'State :' %}</label>
+        </div>
+        <div class="small-8 columns end">
+          <select id="state_list">
+          </select>
+        </div>
+      </div>
+      <div class="row">
+        <div class="small-4 columns end">
+          <label>{% trans 'University :' %}</label>
+        </div>
+        <div class="small-8 columns end">
+          <select id="univ_list" disabled="disabled">
+          </select>
+        </div>
+      </div>
+      <div class="row">
+        <div class="small-4 columns end">
+          <label>{% trans 'College :' %}</label>
+        </div>
+        <div class="small-8 columns end">
+          <select id="colg_list" disabled="disabled">
+          </select>
+        </div>
+      </div>
+  </fieldset>
+
+  <fieldset class="event_duration hide">
+      <div class="row">
+        <div class="small-6 columns">
+          <div class="small-2 columns end">
+            <label>{% trans 'From :' %}</label>
+          </div>
+          <div class="small-4 columns end">
+          <input type="text" id="event_start" name="event_start" value="" placeholder="DD/MM/YYYY" readonly="" required="" class="date_month_day_year" style="float:left; width:10rem">
+          </div>
+        </div>
+        <div class="small-6 columns">
+          <div class="small-2 columns end">
+            <label>{% trans 'To :' %}</label>
+          </div>
+          <div class="small-4 columns end">
+          <input type="text" id="event_end" name="event_end" value="" placeholder="DD/MM/YYYY" readonly="" required="" class="date_month_day_year" style="float:left; width:10rem">
+          </div>
+        </div>
+      </div>
+    
+  </fieldset>
+
+  <fieldset class="ac_year hide">
+      <div class="row">
+        <div class="small-4 columns end">
+          <label>{% trans 'Registration Year :' %}</label>
+        </div>
+        <div class="small-8 columns end">
+          <select id="ac_year_list">
+          <option value="">{% trans '- - - Select Year - - -' %}</option>
+          <option value="2013">{% trans '2013' %}</option>
+          <option value="2014">{% trans '2014' %}</option>
+          <option value="2015">{% trans '2015' %}</option>
+          <option value="ALL">{% trans 'ALL' %}</option>
+          </select>
+        </div>
+      </div>
+  </fieldset>
+
+  <div class="row">
+    <input type="button" class="button" value="FIND" id="get_reports_btn" style="margin-left:30.25em" disabled="disabled">
+  </div>
+
+  <div id="report1"></div>
+  <div id="report2"></div>
+
+{% endblock %}
+
+{% block script %}
+  //<script>
+
+
+    $("select#fetchDataOf").change(function() {
+      sel_type = $("select#fetchDataOf").val();
+      $("#event_start").val('');
+      $("#event_end").val('');
+      $("select#univ_list").attr("disabled",true).empty();
+      $("select#colg_list").attr("disabled",true).empty();
+      $("select#state_list").prop("selectedIndex", 0);
+      $("#report1").html('')
+      $("#report2").html('')
+
+      $("#ac_year_list").val('')
+      if (sel_type == "Student"){
+        $(".ac_year").removeClass("hide");
+        $(".event_duration").addClass("hide")
+      }
+      else if(sel_type == "Event") {
+        $(".ac_year").addClass("hide").val('');
+        $(".event_duration").removeClass("hide")
+      }
+      else{
+        $(".ac_year").addClass("hide").val('');
+        $(".event_duration").addClass("hide")
+      }
+    });
+    $("select#state_list").change(function() {
+      // Get selected State's value (ObjectId) and selected-index
+      selected_state_id = $(this).val()
+      selected_state_index = this.selectedIndex
+
+      if (selected_state_index != 0) {
+        // Perform this only when a State is selected
+        // Ajax call that fetches all Universities belonging to selected State
+        $.ajax({
+          url:"{% url 'get_universities' groupid %}",
+
+          data: {
+            state_id: selected_state_id
+          },
+
+          type: "GET",
+
+          dataType: "json",
+
+          complete: function () {
+            // Enable Univ field
+            $("select#univ_list").removeAttr('disabled')
+          },
+
+          success: function (data) {
+            if (data.hasOwnProperty("message")) {
+              // Pops-up only when there is any error found during the ajax call
+              alert(data["message"])
+              // $("select#state_list").prop("selectedIndex", 0);
+            }
+
+            else {
+              $("#get_reports_btn").removeAttr("disabled");
+
+              // First empty all values of Univ field (dropdown/select)
+              $("select#univ_list").empty();
+
+              // Make very first entry as given below
+              $("select#univ_list").append(
+                  $("<option></option>")
+                    .attr("value", "")
+                    .text("- - - Select University - - -")
+              );
+              // First empty all values of College field (dropdown/select)
+              $("select#colg_list").empty().attr("disabled",true);
+
+              // Fill returned univ values based on which state is selected
+              $.each(data, function(i, value) {
+                $("select#univ_list").append(
+                  $("<option></option>")
+                    .attr("value", value[0])
+                    .text(value[1])
+                );
+              });
+
+              $("select#univ_list").append(
+                $("<option></option>")
+                  .attr("value", "ALL")
+                  .text("ALL")
+              );
+
+
+              // Set very first entry so that user doesn't forgets to select a value
+              $("select#univ_list").prop("selectedIndex", 0);
+            }
+          }
+        });
+      }
+
+      else {
+        // If state is not selected or changed back to very first element from State's dropdown
+        // then set even univ field's value to very first entry and disabled it until user again selects any state
+        $("select#univ_list").empty().attr("disabled",true);
+        $("select#colg_list").empty().attr("disabled",true);
+      }
+    });
+
+
+    $("select#univ_list").on("change", function() {
+      // Get selected University's value (ObjectId) and selected-index
+      var selected_university_id = $(this).val();
+      var selected_university_index = this.selectedIndex;
+      var success_state = false;
+      if (selected_university_index != 0) {
+        // Perform this only when a University is selected
+        // Ajax call that fetches all Colleges affiliated to selected University
+        $.ajax({
+          url:"{% url 'get_affiliated_colleges' groupid %}",
+
+          data: {
+            university_id: selected_university_id
+          },
+
+          type: "GET",
+
+          dataType: "json",
+
+          success: function(data) {
+            success_state = data["success"];
+
+            if (success_state) {
+              $("select#colg_list").removeAttr('disabled')
+              // First empty all values of College field (dropdown/select)
+              $("select#colg_list").empty();
+
+              // Make very first entry as given below
+              $("select#colg_list").append(
+                  $("<option></option>")
+                    .attr("value", "")
+                    .text("- - - Select college - - -")
+              );
+
+              // Fill returned college values based on which university is selected
+              $.each(data["affiliated_colleges"], function(i, value) {
+                $("select#colg_list").append(
+                  $("<option></option>")
+                    .attr("value", value[0])
+                    .text(value[1])
+                );
+              });
+
+              $("select#colg_list").append(
+                $("<option></option>")
+                  .attr("value", "ALL")
+                  .text("ALL")
+              );
+
+
+              // Set very first entry so that user doesn't forgets to select a value
+              $("select#colg_list").prop("selectedIndex", 0);
+            }
+
+            else {
+              $("#alertModal").removeClass("success");
+              $("#alertModal").addClass("alert");
+              $("#alertModal").foundation('reveal', 'open');
+            }
+          },
+        });
+      }
+
+      else {
+        // If university is not selected or changed back to very first element from university's dropdown
+        // then set even College field's value to very first entry and disabled it until user again selects any university
+        $("select#colg_list").empty().attr('disabled', 'disabled')
+      }
+    });
+
+    $(document).on("click", ".total_val", function() {
+      gst_name = $("#fetchDataOf").val()
+      query_data = $(this).attr('data-query');
+      $.ajax({
+        url:"{% url 'get_detailed_report' groupid %}",
+
+        data: {
+          'query': query_data,
+          'gst_name':gst_name,
+          'csrfmiddlewaretoken': "{{csrf_token}}"
+        },
+
+        type: "POST",
+
+        dataType: "json",
+
+          success: function(data) {
+            success_state = data["success"];
+            $("#alertModalLabel").text(data["message"]);
+
+            if (success_state) {
+              // $("#report2").html(data["students_data_review"]);
+        
+              groupid_val = data["groupid"];
+              app_id_val = data["app_id"];
+              app_set_id_val = data["app_set_id"];
+              var caption_college = ""
+              var caption_university = ""
+              filename = data["filename"];
+              if (data.hasOwnProperty("university")){
+                university = data["university"];
+                caption_university = '<h4>' + university + '</h4>';
+              }
+              if (data.hasOwnProperty("college")){
+                college = data["college"];
+                caption_college = '<h3>' + college + '</h3>';
+              }
+              students_count = data["students_count"];
+              column_headers = data["column_headers"];
+              students_data_set = data["students_data_set"];
+              dataTable_columns_set = [];
+              download_link = "{% static 'filename' %}".replace('filename', filename);
+
+              if (parseInt(students_count) <= 0) {
+                c = '<div class="row">' +
+                  '<div class="large-4 large-centered columns">' +
+                    '<p class="alert-box alert radius text-center text-size-15">No records match the given criteria !!!</p>' +
+                  '</div>' +
+                '</div>'
+                $("#report2").html(c);
+              }
+
+              else {
+                // Define table
+                student_data_table = '<table cellpadding="0" cellspacing="0" border="0" class="display" id="student_data_table">' +
+                  '<caption>' +
+                    caption_college +
+                    caption_university +
+                    '<h6>No. of '+ gst_name +'s: <b>' + students_count + '</b></h6>' +
+                    '<a href="' + download_link + '" download="">' +
+                      '<span class="fi-download large">&nbsp;&nbsp;&nbsp;Download '+gst_name+'\' data (CSV)</span>' +
+                    '</a>' + 
+                  '</caption>' +
+                '</table>';
+                $("#report2").html(student_data_table);
+                
+                // Prepare title & data headers used in dataTable
+                $.each(column_headers, function(index, v) {
+                  d = {};
+                  d["data"] = v[0];
+                  d["title"] = v[1];
+                  dataTable_columns_set.push(d);
+                });
+
+                // Set defintion dataTable
+                sce_dt_var = $("#student_data_table").dataTable({
+                  "data": students_data_set,
+                  "columns": dataTable_columns_set,
+                  "columnDefs": [{ "width": "15%", "targets": 1 }],
+                  "createdRow": function ( row, data, index ) {
+                    // Attaching Student's ObjectId to each row (i.e., assigning to it's id attribute)
+                    s_id = data["stud_id"];
+                    $(row).attr("id", s_id);
+                  }
+                });
+              }
+            }
+            else {
+              $("#alertModal").removeClass("success").removeClass("warning");
+              $("#alertModal").addClass("alert");
+              $("#alertModal").foundation('reveal', 'open');
+            }
+          },
+      });
+    })
+    $(document).on("click", "#get_reports_btn", function() {
+      data_dict = {};
+      gst_name = $("#fetchDataOf").val();
+      sel_ac_year = $("#ac_year_list").val();
+      var selected_state_index = $("select#state_list")[0].selectedIndex;
+      if (selected_state_index > 0){
+        data_dict['state'] = $("select#state_list").val();
+      }
+      var selected_university_index = $("select#univ_list")[0].selectedIndex;
+      if(selected_university_index > 0){
+        data_dict['university'] = $("select#univ_list").val();
+      }
+      var selected_colg_index = $("select#colg_list")[0].selectedIndex;
+      if (selected_colg_index > 0){
+        data_dict['college'] = $("select#colg_list").val();
+      }
+      
+      start_date = $("#event_start").val()
+      if (start_date){
+        data_dict['start_date'] = start_date  
+      }
+      end_date = $("#event_end").val()
+      if (end_date){
+        data_dict['end_date'] = end_date  
+      }
+      console.log(data_dict)
+      $.ajax({
+        url:"{% url 'mis:get_mis_reports' groupid %}",
+
+        data: {
+          'data_set': JSON.stringify(data_dict),
+          'gst_name':gst_name,
+          'academic_year':sel_ac_year,
+          'event_start':start_date,
+          'event_end':end_date,
+          'csrfmiddlewaretoken': "{{csrf_token}}"
+        },
+
+        type: "POST",
+
+        dataType: "json",
+
+        success: function (data) {
+          column_headers = data["column_headers"];
+          console.log(column_headers)
+          console.log(data["return_data_set"])
+          // ac_data_set = JSON.parse(data["return_data_set"]);
+          ac_data_set = data["return_data_set"];
+          console.log(ac_data_set)
+          dataTable_columns_set = [];
+
+          if (ac_data_set.length > 0) {
+            // Define table
+            ac_table = '<table cellpadding="0" cellspacing="0" border="0" class="display" id="ac_table">' +
+              '</table>';
+
+            $("#report1").html(ac_table);
+
+            // Prepare title & data headers used in dataTable
+            $.each(column_headers, function(index, v) {
+              d = {};
+              d["data"] = v[0];
+              d["title"] = v[1];
+              dataTable_columns_set.push(d);
+            });
+            // report1_data = JSON.stringify(JSON.parse(data['data_for_report1']))
+            // Set defintion dataTable
+            sce_dt_var = $("#ac_table").dataTable({
+              "data": ac_data_set,
+              "columns": dataTable_columns_set,
+              "createdRow": function ( row, data, index ) {
+                rec_id = data["rec_id"];
+                $(row).attr("id", rec_id);
+                $(row).find("td:nth-child(4)")
+                      .attr('class','total_val')
+                      .attr('data-query',data['query']) 
+                }
+            });
+          }
+          else{
+            $("#report1").html("No data to display"); 
+          
+        }
+      }
+    });//end of ajax call
+    });//end of click function
+    
+
+
+  //</script>
+{% endblock %}
+
+{% block document_ready %}
+    var currentYear = (new Date()).getFullYear()
+    lowerYearLimit = currentYear - 5;
+    var startDtInput = $("#event_start")
+    var endDtInput = $("#event_end")
+    $("#event_start.date_month_day_year").datepicker({
+      changeMonth: true,
+      changeYear: true,
+      dateFormat: "dd/mm/yy",
+      yearRange: lowerYearLimit + ":" + (currentYear),
+      minDate: new Date(lowerYearLimit, 1 - 1, 1),
+      //maxDate: 0,
+      defaultDate: new Date(lowerYearLimit, 1 - 1, 1),
+      onClose: function(dateText, inst) {
+        if (endDtInput.val() != '') {
+          var testStartDate = startDtInput.datetimepicker('getDate');
+          var testEndDate = endDtInput.datetimepicker('getDate');
+
+          if (testStartDate > testEndDate) {
+            endDtInput.datetimepicker('setDate', testStartDate);
+          }
+        }
+
+        else {
+          endDtInput.val(dateText);
+        }
+      },
+
+      onSelect: function (selectedDateTime){
+        endDtInput.datetimepicker('option', 'minDate', startDtInput.datetimepicker('getDate'));
+      }
+
+    });
+
+    $("#event_end.date_month_day_year").datepicker({
+      changeMonth: true,
+      changeYear: true,
+      dateFormat: "dd/mm/yy",
+      yearRange: lowerYearLimit + ":" + (currentYear),
+      minDate: new Date(lowerYearLimit, 1 - 1, 1),
+      //maxDate: 0,
+      defaultDate: new Date(lowerYearLimit, 1 - 1, 1),
+      onClose: function(dateText, inst) {
+        if (startDtInput.val() != '') {
+          var testStartDate = startDtInput.datetimepicker('getDate');
+          var testEndDate = endDtInput.datetimepicker('getDate');
+
+          if (testStartDate > testEndDate) {
+            startDtInput.datetimepicker('setDate', testEndDate);
+          }
+        }
+
+        else {
+          startDtInput.val(dateText);
+        }
+      }
+
+    });
+
+
+    data = {{states_list|safe}}
+    // First empty all values of District field (dropdown/select)
+    $("select#state_list").empty();
+
+    // Make very first entry as given below
+    $("select#state_list").append(
+        $("<option></option>")
+          .attr("value", "")
+          .text("- - - Select state - - -")
+    );
+
+    // Fill returned district values based on which state is selected
+    $.each(data, function(i, value) {
+      $("select#state_list").append(
+        $("<option></option>")
+          .attr("value", value[0])
+          .text(value[1])
+      );
+    });
+
+    $("select#state_list").append(
+      $("<option></option>")
+        .attr("value", "ALL")
+        .text("ALL")
+    );
+
+    // Set very first entry so that user doesn't forgets to select a value
+    $("select#state_list").prop("selectedIndex", 0);
+
+{% endblock %}

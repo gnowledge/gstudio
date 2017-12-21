@@ -1,0 +1,26 @@
+Create New GSystem
+
+1.The new GSystem can be create from the Admin Designer tab.
+
+    1.1. The user is required to select a GSystemType depending on which a corressponding GSystem template would be loaded.
+
+    1.2. Here there are two possible cases:
+        1.2.1. If the GSystemType select, has its own .html page (eg. The GSystemType Page has its own
+                page.html ) then that page would be loaded.
+        1.2.2. If the GSystemType selected does not have its own .html page,then a dynamic
+                page is loaded having the fields based on :
+                1.2.2.1. attribute_type_set of the GSystemType selected
+                1.2.2.2. relation_type_set of the GSystemType selected
+                1.2.2.3. get_possible_attributes of the GSystemType selected, fetched by using the
+                         method in models.py
+                1.2.2.4. get_possible_relations of the GSystemType selected, fetched by using the
+                         method in models.py
+                (NOTE: In case, there is any duplicity between  attribute_type_set and get_possible_attributes, then the duplicate fields from get_possible_attributed are removed.)
+                1.2.2.5. Default fields of GSystem class.
+
+    1.3. After the form is saved, the corressponding GAttribute's and GRelation's are added.
+
+2. The form saved can be edited from the admin/data/GSystem or admin/designer/GSystem drawer.
+
+3. The Graphs: Concept Graph, Collection Graph, Dependency Graph can be viewed from admin/data/GSystem
+    and admin/designer/GSystem drawer.

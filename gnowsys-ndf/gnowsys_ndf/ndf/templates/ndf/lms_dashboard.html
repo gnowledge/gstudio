@@ -1,0 +1,119 @@
+{% extends "ndf/gbase.html" %}
+{% load i18n %}
+{% load cache %}
+
+
+{# lms_dashboard.html lms My Desk screen #}
+
+{% block title %} My Desk {% endblock%}
+
+
+{% block body_content %}
+{% load ndf_tags %}
+{% get_gstudio_workspace_instance as is_workspace_instance %}
+
+<div class="mydesk_page">
+  <div class="page_banner">
+    <div class="banner_overlay"></div>
+    <div class="banner_profile">
+      <div class="buddy_logo">
+        {% get_profile_pic request.user.pk as prof_pic %}
+        {% if prof_pic %}
+        <img src="{{MEDIA_URL}}{{prof_pic.if_file.original.relurl}}" >
+        {% else %}
+        <img style="background-color:rgba(0, 0, 0, 0.34);" src="/static/ndf/bower_components/foundation-icon-fonts/svgs/fi-torso.svg" >
+        {% endif %}
+      </div>
+      <div class="banner_heading">
+        <span class="buddy_name">{{user.username}}</span>
+      </div>
+    </div>
+  </div>
+  <div class="page_menu">
+    <ul class="nav_menu_1">
+      <li>
+        <a href="{% url 'my_desk' request.user.id  %}" {% if title == "my desk" %} class="selected" {% endif %}> {% if  is_workspace_instance %} {% trans "My Workspaces" %} {% else %} <i class="fi-book-bookmark" style="font-size:20px;"></i> {% trans "My Courses" %} {% endif %} </a>
+      </li>
+
+      <li class=""><a {% if title == "my performance" %} class="selected" {% endif %} href="{% url 'my_performance' request.user.id  %}"> <i class="fa fa-line-chart" aria-hidden="true"></i> {% trans "My Performance" %}</a> </li>
+
+    </ul>
+  </div>
+
+  <ul class="small-block-grid-1 medium-block-grid-2 large-block-grid-2" >
+    {% comment %}
+
+    {% for each_obj in modules_cur %}
+    <li class="card-image-wrapper">
+      {% include "ndf/horizontal_card.html" with node=each_obj url_name="module_detail" first_arg=group_id second_arg=each_obj.pk %}
+    </li>
+    {% empty %}
+    No modules found!
+    {% endfor %}
+  </ul>
+</div>
+{% endcomment %}
+</br>
+<div class="small-12 columns group_sections_content">
+  {% if title == "my desk" %}
+  <div class="small-12 columns lms_explore_back_unit">
+    <ul class="small-block-grid-1 medium-block-grid-3 large-block-grid-3">
+      {% for each_obj in units_cur %}
+      <li class="card-image-wrapper">
+        {% include "ndf/card_group.html" with node=each_obj url_name="groupchange" first_arg=each_obj.pk no_enroll=True %}
+      </li>
+      {% empty %}
+      <section class="empty-dashboard-message">
+        <p>You are not enrolled in any course!</p>
+          <a class="button-explore-courses" href="{% url 'explore_courses' %}">Explore</a>
+      </section>
+      {% endfor %}
+    </ul>
+  </div>
+  {% endif %}
+</div>
+
+<div class="small-12 columns group_sections_content">
+  {% if title == "my performance" %}
+  <div class="small-12 columns lms_explore_back_unit">
+    <ul class="small-block-grid-1 medium-block-grid-3 large-block-grid-3">
+      {% for each_obj in units_cur %}
+      <li class="card-image-wrapper">
+        {% include "ndf/card_group.html" with group_counts=True node=each_obj no_url=True first_arg=each_obj.pk  %}
+      </li>
+      {% empty %}
+      <section class="empty-dashboard-message">
+        <p>You are not enrolled in any course!</p>
+          <a class="button-explore-courses" href="{% url 'explore_courses' %}">Explore</a>
+      </section>
+      {% endfor %}
+    </ul>
+  </div>
+</div>
+
+<div id="show-overlay" class="reveal-modal reveal-modal-overlay" data-options="close_on_background_click:false;close_on_esc:false;"  data-reveal aria-labelledby="modalTitle" aria-hidden="true" role="dialog"></div>
+
+  <script type="text/javascript">
+
+    function show_my_performance(this_obj){
+      data_unit_id  = $(this_obj).attr("data-node-id");
+      $.blockUI();
+      $.ajax({
+        url: "{% url 'course_analytics' group_id request.user.id %}",
+        type: "GET",
+        dataType: "html",
+        data: {
+          "data_unit_id":data_unit_id
+        },
+        global: false,
+        success: function(data){
+          $.unblockUI();
+          $('#show-overlay').foundation('reveal', 'open');
+          $('#show-overlay').html(data);
+        },
+      });
+    }
+
+  </script>
+  {% endif %}
+  {% endblock  %}

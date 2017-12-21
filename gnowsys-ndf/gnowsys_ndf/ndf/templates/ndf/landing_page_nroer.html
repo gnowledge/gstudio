@@ -1,0 +1,222 @@
+{% extends "ndf/base.html" %}
+{% load i18n %}
+
+{% load ndf_tags %}
+{% load cache %}
+
+{% block title %} {% trans "Welcome" %} {% endblock %}
+
+{% block head %}
+
+    <!-- slick-carousel -->
+    <link rel="stylesheet" type="text/css" href="/static/ndf/bower_components/slick-carousel/slick/slick.css"/>
+    <!-- {#%# load get_site_variables get_all_users_int_count get_all_file_int_count from ndf_tags %} -->
+    <!-- Add the new slick-theme.css if you want the default styling -->
+    <!-- <link rel="stylesheet" type="text/css" href="/static/ndf/bower_components/slick-carousel/slick/slick-theme.css"/> -->
+    <script type="text/javascript" src="/static/ndf/bower_components/slick-carousel/slick/slick.min.js"></script>
+
+{% endblock %}
+
+{% block style %}
+
+article.columns{
+    padding: 0;
+    min-height: auto;
+}
+
+#top-headers{
+    margin-bottom: 0;
+}
+
+.workspace{
+    min-height: auto;
+}
+
+#landing-slider-container{
+}
+
+.slick-slider{
+    margin-bottom: 0;
+}    
+    
+{% endblock style %}
+
+
+{% block body_content %}
+
+    {% get_site_variables as site %}
+    {% get_all_users_int_count as all_users %}
+    {% get_all_file_int_count as all_files %}
+
+    {% cache 1800 welcome_slider request.LANGUAGE_CODE %} <!-- caching slider for 30 mins -->
+
+    {% comment %}
+    <article class="landing row hide">
+        <section class="promo">
+            <div class="banner">
+                <div id="group-banner">
+
+                    <div class="slide" style="background-color:#10a05d">
+                        <!-- <i class="fi-torsos slide-back-image"></i> -->
+                        <div class="row">
+                            <div class="small-12 columns">
+                                <h2> {% trans "An initiative of Government of India" %} </h2>
+                            </div>
+                        </div>
+                        <br/>
+                        <div class="row">
+                            <div class="small-8 push-1 offset-1 columns">
+                                <h3>{% trans "Offering Open Educational Resources" %}</h3>
+                                <blockquote>
+                                    {% trans "In all Indian Languages" %}<br><br>
+                                    {% trans "Created, adapted, translated and shared" %}
+                                </blockquote>
+                            </div>
+                            <div class="small-3 columns">
+                                <div class="count-box">
+                                    <span class="count"> {{all_files}}</span> {% trans "Resources" %} <br>
+                                    <span class="count"> {{all_users}}</span> {% trans "Members" %} <br>
+                                    <br>
+                                    {# <a href="../accounts/register/" class="ui button"> #}{% trans "Let's Join NROER" %}{# </a> #}
+                                </div>
+                                    
+                                <div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="slide" style="background-color:#0F69B4">
+                        <!-- <i class="fi-lightbulb slide-back-image"></i> -->
+                        <div class="medium-12 columns">
+                            <div class="row">
+                                <div class="medium-12 columns">
+                                    <h3><i class="fi-arrows-in slide-2-icons"></i> &nbsp; {% trans "Bridging divides" %}</h3>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="medium-12  push-1 columns">
+                                    <h3><i class="fi-annotate slide-2-icons"></i> &nbsp; {% trans "Building partnerships" %}</h3>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="medium-12  push-2 columns">
+                                    <h3><i class="fi-results-demographics slide-2-icons"></i> &nbsp; {% trans "Nurturing networks and interest groups" %}</h3>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="medium-12  push-3 columns">
+                                    <h3><i class="fi-magnifying-glass slide-2-icons"></i> &nbsp; {% trans "Capturing and analyzing data" %}</h3>
+                                </div>
+                            </div>
+
+                        </div>
+
+                    </div>
+
+
+                    <div class="slide" style="background-color:#eb3849">
+                        <!-- <i class="fi-asl slide-back-image"></i> -->
+                        <div class="row">
+                            <div class="small-12 columns">
+                                <h2> {% trans "Connecting knowledge connecting people..." %} </h2>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="small-9 offset-3 columns">
+                                <h3>
+                                    <span class="quotes">&#8220</span>
+                                        {% trans "Strengthening school and teacher education" %}
+                                    <span class="quotes">&#8221</span>
+                                </h3>
+                            </div>
+                        </div>
+
+                    </div>
+
+
+                </div>
+            </div>
+            <!-- end of banner -->
+        </section>
+
+    </article>
+    {% endcomment %}
+
+    <div id="landing-slider-container">
+    <div>
+        <img src="static/ndf/images/landing_pg_slides/Slider1.png" style="width:100%;">
+    </div>
+    <div>
+        <img src="static/ndf/images/landing_pg_slides/Slider2.png" style="width:100%;">
+        </div>
+    <div>
+        <img src="static/ndf/images/landing_pg_slides/Slider3.png" style="width:100%;">
+        </div>
+    </div>
+    <div class="text-center">
+        <a href="http://nroer.in" target="_blank"> Click here to visit the old site</a>
+    </div>
+    {% endcache %}
+    
+    <script>
+
+        // removing left panel:
+        $("main.row > aside.columns").detach();
+
+        // making body_content block to take 12-large columns
+        $article = $("main.row > article.columns");
+        $article.removeClass("medium-10").addClass("large-12");
+        
+        // redundantly kept to improve the speed of forming slideshow.
+        // Along with that to ensure this script found it's elements. Hence forth kept in .ready() too.
+        // $("#group-banner").slick({
+        //     dots: true,
+        //     autoplaySpeed: 7000,
+        //     autoplay: true
+        // });
+
+        // $(document).ready(function(){
+  
+        //     try{
+        //         $("#group-banner").slick({
+        //             dots: true,
+        //             autoplaySpeed: 7000,
+        //             autoplay: true
+        //         });
+        //     }
+        //     finally{
+        //     }
+	
+/*
+            function resize()
+            {
+                // alert("resize event detected!");
+                // $(".slide").height($("#group-banner").height() - 50);
+                if($(document).height() < $(document).width()) 
+                {
+                    $(".slide").height("20vh");
+                }
+                else
+                {
+                    $(".slide").height("12vw");
+                }
+            }
+
+            setTimeout(function() {window.onresize = resize; resize()}, 7000);
+*/
+            
+      // });
+
+    $(document).ready(function(){
+        $('#landing-slider-container').slick({
+            // adaptiveHeight: true,
+            // speed: 300,
+            // fade: true,
+            autoplaySpeed: 5000,
+            autoplay: true
+        });
+    });
+    </script>
+
+{% endblock %}

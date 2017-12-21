@@ -1,0 +1,124 @@
+<script type="text/javascript" src="/static/ndf/bower_components/blueimp-canvas-to-blob/js/canvas-to-blob.min.js"></script>
+<div class="large-12 columns">
+  <div class="large-12 columns row">
+        <div class="large-6 columns">
+          <label>Existing Thumbnail</label>
+    {% if grel_dict %}
+          <img  src="{{MEDIA_URL}}{{grel_dict.grel_node.if_file.thumbnail.relurl}}">
+    {% elif node.if_file.thumbnail.relurl %}
+          <img  src="{{MEDIA_URL}}{{node.if_file.thumbnail.relurl}}">
+    {% endif %}
+        </div>
+        <div class="large-6 columns">
+          <label>Captured Thumbnail</label>
+          <canvas id="canvas" width="50px" height="50px" style="display:block;"></canvas>
+          <div id="screenShots"></div>
+        </div>
+</div>  
+  </div>
+       <div class="large-12 columns">
+          <a class="button" id="snap" onclick="startScreenshot()" value="">take snapshot</a>
+          <a class="button" style="display:none" id="save-snap" onclick="saveScreenshot()" value="">save snapshot</a>
+       </div>
+
+<script type="text/javascript">
+var video_obj = document.getElementById("{{video_id}}");
+var canvas = document.getElementById("canvas");
+var ctx = canvas.getContext("2d");
+var ssContainer = document.getElementById("screenShots");
+var videoHeight, videoWidth;
+var drawTimer = null;
+// console.log(video_obj);  
+
+function initScreenshot() {
+  videoHeight = video_obj.videoHeight; 
+  videoWidth = video_obj.videoWidth;
+  canvas.width = 120;
+  canvas.height = 120;
+  console.log(video_obj);
+}
+
+function grabScreenshot() {
+  ctx.drawImage(video_obj, 0, 0, 120, 120);
+  var img = new Image();
+  img.src = canvas.toDataURL("image/png");
+  img.width = 120;
+  // console.log(canvas)
+}
+
+function startScreenshot() {
+
+  initScreenshot();
+  if (drawTimer == null) {
+    drawTimer = grabScreenshot();
+    // alert("hello");
+      
+      // alert(test);
+  }
+}
+
+
+function saveScreenshot(){
+    var canvas = document.getElementById("canvas");
+    var formData = new FormData();
+    var blob_object = new Blob();
+    var d = new Date();
+    timeStamp = d.getTime();
+    fileName = "{{node.name}}"+"-th-"+timeStamp.toString();
+
+    if (canvas.toBlob) {
+          canvas.toBlob(
+              function (blob) {
+                  blob_object = blob;
+                  file = blob
+                  formData.append('filehive', file, fileName);
+                  formData.append('csrfmiddlewaretoken', '{{csrf_token}}');
+                  formData.append('parent_node','{{parent_node}}');
+
+                  // Set up the request.
+                  xhr = new XMLHttpRequest();
+                  // Open the connection.
+                  xhr.open('POST', "{% url 'upload_video_thumbnail' group_id  %}");
+
+                  // Set up a handler for when the request finishes sucessfully.
+                  xhr.onload = function () {
+
+                    if (xhr.status === 200)
+                    {
+                      // File(s) uploaded.
+                     // if file is not uploaded sucessfully
+                      if(xhr.responseText == "UploadError")
+                      {
+                         alert("Error occurred");
+                      }
+                      // check if image is not in the list, add it.
+                      else if(xhr.responseText )
+                      {
+                          
+                            alert("Thumbnail changed sucessfully");
+
+                      }
+
+                    }
+                    else
+                    {
+                      alert('An error occurred!');
+                    }
+                  };
+
+                  // Send the Data.
+                  xhr.send(formData);
+
+                                /* ... */
+                            },
+                            'image/jpeg'
+                        );
+                  }
+
+
+}
+$("#snap").click(function(){
+  $("#save-snap").show();
+})
+
+</script>

@@ -1,0 +1,84 @@
+{% load i18n %}
+{% load ndf_tags %}
+
+{% if is_create_collection %}
+<div class="collection-area large-12 columns">
+        <div class="large-6 columns">
+			Create New Collection:
+            <input type="text" class="coll_value" placeholder="Enter collection name" name="coll_name"/>
+        </div>
+        <a class="create_coll"><span class="fi-check" style="color:green;"></span></a>
+</div>
+{% endif %}
+{% if is_add_to_collection %}
+<div class="large-12 columns">
+	
+Choose From existing collection:
+<ul class="small-block-grid-1 medium-block-grid-3 large-block-grid-5" >
+
+	{% for each_node in result_cur %}
+                    
+                    <li class="card-image-wrapper " id="{{each_node.pk}}" style="margin-top:13px;margin-left:-10px">
+						            {% include 'ndf/simple_card.html' with no_url=True resource=each_node first_arg=group_id second_arg=each_node.pk third_arg=False %}
+                    </li>
+                {% endfor %}
+</ul>
+</div>
+{% endif %}
+<script type="text/javascript">
+	
+	$(document).on('change','.filenode',function(){
+
+        var checked = $('.filenode:checked').length;
+        if (checked){
+          $(".collection-area").css("display", "none");          
+        }
+        else{
+          $(".collection-area").display();          
+        }
+        
+    });
+
+	 $('.create_coll').click(function() {
+
+      var coll_arr = []
+      var coll_node = $(".coll_value").val()
+      $('.filenode:checked').each(function() {
+        coll_arr.push($(this).val());
+      });
+      var r = confirm("Do you want to save the collection of selected elements");
+      if (r == true) {
+          x = "Your collection is saved successfully";
+          $.ajax({
+            type: "POST",
+            url: "{% url 'collection_create' group_id %}",
+            datatype: "html",
+            data:{
+              collection: coll_arr,
+              name: coll_node,
+              csrfmiddlewaretoken: '{{ csrf_token }}',
+              coll_redir : "{{coll_redir}}"
+            },
+            success: function(data) {
+              if("{{coll_redir}}" == "raw-material"){
+
+                location.href = "{% url 'course_raw_material' group_id %}";
+              }
+              else if("{{coll_redir}}" == "gallery"){
+                location.href = "{% url 'course_gallery' group_id %}"; 
+              }
+            }
+          });
+
+          
+      } else {
+          x = "Cancelled";
+      }
+      
+      
+          
+    });
+
+
+
+</script>

@@ -1,0 +1,182 @@
+{% load get_nroer_menu  get_user_group  get_group_object  get_existing_groups_excluded  get_profile_pic  get_gapps_iconbar user_access_policy get_user_object check_is_gstaff get_attribute_value get_sg_member_of get_relation_value get_explore_url get_test_page_oid get_gstudio_registration get_gstudio_workspace_instance get_unicode_lang from  ndf_tags %}
+{% load i18n %}
+{% load cache %}
+
+  {% get_group_object groupid as group_object %}
+  {% get_explore_url as explore_url %}
+  {% get_test_page_oid as help_oid %}
+  {% get_gstudio_registration as registration %}
+  {% get_gstudio_workspace_instance as is_workspace_instance %}
+
+<nav class="top-bar" data-topbar role="navigation" id="menu_bar_gstudio">
+        <ul class="title-area">
+            <li class="name show-for-medium-up">
+                <a title="About: Connected Learning Initiative (CLIx)" class="loggedin-user" href="{% url 'landing_page'  %}?True">
+                
+                <img src="{{site.SECONDARY_LOGO}}">
+                </a>
+            </li>
+            <li class="name hide-for-medium-up">
+                <i class="fi-list side-bar-button"></i>
+                <i class="fi-x close-menu-dropdown hide"></i>
+                <a class="loggedin-user" href="#">
+                    <div></div>
+                </a>
+            </li>
+            <!-- Remove the class "menu-icon" to 
+            get rid of menu icon. Take out "Menu" to just have icon alone -->
+            <li class="toggle-topbar"><a href="#"><i class="icons-large fi-torso"></i>&nbsp;<span class="badge badge-blue">1</span></a></li>
+        </ul>
+
+        <section class="top-bar-section">
+            <!-- Left Nav Section -->
+            <ul class="left show-for-medium-up">
+                {% if request.user.is_authenticated %}
+                    <li> 
+                        <a title="Click here to view your enrolled Courses" href="{% url 'my_desk' request.user.id %}" {% if title == "my desk" or title == "my performance" %} class="active" {% endif %}> <i class="fa fa-briefcase" aria-hidden="true"></i> My Desk</a>
+                    </li>
+                {% endif %}
+            
+                <li>
+                    <a title="Click here to view all Courses" href="{% url explore_url %}" {% if title == 'base courses' or title == "courses" or title == "drafts" %} class="active" {% endif %} ><i class="fa fa-binoculars" aria-hidden="true"></i> Explore</a>
+                </li>
+
+                <li>
+                    <a  title="Click here to play games and interactives" target="_blank" href="{% url 'tools_temp' %}" {% if title == 'tools' %} class="active" {% endif %}> <i class="fi-die-three" aria-hidden="true" style="font-size:20px;"></i> Interactives</a>
+                </li>
+                
+            </ul>
+            <ul class="right show-for-medium-up top-right-menu">
+                {% if help_oid %}
+                    <li class=""><a title="Click here to view FAQ Help" {% if title == 'Help Page'  %} class="active" {% endif %} target="_blank" href="{% url 'course_content' help_oid %}"> <i class="fa fa-info-circle"></i> Help </a></li>
+                {% endif %}
+                <li class="has-dropdown not-click" title="Choose Language">
+                    <a href="#"> <i class="fa fa-globe" aria-hidden="true"></i>
+                    {{request.LANGUAGE_CODE|get_unicode_lang}}
+                    </a>
+                    <ul class="dropdown">
+                        {% for lang in LANGUAGES %}
+                            <li>
+                                <form action="/i18n/setlang/" method="POST">
+                                {% csrf_token %}
+                                <input name="url" type="hidden" value="{{request.get_full_path}}"/>
+                                <input type="hidden" name="language" value="{{ lang.0 }}">
+                                <input type="submit" class="button expand secondary" value="{{ lang.1 }}"/>
+                                </form>
+                            </li>
+                        {% endfor %}
+                    </ul>
+                </li>
+          
+            {% if request.user.is_authenticated %}
+                <li class="has-dropdown buddy_margin white-text" style="margin-right: auto;"  title="{{ user.username }}">
+                    {% get_profile_pic request.user.pk as prof_pic %}
+                    <!-- <a href="{% url 'dashboard' request.user.pk %}"> -->
+                    
+                    {% if prof_pic %}
+                      <img src="{{MEDIA_URL}}{{prof_pic.if_file.original.relurl}}" id="profile-img">
+                      {{ user.username }}
+                    {% else %}
+                        <img class="profile-img" style="background-color:rgba(0, 0, 0, 0.34);" src="/static/ndf/bower_components/foundation-icon-fonts/svgs/fi-torso.svg" >
+                        {{ user.username }}
+                    {% endif %}
+                    <ul class="dropdown">
+                        {% if registration %}
+                        <li class="text-center">
+                          <a href="{% url 'auth_password_change' %}">{% trans "Change Password" %}</a>
+                        </li>
+                        {% endif %}
+                        <li>
+                          <a title="Click here to logout" class="logout" href="{% url 'auth_logout' %}">
+                            <i class="fi-power"></i> &nbsp;{% trans "Logout" %}
+                          </a>
+                        </li>
+                    </ul>
+                </li>
+            {% else %}
+                <li>
+                    <a title="Click here to login" class="" href="{% url 'auth_login' %}" accesskey="l">
+                    <i class="fi-key"></i>&nbsp; {% trans "Login" %}
+                  </a>
+                </li>
+            {% endif %}
+            </ul>
+            <ul class="right hide-for-medium-up dropdown-menu hide">
+                <li class=""><a href="#"> <i class="fa fa-briefcase" aria-hidden="true"></i> My Desk</a></li>
+                <li><a  class="{%if title == 'courses'%}active{%endif%}" href="{% url explore_url %}"> <i class="fa fa-binoculars" aria-hidden="true"></i> Explore </a></li>
+                <li class=""><a href="#"> Blog</a></li>
+                <li class=""><a href="#"><i class="fi-info"></i> Help Topics</a></li>
+            </ul>
+            {% if user.is_authenticated %}
+            <ul class="right hide-for-medium-up side-bar-menu hide">
+                <li class="">
+                    {% comment %}
+                    <!--<a href="{% url 'dashboard' request.user.pk %}">-->
+                        {% endcomment %}
+                    <a href="{% url 'my_desk' request.user.pk %}">
+                        <i class="icons-medium fi-torso"></i>&nbsp;
+                        <span>LOGGED IN BUDDIES</span>&nbsp;
+                        <span class="badge badge-blue">1</span>
+                    </a>
+                </li>
+                <li class="has-dropdown not-click">
+                    <a href="#">
+                        <img src="{{MEDIA_URL}}{{prof_pic.if_file.original.relurl}}" class="user-profile-pic-small"/>
+                        {{ user.username }}
+                    </a>
+                    <ul class="dropdown">
+                        <li>
+                            <a href="{% url 'auth_password_change' %}">{% trans "Change Password" %}
+                            </a>
+                        </li>
+                        <li>
+                            <a class="logout" href="{% url 'auth_logout' %}">
+                              <i class="fi-power"></i> &nbsp;{% trans "Logout" %}
+                            </a>
+                        </li>
+                    </ul>
+                </li>
+                <li>
+                    <a href="" class='add_buddy'>
+                        <center>
+                            <i class="fi-plus round-icon"></i>&nbsp;
+                            <span>Add Buddy</span>
+                        </center>
+                    </a>
+                </li>
+            </ul>
+            {% else %}
+              <ul class="right hide-for-medium-up side-bar-menu hide">
+                <li class="">
+                    <a title="Click here to Login" class="" href="{% url 'auth_login' %}" accesskey="l">
+                    <i class="fi-key"></i>&nbsp; {% trans "Login" %}
+                  </a>
+                </li>
+            </ul>
+            {% endif %}
+
+          </section>
+    </nav>
+    <script type="text/javascript">
+        // $(document).foundation();
+        $(function(){
+            $('.top-bar .toggle-topbar').on('click', function() {
+                $('.top-bar').find('.close-menu-dropdown, .side-bar-button').toggleClass('hide');
+                $('.top-bar-section ul.dropdown-menu').removeClass('hide');
+                $('.top-bar-section ul.side-bar-menu').addClass('hide');
+            });
+
+            $('.top-bar .side-bar-button').on('click', function() {
+                $('.top-bar').toggleClass('expanded');
+                $('.top-bar-section ul.dropdown-menu').addClass('hide');
+                $('.top-bar-section ul.side-bar-menu').removeClass('hide');
+            });
+
+            $('.top-bar .close-menu-dropdown').on('click', function() {
+                $('.top-bar .toggle-topbar').trigger('click');
+            })
+        })
+    </script>
+  
+
+  

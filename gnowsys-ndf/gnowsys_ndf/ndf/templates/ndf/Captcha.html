@@ -1,0 +1,79 @@
+{% load i18n %}
+{% load ndf_tags %}
+
+
+<div class = "row">
+  <div class = "small-9  medium-12 columns login-captcha"  >
+    <div>
+        <label class='fi-refresh js-captcha-refresh'>  </label>
+    </div>
+    <div id = "captcha-content"></div>
+    <!-- Area to append captcha -->
+  </div>
+</div>
+<div class = "invalid-captcha">
+
+</div>
+<script type="text/javascript">
+
+   var formData = [];
+   $('form').submit(function(event){
+		event.preventDefault();
+
+		$('form').find("input[name]").each(function (index, node) {
+	    formData.push(String(node.name) + ":"+ String(node.value));
+	    });
+
+		$.ajax({
+				url: "{% url 'captcha_validate' %}",
+				type:"POST",
+				data:{
+						formData,
+						csrfmiddlewaretoken: '{{ csrf_token }}'},
+
+				success:function(data)
+					{   if (data == 'True')
+						{   //Diconnect the on Submit action from form
+						 	$('.invalid-captcha').empty();
+							$('form').off("submit")
+							//Trigger the submit action manually
+							$('form').submit()
+						}
+						else
+						{	$('.invalid-captcha').empty();
+							$('.invalid-captcha').append("<label style = 'color:red;'> {% trans 'invalid captcha Try Again' %} !! </label>")
+						}
+					}
+			   });
+	});
+
+  $(document).ready(function(){
+			get_new_captcha();
+	});
+
+
+  function get_new_captcha(){
+  	$.ajax({
+				url:"{% url 'new_captcha' %}",
+				type:"GET",
+				success:function(data)
+					{
+                        console.log(data);
+						$('#captcha-content').empty()
+						$('#captcha-content').append(data)
+						$('.invalid-captcha').empty();
+					},
+				complete:function()
+					{
+						$("#id_captcha_1").attr("tabindex", "3");
+					}
+  		});
+  }
+
+  $('.js-captcha-refresh').click(function(){
+    		get_new_captcha();
+
+  });
+
+
+</script>

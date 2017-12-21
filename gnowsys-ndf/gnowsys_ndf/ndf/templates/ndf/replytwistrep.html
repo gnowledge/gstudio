@@ -1,0 +1,196 @@
+{% load ndf_tags %}
+{% load i18n %}
+{% block head %}
+
+<!-- orgitdown! -->
+<script type="text/javascript" src="/static/ndf/orgitdown/jquery.orgitdown-foundation.js"></script>
+<!-- orgitdown! toolbar settings -->
+<script type="text/javascript" src="/static/ndf/orgitdown/skins/gstudio/set.js"></script>
+<!-- orgitdown! skin -->
+<link rel="stylesheet" type="text/css" href="/static/ndf/orgitdown/skins/gstudio/style.css" />
+
+<script type="text/javascript">
+
+  function reply_del{{eachrep}}() {
+    var repl_count=$("#replycount{{eachrep}}").val();
+  
+    if (repl_count <= 0) {
+      if (!window.confirm("Are you sure you want to delete this ?")) {
+        $("edit-options").class="f-dropdown";		
+        return false;
+      }
+    }
+    else {
+      alert("This reply has "+repl_count +" existing replies.Please delete them and then try again.");
+      $("edit-options").hide();
+      return false;
+    }
+  }
+  
+  $(document).ready(function(){
+    $("#orgitdownreps{{eachrep}}").orgitdown(mySettings);
+
+    $("#reply_forum{{eachrep}}").on("click", function() {
+     
+      document.getElementById('org{{eachrep}}').style.visibility='visible';
+      $("#org{{eachrep}}").css("display","block");
+      document.getElementById('upload_link').style.visibility='visible';
+    });
+
+
+    $("#savereply{{eachrep}}").on("click", function() {
+
+      var contento=$('#orgitdownreps{{eachrep}}').val();
+
+      $('#orgitdownreps{{eachrep}}').val("");
+      var docs_list=new FormData();
+      if (contento != "") {
+        var repl=$("#rep{{eachrep}}").val();
+        var thd=$("#thd{{eachrep}}").val();
+        var twname=""
+        var fid="{{forum}}"
+        var gpid="{{groupid}}"
+        var ajurl="/"+gpid+"/forum/add_node/";
+        var docs_count=$("#docFile{{eachrep}}").get(0).files.length;
+        var all_files = document.getElementById("docFile{{eachrep}}");
+
+        for(var i=0; i< docs_count; i++)
+        {
+          // docs_list.append("upload"+i,$("docFile{{eachrep}}")[0].files[i]);
+          docs_list.append("upload"+i, all_files.files[i]);
+          // console.log(all_files.files[i]);
+        }
+// console.log(docs_list);
+docs_list.append('upload_cnt',docs_count)
+docs_list.append('node','Reply');
+docs_list.append('thread',thd);
+docs_list.append('forumid',fid);
+docs_list.append('supnode',repl);
+docs_list.append('reply',contento);
+docs_list.append('twistname',twname);
+docs_list.append('csrfmiddlewaretoken','{{csrf_token}}');
+// console.log(docs_list);
+
+        $.ajax({
+          url: ajurl,
+
+          type: 'POST',
+         
+          data : docs_list,
+          processData: false, 
+          contentType: false,
+
+          success: function(data){
+            document.getElementById('org{{eachrep}}').style.visibility='hidden';
+            $("#org{{eachrep}}").css("display","none");
+            document.getElementById('upload_link').style.visibility='hidden';
+            $("upload_link").css("display","none");
+            $("#docFile{{eachrep}}").replaceWith($("#docFile{{eachrep}}").val('').clone(true));
+            $('#refreshthread').html(data);
+            // $('a.close-reveal-modal').trigger('click');
+          }
+        });
+      }
+
+      else {
+        alert("Reply can't be empty");
+      }
+
+      // $('a.close-reveal-modal').trigger('click');
+    });
+  });
+</script>
+
+<style type="text/css">
+  
+  .orgitdown{
+    /*height:100px;*/
+    width: 20em !important;
+  }
+  
+  .row.orgitdownContainer{
+    /*height:100px;*/
+    background-color: #EEEEEE;
+    padding: 0 1em;
+  }
+
+  .row.orgitdownContainer > ul
+  {
+    margin-bottom: 0 !important; 
+  }
+  /*.orgitdownEditor{
+    height:60px;
+  */}
+
+  .orgitdownContainer::before {
+    background-color: #F2F2F2;
+    content: "\00a0";
+    display: block;
+    height: 16px;
+    position: absolute;
+    top: 11px;
+    transform:             rotate( 29deg ) skew( -35deg );
+        -moz-transform:    rotate( 29deg ) skew( -35deg );
+        -ms-transform:     rotate( 29deg ) skew( -35deg );
+        -o-transform:      rotate( 29deg ) skew( -35deg );
+        -webkit-transform: rotate( 29deg ) skew( -35deg );
+    width:  20px;
+    box-shadow: -2px 2px 2px 0 rgba( 178, 178, 178, .4 );
+    left: -9px; 
+  
+  }
+
+  .reply-button{
+    margin-left: -1.3em;
+    margin-top: -1em;
+    position: relative;
+    width: 21.87rem;
+  }
+/*
+  div#insidediv{
+    background-color:#e2f6ed ;
+  }*/
+
+</style>
+{% endblock %}
+<!-- end of head block -->
+
+<!-- <input type="button" id="reply_forum{{eachrep}}" value="Reply" class="button"/> -->
+{% get_all_replies eachrep as rep_cnt %}
+<input type="hidden" id="replycount{{eachrep}}" style="visibility:hidden" value="{{rep_cnt.count}}">
+<div class="row">
+  <div class="small-2 columns">
+    <button id="reply_forum{{eachrep}}" class="button large postfix" style="height: 2.5em;">
+      Reply  &nbsp;|&nbsp; <i class="fi-refresh"></i>
+    </button>
+<div class="uploaded_files">
+<!-- {#% get_files_for_reply eachrep eachrep %} -->
+</div>
+ </div>
+    {% get_group_name groupid as group_name_tag %}
+
+   {% if  request.user.id == eachrep.created_by or request.user.is_superuser %}
+     {% if eachrep != thread %}
+       <a class="tiny alert button" data-reply-id="{{eachrep.created_by}}" href="{% url 'reply_delete' group_name_tag forum thread eachrep %}" onClick="return reply_del{{eachrep}}();" >{% trans "Delete" %}</a>
+     
+     {% endif %}
+   {% endif %}
+
+</div>
+
+<div id="org{{eachrep}}" style="display:none; margin-left:1em;" class="try">
+  <div id="showorgeditor{{eachrep}}" class="orgcont" data-reveal="">
+    <!-- Reply : -->
+
+    <textarea id="orgitdownreps{{eachrep}}" name="content_org" placeholder="Please enter description..."></textarea>
+
+    <input type="file" name="doc" id="docFile{{eachrep}}" multiple/>
+  
+    <input id="savereply{{eachrep}}" type="button" value="Post Reply"  class="button tiny reply-button">
+  
+    <input type="hidden" id="rep{{eachrep}}" style="visibility:hidden" value="{{eachrep}}">
+    <input type="hidden" id="thd{{eachrep}}" style="visibility:hidden" value="{{thread}}">
+
+  </div>
+ <div id="upload_link">upload file</div>
+</div>

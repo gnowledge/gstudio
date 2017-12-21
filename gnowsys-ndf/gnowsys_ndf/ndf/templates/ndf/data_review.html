@@ -1,0 +1,972 @@
+{% extends "ndf/base.html" %}
+{% load i18n %}
+{% load ndf_tags %}
+{% get_group_name groupid as group_name_tag %}
+{% get_group_object groupid as group_object %}
+
+{% block title %} {% firstof title group_name_tag %} {% endblock %}
+
+
+{% block style %}
+
+	#data-review-table thead{
+		border-bottom: 2px solid rgb(221, 221, 221);
+		background-color: #EFEFEF;
+	}
+
+	#data-review-table thead > tr:nth-child(2){
+		background-color: #F5F5F5;
+	}
+
+	#data-review-table td, th {
+		border-right: solid thin #eee;
+	}
+
+	#data-review-table .right-border{
+		border-right: 1px solid lightgray;
+	}
+
+	.bottom-border > th {
+		border-bottom: 1px solid #f1f1f1;
+	}
+
+	article.columns{
+		padding-bottom: 0;
+		margin-bottom: 2em;
+	}
+
+	.expand-width-8{
+		padding: 0 8em;
+	}
+
+	.expand-width-6{
+		padding: 0 6em;
+	}
+
+	.expand-width-3{
+		padding: 0 3em;
+	}
+
+	.expand-width-2{
+		padding: 0 2em;
+	}
+
+	.expand-width-1{
+		padding: 0 1em;
+	}
+
+	.hide-el input, .hide-el select{
+		display: none;
+	}
+
+	.show-el input, .show-el select{
+		display: block;
+	}
+
+	.show-view-border{
+		border: solid #43ac6a;
+		border-bottom: none;
+	}
+	
+	.show-edit-border{
+		border: solid #43ac6a;
+		border-top: none;
+	}
+
+	/* drawer CSS */
+	.resource-drawer { 
+		border-color: #D3D3D3; border-style: solid; 
+		padding: 0 !important; 
+		overflow-y: auto;
+	}
+
+	.resource-drawer li.bullet-item:hover{
+		background-color: #ecf0f1; cursor:pointer;
+	}
+
+	.posted-by{ color: #808080; font-size: small; }
+
+	.selected-resource { background-color:lightgray !important ; }
+
+	.resource-type-image {
+		height:40px; 		
+		background-repeat:no-repeat; background-size: 48px 48px
+	}
+
+	#data-rev-table-container-div{
+		overflow: auto;
+		min-height: auto;
+		max-height: 75vh;
+	}
+
+	#kbd-tips {
+	    bottom: 20px;
+	    position: absolute;
+	    right: 50px;
+	    color: #999999;
+	    transition: color 1s ease-out;
+	}
+
+	#kbd-tips:hover {
+		color: inherit;
+	    cursor: pointer;
+	}
+
+	#kbd-tips > i{
+		font-size: 2em;
+	    position: absolute;
+	    left: -35px;
+	    top: -10px;
+	}
+
+	#kbd-tips-alert {
+	    bottom: 50px;
+	    right: 50px;
+	    z-index: 100;
+	    padding: 1em;
+	    background-color: #e5e5e5;
+	    border: thin solid #b7b7b7;
+	    border-radius: 5px 5px 0 0;
+	    box-shadow: 0 -2px 8px gray;
+	    position: absolute;
+	    display: none;
+	}
+
+	#kbd-tips-alert > div.close{
+		position: absolute;
+	    right: 3px;
+	    top: 0;
+		color: gray;
+	}
+
+	#kbd-tips-alert > div.close > i {
+		font-size: 1.25em;
+		cursor: pointer;
+	}
+
+	/* ---END of drawer CSS */
+
+{% endblock %}
+
+{% block body_content %}
+	
+	{% check_user_join request groupid as user_is_joined %}
+    {% user_access_policy groupid request.user as user_access %}
+
+<!-- form for search in the data-review -->
+<form method="GET" action="{% url 'data_review_search' group_name_tag %}">
+	
+	<div class="row">
+		<div class="small-9 columns">
+			<!-- kept for future-use/filters -->
+			<h3 class="text-center">
+				{{group_object.altnames|default_if_none:group_object.name}}
+				<small>
+					(<span id="data-resources-count">{{page_info.count}}</span>)
+				</small>
+			</h3>
+		</div>
+		<div class="small-3 columns">
+			<div class="row collapse">
+				<div class="small-10 columns">
+					<input type="text" id="dr-search" name="search_text" placeholder="Search in the {{group_object.altnames|default_if_none:group_object.name}}" value="{{search_text}}" title="Search in the '{{group_object.altnames|default_if_none:group_object.name}}'">
+				</div>
+				<div class="small-2 columns">
+					<!-- <div id="dr-search-btn" class="button postfix">Search</div> -->
+					<button type="submit" class="button postfix">Search</button>
+				</div>
+			</div>
+		</div>
+	</div>
+
+</form>
+<!-- END of form for search in the data-review -->
+
+<input type="hidden" id="currently-edited-row" data-edited-row-id="" data-edited-row-name="">
+<input type="hidden" id="last-edited-row" data-edited-row-id="">
+
+<div id="data-rev-table-container-div" style="width: auto; ">
+	{% include "ndf/data_review_table.html" %}
+</div>
+
+<div id="content_org_overlay" class="reveal-modal" data-reveal>
+       {% include "ndf/add_editor.html" with var_name="data_reveal_editor" var_placeholder="Enter your content here."  %}
+  <a class="close-reveal-modal">&#215;</a>
+</div>
+
+<div id="teaches-overlay" data-right-drawer-list="" class="reveal-modal" data-reveal>
+	teaches
+	<div id="teaches_drawer"></div>
+	<a class="close-reveal-modal">&#215;</a>
+</div>
+
+<div id="prior_node-overlay" data-right-drawer-list="" class="reveal-modal" data-reveal>
+	prior node
+	<div id="prior_node_drawer"></div>
+	<a class="close-reveal-modal">&#215;</a>
+</div>
+<!-- END of Looping through each resource -->
+
+{% endblock %}
+
+<!-- Pagination -->
+{% block data_review_pagination %}
+	
+	{% include 'ndf/pagination.html' with urlname=urlname first_arg=group_name_tag second_arg=second_arg third_arg="" %}
+	<div id="kbd-tips" onclick="$('#kbd-tips-alert').toggle()"><i class="fi-layout"></i>Keyboard Shortcuts</div>
+	
+	<div id="kbd-tips-alert">
+
+		<div class="close" onclick="$('#kbd-tips-alert').fadeOut()">
+			<i class="fi-x-circle"></i>
+		</div>
+
+		<h4 class="text-center"><small>Data Review: Keyboard shortcuts</small></h4>
+		When the row is open to edit:
+		<ul>
+			<li>"<b>save</b>" : Press <span class="radius secondary label"> s </span> of keyboard</li>
+			<li>"<b>cancel</b>" : Press <span class="radius secondary label"> c </span> of keyboard</li>
+		</ul>
+		<hr/>
+		<ul>
+			<li>"Scroll right till end" : <span class="radius secondary label"> Ctrl </span> + <span class="radius secondary label"><i class="fi-arrow-right"></i></span></li>
+			<li>"Scroll left till end" : <span class="radius secondary label"> Ctrl </span> + <span class="radius secondary label"><i class="fi-arrow-left"></i></span></li>
+		</ul>
+	 	 
+	</div>
+
+	<!-- Datetimepicker  -->
+	<script src="/static/ndf/bower_components/jquery-ui/jquery-ui.js"></script> <!-- checked -->
+	<script src="/static/ndf/bower_components/jqueryui-timepicker-addon/dist/jquery-ui-timepicker-addon.min.js"></script> <!-- checked -->
+	<script src="/static/ndf/bower_components/jqueryui-timepicker-addon/dist/jquery-ui-sliderAccess.js"></script> <!-- checked -->
+	<link rel="stylesheet" href="/static/ndf/bower_components/jqueryui-timepicker-addon/dist/jquery-ui-timepicker-addon.css"> <!-- checked -->
+	<link rel="stylesheet" type="text/css" href="/static/ndf/bower_components/jquery-ui/themes/smoothness/jquery-ui.css"> <!-- checked -->
+	<script type="text/javascript" src="/static/ndf/bower_components/mousetrap/mousetrap.js"></script>
+
+{% endblock %}
+<!-- -END of Pagination -->
+
+
+{% block script %}
+// <script type="text/javascript">
+	
+	var isFieldEdited = false;
+	
+	{% check_user_join request groupid as user_is_joined %}
+	var user_is_joined = "{{user_is_joined}}";
+
+	// removing left panel:
+	$("main.row > aside.columns").detach();
+
+	// making body_content block to take 12-large columns
+	$article = $("main.row > article.columns");
+	$article.removeClass("medium-10").addClass("large-12");
+	// $article.css("overflow-x", "scroll");
+
+	// setting the height of data review table
+	// $("#data-rev-table-container-div").height(window.innerHeight - ($("nav.top-bar").height()*4) + "px");
+	$("select[multiple]:visible").focus(function(){ $(this).css("height", "6em"); });
+	$("select[multiple]:visible").blur(function(){ $(this).css("height", ""); });
+
+	function updateContent()
+	{
+		// console.log(":::before  " + history.state)
+		if(window.location.hash && $("tr#edit-row-" + window.location.hash.substr(1)).length)
+		{
+			document.getElementById("view-row-"+window.location.hash.substr(1)).scrollIntoView(true);
+
+			if(document.getElementById("currently-edited-row").getAttribute("data-edited-row-id") != window.location.hash.substr(1))
+			{
+				editResRow(window.location.hash.substr(1));
+			}
+		}
+		else if(!history.state)
+		{
+			// console.log("----------" + history.state)
+			var oid = document.getElementById("currently-edited-row").getAttribute("data-edited-row-id");
+
+			// fetching resource object edit row
+			var $resEditRow = $("tr#edit-row-" + oid),
+			resEditRowArr = $resEditRow.children();
+
+			if( oid && (resEditRowArr.length > 0) )
+			{
+				// console.log("========== calling changeSaveCancelToEdit() history.state")
+				changeSaveCancelToEdit(oid, resEditRowArr);
+			}
+		}
+		// console.log("In updateContent() : ");
+	}
+
+	// call the specific row to edit depending on availability of #oid in the url
+	if( window.location.hash.length >= 24 ){ updateContent() };
+
+	// Revert to a previously saved state
+	window.addEventListener('popstate', updateContent );
+
+
+	function checkCurrEditRow()
+	{
+		var editedRowName = document.getElementById("currently-edited-row").getAttribute("data-edited-row-name").trim(),
+			editedRowId = document.getElementById("currently-edited-row").getAttribute("data-edited-row-id").trim();
+
+		if(editedRowName.length > 0 || editedRowId.length > 0)
+		{
+			alert("At a time you could edit only one row. \n\nNow you are editing: '" + editedRowName + "'\n\nPlease 'SAVE' or 'CANCEL' the changes to edit any other row!");
+
+			return true; // Row editing is going on.
+		}
+		else
+		{
+			return false; // NO row is being editing now.
+		}
+	}
+
+
+	function setCurrNoneToEditRow(oid)
+	{
+		var $resEditRow = $("tr#edit-row-" + oid);
+
+		document.getElementById("currently-edited-row").setAttribute("data-edited-row-id", oid);
+		document.getElementById("currently-edited-row").setAttribute("data-edited-row-name", $resEditRow.attr("data-row-name"));
+
+		window.location.hash = oid;
+		history.pushState({'oid': oid}, document.title, window.location.href);
+	}
+
+
+	function setCurrEditRowToNone(oid)
+	{
+		// var oid = document.getElementById("currently-edited-row").getAttribute("data-edited-row-id");
+
+		document.getElementById("currently-edited-row").setAttribute("data-edited-row-id", "");
+		document.getElementById("currently-edited-row").setAttribute("data-edited-row-name", "");
+
+		document.getElementById("last-edited-row").setAttribute("data-edited-row-id", oid);
+
+		window.location.hash = "";
+		// window.location = window.location.pathname;
+		// location.reload();
+	}
+
+	// hiding save/cancel buttons and showing edit button again
+	function changeSaveCancelToEdit(oid, resEditRowArr)
+	{
+		$("div[data-id='save-cancel-div-" + oid +"']").fadeOut(0);
+		for (var i = 1; i < resEditRowArr.length; i++)
+		{
+			resEditRowArr[i].classList.add("hide-el");
+		}
+
+		$("tr#view-row-" + oid).removeClass("show-view-border");
+		$("tr#view-row-" + oid).css("opacity", 1);
+
+		$("tr#edit-row-" + oid).removeClass("show-edit-border");
+
+		$("div[data-id='edit-btn-" + oid +"']").fadeIn(800);
+		setCurrEditRowToNone(oid);
+	}
+
+	// action on edit click:
+	function editResRow(oid)
+	{
+		// console.log("In editResRow() ")
+		// exit from the function if any other row is being edited now.
+		if(checkCurrEditRow()){ return false; }
+
+		// fetching resource object edit row
+		var $resEditRow = $("tr#edit-row-" + oid),
+			resEditRowArr = $resEditRow.children();
+
+		setCurrNoneToEditRow(oid);
+
+		$("div[data-id='edit-btn-" + oid +"']").fadeOut();
+
+		// processing each element of row
+		for (var i = 0; i < resEditRowArr.length; i++)
+		{
+			resEditRowArr[i].classList.remove("hide-el");
+		};
+
+		// setting focus to first input text box
+		resEditRowArr[1].children[0].focus()
+
+		// setting orgitdown_data_reveal_editor content to content_org of current row object.
+		content_org = $("input[data-content-org-row-id="+oid+"]").attr("data-content-org");
+		document.getElementById("orgitdown_data_reveal_editor").value = content_org;
+
+		$resEditRow.addClass("show-edit-border");
+		$("tr#view-row-" + oid).addClass("show-view-border");
+		$("tr#view-row-" + oid).css("opacity", 0.25);
+
+		$("div[data-id='save-cancel-div-" + oid +"']").fadeIn(800);
+
+		populateTeachesPriorNode(oid, "teaches");
+		populateTeachesPriorNode(oid, "prior_node");
+
+		selectMultiAdjHt();
+	}
+
+
+	function getEditSummary(oid, msg, action)
+	{
+		// fetching resource object VIEW row
+		var $resViewRow = $("tr#view-row-" + oid),
+			resViewRowArr = $resViewRow.children();
+
+		// fetching resource object EDIT row
+		var $resEditRow = $("tr#edit-row-" + oid);
+			resEditRowArr = $resEditRow.children();
+
+		// to show details on confirm popup
+		var tempEditedFields = "",
+			fieldEditCntr = 0;
+
+		var nodeObj = new Object()
+
+		// processing each element of row
+		for (var i = 1; i < resEditRowArr.length; i++)
+		{
+			// checking if the values in textboxes are changed
+			if(resEditRowArr[i].firstElementChild)
+			{
+				// console.log(resEditRowArr[i].firstElementChild.type)
+				if((resEditRowArr[i].firstElementChild.type == "text") || (resEditRowArr[i].firstElementChild.type == "select-one"))
+				{
+					var tempEditFieldVal = resEditRowArr[i].firstElementChild.value.trim(),
+						tempViewFieldVal = resViewRowArr[4+i].textContent.trim();
+
+					if(tempViewFieldVal != tempEditFieldVal)
+					{
+						++fieldEditCntr;
+
+						tempEditedFields += "\n-------| FIELD "+String(fieldEditCntr)+": " + $(resEditRowArr[i]).attr("data-field") + " |-------\n\n(" 
+						+ tempViewFieldVal + ")\nChanged to:\n(" 
+						+ tempEditFieldVal + ")\n\n";
+					}
+
+					// adding the key value pair in nodeObj
+					nodeObj[resEditRowArr[i].attributes.getNamedItem("data-field").value] = tempEditFieldVal;
+
+					// checking if status value is changed explicitely
+					if((resEditRowArr[i].getAttribute("data-field") == "status") && (tempViewFieldVal == tempEditFieldVal))
+					{
+						nodeObj[resEditRowArr[i].attributes.getNamedItem("data-field").value] = ""; 
+					}
+				}
+				else if( resEditRowArr[i].firstElementChild.type == "select-multiple" )
+				{
+					var tempViewFieldVal = resViewRowArr[4+i].textContent.trim();
+						tempViewFieldValArr = (tempViewFieldVal.length > 0) ? tempViewFieldVal.split(",") : [];
+
+					// trimming the values in the array
+					tempViewFieldValArr.forEach(function(elm, index){ tempViewFieldValArr[index] = elm.trim() })
+
+					// returns array of selected sub items.
+					var tempMultiSelElem = resEditRowArr[i].firstElementChild.selectedOptions,
+						tempMultiSelVals = [];
+
+					for(var v = 0; v < tempMultiSelElem.length; v++)
+					{
+						if(tempMultiSelElem[v].index != 0)
+						{
+							tempMultiSelVals.push( tempMultiSelElem[v].value.trim() );
+						}
+					}
+					// console.log(tempViewFieldValArr);
+					// console.log(tempMultiSelVals)
+
+					// checking if any of the element is not matching with any of the element from other array.
+					if ( !(($(tempViewFieldValArr).not(tempMultiSelVals).length === 0) && ($(tempMultiSelVals).not(tempViewFieldValArr).length === 0)) )
+					{
+						++fieldEditCntr;
+						// console.log("tempEditedFields");
+						tempEditedFields += "\n-------| FIELD "+String(fieldEditCntr)+": " + $(resEditRowArr[i]).attr("data-field") + " |-------\n\n("+ tempViewFieldValArr.toString() + ")\nChanged to:\n("+ tempMultiSelVals.toString() + ")\n\n";
+					}
+
+					nodeObj[resEditRowArr[i].attributes.getNamedItem("data-field").value] = tempMultiSelVals.toString();
+				}
+				else if( resEditRowArr[i].firstElementChild.type == "button" )
+				{
+					// 'content-org' field
+					if(resEditRowArr[i].getAttribute("data-field") == "content_org")
+					{
+						var tempContentOrg = document.getElementById("orgitdown_data_reveal_editor").value.trim();
+
+						if(resViewRowArr[4+i].getAttribute("title").trim() != tempContentOrg)
+						{
+							++fieldEditCntr;
+
+							tempEditedFields += "\n-------| FIELD"+String(fieldEditCntr)+": " + $(resEditRowArr[i]).attr("data-field") + " |-------\n\n content_org's content is changed.\n\n"
+						}
+
+						nodeObj[resEditRowArr[i].attributes.getNamedItem("data-field").value] = tempContentOrg;
+					}
+					// 'prior_node' field and 'teaches' relation edit checking
+					else if((resEditRowArr[i].getAttribute("data-field") == "teaches") || (resEditRowArr[i].getAttribute("data-field") == "prior_node"))
+					{
+						// calling following to fill values in hidden _list/s
+						getDrawerVals();
+
+						var tempPrevDrawerFields = $("#"+ resEditRowArr[i].getAttribute("data-field") +"-overlay").attr("data-right-drawer-list");
+						var tempCurrDrawerFields = $("#" + resEditRowArr[i].getAttribute("data-field") + "_list").val();
+
+						if(tempPrevDrawerFields != tempCurrDrawerFields)
+						{
+							++fieldEditCntr;
+
+							tempEditedFields += "\n-------| FIELD "+String(fieldEditCntr)+": " + $(resEditRowArr[i]).attr("data-field") + " |-------\n\n Element's in right drawer are changed.\n\n";
+						}
+
+						nodeObj[resEditRowArr[i].attributes.getNamedItem("data-field").value] = tempCurrDrawerFields;
+						nodeObj[resEditRowArr[i].attributes.getNamedItem("data-field").value + "_prev"] = tempPrevDrawerFields;
+					}
+				}
+
+			}
+		};
+
+		isFieldEdited = (fieldEditCntr > 0) ? true: false;
+
+		if(isFieldEdited)
+		{
+			var saveCancelConfirm = "false"
+			
+			saveCancelConfirm = window.confirm("Please Note that following [ " + String(fieldEditCntr) + " ] fields are changed:\n\n" + tempEditedFields + msg);
+			
+			if(saveCancelConfirm)
+			{
+				if(action == "save")
+				{
+					return [true, nodeObj, fieldEditCntr];
+				}
+				changeSaveCancelToEdit(oid, resEditRowArr);
+			}	
+			else
+			{
+				return [false, nodeObj, fieldEditCntr];
+			}
+		}
+		else
+		{
+			if(action == "save")
+			{
+				alert("No field is edited or changed to save !")
+				return [false, nodeObj];
+			}
+
+			changeSaveCancelToEdit(oid, resEditRowArr)
+		}
+
+	}
+
+
+	// function for setting the values in the view of data row.
+	function setViewByEditData(oid, status)
+	{
+		// fetching resource object VIEW row
+		var $resViewRow = $("tr#view-row-" + oid),
+			resViewRowArr = $resViewRow.children();
+
+		// fetching resource object EDIT row
+		var $resEditRow = $("tr#edit-row-" + oid),
+			resEditRowArr = $resEditRow.children();
+
+		// processing each element of row
+		for (var i = 1; i < resEditRowArr.length; i++)
+		{
+			// checking if the values in textboxes are changed
+			if(resEditRowArr[i].firstElementChild)
+			{
+				if((resEditRowArr[i].firstElementChild.type == "text") || (resEditRowArr[i].firstElementChild.type == "select-one"))
+				{
+					var tempEditFieldVal = resEditRowArr[i].firstElementChild.value.trim(),
+						tempViewFieldVal = resViewRowArr[4+i].textContent.trim();
+
+					if(tempViewFieldVal != tempEditFieldVal)
+					{
+						resViewRowArr[4+i].textContent = resEditRowArr[i].firstElementChild.value.trim();
+					}
+
+					if(resEditRowArr[i].firstElementChild.name.trim() == "status")
+					{
+						resViewRowArr[4+i].textContent = status;
+						resEditRowArr[i].firstElementChild.value = status;								
+					}
+				}
+				else if( resEditRowArr[i].firstElementChild.type == "select-multiple" )
+				{
+					// returns array of selected sub items.
+					var tempViewFieldVal = resViewRowArr[4+i].textContent.trim(),
+						tempMultiSelElem = resEditRowArr[i].firstElementChild.selectedOptions,
+						tempMultiSelVals = [];
+
+					for(var v = 0; v < tempMultiSelElem.length; v++)
+					{
+						if(tempMultiSelElem[v].index != 0)
+						{
+							tempMultiSelVals.push( tempMultiSelElem[v].value.trim() );
+						}
+					}
+
+					if(tempViewFieldVal != tempMultiSelVals.toString())
+					{
+						resViewRowArr[4+i].textContent = tempMultiSelVals.toString();
+					}
+
+				}
+				else if((resEditRowArr[i].firstElementChild.type == "button"))
+				{
+					var tempEditField = resEditRowArr[i].getAttribute("data-field");
+
+					// 'content-org' field
+					if(tempEditField == "content_org")
+					{
+						var tempContentOrg = document.getElementById("orgitdown_data_reveal_editor").value.trim();
+
+						if(resViewRowArr[4+i].getAttribute("title").trim() != tempContentOrg)
+						{
+							resViewRowArr[4+i].title = tempContentOrg;
+							resViewRowArr[4+i].textContent = tempContentOrg.substr(0, 60);
+							resEditRowArr[i].firstElementChild.setAttribute("data-content-org", tempContentOrg);
+						}
+
+					}
+					// 'prior_node' field and 'teaches' relation edit checking
+					else if((tempEditField == "teaches") || (tempEditField == "prior_node"))
+					{
+						var tempPrevDrawerFields = $("#"+ tempEditField +"-overlay").attr("data-right-drawer-list");
+						var tempCurrDrawerFields = $("#" + tempEditField + "_list").val();
+
+						if(tempPrevDrawerFields != tempCurrDrawerFields)
+						{
+							var tempArr = [];
+							$("#"+ tempEditField +"_drawer2").find(".node_id").each(function(){tempArr.push(this.getAttribute("name"))});
+
+							resViewRowArr[4+i].textContent = tempArr.toString()	;
+						}
+					}
+				}
+
+			}
+		}
+		// --- END of for()
+	}
+
+
+	function saveResource(oid)
+	{
+		// fetching resource object EDIT row
+		var $resEditRow = $("tr#edit-row-" + oid);
+			resEditRowArr = $resEditRow.children();
+
+		var msg = "To save above changes click on - 'OK'."
+
+		// to show details on confirm popup; getEditSummary returns: [bool, nodeObject]
+		var nodeData = getEditSummary(oid, msg, "save");
+
+		nodeObject = nodeData[1];
+
+		// if user is not superuser or admin of the group then remove value of status
+		{% if not user.is_superuser %}
+			if(user_is_joined != "author"){ nodeObject.status = ""; }
+		{% endif %}
+
+		if(nodeData[0])
+		{
+			// console.log(JSON.stringify(nodeData[1]))
+			$.ajax({
+
+				type: "POST",
+				url: "{% url 'data_review_save' groupid %}",
+				data:{
+					node_oid: oid,
+					node_details: JSON.stringify(nodeObject),
+					csrfmiddlewaretoken: '{{ csrf_token }}'
+				},
+				success: function(data){
+					alert("Resource is successfully saved.");
+					setViewByEditData(oid, data);
+					changeSaveCancelToEdit(oid, resEditRowArr)
+				}
+			})
+		}
+
+	}
+
+
+	// action on cancel button click
+	function CancelEditResRow(oid)
+	{
+		var msg="\n\nAre you sure that you don't want to save these edited fields ?\nIf yes click - 'OK' or else click 'cancel'."
+
+		// to show details on confirm popup and show edit button
+		getEditSummary(oid, msg, "cancel");
+	}
+
+
+	function populateTeachesPriorNode(oid, field)
+	{
+
+		var app = "";
+		
+		$.ajax({
+			type: "POST",
+			url: "{% url 'drawer_widget' groupid %}",
+			datatype: "html",
+			data:{
+				node_id: oid,
+				field: field,
+				app: app, // gapp name
+				page_no: 1,
+				csrfmiddlewaretoken: '{{ csrf_token }}'
+			},
+			success: function(data) {
+				if(field == "teaches")
+				{
+					$("#teaches_drawer").html(data);
+				}
+				else if(field == "prior_node")
+				{
+					$("#prior_node_drawer").html(data);	
+				}
+			
+				getDrawerVals();
+				$("#teaches-overlay").attr("data-right-drawer-list", $("#teaches_list").val());
+				$("#prior_node-overlay").attr("data-right-drawer-list", $("#prior_node_list").val());
+
+			}
+		});
+	}
+    
+
+	// set inputbox to timepicker
+	$('.time-required').timepicker({
+		timeOnlyTitle: 'Choose Time Required',
+		minDate: new Date(2050, 1, 1)
+	});
+
+
+	function getDrawerVals()
+	{
+                      
+      	var pn_arr = [],
+			cn_arr = [],
+			md_arr = [], //for adding module
+			tch_arr = [],  // for teaches
+			assess_arr = []; // for assesses		
+
+ 		$(".node_id").each(function (){
+			if ($(this).parent(".bullet-item").parent("#prior_node_drawer2").attr("id") == "prior_node_drawer2") {
+				pn_arr.push($(this).val());
+			}
+			if ($(this).parent(".bullet-item").parent("#teaches_drawer2").attr("id") == "teaches_drawer2") {
+				tch_arr.push($(this).val());
+			}
+
+			// if ($(this).parent(".bullet-item").parent("#assesses_drawer2").attr("id") == "assesses_drawer2") {
+				// assess_arr.push($(this).val());
+			// }
+		});
+
+		$("#prior_node_list").val(pn_arr);
+		$("#teaches_list").val(tch_arr);
+		// $("#assesses_list").val(assess_arr);
+	}
+
+	// defining keyboard shortcuts to elements
+
+	function clickAction(button) {
+		if (button.closest(".disabled").length) {
+			return;
+		}
+		if (button.is(":visible")) {
+			button[0].click();
+		}
+	}
+
+
+	function selectMultiAdjHt() {
+
+		$("select[multiple]:visible").focus(function(){ $(this).css("height", "6em"); });
+		$("select[multiple]:visible").blur(function(){ $(this).css("height", ""); });
+
+	}
+
+	var $drContainer = $('#data-rev-table-container-div');
+
+	Mousetrap.bind('s', function () { clickAction($('[data-action="save"]:visible')); });
+	Mousetrap.bind('c', function () { clickAction($('[data-action="cancel"]:visible')); });
+
+	Mousetrap.bind('right', function () {
+		$drContainer.animate({ scrollLeft: '+=' + $drContainer.width()/2 }, 400, 'easeOutQuad');
+	});
+
+	Mousetrap.bind('ctrl+right', function () {
+		$drContainer.animate({ scrollLeft: '+=' + $drContainer.width()*3 }, 1000, 'easeOutQuad');
+	});
+
+	Mousetrap.bind('left', function () {
+		$drContainer.animate({ scrollLeft: '-=' + $drContainer.width()/2 }, 400, 'easeOutQuad');
+	});
+
+	Mousetrap.bind('ctrl+left', function () {
+		$drContainer.animate({ scrollLeft: '-=' + $drContainer.width()*3 }, 1000, 'easeOutQuad');
+	});
+	// --- END of defining keyboard shortcuts to elements
+
+	// search in the data-review search input box
+	$("#dr-search").focus(function(){
+		$drContainer.css("opacity", "0.25");
+	})
+
+	$("#dr-search").blur(function(){
+		$drContainer.css("opacity", "1"); 
+	})
+	// ---END of search in the data-review
+
+	function removeRow (oid) {
+
+		var $resBlankRow = $("tr#blank-row-" + oid);
+		
+		// fetching resource object VIEW row
+		var $resViewRow = $("tr#view-row-" + oid);
+		
+		// fetching resource object EDIT row
+		var $resEditRow = $("tr#edit-row-" + oid);
+
+		$($resEditRow).add($resViewRow).add($resBlankRow).animate({
+				opacity: 0.1
+			}, 1000).fadeOut(1000);
+
+ 		setCurrNoneToEditRow(oid);
+
+ 		var totalCount = parseInt($('#data-resources-count').text());
+ 		if(totalCount > 0)
+ 		{
+ 			$('#data-resources-count').text(totalCount - 1);
+ 		}
+	}
+
+	purge_confirm = false
+	restore_confirm = false
+
+	function deleteNode(oid)
+	{ 
+		$(".action_val").attr("value", 'purge')
+		$(".oid_val").attr("value", oid)
+
+		if(purge_confirm){
+			$.ajax({
+			    url:"{% url 'delete_resource' groupid  %}",
+			    type:'Get',
+			    data:{
+					'node_id':oid
+			    },
+			    success:function(data){
+			 		data = JSON.parse(data)
+			 		if(data['success']){
+						//updateContent();
+						removeRow(oid);
+						purge_confirm = false
+			    	}
+			    	else{
+			 			alert("Something went wrong! Resource unable to purge.\
+			 		 		Please try again after sometime."); 
+			    	}
+				}               
+			});
+			$(".oid_val").attr("value", "")
+		}
+		else{
+			$("#purgeRestoreNodeAlertLabel").html("<p>Are you sure you want to Purge this resource?<br> \
+				Please click 'Yes' to continue or 'No' to abort this action.<br><br>\
+				<small>* Purge will delete this resource forever. </small></p>");
+			$("#purgeRestoreNodeAlert").foundation('reveal', 'open');
+		}
+
+	}
+
+	function restoreNode (oid) {
+		$(".action_val").attr("value", 'restore')
+		$(".oid_val").attr("value", oid)
+
+		if(restore_confirm){
+			$.ajax({
+
+			 	url:"{% url 'restore_resource' groupid  %}",
+			 	type:'Get',
+			 	data:{
+			 			'node_id':oid
+			 	},
+
+			 	success:function(data){
+			 		data = JSON.parse(data)
+
+			 		if(data['success']){
+				 		//updateContent();
+						removeRow(oid); 
+						restore_confirm = false
+			 		}
+			 		else {
+			 			alert("Something went wrong! Resource unable to restore.\
+			 		 		Please try again after sometime."); 
+			 		};
+			 	}		
+			});	
+			$(".oid_val").attr("value", "")
+
+		}
+		else{
+
+			$("#purgeRestoreNodeAlertLabel").html("<p>Are you sure you want to Restore this resource?<br> \
+				Please click 'Yes' to continue or 'No' to abort this action.<br><br> \
+				<small>* Restore will move this resource to its previous state. </small></p>");
+			$("#purgeRestoreNodeAlert").foundation('reveal', 'open');
+		}
+
+	}
+
+
+  //Confirm or Cancel Deletion
+    $(document).on("click", "#btnPurgeRestoreConfirmYes", function() {
+		$("#purgeRestoreNodeAlert").foundation('reveal', 'close');
+		node_id = $(".oid_val").val()
+		action_value = $(".action_val").val()
+		if(action_value == "purge"){
+			purge_confirm = true
+			deleteNode(node_id)
+		}
+		else if(action_value == "restore"){
+			restore_confirm = true
+			restoreNode(node_id)
+		}
+    });
+
+
+
+    $(document).on("click", "#btnPurgeRestoreConfirmNo", function() {
+        $("#purgeRestoreNodeAlert").foundation('reveal', 'close');
+		purge_confirm = false
+		restore_confirm = false
+        
+    });
+
+
+// </script>
+{% endblock %}
+
+<!--
+tasks to do in data review:
+
+1. Showing draft version of different users to superuser/group-admin
+2. to show attr and rel values at diff versions, need to use values in document but:
+	2.1 currently it has some issue
+	2.2 only some docs are holding all the possible attrs and relations.
+	2.3 and hence only those values are getting updated.
+	2.4 thats why need to use get_neighbourhood() for time being.
+	2.5 cannot use the same for traversing and rendering on template.
+3. -
+4. calling create_task() method.
+5. observe if all the values in the right side of drawer are of status "published" in relations.
+-->

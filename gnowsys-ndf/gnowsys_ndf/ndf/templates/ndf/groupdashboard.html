@@ -1,0 +1,291 @@
+{% extends "ndf/node_details_base.html" %}
+{% load i18n %}
+{% load cache %}
+{% load ndf_tags %}
+
+<!-- from django.contrib.auth.decorators import login_required -->
+{% block title %} {{group_name_tag}} Group Dashboard {% endblock %}
+
+{% block head %}
+
+  <script type="text/javascript" src="/static/ndf/bower_components/MathJax/MathJax.js?config=TeX-AMS-MML_HTMLorMML" async></script> <!-- checked -->
+
+
+<script type="text/javascript" >
+  var chk_login = "{{ user }}";
+</script>
+
+<!-- Ajax for getting user List  -->
+<script type="text/javascript">
+  jQuery(document).ready(function($) {
+
+  {% get_sg_member_of groupid as list_of_sg_member_of %}
+  {% if "ProgramEventGroup" in node.member_of_names_list or "ProgramEventGroup" in list_of_sg_member_of %}
+    $("#group-level-header").addClass("hide");
+  {% endif %}
+
+  });
+  /*
+  $('#btn_list_member').on("click",function() {
+  var ajurl ="{% url 'get_author_set_users' groupid %}?_id={{node.pk}}";
+  $.ajax({
+         url:ajurl,
+  success: function(data){
+  $('#firstModal').html(data); },
+  }); });
+
+
+  $(document).on('click',".button.alert.small.remove",function(){
+  user_id = $(this).attr("id")
+  node_id = $('#node_id').val()
+  var ajurl ="{% url 'remove_user_from_author_set' groupid %}?_id="+node_id+"&user_id="+user_id;
+   $.ajax({
+         url:ajurl,
+  success: function(data){
+  $('#firstModal').html(data); },
+  });}); 
+  */
+
+
+</script> 
+<!-- End Ajax -->
+
+
+<script type="text/javascript">
+//function to toggle the lable Join and Unsubscribe
+
+/* 
+function change_label(label)
+{   
+	if(chk_login=="AnonymousUser")
+	{  document.location.href = '/accounts/login/';
+        }
+        else if(label == "Join")
+        {  $("#notify").val("Unsubscribe");
+        }
+        else if(label == "Unsubscribe")
+        { $("#notify").val("Join");
+        }
+        else if(label == "Follow")
+        { $("#notify").val("Stop following");
+        }
+        else if(label == "Stop following")
+        { $("#notify").val("Follow");
+        }
+
+}
+*/
+//function for sending notifications for Join and Unsubscribe
+function notify(node,activity)
+{
+
+  var surl="/"+node+"/group/notify/"+activity+"/"
+  $.ajax({
+    url: surl,
+    // beforeSend: function() {
+    //   $("#ajax_load_image").show();
+    //   $("#body").css({"opacity":"0.1",})
+    // },
+    success: function(data){
+      $("#ajax_load_image").hide();
+      $("#body").css({"opacity":"",})
+      location.reload();
+    }
+    // complete: function(){
+    //   $("#ajax_load_image").hide();
+    //   $("#body").css({"opacity":"",})
+    // }
+});  //end_ajax
+
+
+}
+/*
+
+$(document).ready(function()
+{
+  // var groupn = $("#groupname").val();
+  var groupn = '{{group_id}}'
+  var label = $("#notify").val();
+  $("#notify").click(function(){
+   if (label == "Follow")
+   {
+     notify(groupn,"join");
+     change_label("Follow");
+     label="Stop following"
+   }
+   else if (label == "Join")
+   {
+     notify(groupn,"join");
+     change_label("Join");
+     label="Unsubscribe"
+   }
+   else if (label == "Unsubscribe")
+   {
+    notify(groupn,"remove");
+    change_label("remove");
+    label="Join"
+   }
+   else if (label == "Stop following")
+   {
+    notify(groupn,"remove");
+    change_label("Stop following");
+    label="Follow"
+   }
+  
+  }); //end notify_click()
+}); //end document_ready()
+
+*/
+</script>
+{% endblock %}
+<!-- end of head block -->
+
+{% block style %}
+
+  .group-images{
+    max-height: 200px;
+    display: block;
+    margin: 0px auto;
+  }
+  .grp_mem_count{
+    display: inline-block;
+  }
+
+{% endblock %}
+
+<!-- overide meta_content block from base.html -->
+{% cache 300 groupdashboard_meta_content %}
+{% block meta_content %}
+<div class="repository-title large-4 columns" style="width:100%">{% firstof  node.altnames node.name %}</div>
+  <i class="fi-torsos" title="Group member{{node.author_set|length|pluralize }}"></i> <h4 class="grp_mem_count" value="{{node.author_set|length}}">
+  {{node.author_set|length}} 
+  </h4>
+
+  <div id="group_picture">
+  {% include "ndf/widget_photo_upload.html" with url_name='groupchange'  widget_for="Group_about" is_banner=False is_profile=True %}
+  </div>
+
+</br>
+{% if group_object.prior_node %}
+<div class="repository-title large-4 columns" style="width:100%">Parent Group(s)</div></br>
+ {% for each in group_object.prior_node  %}
+    {% get_group_name each as prior_node_name %}
+      
+     <ul style="list-style: none; border-bottom: solid thin #ddd;">
+      <li style="border-bottom: solid thin #ddd;">
+        <a href="{% url 'groupchange' each %}">
+          {{prior_node_name}}
+        </a>
+      </li>
+    </ul>
+ {% endfor %}
+{% endif %}
+
+{% endblock %}
+{% endcache %}
+<!-- end of meta_content block -->
+
+{% block app_action_list %}
+{% comment %}
+  {% check_is_user_group group_id as is_user_group %}
+  {% get_policy node request.user as policy  %}
+
+{% get_create_url node.pk as create_url %}
+{% if request.user.is_superuser %}
+            <li>
+              <a href="{% url create_url group_name_tag %}">
+                <span class="fi-plus"> {% trans "Create a New Group" %}</span>
+              </a>
+            </li>
+            {% endif %}
+
+  {% if policy %}
+  <!-- Triggers the modals -->
+  <li><a href="#" id ="btn_list_member" data-reveal-id="firstModal">{% trans "List Members" %}</a></li>
+
+  <!-- Reveal Modals begin -->
+  <div id="firstModal" class="reveal-modal" data-reveal></div>
+  {% endif %}
+  <!-- Reveal Model end -->
+
+  {% get_group_policy node request.user as policy %}
+  {% get_prior_post_node group_id as groupname %}
+  {% check_user_join request groupid as user_is_joined %}
+
+  <input type="hidden" id="groupname" value="{{node}}">
+  {% if user.is_authenticated %}
+     {% if user.is_superuser or node.created_by == user.id %}
+         <li><a href="{% url 'create_sub_group' group_id %}" >create subgroup</li>
+     {% endif %}
+  {% if user_is_joined == "joined" %}
+    {% if is_user_group and node.created_by != request.user %}
+    <li><input class="button" type="submit" id="notify" value="Stop following"></li>
+
+    {% else %}
+    <li><input class="button" type="submit" id="notify" value="Unsubscribe"></li>
+    {% endif %} 
+
+  {% elif user_is_joined == "not" or not user.is_authenticated %}
+    {% if is_user_group and node.created_by != request.user %}
+    <li><input class="button" type="submit" id="notify" value="Follow"></li>
+
+    {% else %}
+    <li><input class="button" type="submit" id="notify" value="Join"></li>
+    {% endif %}
+
+  {% endif %}
+
+  {% endif %}
+
+  {% check_is_gstaff groupid request.user as is_gstaff %}
+  {% if is_gstaff %}
+    {% include "ndf/invite_users.html" %}
+    {% include "ndf/invite_admins.html" %}
+  {% endif %} 
+{% endcomment %}
+
+
+{% endblock %}
+
+  <!-- SCRIPT ADDED TO ALLOW SEARCH ON THE ITEMS IN THE GROUP -->
+<!-- Seems to be redundant with the top bar search
+  <h4>Search</h4>
+  <script type = "text/javascript" src = "/static/ndf/js/jquery2.js">
+  </script>
+
+  <form name="search_form" method="GET" action="{% url 'group_results' groupid %}">
+    {% csrf_token %}
+    <font style="font-size:0.8em">Enter the value to be searched:</font>
+    <input type="text" name="search_text" id="search_text" required>
+
+    <font style="font-size:0.8em">Search by:<br>
+    <input type="checkbox" name="search_fields" checked="true" id="chk_name" value="name" />Name &nbsp
+    <input type="checkbox" name="search_fields" checked="true" id="chk_tags" value="tags" />Tags &nbsp
+    <input type="checkbox" name="search_fields" checked="true" id="chk_content" value="contents" />Content <br>
+  </font>
+    Search particular user: 
+    <select name="users">
+      <option value="all">All users</option>
+      {% for mem in authors %}    
+        <option value="hello">{{ mem }} </option>
+        {% endfor %}
+    </select>
+
+    <input type="submit" name="subButton2" id="subButton2" value="Submit" />
+  </form>
+  <div id="results">
+
+  </div>
+  <script>
+    function getUrlVars() {
+        var vars = {};
+        var parts = window.location.href.replace(/[?&]+([^=&]+)=([^&]*)/gi, function(m,key,value) {
+      vars[key] = value;
+        });
+        return vars;
+    }
+
+    var search_key = getUrlVars()["search_text"];
+    $('#search_text').val(search_key);
+  </script>
+-->

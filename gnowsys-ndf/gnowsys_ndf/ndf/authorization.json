@@ -1,0 +1,34 @@
+{
+	"superuser": {
+		"create": 1,
+		"read": 1,
+		"update": 1,
+		"delete": 1,
+		},
+	"creator": {
+		"create": 1,
+		"read": 1,
+		"update": 1,
+		"delete": 1,
+		},
+	"admin": {
+		"create": 1,
+		"read": 1,
+		"update": 1,
+		"delete": 1,
+		},
+	"user": {
+		"self": {
+			"create": 1,
+			"read": 1,
+			"update": 1,
+			"delete": 1,
+		},
+		"others": {
+			"create": 1,
+			"read": 1,
+			"update": 1,
+			"delete": 1,
+		}
+	}
+}

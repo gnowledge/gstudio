@@ -1,0 +1,123 @@
+<html>
+
+{% load pagination_tags %}
+<head>
+  <link rel="stylesheet" href="/static/ndf/bower_components/foundation/css/normalize.css"> 
+  <link rel="stylesheet" href="/static/ndf/css/themes/metastudio/styles.css"> 
+  <script type="text/javascript" src="/static/ndf/bower_components/jquery-ui/jquery-ui.min.js"></script> <!-- checked -->
+  <script src="/static/ndf/bower_components/jquery/dist/jquery.min.js"></script> 
+</head>
+<center>
+<div  style = "width:70%;" align="right"> 
+			<center><h1>   MetaStudio  </h1> </center>
+			<center><h2> <u>  BenchMark Report </u> </h2> </center>
+</div>
+{% block body_content %}      
+			<center> 
+			   <div class = "row">
+			       <div class= "small-3 columns">
+			          
+			           <form method="POST" >
+			                  {% csrf_token %}
+			                  
+			                  <input type = "text" name = "searchmethod" >
+			                  </div>
+			                  
+			                  <div class= "small-3 columns">
+			                      <select name = "methodlist" >
+			                         <option value = 'ALL' > ALL </option>
+			                         {% for i in listofmethods %}
+			                           <option value = {{i}}> {{i}} </option>
+			                         {% endfor %}  
+			                      </select>
+			                  </div>
+			                  <div class= "small-1 columns">
+			                      <input class="button tiny" type="submit"  value = "search">
+                        </div>
+			          </form>
+			         
+			      
+			      <div >
+			         <form method="POST" action = "{% url 'month_view' %}" >
+			           {% csrf_token %} 
+			           
+			           <input class="button tiny" type="submit"  value="frequency" > 
+			           check frequency of methods
+			         </form> 
+			      </div>
+			  </div>
+			 
+			 
+			
+			<table border="1" width="100%">
+				  	    <thead>
+                        <th>  Method Name  </th> 
+					  	<th>  Last Executed at </th>
+					  	<th>  URL Called from  </th>
+					  	<th>  paramerters     </th>
+					  	<th>  Size of patameters  </th>	  
+					  	<th>  Time Taken   </th>
+					  	{% if search_cur %}
+					  	  <!-- no Average row creation -->
+					  	{% else %}
+					  	 <th>  Average Time Taken</th> 
+					  	{% endif %}   
+					  	</thead>
+					
+			{% if search_cur %}
+				<div align="left"> 	
+				<b> Last All the  Execution time of the method </b> </br> 
+				{% autopaginate search_cur 10 %}
+				{% for i in search_cur %}
+				   <tbody>
+						  <tr> <td> {{i.name}}  </td>  
+						   <td> {{i.last_update}} </td>  
+						   <td> {{i.calling_url}}</td>  
+						   <td> {{i.parameters}}</td>  
+						   <td> {{i.size_of_parameters}} </td>
+						   <td> {{i.time_taken}} </td>
+						  </tr>
+
+						  
+			      </tbody>  
+			    {% endfor %}
+			    {% paginate %}
+			  </table>
+			  </div>
+
+				
+			{% else %}
+			  <div align="left"> 	
+				<b> Last Execution time of the methods executed today </b> </br> 
+				{% autopaginate bench_cur 10 %}
+				{% for i in bench_cur %}
+				   <tbody>
+                         
+						  <tr> <td> {{i.name}}  </td>  
+						   <td> {{i.last_update}} </td>  
+						   <td> {{i.calling_url}}</td>  
+						   <td> {{i.parameters}}</td>  
+						   <td> {{i.size_of_parameters}} </td>
+						   <td> {{i.time_taken}} </td>
+						   {% if i.avg %}
+						   <td> <center> {{i.avg}} </center> </td>
+						   {% else %}
+						   <td> <center> ---  </center> </td>
+						   {% endif %}
+						   </tr>
+
+						  
+			      </tbody>  
+			    {% endfor %}
+			  {% paginate %}
+			  </table>
+			   
+			  </div>  
+			{% endif %}
+			{% endblock %}
+</div>
+{%  block script %}
+{% endblock %}
+</center>
+
+</html>

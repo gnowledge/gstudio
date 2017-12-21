@@ -1,0 +1,93 @@
+{% extends "ndf/base.html" %}
+{% load i18n %}
+{% block style %}
+
+	#all-markers-map-widget { background-color:inherit; height:calc(100vh - 60px); }
+
+
+	.selected-app-set-item { background-color:#33C284; }
+
+{% endblock %}
+
+<!-- Concern Information Block -->
+{% block collection_content %}
+
+	
+	<ul class="side-nav" id="app-set-item">
+        <li>
+            <h5 title="All Observations"><a href='{% url "all_observations" groupid %}'>Show all observations</a></h5>
+        </li>
+        
+		{% for each in app_collection_set %}
+				
+			{% if app_set_name_slug == each.name|slugify %}
+				<li class="{{each.name|slugify}} active" id="{{each.id}}">
+			{% else %}
+				<li class="{{each.name|slugify}}" id="{{each.id}}">
+			{% endif %}
+                    <h6>
+                    <a href='{% url "observations_app" groupid app_id each.name|slugify each.id %}'>
+					{{each.name}} &nbsp;&nbsp;&nbsp;<span class="fi-marker"> {{each.total_locations}} </span>  
+                        </a>
+                        </h6>
+				</li>
+			
+			<input type="hidden" name="hidden_{{each.name|slugify}}" value="{{each.locations}}" />
+		{% endfor%}
+	</ul>
+
+	{% if user.is_authenticated %}{% endif %}
+
+
+{% endblock %}
+<!-- END of Concern Information Block -->
+
+
+<!-- Meta content Block -->
+{% block meta_content %}
+<h4>Observations</h4>
+	
+{% endblock %}
+<!-- END of Meta content Block -->
+
+
+<!-- Body content Block -->
+{% block body_content %}
+
+	<!-- Landing page view -->
+	
+	{% if template_view == "landing_page_view" %}
+		<div class="row">
+			<div id="all-markers-map-widget" class="small-12 large-12 columns" >
+				{% include "ndf/observations_map.html" with mode="read" template_view=template_view %}
+			</div>
+		</div>
+	{% endif %}
+	
+	<!-- END of Landing page view -->
+	<!-- ======================== -->
+
+
+	{% if template_view == "app_set_view" %}
+		<div class="row">
+			<div id="all-markers-map-widget" class="small-12 large-12 columns" >
+				{% include "ndf/observations_map.html" with mode="edit" template_view=template_view %}
+			</div>
+		</div>
+	{% endif %}
+	
+
+<!-- 
+<script type="text/javascript">
+</script>
+ -->
+
+{% endblock %}
+<!-- END of Body content Block -->
+
+
+{% block script %}
+
+	$("#node_search_form").parent().hide();
+	
+{% endblock %}

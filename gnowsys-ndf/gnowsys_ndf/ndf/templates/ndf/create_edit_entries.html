@@ -1,0 +1,58 @@
+{% extends "ndf/base.html" %}
+{% block meta_content %}
+  <h3>Writing</h3>
+  <p class="text-justify"><b>{{title}}</b> store the meta data of any {{title}} in bibtex format</p>
+{% endblock %}
+print "entered template"
+{% block related_content %}
+<div class="create card">
+    <div class={{title}}>
+      <br/>
+      <a class="button medium" href="{% url 'create_entries' group_id %}?num={{num}}">
+        <span class="fi-plus">&nbsp;&nbsp;New {{title}}</span>
+      </a>
+    </div>
+  </div>
+{% endblock %}
+
+{% block body_content %}
+<form data-abide id="form-edit-node" method="POST" action="#">
+  {% csrf_token %}
+  <header class="row">
+
+    <h2 class="medium-12 columns">
+     
+      {% if node %}
+      Editing {{title}}: {{node.name}}
+    
+      {% else %}
+      Create a New {{title}}
+      {% endif %}
+    </h2>
+
+    </header>
+   
+    <label> <b> {{title}} Name </b> </label>
+  <input type="text" value placeholder="Enter name..." style="width:500px;height:28px;" name="name">
+  <small class="error">Please give your entry a descriptive name. It's helpful for others and for yourself.</small>
+  <label>Citation Key</label>
+  <input type="text" style="width:500px;height:28px;" name="citation_key">
+  
+  {% for each in list_item %}
+  <label>{{each}}</label>
+  <input type=each style="width:500px;height:28px;" name={{each}}>
+  </br>
+  </br>
+  </br>
+  {% endfor %}
+  <div class="" style="width:500px;height:100px;">
+          {% include "ndf/add_editor.html"  with var_name="content_org" var_placeholder="Enter the content here" var_value="" %}
+   
+</div>
+</br>
+</br>
+</br></br></br>
+  <input type="submit" value="save" id="save-node" class="button medium-6 columns">
+  </form>
+
+{% endblock %}

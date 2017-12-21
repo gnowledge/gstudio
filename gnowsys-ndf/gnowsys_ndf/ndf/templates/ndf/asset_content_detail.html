@@ -1,0 +1,529 @@
+{% load i18n %}
+{% load ndf_tags %}
+{% check_is_gstaff group_id request.user as is_gstaff %}
+{% get_download_filename node as download_filename %}
+{% get_group_object groupid as group_object %}
+<div class="row">
+  <div class="medium 12 columns">
+	    <div class="left small-12 medium-6 columns">
+	                <label>{% trans "File name:" %} <b> {{node.name}} </b>
+                  	                    
+	                    <!--<input type="text" placeholder="" name="resource_name" />-->
+	                </label>
+                    <label>{% trans "Created By:" %} <b> {{ node.user_details_dict.contributors|join:', ' }} </b>
+                      <!--<input type="text" placeholder="" name="resource_name" />-->
+                  </label>
+
+	      <div class="preview_asset"> 
+           {% if title == "asset_content_detail" or title == "asset_gallery_detail" or title == "raw_material_detail"%}
+
+	          {% include "ndf/resource_view.html" with node=node %}
+	          {% endif %}
+	      </div>
+	    </div>
+
+
+          <div class="right small-12 medium-6 columns">
+          <a class="text_button right"  href="{% url 'read_file' group_name_tag node download_filename %}"  download="{{ download_filename }}">
+                    <i class="fa fa-download" aria-hidden="true"></i> {% trans 'Download' %}
+          </a>
+          {% if node.created_by == request.user.id or is_gstaff  %}
+                <span data-dropdown="assetcontent-settings-drop" aria-controls="assetcontent-settings-drop" aria-expanded="false" class="orange-button right">
+                   {% trans "Link/Add Related File" %}  <i class="fa fa-chevron-down"></i>
+                </span>
+                <ul id="assetcontent-settings-drop" class="f-dropdown" data-dropdown-content aria-hidden="true" tabindex="-1">
+ 
+                  <li><a onclick="load_file_upload_modal(1)">{% trans "Add Alternate File" %}</a> </li>
+                {% if 'video' in node.if_file.mime_type or 'audio' in node.if_file.mime_type %}
+                  <li><a onclick="load_file_upload_modal(2)">{% trans "Add Transcript" %}</a></li>
+                {%  endif %}
+                {% if 'video' in node.if_file.mime_type %}
+                  <li><a onclick="load_file_upload_modal(3)">{% trans "Add Subtitle" %}</a></li>
+                {%  endif %}
+            {%  endif %}
+            </div>
+        </div>
+            
+        </div>
+        
+
+        {% get_gstudio_alt_opts as alt_opts %}
+        {% if 'video' in node.if_file.mime_type %}
+          {% get_gstudio_alt_size 'video' as size_types %}
+          {% get_gstudio_alt_file_formats  'video' as format_types %}
+        {% endif %}
+        {% if 'image' in node.if_file.mime_type %}
+          {% get_gstudio_alt_size 'image' as size_types %}
+          {% get_gstudio_alt_file_formats  'image' as format_types %}
+        {% endif %}
+        {% if 'audio' in node.if_file.mime_type %}
+          {% get_gstudio_alt_size 'audio' as size_types %}
+          {% get_gstudio_alt_file_formats  'audio' as format_types %}
+        {% endif %}
+  	
+
+        <hr/>
+     
+      <div class="row">
+           {% get_relation_value node.pk 'has_subtitle' as grel_sub %}
+           {% for each in grel_sub.grel_node %}
+            <div class="small-4 columns asset_list">
+              {{each.name}}  
+            </div>
+             <div class="small-4 columns right" >
+              {% if node.created_by == request.user.id or is_gstaff %}
+              <button type="button" data-sub-id = "{{each.pk}}" class="right orange-button-subtitle delete-subtitle" onclick="delete_rel_files('{{each.pk}}','has_subtitle')">{% trans "Delete subtitle" %}</button> <br>
+              {% endif %}
+             </div>
+           {% endfor %}
+      </div>
+      
+    <div class="row">     
+        {% get_relation_value node.pk 'has_transcript' as grel_trans %}
+        {% if grel_trans.grel_node.pk %}
+        {% if node.created_by == request.user.id or is_gstaff %}
+        <div class="small-4 columns asset_list">
+          {{grel_trans.grel_node.name}}
+        </div>
+        <div class="small-4 columns right " >
+           <button type="button"  class="right orange-button-subtitle delete-transcript" onclick="delete_rel_files('{{grel_trans.grel_node.pk}}','has_transcript')" >{% trans "Delete transcript" %}</button>
+        </div> 
+          {% endif %}
+        <br>
+        {% endif %}
+    </div>
+    
+    <div class="row">
+            {% get_relation_node node.pk  'has_alt_content' as alt_lang_rel_node %}
+              {% if alt_lang_rel_node %}
+              	<div class="small-4 columns asset_list">
+                  {% trans "Alternate Files :" %} 
+                {% for each in  alt_lang_rel_node %} 
+                  <a href="{% url 'assetcontent_detail' group_id asset_obj.pk each.file_id %}" >
+                      {{each.file_name}} &nbsp; &nbsp;
+                  </a>
+                {% endfor  %} 
+                </div>
+              {% endif %}
+    </div>
+
+  <div id="addSupportingFile" class="reveal-modal medium radius" data-reveal data-alert>
+    <p id="addSupportingFileLabel"></p>
+    <div class="file-upload-div-modal">
+        {% if 'video' in node.if_file.mime_type or 'audio' in node.if_file.mime_type %}
+        <a class="right close-reveal-modal reveal-modal-overlay" aria-label="Close">&#215;</a>
+          <div class="video-related transcript-upload hide">
+              <label><u>{% trans "Upload Transcript" %}</u></label>
+              <div class="transcript_files">
+                <form class="dropzone" id ="doctranscript" enctype="multipart/form-data" method="post" action="{% url 'add_assetcontent' group_id %}" > 
+                    <input class="trans-sub" type="file" placeholder="" id="doctranscriptfile" name="transcript_file" />
+                    <!-- <a class="right orange-button  save-transcript">Save Asset</a> -->
+                    <button type="button" class="right orange-button save-transcript" style="display: none;" >{% trans "Upload" %} </button>
+                </form>
+              </div>
+          </div>
+        {% endif %}
+
+        {% if 'video' in node.if_file.mime_type %}
+            <div class="subtitle-upload hide">
+              <a class="right close-reveal-modal reveal-modal-overlay" aria-label="Close">&#215;</a>
+              <div class="subtitle_files ">
+                <label><u style="margin-left: -17px; font-weight: normal;">{% trans "Upload Subtitle" %}</u></label>
+                  <form class="dropzone" id ="docsubtitle" enctype="multipart/form-data" method="post" action="{% url 'add_assetcontent' group_id %}" style="margin-left: -19px;" >
+                      <input class="trans-sub" type="file" id="docsubtitlefile" placeholder="" name="doc_f" />
+                      <br>
+                  </form>
+              </div>
+
+              <select  style=" display: block;height: 51px;border-radius: 5px;" class="select-subtitle-langauge" name="lan" id="sub_languageid" tabindex=3 >
+                <option value="">{% trans "--- Select Language ---" %}</option>
+                {% get_language_info_list for LANGUAGES as languages %}
+                {% for language in languages %}
+                <option data-sub-lang="{{ language.name }}" data-sub-code="{{ language.code }}">
+                  {{ language.name }}
+                </option>
+                {% endfor %}
+              </select>
+              <div class="row">
+                <button type="button" class="right orange-button-subtitle save-subtitle" style="display: none;" onclick="save_subtitle()">{% trans "Upload" %}</button></div>
+              </div>
+        {%  endif %}
+
+
+        <div class="alt-file-upload hide">
+        	<a class="right close-reveal-modal reveal-modal-overlay" aria-label="Close">&#215;</a>
+               <select   class="select-language" name="lan" id="alt_types" >
+                    <option value="">{% trans "--- Select Alternate Type ---" %}</option>
+                    {% for each_alt_types in alt_opts %}
+
+                    <option data-opts="{{each_alt_types}}" >
+                      {{ each_alt_types }}
+                    </option>
+                    {% endfor %}
+                </select>
+              <div class="alternate_files ">
+                
+                  <form class="dropzone large-6 columns" id ="docalternate" enctype="multipart/form-data" method="post" action="{% url 'add_assetcontent' group_id %}" style="margin-left: -23px;width: 508px;" >
+                      <input style="display: none" class="alternate-file" type="file" id="docalternatefile" placeholder="" name="doc_altf" />
+                      <br>
+                  </form>
+              </div>
+              <hr/>
+
+              <div class="row">
+                <button type="button" style="display: none" class="right orange-button-subtitle save-altfile" onclick="save_alternate_file()">{% trans "Upload" %}</button>
+              </div>
+        </div>
+    </div>
+    <!-- <a class="close-reveal-modal">&#215;</a> -->
+
+  </div>
+  <hr/>
+     
+<script type="text/javascript">
+  
+  function load_file_upload_modal(choice){
+    if (choice == 1){
+      $(".alt-file-upload").removeClass("hide");
+      $(".transcript-upload").addClass("hide");
+      $(".subtitle-upload").addClass("hide");
+    }
+    else if(choice == 2){
+      $(".transcript-upload").removeClass("hide");
+      $(".alt-file-upload").addClass("hide");
+      $(".subtitle-upload").addClass("hide");
+    }
+    else if (choice == 3){
+      $(".subtitle-upload").removeClass("hide");
+      $(".transcript-upload").addClass("hide");
+      $(".alt-file-upload").addClass("hide");
+    }
+    $('#addSupportingFile').foundation('reveal', 'open');
+  }
+$("#doctranscriptfile").change(function(){
+        $(".save-transcript").css('display','block')
+    });
+$("#docsubtitlefile").change(function(){
+        $(".select-subtitle-langauge").css('display','block')
+    });
+
+$(".select-subtitle-langauge").change(function(){
+        $(".save-subtitle").css('display','block')
+    });
+
+$("#docalternatefile").change(function(){
+        $(".save-altfile").css('display','block')
+    });
+
+$("#alt_types").change(function(){
+
+    $("#docalternatefile").css('display','block')
+    
+
+    });
+
+
+
+
+
+
+
+  // var form = document.getElementById('docsubtitle');
+  var selectedSubtitle = document.getElementById('docsubtitlefile');
+  // var uploadButton = document.getElementById('submitpostid');
+        function save_subtitle(event) {
+
+        sel_sub_lang =  $('#sub_languageid').find(':selected').attr('data-sub-lang');
+        sel_sub_lang_code =  $('#sub_languageid').find(':selected').attr('data-sub-code');
+
+        // assetval = $('.asset_obj_val').attr('data-asset-obj-val');
+        // Update button text.
+        // uploadButton.innerHTML = 'Uploading...';
+
+        // Get the selected files from the input.
+        var files = selectedSubtitle.files;
+
+        // Create a new FormData object.
+        var formData = new FormData();
+
+        // Loop through each of the selected files.
+        for (var i = 0; i < files.length; i++) {
+          var file = files[i];
+
+          // // Check the file type.
+          // if (!file.type.match('image.*')) {  continue; }
+
+          // Add the file to the request.
+          formData.append('uploaded_subtitle', file, file.name);
+        }
+
+        // appending csrfmiddlewaretoken and user-id
+        formData.append('csrfmiddlewaretoken', '{{csrf_token}}');
+        formData.append('user','{{request.user.id}}');
+        formData.append('if_subtitle','True');
+        formData.append('assetcontentid','{{node.pk}}');
+        formData.append('sel_sub_lang',sel_sub_lang);
+        formData.append('sel_sub_lang_code',sel_sub_lang_code);
+        
+        if(!"{{asset_obj}}"){
+            formData.append('asset_obj',assetval);
+        }
+        else{
+            formData.append('asset_obj','{{asset_obj}}');
+        }
+        // Set up the request.
+        xhr = new XMLHttpRequest();
+
+        // Open the connection.
+        xhr.open('POST', "{% url 'add_assetcontent' group_id %}", true);
+
+        // Set up a handler for when the request finishes sucessfully.
+        xhr.onload = function () {
+          if (xhr.status === 200) 
+          {
+            // File(s) uploaded.
+           // if file is not uploaded sucessfully
+            if(xhr.responseText == "UploadError")
+            {
+               alert("Error occurred");
+            }
+            // check if image is not in the list, add it.
+            else if(xhr.responseText )
+            {
+              alert("Subtitle uploaded successfully");
+              location.reload();
+            }
+
+            uploadButton.innerHTML = 'Upload';
+
+            // updating metadata of files, if file is uploaded sucessfully
+            // if(xhr.responseText != "UploadError")
+            // {
+            //   // alert('xhr.responseText != "UploadError"');
+            // }
+          }
+          else
+          {
+            alert('An error occurred while uploading subtitle-file!');
+          }
+        };
+
+        // Send the Data.
+        xhr.send(formData);
+      }
+
+  
+
+  // var form = document.getElementById('docsubtitle');
+  $( ".save-transcript" ).click(function() {
+  var selectedtrans = document.getElementById('doctranscriptfile');
+  // var uploadButton = document.getElementById('submitpostid');
+            // console.log(selectedSubtitle)
+               // Get the selected files from the input.
+            var files = selectedtrans.files;
+
+            // Create a new FormData object.
+            var formData = new FormData();
+
+            // Loop through each of the selected files.
+            for (var i = 0; i < files.length; i++) {
+              var file = files[i];
+
+              // // Check the file type.
+              // if (!file.type.match('image.*')) {  continue; }
+
+              // Add the file to the request.
+              formData.append('uploaded_transcript', file, file.name);
+            }
+
+        // appending csrfmiddlewaretoken and user-id
+        formData.append('csrfmiddlewaretoken', '{{csrf_token}}');
+        formData.append('user','{{request.user.id}}');
+        formData.append('if_transcript','True');
+        formData.append('assetcontentid','{{node.pk}}');
+        
+        if(!"{{asset_obj}}"){
+            formData.append('asset_obj',assetval);
+        }
+        else{
+            formData.append('asset_obj','{{asset_obj}}');
+        }
+        // Set up the request.
+        xhr = new XMLHttpRequest();
+
+        // Open the connection.
+        xhr.open('POST', "{% url 'add_assetcontent' group_id %}", true);
+
+        // Set up a handler for when the request finishes sucessfully.
+        xhr.onload = function () {
+          if (xhr.status === 200) 
+          {
+            // File(s) uploaded.
+           // if file is not uploaded sucessfully
+            if(xhr.responseText == "UploadError")
+            {
+               alert("Error occurred");
+            }
+            // check if image is not in the list, add it.
+            else if(xhr.responseText )
+            {
+              alert("Transcript added successfully");
+              location.reload();
+            }
+
+            //uploadButton.innerHTML = 'Upload';
+
+            // updating metadata of files, if file is uploaded sucessfully
+            // if(xhr.responseText != "UploadError")
+            // {
+            //   // alert('xhr.responseText != "UploadError"');
+            // }
+          }
+          else
+          {
+            alert('An error occurred while uploading transcript-file!');
+          }
+        };
+
+        // Send the Data.
+        xhr.send(formData);
+
+});
+
+  // var uploadButton = document.getElementById('submitpostid');
+    function save_alternate_file(event) {
+        var alt_files = document.getElementById('docalternatefile');
+        
+        sel_alt_type =  $('#alt_types').find(':selected').attr('data-opts');
+        
+        
+        
+        // Get the selected files from the input.
+        var files = alt_files.files;
+
+        // Create a new FormData object.
+        var formData = new FormData();
+
+        // Loop through each of the selected files.
+        for (var i = 0; i < files.length; i++) {
+          var file = files[i];
+
+          // // Check the file type.
+          // if (!file.type.match('image.*')) {  continue; }
+
+          // Add the file to the request.
+          formData.append('uploaded_alt_lang_file', file, file.name);
+        }
+
+        // appending csrfmiddlewaretoken and user-id
+        formData.append('csrfmiddlewaretoken', '{{csrf_token}}');
+        formData.append('user','{{request.user.id}}');
+        
+        formData.append('assetcontentid','{{node.pk}}');
+        
+
+        if(sel_alt_type == 'Language' ){
+          sel_alt_lang =  $('#alt_languageid').find(':selected').attr('data-sub-lang');
+          alt_file_type =  $('#alt_languageid').find(':selected').attr('data-sub-code');
+          formData.append('if_alt_file','True');
+          formData.append('alt_file_type','alt_language');
+          formData.append('sel_alt_value',sel_alt_lang);
+        }
+        if(sel_alt_type == 'Format' ){
+          sel_alt_fr_type =  $('.alt-fr-type').find(':selected').attr('data-opts');
+          formData.append('if_alt_file','True');
+          formData.append('sel_alt_value',sel_alt_fr_type);
+          formData.append('alt_file_type','alt_format');
+        }
+        if(sel_alt_type == 'Size' ){
+          sel_alt_fr_type =  $('.alt-size-type').find(':selected').attr('data-opts');
+          formData.append('if_alt_file','True');
+          formData.append('sel_alt_value',sel_alt_fr_type);
+          formData.append('alt_file_type','alt_size');
+        }
+
+        if(sel_alt_type == 'Content' ){
+          sel_alt_fr_type =  $('.alt-size-type').find(':selected').attr('data-opts');
+          formData.append('if_alt_file','True');
+          formData.append('sel_alt_value',sel_alt_fr_type);
+          formData.append('alt_file_type','alt_content');
+        }
+
+        if(sel_alt_type == 'Other' ){
+          sel_alt_fr_type =  $('.alt-size-type').find(':selected').attr('data-opts');
+          formData.append('if_alt_file','True');
+          formData.append('sel_alt_value',sel_alt_fr_type);
+          formData.append('alt_file_type','alt_others');
+        }
+        
+        if(!"{{asset_obj}}"){
+            formData.append('asset_obj',assetval);
+        }
+        else{
+            formData.append('asset_obj','{{asset_obj}}');
+        }
+        // Set up the request.
+        xhr = new XMLHttpRequest();
+
+        // Open the connection.
+        xhr.open('POST', "{% url 'add_assetcontent' group_id %}", true);
+
+        // Set up a handler for when the request finishes sucessfully.
+        xhr.onload = function () {
+          if (xhr.status === 200) 
+          {
+            // File(s) uploaded.
+           // if file is not uploaded sucessfully
+            if(xhr.responseText == "UploadError")
+            {
+               alert("Error occurred");
+            }
+            // check if image is not in the list, add it.
+            else if(xhr.responseText )
+            {
+              alert("Alternate file uploaded successfully");
+              location.reload();
+            }
+
+            uploadButton.innerHTML = 'Upload';
+
+            // updating metadata of files, if file is uploaded sucessfully
+            // if(xhr.responseText != "UploadError")
+            // {
+            //   // alert('xhr.responseText != "UploadError"');
+            // }
+          }
+          else
+          {
+            alert('An error occurred while uploading alternate-file!');
+          }
+        };
+
+        // Send the Data.
+        xhr.send(formData);
+      }
+
+function delete_rel_files(sel_sub,rel_type){    
+   if (confirm("Do you want to delete selected file?.") == true){
+    
+
+    $.ajax({
+              type: "POST",
+              data:{
+                    'csrfmiddlewaretoken': "{{csrf_token}}",
+                    'node':"{{node}}",
+                    'asset_obj':"{{asset_obj}}",
+                    'grel_name':rel_type,
+                    'sel_file' : sel_sub
+                },
+              url: "{% url 'remove_related_doc' group_id  %}",
+              datatype: "html",
+              success: function(data) {
+                location.reload()
+            }
+        });
+   }
+}
+</script>
+
+

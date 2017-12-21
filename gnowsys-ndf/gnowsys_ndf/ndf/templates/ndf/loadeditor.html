@@ -1,0 +1,57 @@
+{% block head %}
+{% load i18n %}
+
+
+<!-- orgitdown! -->
+<!-- orgitdown! toolbar settings -->
+<script type="text/javascript" src="/static/ndf/orgitdown/sets/org/set.js"></script>
+<!-- orgitdown! toolbar skin -->
+<link rel="stylesheet" type="text/css" href="/static/ndf/orgitdown/sets/org/style.css" />
+<!-- orgitdown! skin -->
+<link rel="stylesheet" type="text/css" href="/static/ndf/orgitdown/skins/orgitdown/style.css" />
+
+
+<script src="/static/ndf/js/loadeditor.js"></script> <!-- custom js code -->
+<script type="text/javascript" src="/static/ndf/orgitdown/jquery.orgitdown.js"></script>
+
+<style type="text/css">
+	.orgitdown {
+		height:155px;
+		width:466px;
+	}
+	.orgitdownEditor{
+		height:100px;
+	}
+
+	.orgitdownContainer{
+		height:145px;
+		width:457px;
+	}
+
+	#Editor{
+		width:530px;
+		height=250px;
+		top:50px;
+		left:645px;
+	}
+
+</style>
+
+
+{% endblock %}
+
+
+
+
+<input type="text"  class="description" data-reveal-id="Editor" placeholder="Please click to add content">
+
+
+
+<div id="Editor" class="reveal-modal" data-reveal="">
+
+	<textarea id="orgitdown" name="content_org" placeholder="Please enter description..."></textarea>
+
+	<input type="button" id="save_edit_cont" class="btn btn-primary btn-large btn-block" value="Save">
+
+	<a  class="close-reveal-modal">×</a>
+</div>

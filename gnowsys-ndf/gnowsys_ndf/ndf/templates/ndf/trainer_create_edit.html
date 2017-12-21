@@ -1,0 +1,1473 @@
+{% extends "ndf/mis_base_create_edit.html" %}
+{% load i18n %}
+{% load ndf_tags %}
+{% load pagination_tags %}
+
+{% block style %}
+  {{block.super}}
+
+  /* Disable tab's (anchor tag's) click as it's navigation is propagated on buttons (Next & Previous) */
+    dl.tabs>dd a.disable {
+      pointer-events: none;
+      cursor: default;
+    }
+
+    .row .row {
+      margin: 0 0;
+    }
+
+  /* Resetting css-properties for fieldset (also legend, input) */
+    /* fieldset (padding-bottom) */ 
+    fieldset {
+      padding: 1.25rem 1.25rem 1.25rem 1.25rem !important;
+    }
+
+    /* legend (background-color) */
+    fieldset legend {
+      background-color: transparent !important;
+    }
+
+    /* input (margin) */
+    fieldset input {
+      margin: 0 !important;
+    }
+
+    fieldset label.note {
+      color: #909b9c;
+      margin-bottom: 0.8rem;
+      font-size: 0.875em;
+      font-weight: bold;
+      padding-left: 8.8rem;
+    }
+
+  /* Setting css-properties for reveal-modal's label */
+    div.reveal-modal > label {
+      color: white;
+      font-weight: bold;
+      font-size: 1rem;
+    }
+
+  /* css-properties for table */
+    .width-5p {
+      width: 5%;
+    }
+
+    .width-8p {
+      width: 8%;
+    }
+
+    .width-10p {
+      width: 10%;
+    }
+
+    .width-20p {
+      width: 20%;
+    }
+
+    .width-30p {
+      width: 30%;
+    }
+
+    .width-37p {
+      width: 37%;
+    }
+
+    .width-80p {
+      width: 80%;
+    }
+
+    .margin-0r {
+      margin: 0 !important;
+    }
+
+    .counter {
+      font-weight: bold;
+      text-align: right;
+    }
+{% endblock %}
+
+{% block body_content %}
+  <div id="alertModal" class="reveal-modal medium alert-box radius" data-reveal data-alert>
+    <label id="alertModalLabel"></label>
+    <a class="close-reveal-modal">&#215;</a>
+  </div>
+
+  <form data-abide enctype="multipart/form-data" id="form-edit-node" method="POST" action="">
+    <header class="row" style="margin: 1rem 0 0 0 ;">
+      <h2 class="small-12 columns">
+        {% if node %}
+        {% trans "Editing" %} {{title}}: {{node.name}}
+        {% else %}
+        {% trans "Register " %} {{title}}
+        {% endif %}
+      </h2>
+    </header>
+
+    <nav class="row" style="margin-top: 0.5rem;">
+      <dl class="tabs small-12 columns" data-tab data-options="deep_linking:true">
+        <dd>
+          <label><h4>{% trans "Fill"%}:&nbsp;&nbsp;</h4></label>
+        </dd>
+
+        {% for tab_details in property_order_list %}
+        <dd {% if forloop.counter == 1 %}class="active"{% endif %} title="STEP-{{forloop.counter}}: Fill {{tab_details.0|lower}} details...">
+          <a href="#panel_{{tab_details.0}}" class="disable">
+            {{tab_details.0}}
+          </a>
+        </dd>
+        {% endfor %}
+      </dl>
+    </nav>
+
+    {% csrf_token %}
+
+    <div id="trainer-details-edit-div" class="tabs-content" style="border-style: solid; border-width: 1.5px; border-color: #0eacb5; padding: 0px 5px;">
+      <!-- Personal-Details tab ///////////////////////////////////////////////// -->
+      <div class="active content row" id="panel_{{property_order_list.0.0}}">
+        <br>
+        <!-- For name -->
+        <div class="row">
+          <div class="small-4 columns">
+            <div class="row">
+              <div class="small-3 columns">
+                <label for="{{property_order_list.0.1.0.name}}" class="right inline"> 
+                  {% blocktrans with label_val=property_order_list.0.1.0.altnames %} {{label_val}} {% endblocktrans %}
+                </label>
+              </div>
+              <div class="small-9 columns" tabindex="1">
+                {% html_widget groupid node.pk property_order_list.0.1.0 %}
+              </div>
+            </div>
+          </div>
+          <div class="small-4 columns">
+            <div class="row">
+              <div class="small-4 columns">
+                <label for="{{property_order_list.0.1.1.name}}" class="right inline">
+                  {% blocktrans with label_val=property_order_list.0.1.1.altnames %} {{label_val}} {% endblocktrans %} 
+                </label>
+              </div>
+              <div class="small-8 columns">
+                {% html_widget groupid node.pk property_order_list.0.1.1 %}
+              </div>
+            </div>
+          </div>
+          <div class="small-4 columns">
+            <div class="row">
+              <div class="small-3 columns">
+                <label for="{{property_order_list.0.1.2.name}}" class="right inline">
+                  {% blocktrans with label_val=property_order_list.0.1.2.altnames %} {{label_val}} {% endblocktrans %} 
+                </label>
+              </div>
+              <div class="small-9 columns">
+                {% html_widget groupid node.pk property_order_list.0.1.2 %}
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- For Gender, DOB, Religion -->
+        <div class="row">
+          <div class="small-4 columns">
+            <div class="row">
+              <div class="small-3 columns">
+                <label for="{{property_order_list.0.1.3.name}}" class="right inline">
+                  {% blocktrans with label_val=property_order_list.0.1.3.altnames %} {{label_val}} {% endblocktrans %} 
+                </label>
+              </div>
+              <div class="small-9 columns">
+                {% html_widget groupid node.pk property_order_list.0.1.3 %}
+              </div>
+            </div>
+          </div>
+          <div class="small-4 columns">
+            <div class="row">
+              <div class="small-4 columns">
+                <label for="{{property_order_list.0.1.4.name}}" class="right inline">
+                  {% blocktrans with label_val=property_order_list.0.1.4.altnames %} {{label_val}} {% endblocktrans %}
+                </label>
+              </div>
+              <div class="small-8 columns">
+                {% html_widget groupid node.pk property_order_list.0.1.4 %}
+              </div>
+            </div>
+          </div>
+          <div class="small-4 columns">
+            <div class="row">
+              <div class="small-3 columns">
+                <label for="{{property_order_list.0.1.5.name}}" class="right inline">
+                  {% blocktrans with label_val=property_order_list.0.1.5.altnames %} {{label_val}} {% endblocktrans %} 
+                </label>
+              </div>
+              <div class="small-9 columns">
+                {% html_widget groupid node.pk property_order_list.0.1.5 %}
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- For Email-ID, Languages Known -->
+        <div class="row">
+          <div class="small-4 columns">
+            <div class="row">
+              <div class="small-3 columns">
+                <label for="{{property_order_list.0.1.6.name}}" class="right inline"> {{property_order_list.0.1.6.altnames}} </label>
+              </div>
+              <div class="small-9 columns">
+                {% html_widget groupid node.pk property_order_list.0.1.6 %}
+              </div>
+            </div>
+          </div>
+          <div class="small-5 columns end">
+            <div class="row">
+              <div class="small-4 columns">
+                <label for="{{property_order_list.0.1.7.name}}" class="right inline"> {{property_order_list.0.1.7.altnames}} </label>
+              </div>
+              <div class="small-8 columns">
+                {% html_widget groupid node.pk property_order_list.0.1.7 %}
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <br>
+        <!-- For other fields: 2 columns(6-6) -->
+        <div class="row">
+          <div class="small-6 columns">
+            <div class="row">
+              <div class="small-3 columns">
+                <label for="{{property_order_list.0.1.8.name}}" class="right inline">
+                  {% blocktrans with label_val=property_order_list.0.1.8.altnames %} {{label_val}}   (Max. Size Limit 40kb) {% endblocktrans %}
+                </label>
+              </div>
+              <div class="small-9 columns">
+                {% html_widget groupid node.pk property_order_list.0.1.8 %}
+              </div>
+            </div>
+          </div>
+          
+          <div class="small-6 columns">
+            <div class="row">
+              <div class="small-3 columns">
+                <label for="{{property_order_list.0.1.9.name}}" class="right inline">
+                  {% blocktrans with label_val=property_order_list.0.1.9.altnames %} {{label_val}}   (Max. Size Limit 200kb) {% endblocktrans %}
+                </label>
+              </div>
+              <div class="small-9 columns">
+                {% html_widget groupid node.pk property_order_list.0.1.9 %}
+              </div>
+            </div>
+          </div>
+        </div>  
+
+        <div class="row">
+          <div class="small-6 columns">
+            <div class="row">
+              <div class="small-3 columns">
+                <label for="{{property_order_list.0.1.10.name}}" class="right inline"> {{property_order_list.0.1.10.altnames}} </label>
+              </div>
+              <div class="small-9 columns">
+                {% html_widget groupid node.pk property_order_list.0.1.10 %}
+              </div>
+            </div>
+          </div>
+          
+          <div class="small-6 columns">
+            <div class="row">
+              <div class="small-3 columns">
+                <label for="{{property_order_list.0.1.11.name}}" class="right inline">
+                  {% blocktrans with label_val=property_order_list.0.1.11.altnames %} {{label_val}} {% endblocktrans %} 
+                </label>
+              </div>
+              <div class="small-9 columns">
+                {% html_widget groupid node.pk property_order_list.0.1.11 %}
+              </div>
+            </div>
+          </div>
+        </div>  
+
+        <br>
+        <!-- Navigation buttons for tab -->
+        <div class="row tab-nav">
+          <div class="small-2 columns for-prev">
+          </div>
+          <!-- 
+          <div class="small-4 small-offset-5 columns end for-save">
+          </div>
+          -->
+          <div class="small-2 small-offset-8 columns for-next">
+          </div>
+        </div>
+      </div>
+
+      <!-- Address-Details tab ////////////////////////////////////////////////// -->
+      <div class="content row" id="panel_{{property_order_list.1.0}}">
+        <br>
+        <!-- For fields: 2 columns(6-6) -->
+        <div class="row">
+          <div class="small-6 columns">
+            <div class="row">
+              <div class="small-3 columns">
+                <label for="{{property_order_list.1.1.0.name}}" class="right inline">
+                  {% blocktrans with label_val=property_order_list.1.1.0.altnames %} {{label_val}} {% endblocktrans %} 
+                </label>
+              </div>
+              <div class="small-9 columns">
+                {% html_widget groupid node.pk property_order_list.1.1.0 %}
+              </div>
+            </div>
+          </div>
+          
+          <div class="small-6 columns">
+            <div class="row">
+              <div class="small-3 columns">
+                <label for="{{property_order_list.1.1.1.name}}" class="right inline">
+                  {% blocktrans with label_val=property_order_list.1.1.1.altnames %} {{label_val}} {% endblocktrans %} 
+                </label>
+              </div>
+              <div class="small-9 columns">
+                {% html_widget groupid node.pk property_order_list.1.1.1 %}
+              </div>
+            </div>
+          </div>
+        </div>  
+
+        <div class="row">
+          <div class="small-6 columns">
+            <div class="row">
+              <div class="small-3 columns">
+                <label for="{{property_order_list.1.1.2.name}}" class="right inline">
+                  {% blocktrans with label_val=property_order_list.1.1.2.altnames %} {{label_val}} {% endblocktrans %} 
+                </label>
+              </div>
+              <div class="small-9 columns">
+                {% html_widget groupid node.pk property_order_list.1.1.2 %}
+              </div>
+            </div>
+          </div>
+          
+          <div class="small-6 columns">
+            <div class="row">
+              <div class="small-3 columns">
+                <label for="{{property_order_list.1.1.3.name}}" class="right inline">
+                  {% blocktrans with label_val=property_order_list.1.1.3.altnames %} {{label_val}} {% endblocktrans %} 
+                </label>
+              </div>
+              <div class="small-9 columns">
+                {% html_widget groupid node.pk property_order_list.1.1.3 %}
+              </div>
+            </div>
+          </div>
+        </div>  
+
+        <div class="row">
+          <div class="small-6 columns">
+            <div class="row">
+              <div class="small-3 columns">
+                <label for="{{property_order_list.1.1.4.name}}" class="right inline">
+                  {% blocktrans with label_val=property_order_list.1.1.4.altnames %} {{label_val}} {% endblocktrans %}
+                </label>
+              </div>
+              <div class="small-9 columns">
+                {% html_widget groupid node.pk property_order_list.1.1.4 %}
+              </div>
+            </div>
+          </div>
+          
+          <div class="small-6 columns">
+            <div class="row">
+              <div class="small-3 columns">
+                <label for="{{property_order_list.1.1.5.name}}" class="right inline">
+                  {% blocktrans with label_val=property_order_list.1.1.5.altnames %} {{label_val}} {% endblocktrans %}
+                </label>
+              </div>
+              <div class="small-9 columns">
+                {% html_widget groupid node.pk property_order_list.1.1.5 %}
+              </div>
+            </div>
+          </div>
+        </div>  
+
+        <div class="row">
+          <div class="small-6 columns end">
+            <div class="row">
+              <div class="small-3 columns">
+                <label for="{{property_order_list.1.1.6.name}}" class="right inline">
+                  {% blocktrans with label_val=property_order_list.1.1.6.altnames %} {{label_val}} {% endblocktrans %}
+                </label>
+              </div>
+              <div class="small-9 columns">
+                {% html_widget groupid node.pk property_order_list.1.1.6 %}
+              </div>
+            </div>
+          </div>
+        </div>  
+
+        <br>
+        <!-- Navigation buttons for tab -->
+        <div class="row tab-nav">
+          <div class="small-2 columns for-prev">
+          </div>
+          <!-- 
+          <div class="small-4 small-offset-5 columns end for-save">
+          </div>
+          -->
+          <div class="small-2 small-offset-8 columns for-next">
+          </div>
+        </div>    
+      </div>
+
+      <!-- Course-Details tab /////////////////////////////////////////////////// -->
+      <div class="content row" id="panel_{{property_order_list.2.0}}">
+        <!-- Course Type -->
+        <div class="row">
+          <div class="small-6 columns end">
+            <div class="row">
+              <div class="small-3 columns" style="margin-left: 1rem;">
+                <label for="{{nussd_course_type.name}}" class="right inline">
+                  {% blocktrans with label_val=nussd_course_type.altnames %} {{label_val}} {% endblocktrans %}
+                </label>
+              </div>
+              <div class="small-6 columns end">
+                {% html_widget groupid "" nussd_course_type %}
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Fieldset: To select course details and add -->
+        <fieldset id="fsCourseDetails" class="hide">
+          <legend>
+            <label> <b>{% trans "Course Enrollment Details"%}</b> </label>
+          </legend>
+
+          <div class="row">
+            <div class="small-12 columns end">
+              <label class="note">
+                NOTE - Please select course enrollment details in following order: Course > University > College
+              </label>
+            </div>
+          </div>
+
+
+          <!-- For fields: 2 columns(6-6) -->
+          <div class="row">
+            <!-- Course -->
+            <div class="small-6 columns">
+              <div class="row">
+                <div class="small-3 columns">
+                  <label for="selCourse" class="right inline">
+                    {% trans "Course" %} 
+                  </label>
+                </div>
+                <div class="small-9 columns">
+                  <select id="selCourse" name="course" required="" style="float:left; width:95%">
+                    <option value="">{% trans "- - - Select Course - - -" %}</option>
+                  </select>
+                  <i style="color:red; float:left display:inline">*</i>
+                  <small class="error">{% trans "Please select course" %}! </small>
+                </div>
+              </div>
+            </div>
+            
+            <!-- University -->
+            <div class="small-6 columns">
+              <div class="row">
+                <div class="small-3 columns">
+                  <label for="selUniversity" class="right inline">
+                    {% trans "University" %} 
+                  </label>
+                </div>
+                <div class="small-9 columns">
+                  <select id="selUniversity" name="university" required="" style="float:left; width:95%">
+                    <option value="">{% trans "- - - Select University - - -" %}</option>
+                  </select>
+                  <i style="color:red; float:left display:inline">*</i>
+                  <small class="error">{% trans "Please select university" %}! </small>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- For fields: 1 columns(9)  -->
+          <div class="row">
+            <div class="small-9 columns end">
+              <div class="row">
+                <!-- College -->
+                <div class="small-2 columns">
+                  <label for="selCollege" class="right inline">
+                    {% trans "College" %} 
+                  </label>
+                </div>
+
+                <div class="small-8 columns">
+                  <select id="selCollege" name="college" required="" style="float:left; width:95%">
+                    <option value="">{% trans "- - - Select College - - -" %}</option>
+                  </select>
+                  <i style="color:red; float:left display:inline">*</i>
+                  <small class="error">{% trans "Please select college" %}! </small>
+                </div>
+
+                <!-- Add -->
+                <div class="small-2 columns">
+                  <input type="button" class="button tiny round expand" value="Add" id="btnAddCourseDetail">
+                </div>
+              </div>
+            </div>
+          </div>
+        </fieldset>
+
+        <!-- Table: To summarize course details and delete, if not required -->
+        <table id="tblCourseDetails">
+          <thead>
+            <th class="width-5p counter">{% trans "S. #" %}</th>
+            <th class="width-20p">{% trans "Course Type" %}</th>
+            <th class="width-30p">{% trans "Course" %}</th>
+            <th class="width-37p">{% trans "College" %}</th>
+            <th class="width-8p text-center"><input type="checkbox" class="margin-0r" id="cbDeleteCourseAll" name="delete_course_all"><input type="button" class="button tiny round margin-0r" value="{% trans 'Delete' %}" id="btnDeleteCourse"></th>
+          </thead>
+
+          <tbody>
+          </tbody>
+        </table>
+
+        <input type="hidden" name="{{property_order_list.2.1.0.name}}" value="">
+        <input type="hidden" name="{{property_order_list.2.1.1.name}}" value="">
+
+        <br>
+        <div class="row tab-nav">
+          <div class="small-2 columns for-prev">
+          </div>
+          <div class="small-2 small-offset-8 columns for-next">
+          </div>
+        </div>
+      </div>
+
+      <!-- Educational-Details tab ////////////////////////////////////////////// -->
+      <div class="content row" id="panel_{{property_order_list.3.0}}">
+        {% for field in property_order_list.3.1 %}
+        <div class="row">
+          <div class="small-3 columns"> 
+            <label for="{{field.name}}" class="right inline">
+              {{field.altnames}}
+            </label>
+          </div>
+          <div class="small-9 columns">
+            {% html_widget groupid node.pk field %}
+          </div>
+        </div>
+        {% endfor %}
+
+        <fieldset id="fsCourseRequirements">
+          <legend>
+            <label> <b>{% trans "Course Requirements" %}</b> </label>
+          </legend>
+        </fieldset>
+
+        <br>
+        <!-- Navigation buttons for tab -->
+        <div class="row tab-nav">
+          <div class="small-2 columns for-prev">
+          </div>
+          <!-- 
+          <div class="small-4 small-offset-5 columns end for-save">
+          </div>
+          -->
+          <div class="small-2 small-offset-8 columns for-next">
+          </div>
+        </div>    
+      </div>
+
+      <!-- Professional-Details tab ///////////////////////////////////////////// -->
+      <div class="content row" id="panel_{{property_order_list.4.0}}">
+        {% for field in property_order_list.4.1 %}
+        <div class="row">
+          <div class="small-3 columns"> 
+            <label for="{{field.name}}" class="right inline">
+              {{field.altnames}}
+            </label>
+          </div>
+          <div class="small-9 columns">
+            {% html_widget groupid node.pk field %}
+          </div>
+        </div>
+        {% endfor %}
+
+        <br>
+        <!-- Navigation buttons for tab -->
+        <div class="row tab-nav">
+          <div class="small-2 columns for-prev">
+          </div>
+          <!-- 
+          <div class="small-4 small-offset-5 columns end for-save">
+          </div>
+          -->
+          <div class="small-2 small-offset-8 columns for-next">
+          </div>
+        </div>    
+      </div>
+
+      <input type="hidden" id="name" name="name" value="">
+    </div>
+  </form>
+{% endblock %}
+
+{% block script %}
+  {{block.super}}
+
+  // Global variables for script
+    var currentYear = (new Date()).getFullYear()
+    lowerYearLimit = currentYear - 70;
+    course_enrollement_details = {};
+    course_requirements = {};
+    node_course_requirements = {}
+    course_data = {};
+    node_id = "{{node.pk}}";
+
+  // Tabs navigation: Enable and Disable tabs in sequential manner using Next & Previous buttons ----
+    $(".content").on('click', '.tab_next' ,function(event){
+      event.preventDefault();
+
+      // Forcefully blur all input elements, so that mandatory fields become data-invalid if not fill
+      $(this).parents(".tab-nav").parents(".content").find(':input[required]').blur();
+
+      // Then check no. of data-invalid fields
+      // if count == 0, then only proceed to next tab
+      parent_tab = $(this).parents(".tab-nav").parents(".content");
+
+      tab_id = parent_tab.attr("id");
+      // Special case for Course tab
+      if (tab_id == "panel_{{property_order_list.2.0}}") {
+        event.preventDefault();
+
+        // Reset course_requirements (dictionary), only when node exists meaning while editing
+          if (node_id != "") {
+            if (JSON.stringify(course_requirements) == "{}") {
+              course_requirements = node_course_requirements;
+            }
+
+            else {
+              $.each(course_requirements, function(k, v) {
+                if (node_course_requirements.hasOwnProperty(k)) {
+                  $.each(course_requirements[k], function(index, dict_val) {
+                    $.each(node_course_requirements[k], function(index, node_dict_val) {
+                      if (dict_val["text"] == node_dict_val["text"]) {
+                        dict_val["has_qualification"] = node_dict_val["has_qualification"];
+                        return false;
+                      }
+                    });
+                  });
+                }
+              });
+            }
+          }
+
+        // Set Course Requirements
+          fieldset = "";
+          course_list = [];
+          main_fieldset_legend = "";
+          $("#tblCourseDetails > tbody > tr").each(function(index) {
+            courseSelected = $(this).find(".course").html();
+            
+            if (course_list.indexOf(courseSelected) < 0) {
+              course_list.push(courseSelected);
+
+              main_fieldset_legend_name = '{% trans "Course Qualification Specifications" %}'
+              main_fieldset_legend = "<legend>" +
+                                        "<label><b>" + main_fieldset_legend_name + "</b></label>" +
+                                      "</legend>"
+
+              inner_fieldset_legend_name = '{% trans "' + courseSelected + '" %}'
+              inner_fieldset_legend = "<legend>" +
+                                        "<label><b>" + inner_fieldset_legend_name + "</b></label>" +
+                                      "</legend>"
+
+              if (course_requirements.hasOwnProperty(courseSelected) && course_requirements[courseSelected] != "None") {
+                th1 = "{% trans 'Mandatory' %}"
+                th2 = "{% trans 'Qualifications' %}"
+                th3 = "{% trans 'Select' %}"
+                specification_table_head = "<thead>" + 
+                                             "<th class='width-10p text-center'>" + th1 + "</th>" +
+                                             "<th class='width-80p'>" + th2 + "</th>" +
+                                             "<th class='width-10p text-center'>" + th3 + "</th>" +
+                                           "</thead>"
+
+                table_rows = ""
+
+                $.each(course_requirements[courseSelected], function(index, requirement_dict){
+                  td1 = "<i class='fi-x medium'></i>";
+                  if (requirement_dict["mandatory"]) {
+                    td1 = "<i class='fi-check medium'></i>";
+                  }
+
+                  td2 = requirement_dict["text"];
+                  td3 = "<input type='checkbox' class='margin-0r requirement' id='has_requirement_'" + (index+1) + " name='has_requirement_'" + (index+1) + ">";
+                  if (requirement_dict.hasOwnProperty("has_qualification")) {
+                    if (requirement_dict["has_qualification"]) {
+                      td3 = "<input type='checkbox' class='margin-0r requirement' id='has_requirement_'" + (index+1) + " name='has_requirement_'" + (index+1) + " checked=''>";
+                    }
+                  }
+                  table_rows += "<tr>" +
+                                  "<td class='mandatory text-center'>" + td1 + "</td>" +
+                                  "<td class='text'>" + td2 + "</td>" +
+                                  "<td class='other text-center'>" + td3 + "</td>" +
+                               "</tr>"
+                });
+
+                specification_table_body = "<tbody>" + 
+                                              table_rows +
+                                           "</tbody>"
+
+                specification_table = "<table id='tblCourseRequirements'>" + 
+                                        specification_table_head +
+                                        specification_table_body +
+                                      "</table>"
+              }
+
+              else {
+                // Dont show table
+                specification_table = "<label class='note'>No qualification specifications are defined for this course !!!</label>"
+              }
+
+              fieldset += "<fieldset id='fs" + (index + 1) + "'>" +
+                            inner_fieldset_legend +
+                            specification_table +
+                          "</fieldset>"
+            }
+          });
+          $("#fsCourseRequirements").html(main_fieldset_legend + fieldset);
+
+        // Move to next Tab
+        $('.active').removeClass('active').next().addClass('active');
+      }
+
+      else if(parent_tab.find(':input[data-invalid]').length == 0) {
+        // Valid, move to next step
+        $('.active').removeClass('active').next().addClass('active');
+      }
+    });
+
+    $(".content").on('click', '.tab_prev' ,function(event){
+      event.preventDefault();
+      $('.active').removeClass('active').prev().addClass('active');
+    });
+
+  // Only keeping year's drop-down and hiding other datepicker's elements ------------------------------------------
+    $(document).on('focus click blur', '.date_year' ,function(){
+      $(".ui-datepicker-calendar").hide();
+      $(".ui-datepicker-month").hide();
+      $(".ui-datepicker-prev").hide();
+      $(".ui-datepicker-next").hide();
+      $("#ui-datepicker-div").position({
+        my: "center top",
+        at: "center bottom",
+        of: $(this)
+      }); 
+    });
+
+  // State-wise District selection ------------------------------------------------------------------
+    // Disable District field, later on will be enabled after a state is selected
+    $("select#person_belongs_to_district").attr('disabled', 'disabled')
+
+    $("select#person_belongs_to_state").change(function() {
+      // Get selected State's value (ObjectId) and selected-index
+      selected_state_id = $(this).val()
+      selected_state_index = this.selectedIndex
+
+      if (selected_state_index != 0) {
+        // Perform this only when a State is selected
+        // Ajax call that fetches all Districts belonging to selected State
+        $.ajax({
+          url:"{% url 'get_districts' groupid %}",
+
+          data: {
+            state_id: selected_state_id
+          },
+
+          type: "GET",
+
+          dataType: "json",
+
+          complete: function () {
+            // Enable District field
+            $("select#person_belongs_to_district").removeAttr('disabled')
+          },
+
+          success: function (data) {
+            if (data.hasOwnProperty("message")) {
+              // Pops-up only when there is any error found during the ajax call
+              alert(data["message"])
+            }
+
+            else {
+              // First empty all values of District field (dropdown/select)
+              $("select#person_belongs_to_district").empty();
+
+              // Make very first entry as given below
+              $("select#person_belongs_to_district").append(
+                  $("<option></option>")
+                    .attr("value", "")
+                    .text("- - - Select district - - -")
+              );
+
+              // Fill returned district values based on which state is selected
+              $.each(data, function(i, value) {
+                $("select#person_belongs_to_district").append(
+                  $("<option></option>")
+                    .attr("value", value[0])
+                    .text(value[1])
+                );
+              });
+
+              // Set very first entry so that user doesn't forgets to select a value
+              $("select#person_belongs_to_district").prop("selectedIndex", 0);
+            }
+          }
+        });
+      }
+
+      else {
+        // If state is not selected or changed back to very first element from State's dropdown
+        // then set even District field's value to very first entry and disabled it until user again selects any state
+        $("select#person_belongs_to_district").prop("selectedIndex", 0);
+        $("select#person_belongs_to_district").attr('disabled', 'disabled')
+      }
+    });
+
+  // Empty dropdowns ("selCourse", "selUniversity", "selCollege") -----------------------------------
+    function empty3Select() {
+      // Except Oth index option, i.e. "- - - Select ??? - - -", 
+      // this function removes all other existing option(s)
+      $("#selCourse option:not(:first)").remove();
+      $("#selUniversity option:not(:first)").remove();
+      $("#selCollege option:not(:first)").remove();
+    }
+
+  // Fill dropdown ----------------------------------------------------------------------------------
+    function fillSelect(selectElement, dataList) {
+      $.each(dataList, function(index, data_value) {
+        selectElement.append($('<option>', { 
+          value: data_value,
+          text: data_value 
+        }));
+      });
+    }
+
+  function is_course_n_college_set(course_college_list, value_as_list) {
+    for (var i = 0; i < course_college_list.length; i++) {
+      if (course_college_list[i][0] === value_as_list[0] && course_college_list[i][1] === value_as_list[1]) {
+        return true;
+      }
+    }
+
+    return false;
+  }
+
+  var prev_nussd_course_type = "";
+  // If "nussd_course_type" is changed --------------------------------------------------------------
+    $("#nussd_course_type").on('change', function(){
+      // Empty all dropdowns of "fsCourseDetails" -------------------------------------------------------
+        empty3Select();
+
+      // hide fieldset (fsCourseDetails)
+        $("#fsCourseDetails").addClass("hide");
+
+      nussd_course_type = $("#nussd_course_type").val();
+
+      if(prev_nussd_course_type != nussd_course_type) {
+        // Check whether any rows in "tblCourseDetails" exists
+        // If yes, extract "ann_course_id" from those rows
+        course_n_college_list = [];
+        $("#tblCourseDetails > tbody > tr").each(function() {
+          row = $(this).find(".ann_course_id");
+          row_course_id = row.data("courseId");
+          row_organization_id = row.data("organizationId");
+
+          course_n_college_list.push([row_course_id, row_organization_id])
+        });
+
+        // Reset prev_nussd_course_type
+        prev_nussd_course_type = nussd_course_type;
+        success_state = false;
+        $.ajax({
+          url: "{% url 'get_course_details_for_trainer' group_id %}",
+
+          type: "GET",
+
+          data: {
+            course_type: nussd_course_type,
+            trainer_type: "{{title}}"
+          },
+
+          dataType: "json",
+
+          complete: function() {
+            if (success_state) {
+              // Hide "fsCourseDetails" fieldset
+              $("#fsCourseDetails").removeClass("hide");
+            }
+          },
+
+          success: function(data) {
+            success_state = data["success"];
+            $("#alertModalLabel").text(data["message"]);
+
+            if (success_state) {
+              // Populate course_data (dictionary)
+              course_data = {};
+
+              $.each(data["course_enrollement_details"], function(k, v_list){
+                // Add Course
+                if (!course_data.hasOwnProperty(k)) {
+                  course_data[k] = {};
+                }
+
+                // Add University, College & Announced Course ObjectId for respective Course
+                $.each(v_list, function(index, v_dict) {
+                  if (!course_data[k].hasOwnProperty(v_dict["university"])) {
+                    course_data[k][v_dict["university"]] = {};
+                  }
+
+                  if (!course_data[k][v_dict["university"]].hasOwnProperty(v_dict["college"])) {
+                    if (!is_course_n_college_set(course_n_college_list, [v_dict["ann_course_id"], v_dict["organization_id"]])) {
+                      // Doesn't exists in table-rows, so add it
+                      course_data[k][v_dict["university"]][v_dict["college"]] = [v_dict["ann_course_id"], v_dict["organization_id"]];
+                    }
+
+                    else {
+                      // Remove from course_data
+                      delete course_data[k][v_dict["university"]][v_dict["college"]];
+
+                      // If no college exists for university, then delete university too
+                      if (JSON.stringify(course_data[k][v_dict["university"]]) == "{}") {
+                        delete course_data[k][v_dict["university"]];
+                      }
+                    }
+                  }
+                });
+
+                // If no university exists for course, then delete course too
+                if (JSON.stringify(course_data[k]) == "{}") {
+                  delete course_data[k];
+                }
+              });
+
+              // Populate course_requirements (dictionary)
+              course_requirements = data["course_requirements"];
+
+              // Empty all dropdowns of "fsCourseDetails"
+              empty3Select();
+
+              // Fill "course" dropdown
+              course_list = Object.keys(course_data);
+              course_list.sort();
+              fillSelect($('#selCourse'), course_list);
+            }
+
+            else {
+              $("#alertModal").addClass("alert");
+              $("#alertModal").foundation('reveal', 'open');
+            }
+          }
+        });
+      }
+    });
+
+  // Binding change event of "selCourse" ------------------------------------------------------------
+    $("#selCourse").bind("change", function() {
+      courseSelected = $(this).val();
+
+      university_list = Object.keys(course_data[courseSelected]);
+      university_list.sort();
+
+      // Empty "selUniversity" dropdown
+      $("#selUniversity option:not(:first)").remove();
+
+      // Fill "selUniversity" dropdown
+      fillSelect($('#selUniversity'), university_list);
+    });
+
+  // Binding change event of "selUniversity" --------------------------------------------------------
+    $("#selUniversity").bind("change", function() {
+      courseSelected = $("#selCourse").val();
+      universitySelected = $(this).val();
+
+      college_list = Object.keys(course_data[courseSelected][universitySelected]);
+      college_list.sort();
+
+      // Empty "selCollege" dropdown
+      $("#selCollege option:not(:first)").remove();
+
+      // Fill "selCollege" dropdown
+      fillSelect($('#selCollege'), college_list);
+    });
+
+  // Reset dropdowns ("selCourse", "selUniversity", "selCollege") -----------------------------------
+    function reset3Select() {
+      $("#selCourse option:first").attr("selected", "selected");
+      $("#selUniversity option:first").attr("selected", "selected");
+      $("#selCollege option:first").attr("selected", "selected");
+    }
+
+  // On click of "btnAddCourseDetail" ---------------------------------------------------------------
+    $("#btnAddCourseDetail").click(function() {
+      $("#fsCourseDetails").find(":input[required]").blur();
+
+      if ($("#fsCourseDetails").find(":input[data-invalid]").length == 0) {
+        courseTypeSelected = $("#nussd_course_type").val();
+        courseSelected = $("#selCourse").val();
+        universitySelected = $("#selUniversity").val();
+        collegeSelected = $("#selCollege").val();
+
+        ann_course_id = course_data[courseSelected][universitySelected][collegeSelected][0]
+        organization_id = course_data[courseSelected][universitySelected][collegeSelected][1]
+
+        // Remove from course_data, and
+        // from respective College, University & Course dropdown
+        delete course_data[courseSelected][universitySelected][collegeSelected];
+        $('#selCollege option[value="' + collegeSelected + '"]').remove()
+
+        // If no college exists for university, then delete university too
+        if (JSON.stringify(course_data[courseSelected][universitySelected]) == "{}") {
+          delete course_data[courseSelected][universitySelected];
+          $('#selUniversity option[value="' + universitySelected + '"]').remove()
+
+          // If no university exists for course, then delete course too
+          if (JSON.stringify(course_data[courseSelected]) == "{}") {
+            delete course_data[courseSelected];
+            $('#selCourse option[value="' + courseSelected + '"]').remove()
+
+            if (JSON.stringify(course_data) == "{}") {
+              delete course_data;
+            }
+          }
+        }
+
+        // Add a row with values (deleted from respective dropdowns) into table
+        var row_count = $("#tblCourseDetails >tbody >tr").length;
+        var table_row = "<tr>" +
+                          "<td class='counter'>" + (row_count + 1) + ".</td>" +
+                          "<td class='courseType'>" + courseTypeSelected + "</td>" +
+                          "<td class='course'>" + courseSelected + "</td>" +
+                          "<td class='college'>" + collegeSelected + "</td>" +
+                          "<td class='text-center other'>" +
+                            "<input type='checkbox' class='ann_course_id' style='margin: 0.4rem 0 0 0;' id='"+ ann_course_id +"' name='delete_course' data-course-id='"+ ann_course_id +"' data-organization-id='"+ organization_id +"' >" +
+                            "<input type='hidden' class='university' value='" + universitySelected + "' >" +
+                          "</td>" +
+                        "</tr>"
+        $("#tblCourseDetails > tbody:last").append(table_row);
+
+        // Reset all dropdowns of "fsCourseDetails"
+        reset3Select();
+      }
+    });
+
+  // On close event of reveal-modal (alertModal) ----------------------------------------------------
+    $(document).on('closed.fndtn.reveal', '#alertModal[data-reveal]', function () {
+      $(this).removeClass("success").removeClass("error").removeClass("warning");
+    });
+
+  // Select/Deselect "delete_course" checkboxes based on state of "cbDeleteCourseAll" ---------------
+    $("#cbDeleteCourseAll").bind("change", function() {
+      deleteCourseAllState = this.checked;
+
+      $("input[name='delete_course']").each(function() {
+        $(this).prop("checked", deleteCourseAllState);
+      });
+    });
+
+  // Select/Deselect "cbDeleteCourseAll" checkbox based on state of all "delete_course" checkboxes --
+    $("input[name='delete_course']").bind("change", function() {
+      deleteCourseState = this.checked;
+
+      if (!deleteCourseState && $("#cbDeleteCourseAll").prop("checked")) {
+        // Deselect "cbDeleteCourseAll" checkbox
+        // If state of currently modified checkbox is false, and
+        // state of "cbDeleteCourseAll" checkbox is also false
+        $("#cbDeleteCourseAll").prop("checked", deleteCourseState);
+      }
+
+      else if (deleteCourseState && !$("#cbDeleteCourseAll").prop("checked")) {
+        // Select "cbDeleteCourseAll" checkbox
+        // If state of currently modified checkbox is true,
+        // state of "cbDeleteCourseAll" checkbox is false, and
+        // state of all checkboxes is true
+        totalDeleteCourse = $("input[name='delete_course']").length;
+        totalDeleteCourseChecked = $("input[name='delete_course']:checked").length;
+
+        if (totalDeleteCourse == totalDeleteCourseChecked) {
+          $("#cbDeleteCourseAll").prop("checked", deleteCourseState);
+        }
+      }
+    });
+
+  // On click of "btnDeleteCourse" ------------------------------------------------------------------
+    $("#btnDeleteCourse").click(function(event) {
+      event.preventDefault();
+
+      row_count = $("#tblCourseDetails > tbody > tr").length;
+
+      // If any row exists then only perform delete activities
+      if (row_count > 0) {
+        checked_delete_courses = $("input[name='delete_course']:checked");
+
+        if (checked_delete_courses.length > 0) {
+          // Find checked checboxe(s), and delete the corresponding row(s)
+          checked_delete_courses.each(function() {
+
+            // Fetch corresponding row
+            table_row = $(this).closest("tr");
+
+            // Fetch Course enrollment details from given row
+            // Course, University, College & Course Id
+            courseSelected = table_row.find(".course").html();
+            collegeSelected = table_row.find(".college").html();
+            universitySelected = table_row.find(".university").val();
+            annCourseIdSelected = table_row.find(".ann_course_id").attr("id");
+
+            // Add fetched data into course_data
+            if (course_data.hasOwnProperty(courseSelected)) {
+              if (course_data[courseSelected].hasOwnProperty(universitySelected)) {
+                if (course_data[courseSelected][universitySelected].hasOwnProperty(collegeSelected)) {
+                  course_data[courseSelected][universitySelected][collegeSelected] = annCourseIdSelected;
+                }
+
+                else {
+                  course_data[courseSelected][universitySelected][collegeSelected] = annCourseIdSelected;
+                }
+              }
+
+              else {
+                course_data[courseSelected][universitySelected] = {};
+                course_data[courseSelected][universitySelected][collegeSelected] = annCourseIdSelected;
+              }
+            }
+
+            else {
+              course_data[courseSelected] = {};
+              course_data[courseSelected][universitySelected] = {};
+              course_data[courseSelected][universitySelected][collegeSelected] = annCourseIdSelected;
+            }
+
+            // Delete row
+            table_row.remove();
+          });
+
+          // Reset S.No. of existing rows
+          $("#tblCourseDetails > tbody >tr").each(function(index) {
+            $(this).find(".counter").html((index+1) + ".");
+          });
+
+          // Empty all dropdowns of "fsCourseDetails"
+          empty3Select();
+
+          // Fill "course" dropdown
+          course_list = Object.keys(course_data);
+          course_list.sort();
+          fillSelect($('#selCourse'), course_list);
+
+          // Deselect "cbDeleteCourseAll" checkbox
+          $("#cbDeleteCourseAll").prop("checked", "");
+        }
+
+        else {
+          $("#alertModalLabel").text("Please select atleast a row to delete !!!");
+          $("#alertModal");
+          $("#alertModal").removeClass("success").removeClass("warning").addClass("alert");
+          $("#alertModal").foundation('reveal', 'open');
+        }
+      }
+
+      else {
+        $("#alertModalLabel").text("Please add few course enrollment details !!!");
+        $("#alertModal");
+        $("#alertModal").removeClass("success").removeClass("warning").addClass("alert");
+        $("#alertModal").foundation('reveal', 'open');
+      }
+    });
+
+  // On click of "btnSaveTrainer" -------------------------------------------------------------------
+    $(document).on("click", "#btnSaveTrainer", function(event) {
+      // Store Course(s) & Organization (College for Voulntary Teacher / University for Master Trainer)
+        // This list holds list(s) where each list has course and organization Ids
+        course_n_organization_id = [];
+
+        $("#tblCourseDetails > tbody > tr").each(function() {
+          row = $(this).find(".ann_course_id");
+
+          row_course_id = row.data("courseId");
+          row_organization_id = row.data("organizationId");
+
+          course_n_organization_id.push([row_course_id, row_organization_id]);
+        });
+
+        $("input[name='{{property_order_list.2.1.0.name}}']").val(JSON.stringify(course_n_organization_id));
+
+      // Store trainer's Course specification
+        course_requirements_list = [];
+        $("#fsCourseRequirements > fieldset").each(function() {
+          courseSelected = $(this).find("legend").text();
+
+          if ($(this).find("#tblCourseRequirements").length > 0) {
+            if ($(this).find("#tblCourseRequirements > tbody > tr").length > 0) {
+              $.each($(this).find("#tblCourseRequirements > tbody > tr"), function(index) {
+                reqText = ($(this).find(".text").text());
+                if (course_requirements[courseSelected][index]["text"] == reqText) {
+                  course_requirements[courseSelected][index]["has_qualification"] = $(this).find(".requirement").prop("checked");
+                }
+              });
+            }
+          }
+
+          else {
+            course_requirements[courseSelected] = [];
+          }
+
+          course_requirements_dict = {}
+          course_requirements_dict[courseSelected] = course_requirements[courseSelected];
+          course_requirements_list.push(course_requirements_dict);
+        });
+
+        $("input[name='{{property_order_list.2.1.1.name}}']").val(JSON.stringify(course_requirements_list));
+
+      // Remove required attribute from fields
+        $("#nussd_course_type").removeAttr("required");
+        $("#selCourse").removeAttr("required");
+        $("#selUniversity").removeAttr("required");
+        $("#selCollege").removeAttr("required");
+
+      // Store concatenated value of first, middle & last name field's values into name field (hidden input field)
+        name = "";
+        first_name = $("#first_name").val().trim();
+        middle_name = $("#middle_name").val().trim();
+        last_name = $("#last_name").val().trim();
+
+        name = first_name;
+        if (middle_name != "") {
+          name = first_name + " " + middle_name;
+        }
+
+        if (last_name != "") {
+          name = name + " " + last_name;
+        }
+
+        $("#name").val(name);
+
+      // Enable any disabled field as disabled values can't be fetched in views
+        $(".content").find(":input[disabled]").each(function(){
+          $(this).removeAttr('disabled');
+        });
+    });
+{% endblock %}
+
+{% block document_ready %}
+  // Tabs: Adding Next and Previous buttons for navigation ------------------------------------------
+    $(".content").each(function(i) {
+      totalTabs = $(".content").size() - 1
+
+      if (i != totalTabs) {
+        // Not in last tab
+        $(this).children(".tab-nav").children(".for-next")
+          .append("<input type='button' class='button small round tab_next' value='{% trans 'Next' %}' />");
+      }
+
+      if (i == totalTabs) {
+        // Only in last tab
+        var is_existing_nussd_course = "{{node.pk|default_if_none:''}}";
+        var submit_btn_label = '{% trans "Register" %}' // By default considering registering a new nussd_course
+        if (is_existing_nussd_course) {
+          // If value (ObjectId) found, it means updating existing nussd_course record
+          submit_btn_label = '{% trans "Update" %}'
+        }
+        $(this).children(".tab-nav").children(".for-next")
+          .append("<input type='submit' id='btnSaveTrainer' class='small button expand' value='"+submit_btn_label+"' style='float:right;' />");
+      }
+
+      if (i != 0) {
+        // Not in first tab
+        $(this).children(".tab-nav").children(".for-prev")
+          .append("<input type='button' class='button small round tab_prev' value='{% trans 'Previous' %}' style='float:right;' />");
+      }
+    });
+
+  // Settings for datepicker widget (with all) ------------------------------------------------------
+    $("#dob.date_month_day_year").datepicker({
+      changeMonth: true,
+      changeYear: true,
+      dateFormat: "dd/mm/yy",
+      yearRange: lowerYearLimit + ":" + (currentYear-14),
+      minDate: new Date(lowerYearLimit, 1 - 1, 1),
+      maxDate: new Date((currentYear-14), 1 - 1, 1),
+      defaultDate: new Date(lowerYearLimit, 1 - 1, 1)
+    });
+
+    $("#registration_date.date_month_day_year").datepicker({
+      changeMonth: true,
+      changeYear: true,
+      yearRange: "" + lowerYearLimit + ":" + currentYear,
+      minDate: new Date(lowerYearLimit, 1 - 1, 1),
+      maxDate: '0',
+      defaultDate: '0'
+    });
+
+  // Signature Upload File Size Limit ---------------------------------------------------------------
+    $("#uploadBtn_signature").change(function() {
+      var max_size = 40;
+      var fsize = this.files[0].size;
+      fsize = fsize/1024;
+      if(fsize <= max_size) {
+        $('#uploadFile_signature').val(this.value);
+      }
+      else {
+        alert("Sorry. Max File Size Limit Exceeded");
+        $(this).val("");
+        $('#uploadFile_signature').val(this.value);
+      }
+    });
+
+  // User photo Upload File Size Limit --------------------------------------------------------------
+    $("#uploadBtn_user_photo").change(function() {
+      var max_size = 200
+      var fsize=this.files[0].size
+      fsize=fsize/1024
+      if(fsize<=max_size){
+        $('#uploadFile_user_photo').val(this.value);
+      }
+      else {
+        alert("Sorry. Max File Size Limit Exceeded");
+        $(this).val("")
+        $('#uploadFile_user_photo').val(this.value);
+      }
+    });
+
+  // Settings for datepicker widget (only for year) -------------------------------------------------
+    $(".date_year").datepicker({
+      changeYear: true,
+      dateFormat: 'yy',
+      yearRange: lowerYearLimit + ":" + currentYear,
+      minDate: new Date(lowerYearLimit, 1 - 1, 1),
+      maxDate: '0',
+      defaultDate: new Date(lowerYearLimit, 1 - 1, 1),
+
+      onClose: function(dateText, inst) {
+        $(this).val(dateText)
+      },
+
+      beforeShow: function() {
+        var year = $(this).val();
+        if (year) {
+          $(this).datepicker('option', 'defaultDate', new Date(year, 1, 1));
+          $(this).datepicker('setDate', new Date(year, 1, 1));
+        }
+      },
+
+      onChangeMonthYear: function(year, month, inst){
+        $(this).val(year)
+      }
+    });
+
+  // Empty all dropdowns of "fsCourseDetails" -------------------------------------------------------
+    empty3Select();
+
+  // Fill "tblCourseDetails", if editing node & values already exist for ann_course_id --------------
+    {% if title == "Voluntary Teacher" %}
+      {% for each_course_college in node.trainer_teaches_course_in_college %}
+        // Returns another list holding elements in following order
+        // course-type, course-name, college-name, course-id, college-id
+
+        // Add a row with values (taken from node's attribute) into table
+        var table_row = "<tr>" +
+                          "<td class='counter'>{{forloop.counter}}.</td>" +
+                          "<td class='courseType'>{{each_course_college.0}}</td>" +
+                          "<td class='course'>{{each_course_college.1}}</td>" +
+                          "<td class='college'>{{each_course_college.2}}</td>" +
+                          "<td class='text-center other'>" +
+                            "<input type='checkbox' class='ann_course_id' style='margin: 0.4rem 0 0 0;' id='{{each_course_college.3}}' name='delete_course' data-course-id='{{each_course_college.3}}' data-organization-id='{{each_course_college.4}}' >" +
+                            "<input type='hidden' class='university' value='{{each_course_college.5}}' >" +
+                          "</td>" +
+                        "</tr>"
+        $("#tblCourseDetails > tbody:last").append(table_row);
+      {% endfor %}
+
+    {% elif title == "Master Trainer" %}
+      {% for each in node.master_trainer_of_course %}
+        course_details = "{{each.name}}"
+        course_details = course_details.split(" -- ");
+
+        // Add a row with values (taken from node's attribute) into table
+        var table_row = "<tr>" +
+                          "<td class='counter'>{{forloop.counter}}.</td>" +
+                          "<td class='courseType'>" + course_details[1] + "</td>" +
+                          "<td class='course'>" + course_details[0] + "</td>" +
+                          "<td class='college'>" + course_details[2] + "</td>" +
+                          "<td class='text-center other'>" +
+                            "<input type='checkbox' class='ann_course_id' style='margin: 0.4rem 0 0 0;' id='{{each.pk}}' name='delete_course'>" +
+                            "<input type='hidden' class='university' value='' >" +
+                          "</td>" +
+                        "</tr>"
+        $("#tblCourseDetails > tbody:last").append(table_row);
+      {% endfor %}
+
+    {% endif %}
+  
+  // Populate "node_course_requirements"
+    node_course_requirements = {}
+    {% if title == "Voluntary Teacher" %}
+      {% for each in node.voln_tr_qualifications %}
+        {% for k, v in each.items %}
+          node_course_requirements["{{k}}"] = [];
+
+          {% for it in v %}
+            dummy_dict = {};
+            {% for ik, iv in it.items %}
+              if ("{{ik}}" == "mandatory" || "{{ik}}" == "has_qualification") {
+                if ("{{iv}}" == "True") {
+                  dummy_dict["{{ik}}"] = true;
+                }
+                else {
+                  dummy_dict["{{ik}}"] = false;
+                }
+              }
+              else {
+                dummy_dict["{{ik}}"] = "{{iv}}";
+              }
+            {% endfor %}
+            node_course_requirements["{{k}}"].push(dummy_dict);
+          
+          {% empty %}
+            delete node_course_requirements["{{k}}"];
+
+          {% endfor %}
+        {% endfor %}
+      {% endfor %}
+
+    {% elif title == "Master Trainer" %}
+      {% for each in node.mast_tr_qualifications %}
+        {% for k, v in each.items %}
+          node_course_requirements["{{k}}"] = [];
+
+          {% for it in v %}
+            dummy_dict = {};
+            {% for ik, iv in it.items %}
+              if ("{{ik}}" == "mandatory" || "{{ik}}" == "has_qualification") {
+                if ("{{iv}}" == "True") {
+                  dummy_dict["{{ik}}"] = true;
+                }
+                else {
+                  dummy_dict["{{ik}}"] = false;
+                }
+              }
+              else {
+                dummy_dict["{{ik}}"] = "{{iv}}";
+              }
+            {% endfor %}
+            node_course_requirements["{{k}}"].push(dummy_dict);
+          
+          {% empty %}
+            delete node_course_requirements["{{k}}"];
+
+          {% endfor %}
+        {% endfor %}
+      {% endfor %}
+
+    {% endif %}
+{% endblock %}

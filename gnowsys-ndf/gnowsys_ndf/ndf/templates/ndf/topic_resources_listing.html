@@ -1,0 +1,13 @@
+{% load ndf_tags %}
+{% load simple_filters %}
+{% load i18n %}
+  
+{% get_topic_nodes node.pk as resources %}
+
+<ul class="small-block-grid-1 medium-block-grid-3 large-block-grid-5" >
+  {% for each in  resources %}
+  <li class="card-image-wrapper" >
+    {% include 'ndf/simple_card.html' with  has_contributor=True resource=each url_name="file_detail" first_arg=group_id second_arg=each.pk %}
+  </li>
+  {% endfor %}
+</ul>

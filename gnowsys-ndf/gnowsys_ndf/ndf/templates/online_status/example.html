@@ -1,0 +1,11 @@
+{% load online_status_tags %}
+{% load i18n %}
+
+<h1>{% trans "Users online"  %}</h1>
+{% online_users 30 %}
+
+<h1>{% trans "Status for user " %}{{ example_user.username }}"</h1>
+<p>{% user_status example_user %}</p>
+
+<h1>{% trans "My status " %} ("{{ user.username }}") </h1>
+<p>{% user_status user %}</p>

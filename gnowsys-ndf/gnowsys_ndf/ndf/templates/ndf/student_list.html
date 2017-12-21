@@ -1,0 +1,695 @@
+{% extends "ndf/mis_base_create_edit.html" %}
+{% load staticfiles %}
+
+{% load ndf_tags %}
+{% load i18n %}
+
+  
+{% block title %}
+  {% trans "Students List View" %}
+{% endblock %}
+
+{% block head %}
+  {{block.super}}
+
+  <!-- DataTables -->
+  <script src="/static/ndf/bower_components/DataTables/media/js/jquery.dataTables.js"></script>
+  <script src="/static/ndf/bower_components/datatables-plugins/integration/foundation/dataTables.foundation.js"></script>
+  <!-- DataTables CSS -->
+  <link href="/static/ndf/bower_components/datatables-plugins/integration/foundation/dataTables.foundation.css" rel="stylesheet" type="text/css" />
+{% endblock %}
+
+{% block style %}
+  {{block.super}}
+
+  /* Setting css-properties for reveal-modal's label */
+    div.reveal-modal > label {
+      color: white;
+      font-weight: bold;
+      font-size: 1rem;
+    }
+
+  /* Overriding css-properties for fieldset (also legend, input) */
+    /* fieldset (padding-bottom) */ 
+    fieldset {
+      padding: 1.25rem 1.25rem 1.25rem 1.25rem !important;
+    }
+
+    /* legend (background-color) */
+    fieldset legend {
+      background-color: transparent !important;
+    }
+
+    /* input (margin) */
+    fieldset input {
+      margin: 0 !important;
+    }
+
+  /* Overriding css-properties for select */
+    select {
+      margin: 0 !important;
+    }
+  
+  /* Setting css-properties for filter class */
+    .filter {
+      padding-bottom: 15px;
+    }
+
+  /* Setting css-properties for button-margin-top class */
+    .button-margin-top {
+      margin-top: 0.85rem;
+    }
+
+  /* Setting css-properties for small.error */
+    small.error {
+      padding: 0 0 0 0.5rem !important;
+      margin-top: 1rem !important;
+      position: relative !important;
+    }
+
+  .padding-top-1p5 {
+    padding-top: 1.5rem;
+  }
+  
+  .padding-left-2p2 {
+    padding-left: 2.2rem;
+  }
+
+  .text-size-15 {
+    font-size: 15px;
+  }
+{% endblock %}
+
+{% block body_content %}
+  <div id="alertModal" class="reveal-modal medium alert-box radius" data-reveal data-alert>
+    <label id="alertModalLabel"></label>
+    <a class="close-reveal-modal">&#215;</a>
+  </div>
+
+  <header class="row" style="margin: 1rem 0 0 0;">
+    <div class="small-7 columns">
+      <h2>
+        {% trans "Student List View" %}
+      </h2>
+    </div>
+    <div class="small-5 columns end">
+      {% comment %}
+      <!--
+      <a href="{% url 'mis:mis_enroll' groupid app_id app_set_id %}" class="button small right align">
+        {% trans "Enroll in Courses" %}
+      </a>
+      -->
+      {% endcomment %}
+    </div>
+  </header>
+
+  {% if group_name_tag == "MIS_admin" %}
+  <!-- Show below link on to the MIS_admin group only -->
+  <div class="row padding-top-1p5">
+    <div class="large-6 columns padding-left-2p2">
+      <a id="get_college_wise_data">
+        <span>Generate Degree-wise & College-wise Students' data (CSV)</span>
+      </a>
+    </div>
+    <div class="large-6 columns end padding-left-2p2">
+      <a id="college_wise_data" class="hide">
+        <span class="fi-download large">&nbsp;&nbsp;&nbsp;Click here to Download</span>
+      </a>
+    </div>
+  </div>
+  {% endif %}
+
+  <!-- fieldset for Filters //////////////////////////////////////////////////// -->
+  <fieldset id="fsFilters" data-abide>
+    <legend>
+      <h5>{% trans "Filters" %}</h5>
+    </legend>
+
+    <!-- University & College -->
+    <div class="row filter">
+      <!-- University -->
+      <div class="small-5 large-5 columns">
+        <label>
+          University
+        </label>
+        <select id="student_belongs_to_university"></select>
+      </div>
+
+      <!-- College -->
+      <div class="small-5 large-5 columns">
+        <label>
+          College
+        </label>
+        <select id="student_belongs_to_college"></select>
+      </div>
+
+      <div class="small-2 large-2 columns end">
+        <label> Select Year
+        </label>
+        <input type="text" class="date_year" id="datepicker_year" required readonly="" placeholder="YYYY" style="float:left; width:85%"/>
+        <i style="color:red; display:inline">*</i>
+        <small class="error">{% trans "Please select year" %} </small>
+      </div>
+    </div>
+
+    <!-- Name -->
+    <div class="row filter{% if not lstFilters.0.value %} hide{% endif %}">
+      <div class="small-12 large-10 columns">
+        <label for="{{lstFilters.0.name}}">
+          {{lstFilters.0.altnames}}
+        </label>
+        {% html_widget groupid node.pk lstFilters.0 %}
+      </div>
+      <div class="small-5 large-2 columns end button-margin-top">
+        <input type="button" value="Delete" class="button small expand deleteFilter"/>
+      </div>            
+    </div>
+
+    <!-- Degree Year -->
+    <div class="row filter{% if not lstFilters.1.value %} hide{% endif %}">
+      <div class="small-12 large-10 columns">
+        <label for="{{lstFilters.1.name}}">
+          {{lstFilters.1.altnames}}
+        </label>
+        {% html_widget groupid node.pk lstFilters.1 %}
+      </div>
+      <div class="small-5 large-2 columns end button-margin-top">
+        <input type="button" value="Delete" class="button small expand deleteFilter"/>
+      </div>            
+    </div>
+
+    <!-- Status -->
+    {% comment %}
+    <!--
+    <div class="row filter{% if not lstFilters.4.value %} hide{% endif %}">
+      <div class="small-12 large-10 columns">
+        <label for="{{lstFilters.4.name}}">
+          {{lstFilters.4.altnames}}
+        </label>
+        {% html_widget groupid node.pk lstFilters.4 %}
+      </div>
+      <div class="small-5 large-2 columns end button-margin-top">
+        <input type="button" value="Delete" class="button small expand deleteFilter"/>
+      </div>            
+    </div>
+    -->
+    {% endcomment %}
+
+    <!-- Add filter -->
+    <div class="row addFilter">
+      <div>
+        <hr>
+      </div>
+      <div class="small-12 large-10 columns">
+        <label>
+          {% trans "Select" %}
+        </label>
+        <select id="selAddFilter" name="selAddFilter" style="float:left; width:95%">
+          <option value="">{% trans " - - - Select Filter - - - " %}</option>
+          {% for each in lstFilters %}
+          {% if each.name != "student_belongs_to_university" and each.name != "student_belongs_to_college" and not each.value %}
+          <option value="{{each.name}}">{{each.altnames}}</option>
+          {% endif %}
+          {% endfor %}
+        </select>
+      </div>
+      <div class="small-5 large-2 columns end button-margin-top">
+        <input type="button" id="btnAddFilter" value="Add" class="button small radius expand"/>
+      </div>
+    </div>
+
+    <!-- Search based on filter values -->
+    <div class="row">
+      <div class="small-5 small-centered large-2 large-centered columns button-margin-top">
+        <input type="button" id="btnFindStudents" value="Search" class="button small round expand"/>
+      </div>
+    </div>
+  </fieldset>
+
+  <div id="students-data-review">
+  </div>
+{% endblock %}
+
+{% block script %}
+  // Only keeping year's drop-down and hiding other datepicker's elements ------------------------------------------
+    $(document).on('focus click blur', '.date_year' ,function(){
+      $(".ui-datepicker-calendar").hide();
+      $(".ui-datepicker-month").hide();
+      $(".ui-datepicker-prev").hide();
+      $(".ui-datepicker-next").hide();
+      $("#ui-datepicker-div").position({
+        at: "center bottom",
+        my: "center top",
+        of: $(this)
+      }); 
+    });
+
+  // On click of "college_wise_data"
+    $("#get_college_wise_data").click(function(event) {
+      success_state = false;
+      link_url = "";
+
+      $.ajax({
+        url:"{% url 'get_college_wise_students_data' groupid %}",
+
+        type: "GET",
+
+        dataType: "json",
+
+        success: function(data) {
+          success_state = data["success"];
+          // $("#alertModalLabel").text(data["message"]);
+
+          if (success_state) {
+            // $("#alertModal").removeClass("alert");
+            // $("#alertModal").addClass("success");
+            // $("#alertModal").foundation('reveal', 'open');
+            link_url = data["download_link"];
+          }
+
+          else {
+            $("#alertModal").removeClass("success").removeClass("warning");
+            $("#alertModal").addClass("alert");
+            $("#alertModal").foundation('reveal', 'open');
+          }
+        },
+
+        complete: function() {
+          if (success_state) {
+            if (link_url != "") {
+              $("#college_wise_data").attr("href", link_url);
+              $("#college_wise_data").removeClass("hide");
+            }
+
+            else {
+              event.preventdefault();
+            }
+          }
+        },
+      });
+    });
+
+  // University-wise College selection
+    // Disable College field, later on will be enabled after a university is selected
+    // $("select#student_belongs_to_college").attr('disabled', 'disabled')
+
+    $("select#student_belongs_to_university").on("change", function() {
+      // Get selected University's value (ObjectId) and selected-index
+      var selected_university_id = $(this).val();
+      var selected_university_index = this.selectedIndex;
+      var success_state = false;
+
+      if (selected_university_index != 0) {
+        // Perform this only when a University is selected
+        // Ajax call that fetches all Colleges affiliated to selected University
+        $.ajax({
+          url:"{% url 'get_affiliated_colleges' groupid %}",
+
+          data: {
+            university_id: selected_university_id
+          },
+
+          type: "GET",
+
+          dataType: "json",
+
+          success: function(data) {
+            success_state = data["success"];
+            // $("#alertModalLabel").text(data["message"]);
+
+            if (success_state) {
+              // $("#alertModal").removeClass("alert");
+              // $("#alertModal").addClass("success");
+              // $("#alertModal").foundation('reveal', 'open');
+
+              // First empty all values of College field (dropdown/select)
+              $("select#student_belongs_to_college").empty();
+
+              // Make very first entry as given below
+              $("select#student_belongs_to_college").append(
+                  $("<option></option>")
+                    .attr("value", "")
+                    .text("- - - Select college ( graduation ) - - -")
+              );
+
+              // Fill returned college values based on which university is selected
+              $.each(data["affiliated_colleges"], function(i, value) {
+                $("select#student_belongs_to_college").append(
+                  $("<option></option>")
+                    .attr("value", value[0])
+                    .text(value[1])
+                );
+              });
+
+              // Set very first entry so that user doesn't forgets to select a value
+              $("select#student_belongs_to_college").prop("selectedIndex", 0);
+            }
+
+            else {
+              $("#alertModal").removeClass("success");
+              $("#alertModal").addClass("alert");
+              $("#alertModal").foundation('reveal', 'open');
+            }
+          },
+
+          complete: function() {
+            if (success_state) {
+              // Enable College field
+              $("select#student_belongs_to_college").removeAttr('disabled')
+          
+              var college_name_str = "{{group_name_tag|safe}}";
+              var university_name_str = ""
+              
+              $("#student_belongs_to_college option").each(function(){
+                // If college-name matches with that of college-name, 
+                // then select that college from drop-down and disable it
+                if (college_name_str.trim() == $(this).text().trim()) {
+                  $(this).attr("selected", true);
+                  $(this).parent().attr("disabled", "disabled");
+                  
+                  {% get_university group_name_tag as university_name %}
+                  university_name_str = "{{university_name|safe}}"
+                  
+                  // Retrieve university-name & match with list of university-names from dropdown -
+                  $("#student_belongs_to_university option").each(function(){
+                    // If university-name matches with that of university-name, 
+                    // then select that university from drop-down and disable it
+                    if (university_name_str.trim() == $(this).text().trim()) {
+                      $(this).attr("selected", true);
+                      $(this).parent().attr("disabled", "disabled");
+                    }
+                  });
+                }
+              });
+
+            }
+          },
+        });
+      }
+
+      else {
+        // If university is not selected or changed back to very first element from university's dropdown
+        // then set even College field's value to very first entry and disabled it until user again selects any university
+        $("select#student_belongs_to_college").prop("selectedIndex", 0);
+        $("select#student_belongs_to_college").attr('disabled', 'disabled')
+      }
+    });
+
+  // Disable Search button, if no filter is set
+    function searchDisablility() {
+      if (!($("#fsFilters").find(".filter").length > 0)) {
+        $("#btnFindStudents").attr('disabled', "disabled");
+        $("#alertModalLabel").text("Search: You need to add atleast one filter to enable search button !!!");
+        $("#alertModal").removeClass("success").removeClass("alert");
+        $("#alertModal").addClass("warning");
+        $("#alertModal").foundation('reveal', 'open');
+      }
+    }
+
+  // On click of Delete button, delete corresponding filter & add to 'selAddFilter' drop-down
+    $(document).on("click", ".deleteFilter", function() {
+      parent_filter_row = $(this).parent("div").parent(".filter");
+      // Hide corresponding filter row
+      parent_filter_row.addClass("hide");
+
+      // Add corresponding filter in 'selAddFilter' drop-down
+      widget_name = parent_filter_row.find(":input").attr("name").trim();
+      widget_text = parent_filter_row.find("label[for='"+widget_name+"']").text().trim();
+      widget_option = "<option value='"+widget_name+"'>"+widget_text+"</option>"
+      $("#selAddFilter").append(widget_option)
+
+      searchDisablility();
+
+      // Show Add-filter Widgets (drop-down & button)
+      if ($(".filter.hide").length == 1) {
+        toggleAddFilterWidgets();
+      }
+    });
+
+  // Function that Show/Hide Add-Filter widgets (drop-down & button)
+    function toggleAddFilterWidgets() {
+      $("#btnAddFilter").parent("div").parent(".addFilter").toggle();
+    }
+
+  // On click of Add button, add row for corresponding filter & remove from 'selAddFilter' drop-down
+    $("#btnAddFilter").click(function() {
+      widget_option = $("#selAddFilter :selected")
+      widget_name = widget_option.val();
+
+      if (widget_option.index() == 0) {
+        // When no filter is seleceted
+
+        $("#alertModalLabel").text("Add Filter: Select atleast one of the filter !");
+        $("#alertModal").removeClass("success").removeClass("alert");
+        $("#alertModal").addClass("warning");
+        $("#alertModal").foundation('reveal', 'open');
+      }
+
+      else {
+        // When any of the filter is seleceted
+
+        // Show corresponding filter row
+        filter_row_visibility = false;
+        $(".filter.hide").each(function() {
+          row_widget_name = $(this).find(":input").attr("name").trim();
+
+          if (widget_name == row_widget_name) {
+            // $(this).find(":input").removeAttr('disabled').attr("required", "");
+            $(this).find(":input").removeAttr('disabled');
+            $(this).removeClass("hide");
+            filter_row_visibility = true;
+            return;
+          }
+        });
+
+        // Delete corresponding filter from 'selAddFilter' drop-down
+        if (filter_row_visibility) {
+
+          widget_option.remove();
+        }
+
+        // Check whether to Hide Add-filter Widgets (drop-down & button)
+        if ($("#selAddFilter option").length == 1) {
+
+          toggleAddFilterWidgets();
+        }
+      }
+    });
+
+  // On click of Search button
+    $("#btnFindStudents").click(function() {
+      // Disabled inactive filters before sending a POST request
+      $(".filter.hide").each(function() {
+        //$(this).find(":input").removeAttr("required").attr('disabled', "disabled");
+        $(this).find(":input").attr('disabled', "disabled");
+      });
+
+      // Check whether all mandatory field(s) is/are set/selected or not
+      $("#fsFilters").find(":input[required]").blur();
+
+      // Make ajax call, if and only if when all mandatory fields are set/selected
+      if ($("#fsFilters").find(":input[data-invalid]").length == 0) {
+        ajax_request_data = {}
+        ajax_request_data['groupid'] = "{{groupid}}"
+        ajax_request_data['app_id'] = "{{app_id}}"
+        ajax_request_data['app_set_id'] = "{{app_set_id}}"
+        ajax_request_data['student_belongs_to_university'] = $("select#student_belongs_to_university").val()
+        ajax_request_data['student_belongs_to_college'] = $("select#student_belongs_to_college").val()
+        ajax_request_data['reg_year'] = $("#datepicker_year").val() 
+
+        // Iterate rows with class set as 'filter' and class not set as 'hide'
+        $(".filter").not(".hide").each(function() {
+          // Iterate all input elements whose type is not 'button'
+          widget = $(this).find(":input").not(":input[type=button]");
+          $(widget).each(function() {
+            ajax_request_data[$(this).attr("name")] = $(this).val();
+          });
+        });
+
+        ajax_request_data['csrfmiddlewaretoken'] = "{{csrf_token}}"
+
+        var success_state = false;
+        // Ajax call that fetches all students data depending on selection criteria
+        $.ajax({
+          url: "{% url 'get_students' groupid %}",
+
+          data: ajax_request_data,
+
+          type: "POST",
+
+          dataType: "json",
+
+          success: function(data) {
+            success_state = data["success"];
+            $("#alertModalLabel").text(data["message"]);
+
+            if (success_state) {
+              // $("#students-data-review").html(data["students_data_review"]);
+        
+              groupid_val = data["groupid"];
+              app_id_val = data["app_id"];
+              app_set_id_val = data["app_set_id"];
+              var caption_college = ""
+              var caption_university = ""
+              filename = data["filename"];
+              if (data.hasOwnProperty("university")){
+                university = data["university"];
+                caption_university = '<h4>' + university + '</h4>';
+              }
+              if (data.hasOwnProperty("college")){
+                college = data["college"];
+                caption_college = '<h3>' + college + '</h3>';
+              }
+              students_count = data["students_count"];
+              column_headers = data["column_headers"];
+              students_data_set = data["students_data_set"];
+              dataTable_columns_set = [];
+              download_link = "{% static 'filename' %}".replace('filename', filename);
+
+              if (parseInt(students_count) <= 0) {
+                c = '<div class="row">' +
+                  '<div class="large-4 large-centered columns">' +
+                    '<p class="alert-box alert radius text-center text-size-15">No records match the given criteria !!!</p>' +
+                  '</div>' +
+                '</div>'
+                $("#students-data-review").html(c);
+              }
+
+              else {
+                // Define table
+                student_data_table = '<table cellpadding="0" cellspacing="0" border="0" class="display" id="student_data_table">' +
+                  '<caption>' +
+                    caption_college +
+                    caption_university +
+                    '<h6>Total No. of Students Registered: <b>' + students_count + '</b></h6>' +
+                    '<a href="' + download_link + '" download="">' +
+                      '<span class="fi-download large">&nbsp;&nbsp;&nbsp;Download Students\' data (CSV)</span>' +
+                    '</a>' + 
+                  '</caption>' +
+                '</table>';
+                $("#students-data-review").html(student_data_table);
+                
+                // Prepare title & data headers used in dataTable
+                $.each(column_headers, function(index, v) {
+                  d = {};
+                  d["data"] = v[0];
+                  d["title"] = v[1];
+                  dataTable_columns_set.push(d);
+                });
+
+                // Set defintion dataTable
+                sce_dt_var = $("#student_data_table").dataTable({
+                  "data": students_data_set,
+                  "columns": dataTable_columns_set,
+                  "createdRow": function ( row, data, index ) {
+                    // Attaching Student's ObjectId to each row (i.e., assigning to it's id attribute)
+                    s_id = data["stud_id"];
+                    $(row).attr("id", s_id);
+
+                    edit_url = "{% url 'mis:mis_app_instance_detail' 'groupid' 'app_id' 'app_set_id' 'stud_id' %}".replace("groupid", groupid_val).replace("app_id", app_id_val).replace("app_set_id", app_set_id_val).replace("stud_id", s_id);
+                    name = data['Name']
+                    
+                    $(row).find("td:nth-child(3)").html("<a href='" + edit_url + "'>"+name+"</a>");
+                  }
+                });
+              }
+            }
+
+            else {
+              $("#alertModal").removeClass("success").removeClass("warning");
+              $("#alertModal").addClass("alert");
+              $("#alertModal").foundation('reveal', 'open');
+            }
+          },
+
+          complete: function() {
+          },
+        });
+      }
+    });
+{% endblock %}
+
+{% block document_ready %}
+  {{block.super}}
+
+    var currentYear = (new Date()).getFullYear()
+    lowerYearLimit = currentYear - 5;
+
+    // Settings for datepicker widget (only for year) --------------------------------------------------------------
+      $(".date_year").datepicker({
+        changeYear: true,
+        dateFormat: 'yy',
+        yearRange: lowerYearLimit + ":" + currentYear,
+        minDate: new Date(lowerYearLimit, 1 - 1, 1),
+        maxDate: '0',
+        defaultDate: new Date(lowerYearLimit, 1 - 1, 1),
+
+        onClose: function(dateText, inst) {
+          $(this).val(dateText)
+        },
+
+        beforeShow: function() {
+          var year = $(this).val();
+          if (year) {
+            $(this).datepicker('option', 'defaultDate', new Date(year, 1, 1));
+            $(this).datepicker('setDate', new Date(year, 1, 1));
+          }
+        },
+
+        onChangeMonthYear: function(year, month, inst){
+          $(this).val(year)
+        }
+      });
+
+    $("select#student_belongs_to_university").empty();
+      $("select#student_belongs_to_university").append(
+        $("<option></option>")
+          .attr("value", "")
+          .text("{% trans ' - - - Select University - - - ' %}")
+      );
+      
+    //Update the Univ and college dropdown list
+    var univ_data = {{ univ_list|safe }}
+    $.each(univ_data, function(i,v){
+      $("select#student_belongs_to_university").append(
+        $("<option></option>")
+          .attr("value", v['_id'])
+          .text(v['name'])
+      );
+    });
+    {% if group_name_tag != "MIS_admin" %}
+      // Select and then Disable College & University when visiting respective college group
+        
+        var college_name_str = "{{group_name_tag|safe}}";
+        var university_name_str = ""
+        //check if univ exists
+        {% get_university group_name_tag as university_name %}
+        university_name_str = "{{university_name|safe}}"
+        
+        $("select#student_belongs_to_university option").each(function(){
+          if (university_name_str.trim() == $(this).text().trim()) {
+            $(this).attr("selected", true);
+            $(this).parent().attr("disabled", "disabled");
+          }
+        });
+        
+      // If university selected, then trigger 'change' event for respective university-widget
+        university_widget = $("select#student_belongs_to_university");
+        is_selected = university_widget.find(":selected").index();
+
+        if (is_selected) {
+          university_widget.trigger("change");
+        }
+        else {
+          // Disable College field, later on will be enabled after a university is selected
+          $("select#student_belongs_to_college").attr('disabled', 'disabled')
+        }
+        $("select#student_belongs_to_college option").each(function(){
+          if (college_name_str.trim() == $(this).text().trim()) {
+            $(this).attr("selected", true);
+            //$(this).parent().attr("disabled", "disabled");
+          }
+        });
+      {% endif %}    
+{% endblock %}
+

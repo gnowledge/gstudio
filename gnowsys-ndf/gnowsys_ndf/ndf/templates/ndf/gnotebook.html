@@ -1,0 +1,500 @@
+{% load get_course_filters get_username user_access_policy get_group_object get_gstudio_workspace_instance from ndf_tags %}
+{% user_access_policy groupid request.user as user_access_priv %}
+{% load simple_filters %}
+
+
+
+{% get_group_object group_id as group_object %}
+{% get_gstudio_workspace_instance as is_workspace %}
+
+{% include 'ndf/widget_user_access_modal.html' %}
+
+<div class="small-12 medium-12 large-12 columns" style="border:2px solid #80808038;">
+      {% if "CourseEventGroup" in node.member_of_names_list %}
+        {% get_course_filters group_id title as filter_dict %}
+        <input type="hidden"  class="title-for-filters" value="notebook">
+      {% else %}
+      <input type="hidden"  class="title-for-filters" value="notebook_lms">
+        {% get_course_filters group_id "notebook_lms" as filter_dict %}
+      {% endif %}
+    {% include "ndf/filters.html" with filter_dict=filter_dict %}
+
+</div>
+
+
+<div class="notebook">
+    {% comment %}
+    <div class="row notebook-header collapse">
+    </div>
+    {% endcomment %}
+
+    {% comment %}
+
+    <div class="row notebook-header collapse">
+        <div class="medium-6 columns filters">
+            <div class="row" data-equalizer>
+                <div class="medium-2 columns" data-equalizer-watch> View By</div>
+                <div class="medium-4 columns" data-equalizer-watch>
+                    <select>
+                        <option value="husker">User</option>
+                        <option value="husker">School</option>
+                        <option value="husker">Tags</option>
+                    </select>
+                </div>
+                <div class="medium-4 columns end" data-equalizer-watch>
+                    <select>
+                        <option value="husker">Pinky Bunny</option>
+                        <option value="husker">Fluffy Apple</option>
+                    </select>
+                </div>
+            </div>
+        </div>
+        <div class="medium-6 columns">
+            <div class="row">
+                <div class="medium-6 medium-offset-3 columns">
+                    <div class="row collapse prefix-round">
+                        <div class="small-3 columns">
+                          <span class="prefix">
+                              <i class="fi-magnifying-glass"></i>
+                          </span>
+                        </div>
+                        <div class="small-9 columns">
+                            <input type="text" placeholder="Search">
+                        </div>
+                    </div>
+                </div>
+                <div class="medium-3 columns">
+                    <!--a href="{% url 'page_create_edit' node.pk %}?course_event_id={{node.pk}}&blog_type=True" class="button tiny radius"><i class="fi-plus"></i>  New Note</a-->
+                    <a href="#" data-reveal-id="newNoteModal" class="button tiny radius"><i class="fi-plus"></i>  New Note</a>
+                </div>
+            </div>
+        </div>
+
+    </div>
+    {% endcomment %}
+    <!-- <div class="row notebook-header collapse">
+        <div class="small-12 medium-3 large-3 columns ">
+            <a href="{% url 'page_create_edit' group_name %}?course_event_id={{group_id}}&blog_type=True" class="button radius tiny" style="margin: 0em 0em 1em;">
+                <i class="fi-plus"></i>
+                New Note
+            </a>
+        </div>
+        <div class="small-12 medium-6 large-6 columns notes-count ">
+            <span>Notes</span><span>55</span>
+        </div>
+        <div class="small-12 medium-3 large-3 columns ">
+            <input type="text" placeholder="Search">
+        </div>
+    </div> -->
+    <div class="notebook-body">
+        <div class="small-12 medium-4 large-3 columns notebook-index panel">
+            <div class="row">
+                <div class="small-12 columns">
+                    <span style="font-size: 17px;margin: 7px 19px;display: inline-block;color: #6153AE;"> {% if 'Group' in group_object.member_of_names_list and 'base_unit' not in group_object.member_of_names_list %} Blogs {% else %} Notes {% endif %}</span>
+                    {% if request.user.is_authenticated %}
+                    {% comment %}
+                    <a href="#" data-reveal-id="newNoteModal" class="button expand radius" style="margin: 0em 0em 1em;"><i class="fi-plus"></i> </a>
+                    {% endcomment %}
+
+                    <a {% if user_access_priv == "allow" %} class=" add-note-btn button radius" title="Create Note" {% else %} class="bef-note-btn button radius user_not_enrolled" {% endif %}><i class="fi-plus"></i></a>
+
+                    {# <a class="add-note-btn"><i class="fi-plus"></i></a> #}
+<!--                     <a href="{% url 'page_create_edit' group_name %}?course_event_id={{group_id}}&blog_type=True" class="button radius" style="padding: 3px 11px;border-radius: 100%;float: right;margin: 5px 5px 8px 0px;border: 1px solid #6153AE;background: #fff;font-size: 23px;color: #6153AE;"><i class="fi-plus"></i></a>
+
+
+ -->                    {% endif %}
+                </div>
+            </div>
+
+            <ul class="tabs" data-tab style="">
+                <li class="tab-title {% ifequal tab 'all-notes' %} active{% endifequal %}"><a href="#all-notes" title="Notes created by all">
+                {% if 'Group' in group_object.member_of_names_list and 'base_unit' not in group_object.member_of_names_list %}All Blogs {% else %} All Notes {% endif %} ({{blog_pages.count}})</a></li>
+                {% if user.is_authenticated %}
+                    <li class="tab-title {% ifequal tab 'my-notes' %} active{% endifequal %}"><a href="#my-notes" title="Notes created by me"> {% if 'Group' in group_object.member_of_names_list and 'base_unit' not in group_object.member_of_names_list %}My Blogs {% else %} My Notes {% endif %} ({{user_blogs.count}})</a></li>
+                {% endif %}
+                {% comment %}
+                    <li class="tab-title"><a href="#my-drafts">My Drafts</a></li>
+                {% endcomment %}
+            </ul>
+
+            <div class="small-12 columns tabs-content">
+                <div class="content notes all-notes-tab{% ifequal tab 'all-notes' %} active{% endifequal %}" id="all-notes">
+                {% for each_blog in blog_pages %}
+                    {% comment %}
+                        <div class="date">
+                            December 2015
+                            <span class="notes-count right">2</span>
+                        </div>
+                    {% endcomment %}
+                    <a href="{% url 'course_notebook_note' group_name each_blog.pk %}" title="{{each_blog.content|safe|striptags|default_if_none:each_blog.name}}">
+
+                    <div class="note {% if node.pk == each_blog.pk %} active {% endif %}" id="{{each_blog.pk}}">
+                        <div class="note-heading"> {{each_blog.name}} </div>
+                        <div class="note-meta">
+                            <span title="{{each_blog.created_by|get_username}}">
+                                {{each_blog.created_by|get_username|truncatechars:"10"}}
+                            </span>
+                            &#8226;
+                            <span>{{each_blog.created_at|date:"d M Y h:i A"}}</span>
+                        </div>
+                        {% comment %}
+                        <div class="note-footer">
+                            <i class="fi-eye"></i>
+                            <span class="viewed-count">214</span>
+                            <i class="fi-like"></i>
+                            <span class="likes-count">10</span>
+                            <i class="fi-comments"></i>
+                            <span class="comment-count">22</span>
+                            <i class="fi-trash"></i>
+                        </div>
+                        {% endcomment %}
+
+                    </div>
+                    </a>
+                {% endfor %}
+                </div>
+
+                <div class="content notes my-notes-tab {% ifequal tab 'my-notes' %} active{% endifequal %}" id="my-notes">
+                {% for each_user_blog in user_blogs %}
+                    {% comment %}
+                        <div class="date">
+                            December 2015
+                            <span class="notes-count right">2</span>
+                        </div>
+                    {% endcomment %}
+                    <a href="{% url 'course_notebook_note' group_name each_user_blog.pk %}" title="{{each_user_blog.content|safe|striptags|default_if_none:each_user_blog.name}}">
+                    <div class="note {% if node.pk == each_user_blog.pk %} active {% endif %}" id="{{each_user_blog.pk}}">
+                        <div class="note-heading"> {{each_user_blog.name}} </div>
+                        <div class="note-meta">
+                            <span title="{{each_user_blog.created_by|get_username}}">
+                                {{each_user_blog.created_by|get_username}}
+                            </span>
+                            &#8226;
+                            <span>{{each_user_blog.created_at|date:"d M Y h:i A"}}</span>
+                        </div>
+                        {% comment %}
+                        <div class="note-footer">
+                            <i class="fi-eye"></i>
+                            <span class="viewed-count">214</span>
+                            <i class="fi-like"></i>
+                            <span class="likes-count">10</span>
+                            <i class="fi-comments"></i>
+                            <span class="comment-count">22</span>
+                            <i class="fi-trash"></i>
+                        </div>
+                        {% endcomment %}
+
+                    </div>
+                    </a>
+                {% endfor %}
+                </div>
+
+                {% comment %}
+                <div class="content notes" id="my-drafts"> </div>
+                {% endcomment %}
+
+            </div>
+        </div>
+            <div class="small-12 medium-7 large-7 columns note-page panel">
+               {% if node %}
+                   {% include "ndf/note_page.html" %}
+               {% endif %}
+           </div>
+        </div>
+</div>
+
+{# {% include "ndf/add_new_note.html" %} #}
+{# {% include "ndf/gcomment.html" %} #}
+{% comment %}
+{% verbatim %}
+<script id="note-card-temp" type="text/x-handlebars-template">
+    <div class="small-4 columns">
+        <div class="note-card" data-note-id={{id}}>
+            <div class="note-heading">{{name}}</div>
+            <div class="note-summary">{{summary}}</div>
+            <div class="note-info">{{teacher}}&nbsp;&#8226;&nbsp;{{date}}&nbsp;&#8226;&nbsp;{{time}}</div>
+            <div class="note-extra-data">
+                <i class="fa fa-eye"></i>
+                <span>{{views}}</span>
+                <i class="fa fa-smile-o"></i>
+                <span>{{likes}}</span>
+                <i class="fa fa-comment-o"></i>
+                <span>{{comments}}</span>
+            </div>
+            <div class="note-tags">
+                {{#each tags}}
+                <span>
+                    {{this}}
+                </span>
+                {{/each}}
+            </div>
+            <div class="note-actions">
+                <i class="fa fa-trash-o"></i>
+                <span>Delete</span>
+                <i class="fa fa-flag"></i>
+                <span>Report</span>
+            </div>
+        </div>
+    </div>
+</script>
+<script id="note-card-exp-temp" type="text/x-handlebars-template">
+    <div class="small-12 columns">
+        <div class="note-details" data-note-id='note_{{id}}'>
+            <div class="note-heading">{{name}}</div>
+            <div class="note-close">&times;</div>
+            <div class="note-summary">{{noteText}}</div>
+            <div class="note-info">{{teacher}}&nbsp;&#8226;&nbsp;{{date}}&nbsp;&#8226;&nbsp;{{time}}</div>
+            <div class="note-extra-data">
+                <i class="fa fa-eye"></i>
+                <span>{{views}}</span>
+                <i class="fa fa-smile-o"></i>
+                <span>{{likes}}</span>
+                <i class="fa fa-comment-o"></i>
+                <span>{{comments}}</span>
+            </div>
+            <div class="note-tags">
+                {{#each tags}}
+                <span>
+                    {{this}}
+                </span>
+                {{/each}}
+            </div>
+            <div class="note-actions">
+                <i class="fa fa-trash-o"></i>
+                <span>Delete</span>
+                <i class="fa fa-flag"></i>
+                <span>Report</span>
+            </div>
+        </div>
+    </div>
+</script>
+
+{% endverbatim %}
+{% endcomment %}
+<script type="text/javascript" src="/static/ndf/bower_components/ckeditor/ckeditor.js"></script>
+<script type="text/javascript" src="/static/ndf/bower_components/ckeditor/config.js"></script>
+<script type="text/javascript">
+
+    // var notes = [{
+    //     id: 1,
+    //     name: 'BLOG 1',
+    //     summary: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Pellentesque vel dapibus sem. Suspendisse non ex nulla. Pellentesque cursus, neque vitae sodales pellentesque, urna libero sagittis justo, vitae suscipit leo eros vitae velit. Vestibulum vitae euismod velit...',
+    //     noteText: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Pellentesque vel dapibus sem. Suspendisse non ex nulla. Pellentesque cursus, neque vitae sodales pellentesque, urna libero sagittis justo, vitae suscipit leo eros vitae velit. Vestibulum vitae euismod velit. Sed vitae volutpat ligula. Praesent congue ipsum ut metus pretium vestibulum. Phasellus at molestie turpis.',
+    //     teacher: 'Madam X',
+    //     date: '25 Dec 2015',
+    //     time: '3 PM',
+    //     views: '55',
+    //     likes: '125',
+    //     comments: '56',
+    //     tags: ['tag1', 'tag2'],
+
+    // },
+    // {
+    //     id: 2,
+    //     name: 'BLOG 2',
+    //     summary: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Pellentesque vel dapibus sem. Suspendisse non ex nulla. Pellentesque cursus, neque vitae sodales pellentesque, urna libero sagittis justo, vitae suscipit leo eros vitae velit. Vestibulum vitae euismod velit...',
+    //     noteText: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Pellentesque vel dapibus sem. Suspendisse non ex nulla. Pellentesque cursus, neque vitae sodales pellentesque, urna libero sagittis justo, vitae suscipit leo eros vitae velit. Vestibulum vitae euismod velit. Sed vitae volutpat ligula. Praesent congue ipsum ut metus pretium vestibulum. Phasellus at molestie turpis.',
+    //     teacher: 'Madam X',
+    //     date: '25 Dec 2015',
+    //     time: '3 PM',
+    //     views: '55',
+    //     likes: '125',
+    //     comments: '56',
+    //     tags: ['tag1', 'tag2'],
+
+    // },
+    // {
+    //     id: 3,
+    //     name: 'BLOG 3',
+    //     summary: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Pellentesque vel dapibus sem. Suspendisse non ex nulla. Pellentesque cursus, neque vitae sodales pellentesque, urna libero sagittis justo, vitae suscipit leo eros vitae velit. Vestibulum vitae euismod velit...',
+    //     noteText: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Pellentesque vel dapibus sem. Suspendisse non ex nulla. Pellentesque cursus, neque vitae sodales pellentesque, urna libero sagittis justo, vitae suscipit leo eros vitae velit. Vestibulum vitae euismod velit. Sed vitae volutpat ligula. Praesent congue ipsum ut metus pretium vestibulum. Phasellus at molestie turpis.',
+    //     teacher: 'Madam X',
+    //     date: '25 Dec 2015',
+    //     time: '3 PM',
+    //     views: '55',
+    //     likes: '125',
+    //     comments: '56',
+    //     tags: ['tag1', 'tag2'],
+
+    // },
+    // {
+    //     id: 4,
+    //     name: 'BLOG 4',
+    //     summary: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Pellentesque vel dapibus sem. Suspendisse non ex nulla. Pellentesque cursus, neque vitae sodales pellentesque, urna libero sagittis justo, vitae suscipit leo eros vitae velit. Vestibulum vitae euismod velit...',
+    //     noteText: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Pellentesque vel dapibus sem. Suspendisse non ex nulla. Pellentesque cursus, neque vitae sodales pellentesque, urna libero sagittis justo, vitae suscipit leo eros vitae velit. Vestibulum vitae euismod velit. Sed vitae volutpat ligula. Praesent congue ipsum ut metus pretium vestibulum. Phasellus at molestie turpis.',
+    //     teacher: 'Madam X',
+    //     date: '25 Dec 2015',
+    //     time: '3 PM',
+    //     views: '55',
+    //     likes: '125',
+    //     comments: '56',
+    //     tags: ['tag1', 'tag2'],
+
+    // }];
+
+    // $(function(){
+    //     var noteCardSource   = $("#note-card-temp").html();
+    //     var noteTemplate = Handlebars.compile(noteCardSource);
+    //     $("#note-card-cotainer").empty();
+    //     notes.forEach(function(note, pos){
+    //         //console.log(noteTemplate(note));
+    //         if(pos % 3 === 0) {
+    //             $('#note-card-cotainer').append('<div class="row"></div>');
+    //         }
+    //         $("#note-card-cotainer").find(".row:last-child").append(noteTemplate(note));
+    //     });
+
+    //     var noteDetailsSource   = $("#note-card-exp-temp").html();
+    //     var noteDetailsTemplate = Handlebars.compile(noteDetailsSource);
+
+    //     $("#note-card-cotainer").on('click', '.note-card', function(e){
+    //         e.stopPropagation();
+    //         $('div[data-note-id ^= note_]').closest('.row').remove();
+    //         var noteId = $(this).closest('.note-card').attr('data-note-id');
+    //         var noteObj = notes.filter(function(note){
+    //             console.log(note);
+    //             return note.id == noteId;
+    //         })[0];
+    //         var noteDetails = $('<div class="row note-expanded"></div>').append(noteDetailsTemplate(noteObj));
+    //         if(!$('div[data-note-id = note_' + noteObj.id + ']').length) {
+    //             $(this).closest('.row').after(noteDetails);
+    //         }
+    //     })
+    //     $("#note-card-cotainer").on('click', '.note-close', function(e){
+    //         e.stopPropagation();
+    //         $(this).closest('.row').remove();
+    //     });
+    // })
+    /*
+    $('.notebook-index .notes').on('click', '.note', function() {
+        $(this).siblings().removeClass('active');
+        $(this).addClass('active');
+        node_id = $(this).attr('id')
+        $.ajax({
+          url: "{% url 'course_note_page' group_id %}",
+
+          data: {
+            node_id: node_id
+          },
+
+          type: "GET",
+
+          dataType: "html",
+
+          success: function(data){
+            $(".note-page").show().html(data);
+          },
+        });//end of ajax
+    });
+    */
+
+    $(function() {
+        // //New Note section
+        $("#newNoteModal").on('click', 'save-note', function() {
+            //Necessary ajax call
+        });
+        $("#newNoteModal").on('click', 'delete-note', function() {
+            //Necessary ajax call
+        });
+        $("#newNoteModal").on('click', 'publish-note', function() {
+        //     //Necessary ajax call
+        });
+
+
+        $(document).on('opened.fndtn.reveal', '#newNoteModal[data-reveal]', function (e) {
+            e.stopPropagation();
+            e.preventDefault();
+            if(!CKEDITOR.instances['textarea-add-note']){
+                CKEDITOR.replaceAll('textarea-add-note',{
+                    enterMode : 'GeneralToolbar', //override default behaviour that adds <p></p> in ck editor
+                    toolbar:'basic',
+                    uiColor:'#f2f2f2',
+                    textarea_id: 'textarea-add-note'
+                });
+            }
+        });
+        $(document).on('closed.fndtn.reveal', '#newNoteModal[data-reveal]', function () {
+            if (CKEDITOR.instances['textarea-add-note']) {
+                CKEDITOR.instances['textarea-add-note'].destroy(true);
+            }
+        });
+
+        //Rating system
+    });
+
+    $("body").on('mouseenter', '.rate-scale i', function() {
+        $(this).nextAll().add($(this)).addClass('hover-rating');
+    });
+    $("body").on('mouseleave', '.rate-scale i', function() {
+        $(this).nextAll().add($(this)).removeClass('hover-rating');
+    });
+
+    $("body").on('click', '.rate-scale i' ,function() {
+        $(this).siblings().removeClass('rated');
+        $(this).nextAll().add($(this)).addClass('rated');
+    });
+
+    function applyFilter(filtersObjArr){
+        filtersObjArr = JSON.stringify(getFiltersObjsInAndOrFormat());
+        title = $(".title-for-filters").val();
+        $.ajax({
+          url: "{% url 'course_filters' group_id %}",
+          data: {
+            filter_dict: filtersObjArr,
+            'filter_applied': 'True',
+            'title': title
+          },
+          type: "GET",
+          dataType: "html",
+          success: function(data){
+            if(data == "reload"){
+                location.reload()
+            }
+            else{
+                $(".note-page").html(data)
+            }
+          },
+        });//end of ajax
+    }
+    $(document).on('click', '.add-note-btn', function() {
+        load_page_create_edit()
+    });
+
+    function load_page_create_edit(node_id){
+            editor_type = "";
+            if("{{is_workspace}}" == "True"){
+                editor_type = "GeneralToolbar";
+            }
+            else{
+
+                editor_type = "LMSStudentsToolbar";
+            }
+        $.ajax({
+          url: "{% url 'widget_page_create_edit' group_id %}",
+
+          data: {
+            node_id: node_id,
+            detail_url: "course_notebook_note",
+            editor_type: editor_type,
+          },
+
+          type: "GET",
+
+          dataType: "html",
+
+          success: function(data){
+            $(".note-page").html(data);
+            $("input.node_name").focus()
+            window.scrollTo(0,250);
+          },
+        });//end of ajax
+
+    }
+
+    $(document).ready(function(){
+        {% if create_flag %}
+            load_page_create_edit()
+        {% endif %}
+
+    })
+</script>

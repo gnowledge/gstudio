@@ -1,0 +1,143 @@
+{% extends "ndf/node_details_base.html" %}
+{% load ndf_tags %}
+{% load i18n %}
+{% block title %} {{title}} {{node.name}}{% endblock %}
+{% block url %}{% url 'create_edit' groupid node %}{% endblock %}
+
+<!-- overide head block from base.html -->
+{% block head %}
+  <!-- <script src="/static/ndf/js/tree.jquery.js"></script> -->
+  <script src="/static/ndf/bower_components/jqtree/tree.jquery.js"></script> <!-- checked -->
+{% endblock %}
+{% block style %}
+{{ block.super }}
+	.questions_table{
+		width: 150%;
+	}
+{% endblock %}
+<!-- overiding block from node_detail_base.html -->
+
+{% block collection_content %}
+      {% check_is_gstaff groupid request.user as is_gstaff %}
+      {% if is_gstaff or request.user.id == node.created_by %}
+        <span data-tooltip title="Edit this Course"><a class="fi-pencil tiny button" href="{% url 'quiz_edit' group_id node.pk %}">Edit this Quiz</a></span>
+
+	    <span>  <a href="{% url 'quiz_item_create' group_name_tag %}?quiznode={{node.pk}}" class="tiny button">Add Question</a>
+
+		</span>
+      {% endif %}
+
+{% endblock %}
+
+<!-- overiding block from node_detail_base.html -->
+{% block body_content %}
+{% get_group_name groupid as group_name_tag %}
+{% check_is_gstaff groupid request.user as gstaff_access %}
+
+<div class="row">
+<section class="medium-8 columns" >
+	<!-- Tabs -->
+	<div class="small-12 columns">
+		<dl class="tabs" data-tab> 
+			<dd class="tab-title active ">
+			<a href="#about"><i class="fi-info"></i> {% trans "About" %}</a>
+			</dd>
+
+			<dd class="tab-title ">
+			<a href="#questions"><i class="fi-lightbulb"></i> {% trans "Questions" %}</a>
+			</dd>
+    	</dl>
+    </div>        
+    <div class="small-12 columns">
+		<div class="tabs-content">
+			<div class="content active" id="about">
+				<div class="row">
+					<div class="row">
+						<div class="small-2 columns">
+							{% trans "Description :" %}
+						</div>
+						<div class="small-10 columns">
+							{% firstof node.content_org "<i>No Description added yet!</i>" %}
+						</div>
+					</div>
+
+					<div class="row">
+						<div class="small-2 columns">
+							{% trans "Tags :" %}
+						</div>
+						<div class="small-10 columns">
+							{% for each_tag in node.tags %}
+								<a href="{% url 'tag_info' groupid each_tag %}" title="{{each_tag}}">{{each_tag}}{% if not forloop.last %},{% endif %}</a>
+							{% empty %}
+								{% trans "No tags have been added yet!" %}
+							{% endfor %}
+						</div>
+					</div>
+				
+					
+				</div>
+			</div>
+
+			<div class="content" id="questions">
+					<div class="row">
+					<div class="small-12 columns text-center">
+					{% if quiz_item_nodes %}
+						<table class="questions_table">
+							<thead>
+								<tr>
+									<td>{% trans "Sr. No " %}</td>
+									<!-- <td>{% trans "Name" %}</td> -->
+									<td>{% trans "Question" %}</td>
+									<td>{% trans "Type" %}</td>
+									<td>{% trans "Options" %}</td>
+									{% comment %}
+									<td>{% trans "Add to 'Question Library' " %}</td>
+									{% endcomment %}
+				                	{% if request.user.id == node.created_by or gstaff_access %}
+										<td>{% trans "Edit " %}</td>
+									{% endif %}
+
+								</tr>
+							</thead>
+							<tbody>
+							{% for each_question in quiz_item_nodes %}
+								<tr>
+									<td>{{forloop.counter}}</td>
+									<!-- <td>{{each_question.name}}</td> -->
+									<td>{{each_question.content_org}}</td>
+									<td>{{each_question.quiz_type}}</td>
+									{% if each_question.quiz_type == "Short-Response" %}
+										<td><i>{% trans "Not Applicable" %}</i></td>
+									{% else %}
+									<td>
+									{% for each_opt in each_question.options %}
+										{{each_opt}}{% if not forloop.last %},{% endif %}
+									{% endfor %}
+									</td>
+									{% endif %}
+									{% comment %}
+									<td><input type="button" value="Yes" class="button tiny add_qtn_lib"></td>
+									{% endcomment %}
+			                		{% if request.user.id == node.created_by or gstaff_access %}
+										<td><a  title="Edit this Question" class="button tiny" href="{% url 'quiz_item_edit' group_id each_question.pk %}">{% trans "Edit" %}</a></td>
+			                		{% endif %}
+								</tr>
+							{% endfor %}
+							</tbody>
+						</table>
+					{% else %}
+						<i>{% trans "No Questions have been added yet!" %}</i>
+
+					{% endif %}
+					</div>
+					</div>
+
+			</div>
+		</div>
+	</div>
+</section>
+
+</div>
+
+{% endblock %}
+

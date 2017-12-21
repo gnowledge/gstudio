@@ -1,0 +1,147 @@
+#+TITLE: Feature list of gStudio 
+
+GNOWSYS-studio (gstudio for short) is a feature rich online
+collaborative application/resource creation, curation and publication
+framework. The following is a list of such features with breif
+description of what is expected from each feature.
+
+* Pages: A base App
+** DONE Collaboratively edit pages
+** DONE text processing using orgmode (JS plain text editor with orgmode menu)
+** DONE support for LaTeX using MathJax
+** DONE simultaneous editing of the same document by more than one user
+* File upload/download
+** DONE upload and download files as resources
+** DONE create collections of resources (both homogeneous and heterogeneous)
+** DONE seggregate files according to mimetype
+* Organizing resources as ordered and hierarchical collections
+** DONE Themes
+** DONE Sub-Themes
+** DONE Topics
+* General Features
+** Users
+*** DONE registration
+*** DONE login
+*** DONE forgotten password
+*** TODO socialauth support
+** DONE Cross publication of pages and resources
+** Groups
+*** DONE creation of project groups for collabroation
+*** DONE Selection of Apps for each group
+*** DONE join and remove subsrribers from groups 
+*** DONE support for public project groups
+*** DONE PARTIAL-COMPLETE support for private project groups
+*** TODO groups and subgroups
+*** DONE listing members for private groups for members only
+*** DONE PARTIAL-COMPLETE subscribe and unsubscribe from groups by group admin/moderator
+*** DONE support for multi-level moderated groups (public or private)
+*** TODO encrypted groups based on web-of-trust
+** TODO social networking
+*** TODO share (broadcast to other social media sites)
+*** TODO microblog (broadcast to other social media sites)
+*** TODO blog
+*** DONE online meetings (synchronous/scheduled)
+*** DONE one-2-one
+*** DONE conference with more than two
+** Search
+*** DONE context based search
+*** DONE generic site-wide search
+*** DONE resource filtering 
+** Version Control
+*** DONE versioning data
+*** DONE versioning metadata
+*** TODO versioning files
+** DONE user dashboard
+** PARTIALLYDONE shelf: bookmarking resources from the site
+** ONGOING context based help
+** PARTIALLYDONE Responsive frontend suitable for desktop, tablets, phones etc.
+** DONE location widget using GeoJSON and open street map
+** DONE discussion thread for each resource
+** DONE rating of resources
+** DONE intimation to collaborating users of the activity on the site
+** ONGOING Image viewer
+** ONGOING Video viewer
+** DONE Pan.do/ra video support
+** DONE admin: user management
+** DONE tags
+** DONE translations
+*** DONE of the UI interface through PO files
+*** DONE of the data and metadata through the user interface
+** TODO tag cloud
+** Intimation
+*** DONE Registration
+*** DONE subscription to a group
+*** DONE reporting changes to collaborators
+*** DONE moderators
+*** TODO members of a group based on configuration
+*** DONE members in a forum
+** ONGOING sms and email support for interacting with the portal
+** TODO dynamic template variable support while composing text
+** PARTIALLYDONE data visualization app
+* Custom Online Application Designer
+** DONE Creation of new Systemtypes (internal name for classes)
+** DONE Creation of Relation Types
+** DONE Creation of Attribute Types
+** DONE Application as a collection of System Types 
+** DONE designing new Apps (custom applications)
+** PARTIALLYDONE automatic form builder based on the design of the classes of an app
+** ONGOING native widgets and validation of standard datatypes and regular expressions
+** ONGOING download and upload custom app schema, with and without data.
+** PARTIALLYDONE custom templates for custom apps
+* SVG graphs: support for three kinds of graphs:
+** DONE hierarchical tree graph based on colection
+** DONE dependency graph to create teaching/learning sequence based on priornode or recommended navitation
+** DONE semantic network (concept mapping) 
+* Discussion Forums
+** DONE threads,
+** DONE messages and
+** DONE replies
+* Making Course Ware collaboratively
+** DONE Collections of Resources
+** DONE Authoring Quiz
+** DONE Module builder: freeze a snapshot of hierarchical collection into a non**editable resource (meant for modules of a course, or finalizing collaboratively written documents)
+** DONE Course builder: an ordered collection of modules
+** TODO export of modules, collections and courses for download
+*** HTML
+*** PDF
+*** LaTex 
+*** ODT
+** TODO course player
+** TODO enrolement to the course
+** TODO evaluation
+** TODO reports
+*** to the student
+*** to the mentors
+*** to the admins
+* DONE Management of Students, Trainers, Mentors, Fellows 
+* ONGOING distributed p2p sync between servers based on group mirroring
+* Application for citizen science projects
+** DONE Observations app
+* Extra feathers to be added to the cap of gstudio!
+** DONE Audio, video meetings
+** TODO Badges
+** TODO Multi-lingual dictionary/thesaurus wordnet 
+** PARTIALLYDONE Text annotation and analysis
+** Integrating with other popularly used applications
+*** PARTIALLYDONE gnu mailman (mailing list) integration
+*** PARTIALLYDONE wikimedia integration
+*** PARTIALLYDONE zotero integration
+** DONE  Task management
+*** DONE creation of a task
+*** DONE assigning to a member of the group
+*** DONE task assigned to multiple members of a group
+*** DONE task assigned to more than one member expecting any member to complete the task
+*** DONE status modification
+*** DONE discussion
+*** DONE tags
+*** DONE calendar view
+
+   
+* Project Ideas for Interns
+
+** concept mapping 
+** custom app designer
+** analytics
+*** reputation analysis
+*** badges
+** wordnet

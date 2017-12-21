@@ -1,0 +1,258 @@
+<!DOCTYPE html>
+<html xmlns:xlink="http://www.w3.org/1999/xlink">
+<head>
+	<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+
+	<!-- Scripts required for D3 graph -->
+	<script type="text/javascript" src="/static/ndf/bower_components/d3/d3.min.js"></script> <!-- checked -->
+	<script type="text/javascript" src="/static/ndf/bower_components/underscore/underscore.js"></script> <!-- checked -->
+	<script sync="text/javascript" src="/static/ndf/bower_components/FileSaver/FileSaver.js" ></script> <!-- checked -->
+	<script type="text/javascript" src="/static/ndf/bower_components/jquery/dist/jquery.js"></script>	
+
+	<style type="text/css">
+
+		.node circle {
+			cursor: pointer;
+			stroke: #00ba7b;
+			stroke-width: 1.5px;
+		}
+
+		.node text {
+			font: 14px sans-serif;
+			pointer-events: none;
+		}
+
+		line.link {
+			fill: none;
+			stroke: #00ba7b;
+			stroke-width: 1.5px;
+			stroke-opacity: 1.0;
+		}
+		
+		marker#arrow {
+			fill: #006f49;
+		}
+
+	</style>
+
+</head>
+
+<body>
+	<div class="row" data-loc="{{request.META.PATH_INFO}}" id="graphArea">
+		
+		<div class="small-3 columns">
+			<br/>
+			<h5>Sort by: </h5>
+			<hr/>
+			<input type="radio" name="degree" value="1"> Current node<br>
+			<input type="radio" name="degree" value="2"> Associated nodes<br>
+			<input type="radio" name="degree" value="3" checked="checked"> Associated nodes node<br>
+		</div>
+
+		<div class="small-6 small-pull-3 columns">
+			<div id="chart" data-graph="{{graphData}}"></div>
+		</div>
+
+	</div>
+	<script type="text/javascript">
+
+	var loc = ($('#graphArea').attr("data-loc")).split("/")[3];
+
+	if( loc != "details") {
+		$("#graphArea").hide();
+	}
+
+	var w = 400,
+		h = 300,
+		root,
+		jsonData = $.parseJSON($("#chart").attr("data-graph"));
+	
+
+	var force = d3.layout.force()
+    				.linkDistance(100)//this is distance between two nodes.
+				    .charge(-200)     //this is attraction betweeb nodes.
+				    .gravity(0.05)    //gravity ensures that graph will not get out of border.
+				    .size([w, h]);
+
+	var vis = d3.select("#chart").append("svg:svg")
+	.attr("width", w)
+	.attr("height", h);
+
+	//adding json file :
+	d3.json(jsonData, function(json) { root = jsonData; update();} );
+	
+	//define marker of Arrow.
+	vis.append("svg:defs").append("svg:marker")
+	.attr("id", "end-arrow")
+	.attr("viewBox", "0 0 10 10")
+	.attr("refX", 20)
+	.attr("refY", 5)
+	.attr("markerUnits","strokeWidth")
+	.attr("markerWidth", 10)
+	.attr("markerHeight", 5)
+	.attr("orient", "auto")
+	.append("svg:path")
+	.attr("d","M 0 0 L 10 5 L 0 10 z")
+	.attr("fill", "#009bba"); 
+
+	var totalnodes,fix;
+
+	function update() 
+	{
+	  	  var nodes = flatten(root), 	
+	  	  links = d3.layout.tree().links(nodes);
+	  	  totalnodes = nodes;
+	  	  fix = nodes;
+
+		  // Restart the force layout.
+		  force
+		  .nodes(nodes)
+		  .links(links)
+		  .start();
+
+		  // Update the links…
+		  var link = vis.selectAll("line.link")
+		  .data(links, function(d) { return d.target.id; });
+
+		  // Enter any new links.
+		  link.enter().insert("svg:line", ".node")
+		  .attr("class", "link")	  
+		  .attr("x1", function(d) { return d.source.x; })
+		  .attr("y1", function(d) { return d.source.y; })
+		  .attr("x2", function(d) { return d.target.x; })
+		  .attr("y2", function(d) { return d.target.y; })
+		  .attr("marker-end", "url(#end-arrow)");
+
+		  // Exit any old links.
+		  link.exit().remove();
+
+		  // Update the nodes…
+		  var node = vis.selectAll("g.node")
+		  .data(nodes, function(d) { return d.id; })
+
+		  node.select("circle")
+		  .style("fill", color);
+
+		  // Enter any new nodes.
+		  var nodeEnter = node.enter().append("svg:g")
+		  .attr("class", "node")
+		  .attr("degree",function(d){return d.degree?d.degree:9999;})
+		  .attr("transform", function(d) { return "translate(" + d.x + "," + d.y + ")"; })
+		  .on("click", click)
+		  .call(force.drag);
+
+		  nodeEnter.append("svg:a") //To append hyperlink to circle
+		  .attr("class", "node")
+		  .attr("xlink:href", function(d){return d.url;})	
+		  	.append("svg:circle")   //To append circle.
+		  	.attr("r", function(d) { return d.size || 4.5; })
+		  	.style("fill", color);
+
+		  //Appending tooltip to circle.	
+		  nodeEnter.append("svg:title")
+		  .text(function(d) { return d.name; });      	
+
+		  //Appending text to circle.	
+		  nodeEnter.append("svg:text")
+		  .attr("text-anchor", "middle")
+		  .attr("dy", "-0.50em")
+		  .text(function(d) { return d.name; });      	
+
+	  	  // Exit any old nodes.
+	  	  node.exit().remove();
+
+	 	  // Re-select for update.
+	 	  link = vis.selectAll("line.link");
+	 	  node = vis.selectAll("g.node");
+
+	 	  force.on("tick", function() 
+	 	  {
+	 	  	link.attr("x1", function(d) { return d.source.x; })
+	 	  	.attr("y1", function(d) { return d.source.y; })
+	 	  	.attr("x2", function(d) { return d.target.x; })
+	 	  	.attr("y2", function(d) { return d.target.y; });
+
+	 	  	node.attr("transform", function(d) { return "translate(" + d.x + "," + d.y + ")"; });
+	 	  });
+	}//end of Update() 
+
+	function color(d) {
+	  	return d._children ? "#003b27" : d.children ? "#006f49" : "#bfedde"; 
+	}
+	
+	function click(d) 
+	{	
+		if (d.children)
+		{
+		  	d._children = d.children;
+		  	d.children = null;
+	  	}
+  	  	else 
+	  	{
+	  	  	d.children = d._children;
+	  	  	d._children = null;
+	  	}
+	  	update();
+	}
+
+	function flatten(root) 
+	{
+		var nodes = [], i = 0;
+
+		function recurse(node) 
+		{
+			if (node.children) 
+				node.children.forEach(recurse);
+
+			if (!node.id)
+				 node.id = ++i;		//id field is inserted for each node
+
+				nodes.push(node);
+		}
+			recurse(root);  
+			return nodes;
+	}
+
+	$( document ).ready(function() 
+	{
+		$("input[type='radio']").change( function() 
+		{
+			var i, degreeSelection = $(this).attr("value");           	
+			var l = totalnodes.length;
+
+			for(i=0; i < l ; i++){           		
+				if(totalnodes[i].degree){            		
+					if( (totalnodes[i].degree < degreeSelection) ){
+	           			if (!totalnodes[i].children){
+	           				totalnodes[i].children = totalnodes[i]._children;
+	           				totalnodes[i]._children = null;
+	           			}
+	           		}
+	           		
+	           		if(totalnodes[i].degree >= degreeSelection){
+	           			  if (totalnodes[i].children){
+	           			  	totalnodes[i]._children = totalnodes[i].children;
+	           			  	totalnodes[i].children = null;
+	           			}
+	           		}	            		
+	           	}
+	        }
+	        update();
+
+	        for(i=0;i<totalnodes.length;i++){
+	           	if(totalnodes[i].degree){	
+	           		if( (totalnodes[i].degree < degreeSelection) ){
+	           			if (!totalnodes[i].children){
+	           				totalnodes[i].children = totalnodes[i]._children;
+	           				totalnodes[i]._children = null;
+	           				}						 
+	           			}
+	           		}
+	           	}
+	        update();
+	    });
+	});
+
+</script>
+</body>
+</html>

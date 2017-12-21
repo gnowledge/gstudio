@@ -1,0 +1,758 @@
+{% extends "ndf/base.html" %}
+{% load i18n %}
+{% load ndf_tags %}
+{% load pagination_tags %}
+
+{% block title %} {{ title }} {% endblock %}
+
+{% block head%}
+  {{block.super}}
+
+  <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+
+  <!-- Scripts required for D3 graph -->
+  <script type="text/javascript" src="/static/ndf/bower_components/d3/d3.min.js"></script> <!-- checked -->
+  <script type="text/javascript" src="/static/ndf/bower_components/underscore/underscore.js"></script> <!-- checked -->
+  <script sync="text/javascript" src="/static/ndf/bower_components/FileSaver/FileSaver.js" ></script> <!-- checked -->
+{% endblock %}
+
+{% block style %}
+  {{block.super}}
+
+  /* Setting css-properties for app-set in left panel */
+    .active-app-set, .active-app-set-edit, .active-app-set-view {
+      /*padding:0.5em 0 0.5em 0.5em; */
+      /*margin-left: -10px !important;*/
+      background-color:#efefef;
+    }
+
+    .active-app-set-edit {
+      border-right: 4px solid #808080;
+      font-weight: bold;
+    }
+
+    .active-app-set-view {
+      border-left: 4px solid #808080;
+      font-weight: bold;
+    }
+{% endblock %}
+
+{% block meta_content %}
+  {% check_is_gstaff groupid request.user as gstaff_access %}
+
+  <ul class="side-nav"> 
+  	<li>
+  		<a></a>
+  	</li>
+
+    {% for each in app_collection_set %}
+    {% get_memberof_objects_count each.pk groupid as count %}
+
+    {% if app_set_id == each|safe %}
+      {% if '/new/' in request.path %}
+      <li class="active-app-set-edit">
+      {% else %}
+      <li class="active-app-set-view">
+      {% endif %}
+    {% else %}
+    <li>
+    {% endif %}
+    
+      <div class="row">
+        {% if each.type_of or each.name == "Caste" or each.name == "NUSSD Course" %}
+          {% if app_name == "MIS" %}
+          <a class="small-8 columns" href="{% url 'mis:mis_app_detail' groupid app_id each.pk %}" title="View all {{each.name}}'s">
+          {% else %}
+          <a class="small-8 columns" href="{% url 'mis-po:mis_app_detail' groupid app_id each.pk %}" title="View all {{each.name}}'s">
+          {% endif %}
+            {{each.name}} ({{count}})
+          </a>
+
+          {% if gstaff_access %}
+          {% if app_name == "MIS" %}
+          <a class="small-4 columns" href="{% url 'mis:mis_app_instance_create' groupid app_id each.pk %}" title="Add {{each.name}}">
+          {% else %}
+          <a class="small-4 columns" href="{% url 'mis-po:mis_app_instance_create' groupid app_id each.pk %}" title="Add {{each.name}}">
+          {% endif %}
+            +&nbsp;Add
+          </a>
+          {% endif %}
+
+        {% else %}
+          {{each.name}}
+        {% endif %}
+      </div>
+  	</li>
+
+  	{% endfor %}
+  </ul>
+{% endblock %}
+
+{% block body_content %} 
+  {# template for showing apt_set_instance details #}
+
+  {% if app_set_instance_template %}
+
+    <!-- Consistent details-view -->
+    {% if user.is_authenticated %}
+      <a id="toggle-shelf" class="right-off-canvas-toggle right" ><i class='fi-book-bookmark'></i></a> 
+    {% endif %}
+
+    <!-- Header of the page -->
+
+    <header class="row page">
+
+      <section class="medium-12 columns" >
+        <h2>
+        	<span class='node'>{{node.name}}</span>
+        	<small class="label-list"> 
+        
+        	  {% for tag in node.tags %}
+          	  <a href="{% url 'tag_info' groupid tag %}"><span class="label">{{tag}}</span></a>
+        	  {% endfor %}
+        
+        	</small>      
+        </h2>
+
+        <dl class="row tabs" data-tab data-options="deep_linking:true">
+
+        	<dd class="active"><a href="#view-page"><i class="fi-eye"></i>{% trans "Read" %}</a></dd>
+          <dd ><a href="#view-scheduler-calendar"><i class="fi-calendar"></i> {% trans "Events" %} </a></dd>
+          <dd>
+            <a href="#" data-dropdown="graph-hover" data-options="is_hover:true"><i class="fi-share"></i>{% trans "Graph" %}</a>
+            <ul id="graph-hover" class="f-dropdown" data-dropdown-content>
+              <li><a href="#view-concept-graph" data-reveal-id="view-concept-graph">{% trans "Concept Graph" %}</a></li>
+              {% if node.collection_set %}
+              <li><a href="#view-collection-graph" data-reveal-id="view-collection-graph">{% trans "Collection Graph" %}</a></li>
+              {% endif %}
+              {% if node.prior_node %}
+              <li><a href="#view-dependency-graph" data-reveal-id="view-dependency-graph">{% trans "Dependency Graph" %}</a></li>
+              {% endif %}
+            </ul>
+          </dd>
+          <dd><a href="#view-map-widget" data-reveal-id="view-map-widget"><i class="fi-marker"></i>{% trans "Location" %}</a></dd>
+          <dd><a href="#view-comments"><i class="fi-comment"></i> {% trans "Discuss" %}</a></dd>
+
+        </dl>
+      </section>
+      
+    </header>
+
+
+    <div class="row">
+
+      <section class="medium-9 columns">
+        <div class="tabs-content">
+
+        	<!-- Read Tab content -->
+          <div id="view-page" class="content active">
+
+            {% if mime_type %}
+            <div class="row">
+              {% if "image" in mime_type %}
+              <a class="small-12 columns" href="{% url 'file_detail' groupid system_id %}">
+                <img src="{% url 'getFileThumbnail' groupid system_id %}" />
+              </a>
+
+              {% elif "video" in mime_type %}
+              <a class="small-12 columns" href="{% url 'file_detail' groupid system_id %}">
+                <img src="{% url 'getFileThumbnail' groupid system_id %}" />
+              </a>
+
+              {% else %}
+              <a class="small-12 columns" href="{% url 'file_detail' groupid system_id %}">
+                <font size="3">{{app_set_instance_name}}</font>
+              </a>
+
+              {% endif %}
+            </div>
+            {% endif %}
+            
+
+            {% if node.content %}
+            <div class="row" id="about">
+              <div class="small-12 columns">
+              {% with node.html_content|safe as description %}
+              {{description}}
+              {% endwith %}  
+              </div>
+            </div>
+            {% endif %}
+
+
+            {% for tab_name, display_fields in property_display_order %}
+            {% ifnotequal tab_name "Address" %}
+            {% for altname, value in display_fields %}
+            <div class="row">
+              <div class="small-4 columns">
+                <label>{{altname}}</label>
+              </div>
+              <div class="small-8 columns">
+                <p>{{value}}</p>
+              </div>
+            </div>
+            {% endfor %}
+
+            {% else %}
+            {% if node.person_belongs_to_country %}
+            <div class="row">
+              <div class="small-4 columns">
+                <label>Address</label>
+              </div>
+              <div class="small-8 columns">
+                {{node.house_street|default_if_none:""}}{% if node.house_street %}; {% endif %}
+                {{node.village|default_if_none:""}}{% if node.village %}; {% endif %}
+                {{node.taluka|default_if_none:""}}{% if node.taluka %}; {% endif %}
+                {{node.town_city|default_if_none:""}}{% if node.town_city %}; {% endif %}
+                <br/>
+                {% for n in node.person_belongs_to_district|slice:":1" %}
+                  <a href="#">{{n.name}}</a>{% if n.name %}; {% endif %}
+                {% endfor %}
+                {% for n in node.person_belongs_to_state|slice:":1" %}
+                  <a href="#">{{n.name}}</a>{% if n.name %} - {% endif %}
+                {% endfor %}
+                {{node.pin_code|default_if_none:""}}{% if node.pin_code %}; {% endif %}
+                {% for n in node.person_belongs_to_country|slice:":1" %}
+                  <a href="#">{{n.name}}</a>
+                {% endfor %}
+              </div>
+            </div>
+            <br/>
+            {% endif %}
+
+            {% endifnotequal %}
+            {% endfor %}
+
+
+            {% if node.enrollment_code %}
+            <br/>
+
+            <div class="row" id="enrollment_code">
+              <label class="small-4 columns">
+                Enrollment Code
+              </label>
+              <div class="small-8 columns">
+              {{node.enrollment_code}}
+              </div>
+            </div>
+            {% endif %}
+
+
+            {% if node.college_affiliated_to %}
+            <br/>
+
+            <div class="row" id="college_affiliated_to">
+              <label class="small-4 columns">
+                Affiliated to
+              </label>
+              <div class="small-8 columns">
+              {% for n in node.college_affiliated_to|slice:":5" %}
+                <a href="#">{{n.name}}</a><br/>
+                {% if forloop.counter0 == 4%}
+                ... <a href="#">See {{node.college_affiliated_to|length|add:"-5"}} more</a>
+                {% endif %}
+              {% endfor %}    
+              </div>
+            </div>
+            {% endif %}
+
+            {% if node.college_of_student %}
+            <br/>
+
+            <div class="row" id="college_of_student">
+              <label class="small-4 columns">
+                No. of Students Enrolled
+              </label>
+              <div class="small-8 columns">
+              {% if node.college_of_student|length > 5 %}
+                <a href="#">{{node.college_of_student|length}}</a>
+
+              {% else %}
+              {% for n in node.college_of_student %}
+                <a href="#">{{n.name|title}}</a><br/>
+              {% endfor %}
+
+              {% endif %}
+              </div>
+            </div>
+            {% endif %}
+
+            {% if node.college_has_trainer %}
+            <br/>
+
+            <div class="row" id="college_has_trainer">
+              <label class="small-4 columns">
+                No. of Teachers Enrolled
+              </label>
+              <div class="small-8 columns">
+              {% if node.college_has_trainer|length > 5 %}
+                <a href="#">{{node.college_has_trainer|length}}</a>
+
+              {% else %}
+              {% for n in node.college_has_trainer %}
+                <a href="#">{{n.name|title}}</a><br/>
+              {% endfor %}
+
+              {% endif %}
+              </div>
+            </div>
+            {% endif %}
+
+
+            {% if node.affiliated_college %}
+            <br/>
+
+            <div class="row" id="affiliated_college">
+              <label class="small-4 columns">
+                Affiliated Colleges
+              </label>
+              <div class="small-8 columns">
+              {% for n in node.affiliated_college|slice:":5" %}
+                <a href="#">{{n.name}}</a><br/>
+                {% if forloop.counter0 == 4%}
+                ... <a href="#">See {{node.affiliated_college|length|add:"-5"}} more</a>
+                {% endif %}
+              {% endfor %}    
+              </div>
+            </div>
+            {% endif %}
+
+            {% if node.university_of_student %}
+            <br/>
+
+            <div class="row" id="university_of_student">
+              <label class="small-4 columns">
+                No. of Students Enrolled
+              </label>
+              <div class="small-8 columns">
+              {% if node.university_of_student|length > 5 %}
+                <a href="#">{{node.university_of_student|length}}</a>
+
+              {% else %}
+              {% for n in node.university_of_student %}
+                <a href="#">{{n.name|title}}</a><br/>
+              {% endfor %}
+
+              {% endif %}
+              </div>
+            </div>
+            {% endif %}
+
+          </div>
+
+        	<!-- Content for Concept Graph -->
+        	<div class="content reveal-modal graph-div" id="view-concept-graph" data-reveal>
+        	  
+            <a class="close-reveal-modal">&#215;</a>
+        	  {% include "ndf/graph_concept.html" %}
+
+        	</div>
+
+        	<!-- Content for Collection Graph -->
+          {% if node.collection_set %}
+          	<div class="content reveal-modal graph-div" id="view-collection-graph" data-reveal>    
+          	  
+              <a class="close-reveal-modal">&#215;</a>
+          	  {% include "ndf/graph_collection.html" %}
+
+          	</div>
+          {% endif%}
+          
+        	<!-- Content for dependency Graph -->
+          {% if node.prior_node %}
+          	<div class="content reveal-modal graph-div" id="view-dependency-graph" data-reveal>    
+          	  
+              <a class="close-reveal-modal">&#215;</a>
+          	  {% include "ndf/graph_dependency.html" %}
+
+          	</div>
+          {% endif %}
+
+        	<!-- Tab View Map Widget -->
+        	<div class="content reveal-modal graph-div" id="view-map-widget" data-reveal>    
+        	  
+            <a class="close-reveal-modal" >&#215;</a>
+        	  {% include "ndf/map_widget.html" with mode="read" source="custom_template_edit" %}
+
+        	</div>
+
+          <!-- Tab View Scheduler-Calender -->
+          <div class="content" id="view-scheduler-calendar" >    
+
+            {% include "ndf/scheduler_calender.html" with app_set_instance_atlist=app_set_instance_atlist %}
+
+          </div>
+
+        </div>
+      </section>
+
+      <section class="medium-3 columns">
+        <div class="panel">
+        	
+          <h3 class="subheader"></h3>
+        	
+          Edited {{ node.last_update|timesince }} ago by <a class="user">{{node.user_details_dict.modified_by}}</a>
+
+        	<small>
+            <div><a href="#view-changes"><i class="fi-clock"></i> Versions </a>
+              {% for seq_no, version_no in node.version_dict.items reversed %}
+            
+                <abbr title={{version_no}}><a href="{% url 'node_version' groupid node.pk version_no %}" style="padding-left:5px;">+</a></abbr> 
+
+              {% endfor %}
+            </div>
+          </small>
+    
+        	<!-- Button that converts collection into module-->
+        	
+        	{% if node.collection_set and user.is_authenticated%}
+          	<a href="#" class="button" id="module"></i> <span>{% trans "Make Module" %}</a>
+        	{% endif %}
+
+          {% if node %}
+            
+            {% get_publish_policy request groupid node as group_policy %}
+            {% check_group node.pk as is_group %}
+
+          	{% if group_policy == "allow" %}
+          	  {% if is_group %} 
+                <div>
+        	       <a class="button small" href="{% url 'publish_group'  group_id node %}"> {% trans "Publish" %} </a>
+        	      </div>
+
+          	  {% else %}
+          	    <div>
+        	       <a class="button small" href="{% url 'publish_page'  group_id node %}">{% trans "Publish" %} </a>  
+        	      </div>
+        	    {% endif %}
+
+            {% endif %}
+  	      
+          {% endif %}
+
+  	      {% edit_policy groupid node request.user as status %}
+       
+        	{% if status == "allow" %}
+
+        	  {% get_edit_url node.pk as edit_url %}
+        	  {% switch_group_conditions request.user group_id as switch_conditions %}
+        	  {% check_group node.pk as is_group %}
+        	  {% get_user_object node.created_by as created_user %}
+
+        	  {% if is_group %}
+              {% ifequal created_user request.user %}     
+          	  
+                <a href="{#% url edit_url node %#}" class="small button split edit">
+          	      <i class="fi-pencil"></i> {% trans "Edit" %} <span data-dropdown="edit-options"></span>
+          	    </a> 
+              
+              {% endifequal %}
+
+        	  {% else %}
+                    {% if switch_conditions %}     
+        	    <input type="button" id="switch_group" class="button small" value="Publish in group/s">
+        	    <div id="mySystemtype" class="reveal-modal" data-reveal >
+        	      <h2>{% trans "Select Groups" %}</h2>
+        	      <div id="module_drawer" >
+        		{% include "ndf/drawer_widget.html" with widget_for="collection_set" %}
+        	      </div>
+        	      <a class="close-reveal-modal st">&#215;</a>
+        	      <input type="button" id="save_switch_group" class="button small-10 small-push-1 column" value="Save">
+        		</div>
+        	    {% endif %}
+
+              {% if app_name == "MIS" %}
+        	    <a href="{% url 'mis:mis_app_instance_edit' groupid app_id app_set_id app_set_instance_id %}" class="small button split edit">
+              {% else %}
+              <a href="{% url 'mis-po:mis_app_instance_edit' groupid app_id app_set_id app_set_instance_id %}" class="small button split edit">
+              {% endif %}
+        	      <i class="fi-pencil"></i> {% trans "Edit" %} <span data-dropdown="edit-options"></span>
+        	    </a>
+
+        	    <ul id="edit-options" class="f-dropdown">
+        	      <li>
+        		<a href="{% url 'page_create_edit' groupid %}">Create a new page</a>
+        	      </li>
+        	    </ul>
+
+        	  {% endif %}    
+
+        	{% endif %}
+
+        </div>
+      </section>
+
+    </div>
+  {% endif %}
+{% endblock %}
+
+{% block script %}
+  {{block.super}}
+
+  $(document).on('click', ".checkedAll", function() {
+    if($(this).is(":checked")==true) {
+      $('.objectsCheckbox input').prop( "checked", true );
+    }
+
+    else {
+      $('.objectsCheckbox input').prop( "checked", false );
+    }
+  });
+
+  $(document).on('click', ".button.confirmDeleteObjects", function(){
+    var selectedobject = $(".objectsCheckbox input:checked");
+
+    $('#myModal').foundation('reveal', 'open');
+    // $('#myModal').foundation('reveal', 'close');
+    
+    if(selectedobject.length > 0) {
+      var i = 0;
+      var str = "";  
+      
+      $.map(selectedobject,function(each){
+        if(i == 0) {
+          str = str.concat(each.parentElement.id)
+        }
+
+        else {
+          str = str.concat(","+each.parentElement.id)
+        }
+        i = i+1;
+      })
+
+      $.ajax({
+        url: "{% url 'deletion_instances' groupid %}",
+        type: 'POST',
+        data: {deleteobjects: str, csrfmiddlewaretoken: '{{ csrf_token }}', confirm: "yes"},
+        
+        beforeSend: function() {},
+        
+        success: function(result) {},
+      
+        complete: function() { 
+          $('#myModal').foundation('reveal', 'close');
+        }
+      });
+
+      $.map(selectedobject,function(each) {
+        each.parentElement.parentElement.remove()
+      });
+
+      $('#myModal').foundation('reveal', 'close');
+    }
+    
+    else{
+      alert("select object to delete")
+    }
+  });
+
+  $(document).on('click',".button.deleteObjects",function(){
+    var selectedobject = $(".objectsCheckbox input:checked");
+    // $('#myModal').foundation('reveal', 'close');
+    
+    if(selectedobject.length > 0) {
+      $('#myModal').foundation('reveal', 'open');
+
+      // var confirmed = confirm("Deleting "+selectedobject.length+" objects");
+      // if(confirmed == true){
+      var i = 0;
+      var str = "";
+    
+      $.map(selectedobject,function(each){
+        if(i == 0) {
+          str = str.concat(each.parentElement.id)
+        }
+
+        else {
+          str = str.concat(","+each.parentElement.id)
+        }
+
+        i = i+1;
+      })
+
+      $.ajax({
+        url: "{% url 'deletion_instances' groupid %}",
+        type: 'POST',
+        data: {deleteobjects:str,csrfmiddlewaretoken: '{{ csrf_token }}'},
+
+        beforeSend: function() {},
+
+        success: function(result) {
+          $("#deletion_results").html("");
+        
+          for(var obj in result){
+            var ulist = $("<ul>"+"</ul>")
+            .attr("id","conceptlist")
+            .appendTo($("#deletion_results"));
+        
+            var li = $("<li><b>"+result[obj].title+"</b></li>")
+            .appendTo(ulist);
+        
+            var ulist1 = $("<ul>"+"</ul>")
+            .attr("id","conceptlist")
+            .appendTo(li);
+        
+            for(var obj2 in result[obj].content){
+              object = result[obj].content[obj2]
+              for(var obj3 in  object){
+                for(var each in object[obj3]){
+                  var li1 = $("<li>"+object[obj3][each]+"</li>")
+                  .appendTo(ulist1);
+                }
+              }
+            }
+          }
+        },
+
+        complete: function() {}
+      });
+      // }
+    }
+
+    else {
+      alert("select object to delete")
+    }
+  });
+
+  $(document).on('click', ".button.cancelDeleteObjects", function() {
+    
+    $('#myModal').foundation('reveal', 'close');
+  });
+
+  $(document).on('open', '#view-map-edit-widget[data-reveal], #view-map-widget[data-reveal]', function() {  
+    $.ajax({
+      url: "{% url 'get_visited_location' groupid %}",
+
+      success: function(data) { 
+        data = JSON.parse(data);
+
+        var lastVisitedLocationVal = data;
+        
+        if(lastVisitedLocationVal) {
+          if(lastVisitedLocationVal == "[]") {
+            lastVisitedLocationVal = JSON.parse(lastVisitedLocationVal);
+          }
+
+          if(lastVisitedLocationVal.length > 0) {
+            // lastVisitedLocationVal = JSON.parse(lastVisitedLocationVal);
+            var zoom = lastVisitedLocationVal.pop(),
+            lng = lastVisitedLocationVal[1],
+            lat = lastVisitedLocationVal[0];
+            map.setView([lat, lng], zoom);
+          }
+        }
+
+        else if(tempArr.length) {
+          var group = new L.featureGroup(tempArr)
+          map.fitBounds(group.getBounds());
+        }
+      }
+    });
+  });
+
+  $(document).on('opened', '#view-map-edit-widget[data-reveal], #view-map-widget[data-reveal]', function() {  
+    
+    map.invalidateSize();  
+  });
+
+  /*
+    $(document).foundation({
+      tab: {
+        callback : function (tab) {
+          // console.log(tab);
+        }
+      }
+    });
+  */
+  
+  var startDtInput = $("font:contains('start_time')");
+  startDtInput = startDtInput.parent().next().find("input");
+
+  var endDtInput = $("font:contains('end_time')");
+  endDtInput = endDtInput.parent().next().find("input");
+
+  if(startDtInput.length > 0) {
+    startDtInput.datetimepicker({ 
+      hourGrid: 6,
+      minuteGrid: 15,
+
+      onClose: function(dateText, inst) {
+        if (endDtInput.val() != '') {
+          var testStartDate = startDtInput.datetimepicker('getDate');
+          var testEndDate = endDtInput.datetimepicker('getDate');
+
+          if (testStartDate > testEndDate)
+            endDtInput.datetimepicker('setDate', testStartDate);
+        }
+
+        else {
+          endDtInput.val(dateText);
+        }
+      },
+
+      onSelect: function(selectedDateTime) {
+        endDtInput.datetimepicker('option', 'minDate', startDtInput.datetimepicker('getDate') );
+      }
+    });
+  }
+
+  if(endDtInput.length > 0){
+    endDtInput.datetimepicker({ 
+      hourGrid: 6,
+      minuteGrid: 15,
+      numberOfMonths: 2,
+
+      onClose: function(dateText, inst) {
+        if (startDtInput.val() != '') {
+          var testStartDate = startDtInput.datetimepicker('getDate');
+          var testEndDate = endDtInput.datetimepicker('getDate');
+          if (testStartDate > testEndDate)
+            startDtInput.datetimepicker('setDate', testEndDate);
+        }
+
+        else {
+          startDtInput.val(dateText);
+        }
+      },
+
+      onSelect: function (selectedDateTime){
+        startDtInput.datetimepicker('option', 'maxDate', endDtInput.datetimepicker('getDate') );
+      }
+    });
+  }
+
+  // totWhen ---------------
+  var totWhen = $("font:contains('tot_when')").parent().next().find("input");
+
+  if(totWhen.length > 0) {
+    totWhen.datetimepicker();
+    $(totWhen).after('&nbsp;<input class="button tiny" type="button" value="Add Date"><br/>')
+    $("input.tiny").after("<div id='tot-when-date-list'></div>")
+  }
+
+  $(totWhen).change(function(){ 
+    if($(totWhen).val().length > 0) {
+      $("input.tiny").removeClass("disabled");
+    }
+
+    else {
+      $("input.tiny").addClass("disabled");
+    }
+  });
+
+  $("input.tiny").click(function(){
+    if(!$(this).hasClass("disabled")) {
+      $("#tot-when-date-list").append('<span class="secondary label" style="margin-right:5px;"><span class="date-item">'+$(totWhen).val()+' </span><span style="font-size:large; cursor:pointer;" onclick="$(this).parent().remove();">&times;</span></span>');
+      $(totWhen).val("");
+      $("input.tiny").addClass("disabled");
+    }
+  })
+
+  function getTotWhen() {
+    var datesList = []
+    dts = $("#tot-when-date-list .date-item");
+    $.each(dts, function(i, val){datesList.push($(val).text().trim())});
+
+    return datesList;
+  }
+{% endblock %}	

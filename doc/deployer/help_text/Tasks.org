@@ -1,0 +1,14 @@
+
+* Tasks (Project Management)
+
+  Tasks is an app to get things done!
+
+  Though it is developed keeping collaboration among the members in
+  mind, it can also be used for your own personal tasks.  
+
+  Create tasks, assign to your colleagues, set due dates, keep track
+  of the progress, discuss the tasks, view in the calendar etc.  
+
+  
+
+

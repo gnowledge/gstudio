@@ -1,0 +1,690 @@
+{% extends "ndf/mis_base_create_edit.html" %}
+{% load i18n %}
+{% load ndf_tags %}
+
+{% block style %}
+  {{block.super}}
+
+  /* Resetting css-properties for fieldset (also legend, input) */
+    /* fieldset (padding-bottom) */ 
+    fieldset {
+      padding: 1.25rem 1.25rem 1.25rem 1.25rem !important;
+    }
+
+    /* legend (background-color) */
+    fieldset legend {
+      background-color: transparent !important;
+    }
+
+    /* input (margin) */
+    fieldset input {
+      margin: 0 !important;
+    }
+
+  /* Setting css-properties for reveal-modal's label */
+    div.reveal-modal > label {
+      color: white;
+      font-weight: bold;
+      font-size: 1rem;
+    }
+
+  /* .orgitdownContainer properties */
+    /*  .orgitdownContainer {
+        width: 62rem !important;
+      }
+    */
+  
+  /* dropdown class's button properties */
+    /*
+    .dropdown.button:after, button.dropdown:after {
+        right: 0.80625rem !important;
+    }
+
+    .dropdown.button.tiny, button.dropdown.tiny {
+        padding-right: 1.125rem !important;
+    }
+    */
+
+  /* classes defined specifically for this template */
+    .row-space {
+      margin-bottom: 13px;
+    }
+
+    .checkbox-top-padding {
+      padding-top: 4px !important;
+    }
+
+    .option-spacing {
+      padding: 0px 5px; 
+      line-height: 1.8rem;
+    }
+
+  /* textarea properties specifically for this template */
+    textarea.qualification-text {
+      resize: none;
+      min-height: 2.7rem !important;
+      height: 2.7rem !important;
+      float: left;
+      width: 99% !important;
+    }
+{% endblock %}
+
+{% block body_content %} 
+  <form data-abide enctype="multipart/form-data" id="form-edit-node" method="POST" action="">
+
+    <header class="row" style="margin: 1rem 0 0 0;">
+      <h2 class="small-12 columns">
+        {% if node %}
+        {% trans "Editing" %} {{title}}: {{node.name}}
+        {% else %}
+        {% trans "Register " %} {{title}}
+        {% endif %}
+      </h2>
+    </header>
+
+    <nav class="row" style="margin-top: 0.5rem;">
+      <dl class="tabs small-12 columns" data-tab data-options="deep_linking:true">
+        <dd>
+          <label><h4>{% trans "Fill"%}:&nbsp;&nbsp;</h4></label>
+        </dd>
+
+        {% for tab_details in property_order_list %}
+        <dd {% if forloop.counter == 1 %}class="active"{% endif %} title="STEP-{{forloop.counter}}: Fill {{tab_details.0|lower}} details...">
+          <a href="#panel_{{tab_details.0}}" class="disable">
+            {{tab_details.0}} 
+          </a>
+        </dd>
+        {% endfor %}
+      </dl>
+    </nav>
+
+    {% csrf_token %}
+
+    <div id="nussd-course-edit-div" class="tabs-content" style="border-style: solid; border-width: 1.5px; border-color: #0eacb5; padding: 0px 5px;" >
+      <!-- Basic tab //////////////////////////////////////////////////////////////////////////////////////// -->
+      <div class="active content row" id="panel_{{property_order_list.0.0}}">
+        <!-- Type, Course Name -->
+        <div class="row">
+          <div class="small-2 columns">
+            <label for="{{property_order_list.0.1.0.name}}" class="right inline"> 
+              {{property_order_list.0.1.0.altnames}}
+            </label>
+          </div>
+          <div class="small-4 columns">
+            {% html_widget groupid node.pk property_order_list.0.1.0 %}
+          </div>            
+          
+          <div class="small-2 columns">
+            <label for="{{property_order_list.0.1.1.name}}" class="right inline"> 
+              {{property_order_list.0.1.1.altnames}}
+            </label>
+          </div>
+          <div class="small-4 columns">
+            {% html_widget groupid node.pk property_order_list.0.1.1 %}
+          </div>            
+        </div>
+        <!-- Code, tags -->
+        <div class="row">
+          <div class="small-2 columns">
+            <label for="{{property_order_list.0.1.2.name}}" class="right inline"> 
+              {{property_order_list.0.1.2.altnames}}
+            </label>
+          </div>
+          <div class="small-4 columns">
+            {% html_widget groupid node.pk property_order_list.0.1.2 %}
+          </div>            
+          
+          <div class="small-2 columns">
+            <label for="{{property_order_list.0.1.3.name}}" class="right inline"> 
+              {{property_order_list.0.1.3.altnames}}
+            </label>
+          </div>
+          <div class="small-4 columns">
+            {% html_widget groupid node.pk property_order_list.0.1.3 %}
+          </div>            
+        </div>
+
+        <!-- Theory Credit, Field Work Credit -->
+        <div class="row">
+          <div class="small-2 columns">
+            <label for="{{property_order_list.0.1.4.name}}" class="right inline"> 
+              {{property_order_list.0.1.4.altnames}}
+            </label>
+          </div>
+          <div class="small-4 columns">
+            {% html_widget groupid node.pk property_order_list.0.1.4 %}
+          </div>            
+          
+          <div class="small-2 columns">
+            <label for="{{property_order_list.0.1.5.name}}" class="right inline"> 
+              {{property_order_list.0.1.5.altnames}}
+            </label>
+          </div>
+          <div class="small-4 columns">
+            {% html_widget groupid node.pk property_order_list.0.1.5 %}
+          </div>            
+        </div>
+
+        <!-- Qual. Attendance %, Evaluation Type -->
+        <div class="row">
+          <div class="small-2 columns">
+            <label for="{{property_order_list.0.1.6.name}}" class="right inline"> 
+              {{property_order_list.0.1.6.altnames}}
+            </label>
+          </div>
+          <div class="small-4 columns">
+            {% html_widget groupid node.pk property_order_list.0.1.6 %}
+          </div>            
+          
+          <div class="small-2 columns">
+            <label for="{{property_order_list.0.1.7.name}}" class="right inline"> 
+              {{property_order_list.0.1.7.altnames}}
+            </label>
+          </div>
+          <div class="small-4 columns">
+            {% html_widget groupid node.pk property_order_list.0.1.7 %}
+          </div>            
+        </div>
+
+        <!-- Min. Marks, Max. Marks -->
+        <div class="row">
+          <div class="small-2 columns">
+            <label for="{{property_order_list.0.1.8.name}}" class="right inline"> 
+              {{property_order_list.0.1.8.altnames}}
+            </label>
+          </div>
+          <div class="small-4 columns">
+            {% html_widget groupid node.pk property_order_list.0.1.8 %}
+          </div>            
+          
+          <div class="small-2 columns">
+            <label for="{{property_order_list.0.1.9.name}}" class="right inline"> 
+              {{property_order_list.0.1.9.altnames}}
+            </label>
+          </div>
+          <div class="small-4 columns">
+            {% html_widget groupid node.pk property_order_list.0.1.9 %}
+          </div>            
+        </div>
+
+        <!-- Description -->
+        <div class="row">
+          <div class="small-12 columns end" style="padding-left:6.6rem;">
+            <label for="{{property_order_list.0.1.10.name}}"> 
+              {{property_order_list.0.1.10.altnames}}
+            </label>
+            {% html_widget groupid node.pk property_order_list.0.1.10 %}
+          </div>            
+        </div>
+
+        <div class="row tab-nav">
+          <div class="small-2 columns for-prev">
+          </div>
+          <!-- 
+          <div class="small-4 small-offset-5 columns end for-save">
+          </div>
+          -->
+          <div class="small-2 small-offset-8 columns for-next">
+          </div>
+        </div>
+      </div>
+
+      <!-- Minimum Qualification Requirements tab /////////////////////////////////////////////////////////// -->
+      <div class="content row" id="panel_{{property_order_list.1.0}}">
+        <!-- Master Trainer: Requirement's fieldset ///////////////////////////////////////// -->
+        <fieldset id="fs{{property_order_list.1.1.0.name}}">
+          <legend>
+            {{property_order_list.1.1.0.altnames}}
+          </legend>
+
+          <div class="row">
+            <div class="small-1 columns row-space"></div>
+            <div class="small-10 columns row-space"><label><b>{% trans "Qualification" %}</b></label></div>
+            <div class="small-1 columns end row-space"><label><b>{% trans "Action" %}</b></label></div>
+
+            <div class="small-10 small-offset-1 columns mt-add-div">
+              <textarea id="mt_qualification_text" name="mt_qualification_text" rows="1" maxlength="250" placeholder="Enter qualification text (max. 250 characters)..." class="qualification-text"></textarea>
+              <small>Select the checkbox to mark mandatory</small>
+              <small class="error">{% trans "Please set qualification text!" %}</small>
+            </div>
+            <div class="small-1 columns end" style="padding-top:3px;">
+              <input type="button" id="mt" class="tiny button radius expand add_requirement" value="Add">
+            </div>
+          </div>
+        </fieldset>
+
+        <!-- Voluntary Trainer: Requirement's fieldset ////////////////////////////////////// -->
+        <fieldset id="fs{{property_order_list.1.1.1.name}}">
+          <legend>
+            {{property_order_list.1.1.1.altnames}}
+          </legend>
+
+          <div class="row">
+            <div class="small-1 columns row-space"></div>
+            <div class="small-10 columns row-space"><label><b>{% trans "Qualification" %}</b></label></div>
+            <div class="small-1 columns end row-space"><label><b>{% trans "Action" %}</b></label></div>
+
+            <div class="small-10 small-offset-1 columns vt-add-div">
+              <textarea id="vt_qualification_text" name="vt_qualification_text" rows="1" maxlength="250" placeholder="Enter qualification text (max. 250 characters)..." class="qualification-text"></textarea>
+              <small>Select the checkbox to mark mandatory</small>              
+              <small class="error">{% trans "Please set qualification text!" %} </small>
+            </div>
+            <div class="small-1 columns end" style="padding-top:3px;">
+              <input type="button" id="vt" class="tiny button radius expand add_requirement" value="Add">
+            </div>
+          </div>
+        </fieldset>
+
+        <div class="row tab-nav">
+          <div class="small-2 columns for-prev">
+          </div>
+          <!-- 
+          <div class="small-4 small-offset-5 columns end for-save">
+          </div>
+          -->
+          <div class="small-2 small-offset-8 columns for-next">
+          </div>
+        </div>
+      </div>
+    </div>
+
+  <!-- Hidden fields for storing qualification requirements of respective trainers ////////////////////////// -->
+    <input type="hidden" id="{{property_order_list.1.1.0.name}}" name="{{property_order_list.1.1.0.name}}" value="">
+    <input type="hidden" id="{{property_order_list.1.1.1.name}}" name="{{property_order_list.1.1.1.name}}" value="">
+  </form>
+
+  <!-- Hidden requirement row that would appear on click of Add button of respective fieldset /////////////// -->
+    <div id="qualification_mandatory_div" class="small-1 columns checkbox-top-padding row-space" style="display:none;">
+      <input type='checkbox' id="_mandatory" name='_mandatory' class="right inline">
+    </div>
+    <div id="qualification_text_div" class="small-10 columns row-space" style="display:none;">
+      <label id="_text" name="_text">{% trans "Demo requirement text" %}</label>
+    </div>
+    <div id="qualification_action_div" class="small-1 columns end row-space" style="display:none;">
+      <input type="button" id="_delete"  class="button tiny radius expand delete_requirement" value="{% trans 'Delete' %}">
+      <!--
+      <div id="_delete" data-dropdown="-dropdown" data-options="is_hover:true" class="button tiny radius expand dropdown delete_requirement">
+        {#% trans "Delete" %#}
+      </div>
+      <br>
+      <ul id="-dropdown" data-dropdown-content class="f-dropdown">
+        <li><div id="_edit" class="option-spacing">{#% trans "Edit" %#}</div></li>
+      </ul>
+      -->
+    </div>
+
+  <!-- Hidden fields for storing no. of counts of requirements of respective trainers /////////////////////// -->
+    <input type="hidden" id="mt_requirements_count" name="mt_requirements_count" value="0">
+    <input type="hidden" id="vt_requirements_count" name="vt_requirements_count" value="0">
+{% endblock %}
+
+{% block script %}
+  {{block.super}}
+  
+  // function to get requirements count
+    function get_requirements_count(widget_for) {
+      return (parseInt($("#"+widget_for+"_requirements_count").val()));
+    }
+
+  // function to add requirement row (checkbox, text, action button (delete)) -------------------------------------
+    function add_requirement(add_req_options) {
+      // add_req_options = {
+      //   widget_for: "mt"/"vt", 
+      //   requirements_count: null/int,
+      //   textarea_html: null/html-element,
+      //   requirement_dict: null/dict-object
+      // }
+      var widget_for = add_req_options.widget_for;
+      var requirements_count = add_req_options.requirements_count|null;
+      var textarea_html = add_req_options.textarea_html || null;
+      var from_node = add_req_options.from_node || false;
+      var requirement_dict = add_req_options.requirement_dict || null;
+
+      // if requirements_count is not passed, fetch it
+      if (requirements_count === null) {
+        requirements_count = get_requirements_count(widget_for);
+        requirements_count = requirements_count + 1;
+      }
+
+      // if textarea element is not passed, fetch it
+      if (textarea_html === null) {
+        textarea_html = $("#"+widget_for+"_qualification_text");
+      }
+
+      var add_button_class = "."+widget_for+"-add-div";
+
+    // mandatory-div & checkbox -----------------------------------------------------------------------------------
+      mandatory_div = $("#qualification_mandatory_div").clone();
+      
+      name_var = widget_for+"_"+requirements_count+"_mandatory";
+      
+      mandatory_div.attr('id', name_var+"_div");
+      
+      mandatory_checkbox = mandatory_div.children("input[type='checkbox']");
+      mandatory_checkbox.attr('id', name_var);
+      mandatory_checkbox.attr('name', name_var);
+
+      if (requirement_dict !== null) {
+        mandatory_checkbox.prop("checked", requirement_dict["mandatory"]);
+      }
+
+      $(mandatory_div).insertBefore(add_button_class);
+      mandatory_div.css('display', "block");
+
+    // text-div & label -------------------------------------------------------------------------------------------
+      text_div = $("#qualification_text_div").clone();
+      
+      name_var = widget_for+"_"+requirements_count+"_text";
+      
+      text_div.attr('id', name_var+"_div");
+      
+      text_label = text_div.children("label");
+      text_label.attr('id', name_var);
+      text_label.attr('name', name_var);
+
+      if (requirement_dict !== null) {
+        text_label.text(requirement_dict["text"]);
+      }
+
+      else {
+        text_label.text(textarea_html.val());
+      }    
+
+      $(text_div).insertBefore(add_button_class);
+      text_div.css('display', "block");
+
+    // action-div & options ---------------------------------------------------------------------------------------
+      action_div = $("#qualification_action_div").clone();
+      
+      name_var = widget_for+"_"+requirements_count+"_action";
+      
+      action_div.attr('id', name_var+"_div");
+      
+      // action_div.children("div").attr('id', name_var+"_delete");
+      // action_div.children("div").attr('data-dropdown', name_var+"_dropdown");
+
+      // action_div.find(".f-dropdown").attr('id', name_var+"_dropdown");
+      // action_div.find(".option-spacing").attr('id', name_var+"_edit");
+      action_div.children("input[type='button']").attr('id', name_var+"_delete");
+
+      $(action_div).insertBefore(add_button_class);
+      action_div.css('display', "block");
+
+      if (requirement_dict === null) {
+      // clear textarea & update hidden requirements_count (increment by 1) -----------------------------------------
+        $("#"+widget_for+"_requirements_count").val(requirements_count);
+        textarea_html.val("");
+
+      // remove required attr ---------------------------------------------------------------------------------------
+        textarea_html.removeAttr("required");
+      }
+    }
+
+  // Tabs navigation: Enable and Disable tabs in sequential manner using Next & Previous buttons ------------------
+    $(".content").on('click', '.tab_next' ,function(event){
+      event.preventDefault();
+
+      // Forcefully blur all input elements, so that mandatory fields become data-invalid if not fill
+      $(this).parents(".tab-nav").parents(".content").find(':input[required]').blur();
+
+      // Then check no. of data-invalid fields
+      // if count == 0, then only proceed to next tab
+      if($(this).parents(".tab-nav").parents(".content").find(':input[data-invalid]').length == 0) {
+        // Valid, move to next step
+        $('.active').removeClass('active').next().addClass('active');
+      }
+    });
+
+    $(".content").on('click', '.tab_prev' ,function(event){
+      event.preventDefault();
+      $('.active').removeClass('active').prev().addClass('active');
+    });
+
+  // Enable/Disable Min. & Max. Marks based on value of Evaluation Type -------------------------------------------
+    $("input[name='evaluation_type']").on("change", function(){
+      if (this.value == "Final") {
+        $("#min_marks").removeAttr("disabled");
+        $("#max_marks").removeAttr("disabled");
+      }
+
+      else {
+        // Clear Marks' fields first
+        $("#min_marks").val("");
+        $("#max_marks").val("");
+
+        // Then disable them!
+        $("#min_marks").attr("disabled", "disabled");
+        $("#max_marks").attr("disabled", "disabled");
+      }
+    });
+
+  // On click of 'Add', add a row with checkbox, label & action buttons (delete & edit) ---------------------------
+    $(document).on("click", ".add_requirement", function(){
+      var widget_for = $(this).attr("id");
+
+      // Forcefully blur textarea, so that mandatory fields become data-invalid if not fill
+      textarea_html = $("#"+widget_for+"_qualification_text");
+
+      if (textarea_html.val() == "") {
+        textarea_html.attr('required', "required");
+      }
+
+      textarea_html.attr('required', true).blur();
+
+      if (!(textarea_html.attr('data-invalid') !== undefined)) {
+        var add_button_class = "."+widget_for+"-add-div";
+
+        var requirements_count = get_requirements_count(widget_for);
+        requirements_count = requirements_count + 1;
+
+      // mandatory-div & checkbox -----------------------------------------------------------------------------------
+        mandatory_div = $("#qualification_mandatory_div").clone();
+        
+        name_var = widget_for+"_"+requirements_count+"_mandatory";
+        
+        mandatory_div.attr('id', name_var+"_div");
+        
+        mandatory_checkbox = mandatory_div.children("input[type='checkbox']");
+        mandatory_checkbox.attr('id', name_var);
+        mandatory_checkbox.attr('name', name_var);
+
+        $(mandatory_div).insertBefore(add_button_class);
+        mandatory_div.css('display', "block");
+
+      // text-div & label -------------------------------------------------------------------------------------------
+        text_div = $("#qualification_text_div").clone();
+        
+        name_var = widget_for+"_"+requirements_count+"_text";
+        
+        text_div.attr('id', name_var+"_div");
+        
+        text_label = text_div.children("label");
+        text_label.attr('id', name_var);
+        text_label.attr('name', name_var);
+        text_label.text(textarea_html.val());
+
+        $(text_div).insertBefore(add_button_class);
+        text_div.css('display', "block");
+
+      // action-div & options ---------------------------------------------------------------------------------------
+        action_div = $("#qualification_action_div").clone();
+        
+        name_var = widget_for+"_"+requirements_count+"_action";
+        
+        action_div.attr('id', name_var+"_div");
+        
+        // action_div.children("div").attr('id', name_var+"_delete");
+        // action_div.children("div").attr('data-dropdown', name_var+"_dropdown");
+
+        // action_div.find(".f-dropdown").attr('id', name_var+"_dropdown");
+        // action_div.find(".option-spacing").attr('id', name_var+"_edit");
+        action_div.children("input[type='button']").attr('id', name_var+"_delete");
+
+        $(action_div).insertBefore(add_button_class);
+        action_div.css('display', "block");
+
+      // clear textarea & update hidden requirements_count (increment by 1) -----------------------------------------
+        $("#"+widget_for+"_requirements_count").val(requirements_count);
+        textarea_html.val("");
+
+      // remove required attr ---------------------------------------------------------------------------------------
+        textarea_html.removeAttr("required");
+      }
+
+      else {
+      // remove required attr ---------------------------------------------------------------------------------------
+        textarea_html.removeAttr("required");
+      }
+    });
+
+  // On click of 'Delete', delete corresponding row with checkbox, label & action buttons (delete & edit) ---------
+    $(document).on("click", ".delete_requirement", function(){
+      var button_id = $(this).attr('id');
+      var first_underscore_index = button_id.indexOf("_", 0);
+      var second_underscore_index = button_id.indexOf("_", 3);
+
+      var widget_for = button_id.slice(0, first_underscore_index);
+      var widget_count_to_delete = button_id.slice((first_underscore_index + 1), second_underscore_index);
+
+    // remove 'mandatory' div along with all it's children
+      $("#"+widget_for+"_"+widget_count_to_delete+"_mandatory_div").remove();
+    // remove 'text' div along with all it's children
+      $("#"+widget_for+"_"+widget_count_to_delete+"_text_div").remove();
+    // remove 'action' div along with all it's children
+      $("#"+widget_for+"_"+widget_count_to_delete+"_action_div").remove();
+
+      // DON'T DECEREMENT requirements count, may create conflicts in ids
+    });
+
+  // On click of Register/Update ----------------------------------------------------------------------------------
+    $(document).on("click", "#save_course", function(event) {
+    // Store requirements in a list for master-trainer & voluntary-teacher respectively
+      var widget_for = ["mt", "vt"];
+
+      for (var i=0; i<widget_for.length; i++) {
+        qualification_list = [];
+        requirements_count = parseInt($("#"+widget_for[i]+"_requirements_count").val());
+
+        if (requirements_count > 0) {
+          cnt = 1;
+          while (cnt <= requirements_count) {
+            qualification_mandatory = $("#"+widget_for[i]+"_"+cnt+"_mandatory").prop('checked');
+            qualification_text = $("#"+widget_for[i]+"_"+cnt+"_text").text();
+
+            if (qualification_mandatory !== undefined && qualification_text != "") {
+              // alert("qualification_mandatory: " + qualification_mandatory + "\nqualification_text: " + qualification_text);
+              // qualification = {}
+              // qualification["qualification_mandatory"] = qualification_mandatory;
+              // qualification["qualification_text"] = qualification_text;
+
+              // qualification_list.push(qualification);
+              qualification_list.push(qualification_mandatory);
+              qualification_list.push(qualification_text);
+
+            }
+
+            cnt += 1;
+          }
+
+          if (widget_for[i] == "mt") {
+            $("#mast_tr_qualifications").val(qualification_list);
+          }
+
+          else if (widget_for[i] == "vt") {
+            $("#voln_tr_qualifications").val(qualification_list);
+          }
+        }
+      }
+    });
+{% endblock %}
+
+{% block document_ready %}
+  {{block.super}}
+  
+  // Default settings for tabs & evaluation_type on page load -----------------------------------------------------
+    // Tabs: Adding Next and Previous buttons for navigation ------------------------------------------------------
+      $(".content").each(function(i) {
+        totalTabs = $(".content").size() - 1
+
+        if (i != totalTabs) {
+          // Not in last tab
+          $(this).children(".tab-nav").children(".for-next")
+            .append("<input type='button' class='button small round tab_next' value='{% trans 'Next' %}' />");
+        }
+
+        if (i == totalTabs) {
+          // Only in last tab
+          var is_existing_nussd_course = "{{node.pk|default_if_none:''}}";
+          var submit_btn_label = '{% trans "Register" %}' // By default considering registering a new nussd_course
+          if (is_existing_nussd_course) {
+            // If value (ObjectId) found, it means updating existing nussd_course record
+            submit_btn_label = '{% trans "Update" %}'
+          }
+          $(this).children(".tab-nav").children(".for-next")
+            .append("<input type='submit' id='save_course' class='small button expand' value='"+submit_btn_label+"' style='float:right;' />");
+        }
+
+        if (i != 0) {
+          // Not in first tab
+          $(this).children(".tab-nav").children(".for-prev")
+            .append("<input type='button' class='button small round tab_prev' value='{% trans 'Previous' %}' style='float:right;' />");
+        }
+      });
+
+    // If Continuous value found, disable Min. & Max. Marks -------------------------------------------------------
+      if ($('input:radio[name="evaluation_type"]').filter('[value="Continuous"]').attr('checked') == "checked") {
+      // Clear Marks' fields first
+        $("#min_marks").val("");
+        $("#max_marks").val("");
+
+      // Disabling Marks fields!
+        $("#min_marks").attr("disabled", "disabled");
+        $("#max_marks").attr("disabled", "disabled");
+      }
+
+    // Set requirements count for master-trainer & populate requirements if any exists ----------------------------
+      widget_for = "mt"
+      textarea_html = $("#"+widget_for+"_qualification_text");
+      requirements_count = "{{property_order_list.1.1.0.value|length}}";
+      if (requirements_count) {
+        $("#mt_requirements_count").val(requirements_count);
+      
+      // Populate row with requirements for already existing ones! ----------------------------------------------
+        requirements_list = {{property_order_list.1.1.0.value|jsonify|safe}}
+        $.each(requirements_list, function(index, requirements_dict) {
+          add_requirement({
+            widget_for: "mt", 
+            requirements_count: (index + 1),
+            textarea_html: textarea_html,
+            requirement_dict: requirements_dict
+          })
+        });
+      }
+
+      else {
+        $("#mt_requirements_count").val(0);
+      }
+
+    // Set requirements count for voluntary-trainer & populate requirements if any exists -------------------------
+      widget_for = "vt"
+      textarea_html = $("#"+widget_for+"_qualification_text");
+      requirements_count = "{{property_order_list.1.1.1.value|length}}";
+      if (requirements_count) {
+        $("#vt_requirements_count").val(requirements_count);
+
+      // Populate row with requirements for already existing ones! ----------------------------------------------
+        requirements_list = {{property_order_list.1.1.1.value|jsonify|safe}}
+        $.each(requirements_list, function(index, requirements_dict) {
+          add_requirement({
+            widget_for: "vt", 
+            requirements_count: (index + 1),
+            textarea_html: textarea_html,
+            requirement_dict: requirements_dict
+          })
+        });
+      }
+
+      else {
+        $("#vt_requirements_count").val(0);
+      }
+{% endblock %}

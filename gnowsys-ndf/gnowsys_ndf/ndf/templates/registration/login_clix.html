@@ -1,0 +1,168 @@
+{% load simple_filters %}
+{% xextends "registration/registration_base.html" with first_body_column=0 %}
+{# {% extends "registration/registration_base.html" %} #}
+{% load i18n %}
+
+
+{% load ndf_tags %}
+{% block title %}{% trans "Login" %}{% endblock %}
+
+{% block style %}
+	{{block.super}}
+
+	label, small.all-error { font-size: 15px; }
+
+  /* Setting css-properties for small.error */
+  small.error {
+    padding: 0 0 0 0.5rem !important;
+    margin-top: 0rem !important;
+    position: relative !important;
+  }
+{% endblock %}
+
+{% block body_content %}
+	{% url 'auth_password_reset' as auth_pwd_reset_url %}
+	{% url 'registration_register' as register_url %}
+	<div class="login-page row">
+		<div class="login-page-opacity"></div>
+        <div class="login-page-form">
+            <div class="row">
+                <div class="small-12 medium-12 large-12 columns end text-center login-page-header">
+                	<img src="/static/ndf/images/landing_pg_slides/clix-logo-i2c-site.svg">
+                	<span>{% trans "LogIn" %}</span>
+                </div>
+            </div>
+			<br/>
+			{% if form.errors %}
+				<small class="small-10 medium-8 large-8 columns error all-error">{% trans "Either your email or password is incorrect !" %}</small>
+			{% endif %}
+
+			<form method="post" id="loginSubmit" action="{% url 'auth_login' %}" data-abide>
+				{% csrf_token %}
+
+				<!-- Email -->
+				<div class="row">
+					<div class="small-12 columns end">
+						<label class="left">
+							{{ form.username.label }} or E-mail
+						</label>
+					</div>
+				</div>
+				<div class="row">
+					<div class="small-12 columns end">
+						{{ form.username }}
+					</div>
+				</div>
+
+				<!-- Password -->
+				<div class="row">
+					<div class="small-12 columns">
+						<label class="left">
+							{{ form.password.label_tag }}
+						</label>
+					</div>
+
+				</div>
+				<div class="row">
+					<div class="small-12 columns end">
+						{{ form.password }}
+					</div>
+				</div>
+				{% get_is_captcha_visible as is_captcha %}
+				{% if is_captcha %}
+				<div class="row">
+					<div class="small-12 columns">
+						<div class="row">
+							<div class="small-12" style="font-size: 11px;">
+								Enter these alphabets in the box below
+							</div>
+						</div>
+						<div>
+							{% include "ndf/Captcha.html" %}
+						</div>
+					</div>
+				</div>
+				{% endif %}
+
+				<div class="row">
+					<div class="small-12 medium-12 large-12 text-center columns end login-button">
+						<input type="submit" onclick='trim_space()' class="button small expand" tabindex= "4" value="{% trans "Login" %}" style="font-size:15px"  />
+					</div>
+				</div>
+		{% get_gstudio_registration as registration %}
+		{% if registration %}
+				<div class="row">
+					<div class="medium-12 large-12 small-text-left text-center columns end forgot-password">
+						<label>
+							<a title={% trans "Recover your password" %} href="{{ auth_pwd_reset_url }}">{% trans "Forgot your password?" %}</a>
+						</label>
+					</div>
+				</div>
+				<!-- Login button -->
+
+				<!-- Forgot password link & New Registration link -->
+      			{# {% if site.SITE_NAME != "NROER" %}  #}
+					<div class="row">
+						<div class="small-12 medium-12 large-12 text-ceter columns end `-user">
+							<center>
+							<label>
+							<a title={% trans "Click here to register" %} href="{{ register_url }}">
+								{% trans "Don't have an account?" %}
+								<span>
+									Register
+								</span>
+							</a>
+							</label>
+							{% if site.SITE_NAME == "NROER" %}
+							<br/>
+							<a href="mailto:nroer.support@gnowledge.org">
+								Can't register? Contact us for help.
+							</a>
+							{% endif %}
+							</center>
+						</div>
+					</div>
+					{% endif  %}
+				{# {% endif %} #}
+				<input type="hidden" name="next" value="{{ next }}" />
+			</form>
+        </div>
+	</div>
+{% endblock %}
+
+
+<script type="text/javascript">
+
+</script>
+
+{% block document_ready %}
+	{{block.super}}
+	$("input[name='username']").focus();
+
+	function trim_space() {
+		user_name_val = $('#id_username').val();
+	    trim_usrname = user_name_val.trim();
+	    $('#id_username').val(trim_usrname);
+}
+	// Setting tabindex for following html elements
+	$("#id_username").attr("tabindex", "1");
+	$("#id_password").attr("tabindex", "2");
+	$("a[title='Recover your password']").attr("tabindex", "5");
+	$("a[title='Click here to register']").attr("tabindex", "6");
+
+	$("input[id='id_username'], input[id='id_password']").each(function(){
+		$(this).attr("required", "");
+		$(this).after("<small class='error'>Please fill valid "+this.name+"</small>");
+	});
+
+	//Code to refresh the Captcha
+    $('.js-captcha-refresh').click(function(){
+    $form = $(this).parents('form');
+
+    $.getJSON($(this).data('url'), {}, function(json) {
+        // This should update your captcha image src and captcha hidden input
+    });
+
+    return false;
+	});
+{% endblock %}

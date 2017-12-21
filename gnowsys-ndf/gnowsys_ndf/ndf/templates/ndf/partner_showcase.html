@@ -1,0 +1,25 @@
+{% extends "ndf/base.html" %}
+{% load i18n %}
+{% load ndf_tags %}
+{% block title %} {% trans 'Partner Showcase' %} {% endblock %}
+{% block style %}
+.top-gap
+{
+margin-top:15px;
+}
+ul.top-gap2 li
+{
+margin-top:13px;
+}
+{% endblock %}
+{% block body_content %}
+<div class="repository-title top-gap  large-4 columns">All Partners</div>
+<ul class="small-block-grid-2 medium-block-grid-3 large-block-grid-5 top-gap2">
+{% for each_partner in source_partners %}
+<li class="card-image-wrapper"> 
+  {% include 'ndf/simple_card.html' with resource=each_partner has_prof_pic=True url_name='e-library' first_arg='home' second_arg='' search_url_text='filter?selfilters=[{"or":[{"selFieldValue":"source","selFieldValueAltnames":"source","selFieldGstudioType":"attribute","selFieldText":"'|add:each_partner.name|add:'","selFieldPrimaryType":"basestring"}]}]' %}
+  </li>
+{% endfor %}
+</ul>
+
+{% endblock body_content %}

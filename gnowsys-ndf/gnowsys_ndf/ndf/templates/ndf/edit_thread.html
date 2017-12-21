@@ -1,0 +1,220 @@
+{% extends "ndf/base.html" %}
+{% load i18n %}
+{% load ndf_tags %}
+{% block title %}Creating Thread to Forum:  {{forum.name}} {% endblock %}
+
+{% block head %}
+
+  <!-- orgitdown! -->
+  <script type="text/javascript" src="/static/ndf/orgitdown/jquery.orgitdown-foundation.js"></script>
+  <!-- orgitdown! toolbar settings -->
+  <script type="text/javascript" src="/static/ndf/orgitdown/skins/gstudio/set.js"></script>
+  <!-- orgitdown! skin -->
+  <link rel="stylesheet" type="text/css" href="/static/ndf/orgitdown/skins/gstudio/style.css" />
+
+  <style type="text/css">
+    #save_form{ margin-top: 2em; }
+    
+    .pricing-table li.bullet-item {  text-align: left; }
+
+    .forum-summary{
+      background-color: #efefef;
+      box-shadow: 0px 2px 2px 2px lightgray;
+      margin: 2em 1em !important;
+      padding: 1em;
+      border : medium gray;
+      border-radius: 4px;
+    }
+
+    .forum-summary .user {  font-size: 1.5em;}
+    .forum-summary .user i { border-radius: 50px; }
+  </style>
+  
+
+<script language="javascript" >
+
+function cancel(){
+
+	if(confirm("Are you sure you want to cancel edit?"))
+	{
+		 history.go(-1);
+	}
+}
+
+</script>
+
+
+{% endblock %}
+
+
+{% block meta_content %}
+  <h2 style="border-bottom: medium dotted #008759; margin-top: -1.3rem; padding-bottom: 1rem;">{% trans "Thread" %}</h2>
+  <br/>  
+{% endblock %}
+
+
+{% block concern_information %}
+  <div id="thread-listing"></div>
+{% endblock %}
+
+
+{% block help_content %}
+  <p>{% trans "Threads are new ideas on the topic" %}</p>
+{% endblock %}
+
+
+{% block body_content %} 
+    
+  <h2>{% trans "Edit Thread " %}</h2>
+  
+  <div class="row forum-summary">
+    <div class="small-2 columns">
+      <a class="user"></a>
+      <br/><br/>
+      <i>{{ forum_created_by }}</i> <br/>
+      <small>{{forum.created_at|date:"D d M Y" }}</small>
+      <!-- <small>{#{#forum.created_by}}</small> -->
+    </div>
+    <div class="small-10 columns">
+      <font size ="5">Forum: <a href="/{{groupid}}/forum/{{forum}}">
+        {{forum.name}}</a></font>
+      <!-- <hr style="margin:0.5rem 0;" /> -->
+      <br/><br/>      
+      <blockquote>
+        <!-- #{#{forum.content|default_if_none:"No description !!"}} -->
+        {% with forum.content|safe as forum_content %}
+          {{forum_content}}
+        {% endwith %}
+      </blockquote>
+    </div>
+  </div>
+  <hr/>
+  <!-- <hr/> -->
+
+  <form id="edit_thread" method="POST">
+  {% csrf_token %}
+
+    <!-- forum name   -->
+    <div class="row">
+      <div class="large-2 medium-4 columns "><h5><b>{% trans "Thread:" %} </b></h5></div>
+      <div class="large-pull-4 large-6 medium-8 columns">
+        <input type="text" placeholder="Change the name of thread" 
+        name="thread_name" id="thread_name" value="{{thread.name}}">
+        <input id="exst_thread_name" type="hidden" value="{{thread.name}}">
+         
+      </div>
+    </div>
+    <br/><br/>
+ <input type="hidden" id="forum_threads" value="{{request.session.nodes}}"/>  
+    <!-- Description org editor -->
+    <h5><b>{% trans "Thread Content: " %}</b></h5>
+    <div class="row">
+      <div class="large-8 large-pull-4 large-offset-4 columns" 
+           style="padding:0 1.65em 0 1.4em;">
+            {% include "ndf/html_editor.html" with var_name="content_org" var_value=thread.content|default_if_none:"" node_id=thread.pk  %}
+
+        <div id="message" style="display:none; color:red"></div>
+        <!-- <input type="button" id="save_edit_cont" class="button" value="Save"> -->
+      </div>
+      <br/>
+
+      <!-- Final Create forum button -->
+      <div class="large-8 columns">
+
+        <input type="submit" id="forum" value="Create Forum" style="display:none">
+        <!-- <input id="forum" type="hidden" value="{{forum}}"> -->
+        <input type="button" id="save_form" class="button tiny" value="Save Changes" onclick="saveforum()">
+        <input type="button" id="cancel_edit" class="button tiny" value="Cancel" onclick="cancel()">
+      </div>
+
+    </div>
+ 
+  </form>
+
+{% endblock %}
+
+
+{% block script %}
+
+
+
+  // <script type="text/javascript">
+  $("#node_search_form").parent().hide();
+
+  var flag = false;
+
+{% block document_ready %}
+
+  
+    $('#orgitdown').orgitdown(mySettings);
+     
+    $("#thread_name").change(function(){
+    var nodes = JSON.parse($("#forum_threads").val());
+      var name = $("#thread_name").val().toLowerCase();
+      nodes.forEach( function(s, i){ nodes[i] = s.toLowerCase()})
+      var exst_name=$("#exst_thread_name").val().toLowerCase();
+      if (exst_name == name)
+      {
+        flag = true;
+        $("#message").css("display", "none");
+      }
+      else
+      {
+       if (nodes.indexOf(name) > -1)
+      {
+        flag = false;
+        $("#message").css("display", "block");
+        $("#message").html("Name '"+ name +"' already exist .. Please choose another name");
+        $("#thread_name").val("");
+      }
+      else
+      {
+        flag = true;
+        $("#message").css("display", "none");
+      }
+      }
+    });
+
+
+  function saveforum(){
+
+    var name=$("#thread_name").val();
+    var exst_name=$("#exst_thread_name").val().toLowerCase();  
+    if (name=="" )
+    {
+      alert("Please enter thread name");
+    }
+    else if(flag)
+    {
+      if (exst_name != name)
+      {
+        flag = true;
+        $("#message").css("display", "none");
+        $("#forum").trigger('click');
+      }
+      else if (exst_name == name)
+      {
+        flag = true;
+        $("#message").css("display", "none");
+        $("#forum").trigger('click');
+      }
+      else
+       {
+       alert("Thread with same name already exist !")
+       } 
+    }
+    else
+    {
+      $("#forum").trigger('click');
+    }
+  }
+
+{% endblock %}
+  // ==================================
+
+  // orgitdown
+
+  // </script>
+
+
+{% endblock %}

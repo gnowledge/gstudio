@@ -1,0 +1,308 @@
+{% load get_grid_fs_object from ndf_tags %}
+{% load i18n %}
+{% load ndf_tags %}
+{% get_grid_fs_object node as grid_fs_obj %}
+<style type="text/css">
+    .image-details .tabs .tab-title{
+        width: 43% !important;
+    }
+    .tab-title > a{
+        font-size: 0.80rem !important;
+    }
+    .lbl_of_tag{
+        background-color: gold !important;
+    }
+    .show-image{
+        margin-left:100px!important;
+    }
+</style>
+<!--<style type="text/css">
+    .gmodal-item-panel .text-gray{
+        display:none;
+    }
+    .gmodal-item-panel iframe{
+        height: 550px!important;
+        width:130%!important;
+    }
+    #view-page{
+        margin-top: -10px!important;
+    }
+    .gmodal-item-panel span{
+        display:none!important;
+    }
+    .gmodal-item-panel .button{
+        display:none!important;
+    }
+</style>-->
+<div id="reveal-{{node.pk}}" class="reveal-modal file-detail-modal" data-reveal >
+    <!--div class="row gmodal-toolbar">
+        <div class="small-8 columns file-name" title="{{node.name}}">
+            {% firstof node.altnames node.name %}
+        </div>
+        <div class="small-4 columns gmodal-actions">
+            <div class="view-info download-file">
+                <a>
+                    <i class="fi-info"></i>View Info
+                </a>
+            </div>
+            <div class="create-note download-file">
+                {% get_edit_url node.pk as edit_url %}
+                {% check_is_gstaff group_id request.user as is_gstaff %}
+                {% if is_gstaff or node.created_by == request.user.id %}
+                    <a href="{% url edit_url group_id node.pk %}">
+                        <i class="fi-page-edit" ></i>Edit
+                    </a>
+                {% endif %}
+            </div>
+
+            <div class="download-file">
+                <a class="download-link" title="Click here to Download" href="{% url 'read_file' group_name node grid_fs_obj.filename %}" download="{{ grid_fs_obj.filename }}">
+                    <i class="fi-download"></i>Download
+                </a>
+            </div>
+            <a href="{% url redirect_tab_url group_id %}" class="file-detail-modal-close"></a>
+        </div>
+    </div-->
+    <div class="row gmodal-body">
+        <div class="small-8 columns gmodal-item-panel" style="overflow-y: auto;">
+            <!-- Detail view section -->
+            {% include 'ndf/node_ajax_content.html' with no_discussion=True is_course=True %}
+        </div>
+            {% comment %}
+            <div class="row gmodal-footer">
+                <div class="columns small-1 prev-item">< Prev</div>
+                <div class="columns small-10 gmodal-item-details">
+                    <i class="fi-eye"></i>
+                    <span class="viewed-count">214</span>
+                    <i class="fi-like"></i>
+                    <span class="likes-count">10</span>
+                    <i class="fi-comments"></i>
+                    <span class="comment-count">22</span>
+                    <i class="fi-trash"></i>
+                    <span class="">Delete</span>
+                </div>
+                <div class="columns small-1 next-item">Next ></div>
+            </div>
+            {% endcomment %}
+    </div>
+    <!-- Comments section -->
+    <div class="small-4 columns gmodal-side-panel" >
+
+        <div class="gmodal-side row"   style="overflow-y:auto;">
+            <div class="small-12">
+                <div class="row view-info-area image-name">
+                    <div class="small-12 columns">
+                        <h5>{% firstof node.altnames node.name %}</h5>
+                    </div>
+                </div>
+                {% if node.tags %}
+                    <div class="row tag-rating-div">
+                            {% for tag in node.tags %}
+                                {% if forloop.counter < 3 %}
+                                    <small><label class="lbl_of_tag label">
+                                {% else %}
+                                    <small><label class="lbl_of_tag label tag_ele hide">
+                                {% endif %}
+                                <a href="{% url 'tag_info' groupid tag %}">{{tag}} </a></label></small>
+                            {% endfor %}
+                            {% if node.tags|length > 2 %}
+                                <small><label class="view-more-tags" style="display:inline-block;">More</label></small>
+                            {% endif %}
+                    </div>
+                {% else %}
+                    <i><small><label>{% trans "No tags defined yet!" %}</label></small></i>
+                {% endif %}
+
+                <div class="row image-brief">
+                    <div class="small-12 columns">
+                        {% include "ndf/widget_analytics_views.html" %}
+                        {% comment %}
+                        <i class="fi-eye"></i>
+                        <span>Avg&nbsp;</span>
+                        <span class="image-rating">3.4</span>
+                        <span>Rate this</span>
+                        {% endcomment %}
+                        <span>
+                            {% include "ndf/rating.html" %}
+                        </span>
+                    </div>
+                </div>
+                <div class="row image-actions">
+                    <div class="small-12 columns">
+                    {% if not node.collection_set %}
+                    {% get_download_filename node as download_filename %}
+                        <a href="{% url 'read_file' group_name node download_filename %}" download="{{ download_filename }}"><i class="fa fa-arrow-circle-down"></i>&nbsp;Download</a>
+                        {% comment %}
+                        <a><i class="fa fa-pencil"></i>&nbsp;Create Note</a>
+                        {% endcomment %}
+                    {% endif %}
+                        {% get_edit_url node.pk as edit_url %}
+                        {% check_is_gstaff group_id request.user as is_gstaff %}
+                        {% if is_gstaff or node.created_by == request.user.id %}
+                            <a href="{% url edit_url group_id node.pk %}?course_tab_title={{title}}">
+                                <i class="fi-page-edit" ></i>Edit
+                            </a>
+                            <a class="delete-btn" title="Delete  {{node.member_of_names_list.0}}"><i class="fi-trash"></i> Delete </a>
+                        {% endif %}
+                    </div>
+                </div>
+
+                <div class="row image-details">
+                    <div class="small-12 columns ">
+                        <ul class="tabs" data-tab>
+                          <li class="tab-title active"><a href="#image-comments">Comments</a></li>
+                          <li class="tab-title"><a href="#image-info-desc">Info</a></li>
+                          <!-- <li class="tab-title"><a href="#image-desc">Description</a></li> -->
+                        </ul>
+                        <div class="tabs-content">
+                            <div class="content" id="image-info-desc">
+                                {% get_file_obj  node as file_res %}
+                                <span>Created At: </span>{{node.created_at}}<br>
+                                <span>Uploaded by: </span>{{node.created_by|get_username}}<br>
+                                <span>Dimensions: </span>{{ file_res.if_image_dimensions|default_if_none:"No dimensions available" }}<br>
+                                <span>Format: </span>{{file_res.mime_type}}<br>
+                                <span>Size: </span>{{file_res.length|filesizeformat}}<br>
+                                <hr/>
+                                <span>Description:</span><br>
+                                {{node.content|default_if_none:"No description added yet."|safe}}
+                            </div>
+
+                            <div class="content active" id="image-comments">
+                                <div class="row comments-area">
+                                    <div class="small-12 columns" >
+                                        {% get_thread_node node.pk as thread_node_obj %}
+                                        {% if thread_node_obj %}
+                                            {% get_disc_replies thread_node_obj.pk group_id global_disc_all_replies as all_replies %}
+                                                {% include 'ndf/ggallery-discussion.html' with node=thread_node_obj var_name="content_org" ckeditor_toolbar="GgallaryCommentsToolbar" %}
+                                            {% else %}
+                                                {% get_disc_replies node.pk group_id global_disc_all_replies as all_replies %}
+                                                {% include 'ndf/ggallery-discussion.html' with var_name="content_org" ckeditor_toolbar="GgallaryCommentsToolbar" %}
+                                            {% endif %}
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <a href="{% url redirect_tab_url group_id %}" class="file-detail-modal-close"></a>
+    <a class="close-reveal-modal" aria-label="Close" style="top:0rem!important;margin-right:10px!important;">&#215;</a>
+
+</div>
+<script type="text/javascript">
+
+$(".view-info").click(function(){
+    $(".view-info-area").show();
+    $(".rating-area").hide();
+    $(".comments-area").hide();
+});
+
+$(".view-info-close").click(function(){
+    $(".view-info-area").hide();
+    $(".rating-area").show();
+    $(".comments-area").show();
+});
+
+$(document).on('click','.view-more-tags',function(){
+    if($(this).text()=="Less"){
+        $(".tag_ele").addClass("hide")
+        $(this).text("More")
+    }
+    else{
+        $(".tag_ele").removeClass("hide")
+        $(this).text("Less")
+    }
+})
+
+</script>
+
+{% comment %}
+<script type="text/javascript">
+(function( $ ) {
+    var _items = [];
+    var _itemsIdMap = {};
+    var _itemsPosMap = {};
+    var _galleryId;
+    var _currentItemGroup;
+    var _currentItem;
+    var _currentIndex;
+
+    $.fn.userGalleryModal = function(config) {
+       if(config) {
+            _items = config.items || _items;
+            $.each(_items, function(key, val) {
+                _itemsIdMap[val.id] = val;
+                _itemsPosMap[val.id] = key;
+            });
+            _galleryId = config.galleryId;
+        } else {
+            return false;
+        }
+       //initializing gallery functions
+        $('#' + _galleryId).find('.prev-item').on('click', function() {
+            _currentItem = _itemsPosMap[_currentItem.id] - 1 > -1 ?
+                _items[_itemsPosMap[_currentItem.id] - 1] :
+                _currentItem;
+            _renderItem();
+        });
+       $('#' + _galleryId).find('.next-item').on('click', function() {
+           _currentItem = _itemsPosMap[_currentItem.id] + 1 < _items.length ?
+               _items[_itemsPosMap[_currentItem.id] + 1] :
+               _currentItem;
+           _renderItem();
+       });
+       _currentItemGroup = $(this);
+       function _renderItem() {
+           $('#' + _galleryId).find('.file-name').html(_currentItem.name);
+           $('#' + _galleryId).find('.gmodel-item-image').attr('src', _currentItem['item-image']);
+           $('#' + _galleryId).find('.viewed-count').html(_currentItem.views);
+           $('#' + _galleryId).find('.download-link')
+                       .attr('href',_currentItem['download-link'])
+                       .attr('download',_currentItem.grid_fs_obj_name)
+           $('#' + _galleryId).find('.likes-count').html(_currentItem.rating);
+           $('#' + _galleryId).find('.comment-count').html(_currentItem.comments);
+       }
+       return {
+            getItems : function() {
+                return _items;
+            },
+            openItem : function(id) {
+                _currentItem = _itemsIdMap[id];
+                _currentIndex = _items[_currentItem];
+                _renderItem();
+            }
+        }
+        return this;
+   };
+
+}( jQuery ));
+</script>
+{% endcomment %}
+
+<script type="text/javascript">
+    $(document).on("click", ".delete-btn", function() {
+        msg = confirm("Do you want to delete this resource?.");
+        if (msg == true) {
+            $.ajax({
+                    type: "POST",
+                    url: "{% url 'trash_resource' group_id node %}",
+                    datatype: "html",
+                    data:{
+                           csrfmiddlewaretoken: '{{ csrf_token }}'
+                      },
+                  success: function(data) {
+                        data = JSON.parse(data)
+                        if(data['success']){
+                            $('.close-reveal-modal').trigger('click');
+                            window.location.replace("{% url redirect_tab_url group_id %}");
+                            
+                        }
+                  }
+
+            });
+        } 
+    });
+            
+</script>

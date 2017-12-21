@@ -1,0 +1,404 @@
+{% load i18n %}
+{% load cache %}
+
+{% cache 3600 map_widget_header %}
+{% block head %}
+
+	<meta content="width=device-width, initial-scale=1.0" name="viewport">
+
+	<!-- JS Links -->
+	<!-- <script src="http://cdn.leafletjs.com/leaflet-0.7.2/leaflet.js"></script> -->
+	<script src="/static/ndf/bower_components/leaflet/dist/leaflet.js"></script>
+	<!-- <script src="https://raw.githubusercontent.com/stefanocudini/leaflet-search/master/src/leaflet-search.js" type="text/javascript" ></script> -->
+
+	<!-- CSS Links -->
+	<!-- <link rel="stylesheet" href="http://cdn.leafletjs.com/leaflet-0.7.2/leaflet.css" /> -->
+	<link rel="stylesheet" href="/static/ndf/bower_components/leaflet/dist/leaflet.css">
+
+	<link rel="stylesheet" href="/static/ndf/bower_components/Leaflet.awesome-markers/dist/leaflet.awesome-markers.css">
+	<script src="/static/ndf/bower_components/Leaflet.awesome-markers/dist/leaflet.awesome-markers.js"></script>
+
+	<!-- <link rel="stylesheet" type="text/css" href="https://raw.githubusercontent.com/stefanocudini/leaflet-search/master/src/leaflet-search.css"> -->
+
+{% endblock %}
+
+	<style type="text/css">
+
+		#map { height: 100%; width: 100%; }
+
+		.leaflet-popup-content {	min-width:145px; max-width: auto;	}
+
+		.popup-add-content-button { background-color: #199369; color: #FFFFFF; display: block; float: left; padding: 1px 2px; cursor: pointer;	}
+		.popup-add-content-button:hover { background-color: #00BA7B; }
+
+		.popup-delete-content-button { background-color: #d84b33; color: #FFFFFF; display: inline-block; float: right; padding: 1px 2px; cursor: pointer;	}
+		.popup-delete-content-button:hover { background-color: #f15439; }
+
+		.popup-content {	padding: 0.25;	margin-bottom: 0.5em; }
+
+		.popup-content:focus {	background-color: #FFFFE0; border-color: buttonface; border-style: dashed; margin-bottom: 0.5em; padding: 0.25em; }
+
+	</style>
+{% endcache %}
+
+<body>
+	<div id="map" data-mode="{{mode}}">
+		<input type="hidden" data-map-markers='{{ node.location }}' value="{{location}}" name="map-geojson-data"/>
+	</div>
+
+	<div style="display:none;">
+		<div class="popup-html">
+			<div class="popup-content" contenteditable="true"></div>
+			<div class="row">
+				<div class="small-5 popup-add-content-button text-center"><i class="fi-page-edit">&nbsp; edit</i></div>
+				<div class="small-5 popup-delete-content-button text-center"><i class="fi-trash">&nbsp; marker</i></div>
+			</div>
+		</div>
+	</div>
+
+	<input type="hidden" value="{{ visited_location }}" name="last_visited_location"/>
+
+	{% cache 300 map_widget_JS mode source %}
+	<script type="text/javascript">
+
+
+	 	// We’ll add a OSM tile layer to our map
+	 	var osmUrl 	  = 'http://{s}.tile.osm.org/{z}/{x}/{y}.png',
+	 	osmAttrib = '&copy; <a href="http://openstreetmap.org/copyright">OpenStreetMap</a> contributors',
+	 	osm 	  = L.tileLayer(osmUrl, {maxZoom: 18, attribution: osmAttrib});
+
+        // Lets try to access some Bhuvan WMS tiles, currently does not work
+		//         var bhuvan = L.tileLayer.wms("http://tile3.nrsc.gov.in/tilecache/tilecache.py", {
+		//     layers: 'bhuvan_imagery',
+		//     format: 'image/jpeg',
+		//             crs : L.CRS.EPSG4326,
+		//     attribution: "Indian Remote Sensing Satellites, NRSC"
+		// });
+
+	 	// initialize the map on the "map" div with a given center and zoom
+	 	var map = L.map('map').setView([25.92,79.84], 5).addLayer(osm);
+
+	 	var nonInfoMarker = L.AwesomeMarkers.icon({ markerColor: 'blue', iconColor: 'white', spin:false });
+	 	var infoMarker = L.AwesomeMarkers.icon({ icon: 'info', prefix: 'fi', markerColor: 'blue', iconColor: 'white', spin:false });
+
+  		// L.marker([25.92,79.84], { icon: infoMarker }).addTo(map);
+
+	 	var initialPopContent = "Add description.. <i>(optional)</i>",
+	 		initialPopContentText = "Add description.. (optional)";
+
+
+	 	// map.addControl( new L.Control.Search({layer: searchLayer}) );
+
+		{% if source == "custom_template_edit" %}
+
+	 		mapdata = $("input:hidden[name=map-geojson-data]").val();
+
+	 		if(mapdata && typeof(mapdata) == "string")
+	 		{
+	 			mapdata = mapdata.trim();
+
+	 			mapdata = mapdata[0]!="["?"["+mapdata:mapdata ;
+	 			mapdata = mapdata[mapdata.length-1]!="]"? mapdata+"]":mapdata ;
+	 		}
+
+	 	{% else %}
+	 		mapdata = $("input:hidden[name=map-geojson-data]").attr("data-map-markers");
+	 	{% endif %}
+
+	 	markerGeoJSON = [];
+	 	popupBasicHtml = $(".popup-html").html()
+
+	 	tempArr = []	// to catch newly created markers
+
+	 	if( mapdata.length > 0 )
+	 	{
+	 		// Adding mapdata on map
+		 	// L.geoJson(mapdata, {onEachFeature: function (feature, layer) {
+		 	// 	// layer.bindPopup("feature.properties.description");
+		 	// }}).addTo(map);
+
+			mapdata = mapdata.replace(/'/gm, '"');
+	 		mapdata = mapdata.replace(/u"/gm, '"');
+	 		mapdata = JSON.parse(mapdata);
+
+			L.geoJson(mapdata, {
+
+			    pointToLayer: function (feature, latlng) {
+
+					var description = feature.properties.description,
+						tempPopupContent;
+
+					if(description)
+					{
+						tempPopupContent = popupBasicHtml.replace('<div class="popup-content" contenteditable="true"></div>','<div class="popup-content" contenteditable="true">'+description+'</div>');
+					}
+					else
+					{
+						tempPopupContent = popupBasicHtml.replace('<div class="popup-content" contenteditable="true"></div>','<div class="popup-content" contenteditable="true">'+ initialPopContent +'</div>');
+					}
+
+					var marker = L.marker(latlng, {
+						icon: (description)?infoMarker:nonInfoMarker,
+						title: (description)?description:"Resource Location",
+						alt: (description)?description:"Resource Location",
+						riseOnHover:true
+
+			    	{% if mode == "edit" %}
+							,draggable:true,
+						}).bindPopup(tempPopupContent);
+
+			        	marker.on("popupopen", activateMarker );
+						marker.on("dragend", dragend);
+
+			        {% elif mode == "read" %}
+
+						}); // End of marker for read
+						if(description){ marker.bindPopup(feature.properties.description); }
+
+			       	{% endif %}
+
+					tempArr.push(marker);
+
+					return marker;
+
+			    }
+			}).addTo(map);
+
+
+
+	        // Adding mapdata values in markerGeoJSON.
+	        $.each(tempArr, function(i, val){
+
+	        	var addLeafletID = tempArr[i].toGeoJSON();
+
+	        	// console.log(tempArr[i].feature.properties.description);
+
+	        	$(addLeafletID).attr("properties", {"id": tempArr[i]._leaflet_id, "description":tempArr[i].feature.properties.description});
+	        	markerGeoJSON.push(JSON.stringify(addLeafletID));
+
+	        })
+
+			{% if mode == "edit" %}
+	        	updateHiddenTagContent();
+	        {% endif %}
+	 	}
+
+
+	{% if mode == "edit" %}
+
+		function updateHiddenTagContent(visitedMarker)
+	 	{
+	 		$('input:hidden[name=map-geojson-data]').attr("data-map-markers", markerGeoJSON)
+			$('input:hidden[name=map-geojson-data]').attr("value", markerGeoJSON)
+
+			// To set user's latest accesed marker.
+			if(visitedMarker)
+			{
+				if(!visitedMarker[2])
+				{
+					visitedMarker.push(map.getZoom());
+				}
+
+				$('input:hidden[name=last_visited_location]').attr("value", visitedMarker);
+			}
+	 	}
+
+		map.on('click', onMapClick );
+
+		// Script for adding marker on map click
+		function onMapClick(e) {
+
+			var tempPopupContent = popupBasicHtml.replace('<div class="popup-content" contenteditable="true"></div>','<div class="popup-content" contenteditable="true">'+ initialPopContent +'</div>');
+
+			var marker = L.marker(e.latlng, {
+				icon: nonInfoMarker,
+				draggable:true,
+				title:"Resource location",
+				alt:"Resource Location",
+				riseOnHover:true
+			}).addTo(map)
+				.bindPopup(tempPopupContent);
+				// .openPopup();
+
+			marker.on("popupopen", activateMarker );
+			marker.on("dragend", dragend);
+
+			var addLeafletID = marker.toGeoJSON();
+			$(addLeafletID).attr("properties", {"id": marker._leaflet_id});
+
+			markerGeoJSON.push(JSON.stringify(addLeafletID));
+
+
+            var changedMarkerLatLng = []
+            changedMarkerLatLng.push(e.latlng.lat);
+            changedMarkerLatLng.push(e.latlng.lng);
+
+            updateHiddenTagContent(changedMarkerLatLng);
+		}
+
+		// Update marker on changing it's position
+		function dragend(ev){
+
+			var	changedPos = ev.target.getLatLng(),
+				zoom;
+
+
+           	this.setLatLng(changedPos).update();	// Update the marker position
+
+           	var lID = this._leaflet_id;		// Getting Leaflet ID of this marker
+
+           	var tempMarkerGeoJSON = this.toGeoJSON();
+
+			var description = tempMarkerGeoJSON.properties.description;
+
+			if(! description)
+			{
+				$.each(markerGeoJSON, function(i, val) {
+
+					            		var getID = $.parseJSON(val).properties.id,
+					            			getDescription = $.parseJSON(val).properties.description;
+
+					            		if(getID == lID) { description = getDescription?getDescription:"";  }
+					           		})
+			}
+
+			if(description)
+			{
+				$(".popup-content:visible").text(description);
+			}
+
+			// tempMarkerGeoJSON.properties.description = $(this).parent().parent().find(".popup-content:visible").text();
+
+			tempMarkerGeoJSON.properties.id = lID;
+
+
+			var updatedGeoJSON = JSON.stringify(tempMarkerGeoJSON);
+
+            $.each(markerGeoJSON, function(i, val) {
+
+	        	var getID = $.parseJSON(val).properties.id;
+	        	if(getID == lID) { markerGeoJSON[i] = updatedGeoJSON; }
+            })
+
+            var changedMarkerLatLng = []
+            changedMarkerLatLng.push(changedPos.lat);
+            changedMarkerLatLng.push(changedPos.lng);
+
+            updateHiddenTagContent(changedMarkerLatLng);
+
+		    //	var addLeafletID = this.toGeoJSON();
+			// 	$(addLeafletID).attr("properties", {"id": lID});
+        }
+
+
+
+		function activateMarker(){
+
+			tempMarker = this;
+			// tempMarker._popup._content
+			var tempMarkerGeoJSON = this.toGeoJSON();
+			// console.log(JSON.stringify(tempMarkerGeoJSON));
+			var lID = tempMarker._leaflet_id;		// Getting Leaflet ID of this marker
+
+			var description = tempMarkerGeoJSON.properties.description;
+
+            var changedMarkerLatLng = []
+            changedMarkerLatLng.push(tempMarker.getLatLng().lat);
+            changedMarkerLatLng.push(tempMarker.getLatLng().lng);
+            updateHiddenTagContent(changedMarkerLatLng);
+
+			if(! description)
+			{
+				$.each(markerGeoJSON, function(i, val) {
+
+					            		var getID = $.parseJSON(val).properties.id,
+					            			getDescription = $.parseJSON(val).properties.description;
+
+					            		if(getID == lID) { description = getDescription?getDescription:"";  }
+					           		})
+			}
+
+			if(description)
+			{
+				$(".popup-content:visible").text(description);
+			}
+
+			// To remove marker on click of delete
+			$(".popup-delete-content-button:visible").click(function(){
+
+				$.each(markerGeoJSON, function(i, val) {
+
+	            		getID = JSON.parse(val).properties.id;
+
+	            		if(getID == lID) { markerGeoJSON.splice(i,1);	return false; }
+            		})
+
+				map.removeLayer(tempMarker);
+
+				updateHiddenTagContent();
+			});
+
+			$(".popup-content:visible").bind("keyup keypress onmouseup change blur", function(){
+
+				var tempContentText = ($(this).text()).trim();
+
+				if( tempContentText != initialPopContentText )
+				{
+					$(this).siblings().find("i.fi-page-edit:visible").attr("class", "fi-save").text(" save");
+				}
+				else
+				{
+					$(this).siblings().find("i.fi-save:visible").attr("class", "fi-page-edit").text(" edit");
+				}
+			});
+
+			// To add content on click of add content
+			$(".popup-add-content-button:visible").click(function(){
+
+				if($(this).children("i").hasClass("fi-page-edit"))
+				{
+					$(this).parent().parent().find(".popup-content").focus();
+				}
+				else if($(this).children("i").hasClass("fi-save"))
+				{
+					$(this).find("i.fi-save:visible").attr("class", "fi-page-edit").text(" edit");
+
+					getMarkerTextNote = $(this).parent().parent().find(".popup-content:visible").text().trim();
+
+					if(getMarkerTextNote.length && getMarkerTextNote != initialPopContentText )
+					{
+						tempMarker.setIcon(infoMarker);
+
+						tempMarker.options.title = tempMarkerGeoJSON.properties.description;
+					}
+					else
+					{
+						tempMarker.setIcon(nonInfoMarker);
+					}
+
+					tempMarkerGeoJSON.properties.description = getMarkerTextNote.replace(/'/gm, "");	// temp fix.
+
+					if(! tempMarkerGeoJSON.properties.id)
+					{
+						tempMarkerGeoJSON.properties.id = lID;
+					}
+
+					var updatedGeoJSON = JSON.stringify(tempMarkerGeoJSON);
+
+            		$.each(markerGeoJSON, function(i, val) {
+
+	            		var getID = $.parseJSON(val).properties.id;
+	            		if(getID == lID) { markerGeoJSON[i] = updatedGeoJSON; }
+            		})
+
+            		updateHiddenTagContent(changedMarkerLatLng);
+				}
+			});
+
+		}
+
+	{% endif %}
+
+	</script>
+
+	{% endcache %}

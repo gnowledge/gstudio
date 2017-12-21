@@ -1,0 +1,49 @@
+<h1>cache status</h1>
+
+<ul>
+<li>memory usage:
+    {{ stats.bytes|filesizeformat }}
+<li>keys in cache:
+    {{ stats.curr_items }} of {{ stats.total_items }}
+<li>cache hits:
+    {{ stats.get_hits }} of {{ stats.cmd_get }}:
+    <b>{{ hit_rate }}%</b>
+<li>cache traffic:
+    {{ stats.bytes_read|filesizeformat }} in,
+    {{ stats.bytes_written|filesizeformat }} out
+<li>uptime: {{ stats.uptime }}
+</ul>
+<hr/>
+
+<h1>listing all the <u>{{ stats.curr_items }}</u> memcached items with keys</h1>
+<ol>
+{% for each_item in all_cached_items %}
+	<li>{{each_item}}</li>
+	<br/> <br/>
+{% endfor %}
+</ol>
+<hr/>
+
+<h1>All the memcache stats variables</h1>
+<pre>
+pid                   {{ stats.pid }}
+uptime                {{ stats.uptime }}
+time                  {{ stats.time }}
+version               {{ stats.version }}
+rusage_user           {{ stats.rusage_user }}
+rusage_system         {{ stats.rusage_system }}
+curr_items            {{ stats.curr_items }}
+total_items           {{ stats.total_items }}
+bytes                 {{ stats.bytes }}
+curr_connections      {{ stats.curr_connections }}
+total_connections     {{ stats.total_connections }}
+connection_structures {{ stats.connection_structures }}
+cmd_get               {{ stats.cmd_get }}
+cmd_set               {{ stats.cmd_set }}
+get_hits              {{ stats.get_hits }}
+get_misses            {{ stats.get_misses }}
+evictions             {{ stats.evictions }}
+bytes_read            {{ stats.bytes_read }}
+bytes_written         {{ stats.bytes_written }}
+limit_maxbytes        {{ stats.limit_maxbytes }}
+</pre>

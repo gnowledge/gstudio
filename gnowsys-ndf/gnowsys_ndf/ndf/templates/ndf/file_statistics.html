@@ -1,0 +1,305 @@
+{% load i18n %}
+<style type="text/css">
+    #tooltip {
+        position: absolute;
+        width: 200px;
+        height: auto;
+        padding: 10px;
+        background-color: white;
+        -webkit-border-radius: 10px;
+        -moz-border-radius: 10px;
+        border-radius: 10px;
+        -webkit-box-shadow: 4px 4px 10px rgba(0, 0, 0, 0.4);
+        -moz-box-shadow: 4px 4px 10px rgba(0, 0, 0, 0.4);
+        box-shadow: 4px 4px 10px rgba(0, 0, 0, 0.4);
+        pointer-events: none;
+    }
+    #tooltip.hidden {
+        display: none;
+    }
+    #tooltip p {
+        margin: 0;
+        font-family: sans-serif;
+        font-size: 16px;
+        line-height: 20px;
+        color: black;
+    }
+
+    #tot_rating{
+        font-size: 25px;
+        font-weight: bold;
+    }
+</style>
+<script src="/static/ndf/bower_components/d3/d3.js"></script>
+<script src="/static/ndf/bower_components/d3-tip/index.js"></script>
+<script type="text/javascript">
+    var g = "{{datavisual}}";
+
+    var m = g.replace(/&quot;/gi, '"');
+
+    var dataset = [];
+
+    m = JSON.parse(m);
+    var l = m.length;
+    for (var l = 0; l < m.length; l += 1) {
+        dataset.push(m[l]);
+    }
+    //  alert(dataset);
+
+    var w = 270;
+    var h = 350;
+    //defining a custom color scale
+    var color = d3.scale.category10();
+
+</script>
+<h3>Statistics</h3>
+    <dl class="tabs" data-tab>
+        {% if not show_only_pie %}
+            <dd class="tab-title active"><a href="#bar_visual">{% trans 'Bar-Chart' %}</a></dd>
+            <dd class="tab-title"><a href="#pie_visual">{% trans 'Pie' %}</a></dd>
+        {% else %}
+            <dd class="tab-title active"><a href="#pie_visual">{% trans 'Activity Ratings' %}</a></dd>
+        {% endif %}
+    </dl>
+  <!-- <p "font-family: tahoma">Hover over to view tooltip</p> -->
+  <br/>
+    <div class="tabs-content">
+        <div id="tooltip" class="hidden">
+          <h6>{% trans 'Details' %}</h6>
+          <p><span id="tip-value">100</span></p>
+        </div>
+        {% if not show_only_pie %}
+        <div class="content active" id="bar_visual">
+            <script type="text/javascript">
+                // var g = "{{datavisual}}";
+
+                // var m = g.replace(/&quot;/gi, '"');
+
+                // var dataset = [];
+
+                // m = JSON.parse(m);
+                // var l = m.length;
+                // for (var l = 0; l < m.length; l += 1) {
+                //     dataset.push(m[l]);
+                // }
+                // //   alert(dataset);
+
+                // var w = 270;
+                // var h = 200;
+                // //defining a custom color scale
+                // var color = d3.scale.category10();
+
+                var barPadding = 1;
+                //creating an svg canvas to draw our visualizaions
+                var svg = d3.select("#bar_visual").append("svg")
+                    .attr("width", w)
+                    .attr("height", h);
+
+                //core d3 at work. first we create a variable named bars. bars consists of a selection of rects . the rects will form the bars of our bar graph.
+
+                var bars = svg.selectAll("rect")
+                    .data(dataset)
+                    .enter()
+                    .append("rect")
+                    .attr("class", "bar")
+                    .attr("title", "sample")
+                    .attr("x", function (d, i) {
+                        return i * (w / dataset.length);
+                    })
+                    .attr("y", function (d) {
+                        return h;
+                    })
+                    .attr("height", function (d) {
+                        return (d.count * 4);
+                    })
+                    .attr("width", function (d) {
+                        return w / dataset.length - barPadding;
+                    })
+                    .attr("fill", function (d, i) {
+                        return color(i);
+                    })
+                    .attr("title", function (d) {
+                        return d.name + "s : " + d.count
+                    })
+                    .on("mouseover", function (d) {
+
+                        //Get this bar's x/y values, then augment for the tooltip
+                        var xPosition = parseFloat(d3.select(this).attr("x")); // xScale.rangeBand() / 2;
+                        var yPosition = parseFloat(d3.select(this).attr("y")) / 2 + h / 2;
+
+                        //Update the tooltip position and value
+                        d3.select("#tooltip")
+                            .style("left", xPosition + "px")
+                            .style("top", yPosition + "px")
+                            .select("#tip-value")
+                            .text(d.name + " : " + d.count);
+
+                        //Show the tooltip
+                        d3.select("#tooltip").classed("hidden", false);
+
+                        d3.select(this)
+                            .attr("fill", "orange");
+
+                    })
+                    .on("mouseout", function (d, i) {
+
+                        d3.select(this)
+                            .transition()
+                            .duration(250)
+                            .attr("fill", color(i));
+                        //Hide the tooltip
+
+                        d3.select("#tooltip").classed("hidden", true);
+
+                    });
+
+                bars.data(dataset)
+                    .transition()
+                    .attr("y", function (d) {
+                        return h - (d.count * 4);
+                    })
+                    .duration(500);
+
+
+                svg.selectAll("text")
+                    .data(dataset)
+                    .enter()
+                    .append("text")
+                    .transition()
+                    .delay(1000)
+                    .text(function (d) {
+                        return d.count;
+                    })
+                    .attr("x", function (d, i) {
+                        return i * (w / dataset.length) + (w / dataset.length - barPadding) / 2;
+                    })
+                    .attr("y", function (d) {
+                        return h - (d.count * 4) + 14;
+                    })
+                    .attr("font-family", "sans-serif")
+                    .attr("font-size", "11px")
+                    .attr("fill", "white")
+                    .attr("text-anchor", "middle");
+            </script>
+        </div>
+        {% endif %}
+        {% if show_only_pie %}
+        <label id="tot_rating">{{username}}'s{% trans 'Total Rating Score' %}: {{total_activity_rating}}</label>
+        <div class="content active" id="pie_visual">
+        {% else %}
+        <div class="content " id="pie_visual">
+        {% endif %}
+            <script type="text/javascript">
+                
+                // var g = "{{datavisual}}";
+
+                // var m =g.replace(/&quot;/gi,'"');
+
+                // var dataset = [];
+                var system_count = [];
+                // m = JSON.parse(m);
+                // var i = m.length;
+                
+                // for (var i =0 ; i < m.length ; i+=1)
+                // {
+                //  dataset.push(m[i]);
+                // //   alert(m[i]);
+                // }
+
+                for (var i = 0 ; i < dataset.length ; i += 1)
+                {
+                    system_count.push(dataset[i].count);
+                }
+
+                // var w= 270;
+                // var h = 350;
+                // var colorScale = d3.scale.category10();
+
+
+                var outerRadius = w/2
+                var innerRadius = 75;
+                var arc = d3.svg.arc()
+                .innerRadius(innerRadius)
+                .outerRadius(outerRadius);
+
+                var pie_svg = d3.select("#pie_visual")
+                .append("svg")
+                .attr("height",h)
+                .attr("width",w);
+
+                var pie = d3.layout.pie().sort(null);
+
+                var p = pie(system_count);
+                //alert(p);
+                var arcgrp = pie_svg.selectAll("g.arc")
+                .data(p)
+                .enter()
+                .append("g")
+                .attr("class","arc")
+                .attr("transform","translate(" + outerRadius + "," + outerRadius + ")");
+
+                arcgrp.append("path")
+                .attr("d",arc)
+                .attr("fill", function (d, i) {
+                    return color(i);
+                })
+
+                .on("mouseover", function(d,i) {
+
+                            //Get this bar's x/y values, then augment for the tooltip
+                            var xPosition = arc.centroid(d)[0] + 85 ;//+ xScale.rangeBand() / 2;
+                            var yPosition = arc.centroid(d)[1] + 225 ;// 2 + h / 2;
+
+                            //Update the tooltip position and value
+                            tips = d3.select("#tooltip")
+                            .style("left", xPosition + "px")
+                            .style("top", yPosition + "px")                     
+                            .select("#tip-value")
+                            .text(dataset[i].name+ " : " + system_count[i]);
+                            
+
+                            //Show the tooltip
+                            d3.select("#tooltip").classed("hidden", false);
+
+                            d3.select(this)
+                            .attr("fill","yellow");
+
+                        })
+                    .on("mouseout", function(d,i) {
+
+                        d3.select(this)
+                        .transition()
+                        .duration(250)
+                        .attr("fill", color(i));
+                            //Hide the tooltip
+
+                            d3.select("#tooltip").classed("hidden", true);
+                            
+                        })
+                .transition()
+                .ease("bounce")
+                .duration(2000)
+                .attrTween("d", tweenPie)
+                .transition()
+                .ease("elastic")
+                .delay(function(d, i) { return 2000 + i * 50; })
+                .duration(750)
+                .attrTween("d", tweenDonut);
+
+                function tweenPie(b) {
+                    b.innerRadius = 0;
+                    var i = d3.interpolate({startAngle: 0, endAngle: 0}, b);
+                    return function(t) { return arc(i(t)); };
+                }
+
+                function tweenDonut(b) {
+                    b.innerRadius = outerRadius * .6;
+                    var i = d3.interpolate({innerRadius: 0}, b);
+                    return function(t) { return arc(i(t)); };
+                };
+
+                arcgrp.data(system_count)
+                .attr("fill", function(d){ return color(d);});
+            </script>
+        </div>
+    </div>

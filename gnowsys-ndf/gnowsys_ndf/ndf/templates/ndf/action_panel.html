@@ -1,0 +1,563 @@
+{% load ndf_tags %}
+{% load i18n %}
+{% load cache %}
+{% user_access_policy groupid request.user as user_access_priv %}
+{% get_group_object groupid as group_object %}
+{% is_partner group_object as is_partner_val %}
+{% with user.is_authenticated as is_user_authenticated %}
+{% check_is_gstaff groupid request.user as is_gstaff %}
+{% check_group node.pk as is_group %}
+{% check_is_user_group node.pk as is_user_group %}
+{% get_relation_value node.pk 'has_help' as grel_dict %}
+<style type="text/css">
+	.right-btn, .left-btn{
+		/*float: left;*/
+		/*margin-left: 1rem;*/
+		width: 40%;
+		font-size: 0.85em !important;
+		margin-top: 0.1rem !important;
+		text-align: center;
+	}
+	.tag-rating-div{
+		margin-left: 0.6rem !important;
+		margin-top: 0.3rem !important;
+	}
+	/*	
+	.right-btn{
+		float: right;
+		margin-right: 1rem;
+		width: 8rem;
+		font-size: 0.75rem !important
+	}
+	*/
+	.rating-lbl{
+		display: inline-block;
+		font-size: 1rem !important;
+		/*font-style: italic;*/
+		/*margin-left: 3rem;*/
+
+	}
+	.rating_template{
+		display: inline-table;
+	}
+	.mod-btn{
+		width: 80% !important;
+		font-size: 0.75rem !important;
+	}
+	.btn-row{
+		/*margin-left: 1rem !important;*/
+		text-align: center;
+		margin-bottom: -1rem !important;
+	}
+	.lbl_tag{
+		display: inline-block;
+		font-size: 0.80rem !important;
+	}
+	.lbl_field{
+		width: 20%;
+		color: #194d6f;
+		/*font-weight: bold;*/
+		margin-top: 1rem;
+		font-size: 1rem !important;
+	}
+	.label > a{
+		color: white !important;
+	}
+
+	.graph_btn{
+		margin-left: 3rem;
+	}
+
+	#group_drawer{
+		height: 400px;
+		overflow-y: auto;
+		margin-left: 2em;
+	}
+</style>
+
+  <div id="deleteModal" class="reveal-modal medium alert-box radius" data-reveal data-alert>
+    <p id="deleteModalLabel"></p>
+    <div class="row feeds_proceed">
+      <div class="small-3 small-offset-3 columns">
+        <input type="button" id="btnConfirmYes" class="button tiny expand" value={% trans "Yes" %}>
+      </div>
+      <div class="small-3 columns end">
+        <input type="button" id="btnConfirmNo" class="button tiny expand " value={% trans "No" %}>
+      </div>
+    </div>
+    <a class="close-reveal-modal">&#215;</a>
+  </div>
+
+<section class="medium-3 columns"> 
+
+	<ul class="side-nav">
+
+		<!-- PANEL 1
+		 Resource related Actions such as 
+			Edit, Publish, Delete, History,
+			Translate, Cross Publish,
+			Tags
+		 -->
+		<div class="panel">
+			<!-- Edit and Publish -->
+				<div class="row btn-row">
+					<!-- Edit button -->
+						{% if is_user_authenticated %}
+							{% get_edit_url node.pk as edit_url %}
+							{% if is_group %}
+								{% if is_gstaff %}
+									{% if "PartnerGroup" in node.member_of_names_list %}
+									<a href="{% url 'edit_group' group_id %}?subgroup=True&partnergroup=True" class="tiny button radius left-btn" title="Edit this {{node.member_of_names_list.0}}">{% trans " Edit" %}</a>
+									{% else %}
+									<a href="{% url edit_url group_id %}" title="Edit this {{node.member_of_names_list.0}}" class="tiny button radius left-btn">{% trans " Edit" %}</a>
+									{% endif %}
+								{% endif %}
+							{% else %}
+								{% get_list_of_fields node.type_of "name" as type_of_list %}
+								{% if "Wiki page" in type_of_list and user_access_priv == "allow" %}
+									<a href="{% url edit_url group_id node %}" class="tiny button radius left-btn" title="Edit this {{node.member_of_names_list.0}}">{% trans " Edit" %}</a>
+								{% else %}
+
+									{% if is_gstaff or node.created_by == user.id %}
+										<a href="{% url edit_url group_id node %}" class="tiny button radius left-btn" title="Edit this {{node.member_of_names_list.0}}">{% trans " Edit" %}</a>
+									{% else %}
+										<input type="button" class="tiny button radius secondary left-btn  disabled" value="Edit" title="{% trans 'You are not authorized for this action' %}">
+									{% endif %}
+								{% endif %}
+							{% endif %}
+						{% else %}
+							<input type="button" class="tiny button radius secondary left-btn  disabled" value="Edit" title="{% trans 'You are not authorized for this action' %}">
+						{% endif %}
+
+
+					<!-- Publish button -->
+					{% if node %}
+						{% get_publish_policy request groupid node as group_policy %}
+						{% if group_policy == "allow" %}
+							{% if user.is_superuser or node.created_by == user.id %}
+								{% if is_group %}
+									<a href="{% url 'publish_group' group_id node %}" class="tiny button radius right-btn" title="Publish this {{node.member_of_names_list.0}}">{% trans "Publish" %}</a>
+								{% else %}
+									<a href="{% url 'publish_page' group_id node %}" class="tiny button radius right-btn" title="Publish this {{node.member_of_names_list.0}}">{% trans "Publish" %}</a>
+								{% endif %}
+							{% endif %}
+						{% elif group_policy == "MODERATION" %}
+							<input type="button" class="tiny button radius right-btn secondary disabled" title="Resource is under Moderation" value="{% trans 'Moderation' %}">
+						{% else %}
+							<input type="button" class="tiny button radius right-btn secondary disabled" title="This {{node.member_of_names_list.0}} is Published." value="{% trans 'Published' %}">
+						{% endif %}
+					{% endif %}
+				</div>
+			{% if not is_group %}
+			{% if node.status != "MODERATION" %}
+			<!-- Delete and History NA -->
+			<!-- Cross publish and Delete -->
+				{% if user.is_authenticated %} 
+				<div class="row btn-row">
+					<!-- History -->
+					<a href = "{% url 'node_version' groupid node.pk  %}" class="tiny button radius right-btn" >{% trans "History" %}</a> 
+						<!-- Delete button				 -->
+						{% if node.created_by == request.user.id or is_gstaff %}
+							{% if "Page" in node.member_of_names_list or "File" in node.member_of_names_list or "Term" in node.member_of_names_list %}
+								<a class="tiny button radius right-btn delete-btn" title="Delete  {{node.member_of_names_list.0}}">{% trans 'Delete' %} {{node.member_of_names_list.0}}</a>
+							{% else %}
+								<input type="button" class="tiny button radius right-btn disabled secondary" value="{% trans 'Delete'  %} {{node.member_of_names_list.0}}">
+							{% endif %}
+						{% else %}
+							<input type="button" class="tiny button radius right-btn secondary disabled" value="{% trans 'Delete' %} {{node.member_of_names_list.0}}" title="{% trans 'You are not authorized for this action' %}">
+						{% endif %}
+						
+						<a href="{% url 'uploadDoc' groupid %}" class="tiny expand button radius">
+            				{% trans "Upload File" %}
+      					</a>
+						<!-- Cross Publish -->
+						{% if 'CourseEventGroup' not in group_object.member_of_names_list %}
+							{% if node.created_by == request.user.id or is_gstaff %}
+							<!-- {% switch_group_conditions request.user group_id as switch_conditions %} -->
+							<!-- If resource is already under moderation, don't show cross-publish button -->
+
+								<span  title="{% trans 'Publish this resource in other group/s' %}" class="has-tip tip-bottom"><a id="switch_group" class="tiny button radius mod-btn" data-reveal-id="publish_resource"> {% trans "Cross Publish" %}</a></span>
+								
+								<div id="publish_resource" class="reveal-modal" data-reveal style="position:absolute;"> 
+									<h4>{% trans "Select Groups" %}</h4>
+									<div id="switchgrp" class="content">
+									<ul id="group_drawer" class="large-block-grid-2">
+									</ul><br/>
+									<input type="button" id="save_switch_group" class="round button push-4" value="{% trans 'Save selected group' %}">
+									</div>
+									<a class="close-reveal-modal">&#215;</a>
+								</div>
+							{% else %}
+								<input type="button" class="tiny button radius mod-btn secondary disabled" title="{% trans 'You are not authorized for this action' %}" value="{% trans 'Cross Publish' %}">
+							{% endif %}
+						{% endif %}
+						
+
+				</div>
+				{% endif %}
+			{% comment %}
+			<!-- Translate and Cross Publish if not is_group-->
+
+				<div class="row btn-row">
+
+					<!-- ste -->
+					{% if user.is_authenticated %}
+						{% if user_is_joined == "joined" or user_is_joined == "author" %}
+							<a href="{% url 'node_translation' group_object.name node %}" class="tiny button radius left-btn">{% trans "Translate" %}</a>
+						{% endif %}
+						<!-- Cross Publish -->
+						{% if 'CourseEventGroup' not in group_object.member_of_names_list %}
+							<!-- {% switch_group_conditions request.user group_id as switch_conditions %} -->
+							<!-- If resource is already under moderation, don't show cross-publish button -->
+								<span  title="{% trans 'Publish this resource in other group/s' %}" class="has-tip tip-bottom"><a id="switch_group" class="tiny button radius right-btn" data-reveal-id="publish_resource"> {% trans "Cross Publish" %}</a></span>
+								<div id="publish_resource" class="reveal-modal" data-reveal style="position:absolute;"> 
+									<div id="switchgrp" class="content">
+									<h4>{% trans "Select Groups" %}</h4>
+									<div id="group_drawer">
+									{% include "ndf/drawer_widget.html" with widget_for="collection_set" %}
+									</div><br/>
+									<input type="button" id="save_switch_group" class="round button push-4" value="{% trans 'Save selected group' %}">
+									</div>
+									<a class="close-reveal-modal">&#215;</a>
+								</div>          
+
+						{% endif %}
+
+					{% else %}
+						<input type="button" class="tiny disabled secondary button radius left-btn" value="{% trans "Translate" %}" >
+						<span title="{% trans 'Publish this resource in other group/s' %}" class="has-tip tip-bottom"><input type="button" class="secondary disabled tiny button radius right-btn" value="{% trans 'Cross Publish' %}"></span>
+					{% endif %}
+				</div>
+			{% endcomment %}
+			<!-- Tags row -->
+				<div class="row tag-rating-div">
+					<span title="{% trans 'keyword or label to categorize' %}"><label class="lbl_tag lbl_field">{% trans "Tags" %}</label></span>
+						{% if node.tags %}
+							{% for tag in node.tags %}
+								{% if forloop.counter < 3 %}
+									<small><label class="lbl_tag label">
+								{% else %}
+									<small><label class="lbl_tag label tag_ele hide">
+								{% endif %}
+								<a href="{% url 'tag_info' groupid tag %}">{{tag}} </a></label></small>
+							{% endfor %}
+							{% if node.tags|length > 2 %}
+								<small><label class="view-more-tags" style="display:inline-block;">More</label></small>
+							{% endif %}	
+						{% else %}
+						<i><small><label class="lbl_tag">{% trans "No tags defined yet!" %}</label></small></i>
+						{% endif %}
+				</div>
+
+			<!-- Views row -->
+				<div class="row tag-rating-div">
+					<span title="{% trans 'Click to see no. of view ' %}"><label class="lbl_tag lbl_field">{% trans "Views" %}</label></span>
+					{% include "ndf/widget_analytics_views.html" %}
+				</div>
+
+			<!-- Ratings -->
+				{% if group_object.edit_policy != "EDITABLE_MODERATED" or "CourseEventGroup" in group_object.member_of_names_list %}
+					{% if "File" in node.member_of_names_list or "Page" in node.member_of_names_list %}
+					{% get_list_of_fields node.type_of "name" as type_of_list %}
+					{% if "Info page" not in type_of_list %}
+						<div class="row tag-rating-div">
+							<span title="{% trans 'Rating defines popularity' %}">
+								<label class="lbl_tag lbl_field">{% trans "Rating" %}</label>
+							</span>
+							<div class="rating_template"> {% include "ndf/rating.html" %} </div>
+						</div>
+					{% endif %}
+					{% endif %}
+				{% endif %}
+			
+			<!-- Location	-->
+				
+				{% if node.location %}
+		        	<a data-reveal-id="view-map-widget" class="lbl_field tag-rating-div" title='{% trans "Click to view the location" %}'><i class="fi-marker"></i> {% trans "Location" %}</a>
+	        	{% endif %}
+
+		    <!-- Graphs For Topics or Concept -->
+	      	
+		      {% if "Topic" in node.member_of_names_list or "Concept" in node.member_of_names_list or "Page" in node.member_of_names_list %}
+		        <!-- Below code/widgets will only be shown for all resource instances/documents
+		             which are Topic or Concept
+		        -->
+
+		        {% if node.collection_set or node.prior_node %}
+		        	
+		        <!-- commented for time being, for TB. -->
+		        <a href="#" class="lbl_field tag-rating-div" data-dropdown="graph-list" data-options="is_hover:true;align:left"><i class="fi-share"></i> {% trans "Graphs" %}</a>
+		        
+		        <ul id="graph-list" class="f-dropdown" data-dropdown-content>
+		        	
+		        {% comment %}
+		          <li><a href="#view-concept-graph" data-reveal-id="view-concept-graph" id="clickConceptGraph">{% trans "Concept Graph" %}</a></li>
+		        {% endcomment %}
+
+		          {% if node.collection_set %}
+		          	<li><a href="#view-collection-graph" data-reveal-id="view-collection-graph">{% trans "Collection Graph" %}</a></li>
+		          {% endif %}
+
+		          {% if node.prior_node %}
+		          	<li><a href="#view-dependency-graph" data-reveal-id="view-dependency-graph">{% trans "Dependency Graph" %}</a></li>
+		          {% endif %}               
+		        </ul>
+		        {% endif %}
+		      {% endif %}
+
+				{% if grel_dict.cursor and grel_dict.grel_node.count %}
+						<a class="lbl_field tag-rating-div" data-dropdown="help-list" data-options="is_hover:true;align:left"><i class="fi-info"></i> {% trans "Help" %}</a>
+						<ul id="help-list" class="f-dropdown" data-dropdown-content>
+						{% for each_help_page in grel_dict.grel_node %}
+							<li><a href="{% url 'page_details' groupid each_help_page.pk %}" target="_blank" title='{% trans "Click to view help page" %}'>{{each_help_page.name}}</a></li>
+						{% endfor %}
+						</ul>
+				{% endif %}
+	        
+			{% endif %}
+
+			{% endif %}
+		</div>
+
+		<!-- PANEL 2
+		New {{node}} and Group related actions such as
+		Group Analytics, New Subgroup, New ProgramEvent,
+ 		-->		
+ 		
+ 		{% if group_object.edit_policy != "EDITABLE_MODERATED" %}
+		<div class="panel">
+
+			{% if user.is_authenticated %}
+			<div class="row btn-row">
+				<!-- New (GS) -->
+					{% get_create_url node.pk as create_url %}
+						{% if is_group %}
+							{% if is_gstaff %}
+							<!-- Prevent creating New group from context of top mod group -->
+							{% if group_object.edit_policy != "EDITABLE_MODERATED" and is_gstaff %}
+								<a href="{% url create_url group_object.name %}" class="tiny button radius left-btn" title="{% trans 'Create New' %}">
+									{% if group_object.agency_type == 'Partner' %}
+										{% trans 'New Partner' %}
+									{% else %}
+										{% trans 'New Group' %}
+									{% endif %}
+								</a>
+								{% if node %}
+									<a class="tiny button radius delete-btn grp_delete right-btn" title="{% trans 'Delete' %}">
+										{% if group_object.agency_type == 'Partner' %}
+											{% trans 'Delete Partner' %}
+										{% else %}
+											{% trans 'Delete Group' %}
+										{% endif %}
+									</a>
+								{% endif %}
+							{% endif %}								
+							{% endif %}								
+						{% else %}
+							{% if user_is_joined == "joined" or  user_is_joined == "author" %}
+								{% if node.status != 'MODERATION' %} 
+									{% if "File" in node.member_of_names_list and group_object.name != "home" %}
+										<a href="{% url 'uploadDoc' group_object.pk %}?next={{request.path}}" class="tiny button radius expand mod-btn" title="Create New {{node.member_of_names_list.0}}">{% trans "New" %} {{node.member_of_names_list.0}}</a>
+									{% else %}
+										{% if "Theme" in node.member_of_names_list or "Topic" in node.member_of_names_list  %}
+											{% if is_gstaff %}
+												<a href="{% url create_url group_object.name app_id %}" class="tiny button radius expand mod-btn" title="Create New {{node.member_of_names_list.0}}">{% trans "New" %} {{node.member_of_names_list.0}}</a>
+											{% endif %}
+
+										{% elif "Term" in node.member_of_names_list %}
+											<a href="{% url create_url group_object.name %}" class="tiny button radius expand mod-btn" title="Create New {{node.member_of_names_list.0}}">{% trans "New" %} Topic
+											</a>
+										{% elif "Group" not in node.member_of_names_list and "ProgramEventGroup" not in node.member_of_names_list and "CourseEventGroup" not in node.member_of_names_list and "ModeratingGroup" not in node.member_of_names_list  and group_object.name != "home"%}
+											<a href="{% url create_url group_object.name %}" class="tiny button radius expand mod-btn" title="Create New  {{node.member_of_names_list.0}}">{% trans "New" %} {{node.member_of_names_list.0}}</a>
+										{% endif %}
+									{% endif %}
+								{% endif %}
+							{% endif %}
+						{% endif %}
+
+				{% comment %}
+					<!-- Group Analytics -->
+					<a href="/{{group_id}}/analytics/group/summary/" class="tiny button radius right-btn">{% trans 'Group Analytics' %}</a>
+				{% endcomment %}
+			</div>
+			{% endif %}
+
+			
+			{% if is_gstaff %}
+			<!-- New SubGroup and PE-->
+			<div class="row btn-row">
+						{% if is_partner_val %}
+							<a class="button tiny radius left-btn" href="{% url 'create_group' group_object.pk %}?subgroup=True&partnergroup=True" title="Create New Sub Partner">{% trans "New Sub Partner" %} </a>
+						{% else %}
+							<a href="{% url 'create_group' group_id %}?subgroup=True" class="tiny button radius left-btn" title="Create New Sub Group">{% trans "New SubGroup" %}</a>
+	  					{% endif %}
+						<a href="{% url 'create_event_group' group_id 'ProgramEventGroup' %}" class="tiny button radius right-btn" title="Create New Program">{% trans "New Program" %}</a>
+			</div>
+			{% endif %}
+		</div>
+		{% endif %}
+
+		<!-- PANEL 3
+		Group subscription related actions such as
+		List Members, Join/Unsubscribe,
+		Subscribe Users, Subscribe Admins
+ 		-->
+		{% if not is_user_group %}
+
+		<div class="panel">
+			{% if is_gstaff or 'ModeratingGroup' not in group_object.member_of_names_list and 'ProgramEventGroup' not in group_object.member_of_names_list and "PartnerGroup" not in group_object.member_of_names_list %}
+				<!-- List Members and Join buttons -->
+				<div class="row btn-row">
+					{% comment %}
+					<!-- List Members -->
+		            {% if  is_gstaff %}     
+		                    <input type="button" id ="btn_list_member" class="tiny button radius left-btn" data-reveal-id="firstModal" value="{% trans 'List Members' %}" title="List Members of this group">
+		            {% endif %}
+		                    <!-- Reveal Modals begin -->
+		                    <div id="firstModal" class="reveal-modal" data-reveal></div>
+					{% endcomment %}
+							<a href="{% url 'program' groupid %}" class="tiny button radius left-btn"><span>{% trans 'Programs' %}</span></a>
+					
+					<!-- Join/ Unsubscribe -->
+						{% if user.is_authenticated %}
+							{% if not is_gstaff %}
+								{% if user_is_joined == "joined" %}
+									<input data-user-admin='False' data-user-id={{request.user.id}} class="tiny button radius subscription_policy right-btn" title="Unsubscribe from this group" type="button" id="unsubscribe_from_grp" value="{% trans 'Unsubscribe' %}"
+									{% if group_object.name == "home" %}
+										disabled="disabled" 
+									{% endif %}
+									>
+									{% comment %}
+										<input class="tiny button radius right-btn" type="button" value="{% trans 'Stop following' %}">
+									{% endcomment %}
+
+								{% elif user_is_joined == "not" %}
+									<input data-user-admin='False' data-user-id={{request.user.id}} class="tiny button radius right-btn subscription_policy" type="button" id="subscribe_to_grp" value="{% trans 'Join' %}" title="Join this Group">
+									{% comment %}
+										<input class="tiny button radius right-btn" type="button" value="{% trans 'Follow' %}">
+									{% endcomment %}
+								{% endif %}
+							{% else %}
+								<input class="tiny button radius secondary disabled right-btn" type="button" value="{% trans 'Joined' %}" title="{% trans 'You are already a member of this group' %}">
+							{% endif %}
+						{% else %}
+							<input class="tiny button radius disabled secondary right-btn" type="button" value="{% trans 'Join' %}" title="{% trans 'You are not authorized for this action' %}" >
+						{% endif %}
+				</div>
+			{% endif %}
+
+            {% if is_gstaff %}
+				<!-- Subscribe Users and Subscribe Admins buttons-->
+				<div class="row btn-row">
+                   <a data-reveal-id="manage_users_modal" class="tiny expand button radius mod-btn" href="{% url 'manage_users' group_id %}">Manage Members</a>                    
+
+                <div id="manage_users_modal" class="reveal-modal large" data-reveal style="position:absolute;"> 
+                    <div id="group_drawer">
+                    {% include "ndf/widget_user_search.html" with subscription_status=True %}
+                    </div>
+                    <a class="close-reveal-modal">&#215;</a>
+                </div>          
+
+				</div>
+
+				<!-- Moderate Resources or Moderation Status button -->
+	            <div class="row btn-row">
+					{% if group_object.edit_policy == "EDITABLE_MODERATED" and "CourseEventGroup" not in group_object.member_of_names_list %}
+						{% if 'ModeratingGroup' in group_object.member_of_names_list or 'ProgramEventGroup' in group_object.member_of_names_list and 'Group' not in group_object.member_of_names_list %}
+							<a class="tiny expand button radius mod-btn" href="{% url 'moderation' group_object.name %}" title="Moderate Resources of this group">
+							{% trans 'Moderate Resources' %}
+							</a>
+						{% endif %}
+
+						{% if 'Group' in group_object.member_of_names_list %}
+							<a class="tiny expand button radius mod-btn" href="{% url 'all_under_moderation' group_id %}" title="Check Moderation Status of resources of this group">
+							{% trans 'Moderation Status' %}
+							</a>
+						{% endif %} 
+					{% endif %} 
+	            </div>
+			{% endif %}
+		</div>
+		{% endif %} 
+	</ul>
+</section>
+{% endwith %}
+
+<script type="text/javascript">
+
+	// a = $(".side-nav").find(".panel:not(:has(*))")
+	a = $(".side-nav").find(".panel:not(:has('input, a'))")
+	a.addClass("hide");
+	$(document).on('click','.view-more-tags',function(){
+		if($(this).text()=="Less"){
+			$(".tag_ele").addClass("hide")
+			$(this).text("More")
+		}
+		else{
+			$(".tag_ele").removeClass("hide")
+			$(this).text("Less")
+		}
+	})
+
+  var set_href = false;
+  $(document).on('click','.delete-btn',function(){
+    if(!set_href){
+        lbl_msg = "Are you sure you want to delete?"
+        $("#deleteModalLabel").text(lbl_msg);
+        $("#deleteModal")
+          .removeClass("medium").addClass("small")
+          .addClass("alert")
+        $("#deleteModal").foundation('reveal', 'open');
+    }
+  })
+
+  //Confirm or Cancel Deletion
+    $(document).on("click", "#btnConfirmYes", function() {
+        set_href = true;
+        delete_url = ""
+        $("#deleteModal").foundation('reveal', 'close');
+		{% if "Page" in node.member_of_names_list or "File" in node.member_of_names_list %}
+			// alert("page")
+			$.ajax({
+                    type: "POST",
+                    url: "{% url 'trash_resource' group_id node %}",
+                    datatype: "html",
+                    data:{
+                           csrfmiddlewaretoken: '{{ csrf_token }}'
+                      },
+                  success: function(data) {
+                  	redirect_url ="/"+"{{group_id}}"+"/"+"{{node.member_of_names_list.0|lower}}" 
+                    window.location.replace(redirect_url);
+                  }
+
+            });
+		
+		{% elif "Term" in node.member_of_names_list %}
+			$.ajax({
+                    type: "POST",
+                    url: "{% url 'term_delete' group_object.name node %}",
+                    datatype: "html",
+                    data:{
+                           csrfmiddlewaretoken: '{{ csrf_token }}'
+                      },
+                  success: function(data) {
+                        window.location.replace("{% url 'file' group_id  %}");
+                  }
+
+            });
+		{% elif "Group" in node.member_of_names_list %}
+			$(".grp_delete").attr('href', "{% url 'delete_group' group_object.pk %}")
+			$(".grp_delete")[0].click()
+		{% endif %}
+
+
+
+    });
+
+    $(document).on("click", "#btnConfirmNo", function() {
+        set_href = false;
+        $("#deleteModal").foundation('reveal', 'close');
+    });
+
+
+</script>

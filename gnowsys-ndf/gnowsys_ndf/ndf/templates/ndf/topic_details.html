@@ -1,0 +1,128 @@
+{% include "ndf/node_details_base.html" %}  
+
+{% block script %}
+<script type="text/javascript">
+	
+	
+  {% if topic %}
+  // select particular type to display contents in topic page
+  $(".view_list").click(function() {
+    
+    $("#view-elements").css("display", "none");  // 'ul' and 'li' should be disabled after selection
+
+    var selected = this.id;
+    var choice = this.title;
+
+    $.ajax({
+      type: "POST",
+      url: "{% url 'get_topic_contents' groupid %}",
+      datatype: "html",
+      data:{
+        node_id: '{{node.pk}}',
+        selected: selected,
+        choice: choice,
+        csrfmiddlewaretoken: '{{ csrf_token }}'
+      },
+      success: function(data) {
+
+        data_obj = JSON.parse(data);
+
+        if (data != "{}"){
+          var k = Object.keys(data_obj); // To get the keys from incomming data
+          if (selected){
+
+            fs = "<b><i><u>Resources with "+ selected + ": " + choice +"  </u></i></b><br/>"  // Fieldset for one element
+          }
+          else{
+            fs = ""  // Fieldset for one element
+          }
+
+          // For loop the list of keys to evaluate values
+          for (var m = 0; m < k.length; m++) { 
+            var key = k[m];  
+            var len = data_obj[key].length;  // length of list as a value of key
+            cont_list = ""  // variable to create html data to show the thumbnail and url
+
+            // For loop the list of values for key defined in a list(eg: for list of images, videos)
+            for (var i = 0; i < len; i++) { 
+              var res_id = data_obj[key][i][1]
+              if (key == "Images"){
+                cont_list += "<a data-id="+res_id+" href='{% url 'image_detail' groupid 'replace_with_id' %}?nav_li={{nav_list}}' style='display: inline-block'><img data-id="+res_id+" src='' data-src='{% url 'getFileThumbnail' groupid 'replace_with_id' %}' /> <br/><div>"+data_obj[key][i][0]+"</div></a>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;";
+              }
+              else if(key == "Videos"){
+                cont_list += "<a data-id="+res_id+" href='{% url 'video_detail' groupid 'replace_with_id' %}?nav_li={{nav_list}}' style='display: inline-block'><img data-id="+res_id+" src='' data-src='{% url 'getFileThumbnail' groupid 'replace_with_id' %}' /> <br/><div>"+data_obj[key][i][0]+"</div></a>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;";
+              }
+              else{
+                cont_list += "<a data-id="+res_id+" href='{% url 'file_detail' groupid 'replace_with_id' %}?nav_li={{nav_list}}' style='display: inline-block'>"+data_obj[key][i][0]+"</a>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;";
+              }
+            } 
+
+            // fs variable will contain the contents list for a topic each time this variable will append with new values
+            fs = fs + "<fieldset> <legend>"+key+"</legend>"+ cont_list +"</fieldset>";
+
+          }
+
+          $("#view-info").css("display", "none");     
+          $(".topic_content").css("display", "block");
+          $(".topic_content").html(fs); // render the html data 'fs' in topic contents div
+
+          // Both bellow statements will take the variable values used in above html code and replace with required attributes 
+          $("a[data-id]").each(function(){var res_link = this.href.replace("replace_with_id", $(this).attr("data-id")); this.href=res_link;
+          })
+          $("img[data-id]").each(function(){
+            var tempSrc = $(this).attr("data-src");  
+            // 'src' identified by browser when it finds <img> tag and very first time we take temp variable to store the resource id 
+            // and then replace that temp variable in 'src' variable to get the value for 'replace_with_id' variable 
+            var res_link = tempSrc.replace("replace_with_id", $(this).attr("data-id"));
+            this.src=res_link;
+          })
+          
+        }
+        else{
+          $("#view-info").css("display", "none");     
+          // If no resource found for topic it will show bellow statement
+          var cont = "<b>No resources found matching selected filter.</b>"
+          $(".topic_content").css("display", "block");
+          $(".topic_content").html(cont);
+        }
+
+        // After successfull return of data in success just enable the 'ul' and 'li' for filtering options
+        $("#view-elements").css("display", "block");
+      }
+    });
+  });
+  {% endif %}
+
+
+	function applyFilter(filtersArr)
+	{
+		// var filtersObjArr = getFiltersObjArr()
+		// console.log(filtersObjArr);
+		var filtersObjArr = {};
+		if (getFiltersObjsInAndOrFormat){
+			filtersObjArr = JSON.stringify(getFiltersObjsInAndOrFormat());
+
+			var url = "{% url 'get_filtered_topic_resources' groupid 'replace_with_id' %}";
+			url = url.replace('replace_with_id', '{{node.pk}}');
+
+		    $.ajax({
+
+		      type: 'POST',
+		      url: url,
+		      datatype: 'html',
+		      data: {
+
+					filters: filtersObjArr,
+			        csrfmiddlewaretoken: '{{ csrf_token }}'
+		      },
+		      success: function(data){
+		      	$('#topic-resources').html(data)
+		 		}
+	 		});      
+		}
+	}
+
+// </script>
+{% endblock script %}
+
+

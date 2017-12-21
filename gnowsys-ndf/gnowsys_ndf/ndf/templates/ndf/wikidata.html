@@ -1,0 +1,254 @@
+{% extends "ndf/node_details_base.html" %}
+{% load ndf_tags %}
+{% load i18n %}
+
+{% block title %} {{title}} {% endblock %}
+
+{% block search_content %}
+ {% include "ndf/node_search_base.html" %}
+{% endblock %}
+
+{% block related_content %}	
+	<center>{{ topic_count }} {% trans "items found " %} </center>	
+	{% for topic in topic_coll %}
+    		{% if selected_topic.name == topic.name %}
+		<br/> 
+		<div class="create card">
+		<a class="button medium" href="{% url 'wikidata_topic_display' group_id topic %}" style="text-decoration:underline;font-weight:bold;text-color:red;font-size:20px;"> 
+		{{ topic.name }}
+     		 </a>
+		</div>
+		{% else %}
+		<br/>
+		<div class="create card">
+		<a class="button medium" href="{% url 'wikidata_topic_display' group_id topic %}" style="margin-left:20px;margin-right:20px;"> 
+		{{ topic.name }}
+     		 </a>
+		</div>
+
+		{% endif %}
+	{% empty %}
+   		<h5>{% trans "Sorry, no topics are available." %}</h5>
+	{% endfor %} 
+
+
+{% endblock %}
+
+
+{% block meta_content %}
+  <h2>{{ title }}</h2>
+{% endblock %}
+
+
+
+{% block body_content %}
+
+
+	<!-- Scripts required for D3 graph -->
+	<script type="text/javascript" src="/static/ndf/bower_components/d3/d3.min.js"></script> <!-- checked -->
+	<script type="text/javascript" src="/static/ndf/bower_components/underscore/underscore.js"></script> <!-- checked -->
+	<script sync="text/javascript" src="/static/ndf/bower_components/FileSaver/FileSaver.js" ></script> <!-- checked -->
+
+
+{% if  flag %}
+	<br>
+	<br>
+	<h2>
+	<strong><center>
+{% blocktrans %} Tags Topic Display
+	</h2><h5>Following are the topics with the tag <strong>"{{tag}}"</strong></center><br><br>
+	Select the topic from the panel on the left to view the details about that topic. The knowledge graph for that particular topic is also available on the same page.
+{% endblocktrans %}
+	</strong>
+	</h5>
+	
+	
+	<hr align = "center" size = "10%">
+
+
+
+{% elif selected_topic == None %}
+	<br>
+	<br>
+	<h3>
+	<strong><center>
+{% trans "Select the topic from the panel on the left to view the details about that topic. The knowledge graph for that particular topic is also available on the same page." %}
+	</strong></center>
+	</h3>
+	<hr align = "center" size = "10%">
+
+{% else %}
+	
+
+
+
+<header class="row page">
+
+  <section class="medium-12 columns" >
+  
+  <dl class="row tabs" data-tab data-options="deep_linking:true">
+	
+  <dd class="active"><a href="#view-page"><i class="fi-eye"></i>{% trans "Read" %}</a></dd>
+
+    <dd>
+        <a href="#" data-dropdown="graph-hover" data-options="is_hover:true"><i class="fi-share"></i>{% trans "Graph" %}</a>
+            <ul id="graph-hover" class="f-dropdown" data-dropdown-content>
+                <li><a href="#view-concept-graph" data-reveal-id="view-concept-graph">{% trans "Concept Graph" %}</a></li>
+                {% if node.collection_set %}
+         	 <li><a href="#view-collection-graph" data-reveal-id="view-collection-graph">{% trans "Collection Graph" %}</a></li>
+          	{% endif %}
+          	{% if node.prior_node %}
+          	<li><a href="#view-dependency-graph" data-reveal-id="view-dependency-graph">{% trans "Dependency Graph" %}</a></li>
+          	{% endif %}
+            </ul>
+    </dd>
+
+
+    <dd><a href="#view-map-widget" data-reveal-id="view-map-widget"><i class="fi-marker"></i> {% trans "Location" %}</a></dd>
+	
+
+    <dd><a href="#view-comments"><i class="fi-comment"></i> {% trans "Discuss" %}</a></dd>
+     </section>
+
+</header>
+
+	    <!-- Content for Concept Graph -->
+      <div class="content reveal-modal graph-div" id="view-concept-graph" data-reveal>
+        <a class="close-reveal-modal">&#215;</a>
+        {% include "ndf/graph_concept.html" %}
+      </div>
+
+     <!-- Content for Collection Graph -->
+      
+      {% if node.collection_set %}
+        <div class="content reveal-modal graph-div" id="view-collection-graph" data-reveal>    
+        	<a class="close-reveal-modal">&#215;</a>
+        	{% include "ndf/graph_collection.html" %}
+        </div>
+      {% endif %}
+
+
+      <!-- Content for dependency Graph -->
+      
+      {% if node.prior_node %}
+      
+        <div class="content reveal-modal graph-div" id="view-dependency-graph" data-reveal>    
+         <a class="close-reveal-modal">&#215;</a>
+         {% include "ndf/graph_dependency.html" %}
+        </div>
+      {% endif %}
+     <!-- Tab View Map Widget -->
+     <div class="content reveal-modal graph-div" id="view-map-widget" data-reveal>
+       <!-- #{#%# if '/details/' in request.path  or '/image_detail/' in request.path  or '/video_detail/' in request.path%} -->
+       <a class="close-reveal-modal" >&#215;</a>
+       {% include "ndf/map_widget.html" with mode="read" %}
+       <!-- <div style="background-color:gray; width:100%; height:80%;"></div> -->
+       <!-- #{#%# endif %} -->
+     </div>
+     <script>
+$(document).on('opened', '#view-map-widget[data-reveal]', function () {  
+      
+    map.invalidateSize();  
+
+  });
+    </script>
+
+  	
+		<h5><strong>Tags for this item</strong></h5>
+	<div >	
+	<script>
+$(document).on('opened', '#view-map-widget[data-reveal]', function () {  
+      
+    map.invalidateSize();  
+
+  });
+
+
+</script>
+	
+	{% for tag in selected_topic.tags %}
+
+		<a class="[success alert secondary] [round radius] label" href="{% url 'tag_topic_display' group_id selected_topic.pk tag %}" style="text-decoration:none;font-weight:bold;text-color:red;font-size:17px;"> 
+		{{ tag }} {{"  "}}
+     		</a>
+		{% endfor %}
+
+		<h2><strong><center>Topic Name: {{ selected_topic.name }}</h2></strong></center>
+		<br>
+		<strong>
+		Created By: (User Id)</strong> - {{ selected_topic.created_by }}
+		<br><br>
+		<strong>
+		Content:
+		</strong>
+	 	{{ selected_topic.content_org }}
+		<br><br>
+		<strong>
+		Aliases:
+		<br><br>
+		</strong>
+		{{ selected_topic.altnames }}
+		<br><br>
+		<strong>
+		Tags:
+		<br><br>
+		</strong>
+		{% for tag in selected_topic.tags %}
+			{{ tag }} {{" "}}		
+
+		{% endfor %}
+		<br><br><strong>
+		{% trans "Wikipedia Page Link:" %}</strong>
+		<a href = "{{ selected_topic.url }}">{{ selected_topic.url }}</a>		
+		<br><br>
+
+		<p>
+		<ul>
+		<strong>{% trans "Member of" %}</strong>
+			{% for parent_class in selected_topic.member_of_names_list %}
+				<li>{{ parent_class }}</li>
+			{% endfor %}
+		</ul>
+		<br>
+		<br>
+		<ul>
+		<strong>{% trans "Attributes:" %}</strong>
+		<br><br>
+		{% for gattribute in attribute_set %}
+			{% if 'image' in gattribute.attribute_type.name %}
+			<li>{{ gattribute.attribute_type.name }} : <a href ={{ gattribute.object_value }}>{{ gattribute.object_value }}</a></li>		
+			{% else %}
+			<li>{{ gattribute.attribute_type.name }} :{{ gattribute.object_value }}</li>
+		
+		{% endif %}
+		{% endfor %}
+		</ul>
+		<ul>
+		<strong>{% trans "Relations:" %}</strong>
+		<br>
+		{% for relation_name, relation_value in relation_set.items %}
+			<li>{{ relation_name }}: {{ relation_value }}</li>
+		{% empty %}
+   			<li>{% trans "Sorry, no relations in this list." %}</li>
+		{% endfor %}
+		</ul>
+		<br><hr>
+		<strong>{% trans "Wikipedia Page:" %}</strong>
+		<hr align = "center" size = "10%" />
+		<iframe src="{{ selected_topic.url }}" width="95%" height="600" align = "middle" frameborder = 0>
+ 		 <p>{% trans "Your browser does not support iframes." %}</p>
+		</iframe>
+		
+  	</div>
+	<br>
+
+ 	<p><h5><small>{% trans "This data has been harvested from" %} <a href="http://www.wikidata.org/wiki/Wikidata:Main_Page">{% trans "Wikidata Project" %}</a></h5></small>
+	<h5><small>{% trans "All structured data from the main and property namespace is available under the Creative Commons CC0 License. Text in the other namespaces is available under the Creative Commons Attribution-ShareAlike License. Additional terms may apply. By using this site, you agree to the Terms of Use and Privacy Policy." %}</small></h5>
+
+ 
+
+{% endif %}
+{% endblock %}
+
+
+

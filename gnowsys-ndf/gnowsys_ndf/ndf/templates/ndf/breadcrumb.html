@@ -1,0 +1,20 @@
+{% load i18n %}
+{% load get_site_name_from_settings from ndf_tags %}
+
+{% get_site_name_from_settings as site_name %}
+
+{% if path and not site_name == 'NROER' %}
+<div class="group_breadcumbs row">
+    <div class="small-12 columns">
+    {% for each_br in path %}
+
+	{% if forloop.last %}
+	      <span><b><a href="#"> {{each_br.name}} </a></b></span>&nbsp;&gt;&nbsp;&nbsp;
+        {% else %}
+	      <span><a href="{{each_br.link}}"> {{each_br.name}} </a></span> &nbsp;&gt;
+        {% endif %}
+
+    {% endfor %}
+    </div>
+</div>
+{% endif %}

@@ -1,0 +1,53 @@
+{% load i18n %}
+<h1></h1>
+<a href="#view-map-edit-widget" id="{{field_name}}" data-reveal-id="view-map-edit-widget" title="Click to add location markers">
+  <i class="fi-marker"></i> &nbsp; {% trans "Add Location" %}
+</a>
+
+<!-- Overlay : Map EDIT Widget -->
+<div class="reveal-modal graph-div" id="view-map-edit-widget" data-reveal>    
+  <a class="close-reveal-modal" >&#215;</a>
+  {% include "ndf/map_widget.html" with mode="edit" source="custom_template_edit" %}
+</div>
+<!-- END of Map Widget Overlay -->
+
+
+<script type="text/javascript">
+  
+  $(document).on('open', '#view-map-edit-widget[data-reveal], #view-map-widget[data-reveal]', function () {  
+    
+    $.ajax({
+      url: "{% url 'get_visited_location' 'groupid' %}",
+      success: function(data){ 
+        data = JSON.parse(data);
+
+        var lastVisitedLocationVal = data;
+        
+        if(lastVisitedLocationVal){
+
+          if(lastVisitedLocationVal == "[]") {
+            lastVisitedLocationVal = JSON.parse(lastVisitedLocationVal);
+          }
+
+          if(lastVisitedLocationVal.length > 0) { 
+            // lastVisitedLocationVal = JSON.parse(lastVisitedLocationVal);
+            var zoom = lastVisitedLocationVal.pop(),
+            lng = lastVisitedLocationVal[1],
+            lat = lastVisitedLocationVal[0];
+            map.setView([lat, lng], zoom);
+          }
+        }
+
+        else if( tempArr.length ) {
+          var group = new L.featureGroup(tempArr)
+          map.fitBounds(group.getBounds());
+        }
+      }
+    });
+  });
+
+  $(document).on('opened', '#view-map-edit-widget[data-reveal], #view-map-widget[data-reveal]', function () {  
+    
+    map.invalidateSize();  
+  });
+</script>

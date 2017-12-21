@@ -1,0 +1,1289 @@
+{% extends "ndf/event.html" %}
+{% load ndf_tags %}
+{% load i18n %}
+{% load pagination_tags %}
+{% load static %}
+{% get_static_prefix as STATIC_PREFIX %}
+{% block head %}  
+{{block.super}}
+
+  <!-- Scripts required for D3 graph -->
+  <script type="text/javascript" src="/static/ndf/bower_components/d3/d3.min.js"></script> <!-- checked -->
+  <script type="text/javascript" src="/static/ndf/bower_components/underscore/underscore.js"></script> <!-- checked -->
+  <script type="text/javascript" src="/static/ndf/bower_components/FileSaver/FileSaver.js" ></script> <!-- checked -->
+  
+  <script type="text/javascript" src="/static/ndf/bower_components/jquery-ui/jquery-ui.min.js"></script> <!-- checked -->
+  <script type="text/javascript" src="/static/ndf/bower_components/foundation-datepicker/js/foundation-datepicker.js"></script> <!-- checked -->
+  <link rel="stylesheet" type="text/css" href="/static/ndf/bower_components/foundation-datepicker/stylesheets/foundation-datepicker.css"> <!-- checked -->
+  <link rel="stylesheet" type="text/css" href="/static/ndf/bower_components/jquery-ui/themes/smoothness/jquery-ui.min.css"> <!-- checked -->
+  <script src="/static/ndf/bower_components/moment/moment.js"></script> 
+  <script src="/static/ndf/bower_components/jquery-ui/jquery-ui.js"></script> <!-- checked -->
+  <script src="/static/ndf/bower_components/jqueryui-timepicker-addon/dist/jquery-ui-timepicker-addon.min.js"></script> <!-- checked -->
+  <script src="/static/ndf/bower_components/jqueryui-timepicker-addon/dist/jquery-ui-sliderAccess.js"></script>
+   <!-- checked -->
+  <link rel="stylesheet" href="/static/ndf/bower_components/jqueryui-timepicker-addon/dist/jquery-ui-timepicker-addon.css"> <!-- checked -->
+  <link rel="stylesheet" type="text/css" href="/static/ndf/bower_components/jquery-ui/themes/smoothness/jquery-ui.css"> <!-- checked -->
+
+{% endblock %}
+
+
+{% block body_content %} 
+<style>
+table, th, td {
+   border: 1px solid #F5F5DC;
+} 
+
+ #lbl_displ
+  {
+     color: #0b8a91;
+     font-weight: bold;
+     font-size: 1rem;
+   }
+   #myModal
+    {
+		min-height: 10vh;
+    		
+    }
+
+    #reschedulemodal
+    {
+		min-height: 10vh;
+			
+    }
+  
+</style>
+
+<div id="view_event">
+
+  {% if user.is_authenticated %}
+  <a id="toggle-shelf" class="right-off-canvas-toggle right" ><i class='fi-book-bookmark'></i></a> 
+  {% endif %}
+
+  <header class="row event">
+    <section class="medium-12 columns" >
+      <h2>
+        <span class='node'>{{node.name}}</span>      
+        <small class="label-list"> 
+        {% for tag in node.tags %}
+        <a href="{% url 'tag_info' groupid tag %}"><span class="label">{{tag}}</span></a>
+        {% endfor %}
+        </small>      
+      </h2>
+
+      <dl class="row tabs" data-tab data-options="deep_linking:true">
+        <dd class="active"><a href="#view-page"><i class="fi-eye"></i> {% trans "Read" %}</a></dd>
+        <dd onClick="controler()"><a href="#view-Attendance"><i class="fi-Attendance"></i>{% trans "Attendance" %} </a></dd>
+        
+      </dl>
+        
+    </section>
+  </header> 
+  
+  <div class="row">
+
+     <div class="tabs-content">
+                  
+              <div class="content active" id="view-page">
+                      <section class="medium-9 columns">    
+                       <div id="message">
+                       </div>
+                       <fieldset>   
+                          <ul class="inline-list">
+                          {% if user.is_authenticated %}
+                          {% block add_list %}{% endblock %}
+                          {% endif %}
+                          </ul>
+
+                          <div class="row">
+                              <div class="small-3 columns">
+                                <label>Start time:</label> 
+                              </div>
+                              
+                              <div class="small-5 end columns">
+                                <label>{{node.start_time}}</label> 
+                              </div>
+                              <div id = 'Edit_start_time'> 
+	                                  <a  onclick="checkDate()" class="tiny button">  Edit 
+	                                  </a>
+	                          </div>
+                              
+                              <div id='reschedule' class = "row">
+                              </div>
+                              <div id='br-div'>
+                               <br>
+                              </div>
+
+                          </div>    
+                              
+                          <div class="row">
+                              <div class="small-3 columns">
+                                <label>End time:</label>
+                              </div>
+                              <div class="small-5 end columns">
+                                <label>{{node.end_time}}</label>
+                              </div>
+                          </div>
+                        
+                          {% if  Eventtype == 'Eventtype' %}
+                            {%  if node.event_organised_by %}
+                                <br>
+                                <div class="row">
+                                  <div class="small-3 columns">
+                                    <label>Event organised by:</label>
+                                  </div>
+                                  <div class="small-5 end columns">
+                                    {% for details in node.event_organised_by %}
+                                      <label>
+                                      {% if forloop.counter != 1 %}
+                                      ,
+                                      {% endif %}
+                                      {{details.name}}
+                                      </label>
+                                    {% endfor %}
+                                  </div>
+                                </div>
+                                
+                          {% endif %}             
+                          
+                         
+                         {% if node.event_coordinator %} 
+                          <br>
+                          <div class="row">
+                            <div class="small-3 columns">
+                              <label>Event Co-ordinator:</label>
+                            </div>
+                            <div class="small-5 end columns">
+                              {% for details in node.event_coordinator %}
+                                <label>
+                                {% if forloop.counter != 1 %}
+                                {% endif %}
+                                {{details.name}}
+                                </label>
+                              {% endfor %}
+                            </div>
+                          </div>
+                          {% endif %}
+
+                          <br>
+
+                          {% endif %}
+                           
+
+                          {% if Eventtype == 'CollegeEvents' %}  
+                            <br>
+                            <div class="row">
+                              <div class="small-3 columns">
+                                <label>Batch:</label>
+                              </div>
+                              <div class="small-5 end columns">
+                                <label>{{batch}}</label>
+                              </div>
+                            </div>
+                              <br>
+                          
+                          <div class="row">
+                              <div class="small-3 columns">
+                                <label>Course:</label>
+                              </div>
+                              <div class="small-5 end columns">
+                                <label>{{course.name}}</label>
+                              </div>
+                          </div>
+                            
+                          <br>
+                          <div class="row">
+                              <div class="small-3 columns">
+                                <label>Min marks:</label>
+                              </div>
+                              <div class="small-3 end columns">
+                                <label>{{session_min_marks}}</label>
+
+                              </div>
+                                
+                              <div class="small-3 columns">
+                                <label>Max Marks:</label>
+                              </div>
+                              <div class="small-2 end columns">
+                                  <label>{{session_max_marks}}</label>  
+                              </div>
+                         </div>
+                          {% endif %}
+
+                         <div class = "row"> 
+                          {% with node.html_content|safe as description %}
+                          {% if description != "None" %}
+                         <div class="small-3 columns">
+                                <label>Brief Description:</label>
+                         </div>       
+                          <div class="small-5 end columns">
+                                <label>{{ description }}</label>
+                          </div>
+                          <br>
+                          <br>
+                          {% endif %}
+                          {% endwith %}
+                        </div>
+
+                        {% if open_event %}
+                          <div class="row">
+                              <div class="small-3 columns">
+                                <label>Open Event:</label>
+                              </div>
+                              <div class="small-5 end columns">
+                                <label>Yes</label>
+                              </div>
+                            </div>
+                          {% else %}
+                          <div class="row">
+                              <div class="small-3 columns">
+                                <label>Open Event:</label>
+                              </div>
+                              <div class="small-5 end columns">
+                                <label>No</label>
+                              </div>
+                            </div>  
+                          {% endif %} 
+
+                          <br>
+                        
+
+                          {% if is_bbb %}
+
+                          <div class="row">
+                            <div class="small-3 columns">
+                              <label>Meeting Type:</label>
+                            </div>
+                            <div class="small-5 end columns">
+                              <label>Online</label>
+                            </div>
+                          </div>
+                          <br>
+
+                          {% if show%}
+
+                            {%if active == 0%}
+
+                          <div align = "center">
+                            <button target = "_blank" onClick="window.open('{{url}}')">Join</button> 
+                          </div>
+
+                            {% elif active == -1%}
+                             
+                              {% if shortly %}
+
+                             <div align = "center">
+                             <button disabled>{{node.name}} will begin shortly</button>
+                             </div>
+
+                              {% else %}
+                               
+                                 {% if days_left == 0 %}
+
+                                       <div align = "center">
+                                       <button disabled>{{node.name}} will start in {{hours_left}} hours</button>
+                                       </div>
+
+                                 {% else %}
+
+                                       <div align = "center">
+                                       <button disabled>{{node.name}} will start in {{days_left}} days</button>
+                                       </div>
+
+                                 {% endif %}
+
+                              {% endif %}   
+
+                            {% else %}
+
+                             <div align = "center">
+                             <button disabled>{{node.name}} has ended</button>
+                             </div>
+
+                            {% endif %} 
+
+                          {% else %}
+                           <div align = "center">
+                          <button disabled>For joining {{node.name}} contact the Co-ordinator</button>
+                          </div>  
+                          {% endif %}
+
+                          {% else %}
+                            <div class="row">
+                              <div class="small-3 columns">
+                                <label>Meeting Type:</label>
+                              </div>
+                              <div class="small-5 end columns">
+                                <label>Offline</label>
+                              </div>
+                            </div>
+                            
+                          {% endif %}
+
+
+                    
+                    </fieldset>   
+                    </section>
+                   
+                    <section class="medium-3 columns">
+                      <div class="panel">
+                        <p>
+                        {{ node.member_of_names_list.0 }} 
+                        Edited {{ node.last_update|timesince }} ago by <a class="user" href="{% url 'dashboard' node.modified_by %}">{{node.user_details_dict.modified_by}}</a>
+                        <br>
+                        <small>
+                          <a href="#view-changes"><i class="fi-clock"></i> Versions </a>
+                          {% for seq_no, version_no in node.version_dict.items|slice:"-6:" reversed %}
+                          <abbr title="Version #{{version_no}}">
+                            {% if forloop.last and forloop.counter > 5 %}
+                            <a href="{% url 'node_version' group_name_tag node.pk version_no %}" style="padding-left:5px;">. . .</a>
+                            
+                            {% else %}  
+                            <a href="{% url 'node_version' group_name_tag node.pk version_no %}" style="padding-left:5px;">{{version_no}}</a>
+
+                            {% endif %}
+                          </abbr> 
+                          {% endfor %}
+                        </small>
+                      </p>
+                      </div>
+
+                      <!-- Start of Block: For listing Editing options --> 
+                      {% check_is_gstaff groupid request.user as gstaff_access %}
+
+                      {% edit_policy groupid node request.user as status %}
+                      {% if user.is_authenticated and status == "allow" and gstaff_access %}
+                        <div id = 'Edit' hidden> 
+                              <a href="{% url 'event_app_instance_edit' groupid  app_set_id node %}" class="small button split edit">
+                               <i class="fi-pencil"></i> Edit <span data-dropdown="edit-options"></span>
+                              </a>
+                        </div>
+                        
+                        <ul id="edit-options" class="f-dropdown">
+                          <li>
+                            <a class="button small expand" href="{% url 'event_app_instance_create' groupid app_set_id %}">
+                            <span class="fi-plus">&nbsp;&nbsp; New {{node.member_of_names_list.0}}</span>
+                            </a>
+                          </li>
+
+                        </ul>
+                      {% endif %}
+                    </section>
+ 
+                 </div> <!-- End of class="content active" -->
+
+                 <div id="myModal" class="small reveal-modal" animation="None" data-reveal >
+
+                   <fieldset> 
+                          <div class = "row">
+                            <div class="small-6 columns">
+                                <h6> <b> Reschedule Session Dates </b> </h6>
+                            </div>
+                            <div id="total_session_time" align ="right"> 
+                                
+                            </div>
+
+                          </div>
+                          <br>
+                          <div class = "row"> 
+                             <div class = "large-2  medium-4  columns">
+                               <label> Start time </label>
+                             </div>  
+                             <div class = "large-4   columns"> 
+                               <input id="start_time" class="date_month_day_year" type="text" style="float:left; width:10rem" required="" readonly="" placeholder="DD/MM/YYYY HH:MM" value="" name="start_time">
+                             </div>  
+                             <div class = "large-2   columns">
+                               <label> End time </label>
+                             </div>
+                             	
+                             <div class = "large-4  columns">  
+                               <input id="end_time" class="date_month_day_year" type="text" style="float:left; width:10rem" required="" readonly="" placeholder="DD/MM/YYYY HH:MM" value="" name="end_time">
+                             </div>  
+                          </div>     
+                          <div class="save" align="center">
+                             <input type="button" class="tiny button" onclick="saveTime()" value ="Save"> 
+                          </div>
+                          <div class = "row"> 
+                            <div id='note'>
+                               <label style = "color:red;"> Note:- Please schedule session same as total time </label>
+                            </div>
+                          </div> 
+                      <a class="close-reveal-modal">&#215;</a>      
+                    </fieldset> 
+                 </div>                
+                 <div id = "reschedulemodal" class="small reveal-modal" animation="None" data-reveal>
+                   <fieldset> 
+                          <div class = "row">
+                            
+                          <div class = "row">
+                               <div class = "small-4  medium -4 large-4 columns">
+                              	 <label><b>Reschedule Session till : </b></label>
+                               </div>  
+                              <div class = "small-4  medium -4 large-5 columns">  
+                               <input id="start_time_1" class="date_month_day_year" type="text" style="float:left;" required="" readonly="" placeholder="DD/MM/YYYY HH:MM" value="" name="start_time_1">
+                              </div>
+                              <div class = "small-4  medium -4 large-3 columns" id = 'reschedule_save' aling="left">  
+                                 
+                              </div>
+                          </div>
+
+                      <a class="close-reveal-modal">&#215;</a>      
+                    </fieldset> 
+                 </div>                
+                 <div id = "rescheduleoption" class="small reveal-modal" animation="None" data-reveal>
+                   <fieldset> 
+                          
+                          
+                          <div class = "row" align="center">
+                                <label> <h5> Please select what you want to reschedule </h5> </label>
+                                <br>
+
+                                <form>
+                                    <div class = "small-5 columns ">  
+                                      Attendance:
+                                      <input type="radio" class = "sessiontype" name = "sessiontype" id="a1" value = "Attendance">
+                                    </div>
+                                    <div class = "small-5 columns ">  
+                                      Assessment:
+                                      <input type="radio" class = "sessiontype" name = "sessiontype" id="a2" value = "Assessment">
+                                    </div>  
+                                </form>    
+                              
+
+                         </div>
+                         <div class = "row">       
+                              <div class = "small-12 columns" id = 'reschedule_check' align= "center">  
+                                 
+                              </div>
+                         </div> 
+                                                     
+
+                      <a class="close-reveal-modal">&#215;</a>      
+                    </fieldset> 
+                 </div>                
+
+
+
+                       <div class="content" id="view-Attendance" >    
+                        
+                        <div  id  = "attendance_message">
+                        </div>
+                      
+                        <div id="attendance">
+                            
+                        </div>
+
+                        
+                        <div id="atten_asses_cmpl">
+                        </div>
+                      </div>
+                      <!-- Tab View Map Widget -->
+                 </div> <!-- End of class="tabs-content" -->
+      </div>
+
+          
+{% endblock %}
+
+{% block script %}
+
+
+ eventreschedule=""
+pass = ""
+
+session_time  = 0
+session_time  = get_time_diff("{{node.start_time|date:'c'}}","{{node.end_time|date:'c'}}")
+
+$('#total_session_time').append("<label>  <h6> <b> Total Session time :" + session_time + "minutes<b> </b> </h6></label>")  
+
+function get_time_diff(start_time , end_time)
+ {
+     start_time = new Date(start_time)
+     end_time =new Date(end_time)
+     var difference = start_time.getTime() - end_time.getTime();
+     var daysDifference = Math.floor(difference/1000/60/60/24);
+     difference -= daysDifference*1000*60*60*24
+     var hoursDifference = Math.floor(difference/1000/60/60);
+     difference -= hoursDifference*1000*60*60
+     var minutesDifference = Math.floor(difference/1000/60);
+     difference -= minutesDifference*1000*60 
+     var secondsDifference = Math.floor(difference/1000);
+     diffhh = 23-hoursDifference
+     diffmm = 60-minutesDifference
+     total_min_diff=((Number(diffhh)*60) + Number(diffmm))
+     return total_min_diff    
+ }
+
+if ('{{Eventtype}}' == 'Eventtype')
+  {
+     $('#Edit').show()
+     $('#Edit_start_time').hide()
+  
+  }
+
+
+
+
+if ('{{Eventtype}}' == 'CollegeEvents')
+ {
+
+    //$('#Edit_start_time').show()
+    if ('{{reschedule}}' == 'True')
+      {
+          
+          $('#br-div br:first').remove()
+          $('#Edit_start_time').show()
+      }
+    if ('{{reschedule}}' == 'False')
+      {     $('#br-div br:first').remove()
+            add_reschedule()
+            $('#Edit_start_time').hide()
+      }
+
+
+ }  
+
+
+
+function remove_reschedule(){
+
+    $('#reschedule').hide()
+    $('#br-div br:first').remove()
+    $('#Edit_start_time').show() 
+}
+
+
+
+function add_reschedule(){
+
+         if ('{{Add}}' == 'Allow'){
+                  $('#reschedule').append("<div class='small-2 columns'>"
+                  + "<input class='tiny button' onclick=reschedule_time('event_reschedule') value='Reschedule'>"
+                  +"</div>")
+                  }
+         if ('{{task_date}}' != 'False')
+             { 
+      
+                if('{{Add}}' == 'Stop')
+                  {     
+                        $('#br-div br:first').remove()
+                        $('#reschedule').append("<div class='small-2 columns'>"
+                  		+ "<input class='tiny button' onclick=reschedule_event('event_reschedule') value='Reschedule'>"	
+                  		+"</div>")
+                  }
+                  
+                $('#Edit_start_time').hide()
+            }
+            
+ if ('{{task_date}}' == 'False' && '{{Add}}' == 'Stop'){  
+      $('#message').empty()
+      $('#message').append("<label id = 'lbl_displ' > Your request to reschedule the event has been sent to Admin </label>")
+   }
+}
+ 
+function closeEvent()
+{
+
+    $.ajax({
+
+               url:"{% url 'close_event' groupid node %}",
+               type: "POST",
+               data:{
+                   csrfmiddlewaretoken: '{{ csrf_token }}'},
+	               success: function(data){
+               }
+
+          });
+    
+}
+
+function checkDate()
+{
+   
+
+   $.ajax({
+
+             url:"{% url 'check_date' groupid node %}",
+             type: "POST",
+             data:{
+             reschedule:'{{reschedule}}',
+             csrfmiddlewaretoken: '{{ csrf_token }}'},
+             success: function(data){
+                if (data == 'event Open')
+                   { 
+                    $('#myModal').foundation('reveal', 'open'); 
+                   }
+                if (data == 'event closed')
+                  {
+                    alert("Time to reschdule event has passed please request to central office")
+                    add_reschedule()
+                  }   
+             }
+          });
+}
+
+function controler()
+{
+          //checks wheather the has_attende relation is createad or not 
+          //this confirms that attendance is being taken 
+         
+          
+          $.ajax({
+                      url: "{% url 'attendees_relations' groupid node %}",
+                      type: "GET",
+                      success: function(data){
+                      attended=JSON.parse(data)
+                      },
+                      complete:function()
+                      {
+	                      if (attended != "" )
+	                      {
+		                      reschedule = attended[2]
+		                      marks_enter = attended[3]
+		                      if (attended[0] == 'True')
+		                      {
+		                          EditAttendance(attended)             
+		                      }
+		                      else
+		                      {
+		                          EditAttendance(attended)        
+		                      }
+		                      
+		                  }
+	                     else
+	                      {
+	                         $('#attendance_message').empty()
+	                         $('#attendance_message').append("<label id = 'lbl_displ' > Attendance would be available after start time of event </label>")
+	                      } 
+                     }   
+                });
+
+
+}
+
+function EditAttendance(columns)
+{
+
+        $.ajax({
+                      url: "{% url 'get_attendance' groupid node %}",
+                      type: "GET",
+                      dataType: "json",
+                      success: function(data){
+                      data
+                      attended=data
+                      $('#attendance').empty()
+                      },
+                      complete:function(){
+                      $('#attendance').append("<table id='forattendance'> </table>")
+                      drawTable(attended,columns)
+                      if(reschedule == false)
+                      {
+                          disableAttendance();
+                      }
+                      }
+          });
+
+}
+function saveTime()
+{
+     time_diff = get_time_diff(new Date($("#start_time").datetimepicker('getDate')),new Date($("#end_time").datetimepicker('getDate')))
+     var start_time = $("#start_time").val()
+     var end_time   = $("#end_time").val()
+     if (Number(time_diff) == Number(session_time)) 
+        {     $.ajax({
+                     url:"{% url 'save_time' groupid node %}",
+                     type: "POST",
+                     data:{
+                     start_time:start_time,
+                     end_time:end_time,
+                     csrfmiddlewaretoken: '{{ csrf_token }}'},
+                     success: function(data){
+                     alert(data)
+                     $('#myModal').foundation('reveal', 'close');
+                     location.reload();
+                     }
+                   
+                  });
+        }
+     else
+         {
+            alert("session time should be exactly same as previouse alloted time")
+         }     
+    
+
+}
+
+
+
+function disableAttendance()
+{
+    $(':checkbox.chkbx').each(function () 
+    { this.disabled = true})
+    $('#selall').attr('disabled','true')
+    $('#attendancediv').hide()
+}
+
+function drawTable(attended,columns)
+{
+
+if ( (columns == 'Edit') == false ){
+      pass=columns
+}
+else
+{
+    pass[0] ='Edit'
+}
+
+column1="<th> Name </th>"
+column2="<th> Presence </th>"
+checkbox1="<input type=checkbox class='selall' onClick=mark_all_present() id='selall'>"
+if ( pass[0] == 'Edit')
+{
+  column2="<th> Presence " + checkbox1 +"</th>" 
+}
+else
+{
+
+  column2="<th> Presence </th>"
+}  
+column3="<th> Assignment Marks </th>"
+column4="<th> Assessment Marks </th>"
+     if(pass[1] == 1)
+      {
+        column3= " " 
+        column4= " " 
+     
+      }
+      if (pass[1] == 2)
+      {
+         
+     }
+      if (pass[1] == 4 || pass[1] == 5 )
+      {
+       column3=""
+      }
+      if (pass[1] == 3 )
+      {
+       column4=""
+      }
+       $('#forattendance').append("<thead><tr>"+ column1+column2+column3+column4 + "</tr></thead>")  
+       $.each(attended, function(key,val) {
+       column1_data="<td>" + val.name +"</td>"
+       column2_data="<td> " + val.presence + "</td >"
+       column3_data="<td class='Assigntxtbx'> " + val.Assignment_marks + "</td >"
+       column4_data= "<td class='Assesstxtbx'> "  + val.Assessment_marks + "</td > " 
+
+       column3data="<td><input type='number'   class='Assigntxtbx input_text_only' id="+val.id+"Assignment" + " value= "+ val.Assignment_marks + " </td>"
+       column4data="<td> <input type='number'  onblur='validate_txtbx(this)'  class='Assesstxtbx input_text_only' id="+val.id+"Assessment" +" value= "+ val.Assessment_marks + " </td>"
+       execute();  
+     if(pass[1] == 1)
+      {
+        column3data = " " 
+        column3_data= " " 
+        column4_data= " " 
+        column4data = ""
+      }
+      if (pass[1] == 2)
+      {
+         
+      }
+      if (pass[1] == 4 ||pass[1] == 5 )
+      {
+       column3_data=""
+       column3data=""
+       
+      }
+      if (pass[1] == 3 )
+      {
+       column4_data=""
+       column4data=""
+       
+      }   
+
+if ( pass[0] == 'Edit'){
+
+          
+                     if(val.presence == 'Absent')
+                              {
+                    $('#forattendance').append("<tr><td>" + val.name +"</td>  <td> <input type='checkbox' onClick='enablemarks(this)' class='chkbx'  value=" + val.id + " ></td>  " 
+                  + column3data + column4data + " </tr>")
+                            
+                            
+                            if (document.getElementById(val.id+"Assignment")){
+                                  document.getElementById(val.id+"Assignment").disabled = true;
+                                }
+                            else
+                                {}
+                            if (document.getElementById(val.id+"Assessment"))
+                               {
+                                            document.getElementById(val.id+"Assessment").disabled = true;
+                               }
+                            else
+                               {} 
+                  
+                             }
+                     else
+                              {
+                                        $('#forattendance').append("<tr><td>" + val.name +"</td>  <td> <input type='checkbox' onClick='enablemarks(this)' class='chkbx'  value=" + val.id + " checked></td >  " 
+            + column3data  + column4data + "</tr>")
+                              }
+                                 
+
+}
+else{
+
+       
+       
+       $('#forattendance').append("<tr>"+ column1_data + column2_data + column3_data + column4_data   + "</tr>")         
+
+    }
+  });
+  
+if ( pass[0] == 'Edit'){
+      
+         
+
+      if (pass[1] == '2' || pass[1] == '4' || pass[1] == '3')
+      {
+        $('#attendance').append("<div class='row'>" 
+         + "<div class='small-8 columns'> "
+         + " <fieldset>"
+         + "<div id='assessmentdiv'> <input type='checkbox'  class='assessmentchkbx' id='assessmentchkbx'> Assessment Done </div>"
+         + "<div id='attendancediv'> <input type='checkbox'  class='attendancechkbx' id='attendancechkbx'> Attendance Done </div>"
+         + " <br> <span style='color:red;'> Note:- Edit option will be closed after asessment is done. </span> "
+         + " </fieldset> </div></div>")
+      }
+      else
+      {
+
+        $('#attendance').append("<div class='row'>" 
+         + "<div class='small-8 columns'> "
+         + " <fieldset>   "
+         + " <input type='checkbox'  class='attendancechkbx' id='attendancechkbx'> Attendance Done"
+         + " <br> <span style='color:red;'> Note:- Edit option will be closed after Attendance is done. </span> "
+         + " </fieldset> </div></div>")
+
+      }
+
+        $('#attendance').append("<br>")
+        $('#attendance').append("<input class='tiny button' onclick='saveattendees("+pass[1]+")' value='Save' >")
+        $('#attendance').append("<input class='tiny button' onclick='TakePrint()' value='Print'>")
+                   
+
+}
+else
+{     
+        
+      $('#attendance').append("<input class='tiny button' id='d' onclick='Download("+pass[1]+")' value='Download'>")
+      
+      if(reschedule == true || marks_enter  == false)
+           {
+              $('#attendance').append("<input class='tiny button' id='d' onclick=EditAttendance('Edit') value='Edit'>" )
+           }
+      if(reschedule == false)
+      {
+        <!-- reschedule == false meaning event edit functionality if closed and reschedule is not allow -->
+        if ('{{Add}}' == 'Allow'){
+          <!-- if admin show the reschedule till panel  --> 
+          $('#attendance').append("<input class='tiny button'  onclick=reschedule_time('attendance_reschedule',pass) value='Re-Schedule'>" )
+          }
+        if ('{{task_attendance}}' != 'False')
+             {  
+                if('{{Add}}' == 'Stop')
+                  {
+                  		$('#attendance').append("<input class='tiny button'  onclick = reschedule_event('attendance_reschedule') value='Re-Schedule'>" )
+                  }
+             }  
+        if ('{{task_attendance}}' == 'False' && '{{Add}}' == 'Stop' )
+          {
+              $('#attendance_message').empty()
+              $('#attendance_message').append("<label id = 'lbl_displ'   >  Your request to reschedule the event has been sent to Admin  </label>")
+
+          } 
+     
+      }
+          
+      
+}
+
+
+}
+
+function reschedule_time(type,value)
+{
+    
+    var event_type = ""
+    var marks_entry_completed = '{{marks_entry_completed}}'
+    event_type  = String(type)
+    if (marks_entry_completed == 'True' && event_type == 'attendance_reschedule')
+    {
+       if(value[1] != '1'){
+        $('#rescheduleoption').foundation('reveal', 'open');
+        $('#reschedule_check').empty()
+        $('#reschedule_check').append( "<input type='button' class='tiny button' onclick = reschedule_till_overlay('" + event_type + "') value='ok'>")}
+        else
+        {
+             $('#reschedule_save').empty()
+             $('#reschedule_save').append( "<input type='button' class='tiny button' onclick=reschedule_event('" + event_type + "') value='Save'>")
+             $('#reschedulemodal').foundation('reveal', 'open');
+        }
+    }
+    else
+    {
+           $('#reschedule_save').empty()
+           $('#reschedule_save').append( "<input type='button' class='tiny button' onclick=reschedule_event('" + event_type + "') value='Save'>")
+           $('#reschedulemodal').foundation('reveal', 'open');
+     }
+}
+
+function reschedule_till_overlay(type)
+ {    
+      if ( $('.sessiontype:checked').val() == 'Attendance')
+      {
+           $('#rescheduleoption').foundation('reveal', 'close');
+           var event_type = ""
+           event_type  = String(type) 
+           $('#reschedule_save').empty()
+           $('#reschedule_save').append( "<input type='button' class='tiny button' onclick=reschedule_event('" + event_type + "') value='Save'>")
+           $('#reschedulemodal').foundation('reveal', 'open');
+      }
+      if ( $('.sessiontype:checked').val() == 'Assessment' )
+       {
+           reschedule_event(type)
+       }   
+}
+
+function reschedule_event(type)
+{
+   var start_time =  $("#start_time_1").val()
+   var session =""  
+     if (pass)
+     {
+        session = pass[1]
+     
+     }
+     
+     $.ajax({
+             url:"{% url 'reschedule_task' groupid node.pk  %}",
+             type:"POST",
+             data:{
+                 path:"{{request.path}}",
+                 session:session,
+                 reschedule_type:type,
+                 reschedule_date:start_time,
+                 reshedule_choice:$('.sessiontype:checked').val(),
+                 csrfmiddlewaretoken: '{{ csrf_token }}'
+                },
+             success:function(data)
+             {
+              alert(data)
+              if ('{{Add}}' == 'Allow'){
+                  $('#reschedulemodal').foundation('reveal', 'close');
+              }
+              if (data == 'Event Dates Re-Schedule Opened')
+                 {
+                    remove_reschedule()
+                    location.reload();
+                 }
+              else
+                 {
+                      location.reload();
+                 }   
+             
+              /*if ( type != 'event_reschedule') 
+                  {
+                   //controler()
+                   location.reload();
+                  }
+              if (type == 'attendance_reschedule')
+              {
+                location.reload();
+              }
+
+               if ( type == 'event_reschedule') 
+                  {
+                   location.reload();
+                                    } */
+
+                 
+             }
+         }); 
+  
+}
+
+function enablemarks(value)
+{
+
+if (value.checked == true)
+{
+  if (document.getElementById(value.value+"Assignment")){
+  document.getElementById(value.value+"Assignment").disabled = "";
+  }
+  if (document.getElementById(value.value+"Assessment")){
+       document.getElementById(value.value+"Assessment").disabled = "";}
+     }
+else
+{
+  if (document.getElementById(value.value+"Assignment")){
+  document.getElementById(value.value+"Assignment").disabled = true;
+  document.getElementById(value.value+"Assignment").value = '0';
+  }
+  if (document.getElementById(value.value+"Assessment")){
+     document.getElementById(value.value+"Assessment").disabled = true;
+     document.getElementById(value.value+"Assessment").value = '0';
+  }
+}
+}
+
+function Download(save)
+{
+var Event_attended_by = [];
+var column=[]    
+    var table = document.getElementById("forattendance");
+    
+    column.push('Name')
+    column.push('Presence')
+    if (save ==2 || save == 3){
+      column.push('Assignment Marks')
+      } 
+      if (save == 2 || save == 4) { 
+        column.push('Assessment_marks')
+        }
+         
+    $("#forattendance").find('tr').each(function(){
+   
+    var Names_attended = $(this).find('td:eq(0)').text()
+    var Status_attended = $(this).find('td:eq(1)').text()
+  /* if (!(Status_attended))
+    {
+      Status_attended='Absent'
+    }
+    else
+    {
+      Status_attended='Present'
+    }*/
+   
+    var values = '{"Name":"'+ String(Names_attended) +'","Presence":"'+String(Status_attended)
+    if ( save ==  2 || save == 3){
+      var Attendance_marks = $(this).find('td:eq(2)').text()
+      values = values + '","Assignment Marks":"'+String    (Attendance_marks) 
+    }
+    if (save ==  2 || save == 4){ 
+       if (save == 4){
+       var Assessment_marks = $(this).find('td:eq(2)').text()
+       }
+       if (save == 2)
+       { 
+         var Assessment_marks = $(this).find('td:eq(3)').text()
+       
+       }
+       values = values + '","Assessment_marks":"' + String(Assessment_marks) 
+     }
+   
+    
+      /*var values = '{"Name":"'+ String(Names_attended) +'","Presence":"'+String(Status_attended)+'","Attendance_marks":"'+String(Attendance_marks) + '","Assessment_marks":"' + String(Assessment_marks) +'","save":"'+save_val +'"}'
+    */
+   values = values + '"}'
+   Event_attended_by.push(values)
+    });
+
+ val_data = ""
+ $.ajax({
+      url: "{% url 'save_csv' groupid node.pk %}",
+      type: "POST",
+      data:{attendance:Event_attended_by,
+      column:column, 
+      csrfmiddlewaretoken: '{{ csrf_token }}'
+      },
+      success: function(data){
+        val_data = data
+      },
+        complete: function(){
+     document.location.href=val_data
+       
+      }
+    
+      
+    });
+
+}
+function TakePrint()
+{
+     var printContents = document.getElementById("attendance").innerHTML;
+     var originalContents = document.body.innerHTML;
+
+     document.body.innerHTML = printContents;
+     window.print();
+     document.body.innerHTML = originalContents;
+}
+
+function saveattendees(save_val)
+{var attendees_list = [];
+var  absentees_list=[];
+var student_marks=[]
+var student_id=[]
+var eventid=[]
+var Event_attended_by=[]
+var assessmentdone = ""
+var attendancedone = ""
+eventid='{{node.pk}}'
+title='{{app_set_id}}'
+
+var url="{% url 'event_assginee' groupid  node.pk  %}"
+
+$("#forattendance").find('tr').each(function(){
+var Names_attended = $(this).find('.chkbx').val()
+var Status_attended = $(this).find('.chkbx:checked').val()
+var Attendance_marks = $(this).find('.Assigntxtbx').val()
+var Assessment_marks = $(this).find('.Assesstxtbx').val()
+
+   
+if (!(Status_attended))
+    {
+      Status_attended='False'
+    }
+    else
+    {
+      Status_attended='True'
+    }
+     var values = '{"Name":"'+ String(Names_attended) +'","Presence":"'+String(Status_attended)+'","Attendance_marks":"'+String(Attendance_marks) + '","Assessment_marks":"' + String(Assessment_marks) +'","save":"'+save_val +'"}'
+    Event_attended_by.push(values)
+    }); 
+    
+    if ($('#assessmentchkbx').is(':checked')) 
+      {
+          assessmentdone = 'True'
+      }
+
+    if($('#attendancechkbx').is(':checked'))
+      {
+          attendancedone = 'True'
+      }
+    
+     if(Event_attended_by !="")
+     {
+              var success_data = ""
+              $.ajax({
+                      url: url,
+                      type: "POST",
+                      data:{
+                      marks:'{{marks_enter}}',
+                      assessmentdone:assessmentdone,
+                      attendancedone:attendancedone,               
+                      attendancesession:pass[1],
+                      Event_attended_by:Event_attended_by,
+                      Event:eventid,
+                      csrfmiddlewaretoken: '{{ csrf_token }}'},
+                      success: function(data){
+                        success_data = data;
+                      },
+                      complete:function()
+                      {
+                          alert(success_data);
+                          //controler();
+                          location.reload();
+                      }
+                    });
+     }
+     else
+     {
+     alert("No Attendance Taken.")
+     }
+     }
+    
+    
+    
+ 
+    
+   
+function validate_txtbx(input)
+{ 
+    
+  if ( Number(input.value) >= Number('{{session_min_marks}}') && Number(input.value) <= Number('{{session_max_marks}}') )
+  {
+    
+  }
+  else
+  {
+    document.getElementById(input.id).value = "0" 
+     alert("Please Enter valid marks Between Min and Max Marks!")
+  }
+}
+   
+function mark_all_present()
+{
+   $(':checkbox.chkbx').each(function () {
+      if ($(':checkbox.selall')[0].checked == true)
+        {
+        this.checked=true
+        enablemarks(this)
+        }
+        if ($(':checkbox.selall')[0].checked == false)
+        {
+        this.checked=false
+        enablemarks(this)
+        }
+     });
+
+ 
+
+  
+}
+$(document).on('opened', '#view-map-edit-widget[data-reveal], #view-map-widget[data-reveal]', function () {  
+  
+  map.invalidateSize();  
+});
+
+currentDate = new Date();
+var currentDay = currentDate.getDate();
+var currentMonth = currentDate.getMonth();
+var currentYear = currentDate.getFullYear();
+
+$(".date_month_day_year").datetimepicker({
+       
+      changeMonth: true,
+      dateFormat: 'dd/mm/yy',
+      
+      minDate: '0',
+      maxDate: '+2m',
+      defaultDate: '0',
+      hourGrid: 6,
+      minuteGrid: 15,
+      onClose: function(dateText, inst) {
+        $(this).val(dateText);
+        var month_year = $(this).val();
+        day = currentDay;
+        month = currentMonth;
+        year = currentYear;
+      },
+
+      beforeShow: function() {
+        var month_year = $(this).val();
+        day = currentDay;
+        month = currentMonth;
+        year = currentYear;
+
+        if (month_year) {
+          month_year = month_year.split("/");
+          day = parseInt(month_year[0]);
+          month = parseInt(month_year[1]);
+          year = parseInt(month_year[2]);
+        }
+        $(this).datetimepicker('option', 'defaultDate', new Date(year, (month-1), day));
+        $(this).datetimepicker('setDate', new Date(year, (month-1), day));
+      }
+    });
+function execute(){
+$(".input_text_only").keydown(function (e) {
+            // Allow ctrl+A
+        if ((e.keyCode == 65 && e.ctrlKey === true) || 
+                 // Allow: home, end, left, right, down, up and //Allow delete, backspace, tab
+                (e.keyCode >= 35 && e.keyCode <= 40) || e.keyCode==46 || e.keyCode==8 || e.keyCode==9) {
+                     // let it happen, don't do anything
+                     return;
+            }
+       // Ensure that it is a number and stop the keypress
+        if ((e.shiftKey || (e.keyCode < 48 || e.keyCode > 57)) && (e.keyCode < 96 || e.keyCode > 105)) {
+            e.preventDefault();
+        }        
+      });
+}
+{% endblock %}	

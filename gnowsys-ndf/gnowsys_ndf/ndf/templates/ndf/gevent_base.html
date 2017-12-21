@@ -1,0 +1,237 @@
+{% load simple_filters %}
+{% xextends "ndf/gbase.html" with first_body_column=0 %}
+{# {% extends "ndf/base.html" %} #}
+{% load i18n %}
+{% load cache %}
+{% load ndf_tags %}
+{% block title %}
+    {% get_group_object groupid as group_object %}
+    {% trans 'Unit: ' %}{% firstof group_object.altnames group_object.name  %}
+{% endblock %}
+{% block head %}
+{{block.super}}
+
+{% endblock %}
+{% block body_content %}
+{% get_group_object groupid as group_object %}
+{% check_is_gstaff group_id request.user as is_gstaff %}
+{% comment %}{% get_breadcrumb request.path %}{% endcomment %}
+<div class="">
+    <div class="row group_content {% if hide_bannerpic %} max-width {% endif %}">
+        <div class="small-12 columns">
+            <div class="row">
+                <div class="small-12 columns group_banner {% if hide_bannerpic %}hide {% endif %}"></div>
+            </div>
+            <div class="row">
+                <div class="small-12 columns group_header">
+                    <div class="group_title left">{% firstof group_object.altnames group_object.name  %}</div>
+                    {% if is_gstaff %}
+                    <div class="right course_actions margin-right-50">
+
+
+                        <span data-dropdown="course-settings-drop" aria-controls="course-settings-drop" aria-expanded="false" class="tiny radius right" data-options="align:left">
+                            <i class="icon-widget fi-widget"></i>
+                        </span>
+                        <ul id="course-settings-drop" class="f-dropdown" data-dropdown-content aria-hidden="true" tabindex="-1">
+                        <li>
+                            <a href="{% url 'unit_edit' groupid group_object.pk %}" class="fi-pencil">{% trans "Edit" %} </a>
+                        </li>
+                        <li>
+                            <a data-reveal-id="manage_users_modal" href="{% url 'manage_users' group_id %}"  class="fi-torsos">{% trans "Manage Users" %} </a>
+                            <div id="manage_users_modal" class="reveal-modal large" data-reveal style="position:absolute;">
+                                <div id="group_drawer">
+                                {% include "ndf/widget_user_search.html" with subscription_status=True %}
+                                </div>
+                                <a class="close-reveal-modal">&#215;</a>
+                            </div>
+                        </li>
+                        <li>
+                            <a href="{% url 'create_event_group' group_id 'CourseEventGroup' %}" class="fi-volume"> {% trans "Announce" %}</a>
+                        </li>
+
+                        {% get_lessons group_object as lessons_list %}
+                        <li class="lesson-dropdown">
+                        <a href="#" class="fi-page-export"> {% trans "Export to ePub" %}</a>
+                        <ul>
+                            {% for each_lesson in lessons_list  %}
+                            <li class="lesson_name_in_export"><a href="{% url 'export_to_epub' group_id each_lesson.pk %}" class="export_lesson" title="{{each_lesson.name}}">{{each_lesson.name|truncatechars:15}}</a></li>
+                            {% endfor %}
+                        </ul>
+                        </li>
+
+
+                        <li> <a data-reveal-id="delete-unit"><i class="fa fa-trash"></i>{% trans "Delete" %}</a> </li>
+
+                        </ul>
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+            <div class="row">
+                <div class="small-12 columns group_sections sticky">
+                    <nav data-topbar data-options="sticky_on: large" role="navigation">
+                        <ul class="title-area text-center horizontal_tabs_gstudio">
+                        <li>
+                            <a href="{% url 'course_about' group_id %}" {% if title == 'about' %}class="selected"{% endif %}>{% trans "Overview" %}</a>
+                        </li>
+                        <li >
+
+                            <a href="{% url 'unit_detail' group_id %}" {% if title == 'unit_authoring' %}class="selected"{% endif %}>{% if not group_object.project_config.tab_name %}{% trans "Lessons" %} {% else %}{{group_object.project_config.tab_name}} {% endif %}</a>
+
+
+                        </li>
+                       <li>
+                            <a href="{% url 'course_pages' group_id %}" {% if title == 'course_pages' or title == 'create_course_pages' %}class="selected"{% endif %}>{% trans "Activities" %}</a>
+                        </li>
+                        <li>
+                            <a href="{% url 'asset_list' group_id %}" {% if title == 'asset_list' or title == 'asset_detail' or title == 'asset_content_detail'%}class="selected"{% endif %}>{%trans "Assets" %}</a>
+                        </li>
+                        <li >
+                            <a href="https://clix-authoring.mit.edu/#/" target="_blank" {% if title == 'Assessments' %}class="selected"{% endif %}>{% trans "Assessments" %}</a>
+                        </li>
+                        <li >
+                            <a href="{% url 'course_notebook' group_id %}" {% if title == 'notebook' %}class="selected"{% endif %}>{% trans "Notebook" %}</a>
+                        </li>
+                        
+                    </ul>
+                </nav>
+
+
+                </div>
+            </div>
+            <div class="row">
+                <div class="small-12 columns group_sections_content">
+
+                    <div id="group_overview">
+                        {% if title == "about" %}
+                            {% include "ndf/course_about.html" %}
+                        {% endif %}
+                    </div>
+                    <div id="group_pages">
+                        {% if title == "course_pages" %}
+                            {% include "ndf/course_pages.html" %}
+                        {% elif title == "create_course_pages" %}
+                            {% include "ndf/course_page_create_edit.html" %}
+                        {% endif %}
+
+                    </div>
+                    <div id="group_elibrary">
+                        {% if title == "asset_list" %}
+                            {% include "ndf/assets.html" %}
+                        {% endif %}
+                        {% if title == "asset_detail" or title == "asset_content_detail" %}
+                            {% include "ndf/add_asset.html" %}
+                        {% endif %}
+                    </div>
+                    <div id="addAsset" class="reveal-modal reveal-modal-overlay" data-reveal aria-labelledby="modalTitle" aria-hidden="true" role="dialog">
+                        <a class="close-reveal-modal" aria-label="Close">&#215;</a>
+                    </div>
+
+                    <div id="delete-unit" class="reveal-modal tiny text-center" data-reveal>
+                    <h3>{% trans "Delete Unit:" %} {% firstof group_object.altnames group_object.name  %} ?</h3>
+                        <br/>
+                        {% trans "Are you sure want to delete this unit?" %}
+                        <br/>
+                        <a href="#" class="button tiny success">{% trans "Cancel" %}</a>
+                        <a href="{% url 'delete_group_url_redirect' group_object.pk 'explore_basecourses' %}" class="button tiny alert">{% trans "Yes" %}</a>
+                        <a class="close-reveal-modal" aria-label="Close">&#215;</a>
+                    </div>
+
+                    <div id="group_forum">
+
+                    </div>
+                    <div id="group_blog">
+                        {% if title == 'notebook' %}
+                            {% include "ndf/gnotebook.html" %}
+                        {% endif %}
+                    </div>
+                    <div id="group_calendar">
+
+                    </div>
+                    <div id="group_assessment">
+                    </div>
+                    <div id="unit_authoring_div">
+                        {% if title == 'unit_authoring' %}
+                        {% include "ndf/unit_structure.html" %}
+                        {% comment %}
+                        {% get_node_hierarchy group_object as node_hierarchy %}
+                            {% include "ndf/section_subsection.html" with unit_structure=node_hierarchy unit_obj=group_object group_id=group_object.pk section_name=group_object.project_config.section_name sub_section_name="Activity"  %}
+                        {% endcomment %}
+                        {% endif %}
+
+                    </div>
+
+
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div id="exportLessonModal" class="reveal-modal medium success radius" data-reveal data-alert>
+        <div id="exportLessonModalLabel">{% trans "Epub will be downloaded automatically." %}</div>
+        <a class="close-reveal-modal">&#215;</a>
+    </div>
+</div>
+
+
+
+        
+
+
+    <script type="text/javascript">
+
+        $(function(){
+            /*Group sections tabs*/
+            // $('.group_sections_content >div').hide();
+            // $('.group_sections_content #group_elibrary').show();
+            // $('.horizontal_tabs_gstudio').on('click', ' >li>a', function(e) {
+            //     e.preventDefault();
+            //     var id = $(this).attr('href');
+
+            //     if (id !== '#') { // If the id is hash then we will not handle it.
+            //         $('.group_sections .selected').removeClass('selected');
+            //         $(this).addClass('selected');
+
+            //         $('.group_sections_content >div').hide();
+            //         $('.group_sections_content '+id).show();
+            //     }
+            // });
+
+            // Create Curriculum
+
+            $('.transcript_files, .subtitle_files').on('click', 'span', function(){
+                var input = $(this).siblings('input');
+                $(this).closest('div').prepend('<input type="file" name="'+input.attr('name')+'"/>');
+            })
+        });
+
+            $(document).on('click','.export_lesson',  function(){
+                $("#exportLessonModal").foundation('reveal', 'open');
+                setTimeout(
+                    function() {
+                        $("#exportLessonModal").foundation('reveal', 'close');
+                    }, 2000);
+            })
+
+
+            $( ".createAsset" ).click(function() {
+                    var asset_id = $(this).attr('data-asset_id');
+                    $.ajax({
+                              type: "GET",
+                              url: "{% url 'add_asset' group_id %}",
+                              data: {
+                                node_id: asset_id
+                              },
+                              datatype: "html",
+                              success: function(data) {
+                                $('#addAsset').foundation('reveal', 'open');
+                                $('#addAsset').html(data);
+                            }
+
+                      });
+            });
+
+    </script>
+
+
+{% endblock body_content %}

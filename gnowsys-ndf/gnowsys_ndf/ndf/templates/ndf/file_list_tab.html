@@ -1,0 +1,184 @@
+{% load i18n %}
+{% load ndf_tags %}
+
+{% if searching and resource_type.count > 0 %}
+  <div class="row">
+    <div class="small-12 columns end">
+      <p>{% trans "Search Results:" %} <span class="label success round">{% trans 'Found' %} {{resource_type.count}} {{title|lower}}{{resource_type.count|pluralize}}.</span></p>
+    </div>
+  </div>
+{% elif searching and resource_type.count == 0 %}
+  <div class="row">
+    <div class="small-12 columns">
+      <p>{% trans "Search Results:" %} <span class="label alert">No {{title|lower}}{{resource_type.count|pluralize}} matched your search criteria!!!</span></p>
+    </div>  
+  </div>  
+{% endif %}
+
+
+<!-- Card -->
+<ul class="small-block-grid-1 medium-block-grid-3 large-block-grid-5" >
+
+  <!-- Existing card list-->
+  {% for each_res in resource_type %}      
+    <!-- #{#%# get_grid_fs_object each_res as grid_fs_obj %} -->
+    <li class="card-image-wrapper" > 
+    <!--old card-view > card.html &&  new card-view > simple_card.html  -->
+    {% if notebook_filter %}
+      {% include 'ndf/simple_card.html' with  has_contributor=True resource=each_res url_name='course_notebook_tab_note' first_arg=group_name second_arg="all-notes" third_arg=each_res.pk %}
+    {% else %}
+      {% include 'ndf/simple_card.html' with  has_contributor=True resource=each_res url_name=detail_urlname first_arg=group_name second_arg=each_res.pk %}
+    {% endif %}
+    </li>
+
+    {% comment %}
+    <li class="card">
+      {% if grouptype == "Moderated" %}
+        {% if each_res.status == "DRAFT" %}
+          <div class="draft">
+        {% elif each_res.status == "PUBLISHED" %}
+          <div class="published">
+        {% elif each_res.status == "MODERATION" %}
+          <div class="moderation">
+        {% endif %}
+      {% elif each_res.status == "MODERATION" %}
+        <div class='moderation'>
+      {% else %}
+        <div class='{% if each_res.status == "PUBLISHED" %}published{% endif %}'>
+      {% endif %} 
+
+      {% if "Pandora_video" in each_res.member_of_names_list %}
+        <a href="{% url detail_urlname group_id each_res %}?vid_id={{src_id}}">
+      {% elif "Page" in each_res.member_of_names_list %}
+        <a href="{% url 'page_details' group_id each_res %}">
+      {% else %}
+        <a href="{% url detail_urlname group_id each_res %}">
+      {% endif %}
+
+        <div class="row">
+          <div class="small-8 column">
+            <b>
+              {{ each_res.name }} {% if each_res.collection_set %} <i class="fi-page-multiple"></i> {% endif %}
+            </b>
+          </div>
+          <div class="small-4 column">
+            {% if "image" in each_res.mime_type or each_res.fs_file_ids.1 %}
+              <img src="{% url 'getFileThumbnail' group_id each_res.pk %}" alt="No thumbnail available!" />
+            {% elif "audio" in each_res.mime_type %}
+              <span class="fi-music" style="font-size:40px"></span>
+            {% elif "Pandora_video" in each_res.member_of_names_list and "video" in each_res.mime_type %}
+            {% get_source_id each_res.pk as source_id %}
+              <img src="http://wetube.gnowledge.org/{{source_id}}/icon128.jpg"/>
+            {% elif "video" in each_res.mime_type and each_res.member_of_names_list|join:', ' != "Pandora_video" %}
+        {% get_source_id each_res.pk as source_id %}
+        {% if source_id %}
+        <!--
+              <img src="http://wetube.gnowledge.org/{{source_id}}/icon128.jpg"/>
+        -->
+        {% endif %}
+              <img src="{% url 'getFileThumbnail' group_id each_res.pk %}" alt="No thumbnail available!"/>
+             
+            {% else %}
+              <span class="fi-page-filled" style="font-size:40px"></span>
+            {% endif %}
+          </div>
+        </div>
+        <hr/>
+        <span style="font-size:12px;">{{ each_res.html_content|default_if_none:"Add some description."|safe|striptags|truncatechars:75 }}</span></br>
+        
+        <footer>
+          <div class="small-6 columns">{{each_res.mime_type|truncatechars:15}}</div>
+          <div class="small-6 columns"><div class="right"><strong>{{each_res.file_size.size}}</strong> {{each_res.file_size.unit}}</div></div>
+        </footer>
+        <footer>
+            <div class="age">
+              {{ each_res.member_of_names_list|join:', ' }}{% trans 'created' %} {{each_res.created_at|timesince}} {% trans 'ago' %} 
+              <br/>
+            <span><strong>{{each_res.contributors|length}}</strong> {% trans 'Contributor' %}{{each_res.contributors|pluralize}} | </span>
+              by <span class="user" href="{% url 'dashboard' each_res.created_by %}" data-gnow="">{{each_res.user_details_dict.created_by}}</span> &nbsp;&nbsp;&nbsp;
+            </div>
+          </footer>
+          </a>
+
+          <div class="label-list small-11 columns">
+            {% for tag in each_res.tags|slice:":3" %}
+            <a href="{% url 'tag_info' group_name_tag tag %}">
+              <span class="label" style="background-color:yellow">{{tag}}</span>
+            </a>{% endfor %}
+          </div>
+
+          {% if user.is_authenticated %}
+            <div class="label-list small-1 columns">
+              <input type="checkbox" name="filenode" class="filenode" value="{{each_res.pk}}">
+            </div>
+          {% endif %}
+
+      </div>
+    </li>
+    {% endcomment %}
+
+      <!-- end new -->      
+
+    {% empty %}
+      {% if not searching %}
+        <div class="row">
+          <div class="small-11 small-offset-1 columns">
+            {% if res_type_name == "collection" %}
+              <h5> {% trans "This group doesn't have any collections." %}</h5>
+            {% elif filter_result == "False" %}
+              <h5> {% trans "Sorry, No such files found." %}.</h5>
+            {% else %}
+              {% if not dont_show_error %}
+                {% if "CourseEventGroup" in node.member_of_names_list %}
+                <h5> 
+                  {% blocktrans %}No files have been uploaded yet.{% endblocktrans %}
+                </h5>
+                {% else %}
+                  <h5> {% trans "Sorry, No such files found." %}.</h5>
+                {% endif %}
+              {% endif %}
+            {% endif %}
+
+          </div>
+        </div>
+      {% endif %}
+      
+  {% endfor %}
+  
+</ul>
+
+{% if title == "E-Library" %}
+  
+  {% include 'ndf/pagination.html' with urlname="elib_paged_file_objs" first_arg=group_name_tag second_arg=filetype third_arg="" %}
+
+  <div class="hide" data-educationaluse-stats='{{ educationaluse_stats }}'></div>
+  
+{% elif title == "eBooks" %}
+
+    {% include 'ndf/pagination.html' with urlname="e-book_filter_page" first_arg=group_name_tag second_arg=""  third_arg="" page_info=page_info %}
+
+{% else %}
+
+  {% include 'ndf/pagination.html' with urlname="paged_file_objs" first_arg=group_name_tag second_arg=filetype third_arg="" %}
+
+{% endif %}
+
+<link rel="stylesheet" type="text/css" href="/static/ndf/bower_components/slick-carousel/slick/slick.css"/>
+<link rel="stylesheet" type="text/css" href="/static/ndf/css/open-sans-bold-font.css">
+<script type="text/javascript" src="/static/ndf/bower_components/slick-carousel/slick/slick.min.js"></script>
+
+
+<script type="text/javascript">
+  $(document).ready(function () {
+
+      $('.rcard .content').slick({
+      // dots: true,
+      infinite: true,
+      arrows: true,
+      speed: 500,
+      // fade: true,
+      cssEase: 'linear'
+    });
+    
+  })
+</script>

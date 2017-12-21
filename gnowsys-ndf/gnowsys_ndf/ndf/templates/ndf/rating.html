@@ -1,0 +1,50 @@
+{% load ndf_tags %}
+{% user_access_policy groupid request.user as user_access %}
+{% load i18n %}
+<!-- <div id="rating-bar" class="show-on-hover"> -->
+{% block body_content %} 
+<script src="/static/ndf/js/rating.js"></script>
+{% if if_comments %}
+    {% get_node nodeid as node %}
+    
+    {% get_node_ratings request node.pk as ratings %}
+{% else %}
+    {# {% get_node node.pk as node %} #}
+    {% get_node_ratings request node.pk as ratings %}
+{% endif %}
+
+    <form style="display: inline-block" id="form-for-{{node.pk}}">
+    <!-- Sets the rating values as data attributes -->
+        <input type="hidden" name="is_contributor" class="is-contributor-{{node.pk}}" "{% if request.user.id in node.contributors %}" value= "True" "{% endif %}">
+        <input type="hidden" name="user_access_priv" class="user_access_priv"  value= "{{user_access_priv}}">
+        <span datat-tooltip title="Your rating" class="lbl_tag" style="display: inline-block">
+            <div id="rating-area-{{node.pk}}" {% if user_access_priv == "allow" %}  data-node="{{node}}" data-avg-rating="{{ratings.avg}}" data-votes="{{ratings.tot}}" class="rating-bar rating-bar-{{node.pk}}" data-user-rating="{{ratings.user_rating}}" {% else %} class=" rating-bar rating-bar-{{node.pk}}show user_not_enrolled" {% endif %}>
+                <span id="rating-span-{{node.pk}}" >
+                    <input type="radio" id="rating-5-{{node.pk}}" data-node-id="{{node.pk}}"  onclick="add_ratings($(this));" name="rating-{{node.pk}}" value="5" />
+                        <label for="rating-5-{{node.pk}}">{% trans "5" %}</label>
+                    <input type="radio" id="rating-4-{{node.pk}}"   data-node-id="{{node.pk}}" onclick="add_ratings($(this));" name="rating-{{node.pk}}" value="4" />
+                        <label for="rating-4-{{node.pk}}">{% trans "4" %}</label>
+                    <input type="radio" id="rating-3-{{node.pk}}"   data-node-id="{{node.pk}}" onclick="add_ratings($(this));" name="rating-{{node.pk}}" value="3" />
+                        <label for="rating-3-{{node.pk}}">{% trans "3" %}</label>
+                    <input type="radio" id="rating-2-{{node.pk}}"  data-node-id="{{node.pk}}" onclick="add_ratings($(this));" name="rating-{{node.pk}}" value="2" />
+                        <label for="rating-2-{{node.pk}}">{% trans "2" %}</label>
+                    <input type="radio" id="rating-1-{{node.pk}}"   data-node-id="{{node.pk}}" onclick="add_ratings($(this));" name="rating-{{node.pk}}" value="1" />
+                        <label for="rating-1-{{node.pk}}">{% trans "1" %}</label>
+                    <input type="radio" id="rating-0-{{node.pk}}"   data-node-id="{{node.pk}}" onclick="add_ratings($(this));" name="rating-{{node.pk}}" value="0" class="last" />
+                        <label for="rating-0-{{node.pk}}">{% trans "0" %}</label>
+                </span>
+            </div>
+        </span>
+    </form>
+        {% if node.rating %}
+            <span data-tooltip title="{% trans 'Average Rating' %} : {{ratings.avg}}<br> {% trans 'No. of Users rated' %}  : {{node.rating|length}}" style="display: inline-block;vertical-align: baseline;">
+                <label class="rating-lbl" style="font-size: 15px;color: #7D7D7D" id="avg-rating-{{node.pk}}"  >{% trans "Avg" %} : &nbsp;{{ratings.avg|default:"unrated"}} {% trans ' by ' %}{{ node.rating|length }}</label>
+            </span>
+        {% endif %}
+
+
+<script type="text/javascript">
+ setStars("{% firstof ratings.user_rating  ratings.avg %}","{{node.pk}}")
+</script>
+{% endblock %}
+

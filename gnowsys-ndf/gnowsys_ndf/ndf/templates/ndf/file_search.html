@@ -1,0 +1,57 @@
+{% extends "ndf/base.html" %}
+{% load i18n %}
+{% load ndf_tags %}
+{% block title %} {{title}} {% endblock %}
+{% block body_content %} 
+{% get_group_name groupid as group_name_tag %}
+<form id ="file_search" enctype="multipart/form-data" method="GET" action="{% url view_name  group_name_tag %}">
+  <div class="row"  style="padding-top:20px">
+    <div class="large-6 columns">
+      <div class="row collapse">
+	<div class="small-10 columns">
+          <input type="text" placeholder="search images" name="search">
+	</div>
+	<div class="small-2 columns">
+          <a href="#" class="button postfix" onclick="document.forms[0].submit();return false;">
+	    <i class="fi-magnifying-glass large">{% trans "Search" %}</i>
+	  </a>
+	</div>
+      </div>
+    </div>
+  </div>  
+</form> 
+<hr />
+<div name="search">
+  {% for file in file_collection %}
+  <h3> {{file.name}}</h3>
+  <div style='display:table;'>
+    <div style='display:table-row;'>
+      <div style='display:table-cell;'>
+	{% if "image" in  file.mime_type %}
+	<img src="{% url 'getFileThumbnail' group_name_tag file %}" vertical-align="top"></img>
+	{% endif %}
+	<!-- {% if "pdf" in  file.mime_type %} -->
+	<!-- <img src="/home/file/readDoc/52aacbfd1606ea57ec7c40f6" vertical-align="top"></img> -->
+	<!-- {% endif %} -->
+	
+      </div>
+      <div style='display:table-cell;'>
+	{% get_user_object file.created_by as user_obj %}
+	<span style="padding-left:10px"><b>{% trans "Posted by:" %}</b> {{ user_obj.username}}</span><br />
+	<span style="padding-left:10px"><b>{% trans "size:" %}</b> {{file.file_size.size}}{{file.file_size.unit}}</span><br />
+	<span style="padding-left:10px"><b>{% trans "file Type:" %}</b> {{file.mime_type}}</span><br />
+	<span style="padding-left:10px"><b>{% trans "Tags:" %}</b> 
+	  {% for each in file.tags %} 
+	  {{each}},
+	  {% endfor %}
+	</span>
+      </div>
+    </div>
+  </div>
+<hr />
+{% empty %}
+    {% blocktrans %}<span>No file found. Please try using some other keyword</span>{% endblocktrans %}
+{% endfor %}
+</div>
+{% endblock %}
+ 

@@ -1,0 +1,14 @@
+{% extends "registration/registration_base.html" %}
+{% load i18n %}
+
+{% block title %}{% trans "Registration Closed" %}{% endblock %}
+
+{% block body_content %}
+
+	{% url 'auth_login' as auth_login_url %}
+	<br/>
+	<h3> {% trans "Sorry, registration is closed!" %}</h3>
+
+{% endblock %}
+
+

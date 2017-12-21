@@ -1,0 +1,650 @@
+<!ATTLIST acourse_list_name scount CDATA #IMPLIED>
+{% extends "ndf/base.html" %}
+{% load i18n %}
+{% load ndf_tags %}
+{% block title %} {{title}} {% endblock %}
+
+{% block head %}
+  {{block.super}}
+
+  <!-- DataTables -->
+  <script src="/static/ndf/bower_components/DataTables/media/js/jquery.dataTables.js"></script>
+  <script src="/static/ndf/bower_components/datatables-plugins/integration/foundation/dataTables.foundation.js"></script>
+  <!-- DataTables CSS -->
+  <link href="/static/ndf/bower_components/datatables-plugins/integration/foundation/dataTables.foundation.css" rel="stylesheet" type="text/css" />
+{% endblock %}
+
+
+{% block style %}
+  {{block.super}}
+
+  .divider-line { font-size: xx-large; color:lightgray; }
+  .line-height-2 { line-height:2; }
+  .line-height-2pt5 { line-height:2.5; }
+  .fontsize-x-large { font-size: x-large; }
+
+  .margin-0 { 
+    margin: 0 !important;
+  }
+  tr:hover{
+      cursor:pointer;
+  }
+
+  .resource-drawer { 
+    border-color: #D3D3D3; border-style: solid; 
+    padding: 0 !important; 
+    overflow-y: auto;
+  }
+
+  .resource-drawer li.bullet-item:hover{
+    background-color: #ecf0f1; cursor:pointer;
+  }
+
+  .target {
+    width:400px;
+    padding:10px;
+    margin:12px;
+    border:2px solid #bbb;
+  }
+  
+  /* Setting css-properties for reveal-modal's label */
+  div.reveal-modal > label {
+    color: white;
+    font-weight: bold;
+    font-size: 1rem;
+  }
+
+  .existing_batch, .view_batch{
+    text-decoration: underline;
+  }
+
+  .posted-by{ color: #808080; font-size: small; }
+
+  .selected { background-color:lightgray !important ; }
+
+  .resource-type-image {
+  height:40px;    
+  background-repeat:no-repeat; background-size: 48px 48px
+
+  /* Resetting css-properties for fieldset (also legend, input) */
+    /* fieldset (padding-bottom) */ 
+    fieldset {
+      padding: 0em !important;
+      margin: 0 !important;
+    }
+
+    /* legend (background-color) */
+    fieldset legend {
+      background-color: transparent !important;
+    }
+
+    /* input (margin) */
+    fieldset input {
+      padding: 0 !important;
+    }
+
+  /* Setting css-properties for small.error */
+    small.error {
+      padding: 0 0 0 0.5em !important;
+      margin: 3.3em 0em !important;
+      position: relative !important;
+    }
+
+    .batch_create_edit_table > tr {
+      border: 1px solid black;
+    }
+{% endblock %}
+
+{% block body_content %}
+
+  <div id="alertModal" class="reveal-modal small alert alert-box radius" data-reveal data-alert>
+    <label id="alertModalLabel"> </label>
+    <a class="close-reveal-modal">&#215;</a>
+  </div>
+
+
+    <div id="batch_info" class="reveal-modal medium" data-reveal style="height:500px;overflow-y: auto !important;"> 
+        <a class="close-reveal-modal">&#215;</a>
+    </div>
+
+<div class="course_details_div">
+  <fieldset id="stud-count" class="small-10 columns">
+    <div class="row">
+      <div class="small-2 columns">
+        <label class="right inline" for="nussd_course_type">{% trans "Course Type" %}</label>
+      </div>
+      <div class="small-4 columns end">
+        {% html_widget groupid "" ATs.0 %}
+      </div>
+    </div>
+
+    <div class="row">
+      <div class="small-2 columns">
+        <label class="right inline" for="acourse_list">{% trans "Name of Course" %}</label>
+      </div>
+      <div class="small-4 columns end">
+        <select id="acourse_list" name="acourse_list_name" disabled="disabled">
+        </select>
+      </div>
+    </div>
+  </fieldset>
+
+  <div class="small-2 columns end" align="center">
+    <br>  
+    <label id="stud_count" style='display: none'></label>
+    <label id="lblstud" style='display: none'> {% trans "Student(s)" %}</label>
+  </div>
+  <div class="small-12 columns" align="center">
+    <input type="button" class="small button right inline" id="nextbtn" value="Proceed" disabled="disabled" style='display: none'/>
+  </div>
+</div>
+
+  <br>
+  <div class="batch_div hide">
+  <div class="row">
+    <div style="text-align: center;">
+      <div class="small-4 columns end" style="display: inline-block;  ">
+        <h4>{% trans 'Search Student by name : ' %}</h4>
+      </div>
+      <div class="small-4 columns end" style="display: inline-block;  ">
+        <input type="text" class="ajax_input_name small-6 columns" value="" placeholder="Enter atleast 3 letters to search">      
+      </div>
+    </div>
+  </div>
+  </div>
+  <div class="datatable_div"></div>
+
+  <div id="batch-details"></div>
+
+
+  <fieldset id="make_batch_fs" class="hide small-12 columns">
+  <table id="batch_create_edit_table">
+    <tbody>
+    </tbody>
+  </table>
+    <input type="button" class="create_batch_row button small" value="Create Batch" disabled="disabled">
+    <li style="color:red;">Batch once created CANNOT be deleted</li>
+    <li>Click on Batch name to add more students to the batch</li>
+    <li>Click on 'View' to display/remove batch members</li>
+      <div class="batch_create_div hide">
+        <input type="text" class="batch_name_inp" placeholder="Enter name of Batch">
+        <input type="button" class="save small round button" value="Save">
+        <input type="button" class="cancel small round button" value="Cancel">
+      </div>
+  <input type="hidden" name="batch_user_list_dict" id="batch_user_list_dict">
+  <input type="hidden" name="ac_id" id="ac_id">
+  </div>
+  </fieldset>
+{% endblock %}
+<script>
+{% block script%}
+  //global variables 
+  var ac_id=""
+  var ac;
+  var added_ids_list = []
+  var batch_name_index;
+  var batch_name;
+  var ac_name_as_prefix;
+  var batch_user_list_dict = {}
+  var batch_user_list_list = {}
+  var scount_lbl = 0
+  var sce_dt_var;
+  //For selecting Course type
+    $("select#nussd_course_type").change(function() {
+      var nussd_course_type = $("#nussd_course_type").val();
+      success_state = false;
+
+      $.ajax({
+        url: "{% url 'get_announced_courses_with_ctype' group_id %}",
+
+        data: {
+          nussd_course_type: nussd_course_type
+        },
+
+        type: "GET",
+
+        dataType: "json",
+
+        complete: function () {
+          // Enable AC field
+          $("select#acourse_list").removeAttr('disabled')
+
+          {% if ac_node %}
+          $("select#acourse_list").val("{{ac_node.pk}}");
+          $("select#acourse_list").trigger("change");
+          {% endif %}
+        },
+
+        success: function(data){
+          success_state = data["success"]
+          if (success_state){
+
+            ac_data = data["acourse_ctype_list"]
+            ac_data = JSON.parse(ac_data)
+
+            $("select#acourse_list").empty();
+              $("select#acourse_list").append(
+                $("<option></option>")
+                  .attr("value", "")
+                  .text("{% trans ' - - - Select course - - - ' %}")
+              );
+            
+            $.each(ac_data, function(i,v){
+              se = v["_id"];
+              ac_name = v["name"];
+              scount_lbl = v["enrolled_stud_count"]
+              $("select#acourse_list").append(
+                $("<option></option>")
+                  .attr("value", se)
+                  .text(ac_name)
+                  .attr("scount", scount_lbl)
+              );
+            });
+            $("select#acourse_list").prop("selectedIndex", 0);
+          }
+          else {
+            $("#alertModalLabel").text(data["message"]);
+            $("#alertModal").foundation('reveal', 'open');
+            $("select#nussd_course_type").prop("selectedIndex", 0);
+            $("select#acourse_list").empty();
+          }
+        },
+      });//end of ajax
+    });//end of nussd_course_type.change function
+
+  // On close event of reveal-modal (alertModal) -------------------------------------------------------------
+    $(document).on('closed.fndtn.reveal', '#alertModal[data-reveal]', function () {
+      // Reset reveal-modal content & it's setting
+      $("#alertModalLabel").text("");
+      $("#alertModal").find("div.row").addClass("hide");
+    });
+
+  
+  //For selecting Announced Course type
+    $("select#acourse_list").change(function() {
+        //ac_id = $("#acourse_list").val();
+        $("#stud_count").text("")
+        // sct = $(this).data("scount")
+        
+        if ($("#nextbtn").css("display") == "none") {
+          $("#nextbtn").toggle()
+        }
+        if ($("#stud_count").css("display") == "none") {
+          $("#stud_count").toggle()
+        }
+        if ($("#lblstud").css("display") == "none") {
+          $("#lblstud").toggle()
+        }
+        scount_lbl = $("#acourse_list option:selected").attr("scount")
+        $("#stud_count").css("font-size", "53px");
+        $("#stud_count").text(scount_lbl)
+
+        if(scount_lbl>0){
+          $("#nextbtn").removeAttr("disabled")
+        }
+        else{
+          $("#nextbtn").attr("disabled","disabled")
+        }
+  
+        {% if node %}
+          if ($("#stud_count").css("display") == "none") {
+            $("#stud_count").toggle()
+          }
+
+          if ($("#lblstud").css("display") == "none") {
+            $("#lblstud").toggle()
+          }
+
+          $("#nextbtn").trigger("click");
+        {% endif %}
+    });//end of acourse_list.change function
+
+  //Proceed to create batches for selected AC
+    $("#nextbtn").click(function(event) {
+      if ($("#nextbtn").css("display") != "none") {
+        $("#nextbtn").css("display", "none");
+      }
+      // $("#nussd_course_type").attr("disabled","disabled")
+      // $("#acourse_list").attr("disabled","disabled")
+      // Give a textbox to enter name
+
+      $(".batch_div").removeClass("hide");
+      $(".course_details_div").addClass("hide");
+      nc = $("#nussd_course_type").val();
+      ac = $("#acourse_list option:selected").text()
+      ac_id = $("#acourse_list").val();
+      $("aside.medium-2.columns").html("Batch creation for: <b>'"+ac+"'</b> ("+nc+")")
+      $.ajax({
+        url: "{% url 'get_possible_batches' groupid %}",
+
+        data: {
+          'ac_id': ac_id,
+          'create_new_batch':true,
+          'csrfmiddlewaretoken': "{{csrf_token}}"
+        },
+
+        type: "POST",
+
+        dataType: "json",
+
+        success: function(data){
+          success_state = data["success"]
+          if(success_state){
+            batch_data = data['old_batches']
+            if (batch_data!=""){
+              // batch_user_list_dict = batch_data
+              $("#make_batch_fs").removeClass("hide")
+              var table = document.getElementById("batch_create_edit_table");
+              $.each(batch_data, function(index){
+                $.each(batch_data[index], function(key,val){
+                  batch_user_list_dict[key] = val[0]
+                  var row = table.insertRow(-1);
+                  var cell1 = row.insertCell(0);
+                  var cell2 = row.insertCell(1);
+                  var cell3 = row.insertCell(2);
+                  cell1.innerHTML = "<span data-tooltip title='Click to view/edit'>View</span>";
+                  cell1.className = "view_batch";
+                  cell2.innerHTML = "<span data-tooltip title='Click to Add to this Batch'>"+key+"</span>";
+                  cell2.className = "save";
+                  cell2.className += " existing_batch";
+                  cell2.id = val[1];
+                  cell3.innerHTML = "<span data-tooltip title='Total students'>"+val[0].length+" student(s)<span>";
+                  cell3.className = "stud_count_in_batch";
+                  val.pop();
+                })
+              })
+            }
+          }
+        },
+      });//end of ajax
+
+    });//end of nextbtn.click()
+
+
+  // Click event: "Student data" Row of DataTable
+    $(document).on( 'click', '#student_data_table tbody tr', function () {
+      $(this).toggleClass('selected');
+      $("#make_batch_fs").removeClass("hide")
+      $(".create_batch_row").removeAttr("disabled")
+    });
+
+  // On click of create batch button
+    $(document).on( 'click', '.create_batch_row', function () {
+        $(".batch_create_div").removeClass("hide")
+        total_batches = Object.keys(batch_user_list_dict).length + 1
+        $(".batch_name_inp").val(ac + " - Batch " + total_batches)
+                            .attr("disabled", true)
+        $(".create_batch_row").attr("disabled",true)
+
+    });
+
+  // Create batch and add selected students to it.
+  // Also hide batch_create_div from first row
+  // Add new row to batch create edit table with the batch name as inputted
+    $(document).on( 'click', '.save', function () {
+      arr = []
+      batch_id = null;
+      //do nothing
+      $(".create_batch_row").attr("disabled",true)
+
+      $(".batch_create_div").addClass("hide");
+      batch_name = $(".batch_name_inp").val();
+      sce_dt_var.$("tr.selected").each(function () {
+          $(this).removeClass('selected');
+          arr.push(this.id);
+      });
+      if (arr.length != 0){
+        if($(this).hasClass('existing_batch')){
+          batch_name = $(this).text()
+          if(batch_user_list_dict.hasOwnProperty(batch_name)){
+            old_arr = batch_user_list_dict[batch_name]
+            batch_user_list_dict[batch_name] = old_arr.concat(arr)
+            $(this).next('td').html(batch_user_list_dict[batch_name].length+ " student(s)")
+            arr = batch_user_list_dict[batch_name]
+            batch_id = $(this).attr('id')
+          }
+        }
+
+        $.ajax({
+          url: "{% url 'save_batch' groupid %}",
+
+          data: {
+            'ac_id': ac_id,
+            'batch_name': batch_name,
+            'batch_id': batch_id,
+            'user_list':arr,
+            'csrfmiddlewaretoken': "{{csrf_token}}"
+          },
+
+          type: "POST",
+
+          dataType: "json",
+
+          success: function(data){
+            new_batch_node = data
+            if(new_batch_node['new_batch_created']){
+              var table = document.getElementById("batch_create_edit_table");
+              var row = table.insertRow(-1);
+              var cell1 = row.insertCell(0);
+              var cell2 = row.insertCell(1);
+              var cell3 = row.insertCell(2);
+              batch_user_list_dict[batch_name] = arr;
+              cell2.innerHTML = "<span data-tooltip title='Click to Add to this Batch'>"+new_batch_node['new_batch_node_name']+"</span>";
+
+              cell2.className = "save";
+              cell2.className += " existing_batch";
+              cell2.id = new_batch_node['new_batch_node_id']
+              cell3.innerHTML = "<span data-tooltip title='Total students'>"+batch_user_list_dict[batch_name].length+" student(s)<span>";
+              cell3.className = "stud_count_in_batch";
+              cell1.innerHTML = "<span data-tooltip title='Click to view/edit'>View</span>";
+
+              cell1.className = "view_batch";
+            }
+            $(".batch_name_inp").val('');
+            $('.ajax_input_name').val('');
+            $(".datatable_div").html('');
+          },
+        });//end of ajax
+      }
+      else{
+        alert("Please select students");
+      }
+
+    })
+
+  //view batch members on click of 'View'
+    $(document).on( 'click', '.view_batch  ', function () {
+
+      batch_id = $(this).next('.existing_batch').attr('id');
+      batch_name = $(this).next('.existing_batch').text();
+      $.ajax({
+        url: "{% url 'batch_detail' groupid %}",
+
+        data: {
+          'batch_id': batch_id,
+        },
+
+        type: "GET",
+
+        dataType: "json",
+
+        success: function(data){
+          $("#batch_info").html("")
+          if(data!=""){
+            var table = document.createElement("TABLE");
+            table.id = batch_id
+            table.className = "batch_table_id"
+            $.each(data, function(index){
+              var row = table.insertRow(-1);
+              var cell1 = row.insertCell(0);
+              cell1.innerHTML = data[index]['name'];
+              var cell2 = row.insertCell(1);
+              cell2.innerHTML = "Remove from Batch";
+              cell2.id = data[index]['_id'];
+              cell2.className = 'button alert remove_stud';
+            })
+            $("#batch_info").append(table)
+          }
+          else{
+            $("#batch_info").html("No data to display")
+          }
+          $("#batch_info").append("<a class='close-reveal-modal'>&#215;</a>")
+          $('#batch_info').foundation('reveal', 'open');
+
+
+        },
+      });//end of ajax
+
+
+
+    })
+
+
+  //remove batch members 
+    $(document).on( 'click', '.remove_stud  ', function () {
+      stud_id = $(this).attr('id');
+      batch_id = $(".batch_table_id").attr('id')
+      $(this).closest("tr").remove()
+      $.ajax({
+        url: "{% url 'remove_stud_from_batch' groupid %}",
+
+        data: {
+          'batch_id': batch_id,
+          'stud_id': stud_id,
+          'csrfmiddlewaretoken': "{{csrf_token}}"
+        },
+
+        type: "POST",
+
+        dataType: "json",
+
+        success: function(data){
+          status = data
+          if(status=="success"){
+            if(batch_user_list_dict.hasOwnProperty(batch_name)){
+              old_arr = batch_user_list_dict[batch_name]
+              if(old_arr.indexOf(stud_id)>=0){
+                i = old_arr.indexOf(stud_id)
+                old_arr.splice(i,1)
+              }
+              batch_user_list_dict[batch_name] = old_arr
+            }
+            $("#batch_create_edit_table").find("#"+batch_id).next('.stud_count_in_batch').html(old_arr.length+ " student(s)")
+          }
+        },
+      });//end of ajax
+
+
+    })
+
+
+  // Make an ajax call to search approved student 
+  // of the selected AC with entered name
+  // ajax search student by name
+    var search_text_old = "";
+    $(document).on( 'keyup', '.ajax_input_name', function (e) {
+        var search_text = (this.value).toLowerCase();
+        var search_text_len = (search_text.length);
+        ac_id = $("#acourse_list").val();
+
+        // if (e.keyCode == 8) {
+        //   // If backspace pressed, then do nothing
+        //   search_text_len = 0;
+        // }
+        if (search_text_len > 2){
+          for(var key in batch_user_list_dict){
+            added_ids_list = added_ids_list.concat(batch_user_list_dict[key])
+          }
+
+          $.ajax({
+            type: "POST",
+            url: "{% url 'get_students_for_batches' groupid %}",
+            datatype: "json",
+            data:{
+              'search_text': search_text,
+              'ac_id': ac_id,
+              'added_ids_list':added_ids_list,
+              'csrfmiddlewaretoken': '{{ csrf_token }}'
+            },
+            success: function(data) {
+              data = JSON.parse(data)
+              success_state = data["success"];
+              search_text_old = search_text
+              // $("#alertModalLabel").text(data["message"]);
+
+              if (success_state) {
+                students_count = data["students_count"];
+                column_headers = data["column_headers"];
+                students_data_set = data["students_data_set"];
+                dataTable_columns_set = [];
+
+                if (parseInt(students_count) <= 0) {
+                  c = '<div class="row">' +
+                    '<div class="large-4 large-centered columns">' +
+                      '<p class="alert-box alert radius text-center text-size-15">No records match the given criteria !!!</p>' +
+                    '</div>' +
+                  '</div>'
+                  $(".datatable_div").html(c);
+                }
+
+                else {
+                  // Define table
+                  student_data_table = '<table cellpadding="0" cellspacing="0" border="0" class="display" id="student_data_table">' +
+                    '<caption>' +
+                      '<h6>No. of Students: <b>' + students_count + '</b></h6>' +
+                    '<label>(Click on Name to select student)</label></caption>' +
+                  '</table>';
+                  $(".datatable_div").html(student_data_table);
+                  
+                  // Prepare title & data headers used in dataTable
+                  $.each(column_headers, function(index, v) {
+                    d = {};
+                    d["data"] = v[0];
+                    d["title"] = v[1];
+                    dataTable_columns_set.push(d);
+                  });
+
+                  // Set defintion dataTable
+                  sce_dt_var = $("#student_data_table").dataTable({
+                    "data": students_data_set,
+                    "columns": dataTable_columns_set,
+                    "columnDefs": [{ "width": "15%", "targets": 0 }],
+                    "createdRow": function ( row, data, index ) {
+                      // Attaching Student's ObjectId to each row (i.e., assigning to it's id attribute)
+                      s_id = data["stud_id"];
+                      $(row).attr("id", s_id);
+                    }
+                  });
+                }
+              }
+              else {
+                $("#alertModal").removeClass("success").removeClass("warning");
+                $("#alertModal").addClass("alert");
+                $("#alertModal").foundation('reveal', 'open');
+              }
+            },
+          });
+        }
+    })
+
+  
+  //
+    $(document).on('click','.cancel',function(){
+        $(".batch_create_div").addClass("hide")
+        $(".batch_name_inp").val("");
+        $(".create_batch_row").removeAttr("disabled")
+    });
+
+
+{% endblock %}
+</script>
+{% block document_ready %}
+  {% if nussd_course_name %}
+  $("select#nussd_course_type").val("{{nussd_course_name}}");
+  {% endif %}
+
+  if ($("select#nussd_course_type :selected").index() > 0) {
+    $("select#nussd_course_type").trigger("change");
+  } 
+
+{% endblock %}

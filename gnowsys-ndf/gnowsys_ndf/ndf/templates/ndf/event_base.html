@@ -1,0 +1,269 @@
+{% extends "ndf/base.html" %}
+{% load i18n %}
+{% load cache %}
+{% load ndf_tags %}
+{% block title %}{% trans 'Events' %}{% endblock %}
+
+{% block style %}
+  .course_outline_table, tr {
+    border: 2px solid #0b8a91;
+    border-collapse: collapse;
+  }
+
+  .gray-text{
+    color: gray;
+  }
+
+  #content > p { color: #6F6F6F !important; /*font-size: inherit;*/ }
+
+  tr:hover{
+    cursor:pointer;
+  }
+
+  .tab{
+    padding-left: 2em;
+    background-color:yellow !important;
+  }
+
+  .tab2{
+    padding-left: 4em;
+  }
+
+  #eventModal > label {
+    color: white;
+    font-weight: bold;
+    font-size: 1rem;
+  }
+
+  .all_blogs{
+      overflow-y: auto;
+      height:500px;
+  }
+
+  .jqtree-tree .jqtree-title {
+      margin: 5px;
+      font-size: 15px;
+      color: black !important;
+      /*Change the color here to change font color of tree*/
+  }
+
+  .jqtree-tree {
+      border-color:#0b8a91;
+      border-width:1px;
+      border-style: solid;
+  }
+
+  li.enroll-btn-li{
+    list-style: none;
+  }
+
+
+{% endblock %}
+
+{% block head %}
+    <script type="text/javascript" src="/static/ndf/orgitdown/jquery.orgitdown-foundation.js"></script>
+    <!-- orgitdown! toolbar settings -->
+    <script type="text/javascript" src="/static/ndf/orgitdown/skins/gstudio/set.js"></script>
+    <!-- orgitdown! skin -->
+    <link rel="stylesheet" type="text/css" href="/static/ndf/orgitdown/skins/gstudio/style.css" />
+{% endblock %}
+
+{% block extended_header %}
+{% endblock %}
+{% block body_content %}
+{% check_is_gstaff groupid request.user as gstaff_access %}
+{% user_access_policy groupid request.user as user_access %}
+
+  <div id="eventModal" class="reveal-modal medium alert-box radius" data-reveal data-alert>
+      <label id="eventModalLabel"></label>
+      <a class="close-reveal-modal">&#215;</a>
+  </div>
+
+	<div id="view-page" class="small-12 large-12 columns"></div>
+
+    <!-- Tabs -->
+    <div class="small-12 columns">
+      <dl class="tabs" data-tab data-options="deep_linking:true"  >
+
+            <dd class="tab-title active ">
+              <a href="#about-tab"><i class="fi-info "></i> {% trans "About" %}</a>
+            </dd>
+          {% if user_access == "allow" %}
+            {% if node.collection_set %}
+              <dd class="tab-title">
+                <a href="#view_page" class="view_page_link"><i class="fi-list-thumbnails"></i> {% trans "Start" %}</a>
+              </dd>
+            {% endif %}
+
+            <dd class="tab-title ">
+              <a href="#journal-tab"><i class="fi-page-edit "></i> {% trans "NoteBook" %}</a>
+            </dd>
+
+            <dd class="tab-title">
+              <a href="#gallery-tab"><i class="fi-photo "></i> {% trans "Gallery" %}</a>
+            </dd>
+            {% comment %}
+            <dd class="tab-title ">
+              <a href="#analytics-tab"><i class="fi-graph-trend "></i> {% trans "Analytics" %}</a>
+            </dd>
+            {% endcomment %}
+          {% endif %}
+      </dl>
+
+			<!-- Right Nav Section for enrollment -->
+            {% if not gstaff_access %}
+                <ul class="right">
+                  <li class="enroll-btn-li">
+                  {% if user_access == "allow" %}
+                    <input class="button tiny" type="button" value="ENROLLED" disabled="disabled">
+                  {% else %}
+                    {% if user.is_authenticated %}
+                      {% if allow_to_join == "Open" %}
+                        <input class="enroll-btn button tiny" type="button" value="ENROLL">
+                      {% else %}
+                        <input class="button tiny" type="button" value="Enrollment {{allow_to_join}}" disabled="disabled">
+                      {% endif %}
+                    {% else %}
+                        <a href="{% url 'auth_login' %}" class="button tiny" title="Please login to Enroll">ENROLL</a>
+                    {% endif %}
+                  {% endif %}
+                  </li>
+                </ul>
+            {% endif %}
+
+	    <!-- Tab content -->
+	    <div class="row">
+			<section class="small-12 medium-12 columns content">
+		      	<div class="tabs-content">
+
+			        <div class="content active" id="about-tab">
+			          <div class="row">
+			            {% include "ndf/res_node_ajax_view.html" %}
+			          </div>
+			        </div>
+
+			        <div class="content" id="view_page">
+			        </div>
+
+			        {% if user_access == "allow" %}
+
+			        <div class="content" id="journal-tab">
+                  <h4>
+                    {% trans 'Following are the Notes added: ' %}
+                  </h4>
+                  <div class="text-right">
+			                <a href="{% url 'page_create_edit' node.pk %}?course_event_id={{node.pk}}&blog_type=True" class="button small radius"> Add Note </a>
+			            </div>
+			            <div class="row all_blogs small-block-grid-1 medium-block-grid-2 large-block-grid-5">
+			            	{% for each_blog in blog_pages %}
+                      <li class="card-image-wrapper" style="margin-top:13px;margin-left:-10px">
+                        {% include 'ndf/simple_card.html' with resource=each_blog has_contributor=True no_description=True no_checkbox=True url_name="page_details" first_arg=group_id second_arg=each_blog.pk %}
+                      </li>
+
+                      {% comment %}
+                      <div class="blogpage"  style="margin-left:10px;">
+                        <h4>
+                          <a href="{% url 'page_details' group_id each_blog.pk %}">{{each_blog.name}}</a>
+                        </h4>
+                        {% if request.user.id == each_blog.created_by or gstaff_access %}
+
+                          <a class="fi-pencil" href="{% url 'page_create_edit' node.pk each_blog.pk %}?course_event_id={{node.pk}}&blog_type=True"> Edit </a>
+                        {% endif %}
+                        <span>
+                        Created by {{each_blog.created_by|get_username}} at {{each_blog.created_at}}
+                        </span>
+                        <div>
+                          {{each_blog.html_content|safe}}
+                        </div>
+                      </div>
+                      <hr/>
+                      {% endcomment %}
+			              {% empty %}
+			                <div class="blogpage"  style="margin-left:10px;">
+			                  <h4><u>
+			                    <a href="{% url 'page_create_edit' node.pk %}?course_event_id={{node.pk}}&blog_type=True">Start writing Pages </a>
+			                  </u></h4>
+			                </div>
+			              {% endfor %}
+			            </div>
+			        </div>
+			        <div class="content" id="gallery-tab">
+				        {% if "CourseEventGroup" in group_object.member_of_names_list %}
+				            <div id="upload_form_div" class="text-right">
+
+				                <form class="dropzone" id ="docPost" enctype="multipart/form-data" method="post" action="{% url 'upload_using_save_file' group_id %}">
+				                    {% csrf_token %}
+				                    <input type="file" name="doc" id="docFile"/>
+				                    <div class="save_cancel hide">
+				                      <input type="submit" id="submitpostid" class="tiny button radius" value="Save"/>
+				                      <input type="button" id="btnUploadCancel" class="tiny button radius" value="Cancel"/>
+				                    </div>
+				                </form>
+
+				            </div>
+				        {% endif %}
+			            <div class="row">
+			                  {% include "ndf/file_list_tab.html" with resource_type=files_cur detail_urlname="file_detail" filetype="all" res_type_name="" %}
+			            </div>
+		        	</div>
+
+			        {% comment %}
+			        <div class="content" id="analytics-tab">
+			                <div class="row">
+			                {% if gstaff_access %}
+			                    <a href='{% url "group_summary" node.pk %}' target="_blank">{%  trans "Click here to view Group Analytics" %}</a>
+			                {% else %}
+			                    <a href='{% url "user_summary" node.pk %}' target="_blank">{%  trans "Click here to view  My Analytics" %}</a>
+			                {% endif %}
+			                </div>
+			        </div>
+			        {% endcomment %}
+
+		        	{% endif %}
+				</div>
+	    	</section>
+	  	</div>
+    </div>
+
+{% endblock %}
+
+
+
+{% block script %}
+
+  $(document).on('click','.enroll-btn',function(){
+    //trigger the ajax call to enroll
+      $.ajax({
+        url: "{% url 'enroll_to_course' node.pk %}",
+
+        data: {
+          'csrfmiddlewaretoken': "{{csrf_token}}"
+        },
+
+        type: "POST",
+
+        dataType: "json",
+
+        success: function(data){
+          success_state = data["success"]
+          if(success_state){
+            $(".enroll-btn").attr('value', 'ENROLLED')
+            $(".enroll-btn").attr("disabled","disabled")
+            location.reload();
+          }
+        },
+      });//end of ajax
+  })
+
+  $("main.row > aside.columns")
+    .removeClass("medium-2")
+    .addClass('medium-3').addClass("large-3");
+
+  $("main.row > article.columns")
+    .removeClass("medium-10")
+    .addClass("medium-9")
+    .addClass("large-9")
+    .css('float','left');
+    $(".jqtree-title-folder").addClass('jqtree-toggler').removeClass('jqtree-title').removeClass('jqtree-title-folder')
+
+{% endblock %}

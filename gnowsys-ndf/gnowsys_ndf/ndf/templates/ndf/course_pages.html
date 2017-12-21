@@ -1,0 +1,313 @@
+{% load i18n %}
+{% load ndf_tags %}
+
+{% block head %}
+    
+    <style type="text/css">
+    .right-btn, .left-btn{
+        /*float: left;*/
+        /*margin-left: 1rem;*/
+        width: 40%;
+        font-size: 0.85em !important;
+        margin-top: 0.1rem !important;
+        text-align: center;
+    }
+</style>
+{% endblock %}
+
+<!-- Handles Activity page detail and listing -->
+{% if activity_node and not editor_view %}
+    <div class="activity-detail-page">
+        <div class="row">
+            <div class="small-1 columns icon-widget" style="margin-top: 5.6px;">
+            <a href="{% url 'course_pages' group_id %}"><i class="fa fa-chevron-left large" aria-hidden="true"></i></a>
+            </div>
+
+            <div class="small-8 columns">
+                <h4 class="page-name">{% firstof activity_node.altnames activity_node.name %}</h4>
+            </div>
+              
+            {% check_is_gstaff groupid request.user as is_gstaff %}
+            {% if activity_node.created_by == request.user.id or is_gstaff %}
+            <div class="small-3 columns right">
+                <span data-dropdown="activity-page-settings-drop" aria-controls="activity-page-settings-drop" aria-expanded="false" class="orange-button right">
+                    {% trans "Actions" %} <i class="fa fa-chevron-down"></i>
+                </span>
+                <ul id="activity-page-settings-drop" class="f-dropdown" data-dropdown-content aria-hidden="true" tabindex="-1">
+            
+                <li><a href="{% url 'edit_course_page' group_id activity_node.pk %}">{% trans "Edit" %}</a></li>
+                <li><a title="Edit Content" class="edit_res_unit">{% trans " Edit Content" %}</a></li>
+                <li><a title="Edit Interaction Settings" class="edit-interaction">{% trans "Interaction Settings" %}</a></li>
+                {% if not activity_node.type_of %}
+                  <li><a title="add admin page" class="add-admin-page">{% trans "Link Teacher's page" %}</a></li>
+                  <li><a title="add help page" class="add-help-page">{% trans "Link Help page" %}</a></li>
+                {% endif %}
+                <li><a href="{% url 'all_translations' group_id activity_node.pk %}" target="_blank">{% trans "Alternate Language" %}</a></li>
+                
+                </ul>
+            </div>
+            {% endif %}
+        </div>
+
+         <div class="row">
+            <div class="small-8 columns left">
+                 {% if activity_node.tags %}
+                    {% for tag in activity_node.tags %}
+                            <small><label class="tag-ele" style="margin-top: 13px;">
+                        <a href="{% url 'tag_info' group_id tag %}">{{tag}} </a></label></small>
+                    {% endfor %} 
+                {% endif %}   
+            </div>
+            <div class="small-4 columns right">
+                {% include 'ndf/rating.html' with node=activity_node %}
+              
+            </div>
+        </div>
+
+        <div class="row activity-detail-content">
+            {% include "ndf/node_ajax_content.html" with node=activity_node expand_content=True  no_discussion=True hide_breadcrumbs=True %}
+        </div>
+        <div id="info-page-area">
+                    
+        </div>
+        <div class="row listing-row"> 
+          {% for each in other_translations %}
+            <a href="{% url 'view_course_page' group_id each.pk %}"  title="{% firstof each.altnames each.name %}">
+              <div class="small-12 medium-6 large-3 columns ">
+                <div class="activity_tile">
+                  <div class="activity_preview">
+                    <div class="raw_material_asset">{{each.language.1}}</div>                
+                      <img src="/static/ndf/images/asset.png">
+                  </div>
+                  <div class="asset_text">
+                      <div class="asset_title">{% firstof each.altnames|truncatechars:25 each.name|truncatechars:25 %}</div>
+                      <div class="asset_desc">{{each.content|striptags|truncatechars:25}}</div>
+
+                  </div>
+                </div>
+              </div>
+            </a>
+          {% endfor %}
+        </div>
+    </div>
+
+
+{% else %}
+    
+        <div class="activity-sheet-actions">
+            <div class="row">
+            {% if all_pages.count %}
+            <button type="button" class="orange-button delete-activity right" title="Click on the checkbox on the files below to Delete"><i class="fa fa-trash"></i> {% trans "Delete" %}</button>
+            {% endif %}
+            {% if user.is_authenticated %}
+            <a class="right orange-button-template" href="{% url 'create_course_page' group_id %}"><i class="fi-plus"></i> {% trans "Add Activity page" %}</a>
+            <a class="right orange-button-template" href="{% url 'create_course_page_info'  group_id 'Info' %}"><i class="fi-plus"></i> {% trans "Add Teacher's page" %}</a>
+            <a class="right orange-button-template" href="{% url 'create_course_page_info' group_id 'Info' %}"><i class="fi-plus"></i> {% trans "Add Help page" %}</a>
+            {% endif %}
+
+
+            </div>
+        </div>
+    
+
+
+        <div class="row listing-row">
+            {% for each in all_pages %}
+
+                   {% include "ndf/asset_card.html" with url_name="view_course_page" each_asset=each first_arg=group_id second_arg=each.pk  no_asset=True if_activities=True %} 
+            {% endfor %}
+        </div>
+
+
+
+{% endif %}
+{% include 'ndf/pagination.html' with urlname="course_pages_paged" first_arg=group_id page_info=course_pages_info  %}
+
+<script type="text/javascript">
+    $(".delete-activity").click(function(){
+        var checked = $('.select-chkbox:checked').length;
+        if (checked > 0){
+
+            if (confirm("Do you want to delete selected files?.") == true) {
+                coll_arr = []
+                $('.select-chkbox:checked').each(function() {
+                    coll_arr.push($(this).val());
+                });
+                $.ajax({
+                          type: "POST",
+                          data:{
+                                'csrfmiddlewaretoken': "{{csrf_token}}",
+                                'delete_files_list' : coll_arr,
+                            },
+                          url: "{% url 'delete_activity_page' group_id %}",
+                          datatype: "json",
+                          success: function(data) {
+                            console.log(data)
+                            if (data=="success"){
+                                // $.each(coll_arr, function(ind,activity_id){
+                                //     $("a[data-del-activity-page-id='"+activity_id+"']").addClass('hide')
+                                // })
+                                location.reload()
+                            }
+                            else{
+                                alert("Something went wrong. Please try again later.")
+                            }
+                        }
+                    });
+                }
+        }
+        else{
+            alert("Choose atleast one Activity");
+        }
+
+
+    });
+
+        $( ".edit-interaction" ).click(function(event) {
+            $.ajax({
+                  type: "POST",
+                  data:{
+                        'csrfmiddlewaretoken': "{{csrf_token}}",
+                        "node_id":'{{activity_node.pk}}',
+                    },
+                  url: "{% url 'get_interaction_widget' group_id  %}",
+                  datatype: "html",
+                  success: function(data) {
+                  $('#addAsset').foundation('reveal', 'open');
+                  $('#addAsset').html(data);
+                }
+            });
+        });
+
+        $( ".add-admin-page" ).click(function(event) {
+            $.ajax({
+                  type: "POST",
+                  data:{
+                        'csrfmiddlewaretoken': "{{csrf_token}}",
+                        "node_id":'{{activity_node.pk}}',
+                    },
+                  url: "{% url 'get_admin_page_form' group_id  %}",
+                  datatype: "html",
+                  success: function(data) {
+                  $('#addAsset').foundation('reveal', 'open');
+                  $('#addAsset').html(data);
+                }
+            });
+        });
+
+        $( ".add-help-page" ).click(function(event) {
+            $.ajax({
+                  type: "POST",
+                  data:{
+                        'csrfmiddlewaretoken': "{{csrf_token}}",
+                        "node_id":'{{activity_node.pk}}',
+                    },
+                  url: "{% url 'get_help_page_form' group_id  %}",
+                  datatype: "html",
+                  success: function(data) {
+                  $('#addAsset').foundation('reveal', 'open');
+                  $('#addAsset').html(data);
+                }
+            });
+        });
+    
+        $(document).on('click',".edit_res_unit",function(){
+        $.ajax({
+          url: "{% url 'inline_edit_res' group_id %}",
+
+          type: "POST",
+
+          data: {
+            "node_id": "{{activity_node.pk}}",
+            'csrfmiddlewaretoken': "{{csrf_token}}",
+            "node_content": $(".activity-detail-content .content_val").html(),
+            "type": "edit"
+          },
+          dataType: "html",
+
+          success: function(data){
+            $(".activity-detail-content").html(data);
+            $(".edit_res_unit").text("Save Content")
+                          .addClass("save_res_unit")
+                          .removeClass("edit_res_unit")
+          },
+        });//end of ajax
+    });
+
+    $(document).on('click',".save_res_unit",function(){
+        var content_val = CKEDITOR.instances['ckeditor_textarea'].getData();
+        // console.log(content_val)
+        $.ajax({
+          url: "{% url 'inline_edit_res' group_id %}",
+
+          data: {
+            "content_val": content_val,
+            "node_id": "{{activity_node.pk}}",
+            "custom_redirect": "view_course_page",
+            'csrfmiddlewaretoken': "{{csrf_token}}",
+            "type": "save"
+
+          },
+
+          type: "POST",
+
+          dataType: "html",
+
+          success: function(data){
+            $(".node_details").html(data);
+            $(".save_res_unit").text("Edit Content")
+                          .addClass("edit_res_unit")
+                          .removeClass("save_res_unit")
+            location.reload()
+          },
+        });//end of ajax
+
+    });
+            
+$( document ).ready(function() {
+    
+    {% for each in  activity_node.relation_set %}
+      {% if each.has_help %}
+        $.ajax({
+                type: "POST",
+
+                url: "{% url 'get_info_pages' group_id %}",
+                datatype: "html",
+                data:{
+                  'csrfmiddlewaretoken': "{{csrf_token}}",
+                  'node_id':'{{activity_node.pk}}',
+                  'page_type':'has_help'
+
+                },
+                  success: function(data) {
+                  // $('#info-page-area').html(data);
+                  parent = $("#info-page-area");
+                  parent.after(data);
+                }
+          });
+
+        {% endif %}
+      
+      {% if each.has_admin_page %}
+
+        $.ajax({
+                type: "POST",
+
+                url: "{% url 'get_info_pages' group_id %}",
+                datatype: "html",
+                data:{
+                  'csrfmiddlewaretoken': "{{csrf_token}}",
+                  'node_id':'{{activity_node.pk}}',
+                  'page_type':'has_admin_page'
+
+                },
+                  success: function(data) {
+                  // $('#info-page-area').html(data);
+                  parent = $("#info-page-area");
+                  parent.after(data);
+                }
+              });
+        {% endif %}
+    {% endfor %}
+});
+</script>

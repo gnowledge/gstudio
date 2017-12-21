@@ -1,0 +1,56 @@
+{% load ndf_tags %}
+{% load i18n %}
+{% get_group_name groupid as group_name_tag %}
+<!-- GApps Menubar -->
+{% check_gapp_menus groupid as check_menu %}
+
+
+{% if check_menu %}
+
+{% get_apps_for_groups groupid as gapps %}
+
+
+{% endif %}
+
+
+<input type="hidden" value="{{newgroup}}">
+
+<!-- The template has been modified to show only the groups, partner and other top level apps in the top navbar -->
+<!-- See gapps_iconbar.html for the app icon bar in the sidebar -->
+
+{% for index_key, app_dict in gapps.items %}
+
+{% check_is_gapp_for_gstaff groupid app_dict request.user as gstaff_access_for_gapp %}
+
+{% if gstaff_access_for_gapp %}
+
+{% if app_dict.name|lower == "group" %}
+<!--
+<li class="
+
+	{% comment %} Sets active-menu class on active app{% endcomment %}
+	{% if app_dict.name|lower == selectedGapp|lower %}
+	
+	active 
+
+	{% elif app_dict.id|safe == selectedGapp|safe %}
+
+	active
+	
+	{% endif %}
+	app">
+    
+	<a class="app" href="{% url 'GAPPS' group_name_tag app_dict.name|lower %}">
+	<i class='fi-torsos'></i> {{app_dict.name|title}}</a>
+
+</li>
+-->
+{% endif %}
+
+{% endif %}
+
+{% endfor %}
+
+
+
+<!-- ============= -->

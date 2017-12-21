@@ -1,0 +1,92 @@
+{% extends "ndf/base.html" %}
+{% load pagination_tags %}
+{% load ndf_tags %}
+{% load i18n %}
+
+{% block title %} {{title}} {% endblock %}
+
+{% block head %}
+  <script src="/static/ndf/js/mailclientcheck.js"></script>
+{% endblock %}
+
+
+{% block meta_content %}
+  <h3 class="subheader">{% trans "Create Mailbox" %} </h3>
+{% endblock %}
+
+{% block body_content %}
+  <!-- reveal-modal removed -->
+  
+  <form data-abide id="form-edit-node" enctype="multipart/form-data" method="POST" action="">
+    {% csrf_token %}
+
+    <h2 class="medium-12 columns">
+      {% if node %}
+        Editing {{title}}: {{node.name}}
+      {% else %}
+        <!-- title=add a new mailbox -->
+        {{title}} 
+      {% endif %}
+    </h2>
+    <br/><br/>
+    <p id="page_type" style="display:none;">create</p>
+    <div class="medium-6 columns end">
+      
+      <!-- Mail Box Name -->
+      <div class="row">
+        <div class="medium-12 columns">
+          <label>Mailbox Name <font color="red">*</font></label>
+          <input id="name_id" name="mailboxname" type="text" placeholder="Enter name..." required>
+          <small class="error">Please give a Mailbox name.It should contain only alphabets, digits and undescores.</small>
+          <small id="name_id_error"></small>
+        </div>
+      </div>
+
+      <!-- E-Mail ID -->
+      <div class="row">
+        <div class="medium-12 columns">
+          <label>Email ID <font color="red">*</font></label>
+          <input id="email_id" name="emailid" type="text" placeholder="Enter Email ID for this mail box..." required>
+          <small class="error">Please enter an email id for this mail box.</small>
+          <small id="email_id_error"></small>
+        </div>
+      </div>
+
+    <!-- Password -->
+      <div class="row">
+        <div class="medium-12 columns">
+          <label>Password <font color="red">*</font></label>
+          <input id="password" name="password" type="password" required>
+          <small class="error">Please enter the password for this email id.</small>
+        </div>
+      </div>
+      
+      <!-- Domains List -->
+      <div class="row">
+        <div class="medium-12 columns">
+          <label>Domain <font color="red">*</font></label>
+          <select required="" class="medium" id="customDropdown1" name="domain" data-invalid="">
+            <!-- <option selected="selected" value="Gmail" id="Gmail">Gmail</option> -->
+            {% for domain in server_dict %}
+              <option name="domain" value={{ domain }} id= {{ domain }}>{{domain}}</option>           
+            {% endfor %}
+          </select>
+        </div>
+          
+      <!-- Hidden variables & Save button -->
+      <div class="row" >
+        <div class="medium-3 medium-centered columns">
+          <!-- Hidden variables -->
+          <input type="hidden" name="node" value="{{node.pk}}">
+          <input type="hidden" name="user" value="{{user.id}}">
+          <input type="hidden" name="page_url" value="{{request.path}}">
+          <!-- deleted above -->
+          <input type="hidden" name="parent" id="hidden_parent" value="{{parent_id}}">
+          <div id="saveButton">
+            <input type="submit" id="save-node" value="Save" class="button small expand" />
+          </div>
+        </div>
+      </div>
+    </div>
+  </form>
+{% endblock %}

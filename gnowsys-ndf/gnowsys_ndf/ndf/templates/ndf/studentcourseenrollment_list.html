@@ -1,0 +1,98 @@
+{% extends "ndf/mis_base.html" %}
+{% load i18n %}
+{% load ndf_tags %}
+{% load pagination_tags %}
+
+{% block head %}
+  {{block.super}}
+
+  <!-- DataTables -->
+  <script src="/static/ndf/bower_components/DataTables/media/js/jquery.dataTables.js"></script>
+  <script src="/static/ndf/bower_components/datatables-plugins/integration/foundation/dataTables.foundation.js"></script>
+  <!-- DataTables CSS -->
+  <link href="/static/ndf/bower_components/datatables-plugins/integration/foundation/dataTables.foundation.css" rel="stylesheet" type="text/css" />
+{% endblock %}
+
+{% block title %} {{ title }} {% endblock %}
+{% block body_content %} 
+      <h3> List of {{title}}s in MIS</h3>
+
+  
+      <div id="org_listing_div"></div>    
+
+      <table style="float:right;">
+        <tr>
+          <th>Status</th>
+          <th>Description</th>
+        </tr>
+        <tr>
+          <td>OPEN</td>
+          <td>Enrollment is Open</td>
+        </tr>
+        <tr>
+          <td>APPROVAL</td>
+          <td>Enrollment is Closed. Approval is Open</td>
+        </tr>
+        <tr>
+          <td>CLOSED</td>
+          <td>Approval is Closed</td>
+        </tr>
+        <tr>
+          <td>PENDING</td>
+          <td>Requested for Re-opening Enrollment</td>
+        </tr>
+      </table>
+{% endblock %}
+
+
+{% block document_ready %}
+  {{block.super}}
+    {% check_is_gstaff groupid request.user as gstaff_access %}
+    {% if response_dict %}
+
+      data = {{response_dict|safe}}
+      column_headers = data["column_headers"];
+      ac_data_set = data["students_data_set"];
+      dataTable_columns_set = [];
+      groupid_val = data["groupid"];
+      app_id_val = data["app_id"];
+      app_set_id_val = data["app_set_id"];
+
+      if (ac_data_set.length > 0) {
+        // Define table
+        ac_table = '<table cellpadding="0" cellspacing="0" border="0" class="display" id="ac_table">' +
+          '</table>';
+
+        $("#org_listing_div").html(ac_table);
+
+        // Prepare title & data headers used in dataTable
+        $.each(column_headers, function(index, v) {
+          d = {};
+          d["data"] = v[0];
+          d["title"] = v[1];
+          dataTable_columns_set.push(d);
+        });
+
+        // Set defintion dataTable
+        sce_dt_var = $("#ac_table").dataTable({
+          "data": ac_data_set,
+          "columns": dataTable_columns_set,
+          "columnDefs": [{ "width": "10%", "targets": 0 }],
+          "createdRow": function ( row, data, index ) {
+            org_id = data["sce_id"];
+            name = data['name']
+            {% if gstaff_access and group_name_tag == "MIS_admin" %}
+              edit_url = "{% url 'mis:mis_app_instance_edit' 'groupid' 'app_id' 'app_set_id' 'stud_id' %}".replace("groupid", groupid_val).replace("app_id", app_id_val).replace("app_set_id", app_set_id_val).replace("stud_id", org_id);
+              $(row).find("td:nth-child(1)").html("<a href='" + edit_url + "' title='Edit " + data['name'] + "' target='_blank'><i class='fi-pencil medium'></i>Edit</a>");
+            {% endif %}
+
+            {% if gstaff_access and group_name_tag != "MIS_admin" %}
+              enroll_url = "{% url 'mis:mis_enroll' 'groupid' 'app_id' 'app_set_id' 'stud_id' %}".replace("groupid", groupid_val).replace("app_id", app_id_val).replace("app_set_id", app_set_id_val).replace("stud_id", org_id);
+              $(row).find("td:nth-child(1)").html("<a href='" + enroll_url + "' title='Enroll " + data['name'] + "' target='_blank'><i class='fi-pencil medium'></i>Enroll</a>");
+            {% endif %}
+            $(row).attr("id", org_id);
+          }
+        });
+      }
+    {% endif %}
+{% endblock %}

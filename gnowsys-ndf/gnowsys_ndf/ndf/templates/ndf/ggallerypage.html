@@ -1,0 +1,295 @@
+{% load get_course_filters get_group_name  check_is_gstaff from ndf_tags %}
+{% load i18n %}
+{% load simple_filters %}
+
+{% get_group_name groupid as group_name_tag %}
+
+<div class="gallery-page">
+    <div class="row gallery-header">
+        {% get_course_filters group_id title as filter_dict %}
+        {% include "ndf/filters.html" with filter_dict=filter_dict %}
+    </div>
+
+    <div class="row gallery-panel">
+        <div class="medium-12 columns gallery-content" >
+            <div class="gallery-subheader small-12">
+                <div class="row">
+`                {% if request.user.is_authenticated %}
+                  {% if allow_to_upload %}
+                    <div class="upload-file small-12 medium-3 large-2 columns" id="upload_form_div">
+                        <form class="dropzone" id ="docPost" enctype="multipart/form-data" method="post" action="{% url 'upload_using_save_file' group_id %}">
+                            {% csrf_token %}
+                            <label class="tiny button radius expand upload-btn" style="margin: 0px;">
+                                <i class="fa fa-upload"></i>
+                                &nbsp;
+                                <span>Upload File</span>
+                                <input type="file" name="filehive" id="docFile" style="display: none;" multiple/>
+                            </label>
+                            <div class="save_cancel hide">
+                                <img id="img_preview" alt="New file" class="hide" />
+                                <label id="file_preview" class="hide"></label>
+
+                              <input type="submit" id="submitpostid" class="tiny button radius" value="Save"/>
+                              <input type="button" id="btnUploadCancel" class="tiny button radius" value="Cancel"/>
+                            </div>
+                            <input type="hidden" name="context_name" value="{{title}}">
+                        </form>
+                    </div>
+                  {% endif %}
+                  {% endif %}
+                <!-- Commented  create collection and create note for this commit-->
+                    <div class="small-12 medium-10 columns gallery-actions" style="display:none" >
+                        <div class="create-note " id="create-note">
+                         <a style="margin: 0em 0em 1em;">
+                            <i class="fi-page-edit"></i>
+                            <span> Create note</span>
+                        </a>
+                        </div>
+                        {% check_is_gstaff group_id request.user as gstaff_access %}
+                        {% if gstaff_access %}
+                        <div class="create-collection " id="create-collection">
+                            <i class="fi-folder"></i>
+                            <span> Create new collection</span>
+                        </div>
+                        {% endif %}
+                        {% comment %}
+                        <div class ="add-to-collection " id="add-to-collection">
+                            <i class="fa fa-plus"></i>
+                            <span>Add to collection</span>
+                        </div>
+                        {% endcomment %}
+                        <!-- <div class="download-file hide">
+                            <i class="fi-download"></i>
+                            <span> Download</span>
+                        </div>
+                        <div class="hide">
+                            <i class="fi-info "></i>
+                            <span>View info</span>
+                        </div> -->
+                    </div>
+                     <div id="create_collection_model" class="reveal-modal" data-reveal aria-labelledby="modalTitle" aria-hidden="true" role="dialog" >
+                    </div>
+
+            </div>
+            <!-- Files listing div -->
+            <div class="gallery-body small-12 columns">
+                <ul class="small-block-grid-1 medium-block-grid-2 large-block-grid-5 gallery-body-ul">
+
+                {% for each_img in files_cur %}
+                    <li class="card-image-wrapper gallery-img" id="{{each_img.pk}}" style="margin-top:13px;margin-left:-10px">
+
+                        {% include 'ndf/simple_card.html' with is_course_card="True" resource=each_img no_description=True url_name=file_detail_url first_arg=group_id second_arg=each_img.pk %}
+                    </li>
+                {% endfor %}
+                </ul>
+            </div>
+        </div>
+        <!-- File info panel div -->
+
+        <!--div class="medium-3 columns file-info-panel">
+            <div class="file-name"> File Name </div>
+            <div class="row">
+                <div class="small-6 columns"> Type : </div>
+                <div class="small-6 columns"> info </div>
+            </div>
+            <div class="row">
+                <div class="small-6 columns"> Size : </div>
+                <div class="small-6 columns"> info </div>
+            </div>
+            <div class="row">
+                <div class="small-6 columns"> Uploaded By : </div>
+                <div class="small-6 columns"> info </div>
+            </div>
+            <div class="row">
+                <div class="small-6 columns"> Created Date : </div>
+                <div class="small-6 columns"> info </div>
+            </div>
+        </div-->
+
+    </div>
+
+</div>
+</div>
+<div class="reveal-container">
+    {% if file_obj %}
+        {% include "ndf/ggallerymodal.html" with node=file_obj %}
+    {% endif %}
+
+</div>
+{% comment %}
+{% verbatim %}
+<script id="filter-tag-template" type="text/x-handlebars-template">
+    <div class="filter-tag">{{label}} <span>&times;</span></div>
+</script>
+{% endverbatim %}
+{% endcomment %}
+<script type="text/javascript">
+    $(document).ready(function(){
+        {% if file_obj %}
+            $("#reveal-{{file_obj.pk}}").foundation('reveal','open');
+        {% endif %}
+    })
+
+    // On close event of reveal-modal
+    $(document).on('close', '.file-detail-modal', function () {
+        $('.file-detail-modal-close')[0].click()
+    });
+
+    /*
+    var filterTagSource   = $("#filter-tag-template").html();
+    var filterTagTemplate = Handlebars.compile(filterTagSource);
+
+    function createFilterTag(label) {
+        return filterTagTemplate({label});
+    }
+    $(function() {
+
+        //Filter tags creation on changing seconday filter.
+        $(".secondary-filter").on('change', function() {
+            $('.filter-tags').append(createFilterTag($(".secondary-filter option:selected").text()));
+        });
+
+        //Filter tag deletion on cross.
+        $(".filter-tags").on('click', '.filter-tag>span', function() {
+            $(this).closest('.filter-tag').remove();
+        });
+    })
+    */
+
+    function applyFilter(filtersObjArr){
+        filtersObjArr = JSON.stringify(getFiltersObjsInAndOrFormat());
+        // console.log(filtersObjArr);
+        $.ajax({
+          url: "{% url 'course_filters' group_id %}",
+          data: {
+            filter_dict: filtersObjArr,
+            'filter_applied': 'True',
+            'title': '{{title}}'
+          },
+          type: "GET",
+          dataType: "html",
+          success: function(data){
+            $(".gallery-body-ul").html(data)
+          },
+        });//end of ajax
+
+    }
+
+     $(document).on('change','.filenode',function(){
+
+        var checked = $('.filenode:checked').length;
+        if (checked > 1){
+          $(".gallery-actions").css("display", "block");
+          //$(".create-collection").css("display", "block");
+          //$(".add-to-collection").css("display", "block");
+        }
+        else{
+          $(".gallery-actions").css("display", "none");
+          // $(".create-note").css("display", "none");
+          // $(".create-collection").css("display", "none");
+          // $(".add-to-collection").css("display", "none");
+        }
+
+    });
+
+    $('.create-collection').click(function() {
+        var checked = $('.filenode:checked').length;
+        is_raw_material =  window.location.href.indexOf("raw-material") > -1;
+        is_gallery = window.location.href.indexOf("gallery") > -1;
+        var is_create_collection = "True";
+        if (checked){
+          $.ajax({
+            type: "GET",
+            url: "{% url 'course_create_collection' group_id %}",
+            datatype: "html",
+            data:{
+              'is_create_collection':is_create_collection,
+              'is_raw_material':is_raw_material,
+              'is_gallery':is_gallery
+            },
+            success: function(data) {
+                $("#create_collection_model").html(data);
+                $("#create_collection_model").foundation('reveal', 'open');
+              // location.href = "{% url 'course_gallery' group_id %}";
+
+            }
+          });
+        }
+        else{
+          alert("Select atleast 1 resource");
+        }
+    });
+
+
+    $('.add-to-collection').click(function() {
+        var checked = $('.filenode:checked').length;
+        var is_add_to_collection = "True";
+        if (checked){
+          $.ajax({
+            type: "GET",
+            url: "{% url 'course_create_collection' group_id %}",
+            datatype: "html",
+            data:{
+              'is_add_to_collection':is_add_to_collection,
+            },
+            success: function(data) {
+                $("#create_collection_model").html(data);
+                $("#create_collection_model").foundation('reveal', 'open');
+              // location.href = "{% url 'course_gallery' group_id %}";
+
+            }
+          });
+        }
+        else{
+          alert("Select atleast 1 resource");
+
+        }
+
+    });
+
+  $(".create-note").click(function(){
+    var checked = $('.filenode:checked').length;
+    var img_list= " ";
+    var audio_list = " ";
+    var video_list = " ";
+    $('.filenode:checked').each(function() {
+        // curr_obj = $(this).attr("value");
+
+        mime_type_list = $(this).closest('.scard-container').find('div').attr('data-mime-type');
+        if_image =  mime_type_list.search("image");
+        if_audio =  mime_type_list.search("audio");
+        if_video =  mime_type_list.search("video");
+         if( if_image == 0 ) {
+            url_list = $(this).closest('.scard-container').find('div').attr('original-src');
+            img_list = img_list+url_list+",";
+         }
+        else if(if_audio == 0){
+            url_list = $(this).closest('.scard-container').find('div').attr('original-src');
+            audio_list = audio_list+url_list+",";
+        }
+        else if(if_video == 0){
+            url_list = $(this).closest('.scard-container').find('div').attr('original-src');
+            video_list = video_list + url_list + ",";
+        }
+
+      });
+          $.ajax({
+            type: "GET",
+            url: "{% url 'course_create_note' group_id %}",
+            datatype: "html",
+
+            data:{
+                "csrfmiddlewaretoken": '{{ csrf_token }}',
+                "img_list": img_list,
+                "audio_list": audio_list,
+                "video_list": video_list
+            },
+            success: function(data) {
+                $("#create_collection_model").html(data);
+
+                $("#create_collection_model").foundation('reveal', 'open');
+            }
+          });
+  })
+
+</script>

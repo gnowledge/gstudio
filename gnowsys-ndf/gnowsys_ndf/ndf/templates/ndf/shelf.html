@@ -1,0 +1,196 @@
+{% load i18n %}
+<div id="shelf">
+
+<h4 class="text-center"><i class='fi-book-bookmark'></i>  {% trans "Shelf" %}</h4>
+<dl class="accordion" data-accordion>
+<!-- Adding new shelf text input and add button -->
+  <dd>  
+    <div class="row">
+      <div class="row collapse">
+        <div class="small-10 columns">
+          <input type="text" id="new-shelf-text" onkeyup="(this.value).trim().length?$('#add-shelf-btn').removeClass('disabled'):$('#add-shelf-btn').addClass('disabled');" placeholder="Add new shelf">
+        </div>
+        <div class="small-2 columns">
+          <div id="add-shelf-btn" class="button postfix disabled">{% trans "Add" %}</div>
+        </div>
+      </div>
+    </div>
+    
+  </dd>
+  
+  {% for each in shelves %}   
+
+    {% for key,val in shelf_list.items %}          
+
+      {% if key == each.name %}
+ 
+        <dd>
+          <a class="shelfName" href="#shelf{{each}}"> {{ key }}  <i class='right fi-minus-circle remove_shelf' name="{{key}}" style="font-size:15px; color:red;"></i> </a>
+
+          <div id="shelf{{each}}" class="content">
+            {% if val %}
+              {% for name in val %}
+                <div class="row">
+                  <div class="row collapse">
+                    <div class="small-8 columns">
+                      {{name}}
+                    </div>
+                    <div class="small-4 columns">
+                      <a class="remove-shelf-item"  name="{{name}}" rel="{{key}}" ><i class='button postfix'>Remove</i></a>
+                    </div>
+                  </div>
+                </div>
+              {% endfor %}
+
+            {% endif %}
+           
+
+            <br/>
+            {% if allowed %}
+              {% if node.name not in val %}            
+              <div class="row">
+                <div class="row collapse">
+                  <div class="small-2 columns">
+                    <a class="add-shelf-item"  name="{{each.name}}"><i class='button postfix fi-arrow-right'></i></a>
+                  </div>
+                  <div class="small-10 columns">
+          	          
+                    {% trans "Add " %} {{node.name}}
+            
+                  </div>
+                </div>
+              </div>
+              {% endif %}
+
+            {% else %}
+
+              <div class="row">
+                <div class="row collapse">                  
+                  <div class="small-12 columns">                      
+                    <h5 style="color:gray;">This is not a valid resource, please go to detail view to select and keep resource in your shelf </h5>            
+                  </div>
+                </div>
+              </div>
+              
+            {% endif %}
+
+          </div>
+      
+        </dd>
+
+      {% endif %}
+
+    {% endfor %}
+ 
+  {% endfor %}   
+
+</dl>
+</div>
+
+<script>
+
+  $("#add-shelf-btn").click(function() {
+
+    var shelf = $('#new-shelf-text').val();
+
+    $.ajax({
+      type: "POST",
+      url: "{% url 'shelf' groupid %}",
+      datatype: "html",
+      data:{
+        shelf_name: shelf,
+        shelf_add: "{{ node.pk }}",
+        csrfmiddlewaretoken: '{{ csrf_token }}'
+      },
+      success: function(data) {
+
+        if ($.trim(data) === "failure") {
+          alert("Shelf '"+ shelf +"' already available, please choose different shelf name");
+        }
+
+        else{
+          $("#shelf").html(data);   
+          alert("New shelf '"+ shelf + "' created successfully" );          
+        }
+        // $("#shelf").html(data);   
+        location.reload(true);      
+      }
+    });
+
+  });
+
+  $(".add-shelf-item").click(function() {
+
+    var shelf = this.name;
+
+    $.ajax({
+      type: "POST",
+      url: "{% url 'shelf' groupid %}",
+      datatype: "html",
+      data:{
+        shelf_name: shelf,
+        shelf_add: "{{ node.pk }}",
+        csrfmiddlewaretoken: '{{ csrf_token }}'
+      },
+      success: function(data) {
+        $("#shelf").html(data);
+        alert("'{{node.name}}' added into the shelf '"+ shelf + "' Successfully" );
+        location.reload(true);                
+      }
+    });
+
+  });
+
+  $(".remove_shelf").click(function() {
+
+    var shelf = $(this).attr("name");
+
+    $.ajax({
+      type: "POST",
+      url: "{% url 'shelf' groupid %}",
+      datatype: "html",
+      data:{
+        shelf_remove: shelf,
+        csrfmiddlewaretoken: '{{ csrf_token }}'
+      },
+      success: function(data) {
+        $("#shelf").html(data);
+        alert("Shelf '"+shelf+"' removed Successfully" );
+        location.reload(true);                
+      }
+    });
+
+  });
+
+
+  $(".remove-shelf-item").click(function() {
+    var shelf_item = this.name;
+    var shelf = this.rel;
+
+    $.ajax({
+      type: "POST",
+      url: "{% url 'shelf' groupid %}",
+      datatype: "html",
+      data:{
+        shelf_name: shelf,
+        shelf_item_remove: shelf_item,
+        csrfmiddlewaretoken: '{{ csrf_token }}'
+      },
+      success: function(data) {
+        $("#shelf").html(data);
+        alert("'"+shelf_item+"' removed from shelf '"+ shelf + "' Successfully" );
+        location.reload(true);                
+      }
+    });
+
+  });
+  
+</script>
+
+
+
+
+
+  
+
+

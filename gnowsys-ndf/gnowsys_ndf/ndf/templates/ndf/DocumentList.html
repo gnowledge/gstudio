@@ -1,0 +1,31 @@
+{% extends "ndf/base.html" %}
+{% load i18n %}
+{% load ndf_tags %}
+{% block title %} List of Documents {% endblock %}
+{% block body_content %}
+{% if alreadyUploadedFiles %} 
+<div id="message">
+<span style="color:red">{% trans "Files Listed below are already uploaded. Duplicate file uploads are not possible." %}</span>
+<ul>
+{% for each in alreadyUploadedFiles %}
+  <li>{{each}}</li>
+{% endfor %}
+</ul>
+</div>
+{% endif %}
+<table border="1">
+	<tr>
+		<th>{% trans "File Name" %}</th>
+		<th>{% trans "View" %}</th>
+	</tr>
+	{% for doc in filecollection %}
+	{% get_grid_fs_object doc as grid_fs_obj %}
+		<tr>
+			<td>{{doc.name}}</td>
+			<td><a href="{% url 'read_file' 'group' doc grid_fs_obj.filename %}">{% trans "View" %}</a></td>
+			
+		<tr/> 
+	{% endfor %} 	
+
+</table>	
+{% endblock %}

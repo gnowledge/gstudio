@@ -1,0 +1,343 @@
+{% extends "ndf/base.html" %}
+{% load i18n %}
+{% load pagination_tags %}
+{% load ndf_tags %}
+{% block title %} {{title}} {% endblock %}
+
+{% block head %}
+{% endblock %}
+
+{% block help_content %}
+{% endblock %}
+ 
+{% block meta_content %}
+  <h2 class="subheader">{% trans "Tasks" %}</h2>
+{% endblock %}
+
+{% block search_content %}
+  {% include "ndf/node_search_base.html" %}
+{% endblock %}
+
+{% block related_content %}
+{% check_is_user_group groupid as is_author %}
+
+  {% if user.is_authenticated %}
+  {% user_access_policy groupid request.user as user_access %}
+  {% if is_author == False %}
+  <br/>
+     <div class="task">
+      <br/>
+      <a class="button medium" href="{% url 'task_create_edit' group_name %}">
+      	<span class="fi-plus">&nbsp;&nbsp;{% trans "New " %}{{title}}</span>
+      </a>
+    </div>
+  {% endif %}
+  {% endif %}
+{% endblock %}
+
+  
+{% block body_content %}
+
+<header class="row" >
+  <dl class="tabs" data-tab data-options="deep_linking:true" >
+    <dd class="active"><a href="#panel2-1" id="p1"><i class="fi-eye"></i>{% trans 'All Task' %} {% if count %}({{ count }}){% endif %}</a></dd>
+  <dd ><a href="#panel2-2" id="p2" name="Completed" onClick="$('#example').empty()">{% trans 'Completed' %} </a></dd>
+  <dd ><a href="#panel2-3" id="p3" name="Createdbyme" onClick="$('#example').empty()">{% trans 'Created by me' %} </a></dd>
+  <dd ><a href="#panel2-4" id="p4" name="Assignedtome" onClick="$('#example').empty()"> {% trans 'Assigned to me' %} </a></dd> 
+  <dd ><a href="#panel2-5" id="p5" name="pending" onClick="$('#example').empty()">{% trans  'pending' %} </a></dd> 
+  <dd ><a href="#panel2-6" id="p6" name="Statuswise" onClick="$('#example').empty()">{% trans 'Status Wise' %} </a></dd>
+
+
+  </dl>
+  
+</header>
+<div class="tabs-content" id="tag">
+  <div class="content" id="panel2-1">
+
+  </div>
+  
+  <div class="content" id="panel2-6">
+ 	<div class="row">
+ 		<div class="small-3  rows">
+ 			 <select id="filter">
+  				<option id="0" onClick="showHide()" value="New">  </option>
+  				<option id="1" onClick="showHide()" value="New"> {% trans 'New' %} </option>
+  				<option id="2" onClick="showHide()" value="In Progress">{% trans  'In Progress' %} </option>
+  				<option id="3" onClick="showHide()" value="Resolved"> {% trans 'Resolved' %} </option>
+  				<option id="4" onClick="showHide()" value="Feedback">{% trans  'Feedback' %}</option>
+  				<option id="5" onClick="showHide()" value="Closed"> {% trans 'Closed' %} </option>
+  				<option id="6" onClick="showHide()" value="Rejected">{% trans 'Rejected' %} </option>
+
+  			 </select>
+  		</div>
+  	</div>
+  </div>
+  
+
+</div>
+
+<div class="row">
+	<div  id="example">
+    	</div>
+</div>
+
+<script type="text/javascript">
+	
+
+var dyurl="{% url 'check_filter' group_name 1 'None' %}"
+
+$("#document").ready(function(){
+$("#p1").ready(function (){
+location.hash='panel2-1' 
+$('#example').empty()
+$('#tag').hide() 
+$.ajax({
+      url: dyurl,
+
+      type: "GET",
+      
+      success: function(data){
+        $("#example").html(data)      
+      },
+      
+      complete: function(){
+        // $('#Student').foundation('reveal', 'open');
+      }
+    });
+});
+
+$("#p1").click(function (){
+location.hash='panel2-1' 
+$('#example').empty()
+$('#tag').hide() 
+$.ajax({
+      url: dyurl,
+
+      type: "GET",
+      
+      success: function(data){
+        $("#example").html(data)      
+      },
+      
+      complete: function(){
+        // $('#Student').foundation('reveal', 'open');
+      }
+    });
+});
+
+$("#p2").click(function (){
+ $('#tag').hide();
+$('#example').empty() 
+  $.ajax({
+      url: "{% url 'check_filter' group_name 2 'None' %}",
+
+      type: "GET",
+      
+      success: function(data){
+        $("#example").html(data)      
+      },
+      
+      complete: function(){
+        // $('#Student').foundation('reveal', 'open');
+      }
+    });
+});
+
+$("#p3").click(function (){
+ $('#tag').hide(); 
+$('#example').empty()
+  $.ajax({
+      url: "{% url 'check_filter' group_name 3 'None' %}",
+
+      type: "GET",
+      
+      success: function(data){
+        $("#example").html(data)      
+      },
+      
+      complete: function(){
+        // $('#Student').foundation('reveal', 'open');
+      }
+    });
+});
+$("#p4").click(function (){
+ $('#tag').hide();
+$('#example').empty() 
+  $.ajax({
+      url: "{% url 'check_filter' group_name 4 'None' %}",
+
+      type: "GET",
+      
+      success: function(data){
+        $("#example").html(data)      
+      },
+      
+      complete: function(){
+        // $('#Student').foundation('reveal', 'open');
+      }
+    });
+});
+$("#p5").click(function (){
+ $('#tag').hide();
+$('#example').empty() 
+  $.ajax({
+      url: "{% url 'check_filter' group_name 5 'None' %}",
+
+      type: "GET",
+      
+      success: function(data){
+        $("#example").html(data)      
+      },
+      
+      complete: function(){
+        // $('#Student').foundation('reveal', 'open');
+      }
+    });
+});
+
+$("#p6").click(function (){
+
+ $('#tag').show();
+
+});
+
+});
+function showHide()
+ {
+  
+  var val = document.getElementById("filter").value; 
+ if (val == "New")
+ {
+  
+  $.ajax({
+      url: "{% url 'check_filter' group_name 6 'New' %}",
+
+      type: "GET",
+      
+      success: function(data){
+        $("#example").html(data)      
+      },
+      
+      complete: function(){
+        // $('#Student').foundation('reveal', 'open');
+      }
+    });
+
+ }
+if (val == "In Progress")
+ {
+  
+  $.ajax({
+      url: "{% url 'check_filter' group_name 6 'InProgress' %}",
+
+      type: "GET",
+      
+      success: function(data){
+        $("#example").html(data)      
+      },
+      
+      complete: function(){
+        // $('#Student').foundation('reveal', 'open');
+      }
+    });
+
+ }
+if (val == "Resolved")
+ {
+  
+  $.ajax({
+      url: "{% url 'check_filter' group_name 6 'Resolved' %}",
+
+      type: "GET",
+      
+      success: function(data){
+        $("#example").html(data)      
+      },
+      
+      complete: function(){
+        // $('#Student').foundation('reveal', 'open');
+      }
+    });
+
+ }
+if (val == "Feedback")
+ {
+  
+  $.ajax({
+      url: "{% url 'check_filter' group_name 6 'Feedback' %}",
+
+      type: "GET",
+      
+      success: function(data){
+        $("#example").html(data)      
+      },
+      
+      complete: function(){
+        // $('#Student').foundation('reveal', 'open');
+      }
+    });
+
+ }
+if (val == "Closed")
+ {
+  
+  $.ajax({
+      url: "{% url 'check_filter' group_name 6 'Closed' %}",
+
+      type: "GET",
+      
+      success: function(data){
+        $("#example").html(data)      
+      },
+      
+      complete: function(){
+        // $('#Student').foundation('reveal', 'open');
+      }
+    });
+
+ }
+if (val == "Rejected")
+ {
+  
+  $.ajax({
+      url: "{% url 'check_filter' group_name 6 'Rejected' %}",
+
+      type: "GET",
+      
+      success: function(data){
+        $("#example").html(data)      
+      },
+      
+      complete: function(){
+        // $('#Student').foundation('reveal', 'open');
+      }
+    });
+
+ }
+ 
+}
+</script>
+
+
+{% if searching and TASK_inst.count > 0 %}
+<div class="row">
+  <div class="small-12 columns end">
+    <p>Search Results: <span class="label success round">Found {{TASK_inst.count}} {{title|lower}}{{TASK_inst.count|pluralize}}.</span></p>
+  </div>
+</div>
+
+{% elif searching and TASK_inst.count == 0 %}
+<div class="row">
+  <div class="small-12 columns">
+    <p> {% blocktrans %}Search Results: <span class="label alert">No {{title|lower}}{{TASK_inst.count|pluralize}} matched your search criteria {% endblocktrans %}!!!</span></p>
+  </div>  
+</div>  
+
+{% endif %}
+
+ 
+
+
+
+{% endblock %}
+

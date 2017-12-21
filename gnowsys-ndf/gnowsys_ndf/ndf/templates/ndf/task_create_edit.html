@@ -1,0 +1,799 @@
+{% extends "ndf/base.html" %}
+{% load pagination_tags %}
+{% load ndf_tags %}
+{% load i18n %}
+
+{% block title %} {{title}} {% endblock %}
+
+{% block head %}
+	<script type="text/javascript" src="/static/ndf/bower_components/jquery-ui/jquery-ui.min.js"></script> <!-- checked -->
+	<script type="text/javascript" src="/static/ndf/bower_components/foundation-datepicker/js/foundation-datepicker.js"></script> <!-- checked -->
+	<link rel="stylesheet" type="text/css" href="/static/ndf/bower_components/foundation-datepicker/stylesheets/foundation-datepicker.css"> <!-- checked -->
+	<link rel="stylesheet" type="text/css" href="/static/ndf/bower_components/jquery-ui/themes/smoothness/jquery-ui.min.css"> <!-- checked -->
+
+  <script src="/static/ndf/bower_components/jquery-ui/jquery-ui.js"></script> <!-- checked -->
+  <script src="/static/ndf/bower_components/jqueryui-timepicker-addon/dist/jquery-ui-timepicker-addon.min.js"></script> <!-- checked -->
+  <script src="/static/ndf/bower_components/jqueryui-timepicker-addon/dist/jquery-ui-sliderAccess.js"></script> <!-- checked -->
+  <link rel="stylesheet" href="/static/ndf/bower_components/jqueryui-timepicker-addon/dist/jquery-ui-timepicker-addon.css"> <!-- checked -->
+	<link rel="stylesheet" type="text/css" href="/static/ndf/bower_components/jquery-ui/themes/smoothness/jquery-ui.css"> <!-- checked -->
+{% endblock %}
+
+{% block style %}
+  /* Setting css-properties for ui-datepicker */
+    #ui-datepicker-div {
+      box-shadow: 0 5px 5px #808080;
+      width: 230px;
+    }
+
+    .ui-widget {
+      font-family: inherit;
+      font-size: inherit;
+    }
+
+    .ui-corner-all {
+    
+      border-radius: 0;
+    }
+
+    #ui-datepicker-div dt.ui_tpicker_minute_label {
+    
+      margin-bottom: 0;
+    }
+
+    .ui-slider-horizontal {
+    
+      margin-top: 1em;
+    }
+
+    .ui-datepicker-title select {
+      background-color: #e6e6e6;
+      /*border-collapse: separate;
+      border-spacing: 30px 0px;*/
+      font-family: inherit;
+      /*font-size: 0.3em;*/
+      font-weight: normal;
+      height: 1.5rem;
+      /*margin: 30px 0;*/
+      padding: 0;
+    }
+
+  /* Resetting css-properties for fieldset (also legend, input) */
+    /* fieldset (padding-bottom) */ 
+    fieldset {
+      padding: 1.25rem 1.25rem 1.25rem 1.25rem !important;
+    }
+
+    /* legend (background-color) */
+    fieldset legend {
+      background-color: transparent !important;
+    }
+
+    /* input (margin) */
+    fieldset input {
+      margin: 0 !important;
+    }
+  
+  /* Setting css-properties for small.error */
+    small.error {
+      padding: 0 0.5em !important;
+      position: relative !important;
+    }
+
+  .watchers{
+    max-height: 210px;
+    overflow-x: hidden;
+    overflow-y: auto;
+    padding-left: 10px;
+    width: 300px;
+  }
+
+  #list{
+    max-height: 80px;
+    overflow-x: hidden;
+    overflow-y: auto;
+    padding-left: 10px;
+  }
+
+	.selFile {
+    border-radius: 1px;
+    box-shadow: 3px 3px 3px 1px rgba(9,9,9,0.2);
+  }
+{% endblock %}
+
+{% block meta_content %}
+  <h3 class="subheader">{% trans "Task Editor" %} </h3>
+{% endblock %}
+
+{% block body_content %}
+  
+  <div id="myModal" class="reveal-modal" animation="None" data-reveal>
+    <h3>  {% trans 'Please wait while file is Uploading...' %} </h3>                
+  </div>
+  
+  <div id="selectAssigneeslist" class="tiny reveal-modal" animation="None" data-reveal>
+    <h3> {% trans 'Assignees' %} </h3> 
+    
+    <div id="list">
+    </div>
+    <div class="row">
+	    <div class="medium-5 columns" id = "assignee_drop_down_div">
+	    	    <select name="Assignee" class="medium" id="customDropdown2" data-invalid="">
+	            <option value="" selected="selected">{% trans "- - - Select Assignee - - -" %}</option>
+	    		  </select>
+	    </div>    
+	 
+	    <div class="medium-5 columns">
+	    	
+	    	<input type = 'button' onclick = "fillist()" value = "Done">
+	    </div>
+	    <a class="close-reveal-modal" aria-label="Close">&#215;</a>
+	</div>                   
+  </div>
+
+  <form data-abide id="form-edit-node" enctype="multipart/form-data" onSubmit="enableselect();" method="POST" action="">
+    {% csrf_token %}
+
+      
+    <h2 class="medium-12 columns">
+      {% if node %}
+        Editing {{title}}: {{node.name}}
+      {% else %}
+        Create a New {{title}}
+      {% endif %}
+    </h2>
+
+    <br/><br/><br/><br/>
+
+    <div class="medium-6 columns end">
+      <!-- TaskType -->
+      <div class="row">
+        <div class="medium-6 columns end">
+          <label>{% trans "Task Type " %}<font color="red">*</font></label>
+          <select id="has_type" name="has_type" required>
+            <option value="">{% trans "- - - Select Task Type - - -" %}</option>
+            {% for choice in task_type_choices %}
+            <option value="{{choice.pk}}" {% if choice.pk in has_type|jsonify %} selected {% endif %} >{% blocktrans with alt=choice.name %}{{alt}}{% endblocktrans %}</option>
+            {% endfor %}
+          </select>
+          <small class="error">{% trans "Please select Task Type." %}</small>
+        </div>
+      </div>
+      
+      <!-- Name -->
+      {% if not task_id %}
+    	<div class="row">
+    	  <div class="medium-12 columns">
+    	    <label> {% trans title %}  {% trans  'Name' %} <font color="red">*</font></label>
+    	    <input id="name_id" name="name" type="text" value="{{node.name}}" placeholder="{% trans 'Enter name' %}..." required>
+    	    <small class="error">{% trans 'Please give your Task a descriptive name' %}.</small>
+    	  </div>
+    	</div>
+    	{% endif %}
+
+      <!-- Parent task -->
+    	<div class="row">
+    	  <div class="medium-12 columns">
+    	    <label>{% trans 'Parent' %} {% trans 'Task' %} </label>
+    	    <input id="parent" type="text" value="{{parent}}">
+    	    <input type="hidden" name="parent" id="hidden_parent" value="{{parent_id}}">
+    	  </div>
+    	</div>
+
+      <!-- Status & Start date -->
+    	<div class="row">
+    	  <div class="medium-6 columns">
+    	    <label>{% trans 'Status' %} <font color="red">*</font></label>
+      		<select required="" class="medium" id="customDropdown" name="Status" data-invalid="">
+      			<option selected="selected" value="New" id="New">{% trans 'New' %}</option>
+      			<option value="In Progress" id="In Progress">{% trans 'In Progress' %}</option>
+      			<option value="Resolved" id="Resolved">{% trans 'Resolved' %}</option>
+      			<option value="Feedback" id="Feedback">{% trans 'Feedback' %}</option>
+      			<option value="Closed" id="Closed">{% trans 'Closed' %}</option>
+      			<option value="Rejected" id="Rejected">{% trans 'Rejected' %}</option></select>
+      		</select>
+      		<input type="hidden" name="myselect" value="myselectedvalue" />
+      		<small class="error">Broke.</small>
+    	  </div>
+
+    	  <div class="medium-3 columns end">
+    	    <label>{% trans 'Start date' %}</label>
+          <input id="start_date" class="date_month_day_year" type="text" placeholder="DD/MM/YYYY" value="" name="start_time" readonly="" {% if start_time %}disabled{% endif %}>
+    	  </div>
+    	</div>	
+
+      <!-- Priority & Due date -->
+    	<div class="row">
+    	  <div class="medium-6 columns">
+    	    <label>{% trans 'Priority' %} <font color="red">*</font></label>
+    	    <select required="" class="medium" id="customDropdown1" name="Priority" data-invalid="">
+        		<option value="Low" id="Low">{% trans 'Low' %}</option>
+        		<option selected="selected" value="Normal" id="Normal">{% trans 'Normal' %}</option>
+        		<option value="High" id="High">{% trans 'High' %}</option>
+        		<option value="Urgent" id="Urgent">{% trans 'Urgent' %}</option>
+        		<option value="Immediate" id="Immediate">{% trans 'Immediate' %}</option></select>
+    	    </select>
+    	  </div>
+
+    	  <div class="medium-3 columns end">
+    	    <label>{% trans 'Due date' %}</label>
+          <input id="end_date" class="date_month_day_year" type="text" placeholder="DD/MM/YYYY" value="" name="end_time" readonly="">
+    	  </div>
+    	</div>
+
+      <!-- Assignee & Estimated time -->
+    	<div class="row">
+    	  
+	    	  <div class="medium-4 columns">
+	    	    <label>{% trans 'Estimated time' %}</label>
+	    	    <input id="Estimated time" name="Estimated_time" type="text" value="{{Estimated_time}}" placeholder="{% trans 'Enter Hours' %}..."/>
+	    	    <small class="error">{% trans 'Please give Time in' %} HH:MM:SS</small>
+	    	  </div>
+		    
+		     <div class = "medium-4 columns">
+		        <label> To be done By </label>
+				<select name = "assignees" class = "assignees" id = "assignees">
+				<option value = 'Select'> -- select -- </option>
+				<option value = 'Single Assignee'> {% trans 'Single Assignee' %} </option>	
+				<option value = 'Multiple Assignee'>{% trans 'Multiple Assignee' %}</option>
+				<option value = 'Group Assignees'> {%  trans  'Group Assignees' %} </option>
+				</select>
+		 	 </div>
+	    	
+	    	<div class= "medium-2 columns">
+				<br>
+				<label class = "fi-plus " id = "selectAssignees" data-reveal-id = "selectAssigneeslist" value ="{% trans 'select Asssignees' %}"> </label>
+			</div>
+	        <div class= "medium-2 columns">
+				<br>
+				<label id = "assignee_warning" >   </label>
+			</div>       
+    	
+    	</div>
+    	<div>
+    	    <div id = "assignee_information_div">
+    	    	<label> <h3>  {% trans 'Assignees Assigned for task' %}: </h3> </lable>
+    	    </div>
+
+	    	<div id="selected_assignees">
+	    	</div>
+	    	<br>	
+    	    <br>
+        </div>
+
+      <!-- Upload files -->
+      <div class="row">
+        <div class="medium-12 columns">
+          <input type="file" class="button small radius" name="UploadTask" onChange="handleFileSelect(this)" id="docFile" value= "" style="padding-right: 15rem;" />
+          <div id="selectedFiles" style="margin-bottom: 20px;">
+          </div>
+        </div>
+      </div>
+      	
+      </div>
+      <!-- Describe -->
+      <div class="row">
+  	    <div id="contentlist" class="medium-12 columns content">
+          <div class="">
+            <label style="margin-left: -5px;margin-bottom: -15px;">{% trans "Describe" %}</label>
+    		    
+            {% include "ndf/html_editor.html" with var_name="content_org" var_placeholder="Enter the content here" var_value=node.content|default_if_none:"" ckeditor_toolbar="GeneralToolbar" node_id=node.pk %}
+          </div>
+        </div>
+  	  </div>
+      {% comment %}
+      <!-- Watchers list -->
+    	<!-- 
+      <div class="row">
+        <div class="medium-12 columns">
+          <label>Watchers</label>
+
+      		<div class="watchers">
+          </div>
+    	  </div>
+      	<input type="hidden" name="watchers" id="hidden_watchers" value="">
+      </div>
+      -->
+      {% endcomment %}
+      {% if Upload_Task %}
+      	{% get_file_node request Upload_Task as new %}
+        <div class="row">
+        {% for node in new %}
+        	{% get_grid_fs_object node as grid_fs_obj %}
+        	<div id="Uploaded" class="medium-6 columns end">
+          	<b><a href="{% url 'read_file' group_id node.pk grid_fs_obj.filename %}">{{grid_fs_obj.filename}}</a></b>
+        	</div>
+      	{% endfor %}
+        </div>
+      {% endif %}
+
+      <!-- Hidden variables & Save button -->
+      <div class="row" >
+        <div class="medium-3 medium-centered columns">
+          <!-- Hidden variables -->
+          <input type="hidden" name="node" value="{{node.pk}}">
+          <input type="hidden" name="user" value="{{user.id}}">
+          <input type="hidden" name="files" id="trial" >
+          <input type="hidden" name="files_name" id="filename" >
+          <input type="hidden" name="page_url" value="{{request.path}}">
+          <input type="hidden" name = "Assignee" id="Assignee" required>
+
+          <!-- Save button -->
+          <input type="submit" id="save-node" value="{% trans 'Save' %}" class="button small expand"/>
+        </div>
+      </div>
+    </div>
+  </form>
+{% endblock %}
+
+{% block script %}
+
+
+  $("#parent").autocomplete({
+    source: "{% url 'search_tasks' groupid %}" + $("#parent").val(),
+    select: function(event, ui) {
+      $('#hidden_parent').val(ui.item.id);
+    } 
+  });
+
+  {% if parent %}
+  var parent = document.getElementById("parent");
+  parent.value = "{{parent}}";
+  {% endif %}
+
+  var watchers_arr = new Array();
+  $(document).on("click", "#save-node", function() {
+    $("div.watchers input[type='checkbox']:checked").each(function() {
+      if ($.inArray(this.value, watchers_arr) == -1) {
+        watchers_arr.push(this.value);
+      }
+     });
+     
+    if ('{{Assignee_name}}' != "" )
+    {
+        return true;     
+    }  
+    else if( $('#Assignee').val() == "" )
+      {
+        $('#assignee_warning').append("<h6 style = 'color:red;'> {% trans 'Assignees not selected' %} </h6>")
+      	return false;
+	  } 
+    
+    $('#hidden_watchers').val(watchers_arr);
+  });
+
+  var selDiv = "";
+  var storedFiles = [];
+  var selfiles = [];
+
+  var currentYear = (new Date()).getFullYear();
+  var lowerYearLimit = currentYear - 30;
+  
+  function attachedfiles() {
+    //popultate the files with their names
+      {% if Upload_Task %}
+      var sData = {{Upload_Task|safe}};
+      if (sData) {
+        $.each(sData, function(index, val) {
+          storedFiles.push(val);
+          
+          var html_content = "<div>" +
+                                "<span data-file='"+val+"' class='selFile' title='Click to remove'>" + 
+                                  val + " &#215;" +
+                                "</span>" +
+                              "</div>";
+          
+          selDiv.append(html_content);
+        });
+      }
+      {% endif %}
+
+    //populate the list with their ids
+      {% if select %}
+      var sData = {{select|safe}};
+      if (sData) {
+        $.each(sData, function(index, val) {
+          if(val) {
+            selfiles.push(val)
+          }
+        });
+      }
+      {% endif %}
+
+    var select = document.getElementById('trial');
+    select.value = selfiles;
+    
+    var files_name = document.getElementById('filename');
+    files_name.value = storedFiles;
+  }
+  
+  function handleFileSelect(e) {
+    var files = e.files;
+    var filesArr = Array.prototype.slice.call(files);
+    
+    filesArr.forEach(function(f) {  
+      storedFiles.push(f.name);
+      
+      var reader = new FileReader();
+      reader.onload = function (e) {
+        var html = "<div>" + 
+                      "<span data-file='"+f.name+"' class='selFile' title='{% trans 'Click to remove'%}'>" + 
+                        f.name + " &#215;" +
+                      "</span>" + 
+                    "</div>";
+      
+        selDiv.append(html);
+      }
+
+      reader.readAsDataURL(f); 
+    });
+    
+    var files_name = document.getElementById('filename');
+    files_name.value = storedFiles;
+    
+    var formData = new FormData();
+    // Loop through each of the selected files.
+      for (var i = 0; i < files.length; i++) {
+        var file = files[i];
+        formData.append('doc[]', file, file.name);
+      }
+
+    // appending csrfmiddlewaretoken and user-id
+      formData.append('csrfmiddlewaretoken', '{{csrf_token}}');
+      formData.append('user', '{{request.user.id}}');
+
+    // Set up the request.
+      xhr = new XMLHttpRequest();
+      xhr.open('POST', "{% url 'save_image' group_name %}", true);
+        
+    // Set up a handler for when the request finishes sucessfully.
+      $('#myModal').foundation('reveal', 'open');
+  
+      xhr.onload = function () {
+        if (xhr.status === 200) {
+          $('#myModal').foundation('reveal', 'close');      
+          selfiles.push(xhr.responseText);
+          
+          var select=document.getElementById('trial');
+          select.value=selfiles
+        }
+      }
+      
+      xhr.send(formData);
+  }
+    
+  function removeFile(e) {
+    var file = $(this).data("file");
+    for(var i = 0; i < storedFiles.length; i++) {
+      if(storedFiles[i] === file) {
+        storedFiles.splice(i, 1);
+        selfiles.splice(i, 1);
+        break;
+      }
+    }
+    
+    $(this).parent().remove();
+
+    var select = document.getElementById('trial');
+    select.value = selfiles;
+    
+    var files_name = document.getElementById('filename');
+    files_name.value = storedFiles;
+    
+    var select_docfile = document.getElementById('docFile');
+    select_docfile.value = "";
+  }
+  $('#selectAssignees').click(function(){
+   <!-- Get the value from the Assigne Drop down -->
+   if ($('#assignees').val() == "Group Assignees" || $('#assignees').val() == "Multiple Assignee" )
+   {
+   	select_values("customDropdown2");
+   	$('#list').show()
+   	$("#assignee_drop_down_div").hide()
+   }
+   else
+   {
+   		$("#assignee_drop_down_div").show()
+   		$('#list').hide()	
+   }
+   
+  });
+
+	function fillist()
+	{
+	      assignee_list=[]
+	      disp_assignee_list = []
+	      $('#assignee_warning').empty()
+	      if ($('#assignees').val() == "Group Assignees" || $('#assignees').val() == "Multiple Assignee" ){
+	       
+	      $('#list').children(":checkbox").each(function(){ 
+	            if (this.checked == true)
+	 			{  
+					assignee_list.push(Number(this.value))
+					disp_assignee_list.push($('#' + this.value + '').text())
+                }
+	      });
+	      		$("#Assignee").attr('value',assignee_list)
+	      }
+	      else
+	      {		disp_assignee_list.push($('#customDropdown2 option:selected').text())
+            	$('#Assignee').attr('value',$('#customDropdown2').val())
+	      }
+	      
+	      	$('#Assignees_list').attr('value',assignee_list)
+	      	$('#selected_assignees').empty()
+	      	$('#selected_assignees').append("<label> <h4>" + disp_assignee_list + "</h4></label>")
+	      	$('#selectAssigneeslist').foundation('reveal', 'close');
+	}
+
+  function toggle(source) {
+    /*
+      if ((source.value) == 'Single Assignee') {
+        document.getElementById("AssigneeType").style.visibility = "hidden";
+        document.getElementById("group").style.visibility = "hidden";
+      }
+
+      else if ((source.value) == 'Group Assignee') {
+        document.getElementById("AssigneeType").style.visibility = "visible";
+        document.getElementById("group").style.visibility = "visible";
+
+        var check = document.getElementById("AssignTaskGroup");
+        check.checked = false;
+      }
+      */
+
+    /* Selects All the Assignes from the DropDown List */
+      var x = document.getElementById("selectAllOptions").checked;
+      var y = document.getElementById("customDropdown2");
+      select_values("customDropdown2");
+      // checkboxes = document.getElementsByName('Assignee');
+
+      $("input[type='checkbox'][name='Assignee']").attr("checked", x);
+
+      if (x != true) {
+        document.getElementById("list").innerHTML = "";
+        $("#customDropdown2").attr("disabled", false);
+      }
+
+      else {
+        $("#customDropdown2").attr("disabled", true);
+      }
+  }
+
+  function select_values(source) {
+   
+    document.getElementById("list").innerHTML = ""; 
+    
+    var y = document.getElementById(source);
+    var element = document.getElementById("list");
+    var count = 0; 
+    var fieldset = document.createElement("fieldset");
+
+    for(var i = 1; i < y.length; i++) {
+      count=count+1;
+
+      var checkbox = document.createElement('input');
+      checkbox.type = "checkbox";
+      checkbox.name = "Assignee";
+
+      var a = y[i].value;
+      checkbox.value = a;
+      checkbox.id = "group_assignee_" + a;
+
+      var label = document.createElement('label');
+      label.id = a;
+      label.value = y[i].text
+      label.appendChild(document.createTextNode(String(y[i].text)));
+
+      //fieldset.appendChild(checkbox);
+      //fieldset.appendChild(label);
+    
+      element.appendChild(checkbox);
+      element.appendChild(label);
+  
+      if (count == 4) {
+        count = 0;
+        element.appendChild(document.createElement("br"));
+      }
+    }
+  }
+
+  if ('{{node.name}}' == "") {
+    document.getElementById("customDropdown").disabled = true;
+  }
+
+  function enableselect() {
+    document.getElementById('customDropdown').disabled = "";
+    
+  }
+{% endblock %}
+
+{% block document_ready %}
+  $("#files").on("change", handleFileSelect);
+  selDiv = $("#selectedFiles"); 
+  $("body").on("click", ".selFile", removeFile);
+
+  attachedfiles();
+
+  /*
+  var select = document.getElementById("selectAllOptions");
+  select.checked = false;
+  */
+
+  {% if Status %}
+  $("select[name='Status'] option[value='{{Status}}']").prop("selected", true);
+  {% endif %}
+
+  {% if Priority %}
+  $("select[name='Priority'] option[value='{{Priority}}']").prop("selected", true);
+  {% endif %}
+
+  {% if start_time %}
+    var start_date  = document.getElementById("start_date");
+    start_date.value = "{{start_time|date:'d/m/Y'}}";
+  {% endif %}
+
+  {% if end_time %}
+    var end_date = document.getElementById("end_date");
+    end_date.value = "{{end_time|date:'d/m/Y'}}";
+  {% endif %}
+  {% if Assignee_name %}
+  Assignee_name ='{{Assignee_name}}'
+  	$('#selected_assignees').append("<label>  <h4>" +  Assignee_name + " </h4></label>")
+  {% else %}
+    $('#selected_assignees').append("<label> <h4> {% trans 'No Assignees Assigned' %} </h4> </label>")	
+  {% endif %}
+
+  // Populates group's user(s) into Assignee & Watcher widgets respectively
+  $.ajax({
+    url: "{% url 'get_group_member_user' groupid %}",
+    success: function(data) {
+      users = JSON.parse(data);
+    },
+
+    complete: function() {
+      $.each(users, function(key,val) {
+        // Populates Assignee widget
+        $('#customDropdown2').append(
+          $("<option></option>")
+            .attr("id", "assignee_"+key)
+            .attr("value", key)
+            .text(val)
+        );
+
+        {% if Assignee %}
+          var edit_Assignee = document.getElementById("customDropdown2");
+          if ($("select[name='Assignee'] option[value='{{Assignee.0}}']").length) {
+            {% for each in Assignee %}
+            $("select[name='Assignee'] option[value='{{each}}']").prop("selected", true);
+            {% endfor %}
+          }
+
+          else {
+            
+            $("select[name='Assignee'] option[value='{{Assignee}}']").prop("selected", true);
+          	
+          }
+        {% endif %}
+
+        // Populates Watcher widget
+        var div = $("<div>" + "</div>")
+          .attr("class", "row")
+          .appendTo($(".watchers"));
+        
+        var input = $("<input>").attr("type", "checkbox")
+          .attr("id", "watcher_"+key)
+          .attr("value", key)
+          .appendTo(div);
+
+        $("<label>"+val+"</label>").insertAfter(input);
+
+        {% if Watchers %}
+        {% for each in Watchers %}
+          $("div.watchers input[type='checkbox'][value='{{each}}']").prop("checked", true);
+        {% endfor %}
+        {% endif %}
+      });
+    }
+  });
+
+  // Start-date & End-date settings -------------------------------------------
+    var start_date = $("#start_date");
+    var end_date = $("#end_date");
+    currentDate = new Date();
+    var currentDay = currentDate.getDate();
+    var currentMonth = currentDate.getMonth();
+    var currentYear = currentDate.getFullYear();
+  
+    $(".date_month_day_year").datepicker({
+      changeMonth: true,
+      dateFormat: 'dd/mm/yy',
+      minDate: '0',
+      maxDate: '+2m',
+      defaultDate: '0',
+
+      onClose: function(dateText, inst) {
+        $(this).val(dateText);
+        
+        var month_year = $(this).val();
+        day = currentDay;
+        month = currentMonth;
+        year = currentYear;
+        
+        if ($(this).attr('id') == "start_date") {
+          if (month_year) {
+            month_year = month_year.split("/");
+            day = parseInt(month_year[0]);
+            month = parseInt(month_year[1]);
+            year = parseInt(month_year[2]);
+          }
+
+          if (end_date.val() != '') {
+            var testStartDate = start_date.datepicker('getDate');
+            var testEndDate = end_date.datepicker('getDate');
+
+            if (testStartDate > testEndDate) {
+              end_date.datepicker('setDate', testStartDate);
+            }
+
+            else {
+              $(this).val(day+"/"+month+"/"+year);
+              $(this).datepicker('setDate', new Date(year, (month-1), day));
+            }
+          }
+
+          else {
+            end_date.val(day+"/"+month+"/"+year);
+            $(this).datepicker('setDate', new Date(year, (month-1), day));
+          }
+
+          $("#end_date").datepicker('option', 'minDate', new Date(year, (month-1), day));
+        }
+
+        else if ($(this).attr('id') == "end_date") {
+          if (month_year) {
+            month_year = month_year.split("/");
+            day = parseInt(month_year[0]);
+            month = parseInt(month_year[1]);
+            year = parseInt(month_year[2]);
+          }
+
+          if (start_date.val() != '') {
+            var testStartDate = start_date.datepicker('getDate');
+            var testEndDate = end_date.datepicker('getDate');
+
+            if (testStartDate > testEndDate) {
+              start_date.datepicker('setDate', testEndDate);
+            }
+
+            else {
+              $(this).val(day+"/"+month+"/"+year);
+              $(this).datepicker('setDate', new Date(year, (month-1), day));
+            }
+          }
+
+          else {
+            start_date.val(day+"/"+month+"/"+year);
+
+            $(this).datepicker('setDate', new Date(year, (month-1), day));
+          }
+        }
+      },
+
+      beforeShow: function() {
+        var month_year = $(this).val();
+        day = currentDay;
+        month = currentMonth;
+        year = currentYear;
+
+        if (month_year) {
+          month_year = month_year.split("/");
+          day = parseInt(month_year[0]);
+          month = parseInt(month_year[1]);
+          year = parseInt(month_year[2]);
+        }
+
+        $(this).datepicker('option', 'defaultDate', new Date(year, (month-1), day));
+        $(this).datepicker('setDate', new Date(year, (month-1), day));
+      },
+    });
+{% endblock %}

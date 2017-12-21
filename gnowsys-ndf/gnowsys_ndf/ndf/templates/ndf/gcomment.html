@@ -1,0 +1,56 @@
+{% verbatim %}
+<script id="user-comment-template" type="text/x-handlebars-template">
+    <div class="user-comment" data-comment-id="{{comment.id}}">
+        <div class="user-avatar"><i class="fi-torso" style="line-height:0em;"></i></div>
+        <div style="padding: 0em 0em 0em 1em;" class="comment-container">
+            <div class="comment-heading">
+                <div class="commentor-name">
+                    <span>{{comment.userName}}</span>
+                    &#8226;
+                </div>
+                <div class="commented-date">
+                    <span> {{comment.commentedOn}}</span>
+                    &#8226;
+                </div>
+                <div class="comment-rating right" >
+                    <div style="display:inline-block">Avg Rating</div>
+                    <div class="rate-scale" style="display:inline-block">
+                        <i class="fi-like"></i>
+                        <i class="fi-like"></i>
+                        <i class="fi-like"></i>
+                        <i class="fi-like"></i>
+                        <i class="fi-like"></i>
+                    </div>
+                    <span>({{comment.commentRating}})</span>
+                </div>
+            </div>
+            <div class="comment-text">{{comment.commentContent}}</div>
+            <div class="comment-footer row">
+                <div class="small-2 columns comment-reply">
+                    <i class="fa fa-reply"></i>Reply
+                </div>
+                <div class="small-4 columns comment-rate rate-scale">
+                    <i class="fi-like"></i>
+                    <i class="fi-like"></i>
+                    <i class="fi-like"></i>
+                    <i class="fi-like"></i>
+                    <i class="fi-like"></i>
+                    Rate this
+                </div>
+                <div class="small-2 columns comment-delete ">
+                    <i class="fi-trash"></i>Delete
+                </div>
+            </div>
+            <div class="row comment-add">
+                <div class="small-10 columns">
+                    <textarea class="textarea-reply-comment small-10 columns" name="textarea-reply-comment"></textarea>
+                </div>
+                <div class="small-2 columns post-reply">
+                    <a href="#" class="button radius">Post Reply</a>
+                </div>
+            </div>
+            <div class="comment-child">{{{childComment}}}</div>
+        </div>
+    </div>
+</script>
+{% endverbatim %}

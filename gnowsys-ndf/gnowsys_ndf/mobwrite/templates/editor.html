@@ -1,0 +1,69 @@
+{% extends "base.html" %}
+
+{% block head %}
+<title>{{url}} - share and write</title>
+<script src="/static/js/jquery.js"></script>
+<!--
+<script src="/static/js/mobwrite/compressed_form.js"></script>
+-->
+<script src="/static/js/mobwrite/diff_match_patch.js"></script>
+<script src="/static/js/mobwrite/core.js"></script>
+<script src="/static/js/mobwrite/form.js"></script>
+<script src="/static/js/mobwrite/iframe.js"></script>
+<script>
+mobwrite.syncGateway = '/mobwrite/';
+function adjustCanvas() {
+    $('#canvas').height($(window).height() - $('#canvas').offset().top - 8);
+    $('#canvas').width($(window).width() - $('#canvas').offset().left - 8);
+};
+$(window).bind('resize', adjustCanvas);
+$(function(){
+    adjustCanvas();
+    setTimeout(function() { adjustCanvas(); }, 100);
+{% if iframe_editing %}
+    $("#{{name}}").load(function() {
+        mobwrite.share('{{name}}');
+    });
+
+    var iframe = document.getElementById('{{name}}').contentWindow.document;
+    iframe.onkeypress = function () {
+      // Is the sync gap big? and do we have a sync in transit?
+      if ((mobwrite.syncInterval > 1000) && (mobwrite.syncKillPid_==null)) {
+        // Stop the current timer, run a sync, and start the timer again.
+        window.clearTimeout(mobwrite.syncRunPid_);
+        mobwrite.syncRun1_();
+        mobwrite.syncRunPid_ = window.setTimeout(mobwrite.syncRun1_,mobwrite.syncInterval);
+      }
+    };
+{% else %}
+    mobwrite.share('{{name}}');
+{% endif %}
+    /* insert 4 spaces instead of leaving textarea */
+    function insertTab(e) {
+        if (e.keyCode == 9) {
+            var tab = "    ";
+            var txt = e.currentTarget;
+            var pos = txt.selectionStart;
+            var scrollTop = txt.scrollTop;
+            txt.value = txt.value.substring(0, pos) + tab + txt.value.substring(txt.selectionEnd, txt.textLength);
+            txt.focus();
+            txt.selectionStart = pos + tab.length;
+            txt.selectionEnd = pos + tab.length;
+            txt.scrollTop = scrollTop;
+            return false;
+        }
+        return true;
+    }
+    $("#{{name}}").keydown(insertTab);
+});
+</script>
+{% endblock %}
+
+{% block content %}
+<div id="title"><a href="{{url}}">{{name}}</a></div>
+<div id="canvas">
+{% if iframe_editing %}<iframe id="{{name}}"  src="/static/blank.html" height="100%" width="100%"></iframe>
+{% else %}<textarea id="{{name}}" style="width: 100%; height: 100%"></textarea>{% endif %}
+</div>
+{% endblock %}
+

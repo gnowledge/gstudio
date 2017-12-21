@@ -1,0 +1,12 @@
+* Forum
+
+  A forum is meant for discussion on any topic related to the
+  activities of the group.  Each group can have any number of fora.
+
+  After creating a forum on a broad topic, users can create a *thread*
+  on an issue and seek feedback from the members of the group. Each
+  thread could have replies that are organized in a nested way to
+  visually display the reply pattern.
+
+  Notifications will be sent to members of the group when a new
+  thread or a reply is posted.

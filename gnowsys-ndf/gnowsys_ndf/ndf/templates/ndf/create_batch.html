@@ -1,0 +1,152 @@
+{% extends "ndf/base.html" %}
+{% load pagination_tags %}
+{% load i18n %}
+{% load ndf_tags %}
+{% block title %} {{title}} {% endblock %}
+
+{% block style %}
+
+.divider-line { font-size: xx-large; color:lightgray; }
+.line-height-2 { line-height:2; }
+.line-height-2pt5 { line-height:2.5; }
+.fontsize-x-large { font-size: x-large; }
+
+.margin-0 { margin: 0 !important ;}
+
+.resource-drawer { 
+border-color: #D3D3D3; border-style: solid; 
+padding: 0 !important; 
+overflow-y: auto;
+}
+
+.resource-drawer li.bullet-item:hover{
+background-color: #ecf0f1; cursor:pointer;
+}
+
+.posted-by{ color: #808080; font-size: small; }
+
+.selected-resource { background-color:lightgray !important ; }
+
+.resource-type-image {
+height:40px; 		
+background-repeat:no-repeat; background-size: 48px 48px
+}
+{% endblock %}
+
+{% block script %}
+
+function set_drawer_value(group_id)
+{
+ $('#collection_set_drawer1').html("");
+ $('#collection_set_drawer2').html("");
+ $('#collection_set_drawer1').html('<li class="price"><input type="text" placeholder="Type here to search in the resources" id="\
+collection_set_search" class="margin-0"></li>');
+  var _id = '{{batch.pk}}'
+  if (_id != "")
+  {
+  var url = '/{{groupid}}/ajax/get_data_for_user_drawer/?st_batch_id='+st_batch_id+'&'+'_id='+_id;
+  }
+  else
+  {
+  var url = '/{{groupid}}/ajax/get_data_for_user_drawer/?st_batch_id='+st_batch_id;
+  }
+  $.getJSON( url, function( data ) {
+  $.each(data ,function(index , drawer_elements){
+   if(index == 0)
+    {
+     $.each(drawer_elements.drawer1, function(index, element) {
+        $('#collection_set_drawer1').append("<li id='"+element.id+"' class='bullet-item text-left'>"+element.name+"</li>");
+      });
+   }
+   if(index == 1)
+    {
+    $.each(drawer_elements.drawer2, function(index, element) {
+        $('#collection_set_drawer2').append("<li id='"+element.id+"' class='bullet-item text-left'>"+element.name+"</li>");
+      });
+    }
+  });
+   });
+}
+
+var group_id = '{{group_id}}'
+var st_batch_id = '{{st_batch_id}}'
+set_drawer_value(group_id, st_batch_id);
+
+
+$("#save-node").click(function() {
+   cn_arr = []   
+   $.each($('#collection_set_drawer2 li'),function(index,item){
+         cn_arr.push(item.id);
+         });
+$("#collection_set_list").val(cn_arr)
+});
+
+<!-- script for making batch name -->
+$('#sel_course').change(function () {
+     var optionSelected = $(this).find("option:selected");
+     var textSelected   = optionSelected.text();
+     var  batch_name = textSelected + "-Batch-" + '{{batch_count}}'
+   
+     if(textSelected == "--select--")
+     {
+         $('#txt_batch_name').val(" ")
+     }
+     else
+     {
+         $('#txt_batch_name').val(batch_name)
+     }
+   
+ });
+<!-- end-->
+
+{% endblock %}
+
+
+{% block body_content %}
+<form data-abide id="form-create-batch" method="POST" action="{% url 'save' groupid %}">{% csrf_token %}
+  <div class="row">
+    <div class="large-9 columns">
+      <label>select course
+	<select name="courses" id="sel_course">
+	  <option value="">--select--</option>
+	  {% for each in fc_courses %}
+	  {% if each.name == course_name %}
+          <option selected value="{{each.pk}}">{{each.name}}</option>
+	  {% else %}
+	  <option  value="{{each.pk}}">{{each.name}}</option>
+	  {% endif %}
+          {% endfor %}
+	</select>
+      </label>
+    </div>
+  </div>
+   <div class="row">
+    <div class="large-9 columns">
+      <label>{% trans "Enter Batch Name" %}
+	<input type="text" placeholder="Batch Name" id="txt_batch_name" name="batch_name" value="{{batch.name}}" />
+	<input type="hidden" name="batch_count" value="{{batch_count}}"/>
+	<input type="hidden" name="node_id" value="{{batch.pk}}"/>
+      </label>
+    </div>
+  </div>
+  <div class="row">
+    <div class="large-11 columns" >
+      <label><h3>{% trans "Choose users" %}</h3>
+	<div id="user_drawer" >
+	  {% include "ndf/drawer_widget.html" with widget_for="collection_set" %}
+	</div>
+      </label>
+    </div>
+  </div><br/><br/>
+  <div class="row">
+    <div class="large-11 columns" >
+      {% if batch_count == 1 %}
+      <input type="submit" class="button expand" id="save-node" value="Save & Finish">
+      {% else %}
+      <input type="submit" class="button expand" id="save-node" value="Save & Continue">
+      {% endif %}
+    </div>
+  </div>
+</div>
+</form>
+{% endblock %}

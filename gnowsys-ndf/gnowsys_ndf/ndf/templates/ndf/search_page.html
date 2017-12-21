@@ -1,0 +1,206 @@
+{% extends "ndf/base.html" %}
+{% load ndf_tags %}
+{% load i18n %}
+{% block title %}{% trans 'Search' %}{% endblock %}
+{% block concern_information %}
+    <div id="search_help" align="justify">
+      <h3><strong>Search Help</strong></h3>
+      <ul>
+          <li><strong>Keyword search </strong>
+              <ul>
+                    <li>It searches all the public resources for the keywords provided.</li>
+                    {% comment %}<li>Search by name, tags, contents and on specific users. </li>{% endcomment %}
+              </ul><br>
+                </ul>
+
+    </div>
+{% endblock %}
+
+{% block body_content %} 
+
+<hr>
+      <div id="results" width="100%" style="position:relative">
+      
+      
+      </div>
+
+<div id="pages">
+    <ul class="small-block-grid-5 medium-block-grid-3 large-block-grid-5" >
+      {% for each in  search_curr %}
+        <li class="card-image-wrapper" >
+        {% include 'ndf/simple_card.html' with  no_footer=True resource=each url_name="page_details" first_arg=groupid second_arg=each %}
+        </li>
+      {% endfor %}
+    </ul>
+      {% if not search_curr %}
+       <b> No results found  </b>
+      {% endif %}
+</div>
+
+<hr>
+   {% comment %} 
+    <dl class="accordion" data-accordion>
+        <dd class="accordion-navigation" data-options="deep_linking:true">
+              <a href="#panel1" style="background-color: #2980B9; color:#FFF">Search</a>
+              <div id="panel1" class="content active small-12 large-4 columns">
+                
+                           <!-- <h1>Search</h1> -->
+
+                          <form name="search_form" method="GET" action="{% url 'results' groupid %}">
+                            {% csrf_token %}
+                            Enter the value to be searched:
+                            <input type="text" class="small-2 columns" name="search_text" id="search_text" required>
+                            <h5> Search by: </h5>
+                            <input type="checkbox" name="search_fields" checked="true" id="chk_name" value="name" />Name
+                            <input type="checkbox" name="search_fields" checked="true" id="chk_tags" value="tags" />Tags 
+                            <input type="checkbox" name="search_fields" checked="true" id="chk_content" value="contents" />Content <br>
+                            Search particular user: 
+                            <select name="users" required>
+                              <option value="all">All users</option>
+                              {% for mem in authors %}    
+                                <option value="hello">{{ mem }} </option>
+                                {% endfor %}
+                            </select>
+
+                            <input type="submit" class="button" name="subButton2" id="subButton2" value="Submit" />
+                          </form>
+        
+                
+              </div>
+        
+        </dd>
+    </dl>
+    {% endcomment %}
+<script>
+  /********************************************************************************
+  THIS SCRIPT EXTRACTS THE GET VARIABLES FROM THE URL AND CONVERTS IT INTO A DICTIONARY - "VARS"  
+  **********************************************************************************/
+  function getUrlVars() {
+      var vars = {};
+      var parts = window.location.href.replace(/[?&]+([^=&]+)=([^&]*)/gi, function(m,key,value) {
+          vars[key] = value;
+      });
+      return vars;
+  }
+
+  // ASSIGN THE SEARCHED QUERY TO THE INPIT BOX AGAIN
+  var search_key = String(getUrlVars()["search_text"]);
+  search_key = search_key.split('+').join(' ');
+  $('#search_text').val(search_key);
+
+</script>
+
+<script type="text/javascript">
+
+</script>
+
+<script type="text/javascript">
+  /*$('#GSystems').change(function(){
+      GSystem_name = $("#GSystems").val();
+
+      $.ajax({
+            type: "GET",
+            url: "{% url 'get_attributes' groupid %}",
+            datatype: "json",
+            data: {
+              GSystem: GSystem_name,
+              csrfmiddlewaretoken: '{{ csrf_token }}'
+            },
+            success: function(data) {
+          //json = jQuery.parseJSON(data);
+          parsed = $.parseJSON(data);
+          alert(parsed[0]);
+          options_to_add = "";
+          for (i=0; i<parsed.length; i++) {
+            options_to_add += "<option value='" + parsed[i]['name'] + "'>" + parsed[i]['name'] + "</option>";
+          }
+          alert(options_to_add);
+          $("#attribs").html(options_to_add);
+          }
+      });
+  });
+  $("#attribs").change(function() {
+    alert($("#attribs").val());
+  });*/
+</script>
+
+<script type="text/javascript">
+  $(".pagination").click(function(){
+    alert("ssss")
+    window.location.href += '?selected=true';  
+  });
+  var GSystem_name = [];
+  $("#search_text_rel").keyup(function(e){
+
+    // console.log(e.which);
+    var searchKey = $("#search_text_rel").val();
+    words = searchKey.split(' ');
+    cur_word = words[words.length-1];
+    already_typed = "";
+    pref = "";
+
+    if (words.length != 1) {
+      //console.log('not zero'+words);
+      for (i=0;i<words.length-1;i++) {
+        already_typed += ' ' + words[i];
+      }
+      pref = already_typed;
+    }
+    else {
+      //console.log('zero');
+      already_typed = searchKey;
+      pref = "";
+    }
+
+    if (already_typed != "" && cur_word != "") {
+      $.ajax({
+        url:"{% url 'get_relations_for_autoSuggest' groupid %}",
+        type:"GET",
+        dataType:"JSON",
+        data:{
+          sVal:cur_word,
+          prefix:pref
+        },
+        success:function(data){
+          //var str = "<select size='5' id='autocomplete' onChange='changed_val()'>";
+          var str = "<datalist style='color:#fff' id='datalist1'>";
+          for(i=0;i<data.length;i++){
+            str += "<option value='" + data[i].split('_').join(' ').trim() + "'>"; 
+          }
+          str += "</datalist>";     
+          console.log(data.length);
+          //dataVals = ["one", "two", "three"];
+          $("#suggestions").html(str);
+          //$( "#search_text" ).autocomplete({
+          //  source: data
+          //});
+        },
+        failure:function(data){
+          alert('GOT AN ERROR');
+        }     
+      });
+    }
+    else {
+      $("#suggestions").html("");
+    }
+    return false;
+  });
+
+  function changed_val() {
+    $("#search_text").val($("#autocomplete").val().trim());
+    console.log("click 2");
+  }
+
+  $(document).ready(function(){
+      scrollTo("results");
+  });
+  function scrollTo(hash) {
+    location.hash = "#" + hash;
+    
+  }
+
+
+</script>
+
+
+{% endblock %}

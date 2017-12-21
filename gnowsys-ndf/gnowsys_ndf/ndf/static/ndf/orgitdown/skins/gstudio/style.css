@@ -1,0 +1,106 @@
+.orgitdown * {
+}
+.orgitdown a:link,
+.orgitdown a:visited {
+
+}
+.orgitdown  {
+
+}
+.orgitdownContainer  {
+	/*font:11px Verdana, Arial, Helvetica, sans-serif;*/
+}
+.orgitdownEditor {
+	
+	overflow:auto;
+}
+.orgitdownPreviewFrame	{
+	overflow:auto;
+}
+.orgitdownFooter {
+
+}
+.orgitdownResizeHandle {
+	overflow:hidden;
+	width:22px; height:5px;
+	margin-left:auto;
+	margin-right:auto;
+	background-image:url(images/handle.png);
+	cursor:n-resize;
+}
+/***************************************************************************************/
+/* first row of buttons */
+.orgitdownHeader ul li	{
+	list-style:none;
+	float:left;
+	position:relative;
+}
+.orgitdownHeader ul .orgitdownSeparator {
+	width:5px;
+	height: 1px;
+}
+.orgitdown textarea{
+	min-height: 250px;
+	padding:5px;
+line-height: 1.2rem;
+ padding: 2px 10px;
+}
+
+.orgitdownHeader ul {
+	margin-left: 0px;
+}
+
+/*
+.orgitdown .orgitdownButton0 a {
+	background-image:url(images/save.jpeg);
+}
+*/
+.orgitdownButton a{
+	background-color: #eee;
+	width:30px;
+	height: 30px;
+	padding:5px;
+	display: block;
+	text-indent: -999em;
+	background-repeat: no-repeat;
+	background-position: center;
+}
+.orgitdownButton a:hover{
+	background-color: #fafafa;
+	}
+
+.orgitdown .orgitdownButton1 a {
+	background-image:url(images/bold.png);
+}
+.orgitdown .orgitdownButton2 a {
+	background-image:url(images/italic.png);
+}
+.orgitdown .orgitdownButton3 a {
+	background-image:url(images/stroke.png);
+}
+
+.orgitdown .orgitdownButton4 a {
+	background-image:url(images/list-bullet.png); 
+}
+.orgitdown .orgitdownButton5 a {
+	background-image:url(images/list-numeric.png);
+}
+
+.orgitdown .orgitdownButton6 a {
+	background-image:url(images/picture.png); 
+}
+.orgitdown .orgitdownButton7 a {
+	background-image:url(images/link.png);
+}
+
+.orgitdown .orgitdownButton8 a {
+	background-image:url(images/html.jpeg);
+}
+
+.orgitdown .orgitdownButton9 a {
+	background-image:url(images/close.jpeg);
+}
+
+.orgitdown .orgitdownButton10 a {
+	background-image:url(images/cite.png);
+}

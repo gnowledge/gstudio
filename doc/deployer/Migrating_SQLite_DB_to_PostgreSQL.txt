@@ -1,0 +1,141 @@
+INSTALLING PostgreSQL:
+
+	$ sudo apt-get update
+
+	# instaling db with dependencies
+	$ sudo apt-get install python-pip python-dev libpq-dev postgresql postgresql-contrib
+
+	# installing psycopg2 (postgresql dependency)
+	$ pip install python-psycopg2
+	$ pip install psycopg2
+
+	# getting into db commandline:
+	$ sudo su - postgres
+
+	# getting into sql commandline
+	$ psql
+
+	# creating Database and user
+	$ CREATE DATABASE <oer>;
+	$ CREATE USER <projectuser> WITH PASSWORD <'password'>;
+
+	$ ALTER ROLE <projectuser> SET client_encoding TO 'utf8';
+	$ ALTER ROLE <projectuser> SET default_transaction_isolation TO 'read committed';
+	$ ALTER ROLE <projectuser> SET timezone TO 'UTC';
+
+	$ GRANT ALL PRIVILEGES ON DATABASE <oer> TO <projectuser>;
+
+	# done with db structure/env creation.
+
+=======================================================
+
+TRANSFERRING DATA FROM OLD/sqlite TO PostgreSQL
+
+1. Get dump of data from sqlite for only following apps:
+	# (comment other than following apps in INSTALLED_APPS)
+	'gnowsys_ndf.ndf',
+    'django.contrib.auth',
+    'django.contrib.admin',
+    'django.contrib.contenttypes',
+    'django.contrib.sites',
+    'django.contrib.messages',
+    'django.contrib.staticfiles',
+    'gnowsys_ndf.benchmarker',
+    'registration',
+    'registration_email',
+    'jsonrpc'
+
+	Now hit following command:
+		$ python manage.py dumpdata > db.json
+
+2. 	In settings.py, replace DB settings with new DB settings or
+	add new DB settings in local_settings.py file.
+	- Now hit following command:
+		# (do not create a superuser)
+		$ python manage.py syncdb
+
+3. Restore this initial dump:
+	- With command:
+		$ python manage.py loaddata db.json
+
+4. Now open commented remaining INSTALLED_APPS:
+    'django.contrib.sessions',
+	'djangoratings',
+    'notification',
+    'pagination',
+    'captca',
+    'memcache_admin',
+    'jsonrpc',
+    'djcelery',
+
+	- Again do:
+		$ python manage.py syncdb
+
+# 5. thats it!
+
+
+=======================================================
+
+# Misc commands:
+
+# dumps data with traceback on terminal:
+$ python manage.py dumpdata --indent=2 -v 2 --traceback
+
+
+# Dump data excluding above specified excluded apps:
+$ ./manage.py dumpdata --exclude auth.permission --exclude contenttypes --exclude memcache_admin > db.json
+
+
+# to inspect DB:
+$ python manage.py inspectdb
+
+
+# list all table names from django project shell:
+>>> from django.db import connections
+>>> connection = connections['default']
+>>> connection.introspection.table_names()
+
+
+# Updating size of notification columns.
+alter table notification_noticetype alter COLUMN display TYPE varchar(1024);
+alter table notification_noticetype alter COLUMN label TYPE varchar(1024);
+alter table notification_noticetype alter COLUMN description TYPE varchar(1024);
+
+
+# to reset last author id
+select max(id) from auth_user;
+select max_value from auth_user_id_seq;
+ALTER SEQUENCE auth_user_id_seq RESTART WITH 1261000;
+alter sequence auth_user_id_seq restart
+
+
+# Tabing BACKUP/DUMP of all DBs and table
+pg_dumpall > file-name.sql
+
+
+# DROP database
+$ sudo su - postgres
+# getting into psql
+postgres@62ea0453f8a2:~$ psql
+# listing of tables
+postgres=# \l
+postgres=# drop database gstudio_psql ;
+
+
+# RESTORE SQL table:
+$ echo "psql -f <path and name of dump file e.g: pg_dump_all.sql> ;" | sudo su - postgres
+
+
+# links:
+http://www.thegeekstuff.com/2009/01/how-to-backup-and-restore-postgres-database-using-pg_dump-and-psql/
+
+
+# To know size of each and every table of db:
+root@mz3:/home/docker/code# su - postgres
+postgres@mz3:~$ psql
+postgres=# \c gstudio_psql 
+gstudio_psql=# SELECT
+   relname as "Table",
+   pg_size_pretty(pg_total_relation_size(relid)) As "Size",
+   pg_size_pretty(pg_total_relation_size(relid) - pg_relation_size(relid)) as "External Size"
+   FROM pg_catalog.pg_statio_user_tables ORDER BY pg_total_relation_size(relid) DESC;

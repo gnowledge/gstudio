@@ -1,0 +1,307 @@
+{% load i18n %}
+{% load ndf_tags %}
+
+{% block head %}
+<style type="text/css">
+  .right-btn, .left-btn{
+      /*float: left;*/
+      /*margin-left: 1rem;*/
+      width: 40%;
+      font-size: 0.85em !important;
+      margin-top: 0.1rem !important;
+      text-align: center;
+  }
+  .tag-rating-div{
+      margin-left: 0.6rem !important;
+      margin-top: 0.3rem !important;
+  }
+  /*  
+  .right-btn{
+      float: right;
+      margin-right: 1rem;
+      width: 8rem;
+      font-size: 0.75rem !important
+  }
+  */
+  .table-container{
+    margin-top: 15px;
+  }
+  .rating-lbl{
+      display: inline-block;
+      font-size: 1rem !important;
+      /*font-style: italic;*/
+      /*margin-left: 3rem;*/
+
+  }
+  .rating_template{
+      display: inline-table;
+  }
+  .mod-btn{
+      width: 80% !important;
+      font-size: 0.75rem !important;
+  }
+  .btn-row{
+      /*margin-left: 1rem !important;*/
+      text-align: center;
+      margin-bottom: -1rem !important;
+  }
+  .lbl_tag{
+      display: inline-block;
+      font-size: 0.80rem !important;
+  }
+  .lbl_field{
+      width: 20%;
+      color: #194d6f;
+      /*font-weight: bold;*/
+      margin-top: 1rem;
+      font-size: 1rem !important;
+  }
+  .label > a{
+      color: white !important;
+  }
+
+  .graph_btn{
+      margin-left: 3rem;
+  }
+
+  #group_drawer{
+      height: 400px;
+      overflow-y: auto;
+      margin-left: 2em;
+  }
+
+  .short-text {
+    overflow: hidden;
+    height: 6em;
+  }
+  .full-text{
+    height: auto;
+  }
+
+  #course-notification{
+    overflow-y:scroll !important;
+    height: 400px !important;
+  }
+
+  .selFile{
+    margin-left: 2% !important;
+    margin-right: 2% !important;
+    padding: 15px 5px;
+  }
+</style>
+  <script src="/static/ndf/bower_components/pace/pace.js"></script>
+  <link href="/static/ndf/bower_components/pace/themes/blue/pace-theme-loading-bar.css" rel="stylesheet" />
+
+
+  <!-- DataTables -->
+  <!-- Foundation theme for datatables and datatables-rowsgroup disables pagination -->
+  <script src="/static/ndf/bower_components/DataTables/media/js/jquery.dataTables.js"></script>
+  <script src="/static/ndf/bower_components/DataTables/media/js/jquery.dataTables.min.js"></script>
+  <script src="/static/ndf/bower_components/datatables-rowsgroup/dataTables.rowsGroup.js"></script>
+  <script src="/static/ndf/bower_components/datatables.net-buttons/js/dataTables.buttons.js"></script>
+  <script src="/static/ndf/bower_components/datatables.net-buttons/js/dataTables.buttons.min.js"></script>
+  <script src="/static/ndf/bower_components/datatables.net-buttons/js/buttons.html5.js"></script>
+  <script src="/static/ndf/bower_components/datatables.net-buttons/js/buttons.print.min.js"></script>
+  <link href="/static/ndf/bower_components/datatables.net-buttons-dt/css/buttons.dataTables.min.css" rel="stylesheet" type="text/css" />
+  <link href="/static/ndf/bower_components/DataTables/media/css/jquery.dataTables.css" rel="stylesheet" type="text/css" />
+  <script src="/static/ndf/bower_components/pdfmake/build/pdfmake.min.js"></script>
+  <script src="/static/ndf/bower_components/pdfmake/build/vfs_fonts.js"></script>
+  <script src="/static/ndf/bower_components/jszip/dist/jszip.min.js"></script>
+
+  <!-- <link href="/static/ndf/bower_components/datatables-plugins/integration/foundation/dataTables.foundation.css" rel="stylesheet" type="text/css" />
+  <script src="/static/ndf/bower_components/datatables-plugins/integration/foundation/dataTables.foundation.js"></script>
+ -->
+{% endblock %}
+{% get_group_name group_id as group_name %}
+
+  <div class="small-12 columns table-container">
+  </div>
+
+  <script type="text/javascript">
+      // Student analytics view
+      $(document).ready(function(){
+          // Image embedding in pdf
+          // var image = new Image();
+          // // image.src = '/static/ndf/images/Clix_logo.png',
+          // image.src = '{{site.LOGO}}',
+          // console.log(image.src)
+          // image.crossOrigin = 'anonymous';
+
+          // var canvas = document.createElement("canvas"),
+          // canvasContext = canvas.getContext("2d");
+          // canvasContext.drawImage(image, 0, 0, 60, 50);
+          // // var dataURL = canvas.toDataURL();
+          // var dataURL = canvas.toDataURL('image/png');
+          // console.log(dataURL )
+          // console.log(dataURL.length)
+          // console.log(img_dataURL)
+
+
+          var buttonCommon = {
+              exportOptions: {
+                stripHtml: false,
+                  format: {
+                      body: function ( data, row, column, node ) {
+                          // Format options
+                          // if (column==3){
+                            // console.log(data)
+                            // data = JSON.stringify(data)
+                            // console.log(data + "====")
+                          // }
+                          return data
+                      }
+                  },
+              },
+                title: function(){
+                  return "{{group_name|slugify  }}"
+                },
+
+
+          };
+
+          data = {{data|safe}}
+          check_length = 0
+          submit_length = 0
+          // console.log(data)
+          column_headers = data["column_headers"];
+          students_data_set = data["students_data_set"];
+          dataTable_columns_set = [];
+
+          var students_points_table = '<table cellpadding="0" cellspacing="0" border="0" class="display" id="quiz-details-table-tbody">' + '</table>';
+          $(".table-container").html(students_points_table)
+          // Prepare title & data headers used in dataTable
+          $.each(column_headers, function(index, v) {
+            d = {};
+            d["data"] = v[0];
+            d["title"] = v[1];
+            dataTable_columns_set.push(d);
+          });
+          // Set defintion dataTable
+          sce_dt_var = $("#quiz-details-table-tbody").dataTable({
+            "data": data,
+            "columns": dataTable_columns_set,
+            "dom": 'Bfrtip',
+            "buttons": [
+              'pageLength', 
+                {
+                    extend: 'csvHtml5',
+                    title: function(){
+                      return "{{group_name|slugify}}" 
+                    } 
+                },
+                {
+                    extend: 'pdfHtml5',
+                    header : true,
+                    footer: true,
+
+                    customize: function ( doc ) {
+                        doc.pageMargins = [30,30,30,30];
+                        doc['footer']=(function(page, pages) {
+                            return {
+                                columns: [
+                                    'CLIx, Tata Institute of Social Sciences\nPowered by gStudio',
+                                    {
+                                        alignment: 'right',
+                                        text: ['Page ', { text: page.toString() },  ' of ', { text: pages.toString() }]
+                                    }
+                                ],
+                                margin: [10, 0]
+                            }
+                        });
+                        // doc.content.splice( 1, 0, {
+                        //     margin: [ 0, 0, 0, 5 ],
+                        //     alignment: 'left',
+                        //     image: dataURL
+                        // }),
+
+                        doc.styles.title = {
+                          margin: [ 20, 0, 0, 5 ],
+                          color: '#6e3254',
+                          fontSize: '22',
+                          fontWeight: 'bold',
+                          alignment: 'center'
+                        }
+                    },
+                    title: function(){
+                      return "{{group_name|slugify}}" 
+                    } 
+
+                }
+            ],
+            "columns": [
+                    {
+                        'name': 'first',
+                        'title': 'QUESTION',
+                    },
+                    {
+                        'name': 'second',
+                        'title': 'USER',
+                    },
+                    {
+                        'title': 'DATE - TIME',
+                    },
+                    {
+                        'title': 'RESPONSE  ',
+                    },
+                    // {
+                    //     'title': 'Datetime',
+                    // },
+                    // {
+                    //     'title': 'Answer',
+                    // },
+            ],
+            "rowsGroup": [
+                0,
+                1
+            ],
+
+            "autoWidth": false,
+            "createdRow": function (row, data, index) {
+              // console.log(data)
+              /*
+              $.each(data, function(key, quiz_dict){
+                $(row).find("td:nth-child(1)").html(key.toString());
+                $.each(quiz_dict, function(k,v){
+                  if(k === "check"){
+                    check_length = Object.keys(v).length
+                    $.each(v, function(checked_ans,checked_time){
+                        $(row).find("td:nth-child(3)").html(checked_ans);
+                        $(row).find("td:nth-child(4)").html(checked_time);
+
+                    })
+                  }
+                  else if(k === "submit"){
+                    submit_length = Object.keys(v).length
+                    $.each(v, function(submitted_ans,submitted_time){
+                        $(row).find("td:nth-child(5)").html(submitted_ans);
+                        $(row).find("td:nth-child(6)").html(submitted_time);
+                    })
+                  }
+
+                  // $(row).find("td:nth-child(2)").html(v.join(','));
+                })
+                alert(Math.max(check_length, submit_length))
+                $(row).attr('rowspan',Math.max(check_length, submit_length));
+
+              })
+              */
+
+            }
+          });
+          $(".group-analytics").removeClass("hide")
+          old_thead = $("#quiz-details-table-tbody").find("thead");
+          tr_ele = document.createElement("tr")
+          // tr_list = ["", "","Checked", "Submitted"]
+          tr_list = ["", "","DATA"]
+          $.each(tr_list, function(ind,val){
+            th_ele = document.createElement("th")
+            th_ele.textContent = val
+            if (val){
+              th_ele.colSpan = 2;
+            }
+            tr_ele.appendChild(th_ele)
+
+          })
+          $(old_thead).prepend(tr_ele)
+    })
+</script>

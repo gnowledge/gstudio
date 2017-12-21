@@ -1,0 +1,149 @@
+{% extends "ndf/base.html" %}
+{% load i18n %}
+{% load ndf_tags %}
+{% block title %} {{title}} {% endblock %}
+
+{% block help_content %}
+{% comment %}
+<h3>{% trans "About Quiz/QuizItem" %}</h3>
+<p class="text-justify">By <b>Quiz Item</b>, you can create a miscellaneous quiz-question. This quiz-question can be of, basically three types: <strong><i>short response, single-choice</i></strong> and <strong><i>multiple-choice</i></strong>.</p>
+
+<p class="text-justify">By <b>Quiz</b>, you can build a quiz having list of quiz-items. Quiz-Items can be added to quiz in two ways:
+  <ol  class="text-justify">
+   <li>By editing, Quiz node (via collection-list).</li>
+   <li>By using Quiz-Item button corresponding to the Quiz node (i.e. this will automatically add the quiz-item node to your quiz node).</li>
+ </ol>
+</p>
+
+{% endcomment %}
+{% endblock %}
+
+{% block style %}
+{{ block.super }}
+.quizitem_act{
+margin-left:1.5em;
+}
+{% endblock %}
+
+
+{% block meta_content %}
+{% check_is_gstaff group_id request.user as is_gstaff %}
+<h2 class="subheader">{% trans "Quiz" %}</h2>
+{% if is_gstaff %}
+<a href="{% url 'quiz_create' group_name_tag %}" title="Create New Quiz">Create New Quiz</a><br/>
+<a href="{% url 'quiz_item_create' group_name_tag %}" title="Create New Question">Create New Question</a>
+{% endif %}
+
+{% endblock %}
+
+{% block breadcrumb %} 
+{% endblock breadcrumb %}
+
+{% block body_content %} 
+{% check_is_gstaff groupid request.user as is_gstaff %}
+{% get_group_name groupid as group_name_tag %}
+<ul class="tabs" data-tab>
+  <li class="tab-title active">
+    <a href="#all_quiz"> {% trans 'Quiz' %}({{quiz_nodes.count}}) </a>
+  </li>
+  <li class="tab-title">
+    <a href="#all_questions"> {% trans 'Questions' %}({{quiz_item_nodes.count}}) </a>
+  </li>
+</ul>
+
+<br/>
+<div class="tabs-content row">
+  <div class="content active" id="all_quiz">
+
+    <div class="repository-title large-4 columns">All Quizzes </div><hr>
+
+    <section class="small-block-grid-1 medium-block-grid-2 large-block-grid-5" style="background-color:#fafafa;border-style:none">
+      {% for node in quiz_nodes %}
+      <li class="card-image-wrapper" style="margin-top:13px;margin-left:-10px"> 
+        {% include 'ndf/simple_card.html' with resource=node no_footer=True no_description=True url_name="quiz_details" first_arg=group_name_tag second_arg=node.pk %}
+      </li>
+      {% empty %}
+      <div class="row">
+        <div class="small-12 columns">
+          <h5> {% trans 'Currently there is no Quiz.' %}
+          </h5>
+        </div>
+      </div>
+      {% endfor %}
+    </section>
+  </div>
+  <div class="content" id="all_questions">
+    <div class="repository-title large-4 columns" >All Questions </div><hr>
+    <section class="small-block-grid-1 medium-block-grid-2 large-block-grid-5" style="background-color:#fafafa;border-style:none">
+      {% for quizitem_node in quiz_item_nodes %}
+      <div>
+        {{forloop.counter}}. {{quizitem_node.name}} .
+        <br/>
+        <div>
+          {% if is_gstaff or quizitem_node.created_by == request.user.id %}
+            <a href="{% url 'quiz_item_edit' group_id quizitem_node.pk %}" class="quizitem_act">{% trans 'Edit' %}</a> | 
+            <a href="#" data-dropdown="quiz_drop-{{quizitem_node.pk}}" aria-controls="quiz_drop-{{quizitem_node.pk}}" aria-expanded="false" class="inner" >{% trans "Translate" %} <i class="fa fa-chevron-down"></i></a> | 
+
+            <ul id="quiz_drop-{{quizitem_node.pk}}" data-dropdown-content class="f-dropdown" aria-hidden="true">
+            {% for each_lang in supported_languages %}
+              {% get_trans_node quizitem_node.pk each_lang as trans_node %}
+              {% if trans_node %}
+                <li><a href="{% url 'quiz_item_translate_edit' group_id quizitem_node.pk trans_node.pk each_lang %}" target="_blank">{{each_lang}}</a></li>
+              {% else %}
+                <li><a href="{% url 'quiz_item_translate_create' group_id quizitem_node.pk each_lang %}" target="_blank">{{each_lang}}</a></li>
+              {% endif %}
+            {% endfor %}
+            </ul>
+          {% endif %}
+          <a href="{% url 'quiz_item_detail' group_id quizitem_node.pk %}">{% trans 'Preview' %}</a>
+          <br/>
+          <small class="quizitem_act"><i>{% trans 'Created by: ' %}
+            <a href="{% url 'dashboard' quizitem_node.created_by %}" title="{{quizitem_node.created_by|get_username}}" target="_blank" >{{quizitem_node.created_by|get_username}}</a></i>
+          </small>
+        </div>
+      </div>
+      {% empty %}
+      <div class="row">
+        <div class="small-12 columns">
+          <h5> {% trans 'Currently there is no Question.' %}
+          </h5>
+        </div>
+      </div>
+      {% endfor %}
+    </section>
+
+  </div>
+
+</div>
+{% comment %}
+<!-- column-left for Quiz -->
+<div class="small-5 columns">
+  <h5>{% trans "Quiz" %}</h5>
+  {% if is_gstaff %}
+  <div class="small-4 columns">
+    <a href="{% url 'quiz_item_create' group_name_tag %}">
+      <input type="button" class="button small" style="float:right;" value="+ Add Quiz Item" />
+    </a>
+  </div>
+  {% endif %}
+</div>
+
+<!-- column-right for Quiz-Items -->
+<div class="small-7 columns" >
+  <h5>{% trans "Quiz Items" %}</h5>
+  {% for node in quiz_item_nodes %}
+  <div class="row" style="padding-left:8px;">
+    <div class="small-12 columns">
+      <label><strong><a href="{% url 'quiz_details' group_name_tag node %}">{{ node.html_content|safe|truncatewords:30 }}</a></strong></label>
+    </div>
+  </div>
+  {% empty %}
+  <div class="row">
+    <div class="small-12 columns">
+      <h5>{% trans "This group doesn't have any quiz-items." %}</h5>
+    </div>
+  </div>
+  {% endfor %}
+</div>
+{% endcomment %}
+{% endblock %}

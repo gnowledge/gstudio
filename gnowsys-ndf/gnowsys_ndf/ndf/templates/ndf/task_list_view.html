@@ -1,0 +1,170 @@
+<style>
+    .reveal-modal {
+        top:-1;
+    }
+</style>
+{% load i18n %}
+
+<div id="container">
+    <div id="myModal" class="reveal-modal" animation="None" data-reveal>
+    </div>
+</div>
+<br/>
+
+<div id="example" >
+    {% if TASK_inst %}
+    <table style="width:auto">
+        <thead>
+            <tr>
+        	{%for i in TASK_inst.0 %}
+            	{% if i != "id" and i != "collection" and i != "owner"   %}
+            	<th class="view" style="width:10000px">{{i}}</th>
+            	<input type='hidden' id='{{i}}' value='{{i}}'>
+            	{% endif %}
+        	{% endfor %}
+            	<th class="view" style="width:10000px"> </th>
+            	<th class="view" style="width:10000px"> </th>
+            </tr>
+        </thead>
+    	
+        <tbody>
+        {% for i in TASK_inst %}
+    		<tr id="view-row-{{i.id}}">
+            {% for j,v in i.items %}
+                {% if j != "id" and j != "collection" and j != "owner" %}
+                    {% if j == "Status" %}
+                        {% if i.collection %}
+
+                        <td class="view" ><a onClick="collection_overlay('{{i.id }}')" >{{v|default_if_none:" -- "}} ({% trans "Group Task" %}) </a></td>
+
+    	    
+                        {% else %}
+                        <td class="view" ><a href="{% url 'task_details' group_name i.id %}">{{v|default_if_none:" -- "}}  </a></td>
+                        
+                        {% endif %}
+    					             
+                    {% elif j == "start_time" or j = "end_time" %}
+                        <td class="view" ><a href="{% url 'task_details' group_name i.id %}" >{{v|default_if_none:""|date:"d/m/Y"}} </a></td>
+                    
+                    {% elif j == "Assignee" %}
+                        <td class="view" ><a href="{% url 'task_details' group_name i.id %}" >
+                        {% if v %}
+                        {{v|join:", "}}
+                        {% else %}
+                        {{v|default_if_none:" -- "}}
+                        {% endif %}
+                        </a></td>
+    		        
+                    {% else %}
+			            <td class="view" ><a href="{% url 'task_details' group_name i.id %}" >{{v|default_if_none:" -- "}}</a></td>
+                    
+                    {% endif %}
+    			{% endif %}
+            {% endfor %}
+
+    		{% if i.collection %}
+                <td>	</td>
+                <td>	</td>
+    		{% else %}
+                <td> <a class="tiny button" href="{% url 'task_edit' group_name i.id %}"> Update </td>						
+
+                {% if i.owner == "owner" %}
+                <td> <a class="tiny button" href="{% url 'delete_task' group_name i.id %}"> Delete </td>
+                {% else %}	
+                <td>	</td>				
+                {% endif %}
+    		{% endif %}
+    		</tr>	
+        {% endfor %}
+        </tbody>
+    </table>
+    {% else %}
+	<h2> {{send}}</h2>
+    {% endif %}
+
+    {% block data_review_pagination %}
+    {% if TASK_inst %}
+    	{% if page_info > 1 %}
+    		<div class="pagination-centered">
+    			<ul class="pagination" role="menubar" aria-label="Pagination">
+    				{% if page_info.num_pages < 11 %}
+    					{% for each_page in page_info.page_range %}
+    						{% if page_info.current_page == each_page %}
+    						<li class="current">
+    						{% else %}
+    						<li>
+    						{% endif %}
+    							
+    							<a onClick="updatefeild({{each_page}})"> {{ each_page }} </a>
+    						</li>
+    					{% endfor %}
+    				{% endif %}	
+    			</ul>
+    		</div>
+    	{% endif %}
+    {% endif %}
+    {% endblock %}
+</div>
+
+<script>
+    function updatefeild(oid) {
+        var aurl=""
+        if ('{{choice}}'==0) {
+            var task_id='{{task}}';
+            aurl = "{% url 'task_collection' group_name 'task_id' 'oid' %}".replace('oid',oid).replace('task_id',task_id);
+
+            $.ajax({
+                url:aurl,
+
+                type: "GET",
+
+                success: function(data) {
+                    $('#myModal').empty()
+                    $('#myModal').append(data)
+                    $('#myModal').foundation('reveal', 'open');
+                }
+            });
+        }
+
+        else {
+            aurl ="{% url 'filter' group_name choice status 'oid' %}".replace('oid',oid);
+            $.ajax({
+                url:aurl,
+
+                type: "GET",
+
+                success: function(data) {
+                    $("#example").html(data)      
+                }
+            });
+        }
+    }
+
+    function collection_overlay(oid) {
+        $.ajax({
+            url:"{% url 'task_collection' group_name 'oid' '1' %}".replace('oid',oid),
+
+            type: "GET",
+
+            success: function(data) {
+                $('#myModal').empty()
+                $('#myModal').append(data)
+                $('#myModal').append( '<a class="close-reveal-modal"  data-reveal-id="myModal" >&#215;</a>')
+                $('#myModal').foundation('reveal', 'open');
+            }
+        });
+    }
+
+    function editResRow(oid) {
+        var id=String(oid);
+    	document.getElementById("list-btn-"+id).style.visibility="visible";
+    	document.getElementById("button").style.visibility="visible";
+    	$("div[id='edit-btn-" + String(id) +"']").fadeOut(0);
+    	$("div[id='list-btn-" +String(id) +"']").fadeIn(0);
+    }
+</script>
+
+
+
+
+

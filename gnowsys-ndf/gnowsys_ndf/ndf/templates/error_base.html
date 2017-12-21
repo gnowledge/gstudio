@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+
+{% load i18n %}
+{% load get_site_variables from ndf_tags %}
+{% get_site_variables as site %}
+
+<html>
+<head>
+
+	<meta charset="utf-8">
+	<meta http-equiv="X-UA-Compatible" content="IE=edge">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<meta name="description" content="">
+
+	<title>{% block error_title %}{% endblock %}</title>
+	
+	<script src="/static/ndf/js/app.js"></script> 
+
+	<link rel="shortcut icon" href="/static/ndf/images/favicon/logo.png"> 
+	
+	<!-- Foundation 5 - Responsive CSS Framework http://foundation.zurb.com/docs/css.html-->
+	<link rel="stylesheet" href="/static/ndf/bower_components/foundation/css/normalize.css"> 
+	<link rel="stylesheet" href="/static/ndf/css/themes/metastudio/styles.css"> 
+
+	<!-- Foundation Icon Font http://zurb.com/playground/foundation-icon-fonts-3 -->
+	<link rel="stylesheet" href="/static/ndf/bower_components/foundation-icon-fonts/foundation-icons.css"> 
+
+	<style type="text/css">
+
+		body > footer{
+			position: absolute;
+			bottom: 0;
+			width: 100%;
+		}
+
+		.bk-image {
+		    position: absolute;
+		    top: 0%;
+		    left: 12%;
+		    color: gray;
+		    font-size: 20em;
+		    z-index: -1;
+		    opacity: 0.5;
+		    -ms-transform: rotate(25deg); /* IE 9 */
+		    -webkit-transform: rotate(25deg); /* Chrome, Safari, Opera */
+		    transform: rotate(-25deg);
+		}
+
+	</style>
+
+</head>
+<body>
+
+    <nav class="top-bar drop-shadow row" data-topbar role="navigation">
+
+		<ul class="title-area ">
+
+		<li class="name">
+		    <h1>
+		      <a href="/home/" class="group" accesskey="q" id="home-group">
+		      	<img src="{{site.LOGO}}" style="height:45px;">
+		      </a>
+		    </h1>
+		</li>
+
+		<li class="toggle-topbar menu-icon">
+		  <a href="#">{% trans "Menu" %}</a>
+		</li>
+
+		</ul>
+    </nav>
+
+    <div class="bk-image">
+    	<i class="fi-paw"></i>
+    </div>
+
+    <br/>
+    <br/>
+
+	<div class="text-center">
+		{% block error_body_text %}	
+			{% if message %}
+				<h2>{{message}}</h2>
+				<br/>
+				<a href="javascript:window.history.back();">
+					{% trans "Click here to go back" %}
+				</a>
+			{% endif %}
+		{% endblock %}
+	</div>
+
+	{% include "ndf/footer.html" with site=site %} 
+
+	<script type="text/javascript">
+
+        try{
+			// function defined in app.js to check the font and load it asynchronously.
+			checkOpenSansFont();
+        }
+        finally{
+        }
+
+	</script>
+
+</body>
+</html>

@@ -1,0 +1,76 @@
+{% load i18n %}
+{% load get_latest_git_hash from simple_filters %}
+{% load get_pages from ndf_tags %}
+
+{% get_pages "Info page" as infopages %}
+<footer>
+    <div class="myfooter">
+    <div class="footer-section container content-section">
+        <div class="row" style="padding-left:0px;">
+            <div class="footer_content">
+                <img class="footer-logo" title="{{site.SITE_NAME}}" src="{{site.LOGO}}">
+                <br>
+                <ul>
+                    <li>
+                        {% get_latest_git_hash as git_commit_hash %}
+                        <strong>Powered by <a href="https://gitlab.com/gnowledge/gstudio/tree/{{git_commit_hash}}" target="_blank">gstudio </a> built at Gnowledge Lab,</strong>
+                    </li>
+                    <li>
+                        <strong><a href="http://www.hbcse.tifr.res.in/" target="_blank">Homi Bhabha Centre for Science Education</a>, <a href="http://www.tifr.res.in/" target="_blank">TIFR</a>.</strong>
+                    </li>
+                </ul>
+            </div>
+
+            <!--  -->
+            <div style="display:block;clear:both;">
+                <div class="footer_link_cont">
+                    <h4 style="color: #999;">Quick Links</h4>
+                    <div class="links_collapse">
+                        <ul>
+                            <li><a href="{{site.ABOUT}}">{% trans "About" %}</a></li>
+                            <li><a href="{{site.PARTNERS}}">{% trans "Partners" %}</a></li>
+                            <li><a href="{{site.GROUPS}}">{% trans "Groups" %}</a></li>
+                            <li><a href="{{site.TERMS_OF_SERVICE}}">{% trans "Terms of Service" %}</a></li>
+                            <li><a href="{{site.PRIVACY_POLICY}}">{% trans "Privacy Policy" %}</a></li>
+                            <li><a href="{{site.CONTRIBUTE}}">{% trans "Contribute" %}</a></li>
+                            <li><a href="{{site.CONTACT}}">{% trans "Contact" %}</a></li>
+                            <!--
+                            <li><a href="https://gitlab.com/gnowledge/gstudio/issues">{% trans "Issues" %}</a></li>
+                            -->
+                            <li><a href="{{site.ISSUES_PAGE}}">{% trans "Feedback" %}</a></li>
+                        </ul>
+                    </div>
+                    <div class="show_foot_links">Show More</div>
+                </div>
+                <div class="footer_link_cont">
+                    <h4 style="color: #999;">Info pages</h4>
+                    <div class="links_collapse">
+                        <ul>
+                            {% for infopage in infopages %}
+                                <li><a href="{% url 'page_details' group_name_tag infopage %}">{% trans infopage.name %}</a></li>
+                            {% endfor %}
+                        </ul>
+                    </div>
+                    <div class="show_foot_links">Show More</div>
+                </div>
+            </div>
+            <!-- ****** -->
+        </div>
+    </div>
+    </div>
+</footer>
+<script>
+    $(document).ready(function(){
+        $('.show_foot_links').click(function(){
+            var col = $(this).parent().find('.links_collapse');
+            if(col.hasClass('links_show')){
+                col.removeClass('links_show');
+                $(this).text('Show More');
+            }
+            else{
+                col.addClass('links_show');
+                $(this).text('Show Less');
+            }
+        });
+    });
+</script>

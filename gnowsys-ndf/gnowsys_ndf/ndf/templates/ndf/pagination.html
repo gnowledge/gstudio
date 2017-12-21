@@ -1,0 +1,265 @@
+<!-- 
+{% comment %}
+=================================| How to use this mongokit pagination template |===============================
+
+1. 	In the template:
+	
+	I.	Just include this template into your template
+		Example:
+		{% include 'ndf/pagination.html' with urlname="data_review_page" first_arg=group_name_tag second_arg="" third_arg="" %}
+			
+		parameters:
+			urlname - this is the name of your url
+			first_arg, second_arg, third_arg - these are sequenced arguments needed by your url (and then view).
+
+	II.	Fill the variables that required by your URL. Leave others as empty ("") shown in the above example.
+
+	III.For template reference please check gnowsys_ndf.ndf.templates.ndf.data_review.html
+
+	IV.	For url reference please check url with name="data_review_page" in gnowsys_ndf.ndf.urls.file
+
+
+2.	In the views:
+
+	I.	from mongokit import paginator
+
+	II.	page_info = paginator.Paginator(<mongocursor: your_cursor_obj>, <int: page_no>, <int: no_of_objects_per_page>)
+
+	III.Along with other data variables send "page_info".
+
+	IV.	For reference please check gnowsys_ndf.ndf.views.file.data_review
+
+===================================================================================================================
+{% endcomment %}
+ -->
+
+{% if page_info.num_pages > 1 %}
+
+	<div class="pagination-centered">
+		<ul class="pagination" role="menubar" aria-label="Pagination">
+			
+			{% if page_info.num_pages < 11 %}
+			
+
+				{% for each_page in page_info.page_range %}
+
+					{% if page_info.current_page == each_page %}
+						<li class="current">
+					{% else %}
+						<li>
+					{% endif %}
+					
+					{% if third_arg %}
+						<a href="{% url urlname first_arg second_arg third_arg each_page %}"> {{ each_page }} </a>
+					{% elif second_arg %}
+						<a href="{% url urlname first_arg second_arg each_page %}"> {{ each_page }} </a>
+					{% elif first_arg %}
+						<a href="{% url urlname first_arg  each_page %}"> {{ each_page }} </a>	
+					{% else %}
+						<a href="{% url urlname  each_page %}"> {{ each_page }} </a>
+					{% endif %}
+
+					</li>
+
+				{% endfor %}
+			
+			{% else %}
+
+				{% if page_info.has_previous %}
+
+					<!-- for  << previous  text -->
+					<li class="arrow">
+
+					{% if third_arg %}
+						<a href="{% url urlname first_arg second_arg third_arg page_info.previous_page %}"> &laquo; Previous </a>
+					{% elif second_arg %}
+						<a href="{% url urlname first_arg second_arg page_info.previous_page %}"> &laquo; Previous </a>
+
+					{% elif first_arg %}
+						<a href="{% url urlname first_arg page_info.previous_page %}"> &laquo; Previous </a>
+					{% else %}
+						<a href="{% url urlname page_info.previous_page %}"> &laquo; Previous </a>
+					{% endif %}
+
+					</li>
+
+					<!-- for page 1, page 2 and ... -->
+					{% if page_info.previous_page|add:"-2" != 1 and page_info.previous_page|add:"-2" > 0 %}
+
+					{% if third_arg %}
+						<li><a href="{% url urlname first_arg second_arg third_arg 1 %}"> 1 </a></li>
+						<li><a href="{% url urlname first_arg second_arg third_arg 2 %}"> 2 </a></li>
+					{% elif second_arg %}
+						<li><a href="{% url urlname first_arg second_arg 1 %}"> 1 </a></li>
+						<li><a href="{% url urlname first_arg second_arg 2 %}"> 2 </a></li>
+					{% elif first_arg %}
+						<li><a href="{% url urlname first_arg 1 %}"> 1 </a></li>
+						<li><a href="{% url urlname first_arg 2 %}"> 2 </a></li>
+					{% else %}
+						<li><a href="{% url urlname  1 %}"> 1 </a></li>
+						<li><a href="{% url urlname  2 %}"> 2 </a></li>
+					{% endif %}
+
+						<li class="unavailable" aria-disabled="true"><span class="subheader">&hellip;</span></li>
+					{% endif %}
+		
+					<!-- for previous page -->
+					<li>
+
+					{% if third_arg %}
+						<a href="{% url urlname first_arg second_arg third_arg page_info.previous_page %}">
+							{{ page_info.previous_page }}
+						</a>
+					{% elif second_arg %}
+						<a href="{% url urlname first_arg second_arg page_info.previous_page %}">
+							{{ page_info.previous_page }}
+						</a>
+					{% elif first_arg %}
+						<a href="{% url urlname first_arg page_info.previous_page %}">
+							{{ page_info.previous_page }}
+						</a>
+					{% else %}
+						<a href="{% url urlname  page_info.previous_page %}">
+							{{ page_info.previous_page }}
+						</a>
+					{% endif %}
+
+					</li>
+
+				{% endif %}
+
+
+				<!-- for current page -->
+				<li class="current">
+					{% if third_arg %}
+						<a href="{% url urlname first_arg second_arg third_arg page_info.current_page %}">
+							{{ page_info.current_page }}
+						</a>
+					{% elif second_arg %}
+						<a href="{% url urlname first_arg second_arg page_info.current_page %}">
+							{{ page_info.current_page }}
+						</a>
+					{% elif first_arg %}
+						<a href="{% url urlname first_arg page_info.current_page %}">
+							{{ page_info.current_page }}
+						</a>
+					{% else %}
+						<a href="{% url urlname  page_info.current_page %}">
+							{{ page_info.current_page }}
+						</a>
+					{% endif %}
+				</li>
+				
+
+				{% if page_info.has_next %}
+
+					<!-- for next page -->
+					
+					<li>
+						{% if third_arg %}
+							<a href="{% url urlname first_arg second_arg third_arg page_info.next_page %}">
+								{{ page_info.next_page }}
+							</a>
+						{% elif second_arg %}
+							<a href="{% url urlname first_arg second_arg page_info.next_page %}">
+								{{ page_info.next_page }}
+							</a>
+						{% elif first_arg %}
+							<a href="{% url urlname first_arg page_info.next_page %}">
+								{{ page_info.next_page }}
+							</a>
+						{% else %}
+							<a href="{% url urlname  page_info.next_page %}">
+								{{ page_info.next_page }}
+							</a>
+						{% endif %}
+					</li>
+
+
+					{% if page_info.next_page != page_info.num_pages %}
+						
+						{% if page_info.next_page != page_info.num_pages|add:"-1" %}
+
+							<!-- for .... -->
+							{% if page_info.next_page != page_info.num_pages|add:"-2" %}
+								<li class="unavailable" aria-disabled="true"><span class="subheader">&hellip;</span></li>
+							{% endif %}
+			
+							<!-- for secondlast page -->
+						
+							<li>
+								{% if third_arg %}
+									<a href="{% url urlname first_arg second_arg third_arg page_info.num_pages|add:'-1' %}">
+										{{ page_info.num_pages|add:'-1' }}
+									</a>
+								{% elif second_arg %}
+									<a href="{% url urlname first_arg second_arg page_info.num_pages|add:'-1' %}">
+										{{ page_info.num_pages|add:'-1' }}
+									</a>
+								{% elif first_arg %}
+									<a href="{% url urlname first_arg page_info.num_pages|add:'-1' %}">
+										{{ page_info.num_pages|add:'-1' }}
+									</a>
+								{% else %}
+									<a href="{% url urlname  page_info.num_pages|add:'-1' %}">
+										{{ page_info.num_pages|add:'-1' }}
+									</a>
+								{% endif %}
+							</li>
+
+
+						{% endif %}
+						
+						<!-- for last page -->
+					
+						<li>
+							{% if third_arg %}
+								<a href="{% url urlname first_arg second_arg third_arg page_info.num_pages %}">
+									{{ page_info.num_pages }}
+								</a>
+							{% elif second_arg %}
+								<a href="{% url urlname first_arg second_arg page_info.num_pages %}">
+									{{ page_info.num_pages }}
+								</a>
+							{% elif first_arg %}
+								<a href="{% url urlname first_arg page_info.num_pages %}">
+									{{ page_info.num_pages }}
+								</a>
+							{% else %}
+								<a href="{% url urlname  page_info.num_pages %}">
+									{{ page_info.num_pages }}
+								</a>
+							{% endif %}
+						</li>
+
+					{% endif %}
+
+					<!-- for text Next >> -->
+
+					<li>
+						{% if third_arg %}
+							<a href="{% url urlname first_arg second_arg third_arg page_info.next_page %}">
+								Next &raquo;
+							</a>
+						{% elif second_arg %}
+							<a href="{% url urlname first_arg second_arg page_info.next_page %}">
+								Next &raquo;
+							</a>
+						{% elif first_arg %}
+							<a href="{% url urlname first_arg page_info.next_page %}">
+								Next &raquo;
+							</a>
+						{% else %}
+							<a href="{% url urlname  page_info.next_page %}">
+								Next &raquo;
+							</a>
+						{% endif %}
+					</li>
+
+				{% endif %}
+
+			{% endif %}
+		</ul>
+	</div>
+
+{% endif %}

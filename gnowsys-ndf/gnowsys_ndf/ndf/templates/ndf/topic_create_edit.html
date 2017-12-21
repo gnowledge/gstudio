@@ -1,0 +1,764 @@
+
+{% load ndf_tags %}
+{% load i18n %}
+
+<style>
+
+.divider-line { font-size: xx-large; color:lightgray; }
+.line-height-2 { line-height:2; }
+.line-height-2pt5 { line-height:2.5; }
+.fontsize-x-large { font-size: x-large; }
+
+.margin-0 { margin: 0 !important ;}
+
+.resource-drawer { 
+border-color: #D3D3D3; border-style: solid; 
+padding: 0 !important; 
+overflow-y: auto;
+}
+
+.resource-drawer li.bullet-item:hover{
+background-color: #ecf0f1; cursor:pointer;
+}
+
+.posted-by{ color: #808080; font-size: small; }
+
+.selected-resource { background-color:lightgray !important ; }
+
+.resource-type-image {
+height:40px; 		
+background-repeat:no-repeat; background-size: 48px 48px
+}
+
+</style>
+
+<form data-abide id="form-edit-node" method="POST" action="">
+
+	<header class="row">
+
+    <h2 class="medium-12 columns">
+		{% if node %}
+		{% with node.name as node_name %}{% trans "Editing "%}{{title}}: {{node_name}}{% endwith%}
+		{% else %}
+		{% trans "Create a New "%} {{title}} 
+		{% endif %}
+    </h2>
+
+    <nav class="medium-12 columns">
+   		<dl class="tabs" data-tab data-options="deep_linking:true">
+		{% if node %}
+			<dd><h3>{% trans "View:" %}</h3></dd>
+		
+			<dd class="active" title="Click here to add Name, Description, Privacy and Tags">
+		  	<!-- change name of collection tab overide block in your code -->
+		  		<a href="#panel-name-description"> {{title}} </a>
+			</dd>
+			<dd title="Click here to add/edit collection">
+  			<a href="#panel-collection" class="collection_tab">{% trans "Collection" %} </a> 
+			</dd>
+			<!-- change name of metadata tab overide block in your code -->
+			<dd title="Click here to add/edit metadata">
+ 			<a href="#panel-metadata" > {% trans "Metadata" %} </a> 
+			</dd> 
+			<dd title="Click here to add/edit requires">
+ 			<a href="#panel-prior-node" class="prior_node_tab" >{% trans "Requires" %} </a> 
+			</dd>
+			<dd title="Click here to add/edit assesses">
+ 			<a href="#panel-assesses " class="assesses_tab" >{% trans "Assesses" %} </a> 
+			</dd>
+			<dd title="Click here to add/edit teaches">
+ 			<a href="#panel-teaches" class="teaches_tab" >{% trans "Teaches" %} </a> 
+			</dd>			  
+		{% endif %}
+     	</dl>
+  	</nav>
+  	</header>
+
+  	{% csrf_token %}
+
+  	<div id="node-details-edit-div" class="tabs-content" > 
+  		{% if node %}
+
+  		<!-- Block Description -->
+		<div class="active content row" id="panel-name-description">
+	  		<div class="medium-6 columns">
+
+				<div class="row">
+		  			<div class="medium-8 columns">
+		    			<label>{{title}} {% trans "Name" %} </label>
+		    			<input id="name_id" name="name" type="text" value="{{node.name}}" placeholder="Enter name..." required>
+		    			<small class="error">{% trans "Please give your page a descriptive name. It's helpful for others and for yourself." %}</small>
+		  			</div>
+
+		  			<div class="medium-4 columns">
+		    			{% if node.created_by == request.user.pk %}		    	
+							<span data-tooltip class="has-tip" title="Public pages can be viewed and edited by any group member, while private pages are only for you"><label>{% trans "Privacy" %}</label></span>
+
+							<div class="privacy-mode switch round">
+							{% if node.access_policy == "PUBLIC" or node.group_type == "PUBLIC" %}
+								<input id="PUBLIC" name="login-mode" value="PUBLIC" type="radio" checked>
+								<label for="PUBLIC" onclick="">{% trans "Public" %} <i class="fi-torsos-all"></i></label>
+
+								<input id="PRIVATE" name="login-mode" value="PRIVATE" type="radio">
+								<label for="PRIVATE" onclick="">{% trans "Private" %} <i class="fi-lock"></i></label>
+							{% else %}
+								{% if node.access_policy == "PRIVATE" or node.group_type == "PRIVATE" %}
+									<input id="PUBLIC" name="login-mode" value="PUBLIC" type="radio" >
+									<label for="PUBLIC" onclick="">{% trans "Public" %} <i class="fi-torsos-all"></i></label>
+
+									<input id="PRIVATE" name="login-mode" value="PRIVATE" type="radio" checked>
+									<label for="PRIVATE" onclick="">{% trans "Private" %} <i class="fi-lock"></i></label>
+								{% endif %}
+							{% endif %}
+								<span></span>
+							</div>
+
+						{% endif %}	    
+		  			</div>
+				</div>
+
+				<div id="message" style="display:none; color:red"></div>
+
+				<div class="row">
+		  
+		  			<div class="large-6 columns"><label>{% trans "Language" %}<select name="lan">
+                                              {% get_language_info_list for LANGUAGES as languages %}
+					      {% for language in languages %}
+					      
+                                              <option value="{{language.code}}">{{language.name}}</option></select></label>
+		     		</div>
+
+		  			<div class="large-6 columns" style="padding: 1.8em;">
+		  				<a href="#view-map-edit-widget" data-reveal-id="view-map-edit-widget" title="Click to add location markers">
+		  					<i class="fi-marker"></i> &nbsp; {% trans "Add Location" %}
+		  				</a>
+		  			</div>
+				</div>
+
+				<div class="row">
+		  			<div class="medium-12 columns">
+					 {% include "ndf/add_editor.html" with var_name="content_org" var_placeholder="Enter the content here" var_value=node.content_org|default_if_none:"" node_id=node.pk%}
+		  			</div>
+				</div>
+
+				<div class="row">
+		  			<div class="medium-12 columns">
+		    			<span data-tooltip class="has-tip" title="Tags help identify similiar work easily. You can add as many labels as you wish using a comma ','"><label>Tag{{node.tags|pluralize|default_if_none:"s"}}</label>
+		    			</span>
+		    			<input id="tags_id" name="tags" type="text" value="{{node.tags|join:', '|default_if_none:""}}" placeholder="Separate tags with commas...">
+		  			</div>		
+				</div>
+
+	  		</div>
+		</div>
+
+
+	    {% else %}
+	    	<!-- Block Description -->
+	    	<div class="active content row" id="panel-name-description">
+	      		<div class="medium-6 columns">
+		
+				<div class="row">
+		  			<div class="medium-8 columns">
+		    			<label>{{title}} {% trans "Name" %} </label>
+		    			<input id="name_id" name="name" type="text" placeholder="Enter name..." required>
+		    			<small class="error">{% trans "Please give your page a descriptive name. It's helpful for others and for yourself." %}</small>
+		  			</div>
+
+		  			<div class="medium-4 columns">
+		    			
+						<span data-tooltip class="has-tip" title="Public pages can be viewed and edited by any group member, while private pages are only for you"><label>{% trans "Privacy" %}</label></span>
+						<div class="privacy-mode switch round">
+					
+							<input id="PUBLIC" name="login-mode" value="PUBLIC" type="radio" checked>
+							<label for="PUBLIC" onclick="">{% trans "Public " %} <i class="fi-torsos-all"></i></label>
+
+							<input id="PRIVATE" name="login-mode" value="PRIVATE" type="radio">
+							<label for="PRIVATE" onclick="">{% trans "Private" %}  <i class="fi-lock"></i></label>
+						
+							<span></span>
+						</div>
+
+		  			</div>
+				</div>
+
+				<div id="message" style="display:none; color:red"></div>
+
+				<div class="row">
+		  
+		  			<div class="large-6 columns"><label>{% trans "Language" %}<select name="lan">
+                                        {% get_language_info_list for LANGUAGES as languages %}
+					{% for language in languages %}
+					<option value="{{language.code}}">{{language.name}}</option></select></label>
+		     		</div>
+
+		  			<div class="large-6 columns" style="padding: 1.8em;">
+		  				<a href="#view-map-edit-widget" data-reveal-id="view-map-edit-widget" title="Click to add location markers">
+		  					<i class="fi-marker"></i> &nbsp; {% trans "Add Location" %}
+		  				</a>
+		  			</div>
+				</div>
+
+				<div class="row">
+		  			<div class="medium-12 columns">
+					        {% include "ndf/add_editor.html" with var_name="content_org" var_placeholder="Enter the content here" %}
+					</div>
+				</div>
+
+				<div class="row">
+		  			<div class="medium-12 columns">
+		    			<span data-tooltip class="has-tip" title="Tags help identify similiar work easily. You can add as many labels as you wish using a comma ','"><label>{% trans "Tag" %}</label>
+		    			</span>
+		    			<input id="tags_id" name="tags" type="text" placeholder="Separate tags with commas...">
+		  			</div>		
+				</div>
+		
+	      		</div>
+  			</div>
+
+	    {% endif %}
+
+	    {% block collection %}
+
+	    <div class="content" id="panel-collection" style="width:95%;">
+	      <div class="row">
+		<div class="small-12 columns">
+		  <h5>{% trans "Add or edit Collection: " %} </h5>
+		</div>				
+		<br/><br/>
+		
+		<div class="small-12 columns" {% ifequal title "Quiz" %}style="display:none;"{% endifequal %}>
+		  <div id="SelectApp" class="row">
+		    <div class="small-2 columns line-height-2pt5">
+		      {% trans "Classify by:" %}
+		    </div>
+		    <div class="small-2 columns">
+		      <input type="radio" name="col" value="Page"/>
+		      {% trans "Page" %} <span class="divider-line">|</span>
+		      <span class="fontsize-x-large"><i class="step fi-page-filled"></i></span>
+		    </div>
+		    <div class="small-2 columns">
+		      <input type="radio" name="col" value="File" />
+		      {% trans "File" %} <span class="divider-line">|</span>
+		      <span class="fontsize-x-large"><i class="step fi-page-multiple"></i></span>
+		    </div>
+		    <div class="small-2 columns">
+		      <input type="radio" name="col" value="Image" />
+		      {% trans "Image" %} <span class="divider-line">|</span>
+		      <span class="fontsize-x-large"><i class="step fi-photo"></i>
+		      </span>
+		    </div>
+		    <div class="small-2 columns">
+		      <div class="row">
+		      <input type="radio" name="col" value="Video" />
+		      {% trans "Video" %} <span class="divider-line">|</span>
+		      <span class="fontsize-x-large"><i class="step fi-video"></i>
+		      </span>
+		      </div>
+		      <div class="row">
+		      <input type="radio" name="col" value="Pandora Video" />
+		      {% trans "Pandora" %} <span class="divider-line">|</span>
+		      <span class="fontsize-x-large"><i class="step fi-video"></i>
+		      </span>
+		      </div>
+		    </div>
+		    <div class="small-2 columns">
+		      <input type="radio" name="col" value="QuizObj" />
+		      {% trans "Quiz" %} <span class="divider-line">|</span>
+		      <span class="fontsize-x-large"><i class="step fi-pencil"></i>
+		      </span>
+		    </div>
+		  </div>
+		</div>
+		
+		<div class="small-12 columns">
+		  <div id="collection_drawer" >
+		    <!-- {#% edit_drawer_widget "collection" groupid node title %#} -->
+		  </div>
+		</div>
+	      </div>
+	    </div>
+
+	    {% endblock %}
+    	  <!-- this is for requires -->
+          <div class="content" id="panel-teaches"  style="width:95%;">
+      		<div class="row">
+			<div class="small-12 columns">
+	  		<h5>{% trans "Add or edit Teaches: " %} </h5>
+			</div>
+		<br/>
+	
+			<div class="small-12 columns">
+	  		<div id="teaches_drawer">
+	    <!-- {#% edit_drawer_widget "prior_node" groupid node title %#} --> 
+	  		</div>
+			</div>
+      		</div>
+    	</div>
+	
+	 <div class="content" id="panel-prior-node"  style="width:95%;">
+      		<div class="row">
+			<div class="small-12 columns">
+	  		<h5>Add or edit Requires: </h5>
+			</div>
+		<br/>
+	
+			<div class="small-12 columns">
+	  		<div id="prior_node_drawer">
+	    <!-- {#% edit_drawer_widget "prior_node" groupid node title %#} --> 
+	  		</div>
+			</div>
+      		</div>
+    	</div>
+	<div class="content" id="panel-assesses"  style="width:95%;">
+      		<div class="row">
+			<div class="small-12 columns">
+	  		<h5>Add or edit Assesses:  </h5>
+			</div>
+		<br/>
+	
+			<div class="small-12 columns">
+	  		<div id="assesses_drawer">
+	    <!-- {#% edit_drawer_widget "prior_node" groupid node title %#} --> 
+	  		</div>
+			</div>
+      		</div>
+       </div>
+
+	 <div class="content" id="panel-metadata" style="width:95%;" >
+      
+      <div class="row">
+	  <h3>Add or edit Metadata - Please spend a few minutes </h3>
+        
+
+        <div class="small-5 columns">
+         <h5>Age Range:</h5>  <input id="age_range" name="age_range" type="text" value="{{node.age_range}}"  >
+        
+         <h5>Target Audience: </h5> <input name="audience" type="text" value="{{node.audience}}"  >
+         <label><h5>Time Required: </h5> <select name="timerequired" value="{{node.timerequired}}"><option>0-2M</option><option>2-5M</option><option>5-15M</option><option>15-45M</option></select></label>
+         <label><h5>Interactivity Type: </h5> <select name="interactivitytype "><option>Active</option><option>Mixed</option><option>Expositive</option></select></label>
+         <label><h5>Based on Url: </h5> <input name="basedonurl" type="text" value="{{node.basedonurl}}"  ></label>
+         <label><h5>Educational Use: </h5> <input name="educationaluse" type="text" value="{{node.educationaluse}}" placeholder="" ></label>
+        </div>
+
+	 <div class="small-5 columns">
+	  <h5>Text Complexity</h5>  <input  name="textcomplexity" type="text" value="{{node.textcomplexity}}" placeholder="" >
+        
+         <h5>Reading Level: </h5> <input name="readinglevel" type="text" value="{{node.readinglevel}}" placeholder="" >
+         
+         <h5>Educational Subject: </h5> <input name="educationalsubject" type="text" value="{{node.educationalsubject}}" placeholder="" >
+         <h5>Educational Level: </h5> <input name="educationallevel" type="text" value="{{node.educationallevel}}" placeholder="" >
+        </div>
+      </div>
+        
+	
+    </div>  
+
+    </div>  <!--final div -->
+
+	{% block add_fields %} {% endblock %}
+  		
+  	<div class="row" >
+    	<input type="submit" id="save-node" value="Save as Draft And Preview" class="button medium-6 columns"/>
+  	</div>
+
+  	<!-- Overlay: Map Widget -->
+    <div class="content reveal-modal graph-div" id="view-map-edit-widget" data-reveal>    
+      
+  		<a class="close-reveal-modal" >&#215;</a>
+        {% include "ndf/map_widget.html" with mode="edit" %}
+    </div>
+
+    <input type="hidden" id="nodes_list" value="{{nodes_list}}">	
+    <input type="hidden" id="parent_nodes_list" value="{{parent_nodes_collection}}">						
+</form>
+
+<script type="text/javascript">
+
+	$(document).ready(function(){
+		$("#name_id").change(function(){
+
+			var name = $("#name_id").val();
+			var nodes = $("#nodes_list").val();
+			var parent_nodes = $("#parent_nodes_list").val();
+
+			if (nodes.indexOf(name) > 0)  
+			{
+				alert("Theme name '"+ name +"' already exist .. Please choose another name");
+				$("#name_id").val("");
+			}
+			if (parent_nodes.indexOf(name) > 0)  
+			{
+				alert("Theme name '"+ name +"' already exist .. Please choose another name");
+				$("#name_id").val("");
+			}
+
+		});
+
+	});
+
+
+	$("input:radio").click(function() {
+
+		cn_arr = []
+
+		$(".node_id").each(function (){
+			if ($(this).parent(".bullet-item").parent("#collection_drawer2").attr("id") == "collection_drawer2") {
+				cn_arr.push($(this).val());
+			}
+		});
+
+		var cn_list = cn_arr.join(',');
+		var homo_coll = this.value;
+		$("#save-node").hide();
+		
+		$.ajax({
+			type: "POST",
+			url: "{% url 'select_drawer' groupid %}",
+			datatype: "html",
+			data:{
+				homo_collection: homo_coll,
+				collection_list: cn_list,
+				node_id: '{{node.pk}}',
+				page_no: 1,
+				csrfmiddlewaretoken: '{{ csrf_token }}'
+			},
+			success: function cnt(data) {
+				
+				if ($.trim(data) === "Warning") {
+
+					var r = confirm("Please save the element before going ahead\nDo you want to save ?");
+		            if (r == true){
+
+		            	$.ajax({
+							type: "POST",
+							url: "{% url 'select_drawer' groupid %}",
+							datatype: "html",
+							data:{							
+								homo_collection: homo_coll,
+								collection_list: cn_list,
+								node_id: '{{node.pk}}',
+								selection_save: "True",
+								page_no: 1,
+								csrfmiddlewaretoken: '{{ csrf_token }}'
+							},
+							success: function(data) {													
+								// cnt(data)
+								alert("Saved element in collection Successfully");
+								$("input:radio").prop('checked', false);
+								$(".collection_tab").trigger('click');
+								// location.reload(true);
+							}
+
+						});
+		            }
+		            else{
+
+		            	$("input:radio").prop('checked', false);
+						$(".collection_tab").trigger('click');
+		            }
+
+		        }
+		        else{
+
+		        	$("#collection_drawer").html(data);
+				
+					$(".next_prev").click(function() {
+						
+						// alert(this.name);
+					 	$.ajax({
+							type: "POST",
+							url: "{% url 'select_drawer' groupid %}",
+							datatype: "html",
+							data:{							
+								homo_collection: homo_coll,
+								collection_list: cn_list,
+								node_id: '{{node.pk}}',
+								page_no: this.name,
+								csrfmiddlewaretoken: '{{ csrf_token }}'
+							},
+							success: function(data) {													
+								cnt(data)
+							}
+
+						});
+					});
+
+		        }
+
+
+				
+			}
+		});
+
+	});
+
+	$(".collection_tab").click(function() {
+
+		$("#SelectApp").css("display", "none");
+		$("#save-node").css("display", "none");
+		$('#collection_drawer').html('<img src="/static/ndf/images/ajax-wait.gif" height="40" width="40"> loading...');
+
+		$.ajax({
+			type: "POST",
+			url: "{% url 'drawer_widget' groupid %}",
+			datatype: "html",
+			data:{
+				node_id: '{{node.pk}}',
+				field: "collection",
+				app:"{{title}}",
+				page_no: 1,
+				csrfmiddlewaretoken: '{{ csrf_token }}'
+			},
+			success: function cnt(data) {
+
+				$("#collection_drawer").html(data);
+				$("#module_drawer").html(data);
+				$("#SelectApp").css("display", "block");				
+				$("#save-node").css("display", "block");
+
+				$(".next_prev").click(function() {
+					
+					// alert(this.name);
+				 	$.ajax({
+						type: "POST",
+						url: "{% url 'drawer_widget' group_id %}",
+						datatype: "html",
+						data:{							
+							field: "collection",
+							node_id: '{{node.pk}}',
+							app:"{{title}}",
+							page_no: this.name,
+							csrfmiddlewaretoken: '{{ csrf_token }}'
+						},
+						success: function(data) {													
+							cnt(data)
+						}
+
+					});
+
+				});
+				
+			}
+		});
+
+	});
+
+	$(".prior_node_tab").click(function() {
+
+		
+		$("#save-node").css("display", "none");
+		$('#prior_node_drawer').html('<img src="/static/ndf/images/ajax-wait.gif" height="40" width="40"> loading...');
+
+		$.ajax({
+			type: "POST",
+			url: "{% url 'drawer_widget' groupid %}",
+			datatype: "html",
+			data:{
+				node_id: '{{node.pk}}',
+				field: "prior_node",
+				app: "{{title}}",
+				page_no: 1,
+				csrfmiddlewaretoken: '{{ csrf_token }}'
+			},
+			success: function cnt(data) {
+				// alert(data);
+				$("#prior_node_drawer").html(data);
+				$("#save-node").css("display", "block");
+
+				$(".next_prev").click(function() {
+					
+					// alert(this.name);
+				 	$.ajax({
+						type: "POST",
+						url: "{% url 'drawer_widget' group_id %}",
+						datatype: "html",
+						data:{							
+							field: "prior_node",
+							node_id: '{{node.pk}}',
+							app:"{{title}}",
+							page_no: this.name,
+							csrfmiddlewaretoken: '{{ csrf_token }}'
+						},
+						success: function(data) {													
+							cnt(data)
+						}
+
+					});
+				});
+
+			}
+		});
+
+	});
+
+	$(".teaches_tab").click(function() {
+
+		
+		$("#save-node").css("display", "none");
+		$('#teaches_drawer').html('<img src="/static/ndf/images/ajax-wait.gif" height="40" width="40"> loading...');
+
+		$.ajax({
+			type: "POST",
+			url: "{% url 'drawer_widget' groupid %}",
+			datatype: "html",
+			data:{
+				node_id: '{{node.pk}}',
+				field: "teaches",
+				app: "{{title}}",
+				page_no: 1,
+				csrfmiddlewaretoken: '{{ csrf_token }}'
+			},
+			success: function cnt(data) {
+				$("#teaches_drawer").html(data);
+				$("#save-node").css("display", "block");
+
+				$(".next_prev").click(function() {
+					
+					// alert(this.name);
+				 	$.ajax({
+						type: "POST",
+						url: "{% url 'drawer_widget' group_id %}",
+						datatype: "html",
+						data:{							
+							field: "teaches",
+							node_id: '{{node.pk}}',
+							app:"{{title}}",
+							page_no: this.name,
+							csrfmiddlewaretoken: '{{ csrf_token }}'
+						},
+						success: function(data) {													
+							cnt(data)
+						}
+
+					});
+
+				});
+
+			}
+		});
+
+	});
+	
+	$(".assesses_tab").click(function() {
+
+		
+		$("#save-node").css("display", "none");
+		$('#assesses_drawer').html('<img src="/static/ndf/images/ajax-wait.gif" height="40" width="40"> loading...');
+
+		$.ajax({
+			type: "POST",
+			url: "{% url 'drawer_widget' groupid %}",
+			datatype: "html",
+			data:{
+				node_id: '{{node.pk}}',
+				field: "assesses",
+				app: "{{title}}",
+				page_no: 1,
+				csrfmiddlewaretoken: '{{ csrf_token }}'
+			},
+			success: function cnt(data) {
+				 //alert(data);
+				$("#assesses_drawer").html(data);
+				$("#save-node").css("display", "block");
+
+				$(".next_prev").click(function() {
+					
+					// alert(this.name);
+				 	$.ajax({
+						type: "POST",
+						url: "{% url 'drawer_widget' group_id %}",
+						datatype: "html",
+						data:{							
+							field: "assesses",
+							node_id: '{{node.pk}}',
+							app:"{{title}}",
+							page_no: this.name,
+							csrfmiddlewaretoken: '{{ csrf_token }}'
+						},
+						success: function(data) {													
+							cnt(data)
+						}
+
+					});
+
+				});
+
+			}
+		});
+
+	});
+	$("#save-node").click(function() {
+		cn_arr = []
+		pn_arr = []
+		tch_arr = []
+		assess_arr=[]
+		$(".node_id").each(function (){
+			if ($(this).parent(".bullet-item").parent("#collection_drawer2").attr("id") == "collection_drawer2") {
+				cn_arr.push($(this).val());
+			}
+			if ($(this).parent(".bullet-item").parent("#prior_node_drawer2").attr("id") == "prior_node_drawer2") {
+				pn_arr.push($(this).val());
+			}
+			if ($(this).parent(".bullet-item").parent("#teaches_drawer2").attr("id") == "teaches_drawer2") {
+				tch_arr.push($(this).val());
+			}
+			if ($(this).parent(".bullet-item").parent("#assesses_drawer2").attr("id") == "assesses_drawer2") {
+				assess_arr.push($(this).val());
+			}
+		});
+		//alert(assess_arr)
+		$("#collection_list").val(cn_arr);
+		$("#prior_node_list").val(pn_arr);
+		$("#teaches_list").val(tch_arr);
+		$("#assesses_list").val(assess_arr);
+		location.reload(true);
+
+		
+
+	});
+
+
+  $(document).on('open', '#view-map-edit-widget[data-reveal]', function () {  
+    
+    $.ajax({
+  url: "{% url 'get_visited_location' groupid %}",
+  success: function(data){ 
+   
+  	data = JSON.parse(data);
+
+    var lastVisitedLocationVal = data;
+    
+    if(lastVisitedLocationVal){
+
+      if(lastVisitedLocationVal == "[]"){
+        lastVisitedLocationVal = JSON.parse(lastVisitedLocationVal);
+      }
+
+      if(lastVisitedLocationVal.length > 0){
+            // lastVisitedLocationVal = JSON.parse(lastVisitedLocationVal);
+            var zoom = lastVisitedLocationVal.pop(),
+                lng = lastVisitedLocationVal[1],
+                lat = lastVisitedLocationVal[0];
+              map.setView([lat, lng], zoom);
+            }
+    }
+    else if( tempArr.length )
+    {
+      var group = new L.featureGroup(tempArr)
+          map.fitBounds(group.getBounds());
+    }
+   
+  }
+});
+
+  });
+
+	$(document).on('opened', '#view-map-edit-widget[data-reveal]', function () {  
+	
+		map.invalidateSize();  
+	   
+	});
+
+</script>
+

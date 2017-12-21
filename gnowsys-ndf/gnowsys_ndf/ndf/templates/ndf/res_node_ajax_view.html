@@ -1,0 +1,359 @@
+{% load ndf_tags %}
+{% load i18n %}
+{% block head %}
+
+  <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+  
+  {% if user.is_authenticated %}
+    <script type="text/javascript" src="/static/ndf/bower_components/MathJax/MathJax.js?config=TeX-AMS-MML_HTMLorMML" async></script> <!-- checked -->
+
+    <!-- orgitdown! -->
+    <script type="text/javascript" src="/static/ndf/orgitdown/jquery.orgitdown-foundation.js"></script>
+    <!-- orgitdown! toolbar settings -->
+    <script type="text/javascript" src="/static/ndf/orgitdown/skins/gstudio/set.js"></script>
+    <!-- orgitdown! skin -->
+    <link rel="stylesheet" type="text/css" href="/static/ndf/orgitdown/skins/gstudio/style.css" />
+
+	<script src="/static/ndf/bower_components/foundation/js/foundation.min.js"></script> <!-- checked -->
+
+	<script type="text/javascript">
+	  $(document).foundation();
+	</script>
+  {% endif %}
+  <style type="text/css">
+
+  .margin-0 { margin: 0 !important ;}
+
+  .resource-drawer {
+  border-color: #D3D3D3; border-style: solid;
+  padding: 0 !important;
+  overflow-y: auto;
+  }
+
+  .resource-drawer li.bullet-item:hover{
+  background-color: #ecf0f1; cursor:pointer;
+  }
+
+  .selected-resource { background-color:lightgray !important ; }
+
+  li.subsc_users_li {
+    list-style: none;
+  }
+  .btn-row{
+    /*margin-left: 1rem !important;*/
+    text-align: center;
+    margin-bottom: -1rem !important;
+  }
+
+  .right-btn, .left-btn{
+    /*float: left;*/
+    /*margin-left: 1rem;*/
+    width: 40%;
+    font-size: 0.60em !important;
+    margin-top: 0.1rem !important;
+  }
+
+
+  </style>
+
+{% endblock %}
+{% get_group_object groupid as group_object %}
+{% user_access_policy group_id request.user as user_access %}
+{% check_is_gstaff groupid request.user as is_gstaff %}
+{% check_group node.pk as is_group %}
+
+  {% block breadcrumb %} {% get_breadcrumb request.path %} {% endblock breadcrumb %}
+  <h5><u>{{node.name}}</u></h5>
+  <section class="medium-9 columns"> 
+  	<div class="content active commentable-section" id="accordion1" data-section-id="1">
+      <!-- Code for showing media details -->
+      {% if node.mime_type %}
+
+        {% get_grid_fs_object node as grid_fs_obj %}
+
+        <!-- New Implementation -->
+        {% trans "Resource Type" %}: {{node.mime_type}}<br/><br/>          
+        
+        {% if node.collection_set %} 
+
+          {% if 'image' in node.mime_type or 'video' in node.mime_type %}
+            <!-- Orbit image slider only for image and video collections--> 
+            
+            <ul data-orbit data-options="variable_height: true;timer:false;">
+              <li class="active">
+                <center>                   
+                {% if 'image' in node.mime_type %}
+                <a class="th" href="{% url 'read_file' group_object.name node grid_fs_obj.filename %}">
+                  <img src="{% url 'get_mid_size_img' group_object.name node.pk %}" /> 
+                  </a>
+                {% elif 'video' in node.mime_type %}
+        		     <video width="768" height="432" class="video-js vjs-default-skin vjs-big-play-centered" data-setup='{ "autoplay": false, "preload": "metadata" }' poster="{% url 'getvideoThumbnail' group_object.name node %}" controls buffered>
+                    <source src="{% url 'getFullvideo' group_object.name node %}" type="video/mp4">    
+                    <source src="{% url 'getFullvideo' group_object.name node %}" type="video/webm">
+                    <source src="{% url 'getFullvideo' group_object.name node %}" type="video/ogg">    
+                    <source src="{% url 'getFullvideo' group_object.name node %}" type="{{node.mime_type}}">    
+                    {% trans "Your browser does not support the video tag." %}
+                  </video>
+                {% elif 'Pandora_video' in node.member_of_names_list %}
+                  {% get_source_id node.pk as source_id %}
+                  <video width="500" poster="http://wetube.gnowledge.org/{{source_id}}/icon128.jpg" controls>
+                    <source src="http://wetube.gnowledge.org/{{source_id}}/480p.webm" type="video/webm"> 
+                    {% trans "Your browser does not support the video tag." %}
+                  </video>  
+                {% endif %}
+                <div class="orbit-caption"> {{node.name}} </div>             
+              </li>                
+
+              {% for k in node.collection_set %}
+                {% get_node k as obj %}
+                {% get_grid_fs_object obj as grid_fs_obj %}
+                {% if 'image' in obj.mime_type or 'video' in obj.mime_type %}
+                <li>
+                  <center>
+                    {% if 'image' in obj.mime_type %}
+                    <a class="th" href="{% url 'read_file' group_object.name k grid_fs_obj.filename %}">
+                      <img src="{% url 'get_mid_size_img' group_object.name k %}" /> 
+                    </a>
+                    {% elif 'Pandora_video' in obj.member_of_names_list %}
+                      {% get_source_id k as source_id %}
+                      <!-- <video width="480px" poster="http://wetube.gnowledge.org/{{source_id}}/icon128.jpg" controls> -->
+                      <video width="500" poster="http://wetube.gnowledge.org/{{source_id}}/icon128.jpg" controls>
+                        <source src="http://wetube.gnowledge.org/{{source_id}}/480p.webm" type="video/webm"> 
+                        {% trans "Your browser does not support the video tag." %}
+                      </video>  
+                    {% elif 'video' in obj.mime_type %}
+                      <video width="768" height="432" class="video-js vjs-default-skin vjs-big-play-centered" data-setup='{ "autoplay": false, "preload": "metadata" }' poster="{% url 'getvideoThumbnail' group_object.name node %}" controls buffered>
+
+                        <source src="{% url 'getFullvideo' group_object.name k %}" type="video/webm">
+                        <source src="{% url 'getFullvideo' group_object.name k %}" type="video/ogg">    
+                        <source src="{% url 'getFullvideo' group_object.name k %}" type="video/mp4">    
+                        {% trans "Your browser does not support the video tag." %}
+                      </video>                    
+                    {% endif %}    
+                    <div class="orbit-caption"> {{obj.name}} </div> 
+                  </center>
+                </li>
+                {% endif %} 
+
+              {% endfor %}
+            </ul>           
+
+            <!-- End of slider --> 
+          {% else %}
+              {% if 'audio' in node.mime_type %}
+                <audio src="{% url 'read_file' group_object.name node grid_fs_obj.filename %}" controls loop>
+                  <p>{% trans "Your browser does not support the audio element" %} </p>
+                </audio>
+              {% elif 'html' in node.mime_type %}
+                <iframe id="html-res-iframe" width="100%" seamless="seamless" src="{% url 'read_file' group_object.name node grid_fs_obj.filename %}">
+                  <p>{% trans "Your browser does not support the audio element" %} </p>
+                </iframe>
+                {% elif 'pdf' in node.mime_type %}
+                    <iframe width="100%" style="height:90vh;" src="/static/ndf/bower_components/pdfjs-build/generic/web/viewer.html?file={% url 'read_file' group_object.name node grid_fs_obj.filename %}"></iframe>
+                    <br/>
+                    <a target="_blank" href="/static/ndf/bower_components/pdfjs-build/generic/web/viewer.html?file={% url 'read_file' group_object.name node grid_fs_obj.filename %}">{% trans "Full screen view" %}</a>
+              {% else %}
+                <a href="{% url 'read_file' group_object.name node grid_fs_obj.filename %}">
+                  {{ grid_fs_obj.filename }}
+                </a>
+              {% endif %}       
+          {% endif %}
+          <!-- end of if 'image' in node.mime_type ... -->
+
+        {% else %}
+          <!-- not a collection -->
+          {% if 'image' in node.mime_type %}
+            <a class="th" href="{% url 'read_file' group_object.name node grid_fs_obj.filename %}">
+              <img src="{% url 'get_mid_size_img' group_object.name node.pk %}" /> 
+            </a>
+          {% elif 'Pandora_video' in node.member_of_names_list %}
+            {% get_source_id node.pk as source_id %}
+            <video width="500" poster="http://wetube.gnowledge.org/{{source_id}}/icon128.jpg" controls>
+              <source src="http://wetube.gnowledge.org/{{source_id}}/480p.webm" type="video/webm"> 
+              {% trans "Your browser does not support the video tag." %}
+            </video>  
+          {% elif 'video' in node.mime_type %}
+
+            <video width="768" height="432" class="video-js vjs-default-skin vjs-big-play-centered" data-setup='{ "autoplay": false, "preload": "metadata" }' poster="{% url 'getvideoThumbnail' group_object.name node %}" controls buffered>
+              <source src="{% url 'getFullvideo' group_object.name node %}" type="video/mp4">
+              <source src="{% url 'getFullvideo' group_object.name node %}" type="video/webm">
+              <source src="{% url 'getFullvideo' group_object.name node %}" type="video/ogg">    
+              <source src="{% url 'getFullvideo' group_object.name node %}" type="{{node.mime_type}}">    
+              {% trans "Your browser does not support the video tag." %}
+            </video>
+          {% elif 'audio' in node.mime_type %}
+            <audio src="{% url 'read_file' group_object.name node grid_fs_obj.filename %}" controls loop>
+              <p>{% trans "Your browser does not support the audio element" %} </p>
+            </audio>
+          {% elif 'html' in node.mime_type %}
+            <iframe id="html-res-iframe" width="100%" seamless="seamless" src="{% url 'read_file' group_object.name node grid_fs_obj.filename %}">
+              <p>{% trans "Your browser does not support the audio element" %} </p>
+            </iframe>
+          {% elif 'pdf' in node.mime_type %}
+            <iframe width="100%" style="height:90vh;" src="/static/ndf/bower_components/pdfjs-build/generic/web/viewer.html?file={% url 'read_file' group_object.name node grid_fs_obj.filename %}"></iframe>
+            <br/>
+            <a target="_blank" href="/static/ndf/bower_components/pdfjs-build/generic/web/viewer.html?file={% url 'read_file' group_object.name node grid_fs_obj.filename %}">{% trans "Full screen view" %}</a>
+          {% elif 'epub' in node.mime_type %}
+            <script type="text/javascript" src="/static/ndf/bower_components/epub.js/build/epub.js"></script>
+            <script type="text/javascript" src="/static/ndf/bower_components/epub.js/build/libs/zip.min.js"></script>
+            <!-- <script type="text/javascript" src="https://raw.githubusercontent.com/futurepress/epub.js/master/build/libs/zip.min.js"></script> -->
+
+            <div class="row">
+              <h2 class="small-4 columns redirection" onclick="Book.prevPage();">
+                <small class="fi-arrow-left"> {% trans "Previous" %}</small>
+              </h2>
+              <div class="small-8 columns text-center"></div>
+              <h2 class="text-right small-4 columns redirection" onclick="Book.nextPage();">
+                <small>{% trans "Next" %} <i class="fi-arrow-right"></i></small>
+              </h2>
+            </div>
+            
+            <div class="row ebook-container border-thin-lightgray">
+              <div class="small-12 columns" id="ebook-area"></div>
+            </div>
+            
+            <div class="row">
+              <h2 class="small-4 columns redirection" onclick="Book.prevPage();">
+                <small class="fi-arrow-left"> {% trans "Previous" %}</small>
+              </h2>
+
+              <a class="small-4 columns button tiny text-center" style="margin-top: 1em;" href="{% url 'read_file' group_object.name node grid_fs_obj.filename %}">
+                {% trans "Download" %} "{{ grid_fs_obj.filename }}"
+              </a>
+              <h2 class="text-right small-4 columns redirection" onclick="Book.nextPage();">
+                <small>{% trans "Next" %} <i class="fi-arrow-right"></i></small>
+              </h2>
+            </div>
+            
+            <script>
+              // var Book = ePub("{% url 'read_file' group_object.name node grid_fs_obj.filename %}");
+              var Book = ePub("{% url 'read_file' group_object.name node grid_fs_obj.filename %}", {
+                width: 400,
+                height: false,
+                restore: true
+              });
+              Book.renderTo("ebook-area");
+
+            </script>
+          {% else %}
+            <a href="{% url 'read_file' group_object.name node grid_fs_obj.filename %}">
+              {{ grid_fs_obj.filename }}
+            </a>
+          {% endif %}
+
+        {% endif %}
+
+      	{% comment %}
+        {% if user.is_authenticated %}
+          <br/>
+          <br/>
+          {% if 'video' in node.mime_type %}
+            <a class="button small secondary" href="{% url 'getFullvideo' group_object.name node %}" download="{{ grid_fs_obj.filename }}">
+          {% else %}
+            <a class="button small secondary" href="{% url 'read_file' group_object.name node grid_fs_obj.filename %}" download="{{ grid_fs_obj.filename }}">
+          {% endif %}
+              <span class="fi-download large"> {% trans "Download " %} </span>
+            </a>
+          
+        {% endif %}
+        {% endcomment %}
+
+        <!-- End New -->          
+
+      {% endif %}
+      <div>
+
+          {% if is_group %}
+              {% get_attribute_value group_object.pk 'start_time' as event_start_time %}
+              {% get_attribute_value group_object.pk 'end_time' as event_end_time %}
+              {% get_attribute_value group_object.pk 'start_enroll' as event_start_enroll %}
+              {% get_attribute_value group_object.pk 'end_enroll' as event_end_enroll %}
+              <div class="row">
+              <section class="medium-4 columns">
+                  <label>{% trans "Event duration" %}</label>
+                   {% trans "Fromw" %} <i>{{event_start_time|date:"d-M-Y"}}</i> to <i> {{event_end_time|date:"d-M-Y"}}</i>
+              </section>
+              <section  class="medium-4 columns end">
+                  <label>{% trans "Enrollment duration" %}</label>
+                   {% trans "From" %} <i>{{event_start_enroll|date:"d-M-Y"}}</i> to <i> {{event_end_enroll|date:"d-M-Y"}}</i>
+              </section>
+              </div><hr>
+          {% endif %}
+
+  			{% with node.html_content|safe as description %}
+  			{% if description != "None" %}
+  			<span itemprop="{{schema.1.description}}">{{ description }}</span>
+  			{% endif %}
+  			{% endwith %}
+      </div>
+    </div>
+    {% if not is_group %}
+      {% comment %}
+        {% if user_access == "allow" %}
+          <div class="medium-6 columns">
+            {% if "File" in node.member_of_names_list or "Page" in node.member_of_names_list %}
+              <div>
+                {% include "ndf/rating.html" %} 
+              </div><br/>
+            {% endif %}
+          </div>
+        {% endif %} 
+      {% endcomment %}
+
+      <div class="content small-12 columns"  id="view-discussion">
+  
+        {% get_node group_id as group_obj %}
+
+        {% get_thread_node node.pk as thread_node_obj %}
+        {% if thread_node_obj %}
+            {% get_disc_replies thread_node_obj.pk group_id global_disc_all_replies as all_replies %}
+            {% include 'ndf/in-line-texteditor.html' with node=thread_node_obj %}
+        {% else %}
+            {% get_disc_replies node.pk group_id global_disc_all_replies as all_replies %}
+            {% include 'ndf/in-line-texteditor.html' %}
+        {% endif %}
+
+          {% comment %}
+          {% else %}
+            {% if node.discussion_enable == True %}
+              {% if thread_node %}
+                  {% get_node thread_node as thread_node_obj %}
+                  {% get_disc_replies thread_node_obj.pk group_id global_disc_all_replies as all_replies %}
+                  {% include 'ndf/in-line-texteditor.html' with node=thread_node_obj %}
+              {% endif %}
+            {% endif %}
+          {% endcomment %}
+      </div>
+      </li>
+      </ul>
+    {% endif %}
+  </section>
+  {% if is_gstaff %}
+    {% if is_group %}
+    <section class="medium-3 columns"> 
+        <div class="panel">
+            <div class="row btn-row">
+              <a href="{% url 'edit_event_group' groupid sg_type %}" class="tiny button radius edit mod-btn"><i class="fi-pencil"></i> {% trans "Edit " %}{% if sg_type == "ProgramEventGroup" %}{% trans "Event" %}{% else %}{% trans "eCourse" %}{% endif %}</a>
+              <!-- <input type="button" class="button tiny radius right-btn" value="List Users">         -->
+            </div>
+            <br/>
+            <div class="row btn-row">
+              {% include "ndf/invite_users.html" %}
+              {% include "ndf/invite_admins.html" %}
+            </div>
+
+        </div>
+    </section>
+    {% else %} 
+
+      {% get_edit_url node.pk as edit_url %}
+        <a href="{% url edit_url groupid node %}?course_event_id={{groupid}}&res=True" class="right"><i class="fi-pencil"></i> {% trans "Edit " %}</a>
+    {% endif %} 
+  {% endif %}
+
+  {% if not is_group %}
+    <br/>
+    <div class="right">
+      {% include "ndf/widget_analytics_views.html" with event_player_flag=True %}
+    </div>
+  {% endif %}

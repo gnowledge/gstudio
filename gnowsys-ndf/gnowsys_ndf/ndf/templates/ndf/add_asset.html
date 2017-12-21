@@ -1,0 +1,621 @@
+{% load i18n %}
+{% load ndf_tags %}
+{% check_is_gstaff group_id request.user as is_gstaff %}
+{% user_access_policy groupid request.user as user_access_priv %}
+{% block head %}
+    
+    <style type="text/css">
+    .right-btn, .left-btn{
+        /*float: left;*/
+        /*margin-left: 1rem;*/
+        width: 40%;
+        font-size: 0.85em !important;
+        margin-top: 0.1rem !important;
+        text-align: center;
+    }
+
+</style>
+{% endblock %}
+
+   <!--  Interaction settings modal ends  -->
+   {% include 'ndf/widget_user_access_modal.html' %}
+
+<div class="overlay-head">
+   <div class="row">
+        {% if edit or not asset_obj.name %}
+            <a class="right close-reveal-modal reveal-modal-overlay" aria-label="Close">&#215;</a>
+        {% endif %}
+            <div class="small-1 columns icon-widget" style="margin-top: 5.6px;">
+                  {% if title == "asset_detail" %}
+                <a href="javascript:window.history.back();"><i class="fa fa-chevron-left large" aria-hidden="true"></i></a>
+                {% endif %}
+                {% if title == "raw_material_detail" %}
+                <a href="javascript:window.history.back();"><i class="fa fa-chevron-left large" aria-hidden="true"></i></a>
+                {% endif %}
+                {% if title == "asset_gallery_detail" %}
+                <a href="javascript:window.history.back();"><i class="fa fa-chevron-left large" aria-hidden="true"></i></a>
+                {% endif %}
+            </div>
+
+            <div class="small-7 columns">
+            {% if not edit and asset_obj %}
+                <h4 class="page-name">{% firstof asset_obj.altnames|truncatechars:25  asset_obj.name|truncatechars:25 %} </h4>
+
+            </div>
+            
+            <div class="small-4 columns right margin-right-50">       
+            {% if not edit and asset_obj %}
+                {% if asset_obj.created_by == request.user.id or is_gstaff  %}
+                    <span data-dropdown="asset-settings-drop" aria-controls="asset-settings-drop" aria-expanded="false" class="large orange-button right">
+                        {% trans "Actions" %} <i class="fa fa-chevron-down"></i>
+                    </span>
+                    <ul id="asset-settings-drop" class="f-dropdown" data-dropdown-content aria-hidden="true" tabindex="-1">
+                        <li> <a class="createAsset" data-asset_id='{{asset_obj.pk}}'>{% trans "Edit" %}</a></li>
+                        <li><a class="edit-metadata">{% trans "Metadata" %}</a></li>
+                        <li>
+                        {% if not asset_content_list.grel_id %}
+                            <a class="delete-asset">
+                            {% if 'raw@material' in asset_obj.tags and is_gstaff and title == "raw_material_detail"  %}
+                                {% trans "Delete Asset" %}
+                            {% elif 'asset@gallery' in asset_obj.tags  %}
+                                {% trans "Delete Folder" %}
+                            {% elif title == 'asset_detail'  %}
+                            {% trans "Delete Asset" %}
+                            {% endif  %}
+                            </a>
+                        {% endif  %}
+                        </li>   
+                    </ul>
+                {% endif %}
+            
+            {% endif%}
+            
+            {% if request.user.is_authenticated  %}            
+                {% if 'raw@material' in asset_obj.tags and is_gstaff and title == "raw_material_detail"  %}
+                <button type="button" class="orange-button add-asset-content right"><i class="fi-plus"></i> {% trans "Add File" %}</button>
+                {% endif %}
+                {% if 'asset@gallery' in asset_obj.tags  %}
+                <button   type="button" class="orange-button add-asset-content right" ><i class="fi-plus"></i> {% trans "Add File" %}</button>
+                {% endif %}
+                {% if title == 'asset_detail'  %}
+                <button type="button" class="orange-button add-asset-content right"><i class="fi-plus"></i> {% trans "Add File" %}</button>
+                {% endif %}
+
+            {% endif %}
+            </div>
+   </div>
+
+    <div class="row">
+        <div class="small-8 columns left">
+             {% if asset_obj.tags %}
+                {% for tag in asset_obj.tags %}
+                    {% if tag != "asset@asset" and tag != "raw@material" and tag != "asset@gallery" %}
+                        <small><label class="tag-ele">
+                        <a href="{% url 'tag_info' group_id tag %}">{{tag}} </a></label></small>
+                    {% endif %}
+                {% endfor %} 
+            {% endif %}   
+        </div>
+            <div class="small-4 columns right">
+            {% include 'ndf/rating.html' with node=asset_obj %}
+                
+            </div>
+
+    </div>
+    <br/>
+
+    <div class="row ">
+      {{asset_obj.content|safe|striptags}} 
+    </div>
+            
+
+            {% else %}
+                
+                <h3 class="left overlay-title">&nbsp;
+                {% if not asset_obj %} 
+                    {% trans "Add a new" %} 
+                {% else %} 
+                    {% trans "Edit" %} 
+                {% endif %}
+                {% if title == "raw material"   and is_gstaff %}
+                    {% trans "Resource" %}
+                {% elif title == "gallery"  %}
+                    {% trans "Folder" %}
+                {% elif title == "asset_list"  %}
+                    {% trans "Asset" %} 
+                {% endif     %}
+                </h3>
+
+                <button type="button" class="blue-white-button save-asset right" data-asset_id='{{asset_obj.pk}}' style="margin-top: 9px;margin-right: -150px;">{% trans "Save" %}</button>
+            {% endif %}
+<div class="row">
+    <hr/>
+</div>
+        <div class="row">
+            <div class="small-12 medium-10 large-10 columns">
+                <label>
+                    {% if edit or not asset_obj %}
+                        {% if title == "raw material"  or 'raw@material' in asset_obj.tags %}
+                            {% trans "Resource Name" %}
+                        
+                        {% elif title == "gallery"  or 'asset@gallery' in asset_obj.tags %}
+                             {% trans "Folder Name" %}
+                        
+                        {% else %}
+                       {% trans "Asset Name:" %} {% endif %}<h9 style="color: red;">*</h9>
+                       <input type="text" placeholder="" class="required" id = "asset-name" name="asset_unique_name" value="{% if asset_obj %} {{asset_obj.name}}{% endif %}"/>
+
+                        {% trans "Display Name:" %}  <h9 style="color: red;">*</h9>
+                       <input type="text" placeholder="" class="required" id = "asset-disp-name" name="asset_display_name" value="{% if asset_obj %} {{asset_obj.altnames}}{% endif %}"/>                       
+
+
+                    {% endif %}
+                </label>
+            </div>
+        </div>
+
+        {% if edit or not asset_obj %}
+
+        <div class="row">
+            <div class="small-12 medium-10 large-10 columns">
+            <label>
+                
+                    {% if title == "raw material"  or 'raw@material' in asset_obj.tags %}
+                        {% trans "Resource Description" %}
+                    
+                    {% elif title == "gallery"  or 'asset@gallery' in asset_obj.tags %}
+                         {% trans "Folder Description" %}
+                    {% else %}
+                    
+                    {% trans "Asset description" %} {% endif %} <h9 style="color: red;">*</h9>
+                    <textarea rows="4" cols="2" class="small-12 columns" placeholder="Enter Description" id="asset-descid" value=''>{% if asset_obj %} {{asset_obj.content|safe|striptags}}{% endif %}</textarea>
+            </label>
+            </div>
+        </div>
+        <div class="row">
+            <div class="small-12 medium-10 large-10 columns">
+            <label>  
+                     {% if asset_obj %}
+                        {% get_relation_value asset_obj.pk "teaches"  as selected_topic %}
+                    {%  endif %}                                  
+                    choose topic :
+                        <select name="topics" id = "topic_list" multiple style="height:100px">
+                                <option value="">--- Select Topic ---</option>
+                                {% for each in topic_nodes %}
+                                 {% if each.pk == selected_topic.grel_node.0.pk %}
+                                    <option selected value="{{ each.pk }}" data-topic="{{ each.pk }}">
+                                        {{each.name}}
+                                {% else %}
+                                    <option value="{{ each.pk }}" data-topic="{{ each.pk }}">
+                                        {{each.name}}
+                                {%  endif %}
+                                {% endfor %}
+                        </select>
+            </label>
+            </div>
+        </div>
+
+
+        <div class="row">
+            <div class="small-12 medium-10 large-10 columns">
+                <label style="text-transform: none!important;">
+                    {% trans "Select Language" %}
+                {% get_language_info_list for LANGUAGES as languages %}
+                <select class="asset-lang" name="lan" id="asset_lang" >
+                    asset_obj.language.0
+                    {% for language in languages %}
+                    {% if asset_obj.language.0 in  language.code  %}
+                        <option selected data-sub-lang="{{ language.name }}" data-sub-code="{{ language.code }}">
+                        {{language.name}}
+                    {%  else %}
+                        <option data-sub-lang="{{ language.name }}" data-sub-code="{{ language.code }}">
+                          {{ language.name }}
+                    {% endif %}
+                    </option>
+                    {% endfor %}
+                </select>
+                </label>
+            </div>
+        </div>
+        <div class="row">
+            <div class="asset-tags-container small-12 medium-10 large-10 columns">
+                <label>
+                {% trans "Add tags:" %}
+                {% include 'ndf/widget_tags.html' with node=asset_obj hide_lbl=True %}
+                </label>
+            </div>
+        </div>
+        <div class="row">
+            <div class="asset-tags-container small-12 medium-10 large-10 columns">
+                <label>
+                {% if not "announced_unit" in group_obj.member_of_names_list %}
+                <input type="checkbox" name="is_raw_material" class="is_raw_material" {% if "raw@material" in asset_obj.tags %} checked="checked" {% endif %}> {% trans "Mark as Raw Material" %}
+
+                </label>
+                {% endif %}
+            </div>
+        </div>
+
+        {% endif %}
+
+    <div class="asset-content-area"{% if not asset_obj %} style="display:none"{% endif %}>
+        {% if not edit %}
+        <div class="row">
+        </div>
+
+        <div class="name-desc-asset-cont-area hide">
+            <div class="row">
+                <div class="small-8 medium-6 large-6 columns">
+                    <label>{% trans "Enter File Name" %} <h9 style="color: red;">*</h9>
+                        <input type="text" placeholder="Enter File name" class="required" id = "asset_content_name" name="" style="padding-bottom: 10px;margin-bottom: 31px;"/>
+                    </label>
+                    <form class="dropzone" id ="docPost" enctype="multipart/form-data" method="post" action="{% url 'add_assetcontent' group_id %}" style="margin-left: -13px;width: 429px;" >
+                        <input type="file" id="docFile" class="asset_content_upload" placeholder="" name=""/>
+                    </form>
+                </div>
+
+                <div class="small-8 medium-6 large-6 columns">
+                <label>{% trans "Enter File Description" %} <br/>
+                    <textarea rows="6" cols="2" class="small-12 columns" placeholder="Enter File Description" id="asset_content_desc"></textarea>
+                </label>
+                    <button type="button" class="orange-button right" id="upload_asset" onclick="save_form()" style="margin-right: -3px;">{% trans "Upload" %}</button>
+                </div>
+            </div>
+        </div>
+        <!--<button type="button" class="right orange-button save-asset" onclick="save_asset_cont_data()">Save Asset</button>-->
+        <input type="hidden" name="context_name" value="{{title}}"/>
+        <input type="hidden" class ="asset_obj_val" name="asset_obj_name" data-asset-obj-val=""/>
+        
+            
+        
+   
+    </div>
+
+
+        <div class="row">
+            {% if asset_content_list.grel_id and asset_obj.created_by == request.user.id  or is_gstaff and asset_obj and asset_content_list.grel_id  %}
+            <div class="row">
+                <button type="button" class="orange-button delete-asset-content right icon-widget" style="margin-right: 100px;" title="Click on the checkbox on the files below to Delete"><i class="fa fa-trash"></i> {% trans "Delete Files" %}</button>
+            </div>
+            {% endif %}
+
+        <div class="row listing-row">
+            {% for each in asset_content_list.grel_node %}
+                {% if  'DELETED' != each.status %}
+                   {% include "ndf/asset_card.html" with url_name="assetcontent_detail" each_asset=each first_arg=group_id second_arg=asset_obj.pk third_arg=each.pk no_asset=True %} 
+                {% endif %}
+            {% endfor %}
+        </div>
+        </div>
+        <!-- </div> -->
+    {% include 'ndf/pagination.html' with urlname="asset_details_paged" first_arg=group_id second_arg=asset_obj.pk page_info=assetcontent_page_info %}
+    
+        <div class="row asset-content-detail">
+              {% if node %}
+              <hr/>
+               &nbsp; {% include "ndf/asset_content_detail.html" with node=node %}
+              {%  endif %}
+        </div>
+    <!-- </div> -->
+    <div class="row">
+    <hr/>
+    </div>
+    <div class="row asset-comments-section">
+      <div class="small-10 columns" id="view-discussion" style="overflow-x:auto;overflow-y:hidden">
+            <!-- discussion content area -->
+            {% get_thread_node asset_obj.pk as thread_node_obj %}
+            {% if thread_node_obj %}
+                {% get_disc_replies thread_node_obj.pk group_id global_disc_all_replies as all_replies %}
+                {% include 'ndf/in-line-texteditor.html' with node=thread_node_obj var_name="content_org" allow_to_comment=True ckeditor_toolbar="LMSStudentsToolbar" %}
+            {% endif %}
+
+
+            <!-- END of discussion content area -->
+      </div>
+    </div>
+
+    {% endif %}
+</div>
+
+<script type="text/javascript">
+
+    $(".add-asset-content").click(function(){
+        $(".asset-content-area").removeClass("hide")
+        $(".name-desc-asset-cont-area").removeClass("hide")
+
+        $("#upload_asset").removeClass("hide")
+    });
+
+    $(".delete-asset-content").click(function(){
+        var checked = $('.select-chkbox:checked').length;
+        if (checked > 0){
+
+            if (confirm("Do you want to delete selected files?.") == true) {
+                coll_arr = []
+                $('.select-chkbox:checked').each(function() {
+                    coll_arr.push($(this).val());
+                });
+
+                $.ajax({
+                          type: "POST",
+                          data:{
+                                'csrfmiddlewaretoken': "{{csrf_token}}",
+                                'delete_files_list' : coll_arr,
+                                'delete_asset_content' : 'True'
+                            },
+                          url: "{% url 'delete_asset' group_id %}",
+                          datatype: "html",
+                          success: function(data) {
+                            {% if asset_obj %}
+                                location.href = "{% url 'asset_detail' group_id asset_obj.pk %}";
+                            {% endif %}
+                        }
+                    });
+
+                }
+        }
+        else{
+            alert("Choose atleast one file");
+        }
+
+
+    });
+    $(".delete-asset").click(function(){
+        if (confirm("Do you want to delete selected files?.") == true){
+
+        $.ajax({
+                  type: "POST",
+                  data:{
+                        'csrfmiddlewaretoken': "{{csrf_token}}",
+                        'delete_asset':'True',
+                        'asset_id':'{{asset_obj.pk}}',
+                        'asset_id':'{{asset_obj.pk}}',
+                        'group_id':'{{group_id}}',
+                    },
+                  url: "{% url 'delete_asset' group_id %}",
+                  datatype: "html",
+                  success: function(data) {
+                        
+                        if("{{title}}" == "asset_detail"){
+
+                            location.href = "{% url 'course_gallery' group_id  %}";
+                        }
+                        else if ("{{title}}" == "asset_gallery_detail") {
+                            
+                            location.href = "{% url 'course_gallery' group_id  %}";
+                        }
+                        else if ("{{title}}" == "raw_material_detail"){
+                            location.href = "{% url 'course_raw_material' group_id  %}";
+
+                        }
+                        
+                }
+            });
+        }
+
+    });
+
+    // $('.save-asset').attr('disabled',true);
+    $('#upload_asset').attr('disabled',true);
+
+    $('#asset_content_name').keyup(function(){
+        if($(this).val().length !=0 )
+            $('#upload_asset').attr('disabled', false);
+        else
+            $('#upload_asset').attr('disabled',true);
+    })
+
+    $('#asset-name').keyup(function(){
+        if($(this).val().length !=0 && $('#asset-descid').val().length !=0 && $('#asset-disp-name').val().length !=0 )
+            $('.save-asset').attr('disabled', false);
+        else
+            $('.save-asset').attr('disabled',true);
+    })
+
+    $('#asset-descid').keyup(function(){
+        if($(this).val().length !=0 &&  $('#asset-name').val().length !=0 && $('#asset-disp-name').val().length !=0)
+            $('.save-asset').attr('disabled', false);
+        else
+            $('.save-asset').attr('disabled',true);
+    })
+    $('#asset-disp-name').keyup(function(){
+        if($(this).val().length !=0 &&  $('#asset-name').val().length !=0 && $('#asset-descid').val().length !=0 )
+            $('.save-asset').attr('disabled', false);
+        else
+            $('.save-asset').attr('disabled',true);
+    })
+    $( ".save-asset" ).click(function(event) {
+        updateAllTags();
+        coll_arr = []
+        
+        $('#topic_list :selected').each(function(){
+            coll_arr.push($(this).val())
+        });
+        
+        var tagsStr = tags.value.trim();
+        if(checkTag())
+        {
+            $("input:hidden[name='tags']").val($("input:hidden[name='tags']").val() + ', ' + tagsStr);
+        }
+        else if(tagsStr)
+        {
+            event.preventDefault();
+        }
+        is_raw_material = "False"
+        if($('input[name="is_raw_material"]:checked').length > 0)
+        {
+            is_raw_material = "True"
+        }
+        sel_tags = $("input:hidden[name='tags']").val()
+        sel_asset_lang =  $('#asset_lang').find(':selected').attr('data-sub-code');
+        asset_name = $("#asset-name").val();
+        topic_list = $("#topic_list").find(':selected').attr('data-topic');
+        asset_disp_name = $("#asset-disp-name").val();
+        asset_description = $("#asset-descid").val();
+        var asset_id = $(this).attr('data-asset_id');
+        if (asset_name != '' && asset_description != ''){
+            $.ajax({
+                  type: "POST",
+                  data:{
+                        'csrfmiddlewaretoken': "{{csrf_token}}",
+                        "asset_name":asset_name,
+                        "asset_disp_name":asset_disp_name,
+                        "asset_description":asset_description,
+                        "node_id": asset_id,
+                        "sel_tags":sel_tags,
+                        "sel_asset_lang":sel_asset_lang,
+                        "is_raw_material": is_raw_material,
+                        'topic_list':topic_list,
+                        //'coll_arr':coll_arr,
+                        'title' :"{{title}}",
+
+                        // "asset_objective":asset_objective
+                    },
+                  url: "{% url 'create_edit_asset' group_id %}",
+                  datatype: "json",
+                  success: function(data) {
+                    // $('#addAsset').html(data);
+                    // $('#addAsset').foundation('reveal', 'open');
+                    $('.save-asset').css('display', 'none')
+                    $('.asset-content-area').css('display', 'block')
+                    $('.asset_obj_val').attr('data-asset-obj-val',data);
+                    $('#addAsset').foundation('reveal', 'close');
+                    {% if asset_obj %}
+
+                        location.href = "{% url 'asset_detail' group_id asset_obj.pk %}";
+                    {% else %}
+                        location.reload();
+                    {% endif %}
+                }
+            });
+
+        }
+        else{
+            event.preventDefault()
+        }
+        
+    });
+
+  var form = document.getElementById('docPost');
+  var fileSelect = document.getElementById('docFile');
+  // var uploadButton = document.getElementById('submitpostid');
+        function save_form(event) {
+        $.blockUI();
+        assetval = $('.asset_obj_val').attr('data-asset-obj-val');
+        asset_cont_name = $('#asset_content_name').val();
+        asset_cont_desc = $('#asset_content_desc').val();
+        // Update button text.
+        // uploadButton.innerHTML = 'Uploading...';
+
+        // Get the selected files from the input.
+        var files = fileSelect.files;
+
+        // Create a new FormData object.
+        var formData = new FormData();
+
+        // Loop through each of the selected files.
+        for (var i = 0; i < files.length; i++) {
+          var file = files[i];
+
+          // // Check the file type.
+          // if (!file.type.match('image.*')) {  continue; }
+
+          // Add the file to the request.
+          formData.append('filehive', file, file.name);
+        }
+
+        // appending csrfmiddlewaretoken and user-id
+        formData.append('csrfmiddlewaretoken', '{{csrf_token}}');
+        formData.append('asset_cont_name',asset_cont_name);
+        formData.append('asset_cont_desc',asset_cont_desc);
+        formData.append('user','{{request.user.id}}');
+        if(!"{{asset_obj}}"){
+            formData.append('asset_obj',assetval);
+        }
+        else{
+            formData.append('asset_obj','{{asset_obj}}');
+        }
+        // Set up the request.
+        xhr = new XMLHttpRequest();
+
+        // Open the connection.
+        xhr.open('POST', "{% url 'add_assetcontent' group_id %}", true);
+
+        // Set up a handler for when the request finishes sucessfully.
+        xhr.onload = function () {
+          if (xhr.status === 200)
+          {
+            // File(s) uploaded.
+           // if file is not uploaded sucessfully
+            if(xhr.responseText == "UploadError")
+            {
+               alert("Error occurred");
+            }
+            // check if image is not in the list, add it.
+            else if(xhr.responseText )
+            {
+              $.unblockUI();
+              location.reload();
+
+            }
+
+            // uploadButton.innerHTML = 'Upload';
+
+            // updating metadata of files, if file is uploaded sucessfully
+            // if(xhr.responseText != "UploadError")
+            // {
+            //   // alert('xhr.responseText != "UploadError"');
+            // }
+          }
+          else
+          {
+            $.unblockUI();
+            alert('An error occurred!');
+          }
+        };
+
+        // Send the Data.
+        xhr.send(formData);
+      }
+
+$( ".edit-metadata" ).click(function(event) {
+    $.ajax({
+              type: "POST",
+              data:{
+                    'csrfmiddlewaretoken': "{{csrf_token}}",
+                    "node_id":'{{asset_obj}}',
+                },
+              url: "{% url 'get_metadata_page' group_id  %}",
+              datatype: "html",
+              success: function(data) {
+              $('#addAsset').foundation('reveal', 'open');
+              $('#addAsset').html(data);
+            }
+        });
+})
+
+    {% if node %}
+        $( document ).ready(function() {
+            $('html,body').animate({
+                    scrollTop: $(".asset-content-detail").offset().top},
+                    'slow');
+        });
+    {% endif %}
+   $( ".createAsset" ).click(function() {
+                   var asset_id = $(this).attr('data-asset_id');
+                   
+                   $.ajax({
+                             type: "GET",
+                             url: "{% url 'add_asset' group_id %}",
+                             data: {
+                               node_id: asset_id,
+                               'title' : "{{title}}"
+                             },
+                             datatype: "html",
+                             success: function(data) {
+                               $('#addAsset').foundation('reveal', 'open');
+                               $('#addAsset').html(data);
+                           }
+                     });
+           });
+</script>

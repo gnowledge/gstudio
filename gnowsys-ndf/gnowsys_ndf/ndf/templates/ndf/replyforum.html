@@ -1,0 +1,107 @@
+{% load ndf_tags %}
+{% load i18n %}
+{% block head %}
+<!-- orgitdown! -->
+  <!-- orgitdown! toolbar settings -->
+  <script type="text/javascript" src="/static/ndf/orgitdown/sets/org/set.js"></script>
+  <!-- orgitdown! toolbar skin -->
+  <link rel="stylesheet" type="text/css" href="/static/ndf/orgitdown/sets/org/style.css" />
+  <!-- orgitdown! skin -->
+  <link rel="stylesheet" type="text/css" href="/static/ndf/orgitdown/skins/orgitdown/style.css" />
+
+<script type="text/javascript">
+$(document).ready(function(){
+$("#twist_save_reply").click(function(){
+var content=$('#orgitdown').val()
+$('#orgitdown').val("");
+var tw_name=$("#thread_name").val();
+if (tw_name != "")
+{
+
+var forum=$("#forum").val();
+var thd = "";
+$("#thread_name").val("");
+var gpid="{{groupid}}"
+var ajurl="/"+gpid+"/forum/add_node/"
+
+$.ajax({
+        url: ajurl,
+        type: 'POST',
+        data: {node:'Twist',thread:thd,forumid:forum,supnode:forum,reply:content,twistname:tw_name,csrfmiddlewaretoken: '{{ csrf_token }}'},
+        beforeSend: function() {
+              $("#ajax_load_image").show();
+              $("#body").css({"opacity":"0.1",})
+                              },
+        success: function(data){
+                       $('#thread').html(data);
+                      $('a.close-reveal-modal').trigger('click');
+           },
+       complete: function(){
+                    $("#ajax_load_image").hide();
+                $("#body").css({"opacity":"",})
+
+          }
+   })
+
+
+}
+else
+{
+alert("Thread name can't be blank");
+$('a.close-reveal-modal').trigger('click');
+
+}
+});
+});
+</script>
+
+<!--
+<script src="/static/ndf/js/twist_scripts.js"></script>
+-->
+ <script type="text/javascript" src="/static/ndf/orgitdown/jquery.orgitdown.js"></script>
+
+
+<script type="text/javascript">
+$(document).ready(function(){
+ $('#orgitdown').orgitdown(mySettings);
+});
+</script>
+
+
+
+{% endblock %}
+
+<style type="text/css">
+.orgitdown{
+height:140px;
+width:463px;
+}
+.orgitdownContainer{
+height:130px;
+width:453px;
+}
+.orgitdownEditor{
+height:100px;
+}
+</style>
+
+
+<a href="#" id="reply_forum" class="button" data-reveal-id="reply">{% trans 'Add a Thread' %}</a>
+</p>
+<div id="reply" class="reveal-modal medium" data-reveal="">
+{% trans "Add a thread to the Forum": %} <br/>
+<div class="row">
+<div class="large-3 small-2 columns">
+<label>{% trans "Thread Name ": %}</label>
+</div>
+<div class="large-9 small-2 columns">
+ <input type="text" id="thread_name"> 
+</div>
+</div>
+  <textarea id="orgitdown" name="content_org" placeholder="{% trans 'Please enter description' %}..."></textarea>
+
+<input id="twist_save_reply" type="button" value="{% trans 'Save' %}">
+<input id="forum" type="hidden" value="{{forum}}">
+<a  class="close-reveal-modal">×</a>
+</div>
+

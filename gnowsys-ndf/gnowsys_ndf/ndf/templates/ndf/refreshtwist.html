@@ -1,0 +1,17 @@
+{% load ndf_tags %}
+{% load i18n %}
+<div class="response_change" id="refreshthread" class="large-12 columns">
+
+<div class="row">
+{% get_reply request thread thread forum csrf_token request.user groupid%}
+
+</div>
+</div>
+
+
+<script type="text/javascript">
+  var temp = $("#insidediv .user");
+  var tempHtml = '<i style="background-color:undefined" class="fi-torso"></i>';
+  temp.each(function(){ ($(this).hasClass("fi-torso"))?"":$(this).html(tempHtml) });
+  $("#refreshthread button.button.large.postfix").removeClass("large");
+</script>

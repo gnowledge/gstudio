@@ -1,0 +1,49 @@
+* Group
+
+A group is a collection of subscribed users of the platform with a
+special interest to work together on a common goal. If you have a
+project and you want to execute it collaboratively, you may create a
+group.
+
+A group acts as an achor to a group of members of the platform, a
+collection of apps (software activities) which can be used to create
+digital resources, share them and seek feedback from others. 
+
+Groups can be configured as private or public groups.  The resources
+made within a Public group are published for all users including
+anonymous users visiting the platform.  If the group is set as
+private, only the subscribed users can have access to the resources. 
+
+Each group can be configured to have any or all of the following Apps:
+
+- Theme (built to maintain a hierarchy of categories that ends with topics)
+- Topic (a node that holds several resources in this context)
+- Concept (concepts that explain or add detail to the topic)
+- Page (a resource generated online to write text with images, videos etc.)
+- File (upload, download and curate) 
+  - pictures,
+  - videos,
+  - simulations,
+  - documents,
+  - presentations,
+  - applications etc.
+- Forum ()
+- Tasks
+- Events
+- Report events (observations)
+- Quiz and Quiz item (to maintain a question bank)
+- Module (Published versions of  above resources as a collection)
+- Course (an organized set of modules on a subject)
+- Meeting (Video, Audio and Instant Messaging)
+- Blog (coming soon)
+- News (coming soon)
+- Knowledge Map (coming soon)
+- EduMap (coming soon)
+  - School Map 
+  - College Map 
+  - University Map 
+  
+
+More and more Apps are being added as contributions from developers.
+You may want to propose an App or develop your own. 
+  

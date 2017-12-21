@@ -1,0 +1,165 @@
+{% extends "ndf/base.html" %}
+{% load i18n %}
+{% load pagination_tags %}
+{% load ndf_tags %}
+{% get_group_name groupid as group_name_tag %}
+
+{% block title %} {{title}} {% endblock %}
+
+{% block head %}
+<!--External  css for tree -- >
+
+<!-- javascript file for tree -->
+<!-- <script src="/static/ndf/js/tree.jquery.js"></script> -->
+<script src="/static/ndf/bower_components/jqtree/tree.jquery.js"></script> <!-- checked -->
+
+<script type="text/javascript">
+  $(document).ready(function()
+  {
+    $(function() {
+      $('.tree').tree();
+    });
+  });
+</script>
+
+{% endblock %}
+
+
+{% block help_content %}
+{% blocktrans %}<p>About Module... <em>coming soon</em></p>{% endblocktrans %}
+{% endblock %}
+
+
+{% block meta_content %}
+ <h2 class="subheader">{% trans "Modules" %}</h2>
+{% endblock %}
+
+
+{% block search_content %}
+  {% include "ndf/node_search_base.html" %}
+{% endblock %}
+
+  
+{% block body_content %}
+
+<header class="row">
+  <dl class="tabs" data-tab data-options="deep_linking:true">
+    <dd class="active"><a href="#panel2-1"><i class="fi-eye"></i> All Modules {% if module_coll.count %}({{ module_coll.count }}){% endif %}</a></dd>
+  </dl>
+</header>
+
+{% if searching and module_coll.count > 0 %}
+<div class="row">
+  <div class="small-12 columns end">
+    <p>Search Results: <span class="label success round">Found {{module_coll.count}} {{title|lower}}{{module_coll.count|pluralize}}.</span></p>
+  </div>
+</div>
+
+{% elif searching and module_coll.count == 0 %}
+<div class="row">
+  <div class="small-12 columns">
+    <p>Search Results: <span class="label alert">No {{title|lower}}{{module_coll.count|pluralize}} matched your search criteria!!!</span></p>
+  </div>  
+</div>  
+
+{% endif %}
+
+{% group_type_info groupid request.user as grouptype %}
+
+<ul class="small-block-grid-1 medium-block-grid-2 large-block-grid-4">
+
+  {% autopaginate module_coll 23 %}
+
+  {% for node in module_coll %}
+  {% get_version_of_module node.pk as version %}
+  <li class="card">
+        {% if grouptype == "Moderated" %}
+          {% if node.status == "DRAFT" %}
+            <div class="draft course">
+          {% elif node.status == "PUBLISHED" %}
+            <div class="published course">
+          {% endif %}
+        {% else %}
+          <div class='{% if node.status == "PUBLISHED" %}published{% endif %} course'>
+        {% endif %}
+
+        <a href="{% url 'module_detail' group_name_tag node %}">
+        <div class="row">
+          <div class="small-10 columns">                             
+              <b>
+                {{ node.name }}<font color = "red"><b>Ver.</b>{{version}}</font>
+              </b>
+          </div>
+        </div>
+
+        <span style="font-size:12px;">{{ node.html_content|default_if_none:"Add some description."|safe|striptags|truncatechars:75 }}</span><br/>
+
+        <footer>
+          <div class="age">
+            {{ node.member_of_names_list|join:', ' }} created {{node.created_at|timesince}} ago 
+            <br/>
+            by <span class="user" href="{% url 'dashboard' node.created_by %}" data-gnow="">{{node.user_details_dict.created_by}}</span> 
+          </div>
+          <span><strong>{{node.contributors|length}}</strong> Contributor{{node.contributors|pluralize}}</span>
+        </footer>
+        </a>
+
+        <div class="label-list small-12 columns">
+        {% for tag in node.tags|slice:":3" %}
+          <a href="{% url 'tag_info' groupid tag %}"><span class="label" style="background-color:yellow;">{{tag}}</span></a>
+        {% endfor %}
+        </div>
+
+    </div>
+  </li>  
+
+  {% empty %}
+    {% if not searching %}
+    <div class="row">
+      <div class="small-12 columns">
+       <h5> {% blocktrans %} This group doesn't have any modules. <b>Be the first to create a Module!</b>{% endblocktrans %} </h5>
+      </div>
+    </div>
+    {% endif %}
+
+  {% endfor %}
+
+  {% paginate %}
+
+</ul>
+
+{% comment %}
+{% autopaginate module_coll 23 %}
+  <div class="row">
+    <div class="small-6 large-12 columns">
+      <ul class="small-block-grid-1 medium-block-grid-2 large-block-grid-4">
+
+  {% for module in module_coll %}
+  <li class="bullet-item text-left">
+    <div class="row">
+            <div class="small-5 columns ">    
+        <!-- bellow div for making tree from json data -->
+        <div class="tree" data-url="{% url 'get_module_json' groupid %}?_id={{module.pk}}"></div>
+            </div>                
+            <div class="small-7 columns text-right">
+              <i class="label secondary" >Created by {{module.user_details_dict.created_by}} on {{module.created_at|date:"j F Y"}} </i>
+            </div>    
+            <div class="small-12 columns" style="padding-top:5px;">
+        <p>{{ node.html_content|safe|striptags|truncatechars:150 }}</p>
+            </div>
+    </div>
+  </li>
+
+  {% empty %}
+    <div class="row">
+      <div class="small-12 columns">
+       <h5> {% blocktrans %}This group doesn't have any modules. <b>Be the first to create a Module!</b>{% endblocktrans %} </h5>
+      </div>
+    </div>
+
+  {% endfor %}
+{% paginate %}
+{% endcomment %}
+
+{% endblock %}
+

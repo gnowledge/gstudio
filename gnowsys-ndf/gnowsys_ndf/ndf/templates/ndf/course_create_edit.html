@@ -1,0 +1,75 @@
+{% extends "ndf/node_edit_base.html" %}
+{% load i18n %}
+{% load ndf_tags %}
+{% block title %}
+  {% if node %}
+    Edit {{title}} {{node.name}}
+  {% else %}
+    Create {{title}}
+  {% endif %}
+{% endblock %}
+
+{% block meta_content %}
+{% blocktrans %} <h3>Building of a Course </h3>
+  <p class="text-justify"><b>Course</b> is a sequence of learning modules.</p>{% endblocktrans %}
+{% endblock %}
+
+{% block page_tab %} Basic {% endblock %}
+
+{% block upload_logo %}
+	<div class="small-8 columns">
+		<div class="small-4 columns">
+			<h5>{% trans "Upload thumbnail : " %}</h5>
+			<small><i>(.svg images are currently not supported)</i></small>
+		</div>
+		<div class="small-6 columns end">
+			<div class="small-1 columns">
+				<span class="fi-upload"></span>
+			</div>
+			<div class="small-11 columns end">
+	            {% if logo_img_node %}
+				    <a target="_blank" href="{% url 'read_file' group_id logo_img_node.pk %}">{% trans "View existing thumbnail " %}</a>
+				    <input type="button" class="button tiny" id="change_logo" value="Edit">
+				    <input type="button" class="button tiny hide" id="cancel_change_logo" value="Cancel">
+					<input type="file" name="doc" id="docFile" class="hide" accept="image/*"/>
+			    {% else %}
+					<input type="file" name="doc" id="docFile" accept="image/*"/>
+			    {% endif %}
+			</div>
+		</div>
+	</div>   
+{% endblock %}
+
+{% block document_ready %}
+  {{block.super}}
+  $(".collection_tab").hide();
+{% endblock %}
+
+{% block script %}
+	{{block.super}}
+
+	$(document).on('click',"#change_logo",function(){
+		$("#cancel_change_logo").removeClass("hide");
+		$("#docFile").removeClass("hide");
+	})
+
+	$(document).on('click',"#cancel_change_logo",function(){
+		$("#cancel_change_logo").addClass("hide");
+		$("#docFile").addClass("hide");
+		$("#docFile").val("")
+	})
+
+	$("#docFile").change(function(event) {
+		file_mime_type = this.files[0].type;
+		if(file_mime_type.indexOf("svg") >= 0 ){
+			alert(".svg images are currently not supported")
+			$("#docFile").val("");
+			event.preventDefault();
+		}
+	});
+
+
+{% endblock %}
+
+
+

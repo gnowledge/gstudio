@@ -1,0 +1,105 @@
+{% extends "ndf/mis_base.html" %}
+
+{% block head %}  
+  {{block.super}}
+  
+  <script src="/static/ndf/bower_components/jquery-ui/jquery-ui.js"></script> <!-- checked -->
+  <script src="/static/ndf/bower_components/jqueryui-timepicker-addon/dist/jquery-ui-sliderAccess.js"></script> <!-- checked -->
+  <script src="/static/ndf/bower_components/jqueryui-timepicker-addon/dist/jquery-ui-timepicker-addon.min.js"></script> <!-- checked -->
+
+  <link rel="stylesheet" href="/static/ndf/bower_components/jqueryui-timepicker-addon/dist/jquery-ui-timepicker-addon.css"> <!-- checked -->
+  <link rel="stylesheet" href="/static/ndf/bower_components/jquery-ui/themes/smoothness/jquery-ui.css"> <!-- checked -->
+{% endblock%}
+
+{% block style %}
+  {{block.super}}
+
+  /* Setting css-properties for ui-datepicker */
+    #ui-datepicker-div {
+      box-shadow: 0 5px 5px #808080;
+      width: 230px;
+    }
+
+    .ui-widget {
+      font-family: inherit;
+      font-size: inherit;
+    }
+
+    .ui-corner-all {
+    
+      border-radius: 0;
+    }
+
+    #ui-datepicker-div dt.ui_tpicker_minute_label {
+    
+      margin-bottom: 0;
+    }
+
+    .ui-slider-horizontal {
+    
+      margin-top: 1em;
+    }
+
+    .ui-datepicker-title select {
+      background-color: #e6e6e6;
+      /*border-collapse: separate;
+      border-spacing: 30px 0px;*/
+      font-family: inherit;
+      /*font-size: 0.3em;*/
+      font-weight: normal;
+      height: 1.5rem;
+      /*margin: 30px 0;*/
+      padding: 0;
+    }
+
+  /* CSS for Multiple-selection (or drawer) widget */
+    .divider-line { font-size: xx-large; color:lightgray; }
+    .line-height-2 { line-height:2; }
+    .line-height-2pt5 { line-height:2.5; }
+    .fontsize-x-large { font-size: x-large; }
+
+    .margin-0 { margin: 0 !important ;}
+
+    .resource-drawer { 
+      border-color: #D3D3D3; border-style: solid; 
+      padding: 0 !important; 
+      overflow-y: auto;
+    }
+
+    .resource-drawer li.bullet-item:hover{
+      background-color: #ecf0f1; cursor:pointer;
+    }
+
+    .posted-by{ color: #808080; font-size: small; }
+
+    .selected-resource { background-color:lightgray !important ; }
+
+    .resource-type-image {
+      height:40px;    
+      background-repeat:no-repeat; background-size: 48px 48px
+    }
+
+  /* Disable tab's (anchor tag's) click as it's navigation is propagated on buttons (Next & Previous) */
+    dl.tabs>dd a.disable {
+      pointer-events: none;
+      cursor: default;
+    }
+
+    .row .row {
+      margin: 0 0;
+    }
+
+  /* Setting css-properties for small.error */
+    small.error {
+      padding: 0 0 0 0.5rem !important;
+      margin-top: 1rem !important;
+      position: relative !important;
+    }
+
+  /* Setting css-properties for small.non-required*/
+    small.non-required {
+      padding: 0 0 0 0.5rem !important;
+      margin-top: 2.5rem !important;
+      position: relative !important;
+    }
+{% endblock %}

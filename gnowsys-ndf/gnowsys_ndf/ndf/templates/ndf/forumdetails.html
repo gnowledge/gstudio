@@ -1,0 +1,286 @@
+{% extends "ndf/base.html" %}
+{% load i18n %}
+{% load ndf_tags %}
+{% block title %}{{forum.name}}{% endblock %}
+
+
+{% block head %}
+<style type="text/css">
+
+  #create-thread i{
+    color: white;
+  }
+
+  .gray-text{
+    color: gray;
+  }
+
+  .pricing-table li.bullet-item {  text-align: left; }
+
+  .forum-summary{
+    background-color: #efefef;
+    box-shadow: 0px 2px 2px 2px lightgray;
+    margin: 2em 1em !important;
+    padding: 1em;
+    border : medium gray;
+    border-radius: 4px;
+  }
+
+  .forum-summary .user {  font-size: 1.5em;}
+  .forum-summary .user i { border-radius: 50px; }
+
+  table .user {  padding-left: 0.5em;}
+  /*table .user i { border-radius: 50px;  }*/
+
+  /*.org-content-style, #content > p { color: #6F6F6F !important; font-size: small; }*/
+
+  table { border: none }
+
+</style>
+{% endblock %}
+
+
+{% block help_content %}
+<p> {% trans 'Threads are new ideas on the topic' %}</p>
+{% endblock %}
+
+
+{% block meta_content %}
+<!-- <h2>Threads</h2> -->
+  {% if other_forums %}
+    <h3> &nbsp;
+      {% trans "Other Forums" %}
+    </h3>
+    {% for each_forum in other_forums %}
+      <a href="{% url 'show' group_id each_forum.0 %}">
+      {{each_forum.1}}</a><br>
+    {% endfor %}
+  {% endif %}
+  {% if user.is_authenticated %}
+  {% user_access_policy groupid request.user as user_access %}
+  {% if user_access == "allow" %}
+    <a class="tiny button" href="{% url 'create_forum' group_name_tag %}">
+    {% if hide_create_thread_btn %}
+       <span class="fi-plus">&nbsp;&nbsp;{% trans "Create Forum" %}</span>
+    {% endif %}
+    </a>
+  {% endif %}
+  {% endif %}
+
+
+{% endblock %}
+
+
+{% block concern_information %}
+<br/>
+<ul class="no-bullet" id="create-thread"> 
+      {% if hide_create_thread_btn %}
+        {% if user.is_authenticated %}
+        {% user_access_policy groupid request.user as user_access %}
+
+        {% if user_access == "allow" %}
+        {%  blocktrans %}<h3> &nbsp;Add thread to this forum</h3>{% endblocktrans %}
+        <a class="button expand" href="{% url 'create_thread' groupid forum.pk %}">
+         {% blocktrans %} Create &nbsp;Thread {% endblocktrans %}
+        </a>
+        {% endif %}
+        {% endif %}
+      {% endif %}
+</ul>
+
+<!-- <a href="#"> Browse forums</a> -->
+  <!-- <h2>Threads</h2>
+  {% comment %}
+  {% if user.is_authenticated %}
+    {% include "ndf/replyforum.html" %}
+  {% endif %} 
+  <h4>{% trans "Top Contributors" %}</h4>
+  {% endcomment %} -->
+  {% endblock %}
+
+  {% block body_content %}
+  {% get_group_name groupid as group_name_tag %}
+  <!-- <div class="row"> -->
+    <!-- <div class="small-12 large-12 columns"> -->
+
+    <div class="repository-title large-4 columns">{% trans "Forum" %}</div> 
+    
+     <a href="{% url 'show' groupid forum.pk %}" style="color:#878787!important;">
+        <div class="repository-desc large-8 columns">{{forum.name}}</a></div>
+        <br>
+    
+    {% get_edit_url forum.pk as edit_url %}
+   
+    {% if user.is_superuser or forum.created_by == user.id %}
+ <a href="{% url edit_url group_name_tag forum.pk %}" class="small button split edit"><i class="fi-pencil"></i> {% trans "Edit" %}<span data-dropdown="edit-options"></span></a>
+    {% endif %}
+  
+<ul id="edit-options" data-dropdown-content class="f-dropdown">
+            <li>
+
+            {% if forum.created_by == request.user.id %}
+      <a id="delthread" class="tiny alert button" href="{% url 'forum_delete' group_name_tag forum %}" onClick="return forum_del();">{% trans "Delete" %}</a>
+      {% endif %}
+
+            </li>
+
+</ul>
+    <div class="row forum-summary">
+      <div class="small-2 columns">
+        <a class="user"></a>
+        <br/><br/>
+        <i>{{ forum_created_by }}</i> <br/>
+        <small>{{forum.created_at|date:"D d M Y" }}</small>
+        <!-- <small>{#{#forum.created_by}}</small> -->
+      </div>
+      <div class="small-10 columns">
+        <blockquote>
+          {% with forum.content|safe as forum_content %}
+          {{forum_content|default_if_none:"No description !!"}}
+          {% endwith %}
+          <!-- #{#{forum.content|default_if_none:"No description !!"}} -->
+        </blockquote>
+      </div>
+    </div>
+
+    <hr/>
+
+    {% get_forum_twists forum as thread %}
+
+    {% if thread %}
+
+    <table width="100%">
+      <thead>
+        <tr>
+          <th width="200">{% trans "Thread Name" %}</th>
+          <th>{% trans "Thread Content" %}</th>
+          <th width="100">{% trans "Total Reply" %}</th>
+          <th width="300">{% trans "Latest Activity" %}</th>
+        </tr>
+      </thead>
+      <tbody>
+
+
+        {% for each in thread %}
+          {% get_user_object each.created_by as user_obj %}
+
+          <tr>
+            <td>
+              <a href="/{{groupid}}/forum/thread/{{each}}">
+                {{each.name}}
+              </a>
+              <br/>
+                <i class="gray-text"> {% trans 'by' %} {{user_obj.username}}</i>
+            </td>
+          
+            <td class="org-content-style">
+                {{each.content_org|safe|truncatewords:25}}
+            </td>
+          
+            <td class="text-center">{{ each.thread_reply_count }}</td>
+            <td>
+              <div class="row">
+                <div class="small-3 columns">
+                  <a class="user"></a>
+                  <br/>
+                  <i class="gray-text">{{ each.latest_reply.user|truncatechars:10 }}</i>                  
+                </div>
+                <div class="small-9 columns">
+                  {{ each.latest_reply.content_org|truncatechars:25 }}
+                  <br/>
+                  <span class="gray-text">{{ each.latest_reply.last_update }}</span>
+                </div>
+              </div>
+
+            </td>
+          </tr>
+
+        {% endfor %}
+          
+      </tbody>
+    </table>
+    
+    {% else %}
+    
+    <h2 ><small>&#8220; {% trans 'This forum dosen&#39t have any threads. Be the first to create a thread' %}!&#8221;</small></h2>
+
+    {% endif %}
+
+    <!-- <font size ="2" >{{forum_content}} </font> -->
+
+  <!-- </div> -->
+   <!-- <div class="small-6 large-6 columns" style="height:40px">
+    <ul class="sub-nav">
+      <li>
+       <h5>
+
+       </h5>
+     </li>
+   </ul>
+ </div> -->
+<!-- </div> -->
+
+{% comment %}
+<!-- 
+<div class="row" style="padding-top:10px" id="thread">
+{% get_forum_twists forum as thread %}
+{% for each in thread %}
+{% get_user_object each.created_by as user_obj %}
+<div class ="small-1 large-1 columns"> 
+  <div class="post-count-container new already-checked">
+    <span class="reply-count new-post already-checked">NEW</span>
+  </div>
+</div>
+<div class= "small-10 large-10 columns">
+  <h4>
+    <a href="/{{group_name_tag}}/forum/thread/{{each}}">
+      {{each.name}}
+    </a><br/>
+    <small>
+      by:<a class="user" href="#" data-gnow="#337700">{{user_obj.username}}</a>
+    </small>
+  </h4>
+  {% with each.content|safe as twist_content %}
+  <font size ="1" >{{twist_content}} </font>
+  {% endwith %}
+  {% for tag in each.tags %}
+  <span class="radius secondary label">{{tag}}</span>
+  {% endfor %}
+</div>
+ -->
+{% endcomment %}
+
+{% endblock %}
+
+
+{% block script %}
+
+// <script type="text/javascript">
+
+function forum_del() {
+var th_count={{thread_count}};
+if (th_count <= 0)
+{
+if (!window.confirm("Are you sure you want to delete this ?"))
+{
+  $("edit-options").class="f-dropdown";		
+  return false;
+}
+}
+else
+{
+
+alert(" {% blocktrans %} This forum has  {{thread_count}}  existing threads.Please remove them and try again {% endblocktrans %}.");
+$("edit-options").hide();
+return false;
+}
+}
+$("#node_search_form").parent().hide();
+
+  // removing left-off-canvas behaviour
+  // $("#create-thread a.left-off-canvas-toggle:lt(2)").remove();
+  // $("#create-thread a.left-off-canvas-toggle").removeClass("left-off-canvas-toggle");
+
+  // </script>
+
+  {% endblock %}

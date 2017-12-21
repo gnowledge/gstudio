@@ -1,0 +1,68 @@
+{% load simple_filters %}
+{% xextends "ndf/base.html" with first_body_column=0 %}
+{% load i18n %}
+{% load ndf_tags %}
+{% load cache %}
+
+{% cache 3600 repository request.LANGUAGE_CODE %}
+
+{% block title %} Repository {% endblock %}
+
+{% block style %}
+
+
+{% endblock %}
+
+
+{% block body_content %}
+
+	<div class="repository-title medium-3 medium-offset-2 large-3 large-offset-2 columns">{% trans "Repository" %}</div>
+	<div class="repository-desc medium-6 large-7 columns">{% trans "Digital resource grouped in multiple ways" %}</div>
+	
+	<!-- <ul class="inline-list card-holder"> -->
+	<div class="app-card-wrapper">
+		{% for each_gapp in gapps_obj_list %}
+			<div class="app-card-container">
+				<a class="app-card text-center" 
+				{% if each_gapp.name|lower == "event" %}
+					href="{% url 'program' group_id %}"
+				{% else %}
+					href="{% url each_gapp.name|lower group_id %}"
+				{% endif %}
+				>
+				<div class="app-card-title"><h4>  
+				{% if each_gapp.altnames %}
+					{% trans each_gapp.altnames %}
+				{% elif each_gapp.name %}
+					{% trans each_gapp.name %}
+				{% endif %}
+				</h4></div>
+					<!-- <div class="app-card-title"><h4>{% firstof each_gapp.altnames each_gapp.name %}</h4></div> -->
+					<div class="app-card-icon"><img src="{{ each_gapp.url }}" width="50%"></div>
+					<div class="app-card-content">{{each_gapp.content_org|truncatechars:60 }}</div>
+				</a>
+			</div>
+		{% endfor %}
+		<div class="app-card-container">
+			<a class="app-card text-center" href="{% url 'partner_showcase' group_id %}">
+				<div class="app-card-title"><h4>{% trans "Partner Showcase" %}</h4></div>
+				<div class="app-card-icon"><img src="/static/ndf/images/partner-01.svg" width="50%" style="padding-top:-2em"></div>
+				
+					<div class="app-card-content">{% trans "Contributions from institutions and individuals" %}</div>
+				
+			</a>
+		</div>
+	</ul>
+
+
+	<script type="text/javascript">
+        // // removing left panel:
+        // $("main.row > aside.columns").detach();
+
+        // // making body_content block to take 12-large columns
+        // $article = $("main.row > article.columns");
+        // $article.removeClass("medium-10").addClass("large-12");
+	</script>	
+
+{% endblock %}
+{% endcache %}

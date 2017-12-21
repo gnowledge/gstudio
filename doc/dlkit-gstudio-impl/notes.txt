@@ -1,0 +1,35 @@
+AUTHZ configuration:
+	- all project configuration lies under folder `app_configs` in `config.py` file.
+	- dlkit_runtime.__init__ calls dlkit_runtime.managers.Runtime()
+		- `dlkit_runtime.managers` imports config from `app_configs`
+		- following modules/files imported (make sure your custom changes/paths in this files):
+			- registry
+				- override/update MANAGER_PATHS of authz_adapter's appropriate service wrt one in dlkit_gstudio.
+			- config
+		- with these imported config, runtime object is initialized.
+			- e.g: RUNTIME = Runtime()
+	- RUNTIME is used to call different service managers.
+		- e.g: repository_service_mgr = RUNTIME.get_service_manager('REPOSITORY', proxy=proxy)
+
+
+ISO Script Types:
+	- It's in `primodium.locale.types.script`
+	- What is it?
+		- ISO 15924, Codes for the representation of names of scripts
+		- they can be used in HTML and XML to help Web browsers determine which typeface to use for foreign text.
+	- REF: https://en.wikipedia.org/wiki/ISO_15924
+
+
+ISO Language Types (DisplayText Languages):
+	- It's in `primodium.locale.types.language`
+	- What is it?
+		- ISO 639 is a standardized nomenclature used to classify languages.
+		- Each language is assigned a two-letter (639-1) and three-letter (639-2 and 639-3), lowercase abbreviation, amended in later versions of the nomenclature.
+		- ISO 639 is a set of standards by the International Organization for Standardization that is concerned with representation of names for language and language groups.
+		- GStudio currently supports, ISO 639-1 standard. But dlkit supports ISO 639-2 and ISO 639-3.
+	- REF:
+		- https://en.wikipedia.org/wiki/ISO_639
+		- https://en.wikipedia.org/wiki/List_of_ISO_639-1_codes
+		- http://data.okfn.org/data/core/language-codes
+
+

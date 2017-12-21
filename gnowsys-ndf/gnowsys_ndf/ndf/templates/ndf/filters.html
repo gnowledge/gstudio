@@ -1,0 +1,587 @@
+{% load i18n %}
+<!-- {# /**
+	===: Instructions :===
+
+	Provide method applyFilter() in your template with following signature:
+	applyFilter(filtersObjArr)
+	where,
+	filtersObjArr -- is array containing all selected filters.
+		- Each of the filter is contained in following format of JS Object:
+			{
+				"selFieldValue": <selFieldValue>,
+				"selFieldGstudioType": <selFieldGstudioType>,
+				"selFieldText": <selFieldText>,
+				"selFieldPrimaryType": <selFieldPrimaryType>
+			}
+
+	Example - for filter "audience: Teachers"
+	If "audience"(selFieldValue) is "attribute"(selFieldGstudioType) having data_type as "basestring"(selFieldPrimaryType) and value as "teachers"(selFieldText).
+	then filtersObjArr will be as follows:
+	[
+		{
+			"selFieldValue": "audience",
+			"selFieldGstudioType": "attribute",
+			"selFieldText": "teachers",
+			"selFieldPrimaryType": "selFieldPrimaryType"
+		}
+	]
+	And call the method as follows:
+	applyFilter(filtersObjArr).
+**/ } -->
+
+<style type="text/css">
+
+	div#filter-area {
+		/*//border: solid thin thistle;*/
+		padding: 10px;
+		margin: 0px -10px;
+		text-align: left;
+		border-bottom: 1px solid #cfcfcf;
+ 	}
+
+ 	div.filter-body>div, div.filter-body>select, div.filter-body>input {
+ 		display: inline-block;
+ 		vertical-align: top;
+ 		margin: 0px 10px;
+ 		margin-bottom: 0px;
+ 	}
+
+ 	@media screen and (min-width: 1026px) {
+ 		div.filter-body>div{
+ 			display: inline-block;
+	 		vertical-align: top;
+	 		margin-bottom: 0px;
+ 			width: 330px;
+ 		}
+
+
+        }
+
+ 	div.filter-body>div {
+ 		color: #A2A2A2;
+ 	}
+ 	div.filter-body>select {
+ 		display: none;
+ 		width: 330px;
+ 	}
+ 	div.filter-body {
+	    display: inline-block;
+		padding: 1px 1px;
+		border: 1px solid #DEDEDE;
+ 	}
+ 	div.filter-body i {
+ 		cursor: pointer;
+ 		font-size: 20px;
+ 	}
+ 	div.filter-body>input {
+ 		display: none;
+ 	}
+
+	/*div#filter-area:hover { border: dashed thistle; }*/
+
+	div#add-filters/*, div#close-select-filters*/ { cursor: pointer; height: 100%; }
+	div#add-filters:hover/*, div#close-select-filters:hover*/ { background-color: lightgray; }
+
+	#add-filters {
+		padding-bottom: 5px;
+		cursor: pointer;
+	}
+
+	#filters-label{
+		opacity: 0.1;
+	}
+
+	div.filters{
+		margin: 10px 5px 0px 0px;
+		color: white;
+		font-size: 0.9em;
+	}
+
+	i.remove-filter{
+		padding-left: 8px;
+		font-size: 1.1em;
+		cursor: pointer;
+	}
+
+	select[name="filter-field-value"]{
+		opacity: 0.5;
+	}
+
+</style>
+
+
+<div id="filter-area">
+
+	<!-- second filter row -->
+	<div class="row" id="select-filters">
+		<!--
+		<div class="small-1 columns text-center" id="close-select-filters">
+			<i class="fi-x-circle" style="font-size:large;"></i>&nbsp; <br/>
+			Close
+		</div>
+		 -->
+		<div class="small-12 columns" id="create-filter">
+			<div class="row">
+				<!--div class="small-12 large-3 columns small-text-left  large-text-center"><h5> {% trans 'Filter Resources' %}</h5></div-->
+				<div class="small-12 large-12 columns">
+					<div class="filter-body">
+						<div class="filter-button" id="filter_button">
+							<i class="fi-filter small" aria-hidden="true"></i>
+							<span>Add Filter</span>
+						</div>
+						<select name="filter-field-name">
+							<option value="initial-select"> -- {% trans 'Select' %} -- </option>
+							{% for key, val in filter_dict.items %}
+								<option value='{{val.value}}'
+								data-primary-type='{{val.data_type}}'
+								data-gstudio-type='{{val.type}}' data-name-field='{{key}}'>
+									{% comment %}
+										{# {% if val.altnames %}
+											{{val.altnames}}
+										{% else %}
+											{{key}}
+										{% endif %} #}
+									{% endcomment %}
+									{% firstof val.altnames key %}
+								</option>
+							{% endfor %}
+
+						</select>
+						<select name="filter-field-value"
+						onblur="$(this).css('height', '')"
+						onfocus="$(this).css('height', '6em')" multiple disabled>
+							<option value=""> -- {% trans 'Select' %} -- </option>
+
+						</select>
+						<input type="button" class="button radius tiny" value="{% trans 'Filter' %}"  style="width:65px!important" id="filter-btn">
+						<input type="button" class="button radius tiny" value="Clear" id="filter-clear-btn" style="width:65px!important">
+					</div>
+				</div>
+			</div>
+		</div>
+
+	</div>
+	<!-- end of second level filter -->
+	<!-- top-filter row -->
+	<div class="row" >
+
+		<div id="applied-filters" class="small-12 columns"></div>
+	</div>
+
+</div>
+<!-- end of filter section -->
+
+
+<script type="text/javascript">
+
+
+	// show and hide functionality on click of add filters
+	$("#add-filters").click(function(){
+		if ( $( "#select-filters" ).is( ":hidden" ) ) {
+			$( "#select-filters" ).show( "slow" );
+		} else {
+			$( "#select-filters" ).slideUp();
+		}
+	} )
+
+	// hide functionality on click of close filters
+	// $("#close-select-filters").click(function(){
+	// 	$( "#select-filters" ).slideUp();
+	// })
+
+	// getting both the <select>
+	var $selectName = $("select[name='filter-field-name']"),   // first <select>
+		$selectValue = $("select[name='filter-field-value']"); // second <select>
+
+	$('#filter_button').on('click', function(){
+		$selectName.show();
+		$(this).find('span').hide();
+		$("#filter-clear-btn").show();
+		$selectName.val('initial-select')
+	})
+
+	$("#filter-clear-btn").on('click', function(){
+		$(".filter-body").find('select, input').hide();
+		$("#filter_button>span").show();
+		$(".filter-body").find('select').val('');
+	})
+	// handling change of first <select>;
+	// to populate second <select> with "value" field of this (first <select>'s) <option>.
+	$selectName.change(function(){
+		// ff: first filter. getting the name and value field of it.
+		var selectedNameEl = $selectName.children("option:selected");
+
+		// if --Select-- is choosen then reset secondary selection
+		if (selectedNameEl.index() == 0) {
+			// making --Select-- to appear with less opacity and disabled way
+			// $selectValue.children()[0].style.display = "block";
+			// $selectValue.attr('disabled', true);
+			// $selectValue.css('opacity', 0.5);
+			$selectValue.hide();
+			$(".filter-body").find('select, input').hide();
+			$("#filter_button>span").show();
+			$(".filter-body").find('select').val('');
+
+			return false;
+		};
+
+		// console.log(selectedNameEl.attr("data-name-field").trim());
+
+		var ffName = selectedNameEl.attr("data-name-field").trim(),
+			ffAltnames = selectedNameEl.text().trim(),
+			ffValues = selectedNameEl.val().trim(),
+			ffPriDataType = selectedNameEl.attr("data-primary-type").trim(),
+			ffType = selectedNameEl.attr("data-gstudio-type").trim();
+
+		// the value is stored as a array of strings in individual <option>
+		if( ffValues != "[]" && (ffValues[0] == "[") && (ffValues[ffValues.length - 1] == "]") )
+		{
+			// hide very first <option> --- Select --- </option>
+			$selectValue.children("option:first-child").hide();
+
+			// removing prev <option> values (except very-first/above <option>)
+			$selectValue.children("option:not(:first-child)").detach();
+
+			// as soon as second <select> is going to get populate,
+			// and it's multi-select increase it's height.
+			$selectValue.css("height", "6em");
+			$selectValue.css("opacity", "1");
+			$selectValue.removeAttr("disabled");
+
+			// console.log(ffValues)
+			var ffValuesArr = JSON.parse(ffValues);
+
+			// loop over each value of the array
+			for (var i = 0; i < ffValuesArr.length; i++) {
+
+				// creating new <option> element by JS way
+				var newOption = document.createElement("option");
+				newOption.value = ffName;
+				newOption.text = String(ffValuesArr[i]).trim();
+				newOption.setAttribute("data-gstudio-type", ffType);
+				newOption.setAttribute("data-value-altnames", ffAltnames);
+				newOption.setAttribute("data-primary-type", ffPriDataType);
+				$selectValue.append(newOption);
+			};
+			$selectValue.show();
+		}
+		else if( ffValues == "initial-select")  // handling selection of very-first option
+		{
+			$selectValue.children("option:first-child").show();
+			$selectValue.children("option:not(:first-child)").detach();
+			$selectValue.css("height", "");
+			$selectValue.show();
+		}
+		else if( !ffValues || ffValues == "[]" )  // handling key with no values
+		{
+			alert("{% trans 'No values for the key' %} : " + ffName);
+			$selectValue.hide();
+		}
+	})
+
+	$selectValue.on('change', function(e){
+		console.log(e.target);
+		$("#filter-btn").show();
+	})
+	function getFiltersObjArr()
+	{
+		var filtersObjArr = new Array();
+
+		// looping to fill prevFiltersArr and filtersObjArr.
+		$("#applied-filters").children("div.filters.label").each(function(){
+
+			var tempObj = new Object();
+			tempObj["selFieldValue"] 		= this.getAttribute("data-selFieldValue");;
+			tempObj["selFieldValueAltnames"] = this.getAttribute("data-value-altnames");
+			tempObj["selFieldGstudioType"] 	= this.getAttribute("data-gstudio-type");
+			tempObj["selFieldText"] 		= this.getAttribute("data-selFieldText");
+			tempObj["selFieldPrimaryType"] 	= this.getAttribute("data-primary-type");
+
+			filtersObjArr.push(tempObj);
+		});
+
+		return filtersObjArr;
+	}
+
+	function updateFiltersCount(){
+
+		// looping to get all fiters after their addition.
+		var allFilters = $("#applied-filters").children("div.filters.label").length;
+
+		// setting the text/label of filters/filter based on count plurality
+		if(allFilters > 0)
+		{
+			$("#filters-label").html("<i class='fi-filter'></i>").fadeIn();
+			$("#filters-count").text(allFilters).fadeIn();
+		}
+		else
+		{
+			$("#filters-label").fadeOut();
+			$("#filters-count").fadeOut();
+		}
+
+	}
+
+	function getFiltersObjsInAndOrFormat()
+	{
+		var filtersObjArr = getFiltersObjArr();
+		var tempObj = new Object();
+
+		// grouping together with same selFieldGstudioType + selFieldValue + selFieldPrimaryType
+		filtersObjArr.forEach(function(f) {
+
+			var temp = f.selFieldGstudioType + f.selFieldValue + f.selFieldPrimaryType;
+
+			if(tempObj.hasOwnProperty(temp))
+			{
+				tempObj[temp].push(f);
+			}
+			else
+			{
+				tempObj[temp] = [f];
+			}
+		});
+		// console.log(tempObj)
+		// aaa = tempObj
+
+		// creating new array with "or" as key-name rather than comb name as in tempObj
+		filtersObjAndOrArr = new Array();
+		for(i in tempObj)
+		{
+			var o = new Object();
+			 o["or"] = tempObj[i];
+			 filtersObjAndOrArr.push(o);
+		}
+
+		// console.log(JSON.stringify(filtersObjAndOrArr));
+		return filtersObjAndOrArr;
+	}
+
+	function updateFilterUrl(url)
+	{
+		var filters = getFiltersObjsInAndOrFormat();
+		// alert(filters);
+
+		if ((filters.length > 0) && url) {
+
+			filters = JSON.stringify(filters);
+
+			url = url + 'filter?selfilters=' + filters;
+		}
+
+		window.location.href = url;
+	}
+
+	function getQueryVariable(variable)
+	{
+	       var query = window.location.search.substring(1);
+	       var vars = query.split("&");
+	       for (var i=0;i<vars.length;i++) {
+	               var pair = vars[i].split("=");
+	               if(pair[0] == variable){return decodeURI(pair[1]);}
+	       }
+	       return(false);
+	}
+
+	filtersInUrl = getQueryVariable('selfilters');
+	filtersInUrl = (typeof(filtersInUrl) == 'string')? JSON.parse(filtersInUrl): filtersInUrl;
+
+	// console.log(filtersInUrl);
+	filtersInUrlList = []
+	for (var key in filtersInUrl) {
+	  if (filtersInUrl.hasOwnProperty(key)) {
+	    // console.log(key + " -> " + JSON.stringify(filtersInUrl[key]['$or'][0]));
+	    filtersInUrlList = filtersInUrlList.concat(filtersInUrl[key]['or']);
+
+	  }
+
+	}
+	// console.log(filtersInUrlList);
+    filtersInUrlList.forEach(function(f){populateFilters (f.selFieldValue, f.selFieldValueAltnames, f.selFieldText, f.selFieldGstudioType, f.selFieldPrimaryType) });
+	updateFiltersCount();
+
+	function populateFilters (selFieldValue, selFieldValueAltnames, selFieldText, selFieldGstudioType, selFieldPrimaryType) {
+
+					var filterText = selFieldValueAltnames + ": " + selFieldText;  // text to be visible as filter
+
+					// if new filter then creating it in a JS way
+					var filterDiv = document.createElement("div");
+					filterDiv.className = "filters label round";
+					filterDiv.appendChild(document.createTextNode(filterText));
+					filterDiv.setAttribute("data-selFieldValue", selFieldValue);
+					filterDiv.setAttribute("data-gstudio-type", selFieldGstudioType);
+					filterDiv.setAttribute("data-selFieldText", selFieldText);
+					filterDiv.setAttribute("data-primary-type", selFieldPrimaryType);
+					filterDiv.setAttribute("data-value-altnames", selFieldValueAltnames);
+
+					var closeBtn = document.createElement("i");
+					closeBtn.className = "fi-x-circle remove-filter";
+					closeBtn.title = "{% trans 'Remove this filter' %}";
+					closeBtn.onclick = function(){
+						$(this).parent().fadeOut("slow", function(){
+							$(this).detach();
+							var filtersObjArr = getFiltersObjArr();
+							applyFilter(filtersObjArr);
+							updateFiltersCount();
+						});
+
+					};
+					filterDiv.appendChild(closeBtn);
+
+					// appending newly created filter element to applied-filters area
+					$("#applied-filters").append(filterDiv);
+
+					$(".remove-filter").mouseenter(function(){
+						$(this).parent("div.filters").css("text-decoration", "line-through")
+					});
+
+					$(".remove-filter").mouseleave(function(){
+						$(this).parent("div.filters").css("text-decoration", "none")
+					});
+	}
+
+	// adding filters label functionality on click of add filter button
+	$("#filter-btn").click(function(){
+
+		// flag to check if filter is selected or not
+		var flagIsNewFilterSelected = false;
+
+		// getting second <select>'s selected options
+		var selOpts = $("select[name='filter-field-value'] :not(:first-child):selected");
+
+		// getting already added filers as array of text strings
+		var prevFiltersArr = [];
+
+		// getting already added filers as an array of objects, holding entire properties of it.
+		var filtersObjArr = getFiltersObjArr();
+
+		// looping to fill prevFiltersArr.
+		$("#applied-filters").children("div.filters.label").each(function(){
+			prevFiltersArr.push(this.textContent.trim())
+		});
+
+		$(".filter-body").find('select, input').hide();
+		$("#filter_button>span").show();
+		if(selOpts.length > 0)  // if any of the second <select>'s option/s are selected
+		{
+			selOpts.each(function(){
+				// console.log(this.text)
+
+				var selFieldValue = this.value.trim(),  // value id parent/key from first <select>
+					selFieldValueAltnames = this.getAttribute("data-value-altnames").trim(),
+					selFieldText  = this.text.trim(),   // actual text value of this <option>
+					selFieldGstudioType = this.getAttribute("data-gstudio-type").trim(),
+					selFieldPrimaryType = this.getAttribute("data-primary-type").trim(),
+					filterText = selFieldValueAltnames + ": " + selFieldText;  // text to be visible as filter
+
+				// checking if filter does exists in already selected/added filters
+				if(prevFiltersArr.indexOf(filterText) < 0)
+				{
+					// set flag to true
+					flagIsNewFilterSelected = true;
+
+					populateFilters(selFieldValue, selFieldValueAltnames, selFieldText, selFieldGstudioType, selFieldPrimaryType);
+
+					// // if new filter then creating it in a JS way
+					// var filterDiv = document.createElement("div");
+					// filterDiv.className = "filters label round";
+					// filterDiv.appendChild(document.createTextNode(filterText));
+					// filterDiv.setAttribute("data-selFieldValue", selFieldValue);
+					// filterDiv.setAttribute("data-gstudio-type", selFieldGstudioType);
+					// filterDiv.setAttribute("data-selFieldText", selFieldText);
+					// filterDiv.setAttribute("data-primary-type", selFieldPrimaryType);
+					// filterDiv.setAttribute("data-value-altnames", selFieldValueAltnames);
+
+					// var closeBtn = document.createElement("i");
+					// closeBtn.className = "fi-x-circle remove-filter";
+					// closeBtn.title = "{% trans 'Remove this filter' %}";
+					// closeBtn.onclick = function(){
+					// 	$(this).parent().fadeOut("slow", function(){
+					// 		$(this).detach();
+					// 		var filtersObjArr = getFiltersObjArr();
+					// 		applyFilter(filtersObjArr);
+					// 		updateFiltersCount();
+					// 	});
+
+					// };
+					// filterDiv.appendChild(closeBtn);
+
+					// // appending newly created filter element to applied-filters area
+					// $("#applied-filters").append(filterDiv);
+
+					// $(".remove-filter").mouseenter(function(){
+					// 	$(this).parent("div.filters").css("text-decoration", "line-through")
+					// });
+
+					// $(".remove-filter").mouseleave(function(){
+					// 	$(this).parent("div.filters").css("text-decoration", "none")
+					// });
+
+					var filtersObj = new Object();
+					filtersObj["selFieldValue"] = selFieldValue;
+					filtersObj["selFieldValueAltnames"] = selFieldValueAltnames;
+					filtersObj["selFieldGstudioType"] = selFieldGstudioType;
+					filtersObj["selFieldText"] = selFieldText;
+					filtersObj["selFieldPrimaryType"] = selFieldPrimaryType;
+
+					filtersObjArr.push(filtersObj);
+
+				}
+				else  // handling selection of already existing filter
+				{
+					alert('Filter - [ "' + filterText + '" ] {% trans 'is already applied' %} !');
+				}
+
+				// make the height of second select to initial
+				$selectValue.css("height", "");
+
+			});  // end of looping through selected filter
+
+			updateFiltersCount();
+
+			/**
+			===: Instructions :===
+
+			Provide method applyFilter() in your template with following signature:
+			applyFilter(filtersObjArr)
+			where,
+			filtersObjArr -- is array containing all selected filters.
+				- Each of the filter is contained in following format of JS Object:
+					{
+						"selFieldValue": selFieldValue,
+						"selFieldGstudioType": selFieldGstudioType,
+						"selFieldText": selFieldText,
+						"selFieldPrimaryType": selFieldPrimaryType
+					}
+
+			Example - for filter "audience: Teachers"
+			If "audience"(selFieldValue) is "attribute"(selFieldGstudioType) having data_type as "basestring"(selFieldPrimaryType) and value as "teachers"(selFieldText).
+			then filtersObjArr will be as follows:
+			[
+				{
+					"selFieldValue": "audience",
+					"selFieldGstudioType": "attribute",
+					"selFieldText": "teachers",
+					"selFieldPrimaryType": "selFieldPrimaryType"
+				}
+			]
+			And call the method as follows:
+			applyFilter(filtersObjArr).
+			**/
+
+			// if filtersObjArr is having any object/selected-filter then only call applyFilter()
+			if(flagIsNewFilterSelected)
+			{
+				// console.log(filtersObjArr);
+				applyFilter(filtersObjArr);
+			}
+
+		}
+		else  // handling no filter is selected
+		{
+		 	alert("{% trans 'Please select the proper filter first' %} !");
+		}
+
+	})
+
+</script>

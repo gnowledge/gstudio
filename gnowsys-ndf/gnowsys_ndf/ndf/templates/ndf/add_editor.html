@@ -1,0 +1,278 @@
+{% load ndf_tags %}
+{% load i18n %}
+{% load cache %}
+
+{% get_group_name groupid as group_name_tag %}
+
+<!-- orgitdown! -->
+{% cache 3600 editor_static_files %}
+<script type="text/javascript" src="/static/ndf/orgitdown/jquery.orgitdown-foundation.js"></script>
+<!-- orgitdown! toolbar settings -->
+<script type="text/javascript" src="/static/ndf/orgitdown/skins/gstudio/set.js"></script>
+<!-- orgitdown! skin -->
+<link rel="stylesheet" type="text/css" href="/static/ndf/orgitdown/skins/gstudio/style.css" />
+{% endcache %}
+
+<style type="text/css">
+
+
+</style>
+
+{% comment %}
+
+<!-- start of mobwrite -->
+<!-- {% if node_id %}
+	<script src="/static/js/mobwrite/diff_match_patch.js"></script>
+	<script src="/static/js/mobwrite/core.js"></script>
+	<script src="/static/js/mobwrite/form.js"></script>
+	<script src="/static/js/mobwrite/iframe.js"></script>
+	<script>
+	mobwrite.syncGateway = '/mobwrite/';
+        mobwrite.syncUsername = "{{request.user.username}}";
+	$(function(){
+	        mobwrite.share('{{node_id|mongo_id}}');
+		
+	});
+// ajax call for editing users
+        var onlineuser = function() {
+        $.ajax({
+          url: "{% url 'get_online_editing_user' 'groupid' %}",
+          type: "POST",
+          data: ({
+            editorid: '{{node_id}}',
+	    csrfmiddlewaretoken: '{{ csrf_token }}',
+          }),
+          beforeSend: function() {  },
+          error: function(request){
+		$("#plistOnlineUser").html("error"); },
+          success: function(data) {
+		$(".orgitdownLive").show();
+		$("#plistOnlineUser").html("");
+		$("#listOnlineUser").html("");
+		if(data[0] == "No users"){$("#plistOnlineUser").html("No other users editing this resource");}
+		else{
+			for(var item in data)
+			{
+			 var li = $("<li class='user'></li>")
+                                 .appendTo($("#listOnlineUser"));
+			if(data[item]['pro_img'] == "no"){
+				itag = $('<i class="fi-torso" style="background-color:#aabb44"></i>')
+					.appendTo(li);
+				li.append(data[item]['username']); }
+			else{
+				imgtag = $('<img height="30" width="30" style="margin-right:0.4em;" src='+data[item]['pro_img']+'>')
+					.appendTo(li);
+				li.append(data[item]['username']);
+
+			}
+				
+			}
+			}
+		    }
+		
+        }); //end of ajax
+
+      };
+	setInterval(onlineuser, 5000);
+	</script>
+{% endif %}
+ --><!-- end of mobwrite -->
+{% endcomment %}
+
+{% trans var_placeholder as content %}
+{% comment %}
+{% if node_id %}
+<!-- <input type="hidden" value="{#% check_existence_textObj_mobwrite node_id %#}"> -->
+<textarea id="{{node_id|mongo_id}}" class="small-12 columns" name="{{var_name}}" placeholder="{% blocktrans %}  {{content}} {% endblocktrans %}" value="{{var_value}}">{{var_value}}</textarea>
+
+{% else %}
+<textarea id="orgitdown_{{var_name}}" class="small-12 columns orgedit" name="{{var_name}}" placeholder="{% blocktrans %}  {{content}} {% endblocktrans %}" value="{{var_value}}">{{var_value}}</textarea>
+
+{% endif %}
+{% endcomment %}
+{% include "ndf/html_editor.html" with var_name="content_org" var_placeholder="Enter the content here" var_value=node_content|default_if_none:"" node_id=node.pk ckeditor_toolbar="GeneralToolbar" %}
+<script>
+{% if node_id %}
+  $("#{{node_id|mongo_id}}").orgitdown(mySettings);
+{% else %}
+  $("#orgitdown_{{var_name}}").orgitdown(mySettings);
+{% endif %}
+
+function getfullImg(){
+var selectBox = document.getElementById("img-select");
+var selectedValue = selectBox.options[selectBox.selectedIndex].value;
+var selectedid = selectBox.options[selectBox.selectedIndex].id;
+var fileurl = window.location.protocol+"//"+window.location.host+"/{{group_name_tag}}/file/readDoc/"+selectedid+"/"+selectedValue;
+insertImg(fileurl)
+}
+
+function insertImg(fileurl){
+   if (fileurl){
+   insert_img=("\n#+CAPTION: "+$("#image_des_int").val()+"\n#+ATTR_HTML: width='"+$("#image_width_int").val()+"'"+"\n[["+fileurl+"]]\n");
+  if ("{{node_id}}"){
+           var startPos = $("#{{node_id}}").prop("selectionStart");
+           var endPos = $("#{{node_id}}").prop("selectionEnd");
+           var content = $("#{{node_id}}").val().substring(0, startPos) + insert_img + $("#{{node_id}}").val().substring(endPos, $("#{{node_id}}").val().length);
+          $("#{{node_id}}").val(content);
+        }
+       else {
+           var startPos = $("#orgitdown_content_org").prop("selectionStart");
+           var endPos = $("#orgitdown_content_org").prop("selectionEnd");
+           var content = $("#orgitdown_content_org").val().substring(0, startPos) + insert_img + $("#orgitdown_content_org").val().substring(endPos, $("#orgitdown_content_org").val().length);
+           $("#orgitdown_content_org").val(content); 
+           }
+       $(".close-reveal-modal").trigger("click");
+ }
+   else {
+   insert_img=("\n#+CAPTION: "+$("#image_des").val()+"\n#+ATTR_HTML: width='"+$("#image_width").val()+"'"+"\n[["+$("#image_url").val()+"]]\n");
+  if($("#image_url").val() == ""){
+    alert("Please insert an image url");}
+  else {
+  if ("{{node_id}}"){
+           var startPos = $("#{{node_id}}").prop("selectionStart");
+           var endPos = $("#{{node_id}}").prop("selectionEnd");
+           var content = $("#{{node_id}}").val().substring(0, startPos) + insert_img + $("#{{node_id}}").val().substring(endPos, $("#{{node_id}}").val().length);
+          $("#{{node_id}}").val(content);
+        }
+       else {
+           var startPos = $("#orgitdown_content_org").prop("selectionStart");
+           var endPos = $("#orgitdown_content_org").prop("selectionEnd");
+           var content = $("#orgitdown_content_org").val().substring(0, startPos) + insert_img + $("#orgitdown_content_org").val().substring(endPos, $("#orgitdown_content_org").val().length);
+           $("#orgitdown_content_org").val(content); 
+           }
+ }       
+ $("#insert-pic .close-reveal-modal").trigger("click");
+   }
+}
+
+
+function myFunction(str){ 
+				cite = document.getElementById(str.id).name;
+				var txtAreaContainer = $(".orgitdownContainer textarea");
+				cursor_position=$(txtAreaContainer).prop('selectionStart')
+				string1=txtAreaContainer.val().substring(0,cursor_position);
+				string2=txtAreaContainer.val().substring(cursor_position,txtAreaContainer.val().length);
+				string3=cite
+				string4=string1+string3+string2
+				txtAreaContainer.val(string4);
+				$('#bib-text').foundation('reveal', 'close');
+			}
+function externalImg(){
+     $.ajax({
+                 url: "{% url 'insert_picture' group_id %}".replace('group_id', "{{group_id}}"),
+                 type:"GET",
+                 success: function(data) {
+                       $('#int-img').foundation('reveal', 'open');
+                   }
+          }) 
+}
+
+function internalImg(){
+     $.ajax({
+                 url: "{% url 'insert_picture' group_id %}",
+                 type:"GET",
+                 success: function(data) {
+                           data1 = JSON.parse(data);
+                           temp1=''
+                           temp1 +="<h3>{% trans 'Add Internal Image' %}:</h3><div><label>{% trans 'Image' %} {% trans 'Description' %}</label><input type='text' id='image_des_int' placeholder='{% trans 'Some description' %} ...'><label>{% trans 'Width' %}</label><input type='text' id='image_width_int' placeholder='{% trans 'Enter width in pixel eg.600' %}...'></div>";
+                           temp1 +='<label>URL</label><select id="img-select">'
+                           for(i=0; i<data1.length; i++)
+                           {temp1 += '<option value="'+data1[i].fname+'" id="'+data1[i]._id+'" name="checkedpic">'+data1[i].name+''+'<img src="'+data1[i].name+'">'+'</option>'
+ }
+                           temp1 +='</select>'                     
+                           temp1 +='<input type="button" onclick="getfullImg()" class="button" value="Add Image">'
+						    
+                          $('#ext-img').foundation('reveal', 'open');
+                          document.getElementById("extimg").innerHTML=temp1;
+
+	} 
+})
+}
+
+$(".orgitdownButton.orgitdownButton6 a").click(function(){
+	$('#insert-pic').foundation('reveal', 'open');
+       })
+
+$(".orgitdownButton.orgitdownButton10 a").click(function(){
+	$.ajax({
+          url: "{% url 'view_articles' group_id %}",
+          type:"GET",
+          success: function(data) {
+                        data = JSON.parse(data);
+                        temp = '';
+			for(i=0; i<data.length; i++)
+			{
+				console.log(data.length)
+				$.each(data[i], function(j, entry){
+						temp += '<dd class="accordion-navigation"><a href="#'+j+'">'+j+'</a><div id="'+j+'" class="content">';
+						temp2 = '';
+						array=entry
+						for(j=0;j<array.length;j++)
+						{
+							prop=(array[j].name)
+							prop2=(array[j].cite)
+							temp2 += '<div> <button id="#'+prop+'" name="'+prop2+'" onclick="myFunction(this)">'+ prop +' </button> </div>';
+							
+						}
+						temp2 += '</div></dd>'
+						
+						temp += temp2;
+
+					})
+
+			}
+				
+			$('#bib-text').foundation('reveal', 'open');
+
+			document.getElementById("bib1").innerHTML=temp;
+			
+			
+		}
+
+        }); 
+		});
+
+</script>
+
+{% cache 3600 editor_menu %}
+<div id="bib-text" class="reveal-modal" data-reveal>
+<dl class="accordion" data-accordion id="bib1">
+</dl>
+<a class="close-reveal-modal">&#215;</a>
+</div>
+<div id="alert" class="reveal-modal small" data-reveal>
+<p> {% trans 'citation has been inserted' %} </p>
+<a class="close-reveal-modal">&#215;</a>
+</div>
+
+<div id="insert-pic" class="small reveal-modal" data-reveal>
+  <a class="close-reveal-modal">&#215;</a>
+  <h3> {% trans 'Add Internal/External Images' %}:</h3> 
+  <div>
+    <input type="radio" id="extimage" name="imginsert" onclick="externalImg()"><label>{% trans 'External' %}</label>
+    <input type="radio" id="intimage" name="imginsert" onclick="internalImg()"><label>{% trans 'Internal' %}</label>
+  </div>
+</div>
+
+
+<div id="int-img" class="small reveal-modal" data-reveal>
+<a class="close-reveal-modal">&#215;</a>
+<h3>{% trans 'Add External Image' %}:</h3> 
+<div>
+    <label>{% trans 'Image' %} {% trans 'Description' %}</label> 
+    <input type="text" id="image_des" placeholder="{% trans 'Some description' %} ...">
+    <label>Width</label>
+    <input type="text" id="image_width" placeholder="{% trans 'Enter width in pixel eg.600' %}...">
+    <label>URL</label>
+    <input type="text" id="image_url" placeholder="{% trans 'Enter Image path' %} {% trans 'eg' %}. http:filename.jpg...">
+    <!-- <button type="submit" id="insertimage" onclick="insertImg()"> Add Image</button> -->
+    <input type="button" id="insertimage" onclick="insertImg()" value="Add Image" class="button">
+
+</div></div>
+
+<div id="ext-img" class="small reveal-modal" data-reveal>
+<dl class="accordion" data-accordion id="extimg">
+  </dl>
+<a class="close-reveal-modal">&#215;</a>
+</div>
+{% endcache %}

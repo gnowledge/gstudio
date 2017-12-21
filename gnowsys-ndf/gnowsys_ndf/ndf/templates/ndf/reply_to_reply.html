@@ -1,0 +1,88 @@
+{% load ndf_tags %}
+{% load i18n %}
+<script type="text/javascript">
+
+{% block document_ready %}
+
+ $('#orgitdown{{each}}').orgitdown(mySettings);
+
+$("#savereply{{each}}").click(function(){
+var content=$('#orgitdown{{each}}').val()
+
+
+var repl=$("#rep{{each}}").val();
+var ajurl="/"+groupid+"/forum/add_node/"
+
+$.ajax({
+        url: ajurl,
+        type: 'POST',
+        data: {node:'Reply',supnode:repl,reply:content,twistname:"",csrfmiddlewaretoken: '{{ csrf_token }}'},
+        beforeSend: function() {
+              $("#ajax_load_image").show();
+              $("#body").css({"opacity":"0.1",})
+                              },
+        success: function(data){
+                if(data=="success")
+                    {
+                       $(".close").trigger('click');
+                    }
+                else
+                    {
+                    $(".close").trigger('click');
+                    }
+           },
+       complete: function(){
+                $("#ajax_load_image").hide();
+                $("#body").css({"opacity":"",})
+          }
+   })
+
+});
+});
+{% endblock %}
+</script>
+
+
+
+
+
+<style type="text/css">
+.orgitdown{
+height:100px;
+}
+.orgitdownContainer{
+height:100px;
+}
+.orgitdownEditor{
+height:60px;
+}
+div.overlay {
+        width:500px;
+        display:none;
+        color:Blue;
+        padding:10px;
+        background-color:white;
+}
+img{
+position:absolute;
+}
+
+div.overlay a.close {
+        background-image:url("/static/ndf/images/close.png");
+        position:absolute;
+        right:5px;
+        top:5px;
+        cursor:pointer;
+        height:27px;
+        width:27px;
+}
+</style>
+
+
+<button rel="#reply_frm{{each}}" id="reply_forum{{each}}" type="button" >{% trans "Reply" %}</button>
+<div class="overlay" id="reply_frm{{each}}">
+{% trans "Reply to Reply:" %}
+  <textarea id="orgitdown{{each}}" name="content_org" placeholder="Please enter description..."></textarea>
+<input id="savereply{{each}}" type="button" value="Save">
+<input type="text" id="rep{{each}}" style="visibility:hidden" value="{{each}}">
+</div>

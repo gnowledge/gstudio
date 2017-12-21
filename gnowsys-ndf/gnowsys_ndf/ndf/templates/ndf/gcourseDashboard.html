@@ -1,0 +1,91 @@
+<div class="row course-dashboard">
+    <div class="small-12 columns">
+        <div class="row">
+            <div class="medium-6 small-12 columns course-status dash-tile">
+                <div class="row">
+                    <div class="small-12 columns dash-tile-heading">
+                        Course Status
+                    </div>
+                    <div class="small-12 course-update columns dash-tile-row">
+                        <div class="row">
+                            <div class="small-12 columns course-current-state"> ONGOING SESSION </div>
+                        </div>
+                        <div class="row">
+                            <div class="small-12 columns"> {{next_session_in_course.0|default_if_none:"Data Not Available"}} </div>
+                        </div>
+                        <div class="row">
+                            <div class="small-12 columns">
+                                <a href="#" class="button small radius">
+                                    <i class="fa fa-sign-out"></i>Enter Session
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+
+                    {% if request.user.is_authenticated %}
+                      <div class="small-12 columns course-progress dash-tile-row">
+                        <label>{{completed_count}} out of {{total_count}} modules completed</label>
+                        <div class="progress success round">
+                        <div class="meter" style="width: {{course_complete_percentage}}%"></div>
+                        </div>
+                      </div>
+                    {% endif %}
+
+                </div>
+            </div>
+            <div class="small-6 columns course-performance dash-tile">
+                <div class="row">
+                    <div class="small-12 columns dash-tile-heading">
+                        <div>Course Performance</div>
+                    </div>
+                    <div class="small-12 columns">
+                        <div class="row">
+                            <div class="small-12 columns performace-label">
+                                LAST ACTIVITY
+                            </div>
+                            <div class="small-12 columns performace-value">
+                                JAN 25th 2016 &#8226; 12:00pm
+                            </div>
+                        </div>
+                    </div>
+                    <div class="small-12 columns">
+                        <div class="row">
+                            <div class="small-12 columns performace-label">
+                                LAST ACTIVITY
+                            </div>
+                            <div class="small-12 columns performace-value">
+                                JAN 25th 2016 &#8226; 12:00pm
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            {% comment %}
+            <div class="medium-6 small-12 course-notifications columns dash-tile">
+                <div class="row">
+                    <div class="small-12 columns dash-tile-heading" style="position: relative">
+                        <div>Notification</div>
+                        <div class="notification-count badge red">4</div>
+                    </div>
+                    <div class="small-12 columns dash-tile-row">
+                        <div class="row notification-row">
+                            <div class="small-12 columns notification-text">
+                                Lorem ipsum dolor sit amet, consectetur adipiscing elit. Duis mattis fermentum imperdiet. Nam iaculis, nulla quis dignissim imperdiet, mauris lorem faucibus ante, vel malesuada nisi nisi eget mi. In eget semper lorem, sit amet tempor ex.
+                            </div>
+                            <div class="small-12 columns time-elapsed"> less than a minute</div>
+                        </div>
+                    </div>
+                    <div class="small-12 columns dash-tile-row">
+                        <div class="row notification-row">
+                            <div class="small-12 columns notification-text">
+                                Lorem ipsum dolor sit amet, consectetur adipiscing elit. Duis mattis fermentum imperdiet. Nam iaculis, nulla quis dignissim imperdiet, mauris lorem faucibus ante, vel malesuada nisi nisi eget mi. In eget semper lorem, sit amet tempor ex.
+                            </div>
+                            <div class="small-12 columns time-elapsed"> less than a minute</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            {% endcomment %}
+        </div>
+    </div>
+</div>

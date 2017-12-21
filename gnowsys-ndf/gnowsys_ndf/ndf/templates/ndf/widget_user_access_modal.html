@@ -1,0 +1,28 @@
+  <div id="userDenied" class="reveal-modal medium alert-box radius" data-reveal data-alert>
+    <p id="userDeniedLabel" style="color: black;"></p>
+    <div class="row user_actions hide">
+
+      <div class="small-3 small-offset-3 columns enroll-action hide">
+        {% include 'ndf/widget_enroll.html' %}
+      </div>
+
+      <div class="small-3 small-offset-3 columns login-action hide">
+        <a href="{% url 'auth_login' %}?next={{request.path}}">Login</a>
+      </div>
+    </div>
+    <a class="close-reveal-modal">&#215;</a>
+  </div>
+
+<script type="text/javascript">
+  $(document).on('click','.user_not_enrolled',function(){
+      {% if request.user.is_authenticated %}
+        $("#userDeniedLabel").text("Click on Enroll to continue and gain points")
+        $(".user_actions .enroll-action").removeClass("hide")
+      {% else %}
+        $("#userDeniedLabel").text("Click on Login to continue.")
+        $(".user_actions .login-action").removeClass("hide")
+      {% endif %}
+      $(".user_actions").removeClass("hide")
+      $("#userDenied").foundation('reveal', 'open');
+      });
+</script>

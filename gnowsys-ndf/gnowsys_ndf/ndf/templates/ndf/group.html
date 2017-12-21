@@ -1,0 +1,153 @@
+{% extends "ndf/base.html" %}
+{% load i18n %}
+{% load ndf_tags %}
+{% load pagination_tags %}
+{% get_group_name groupid as group_name_tag %}
+
+{% block title %} Group {% endblock %}
+
+<!-- left top panel -->
+{% block meta_content %}
+
+  <h2 class="subheader">{% trans "Groups" %}</h2>
+
+<!-- 
+{% comment %}
+  <a href="{% url app_gst.name|lower group_name_tag %}">
+    <h2 class="subheader">
+      {% if app_gst.altnames and app_gst.altnames != "None" %}
+        {{app_gst.altnames}}
+      {% else %}
+        {{app_gst.name}}
+      {% endif%}
+    </h2>
+    {{app_gst.content|safe}}
+  </a>
+{% endcomment %}
+ -->
+{% endblock %}
+
+{% block help_content %}
+{% blocktrans %}<p>Groups are an easy way to share content and conversation, either privately or with the world. Many times, a group already exist for a specific interest or topic. If you can't find one you like, feel free to start your own.</p>
+<h5>How do groups work?</h5>
+<p>Groups can either be public, restricted (users may read a brief description or overview but not view content) or completely private. Every group has a wiki, a pool for resources, and a discussion board for talking.</p>{% endblocktrans %}
+{% endblock %}
+
+
+{% block search_content %}
+  {% include "ndf/node_search_base.html" %}
+{% endblock %}
+
+
+{% block related_content %}
+  {% if user.is_authenticated %}
+  {% user_access_policy groupid request.user as user_access %}
+  {% if user_access == "allow" %}
+  <br/>
+  <div class="create card">
+    <div class="group">
+      <br/>
+      <a class="button medium" href="{% url 'create_group' group_name_tag %}">
+    	<span class="fi-plus">&nbsp;&nbsp;{% trans "New Group" %}</span>
+      </a>
+    </div>
+  </div>
+  {% endif %}
+  {% endif %}
+{% endblock %}
+
+
+{% block body_content %}
+{% get_group_name groupid as group_name_tag %}
+<header class="row">
+  <dl class="tabs" data-tab data-options="deep_linking:true">
+    <dd class="active"><a href="#panel2-1"><i class="fi-eye"></i> {% trans 'All Groups' %} {% if group_nodes_count %}({{ group_nodes_count }}){% endif %}</a></dd>
+    <!--<dd><a href="#panel2-3"><i class="fi-trophy"></i> Popular Groups</a></dd>-->
+  </dl>
+</header>
+
+<div class="content row">
+    
+{% if searching and group_nodes_count > 0 %}
+
+  <div class="small-12 columns end">
+    <p>{% trans "Search Results:" %} <span class="label success round">{% trans 'Found' %} {{group_nodes_count}} {{title|lower}}{{group_nodes_count|pluralize}}.</span></p>
+  </div>
+
+{% elif searching and group_nodes_count == 0 %}
+  <div class="small-12 columns">
+    <p>{% trans "Search Results:" %} <span class="label alert">
+     {% blocktrans %} No {{title|lower}}{{group_nodes_count|pluralize}} matched your search criteria {% endblocktrans %}!!!</span></p>
+  </div>  
+
+{% endif %}
+
+<ul class="small-block-grid-1 medium-block-grid-2 large-block-grid-4">
+  
+  <!-- Existing card list-->
+  <!-- #{#% get_group_type request.path request.user as group_type %} -->
+  {% group_type_info groupid request.user as grouptype %}
+
+  {% autopaginate group_nodes 23 %}
+
+  {% for node in group_nodes %}
+  {% if node and node.name != request.user.username %}
+  
+    <li class="card">
+      {% if grouptype == "Moderated" %}
+        {% if node.status == "DRAFT" %}
+          <div class="draft group">
+        {% elif node.status == "PUBLISHED" %}
+          <div class="published group">
+        {% endif %}
+      {% else %}
+        <div class='{% if node.status == "PUBLISHED" %}published{% endif %} group'>
+      {% endif %} 
+
+      <a href="{% url 'groupchange' node.pk %}">
+      <div class="row">
+        <div class="small-10 columns">                             
+            <b>
+              {{ node.name }}{% if node.collection_set %} <i class="fi-page-multiple"></i> {% endif %}
+            </b>
+        </div>
+      </div>
+      <hr/>
+      <span style="font-size:12px;">{{ node.html_content|default_if_none:"{ % trans 'Add some description.' %}"|safe|striptags|truncatechars:75 }}</span><br/>
+      
+      <footer>
+          <div class="age">
+            {{ node.member_of_names_list|join:', ' }}{% trans 'created' %} {{node.created_at|timesince}} {% trans 'ago' %} {% trans 'by' %} <span class="user" href="{% url 'dashboard' node.created_by %}" data-gnow="">{{node.user_details_dict.created_by}}</span>
+        </div>
+        <span><strong>{{node.author_set|length}}</strong> {% trans 'Members' %} </span>
+        {% get_group_resources node as obj_count %}
+        <span class="right"><strong>{{obj_count}}</strong>{% trans 'Objects' %} </span>
+      </footer>
+      </a>
+
+      <div class="label-list small-12 columns">
+        {% for tag in node.tags|slice:":3" %}
+          <a href="{% url 'tag_info' groupid tag %}"><span class="label" style="background-color:yellow;">{{tag}}</span></a>
+        {% endfor %}
+      </div>
+
+    </div>
+  </li>
+  {% endif %}
+
+  {% empty %}
+    {% if not searching %}
+      <div class="row">
+        <div class="small-12 columns">
+         {% blocktrans %} <h5>There are no groups created yet. <b>Be the first to create a Group!</b></h5> {% endblocktrans %}
+        </div>
+      </div>
+    {% endif %}
+
+  {% endfor %}
+  
+</ul>
+
+{% paginate %}
+
+{% endblock %}

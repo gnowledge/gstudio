@@ -1,0 +1,713 @@
+{% comment %}
+
+<!--
+HOW TO USE
+
+- EXAMPLE:
+    {% include 'ndf/widget_selector.html' with for='apps_to_set' all_options=all_gapps selected_options=group_gapps oneline_element=true %}
+
+    where,
+
+    - "for" is name which will be given to widget.
+        (NOTE: If you are including more than one widget_selector, then be sure that
+               this field's value should be unique to each inclusion).
+
+    - "all_options" is the ALL the options that will be provided in option box (including selected).
+
+    - "selected_options" is field which holds options selected amongst ALL options.
+
+    - "oneline_element" is just CSS which will render selected items either next to each other
+        or one below the other.
+
+- Before calling save method, call "getSelValuesHiddenElement" method.
+  Which will create a hidden input element holding selected values with name
+  specified as in first arg. So that values can be exctracted from backend accordingly.
+
+  - EXAMPLE:
+      getSelValuesHiddenElement('apps_to_set', 'create_group');
+
+      where,
+      - first arg: should be matching with field specified in the <for>
+        while including widget_selector.html
+      - second arg: optional, id to be assign to this newly created hidden element.
+  - If there are 3 inclusions of widget_selector then "getSelValuesHiddenElement()"
+    should be called (before save) 3 times with appropriate first args (<for>).
+
+-->
+{% endcomment %}
+
+<script type="text/javascript" src="/static/ndf/bower_components/mousetrap/mousetrap.js"></script>
+<script type="text/javascript" src="/static/ndf/bower_components/jquery-ui/jquery-ui.min.js"></script>
+<!-- <script type="text/javascript" src="/static/ndf/bower_components/jquery-ui/jquery-ui.js"></script> -->
+
+<style type="text/css">
+
+  .selector-widget{
+    margin-bottom: 2rem;
+    border: solid thin #efefef;
+  }
+
+  /*#select-search-container{*/
+  .select-search-container{
+    /*padding-right: 5px;*/
+    text-align: left;
+  }
+
+  /*#select-search-container > i.fi-play{*/
+  .select-search-container > i.fi-play{
+    min-height: 2px ;
+    max-height: auto ;
+    max-width: 50px ;
+    position: absolute;
+    right: 12px;
+    transform: rotate(90deg);
+    color: gray;
+  }
+
+  /*#selected-items > .selection{*/
+  .selected-items > .selection{
+    {% if oneline_element == "true" %}
+      width: 50% ;
+    {% endif %}
+    float: center ;
+    text-align: center;
+    min-width: 300px;
+    margin: 0.25rem 0.5rem;
+    background-color: #ffffff;
+    border:1px solid #000;
+    cursor: move;
+  }
+
+  /*#selected-items{*/
+  .selected-items{
+    max-height: 200px ;
+    min-width: 350px ;
+    overflow-y : auto ;
+    overflow-x: hidden;
+  }
+
+  .selection > .item{
+    text-align: center;
+    float: left;
+    font-size: larger;
+    padding-top: 2.5px;
+  }
+
+  i.remove-tag{
+    float: right ;
+    padding-left: 8px;
+    font-size: 1.1em;
+    cursor: pointer;
+    font-size: large;
+  }
+
+  /*#search-text{*/
+  .search-text{
+    /*min-height: 2em;
+    padding: 2px;
+    color: gray;*/
+    display: inline-block;
+    float: left;
+    margin: auto 1em;
+    width: 15em;
+    border: none !important;
+    box-shadow: none !important;
+    background-color: inherit;
+  }
+
+  /*#to-be-selected{*/
+  .to-be-selected{
+    max-height: 10rem;
+    min-height: auto;
+    background-color: #efefef;
+    display: block;
+    overflow-x: hidden;
+    overflow-y: auto;
+    position: absolute;
+    width: 97%;
+    z-index: 1000;
+    box-shadow: 0 5px 5px 1px lightgray;
+    border: solid thin #efefef;
+    border-top: none;
+  }
+
+  /*#to-be-selected > .item{*/
+  .to-be-selected > .item{
+    cursor: pointer;
+    padding: 5px;
+    border-bottom: solid thin lightgray;
+  }
+
+  /*#to-be-selected > .item:hover{*/
+  .to-be-selected > .item:hover{
+    background-color: lightgray;
+  }
+
+  .traversing-el{
+    background-color: lightgray;
+  }
+
+  .item-title{
+    /*text-transform: uppercase;*/
+    color: #020;
+  }
+
+  .item-description{
+    color: gray;
+  }
+
+</style>
+<!-- start of selector widget -->
+<div class="selector-widget" id="{{for}}-selector-widget">
+
+  <!-- search text box -->
+
+  <div class="row">
+    <div class="small-10 medium-12 columns">
+      <div class="select-search-container" data-selector-widget-for="{{for}}">
+        <i class="fi-play" ></i>
+
+        <!-- selected items area -->
+        <div class="selected-items" data-selector-widget-for="{{for}}"></div>
+
+        <input type="text" class="search-text mousetrap" placeholder="Type To Search" autocomplete="off" data-selector-widget-for="{{for}}">
+
+      </div>
+    </div>
+  </div>
+  <!-- END of search text box -->
+
+
+  <!-- all items / to be select items /select dropdown list -->
+  <div class="row">
+    <div class="small-12 medium-12 medium-centered columns">
+      <div class="to-be-selected hide" data-selector-widget-for="{{for}}">
+
+      {% for each_opt in all_options|dictsort:'name' %}
+
+        <div class="item"
+          data-title="{{each_opt.name}}"
+          data-description="{{each_opt.content_org|default_if_none:''}}"
+          title="{{each_opt.content_org|default_if_none:each_opt.name}}"
+          data-value="{{each_opt.pk}}"
+          data-selector-widget-for="{{for}}">
+
+          <div class="row">
+            <div class="small-12 columns">
+              <div class="item-title">
+              {% firstof each_opt.altnames each_opt.name %}
+              </div>
+              <div class="item-description">
+                {{each_opt.content_org|default_if_none:''|safe|truncatewords:5}}
+              </div>
+            </div>
+          </div>
+
+        </div>
+      {% endfor %}
+
+      </div>
+    </div>
+  </div>
+  <!-- END of all items / to be select items /select dropdown list -->
+
+</div>
+<!-- END of selector widget -->
+
+
+<script type="text/javascript">
+
+  // querySelector, jQuery style but in pure JS.
+  var $s = function (selector) { return document.querySelector(selector); };
+
+  var $sa = function (selector) { return document.querySelectorAll(selector); };
+
+  // selector widget container div's id
+  var selectorWidgetID = "{{for}}-selector-widget.selector-widget";
+  var selectorWidget = $s('#' + selectorWidgetID);
+
+  var selectedItems = $s('#' + selectorWidgetID + ' .selected-items');
+
+  var searchText = $s('#' + selectorWidgetID + ' .search-text');
+
+  var toBeSelected = $s('#' + selectorWidgetID + ' .to-be-selected');
+  // toBeSelected.onblur = function(){$s('#' + selectorWidgetID + ' .to-be-selected').classList.add('hide');}
+
+  var sItems = $sa('#' + selectorWidgetID + ' .to-be-selected' + ' .item');
+
+  var oneline_element = "{{oneline_element}}";
+
+  // making list of all selected items data
+  
+  var selected_options = [ {% for each_opt in selected_options %}"{{each_opt|safe}}"{% if not forloop.last %},{% endif %}{% endfor %} ];
+  // console.log(selected_options)
+
+  {% if ajax_search %}
+    {% if url_first_arg and url_second_arg %}
+      var ajax_url = '{% url ajax_url_name url_first_arg url_second_arg %}'
+    {% elif url_first_arg %}
+      var ajax_url = '{% url ajax_url_name url_first_arg %}'
+    {% else %}
+      var ajax_url = '{% url ajax_url_name %}'
+    {% endif %}
+    var ajax_url = '{% url ajax_url_name url_first_arg %}'
+  {% endif %}
+
+  function createItemElements (name, content, oid, selectorWidgetFor) {
+
+    // var selectorWidgetID = "{{for}}-selector-widget.selector-widget";
+    var itemExists = $s('#' + selectorWidgetFor + '-selector-widget.selector-widget .to-be-selected .item[data-value="'+ oid +'"]');
+
+    if (itemExists) {return 0};
+
+    var itemDiv =  document.createElement('div'),
+      rowDiv =  document.createElement('div'),
+      columnsDiv =  document.createElement('div'),
+      itemTitleDiv =  document.createElement('div'),
+      itemDescrDiv = document.createElement('div');
+
+
+    itemDiv.classList.add('item');
+    itemDiv.setAttribute('data-title', name);
+    itemDiv.setAttribute('data-description', content);
+    itemDiv.setAttribute('title', content);
+    itemDiv.setAttribute('data-value', oid);
+    itemDiv.setAttribute('data-selector-widget-for', selectorWidgetFor);
+
+    itemDiv.onclick = addToSelection;
+    toBeSelected.appendChild(itemDiv);
+
+    // var rowDiv = document.createElement('div');
+    rowDiv.classList.add('row');
+    itemDiv.appendChild(rowDiv);
+
+    // var columnsDiv = document.createElement('div');
+    columnsDiv.classList.add('small-12', 'columns');
+    rowDiv.appendChild(columnsDiv);
+
+    // var itemTitleDiv = document.createElement('div');
+    itemTitleDiv.classList.add('item-title');
+    itemTitleDiv.appendChild(document.createTextNode(name))
+    columnsDiv.appendChild(itemTitleDiv);
+
+    // var itemDescrDiv = document.createElement('div');
+    itemDescrDiv.classList.add('item-description');
+    itemDescrDiv.appendChild(document.createTextNode(content))
+    columnsDiv.appendChild(itemDescrDiv);
+
+    // bindKeyEvents()
+    // console.log(itemDiv);
+
+  }
+
+
+  function getElementByParentRef (currentElemObj, parentSelector, expectedChildSelector) {
+    /*
+    This method will return htmlObject based on current element's reference and under which parent element to be look for.
+    e.g:
+    var toBeSelectedElemObj = getElementByParentRef(this, '.selector-widget', '.to-be-selected');
+     */
+    var parentElemObj = closest(currentElemObj, parentSelector);
+    if(parentElemObj)
+    {
+      // console.log('#' + parentElemObj.id + ' ' + expectedChildSelector);
+      return $s('#' + parentElemObj.id + ' ' + expectedChildSelector);
+    }
+    else
+    {
+      return false
+    }
+  }
+
+
+  function removeTag(){
+
+    var tempItem = this.parentNode.querySelector('.item');
+
+    var selectorWidgetFor = tempItem.getAttribute('data-selector-widget-for');
+    var toBeSelected = $s('.to-be-selected[data-selector-widget-for="'+ selectorWidgetFor +'"]');
+
+    tempItem.querySelector('.item-title').style.textDecoration = '';
+    tempItem.onclick = addToSelection;
+    tempItem.querySelector('.item-description').classList.remove('hide');
+    toBeSelected.appendChild(tempItem);
+    this.parentNode.onclick = detachEvent
+    this.parentNode.remove();
+
+    toBeSelected.classList.remove('hide');
+  }
+
+
+  function lineThrough(){
+    var tempEl = this.previousSibling?this.previousSibling.querySelector('.item-title'):false;
+    if (tempEl) {tempEl.style.textDecoration = 'line-through';}
+  }
+
+  function removeLineThrough(){
+    var tempEl = this.previousSibling?this.previousSibling.querySelector('.item-title'):false;
+    if (tempEl) {tempEl.style.textDecoration = '';}
+  }
+
+  function detachEvent() { return false; }
+
+  function addToSelection () {
+
+    // creating new div element
+    var selDiv = document.createElement('div');
+    selDiv.classList.add('label', 'secondary', 'selection');
+    this.onclick = detachEvent;
+    this.classList.remove('traversing-el');
+    this.querySelector('.item-description').classList.add('hide');
+    selDiv.appendChild(this);
+    // selDiv.replaceChild(this,this);
+
+    var closeBtn = document.createElement("i");
+    closeBtn.className = "fi-x-circle remove-tag";
+    closeBtn.title = "Remove";
+    closeBtn.onclick = removeTag;
+    closeBtn.onmouseenter = lineThrough;
+    closeBtn.onmouseleave = removeLineThrough;
+    selDiv.appendChild(closeBtn);
+    // selDiv.appendChild(linebreak);
+
+    var selectorWidgetFor = this.getAttribute('data-selector-widget-for');
+    var selectedItems = $s('.selected-items[data-selector-widget-for="'+ selectorWidgetFor +'"]');
+
+    if (selectedItems) { selectedItems.appendChild(selDiv); };
+    // if (selectedItems) { selectedItems.replaceChild(selDiv,selDiv); };
+  }
+
+  // attaching onclick event on items to be selected / drop-down items
+  for (var i = sItems.length - 1; i >= 0; i--) {
+    sItems[i].onclick = addToSelection;
+  }
+
+  // trigger click event on selected items amongst drop down list
+  for (var i = 0; i < selected_options.length; i++) {
+    var temp_item = toBeSelected.querySelector('.item[data-value="'+ selected_options[i] +'"]');
+    if(temp_item){temp_item.click()};
+  };
+
+  function searchOnItems (ev){
+
+    var toBeSearch = this.value.trim().toLowerCase();
+    // var sItemsTemp = $sa("#to-be-selected .item");
+
+    var selectorWidgetFor = this.getAttribute('data-selector-widget-for');
+
+    {% if ajax_search %}
+      if (toBeSearch.length > 2)
+      {
+
+      var xhr = new XMLHttpRequest();
+
+      function ensureReadiness() {
+          if(xhr.readyState < 4) { return; }
+
+          if(xhr.status !== 200) { return; }
+
+          // all is well
+          if(xhr.readyState === 4) {
+              // console.log(xhr.responseText);
+              ajax_data = JSON.parse(xhr.responseText);
+              toBeSelected.innerHTML = '';
+              ajax_data.forEach(function(i){createItemElements(i.name, i.content||'', i._id.$oid, '{{for}}')})
+          }
+      }
+
+      xhr.onreadystatechange = ensureReadiness;
+      var selectedIds = getSelectedValues(selectorWidgetFor);
+      // console.log(selectedIds);
+      xhr.open('GET', ajax_url + '?search_text=' + toBeSearch + '&selected_ids=' + selectedIds, true);
+      xhr.send();
+      };
+
+    {% endif %}
+
+
+    if (selectorWidgetFor)
+    {
+      var sItemsTemp = currentEl = $sa('.to-be-selected[data-selector-widget-for="'+ selectorWidgetFor +'"] .item');
+    }
+    else
+    {
+      var sItemsTemp = currentEl = $sa('#' + selectorWidgetID + ' .to-be-selected .item');
+    }
+
+    for (var i = sItemsTemp.length - 1; i >= 0; i--) {
+
+      // sItemsTemp[i].style.display = (sItemsTemp[i].textContent.indexOf(toBeSearch)>=0)? 'block': 'none';
+        if(sItemsTemp[i].getAttribute('data-title').toLowerCase().indexOf(toBeSearch) >= 0)
+        {
+          sItemsTemp[i].style.display = 'block';
+          // tempFirstItem = sItemsTemp[i];
+        }
+        else
+        {
+          sItemsTemp[i].style.display = 'none';
+          sItemsTemp[i].classList.remove('traversing-el');
+        }
+    };
+  }
+
+  function showOptionItems () {
+
+    var selectorWidgetFor = false;
+
+    if (this != window) {
+      selectorWidgetFor = this.getAttribute('data-selector-widget-for');
+    };
+
+    if (selectorWidgetFor)
+    {
+      var toBeSelected = $s('.to-be-selected[data-selector-widget-for="'+ selectorWidgetFor +'"]');
+      toBeSelected.classList.remove('hide');
+      toBeSelected.scrollTop = 0
+    }
+    else
+    {
+      var parentSelectorWidget = closest(this, '.selector-widget');
+      if(parentSelectorWidget)
+      {
+        var parentSelectorWidgetID = parentSelectorWidget.id;
+        var toBeSelected = $s('#' + parentSelectorWidgetID + ' .to-be-selected');
+        toBeSelected.classList.remove('hide');
+        toBeSelected.scrollTop = 0
+      }
+    };
+
+    // document.querySelector('#to-be-selected > .item:first-child').classList.add('traversing-el');
+    // if(!searchText.textContent || searchText.textContent=='search'){
+    //   searchText.textContent = this.id == 'search-text'? '': searchText.textContent;
+    // }
+  }
+
+  function hideOptionItems () {
+    var toBeSelectedList = $sa('.to-be-selected');
+
+    for (var i = toBeSelectedList.length - 1; i >= 0; i--) {
+
+      if(!isHidden(toBeSelectedList[i]))
+      {
+        var toBeSelected = toBeSelectedList[i];
+        // var sItems = toBeSelected.children;
+        // if(sItems) { sItems.classList.remove('traversing-el'); };
+        toBeSelected.classList.add('hide');
+      }
+    };
+    // console.log(this);
+    // var parentSelectorWidget = closest(this, '.selector-widget');
+
+    // if(parentSelectorWidget)
+    // {
+    //   var elem = $s('#' + parentSelectorWidget.id + ' .to-be-selected > .item');
+    //   if(elem) {elem.classList.remove('traversing-el');};
+    //   var toBeSelected = $s('#' + parentSelectorWidget.id + ' .to-be-selected');
+    //   // toBeSelected.classList.add('hide');
+    // }
+    // if(!searchText.textContent || searchText.textContent=='search'){
+    //   searchText.textContent = 'search';
+    // }
+  }
+
+
+  searchText.onfocus = showOptionItems;
+  // searchText.onblur = hideOptionItems;
+  // searchText.onchange = searchOnItems;
+  searchText.oninput = searchOnItems;
+  searchText.onkeydown = function (e) { if(e.keyCode == 13) return false; };
+
+
+  function getSelectedValues (selectorWidgetFor) {
+    /*
+    this method will return
+    */
+
+    var selectedItems = $s('#' + selectorWidgetFor + ' .selected-items');
+
+    var selected = $sa('.selected-items[data-selector-widget-for="'+ selectorWidgetFor +'"] .selection .item')
+
+    // var selected = selectedItems.querySelectorAll('.selection .item');
+    var selectedValuesList = [];
+    for (var i = 0; i < selected.length; i++) {
+      selectedValuesList.push( selected[i].getAttribute('data-value') );
+    }
+    return selectedValuesList
+  }
+
+  function getSelValuesHiddenElement (selectorWidgetFor, idToAppend){
+    /*
+    This method will create a new hidden input element.
+    This input element will be holding values selected.
+    args:
+      - selectorWidgetFor: specify the specific selector widget with it's
+                           <for> value specified at the time of inclusion.
+      - idToAppend (optional): If you want any specific id to add to this newly created
+                    hidden element then specify id value.
+     */
+
+    var idToAppend = idToAppend || false;
+    var hiddenInput = document.createElement('input');
+    hiddenInput.type = 'hidden';
+    hiddenInput.name = selectorWidgetFor;
+    // hiddenInput.value = getSelectedValues(selectorWidgetFor);
+    if (oneline_element) {
+      hiddenInput.value = JSON.stringify(getSelectedValues(selectorWidgetFor));
+    } else {
+      hiddenInput.value = getSelectedValues(selectorWidgetFor);
+    }
+
+    if (idToAppend) {
+      // document.getElementById(idToAppend).appendChild(hiddenInput.value);
+      document.getElementById(idToAppend).appendChild(hiddenInput);
+
+    }
+    return hiddenInput;
+  }
+
+  document.querySelector('html').onclick = function (e) {
+    // var parentEl = $(e.target).closest('.selector-widget');
+    var parentEl = closest(e.target, '.selector-widget');
+    // console.log(parentEl);
+
+    // if (parentEl.hasClass('selector-widget')) {
+    if (parentEl) {
+      showOptionItems();
+      bindKeyEvents();
+    }
+    else
+    {
+      hideOptionItems();
+      unBindKeyEvents();
+    }
+  };
+
+  function traverseListDown (ev) {
+    ev.preventDefault();
+
+    var currentEl = getElementByParentRef(ev.target, '.selector-widget', '.to-be-selected  .item.traversing-el');
+
+    // var currentEl = $s('#' + selectorWidgetID + ' .to-be-selected .item.traversing-el');
+    // document.querySelector('#to-be-selected > .item').classList.remove('traversing-el');
+    if(currentEl && currentEl.nextElementSibling && (currentEl.nextElementSibling.offsetHeight>0))
+    {
+      currentEl.nextElementSibling.classList.add('traversing-el');
+      currentEl.classList.remove('traversing-el');
+      // toBeSelected.scrollBy(0, currentEl.clientHeight);
+      var toBeSelected = getElementByParentRef(ev.target, '.selector-widget', '.to-be-selected');
+      toBeSelected.scrollTop += currentEl.clientHeight;
+    }
+    else if(!currentEl)
+    {
+      // var makeTraversingEl = $('#to-be-selected > .item:visible')[0];
+      // var tempItemList = $sa('#to-be-selected > .item'),
+      var selectorWidget = closest(ev.target, '.selector-widget');
+      var selectorWidgetID = selectorWidget.id;
+
+      var tempItemList = $sa('#' + selectorWidgetID + ' .to-be-selected .item'),
+          tempItemListLen = tempItemList.length;
+
+      for (var i = 0; i < tempItemListLen; i++)
+      {
+        if( (tempItemList[i].offsetHeight > 0 && tempItemList[i].offsetWidth > 0) ||
+          (window.getComputedStyle(tempItemList[i]).getPropertyValue('display') != 'none'))
+        {
+          var makeTraversingEl = tempItemList[i];
+          break;
+        }
+      };
+
+      if(makeTraversingEl){ makeTraversingEl.classList.add('traversing-el'); }
+      // var makeTraversingEl = $s('#to-be-selected > .item');
+      // if (makeTraversingEl) {makeTraversingEl.classList.add('traversing-el');};
+    }
+  }
+
+
+  function traverseListUp (ev) {
+    ev.preventDefault();
+    var selectorWidgetFor = ev.target.getAttribute('data-selector-widget-for');
+    currentEl = $s('.to-be-selected[data-selector-widget-for="'+ selectorWidgetFor +'"] .item.traversing-el');
+    // var currentEl = getElementByParentRef(ev.target, '.selector-widget', '.to-be-selected  .item.traversing-el');
+    // var currentEl = $s('#' + selectorWidgetID + ' .to-be-selected .item.traversing-el');
+
+    // document.querySelector('#to-be-selected > .item').classList.remove('traversing-el');
+    // console.log(currentEl.classList)
+    if(currentEl && currentEl.previousElementSibling  && (currentEl.previousElementSibling.offsetHeight>0))
+    {
+      currentEl.previousElementSibling.classList.add('traversing-el');
+      currentEl.classList.remove('traversing-el');
+      // toBeSelected.scrollBy(0,-50);
+      var toBeSelected = $s('.to-be-selected[data-selector-widget-for="'+ selectorWidgetFor +'"]');
+      toBeSelected.scrollTop -= currentEl.clientHeight;
+    }
+    else if(currentEl)
+    {
+      currentEl.classList.remove('traversing-el');
+    }
+  }
+
+  function bindKeyEvents () {
+    Mousetrap.bind('up', traverseListUp );
+    Mousetrap.bind('down', traverseListDown );
+    Mousetrap.bind('tab', traverseListDown );
+    Mousetrap.bind('enter', function(){
+      // var elemToBeSelected = $s('#to-be-selected > .item.traversing-el');
+      var elemToBeSelectedList = $sa('.selector-widget .to-be-selected .item.traversing-el');
+
+      if(elemToBeSelectedList.length > 0)
+      {
+        for (var i = elemToBeSelectedList.length - 1; i >= 0; i--) {
+          isHidden(!elemToBeSelectedList[i])
+          {
+            elemToBeSelectedList[i].classList.remove('traversing-el');
+            elemToBeSelectedList[i].click();
+            searchText.value = '';
+          }
+        };
+      }
+      else
+      {
+        var elemToBeSelected = $s('#' + selectorWidgetID + ' .to-be-selected .item.traversing-el');
+
+        if(elemToBeSelected)
+        {
+          elemToBeSelected.classList.remove('traversing-el');
+          elemToBeSelected.click();
+          searchText.value = '';
+        }
+      }
+
+    });
+  }
+
+  function unBindKeyEvents () {
+    Mousetrap.unbind('up');
+    Mousetrap.unbind('down');
+    Mousetrap.bind('enter');
+  }
+
+  function closest(elem, selector) {
+   var matchesSelector = elem.matches || elem.webkitMatchesSelector || elem.mozMatchesSelector || elem.msMatchesSelector;
+   // console.log(matchesSelector)
+    while (elem) {
+        if (matchesSelector && matchesSelector.bind(elem)(selector)) {
+            return elem;
+        } else {
+            elem = elem.parentElement;
+        }
+    }
+    return false;
+  }
+
+  function isHidden(el) {
+    return (el.offsetParent === null)
+  }
+
+  if (window.jQuery) {
+    $(document).ready(function () {
+      $(".selected-items").sortable({revert: true, scroll: true});
+    })
+  };
+
+</script>

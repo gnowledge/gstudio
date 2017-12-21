@@ -1,0 +1,23 @@
+{% load i18n %}
+{% load ndf_tags %}
+<form data-abide id="form-edit-node" method="POST" action="{% url 'save_course_page' group_id %}" enctype="multipart/form-data">
+<div class="content contents" id="panel-help" style="width:95%;" >
+    {% csrf_token %}
+        <input type="hidden" name="node_id"  value="{{node.pk}}">
+        <div class="row">
+            <h7>{% trans "Select admin page(s) for this resource from following options:"%} </h7>
+        </div>
+        <div class="help-settings-div">
+            {% get_help_pages_of_node node "has_admin_page" as admin_page_list %}
+            {% get_info_pages group_id as all_info_pages %}
+            {% include 'ndf/widget_selector.html' with for='admin_info_page' all_options=all_info_pages selected_options=admin_page_list oneline_element='false' %}
+        </div>
+
+    </div>
+<button type="submit" class="right blue-white-button save-metadata">Save</button>
+</form>
+<script type="text/javascript">
+    $( ".save-metadata" ).click(function(event) {
+        getSelValuesHiddenElement('admin_info_page','form-edit-node');
+    });
+</script>

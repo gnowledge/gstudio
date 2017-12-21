@@ -1,0 +1,548 @@
+{% load simple_filters %}
+{% xextends "ndf/base.html" with first_body_column=0 %}
+
+{# {% extends "ndf/base.html" %} #}
+
+{% load i18n %}
+{% load cache %}
+{% load ndf_tags %}
+{% block title %}{% trans 'Events' %} {% endblock %}
+
+{% block style %}
+  .course_outline_table, tr {
+    border: 2px solid #0b8a91;
+    border-collapse: collapse;
+  }
+
+  .gray-text{
+    color: gray;
+  }
+
+  #content > p {
+    color: #6F6F6F !important;
+    /*font-size: inherit;*/
+  }
+
+  tr:hover{
+    cursor:pointer;
+  }
+
+  .tab{
+    padding-left: 2em;
+    background-color:yellow !important;
+  }
+
+  .tab2{
+    padding-left: 4em;
+  }
+
+  #eventModal > label {
+    color: white;
+    font-weight: bold;
+    font-size: 1rem;
+  }
+
+  .all_blogs{
+    overflow-y: auto;
+    height:500px;
+  }
+
+  .jqtree-tree .jqtree-title {
+    margin: 5px;
+    font-size: 15px;
+    color: black !important;
+    /*Change the color here to change font color of tree*/
+  }
+
+  li.remove-dot{
+    list-style: none;
+  }
+
+  .div-height {
+    margin-bottom: 0px !important;
+    height: 258px !important;
+  }
+
+  .course-banner{
+    text-shadow: 2px 2px black !important;
+    background: none !important;
+  }
+
+  #status{
+    width: 100% !important;
+  }
+{% endblock %}
+
+{% block head %}
+{# <script type="text/javascript" src="/static/ndf/orgitdown/jquery.orgitdown-foundation.js"></script> #}
+<!-- orgitdown! toolbar settings -->
+{# <script type="text/javascript" src="/static/ndf/orgitdown/skins/gstudio/set.js"></script> #}
+<!-- orgitdown! skin -->
+{# <link rel="stylesheet" type="text/css" href="/static/ndf/orgitdown/skins/gstudio/style.css" /> #}
+
+<script src="/static/ndf/bower_components/jquery-ui/jquery-ui.min.js"></script>
+<link rel="stylesheet" href="/static/ndf/bower_components/jquery-ui/themes/smoothness/jquery-ui.css">
+
+{% endblock %}
+
+{% block extended_header %}
+{% endblock %}
+
+{% block body_content %}
+  {% check_is_gstaff groupid request.user as is_gstaff %}
+  {% user_access_policy groupid request.user as user_access %}
+  {# {% get_course_session_status group_obj True as next_session_in_course %} #}
+
+  <div id="eventModal" class="reveal-modal medium alert-box radius" data-reveal data-alert>
+    <label id="eventModalLabel"></label>
+    <a class="close-reveal-modal">&#215;</a>
+  </div>
+  <div class="course-page-opacity"></div>
+
+  <div class="course-page">
+
+    <div class="container">
+
+
+
+
+    <div id="envelop-cover">
+
+      <div class="medium-12 course-page-header">
+      <div class="row " >
+        <div class="course-header-background" style="background-color: #000080;">
+          {% include 'ndf/widget_photo_upload.html' with url_name='course_about' widget_for="group_banner" is_banner=True is_profile=False no_update_btn=True node=group_obj %}
+          <div class="course-header-background-layer"></div>
+        </div>
+        {% if is_gstaff %}
+          <div class="row" style="z-index: 2;">
+              <div class="course-settings">
+                <span data-dropdown="course-settings-drop" aria-controls="course-settings-drop" aria-expanded="false" class="tiny radius right">
+                  <i class="fi-widget"></i>
+                </span>
+                <span data-reveal-id="group_banner_prof_pic_prop" id="group_banner_btnUploadProfilePic" class="right">
+                  <i class="fi-photo"></i>
+                  <span style="position: relative;top: -3px;left: 2px;">Change image</span>
+                </span>
+                <ul id="course-settings-drop" class="f-dropdown" data-dropdown-content aria-hidden="true" tabindex="-1">
+                  {% with group_obj.member_of_names_list.0 as sg_type %}
+                    <li><a href="{% if sg_type != 'CourseEventGroup' %}{% url 'edit_event_group' groupid 'ProgramEventGroup' %}{% else %}{% url 'edit_event_group' groupid sg_type %}{% endif %}" class="tiny radius"><i class="fi-page-edit"></i> {% trans "Edit " %}{% if sg_type == "CourseEventGroup" %}{% trans "eCourse" %}{% else %}{% trans "Event" %}{% endif %}</a></li>
+                  <li><a class="tiny radius" href="{% url 'create_course_struct' group_id group_obj.pk %}"> <i class="fi-clipboard-notes"></i> 
+                  {% if group_obj.collection_set %} 
+                    {% if sg_type == "CourseEventGroup" %} {% trans "Edit Course Structure" %}{% else %}{% trans "Edit Event Structure" %} {% endif %}
+                  {% else %}
+                     {% if sg_type == "CourseEventGroup" %} {% trans "Add Course Structure" %}{% else %}{% trans "Add Event Structure" %}  {% endif %}  
+                  {% endif %}</a></li>
+                  {% comment %}
+                  <li><a class="tiny radius settings" ><i class="fi-clock"></i> {% trans " Plan Release Dates" %}</a></li>
+                  {% endcomment %}
+                  <li>
+                    <a href="{% url 'create_event_group' group_id 'CourseEventGroup' %}?cnode_id={{group_id}}" class="fi-volume"> Announce</a>
+                  </li>
+                  <li>
+                    <a id="subscr_users" class="fi-torsos" data-reveal-id="inviteusers" title="View/Subscribe Users">{% if sg_type == "CourseEventGroup" %}{% trans ' Add Students' %} {% else %} {% trans ' Add Members' %} {% endif %} </a>
+                    {% include "ndf/invite_users.html" with no_subscribe_btn=True node=group_obj%}
+                  </li>
+                  <li>
+                    <a id="subscr_admins" data-reveal-id="inviteadmins" title="View/Subscribe Admins" class="fi-torsos">{% trans ' Add Admins' %}</a>
+                    {% include "ndf/invite_admins.html" with no_subscribe_btn=True node=group_obj %}
+                  </li>
+                  <li>
+                    <a href="{% url 'manage_users' group_id %}" class="fi-torso"> {% if sg_type == "CourseEventGroup" %} {% trans 'Manage Students' %}{% else %} {% trans 'Manage Members' %} {% endif %} </a>
+                  </li>
+
+                  {% endwith %}
+                </ul>
+              </div>
+          </div>
+
+        {% else %}
+          <div class="row" >
+              <div class="small-2 course-settings">
+                {% if user_access == "allow" %}
+                  <a class="button radius small" disabled="disabled"> ENROLLED</a>
+                {% else %}
+                  {% if user.is_authenticated %}
+                    {% if allow_to_join == "Open" %}
+                      <a class="enroll-btn button radius small"> ENROLL</a>
+                    {% else %}
+                      <a class="button radius small" disabled="disabled"> Enrollment {{allow_to_join}} </a>
+                    {% endif %}
+                  {% else %}
+                      <a href="{% url 'auth_login' %}" class="button radius small" title="Please login to Enroll">ENROLL</a>
+                  {% endif %}
+                {% endif %}
+              </div>
+          </div>
+        {% endif %}
+
+
+        <div class="row">
+          <div class="columns small-3 small-centered course-title">
+            {% firstof group_obj.altnames group_obj.name  %}
+          </div>
+        </div>
+        {% comment %}
+
+        {% if request.user.is_authenticated %}
+        <div class="row">
+          <div class="columns small-3 small-centered">
+            <label>{{completed_count}} out of {{total_count}} modules completed</label>
+            <div class="progress success round">
+            <div class="meter" style="width: {{course_complete_percentage}}%"></div>
+            </div>
+          </div>
+        </div>
+        {% endif %}
+        {% endcomment %}
+
+        {% comment %}
+        {% if request.user.is_authenticated %}
+          <!--div class="small-12 medium-4 columns">
+            <label>{{completed_count}} out of {{total_count}} modules completed</label>
+            <div class="progress success round">
+            <div class="meter" style="width: {{course_complete_percentage}}%"></div>
+            </div>
+          </div-->
+        {% endif %}
+        {% endcomment %}
+
+
+        <div class="row" style="line-height: 0.7em;">
+          <ul class="tabs course-tabs show-for-medium-up"  style="background-color: #cccce6;">
+
+            <li class="tab-title {% ifequal title 'about' %}active{% endifequal %}">
+              <a href="{% url 'course_about' group_id %}">
+                <i class="fa fa-eye"></i>
+                <span>{% trans "Overview" %}</span>
+              </a>
+            </li>
+
+            <li class="tab-title {% ifequal title 'course content' %}active{% endifequal %}">
+              <a href="{% url 'course_content' group_id %}">
+                <i class="fi-list-thumbnails"></i><span>{% trans "Course Content" %}</span>
+              </a>
+            </li>
+
+            <li class="tab-title {% ifequal title 'raw material' %}active{% endifequal %}">
+              <a href="{% url 'course_raw_material' group_id %}">
+                <i class="fi-paint-bucket "></i><span>{% trans "Raw Material" %}</span>
+              </a>
+            </li>
+
+            <li class="tab-title {% ifequal title 'notebook' %}active{% endifequal %}">
+              <a href="{% url 'course_notebook' group_id %}">
+                <i class="fi-book "></i><span>{% trans "Notebook" %}</span>
+              </a>
+            </li>
+
+            <li class="tab-title {% ifequal title 'gallery' %}active{% endifequal %}">
+              <a href="{% url 'course_gallery' group_id %}">
+                <i class="fi-photo "></i> <span>{% trans "Gallery" %}</span>
+              </a>
+            </li>
+            {% if 'CourseEventGroup' in group_obj.member_of_names_list and request.user.is_superuser %}
+              <li class="tab-title {% ifequal title 'course_quiz_data' %}active{% endifequal %}">
+                <a href="{% url 'course_quiz_data' group_id %}">
+                  <i class="fi-photo "></i> <span>{% trans "Quiz" %}</span>
+                </a>
+              </li>
+            {% endif %}
+
+            <!--
+            <li class="tab-title {% ifequal title 'dashboard' %}active{% endifequal %}">
+              <a href="{% url 'course_about' group_id %}">
+                <i class="fi-clipboard-notes"></i>{% trans "Dashboard" %}
+              </a>
+            </li>
+             -->
+          </ul>
+        </div>
+      </div>
+      </div>
+      <!--div class="row collapse meta">
+        <div class="key">Starts on</div>
+        <div class="value">
+          {% get_attribute_value group_obj.pk 'start_time' as course_start_date %}
+
+          <div class="time"> {{course_start_date|date:"d M Y"}} </div>
+        </div>
+      </div-->
+      {% comment %}
+
+      {% if next_session_in_course.1 %}
+      <div class="row collapse meta">
+        <div class="key">Next Session</div>
+        <div class="value">
+          <div class="name">{{next_session_in_course.0|default_if_none:"Data Not Available"}}</div>
+          <div class="time"> {{next_session_in_course.1|date:"d M Y"}}</div>
+        </div>
+      </div>
+      {% endif %}
+      {% endcomment %}
+      </div>
+
+
+
+    <!-- Tabs -->
+    <div id="envelop-content" >
+      <div class="row">
+      <!-- Envelop box-->
+      <div class="small-12 large-12 columns">
+        <div class="row show-for-small-only">
+          <div class="large-12 columns">
+            <label>
+              <select id="selectCourseTab">
+                <option value="about_course" {% ifequal title 'about' %}selected{% endifequal %}>{% trans "About the course" %}</option>
+                <option value="course_content" {% ifequal title 'course content' %}selected{% endifequal %}>{% trans "Course Content" %}</option>
+                <option value="raw_material" {% ifequal title 'raw material' %}selected{% endifequal %}>{% trans "Raw Material" %}g</option>
+                <option value="notebook" {% ifequal title 'notebook' %}selected{% endifequal %}>{% trans "Notebook" %}</option>
+                <option value="gallery" {% ifequal title 'gallery' %}selected{% endifequal %}>{% trans "Gallery" %}</option>
+              </select>
+            </label>
+          </div>
+        </div>
+        <!-- Load tab contents dynamically -->
+        <div class="tabs-content course-book">
+          <div class="content active" id="course-dashboard">
+            {% if title == 'dashboard' %}
+              {% include "ndf/gcourseDashboard.html" %}
+
+            {% elif title == 'course content' %}
+              {% include "ndf/gcollection_ajax_view.html" %}
+
+            {% elif title == 'notebook' %}
+              {% include "ndf/gnotebook.html" %}
+
+            {% elif title == 'gallery' %}
+              {% include "ndf/ggallerypage.html" with file_detail_url='course_gallery_detail' redirect_tab_url='course_gallery' %}
+
+            {% elif title == 'raw material' %}
+              {% include "ndf/ggallerypage.html" with file_detail_url='course_raw_material_detail' redirect_tab_url='course_raw_material'%}
+
+            {% elif title == 'course_quiz_data' %}
+              {% include "ndf/course_quiz_data.html" %}
+
+            {% elif title == 'about' %}
+              {% include "ndf/course_about.html" %}
+              {% comment %}
+              <div class="row collapse">
+                <div class="about-course-details">
+                  <!--@anotation('replace this with the about course details')-->
+                  <p>{{group_object.content_org|safe}}
+                  </p>
+                </div>
+                <!--div class="row collapse">
+                  <div class="about-course-details">
+                    <!--@anotation('replace this with the about course details')>
+                    <p>{{group_object.content_org}}
+                    </p>
+                  </div>
+                </div-->
+              </div>
+              {% endcomment %}
+            {% endif %}
+          </div>
+        </div>
+        <!-- tab-content ends here -->
+      </div>
+      </div>
+      </div>
+      {% if title == "gallery" %}
+          {% include 'ndf/pagination.html' with urlname="course_gallery_paged" first_arg=group_name_tag page_info=gallery_page_info %}
+        {% elif title == "raw material" %}
+          {% include 'ndf/pagination.html' with urlname="course_raw_material_paged" first_arg=group_name_tag    page_info=raw_material_page_info %}
+        {% endif  %}
+    </div>
+  </div>
+<script type="text/javascript">
+  $(function() {
+    $("#selectCourseTab").on('change', function() {
+        switch($(this).val()) {
+          case 'about_course':
+            window.location="{% url 'course_about' group_id %}"
+          break;
+          case 'course_content':
+            window.location="{% url 'course_content' group_id %}"
+          break;
+          case 'raw_material':
+            window.location="{% url 'course_raw_material' group_id %}"
+          break;
+          case 'notebook':
+            window.location="{% url 'course_notebook' group_id %}"
+          break;
+          case 'gallery':
+            window.location="{% url 'course_gallery' group_id %}"
+          break;
+          case 'dashboard':
+            window.location="{% url 'course_dashboard' group_id %}"
+          break;
+        }
+    })
+  })
+</script>
+{% endblock %}
+
+
+{% block script %}
+  {{block.super}}
+
+  $(document).on('click','.enroll-btn',function(){
+    //trigger the ajax call to enroll
+    $.ajax({
+      url: "{% url 'enroll_to_course' group_id %}",
+
+      data: {
+        'csrfmiddlewaretoken': "{{csrf_token}}"
+      },
+
+      type: "POST",
+
+      dataType: "json",
+
+      success: function(data){
+        success_state = data["success"]
+        if(success_state){
+        $(".enroll-btn").attr('value', 'ENROLLED')
+        $(".enroll-btn").attr("disabled","disabled")
+        location.reload();
+        }
+      },
+    });//end of ajax
+  })
+
+  // <script type="text/javascript">
+
+  $(document).on("change", ".date_month_day_year", function(){
+    $(".save_date").attr("disabled",false);
+  })
+
+  $(document).on('click','.save_date',function(){
+    $.each(all_css_js_var,function(index,css_dict){
+      if($(".date_val_"+css_dict['id']).val()){
+        css_dict['start_time'] = $(".date_val_"+css_dict['id']).val()
+      }
+      else{
+        css_dict['start_time'] = null;
+      }
+    })
+    $.ajax({
+      url: "{% url 'set_release_date_css' group_obj.pk %}",
+
+      data: {
+        'css_date_dict':JSON.stringify(all_css_js_var),
+        'csrfmiddlewaretoken': "{{csrf_token}}"
+      },
+
+      type: "POST",
+
+      dataType: "json",
+
+      success: function(data){
+          success_state = data["success"]
+          $("#eventModalLabel").text(data["message"]);
+          if(success_state){
+            $("#eventModal").addClass("success");
+          }
+          else{
+            $("#eventModal").addClass("warning");
+          }
+          $("#eventModal").foundation('reveal', 'open');
+          location.reload();
+      },
+    });//end of ajax
+    // console.log(JSON.stringify(all_css_js_var))
+  })
+
+  // Settings-------------------------------------------------------------
+  $(".settings").click(function() {
+    $("#date_reveal_modal").foundation('reveal', 'open');
+  });
+
+  // On close event of reveal-modal (eventModal) -------------------------------------------------------------
+  $(document).on('closed.fndtn.reveal', '#eventModal[data-reveal]', function () {
+    // Reset reveal-modal content & it's setting
+    $("#eventModalLabel").text("<p>Please select course type.</p>");
+    $("#eventModal")
+      .removeClass("success").removeClass("warning").removeClass("alert").removeClass("small")
+      .addClass("medium")
+  });
+
+  $(".date_month_day_year").datepicker({
+    changeMonth: true,
+    changeYear: true,
+    dateFormat: 'dd/mm/yy',
+    defaultDate: '0'
+  });
+
+  // Cancel/Abort Upload-------------------------------------------------------------
+  $("#btnUploadCancel").click(function() {
+    $(".save_cancel").addClass("hide");
+    $("#docFile").val("");
+    $(".upload-btn").css("display","block")
+  });
+
+  //Upload file action validation ---------------------------------------------------------------
+  $(document).on('change','#docFile',function(){
+    $(".upload-btn").css("display","none")
+    $(".save_cancel").removeClass("hide");
+    file_mime_type = this.files[0].type;
+    file_name = this.files[0].name;
+    if(file_mime_type.indexOf("image") > -1){
+
+      var reader = new FileReader();
+      reader.onload = function (e) {
+        $('#img_preview')
+          .attr('src', e.target.result)
+          .width(150)
+          .height(200)
+          .removeClass("hide");
+      };
+      reader.readAsDataURL(this.files[0]);
+      $('#file_preview').addClass("hide")
+    }
+    else{
+      $('#img_preview').addClass("hide")
+      $('#file_preview')
+        .text(file_name)
+        .removeClass("hide");
+        $(".upload-btn").css("display","block")
+    }
+    /*
+    file_mime_type = this.files[0].type;
+
+    if(file_mime_type.indexOf("image/") < 0){
+      $(this).val("");
+      $(".save_cancel").addClass("hide");
+      $('#docFile').val(this.value);
+      var message = "{% trans 'Only image files can be uploaded!' %}"
+      $("#eventModalLabel").text(message);
+      $("#eventModal").addClass("alert");
+      $("#eventModal").foundation('reveal', 'open');
+    }
+    */
+  });
+
+  // Update profile photo -----------------------------------------------------------------------
+  $("#submitpostid").click(function() {
+    if($("#docFile").val() != "") {
+      $("#message").show();
+      $(".save_cancel").addClass("hide");
+      var message = "{% trans 'Please wait while file is Uploading...' %}"
+      $("#eventModalLabel").text(message);
+      $("#eventModal").addClass("success");
+      $("#eventModal").foundation('reveal', 'open');
+    }
+
+    else {
+      var message = "{% trans 'Please select an image to set it as a profile picture !' %}"
+      $("#eventModalLabel").text(message);
+      $("#eventModal").addClass("warning");
+      $("#eventModal").foundation('reveal', 'open');
+      $(".save_cancel").addClass("hide");
+      return false;
+    }
+  });
+
+// </script>
+{% endblock %}

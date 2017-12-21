@@ -1,0 +1,43 @@
+{% extends "ndf/node_details_base.html" %}
+{% load ndf_tags %}
+{% load i18n %}
+{% block title %} {{title}} {% endblock %}
+{% block url %}{% url 'create_edit' groupid node %}{% endblock %}
+
+<!-- overiding block from node_detail_base.html -->
+
+{% block body_content %}
+  <header class="row page">
+    <section class="medium-10 columns" >
+      <h2>
+        <span class='node'>{{node_name_human_readable}}</span>
+        {% user_access_policy groupid request.user as user_access %}
+        {% edit_policy groupid node request.user as status %}
+        {% if user.is_authenticated and status == "allow" and user_access == "allow" %}
+        {% user_access_policy groupid request.user as user_access %}
+        {% if user.is_superuser or node.created_by == user.id %}
+        <span><a class="button tiny" href="{% url 'edit' groupid node.pk %}">{% trans "Edit" %}</a>
+        </span>
+        {% endif %}
+        {% endif %}
+      </h2>
+      <h3 class="subheader"></h3>
+        <small>
+      {% with node.last_update|timesince as timesince %}
+          {{timesince}} {% trans "ago edited by  " %}<a class="user">{% trans "User" %}</a> <a href="#view-changes"><i class="fi-clock"></i> {% trans "View history " %}</a>
+        </small>{% endwith%}
+    </section>
+  </header>
+  <div class="row">
+    <h4> This batch has following {{student_coll|length}} Members: </h4>
+    {% for each in student_coll %}
+      <div>
+        &nbsp;&nbsp;&nbsp;&nbsp; <b>{{ forloop.counter }}. {{each.name}}<b><br>
+      </div>
+    {% endfor %}
+  </div>
+{% endblock %}
+
+{% block meta_content %}
+  <h2>{% trans "Batch" %}</h2>
+{% endblock %}

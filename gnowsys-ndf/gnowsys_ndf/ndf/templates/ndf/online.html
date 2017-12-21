@@ -1,0 +1,51 @@
+{% extends "ndf/base.html" %}
+{% load i18n %}
+{% load ndf_tags %}
+{% load pagination_tags %}
+{% get_group_name groupid as group_name_tag %}
+
+{% block title %} {{ title }} {% endblock %}
+
+{% block help_content %}
+  <p>
+    Lets u have video chat.
+  </p>
+{% endblock %}
+
+{% block meta_content %}
+  {% blocktrans %}<h2>Meeting</h2>{% endblocktrans %}
+{% endblock %}
+
+{% block search_content %}
+
+{% endblock %}
+
+{% block related_content %}
+  {% if user.is_authenticated %}
+  {% user_access_policy groupid request.user as user_access %}
+  {% if user_access == "allow" %}
+  <br/>
+  <div class="create card">
+    <div class="chat">
+      <br/>
+     <a class="button medium" href="" target="Chatb"> 
+      	{% blocktrans %}<span class="start">&nbsp;&nbsp;Start</span>{% endblocktrans %}
+      </a>
+    </div>
+  </div>
+  {% endif %}
+  {% endif %}
+{% endblock %}
+
+
+
+{% block body_content %} 
+{% with request.user.get_profile as profile %}
+
+ <table>
+   <tr><th>{% trans "Last Seen" %}</th><td>{% if profile.last_seen %}{{ profile.last_seen|timesince }}{% else %}awhile{% endif %} ago</td></tr>
+   <tr><th>{% trans "Online" %}</th><td>{{ profile.online }}</td></tr>
+ </table>
+
+{% endwith %}
+{% endblock %}

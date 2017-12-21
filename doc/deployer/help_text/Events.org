@@ -1,0 +1,8 @@
+
+* Events
+
+  Create events with a start and end date, view the events in the
+  group's calendar, assign attendees among the group members, record
+  attendance and take notes.  
+
+  

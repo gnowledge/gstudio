@@ -1,0 +1,579 @@
+{% extends "ndf/mis_base_create_edit.html" %}
+{% load i18n %}
+{% load ndf_tags %}
+{% load pagination_tags %}
+
+{% block title %}
+  {% trans "Enroll Students in Courses" %}
+{% endblock %}
+
+{% block head %}
+  {{block.super}}
+
+  <!-- DataTables -->
+  <script src="/static/ndf/bower_components/DataTables/media/js/jquery.dataTables.js"></script>
+  <script src="/static/ndf/bower_components/datatables-plugins/integration/foundation/dataTables.foundation.js"></script>
+  <!-- DataTables CSS -->
+  <link href="/static/ndf/bower_components/datatables-plugins/integration/foundation/dataTables.foundation.css" rel="stylesheet" type="text/css" />
+{% endblock %}
+
+{% block style %}
+  {{block.super}}
+
+  /* Resetting css-properties for fieldset (also legend, input) */
+    /* fieldset (padding-bottom) */ 
+    fieldset {
+      padding: 1.25rem 1.25rem 1.25rem 1.25rem !important;
+    }
+
+    /* legend (background-color) */
+    fieldset legend {
+      background-color: transparent !important;
+    }
+
+    /* input (margin) */
+    fieldset input {
+      margin: 0 !important;
+    }
+
+  /* Setting css-properties for reveal-modal's label */
+    div.reveal-modal > label {
+      color: white;
+      font-weight: bold;
+      font-size: 1rem;
+    }
+    div.reveal-modal > div.row > div.columns > input.button, input.button {
+      color: white;
+      font-weight: bold;
+      font-size: 14px;
+      margin: 0.8em 0 0 0 !important;
+    }
+
+  .text-size-15 {
+    font-size: 15px;
+  }
+
+  /* DataTables css-properties */
+    .selected {
+      background-color: #D3D3D3 !important;
+    }
+
+    #lbl_displ, .table_lbl {
+      color: #0b8a91;
+      cursor: default;
+      font-weight: bold;
+      font-size: 1rem;
+    }
+
+
+{% endblock %}
+
+{% block body_content %} 
+  <div id="alertModal" class="reveal-modal medium alert-box radius" data-reveal data-alert>
+    <label id="alertModalLabel"></label>
+    <div class="row complete_inp_enroll hide">
+      <div class="small-3 small-offset-3 columns">
+        <input type="button" id="btnConfirmYes" class="button tiny expand" value="Yes">
+      </div>
+      <div class="small-3 columns end">
+        <input type="button" id="btnConfirmNo" class="button tiny expand " value="No">
+      </div>
+    </div>
+    <a class="close-reveal-modal">&#215;</a>
+  </div>
+
+  <form data-abide id="form-edit-node" method="POST" action="">
+    <header class="row" style="margin: 0.8rem 0 ;">
+      <h2 class="small-12 columns">
+        {% trans "Enroll Students in Courses" %}
+      </h2>
+    </header>
+
+    {% csrf_token %}
+
+    <div id="enrollment-content-div">
+      {% if enrollment_closed %}
+      <div class="row">
+        <p class='medium-9 medium-centered columns alert-box alert radius text-center text-size-15'>Student-Course enrollment is <b>CLOSED</b> for {{title}} !!!</p>
+
+        <div class="small-3 small-centered columns">
+          <input type="submit" id="re_open_enrollment" name="re_open_enrollment" value="Re-open Enrollment" class="button medium expand" />
+        </div>
+      </div>
+
+      {% elif enrollment_reopen %}
+      <div class="row">
+        <p class='medium-9 medium-centered columns alert-box info radius text-center text-size-15'>Your request to re-open enrollment for this course has been sent to Admin. You will get a Task assigned, if Admin accepts your request!!!</p>
+      </div>
+
+      {% else %}
+      <!-- fieldset for selecting announced course/////////////////////////////////////////////// -->
+      <fieldset id="fsSc">
+        <legend>
+          <label><h5>{% trans "Course Details" %}</h5></label>
+        </legend>
+
+        <div class="row">
+          <!-- Drop down for announced courses -->
+          <div class="small-2 columns">
+            <label for="acourse_list_div" class="right inline"> 
+              {% trans "Announced Course"%}
+            </label>
+          </div>
+          <div class="small-4 columns">
+            <div id="acourse_list_div" style="padding-top: 8px;">
+              <ul id="acourse_list">
+              {% for each in ann_course_list %}
+                <li id="{{each.0}}">{{each.1}}</li>
+              {% endfor %}
+              </ul>
+            </div>
+          </div>
+
+          <!-- Announced Course Duration -->
+          <div class="small-2 columns">
+            <label for="enrollment_duration" class="right inline">
+              {% trans "Enrollment Duration" %}
+            </label>
+          </div>
+          <div class="small-4 columns end">
+            <div style="padding-top: 8px;">
+              <label style="float:left; padding-right:8px;">From:</label>{{start_enroll|date:"d/m/Y"}}
+              <label style="display:inline; padding-right:8px;">To:</label>{{end_enroll|date:"d/m/Y"}}
+            </div>
+          </div>
+        </div>
+
+        <!-- Checkbox: Students Enrolled and/or Non-enrolled -->
+        
+        <div class="row">
+          <div class="small-11 small-centered columns">
+            <input type="checkbox" id="all_students" name="all_students">
+            <label for="all_students">
+              <b>{% trans "NOTE: Display enrolled students also." %}</b>
+            </label>
+          </div>
+        </div>
+        
+    <div id="filter_students_to_enroll" class="tabs-content" style="padding: 0px 5px; width:1150px;">
+      <!-- Tab: Enrollment Approval Details -->
+      <div class="active content row" id="panel_enrollment_approval_details">
+        <dl class="accordion" data-accordion>
+          <!-- Enrollment Details -->
+          <dd class="accordion-navigation">
+            <a href="#filter_stud_accordion">{% trans "Filter Students" %}</a>
+            <div id="filter_stud_accordion" class="content active">
+              <div class="row">
+                
+                <div class="small-2 large-2 columns end">
+                  <label> Registration Year
+                  </label>
+                  <input type="text" class="date_year" id="datepicker_year" required readonly="" placeholder="YYYY" style="float:left; width:85%"/>
+                  <i style="color:red; display:inline">*</i>
+                  <small class="error">{% trans "Please select year" %} </small>
+                </div>
+
+                <!-- Filter dropdown -->
+                <div class="small-2 large-2 columns end">
+                  <label> Select Filter
+                  </label>
+                  <select id="student_filter">
+                    <option class="no_selection">Select Filter</option>
+                    <option id="year_of_study_opt">Year of Study</option>
+                    <option id="stream_opt">Stream</option>
+                  </select>
+                </div>
+                </div>
+                <div class="row">
+
+                  <!-- Year of study dropdown -->
+                  <div class="small-3 large-3 columns end hide" id="year_of_study_div" >
+                    <label>Select Year</label>
+                    {% html_widget groupid "" ATs.1 %}
+                  </div>
+
+
+                  <!-- Stream dropdown -->
+                  <div class="small-4 large-3 columns end hide" id="stream_div">
+                    <label>Select Year</label>
+                    {% html_widget groupid "" ATs.2 %}
+                  </div>
+              </div>
+            </div>
+          </dd>
+        </dl>
+      </div>
+    </div>
+
+        <!-- Find button -->
+        <div class="row">
+          <div class="small-2 small-centered columns">
+            <input type="button" id="btnFindES" value="Find" class="button small round expand"/>
+          </div>
+        </div>
+      </fieldset>
+
+      <!-- fieldset for listing  Students for enrolling into them /////////////////////// -->
+      <fieldset id="fsSt" style="display: none">
+        <legend>
+          <label><h5>Students : </h5></label>
+        </legend>
+        
+        <div class="row" id="divSt">
+        </div>
+
+        <!-- hidden variables -->
+        <input type="hidden" id="student_enroll_list" name="student_enroll_list" value="">
+        <input type="hidden" id="task_id" name="task_id" value="{{task_id}}">
+        
+        <!-- In Progress/Complete (submit) button -->
+        <div class="row hide" id="sbtn_div">
+          <div class="medium-4 medium-centered columns">
+            <div class="row">
+              <div class="medium-5 columns">
+                <input type="submit" id="sbtnInProgress" value="In Progress" class="button small radius expand sbtn">
+              </div>
+              <div class="medium-5 medium-offset-2 columns end">
+                <input type="submit" id="sbtnComplete" value="Complete" class="button small radius expand sbtn">
+              </div>
+            </div>
+          </div>
+        </div>
+      </fieldset>
+
+      {% endif %}
+
+      <input type="hidden" id="enrollState" name="enrollState" value="">
+    </div>
+  </form>
+{% endblock %}
+
+{% block script %}
+  {{block.super}}
+  var sce_gs_id;
+  var ann_course_id_list = [];
+  var acourse_val = [];
+  var sce_dt_var = "";
+
+   
+  // Click event: "Student data" Row of DataTable
+  $(document).on( 'click', '#student_data_table tbody tr', function () {
+    $(this).toggleClass('selected');
+    $("#lbl_displ").text("")
+  });
+
+  // Only keeping year's drop-down and hiding other datepicker's elements ------------------------------------------
+    $(document).on('focus click blur', '.date_year' ,function(){
+      $(".ui-datepicker-calendar").hide();
+      $(".ui-datepicker-month").hide();
+      $(".ui-datepicker-prev").hide();
+      $(".ui-datepicker-next").hide();
+      $("#ui-datepicker-div").position({
+        at: "center bottom",
+        my: "center top",
+        of: $(this)
+      }); 
+    });
+
+  // On changing filter dropdown
+    $("select#student_filter").on("change", function() {
+      selected_option_id = $(this).find('option:selected').attr('id')
+      if(selected_option_id == "year_of_study_opt"){
+        $("#year_of_study_div").removeClass("hide")
+      }
+      else if(selected_option_id == "stream_opt"){
+        $("#stream_div").removeClass("hide")
+      }
+    })
+
+  // On click of Find (Setup Ajax call) ----------------------------------------------------------------------
+    $("#btnFindES").click(function(event) {
+    
+    // Forcefully blur all input elements, so that mandatory fields become data-invalid if not fill
+    $("#form-edit-node").find(':input[required]').blur();
+
+    if($("#form-edit-node").find(':input[data-invalid]').length == 0){
+      registration_year = $("#datepicker_year").val()
+      var success_state = false;
+      var non_enrolled_students = 0;
+      var degree_name = "";
+      var degree_year = "";
+      var all_students = $("#all_students").prop("checked");
+
+      if($("select#degree_name option:selected").index() > 0) {
+       degree_name = $("select#degree_name").val()
+      }
+      
+      if($("select#degree_year option:selected").index() > 0) {
+       degree_year = $("select#degree_year").val()
+      }
+      $("#acourse_list li").each(function() {
+        acourse_val.push($(this).attr("id"));
+      });
+      $.ajax({
+        url: "{% url 'get_anncourses_allstudents' group_id %}",
+
+        data: {
+          sce_gs_id: sce_gs_id,
+          registration_year: $("#datepicker_year").val() ,
+          acourse_val: acourse_val,
+          degree_year: degree_year,
+          degree_name: degree_name,
+          all_students: all_students
+        },
+
+        type: "GET",
+
+        dataType: "json",
+
+        success: function(data){
+          success_state = data["success"];
+          if (data["success"]) {
+            // Fill divSt
+            drawer_widget = ""
+            students_data_set = ""
+            nesc = ""
+            esc = ""
+            displ_stat = ""
+            non_enrolled_students = parseInt(data["non_enrolled_stud_count"]);
+            students_data_set = data["students_data_set"];
+
+            if (students_data_set.length > 0) {
+              nesc = "<p class='text-center'>No. of students <b><i>not enrolled</i></b> in this course : <b>" + data["non_enrolled_stud_count"] + "</b></p>"
+              esc = "<p class='text-center'>No. of students <b><i>enrolled</i></b> in this course : <b>" + data["enrolled_stud_count"] + "</b></p>"
+              if(all_students){
+                displ_stat = "<p class='text-center'> Displaying <b><i>enrolled</i></b> and <b><i>non-enrolled</i></b> students</p>"
+              }
+              else{
+                displ_stat = "<p class='text-center'> Displaying only <b><i>non-enrolled</i></b> students</p>"
+              }
+
+              column_headers = data["column_headers"];
+              dataTable_columns_set = [];
+
+              // Define table
+              student_data_table = '<table cellpadding="0" cellspacing="0" border="0" class="display" id="student_data_table">' +
+              '<input type="button" class="button tiny select_all_rows" value="Select All" >' +
+              '&nbsp;<input type="button" class="button tiny deselect_all_rows" value="De-Select All" >' +
+              '<label style="display:inline;" class="table_lbl">&nbsp;&nbsp;&nbsp;Click on the row to select</label>'+
+              '<label id="lbl_displ"></label>'
+              '</table>';
+
+              $("#divSt").html(nesc + esc + displ_stat + student_data_table); 
+
+              // Prepare title & data headers used in dataTable
+              $.each(column_headers, function(index, v) {
+                d = {};
+                d["data"] = v[0];
+                d["title"] = v[1];
+                dataTable_columns_set.push(d);
+              });
+
+              // Set defintion dataTable
+              sce_dt_var = $("#student_data_table").dataTable({
+                "data": students_data_set,
+                "columns": dataTable_columns_set,
+                "createdRow": function ( row, data, index ) {
+                  // Attaching Student's ObjectId to each row (i.e., assigning to it's id attribute)
+                  $(row).attr("id", data["_id"]);
+                  // $(row).find("td:nth-child(3)").attr("id", data["college_id"]);
+                  // $(row).find("td:nth-child(4)").attr("id", data["university_id"]);
+                }
+              });
+            }
+            else {
+              nesc = "<p class='text-center'><b>No Students registered for this year!!!" + "</b></p>"
+              $("#divSt").html(nesc); 
+            }
+          }
+
+          else {
+            $("#alertModal").removeClass("success");
+            $("#alertModal").addClass("alert");
+             $("#alertModalLabel").text(data["message"]);
+            $("#alertModal").foundation('reveal', 'open');
+          }
+        },
+
+        complete: function(){
+          if (success_state) {
+            // If Announced Courese & Students found, 
+            // display fieldset (fsSt) & submit buttons (sbtnInProgress & sbtnComplete)
+            // depending upon their visibility state 
+            if ((students_data_set.length > 0) && $("#sbtn_div").hasClass("hide")) {
+              $("#sbtn_div").removeClass("hide");
+            }
+
+            // Also toggle fieldset (fsSt)
+            if ($("#fsSt").css("display") == "none") {
+              $("#fsSt legend label h5").text("Enroll following listed Student(s):");
+              $("#fsSt").toggle();
+            }
+
+            //$("#btnFindES").attr("disabled", true);
+          }
+
+          else {
+            // Otherwise, hide submit buttons as well as fieldset
+            if (!$("#sbtn_div").hasClass("hide")) {
+              $("#sbtn_div").addClass("hide");
+            }
+
+            // Also toggle fieldset (fsSt)
+            if ($("#fsSt").css("display") != "none") {
+              if ($("#divSt").children().length > 0) {
+                $("#divSt").empty();
+              }
+              $("#fsSt").toggle();
+            }
+          }
+        }
+      });
+    }
+    else{
+      alert("Please fill required fields");
+      event.preventDefault();
+    }
+    });
+
+  //On click of select All, highlight all rows
+    $(document).on('click','.select_all_rows',function(){
+      $(sce_dt_var.fnGetNodes()).addClass('selected')
+      $("#lbl_displ").text("All " + $(sce_dt_var.fnGetNodes()).length + " rows are selected")
+    });
+
+  //On click of De-Select All, remove highlight from all rows
+    $(document).on('click','.deselect_all_rows',function(){
+        $("#lbl_displ").text("All rows are de-selected")
+        $(sce_dt_var.fnGetNodes()).removeClass("selected");
+    });
+
+    // On close evar sce_gs_idvent of reveal-modal (alertModal)  = {{ app_set_instance_id }}---------------------
+    $(document).on('closed.fndtn.reveal', '#alertModal[data-reveal]', function () {
+      if ($(this).hasClass('success')) {
+        // Disable 'Find' button, which gets enable only when any of the input element
+        // of the fieldset (fsSc) is changed
+        $("#btnFindES").attr('disabled', "disabled");
+      }
+
+      // Reset reveal-modal content & it's setting
+      $("#alertModalLabel").text("");
+      $("#alertModal")
+        .removeClass("success").removeClass("warning").removeClass("alert").removeClass("small")
+        .addClass("medium")
+        .find("div.complete_inp_enroll").addClass("hide")
+    });
+
+  // On click of InProgress/Complete/Complete-Yes ------------------------------------------------------------
+    var is_complete_confirm = false;
+    var is_inprogress_confirm = false;
+
+    $(document).on("click", ".sbtn", function(event) {
+      $("#enrollState").val($(this).val());
+      if ( !is_inprogress_confirm && !is_complete_confirm) {
+        if($("#enrollState").val() == "In Progress"){
+          $("#alertModalLabel").text("You can come back to enroll more students to this course again. This will not complete your enrollment task. Do you want to continue?");
+        }
+        else if($("#enrollState").val() == "Complete"){
+          $("#alertModalLabel").text("This will not allow further enrollments. Do you want to continue?");
+        }
+        $("#alertModal")
+          .removeClass("medium").addClass("small")
+          .addClass("alert")
+          .find("div.complete_inp_enroll").removeClass("hide")
+        $("#alertModal").foundation('reveal', 'open');
+        return false;
+      }
+      // Fetching class name of hidden input element(s) of drawer2 from drawer-widget('student_enroll')
+      var student_enroll_list = [];
+      sce_dt_var.$("tr.selected").each(function () {
+        student_enroll_list.push(this.id);
+      } );
+      $("#student_enroll_list").val(student_enroll_list);
+
+      // Setting hidden field's value as the selected value from acourse_list (dropdown)
+      $("#announced_courses_list").val(acourse_val);
+
+      $('article').block({ 
+        message: '<h4>Processing... Please wait!</h4>',
+        css: { 
+          border: 'none', 
+          padding: '15px', 
+          color: '#fff !important', 
+          backgroundColor: '#10c1cb !important', 
+          '-webkit-border-radius': '10px', 
+          '-moz-border-radius': '10px', 
+          opacity: 1.0
+        }
+      });
+    });
+
+    //Complete/In Progress
+    $(document).on("click", "#btnConfirmYes", function() {
+      if ($("#enrollState").val() == "Complete"){
+        is_complete_confirm = true;
+        $("#sbtnComplete").trigger("click");
+        }
+      else if ($("#enrollState").val() == "In Progress"){
+        is_inprogress_confirm = true;
+        $("#sbtnInProgress").trigger("click");
+      }
+      $("#alertModal").foundation('reveal', 'close');
+    });
+
+    $(document).on("click", "#btnConfirmNo", function() {
+      if ($("#enrollState").val() == "Complete"){
+        is_complete_confirm = false;
+      }
+      else if ($("#enrollState").val() == "In Progress"){
+        is_inprogress_confirm = false;
+      }
+      $("#alertModal").foundation('reveal', 'close');
+    });
+
+  // On click of Re-open Enrollment --------------------------------------------------------------------------
+    $("#re_open_enrollment").click(function (event) {
+      $("#enrollState").val($(this).val());
+    });
+{% endblock %}
+
+{% block document_ready %}
+  {{block.super}}
+
+  sce_gs_id = "{{ app_set_instance_id }}"
+
+  $(":not(#datepicker_year)").removeAttr("required")
+  
+  var success_state = false;
+  var currentYear = (new Date()).getFullYear()
+  lowerYearLimit = currentYear - 5;
+
+  // If Find button is disabled, enable it
+    $("#btnFindES").removeAttr("disabled");
+
+  // Settings for datepicker widget (only for year) --------------------------------------------------------------
+    $(".date_year").datepicker({
+      changeYear: true,
+      dateFormat: 'yy',
+      yearRange: lowerYearLimit + ":" + currentYear,
+      minDate: new Date(lowerYearLimit, 1 - 1, 1),
+      maxDate: '0',
+      defaultDate: new Date(lowerYearLimit, 1 - 1, 1),
+
+      onClose: function(dateText, inst) {
+        $(this).val(dateText)
+      },
+
+      beforeShow: function() {
+        var year = $(this).val();
+        if (year) {
+          $(this).datepicker('option', 'defaultDate', new Date(year, 1, 1));
+          $(this).datepicker('setDate', new Date(year, 1, 1));
+        }
+      },
+
+      onChangeMonthYear: function(year, month, inst){
+        $(this).val(year)
+      }
+    });
+{% endblock %}

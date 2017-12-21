@@ -1,0 +1,144 @@
+{% extends "ndf/base.html" %}
+{% load i18n %}
+{% load ndf_tags %}
+
+
+{% block title %}
+ 
+ {{"Group Member Info."}}
+ 
+ {% endblock %}
+
+
+{% block style %}
+    .table_wrapper {
+        width : 100%;
+        height : auto;
+        position : relative;
+        float : left;
+        margin : 10px 0px;
+        padding : 10px;
+        font-size : 30px;
+    }
+	.cate {
+        width: 100%;
+        border-bottom : 1px solid #ddd;
+        margin-bottom : 10px;
+    }
+    .date-head {
+    	font-size : 20px;
+    }
+    .c_row {
+    	margin : 10px 100px !important;
+    	height : 45px;
+    }
+    .timestamp {
+    	font-size : 12px;
+    	color : #444;
+    	margin-top : 5px;
+    }
+	.b1 {
+		width : 75%;
+	}
+	.element {
+		margin : 5px;
+	}
+
+{% endblock %}
+
+{% block meta_content%}
+    <div>
+        <header>
+            <a href="/{{group_id}}/analytics/group/list_activities/">
+                <h2 class="subheader">Group Analytics</h2>
+            </a>
+        </header>
+
+        <!-- Meta content in the (main aside header)-->
+        <section>
+            <div>
+                <div class="panel" style="background-color:#ddd;">
+                    <ul class="side-nav">
+                        
+        <!-- summary -->
+        	<div class="tabs">
+            <a href="/{{group_id}}/analytics/group/summary/">
+                 Summary
+            </a>
+            </div>
+        
+
+        <br><br>
+
+        <!-- activities -->
+        	<div class="tabs">
+            <a href="/{{group_id}}/analytics/group/list_activities/">
+               
+                Activities
+          	</a>
+          	</div>
+
+        <br><br>
+ 
+        <!-- members -->
+        	<div class="tabs">
+            <a href="/{{group_id}}/analytics/group/members/">
+                Members
+                
+            </a>
+            </div>
+
+        <br>
+
+    </ul>
+  </div>
+
+                </div>
+              </section>
+
+              <div>
+                  
+              </div>
+            </div>
+{% endblock %}
+
+
+{% block body_content %}
+
+
+<div class="table_wrapper">
+	<div class="cate">Activities by {{user_name}} in group {{group_name}}</div>
+	
+	{% for day in data.activities %}
+		{% for date, activity_lst in day.items %}
+			<div class="date-head">{{date}}</div>
+			<table style="width : 100%">
+				{% for activity in activity_lst %}
+					{% for key, value in activity.obj.items %}
+						<tr class="c_row">
+							<td class="b1">
+								<div class="element">
+									<b><a href="/{activity.user.id}}/dashboard/">{{activity.user.name}}</a></b>&nbsp;{{activity.action.phrase}}&nbsp;{{key}}										{% if not value.name|is_empty %}:
+											{% if not value.url|is_empty %}
+												<a href="/{{activity.group_id}}/{{value.url}}/{{value.id}}">{{value.name}} <i class="fi-link"></i></a>
+													<br>
+											{% else %}
+												{{value.name}}
+											{% endif %}
+										{% endif %}
+									<div class="timestamp">{{activity.timestamp}}</div>
+								</div>
+							</td>
+							<td class="b2">
+								<div class="timestamp"><b>{{activity.timestamp|timesince}} ago</b></div>
+							</td>
+						</tr>
+					{% endfor %}
+				{% endfor %}
+			</table>
+		{% endfor %}
+	{% endfor %}
+</div>
+
+
+{% endblock %}

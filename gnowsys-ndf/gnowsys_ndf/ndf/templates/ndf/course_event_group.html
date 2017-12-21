@@ -1,0 +1,176 @@
+{% extends "ndf/event_base.html" %}
+{% load i18n %}
+{% load ndf_tags %}
+{% block title %} eCourse {{node.name}} {% endblock %}
+{% block style %}
+  {{block.super}}
+
+  #upload_form_div{
+    display: inline-block;
+  }
+
+{% endblock %}
+
+{% block head %}
+{{block.super}}
+    <script type="text/javascript" src="/static/ndf/bower_components/MathJax/MathJax.js?config=TeX-AMS-MML_HTMLorMML" async></script> <!-- checked -->
+  <script type="text/javascript" src="/static/ndf/bower_components/foundation-datepicker/js/foundation-datepicker.js"></script> <!-- checked -->
+  <link rel="stylesheet" type="text/css" href="/static/ndf/bower_components/foundation-datepicker/stylesheets/foundation-datepicker.css"> <!-- checked -->
+
+{% endblock %}
+
+{% block meta_content %}
+  <h3 class="subheader">{{node.name}}</h3>
+      {% check_is_gstaff groupid request.user as is_gstaff %}
+      {% if is_gstaff %}
+        <span><a class="tiny button radius" href="{% url 'create_course_struct' group_id node.pk %}">{% if course_structure_exists %}{% trans "Edit  Course Structure" %}{% else %}{% trans "Add  Course Structure" %}{% endif %}</a></span>
+        <span><input type="button" class="tiny button radius settings" value="Settings"></span>
+      {% endif %}
+  
+  <div id="view_collection">
+    {% include "ndf/collection_ajax_view.html" %}  
+  </div>
+{% endblock %}
+
+{% block body_content %}
+  {{block.super}}
+    <!-- start date -->
+
+    <div id="date_reveal_modal" class="reveal-modal medium alert-box radius" data-reveal data-alert>
+    <label>{% trans 'Release Date' %}</label>
+    {% get_all_subsections_of_course group_id node.pk as all_css %}
+    <script type="text/javascript">
+      var all_css_js_var = {{all_css|safe}}
+    </script>
+    {% for each_css in all_css %}
+      <div class="row release_date_div text-center">
+          <div class="small-3 columns">
+            <label>{{each_css.name}}
+            </label>
+          </div>
+          <div class="small-3 columns end">
+            <input type="text" value="{{each_css.start_time}}" placeholder="DD/MM/YYYY" readonly="" class="date_val_{{each_css.id}} date_month_day_year">
+          </div>
+      </div>
+    {% endfor %}
+    <div class="small-3 columns end">
+        <input type="button" value="Save" class="save_date button small" disabled="disabled">
+    </div>
+    <a class="close-reveal-modal">&#215;</a>
+
+    </div>
+
+{% endblock %}
+
+
+{% block script %}
+{{block.super}}
+  $(document).on("change", ".date_month_day_year", function(){
+    $(".save_date").attr("disabled",false);
+  })
+
+  $(document).on('click','.save_date',function(){
+    $.each(all_css_js_var,function(index,css_dict){
+      if($(".date_val_"+css_dict['id']).val()){
+        css_dict['start_time'] = $(".date_val_"+css_dict['id']).val()
+      }
+      else{
+        css_dict['start_time'] = null;
+      }
+    })
+    $.ajax({
+      url: "{% url 'set_release_date_css' node.pk %}",
+
+      data: {
+        'css_date_dict':JSON.stringify(all_css_js_var),
+        'csrfmiddlewaretoken': "{{csrf_token}}"
+      },
+
+      type: "POST",
+
+      dataType: "json",
+
+      success: function(data){
+          success_state = data["success"]
+          $("#eventModalLabel").text(data["message"]);
+          if(success_state){
+            $("#eventModal").addClass("success");
+          }
+          else{
+            $("#eventModal").addClass("warning");
+          }
+          $("#eventModal").foundation('reveal', 'open');
+          location.reload();
+      },
+    });//end of ajax
+
+    // console.log(JSON.stringify(all_css_js_var))
+
+  })
+
+  // Settings-------------------------------------------------------------
+  $(".settings").click(function() {
+    $("#date_reveal_modal").foundation('reveal', 'open');
+  });
+
+  // On close event of reveal-modal (eventModal) -------------------------------------------------------------
+    $(document).on('closed.fndtn.reveal', '#eventModal[data-reveal]', function () {
+      // Reset reveal-modal content & it's setting
+      $("#eventModalLabel").text("<p>Please select course type.</p>");
+      $("#eventModal")
+        .removeClass("success").removeClass("warning").removeClass("alert").removeClass("small")
+        .addClass("medium")
+    });
+
+  $(".date_month_day_year").datepicker({ 
+    changeMonth: true,
+    changeYear: true,
+    dateFormat: 'dd/mm/yy',
+    defaultDate: '0'
+  });
+
+
+  // Cancel/Abort Upload-------------------------------------------------------------
+  $("#btnUploadCancel").click(function() {
+    $(".save_cancel").addClass("hide");
+    $("#docFile").val("");
+  });
+
+  
+  //Upload file action validation ---------------------------------------------------------------
+  $(document).on('change','#docFile',function(){
+    $(".save_cancel").removeClass("hide");
+    file_mime_type = this.files[0].type;
+    if(file_mime_type.indexOf("image/") < 0){
+      $(this).val("");
+      $(".save_cancel").addClass("hide");
+      $('#docFile').val(this.value);
+      var message = "{% trans 'Only image files can be uploaded!' %}"
+      $("#eventModalLabel").text(message);
+      $("#eventModal").addClass("alert");
+      $("#eventModal").foundation('reveal', 'open');
+    }
+  });
+
+  // Update profile photo -----------------------------------------------------------------------
+  $("#submitpostid").click(function() {
+    if($("#docFile").val() != "") { 
+      $("#message").show();
+      $(".save_cancel").addClass("hide");
+      var message = "{% trans 'Please wait while file is Uploading...' %}"
+      $("#eventModalLabel").text(message);
+      $("#eventModal").addClass("success");
+      $("#eventModal").foundation('reveal', 'open');
+    }
+
+    else {
+      var message = "{% trans 'Please select an image to set it as a profile picture !' %}"
+      $("#eventModalLabel").text(message);
+      $("#eventModal").addClass("warning");
+      $("#eventModal").foundation('reveal', 'open');
+      $(".save_cancel").addClass("hide");
+      return false;
+    }
+  });
+
+{% endblock %}

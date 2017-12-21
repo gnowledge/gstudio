@@ -1,0 +1,54 @@
+body {
+  background-color: #ccc;
+  font-family: sans-serif;
+  font-size: 9pt;
+  margin: 0;
+  padding: 0;
+}
+h1, h2, h3 {
+  font-weight: normal;
+  padding: 0;
+  margin: 4px;
+}
+h1 {
+    font-size: 15pt;
+}
+textarea {
+  background-color: #f0f0f0;
+  font-family:monospace;
+  border: 0;
+  font-size: 9pt;
+  padding: 0px;
+  outline: none;
+  resize: none;
+  -moz-resize: none;
+}
+#canvas {
+  padding: 4px;
+}
+#title {
+    margin-left: 4px;
+    margin-top: 4px;
+}
+#menu {
+    position: fixed;
+    top: 4px;
+    right: 4px;
+    text-align: right;
+}
+a {
+    color: #000;
+}
+
+#content {
+  border: 0;
+  padding: 0px;
+  position: absolute;
+  top: 60px;
+  left: 8px;
+}
+
+iframe {
+    border: 0
+    
+}

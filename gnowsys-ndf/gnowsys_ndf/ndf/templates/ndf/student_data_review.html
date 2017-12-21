@@ -1,0 +1,152 @@
+{% load static %}
+{% get_static_prefix as STATIC_PREFIX %}
+
+<style type="text/css">
+  .text-center {
+    text-align: center;
+  }
+
+  .text-size-15 {
+    font-size: 15px;
+  }
+
+  .button {
+    margin: 0 !important;
+  }
+
+  .padding-bottom-1 {
+    padding-bottom: 1rem;
+  }
+
+  .column-width-3p8 {
+    width: 3.8rem;
+  }
+  .column-width-4 {
+    width: 4rem;
+  }
+  .column-width-6p5 {
+    width: 6.5rem;
+  }
+  .column-width-9 {
+    width: 9rem;
+  }
+  .column-width-20 {
+    width: 20rem;
+  }
+
+  .counter {
+    font-weight: bold;
+    text-align: right;
+  }
+
+  .sub-nav {
+    background: none repeat scroll 0 0 #C8C8C8 !important;
+    padding: 0.5rem 0.3rem !important;
+  }
+
+  .sub-nav dd a {
+    background: none repeat scroll 0 0 #0eacb5 !important;
+    border-radius: 3px !important;
+    color: white !important;
+    cursor: default !important;
+    font-weight: normal !important;
+    text-align: center;
+    /*padding: 0.16667rem 0.88889rem !important;*/
+  }
+</style>
+
+<div class="row">
+  <div class="large-9 large-centered columns text-center">
+    <h3>{{college.name}}</h3>
+  </div>
+</div>
+
+<div class="row">
+  <div class="large-9 large-centered columns text-center">
+    <h4>{{university.name}}</h4>
+  </div>
+</div>
+
+<div class="row padding-bottom-1">
+  <div class="large-9 large-centered columns text-center">
+    <h6>Total No. of Students: {{students_count}}</h6>
+  </div>
+</div>
+
+{% if students_count %}
+
+<div class="row padding-bottom-1">
+  <div class="large-9 large-centered columns text-center">
+    <a href="{{STATIC_PREFIX}}{{filename}}" download="">
+      <span class="fi-download large">&nbsp;&nbsp;&nbsp;Download Students' data (CSV)</span>
+    </a>
+  </div>
+</div>
+
+<!-- Magellin Navigation -->
+<div class="div-center" data-magellan-expedition="fixed" data-options="active_class:'active';destination_threshold:65;throttle_delay:0;">
+  <dl class="sub-nav">
+    <dd data-magellan-arrival="top"><a href="#top">Top</a></dd>
+    <dd data-magellan-arrival="middle"><a href="#middle">Middle</a></dd>
+    <dd data-magellan-arrival="bottom"><a href="#bottom">Bottom</a></dd>
+  </dl>
+</div>
+
+<table>
+  <thead id="top" data-magellan-destination="top">
+    <tr>
+      <!-- <th class="column-width-1"> -->
+      <th class="column-width-3p8">S.No.</th>
+      <th class="column-width-20">{{column_header.0}}</th>
+      <th class="column-width-6p5">{{column_header.1}}</th>
+      <th class="column-width-4">{{column_header.2}}</th>
+      <th class="column-width-6p5">{{column_header.3}}</th>
+      <th class="column-width-20">{{column_header.4}}</th>
+      <th>Edit</th>
+    </tr>
+  </thead>
+
+  {% for each_student in students_list %}
+
+  {% if forloop.counter == half_count %}
+  <tr id="middle" data-magellan-destination="middle">
+  {% elif forloop.last %}
+  <tr id="bottom" data-magellan-destination="bottom">
+  {% else %}
+  <tr>
+  {% endif %}
+    <td class="column-width-3p8 counter">{{forloop.counter}}</td>
+    <td class="column-width-20">{{each_student.0|title}}</td>
+    <td class="column-width-6p5">{{each_student.1}}</td>
+    <td class="column-width-4">{{each_student.2}}</td>
+    <td class="column-width-6p5">{{each_student.3}}</td>
+    <td class="column-width-20">{{each_student.4}}</td>
+    <td>
+      <a href="{% url 'mis:mis_app_instance_edit' groupid app_id app_set_id each_student.5 %}" style="font-size:14px;" class="button small expand left inline" target="_blank">Edit</a>
+    </td>
+  </tr>
+
+  {% endfor %}
+</table>
+
+{% else %}
+
+<div class="row">
+  <div class="large-4 large-centered columns">
+    <p class="alert-box alert radius text-center text-size-15">No records match the given criteria !!!</p>
+  </div>
+</div>
+
+{% endif %}
+
+<script type="application/javascript">
+  $(document).foundation();
+
+  $('#loading-image')
+  .bind('ajaxStart', function(){
+    $(this).show();
+  }).
+  bind('ajaxStop', function(){
+    $(this).hide();
+  });
+</script>

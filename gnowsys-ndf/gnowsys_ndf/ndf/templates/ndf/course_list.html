@@ -1,0 +1,71 @@
+{% extends "ndf/mis_base.html" %}
+{% load i18n %}
+{% load ndf_tags %}
+{% load pagination_tags %}
+{% block head %}
+  {{block.super}}
+
+  <!-- DataTables -->
+  <script src="/static/ndf/bower_components/DataTables/media/js/jquery.dataTables.js"></script>
+  <script src="/static/ndf/bower_components/datatables-plugins/integration/foundation/dataTables.foundation.js"></script>
+  <!-- DataTables CSS -->
+  <link href="/static/ndf/bower_components/datatables-plugins/integration/foundation/dataTables.foundation.css" rel="stylesheet" type="text/css" />
+{% endblock %}
+
+{% block title %} {{ title }} {% endblock %}
+{% block body_content %} 
+  <h3> List of {{title}}s in MIS</h3>
+  <div id="ac_listing_div"></div>    
+{% endblock %}
+
+{% block document_ready %}
+  {{block.super}}
+      data = {{response_dict|safe}}
+      column_headers = data["column_headers"];
+      ac_data_set = data["students_data_set"];
+      groupid_val = data["groupid"];
+      app_id_val = data["app_id"];
+      app_set_id_val = data["app_set_id"];
+      dataTable_columns_set = [];
+
+      if (ac_data_set.length > 0) {
+        // Define table
+        ac_table = '<table cellpadding="0" cellspacing="0" border="0" class="display" id="ac_table">' +
+          '</table>';
+
+        $("#ac_listing_div").html(ac_table);
+
+        // Prepare title & data headers used in dataTable
+        $.each(column_headers, function(index, v) {
+          d = {};
+          d["data"] = v[0];
+          d["title"] = v[1];
+          dataTable_columns_set.push(d);
+        });
+
+        // Set defintion dataTable
+        sce_dt_var = $("#ac_table").dataTable({
+          "data": ac_data_set,
+          "columns": dataTable_columns_set,
+          {% if title == "NUSSD Course" %}
+          "columnDefs": [{ "width": "10%", "targets": 0 }],
+	      {% endif %}
+          "createdRow": function ( row, data, index ) {
+          	node_id = data["ac_id"];
+            $(row).attr("id", node_id);
+            {% if title == "NUSSD Course" %}
+	            // Attaching Announced Course's ObjectId to each row (i.e., assigning to it's id attribute)
+	            edit_url = "{% url 'mis:mis_app_instance_edit' 'groupid' 'app_id' 'app_set_id' 'stud_id' %}".replace("groupid", groupid_val).replace("app_id", app_id_val).replace("app_set_id", app_set_id_val).replace("stud_id", node_id);
+
+	            $(row).find("td:nth-child(1)").html("<a href='" + edit_url + "' title='Edit " + data['name'] + "' target='_blank'><i class='fi-pencil medium'></i></a>");
+
+	            detail_url = "{% url 'mis:mis_app_instance_detail' 'groupid' 'app_id' 'app_set_id' 'stud_id' %}".replace("groupid", groupid_val).replace("app_id", app_id_val).replace("app_set_id", app_set_id_val).replace("stud_id", node_id);
+	            name = data['name']
+	            $(row).find("td:nth-child(2)").html("<a href='" + detail_url + "'>"+name+"</a>");
+	        {% endif %}
+	            $(row).attr("id", data["ac_id"]).addClass("row_rec");
+          }
+        });
+      }
+
+{% endblock %}

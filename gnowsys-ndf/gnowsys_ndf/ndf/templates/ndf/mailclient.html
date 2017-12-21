@@ -1,0 +1,108 @@
+{% extends "ndf/base.html" %}
+{% load i18n %}
+{% load pagination_tags %}
+{% load ndf_tags %}
+{% block title %} {{title}} {% endblock %}
+
+
+<!-- The StyleSheet of the side column -->
+{% block style %}
+	.BoxNames{
+		padding-left: 40px;
+	}
+	.activeMailBox{
+		position: relative;
+	}
+	.mailBoxContent{
+		min-height: 100%;
+		position: relative;
+	}
+	.boxController{
+		margin-bottom: 0px;
+	}
+{% endblock %}
+
+
+{% block head %}
+<script src="/static/ndf/js/mailbox.js"></script>
+{% endblock %}
+
+
+{% block meta_content %}
+  <h2 class="subheader">{% trans "MailBoxes" %}</h2>
+{% endblock %}
+ 
+
+{% block search_content %}
+  {% include "ndf/node_search_base.html" %}
+{% endblock %}
+
+
+{% block related_content %}
+  {% if user.is_authenticated %}
+  {% user_access_policy groupid request.user as user_access %}
+  {% if user_access == "allow" %}
+  <br/>
+      <div class="task">
+      <br/>
+      <a class="button medium" href="create">
+        <span class="fi-plus">&nbsp;&nbsp;{% trans "New Mail Box" %}</span>
+      </a>
+    </div>
+  {% endif %}
+  {% endif %}
+{% endblock %}
+ 
+{% block add_resource_content %}
+
+  <div class="BoxNames" style="padding-right:10px">
+    {% for box in mailbox_data %}
+    <a onclick="setMailBoxName('{{ user.username }}','{{ csrf_token }}', document.getElementById('{{ box.name }}').innerHTML, '{{ box.emailid }}'); toolbarDisplay();" ><h3 id={{ box.name }}>{% trans box.name %}</h3></a>
+    {% endfor %}
+  </div>
+{% endblock %}
+
+{% block body_content %}
+  <!-- To Display the name of the active mailbox -->
+
+  <div class="activeMailBox" style="height: 4.5rem">
+    <h2 id="mailBoxName" style="float: left; width:50%;"></h2>
+    
+    <div class="boxController" style="float: right; width:50%;" align="right" >
+      <a id="set_box" href="{% url 'mailbox_settings' groupid 'dummy' %}" class="button small" style="display:none;">Mailbox Settings</a>
+      <a id="compose_mail" href="{% url 'compose_mail' groupid 'dummy' %}" class="button small" style="display:none;">Write Mail</a>    
+      <a id="down_count" class="button small" onclick="decreaseMailFetchCount();" style="display:none;">{% trans "<" %}</a>
+      <a id="up_count" class="button small" onclick="increaseMailFetchCount();" style="display:none;">{% trans ">" %}</a>
+    </div>
+    <p id="emailIdBox"></p>
+  </div>
+  <br>
+  <div class='tabSpace' style = "height: 46px;">
+
+    <div id='tab1' style="float:left; width:45%;border-right-style: solid; border-right-width: 1px;">
+      <h3><a  id="unreadMailsLink" style="display:none;">{% trans "Unread Mails" %}</a></h3>
+    </div>
+
+    <div id='tab2' style="float:right; width:55%;">
+      <h3 id="readMailsLink" style="margin-left: 20px; display:none;"><a>{% trans "Read Mails" %}</a></h3>
+    </div>
+  </div>
+  <!-- To Display the mails (first 10) of the active mailbox -->
+  <div class="mailBoxContent" style="height: 60rem;">
+    <!-- generate them iteratively -->
+    <!-- <div align="left"> -->
+      <img id="go1" src='/static/ndf/images/email.png' style="opacity:0.4; margin-left: 5rem; margin-right:20rem;float:right" width="400">
+      <br>
+      <br>
+      <br>
+      <br>
+      <img id="go2" src='/static/ndf/images/arrow.png' style="opacity:0.4; float:left" width="200">
+      <!-- <br> -->
+      <br>
+      <br>
+      <br>
+      <h1 id="go3" style="opacity:0.5; float:center; margin-left: 17rem;">Choose the mailbox!</h1>
+    <!-- </div> -->
+  </div>
+  
+{% endblock %}

@@ -1,0 +1,110 @@
+{% extends "ndf/base.html" %}
+{% load i18n %}
+{% load ndf_tags %}
+{% load pagination_tags %}
+{% get_group_name groupid as group_name_tag %}
+
+{% block title %} Forum {% endblock %}
+
+{% block head %}
+<style type="text/css">
+
+	#create-forum i{
+		color: white;
+	}
+
+  .gray-text{
+    color: gray;
+  }
+
+	#content > p { color: #6F6F6F !important; /*font-size: inherit;*/ }
+
+	/*p { color: #6F6F6F !important; font-size: inherit; }*/
+
+</style>
+{% endblock %}
+
+
+{% block help_content %}
+<p>{ % trans 'The Forum is a place for discussion. You can create a new one for your idea and build on it with the help of others' %}.</p>
+{% endblock %}
+
+
+{% block meta_content %}
+  <div class="repository-title large-4 columns" style="width:100%">{% trans 'Forums' %}
+  </div>
+  <br>
+  <br>
+
+ {% if user.is_authenticated %}
+	{% user_access_policy groupid request.user as user_access %}
+	{% if user_access == "allow" %}
+  
+      <a class="small button" href="{% url 'create_forum' group_name_tag %}">
+	     <span class="fi-plus">&nbsp;&nbsp;{% trans "Create Forum" %}</span>
+      </a>
+  {% endif %}
+  {% endif %}
+
+{% endblock %}
+
+
+{% block search_content %}
+  {% include "ndf/node_search_base.html" %}
+{% endblock %}
+
+
+{% block related_content %}
+ 
+{% endblock %}
+
+
+{% block body_content %}
+
+    <div class="repository-title large-4 columns"> 
+      {% trans 'All Forums' %} {% if existing_forums|length %}({{ existing_forums|length }}){% endif %}
+    </div><br><br>
+
+
+{% comment %}
+<header class="row">
+  <dl class="tabs" data-tab data-options="deep_linking:true">
+    <dd class="active"><a href="#panel2-1"><i class="fi-comment-quotes gray-text"></i> {% trans 'All Forums' %} {% if existing_forums|length %}({{ existing_forums|length }}){% endif %}</a></dd>
+  </dl>
+</header>
+{% endcomment %}
+
+{% if searching and existing_forums.count > 0 %}
+<div class="row">
+  <div class="small-12 columns end">
+    <p>Search Results: <span class="label success round"> {% trans 'Found' %} {{existing_forums.count}} {{title|lower}}{{existing_forums.count|pluralize}}.</span></p>
+  </div>
+</div>
+
+{% elif searching and existing_forums.count == 0 %}
+<div class="row">
+  <div class="small-12 columns">
+    <p>{% trans 'Search Results' %}: <span class="label alert">No {{title|lower}}{{existing_forums.count|pluralize}} {%trans 'matched your search criteria' %}!!!</span></p>
+  </div>  
+</div>  
+
+{% endif %}
+
+
+<ul class="small-block-grid-2 medium-block-grid-4">
+  {% autopaginate existing_forums 23 %}
+
+  {% for each in existing_forums %}
+  <li class="card-image-wrapper" > 
+    
+      {% include 'ndf/simple_card.html' with  has_contributor=True resource=each url_name="show" first_arg=groupid second_arg=each.pk %}
+    
+    </li>
+  
+  {% endfor %}
+</ul>
+
+{% paginate %}
+
+{% endblock %}
+

@@ -1,0 +1,151 @@
+{% extends "ndf/base.html" %}
+
+{% load i18n %}
+{% load ndf_tags %}
+{% load simple_filters %}
+
+{% block title %} Repository {% endblock %}
+
+{% block head %}
+<link rel="stylesheet" type="text/css" href="/static/ndf/bower_components/slick-carousel/slick/slick.css"/>
+<link rel="stylesheet" type="text/css" href="/static/ndf/css/open-sans-bold-font.css">
+<script type="text/javascript" src="/static/ndf/bower_components/slick-carousel/slick/slick.min.js"></script>
+
+<style>
+.top-gap
+{
+margin-top:15px;
+}
+.theme-panel
+{
+    background-color: #ddd;
+    padding: 0.85rem;
+    margin-top: 1em;
+    border: 1px solid #c3ecfe;
+}
+.filter-body
+{
+margin-top:5px;
+}
+.first-load { display: none; }
+
+  .tabs dd.active a, .tabs .tab-title.active a { background-color: #f7f7f7; color: black; }
+  .tabs dd > a, .tabs .tab-title > a {color: #4c4c4c;}
+
+  .tabs dd { width: 100%; }
+
+  .tabs dd a { padding-right: 0; width: 100%; }
+
+  .count { position: absolute; right: 5px; opacity: 0.75; }
+
+  .panel > .side-nav > .tabs i {margin-right: 0.5rem;}
+
+  .tabs-content > .content.active{
+  margin-left:-1px !important;
+  }
+</style>
+
+{% endblock head %}
+
+{% block related_content %}
+  <div class="panel" style="background-color:#ddd; padding: 0.25rem;margin-top:1em">
+    
+    <ul class="side-nav">
+      <dl class="tabs" data-tab >
+
+        <!-- Collections -->
+        <dd>
+          <i class="fi-book"></i>
+                {% trans "eBooks" %}
+            <span class="count">
+               {% if all_ebooks %}
+                  {{all_ebooks.count}}
+               {% endif %}
+            </span>
+        </dd>
+    </ul>
+  </div>
+
+
+
+{% endblock  %}
+
+
+{% block meta_content %}
+
+  {% get_ebook_help_text as ebook_help_text_url %}
+  {% blocktrans %} 
+<div class="theme-panel">
+    <div class="text-justify subheader">Each eBook is a collection of chapter files.
+    </div> 
+  {% endblocktrans %}
+  <div>
+    <a href="{{ebook_help_text_url}}" target="_blank">How to read eBooks</a>  
+  </div>
+</div>
+{% endblock %}
+
+
+{% comment %}
+
+{% block body_content %}
+
+<ul class="small-block-grid-1 medium-block-grid-2 large-block-grid-4">
+
+<!-- {#% get_preferred_lang request page_nodes "Page" as page_nodes %#} -->
+
+  {% group_type_info groupid request.user as grouptype %}
+
+  <!-- Existing card list-->
+  {% for node in all_ebooks %}
+
+    <li class="card-image-wrapper">
+      {% include 'ndf/card.html' with resource=node url_name='page_details' first_arg=group_name_tag second_arg=node.pk %}
+    </li>
+
+  {% endfor %}
+
+</ul>
+
+{% endblock %}
+
+{% block extra_content %} 
+
+  {% include 'ndf/pagination.html' with urlname="e-book_paged" first_arg=group_name_tag second_arg=""  third_arg="" page_info=page_info %}
+
+{% endblock %}
+{% endcomment %}
+{# ===================================== #}
+
+{% block body_content %}
+<a href="{% url 'e-book' group_name_tag %}" title="Click to go to ebooks">
+    <div class="large-4 columns repository-title top-gap" >
+      {% if ebook_gst.altnames and ebook_gst.altnames != "None" %}
+        {{ebook_gst.altnames}}
+      {% else %}
+        {{ebook_gst.name}}
+      {% endif%}
+    </div>
+  </a>
+  <div class="large-8 columns repository-desc top-gap">{{ebook_gst.content_org|default_if_none:""|safe}}</div>
+
+  {% get_filters_data "E-Book" as filter_dict %}
+  {% include "ndf/filters.html" with filter_dict=filter_dict %}
+
+    <div style="margin-top:13px">{% include "ndf/file_list_tab.html" with resource_type=all_ebooks detail_urlname="page_details" filetype="ebook" res_type_name="" page_info=page_info %}</div>
+
+{% endblock body_content %}
+
+
+{% block script %}
+// <script type="text/javascript">
+  
+function applyFilter() { if (updateFilterUrl){ updateFilterUrl("{% url 'e-book' group_name_tag %}"); } }
+
+var pageAnchors = document.querySelectorAll('ul.pagination > li > a');
+for (var i = pageAnchors.length - 1; i >= 0; i--) {
+  pageAnchors[i].href += location.search; 
+}
+
+// </script>
+{% endblock script %}

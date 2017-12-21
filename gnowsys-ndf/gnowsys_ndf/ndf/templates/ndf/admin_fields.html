@@ -1,0 +1,151 @@
+{% load ndf_tags %}
+{% load i18n %}
+<style type = "text/css">
+  .divider-line { font-size: xx-large; color:lightgray; }
+  .line-height-2 { line-height:2; }
+  .line-height-2pt5 { line-height:2.5; }
+  .fontsize-x-large { font-size: x-large; }
+  .margin-0 { margin: 0 !important ;}
+  .resource-drawer {
+  border-color: #D3D3D3; border-style: solid;
+  padding: 0 !important;
+  overflow-y: auto;
+  }
+
+  .resource-drawer li.bullet-item:hover{
+  background-color: #ecf0f1; cursor:pointer;
+  }
+  
+  .posted-by{ color: #808080; font-size: small; }
+  
+  .selected-resource { background-color:lightgray !important ; }
+  
+  .resource-type-image {
+  height:40px;
+  background-repeat:no-repeat; background-size: 48px 48px
+  }
+
+  .list_drawer_list {
+    width: 500px;
+    height: 45px;
+  }
+
+  .list_drawer {
+    width: 500px;
+    height: 45px;
+  }
+  
+</style>
+{% if fields_type == "unicode" or fields_name == "tags" %}
+<div style="display:table-cell;">
+  {% if fields_name == "tags" %}
+  <font size="3"> <input type="textbox" name="{{fields_name}}" value="{{fields_value|join:', '|default_if_none:''}}"></font>
+  {% else %}
+  {% if translate %}
+  <font size="3"> <input type="textbox" name="{{fields_name}}_trans" value="{{fields_value|default_if_none:''}}"></font>
+   
+{% else %}
+
+  <font size="3"> <input type="textbox" name="{{fields_name}}" value="{{fields_value|default_if_none:''}}"></font>
+  {% endif %}
+  {% endif %}
+</div>
+
+{% elif fields_type == "bool" %}
+<select id="id_auto_now_add" name="{{fields_name}}" style="width:50%">
+  <option value="0">{% trans "Unknown" %}</option>
+  <option value="1" {% if fields_value == 1 %}selected{% endif %} >{% trans "Yes" %}</option>
+  <option value="2" {% if fields_value == 2 %}selected{% endif %} >{% trans "No" %}</option>
+</select>
+
+{% elif fields_type == "datetime" %}
+<label>{% now "jS F Y H:i" %}</label>
+
+{% elif fields_type == "status" %}
+<select id="id_auto_now_add" name="{{fields_name}}" style="width:60%">
+  <option value="PUBLISHED" {% if fields_value == "PUBLISHED" %}selected{% endif %} >{% trans "PUBLISHED" %}</option>
+  <option value="DRAFT" {% if fields_value == "DRAFT" %}selected{% endif %} >{% trans "DRAFT" %}</option>
+  <option value="HIDDEN" {% if fields_value == "HIDDEN" %}selected{% endif %} >{% trans "HIDDEN" %}</option>
+</select>
+
+{% elif fields_type == "list" %}
+<div id="list_drawer_list" style="border-spacing:0px" class="list_drawer_list">
+
+  {% if fields_name == "subject_type"   %}
+    {% get_selected_drawer_items_single_dropdown fields_name fields_value as drawer_items %} 
+
+    {% get_all_drawer_items_single_dropdown fields_name fields_value as all_items %} 
+
+    {% include 'ndf/widget_selector.html' with for=fields_name all_options=all_items selected_options=drawer_items %}
+  
+    {# {% list_widget fields_name fields_type fields_value  %} #}
+
+
+  {% elif fields_name == "relation_type_set" or fields_name == "attribute_type_set" or fields_name == "meta_type_set" or fields_name == "member_of" or fields_name == "type_of" %}  
+
+  {% get_selected_drawer_items fields_name fields_value as drawer_items %}
+
+  {% get_all_drawer_items fields_name fields_value as all_items %} 
+
+    <!-- The tags fetch selected items as drawer_items and rest all the items as all_items -->
+  
+    {% include 'ndf/widget_selector.html' with for=fields_name all_options=all_items selected_options=drawer_items %}
+    
+  {% elif fields_name == "prior_node" %} 
+
+  {% get_selected_drawer_items fields_name fields_value as drawer_items %}
+
+  {% get_all_priornode_items fields_name fields_value as all_prior_items %}
+    <!-- The tags fetch selected items as drawer_items and rest all the items as all_prior_items specifically for prior_node -->
+
+    {% include 'ndf/widget_selector.html' with for=fields_name all_options=all_prior_items selected_options=drawer_items %}
+
+  {% elif fields_name == "validators" %}
+    <div style="display:table-cell;">
+    <font size="3"> <input type="textbox" name="{{fields_name}}" value="{{fields_value|default_if_none:''}}"></font>
+    </div>
+
+  {% endif %}
+
+<!-- 
+  {% if fields_name in field_type_list %}
+  <input id="{{fields_name}}_type" type="hidden" name="{{fields_name}}" value="" />
+  <script type="text/javascript">
+    
+    function {{fields_name}}() {
+    type_arr = []
+    $(".node_id").each(function (){
+    if ($(this).parent(".bullet-item").parent("#{{fields_name}}_drawer2").attr("id") == "{{fields_name}}_drawer2") {
+    type_arr.push($(this).val());
+    }
+    });
+    $("#{{fields_name}}_type").val(type_arr)
+    }
+    type_list.push("{{fields_name}}");
+  </script>
+  {% endif %}
+
+{# The above code lines are to fetch the element from drawer_widget #}
+
+-->
+</div>
+
+
+{% elif fields_type == "int" %}
+<div style="display:table-cell;">
+  <font size="3"> <input type="number" name="{{fields_name}}" value="{{fields_value|default_if_none:''}}"></font>
+</div>
+
+{% elif fields_name == "subject_applicable_nodetype" or fields_name == "object_applicable_nodetype" or fields_name == "data_type" or fields_name == "applicable_node_type"  %}
+
+  <div id="list_drawer" class="list_drawer" >
+    {#% edit_drawer_widget fields_name groupid node %#}
+    {% list_widget fields_name fields_type fields_value  %}
+  </div>
+
+{% else %}
+<div style="display:table-cell;">
+  <font size="3"> <input type="textbox" name="{{fields_name}}" value="{{fields_value|default_if_none:''}}"></font>
+</div>
+
+{% endif %}

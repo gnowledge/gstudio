@@ -1,0 +1,668 @@
+{% extends "ndf/base.html" %}
+{% load i18n %}
+{% load ndf_tags %}
+{% load pagination_tags %}
+
+{% block title %} {{ title }} {% endblock %}
+
+{% block head %}
+  <script type="text/javascript" src="http://davidlynch.org/projects/maphilight/jquery.maphilight.js"></script>
+{% endblock %}
+
+{% block style %}
+  {{block.super}}
+
+  /* Setting css-properties for app-set in left panel */
+    .active-app-set, .active-app-set-edit, .active-app-set-view {
+      /*padding:0.5em 0 0.5em 0.5em; */
+      /*margin-left: -10px !important;*/
+      background-color:#efefef;
+    }
+
+    .active-app-set-edit {
+      border-right: 4px solid #808080;
+      font-weight: bold;
+    }
+
+    .active-app-set-view {
+      border-left: 4px solid #808080;
+      font-weight: bold;
+    }
+
+  /* css-properties for table */
+    .width_s_no {
+      width: 5%;
+    }
+
+    .width_gender, .width_edit {
+      width: 8%;
+    }
+
+    .width_delete {
+      width: 8%;
+      line-height: 0.5em;
+      text-align: center !important;
+    }
+
+    .width_dob {
+      width: 9%;
+    }
+
+    .width_name, .width_email_id {
+      width: 31%;
+    }
+
+    .margin-0r {
+      margin: 0 !important;
+    }
+
+    .counter {
+      font-weight: bold;
+      text-align: right;
+    }
+
+    .tiny.button {
+      font-size: 1em !important;
+    }
+{% endblock%}
+{% block meta_content %}
+  {% check_is_gstaff groupid request.user as gstaff_access %}
+  
+  {% comment %}
+  <!-- 
+    get_features_with_special_rights: Returns list of feature(s) for which creation rights should not be given
+  -->
+  {% endcomment %}
+  {% get_features_with_special_rights groupid request.user as features_list %}
+
+  <ul class="side-nav"> 
+    {% for each in app_collection_set %}
+    {% get_memberof_objects_count request each.pk groupid as count %}
+    {% if each.name != "Student" %}
+      {% if app_set_id == each|safe %}
+        {% if '/new/' in request.path %}
+        <li class="active-app-set-edit">
+        {% else %}
+        <li class="active-app-set-view">
+        {% endif %}
+      {% else %}
+      <li>
+      {% endif %}
+        <div class="row">
+          {% if each.type_of or each.name == "Caste" or each.name == "NUSSD Course" %}
+            <a class="large-8 columns" href="{% url 'mis:mis_app_detail' groupid app_id each.pk %}" title="View all {{each.name}}'s">
+              {{each.name}} ({{count}})
+            </a>
+
+            {% if gstaff_access and each.name not in features_list %}
+            <a class="large-4 columns" href="{% url 'mis:mis_app_instance_create' groupid app_id each.pk %}" title="Add {{each.name}}">
+              +&nbsp;Add
+            </a>
+            {% endif %}
+
+          {% else %}
+            {{each.name}}
+          {% endif %}
+        </div>
+      </li>
+      {% endif %}
+    {% endfor %}
+  </ul>
+{% endblock %}
+
+{% block body_content %} 
+  {% if title == "MIS" %}
+
+  <div class="row">
+    <div class="small-12 small-centered columns">
+      <h2 class="text-center">National University Students' Skill Development (NUSSD) Programme</h2>
+      <h4 class="text-center">Affiliated Universities</h4>
+    </div>
+  </div>
+
+  <div class="row">
+    <div class="small-8 columns">
+      <table align="center" cellspacing="0" cellpadding="0" border="0"> 
+        <tr> 
+          <td>
+            <center>
+            <img src="/static/ndf/images/India-states-nussd.svg" id="india_map" border="0" alt="NUSSD Affiliated Universities" title="NUSSD Affiliated Universities" usemap="#India_Map" />
+            </center>
+          </td>
+          <map name="India_Map" id="India_Map"> 
+            
+            <area class="state_data" shape="poly" alt="Rajasthan" coords="68,307,65,300,64,295,60,290,61,283,55,285,51,281,50,276,53,270,52,264,45,264,42,260,40,254,47,247,52,241,56,234,61,234,63,234,67,241,75,239,85,238,88,235,89,231,93,227,98,221,99,216,107,214,111,209,116,202,119,194,127,192,128,194,139,196,139,201,139,208,147,208,151,211,155,210,155,214,157,217,158,224,165,232,166,236,165,241,168,243,171,238,173,236,176,241,179,236,183,236,184,246,188,243,191,244,192,252,195,254,199,255,197,260,194,265,201,264,206,265,207,263,210,265,206,269,198,272,189,277,181,283,175,287,174,293,179,299,186,298,190,297,191,302,181,304,180,309,184,312,185,315,180,315,181,323,177,323,175,321,172,322,167,320,165,324,162,328,158,329,156,331,154,326,159,326,160,323,159,317,163,316,159,310,153,311,151,310,151,305,148,303,145,308,142,305,139,310,139,317,143,324,142,332,139,335,135,338,137,343,133,344,130,345,117,335,112,328,107,319,104,314,97,315,89,309,84,309,80,307,78,307,75,308,72,307" href="" title="Rajasthan" />
+            
+            <area class="state_data" shape="poly" alt="Gujarat" coords="9,322,12,318,21,319,22,311,29,314,37,314,41,317,46,317,48,313,57,312,57,316,63,316,67,312,65,308,68,307,79,308,91,310,99,314,107,314,108,316,106,319,111,324,114,331,123,339,131,346,131,354,126,356,125,364,125,369,118,371,119,376,127,378,121,380,115,385,119,391,117,396,113,398,109,393,109,401,107,405,101,405,97,400,97,390,95,381,96,373,95,366,95,361,91,361,89,360,83,370,88,374,83,384,71,388,62,391,57,393,49,389,39,379,33,369,24,361,22,355,21,352,25,351,27,356,36,356,45,352,50,347,53,343,58,338,49,339,43,344,31,346,24,343,15,333,11,327" href="" title="Gujarat" />
+            
+            <area class="state_data" shape="poly" alt="Madhya Pradesh" coords="209,264,206,269,193,274,181,282,174,288,176,297,183,299,191,297,191,301,182,304,180,307,185,312,184,315,179,316,181,323,176,323,173,322,166,320,163,328,156,329,153,326,160,326,159,320,159,317,163,315,159,309,153,311,150,310,151,305,148,303,145,307,142,305,139,312,139,319,143,324,141,332,135,338,137,343,129,345,132,350,130,354,126,355,127,363,126,369,131,367,133,376,141,378,147,382,153,382,163,383,166,389,172,387,177,381,178,378,183,377,185,375,191,375,193,378,190,380,195,383,203,383,210,379,218,381,223,381,226,379,230,376,237,380,244,381,248,379,253,383,257,384,260,378,261,372,262,368,268,361,268,360,274,360,280,355,283,347,286,345,286,341,279,336,276,337,276,334,278,330,284,331,295,330,299,326,298,321,297,316,299,314,297,311,289,313,286,309,281,308,281,305,274,304,269,301,266,307,260,307,261,301,252,305,250,301,250,297,241,301,240,303,232,303,232,299,229,301,223,299,223,295,220,295,217,298,218,306,220,314,224,316,224,321,220,322,214,319,211,319,208,313,208,306,212,299,211,296,213,294,222,289,224,282,226,275,225,271,221,267,216,266" href="" title="Madhya Pradesh" />
+            
+            <area class="state_data" shape="poly" alt="Uttar Pradesh" coords="279,242,271,236,264,231,254,225,246,222,237,221,229,217,226,214,223,214,220,210,222,208,216,205,213,202,206,206,202,200,204,194,206,191,198,188,190,198,188,203,186,207,189,217,191,217,198,218,197,232,195,236,194,242,191,245,191,251,197,255,195,265,206,264,208,263,216,266,221,267,225,271,226,277,221,289,212,295,211,299,209,308,209,317,214,320,220,322,222,321,223,321,219,309,216,299,221,295,224,300,230,301,233,299,233,302,240,302,245,298,250,297,252,306,260,302,262,307,267,306,270,301,276,304,280,305,282,309,286,309,290,313,296,311,299,314,297,319,300,327,304,329,311,325,311,315,314,313,309,305,309,300,318,295,324,289,327,288,333,288,332,285,322,280,325,275,320,272,324,269,328,268,325,263,320,258,315,251,310,251,308,253,297,249,296,245,292,246,283,241" href="" title="Uttar Pradesh" />
+            
+            <area class="state_data" shape="poly" alt="Chhattisgarh" coords="274,460,271,463,268,463,265,463,264,453,259,451,258,447,255,443,251,442,250,433,252,429,256,427,258,430,261,428,261,424,255,417,252,416,255,413,255,411,252,411,253,408,256,407,256,397,256,395,253,389,256,384,260,376,262,368,268,360,276,359,281,353,284,347,287,344,286,340,281,337,276,338,278,330,285,331,294,331,299,327,306,329,310,325,317,329,321,336,324,333,324,339,327,345,329,349,330,353,325,356,328,361,317,363,316,367,317,372,313,375,309,388,300,388,296,390,294,395,291,395,293,407,293,411,300,414,299,417,290,414,282,411,283,416,286,420,288,426,290,436,284,444,277,450,274,454" href="" title="Chhattisgarh" />
+            
+            <area class="state_data" shape="poly" alt="Orissa" coords="341,431,338,431,334,436,331,439,324,438,319,433,313,435,313,439,308,439,306,449,302,446,300,450,294,444,291,447,292,455,285,456,280,459,274,462,273,455,281,446,287,441,290,435,287,423,286,419,282,411,290,414,299,417,300,413,293,411,293,403,292,395,299,387,310,387,312,382,312,375,317,371,317,364,330,361,336,359,344,358,347,363,346,367,350,367,353,365,359,366,362,368,366,365,365,355,371,359,379,362,385,366,385,369,392,368,393,372,399,373,390,377,386,379,383,385,386,393,382,401,382,403,377,407,374,412,358,417,350,423" href="" title="Orissa" />
+            
+            <area class="state_data" shape="poly" alt="Maharashtra" coords="103,484,105,492,109,502,113,504,118,506,124,502,127,494,123,494,123,488,131,485,135,482,139,479,144,481,148,479,152,479,153,468,159,472,166,471,168,465,176,464,180,453,186,449,188,447,193,451,193,445,198,442,200,438,198,434,200,427,204,430,208,425,210,416,217,418,222,423,228,424,234,424,240,422,243,427,242,431,243,439,251,442,250,433,254,427,258,429,261,428,261,425,253,416,255,412,252,411,254,409,256,407,255,395,253,389,256,384,248,379,242,381,229,376,223,379,222,381,211,379,204,381,201,383,192,383,191,379,193,377,190,375,185,375,183,377,179,377,177,382,173,387,166,389,161,382,151,382,146,382,139,377,132,375,131,367,120,371,119,376,126,379,116,385,118,390,118,395,113,397,109,395,109,401,106,406,99,405,96,401,94,410,94,422,96,436,98,451,102,469" href="" title="Maharashtra" />
+            <area class="state_data" shape="poly" alt="Bihar" coords="334,253,326,253,323,249,321,252,316,252,322,262,328,267,324,269,320,272,326,275,322,279,328,283,333,287,333,289,324,289,320,292,316,296,310,299,310,306,314,314,321,314,324,312,329,315,333,319,338,315,343,317,350,314,356,311,357,307,360,307,365,309,368,313,372,315,373,310,381,310,384,308,385,300,392,295,396,294,401,296,397,291,403,288,399,282,397,278,404,273,404,266,401,270,392,270,384,271,380,267,374,270,369,267,361,266,360,268,355,268,355,264,353,262,348,265,340,261,333,259" href="" title="Bihar" />
+            
+            <area class="state_data" shape="poly" alt="Jharkhand" coords="379,355,382,360,382,363,375,361,365,355,364,359,366,363,362,368,357,365,353,365,351,366,346,367,347,362,343,357,340,359,328,361,326,355,331,352,331,348,327,347,325,343,324,338,323,334,320,335,319,332,317,329,312,325,312,317,313,313,320,315,325,313,330,316,334,319,338,315,346,317,356,311,356,307,362,308,368,313,373,315,373,310,380,310,383,308,386,300,393,296,399,295,400,302,399,311,399,316,395,320,389,325,383,327,380,327,380,329,374,331,370,335,366,334,362,335,361,339,362,342,366,343,371,346,374,346,375,351" href="" title="Jharkhand" />
+          </map>
+        </tr> 
+      </table>
+
+      <div id="stateDataModal" class="reveal-modal medium" data-reveal>
+        <div id="university-wise-data">
+        </div>
+
+        <a class="close-reveal-modal">&#215;</a>
+      </div>
+    </div>
+
+    <div>
+      <span class="button radius small">
+        <a href="{% url 'mis:get_mis_reports' group_id %}" style="float:right;color:white;">MIS REPORTS</a>
+      </span>
+    </div>
+
+    <!-- Dec 4 2015 For registartions using kobo collect katkam.rachana@gmail.com -->
+    <div>
+      <span class="button radius small">
+        <a href="http://report.metastudio.org:8005/_/#YYYi" style="float:right;color:white;" target="_blank">Registration</a>
+      </span>
+    </div>
+
+    <div class="small-4 columns end">
+      <ul>
+        {% for university_name, students_count in university_wise_students_count %}
+        <li>
+          <b>{{university_name}}</b>
+          <ol> 
+            <i>Students registered</i>: <code>{{students_count}}</code>
+          </ol>
+        </li>
+        {% endfor %}
+      </ul>    
+    </div>    
+
+  </div>
+
+  <!-- Hidden Accordion for University listing -->
+  <dl class="accordion university-wise hide" data-accordion>
+    <dd class="accordion-navigation">
+      <a href="#panel_" class="university-wise"></a>
+      <div id="panel_" class="content university-wise">
+        <center>
+          <table id="table_">
+            <thead>
+              <tr>
+                <td rowspan="2">{% trans "College" %}</td>
+                <td colspan="3" class="text-center">{% trans "Degree Year" %}</td>
+                <!-- <td></td> -->
+                <!-- <td></td> -->
+                <td rowspan="2" class="text-center">{% trans "Total" %}</td>
+              </tr>
+              <tr>
+                <!-- <td></td> -->
+                <td class="text-center">{% trans "I" %}</td>
+                <td class="text-center">{% trans "II" %}</td>
+                <td class="text-center">{% trans "III" %}</td>
+                <!-- <td></td> -->
+              </tr>
+            </thead>
+            <tbody>
+            </tbody>
+          </table>
+        </center>
+      </div>
+    </dd>
+  </dl>
+
+  {% else %}
+
+  {% check_is_gstaff groupid request.user as gstaff_access %}  
+      <h3> List of {{title}}{% if title != "Partners" %}s{% endif %} in MIS</h3>
+  {% if nodes %}
+    {% autopaginate nodes 25 %}
+  
+    <div id="myModal" class="reveal-modal" data-reveal style="height:500px;overflow:scroll;"> 
+     {% blocktrans %} <h3>Are you sure you want to delete? All of the following related data also will be deleted:</h3> {% endblocktrans %} 
+      <input class="button tiny confirmDeleteObjects" type="button" value="Confirm">
+      <input class="button tiny cancelDeleteObjects" type="button" value="Cancel">
+      <div id="deletion_results"></div>
+      <a class="close-reveal-modal">&#215;</a>
+    </div>
+
+    <div class="row" style="margin-top: 1rem;">
+      <form method="POST">
+        {% csrf_token %}
+        <div class="large-5 large-push-7 columns">
+          <div class="row collapse">
+            <div class="large-10 columns">
+              <input type="text" name="search" value="" placeholder="By name...">
+            </div>
+            <div class="large-2 columns end">
+              <input type="submit" class="button postfix" value="Search">
+              <input type="hidden" name="class" value="{{class_name}}">
+            </div>
+          </div>
+        </div>
+      </form>
+    </div>
+  {% endif %}
+
+  <table>
+    <thead>
+      {% if nodes %}
+        <th class="width_s_no counter">{% trans "S. #" %}</th>
+        {% for each_key in nodes_keys %}
+        <th class="width_{{each_key.0}}">{{each_key.1}}</th>
+        {% endfor %}
+        {% if gstaff_access %}
+        <th class="width_edit">{% trans "Edit" %}</th>
+        <th class="width_delete"><input class="margin-0r checkedAll" type="checkbox"><br><input class="button tiny margin-0r deleteObjects" type="button" value="Delete"></th>
+        {% endif %}
+      {% endif %}
+    </thead>
+    
+    <tbody>
+      {% for each in nodes %}
+        <tr>
+          <td class="counter">{{forloop.counter}}.</td>
+          {% for each_key in nodes_keys %}
+              {% if forloop.counter == 1 %}
+                  <td><a href="{% url 'mis:mis_app_instance_detail' groupid app_id app_set_id each|get_dict_item:'_id' %}" >{{each|get_dict_item:each_key.0|title}}</a></td>
+              {% elif forloop.counter > 2 %}
+                  <td>{{each|get_dict_item:each_key.0|default:"--"}}</td>
+              {% else %}
+                  <td>{{each|get_dict_item:each_key.0}}</td>
+              {% endif %}
+          {% endfor %}
+    
+          {% if gstaff_access %}
+              <td class="name"><a href="{% url 'mis:mis_app_instance_edit' groupid app_id app_set_id each|get_dict_item:'_id' %}" target="_blank" class="button tiny expand margin-0r width_edit">Edit</a></td>
+              <td id="{{each|get_dict_item:'_id'}}" class="width_delete objectsCheckbox"> <input type="checkbox"> </td>
+          {% endif %}
+        </tr>
+        
+      {% empty %}
+        {% blocktrans %}<h3>No data to display</h3> {% endblocktrans %}
+
+      {% endfor %}
+    </tbody>
+  </table>
+
+  {% paginate %}
+
+  {% endif %}
+{% endblock %}
+
+{% block script %}
+  {{block.super}}
+
+  $("#india_map").maphilight({
+    fill: true,
+    fillColor: 'ff0000',
+    stroke: true,
+    strokeColor: 'FFFFFF',
+    strokeOpacity: 1,
+    strokeWidth: 6,
+  });
+
+  var state_val = "";
+  var university_wise_data = {};
+
+  $(document).on("click", ".state_data", function(event) {
+    event.preventDefault();
+
+    if (state_val == $(this).attr("title")) {
+      if (state_val != "") {
+        $("#stateDataModal").foundation("reveal", "open");
+      }
+      return false;
+    }
+
+    state_val = $(this).attr("title");
+
+    $.ajax({
+      url: "{% url 'get_statewise_data' groupid %}",
+
+      data: {
+        state_val: state_val
+      },
+
+      type: "GET",
+
+      dataType: "json",
+
+      success: function(data){
+        success_state = data["success"];
+
+        if (data["success"]) {
+          university_wise_data = data["university_wise_data"];
+        }
+      },
+
+      complete: function(){
+        if (success_state) {
+          uw_div = $("#stateDataModal").find("#university-wise-data");
+          uw_div.html("");
+
+          var university_counter = 0;
+          
+          university_length = Object.keys(university_wise_data).length;
+          if (university_length > 1) {
+            title_text = "<h4>" + state_val + " has following NUSSD affiliated Universities: </h4>"
+          }
+          
+          else {
+            title_text = "<h4>" + state_val + " has following NUSSD affiliated University: </h4>"
+          }
+          uw_div.append(title_text);
+
+          $.each(university_wise_data, function(university_name, college_wise_data) {
+            university_counter += 1;
+
+            // dl tag
+            university_dl = $("dl.university-wise.hide").clone();
+            
+            // anchor tag
+            a_tag = university_dl.find("a.university-wise");
+            a_href = a_tag.attr("href");
+            a_href += "university_counter_" + university_counter;
+            a_tag.text(university_name);
+            a_tag.attr("href", a_href);
+
+            // div tag
+            div_tag = university_dl.find("div.university-wise");
+            div_id = div_tag.attr("id");
+            div_id += "university_counter_" + university_counter;
+            div_tag.attr("id", div_id);
+
+            // table tag
+            table_tag = university_dl.find("table");
+            table_tbody = table_tag.find("tbody");
+            total_students_in_university = 0;
+            $.each(college_wise_data, function(college_name, degree_year_wise) {
+              tr_tag = "<tr>"
+                + "<td>" + college_name + "</td>"
+                + "<td class='text-center'>" + degree_year_wise["I"] + "</td>"
+                + "<td class='text-center'>" + degree_year_wise["II"] + "</td>"
+                + "<td class='text-center'>" + degree_year_wise["III"] + "</td>"
+                + "<td class='text-center'><b>" + degree_year_wise["Total"] + "</b></td>"
+                + "</tr>";
+
+              table_tbody.append(tr_tag);
+              total_students_in_university += parseInt(degree_year_wise["Total"]);
+            });
+
+            // Update University accordion text with total no. of students count
+            a_tag.text(university_name + " (Students registered: " + total_students_in_university + ")");
+
+            // Append this university-accordion into university-wise-data
+            university_dl.removeClass("hide");
+            university_dl.foundation();
+            uw_div.append(university_dl);
+          });
+
+          $("#stateDataModal").foundation("reveal", "open");
+        }
+      }
+    });
+  });
+
+  $(document).on('click', ".checkedAll", function() {
+    if($(this).is(":checked")==true) {
+      $('.objectsCheckbox input').prop( "checked", true );
+    }
+
+    else {
+      $('.objectsCheckbox input').prop( "checked", false );
+    }
+  });
+
+  $(document).on('click', ".button.confirmDeleteObjects", function() {
+    var selectedobject = $(".objectsCheckbox input:checked");
+
+    $('#myModal').foundation('reveal', 'open');
+    // $('#myModal').foundation('reveal', 'close');
+    
+    if(selectedobject.length > 0) {
+      var i = 0;
+      var str = "";  
+      
+      $.map(selectedobject,function(each){
+        if(i == 0) {
+          str = str.concat(each.parentElement.id)
+        }
+        else {
+          str = str.concat(","+each.parentElement.id)
+        }
+
+        i = i+1;
+      });
+
+      $.ajax({
+        url: "{% url 'deletion_instances' groupid %}",
+        type: 'POST',
+        data: {deleteobjects:str,csrfmiddlewaretoken: '{{ csrf_token }}',confirm:"yes"},
+    
+        beforeSend: function() {},
+    
+        success: function(result) {},
+    
+        complete: function() { 
+          $('#myModal').foundation('reveal', 'close');
+        } 
+      });
+
+      $.map(selectedobject,function(each) {
+        each.parentElement.parentElement.remove()
+      });
+
+      $('#myModal').foundation('reveal', 'close');
+    }
+
+    else{
+      alert("select object to delete")
+    }
+  });
+
+  $(document).on('click', ".button.deleteObjects", function(){
+    var selectedobject = $(".objectsCheckbox input:checked");
+    // $('#myModal').foundation('reveal', 'close');
+    
+    if(selectedobject.length > 0) {
+      var i = 0;
+      var str = "";  
+   
+      $.map(selectedobject, function(each) {
+        if(i == 0) {
+          str = str.concat(each.parentElement.id)
+        }
+        else {
+          str = str.concat(","+each.parentElement.id)
+        }
+        i = i+1;
+      });
+
+      $.ajax({
+        url: "{% url 'deletion_instances' groupid %}",
+        type: 'POST',
+        data: {deleteobjects: str, csrfmiddlewaretoken: '{{ csrf_token }}'},
+    
+        beforeSend: function() {},
+
+        success: function(result) {
+          $("#deletion_results").html("");
+
+          for(var obj in result){
+            var ulist = $("<ul>"+"</ul>")
+              .attr("id","conceptlist")
+              .appendTo($("#deletion_results"));
+      
+            var li = $("<li><b>"+result[obj].title+"</b></li>")
+              .appendTo(ulist);
+      
+            var ulist1 = $("<ul>"+"</ul>")
+              .attr("id","conceptlist")
+              .appendTo(li);
+        
+            for(var obj2 in result[obj].content) {
+              object = result[obj].content[obj2]
+              for(var obj3 in  object) {
+                for(var each in object[obj3]) {
+                  var li1 = $("<li>"+object[obj3][each]+"</li>")
+                    .appendTo(ulist1);
+                }
+              }
+            }
+          }
+
+          $('#myModal').foundation('reveal', 'open');
+        },
+
+        complete: function() {
+        }
+      });
+
+      // }
+    }
+    
+    else {
+      alert("select object to delete")
+    }
+  });
+
+  $(document).on('click', ".button.cancelDeleteObjects", function() {
+    
+    $('#myModal').foundation('reveal', 'close');
+  });
+
+  $(document).on('open', '#view-map-edit-widget[data-reveal], #view-map-widget[data-reveal]', function() {  
+    $.ajax({
+      url: "{% url 'get_visited_location' groupid %}",
+
+      success: function(data) { 
+        data = JSON.parse(data);
+
+        var lastVisitedLocationVal = data;
+        
+        if(lastVisitedLocationVal) {
+          if(lastVisitedLocationVal == "[]") {
+            lastVisitedLocationVal = JSON.parse(lastVisitedLocationVal);
+          }
+
+          if(lastVisitedLocationVal.length > 0) {
+            // lastVisitedLocationVal = JSON.parse(lastVisitedLocationVal);
+            var zoom = lastVisitedLocationVal.pop(),
+            lng = lastVisitedLocationVal[1],
+            lat = lastVisitedLocationVal[0];
+            map.setView([lat, lng], zoom);
+          }
+        }
+
+        else if( tempArr.length ) {
+          var group = new L.featureGroup(tempArr)
+          map.fitBounds(group.getBounds());
+        }
+      }
+    });
+  });
+
+  $(document).on('opened', '#view-map-edit-widget[data-reveal], #view-map-widget[data-reveal]', function() {  
+    
+    map.invalidateSize();  
+  });
+
+  var startDtInput = $("font:contains('start_time')");
+  startDtInput = startDtInput.parent().next().find("input");
+
+  var endDtInput = $("font:contains('end_time')");
+  endDtInput = endDtInput.parent().next().find("input");
+
+  if(startDtInput.length > 0) {
+    startDtInput.datetimepicker({ 
+      hourGrid: 6,
+      minuteGrid: 15,
+
+      onClose: function(dateText, inst) {
+        if (endDtInput.val() != '') {
+          var testStartDate = startDtInput.datetimepicker('getDate');
+          var testEndDate = endDtInput.datetimepicker('getDate');
+
+          if (testStartDate > testEndDate)
+            endDtInput.datetimepicker('setDate', testStartDate);
+        }
+
+        else {
+          endDtInput.val(dateText);
+        }
+      },
+
+      onSelect: function (selectedDateTime) {
+        endDtInput.datetimepicker('option', 'minDate', startDtInput.datetimepicker('getDate') );
+      }
+    });
+  }
+
+  if(endDtInput.length > 0) {
+    endDtInput.datetimepicker({ 
+      hourGrid: 6,
+      minuteGrid: 15,
+      numberOfMonths: 2,
+
+      onClose: function(dateText, inst) {
+        if (startDtInput.val() != '') {
+          var testStartDate = startDtInput.datetimepicker('getDate');
+          var testEndDate = endDtInput.datetimepicker('getDate');
+          if (testStartDate > testEndDate)
+            startDtInput.datetimepicker('setDate', testEndDate);
+        }
+
+        else {
+          startDtInput.val(dateText);
+        }
+      },
+
+      onSelect: function (selectedDateTime) {
+        startDtInput.datetimepicker('option', 'maxDate', endDtInput.datetimepicker('getDate') );
+      }
+    });
+  }
+
+  // totWhen ---------------
+  var totWhen = $("font:contains('tot_when')").parent().next().find("input");
+
+  if(totWhen.length > 0) {
+    totWhen.datetimepicker();
+    $(totWhen).after('&nbsp;<input class="button tiny" type="button" value="Add Date"><br/>')
+    $("input.tiny").after("<div id='tot-when-date-list'></div>")
+  }
+
+  $(totWhen).change(function(){ 
+    if($(totWhen).val().length > 0) {
+      $("input.tiny").removeClass("disabled");
+    }
+
+    else {
+      $("input.tiny").addClass("disabled");
+    }
+  });
+
+  $("input.tiny").click(function() {
+    if(!$(this).hasClass("disabled")) {
+      $("#tot-when-date-list").append('<span class="secondary label" style="margin-right:5px;"><span class="date-item">'+$(totWhen).val()+' </span><span style="font-size:large; cursor:pointer;" onclick="$(this).parent().remove();">&times;</span></span>');
+      $(totWhen).val("");
+      $("input.tiny").addClass("disabled");
+    }
+  })
+
+  function getTotWhen() {
+    var datesList = []
+    dts = $("#tot-when-date-list .date-item");
+    $.each(dts, function(i, val){datesList.push($(val).text().trim())});
+
+    return datesList;
+  }
+{% endblock %}  

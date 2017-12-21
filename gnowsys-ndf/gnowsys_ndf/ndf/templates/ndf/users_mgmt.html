@@ -1,0 +1,113 @@
+{% extends "ndf/base.html" %}
+
+{% load i18n %}
+{% load cache %}
+{% load ndf_tags %}
+{% block title %}{% trans 'User Management' %} {% endblock %}
+
+{% block extended_header %}
+{% endblock %}
+{% block style %}
+{{ block.super }}
+  #userMgmtAlertModal{
+    color: white !important;
+    font-weight: bold !important;
+  }
+  .password_info{
+    color: red
+  }
+{% endblock %}
+{% block meta_content %}
+    <a href="{% url 'groupchange' group_name %}"><h3><u>Go back to '{{group_name}}' </u></h3></a>
+{% endblock %}
+
+
+{% block body_content %}
+  <div id="userMgmtAlertModal" class="reveal-modal medium alert-box radius" data-reveal data-alert>
+    <h5 id="userMgmtAlertModalLabel" class="text-center"> </h5> <br/>
+    <div class="row text-center">
+      <div class="small-6 columns">
+        <label>Enter Password </label>
+      </div>
+      <div class="small-6 columns">
+        <input type="password" class="password1" />
+      </div>
+    </div>
+    <div class="row text-center">
+      <div class="small-6 columns">
+        <label>Re-Enter Password </label>
+      </div>
+      <div class="small-6 columns">
+        <input type="password" class="password2" />
+      </div>
+    </div>
+    <div class="text-center">
+    <input type="hidden" id="student-id-pass-change">
+    <input type="button" class="small radius button save_password" value="Submit"> 
+    <br/>
+    </div>
+  <small class="password_info">
+    Password should contain minimum 6 letters<br/>
+    Password cannot contain any white-space
+  </small>
+
+    <a class="close-reveal-modal">&#215;</a>
+  </div>
+
+    {% include "ndf/widget_user_search.html" %}
+{% endblock %}
+
+{% block script %}
+    $(document).on('click','.action_on_user', function(event){
+      $(".password1").val("")
+      $(".password2").val("")
+      student_id = $(this).closest('tr').attr('id')
+      $("#student-id-pass-change").attr('value', student_id)
+      student_name = $("#"+ student_id).children('.username').text()
+      $("#userMgmtAlertModalLabel").text("Change Password for User: "+ student_name);
+      $("#userMgmtAlertModal").foundation('reveal', 'open');
+
+    })
+
+    $(document).on('click','.save_password', function(event){
+      pass1 = $(".password1").val().trim()
+      pass2 = $(".password2").val().trim()
+      student_id_hidden = $("#student-id-pass-change").attr("value")
+      if (student_id_hidden){
+
+      if(pass1 === pass2){
+        if(pass1.indexOf(' ') < 0){
+          if (pass1.length > 6){
+              $.ajax({
+              type: "POST",
+              url: "{% url 'save_user_password' groupid %}",
+              datatype: "json",
+              data:{
+                'stud_id' :student_id_hidden,
+                'new_password': pass2,
+                'csrfmiddlewaretoken': "{{csrf_token}}"
+              },
+              success: function(data) {
+                $("#userMgmtAlertModal").foundation('reveal', 'close');
+                $("#student-id-pass-change").attr('value','')
+              },
+            });
+          }
+          else{
+            alert("Password should be minimum of 6 letters. Please try again.");
+            event.preventDefault();
+          }
+        }
+        else{
+          alert("Password CANNOT contain whitespaces. Please try again.");
+          event.preventDefault();
+        }
+      }
+      else{
+        alert("Passwords did NOT match. Please try again.");
+        event.preventDefault();
+      }
+      }
+    })
+  
+{% endblock %}

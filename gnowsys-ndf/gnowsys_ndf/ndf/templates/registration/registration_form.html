@@ -1,0 +1,224 @@
+{% extends "registration/registration_base.html" %}
+{% load i18n %}
+{% load ndf_tags %}
+
+{% block title %}{% trans "Register for an account" %}{% endblock %}
+
+{% block style %}
+  {{block.super}}
+  th {  text-align:left;  }
+  table td {  padding:0.5em;  }
+  table ul {  color:#ff3232;  }
+
+  label { font-size: 15px; }
+
+  .text-center { text-align: center; }
+
+  small.all-error { font-size: 16px; }
+
+  /* Setting css-properties for small.error */
+    small.error {
+      padding: 0 0 0 0.5rem !important;
+      margin-top: 1rem !important;
+      position: relative !important;
+      width: 95%;
+    }
+{% endblock %}
+
+{% block meta_content %}
+<h2 class="subheader text-center">{% trans "Register" %}</h2>
+
+  <b>As a registered user you can:</b>
+  <ul>
+    
+  <li> critique resources</li>
+  <li> share feedback</li>
+  <li> contribute creations</li>
+  <li> Participate and create events</li>
+  <li> Participate and create courses</li>
+  <li> And many more...</li>
+  </ul>
+{% endblock meta_content %}
+
+
+{% block body_content %}
+  {% get_site_registration_variable_visibility as site_registration_variable_visibility %}
+
+  <!-- Heading -->
+  <div class="row" style="margin: 1.2rem 0;">
+    <div class="small-10 large-10 small-centered large-centered columns">
+      <!-- Heading text -->
+      <div class="row">
+        <div class="small-10 large-10 columns end text-center">
+          <!-- <h2 style="padding-left: 30px;">{% trans "Register a New User Account" %}</h2> -->
+        </div>
+      </div>
+    </div>
+
+    <!-- Error message -->
+    {% if form.errors %}
+    <div class="row">
+      <div class="small-7 large-7 small-offset-2 large-offset-2 columns end">
+        <small class="error all-error">
+          <!-- {% trans "Either both passwords doesn't match or doesn't satisfy the criteria!!!" %} -->
+          {{form.errors}}
+        </small>
+      </div>
+    </div>
+    {% endif %}
+  </div>
+
+  <!-- Form -->
+  <div class="row">
+    <div class="small-12 large-10 small-centered large-centered columns">
+      <form method='post' action='' data-abide>
+        {% csrf_token %}
+
+        <!-- Email -->
+        <div class="row">
+          <div class="small-12 large-3 columns">
+            <label class="small-text-left large-text-right">
+              {{form.email.label_tag}}
+            </label>
+          </div>
+          <div class="small-12 large-6 columns end">
+            {{form.email}}
+          </div>
+        </div>
+
+        <!-- Username -->
+        <div class="row">
+          <div class="small-12 large-3 columns">
+            <label class="small-text-left large-text-right">
+              {{form.username.label_tag}}
+            </label>
+          </div>
+          <div class="small-12 large-6 columns end">
+            {{form.username}}
+          </div>
+        </div>
+
+        <!-- Password1 -->
+        <div class="row">
+          <div class="small-12 large-3 columns">
+            <label class="small-text-left large-text-right">
+              {{form.password1.label_tag}}
+            </label>
+          </div>
+          <div class="small-12 large-6 columns end">
+            {{form.password1}}
+            <small style="color: green; font-weight: bold;">{% trans "NOTE: " %}</small>
+            <ul style="color: green; font-weight: normal;">
+                <li>{% trans "Password must contain atleast 8 characters," %}</li>
+                <li>{% trans "One uppercase letter, and" %}</li>
+                <li>{% trans "One numeral" %}</li>
+            </ul>
+          </div>
+        </div>
+
+        <!-- Password2 -->
+        <div class="row">
+          <div class="small-12 large-3 columns">
+            <label class="small-text-left large-text-right">
+              {{form.password2.label_tag}}
+            </label>
+          </div>
+          <div class="small-12 large-6 columns end">
+            {{form.password2}}
+          </div>
+        </div>
+
+        {% if site_registration_variable_visibility.AUTHOR_AGENCY_TYPE %}
+        <!-- Occupation -->
+        <div class="row">
+          <div class="small-12 large-3 columns">
+            <label for="id_agency_type" class="small-text-left large-text-right">
+              {% trans "Occupation" %}
+            </label>
+          </div>
+          <div class="small-12 large-6 columns end">
+            {% get_author_agency_types as agency_types %}
+
+            <select id="id_agency_type" name="agency_type">
+              <option value="">{% trans "- - - Select Occupation - - -" %}</option>
+              {% for each in agency_types %}
+              <option id="{{each}}" name="group_agency_type">{{each}}</option>
+              {% endfor %}
+            </select>
+          </div>
+        </div>
+        {% endif %}
+
+        {% if site_registration_variable_visibility.AFFILIATION %}
+        <!-- Organization -->
+        <div class="row">
+          <div class="small-12 large-3  columns">
+            <label for="id_affiliation" class="small-text-left large-text-right">
+              {% trans "Organization" %}
+            </label>
+          </div>
+          <div class="small-12 large-6 columns end">
+            <input type="text" id="id_affiliation" name="group_affiliation">
+          </div>
+        </div>
+        {% endif %}
+
+        <!-- T & C -->
+        <div class="row">
+          <div class="small-12 large-9 large-push-3 columns end">
+
+            <input type="checkbox" id="tc-check" class="text-right" title="check to accept T&C" required>
+            <label for="tc-check" class="overlay-description-by-oid-caller" data-reveal-id="overlay-description-by-oid" data-oid="{{oids.tc}}" title="click to read T&C">
+            {% trans "I agree to the terms and conditions" %}.
+            </label>
+            <small class="error">Please accept terms & conditions.</small>
+
+          </div>
+        </div>
+        <!-- END of T & C -->
+        
+        <br/>
+
+        <!-- Send Activation button -->
+        <div class="row">
+          <div class="small-7 large-3 small-offset-3 large-offset-4 columns end">
+            <input type="submit" class="button small expand" value="{% trans 'Send activation email' %}" style="font-size:15px" >
+          </div>
+        </div>
+      </form>
+    </div>
+  </div>  
+{% endblock %}
+
+{% block document_ready %}
+  {{block.super}}
+  
+  $("input[id='id_email'], input[id='id_username'], input[id='id_password1'], input[id='id_password2'], select[id='id_agency_type']").each(function(){
+    if (this.id == "id_email") {
+      $(this).prop("type", "email");
+    }
+    if(this.id == "id_username")
+    {
+      $(this).attr("pattern", "^[a-z](([\._\-][a-z0-9])|[a-z0-9])*[a-z0-9]$");
+    }
+
+    $(this).css("width", "95%");
+    $(this).attr("required", "");
+    $(this).css("float", "left");
+
+    if(this.name == 'username')
+    {
+      $(this).after("<small class='error'>Username should start with letters and can have digits and - / . / _ / Lower case letters only</small>");
+    }
+    else{
+      $(this).after("<small class='error'>Please fill valid "+this.name+"</small>");
+    }
+
+    $(this).after("<i style='color:red; float:left display:inline'>*</i>");
+  });
+
+  $("select[id='id_agency_type'], input[id='id_affiliation']").each(function(){
+    $(this).css("width", "95%");
+  });
+{% endblock %}
+

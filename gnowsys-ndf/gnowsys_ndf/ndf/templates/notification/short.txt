@@ -1,0 +1,7 @@
+{% load i18n %}
+{% load ndf_tags %}
+{% get_site_info as site_info %}
+
+{% trans "Activity notification from" %} {{site_info}}
+
+

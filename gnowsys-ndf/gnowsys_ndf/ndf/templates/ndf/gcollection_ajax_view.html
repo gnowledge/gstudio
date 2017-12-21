@@ -1,0 +1,462 @@
+ {% load ndf_tags %}
+{% load i18n %}
+
+{% block head %}
+  <link href="/static/ndf/bower_components/jqtree/jqtree.css" rel="stylesheet">
+  <script src="/static/ndf/bower_components/jqtree/tree.jquery.js"></script> <!-- checked -->
+
+
+  <script type="text/javascript">
+    iconMapping = {
+      'WARNING': 'fa-exclamation-circle',
+      'COMPLETED': 'fa-check',
+      'INPROGRESS': 'fa-clock-o',
+      'PENDING': ''
+    }
+
+
+    $(document).ready(function() {
+      {% check_is_gstaff groupid request.user as is_gstaff %}
+
+      // Funtion for loading tree for showing collection list left side panel
+      doc();
+
+      // Function for manipulating tree when user visits to page directly via browser url
+      TreeTillNode();
+    });
+
+    function TreeTillNode () {
+      // This gives the last hierarchy node id from browser url.
+      // var url = window.location.search.replace("?selected=", "")
+      url = "{{selected}}";
+
+      // Condition to check whether the tree has been loaded on the page completely or not before attempting any function on tree(such as 'getNodeById')
+      if (url && $(".collection").not(".jqtree-loading").length > 0){
+        var tree_build = $(".collection").not(".jqtree-loading");
+        selected_node = tree_build.tree('getNodeById', url);
+        tree_build.tree('selectNode', selected_node);
+        return;
+      }
+
+      // Javascript function to be used for checking objects in specific time of interval
+      setTimeout(function(){
+        // console.log($(".collection"))
+        if(url && ($(".collection").length > 0)) { TreeTillNode() }
+        $(".jqtree-title-folder").addClass('jqtree-toggler').removeClass('jqtree-title').removeClass('jqtree-title-folder');}, 100 );
+    }
+
+
+    function doc(){
+      cs_ids = []
+      css_ids = []
+      cu_ids = []
+      cr_ids = []
+      var $tree = $('.collection');
+      var arr = [];
+      {% get_node_type node as node_type %}
+
+      var node_type = "{{node_type}}";
+
+      $tree.tree({
+        selectable: true,
+        keyboardSupport: false,
+        autoOpen: false,
+        onCreateLi: function(node, $li) {
+          if(node.node_type == "CourseSectionEvent"){
+            cs_ids.push(node.id)
+          }
+          else if(node.node_type == "CourseSubSectionEvent"){
+            css_ids.push(node.id)
+          }
+          $li.find('.jqtree-title').attr('data-id',node.id);
+          if (node.node_type == "CourseUnit" ||  node.node_type == "CourseUnitEvent" || node.node_type == "lesson"){
+            cu_ids.push(node.id)
+            if (node.collection_set && node.collection_set.length > 0 ){
+              cr_ids = cr_ids.concat(node.collection_set)
+              $li.find('.jqtree-title').addClass('module-page');
+              url = '/{{group_name_tag}}/course/course_section/' + node.parent.id + '/' + node.id + '/' + node.collection_set[0]
+              $li.find('.jqtree-title')
+                .html('<a href="'+url+'" id='+node.collection_set[0]+' class="redirect_to_unitplayer"><span>' + $li.find('.jqtree-title').html() + ' </a></span>');
+            }
+          }
+          else{
+            $li.find('.jqtree-title')
+              .html('<span>' + $li.find('.jqtree-title').html() + ' </span>');
+          }
+        }
+      });
+
+      // This "tree.open" event helps to open the particular node from browser url
+      $tree.bind(
+        'tree.open',
+        function(e) {
+            var node = e.node;
+            var node_id = node.id;
+
+            var tree_build = $(".collection").not(".jqtree-loading");
+            selected_node = tree_build.tree('getNodeById', url);
+
+            if (arr.indexOf(node_id) < 0){
+              arr.push(node_id);
+            }
+            if(selected_node){
+              node = selected_node
+            }
+            $tree.tree('selectNode', node);
+        }
+      );
+
+      // This "tree.select" event helps to click the particular tree node and also triggers the click event on tree node
+      $tree.bind(
+        'tree.select',
+        function(event) {
+          if(event.node){
+            // The clicked node is 'event.node
+            var node = event.node;
+            var parent_arr = [];
+            var parent_node = node;
+            parent_arr.push(node.id);
+
+            // Bellow code manipulates the parent hierarchy of clicked node in a tree
+            while (parent_node) {
+                if (parent_node.name !== undefined){
+                  $tree.tree('openNode', parent_node);
+                  parent_node = parent_node.parent;
+                  if (parent_node.name !== undefined){
+                    parent_arr.push(parent_node.id);
+                  }
+                }
+                else{
+                  break;
+                }
+            }
+            // collapse_tree(node);
+            var nav_list = parent_arr.reverse();
+            if(node['node_type']!="CourseSectionEvent" && node['node_type']!="CourseSubSectionEvent" && node['node_type']!="CourseUnitEvent" && node['node_type']!="CourseSection" && node['node_type']!="CourseSubSection" && node['node_type']!="CourseUnit" && update_url && node['node_type'] != "CourseEventGroup"){
+            // alert(nav_list);
+            // alert("node_type");
+            $.ajax({
+                type: "GET",
+                url: "{% url 'collection_nav' group_id %}",
+                datatype: "html",
+                data:{
+                  node_id: node.id,
+                  curr_node:"{{node.pk}}",
+                  nav: nav_list,
+                  nod_type: node_type
+                  // csrfmiddlewaretoken: '{{ csrf_token }}'
+                },
+                success: function(data) {
+                  if (node_type == "Page"){
+                   window.history.pushState("", "", "/{{group_name_tag}}/page/{{node.pk}}"+"?selected="+node.id+"");
+                  }
+                  else if(node_type == "File"){
+                    window.history.pushState("", "", "/{{group_name_tag}}/file/{{node.pk}}"+"?selected="+node.id+"");
+                  }
+                  else if (node_type == "Term"){
+                    window.history.pushState("", "", "/{{group_name_tag}}/term/{{node.pk}}"+"?selected="+node.id+"");
+                  }
+                  else if (node_type == "Course"){
+                    window.history.pushState("", "", "/{{group_id}}/course/course_detail/{{node.pk}}"+"?selected="+node.id+"");
+                  }
+                  if (node_type == "CourseEventGroup" || node_type == "ProgramEventGroup"){
+                    window.history.pushState("", "", "/{{node.pk}}"+"?selected="+node.id+"");
+                    $(".view_page_link").trigger('click')
+                  }
+                  else if (node_type == "Topic"){
+                    window.history.pushState("", "", "/{{group_name_tag}}/topic_details/{{node.pk}}"+"?selected="+node.id+"");
+                  }
+
+                  $("#view_page").html(data);
+                }
+            });
+            }
+            else if(node['node_type']=="CourseUnitEvent"){
+              $(".view_page_link").trigger('click')
+              $("#view_page").html("")
+              var lbl_name = document.createElement('label');
+              lbl_name.style.fontSize = "20px"
+              if(node.hasChildren()){
+                lbl_name.innerHTML = node.name + " contains following : ";
+                $("#view_page").append(lbl_name);
+                var ol_elem = document.createElement('OL');
+                ol_elem.id = "res_container";
+                if (node){
+                  for(var i=0;i<node.children.length;i++){
+                    var elem2 = document.createElement('LI');
+                    elem2.innerHTML = node.children[i].name;
+                    elem2.className = "res_name"
+                    $(ol_elem).append(elem2)
+                  }
+                }
+              }
+              else{
+                lbl_name.innerHTML = node.name + " contains no files yet!";
+                $("#view_page").append(lbl_name);
+              }
+              $("#view_page").append(ol_elem)
+            }
+          }
+          else{
+            var close_nele = event.previous_node
+            // unselect_treenode(close_nele)
+          }
+
+        });
+      if (window.location.pathname.search("add_units") > -1) {
+          update_url = false;
+          $tree.tree({
+            selectable: false,
+          });
+          $tree.unbind('tree.open')
+          $tree.unbind('tree.select')
+
+      } else {
+          update_url = true;
+      }
+
+    }
+    function get_all_siblings(node_item){
+      if(node_item.parent){
+        var all_childrens = node_item.parent.children
+        return all_childrens
+      }
+    }
+
+    function collapse_tree(node_item){
+      var $tree = $('.collection');
+      // $tree.tree('openNode', node_item);
+      var all_nodes = $tree.tree('getTree');
+      var all_siblings = get_all_siblings(node_item)
+
+      for(var i=0;i<all_siblings.length;i++){
+        if(all_siblings[i]!=node_item){
+          close_child_nodes($tree,all_siblings[i]);
+          $tree.tree('closeNode', all_siblings[i]);
+        }
+      }
+    }
+
+    function close_child_nodes(tree,node_item){
+      all_child_nodes = node_item.children
+      for(var c=0;c<all_child_nodes.length;c++){
+        tree.tree('closeNode', all_child_nodes[c]);
+      }
+    }
+
+    function unselect_treenode(closing_node){
+      var $tree = $('.collection');
+      $tree.tree('closeNode', closing_node);
+    }
+
+    // This function takes id of clicked "related" node and redirect to its page with its proper breadcrumbs
+    // nav_li manipulates the navigation path of that topic in theme map
+    function topic_redirect (obj_id) {
+
+      var nav_list = window.location.search.replace("?nav_li=", ""); // This takes "nav_li" from browser url
+      var nav_li = nav_list.replace('{{node.pk}}', obj_id); // This replaces the last node id with clicked "related" node id
+      location.href = "/{{group_name_tag}}/topic_details/"+obj_id+"?nav_li="+nav_li+"";
+    }
+
+    function update_res_status(){
+      completed_res_ids = []
+      $.ajax({
+        url: "{% url 'get_resource_completion_status' group_id %}",
+
+        data: {
+          cr_ids : JSON.stringify(cr_ids)
+        },
+
+        type: "GET",
+
+        dataType: "json",
+        global: false,
+        beforeSend: function(){
+          $('.get_course-status').attr('value','Loading...')
+                                .attr('disabled','disabled')
+        },
+        success: function(data){
+          if(data){
+            // console.log(data)
+            $.each(data, function(key,value){
+              if (key === "COMPLETED" && value.length > 0){
+                $.each(value, function(each_index){
+                  completed_res_ids.push(value[each_index])
+                  $('[data-id='+ String(value[each_index]) + ']').prepend('<i class="fa '+iconMapping['COMPLETED']+'"</i>');
+                })
+              }
+            })
+            var $tree = $('.collection');
+
+            var tree = $tree.tree('getTree');
+
+            tree.iterate(function(node) {
+
+              if (node.hasChildren()) {
+                $tree.tree('openNode', node, true);
+              }
+              return true;
+            });
+          }
+          $('.get_course-status').attr('value','Get Status')
+                                .removeAttr('disabled')
+          if (completed_res_ids.length > 0){
+            update_units_status(completed_res_ids)
+          }
+        },
+      });//end of ajax
+
+    }
+
+    function sublist_chk(super_list, sub_list) {
+      var newArray = [];
+      for(var j = 0; j < sub_list.length; j++)
+        if(super_list.indexOf(sub_list[j]) != -1)
+        {
+            newArray.push(sub_list[j]);
+        }
+        if(newArray.length == sub_list.length){
+          return true
+        }
+      return false;
+    }
+
+    function update_units_status(completed_res_ids){
+      completed_unit_ids = []
+      if(cu_ids.length > 0 && completed_res_ids.length > 0){
+        var $tree = $('.collection');
+        $.each(cu_ids, function(index_val){
+          var u_node = $tree.tree('getNodeById',cu_ids[index_val]);
+          u_node_children_ids = []
+          // $.each(u_node.children, function(each_ch_index){
+          //   u_node_children_ids.push(u_node.children[each_ch_index].id)
+          // })
+          u_node_children_ids = u_node.collection_set
+          res = sublist_chk(completed_res_ids, u_node_children_ids)
+          if(res){
+            $('[data-id='+ String(cu_ids[index_val]) + ']').prepend('<i class="fa '+iconMapping['COMPLETED']+'"</i>');
+            completed_unit_ids.push(cu_ids[index_val])
+          }
+          else{
+            $('[data-id='+ String(cu_ids[index_val]) + ']').prepend('<i class="fa '+iconMapping['WARNING']+'"</i>');
+          }
+
+        })
+        if (completed_unit_ids.length > 0){
+          update_sessions_status(completed_unit_ids)
+        }
+      }
+    }
+
+    function update_sessions_status(completed_unit_ids){
+      completed_session_ids = []
+      if(css_ids.length > 0 && completed_unit_ids.length > 0){
+        var $tree = $('.collection');
+        $.each(css_ids, function(index_val){
+          var css_node = $tree.tree('getNodeById',css_ids[index_val]);
+          css_node_children_ids = []
+          $.each(css_node.children, function(each_ch_index){
+            css_node_children_ids.push(css_node.children[each_ch_index].id)
+          })
+          res = sublist_chk(completed_unit_ids, css_node_children_ids)
+          if(res){
+            $('[data-id='+ String(css_ids[index_val]) + ']').prepend('<i class="fa '+iconMapping['COMPLETED']+'"</i>');
+            completed_session_ids.push(css_ids[index_val])
+          }
+          else{
+            $('[data-id='+ String(css_ids[index_val]) + ']').prepend('<i class="fa '+iconMapping['WARNING']+'"</i>');
+          }
+
+        })
+        if(completed_session_ids.length > 0){
+          update_modules_status(completed_session_ids)
+        }
+      }
+    }
+
+    function update_modules_status(completed_session_ids){
+      if(cs_ids.length > 0 && completed_session_ids.length > 0 ){
+        var $tree = $('.collection');
+        $.each(cs_ids, function(index_val){
+          var cs_node = $tree.tree('getNodeById',cs_ids[index_val]);
+          cs_node_children_ids = []
+          $.each(cs_node.children, function(each_ch_index){
+            cs_node_children_ids.push(cs_node.children[each_ch_index].id)
+          })
+          res = sublist_chk(completed_session_ids, cs_node_children_ids)
+          if(res){
+            $('[data-id='+ String(cs_ids[index_val]) + ']').prepend('<i class="fa '+iconMapping['COMPLETED']+'"</i>');
+          }
+          else{
+            $('[data-id='+ String(cs_ids[index_val]) + ']').prepend('<i class="fa '+iconMapping['WARNING']+'"</i>');
+          }
+
+        })
+      }
+    }
+
+    $(document).on('click','.get_course-status',function(){
+      // console.log("get_course-status btn clicked")
+      update_res_status()
+    });
+
+  </script>
+
+<style type="text/css">
+
+  .fa{
+    display: inline !important;
+  }
+
+  .collection {
+    margin-bottom: 1em;
+    overflow: auto;
+    margin-top: 15px 0px;
+  }
+  ul.jqtree-tree .jqtree-element { /* Hanging Indent Setting */
+      position: relative !important;
+       padding-left: 30px !important;
+      text-indent:-32px !important;
+      padding: 9px;
+
+  }
+  .hanging-indent-topics-name{
+      position: relative !important;
+      padding-left: 16px !important;
+      text-indent:-18px !important;
+  }
+
+  /*.collection > ul li:nth-child(odd) { background: #ddd; }*/
+  .collection > ul li { border-bottom: solid thin #ddd; border-top: solid thin #ddd; }
+  /*.collection > ul li { padding-left: 22px ;
+  text-indent: -22px ;
+ }*/
+
+  #view_collection legend{
+    text-align: center;
+    //border-left: solid thin #ddd;
+    //border-right: solid thin #ddd;
+    margin-top: 20px;
+    color:black !important;
+  }
+
+
+  .res_name{
+    margin-left: 20px;
+    font-size: 18px;
+    list-style: inherit;
+  }
+</style>
+
+{% endblock %}
+
+
+  <!-- <b class="current">{{node.name}}</b> -->
+  {% if node.collection_set %}
+    <div>
+      <div class="collection" data-url="{% url 'get_course_collection' group_id node.pk True %}"></div>
+    </div>
+    <div class="status-div">
+      <input type="button" class="button small radius get_course-status" value="Get Status"></input>
+    </div>
+  {% endif %}

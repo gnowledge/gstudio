@@ -1,0 +1,41 @@
+{% load ndf_tags %}
+{% load i18n %}
+<div class="row" style="padding-top:10px" id="thread">
+
+  {% get_forum_twists forum as thread %}
+  {% for each in thread %}
+  
+    {% get_user_object each.created_by as user_obj %}
+
+    <div class ="small-1 large-1 columns"> 
+      <div class="post-count-container new already-checked">
+        <span class="reply-count new-post already-checked">NEW</span>
+      </div>
+    </div>
+  
+    <div class= "small-10 large-10 columns">
+      <h4>
+        <a href="/{{groupid}}/forum/thread/{{each}}">
+          {{each.name}}
+        </a><br/>
+        <small>
+          by:<strong>{{user_obj.username}}</strong>
+        </small>
+      </h4>
+      {% with each.content|safe as twist_content %}
+      <font size ="1" >{{twist_content}} </font>
+      {% endwith %}
+      {% for tag in each.tags %}
+      <span class="radius secondary label">{{tag}}</span>
+      {% endfor %}
+    </div>
+    
+    <hr>
+
+  {% endfor %}
+</div>
+
+<script type="text/javascript">
+  $("#refreshthread button.button.large.postfix").removeClass("large");
+</script>
+

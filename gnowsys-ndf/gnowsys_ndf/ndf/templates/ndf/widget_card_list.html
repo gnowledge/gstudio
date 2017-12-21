@@ -1,0 +1,13 @@
+{% load i18n %}
+{% load ndf_tags %}
+
+
+<!-- Card -->
+
+{% for each in files_cur %}
+    
+    {% include 'ndf/asset_card.html' with url_name=detail_urlname first_arg=group_id second_arg=each.pk each_asset=each %}    
+
+{% endfor %}
+
+

@@ -1,0 +1,297 @@
+{% extends "ndf/base.html" %}
+{% load i18n %}
+{% load ndf_tags %}
+
+{% get_group_name groupid as group_name_tag %}
+<!-- #{#% get_group_type request.path request.user as group_type %} -->
+
+{% block title %} {{ node.member_of_names_list|join:", " }} - {{ node.name }}  {% endblock %}
+{% block head %}
+
+<!-- script to call ajax function for converting collection into module <script>
+
+  $(document).ready(function()
+  {
+    $("#module").one("click", function()
+    {
+     $.ajax({
+      url:"/{{groupid}}/ajax/make_module/",
+      type:"GET",
+      data:{_id:"{{node.pk}}"},
+      beforeSend:function(){
+        $("#ajax_search").show();
+      },
+      success: function(result){
+       $("#ajax_search").hide();
+       $("#module").hide();
+       alert(result);
+
+     }
+   });
+   });
+  });
+</script>
+-->
+
+{% endblock %}
+
+
+{% block style %}
+  .topic.accordion dd > a{
+    background: none;
+    {# color: Gray; #}
+  }
+{% endblock style %}
+
+{% block meta_content %}
+{{block.super }}
+<div class="repository-title" itemprop="{{schema.1.name}}" style="font-size:1.2em !important;width:100%;margin-top:8px">
+      {% firstof node.name node.altnames node.name %}
+  </div>
+
+  <br>
+
+{% endblock %}
+
+
+{% block related_content %}
+{% endblock %}
+
+
+{% block collection_content %}
+  {% check_group node.pk as is_group %}
+  {% comment %}
+  {% if node.collection_set and not node.if_file.original.relurl and not is_group %}
+      <div class="show-collection">
+        <a class=" {% if node.collection_set %}collection-exists{% endif %}"  style="width:100%" data-oid="{{node.pk|safe}}">
+         Show Collection
+        </a>
+     </div>
+  {% endif %}
+  {% endcomment %}
+  {% if node.collection_set %}
+    <div id="view_collection">
+      {% include "ndf/collection_ajax_view.html" %}
+    </div>
+  {% endif %}
+  {% if not 'video' in node.if_file.mime_type and not is_group  %}
+    <dl class="accordion" data-accordion>
+        <dd class="accordion-navigation" data-options="deep_linking:true">
+              <a href="#panel1" style="background-color: #2980B9; color:#FFF;width:70%!important">
+                <div style="font-size:13px">Change Thumbnail <i  style="float:right;font-size:13px" class= "fi-pencil"></i></div></a>
+              <div id="panel1" class="content">
+                          {% include "ndf/widget_photo_upload.html" with  node_id=node.pk url_name="file" widget_for="file_detail_view" is_banner=False is_profile=False is_thumbnail=True %}
+              </div>
+
+        </dd>
+    </dl>
+
+  {% endif %}
+
+  {% if node.teaches %}
+    <div class="teaches-block">
+      <div class="repository-title large-4 columns" style="width:100%;font-size:1.2em">Teaches</div><br><br>
+      <ul style="list-style: none; border-bottom: solid thin #ddd;">
+        {% for each_teaches in node.teaches %}
+            {% get_topic_breadcrumb_hierarchy each_teaches.pk as topic_prior_hier %}
+            <li style="border-bottom: solid thin #ddd;">
+              <a href="{% url 'topic_details' group_name_tag each_teaches.pk %}?nav_li={{topic_prior_hier}}" >{% trans each_teaches.name %}</a>
+            </li>
+        {% endfor %}
+      </ul>
+    </div>
+  {% endif %}
+
+{% endblock %}
+
+
+{% block add_resource_content %}
+
+{% comment %}
+{% user_access_policy groupid request.user as user_access %}
+
+{% if user.is_authenticated %}
+{% if user_access == "allow" %}
+
+
+
+{% if topic %}
+  <br/>
+  <dl class="accordion topic" data-accordion>
+    <dd>
+      <a href="#add_resources"> <b>{% trans "Add resources in this topic " %}</b> </a>
+      <div id="add_resources" class="content">
+        <div>
+
+            <a class="tiny button" data-reveal-id="view_add_page">
+              <span class="fi-plus">&nbsp;&nbsp;{% trans "Add Page " %} </span>&nbsp;&nbsp; <i class="fi-page"></i>
+            </a>
+            <div id="view_add_page" class="reveal-modal" data-reveal style="height:500px;overflow:scroll;">
+
+              <h3>{% trans "Add New Page: " %}</h3>
+              <!-- To enter name of the page -->
+              <div>
+                <input class="name_id" name="name" type="text" placeholder="Enter name...">
+              </div>
+              <!-- To enter tags -->
+              <div>
+                <span data-tooltip class="has-tip" title="Tags help identify similiar work easily. You can add as many labels as you wish using a comma ','"><label>Tag{{node.tags|pluralize|default_if_none:"s"}}</label>
+                </span>
+                <input class="tags_id" name="tags" type="text" value="{{node.tags|join:', '|default_if_none:""}}" placeholder="{% trans 'Separate tags with commas...' %}">
+              </div>
+              <!-- To enter description(org content) -->
+              <div class="row">
+                <div class="medium-12 columns">
+                  {% include "ndf/add_editor.html" with var_name="content_org" var_placeholder="Enter the content here" %}
+                </div>
+              </div>
+
+              <input type="submit" id="add_page" value="{% trans 'Save Page' %}" class="medium round button"/>
+
+              <a class="close-reveal-modal">&#215;</a>
+
+            </div>
+
+        </div>
+
+        <div>
+          <a class="tiny button" data-reveal-id="view_add_file">
+            <span class="fi-plus">&nbsp;&nbsp;{% trans "Add File " %} </span>&nbsp;&nbsp; <i class="fi-play"></i>
+          </a>
+
+          <div id="view_add_file" class="reveal-modal" data-reveal style="height:300px;">
+            <h3>{% trans "Add New File: " %}</h3><br/>
+            <!-- Upload file -->
+            <form class="dropzone" id ="docPost" enctype="multipart/form-data" method="post" action="{% url 'add_file' 'desk' %}?context_node={{node.pk}}">
+            {% csrf_token %}
+
+            <div>
+              <span class="fi-upload"><input type="file" name="doc[]" id="docFile" multiple/></span>
+            </div>
+            <!-- For making access policy of files PUBLIC initially by uploading it from topic page -->
+            <input type="hidden" name="login-mode" value="PUBLIC">
+            <!-- Just a hidden value which enables us to retun to add_file() in ajax_views when any file gets uploaded -->
+            <input type="hidden" name="type" value="topic_file">
+            <input type="hidden" name="context_name" id="context_name" value="Topic">
+            <!-- This is for getting the user of the uploaded file -->
+            <input type="hidden" name="user" value="{{request.user.pk}}">
+            <input type="submit" class="small round button" id="add_file" value="{% trans 'Save File' %}">
+
+            </form>
+            <a class="close-reveal-modal">&#215;</a>
+
+          </div>
+
+        </div>
+
+        <div>
+          <a class="tiny button" data-reveal-id="view_add_event">
+           <span class="fi-plus">&nbsp;&nbsp;{% trans "Add Events " %} </span>&nbsp;&nbsp; <i class=""></i>
+          </a>
+
+          <div id="view_add_event" class="reveal-modal" data-reveal style="height:500px;overflow:scroll;">
+
+            <b>{% trans "Add events feature will be coming soon " %}</b>
+
+            <a class="close-reveal-modal">&#215;</a>
+          </div>
+
+        </div>
+      </div>
+    </dd>
+  </dl>
+
+<script type="text/javascript">
+
+$("#add_page").click(function() {
+
+      $.ajax({
+        type: "POST",
+        url: "{% url 'add_page' groupid %}",
+        datatype: "html",
+        data:{
+          context_node: "{{node.pk}}",
+          name: $(".name_id").val(),
+          tags: $(".tags_id").val(),
+          content_org: $(".orgedit").val(),
+          csrfmiddlewaretoken: '{{ csrf_token }}'
+        },
+        success: function(data) {
+          data = JSON.parse(data)
+          var page = $(".name_id").val();
+
+          if ($.trim(data["success"]) === false) {
+            alert(" Page name "+ page +" already available, Please choose different name");
+          }
+
+          if ($.trim(data["success"]) === true) {
+            location.reload(true);
+          }
+
+          $(".name_id").val("");
+        }
+      });
+
+});
+
+</script>
+{% endif %}
+
+{% endif %}
+
+{% else %}
+<!--  <b>Please login to see the add resource options</b>-->
+{% endif %}
+
+{% endcomment %}
+{% endblock %}
+
+
+{% comment %}
+
+  {% block shelf_content %}
+    {% if user.is_authenticated %}
+      {% shelf_allowed node as allowed %}
+
+      {% include "ndf/shelf.html" %}
+    {% else %}
+    <h4>{% trans 'Please Login to create your shelf' %}</h4>
+    {% endif %}
+  {% endblock %}
+
+{% endcomment %}
+
+
+{% block breadcrumb %}
+{% endblock breadcrumb %}
+
+{% block body_content %}
+<div id="view_page">
+  {% include "ndf/node_ajax_view.html" %}
+</div>
+{% endblock %}
+
+{% block script%}
+
+{% comment %}
+
+function addNewShelf(shelfName)
+{
+  shelfNameList = [];
+  $('#shelf-items dd > a').each(function(b){ shelfNameList.push($(this).text())});
+
+  if ( ($.inArray(shelfName.toLowerCase(), $.map(shelfNameList, function(n,i){return n.toLowerCase()}))) < 0 ) {
+    shelfNameId = shelfName.split(" ").join("_");
+
+    $( "#shelf-items dd:nth-child(1)" )
+    .after( "<dd><a href='#panel_"+shelfNameId+"'>"+shelfName+"</a><div id='panel_"+shelfNameId+"' class='content'><a href='#' class='button expand'> Add this to shelf </a></div></dd>" );
+  }
+
+  else {
+    alert("{% trans 'Shelf with this name already exist !\n\n Create shelf with different name.' %}");
+  }
+
+}
+{% endcomment %}
+
+{% endblock %}

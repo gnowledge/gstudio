@@ -1,0 +1,46 @@
+{% extends "ndf/base.html" %}
+{% block body_content %}
+<div id="details_table">
+</div>
+<!-- <script type = "text/javascript" src = "/static/ndf/js/jquery.js"> -->
+</script>
+
+<script type="text/javascript">
+	var table_data = "<table>";
+	var is_list = Number('{{ is_list }}');
+	//alert(is_list);
+
+	$(document).ready(function() {
+		if (is_list == 0) {
+			var all_fields = '{{ all_fields }}';
+			all_fields = all_fields.replace(/&quot;/g, '"'); 
+			all_fields = jQuery.parseJSON(all_fields);
+			for (var key in all_fields) {
+				table_data += "<tr><td style='padding:0px 20px'>" + String(key) +"</td><td>" + String(all_fields[key]) +"</td></tr>";
+			}
+			table_data += "</table>";
+			
+			$("#details_table").html(table_data);
+		}
+		else {
+			list_nodes = '{{ list_nodes }}';
+			list_nodes = list_nodes.replace(/&quot;/g, '"'); 
+			//alert(list_nodes);
+			list_nodes = jQuery.parseJSON(list_nodes);
+			div_data = "<ul>";
+			c = 0;
+			for (var obj in list_nodes) {
+				var url_mask = "{% url 'get_node_info2' groupid 12345 %}".replace(/12345/, list_nodes[c]);
+				//alert(url_mask);
+				div_data += "<li><a href='" + url_mask + "'>hello</a></li>";
+				c = c+1;	
+			}
+
+			div_data += "</ul>";
+			//alert(div_data);
+			$("#details_table").html(div_data);
+		}
+	});
+
+</script>
+{% endblock %}

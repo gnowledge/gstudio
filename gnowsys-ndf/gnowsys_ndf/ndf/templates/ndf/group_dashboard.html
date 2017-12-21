@@ -1,0 +1,732 @@
+{% extends "ndf/base.html" %}
+{% load ndf_tags %}
+{% load i18n %}
+{% load cache %}
+
+{% block title %} {{username}} Dashboard Updates  {% endblock %}
+
+{% block head %}
+  {{block.super}}
+  {% if approval %}
+    <!-- DataTables -->
+    <script src="/static/ndf/bower_components/DataTables/media/js/jquery.dataTables.js"></script>
+    <script src="/static/ndf/bower_components/datatables-plugins/integration/foundation/dataTables.foundation.js"></script>
+    <!-- DataTables CSS -->
+    <link href="/static/ndf/bower_components/datatables-plugins/integration/foundation/dataTables.foundation.css" rel="stylesheet" type="text/css" />
+  {% endif %}
+{% endblock %}
+
+{% block style %}
+  {{block.super}}
+
+    /*
+    .div-height {
+      margin-bottom: 0.5em; 
+      height: 9em;
+    }
+
+    .counter {
+      font-weight: bold;
+      text-align: right;
+    }
+    */
+
+    .width_Status, .width_Completed_On, .width_Enrolled, .width_Remaining, .width_Approved, .width_Rejected {
+      width: 8%;
+    }
+
+    #status{
+      padding-left: 0.5rem;
+    }
+
+    .width_19p {
+      width: 19%;
+    }
+
+    .width_delete {
+      width: 8%;
+      line-height: 0.5em;
+      text-align: center !important;
+    }
+
+    .margin-0r {
+      margin: 0 !important;
+    }
+
+    .counter {
+      font-weight: bold;
+      text-align: right;
+    }
+  
+  .img-height {
+    height: 100%;
+  }
+
+  .tiny.button {
+    font-size: 1em !important;
+  }
+
+  div.reveal-modal > label {
+    color: white;
+    font-weight: bold;
+    font-size: 1rem;
+  }
+
+  .selected{
+    background-color: #D5D3D3 !important;
+  }
+
+  #lbl_displ {
+    color: #0b8a91;
+    font-weight: bold;
+    font-size: 1rem;
+  }
+
+  #group_picture{
+    background-color: inherit;
+  }
+
+  .group-images{
+    max-height: 200px;
+    display: block;
+    margin: 0px auto;
+  }
+
+{% endblock %}
+
+<!-- LHS Block -->
+{% block meta_content %}
+  <!-- <h3>{% trans "About" %}</h3> -->
+
+  {% blocktrans %}
+    <b> Group Dashboard </b> Shows the tasks and activities on the site.
+  {% endblocktrans %}
+  <br><br>
+
+  <!-- form for group/profile picture on LHS -->
+  {% include "ndf/widget_photo_upload.html" with url_name='group_dashboard' widget_for="Group_updates" is_banner=False is_profile=True %}
+  <!-- END OF form for group/profile picture on LHS -->
+{% endblock %}
+<!-- END of LHS block -->
+
+
+{% block body_content %}
+  <div id="GroupUpdatesModal" class="reveal-modal medium alert-box radius" data-reveal data-alert>
+    <label id="GroupUpdatesModalLabel"></label>
+    <div class="row approval_modal hide">
+      <div class="small-3 small-offset-3 columns">
+        <input type="button" id="btnConfirmYes" class="button tiny expand" value="{% trans 'Yes' %}">
+      </div>
+      <div class="small-3 columns end">
+        <input type="button" id="btnConfirmNo" class="button tiny expand " value="{% trans 'No' %}">
+      </div>
+    </div>
+    <a class="close-reveal-modal">&#215;</a>
+  </div>
+
+  <!-- Banner Div -->
+
+  <!-- as per nroer specs, it doesn't want banner picture. So checking -->
+  {% if site.SITE_NAME != "NROER" %}
+
+    <form id ="frmBanner" enctype="multipart/form-data" method="post" action="{% url 'group_dashboard' group_id %}">
+      {% csrf_token %}
+      <div id="group_dashboard_Banner" style="height:300px; width:1150px; background-color: #b0e1df;">
+        
+        {% if banner_pic %}
+          {% get_grid_fs_object banner_pic as grid_fs_obj %}
+          <img alt="Profile picture for this group." src="{% url 'read_file' group_id banner_pic.pk grid_fs_obj.filename %}"
+          style="height:300px; width:1150px; position:absolute; z-index:auto;">
+          {% else %}
+            <img src="/static/ndf/images/{{site.SITE_NAME|lower}}-site-banner.png" alt="Banner picture for this group." width="100%" style="background-color:white; border:solid 1px darkgray;">
+        {% endif %}   
+
+      {% comment %}
+        <div class="row">
+          <div class="row" style="margin-top:80px; margin-left:20px; background: transparent;position:absolute z-index:1"  align="Left">
+            <input type="file" name="has_Banner_pic" id="docFile" accept="image/*" class="hide"/>
+            <input type="hidden" name="type" value="banner_pic">           
+            <input type="hidden" name="user" value="{{usr}}">         
+            <p id="message" style="display:none">
+              {% trans "Please wait while profile picture is uploaded .." %}
+            </p>
+          </div> 
+        </div>
+      {% endcomment %}
+      </div>
+      <div class="height-div" style="height:5px">
+        <!-- this div is used for spaceing between the button Add photo button and profile picture area -->
+      </div>
+        
+      {% comment %}
+      {% if request.user.is_authenticated %}
+        <div style="position:relative;">
+          <div style="float:left;">
+            <a style="border-style:solid; border-width:1.5px; padding:3px 5px; border-radius:4px" id="btnUploadBannerPic" >  
+            Add a Banner Photo 
+            </a>
+          </div>
+          <div>
+            <input type="submit" id="submitpostid" value="{% trans 'Save' %}" style="font-size:15px;"  />
+          </div>
+        </div>
+        {% endif %}
+      {% endcomment %}
+    </form>  
+
+  {% endif %}
+  <!-- end of checking for banner in nroer menu -->
+
+  <nav class="row" style="margin-top: 2em;">
+    <dl class="tabs small-12 columns" data-tab data-options="deep_linking:false">
+      {% if approval %}
+      <input type="hidden" id="enrollment_id">
+      <input type="hidden" id="course_id" >
+      <input type="hidden" id="course_name" >
+      <input type="hidden" id="college_id" >
+      <input type="hidden" id="college_name" >
+
+      <dd class="active" title="Enrollment Approval Details">
+        <a href="#panel_enrollment_approval_details">
+          {% trans "Approval" %}
+        </a>
+      </dd>
+      {% endif %}
+      
+      <dd class="{% if not approval %}active{% endif %}" >
+        <a onclick="loaddata()" href="#status" name="Status">{% trans 'Activity' %}</a>
+      </dd>
+      
+      <dd>
+        <a href="#view-scheduler-calendar" name="Calendar">{% trans 'Calendar' %}</a>
+      </dd>
+    </dl>
+  </nav>
+
+  <div id="group_dashboard_details" class="tabs-content" style="padding: 0px 5px; width:1150px;">
+    {% if approval %}
+    <!-- Tab: Enrollment Approval Details -->
+    <div class="active content row" id="panel_enrollment_approval_details">
+      <dl class="accordion" data-accordion>
+        <!-- Enrollment Details -->
+        <dd class="accordion-navigation">
+          <a href="#enrollment_accordion">{% trans "Enrollment Details" %}</a>
+          <div id="enrollment_accordion" class="content active">
+            {% if enrollment_details %}
+            <table>
+              <thead>
+                <th class="width_s_no counter">{% trans "S. #" %}</th>
+                {% for each_column in enrollment_columns %}
+                <th class="width_{{each_column}}">{{each_column}}</th>
+                {% endfor %}
+              </thead>
+
+              <tbody>
+                {% for each in enrollment_details %}
+                <tr id="{{each|get_dict_item:'_id'}}">
+                  <td class="counter">{{forloop.counter}}.</td>
+                  {% for each_key in enrollment_columns %}
+                  <td class="width_{{each_key}}">
+                    <a href="#" class="detail-view {{each_key}}">
+                      {{each|get_dict_item:each_key}}
+                    </a>
+                  </td>
+                  {% endfor %}
+                </tr>
+                {% endfor %}
+              </tbody>  
+            </table>
+            {% else %}
+            <h4>Nothing there to be approved!!</h4>
+            {% endif %}
+          </div>
+        </dd>
+
+        {% if enrollment_details %}
+        <!-- Approval Details -->
+        <dd class="accordion-navigation">
+          <a href="#approval_accordion">{% trans "Approval Details" %}</a>
+          <div id="approval_accordion" class="content">
+          <div id="approval_table">
+            
+          </div>
+            <div class="row hide" id="approval_buttons">
+                <div class="medium-2 columns">
+                    <input type="button" class="button small radius expand btnApproval" id="btnApp_id" value="Approve" disabled="disabled">
+                </div>
+                <div class="medium-2 columns end">
+                    <input type="button" class="button small radius expand btnApproval"  id="btnRej_id" value="Reject" disabled="disabled">
+                </div>
+            </div>
+          </div>
+        </dd>
+        {% endif %}
+      </dl>
+    </div>
+    {% endif %}
+
+    <div class="content row {% if not approval %}active {% endif %}" id="status" align="center">
+    </div>
+    <div class="content row" id="view-scheduler-calendar">
+      {% include "ndf/scheduler_calender.html"  %}
+    </div>
+  </div>
+{% endblock %}
+
+{% block script %}
+// <script type="text/javascript">
+  
+  {{block.super}}
+
+  var count = 0;
+  var morecount = 0;
+  var counter = 1;
+
+  function scrolling(){
+   
+    if ($('#status').hasClass('active')) {
+      
+      $(window).bind('scroll', loadOnScroll);
+      count = 0;
+    }
+  }
+
+  window.onscroll = scrolling;
+
+  var loadOnScroll = function() {
+  if ($(window).scrollTop()+$(window).height() >= $(document).height()) {
+
+      $(window).unbind("scroll");
+    
+      // execute the load function below that will visit the JSON feed and stuff data into the HTML
+      if (count == 0) {
+        loaddata();
+        count = count+1;
+      }
+    }
+  }
+
+  function loaddata() {
+    $(window).unbind();
+    
+    if('{{page}}' != 0) {
+      $.ajax({
+        url: "{% url 'page_scroll' groupid 'counter' %}".replace("counter", counter),
+        type: "GET",
+        datatype: "json",
+      
+        success:function(data){
+          if(String(data)) {
+            $("#status").append(data);
+            counter = counter+1;
+          }
+
+          if(!data) {
+            if(morecount ==0) { 
+              $("#status").append("<h6> {% trans ' No more data to show' %}</h6>");
+              morecount = morecount+1;
+              counter = 2;
+            } 
+          }
+        }
+      });
+    }
+  }
+
+  $("input:not('#docFile')").each(function() {
+    $(this).bind('keydown keypress keyup change', function() {
+      var search = (this.value).toLowerCase();      
+      var resource = (this.name); 
+      var $li = $("#"+resource+"_drawer li.bullet-item").hide();  
+
+      $li.filter(function() {               
+          return $(this).text().toLowerCase().indexOf(search) >= 0;
+      }).show();
+    });
+  });
+
+
+  // --- update/upload/edit of group/profile picture ---
+
+  // on click of Edit button
+  /*
+  $("#group-img-edit-btn").click(function () {
+    $(this).addClass("hide");
+    $("#group-img-browse-btn").removeClass("hide").val("");
+  });
+
+  // on selecting/changing group image
+  $('#group-img-browse-btn').on("change", function() {
+
+    var file_mime_type = this.files[0].type;
+
+    // check if selected file is of image type or not
+    if(file_mime_type.indexOf("image/") < 0)
+    {
+      // not of image type file
+      this.value = "";  // removing selected file
+      alert("{% trans 'Please select the image type file!' %}");
+    }
+    else  // image type file selected
+    {
+      $("#group-img-save-cancel-btn").removeClass("hide");
+
+      // showing the uploaded image
+      var src = document.getElementById("group-img-browse-btn");
+      var target = document.getElementById("temp-group-image");
+      showImage(src, target);
+
+      $("#group-image").addClass("hide");
+      $("#temp-group-image").removeClass("hide");
+    }
+
+  });
+
+  // on click of cancel button
+  $("#group-img-cancel-btn").click(function(){
+    // only show Edit button and hide other buttons/image
+    
+    $("#group-img-browse-btn").addClass("hide");
+    $("#group-img-save-cancel-btn").addClass("hide");
+    $("#group-img-edit-btn").removeClass("hide");
+
+    $("#group-image").removeClass("hide");
+    $("#temp-group-image").attr("src", "").addClass("hide");
+  });
+
+  // method to show/render selected image
+  function showImage(src, target) {
+    var fr = new FileReader();
+
+    fr.onload = function(){
+    target.src = fr.result;
+    }
+    fr.readAsDataURL(src.files[0]);
+  }
+  // ---END update/upload/edit of group/profile picture
+
+
+  // $("#btnUploadGroupPic").click(function() {
+
+  //   $("#groupdocfile").trigger("click");
+  // });
+
+  // $('#groupdocfile').on("change", function() {
+  //   $("#pic_div").removeClass("hide");
+
+  //   file_mime_type = this.files[0].type;
+  //   if(file_mime_type.indexOf("image/") < 0){
+  //     $(this).val("");
+  //     $('#groupdocfile').val(this.value);
+
+  //     var message = "{% trans 'Only image files should be selected for setting your profile picture!' %}"
+  //     $("#GroupUpdatesModalLabel").text(message);
+  //     $("#GroupUpdatesModal").addClass("alert");
+  //     $("#GroupUpdatesModal").foundation('reveal', 'open');
+
+  //     $("#pic_div").addClass("hide");
+  //   }
+  // });
+
+  $("#submitpostid").click(function() {
+    if($("#docFile").val() != "") { 
+      $("#message").show();
+      $("#submitpostid").hide();
+    }
+
+    else {
+      var message = "{% trans 'Please select an image to set it as a profile picture !' %}"
+      $("#GroupUpdatesModalLabel").text(message);
+      $("#GroupUpdatesModal").addClass("warning");
+      $("#GroupUpdatesModal").foundation('reveal', 'open');
+
+      $("#pic_div").addClass("hide");
+
+      return false;
+    }
+  });
+
+  $("#btnUploadBannerPic").click(function() {
+
+    $("#docFile").trigger("click");
+  });
+
+  $('#docFile').on("change", function() {
+    $("#pic_div").removeClass("hide");
+
+    file_mime_type = this.files[0].type;
+    if(file_mime_type.indexOf("image/") < 0){
+      $(this).val("");
+      $('#docFile').val(this.value);
+
+      var message = "{% trans 'Only image files should be selected for setting your profile picture!' %}"
+      $("#GroupUpdatesModalLabel").text(message);
+      $("#GroupUpdatesModal").addClass("alert");
+      $("#GroupUpdatesModal").foundation('reveal', 'open');
+
+      $("#pic_div").addClass("hide");
+    }
+  });
+
+  $("#submitpostid").click(function() {
+    if($("#docFile").val() != "") { 
+      $("#message").show();
+      $("#submitpostid").hide();
+    }
+
+    else {
+      var message = "{% trans 'Please select an image to set it as a profile picture !' %}"
+      $("#GroupUpdatesModalLabel").text(message);
+      $("#GroupUpdatesModal").addClass("warning");
+      $("#GroupUpdatesModal").foundation('reveal', 'open');
+
+      $("#pic_div").addClass("hide");
+
+      return false;
+    }
+  });
+*/
+
+  // Detail view
+    $(".detail-view").click(function(event) {
+      event.preventDefault();
+      enrollment_id = $(this).closest("tr").attr("id");
+
+      approval_data_review = "";
+      nesc=""
+      success_state = false;
+      $.ajax({
+        url: "{% url 'get_students_for_approval' groupid %}",
+
+        data: {
+          'enrollment_id': enrollment_id,
+          'csrfmiddlewaretoken': "{{csrf_token}}"
+        },
+
+        type: "POST",
+
+        dataType: "json",
+
+        success: function(data) {
+          success_state = data["success"];
+          approval_data_review = data["student_approval_data"];
+          if (success_state) {
+            $("#enrollment_id").val(data["enrollment_details"]["pk"])
+            $("#course_id").val(data["enrollment_details"]["CourseId"])
+            $("#course_name").val(data["enrollment_details"]["Course"])
+            $("#college_id").val(data["enrollment_details"]["CollegeId"])
+            $("#college_name").val(data["enrollment_details"]["College"])
+
+            if(approval_data_review.length >0){
+
+              column_headers = data["column_headers"];
+              dataTable_columns_set = [];
+
+              // Define table
+              student_data_table = '<table cellpadding="0" cellspacing="0" border="0" class="display" id="student_app_data_table">' +
+              '<input type="button" class="button tiny select_all_rows" value="Select All" >' +
+              '&nbsp;<input type="button" class="button tiny deselect_all_rows" value="De-Select All" >' +
+              '<label id="lbl_displ"></label>' +
+              '</table>';
+              $("#approval_table").html(student_data_table); 
+              $("#approval_buttons").removeClass("hide")
+              // Prepare title & data headers used in dataTable
+              $.each(column_headers, function(index, v) {
+                d = {};
+                d["data"] = v[0];
+                d["title"] = v[1];
+                dataTable_columns_set.push(d);
+              });
+
+              // Set defintion dataTable
+              sce_dt_var = $("#student_app_data_table").dataTable({
+                "data": approval_data_review,
+                "columns": dataTable_columns_set,
+                "createdRow": function ( row, data, index ) {
+                  $(row).attr("id", data["_id"]);
+                }
+              });
+            }
+            else {
+              nesc = "<p class='text-center'><b> {% trans 'Students have been approved' %}" + "</b></p>"
+              $("#approval_table").html(nesc); 
+              $("#approval_buttons").addClass("hide")
+            }
+          }
+
+          else {
+            $("#GroupUpdatesModalLabel").text(data["message"]);
+            $("#GroupUpdatesModal").removeClass("success").removeClass("warning");
+            $("#GroupUpdatesModal").addClass("alert");
+            $("#GroupUpdatesModal").foundation('reveal', 'open');
+          }
+        },
+
+        complete: function() {
+          if (success_state) {
+            $("#enrollment_accordion").removeClass("active");
+            $("#approval_accordion").addClass("active");
+          }
+        },
+      });
+    })
+
+  // approval table tr click functions
+    $(document).on( 'click', '#student_app_data_table tbody tr', function () {
+      $(this).toggleClass('selected');
+      $("#lbl_displ").text("")
+      $(".btnApproval").removeAttr("disabled")
+    } );
+
+  //On click of select All, highlight all rows
+    $(document).on('click','.select_all_rows',function(){
+      $(sce_dt_var.fnGetNodes()).addClass('selected');
+      $("#lbl_displ").text("All " + $(sce_dt_var.fnGetNodes()).length + " rows are selected")
+      $(".btnApproval").removeAttr("disabled")
+    });
+
+  //On click of De-Select All, remove highlight from all rows
+    $(document).on('click','.deselect_all_rows',function(){
+      $("#lbl_displ").text("All rows are de-selected")
+      $(sce_dt_var.fnGetNodes()).removeClass("selected");
+      $(".btnApproval").attr("disabled",true)
+    });
+
+  // On click of Approve/Reject
+    var is_approve_confirm = false;
+    var is_reject_confirm = false;
+    var approval_state;
+
+    $(document).on("click", ".btnApproval", function() {
+      approval_state = $(this).val();
+      if ( !is_approve_confirm && !is_reject_confirm) {
+        if(approval_state == "Approve"){
+          $("#GroupUpdatesModalLabel").text("{% trans 'Do you want to continue approving the selected students?' %}");
+        }
+        else if(approval_state == "Reject"){
+          $("#GroupUpdatesModalLabel").text("{% trans 'Do you want to continue rejecting the selected students?' %}");
+        }
+        $("#GroupUpdatesModal")
+          .removeClass("medium").addClass("small")
+          .addClass("alert")
+          .find("div.approval_modal").removeClass("hide")
+        $("#GroupUpdatesModal").foundation('reveal', 'open');
+        return false;
+      }
+      students_selected = []
+      sce_dt_var.$("tr.selected").each(function() {
+        students_selected.push($(this).attr("id"));
+      });
+      if (students_selected.length > 0) {
+        enrollment_id = $("#enrollment_id").val();
+        course_id = $("#course_id").val();
+        course_name = $("#course_name").val();
+        college_id = $("#college_id").val();
+        college_name = $("#college_name").val();
+
+        success_state = false
+        approved = ""
+        rejected = ""
+        remaining = ""
+        task_status = ""
+        $.ajax({
+          url: "{% url 'approve_students' groupid %}",
+
+          data: {
+            'approval_state': approval_state,
+            'enrollment_id': enrollment_id,
+            'course_id': course_id,
+            'course_name': course_name,
+            'college_id': college_id,
+            'college_name': college_name,
+            'students_selected': students_selected,
+            'csrfmiddlewaretoken': "{{csrf_token}}"
+          },
+
+          type: "POST",
+
+          dataType: "json",
+
+          success: function(data) {
+            success_state = data["success"];
+            if (success_state) {
+              approved = data["approved"];
+              rejected = data["rejected"];
+              remaining = data["remaining"];
+              task_status = data["task_status"];
+            }
+
+            else {
+              $("#GroupUpdatesModalLabel").text(data["message"]);
+              $("#GroupUpdatesModal").removeClass("success").removeClass("warning");
+              $("#GroupUpdatesModal").addClass("alert");
+              $("#GroupUpdatesModal").foundation('reveal', 'open');
+            }
+          },
+
+          complete: function() {
+            if (success_state) {
+              $("#"+enrollment_id).find(".Approved").text(approved);
+              $("#"+enrollment_id).find(".Rejected").text(rejected);
+              $("#"+enrollment_id).find(".Remaining").text(remaining);
+              $("#"+enrollment_id).find(".Status").text(task_status);
+
+              $("#approval_table").html("");
+              $("#approval_buttons").addClass("hide")
+              $("#approval_accordion").removeClass("active");
+              $("#enrollment_accordion").addClass("active");
+              is_reject_confirm = false;
+              is_approve_confirm = false;
+            }
+          },
+        });
+      }
+    });
+
+    //Approval/Rejection confirmation
+    $(document).on("click", "#btnConfirmYes", function() {
+      if(approval_state == "Approve"){
+        is_approve_confirm = true;
+        is_reject_confirm = false;
+        $("#GroupUpdatesModal").foundation('reveal', 'close');
+        $("#btnApp_id").trigger("click");
+      }
+      else if(approval_state == "Reject"){
+        is_reject_confirm = true;
+        is_approve_confirm = false;
+        $("#GroupUpdatesModal").foundation('reveal', 'close');
+        $("#btnRej_id").trigger("click");
+      }
+    });
+
+    $(document).on("click", "#btnConfirmNo", function() {
+      if(approval_state == "Approve"){
+        is_approve_confirm = false;
+        is_reject_confirm = false;
+      }
+      else if(approval_state == "Reject"){
+        is_reject_confirm = false;
+        is_approve_confirm = false;
+      }
+      $("#GroupUpdatesModal").foundation('reveal', 'close');
+    });
+
+
+  // Reset reveal-modal content & it's setting
+    $(document).on('closed.fndtn.reveal', '#GroupUpdatesModal[data-reveal]', function () {
+      $("#GroupUpdatesModalLabel").text("");
+      $("#GroupUpdatesModal")
+        .removeClass("success").removeClass("warning").removeClass("alert").removeClass("small")
+        .addClass("medium")
+        .find("div.approval_modal").addClass("hide")
+    });
+// </script>
+
+{% endblock %}
+
+{% block document_ready %}
+  {{block.super}}
+
+  loaddata();
+
+{% endblock %}

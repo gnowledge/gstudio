@@ -1,0 +1,153 @@
+{% load i18n %}
+{% load ndf_tags %}
+ <form data-abide id="form-edit-node" method="POST"   action="{% url 'save_metadata' group_id %}" enctype="multipart/form-data">
+<div class="row">
+  <input type="hidden" name="node_id" class="form_node_id" value="{{node.pk}}">
+        
+        <div class="small-12 large-12 columns"><h4>{% trans "Please add or edit Metadata" %} </h4></div>
+        <!-- Educational Language is Removed from ndf tags and here  __ Saurabh -->
+        {% get_metadata_values as metadata %}
+        {% for k,v in metadata.items %}
+        <div class="metadata-values-panel">
+          
+          <div class="small-12 large-6 columns">
+            <label>
+              {% if k == "educationaluse" %}
+            <h5 >{% trans "Educational Use:" %} </h5>
+            {% elif k == "interactivitytype" %}
+            <h5>{% trans "Interactivity Type: " %}</h5>
+            {% elif k == "educationallevel" %}
+            <h5 class= "compulsory">{% trans "Educational Level:" %} </h5>
+            {% elif k == "educationalsubject" %}
+            <h5 class= "compulsory">{% trans "Educational Subject:" %} </h5>
+            {% elif k == "timerequired" %}
+            <h5>{% trans "Time Required: " %}</h5>
+            {% elif k == "audience" %}
+            <h5 class= "compulsory">{% trans "Target Audience:" %} </h5>
+            {% elif k == "textcomplexity" %}
+            <h5>{% trans "Text Complexity" %}</h5>
+            {% elif k == "age_range" %}
+            <h5>{% trans "Age Range:" %}</h5>
+            {% elif k == "readinglevel" %}
+            <h5>{% trans "Reading Level:" %} </h5>
+            {% elif k == "curricular" %}
+            <h5>{% trans "Curricular:" %}</h5>
+            {% elif k == "educationalalignment" %}
+            <h5>{% trans "Educational Alignment:" %}</h5>
+            {% endif %}
+
+                {% get_attribute_value node.pk k "True" as attr_val %}
+                {% if attr_val.data_type == "list" %}
+                 <select name="{{k}}" id ="{{k}}" multiple style="height:5em!important;">
+                {% else %}
+                 <select name="{{k}}" id ="{{k}}">
+                {% endif %}
+              <option> --Select-- </option>
+              {% for opts in v %}
+                {% if opts == attr_val.value|stringformat:"s" or opts in attr_val.value  %}
+                <option selected>{% trans opts %}</option>
+                {% else %}
+                <option data-opts = "{{opts}}">{% trans opts %}</option>
+                {% endif %}
+              {% endfor %}
+            </select>
+          </label>
+        </div>
+
+        {% endfor %}
+      <div class=" small-12 large-12 columns">
+        <div class="small-12 large-4 columns">
+          <label>
+      {% get_attribute_value node.pk "basedonurl" as basedonurl %}
+          <h5>{% trans "Based on Url: " %} </h5>
+          <input name="basedonurl" id="basedonurl_id" type="text" value="{{basedonurl}}">
+        </label>
+      </div>
+      {% get_attribute_value node.pk "source" as source %}
+      <div class="small-12 large-4 columns">
+        <label>
+          <h5>{% trans "Source: " %} </h5>
+          <input id = "source" name="source" type="text" value="{{source}}">
+        </label>
+      </div>
+
+      <div class="small-12 large-4 columns">
+        <label><h5>Copyright</h5></label>
+        <!-- <input id="copyright_id" name="Copyright" type="text" placeholder="Enter source name"/> -->
+        {% get_copyright as copyright %}
+        <select name="Copyright" id = "copyright_id">
+            {% for each_copyright in copyright %}
+                {# <option value="{{each_copyright}}"  #}
+                {% if each_copyright == node.legal.copyright %}
+                  <option selected>{% trans node.legal.copyright %}</option>
+                {% else %}>
+                  <option data-opts = "{{each_copyright}}">{% trans each_copyright %}</option>
+                {% endif %}>
+          {% endfor %}
+        </select>
+      </div>
+
+    </div>
+  </div>
+  </div>
+{% csrf_token %}
+      
+        </div>
+    <button type="submit" class="right blue-white-button save-metadata">Save Changes</button>
+    <button type="button" class="right blue-white-button cancel-metadata">Cancel</button>
+  </form>
+<script type="text/javascript">
+  $( ".save-metadata" ).click(function(event) {
+      source_val = $("#source").val();
+      basedonurl_val = $("#basedonurl_id").val();
+      copyright_val =  $('#copyright_id').find(':selected').attr('data-opts');
+      obj_list = {};
+      
+      var selectedValueArray = $('.metadata-values-panel select').map(function() {
+      // alert($(this).attr("id") + $(this).val() )
+      obj_name = $(this).attr("id");
+      //alert(obj_name)
+      obj_value = $(this).val();
+      //alert(obj_value)
+        obj_list[obj_name] = obj_value;     
+  })
+// });    
+  
+    $.ajax({
+              type: "POST",
+              data:{
+                    'csrfmiddlewaretoken': "{{csrf_token}}",
+                    "node_id":'{{node.pk}}',
+                    "source_val":source_val,
+                    "basedonurl_val":basedonurl_val,
+                    "copyright_val":copyright_val,
+                    'obj_list':JSON.stringify(obj_list)
+                },
+              url: "{% url 'save_metadata' group_id  %}",
+              datatype: "html",
+              success: function(data) {
+              location.reload();
+            }
+        });
+
+
+});
+
+  $( ".cancel-metadata" ).click(function(event) {
+    $('#addAsset').foundation('reveal', 'close');     
+  });
+
+ 
+   
+$(document).ready(function(){
+    {% if attr_pl_desc %}
+        $("input[name='thread_create'][value='Yes']").attr("checked","checked");
+    
+    {% else %}
+        // $("input[name='thread_create']").attr("disabled",true);
+        $("input[name='thread_create'][value='No']").attr("checked","checked");
+    {% endif %}
+  
+  });
+
+</script>

@@ -1,0 +1,51 @@
+Quiz Module
+
+1. Quiz Implementation
+	1. New GSystemTypes
+		- QuizItemEvent
+		- QuizItemPost
+	2. New AttributeTypes
+		- quizitem_show_correct_ans. Type: bool
+		- quizitem_problem_weight. Type: float (0 to 100)
+		- quizitem_max_attempts. Type: int (0 to 5)
+		- quizitempost_user_given_ans. basestring
+	3. New RelationTypes
+		- clone_of
+
+2. Quiz Authoring
+	1. Quiz:
+		- Collection of QuizItems
+	2. QuizItem:
+		- QuizItem can be created as a part of Quiz and/or independently
+		- Attributes of QuizItem:
+			* quiz_type 
+			* correct_ans
+			* options
+			* quizitem_show_correct_ans
+			* quizitem_problem_weight
+			* quizitem_max_attempts 
+
+3. Quiz Announcing
+	1. QuizItem announced as QuizItemEvent (type_of: Page GST)
+		- QuizItemEvent 
+			* content -- QuizItem's content
+			* correct_ans -- QuizItem's correct_ans
+			* options -- QuizItem's options
+			* quiz_type -- QuizItem's quiz_type
+			* quizitem_show_correct_ans -- QuizItem's quizitem_show_correct_ans
+			* quizitem_problem_weight -- QuizItem's quizitem_problem_weight
+			* quizitem_max_attempts -- QuizItem's quizitem_max_attempts
+	2. Create RT 'clone_of' for QuizItem and QuizItemEvent
+	3. Thread for QuizItemEvent will be created.
+	4. Setup Interaction settings for this Thread
+	5. Posts for this thread will be member_of QuizItemPost
+
+4. Quiz Player
+	1. Based on 'quiz_type', setup widgets.
+		- Multi Choice - Checkbox
+		- Single Choice - Radio buttons
+		- Short Answer - Textbox
+	2. After entering answer
+		- prompt button 'Check' to show whether entered ans is correct or not
+		- prompt button 'Show Answer', to show correct_ans if quizitem_show_correct_ans is set True
+	3. Create GAttribute quizitempost_user_given_ans with the QuizItemPost and user's enetered answer

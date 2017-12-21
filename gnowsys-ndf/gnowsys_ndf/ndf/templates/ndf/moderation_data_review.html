@@ -1,0 +1,181 @@
+{% extends "ndf/data_review.html" %}
+{% load i18n %}
+{% load ndf_tags %}
+
+{% get_group_name groupid as group_name_tag %}
+{% get_group_object groupid as group_object %}
+
+
+{% block style %}
+{{ block.super }}
+  #mod_appr_rej_Modal, #mod_appr_rej_ModalLabel{
+    color: black;
+    font-size: 1rem;
+  }
+  #mod_appr_rej_ModalLabel > li{
+  	margin-left:10%;
+  }
+  
+  .reject_options_div >li{
+  	margin-left:10%;
+  	list-style:None;
+  }
+
+  .other-rej-input{
+  	width:65% !important;
+  	margin-left:15% !important;
+  }
+{% endblock %}
+
+{% block body_content %}
+{{ block.super }}
+  <div id="mod_appr_rej_Modal" class="reveal-modal small alert-box radius" data-reveal data-alert>
+    <div class="row mod_msg">
+      	<label id="mod_appr_rej_ModalLabel"></label>
+	</div>
+	<div class="reject_options_div hide">
+		Please specify reason:
+		<li>
+		<input type="radio" name="rej_opt" value="The resource is Copyrighted">This resource is Copyrighted</li>
+		<li>
+		<input type="radio" name="rej_opt" value="The resource needs improvement">This resource needs improvement</li>
+		<li>
+		<input type="radio" name="rej_opt" value="other" class="other-rej-opt">Other</li>
+		<input type="text" class="other-rej-input hide" placeholder="Enter reason here">
+	</div>
+	<div class="row text-center appr_rej_btn_div hide">
+        <input type="button" id="btnAppRejConfirmYes" class="button tiny secondary" value="{% trans 'Yes' %}">
+        <input type="button" id="btnAppRejConfirmNo" class="button tiny secondary" value="{% trans 'No' %}">
+    </div>
+    <input type="hidden" class="oid">
+    <a class="close-reveal-modal">&#215;</a>
+  </div>
+{% comment %}
+<div id="editorial_discussion_overlay" class="reveal-modal text-center" data-reveal>
+	Editorial Discussion:
+	<br/>
+	<hr/>
+	Feature under process!
+	<a class="close-reveal-modal">&#215;</a>
+</div>
+{% endcomment %}
+
+{% endblock body_content %}
+
+{% block script %}
+{{ block.super }}
+	<script type="text/javascript">
+	{% get_sg_member_of group_id as list_of_sg_member_of %}
+	{% if "ProgramEventGroup" in node.member_of_names_list or "ProgramEventGroup" in list_of_sg_member_of%}
+		$("#group-level-header").addClass("hide");
+	{% endif %}
+
+	var approve_reject = ""
+
+	$("input[name=rej_opt]").change(function(){
+		var radio_sel = $('input[name=rej_opt]:checked').val()
+		if(radio_sel=="other"){
+			$(".other-rej-input").removeClass("hide");
+		}
+		else{
+			$(".other-rej-input").addClass("hide");
+		}
+	})
+
+	function approveResource (oid,objname) {
+		approve_reject = "Approve"
+		var appr_confirm_msg = "This action will APPROVE the following resource: <br/><li> ID : "+ String(oid) +". </li><li>Name: "+String(objname)+"</li>Are you sure you want continue?"
+		// var msg = "Resource having ID: " + String(oid) + " will be approved from this group.  Press 'OK' to Approve the resource\n- Press 'Cancel' to cancel the action"
+		
+		// approveConfirm = window.confirm(msg);
+		var approve_rej_confirm = false;
+		$("#mod_appr_rej_ModalLabel").html(appr_confirm_msg);
+		$("#mod_appr_rej_Modal").find(".appr_rej_btn_div").removeClass("hide")
+		$("#mod_appr_rej_Modal").find(".reject_options_div").addClass("hide");
+		$(".oid").val(oid);
+		$("#mod_appr_rej_Modal").foundation('reveal', 'open');
+	}
+
+	function rejectResource (oid,objname) {
+		if($('#radio_button').is(':checked')) { alert("it's checked"); }		
+		
+		approve_reject = "Reject"
+		var reject_confirm_msg = "This action will REJECT the following resource: <br/><li> ID : "+ String(oid) +". </li><li>Name: "+String(objname)+"</li>Are you sure you want continue?"
+	  	var approve_rej_confirm = false;
+	    $("#mod_appr_rej_ModalLabel").html(reject_confirm_msg);
+	    $("#mod_appr_rej_Modal").find(".appr_rej_btn_div").removeClass("hide");
+		$("#mod_appr_rej_Modal").find(".reject_options_div").removeClass("hide");
+	    $(".oid").val(oid);
+	    $("#mod_appr_rej_Modal").foundation('reveal', 'open');
+	}
+
+
+  //Confirm or Cancel Deletion
+    $(document).on("click", "#btnAppRejConfirmYes", function() {
+		$("#mod_appr_rej_Modal").foundation('reveal', 'close');
+        approve_rej_confirm = true;
+        obj_id = $(".oid").val();
+        // var alert_msg = ""
+        var reject_reason = ""
+       	if($('input[name=rej_opt]:checked').val() == "other"){
+	        if($(".other-rej-input").val()){
+	        	reject_reason = $(".other-rej-input").val();
+	        }
+       	}
+        else{
+    		reject_reason = $('input[name=rej_opt]:checked').val()
+        }
+
+		$.ajax({
+			type: "POST",
+			url: "{% url 'approve_resource' group_id %}",
+			data:{
+				node_oid: obj_id,
+				reject_reason:reject_reason,
+				app_rej_state: approve_reject,
+				csrfmiddlewaretoken: '{{ csrf_token }}'
+			},
+			success: function(data){
+				if(parseInt(data))
+				{
+					// alert_msg = "The '"+approve_reject+"' action is successfully executed."
+					// alert("Resource is successfully "+approve_reject+"ed from this group.");
+
+					// fetching resource blank seperator row
+					var $resBlankRow = $("tr#blank-row-" + obj_id);
+					// fetching resource object VIEW row
+					var $resViewRow = $("tr#view-row-" + obj_id);
+					// fetching resource object EDIT row
+					var $resEditRow = $("tr#edit-row-" + obj_id);
+
+					$($resEditRow).add($resViewRow).add($resBlankRow).animate({
+						opacity: 0.1
+					}, 1000).fadeOut(1000);
+
+					setCurrEditRowToNone(obj_id)
+
+					// changing/reducing total count of resources in the page 
+					var $resCount = $("#data-resources-count");
+					var resourcesCount = parseInt($resCount.text());
+					$resCount.text(--resourcesCount);
+				}
+				else
+				{
+					// alert("Resource is NOT "+approve_reject+"ed. \nSomething went wrong! Please try again later.");
+					alert("Something went wrong! Please try again later.")
+					// alert_msg = "Something went wrong! Please try again later."
+				}
+				// $("#mod_appr_rej_ModalLabel").text(alert_msg);
+				// $("#mod_appr_rej_Modal").find(".appr_rej_btn_div").addClass("hide")
+				// $("#mod_appr_rej_Modal").foundation('reveal', 'open');
+			}
+		})
+    });
+
+    $(document).on("click", "#btnAppRejConfirmNo", function() {
+		$("#mod_appr_rej_Modal").find(".reject_options_div").addClass("hide");
+        $("#mod_appr_rej_Modal").foundation('reveal', 'close');
+        approve_rej_confirm = false;
+    });
+</script>
+{% endblock script %}

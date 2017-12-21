@@ -1,0 +1,355 @@
+{% extends "ndf/base.html" %}
+{% load i18n %}
+{% load pagination_tags %}
+{% load ndf_tags %}
+{% load i18n %}
+{% block title %} {{title}} {% endblock %}
+
+{% block head %}
+{% endblock %}
+
+{% block style %}
+  {{block.super}}
+
+  .margin-top-1 {
+    margin-top: 1em !important;
+  }
+{% endblock %}
+
+{% block help_content %}
+{% endblock %}
+
+{% block meta_content %}
+{% endblock %}
+
+{% block search_content %}
+  {% include "ndf/node_search_base.html" %}
+{% endblock %}
+
+{% block related_content %}
+  {% check_is_user_group groupid as is_author_group %}
+  {% if user.is_authenticated %}
+  {% user_access_policy groupid request.user as user_access %}
+  {% if is_author_group == False %}
+  <br/>
+     <div class="task">
+      <br/>
+      <a class="button medium" href="{% url 'task_create_edit' group_name %}">
+        <span class="fi-plus">&nbsp;&nbsp;{% trans "New Task" %}</span>
+      </a>
+    </div>
+  {% endif %}
+  {% endif %}
+{% endblock %}
+  
+{% block body_content %}
+  
+<div class="row margin-top-1">
+  <section class="medium-9 columns">
+  <div class="repository-title large-4 columns">{% trans "Task" %}</div>
+  <div class="repository-desc large-8 columns">{{node.name}}</div></br> 
+    <h2>
+        {% get_user_object node.created_by as user_obj %}
+
+        {% get_relation_value node.pk 'has_type' as grel_dict %}
+        {% if not grel_dict.cursor %}
+          {% if grel_dict.grel_node.name != "Moderation" %}
+            {% if user_obj.username == request.user.username or request.user.is_superuser %}
+            <a href="#" class="button tiny" style="float:right" data-reveal-id="titleModal"> {% trans 'Edit' %}</a>
+            {% endif %}
+
+          {% endif %}
+        {% endif %}
+
+      </span> 
+    </h2>
+
+    <!-- Only Parent Task -->
+    <div class="row margin-top-1">
+      <div class="medium-5 columns end">
+        <div class="row">
+          <div class="medium-4 columns">
+            <label class="align right"><b>{% trans 'Parent task' %}</b></label>
+          </div>
+          <div class="medium-8 columns">
+            <label>{% if parent %}{{parent}}{% else %} -- {% endif %}</label>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Task Type & Status -->
+    <div class="row margin-top-1">
+      <div class="medium-5 columns">
+        <div class="row">
+          <div class="medium-4 columns">
+            <label class="align right"><b>{% trans "Task type:" %}</b></label>
+          </div>
+          <div class="medium-8 columns">
+            <label>{% if has_type %}{{has_type}}{% else %} -- {% endif %}</label>
+          </div>
+        </div>
+      </div>
+
+      <div class="medium-4 columns end">
+        <div class="row">
+          <div class="medium-5 columns">
+            <label class="align right"><b>{% trans "Status:" %}</b></label>
+          </div>
+          <div class="medium-7 columns">
+            <label>{% if Status %}{{Status}}{% else %} -- {% endif %} </label>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Start Date & Priority -->
+    <div class="row margin-top-1">
+      <div class="medium-5 columns">
+        <div class="row">
+          <div class="medium-4 columns">
+            <label class="align right"><b>{% trans "Start Date:" %}</b></label>
+          </div>
+          <div class="medium-8 columns">
+            <label>{% if start_time %}{{start_time|date:'d/m/Y'}}{% else %} -- {% endif %}</label>
+          </div>
+        </div>
+      </div>
+
+      <div class="medium-4 columns end">
+        <div class="row">
+          <div class="medium-5 columns">
+            <label class="align right"><b>{% trans "Priority:" %}</b></label>
+          </div>
+          <div class="medium-7 columns">
+            <label>{% if Priority %}{{Priority}}{% else %} -- {% endif %}</label>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Due Date & Assignee -->
+    <div class="row margin-top-1">
+      <div class="medium-5 columns">
+        <div class="row">
+          <div class="medium-4 columns">
+            <label class="align right"><b>{% trans "Due Date:" %}</b></label>
+          </div>
+          <div class="medium-8 columns">
+            <label>{% if end_time %}{{end_time|date:'d/m/Y'}}{% else %} -- {% endif %}</label>
+          </div>
+        </div>
+      </div>
+
+      <div class="medium-4 columns end">
+        <div class="row">
+          <div class="medium-5 columns">
+            <label class="align right"><b>{% trans "Assignee:" %}</b></label>
+          </div>
+          <div class="medium-7 columns">
+            <label>{% if Assignee %}{{Assignee|join:", "}}{% else %} -- {% endif %}</label>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    {% if subtask %}
+      <hr>
+
+      <div class="row">
+        <div class="medium-3 columns">
+          <label><b>{% trans "Sub Task:" %}</b></label>
+        </div>
+
+        <div class="medium-3 columns">
+          {% for each_subtask in subtask %}
+          <a class="" href="{% url 'task_details' group_name each_subtask.id %}">{{each_subtask.name}}</a>
+          {% if not forloop.last %},{% endif %}
+          {% endfor %}
+        </div>
+      
+        <div class="medium-6 columns">
+        </div>
+      </div>
+    {% endif %}
+
+    <hr>
+
+    <!-- Description -->
+    <div class="row">
+      <div class="medium-12 columns">
+        <label>
+          <b>{% trans "Description:" %}</b>
+        {% if task_type_name.0.name != "Moderation" %}
+          {% if user_obj.username == request.user.username or request.user.is_superuser %}
+          <a href="#" class="button tiny edit-desc" style="float:right" > {% trans 'sEdit' %}</a>
+          {% endif %}
+        {% endif %}
+        </label>
+      
+        <div id="contentlist" class="content" style="padding-left:20px;">
+          <font id="nodeContentId">
+          {% with node.html_content|safe as description %}
+          {% if description != "None" %}
+            {{ description }}
+          {% else %}
+            -- 
+          {% endif %}
+          {% endwith %}
+          </font>
+        </div>
+      </div>
+    </div>
+    
+    <hr>
+    {% comment %}
+    <!-- Attachments -->
+    <div class="row">
+      <div class="medium-12 columns">
+        <label style=""><b>{% trans "Attachment(s):" %}</b></label>
+        {% if Upload_Task %}
+          {% get_file_node request Upload_Task as new %}
+          {% for node in new %}
+            {% get_grid_fs_object node as grid_fs_obj %}
+            <b><a href="{% url 'read_file' group_id node.pk grid_fs_obj.filename %}">{{grid_fs_obj.filename}}</a></b>
+            {% if not forloop.last %}, {% endif %}
+          {% endfor %}
+        {% else %}
+          --
+        {% endif %}
+      </div>
+    </div>
+
+    <hr>
+  
+    <div class="row">
+      <div class="medium-12 columns">
+        <label><b>{% trans "History:" %}</b></label>
+
+        <div class="history_task" style="padding-left:20px;">
+          {% for each_history in history %}
+            <div class="panel">
+              {% if each_history.content %}
+              {% with each_history.content|safe as history_description %}
+                {{ history_description }}
+              {% endwith %}
+              {% endif %}
+              {% for each_altnames in each_history.altnames %}    
+                <p style="color:#999999">{{each_altnames}}</p>
+              {% endfor %}
+              <div align="right">
+                <label>- Updated by <em>{{ each_history.created_by }}  {{ each_history.created_at|timesince }}</em> ago</label>
+              </div>
+            </div>
+          {% empty %}
+            --
+          {% endfor %}  
+        </div>
+      </div>
+    </div>
+ {% endcomment %}
+
+  </section>
+  <section class="medium-3 columns">
+    <div class="panel">
+      <h3 class="subheader"></h3>
+  
+      {% trans 'Edited' %} {{ node.last_update|timesince }} {% trans 'ago' %} {% trans 'by' %} <a class="user">{{node.user_details_dict.modified_by}}</a><br>
+      
+      <small>
+        <div><a href="#view-changes"><i class="fi-clock"></i>{% trans 'Versions' %} </a>
+        {% for seq_no, version_no in node.version_dict.items reversed %}
+        <abbr title={{version_no}}><a href="{% url 'node_version' group_name_tag node.pk version_no %}" style="padding-left:5px;">+</a></abbr> 
+        {% endfor %}
+        </div>
+      </small>
+      
+    {% if task_type_name.0.name != "Moderation" %}
+      {% if collection != 'True' %}
+      <a href="{% url 'task_edit' group_name node %}" class="small button split edit">
+        <i class="fi-pencil"></i> Update <span data-dropdown="edit-options"></span>
+      </a> 
+      {% endif %}
+    {% endif %}
+    </div>
+  </section>
+
+  <div id="titleModal" class="reveal-modal" data-reveal>
+    <label><b>{% trans "Editing Name" %}</b></label><br/>
+    <div class="medium-6 columns">
+       <input id="name_id" name="name" type="text" value="{{node.name}}"  class="medium-3 columns" placeholder="{% trans 'Enter name' %}..." required>
+       <a href="#" class="button tiny" id="title_save">{% trans "Save" %}</a>
+    </div>
+    <a class="close-reveal-modal"> &#215;</a>
+  </div>
+
+  <div id="contentModal" class="get_editor" style="display:none">
+    <div class="medium-12 columns">
+      <label><b>{% trans "Description" %}</b></label>
+
+      <div id="contentlist" class="content">
+        {% include "ndf/html_editor.html" with var_name="content_org" var_placeholder="Enter the content here" var_value=node.content|default_if_none:"" ckeditor_toolbar="GeneralToolbar" node_id=node.pk %}
+      </div>
+
+      <a href="#" class="button tiny" id="content_save">{% trans "Save" %}</a>
+    </div>
+
+    <a class="close-reveal-modal">{% trans "&#215;" %}</a>
+  </div>
+</div>
+
+{% endblock %}
+
+{% block script %}
+{% get_user_object node.created_by as user_obj %}
+{% if user_obj.username = request.user.username or request.user.is_superuser %}
+var task_title = "{{node.name}}"
+$(document).on('click',".edit-desc",function(){
+  $(".get_editor").css("display","block");
+});
+
+$(document).on('click',"#title_save",function(){
+var editedTitle = $('input[name=name]').val();
+if(task_title == $('input[name=name]').val()){
+alert("{% trans 'Nothing is Changed' %}");
+}
+else {
+             $.ajax({
+             url: "{% url 'edit_task_title' groupid %}",
+             type: 'POST',
+             data: {taskid:"{{node}}",csrfmiddlewaretoken: '{{ csrf_token }}',title:editedTitle},
+             beforeSend: function() {     },
+             success: function(result){
+      $('#nodeTitleId').html(result);
+
+             },
+             complete: function(){ 
+                  $('#titleModal').foundation('reveal', 'close');
+             }
+             });
+
+}
+});
+
+$(document).on('click',"#content_save",function(){
+var editedContent = CKEDITOR.instances['ckeditor_textarea'].getData();;
+             $.ajax({
+             url: "{% url 'edit_task_content' groupid %}",
+             type: 'POST',
+             data: {taskid:"{{node}}",csrfmiddlewaretoken: '{{ csrf_token }}',content_org:editedContent},
+             beforeSend: function() {     },
+             success: function(result){
+                  $(".get_editor").css("display","none");
+
+                $('#nodeContentId').html(result);
+
+             },
+             complete: function(){ 
+                  $('#titleModal').foundation('reveal', 'close');
+             }
+             });
+
+});
+{% endif %}
+{% endblock %}
+

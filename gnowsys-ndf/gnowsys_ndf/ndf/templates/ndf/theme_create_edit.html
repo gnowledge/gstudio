@@ -1,0 +1,438 @@
+
+{% load ndf_tags %}
+{% load i18n %}
+
+<style>
+
+.divider-line { font-size: xx-large; color:lightgray; }
+.line-height-2 { line-height:2; }
+.line-height-2pt5 { line-height:2.5; }
+.fontsize-x-large { font-size: x-large; }
+
+.margin-0 { margin: 0 !important ;}
+
+.resource-drawer { 
+border-color: #D3D3D3; border-style: solid; 
+padding: 0 !important; 
+overflow-y: auto;
+}
+
+.resource-drawer li.bullet-item:hover{
+background-color: #ecf0f1; cursor:pointer;
+}
+
+.posted-by{ color: #808080; font-size: small; }
+
+.selected-resource { background-color:lightgray !important ; }
+
+.resource-type-image {
+height:40px; 		
+background-repeat:no-repeat; background-size: 48px 48px
+}
+
+</style>
+
+<form data-abide id="form-edit-node" method="POST" action="">
+
+	<header class="row">
+
+    <h2 class="medium-12 columns">
+		{% if node %}
+			{% with node.name as node_name %}{% trans "Editing " %} {{title}}: {{node_name}} {% endwith %}
+		{% else %}
+			{% trans "Create a new " %} {{title}}
+		{% endif %}
+    </h2>
+
+    <nav class="medium-12 columns">
+   		<dl class="tabs" data-tab data-options="deep_linking:true">
+		{% if node %}
+			<dd><h3>{% trans "View: " %}</h3></dd>
+		
+			<dd class="{% if theme_GST_id in node.member_of %}active{% endif %}" title="Click here to add Name, Description, Privacy and Tags">
+		  	<!-- change name of collection tab overide block in your code -->
+		  		<a href="#panel-name-description"> {{title}} </a>
+			</dd>
+			
+			<!-- change name of collection tab overide block in your code -->
+			<dd class="{% if theme_GST_id not in node.member_of %}active{% endif %}" title="Click here to add/edit collection">
+		  		{% if theme_GST_id not in node.member_of %}<a href="#panel-collection">{% trans "Collection" %} </a> {% endif %}
+			</dd>  
+		{% endif %}
+     	</dl>
+  	</nav>
+  	</header>
+
+  	{% csrf_token %}
+
+  	<div id="node-details-edit-div" class="tabs-content" > 
+  		{% if node %}
+
+  		<!-- Block Description -->
+		<div class="{% if theme_GST_id in node.member_of %}active{% endif %} content row" id="panel-name-description">
+	  		<div class="medium-6 columns">
+
+				<div class="row">
+		  			<div class="medium-8 columns">
+		    			<label>{{title}}{% trans " Name " %}</label>
+		    			<input id="name_id" name="name" type="text" value="{{node.name}}" placeholder="Enter name..." required>
+		    			<small class="error">{% trans "Please give your page a descriptive name. It's helpful for others and for yourself." %}</small>
+		  			</div>
+
+		  			<div class="medium-4 columns">
+		    			{% if node.created_by == request.user.pk %}		    	
+							<span data-tooltip class="has-tip" title="Public pages can be viewed and edited by any group member, while private pages are only for you"><label>{% trans "Privacy" %}</label></span>
+
+							<div class="privacy-mode switch round">
+							{% if node.access_policy == "PUBLIC" or node.group_type == "PUBLIC" %}
+								<input id="PUBLIC" name="login-mode" value="PUBLIC" type="radio" checked>
+								<label for="PUBLIC" onclick="">{% trans "Public" %} <i class="fi-torsos-all"></i></label>
+
+								<input id="PRIVATE" name="login-mode" value="PRIVATE" type="radio">
+								<label for="PRIVATE" onclick="">{% trans "Private" %} <i class="fi-lock"></i></label>
+							{% else %}
+								{% if node.access_policy == "PRIVATE" or node.group_type == "PRIVATE" %}
+									<input id="PUBLIC" name="login-mode" value="PUBLIC" type="radio" >
+									<label for="PUBLIC" onclick="">{% trans "Public" %} <i class="fi-torsos-all"></i></label>
+
+									<input id="PRIVATE" name="login-mode" value="PRIVATE" type="radio" checked>
+									<label for="PRIVATE" onclick="">{% trans "Private" %} <i class="fi-lock"></i></label>
+								{% endif %}
+							{% endif %}
+								<span></span>
+							</div>
+
+						{% endif %}	    
+		  			</div>
+				</div>
+
+				<div id="message" style="display:none; color:red"></div>
+
+				<div class="row">
+		  
+		  			<div class="large-6 columns"><label>{% trans "Language" %}<select name="lan">
+					      {% get_language_info_list for LANGUAGES as languages %}
+					      {% for language in languages %}
+					      <option value="{{ language.code }}" {% ifequal node.language.0  language.code %} selected=selected {% endifequal %}>{{ language.name }}
+					      </option>
+					      {% endfor %}
+					    </select>
+					  </label>
+		     		</div>
+
+		  			<div class="large-6 columns" style="padding: 1.8em;">
+		  				<a href="#view-map-edit-widget" data-reveal-id="view-map-edit-widget" title="Click to add location markers">
+		  					<i class="fi-marker"></i> &nbsp; {% trans "Add Location" %}
+		  				</a>
+		  			</div>
+				</div>
+
+				<div class="row">
+		  			<div class="medium-12 columns">
+					       {% include "ndf/add_editor.html" with var_name="content_org" var_placeholder="Enter the content here" var_value=node.content_org|default_if_none:"" node_id=node.pk%}
+					 
+		  			</div>
+				</div>
+
+				<div class="row">
+		  			<div class="medium-12 columns">
+		    			<span data-tooltip class="has-tip" title="Tags help identify similiar work easily. You can add as many labels as you wish using a comma ','"><label>Tag{{node.tags|pluralize|default_if_none:"s"}}</label>
+		    			</span>
+		    			<input id="tags_id" name="tags" type="text" value="{{node.tags|join:', '|default_if_none:""}}" placeholder="Separate tags with commas...">
+		  			</div>		
+				</div>
+
+	  		</div>
+		</div>
+
+		<!-- Collection tab block -->
+	    <div class="{% if theme_GST_id not in node.member_of %}active{% endif %} content" id="panel-collection" style="width:95%;">
+		    <div class="row">
+
+		    	{% get_theme_node groupid node as add_topic %}
+				<div class="small-5 columns">		
+					{% if add_topic == True or add_topic == "Theme_Enabled" or add_topic == "Theme_Item_Enabled" %}
+		    		<dl class="accordion" data-accordion>
+		    			<dd>
+          					<a class="add_theme medium-4 columns" href="#sub_theme"> + Add Theme Item </a>
+         					
+          					<div id="sub_theme" class="content">
+          						<br/><br/>
+          						<label>{% trans "Theme Name" %}</label>
+		    					<input id="sub_theme_id" type="text" placeholder="Enter name...">
+	    						<input id="save-sub-theme" value="Save" class="button small medium-2 columns"> 
+	          					
+          					</div>
+          				</dd>
+          			</dl>
+          			{% endif %}
+				</div>
+				<div class="small-7 columns">		
+
+					{% if add_topic == True or add_topic == "Topic_Enabled" %}
+
+					<dl class="accordion" data-accordion>
+		    			<dd>
+          					<a class="add_topic medium-4 columns" href="#add_topic">{% trans "+ Add Topic" %} </a>
+         					
+          					<div id="add_topic" class="content">
+          						<br/><br/>
+          						<label>{% trans "Topic Name" %}</label>
+		    					<input id="add_topic_id" type="text" placeholder="Enter name...">
+	    						<input id="save-topic" value="Save" class="button small medium-2 columns"> 
+	          					
+          					</div>
+          				</dd>
+          			</dl>
+          			{% endif %}
+
+				</div>
+				
+				
+				<div class="small-12 columns">
+			  		<div id="collection_drawer">
+
+			    		{% include "ndf/theme_drawer.html" %}
+
+			  		</div>
+				</div>
+				
+		      	
+		  	</div>
+	 	</div>
+
+	    {% else %}
+	    	<!-- Block Description -->
+	    	<div class="active content row" id="panel-name-description">
+	      		<div class="medium-6 columns">
+		
+				<div class="row">
+		  			<div class="medium-8 columns">
+		    			<label>{{title}} Name</label>
+		    			<input id="name_id" name="name" type="text" placeholder="Enter name..." required>
+		    			<small class="error">{% trans "Please give your page a descriptive name. It's helpful for others and for yourself." %}</small>
+		  			</div>
+
+		  			<div class="medium-4 columns">
+		    			
+						<span data-tooltip class="has-tip" title="Public pages can be viewed and edited by any group member, while private pages are only for you"><label>Privacy</label></span>
+						<div class="privacy-mode switch round">
+					
+							<input id="PUBLIC" name="login-mode" value="PUBLIC" type="radio" checked>
+							<label for="PUBLIC" onclick="">{% trans "Public" %} <i class="fi-torsos-all"></i></label>
+
+							<input id="PRIVATE" name="login-mode" value="PRIVATE" type="radio">
+							<label for="PRIVATE" onclick="">{% trans "Private" %} <i class="fi-lock"></i></label>
+						
+							<span></span>
+						</div>
+
+		  			</div>
+				</div>
+
+				<div id="message" style="display:none; color:red"></div>
+
+				<div class="row">
+		  
+		  			<div class="large-6 columns"><label>{% trans "Language" %}<select name="lan">
+					      {% get_language_info_list for LANGUAGES as languages %}
+					      {% for language in languages %}
+					      <option value="{{ language.code }}">{{ language.name }}
+					      </option>
+					      {% endfor %}
+					  </select></label>
+		     		</div>
+
+		  			<div class="large-6 columns" style="padding: 1.8em;">
+		  				<a href="#view-map-edit-widget" data-reveal-id="view-map-edit-widget" title="Click to add location markers">
+		  					<i class="fi-marker"></i> &nbsp; {% trans "Add Location" %}
+		  				</a>
+		  			</div>
+				</div>
+
+				<div class="row">
+		  			<div class="medium-12 columns">
+					  {% include "ndf/add_editor.html" with var_name="content_org" var_placeholder="Enter the content here" %}
+					  </div>
+				</div>
+
+				<div class="row">
+		  			<div class="medium-12 columns">
+		    			<span data-tooltip class="has-tip" title="Tags are like keywords, they help identify similiar resources easily. You can add as many tags as you wish using a comma ','"><label>{% trans "Tag" %}</label>
+		    			</span>
+		    			<input id="tags_id" name="tags" type="text" placeholder="Separate tags with commas...">
+		  			</div>		
+				</div>
+		
+	      		</div>
+  			</div>
+
+	    {% endif %}
+
+    	
+	</div>  
+
+	{% block add_fields %} {% endblock %}
+  
+  	<div class="row" >
+    	<input type="submit" id="save-node" value="Save as Draft And Preview" class="button medium-6 columns"/>
+  	</div>
+
+  	<!-- Overlay : Map Widget -->
+    <div class="content reveal-modal graph-div" id="view-map-edit-widget" data-reveal>    
+      
+  		<a class="close-reveal-modal" >&#215;</a>
+        {% include "ndf/map_widget.html" with mode="edit" %}
+    </div>
+
+    <input type="hidden" id="nodes_list" value="{{nodes_list}}">	
+    <input type="hidden" id="parent_nodes_list" value="{{parent_nodes_collection}}">						
+</form>
+
+<script type="text/javascript">
+
+	$(document).ready(function(){
+		$("#name_id").change(function(){
+
+			var name = $("#name_id").val();
+			var nodes = $("#nodes_list").val();
+			var parent_nodes = $("#parent_nodes_list").val();
+
+			if (nodes.indexOf(name) > 0)  
+			{
+				alert("Theme name '"+ name +"' already exist .. Please choose another name");
+				$("#name_id").val("");
+			}
+			if (parent_nodes.indexOf(name) > 0)  
+			{
+				alert("Theme name '"+ name +"' already exist .. Please choose another name");
+				$("#name_id").val("");
+			}
+
+		});
+
+	});
+
+
+	$("#save-sub-theme").click(function() {
+
+	    $.ajax({
+	      type: "POST",
+	      url: "{% url 'add_sub_themes' groupid %}",
+	      datatype: "html",
+	      data:{
+	        context_node: "{{node.pk}}",
+	        nodes_list: "{{nodes_list}}",
+	        sub_theme_name: $("#sub_theme_id").val(),
+	        csrfmiddlewaretoken: '{{ csrf_token }}'
+	      },
+	      success: function(data) {
+
+	      	var theme_item = $("#sub_theme_id").val();
+
+	      	if ($.trim(data) === "failure") {
+	      		alert("Theme Item name "+ theme_item +" already available, Please choose different name");
+	      	}
+
+	      	if ($.trim(data) === "None") {
+	      		alert("Please enter sub theme name");
+	      	}
+
+	        location.reload(true);
+	        $("#sub_theme_id").val("");
+	      }
+	    });
+
+  	});
+
+
+  	$("#save-topic").click(function() {
+
+	    $.ajax({
+	      type: "POST",
+	      url: "{% url 'add_topics' groupid %}",
+	      datatype: "html",
+	      data:{
+	        context_node: "{{node.pk}}",
+	        nodes_list: "{{nodes_list}}",
+	        add_topic_name: $("#add_topic_id").val(),
+	        csrfmiddlewaretoken: '{{ csrf_token }}'
+	      },
+	      success: function(data) {
+
+	      	var topic = $("#add_topic_id").val();
+
+	      	if ($.trim(data) === "failure") {
+	      		alert("Topic name "+ topic +" already available, Please choose different name");
+	      	}
+
+	      	if ($.trim(data) === "None") {
+	      		alert("Please enter topic name");
+	      	}
+
+	        location.reload(true);
+	        $("#add_topic_id").val("");
+	      }
+	    });
+
+  	});
+
+
+
+	$("#save-node").click(function() {
+		cn_arr = []
+		$(".node_id").each(function (){
+			if ($(this).parent(".bullet-item").parent("#collection_drawer").attr("id") == "collection_drawer") {
+				cn_arr.push($(this).val());
+			}
+
+		});
+
+		$("#collection_list").val(cn_arr); 
+
+	});
+
+
+  $(document).on('open', '#view-map-edit-widget[data-reveal]', function () {  
+    
+    $.ajax({
+  url: "{% url 'get_visited_location' groupid %}",
+  success: function(data){ 
+   
+  	data = JSON.parse(data);
+
+    var lastVisitedLocationVal = data;
+    
+    if(lastVisitedLocationVal){
+
+      if(lastVisitedLocationVal == "[]"){
+        lastVisitedLocationVal = JSON.parse(lastVisitedLocationVal);
+      }
+
+      if(lastVisitedLocationVal.length > 0){
+            // lastVisitedLocationVal = JSON.parse(lastVisitedLocationVal);
+            var zoom = lastVisitedLocationVal.pop(),
+                lng = lastVisitedLocationVal[1],
+                lat = lastVisitedLocationVal[0];
+              map.setView([lat, lng], zoom);
+            }
+    }
+    else if( tempArr.length )
+    {
+      var group = new L.featureGroup(tempArr)
+          map.fitBounds(group.getBounds());
+    }
+   
+  }
+});
+
+  });
+
+	$(document).on('opened', '#view-map-edit-widget[data-reveal]', function () {  
+	
+		map.invalidateSize();  
+	   
+	});
+
+</script>
+

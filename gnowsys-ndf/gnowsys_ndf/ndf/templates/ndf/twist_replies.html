@@ -1,0 +1,109 @@
+{% load ndf_tags %}
+{% load i18n %}
+
+{% block body_content %}
+<style type="text/css">
+  #replydiv
+  {
+   background-color:#F4F4F4;
+   left-padding:5px;
+ }
+ #insidediv
+ {
+   background-color:#edf9f4 ;
+   border-radius: 4px;
+   border: solid thin #e9e9e9;
+ }
+
+ #insidediv::before {
+    background-color: #edf9f4;
+    content: "\00a0";
+    display: block;
+    height: 16px;
+    position: absolute;
+    top: 16px;
+    transform:             rotate( 29deg ) skew( -35deg );
+        -moz-transform:    rotate( 29deg ) skew( -35deg );
+        -ms-transform:     rotate( 29deg ) skew( -35deg );
+        -o-transform:      rotate( 29deg ) skew( -35deg );
+        -webkit-transform: rotate( 29deg ) skew( -35deg );
+    width:  20px;
+    /*box-shadow: -2px 2px 2px 0 rgba( 178, 178, 178, .4 );*/
+    left: -11px; 
+    border-radius: 0px 12px ;
+    border-left : solid thin #e9e9e9;
+    border-bottom : solid thin #e9e9e9;
+  }
+
+ .response_change{
+  margin-bottom:1px;
+  padding-left:25px;
+  padding-right:2px;
+  -moz-border-radius: 5px;
+  -webkit-border-radius: 5px;
+  border-radius: 5px;
+}
+
+#insidediv .user i { border-radius: 50px; margin-left: 5px;}
+</style>
+
+
+{% get_all_replies reply as replies %}
+{% get_agency_type_of_group groupid as group_agency_type %}
+{% user_access_policy groupid user as user_access %}
+
+{% for eachrep in replies %}
+{% get_user_object eachrep.created_by as user_obj %}
+
+<br>
+<div class="row">
+  <div id="insidediv" class="large-6 columns">
+
+    <div class="row ">
+      <div class="small-3 columns" style="margin-top:10px; color:darkgray">
+        <a class="user"></a>
+        <br/><br/>
+        <i>{{user_obj.username}}</i>
+      </div>
+      <div class="small-9 columns">
+        <span style="color: #808080;position: absolute; right: 10px;"><small>{{eachrep.created_at|date:"D d M Y" }}</small></span>
+        <br/>
+        <small>
+          {% with eachrep.content|safe as rep_content %}
+            {{rep_content}}
+            {% get_files_for_reply eachrep eachrep %}
+          {% endwith %}
+        </small>
+      </div>
+    </div>
+
+  </div>
+  <br/>
+  <div class="large-6 columns">
+    {% if user.is_authenticated %}
+
+      <!-- only for partners group: allow user to add reply even without being member of that partner group -->
+
+        {% include "ndf/replytwistrep.html" %}
+
+    {% endif %}
+
+  </div>
+
+
+</div>
+
+<div class="response_change" id="refreshthread" class="large-12 columns">
+
+  {% get_reply request thread eachrep forum csrf_token user groupid %}
+
+</div>
+{% endfor %}
+
+
+{% endblock %}
+
+<script type="text/javascript">
+  $("#refreshthread button.button.large.postfix").removeClass("large");
+</script>
+

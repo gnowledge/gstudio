@@ -1,0 +1,1506 @@
+{% extends "ndf/base.html" %}
+
+{% load i18n %}
+{% load ndf_tags %}
+{% load simple_filters %}
+{% load cache %}
+
+{% block title %}
+{% if node %}
+{% trans "Edit "%}{{title}} - {{node.name}}
+{% else %}
+{% trans "Create "%}{{title}}
+{% endif %}
+{% endblock %}
+
+{% cache 3600 node_edit_base style %}
+{% block style %}
+
+	.divider-line { font-size: xx-large; color:lightgray; }
+	.line-height-2 { line-height:2; }
+	.line-height-2pt5 { line-height:2.5; }
+	.fontsize-x-large { font-size: x-large; }
+
+	.margin-0 { margin: 0 !important ;}
+
+	.resource-drawer {
+	border-color: #D3D3D3; border-style: solid;
+	padding: 0 !important;
+	overflow-y: auto;
+	}
+
+	.resource-drawer li.bullet-item:hover{
+	background-color: #ecf0f1; cursor:pointer;
+	}
+
+	.posted-by{ color: #808080; font-size: small; }
+
+	.selected-resource { background-color:lightgray !important ; }
+
+	.resource-type-image {
+	height:40px;
+	background-repeat:no-repeat; background-size: 48px 48px
+	}
+
+	#type_of{
+		height:36px;
+	}
+{% endblock %}
+{% endcache %}
+
+{% block head %}
+	{{block.super}}
+	{% if title == "Page" or "File" in node.member_of_names_list %}
+	  <script src="/static/ndf/bower_components/jquery-ui/jquery-ui.js"></script> <!-- checked -->
+	  <script src="/static/ndf/bower_components/jqueryui-timepicker-addon/dist/jquery-ui-timepicker-addon.min.js"></script> <!-- checked -->
+	  <script src="/static/ndf/bower_components/jqueryui-timepicker-addon/dist/jquery-ui-sliderAccess.js"></script> <!-- checked -->
+	  <link rel="stylesheet" href="/static/ndf/bower_components/jqueryui-timepicker-addon/dist/jquery-ui-timepicker-addon.css"> <!-- checked -->
+	  <link rel="stylesheet" type="text/css" href="/static/ndf/bower_components/jquery-ui/themes/smoothness/jquery-ui.css"> <!-- checked -->
+	{% endif %}
+{% endblock %}
+
+{% block body_content %}
+
+<form data-abide id="form-edit-node" method="POST" action="" enctype="multipart/form-data">
+
+    <header>
+	    <div class="row">
+		 	<div class="large-8 columns">
+				<h3><span class="subheader">
+					{% if node %}
+						{% trans "Editing " %}{% if blog_type %} {% trans 'Note' %}{% else %} {{title}} {% endif %}: {{node.name}}
+					{% else %}
+						{% if blog_type %}
+							{% trans "Create New Note" %} :
+						{% else %}
+							{% trans "Create New " %} {{title}} :
+						{% endif  %}
+					{% endif %}
+				{% if not blog_type %}
+					<span class="right">
+						<a  class="tiny button radius existing-template">{% trans "Create page from existing template" %}</a>
+					</span>
+				{% endif %}
+				</span></h3>
+
+			    <input tabindex="1" id="name_id" name="name" type="text" value="{{node.name}}" placeholder="Give the {{title}} a name.." {% if node.group_type %}disabled=disabled{% endif %} required>
+		  		<label id="message" style="display:none; color:red"></label>
+
+			    <small class="error">{% trans "Please give your page a descriptive name. It's helpful for others and for yourself." %}</small>
+
+		    </div>
+	    </div>
+    </header>
+
+    {% check_group node.pk as is_group %}
+
+    <div class="edit-card">
+	    <div class="row">
+	      	<dl class="tabs pill large-12 columns select" id = "tabs">
+				{% if not blog_type %}
+				<dd class="active node_tab" title="Click here to add Name, Description, Privacy and Tags">
+		  			<!-- change name of collection tab overide block in your code -->
+		  			<a>{% block page_tab %} {% trans "Node" %} {% endblock %}</a>
+				</dd>
+				<dd class="prior_node_tab" title="Click here to add/edit Prior Node">
+				  	<a>{% block prior_node_tab %} {% trans "Requires" %} {% endblock %}</a>
+				</dd>
+				<!-- change name of collection tab overide block in your code -->
+				<dd class="collection_tab" data-reveal-id="{% if not node %}{% if is_group == False %}publish_resource{% endif %}{% endif %}" title="Click here to add/edit collection">
+				  	<a>{% block collection_tab %} {% trans "Collection" %} {% endblock %}</a>
+				</dd>
+				<!-- change name of metadata tab overide block in your code -->
+				<dd class="meta_tab" title="Click here to add/edit metadata">
+				  	<a>{% trans "Metadata" %} </a>
+				</dd>
+				<dd class="teaches_tab" title="Click here to add/edit teaches">
+				 	<a>{% trans "Teaches" %} </a>
+				</dd>
+
+				<dd class="assesses_tab" title="Click here to add/edit teaches">
+				 	<a>{% trans "Assesses" %} </a>
+				</dd>
+					{% if title == "Page" or "File" in node.member_of_names_list %}
+						<dd class="thread_prop_tab" title="Click here to add/edit properties of Thread">
+						  	<a>{% trans "Interaction Settings" %} </a>
+						</dd>
+					{% endif %}
+				<dd class="help_rt_tab" title="Click here to add/remove Help page for this resource">
+				 	<a>{% trans "Help" %} </a>
+				</dd>
+
+				{% else %}
+					<input type="hidden" name="blog_type" value="{{blog_type}}">
+				{% endif %}
+	     	</dl>
+	   	</div>
+	</div>
+
+  	{% csrf_token %}
+		{% if course_tab_title %}
+		<input type="hidden" name="course_tab_title" value="{{course_tab_title}}"></input>
+		{% endif %}
+
+        {% comment %}
+		  	<div id="publish_resource" class="reveal-modal" data-reveal style="width:500px;">
+		  		Do you want to create:<br/><br/>
+		  		<input class="collection" type="radio" name="coll" value="homogeneous"> &nbsp;Homogeneous Collection<br/>
+		  		<input class="collection" type="radio" name="coll" value="heterogeneous"> &nbsp;Heterogeneous Collection
+		  		<a class="close-reveal-modal">&#215;</a>
+		  	</div>
+        {% endcomment %}
+  	<div id="node-details-edit-div" class="tabs-content" >
+
+    	<div class="active content row contents" id="panel-name-description">
+
+		<div class="medium-8 columns editor-div">
+
+	  		{% include "ndf/html_editor.html" with var_name="content_org" var_placeholder="Enter the content here" var_value=node.content|default_if_none:"" node_id=node.pk ckeditor_toolbar="GeneralToolbar" %}
+		</div>
+
+	{% comment %}
+
+
+    	{% if node.pk %}
+	    	{% get_list_of_fields node.type_of "name" as type_of_list %}
+		   	{% if "Wiki page" in type_of_list  %}
+				<div class="medium-8 columns editor-div">
+			  		{% include "ndf/add_editor.html" with var_name="content_org" var_placeholder="Enter the content here" var_value=node.content_org|default_if_none:"" node_id=node.pk %}
+				</div>
+			{% else %}
+				<div class="medium-8 columns editor-div">
+			  		{% include "ndf/html_editor.html" with var_name="content_org" var_placeholder="Enter the content here" var_value=node.content|default_if_none:"" node_id=node.pk ckeditor_color="#f2f2f2" ckeditor_toolbar="GeneralToolbar" %}
+				</div>
+			{% endif %}
+		{% else  %}
+			{% if title == "Page" %}
+				<div class="medium-8 columns editor-div org-editor">
+			  		{% include "ndf/add_editor.html" with var_name="content_org" var_placeholder="Enter the content here" %}
+				</div>
+			{% endif %}
+				<div class="medium-8 columns editor-div ck-editor hide">
+			  		{% include "ndf/html_editor.html" with var_name="content_org" var_placeholder="Enter the content here" %}
+				</div>
+
+		{% endif %}
+		{% endcomment %}
+
+			{% if ce_id %}
+				<input type="hidden" name="ce_id" value="{{ce_id}}">
+				<input type="hidden" name="res" value="{{res}}">
+			{% endif %}
+
+			{% if program_res %}
+				<input type="hidden" name="program_res" value="{{program_res}}">
+			{% endif %}
+
+			{% if not ce_id %}
+			<div class="large-4 columns">
+	            <div class="panel">
+	                <h5>{% trans "Settings" %}</h5>
+	            	<div class="row">
+		    		{% if node.created_by == request.user.pk %}
+
+		    			{% cache 300 node_edit_base_visibility node.access_policy request.LANGUAGE_CODE %}
+		                    <div class="large-4 columns">
+								<span data-tooltip class="has-tip" title="Public pages can be viewed and edited by any group member, while private pages are only for you"><label>{% trans "Visibility" %}</label></span>
+							</div>
+
+							<div class="large-8 columns">
+								<div class="privacy-mode ">
+									{% if node.access_policy == "PUBLIC" or node.group_type == "PUBLIC" %}
+										<input id="PUBLIC" name="login-mode" value="PUBLIC" type="radio" checked>
+										<label for="PUBLIC" onclick="">{% trans "Visible" %} <i class="fi-eye"></i></label>
+
+										<input id="PRIVATE" name="login-mode" value="PRIVATE" type="radio">
+										<label for="PRIVATE" onclick="">{% trans "Hidden" %} <i class="fi-key"></i></label>
+									{% else %}
+										{% if node.access_policy == "PRIVATE" or node.group_type == "PRIVATE" %}
+											<input id="PUBLIC" name="login-mode" value="PUBLIC" type="radio" >
+											<label for="PUBLIC" onclick="">{% trans "Visible" %} <i class="fi-eye"></i></label>
+
+											<input id="PRIVATE" name="login-mode" value="PRIVATE" type="radio" checked>
+											<label for="PRIVATE" onclick="">{% trans "Hidden" %} <i class="fi-key"></i></label>
+										{% endif %}
+									{% endif %}
+								</div>
+							</div>
+						{% endcache %}
+
+					{% else %}
+
+						{% if not node %}
+		                    <div class="large-4 columns">
+								<span data-tooltip class="has-tip" title="Public pages can be viewed and edited by any group member, while private pages are only for you"><label class="inline">{% trans "Visibility" %}</label></span>
+		                    </div>
+
+		                    <div class="large-8 columns">
+									<div class="privacy-mode">
+
+										<input id="PUBLIC" name="login-mode" value="PUBLIC" type="radio" checked>
+										<label for="PUBLIC" onclick="">{% trans "Visible" %} <i class="fi-eye"></i></label>
+
+										<input id="PRIVATE" name="login-mode" value="PRIVATE" type="radio">
+										<label for="PRIVATE" onclick="">{% trans "Hidden" %} <i class="fi-key"></i></label>
+
+										<span></span>
+									</div>
+							</div>
+						{% endif %}
+
+					{% endif %}
+
+	            </div>
+
+	            	<div class="row">
+	                	<div class="large-4 columns">
+	                		<label class="inline">{% trans "Language" %}</label>
+	                    </div>
+	                	<div class="large-8 columns">
+	               			<select name="lan">
+                               {% get_language_info_list for LANGUAGES as languages %}
+                               {% for language in languages %}
+                           		<option value="{{language.code}}" {% ifequal node.language.0  language.code %} selected=selected {% endifequal %}>
+                               		{% trans language.name %}
+                               	</option>
+                               	{% endfor %}
+                            </select>
+	                    </div>
+	                </div>
+
+	                <div class="row">
+	                	<div class="large-4 columns">
+	                		<label class="inline">{% trans "Location:" %}</label>
+	                    </div>
+	                	<div class="large-8 columns">
+							<a href="#view-map-edit-widget" data-reveal-id="view-map-edit-widget" title="Click to add location markers" class="tiny secondary button radius expand">
+							<i class="fi-marker"></i> &nbsp; {% trans "Add Location" %}
+							</a>
+	                    </div>
+		     		</div>
+
+		     		{% if title == "Page" and "Author" not in group_object.member_of_names_list %}
+	                <div class="row">
+	                	<div class="large-4 columns">
+	                		<label class="inline">{% trans "Page Type:" %}</label>
+	                    </div>
+	                	<div class="large-8 columns">
+					     			<select name="type_of" id="type_of">
+						  			{% for i in page_instance %}
+						  				{% if i.name == "Wiki page" %}
+											<option value = {{i.pk}} selected>{{ i.name }}</option>
+
+										{% else %}
+											<option value = {{i.pk}}>{{ i.name }}</option>
+										{% endif %}
+			  						{% endfor %}
+								</select>
+	                    </div>
+		     		</div>
+		     		{% endif %}
+
+	            </div>
+			</div>
+			{% endif %}
+			<div class="row">
+				{% block upload_logo %} {% endblock %}
+			</div>
+			{% include 'ndf/widget_tags.html' %}
+    	</div>
+
+    {% block prior_node %}
+
+    <div class="content contents" style="display:none;" id="panel-prior-node">
+      <div class="row">
+		<div class="small-12 columns">
+		  	<div id="prior_node_drawer">
+		    	<!-- {#% edit_drawer_widget "prior_node" groupid node title %#} -->
+		 	</div>
+		</div>
+      </div>
+    </div>
+
+    {% endblock %}
+
+    {% block collection %}
+
+    <div class="content contents" style="display:none;" id="panel-collection">
+	    <div class="row">
+			<div class="small-12 columns" {% ifequal title "Quiz" %}style="display:none;"{% endifequal %}></div>
+		</div>
+
+		{% cache 3600 node_edit_base_coll_type_radio request.LANGUAGE_CODE %}
+
+		<div class="choose" style="display:none">
+
+			<div class="row">
+			    <div class="small-6 large-2 columns" >
+			      <span class="fontsize-x-large subheader"><input type="radio" name="col" value="Page"/>
+			      {% trans "Page" %} <i class="step fi-page-filled"></i></span>
+			    </div>
+			    <div class="small-6 large-2 columns">
+			      <span class="fontsize-x-large subheader"><input type="radio" name="col" value="File" />
+			      {% trans "File" %} <i class="step fi-book"></i></span>
+			    </div>
+			    <div class="small-6 large-2 columns">
+			      <span class="fontsize-x-large subheader"><input type="radio" name="col" value="Image" />
+			      {% trans "Image" %} <i class="step fi-photo"></i>
+			      </span>
+			    </div>
+			    <div class="small-6 large-2 columns">
+			      <span class="fontsize-x-large subheader"><input type="radio" name="col" value="Video" />
+			      {% trans "Video" %} <i class="step fi-video"></i>
+			      </span>
+			    </div>
+			    <div class="small-6 large-2 columns">
+			      <span class="fontsize-x-large subheader"><input type="radio" name="col" value="Pandora Video" />
+			      {% trans "Pandora" %} <i class="step fi-video"></i>
+			      </span>
+			    </div>
+			    <div class="small-6 large-2 columns">
+			      <span class="fontsize-x-large subheader"><input type="radio" name="col" value="QuizObj" />
+			      {% trans "Quiz" %} <i class="step fi-pencil"></i>
+			      </span>
+			    </div>
+			</div>
+		</div>
+
+		{% endcache %}
+
+		<div class="row drawers" style="display:none;">
+			<div class="small-12 columns">
+			  <div id="collection_drawer" >
+			    <!-- {#% edit_drawer_widget "collection" groupid node title %#} -->
+			  </div>
+			</div>
+	    </div>
+
+    </div>
+
+    {% endblock %}
+
+    <div class="content contents panel" id="panel-metadata" style="width:100%; display:none;" >
+      	<div class="row">
+		  	<div class="small-12 large-12 columns"><h4>{% trans "Please add or edit Metadata" %} </h4></div>
+		  	<!-- Educational Language is Removed from ndf tags and here  __ Saurabh -->
+		  	{% get_metadata_values as metadata %}
+	  		{% for k,v in metadata.items %}
+
+	  			<div class="small-12 large-6 columns">
+			  		<label>
+			  			{% if k == "educationaluse" %}
+						<h5 >{% trans "Educational Use:" %} </h5>
+						{% elif k == "interactivitytype" %}
+						<h5>{% trans "Interactivity Type: " %}</h5>
+						{% elif k == "educationallevel" %}
+						<h5 class= "compulsory">{% trans "Educational Level:" %} </h5>
+						{% elif k == "educationalsubject" %}
+						<h5 class= "compulsory">{% trans "Educational Subject:" %} </h5>
+						{% elif k == "timerequired" %}
+						<h5>{% trans "Time Required: " %}</h5>
+						{% elif k == "audience" %}
+						<h5 class= "compulsory">{% trans "Target Audience:" %} </h5>
+						{% elif k == "textcomplexity" %}
+						<h5>{% trans "Text Complexity" %}</h5>
+						{% elif k == "age_range" %}
+						<h5>{% trans "Age Range:" %}</h5>
+						{% elif k == "readinglevel" %}
+						<h5>{% trans "Reading Level:" %} </h5>
+						{% elif k == "curricular" %}
+						<h5>{% trans "Curricular:" %}</h5>
+						{% elif k == "educationalalignment" %}
+						<h5>{% trans "Educational Alignment:" %}</h5>
+						{% endif %}
+
+		         		{% get_attribute_value node.pk k "True" as attr_val %}
+		         		{% if attr_val.data_type == "list" %}
+		         		 <select name="{{k}}" id ="{{k}}" multiple style="height:5em!important;">
+		         		{% else %}
+		         		 <select name="{{k}}" id ="{{k}}">
+						{% endif %}
+							<option> --Select-- </option>
+							{% for opts in v %}
+								{% if opts == attr_val.value|stringformat:"s" or opts in attr_val.value  %}
+								<option selected>{% trans opts %}</option>
+								{% else %}
+								<option>{% trans opts %}</option>
+								{% endif %}
+							{% endfor %}
+						</select>
+					</label>
+				</div>
+
+		  	{% endfor %}
+  		<div class=" small-12 large-12 columns">
+		  	<div class="small-12 large-4 columns">
+		  		<label>
+					<h5>{% trans "Based on Url: " %} </h5>
+					<input name="basedonurl" type="text" value="{{node.basedonurl}}">
+				</label>
+			</div>
+			<div class="small-12 large-4 columns">
+				<label>
+					<h5>{% trans "Source: " %} </h5>
+					<input name="source" type="text" value="{{node.source}}">
+				</label>
+			</div>
+
+			<div class="small-12 large-4 columns">
+				<label><h5>{% trans "Copyright" %}</h5></label>
+				<!-- <input id="copyright_id" name="Copyright" type="text" placeholder="Enter source name"/> -->
+				{% get_copyright as copyright %}
+				<select name="copyright"  required>
+						{% for each_copyright in copyright %}
+	        			{# <option value="{{each_copyright}}"  #}
+	        			{% if each_copyright == node.copyright %}
+	        				<option selected>{% trans each_copyright %}</option>
+	        			{% else %}>
+	        			 	<option>{% trans each_copyright %}</option>
+	        			{% endif %}>
+					{% endfor %}
+				</select>
+				<small class="error">{% trans "Please select resource Subject" %}</small>
+
+			</div>
+
+		</div>
+	</div>
+
+	<div id="metadata_info"></div>
+	</div>
+
+    <div class="content contents" id="panel-thread" style="width:95%; display:none;" >
+      	<div class="row">
+		  	<h7>{% trans "Add properties to the discussion feature of this " %}{{title}}{% trans " node "%} </h7>
+		</div>
+
+
+		{% get_attribute_value node.pk 'discussion_enable' as disc_enable_val %}
+
+	    <div class="row yes_no_disc_div">
+	      <div class="large-2 medium-4 columns"><h5>{% trans "Interaction : " %}</h5>
+	      </div>
+	      <div class="large-pull-4 large-6 medium-8 columns">
+			<input type="radio" name="thread_create" value="Yes" {% if disc_enable_val %}checked="checked"{% endif %}>Yes &nbsp;&nbsp;
+			<input type="radio" name="thread_create" value="No" {% if not node or not disc_enable_val %}checked="checked"{% endif %}>No
+	      </div>
+	    </div>
+        {% get_thread_node node.pk as thread_node %}
+		{% if thread_node %}
+			{% get_attribute_value thread_node.pk 'release_response' as resp_val %}
+			{% get_attribute_value thread_node.pk 'thread_interaction_type' as thr_int_type %}
+			{% get_attribute_value thread_node.pk 'start_time' as thr_start_time %}
+			{% get_attribute_value thread_node.pk 'end_time' as thr_end_time %}
+		{% endif %}
+	    <div class="thread-settings-div {% if not node.discussion_enable %} hide {% endif %}">
+		    <div class="row">
+		      <div class="large-2 medium-4 columns "><h5>{% trans "Release Option:" %}</h5>
+		      </div>
+		      <div class="large-pull-4 large-6 medium-8 columns">
+		        <select id="release_resp_sel" name="release_resp_sel">
+		          <option value="True" {% if resp_val or not thread_node %} selected{% endif %}>{% trans "Show Replies to All" %}</option>
+		          <option value="False" {% if thread_node and not resp_val %} selected{% endif %}>{% trans "Hide Replies from All" %}</option>
+		        </select>
+		      </div>
+		    </div>
+
+		    <div class="row">
+		      <div class="large-2 medium-4 columns "><h5>{% trans "Interaction Type:" %}</h5>
+		      </div>
+		      {% get_gstudio_interaction_types as all_interaction_values %}
+		      <div class="large-pull-4 large-6 medium-8 columns">
+		        <select id="interaction_type_sel" name="interaction_type_sel">
+		        {% for each_int in all_interaction_values %}
+		          <option value="{{each_int}}" {% if thr_int_type == each_int %} selected {% endif %}>{{each_int}}</option>
+		        {% endfor %}
+
+		        </select>
+		      </div>
+		    </div>
+
+		    <div class="row">
+		      <div class="large-2 medium-4 columns "><h5>{% trans "Interaction start date:" %}</h5>
+		      </div>
+
+		      <div class="large-pull-4 large-6 medium-8 columns">
+		      	<input type="text" id="thread_start_date" name="thread_start_date" value="{% if thr_start_time %}{{thr_start_time|date:'d/m/Y'}}{% endif %}" placeholder="DD/MM/YYYY" readonly="" class="date_month_day_year" style="width:15rem">
+		      </div>
+		    </div>
+
+		    <div class="row">
+		      <div class="large-2 medium-4 columns "><h5>{% trans "Interaction close date:" %}</h5>
+		      </div>
+
+		      <div class="large-pull-4 large-6 medium-8 columns">
+		      	<input type="text" id="thread_close_date" name="thread_close_date" value="{% if thr_end_time %}{{thr_end_time|date:'d/m/Y'}}{% endif %}" placeholder="DD/MM/YYYY" readonly="" class="date_month_day_year" style="width:15rem">
+		      </div>
+		    </div>
+	    </div>
+	</div>
+
+
+    <div class="content contents" id="panel-help" style="width:95%; display:none;" >
+      	<div class="row">
+		  	<h7>{% trans "Select help page(s) for this resource from following options:"%} </h7>
+		</div>
+	    <div class="help-settings-div">
+	    	{% get_help_pages_of_node node as help_page_list %}
+			{% get_info_pages group_id as all_info_pages %}
+	        {% include 'ndf/widget_selector.html' with for='help_info_page' all_options=all_info_pages selected_options=help_page_list oneline_element='false' %}
+	    </div>
+
+	</div>
+
+
+
+    <!-- Kept this bellow commented part for future reference(Don't delete this) -->
+
+        <!--
+	<div class="small-3 columns">
+                  <dl class="accordion" data-accordion>
+  <dd>
+    <a href="#align1"class="current">AlignmentObject1</a>
+    <div id="align1" class="content active">
+         <label>AlignmentType<select name="aligntype1"><option>Teaches</option><option>Assesses</option><option>Requires</option></select></label>
+	Educational Framework: <input id="" name="eduframework1" type="text" value="" placeholder="" >
+	Target Name: <input id="" name="tname1" type="text" value="" placeholder="" >
+        Target Url: <input id="" name="turl1" type="text" value="" placeholder="" >
+        Target Description: <input id="" name="tdescription1" type="text" value="" placeholder="" >
+
+
+    </div>
+  </dd> </dl>
+  <dl class="accordion" data-accordion><dd>
+
+     <a href="#align2" >AlignmentObject2</a>
+    <div id="align2" class="content active">
+         <label>AlignmentType<select name="aligntype"><option>Teaches</option><option>Assesses</option><option>Requires</option></select></label>
+	Educational Framework: <input id="" name="eduframework2" type="text" value="" placeholder="" >
+	Target Name: <input id="" name="tname2" type="text" value="" placeholder="" >
+        Target Url: <input id="" name="turl2" type="text" value="" placeholder="" >
+        Target Description: <input id="" name="tdescription2" type="text" value="" placeholder="" >
+    </div>
+  </dd></dl>
+  <dl class="accordion" data-accordion><dd>
+     <a href="#align3">AlignmentObject 3</a>
+     <div id="align3" class="content active">
+         <label>AlignmentType<select name="aligntype"><option>Teaches</option><option>Assesses</option><option>Requires</option></select></label>
+	Educational Framework: <input id="" name="eduframework3" type="text" value="" placeholder="" >
+	Target Name: <input id="" name="tname3" type="text" value="" placeholder="" >
+        Target Url: <input id="" name="turl3" type="text" value="" placeholder="" >
+        Target Description: <input id="" name="tdescription3" type="text" value="" placeholder="" >
+     </div>
+  </dd>
+</dl>  -->
+
+
+
+    <div class="content contents" id="panel-teaches"  style="width:95%; display:none;">
+  		<div class="row">
+			<div class="small-12 columns">
+	  			<div id="teaches_drawer">
+	    			<!-- {#% edit_drawer_widget "prior_node" groupid node title %#} -->
+	  			</div>
+			</div>
+      	</div>
+    </div>
+
+    <div class="content contents" id="panel-assesses"  style="width:95%; dsplay:none;">
+  		<div class="row">
+			<div class="small-12 columns">
+	  			<div id="assesses_drawer">
+	    			<!-- {#% edit_drawer_widget "prior_node" groupid node title %#} -->
+	  			</div>
+			</div>
+      	</div>
+    </div>
+
+  </div> <!-- This is final close div of node-details-edit-div -->
+
+
+  	{% block add_fields %} {% endblock %}
+
+ 	<!-- Overlay : Map Widget -->
+ 	{% cache 300 node_edit_base_map_widget %}
+    <div class="content reveal-modal graph-div" id="view-map-edit-widget" data-reveal>
+    	<!-- #{#% #if '/edit/' in request.path  or '/image_detail/' in request.path  or '/video_detail/' in request.path%} -->
+        <a class="close-reveal-modal" >&#215;</a>
+        {% include "ndf/map_widget.html" with mode="edit" %}
+        <!-- <div style="background-color:gray; width:100%; height:80%;"></div> -->
+      <!-- #{#%# endif %} -->
+    </div>
+    {% endcache %}
+
+    <!-- <input type="hidden" id="nodes_list" value="{{nodes_list}}"> -->
+    <input type="submit" tabindex="4" id="save-node" value=" {% trans 'Save as Draft And Preview' %}" class="button radius" />
+
+</form>
+
+<!-- Reveal Modals begin -->
+
+<script type="text/javascript">
+	$( ".existing-template" ).click(function() {
+		$.ajax({
+                        type: "GET",
+                    	url: "{% url 'get_templates_page' groupid %}",
+                        datatype: "html",
+                        data:{
+
+                        },
+                        success: function(data) {
+                         
+                			$("#group_imgs_on_modal").html(data);
+                          	$('#group_imgs_on_modal').foundation('reveal', 'open');
+
+                        }
+                    });
+	
+	});
+	
+
+	{% if title == "Page" or "File" in node.member_of_names_list %}
+
+		$("input[name=thread_create]").change(function(){
+			var radio_sel = $('input[name=thread_create]:checked').val()
+			if(radio_sel=="Yes"){
+				$(".thread-settings-div").removeClass("hide");
+			}
+			else{
+				$(".thread-settings-div").addClass("hide");
+			}
+		})
+
+
+		$("select#release_resp_sel").change(function() {
+			$("select#interaction_type_sel").removeAttr("disabled");
+		})
+
+		var startEnrollDt = $("#thread_start_date");
+		var endEnrollDt = $("#thread_close_date");
+
+		currentDate = new Date();
+		var currentDay = currentDate.getDate();
+		var currentMonth = currentDate.getMonth();
+		var currentYear = currentDate.getFullYear();
+		lowerYearLimit = currentYear;
+		upperYearLimit = currentYear + 20;
+
+
+		$(".date_month_day_year").datepicker({
+			changeMonth: true,
+			changeYear: true,
+			dateFormat: 'dd/mm/yy',
+			yearRange: lowerYearLimit + ":" + upperYearLimit,
+			defaultDate: '0',
+
+			onClose: function(dateText, inst) {
+			  $(this).val(dateText);
+
+			  var month_year = $(this).val();
+			  day = currentDay;
+			  month = currentMonth;
+			  year = currentYear;
+
+			  if ($(this).attr('id') == "thread_start_date") {
+			    if (month_year) {
+			      month_year = month_year.split("/");
+			      day = parseInt(month_year[0]);
+			      month = parseInt(month_year[1]);
+			      year = parseInt(month_year[2]);
+			    }
+
+			    if (endEnrollDt.val() != '') {
+			      var testStartDate = startEnrollDt.datepicker('getDate');
+			      var testEndDate = endEnrollDt.datepicker('getDate');
+
+			      if (testStartDate > testEndDate) {
+			        endEnrollDt.datepicker('setDate', testStartDate);
+			      }
+
+			      else {
+			        $(this).val(day+"/"+month+"/"+year);
+			        $(this).datepicker('setDate', new Date(year, (month-1), day));
+			      }
+			    }
+
+			    else {
+			      endEnrollDt.val(day+"/"+month+"/"+year);
+			      $(this).datepicker('setDate', new Date(year, (month-1), day));
+			    }
+			    $("#thread_close_date").datepicker('option', 'minDate', new Date(year, (month-1), day));
+			  }
+
+			  else if ($(this).attr('id') == "thread_close_date") {
+			    if (month_year) {
+			      month_year = month_year.split("/");
+			      day = parseInt(month_year[0]);
+			      month = parseInt(month_year[1]);
+			      year = parseInt(month_year[2]);
+			    }
+
+			    if (startEnrollDt.val() != '') {
+			      var testStartDate = startEnrollDt.datepicker('getDate');
+			      var testEndDate = endEnrollDt.datepicker('getDate');
+
+			      if (testStartDate > testEndDate) {
+			        startEnrollDt.datepicker('setDate', testEndDate);
+			      }
+			      else {
+			        $(this).val(day+"/"+month+"/"+year);
+			        $(this).datepicker('setDate', new Date(year, (month-1), day));
+			      }
+			    }
+
+			    else {
+			      startEnrollDt.val(day+"/"+month+"/"+year);
+			      $(this).datepicker('setDate', new Date(year, (month-1), day));
+			    }
+			  }
+			},
+
+			beforeShow: function() {
+			  var month_year = $(this).val();
+			  day = currentDay;
+			  month = currentMonth;
+			  year = currentYear;
+
+			  if (month_year) {
+			    month_year = month_year.split("/");
+			    day = parseInt(month_year[0]);
+			    month = parseInt(month_year[1]);
+			    year = parseInt(month_year[2]);
+			  }
+			  $(this).datepicker('option', 'defaultDate', new Date(year, (month-1), day));
+			  $(this).datepicker('setDate', new Date(year, (month-1), day));
+			},
+		});
+
+	{% endif %}
+
+	var data_list = ""
+	var saveflag = 0
+	var old_name;
+	function setdrawer(){
+		$('#switchgrp').foundation('reveal', 'open');
+		$('.close-reveal-modal.st').click(function(){
+			if (saveflag == 0){
+				alert("{% trans 'This will cancel the save' %}");
+			}
+		});
+	}
+
+	function get_new_groups(){
+		$.each($('#switchgrp #collection_set_drawer2 li'),function(index,item){
+			data_list=data_list+String(item.id)+",";
+		});
+	}
+
+	$(document).on('click',"#switch_group",function(){
+		$('#switchgrp #collection_set_drawer1').html("");
+		$('#switchgrp #collection_set_drawer2').html("");
+		$('#switchgrp #collection_set_drawer1').html('<li class="price"><input type="text" placeholder="Type here to search in the resources" id="collection_set_search" class="margin-0"></li>');
+		var url='/{{groupid}}/group/switch_group/'+'{{node}}';
+		$.getJSON( url, function( data ) {
+			$.each(data ,function(index , drawer_elements){
+				if(index == 0)
+				{
+					$.each(drawer_elements.drawer1, function(index, element) {
+						$('#switchgrp #collection_set_drawer1').append("<li id='"+element.id+"' class='bullet-item text-left'>"+element.name+"</li>");
+					});
+				}
+				if(index == 1)
+				{
+					$.each(drawer_elements.drawer2, function(index, element) {
+						$('#switchgrp #collection_set_drawer2').append("<li id='"+element.id+"' class='bullet-item text-left'>"+element.name+"</li>");
+					});
+				}
+			});
+		});
+	});
+
+	$(document).on('click',"#save_switch_group",function(){
+		var turl='/{{groupid}}/group/switch_group/'+'{{node}}';
+		saveflag = 1;
+		get_new_groups();
+		new_groups=data_list;
+		$.ajax({
+			url: turl,
+			type: 'POST',
+			data: {new_grps:new_groups,csrfmiddlewaretoken: '{{ csrf_token }}'},
+			success: function(data){
+				alert("{% trans 'Successfully switched groups' %}");
+			},
+		}); //end of ajax
+	}); //end of document click
+
+	{% get_node_type node as nodetype %}
+	var nt="{{nodetype}}"
+
+	// doument ready function
+	$(document).ready(function(){
+		$(".assesses_tab").hide();
+		$(".teaches_tab").hide();
+		$(".prior_node_tab").hide();
+
+
+
+
+		if (nt == "Page" || nt == "File" || nt == "Pandora_video" || nt == "Concept")
+		{
+			$(".teaches_tab").show();
+			$(".prior_node_tab").show();
+		}
+		else if (nt == "Topic" || nt == "Term")
+		{
+			$(".teaches_tab").show();
+			$(".prior_node_tab").show();
+			$(".assesses_tab").show();
+		}
+		else if(nt == "Quiz" || nt == "QuizItem")
+		{
+			$(".assesses_tab").show();
+		}
+		{% if node %}
+			old_name = "{{node.name}}"
+		    old_name = old_name.toLowerCase();
+		    $("select#type_of option[value='{{node.type_of.0}}']").prop("selected", true);
+		    // $("select#type_of").prop("disabled", true)
+			{% if is_auth_node %}
+				$("#name_id").attr("disabled",true)
+			{% endif %}
+
+		{% endif %}
+		{% if title != "Page" %}
+			$(".ck-editor").removeClass("hide")
+		{% endif %}
+	});
+
+	$("input[type='radio'][name='col']").click(function() {
+
+		cn_arr = []
+
+		$(".node_id").each(function (){
+			if ($(this).parent(".bullet-item").parent("#collection_drawer2").attr("id") == "collection_drawer2") {
+				cn_arr.push($(this).val());
+			}
+		});
+
+		var cn_list = cn_arr.join(',');
+		var homo_coll = this.value;
+		var node_id = "{{node.pk}}";
+
+		$.ajax({
+			type: "POST",
+			url: "{% url 'select_drawer' groupid %}",
+			datatype: "html",
+			data:{
+				homo_collection: homo_coll,
+				node_id: node_id,
+				page_no: 1,
+				csrfmiddlewaretoken: '{{ csrf_token }}'
+			},
+			success: function cnt(data) {
+				$(".drawers").css("display", "block");
+				$("#collection_drawer").html(data);
+				$("#save-node").css("display", "block");
+
+				// write comment
+				$(".next_prev").click(function() {
+
+					// alert(this.name);
+				 	$.ajax({
+						type: "POST",
+						url: "{% url 'select_drawer' groupid %}",
+						datatype: "html",
+						data:{
+							homo_collection: homo_coll,
+							node_id: node_id,
+							page_no: this.name,
+							csrfmiddlewaretoken: '{{ csrf_token }}'
+						},
+						success: function(data) {
+							cnt(data)
+						}
+
+					});
+				});
+				// End of coment
+
+			}
+
+		});
+
+	});
+
+
+	$(".node_tab").click(function() {
+		// for activating "panel-name-description" div and deactivate other div's
+		$("div.contents").css("display", "none");
+		$("#panel-name-description").css("display", "block");
+		$("#save-node").css("display", "block");
+		// For highlighting current clicked element
+		$("dl.select > dd").removeClass("active")
+		$(this).addClass("active")
+
+	});
+
+	$(".meta_tab").click(function() {
+		// for activating "panel-metadata" div and deactivate other div's
+		$("div.contents").css("display", "none");
+		$("#panel-metadata").css("display", "block");
+		$("#save-node").css("display", "block");
+		// For highlighting current clicked element
+
+		$("dl.select > dd").removeClass("active")
+		$(this).addClass("active")
+
+		$("#metadata_info").html("<input type='hidden' name='metadata_info' value='metadata'>");
+	});
+
+	$(".thread_prop_tab").click(function() {
+		// for activating "panel-metadata" div and deactivate other div's
+		$("div.contents").css("display", "none");
+		$("#panel-thread").css("display", "block");
+		$("#save-node").css("display", "block");
+		// For highlighting current clicked element
+
+		$("dl.select > dd").removeClass("active")
+		$(this).addClass("active")
+	});
+
+	$(".help_rt_tab").click(function() {
+		// for activating "panel-metadata" div and deactivate other div's
+		$("div.contents").css("display", "none");
+		$("#panel-help").css("display", "block");
+		$("#save-node").css("display", "block");
+		// For highlighting current clicked element
+
+		$("dl.select > dd").removeClass("active")
+		$(this).addClass("active")
+	});
+
+
+	$(".prior_node_tab").click(function() {
+
+		$.ajax({
+			type: "POST",
+			url: "{% url 'drawer_widget' groupid %}",
+			datatype: "html",
+			data:{
+				node_id: '{{node.pk}}',
+				field: "prior_node",
+				app: "{{title}}",
+				page_no: 1,
+				csrfmiddlewaretoken: '{{ csrf_token }}'
+			},
+			success: function cnt(data) {
+				// for activating div for filling the returned data from ajax according to clicked element and deactivate other div's
+				$("div.contents").css("display", "none");
+				$("#panel-prior-node").css("display", "block");
+				// For highlighting current clicked element
+				$("dl.select > dd").removeClass("active")
+				$(".prior_node_tab").addClass("active")
+
+				// To fill the drawer with returned data from ajax
+				$("#prior_node_drawer").html(data);
+				$("#save-node").css("display", "block");
+
+				$(".next_prev").click(function() {
+
+					// alert(this.name);
+				 	$.ajax({
+						type: "POST",
+						url: "{% url 'drawer_widget' group_id %}",
+						datatype: "html",
+						data:{
+							field: "prior_node",
+							node_id: '{{node.pk}}',
+							app:"{{title}}",
+							page_no: this.name,
+							csrfmiddlewaretoken: '{{ csrf_token }}'
+						},
+						success: function(data) {
+							cnt(data)
+						}
+
+					});
+				});
+
+			}
+		});
+
+	});
+
+  	{% if is_group or node or not node %}
+		$(".collection_tab").click(function() {
+  			var collection = "heterogeneous";
+
+	{% else %}
+		$(".collection").click(function() {
+      			var collection = this.value;
+	{% endif %}
+  		$("#publish_resource").foundation('reveal', 'close');
+		$("input[type='radio'][name='col']").attr("checked", false);
+		$("input[type='radio'][name='coll']").attr("checked", false);
+
+		if (collection == "homogeneous"){
+
+			$("div.contents").css("display", "none");
+			$("#panel-collection").css("display", "block");
+			// For highlighting current clicked element
+			$("dl.select > dd").removeClass("active")
+			$(".collection_tab").addClass("active")
+
+			var node_id = "{{node.pk}}";
+
+			$.ajax({
+				type: "POST",
+				url: "{% url 'select_drawer' groupid %}",
+				datatype: "html",
+				data:{
+					node_id: node_id,
+					node_type: "{{node.member_of}}",
+					page_no: 1,
+					csrfmiddlewaretoken: '{{ csrf_token }}'
+				},
+				success: function cnt(data) {
+					$(".choose").css("display", "none");
+					$(".drawers").css("display", "block");
+					$("#collection_drawer").html(data);
+
+					// write comment
+					$(".next_prev").click(function() {
+
+						// alert(this.name);
+					 	$.ajax({
+							type: "POST",
+							url: "{% url 'select_drawer' groupid %}",
+							datatype: "html",
+							data:{
+								node_id: node_id,
+								page_no: this.name,
+								csrfmiddlewaretoken: '{{ csrf_token }}'
+							},
+							success: function(data) {
+								cnt(data)
+							}
+
+						});
+					});
+					// End of coment
+
+				}
+
+			});
+
+
+		}
+		else{
+
+			$.ajax({
+				type: "POST",
+				url: "{% url 'drawer_widget' groupid %}",
+				datatype: "html",
+				data:{
+					node_id: '{{node.pk}}',
+					field: "collection",
+					app:"{{title}}",
+					page_no: 1,
+					csrfmiddlewaretoken: '{{ csrf_token }}'
+				},
+				success: function cnt(data) {
+					// for activating div for filling the returned data from ajax according to clicked element and deactivate other div's
+					$("div.contents").css("display", "none");
+					$("#panel-collection").css("display", "block");
+					// For highlighting current clicked element
+					$("dl.select > dd").removeClass("active")
+					$(".collection_tab").addClass("active")
+
+					// To fill the drawer with returned data from ajax
+					$(".choose").css("display", "block");
+					$(".drawers").css("display", "block");
+					$("#collection_drawer").html(data);
+					$("#module_drawer").html(data);
+					// $("#save-node").css("display", "block");
+
+					$(".next_prev").click(function() {
+
+					 	$.ajax({
+							type: "POST",
+							url: "{% url 'drawer_widget' group_id %}",
+							datatype: "html",
+							data:{
+								field: "collection",
+								node_id: '{{node.pk}}',
+								app:"{{title}}",
+								page_no: this.name,
+								csrfmiddlewaretoken: '{{ csrf_token }}'
+							},
+							success: function(data) {
+								cnt(data)
+							}
+
+						});
+
+					});
+
+				}
+			});
+		}
+
+	});
+
+
+	$(".teaches_tab").click(function() {
+
+		$.ajax({
+			type: "POST",
+			url: "{% url 'drawer_widget' groupid %}",
+			datatype: "html",
+			data:{
+				node_id: '{{node.pk}}',
+				field: "teaches",
+				app: "{{title}}",
+				page_no: 1,
+				csrfmiddlewaretoken: '{{ csrf_token }}'
+			},
+			success: function cnt(data) {
+				// for activating div for filling the returned data from ajax according to clicked element and deactivate other div's
+				$("div.contents").css("display", "none");
+				$("#panel-teaches").css("display", "block");
+				// For highlighting current clicked element
+				$("dl.select > dd").removeClass("active")
+				$(".teaches_tab").addClass("active")
+				// To fill the drawer with returned data from ajax
+				$("#teaches_drawer").html(data);
+				$("#save-node").css("display", "block");
+
+				$(".next_prev").click(function() {
+
+					// alert(this.name);
+				 	$.ajax({
+						type: "POST",
+						url: "{% url 'drawer_widget' group_id %}",
+						datatype: "html",
+						data:{
+							field: "teaches",
+							node_id: '{{node.pk}}',
+							app:"{{title}}",
+							page_no: this.name,
+							csrfmiddlewaretoken: '{{ csrf_token }}'
+						},
+						success: function(data) {
+							cnt(data)
+						}
+
+					});
+
+				});
+
+			}
+		});
+
+	});
+
+  	$(".assesses_tab").click(function() {
+
+		$.ajax({
+			type: "POST",
+			url: "{% url 'drawer_widget' groupid %}",
+			datatype: "html",
+			data:{
+				node_id: '{{node.pk}}',
+				field: "assesses",
+				app: "{{title}}",
+				page_no: 1,
+				csrfmiddlewaretoken: '{{ csrf_token }}'
+			},
+			success: function cnt(data) {
+				// for activating div for filling the returned data from ajax according to clicked element and deactivate other div's
+				$("div.contents").css("display", "none");
+				$("#panel-assesses").css("display", "block");
+				// For highlighting current clicked element
+				$("dl.select > dd").removeClass("active")
+				$(".assesses_tab").addClass("active")
+				// To fill the drawer with returned data from ajax
+				$("#assesses_drawer").html(data);
+				$("#save-node").css("display", "block");
+
+				$(".next_prev").click(function() {
+
+					// alert(this.name);
+				 	$.ajax({
+						type: "POST",
+						url: "{% url 'drawer_widget' group_id %}",
+						datatype: "html",
+						data:{
+							field: "assesses",
+							node_id: '{{node.pk}}',
+							app:"{{title}}",
+							page_no: this.name,
+							csrfmiddlewaretoken: '{{ csrf_token }}'
+						},
+						success: function(data) {
+							cnt(data)
+						}
+
+					});
+
+				});
+
+			}
+		});
+
+	});
+
+
+	$("#save-node").click(function(event) {
+
+		pn_arr = []
+		cn_arr = []
+		md_arr = [] //for adding module
+		tch_arr=[]  // for teaches
+		assess_arr=[] // for assesses
+
+		// tags_str = $("#tags_id").val()
+		// escape_chars = "~!@#$%^&*()_+{}|:<>?/.,';][=-`'"
+		// if(tags_str.indexOf(escape_chars)>0){
+		// 	alert("Tags cannot contain special characters");
+		// 	event.preventDefault();
+
+		// }
+		// $("#type_of").removeAttr("disabled")
+ 		$(".node_id").each(function (){
+			if ($(this).parent(".bullet-item").parent("#prior_node_drawer2").attr("id") == "prior_node_drawer2") {
+				pn_arr.push($(this).val());
+			}
+
+			if ($(this).parent(".bullet-item").parent("#collection_drawer2").attr("id") == "collection_drawer2") {
+				cn_arr.push($(this).val());
+			}
+
+			if ($(this).parent(".bullet-item").parent("#module_drawer2").attr("id") == "module_drawer2") {
+  				md_arr.push($(this).val());
+  			}
+			if ($(this).parent(".bullet-item").parent("#teaches_drawer2").attr("id") == "teaches_drawer2") {
+				tch_arr.push($(this).val());
+			}
+			if ($(this).parent(".bullet-item").parent("#assesses_drawer2").attr("id") == "assesses_drawer2") {
+				assess_arr.push($(this).val());
+			}
+		});
+
+		$("#prior_node_list").val(pn_arr);
+		$("#collection_list").val(cn_arr) ;
+		$("#module_list").val(md_arr);
+		$("#teaches_list").val(tch_arr);
+		$("#assesses_list").val(assess_arr);
+		{% block base_save_on_click %}{% endblock %}
+
+	    var name = $("#name_id").val().trim().toLowerCase();
+	    var nodes = {{nodes_list|safe}}
+	    condition_result_var = true;
+	    {% if node %}
+	    	if(name == old_name){
+	    		condition_result_var = false;
+	    	}
+	    	else{
+	    		condition_result_var = true;
+	    	}
+	    {% endif %}
+	    var val_chk = name.search(/mod$/gi)
+    	if (condition_result_var && name != "")
+	    {
+			if(val_chk == -1){
+				if (nodes.indexOf(name) != -1)
+				{
+					$("#message").css("display", "block");
+					$("#message").text("{% trans title %}'" + name +"' {% trans 'already exist. Please choose another name' %}");
+					event.preventDefault();
+				}
+			}
+			else if (val_chk != -1){
+				$("#message").css("display", "block");
+				$("#message").text("{% trans 'Name cannot include 'Mod'.'%}");
+				event.preventDefault();
+			}
+	    }
+	    else if (name == ""){
+	      $("#message").css("display", "block");
+	      $("#message").text("{% trans 'Name cannot be empty.' %}");
+	      event.preventDefault();
+	    }
+	    else
+    	{
+          $("#message").css("display", "none");
+	    }
+		$("select#type_of").prop("disabled", false)
+	    if($("#type_of option:selected").text() == "Wiki page"){
+	    	$(".ck-editor").remove();
+	    }
+	    else{
+	    	$(".org-editor").remove();
+	    }
+		{% if not blog_type %}
+
+			{% get_site_name_from_settings as site_name %}
+
+			{%  if site_name == "NROER" and "File" in node.member_of_names_list %}
+	            if(educationallevel.selectedIndex == 0 || educationalsubject.selectedIndex ==0 || audience.selectedIndex == 0){
+	                    // $('#tabs').find('a[href="#tab2"]').trigger('click');
+	                    $('.meta_tab').trigger('click');
+	                    $("#message").css("display", "block");
+	                    $("#message").text("{% trans 'Please fill compulsory metadata fields(marked with a *)' %}");
+	                    event.preventDefault();
+	            }
+			{% endif %}
+
+			$("input[name='thread_create']").attr("disabled",false);
+
+			// {% if title == "Page" or "File" in node.member_of_names_list %}
+			// 	if (!$("input[name='thread_create']:checked").val()) {
+			// 		$('.thread_prop_tab').trigger('click');
+			// 		$("#message").css("display", "block");
+			// 		$("#message").text("{% trans 'Please fill compulsory fields(marked with a *)' %}");
+			// 		event.preventDefault();
+			// 	}
+			// {% endif %}
+		{% endif %}
+	    updateAllTags();
+
+    	var tagsStr = tags.value.trim();
+	    if(checkTag())
+	    {
+			$("input:hidden[name='tags']").val($("input:hidden[name='tags']").val() + ', ' + tagsStr);
+	    }
+	    else if(tagsStr)
+	    {
+	    	event.preventDefault();
+	    }
+	    getSelValuesHiddenElement('help_info_page','form-edit-node');
+
+	});
+
+
+  	$(document).on('open', '#view-map-edit-widget[data-reveal]', function () {
+
+  		$.ajax({
+  			url: "{% url 'get_visited_location' groupid %}",
+  			success: function(data){
+
+			  	data = JSON.parse(data);
+
+			    var lastVisitedLocationVal = data;
+
+			    if(lastVisitedLocationVal){
+
+			      if(lastVisitedLocationVal == "[]"){
+			        lastVisitedLocationVal = JSON.parse(lastVisitedLocationVal);
+			      }
+
+			      if(lastVisitedLocationVal.length > 0){
+			            // lastVisitedLocationVal = JSON.parse(lastVisitedLocationVal);
+			            var zoom = lastVisitedLocationVal.pop(),
+			                lng = lastVisitedLocationVal[1],
+			                lat = lastVisitedLocationVal[0];
+			              map.setView([lat, lng], zoom);
+			            }
+			    }
+			    else if( tempArr.length )
+			    {
+			      var group = new L.featureGroup(tempArr)
+			          map.fitBounds(group.getBounds());
+			    }
+
+			}
+		});
+
+  	});
+
+	$(document).on('opened', '#view-map-edit-widget[data-reveal]', function () {
+
+		map.invalidateSize();
+
+	    // var lastVisitedLocationVal = $('input:hidden[name=last_visited_location]').attr("value");
+	    // lastVisitedLocationVal = lastVisitedLocationVal.trim();
+	    // if((lastVisitedLocationVal) && (!lastVisitedLocationVal.startsWith("["))){
+
+	    // 	lastVisitedLocationVal = "[" + lastVisitedLocationVal;
+	    // }
+	    // if((lastVisitedLocationVal) && (!lastVisitedLocationVal.endsWith("]"))){
+
+	    // 	lastVisitedLocationVal += "]";
+	    // }
+	    // lastVisitedLocationVal = lastVisitedLocationVal.trim();
+	    // if(lastVisitedLocationVal){
+
+	    // 	if(lastVisitedLocationVal == "[]"){
+     //    lastVisitedLocationVal = JSON.parse(lastVisitedLocationVal);
+     //  }
+     //  if(lastVisitedLocationVal.length > 0){
+     //        lastVisitedLocationVal = JSON.parse(lastVisitedLocationVal);
+     //        var zoom = lastVisitedLocationVal.pop(),
+     //            lng = lastVisitedLocationVal[1],
+     //            lat = lastVisitedLocationVal[0];
+     //          map.setView([lat, lng], zoom);}
+    	// }
+
+		// if(lastVisitedLocationVal){
+
+		// 	var zoom = lastVisitedLocationVal.pop();
+
+		// 	map.setView(lastVisitedLocationVal, zoom);
+		// }
+
+		// if( tempArr.length )
+  		//   	{
+		// 	var group = new L.featureGroup(tempArr)
+ 		// 			map.fitBounds(group.getBounds());
+ 		// 	}
+
+ 		// map.setView([lat, lng], zoom);
+	});
+
+	// $(document).on('close', '#view-map-edit-widget[data-reveal]', function () {
+	// 	var mapZoom = map.getZoom();
+	// 	var lastVisitedLocationVal = $('input:hidden[name=last_visited_location]').attr("value");
+	// 	lastVisitedLocationVal = JSON.parse("["+lastVisitedLocationVal+"]");
+	// 	lastVisitedLocationVal.pop();
+	// 	lastVisitedLocationVal.push(mapZoom)
+	// 	$('input:hidden[name=last_visited_location]').attr("value", lastVisitedLocationVal);
+	// });
+	// function update()
+	// {
+	// 	$('#page_type').empty();
+	// 	$('#page_type').append($('#type_of :selected').text());
+	// 	$('#select_page_type').foundation('reveal', 'close');
+	// }
+	/*
+	$("select#type_of").change(function() {
+		sel_val_type_of = $("option:selected", this).text();
+		if(sel_val_type_of == "Wiki page"){
+			$(".ck-editor").addClass("hide");
+			$(".org-editor").removeClass("hide");
+		}
+		else{
+			$(".ck-editor").removeClass("hide");
+			$(".org-editor").addClass("hide");
+		}
+	})
+	*/
+
+
+</script>
+
+{% endblock %}
+
+{% block document_ready %}
+	{{block.super}}
+	$("input[id='educational']").each(function(){
+		$(this).attr("required", "");
+		$(this).css("width", "98%");
+		$(this).css("float", "left");
+		$(this).after("<small class='error'>Please fill valid "+this.name+"</small>");
+		$(this).after("<i style='color:red; float:left display:inline'>*</i>");
+	});
+{% endblock %}

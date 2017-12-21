@@ -1,0 +1,422 @@
+{% extends "ndf/mis_base.html" %}
+{% load i18n %}
+{% load ndf_tags %}
+{% load pagination_tags %}
+
+{% block title %} {{ title }} {% endblock %}
+
+{% block body_content %} 
+  {% check_is_gstaff groupid request.user as gstaff_access %}
+
+  {% if nodes.count %}
+    {% autopaginate nodes 25 %}
+  
+    <div id="myModal" class="reveal-modal" data-reveal style="height:500px;overflow:scroll;"> 
+      
+      <h3>{% trans "Are you sure you want to delete? All of the following related items also will be deleted!" %}</h3>
+      
+      <input class="button confirmDeleteObjects" type="button" value="Confirm">
+      <input class="button cancelDeleteObjects" type="button" value="Cancel">
+      <div id="deletion_results"></div>
+      <a class="close-reveal-modal"> &#215;</a>
+    </div>
+
+    <div id="linkModal" class="reveal-modal small" data-reveal>
+      <center>
+      {% blocktrans %}<h3>Link user-account to respective user-details</h3>
+      <p>NOTE: Please provide username of the user (i.e. student/voluntary-teacher), that he/she has registered on to the website.</p>
+      {% endblocktrans %}
+      </center>
+
+      <form id="linkform" data-abide>
+        <div class="row">
+          <div class="small-2 small-offset-2 columns">
+            <label for="link_to" class="inline left">{% trans "Username:" %}</label>
+          </div>
+          <div class="small-6 columns end">
+            <input id="link_to" name="link_to" type="text" required >
+            <small class="error">{% trans "Please fill username!" %}</small>
+          </div>
+        </div>
+
+        <div class="row">
+          <div class="small-4 small-offset-4 columns end">
+            <input type="button" class="button small link_to_ac" value="Link to User A/C" disabled />
+          </div>
+        </div>
+      </form>
+
+      <a class="close-reveal-modal">{% trans "&#215" %};</a>
+    </div>
+
+    {% if gstaff_access %}
+      <input class="button deleteObjects" type="button" value="Delete">
+    {% endif %}
+    
+    <form method="POST" style="float:right; margin-top:15px;padding-top:10px;">
+
+      {% csrf_token %}
+      <input name="search" type="textbox" value="" style="width:300px;">
+      <input type="hidden" name="class" value="{{class_name}}">
+      <input type="submit" value="search" style="width:100px;">
+
+    </form>
+  {% endif %}
+
+  {% if nodes.count %}
+  <table >
+    <thead>
+      <tr>
+          <th width="20"> <input class="checkedAll" type="checkbox"></th>
+          <th>Title</th>
+
+          {% if gstaff_access %}
+          <th>Edit</th>
+
+          {% comment %}
+          <!--
+          <th>Confirmation status</th>
+
+          {% if is_link_needed %}
+          <th>Link to User A/C</th>
+          {% endif %}
+          -->
+          {% endcomment %}
+
+          {% endif %}
+      </tr>
+    </thead>
+    
+    <tbody>
+      {% for each in nodes %}
+        <tr>
+      
+          <td  id="{{each.pk}}" class="objectsCheckbox"> <input type="checkbox"> </td>
+          {% if app_name == "MIS" %}
+          <td style="font-size:14px;">
+            <a href="{% url 'mis:mis_app_instance_detail' groupid app_id app_set_id each.pk %}">{{each.name}}</a>
+          </td>
+          {% else %}
+          <td style="font-size:14px;">
+            <a href="{% url 'mis-po:mis_app_instance_detail' groupid app_id app_set_id each.pk %}">{{each.name}}</a>
+          </td>
+          {% endif %}
+
+          {% if gstaff_access %}
+          <!-- Show below Edit, Confirm & Link buttons only to GStaff members -->
+
+          {% if app_name == "MIS" %}
+          <td>
+            <a href="{% url 'mis:mis_app_instance_edit' groupid app_id app_set_id each.pk %}" style="font-size:14px;" class="button small">{% trans "Edit" %}</a>
+          </td>
+          {% else %}
+          <td>
+            <a href="{% url 'mis-po:mis_app_instance_edit' groupid app_id app_set_id each.pk %}" style="font-size:14px;" class="button small">{% trans "Edit" %}</a>
+          </td>
+          {% endif %}
+
+          {% comment %}
+          <!--
+          <td>
+            <div id="enrollement_code_{{each.pk}}">
+            <a href="#" class="button small enrollment_code" onclick="get_enrollment_code('{{each.pk}}')">Confirm</a>
+            </div>
+          </td>
+
+          {% if is_link_needed %}
+          {% check_node_linked each.pk as is_linked %}
+          <td style="font-size:11px;">
+            <input id="link_{{each.pk}}" data-reveal-id="linkModal" type="button" style="font-size:14px;" class="button small link" 
+                {% if is_linked %}value="Linked" disabled="disabled" 
+                {% else %}value="Link"
+                {% endif %} 
+            />
+          </td>
+          {% endif %}
+          -->
+          {% endcomment %}
+
+          <!-- endif of GStaff members -->
+          {% endif %}
+        </tr>
+
+      {% endfor %}
+
+    </tbody>
+  </table>
+
+  {% else %}
+  <div class="row">
+    <div class="small-12 columns">
+     <h5> {% trans "This group doesn't have a registered" %}<b> {{title}}</b>.  </h5>
+    </div>
+  </div>
+
+  {% endif %}
+
+  {% paginate %}
+{% endblock %}
+
+{% block script %}
+  {{block.super}}
+
+  $(document).on('click', ".checkedAll", function() {
+    if($(this).is(":checked")==true){
+      $('.objectsCheckbox input').prop( "checked", true );
+    }
+    else{
+      $('.objectsCheckbox input').prop( "checked", false );
+    }
+  });
+
+  $(document).on('click', ".button.confirmDeleteObjects", function() {
+    var selectedobject = $(".objectsCheckbox input:checked")
+    $('#myModal').foundation('reveal', 'open');
+    // $('#myModal').foundation('reveal', 'close');
+    
+    if(selectedobject.length > 0) {
+      var i = 0;
+      var str = "";
+      
+      $.map(selectedobject, function(each) {
+        if(i == 0) {
+          str = str.concat(each.parentElement.id)
+        }
+        else {
+          str = str.concat(","+each.parentElement.id)
+        }
+        
+        i = i+1
+      })
+
+      $.ajax({
+        url: "{% url 'deletion_instances' groupid %}",
+        type: 'POST',
+        data: {deleteobjects:str,csrfmiddlewaretoken: '{{ csrf_token }}',confirm:"yes"},
+        
+        beforeSend: function() {},
+        
+        success: function(result) {
+        },
+      
+        complete: function() { 
+          $('#myModal').foundation('reveal', 'close');
+        }
+      });
+       
+      $.map(selectedobject,function(each) {
+        each.parentElement.parentElement.remove()
+      });
+      
+      $('#myModal').foundation('reveal', 'close');
+    }
+
+    else {
+      alert("select object to delete");
+    }
+  });
+
+  $(document).on('click',".button.deleteObjects",function(){
+    var selectedobject = $(".objectsCheckbox input:checked");
+    // $('#myModal').foundation('reveal', 'close');
+    
+    if(selectedobject.length > 0) {
+      $('#myModal').foundation('reveal', 'open');
+
+      // var confirmed = confirm("Deleting "+selectedobject.length+" objects");
+      // if(confirmed == true){
+   
+      var i = 0;
+      var str = "";  
+   
+      $.map(selectedobject,function(each) {
+        if(i == 0) {
+          str = str.concat(each.parentElement.id)
+        }
+        else {
+          str = str.concat(","+each.parentElement.id)
+        }
+        
+        i= i+1;
+      });
+
+      $.ajax({
+        url: "{% url 'deletion_instances' groupid %}",
+        type: 'POST',
+        data: {deleteobjects:str, csrfmiddlewaretoken: '{{ csrf_token }}'},
+        
+        beforeSend: function() {},
+        
+        success: function(result) {
+          $("#deletion_results").html("");
+          
+          for(var obj in result){
+            var ulist = $("<ul>"+"</ul>")
+            .attr("id","conceptlist")
+            .appendTo($("#deletion_results"));
+            
+            var li = $("<li><b>"+result[obj].title+"</b></li>")
+            .appendTo(ulist);
+            
+            var ulist1 = $("<ul>"+"</ul>")
+            .attr("id","conceptlist")
+            .appendTo(li);
+            
+            for(var obj2 in result[obj].content) {
+              object = result[obj].content[obj2]
+              for(var obj3 in  object) {
+                for(var each in object[obj3]) {
+                  var li1 = $("<li>"+object[obj3][each]+"</li>")
+                  .appendTo(ulist1);
+                }
+              }
+            }
+          }
+        },
+
+        complete: function() {}
+      });
+      
+      // }
+    }
+    
+    else {
+      alert("select object to delete");
+    }
+  });
+
+  $(document).on('click',".button.cancelDeleteObjects",function(){
+    $('#myModal').foundation('reveal', 'close');
+  });
+
+  // ========================================================================================
+
+  /*
+   *  Code regarding "Link" button & its reveal-modal (id: linkModal)
+
+      + linkModal consists of 
+        - text-box: link_to (id)
+        - button: link_to_ac (class)
+   */
+  var link_username = ""
+  var parent_link_button = ""
+  var is_linked = false
+
+  $(".link").click(function() {
+    /*
+     * Stores the current clicked button object from given list of "Link" buttons
+     */
+    parent_link_button = $(this);
+  });
+
+  $("#link_to").bind("keyup keypress onmouseup blur change", function() {
+    /*
+     * Changes state (disabled/enabled) of "Link to User A/C" button (class: link_to_ac) 
+     * depending on whether text-box (id: link_to) having some input or not
+     */
+    link_username = $("#link_to").val().trim()
+
+    if (link_username != "") {
+      if ($(".link_to_ac").attr("disabled")) {
+        $(".link_to_ac").removeAttr('disabled');
+      }
+    }
+
+    else {
+      if (!$(".link_to_ac").attr("disabled")) {
+        $(".link_to_ac").attr("disabled", "disabled")
+      }
+    }
+  });
+
+  $(".link_to_ac").click(function() {
+    /*
+     *  On click of "Link to User A/C" button
+        + Retrieves 
+          - ObjectId of node from parent ("Link") button's id attribute 
+          - Username from text-box
+
+        + Ajax call made to "set_user_link" url
+          + Parameters passed
+            - ObjectId of group (groupid) via url
+            - ObjectId of node (node_id) via POST request
+            - Username entered (username) via POST request
+
+        + Depending on the result of the ajax call, label of parent button is modified:
+          - If successful, Linked.
+          - Else, it remains as Link only!
+     */
+
+    link_node_id = parent_link_button.attr('id').slice(5)  // remove "link_" from given id
+    link_username = $("#link_to").val()
+
+    $.ajax({
+      url:"{% url 'set_user_link' groupid %}",
+
+      data: {
+        node_id: link_node_id,
+        username: link_username,
+        csrfmiddlewaretoken: "{{csrf_token}}"
+      },
+
+      type: "POST",
+
+      dataType: "json",
+
+      complete: function () {
+        $('#linkModal').foundation('reveal', 'close');
+      },
+
+      success: function (data) {
+        is_linked = data["result"]
+        alert(data["message"])
+
+        if (is_linked) {
+          parent_link_button.attr("disabled", "disabled")
+          parent_link_button.val("Linked");
+        }
+
+      }
+    });
+  });
+
+  $(document).on('closed.fndtn.reveal', '[data-reveal]', function () {
+    /*
+     *  On closing of reveal-modal
+        - Clear text-box (id: link_to)
+        - Disable "Link to User A/C" button
+     */
+    $("#link_to").val("")
+
+    if (is_linked) {
+      $(".link_to_ac").attr("disabled", "disabled")
+    }
+  });
+
+  // ========================================================================================
+
+  function get_enrollment_code(node_id) {
+    alert("node_id: " + node_id)
+
+    $.ajax({
+      url:"{% url 'set_enrollment_code' groupid %}",
+
+      data: {
+        node_id: node_id,
+        csrfmiddlewaretoken: "{{csrf_token}}"
+      },
+
+      type: "POST",
+
+      dataType: "html",
+
+      success: function(data) {
+        $("#enrollement_code_"+node_id).html("Enrollment Code: <br><b>"+data+"</b>")
+      },
+
+      error: function(data) {
+        alert("EnrollementCodeError: Either not an ajax call or not a POST request!!!")
+      }
+    });
+  }
+{% endblock %}  

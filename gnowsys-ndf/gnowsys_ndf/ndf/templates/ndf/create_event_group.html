@@ -1,0 +1,605 @@
+{% extends "ndf/base.html" %}
+{% load i18n %}
+{% load ndf_tags %}
+{% load cache %}
+
+{% block head %}
+{{block.super}}
+  <script src="/static/ndf/bower_components/jquery-ui/jquery-ui.js"></script> <!-- checked -->
+  <script src="/static/ndf/bower_components/jqueryui-timepicker-addon/dist/jquery-ui-timepicker-addon.min.js"></script> <!-- checked -->
+  <script src="/static/ndf/bower_components/jqueryui-timepicker-addon/dist/jquery-ui-sliderAccess.js"></script> <!-- checked -->
+  <link rel="stylesheet" href="/static/ndf/bower_components/jqueryui-timepicker-addon/dist/jquery-ui-timepicker-addon.css"> <!-- checked -->
+  <link rel="stylesheet" type="text/css" href="/static/ndf/bower_components/jquery-ui/themes/smoothness/jquery-ui.css"> <!-- checked -->
+{% endblock %}
+
+{% block title %} {% trans title|capfirst %} {% endblock %}
+
+<!-- 
+by keeping future perspective of one template for create/edit of group,
+this template is modified. So for the fields in the template it supports -
+- both create and edit of those fields.
+ -->
+
+{% block meta_content %}
+{% endblock %}
+
+
+{% block body_content %}
+  <h2 class="text-center">
+    <small>
+      {% if node %}
+        Edit | {{node.name}}
+
+      {% else %} 
+        {% trans "Create " %}
+        {% if spl_group_type == "CourseEventGroup" %}
+          Course
+        {% elif spl_group_type == "ProgramEventGroup" %}
+          Program
+        {% endif %}
+      {% endif %}
+    </small>
+  </h2>
+  <br/>
+
+  <form id="create_group"  method="post"
+  {% if node %} action="{% url 'edit_event_group' group_id spl_group_type %}"
+  {% else %} action="{% url 'create_event_group' group_id spl_group_type %}"
+  {% endif %}
+  data-abide enctype="multipart/form-data" 
+  {% if spl_group_type == "CourseEventGroup" and not node %}
+  onsubmit="return confirm('Announcement may take few minutes. Please do NOT refresh/reload/abort the page while processing. Do you really want to continue?');"
+  {% elif spl_group_type == "CourseEventGroup" and node %}
+  onsubmit="return confirm('This may take few minutes. Please do NOT refresh/reload/abort the page while processing. Do you really want to continue?');"
+  {% endif %}
+
+  >
+    {% csrf_token %}
+
+    <!-- node_id, name -->
+    {% if node %}
+      <input type="hidden" name="node_id" value="{{node.pk}}">
+      <input type="hidden" name="name" value="{{node.name}}">
+    {% endif %}
+
+    <!-- name -->
+    <div class="row">
+      <div class="small-12 medium-6 medium-centered columns">
+        <div class="row">
+          
+          <div class="small-4 columns">
+            <label for="right-label" class="inline">{% trans "Group Name" %}</label>
+          </div>
+
+          <div class="small-8 columns">
+            <input type="text" name="name" id="group_name" required placeholder="{% trans 'Enter the unique group name' %}" {% if node %}disabled=disabled title="Group name can not be changed" {% endif %} value="{{node.name}}">
+            <label id="message" style="display:none; color:red"></label>
+            <small class="error">{% trans "Group Name is required and it must be a string. " %}</small>
+          </div>
+
+        </div>
+      </div>
+    </div>
+
+    <!-- altnames -->
+    <div class="row">
+      <div class="small-12 medium-6 medium-centered columns">
+        <div class="row">
+          
+          <div class="small-4 columns">
+            <label for="right-label" class="inline">{% trans "Alternate Group Name" %}</label>
+          </div>
+          
+          <div class="small-8 columns">
+            <input type="text" name="altnames" id="alt_group_name" placeholder="{% trans 'Provide display/alternate group name' %}" value="{{node.altnames}}">
+            </div>
+          </div>
+
+      </div>
+    </div>
+
+    <br/>
+
+    <!-- group_type -->
+    <div class="row">
+      <div class="small-12 medium-6 medium-centered columns">
+        <div class="row">
+          
+          <div class="small-4 columns">
+            <label for="right-label" class="inline">{% trans "Group Type" %}</label>
+          </div>
+
+          <div class="small-8 columns">
+            <!-- getting "TYPES_OF_GROUP" defined in models.py  -->
+            {% get_possible_group_type_values as poss_gr_type %}
+            <select name="group_type" class="gtype">
+              {% for each_gtype in poss_gr_type %}
+                <option {% if each_gtype == node.group_type %}selected=selected{% endif %}>
+                  {{each_gtype}}
+                </option>
+              {% endfor %}
+            </select> 
+            <small class="error">{% trans "Please select group type." %}</small>
+          </div>
+
+        </div>
+      </div>
+    </div>
+
+    <!-- language -->
+    <div class="row">
+      <div class="small-12 medium-6 medium-centered columns">
+        <div class="row">
+          <div class="small-4 columns">
+            <label for="right-label" class="inline">{% trans "Language" %}</label>
+          </div>
+
+          <div class="small-8 columns">
+            {% get_language_info_list for LANGUAGES as languages %}
+            <select name="language" class="gtype">
+                {% for language in languages %}
+                    {% if node.language.0 == language.code %}
+                        <option selected value="{{ language.code }}" data-sub-lang="{{ language.name }}" data-sub-code="{{ language.code }}">{{ language.name }}</option>
+                    {% else %}
+                        <option value="{{ language.code }}" data-sub-lang="{{ language.name }}" data-sub-code="{{ language.code }}">{{ language.name }}</option>
+                    {% endif %}
+                {% endfor %}
+            </select> 
+            <small class="error">{% trans "Please select group type." %}</small>
+          </div>
+
+        </div>
+      </div>
+    </div>
+
+
+    {% if spl_group_type == "ProgramEventGroup" %}
+    <!-- moderation level -->
+    <div class="row" id="moderation-level">
+      <div class="small-12 medium-6 medium-centered columns">
+        <div class="row">
+      
+          <div class="small-4 columns">
+            <label for="right-label" class="inline">{% trans "Level of moderation" %}</label>
+          </div>
+
+          <div class="small-8 columns">
+            <select name="moderation_level">
+              <!-- EDITABLE_MODERATED group cannot have moderation_level to 0 -->
+              <option value="1">--- {% trans "Select Level" %} ---</option>
+              {% get_allowed_moderation_levels as mod_levels %}
+              {% for each_level in mod_levels %}
+                <option value="{{each_level}}" 
+                {% if each_level == node.moderation_level %}selected=selected{% endif %}>
+                  {{each_level}}
+                </option>
+              {% endfor %}
+            </select>
+            <small class="error">{% trans "Please select moderation level." %}</small>
+          </div>
+
+        </div>
+      </div>
+    </div>
+    {% endif %}
+
+
+      <!-- start date -->
+      <div class="row">
+        <div class="small-12 medium-6 medium-centered columns">
+          <div class="row">
+            
+            <div class="small-4 columns">
+              <label for="right-label" class="inline">{% trans 'Start Date' %}</label>
+            </div>
+
+            <div class="small-8 columns">
+            <input type="text" id="event_start_date" name="event_start_date" value="" placeholder="DD/MM/YYYY" readonly="" required="" class="date_month_day_year" style="width:15rem">      
+              <small class="error">{% trans "Please select start date." %}</small>
+            </div>
+
+          </div>
+        </div>
+      </div>
+
+      <!-- end date -->
+      <div class="row">
+        <div class="small-12 medium-6 medium-centered columns">
+          <div class="row">
+            
+            <div class="small-4 columns">
+              <label for="right-label" class="inline">{% trans 'End Date' %}</label>
+            </div>
+
+            <div class="small-8 columns">
+            <input type="text" id="event_end_date" name="event_end_date" value="" placeholder="DD/MM/YYYY" readonly="" required="" class="date_month_day_year" style="width:15rem">      
+
+              <small class="error">{% trans "Please select end date." %}</small>
+            </div>
+
+          </div>
+        </div>
+      </div>
+
+
+      <!-- start enroll -->
+      <div class="row">
+        <div class="small-12 medium-6 medium-centered columns">
+          <div class="row">
+            
+            <div class="small-4 columns">
+              <label for="right-label" class="inline">{% trans 'Enrollment Start Date' %}</label>
+            </div>
+
+            <div class="small-8 columns">
+            <input type="text" id="event_start_enroll_date" name="event_start_enroll_date" value="" placeholder="DD/MM/YYYY" readonly="" required="" class="date_month_day_year" style="width:15rem">      
+              <small class="error">{% trans "Please select enrollment start date." %}</small>
+            </div>
+
+          </div>
+        </div>
+      </div>
+
+      <!-- end enroll -->
+      <div class="row">
+        <div class="small-12 medium-6 medium-centered columns">
+          <div class="row">
+            
+            <div class="small-4 columns">
+              <label for="right-label" class="inline">{% trans 'Enrollment End Date' %}</label>
+            </div>
+
+            <div class="small-8 columns">
+            <input type="text" id="event_end_enroll_date" name="event_end_enroll_date" value="" placeholder="DD/MM/YYYY" readonly="" required="" class="date_month_day_year" style="width:15rem">      
+
+              <small class="error">Please select enrollment end date.</small>
+            </div>
+
+          </div>
+        </div>
+      </div>
+    <!-- following fields are comented because of groups are not implemented accordingly -->
+    {% comment %}
+    <br/>
+
+    <!-- subscription policy -->
+    <div class="row">
+      <div class="small-12 medium-6 medium-centered columns">
+        <div class="row">
+          
+          <div class="small-4 columns">
+            <label for="right-label" class="inline">{% trans "Group Subscription Policy" %}</label>
+          </div>
+
+          <div class="small-8 columns">
+            <select name="subscription" class="subscptn" disabled="disabled">
+              <option id="OPEN">{% trans "OPEN" %}</option>
+              <option id="BY_REQUEST">{% trans "BY_REQUEST" %}</option>
+              <option id="BY_INVITATION">{% trans "BY_INVITATION" %}</option>
+            </select>
+            <small class="error">Please select subscription policy.</small>
+          </div>
+
+        </div>
+      </div>
+    </div>
+    
+    <!-- member visibility -->
+    <div class="row">
+      <div class="small-12 medium-6 medium-centered columns">
+        <div class="row">
+          
+          <div class="small-4 columns">
+            <label for="right-label" class="inline">{% trans "Group Member Visibility" %}</label>
+          </div>
+
+          <div class="small-8 columns">
+            <select name="disclosure_policy" class="mem" disabled="disabled">
+              <option id="DISCLOSED_TO_MEM">{% trans "DISCLOSED_TO_MEM" %}</option>
+              <option id="NOT_DISCLOSED_TO_MEM">{% trans "NOT_DISCLOSED_TO_MEM" %}</option>
+            </select>
+            <small class="error">Please select group member visibility.</small>
+          </div>
+
+        </div>
+      </div>
+    </div>
+
+    <!-- Group Encryption policy -->
+    <div class="row">
+      <div class="small-12 medium-6 medium-centered columns">
+        <div class="row">
+          
+          <div class="small-4 columns">
+            <label for="right-label" class="inline">{% trans "Group Encryption policy" %}</label>
+          </div>
+
+          <div class="small-8 columns">
+            <select name="encryption_policy" class="encr" disabled="disabled">
+              <option id="NOT_ENCRYPTED">{% trans "NOT_ENCRYPTED" %}</option>
+              <option id="ENCRYPTED">{% trans "ENCRYPTED" %}</option>
+            </select>
+            <small class="error">Please select group encryption policy.</small>
+          </div>
+
+        </div>
+      </div>
+    </div>
+
+    <!-- Group Existance visibility -->
+    <div class="row">
+      <div class="small-12 medium-6 medium-centered columns">
+        <div class="row">
+              
+          <div class="small-4 columns">
+            <label for="right-label" class="inline">{% trans "Group Existance visibility" %}</label>
+          </div>
+
+          <div class="small-8 columns">
+            <select name="visibility_policy" class="visibility_policy" disabled="disabled">
+              <option id="ANNOUNCED">{% trans "ANNOUNCED" %}</option>
+              <option id="NOT_ANNOUNCED">{% trans "NOT_ANNOUNCED" %}</option>
+            </select>
+            <small class="error">Please select group visibility policy.</small>
+          </div>
+
+        </div>
+      </div>
+    </div>
+
+    <br/>
+    {% endcomment %}
+    
+
+    <!-- Upload logo for ProgramEvent -->
+    <div class="row">
+      <div class="small-12 medium-6 medium-centered columns">
+        <div class="row">
+              
+          <div class="small-4 columns">
+            <label for="right-label" class="inline">{% trans "Upload thumbnail" %}</label>
+          </div>
+          <div class="small-8 columns">
+          {% if logo_img_node %}
+            <a target="_blank" href="{% url 'read_file' group_id logo_img_node.pk %}">{% trans "View existing thumbnail " %}</a>
+            <input type="button" class="button tiny" id="change_logo" value="Edit">
+            <input type="button" class="button tiny hide" id="cancel_change_logo" value="Cancel">
+            <input type="file" name="filehive" id="filehive" class="hide" accept="image/*"/>
+          {% else %}
+          <input type="file" name="filehive" id="filehive" accept="image/*"/>
+          {% endif %}
+
+          </div>
+
+        </div>
+      </div>
+    </div>
+
+    <!-- description -->
+          
+      <!-- <div class="small-12 medium-6 medium-centered columns"> -->
+    <dl class="accordion row" title="Click to Add/Edit Description" data-accordion>
+      <dd class="accordion-navigation small-12 medium-6 medium-centered columns">
+        <a href="#content">
+          <label for="right-label" class="">
+            {% if node.content %}Edit{% else %}Add{% endif %} {% trans "Description" %}
+          </label>
+        </a>
+        <div id="content" class="content">
+          {% include "ndf/html_editor.html" with var_name="content" var_placeholder="Enter the content here" var_value=node.content|default_if_none:"" ckeditor_toolbar="GeneralToolbar" node_id=node.pk %}
+        </div>
+      </dd>
+    </dl>
+    
+    <br/>
+
+    <div class="row">
+      <div class="small-12 medium-6 medium-centered columns">
+      {% if spl_group_type == "CourseEventGroup" %}
+        <input type="hidden" name="course_node_id" value="{{course_node_id}}">
+      {% endif %}
+
+        <input type="hidden" name="edit_policy" value="EDITABLE_MODERATED">
+        <input type="hidden" name="agency_type" value="Other">
+
+        {% if node %}
+          <input type="submit" value="Update {{spl_group_type}}" id="group-submit" class="button expand">
+        {% else %}
+          <input type="submit" value="Create {{spl_group_type}}" id="group-submit" class="button expand">
+        {% endif %}
+      </div>
+    </div>
+
+  </form>
+{% endblock %}
+
+{% block script %}
+// <script type="text/javascript">
+
+  document.getElementById("group_name").focus();
+
+  $("#create_group").submit(function(event){
+    // $("#editp").removeAttr("disabled")
+    // $("select[name='moderation_level']").removeAttr("disabled")
+    var name = $("#group_name").val().trim().toLowerCase();
+    var nodes = {{nodes_list|safe}} 
+    var val_chk = name.search(/mod$/gi)    
+
+    $("#message").css("display", "none");
+
+    if (name != "")
+    {
+      if(val_chk == -1){
+        if (nodes.indexOf(name) >= 0)  
+          { 
+            $("#message").css("display", "block");
+            $("#message").text("Group '"+ name +"' already exist. Please choose another name");
+            event.preventDefault();
+          }
+      }
+      else if (val_chk != -1){
+          $("#message").css("display", "block");
+          $("#message").text("{% trans 'Group name cannot include 'Mod' or 'mod' text at end.' %}");
+          event.preventDefault();
+      }
+    }
+    else if (name == ""){
+      $("#message").css("display", "block");
+      $("#message").text("{% trans 'Group name cannot be empty.' %}");
+      event.preventDefault();
+    }
+  });
+  $(document).on('click',"#change_logo",function(){
+    $("#cancel_change_logo").removeClass("hide");
+    $("#filehive").removeClass("hide");
+  })
+
+  $(document).on('click',"#cancel_change_logo",function(){
+    $("#cancel_change_logo").addClass("hide");
+    $("#filehive").addClass("hide");
+    $("#filehive").val("")
+  })
+
+// </script>
+{% endblock %}
+
+{% block document_ready %}
+    {% if node %}
+      {% get_attribute_value node.pk 'start_time' as start_time %}
+      {% get_attribute_value node.pk 'end_time' as end_time %}
+      {% get_attribute_value node.pk 'start_enroll' as start_enroll %}
+      {% get_attribute_value node.pk 'end_enroll' as end_enroll %}
+
+      $("#event_start_date").val("{{start_time|date:'d/m/Y'}}")
+      $("#event_end_date").val("{{end_time|date:'d/m/Y'}}")
+      $("#event_start_enroll_date").val("{{start_enroll|date:'d/m/Y'}}")
+      $("#event_end_enroll_date").val("{{end_enroll|date:'d/m/Y'}}")
+    {% endif %}
+  
+    var eventStartDt = $("#event_start_date")
+    var eventEndDt = $("#event_end_date")
+
+    currentDate = new Date();
+    var currentDay = currentDate.getDate();
+    var currentMonth = currentDate.getMonth();
+    var currentYear = currentDate.getFullYear();
+    lowerYearLimit = currentYear - 5;
+    upperYearLimit = currentYear + 5;
+
+    $(".date_month_day_year").datepicker({ 
+      changeMonth: true,
+      changeYear: true,
+      dateFormat: 'dd/mm/yy',
+      yearRange: lowerYearLimit + ":" + upperYearLimit,
+      defaultDate: '0',
+      //minDate: '0',
+      //setDate: new Date(),
+      onClose: function(dateText, inst) {
+        if($(this).attr('id') == 'event_start_date' || $(this).attr('id') == 'event_end_date'){
+          eventStartDt = $("#event_start_date")
+          eventEndDt = $("#event_end_date")
+          eventStartDt_id = "event_start_date"
+          eventEndDt_id = "event_end_date"
+        }
+        else{
+          eventStartDt = $("#event_start_enroll_date")
+          eventEndDt = $("#event_end_enroll_date")
+          eventStartDt_id = "event_start_enroll_date"
+          eventEndDt_id = "event_end_enroll_date"
+        }
+
+        $(this).val(dateText);
+        
+        var month_year = $(this).val();
+        day = currentDay;
+        month = currentMonth;
+        year = currentYear;
+        
+        if ($(this).attr('id') == eventStartDt_id) {
+          if (month_year) {
+            month_year = month_year.split("/");
+            day = parseInt(month_year[0]);
+            month = parseInt(month_year[1]);
+            year = parseInt(month_year[2]);
+          }
+
+          if (eventEndDt.val() != '') {
+            var testStartDate = eventStartDt.datepicker('getDate');
+            var testEndDate = eventEndDt.datepicker('getDate');
+
+            if (testStartDate > testEndDate) {
+              eventEndDt.datepicker('setDate', testStartDate);
+            }
+
+            else {
+              $(this).val(day+"/"+month+"/"+year);
+              $(this).datepicker('setDate', new Date(year, (month-1), day));
+            }
+          }
+
+          else {
+            eventEndDt.val(day+"/"+month+"/"+year);
+            $(this).datepicker('setDate', new Date(year, (month-1), day));
+          }
+          eventEndDt.datepicker('option', 'minDate', new Date(year, (month-1), day));
+        }
+
+        else if ($(this).attr('id') == eventEndDt_id) {
+          if (month_year) {
+            month_year = month_year.split("/");
+            day = parseInt(month_year[0]);
+            month = parseInt(month_year[1]);
+            year = parseInt(month_year[2]);
+          }
+
+          if (eventStartDt.val() != '') {
+            var testStartDate = eventStartDt.datepicker('getDate');
+            var testEndDate = eventEndDt.datepicker('getDate');
+
+            if (testStartDate > testEndDate) {
+              eventStartDt.datepicker('setDate', testEndDate);
+            }
+            else {
+              $(this).val(day+"/"+month+"/"+year);
+              $(this).datepicker('setDate', new Date(year, (month-1), day));
+            }
+          }
+
+          else {
+            eventStartDt.val(day+"/"+month+"/"+year);
+            $(this).datepicker('setDate', new Date(year, (month-1), day));
+          }
+        }
+      },
+
+      beforeShow: function() {
+        if($(this).attr('id') == 'event_start_date' || $(this).attr('id') == 'event_end_date'){
+          eventStartDt = $("#event_start_date")
+          eventEndDt = $("#event_end_date")
+          eventStartDt_id = "event_start_date"
+          eventEndDt_id = "event_end_date"
+        }
+        else{
+          eventStartDt = $("#event_start_enroll_date")
+          eventEndDt = $("#event_end_enroll_date")
+          eventStartDt_id = "event_start_enroll_date"
+          eventEndDt_id = "event_end_enroll_date"
+        }
+
+        var month_year = $(this).val();
+        day = currentDay;
+        month = currentMonth;
+        year = currentYear;
+
+        if (month_year) {
+          month_year = month_year.split("/");
+          day = parseInt(month_year[0]);
+          month = parseInt(month_year[1]);
+          year = parseInt(month_year[2]);
+        }
+        $(this).datepicker('option', 'defaultDate', new Date(year, (month-1), day));
+        $(this).datepicker('setDate', new Date(year, (month-1), day));
+      },
+    });
+
+{% endblock %}

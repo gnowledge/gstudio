@@ -1,0 +1,125 @@
+{% load i18n %}
+{% load ndf_tags %}
+{% get_group_name groupid as group_name_tag %}
+
+<ul class="small-block-grid-1 medium-block-grid-2 large-block-grid-4">
+
+
+  {% group_type_info groupid request.user as grouptype %}
+
+  <h3><u>Topics list: </u></h3>
+  <!-- Existing card list-->
+  {% for node in paged_terms %}
+  		<a href="{% url 'term_details' group_name_tag node.pk %}">
+  			<b>{{ node.name }}</b>
+  		</a><br/><br/>
+
+  {% empty %}
+    {% if not searching %}
+      <div class="row">
+        <div class="small-12 columns">
+        <h5>  {% blocktrans %} This group doesn't have any Terms. <b>Be the first to create a Term!</b>{% endblocktrans %} </h5>
+        </div>
+      </div>
+    {% endif %}
+
+  {% endfor %}
+
+</ul>
+
+<!-- pagination -->
+{% if page_info %}
+  {% if page_info.num_pages > 1 %}
+    <div class="pagination-centered">
+      <ul class="pagination" role="menubar" aria-label="Pagination">
+        {% if page_info.num_pages < 11 %}
+  
+
+          {% for each_page in page_info.page_range %}
+
+            {% if page_info.current_page == each_page %}
+            <li class="current">
+            {% else %}
+            <li>
+            {% endif %}
+              <a class="next_prev" name="{{each_page}}"> {{ each_page }} </a>
+            </li>
+
+          {% endfor %}
+        
+        {% else %}
+
+          {% if page_info.has_previous %}
+
+            <!-- for  << previous  text -->
+            <li class="arrow">
+              <a class="next_prev" name="{{page_info.previous_page}}">&laquo; Previous</a>
+            </li>
+
+            <!-- for page 1, page 2 and ... -->
+            {% if page_info.previous_page|add:"-2" != 1 and page_info.previous_page|add:"-2" > 0 %}
+              <li><a class="next_prev" name="1">1</a></li>
+              <li><a class="next_prev" name="2">2</a></li>
+              <li class="unavailable" aria-disabled="true"><span class="subheader">&hellip;</span></li>
+            {% endif %}
+      
+            <!-- for previous page -->
+            <li>
+              <a class="next_prev" name="{{page_info.previous_page}}">
+                {{ page_info.previous_page }}
+              </a>
+            </li>
+          {% endif %}
+
+          <!-- for current page -->
+          <li class="current"><a class="next_prev" name="{{page_info.current_page}}">{{ page_info.current_page }}</a></li>
+          
+
+          {% if page_info.has_next %}
+
+            <!-- for next page -->
+            <li>
+              <a class="next_prev" name="{{page_info.next_page}}">
+                {{ page_info.next_page }}
+              </a>
+            </li>
+            {% if page_info.next_page != page_info.num_pages %}
+              
+              {% if page_info.next_page != page_info.num_pages|add:"-1" %}
+
+                <!-- for .... -->
+                {% if page_info.next_page != page_info.num_pages|add:"-2" %}
+                  <li class="unavailable" aria-disabled="true"><span class="subheader">&hellip;</span></li>
+                {% endif %}
+        
+                <!-- for secondlast page -->
+                <li>
+                  <a class="next_prev" name="{{page_info.num_pages|add:'-1'}}">
+                    {{ page_info.num_pages|add:"-1" }}
+                  </a>
+                </li>
+              {% endif %}
+              
+              <!-- for last page -->
+              <li>
+                <a class="next_prev" name="{{page_info.num_pages}}">
+                  {{ page_info.num_pages }}
+                </a>
+              </li>
+            {% endif %}
+
+            <!-- for text Next >> -->
+            <li class="arrow">
+              <a class="next_prev" name="{{page_info.next_page}}">Next &raquo;</a>
+            </li>
+        
+          {% endif %}
+
+        {% endif %}
+      </ul>
+    </div>
+  {% endif %}
+
+{% endif %}
+
+<!-- end of pagination -->
