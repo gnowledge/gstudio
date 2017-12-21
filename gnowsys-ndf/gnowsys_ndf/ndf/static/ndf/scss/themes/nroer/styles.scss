@@ -1,0 +1,20 @@
+/*
+*   NROER Customization SASS
+*/
+
+// First load settings for the theme
+@import "theme_settings";     
+
+// Then load customized metastudio settings for foundation
+@import "../../metastudio_settings";
+
+// Import foundation 
+@import "../bower_components/foundation/scss/foundation"; 
+
+// Import the NROER platform styles
+@import "../../nroer_styles";  
+
+// First import all the common styles for the NROER Platform
+@import "../../_app_styles";
+
+// Write your custom styles here

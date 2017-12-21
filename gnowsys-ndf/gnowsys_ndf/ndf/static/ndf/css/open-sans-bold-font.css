@@ -1,0 +1,16 @@
+/* Open Sans @font-face */
+
+/* BEGIN Regular */
+@font-face {
+
+	font-family: 'Open Sans Bold';
+	src: url('/static/ndf/bower_components/open-sans-fontface/fonts/Bold/OpenSans-Bold.eot');
+	src: url('/static/ndf/bower_components/open-sans-fontface/fonts/Bold/OpenSans-Bold.eot?#iefix') format('embedded-opentype'),
+	url('/static/ndf/bower_components/open-sans-fontface/fonts/Bold/OpenSans-Bold.woff') format('woff'),
+	url('/static/ndf/bower_components/open-sans-fontface/fonts/Bold/OpenSans-Bold.ttf') format('truetype'),
+	url('/static/ndf/bower_components/open-sans-fontface/fonts/Bold/OpenSans-Bold.svg#OpenSansRegular') format('svg');
+	/*font-weight: normal;*/
+	font-style: normal;
+	
+}
+/* END Regular */

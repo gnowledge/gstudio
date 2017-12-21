@@ -161,7 +161,10 @@ def partner_list(request, group_id):
                           {'group_nodes': group_nodes,
                            # "groups_category": groups_category,
                            'group_obj':group_obj,
+<<<<<<< HEAD
                            
+=======
+>>>>>>> eb89f37d24f9cb6e206b715499c170c782cd63da
                            'groupid': group_id, 'group_id': group_id, "app_gst": partner_group_gst,
                           }, context_instance=RequestContext(request))
 
@@ -214,7 +217,11 @@ def nroer_groups(request, group_id, groups_category):
                           {'group_nodes': group_nodes, "groups_category": groups_category,
                            #'group_nodes_count': group_nodes_count,
                           'app_gst': app_gst,
+<<<<<<< HEAD
                            'groupid': group_id, 'group_id': group_id, 'group_name':group_name
+=======
+                           'groupid': group_id, 'group_id': group_id,
+>>>>>>> eb89f37d24f9cb6e206b715499c170c782cd63da
 
                           }, context_instance=RequestContext(request))
 

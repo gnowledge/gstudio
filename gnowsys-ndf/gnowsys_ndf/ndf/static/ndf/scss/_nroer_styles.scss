@@ -1,0 +1,120 @@
+/*
+*  NROER Platform Stylesheet
+*/
+
+
+.workspace{
+
+    // group level menu bar
+    .app.button-bar {
+        height: 45px;
+    }
+    
+    //This is the main content container between the header and footer
+    background: url("watermark.png") no-repeat 1% 65%;
+    min-height: 100%;
+    margin-bottom: -130px!important;
+    -webkit-box-sizing: border-box;
+    -moz-box-sizing: border-box;
+    box-sizing: border-box;
+    
+    &:after{
+        //Hack for setting div height to the height of the browser window
+        content: "";
+        display: block;
+        height: 130px;    // allows the content of the footer to be visible at the bottom. This should match the margin-bottom of the div
+    }
+}
+
+
+
+.landing{
+    position: relative;
+    
+    h2{
+     margin-top: 2rem;
+ }
+}
+
+
+div.banner{
+    padding:0 2rem;
+    // margin-bottom: 2rem;
+    // border:2px solid lighten($primary-color,10%);
+    // border-width: 2px 0;
+    &>*{
+        background-color: $primary-color;
+        .slide{
+            padding: 1rem;
+            margin: 0;
+            background-color: darken($primary-color,5%);
+            height: 24em !important;
+            min-height: 50vh !important;
+            // height: inherit;
+            .slide-back-image{
+                position: absolute;
+                font-size: 17rem;
+                font-size: 17vw;
+                pointer-events: none;
+                color: white;
+                opacity: 0.08;
+                right: 7%;
+            }
+            .count-box{
+                font-size: 120%;
+                font-size: 1.35vw;
+                opacity: 0.8;
+                padding-bottom: 1em;
+
+                .count{
+                    font-size: 1.75vw;
+                    padding-right: 5px;
+                }
+                a{
+                    font-size: 1.35vw;
+                }
+            }
+
+            .quotes{
+                opacity: 0.75;
+                font-family: "Times new Roman";
+                font-size: 200%;
+                font-size: 3vw;
+            }
+
+            .slide-2-icons{
+                opacity: 0.5;
+                font-size: 280%;
+                font-size: 3vw;
+            }
+        }
+        color:#eee;
+        margin:0;
+        h2,h3,h4,h5,h6,blockquote{
+            color:white;
+        }
+        h2{
+            font-size: 280%;
+            font-size: 3vw;
+        }
+        h3{
+            font-size: 180%;
+            font-size: 2vw;
+        }
+        blockquote{
+            font-size: 120%;
+            font-size: 1.35vw;
+            font-style: italic;
+        }
+        p{
+            color:white;
+            font-size:120%;
+            font-size:1.35vw;
+        }
+    }
+
+    // Slick Carousel
+    .slick-dots .button{
+    }
+
+}

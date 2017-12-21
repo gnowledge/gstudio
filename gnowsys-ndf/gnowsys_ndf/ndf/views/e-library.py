@@ -35,7 +35,11 @@ GST_JSMOL = node_collection.one({"_type":"GSystemType","name":"Jsmol"})
 ##############################################################################
 
 @get_execution_time
+<<<<<<< HEAD
 def resource_list(request, group_name, app_id=None, page_no=1):
+=======
+def resource_list(request, group_id, app_id=None, page_no=1):
+>>>>>>> eb89f37d24f9cb6e206b715499c170c782cd63da
 	"""
 	* Renders a list of all 'Resources' available within the database (except eBooks).
 	"""
@@ -44,11 +48,16 @@ def resource_list(request, group_name, app_id=None, page_no=1):
 
 	try:
 		group_id = ObjectId(group_id)
+<<<<<<< HEAD
 		
 
 	except:
 		group_name, group_id = get_group_name_id(group_name)
 		
+=======
+	except:
+		group_name, group_id = get_group_name_id(group_id)
+>>>>>>> eb89f37d24f9cb6e206b715499c170c782cd63da
 
 	if app_id is None:
 		app_id = str(app._id)
@@ -220,7 +229,11 @@ def resource_list(request, group_name, app_id=None, page_no=1):
 								 'audio_pages': educationaluse_stats.get("Audios", 0),
 								 'collection_pages': collection_pages,
 								 'collection': collection_pages_cur,
+<<<<<<< HEAD
 								 'groupid': group_id, 'group_id':group_id, 'group_name':group_name,
+=======
+								 'groupid': group_id, 'group_id':group_id,
+>>>>>>> eb89f37d24f9cb6e206b715499c170c782cd63da
 								 "datavisual":datavisual,
 								},
 								context_instance = RequestContext(request))

@@ -81,7 +81,11 @@
                 <li>
                   <a
                   {% for mapk, mapv in nroer_menu.mapping.items %}
+<<<<<<< HEAD
                   
+=======
+
+>>>>>>> eb89f37d24f9cb6e206b715499c170c782cd63da
                     {% if mapv in "Teachers, Schools, Interest Groups" %}
                       {% if each_sub_menu == mapk %}
                         href="/{{mapv}}"
@@ -90,7 +94,10 @@
                         {% endif %}
                       {% endif %}
                     {% endif %}
+<<<<<<< HEAD
                 
+=======
+>>>>>>> eb89f37d24f9cb6e206b715499c170c782cd63da
 
                     {% if each_sub_menu == mapk %}
                       href="{% url 'partnerlist' mapv %}"

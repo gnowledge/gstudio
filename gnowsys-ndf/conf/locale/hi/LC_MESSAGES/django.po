@@ -1,0 +1,4938 @@
+msgid ""
+msgstr ""
+"Project-Id-Version: PACKAGE VERSION\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2015-11-20 12:29+0530\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language-Team: LANGUAGE <LL@li.org>\n"
+"Language: \n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"X-Generator: Translate Toolkit 1.10.0\n"
+
+#: gnowsys_ndf/ndf/templates/error_base.html:65
+#: gnowsys_ndf/ndf/templates/ndf/header.html:46
+msgid "Menu"
+msgstr "मेन्यू"
+
+#: gnowsys_ndf/ndf/templates/admin/base_site.html:7
+msgid "Studio"
+msgstr "स्टूडियो"
+
+#: gnowsys_ndf/ndf/templates/ndf/Captcha.html:47
+msgid "invalid captcha Try Again"
+msgstr ""
+
+#: gnowsys_ndf/ndf/templates/ndf/DocumentList.html:8
+#: gnowsys_ndf/ndf/templates/ndf/beta.html:8
+#: gnowsys_ndf/ndf/templates/ndf/file.html:274
+msgid ""
+"Files Listed below are already uploaded. Duplicate file uploads are not "
+"possible."
+msgstr ""
+
+#: gnowsys_ndf/ndf/templates/ndf/DocumentList.html:18
+#: gnowsys_ndf/ndf/templates/ndf/beta.html:38
+msgid "File Name"
+msgstr "फ़ाइल नाम"
+
+#: gnowsys_ndf/ndf/templates/ndf/DocumentList.html:19
+#: gnowsys_ndf/ndf/templates/ndf/DocumentList.html:25
+#: gnowsys_ndf/ndf/templates/ndf/version_page.html:35
+msgid "View"
+msgstr "देखें"
+
+#: gnowsys_ndf/ndf/templates/ndf/ImageDashboard.html:29
+#: gnowsys_ndf/ndf/templates/ndf/beta.html:21
+#: gnowsys_ndf/ndf/templates/ndf/file_search.html:16
+#: gnowsys_ndf/ndf/templates/ndf/header.html:378
+#: gnowsys_ndf/ndf/templates/ndf/header.html:392
+#: gnowsys_ndf/ndf/templates/ndf/node_search_base.html:6
+#: gnowsys_ndf/ndf/templates/ndf/search_page.html:3
+#: gnowsys_ndf/ndf/templates/ndf/videoDashboard.html:29
+msgid "Search"
+msgstr "खोजें"
+
+#: gnowsys_ndf/ndf/templates/ndf/ImageDashboard.html:34
+#: gnowsys_ndf/ndf/templates/ndf/beta.html:25
+#: gnowsys_ndf/ndf/templates/ndf/html_field_widget.html:221
+#: gnowsys_ndf/ndf/templates/ndf/videoDashboard.html:34
+msgid "Upload"
+msgstr "अपलोड"
+
+#: gnowsys_ndf/ndf/templates/ndf/Nussd_event_Schedule.html:90
+#: gnowsys_ndf/ndf/templates/ndf/event_create_edit.html:65
+msgid "Editing Event:"
+msgstr "संपादन इवेंट"
+
+#: gnowsys_ndf/ndf/templates/ndf/Nussd_event_Schedule.html:93
+#: gnowsys_ndf/ndf/templates/ndf/event_create_edit.html:67
+msgid "Create a New"
+msgstr "नया बनायें"
+
+#: gnowsys_ndf/ndf/templates/ndf/Nussd_event_Schedule.html:93
+#: gnowsys_ndf/ndf/templates/ndf/mis_report.html:56
+#: gnowsys_ndf/ndf/templates/ndf/res_node_ajax_view.html:352
+msgid "Event"
+msgstr "इवेंट"
+
+#: gnowsys_ndf/ndf/templates/ndf/Nussd_event_Schedule.html:194
+msgid "Module:"
+msgstr "मॉड्यूल"
+
+#: gnowsys_ndf/ndf/templates/ndf/Nussd_event_Schedule.html:206
+msgid "Sessions:"
+msgstr "सत्र"
+
+#: gnowsys_ndf/ndf/templates/ndf/Nussd_event_Schedule.html:238
+msgid "Remainig time (in minutes):"
+msgstr "शेष समय (मिनट में)"
+
+#: gnowsys_ndf/ndf/templates/ndf/Nussd_event_Schedule.html:246
+msgid "Alloted time (in minutes):"
+msgstr "सुनिश्चित अवधि (मिनट में)"
+
+#: gnowsys_ndf/ndf/templates/ndf/Nussd_event_Schedule.html:263
+#: gnowsys_ndf/ndf/templates/ndf/mis_report.html:57
+msgid "Voluntary Teacher"
+msgstr "स्वयंसेवी शिक्षक"
+
+#: gnowsys_ndf/ndf/templates/ndf/UploadDoc.html:41
+msgid "Uploading"
+msgstr "अपलोड हो रहा है"
+
+#: gnowsys_ndf/ndf/templates/ndf/UploadDoc.html:42
+msgid "You can upload <b>files</b> of any format to your group library."
+msgstr "समूह लाईब्रेरी में किसी भी प्रारूप में फाईल अपलोड कर सकते हैं"
+
+#: gnowsys_ndf/ndf/templates/ndf/UploadDoc.html:57
+msgid "New File"
+msgstr "नई फ़ाइल"
+
+#: gnowsys_ndf/ndf/templates/ndf/UploadDoc.html:84
+#: gnowsys_ndf/ndf/templates/ndf/Upload_File.html:39
+#: gnowsys_ndf/ndf/templates/ndf/custom_template_for_app.html:417
+#: gnowsys_ndf/ndf/templates/ndf/file.html:218
+#: gnowsys_ndf/ndf/templates/ndf/mis_create_edit.html:285
+msgid "Upload File"
+msgstr "फ़ाइल अपलोड करें"
+
+#: gnowsys_ndf/ndf/templates/ndf/UploadDoc.html:86
+#: gnowsys_ndf/ndf/templates/ndf/Upload_File.html:42
+msgid "Choose File"
+msgstr "फ़ाइल चुनें"
+
+#: gnowsys_ndf/ndf/templates/ndf/UploadDoc.html:88
+#: gnowsys_ndf/ndf/templates/ndf/Upload_File.html:47
+msgid "Title of File"
+msgstr "फ़ाइल शीर्षक"
+
+#: gnowsys_ndf/ndf/templates/ndf/UploadDoc.html:93
+msgid "Select Language"
+msgstr "भाषा चुनें"
+
+#: gnowsys_ndf/ndf/templates/ndf/UploadDoc.html:108
+msgid "Add Description"
+msgstr "विवरण जोड़ें"
+
+#: gnowsys_ndf/ndf/templates/ndf/UploadDoc.html:113
+#: gnowsys_ndf/ndf/templates/ndf/UploadDoc.html:125
+#: gnowsys_ndf/ndf/templates/ndf/UploadDoc.html:136
+#: gnowsys_ndf/ndf/templates/ndf/Upload_File.html:65
+#: gnowsys_ndf/ndf/templates/ndf/node_edit_base.html:294
+#: gnowsys_ndf/ndf/templates/ndf/node_edit_base.html:306
+msgid "Add Tag"
+msgstr "टैग जोड़ें"
+
+#: gnowsys_ndf/ndf/templates/ndf/UploadDoc.html:125
+#: gnowsys_ndf/ndf/templates/ndf/Upload_File.html:69
+#: gnowsys_ndf/ndf/templates/ndf/node_edit_base.html:294
+msgid ""
+"Tags help identify similiar work easily. Just add tag text and click Add Tag "
+"button"
+msgstr ""
+"एक जैसें कार्यों को पहचानने में टैग सहायक है, टैग टेक्स्ट जोड़ें एवं टैग जोड़ें बटन पर क्ल्कि करें"
+
+#: gnowsys_ndf/ndf/templates/ndf/UploadDoc.html:132
+#: gnowsys_ndf/ndf/templates/ndf/node_edit_base.html:302
+msgid "Add tag text and click on [Add Tag] button"
+msgstr "टैग टेक्स्ट जोड़ें एवं टैग जोड़ें बटन पर क्ल्कि करें"
+
+#: gnowsys_ndf/ndf/templates/ndf/UploadDoc.html:145
+#: gnowsys_ndf/ndf/templates/ndf/Upload_File.html:85
+#: gnowsys_ndf/ndf/templates/ndf/node_edit_base.html:315
+msgid ""
+"Non empty tags can have only alphanumeric characters, dash(-) and spaces."
+msgstr "टैग्स में केवल डेस, स्पेस, अक्षर एवं अंक का प्रयोग करें"
+
+#: gnowsys_ndf/ndf/templates/ndf/UploadDoc.html:170
+#: gnowsys_ndf/ndf/templates/ndf/UploadDoc.html:183
+#: gnowsys_ndf/ndf/templates/ndf/Upload_File.html:125
+#: gnowsys_ndf/ndf/templates/ndf/theme_create_edit.html:89
+#: gnowsys_ndf/ndf/templates/ndf/theme_create_edit.html:96
+#: gnowsys_ndf/ndf/templates/ndf/theme_create_edit.html:222
+#: gnowsys_ndf/ndf/templates/ndf/topic_create_edit.html:100
+#: gnowsys_ndf/ndf/templates/ndf/topic_create_edit.html:107
+msgid "Public"
+msgstr "सार्वजनिक"
+
+#: gnowsys_ndf/ndf/templates/ndf/UploadDoc.html:173
+#: gnowsys_ndf/ndf/templates/ndf/UploadDoc.html:187
+#: gnowsys_ndf/ndf/templates/ndf/Upload_File.html:127
+#: gnowsys_ndf/ndf/templates/ndf/theme_create_edit.html:92
+#: gnowsys_ndf/ndf/templates/ndf/theme_create_edit.html:99
+#: gnowsys_ndf/ndf/templates/ndf/theme_create_edit.html:225
+#: gnowsys_ndf/ndf/templates/ndf/topic_create_edit.html:103
+#: gnowsys_ndf/ndf/templates/ndf/topic_create_edit.html:110
+#: gnowsys_ndf/ndf/templates/ndf/topic_create_edit.html:177
+msgid "Private"
+msgstr "निजी"
+
+#: gnowsys_ndf/ndf/templates/ndf/UploadDoc.html:200
+#: gnowsys_ndf/ndf/templates/ndf/Upload_File.html:264
+msgid ""
+"Depending on the size of file/s and your Internet speed, upload process may "
+"take time. Please do not close this window."
+msgstr ""
+"फाईल आकार और इंटरनेट की गति के अनुरूप अपलोड प्रक्रिया में कुछ समय लग सकता है। कृपया पृष्ठ "
+"बंद न करें"
+
+#: gnowsys_ndf/ndf/templates/ndf/UploadDoc.html:202
+#: gnowsys_ndf/ndf/templates/ndf/Upload_File.html:265
+msgid ""
+"Please upload videos in webm format. If you upload videos of other formats, "
+"it will take longer to publish them."
+msgstr ""
+"कृपया वीडियो वेबएम प्रारूप में अपलोड करें। यदि आप किसी अन्य प्रारूप में वीडियो अपलोड करते "
+"हैं तो उनके प्रकाशन में अधिक समय लग सकता है।"
+
+#: gnowsys_ndf/ndf/templates/ndf/UploadDoc.html:206
+#: gnowsys_ndf/ndf/templates/ndf/Upload_File.html:281
+msgid "You are not an authorised user. Please login to upload files."
+msgstr "आप अधिकृत उपयोगकर्ता नहीं हैं। कृपया फाईल अपलोड करने से पहले लॉगिन करें।"
+
+#: gnowsys_ndf/ndf/templates/ndf/Upload_File.html:56
+#: gnowsys_ndf/ndf/templates/ndf/file_statistics.html:68
+#: gnowsys_ndf/ndf/templates/ndf/visualize.html:168
+msgid "Details"
+msgstr "विवरण"
+
+#: gnowsys_ndf/ndf/templates/ndf/Upload_File.html:72
+msgid "Add one tag at a time"
+msgstr ""
+
+#: gnowsys_ndf/ndf/templates/ndf/Upload_File.html:77
+#: gnowsys_ndf/ndf/templates/ndf/event.html:56
+#: gnowsys_ndf/ndf/templates/ndf/event.html:62
+#: gnowsys_ndf/ndf/templates/ndf/mis_base.html:63
+#: gnowsys_ndf/ndf/templates/ndf/quiz_list.html:65
+#: gnowsys_ndf/ndf/templates/ndf/quiz_list.html:67
+#: gnowsys_ndf/ndf/templates/ndf/shelf.html:14
+msgid "Add"
+msgstr "जोड़ें"
+
+#: gnowsys_ndf/ndf/templates/ndf/Upload_File.html:118
+#: gnowsys_ndf/ndf/templates/ndf/custom_template_for_app.html:386
+#: gnowsys_ndf/ndf/templates/ndf/custom_template_for_app.html:391
+#: gnowsys_ndf/ndf/templates/ndf/location_widget.html:4
+#: gnowsys_ndf/ndf/templates/ndf/mis_create_edit.html:310
+#: gnowsys_ndf/ndf/templates/ndf/node_edit_base.html:254
+#: gnowsys_ndf/ndf/templates/ndf/theme_create_edit.html:125
+#: gnowsys_ndf/ndf/templates/ndf/theme_create_edit.html:248
+#: gnowsys_ndf/ndf/templates/ndf/topic_create_edit.html:133
+#: gnowsys_ndf/ndf/templates/ndf/topic_create_edit.html:197
+msgid "Add Location"
+msgstr "स्थान जोड़ें"
+
+#: gnowsys_ndf/ndf/templates/ndf/Upload_File.html:204
+msgid "ctrl + click to select multiple values"
+msgstr ""
+
+#: gnowsys_ndf/ndf/templates/ndf/Uploader_Form.html:9
+msgid "Contribute File"
+msgstr "योगदान करें"
+
+#: gnowsys_ndf/ndf/templates/ndf/Uploader_Form.html:12
+msgid "You can contribute only Open Educational Resources"
+msgstr "मुक्त शैक्षिक संसाधन प्रदान करने वाला"
+
+#: gnowsys_ndf/ndf/templates/ndf/Uploader_Form.html:13
+msgid "Resources copyrighted by others must be cited including OER"
+msgstr ""
+
+#: gnowsys_ndf/ndf/templates/ndf/Uploader_Form.html:16
+msgid "What constitutes OER"
+msgstr ""
+
+#: gnowsys_ndf/ndf/templates/ndf/Uploader_Form.html:20
+msgid "You can upload files of any format"
+msgstr "समूह लाईब्रेरी में किसी भी प्रारूप में फाईल अपलोड कर सकते हैं"
+
+#: gnowsys_ndf/ndf/templates/ndf/Uploader_Form.html:24
+msgid ""
+"All files get uploaded under the CC BY-SA licence (This license lets others "
+"remix, tweak, and build upon your work even for commercial purposes, as long "
+"as they credit you and license their new creations under the identical "
+"terms) unless you chose a different licence"
+msgstr ""
+
+#: gnowsys_ndf/ndf/templates/ndf/Uploader_Form.html:27
+msgid "Please visit"
+msgstr "कृपया सेट करें"
+
+#: gnowsys_ndf/ndf/templates/ndf/Uploader_Form.html:27
+#: gnowsys_ndf/ndf/templates/ndf/quiz_item_details.html:26
+msgid "and"
+msgstr "और"
+
+#: gnowsys_ndf/ndf/templates/ndf/Uploader_Form.html:27
+msgid "to learn more about licenses"
+msgstr ""
+
+#: gnowsys_ndf/ndf/templates/ndf/User_Activity.html:9
+msgid "Activities"
+msgstr "क्रियाकलाप"
+
+#: gnowsys_ndf/ndf/templates/ndf/User_Activity.html:66
+#: gnowsys_ndf/ndf/templates/ndf/uDashboard.html:204
+msgid "No Recent Activities"
+msgstr "हाल ही में कोई क्रियाकलाप नहीं है"
+
+#: gnowsys_ndf/ndf/templates/ndf/action_panel.html:128
+#: gnowsys_ndf/ndf/templates/ndf/action_panel.html:130
+#: gnowsys_ndf/ndf/templates/ndf/mis_details.html:420
+#: gnowsys_ndf/ndf/templates/ndf/mis_details.html:425
+msgid "Publish"
+msgstr "प्रकाशित"
+
+#: gnowsys_ndf/ndf/templates/ndf/action_panel.html:134
+msgid "Moderation"
+msgstr "स्थान"
+
+#: gnowsys_ndf/ndf/templates/ndf/action_panel.html:136
+msgid "Published"
+msgstr "प्रकाशित"
+
+#: gnowsys_ndf/ndf/templates/ndf/action_panel.html:157
+#: gnowsys_ndf/ndf/templates/ndf/action_panel.html:170
+msgid "Cross Publish"
+msgstr "प्रकाशित"
+
+#: gnowsys_ndf/ndf/templates/ndf/action_panel.html:161
+#: gnowsys_ndf/ndf/templates/ndf/adminDashboard.html:64
+#: gnowsys_ndf/ndf/templates/ndf/mis_details.html:455
+msgid "Select Groups"
+msgstr "समूह चुनें"
+
+#: gnowsys_ndf/ndf/templates/ndf/action_panel.html:165
+msgid "Save selected group"
+msgstr "समूह चुनें"
+
+#: gnowsys_ndf/ndf/templates/ndf/action_panel.html:176
+#: gnowsys_ndf/ndf/templates/ndf/action_panel.html:178
+#: gnowsys_ndf/ndf/templates/ndf/course_detail.html:149
+#: gnowsys_ndf/ndf/templates/ndf/discussion.html:87
+#: gnowsys_ndf/ndf/templates/ndf/discussion.html:269
+#: gnowsys_ndf/ndf/templates/ndf/forumdetails.html:122
+#: gnowsys_ndf/ndf/templates/ndf/list_themes.html:60
+#: gnowsys_ndf/ndf/templates/ndf/nussd_course_create_edit.html:304
+#: gnowsys_ndf/ndf/templates/ndf/page_list.html:240
+#: gnowsys_ndf/ndf/templates/ndf/replytwistrep.html:174
+#: gnowsys_ndf/ndf/templates/ndf/thread_details.html:101
+#: gnowsys_ndf/ndf/templates/ndf/trainer_create_edit.html:526
+#: gnowsys_ndf/ndf/templates/ndf/videoDashboard.html:51
+msgid "Delete"
+msgstr "मिटाएं"
+
+#: gnowsys_ndf/ndf/templates/ndf/action_panel.html:181
+#: gnowsys_ndf/ndf/templates/ndf/beta.html:53
+msgid "Delete "
+msgstr "मिटाएं"
+
+#: gnowsys_ndf/ndf/templates/ndf/action_panel.html:224
+#: gnowsys_ndf/ndf/templates/ndf/custom_template_for_app.html:407
+#: gnowsys_ndf/ndf/templates/ndf/mis_create_edit.html:295
+#: gnowsys_ndf/ndf/templates/ndf/quiz_item_create_edit.html:98
+msgid "Tags"
+msgstr "टैग्स"
+
+#: gnowsys_ndf/ndf/templates/ndf/action_panel.html:238
+msgid "No tags defined yet!"
+msgstr "कोई टैग जोड़ा नहीं गया है"
+
+#: gnowsys_ndf/ndf/templates/ndf/action_panel.html:249
+msgid "Rating"
+msgstr "रेटिंग"
+
+#: gnowsys_ndf/ndf/templates/ndf/action_panel.html:260
+#: gnowsys_ndf/ndf/templates/ndf/custom_template_for_app.html:214
+#: gnowsys_ndf/ndf/templates/ndf/custom_template_for_app.html:218
+#: gnowsys_ndf/ndf/templates/ndf/mis_details.html:133
+#: gnowsys_ndf/ndf/templates/ndf/wikidata.html:107
+msgid "Location"
+msgstr "स्थान"
+
+#: gnowsys_ndf/ndf/templates/ndf/action_panel.html:310
+#: gnowsys_ndf/ndf/templates/ndf/group.html:51
+msgid "New Group"
+msgstr "नया समूह"
+
+#: gnowsys_ndf/ndf/templates/ndf/action_panel.html:317
+#: gnowsys_ndf/ndf/templates/ndf/action_panel.html:321
+#: gnowsys_ndf/ndf/templates/ndf/action_panel.html:325
+#: gnowsys_ndf/ndf/templates/ndf/action_panel.html:328
+#: gnowsys_ndf/ndf/templates/ndf/partner_list.html:18
+#: gnowsys_ndf/ndf/templates/ndf/quiz_list.html:30
+#: gnowsys_ndf/ndf/templates/ndf/task.html:29
+#: gnowsys_ndf/ndf/templates/ndf/task.html:62
+#: gnowsys_ndf/ndf/templates/ndf/task_create_edit.html:187
+msgid "New"
+msgstr "नया"
+
+#: gnowsys_ndf/ndf/templates/ndf/action_panel.html:348
+msgid "New Sub Partner"
+msgstr "पार्टर्नस"
+
+#: gnowsys_ndf/ndf/templates/ndf/action_panel.html:350
+msgid "New SubGroup"
+msgstr "नया उप-समूह"
+
+#: gnowsys_ndf/ndf/templates/ndf/action_panel.html:352
+msgid "New Program"
+msgstr "नया कार्य"
+
+#: gnowsys_ndf/ndf/templates/ndf/action_panel.html:370
+#: gnowsys_ndf/ndf/templates/ndf/groupdashboard.html:178
+msgid "List Members"
+msgstr "सदस्यों की सूची"
+
+#: gnowsys_ndf/ndf/templates/ndf/action_panel.html:378
+msgid "Unsubscribe"
+msgstr "विवरण दें"
+
+#: gnowsys_ndf/ndf/templates/ndf/action_panel.html:390
+#: gnowsys_ndf/ndf/templates/ndf/action_panel.html:403
+msgid "Join"
+msgstr ""
+
+#: gnowsys_ndf/ndf/templates/ndf/action_panel.html:392
+#: gnowsys_ndf/ndf/templates/ndf/task.html:66
+#: gnowsys_ndf/ndf/templates/ndf/task_create_edit.html:191
+msgid "Closed"
+msgstr ""
+
+#: gnowsys_ndf/ndf/templates/ndf/action_panel.html:400
+msgid "Joined"
+msgstr ""
+
+#: gnowsys_ndf/ndf/templates/ndf/action_panel.html:420
+#: gnowsys_ndf/ndf/templates/ndf/under_moderation.html:23
+msgid "Moderate Resources"
+msgstr "संसाधन"
+
+#: gnowsys_ndf/ndf/templates/ndf/action_panel.html:426
+#: gnowsys_ndf/ndf/templates/ndf/program_event_group.html:18
+msgid "Moderation Status"
+msgstr "सृजित तिथि"
+
+#: gnowsys_ndf/ndf/templates/ndf/add_editor.html:85
+#: gnowsys_ndf/ndf/templates/ndf/add_editor.html:88
+#, fuzzy, python-format
+msgid "  %(content)s "
+msgstr "विषय-वस्तुः"
+
+#: gnowsys_ndf/ndf/templates/ndf/add_editor.html:174
+msgid "Add Internal Image"
+msgstr ""
+
+#: gnowsys_ndf/ndf/templates/ndf/add_editor.html:174
+#: gnowsys_ndf/ndf/templates/ndf/add_editor.html:259
+#: gnowsys_ndf/ndf/templates/ndf/image_detail.html:4
+#: gnowsys_ndf/ndf/templates/ndf/node_edit_base.html:369
+#: gnowsys_ndf/ndf/templates/ndf/topic_create_edit.html:247
+msgid "Image"
+msgstr "चित्र"
+
+#: gnowsys_ndf/ndf/templates/ndf/add_editor.html:174
+#: gnowsys_ndf/ndf/templates/ndf/add_editor.html:259
+#: gnowsys_ndf/ndf/templates/ndf/create_event_group.html:325
+#: gnowsys_ndf/ndf/templates/ndf/create_group.html:300
+#: gnowsys_ndf/ndf/templates/ndf/task_details.html:275
+#: gnowsys_ndf/ndf/templates/ndf/translation_page.html:111
+#: gnowsys_ndf/ndf/templates/ndf/translation_page.html:197
+msgid "Description"
+msgstr "विवरण"
+
+#: gnowsys_ndf/ndf/templates/ndf/add_editor.html:174
+#: gnowsys_ndf/ndf/templates/ndf/add_editor.html:260
+msgid "Some description"
+msgstr "विवरण"
+
+#: gnowsys_ndf/ndf/templates/ndf/add_editor.html:174
+msgid "Width"
+msgstr ""
+
+#: gnowsys_ndf/ndf/templates/ndf/add_editor.html:174
+#: gnowsys_ndf/ndf/templates/ndf/add_editor.html:262
+msgid "Enter width in pixel eg.600"
+msgstr ""
+
+#: gnowsys_ndf/ndf/templates/ndf/add_editor.html:241
+msgid "citation has been inserted"
+msgstr ""
+
+#: gnowsys_ndf/ndf/templates/ndf/add_editor.html:247
+msgid "Add Internal/External Images"
+msgstr ""
+
+#: gnowsys_ndf/ndf/templates/ndf/add_editor.html:249
+msgid "External"
+msgstr ""
+
+#: gnowsys_ndf/ndf/templates/ndf/add_editor.html:250
+msgid "Internal"
+msgstr "इंटरैक्टिवस"
+
+#: gnowsys_ndf/ndf/templates/ndf/add_editor.html:257
+msgid "Add External Image"
+msgstr ""
+
+#: gnowsys_ndf/ndf/templates/ndf/add_editor.html:264
+msgid "Enter Image path"
+msgstr ""
+
+#: gnowsys_ndf/ndf/templates/ndf/add_editor.html:264
+msgid "eg"
+msgstr ""
+
+#: gnowsys_ndf/ndf/templates/ndf/adminDashboard.html:76
+msgid "Select Collections"
+msgstr "संग्रह चुनें"
+
+#: gnowsys_ndf/ndf/templates/ndf/adminDashboard.html:128
+msgid "Group(s)"
+msgstr "समूह"
+
+#: gnowsys_ndf/ndf/templates/ndf/adminDashboard.html:130
+msgid "Type(s)"
+msgstr "प्रकार"
+
+#: gnowsys_ndf/ndf/templates/ndf/adminDashboard.html:131
+msgid "Author"
+msgstr "लेखक"
+
+#: gnowsys_ndf/ndf/templates/ndf/adminDashboard.html:132
+#: gnowsys_ndf/ndf/templates/ndf/custom_template_for_app.html:120
+#: gnowsys_ndf/ndf/templates/ndf/list_themes.html:32
+#: gnowsys_ndf/ndf/templates/ndf/theme.html:357
+msgid "Creation date"
+msgstr "सृजित तिथि"
+
+#: gnowsys_ndf/ndf/templates/ndf/adminDashboard.html:134
+#: gnowsys_ndf/ndf/templates/ndf/user_profile_form.html:82
+#: gnowsys_ndf/ndf/templates/ndf/wikidata.html:207
+msgid "Member of"
+msgstr "सदस्य"
+
+#: gnowsys_ndf/ndf/templates/ndf/adminDashboard.html:135
+#: gnowsys_ndf/ndf/templates/ndf/node_edit_base.html:120
+#: gnowsys_ndf/ndf/templates/ndf/theme_create_edit.html:59
+#: gnowsys_ndf/ndf/templates/ndf/topic_create_edit.html:57
+msgid "Collection"
+msgstr "संग्रह"
+
+#: gnowsys_ndf/ndf/templates/ndf/adminDashboard.html:136
+msgid "AttributeType_set"
+msgstr "ऐट्रीब्यूट टाइप सेट"
+
+#: gnowsys_ndf/ndf/templates/ndf/adminDashboard.html:137
+msgid "RelationType_set"
+msgstr "रिलेशन टाइप सेट"
+
+#: gnowsys_ndf/ndf/templates/ndf/adminDashboard.html:195
+#: gnowsys_ndf/ndf/templates/ndf/list_themes.html:57
+#: gnowsys_ndf/ndf/templates/ndf/theme.html:382
+msgid "Translate"
+msgstr "अनुवाद करें"
+
+#: gnowsys_ndf/ndf/templates/ndf/admin_fields.html:47
+#: gnowsys_ndf/ndf/templates/ndf/custom_template_for_app.html:329
+#: gnowsys_ndf/ndf/templates/ndf/custom_template_for_app.html:331
+#: gnowsys_ndf/ndf/templates/ndf/custom_template_for_app.html:365
+#: gnowsys_ndf/ndf/templates/ndf/custom_template_for_app.html:367
+#: gnowsys_ndf/ndf/templates/ndf/mis_create_edit.html:176
+#: gnowsys_ndf/ndf/templates/ndf/mis_create_edit.html:178
+msgid "Unknown"
+msgstr "अज्ञात"
+
+#: gnowsys_ndf/ndf/templates/ndf/admin_fields.html:48
+#: gnowsys_ndf/ndf/templates/ndf/custom_template_for_app.html:335
+#: gnowsys_ndf/ndf/templates/ndf/custom_template_for_app.html:337
+#: gnowsys_ndf/ndf/templates/ndf/group_dashboard.html:118
+#: gnowsys_ndf/ndf/templates/ndf/mis_create_edit.html:182
+#: gnowsys_ndf/ndf/templates/ndf/mis_create_edit.html:184
+#: gnowsys_ndf/ndf/templates/ndf/moderation_data_review.html:47
+msgid "Yes"
+msgstr "हाँ"
+
+#: gnowsys_ndf/ndf/templates/ndf/admin_fields.html:49
+#: gnowsys_ndf/ndf/templates/ndf/custom_template_for_app.html:341
+#: gnowsys_ndf/ndf/templates/ndf/group_dashboard.html:121
+#: gnowsys_ndf/ndf/templates/ndf/mis_create_edit.html:188
+#: gnowsys_ndf/ndf/templates/ndf/mis_create_edit.html:190
+#: gnowsys_ndf/ndf/templates/ndf/moderation_data_review.html:48
+#: gnowsys_ndf/ndf/templates/ndf/page_list.html:135
+msgid "No"
+msgstr "नहीं"
+
+#: gnowsys_ndf/ndf/templates/ndf/admin_fields.html:57
+msgid "PUBLISHED"
+msgstr "प्रकाशित"
+
+#: gnowsys_ndf/ndf/templates/ndf/admin_fields.html:58
+msgid "DRAFT"
+msgstr "प्रारूप"
+
+#: gnowsys_ndf/ndf/templates/ndf/admin_fields.html:59
+msgid "HIDDEN"
+msgstr "छिपा हुआ"
+
+#: gnowsys_ndf/ndf/templates/ndf/all_under_moderation_status.html:15
+msgid "Underlying Moderation Groups:"
+msgstr "अंडरलाईन मोडरेशन ग्रुप"
+
+#: gnowsys_ndf/ndf/templates/ndf/announced_course_create_edit.html:7
+#: gnowsys_ndf/ndf/templates/ndf/announced_course_create_edit.html:60
+msgid "Course Announcement "
+msgstr "पाठयक्रम घोषणा"
+
+#: gnowsys_ndf/ndf/templates/ndf/announced_course_create_edit.html:58
+#: gnowsys_ndf/ndf/templates/ndf/studentcourseenrollment_create_edit.html:69
+#, python-format
+msgid " Editing %(title_var)s: %(node_name)s "
+msgstr ""
+
+#: gnowsys_ndf/ndf/templates/ndf/announced_course_create_edit.html:68
+#: gnowsys_ndf/ndf/templates/ndf/event_create_edit.html:75
+#: gnowsys_ndf/ndf/templates/ndf/nussd_course_create_edit.html:88
+#: gnowsys_ndf/ndf/templates/ndf/organization_create_edit.html:22
+#: gnowsys_ndf/ndf/templates/ndf/person_create_edit.html:22
+#: gnowsys_ndf/ndf/templates/ndf/student_create_edit.html:22
+#: gnowsys_ndf/ndf/templates/ndf/trainer_create_edit.html:109
+msgid "Fill"
+msgstr "भरें"
+
+#: gnowsys_ndf/ndf/templates/ndf/announced_course_create_edit.html:74
+#: gnowsys_ndf/ndf/templates/ndf/studentcourseenrollment_create_edit.html:81
+#, python-format
+msgid " %(tab_name)s "
+msgstr ""
+
+#: gnowsys_ndf/ndf/templates/ndf/announced_course_create_edit.html:92
+#: gnowsys_ndf/ndf/templates/ndf/announced_course_create_edit.html:101
+#: gnowsys_ndf/ndf/templates/ndf/create_course_structure.html:188
+#: gnowsys_ndf/ndf/templates/ndf/create_course_structure.html:213
+#: gnowsys_ndf/ndf/templates/ndf/create_course_structure.html:247
+#: gnowsys_ndf/ndf/templates/ndf/create_course_structure.html:258
+#: gnowsys_ndf/ndf/templates/ndf/create_course_structure.html:271
+#: gnowsys_ndf/ndf/templates/ndf/create_course_structure.html:284
+#: gnowsys_ndf/ndf/templates/ndf/create_course_structure.html:293
+#: gnowsys_ndf/ndf/templates/ndf/student_create_edit.html:47
+#: gnowsys_ndf/ndf/templates/ndf/student_create_edit.html:59
+#: gnowsys_ndf/ndf/templates/ndf/student_create_edit.html:71
+#: gnowsys_ndf/ndf/templates/ndf/student_create_edit.html:87
+#: gnowsys_ndf/ndf/templates/ndf/student_create_edit.html:99
+#: gnowsys_ndf/ndf/templates/ndf/student_create_edit.html:111
+#: gnowsys_ndf/ndf/templates/ndf/student_create_edit.html:137
+#: gnowsys_ndf/ndf/templates/ndf/student_create_edit.html:203
+#: gnowsys_ndf/ndf/templates/ndf/student_create_edit.html:251
+#: gnowsys_ndf/ndf/templates/ndf/student_create_edit.html:264
+#: gnowsys_ndf/ndf/templates/ndf/student_create_edit.html:279
+#: gnowsys_ndf/ndf/templates/ndf/student_create_edit.html:292
+#: gnowsys_ndf/ndf/templates/ndf/student_create_edit.html:307
+#: gnowsys_ndf/ndf/templates/ndf/student_create_edit.html:320
+#: gnowsys_ndf/ndf/templates/ndf/student_create_edit.html:335
+#: gnowsys_ndf/ndf/templates/ndf/studentcourseenrollment_create_edit.html:202
+#: gnowsys_ndf/ndf/templates/ndf/trainer_create_edit.html:134
+#: gnowsys_ndf/ndf/templates/ndf/trainer_create_edit.html:146
+#: gnowsys_ndf/ndf/templates/ndf/trainer_create_edit.html:158
+#: gnowsys_ndf/ndf/templates/ndf/trainer_create_edit.html:174
+#: gnowsys_ndf/ndf/templates/ndf/trainer_create_edit.html:186
+#: gnowsys_ndf/ndf/templates/ndf/trainer_create_edit.html:198
+#: gnowsys_ndf/ndf/templates/ndf/trainer_create_edit.html:278
+#: gnowsys_ndf/ndf/templates/ndf/trainer_create_edit.html:311
+#: gnowsys_ndf/ndf/templates/ndf/trainer_create_edit.html:324
+#: gnowsys_ndf/ndf/templates/ndf/trainer_create_edit.html:339
+#: gnowsys_ndf/ndf/templates/ndf/trainer_create_edit.html:352
+#: gnowsys_ndf/ndf/templates/ndf/trainer_create_edit.html:367
+#: gnowsys_ndf/ndf/templates/ndf/trainer_create_edit.html:380
+#: gnowsys_ndf/ndf/templates/ndf/trainer_create_edit.html:395
+#: gnowsys_ndf/ndf/templates/ndf/trainer_create_edit.html:427
+#, python-format
+msgid " %(label_val)s "
+msgstr ""
+
+#: gnowsys_ndf/ndf/templates/ndf/announced_course_create_edit.html:113
+msgid "Announced for"
+msgstr "के लिए घोषणा"
+
+#: gnowsys_ndf/ndf/templates/ndf/announced_course_create_edit.html:135
+msgid "Course Period"
+msgstr "पाठ्यक्रम कालांश"
+
+#: gnowsys_ndf/ndf/templates/ndf/announced_course_create_edit.html:140
+#: gnowsys_ndf/ndf/templates/ndf/studentcourseenrollment_create_edit.html:143
+#: gnowsys_ndf/ndf/templates/ndf/studentcourseenrollment_create_edit.html:182
+msgid "From"
+msgstr "से"
+
+#: gnowsys_ndf/ndf/templates/ndf/announced_course_create_edit.html:148
+#: gnowsys_ndf/ndf/templates/ndf/studentcourseenrollment_create_edit.html:153
+#: gnowsys_ndf/ndf/templates/ndf/studentcourseenrollment_create_edit.html:192
+msgid "To"
+msgstr "तक"
+
+#: gnowsys_ndf/ndf/templates/ndf/announced_course_create_edit.html:164
+msgid "Announced in College(s)"
+msgstr "संस्था में घोषणा"
+
+#: gnowsys_ndf/ndf/templates/ndf/announced_course_create_edit.html:166
+msgid "Select University"
+msgstr "संस्था चुनें"
+
+#: gnowsys_ndf/ndf/templates/ndf/announced_course_create_edit.html:176
+#: gnowsys_ndf/ndf/templates/ndf/trainer_create_edit.html:482
+msgid "- - - Select University - - -"
+msgstr "संस्था चुनें"
+
+#: gnowsys_ndf/ndf/templates/ndf/announced_course_create_edit.html:182
+msgid "Please select University"
+msgstr "कृपया संस्था चुनें"
+
+#: gnowsys_ndf/ndf/templates/ndf/announced_course_create_edit.html:717
+#: gnowsys_ndf/ndf/templates/ndf/drawer_widget.html:190
+#: gnowsys_ndf/ndf/templates/ndf/event_create_edit.html:175
+#: gnowsys_ndf/ndf/templates/ndf/nussd_course_create_edit.html:612
+#: gnowsys_ndf/ndf/templates/ndf/organization_create_edit.html:275
+#: gnowsys_ndf/ndf/templates/ndf/person_create_edit.html:297
+#: gnowsys_ndf/ndf/templates/ndf/student_create_edit.html:680
+#: gnowsys_ndf/ndf/templates/ndf/trainer_create_edit.html:1270
+msgid "Next"
+msgstr "आगे"
+
+#: gnowsys_ndf/ndf/templates/ndf/announced_course_create_edit.html:723
+#: gnowsys_ndf/ndf/templates/ndf/course_detail.html:75
+msgid "Announce"
+msgstr "घोषणा करें"
+
+#: gnowsys_ndf/ndf/templates/ndf/announced_course_create_edit.html:726
+#: gnowsys_ndf/ndf/templates/ndf/event_create_edit.html:184
+#: gnowsys_ndf/ndf/templates/ndf/nussd_course_create_edit.html:621
+#: gnowsys_ndf/ndf/templates/ndf/organization_create_edit.html:284
+#: gnowsys_ndf/ndf/templates/ndf/person_create_edit.html:306
+#: gnowsys_ndf/ndf/templates/ndf/student_create_edit.html:689
+#: gnowsys_ndf/ndf/templates/ndf/trainer_create_edit.html:1279
+msgid "Update"
+msgstr "अद्यतन"
+
+#: gnowsys_ndf/ndf/templates/ndf/announced_course_create_edit.html:735
+#: gnowsys_ndf/ndf/templates/ndf/drawer_widget.html:133
+#: gnowsys_ndf/ndf/templates/ndf/event_create_edit.html:193
+#: gnowsys_ndf/ndf/templates/ndf/node_ajax_content.html:445
+#: gnowsys_ndf/ndf/templates/ndf/node_ajax_content.html:459
+#: gnowsys_ndf/ndf/templates/ndf/nussd_course_create_edit.html:630
+#: gnowsys_ndf/ndf/templates/ndf/organization_create_edit.html:293
+#: gnowsys_ndf/ndf/templates/ndf/person_create_edit.html:315
+#: gnowsys_ndf/ndf/templates/ndf/student_create_edit.html:698
+#: gnowsys_ndf/ndf/templates/ndf/trainer_create_edit.html:1288
+msgid "Previous"
+msgstr "पिछला"
+
+#: gnowsys_ndf/ndf/templates/ndf/approval_data_review.html:29
+msgid "Course Code: "
+msgstr "पाठ्यक्रम कोड"
+
+#: gnowsys_ndf/ndf/templates/ndf/approval_data_review.html:30
+msgid "Enrollment Completed On: "
+msgstr "नामांकन पूर्ण तिथि:"
+
+#: gnowsys_ndf/ndf/templates/ndf/approval_data_review.html:37
+msgid "Sr. #"
+msgstr "Sr. #"
+
+#: gnowsys_ndf/ndf/templates/ndf/attendees_widget.html:24
+msgid "Add Attendance"
+msgstr "उपस्थिति जोड़ें"
+
+#: gnowsys_ndf/ndf/templates/ndf/attendees_widget.html:30
+#: gnowsys_ndf/ndf/templates/ndf/event_details.html:73
+msgid "Attendance"
+msgstr "उपस्थिति"
+
+#: gnowsys_ndf/ndf/templates/ndf/attendees_widget.html:36
+#: gnowsys_ndf/ndf/templates/ndf/batch_detail.html:42
+msgid "Batch"
+msgstr "बैच"
+
+#: gnowsys_ndf/ndf/templates/ndf/attendees_widget.html:41
+msgid "Select the Batch"
+msgstr "बैच चुनें"
+
+#: gnowsys_ndf/ndf/templates/ndf/attendees_widget.html:50
+msgid "Majority"
+msgstr "बहुसंख्य"
+
+#: gnowsys_ndf/ndf/templates/ndf/attendees_widget.html:58
+#: gnowsys_ndf/ndf/templates/ndf/attendees_widget.html:88
+msgid "Present"
+msgstr "उपस्थित"
+
+#: gnowsys_ndf/ndf/templates/ndf/attendees_widget.html:63
+#: gnowsys_ndf/ndf/templates/ndf/attendees_widget.html:89
+msgid "Absent"
+msgstr "अनुपस्थित"
+
+#: gnowsys_ndf/ndf/templates/ndf/attendees_widget.html:79
+msgid "All Students - Mark the attendance"
+msgstr "सभी छात्र उपस्थिति अंकित करें"
+
+#: gnowsys_ndf/ndf/templates/ndf/attendees_widget.html:85
+msgid "Students Name"
+msgstr "छात्र का नाम"
+
+#: gnowsys_ndf/ndf/templates/ndf/attendees_widget.html:109
+#: gnowsys_ndf/ndf/templates/ndf/mis_report.html:55
+msgid "Student"
+msgstr "छात्र"
+
+#: gnowsys_ndf/ndf/templates/ndf/attendees_widget.html:111
+msgid "Done"
+msgstr "पूर्ण हुआ"
+
+#: gnowsys_ndf/ndf/templates/ndf/attendees_widget.html:120
+msgid "Present Students"
+msgstr "उपस्थित छात्र"
+
+#: gnowsys_ndf/ndf/templates/ndf/attendees_widget.html:121
+#: gnowsys_ndf/ndf/templates/ndf/attendees_widget.html:129
+msgid "Student "
+msgstr "छात्र"
+
+#: gnowsys_ndf/ndf/templates/ndf/attendees_widget.html:128
+msgid "Absent Students"
+msgstr "अनुपस्थित छात्र"
+
+#: gnowsys_ndf/ndf/templates/ndf/batch.html:5
+#, python-format
+msgid " %(title)s  "
+msgstr ""
+
+#: gnowsys_ndf/ndf/templates/ndf/batch.html:81
+#: gnowsys_ndf/ndf/templates/ndf/new_create_batch.html:114
+#: gnowsys_ndf/ndf/templates/ndf/trainer_create_edit.html:523
+msgid "Course Type"
+msgstr "पाठ्यक्रम के प्रकार"
+
+#: gnowsys_ndf/ndf/templates/ndf/batch.html:87
+#: gnowsys_ndf/ndf/templates/ndf/new_create_batch.html:123
+msgid "Name of Course"
+msgstr "पाठ्यक्रम का नाम"
+
+#: gnowsys_ndf/ndf/templates/ndf/batch.html:172
+#: gnowsys_ndf/ndf/templates/ndf/new_create_batch.html:229
+msgid " - - - Select course - - - "
+msgstr "पाठ्यक्रम चुनें"
+
+#: gnowsys_ndf/ndf/templates/ndf/action_panel.html:104
+#: gnowsys_ndf/ndf/templates/ndf/action_panel.html:106
+#: gnowsys_ndf/ndf/templates/ndf/action_panel.html:111
+#: gnowsys_ndf/ndf/templates/ndf/batch_detail.html:19
+#: gnowsys_ndf/ndf/templates/ndf/course_detail.html:149
+#: gnowsys_ndf/ndf/templates/ndf/course_details.html:50
+#: gnowsys_ndf/ndf/templates/ndf/course_details.html:144
+#: gnowsys_ndf/ndf/templates/ndf/custom_template_for_app.html:121
+#: gnowsys_ndf/ndf/templates/ndf/custom_template_for_app.html:136
+#: gnowsys_ndf/ndf/templates/ndf/forumdetails.html:115
+#: gnowsys_ndf/ndf/templates/ndf/mis_base_list.html:111
+#: gnowsys_ndf/ndf/templates/ndf/mis_base_list.html:115
+#: gnowsys_ndf/ndf/templates/ndf/mis_details.html:446
+#: gnowsys_ndf/ndf/templates/ndf/mis_details.html:469
+#: gnowsys_ndf/ndf/templates/ndf/mis_list.html:256
+#: gnowsys_ndf/ndf/templates/ndf/task_details.html:53
+#: gnowsys_ndf/ndf/templates/ndf/task_details.html:176
+#: gnowsys_ndf/ndf/templates/ndf/theme.html:359
+msgid "Edit"
+msgstr "संपादित करें"
+
+#: gnowsys_ndf/ndf/templates/ndf/batch_detail.html:27
+#: gnowsys_ndf/ndf/templates/ndf/module_detail.html:60
+msgid "ago edited by  "
+msgstr "द्वारा संपादित पूर्व"
+
+#: gnowsys_ndf/ndf/templates/ndf/batch_detail.html:27
+msgid "User"
+msgstr "उपयोगकर्ता"
+
+#: gnowsys_ndf/ndf/templates/ndf/batch_detail.html:27
+msgid "View history "
+msgstr "इतिहास देखें"
+
+#: gnowsys_ndf/ndf/templates/ndf/beta.html:41
+msgid "File Size "
+msgstr "फ़ाइल आकार"
+
+#: gnowsys_ndf/ndf/templates/ndf/beta.html:44
+msgid "File Type"
+msgstr "फाइल प्रकार"
+
+#: gnowsys_ndf/ndf/templates/ndf/beta.html:47
+msgid "Posted by "
+msgstr "प्रेषक"
+
+#: gnowsys_ndf/ndf/templates/ndf/beta.html:50
+#: gnowsys_ndf/ndf/templates/ndf/node_ajax_content.html:543
+msgid "Download "
+msgstr "डाउनलोड"
+
+#: gnowsys_ndf/ndf/templates/ndf/beta.html:87
+msgid "Nothing found!"
+msgstr "कुछ भी नहीं मिला"
+
+#: gnowsys_ndf/ndf/templates/ndf/course.html:30
+msgid " New Course"
+msgstr "पाठ्यक्रम का नाम"
+
+#: gnowsys_ndf/ndf/templates/ndf/course.html:34
+msgid " New Event"
+msgstr "इवेंट"
+
+#: gnowsys_ndf/ndf/templates/ndf/course.html:47
+msgid "All eCourses"
+msgstr "सभी पाठ्यक्रम"
+
+#: gnowsys_ndf/ndf/templates/ndf/course.html:47
+#: gnowsys_ndf/ndf/templates/ndf/program_event_group.html:11
+msgid "All Events"
+msgstr "इवेंटस जोड़ें"
+
+#: gnowsys_ndf/ndf/templates/ndf/course.html:49
+msgid "My eCourses"
+msgstr "मेरे पाठ्यक्रम"
+
+#: gnowsys_ndf/ndf/templates/ndf/course.html:49
+msgid "My Events"
+msgstr "इवेंटस"
+
+#: gnowsys_ndf/ndf/templates/ndf/course.html:52
+msgid "Courses"
+msgstr "पाठ्यक्रम"
+
+#: gnowsys_ndf/ndf/templates/ndf/course_create_edit.html:13
+msgid ""
+" <h3>Building of a Course </h3>\n"
+"  <p class=\"text-justify\"><b>Course</b> is a sequence of learning modules."
+"</p>"
+msgstr ""
+"<h3>पाठ्यक्रम निर्माण </h3>\n"
+"  <p class=\"text-justify\"><b>पाठ्यक्रम</b> पहले से तैयार क्रमबद्ध संग्रह है</p>"
+
+#: gnowsys_ndf/ndf/templates/ndf/course_create_edit.html:22
+msgid "Upload thumbnail : "
+msgstr "फ़ाइल अपलोड करें"
+
+#: gnowsys_ndf/ndf/templates/ndf/course_create_edit.html:31
+#: gnowsys_ndf/ndf/templates/ndf/create_event_group.html:303
+#: gnowsys_ndf/ndf/templates/ndf/create_partner.html:138
+msgid "View existing thumbnail "
+msgstr ""
+
+#: gnowsys_ndf/ndf/templates/ndf/course_detail.html:66
+#: gnowsys_ndf/ndf/templates/ndf/course_details.html:65
+msgid "View history"
+msgstr "इतिहास देखें"
+
+#: gnowsys_ndf/ndf/templates/ndf/course_detail.html:76
+#: gnowsys_ndf/ndf/templates/ndf/course_details.html:29
+#: gnowsys_ndf/ndf/templates/ndf/course_event_group.html:26
+msgid "Edit  Course Structure"
+msgstr "पाठ्यक्रम संरचना संपादित करें"
+
+#: gnowsys_ndf/ndf/templates/ndf/course_detail.html:76
+#: gnowsys_ndf/ndf/templates/ndf/course_details.html:29
+#: gnowsys_ndf/ndf/templates/ndf/course_event_group.html:26
+msgid "Add  Course Structure"
+msgstr "पाठ्यक्रम संरचना जोड़ें"
+
+#: gnowsys_ndf/ndf/templates/ndf/course_detail.html:146
+msgid "You have not added any content to this course yet"
+msgstr "आपने अभी तक पाठ्यक्रम में विषय-वस्तु नहीं जोड़ी है"
+
+#: gnowsys_ndf/ndf/templates/ndf/course_details.html:76
+#: gnowsys_ndf/ndf/templates/ndf/student_enroll.html:113
+msgid "Course Details"
+msgstr "पाठ्यक्रम विवरण"
+
+#: gnowsys_ndf/ndf/templates/ndf/course_details.html:80
+msgid "Course Registration Details "
+msgstr "पाठ्यक्रम पंजीकरण विवरण"
+
+#: gnowsys_ndf/ndf/templates/ndf/course_event_group.html:40
+msgid "Release Date"
+msgstr "कृपया सेट करें"
+
+#: gnowsys_ndf/ndf/templates/ndf/course_event_group.html:148
+msgid "Only image files can be uploaded!"
+msgstr ""
+
+#: gnowsys_ndf/ndf/templates/ndf/course_event_group.html:160
+msgid "Please wait your file is uploading.."
+msgstr "कृपया प्रतीक्षा करें, प्रोफ़ाइल तस्वीर अपलोड हो रही है"
+
+#: gnowsys_ndf/ndf/templates/ndf/course_event_group.html:167
+#: gnowsys_ndf/ndf/templates/ndf/group_dashboard.html:440
+#: gnowsys_ndf/ndf/templates/ndf/group_dashboard.html:480
+#: gnowsys_ndf/ndf/templates/ndf/upload_pic_widget.html:217
+msgid "Please select an image to set it as a profile picture !"
+msgstr "प्रोफ़ाइल तस्वीर सेट करने के लिए चित्र फाइल का ही चयन करें"
+
+#: gnowsys_ndf/ndf/templates/ndf/course_units.html:104
+msgid "Unit Name: "
+msgstr "इकाई का नाम"
+
+#: gnowsys_ndf/ndf/templates/ndf/course_units.html:153
+#: gnowsys_ndf/ndf/templates/ndf/node_details_base.html:94
+msgid "Add New Page: "
+msgstr "नया पृष्ठ जोड़ें"
+
+#: gnowsys_ndf/ndf/templates/ndf/course_units.html:166
+#: gnowsys_ndf/ndf/templates/ndf/node_details_base.html:126
+msgid "Add New File: "
+msgstr "नई फ़ाइल जोड़ें"
+
+#: gnowsys_ndf/ndf/templates/ndf/create_batch.html:125
+msgid "Enter Batch Name"
+msgstr "बैच का नाम अंकित करें"
+
+#: gnowsys_ndf/ndf/templates/ndf/create_batch.html:134
+msgid "Choose users"
+msgstr "उपयोगकर्ता चुनें"
+
+#: gnowsys_ndf/ndf/templates/ndf/create_event_group.html:24
+#: gnowsys_ndf/ndf/templates/ndf/create_group.html:15
+msgid ""
+"\n"
+"    <h3>Types of Groups</h3>\n"
+"    <hr/>\n"
+"    <h5>Open Groups</h5>\n"
+"    <p class=\"subheader\">Open groups are ideal for projects that require a "
+"high level of collaboration and participation. Any metastudio user can join "
+"this group without prior approval</p>\n"
+"    <h5>Closed Groups</h5>\n"
+"    <p class=\"subheader\">Closed groups are ideal for projects that require "
+"restricted access to content and documents. Users can only join after their "
+"membership request is approved or have been invited.</p>\n"
+"  "
+msgstr ""
+"\n"
+"<h3>Types of Groups</h3>\n"
+"    <hr/>\n"
+"    <h5>Open Groups</h5>\n"
+"    <p class=\"subheader\">Open groups are ideal for projects that require a "
+"high level of collaboration and participation. Any metastudio user can join "
+"this group without prior approval</p>\n"
+"    <h5>Closed Groups</h5>\n"
+"    <p class=\"subheader\">Closed groups are ideal for projects that require "
+"restricted access to content and documents. Users can only join after their "
+"membership request is approved or have been invited.</p>"
+
+#: gnowsys_ndf/ndf/templates/ndf/create_event_group.html:40
+#: gnowsys_ndf/ndf/templates/ndf/node_edit_base.html:12
+msgid "Create "
+msgstr "सृजित करें"
+
+#: gnowsys_ndf/ndf/templates/ndf/create_event_group.html:65
+#: gnowsys_ndf/ndf/templates/ndf/create_group.html:64
+msgid "Group Name"
+msgstr "समूह का नाम"
+
+#: gnowsys_ndf/ndf/templates/ndf/create_event_group.html:69
+#: gnowsys_ndf/ndf/templates/ndf/create_group.html:68
+msgid "Enter the unique group name"
+msgstr "समूह को विशिष्ट नाम दें"
+
+#: gnowsys_ndf/ndf/templates/ndf/create_event_group.html:84
+#: gnowsys_ndf/ndf/templates/ndf/create_group.html:83
+msgid "Alternate Group Name"
+msgstr "समूह का वैकल्पिक नाम"
+
+#: gnowsys_ndf/ndf/templates/ndf/create_event_group.html:88
+#: gnowsys_ndf/ndf/templates/ndf/create_group.html:87
+msgid "Provide display/alternate group name"
+msgstr "समूह का वैकल्पिक / प्रदर्शन नाम"
+
+#: gnowsys_ndf/ndf/templates/ndf/create_event_group.html:103
+#: gnowsys_ndf/ndf/templates/ndf/create_group.html:102
+#: gnowsys_ndf/ndf/templates/ndf/create_sub_group.html:49
+#: gnowsys_ndf/ndf/templates/ndf/edit_group.html:107
+msgid "Group Type"
+msgstr "समूह प्रकार"
+
+#: gnowsys_ndf/ndf/templates/ndf/create_event_group.html:130
+msgid "Start Date"
+msgstr "आरंभ तिथिः"
+
+#: gnowsys_ndf/ndf/templates/ndf/create_event_group.html:148
+msgid "End Date"
+msgstr ""
+
+#: gnowsys_ndf/ndf/templates/ndf/create_event_group.html:168
+msgid "Enrollment Start Date"
+msgstr "नामांकन अवधि"
+
+#: gnowsys_ndf/ndf/templates/ndf/create_event_group.html:186
+msgid "Enrollment End Date"
+msgstr "नामांकन अवधि"
+
+#: gnowsys_ndf/ndf/templates/ndf/create_event_group.html:298
+#: gnowsys_ndf/ndf/templates/ndf/create_partner.html:133
+msgid "Upload thumbnail"
+msgstr "फ़ाइल अपलोड करें"
+
+#: gnowsys_ndf/ndf/templates/ndf/create_forum.html:49
+msgid ""
+"  <h3 class=\"subheader\">Starting Discussions</h3>\n"
+"    <p class=\"text-justify\">Use a relevant topic for the <b>forum</b> so "
+"that interested people can join the discussion</p> "
+msgstr ""
+"[Starting Discussions] [Use a relevant topic for the (forum) so that "
+"interested people can join the discussion]"
+
+#: gnowsys_ndf/ndf/templates/ndf/create_forum.html:55
+msgid "Create a new discussion thread"
+msgstr "एक नई विवरण कड़ी बनायें"
+
+#: gnowsys_ndf/ndf/templates/ndf/create_forum.html:63
+#: gnowsys_ndf/ndf/templates/ndf/edit_forum.html:87
+msgid "Forum name:"
+msgstr "फोरम नाम"
+
+#: gnowsys_ndf/ndf/templates/ndf/create_forum.html:65
+msgid "Enter the name of forum here"
+msgstr "समूह को विशिष्ट नाम दें"
+
+#: gnowsys_ndf/ndf/templates/ndf/create_forum.html:89
+#: gnowsys_ndf/ndf/templates/ndf/edit_forum.html:112
+#: gnowsys_ndf/ndf/templates/ndf/task_details.html:173
+msgid "Description:"
+msgstr "विवरणः"
+
+#: gnowsys_ndf/ndf/templates/ndf/create_forum.html:95
+msgid "Some description about forum"
+msgstr ""
+
+#: gnowsys_ndf/ndf/templates/ndf/create_forum.html:107
+msgid "Create forum"
+msgstr "फोरम बनाएँ"
+
+#: gnowsys_ndf/ndf/templates/ndf/create_forum.html:207
+msgid "Forum with same name already exist. Please choose another name"
+msgstr ""
+
+#: gnowsys_ndf/ndf/templates/ndf/create_forum.html:217
+#: gnowsys_ndf/ndf/templates/ndf/edit_forum.html:306
+msgid "Forum name cannot be empty"
+msgstr ""
+
+#: gnowsys_ndf/ndf/templates/ndf/create_group.html:33
+msgid "Create New Sub Group"
+msgstr "नया समूह बनाएं"
+
+#: gnowsys_ndf/ndf/templates/ndf/create_group.html:35
+msgid "Create New Group"
+msgstr "नया समूह बनाएं"
+
+#: gnowsys_ndf/ndf/templates/ndf/create_group.html:128
+msgid "Group Editing Policy"
+msgstr "समूह संपादन नीति"
+
+#: gnowsys_ndf/ndf/templates/ndf/create_group.html:153
+msgid "Level of moderation"
+msgstr "परिनियमित स्तर"
+
+#: gnowsys_ndf/ndf/templates/ndf/create_group.html:159
+msgid "Select Level"
+msgstr "स्तर चुनें"
+
+#: gnowsys_ndf/ndf/templates/ndf/create_group.html:168
+msgid "Please select moderation level."
+msgstr "कृपया परिनियमित स्तर चुनें"
+
+#: gnowsys_ndf/ndf/templates/ndf/create_group.html:273
+#: gnowsys_ndf/ndf/templates/ndf/create_sub_group.html:85
+#: gnowsys_ndf/ndf/templates/ndf/edit_group.html:187
+msgid "Group Agency Types"
+msgstr "समूह संस्था प्रकार"
+
+#: gnowsys_ndf/ndf/templates/ndf/create_partner.html:14
+msgid "Existing Partners:"
+msgstr "मौजूदा पार्टनर"
+
+#: gnowsys_ndf/ndf/templates/ndf/create_partner.html:99
+msgid "Please fill a valid email"
+msgstr "कृपया वैध < > भरें"
+
+#: gnowsys_ndf/ndf/templates/ndf/create_sub_group.html:9
+msgid ""
+"\n"
+"    <h3>Types of Groups</h3>\n"
+"    <h5>Open Groups</h5>\n"
+"    <p class=\"subheader\">Open groups are ideal for projects that require a "
+"high level of collaboration and participation. Any metastudio user can join "
+"this group without prior approval</p>\n"
+"    <h5>Closed Groups</h5>\n"
+"    <p class=\"subheader\">Closed groups are ideal for projects that require "
+"restricted access to content and documents. Users can only join after their "
+"membership request is approved or have been invited.</p>\n"
+"  "
+msgstr ""
+"\n"
+"<h3>Types of Groups</h3>\n"
+"    <h5>Open Groups</h5>\n"
+"    <p class=\"subheader\">Open groups are ideal for projects that require a "
+"high level of collaboration and participation. Any metastudio user can join "
+"this group without prior approval</p>\n"
+"    <h5>Closed Groups</h5>\n"
+"    <p class=\"subheader\">Closed groups are ideal for projects that require "
+"restricted access to content and documents. Users can only join after their "
+"membership request is approved or have been invited.</p>\n"
+"  "
+
+#: gnowsys_ndf/ndf/templates/ndf/create_sub_group.html:20
+msgid " Existing Groups:"
+msgstr "मौजूदा समूह"
+
+#: gnowsys_ndf/ndf/templates/ndf/create_sub_group.html:31
+#, fuzzy, python-format
+msgid " Create a sub group of %(maingroup)s  "
+msgstr "एक उप-समूह बनायें %"
+
+#: gnowsys_ndf/ndf/templates/ndf/create_sub_group.html:40
+msgid "Name of the Group"
+msgstr "समूह का नाम"
+
+#: gnowsys_ndf/ndf/templates/ndf/create_sub_group.html:53
+#: gnowsys_ndf/ndf/templates/ndf/edit_group.html:112
+msgid "PUBLIC"
+msgstr "सार्वजनिक"
+
+#: gnowsys_ndf/ndf/templates/ndf/create_sub_group.html:54
+#: gnowsys_ndf/ndf/templates/ndf/edit_group.html:113
+msgid "PRIVATE"
+msgstr "निजी"
+
+#: gnowsys_ndf/ndf/templates/ndf/create_sub_group.html:55
+#: gnowsys_ndf/ndf/templates/ndf/edit_group.html:114
+msgid "ANONYMOUS"
+msgstr "नामरहित"
+
+#: gnowsys_ndf/ndf/templates/ndf/create_sub_group.html:66
+msgid "EDITABLE_NON_MODERATED"
+msgstr "संपादन योग्य_अपरिनियमित"
+
+#: gnowsys_ndf/ndf/templates/ndf/create_sub_group.html:67
+msgid "EDITABLE_MODERATED"
+msgstr "संपादन योग्य_परिनियमित"
+
+#: gnowsys_ndf/ndf/templates/ndf/create_sub_group.html:68
+#: gnowsys_ndf/ndf/templates/ndf/edit_group.html:127
+msgid "NON_EDITABLE"
+msgstr "संपादन निषेद"
+
+#: gnowsys_ndf/ndf/templates/ndf/create_sub_group.html:76
+#: gnowsys_ndf/ndf/templates/ndf/edit_group.html:73
+#: gnowsys_ndf/ndf/templates/ndf/edit_group.html:140
+msgid "OPEN"
+msgstr "खोलें"
+
+#: gnowsys_ndf/ndf/templates/ndf/create_sub_group.html:77
+msgid "BY_REQUEST"
+msgstr "अनुरोध द्वारा"
+
+#: gnowsys_ndf/ndf/templates/ndf/create_sub_group.html:78
+msgid "BY_INVITATION"
+msgstr "निमंत्रण द्वारा"
+
+#: gnowsys_ndf/ndf/templates/ndf/create_sub_group.html:97
+#: gnowsys_ndf/ndf/templates/ndf/edit_group.html:162
+msgid "Group Member Visibility"
+msgstr "समूह सदस्य दृश्यता"
+
+#: gnowsys_ndf/ndf/templates/ndf/create_sub_group.html:101
+msgid "DISCLOSED_TO_MEM"
+msgstr "DISCLOSED_TO_MEM"
+
+#: gnowsys_ndf/ndf/templates/ndf/create_sub_group.html:102
+msgid "NOT_DISCLOSED_TO_MEM"
+msgstr "NOT_DISCLOSED_TO_MEM"
+
+#: gnowsys_ndf/ndf/templates/ndf/create_sub_group.html:109
+#: gnowsys_ndf/ndf/templates/ndf/edit_group.html:173
+msgid "Group Encryption policy"
+msgstr "समूह एन्क्रिप्शन नीति"
+
+#: gnowsys_ndf/ndf/templates/ndf/create_sub_group.html:113
+msgid "NOT_ENCRYPTED"
+msgstr "एन्क्रिप्टेड नहीं"
+
+#: gnowsys_ndf/ndf/templates/ndf/create_sub_group.html:114
+#: gnowsys_ndf/ndf/templates/ndf/edit_group.html:179
+msgid "ENCRYPTED"
+msgstr "एन्क्रिप्टेड"
+
+#: gnowsys_ndf/ndf/templates/ndf/create_sub_group.html:119
+#: gnowsys_ndf/ndf/templates/ndf/edit_group.html:147
+msgid "Group Existance visibility"
+msgstr "समूह अस्तित्व दृश्यता"
+
+#: gnowsys_ndf/ndf/templates/ndf/create_sub_group.html:123
+#: gnowsys_ndf/ndf/templates/ndf/edit_group.html:152
+msgid "ANNOUNCED"
+msgstr "घोषित"
+
+#: gnowsys_ndf/ndf/templates/ndf/create_sub_group.html:124
+msgid "NOT_ANNOUNCED"
+msgstr "अघोषित"
+
+#: gnowsys_ndf/ndf/templates/ndf/create_thread.html:41
+#: gnowsys_ndf/ndf/templates/ndf/edit_thread.html:51
+msgid "Thread"
+msgstr "कड़ी"
+
+#: gnowsys_ndf/ndf/templates/ndf/create_thread.html:52
+#: gnowsys_ndf/ndf/templates/ndf/edit_thread.html:62
+#: gnowsys_ndf/ndf/templates/ndf/forumdetails.html:44
+msgid "Threads are new ideas on the topic"
+msgstr "‘कडि़याँ’ विषय से संबंधित नए विचार हैं"
+
+#: gnowsys_ndf/ndf/templates/ndf/create_thread.html:60
+msgid "Add a new Thread to forum"
+msgstr "फोरम में एक नई कड़ी जोड़ें"
+
+#: gnowsys_ndf/ndf/templates/ndf/create_thread.html:92
+#: gnowsys_ndf/ndf/templates/ndf/edit_thread.html:99
+msgid "Thread:"
+msgstr "कड़ी:"
+
+#: gnowsys_ndf/ndf/templates/ndf/create_thread.html:102
+#: gnowsys_ndf/ndf/templates/ndf/edit_thread.html:110
+msgid "Thread Content: "
+msgstr "कड़ी की विषय-वस्तु"
+
+#: gnowsys_ndf/ndf/templates/ndf/create_thread.html:136
+msgid "Existing threads of forum"
+msgstr "फोरम की मौजुदा कडि़याँ"
+
+#: gnowsys_ndf/ndf/templates/ndf/custom_template_for_app.html:88
+msgid ""
+"Are you sure you want to delete? All of the following related items also "
+"will be deleted:"
+msgstr "क्या आप मिटाना चाहते हैं। ऐसा करने से सभी संबंधित वस्तुएँ भी मिट जायेंगी"
+
+#: gnowsys_ndf/ndf/templates/ndf/custom_template_for_app.html:118
+#: gnowsys_ndf/ndf/templates/ndf/list_themes.html:30
+#: gnowsys_ndf/ndf/templates/ndf/theme.html:355
+msgid "Title"
+msgstr "शीर्षक"
+
+#: gnowsys_ndf/ndf/templates/ndf/custom_template_for_app.html:119
+#: gnowsys_ndf/ndf/templates/ndf/list_themes.html:31
+#: gnowsys_ndf/ndf/templates/ndf/theme.html:356
+msgid "Created by"
+msgstr "सृजक"
+
+#: gnowsys_ndf/ndf/templates/ndf/custom_template_for_app.html:142
+#: gnowsys_ndf/ndf/templates/ndf/list_themes.html:68
+#: gnowsys_ndf/ndf/templates/ndf/theme.html:391
+msgid "No data to display"
+msgstr "प्रदर्शन हेतु विषय नहीं हैं"
+
+#: gnowsys_ndf/ndf/templates/ndf/custom_template_for_app.html:236
+msgid "tags"
+msgstr "टैग्स"
+
+#: gnowsys_ndf/ndf/templates/ndf/custom_template_for_app.html:249
+msgid "Uploaded File"
+msgstr "अपलोड की गई फाइल"
+
+#: gnowsys_ndf/ndf/templates/ndf/custom_template_for_app.html:279
+msgid "content:"
+msgstr "विषय-वस्तुः"
+
+#: gnowsys_ndf/ndf/templates/ndf/custom_template_for_app.html:427
+#: gnowsys_ndf/ndf/templates/ndf/mis_create_edit.html:326
+msgid "Content"
+msgstr "विषय-वस्तु"
+
+#: gnowsys_ndf/ndf/templates/ndf/discussion.html:90
+#: gnowsys_ndf/ndf/templates/ndf/discussion.html:272
+#: gnowsys_ndf/ndf/templates/ndf/reply_to_reply.html:82
+msgid "Reply"
+msgstr "जवाब दें"
+
+#: gnowsys_ndf/ndf/templates/ndf/discussion.html:105
+msgid "Enter your reply text here."
+msgstr ""
+
+#: gnowsys_ndf/ndf/templates/ndf/discussion.html:188
+msgid "Login to start discussion"
+msgstr "परिचर्चा करने की पहल करें"
+
+#: gnowsys_ndf/ndf/templates/ndf/discussion.html:227
+msgid "Login to start discussion."
+msgstr "परिचर्चा करने की पहल करें"
+
+#: gnowsys_ndf/ndf/templates/ndf/discussion.html:239
+msgid "Begin Discussion"
+msgstr "परिचर्चा आरंभ करें"
+
+#: gnowsys_ndf/ndf/templates/ndf/discussion.html:240
+msgid "Comment"
+msgstr "टिप्पणी"
+
+#: gnowsys_ndf/ndf/templates/ndf/discussion.html:244
+msgid "Join Discussion"
+msgstr "परिचर्चा से जुड़ें"
+
+#: gnowsys_ndf/ndf/templates/ndf/discussion.html:333
+#: gnowsys_ndf/ndf/templates/ndf/discussion.html:341
+msgid "Please provide the reply content."
+msgstr ""
+
+#: gnowsys_ndf/ndf/templates/ndf/discussion.html:356
+msgid "Along with this reply, total of"
+msgstr ""
+
+#: gnowsys_ndf/ndf/templates/ndf/discussion.html:356
+msgid "replies would get deleted.\\nClick "
+msgstr ""
+
+#: gnowsys_ndf/ndf/templates/ndf/discussion.html:360
+msgid "Are you sure to delete this reply ?\\nClick "
+msgstr ""
+
+#: gnowsys_ndf/ndf/templates/ndf/discussion.html:386
+msgid "To delete this reply, you need to be the author and logged in"
+msgstr "इस जवाब को मिटाने के लिए, आपको इस जवाब का लेखक होना तथा लॉगिन करना आवश्क है"
+
+#: gnowsys_ndf/ndf/templates/ndf/document_detail.html:9
+msgid "download"
+msgstr "डाउनलोड"
+
+#: gnowsys_ndf/ndf/templates/ndf/document_edit.html:5
+#: gnowsys_ndf/ndf/templates/ndf/image_edit.html:5
+#: gnowsys_ndf/ndf/templates/ndf/video_edit.html:5
+msgid "Editor"
+msgstr "संपादक"
+
+#: gnowsys_ndf/ndf/templates/ndf/document_edit.html:6
+#: gnowsys_ndf/ndf/templates/ndf/image_edit.html:6
+msgid ""
+"<p class=\"text-justify subheader\">You can upload <b>files</b> of any "
+"format to your group library. Also edit the details regarding the same.</p>"
+msgstr ""
+"<p class=\"text-justify subheader\">समूह लाईब्रेरी में किसी भी प्रारूप में <b>फाईल</"
+"b> अपलोड कर सकते हैं, विवरण को संपादित करें"
+
+#: gnowsys_ndf/ndf/templates/ndf/drawer_widget.html:25
+msgid "Select from following drawer: "
+msgstr "निम्नलिखित से चयन करें:"
+
+#: gnowsys_ndf/ndf/templates/ndf/drawer_widget.html:29
+msgid "Add selected to following drawer: "
+msgstr "चयनित को निम्नलिखित में जोड़ें"
+
+#: gnowsys_ndf/ndf/templates/ndf/drawer_widget.html:46
+msgid "Type atleast 3 characters to search"
+msgstr ""
+
+#: gnowsys_ndf/ndf/templates/ndf/drawer_widget.html:103
+msgid "No content of selected type !"
+msgstr "चयनित प्रकार की कोई भी विषय वस्तु उपलब्ध नहीं है।"
+
+#: gnowsys_ndf/ndf/templates/ndf/drawer_widget.html:282
+#: gnowsys_ndf/ndf/templates/ndf/forumdetails.html:173
+#: gnowsys_ndf/ndf/templates/ndf/group.html:120
+#: gnowsys_ndf/ndf/templates/ndf/task_details.html:247
+msgid "by"
+msgstr "द्वारा"
+
+#: gnowsys_ndf/ndf/templates/ndf/drawer_widget.html:282
+msgid "on"
+msgstr "पूर्ण हुआ"
+
+#: gnowsys_ndf/ndf/templates/ndf/drawer_widget.html:306
+msgid "Move ALL to Right"
+msgstr ""
+
+#: gnowsys_ndf/ndf/templates/ndf/drawer_widget.html:307
+msgid "Move ALL to Left"
+msgstr ""
+
+#: gnowsys_ndf/ndf/templates/ndf/drawer_widget.html:313
+#: gnowsys_ndf/ndf/templates/ndf/edit_forum.html:126
+#: gnowsys_ndf/ndf/templates/ndf/replyforum.html:103
+#: gnowsys_ndf/ndf/templates/ndf/task_create_edit.html:321
+#: gnowsys_ndf/ndf/templates/ndf/task_details.html:268
+#: gnowsys_ndf/ndf/templates/ndf/task_details.html:281
+msgid "Save"
+msgstr "सहेजें"
+
+#: gnowsys_ndf/ndf/templates/ndf/drawer_widget.html:386
+#: gnowsys_ndf/ndf/templates/ndf/drawer_widget.html:419
+#: gnowsys_ndf/ndf/templates/ndf/drawer_widget.html:588
+#: gnowsys_ndf/ndf/templates/ndf/drawer_widget.html:603
+msgid "Nothing to move."
+msgstr "कुछ भी नहीं मिला"
+
+#: gnowsys_ndf/ndf/templates/ndf/edit_forum.html:53
+msgid "Are you sure you want to cancel edit"
+msgstr ""
+
+#: gnowsys_ndf/ndf/templates/ndf/edit_forum.html:73
+msgid ""
+"  <h3 class=\"subheader\">Existing Discussion</h3>\n"
+"    <p class=\"text-justify subheader\">Use a relevant topic for the "
+"<b>Forum</b> so that people interested can join the discussion.</p> "
+msgstr "फोरम के लिए एक ऐसा विषय चुने जिसमें लोग भाग लेना चाहें"
+
+#: gnowsys_ndf/ndf/templates/ndf/edit_forum.html:79
+msgid "Edit forum: "
+msgstr "फोरम को संपादित करें"
+
+#: gnowsys_ndf/ndf/templates/ndf/edit_forum.html:89
+msgid "Forum Name"
+msgstr "फोरम नाम"
+
+#: gnowsys_ndf/ndf/templates/ndf/edit_forum.html:126
+#: gnowsys_ndf/ndf/templates/ndf/user_profile_form.html:121
+msgid "Forum"
+msgstr "फोरम"
+
+#: gnowsys_ndf/ndf/templates/ndf/edit_forum.html:127
+msgid "Cancel"
+msgstr ""
+
+#: gnowsys_ndf/ndf/templates/ndf/edit_forum.html:300
+msgid "Forum  with same name already exist. Please choose another name"
+msgstr ""
+
+#: gnowsys_ndf/ndf/templates/ndf/edit_forum.html:326
+msgid "Please enter forum name"
+msgstr "कृपया वैध नाम भरें"
+
+#: gnowsys_ndf/ndf/templates/ndf/edit_group.html:8
+msgid "Group Editor"
+msgstr "समूह संपादक"
+
+#: gnowsys_ndf/ndf/templates/ndf/edit_group.html:59
+#, fuzzy, python-format
+msgid " Click here to change settings of %(name)s "
+msgstr "%(name)s के सेटिंग बदलने के लिए यहाँ क्लिक करें"
+
+#: gnowsys_ndf/ndf/templates/ndf/edit_group.html:68
+msgid "Subscription policy"
+msgstr "सदस्यता नीति"
+
+#: gnowsys_ndf/ndf/templates/ndf/edit_group.html:74
+#: gnowsys_ndf/ndf/templates/ndf/edit_group.html:141
+msgid "BY REQUEST"
+msgstr "अनुरोध द्वारा"
+
+#: gnowsys_ndf/ndf/templates/ndf/edit_group.html:75
+#: gnowsys_ndf/ndf/templates/ndf/edit_group.html:142
+msgid "BY INVITATION"
+msgstr "निमंत्रण द्वारा"
+
+#: gnowsys_ndf/ndf/templates/ndf/edit_group.html:79
+msgid "User policy"
+msgstr "उपयोगकर्ता नीति"
+
+#: gnowsys_ndf/ndf/templates/ndf/edit_group.html:119
+msgid "Group Editing policy"
+msgstr "समूह संपादन नीति"
+
+#: gnowsys_ndf/ndf/templates/ndf/edit_group.html:124
+msgid "EDITABLE amd NON_MODERATED"
+msgstr "संपादन योग्य एवं अपरिनियमित"
+
+#: gnowsys_ndf/ndf/templates/ndf/edit_group.html:126
+msgid "EDITABLE and MODERATED"
+msgstr "संपादन योग्य_परिनियमित"
+
+#: gnowsys_ndf/ndf/templates/ndf/edit_group.html:136
+msgid "Group Subscription policy"
+msgstr "समूह सदस्यता नीति"
+
+#: gnowsys_ndf/ndf/templates/ndf/edit_group.html:153
+msgid "NOT ANNOUNCED"
+msgstr "अघोषित"
+
+#: gnowsys_ndf/ndf/templates/ndf/edit_group.html:167
+msgid "DISCLOSED TO MEMBERS"
+msgstr "सदस्यों को दिखेगा"
+
+#: gnowsys_ndf/ndf/templates/ndf/edit_group.html:168
+msgid "NOT DISCLOSED TO MEMBERS"
+msgstr "सदस्यों को नहीं दिखेगा"
+
+#: gnowsys_ndf/ndf/templates/ndf/edit_group.html:178
+msgid "NOT ENCRYPTED"
+msgstr "एन्क्रिप्टेड नहीं"
+
+#: gnowsys_ndf/ndf/templates/ndf/edit_group.html:212
+#, fuzzy, python-format
+msgid " Click here to select apps for %(name)s "
+msgstr "ऐप्स चयन के लिए क्ल्कि करें"
+
+#: gnowsys_ndf/ndf/templates/ndf/edit_thread.html:68
+msgid "Edit Thread "
+msgstr "कड़ी संपादन करें"
+
+#: gnowsys_ndf/ndf/templates/ndf/event_base.html:5
+#: gnowsys_ndf/ndf/templates/ndf/mis_details.html:120
+msgid "Events"
+msgstr "इवेंटस"
+
+#: gnowsys_ndf/ndf/templates/ndf/event_base.html:89
+#: gnowsys_ndf/ndf/templates/ndf/footer.html:9
+#: gnowsys_ndf/ndf/templates/ndf/group_dashboard.html:99
+#: gnowsys_ndf/ndf/templates/ndf/header.html:349
+msgid "About"
+msgstr "बारे में"
+
+#: gnowsys_ndf/ndf/templates/ndf/event_base.html:94
+msgid "Start"
+msgstr "आरंभ"
+
+#: gnowsys_ndf/ndf/templates/ndf/event_base.html:99
+msgid "Journal"
+msgstr ""
+
+#: gnowsys_ndf/ndf/templates/ndf/event_base.html:103
+msgid "Gallery"
+msgstr ""
+
+#: gnowsys_ndf/ndf/templates/ndf/event_create_edit.html:181
+#: gnowsys_ndf/ndf/templates/ndf/page_list.html:86
+#: gnowsys_ndf/ndf/templates/ndf/term.html:36
+msgid "Create"
+msgstr "सृजित करें"
+
+#: gnowsys_ndf/ndf/templates/ndf/event_details.html:72
+#: gnowsys_ndf/ndf/templates/ndf/mis_details.html:119
+#: gnowsys_ndf/ndf/templates/ndf/wikidata.html:91
+msgid "Read"
+msgstr "पढ़ें"
+
+#: gnowsys_ndf/ndf/templates/ndf/event_list.html:18
+#: gnowsys_ndf/ndf/templates/ndf/mis_base_list.html:16
+msgid ""
+"Are you sure you want to delete? All of the following related items also "
+"will be deleted!"
+msgstr "क्या आप मिटाना चाहते हैं। ऐसा करने से सभी संबंधित वस्तुएँ भी मिट जायेंगी"
+
+#: gnowsys_ndf/ndf/templates/ndf/event_list.html:98
+#: gnowsys_ndf/ndf/templates/ndf/mis_base_list.html:153
+msgid "This group doesn't have a registered"
+msgstr "इस समूह में कोई पंजीकृत नहीं है"
+
+#: gnowsys_ndf/ndf/templates/ndf/file.html:76
+#: gnowsys_ndf/ndf/templates/ndf/page_list.html:78
+msgid "Collections"
+msgstr "संग्रह"
+
+#: gnowsys_ndf/ndf/templates/ndf/file.html:87
+msgid "All files"
+msgstr "सभी फाईल"
+
+#: gnowsys_ndf/ndf/templates/ndf/file.html:98
+msgid "Documents"
+msgstr "प्रलेख"
+
+#: gnowsys_ndf/ndf/templates/ndf/file.html:124
+msgid "Interactives"
+msgstr "इंटरैक्टिवस"
+
+#: gnowsys_ndf/ndf/templates/ndf/file.html:153
+msgid "Audios"
+msgstr "ऑडियो"
+
+#: gnowsys_ndf/ndf/templates/ndf/file.html:163
+msgid "Images"
+msgstr "चित्र"
+
+#: gnowsys_ndf/ndf/templates/ndf/file.html:175
+#: gnowsys_ndf/ndf/templates/ndf/file.html:201
+msgid "Videos"
+msgstr "वीडियो"
+
+#: gnowsys_ndf/ndf/templates/ndf/file.html:215
+#: gnowsys_ndf/ndf/templates/ndf/list_themes.html:35
+msgid "Actions"
+msgstr "क्रिया"
+
+#: gnowsys_ndf/ndf/templates/ndf/file.html:228
+msgid "Review"
+msgstr "अवलोकन"
+
+#: gnowsys_ndf/ndf/templates/ndf/file.html:230
+msgid "Data Review"
+msgstr "विषय अवलोकन"
+
+#: gnowsys_ndf/ndf/templates/ndf/file.html:237
+msgid "File Statistics"
+msgstr "फाईल सांख्यिकी"
+
+#: gnowsys_ndf/ndf/templates/ndf/file.html:278
+msgid "this file is already uploaded please choose different file"
+msgstr "यह फाइल अपलोड की गई है कृपया अन्य फाइल चुने"
+
+#: gnowsys_ndf/ndf/templates/ndf/file_list_tab.html:7
+#: gnowsys_ndf/ndf/templates/ndf/file_list_tab.html:13
+#: gnowsys_ndf/ndf/templates/ndf/group.html:74
+#: gnowsys_ndf/ndf/templates/ndf/group.html:79
+#: gnowsys_ndf/ndf/templates/ndf/pandoracollection.html:10
+#: gnowsys_ndf/ndf/templates/ndf/pandoracollection.html:17
+msgid "Search Results:"
+msgstr "खोज परिणामः"
+
+#: gnowsys_ndf/ndf/templates/ndf/file_list_tab.html:7
+#: gnowsys_ndf/ndf/templates/ndf/forum.html:70
+#: gnowsys_ndf/ndf/templates/ndf/group.html:74
+#: gnowsys_ndf/ndf/templates/ndf/page_list.html:128
+msgid "Found"
+msgstr ""
+
+#: gnowsys_ndf/ndf/templates/ndf/file_list_tab.html:124
+msgid "This group doesn't have any collections."
+msgstr "इस समूह में कोई संग्रह नहीं है"
+
+#: gnowsys_ndf/ndf/templates/ndf/file_list_tab.html:126
+msgid "Sorry, No resources found with selected filters"
+msgstr "क्षमा करें, चयनित फिल्टर से कोई संसाधन प्राप्त नहीं हुआ"
+
+#: gnowsys_ndf/ndf/templates/ndf/file_list_tab.html:131
+msgid "No files have been uploaded yet."
+msgstr ""
+
+#: gnowsys_ndf/ndf/templates/ndf/file_list_tab.html:135
+msgid ""
+"This group doesn't have any files. <b>Be the first to upload a file!</b>"
+msgstr ""
+"इस समूह में कोई फाइल नहीं है। <b>आप फाइल अपलोड करने वाले प्रथम व्यक्ति हो सकते हैं</b>"
+
+#: gnowsys_ndf/ndf/templates/ndf/file_search.html:40
+msgid "Posted by:"
+msgstr "प्रेषक"
+
+#: gnowsys_ndf/ndf/templates/ndf/file_search.html:41
+msgid "size:"
+msgstr "आकार"
+
+#: gnowsys_ndf/ndf/templates/ndf/file_search.html:42
+msgid "file Type:"
+msgstr "फाइल प्रकार"
+
+#: gnowsys_ndf/ndf/templates/ndf/file_search.html:43
+msgid "Tags:"
+msgstr "टैग्स"
+
+#: gnowsys_ndf/ndf/templates/ndf/file_search.html:53
+msgid "<span>No file found. Please try using some other keyword</span>"
+msgstr ""
+"<span>कोई फाइल नहीं प्राप्त हुई है। कृपया अन्य संकेतशब्द (keyword) से प्रयास करें।</span>"
+
+#: gnowsys_ndf/ndf/templates/ndf/file_statistics.html:58
+msgid "Bar-Chart"
+msgstr "दंड चार्ट"
+
+#: gnowsys_ndf/ndf/templates/ndf/file_statistics.html:59
+msgid "Pie"
+msgstr "निजी"
+
+#: gnowsys_ndf/ndf/templates/ndf/file_statistics.html:61
+#: gnowsys_ndf/ndf/templates/ndf/uDashboard.html:26
+msgid "Activity Ratings"
+msgstr "क्रियाकलाप रेटिंग"
+
+#: gnowsys_ndf/ndf/templates/ndf/file_statistics.html:187
+msgid "Total Rating Score"
+msgstr "कुल क्रियाकलाप रेटिंग"
+
+#: gnowsys_ndf/ndf/templates/ndf/filters.html:123
+msgid "Filter Resources"
+msgstr "संसाधन"
+
+#: gnowsys_ndf/ndf/templates/ndf/filters.html:126
+#: gnowsys_ndf/ndf/templates/ndf/filters.html:149
+#: gnowsys_ndf/ndf/templates/ndf/html_field_widget.html:299
+#: gnowsys_ndf/ndf/templates/ndf/html_field_widget.html:304
+#: gnowsys_ndf/ndf/templates/ndf/student_list.html:207
+#: gnowsys_ndf/ndf/templates/ndf/trainer_create_edit.html:687
+msgid "Select"
+msgstr "चुनें"
+
+#: gnowsys_ndf/ndf/templates/ndf/filters.html:154
+msgid "Filter"
+msgstr "फिल्टर्स"
+
+#: gnowsys_ndf/ndf/templates/ndf/filters.html:250
+msgid "No values for the key"
+msgstr ""
+
+#: gnowsys_ndf/ndf/templates/ndf/filters.html:387
+#: gnowsys_ndf/ndf/templates/ndf/filters.html:463
+msgid "Remove this filter"
+msgstr ""
+
+#: gnowsys_ndf/ndf/templates/ndf/filters.html:498
+msgid "is already applied"
+msgstr ""
+
+#: gnowsys_ndf/ndf/templates/ndf/filters.html:548
+msgid "Please select the proper filter first"
+msgstr "कृपया संस्था चुनें"
+
+#: gnowsys_ndf/ndf/templates/ndf/footer.html:10
+msgid "Partners"
+msgstr "पार्टर्नस"
+
+#: gnowsys_ndf/ndf/templates/ndf/footer.html:11
+#: gnowsys_ndf/ndf/templates/ndf/group.html:12
+msgid "Groups"
+msgstr "समूह"
+
+#: gnowsys_ndf/ndf/templates/ndf/footer.html:12
+msgid "Terms of Service"
+msgstr "सेवा की शर्तें"
+
+#: gnowsys_ndf/ndf/templates/ndf/footer.html:13
+msgid "Privacy Policy"
+msgstr "गोपनीयता नीति"
+
+#: gnowsys_ndf/ndf/templates/ndf/footer.html:14
+msgid "Contribute"
+msgstr "योगदान करें"
+
+#: gnowsys_ndf/ndf/templates/ndf/footer.html:15
+msgid "Contact"
+msgstr "संपर्क करें"
+
+#: gnowsys_ndf/ndf/templates/ndf/footer.html:22
+msgid "View Source Code"
+msgstr "सोर्स कोड देखें"
+
+#: gnowsys_ndf/ndf/templates/ndf/footer.html:29
+msgid ""
+"All material is licensed under a Creative Commons Attribution-Share Alike "
+"3.0 Unported License unless mentioned otherwise."
+msgstr ""
+"सभी सामग्री क्रियेटिव कॉमन्स ऍट्रीब्यूशन शेयर-अलाइक 3.0 के अनपोर्टेड लाइसेंस के अंतर्गत आती "
+"है, यदि कोई अन्य लाइसेंस अंकित नहीं है तो"
+
+#: gnowsys_ndf/ndf/templates/ndf/footer.html:38
+msgid "Powered by"
+msgstr "पावर्ड बाइ"
+
+#: gnowsys_ndf/ndf/templates/ndf/footer.html:38
+msgid "gstudio"
+msgstr "स्टूडियो"
+
+#: gnowsys_ndf/ndf/templates/ndf/footer.html:38
+msgid "built at Gnowledge Lab"
+msgstr ""
+
+#: gnowsys_ndf/ndf/templates/ndf/footer.html:38
+msgid "Homi Bhabha Centre for Science Education"
+msgstr "होमी भाभा विज्ञान शिक्षा केन्द्र (एच.बी.सी.एस.ई.)"
+
+#: gnowsys_ndf/ndf/templates/ndf/footer.html:38
+msgid "TIFR"
+msgstr "टीआईएफआर"
+
+#: gnowsys_ndf/ndf/templates/ndf/forum.html:34
+msgid "<h2 class=\"subheader\">Forums</h2>"
+msgstr ""
+
+#: gnowsys_ndf/ndf/templates/ndf/forum.html:41
+#: gnowsys_ndf/ndf/templates/ndf/forumdetails.html:64
+msgid "Create Forum"
+msgstr "फोरम बनाएँ"
+
+#: gnowsys_ndf/ndf/templates/ndf/forum.html:63
+msgid "All Forums"
+msgstr "फोरम्स"
+
+#: gnowsys_ndf/ndf/templates/ndf/forum.html:77
+msgid "Search Results"
+msgstr "खोज परिणामः"
+
+#: gnowsys_ndf/ndf/templates/ndf/forum.html:77
+msgid "matched your search criteria"
+msgstr ""
+
+#: gnowsys_ndf/ndf/templates/ndf/forum.html:120
+#: gnowsys_ndf/ndf/templates/ndf/group.html:120
+#: gnowsys_ndf/ndf/templates/ndf/page_list.html:177
+#: gnowsys_ndf/ndf/templates/ndf/page_list.html:252
+#: gnowsys_ndf/ndf/templates/ndf/uDashboard.html:184
+msgid "created"
+msgstr "सृजित"
+
+#: gnowsys_ndf/ndf/templates/ndf/forum.html:120
+#: gnowsys_ndf/ndf/templates/ndf/group.html:120
+#: gnowsys_ndf/ndf/templates/ndf/page_list.html:177
+#: gnowsys_ndf/ndf/templates/ndf/page_list.html:252
+#: gnowsys_ndf/ndf/templates/ndf/task_details.html:247
+#: gnowsys_ndf/ndf/templates/ndf/uDashboard.html:184
+msgid "ago"
+msgstr "टैग"
+
+#: gnowsys_ndf/ndf/templates/ndf/forum.html:125
+#: gnowsys_ndf/ndf/templates/ndf/page_list.html:181
+#: gnowsys_ndf/ndf/templates/ndf/page_list.html:256
+msgid "Contributor"
+msgstr "योगदानकर्ता"
+
+#: gnowsys_ndf/ndf/templates/ndf/forum.html:137
+msgid ""
+"This group doesn't have any forums. <b>Be the first to create a forum!</b></"
+"h5>"
+msgstr "इस समूह में कोई फोरम नहीं है। <b>आप फोरम बनाने वाले प्रथम व्यक्ति हो सकते हैं</b><"
+
+#: gnowsys_ndf/ndf/templates/ndf/forumdetails.html:52
+msgid "Other Forums"
+msgstr "फोरम्स"
+
+#: gnowsys_ndf/ndf/templates/ndf/forumdetails.html:82
+msgid "<h3> &nbsp;Add thread to this forum</h3>"
+msgstr "<h3> &nbsp;इस फोरम में कड़ी जोड़ें</h3>"
+
+#: gnowsys_ndf/ndf/templates/ndf/forumdetails.html:84
+msgid " Create &nbsp;Thread "
+msgstr "कड़ी बनायें"
+
+#: gnowsys_ndf/ndf/templates/ndf/forumdetails.html:99
+msgid "Top Contributors"
+msgstr "सर्वोच्च योगदानकर्ता"
+
+#: gnowsys_ndf/ndf/templates/ndf/forumdetails.html:107
+msgid "Forum:"
+msgstr "फोरम"
+
+#: gnowsys_ndf/ndf/templates/ndf/forumdetails.html:155
+msgid "Thread Name"
+msgstr "कड़ी नाम"
+
+#: gnowsys_ndf/ndf/templates/ndf/forumdetails.html:156
+msgid "Thread Content"
+msgstr "कड़ी विषय वस्तु"
+
+#: gnowsys_ndf/ndf/templates/ndf/forumdetails.html:157
+msgid "Total Reply"
+msgstr "पूरा जवाब"
+
+#: gnowsys_ndf/ndf/templates/ndf/forumdetails.html:158
+msgid "Latest Activity"
+msgstr "नवीनतम क्रियाकलाप"
+
+#: gnowsys_ndf/ndf/templates/ndf/forumdetails.html:207
+msgid "This forum dosen&#39t have any threads. Be the first to create a thread"
+msgstr ""
+"इस समूह में कोई प्रश्नोत्तरी प्रश्न नहीं है। <b>आप प्रश्नोत्तरी प्रश्न बनाने वाले प्रथम व्यक्ति "
+"हो सकते हैं</b>"
+
+#: gnowsys_ndf/ndf/templates/ndf/forumdetails.html:275
+#, python-format
+msgid ""
+" This forum has  %(thread_count)s  existing threads.Please remove them and "
+"try again "
+msgstr ""
+
+#: gnowsys_ndf/ndf/templates/ndf/group.html:31
+msgid ""
+"<p>Groups are an easy way to share content and conversation, either "
+"privately or with the world. Many times, a group already exist for a "
+"specific interest or topic. If you can't find one you like, feel free to "
+"start your own.</p>\n"
+"<h5>How do groups work?</h5>\n"
+"<p>Groups can either be public, restricted (users may read a brief "
+"description or overview but not view content) or completely private. Every "
+"group has a wiki, a pool for resources, and a discussion board for talking.</"
+"p>"
+msgstr ""
+"<p>समूह विषय वस्तु को वितरित करने तथा सम्प्रेषित करने का निजि अथवा विश्व स्तरीयसरल "
+"मार्ग है। कई बार विशिष्ट अभिरुचि या प्रकरण पर समूह पहले से उपस्थिति होते हैं। यदि आपको "
+"अपनी अभिरुचि का समूह नहीं मिले तो आप अपना समूह आरम्भ कर सकते हैं।</p>\n"
+"<h5>समूह कैसे कार्य करते हैं?</h5> <p>समूह सार्वजनिक, अवरुध (उपयोगकर्ता विषय वस्तु का "
+"संक्षिप्त विवरण अथवा रूप् रेखा पढ सकते हैं परंतु विषय वस्तु को पूर्णतः देख नहीं सकते) अथवा "
+"पूर्णतः निजि। प्रत्येक समूह एक विकी, संसाधन समूह तथा वार्ता हेतु परिचर्चा बोर्ड रखता है।</"
+"p>"
+
+#: gnowsys_ndf/ndf/templates/ndf/group.html:64
+msgid "All Groups"
+msgstr "समूह"
+
+#: gnowsys_ndf/ndf/templates/ndf/group.html:80
+#, python-format
+msgid ""
+" No %(title|lower)s%(group_nodes_count|pluralize)s matched your search "
+"criteria "
+msgstr ""
+
+#: gnowsys_ndf/ndf/templates/ndf/group.html:122
+#: gnowsys_ndf/ndf/templates/ndf/landing_page_nroer.html:52
+msgid "Members"
+msgstr "सदस्य"
+
+#: gnowsys_ndf/ndf/templates/ndf/group.html:124
+msgid "Objects"
+msgstr ""
+
+#: gnowsys_ndf/ndf/templates/ndf/group.html:142
+msgid ""
+" <h5>There are no groups created yet. <b>Be the first to create a Group!</"
+"b></h5> "
+msgstr ""
+"<h5>अभी तक कोई समूह नहीं बनाया गया है। <b>आप समूह बनाने वाले प्रथम व्यक्ति हो सकते हैं</"
+"b></h5>"
+
+#: gnowsys_ndf/ndf/templates/ndf/group_dashboard.html:101
+msgid ""
+"\n"
+"    <b> Group Dashboard </b> Shows the tasks and activities on the site.\n"
+"  "
+msgstr ""
+"\n"
+"<b> समूह डेशबोर्ड</b> साइट में हो रहे क्रियाकलाप और कार्य को दिखाता है"
+"  "
+
+#: gnowsys_ndf/ndf/templates/ndf/group_dashboard.html:193
+msgid "Approval"
+msgstr "अनुमोदन"
+
+#: gnowsys_ndf/ndf/templates/ndf/group_dashboard.html:199
+msgid "Activity"
+msgstr "क्रियाकलाप"
+
+#: gnowsys_ndf/ndf/templates/ndf/group_dashboard.html:203
+msgid "Calendar"
+msgstr ""
+
+#: gnowsys_ndf/ndf/templates/ndf/group_dashboard.html:215
+msgid "Enrollment Details"
+msgstr "नामांकन विवरण"
+
+#: gnowsys_ndf/ndf/templates/ndf/group_dashboard.html:220
+#: gnowsys_ndf/ndf/templates/ndf/mis_list.html:251
+#: gnowsys_ndf/ndf/templates/ndf/trainer_create_edit.html:522
+msgid "S. #"
+msgstr ""
+
+#: gnowsys_ndf/ndf/templates/ndf/group_dashboard.html:250
+msgid "Approval Details"
+msgstr "अनुमोदन विवरण"
+
+#: gnowsys_ndf/ndf/templates/ndf/group_dashboard.html:328
+msgid " No more data to show"
+msgstr "प्रदर्शन हेतु विषय नहीं हैं"
+
+#: gnowsys_ndf/ndf/templates/ndf/group_dashboard.html:370
+msgid "Please select the image type file!"
+msgstr "कृपया कार्य प्रकार चुनें"
+
+#: gnowsys_ndf/ndf/templates/ndf/group_dashboard.html:424
+#: gnowsys_ndf/ndf/templates/ndf/group_dashboard.html:464
+#: gnowsys_ndf/ndf/templates/ndf/upload_pic_widget.html:183
+msgid "Only image files should be selected for setting your profile picture!"
+msgstr "प्रोफ़ाइल तस्वीर सेट करने के लिए केवल चित्र फाइल का ही चयन करें"
+
+#: gnowsys_ndf/ndf/templates/ndf/group_dashboard.html:553
+msgid "Students have been approved"
+msgstr "छात्रों का अनुमोदन हो चुका है"
+
+#: gnowsys_ndf/ndf/templates/ndf/group_dashboard.html:606
+msgid "Do you want to continue approving the selected students?"
+msgstr "आप चयनित छात्रों का अनुमोदन जारी रखना चाहते हैं ?"
+
+#: gnowsys_ndf/ndf/templates/ndf/group_dashboard.html:609
+msgid "Do you want to continue rejecting the selected students?"
+msgstr "आप चयनित छात्रों का खारिज जारी रखना चाहते हैं ?"
+
+#: gnowsys_ndf/ndf/templates/ndf/groupdashboard.html:152
+msgid " <span>Group members</span> "
+msgstr "<span>समूह सदस्य</span>"
+
+#: gnowsys_ndf/ndf/templates/ndf/groupdashboard.html:171
+msgid "Create a New Group"
+msgstr "नया समूह बनाएं"
+
+#: gnowsys_ndf/ndf/templates/ndf/header.html:64
+#: gnowsys_ndf/ndf/templates/ndf/repository.html:74
+msgid "Repository"
+msgstr "संसाधन कोष"
+
+#: gnowsys_ndf/ndf/templates/ndf/header.html:165
+msgid "See more groups..."
+msgstr "और अधिक समूहों को देखें......"
+
+#: gnowsys_ndf/ndf/templates/ndf/header.html:238
+#: gnowsys_ndf/ndf/templates/registration/password_change_form.html:12
+#: gnowsys_ndf/ndf/templates/registration/password_reset_confirm.html:34
+msgid "Change Password"
+msgstr "पासवर्ड बदलें"
+
+#: gnowsys_ndf/ndf/templates/ndf/header.html:241
+msgid "Analytics"
+msgstr "विश्लेषण"
+
+#: gnowsys_ndf/ndf/templates/ndf/header.html:245
+msgid "Admin Data"
+msgstr "एडमिन डेटा"
+
+#: gnowsys_ndf/ndf/templates/ndf/header.html:248
+msgid "Admin Designer"
+msgstr "एडमिन डिजाइनर"
+
+#: gnowsys_ndf/ndf/templates/ndf/header.html:252
+msgid "Home Dashboard"
+msgstr "हॉम डेशबोर्ड"
+
+#: gnowsys_ndf/ndf/templates/ndf/header.html:258
+msgid "Logout"
+msgstr "लोगआउट"
+
+#: gnowsys_ndf/ndf/templates/ndf/header.html:278
+#: gnowsys_ndf/ndf/templates/registration/login.html:4
+#: gnowsys_ndf/ndf/templates/registration/login.html:83
+msgid "Login"
+msgstr "लॉगिन"
+
+#: gnowsys_ndf/ndf/templates/ndf/header.html:287
+#: gnowsys_ndf/ndf/templates/ndf/node_edit_base.html:234
+#: gnowsys_ndf/ndf/templates/ndf/theme_create_edit.html:113
+#: gnowsys_ndf/ndf/templates/ndf/theme_create_edit.html:237
+#: gnowsys_ndf/ndf/templates/ndf/topic_create_edit.html:124
+#: gnowsys_ndf/ndf/templates/ndf/topic_create_edit.html:189
+msgid "Language"
+msgstr "भाषा"
+
+#: gnowsys_ndf/ndf/templates/ndf/header.html:334
+msgid "APPS"
+msgstr "ऐप्स"
+
+#: gnowsys_ndf/ndf/templates/ndf/header.html:356
+msgid "Updates"
+msgstr "अद्यतन सूची"
+
+#: gnowsys_ndf/ndf/templates/ndf/html_field_widget.html:12
+#: gnowsys_ndf/ndf/templates/ndf/html_field_widget.html:189
+#: gnowsys_ndf/ndf/templates/ndf/html_field_widget.html:197
+#: gnowsys_ndf/ndf/templates/ndf/html_field_widget.html:252
+#: gnowsys_ndf/ndf/templates/ndf/html_field_widget.html:263
+#: gnowsys_ndf/ndf/templates/ndf/html_field_widget.html:280
+#: gnowsys_ndf/ndf/templates/ndf/html_field_widget.html:296
+msgid "Please select"
+msgstr "कृपया चुनें"
+
+#: gnowsys_ndf/ndf/templates/ndf/html_field_widget.html:28
+#: gnowsys_ndf/ndf/templates/ndf/html_field_widget.html:63
+#: gnowsys_ndf/ndf/templates/ndf/html_field_widget.html:120
+msgid "Please fill a valid"
+msgstr "कृपया वैध < > भरें"
+
+#: gnowsys_ndf/ndf/templates/ndf/html_field_widget.html:163
+msgid "Please fill valid"
+msgstr "कृपया वैध < > भरें"
+
+#: gnowsys_ndf/ndf/templates/ndf/html_field_widget.html:176
+msgid "Please set"
+msgstr "कृपया सेट करें"
+
+#: gnowsys_ndf/ndf/templates/ndf/html_field_widget.html:202
+msgid "Click here to view "
+msgstr "देखने के लिए क्ल्कि करें"
+
+#: gnowsys_ndf/ndf/templates/ndf/html_field_widget.html:223
+msgid "Upload! "
+msgstr "अपलोड करें"
+
+#: gnowsys_ndf/ndf/templates/ndf/html_field_widget.html:257
+#: gnowsys_ndf/ndf/templates/ndf/html_field_widget.html:274
+#: gnowsys_ndf/ndf/templates/ndf/html_field_widget.html:285
+#, fuzzy, python-format
+msgid " - - - Select %(alt)s - - - "
+msgstr " - - - चुनें - - - "
+
+#: gnowsys_ndf/ndf/templates/ndf/html_field_widget.html:259
+#, fuzzy, python-format
+msgid " %(choice)s "
+msgstr "विकल्प"
+
+#: gnowsys_ndf/ndf/templates/ndf/html_field_widget.html:276
+#: gnowsys_ndf/ndf/templates/ndf/html_field_widget.html:290
+#, fuzzy, python-format
+msgid " %(alt)s "
+msgstr "%(alt)s"
+
+#: gnowsys_ndf/ndf/templates/ndf/html_field_widget.html:299
+#: gnowsys_ndf/ndf/templates/notification/notice_settings.html:52
+#: gnowsys_ndf/notification/templates/notification/notice_settings.html:52
+msgid "Change"
+msgstr "बदलें"
+
+#: gnowsys_ndf/ndf/templates/ndf/invite_admins.html:38
+#: gnowsys_ndf/ndf/templates/ndf/invite_users.html:34
+msgid "Notification mails sent to newly selected users"
+msgstr "समूह संचालक के अतिरिक्त अन्य सभी को मेल भेजें"
+
+#: gnowsys_ndf/ndf/templates/ndf/invite_admins.html:42
+#: gnowsys_ndf/ndf/templates/ndf/invite_users.html:38
+msgid "Notification mails sent to all users except group owner"
+msgstr "समूह संचालक के अतिरिक्त अन्य सभी को मेल भेजें"
+
+#: gnowsys_ndf/ndf/templates/ndf/invite_admins.html:54
+#: gnowsys_ndf/ndf/templates/ndf/invite_users.html:50
+msgid "Successfully applied modifications and e-mail notifications sent"
+msgstr ""
+
+#: gnowsys_ndf/ndf/templates/ndf/invite_admins.html:114
+#: gnowsys_ndf/ndf/templates/ndf/invite_users.html:110
+msgid "Type here and press enter to search users"
+msgstr ""
+
+#: gnowsys_ndf/ndf/templates/ndf/invite_admins.html:150
+msgid "Subscribe Admins"
+msgstr ""
+
+#: gnowsys_ndf/ndf/templates/ndf/invite_admins.html:155
+msgid "<h2>Select Admins</h2>"
+msgstr "<h2>उपयोगकर्ता चुनें</h2>"
+
+#: gnowsys_ndf/ndf/templates/ndf/invite_admins.html:160
+msgid ""
+"<label><input type=\"checkbox\" id=\"adminchecknotif\" value=\"ON\">\n"
+"            Send notification mails to all except the group owner</label>"
+msgstr ""
+
+#: gnowsys_ndf/ndf/templates/ndf/invite_admins.html:164
+#: gnowsys_ndf/ndf/templates/ndf/mis_base_list.html:49
+#: gnowsys_ndf/ndf/templates/ndf/mis_create_edit.html:211
+#: gnowsys_ndf/ndf/templates/ndf/mis_create_edit.html:317
+msgid "&#215"
+msgstr "&#215;"
+
+#: gnowsys_ndf/ndf/templates/ndf/invite_users.html:56
+msgid "failed to subscribe"
+msgstr ""
+
+#: gnowsys_ndf/ndf/templates/ndf/invite_users.html:153
+#: gnowsys_ndf/ndf/templates/ndf/invite_users.html:155
+msgid "Subscribe Users"
+msgstr ""
+
+#: gnowsys_ndf/ndf/templates/ndf/invite_users.html:159
+msgid "<h2>Select Users</h2>"
+msgstr "<h2>उपयोगकर्ता चुनें</h2>"
+
+#: gnowsys_ndf/ndf/templates/ndf/invite_users.html:164
+msgid "Send notification mails to all except the group owner"
+msgstr "समूह संचालक के अतिरिक्त अन्य सभी को मेल भेजें"
+
+#: gnowsys_ndf/ndf/templates/ndf/landing_page_nroer.html:7
+msgid "Welcome"
+msgstr "स्वागत है"
+
+#: gnowsys_ndf/ndf/templates/ndf/landing_page_nroer.html:37
+msgid "An initiative of Government of India"
+msgstr "भारत सरकार की एक पहल"
+
+#: gnowsys_ndf/ndf/templates/ndf/landing_page_nroer.html:43
+msgid "Offering Open Educational Resources"
+msgstr "मुक्त शैक्षिक संसाधन प्रदान करने वाला"
+
+#: gnowsys_ndf/ndf/templates/ndf/landing_page_nroer.html:45
+msgid "In all Indian Languages"
+msgstr "सभी भारतीय भाषाओं में"
+
+#: gnowsys_ndf/ndf/templates/ndf/landing_page_nroer.html:46
+msgid "Created, adapted, translated and shared"
+msgstr "सृजित, अनुकूलित, अनुवादित तथा बाँट लेना"
+
+#: gnowsys_ndf/ndf/templates/ndf/landing_page_nroer.html:51
+msgid "Resources"
+msgstr "संसाधन"
+
+#: gnowsys_ndf/ndf/templates/ndf/landing_page_nroer.html:54
+msgid "Let's Join NROER"
+msgstr "एन.आर.ओ.इ.आर के साथ जुड़ें"
+
+#: gnowsys_ndf/ndf/templates/ndf/landing_page_nroer.html:68
+msgid "Bridging divides"
+msgstr "सभी से जुड़ाव"
+
+#: gnowsys_ndf/ndf/templates/ndf/landing_page_nroer.html:73
+msgid "Building partnerships"
+msgstr "पार्टनर्शिप निर्माण करें"
+
+#: gnowsys_ndf/ndf/templates/ndf/landing_page_nroer.html:78
+msgid "Nurturing networks and interest groups"
+msgstr "पोषित नेटवर्क तथा रूचिकर समूह"
+
+#: gnowsys_ndf/ndf/templates/ndf/landing_page_nroer.html:83
+msgid "Capturing and analyzing data"
+msgstr "अभिग्रहित तथा विश्लेषणात्मक आँकड़े"
+
+#: gnowsys_ndf/ndf/templates/ndf/landing_page_nroer.html:96
+msgid "Connecting knowledge connecting people..."
+msgstr "ज्ञान को लोगों से जोड़ना, लोगों को ज्ञान जोड़ना..."
+
+#: gnowsys_ndf/ndf/templates/ndf/landing_page_nroer.html:103
+msgid "Strengthening school and teacher education"
+msgstr "समर्थ स्कूल और अध्यापक शिक्षा"
+
+#: gnowsys_ndf/ndf/templates/ndf/meeting.html:11
+msgid "Video chat."
+msgstr "वीडियो गपशप"
+
+#: gnowsys_ndf/ndf/templates/ndf/meeting.html:17
+msgid "Meeting"
+msgstr "बैठक"
+
+#: gnowsys_ndf/ndf/templates/ndf/meeting.html:36
+msgid "Start Meeting"
+msgstr "बैठक आरंभ करें"
+
+#: gnowsys_ndf/ndf/templates/ndf/mis_base_list.html:26
+msgid ""
+"<h3>Link user-account to respective user-details</h3>\n"
+"      <p>NOTE: Please provide username of the user (i.e. student/voluntary-"
+"teacher), that he/she has registered on to the website.</p>\n"
+"      "
+msgstr ""
+"<h3>Link user-account to respective user-details</h3>\n"
+"      <p>NOTE: Please provide username of the user (i.e. student/voluntary-"
+"teacher), that he/she has registered on to the website.</p>"
+
+#: gnowsys_ndf/ndf/templates/ndf/mis_base_list.html:34
+msgid "Username:"
+msgstr "उपयोगकर्ता नाम:"
+
+#: gnowsys_ndf/ndf/templates/ndf/mis_base_list.html:38
+msgid "Please fill username!"
+msgstr "कृपया उपयोगकर्ता का नाम भरें"
+
+#: gnowsys_ndf/ndf/templates/ndf/mis_create_edit.html:145
+#, fuzzy, python-format
+msgid ""
+"<p> <font size =\"5\" color=\"red\">This file :%(already_uploaded)s Already "
+"uploaded please choose another file</font> </p>"
+msgstr "यह फाइल :%(already_uploaded)s अपलोड किया गया है कोई अन्य फाइल चुनें"
+
+#: gnowsys_ndf/ndf/templates/ndf/mis_create_edit.html:162
+msgid "Please give title for "
+msgstr "कृपया शीर्षक दें"
+
+#: gnowsys_ndf/ndf/templates/ndf/mis_create_edit.html:203
+msgid "Please select "
+msgstr "कृपया चुनें"
+
+#: gnowsys_ndf/ndf/templates/ndf/mis_create_edit.html:213
+msgid "Attendence"
+msgstr "उपस्थिति"
+
+#: gnowsys_ndf/ndf/templates/ndf/mis_create_edit.html:217
+msgid "NUSSD Course"
+msgstr "NUSSD पाठ्यक्रम"
+
+#: gnowsys_ndf/ndf/templates/ndf/mis_create_edit.html:221
+msgid "FC Check"
+msgstr "एफसी जाँच"
+
+#: gnowsys_ndf/ndf/templates/ndf/mis_create_edit.html:228
+msgid "Batches"
+msgstr "बैच"
+
+#: gnowsys_ndf/ndf/templates/ndf/mis_create_edit.html:232
+msgid "Batch Check"
+msgstr "बैच जाँच"
+
+#: gnowsys_ndf/ndf/templates/ndf/mis_details.html:122
+#: gnowsys_ndf/ndf/templates/ndf/theme.html:222
+#: gnowsys_ndf/ndf/templates/ndf/wikidata.html:94
+msgid "Graph"
+msgstr "ग्राफ"
+
+#: gnowsys_ndf/ndf/templates/ndf/mis_details.html:124
+#: gnowsys_ndf/ndf/templates/ndf/wikidata.html:96
+msgid "Concept Graph"
+msgstr "संकल्पना ग्राफ"
+
+#: gnowsys_ndf/ndf/templates/ndf/mis_details.html:126
+#: gnowsys_ndf/ndf/templates/ndf/wikidata.html:98
+msgid "Collection Graph"
+msgstr "संग्रह ग्राफ"
+
+#: gnowsys_ndf/ndf/templates/ndf/mis_details.html:129
+#: gnowsys_ndf/ndf/templates/ndf/wikidata.html:101
+msgid "Dependency Graph"
+msgstr "निर्भरता ग्राफ"
+
+#: gnowsys_ndf/ndf/templates/ndf/mis_details.html:134
+#: gnowsys_ndf/ndf/templates/ndf/wikidata.html:110
+msgid "Discuss"
+msgstr "परिचर्चा"
+
+#: gnowsys_ndf/ndf/templates/ndf/mis_details.html:409
+msgid "Make Module"
+msgstr "मॉड्यूल बनायें"
+
+#: gnowsys_ndf/ndf/templates/ndf/mis_list.html:193
+#: gnowsys_ndf/ndf/templates/ndf/student_create_edit.html:427
+#: gnowsys_ndf/ndf/templates/ndf/studentcourseenrollment_create_edit.html:111
+#: gnowsys_ndf/ndf/templates/ndf/trainer_create_edit.html:498
+#: gnowsys_ndf/ndf/templates/ndf/trainer_create_edit.html:525
+msgid "College"
+msgstr "संस्था"
+
+#: gnowsys_ndf/ndf/templates/ndf/mis_list.html:194
+#: gnowsys_ndf/ndf/templates/ndf/student_create_edit.html:416
+msgid "Degree Year"
+msgstr "उपाधि वर्ष"
+
+#: gnowsys_ndf/ndf/templates/ndf/mis_list.html:197
+msgid "Total"
+msgstr "कुल"
+
+#: gnowsys_ndf/ndf/templates/ndf/mis_list.html:201
+msgid "I"
+msgstr "I"
+
+#: gnowsys_ndf/ndf/templates/ndf/mis_list.html:202
+msgid "II"
+msgstr "II"
+
+#: gnowsys_ndf/ndf/templates/ndf/mis_list.html:203
+msgid "III"
+msgstr "III"
+
+#: gnowsys_ndf/ndf/templates/ndf/mis_list.html:223
+msgid ""
+" <h3>Are you sure you want to delete? All of the following related data also "
+"will be deleted:</h3> "
+msgstr "क्या आप मिटाना चाहते हैं। ऐसा करने से सभी संबंधित वस्तुएँ भी मिट जायेंगी"
+
+#: gnowsys_ndf/ndf/templates/ndf/mis_list.html:283
+msgid "<h3>No data to display</h3> "
+msgstr "प्रदर्शन हेतु विषय नहीं हैं"
+
+#: gnowsys_ndf/ndf/templates/ndf/mis_report.html:50
+msgid "Report of :"
+msgstr "रिपोर्ट"
+
+#: gnowsys_ndf/ndf/templates/ndf/mis_report.html:54
+msgid "- - - Select - - -"
+msgstr "चुनें"
+
+#: gnowsys_ndf/ndf/templates/ndf/mis_report.html:65
+#: gnowsys_ndf/ndf/templates/ndf/student_list.html:126
+msgid "Filters"
+msgstr "फिल्टर्स"
+
+#: gnowsys_ndf/ndf/templates/ndf/mis_report.html:69
+msgid "State :"
+msgstr "राज्य"
+
+#: gnowsys_ndf/ndf/templates/ndf/mis_report.html:78
+msgid "University :"
+msgstr "संस्था"
+
+#: gnowsys_ndf/ndf/templates/ndf/mis_report.html:87
+msgid "College :"
+msgstr "संस्था"
+
+#: gnowsys_ndf/ndf/templates/ndf/mis_report.html:100
+msgid "From :"
+msgstr "से"
+
+#: gnowsys_ndf/ndf/templates/ndf/mis_report.html:108
+msgid "To :"
+msgstr "तक"
+
+#: gnowsys_ndf/ndf/templates/ndf/mis_report.html:121
+msgid "Registration Year :"
+msgstr "पंजीकरण वर्ष"
+
+#: gnowsys_ndf/ndf/templates/ndf/mis_report.html:125
+msgid "- - - Select Year - - -"
+msgstr "वर्ष चुनें"
+
+#: gnowsys_ndf/ndf/templates/ndf/mis_report.html:126
+msgid "2013"
+msgstr "2013"
+
+#: gnowsys_ndf/ndf/templates/ndf/mis_report.html:127
+msgid "2014"
+msgstr "2014"
+
+#: gnowsys_ndf/ndf/templates/ndf/mis_report.html:128
+msgid "2015"
+msgstr "2015"
+
+#: gnowsys_ndf/ndf/templates/ndf/mis_report.html:129
+msgid "ALL"
+msgstr "सभी"
+
+#: gnowsys_ndf/ndf/templates/ndf/module.html:29
+msgid "<p>About Module... <em>coming soon</em></p>"
+msgstr "... <em>शीघ्र आ रहा है</em> पाठ्यक्रम के बारे में"
+
+#: gnowsys_ndf/ndf/templates/ndf/module.html:34
+msgid "Modules"
+msgstr "मॉड्यूल"
+
+#: gnowsys_ndf/ndf/templates/ndf/module.html:120
+msgid ""
+" This group doesn't have any modules. <b>Be the first to create a Module!</b>"
+msgstr "इस समूह में कोई मॉड्यूल नहीं है। <b>आप मॉड्यूल बनाने वाले प्रथम व्यक्ति हो सकते हैं</b>"
+
+#: gnowsys_ndf/ndf/templates/ndf/module_detail.html:30
+msgid "Modules "
+msgstr "मॉड्यूल"
+
+#: gnowsys_ndf/ndf/templates/ndf/module_detail.html:60
+msgid "User "
+msgstr "उपयोगकर्ता"
+
+#: gnowsys_ndf/ndf/templates/ndf/new_create_batch.html:135
+msgid "Student(s)"
+msgstr "छात्र"
+
+#: gnowsys_ndf/ndf/templates/ndf/new_create_batch.html:147
+msgid "Search Student by name : "
+msgstr "नाम से छात्र खोजें:"
+
+#: gnowsys_ndf/ndf/templates/ndf/newmeeting.html:21
+msgid "Accept invite  "
+msgstr "निमंत्रण स्वीकार करें"
+
+#: gnowsys_ndf/ndf/templates/ndf/node_ajax_content.html:180
+msgid " awaiting for moderation: "
+msgstr ""
+
+#: gnowsys_ndf/ndf/templates/ndf/node_ajax_content.html:183
+msgid "Currently, there are no Resources for moderation "
+msgstr ""
+
+#: gnowsys_ndf/ndf/templates/ndf/node_ajax_content.html:191
+msgid "Note: Following Resource is Under Moderation -"
+msgstr ""
+
+#: gnowsys_ndf/ndf/templates/ndf/node_ajax_content.html:192
+msgid "Check the current status of Moderation"
+msgstr ""
+
+#: gnowsys_ndf/ndf/templates/ndf/node_ajax_content.html:326
+#: gnowsys_ndf/ndf/templates/ndf/node_ajax_content.html:332
+#: gnowsys_ndf/ndf/templates/ndf/node_ajax_content.html:353
+#: gnowsys_ndf/ndf/templates/ndf/node_ajax_content.html:361
+#: gnowsys_ndf/ndf/templates/ndf/node_ajax_content.html:404
+#: gnowsys_ndf/ndf/templates/ndf/node_ajax_content.html:413
+#: gnowsys_ndf/ndf/templates/ndf/node_ajax_content.html:423
+#: gnowsys_ndf/ndf/templates/ndf/res_node_ajax_view.html:106
+#: gnowsys_ndf/ndf/templates/ndf/res_node_ajax_view.html:112
+#: gnowsys_ndf/ndf/templates/ndf/res_node_ajax_view.html:133
+#: gnowsys_ndf/ndf/templates/ndf/res_node_ajax_view.html:141
+#: gnowsys_ndf/ndf/templates/ndf/res_node_ajax_view.html:184
+#: gnowsys_ndf/ndf/templates/ndf/res_node_ajax_view.html:193
+msgid "Your browser does not support the video tag."
+msgstr "आपका ब्राउज़र वीडियो टैग को सहयोग नहीं कर रहा है"
+
+#: gnowsys_ndf/ndf/templates/ndf/node_ajax_content.html:376
+#: gnowsys_ndf/ndf/templates/ndf/node_ajax_content.html:380
+#: gnowsys_ndf/ndf/templates/ndf/node_ajax_content.html:427
+#: gnowsys_ndf/ndf/templates/ndf/node_ajax_content.html:431
+msgid "Your browser does not support the audio element"
+msgstr "आपका ब्राउज़र वीडियो टैग को सहयोग नहीं कर रहा है"
+
+#: gnowsys_ndf/ndf/templates/ndf/node_ajax_content.html:385
+#: gnowsys_ndf/ndf/templates/ndf/node_ajax_content.html:436
+msgid "Full screen view"
+msgstr ""
+
+#: gnowsys_ndf/ndf/templates/ndf/node_ajax_content.html:463
+msgid "Download"
+msgstr "डाउनलोड"
+
+#: gnowsys_ndf/ndf/templates/ndf/node_ajax_content.html:471
+#: gnowsys_ndf/ndf/templates/ndf/node_ajax_content.html:557
+msgid "Contributed by"
+msgstr "योगदानकर्ता द्वारा"
+
+#: gnowsys_ndf/ndf/templates/ndf/node_ajax_content.html:725
+msgid "Overview"
+msgstr "अवलोकन"
+
+#: gnowsys_ndf/ndf/templates/ndf/node_ajax_content.html:767
+msgid "Collection Set"
+msgstr "संग्रह"
+
+#: gnowsys_ndf/ndf/templates/ndf/node_ajax_content.html:791
+#, python-format
+msgid " No Collections associted with %(node.name)s resource"
+msgstr ""
+
+#: gnowsys_ndf/ndf/templates/ndf/node_ajax_content.html:800
+msgid "Attribute Set"
+msgstr "विशेषताएँ:"
+
+#: gnowsys_ndf/ndf/templates/ndf/node_ajax_content.html:824
+#, python-format
+msgid " No Attributes associted with %(node.name)s resource "
+msgstr ""
+
+#: gnowsys_ndf/ndf/templates/ndf/node_ajax_content.html:833
+msgid "Relation Set"
+msgstr "संबंध:"
+
+#: gnowsys_ndf/ndf/templates/ndf/node_ajax_content.html:856
+msgid "No Relations associted with"
+msgstr ""
+
+#: gnowsys_ndf/ndf/templates/ndf/node_ajax_content.html:856
+msgid "resource."
+msgstr "संसाधन"
+
+#: gnowsys_ndf/ndf/templates/ndf/node_ajax_view.html:449
+msgid "Type here to search in the resources"
+msgstr ""
+
+#: gnowsys_ndf/ndf/templates/ndf/node_details_base.html:85
+msgid "Add resources in this topic "
+msgstr "इस विषय में संसाधन जोड़ें"
+
+#: gnowsys_ndf/ndf/templates/ndf/node_details_base.html:90
+msgid "Add Page "
+msgstr "पृष्ठ जोड़ें"
+
+#: gnowsys_ndf/ndf/templates/ndf/node_details_base.html:103
+msgid "Separate tags with commas..."
+msgstr ""
+
+#: gnowsys_ndf/ndf/templates/ndf/node_details_base.html:112
+msgid "Save Page"
+msgstr "पृष्ठ"
+
+#: gnowsys_ndf/ndf/templates/ndf/node_details_base.html:122
+msgid "Add File "
+msgstr "फाइल जोड़ें"
+
+#: gnowsys_ndf/ndf/templates/ndf/node_details_base.html:141
+msgid "Save File"
+msgstr "नई फ़ाइल"
+
+#: gnowsys_ndf/ndf/templates/ndf/node_details_base.html:152
+msgid "Add Events "
+msgstr "इवेंटस जोड़ें"
+
+#: gnowsys_ndf/ndf/templates/ndf/node_details_base.html:157
+msgid "Add events feature will be coming soon "
+msgstr "इवेंटस जोड़नें की सुविधा शीघ्र आ रही है"
+
+#: gnowsys_ndf/ndf/templates/ndf/node_edit_base.html:10
+#: gnowsys_ndf/ndf/templates/ndf/res_node_ajax_view.html:352
+#: gnowsys_ndf/ndf/templates/ndf/res_node_ajax_view.html:366
+msgid "Edit "
+msgstr "संपादित करें"
+
+#: gnowsys_ndf/ndf/templates/ndf/node_edit_base.html:86
+#: gnowsys_ndf/ndf/templates/ndf/theme_create_edit.html:41
+#: gnowsys_ndf/ndf/templates/ndf/topic_create_edit.html:41
+msgid "Editing "
+msgstr "%(title_var)s: %(node_name)s को संपादित करें"
+
+#: gnowsys_ndf/ndf/templates/ndf/node_edit_base.html:89
+msgid "Create New Blog"
+msgstr "नया बनायें"
+
+#: gnowsys_ndf/ndf/templates/ndf/node_edit_base.html:91
+msgid "Create New "
+msgstr "नया बनायें"
+
+#: gnowsys_ndf/ndf/templates/ndf/node_edit_base.html:100
+#: gnowsys_ndf/ndf/templates/ndf/theme_create_edit.html:79
+#: gnowsys_ndf/ndf/templates/ndf/theme_create_edit.html:213
+#: gnowsys_ndf/ndf/templates/ndf/topic_create_edit.html:90
+#: gnowsys_ndf/ndf/templates/ndf/topic_create_edit.html:165
+#: gnowsys_ndf/ndf/templates/ndf/translation_page.html:98
+#: gnowsys_ndf/ndf/templates/ndf/translation_page.html:102
+msgid ""
+"Please give your page a descriptive name. It's helpful for others and for "
+"yourself."
+msgstr "अपने पृष्ठ को एक विवरणात्मक नाम दें जो आपके और दूसरों के लिए सहायक होगा"
+
+#: gnowsys_ndf/ndf/templates/ndf/node_edit_base.html:113
+msgid "Node"
+msgstr "नोड"
+
+#: gnowsys_ndf/ndf/templates/ndf/node_edit_base.html:116
+#: gnowsys_ndf/ndf/templates/ndf/topic_create_edit.html:64
+msgid "Requires"
+msgstr "आवश्यक है"
+
+#: gnowsys_ndf/ndf/templates/ndf/node_edit_base.html:124
+#: gnowsys_ndf/ndf/templates/ndf/topic_create_edit.html:61
+msgid "Metadata"
+msgstr "मेटाडाटा"
+
+#: gnowsys_ndf/ndf/templates/ndf/node_edit_base.html:127
+#: gnowsys_ndf/ndf/templates/ndf/topic_create_edit.html:70
+msgid "Teaches"
+msgstr "टीचेस्"
+
+#: gnowsys_ndf/ndf/templates/ndf/node_edit_base.html:131
+#: gnowsys_ndf/ndf/templates/ndf/topic_create_edit.html:67
+msgid "Assesses"
+msgstr "आकलन"
+
+#: gnowsys_ndf/ndf/templates/ndf/node_edit_base.html:137
+msgid "Interaction Settings"
+msgstr "अधिसूचना सेटिंग"
+
+#: gnowsys_ndf/ndf/templates/ndf/node_edit_base.html:177
+msgid "Settings"
+msgstr "सेटिंग"
+
+#: gnowsys_ndf/ndf/templates/ndf/node_edit_base.html:183
+#: gnowsys_ndf/ndf/templates/ndf/node_edit_base.html:211
+msgid "Visibility"
+msgstr "दृश्यता"
+
+#: gnowsys_ndf/ndf/templates/ndf/node_edit_base.html:190
+#: gnowsys_ndf/ndf/templates/ndf/node_edit_base.html:197
+#: gnowsys_ndf/ndf/templates/ndf/node_edit_base.html:218
+msgid "Visible"
+msgstr "दर्शनीय"
+
+#: gnowsys_ndf/ndf/templates/ndf/node_edit_base.html:193
+#: gnowsys_ndf/ndf/templates/ndf/node_edit_base.html:200
+#: gnowsys_ndf/ndf/templates/ndf/node_edit_base.html:221
+msgid "Hidden"
+msgstr "छुपा हुआ"
+
+#: gnowsys_ndf/ndf/templates/ndf/node_edit_base.html:250
+msgid "Location:"
+msgstr "स्थान:"
+
+#: gnowsys_ndf/ndf/templates/ndf/node_edit_base.html:263
+msgid "Page Type"
+msgstr "फाइल प्रकार"
+
+#: gnowsys_ndf/ndf/templates/ndf/node_edit_base.html:361
+#: gnowsys_ndf/ndf/templates/ndf/topic_create_edit.html:237
+msgid "Page"
+msgstr "पृष्ठ"
+
+#: gnowsys_ndf/ndf/templates/ndf/node_edit_base.html:365
+#: gnowsys_ndf/ndf/templates/ndf/topic_create_edit.html:242
+msgid "File"
+msgstr "फ़ाइल"
+
+#: gnowsys_ndf/ndf/templates/ndf/node_edit_base.html:374
+#: gnowsys_ndf/ndf/templates/ndf/topic_create_edit.html:254
+msgid "Video"
+msgstr "वीडियो"
+
+#: gnowsys_ndf/ndf/templates/ndf/node_edit_base.html:379
+#: gnowsys_ndf/ndf/templates/ndf/topic_create_edit.html:260
+msgid "Pandora"
+msgstr "पेंडोरा"
+
+#: gnowsys_ndf/ndf/templates/ndf/node_edit_base.html:384
+#: gnowsys_ndf/ndf/templates/ndf/quiz_item_details.html:26
+#: gnowsys_ndf/ndf/templates/ndf/quiz_list.html:53
+#: gnowsys_ndf/ndf/templates/ndf/quiz_list.html:80
+#: gnowsys_ndf/ndf/templates/ndf/topic_create_edit.html:267
+#: gnowsys_ndf/ndf/templates/ndf/user_profile_form.html:111
+msgid "Quiz"
+msgstr "प्रश्नोत्तरी"
+
+#: gnowsys_ndf/ndf/templates/ndf/node_edit_base.html:407
+msgid "Please add or edit Metadata"
+msgstr "कृपया मेटाडेटा जोड़े अथवा संपादित करें"
+
+#: gnowsys_ndf/ndf/templates/ndf/node_edit_base.html:416
+msgid "Educational Use:"
+msgstr "शैक्षिक उपयोगिताः"
+
+#: gnowsys_ndf/ndf/templates/ndf/node_edit_base.html:418
+msgid "Interactivity Type: "
+msgstr "इंटरैक्टिविटी प्रकार"
+
+#: gnowsys_ndf/ndf/templates/ndf/node_edit_base.html:420
+msgid "Educational Level:"
+msgstr "शैक्षिक स्तरः"
+
+#: gnowsys_ndf/ndf/templates/ndf/node_edit_base.html:422
+msgid "Educational Subject:"
+msgstr "शैक्षिक विषयः"
+
+#: gnowsys_ndf/ndf/templates/ndf/node_edit_base.html:424
+msgid "Time Required: "
+msgstr "आवश्यक समयः"
+
+#: gnowsys_ndf/ndf/templates/ndf/node_edit_base.html:426
+msgid "Target Audience:"
+msgstr "लक्षित गण:"
+
+#: gnowsys_ndf/ndf/templates/ndf/node_edit_base.html:428
+msgid "Text Complexity"
+msgstr "पाठ की जटिलता"
+
+#: gnowsys_ndf/ndf/templates/ndf/node_edit_base.html:430
+msgid "Age Range:"
+msgstr "आयु वर्ग:"
+
+#: gnowsys_ndf/ndf/templates/ndf/node_edit_base.html:432
+msgid "Reading Level:"
+msgstr "पठन स्तरः"
+
+#: gnowsys_ndf/ndf/templates/ndf/node_edit_base.html:434
+msgid "Curricular:"
+msgstr ""
+
+#: gnowsys_ndf/ndf/templates/ndf/node_edit_base.html:436
+msgid "Educational Alignment:"
+msgstr "शैक्षिक उपयोगिताः"
+
+#: gnowsys_ndf/ndf/templates/ndf/node_edit_base.html:458
+msgid "Based on Url: "
+msgstr "यूआरएल पर आधारित:"
+
+#: gnowsys_ndf/ndf/templates/ndf/node_edit_base.html:464
+msgid "Source: "
+msgstr ""
+
+#: gnowsys_ndf/ndf/templates/ndf/node_edit_base.html:496
+msgid "Add properties to the discussion feature of this "
+msgstr ""
+
+#: gnowsys_ndf/ndf/templates/ndf/node_edit_base.html:496
+msgid " node "
+msgstr ""
+
+#: gnowsys_ndf/ndf/templates/ndf/node_edit_base.html:500
+msgid "Interaction : "
+msgstr "इंटरैक्टिवस"
+
+#: gnowsys_ndf/ndf/templates/ndf/node_edit_base.html:510
+msgid "Release Option:"
+msgstr "संबंध:"
+
+#: gnowsys_ndf/ndf/templates/ndf/node_edit_base.html:521
+msgid "Interaction Type:"
+msgstr "इंटरैक्टिविटी प्रकार"
+
+#: gnowsys_ndf/ndf/templates/ndf/node_edit_base.html:538
+msgid "Interaction start date:"
+msgstr "इंटरैक्टिविटी प्रकार"
+
+#: gnowsys_ndf/ndf/templates/ndf/node_edit_base.html:547
+msgid "Interaction close date:"
+msgstr "पंजीकरण बंद"
+
+#: gnowsys_ndf/ndf/templates/ndf/node_edit_base.html:637
+msgid "Save as Draft And Preview"
+msgstr ""
+
+#: gnowsys_ndf/ndf/templates/ndf/node_edit_base.html:770
+msgid "This will cancel the save"
+msgstr ""
+
+#: gnowsys_ndf/ndf/templates/ndf/node_edit_base.html:814
+msgid "Successfully switched groups"
+msgstr ""
+
+#: gnowsys_ndf/ndf/templates/ndf/node_edit_base.html:1320
+msgid "Remove this tag"
+msgstr ""
+
+#: gnowsys_ndf/ndf/templates/ndf/node_edit_base.html:1408
+msgid "already exist. Please choose another name"
+msgstr ""
+
+#: gnowsys_ndf/ndf/templates/ndf/node_edit_base.html:1414
+msgid "Name cannot include "
+msgstr ""
+
+#: gnowsys_ndf/ndf/templates/ndf/node_edit_base.html:1420
+msgid "Name cannot be empty."
+msgstr ""
+
+#: gnowsys_ndf/ndf/templates/ndf/node_edit_base.html:1437
+msgid "Please fill compulsory metadata fields(marked with a *)"
+msgstr "कृपया अनिवार्य मेडाडेटा क्षेत्र भरें (* से चिन्हित करें)"
+
+#: gnowsys_ndf/ndf/templates/ndf/node_edit_base.html:1448
+msgid "Please fill compulsory fields(marked with a *)"
+msgstr "कृपया अनिवार्य क्षेत्र भरें(* से चिन्हित करें)"
+
+#: gnowsys_ndf/ndf/templates/ndf/node_search_base.html:7
+msgid "Please enter a keyword.. "
+msgstr "कृपया संकेतशब्द (keyword) भरें"
+
+#: gnowsys_ndf/ndf/templates/ndf/nussd_course_create_edit.html:78
+#: gnowsys_ndf/ndf/templates/ndf/organization_create_edit.html:12
+#: gnowsys_ndf/ndf/templates/ndf/person_create_edit.html:12
+#: gnowsys_ndf/ndf/templates/ndf/student_create_edit.html:12
+#: gnowsys_ndf/ndf/templates/ndf/trainer_create_edit.html:99
+msgid "Editing"
+msgstr "%(title_var)s: %(node_name)s को संपादित करें"
+
+#: gnowsys_ndf/ndf/templates/ndf/nussd_course_create_edit.html:80
+#: gnowsys_ndf/ndf/templates/ndf/trainer_create_edit.html:101
+msgid "Register "
+msgstr "पंजीकरण"
+
+#: gnowsys_ndf/ndf/templates/ndf/nussd_course_create_edit.html:242
+#: gnowsys_ndf/ndf/templates/ndf/nussd_course_create_edit.html:264
+msgid "Qualification"
+msgstr "अर्हता"
+
+#: gnowsys_ndf/ndf/templates/ndf/nussd_course_create_edit.html:243
+#: gnowsys_ndf/ndf/templates/ndf/nussd_course_create_edit.html:265
+#: gnowsys_ndf/ndf/templates/ndf/refresh_subscribed_users.html:14
+msgid "Action"
+msgstr "क्रिया"
+
+#: gnowsys_ndf/ndf/templates/ndf/nussd_course_create_edit.html:248
+#: gnowsys_ndf/ndf/templates/ndf/nussd_course_create_edit.html:270
+msgid "Please set qualification text!"
+msgstr "Please set qualification text!"
+
+#: gnowsys_ndf/ndf/templates/ndf/nussd_course_create_edit.html:301
+msgid "Demo requirement text"
+msgstr "Demo requirement text"
+
+#: gnowsys_ndf/ndf/templates/ndf/nussd_course_create_edit.html:618
+#: gnowsys_ndf/ndf/templates/ndf/organization_create_edit.html:281
+#: gnowsys_ndf/ndf/templates/ndf/person_create_edit.html:303
+#: gnowsys_ndf/ndf/templates/ndf/student_create_edit.html:686
+#: gnowsys_ndf/ndf/templates/ndf/trainer_create_edit.html:1276
+#: gnowsys_ndf/ndf/templates/registration/registration_form.html:29
+msgid "Register"
+msgstr "पंजीकरण"
+
+#: gnowsys_ndf/ndf/templates/ndf/online.html:16
+msgid "<h2>Meeting</h2>"
+msgstr "<h2>उपयोगकर्ता चुनें</h2>"
+
+#: gnowsys_ndf/ndf/templates/ndf/online.html:32
+msgid "<span class=\"start\">&nbsp;&nbsp;Start</span>"
+msgstr ""
+
+#: gnowsys_ndf/ndf/templates/ndf/online.html:46
+msgid "Last Seen"
+msgstr "Last Seen"
+
+#: gnowsys_ndf/ndf/templates/ndf/online.html:47
+msgid "Online"
+msgstr "ऑनलाइन"
+
+#: gnowsys_ndf/ndf/templates/ndf/organization_create_edit.html:14
+#: gnowsys_ndf/ndf/templates/ndf/person_create_edit.html:14
+#: gnowsys_ndf/ndf/templates/ndf/student_create_edit.html:14
+msgid "Register a "
+msgstr "पंजीकरण"
+
+#: gnowsys_ndf/ndf/templates/ndf/organization_details.html:48
+msgid "MIS Details"
+msgstr "एम.आई.एस. विवरण"
+
+#: gnowsys_ndf/ndf/templates/ndf/organization_details.html:60
+msgid "NOT assinged."
+msgstr "सौंपा नहीं गया"
+
+#: gnowsys_ndf/ndf/templates/ndf/organization_details.html:93
+msgid "Other Details"
+msgstr "अन्य विवरण"
+
+#: gnowsys_ndf/ndf/templates/ndf/organization_details.html:97
+msgid "Created by : "
+msgstr "सृजक"
+
+#: gnowsys_ndf/ndf/templates/ndf/organization_details.html:105
+msgid "Created on : "
+msgstr "सृजन तिथि"
+
+#: gnowsys_ndf/ndf/templates/ndf/page_create_edit.html:6
+msgid "Page Editor"
+msgstr "पृष्ठ संपादक"
+
+#: gnowsys_ndf/ndf/templates/ndf/page_create_edit.html:7
+msgid ""
+"<b>Pages</b> are just like the pages of your notebook. You can write your "
+"content here.</p>"
+msgstr "<b>पृष्ठ</b> आपकी पुस्तक के पृष्ठ जैसा ही है। इसमें आप अपना विषय लिख सकते हैं"
+
+#: gnowsys_ndf/ndf/templates/ndf/page_details.html:4
+msgid ""
+"  <p>Pages are user-written articles on a range of subjects. Any contributor "
+"or a group of contributors can create (and own) new articles, and there can "
+"be multiple articles on the same topic, each written by a different author. "
+"</p>\n"
+"  <h6>Who can make a page?</h6>\n"
+"  <p> Anyone with an account can create a new article. When creating a new "
+"article, the initial contributor can choose to have a defined list of "
+"authors, all of whom can edit the page, or have an open, wiki-like format "
+"where anyone can contribute.  </p>\n"
+msgstr ""
+"<p>पृष्ठ किसी भी विषय पर लिखा गया लेख है। कोई योगदानकर्ता या समूह, पृष्ठ बना सकता है, "
+"किसी भी विषय पर विभिन्न लेखकों द्वारा सृजित अनेक पृष्ठ हो सकते है।</p>  <h6>पृष्ठ कौन "
+"तैयार कर सकता है?</h6> <p>प्रत्येक पंजीकृत उपयोगकर्ता एक नया पृष्ठ सृजित कर सकता है। "
+"लेखक, पूर्व निर्धारित पंजीकृत उपयोगकर्ताओं में से इस पृष्ठ को संपादित करने के लिए आमंत्रित कर "
+"सकता है अथवा विकी प्रारूप का प्रयोग करते हुए सभी पंजीकृत उपयोगकर्ताओं को संपादन करने की "
+"अनुमति भी प्रदान कर सकता है।  </p>\n"
+
+#: gnowsys_ndf/ndf/templates/ndf/page_list.html:11
+msgid "Pages Introduction"
+msgstr "निर्देश"
+
+#: gnowsys_ndf/ndf/templates/ndf/page_list.html:12
+msgid "Working with Pages"
+msgstr ""
+
+#: gnowsys_ndf/ndf/templates/ndf/page_list.html:13
+msgid "Page types"
+msgstr "पृष्ठ"
+
+#: gnowsys_ndf/ndf/templates/ndf/page_list.html:19
+msgid "Pages"
+msgstr "पृष्ठ"
+
+#: gnowsys_ndf/ndf/templates/ndf/page_list.html:25
+msgid ""
+"  <p>  Pages are user-written articles on a range of subjects. Any "
+"contributor or a group of contributors can create (and own) new articles, "
+"and there can be multiple articles on the same topic, each written by a "
+"different author.  </p>\n"
+"  <h5>Who can make a page?</h5>\n"
+"  <p>    Anyone with an account can create a new article. When creating a "
+"new article, the initial contributor can choose to have a defined list of "
+"authors, all of whom can edit the page, or have an open, wiki-like format "
+"where anyone can contribute.  </p>\n"
+msgstr ""
+"<p>पृष्ठ किसी भी विषय पर लिखा गया लेख है। कोई योगदानकर्ता या समूह, पृष्ठ बना सकता है, "
+"किसी भी विषय पर विभिन्न लेखकों द्वारा सृजित अनेक पृष्ठ हो सकते है।</p>  <h6>पृष्ठ कौन "
+"तैयार कर सकता है?</h6> <p>प्रत्येक पंजीकृत उपयोगकर्ता एक नया पृष्ठ सृजित कर सकता है। "
+"लेखक, पूर्व निर्धारित पंजीकृत उपयोगकर्ताओं में से इस पृष्ठ को संपादित करने के लिए आमंत्रित कर "
+"सकता है अथवा विकी प्रारूप का प्रयोग करते हुए सभी पंजीकृत उपयोगकर्ताओं को संपादन करने की "
+"अनुमति भी प्रदान कर सकता है।</p>\n"
+
+#: gnowsys_ndf/ndf/templates/ndf/page_list.html:36
+msgid "Please Login to create your shelf"
+msgstr ""
+
+#: gnowsys_ndf/ndf/templates/ndf/page_list.html:74
+#: gnowsys_ndf/ndf/templates/ndf/term.html:26
+msgid "Visit"
+msgstr "दृश्यता"
+
+#: gnowsys_ndf/ndf/templates/ndf/page_list.html:76
+msgid "All Pages"
+msgstr "पृष्ठ"
+
+#: gnowsys_ndf/ndf/templates/ndf/page_list.html:135
+msgid "matched your search criteria!!!"
+msgstr ""
+
+#: gnowsys_ndf/ndf/templates/ndf/page_list.html:199
+msgid ""
+" This group doesn't have any pages. <b>Be the first to create a Page!</b>"
+msgstr "इस समूह में कोई पृष्ठ नहीं है। <b>आप पृष्ठ बनाने वाले प्रथम व्यक्ति हो सकते हैं</b>"
+
+#: gnowsys_ndf/ndf/templates/ndf/page_list.html:237
+msgid "Page Details"
+msgstr "विवरण"
+
+#: gnowsys_ndf/ndf/templates/ndf/page_list.html:246
+msgid "Under Moderation"
+msgstr "अंडरलाईन मोडरेशन ग्रुप"
+
+#: gnowsys_ndf/ndf/templates/ndf/page_list.html:264
+msgid " This group doesn't have any collections."
+msgstr "इस समूह में कोई संग्रह नहीं है"
+
+#: gnowsys_ndf/ndf/templates/ndf/partner_list.html:42
+msgid "There are no"
+msgstr "अभी तक नहीं है"
+
+#: gnowsys_ndf/ndf/templates/ndf/partner_list.html:42
+msgid "created yet."
+msgstr "अभी तक सृजन"
+
+#: gnowsys_ndf/ndf/templates/ndf/person_details.html:51
+msgid "Graph "
+msgstr "ग्राफ"
+
+#: gnowsys_ndf/ndf/templates/ndf/person_details.html:53
+msgid "Concept Graph "
+msgstr "संकल्पना ग्राफ"
+
+#: gnowsys_ndf/ndf/templates/ndf/person_details.html:54
+msgid "Collection Graph "
+msgstr "संग्रह ग्राफ"
+
+#: gnowsys_ndf/ndf/templates/ndf/person_details.html:55
+msgid "Dependency Graph "
+msgstr "निर्भरता ग्राफ"
+
+#: gnowsys_ndf/ndf/templates/ndf/person_details.html:59
+msgid "Location "
+msgstr "स्थान"
+
+#: gnowsys_ndf/ndf/templates/ndf/person_details.html:61
+msgid "Discuss "
+msgstr "परिचर्चा"
+
+#: gnowsys_ndf/ndf/templates/ndf/program_event_group.html:15
+msgid "Add Page"
+msgstr "पृष्ठ जोड़ें"
+
+#: gnowsys_ndf/ndf/templates/ndf/quiz_create_edit.html:5
+msgid "Quiz Editor"
+msgstr "प्रश्नोत्तरी संपादक"
+
+#: gnowsys_ndf/ndf/templates/ndf/quiz_create_edit.html:7
+msgid ""
+"<p class=\"text-justify\">A <b>Quiz</b> is a sequenced collection of <b>quiz "
+"items</b>. A quiz-item can be any of the three types: <strong><i>short "
+"response, single-choice</i></strong> and <strong><i>multiple-choice</i></"
+"strong>. <i>submit response</i> and <i>match the following</i> types will be "
+"implemented very soon.</p>\n"
+"    <p class=\"text-justify\">You can build a quiz in two ways:\n"
+"      <ol  class=\"text-justify\">\n"
+"\t<li>By editing, Quiz node (via collection-list).</li>\n"
+"\t<li>By using 'Quiz-Item' button corresponding to the Quiz.</li>\n"
+"      </ol>    </p>\n"
+msgstr ""
+"<p class=\"text-justify\">\n"
+"  एक <b>प्रश्नोत्तरी</b> के अनुक्रम संग्रह है <b>प्रश्नोत्तरी आइटम</b>.एक प्रश्नोत्तरी आइटम "
+"तीन प्रकार के किसी भी हो सकता है: <strong><i>कम प्रतिक्रिया, एक विकल्प</i></"
+"strong> और <strong><i>बहुविकल्प</i></strong>. <i>प्रतिक्रिया सबमिट करें</i> और "
+"<i>मैच निम्नलिखित</i> प्रकार के बहुत जल्द ही लागू किया जाएगा.\n"
+"  </p>\n"
+"  <p class=\"text-justify\">आप दो तरह से एक प्रश्नोत्तरी का निर्माण कर सकते हैं:\n"
+"    <ol  class=\"text-justify\">\n"
+"      <li>संपादन करके, प्रश्नोत्तरी नोड (संग्रह की सूची के माध्यम से).</li>\n"
+"      <li>'क्विज आइटम' का उपयोग करके बटन प्रश्नोत्तरी के लिए इसी.</li>\n"
+"    </ol>  </p>\n"
+
+#: gnowsys_ndf/ndf/templates/ndf/quiz_create_edit.html:18
+#: gnowsys_ndf/ndf/templates/ndf/quiz_item_create_edit.html:54
+#: gnowsys_ndf/ndf/templates/ndf/quiz_item_details.html:38
+#: gnowsys_ndf/ndf/templates/ndf/quiz_item_details.html:40
+msgid "+ Add"
+msgstr "+जोड़ें"
+
+#: gnowsys_ndf/ndf/templates/ndf/quiz_create_edit.html:20
+#: gnowsys_ndf/ndf/templates/ndf/quiz_item_details.html:40
+#: gnowsys_ndf/ndf/templates/ndf/quiz_list.html:67
+msgid "Item"
+msgstr "वस्तु"
+
+#: gnowsys_ndf/ndf/templates/ndf/quiz_details.html:7
+msgid ""
+"  <p class=\"text-justify\">\n"
+"  A <b>Quiz</b> is a sequenced collection of <b>quiz items</b>. A quiz-item "
+"can be any of the three types: <strong><i>short response, single-choice</i></"
+"strong> and <strong><i>multiple-choice</i></strong>. <i>submit response</i> "
+"and <i>match the following</i> types will be implemented very soon.\n"
+"  </p>\n"
+"  <p class=\"text-justify\">You can build a quiz in two ways:\n"
+"    <ol  class=\"text-justify\">\n"
+"      <li>By editing, Quiz node (via collection-list).</li>\n"
+"      <li>By using 'Quiz-Item' button corresponding to the Quiz.</li>\n"
+"    </ol>  </p>\n"
+msgstr ""
+"<p class=\"text-justify\">\n"
+"  एक <b>प्रश्नोत्तरी</b> के अनुक्रम संग्रह है <b>प्रश्नोत्तरी आइटम</b>.एक प्रश्नोत्तरी आइटम "
+"तीन प्रकार के किसी भी हो सकता है: <strong><i>कम प्रतिक्रिया, एक विकल्प</i></"
+"strong> और <strong><i>बहुविकल्प</i></strong>. <i>प्रतिक्रिया सबमिट करें</i> और "
+"<i>मैच निम्नलिखित</i> प्रकार के बहुत जल्द ही लागू किया जाएगा.\n"
+"  </p>\n"
+"  <p class=\"text-justify\">आप दो तरह से एक प्रश्नोत्तरी का निर्माण कर सकते हैं:\n"
+"    <ol  class=\"text-justify\">\n"
+"      <li>संपादन करके, प्रश्नोत्तरी नोड (संग्रह की सूची के माध्यम से).</li>\n"
+"      <li>'क्विज आइटम' का उपयोग करके बटन प्रश्नोत्तरी के लिए इसी.</li>\n"
+"    </ol>  </p>\n"
+
+#: gnowsys_ndf/ndf/templates/ndf/quiz_details.html:20
+msgid "Quiz "
+msgstr "प्रश्नोत्तरी"
+
+#: gnowsys_ndf/ndf/templates/ndf/quiz_item_create_edit.html:37
+msgid "Quiz-Item Editor"
+msgstr "प्रश्नोत्तरी प्रश्न संपादक"
+
+#: gnowsys_ndf/ndf/templates/ndf/quiz_item_create_edit.html:40
+msgid ""
+" <p class=\"text-justify\">A <b>Quiz</b> is a sequenced collection of "
+"<b>quiz items</b>. A quiz-item can be any of the three types: "
+"<strong><i>short response, single-choice</i></strong> and "
+"<strong><i>multiple-choice</i></strong>. <i>submit response</i> and <i>match "
+"the following</i> types will be implemented very soon.</p>\n"
+"    <p class=\"text-justify\">You can build a quiz in two ways:\n"
+"      <ol  class=\"text-justify\">\n"
+"\t<li>By editing, Quiz node (via collection-list).</li>\n"
+"\t<li>By using 'Quiz-Item' button corresponding to the Quiz.</li>\n"
+"      </ol>    </p>\n"
+msgstr ""
+"<p class=\"text-justify\">\n"
+"  एक <b>प्रश्नोत्तरी</b> के अनुक्रम संग्रह है <b>प्रश्नोत्तरी आइटम</b>.एक प्रश्नोत्तरी आइटम "
+"तीन प्रकार के किसी भी हो सकता है: <strong><i>कम प्रतिक्रिया, एक विकल्प</i></"
+"strong> और <strong><i>बहुविकल्प</i></strong>. <i>प्रतिक्रिया सबमिट करें</i> और "
+"<i>मैच निम्नलिखित</i> प्रकार के बहुत जल्द ही लागू किया जाएगा.\n"
+"  </p>\n"
+"  <p class=\"text-justify\">आप दो तरह से एक प्रश्नोत्तरी का निर्माण कर सकते हैं:\n"
+"    <ol  class=\"text-justify\">\n"
+"      <li>संपादन करके, प्रश्नोत्तरी नोड (संग्रह की सूची के माध्यम से).</li>\n"
+"      <li>'क्विज आइटम' का उपयोग करके बटन प्रश्नोत्तरी के लिए इसी.</li>\n"
+"    </ol>  </p>\n"
+
+#: gnowsys_ndf/ndf/templates/ndf/quiz_item_create_edit.html:52
+msgid "+ Add Quiz"
+msgstr "+ जोड़ें प्रश्नोत्तरी"
+
+#: gnowsys_ndf/ndf/templates/ndf/quiz_item_create_edit.html:82
+msgid "Quiz Item"
+msgstr "प्रश्नोत्तरी प्रश्न"
+
+#: gnowsys_ndf/ndf/templates/ndf/quiz_item_create_edit.html:85
+msgid "Type of Quiz"
+msgstr "प्रश्नोत्तरी के प्रकार"
+
+#: gnowsys_ndf/ndf/templates/ndf/quiz_item_create_edit.html:111
+#: gnowsys_ndf/ndf/templates/ndf/quiz_item_details.html:53
+msgid "Question"
+msgstr "प्रश्न"
+
+#: gnowsys_ndf/ndf/templates/ndf/quiz_item_create_edit.html:120
+msgid "Options"
+msgstr "विकल्प"
+
+#: gnowsys_ndf/ndf/templates/ndf/quiz_item_details.html:26
+msgid "is a sequenced collection of"
+msgstr "एक क्रमबद्ध संग्रह है"
+
+#: gnowsys_ndf/ndf/templates/ndf/quiz_item_details.html:26
+msgid "quiz items"
+msgstr "प्रश्नोत्तरी प्रश्न"
+
+#: gnowsys_ndf/ndf/templates/ndf/quiz_item_details.html:26
+msgid "A quiz-item can be any of the three types"
+msgstr "प्रश्नोत्तरी प्रश्न किसी भी तीन प्रकार का हो सकता है"
+
+#: gnowsys_ndf/ndf/templates/ndf/quiz_item_details.html:26
+msgid "short response, single-choice"
+msgstr "छोटी अनुक्रिया, एकल विकल्प"
+
+#: gnowsys_ndf/ndf/templates/ndf/quiz_item_details.html:26
+msgid "multiple-choice"
+msgstr "बहुविकल्पीय"
+
+#: gnowsys_ndf/ndf/templates/ndf/quiz_item_details.html:26
+msgid "submit response"
+msgstr "अनुक्रिया दे"
+
+#: gnowsys_ndf/ndf/templates/ndf/quiz_item_details.html:26
+msgid "match the following"
+msgstr "निम्नलिखित से मिलान करें"
+
+#: gnowsys_ndf/ndf/templates/ndf/quiz_item_details.html:26
+msgid "types will be implemented very soon."
+msgstr "शीघ्र ही लागू किया जायेगा"
+
+#: gnowsys_ndf/ndf/templates/ndf/quiz_item_details.html:28
+msgid "You can build a quiz in two ways:"
+msgstr "प्रश्नोत्तरी को दो प्रकार से बनाया जा सकता है"
+
+#: gnowsys_ndf/ndf/templates/ndf/quiz_item_details.html:30
+msgid "By editing, Quiz node (via collection-list)."
+msgstr "संपादन द्वारा, प्रश्नोत्तरी नोड (संग्रह सूची द्वारा)"
+
+#: gnowsys_ndf/ndf/templates/ndf/quiz_item_details.html:31
+msgid "By using 'Quiz-Item' button corresponding to the Quiz."
+msgstr "प्रश्नोत्तरी प्रश्न बटन का उपयोग करके प्रश्नोत्तरी की"
+
+#: gnowsys_ndf/ndf/templates/ndf/quiz_item_details.html:55
+msgid "Edit this Question"
+msgstr "इस प्रश्न को संपादित करें"
+
+#: gnowsys_ndf/ndf/templates/ndf/quiz_item_details.html:59
+msgid "posted on"
+msgstr "भेजा गया"
+
+#: gnowsys_ndf/ndf/templates/ndf/quiz_item_details.html:59
+msgid "by "
+msgstr "द्वारा"
+
+#: gnowsys_ndf/ndf/templates/ndf/quiz_item_details.html:62
+msgid "Contributors:  "
+msgstr "योगदानकर्ता"
+
+#: gnowsys_ndf/ndf/templates/ndf/quiz_item_details.html:65
+msgid "Last update:  "
+msgstr "अंतिम तिथिः"
+
+#: gnowsys_ndf/ndf/templates/ndf/quiz_item_details.html:97
+msgid "Answer"
+msgstr "उत्तर"
+
+#: gnowsys_ndf/ndf/templates/ndf/quiz_list.html:9
+msgid "About Quiz/QuizItem"
+msgstr "प्रश्नोत्तरी के बारे में/प्रश्नोत्तरी प्रश्न"
+
+#: gnowsys_ndf/ndf/templates/ndf/quiz_list.html:23
+msgid "Quizzes"
+msgstr "प्रश्नोत्तरी"
+
+#: gnowsys_ndf/ndf/templates/ndf/quiz_list.html:125
+msgid "This group doesn't have any quiz. Be the first to create a Quiz!"
+msgstr ""
+"इस समूह में कोई प्रश्नोत्तरी नहीं है। <b>आप प्रश्नोत्तरी बनाने वाले प्रथम व्यक्ति हो सकते हैं</"
+"b>"
+
+#: gnowsys_ndf/ndf/templates/ndf/quiz_list.html:137
+msgid "Quiz Items"
+msgstr "प्रश्नोत्तरी प्रश्न"
+
+#: gnowsys_ndf/ndf/templates/ndf/quiz_list.html:150
+msgid ""
+"This group doesn't have any quiz-items. Be the first to create a Quiz-Item!"
+msgstr ""
+"इस समूह में कोई प्रश्नोत्तरी प्रश्न नहीं है। <b>आप प्रश्नोत्तरी प्रश्न बनाने वाले प्रथम व्यक्ति "
+"हो सकते हैं</b>"
+
+#: gnowsys_ndf/ndf/templates/ndf/rating.html:29
+#: gnowsys_ndf/ndf/templates/ndf/rating.html:79
+msgid " by "
+msgstr ""
+
+#: gnowsys_ndf/ndf/templates/ndf/rating.html:31
+msgid "Not rated yet!"
+msgstr "अभी तक सृजन"
+
+#: gnowsys_ndf/ndf/templates/ndf/rating.html:98
+msgid "Please login to rate this resource"
+msgstr ""
+
+#: gnowsys_ndf/ndf/templates/ndf/refresh_subscribed_users.html:3
+msgid "List Of Members. "
+msgstr "सदस्यों की सूची"
+
+#: gnowsys_ndf/ndf/templates/ndf/refresh_subscribed_users.html:7
+msgid "For the course:  "
+msgstr "पाठ्यक्रम के लिए:"
+
+#: gnowsys_ndf/ndf/templates/ndf/refresh_subscribed_users.html:13
+msgid "Users"
+msgstr "उपयोगकर्ता"
+
+#: gnowsys_ndf/ndf/templates/ndf/refresh_subscribed_users.html:22
+msgid "Remove"
+msgstr "हटाएँ"
+
+#: gnowsys_ndf/ndf/templates/ndf/reply_to_reply.html:84
+msgid "Reply to Reply:"
+msgstr "जवाब का जवाब दें:"
+
+#: gnowsys_ndf/ndf/templates/ndf/replyforum.html:89
+msgid "Add a Thread"
+msgstr "कड़ी संपादन करें"
+
+#: gnowsys_ndf/ndf/templates/ndf/replyforum.html:92
+msgid "Add a thread to the Forum"
+msgstr "फोरम के लिए एक कड़ी जोड़ें:"
+
+#: gnowsys_ndf/ndf/templates/ndf/replyforum.html:95
+msgid "Thread Name "
+msgstr "कड़ी नाम"
+
+#: gnowsys_ndf/ndf/templates/ndf/replyforum.html:101
+msgid "Please enter description"
+msgstr "विवरण"
+
+#: gnowsys_ndf/ndf/templates/ndf/repository.html:76
+msgid "Digital"
+msgstr ""
+
+#: gnowsys_ndf/ndf/templates/ndf/repository.html:76
+msgid "resources"
+msgstr "संसाधन"
+
+#: gnowsys_ndf/ndf/templates/ndf/repository.html:76
+msgid "grouped in multiple ways"
+msgstr ""
+
+#: gnowsys_ndf/ndf/templates/ndf/res_node_ajax_view.html:352
+msgid "eCourse"
+msgstr "पाठ्यक्रम"
+
+#: gnowsys_ndf/ndf/templates/ndf/shelf.html:4
+msgid "Shelf"
+msgstr "शेल्फ"
+
+#: gnowsys_ndf/ndf/templates/ndf/shelf.html:58
+msgid "Add "
+msgstr "टैग जोड़ें"
+
+#: gnowsys_ndf/ndf/templates/ndf/student_create_edit.html:164
+#: gnowsys_ndf/ndf/templates/ndf/trainer_create_edit.html:239
+#, fuzzy, python-format
+msgid " %(label_val)s   (Max. Size Limit 40kb) "
+msgstr "%(label_val)s   (Max. Size Limit 40kb)"
+
+#: gnowsys_ndf/ndf/templates/ndf/student_create_edit.html:177
+#: gnowsys_ndf/ndf/templates/ndf/trainer_create_edit.html:252
+#, fuzzy, python-format
+msgid " %(label_val)s   (Max. Size Limit 200kb) "
+msgstr "%(label_val)s   (Max. Size Limit 200kb)"
+
+#: gnowsys_ndf/ndf/templates/ndf/student_create_edit.html:365
+msgid "Passing Year"
+msgstr "उत्तीर्ण वर्ष"
+
+#: gnowsys_ndf/ndf/templates/ndf/student_create_edit.html:376
+msgid "Passing Certificate"
+msgstr "उत्तीर्ण प्रमाण-पत्र"
+
+#: gnowsys_ndf/ndf/templates/ndf/student_create_edit.html:392
+msgid "Degree Name"
+msgstr "उपाधि का नाम"
+
+#: gnowsys_ndf/ndf/templates/ndf/student_create_edit.html:403
+msgid "Stream(Main Subject)"
+msgstr "वर्ग (मुख्य विषय)"
+
+#: gnowsys_ndf/ndf/templates/ndf/student_create_edit.html:440
+msgid "Enroll. (or Roll) No."
+msgstr "पंजीकरण (या अनुक्रमांक) संख्या"
+
+#: gnowsys_ndf/ndf/templates/ndf/student_create_edit.html:451
+msgid "Registered for NSS?"
+msgstr "एन.एस.एस. में पंजीकृत है?"
+
+#: gnowsys_ndf/ndf/templates/ndf/student_create_edit.html:467
+msgid "Date of Registration"
+msgstr "पंजीकरण तिथि"
+
+#: gnowsys_ndf/ndf/templates/ndf/student_enroll.html:7
+#: gnowsys_ndf/ndf/templates/ndf/student_enroll.html:88
+msgid "Enroll Students in Courses"
+msgstr "पाठ्यक्रमों कें छात्रों का नामांकन करें"
+
+#: gnowsys_ndf/ndf/templates/ndf/student_enroll.html:120
+#: gnowsys_ndf/ndf/templates/ndf/studentcourseenrollment_create_edit.html:96
+msgid "Announced Course"
+msgstr "घोषित पाठ्यक्रम"
+
+#: gnowsys_ndf/ndf/templates/ndf/student_enroll.html:136
+msgid "Enrollment Duration"
+msgstr "नामांकन अवधि"
+
+#: gnowsys_ndf/ndf/templates/ndf/student_enroll.html:153
+msgid "NOTE: Display enrolled students also."
+msgstr "टिप्पणी: नामांकित छात्रों को भी दिखाएँ"
+
+#: gnowsys_ndf/ndf/templates/ndf/student_enroll.html:164
+msgid "Filter Students"
+msgstr "फिल्टर"
+
+#: gnowsys_ndf/ndf/templates/ndf/student_enroll.html:173
+#: gnowsys_ndf/ndf/templates/ndf/student_list.html:152
+msgid "Please select year"
+msgstr "कृपया वर्ष चुनें"
+
+#: gnowsys_ndf/ndf/templates/ndf/student_list.html:9
+msgid "Students List View"
+msgstr "छात्र सूची"
+
+#: gnowsys_ndf/ndf/templates/ndf/student_list.html:92
+msgid "Student List View"
+msgstr "छात्र सूची"
+
+#: gnowsys_ndf/ndf/templates/ndf/student_list.html:210
+msgid " - - - Select Filter - - - "
+msgstr "फिल्टर चुनें"
+
+#: gnowsys_ndf/ndf/templates/ndf/student_list.html:650
+msgid " - - - Select University - - - "
+msgstr "संस्था चुनें"
+
+#: gnowsys_ndf/ndf/templates/ndf/studentcourseenrollment_create_edit.html:124
+#: gnowsys_ndf/ndf/templates/ndf/trainer_create_edit.html:477
+msgid "University"
+msgstr "संस्था"
+
+#: gnowsys_ndf/ndf/templates/ndf/tag_browser.html:7
+msgid ""
+"<b>Tag</b> is like a keyword or category label. <br/><br/>Tags helps you to "
+"find photos, videos, files and pages which have something in common.</p>"
+msgstr ""
+"<b>टैग</b> कूटसंकेत के समान है. <br/><br/>टैग का प्रयोग करके खोजा जा सकता है.</p>"
+
+#: gnowsys_ndf/ndf/templates/ndf/task.html:14
+msgid "Tasks"
+msgstr "कार्य"
+
+#: gnowsys_ndf/ndf/templates/ndf/task.html:41
+msgid "All Task"
+msgstr "कार्य"
+
+#: gnowsys_ndf/ndf/templates/ndf/task.html:42
+msgid "Completed"
+msgstr "तुलना करें"
+
+#: gnowsys_ndf/ndf/templates/ndf/task.html:43
+msgid "Created by me"
+msgstr "सृजक"
+
+#: gnowsys_ndf/ndf/templates/ndf/task.html:44
+msgid "Assigned to me"
+msgstr "कार्य प्राप्तकर्ता:"
+
+#: gnowsys_ndf/ndf/templates/ndf/task.html:45
+msgid "pending"
+msgstr "अपलोड हो रहा है"
+
+#: gnowsys_ndf/ndf/templates/ndf/task.html:46
+msgid "Status Wise"
+msgstr "उपयोगकर्ता की स्थिति"
+
+#: gnowsys_ndf/ndf/templates/ndf/task.html:63
+#: gnowsys_ndf/ndf/templates/ndf/task_create_edit.html:188
+msgid "In Progress"
+msgstr ""
+
+#: gnowsys_ndf/ndf/templates/ndf/task.html:64
+#: gnowsys_ndf/ndf/templates/ndf/task_create_edit.html:189
+msgid "Resolved"
+msgstr ""
+
+#: gnowsys_ndf/ndf/templates/ndf/task.html:65
+#: gnowsys_ndf/ndf/templates/ndf/task_create_edit.html:190
+msgid "Feedback"
+msgstr ""
+
+#: gnowsys_ndf/ndf/templates/ndf/task.html:67
+#: gnowsys_ndf/ndf/templates/ndf/task_create_edit.html:192
+msgid "Rejected"
+msgstr ""
+
+#: gnowsys_ndf/ndf/templates/ndf/task.html:330
+#, python-format
+msgid ""
+"Search Results: <span class=\"label alert\">No %(title|lower)s"
+"%(TASK_inst.count|pluralize)s matched your search criteria "
+msgstr ""
+
+#: gnowsys_ndf/ndf/templates/ndf/task_create_edit.html:104
+msgid "Task Editor"
+msgstr "कार्य संपादक"
+
+#: gnowsys_ndf/ndf/templates/ndf/task_create_edit.html:110
+msgid "Please wait till file is Uploading..."
+msgstr ""
+
+#: gnowsys_ndf/ndf/templates/ndf/task_create_edit.html:114
+msgid "Assignees"
+msgstr "कार्य प्राप्तकर्ता:"
+
+#: gnowsys_ndf/ndf/templates/ndf/task_create_edit.html:121
+msgid "- - - Select Assignee - - -"
+msgstr "कार्य प्राप्तकर्ता को चुने"
+
+#: gnowsys_ndf/ndf/templates/ndf/task_create_edit.html:151
+msgid "Task Type "
+msgstr "कार्य प्रकार"
+
+#: gnowsys_ndf/ndf/templates/ndf/task_create_edit.html:153
+msgid "- - - Select Task Type - - -"
+msgstr "कार्य प्रकार चुनें"
+
+#: gnowsys_ndf/ndf/templates/ndf/task_create_edit.html:155
+#, python-format
+msgid "%(alt)s"
+msgstr "%(alt)s"
+
+#: gnowsys_ndf/ndf/templates/ndf/task_create_edit.html:158
+msgid "Please select Task Type."
+msgstr "कृपया कार्य प्रकार चुनें"
+
+#: gnowsys_ndf/ndf/templates/ndf/task_create_edit.html:166
+#: gnowsys_ndf/ndf/templates/ndf/topic_create_edit.html:88
+#: gnowsys_ndf/ndf/templates/ndf/topic_create_edit.html:163
+msgid "Name"
+msgstr "नाम"
+
+#: gnowsys_ndf/ndf/templates/ndf/task_create_edit.html:167
+#: gnowsys_ndf/ndf/templates/ndf/task_details.html:267
+msgid "Enter name"
+msgstr "बैच का नाम अंकित करें"
+
+#: gnowsys_ndf/ndf/templates/ndf/task_create_edit.html:168
+msgid "Please give your Task a descriptive name"
+msgstr "अपने पृष्ठ को एक विवरणात्मक नाम दें जो आपके और दूसरों के लिए सहायक होगा"
+
+#: gnowsys_ndf/ndf/templates/ndf/task_create_edit.html:176
+msgid "Parent"
+msgstr "मूल कार्यः"
+
+#: gnowsys_ndf/ndf/templates/ndf/task_create_edit.html:176
+#: gnowsys_ndf/ndf/templates/ndf/task_details.html:23
+msgid "Task"
+msgstr "कार्य"
+
+#: gnowsys_ndf/ndf/templates/ndf/task_create_edit.html:185
+msgid "Status"
+msgstr "स्थिति:"
+
+#: gnowsys_ndf/ndf/templates/ndf/task_create_edit.html:199
+msgid "Start date"
+msgstr "आरंभ तिथिः"
+
+#: gnowsys_ndf/ndf/templates/ndf/task_create_edit.html:207
+msgid "Priority"
+msgstr "प्राथमिकता:"
+
+#: gnowsys_ndf/ndf/templates/ndf/task_create_edit.html:209
+msgid "Low"
+msgstr "अब"
+
+#: gnowsys_ndf/ndf/templates/ndf/task_create_edit.html:210
+msgid "Normal"
+msgstr ""
+
+#: gnowsys_ndf/ndf/templates/ndf/task_create_edit.html:211
+msgid "High"
+msgstr ""
+
+#: gnowsys_ndf/ndf/templates/ndf/task_create_edit.html:212
+msgid "Urgent"
+msgstr ""
+
+#: gnowsys_ndf/ndf/templates/ndf/task_create_edit.html:213
+msgid "Immediate"
+msgstr ""
+
+#: gnowsys_ndf/ndf/templates/ndf/task_create_edit.html:218
+msgid "Due date"
+msgstr "नियत तिथि:"
+
+#: gnowsys_ndf/ndf/templates/ndf/task_create_edit.html:227
+msgid "Estimated time"
+msgstr ""
+
+#: gnowsys_ndf/ndf/templates/ndf/task_create_edit.html:228
+msgid "Enter Hours"
+msgstr ""
+
+#: gnowsys_ndf/ndf/templates/ndf/task_create_edit.html:229
+msgid "Please give Time in"
+msgstr "कृपया शीर्षक दें"
+
+#: gnowsys_ndf/ndf/templates/ndf/task_create_edit.html:236
+msgid "Single Assignee"
+msgstr "कार्य प्राप्तकर्ता:"
+
+#: gnowsys_ndf/ndf/templates/ndf/task_create_edit.html:237
+msgid "Multiple Assignee"
+msgstr "कार्य प्राप्तकर्ता:"
+
+#: gnowsys_ndf/ndf/templates/ndf/task_create_edit.html:238
+msgid "Group Assignees"
+msgstr "कार्य प्राप्तकर्ता:"
+
+#: gnowsys_ndf/ndf/templates/ndf/task_create_edit.html:244
+msgid "select Asssignees"
+msgstr "कार्य प्राप्तकर्ता को चुने"
+
+#: gnowsys_ndf/ndf/templates/ndf/task_create_edit.html:254
+msgid "Assignees Assigned for task"
+msgstr ""
+
+#: gnowsys_ndf/ndf/templates/ndf/task_create_edit.html:277
+msgid "Describe"
+msgstr "विवरण दें"
+
+#: gnowsys_ndf/ndf/templates/ndf/task_create_edit.html:357
+msgid "Assignees not selected"
+msgstr ""
+
+#: gnowsys_ndf/ndf/templates/ndf/task_create_edit.html:419
+msgid "Click to remove"
+msgstr "देखने के लिए क्ल्कि करें"
+
+#: gnowsys_ndf/ndf/templates/ndf/task_create_edit.html:643
+msgid "No Assignees Assigned"
+msgstr ""
+
+#: gnowsys_ndf/ndf/templates/ndf/task_details.html:38
+msgid "New Task"
+msgstr "नया कार्य"
+
+#: gnowsys_ndf/ndf/templates/ndf/task_details.html:63
+msgid "Parent task"
+msgstr "मूल कार्यः"
+
+#: gnowsys_ndf/ndf/templates/ndf/task_details.html:77
+msgid "Task type:"
+msgstr "कार्य प्रकार:"
+
+#: gnowsys_ndf/ndf/templates/ndf/task_details.html:88
+msgid "Status:"
+msgstr "स्थिति:"
+
+#: gnowsys_ndf/ndf/templates/ndf/task_details.html:102
+msgid "Start Date:"
+msgstr "आरंभ तिथिः"
+
+#: gnowsys_ndf/ndf/templates/ndf/task_details.html:113
+msgid "Priority:"
+msgstr "प्राथमिकता:"
+
+#: gnowsys_ndf/ndf/templates/ndf/task_details.html:127
+msgid "Due Date:"
+msgstr "नियत तिथि:"
+
+#: gnowsys_ndf/ndf/templates/ndf/task_details.html:138
+msgid "Assignee:"
+msgstr "कार्य प्राप्तकर्ता:"
+
+#: gnowsys_ndf/ndf/templates/ndf/task_details.html:152
+msgid "Sub Task:"
+msgstr "उप-कार्य:"
+
+#: gnowsys_ndf/ndf/templates/ndf/task_details.html:199
+msgid "Attachment(s):"
+msgstr "संलगन"
+
+#: gnowsys_ndf/ndf/templates/ndf/task_details.html:217
+msgid "History:"
+msgstr "इतिहासः"
+
+#: gnowsys_ndf/ndf/templates/ndf/task_details.html:247
+msgid "Edited"
+msgstr "संपादित करें"
+
+#: gnowsys_ndf/ndf/templates/ndf/task_details.html:249
+msgid "Versions"
+msgstr "सत्र"
+
+#: gnowsys_ndf/ndf/templates/ndf/task_details.html:265
+msgid "Editing Name"
+msgstr "नाम संपादन"
+
+#: gnowsys_ndf/ndf/templates/ndf/task_details.html:284
+msgid "&#215;"
+msgstr "&#215;"
+
+#: gnowsys_ndf/ndf/templates/ndf/task_details.html:297
+msgid "Nothing is Changed"
+msgstr "कुछ भी नहीं मिला"
+
+#: gnowsys_ndf/ndf/templates/ndf/task_list_view.html:38
+msgid "Group Task"
+msgstr "समूह"
+
+#: gnowsys_ndf/ndf/templates/ndf/term.html:11
+msgid "Topics"
+msgstr "प्रकरण"
+
+#: gnowsys_ndf/ndf/templates/ndf/term.html:59
+msgid "Show Topics"
+msgstr "प्रकरण दिखाएँ"
+
+#: gnowsys_ndf/ndf/templates/ndf/term_create_edit.html:6
+msgid "Topic Editor"
+msgstr "प्रकरण संपादक"
+
+#: gnowsys_ndf/ndf/templates/ndf/terms_list.html:21
+msgid ""
+" This group doesn't have any Terms. <b>Be the first to create a Term!</b>"
+msgstr "इस समूह की कोई शर्त नहीं है। <b>आप शर्त बनाने वाले प्रथम व्यक्ति हो सकते हैं</b>"
+
+#: gnowsys_ndf/ndf/templates/ndf/theme.html:173
+#: gnowsys_ndf/ndf/templates/ndf/theme.html:318
+msgid ""
+"Are you sure you want to delete? All of the related items for the following "
+"themes also will be deleted:"
+msgstr "क्या आप मिटाना चाहते हैं। ऐसा करने से सभी संबंधित वस्तुएँ भी मिट जायेंगी"
+
+#: gnowsys_ndf/ndf/templates/ndf/theme.html:222
+#: gnowsys_ndf/ndf/templates/ndf/theme.html:226
+#: gnowsys_ndf/ndf/templates/ndf/translation_page.html:65
+#: gnowsys_ndf/ndf/templates/ndf/translation_page.html:96
+#: gnowsys_ndf/ndf/templates/ndf/translation_page.html:151
+msgid "Theme"
+msgstr "प्रसंग"
+
+#: gnowsys_ndf/ndf/templates/ndf/theme.html:226
+msgid "Tree"
+msgstr "ट्री"
+
+#: gnowsys_ndf/ndf/templates/ndf/theme.html:230
+msgid "Open"
+msgstr ""
+
+#: gnowsys_ndf/ndf/templates/ndf/theme.html:231
+msgid "Close"
+msgstr ""
+
+#: gnowsys_ndf/ndf/templates/ndf/theme_create_edit.html:43
+msgid "Create a new "
+msgstr "एक नया बनायें"
+
+#: gnowsys_ndf/ndf/templates/ndf/theme_create_edit.html:50
+msgid "View: "
+msgstr "देखें:"
+
+#: gnowsys_ndf/ndf/templates/ndf/theme_create_edit.html:77
+msgid " Name "
+msgstr "नाम"
+
+#: gnowsys_ndf/ndf/templates/ndf/theme_create_edit.html:84
+#: gnowsys_ndf/ndf/templates/ndf/topic_create_edit.html:95
+#: gnowsys_ndf/ndf/templates/ndf/topic_create_edit.html:170
+msgid "Privacy"
+msgstr "गोपनीयता"
+
+#: gnowsys_ndf/ndf/templates/ndf/theme_create_edit.html:161
+msgid "Theme Name"
+msgstr "प्रसंग नाम"
+
+#: gnowsys_ndf/ndf/templates/ndf/theme_create_edit.html:176
+msgid "+ Add Topic"
+msgstr "प्रकरण जोड़ें"
+
+#: gnowsys_ndf/ndf/templates/ndf/theme_create_edit.html:180
+msgid "Topic Name"
+msgstr "प्रकरण नाम"
+
+#: gnowsys_ndf/ndf/templates/ndf/theme_create_edit.html:261
+#: gnowsys_ndf/ndf/templates/ndf/topic_create_edit.html:210
+#: gnowsys_ndf/ndf/templates/ndf/translation_page.html:122
+msgid "Tag"
+msgstr "टैग"
+
+#: gnowsys_ndf/ndf/templates/ndf/thread_details.html:61
+msgid "Other Threads"
+msgstr "अन्य विवरण"
+
+#: gnowsys_ndf/ndf/templates/ndf/thread_details.html:94
+msgid "Edit now"
+msgstr "संपादित करें"
+
+#: gnowsys_ndf/ndf/templates/ndf/topic_create_edit.html:43
+msgid "Create a New "
+msgstr "नया बनायें"
+
+#: gnowsys_ndf/ndf/templates/ndf/topic_create_edit.html:50
+msgid "View:"
+msgstr "देखें:"
+
+#: gnowsys_ndf/ndf/templates/ndf/topic_create_edit.html:174
+msgid "Public "
+msgstr "सार्वजनिक"
+
+#: gnowsys_ndf/ndf/templates/ndf/topic_create_edit.html:226
+msgid "Add or edit Collection: "
+msgstr "संग्रह जोड़ें या संपादित करें"
+
+#: gnowsys_ndf/ndf/templates/ndf/topic_create_edit.html:233
+msgid "Classify by:"
+msgstr "वर्गीकरण करें"
+
+#: gnowsys_ndf/ndf/templates/ndf/topic_create_edit.html:287
+msgid "Add or edit Teaches: "
+msgstr "टीचेस् जोड़ें या संपादित करें:*"
+
+#: gnowsys_ndf/ndf/templates/ndf/topic_resources_listing.html:31
+#: gnowsys_ndf/ndf/templates/ndf/topic_resources_listing.html:76
+#: gnowsys_ndf/ndf/templates/ndf/topic_resources_listing.html:102
+#: gnowsys_ndf/ndf/templates/ndf/topic_resources_listing.html:126
+msgid "In other languages"
+msgstr "अन्य भाषा में"
+
+#: gnowsys_ndf/ndf/templates/ndf/trainer_create_edit.html:440
+msgid "Course Enrollment Details"
+msgstr "पाठ्यक्रम नामांकन विवरण"
+
+#: gnowsys_ndf/ndf/templates/ndf/trainer_create_edit.html:459
+#: gnowsys_ndf/ndf/templates/ndf/trainer_create_edit.html:524
+msgid "Course"
+msgstr "पाठ्यक्रम"
+
+#: gnowsys_ndf/ndf/templates/ndf/trainer_create_edit.html:464
+msgid "- - - Select Course - - -"
+msgstr "पाठ्यक्रम चुनें"
+
+#: gnowsys_ndf/ndf/templates/ndf/trainer_create_edit.html:467
+msgid "Please select course"
+msgstr "कृपया पाठ्यक्रम चुनें"
+
+#: gnowsys_ndf/ndf/templates/ndf/trainer_create_edit.html:485
+msgid "Please select university"
+msgstr "कृपया संस्था चुनें"
+
+#: gnowsys_ndf/ndf/templates/ndf/trainer_create_edit.html:504
+msgid "- - - Select College - - -"
+msgstr "संस्था चुनें"
+
+#: gnowsys_ndf/ndf/templates/ndf/trainer_create_edit.html:507
+msgid "Please select college"
+msgstr "कृपया संस्था चुनें"
+
+#: gnowsys_ndf/ndf/templates/ndf/trainer_create_edit.html:562
+msgid "Course Requirements"
+msgstr "पाठ्यक्रम आवश्यकताएँ"
+
+#: gnowsys_ndf/ndf/templates/ndf/trainer_create_edit.html:674
+msgid "Course Qualification Specifications"
+msgstr "पाठ्यक्रम अर्हता"
+
+#: gnowsys_ndf/ndf/templates/ndf/trainer_create_edit.html:679
+msgid "' + courseSelected + '"
+msgstr "पाठ्यक्रम चुनाव"
+
+#: gnowsys_ndf/ndf/templates/ndf/trainer_create_edit.html:685
+msgid "Mandatory"
+msgstr "अनिवार्य"
+
+#: gnowsys_ndf/ndf/templates/ndf/trainer_create_edit.html:686
+msgid "Qualifications"
+msgstr "अर्हता"
+
+#: gnowsys_ndf/ndf/templates/ndf/translation_page.html:67
+#: gnowsys_ndf/ndf/templates/ndf/translation_page.html:100
+msgid "Page Name"
+msgstr "पृष्ठ नाम"
+
+#: gnowsys_ndf/ndf/templates/ndf/translation_page.html:81
+msgid "Tags: "
+msgstr "टैग्स"
+
+#: gnowsys_ndf/ndf/templates/ndf/translation_page.html:157
+msgid "Theme Item"
+msgstr "प्रसंग वस्तु"
+
+#: gnowsys_ndf/ndf/templates/ndf/translation_page.html:162
+msgid "Topic"
+msgstr "प्रकरण"
+
+#: gnowsys_ndf/ndf/templates/ndf/uDashboard.html:92
+msgid "Welcome "
+msgstr "स्वागत है"
+
+#: gnowsys_ndf/ndf/templates/ndf/uDashboard.html:146
+msgid "No Groups </b>"
+msgstr "कोई समूह नहीं है"
+
+#: gnowsys_ndf/ndf/templates/ndf/uDashboard.html:213
+msgid "Show More.."
+msgstr ""
+
+#: gnowsys_ndf/ndf/templates/ndf/uDashboard.html:262
+msgid "No Assinged Task"
+msgstr "कोई कार्य नहीं दिया गया है"
+
+#: gnowsys_ndf/ndf/templates/ndf/uDashboard.html:284
+msgid "Dashboard"
+msgstr "डेशबोर्ड"
+
+#: gnowsys_ndf/ndf/templates/ndf/uDashboard.html:312
+msgid "image is already selected, choose different image !!!"
+msgstr "यह चित्र पहले से चुना गया है कृपया अन्य चित्र चुनें"
+
+#: gnowsys_ndf/ndf/templates/ndf/upload_pic_widget.html:69
+msgid "Your profile photo is uploading. Please wait.."
+msgstr ""
+
+#: gnowsys_ndf/ndf/templates/ndf/upload_pic_widget.html:211
+msgid "Please wait while your profile photo is updating.."
+msgstr ""
+
+#: gnowsys_ndf/ndf/templates/ndf/user_profile_form.html:23
+msgid "First Name"
+msgstr "फ़ाइल नाम"
+
+#: gnowsys_ndf/ndf/templates/ndf/user_profile_form.html:38
+msgid "Last Name"
+msgstr "Last Seen"
+
+#: gnowsys_ndf/ndf/templates/ndf/user_profile_form.html:48
+#: gnowsys_ndf/ndf/templates/ndf/user_profile_form.html:156
+msgid "Language proficiency"
+msgstr ""
+
+#: gnowsys_ndf/ndf/templates/ndf/user_profile_form.html:62
+msgid "Subject Proficiency"
+msgstr ""
+
+#: gnowsys_ndf/ndf/templates/ndf/user_profile_form.html:72
+msgid "Joined on"
+msgstr "भेजा गया"
+
+#: gnowsys_ndf/ndf/templates/ndf/user_profile_form.html:86
+msgid " Groups"
+msgstr "समूह"
+
+#: gnowsys_ndf/ndf/templates/ndf/user_profile_form.html:92
+msgid "Files uploaded"
+msgstr "फ़ाइल अपलोडेड"
+
+#: gnowsys_ndf/ndf/templates/ndf/user_profile_form.html:102
+msgid "Pages created"
+msgstr "सृजित पृष्ठ"
+
+#: gnowsys_ndf/ndf/templates/ndf/user_profile_form.html:135
+msgid "First name"
+msgstr "फोरम नाम"
+
+#: gnowsys_ndf/ndf/templates/ndf/user_profile_form.html:146
+msgid "Last name"
+msgstr "Last Seen"
+
+#: gnowsys_ndf/ndf/templates/ndf/user_profile_form.html:176
+msgid "Subject proficiency"
+msgstr ""
+
+#: gnowsys_ndf/ndf/templates/ndf/userpreferences.html:3
+msgid "Preferences"
+msgstr "वरीयता"
+
+#: gnowsys_ndf/ndf/templates/ndf/userpreferences.html:31
+msgid "Click here to turn off notification preferences for groups"
+msgstr "समूह की अधिसूचना वरियता को बंद करने के लिए क्लिक करें"
+
+#: gnowsys_ndf/ndf/templates/ndf/userpreferences.html:37
+msgid "Forum Notifications"
+msgstr "फोरम अधिसूचनाएँ"
+
+#: gnowsys_ndf/ndf/templates/ndf/userpreferences.html:41
+msgid "On"
+msgstr "ऑन"
+
+#: gnowsys_ndf/ndf/templates/ndf/userpreferences.html:43
+msgid "Off"
+msgstr "ऑफ"
+
+#: gnowsys_ndf/ndf/templates/ndf/userpreferences.html:49
+msgid "Select Groups:"
+msgstr "चयनित समूह:"
+
+#: gnowsys_ndf/ndf/templates/ndf/version_page.html:37
+#: gnowsys_ndf/ndf/templates/ndf/version_page.html:52
+msgid "Compare"
+msgstr "तुलना करें"
+
+#: gnowsys_ndf/ndf/templates/ndf/version_page.html:39
+msgid "History"
+msgstr "इतिहास"
+
+#: gnowsys_ndf/ndf/templates/ndf/version_page.html:64
+msgid "with"
+msgstr "सहित"
+
+#: gnowsys_ndf/ndf/templates/ndf/videoDashboard.html:63
+msgid "previous"
+msgstr "पिछला"
+
+#: gnowsys_ndf/ndf/templates/ndf/videoDashboard.html:64
+msgid "more details"
+msgstr "अधिक जानकारी"
+
+#: gnowsys_ndf/ndf/templates/ndf/videoDashboard.html:65
+msgid "next"
+msgstr "आगे"
+
+#: gnowsys_ndf/ndf/templates/ndf/video_detail.html:8
+msgid "Media"
+msgstr "मीडिया"
+
+#: gnowsys_ndf/ndf/templates/ndf/visualize.html:4
+msgid "Visualize"
+msgstr "दृश्यीकरण"
+
+#: gnowsys_ndf/ndf/templates/ndf/visualize.html:72
+msgid "Step 1: "
+msgstr "सोपान 1:"
+
+#: gnowsys_ndf/ndf/templates/ndf/visualize.html:74
+msgid "Select a Graph/Visualization of your choice."
+msgstr "इच्छित ग्राफ/दृश्यता का चयन करें*"
+
+#: gnowsys_ndf/ndf/templates/ndf/visualize.html:76
+msgid "Bar Chart"
+msgstr "दंड चार्ट"
+
+#: gnowsys_ndf/ndf/templates/ndf/visualize.html:77
+msgid "Pie Chart"
+msgstr "वृत्त चार्ट"
+
+#: gnowsys_ndf/ndf/templates/ndf/visualize.html:78
+msgid "Scatter Plot"
+msgstr "प्रकीर्ण प्लॉट"
+
+#: gnowsys_ndf/ndf/templates/ndf/visualize.html:79
+msgid "Tag Cloud"
+msgstr "टैग क्लाउड"
+
+#: gnowsys_ndf/ndf/templates/ndf/visualize.html:84
+msgid "Step 2: "
+msgstr "सोपान 2:"
+
+#: gnowsys_ndf/ndf/templates/ndf/visualize.html:85
+msgid ""
+"Upload a CSV file. Please see the instructions regarding the CSV format."
+msgstr ""
+"सी.एस.वी. फाइल अपलोड करें। कृपया सी.एस.वी. प्रारूप से संबंधित निर्देशों को ध्यानपूर्वक पढ़ें"
+
+#: gnowsys_ndf/ndf/templates/ndf/visualize.html:87
+msgid "Instructions for CSV file"
+msgstr "सी.एस.वी. फाइल के लिए निर्देश"
+
+#: gnowsys_ndf/ndf/templates/ndf/visualize.html:89
+msgid "Instructions"
+msgstr "निर्देश"
+
+#: gnowsys_ndf/ndf/templates/ndf/visualize.html:91
+msgid ""
+"CSV files can easily be created from Excel spreadsheets/LibreOffice Calc."
+msgstr ""
+"लिब्रेऑफिस केल्क या एम.एस. ऐक्सल स्प्रेडशीट से सी.एस.वी. फाइल को सरलता से सृजित किया जा "
+"सकता है"
+
+#: gnowsys_ndf/ndf/templates/ndf/visualize.html:93
+msgid "Just click on "
+msgstr "क्लिक करें"
+
+#: gnowsys_ndf/ndf/templates/ndf/visualize.html:96
+msgid ""
+"<li>Currently the graphing app supports CSV files with only 2 columns. So, "
+"your spread sheet must have only two columns.</li>\n"
+"\t\t<li>The first row in every column must be the column heading and not any "
+"data value.</li>\n"
+"\t\t<li>For Example - If you want to plot Cities v/s Annual Rainfall, the "
+"first row in your speardsheet must be a heading like \"City Name\" or "
+"\"Cities\" or something similar and not be a data value like \"Mumbai\".\n"
+"\t\t<br>\n"
+msgstr ""
+
+#: gnowsys_ndf/ndf/templates/ndf/visualize.html:165
+msgid ""
+"Almost there! Just click on the button below to create the visualization."
+msgstr ""
+
+#: gnowsys_ndf/ndf/templates/ndf/visualize.html:166
+msgid "Create Graph!"
+msgstr "ग्राफ बनाएँ!"
+
+#: gnowsys_ndf/ndf/templates/ndf/visualize.html:166
+msgid "Awesome. I have it."
+msgstr ""
+
+#: gnowsys_ndf/ndf/templates/ndf/visualize.html:169
+msgid "100"
+msgstr "100"
+
+#: gnowsys_ndf/ndf/templates/ndf/wikidata.html:12
+msgid "items found "
+msgstr "वस्तुएँ पाई गईं हैं"
+
+#: gnowsys_ndf/ndf/templates/ndf/wikidata.html:31
+msgid "Sorry, no topics are available."
+msgstr "क्षमा करें, प्रकरण उपलब्ध नहीं है"
+
+#: gnowsys_ndf/ndf/templates/ndf/wikidata.html:58
+#, python-format
+msgid ""
+" Tags Topic Display\n"
+"\t</h2><h5>Following are the topics with the tag <strong>\"%(tag)s\"</"
+"strong></center><br><br>\n"
+"\tSelect the topic from the panel on the left to view the details about that "
+"topic. The knowledge graph for that particular topic is also available on "
+"the same page.\n"
+msgstr ""
+
+#: gnowsys_ndf/ndf/templates/ndf/wikidata.html:75
+msgid ""
+"Select the topic from the panel on the left to view the details about that "
+"topic. The knowledge graph for that particular topic is also available on "
+"the same page."
+msgstr ""
+
+#: gnowsys_ndf/ndf/templates/ndf/wikidata.html:201
+msgid "Wikipedia Page Link:"
+msgstr "विकिपीडिया पृष्ठ लिंक:"
+
+#: gnowsys_ndf/ndf/templates/ndf/wikidata.html:215
+msgid "Attributes:"
+msgstr "विशेषताएँ:"
+
+#: gnowsys_ndf/ndf/templates/ndf/wikidata.html:227
+msgid "Relations:"
+msgstr "संबंध:"
+
+#: gnowsys_ndf/ndf/templates/ndf/wikidata.html:232
+msgid "Sorry, no relations in this list."
+msgstr "क्षमा करें, इस सूची में कोई संबंध नहीं है"
+
+#: gnowsys_ndf/ndf/templates/ndf/wikidata.html:236
+msgid "Wikipedia Page:"
+msgstr "विकिपीडिया पृष्ठ:"
+
+#: gnowsys_ndf/ndf/templates/ndf/wikidata.html:239
+msgid "Your browser does not support iframes."
+msgstr "आपका ब्राउज़र आईफ्रेम को सहयोग नहीं कर रहा है"
+
+#: gnowsys_ndf/ndf/templates/ndf/wikidata.html:245
+msgid "This data has been harvested from"
+msgstr "यह विषय < > लिया गया है"
+
+#: gnowsys_ndf/ndf/templates/ndf/wikidata.html:245
+msgid "Wikidata Project"
+msgstr "विकिडाटा परियोजना"
+
+#: gnowsys_ndf/ndf/templates/ndf/wikidata.html:246
+msgid ""
+"All structured data from the main and property namespace is available under "
+"the Creative Commons CC0 License. Text in the other namespaces is available "
+"under the Creative Commons Attribution-ShareAlike License. Additional terms "
+"may apply. By using this site, you agree to the Terms of Use and Privacy "
+"Policy."
+msgstr ""
+
+#: gnowsys_ndf/ndf/templates/notification/base.html:4
+msgid "notices"
+msgstr "सूचनाएँ"
+
+#: gnowsys_ndf/ndf/templates/notification/email_body.txt:1
+msgid "You have received the following notice from the site: "
+msgstr "आपको निम्नलिखित सुचनाएँ साइट से प्राप्त हुई हैं:"
+
+#: gnowsys_ndf/ndf/templates/notification/email_subject.txt:1
+#, python-format
+msgid "[%(current_site)s] %(message)s"
+msgstr ""
+
+#: gnowsys_ndf/ndf/templates/notification/notice_settings.html:8
+#: gnowsys_ndf/ndf/templates/notification/notice_settings.html:11
+#: gnowsys_ndf/notification/templates/notification/notice_settings.html:8
+#: gnowsys_ndf/notification/templates/notification/notice_settings.html:11
+msgid "Notification Settings"
+msgstr "अधिसूचना सेटिंग"
+
+#: gnowsys_ndf/ndf/templates/notification/notice_settings.html:17
+msgid "Notice"
+msgstr "सूचना"
+
+#: gnowsys_ndf/ndf/templates/notification/notice_settings.html:18
+msgid "You do not have a verified email address to which notices can be sent."
+msgstr "सूचनाएँ भेजने के लिए आपका  सत्यापित ईमेल पता नहीं है"
+
+#: gnowsys_ndf/ndf/templates/notification/notice_settings.html:18
+msgid "Add one "
+msgstr "एक नया जोड़ें"
+
+#: gnowsys_ndf/ndf/templates/notification/notice_settings.html:18
+msgid "now"
+msgstr "अब"
+
+#: gnowsys_ndf/ndf/templates/notification/notice_settings.html:27
+#: gnowsys_ndf/notification/templates/notification/notice_settings.html:27
+msgid "Notification Type"
+msgstr "अधिसूचना प्रकार"
+
+#: gnowsys_ndf/ndf/templates/notification/short.txt:5
+msgid "Activity notification from"
+msgstr "से क्रियाकलाप अधिसूचना"
+
+#: gnowsys_ndf/ndf/templates/online_status/example.html:4
+msgid "Users online"
+msgstr "ऑनलाइन उपयोगकर्ता"
+
+#: gnowsys_ndf/ndf/templates/online_status/example.html:7
+msgid "Status for user "
+msgstr "उपयोगकर्ता की स्थिति"
+
+#: gnowsys_ndf/ndf/templates/online_status/example.html:10
+msgid "My status "
+msgstr "मेरी स्थिति"
+
+#: gnowsys_ndf/ndf/templates/registration/activate.html:6
+#: gnowsys_ndf/ndf/templates/registration/activation_complete.html:4
+msgid "Activation complete"
+msgstr "सक्रियता पूर्ण हुई"
+
+#: gnowsys_ndf/ndf/templates/registration/activate.html:8
+msgid "Activation problem"
+msgstr "सक्रियता में समस्या"
+
+#: gnowsys_ndf/ndf/templates/registration/activate.html:19
+msgid "Thanks"
+msgstr "धन्यवाद"
+
+#: gnowsys_ndf/ndf/templates/registration/activate.html:19
+msgid "Your activation complete!"
+msgstr "सक्रियता पूर्ण हुई"
+
+#: gnowsys_ndf/ndf/templates/registration/activate.html:22
+msgid "You may"
+msgstr "आप"
+
+#: gnowsys_ndf/ndf/templates/registration/activate.html:22
+msgid "login"
+msgstr "लॉगिन"
+
+#: gnowsys_ndf/ndf/templates/registration/activate.html:22
+msgid "using your email and password."
+msgstr "अपने ईमेल और पासवर्ड का उपयोग करके"
+
+#: gnowsys_ndf/ndf/templates/registration/activate.html:27
+msgid ""
+"Oops! It seems that your activation key is invalid. Please check the url or "
+"try to reset your password again. "
+msgstr ""
+
+#: gnowsys_ndf/ndf/templates/registration/activation_complete.html:13
+msgid "Account successfully activated."
+msgstr "खाता सफलतापूर्वक सक्रिय हो चुका है"
+
+#: gnowsys_ndf/ndf/templates/registration/activation_complete.html:14
+#: gnowsys_ndf/ndf/templates/registration/password_reset_complete.html:14
+msgid "Please "
+msgstr "कृपया"
+
+#: gnowsys_ndf/ndf/templates/registration/activation_complete.html:14
+#: gnowsys_ndf/ndf/templates/registration/password_reset_complete.html:14
+msgid "Sign In"
+msgstr "साइन इन"
+
+#: gnowsys_ndf/ndf/templates/registration/activation_complete.html:14
+#: gnowsys_ndf/ndf/templates/registration/password_reset_complete.html:14
+msgid " here."
+msgstr "यहाँ"
+
+#: gnowsys_ndf/ndf/templates/registration/activation_email.html:13
+msgid "Account registration"
+msgstr "खाता पजीकृकरण"
+
+#: gnowsys_ndf/ndf/templates/registration/activation_email.html:16
+msgid ""
+"You (or someone pretending to be you) have asked to register an account at "
+"our site."
+msgstr ""
+"लगता है, आपका सक्रियता संकेत शब्द सही नहीं है। कृपया यू.आर.एल. जाँचें अथवा पासवर्ड रीसेट करें"
+
+#: gnowsys_ndf/ndf/templates/registration/activation_email.html:18
+msgid ""
+"If this wasn't you, please ignore this email and your address will be "
+"removed from our records."
+msgstr "यदि आप ये नहीं थे, कृपया इस ईमेल को अनंदेखा करें। आपका ईमेल पता मिटा दिया जायेगा"
+
+#: gnowsys_ndf/ndf/templates/registration/activation_email.html:22
+msgid ""
+"To activate this account, please click the following link within the next "
+"two days."
+msgstr "प्राप्त लिंक केवल दो दिन तक ही वैध रहेगा। कृपया इस अवधि में खाता सक्रिय करें"
+
+#: gnowsys_ndf/ndf/templates/registration/activation_email.html:27
+#: gnowsys_ndf/ndf/templates/registration/activation_email.txt:11
+msgid "Sincerely"
+msgstr "भवदीय"
+
+#: gnowsys_ndf/ndf/templates/registration/activation_email.html:28
+msgid "Management Team"
+msgstr "प्रबंधन टीम"
+
+#: gnowsys_ndf/ndf/templates/registration/activation_email.txt:5
+msgid ""
+"You (or someone pretending to be you) have asked to register an account at "
+msgstr "आपने यहाँ पंजीकरण के लिए आग्रह किया"
+
+#: gnowsys_ndf/ndf/templates/registration/activation_email.txt:6
+msgid ""
+"If this wasn't you, please ignore this email and your details will be "
+"removed from our records."
+msgstr "यदि आप ये नहीं थे, कृपया इस ईमेल को अनंदेखा करें। आपका ईमेल पता मिटा दिया जायेगा"
+
+#: gnowsys_ndf/ndf/templates/registration/activation_email.txt:8
+msgid ""
+"To activate this account, please click the following link within the next"
+msgstr "प्राप्त लिंक केवल दो दिन तक ही वैध रहेगा। कृपया इस अवधि में खाता सक्रिय करें"
+
+#: gnowsys_ndf/ndf/templates/registration/activation_email.txt:8
+msgid "days"
+msgstr "दिन"
+
+#: gnowsys_ndf/ndf/templates/registration/activation_email.txt:12
+#: gnowsys_ndf/ndf/templates/registration/password_reset_email.html:15
+msgid "Management"
+msgstr "प्रबंधन"
+
+#: gnowsys_ndf/ndf/templates/registration/activation_email_subject.txt:3
+msgid "Account registration for"
+msgstr "खाता पजीकृकरण"
+
+#: gnowsys_ndf/ndf/templates/registration/login.html:28
+msgid "Log In"
+msgstr "लॉग-इन"
+
+#: gnowsys_ndf/ndf/templates/registration/login.html:36
+msgid "Either your email or password is incorrect !!!"
+msgstr "ईमेल अथवा पासवर्ड गलत है"
+
+#: gnowsys_ndf/ndf/templates/registration/login.html:73
+msgid "Forgot your password?"
+msgstr "पासवर्ड भूल गए?"
+
+#: gnowsys_ndf/ndf/templates/registration/login.html:94
+msgid "Don't have an account? Register yourself now."
+msgstr "खाता नहीं है? कृपया पंजीकरण करें"
+
+#: gnowsys_ndf/ndf/templates/registration/logout.html:4
+msgid "Logged out"
+msgstr "लॉग-आउट"
+
+#: gnowsys_ndf/ndf/templates/registration/logout.html:11
+msgid "You have sucessfully logged out."
+msgstr "सफलतापूर्वक लॉग-आउट हो गया है"
+
+#: gnowsys_ndf/ndf/templates/registration/logout.html:12
+msgid ""
+"Thank you for visiting our website. Please return often to take advantage of "
+"this platform."
+msgstr ""
+
+#: gnowsys_ndf/ndf/templates/registration/password_change_done.html:7
+msgid "Password successfully changed"
+msgstr "खाता सफलतापूर्वक सक्रिय हो चुका है"
+
+#: gnowsys_ndf/ndf/templates/registration/password_change_form.html:26
+msgid "Submit"
+msgstr ""
+
+#: gnowsys_ndf/ndf/templates/registration/password_reset_complete.html:5
+msgid "Password reset complete"
+msgstr "पासवर्ड रीसेट पूर्ण हुआ"
+
+#: gnowsys_ndf/ndf/templates/registration/password_reset_complete.html:13
+msgid "Your password has been reset successfully."
+msgstr "पासवर्ड सफलतापूर्वक रीसेट हुआ"
+
+#: gnowsys_ndf/ndf/templates/registration/password_reset_confirm.html:4
+msgid "Confirm password reset"
+msgstr "पासवर्ड रीसेट की पुष्टि करें"
+
+#: gnowsys_ndf/ndf/templates/registration/password_reset_confirm.html:43
+#: gnowsys_ndf/ndf/templates/registration/registration_form.html:63
+msgid "Either both passwords doesn't match or doesn't satisfy the criteria!!!"
+msgstr "पासवर्ड कसौटी के अनुरूप नहीं है"
+
+#: gnowsys_ndf/ndf/templates/registration/password_reset_confirm.html:66
+#: gnowsys_ndf/ndf/templates/registration/registration_form.html:110
+msgid "NOTE: "
+msgstr "टिप्पणी:"
+
+#: gnowsys_ndf/ndf/templates/registration/password_reset_confirm.html:68
+#: gnowsys_ndf/ndf/templates/registration/registration_form.html:112
+msgid "Password must contain atleast 8 characters,"
+msgstr "पासवर्ड में कम-से-कम 8 कैरेक्टर का होना आवश्यक है"
+
+#: gnowsys_ndf/ndf/templates/registration/password_reset_confirm.html:69
+#: gnowsys_ndf/ndf/templates/registration/registration_form.html:113
+msgid "One uppercase letter, and"
+msgstr "कम-से-कम एक अपरकेस अक्षर  और"
+
+#: gnowsys_ndf/ndf/templates/registration/password_reset_confirm.html:70
+#: gnowsys_ndf/ndf/templates/registration/registration_form.html:114
+msgid "One numeral"
+msgstr "कम-से-कम एक संख्या"
+
+#: gnowsys_ndf/ndf/templates/registration/password_reset_confirm.html:88
+msgid "Set password"
+msgstr "सेट पासवर्ड"
+
+#: gnowsys_ndf/ndf/templates/registration/password_reset_done.html:4
+#: gnowsys_ndf/ndf/templates/registration/password_reset_email_subject.txt:2
+msgid "Password reset"
+msgstr "पासवर्ड रीसेट"
+
+#: gnowsys_ndf/ndf/templates/registration/password_reset_done.html:11
+msgid "Please check your email."
+msgstr "कृपया ईमेल जाँचें"
+
+#: gnowsys_ndf/ndf/templates/registration/password_reset_done.html:12
+msgid "An email has been sent to email-ID associated with your account."
+msgstr "आपके खाते से संबंधित ईमेल आई.डी. पर ईमेल भेजी गई है"
+
+#: gnowsys_ndf/ndf/templates/registration/password_reset_done.html:13
+msgid ""
+"Please be patient; the delivery of email may be delayed. Remember to confirm "
+"that the email that you entered is correct and to check your junk or spam "
+"folder or filter if you do not receive this email."
+msgstr ""
+
+#: gnowsys_ndf/ndf/templates/registration/password_reset_email.html:4
+msgid "Greetings "
+msgstr "अभिनंदन"
+
+#: gnowsys_ndf/ndf/templates/registration/password_reset_email.html:5
+msgid ""
+"You are receiving this email because you requested that your password be "
+"reset on"
+msgstr ""
+
+#: gnowsys_ndf/ndf/templates/registration/password_reset_email.html:7
+msgid "If you do not wish to reset your password, please ignore this message."
+msgstr ""
+
+#: gnowsys_ndf/ndf/templates/registration/password_reset_email.html:9
+msgid ""
+"To reset your password, please click the following link, or copy and paste "
+"it into your web browser:"
+msgstr ""
+
+#: gnowsys_ndf/ndf/templates/registration/password_reset_email.html:12
+msgid "Your username, in case you've forgotten:"
+msgstr "उपयोगकर्ता का नाम, यदि आप भूल गये हों"
+
+#: gnowsys_ndf/ndf/templates/registration/password_reset_email.html:14
+msgid "Best regards,"
+msgstr "आदर सहित"
+
+#: gnowsys_ndf/ndf/templates/registration/password_reset_error_form.html:5
+#: gnowsys_ndf/ndf/templates/registration/password_reset_error_form.html:72
+#: gnowsys_ndf/ndf/templates/registration/password_reset_form.html:5
+#: gnowsys_ndf/ndf/templates/registration/password_reset_form.html:65
+msgid "Reset password"
+msgstr "रीसेट पासवर्ड"
+
+#: gnowsys_ndf/ndf/templates/registration/password_reset_error_form.html:30
+#: gnowsys_ndf/ndf/templates/registration/password_reset_form.html:30
+msgid "Forgot password? Don't worry..."
+msgstr "पासवर्ड भूल गये हैं? चिंता न करें"
+
+#: gnowsys_ndf/ndf/templates/registration/password_reset_error_form.html:37
+#: gnowsys_ndf/ndf/templates/registration/password_reset_form.html:37
+msgid "Password reset instructions will be sent to the email address associated with your account."
+msgstr "पासवर्ड रीसेट निर्देश अापके खाते से जुडे ईमेल पर भेजे जाएंगे।"
+
+#: gnowsys_ndf/ndf/templates/registration/password_reset_error_form.html:44
+msgid "Invalid email-ID, Please try again."
+msgstr "अवैध ईमेल आई.डी., कृपया फिर से प्रयास करें"
+
+#: gnowsys_ndf/ndf/templates/registration/password_reset_error_form.html:59
+msgid "Please type your valid "
+msgstr "कृपया वैध ईमेल भरें"
+
+#: gnowsys_ndf/ndf/templates/registration/password_reset_error_form.html:59
+#: gnowsys_ndf/ndf/templates/registration/password_reset_form.html:52
+msgid "email address"
+msgstr "ईमेल पता"
+
+#: gnowsys_ndf/ndf/templates/registration/password_reset_error_form.html:59
+#: gnowsys_ndf/ndf/templates/registration/password_reset_form.html:52
+msgid " below:"
+msgstr "नीचे"
+
+#: gnowsys_ndf/ndf/templates/registration/password_reset_form.html:52
+msgid "Please type your "
+msgstr "कृपया भरें"
+
+#: gnowsys_ndf/ndf/templates/registration/registration_closed.html:4
+msgid "Registration Closed"
+msgstr "पंजीकरण बंद"
+
+#: gnowsys_ndf/ndf/templates/registration/registration_closed.html:10
+msgid "Sorry, registration is closed!"
+msgstr "क्षमा करें, पंजीकरण बंद हो गया है "
+
+#: gnowsys_ndf/ndf/templates/registration/registration_complete.html:4
+msgid "Activation email sent"
+msgstr "सक्रियता ईमेल भेजा गया है"
+
+#: gnowsys_ndf/ndf/templates/registration/registration_complete.html:11
+msgid "Account creation successful."
+msgstr "खाता सफलतापूर्वक सृजित हो चुका है"
+
+#: gnowsys_ndf/ndf/templates/registration/registration_complete.html:12
+msgid ""
+"Please activate your account by clicking on the link provided in the email "
+"you will receive."
+msgstr ""
+
+#: gnowsys_ndf/ndf/templates/registration/registration_form.html:5
+msgid "Register for an account"
+msgstr "खाता हेतु पंजीकरण"
+
+#: gnowsys_ndf/ndf/templates/registration/registration_form.html:53
+msgid "Register a New User Account"
+msgstr "नये खातें हेतु पंजीकरण करें"
+
+#: gnowsys_ndf/ndf/templates/registration/registration_form.html:136
+msgid "Occupation"
+msgstr "व्यवसाय"
+
+#: gnowsys_ndf/ndf/templates/registration/registration_form.html:143
+msgid "- - - Select Occupation - - -"
+msgstr "व्यवसाय चुनें"
+
+#: gnowsys_ndf/ndf/templates/registration/registration_form.html:157
+msgid "Organization"
+msgstr "संगठन"
+
+#: gnowsys_ndf/ndf/templates/registration/registration_form.html:172
+msgid "I agree to the terms and conditions"
+msgstr ""
+
+#: gnowsys_ndf/ndf/templates/registration/registration_form.html:185
+msgid "Send activation email"
+msgstr "सक्रियता ईमेल भेजें"
+
+#: gnowsys_ndf/ndf/views/email_registration.py:26
+msgid "User with same username exists. Please provide another username!"
+msgstr ""
+
+#: gnowsys_ndf/ndf/views/email_registration.py:43
+msgid "Email"
+msgstr "ईमेल"
+
+#: gnowsys_ndf/ndf/views/email_registration.py:48
+msgid "Username"
+msgstr "उपयोगकर्ता नाम:"
+
+#: gnowsys_ndf/ndf/views/email_registration.py:53
+msgid "Password"
+msgstr "पासवर्ड"
+
+#: gnowsys_ndf/ndf/views/email_registration.py:58
+msgid "Password (repeat)"
+msgstr "पासवर्ड (रीसेट)"
+
+#: gnowsys_ndf/ndf/views/email_registration.py:73
+msgid "Please enter a valid name."
+msgstr "कृपया वैध नाम भरें"
+
+#: gnowsys_ndf/ndf/views/email_registration.py:82
+msgid "The two password fields didn't match."
+msgstr "दोनों पासवर्ड एक जैसे नही हैं"
+
+#: gnowsys_ndf/notification/models.py:33
+msgid "label"
+msgstr "लेबल"
+
+#: gnowsys_ndf/notification/models.py:34
+msgid "display"
+msgstr "डिस्प्ले"
+
+#: gnowsys_ndf/notification/models.py:35
+msgid "description"
+msgstr "विवरण"
+
+#: gnowsys_ndf/notification/models.py:38
+msgid "default"
+msgstr "तयशुदा"
+
+#: gnowsys_ndf/notification/models.py:47 gnowsys_ndf/notification/models.py:86
+msgid "notice type"
+msgstr "सूचना प्रकार"
+
+#: gnowsys_ndf/notification/models.py:48
+msgid "notice types"
+msgstr "सूचना प्रकार"
+
+#: gnowsys_ndf/notification/models.py:85
+msgid "user"
+msgstr "उपयोगकर्ता"
+
+#: gnowsys_ndf/notification/models.py:87
+msgid "medium"
+msgstr "माध्यम"
+
+#: gnowsys_ndf/notification/models.py:88
+msgid "send"
+msgstr "भेजें"
+
+#: gnowsys_ndf/notification/models.py:91
+msgid "notice setting"
+msgstr "सूचना सेटिंग"
+
+#: gnowsys_ndf/notification/models.py:92
+msgid "notice settings"
+msgstr "सूचना सेटिंग"
+
+#: gnowsys_ndf/notification/templates/notification/email_body.txt:1
+#, python-format
+msgid ""
+"You have received the following notice from %(current_site)s:\n"
+"\n"
+"%(message)s\n"
+"\n"
+"To see other notices or change how you receive notifications, please go to "
+"%(default_http_protocol)s://%(current_site)s%(notices_url)s\n"
+msgstr ""
+
+#: gnowsys_ndf/notification/templates/notification/full.html:1
+#: gnowsys_ndf/notification/templates/notification/full.txt:1
+#: gnowsys_ndf/notification/templates/notification/notice.html:1
+#: gnowsys_ndf/notification/templates/notification/short.txt:1
+#, fuzzy, python-format
+msgid "%(notice)s"
+msgstr "सूचना"
+
+#: gnowsys_ndf/notification/templates/notification/notice_settings.html:15
+#, python-format
+msgid ""
+"\n"
+"        <p class=\"alert alert-warning\">\n"
+"            <span class=\"warning\">Note</span>:\n"
+"            You do not have a verified email address to which notices can be "
+"sent. <a href=\"%(email_url)s\">Add one</a> now.\n"
+"        </p>\n"
+"        "
+msgstr ""
+
+msgid " Delete"
+msgstr "मिटाएं"
+
+msgid "Graphs"
+msgstr "ग्राफ"
+
+msgid "Group Analytics"
+msgstr "समूह संस्था प्रकार"
+
+msgid "All {{title}}"
+msgstr "सभी फाईल"
+
+msgid "Not Enrolled to Any Courses!"
+msgstr "पाठ्यक्रमों कें छात्रों का नामांकन करें"
+
+msgid " No Course Created!"
+msgstr "पाठ्यक्रम संरचना जोड़ें"
+
+msgid "Create a new partner"
+msgstr "नया पार्टनर बनायें"
+
+msgid "Filter based on"
+msgstr "फिल्टर"
+
+msgid "Resource Type"
+msgstr "पाठ्यक्रम के प्रकार"
+
+msgid "Target Group"
+msgstr "नया समूह"
+
+msgid "All"
+msgstr "सभी"
+
+msgid ""
+"\n"
+"        <h5>There are no %(grps_category)s created yet.<b>Be the first to "
+"create a %(grps_category)s!</b></h5>\n"
+"\t"
+msgstr ""
+"\n"
+"        <h5>अभी तक कोई पार्टनर नहीं बनाया गया है। <b>आप पार्टनर बनाने वाले प्रथम व्यक्ति "
+"हो सकते हैं</b></h5>"
+
+msgid "Be the first to create a"
+msgstr "सृजन करने वाले आप प्रथम हो"
+
+msgid " %(each_gapp.content|safe)s "
+msgstr "विषय-वस्तुः"
+
+msgid " Partner Resources "
+msgstr "संसाधन"
+
+msgid "Note Book"
+msgstr "ई-पुस्तक"
+
+msgid "Click here to view Group Analytics"
+msgstr "देखने के लिए क्ल्कि करें"
+
+msgid "Click here to view  My Analytics"
+msgstr "देखने के लिए क्ल्कि करें"
+
+msgid "Announced Courses"
+msgstr "घोषित पाठ्यक्रम"
+
+msgid ""
+"This group doesn't have any courses. <b>Be the first to create a course!</"
+"b>"
+msgstr ""
+"इस समूह में कोई पाठ्यक्रम नहीं है। <b>आप पाठ्यक्रम बनाने वाले प्रथम व्यक्ति हो सकते हैं</b>"
+
+msgid "You are not enrolled to any course yet."
+msgstr "आप अभी तक किसी भी पाठ्यक्रम में नामांकित नहीं हैं"
+
+msgid ""
+"This group doesn't have any Announced courses. <b>Be the first to "
+"Announce a course!</b>"
+msgstr ""
+"इस समूह में कोई पाठ्यक्रम नहीं है। <b>आप पाठ्यक्रम बनाने वाले प्रथम व्यक्ति हो सकते हैं</b>"
+
+msgid "This group doesn't have any Announced courses."
+msgstr "इस समूह में कोई पाठ्यक्रम नहीं है"
+
+msgid "Announced Course for :"
+msgstr "घोषित पाठ्यक्रम"
+
+msgid "delete"
+msgstr "मिटाएं"
+
+msgid "reply"
+msgstr "जवाब दें"
+
+msgid "Gnowsys-Studio"
+msgstr "Gnowsys-Studio"
+
+msgid "at the"
+msgstr "पर"
+
+msgid "Preferred language"
+msgstr "भाषा की वरीयता"
+
+msgid "Set Language"
+msgstr "भाषा चुनें"
+
+msgid "[About Module...] [coming soon]"
+msgstr "<p>मॉडयूल के बारे में... <em> शीघ्र आ रहा है</em></p>"
+
+msgid "Educational Level"
+msgstr "शैक्षिक स्तर"
+
+msgid "Educational Subject"
+msgstr "शैक्षिक विषय"
+
+msgid "Educational Use"
+msgstr "शैक्षिक उपयोगिता"
+
+msgid "Interactivity Type"
+msgstr "इंटरैक्टिविटी प्रकार"
+
+msgid "Audience"
+msgstr "दर्शक"
+
+msgid "Info Box"
+msgstr "सूचना बक्सा"
+
+msgid "Annotate"
+msgstr "व्याख्या करना"
+
+msgid "Publish this resource in other group/s"
+msgstr "इस संसाधन को अन्य समूह में प्रकाशित करें"
+
+msgid "Thread Name:"
+msgstr "कड़ी नाम:"
+
+msgid "Themes"
+msgstr "प्रसंग"
+
+msgid "Tree Browser"
+msgstr "ट्री ब्राउज़र"
+
+msgid "Fold"
+msgstr "मोडि़ये"
+
+msgid "Unfold"
+msgstr "खोलिये"
+
+msgid "Collapsible Tree"
+msgstr "सिमटने वाला ट्री ब्राउज़र"
+
+msgid "<b>Dashboard</b> shows users' own activities on the site."
+msgstr "<b>डेशबोर्ड</b> साइट पर उपयोगकर्ता के क्रियाकलापों को दिखाता है"
+
+msgid "Registered on"
+msgstr "पंजीकरण तिथि"
+
+msgid "Pages modified"
+msgstr "संशोधित पृष्ठ"
+
+msgid "Please wait while file is Uploading..."
+msgstr "कृपया प्रतीक्षा करें फाईल अपलोड हो रही है"
+
+msgid "States"
+msgstr "राज्य"
+
+msgid "Institutions"
+msgstr "संस्थाएँ"
+
+msgid "Individuals"
+msgstr "व्यक्तिगत"
+
+msgid "Teachers"
+msgstr "शिक्षक"
+
+msgid "Interest Groups"
+msgstr "अभिरूचि समूह"
+
+msgid "Schools"
+msgstr "विद्यालय"
+
+msgid "Digital resource grouped in multiple ways"
+msgstr "डिजि़टल संसाधन बहु-माध्यम समूहों में उपलब्ध हैं"
+
+msgid "Open Educational Resources mapped to school curricular"
+msgstr "विद्यालय पाठ्यचर्या से संबद्ध मुक्त शैक्षिक संसाधन"
+
+msgid "Open Educational Resources mapped to schoo..."
+msgstr "विद्यालय पाठ्यचर्या से संबद्ध मुक्त शैक्षिक संसाधन"
+
+msgid "eLibrary"
+msgstr "ई-पुस्तकालय"
+
+msgid "Homogeneous collections of resources"
+msgstr "संसाधनों का सजातीय संग्रह"
+
+msgid "eBooks"
+msgstr "ई-पुस्तकें"
+
+msgid "Device independent digital books"
+msgstr "स्वतंत्र डिजि़टल पुस्तकों की युक्ति"
+
+msgid "eCourses"
+msgstr "ई-पाठ्यक्रम"
+
+msgid "Online and blended courses"
+msgstr "आॅनलाइन और मिश्रित पाठ्यक्रम"
+
+msgid "Community showcases and celebrations"
+msgstr "समुदाय प्रदर्शन तथा महोत्सव"
+
+msgid "Partner Showcase"
+msgstr "पार्टनर शोकेस"
+
+msgid "Contributions from institutions and individuals"
+msgstr "व्यक्तिगत तथा संस्थाओं से योगदान"
+
+msgid "BACK"
+msgstr "पीछे"
+
+msgid "New password"
+msgstr "नया शब्दकूट"

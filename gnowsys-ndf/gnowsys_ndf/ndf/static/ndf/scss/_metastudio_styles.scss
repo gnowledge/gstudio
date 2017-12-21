@@ -1,0 +1,25 @@
+/*
+*  Metstudio Platform Stylesheet
+*/
+
+.workspace{
+    // group level menu bar
+    .app.button-bar {
+        height: 45px;
+    }
+    
+    //This is the main content container between the header and footer
+    background: url("watermark.png") no-repeat 0 80%;
+    min-height: 100%;
+    margin-bottom: -130px !important;
+    -webkit-box-sizing: border-box;
+    -moz-box-sizing: border-box;
+    box-sizing: border-box;
+            
+    &:after{
+      //Hack for setting div height to the height of the browser window
+      content: "";
+      display: block;
+      height: 130px;    // allows the content of the footer to be visible at the bottom. This should match the margin-bottom of the div
+  }
+}

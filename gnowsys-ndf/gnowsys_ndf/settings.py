@@ -476,7 +476,10 @@ TEMPLATE_CONTEXT_PROCESSORS = (
 )
 
 
+<<<<<<< HEAD
 
+=======
+>>>>>>> eb89f37d24f9cb6e206b715499c170c782cd63da
 djcelery.setup_loader()
 # # CELERY_RESULT_BACKEND = "mongodb"
 CELERY_RESULT_BACKEND = "djcelery.backends.database:DatabaseBackend"
