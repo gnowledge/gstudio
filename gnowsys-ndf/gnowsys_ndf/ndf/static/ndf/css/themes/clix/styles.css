@@ -29623,13 +29623,28 @@ ul.horizontal_tabs_gstudio > li.sub_group_action:hover ul {
 }
 
 /* line 6471, ../../../scss/_app_styles.scss */
+[class*="column"] + [class*="column"]:last-child {
+  float: left;
+}
+
+/* line 6475, ../../../scss/_app_styles.scss */
+.input_links {
+  margin-left: 10px;
+}
+/* line 6477, ../../../scss/_app_styles.scss */
+.input_links a {
+  margin-right: 35px;
+  margin-top: 5px;
+}
+
+/* line 6483, ../../../scss/_app_styles.scss */
 .buddy_margin {
   margin-right: 80px;
   font-family: OpenSans-Regular;
   margin-top: 6px;
 }
 
-/* line 6479, ../../../scss/_app_styles.scss */
+/* line 6491, ../../../scss/_app_styles.scss */
 .activity-slides-container {
   height: 100%;
   width: 80%;
@@ -29638,19 +29653,19 @@ ul.horizontal_tabs_gstudio > li.sub_group_action:hover ul {
   padding: 0em 0em 0em 0em;
   margin-bottom: 15px;
 }
-/* line 6488, ../../../scss/_app_styles.scss */
+/* line 6500, ../../../scss/_app_styles.scss */
 .activity-slides-container .activity-slides {
   height: 100%;
   color: #f8f8f8;
 }
-/* line 6493, ../../../scss/_app_styles.scss */
+/* line 6505, ../../../scss/_app_styles.scss */
 .activity-slides-container .activity-slides .activity-slide {
   padding: 1em;
   height: inherit;
   background: #fff;
   position: relative;
 }
-/* line 6499, ../../../scss/_app_styles.scss */
+/* line 6511, ../../../scss/_app_styles.scss */
 .activity-slides-container .activity-slides .activity-slide .view-related-content {
   border: 1px solid #999;
   display: inline-block;
@@ -29658,12 +29673,12 @@ ul.horizontal_tabs_gstudio > li.sub_group_action:hover ul {
   color: #999999;
   margin-left: 12%;
 }
-/* line 6507, ../../../scss/_app_styles.scss */
+/* line 6519, ../../../scss/_app_styles.scss */
 .activity-slides-container .activity-slides .activity-slide .page > section {
   margin-left: 50%;
   transform: translate(-50%);
 }
-/* line 6513, ../../../scss/_app_styles.scss */
+/* line 6525, ../../../scss/_app_styles.scss */
 .activity-slides-container .activity-slides .related-content-close {
   position: absolute;
   right: -2px;
@@ -29672,21 +29687,21 @@ ul.horizontal_tabs_gstudio > li.sub_group_action:hover ul {
   display: none;
   color: #8E8E8E;
 }
-/* line 6522, ../../../scss/_app_styles.scss */
+/* line 6534, ../../../scss/_app_styles.scss */
 .activity-slides-container .activity-slides .content-expanded > i {
   font-size: 20px !important;
   color: #ccc !important;
   top: 8px !important;
 }
-/* line 6527, ../../../scss/_app_styles.scss */
+/* line 6539, ../../../scss/_app_styles.scss */
 .activity-slides-container .activity-slides .content-expanded .related-content-header {
   margin-left: 20px !important;
 }
-/* line 6529, ../../../scss/_app_styles.scss */
+/* line 6541, ../../../scss/_app_styles.scss */
 .activity-slides-container .activity-slides .content-expanded .related-content-header > span:first-child {
   display: none !important;
 }
-/* line 6532, ../../../scss/_app_styles.scss */
+/* line 6544, ../../../scss/_app_styles.scss */
 .activity-slides-container .activity-slides .content-expanded .related-content-header .back-to-activity {
   display: inline-block !important;
   float: right;
@@ -29697,24 +29712,24 @@ ul.horizontal_tabs_gstudio > li.sub_group_action:hover ul {
   color: #757575;
   margin-right: 20px;
 }
-/* line 6542, ../../../scss/_app_styles.scss */
+/* line 6554, ../../../scss/_app_styles.scss */
 .activity-slides-container .activity-slides .content-expanded .related-content-header .related-content-title {
   font-size: 15px !important;
   position: relative;
 }
-/* line 6546, ../../../scss/_app_styles.scss */
+/* line 6558, ../../../scss/_app_styles.scss */
 .activity-slides-container .activity-slides .content-expanded .related-content-header .related-content-title .related-content-close {
   display: block;
 }
-/* line 6549, ../../../scss/_app_styles.scss */
+/* line 6561, ../../../scss/_app_styles.scss */
 .activity-slides-container .activity-slides .content-expanded .related-content-header .related-content-title > i {
   display: none !important;
 }
-/* line 6554, ../../../scss/_app_styles.scss */
+/* line 6566, ../../../scss/_app_styles.scss */
 .activity-slides-container .activity-slides .content-expanded .related-content-body {
   display: block !important;
 }
-/* line 6558, ../../../scss/_app_styles.scss */
+/* line 6570, ../../../scss/_app_styles.scss */
 .activity-slides-container .activity-slides #related-content {
   width: 100%;
   margin: 0px auto;
@@ -29726,7 +29741,7 @@ ul.horizontal_tabs_gstudio > li.sub_group_action:hover ul {
   position: relative;
   color: #222222;
 }
-/* line 6569, ../../../scss/_app_styles.scss */
+/* line 6581, ../../../scss/_app_styles.scss */
 .activity-slides-container .activity-slides #related-content > i {
   color: #fff;
   font-size: 40px;
@@ -29734,15 +29749,15 @@ ul.horizontal_tabs_gstudio > li.sub_group_action:hover ul {
   left: 8px;
   top: 4px;
 }
-/* line 6577, ../../../scss/_app_styles.scss */
+/* line 6589, ../../../scss/_app_styles.scss */
 .activity-slides-container .activity-slides #related-content .related-content-header {
   margin-left: 40px;
 }
-/* line 6579, ../../../scss/_app_styles.scss */
+/* line 6591, ../../../scss/_app_styles.scss */
 .activity-slides-container .activity-slides #related-content .related-content-header .back-to-activity {
   display: none;
 }
-/* line 6582, ../../../scss/_app_styles.scss */
+/* line 6594, ../../../scss/_app_styles.scss */
 .activity-slides-container .activity-slides #related-content .related-content-header span {
   display: block;
   vertical-align: top;
@@ -29752,15 +29767,21 @@ ul.horizontal_tabs_gstudio > li.sub_group_action:hover ul {
   letter-spacing: 0.8px;
   color: #999999;
 }
-/* line 6591, ../../../scss/_app_styles.scss */
+/* line 6603, ../../../scss/_app_styles.scss */
 .activity-slides-container .activity-slides #related-content .related-content-header .related-content-title {
   font-size: 20px;
   color: #000;
   cursor: pointer;
 }
-/* line 6597, ../../../scss/_app_styles.scss */
+/* line 6609, ../../../scss/_app_styles.scss */
 .activity-slides-container .activity-slides #related-content .related-content-body {
   display: none;
+}
+
+/* line 6618, ../../../scss/_app_styles.scss */
+.icon-color {
+  color: #2e3f51 !important;
+  padding: right;
 }
 
 /*

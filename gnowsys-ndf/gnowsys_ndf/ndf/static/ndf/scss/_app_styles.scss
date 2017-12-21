@@ -6468,6 +6468,18 @@ $ah_2_background_color_hover: rgba(244, 244, 244, 0.3);;
 }
 
 
+[class*="column"] + [class*="column"]:last-child {
+    float: left;
+}
+
+.input_links{
+    margin-left: 10px;
+    a{
+        margin-right: 35px;
+        margin-top: 5px;
+    }
+}
+
 .buddy_margin{
     margin-right: 80px;
     font-family:OpenSans-Regular;
