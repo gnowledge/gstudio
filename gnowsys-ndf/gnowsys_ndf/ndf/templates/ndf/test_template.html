@@ -5,280 +5,207 @@
 {% block body_content %}
 
 <style type="text/css">
-	.round{
-		border-radius: 1px;
-		background-color: orange;
+  
+  .notification_body{
+    max-width: 1546px !important;
+    margin: 0 auto !important;
+    display: -moz-box !important;
+    display: -ms-flexbox !important;
+    display: -webkit-box !important;
+    display: -webkit-flex !important;
+    display: flex !important;
+    flex-direction: column !important;
+    padding-bottom: 32px !important;
+    -webkit-flex-direction: column !important;
+    -ms-flex-direction: column !important;
+    -webkit-box-orient: vertical !important;
+    -webkit-box-direction: normal !important;
+    background: #fff;
+    box-shadow: 0px 2px 6px #000;
+  }
+        
+    .notifications_content{
+            display: -moz-box !important;
+            display: -ms-flexbox !important;
+            display: -webkit-box !important;
+            display: -webkit-flex !important;
+            display: flex !important;
+            align-items: center !important;
+            justify-content: space-between !important;
+            width: 100% !important;
+            box-sizing: border-box !important;
+            padding: 16px 8px !important;
+            -webkit-align-items: center !important;
+            -webkit-justify-content: space-between !important;
+            -moz-box-sizing: border-box !important;
+            -ms-flex-align: center !important;
+            -webkit-box-align: center !important;
+            -ms-flex-pack: justify !important;
+            -webkit-box-pack: justify !important;
+                &:hover{
+                background: #F0F1F2 !important;
+            }
+    .content-body{
+            border-bottom: 1px solid #D6D8DA !important;
 
-	}
+    }
 
-	#circle-medium{
-	    background: #ffc14e;
-	    -moz-border-radius: 50px;
-	    -webkit-border-radius: 50px;
-	    border-radius: 50px;
-	    padding: 0px 0px 0px 20px;
-	    margin-right: 5px;
-
-}
-	#circle-high{
-	    background: #f04124;
-	    -moz-border-radius: 50px;
-	    -webkit-border-radius: 50px;
-	    border-radius: 50px;
-	    padding: 0px 0px 0px 20px;
-	    margin-right: 5px;
-}
-	#circle-low{
-	    background: #008cba;
-	    -moz-border-radius: 50px;
-	    -webkit-border-radius: 50px;
-	    border-radius: 50px;
-	    padding: 0px 0px 0px 20px;
-	    margin-right: 5px;
-}
-
-.status-indication{
-	border-radius: 124px;
-    padding: 0px 8px 3px 8px;
-    line-height: 25px;
-    margin: 4px 14px 10px 0;
-    height: auto;
-    display: inline-block !important;
-    border: 2px solid rgba(115, 133, 159, 0.5);
-    color: grey;
-}
-.priority-margin{
-	margin-left: -30px;
-}
-.iconclr{
-	color:#999999;
-}
 </style>
 
 
- 
-  <div class="row task_sheet ">
-    <div class="small-12 columns">
-        <div class="task_editor ">
-          <div class="small-2 columns hide-for-small hide-for-medium">
-            <div class="task_tree">
-              <div class="lesson-title" title="">
-              </div>
-                <div class="activity-title">
-                    <li class="active"> 
-                    	<a href="#">
-                    		<img src="/static/ndf/images/task_list.svg" style="height: 65px;width: 266px;align-content: center;"/>
-                    		<h7 style="margin-left: 81px;font-size: 26px;">Task List</h7>
-                    	</a>
-                    </li>
-                    <li> 
-                    	<a href="#">
-                    		<img src="/static/ndf/images/new_task.svg" style="height: 65px;width: 266px;align-content: center;"/>
-                    		<h7 style="margin-left: 65px;font-size: 26px;">Create New</h7>
-                    	</a>
-                    </li>
-                    <li> 
-                    	<a href="#">
-                    		<img src="/static/ndf/images/assigned_to_me.svg" style="height: 65px;width: 266px;align-content: center;"/>
-                    		<h7 style="margin-left: 65px;font-size: 26px;">Assigned to me</h7>
-                    	</a>
-                    </li>
-                    <li> 
-                    	<a href="#">
-                    		<img src="/static/ndf/images/created_by_me.svg" style="height: 65px;width: 266px;align-content: center;"/>
-                    		<h7 style="margin-left: 65px;font-size: 26px;">Created by me</h7>
-                    	</a>
-                    </li>
-                    <li> 
-                    	<a href="#">
-                    		<img src="/static/ndf/images/pending_task.svg" style="height: 65px;width: 266px;align-content: center;"/>
-                    		<h7 style="margin-left: 65px;font-size: 26px;">Pending Tasks</h7>
-                    	</a>
-                    </li>
-                </div>
+    <div class="notification_body">
+      <div class="content-body">
+        <div class="notifications_content">
+            <div class="small-1 columns">
+              <a href="#">
+                <img class="img-circle" src="/static/ndf/images/gnu-head.png" style="margin-top:-12px;"/>
+              </a>
             </div>
-          </div>
+            <div class="small-14 columns">
+              This is an info alert with a radius.
+              This is an info alert with a radius. Trying if the notication is big enough.
+              This is an info alert with a radius.
+              This is an info alert with a radius. Trying if the notication is big enough.
+              This is an info alert with a radius.
+            </div>
         </div>
-
-
-
-        <div class="large-10 columns task_editor_section ">
-        	<div class="task_editor_top">
-        	</div>
-        	<div class="row task_head">
-        		<div class="large-2 columns left ">
-        			All Tasks
-        		</div>
-        		<div class="large-2 columns right">
-        			<a href="#"><i class="fa fa-ellipsis-h" aria-hidden="true"></i></a>
-        		</div>
-        	</div>
-        	
-			
-<!--			
-			<ul class="inline-list task_ex">
-			  <li class="large-5 columns">
-			  		<form>
-				  		<input type="checkbox" name="task" value="task" style="margin-right: 5px;"> Making responsive UI
-			  		</form>
-			  </li>
-			  <li class="large-1 columns">
-			  		<a href="#" style="color: black;">black-cat-cc</a>
-			  </li>
-			  <li class="large-2 columns">
-			  	<div class="small-2 columns">
-			  		<a href="#" style="color: black;" id="circle-medium"></a>
-			  	</div>
-			  	<div class="small-9 columns priority-margin">
-			  	 Medium priority
-			  	</div>
-			  </li>
-			  <li>
-			  	<a class="status-indication" title="completed">completed</a>
-			  </li>
-			  <li><a href="#" class="iconclr"><i class="fa fa-pencil "></i></a></li>
-			  <li><a href="#" class="iconclr"><i class="fa fa-trash " ></i></a></li>
-			</ul>
-			<ul class="inline-list task_ex">
-			  <li class="large-5 columns">
-			  		<form>
-				  		<input type="checkbox" name="task" value="task" style="margin-right: 5px;"> Export ePub
-			  		</form>
-			  </li>
-			  <li class="large-1 columns">
-			  		<a href="#" style="color: black;">Onwer</a>
-			  </li>
-			  <li class="large-2 columns">
-			  	<div class="small-2 columns">
-			  		<a href="#" style="color: black;" id="circle-low"></a>
-			  	</div>
-			  	<div class="small-9 columns priority-margin">
-			  	 Low priority
-			  	</div>
-			  </li>
-				<li>
-			  	<a class="status-indication" title="Upcoming">Upcoming</a>
-			  </li>
-			  <li><a href="#" class="iconclr"><i class="fa fa-pencil "></i></a></li>
-			  <li><a href="#" class="iconclr"><i class="fa fa-trash " ></i></a></li>
-			</ul>
-			
-			<ul class="inline-list task_ex">
-			  <li class="large-5 columns">
-			  		<form>
-				  		<input type="checkbox" name="task" value="task" style="margin-right: 5px;"> Task 3
-			  		</form>
-			  </li>
-			  <li class="large-1 columns">
-			  		<a href="#" style="color: black;">pink-bear-cg09</a>
-			  </li>
-			  <li class="large-2 columns">
-			  	<div class="small-2 columns">
-			  		<a href="#" style="color: black;" id="circle-high"></a>
-			  	</div>
-			  	<div class="small-9 columns priority-margin">
-			  	 High priority
-			  	</div>
-			  </li>
-			  <li>
-			  	<a class="status-indication" title="in progress">In progress</a>
-			  </li>
-			  <li><a href="#" class="iconclr"><i class="fa fa-pencil "></i></a></li>
-			  <li><a href="#" class="iconclr"><i class="fa fa-trash " ></i></a></li>
-			</ul>
-			<ul class="inline-list task_ex">
-			  <li class="large-5 columns">
-			  		<form>
-				  		<input type="checkbox" name="task" value="task" style="margin-right: 5px;"> Task 4
-			  		</form>
-			  </li>
-			  <li class="large-1 columns">
-			  		<a href="#" style="color: black;">Administrator</a>
-			  </li>
-			  <li class="large-2 columns">
-			  	<div class="small-2 columns">
-			  		<a href="#" style="color: black;" id="circle-medium"></a>
-			  	</div>
-			  	<div class="small-9 columns priority-margin">
-			  	 Medium priority
-			  	</div>
-			  </li>
-			  <li>
-			  	<a class="status-indication" title="in progress">In progress</a>
-			  </li>
-			  <li><a href="#" class="iconclr"><i class="fa fa-pencil "></i></a></li>
-			  <li><a href="#" class="iconclr"><i class="fa fa-trash " ></i></a></li>
-			</ul>-->
-        	<!--<div class="task_listing">
-		    	<div class="task_content">
-		    		<div class="task_content_left">
-		    			<a href="#">checkbox</a>
-		    			<div class="task_content_details">
-		            		<a href="#" class="hyperlink-style">name of task  </a>
-		        			<a href="#" class="hyperlink-info"> Priority </a>
-		        			<a href="#" class="hyperlink-info"> Owner </a>
-		        			<a href="#" class="hyperlink-info"> status </a>
-		    			</div>
-		    		</div>
-		    	</div>
-		    </div>
-        </div>-->
-
-<table style="margin-left:-12px;">
-  <thead>
-    <tr>
-      <th width="600">Task Name</th>
-      <th width="150">Task Owner</th>
-      <th width="150">Task Priority</th>
-      <th width="150">Task status</th>
-      <th width="150">Edit Task</th>
-      <th width="150">Delete Task</th>
-    </tr>
-  </thead>
-  <tbody>
-    <tr>
-      
-      <td><input type="checkbox" name="task" value="task"/>This is longer content Donec id elit non mi porta gravida at eget metus This is longer content Donec id elit non mi porta gravida at eget metus</td>
-      <td>Black-cat-cc and black-peacock-rj78</td>
-      <td><i id="circle-medium"></i>Medium</td>
-      <td><a class="status-indication" title="Upcoming">Upcoming</a></td>
-      <td><i class="fa fa-pencil iconclr"> </td>
-      <td><i class="fa fa-trash iconclr"></td>
-    </tr>
-    <tr>
-      <td><input type="checkbox" name="task" value="task"/>  This is longer content Donec id elit non mi porta gravida at eget metus</td>
-      <td>Administrator</td>
-      <td><i id="circle-medium"></i>Medium</td>
-      <td><a class="status-indication" title="Upcoming">In Progress</a></td>
-      <td><i class="fa fa-pencil iconclr "> </td>
-      <td><i class="fa fa-trash iconclr"></td>
-    </tr>
-    <tr>
-      <td><input type="checkbox" name="task" value="task"/>  This is longer content Donec id elit non mi porta gravida at eget metus</td>
-      <td>black-peacock-rj78</td>
-      <td> <i id="circle-high"></i> high</td>
-      <td><a class="status-indication" title="Upcoming">Upcoming</a></td>
-      <td><i class="fa fa-pencil iconclr"> </td>
-      <td><i class="fa fa-trash iconclr"></td>
-    </tr>
-    <tr>
-      <td><input type="checkbox" name="task" value="task"/> This is longer content Donec id elit non mi porta gravida at eget metus This is longer content Donec id elit non mi porta gravida at eget metus</td>
-      <td>Black-cat-cc and black-peacock-rj78</td>
-      <td><i id="circle-low"></i>Low</td>
-      <td><a class="status-indication" title="Upcoming">Completed</a></td>
-      <td><i class="fa fa-pencil iconclr"> </td>
-      <td><i class="fa fa-trash iconclr"></td>
-    </tr>
-    
-  </tbody>
-</table>
+        <div style="
+        color: orange;
+        margin-left: 140px;
+        margin-top: -25px;
+    ">
+          <i class="fa fa-clock-o fa-1x" aria-hidden="true"></i> 8 hours ago.
+        </div>
+      </div>
     </div>
-  </div>
+    <div class="notification_body">
+      <div class="content-body">
+        <div class="notifications_content">
+            <div class="small-1 columns">
+              <a href="#">
+                <img class="img-circle" src="/static/ndf/images/gnu-head.png" style="margin-top:-12px;"/>
+              </a>
+            </div>
+            <div class="small-14 columns">
+              This is an info alert with a radius.
+              This is an info alert with a radius. Trying if the notication is big enough.
+              This is an info alert with a radius.
+              This is an info alert with a radius. Trying if the notication is big enough.
+              This is an info alert with a radius.
+            </div>
+        </div>
+        <div style="
+        color: orange;
+        margin-left: 140px;
+        margin-top: -25px;
+    ">
+          <i class="fa fa-clock-o fa-1x" aria-hidden="true"></i> 8 hours ago.
+        </div>
+      </div>
+    </div>
+<div class="notification_body">
+      <div class="content-body">
+        <div class="notifications_content">
+            <div class="small-1 columns">
+              <a href="#">
+                <img class="img-circle" src="/static/ndf/images/gnu-head.png" style="margin-top:-12px;"/>
+              </a>
+            </div>
+            <div class="small-14 columns">
+              This is an info alert with a radius.
+              This is an info alert with a radius. Trying if the notication is big enough.
+              This is an info alert with a radius.
+              This is an info alert with a radius. Trying if the notication is big enough.
+              This is an info alert with a radius.
+            </div>
+        </div>
+        <div style="
+        color: orange;
+        margin-left: 140px;
+        margin-top: -25px;
+    ">
+          <i class="fa fa-clock-o fa-1x" aria-hidden="true"></i> 8 hours ago.
+        </div>
+      </div>
+    </div>
+<div class="notification_body">
+      <div class="content-body">
+        <div class="notifications_content">
+            <div class="small-1 columns">
+              <a href="#">
+                <img class="img-circle" src="/static/ndf/images/gnu-head.png" style="margin-top:-12px;"/>
+              </a>
+            </div>
+            <div class="small-14 columns">
+              This is an info alert with a radius.
+              This is an info alert with a radius. Trying if the notication is big enough.
+              This is an info alert with a radius.
+              This is an info alert with a radius. Trying if the notication is big enough.
+              This is an info alert with a radius.
+            </div>
+        </div>
+        <div style="
+        color: orange;
+        margin-left: 140px;
+        margin-top: -25px;
+    ">
+          <i class="fa fa-clock-o fa-1x" aria-hidden="true"></i> 8 hours ago.
+        </div>
+      </div>
+    </div>
+<div class="notification_body">
+      <div class="content-body">
+        <div class="notifications_content">
+            <div class="small-1 columns">
+              <a href="#">
+                <img class="img-circle" src="/static/ndf/images/gnu-head.png" style="margin-top:-12px;"/>
+              </a>
+            </div>
+            <div class="small-14 columns">
+              This is an info alert with a radius.
+              This is an info alert with a radius. Trying if the notication is big enough.
+              This is an info alert with a radius.
+              This is an info alert with a radius. Trying if the notication is big enough.
+              This is an info alert with a radius.
+            </div>
+        </div>
+        <div style="
+        color: orange;
+        margin-left: 140px;
+        margin-top: -25px;
+    ">
+          <i class="fa fa-clock-o fa-1x" aria-hidden="true"></i> 8 hours ago.
+        </div>
+      </div>
+    </div>
+<div class="notification_body">
+      <div class="content-body">
+        <div class="notifications_content">
+            <div class="small-1 columns">
+              <a href="#">
+                <img class="img-circle" src="/static/ndf/images/gnu-head.png" style="margin-top:-12px;"/>
+              </a>
+            </div>
+            <div class="small-14 columns">
+              This is an info alert with a radius.
+              This is an info alert with a radius. Trying if the notication is big enough.
+              This is an info alert with a radius.
+              This is an info alert with a radius. Trying if the notication is big enough.
+              This is an info alert with a radius.
+            </div>
+        </div>
+        <div style="
+        color: orange;
+        margin-left: 140px;
+        margin-top: -25px;
+    ">
+          <i class="fa fa-clock-o fa-1x" aria-hidden="true"></i> 8 hours ago.
+        </div>
+      </div>
+    </div>
 
 
 
 
-
- 
 
 {% endblock body_content %}

@@ -1897,51 +1897,70 @@ def enroll_to_course(request, group_id):
         user_obj = User.objects.get(id=userid)
         set_notif_val(request, group_obj._id, mail_content, activ, user_obj)
 
+    def add_to_author_set(group_id, add_admin, user_id):
+        group_obj = get_group_name_id(group_id, get_obj=True)
+        if group_obj:
+            try:
+                if add_admin:
+                    if isinstance(user_id, list):
+                        non_admin_user_ids = [each_userid for each_userid in user_id if each_userid not in group_obj.group_admin ]
+                        if non_admin_user_ids:
+                            group_obj.group_admin.extend(non_admin_user_ids)
+                            group_obj.group_admin = list(set(group_obj.group_admin))
+                    else:
+                        if user_id not in group_obj.group_admin:
+                            group_obj.group_admin.append(user_id)
+                else:
+                    if isinstance(user_id, list):
+                        non_member_user_ids = [each_userid for each_userid in user_id if each_userid not in group_obj.author_set ]
+                        if non_member_user_ids:
+                            group_obj.author_set.extend(non_member_user_ids)
+                            group_obj.author_set = list(set(group_obj.author_set))
+                    else:
+                        if user_id not in group_obj.author_set:
+                            group_obj.author_set.append(user_id)
+                group_obj.save()
+
+                if 'Group' not in group_obj.member_of_names_list:
+                    # get new/existing counter document for a user for a given course for the purpose of analytics
+                    if isinstance(user_id, list):
+                        for each_user_id in user_id:
+                            _update_user_counter(each_user_id, group_obj._id)
+                    else:
+                        _update_user_counter(user_id, group_obj._id)
+                response_dict["success"] = True
+
+            except Exception as e:
+                pass
+            return group_obj
+        pass
     response_dict = {"success": False}
     if request.is_ajax() and request.method == "POST":
         try:
             user_id = request.POST.get("user_id", "")
+            enroll_group_id = request.POST.get("enroll_group_id", None)
             add_admin = eval(request.POST.get("asAdmin", 'False'))
+            is_module_enroll = eval(request.POST.get("module_enrollment", 'False'))
             if not user_id:
                 user_id = request.user.id
             else:
                 user_id = ast.literal_eval(user_id)
-
-
             if isinstance(user_id, list):
                 user_id = map(int, user_id)
             else:
                 user_id = int(user_id)
-            group_obj = get_group_name_id(group_id, get_obj=True)
-            if add_admin:
-                if isinstance(user_id, list):
-                    non_admin_user_ids = [each_userid for each_userid in user_id if each_userid not in group_obj.group_admin ]
-                    if non_admin_user_ids:
-                        group_obj.group_admin.extend(non_admin_user_ids)
-                        group_obj.group_admin = list(set(group_obj.group_admin))
-                else:
-                    if user_id not in group_obj.group_admin:
-                        group_obj.group_admin.append(user_id)
-            else:
-                if isinstance(user_id, list):
-                    non_member_user_ids = [each_userid for each_userid in user_id if each_userid not in group_obj.author_set ]
-                    if non_member_user_ids:
-                        group_obj.author_set.extend(non_member_user_ids)
-                        group_obj.author_set = list(set(group_obj.author_set))
-                else:
-                    if user_id not in group_obj.author_set:
-                        group_obj.author_set.append(user_id)
+            if enroll_group_id:
+                group_id = enroll_group_id
 
-            group_obj.save()
-            response_dict["success"] = True
-            response_dict["member_count"] = len(group_obj.author_set)
-            if 'Group' not in group_obj.member_of_names_list:
-                # get new/existing counter document for a user for a given course for the purpose of analytics
-                if isinstance(user_id, list):
-                    for each_user_id in user_id:
-                        _update_user_counter(each_user_id, group_obj._id)
-                else:
-                    _update_user_counter(user_id, group_obj._id)
+            if is_module_enroll:
+                module_obj = Node.get_node_by_id(group_id)
+                # print "\n Module: ", module_obj.name, " -- ", module_obj.member_of_names_list
+                for each_group_id in module_obj.collection_set:
+                    group_obj = add_to_author_set(each_group_id, add_admin, user_id)
+            else:
+                group_obj = add_to_author_set(group_id, add_admin, user_id)
+                response_dict["member_count"] = len(group_obj.author_set)
+
             try:
                 if isinstance(user_id, list):
                     for each_user_id in user_id:
@@ -1949,34 +1968,35 @@ def enroll_to_course(request, group_id):
                 else:
                     _send_notif(user_id, group_obj)
             except Exception as e:
-                print "\n Unable to send notifications ",e
+                print "\n Unable to send notifications ", e
 
         except Exception as er:
-            print "\n ERROR!!!! ",er
+            print "\n ERROR Occurred in Enrollment!! ", er
+            pass
         return HttpResponse(json.dumps(response_dict))
 
 
 @login_required
 @get_execution_time
 def set_release_date_css(request, group_id):
-	response_dict = {"success": False}
-	try:
-		if request.is_ajax() and request.method == "POST":
-			css_date_dict = request.POST.get("css_date_dict", "")
-			if css_date_dict:
-				css_date_dict = json.loads(css_date_dict)
-			# print "\n\ncss_date_dict",css_date_dict,"type--",type(css_date_dict)
-			start_date_AT = node_collection.one({'_type': "AttributeType", 'name': "start_time"})
-			for each_css in css_date_dict:
-				if each_css['start_time']:
-					start_date_val = datetime.datetime.strptime(each_css['start_time'], "%d/%m/%Y")
-					create_gattribute(ObjectId(each_css['id']), start_date_AT, start_date_val)
-			response_dict["success"] = True
-			response_dict["message"] = "Release dates have been set successfully!"
-	except Exception as e:
-		response_dict["success"] = False
-		response_dict["message"] = "Something went wrong! Please try after some time"
-	return HttpResponse(json.dumps(response_dict))
+    response_dict = {"success": False}
+    try:
+        if request.is_ajax() and request.method == "POST":
+            css_date_dict = request.POST.get("css_date_dict", "")
+            if css_date_dict:
+                css_date_dict = json.loads(css_date_dict)
+            # print "\n\ncss_date_dict",css_date_dict,"type--",type(css_date_dict)
+            start_date_AT = node_collection.one({'_type': "AttributeType", 'name': "start_time"})
+            for each_css in css_date_dict:
+                if each_css['start_time']:
+                    start_date_val = datetime.datetime.strptime(each_css['start_time'], "%d/%m/%Y")
+                    create_gattribute(ObjectId(each_css['id']), start_date_AT, start_date_val)
+            response_dict["success"] = True
+            response_dict["message"] = "Release dates have been set successfully!"
+    except Exception as e:
+        response_dict["success"] = False
+        response_dict["message"] = "Something went wrong! Please try after some time"
+    return HttpResponse(json.dumps(response_dict))
 
 
 @login_required
@@ -2099,6 +2119,7 @@ def activity_player_detail(request, group_id, lesson_id, activity_id):
 
     if (lesson_index + 1) < lesson_count:
         lesson_next_id = group_obj.collection_set[lesson_index + 1]
+
 
     if lesson_index > 0:
         lesson_prev_id = group_obj.collection_set[lesson_index - 1]
@@ -2335,8 +2356,9 @@ def course_notebook(request, group_id, node_id=None, tab="my-notes"):
         else:
             tab = 'all-notes'
 
-        if notebook_obj:
-            # return HttpResponseRedirect(reverse('course_notebook_tab_note',
+
+        if notebook_obj and not create_flag:
+            # return HttpResponseRedirect(reverse('course_notebook_tab_note', 
                 # kwargs={'group_id': group_id, "node_id": notebook_obj.pk, 'tab': tab}))
             return HttpResponseRedirect(reverse('course_notebook_note',
                 kwargs={'group_id': group_id, "node_id": notebook_obj.pk}))
@@ -2963,11 +2985,11 @@ def course_analytics(request, group_id, user_id, render_template=False, get_resu
                                     completed_activities = completed_activities + 1
             if all(each_act_id in visited_nodes for each_act_id in lesson_act_ids):
                 completed_lessons = completed_lessons + 1
-        analytics_data['level1_lbl'] = "Lesson Completion"
-        analytics_data['level2_lbl'] = "Activity Completion"
+        analytics_data['level1_lbl'] = "Lesson Visited"
+        analytics_data['level2_lbl'] = "Activity Visited"
 
-        analytics_data['level1_progress_stmt'] = str(completed_lessons) + " out of " + str(all_lessons) + " Lessons completed"
-        analytics_data['level2_progress_stmt'] = str(completed_activities) + " out of " + str(all_activities) + " Activities completed"
+        analytics_data['level1_progress_stmt'] = str(completed_lessons) + " out of " + str(all_lessons) + " Lessons Visited"
+        analytics_data['level2_progress_stmt'] = str(completed_activities) + " out of " + str(all_activities) + " Activities Visited"
         if completed_lessons and all_lessons:
             analytics_data['level1_progress_meter'] = (completed_lessons/float(all_lessons))*100
         else:
@@ -3139,6 +3161,10 @@ def course_analytics(request, group_id, user_id, render_template=False, get_resu
 
     # cache.set(cache_key, analytics_data, 60*10)
     analytics_data['group_member_of'] = group_obj.member_of_names_list
+    if group_obj.altnames:
+        analytics_data['group_name'] = group_obj.altnames
+    else:
+        analytics_data['group_name'] = group_obj.name
     return render_to_response("ndf/user_course_analytics.html",
                                 analytics_data,
                                 context_instance = RequestContext(request)
@@ -4132,7 +4158,13 @@ def get_trans_node_list(node_list,lang):
         return trans_node_list
 
 @get_execution_time
-def course_quiz_data(request, group_id):
+def course_quiz_data(request, group_id, all_data=False):
+    '''
+        all_data = True, will return checked and subimitted data
+        all_data = false, will return only subimitted data
+
+    '''
+
     def _merged_to_from(min_list, max_list, na_index):
         # max list contains more num of list
         # min list contains less num of list
@@ -4142,13 +4174,12 @@ def course_quiz_data(request, group_id):
             for ind in na_index:
                 partly_max_list_ele[ind] = min_list_ele[ind]
         return partly_max_list + exception_list
-
     group_obj   = Group.get_group_name_id(group_id, get_obj=True)
     forbid_private_group(request, group_obj)
     group_id    = group_obj._id
     group_name  = group_obj.name
-
-    if not request.user.is_superuser:
+    gstaff_access = check_is_gstaff(group_id, request.user)
+    if not gstaff_access:
         return HttpResponseRedirect(reverse('course_content', kwargs={'group_id': ObjectId(group_id)}))
 
     allow_to_join = get_group_join_status(group_obj)
@@ -4203,34 +4234,30 @@ def course_quiz_data(request, group_id):
                     'name': {'$regex': '^(?!Thread of).*'}})
                 each_record['name'] = qie_node.content
 
-            if record_key == "check" and record_val:
-                for checked_ans_dict in record_val[0]:
-                    for k,v in checked_ans_dict.items():
-                        l2 = []
-                        l2.append(each_record['name'])
-                        l2.append(each_record['user_id'])
-                        l2.append(k)
-                        l2.append(','.join(v))
-                        l2.append("--")
-                        l2.append("--")
-                        l.append(l2)
-
             if record_key == "submit" and record_val:
                 for submitted_ans_dict in record_val[0]:
                     for k,v in submitted_ans_dict.items():
                         l1 = []
                         l1.append(each_record['name'])
                         l1.append(each_record['user_id'])
-                        l1.append("--")
-                        l1.append("--")
                         l1.append(k)
                         l1.append(','.join(v))
                         l.append(l1)
 
+            if all_data:
+                if record_key == "check" and record_val:
+                    for checked_ans_dict in record_val[0]:
+                        for k,v in checked_ans_dict.items():
+                            l2 = []
+                            l2.append(each_record['name'])
+                            l2.append(each_record['user_id'])
+                            l2.append(k)
+                            l2.append(','.join(v))
+                            l2.append("--")
+                            l2.append("--")
+                            l.append(l2)
 
     # print "\nadmin_analytics_data: ", l
-    checked_ans_list = []
-    submitted_ans_list = []
     user_dict_list = []
     user_dict = {}
     for e in l:
@@ -4240,20 +4267,27 @@ def course_quiz_data(request, group_id):
                 if e[1] in en.keys():
                     user_dict = en
         else:
-            user_dict = {e[1]: {'check': [], 'submit': []}}
+            user_dict = {e[1]: {'submit': []}}
+            # user_dict = {e[1]: {'check': [], 'submit': []}}
             user_dict_list.append(user_dict)
-        if e.index('--') in [2,3]:
+        if all_data:
+            if e.index('--') in [2,3]:
+                user_dict[e[1]]['submit'].append(e)
+            elif e.index('--') in [4,5]:
+                user_dict[e[1]]['check'].append(e)
+        else:
             user_dict[e[1]]['submit'].append(e)
-        elif e.index('--') in [4,5]:
-            user_dict[e[1]]['check'].append(e)
 
     return_list = []
     for each_user_dict in user_dict_list:
         for ked, ved in each_user_dict.items():
-            if len(ved['check'])< len(ved['submit']):
-                return_list.extend(_merged_to_from(ved['check'],ved['submit'], na_index=[2,3]))
-            elif len(ved['submit'])< len(ved['check']):
-                return_list.extend(_merged_to_from(ved['submit'],ved['check'], na_index=[4,5]))
+            if all_data:
+                if len(ved['check'])< len(ved['submit']):
+                    return_list.extend(_merged_to_from(ved['check'],ved['submit'], na_index=[2,3]))
+                elif len(ved['submit'])< len(ved['check']):
+                    return_list.extend(_merged_to_from(ved['submit'],ved['check'], na_index=[4,5]))
+            else:
+                return_list.extend(ved['submit'])
 
     banner_pic_obj,old_profile_pics = get_current_and_old_display_pics(group_obj)
     context_variables.update({'old_profile_pics':old_profile_pics,

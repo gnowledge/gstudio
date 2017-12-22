@@ -7086,7 +7086,7 @@ def export_to_epub(request, group_id, node_id):
         response['Content-Disposition'] = 'attachment; filename="'+ slugify(node_obj.name) + '.epub"'
         return response
     except Exception as export_fail:
-        # print "\n export_fail: ", export_fail
+        print "\n export_fail: ", export_fail
         pass
     return HttpResponseRedirect(reverse('unit_detail', kwargs={'group_id': group_id}))
 

@@ -1,7 +1,9 @@
-{# lms_dashboard.html lms My Desk screen #}
 {% extends "ndf/gbase.html" %}
 {% load i18n %}
+{% load cache %}
 
+
+{# lms_dashboard.html lms My Desk screen #}
 
 {% block title %} My Desk {% endblock%}
 
@@ -30,12 +32,13 @@
   </div>
   <div class="page_menu">
     <ul class="nav_menu_1">
-      <li class="">
-        <a href="{% url 'my_desk' request.user.id  %}" {% if title == "my desk" %} class="selected" {% endif %}> {% if  is_workspace_instance %} {% trans "My Workspaces" %} {% else %} {% trans "My Courses" %} {% endif %} </a>
+      <li>
+        <a href="{% url 'my_desk' request.user.id  %}" {% if title == "my desk" %} class="selected" {% endif %}> {% if  is_workspace_instance %} {% trans "My Workspaces" %} {% else %} <i class="fi-book-bookmark" style="font-size:20px;"></i> {% trans "My Courses" %} {% endif %} </a>
       </li>
 
-      <li class=""><a {% if title == "my performance" %} class="selected" {% endif %} href="{% url 'my_performance' request.user.id  %}">{% trans "My Performance" %}</a> </li>
-      <li class=""><a {% if title == "my workspace" %} class="selected" {% endif %} href="{% url 'course_about' request.user.username  %}">{% trans "My WorkSpace" %}</a> </li>
+
+     {# <li class=""><a {% if title == "my workspace" %} class="selected" {% endif %} href="{% url 'course_about' request.user.username  %}">{% trans "My WorkSpace" %}</a> </li> #} 
+      <li class=""><a {% if title == "my performance" %} class="selected" {% endif %} href="{% url 'my_performance' request.user.id  %}"> <i class="fa fa-line-chart" aria-hidden="true"></i> {% trans "My Performance" %}</a> </li>
 
     </ul>
   </div>
@@ -61,10 +64,13 @@
     <ul class="small-block-grid-1 medium-block-grid-3 large-block-grid-3">
       {% for each_obj in units_cur %}
       <li class="card-image-wrapper">
-        {% include "ndf/card_group.html" with node=each_obj url_name="groupchange" first_arg=each_obj.pk %}
+        {% include "ndf/card_group.html" with node=each_obj url_name="groupchange" first_arg=each_obj.pk no_enroll=True %}
       </li>
       {% empty %}
-      You are not enrolled in any Unit!
+      <section class="empty-dashboard-message">
+        <p>You are not enrolled in any course!</p>
+          <a class="button-explore-courses" href="{% url 'explore_courses' %}"> <i class="fa fa-binoculars" aria-hidden="true"></i>  Explore</a>
+      </section>
       {% endfor %}
     </ul>
   </div>
@@ -77,10 +83,13 @@
     <ul class="small-block-grid-1 medium-block-grid-3 large-block-grid-3">
       {% for each_obj in units_cur %}
       <li class="card-image-wrapper">
-        {% include "ndf/card_group.html" with group_counts=True node=each_obj no_url=True first_arg=each_obj.pk %}
+        {% include "ndf/card_group.html" with group_counts=True node=each_obj no_url=True first_arg=each_obj.pk  %}
       </li>
       {% empty %}
-      You are not enrolled in any Unit!
+      <section class="empty-dashboard-message">
+        <p>You are not enrolled in any course!</p>
+          <a class="button-explore-courses" href="{% url 'explore_courses' %}">Explore</a>
+      </section>
       {% endfor %}
     </ul>
   </div>
