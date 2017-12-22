@@ -39,12 +39,9 @@ announced_unit_gst = node_collection.one({'_type': "GSystemType", 'name': "annou
 gst_acourse = node_collection.one({'_type': "GSystemType", 'name': "Announced Course"})
 gst_group = node_collection.one({'_type': "GSystemType", 'name': "Group"})
 group_id = node_collection.one({'_type': "Group", 'name': "home"})._id
-<<<<<<< HEAD
 
 group_name = node_collection.one({'_type': "Group", 'name': "home"}).name
 
-=======
->>>>>>> eb89f37d24f9cb6e206b715499c170c782cd63da
 gst_module_name, gst_module_id = GSystemType.get_gst_name_id('Module')
 gst_base_unit_name, gst_base_unit_id = GSystemType.get_gst_name_id('base_unit')
 
@@ -232,11 +229,8 @@ def explore_courses(request):
     title = 'courses'
     context_variable = {
                         'title': title, 
-<<<<<<< HEAD
                         'group_id': group_id, 'groupid': group_id, 'group_name':group_name,
-=======
-                        'group_id': group_id, 'groupid': group_id,
->>>>>>> eb89f37d24f9cb6e206b715499c170c782cd63da
+
                     }
     module_sort_list = get_attribute_value(group_id, 'items_sort_list')
 

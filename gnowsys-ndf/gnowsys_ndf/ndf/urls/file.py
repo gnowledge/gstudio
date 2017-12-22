@@ -11,13 +11,9 @@ urlpatterns = patterns('gnowsys_ndf.ndf.views.file',
                        url(r'^/documentList/', 'GetDoc', name='documentList'),
                        url(r'^/readDoc/', include('gnowsys_ndf.ndf.urls.readDoc')),
                        url(r'^/search/$', 'file_search', name='file_search'),
-<<<<<<< HEAD
 
                        url(r'^/details/(?P<_id>[\w-]+)$', 'file_detail', name='file_detail'),
                        
-=======
-                       url(r'^/details/(?P<_id>[\w-]+)$', 'file_detail', name='file_detail'),
->>>>>>> eb89f37d24f9cb6e206b715499c170c782cd63da
                        url(r'^/(?P<_id>[\w-]+)$', 'file_detail', name='file_detail'),
                        url(r'^/thumbnail/(?P<_id>[\w-]+)$', 'getFileThumbnail', name='getFileThumbnail'),
                        #url(r'^/delete_file/(?P<_id>[\w-]+)$', 'delete_file', name='delete_file'),

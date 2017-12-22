@@ -56,11 +56,9 @@ top:13px;
 
   {% for node in group_nodes %}
     <li class="card-image-wrapper"> 
-<<<<<<< HEAD
+    
       {% include 'ndf/simple_card.html' with resource=node has_prof_pic=True url_name="e-library" first_arg=node.name %}
-=======
-      {% include 'ndf/simple_card.html' with resource=node has_prof_pic=True url_name="e-library" first_arg=node.pk %}
->>>>>>> eb89f37d24f9cb6e206b715499c170c782cd63da
+
     </li>
   {% empty %}
     

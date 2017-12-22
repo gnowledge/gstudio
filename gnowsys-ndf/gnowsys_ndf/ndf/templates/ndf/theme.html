@@ -320,19 +320,11 @@ margin-top:15px;
   	{% for each in nodes %}
      <li class="card-image-wrapper"> 
 
-<<<<<<< HEAD
  		{% include 'ndf/simple_card.html' with  resource=each url_name="theme_page" first_arg=group_name second_arg=each.pk %}
 	     
 	{% endfor %}
 
 	</li>
-=======
- 		{% include 'ndf/simple_card.html' with  resource=each url_name="theme_page" first_arg=group_id second_arg=each.pk %}
-	     
-	{% endfor %}
-
-</li>
->>>>>>> eb89f37d24f9cb6e206b715499c170c782cd63da
 </ul>
 		
 	{% endcache %}

@@ -4,11 +4,9 @@
 {% if searching and resource_type.count > 0 %}
   <div class="row">
     <div class="small-12 columns end">
-<<<<<<< HEAD
+
       <p>{% trans "Search Results:" %} <span class="label success round">{% trans 'Found' %} {{resource_type.count}} {{title|lower}}{{resource_type.count|pluralize}}.</span></p>
-=======
-    	<p>{% trans "Search Results:" %} <span class="label success round">{% trans 'Found' %} {{resource_type.count}} {{title|lower}}{{resource_type.count|pluralize}}.</span></p>
->>>>>>> eb89f37d24f9cb6e206b715499c170c782cd63da
+
     </div>
   </div>
 {% elif searching and resource_type.count == 0 %}
@@ -29,15 +27,11 @@
     <li class="card-image-wrapper" > 
     <!--old card-view > card.html &&  new card-view > simple_card.html  -->
     {% if notebook_filter %}
-<<<<<<< HEAD
+
       {% include 'ndf/simple_card.html' with  has_contributor=True resource=each_res url_name='course_notebook_tab_note' first_arg=group_name second_arg="all-notes" third_arg=each_res.pk %}
     {% else %}
       {% include 'ndf/simple_card.html' with  has_contributor=True resource=each_res url_name=detail_urlname first_arg=group_name second_arg=each_res.pk %}
-=======
-      {% include 'ndf/simple_card.html' with  has_contributor=True resource=each_res url_name='course_notebook_tab_note' first_arg=group_id second_arg="all-notes" third_arg=each_res.pk %}
-    {% else %}
-      {% include 'ndf/simple_card.html' with  has_contributor=True resource=each_res url_name=detail_urlname first_arg=group_id second_arg=each_res.pk %}
->>>>>>> eb89f37d24f9cb6e206b715499c170c782cd63da
+
     {% endif %}
     </li>
 
