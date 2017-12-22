@@ -30286,6 +30286,13 @@ ul.horizontal_tabs_gstudio > li.sub_group_action:hover ul {
   color: #6a0054;
 }
 
+/* asset description */
+/* line 7132, ../../../scss/_app_styles.scss */
+.name-desc-asset-cont-area {
+  width: 95%;
+  margin-left: 24px;
+}
+
 /*
 *  CLIx Platform Stylesheet
 */
