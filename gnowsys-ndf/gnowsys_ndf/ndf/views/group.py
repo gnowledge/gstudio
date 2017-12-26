@@ -2351,468 +2351,32 @@ def group_dashboard(request, group_id=None):
 
     annotations = json.dumps(group_obj.annotations)
   
-  '''
-  default_template = "ndf/groupdashboard.html"
+    default_template = "ndf/groupdashboard.html"
   # print "\n\n blog_pages.count------",blog_pages
-  if alternate_template:
-    return HttpResponseRedirect( reverse('course_content', kwargs={"group_id": group_id}) )
-  else:
-    return render_to_response([alternate_template,default_template] ,{'node': group_obj, 'groupid':group_id,
-                                                       'group_id':group_id, 'user':request.user,
-                                                       # 'shelf_list': shelf_list,
-                                                       'list_of_unit_events': list_of_unit_events,
-                                                       'blog_pages':blog_pages,
-                                                       'user_blogs': user_blogs,
-                                                       'selected': selected,
-                                                       'files_cur': files_cur,
-                                                       'sg_type': sg_type,
-                                                       'course_collection_data':course_collection_data,
-                                                       'parent_groupid_of_pe':parent_groupid_of_pe,
-                                                       'course_structure_exists':course_structure_exists,
-                                                       'allow_to_join': allow_to_join,
-                                                       'appId':app._id, 'app_gst': group_gst,
-                                                       'subgroups_cur':subgroups_cur,
-                                                       # 'annotations' : annotations, 'shelves': shelves,
-                                                       'prof_pic_obj': profile_pic_image,
-                                                       'old_profile_pics':old_profile_pics,
-                                                       'group_obj': group_obj,
-                                                      },context_instance=RequestContext(request)
-                          )
-
-
-# @login_required
-# @get_execution_time
-# def edit_group(request, group_id):
-
-#   # page_node = node_collection.one({"_id": ObjectId(group_id)})
-#   # title = gst_group.name
-#   # if request.method == "POST":
-#   #   is_node_changed=get_node_common_fields(request, page_node, group_id, gst_group)
-
-#   #   if page_node.access_policy == "PUBLIC":
-#   #     page_node.group_type = "PUBLIC"
-
-#   #   if page_node.access_policy == "PRIVATE":
-#   #     page_node.group_type = "PRIVATE"
-#     # page_node.save(is_changed=is_node_changed)
-#     # page_node.save()
-#   #   group_id=page_node._id
-#   #   page_node.get_neighbourhood(page_node.member_of)
-#   #   return HttpResponseRedirect(reverse('groupchange', kwargs={'group_id':group_id}))
-
-#   # else:
-#   #   if page_node.status == u"DRAFT":
-#   #     page_node, ver = get_page(request, page_node)
-#   #     page_node.get_neighbourhood(page_node.member_of)
-
-#   # available_nodes = node_collection.find({'_type': u'Group', 'member_of': ObjectId(gst_group._id) })
-#   # nodes_list = []
-#   # for each in available_nodes:
-#   #     nodes_list.append(str((each.name).strip().lower()))
-
-#   # return render_to_response("ndf/edit_group.html",
-#   #                                   { 'node': page_node,'title':title,
-#   #                                     'appId':app._id,
-#   #                                     'groupid':group_id,
-#   #                                     'nodes_list': nodes_list,
-#   #                                     'group_id':group_id,
-#   #                                     'is_auth_node':is_auth_node
-#   #                                     },
-#   #                                   context_instance=RequestContext(request)
-#   #                                   )
-
-#     group_obj = get_group_name_id(group_id, get_obj=True)
-
-#     if request.method == "POST":
-#         is_node_changed = get_node_common_fields(request, group_obj, group_id, gst_group)
-#         # print "=== ", is_node_changed
-
-#         if group_obj.access_policy == "PUBLIC":
-#             group_obj.group_type = "PUBLIC"
-
-#         elif group_obj.access_policy == "PRIVATE":
-#             group_obj.group_type = "PRIVATE"
-
-#         group_obj.save(is_changed=is_node_changed)
-
-#         group_obj.get_neighbourhood(group_obj.member_of)
-
-#         return HttpResponseRedirect(reverse('groupchange', kwargs={'group_id':group_obj._id}))
-
-#     elif request.method == "GET":
-#         if group_obj.status == u"DRAFT":
-#             group_obj, ver = get_page(request, group_obj)
-#             group_obj.get_neighbourhood(group_obj.member_of)
-
-#         available_nodes = node_collection.find({'_type': u'Group', '_id': {'$nin': [group_obj._id]}}, {'name': 1, '_id': 0})
-#         nodes_list = [str(g_obj.name.strip().lower()) for g_obj in available_nodes]
-#         # print nodes_list
-
-#         return render_to_response("ndf/create_group.html",
-#                                         {
-#                                         'node': group_obj,
-#                                         'title': 'Group',
-#                                         # 'appId':app._id,
-#                                         'groupid':group_id,
-#                                         'group_id':group_id,
-#                                         'nodes_list': nodes_list,
-#                                         # 'is_auth_node':is_auth_node
-#                                       },
-#                                     context_instance=RequestContext(request)
-#                                     )
-
-
-@login_required
-@get_execution_time
-def app_selection(request, group_id):
-    from gnowsys_ndf.ndf.views.ajax_views import set_drawer_widget
-
-    if ObjectId.is_valid(group_id) is False:
-        group_ins = node_collection.find_one({
-            '_type': "Group", "name": group_id
-        })
-        auth = node_collection.one({
-            '_type': 'Author', 'name': unicode(request.user.username)
-        })
-        if group_ins:
-            group_id = str(group_ins._id)
-        else:
-            auth = collection.Node.one({
-                '_type': 'Author', 'name': unicode(request.user.username)
-            })
-            if auth:
-                group_id = str(auth._id)
+    if alternate_template:
+        return HttpResponseRedirect( reverse('course_content', kwargs={"group_id": group_id}) )
     else:
-        pass
-
-    try:
-        grp = node_collection.one({
-            "_id": ObjectId(group_id)
-        }, {
-            "name": 1, "attribute_set.apps_list": 1
-        })
-        if request.method == "POST":
-            apps_to_set = request.POST['apps_to_set']
-            apps_to_set = json.loads(apps_to_set)
-
-            apps_to_set = [
-                ObjectId(app_id) for app_id in apps_to_set if app_id
-            ]
-
-            apps_list = []
-            apps_list_append = apps_list.append
-            for each in apps_to_set:
-                apps_list_append(
-                    node_collection.find_one({
-                        "_id": each
-                    })
-                )
-
-            at_apps_list = node_collection.one({
-                '_type': 'AttributeType', 'name': 'apps_list'
-            })
-            ga_node = create_gattribute(grp._id, at_apps_list, apps_list)
-            return HttpResponse("Apps list updated successfully.")
-
-        else:
-            list_apps = []
-
-            for attr in grp.attribute_set:
-                if attr and "apps_list" in attr:
-                    list_apps = attr["apps_list"]
-                    break
-
-            st = get_gapps(already_selected_gapps=list_apps)
-
-            data_list = set_drawer_widget(st, list_apps)
-            return HttpResponse(json.dumps(data_list))
-
-    except Exception as e:
-        print "Error in app_selection " + str(e)
-
-
-@get_execution_time
-def switch_group(request,group_id,node_id):
-  from gnowsys_ndf.ndf.views.ajax_views import set_drawer_widget
-
-  try:
-      group_id = ObjectId(group_id)
-  except:
-      group_name, group_id = get_group_name_id(group_id)
-
-  try:
-    node = node_collection.one({"_id": ObjectId(node_id)})
-    existing_grps = node.group_set
-
-    if request.method == "POST":
-
-      new_grps_list = request.POST.getlist("new_groups_list[]", "")
-      resource_exists = False
-      resource_exists_in_grps = []
-      response_dict = {'success': False, 'message': ''}
-      #a temp. variable which stores the lookup for append method
-      resource_exists_in_grps_append_temp = resource_exists_in_grps.append
-      new_grps_list_distinct = [ObjectId(item) for item in new_grps_list if ObjectId(item) not in existing_grps]
-      # print "\nnew_grps_list_distinct",new_grps_list_distinct
-      if new_grps_list_distinct:
-        for each_new_grp in new_grps_list_distinct:
-          if each_new_grp:
-            grp = node_collection.find({'name': node.name, "group_set": ObjectId(each_new_grp), "member_of":ObjectId(node.member_of[0])})
-            if grp.count() > 0:
-              resource_exists = True
-              resource_exists_in_grps_append_temp(unicode(each_new_grp))
-
-        response_dict["resource_exists_in_grps"] = resource_exists_in_grps
-
-      if not resource_exists:
-        # new_grps_list_all = [ObjectId(item) for item in new_grps_list]
-
-        new_grps_list_all = []
-
-        for each_group_id in new_grps_list:
-            each_group_obj = node_collection.one({'_id': ObjectId(each_group_id)})
-
-            if each_group_obj.moderation_level > -1:
-                # means group is moderated one.
-                each_result_dict = moderation_status(request, each_group_obj._id, node._id, get_only_response_dict=True)
-                if each_result_dict['is_under_moderation']:
-                    # means, this node already exists in one of -
-                    # - the underlying mod group of this (each_group_obj).
-                    pass
-                else:
-                    each_group_set = get_moderator_group_set(existing_grps, each_group_id, get_details=False)
-                    merge_group_set = set(each_group_set + new_grps_list_all)
-                    new_grps_list_all = list(merge_group_set)
-                    t = create_moderator_task(request, node.group_set[-1], node._id,on_upload=True)
-
-            else:
-                if each_group_id not in new_grps_list_all:
-                    new_grps_list_all.append(ObjectId(each_group_id))
-
-
-        node.group_set = list(set(new_grps_list_all))
-        node.save()
-        # node_collection.collection.update({'_id': node._id}, {'$set': {'group_set': new_grps_list_all}}, upsert=False, multi=False)
-        # node.reload()
-        response_dict["success"] = True
-        response_dict["message"] = "Published to selected groups"
-      else:
-        response_dict["success"] = False
-        response_dict["message"] = node.member_of_names_list[0] + " with name " + node.name + \
-                " already exists. Hence Cannot Publish to selected groups."
-        response_dict["message"] = node.member_of_names_list[0] + " with name " + node.name + \
-                " already exists in selected group(s). " + \
-                "Hence cannot be cross published now." + \
-                " For publishing, you can rename this " + node.member_of_names_list[0] + " and try again."
-      # print response_dict
-      return HttpResponse(json.dumps(response_dict))
-
-    else:
-      coll_obj_list = []
-      data_list = []
-      user_id = request.user.id
-      all_user_groups = []
-      # for each in get_all_user_groups():
-      #   all_user_groups.append(each.name)
-      #loop replaced by a list comprehension
-      top_partners_list = ["State Partners", "Individual Partners", "Institutional Partners"]
-      all_user_groups = [each.name for each in get_all_user_groups()]
-      if not request.user.is_superuser:
-          all_user_groups.append('home')
-          # exclude home group in listing if not SU
-      all_user_groups.append('Trash')
-      all_user_groups.extend(top_partners_list)
-
-      st = node_collection.find({
-            '$and': [
-                        {'_type': 'Group'},
-                        {'$or':[
-                                {'author_set': {'$in':[user_id]}},
-                                {'group_admin': {'$in':[user_id]}}
-                            ]
-                        },
-                        {'name':{'$nin':all_user_groups}},
-                        {'member_of': {'$in': [group_gst._id]}},
-                        {'status': u'PUBLISHED'}
-                      # ,{'edit_policy': {'$ne': "EDITABLE_MODERATED"}}
-                    ]
-                }).sort('name',-1)
-      # st = node_collection.find({'$and': [{'_type': 'Group'}, {'author_set': {'$in':[user_id]}},
-      #                                     {'name':{'$nin':all_user_groups}},
-      #                                     {'edit_policy': {'$ne': "EDITABLE_MODERATED"}}
-      #                                    ]
-      #                           })
-      # for each in node.group_set:
-      #   coll_obj_list.append(node_collection.one({'_id': each}))
-      #loop replaced by a list comprehension
-
-      # coll_obj_list=[node_collection.one({'_id': each}) for each in node.group_set ]
-
-
-
-      for each_coll_obj_id in node.group_set:
-        each_coll_obj = node_collection.one({'_id': ObjectId(each_coll_obj_id)})
-        if each_coll_obj and moderating_group_gst._id not in each_coll_obj.member_of:
-            coll_obj_list.append(each_coll_obj)
-        elif each_coll_obj:
-
-            try:
-                mod_group_instance = CreateModeratedGroup(request)
-                is_top_group, top_group_obj = mod_group_instance.get_top_group_of_hierarchy(each_coll_obj_id)
-                coll_obj_list.append(top_group_obj)
-            except Exception as d:
-                print d
-
-      data_list = set_drawer_widget(st, coll_obj_list, 'moderation_level')
-      # print "\n\n data_list",data_list
-      return HttpResponse(json.dumps(data_list))
-
-  except Exception as e:
-    print "Exception in switch_group: "+str(e)
-    return HttpResponse("Failure")
-
-
-@login_required
-@get_execution_time
-def publish_group(request,group_id,node):
-
-    group_obj = get_group_name_id(group_id, get_obj=True)
-    profile_pic_image = None
-
-    if group_obj:
-      group_id = group_obj._id
-
-      # getting the profile pic File object
-      for each in group_obj.relation_set:
-
-          if "has_profile_pic" in each:
-              profile_pic_image = node_collection.one( {'_type': "File", '_id': each["has_profile_pic"][0]} )
-              break
-
-    node=node_collection.one({'_id':ObjectId(node)})
-
-    page_node,v=get_page(request,node)
-
-    node.content = page_node.content
-    node.content_org=page_node.content_org
-    node.status=unicode("PUBLISHED")
-    node.modified_by = int(request.user.id)
-    node.save(groupid=group_id)
-
-    return render_to_response("ndf/groupdashboard.html",
-                                   { 'group_id':group_id, 'groupid':group_id,
-                                   'node':node, 'appId':app._id,
-                                   'prof_pic_obj': profile_pic_image
-                                 },
-                                  context_instance=RequestContext(request)
+        return render_to_response([alternate_template,default_template] ,{'node': group_obj, 'groupid':group_id,
+                                                           'group_id':group_id, 'user':request.user,
+                                                           # 'shelf_list': shelf_list,
+                                                           'list_of_unit_events': list_of_unit_events,
+                                                           'blog_pages':blog_pages,
+                                                           'user_blogs': user_blogs,
+                                                           'selected': selected,
+                                                           'files_cur': files_cur,
+                                                           'sg_type': sg_type,
+                                                           'course_collection_data':course_collection_data,
+                                                           'parent_groupid_of_pe':parent_groupid_of_pe,
+                                                           'course_structure_exists':course_structure_exists,
+                                                           'allow_to_join': allow_to_join,
+                                                           'appId':app._id, 'app_gst': group_gst,
+                                                           'subgroups_cur':subgroups_cur,
+                                                           # 'annotations' : annotations, 'shelves': shelves,
+                                                           'prof_pic_obj': profile_pic_image,
+                                                           'old_profile_pics':old_profile_pics,
+                                                           'group_obj': group_obj,
+                                                          },context_instance=RequestContext(request)
                               )
-
-
-@login_required
-@get_execution_time
-def create_sub_group(request,group_id):
-  try:
-      ins_objectid  = ObjectId()
-      grpname=""
-      if ins_objectid.is_valid(group_id) is False :
-          group_ins = node_collection.find_one({'_type': "Group","name": group_id})
-          auth = node_collection.one({'_type': 'Author', 'name': unicode(request.user.username) })
-          if group_ins:
-              grpname=group_ins.name
-              group_id = str(group_ins._id)
-          else :
-              auth = node_collection.one({'_type': 'Author', 'name': unicode(request.user.username) })
-              if auth :
-                  group_id = str(auth._id)
-                  grpname=auth.name
-      else :
-          group_ins = node_collection.find_one({'_type': "Group","_id": ObjectId(group_id)})
-          if group_ins:
-              grpname=group_ins.name
-              pass
-          else:
-              group_ins = node_collection.find_one({'_type': "Author","_id": ObjectId(group_id)})
-              if group_ins:
-                  grpname=group_ins.name
-                  pass
-
-      if request.method == "POST":
-          colg = node_collection.collection.Group()
-          Mod_colg=node_collection.collection.Group()
-          cname=request.POST.get('name', "")
-          colg.altnames=cname
-          colg.name = unicode(cname)
-          colg.member_of.append(gst_group._id)
-          usrid = int(request.user.id)
-          colg.created_by = usrid
-          if usrid not in colg.author_set:
-              colg.author_set.append(usrid)
-          colg.modified_by = usrid
-          if usrid not in colg.contributors:
-              colg.contributors.append(usrid)
-          colg.group_type = request.POST.get('group_type', "")
-          colg.edit_policy = request.POST.get('edit_policy', "")
-          colg.subscription_policy = request.POST.get('subscription', "OPEN")
-          colg.visibility_policy = request.POST.get('existance', "ANNOUNCED")
-          colg.disclosure_policy = request.POST.get('member', "DISCLOSED_TO_MEM")
-          colg.encryption_policy = request.POST.get('encryption', "NOT_ENCRYPTED")
-          colg.agency_type=request.POST.get('agency_type',"")
-          if group_id:
-              colg.prior_node.append(group_ins._id)
-          colg.save(groupid=group_id)
-          #save subgroup_id in the collection_set of parent group
-          group_ins.collection_set.append(colg._id)
-          #group_ins.post_node.append(colg._id)
-          group_ins.save(groupid=group_id)
-
-          if colg.edit_policy == "EDITABLE_MODERATED":
-              Mod_colg.altnames = cname + "Mod"
-              Mod_colg.name = cname + "Mod"
-              Mod_colg.group_type = "PRIVATE"
-              Mod_colg.created_by = usrid
-              if usrid not in Mod_colg.author_set:
-                  Mod_colg.author_set.append(usrid)
-              Mod_colg.modified_by = usrid
-              if usrid not in Mod_colg.contributors:
-                  Mod_colg.contributors.append(usrid)
-              Mod_colg.prior_node.append(colg._id)
-              Mod_colg.save(groupid=group_id)
-
-              colg.post_node.append(Mod_colg._id)
-              colg.save(groupid=group_id)
-          auth = node_collection.one({'_type': 'Author', 'name': unicode(request.user.username) })
-          has_shelf_RT = node_collection.one({'_type': 'RelationType', 'name': u'has_shelf' })
-          shelves = []
-          shelf_list = {}
-
-          if auth:
-              shelf = triple_collection.find({'_type': 'GRelation', 'subject': ObjectId(auth._id), 'relation_type': has_shelf_RT._id })
-
-              if shelf:
-                  for each in shelf:
-                      shelf_name = node_collection.one({'_id': ObjectId(each.right_subject)})
-                      shelves.append(shelf_name)
-                      shelf_list[shelf_name.name] = []
-                      for ID in shelf_name.collection_set:
-                          shelf_item = node_collection.one({'_id': ObjectId(ID) })
-                          shelf_list[shelf_name.name].append(shelf_item.name)
-
-              else:
-                  shelves = []
-
-          return render_to_response("ndf/groupdashboard.html",{'groupobj':colg,'appId':app._id,'node':colg,'user':request.user,
-                                                         'groupid':colg._id,'group_id':colg._id,
-                                                         'shelf_list': shelf_list,'shelves': shelves
-                                                        },context_instance=RequestContext(request))
-      available_nodes = node_collection.find({'_type': u'Group', 'member_of': ObjectId(gst_group._id) })
-      nodes_list = []
-      for each in available_nodes:
-          nodes_list.append(str((each.name).strip().lower()))
-
-      return render_to_response("ndf/create_sub_group.html", {'groupid':group_id,'maingroup':grpname,'group_id':group_id,'nodes_list': nodes_list},RequestContext(request))
-  except Exception as e:
-      print "Exception in create subgroup "+str(e)
-
 
 
 @login_required
@@ -3009,6 +2573,354 @@ def upload_using_save_file(request,group_id):
     else:
         return HttpResponseRedirect( reverse('file_detail', kwargs={"group_id": group_id,'_id':fileobj_id}))
     # return HttpResponseRedirect(url_name)
+
+
+@login_required
+@get_execution_time
+def create_sub_group(request,group_id):
+  try:
+      ins_objectid  = ObjectId()
+      grpname=""
+      if ins_objectid.is_valid(group_id) is False :
+          group_ins = node_collection.find_one({'_type': "Group","name": group_id})
+          auth = node_collection.one({'_type': 'Author', 'name': unicode(request.user.username) })
+          if group_ins:
+              grpname=group_ins.name
+              group_id = str(group_ins._id)
+          else :
+              auth = node_collection.one({'_type': 'Author', 'name': unicode(request.user.username) })
+              if auth :
+                  group_id = str(auth._id)
+                  grpname=auth.name
+      else :
+          group_ins = node_collection.find_one({'_type': "Group","_id": ObjectId(group_id)})
+          if group_ins:
+              grpname=group_ins.name
+              pass
+          else:
+              group_ins = node_collection.find_one({'_type': "Author","_id": ObjectId(group_id)})
+              if group_ins:
+                  grpname=group_ins.name
+                  pass
+
+      if request.method == "POST":
+          colg = node_collection.collection.Group()
+          Mod_colg=node_collection.collection.Group()
+          cname=request.POST.get('name', "")
+          colg.altnames=cname
+          colg.name = unicode(cname)
+          colg.member_of.append(gst_group._id)
+          usrid = int(request.user.id)
+          colg.created_by = usrid
+          if usrid not in colg.author_set:
+              colg.author_set.append(usrid)
+          colg.modified_by = usrid
+          if usrid not in colg.contributors:
+              colg.contributors.append(usrid)
+          colg.group_type = request.POST.get('group_type', "")
+          colg.edit_policy = request.POST.get('edit_policy', "")
+          colg.subscription_policy = request.POST.get('subscription', "OPEN")
+          colg.visibility_policy = request.POST.get('existance', "ANNOUNCED")
+          colg.disclosure_policy = request.POST.get('member', "DISCLOSED_TO_MEM")
+          colg.encryption_policy = request.POST.get('encryption', "NOT_ENCRYPTED")
+          colg.agency_type=request.POST.get('agency_type',"")
+          if group_id:
+              colg.prior_node.append(group_ins._id)
+          colg.save(groupid=group_id)
+          #save subgroup_id in the collection_set of parent group
+          group_ins.collection_set.append(colg._id)
+          #group_ins.post_node.append(colg._id)
+          group_ins.save(groupid=group_id)
+
+          if colg.edit_policy == "EDITABLE_MODERATED":
+              Mod_colg.altnames = cname + "Mod"
+              Mod_colg.name = cname + "Mod"
+              Mod_colg.group_type = "PRIVATE"
+              Mod_colg.created_by = usrid
+              if usrid not in Mod_colg.author_set:
+                  Mod_colg.author_set.append(usrid)
+              Mod_colg.modified_by = usrid
+              if usrid not in Mod_colg.contributors:
+                  Mod_colg.contributors.append(usrid)
+              Mod_colg.prior_node.append(colg._id)
+              Mod_colg.save(groupid=group_id)
+
+              colg.post_node.append(Mod_colg._id)
+              colg.save(groupid=group_id)
+          auth = node_collection.one({'_type': 'Author', 'name': unicode(request.user.username) })
+          has_shelf_RT = node_collection.one({'_type': 'RelationType', 'name': u'has_shelf' })
+          shelves = []
+          shelf_list = {}
+
+          if auth:
+              shelf = triple_collection.find({'_type': 'GRelation', 'subject': ObjectId(auth._id), 'relation_type': has_shelf_RT._id })
+
+              if shelf:
+                  for each in shelf:
+                      shelf_name = node_collection.one({'_id': ObjectId(each.right_subject)})
+                      shelves.append(shelf_name)
+                      shelf_list[shelf_name.name] = []
+                      for ID in shelf_name.collection_set:
+                          shelf_item = node_collection.one({'_id': ObjectId(ID) })
+                          shelf_list[shelf_name.name].append(shelf_item.name)
+
+              else:
+                  shelves = []
+
+          return render_to_response("ndf/groupdashboard.html",{'groupobj':colg,'appId':app._id,'node':colg,'user':request.user,
+                                                         'groupid':colg._id,'group_id':colg._id,
+                                                         'shelf_list': shelf_list,'shelves': shelves
+                                                        },context_instance=RequestContext(request))
+      available_nodes = node_collection.find({'_type': u'Group', 'member_of': ObjectId(gst_group._id) })
+      nodes_list = []
+      for each in available_nodes:
+          nodes_list.append(str((each.name).strip().lower()))
+
+      return render_to_response("ndf/create_sub_group.html", {'groupid':group_id,'maingroup':grpname,'group_id':group_id,'nodes_list': nodes_list},RequestContext(request))
+  except Exception as e:
+      print "Exception in create subgroup "+str(e)
+@login_required
+@get_execution_time
+def app_selection(request, group_id):
+    from gnowsys_ndf.ndf.views.ajax_views import set_drawer_widget
+
+    if ObjectId.is_valid(group_id) is False:
+        group_ins = node_collection.find_one({
+            '_type': "Group", "name": group_id
+        })
+        auth = node_collection.one({
+            '_type': 'Author', 'name': unicode(request.user.username)
+        })
+        if group_ins:
+            group_id = str(group_ins._id)
+        else:
+            auth = collection.Node.one({
+                '_type': 'Author', 'name': unicode(request.user.username)
+            })
+            if auth:
+                group_id = str(auth._id)
+    else:
+        pass
+
+    try:
+        grp = node_collection.one({
+            "_id": ObjectId(group_id)
+        }, {
+            "name": 1, "attribute_set.apps_list": 1
+        })
+        if request.method == "POST":
+            apps_to_set = request.POST['apps_to_set']
+            apps_to_set = json.loads(apps_to_set)
+
+            apps_to_set = [
+                ObjectId(app_id) for app_id in apps_to_set if app_id
+            ]
+
+            apps_list = []
+            apps_list_append = apps_list.append
+            for each in apps_to_set:
+                apps_list_append(
+                    node_collection.find_one({
+                        "_id": each
+                    })
+                )
+
+            at_apps_list = node_collection.one({
+                '_type': 'AttributeType', 'name': 'apps_list'
+            })
+            ga_node = create_gattribute(grp._id, at_apps_list, apps_list)
+            return HttpResponse("Apps list updated successfully.")
+
+        else:
+            list_apps = []
+
+            for attr in grp.attribute_set:
+                if attr and "apps_list" in attr:
+                    list_apps = attr["apps_list"]
+                    break
+
+            st = get_gapps(already_selected_gapps=list_apps)
+
+            data_list = set_drawer_widget(st, list_apps)
+            return HttpResponse(json.dumps(data_list))
+
+    except Exception as e:
+        print "Error in app_selection " + str(e)
+
+@get_execution_time
+def switch_group(request,group_id,node_id):
+  from gnowsys_ndf.ndf.views.ajax_views import set_drawer_widget
+
+  try:
+      group_id = ObjectId(group_id)
+  except:
+      group_name, group_id = get_group_name_id(group_id)
+
+  try:
+    node = node_collection.one({"_id": ObjectId(node_id)})
+    existing_grps = node.group_set
+
+    if request.method == "POST":
+
+      new_grps_list = request.POST.getlist("new_groups_list[]", "")
+      resource_exists = False
+      resource_exists_in_grps = []
+      response_dict = {'success': False, 'message': ''}
+      #a temp. variable which stores the lookup for append method
+      resource_exists_in_grps_append_temp = resource_exists_in_grps.append
+      new_grps_list_distinct = [ObjectId(item) for item in new_grps_list if ObjectId(item) not in existing_grps]
+      # print "\nnew_grps_list_distinct",new_grps_list_distinct
+      if new_grps_list_distinct:
+        for each_new_grp in new_grps_list_distinct:
+          if each_new_grp:
+            grp = node_collection.find({'name': node.name, "group_set": ObjectId(each_new_grp), "member_of":ObjectId(node.member_of[0])})
+            if grp.count() > 0:
+              resource_exists = True
+              resource_exists_in_grps_append_temp(unicode(each_new_grp))
+
+        response_dict["resource_exists_in_grps"] = resource_exists_in_grps
+
+      if not resource_exists:
+        # new_grps_list_all = [ObjectId(item) for item in new_grps_list]
+
+        new_grps_list_all = []
+
+        for each_group_id in new_grps_list:
+            each_group_obj = node_collection.one({'_id': ObjectId(each_group_id)})
+
+            if each_group_obj.moderation_level > -1:
+                # means group is moderated one.
+                each_result_dict = moderation_status(request, each_group_obj._id, node._id, get_only_response_dict=True)
+                if each_result_dict['is_under_moderation']:
+                    # means, this node already exists in one of -
+                    # - the underlying mod group of this (each_group_obj).
+                    pass
+                else:
+                    each_group_set = get_moderator_group_set(existing_grps, each_group_id, get_details=False)
+                    merge_group_set = set(each_group_set + new_grps_list_all)
+                    new_grps_list_all = list(merge_group_set)
+                    t = create_moderator_task(request, node.group_set[-1], node._id,on_upload=True)
+
+            else:
+                if each_group_id not in new_grps_list_all:
+                    new_grps_list_all.append(ObjectId(each_group_id))
+
+
+        node.group_set = list(set(new_grps_list_all))
+        node.save()
+        # node_collection.collection.update({'_id': node._id}, {'$set': {'group_set': new_grps_list_all}}, upsert=False, multi=False)
+        # node.reload()
+        response_dict["success"] = True
+        response_dict["message"] = "Published to selected groups"
+      else:
+        response_dict["success"] = False
+        response_dict["message"] = node.member_of_names_list[0] + " with name " + node.name + \
+                " already exists. Hence Cannot Publish to selected groups."
+        response_dict["message"] = node.member_of_names_list[0] + " with name " + node.name + \
+                " already exists in selected group(s). " + \
+                "Hence cannot be cross published now." + \
+                " For publishing, you can rename this " + node.member_of_names_list[0] + " and try again."
+      # print response_dict
+      return HttpResponse(json.dumps(response_dict))
+
+    else:
+      coll_obj_list = []
+      data_list = []
+      user_id = request.user.id
+      all_user_groups = []
+      # for each in get_all_user_groups():
+      #   all_user_groups.append(each.name)
+      #loop replaced by a list comprehension
+      top_partners_list = ["State Partners", "Individual Partners", "Institutional Partners"]
+      all_user_groups = [each.name for each in get_all_user_groups()]
+      if not request.user.is_superuser:
+          all_user_groups.append('home')
+          # exclude home group in listing if not SU
+      all_user_groups.append('Trash')
+      all_user_groups.extend(top_partners_list)
+
+      st = node_collection.find({
+            '$and': [
+                        {'_type': 'Group'},
+                        {'$or':[
+                                {'author_set': {'$in':[user_id]}},
+                                {'group_admin': {'$in':[user_id]}}
+                            ]
+                        },
+                        {'name':{'$nin':all_user_groups}},
+                        {'member_of': {'$in': [group_gst._id]}},
+                        {'status': u'PUBLISHED'}
+                      # ,{'edit_policy': {'$ne': "EDITABLE_MODERATED"}}
+                    ]
+                }).sort('name',-1)
+      # st = node_collection.find({'$and': [{'_type': 'Group'}, {'author_set': {'$in':[user_id]}},
+      #                                     {'name':{'$nin':all_user_groups}},
+      #                                     {'edit_policy': {'$ne': "EDITABLE_MODERATED"}}
+      #                                    ]
+      #                           })
+      # for each in node.group_set:
+      #   coll_obj_list.append(node_collection.one({'_id': each}))
+      #loop replaced by a list comprehension
+
+      # coll_obj_list=[node_collection.one({'_id': each}) for each in node.group_set ]
+
+
+
+      for each_coll_obj_id in node.group_set:
+        each_coll_obj = node_collection.one({'_id': ObjectId(each_coll_obj_id)})
+        if each_coll_obj and moderating_group_gst._id not in each_coll_obj.member_of:
+            coll_obj_list.append(each_coll_obj)
+        elif each_coll_obj:
+
+            try:
+                mod_group_instance = CreateModeratedGroup(request)
+                is_top_group, top_group_obj = mod_group_instance.get_top_group_of_hierarchy(each_coll_obj_id)
+                coll_obj_list.append(top_group_obj)
+            except Exception as d:
+                print d
+
+      data_list = set_drawer_widget(st, coll_obj_list, 'moderation_level')
+      # print "\n\n data_list",data_list
+      return HttpResponse(json.dumps(data_list))
+
+  except Exception as e:
+    print "Exception in switch_group: "+str(e)
+    return HttpResponse("Failure")
+
+@login_required
+@get_execution_time
+def publish_group(request,group_id,node):
+
+    group_obj = get_group_name_id(group_id, get_obj=True)
+    profile_pic_image = None
+
+    if group_obj:
+      group_id = group_obj._id
+
+      # getting the profile pic File object
+      for each in group_obj.relation_set:
+
+          if "has_profile_pic" in each:
+              profile_pic_image = node_collection.one( {'_type': "File", '_id': each["has_profile_pic"][0]} )
+              break
+
+    node=node_collection.one({'_id':ObjectId(node)})
+
+    page_node,v=get_page(request,node)
+
+    node.content = page_node.content
+    node.content_org=page_node.content_org
+    node.status=unicode("PUBLISHED")
+    node.modified_by = int(request.user.id)
+    node.save(groupid=group_id)
+
+    return render_to_response("ndf/groupdashboard.html",
+                                   { 'group_id':group_id, 'groupid':group_id,
+                                   'node':node, 'appId':app._id,
+                                   'prof_pic_obj': profile_pic_image
+                                 },
+                                  context_instance=RequestContext(request)
+                              )
 
 @get_execution_time
 def notification_details(request,group_id):
