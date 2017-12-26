@@ -2112,6 +2112,35 @@ def group_dashboard(request, group_id=None):
         # shelf_list = {}
         # shelves = []
         auth = node_collection.one({'_type': 'Author', 'name': unicode(request.user.username) })
+    if ("base_unit" in group_obj.member_of_names_list or
+        "CourseEventGroup" in group_obj.member_of_names_list or
+        "BaseCourseGroup" in group_obj.member_of_names_list or 
+        "announced_unit" in group_obj.member_of_names_list):
+        return HttpResponseRedirect(reverse('course_content', kwargs={'group_id': group_id}))
+
+    if group_obj and group_obj.post_node:
+        # subgroups_cur = node_collection.find({'_id': {'$in': group_obj.post_node}, 'edit_policy': {'$ne': "EDITABLE_MODERATED"},
+        # now we are showing moderating group too:
+        subgroups_cur = node_collection.find({
+                '_type': u'Group',
+                '_id': {'$in': group_obj.post_node},
+                # 'member_of': {'$in': [group_gst._id]}, #Listing all types of sub groups
+                '$or': [
+                            {'created_by': request.user.id},
+                            {'group_admin': request.user.id},
+                            {'author_set': request.user.id},
+                            {'group_type': 'PUBLIC'}
+                        ]
+                }).sort("last_update",-1)
+
+
+
+    if not group_obj:
+      group_obj=node_collection.one({'$and':[{'_type':u'Group'},{'name':u'home'}]})
+      group_id=group_obj['_id']
+    else:
+      # group_obj=node_collection.one({'_id':ObjectId(group_id)})
+      group_id = group_obj._id
 
         if auth:
 
@@ -2211,6 +2240,144 @@ def group_dashboard(request, group_id=None):
 
     except Exception as e:
         pass
+#       else:
+#           shelves = []
+    '''
+  except Exception as e:
+    print "\nError: ", e
+    group_obj=node_collection.one({'$and':[{'_type':u'Group'},{'name':u'home'}]})
+    group_id=group_obj['_id']
+    pass
+
+  # profile_pic_image, grelation_node = get_relation_value(group_obj._id,"has_profile_pic")
+  # profile_pic_image = get_relation_value(group_obj._id,"has_profile_pic")
+  # if profile_pic_image:
+  #   profile_pic_image = profile_pic_image[0]
+  grel_dict = get_relation_value(group_obj._id, "has_profile_pic")
+  is_cursor = grel_dict.get("cursor",False)
+  if not is_cursor:
+      profile_pic_image = grel_dict.get("grel_node")
+      # grel_id = grel_dict.get("grel_id")
+
+  has_profile_pic_rt = node_collection.one({'_type': 'RelationType', 'name': unicode('has_profile_pic') })
+  all_old_prof_pics = triple_collection.find({'_type': "GRelation", "subject": group_obj._id, 'relation_type': has_profile_pic_rt._id, 'status': u"DELETED"})
+  if all_old_prof_pics:
+    for each_grel in all_old_prof_pics:
+      n = node_collection.one({'_id': ObjectId(each_grel.right_subject)})
+      old_profile_pics.append(n)
+
+  # Call to get_neighbourhood() is required for setting-up property_order_list
+  # group_obj.get_neighbourhood(group_obj.member_of)
+  course_structure_exists = False
+  files_cur = None
+  parent_groupid_of_pe = None
+  list_of_sg_member_of = get_sg_member_of(group_obj._id)
+  # print "\n\n list_of_sg_member_of", list_of_sg_member_of
+  files_cur = None
+  allow_to_join = ""
+  sg_type = None
+  course_collection_data = []
+  if  u"ProgramEventGroup" in list_of_sg_member_of and u"ProgramEventGroup" not in group_obj.member_of_names_list:
+      sg_type = "ProgramEventGroup"
+      # files_cur = node_collection.find({'group_set': ObjectId(group_obj._id), '_type': "File"})
+      parent_groupid_of_pe = node_collection.find_one({'_type':"Group","post_node": group_obj._id})
+      if parent_groupid_of_pe:
+        parent_groupid_of_pe = parent_groupid_of_pe._id
+
+      alternate_template = "ndf/gprogram_event_group.html"
+  if "CourseEventGroup" in group_obj.member_of_names_list:
+      sg_type = "CourseEventGroup"
+      alternate_template = "ndf/gcourse_event_group.html"
+      # course_collection_data = get_collection(request,group_obj._id,group_obj._id)
+      # course_collection_data = json.loads(course_collection_data.content)
+  if 'Group' in group_obj.member_of_names_list:
+    alternate_template = "ndf/lms.html"
+  # The line below is commented in order to:
+  #     Fetch files_cur - resources under moderation in groupdahsboard.html
+  # if  u"ProgramEventGroup" not in group_obj.member_of_names_list:
+  if "CourseEventGroup" in group_obj.member_of_names_list or u"ProgramEventGroup" in list_of_sg_member_of and u"ProgramEventGroup" not in group_obj.member_of_names_list:
+      page_gst = node_collection.one({'_type': "GSystemType", 'name': "Page"})
+      blogpage_gst = node_collection.one({'_type': "GSystemType", 'name': "Blog page"})
+      # files_cur = node_collection.find({'group_set': ObjectId(group_obj._id), '_type': "File"}).sort("last_update",-1)
+      if group_obj.collection_set:
+          course_structure_exists = True
+      if request.user.id:
+          all_blogs = node_collection.find({
+                'member_of':page_gst._id,
+                'type_of': blogpage_gst._id,
+                'group_set': group_obj._id
+            }).sort('created_at', -1)
+          if all_blogs:
+              blog_pages = all_blogs.clone()
+              blog_pages = blog_pages.where("this.created_by!=" + str(request.user.id))
+              user_blogs = all_blogs.where("this.created_by==" + str(request.user.id))
+      start_enrollment_date = get_attribute_value(group_obj._id,"start_enroll")
+      # if 'start_enroll' in group_obj:
+      #     if group_obj.start_enroll:
+      #         start_enrollment_date = group_obj.start_enroll
+      #         # print "\n\nstart_enrollment_date", start_enrollment_dates
+      if start_enrollment_date:
+        start_enrollment_date = start_enrollment_date.date()
+        curr_date_time = datetime.now().date()
+        if start_enrollment_date > curr_date_time:
+            allow_to_join = "Forthcoming"
+        else:
+            allow_to_join = "Open"
+
+      last_enrollment_date = get_attribute_value(group_obj._id,"end_enroll")
+      # if 'end_enroll' in group_obj:
+      #     if group_obj.end_enroll:
+      #         last_enrollment_date = group_obj.end_enroll
+      if last_enrollment_date:
+        last_enrollment_date = last_enrollment_date.date()
+        curr_date_time = datetime.now().date()
+        if last_enrollment_date < curr_date_time:
+            allow_to_join = "Closed"
+        else:
+            allow_to_join = "Open"
+  if group_obj.edit_policy == "EDITABLE_MODERATED":# and group_obj._type != "Group":
+      files_cur = node_collection.find({'group_set': ObjectId(group_obj._id), '_type': {'$in': ["File","GSystem"]}})
+  '''
+  property_order_list = []
+  if "group_of" in group_obj:
+    if group_obj['group_of']:
+      college = node_collection.one({'_type': "GSystemType", 'name': "College"}, {'_id': 1})
+
+      if college:
+        if college._id in group_obj['group_of'][0]['member_of']:
+          alternate_template = "ndf/college_group_details.html"
+
+      property_order_list = get_property_order_with_value(group_obj['group_of'][0])
+
+  annotations = json.dumps(group_obj.annotations)
+  '''
+  default_template = "ndf/groupdashboard.html"
+  # print "\n\n blog_pages.count------",blog_pages
+  if alternate_template:
+    return HttpResponseRedirect( reverse('course_content', kwargs={"group_id": group_id}) )
+  else:
+    return render_to_response([alternate_template,default_template] ,{'node': group_obj, 'groupid':group_id,
+                                                       'group_id':group_id, 'user':request.user,
+                                                       # 'shelf_list': shelf_list,
+                                                       'list_of_unit_events': list_of_unit_events,
+                                                       'blog_pages':blog_pages,
+                                                       'user_blogs': user_blogs,
+                                                       'selected': selected,
+                                                       'files_cur': files_cur,
+                                                       'sg_type': sg_type,
+                                                       'course_collection_data':course_collection_data,
+                                                       'parent_groupid_of_pe':parent_groupid_of_pe,
+                                                       'course_structure_exists':course_structure_exists,
+                                                       'allow_to_join': allow_to_join,
+                                                       'appId':app._id, 'app_gst': group_gst,
+                                                       'subgroups_cur':subgroups_cur,
+                                                       # 'annotations' : annotations, 'shelves': shelves,
+                                                       'prof_pic_obj': profile_pic_image,
+                                                       'old_profile_pics':old_profile_pics,
+                                                       'group_obj': group_obj,
+                                                      },context_instance=RequestContext(request)
+                          )
+>>>>>>> 6b6941a11b970ff2b57f4ae40bdd3f9f7e7e53aa
 
 
 # @login_required

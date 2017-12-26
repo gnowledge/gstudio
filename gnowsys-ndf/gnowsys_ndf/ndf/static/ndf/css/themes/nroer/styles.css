@@ -28109,3 +28109,2302 @@ h5 {
 .explore-button:hover {
   cursor: pointer;
 }
+
+/*Blue color variable*/
+/*Orange color variables*/
+/* module detail settings drop */
+/* line 4719, ../../../scss/_app_styles.scss */
+.explore-settings-drop {
+  margin-left: 59%;
+  display: inline-block;
+}
+/* line 4722, ../../../scss/_app_styles.scss */
+.explore-settings-drop > button {
+  color: #164a7b;
+  font-weight: 400;
+  cursor: pointer;
+  background-color: #ddeff9;
+  border: 2px solid #719dc8;
+  border-radius: 5px !important;
+  display: inline-block;
+  padding: 3px 8px 4px 8px;
+  margin-top: 10px;
+  margin-left: 20px;
+}
+/* line 4733, ../../../scss/_app_styles.scss */
+.explore-settings-drop > button:hover {
+  border-radius: 10px;
+  background-color: #ddeff9;
+  color: #164a7b;
+}
+/* line 4739, ../../../scss/_app_styles.scss */
+.explore-settings-drop a {
+  font-size: 16px;
+}
+/* line 4742, ../../../scss/_app_styles.scss */
+.explore-settings-drop .f-dropdown li {
+  font-size: 0.875rem;
+  cursor: pointer;
+  line-height: 1.125rem;
+  margin: 0;
+  background-color: #164A7B;
+}
+/* line 4742, ../../../scss/_app_styles.scss */
+.explore-settings-drop .f-dropdown li .explore-settings-drop {
+  margin-left: 59%;
+  display: inline-block;
+}
+/* line 4745, ../../../scss/_app_styles.scss */
+.explore-settings-drop .f-dropdown li .explore-settings-drop > button {
+  color: #164a7b;
+  font-weight: 400;
+  cursor: pointer;
+  background-color: #ddeff9;
+  border: 2px solid #719dc8;
+  border-radius: 5px !important;
+  display: inline-block;
+  padding: 3px 8px 4px 8px;
+  margin-top: 10px;
+  margin-left: 20px;
+}
+/* line 4756, ../../../scss/_app_styles.scss */
+.explore-settings-drop .f-dropdown li .explore-settings-drop > button:hover {
+  border-radius: 10px;
+  background-color: #ddeff9;
+  color: #164a7b;
+}
+/* line 4762, ../../../scss/_app_styles.scss */
+.explore-settings-drop .f-dropdown li .explore-settings-drop a {
+  font-size: 16px;
+}
+/* line 4765, ../../../scss/_app_styles.scss */
+.explore-settings-drop .f-dropdown li .explore-settings-drop .f-dropdown li {
+  font-size: 0.875rem;
+  cursor: pointer;
+  line-height: 1.125rem;
+  margin: 0;
+  background-color: #164A7B;
+}
+/* line 4773, ../../../scss/_app_styles.scss */
+.explore-settings-drop .f-dropdown li .explore-settings-drop .f-dropdown li a {
+  color: #74b3dc;
+}
+/* line 4777, ../../../scss/_app_styles.scss */
+.explore-settings-drop .f-dropdown li .explore-settings-drop .f-dropdown li:hover {
+  border-left: 4px solid #ffc14e;
+}
+/* line 4790, ../../../scss/_app_styles.scss */
+.explore-settings-drop .f-dropdown li a {
+  color: #74b3dc;
+}
+/* line 4794, ../../../scss/_app_styles.scss */
+.explore-settings-drop .f-dropdown li:hover {
+  border-left: 4px solid #ffc14e;
+}
+
+/* line 4804, ../../../scss/_app_styles.scss */
+.lms_page .lms_banner {
+  width: 100%;
+  height: 150px;
+  background-size: 100% 100%;
+  position: relative;
+}
+/* line 4812, ../../../scss/_app_styles.scss */
+.lms_page .lms_banner:before {
+  content: ' ';
+  background-color: rgba(0, 0, 0, 0.1);
+  opacity: .5;
+  width: 100%;
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  box-shadow: inset 0 0 40px rgba(0, 0, 0, 0.2);
+}
+/* line 4825, ../../../scss/_app_styles.scss */
+.lms_page .lms_banner:before a {
+  cursor: pointer;
+}
+/* line 4830, ../../../scss/_app_styles.scss */
+.lms_page .lms_banner .div-height {
+  height: 150px !important;
+  background-size: 100% 100%;
+  position: absolute !important;
+}
+/* line 4838, ../../../scss/_app_styles.scss */
+.lms_page .lms_banner .enroll_unit > a {
+  cursor: pointer;
+}
+/* line 4842, ../../../scss/_app_styles.scss */
+.lms_page .lms_banner .lms_heading {
+  color: #fff;
+  display: inline-block;
+  vertical-align: top;
+}
+/* line 4848, ../../../scss/_app_styles.scss */
+.lms_page .lms_banner .lms_heading .unit_name {
+  font-size: 36px;
+  font-family: OpenSans-Semibold;
+  display: block;
+  margin-top: 90px;
+  margin-left: 40px;
+  border-radius: 8px 0px 0px 8px;
+  transition: border-radius .2s;
+  text-shadow: 3px 2px #164a7b;
+}
+/* line 4859, ../../../scss/_app_styles.scss */
+.lms_page .lms_banner .lms_heading .right-margin {
+  margin-right: 46px;
+}
+
+/* line 4868, ../../../scss/_app_styles.scss */
+.border-bottom-lms-header {
+  border-bottom: 1px solid #00000029;
+}
+
+/* line 4873, ../../../scss/_app_styles.scss */
+.lms_secondary_header {
+  width: 100%;
+  position: relative;
+  color: #fff;
+  box-shadow: 0 0 2px 0 rgba(0, 0, 0, 0.2);
+  border-bottom: 1px solid rgba(0, 0, 0, 0.25);
+}
+/* line 4879, ../../../scss/_app_styles.scss */
+.lms_secondary_header .course_actions {
+  margin-top: 8px;
+}
+/* line 4882, ../../../scss/_app_styles.scss */
+.lms_secondary_header .course_actions > span {
+  background: #2e3f51;
+  border: 1px solid rgba(255, 255, 255, 0.7);
+  padding: 1px 8px;
+  color: #fff;
+  font-size: 23px;
+  cursor: pointer;
+  border-radius: 3px;
+  opacity: 0.8;
+}
+@media screen and (min-width: 980px) and (max-width: 1000px) {
+  /* line 4896, ../../../scss/_app_styles.scss */
+  .lms_secondary_header .course_actions .course_actions {
+    margin-top: 8px;
+  }
+  /* line 4899, ../../../scss/_app_styles.scss */
+  .lms_secondary_header .course_actions .course_actions > span {
+    margin-left: 50px;
+    background: #2e3f51;
+    border: 1px solid rgba(255, 255, 255, 0.7);
+    padding: 1px 8px;
+    color: #fff;
+    font-size: 23px;
+    cursor: pointer;
+    border-radius: 3px;
+    opacity: 0.8;
+  }
+}
+
+/* line 4919, ../../../scss/_app_styles.scss */
+ul.nav_menu_1 {
+  margin-bottom: 0px;
+  background-color: #fff;
+}
+/* line 4922, ../../../scss/_app_styles.scss */
+ul.nav_menu_1 > li {
+  display: inline-block;
+}
+/* line 4925, ../../../scss/_app_styles.scss */
+ul.nav_menu_1 > li > a {
+  list-style-type: none;
+  display: inline-block;
+  padding: 12px 12px 9px;
+  color: #164a7b;
+  cursor: pointer;
+  font-size: 18px;
+  letter-spacing: 0.8px;
+  border-bottom: 3px solid transparent;
+}
+/* line 4936, ../../../scss/_app_styles.scss */
+ul.nav_menu_1 > li > a.selected, ul.nav_menu_1 > li > a:hover {
+  border-bottom: 3px solid #a2238d;
+}
+
+/* Secondary Top Bar */
+/* line 4947, ../../../scss/_app_styles.scss */
+.top-bar-second, .top-bar-second .name {
+  height: 55px;
+  background: #ddeff9;
+  color: #719dc9;
+  margin-bottom: 30px;
+}
+
+/* line 4957, ../../../scss/_app_styles.scss */
+.top-bar-second .title-area {
+  box-shadow: 0px 0.6px 3px #000;
+  z-index: 20;
+  width: 100%;
+}
+/* line 4962, ../../../scss/_app_styles.scss */
+.top-bar-second .name {
+  text-align: center;
+}
+/* line 4965, ../../../scss/_app_styles.scss */
+.top-bar-second .name .close-dropdown, .top-bar-second .name .side-bar-button {
+  position: absolute;
+  left: 15px;
+  color: #fff;
+  font-weight: 100;
+}
+/* line 4975, ../../../scss/_app_styles.scss */
+.top-bar-second li.toggle-topbar i {
+  color: #fff;
+  display: inline-block;
+  vertical-align: bottom;
+}
+/* line 4983, ../../../scss/_app_styles.scss */
+.top-bar-second .top-bar-second-section ul li {
+  background: #164A7B;
+}
+/* line 4985, ../../../scss/_app_styles.scss */
+.top-bar-second .top-bar-second-section ul li > a {
+  border-left: 3px solid transparent;
+  border-bottom: 1px solid #4b5b6b;
+  color: #74b3dc;
+  line-height: 40px;
+  font-weight: bold;
+  letter-spacing: 0.5px;
+}
+/* line 4996, ../../../scss/_app_styles.scss */
+.top-bar-second .top-bar-second-section ul li:hover > a, .top-bar-second .top-bar-second-section ul li.active > a {
+  border-left-color: #ffc14e;
+  color: #ce7869;
+}
+/* line 5004, ../../../scss/_app_styles.scss */
+.top-bar-second .top-bar-second-section .dropdown li.parent-link a {
+  display: none;
+}
+/* line 5010, ../../../scss/_app_styles.scss */
+.top-bar-second .top-bar-second-section .side-bar-menu .add_buddy i {
+  color: #2e3f51;
+  background: #acd4fa;
+}
+
+@media screen and (min-width: 40.063em) {
+  /* line 5021, ../../../scss/_app_styles.scss */
+  .top-bar-second .title-area {
+    box-shadow: none;
+  }
+  /* line 5023, ../../../scss/_app_styles.scss */
+  .top-bar-second .title-area .name {
+    text-align: right;
+  }
+  /* line 5030, ../../../scss/_app_styles.scss */
+  .top-bar-second .top-bar-second-section li:not(.has-form) a:not(.button) {
+    cursor: pointer;
+    background: transparent;
+    border-bottom: 0px;
+    line-height: 52px;
+    border-left-width: 0px;
+  }
+  /* line 5037, ../../../scss/_app_styles.scss */
+  .top-bar-second .top-bar-second-section li:not(.has-form) a:not(.button):hover {
+    color: #ce7869;
+    border-bottom: 3px solid #ffc14e;
+  }
+  /* line 5043, ../../../scss/_app_styles.scss */
+  .top-bar-second .top-bar-second-section li:not(.has-form).active a:not(.button) {
+    color: #ce7869;
+    border-bottom: 3px solid #ffc14e;
+  }
+  /* line 5051, ../../../scss/_app_styles.scss */
+  .top-bar-second .top-bar-second-section li:not(.has-form).has-dropdown a:not(.button):hover {
+    color: #74b3dc;
+    border-bottom: 0px;
+  }
+  /* line 5061, ../../../scss/_app_styles.scss */
+  .top-bar-second .top-bar-second-section li.active:not(.has-form) a:not(.button):hover {
+    background: transparent;
+  }
+  /* line 5070, ../../../scss/_app_styles.scss */
+  .top-bar-second .top-bar-second-section .dropdown li:not(.has-form) > a:not(.button) {
+    border-left-width: 2px;
+    color: #74b3dc;
+    background: #164A7B;
+  }
+  /* line 5077, ../../../scss/_app_styles.scss */
+  .top-bar-second .top-bar-second-section .dropdown li:not(.has-form):hover a:not(.button), .top-bar-second .top-bar-second-section .dropdown li:not(.has-form).active a:not(.button) {
+    background: #164A7B;
+    color: #74b3dc;
+    border-bottom: 0px;
+    border-left-width: 2px;
+    /*&:hover {
+        color: $secondry-blue;
+        border-bottom: 0px;
+    }*/
+  }
+}
+/**
+ * Sass styles related to unit cards
+ */
+/* line 5104, ../../../scss/_app_styles.scss */
+.unit_card {
+  width: 300px;
+  color: #000;
+  padding: 15px;
+  margin: 10px;
+  border-radius: 5px;
+  font-size: 14px;
+  border: 2px solid #d5d5d5;
+  position: relative;
+  height: 210px;
+}
+/* line 5118, ../../../scss/_app_styles.scss */
+.unit_card .unit_status {
+  position: absolute;
+  right: 0px;
+  top: -10px;
+  height: 25px;
+  padding: 2px 10px;
+  line-height: 20px;
+  border-radius: 3px;
+  letter-spacing: 0.6px;
+}
+/* line 5129, ../../../scss/_app_styles.scss */
+.unit_card .unit_header {
+  display: table;
+}
+/* line 5131, ../../../scss/_app_styles.scss */
+.unit_card .unit_header .unit_banner {
+  display: table-cell;
+  border-radius: 5px;
+  height: 50px;
+  width: 50px;
+  margin-right: 10px;
+  color: #333333;
+}
+/* line 5139, ../../../scss/_app_styles.scss */
+.unit_card .unit_header .unit_title {
+  display: table-cell;
+  font-size: 20px;
+  font-weight: 500;
+  letter-spacing: 0.6px;
+  margin: 0px 0px 12px;
+  width: 200px;
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+  vertical-align: middle;
+  color: #333333;
+}
+/* line 5153, ../../../scss/_app_styles.scss */
+.unit_card .unit_desc {
+  display: block;
+  /* Fallback for non-webkit */
+  display: -webkit-box;
+  height: 58.8px;
+  /* Fallback for non-webkit */
+  max-width: 400px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  font-size: 14px;
+  line-height: 1.4;
+  -webkit-line-clamp: 3;
+  -webkit-box-orient: vertical;
+  margin: 10px 0px 20px;
+  color: #333333;
+}
+/* line 5169, ../../../scss/_app_styles.scss */
+.unit_card .unit_breif .unit_breif_row i {
+  margin-right: 10px;
+  color: #99aaba;
+}
+/* line 5175, ../../../scss/_app_styles.scss */
+.unit_card .unit_actions {
+  padding: 5px 0px;
+}
+/* line 5180, ../../../scss/_app_styles.scss */
+.unit_card .unit_actions .unit-card-enrol {
+  background: #a2238d;
+  height: 37px;
+  text-align: center;
+  color: #ffffff;
+  font-size: 19px;
+  border: 2px solid rgba(43, 51, 63, 0.42);
+  border-radius: 5px;
+  width: 120px !important;
+  margin-top: 2px !important;
+  letter-spacing: 0.4px;
+}
+/* line 5192, ../../../scss/_app_styles.scss */
+.unit_card .unit_actions .unit-card-enrol:hover {
+  box-shadow: 0px 0px 17px rgba(0, 0, 0, 0.68);
+}
+/* line 5197, ../../../scss/_app_styles.scss */
+.unit_card .unit_actions .unit-card-analytics {
+  color: #a2238d;
+  font-weight: 500;
+  font-size: 14px;
+  letter-spacing: 0.3px;
+  border-bottom: 2px solid #a2238d;
+}
+/* line 5205, ../../../scss/_app_styles.scss */
+.unit_card .unit_actions .unit-card-analytics-points {
+  background: #ffffff;
+  color: #a2238d;
+  font-size: 15px;
+  border-radius: 20px;
+  letter-spacing: 0.4px;
+  padding: 2px 3px 3px 1px;
+  font-weight: bold;
+  cursor: default;
+}
+/* line 5216, ../../../scss/_app_styles.scss */
+.unit_card .unit_actions .view_unit {
+  height: 37px;
+  text-align: center;
+  color: #a2238d;
+  font-size: 19px;
+  margin-top: 2px !important;
+  letter-spacing: 0.4px;
+}
+/* line 5224, ../../../scss/_app_styles.scss */
+.unit_card .unit_actions .view_unit:hover {
+  border-bottom: 2px solid #ffc14e;
+}
+
+/* unit cards labels */
+/* line 5234, ../../../scss/_app_styles.scss */
+.status-completed {
+  width: auto;
+  top: -1.15em;
+  position: absolute;
+  display: inline-block;
+  color: #fff;
+  right: 1em;
+  padding: 0.3em 0.5em;
+  font-family: OpenSans-Bold;
+  text-transform: uppercase;
+  font-size: 10px;
+  border-radius: 4px;
+  background-color: #008000;
+  letter-spacing: 0.4px;
+}
+
+/* line 5250, ../../../scss/_app_styles.scss */
+.status-in-progress {
+  width: auto;
+  top: -1.15em;
+  position: absolute;
+  display: inline-block;
+  color: #fff;
+  font-family: OpenSans-Bold;
+  right: 1em;
+  padding: 0.3em 0.5em;
+  text-transform: uppercase;
+  font-size: 10px;
+  border-radius: 4px;
+  background-color: #ffc14e;
+  letter-spacing: 0.4px;
+}
+
+/* line 5267, ../../../scss/_app_styles.scss */
+.status-upcoming {
+  width: auto;
+  top: -1.15em;
+  position: absolute;
+  display: inline-block;
+  color: #fff;
+  font-family: OpenSans-Bold;
+  right: 1em;
+  padding: 0.3em 0.5em;
+  text-transform: uppercase;
+  font-size: 10px;
+  border-radius: 4px;
+  background-color: #74b3dc;
+  letter-spacing: 0.4px;
+}
+
+/* line 5284, ../../../scss/_app_styles.scss */
+.status-draft {
+  width: auto;
+  top: -1.15em;
+  position: absolute;
+  display: inline-block;
+  color: #fff;
+  font-family: OpenSans-Bold;
+  right: 1em;
+  padding: 0.3em 0.5em;
+  text-transform: uppercase;
+  font-size: 10px;
+  border-radius: 4px;
+  background-color: grey;
+  letter-spacing: 0.4px;
+}
+
+/* line 5301, ../../../scss/_app_styles.scss */
+.icon-widget {
+  font-size: 24px;
+}
+
+/* module detail css */
+/* line 5310, ../../../scss/_app_styles.scss */
+.thumbnail_style {
+  margin-top: -30px;
+  margin-left: -30px;
+}
+
+/* line 5315, ../../../scss/_app_styles.scss */
+.strip {
+  height: 143px;
+  margin-left: -13px;
+  margin-bottom: 10px;
+}
+
+/* line 5321, ../../../scss/_app_styles.scss */
+.title-strip {
+  box-shadow: 0px 0px 6px rgba(0, 0, 0, 0.2);
+  margin-top: -29px;
+  padding-left: 10px;
+}
+/* line 5325, ../../../scss/_app_styles.scss */
+.title-strip a {
+  float: right;
+  padding-right: 18px;
+  text-transform: uppercase;
+  color: #007095;
+}
+/* line 5335, ../../../scss/_app_styles.scss */
+.title-strip .position-actions {
+  margin-top: -60px;
+  margin-left: 760px;
+}
+/* line 5340, ../../../scss/_app_styles.scss */
+.title-strip .right-margin {
+  margin-right: 46px;
+}
+/* line 5343, ../../../scss/_app_styles.scss */
+.title-strip .course_actions > span {
+  background: #fff;
+  border: 1px solid rgba(255, 255, 255, 0.7);
+  padding: 1px 8px;
+  color: #2e3f51;
+  font-size: 12px;
+  margin: 0px 10px 0px 0px;
+  cursor: pointer;
+  border-radius: 3px;
+  opacity: 0.8;
+  margin-top: 30px;
+  z-index: 1;
+}
+/* line 5360, ../../../scss/_app_styles.scss */
+.title-strip .course_actions > i {
+  margin-right: 3px;
+  background: rgba(0, 0, 0, 0.6);
+  border: 1px solid rgba(255, 255, 255, 0.7);
+  padding: 1px 8px;
+  color: #fff;
+  font-size: 12px;
+  margin: 0px 10px 0px 0px;
+  cursor: pointer;
+  border-radius: 3px;
+}
+
+/* Creating and editing course Structure */
+/* line 5377, ../../../scss/_app_styles.scss */
+.group_tile {
+  height: 300px;
+  background: url(/static/ndf/images/group-tile.png) no-repeat;
+  background-size: 100% 100%;
+  padding: 20px 26px;
+  color: #fff;
+  margin-bottom: 30px;
+  cursor: pointer;
+  box-shadow: 0px 0px 9px rgba(0, 0, 0, 0.4);
+}
+/* line 5386, ../../../scss/_app_styles.scss */
+.group_tile:hover {
+  opacity: 0.7;
+}
+/* line 5389, ../../../scss/_app_styles.scss */
+.group_tile .group-name {
+  font-weight: 700;
+  font-size: 24px;
+  letter-spacing: 1.1px;
+  text-shadow: 0px 0px 7px rgba(46, 63, 81, 0.7);
+}
+/* line 5396, ../../../scss/_app_styles.scss */
+.group_tile .group_desc {
+  letter-spacing: 0.5px;
+}
+
+/* curriculum */
+/* line 5403, ../../../scss/_app_styles.scss */
+ul.horizontal_tabs_gstudio {
+  margin: 0px;
+  height: 44px;
+}
+/* line 5406, ../../../scss/_app_styles.scss */
+ul.horizontal_tabs_gstudio > li {
+  display: inline-block;
+  height: 100%;
+}
+/* line 5409, ../../../scss/_app_styles.scss */
+ul.horizontal_tabs_gstudio > li > a {
+  color: #ce7869;
+  padding: 8px 20px 7.5px;
+  display: block;
+  border-bottom: 3px solid transparent;
+  letter-spacing: 0.3px;
+}
+/* line 5417, ../../../scss/_app_styles.scss */
+ul.horizontal_tabs_gstudio > li > a.selected, ul.horizontal_tabs_gstudio > li > a:hover {
+  border-bottom: 4px solid #ffc14e;
+}
+/* line 5421, ../../../scss/_app_styles.scss */
+ul.horizontal_tabs_gstudio > li.sub_group_action {
+  position: relative;
+}
+/* line 5423, ../../../scss/_app_styles.scss */
+ul.horizontal_tabs_gstudio > li.sub_group_action > ul {
+  position: absolute;
+  top: 50px;
+  display: none;
+  z-index: 10;
+  position: cursor;
+  margin: 0px;
+  background: #fff;
+  box-shadow: 0px 1px 6px 1px #ccc;
+}
+/* line 5433, ../../../scss/_app_styles.scss */
+ul.horizontal_tabs_gstudio > li.sub_group_action > ul li {
+  list-style: none;
+  white-space: nowrap;
+  padding: 15px 15px;
+}
+/* line 5438, ../../../scss/_app_styles.scss */
+ul.horizontal_tabs_gstudio > li.sub_group_action > ul li:hover {
+  background: #d6f2fe;
+}
+/* line 5444, ../../../scss/_app_styles.scss */
+ul.horizontal_tabs_gstudio > li.sub_group_action:hover ul {
+  display: block;
+}
+
+/* line 5451, ../../../scss/_app_styles.scss */
+.max-width {
+  max-width: 100%;
+}
+
+/* line 5457, ../../../scss/_app_styles.scss */
+.group_content .group_banner {
+  transition: all 1s ease;
+  -webkit-transition: all 1s ease;
+  overflow-y: auto;
+  background: url("/static/ndf/images/course-cover.png") no-repeat;
+  background-size: 100% 100%;
+  margin-bottom: -70px;
+  -webkit-box-shadow: 0px 0px 5px 5px #C9C9C;
+}
+/* line 5466, ../../../scss/_app_styles.scss */
+.group_content .group_header {
+  height: 45px;
+  padding-bottom: 5px;
+  background: transparent;
+  color: #fff;
+  width: 100%;
+  /* Permalink - use to edit and share this gradient: http://colorzilla.com/gradient-editor/#49667a+0,49667a+100&0+0,0.5+100 */
+  background: -moz-linear-gradient(top, rgba(73, 102, 122, 0) 0%, rgba(73, 102, 122, 0.8) 100%);
+  /* FF3.6-15 */
+  background: -webkit-linear-gradient(top, rgba(73, 102, 122, 0) 0%, rgba(73, 102, 122, 0.8) 100%);
+  /* Chrome10-25,Safari5.1-6 */
+  background: linear-gradient(to bottom, rgba(73, 102, 122, 0) 0%, rgba(73, 102, 122, 0.8) 100%);
+  /* W3C, IE10+, FF16+, Chrome26+, Opera12+, Safari7+ */
+  filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#0049667a', endColorstr='#8049667a',GradientType=0 );
+  /* IE6-9 */
+}
+/* line 5479, ../../../scss/_app_styles.scss */
+.group_content .group_header .group_title {
+  font-size: 28px;
+  font-weight: 700;
+  letter-spacing: 0.4px;
+  position: absolute;
+  bottom: 10px;
+  left: 25px;
+  color: #164A7B;
+}
+/* line 5488, ../../../scss/_app_styles.scss */
+.group_content .group_header .group_actions > button {
+  display: inline-block;
+  margin: 7px 10px;
+}
+/* line 5493, ../../../scss/_app_styles.scss */
+.group_content .group_sections {
+  text-align: center;
+  border-bottom: 2px solid #f5f5f5;
+  background-color: #ffffff;
+}
+/* line 5498, ../../../scss/_app_styles.scss */
+.group_content .group_sections_content {
+  background-color: #fff;
+  margin-bottom: 100px;
+  margin-top: -1px;
+}
+/* line 5504, ../../../scss/_app_styles.scss */
+.group_content .top-bar-secondions_content {
+  background-color: #fff;
+}
+/* line 5508, ../../../scss/_app_styles.scss */
+.group_content .course_actions > span {
+  margin-right: 5px;
+  background: #2e3f51;
+  border: 1px solid rgba(255, 255, 255, 0.7);
+  padding: 1px 8px;
+  color: #fff;
+  font-size: 12px;
+  margin: 0px 10px 0px 0px;
+  cursor: pointer;
+  border-radius: 3px;
+  margin-left: 130px;
+}
+/* line 5521, ../../../scss/_app_styles.scss */
+.group_content .course_actions > i {
+  margin-right: 5px;
+  background: rgba(0, 0, 0, 0.6);
+  border: 1px solid rgba(255, 255, 255, 0.7);
+  padding: 1px 8px;
+  color: #fff;
+  font-size: 12px;
+  margin: 0px 10px 0px 0px;
+  cursor: pointer;
+  border-radius: 3px;
+  margin-right: 80px;
+}
+
+/* Unit_Structure styles */
+/* line 5539, ../../../scss/_app_styles.scss */
+.course_creator {
+  background: #fff;
+  box-shadow: 0px 2px 6px #000;
+  margin: 0px auto;
+  padding: 0px 0px;
+  max-width: 100vw;
+}
+/* line 5547, ../../../scss/_app_styles.scss */
+.course_creator > .columns {
+  padding: 0px;
+  height: 100%;
+}
+/* line 5551, ../../../scss/_app_styles.scss */
+.course_creator .course_editor {
+  margin-bottom: 10px;
+  position: relative;
+  /*Overriding default*/
+  /*Custom css*/
+  /* Course edit in the edit mode. */
+}
+/* line 5557, ../../../scss/_app_styles.scss */
+.course_creator .course_editor .accordion .accordion-navigation > .content, .course_creator .course_editor .accordion dd > .content {
+  padding: 0px;
+  padding-left: 0px;
+}
+/* line 5563, ../../../scss/_app_styles.scss */
+.course_creator .course_editor > div {
+  display: inline-block;
+  vertical-align: top;
+}
+/* line 5568, ../../../scss/_app_styles.scss */
+.course_creator .course_editor .course_tree {
+  transition: all 1s ease;
+  -webkit-transition: all 1s ease;
+  width: 100%;
+  background-color: #fff;
+  max-height: 100%;
+  overflow-y: auto;
+  height: 100vh;
+}
+/* line 5577, ../../../scss/_app_styles.scss */
+.course_creator .course_editor .course_tree .course-lessons dd {
+  border-bottom: 2px solid #9abfd9;
+  transition: border-color 1s ease;
+  -webkit-transition: border-color 1s ease;
+}
+/* line 5581, ../../../scss/_app_styles.scss */
+.course_creator .course_editor .course_tree .course-lessons dd.accordion-navigation {
+  position: relative;
+  padding-left: 0px;
+}
+/* line 5586, ../../../scss/_app_styles.scss */
+.course_creator .course_editor .course_tree .course-lessons dd.accordion-navigation > a:before {
+  position: absolute;
+  left: 23px;
+  line-height: 20px;
+  color: #74b3dc;
+}
+/* line 5595, ../../../scss/_app_styles.scss */
+.course_creator .course_editor .course_tree .course-lessons dd.accordion-navigation a.entity-title {
+  background: inherit;
+  cursor: pointer;
+  font-weight: 600;
+  color: #3c5267;
+  transition: color 1s ease;
+  -webkit-transition: color 1s ease;
+}
+/* line 5602, ../../../scss/_app_styles.scss */
+.course_creator .course_editor .course_tree .course-lessons dd.accordion-navigation a.entity-title .edit_entity {
+  color: #c9d1d8;
+  font-weight: 400;
+  letter-spacing: 0.5px;
+  display: block;
+  position: relative;
+  display: none;
+}
+/* line 5611, ../../../scss/_app_styles.scss */
+.course_creator .course_editor .course_tree .course-lessons dd.accordion-navigation a.entity-title .edit_entity i {
+  display: none;
+}
+/* line 5616, ../../../scss/_app_styles.scss */
+.course_creator .course_editor .course_tree .course-lessons dd.accordion-navigation a.entity-title .edit_entity > .entity_actions {
+  margin-bottom: 0px;
+}
+/* line 5619, ../../../scss/_app_styles.scss */
+.course_creator .course_editor .course_tree .course-lessons dd.accordion-navigation a.entity-title .edit_entity > .entity_actions li {
+  white-space: nowrap;
+  list-style: none;
+  display: inline-block;
+  margin: 0px 10px;
+  cursor: pointer;
+}
+/* line 5629, ../../../scss/_app_styles.scss */
+.course_creator .course_editor .course_tree .course-lessons dd.accordion-navigation a.entity-title:hover .edit_entity {
+  display: block;
+}
+/* line 5635, ../../../scss/_app_styles.scss */
+.course_creator .course_editor .course_tree .course-lessons dd.accordion-navigation.active > a:before {
+  content: '';
+  line-height: 55px;
+  color: #d7d7d7;
+}
+/* line 5643, ../../../scss/_app_styles.scss */
+.course_creator .course_editor .course_tree .course-lessons dd.accordion-navigation .course-activities {
+  margin: 0px;
+}
+/* line 5645, ../../../scss/_app_styles.scss */
+.course_creator .course_editor .course_tree .course-lessons dd.accordion-navigation .course-activities > li {
+  list-style: none;
+  border-top: 1px solid #e9e9e9;
+  padding: 10px 0px 10px 30px;
+  background: inherit;
+  transition: border-color 1s ease;
+  -webkit-transition: border-color 1s ease;
+}
+/* line 5652, ../../../scss/_app_styles.scss */
+.course_creator .course_editor .course_tree .course-lessons dd.accordion-navigation .course-activities > li > a {
+  color: #7ca0d0;
+  width: 100%;
+  display: block;
+  transition: color 1s ease;
+  -webkit-transition: color 1s ease;
+}
+/* line 5661, ../../../scss/_app_styles.scss */
+.course_creator .course_editor .course_tree .course-lessons dd.accordion-navigation .content {
+  background: inherit;
+}
+/* line 5670, ../../../scss/_app_styles.scss */
+.course_creator .course_editor .course-editor-section {
+  width: 0%;
+  display: inline-block;
+  opacity: 0;
+  transition: width 1s ease;
+  -webkit-transition: width 1s ease;
+  height: inherit;
+  max-height: 100%;
+  overflow-y: auto;
+  background: #fff;
+}
+/* line 5680, ../../../scss/_app_styles.scss */
+.course_creator .course_editor .course-editor-section .editor-header {
+  height: 55px;
+  background-color: #e5f1f6;
+  border-bottom: 1px solid #e6e6e7;
+  margin-bottom: 10px;
+}
+/* line 5686, ../../../scss/_app_styles.scss */
+.course_creator .course_editor .course-editor-section .editor-header .header-left {
+  padding: 14px 10px 10px 10px;
+}
+/* line 5689, ../../../scss/_app_styles.scss */
+.course_creator .course_editor .course-editor-section .editor-header .header-left > span {
+  color: #3c5264;
+  font-weight: 600;
+  margin-right: 10px;
+}
+/* line 5698, ../../../scss/_app_styles.scss */
+.course_creator .course_editor .course-editor-section .editor-header .custom_dropdown {
+  margin: 40px 35px 0px;
+}
+/* line 5703, ../../../scss/_app_styles.scss */
+.course_creator .course_editor .course-editor-section .editor-tool .editor_actions {
+  background-color: #fff;
+  border-bottom: 1px solid #ccc;
+  height: 55px;
+}
+/* line 5707, ../../../scss/_app_styles.scss */
+.course_creator .course_editor .course-editor-section .editor-tool .editor_actions ul {
+  margin: 0px;
+}
+/* line 5709, ../../../scss/_app_styles.scss */
+.course_creator .course_editor .course-editor-section .editor-tool .editor_actions ul li {
+  list-style: none;
+  display: inline-block;
+}
+/* line 5712, ../../../scss/_app_styles.scss */
+.course_creator .course_editor .course-editor-section .editor-tool .editor_actions ul li:not(:first-child) {
+  padding: 1px 30px;
+  border-left: 1px solid #ccc;
+  text-align: center;
+}
+/* line 5718, ../../../scss/_app_styles.scss */
+.course_creator .course_editor .course-editor-section .editor-tool .editor_actions ul li span {
+  display: inline-block;
+  letter-spacing: 0.5px;
+  color: #999;
+  padding: 15px 5px;
+  cursor: pointer;
+}
+/* line 5733, ../../../scss/_app_styles.scss */
+.course_creator .course_editor .add-lesson {
+  margin-top: 20px;
+  margin-left: 20px;
+  float: left;
+}
+/* line 5741, ../../../scss/_app_styles.scss */
+.course_creator .course_editor .add_activity {
+  margin-top: 3px;
+}
+/* line 5747, ../../../scss/_app_styles.scss */
+.course_creator .course_editor .create_activity {
+  margin-top: 0px;
+  margin-left: -7.1px;
+}
+/* line 5756, ../../../scss/_app_styles.scss */
+.course_creator .course_editor.edit_mode button {
+  color: #5097b5;
+  border-color: #5097b5;
+  transition: color 1s ease, border-color 1s ease;
+  -webkit-transition: color 1s ease, border-color 1s ease;
+}
+/* line 5761, ../../../scss/_app_styles.scss */
+.course_creator .course_editor.edit_mode .course_tree {
+  transition: all 1s ease;
+  -webkit-transition: all 1s ease;
+  width: 20%;
+  background-color: #2a6882;
+  border: 1px solid #e5f1f6;
+}
+/* line 5768, ../../../scss/_app_styles.scss */
+.course_creator .course_editor.edit_mode .course_tree .course-lessons dd {
+  border-color: #295566;
+  transition: border-color 1s ease;
+  -webkit-transition: border-color 1s ease;
+}
+/* line 5773, ../../../scss/_app_styles.scss */
+.course_creator .course_editor.edit_mode .course_tree .course-lessons dd.accordion-navigation a {
+  background: inherit;
+  color: #8fbbd8;
+  transition: color 1s ease;
+  -webkit-transition: color 1s ease;
+}
+/* line 5778, ../../../scss/_app_styles.scss */
+.course_creator .course_editor.edit_mode .course_tree .course-lessons dd.accordion-navigation a .edit_entity {
+  width: 20px;
+}
+/* line 5780, ../../../scss/_app_styles.scss */
+.course_creator .course_editor.edit_mode .course_tree .course-lessons dd.accordion-navigation a .edit_entity i {
+  display: block;
+}
+/* line 5784, ../../../scss/_app_styles.scss */
+.course_creator .course_editor.edit_mode .course_tree .course-lessons dd.accordion-navigation a .edit_entity > .entity_actions {
+  display: none;
+  position: absolute;
+  top: 22px;
+  right: -20px;
+  margin: 0px 10px;
+  z-index: 100;
+  background: #fff;
+  color: #999999;
+  border-radius: 3px;
+}
+/* line 5795, ../../../scss/_app_styles.scss */
+.course_creator .course_editor.edit_mode .course_tree .course-lessons dd.accordion-navigation a .edit_entity > .entity_actions li {
+  display: block;
+  margin: 0px;
+  padding: 5px 25px;
+}
+/* line 5800, ../../../scss/_app_styles.scss */
+.course_creator .course_editor.edit_mode .course_tree .course-lessons dd.accordion-navigation a .edit_entity > .entity_actions li:hover {
+  background-color: #d5f2ff;
+}
+/* line 5806, ../../../scss/_app_styles.scss */
+.course_creator .course_editor.edit_mode .course_tree .course-lessons dd.accordion-navigation a .edit_entity:hover > .entity_actions {
+  display: block;
+}
+/* line 5812, ../../../scss/_app_styles.scss */
+.course_creator .course_editor.edit_mode .course_tree .course-lessons dd.accordion-navigation .course-activities > li {
+  transition: border-color 1s ease;
+  -webkit-transition: border-color 1s ease;
+  padding-right: 20px;
+  border-color: #295566;
+  border-bottom: 1px solid transparent;
+}
+/* line 5819, ../../../scss/_app_styles.scss */
+.course_creator .course_editor.edit_mode .course_tree .course-lessons dd.accordion-navigation .course-activities > li:not(:last-child):hover, .course_creator .course_editor.edit_mode .course_tree .course-lessons dd.accordion-navigation .course-activities > li:not(:last-child).active {
+  border-width: 1px 0px 1px 0px;
+  border-style: solid;
+  border-color: #50c0f8;
+}
+/* line 5826, ../../../scss/_app_styles.scss */
+.course_creator .course_editor.edit_mode .course_tree .course-lessons dd.accordion-navigation .course-activities > li > a {
+  color: #edf6ff;
+  transition: color 1s ease;
+  -webkit-transition: color 1s ease;
+}
+/* line 5837, ../../../scss/_app_styles.scss */
+.course_creator .course_editor.edit_mode .course-editor-section {
+  width: 77%;
+  opacity: 1;
+  max-width: 100%;
+  background: #fff;
+  overflow-x: hidden;
+  transition: width 1.9s ease, opacity 4s ease;
+  -webkit-transition: width 1.9s ease, opacity 4s ease;
+}
+
+/* line 5854, ../../../scss/_app_styles.scss */
+.button-hollow-grey {
+  background: inherit;
+  border: 2px solid #c9d1d8;
+  border-radius: 5px;
+  color: #c9d1d8;
+  font-weight: 600;
+  letter-spacing: 0.9px;
+  padding: 1.4px 6px 0.7px 8.5px;
+  cursor: pointer;
+  transition: color 1s ease, border-color 1s ease;
+  -webkit-transition: color 1s ease, border-color 1s ease;
+}
+
+/* lesspn listing LMS */
+/* line 5870, ../../../scss/_app_styles.scss */
+.course-content {
+  background: #fff;
+  margin: 20px auto;
+  padding: 20px 0px;
+  margin-top: 0px;
+}
+/* line 5878, ../../../scss/_app_styles.scss */
+.course-content ul.jqtree-tree .course-tree-node.jqtree-selected .jqtree-element {
+  background: #fff;
+}
+/* line 5881, ../../../scss/_app_styles.scss */
+.course-content ul.jqtree-tree .course-tree-node > div {
+  height: 35px;
+}
+/* line 5883, ../../../scss/_app_styles.scss */
+.course-content ul.jqtree-tree .course-tree-node > div a {
+  margin-right: 0.7em;
+}
+/* line 5890, ../../../scss/_app_styles.scss */
+.course-content .course-unit-name {
+  padding-left: 20px;
+}
+/* line 5892, ../../../scss/_app_styles.scss */
+.course-content .course-unit-name:not(:last-child) {
+  border-bottom: 1px solid #d2cfcf;
+}
+/* line 5897, ../../../scss/_app_styles.scss */
+.course-content .course-unit-name > div .jqtree-title {
+  color: #3c5264;
+  font-size: 19px;
+  font-weight: 600;
+}
+/* line 5905, ../../../scss/_app_styles.scss */
+.course-content .course-activity-group > div .jqtree-title {
+  color: #74a0c0;
+  font-size: 17px;
+}
+/* line 5911, ../../../scss/_app_styles.scss */
+.course-content .course-activity-name > div .jqtree-title {
+  color: #74a0c0;
+  font-size: 17px;
+}
+
+/* line 5918, ../../../scss/_app_styles.scss */
+.jqtree-title > .fa-check {
+  color: green;
+}
+
+/* line 5921, ../../../scss/_app_styles.scss */
+.jqtree-title > .fa-check-circle-o {
+  color: green;
+}
+
+/* line 5924, ../../../scss/_app_styles.scss */
+.jqtree-title > .fa-clock-o {
+  color: orange;
+}
+
+/* line 5927, ../../../scss/_app_styles.scss */
+.course-status-icon {
+  font-size: 20px;
+  margin-right: 5px;
+}
+
+/* activity player header */
+/*
+    Styling for the Secondary header 2
+*/
+/* line 5946, ../../../scss/_app_styles.scss */
+.activity_player_header {
+  background-color: rgba(107, 0, 84, 0.97);
+  box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.1);
+}
+/* line 5949, ../../../scss/_app_styles.scss */
+.activity_player_header > div {
+  height: 45px;
+  line-height: 45px;
+  display: inline-block;
+  vertical-align: top;
+}
+/* line 5957, ../../../scss/_app_styles.scss */
+.activity_player_header > div:not(:last-child) {
+  border-right: 1px solid #fff;
+}
+/* line 5966, ../../../scss/_app_styles.scss */
+.activity_player_header .header_title {
+  position: relative;
+  color: #fff;
+  font-weight: 500;
+  font-size: 20px;
+  letter-spacing: 0.6px;
+  padding: 0px 15px;
+  margin-left: -2px;
+  border-right: 1px solid white;
+}
+/* line 5975, ../../../scss/_app_styles.scss */
+.activity_player_header .header_title a {
+  color: #ffc14f;
+}
+@media only screen and (min-device-width: 1025px) and (max-device-width: 2130px) {
+  /* line 5966, ../../../scss/_app_styles.scss */
+  .activity_player_header .header_title {
+    text-overflow: ellipsis;
+    width: calc(100% - 938px);
+  }
+}
+@media only screen and (min-device-width: 2131px) {
+  /* line 5966, ../../../scss/_app_styles.scss */
+  .activity_player_header .header_title {
+    text-overflow: ellipsis;
+    width: calc(100% - 970px);
+  }
+}
+@media only screen and (max-device-width: 1024px) {
+  /* line 5966, ../../../scss/_app_styles.scss */
+  .activity_player_header .header_title {
+    text-overflow: ellipsis;
+    width: calc(100% - 753px);
+  }
+}
+/* line 6052, ../../../scss/_app_styles.scss */
+.activity_player_header .header_icon {
+  font-size: 16px;
+  line-height: 45px;
+  color: #ffc14f;
+}
+/* line 6058, ../../../scss/_app_styles.scss */
+.activity_player_header .header_icon_block {
+  color: #ffc14f;
+  width: 70px;
+  cursor: pointer;
+  text-align: center;
+}
+/* line 6064, ../../../scss/_app_styles.scss */
+.activity_player_header .header_text_sm_block {
+  padding: 0px 10px;
+}
+@media screen and (min-width: 1025px) {
+  /* line 6064, ../../../scss/_app_styles.scss */
+  .activity_player_header .header_text_sm_block {
+    padding: 0px 15px;
+  }
+}
+@media screen and (min-width: 1025px) {
+  /* line 6071, ../../../scss/_app_styles.scss */
+  .activity_player_header .lesson-nav {
+    float: right;
+    margin-right: 70px;
+    background-color: rgba(107, 0, 84, 0.97);
+  }
+}
+@media screen and (max-width: 1024px) {
+  /* line 6071, ../../../scss/_app_styles.scss */
+  .activity_player_header .lesson-nav {
+    background-color: rgba(107, 0, 84, 0.97);
+  }
+}
+/* line 6084, ../../../scss/_app_styles.scss */
+.activity_player_header .lesson-nav div {
+  height: 45px;
+  line-height: 45px;
+  display: inline-block;
+  vertical-align: top;
+}
+/* line 6090, ../../../scss/_app_styles.scss */
+.activity_player_header .lesson-nav .header_text_block {
+  padding: 0px 15px;
+  margin-left: -2px;
+  border-right: 1px solid white;
+}
+/* line 6094, ../../../scss/_app_styles.scss */
+.activity_player_header .lesson-nav .header_text_block a {
+  color: #ffc14f;
+}
+/* line 6100, ../../../scss/_app_styles.scss */
+.activity_player_header .lesson-nav .header_text_lg_block {
+  padding: 0px 9px;
+}
+@media screen and (min-width: 1025px) {
+  /* line 6100, ../../../scss/_app_styles.scss */
+  .activity_player_header .lesson-nav .header_text_lg_block {
+    padding: 0px 15px;
+  }
+}
+/* line 6108, ../../../scss/_app_styles.scss */
+.activity_player_header .lesson-nav .header_text_md_block {
+  padding: 0px 7px;
+}
+@media screen and (min-width: 1025px) {
+  /* line 6108, ../../../scss/_app_styles.scss */
+  .activity_player_header .lesson-nav .header_text_md_block {
+    padding: 0px 15px;
+  }
+}
+/* line 6117, ../../../scss/_app_styles.scss */
+.activity_player_header .lesson-nav .back_button {
+  border-color: #e0e0e0;
+  background-color: rgba(244, 244, 244, 0.3);
+}
+/* line 6120, ../../../scss/_app_styles.scss */
+.activity_player_header .lesson-nav .back_button i {
+  color: #71318b;
+}
+/* line 6126, ../../../scss/_app_styles.scss */
+.activity_player_header .lesson-nav .settings i {
+  transition: transform .5s ease-in-out;
+  -webkit-transition: -webkit-transform .5s ease-in-out;
+}
+/* line 6130, ../../../scss/_app_styles.scss */
+.activity_player_header .lesson-nav .settings:hover i {
+  transform: rotate(90deg);
+  -webkit-transform: rotate(90deg);
+}
+/* line 6136, ../../../scss/_app_styles.scss */
+.activity_player_header .lesson-nav .pagination:not(i) {
+  color: #a983b9;
+}
+
+/* line 6144, ../../../scss/_app_styles.scss */
+.activity_sheet {
+  background: rgba(231, 231, 231, 0.12);
+  box-shadow: 0px 2px 6px #000;
+  margin: 0px auto;
+  padding: 0px 0px;
+  max-width: 100vw;
+}
+/* line 6151, ../../../scss/_app_styles.scss */
+.activity_sheet > .columns {
+  padding: 0px;
+  height: 100%;
+}
+/* line 6155, ../../../scss/_app_styles.scss */
+.activity_sheet .course_editor {
+  margin-bottom: 10px;
+  position: relative;
+  /*Overriding default*/
+  /*Custom css*/
+}
+/* line 6161, ../../../scss/_app_styles.scss */
+.activity_sheet .course_editor .accordion .accordion-navigation > .content, .activity_sheet .course_editor .accordion dd > .content {
+  padding: 0px;
+  padding-left: 0px;
+}
+/* line 6167, ../../../scss/_app_styles.scss */
+.activity_sheet .course_editor > div {
+  display: inline-block;
+  vertical-align: top;
+}
+/* line 6172, ../../../scss/_app_styles.scss */
+.activity_sheet .course_editor .course_tree {
+  transition: all 1s ease;
+  -webkit-transition: all 1s ease;
+  width: 100%;
+  background-color: #fff;
+  max-height: 100%;
+  overflow-y: auto;
+  height: 100vh;
+}
+/* line 6181, ../../../scss/_app_styles.scss */
+.activity_sheet .course_editor .course_tree .course-lessons dd {
+  border-bottom: 2px solid #9abfd9;
+  transition: border-color 1s ease;
+  -webkit-transition: border-color 1s ease;
+}
+/* line 6185, ../../../scss/_app_styles.scss */
+.activity_sheet .course_editor .course_tree .course-lessons dd.accordion-navigation {
+  position: relative;
+  padding-left: 0px;
+}
+/* line 6190, ../../../scss/_app_styles.scss */
+.activity_sheet .course_editor .course_tree .course-lessons dd.accordion-navigation > a:before {
+  position: absolute;
+  left: 23px;
+  line-height: 20px;
+  color: #74b3dc;
+}
+/* line 6199, ../../../scss/_app_styles.scss */
+.activity_sheet .course_editor .course_tree .course-lessons dd.accordion-navigation a.entity-title {
+  background: inherit;
+  cursor: pointer;
+  font-weight: 600;
+  color: #3c5267;
+  transition: color 1s ease;
+  -webkit-transition: color 1s ease;
+}
+/* line 6206, ../../../scss/_app_styles.scss */
+.activity_sheet .course_editor .course_tree .course-lessons dd.accordion-navigation a.entity-title .edit_entity {
+  color: #c9d1d8;
+  font-weight: 400;
+  letter-spacing: 0.5px;
+  display: block;
+  position: relative;
+  display: none;
+}
+/* line 6215, ../../../scss/_app_styles.scss */
+.activity_sheet .course_editor .course_tree .course-lessons dd.accordion-navigation a.entity-title .edit_entity i {
+  display: none;
+}
+/* line 6220, ../../../scss/_app_styles.scss */
+.activity_sheet .course_editor .course_tree .course-lessons dd.accordion-navigation a.entity-title .edit_entity > .entity_actions {
+  margin-bottom: 0px;
+}
+/* line 6223, ../../../scss/_app_styles.scss */
+.activity_sheet .course_editor .course_tree .course-lessons dd.accordion-navigation a.entity-title .edit_entity > .entity_actions li {
+  white-space: nowrap;
+  list-style: none;
+  display: inline-block;
+  margin: 0px 10px;
+  cursor: pointer;
+}
+/* line 6233, ../../../scss/_app_styles.scss */
+.activity_sheet .course_editor .course_tree .course-lessons dd.accordion-navigation a.entity-title:hover .edit_entity {
+  display: block;
+}
+/* line 6239, ../../../scss/_app_styles.scss */
+.activity_sheet .course_editor .course_tree .course-lessons dd.accordion-navigation.active > a:before {
+  content: '';
+  line-height: 55px;
+  color: #d7d7d7;
+}
+/* line 6247, ../../../scss/_app_styles.scss */
+.activity_sheet .course_editor .course_tree .course-lessons dd.accordion-navigation .course-activities {
+  margin: 0px;
+}
+/* line 6249, ../../../scss/_app_styles.scss */
+.activity_sheet .course_editor .course_tree .course-lessons dd.accordion-navigation .course-activities > li {
+  list-style: none;
+  border-top: 1px solid #e9e9e9;
+  padding: 10px 0px 10px 30px;
+  background: inherit;
+  transition: border-color 1s ease;
+  -webkit-transition: border-color 1s ease;
+}
+/* line 6256, ../../../scss/_app_styles.scss */
+.activity_sheet .course_editor .course_tree .course-lessons dd.accordion-navigation .course-activities > li > a {
+  color: #7ca0d0;
+  width: 100%;
+  display: block;
+  transition: color 1s ease;
+  -webkit-transition: color 1s ease;
+}
+/* line 6265, ../../../scss/_app_styles.scss */
+.activity_sheet .course_editor .course_tree .course-lessons dd.accordion-navigation .content {
+  background: inherit;
+}
+/* line 6274, ../../../scss/_app_styles.scss */
+.activity_sheet .course_editor .course-editor-section {
+  width: 0%;
+  display: inline-block;
+  opacity: 0;
+  transition: width 1s ease;
+  -webkit-transition: width 1s ease;
+  height: inherit;
+  max-height: 100%;
+  overflow-y: auto;
+  background: #fff;
+}
+/* line 6284, ../../../scss/_app_styles.scss */
+.activity_sheet .course_editor .course-editor-section .editor-header {
+  height: 100px;
+  background-color: #e5f1f6;
+  border-bottom: 1px solid #e6e6e7;
+}
+/* line 6289, ../../../scss/_app_styles.scss */
+.activity_sheet .course_editor .course-editor-section .editor-header .header-left {
+  padding: 29px 0px;
+}
+/* line 6292, ../../../scss/_app_styles.scss */
+.activity_sheet .course_editor .course-editor-section .editor-header .header-left > span {
+  color: #3c5264;
+  font-weight: 600;
+  margin-right: 10px;
+}
+/* line 6301, ../../../scss/_app_styles.scss */
+.activity_sheet .course_editor .course-editor-section .editor-header .custom_dropdown {
+  margin: 40px 35px 0px;
+}
+/* line 6306, ../../../scss/_app_styles.scss */
+.activity_sheet .course_editor .course-editor-section .editor-tool .editor_actions {
+  background-color: #fff;
+  border-bottom: 1px solid #ccc;
+  height: 55px;
+}
+/* line 6310, ../../../scss/_app_styles.scss */
+.activity_sheet .course_editor .course-editor-section .editor-tool .editor_actions ul {
+  margin: 0px;
+}
+/* line 6312, ../../../scss/_app_styles.scss */
+.activity_sheet .course_editor .course-editor-section .editor-tool .editor_actions ul li {
+  list-style: none;
+  display: inline-block;
+}
+/* line 6315, ../../../scss/_app_styles.scss */
+.activity_sheet .course_editor .course-editor-section .editor-tool .editor_actions ul li:not(:first-child) {
+  padding: 1px 30px;
+  border-left: 1px solid #ccc;
+  text-align: center;
+}
+/* line 6321, ../../../scss/_app_styles.scss */
+.activity_sheet .course_editor .course-editor-section .editor-tool .editor_actions ul li span {
+  display: inline-block;
+  letter-spacing: 0.5px;
+  color: #999;
+  padding: 15px 5px;
+  cursor: pointer;
+}
+
+/* line 6339, ../../../scss/_app_styles.scss */
+.course_editor_section {
+  background: #fff;
+  min-height: 100vh;
+  min-width: 910px;
+  margin-bottom: 10px;
+  padding-right: 4px;
+}
+/* line 6345, ../../../scss/_app_styles.scss */
+.course_editor_section #scstyle {
+  margin-top: -10px;
+}
+
+/* line 6350, ../../../scss/_app_styles.scss */
+.lesson-title {
+  font-size: 18px;
+  padding-top: 10px;
+  padding-left: 10px;
+}
+
+/* line 6356, ../../../scss/_app_styles.scss */
+.activity-title {
+  font-size: 18px;
+  padding-top: 10px;
+  padding-left: 23px;
+  margin: 0px;
+}
+/* line 6362, ../../../scss/_app_styles.scss */
+.activity-title > li {
+  list-style: none;
+  border-top: 1px solid #e9e9e9;
+  padding: 9px 0px 9px 11px;
+  background: inherit;
+  transition: border-color 1s ease;
+  -webkit-transition: border-color 1s ease;
+  margin-left: -23px;
+}
+/* line 6371, ../../../scss/_app_styles.scss */
+.activity-title > li.active {
+  background: rgba(116, 0, 255, 0.31);
+}
+/* line 6375, ../../../scss/_app_styles.scss */
+.activity-title > li > a {
+  color: black;
+}
+
+/* line 6384, ../../../scss/_app_styles.scss */
+.activity_page_rendered {
+  margin-left: 20px;
+  max-width: 900px;
+}
+
+/* Rating css */
+/* line 6392, ../../../scss/_app_styles.scss */
+.rating-bar {
+  /* the hidden clearer */
+  /* this is gross, I threw this in to override the starred
+  buttons when hovering. */
+}
+/* line 6394, ../../../scss/_app_styles.scss */
+.rating-bar > span {
+  /* remove inline-block whitespace */
+  font-size: 0;
+  /* flip the order so we can use the + and ~ combinators */
+  unicode-bidi: bidi-override;
+  direction: rtl;
+}
+/* line 6402, ../../../scss/_app_styles.scss */
+.rating-bar.unrated {
+  /* If the user has not rated yet */
+}
+/* line 6404, ../../../scss/_app_styles.scss */
+.rating-bar.unrated:checked ~ label:before {
+  color: #ffc14e;
+}
+/* line 6410, ../../../scss/_app_styles.scss */
+.rating-bar [type*="radio"] {
+  display: none;
+}
+/* line 6412, ../../../scss/_app_styles.scss */
+.rating-bar [type*="radio"] + label {
+  /* only enough room for the star */
+  display: inline-block;
+  overflow: hidden;
+  text-indent: 9999px;
+  width: 1em;
+  height: 1.4em;
+  white-space: nowrap;
+  font-size: 1.2rem;
+  margin: 0;
+  vertical-align: bottom;
+}
+/* line 6424, ../../../scss/_app_styles.scss */
+.rating-bar [type*="radio"] + label:before {
+  display: inline-block;
+  text-indent: -9999px;
+  content: '\2606';
+  /* WHITE STAR */
+  color: #888;
+}
+/* line 6431, ../../../scss/_app_styles.scss */
+.rating-bar [type*="radio"]:checked ~ label:before, .rating-bar [type*="radio"] + label:hover ~ label:before, .rating-bar [type*="radio"] + label:hover:before {
+  content: '\2605';
+  /* BLACK STAR */
+  color: #FF980D;
+  text-shadow: 0 0 1px #333;
+}
+/* line 6442, ../../../scss/_app_styles.scss */
+.rating-bar .last[type*="radio"] + label {
+  text-indent: -9999px;
+  width: .5em;
+  margin-left: -.5em;
+}
+/* line 6449, ../../../scss/_app_styles.scss */
+.rating-bar .last[type*="radio"] + label:before {
+  width: .5em;
+  height: 1.4em;
+}
+/* line 6457, ../../../scss/_app_styles.scss */
+.rating-bar:hover [type*="radio"] + label:before {
+  content: '\2606';
+  /* WHITE STAR */
+  color: #888;
+  text-shadow: none;
+}
+/* line 6462, ../../../scss/_app_styles.scss */
+.rating-bar:hover [type*="radio"] + label:hover ~ label:before,
+.rating-bar:hover [type*="radio"] + label:hover:before {
+  content: '\2605';
+  /* BLACK STAR */
+  color: #FF980D;
+  text-shadow: 0 0 1px #333;
+}
+
+/* line 6472, ../../../scss/_app_styles.scss */
+[class*="column"] + [class*="column"]:last-child {
+  float: left;
+}
+
+/* line 6476, ../../../scss/_app_styles.scss */
+.input_links {
+  margin-left: 10px;
+}
+/* line 6478, ../../../scss/_app_styles.scss */
+.input_links a {
+  margin-right: 35px;
+  margin-top: 5px;
+}
+
+/* line 6484, ../../../scss/_app_styles.scss */
+.buddy_margin {
+  margin-right: 80px;
+  font-family: OpenSans-Regular;
+  margin-top: 6px;
+}
+
+/* line 6492, ../../../scss/_app_styles.scss */
+.activity-slides-container {
+  height: 100%;
+  width: 80%;
+  background: #f8f8f8;
+  margin-bottom: 2em;
+  padding: 0em 0em 0em 0em;
+  margin-bottom: 15px;
+}
+/* line 6501, ../../../scss/_app_styles.scss */
+.activity-slides-container .activity-slides {
+  height: 100%;
+  color: #f8f8f8;
+}
+/* line 6506, ../../../scss/_app_styles.scss */
+.activity-slides-container .activity-slides .activity-slide {
+  padding: 1em;
+  height: inherit;
+  background: #fff;
+  position: relative;
+}
+/* line 6512, ../../../scss/_app_styles.scss */
+.activity-slides-container .activity-slides .activity-slide .view-related-content {
+  border: 1px solid #999;
+  display: inline-block;
+  padding: 2px 7px;
+  color: #999999;
+  margin-left: 12%;
+}
+/* line 6520, ../../../scss/_app_styles.scss */
+.activity-slides-container .activity-slides .activity-slide .page > section {
+  margin-left: 50%;
+  transform: translate(-50%);
+}
+/* line 6526, ../../../scss/_app_styles.scss */
+.activity-slides-container .activity-slides .related-content-close {
+  position: absolute;
+  right: -2px;
+  top: -8px;
+  font-size: 25px !important;
+  display: none;
+  color: #8E8E8E;
+}
+/* line 6535, ../../../scss/_app_styles.scss */
+.activity-slides-container .activity-slides .content-expanded > i {
+  font-size: 20px !important;
+  color: #ccc !important;
+  top: 8px !important;
+}
+/* line 6540, ../../../scss/_app_styles.scss */
+.activity-slides-container .activity-slides .content-expanded .related-content-header {
+  margin-left: 20px !important;
+}
+/* line 6542, ../../../scss/_app_styles.scss */
+.activity-slides-container .activity-slides .content-expanded .related-content-header > span:first-child {
+  display: none !important;
+}
+/* line 6545, ../../../scss/_app_styles.scss */
+.activity-slides-container .activity-slides .content-expanded .related-content-header .back-to-activity {
+  display: inline-block !important;
+  float: right;
+  background: #dddddd;
+  padding: 2px 7px;
+  border: 1px solid #ccc;
+  font-size: 13px;
+  color: #757575;
+  margin-right: 20px;
+}
+/* line 6555, ../../../scss/_app_styles.scss */
+.activity-slides-container .activity-slides .content-expanded .related-content-header .related-content-title {
+  font-size: 15px !important;
+  position: relative;
+}
+/* line 6559, ../../../scss/_app_styles.scss */
+.activity-slides-container .activity-slides .content-expanded .related-content-header .related-content-title .related-content-close {
+  display: block;
+}
+/* line 6562, ../../../scss/_app_styles.scss */
+.activity-slides-container .activity-slides .content-expanded .related-content-header .related-content-title > i {
+  display: none !important;
+}
+/* line 6567, ../../../scss/_app_styles.scss */
+.activity-slides-container .activity-slides .content-expanded .related-content-body {
+  display: block !important;
+}
+/* line 6571, ../../../scss/_app_styles.scss */
+.activity-slides-container .activity-slides #related-content {
+  width: 100%;
+  margin: 0px auto;
+  /* border: 0px solid #ccc; */
+  padding: 5px 10px;
+  background: #f8f8f8;
+  margin-top: 10px;
+  min-height: 50px;
+  position: relative;
+  color: #222222;
+}
+/* line 6582, ../../../scss/_app_styles.scss */
+.activity-slides-container .activity-slides #related-content > i {
+  color: #fff;
+  font-size: 40px;
+  position: absolute;
+  left: 8px;
+  top: 4px;
+}
+/* line 6590, ../../../scss/_app_styles.scss */
+.activity-slides-container .activity-slides #related-content .related-content-header {
+  margin-left: 40px;
+}
+/* line 6592, ../../../scss/_app_styles.scss */
+.activity-slides-container .activity-slides #related-content .related-content-header .back-to-activity {
+  display: none;
+}
+/* line 6595, ../../../scss/_app_styles.scss */
+.activity-slides-container .activity-slides #related-content .related-content-header span {
+  display: block;
+  vertical-align: top;
+  margin: 2px 0px 2px 5px;
+  font-weight: 600;
+  font-size: 13px;
+  letter-spacing: 0.8px;
+  color: #999999;
+}
+/* line 6604, ../../../scss/_app_styles.scss */
+.activity-slides-container .activity-slides #related-content .related-content-header .related-content-title {
+  font-size: 20px;
+  color: #000;
+  cursor: pointer;
+}
+/* line 6610, ../../../scss/_app_styles.scss */
+.activity-slides-container .activity-slides #related-content .related-content-body {
+  display: none;
+}
+
+/* line 6619, ../../../scss/_app_styles.scss */
+.icon-color {
+  color: #2e3f51 !important;
+  padding: right;
+}
+
+/* The asset tile  */
+/* line 6629, ../../../scss/_app_styles.scss */
+.group_content .group_banner {
+  transition: all 1s ease;
+  -webkit-transition: all 1s ease;
+  overflow-y: auto;
+  background: url("/static/ndf/images/course-cover.png") no-repeat;
+  background-size: 100% 100%;
+  margin-bottom: -70px;
+  -webkit-box-shadow: 0px 0px 5px 5px #C9C9C;
+}
+/* line 6638, ../../../scss/_app_styles.scss */
+.group_content .group_header {
+  height: 45px;
+  padding-bottom: 5px;
+  background: transparent;
+  color: #fff;
+  width: 100%;
+  /* Permalink - use to edit and share this gradient: http://colorzilla.com/gradient-editor/#49667a+0,49667a+100&0+0,0.5+100 */
+  background: -moz-linear-gradient(top, rgba(73, 102, 122, 0) 0%, rgba(73, 102, 122, 0.8) 100%);
+  /* FF3.6-15 */
+  background: -webkit-linear-gradient(top, rgba(73, 102, 122, 0) 0%, rgba(73, 102, 122, 0.8) 100%);
+  /* Chrome10-25,Safari5.1-6 */
+  background: linear-gradient(to bottom, rgba(73, 102, 122, 0) 0%, rgba(73, 102, 122, 0.8) 100%);
+  /* W3C, IE10+, FF16+, Chrome26+, Opera12+, Safari7+ */
+  filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#0049667a', endColorstr='#8049667a',GradientType=0 );
+  /* IE6-9 */
+}
+/* line 6651, ../../../scss/_app_styles.scss */
+.group_content .group_header .group_title {
+  font-size: 28px;
+  font-weight: 700;
+  letter-spacing: 0.4px;
+  position: absolute;
+  bottom: 10px;
+  left: 25px;
+  color: #164A7B;
+}
+/* line 6660, ../../../scss/_app_styles.scss */
+.group_content .group_header .group_actions > button {
+  display: inline-block;
+  margin: 7px 10px;
+}
+/* line 6665, ../../../scss/_app_styles.scss */
+.group_content .group_sections {
+  text-align: center;
+  border-bottom: 2px solid #f5f5f5;
+  background: #eefaff;
+}
+/* line 6670, ../../../scss/_app_styles.scss */
+.group_content .group_sections_content {
+  background-color: #fff;
+  margin-bottom: 100px;
+  margin-top: -1px;
+}
+/* line 6676, ../../../scss/_app_styles.scss */
+.group_content .top-bar-secondions_content {
+  background-color: #fff;
+}
+/* line 6680, ../../../scss/_app_styles.scss */
+.group_content .course_actions > span {
+  margin-right: 5px;
+  background: #2e3f51;
+  border: 1px solid rgba(255, 255, 255, 0.7);
+  padding: 1px 8px;
+  color: #fff;
+  font-size: 12px;
+  margin: 0px 10px 0px 0px;
+  cursor: pointer;
+  border-radius: 3px;
+  margin-left: 130px;
+}
+/* line 6693, ../../../scss/_app_styles.scss */
+.group_content .course_actions > i {
+  margin-right: 5px;
+  background: rgba(0, 0, 0, 0.6);
+  border: 1px solid rgba(255, 255, 255, 0.7);
+  padding: 1px 8px;
+  color: #fff;
+  font-size: 12px;
+  margin: 0px 10px 0px 0px;
+  cursor: pointer;
+  border-radius: 3px;
+  margin-right: 80px;
+}
+
+/* line 6708, ../../../scss/_app_styles.scss */
+.activity_tile {
+  margin-top: 10px;
+  margin-bottom: 25px;
+  padding-bottom: 10px;
+  cursor: pointer;
+  height: 260px;
+  border: 1px solid #164A7B;
+}
+/* line 6717, ../../../scss/_app_styles.scss */
+.activity_tile .activity_preview {
+  height: 200px;
+  width: 100%;
+  border-width: 5px;
+}
+/* line 6724, ../../../scss/_app_styles.scss */
+.activity_tile .activity_preview img {
+  width: 100%;
+  height: 210px;
+}
+/* line 6730, ../../../scss/_app_styles.scss */
+.activity_tile .activity_text {
+  padding: 7px 0px 0px 0px;
+}
+/* line 6732, ../../../scss/_app_styles.scss */
+.activity_tile .activity_text .activity_title {
+  letter-spacing: 0.2px;
+  overflow: hidden;
+  font-size: 13px;
+  color: #164A7B;
+  padding-top: 10px;
+  padding-left: 6px;
+}
+/* line 6739, ../../../scss/_app_styles.scss */
+.activity_tile .activity_text .activity_title > a {
+  margin-right: 0px !important;
+}
+/* line 6743, ../../../scss/_app_styles.scss */
+.activity_tile .activity_text .activity_title .filenode {
+  z-index: -1;
+}
+/* line 6749, ../../../scss/_app_styles.scss */
+.activity_tile .activity_text .activity_desc {
+  letter-spacing: 0.3px;
+  overflow: hidden;
+  padding-left: 6px;
+  font-size: 11px;
+  color: grey;
+}
+
+/* line 6760, ../../../scss/_app_styles.scss */
+.asset_tile {
+  margin-top: 10px;
+  margin-bottom: 25px;
+  padding-bottom: 10px;
+  cursor: pointer;
+  height: 260px;
+  border: 1px solid #164A7B;
+}
+/* line 6769, ../../../scss/_app_styles.scss */
+.asset_tile .asset_preview {
+  height: 200px;
+  width: 100%;
+  border-width: 5px;
+}
+/* line 6776, ../../../scss/_app_styles.scss */
+.asset_tile .asset_preview .photos-1 img {
+  /* Just in case there are inline attributes */
+  width: 100% !important;
+  height: 210px !important;
+}
+/* line 6781, ../../../scss/_app_styles.scss */
+.asset_tile .asset_preview img {
+  width: 100%;
+  height: 210px;
+}
+/* line 6785, ../../../scss/_app_styles.scss */
+.asset_tile .asset_preview .photos {
+  /* Prevent vertical gaps */
+  line-height: 0;
+  -webkit-column-count: 2;
+  -webkit-column-gap: 0px;
+  -moz-column-count: 2;
+  -moz-column-gap: 0px;
+  column-count: 2;
+  column-gap: 0px;
+}
+/* line 6795, ../../../scss/_app_styles.scss */
+.asset_tile .asset_preview .photos img {
+  /* Just in case there are inline attributes */
+  width: 100% !important;
+  height: 100px !important;
+}
+@media (max-width: 1200px) {
+  /* line 6802, ../../../scss/_app_styles.scss */
+  .asset_tile .asset_preview .photos {
+    -moz-column-count: 2;
+    -webkit-column-count: 2;
+    column-count: 2;
+  }
+}
+@media (max-width: 1000px) {
+  /* line 6811, ../../../scss/_app_styles.scss */
+  .asset_tile .asset_preview .photos {
+    -moz-column-count: 2;
+    -webkit-column-count: 2;
+    column-count: 2;
+  }
+}
+@media (max-width: 800px) {
+  /* line 6818, ../../../scss/_app_styles.scss */
+  .asset_tile .asset_preview .photos {
+    -moz-column-count: 2;
+    -webkit-column-count: 2;
+    column-count: 2;
+  }
+}
+@media (max-width: 400px) {
+  /* line 6825, ../../../scss/_app_styles.scss */
+  .asset_tile .asset_preview .photos {
+    -moz-column-count: 1;
+    -webkit-column-count: 1;
+    column-count: 1;
+  }
+}
+/* line 6833, ../../../scss/_app_styles.scss */
+.asset_tile .asset_preview .photos-02 {
+  /* no vertical space*/
+  line-height: 0;
+  -webkit-column-count: 1;
+  -moz-column-count: 1;
+  -webkit-column-gap: 0px;
+  -moz-column-gap: 0px;
+  column-count: 1;
+  column-gap: 1px;
+  -moz-row-count: 2;
+  row-count: 2;
+  -webkit-row-gap: 0px;
+  -moz-row-gap: 0px;
+}
+/* line 6849, ../../../scss/_app_styles.scss */
+.asset_tile .asset_preview .photos-02 img {
+  /* Just in case there are inline attributes */
+  width: 100% !important;
+  height: 105px !important;
+}
+@media (max-width: 1200px) {
+  /* line 6856, ../../../scss/_app_styles.scss */
+  .asset_tile .asset_preview .photos-02 {
+    -moz-row-count: 2;
+    -webkit-column-count: 1;
+    column-count: 1;
+    row-count: 2;
+    -webkit-row-gap: 0px;
+    -moz-row-gap: 0px;
+  }
+}
+@media (max-width: 1000px) {
+  /* line 6867, ../../../scss/_app_styles.scss */
+  .asset_tile .asset_preview .photos-02 {
+    -moz-row-count: 2;
+    -webkit-column-count: 1;
+    column-count: 1;
+    row-count: 2;
+    -webkit-row-gap: 0px;
+    -moz-row-gap: 0px;
+  }
+}
+@media (max-width: 800px) {
+  /* line 6878, ../../../scss/_app_styles.scss */
+  .asset_tile .asset_preview .photos-02 {
+    -moz-row-count: 2;
+    -webkit-column-count: 0;
+    column-count: 1;
+    row-count: 3;
+    -webkit-row-gap: 0px;
+    -moz-row-gap: 0px;
+  }
+}
+@media (max-width: 400px) {
+  /* line 6889, ../../../scss/_app_styles.scss */
+  .asset_tile .asset_preview .photos-02 {
+    -moz-row-count: 2;
+    -webkit-column-count: 1;
+    column-count: 1;
+    row-count: 2;
+    -webkit-row-gap: 0px;
+    -moz-row-gap: 0px;
+  }
+}
+/* line 6900, ../../../scss/_app_styles.scss */
+.asset_tile .asset_preview .photos-03 {
+  /* no vertical space*/
+  line-height: 0;
+  -webkit-column-count: 1;
+  -moz-column-count: 1;
+  -webkit-column-gap: 0px;
+  -moz-column-gap: 0px;
+  column-count: 1;
+  column-gap: 1px;
+  -moz-row-count: 3;
+  row-count: 3;
+  -webkit-row-gap: 0px;
+  -moz-row-gap: 0px;
+}
+/* line 6916, ../../../scss/_app_styles.scss */
+.asset_tile .asset_preview .photos-03 img {
+  /* Just in case there are inline attributes */
+  width: 100% !important;
+  height: 70px !important;
+}
+@media (max-width: 1200px) {
+  /* line 6923, ../../../scss/_app_styles.scss */
+  .asset_tile .asset_preview .photos-03 {
+    -moz-row-count: 3;
+    -webkit-column-count: 1;
+    column-count: 1;
+    row-count: 3;
+    -webkit-row-gap: 0px;
+    -moz-row-gap: 0px;
+  }
+}
+@media (max-width: 1000px) {
+  /* line 6934, ../../../scss/_app_styles.scss */
+  .asset_tile .asset_preview .photos-03 {
+    -moz-row-count: 3;
+    -webkit-column-count: 1;
+    column-count: 1;
+    row-count: 3;
+    -webkit-row-gap: 0px;
+    -moz-row-gap: 0px;
+  }
+}
+@media (max-width: 800px) {
+  /* line 6945, ../../../scss/_app_styles.scss */
+  .asset_tile .asset_preview .photos-03 {
+    -moz-row-count: 3;
+    -webkit-column-count: 0;
+    column-count: 1;
+    row-count: 3;
+    -webkit-row-gap: 0px;
+    -moz-row-gap: 0px;
+  }
+}
+@media (max-width: 400px) {
+  /* line 6956, ../../../scss/_app_styles.scss */
+  .asset_tile .asset_preview .photos-03 {
+    -moz-row-count: 3;
+    -webkit-column-count: 1;
+    column-count: 1;
+    row-count: 3;
+    -webkit-row-gap: 0px;
+    -moz-row-gap: 0px;
+  }
+}
+/* line 6967, ../../../scss/_app_styles.scss */
+.asset_tile .asset_text {
+  padding: 7px 0px 0px 0px;
+}
+/* line 6969, ../../../scss/_app_styles.scss */
+.asset_tile .asset_text .asset_title {
+  letter-spacing: 0.2px;
+  overflow: hidden;
+  font-size: 13px;
+  color: #164A7B;
+  padding-top: 10px;
+  padding-left: 6px;
+}
+/* line 6977, ../../../scss/_app_styles.scss */
+.asset_tile .asset_text .asset_title .filenode {
+  z-index: -1;
+}
+/* line 6983, ../../../scss/_app_styles.scss */
+.asset_tile .asset_text .asset_desc {
+  letter-spacing: 0.3px;
+  overflow: hidden;
+  padding-left: 6px;
+  font-size: 11px;
+  color: grey;
+}
+
+/* line 6994, ../../../scss/_app_styles.scss */
+.audio_tile {
+  display: inline-block;
+  margin-top: 10px;
+  padding-bottom: 10px;
+  cursor: pointer;
+  height: 75px;
+  border: 1px solid #164A7B;
+  width: 270px;
+  margin-right: 15px;
+}
+/* line 7004, ../../../scss/_app_styles.scss */
+.audio_tile .audio_preview audio {
+  width: 100%;
+}
+/* line 7007, ../../../scss/_app_styles.scss */
+.audio_tile .audio_preview figcaption {
+  margin-left: 5px;
+}
+/* line 7012, ../../../scss/_app_styles.scss */
+.audio_tile:hover {
+  border-width: 2px 2px 5px 2px;
+  border-style: solid;
+  border-color: #ce7869;
+}
+
+/* line 7023, ../../../scss/_app_styles.scss */
+.template_tile {
+  display: inline-block;
+  margin-top: 10px;
+  padding-bottom: 10px;
+  cursor: pointer;
+  height: 160px;
+  border: 1px solid #164A7B;
+  width: 120px;
+  margin-right: 15px;
+}
+/* line 7033, ../../../scss/_app_styles.scss */
+.template_tile .template_preview {
+  height: 85px;
+  width: 100%;
+}
+/* line 7036, ../../../scss/_app_styles.scss */
+.template_tile .template_preview img {
+  width: 100%;
+}
+/* line 7040, ../../../scss/_app_styles.scss */
+.template_tile:hover {
+  border-width: 2px 2px 5px 2px;
+  border-style: solid;
+  border-color: #ce7869;
+}
+/* line 7046, ../../../scss/_app_styles.scss */
+.template_tile .template_text {
+  padding: 10px 0px 0px 0px;
+}
+/* line 7048, ../../../scss/_app_styles.scss */
+.template_tile .template_text .template_title {
+  letter-spacing: 0.2px;
+  overflow: hidden;
+  font-size: 12px;
+  color: #164A7B;
+  padding-top: 22px;
+  padding-left: 6px;
+}
+/* line 7057, ../../../scss/_app_styles.scss */
+.template_tile .template_text .template_desc {
+  letter-spacing: 0.3px;
+  overflow: hidden;
+  padding-left: 6px;
+  font-size: 11px;
+  color: grey;
+}
+
+/* line 7071, ../../../scss/_app_styles.scss */
+.preview_asset {
+  background: #ccc;
+  border: 2px solid #999;
+  width: 485px;
+  min-height: 350px;
+  margin-left: 14px;
+}
+
+/*  Asset detail */
+/* line 7082, ../../../scss/_app_styles.scss */
+.overlay-head {
+  background-color: #fff;
+  height: 60px;
+  margin-bottom: 20px;
+}
+
+/* line 7088, ../../../scss/_app_styles.scss */
+.listing-row {
+  margin-top: 10px !important;
+  background-color: #ffffff;
+}
+
+/* line 7093, ../../../scss/_app_styles.scss */
+.orange-button {
+  color: #ce7869;
+  padding: 7px 14px;
+  background: #fff;
+  border: 1px solid #ce7869;
+  font-size: 12px;
+  font-family: "OpenSans-Regular", serif;
+  border-radius: 5px !important;
+  margin-right: 20px;
+  margin-bottom: 8px;
+  margin-top: 8px;
+  cursor: pointer;
+}
+/* line 7105, ../../../scss/_app_styles.scss */
+.orange-button:hover {
+  background-color: rgba(206, 120, 105, 0.2);
+  color: #ce7869;
+}
+
+/* line 7112, ../../../scss/_app_styles.scss */
+.explore-button {
+  border-radius: 5px;
+  text-transform: uppercase;
+  margin-left: 150px;
+  color: #ffffff;
+  padding: 5px 17px;
+  width: inherit;
+  font-family: "OpenSans-Semibold", sans-serif;
+  border: 2px solid #6a0054;
+  background-color: #6a0054;
+}
+/* line 7123, ../../../scss/_app_styles.scss */
+.explore-button:hover {
+  background-color: #ffffff;
+  cursor: pointer;
+  color: #6a0054;
+}
+
+/* asset description */
+/* line 7132, ../../../scss/_app_styles.scss */
+.name-desc-asset-cont-area {
+  width: 95%;
+  margin-left: 24px;
+}

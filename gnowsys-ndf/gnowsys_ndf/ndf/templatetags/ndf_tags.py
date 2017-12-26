@@ -1062,7 +1062,7 @@ def get_nroer_menu(request, group_name):
 				break
 
 		# print "selected_gapp : ", selected_gapp
-	if (selected_gapp == "partner") and (len(url_split) > 2) and (url_split[2] in ["Partners", "Groups"]):
+	if (selected_gapp == "partner") and (len(url_split) > 2) and (url_split[2] in ["Partners", "Workspaces"]):
 		top_menu_selected = url_split[2]
 
 	mapping = GSTUDIO_NROER_MENU_MAPPINGS
@@ -1079,7 +1079,7 @@ def get_nroer_menu(request, group_name):
 		# with help of sub_menu_selected get it's parent from GSTUDIO_NROER_MENU
 		top_menu_selected = [i.keys()[0] for i in GSTUDIO_NROER_MENU[1:] if sub_menu_selected in i.values()[0]][0]
 		# for Partners, "Curated Zone" should not appear
-		gapps = gapps[1:] if (top_menu_selected in ["Partners", "Groups"]) else gapps
+		gapps = gapps[1:] if (top_menu_selected in ["Partners", "Workspaces"]) else gapps
 
 	elif (len(url_split) >= 3) and ("nroer_groups" in url_split) and (url_split[2] in [i.keys()[0] for i in GSTUDIO_NROER_MENU[1:]]):
 		# print "top_menu_selected ", top_menu_selected
@@ -1090,7 +1090,7 @@ def get_nroer_menu(request, group_name):
 	nroer_menu_dict["gapps"] = gapps
 	nroer_menu_dict["top_menu_selected"] = top_menu_selected
 	nroer_menu_dict["mapping"] = mapping
-	nroer_menu_dict["top_menus"] = GSTUDIO_NROER_MENU[1:]
+	nroer_menu_dict["top_menus"] = GSTUDIO_NROER_MENU[1:2]
 
 	# print "nroer_menu_dict : ", nroer_menu_dict
 	return nroer_menu_dict

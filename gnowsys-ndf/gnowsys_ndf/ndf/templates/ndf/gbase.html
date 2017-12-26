@@ -25,7 +25,8 @@
     <!--<link rel="stylesheet" href="/static/ndf/css/themes/{{site.SITE_NAME|lower}}/styles.css">-->
     <link rel="stylesheet" href="/static/ndf/bower_components/font-awesome/css/font-awesome.css">
     <link rel="stylesheet" href="/static/ndf/bower_components/font-awesome/css/font-awesome.min.css">
-    <link rel="stylesheet" type="text/css" href="/static/ndf/css/themes/clix/clix2017.css">
+    <!--<link rel="stylesheet" type="text/css" href="/static/ndf/css/themes/clix/clix2017.css">-->
+    <link rel="stylesheet" href="/static/ndf/css/themes/{{site.SITE_NAME|lower}}/styles.css">
     <!-- variables for js ussage -->
     
     <input type="hidden" name="group_id" class="group_id" value="{{group_id}}">
@@ -61,11 +62,16 @@
 </head>
 <body>
 
-    {% if site.BUDDY_LOGIN and user.is_authenticated and request.author.agency_type == 'Student'%}
+    {% if site.BUDDY_LOGIN and user.is_authenticated and site.SITE_NAME == 'clix' and request.author.agency_type == 'Student'%}
         {% include "ndf/buddy.html" %}
     {% endif %}
 
-    {% include "ndf/header_clix.html" %}
+    {% if site.SITE_NAME == 'NROER' %}
+        {% include "ndf/header.html" %}
+    {% else %}
+        {% include "ndf/header_clix.html" %}
+    {% endif %}
+
     {% block extended_header %}{% endblock %}
 
     {% block body_content %} {% endblock %}
@@ -196,10 +202,9 @@
 
     {% block script %} {% endblock %}
   </script>
-</body>
-<footer>
+
     {% if not no_footer %}
         {% include 'ndf/footer_clix.html' %}
     {% endif %}
-</footer>
+</body>
 </html>
