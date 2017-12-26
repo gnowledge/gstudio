@@ -2338,18 +2338,19 @@ def group_dashboard(request, group_id=None):
   if group_obj.edit_policy == "EDITABLE_MODERATED":# and group_obj._type != "Group":
       files_cur = node_collection.find({'group_set': ObjectId(group_obj._id), '_type': {'$in': ["File","GSystem"]}})
   '''
-  property_order_list = []
-  if "group_of" in group_obj:
-    if group_obj['group_of']:
-      college = node_collection.one({'_type': "GSystemType", 'name': "College"}, {'_id': 1})
+    property_order_list = []
+    if "group_of" in group_obj:
+        if group_obj['group_of']:
+            college = node_collection.one({'_type': "GSystemType", 'name': "College"}, {'_id': 1})
 
-      if college:
-        if college._id in group_obj['group_of'][0]['member_of']:
-          alternate_template = "ndf/college_group_details.html"
+        if college:
+            if college._id in group_obj['group_of'][0]['member_of']:
+                alternate_template = "ndf/college_group_details.html"
 
-      property_order_list = get_property_order_with_value(group_obj['group_of'][0])
+        property_order_list = get_property_order_with_value(group_obj['group_of'][0])
 
-  annotations = json.dumps(group_obj.annotations)
+    annotations = json.dumps(group_obj.annotations)
+  
   '''
   default_template = "ndf/groupdashboard.html"
   # print "\n\n blog_pages.count------",blog_pages
@@ -2377,7 +2378,6 @@ def group_dashboard(request, group_id=None):
                                                        'group_obj': group_obj,
                                                       },context_instance=RequestContext(request)
                           )
->>>>>>> 6b6941a11b970ff2b57f4ae40bdd3f9f7e7e53aa
 
 
 # @login_required
