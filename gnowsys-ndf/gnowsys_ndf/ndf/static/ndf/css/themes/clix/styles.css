@@ -29925,27 +29925,28 @@ ul.horizontal_tabs_gstudio > li.sub_group_action:hover ul {
   margin-bottom: 25px;
   padding-bottom: 10px;
   cursor: pointer;
+  background-color: white;
   height: 260px;
   border: 1px solid #164A7B;
 }
-/* line 6769, ../../../scss/_app_styles.scss */
+/* line 6770, ../../../scss/_app_styles.scss */
 .asset_tile .asset_preview {
   height: 200px;
   width: 100%;
   border-width: 5px;
 }
-/* line 6776, ../../../scss/_app_styles.scss */
+/* line 6777, ../../../scss/_app_styles.scss */
 .asset_tile .asset_preview .photos-1 img {
   /* Just in case there are inline attributes */
   width: 100% !important;
   height: 210px !important;
 }
-/* line 6781, ../../../scss/_app_styles.scss */
+/* line 6782, ../../../scss/_app_styles.scss */
 .asset_tile .asset_preview img {
   width: 100%;
   height: 210px;
 }
-/* line 6785, ../../../scss/_app_styles.scss */
+/* line 6786, ../../../scss/_app_styles.scss */
 .asset_tile .asset_preview .photos {
   /* Prevent vertical gaps */
   line-height: 0;
@@ -29956,14 +29957,14 @@ ul.horizontal_tabs_gstudio > li.sub_group_action:hover ul {
   column-count: 2;
   column-gap: 0px;
 }
-/* line 6795, ../../../scss/_app_styles.scss */
+/* line 6796, ../../../scss/_app_styles.scss */
 .asset_tile .asset_preview .photos img {
   /* Just in case there are inline attributes */
   width: 100% !important;
   height: 100px !important;
 }
 @media (max-width: 1200px) {
-  /* line 6802, ../../../scss/_app_styles.scss */
+  /* line 6803, ../../../scss/_app_styles.scss */
   .asset_tile .asset_preview .photos {
     -moz-column-count: 2;
     -webkit-column-count: 2;
@@ -29971,7 +29972,7 @@ ul.horizontal_tabs_gstudio > li.sub_group_action:hover ul {
   }
 }
 @media (max-width: 1000px) {
-  /* line 6811, ../../../scss/_app_styles.scss */
+  /* line 6812, ../../../scss/_app_styles.scss */
   .asset_tile .asset_preview .photos {
     -moz-column-count: 2;
     -webkit-column-count: 2;
@@ -29979,7 +29980,7 @@ ul.horizontal_tabs_gstudio > li.sub_group_action:hover ul {
   }
 }
 @media (max-width: 800px) {
-  /* line 6818, ../../../scss/_app_styles.scss */
+  /* line 6819, ../../../scss/_app_styles.scss */
   .asset_tile .asset_preview .photos {
     -moz-column-count: 2;
     -webkit-column-count: 2;
@@ -29987,14 +29988,14 @@ ul.horizontal_tabs_gstudio > li.sub_group_action:hover ul {
   }
 }
 @media (max-width: 400px) {
-  /* line 6825, ../../../scss/_app_styles.scss */
+  /* line 6826, ../../../scss/_app_styles.scss */
   .asset_tile .asset_preview .photos {
     -moz-column-count: 1;
     -webkit-column-count: 1;
     column-count: 1;
   }
 }
-/* line 6833, ../../../scss/_app_styles.scss */
+/* line 6834, ../../../scss/_app_styles.scss */
 .asset_tile .asset_preview .photos-02 {
   /* no vertical space*/
   line-height: 0;
@@ -30009,14 +30010,14 @@ ul.horizontal_tabs_gstudio > li.sub_group_action:hover ul {
   -webkit-row-gap: 0px;
   -moz-row-gap: 0px;
 }
-/* line 6849, ../../../scss/_app_styles.scss */
+/* line 6850, ../../../scss/_app_styles.scss */
 .asset_tile .asset_preview .photos-02 img {
   /* Just in case there are inline attributes */
   width: 100% !important;
   height: 105px !important;
 }
 @media (max-width: 1200px) {
-  /* line 6856, ../../../scss/_app_styles.scss */
+  /* line 6857, ../../../scss/_app_styles.scss */
   .asset_tile .asset_preview .photos-02 {
     -moz-row-count: 2;
     -webkit-column-count: 1;
@@ -30027,7 +30028,7 @@ ul.horizontal_tabs_gstudio > li.sub_group_action:hover ul {
   }
 }
 @media (max-width: 1000px) {
-  /* line 6867, ../../../scss/_app_styles.scss */
+  /* line 6868, ../../../scss/_app_styles.scss */
   .asset_tile .asset_preview .photos-02 {
     -moz-row-count: 2;
     -webkit-column-count: 1;
@@ -30038,7 +30039,7 @@ ul.horizontal_tabs_gstudio > li.sub_group_action:hover ul {
   }
 }
 @media (max-width: 800px) {
-  /* line 6878, ../../../scss/_app_styles.scss */
+  /* line 6879, ../../../scss/_app_styles.scss */
   .asset_tile .asset_preview .photos-02 {
     -moz-row-count: 2;
     -webkit-column-count: 0;
@@ -30049,7 +30050,7 @@ ul.horizontal_tabs_gstudio > li.sub_group_action:hover ul {
   }
 }
 @media (max-width: 400px) {
-  /* line 6889, ../../../scss/_app_styles.scss */
+  /* line 6890, ../../../scss/_app_styles.scss */
   .asset_tile .asset_preview .photos-02 {
     -moz-row-count: 2;
     -webkit-column-count: 1;
@@ -30059,7 +30060,7 @@ ul.horizontal_tabs_gstudio > li.sub_group_action:hover ul {
     -moz-row-gap: 0px;
   }
 }
-/* line 6900, ../../../scss/_app_styles.scss */
+/* line 6901, ../../../scss/_app_styles.scss */
 .asset_tile .asset_preview .photos-03 {
   /* no vertical space*/
   line-height: 0;
@@ -30074,14 +30075,14 @@ ul.horizontal_tabs_gstudio > li.sub_group_action:hover ul {
   -webkit-row-gap: 0px;
   -moz-row-gap: 0px;
 }
-/* line 6916, ../../../scss/_app_styles.scss */
+/* line 6917, ../../../scss/_app_styles.scss */
 .asset_tile .asset_preview .photos-03 img {
   /* Just in case there are inline attributes */
   width: 100% !important;
   height: 70px !important;
 }
 @media (max-width: 1200px) {
-  /* line 6923, ../../../scss/_app_styles.scss */
+  /* line 6924, ../../../scss/_app_styles.scss */
   .asset_tile .asset_preview .photos-03 {
     -moz-row-count: 3;
     -webkit-column-count: 1;
@@ -30092,7 +30093,7 @@ ul.horizontal_tabs_gstudio > li.sub_group_action:hover ul {
   }
 }
 @media (max-width: 1000px) {
-  /* line 6934, ../../../scss/_app_styles.scss */
+  /* line 6935, ../../../scss/_app_styles.scss */
   .asset_tile .asset_preview .photos-03 {
     -moz-row-count: 3;
     -webkit-column-count: 1;
@@ -30103,7 +30104,7 @@ ul.horizontal_tabs_gstudio > li.sub_group_action:hover ul {
   }
 }
 @media (max-width: 800px) {
-  /* line 6945, ../../../scss/_app_styles.scss */
+  /* line 6946, ../../../scss/_app_styles.scss */
   .asset_tile .asset_preview .photos-03 {
     -moz-row-count: 3;
     -webkit-column-count: 0;
@@ -30114,7 +30115,7 @@ ul.horizontal_tabs_gstudio > li.sub_group_action:hover ul {
   }
 }
 @media (max-width: 400px) {
-  /* line 6956, ../../../scss/_app_styles.scss */
+  /* line 6957, ../../../scss/_app_styles.scss */
   .asset_tile .asset_preview .photos-03 {
     -moz-row-count: 3;
     -webkit-column-count: 1;
@@ -30124,11 +30125,11 @@ ul.horizontal_tabs_gstudio > li.sub_group_action:hover ul {
     -moz-row-gap: 0px;
   }
 }
-/* line 6967, ../../../scss/_app_styles.scss */
+/* line 6968, ../../../scss/_app_styles.scss */
 .asset_tile .asset_text {
   padding: 7px 0px 0px 0px;
 }
-/* line 6969, ../../../scss/_app_styles.scss */
+/* line 6970, ../../../scss/_app_styles.scss */
 .asset_tile .asset_text .asset_title {
   letter-spacing: 0.2px;
   overflow: hidden;
@@ -30137,11 +30138,11 @@ ul.horizontal_tabs_gstudio > li.sub_group_action:hover ul {
   padding-top: 10px;
   padding-left: 6px;
 }
-/* line 6977, ../../../scss/_app_styles.scss */
+/* line 6978, ../../../scss/_app_styles.scss */
 .asset_tile .asset_text .asset_title .filenode {
   z-index: -1;
 }
-/* line 6983, ../../../scss/_app_styles.scss */
+/* line 6984, ../../../scss/_app_styles.scss */
 .asset_tile .asset_text .asset_desc {
   letter-spacing: 0.3px;
   overflow: hidden;
@@ -30150,7 +30151,7 @@ ul.horizontal_tabs_gstudio > li.sub_group_action:hover ul {
   color: grey;
 }
 
-/* line 6994, ../../../scss/_app_styles.scss */
+/* line 6995, ../../../scss/_app_styles.scss */
 .audio_tile {
   display: inline-block;
   margin-top: 10px;
@@ -30161,22 +30162,22 @@ ul.horizontal_tabs_gstudio > li.sub_group_action:hover ul {
   width: 270px;
   margin-right: 15px;
 }
-/* line 7004, ../../../scss/_app_styles.scss */
+/* line 7005, ../../../scss/_app_styles.scss */
 .audio_tile .audio_preview audio {
   width: 100%;
 }
-/* line 7007, ../../../scss/_app_styles.scss */
+/* line 7008, ../../../scss/_app_styles.scss */
 .audio_tile .audio_preview figcaption {
   margin-left: 5px;
 }
-/* line 7012, ../../../scss/_app_styles.scss */
+/* line 7013, ../../../scss/_app_styles.scss */
 .audio_tile:hover {
   border-width: 2px 2px 5px 2px;
   border-style: solid;
   border-color: #ce7869;
 }
 
-/* line 7023, ../../../scss/_app_styles.scss */
+/* line 7024, ../../../scss/_app_styles.scss */
 .template_tile {
   display: inline-block;
   margin-top: 10px;
@@ -30187,26 +30188,26 @@ ul.horizontal_tabs_gstudio > li.sub_group_action:hover ul {
   width: 120px;
   margin-right: 15px;
 }
-/* line 7033, ../../../scss/_app_styles.scss */
+/* line 7034, ../../../scss/_app_styles.scss */
 .template_tile .template_preview {
   height: 85px;
   width: 100%;
 }
-/* line 7036, ../../../scss/_app_styles.scss */
+/* line 7037, ../../../scss/_app_styles.scss */
 .template_tile .template_preview img {
   width: 100%;
 }
-/* line 7040, ../../../scss/_app_styles.scss */
+/* line 7041, ../../../scss/_app_styles.scss */
 .template_tile:hover {
   border-width: 2px 2px 5px 2px;
   border-style: solid;
   border-color: #ce7869;
 }
-/* line 7046, ../../../scss/_app_styles.scss */
+/* line 7047, ../../../scss/_app_styles.scss */
 .template_tile .template_text {
   padding: 10px 0px 0px 0px;
 }
-/* line 7048, ../../../scss/_app_styles.scss */
+/* line 7049, ../../../scss/_app_styles.scss */
 .template_tile .template_text .template_title {
   letter-spacing: 0.2px;
   overflow: hidden;
@@ -30215,7 +30216,7 @@ ul.horizontal_tabs_gstudio > li.sub_group_action:hover ul {
   padding-top: 22px;
   padding-left: 6px;
 }
-/* line 7057, ../../../scss/_app_styles.scss */
+/* line 7058, ../../../scss/_app_styles.scss */
 .template_tile .template_text .template_desc {
   letter-spacing: 0.3px;
   overflow: hidden;
@@ -30224,7 +30225,7 @@ ul.horizontal_tabs_gstudio > li.sub_group_action:hover ul {
   color: grey;
 }
 
-/* line 7071, ../../../scss/_app_styles.scss */
+/* line 7072, ../../../scss/_app_styles.scss */
 .preview_asset {
   background: #ccc;
   border: 2px solid #999;
@@ -30234,20 +30235,20 @@ ul.horizontal_tabs_gstudio > li.sub_group_action:hover ul {
 }
 
 /*  Asset detail */
-/* line 7082, ../../../scss/_app_styles.scss */
+/* line 7083, ../../../scss/_app_styles.scss */
 .overlay-head {
   background-color: #fff;
   height: 60px;
   margin-bottom: 20px;
 }
 
-/* line 7088, ../../../scss/_app_styles.scss */
+/* line 7089, ../../../scss/_app_styles.scss */
 .listing-row {
   margin-top: 10px !important;
   background-color: #ffffff;
 }
 
-/* line 7093, ../../../scss/_app_styles.scss */
+/* line 7094, ../../../scss/_app_styles.scss */
 .orange-button {
   color: #ce7869;
   padding: 7px 14px;
@@ -30261,13 +30262,13 @@ ul.horizontal_tabs_gstudio > li.sub_group_action:hover ul {
   margin-top: 8px;
   cursor: pointer;
 }
-/* line 7105, ../../../scss/_app_styles.scss */
+/* line 7106, ../../../scss/_app_styles.scss */
 .orange-button:hover {
   background-color: rgba(206, 120, 105, 0.2);
   color: #ce7869;
 }
 
-/* line 7112, ../../../scss/_app_styles.scss */
+/* line 7113, ../../../scss/_app_styles.scss */
 .explore-button {
   border-radius: 5px;
   text-transform: uppercase;
@@ -30279,7 +30280,7 @@ ul.horizontal_tabs_gstudio > li.sub_group_action:hover ul {
   border: 2px solid #6a0054;
   background-color: #6a0054;
 }
-/* line 7123, ../../../scss/_app_styles.scss */
+/* line 7124, ../../../scss/_app_styles.scss */
 .explore-button:hover {
   background-color: #ffffff;
   cursor: pointer;
@@ -30287,7 +30288,7 @@ ul.horizontal_tabs_gstudio > li.sub_group_action:hover ul {
 }
 
 /* asset description */
-/* line 7132, ../../../scss/_app_styles.scss */
+/* line 7133, ../../../scss/_app_styles.scss */
 .name-desc-asset-cont-area {
   width: 95%;
   margin-left: 24px;
