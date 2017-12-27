@@ -36261,214 +36261,36 @@ ul.nav_menu_1 > li > a.selected, ul.nav_menu_1 > li > a:hover {
   margin-right: 50px;
 }
 
-/* responsive footer */
-/* line 6303, ../../../scss/_clix_styles.scss */
-.clearfix {
-  clear: both;
-}
-
-/* line 6306, ../../../scss/_clix_styles.scss */
-.clr1 {
-  background: #FFFFFF;
-  color: #333743;
-}
-
-/* line 6307, ../../../scss/_clix_styles.scss */
-.clr2 {
-  background: #F1F3F5;
-  color: #8F94A3;
-}
-
-/* line 6308, ../../../scss/_clix_styles.scss */
-.clr3 {
-  background: rgba(221, 221, 221, 0.18);
-  color: #BDC3CF;
-}
-
-/* line 6309, ../../../scss/_clix_styles.scss */
-.clr4 {
-  background: rgba(221, 221, 221, 0.18);
-  color: #E3E7F2;
-}
-
-/* line 6310, ../../../scss/_clix_styles.scss */
-.clr5 {
-  color: #F1F3F5;
-}
-
-/* line 6311, ../../../scss/_clix_styles.scss */
-.clr6 {
-  color: #39B5A1;
-}
-
-/* line 6312, ../../../scss/_clix_styles.scss */
-.clr7 {
-  color: #D45245;
-}
-
-/*##### Footer Structure #####*/
-/* line 6317, ../../../scss/_clix_styles.scss */
-.bo-wrap {
-  clear: both;
-  width: auto;
-}
-
-/* line 6321, ../../../scss/_clix_styles.scss */
-.bo-footer {
-  clear: both;
-  width: auto;
-  padding: 5px;
-  width: 960px;
-  margin: 0 auto;
-}
-
-/* line 6329, ../../../scss/_clix_styles.scss */
-.bo-footer-social {
-  text-align: left;
-  line-height: 1px;
-  padding: 10px 10px 10px 10px;
-}
-/* line 6334, ../../../scss/_clix_styles.scss */
-.bo-footer-social > a {
-  color: #ce7869;
-  word-spacing: 8px;
-}
-/* line 6337, ../../../scss/_clix_styles.scss */
-.bo-footer-social > a:hover {
-  color: #ce7869;
-  border-bottom: 3px solid #ffc14e;
-}
-
-/* line 6347, ../../../scss/_clix_styles.scss */
-.bo-footer-copyright > a {
-  transition: link-color 0.15s ease-in-out 0s,border 0.15s ease-in-out 0s;
-  border-bottom: none;
-  color: #777;
-  text-decoration: none !important;
-  word-spacing: 3px;
-}
-/* line 6353, ../../../scss/_clix_styles.scss */
-.bo-footer-copyright > a:hover {
-  color: #777;
-  border-bottom: 3px solid #c90d97;
-}
-
-/* line 6360, ../../../scss/_clix_styles.scss */
-.bo-footer-smap {
-  width: 600px;
-  float: left;
-  padding: 5px 10px;
-  text-align: left;
-  font-size: 18px;
-  word-spacing: 20px;
-}
-
-/* line 6369, ../../../scss/_clix_styles.scss */
-.bo-footer-uonline {
-  width: 300px;
-  /* Account for margins + border values */
-  float: left;
-  padding: 5px 10px;
-  text-align: center;
-}
-
-/* line 6376, ../../../scss/_clix_styles.scss */
-.bo-footer-power {
-  width: 300px;
-  padding: 5px 10px;
-  float: left;
-  text-align: right;
-  font-size: 14px;
-  color: #636A7D;
-  vertical-align: middle;
-}
-
-/*##### Footer Responsive #####*/
-/* for 980px or less */
-@media screen and (max-width: 980px) {
-  /* line 6392, ../../../scss/_clix_styles.scss */
-  .bo-footer {
-    width: 95%;
-    padding: 1% 2%;
-  }
-
-  /* line 6396, ../../../scss/_clix_styles.scss */
-  .bo-footer-smap {
-    width: 33%;
-    padding: 1% 2%;
-  }
-
-  /* line 6400, ../../../scss/_clix_styles.scss */
-  .bo-footer-uonline {
-    width: 46%;
-    padding: 1% 2%;
-    float: right;
-    text-align: right;
-  }
-
-  /* line 6407, ../../../scss/_clix_styles.scss */
-  .bo-footer-power {
-    clear: both;
-    padding: 1% 2%;
-    width: auto;
-    float: none;
-    text-align: center;
-  }
-}
-/* for 700px or less */
-@media screen and (max-width: 600px) {
-  /* line 6418, ../../../scss/_clix_styles.scss */
-  .bo-footer-smap {
-    width: auto;
-    float: none;
-    text-align: center;
-  }
-
-  /* line 6424, ../../../scss/_clix_styles.scss */
-  .bo-footer-uonline {
-    width: auto;
-    float: none;
-    text-align: center;
-  }
-
-  /* line 6430, ../../../scss/_clix_styles.scss */
-  .bo-footer-power {
-    width: auto;
-    float: none;
-    text-align: center;
-  }
-}
-/* for 480px or less */
-/* line 6444, ../../../scss/_clix_styles.scss */
+/* line 6305, ../../../scss/_clix_styles.scss */
 .color-btn {
   background-color: #720f5e;
   width: 77px;
   margin-left: 17px;
 }
-/* line 6448, ../../../scss/_clix_styles.scss */
+/* line 6309, ../../../scss/_clix_styles.scss */
 .color-btn:hover {
   color: #720f5e;
   background-color: #ffffff;
 }
 
-/* line 6454, ../../../scss/_clix_styles.scss */
+/* line 6315, ../../../scss/_clix_styles.scss */
 .mid_label {
   margin-top: 15px;
   font-size: 15px;
 }
 
-/* line 6459, ../../../scss/_clix_styles.scss */
+/* line 6320, ../../../scss/_clix_styles.scss */
 .compulsory {
   color: red;
   font-size: smaller;
 }
 
-/* line 6464, ../../../scss/_clix_styles.scss */
+/* line 6325, ../../../scss/_clix_styles.scss */
 .select-drop {
   height: auto;
 }
 
-/* line 6468, ../../../scss/_clix_styles.scss */
+/* line 6329, ../../../scss/_clix_styles.scss */
 .template-select {
   border: 1px solid #cccccc;
   border-radius: 5px;
@@ -36477,41 +36299,41 @@ ul.nav_menu_1 > li > a.selected, ul.nav_menu_1 > li > a:hover {
   font-size: 14px;
 }
 
-/* line 6476, ../../../scss/_clix_styles.scss */
+/* line 6337, ../../../scss/_clix_styles.scss */
 .white-text {
   color: white;
 }
 
-/* line 6481, ../../../scss/_clix_styles.scss */
+/* line 6342, ../../../scss/_clix_styles.scss */
 .quiz-player .quiz_qtn {
   margin-left: 20px !important;
   font-size: 20px;
 }
-/* line 6485, ../../../scss/_clix_styles.scss */
+/* line 6346, ../../../scss/_clix_styles.scss */
 .quiz-player .question_edit {
   margin-left: 20px !important;
 }
-/* line 6489, ../../../scss/_clix_styles.scss */
+/* line 6350, ../../../scss/_clix_styles.scss */
 .quiz-player input[type=checkbox], .quiz-player input[type=radio] {
   margin-right: 10px;
   width: 15px;
   height: 15px;
 }
-/* line 6495, ../../../scss/_clix_styles.scss */
+/* line 6356, ../../../scss/_clix_styles.scss */
 .quiz-player .chk_ans_lbl, .quiz-player .rad_ans_lbl {
   font-size: 22px;
   margin-left: 5px;
 }
-/* line 6500, ../../../scss/_clix_styles.scss */
+/* line 6361, ../../../scss/_clix_styles.scss */
 .quiz-player .fi-check {
   color: green;
 }
-/* line 6504, ../../../scss/_clix_styles.scss */
+/* line 6365, ../../../scss/_clix_styles.scss */
 .quiz-player .fi-x {
   color: red;
 }
 
-/* line 6509, ../../../scss/_clix_styles.scss */
+/* line 6370, ../../../scss/_clix_styles.scss */
 .hyperlink-tag {
   cursor: pointer;
   cursor: pointer;
@@ -36524,7 +36346,7 @@ ul.nav_menu_1 > li > a.selected, ul.nav_menu_1 > li > a:hover {
   color: #164A7B;
 }
 
-/* line 6521, ../../../scss/_clix_styles.scss */
+/* line 6382, ../../../scss/_clix_styles.scss */
 .scard {
   background: #FFF;
   border: 1px solid #AAA;
@@ -36536,12 +36358,12 @@ ul.nav_menu_1 > li > a.selected, ul.nav_menu_1 > li > a:hover {
   height: 9rem;
   /*float:left;*/
 }
-/* line 6530, ../../../scss/_clix_styles.scss */
+/* line 6391, ../../../scss/_clix_styles.scss */
 .scard:hover {
   box-shadow: 0 2px 5px 2px rgba(0, 0, 0, 0.16), 0 2px 10px 1px rgba(0, 0, 0, 0.12);
   transition: box-shadow 0.5s ease;
 }
-/* line 6536, ../../../scss/_clix_styles.scss */
+/* line 6397, ../../../scss/_clix_styles.scss */
 .scard .scard_header {
   text-align: center;
   position: fixed;
@@ -36559,7 +36381,7 @@ ul.nav_menu_1 > li > a.selected, ul.nav_menu_1 > li > a:hover {
   font-weight: bold;
 }
 
-/* line 6553, ../../../scss/_clix_styles.scss */
+/* line 6414, ../../../scss/_clix_styles.scss */
 .scard-content {
   height: 2.7em;
   padding: 0.5rem;
@@ -36572,7 +36394,7 @@ ul.nav_menu_1 > li > a.selected, ul.nav_menu_1 > li > a:hover {
   /*height: 8.25rem;*/
   background-color: #3e3e3e;
 }
-/* line 6564, ../../../scss/_clix_styles.scss */
+/* line 6425, ../../../scss/_clix_styles.scss */
 .scard-content .scard-title {
   font-size: 0.8em;
   margin-top: -1em;
@@ -36582,7 +36404,7 @@ ul.nav_menu_1 > li > a.selected, ul.nav_menu_1 > li > a:hover {
   text-align: center;
 }
 
-/* line 6577, ../../../scss/_clix_styles.scss */
+/* line 6438, ../../../scss/_clix_styles.scss */
 .scard-action {
   height: height;
   font-size: 0.6em;
@@ -36596,7 +36418,7 @@ ul.nav_menu_1 > li > a.selected, ul.nav_menu_1 > li > a:hover {
   background-color: #CCCCCC;
 }
 
-/* line 6592, ../../../scss/_clix_styles.scss */
+/* line 6453, ../../../scss/_clix_styles.scss */
 .scard-desc {
   font-size: 0.7em;
   color: #333333;
@@ -36612,7 +36434,7 @@ ul.nav_menu_1 > li > a.selected, ul.nav_menu_1 > li > a:hover {
   display-inline: block;
 }
 
-/* line 6609, ../../../scss/_clix_styles.scss */
+/* line 6470, ../../../scss/_clix_styles.scss */
 .scard-image {
   padding: 0px;
   margin: 0px;
@@ -36623,7 +36445,7 @@ ul.nav_menu_1 > li > a.selected, ul.nav_menu_1 > li > a:hover {
   overflow: hidden;
   background-color: #f2f2f2;
 }
-/* line 6618, ../../../scss/_clix_styles.scss */
+/* line 6479, ../../../scss/_clix_styles.scss */
 .scard-image img {
   border-radius: 2px 2px 0 0;
   display: block;
@@ -36632,18 +36454,18 @@ ul.nav_menu_1 > li > a.selected, ul.nav_menu_1 > li > a:hover {
   height: 100%;
 }
 
-/* line 6630, ../../../scss/_clix_styles.scss */
+/* line 6491, ../../../scss/_clix_styles.scss */
 .published.scard-action {
   background: #A6D9CB;
 }
 
-/* line 6634, ../../../scss/_clix_styles.scss */
+/* line 6495, ../../../scss/_clix_styles.scss */
 .draft.scard-action {
   content: "Draft";
   background: #DCDCDC;
 }
 
-/* line 6640, ../../../scss/_clix_styles.scss */
+/* line 6501, ../../../scss/_clix_styles.scss */
 .scard_footer {
   border-top: 1px solid rgba(160, 160, 160, 0.2);
   padding: 0.25rem 0.5rem;
@@ -36652,17 +36474,17 @@ ul.nav_menu_1 > li > a.selected, ul.nav_menu_1 > li > a:hover {
   height: 2rem;
 }
 
-/* line 6648, ../../../scss/_clix_styles.scss */
+/* line 6509, ../../../scss/_clix_styles.scss */
 .auto_width {
   width: auto !important;
 }
 
-/* line 6652, ../../../scss/_clix_styles.scss */
+/* line 6513, ../../../scss/_clix_styles.scss */
 .explore-settings-drop {
   margin-left: 59%;
   display: inline-block;
 }
-/* line 6655, ../../../scss/_clix_styles.scss */
+/* line 6516, ../../../scss/_clix_styles.scss */
 .explore-settings-drop > button {
   color: #164a7b;
   font-weight: 400;
@@ -36675,17 +36497,17 @@ ul.nav_menu_1 > li > a.selected, ul.nav_menu_1 > li > a:hover {
   margin-top: 10px;
   margin-left: 20px;
 }
-/* line 6666, ../../../scss/_clix_styles.scss */
+/* line 6527, ../../../scss/_clix_styles.scss */
 .explore-settings-drop > button:hover {
   border-radius: 10px;
   background-color: #ddeff9;
   color: #164a7b;
 }
-/* line 6672, ../../../scss/_clix_styles.scss */
+/* line 6533, ../../../scss/_clix_styles.scss */
 .explore-settings-drop a {
   font-size: 16px;
 }
-/* line 6675, ../../../scss/_clix_styles.scss */
+/* line 6536, ../../../scss/_clix_styles.scss */
 .explore-settings-drop .f-dropdown li {
   font-size: 0.875rem;
   cursor: pointer;
@@ -36693,37 +36515,37 @@ ul.nav_menu_1 > li > a.selected, ul.nav_menu_1 > li > a:hover {
   margin: 0;
   background-color: #164A7B;
 }
-/* line 6683, ../../../scss/_clix_styles.scss */
+/* line 6544, ../../../scss/_clix_styles.scss */
 .explore-settings-drop .f-dropdown li a {
   color: #74b3dc;
 }
-/* line 6687, ../../../scss/_clix_styles.scss */
+/* line 6548, ../../../scss/_clix_styles.scss */
 .explore-settings-drop .f-dropdown li:hover {
   border-left: 4px solid #ffc14e;
 }
 
-/* line 6694, ../../../scss/_clix_styles.scss */
+/* line 6555, ../../../scss/_clix_styles.scss */
 .attempts_count {
   color: #000000 !important;
 }
 
-/* line 6700, ../../../scss/_clix_styles.scss */
+/* line 6561, ../../../scss/_clix_styles.scss */
 #course-settings-drop li a {
   text-align: left;
 }
 
-/* line 6708, ../../../scss/_clix_styles.scss */
+/* line 6569, ../../../scss/_clix_styles.scss */
 #asset-settings-drop li a {
   text-align: left;
 }
 
-/* line 6715, ../../../scss/_clix_styles.scss */
+/* line 6576, ../../../scss/_clix_styles.scss */
 .button-bg {
   background-color: #74b3dc;
 }
 
 /* Tools page css listing*/
-/* line 6722, ../../../scss/_clix_styles.scss */
+/* line 6583, ../../../scss/_clix_styles.scss */
 .polaroid {
   width: 330px;
   background-color: white;
@@ -36737,7 +36559,7 @@ ul.nav_menu_1 > li > a.selected, ul.nav_menu_1 > li > a:hover {
   cursor: pointer;
 }
 
-/* line 6735, ../../../scss/_clix_styles.scss */
+/* line 6596, ../../../scss/_clix_styles.scss */
 .polaroid:hover img {
   -webkit-transform: scale(1.05);
   -moz-transform: scale(1.05);
@@ -36746,26 +36568,26 @@ ul.nav_menu_1 > li > a.selected, ul.nav_menu_1 > li > a:hover {
   transform: scale(1.05);
 }
 
-/* line 6744, ../../../scss/_clix_styles.scss */
+/* line 6605, ../../../scss/_clix_styles.scss */
 .container {
   text-align: center;
   padding: 10px 20px;
   border-top: 5px solid #164a7b;
   margin-top: 0px;
 }
-/* line 6750, ../../../scss/_clix_styles.scss */
+/* line 6611, ../../../scss/_clix_styles.scss */
 .container > p {
   color: black;
   font-size: 16px;
   font-weight: 500;
 }
 
-/* line 6759, ../../../scss/_clix_styles.scss */
+/* line 6620, ../../../scss/_clix_styles.scss */
 .tool-bg {
   background-color: rgba(87, 198, 250, 0.07);
 }
 
-/* line 6762, ../../../scss/_clix_styles.scss */
+/* line 6623, ../../../scss/_clix_styles.scss */
 .purple-btn {
   width: inherit;
   text-transform: uppercase;
@@ -36776,7 +36598,7 @@ ul.nav_menu_1 > li > a.selected, ul.nav_menu_1 > li > a:hover {
   border: 2px solid #6a0054;
 }
 
-/* line 6772, ../../../scss/_clix_styles.scss */
+/* line 6633, ../../../scss/_clix_styles.scss */
 .disable-purple-btn {
   width: inherit;
   text-transform: uppercase !important;
@@ -36787,22 +36609,22 @@ ul.nav_menu_1 > li > a.selected, ul.nav_menu_1 > li > a:hover {
   border: 2px solid #4b4852;
 }
 
-/* line 6782, ../../../scss/_clix_styles.scss */
+/* line 6643, ../../../scss/_clix_styles.scss */
 .user-analytics-data {
   margin: 42px 37px 37px 37px;
   border: 2px solid #aaaaaa;
 }
-/* line 6785, ../../../scss/_clix_styles.scss */
+/* line 6646, ../../../scss/_clix_styles.scss */
 .user-analytics-data .close-reveal-modal {
   font-size: 20px;
 }
 
-/* line 6789, ../../../scss/_clix_styles.scss */
+/* line 6650, ../../../scss/_clix_styles.scss */
 .left-space {
   margin-left: 0.5em;
 }
 
-/* line 6797, ../../../scss/_clix_styles.scss */
+/* line 6658, ../../../scss/_clix_styles.scss */
 .top-right-menu {
   margin-right: 80px !important;
 }
