@@ -2,7 +2,9 @@
 {% load i18n %}
 {% load cache %}
 
-  {% get_group_object groupid as group_object %}
+  {% if groupid %}
+    {% get_group_object groupid as group_object %}
+  {% endif %}
   {% get_explore_url as explore_url %}
 
   {% if site.SITE_NAME != "NROER" %}
