@@ -9,13 +9,15 @@
 	"/static/ndf/bower_components/videojs/dist/video-js.min.css",
 	"/static/ndf/css/videojs-skin-color.css",
 	"/static/ndf/css/sgc-toc.css",
+	"/static/ndf/css/opensans-fonts.css",
 	"/static/ndf/css/rubik-fonts.css",
 	"/static/ndf/css/clix-activity-styles.css"],
 	"Misc": ["/static/ndf/bower_components/videojs/dist/video.js", 
 		"/static/ndf/bower_components/videojs/dist/video.min.js", 
 		"/static/ndf/js/assess-sizer.js",
 		"/static/ndf/js/photo-zoom.js",
-		"/static/ndf/bower_components/jquery/dist/jquery.min.js"
+		"/static/ndf/bower_components/jquery/dist/jquery.min.js",
+		"/static/ndf/bower_components/videojs/dist/video.js.map"
 	],
 	"Images": []
 }

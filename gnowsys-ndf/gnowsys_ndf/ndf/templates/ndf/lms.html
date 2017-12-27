@@ -96,16 +96,13 @@
               <li>
                   <a href="{% url 'create_event_group' group_id 'CourseEventGroup' %}" class="fi-volume"> {% trans "Announce" %}</a>
               </li>
-
               {% get_lessons group_object as lessons_list %}
-              <li class="lesson-dropdown">
-              <a href="#" class="fi-page-export"> {% trans "Export to ePub" %}</a>
-              <ul>
-                  {% for each_lesson in lessons_list  %}
-                  <li class="lesson_name_in_export"><a href="{% url 'export_to_epub' group_id each_lesson.pk %}" class="export_lesson" title="{{each_lesson.name}}">{{each_lesson.name|truncatechars:15}}</a></li>
-                  {% endfor %}
-              </ul>
+              {% include 'ndf/epub_export_widget.html' with exp_collection=lessons_list %}
+              <li class="lesson_name_in_export">
+                <a href="#" data-reveal-id='exportLesson' class="export_lesson" title="Export Content into distinct ePubs">Export Content into ePubs</a>
               </li>
+
+
               {% endif %}
 
               <li> <a data-reveal-id="delete-unit"><i class="fa fa-trash"></i> {% trans "Delete" %}</a> </li>
