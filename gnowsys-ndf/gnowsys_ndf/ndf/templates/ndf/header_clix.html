@@ -119,7 +119,7 @@
                 </li>
           
             {% if request.user.is_authenticated %}
-                <li class="has-dropdown buddy_margin white-text" style="margin-right: auto;"  title="{{ user.username }}">
+                <li class="has-dropdown not-click buddy_margin white-text" style="margin-right: auto;"  title="{{ user.username }}">
                     {% get_profile_pic request.user.pk as prof_pic %}
                     <!-- <a href="{% url 'dashboard' request.user.pk %}"> -->
                     
@@ -137,7 +137,7 @@
                         </li>
                         {% endif %}
                         <li>
-                          <a title="Click here to logout" class="logout" href="{% url 'auth_logout' %}">
+                          <a title="Click here to logout" class="logout"  style="background-color:#164A7B !important; " href="{% url 'auth_logout' %}">
                             <i class="fi-power"></i> &nbsp;{% trans "Logout" %}
                           </a>
                         </li>

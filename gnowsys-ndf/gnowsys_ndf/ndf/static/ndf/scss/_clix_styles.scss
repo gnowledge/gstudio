@@ -63,9 +63,7 @@ body>footer {
         font-weight: 600;
       }
 
-      .has-dropdown > a:after {
-        border-color: #000000 rgba(0, 0, 0, 0) rgba(0, 0, 0, 0) !important;
-      }
+      
 
       ul.dropdown {
         background: #fff !important;
@@ -1111,15 +1109,14 @@ h5{
                         border-left-width: 2px;
                         color: $secondry-blue;
                         background: $primary-blue;
-
-                    }
+                      }
 
                     &:hover, &.active{
                         a:not(.button){
                             background: $primary-blue;
                             color: $header-link-hover-color;
                             border-bottom: 0px;
-                            border-left-width: 2px;
+                            border-left: 2px solid $secondary-orange;
                             /*&:hover {
                                 color: $secondry-blue;
                                 border-bottom: 0px;
