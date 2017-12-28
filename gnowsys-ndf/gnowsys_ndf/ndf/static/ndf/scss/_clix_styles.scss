@@ -2632,7 +2632,7 @@ ul.jqtree-tree .jqtree-toggler {
         text-transform: uppercase;
 
         &.active {
-          background-color: $secondary-orange;
+          //background-color: $secondary-orange;
           border: 1px solid #CCC;
           border-bottom: 0px;
         }
@@ -5572,6 +5572,7 @@ $nav_menu_1_tab_border: #a2238d;
 ul.nav_menu_1 {
     margin-bottom: 0px;
     background-color: $nav_menu_1_bg_color;
+    border-bottom: 2px solid #80808063;
     >li {
             display: inline-block;
 
