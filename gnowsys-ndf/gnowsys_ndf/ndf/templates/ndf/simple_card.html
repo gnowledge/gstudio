@@ -23,6 +23,7 @@
 
   </style>
 <div class="scard-container" data-id="{{resource.pk}}">
+
  <div class="scard" data-mime-type="{{resource.if_file.mime_type}}" original-src="{% if 'video' in resource.if_file.mime_type   %}{{MEDIA_URL}}{{resource.if_file.mid.relurl}}{% else %}{{MEDIA_URL}}{{resource.if_file.original.relurl}}{% endif %}">
  {% if is_event %}
   {% get_event_status resource as event_status_msg %}
@@ -37,10 +38,13 @@
 {% if not no_url %}
 {% if first_arg and second_arg and third_arg %}
   <a href="{% url url_name first_arg second_arg third_arg %}{{search_url_text|safe}}">
+  
 {% elif first_arg and second_arg %}
   <a href="{% url url_name first_arg second_arg %}{{search_url_text|safe}}">
+  
 {% elif first_arg %}
   <a href='{% url url_name first_arg %}{{search_url_text|safe}}'>
+  
 {% else %}
   <a href='{% url url_name  %}{{search_url_text|safe}}'>
 {% endif %}
@@ -104,6 +108,8 @@
     {% endif %}
   </div>
 </div>
+
+
 <div class="scard-footer">
   <div class="scard-content" title="{% firstof resource.altnames resource.name %}">
    <span class="scard-title">{% firstof resource.altnames resource.name %}</span>    

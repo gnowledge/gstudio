@@ -296,17 +296,21 @@ margin-top:5px !important;
 
     {% group_type_info groupid request.user as grouptype %}
 
+<!-- 
+
     {% if collection.count > 0 %}
       <div class="content row active" id="view-collection" data-filetype="Collections">
         {% include "ndf/file_list_tab.html" with has_contributor=True resource_type=collection detail_urlname="page_details" filetype="Collections" res_type_name="" page_info=collection_pages %}
       </div>
   
-    {% else %}
+
+    {% else %} -->
       <!-- Tab View #1 - All (Case -I: default landing)-->
-      <div class="content row active" id="view-all" data-filetype="all">
+<!--       <div class="content row active" id="view-all" data-filetype="all">
         {% include "ndf/file_list_tab.html" with resource_type=files detail_urlname="file_detail" filetype="all" res_type_name="" page_info=file_pages %}
       </div>
-    {% endif %}
+    {% endif %} -->
+
       
     <!-- Tab View #1 - All (Case -II: ajax) -->
     <div class="content" id="view-all" data-filetype="all">

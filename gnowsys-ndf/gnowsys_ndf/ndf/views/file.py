@@ -295,7 +295,9 @@ def file(request, group_id, file_id=None, page_no=1):
                                  'files': files, 'docCollection': docCollection, 'imageCollection': imageCollection,
                                  'videoCollection': videoCollection,'pandoravideoCollection':pandoravideoCollection,
                                  'pandoraCollection': pandoraCollection,
-                                 'is_video':is_video,'groupid': group_id, 'group_id':group_id,"datavisual":datavisual
+
+                                 'is_video':is_video,'groupid': group_id, 'group_id':group_id,"datavisual":datavisual, 'group_name':group_name,
+
                                 },
                                 context_instance=RequestContext(request)
       )
@@ -1515,6 +1517,7 @@ def file_detail(request, group_id, _id):
     else:
          # raise Http404
          file_template = "ndf/document_detail.html"
+
     thread_node = None
     allow_to_comment = None
     thread_node, allow_to_comment = node_thread_access(group_id, file_node)
@@ -1552,7 +1555,6 @@ def file_detail(request, group_id, _id):
 
     annotations = json.dumps(file_node.annotations)
     # print "=== ", type(file_node)
-
     return render_to_response(file_template,
                               { 'node': file_node,
                                 'group_id': group_id,

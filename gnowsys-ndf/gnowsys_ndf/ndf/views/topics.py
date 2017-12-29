@@ -131,7 +131,8 @@ def themes(request, group_id, app_id=None, app_set_id=None):
                                'nodes':nodes_dict,'app_id': app_id,'app_name': appName,"selected": selected,
                                'title': title,'themes_list_items': themes_list_items,
                                'themes_hierarchy': themes_hierarchy, 'unfold': unfold,
-                                'appId':app._id,
+                               'appId':app._id,'group_name':group_name
+
                                },
                              
                               context_instance = RequestContext(request)
