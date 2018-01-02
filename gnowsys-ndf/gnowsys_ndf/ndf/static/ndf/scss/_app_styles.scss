@@ -5474,7 +5474,7 @@ ul.horizontal_tabs_gstudio {
     
     .group_banner {
         @include transition-prop(all);
-        height: 300px;
+        height: 200px;
         overflow-y: auto;
         background: url('/static/ndf/images/course-cover.png') no-repeat;
         background-size: 100% 100%;
