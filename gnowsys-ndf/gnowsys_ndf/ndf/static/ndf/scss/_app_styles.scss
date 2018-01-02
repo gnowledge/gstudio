@@ -3077,11 +3077,12 @@ $course-envelop-color: #fff;
 
     .note-page {
       // display: none;
+      margin-left: 15px;
       background-color: #fff;
       padding-bottom: 30px;
-      //.group_sections_content{
-      //  margin-top:5px;
-      //}
+      .group_sections_content{
+       margin-top:5px;
+      }
       .group_content{
         margin-top:5px;
         margin-left:0px;
@@ -6781,6 +6782,7 @@ $ah_2_background_color_hover: rgba(244, 244, 244, 0.3);;
     margin-bottom: 25px;
     padding-bottom: 10px;
     cursor: pointer;
+    background-color: white;
     //height:7rem;
     //margin-left: 3px;
     height:260px;
@@ -7207,10 +7209,8 @@ $ah_2_background_color_hover: rgba(244, 244, 244, 0.3);;
                 color: gray;
                 border: 0px solid $secondry-blue; 
             }
-
-        }
+    }
     
-
     .course_heading {
         input {
             width: 500px;
@@ -7633,6 +7633,8 @@ $ah_2_background_color_hover: rgba(244, 244, 244, 0.3);;
     }
 
 }
+
+
 
 .top-bar-second, .top-bar-second .name {
     height: 52px;
@@ -8311,28 +8313,6 @@ $module-card-lines-to-show: 3;
 }
 
 
-/*  Buttons custom css */
-.secondary-header-tabs{
-   color: #719dc7;
-    font-weight: 400;
-    padding: 14px 10px 3px 10px;
-    cursor: pointer;
-    transition: color 1s ease, border-color 1s ease;
-    -webkit-transition: color 1s ease, border-color 1s ease;
-    display: inline-block;
-
-    &:hover{
-        color: $primary-blue;
-
-    }
-    &.active{
-        color: $primary-blue;
-        border-bottom: 2px solid $primary-blue;
-        padding-bottom: 14px;
-        font-weight: 600;
-
-    }
-}
 
 .explore-settings-drop{
     margin-left: 59%;
@@ -8615,4 +8595,14 @@ $inCompleteBgColor: #fd9e29;
       }
 
     }
+}
+
+.inner
+{
+    display: inline-block !important;
+}
+
+.mid_label{
+    margin-top: 15px;
+    font-size: 15px;    
 }
