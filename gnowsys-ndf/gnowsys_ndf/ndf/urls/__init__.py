@@ -51,7 +51,9 @@ urlpatterns = patterns('',
     # all main apps
     (r'^(?P<group_id>[^/]+)/mailclient', include('gnowsys_ndf.ndf.urls.mailclient')),
     (r'^(?P<group_id>[^/]+)/analytics', include('gnowsys_ndf.ndf.urls.analytics')),
+
     (r'^(?P<group_id>[^/]+)/file', include('gnowsys_ndf.ndf.urls.file')),
+    
     (r'^(?P<group_id>[^/]+)/jhapp', include('gnowsys_ndf.ndf.urls.jhapp')),
     (r'^(?P<group_id>[^/]+)/filehive', include('gnowsys_ndf.ndf.urls.filehive')),
     (r'^(?P<group_id>[^/]+)/image', include('gnowsys_ndf.ndf.urls.image')),
@@ -83,7 +85,10 @@ urlpatterns = patterns('',
     (r'^(?P<group_id>[^/]+)/ratings', include('gnowsys_ndf.ndf.urls.ratings')),
     (r'^(?P<group_id>[^/]+)/topics', include('gnowsys_ndf.ndf.urls.topics')),
     (r'^(?P<group_id>[^/]+)/curriculum', include('gnowsys_ndf.ndf.urls.curriculum')),
-    (r'^(?P<group_id>[^/]+)/e-library', include('gnowsys_ndf.ndf.urls.e-library')),
+
+
+    (r'^(?P<group_name>[^/]+)/e-library', include('gnowsys_ndf.ndf.urls.e-library')),
+
     (r'^(?P<group_id>[^/]+)/e-book', include('gnowsys_ndf.ndf.urls.e-book')),
     (r'^(?P<group_id>[^/]+)/term', include('gnowsys_ndf.ndf.urls.term')),
     (r'^(?P<group_id>[^/]+)/event', include('gnowsys_ndf.ndf.urls.event')),

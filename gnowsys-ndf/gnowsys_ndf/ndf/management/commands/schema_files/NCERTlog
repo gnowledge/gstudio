@@ -1,0 +1,36 @@
+######### Script ran on : Fri Nov 17 16:17:38 2017 #########
+------------------------------------------------------------
+
+!! FileNotFound: Following path (/home/docker/code/gstudio/gnowsys-ndf/gnowsys_ndf/ndf/management/commands/schema_files/NCERT) doesn't exists!!!
+
+!! FileNotFound: Following path (/home/docker/code/gstudio/gnowsys-ndf/gnowsys_ndf/ndf/management/commands/schema_files/NCERT) doesn't exists!!!
+
+ ============================================================ End of Iteration ============================================================
+
+
+######### Script ran on : Fri Nov 17 16:18:47 2017 #########
+------------------------------------------------------------
+
+!! FileNotFound: Following path (/home/docker/code/gstudio/gnowsys-ndf/gnowsys_ndf/ndf/management/commands/schema_files/NCERT) doesn't exists!!!
+
+!! FileNotFound: Following path (/home/docker/code/gstudio/gnowsys-ndf/gnowsys_ndf/ndf/management/commands/schema_files/NCERT) doesn't exists!!!
+
+ ============================================================ End of Iteration ============================================================
+
+
+######### Script ran on : Fri Nov 17 16:19:25 2017 #########
+------------------------------------------------------------
+
+!! FileTypeError: Please choose either 'csv' or 'json' format supported files!!!
+global name 'error_mesage' is not defined
+ ============================================================ End of Iteration ============================================================
+
+
+######### Script ran on : Fri Nov 17 16:19:44 2017 #########
+------------------------------------------------------------
+
+!! FileTypeError: Please choose either 'csv' or 'json' format supported files!!!
+global name 'error_mesage' is not defined
+ ============================================================ End of Iteration ============================================================
+
+

@@ -213,7 +213,8 @@ def nroer_groups(request, group_id, groups_category):
                           {'group_nodes': group_nodes, "groups_category": groups_category,
                            #'group_nodes_count': group_nodes_count,
                           'app_gst': app_gst,
-                           'groupid': group_id, 'group_id': group_id,
+                           'groupid': group_id, 'group_id': group_id, 'group_name':group_name
+
 
                           }, context_instance=RequestContext(request))
 

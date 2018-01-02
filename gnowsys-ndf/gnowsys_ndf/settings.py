@@ -475,7 +475,6 @@ TEMPLATE_CONTEXT_PROCESSORS = (
     # 'django.core.context_processors.csrf',
 )
 
-
 djcelery.setup_loader()
 # # CELERY_RESULT_BACKEND = "mongodb"
 CELERY_RESULT_BACKEND = "djcelery.backends.database:DatabaseBackend"

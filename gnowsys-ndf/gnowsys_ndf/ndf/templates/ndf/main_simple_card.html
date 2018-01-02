@@ -11,7 +11,11 @@
 {% elif first_arg and second_arg %}
   <a class="app-card text-center" href="{% url url_name first_arg second_arg %}{{search_url_text|safe}}">
 {% elif first_arg %}
+
+<!--   <a class="app-card text-center" href='{% url url_name first_arg %}{{search_url_text|safe}}partners'>
+ -->  
   <a class="app-card text-center" href='{% url url_name first_arg %}{{search_url_text|safe}}'>
+
 {% endif %}
    <div class="app-card-title"><h4>{% firstof resource.altnames resource.name %}</h4></div>
 
