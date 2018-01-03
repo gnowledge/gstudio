@@ -1,209 +1,146 @@
-
 {% extends "ndf/gbase.html" %}
 {% load i18n %}
 {% load ndf_tags %}
 {% block body_content %}
 
 <style type="text/css">
-  
-  .notification_body{
-    max-width: 1546px !important;
-    margin: 0 auto !important;
-    display: -moz-box !important;
-    display: -ms-flexbox !important;
-    display: -webkit-box !important;
-    display: -webkit-flex !important;
-    display: flex !important;
-    flex-direction: column !important;
-    padding-bottom: 32px !important;
-    -webkit-flex-direction: column !important;
-    -ms-flex-direction: column !important;
-    -webkit-box-orient: vertical !important;
-    -webkit-box-direction: normal !important;
-    background: #fff;
-    box-shadow: 0px 2px 6px #000;
+  .create-new-task{
+    border: 2px solid black;
+    width: 60%;
+    margin-left: 100px;
   }
-        
-    .notifications_content{
-            display: -moz-box !important;
-            display: -ms-flexbox !important;
-            display: -webkit-box !important;
-            display: -webkit-flex !important;
-            display: flex !important;
-            align-items: center !important;
-            justify-content: space-between !important;
-            width: 100% !important;
-            box-sizing: border-box !important;
-            padding: 16px 8px !important;
-            -webkit-align-items: center !important;
-            -webkit-justify-content: space-between !important;
-            -moz-box-sizing: border-box !important;
-            -ms-flex-align: center !important;
-            -webkit-box-align: center !important;
-            -ms-flex-pack: justify !important;
-            -webkit-box-pack: justify !important;
-                &:hover{
-                background: #F0F1F2 !important;
-            }
-    .content-body{
-            border-bottom: 1px solid #D6D8DA !important;
 
-    }
 
+
+  input[type="file"]:before {
+    content: 'Select files';
+    display: inline-block;
+    border: 1px solid #999;
+    border-radius: 5px;
+    padding: 8px 10px;
+    outline: none;
+    white-space: nowrap;
+    -webkit-user-select: none;
+    cursor: pointer;
+    font-weight: 500;
+    // //font-size: 10pt;
+    color: black;
+    border-color: black;
+    float: right;
+    background-color: gray;
+}
+input[type="file"] {
+    padding: 5px;
+    margin-top: 10px;
+    margin-left: 30.4px;
+    border-radius: 4px;
+    border: 1px solid #ccc;
+    width: 95%;
+}
 </style>
 
 
-    <div class="notification_body">
-      <div class="content-body">
-        <div class="notifications_content">
-            <div class="small-1 columns">
-              <a href="#">
-                <img class="img-circle" src="/static/ndf/images/gnu-head.png" style="margin-top:-12px;"/>
-              </a>
-            </div>
-            <div class="small-14 columns">
-              This is an info alert with a radius.
-              This is an info alert with a radius. Trying if the notication is big enough.
-              This is an info alert with a radius.
-              This is an info alert with a radius. Trying if the notication is big enough.
-              This is an info alert with a radius.
-            </div>
-        </div>
-        <div style="
-        color: orange;
-        margin-left: 140px;
-        margin-top: -25px;
-    ">
-          <i class="fa fa-clock-o fa-1x" aria-hidden="true"></i> 8 hours ago.
-        </div>
-      </div>
+<div class="create-new-task">
+  <div class="row">
+    <div class="small-11 columns">
+      <h4> New Task </h4>
     </div>
-    <div class="notification_body">
-      <div class="content-body">
-        <div class="notifications_content">
-            <div class="small-1 columns">
-              <a href="#">
-                <img class="img-circle" src="/static/ndf/images/gnu-head.png" style="margin-top:-12px;"/>
-              </a>
-            </div>
-            <div class="small-14 columns">
-              This is an info alert with a radius.
-              This is an info alert with a radius. Trying if the notication is big enough.
-              This is an info alert with a radius.
-              This is an info alert with a radius. Trying if the notication is big enough.
-              This is an info alert with a radius.
-            </div>
-        </div>
-        <div style="
-        color: orange;
-        margin-left: 140px;
-        margin-top: -25px;
-    ">
-          <i class="fa fa-clock-o fa-1x" aria-hidden="true"></i> 8 hours ago.
-        </div>
-      </div>
+  </div>
+  <div class="row">
+    <div class="small-3 columns">
+      <h6> Task Name </h6>
     </div>
-<div class="notification_body">
-      <div class="content-body">
-        <div class="notifications_content">
-            <div class="small-1 columns">
-              <a href="#">
-                <img class="img-circle" src="/static/ndf/images/gnu-head.png" style="margin-top:-12px;"/>
-              </a>
-            </div>
-            <div class="small-14 columns">
-              This is an info alert with a radius.
-              This is an info alert with a radius. Trying if the notication is big enough.
-              This is an info alert with a radius.
-              This is an info alert with a radius. Trying if the notication is big enough.
-              This is an info alert with a radius.
-            </div>
-        </div>
-        <div style="
-        color: orange;
-        margin-left: 140px;
-        margin-top: -25px;
-    ">
-          <i class="fa fa-clock-o fa-1x" aria-hidden="true"></i> 8 hours ago.
-        </div>
-      </div>
+    <div class="small-9 columns">
+      <input type="text" placeholder="Enter Task name" />
     </div>
-<div class="notification_body">
-      <div class="content-body">
-        <div class="notifications_content">
-            <div class="small-1 columns">
-              <a href="#">
-                <img class="img-circle" src="/static/ndf/images/gnu-head.png" style="margin-top:-12px;"/>
-              </a>
-            </div>
-            <div class="small-14 columns">
-              This is an info alert with a radius.
-              This is an info alert with a radius. Trying if the notication is big enough.
-              This is an info alert with a radius.
-              This is an info alert with a radius. Trying if the notication is big enough.
-              This is an info alert with a radius.
-            </div>
-        </div>
-        <div style="
-        color: orange;
-        margin-left: 140px;
-        margin-top: -25px;
-    ">
-          <i class="fa fa-clock-o fa-1x" aria-hidden="true"></i> 8 hours ago.
-        </div>
-      </div>
+  </div>
+  <div class="row">
+    <div class="small-1 columns"> 
+      <h6>Start Date </h6>
     </div>
-<div class="notification_body">
-      <div class="content-body">
-        <div class="notifications_content">
-            <div class="small-1 columns">
-              <a href="#">
-                <img class="img-circle" src="/static/ndf/images/gnu-head.png" style="margin-top:-12px;"/>
-              </a>
-            </div>
-            <div class="small-14 columns">
-              This is an info alert with a radius.
-              This is an info alert with a radius. Trying if the notication is big enough.
-              This is an info alert with a radius.
-              This is an info alert with a radius. Trying if the notication is big enough.
-              This is an info alert with a radius.
-            </div>
-        </div>
-        <div style="
-        color: orange;
-        margin-left: 140px;
-        margin-top: -25px;
-    ">
-          <i class="fa fa-clock-o fa-1x" aria-hidden="true"></i> 8 hours ago.
-        </div>
-      </div>
+    <div class="small-2 columns">
+      <input id="start_date" class="date_month_day_year" type="text" placeholder="DD/MM/YYYY" value="" name="start_time" readonly="">
     </div>
-<div class="notification_body">
-      <div class="content-body">
-        <div class="notifications_content">
-            <div class="small-1 columns">
-              <a href="#">
-                <img class="img-circle" src="/static/ndf/images/gnu-head.png" style="margin-top:-12px;"/>
-              </a>
-            </div>
-            <div class="small-14 columns">
-              This is an info alert with a radius.
-              This is an info alert with a radius. Trying if the notication is big enough.
-              This is an info alert with a radius.
-              This is an info alert with a radius. Trying if the notication is big enough.
-              This is an info alert with a radius.
-            </div>
-        </div>
-        <div style="
-        color: orange;
-        margin-left: 140px;
-        margin-top: -25px;
-    ">
-          <i class="fa fa-clock-o fa-1x" aria-hidden="true"></i> 8 hours ago.
-        </div>
-      </div>
+    <div class="small-1 columns">
+      <h6> Start Time </h6>
     </div>
-
+    <div class="small-2 columns">
+      <input type="text" placeholder="Enter Start time" />
+    </div>
+    <div class="small-1 columns">
+      <h6>Due Date</h6>
+    </div>
+    <div class="small-2 columns">
+      <input id="due_date" class="date_month_day_year" type="text" placeholder="DD/MM/YYYY" value="" name="due_date" readonly="">
+    </div>
+    <div class="small-1 columns">
+      <h6> Due Time </h6>
+    </div>
+    <div class="small-2 columns">
+      <input type="text" placeholder="Enter Start time" />
+    </div>
+  </div>
+  <div class="row">
+    <div class="small-3 columns">
+      <h6> Created By: </h6>
+    </div>
+    <div class="small-9 columns">
+      <input type="text" placeholder="Enter Task name" />
+    </div>
+  </div>
+  <div class="row">
+    <div class="small-3 columns">
+      <h6> Assigned To: </h6>
+    </div>
+    <div class="small-9 columns">
+      <input type="text" placeholder="Enter Task name" />
+    </div>
+  </div>
+  <div class="row">
+    <div class="small-1 columns">
+      <h6>Status</h6>
+    </div>
+    <div class="small-5 columns">
+      <select required="" class="medium" id="customDropdown" name="Status" data-invalid="">
+        <option selected="selected" value="New" id="New">{% trans 'New' %}</option>
+        <option value="In Progress" id="In Progress">{% trans 'In Progress' %}</option>
+      </select>
+    </div>
+    <div class="small-1 columns">
+      <h6>Priority</h6>
+    </div>
+    <div class="small-5 columns">
+      <select required="" class="medium" id="customDropdown1" name="Priority" data-invalid="">
+        <option value="Low" id="Low">{% trans 'Low' %}</option>
+        <option value="High" id="High">{% trans 'High' %}</option>
+        <option value="Immediate" id="Immediate">{% trans 'Immediate' %}</option></select>
+      </select>
+    </div>
+  </div>
+  
+  <div class="row">
+    <div class="small-3 columns">
+      <h6>Supporting Files (if any ):</h6>
+    </div>
+    <div class="small-9 columns">
+      <input type="file" class="button" name="" onChange="" id="" value= ""/>
+    </div>
+  </div>
+  <div class="row">
+    <div class="small-2 columns">
+      <h6>Description:</h6>
+    </div>
+    <div class="small-10 columns">
+      <textarea rows="4" cols="50">
+      </textarea>
+    </div>
+  </div>
+  <div class="row">
+    <div class="small-12 columns">
+      <button type="button" class="button expand">Create Task</button>
+    </div>
+  </div>
+</div>
 
 
 
