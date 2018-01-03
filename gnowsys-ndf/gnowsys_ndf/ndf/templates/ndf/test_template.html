@@ -5,9 +5,14 @@
 
 <style type="text/css">
   .create-new-task{
-    border: 2px solid black;
-    width: 60%;
-    margin-left: 100px;
+      width: 60%;
+      margin-left: 17%;
+      border-left: 2px solid gray;
+      height: 460px;
+      border-bottom: 2px solid gray;
+      border-right: 2px solid gray;
+      border-top: 2px solid gray;
+      margin-top: 5px;
   }
 
 
@@ -37,110 +42,143 @@ input[type="file"] {
     border: 1px solid #ccc;
     width: 95%;
 }
+.vl {
+    border-left: 1px solid gray;
+    height: 300px;
+}
+
 </style>
 
-
 <div class="create-new-task">
-  <div class="row">
     <div class="small-11 columns">
       <h4> New Task </h4>
     </div>
+  <hr/>
+  <div class="small-6 columns ">
+      <div class="row">
+        <div class="small-3 columns">
+          <h6> Task Name </h6>
+        </div>
+        <div class="small-9 columns">
+          <input type="text" placeholder="Enter Task name" />
+        </div>
+      </div>
+      <div class="row">
+        <div class="small-3 columns">
+          <h6>Task Type:</h6>
+        </div>
+        <div class="small-9 columns" >
+          <select required="" class="medium" id="customDropdown" name="Status" data-invalid="" style="background-color:#719dc7;">
+            <option selected="selected" value="Feature" id="Feature">{% trans 'Feature' %}</option>
+            <option value="Support" id="Support">{% trans 'Support' %}</option>
+          </select>
+        </div>
+      </div>
+      <div class="row">
+        <div class="small-3 columns"> 
+          <h6>Start Date </h6>
+        </div>
+        <div class="small-3 columns">
+          <input id="start_date" class="date_month_day_year" type="text" style="background-color:#719dc7;" placeholder="DD/MM/YYYY" value="" name="start_time" readonly="">
+        </div>
+        <div class="small-3 columns">
+          <h6>Due Date</h6>
+        </div>
+        <div class="small-3 columns">
+          <input id="due_date" class="date_month_day_year" type="text" style="background-color:#719dc7;"   placeholder="DD/MM/YYYY" value="" name="due_date" readonly="">
+        </div>
+      </div>
+      <div class="row">
+        <div class="small-3 columns">
+          <h6> Created By: </h6>
+        </div>
+        <div class="small-9 columns">
+          <input type="text" placeholder="Write the name of the creator" />
+        </div>
+      </div>
+      <div class="row">
+        <div class="small-3 columns">
+          <h6>Status:</h6>
+        </div>
+        <div class="small-9 columns" >
+          <select required="" class="medium" id="customDropdown" name="Status" data-invalid="" style="background-color:#719dc7;">
+            <option selected="selected" value="New" id="New">{% trans 'New' %}</option>
+            <option value="In Progress" id="In Progress">{% trans 'In Progress' %}</option>
+          </select>
+        </div>
+      </div>
+      <div class="row">
+        <div class="small-3 columns">
+          <h6>Priority</h6>
+        </div>
+        <div class="small-9 columns">
+          <select required="" class="medium" id="customDropdown1" name="Priority" data-invalid="" style="background-color:#719dc7;">
+            <option value="Low" id="Low">{% trans 'Low' %}</option>
+            <option value="High" id="High">{% trans 'High' %}</option>
+            <option value="Immediate" id="Immediate">{% trans 'Immediate' %}</option>
+          </select>
+        </div>
+      </div>
   </div>
-  <div class="row">
-    <div class="small-3 columns">
-      <h6> Task Name </h6>
-    </div>
-    <div class="small-9 columns">
-      <input type="text" placeholder="Enter Task name" />
-    </div>
+  <div class="small-6 columns vl">
+      <div class="row">
+        <div class="small-3 columns">
+          <h6> Assigned To: </h6>
+        </div>
+        <div class="small-9 columns" style="margin-top:2px;">
+          <a href="#" style="color:#3b7ebe">Add Assignees</a>
+        </div>
+      </div>
+      <div class="row">
+        <div class="small-3 columns">
+          <h6>Supporting Files:</h6>
+        </div>
+        <div class="small-9 columns">
+          <!--<input type="file" class="button" name="" onChange="" id="" value= ""/>-->
+          <a href="#" style="color:#3b7ebe">Upload Files</a>
+          
+        </div>
+      </div>
+      <div class="row">
+        <div class="small-3 columns">
+          <h6>Estimated Hours:</h6>
+        </div>
+        <div class="small-9 columns">
+          <input type="text" placeholder="Approx hours of work" />
+        </div>
+      </div>
+      <div class="row">
+        <div class="small-3 columns">
+          <h6>To be Done By:</h6>
+        </div>
+        <div class="small-9 columns" >
+          <select required="" class="medium" id="customDropdown" name="Status" data-invalid="" style="background-color:#719dc7;">
+            <option selected="selected" value="Single Assignee" id="Single Assignee">{% trans 'Single Assignee' %}</option>
+            <option value="Multiple Assignee" id="Multiple Assignee">{% trans 'Multiple Assignee' %}</option>
+            <option value="Group Assignee" id="Group Assignee">{% trans 'Group Assignee' %}</option>
+          </select>
+        </div>
+      </div>
+      <div class="row">
+        <div class="small-3 columns">
+          <h6>Notes:</h6>
+        </div>
+        <div class="small-9 columns">
+          <textarea rows="5" cols="50">
+          </textarea>
+        </div>
+      </div>
   </div>
-  <div class="row">
-    <div class="small-1 columns"> 
-      <h6>Start Date </h6>
+  <hr/>
+
+    <div class="small-2 columns right">
+      <button type="button" class="button expand" style="background-color:#164A7B; border-radius:10px;">Cancel</button>
     </div>
-    <div class="small-2 columns">
-      <input id="start_date" class="date_month_day_year" type="text" placeholder="DD/MM/YYYY" value="" name="start_time" readonly="">
+    <div class="small-2 columns right">
+      <button type="button" class="button expand" style="background-color:#164A7B; border-radius:10px;">Create Task</button>
     </div>
-    <div class="small-1 columns">
-      <h6> Start Time </h6>
-    </div>
-    <div class="small-2 columns">
-      <input type="text" placeholder="Enter Start time" />
-    </div>
-    <div class="small-1 columns">
-      <h6>Due Date</h6>
-    </div>
-    <div class="small-2 columns">
-      <input id="due_date" class="date_month_day_year" type="text" placeholder="DD/MM/YYYY" value="" name="due_date" readonly="">
-    </div>
-    <div class="small-1 columns">
-      <h6> Due Time </h6>
-    </div>
-    <div class="small-2 columns">
-      <input type="text" placeholder="Enter Start time" />
-    </div>
-  </div>
-  <div class="row">
-    <div class="small-3 columns">
-      <h6> Created By: </h6>
-    </div>
-    <div class="small-9 columns">
-      <input type="text" placeholder="Enter Task name" />
-    </div>
-  </div>
-  <div class="row">
-    <div class="small-3 columns">
-      <h6> Assigned To: </h6>
-    </div>
-    <div class="small-9 columns">
-      <input type="text" placeholder="Enter Task name" />
-    </div>
-  </div>
-  <div class="row">
-    <div class="small-1 columns">
-      <h6>Status</h6>
-    </div>
-    <div class="small-5 columns">
-      <select required="" class="medium" id="customDropdown" name="Status" data-invalid="">
-        <option selected="selected" value="New" id="New">{% trans 'New' %}</option>
-        <option value="In Progress" id="In Progress">{% trans 'In Progress' %}</option>
-      </select>
-    </div>
-    <div class="small-1 columns">
-      <h6>Priority</h6>
-    </div>
-    <div class="small-5 columns">
-      <select required="" class="medium" id="customDropdown1" name="Priority" data-invalid="">
-        <option value="Low" id="Low">{% trans 'Low' %}</option>
-        <option value="High" id="High">{% trans 'High' %}</option>
-        <option value="Immediate" id="Immediate">{% trans 'Immediate' %}</option></select>
-      </select>
-    </div>
-  </div>
-  
-  <div class="row">
-    <div class="small-3 columns">
-      <h6>Supporting Files (if any ):</h6>
-    </div>
-    <div class="small-9 columns">
-      <input type="file" class="button" name="" onChange="" id="" value= ""/>
-    </div>
-  </div>
-  <div class="row">
-    <div class="small-2 columns">
-      <h6>Description:</h6>
-    </div>
-    <div class="small-10 columns">
-      <textarea rows="4" cols="50">
-      </textarea>
-    </div>
-  </div>
-  <div class="row">
-    <div class="small-12 columns">
-      <button type="button" class="button expand">Create Task</button>
-    </div>
-  </div>
 </div>
+
 
 
 
