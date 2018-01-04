@@ -34,6 +34,18 @@ historyMgr = HistoryManager()
 DUMP_NODES_LIST = []
 DUMPED_NODE_IDS = set()
 
+
+def create_log_file(req_log_file_name):
+    '''
+        Creates log file in gstudio-logs/ with 
+        the name of the dump folder
+    '''
+    log_file_name = req_log_file_name + '.log'
+    if not os.path.exists(GSTUDIO_LOGS_DIR_PATH):
+        os.makedirs(GSTUDIO_LOGS_DIR_PATH)
+    log_file_path = os.path.join(GSTUDIO_LOGS_DIR_PATH, log_file_name)
+    return log_file_path
+
 def build_rcs(node, collection_name):
     '''
     Updates the rcs json with the current node's strcuture that 
@@ -162,10 +174,8 @@ def copy_rcs(node):
                 path = historyMgr.get_file_path(node)
                 path = path + ",v"
             # log_file.write( "\n RCS Copied " + str(path)
-            print "\nDATA_EXPORT_PATH: ", DATA_EXPORT_PATH
-            cp = "cp  -vu " + path + " " +" --parents " + DATA_EXPORT_PATH + "/"
+            cp = "cp  -u " + path + " " +" --parents " + DATA_EXPORT_PATH + "/"
             subprocess.Popen(cp,stderr=subprocess.STDOUT,shell=True)
-
 
         except Exception as copyRCSError:
             error_log = "\n !!! Error found while Copying RCS ."
@@ -174,25 +184,43 @@ def copy_rcs(node):
             print error_log
             pass
 
+def get_counter_ids(group_id=None, group_node=None, user_ids=None):
+    '''
+    Fetch all the Counter instances of the exporting Group
+    '''
+    if group_id:
+        counter_collection_cur = counter_collection.find({'group_id':ObjectId(group_id)})
+    elif group_node:
+        counter_collection_cur = counter_collection.find({'group_id':ObjectId(group_node._id)})
+    elif user_ids:
+        counter_collection_cur = counter_collection.find({'user_id': {'$in': user_ids}})
+
+    if counter_collection_cur :
+        for each_obj in counter_collection_cur :
+            dump_node(node=each_obj,collection_name=counter_collection, variables_dict=GLOBAL_DICT)
+
+
+def write_md5_of_dump(group_dump_path, configs_file_path):
+    from checksumdir import dirhash
+    md5hash = dirhash(group_dump_path, 'md5')
+    with open(configs_file_path, 'a+') as configs_file_out:
+        configs_file_out.write("\nMD5='" + str(md5hash) + "'")
+
+
 def dumping_call(node, collection_name):
     try:
         global log_file
         global GROUP_ID
         global DUMPED_NODE_IDS
         log_file.write( "\nDumping Call for : " + str(node))
-        if (node._id == GROUP_ID or node._type != "Group") and node._id not in DUMPED_NODE_IDS:
-            build_rcs(node, collection_name)
+        print ".",
+        build_rcs(node, collection_name)
 
-            if collection_name == node_collection:
-                get_triple_data(node._id)
-                DUMPED_NODE_IDS.add(node._id)
-                if 'File' in node.member_of_names_list:
-                    get_file_node_details(node, exclude_node=True)
-            else:
-                DUMPED_NODE_IDS.add(node._id)
-            log_file.write( "\n Dump node finished for:  " + str(node._id))
-        else:
-            log_file.write( "\n Already dumped node: " + str(node._id))
+        if collection_name == node_collection:
+            get_triple_data(node._id)
+            if 'File' in node.member_of_names_list:
+                get_file_node_details(node, exclude_node=True)
+        log_file.write( "\n Dump node finished for:  " + str(node._id))
 
     except Exception as dumping_call_err:
         error_log = "\n !!! Error found in dumping_call_node() ."
@@ -257,24 +285,23 @@ def dump_node(collection_name=node_collection, node=None, node_id=None, node_id_
         global log_file
         log_file.write( "\n dump_node invoked for: " + str(collection_name))
         if node:
-                dumping_call(node,collection_name)
+            dumping_call(node,collection_name)
         elif node_id:
             log_file.write( "\tNode_id : " + str(node_id))
             node = collection_name.one({'_id': ObjectId(node_id), '_type': {'$nin': ['Group', 'Author']}})
             if node:
-                dumping_call(node,collection_name)
+                dumping_call(node, collection_name)
 
         elif node_id_list:
             node_cur = collection_name.one({'_id': {'$in': node_id_list}, '_type': {'$nin': ['Group', 'Author']}})
             log_file.write( "\tNode_id_list : " + str(node_id_list))
             for each_node in nodes_cur:
                 if each_node:
-                    dumping_call(node,collection_name)
-
+                    dumping_call(each_node,collection_name)
     except Exception as dump_err:
         error_log = "\n !!! Error found while taking dump in dump_node() ."
         error_log += "\nError: " + str(dump_err)
-        log_file.write( str(error_log))
+        log_file.write(str(error_log))
         print error_log
         pass
 
