@@ -3,6 +3,7 @@
 {% load ndf_tags %}
 {% block body_content %}
 
+{% comment %} 
 <style type="text/css">
   .create-new-task{
       width: 60%;
@@ -172,9 +173,225 @@ input[type="file"] {
       <button type="button" class="button expand" style="background-color:#164A7B; border-radius:10px;">Create Task</button>
     </div>
 </div>
+{% endcomment %}
 
 
+<!-- Analytics UI -->
+<style type="text/css">
+  .analytics-details{
+    border-style: solid;
+    border-width: 70px;
+    border-color: rgba(107, 0, 84, 0.97);
+    background-color: #80808026;
+  }
+  .analytics-user{
+    //background-color: #80808026;
+  }
+  .analytics-card{
+    background-color: black;
+  }
 
+  .analytics_tile {
+    height: 300px;
+    background-size: 100% 100%;
+    background-color: white;
+    padding: 20px 22px;
+    color: #fff;
+    margin-bottom: 30px;
+    cursor: pointer;
+    border-radius: 6px;
+  }
 
+    .analytics_tile-name {
+        font-size: 25px;
+        font-weight: 500;
+        letter-spacing: 1.1px;
+        margin-bottom: 15px;
+        display: block;
+        color:black;
+    }
+
+    .analytics_tile_desc {
+        letter-spacing: 0.5px;
+        font-size: 17px;
+        color:black;
+    }
+    .course-metric-heading {
+    text-transform: uppercase;
+    // //font-size: 12px;
+    letter-spacing: 0.9px;
+    font-weight: 500;
+    color: #000000;
+    display: block;
+  }
+
+.course-section-heading {
+      text-transform: uppercase;
+      font-weight: 600;
+      letter-spacing: 1.5px;
+      // //font-size: 14px;
+      display: block;
+      margin: 2px 0px 15px;
+      color: #888;
+    }
+    .course-section-icon {
+      //position: absolute;
+      font-size: 20px;
+      top: -35px;
+      //right: 5px;
+      color: #000000;
+      background: #ffffff;
+      margin-left: 22px;
+    }
+    .course-metric-count {
+    // //font-size: 30px;
+    font-weight: 600;
+    letter-spacing: 0.5px;
+    display: block;
+    color: #000000;
+    font-size: 17px;
+  }
+
+</style>
+<div class="analytics-details">
+  <div class="row analytics-user">
+    <h6><b>PROGRESS REPORT</b></h6>
+      <div class="small-4 columns">
+        <h4 class="inner left-space">Course: Health and disease </h4><br/>
+      </div>
+      <div class="small-3 columns">
+        <h4 class="inner left-space"> User: black-bull-ct1 </h4> 
+      </div>
+      <div class="small-4 columns">
+        <h4 class="inner">Total points gained:  <h3 class="course-metric-count users_points inner left-space">100</h3></h4>
+      </div>
+  </div>
+  <hr/>
+  <div class="row">
+    <div class="large-3 medium-6 small-12 columns">
+      <div class="analytics_tile">
+          <span class="course-metric-heading">Lesson Visited</span>
+          <h4 class="module_progress_stmt">0 out of 20 lessons visited</h4>
+          <div class="progress success round">
+            <div class="module_progress_meter meter" style="width:{{level1_progress_meter}}%"></div>
+          </div>
+          <br/>
+          <span class="course-metric-heading">Activity Visited</span>
+            <h4 class='units_progress_stmt'>0 out of 4 activities visited</h4>
+            <div class="progress success round">
+              <div class="unit_progress_meter meter" style="width:{{level2_progress_meter}}%"></div>
+            </div>
+      </div>
+    </div>
+    <div class="large-3 medium-6 small-12 columns">
+      <div class="analytics_tile">
+          <span class="course-section-icon">
+            <i class="fa fa-question-circle"></i>
+          </span>
+          <span class="course-section-heading inner">Assessment Performance  </span>
+          <a class="fetch-assessment-analytics inner left-space" data-user-id={{user_id}}>Refresh</a>
+          <hr/>
+          <div class="small-6 columns">
+            <span class="course-metric-heading">{% trans "Total Questions" %}</span>
+            <span class="course-metric-count total_quizitems">0</span>
+          </div>
+          <span class="course-metric-heading">Correct Answers</span>
+          <span class="course-metric-count correct-count correct_attempted_quizitems">0</span>
+          <div class="small-6 columns">
+            <span class="course-metric-heading">Attempted</span>
+              <span class="course-metric-count attempted_quizitems">0</span>
+          </div>
+          <span class="course-metric-heading">{% trans "Incorrect answers" %}</span>
+          <span class="course-metric-count incorrect-count incorrect_attempted_quizitems">0</span>
+          <div class="small-6 columns">
+          <span class="course-metric-heading">{% trans "Not Attempted" %}</span>
+          <span class="course-metric-count unattempted_quizitems">0</span>
+          </div>
+      </div>
+    </div>
+    <div class="large-3 medium-6 small-12 columns">
+      <div class="analytics_tile">
+          <span class="course-section-icon">
+            <i class="fa fa-pencil-square-o"></i>
+          </span>
+          <span class="course-section-heading inner">{% trans "Note Making" %}</span>
+          <hr/>
+          <div class="small-6 columns">
+            <span class="course-metric-heading">{% trans "Notes Written" %}</span>
+            <span class="course-metric-count user_notes">0</span>
+          </div>
+          <span class="course-metric-heading">{% trans "Views Gained" %}</span>
+            <span class="course-metric-count others_reading_my_notes">0</span>
+          <div class="small-6 columns">
+            <span class="course-metric-heading">{% trans "Comments recieved" %}</span>
+            <span class="course-metric-count cmts_on_user_notes">0</span>
+          </div>
+          <span class="course-metric-heading">{% trans "Visits on Other Notes" %}</span>
+            <span class="course-metric-count total_notes_read_by_user">0</span>
+          <div class="small-6 columns">
+            <span class="course-metric-heading">{% trans "Comments on other notes" %}</span>
+            <span class="course-metric-count commented_on_others_notes">0</span>
+          </div>
+          <span class="course-metric-heading">{% trans "Avg. Rating Awarded" %}</span>
+            <span class="course-metric-count total_notes_read_by_user">0</span>
+
+      </div>
+    </div>
+    <div class="large-3 medium-6 small-12 columns">
+      <div class="analytics_tile">
+        <span class="course-section-icon">
+          <i class="fa fa-comments"></i>
+        </span>
+        <span class="course-section-heading inner">{% trans "Interactions" %}
+        </span>
+        <hr/>
+        <span class="course-metric-heading">{% trans "Comments By me" %}</span>
+            <span class="course-metric-count total_cmnts_by_user">0</span>
+            <br/>
+        <span class="course-metric-heading">{% trans "Comments for me" %}</span>
+            <span class="course-metric-count cmnts_rcvd_by_user">0</span>
+      </div>
+    </div>
+    <div class="large-6 medium-8 small-12 columns">
+      <div class="analytics_tile">
+        <div class="columns small-12 medium-6 points-data">
+          <div class="course-points-breakup">
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="large-6 medium-8 small-12 columns">
+      <div class="analytics_tile">
+          <span class="course-section-icon">
+            <i class="fa fa-upload"></i>
+          </span>
+          <span class="course-section-heading inner">{% trans "Gallery uploads" %}</span>
+          <hr/>
+          <div class="small-6 columns">
+            <span class="course-metric-heading">{% trans "Files Uploaded" %}</span>
+            <span class="course-metric-count user_files">0</span>
+            <span class="course-metric-heading">{% trans "Avg. Rating awarded" %}</span>
+            <span class="course-metric-count commented_on_others_files">0</span>
+            <span class="course-metric-heading">{% trans "Comments on other Files" %}</span>
+            <span class="course-metric-count commented_on_others_files">0</span>
+            <span class="course-metric-heading">{% trans "Comments on other Files" %}</span>
+            <span class="course-metric-count commented_on_others_files">0</span>
+          </div>
+          <div class="small-6 columns">
+            <span class="course-metric-heading">{% trans "Comments by unique users" %}</span>
+            <span class="course-metric-count unique_users_commented_on_user_files">0</span>
+            <span class="course-metric-heading">{% trans "Visits gained" %}</span>
+            <span class="course-metric-count other_viewing_my_files">0</span>
+            <span class="course-metric-heading">{% trans "Comments recieved" %}</span>
+            <span class="course-metric-count cmts_on_user_files">0</span>
+            <span class="course-metric-heading">{% trans "Visits on Other Files" %}</span>
+            <span class="course-metric-count total_files_viewed_by_user">0</span>
+            
+          </div>
+      </div>
+    </div>
+    
+  </div>
+</div>
 
 {% endblock body_content %}
