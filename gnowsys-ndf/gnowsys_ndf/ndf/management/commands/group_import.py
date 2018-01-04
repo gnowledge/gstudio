@@ -66,35 +66,26 @@ def call_exit():
     print "\n Exiting..."
     os._exit(0)
 
-def read_config_file():
-    """
-    Read migration_configs.py file generated during
-     the export of group and load the variables in 
-     CONFIG_VARIABLES to be accessible in entire program
-    """
-    global CONFIG_VARIABLES
-    CONFIG_VARIABLES = imp.load_source('config_variables',
-            os.path.join(DATA_RESTORE_PATH,'migration_configs.py'))
 
-def get_file_path_with_id(node_id):
-    file_name = (node_id + '.json')
+# def get_file_path_with_id(node_id):
+#     file_name = (node_id + '.json')
     
-    collection_dir = os.path.join(DATA_DUMP_PATH, 'data', 'rcs-repo', 'Nodes')
+#     collection_dir = os.path.join(DATA_DUMP_PATH, 'data', 'rcs-repo', 'Nodes')
 
-    # Example:
-    # if -- file_name := "523f59685a409213818e3ec6.json"
-    # then -- collection_hash_dirs := "6/c/3/8/
-    # -- from last (2^0)pos/(2^1)pos/(2^2)pos/(2^3)pos/../(2^n)pos"
-    # here n := hash_level_num
-    collection_hash_dirs = ""
-    for pos in range(0, RCS_REPO_DIR_HASH_LEVEL):
-        collection_hash_dirs += \
-            (node_id[-2**pos] + "/")
-    file_path = \
-        os.path.join(collection_dir, \
-                         (collection_hash_dirs + file_name))
-    # print "\n\nfilepath: ", file_path
-    return file_path
+#     # Example:
+#     # if -- file_name := "523f59685a409213818e3ec6.json"
+#     # then -- collection_hash_dirs := "6/c/3/8/
+#     # -- from last (2^0)pos/(2^1)pos/(2^2)pos/(2^3)pos/../(2^n)pos"
+#     # here n := hash_level_num
+#     collection_hash_dirs = ""
+#     for pos in range(0, RCS_REPO_DIR_HASH_LEVEL):
+#         collection_hash_dirs += \
+#             (node_id[-2**pos] + "/")
+#     file_path = \
+#         os.path.join(collection_dir, \
+#                          (collection_hash_dirs + file_name))
+#     # print "\n\nfilepath: ", file_path
+#     return file_path
 
 def check_group_availability(*args):
     group_node = node_collection.one({'_id': ObjectId(CONFIG_VARIABLES.GROUP_ID)})
@@ -114,7 +105,7 @@ def check_group_availability(*args):
             log_file.write("\n Group with Restore Group ID is FOUND on Target system.")
             call_exit()
         else:
-            fp = get_file_path_with_id(CONFIG_VARIABLES.GROUP_ID)
+            fp = get_file_path_with_id(CONFIG_VARIABLES.GROUP_ID, DATA_DUMP_PATH)
             if fp:
                 if not fp.endswith(',v'):
                     fp = fp + ',v'
@@ -137,7 +128,7 @@ def check_group_availability(*args):
             print " Cancelling to restore."
             call_exit()
         else:
-            fp = get_file_path_with_id(CONFIG_VARIABLES.GROUP_ID)
+            fp = get_file_path_with_id(CONFIG_VARIABLES.GROUP_ID, DATA_DUMP_PATH)
             if fp:
                 if not fp.endswith(',v'):
                     fp = fp + ',v'
@@ -196,7 +187,8 @@ def user_objs_restoration(*args):
             DEFAULT_USER_ID = 1
         print "\n No RESTORE_USER_DATA available. Setting Default user with id: 1"
         log_file.write("\n No RESTORE_USER_DATA available. Setting Default user with id :" + str(DEFAULT_USER_SET))
-'''
+
+
 def update_schema_id_for_triple(document_json):
     if SCHEMA_ID_MAP:
         global log_file
@@ -210,6 +202,7 @@ def update_schema_id_for_triple(document_json):
             document_json[u'attribute_type'] = SCHEMA_ID_MAP[document_json[u'attribute_type']]
             log_file.write("\nNEW attribute_type id " + str(document_json[u'attribute_type']))
     return document_json
+'''
 
 def update_group_set(document_json):
     if 'group_set' in document_json:
@@ -217,6 +210,7 @@ def update_group_set(document_json):
             document_json['group_set'].append(ObjectId(CONFIG_VARIABLES.GROUP_ID))
     return document_json
 
+'''
 def _mapper(json_obj, key, MAP_obj, is_list=False):
     log_file.write("\n Calling _mapper:\n\t " + str(json_obj)+ str(key)+ str(MAP_obj)+ str(is_list))
 
@@ -227,7 +221,9 @@ def _mapper(json_obj, key, MAP_obj, is_list=False):
                     replace_in_list(json_obj[key],eu, MAP_obj[eu])
         else:
             json_obj[key] = MAP_obj[json_obj[key]]
+'''
 
+'''
 def update_schema_and_user_ids(document_json):
     log_file.write("\n Invoked update_schema_and_user_ids:\n\t " + str(document_json))
     global DEFAULT_USER_SET
@@ -255,10 +251,8 @@ def update_schema_and_user_ids(document_json):
     log_file.write("\n Finished update_schema_and_user_ids:\n\t " + str(document_json))
     return document_json
 
-    '''
-    else:
-        Schema is same. No updation required.
-    '''
+    # else:
+    #     Schema is same. No updation required.
 
 def copy_version_file(filepath):
     if os.path.exists(filepath):
@@ -270,7 +264,6 @@ def copy_version_file(filepath):
         cp = "cp  -v " + rcs_file_path + " " +" --parents " + RCS_REPO_DIR + "/"
         subprocess.Popen(cp,stderr=subprocess.STDOUT,shell=True)
         os.chdir(cwd_path)
-
 
 def restore_filehive_objects(rcs_filehives_path):
     print "\nRestoring Filehives.."
@@ -505,9 +498,11 @@ def restore_counter_objects(rcs_counters_path):
                 except Exception as counter_insert_err:
                     log_file.write("\nError while inserting Counter obj" + str(counter_insert_err))
                     pass
+'''
 
 def call_group_import(rcs_repo_path,non_grp_root_node=None):
 
+    global DATA_RESTORE_PATH
     rcs_filehives_path = os.path.join(rcs_repo_path, "Filehives")
     rcs_nodes_path = os.path.join(rcs_repo_path, "Nodes")
     rcs_triples_path = os.path.join(rcs_repo_path, "Triples")
@@ -515,14 +510,14 @@ def call_group_import(rcs_repo_path,non_grp_root_node=None):
 
     # Following sequence is IMPORTANT
     # restore_filehive_objects(rcs_filehives_path)
-    restore_node_objects(rcs_nodes_path, non_grp_root_node)
+    restore_node_objects(rcs_nodes_path, log_file_path, DATA_RESTORE_PATH, non_grp_root_node)
     restore_triple_objects(rcs_triples_path)
 
     # skip foll. command katkamrachana 21Apr2017
     # Instead run python manage.py fillCounter
     # restore_counter_objects(rcs_counters_path)
 
-
+'''
 def copy_media_data(media_path):
     # MEDIA_ROOT is destination usually: /data/media/
     # media_path is "dump-data/data/media"
@@ -530,11 +525,13 @@ def copy_media_data(media_path):
         media_copy_cmd = "rsync -avzhP " + media_path + "/*  " + MEDIA_ROOT + "/"
         subprocess.Popen(media_copy_cmd,stderr=subprocess.STDOUT,shell=True)
         log_file.write("\n Media Copied:  " + str(media_path) )
+'''
 
 def core_import(non_grp_root_node=None, *args):
     global log_file
     global log_file_path
-    log_file_name = 'group_restore_' + str(CONFIG_VARIABLES.GROUP_ID)+ '.log'
+    datetimestamp = datetime.datetime.now().strftime("%Y-%m-%d_%H-%M-%S")
+    log_file_name = 'artifacts_restore_' + str(GSTUDIO_INSTITUTE_ID) + "_"+ str(datetimestamp)
     log_file_path = create_log_file(log_file_name)
     log_file = open(log_file_path, 'w+')
     log_file.write("\n######### Script ran on : " + str(datetime.datetime.now()) + " #########\n\n")
@@ -560,6 +557,7 @@ class Command(BaseCommand):
         global DATA_DUMP_PATH
         global SCHEMA_ID_MAP
         global log_file_path
+        global CONFIG_VARIABLES
         if args and len(args) == 4:
             DATA_RESTORE_PATH = args[0]
         else:
@@ -571,7 +569,7 @@ class Command(BaseCommand):
                 # Single Group Dump
                 DATA_DUMP_PATH = os.path.join(DATA_RESTORE_PATH, 'dump')
                 SCHEMA_ID_MAP = update_factory_schema_mapper(DATA_RESTORE_PATH)
-                read_config_file()
+                CONFIG_VARIABLES =  read_config_file(DATA_RESTORE_PATH)
                 core_import(None,*args)
             else:
                 # Multi Group Dump
@@ -590,7 +588,7 @@ class Command(BaseCommand):
                     # SCHEMA_ID_MAP = update_factory_schema_mapper(DATA_DUMP_PATH)
                     DATA_DUMP_PATH = os.path.join(each_gd_abs_path, 'dump')
                     DATA_RESTORE_PATH = each_gd_abs_path
-                    read_config_file()
+                    CONFIG_VARIABLES =  read_config_file(DATA_RESTORE_PATH)
 
                     non_grp_root_node_obj = node_collection.one({
                         '_id': ObjectId(CONFIG_VARIABLES.ROOT_DUMP_NODE_ID)
@@ -798,7 +796,7 @@ def restore_node(filepath, non_grp_root_node=None):
 #                 if each_key in ["start_time", "end_time", "start_enroll", "end_enroll"]:
 #                     each_attr_dict[each_key] = datetime.datetime.fromtimestamp(each_val/1e3)
 #     return d
-
+'''
 def parse_json_values(d):
     # This decoder will be moved to models next to class NodeJSONEncoder
     if u'uploaded_at' in d:
@@ -818,7 +816,6 @@ def parse_json_values(d):
                 if each_key in [u"start_time", u"end_time", u"start_enroll", u"end_enroll"]:
                     each_attr_dict[each_key] = datetime.datetime.fromtimestamp(each_val/1e3)
     return d
-
 
 def get_json_file(filepath):
     
@@ -840,3 +837,4 @@ def get_json_file(filepath):
     except Exception as get_json_err:
         print "Exception while getting JSON: ", get_json_err
         pass
+'''

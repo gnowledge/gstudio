@@ -77,7 +77,7 @@ def call_exit():
     print "\n Exiting..."
     os._exit(0)
 
-def read_config_file():
+def read_config_file(DATA_RESTORE_PATH):
     """
     Read migration_configs.py file generated during
      the export of group and load the variables in 
@@ -86,6 +86,8 @@ def read_config_file():
     global CONFIG_VARIABLES
     CONFIG_VARIABLES = imp.load_source('config_variables',
             os.path.join(DATA_RESTORE_PATH,'migration_configs.py'))
+    print "\nCONFIG_VARIABLES: ", CONFIG_VARIABLES
+    return CONFIG_VARIABLES
 
 def validate_data_dump(dump, md5, *args):
     """
@@ -120,7 +122,7 @@ def validate_data_dump(dump, md5, *args):
         if proceed_with_validation in ['y', 'Y']:
             log_file.write("\n Checksum validation Success on dump data")
 
-def get_file_path_with_id(node_id):
+def get_file_path_with_id(node_id, DATA_DUMP_PATH):
     file_name = (node_id + '.json')
     
     collection_dir = os.path.join(DATA_DUMP_PATH, 'data', 'rcs-repo', 'Nodes')
@@ -255,11 +257,11 @@ def update_schema_id_for_triple(document_json):
             log_file.write("\nNEW attribute_type id " + str(document_json[u'attribute_type']))
     return document_json
 
-def update_group_set(document_json):
-    if 'group_set' in document_json:
-        if ObjectId(CONFIG_VARIABLES.GROUP_ID) not in document_json['group_set']:
-            document_json['group_set'].append(ObjectId(CONFIG_VARIABLES.GROUP_ID))
-    return document_json
+# def update_group_set(document_json):
+#     if 'group_set' in document_json:
+#         if ObjectId(CONFIG_VARIABLES.GROUP_ID) not in document_json['group_set']:
+#             document_json['group_set'].append(ObjectId(CONFIG_VARIABLES.GROUP_ID))
+#     return document_json
 
 def _mapper(json_obj, key, MAP_obj, is_list=False):
     log_file.write("\n Calling _mapper:\n\t " + str(json_obj)+ str(key)+ str(MAP_obj)+ str(is_list))
@@ -345,14 +347,20 @@ def restore_filehive_objects(rcs_filehives_path):
                 log_file.write("\nFound Existing Filehive Object : \n\tFound-obj: " + \
                     str(fh_obj) + "\n\tExiting-obj: "+str(fh_json))
 
-def restore_node_objects(rcs_nodes_path, non_grp_root_node=None):
+def restore_node_objects(rcs_nodes_path, req_log_file_path, data_restore_path, non_grp_root_node=None):
     print "\nRestoring Nodes.."
     global log_file
+    global DATA_RESTORE_PATH
+    DATA_RESTORE_PATH = data_restore_path
+    global log_file_path
+    log_file_path = req_log_file_path
+    log_file = open(log_file_path, 'w+')
+    log_file.write("\n######### Script ran on : " + str(datetime.datetime.now()) + " #########\n\n")
     log_file.write("\nRestoring Nodes. ")
     for dir_, _, files in os.walk(rcs_nodes_path):
         for filename in files:
             filepath =  os.path.join(dir_, filename)
-            restore_node(filepath,non_grp_root_node)
+            restore_node(filepath, non_grp_root_node)
 
 def restore_triple_objects(rcs_triples_path):
     print "\nRestoring Triples.."
@@ -564,7 +572,7 @@ def call_group_import(rcs_repo_path,non_grp_root_node=None):
 
     # skip foll. command katkamrachana 21Apr2017
     # Instead run python manage.py fillCounter
-    # restore_counter_objects(rcs_counters_path)
+    restore_counter_objects(rcs_counters_path)
 
 
 def copy_media_data(media_path):
@@ -591,72 +599,6 @@ def copy_media_data(media_path):
 #     call_group_import(os.path.join(DATA_DUMP_PATH, 'data', 'rcs-repo'),non_grp_root_node)
 #     copy_media_data(os.path.join(DATA_DUMP_PATH, 'media_files', 'data', 'media'))
 
-class Command(BaseCommand):
-    def handle(self, *args, **options):
-
-        global DATA_RESTORE_PATH
-        global DATA_DUMP_PATH
-        global SCHEMA_ID_MAP
-        if args and len(args) == 4:
-            DATA_RESTORE_PATH = args[0]
-        else:
-            DATA_RESTORE_PATH = raw_input("\n\tEnter absolute path of data-dump folder to restore:")
-        print "\nDATA_RESTORE_PATH: ", DATA_RESTORE_PATH
-        if os.path.exists(DATA_RESTORE_PATH):
-            # Check if DATA_DUMP_PATH has dump, if not then its dump of Node holding Groups.
-            if os.path.exists(os.path.join(DATA_RESTORE_PATH, 'dump')):
-                # Single Group Dump
-                DATA_DUMP_PATH = os.path.join(DATA_RESTORE_PATH, 'dump')
-                SCHEMA_ID_MAP = update_factory_schema_mapper(DATA_RESTORE_PATH)
-                read_config_file()
-                core_import(None,*args)
-            else:
-                # Multi Group Dump
-                # Get the dumps of Groups and loop over each dump to import
-                # gd == group-dump
-                print "\n***** NON Group Dump found. *****\n"
-                global GROUP_CONTAINERS
-                GRP_CONTAINERS_CUR = node_collection.find({'name': {'$in': GROUP_CONTAINERS},
-                    '_type': 'GSystemType'})
-                GRP_CONTAINERS_IDS = [cont._id for cont in GRP_CONTAINERS_CUR]
-                SCHEMA_ID_MAP = update_factory_schema_mapper(DATA_RESTORE_PATH)
-                dump_dir = [os.path.join(DATA_RESTORE_PATH,gd) for gd in os.listdir(DATA_RESTORE_PATH) if os.path.isdir(os.path.join(DATA_RESTORE_PATH,gd))]
-                print "\n Total Groups to be Restored: ", len(dump_dir)
-                for each_gd_abs_path in dump_dir:
-                    # Call this tmw
-                    # SCHEMA_ID_MAP = update_factory_schema_mapper(DATA_DUMP_PATH)
-                    DATA_DUMP_PATH = os.path.join(each_gd_abs_path, 'dump')
-                    DATA_RESTORE_PATH = each_gd_abs_path
-                    read_config_file()
-
-                    non_grp_root_node_obj = node_collection.one({
-                        '_id': ObjectId(CONFIG_VARIABLES.ROOT_DUMP_NODE_ID)
-                    })
-                    if non_grp_root_node_obj:
-                        core_import((CONFIG_VARIABLES.ROOT_DUMP_NODE_ID,CONFIG_VARIABLES.ROOT_DUMP_NODE_NAME),*args)
-                    else:
-                        non_grp_root_node_obj = node_collection.one({
-                                'name': CONFIG_VARIABLES.ROOT_DUMP_NODE_NAME,
-                                'member_of': {'$in': GRP_CONTAINERS_IDS}})
-
-                        if non_grp_root_node_obj:
-                            # if non_grp_root_node_obj._id != ObjectId(CONFIG_VARIABLES.ROOT_DUMP_NODE_ID):
-                            #     # Module exists, but ID is different
-                            #     core_import(None,*args)
-                            # else:
-                            core_import((CONFIG_VARIABLES.ROOT_DUMP_NODE_ID,CONFIG_VARIABLES.ROOT_DUMP_NODE_NAME),*args)
-                        else:
-                            core_import(None,*args)
-
-                    # print "\n each_gd_abs_path: ", os.path.join(DATA_RESTORE_PATH,each_gd_abs_path)
-            print "*"*70
-            # print "\n Export will be found at: ", DATA_EXPORT_PATH
-            print "\n This will take few minutes. Please be patient.\n"
-            print "*"*70
-            
-        else:
-            print "\n No dump found at entered path."
-            call_exit()
 
 def restore_node(filepath, non_grp_root_node=None):
     '''
@@ -666,10 +608,15 @@ def restore_node(filepath, non_grp_root_node=None):
     (dumped_node_id, exisiting_node_id)
     '''
     global log_file
+    global SCHEMA_ID_MAP
+    global DATA_RESTORE_PATH
+    if not SCHEMA_ID_MAP:
+        SCHEMA_ID_MAP = update_factory_schema_mapper(DATA_RESTORE_PATH)
+
     log_file.write("\nRestoring Node: " +  str(filepath))
 
     node_json = get_json_file(filepath)
-    print node_json
+    # print node_json
     proceed_flag = True
     try:
         if non_grp_root_node:
@@ -802,7 +749,7 @@ def restore_node(filepath, non_grp_root_node=None):
                 copy_version_file(filepath)
                 log_file.write("\n RCS file copied : \n\t" + str(filepath))
                 node_json = update_schema_and_user_ids(node_json)
-                node_json = update_group_set(node_json)
+                # node_json = update_group_set(node_json)
                 try:
                     log_file.write("\n Inserting Node doc : \n\t" + str(node_json))
                     node_id = node_collection.collection.insert(node_json)
