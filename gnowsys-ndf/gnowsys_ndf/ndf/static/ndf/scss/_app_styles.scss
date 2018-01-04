@@ -7102,8 +7102,8 @@ $ah_2_background_color_hover: rgba(244, 244, 244, 0.3);;
 
 .overlay-head{
     background-color: #fff;
-    height: 60px;
-    margin-bottom:20px;
+/*    height: 60px;
+*/    margin-bottom:20px;
 }
 
 .listing-row{
@@ -8606,3 +8606,142 @@ $inCompleteBgColor: #fd9e29;
     margin-top: 15px;
     font-size: 15px;    
 }
+
+
+/* responsive footer */
+.clearfix {clear: both;}
+
+
+.clr1 {background: #FFFFFF; color: #333743;}
+.clr2 {background: #F1F3F5; color: #8F94A3;}
+.clr3 {background: rgba(221, 221, 221, 0.18); color: #BDC3CF;}
+.clr4 {background: rgba(221, 221, 221, 0.18); color: #E3E7F2;}
+.clr5 {color: #F1F3F5;}
+.clr6 {color: #39B5A1;}
+.clr7 {color: #D45245;}
+
+
+/*##### Footer Structure #####*/
+.bo-wrap {
+    clear:both; 
+    width: auto;
+}
+.bo-footer {
+  clear:both;
+  width: auto;
+  padding: 5px;
+  width: 960px;
+  margin: 0 auto;
+}
+
+.bo-footer-social {
+  text-align: left; 
+  line-height: 1px;
+  padding: 10px 10px 10px 10px;
+
+      &>a{
+            color:$primary-orange;
+            word-spacing:8px;
+            &:hover {
+            color: $primary-orange;
+            border-bottom: 3px solid $secondary-orange;
+
+        }
+    }
+            
+}
+
+.bo-footer-copyright{
+    &>a{
+            transition: link-color 0.15s ease-in-out 0s,border 0.15s ease-in-out 0s;
+            border-bottom: none;
+            color: #777;
+            text-decoration: none !important;
+            word-spacing:3px;
+            &:hover {
+            color:#777;
+            border-bottom: 3px solid hsla(316, 88%, 42%, 1);
+        }
+    }
+}
+
+.bo-footer-smap {
+  /*width: 600px;*/
+  float: left;
+  padding: 5px 10px;
+  text-align: left;
+  font-size: 18px;
+  word-spacing:20px;
+}
+
+.bo-footer-uonline {
+  width: 300px; /* Account for margins + border values */
+  float: left;
+  padding: 5px 10px;
+  text-align: center;
+}
+
+.bo-footer-power {
+  width: 300px;
+  padding: 5px 10px;
+  float: left;
+  text-align: right;
+  font-size: 14px;
+  color: #636A7D;
+  vertical-align: middle;
+}
+
+
+
+
+/*##### Footer Responsive #####*/
+/* for 980px or less */
+@media screen and (max-width: 980px) {
+  
+  .bo-footer {
+    width: 95%;
+    padding: 1% 2%;
+  }
+  .bo-footer-smap {
+    width: 33%;
+    padding: 1% 2%;
+  }
+  .bo-footer-uonline {
+    width: 46%;
+    padding: 1% 2%;
+    float: right;
+    text-align: right;
+  }
+  
+  .bo-footer-power {
+    clear: both;
+    padding: 1% 2%;
+    width: auto;
+    float: none;
+    text-align: center;
+  }
+}
+/* for 700px or less */
+@media screen and (max-width: 600px) {
+
+  .bo-footer-smap {
+    width: auto; 
+    float: none;
+    text-align: center;
+  }
+  
+  .bo-footer-uonline {
+    width: auto;
+    float: none;
+    text-align: center;
+  }
+  
+  .bo-footer-power {
+    width: auto;
+    float: none;
+    text-align: center;
+  }
+
+}
+
+
