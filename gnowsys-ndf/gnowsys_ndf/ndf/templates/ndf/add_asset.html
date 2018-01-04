@@ -3,7 +3,7 @@
 {% check_is_gstaff group_id request.user as is_gstaff %}
 {% user_access_policy groupid request.user as user_access_priv %}
 {% block head %}
-    
+
     <style type="text/css">
     .right-btn, .left-btn{
         /*float: left;*/
@@ -42,8 +42,8 @@
                 <h4 class="page-name">{% firstof asset_obj.altnames|truncatechars:25  asset_obj.name|truncatechars:25 %} </h4>
 
             </div>
-            
-            <div class="small-4 columns right margin-right-50">       
+
+            <div class="small-4 columns right margin-right-50">
             {% if not edit and asset_obj %}
                 {% if asset_obj.created_by == request.user.id or is_gstaff  %}
                     <span data-dropdown="asset-settings-drop" aria-controls="asset-settings-drop" aria-expanded="false" class="large orange-button right">
@@ -64,13 +64,13 @@
                             {% endif  %}
                             </a>
                         {% endif  %}
-                        </li>   
+                        </li>
                     </ul>
                 {% endif %}
-            
+
             {% endif%}
-            
-            {% if request.user.is_authenticated  %}            
+
+            {% if request.user.is_authenticated  %}
                 {% if 'raw@material' in asset_obj.tags and is_gstaff and title == "raw_material_detail"  %}
                 <button type="button" class="orange-button add-asset-content right"><i class="fi-plus"></i> {% trans "Add File" %}</button>
                 {% endif %}
@@ -80,6 +80,7 @@
                 {% if title == 'asset_detail'  %}
                 <button type="button" class="orange-button add-asset-content right"><i class="fi-plus"></i> {% trans "Add File" %}</button>
                 {% endif %}
+                <a class="right orange-button-template" href="{% url 'create_edit_asset_page' group_id asset_obj.pk %}"><i class="fi-plus"></i> {% trans "Add  page" %}</a>
 
             {% endif %}
             </div>
@@ -93,36 +94,36 @@
                         <small><label class="tag-ele">
                         <a href="{% url 'tag_info' group_id tag %}">{{tag}} </a></label></small>
                     {% endif %}
-                {% endfor %} 
-            {% endif %}   
+                {% endfor %}
+            {% endif %}
         </div>
             <div class="small-4 columns right">
             {% include 'ndf/rating.html' with node=asset_obj %}
-                
+
             </div>
 
     </div>
     <br/>
 
     <div class="row ">
-      {{asset_obj.content|safe|striptags}} 
+      {{asset_obj.content|safe|striptags}}
     </div>
-            
+
 
             {% else %}
-                
+
                 <h3 class="left overlay-title">&nbsp;
-                {% if not asset_obj %} 
-                    {% trans "Add a new" %} 
-                {% else %} 
-                    {% trans "Edit" %} 
+                {% if not asset_obj %}
+                    {% trans "Add a new" %}
+                {% else %}
+                    {% trans "Edit" %}
                 {% endif %}
                 {% if title == "raw material"   and is_gstaff %}
                     {% trans "Resource" %}
                 {% elif title == "gallery"  %}
                     {% trans "Folder" %}
                 {% elif title == "asset_list"  %}
-                    {% trans "Asset" %} 
+                    {% trans "Asset" %}
                 {% endif     %}
                 </h3>
 
@@ -137,16 +138,16 @@
                     {% if edit or not asset_obj %}
                         {% if title == "raw material"  or 'raw@material' in asset_obj.tags %}
                             {% trans "Resource Name" %}
-                        
+
                         {% elif title == "gallery"  or 'asset@gallery' in asset_obj.tags %}
                              {% trans "Folder Name" %}
-                        
+
                         {% else %}
                        {% trans "Asset Name:" %} {% endif %}<h9 style="color: red;">*</h9>
                        <input type="text" placeholder="" class="required" id = "asset-name" name="asset_unique_name" value="{% if asset_obj %} {{asset_obj.name}}{% endif %}"/>
 
                         {% trans "Display Name:" %}  <h9 style="color: red;">*</h9>
-                       <input type="text" placeholder="" class="required" id = "asset-disp-name" name="asset_display_name" value="{% if asset_obj %} {{asset_obj.altnames}}{% endif %}"/>                       
+                       <input type="text" placeholder="" class="required" id = "asset-disp-name" name="asset_display_name" value="{% if asset_obj %} {{asset_obj.altnames}}{% endif %}"/>
 
 
                     {% endif %}
@@ -159,14 +160,14 @@
         <div class="row">
             <div class="small-12 medium-10 large-10 columns">
             <label>
-                
+
                     {% if title == "raw material"  or 'raw@material' in asset_obj.tags %}
                         {% trans "Resource Description" %}
-                    
+
                     {% elif title == "gallery"  or 'asset@gallery' in asset_obj.tags %}
                          {% trans "Folder Description" %}
                     {% else %}
-                    
+
                     {% trans "Asset description" %} {% endif %} <h9 style="color: red;">*</h9>
                     <textarea rows="4" cols="2" class="small-12 columns" placeholder="Enter Description" id="asset-descid" value=''>{% if asset_obj %} {{asset_obj.content|safe|striptags}}{% endif %}</textarea>
             </label>
@@ -174,10 +175,10 @@
         </div>
         <div class="row">
             <div class="small-12 medium-10 large-10 columns">
-            <label>  
+            <label>
                      {% if asset_obj %}
                         {% get_relation_value asset_obj.pk "teaches"  as selected_topic %}
-                    {%  endif %}                                  
+                    {%  endif %}
                     choose topic :
                         <select name="topics" id = "topic_list" multiple style="height:100px">
                                 <option value="">--- Select Topic ---</option>
@@ -233,6 +234,10 @@
 
                 </label>
                 {% endif %}
+                <div class="switch round large">
+                    <input id="exampleCheckboxSwitch" name="access_policy" {% if "Author" in group_obj.member_of_names_list and not asset_obj %} checked {% elif asset_obj.access_policy == "PRIVATE" %} checked {% endif %} type="checkbox">
+                    <label for="exampleCheckboxSwitch"> </label>
+                </div>
             </div>
         </div>
 
@@ -265,31 +270,31 @@
         <!--<button type="button" class="right orange-button save-asset" onclick="save_asset_cont_data()">Save Asset</button>-->
         <input type="hidden" name="context_name" value="{{title}}"/>
         <input type="hidden" class ="asset_obj_val" name="asset_obj_name" data-asset-obj-val=""/>
-        
-            
-        
-   
+
+
+
+
     </div>
 
 
         <div class="row">
             {% if asset_content_list.grel_id and asset_obj.created_by == request.user.id  or is_gstaff and asset_obj and asset_content_list.grel_id  %}
             <div class="row">
-                <button type="button" class="orange-button delete-asset-content right icon-widget" style="margin-right: 100px;" title="Click on the checkbox on the files below to Delete"><i class="fa fa-trash"></i> {% trans "Delete Files" %}</button>
+                <button type="button" class="orange-button delete-asset-content right icon-widget" style="margin-right: 100px;display:none" title="Click on the checkbox on the files below to Delete"><i class="fa fa-trash"></i> {% trans "Delete Files" %}</button>
             </div>
             {% endif %}
 
         <div class="row listing-row">
             {% for each in asset_content_list.grel_node %}
                 {% if  'DELETED' != each.status %}
-                   {% include "ndf/asset_card.html" with url_name="assetcontent_detail" each_asset=each first_arg=group_id second_arg=asset_obj.pk third_arg=each.pk no_asset=True %} 
+                   {% include "ndf/asset_card.html" with url_name="assetcontent_detail" each_asset=each first_arg=group_id second_arg=asset_obj.pk third_arg=each.pk no_asset=True %}
                 {% endif %}
             {% endfor %}
         </div>
         </div>
         <!-- </div> -->
     {% include 'ndf/pagination.html' with urlname="asset_details_paged" first_arg=group_id second_arg=asset_obj.pk page_info=assetcontent_page_info %}
-    
+
         <div class="row asset-content-detail">
               {% if node %}
               <hr/>
@@ -326,6 +331,16 @@
         $("#upload_asset").removeClass("hide")
     });
 
+    $(document).on('change','.select-chkbox',function(){
+        var checked = $('.select-chkbox:checked').length;
+        if (checked){
+          $(".delete-asset-content").css("display", "block");          
+        }
+        else{
+          $(".delete-asset-content").css("display", "none");          
+        }
+        
+    });
     $(".delete-asset-content").click(function(){
         var checked = $('.select-chkbox:checked').length;
         if (checked > 0){
@@ -375,20 +390,20 @@
                   url: "{% url 'delete_asset' group_id %}",
                   datatype: "html",
                   success: function(data) {
-                        
+
                         if("{{title}}" == "asset_detail"){
 
                             location.href = "{% url 'course_gallery' group_id  %}";
                         }
                         else if ("{{title}}" == "asset_gallery_detail") {
-                            
+
                             location.href = "{% url 'course_gallery' group_id  %}";
                         }
                         else if ("{{title}}" == "raw_material_detail"){
                             location.href = "{% url 'course_raw_material' group_id  %}";
 
                         }
-                        
+
                 }
             });
         }
@@ -427,11 +442,11 @@
     $( ".save-asset" ).click(function(event) {
         updateAllTags();
         coll_arr = []
-        
+
         $('#topic_list :selected').each(function(){
             coll_arr.push($(this).val())
         });
-        
+
         var tagsStr = tags.value.trim();
         if(checkTag())
         {
@@ -442,9 +457,14 @@
             event.preventDefault();
         }
         is_raw_material = "False"
+        access_check = "False"
         if($('input[name="is_raw_material"]:checked').length > 0)
         {
             is_raw_material = "True"
+        }
+        if($('input[name="access_policy"]:checked').length > 0)
+        {
+            access_check = "True"
         }
         sel_tags = $("input:hidden[name='tags']").val()
         sel_asset_lang =  $('#asset_lang').find(':selected').attr('data-sub-code');
@@ -468,7 +488,7 @@
                         'topic_list':topic_list,
                         //'coll_arr':coll_arr,
                         'title' :"{{title}}",
-
+                        'access_check':access_check
                         // "asset_objective":asset_objective
                     },
                   url: "{% url 'create_edit_asset' group_id %}",
@@ -493,7 +513,7 @@
         else{
             event.preventDefault()
         }
-        
+
     });
 
   var form = document.getElementById('docPost');
@@ -603,7 +623,7 @@ $( ".edit-metadata" ).click(function(event) {
     {% endif %}
    $( ".createAsset" ).click(function() {
                    var asset_id = $(this).attr('data-asset_id');
-                   
+
                    $.ajax({
                              type: "GET",
                              url: "{% url 'add_asset' group_id %}",

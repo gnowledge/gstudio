@@ -4,8 +4,9 @@ import json
 import shutil
 import re
 from datetime import datetime
-from bs4 import BeautifulSoup
+from bs4 import BeautifulSoup, CData
 from html import HTML
+import urlparse
 from django.template.defaultfilters import slugify
 from gnowsys_ndf.settings import GSTUDIO_EPUBS_LOC_PATH
 from gnowsys_ndf.ndf.models import node_collection
@@ -17,14 +18,19 @@ except ImportError:  # old pymongo
 
 oebps_files = ["Fonts", "Audios", "Images", "Videos", "Text", "Styles", "Misc"]
 oebps_path = None
-tool_mapping = {'policequad': 'modules/Tools/Police Quad/index.html',
-                'turtleblocksjs': 'modules/Tools/Turtle Blocks/index.html',
-                'biomechanic': 'modules/Tools/Bio- Mechanic/index.html'}
+tool_mapping = {}
+
+with open("/static/ndf/epub/tool_mapping.json", "r") as tool_paths:
+    global tool_mapping
+    tool_mapping = json.loads(tool_paths.read())
+
+# tool_mapping = {'policequad': 'modules/Tools/Police Quad/index.html',
+#                 'turtleblocksjs': 'modules/Tools/Turtle Blocks/index.html',
+#                 'biomechanic': 'modules/Tools/Bio- Mechanic/index.html'}
 
 def create_subfolders(root,subfolder_names_list):
     for subfolder in subfolder_names_list:
         os.makedirs(os.path.join(root, subfolder))
-
 
 def create_container_file(meta_path):
     with open("/static/ndf/epub/container.xml", "r") as base_container_obj:
@@ -34,13 +40,9 @@ def create_container_file(meta_path):
     with open(os.path.join(meta_path,"container.xml"), "w+") as container_file:
         container_file.write(soup.prettify("utf-8"))
 
-
 def create_mimetype(epub_name):
     with open(os.path.join(epub_name,"mimetype"), "w+") as mimetype_file:
         mimetype_file.write("application/epub+zip")
-
-# =====
-
 
 def create_update_ncx(file_display_name, file_slugified_name):
     """
@@ -82,7 +84,6 @@ def create_update_ncx(file_display_name, file_slugified_name):
         navPoint_ele.append(content_ele)
         navMap_ele.append(navPoint_ele)
         ncx_file.write(soup.prettify("utf-8"))
-    pass
 
 def create_update_nav(file_display_name, filename, path):
     """
@@ -108,7 +109,7 @@ def create_update_nav(file_display_name, filename, path):
         soup.body.nav.ol.append(new_nav)
         nav_file.write(soup.prettify("utf-8"))
 
-def create_update_content_file(file_name_wo_ext, file_loc, media_type, is_non_html=False):
+def create_update_content_file(file_name_wo_ext, file_loc, media_type,  epub_name, is_non_html=False):
     """
     This will update content.opf
     Make use of : oebps_path
@@ -124,17 +125,18 @@ def create_update_content_file(file_name_wo_ext, file_loc, media_type, is_non_ht
     soup = None
     with open("/static/ndf/epub/content.opf", "r") as base_content_pkg_file:
         html_doc = base_content_pkg_file.read()
-        soup = BeautifulSoup(html_doc, 'xml')
+        soup = BeautifulSoup(html_doc, 'lxml')
 
     content_pkg_file_path = os.path.join(oebps_path,"content.opf")
     if os.path.exists(content_pkg_file_path):
         with open(content_pkg_file_path, "r") as existing_content_file:
             content_doc = existing_content_file.read()
-            soup = BeautifulSoup(content_doc, 'xml')
+            soup = BeautifulSoup(content_doc, 'lxml')
 
     with open(content_pkg_file_path, "w+") as content_pkg_file_obj:
         manifest_container = soup.find("manifest")
-        # print soup
+
+
         new_item = soup.new_tag("item", id=file_name_w_ext, href=file_path)
         new_item.attrs.update({'media-type': media_type})
         manifest_container.append(new_item)
@@ -143,27 +145,31 @@ def create_update_content_file(file_name_wo_ext, file_loc, media_type, is_non_ht
             spine_container = soup.find("spine")
             new_itemref = soup.new_tag("itemref", idref=file_name_wo_ext+".xhtml")
             spine_container.append(new_itemref)
+
+        # print soup
         content_pkg_file_obj.write(soup.prettify("utf-8"))
 
-
-def update_content_metadata(node_id, date_value):
+def update_content_metadata(node_id, date_value, epub_name):
 
     soup = None
     content_pkg_file_path = os.path.join(oebps_path,"content.opf")
     if os.path.exists(content_pkg_file_path):
         with open(content_pkg_file_path, "r") as existing_content_file:
             content_doc = existing_content_file.read()
-            soup = BeautifulSoup(content_doc, 'xml')
+            soup = BeautifulSoup(content_doc, 'lxml')
     if soup:
+        # print "\n\n: soup: ", soup
         with open(content_pkg_file_path, "w+") as content_meta_file_obj:
             meta_datetimestamp = soup.find('meta',{"property":"dcterms:modified"})
             meta_datetimestamp.string = date_value
-            dc_ident = soup.find('identifier',{"id": "BookId"})
+            metadata_tag = soup.find('metadata')
+            dc_ident = soup.find('dc:identifier',{"id": "BookId"})
             dc_ident.string = node_id
+            dc_title = soup.find('dc:title',{"id": "bookTitle"})
+            dc_title.string =  epub_name
             content_meta_file_obj.write(soup.prettify("utf-8"))
 
-
-def copy_file_and_update_content_file(file_node, source_ele, src_val):
+def copy_file_and_update_content_file(file_node, source_ele, src_val, epub_name):
     mimetype_val = file_node.if_file.mime_type.lower()
     # mimetype can be audio|video|image
     # file_name = slugify(file_node.name) + "." + file_extension
@@ -179,7 +185,7 @@ def copy_file_and_update_content_file(file_node, source_ele, src_val):
         file_loc = "Misc"
     source_ele[src_val] = (os.path.join('..',file_loc, file_name))
     shutil.copyfile("/data/media/" + file_node['if_file']['original']['relurl'], os.path.join(oebps_path, file_loc, file_name))
-    create_update_content_file(file_name, file_loc, mimetype_val, is_non_html=True)
+    create_update_content_file(file_name, file_loc, mimetype_val, epub_name, is_non_html=True)
 
 def find_file_from_media_url(source_attr):
     source_attr = source_attr.split("media/")[-1]
@@ -188,8 +194,7 @@ def find_file_from_media_url(source_attr):
         {'if_file.mid.relurl': source_attr},{'if_file.thumbnail.relurl': source_attr}]})
     return file_node
 
-# =====
-def parse_content(path, content_soup):
+def parse_content(path, content_soup, epub_name):
     """
     This will fill:
         OEBPS/Images
@@ -201,6 +206,8 @@ def parse_content(path, content_soup):
     """
     # all_a = content_soup.find_all('a', href=True)
     # remove bower links
+
+    tool_mapping_keys = tool_mapping.keys()
     scoped_style = content_soup.find_all('style', {'scoped': ''})
     static_imports = content_soup.find_all('script', src=re.compile('static'))
     for each_style in scoped_style:
@@ -218,7 +225,7 @@ def parse_content(path, content_soup):
         if data_ele:
             if 'media' in data_ele['data']:
                 trans_file_node = find_file_from_media_url(data_ele['data'])
-                copy_file_and_update_content_file(trans_file_node, data_ele, 'data')
+                copy_file_and_update_content_file(trans_file_node, data_ele, 'data', epub_name)
 
 
     # all_src = content_soup.find_all(src=True)
@@ -236,25 +243,51 @@ def parse_content(path, content_soup):
             file_node = node_collection.one({'_id': ObjectId(node_id)})
 
         if file_node:
-            copy_file_and_update_content_file(file_node, each_src, 'src')
+            copy_file_and_update_content_file(file_node, each_src, 'src', epub_name)
 
-    # ==== updating assessment iframes ==== 
-
-    # ==== updating App iframes ==== 
     all_iframes = content_soup.find_all('iframe',src=True)
     for each_iframe in all_iframes:
         iframe_src_attr = each_iframe["src"]
         new_iframe_src = iframe_src_attr
         if iframe_src_attr:
+            if "assessment.AssessmentOffered" in iframe_src_attr:
+                # ==== updating assessment iframes ==== 
+                new_iframe_src = iframe_src_attr
+                parsed = urlparse.urlparse(iframe_src_attr)
+                new_iframe_src = parsed._replace(netloc="localhost:8888", path="/oea/")
+                each_iframe["src"] = new_iframe_src.geturl()
+            else:
+                # ==== updating App iframes ==== 
+                for each_tool_key,each_tool_val in tool_mapping.items():
+                    if each_tool_key in iframe_src_attr:
+                        new_iframe_src = each_tool_val
+                each_iframe["src"] = new_iframe_src
+
+
+    all_tool_links = content_soup.find_all('a',href=True)
+    for each_tool_link in all_tool_links:
+        tool_href = each_tool_link["href"]
+        new_tool_link = tool_href
+        if tool_href:
             for each_tool_key,each_tool_val in tool_mapping.items():
-                if each_tool_key in iframe_src_attr:
-                    new_iframe_src = iframe_src_attr.replace(each_tool_key,each_tool_val)
-            each_iframe["src"] = new_iframe_src
+                if each_tool_key in tool_href:
+                    new_tool_link = each_tool_val
+            each_tool_link["href"] = new_tool_link
+
+
+    all_img = content_soup.find_all('img',src=True)
+    for each_img in all_img:
+        img_src_attr = each_img["src"]
+        file_name = img_src_attr.split("/")[-1]
+        if "/static/ndf/images" in img_src_attr:
+            each_img["src"] = "../Images/"+ file_name
+            shutil.copyfile(img_src_attr, os.path.join(oebps_path, "Images", file_name))
+            # idnetify the mimetype and add accordingly in following line
+            create_update_content_file(file_name, "Images", "image/png", epub_name, is_non_html=True)
+
     return content_soup
 
-
-
-def build_html(path,obj):
+def build_html(path,obj, epub_name):
     """
     obj = collection_dict
     {1: node}
@@ -271,8 +304,9 @@ def build_html(path,obj):
     for each_obj in obj.values():
         name = each_obj['name'].strip()
         name_slugified = slugify(name)
-        content_val = (each_obj["content"]).encode('ascii', 'ignore')
-        new_content = parse_content(path, BeautifulSoup(content_val, 'html.parser'))
+        # content_val = (each_obj["content"]).encode('ascii', 'ignore')
+        content_val = each_obj["content"]
+        new_content = parse_content(path, BeautifulSoup(content_val, 'html.parser'), epub_name)
         # new_content = parse_content(content_val)
         with open("/static/ndf/epub/epub_activity_skeleton.xhtml", "r") as base_file_obj:
             html_doc = base_file_obj.read()
@@ -283,7 +317,7 @@ def build_html(path,obj):
 
         # update_ncx(each_obj["name"])
         create_update_nav(name, name_slugified, path)
-        create_update_content_file(name_slugified, "Text", "application/xhtml+xml")
+        create_update_content_file(name_slugified, "Text",  epub_name, "application/xhtml+xml")
         create_update_ncx(name,name_slugified)
     pass
 
@@ -330,7 +364,6 @@ def fill_from_static():
                     shutil.copyfile(each_dep, new_filepath)
             # [shutil.copyfile(each_dep, os.path.join(oebps_path, dep_type, each_dep.split('/')[-1])) for each_dep in dep_list]
 
-
 def epub_dump(path, ziph):
     abs_src = os.path.abspath(path)
     for root, dirs, files in os.walk(path):
@@ -340,7 +373,12 @@ def epub_dump(path, ziph):
             ziph.write(absname, arcname)
 
 def create_epub(node_obj):
+    epub_disp_name = None
     epub_name = node_obj.name
+    if node_obj.altnames:
+        epub_disp_name = node_obj.altnames
+    else:
+        epub_disp_name = node_obj.name
     content_list = node_obj.collection_dict
     if not os.path.exists(GSTUDIO_EPUBS_LOC_PATH):
         os.makedirs(GSTUDIO_EPUBS_LOC_PATH)
@@ -355,8 +393,8 @@ def create_epub(node_obj):
     create_mimetype(epub_root)
     create_container_file(os.path.join(epub_root, "META-INF"))
     create_subfolders(os.path.join(epub_root,"OEBPS"),oebps_files)
-    build_html(os.path.join(epub_root,"OEBPS", "Text"),content_list)
-    update_content_metadata(str(node_obj._id), datetimestamp)
+    build_html(os.path.join(epub_root,"OEBPS", "Text"),content_list, epub_name)
+    update_content_metadata(str(node_obj._id), datetimestamp, epub_disp_name)
     # create_content_file(os.path.join(epub_name,"OEBPS"),content_list)
     # create_ncx_file(os.path.join(epub_name,"OEBPS"),content_list)
     fill_from_static()
@@ -366,8 +404,6 @@ def create_epub(node_obj):
     zipf.close()
     print "Successfully created epub: ", epub_name
     return str(epub_root + '.epub')
-
-# create_epub(node.name, node.collection_dict)
 
 def check_ip_validity():
     import re
