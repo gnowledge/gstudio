@@ -15,7 +15,7 @@ from django.template.defaultfilters import slugify
 from django.core.management.base import BaseCommand, CommandError
 from schema_mapping import create_factory_schema_mapper
 from users_dump_restore import create_users_dump
-from export_logic import dump_node
+from export_logic import dump_node, create_log_file, get_counter_ids, write_md5_of_dump
 from gnowsys_ndf.ndf.models import node_collection, triple_collection, filehive_collection, counter_collection
 from gnowsys_ndf.ndf.models import HistoryManager
 from gnowsys_ndf.settings import GSTUDIO_DATA_ROOT, GSTUDIO_LOGS_DIR_PATH, MEDIA_ROOT, GSTUDIO_INSTITUTE_ID
@@ -39,22 +39,6 @@ DUMPED_NODE_IDS = set()
 ROOT_DUMP_NODE_ID = None
 ROOT_DUMP_NODE_NAME = None
 MULTI_DUMP = False
-
-def create_log_file(dump_node_id):
-    '''
-        Creates log file in gstudio-logs/ with 
-        the name of the dump folder
-    '''
-    log_file_name = 'group_dump_' + str(dump_node_id)+ '.log'
-    if not os.path.exists(GSTUDIO_LOGS_DIR_PATH):
-        os.makedirs(GSTUDIO_LOGS_DIR_PATH)
-    global log_file_path
-    log_file_path = os.path.join(GSTUDIO_LOGS_DIR_PATH, log_file_name)
-    # print log_file_path
-    global log_file
-    log_file = open(log_file_path, 'w+')
-    log_file.write("\n######### Script ran on : " + str(datetime.datetime.now()) + " #########\n\n")
-    return log_file_path
 
 def setup_dump_path(node_name):
     '''
@@ -92,13 +76,6 @@ def create_configs_file(group_id):
         configs_file_out.write('\nSYSTEM_DETAILS="' + str(os.uname()) + '"')
     return configs_file_path
 
-def write_md5_of_dump(group_dump_path, configs_file_path):
-    global DUMP_PATH
-    from checksumdir import dirhash
-    md5hash = dirhash(group_dump_path, 'md5')
-    with open(configs_file_path, 'a+') as configs_file_out:
-        configs_file_out.write("\nMD5='" + str(md5hash) + "'")
-
 def core_export(group_node):
     if group_node:
         print "\tRequest received for Export of : ", group_node.name , ' | ObjectId: ', group_node._id
@@ -115,13 +92,13 @@ def core_export(group_node):
         print "\n\tTotal objects found: ", nodes_falling_under_grp.count()
         confirm_export = raw_input("\n\tEnter y/Y to Continue or any other key to Abort:\t ")
         if confirm_export in ['y', 'Y']:
-            print "START : ", str(datetime.datetime.now())
+
             group_dump_path = setup_dump_path(slugify(group_node.name))
 
             global GROUP_ID
             GROUP_ID = group_node._id
             call_group_export(group_node, nodes_falling_under_grp)
-            get_counter_ids(group_node._id)
+            get_counter_ids(group_id=group_node._id)
             # import ipdb; ipdb.set_trace()
             global GROUP_CONTRIBUTORS
             if RESTORE_USER_DATA:
@@ -134,7 +111,6 @@ def core_export(group_node):
 
             log_file.write("\n*************************************************************")
             log_file.write("\n######### Script Completed at : " + str(datetime.datetime.now()) + " #########\n\n")
-            print "END : ", str(datetime.datetime.now())
         else:
             call_exit()
     else:
@@ -259,14 +235,6 @@ def call_group_export(group_node, nodes_cur, num_of_processes=5):
     # return resultlist
 
 
-def get_counter_ids(group_id):
-    '''
-    Fetch all the Counter instances of the exporting Group
-    '''
-    counter_collection_cur = counter_collection.find({'group_id':ObjectId(group_id)})
-    if counter_collection_cur :
-        for each_obj in counter_collection_cur :
-            dump_node(node=each_obj,collection_name=counter_collection, variables_dict=GLOBAL_DICT)
 
 class Command(BaseCommand):
     def handle(self, *args, **options):
@@ -276,12 +244,21 @@ class Command(BaseCommand):
         global ROOT_DUMP_NODE_NAME
         global MULTI_DUMP
         global GLOBAL_DICT
+        global log_file
+        global log_file_path
+        global TOP_PATH
+        global DUMP_NODES_LIST
         input_name_or_id = raw_input("\n\tPlease enter ObjectID of the Group: ")
         dump_node_obj = node_collection.one({'_id': ObjectId(input_name_or_id)})
         group_node = None
 
         if dump_node_obj:
-            log_file_path = create_log_file(dump_node_obj._id)
+            datetimestamp = datetime.datetime.now().strftime("%Y-%m-%d_%H-%M")
+            log_file_name = 'group_dump_' + slugify(dump_node_obj.name) + "_" + str(datetimestamp)
+            log_file_path = create_log_file(log_file_name)
+            log_file = open(log_file_path, 'w+')
+            log_file.write("\n######### Script ran on : " + str(datetimestamp) + " #########\n\n")
+
             ROOT_DUMP_NODE_ID = dump_node_obj._id
             ROOT_DUMP_NODE_NAME = dump_node_obj.name
 
@@ -290,8 +267,6 @@ class Command(BaseCommand):
                 SCHEMA_MAP_PATH = DUMP_PATH
                 create_factory_schema_mapper(SCHEMA_MAP_PATH)
             else:
-                global TOP_PATH
-                global DUMP_NODES_LIST
                 datetimestamp = datetime.datetime.now().strftime("%Y-%m-%d_%H-%M")
                 TOP_PATH = os.path.join(GSTUDIO_DATA_ROOT, 'data_export', slugify(dump_node_obj.name) + "_"+ str(datetimestamp))
                 SCHEMA_MAP_PATH = TOP_PATH
@@ -321,8 +296,10 @@ class Command(BaseCommand):
                         dump_node(node=dump_node_obj,collection_name=node_collection, variables_dict=GLOBAL_DICT)
                         create_factory_schema_mapper(SCHEMA_MAP_PATH)
             print "*"*70
-            print "\n This will take few minutes. Please be patient.\n"
+            print "\n START : ", str(datetimestamp)
             print "\n Log will be found at: ", log_file_path
+            print "\n Dump will be found at: ", SCHEMA_MAP_PATH
+            print "\n END : ", str(datetime.datetime.now().strftime("%Y-%m-%d_%H-%M-%S"))
             print "*"*70
             log_file.close()
             call_exit()
