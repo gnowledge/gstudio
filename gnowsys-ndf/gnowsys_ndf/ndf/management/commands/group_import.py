@@ -27,6 +27,7 @@ from gnowsys_ndf.ndf.models  import node_collection, triple_collection, filehive
 from gnowsys_ndf.ndf.models import HistoryManager, RCS
 from gnowsys_ndf.settings import GSTUDIO_DATA_ROOT, GSTUDIO_LOGS_DIR_PATH, MEDIA_ROOT, GSTUDIO_INSTITUTE_ID, RCS_REPO_DIR
 from users_dump_restore import load_users_dump
+from import_logic import *
 from gnowsys_ndf.settings import RCS_REPO_DIR_HASH_LEVEL
 from schema_mapping import update_factory_schema_mapper
 from gnowsys_ndf.ndf.views.utils import replace_in_list, merge_lists_and_maintain_unique_ele
@@ -60,22 +61,6 @@ Following will be available:
     CONFIG_VARIABLES.MD5='aeba0e3629fb0443861c699ae327d962'
 '''
 
-def create_log_file(restore_path):
-    '''
-        Creates log file in gstudio-logs/ with 
-        the name of the dump folder
-    '''
-    restore_path = restore_path.split("/")[-1]
-    log_file_name = 'group_restore_of_dump_' + str(CONFIG_VARIABLES.GROUP_ID)+ '.log'
-    if not os.path.exists(GSTUDIO_LOGS_DIR_PATH):
-        os.makedirs(GSTUDIO_LOGS_DIR_PATH)
-
-    log_file_path = os.path.join(GSTUDIO_LOGS_DIR_PATH, log_file_name)
-    global log_file
-    log_file = open(log_file_path, 'w+')
-    log_file.write("\n######### Script ran on : " + str(datetime.datetime.now()) + " #########\n\n")
-    return log_file_path
-
 
 def call_exit():
     print "\n Exiting..."
@@ -90,39 +75,6 @@ def read_config_file():
     global CONFIG_VARIABLES
     CONFIG_VARIABLES = imp.load_source('config_variables',
             os.path.join(DATA_RESTORE_PATH,'migration_configs.py'))
-
-def validate_data_dump(*args):
-    """
-    For validation of the exported dump and the 
-     importing data-dump, calculate MD5 and
-     check with CONFIG_VARIABLES.MD5
-     This will ensure the exported data is NOT altered
-     before importing
-    """
-    global log_file
-    from checksumdir import dirhash
-    md5hash = dirhash(DATA_DUMP_PATH, 'md5')
-    if CONFIG_VARIABLES.MD5 != md5hash:
-        print "\n MD5 NOT matching."
-        print "\nargs: ", args
-        if args and len(args) == 4:
-            proceed_without_validation = args[1]
-        else:
-            proceed_without_validation = raw_input("MD5 not matching. Restoration not recommended.\n \
-                            Enter (y/Y) to continue ?")
-        if proceed_without_validation not in ['y', 'Y']:
-            log_file.write("\n Checksum validation Failed on dump data")
-            call_exit()
-    else:
-        print "\nValidation Success..!"
-        proceed_with_validation = ''
-        if args and len(args) == 4:
-            proceed_without_validation = args[1]
-        else:
-            proceed_with_validation = raw_input("MD5 Matching.\n \
-                            Enter (y/Y) to proceed to restoration")
-        if proceed_with_validation in ['y', 'Y']:
-            log_file.write("\n Checksum validation Success on dump data")
 
 def get_file_path_with_id(node_id):
     file_name = (node_id + '.json')
@@ -197,13 +149,14 @@ def check_group_availability(*args):
             log_file.write("\n Group Merge confirmed.")
             print " Proceeding to restore."
 
-
+'''
 def user_objs_restoration(*args):
     global USER_ID_MAP
     global DEFAULT_USER_ID
     global DEFAULT_USER_SET
     global log_file
     user_json_data = None
+
     if CONFIG_VARIABLES.RESTORE_USER_DATA:
         user_dump_restore = raw_input("\n\tUser dump is available.  \
             Would you like to restore it (y/n) ?: ")
@@ -243,7 +196,7 @@ def user_objs_restoration(*args):
             DEFAULT_USER_ID = 1
         print "\n No RESTORE_USER_DATA available. Setting Default user with id: 1"
         log_file.write("\n No RESTORE_USER_DATA available. Setting Default user with id :" + str(DEFAULT_USER_SET))
-
+'''
 def update_schema_id_for_triple(document_json):
     if SCHEMA_ID_MAP:
         global log_file
@@ -580,15 +533,21 @@ def copy_media_data(media_path):
 
 def core_import(non_grp_root_node=None, *args):
     global log_file
-    log_file_path = create_log_file(DATA_RESTORE_PATH)
-    print "\n Log will be found at: ", log_file_path
+    global log_file_path
+    log_file_name = 'group_restore_' + str(CONFIG_VARIABLES.GROUP_ID)+ '.log'
+    log_file_path = create_log_file(log_file_name)
+    log_file = open(log_file_path, 'w+')
+    log_file.write("\n######### Script ran on : " + str(datetime.datetime.now()) + " #########\n\n")
     log_file.write("\nUpdated CONFIG_VARIABLES: "+ str(CONFIG_VARIABLES))
     print "\n Validating the data-dump"
-    validate_data_dump(*args)
+    print "\nDATA_DUMP_PATH: ", DATA_DUMP_PATH
+    validate_data_dump(DATA_DUMP_PATH,CONFIG_VARIABLES.MD5, *args)
     print "\n Checking the dump Group-id availability."
     check_group_availability(*args)
     print "\n User Restoration."
-    user_objs_restoration(*args)
+    user_json_file_path = os.path.join(DATA_DUMP_PATH, 'users_dump.json')
+    log_stmt = user_objs_restoration(CONFIG_VARIABLES.RESTORE_USER_DATA , user_json_file_path, DATA_DUMP_PATH, *args)
+    log_file.write(log_stmt)
     print "\n Factory Schema Restoration. Please wait.."
     # print "\n SCHEMA: ", SCHEMA_ID_MAP
     call_group_import(os.path.join(DATA_DUMP_PATH, 'data', 'rcs-repo'),non_grp_root_node)
@@ -600,6 +559,7 @@ class Command(BaseCommand):
         global DATA_RESTORE_PATH
         global DATA_DUMP_PATH
         global SCHEMA_ID_MAP
+        global log_file_path
         if args and len(args) == 4:
             DATA_RESTORE_PATH = args[0]
         else:
@@ -653,8 +613,7 @@ class Command(BaseCommand):
 
                     # print "\n each_gd_abs_path: ", os.path.join(DATA_RESTORE_PATH,each_gd_abs_path)
             print "*"*70
-            # print "\n Export will be found at: ", DATA_EXPORT_PATH
-            print "\n This will take few minutes. Please be patient.\n"
+            print "\n Log will be found at: ", log_file_path
             print "*"*70
             
         else:
