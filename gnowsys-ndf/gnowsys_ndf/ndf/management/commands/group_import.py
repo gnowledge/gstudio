@@ -91,6 +91,7 @@ def check_group_availability(*args):
     group_node = node_collection.one({'_id': ObjectId(CONFIG_VARIABLES.GROUP_ID)})
     global log_file
     global DEFAULT_USER_ID
+    global DATA_RESTORE_PATH
 
     print '\n\n Restoring Group'
     log_file.write("\n Restoring Group")
@@ -110,7 +111,7 @@ def check_group_availability(*args):
                 if not fp.endswith(',v'):
                     fp = fp + ',v'
                 log_file.write("\n Restoring Group: " + str(fp))
-                restore_node(fp)
+                restore_node(fp, None, DATA_RESTORE_PATH, log_file_path)
             group_node = node_collection.one({'_id': ObjectId(CONFIG_VARIABLES.GROUP_ID)})
             group_node.group_admin = [DEFAULT_USER_ID]
             group_node.save()
@@ -133,7 +134,7 @@ def check_group_availability(*args):
                 if not fp.endswith(',v'):
                     fp = fp + ',v'
                 log_file.write("\n Restoring Group: " + str(fp))
-                restore_node(fp)
+                restore_node(fp, None, DATA_RESTORE_PATH, log_file_path)
             group_node = node_collection.one({'_id': ObjectId(CONFIG_VARIABLES.GROUP_ID)})
             group_node.group_admin = [DEFAULT_USER_ID]
             group_node.save()
@@ -500,22 +501,22 @@ def restore_counter_objects(rcs_counters_path):
                     pass
 '''
 
-def call_group_import(rcs_repo_path,non_grp_root_node=None):
+# def call_group_import(rcs_repo_path,non_grp_root_node=None):
 
-    global DATA_RESTORE_PATH
-    rcs_filehives_path = os.path.join(rcs_repo_path, "Filehives")
-    rcs_nodes_path = os.path.join(rcs_repo_path, "Nodes")
-    rcs_triples_path = os.path.join(rcs_repo_path, "Triples")
-    rcs_counters_path = os.path.join(rcs_repo_path, "Counters")
+#     global DATA_RESTORE_PATH
+#     rcs_filehives_path = os.path.join(rcs_repo_path, "Filehives")
+#     rcs_nodes_path = os.path.join(rcs_repo_path, "Nodes")
+#     rcs_triples_path = os.path.join(rcs_repo_path, "Triples")
+#     rcs_counters_path = os.path.join(rcs_repo_path, "Counters")
 
-    # Following sequence is IMPORTANT
-    # restore_filehive_objects(rcs_filehives_path)
-    restore_node_objects(rcs_nodes_path, log_file_path, DATA_RESTORE_PATH, non_grp_root_node)
-    restore_triple_objects(rcs_triples_path)
+#     # Following sequence is IMPORTANT
+#     # restore_filehive_objects(rcs_filehives_path)
+#     restore_node_objects(rcs_nodes_path, log_file_path, DATA_RESTORE_PATH, non_grp_root_node)
+#     restore_triple_objects(rcs_triples_path)
 
-    # skip foll. command katkamrachana 21Apr2017
-    # Instead run python manage.py fillCounter
-    # restore_counter_objects(rcs_counters_path)
+#     # skip foll. command katkamrachana 21Apr2017
+#     # Instead run python manage.py fillCounter
+#     # restore_counter_objects(rcs_counters_path)
 
 '''
 def copy_media_data(media_path):
@@ -547,7 +548,9 @@ def core_import(non_grp_root_node=None, *args):
     log_file.write(log_stmt)
     print "\n Factory Schema Restoration. Please wait.."
     # print "\n SCHEMA: ", SCHEMA_ID_MAP
-    call_group_import(os.path.join(DATA_DUMP_PATH, 'data', 'rcs-repo'),non_grp_root_node)
+    call_group_import(os.path.join(DATA_DUMP_PATH, 'data', 'rcs-repo'), 
+        log_file_path, DATA_RESTORE_PATH, non_grp_root_node)
+    # call_group_import(os.path.join(DATA_DUMP_PATH, 'data', 'rcs-repo'),non_grp_root_node)
     copy_media_data(os.path.join(DATA_DUMP_PATH, 'media_files', 'data', 'media'))
 
 class Command(BaseCommand):
@@ -617,14 +620,12 @@ class Command(BaseCommand):
         else:
             print "\n No dump found at entered path."
             call_exit()
-
+'''
 def restore_node(filepath, non_grp_root_node=None):
-    '''
-    non_grp_root_node tuple (ObjectId, name) is used if the GSystem existing on target 
-    and we intend to skip the dumped-node-id having the name 
-    and member_of same but that differ in ObjectId.
-    (dumped_node_id, exisiting_node_id)
-    '''
+    # non_grp_root_node tuple (ObjectId, name) is used if the GSystem existing on target 
+    # and we intend to skip the dumped-node-id having the name 
+    # and member_of same but that differ in ObjectId.
+    # (dumped_node_id, exisiting_node_id)
     global log_file
     log_file.write("\nRestoring Node: " +  str(filepath))
 
@@ -776,7 +777,7 @@ def restore_node(filepath, non_grp_root_node=None):
         print "\n Error in restore_node_obj_err: ", restore_node_obj_err
         log_file.write("\nOuter Error while inserting Node obj" + str(restore_node_obj_err))
         pass
-
+'''
 # def parse_datetime_values(d):
 #     # This decoder will be moved to models next to class NodeJSONEncoder
 #     if u'uploaded_at' in d:
