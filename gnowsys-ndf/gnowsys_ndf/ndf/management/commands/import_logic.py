@@ -347,15 +347,9 @@ def restore_filehive_objects(rcs_filehives_path):
                 log_file.write("\nFound Existing Filehive Object : \n\tFound-obj: " + \
                     str(fh_obj) + "\n\tExiting-obj: "+str(fh_json))
 
-def restore_node_objects(rcs_nodes_path, req_log_file_path, data_restore_path, non_grp_root_node=None):
+def restore_node_objects(rcs_nodes_path, non_grp_root_node=None):
     print "\nRestoring Nodes.."
     global log_file
-    global DATA_RESTORE_PATH
-    DATA_RESTORE_PATH = data_restore_path
-    global log_file_path
-    log_file_path = req_log_file_path
-    log_file = open(log_file_path, 'w+')
-    log_file.write("\n######### Script ran on : " + str(datetime.datetime.now()) + " #########\n\n")
     log_file.write("\nRestoring Nodes. ")
     for dir_, _, files in os.walk(rcs_nodes_path):
         for filename in files:
@@ -447,105 +441,163 @@ def restore_counter_objects(rcs_counters_path):
                 #     counter_obj.last_update = counter_json['last_update']
                 #     counter_changed = True
 
-                if counter_obj.is_group_member != counter_json['is_group_member'] :
-                    counter_obj.is_group_member = counter_json['is_group_member']
+                if counter_obj.assessment != counter_json['assessment'] :
+                    counter_obj.assessment = counter_json['assessment']
                     counter_changed = True
 
-                if counter_obj.modules_completed != counter_json['modules_completed'] :
-                    counter_obj.modules_completed = counter_json['modules_completed']
+                if counter_obj.assessment != counter_json['assessment'] :
+                    counter_obj.assessment = counter_json['assessment']
                     counter_changed = True
 
-                if counter_obj.course_score != counter_json['course_score'] :
-                    counter_obj.course_score = counter_json['course_score']
+                if counter_obj['course']['modules']['completed'] != counter_json['course']['modules']['completed'] :
+                    counter_obj['course']['modules']['completed'] = counter_json['course']['modules']['completed']
+                    counter_changed = True
+                if counter_obj['course']['units']['completed'] != counter_json['course']['units']['completed'] :
+                    counter_obj['course']['units']['completed'] = counter_json['course']['units']['completed']
                     counter_changed = True
 
-                if counter_obj.units_completed != counter_json['units_completed'] :
-                    counter_obj.units_completed = counter_json['units_completed']
+                if counter_obj.group_points != counter_json['group_points'] :
+                    counter_obj.group_points = counter_json['group_points']
                     counter_changed = True
 
-                if counter_obj.no_comments_by_user != counter_json['no_comments_by_user'] :
-                    counter_obj.no_comments_by_user = counter_json['no_comments_by_user']
+                if counter_obj.total_comments_by_user != counter_json['total_comments_by_user'] :
+                    counter_obj.total_comments_by_user = counter_json['total_comments_by_user']
                     counter_changed = True
 
-                if counter_obj.no_comments_for_user != counter_json['no_comments_for_user'] :
-                    counter_obj.no_comments_for_user = counter_json['no_comments_for_user']
+                if counter_obj.visited_nodes != counter_json['visited_nodes'] :
+                    counter_obj.visited_nodes = counter_json['visited_nodes']
                     counter_changed = True
 
-                if counter_obj.no_files_created != counter_json['no_files_created'] :
-                    counter_obj.no_files_created = counter_json['no_files_created']
+                if counter_obj['file']['avg_rating_gained'] != counter_json['file']['avg_rating_gained']:
+                    counter_obj['file']['avg_rating_gained'] = counter_json['file']['avg_rating_gained']
                     counter_changed = True
 
-                if counter_obj.no_visits_gained_on_files != counter_json['no_visits_gained_on_files'] :
-                    counter_obj.no_visits_gained_on_files = counter_json['no_visits_gained_on_files']
+                if counter_obj['file']['commented_on_others_res'] != counter_json['file']['commented_on_others_res']:
+                    counter_obj['file']['commented_on_others_res'] = counter_json['file']['commented_on_others_res']
                     counter_changed = True
 
-                if counter_obj.no_comments_received_on_files != counter_json['no_comments_received_on_files'] :
-                    counter_obj.no_comments_received_on_files = counter_json['no_comments_received_on_files']
+                if counter_obj['file']['comments_by_others_on_res'] != counter_json['file']['comments_by_others_on_res']:
+                    counter_obj['file']['comments_by_others_on_res'] = counter_json['file']['comments_by_others_on_res']
                     counter_changed = True
 
-                if counter_obj.no_others_files_visited != counter_json['no_others_files_visited'] :
-                    counter_obj.no_others_files_visited = counter_json['no_others_files_visited']
+                if counter_obj['file']['comments_gained'] != counter_json['file']['comments_gained']:
+                    counter_obj['file']['comments_gained'] = counter_json['file']['comments_gained']
                     counter_changed = True
 
-                if counter_obj.no_comments_on_others_files != counter_json['no_comments_on_others_files'] :
-                    counter_obj.no_comments_on_others_files = counter_json['no_comments_on_others_files']
+                if counter_obj['file']['created'] != counter_json['file']['created']:
+                    counter_obj['file']['created'] = counter_json['file']['created']
                     counter_changed = True
 
-                if counter_obj.rating_count_received_on_files != counter_json['rating_count_received_on_files'] :
-                    counter_obj.rating_count_received_on_files = counter_json['rating_count_received_on_files']
+                if counter_obj['file']['rating_count_received'] != counter_json['file']['rating_count_received']:
+                    counter_obj['file']['rating_count_received'] = counter_json['file']['rating_count_received']
                     counter_changed = True
 
-                if counter_obj.avg_rating_received_on_files != counter_json['avg_rating_received_on_files'] :
-                    counter_obj.avg_rating_received_on_files = counter_json['avg_rating_received_on_files']
+                if counter_obj['file']['visits_gained'] != counter_json['file']['visits_gained']:
+                    counter_obj['file']['visits_gained'] = counter_json['file']['visits_gained']
                     counter_changed = True
 
-                if counter_obj.no_questions_attempted != counter_json['no_questions_attempted'] :
-                    counter_obj.no_questions_attempted = counter_json['no_questions_attempted']
+                if counter_obj['file']['visits_on_others_res'] != counter_json['file']['visits_on_others_res']:
+                    counter_obj['file']['visits_on_others_res'] = counter_json['file']['visits_on_others_res']
                     counter_changed = True
 
-                if counter_obj.no_correct_answers != counter_json['no_correct_answers'] :
-                    counter_obj.no_correct_answers = counter_json['no_correct_answers']
+                if counter_obj['page']['blog']['avg_rating_gained'] != counter_json['page']['blog']['avg_rating_gained']:
+                    counter_obj['page']['blog']['avg_rating_gained'] = counter_json['page']['blog']['avg_rating_gained']
                     counter_changed = True
 
-                if counter_obj.no_incorrect_answers != counter_json['no_incorrect_answers'] :
-                    counter_obj.no_incorrect_answers = counter_json['no_incorrect_answers']
+                if counter_obj['page']['blog']['commented_on_others_res'] != counter_json['page']['blog']['commented_on_others_res']:
+                    counter_obj['page']['blog']['commented_on_others_res'] = counter_json['page']['blog']['commented_on_others_res']
                     counter_changed = True
 
-                if counter_obj.no_notes_written != counter_json['no_notes_written'] :
-                    counter_obj.no_notes_written = counter_json['no_notes_written']
+                if counter_obj['page']['blog']['comments_by_others_on_res'] != counter_json['page']['blog']['comments_by_others_on_res']:
+                    counter_obj['page']['blog']['comments_by_others_on_res'] = counter_json['page']['blog']['comments_by_others_on_res']
                     counter_changed = True
 
-                if counter_obj.no_views_gained_on_notes != counter_json['no_views_gained_on_notes'] :
-                    counter_obj.no_views_gained_on_notes = counter_json['no_views_gained_on_notes']
+                if counter_obj['page']['blog']['comments_gained'] != counter_json['page']['blog']['comments_gained']:
+                    counter_obj['page']['blog']['comments_gained'] = counter_json['page']['blog']['comments_gained']
                     counter_changed = True
 
-                if counter_obj.no_others_notes_visited != counter_json['no_others_notes_visited'] :
-                    counter_obj.no_others_notes_visited = counter_json['no_others_notes_visited']
+                if counter_obj['page']['blog']['created'] != counter_json['page']['blog']['created']:
+                    counter_obj['page']['blog']['created'] = counter_json['page']['blog']['created']
                     counter_changed = True
 
-                if counter_obj.no_comments_received_on_notes != counter_json['no_comments_received_on_notes'] :
-                    counter_obj.no_comments_received_on_notes = counter_json['no_comments_received_on_notes']
+                if counter_obj['page']['blog']['rating_count_received'] != counter_json['page']['blog']['rating_count_received']:
+                    counter_obj['page']['blog']['rating_count_received'] = counter_json['page']['blog']['rating_count_received']
                     counter_changed = True
 
-                if counter_obj.no_comments_on_others_notes != counter_json['no_comments_on_others_notes'] :
-                    counter_obj.no_comments_on_others_notes = counter_json['no_comments_on_others_notes']
+                if counter_obj['page']['blog']['visits_gained'] != counter_json['page']['blog']['visits_gained']:
+                    counter_obj['page']['blog']['visits_gained'] = counter_json['page']['blog']['visits_gained']
                     counter_changed = True
 
-                if counter_obj.rating_count_received_on_notes != counter_json['rating_count_received_on_notes'] :
-                    counter_obj.rating_count_received_on_notes = counter_json['rating_count_received_on_notes']
+                if counter_obj['page']['blog']['visits_on_others_res'] != counter_json['page']['blog']['visits_on_others_res']:
+                    counter_obj['page']['blog']['visits_on_others_res'] = counter_json['page']['blog']['visits_on_others_res']
                     counter_changed = True
 
-                if counter_obj.avg_rating_received_on_notes != counter_json['avg_rating_received_on_notes'] :
-                    counter_obj.avg_rating_received_on_notes = counter_json['avg_rating_received_on_notes']
+                if counter_obj['page']['info']['avg_rating_gained'] != counter_json['page']['info']['avg_rating_gained']:
+                    counter_obj['page']['info']['avg_rating_gained'] = counter_json['page']['info']['avg_rating_gained']
+                    counter_changed = True 
+
+                if counter_obj['page']['info']['commented_on_others_res'] != counter_json['page']['info']['commented_on_others_res']:
+                    counter_obj['page']['info']['commented_on_others_res'] = counter_json['page']['info']['commented_on_others_res']
+                    counter_changed = True 
+
+                if counter_obj['page']['info']['comments_by_others_on_res'] != counter_json['page']['info']['comments_by_others_on_res']:
+                    counter_obj['page']['info']['comments_by_others_on_res'] = counter_json['page']['info']['comments_by_others_on_res']
+                    counter_changed = True 
+
+                if counter_obj['page']['info']['comments_gained'] != counter_json['page']['info']['comments_gained']:
+                    counter_obj['page']['info']['comments_gained'] = counter_json['page']['info']['comments_gained']
+                    counter_changed = True 
+
+                if counter_obj['page']['info']['created'] != counter_json['page']['info']['created']:
+                    counter_obj['page']['info']['created'] = counter_json['page']['info']['created']
+                    counter_changed = True 
+
+                if counter_obj['page']['info']['rating_count_received'] != counter_json['page']['info']['rating_count_received']:
+                    counter_obj['page']['info']['rating_count_received'] = counter_json['page']['info']['rating_count_received']
+                    counter_changed = True 
+
+                if counter_obj['page']['info']['visits_gained'] != counter_json['page']['info']['visits_gained']:
+                    counter_obj['page']['info']['visits_gained'] = counter_json['page']['info']['visits_gained']
+                    counter_changed = True 
+
+                if counter_obj['page']['info']['visits_on_others_res'] != counter_json['page']['info']['visits_on_others_res']:
+                    counter_obj['page']['info']['visits_on_others_res'] = counter_json['page']['info']['visits_on_others_res']
+                    counter_changed = True 
+
+                if counter_obj['page']['wiki']['avg_rating_gained'] != counter_json['page']['wiki']['avg_rating_gained']:
+                    counter_obj['page']['wiki']['avg_rating_gained'] = counter_json['page']['wiki']['avg_rating_gained']
+                    counter_changed = True
+                if counter_obj['page']['wiki']['commented_on_others_res'] != counter_json['page']['wiki']['commented_on_others_res']:
+                    counter_obj['page']['wiki']['commented_on_others_res'] = counter_json['page']['wiki']['commented_on_others_res']
+                    counter_changed = True
+                if counter_obj['page']['wiki']['comments_by_others_on_res'] != counter_json['page']['wiki']['comments_by_others_on_res']:
+                    counter_obj['page']['wiki']['comments_by_others_on_res'] = counter_json['page']['wiki']['comments_by_others_on_res']
+                    counter_changed = True
+                if counter_obj['page']['wiki']['comments_gained'] != counter_json['page']['wiki']['comments_gained']:
+                    counter_obj['page']['wiki']['comments_gained'] = counter_json['page']['wiki']['comments_gained']
+                    counter_changed = True
+                if counter_obj['page']['wiki']['created'] != counter_json['page']['wiki']['created']:
+                    counter_obj['page']['wiki']['created'] = counter_json['page']['wiki']['created']
+                    counter_changed = True
+                if counter_obj['page']['wiki']['rating_count_received'] != counter_json['page']['wiki']['rating_count_received']:
+                    counter_obj['page']['wiki']['rating_count_received'] = counter_json['page']['wiki']['rating_count_received']
+                    counter_changed = True
+                if counter_obj['page']['wiki']['visits_gained'] != counter_json['page']['wiki']['visits_gained']:
+                    counter_obj['page']['wiki']['visits_gained'] = counter_json['page']['wiki']['visits_gained']
+                    counter_changed = True
+                if counter_obj['page']['wiki']['visits_on_others_res'] != counter_json['page']['wiki']['visits_on_others_res']:
+                    counter_obj['page']['wiki']['visits_on_others_res'] = counter_json['page']['wiki']['visits_on_others_res']
+                    counter_changed = True
+                if counter_obj['quiz']['attempted'] != counter_json['quiz']['attempted']:
+                    counter_obj['quiz']['attempted'] = counter_json['quiz']['attempted']
+                    counter_changed = True
+                if counter_obj['quiz']['correct'] != counter_json['quiz']['correct']:
+                    counter_obj['quiz']['correct'] = counter_json['quiz']['correct']
+                    counter_changed = True
+                if counter_obj['quiz']['incorrect'] != counter_json['quiz']['incorrect']:
+                    counter_obj['quiz']['incorrect'] = counter_json['quiz']['incorrect']
                     counter_changed = True
 
-                if counter_obj.comments_by_others_on_files != counter_json['comments_by_others_on_files'] and counter_json['comments_by_others_on_files']:
-                    n.comments_by_others_on_files.extend(counter_json['comments_by_others_on_files'])
-                    counter_changed = True
-
-                if counter_obj.comments_by_others_on_notes != counter_json['comments_by_others_on_notes'] and counter_json['comments_by_others_on_notes']:
-                    n.comments_by_others_on_notes.extend(counter_json['comments_by_others_on_notes'])
-                    counter_changed = True
 
                 if counter_changed:
                     log_file.write("\n Counter Updated: \n\t OLD: " + str(counter_obj), + "\n\tNew: "+str(counter_json))
@@ -558,7 +610,14 @@ def restore_counter_objects(rcs_counters_path):
                     log_file.write("\nError while inserting Counter obj" + str(counter_insert_err))
                     pass
 
-def call_group_import(rcs_repo_path,non_grp_root_node=None):
+def call_group_import(rcs_repo_path, req_log_file_path, data_restore_path, non_grp_root_node=None):
+
+    global log_file_path
+    global DATA_RESTORE_PATH
+    log_file_path = req_log_file_path
+    DATA_RESTORE_PATH = data_restore_path
+    log_file = open(log_file_path, 'a+')
+    log_file.write("\n######### Script ran on : " + str(datetime.datetime.now()) + " #########\n\n")
 
     rcs_filehives_path = os.path.join(rcs_repo_path, "Filehives")
     rcs_nodes_path = os.path.join(rcs_repo_path, "Nodes")
@@ -600,7 +659,7 @@ def copy_media_data(media_path):
 #     copy_media_data(os.path.join(DATA_DUMP_PATH, 'media_files', 'data', 'media'))
 
 
-def restore_node(filepath, non_grp_root_node=None):
+def restore_node(filepath, non_grp_root_node=None, data_restore_path=None, req_log_file_path=None):
     '''
     non_grp_root_node tuple (ObjectId, name) is used if the GSystem existing on target 
     and we intend to skip the dumped-node-id having the name 
@@ -610,6 +669,13 @@ def restore_node(filepath, non_grp_root_node=None):
     global log_file
     global SCHEMA_ID_MAP
     global DATA_RESTORE_PATH
+    global log_file_path
+    if not DATA_RESTORE_PATH and data_restore_path:
+        DATA_RESTORE_PATH = data_restore_path
+    if not log_file or log_file_path and req_log_file_path:
+        log_file_path = req_log_file_path
+        log_file = open(log_file_path, 'a+')
+
     if not SCHEMA_ID_MAP:
         SCHEMA_ID_MAP = update_factory_schema_mapper(DATA_RESTORE_PATH)
 
@@ -754,7 +820,8 @@ def restore_node(filepath, non_grp_root_node=None):
                     log_file.write("\n Inserting Node doc : \n\t" + str(node_json))
                     node_id = node_collection.collection.insert(node_json)
                     node_obj = node_collection.one({'_id': node_id})
-                    node_obj.save(groupid=ObjectId(CONFIG_VARIABLES.GROUP_ID))
+                    if 'GROUP_ID' in CONFIG_VARIABLES:
+                        node_obj.save(groupid=ObjectId(CONFIG_VARIABLES.GROUP_ID))
                     log_file.write("\nUpdate RCS using save()")
                 except Exception as node_insert_err:
                     log_file.write("\nError while inserting Node obj" + str(node_insert_err))
