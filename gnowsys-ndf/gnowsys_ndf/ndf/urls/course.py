@@ -45,6 +45,7 @@ urlpatterns = patterns('gnowsys_ndf.ndf.views.gcourse',
                         url(r'^/gallery/$', 'course_gallery', name='course_gallery'),
                         url(r'^/gallery/(?P<node_id>[\w-]+)$', 'course_gallery', name='course_gallery_detail'),
                         url(r'^/gallery/page-no=(?P<page_no>\d+)/$', 'course_gallery', name='course_gallery_paged'),
+                        url(r'^/progress_report/(?P<user_id>[\w-]+)$', 'progress_report', name='progress_report'),
 
                         url(r'^/filters/$', 'course_filters', name='course_filters'),
                         url(r'^/about/$', 'course_about', name='course_about'),
