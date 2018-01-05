@@ -56,6 +56,7 @@
     "rubik-googlefont": "#a23ec91574",
     "MathJax": "2.7.0",
     "jquery-backstretch": "^2.1.15",
+    "ckeditor-youtube-plugin":"#2.1.4",
     "datatables-rowsgroup": "#2.0.0",
     "datatables.net-buttons": "#1.4.2",
     "datatables.net-buttons-dt": "#1.4.2",

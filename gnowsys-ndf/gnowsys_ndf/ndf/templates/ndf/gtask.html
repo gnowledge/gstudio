@@ -1,0 +1,167 @@
+{% load i18n %}
+{% load pagination_tags %}
+{% load ndf_tags %}
+  
+{% block body_content %}
+{% check_is_user_group groupid as is_author %}
+
+
+ 
+  <div class="row task_sheet ">
+    <div class="small-12 columns">
+        <div class="task_editor ">
+          <div class="small-2 columns hide-for-small hide-for-medium">
+            <div class="task_tree">
+              <div class="lesson-title" title="">
+              </div>
+                <div class="activity-title">
+                    <li class="active task-list"> 
+                      <a href="#">
+                        <img src="/static/ndf/images/task_list.svg" style="height: 65px;width: 266px;align-content: center;"/>
+                        <h7 style="margin-left: 81px;font-size: 26px;">Task List</h7>
+                      </a>
+                    </li>
+                    <li> 
+                      <a href="#">
+                        <img src="/static/ndf/images/new_task.svg" style="height: 65px;width: 266px;align-content: center;"/>
+                        <h7 style="margin-left: 65px;font-size: 26px;">Create New</h7>
+                      </a>
+                    </li>
+                    <li class="assigned-to-me"> 
+                      <a href="#">
+                        <img src="/static/ndf/images/assigned_to_me.svg" style="height: 65px;width: 266px;align-content: center;"/>
+                        <h7 style="margin-left: 65px;font-size: 26px;">Assigned to me</h7>
+                      </a>
+                    </li>
+                    <li class="created-by-me"> 
+                      <a href="#">
+                        <img src="/static/ndf/images/created_by_me.svg" style="height: 65px;width: 266px;align-content: center;"/>
+                        <h7 style="margin-left: 65px;font-size: 26px;">Created by me</h7>
+                      </a>
+                    </li>
+                    <li class="pending-tasks"> 
+                      <a href="#">
+                        <img src="/static/ndf/images/pending_task.svg" style="height: 65px;width: 266px;align-content: center;"/>
+                        <h7 style="margin-left: 65px;font-size: 26px;">Pending Tasks</h7>
+                      </a>
+                    </li>
+                </div>
+            </div>
+          </div>
+        </div>
+
+       <div class="large-10 columns task_editor_section ">
+       </div> 
+
+        
+  </div>
+
+
+
+
+ <script type="text/javascript">
+  $( document ).ready(function() {
+    $.ajax({
+        url: "{% url 'gcheck_filter' group_id 1 'None' %}",
+
+        type: "GET",
+        
+        success: function(data){
+          $(".task_editor_section").html(data)      
+        },
+        
+        complete: function(){
+          // $('#Student').foundation('reveal', 'open');
+        }
+      });
+
+});
+ $( ".task-list" ).click(function() {
+  $.ajax({
+        url: "{% url 'gcheck_filter' group_id 1 'None' %}",
+
+        type: "GET",
+        
+        success: function(data){
+          addActiveClass('task-list')  
+          
+          $(".task_editor_section").html("") 
+          $(".task_editor_section").html(data) 
+        },
+        
+        complete: function(){
+          // $('#Student').foundation('reveal', 'open');
+        }
+      });
+});
+
+
+ $( ".created-by-me" ).click(function() {
+  $.ajax({
+        url: "{% url 'gcheck_filter' group_id 3 'None' %}",
+
+        type: "GET",
+        
+        success: function(data){
+        addActiveClass('created-by-me')  
+          
+          $(".task_editor_section").html("") 
+          $(".task_editor_section").html(data) 
+        },
+        
+        complete: function(){
+          // $('#Student').foundation('reveal', 'open');
+        }
+      });
+});
+
+ $( ".assigned-to-me" ).click(function() {
+  $.ajax({
+        url: "{% url 'gcheck_filter' group_id 4 'None' %}",
+
+        type: "GET",
+        
+        success: function(data){        
+        addActiveClass('assigned-to-me')  
+          $(".task_editor_section").html("") 
+          $(".task_editor_section").html(data) 
+        },
+        
+        complete: function(){
+          // $('#Student').foundation('reveal', 'open');
+        }
+      });
+});
+
+ $( ".pending-tasks" ).click(function() {
+  $.ajax({
+        url: "{% url 'gcheck_filter' group_id 5 'None' %}",
+
+        type: "GET",
+        
+        success: function(data){
+          addActiveClass('pending-tasks')
+          $(".task_editor_section").html("") 
+          $(".task_editor_section").html(data) 
+        },
+        
+        complete: function(){
+          // $('#Student').foundation('reveal', 'open');
+        }
+      });
+});
+
+ function addActiveClass(className){
+      $('.task-list').removeClass('active')
+      $('.created-by-me').removeClass('active')
+      $('.assigned-to-me').removeClass('active')
+      $('.pending-tasks').removeClass('active')
+      $('.' + className).addClass('active')
+  
+ }
+
+ </script>
+
+
+{% endblock %}
+

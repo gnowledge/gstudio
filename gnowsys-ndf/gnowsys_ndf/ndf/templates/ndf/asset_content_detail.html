@@ -6,15 +6,14 @@
 <div class="row">
   <div class="medium 12 columns">
 	    <div class="left small-12 medium-6 columns">
-	                <label>{% trans "File name:" %} <b> {{node.name}} </b>
+	                <label >{% trans "File name:" %} <b> <a href="{% url 'read_file' group_name_tag node download_filename %}" download="{{ download_filename }}"> {{node.name}} </a> </b>
                   	                    
 	                    <!--<input type="text" placeholder="" name="resource_name" />-->
 	                </label>
                     <label>{% trans "Created By:" %} <b> {{ node.user_details_dict.contributors|join:', ' }} </b>
                       <!--<input type="text" placeholder="" name="resource_name" />-->
                   </label>
-
-	      <div class="preview_asset"> 
+	      <div  {% if 'Page' in node.member_of_names_list %} class="preview_asset_page" {% else %} class="preview_asset" {% endif %} > 
            {% if title == "asset_content_detail" or title == "asset_gallery_detail" or title == "raw_material_detail"%}
 
 	          {% include "ndf/resource_view.html" with node=node %}
@@ -23,6 +22,7 @@
 	    </div>
 
 
+          {% if 'Page'  not in node.member_of_names_list %}
           <div class="right small-12 medium-6 columns">
           <a class="text_button right"  href="{% url 'read_file' group_name_tag node download_filename %}"  download="{{ download_filename }}">
                     <i class="fa fa-download" aria-hidden="true"></i> {% trans 'Download' %}
@@ -42,6 +42,9 @@
                 {%  endif %}
             {%  endif %}
             </div>
+            {% else %}
+            <a href="{% url 'edit_asset_page' group_id asset_obj.pk node.pk %}">{% trans "Edit" %}</a>
+            {% endif %}
         </div>
             
         </div>

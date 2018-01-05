@@ -30422,7 +30422,7 @@ ul.horizontal_tabs_gstudio > li.sub_group_action:hover ul {
 }
 
 /* create units */
-/* line 7163, ../../../scss/_app_styles.scss */
+/* line 7164, ../../../scss/_app_styles.scss */
 .course_creator_header {
   width: 100%;
   height: 50px;
@@ -30430,7 +30430,7 @@ ul.horizontal_tabs_gstudio > li.sub_group_action:hover ul {
   padding: 5px 15px;
   box-shadow: 1px 0px 0px #000;
 }
-/* line 7170, ../../../scss/_app_styles.scss */
+/* line 7171, ../../../scss/_app_styles.scss */
 .course_creator_header .unit_editor {
   width: 100%;
   height: 320px;
@@ -30438,13 +30438,13 @@ ul.horizontal_tabs_gstudio > li.sub_group_action:hover ul {
   padding: 5px 15px;
   box-shadow: 1px 0px 0px #000;
 }
-/* line 7179, ../../../scss/_app_styles.scss */
+/* line 7180, ../../../scss/_app_styles.scss */
 .course_creator_header .back_to_group {
   padding: 0px 15px 0px 10px;
   border-right: 1px solid #ccc;
   margin-right: 15px;
 }
-/* line 7185, ../../../scss/_app_styles.scss */
+/* line 7186, ../../../scss/_app_styles.scss */
 .course_creator_header .course_heading_unit {
   width: 500px;
   height: 40px;
@@ -30453,24 +30453,24 @@ ul.horizontal_tabs_gstudio > li.sub_group_action:hover ul {
   float: right;
   text-align: center;
 }
-/* line 7194, ../../../scss/_app_styles.scss */
+/* line 7195, ../../../scss/_app_styles.scss */
 .course_creator_header .course_heading_unit:focus {
   border: 1px solid #74b3dc;
 }
-/* line 7198, ../../../scss/_app_styles.scss */
+/* line 7199, ../../../scss/_app_styles.scss */
 .course_creator_header .course_heading_unit::-webkit-input-placeholder
  {
   color: #d9dfe4;
   letter-spacing: 0.8px;
 }
-/* line 7206, ../../../scss/_app_styles.scss */
+/* line 7207, ../../../scss/_app_styles.scss */
 .course_creator_header .course_heading_unit select {
   font-size: 14px;
   font-family: 'OpenSans-Regular', sans-serif;
   color: gray;
   border: 0px solid #74b3dc;
 }
-/* line 7215, ../../../scss/_app_styles.scss */
+/* line 7216, ../../../scss/_app_styles.scss */
 .course_creator_header .course_heading input {
   width: 500px;
   height: 40px;
@@ -30479,31 +30479,31 @@ ul.horizontal_tabs_gstudio > li.sub_group_action:hover ul {
   float: right;
   text-align: center;
 }
-/* line 7223, ../../../scss/_app_styles.scss */
+/* line 7224, ../../../scss/_app_styles.scss */
 .course_creator_header .course_heading input:focus {
   border: 1px solid #74b3dc;
 }
-/* line 7227, ../../../scss/_app_styles.scss */
+/* line 7228, ../../../scss/_app_styles.scss */
 .course_creator_header .course_heading input::-webkit-input-placeholder
  {
   color: #d9dfe4;
   letter-spacing: 0.8px;
 }
-/* line 7237, ../../../scss/_app_styles.scss */
+/* line 7238, ../../../scss/_app_styles.scss */
 .course_creator_header .course_heading h5 {
   margin-top: 15px;
 }
-/* line 7242, ../../../scss/_app_styles.scss */
+/* line 7243, ../../../scss/_app_styles.scss */
 .course_creator_header .course_heading span {
   letter-spacing: 0.9px;
   font-weight: 600;
   line-height: 50px;
 }
-/* line 7250, ../../../scss/_app_styles.scss */
+/* line 7251, ../../../scss/_app_styles.scss */
 .course_creator_header .course_actions ul {
   margin: 0px;
 }
-/* line 7253, ../../../scss/_app_styles.scss */
+/* line 7254, ../../../scss/_app_styles.scss */
 .course_creator_header .course_actions ul li {
   list-style-type: none;
   display: inline-block;
@@ -30512,11 +30512,11 @@ ul.horizontal_tabs_gstudio > li.sub_group_action:hover ul {
   cursor: pointer;
   letter-spacing: 0.8px;
 }
-/* line 7262, ../../../scss/_app_styles.scss */
+/* line 7263, ../../../scss/_app_styles.scss */
 .course_creator_header .course_actions ul li.active, .course_creator_header .course_actions ul li:hover {
   border-bottom: 3px solid #ffc14e;
 }
-/* line 7267, ../../../scss/_app_styles.scss */
+/* line 7268, ../../../scss/_app_styles.scss */
 .course_creator_header .course_actions span {
   margin-right: 5px;
   background: rgba(0, 0, 0, 0.6);
@@ -30528,7 +30528,7 @@ ul.horizontal_tabs_gstudio > li.sub_group_action:hover ul {
   cursor: pointer;
   border-radius: 3px;
 }
-/* line 7279, ../../../scss/_app_styles.scss */
+/* line 7280, ../../../scss/_app_styles.scss */
 .course_creator_header .course_actions i {
   margin-right: 5px;
   background: rgba(0, 0, 0, 0.6);
@@ -30541,7 +30541,7 @@ ul.horizontal_tabs_gstudio > li.sub_group_action:hover ul {
   border-radius: 3px;
 }
 
-/* line 7297, ../../../scss/_app_styles.scss */
+/* line 7298, ../../../scss/_app_styles.scss */
 .create_unit {
   background: #fff;
   box-shadow: 0px 2px 3px #000;
@@ -30549,7 +30549,7 @@ ul.horizontal_tabs_gstudio > li.sub_group_action:hover ul {
   padding: 10px;
 }
 
-/* line 7305, ../../../scss/_app_styles.scss */
+/* line 7306, ../../../scss/_app_styles.scss */
 .button-hollow-black {
   background: #fff;
   border: 2px solid #164A7B;
@@ -30560,312 +30560,13 @@ ul.horizontal_tabs_gstudio > li.sub_group_action:hover ul {
   padding: 2px 10px;
 }
 
-/* line 7315, ../../../scss/_app_styles.scss */
+/* line 7316, ../../../scss/_app_styles.scss */
 .vertically-center {
   top: 50%;
   transform: translateY(-50%);
 }
 
-/* Unit_Structure styles */
-/* line 7323, ../../../scss/_app_styles.scss */
-.course_creator {
-  background: #fff;
-  box-shadow: 0px 2px 6px #000;
-  margin: 0px auto;
-  padding: 0px 0px;
-  max-width: 100vw;
-}
-/* line 7331, ../../../scss/_app_styles.scss */
-.course_creator > .columns {
-  padding: 0px;
-  height: 100%;
-}
-/* line 7335, ../../../scss/_app_styles.scss */
-.course_creator .course_editor {
-  margin-bottom: 10px;
-  position: relative;
-  /*Overriding default*/
-  /*Custom css*/
-  /* Course edit in the edit mode. */
-}
-/* line 7341, ../../../scss/_app_styles.scss */
-.course_creator .course_editor .accordion .accordion-navigation > .content, .course_creator .course_editor .accordion dd > .content {
-  padding: 0px;
-  padding-left: 0px;
-}
-/* line 7347, ../../../scss/_app_styles.scss */
-.course_creator .course_editor > div {
-  display: inline-block;
-  vertical-align: top;
-}
-/* line 7352, ../../../scss/_app_styles.scss */
-.course_creator .course_editor .course_tree {
-  transition: all 1s ease;
-  -webkit-transition: all 1s ease;
-  width: 100%;
-  background-color: #fff;
-  max-height: 100%;
-  overflow-y: auto;
-  height: 100vh;
-}
-/* line 7361, ../../../scss/_app_styles.scss */
-.course_creator .course_editor .course_tree .course-lessons dd {
-  border-bottom: 2px solid #9abfd9;
-  transition: border-color 1s ease;
-  -webkit-transition: border-color 1s ease;
-}
-/* line 7365, ../../../scss/_app_styles.scss */
-.course_creator .course_editor .course_tree .course-lessons dd.accordion-navigation {
-  position: relative;
-  padding-left: 0px;
-}
-/* line 7370, ../../../scss/_app_styles.scss */
-.course_creator .course_editor .course_tree .course-lessons dd.accordion-navigation > a:before {
-  position: absolute;
-  left: 23px;
-  line-height: 20px;
-  color: #74b3dc;
-}
-/* line 7379, ../../../scss/_app_styles.scss */
-.course_creator .course_editor .course_tree .course-lessons dd.accordion-navigation a.entity-title {
-  background: inherit;
-  cursor: pointer;
-  font-weight: 600;
-  color: #3c5267;
-  transition: color 1s ease;
-  -webkit-transition: color 1s ease;
-}
-/* line 7386, ../../../scss/_app_styles.scss */
-.course_creator .course_editor .course_tree .course-lessons dd.accordion-navigation a.entity-title .edit_entity {
-  color: #c9d1d8;
-  font-weight: 400;
-  letter-spacing: 0.5px;
-  display: block;
-  position: relative;
-  display: none;
-}
-/* line 7395, ../../../scss/_app_styles.scss */
-.course_creator .course_editor .course_tree .course-lessons dd.accordion-navigation a.entity-title .edit_entity i {
-  display: none;
-}
-/* line 7400, ../../../scss/_app_styles.scss */
-.course_creator .course_editor .course_tree .course-lessons dd.accordion-navigation a.entity-title .edit_entity > .entity_actions {
-  margin-bottom: 0px;
-}
-/* line 7403, ../../../scss/_app_styles.scss */
-.course_creator .course_editor .course_tree .course-lessons dd.accordion-navigation a.entity-title .edit_entity > .entity_actions li {
-  white-space: nowrap;
-  list-style: none;
-  display: inline-block;
-  margin: 0px 10px;
-  cursor: pointer;
-}
-/* line 7413, ../../../scss/_app_styles.scss */
-.course_creator .course_editor .course_tree .course-lessons dd.accordion-navigation a.entity-title:hover .edit_entity {
-  display: block;
-}
-/* line 7419, ../../../scss/_app_styles.scss */
-.course_creator .course_editor .course_tree .course-lessons dd.accordion-navigation.active > a:before {
-  content: '';
-  line-height: 55px;
-  color: #d7d7d7;
-}
-/* line 7427, ../../../scss/_app_styles.scss */
-.course_creator .course_editor .course_tree .course-lessons dd.accordion-navigation .course-activities {
-  margin: 0px;
-}
-/* line 7429, ../../../scss/_app_styles.scss */
-.course_creator .course_editor .course_tree .course-lessons dd.accordion-navigation .course-activities > li {
-  list-style: none;
-  border-top: 1px solid #e9e9e9;
-  padding: 10px 0px 10px 30px;
-  background: inherit;
-  transition: border-color 1s ease;
-  -webkit-transition: border-color 1s ease;
-}
-/* line 7436, ../../../scss/_app_styles.scss */
-.course_creator .course_editor .course_tree .course-lessons dd.accordion-navigation .course-activities > li > a {
-  color: #7ca0d0;
-  width: 100%;
-  display: block;
-  transition: color 1s ease;
-  -webkit-transition: color 1s ease;
-}
-/* line 7445, ../../../scss/_app_styles.scss */
-.course_creator .course_editor .course_tree .course-lessons dd.accordion-navigation .content {
-  background: inherit;
-}
-/* line 7454, ../../../scss/_app_styles.scss */
-.course_creator .course_editor .course-editor-section {
-  width: 0%;
-  display: inline-block;
-  opacity: 0;
-  transition: width 1s ease;
-  -webkit-transition: width 1s ease;
-  height: inherit;
-  max-height: 100%;
-  overflow-y: auto;
-  background: #fff;
-}
-/* line 7464, ../../../scss/_app_styles.scss */
-.course_creator .course_editor .course-editor-section .editor-header {
-  height: 55px;
-  background-color: #e5f1f6;
-  border-bottom: 1px solid #e6e6e7;
-  margin-bottom: 10px;
-}
-/* line 7470, ../../../scss/_app_styles.scss */
-.course_creator .course_editor .course-editor-section .editor-header .header-left {
-  padding: 14px 10px 10px 10px;
-}
-/* line 7473, ../../../scss/_app_styles.scss */
-.course_creator .course_editor .course-editor-section .editor-header .header-left > span {
-  color: #3c5264;
-  font-weight: 600;
-  margin-right: 10px;
-}
-/* line 7482, ../../../scss/_app_styles.scss */
-.course_creator .course_editor .course-editor-section .editor-header .custom_dropdown {
-  margin: 40px 35px 0px;
-}
-/* line 7487, ../../../scss/_app_styles.scss */
-.course_creator .course_editor .course-editor-section .editor-tool .editor_actions {
-  background-color: #fff;
-  border-bottom: 1px solid #ccc;
-  height: 55px;
-}
-/* line 7491, ../../../scss/_app_styles.scss */
-.course_creator .course_editor .course-editor-section .editor-tool .editor_actions ul {
-  margin: 0px;
-}
-/* line 7493, ../../../scss/_app_styles.scss */
-.course_creator .course_editor .course-editor-section .editor-tool .editor_actions ul li {
-  list-style: none;
-  display: inline-block;
-}
-/* line 7496, ../../../scss/_app_styles.scss */
-.course_creator .course_editor .course-editor-section .editor-tool .editor_actions ul li:not(:first-child) {
-  padding: 1px 30px;
-  border-left: 1px solid #ccc;
-  text-align: center;
-}
-/* line 7502, ../../../scss/_app_styles.scss */
-.course_creator .course_editor .course-editor-section .editor-tool .editor_actions ul li span {
-  display: inline-block;
-  letter-spacing: 0.5px;
-  color: #999;
-  padding: 15px 5px;
-  cursor: pointer;
-}
-/* line 7517, ../../../scss/_app_styles.scss */
-.course_creator .course_editor .add-lesson {
-  margin-top: 20px;
-  margin-left: 20px;
-  float: left;
-}
-/* line 7525, ../../../scss/_app_styles.scss */
-.course_creator .course_editor .add_activity {
-  margin-top: 3px;
-}
-/* line 7531, ../../../scss/_app_styles.scss */
-.course_creator .course_editor .create_activity {
-  margin-top: 0px;
-  margin-left: -7.1px;
-}
-/* line 7540, ../../../scss/_app_styles.scss */
-.course_creator .course_editor.edit_mode button {
-  color: #5097b5;
-  border-color: #5097b5;
-  transition: color 1s ease, border-color 1s ease;
-  -webkit-transition: color 1s ease, border-color 1s ease;
-}
-/* line 7545, ../../../scss/_app_styles.scss */
-.course_creator .course_editor.edit_mode .course_tree {
-  transition: all 1s ease;
-  -webkit-transition: all 1s ease;
-  width: 20%;
-  background-color: #2a6882;
-  border: 1px solid #e5f1f6;
-}
-/* line 7552, ../../../scss/_app_styles.scss */
-.course_creator .course_editor.edit_mode .course_tree .course-lessons dd {
-  border-color: #295566;
-  transition: border-color 1s ease;
-  -webkit-transition: border-color 1s ease;
-}
-/* line 7557, ../../../scss/_app_styles.scss */
-.course_creator .course_editor.edit_mode .course_tree .course-lessons dd.accordion-navigation a {
-  background: inherit;
-  color: #8fbbd8;
-  transition: color 1s ease;
-  -webkit-transition: color 1s ease;
-}
-/* line 7562, ../../../scss/_app_styles.scss */
-.course_creator .course_editor.edit_mode .course_tree .course-lessons dd.accordion-navigation a .edit_entity {
-  width: 20px;
-}
-/* line 7564, ../../../scss/_app_styles.scss */
-.course_creator .course_editor.edit_mode .course_tree .course-lessons dd.accordion-navigation a .edit_entity i {
-  display: block;
-}
-/* line 7568, ../../../scss/_app_styles.scss */
-.course_creator .course_editor.edit_mode .course_tree .course-lessons dd.accordion-navigation a .edit_entity > .entity_actions {
-  display: none;
-  position: absolute;
-  top: 22px;
-  right: -20px;
-  margin: 0px 10px;
-  z-index: 100;
-  background: #fff;
-  color: #999999;
-  border-radius: 3px;
-}
-/* line 7579, ../../../scss/_app_styles.scss */
-.course_creator .course_editor.edit_mode .course_tree .course-lessons dd.accordion-navigation a .edit_entity > .entity_actions li {
-  display: block;
-  margin: 0px;
-  padding: 5px 25px;
-}
-/* line 7584, ../../../scss/_app_styles.scss */
-.course_creator .course_editor.edit_mode .course_tree .course-lessons dd.accordion-navigation a .edit_entity > .entity_actions li:hover {
-  background-color: #d5f2ff;
-}
-/* line 7590, ../../../scss/_app_styles.scss */
-.course_creator .course_editor.edit_mode .course_tree .course-lessons dd.accordion-navigation a .edit_entity:hover > .entity_actions {
-  display: block;
-}
-/* line 7596, ../../../scss/_app_styles.scss */
-.course_creator .course_editor.edit_mode .course_tree .course-lessons dd.accordion-navigation .course-activities > li {
-  transition: border-color 1s ease;
-  -webkit-transition: border-color 1s ease;
-  padding-right: 20px;
-  border-color: #295566;
-  border-bottom: 1px solid transparent;
-}
-/* line 7603, ../../../scss/_app_styles.scss */
-.course_creator .course_editor.edit_mode .course_tree .course-lessons dd.accordion-navigation .course-activities > li:not(:last-child):hover, .course_creator .course_editor.edit_mode .course_tree .course-lessons dd.accordion-navigation .course-activities > li:not(:last-child).active {
-  border-width: 1px 0px 1px 0px;
-  border-style: solid;
-  border-color: #50c0f8;
-}
-/* line 7610, ../../../scss/_app_styles.scss */
-.course_creator .course_editor.edit_mode .course_tree .course-lessons dd.accordion-navigation .course-activities > li > a {
-  color: #edf6ff;
-  transition: color 1s ease;
-  -webkit-transition: color 1s ease;
-}
-/* line 7621, ../../../scss/_app_styles.scss */
-.course_creator .course_editor.edit_mode .course-editor-section {
-  width: 77%;
-  opacity: 1;
-  max-width: 100%;
-  background: #fff;
-  overflow-x: hidden;
-  transition: width 1.9s ease, opacity 4s ease;
-  -webkit-transition: width 1.9s ease, opacity 4s ease;
-}
-
-/* line 7639, ../../../scss/_app_styles.scss */
+/* line 7325, ../../../scss/_app_styles.scss */
 .top-bar-second, .top-bar-second .name {
   height: 52px;
   background: #ddeff9;
@@ -30873,34 +30574,34 @@ ul.horizontal_tabs_gstudio > li.sub_group_action:hover ul {
   margin-bottom: 30px;
 }
 
-/* line 7649, ../../../scss/_app_styles.scss */
+/* line 7335, ../../../scss/_app_styles.scss */
 .top-bar-second .title-area {
   box-shadow: 0px 0.6px 3px #000;
   z-index: 20;
   width: 100%;
 }
-/* line 7654, ../../../scss/_app_styles.scss */
+/* line 7340, ../../../scss/_app_styles.scss */
 .top-bar-second .name {
   text-align: center;
 }
-/* line 7657, ../../../scss/_app_styles.scss */
+/* line 7343, ../../../scss/_app_styles.scss */
 .top-bar-second .name .close-dropdown, .top-bar-second .name .side-bar-button {
   position: absolute;
   left: 15px;
   color: #fff;
   font-weight: 100;
 }
-/* line 7667, ../../../scss/_app_styles.scss */
+/* line 7353, ../../../scss/_app_styles.scss */
 .top-bar-second li.toggle-topbar i {
   color: #fff;
   display: inline-block;
   vertical-align: bottom;
 }
-/* line 7675, ../../../scss/_app_styles.scss */
+/* line 7361, ../../../scss/_app_styles.scss */
 .top-bar-second .top-bar-second-section ul li {
   background: #164A7B;
 }
-/* line 7677, ../../../scss/_app_styles.scss */
+/* line 7363, ../../../scss/_app_styles.scss */
 .top-bar-second .top-bar-second-section ul li > a {
   border-left: 3px solid transparent;
   border-bottom: 1px solid #4b5b6b;
@@ -30909,31 +30610,31 @@ ul.horizontal_tabs_gstudio > li.sub_group_action:hover ul {
   font-weight: bold;
   letter-spacing: 0.5px;
 }
-/* line 7688, ../../../scss/_app_styles.scss */
+/* line 7374, ../../../scss/_app_styles.scss */
 .top-bar-second .top-bar-second-section ul li:hover > a, .top-bar-second .top-bar-second-section ul li.active > a {
   border-left-color: #ffc14e;
   color: #ce7869;
 }
-/* line 7696, ../../../scss/_app_styles.scss */
+/* line 7382, ../../../scss/_app_styles.scss */
 .top-bar-second .top-bar-second-section .dropdown li.parent-link a {
   display: none;
 }
-/* line 7702, ../../../scss/_app_styles.scss */
+/* line 7388, ../../../scss/_app_styles.scss */
 .top-bar-second .top-bar-second-section .side-bar-menu .add_buddy i {
   color: #2e3f51;
   background: #acd4fa;
 }
 
 @media screen and (min-width: 40.063em) {
-  /* line 7713, ../../../scss/_app_styles.scss */
+  /* line 7399, ../../../scss/_app_styles.scss */
   .top-bar-second .title-area {
     box-shadow: none;
   }
-  /* line 7715, ../../../scss/_app_styles.scss */
+  /* line 7401, ../../../scss/_app_styles.scss */
   .top-bar-second .title-area .name {
     text-align: right;
   }
-  /* line 7722, ../../../scss/_app_styles.scss */
+  /* line 7408, ../../../scss/_app_styles.scss */
   .top-bar-second .top-bar-second-section li:not(.has-form) a:not(.button) {
     cursor: pointer;
     background: transparent;
@@ -30941,32 +30642,32 @@ ul.horizontal_tabs_gstudio > li.sub_group_action:hover ul {
     line-height: 52px;
     border-left-width: 0px;
   }
-  /* line 7729, ../../../scss/_app_styles.scss */
+  /* line 7415, ../../../scss/_app_styles.scss */
   .top-bar-second .top-bar-second-section li:not(.has-form) a:not(.button):hover {
     color: #ce7869;
     border-bottom: 3px solid #ffc14e;
   }
-  /* line 7735, ../../../scss/_app_styles.scss */
+  /* line 7421, ../../../scss/_app_styles.scss */
   .top-bar-second .top-bar-second-section li:not(.has-form).active a:not(.button) {
     color: #ce7869;
     border-bottom: 3px solid #ffc14e;
   }
-  /* line 7743, ../../../scss/_app_styles.scss */
+  /* line 7429, ../../../scss/_app_styles.scss */
   .top-bar-second .top-bar-second-section li:not(.has-form).has-dropdown a:not(.button):hover {
     color: #74b3dc;
     border-bottom: 0px;
   }
-  /* line 7753, ../../../scss/_app_styles.scss */
+  /* line 7439, ../../../scss/_app_styles.scss */
   .top-bar-second .top-bar-second-section li.active:not(.has-form) a:not(.button):hover {
     background: transparent;
   }
-  /* line 7762, ../../../scss/_app_styles.scss */
+  /* line 7448, ../../../scss/_app_styles.scss */
   .top-bar-second .top-bar-second-section .dropdown li:not(.has-form) > a:not(.button) {
     border-left-width: 2px;
     color: #74b3dc;
     background: #164A7B;
   }
-  /* line 7769, ../../../scss/_app_styles.scss */
+  /* line 7455, ../../../scss/_app_styles.scss */
   .top-bar-second .top-bar-second-section .dropdown li:not(.has-form):hover a:not(.button), .top-bar-second .top-bar-second-section .dropdown li:not(.has-form).active a:not(.button) {
     background: #164A7B;
     color: #74b3dc;
@@ -30979,7 +30680,7 @@ ul.horizontal_tabs_gstudio > li.sub_group_action:hover ul {
   }
 }
 /*  Buttons custom css */
-/* line 7790, ../../../scss/_app_styles.scss */
+/* line 7476, ../../../scss/_app_styles.scss */
 .secondary-header-tabs {
   color: #719dc7;
   font-weight: 400;
@@ -30989,11 +30690,11 @@ ul.horizontal_tabs_gstudio > li.sub_group_action:hover ul {
   -webkit-transition: color 1s ease, border-color 1s ease;
   display: inline-block;
 }
-/* line 7799, ../../../scss/_app_styles.scss */
+/* line 7485, ../../../scss/_app_styles.scss */
 .secondary-header-tabs:hover {
   color: #164A7B;
 }
-/* line 7803, ../../../scss/_app_styles.scss */
+/* line 7489, ../../../scss/_app_styles.scss */
 .secondary-header-tabs.active {
   color: #164A7B;
   border-bottom: 2px solid #164A7B;
@@ -31001,7 +30702,7 @@ ul.horizontal_tabs_gstudio > li.sub_group_action:hover ul {
   font-weight: 600;
 }
 
-/* line 7812, ../../../scss/_app_styles.scss */
+/* line 7498, ../../../scss/_app_styles.scss */
 .secondary-header-button {
   color: #3c556d;
   font-weight: 700;
@@ -31014,12 +30715,12 @@ ul.horizontal_tabs_gstudio > li.sub_group_action:hover ul {
   font-size: 13px;
   letter-spacing: 1.2px;
 }
-/* line 7824, ../../../scss/_app_styles.scss */
+/* line 7510, ../../../scss/_app_styles.scss */
 .secondary-header-button:hover {
   opacity: 0.5;
 }
 
-/* line 7831, ../../../scss/_app_styles.scss */
+/* line 7517, ../../../scss/_app_styles.scss */
 .orange-button {
   color: #ce7869;
   padding: 7px 14px;
@@ -31033,13 +30734,13 @@ ul.horizontal_tabs_gstudio > li.sub_group_action:hover ul {
   margin-top: 8px;
   cursor: pointer;
 }
-/* line 7843, ../../../scss/_app_styles.scss */
+/* line 7529, ../../../scss/_app_styles.scss */
 .orange-button:hover {
   background-color: rgba(206, 120, 105, 0.2);
   color: #ce7869;
 }
 
-/* line 7849, ../../../scss/_app_styles.scss */
+/* line 7535, ../../../scss/_app_styles.scss */
 .pink-button {
   background: #a2238d;
   height: 37px;
@@ -31052,12 +30753,12 @@ ul.horizontal_tabs_gstudio > li.sub_group_action:hover ul {
   margin-top: 2px !important;
   letter-spacing: 0.4px;
 }
-/* line 7860, ../../../scss/_app_styles.scss */
+/* line 7546, ../../../scss/_app_styles.scss */
 .pink-button:hover {
   box-shadow: 0px 0px 17px rgba(0, 0, 0, 0.68);
 }
 
-/* line 7865, ../../../scss/_app_styles.scss */
+/* line 7551, ../../../scss/_app_styles.scss */
 .orange-button-template {
   color: #ce7869;
   padding: 7px 14px;
@@ -31070,13 +30771,13 @@ ul.horizontal_tabs_gstudio > li.sub_group_action:hover ul {
   margin-bottom: 8px;
   margin-top: 10px;
 }
-/* line 7876, ../../../scss/_app_styles.scss */
+/* line 7562, ../../../scss/_app_styles.scss */
 .orange-button-template:hover {
   background-color: rgba(206, 120, 105, 0.2);
   color: #ce7869;
 }
 
-/* line 7884, ../../../scss/_app_styles.scss */
+/* line 7570, ../../../scss/_app_styles.scss */
 .orange-button-subtitle {
   color: #ce7869;
   padding: 7px 14px;
@@ -31089,13 +30790,13 @@ ul.horizontal_tabs_gstudio > li.sub_group_action:hover ul {
   margin-bottom: 8px;
   margin-top: 10px;
 }
-/* line 7895, ../../../scss/_app_styles.scss */
+/* line 7581, ../../../scss/_app_styles.scss */
 .orange-button-subtitle:hover {
   background-color: rgba(206, 120, 105, 0.2);
   color: #ce7869;
 }
 
-/* line 7902, ../../../scss/_app_styles.scss */
+/* line 7588, ../../../scss/_app_styles.scss */
 .asset-unit-button {
   color: #ce7869;
   padding: 7px 14px;
@@ -31108,13 +30809,13 @@ ul.horizontal_tabs_gstudio > li.sub_group_action:hover ul {
   margin-bottom: 8px;
   margin-top: 300px;
 }
-/* line 7913, ../../../scss/_app_styles.scss */
+/* line 7599, ../../../scss/_app_styles.scss */
 .asset-unit-button:hover {
   background-color: rgba(206, 120, 105, 0.2);
   color: #ce7869;
 }
 
-/* line 7920, ../../../scss/_app_styles.scss */
+/* line 7606, ../../../scss/_app_styles.scss */
 .disab-button {
   margin-right: 10px;
   background-color: #fff;
@@ -31122,13 +30823,13 @@ ul.horizontal_tabs_gstudio > li.sub_group_action:hover ul {
   font-size: 14px;
 }
 
-/* line 7928, ../../../scss/_app_styles.scss */
+/* line 7614, ../../../scss/_app_styles.scss */
 .save-asset {
   margin-top: 9px;
   margin-right: -133px;
 }
 
-/* line 7932, ../../../scss/_app_styles.scss */
+/* line 7618, ../../../scss/_app_styles.scss */
 .asset-save-button {
   color: #ce7869;
   display: inline-block;
@@ -31148,7 +30849,7 @@ ul.horizontal_tabs_gstudio > li.sub_group_action:hover ul {
   margin-top: 5px;
 }
 
-/* line 7952, ../../../scss/_app_styles.scss */
+/* line 7638, ../../../scss/_app_styles.scss */
 .blue-white-button {
   color: #fff;
   background: #164A7B;
@@ -31159,7 +30860,7 @@ ul.horizontal_tabs_gstudio > li.sub_group_action:hover ul {
   padding: 8px 10px;
 }
 
-/* line 7962, ../../../scss/_app_styles.scss */
+/* line 7648, ../../../scss/_app_styles.scss */
 button[disabled], .button.disabled, .button[disabled] {
   background-color: #eefaff;
   border-color: #eefaff;
@@ -31173,13 +30874,13 @@ button[disabled], .button.disabled, .button[disabled] {
   padding: 8px 10px;
 }
 
-/* line 7976, ../../../scss/_app_styles.scss */
+/* line 7662, ../../../scss/_app_styles.scss */
 .button-small {
   padding: 1px 5px;
 }
 
 /* Tag styles */
-/* line 7984, ../../../scss/_app_styles.scss */
+/* line 7670, ../../../scss/_app_styles.scss */
 .asset-tags-container {
   width: 100%;
   height: 50px;
@@ -31187,16 +30888,16 @@ button[disabled], .button.disabled, .button[disabled] {
   padding: 5px 15px;
   margin-bottom: 65px;
 }
-/* line 7991, ../../../scss/_app_styles.scss */
+/* line 7677, ../../../scss/_app_styles.scss */
 .asset-tags-container .tag-input-ele {
   margin-left: 17px;
   width: 96%;
 }
-/* line 7996, ../../../scss/_app_styles.scss */
+/* line 7682, ../../../scss/_app_styles.scss */
 .asset-tags-container .added-tags-div {
   margin-left: -206px;
 }
-/* line 8001, ../../../scss/_app_styles.scss */
+/* line 7687, ../../../scss/_app_styles.scss */
 .asset-tags-container #add-tag-btn {
   color: #ce7869;
   padding: 7px 14px;
@@ -31211,13 +30912,13 @@ button[disabled], .button.disabled, .button[disabled] {
   cursor: pointer;
   display: inline-block;
 }
-/* line 8014, ../../../scss/_app_styles.scss */
+/* line 7700, ../../../scss/_app_styles.scss */
 .asset-tags-container #add-tag-btn:hover {
   background-color: rgba(206, 120, 105, 0.2);
   color: #ce7869;
 }
 
-/* line 8024, ../../../scss/_app_styles.scss */
+/* line 7710, ../../../scss/_app_styles.scss */
 .tags-container {
   width: 100%;
   height: 50px;
@@ -31226,7 +30927,7 @@ button[disabled], .button.disabled, .button[disabled] {
   box-shadow: 1px 0px 0px #000;
   margin-bottom: 65px;
 }
-/* line 8032, ../../../scss/_app_styles.scss */
+/* line 7718, ../../../scss/_app_styles.scss */
 .tags-container .add-tag-heading span {
   width: 40%;
   color: #99aaba;
@@ -31237,17 +30938,17 @@ button[disabled], .button.disabled, .button[disabled] {
   margin-left: 8px;
   font-family: "Helvetica Neue", "Helvetica", "Roboto", "Arial", "sans-serif";
 }
-/* line 8043, ../../../scss/_app_styles.scss */
+/* line 7729, ../../../scss/_app_styles.scss */
 .tags-container .tag-input-ele {
   margin-left: 193px;
   width: 54%;
 }
-/* line 8048, ../../../scss/_app_styles.scss */
+/* line 7734, ../../../scss/_app_styles.scss */
 .tags-container .added-tags-div {
   margin-left: 293px !important;
   width: 54%;
 }
-/* line 8053, ../../../scss/_app_styles.scss */
+/* line 7739, ../../../scss/_app_styles.scss */
 .tags-container #add-tag-btn {
   color: #ce7869;
   padding: 7px 14px;
@@ -31262,13 +30963,13 @@ button[disabled], .button.disabled, .button[disabled] {
   cursor: pointer;
   display: inline-block;
 }
-/* line 8066, ../../../scss/_app_styles.scss */
+/* line 7752, ../../../scss/_app_styles.scss */
 .tags-container #add-tag-btn:hover {
   background-color: rgba(206, 120, 105, 0.2);
   color: #ce7869;
 }
 
-/* line 8075, ../../../scss/_app_styles.scss */
+/* line 7761, ../../../scss/_app_styles.scss */
 .asset-unit-button {
   color: #ce7869;
   padding: 7px 14px;
@@ -31281,14 +30982,14 @@ button[disabled], .button.disabled, .button[disabled] {
   margin-bottom: 8px;
   margin-top: 300px;
 }
-/* line 8086, ../../../scss/_app_styles.scss */
+/* line 7772, ../../../scss/_app_styles.scss */
 .asset-unit-button:hover {
   background-color: rgba(206, 120, 105, 0.2);
   color: #ce7869;
 }
 
 /* exploer back*/
-/* line 8094, ../../../scss/_app_styles.scss */
+/* line 7780, ../../../scss/_app_styles.scss */
 .lms_explore_head {
   width: 100%;
   height: 45px;
@@ -31296,43 +30997,43 @@ button[disabled], .button.disabled, .button[disabled] {
   color: #164A7B;
   margin-top: -30px;
 }
-/* line 8100, ../../../scss/_app_styles.scss */
+/* line 7786, ../../../scss/_app_styles.scss */
 .lms_explore_head > p {
   margin-left: 81px;
   padding: 12px 0px 0px 1px;
   font-family: OpenSans-Semibold;
   font-size: 20px;
 }
-/* line 8106, ../../../scss/_app_styles.scss */
+/* line 7792, ../../../scss/_app_styles.scss */
 .lms_explore_head > a {
   padding: 12px 85px 3px 0px;
 }
 
-/* line 8110, ../../../scss/_app_styles.scss */
+/* line 7796, ../../../scss/_app_styles.scss */
 .lms_explore_head_unit {
   width: 100%;
   height: 50px;
   background-color: #fff;
   color: #164A7B;
 }
-/* line 8115, ../../../scss/_app_styles.scss */
+/* line 7801, ../../../scss/_app_styles.scss */
 .lms_explore_head_unit > p {
   margin-left: 81px;
   padding: 0px 0px 0px 1px;
   font-family: OpenSans-Semibold;
   font-size: 20px;
 }
-/* line 8121, ../../../scss/_app_styles.scss */
+/* line 7807, ../../../scss/_app_styles.scss */
 .lms_explore_head_unit > a {
   padding: 0px 85px 3px 0px;
 }
 
-/* line 8126, ../../../scss/_app_styles.scss */
+/* line 7812, ../../../scss/_app_styles.scss */
 .lms_explore_back {
   background-color: #fff;
 }
 
-/* line 8130, ../../../scss/_app_styles.scss */
+/* line 7816, ../../../scss/_app_styles.scss */
 .lms_explore_back_unit {
   background-color: #fff;
   margin-top: -23.3px;
@@ -31341,7 +31042,7 @@ button[disabled], .button.disabled, .button[disabled] {
 /**
  * Sass styles related to module cards
  */
-/* line 8147, ../../../scss/_app_styles.scss */
+/* line 7833, ../../../scss/_app_styles.scss */
 .module_card {
   display: table;
   height: 290px;
@@ -31352,16 +31053,16 @@ button[disabled], .button.disabled, .button[disabled] {
   position: relative;
   box-shadow: 0px 0px 5px 1px rgba(0, 0, 0, 0.15);
 }
-/* line 8157, ../../../scss/_app_styles.scss */
+/* line 7843, ../../../scss/_app_styles.scss */
 .module_card:hover {
   box-shadow: 0px 0px 17px rgba(0, 0, 0, 0.68);
 }
-/* line 8161, ../../../scss/_app_styles.scss */
+/* line 7847, ../../../scss/_app_styles.scss */
 .module_card > div {
   display: table-cell;
   height: 290px;
 }
-/* line 8166, ../../../scss/_app_styles.scss */
+/* line 7852, ../../../scss/_app_styles.scss */
 .module_card .card_banner {
   width: 250px;
   height: 290px;
@@ -31375,14 +31076,14 @@ button[disabled], .button.disabled, .button[disabled] {
   -webkit-transition: border-radius .2s;
   transition: border-radius .2s;
 }
-/* line 8179, ../../../scss/_app_styles.scss */
+/* line 7865, ../../../scss/_app_styles.scss */
 .module_card .card_banner > img {
   height: 100%;
   width: 100%;
   border-radius: 4px;
   -webkit-filter: drop-shadow(16px 16px 10px rgba(0, 0, 0, 0.9));
 }
-/* line 8184, ../../../scss/_app_styles.scss */
+/* line 7870, ../../../scss/_app_styles.scss */
 .module_card .card_banner > img:hover {
   -webkit-transform: scale(1.03);
   -moz-transform: scale(1.03);
@@ -31391,7 +31092,7 @@ button[disabled], .button.disabled, .button[disabled] {
   transform: scale(1.03);
   opacity: 0.8;
 }
-/* line 8196, ../../../scss/_app_styles.scss */
+/* line 7882, ../../../scss/_app_styles.scss */
 .module_card .card_banner > h4 {
   position: absolute;
   top: 100px;
@@ -31400,7 +31101,7 @@ button[disabled], .button.disabled, .button[disabled] {
   color: #ffffff !important;
   text-shadow: 2px 0px 8px black;
 }
-/* line 8211, ../../../scss/_app_styles.scss */
+/* line 7897, ../../../scss/_app_styles.scss */
 .module_card .card_title {
   display: block;
   width: 230px;
@@ -31410,27 +31111,27 @@ button[disabled], .button.disabled, .button[disabled] {
   margin: 0px auto;
   letter-spacing: 1px;
 }
-/* line 8222, ../../../scss/_app_styles.scss */
+/* line 7908, ../../../scss/_app_styles.scss */
 .module_card.animated_card .card_banner {
   border-radius: 8px;
 }
-/* line 8225, ../../../scss/_app_styles.scss */
+/* line 7911, ../../../scss/_app_styles.scss */
 .module_card.animated_card:hover .card_banner {
   border-radius: 8px 0px 0px 8px;
 }
-/* line 8230, ../../../scss/_app_styles.scss */
+/* line 7916, ../../../scss/_app_styles.scss */
 .module_card.animated_card.isOpen .card_banner {
   border-radius: 8px 0px 0px 8px;
 }
-/* line 8234, ../../../scss/_app_styles.scss */
+/* line 7920, ../../../scss/_app_styles.scss */
 .module_card.animated_card:hover .card_summary {
   left: 30px;
 }
-/* line 8237, ../../../scss/_app_styles.scss */
+/* line 7923, ../../../scss/_app_styles.scss */
 .module_card.animated_card .card_summary {
   left: 5px;
 }
-/* line 8241, ../../../scss/_app_styles.scss */
+/* line 7927, ../../../scss/_app_styles.scss */
 .module_card .card_summary {
   width: 290px;
   padding: 0px 15px;
@@ -31446,35 +31147,35 @@ button[disabled], .button.disabled, .button[disabled] {
   /* Safari */
   transition-property: left;
 }
-/* line 8255, ../../../scss/_app_styles.scss */
+/* line 7941, ../../../scss/_app_styles.scss */
 .module_card .card_summary .card_label {
   font-weight: 500;
   font-size: 12.5px;
   letter-spacing: 1px;
   color: black;
 }
-/* line 8261, ../../../scss/_app_styles.scss */
+/* line 7947, ../../../scss/_app_styles.scss */
 .module_card .card_summary .card_section {
   margin: 5px 0px;
   padding: 5px 0px;
 }
-/* line 8265, ../../../scss/_app_styles.scss */
+/* line 7951, ../../../scss/_app_styles.scss */
 .module_card .card_summary .card_section:not(:last-child) {
   border-bottom: 1px solid #ccc;
 }
-/* line 8268, ../../../scss/_app_styles.scss */
+/* line 7954, ../../../scss/_app_styles.scss */
 .module_card .card_summary .card_section p {
   margin-bottom: 7px;
   font-size: 12.5px;
 }
-/* line 8272, ../../../scss/_app_styles.scss */
+/* line 7958, ../../../scss/_app_styles.scss */
 .module_card .card_summary .card_section .ellipsis {
   width: 245px;
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
 }
-/* line 8280, ../../../scss/_app_styles.scss */
+/* line 7966, ../../../scss/_app_styles.scss */
 .module_card .card_summary .card_section .module-card-enrol {
   background: #a2238d;
   height: 37px;
@@ -31488,11 +31189,11 @@ button[disabled], .button.disabled, .button[disabled] {
   margin-top: 2px !important;
   letter-spacing: 0.4px;
 }
-/* line 8293, ../../../scss/_app_styles.scss */
+/* line 7979, ../../../scss/_app_styles.scss */
 .module_card .card_summary .card_section .module-card-enrol:hover {
   box-shadow: 0px 0px 17px rgba(0, 0, 0, 0.68);
 }
-/* line 8299, ../../../scss/_app_styles.scss */
+/* line 7985, ../../../scss/_app_styles.scss */
 .module_card .card_summary .module_brief {
   display: block;
   /* Fallback for non-webkit */
@@ -31509,52 +31210,7 @@ button[disabled], .button.disabled, .button[disabled] {
   color: black;
 }
 
-/* line 8317, ../../../scss/_app_styles.scss */
-.explore-settings-drop {
-  margin-left: 59%;
-  display: inline-block;
-}
-/* line 8320, ../../../scss/_app_styles.scss */
-.explore-settings-drop > button {
-  color: #164a7b;
-  font-weight: 400;
-  cursor: pointer;
-  background-color: #ddeff9;
-  border: 2px solid #719dc8;
-  border-radius: 5px !important;
-  display: inline-block;
-  padding: 3px 8px 4px 8px;
-  margin-top: 10px;
-  margin-left: 20px;
-}
-/* line 8331, ../../../scss/_app_styles.scss */
-.explore-settings-drop > button:hover {
-  border-radius: 10px;
-  background-color: #ddeff9;
-  color: #164a7b;
-}
-/* line 8337, ../../../scss/_app_styles.scss */
-.explore-settings-drop a {
-  font-size: 16px;
-}
-/* line 8340, ../../../scss/_app_styles.scss */
-.explore-settings-drop .f-dropdown li {
-  font-size: 0.875rem;
-  cursor: pointer;
-  line-height: 1.125rem;
-  margin: 0;
-  background-color: #164A7B;
-}
-/* line 8348, ../../../scss/_app_styles.scss */
-.explore-settings-drop .f-dropdown li a {
-  color: #74b3dc;
-}
-/* line 8352, ../../../scss/_app_styles.scss */
-.explore-settings-drop .f-dropdown li:hover {
-  border-left: 4px solid #ffc14e;
-}
-
-/* line 8359, ../../../scss/_app_styles.scss */
+/* line 8003, ../../../scss/_app_styles.scss */
 .img-height {
   height: 150px;
   width: 1351px;
@@ -31563,7 +31219,7 @@ button[disabled], .button.disabled, .button[disabled] {
 /*
    Common css
  */
-/* line 8368, ../../../scss/_app_styles.scss */
+/* line 8012, ../../../scss/_app_styles.scss */
 .text-button-blue {
   background-color: transparent;
   color: #00A9EE;
@@ -31573,84 +31229,7 @@ button[disabled], .button.disabled, .button[disabled] {
   line-height: 25px;
 }
 
-/**
-    Status styles added for the unit styles.
- */
-/* line 8386, ../../../scss/_app_styles.scss */
-.in-progress-status {
-  color: #fff;
-  background-color: #fd9e29;
-}
-
-/* line 8391, ../../../scss/_app_styles.scss */
-.in-complete-status {
-  color: #fff;
-  background-color: #fd9e29;
-}
-
-/* line 8396, ../../../scss/_app_styles.scss */
-.thumbnail_style {
-  margin-top: -30px;
-  margin-left: -30px;
-}
-
-/* line 8401, ../../../scss/_app_styles.scss */
-.strip {
-  height: 143px;
-  margin-left: -13px;
-  margin-bottom: 10px;
-}
-
-/* line 8407, ../../../scss/_app_styles.scss */
-.title-strip {
-  box-shadow: 0px 0px 6px rgba(0, 0, 0, 0.2);
-  margin-top: -29px;
-  padding-left: 10px;
-}
-/* line 8411, ../../../scss/_app_styles.scss */
-.title-strip a {
-  float: right;
-  padding-right: 18px;
-  text-transform: uppercase;
-  color: #007095;
-}
-/* line 8421, ../../../scss/_app_styles.scss */
-.title-strip .position-actions {
-  margin-top: -60px;
-  margin-left: 760px;
-}
-/* line 8426, ../../../scss/_app_styles.scss */
-.title-strip .right-margin {
-  margin-right: 46px;
-}
-/* line 8429, ../../../scss/_app_styles.scss */
-.title-strip .course_actions > span {
-  background: #fff;
-  border: 1px solid rgba(255, 255, 255, 0.7);
-  padding: 1px 8px;
-  color: #2e3f51;
-  font-size: 12px;
-  margin: 0px 10px 0px 0px;
-  cursor: pointer;
-  border-radius: 3px;
-  opacity: 0.8;
-  margin-top: 30px;
-  z-index: 1;
-}
-/* line 8446, ../../../scss/_app_styles.scss */
-.title-strip .course_actions > i {
-  margin-right: 3px;
-  background: rgba(0, 0, 0, 0.6);
-  border: 1px solid rgba(255, 255, 255, 0.7);
-  padding: 1px 8px;
-  color: #fff;
-  font-size: 12px;
-  margin: 0px 10px 0px 0px;
-  cursor: pointer;
-  border-radius: 3px;
-}
-
-/* line 8460, ../../../scss/_app_styles.scss */
+/* line 8024, ../../../scss/_app_styles.scss */
 .dropdown-settings {
   text-align: left;
   text-transform: none;
@@ -31660,331 +31239,19 @@ button[disabled], .button.disabled, .button[disabled] {
   background: white;
   border-radius: 1px;
 }
-/* line 8468, ../../../scss/_app_styles.scss */
+/* line 8032, ../../../scss/_app_styles.scss */
 .dropdown-settings:hover {
   color: #ce7869;
   border-left: 2px solid #ffc14e;
 }
 
-/* line 8474, ../../../scss/_app_styles.scss */
-.activity-slides-container {
-  height: 100%;
-  width: 80%;
-  background: #f8f8f8;
-  margin-bottom: 2em;
-  padding: 0em 0em 0em 0em;
-  margin-bottom: 15px;
-}
-/* line 8483, ../../../scss/_app_styles.scss */
-.activity-slides-container .activity-slides {
-  height: 100%;
-  color: #f8f8f8;
-}
-/* line 8488, ../../../scss/_app_styles.scss */
-.activity-slides-container .activity-slides .activity-slide {
-  padding: 1em;
-  height: inherit;
-  background: #fff;
-  position: relative;
-}
-/* line 8494, ../../../scss/_app_styles.scss */
-.activity-slides-container .activity-slides .activity-slide .view-related-content {
-  border: 1px solid #999;
-  display: inline-block;
-  padding: 2px 7px;
-  color: #999999;
-  margin-left: 12%;
-}
-/* line 8502, ../../../scss/_app_styles.scss */
-.activity-slides-container .activity-slides .activity-slide .page > section {
-  margin-left: 50%;
-  transform: translate(-50%);
-}
-/* line 8508, ../../../scss/_app_styles.scss */
-.activity-slides-container .activity-slides .related-content-close {
-  position: absolute;
-  right: -2px;
-  top: -8px;
-  font-size: 25px !important;
-  display: none;
-  color: #8E8E8E;
-}
-/* line 8517, ../../../scss/_app_styles.scss */
-.activity-slides-container .activity-slides .content-expanded > i {
-  font-size: 20px !important;
-  color: #ccc !important;
-  top: 8px !important;
-}
-/* line 8522, ../../../scss/_app_styles.scss */
-.activity-slides-container .activity-slides .content-expanded .related-content-header {
-  margin-left: 20px !important;
-}
-/* line 8524, ../../../scss/_app_styles.scss */
-.activity-slides-container .activity-slides .content-expanded .related-content-header > span:first-child {
-  display: none !important;
-}
-/* line 8527, ../../../scss/_app_styles.scss */
-.activity-slides-container .activity-slides .content-expanded .related-content-header .back-to-activity {
-  display: inline-block !important;
-  float: right;
-  background: #dddddd;
-  padding: 2px 7px;
-  border: 1px solid #ccc;
-  font-size: 13px;
-  color: #757575;
-  margin-right: 20px;
-}
-/* line 8537, ../../../scss/_app_styles.scss */
-.activity-slides-container .activity-slides .content-expanded .related-content-header .related-content-title {
-  font-size: 15px !important;
-  position: relative;
-}
-/* line 8541, ../../../scss/_app_styles.scss */
-.activity-slides-container .activity-slides .content-expanded .related-content-header .related-content-title .related-content-close {
-  display: block;
-}
-/* line 8544, ../../../scss/_app_styles.scss */
-.activity-slides-container .activity-slides .content-expanded .related-content-header .related-content-title > i {
-  display: none !important;
-}
-/* line 8549, ../../../scss/_app_styles.scss */
-.activity-slides-container .activity-slides .content-expanded .related-content-body {
-  display: block !important;
-}
-/* line 8553, ../../../scss/_app_styles.scss */
-.activity-slides-container .activity-slides #related-content {
-  width: 100%;
-  margin: 0px auto;
-  /* border: 0px solid #ccc; */
-  padding: 5px 10px;
-  background: #f8f8f8;
-  margin-top: 10px;
-  min-height: 50px;
-  position: relative;
-  color: #222222;
-}
-/* line 8564, ../../../scss/_app_styles.scss */
-.activity-slides-container .activity-slides #related-content > i {
-  color: #fff;
-  font-size: 40px;
-  position: absolute;
-  left: 8px;
-  top: 4px;
-}
-/* line 8572, ../../../scss/_app_styles.scss */
-.activity-slides-container .activity-slides #related-content .related-content-header {
-  margin-left: 40px;
-}
-/* line 8574, ../../../scss/_app_styles.scss */
-.activity-slides-container .activity-slides #related-content .related-content-header .back-to-activity {
-  display: none;
-}
-/* line 8577, ../../../scss/_app_styles.scss */
-.activity-slides-container .activity-slides #related-content .related-content-header span {
-  display: block;
-  vertical-align: top;
-  margin: 2px 0px 2px 5px;
-  font-weight: 600;
-  font-size: 13px;
-  letter-spacing: 0.8px;
-  color: #999999;
-}
-/* line 8586, ../../../scss/_app_styles.scss */
-.activity-slides-container .activity-slides #related-content .related-content-header .related-content-title {
-  font-size: 20px;
-  color: #000;
-  cursor: pointer;
-}
-/* line 8592, ../../../scss/_app_styles.scss */
-.activity-slides-container .activity-slides #related-content .related-content-body {
-  display: none;
-}
-
-/* line 8600, ../../../scss/_app_styles.scss */
+/* line 8040, ../../../scss/_app_styles.scss */
 .inner {
   display: inline-block !important;
 }
 
-/* line 8605, ../../../scss/_app_styles.scss */
+/* line 8045, ../../../scss/_app_styles.scss */
 .mid_label {
   margin-top: 15px;
   font-size: 15px;
-}
-
-/* responsive footer */
-/* line 8612, ../../../scss/_app_styles.scss */
-.clearfix {
-  clear: both;
-}
-
-/* line 8615, ../../../scss/_app_styles.scss */
-.clr1 {
-  background: #FFFFFF;
-  color: #333743;
-}
-
-/* line 8616, ../../../scss/_app_styles.scss */
-.clr2 {
-  background: #F1F3F5;
-  color: #8F94A3;
-}
-
-/* line 8617, ../../../scss/_app_styles.scss */
-.clr3 {
-  background: rgba(221, 221, 221, 0.18);
-  color: #BDC3CF;
-}
-
-/* line 8618, ../../../scss/_app_styles.scss */
-.clr4 {
-  background: rgba(221, 221, 221, 0.18);
-  color: #E3E7F2;
-}
-
-/* line 8619, ../../../scss/_app_styles.scss */
-.clr5 {
-  color: #F1F3F5;
-}
-
-/* line 8620, ../../../scss/_app_styles.scss */
-.clr6 {
-  color: #39B5A1;
-}
-
-/* line 8621, ../../../scss/_app_styles.scss */
-.clr7 {
-  color: #D45245;
-}
-
-/*##### Footer Structure #####*/
-/* line 8625, ../../../scss/_app_styles.scss */
-.bo-wrap {
-  clear: both;
-  width: auto;
-}
-
-/* line 8629, ../../../scss/_app_styles.scss */
-.bo-footer {
-  clear: both;
-  width: auto;
-  padding: 5px;
-  width: 960px;
-  margin: 0 auto;
-}
-
-/* line 8637, ../../../scss/_app_styles.scss */
-.bo-footer-social {
-  text-align: left;
-  line-height: 1px;
-  padding: 10px 10px 10px 10px;
-}
-/* line 8642, ../../../scss/_app_styles.scss */
-.bo-footer-social > a {
-  color: #ce7869;
-  word-spacing: 8px;
-}
-/* line 8645, ../../../scss/_app_styles.scss */
-.bo-footer-social > a:hover {
-  color: #ce7869;
-  border-bottom: 3px solid #ffc14e;
-}
-
-/* line 8655, ../../../scss/_app_styles.scss */
-.bo-footer-copyright > a {
-  transition: link-color 0.15s ease-in-out 0s,border 0.15s ease-in-out 0s;
-  border-bottom: none;
-  color: #777;
-  text-decoration: none !important;
-  word-spacing: 3px;
-}
-/* line 8661, ../../../scss/_app_styles.scss */
-.bo-footer-copyright > a:hover {
-  color: #777;
-  border-bottom: 3px solid #c90d97;
-}
-
-/* line 8668, ../../../scss/_app_styles.scss */
-.bo-footer-smap {
-  /*width: 600px;*/
-  float: left;
-  padding: 5px 10px;
-  text-align: left;
-  font-size: 18px;
-  word-spacing: 20px;
-}
-
-/* line 8677, ../../../scss/_app_styles.scss */
-.bo-footer-uonline {
-  width: 300px;
-  /* Account for margins + border values */
-  float: left;
-  padding: 5px 10px;
-  text-align: center;
-}
-
-/* line 8684, ../../../scss/_app_styles.scss */
-.bo-footer-power {
-  width: 300px;
-  padding: 5px 10px;
-  float: left;
-  text-align: right;
-  font-size: 14px;
-  color: #636A7D;
-  vertical-align: middle;
-}
-
-/*##### Footer Responsive #####*/
-/* for 980px or less */
-@media screen and (max-width: 980px) {
-  /* line 8701, ../../../scss/_app_styles.scss */
-  .bo-footer {
-    width: 95%;
-    padding: 1% 2%;
-  }
-
-  /* line 8705, ../../../scss/_app_styles.scss */
-  .bo-footer-smap {
-    width: 33%;
-    padding: 1% 2%;
-  }
-
-  /* line 8709, ../../../scss/_app_styles.scss */
-  .bo-footer-uonline {
-    width: 46%;
-    padding: 1% 2%;
-    float: right;
-    text-align: right;
-  }
-
-  /* line 8716, ../../../scss/_app_styles.scss */
-  .bo-footer-power {
-    clear: both;
-    padding: 1% 2%;
-    width: auto;
-    float: none;
-    text-align: center;
-  }
-}
-/* for 700px or less */
-@media screen and (max-width: 600px) {
-  /* line 8727, ../../../scss/_app_styles.scss */
-  .bo-footer-smap {
-    width: auto;
-    float: none;
-    text-align: center;
-  }
-
-  /* line 8733, ../../../scss/_app_styles.scss */
-  .bo-footer-uonline {
-    width: auto;
-    float: none;
-    text-align: center;
-  }
-
-  /* line 8739, ../../../scss/_app_styles.scss */
-  .bo-footer-power {
-    width: auto;
-    float: none;
-    text-align: center;
-  }
 }

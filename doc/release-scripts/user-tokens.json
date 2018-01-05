@@ -45,6 +45,7 @@
     [
         "apple",
         "banana",
+        "grapes",
         "pineapple",
         "strawberry"
     ],
@@ -76,7 +77,6 @@
         "frog",
         "goat",
         "gorilla",
-        "grapes",
         "grasshopper",
         "hen",
         "heron",
