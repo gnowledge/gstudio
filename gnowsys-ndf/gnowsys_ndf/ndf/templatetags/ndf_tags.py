@@ -4220,10 +4220,7 @@ def get_unicode_lang(lang_code):
 @get_execution_time
 @register.filter
 def get_header_lang(lang):
-    try:
-        for each_lang in HEADER_LANGUAGES:
-            if lang in each_lang:
-                return each_lang[1]
-    except Exception as e:
-        return lang
-        pass
+    for each_lang in HEADER_LANGUAGES:
+        if lang in each_lang:
+            return each_lang[1]
+    return lang
