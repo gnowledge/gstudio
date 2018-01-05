@@ -25,6 +25,7 @@ DUMP_PATH = None
 TOP_PATH = None
 GROUP_ID = None
 DATA_EXPORT_PATH = None
+RESTORE_USER_DATA = True
 MEDIA_EXPORT_PATH = None
 SCHEMA_MAP_PATH = None
 log_file_path = None
@@ -80,8 +81,9 @@ def create_configs_file():
     configs_file_path = os.path.join(DUMP_PATH, "migration_configs.py")
     with open(configs_file_path, 'w+') as configs_file_out:
         configs_file_out.write("\nGSTUDIO_INSTITUTE_ID='" + str(GSTUDIO_INSTITUTE_ID) + "'")
-        configs_file_out.write("\nUNIT_NAMES='" + str(UNIT_NAMES) + "'")
-        configs_file_out.write("\nUNIT_IDS='" + str(UNIT_IDS) + "'")
+        configs_file_out.write("\nRESTORE_USER_DATA=" + str(RESTORE_USER_DATA))
+        configs_file_out.write('\nUNIT_NAMES="' + str(UNIT_NAMES) + '"')
+        configs_file_out.write('\nUNIT_IDS="' + str(UNIT_IDS) + '"')
         configs_file_out.write("\nGIT_COMMIT_HASH='" + str(get_latest_git_hash()) + "'")
         configs_file_out.write("\nGIT_BRANCH_NAME='" + str(get_active_branch_name()) + "'")
         configs_file_out.write('\nSYSTEM_DETAILS="' + str(os.uname()) + '"')
@@ -135,7 +137,7 @@ class Command(BaseCommand):
         proceed_flag = raw_input("\nEnter y/Y to Confirm: ")
         if proceed_flag:
           try:
-            
+
             datetimestamp = datetime.datetime.now().strftime("%Y-%m-%d_%H-%M-%S")
             log_file_name = 'artifacts_dump_' + str(GSTUDIO_INSTITUTE_ID) + "_"+ str(datetimestamp)
 

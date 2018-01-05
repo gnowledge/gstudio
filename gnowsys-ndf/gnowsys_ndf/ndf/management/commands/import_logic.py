@@ -97,7 +97,7 @@ def validate_data_dump(dump, md5, *args):
      This will ensure the exported data is NOT altered
      before importing
     """
-    global log_file
+    log_stmt = ""
     from checksumdir import dirhash
     md5hash = dirhash(dump, 'md5')
     if md5 != md5hash:
@@ -109,7 +109,7 @@ def validate_data_dump(dump, md5, *args):
             proceed_without_validation = raw_input("MD5 not matching. Restoration not recommended.\n \
                             Enter (y/Y) to continue ?")
         if proceed_without_validation not in ['y', 'Y']:
-            log_file.write("\n Checksum validation Failed on dump data")
+            log_stmt += "\n Checksum validation Failed on dump data"
             call_exit()
     else:
         print "\nValidation Success..!"
@@ -120,7 +120,8 @@ def validate_data_dump(dump, md5, *args):
             proceed_with_validation = raw_input("MD5 Matching.\n \
                             Enter (y/Y) to proceed to restoration")
         if proceed_with_validation in ['y', 'Y']:
-            log_file.write("\n Checksum validation Success on dump data")
+            log_stmt += "\n Checksum validation Success on dump data"
+    return log_stmt
 
 def get_file_path_with_id(node_id, DATA_DUMP_PATH):
     file_name = (node_id + '.json')
@@ -600,7 +601,7 @@ def restore_counter_objects(rcs_counters_path):
 
 
                 if counter_changed:
-                    log_file.write("\n Counter Updated: \n\t OLD: " + str(counter_obj), + "\n\tNew: "+str(counter_json))
+                    log_file.write("\n Counter Updated: \n\t OLD: " + str(counter_obj) + "\n\tNew: "+str(counter_json))
                     counter_obj.save()
             else:
                 try:
@@ -613,6 +614,7 @@ def restore_counter_objects(rcs_counters_path):
 def call_group_import(rcs_repo_path, req_log_file_path, data_restore_path, non_grp_root_node=None):
 
     global log_file_path
+    global log_file
     global DATA_RESTORE_PATH
     log_file_path = req_log_file_path
     DATA_RESTORE_PATH = data_restore_path
@@ -799,8 +801,9 @@ def restore_node(filepath, non_grp_root_node=None, data_restore_path=None, req_l
 
                 log_file.write("\n Old group_set :\n\t "+ str(node_obj.group_set))
 
-                if ObjectId(CONFIG_VARIABLES.GROUP_ID) not in node_obj.group_set:
-                    node_obj.group_set.append(ObjectId(CONFIG_VARIABLES.GROUP_ID))
+                # if 'GROUP_ID' in CONFIG_VARIABLES:
+                #     if ObjectId(CONFIG_VARIABLES.GROUP_ID) not in node_obj.group_set:
+                #         node_obj.group_set.append(ObjectId(CONFIG_VARIABLES.GROUP_ID))
 
                 # node_obj.group_set = [ObjectId(CONFIG_VARIABLES.GROUP_ID)]
                 log_file.write("\n New group_set :\n\t "+ str(node_obj.group_set))

@@ -539,7 +539,7 @@ def core_import(non_grp_root_node=None, *args):
     log_file.write("\nUpdated CONFIG_VARIABLES: "+ str(CONFIG_VARIABLES))
     print "\n Validating the data-dump"
     print "\nDATA_DUMP_PATH: ", DATA_DUMP_PATH
-    validate_data_dump(DATA_DUMP_PATH,CONFIG_VARIABLES.MD5, *args)
+    log_file.write(validate_data_dump(DATA_DUMP_PATH,CONFIG_VARIABLES.MD5, *args))
     print "\n Checking the dump Group-id availability."
     check_group_availability(*args)
     print "\n User Restoration."
