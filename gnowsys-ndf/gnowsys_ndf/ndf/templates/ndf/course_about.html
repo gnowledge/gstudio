@@ -277,17 +277,7 @@
 
             <li class="tab-title active" ><a href="#course-notification" role="tab" tabindex="0" aria-selected="true" aria-controls="panel2-1"> <i class="fa fa-bell" aria-hidden="true"></i> Notifications</a></li>
 
-            {% if request.user.is_authenticated and not gstaff_access %}
-            {# {% if request.user.is_authenticated and not gstaff_access and request.user.id in group_obj.author_set %} #}
-              <li class="tab-title" title="Click here to refresh">
-
-                <a role="tab" href="#analytics-content" class="fetch-analytics" tabindex="1" aria-selected="false" aria-controls="panel2-2" data-id={{request.user.id}}> <i class="fa fa-line-chart" aria-hidden="true"></i> Progress Report</a>
-              </li>
-              <input type="hidden" class="is_admin" value="False" />
-            {% elif gstaff_access or request.user.id in group_object.group_admin %}
-              <input type="hidden" class="is_admin" value="True" />
-              <li class="tab-title" ><a role="tab" href="#analytics-content" tabindex="1" aria-selected="false" class="fetch-group-analytics" aria-controls="panel2-2" data-id={{request.user.id}}> <i class="fa fa-line-chart" aria-hidden="true"></i> Group Analytics</a></li>
-            {% endif %}
+            
 
           </ul>
           <div class="tabs-content">
@@ -336,7 +326,6 @@
           var user_id = $(this).attr("data-id");
           var dataPointsDict = $(this).attr('data-points-dict');
           // $(this).addClass("hide")
-          $(".pre-analytics-msg-div").removeClass("hide")
           $.ajax({
               url: "{% url 'course_analytics' group_id 'user_id' %}".replace("user_id", user_id),
               type: "GET",
@@ -351,7 +340,6 @@
                   else{
                     $("#analytics-content").html(data)
                   }
-                  $(".pre-analytics-msg-div").addClass("hide")
               },
           });//end of ajax
       })
