@@ -17,7 +17,7 @@
 
     <link rel="stylesheet" type="text/css" href="/static/ndf/bower_components/foundation/css/normalize.css">
     <link rel="stylesheet" type="text/css" href="/static/ndf/bower_components/foundation-icon-fonts/foundation-icons.css">
-   <link rel="stylesheet" type="text/css" href="/static/ndf/css/opensans-fonts.css">
+    <link rel="stylesheet" type="text/css" href="/static/ndf/css/opensans-fonts.css">
     <link rel="stylesheet" type="text/css" href="/static/ndf/css/clix-activity-styles.css">
     <link rel="stylesheet" type="text/css" href="/static/ndf/bower_components/foundation/css/foundation.css">
     <link rel="shortcut icon" href="{{site.FAVICON}}">
@@ -38,56 +38,56 @@
     <script type="text/javascript" src="/static/ndf/bower_components/foundation/js/foundation.min.js"></script>
     <script type="text/javascript" src="/static/ndf/bower_components/foundation/js/foundation/foundation.topbar.js"></script>
     <script type="text/javascript" src="/static/ndf/bower_components/modernizr/modernizr.js"></script>
-    </script>
-    <!-- Foundation 5 - Responsive CSS Framework http://foundation.zurb.com/docs/css.html-->
-    <script src="/static/ndf/js/MediaStreamRecorder.js"></script>
-    <script src="/static/ndf/js/adapter.js"></script>
-    <script src="/static/ndf/bower_components/modernizr/modernizr.js"></script>
-    <!-- jQuery -->
-    <script src="/static/ndf/bower_components/jquery/dist/jquery.min.js"></script>
-    <script src="/static/ndf/bower_components/blockui/jquery.blockUI.js"></script>
-    <script type="text/javascript" src="/static/ndf/bower_components/jqtree/tree.jquery.js"></script>
-    <link rel="stylesheet" type="text/css" href="/static/ndf/bower_components/jqtree/jqtree.css">
+</script>
+<!-- Foundation 5 - Responsive CSS Framework http://foundation.zurb.com/docs/css.html-->
+<script src="/static/ndf/js/MediaStreamRecorder.js"></script>
+<script src="/static/ndf/js/adapter.js"></script>
+<script src="/static/ndf/bower_components/modernizr/modernizr.js"></script>
+<!-- jQuery -->
+<script src="/static/ndf/bower_components/jquery/dist/jquery.min.js"></script>
+<script src="/static/ndf/bower_components/blockui/jquery.blockUI.js"></script>
+<script type="text/javascript" src="/static/ndf/bower_components/jqtree/tree.jquery.js"></script>
+<link rel="stylesheet" type="text/css" href="/static/ndf/bower_components/jqtree/jqtree.css">
 
 
-    <title>{{ site.SITE_NAME }} - {% block title %} {% endblock %}</title>
-    {% block head %}{% endblock %}
+<title>{{ site.SITE_NAME }} - {% block title %} {% endblock %}</title>
+{% block head %}{% endblock %}
 
-    <style>
+<style>
 
     {% block style %}{% endblock %}
 
-  </style>
+</style>
 
 </head>
 <body>
 
     {% if site.BUDDY_LOGIN and user.is_authenticated and site.SITE_NAME == 'clix' and request.author.agency_type == 'Student'%}
-        {% include "ndf/buddy.html" %}
+    {% include "ndf/buddy.html" %}
     {% endif %}
 
     {% if site.SITE_NAME == 'NROER' %}
-        {% include "ndf/header.html" %}
+    {% include "ndf/header.html" %}
     {% else %}
-        {% include "ndf/header_clix.html" %}
+    {% include "ndf/header_clix.html" %}
     {% endif %}
 
     {% block extended_header %}{% endblock %}
 
     {% block body_content %} {% endblock %}
-  <!-- JS -->
-  <!--<script src="/static/ndf/js/app.js"></script>-->
-  <script src="/static/ndf/bower_components/foundation/js/foundation.min.js"></script>
-  <script src="/static/ndf/js/gstudio-functions.js"></script>
+    <!-- JS -->
+    <!--<script src="/static/ndf/js/app.js"></script>-->
+    <script src="/static/ndf/bower_components/foundation/js/foundation.min.js"></script>
+    <script src="/static/ndf/js/gstudio-functions.js"></script>
 
-  <!-- end of footer cache -->
+    <!-- end of footer cache -->
 
-  <script type="text/javascript">
+    <script type="text/javascript">
     // Initialize Foundation CSS
-       $(document).foundation();
+    $(document).foundation();
 
     // Register global ajax start and complete events to show ajax loader when request is in process
-      $(document).ajaxStart($.blockUI).ajaxStop($.unblockUI);
+    $(document).ajaxStart($.blockUI).ajaxStop($.unblockUI);
 
     // // Toggles the display of main sidebar for 12 col article view
     //   var toggleMainSidebar = function(){
@@ -160,7 +160,7 @@
         // wiping out #overlay-description-by-oid-content and overlay-description-by-oid-title
         document.getElementById('overlay-description-by-oid-content').textContent = ""
         document.getElementById('overlay-description-by-oid-title').textContent = ""
-      });
+    });
 
       $(document).on('open', '#overlay-description-by-oid[data-reveal]', function () {
         var modal = this;
@@ -170,7 +170,7 @@
 
         if (!oid) {return};
 
-      });
+    });
 
     // // start of document.ready()
     //   $(document).ready(function() {
@@ -201,10 +201,25 @@
     //   });
 
     {% block script %} {% endblock %}
-  </script>
-
-    {% if not no_footer %}
+    </script>
+    <div id="footer_course">
+        {% if not no_footer %}
         {% include 'ndf/footer_clix.html' %}
-    {% endif %}
+        {% endif %}
+    </div>
+    <script type="text/javascript">
+        $(window).bind("load", function () {
+        var footer = $("#footer_course");
+        var pos = footer.position();
+        var height = $(window).height();
+        height = height - pos.top;
+        height = height - footer.height();
+        if (height > 0) {
+            footer.css({
+            'margin-top': height + 'px'
+            });
+        }
+        });
+</script>
 </body>
 </html>

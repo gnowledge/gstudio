@@ -30248,7 +30248,8 @@ ul.horizontal_tabs_gstudio > li.sub_group_action:hover ul {
 /* line 7103, ../../../scss/_app_styles.scss */
 .overlay-head {
   background-color: #fff;
-  height: 60px;
+  /*    height: 60px;
+  */
   margin-bottom: 20px;
 }
 
@@ -31139,6 +31140,183 @@ button[disabled], .button.disabled, .button[disabled] {
   font-size: 15px;
 }
 
+/* responsive footer */
+/* line 8051, ../../../scss/_app_styles.scss */
+.clearfix {
+  clear: both;
+}
+
+/* line 8054, ../../../scss/_app_styles.scss */
+.clr1 {
+  background: #FFFFFF;
+  color: #333743;
+}
+
+/* line 8055, ../../../scss/_app_styles.scss */
+.clr2 {
+  background: #F1F3F5;
+  color: #8F94A3;
+}
+
+/* line 8056, ../../../scss/_app_styles.scss */
+.clr3 {
+  background: rgba(221, 221, 221, 0.18);
+  color: #BDC3CF;
+}
+
+/* line 8057, ../../../scss/_app_styles.scss */
+.clr4 {
+  background: rgba(221, 221, 221, 0.18);
+  color: #E3E7F2;
+}
+
+/* line 8058, ../../../scss/_app_styles.scss */
+.clr5 {
+  color: #F1F3F5;
+}
+
+/* line 8059, ../../../scss/_app_styles.scss */
+.clr6 {
+  color: #39B5A1;
+}
+
+/* line 8060, ../../../scss/_app_styles.scss */
+.clr7 {
+  color: #D45245;
+}
+
+/*##### Footer Structure #####*/
+/* line 8064, ../../../scss/_app_styles.scss */
+.bo-wrap {
+  clear: both;
+  width: auto;
+}
+
+/* line 8068, ../../../scss/_app_styles.scss */
+.bo-footer {
+  clear: both;
+  width: auto;
+  padding: 5px;
+  width: 960px;
+  margin: 0 auto;
+}
+
+/* line 8076, ../../../scss/_app_styles.scss */
+.bo-footer-social {
+  text-align: left;
+  line-height: 1px;
+  padding: 10px 10px 10px 10px;
+}
+/* line 8081, ../../../scss/_app_styles.scss */
+.bo-footer-social > a {
+  color: #ce7869;
+  word-spacing: 8px;
+}
+/* line 8084, ../../../scss/_app_styles.scss */
+.bo-footer-social > a:hover {
+  color: #ce7869;
+  border-bottom: 3px solid #ffc14e;
+}
+
+/* line 8094, ../../../scss/_app_styles.scss */
+.bo-footer-copyright > a {
+  transition: link-color 0.15s ease-in-out 0s,border 0.15s ease-in-out 0s;
+  border-bottom: none;
+  color: #777;
+  text-decoration: none !important;
+  word-spacing: 3px;
+}
+/* line 8100, ../../../scss/_app_styles.scss */
+.bo-footer-copyright > a:hover {
+  color: #777;
+  border-bottom: 3px solid #c90d97;
+}
+
+/* line 8107, ../../../scss/_app_styles.scss */
+.bo-footer-smap {
+  /*width: 600px;*/
+  float: left;
+  padding: 5px 10px;
+  text-align: left;
+  font-size: 18px;
+  word-spacing: 20px;
+}
+
+/* line 8116, ../../../scss/_app_styles.scss */
+.bo-footer-uonline {
+  width: 300px;
+  /* Account for margins + border values */
+  float: left;
+  padding: 5px 10px;
+  text-align: center;
+}
+
+/* line 8123, ../../../scss/_app_styles.scss */
+.bo-footer-power {
+  width: 300px;
+  padding: 5px 10px;
+  float: left;
+  text-align: right;
+  font-size: 14px;
+  color: #636A7D;
+  vertical-align: middle;
+}
+
+/*##### Footer Responsive #####*/
+/* for 980px or less */
+@media screen and (max-width: 980px) {
+  /* line 8140, ../../../scss/_app_styles.scss */
+  .bo-footer {
+    width: 95%;
+    padding: 1% 2%;
+  }
+
+  /* line 8144, ../../../scss/_app_styles.scss */
+  .bo-footer-smap {
+    width: 33%;
+    padding: 1% 2%;
+  }
+
+  /* line 8148, ../../../scss/_app_styles.scss */
+  .bo-footer-uonline {
+    width: 46%;
+    padding: 1% 2%;
+    float: right;
+    text-align: right;
+  }
+
+  /* line 8155, ../../../scss/_app_styles.scss */
+  .bo-footer-power {
+    clear: both;
+    padding: 1% 2%;
+    width: auto;
+    float: none;
+    text-align: center;
+  }
+}
+/* for 700px or less */
+@media screen and (max-width: 600px) {
+  /* line 8166, ../../../scss/_app_styles.scss */
+  .bo-footer-smap {
+    width: auto;
+    float: none;
+    text-align: center;
+  }
+
+  /* line 8172, ../../../scss/_app_styles.scss */
+  .bo-footer-uonline {
+    width: auto;
+    float: none;
+    text-align: center;
+  }
+
+  /* line 8178, ../../../scss/_app_styles.scss */
+  .bo-footer-power {
+    width: auto;
+    float: none;
+    text-align: center;
+  }
+}
 /*
 *  CLIx Platform Stylesheet
 */
