@@ -32,7 +32,10 @@
 									<a class="buddy_margin right edit_button dropdown-settings" href="{% url 'module_edit' group_id node.pk %}" style="margin-top:0px; margin-right:0px; text-transform: none;"><i class="fa fa-pencil"></i> {% trans "Edit" %}</a>
 								</li>
 								<li>
+									{% comment %}
 									<a href="{% url 'create_group' node.pk %}?subgroup=True" class="tiny button radius left-btn" title="Create New Sub Group">{% trans "New SubGroup" %}</a>
+									{% endcomment %}
+									<a href="#" class="tiny button radius left-btn" title="Create New Sub Group">{% trans "New SubGroup" %}</a>
 							    </li>
 
 				              	<li>
