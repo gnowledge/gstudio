@@ -60,9 +60,16 @@
     </li>
     {% if 'Group'  in group_object.member_of_names_list %}
     <li>
-      <a href="{% url 'curriculum_list' groupid  %}" tabindex="6"> {% trans "Topic Map" %}</a>
+      <a href="{% url 'curriculum_list' groupid  %}" tabindex="6"> <i class="fa fa-sitemap ">  </i> {% trans "Topic Map" %}</a>
     </li>
     {% endif %}
+    <li>
+      <a href="{% url 'progress_report' group_id request.user.pk %}" {% if title == 'progress_report' %}class="selected"{% endif %} tabindex="6" title="See how you have done, how many comments have you received."><i class="fa fa-line-chart"></i> {% trans "Progress Report" %}
+    </li>
+    <li>
+      <a href="{% url 'gtask' group_id  %}"  tabindex="7" title=""> <i class="fa fa-list-alt"></i> {% trans "Task" %}
+    </li>
+
   </ul>
 </div>
 <div class="small-2 medium-3 large-3 columns" style="border-bottom: 1px solid #00000029; background-color:#ffffff; height: 53px;">
@@ -152,6 +159,13 @@
           {% include "ndf/gnotebook.html" %}
         {% endif %}
     </div>
+
+    <div id="progress_report">
+       {% if title == 'progress_report' %}
+          {% include "ndf/user_course_analytics.html" %}
+        {% endif %}
+    </div>
+
     <div id="group_course_content">
        {% if title == 'course content' %}
           {% include "ndf/course_content.html" %}

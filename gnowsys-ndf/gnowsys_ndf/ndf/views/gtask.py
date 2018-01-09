@@ -29,7 +29,6 @@ from gnowsys_ndf.ndf.models import GSystemType, Node
 from gnowsys_ndf.ndf.views.methods import get_node_common_fields, get_file_node,get_execution_time,get_group_name_id, capture_data
 from gnowsys_ndf.ndf.views.methods import parse_template_data, create_gattribute, create_grelation
 from gnowsys_ndf.ndf.views.notify import set_notif_val
-
 sitename=Site.objects.all()
 app = node_collection.one({'_type': "GSystemType", 'name': 'Task'})
 
@@ -56,7 +55,6 @@ def gtask(request, group_name, task_id=None):
     #       group_id = str(auth._id)
     # else :
     #     pass
-    print "7777777777777777777777777",group_name
     group_name, group_id = get_group_name_id(group_name)
 
     GST_TASK = node_collection.one({'_type': "GSystemType", 'name': 'Task'})
@@ -214,152 +212,23 @@ def save_image(request, group_name, app_id=None, app_name=None, app_set_id=None,
 
 @login_required
 @get_execution_time
-def gcreate_edit_task(request, group_name, task_id=None, task=None, count=0):
+def gcreate_edit_task(request, group_name, task_id=None):
   """Creates/Modifies details about the given Task.
-
   """
-  edit_task_node = ""
-  parent_task_check = ""
-  userlist = []
-
-  if ObjectId.is_valid(group_name) is False:
-    group_ins = node_collection.find_one({'_type': "Group","name": group_name})
-    auth = node_collection.one({'_type': 'Author', 'name': unicode(request.user.username) })
-
-  elif ObjectId.is_valid(group_name) is True:
-    group_ins = node_collection.find_one({'_type': "Group","_id": ObjectId(group_name)})
-    auth = node_collection.one({'_type': 'Author', 'name': unicode(request.user.username) })
-
-  if group_ins:
-    group_id = str(group_ins._id)
-  else:
-    auth = node_collection.one({'_type': 'Author', 'name': unicode(request.user.username) })
-    if auth:
-      group_id = str(auth._id)
-
-  blank_dict = {}
-
-  collection_set_ids = []
-  userlist=[]
-
-  at_list = ["Status", "start_time", "Priority", "end_time", "Assignee", "Estimated_time", "Upload_Task"] # fields
-  rt_list = ["has_type"]
-  if request.method == "POST": # create or edit
-
-
-    if not task_id: # create
-      task_type = request.POST.get("assignees","")
-      Assignees = request.POST.get("Assignee","").split(',')
-      Assignees = [int(x) for x in Assignees]
-      if task_type != "Group Assignees" :
-          for i in Assignees:
-            if i:
-              task_node = create_task(request,task_id,group_id)
-              create_task_at_rt(request,rt_list,at_list,task_node,i,group_name,group_id)
-              collection_set_ids.append(ObjectId(task_node._id))
-          if len(Assignees)>1:
-              task_node = create_task(request,task_id,group_id)
-              task_node.collection_set = collection_set_ids
-
-              task_node.save(groupid=group_id)
-              create_task_at_rt(request,rt_list,at_list,task_node,request.user.id,group_name,group_id)
-      else:
-            task_node = create_task(request,task_id,group_id)
-            create_task_at_rt(request,rt_list,at_list,task_node,Assignees,group_name,group_id)
-
-    else: #update
-          task_node = node_collection.one({'_type': u'GSystem', '_id': ObjectId(task_id)})
-          update(request,rt_list,at_list,task_node,group_id,group_name)
-
-    return HttpResponseRedirect(reverse('task_details', kwargs={'group_name': group_name, 'task_id': str(task_node._id) }))
-
-  # Filling blank_dict in below if block
-  if task_id:
-    task_node = node_collection.one({'_type': u'GSystem', '_id': ObjectId(task_id)})
-    for each in at_list:
-      attributetype_key = node_collection.find_one({"_type": 'AttributeType', 'name': each})
-      attr = triple_collection.find_one({"_type": "GAttribute", "subject": task_node._id, "attribute_type": attributetype_key._id})
-      if attr:
-        if each == "Upload_Task":
-          file_list=[]
-          new_list=[]
-          files=str(attr.object_value).split(',')
-          for i in files:
-            files_name=str(i.strip('   [](\'u\'   '))
-            new_list.append(files_name)
-
-          ins_objectid  = ObjectId()
-          for i in new_list:
-            if  ins_objectid.is_valid(i) is False:
-              filedoc = node_collection.find({'_type': 'File', 'name': unicode(i)})
-
-            else:
-              filedoc = node_collection.find({'_type': 'File', '_id': ObjectId(i)})
-
-            if filedoc:
-              for i in filedoc:
-                file_list.append(i.name)
-
-          blank_dict[each] = json.dumps(file_list)
-          blank_dict['select'] = json.dumps(new_list)
-
-        else:
-          blank_dict[each] = attr.object_value
-
-    if task_node.prior_node:
-      pri_node = node_collection.one({'_id': task_node.prior_node[0]})
-      blank_dict['parent'] = pri_node.name
-      blank_dict['parent_id'] = str(pri_node._id)
-
-    # Appending TaskType to blank_dict, i.e. "has_type" relationship
-    if task_node.relation_set:
-      for rel in task_node.relation_set:
-        for k in rel:
-          blank_dict[k] = rel[k]
-
-    blank_dict["node"] = task_node
-    Assignee = ""
-    for i in blank_dict["Assignee"]:
-        Assignee_name = (User.objects.get(id=int(i)))
-        Assignee = Assignee_name.username + "," +  Assignee
-    blank_dict["Assignee_name"] = Assignee
-    # Appending Watchers to blank_dict, i.e. values of node's author_set field
-    if task_node.author_set:
-      watchers_list = []
-      for eachid in task_node.author_set:
-        if eachid not in watchers_list:
-          watchers_list.append(eachid)
-      blank_dict["Watchers"] = watchers_list
-
-  # Fetch Task Type list values
-  glist = node_collection.one(
-    {'_type': "GSystemType", 'name': "GList"},
-    {'name': 1}
-  )
-  task_type_node = node_collection.one(
-    {'_type': "GSystem", 'member_of': glist._id, 'name': "TaskType"},
-    {'collection_set': 1}
-  )
-  task_type_list = []
-  for task_type_id in task_type_node.collection_set:
-    task_type = node_collection.one({'_id': task_type_id}, {'name': 1})
-    if task_type:
-      if task_type not in task_type_list:
-        task_type_list.append(task_type)
-
-  var = {
-    'title': 'Task', 'task_type_choices': task_type_list,
-    'group_id': group_id, 'groupid': group_id, 'group_name': group_name, 'appId':app._id,
-    # 'node': task_node, 'task_id': task_id
-    'task_id': task_id
-  }
-  var.update(blank_dict)
-  context_variables = var
-
-  return render_to_response("ndf/gtask_create_edit.html",
-          context_variables,
+  group_object = node_collection.one({'name': unicode(group_name)})
+  update = request.POST.get("update")
+  if update == "True":
+    name = request.POST.get("name")
+    task_obj = node_collection.collection.GSystem()
+    task_obj.fill_gstystem_values(request=request,name=str(name),group_set=group_object._id,member_of=app._id)
+    task_obj.save(group_id=group_object._id)
+    print "&&&&&&&&&&&&&&&&&&",task_obj
+  if not task_id:
+    return render_to_response("ndf/gtask_create_edit.html",
+          {"group_object" : group_object },
           context_instance=RequestContext(request)
         )
+
 
 
 def update(request,rt_list,at_list,task_node,group_id,group_name):

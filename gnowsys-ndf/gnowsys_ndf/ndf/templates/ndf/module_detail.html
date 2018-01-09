@@ -34,9 +34,11 @@
 								</li>
 								<li>
 									 {% comment %}
+									{% comment %}
 									<a href="{% url 'create_group' node.pk %}?subgroup=True" class="tiny button radius left-btn" title="Create New Sub Group">{% trans "New SubGroup" %}</a>
+									{% endcomment %}
+									<a href="#" class="tiny button radius left-btn" title="Create New Sub Group">{% trans "New SubGroup" %}</a>
 							    </li>
-							    {% endcomment %}
 
 				              	<li>
 				                    <a class="fi-photo dropdown-settings" style="position: relative;top: -3px;left: 0px;" data-reveal-id="group_banner_prof_pic_prop">
