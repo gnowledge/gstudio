@@ -3,6 +3,7 @@
 {% load ndf_tags %}
   
 {% block body_content %}
+{% get_group_object groupid as group_object %}
 {% check_is_user_group groupid as is_author %}
 
 
@@ -21,7 +22,7 @@
                         <h7 style="margin-left: 81px;font-size: 26px;">Task List</h7>
                       </a>
                     </li>
-                    <li> 
+                    <li class="create-task"> 
                       <a href="#">
                         <img src="/static/ndf/images/new_task.svg" style="height: 65px;width: 266px;align-content: center;"/>
                         <h7 style="margin-left: 65px;font-size: 26px;">Create New</h7>
@@ -81,6 +82,28 @@
         url: "{% url 'gcheck_filter' group_id 1 'None' %}",
 
         type: "GET",
+        
+        success: function(data){
+          addActiveClass('task-list')  
+          
+          $(".task_editor_section").html("") 
+          $(".task_editor_section").html(data) 
+        },
+        
+        complete: function(){
+          // $('#Student').foundation('reveal', 'open');
+        }
+      });
+});
+
+ $( ".create-task" ).click(function() {
+  $.ajax({
+        url: "{% url 'gtask_create_edit' group_object.name %}",
+        data: {
+          'csrfmiddlewaretoken': "{{csrf_token}}",
+          'update':"True",
+        } ,
+        type: "POST",
         
         success: function(data){
           addActiveClass('task-list')  

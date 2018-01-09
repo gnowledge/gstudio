@@ -98,7 +98,7 @@ def course(request, group_id, course_id=None):
     app_set_name, app_set_id = GSystemType.get_gst_name_id("Announced Course")
 
     # ce_gst = node_collection.one({'_type': "GSystemType", 'name': "CourseEventGroup"})
-    ce_gst_name, ce_gst_id = GSystemType.get_gst_name_id("CourseEventGroup")
+    ce_gst_name, ce_gst_id = GSystemType.get_gst_name_id("announced_unit")
 
     # Course search view
     # title = GST_COURSE.name
@@ -113,14 +113,14 @@ def course(request, group_id, course_id=None):
         if not gstaff_access:
             query.update({'author_set':{'$ne':int(request.user.id)}})
 
-        course_coll = node_collection.find({'member_of': course_gst_id,'group_set': ObjectId(group_id),'status':u"DRAFT"}).sort('last_update', -1)
+        course_coll = node_collection.find({'member_of': ce_gst_id}).sort('last_update', -1)
         enr_ce_coll = node_collection.find({'member_of': ce_gst_id,'author_set': int(request.user.id),'_id':{'$in': group_obj_post_node_list}}).sort('last_update', -1)
 
         user_access =  user_access_policy(group_id ,request.user)
         if user_access == "allow":
             # show PRIVATE CourseEvent
             query.update({'group_type': {'$in':[u"PRIVATE",u"PUBLIC"]}})
-
+    
     ce_coll = node_collection.find(query).sort('last_update', -1)
     # print "\n\n ce_coll",ce_coll.count()
     return render_to_response("ndf/gcourse.html",
