@@ -24,7 +24,7 @@
         <ul class="small-block-grid-1 medium-block-grid-3 large-block-grid-3">
         {% for each_obj in units_cur %}
           <li class="card-image-wrapper">
-            {% include "ndf/card_group.html" with node=each_obj url_name="groupchange" first_arg=each_obj.pk  prevent_click=True %}
+            {% include "ndf/card_group.html" with node=each_obj url_name="groupchange" first_arg=each_obj.pk  %}
           </li>
         {% endfor %}
         </ul>
