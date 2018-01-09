@@ -1,4 +1,5 @@
 from django_mongokit import get_database
+from gnowsys_ndf.ndf.views.utils import reverse_dict_having_listvalues
 
 db = get_database()
 
@@ -33,3 +34,7 @@ def get_model_structure(collection_name):
 	# collection_name: str
 	from gnowsys_ndf.ndf.models import *
 	return getattr(eval(collection_name), 'structure')
+
+
+def get_db_collection_name_from_cls(collection_cls_name):
+	return reverse_dict_having_listvalues(get_collection_hierarchy())[collection_cls_name]
