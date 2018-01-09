@@ -2396,14 +2396,6 @@ def progress_report(request, group_id, user_id, render_template=False, get_resul
     group_name = group_obj.name
 
     analytics_data = {'user_id': user_id}
-    analytics_data.update({
-                'correct_attempted_quizitems' : 0,
-                'unattempted_quizitems': 0,
-                'visited_quizitems': 0,
-                'notapplicable_quizitems': 0,
-                'incorrect_attempted_quizitems': 0,
-                'attempted_quizitems': 0,
-            })
     data_points_dict = {}
     assessment_and_quiz_data = kwargs.get('assessment_and_quiz_data', False)
 
@@ -2428,6 +2420,15 @@ def progress_report(request, group_id, user_id, render_template=False, get_resul
             'group_obj': group_obj, 'title': 'progress_report', 'allow_to_join': allow_to_join,
             'old_profile_pics':old_profile_pics, "prof_pic_obj": banner_pic_obj,
             }
+    context_variables.update({
+                'correct_attempted_quizitems' : 0,
+                'unattempted_quizitems': 0,
+                'visited_quizitems': 0,
+                'notapplicable_quizitems': 0,
+                'incorrect_attempted_quizitems': 0,
+                'attempted_quizitems': 0,
+            })
+
 
     if request.user.is_authenticated():
         user_id = request.user.id
@@ -2515,7 +2516,8 @@ def progress_report(request, group_id, user_id, render_template=False, get_resul
     context_variables['username'] = author_obj.name
     # QuizItem Section
 
-    if "announced_unit" in group_obj_member_of_names_list:
+
+    if "announced_unit" in group_obj_member_of_names_list or "Group" in group_obj_member_of_names_list:
         visited_nodes = []
         if counter_obj:
             visited_nodes = counter_obj['visited_nodes'].keys()
@@ -2541,6 +2543,7 @@ def progress_report(request, group_id, user_id, render_template=False, get_resul
                                     completed_activities = completed_activities + 1
             if all(each_act_id in visited_nodes for each_act_id in lesson_act_ids):
                 completed_lessons = completed_lessons + 1
+
         context_variables['level1_lbl'] = "Lesson Visited"
         context_variables['level2_lbl'] = "Activity Visited"
 
