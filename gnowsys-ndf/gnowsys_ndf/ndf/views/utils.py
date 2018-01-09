@@ -53,7 +53,7 @@ def add_to_list(list_to_update, value_to_append):
 
 def cast_to_data_type(value, data_type):
     '''
-    This method will cast first argument: "value" to second argument: "data_type" and returns catsed value.
+    This method will cast first argument: "value" to second argument: "data_type" and returns casted value.
     '''
 
     if (data_type in ["basestring", "unicode"]) and isinstance(value, (str, unicode)):

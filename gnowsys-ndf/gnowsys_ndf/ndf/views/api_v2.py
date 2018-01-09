@@ -50,7 +50,8 @@ def db_schema(request, collection_name='', field_name='', field_value=''):
     if collection_name:
         # TODO: check for validity of collection_name.
         # get all class names and cache them. Use this list for validation.
-        get_parameters_dict = request.GET.dict()
+        get_parameters_dict = query_dict = request.GET.dict()
+        # print "get_parameters_dict: ", get_parameters_dict
         json_response = json.dumps(db_utils.get_model_structure(collection_name).keys())
 
         if field_name:
@@ -61,7 +62,8 @@ def db_schema(request, collection_name='', field_name='', field_value=''):
             json_response = json.dumps(all_unique_field_values, cls=NodeJSONEncoder)
 
             if field_value:
-                query_cur = query_utils.get_documents(collection_name, field_name, field_value)
+                query_dict.update({field_name: field_value})
+                query_cur = query_utils.get_documents(collection_name, **query_dict)
                 # print query_cur.count()
                 # json_response = json.dumps(query_cur, cls=NodeJSONEncoder)
                 json_response = json.dumps(list(query_cur), cls=NodeJSONEncoder)
