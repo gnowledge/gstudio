@@ -170,8 +170,8 @@
                         <button type="button" class ="right asset-unit-button" id="save_unit">Save</button>
                     {% endcomment %}
                     <!-- <input type="button" class="asset-unit-button right" value="Cancel"/> -->
-                    <a href="{% if unit_node %} {% url 'groupchange' unit_node.pk %}{% else %} {% url 'explore_basecourses' %}{% endif %} " class="asset-unit-button right" value="Cancel"/>{% trans "Cancel" %}</a>
-                    <input type="submit" class="asset-unit-button right" id="save_unit" value="Save"/>
+                    <a href="{% if unit_node %} {% url 'groupchange' unit_node.pk %}{% else %} {% url 'explore_basecourses' %}{% endif %} " class="button-cancel-new right" style="margin-right: 30px;margin-bottom: 8px;margin-top: 300px;" value="Cancel"/>{% trans "Cancel" %}</a>
+                    <input type="submit" class="button-save-new right" style="margin-right: 30px;margin-bottom: 8px;margin-top: 300px;" id="save_unit" value="Save"/>
                 </div>
             </form>
         </div>
