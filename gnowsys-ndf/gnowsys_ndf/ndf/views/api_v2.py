@@ -45,6 +45,12 @@ def db_schema(request, collection_name='', field_name='', field_value=''):
 
     GET /api/v2/schema/Filehive
     ["_type", "first_uploader", "if_image_dimensions", "relurl", "first_parent", "uploaded_at", "filename", "length", "if_image_size_name", "md5", "mime_type"]
+
+    # following URL will list all possible md5:
+    GET /api/v2/schema/Filehive/md5/
+    
+    # following url will return matching document:
+    GET /api/v2/schema/Filehive/md5/2bb048c86ae0aa3d0c496e00d128638bc3576f9dfe4f5aa15dc0a68088bea1c4
     '''
     # TODO: change logical sequence of `if` checking statements:
     if collection_name:
@@ -68,7 +74,8 @@ def db_schema(request, collection_name='', field_name='', field_value=''):
                 # json_response = json.dumps(query_cur, cls=NodeJSONEncoder)
                 json_response = json.dumps(list(query_cur), cls=NodeJSONEncoder)
                 # print json_response
-    else:
+
+    else:  # if no collection_name then return DB schema
         json_response = json.dumps(db_utils.get_collection_hierarchy())
 
     return StreamingHttpResponse(json_response)
