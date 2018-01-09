@@ -201,25 +201,41 @@
     //   });
 
     {% block script %} {% endblock %}
-    </script>
-    <div id="footer_course">
+</script>
+
+<div id="footer_course"> 
+    <div class="row">
+
         {% if not no_footer %}
         {% include 'ndf/footer_clix.html' %}
         {% endif %}
     </div>
-    <script type="text/javascript">
-        $(window).bind("load", function () {
-        var footer = $("#footer_course");
-        var pos = footer.position();
-        var height = $(window).height();
-        height = height - pos.top;
-        height = height - footer.height();
-        if (height > 0) {
-            footer.css({
-            'margin-top': height + 'px'
-            });
-        }
-        });
+</div>
+<script type="text/javascript">
+    $(document).ready(function() {
+  fixFooter();//at page load
+});
+
+    $(window).resize(function() {
+  fixFooter();//at page resize
+});
+
+    function fixFooter() {
+      footer=$("#footer_course");
+      height=footer.height();
+  paddingTop=parseInt(footer.css('padding-top'),10);//zero if is undefined
+  paddingBottom=parseInt(footer.css('padding-bottom'),10);//zero if is undefined
+  totalHeight=(height+paddingTop+paddingBottom);
+  footerPosition=footer.position();
+  windowHeight=$(window).height();
+  height=(windowHeight - footerPosition.top)-totalHeight;
+  if ( height > 0 ) {
+    footer.css({
+      'margin-top': (height) + 'px'
+  });
+}
+}
 </script>
+
 </body>
 </html>

@@ -222,6 +222,7 @@ pre{
 body{
     background-color: #F2F2F2;
     font-family: 'ubuntu-regular';
+    height: auto;
 }
 
 
@@ -5516,7 +5517,7 @@ ul.horizontal_tabs_gstudio {
     .group_sections_content {
         // min-height: 400px;
         background-color: #fff;
-        margin-bottom: 100px;
+        /*margin-bottom: 100px;*/
         margin-top:-1px;
     }
     .top-bar-secondions_content{
@@ -8046,3 +8047,11 @@ $module-card-lines-to-show: 3;
     margin-top: 15px;
     font-size: 15px;    
 }
+
+#footer_course{
+  width: 100%;
+  padding: 14px 0 20px 0;
+
+}
+
+

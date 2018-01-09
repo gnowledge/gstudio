@@ -4,175 +4,174 @@
 
 <style type="text/css">
 
-<<<<<<< HEAD
-		<div class="bo-wrap clr4">
-=======
-/* responsive footer */
-.clearfix {clear: both;}
+  /** responsive footer */
+  .clearfix {clear: both;}
 
 
-.clr1 {background: #FFFFFF; color: #333743;}
-.clr2 {background: #F1F3F5; color: #8F94A3;}
-.clr3 {background: rgba(221, 221, 221, 0.18); color: #BDC3CF;}
-.clr4 {background: rgba(221, 221, 221, 0.18); color: #E3E7F2;}
-.clr5 {color: #F1F3F5;}
-.clr6 {color: #39B5A1;}
-.clr7 {color: #D45245;}
+  .clr1 {background: #FFFFFF; color: #333743;}
+  .clr2 {background: #F1F3F5; color: #8F94A3;}
+  .clr3 {background: rgba(221, 221, 221, 0.18); color: #BDC3CF;}
+  .clr4 {background: rgba(221, 221, 221, 0.18); color: #E3E7F2;}
+  .clr5 {color: #F1F3F5;}
+  .clr6 {color: #39B5A1;}
+  .clr7 {color: #D45245;}
 
 
 
-/*##### Footer Structure #####*/
-.bo-wrap {
+  /*##### Footer Structure #####*/
+  .bo-wrap {
     clear:both; 
     width: auto;
-}
-.bo-footer {
-  clear:both;
-  width: auto;
-  padding: 5px;
-  width: 960px;
-  margin: 0 auto;
-}
+  }
+  .bo-footer {
+    clear:both;
+    width: auto;
+    padding: 5px;
+    width: 960px;
+    margin: 0 auto;
+  }
 
-.bo-footer-social {
-  text-align: left; 
-  line-height: 1px;
-  padding: 10px 10px 10px 10px;
+  .bo-footer-social {
+    text-align: left; 
+    line-height: 1px;
+    padding: 10px 10px 10px 10px;
 
-      &>a{
-            color:$primary-orange;
-            word-spacing:8px;
-            &:hover {
-            color: $primary-orange;
-            border-bottom: 3px solid $secondary-orange;
-
-        }
-    }
-            
-}
-
-.bo-footer-copyright{
     &>a{
-            transition: link-color 0.15s ease-in-out 0s,border 0.15s ease-in-out 0s;
-            border-bottom: none;
-            color: #777;
-            text-decoration: none !important;
-            word-spacing:3px;
-            &:hover {
-            color:#777;
-            border-bottom: 3px solid hsla(316, 88%, 42%, 1);
-        }
+      color:$primary-orange;
+      word-spacing:8px;
+      &:hover {
+        color: $primary-orange;
+        border-bottom: 3px solid $secondary-orange;
+
+      }
     }
-}
 
-.bo-footer-smap {
-  width: 600px;
-  float: left;
-  padding: 5px 10px;
-  text-align: left;
-  font-size: 18px;
-  word-spacing:20px;
-}
+  }
 
-.bo-footer-images{
+  .bo-footer-copyright{
+    &>a{
+      transition: link-color 0.15s ease-in-out 0s,border 0.15s ease-in-out 0s;
+      border-bottom: none;
+      color: #777;
+      text-decoration: none !important;
+      word-spacing:3px;
+      &:hover {
+        color:#777;
+        border-bottom: 3px solid hsla(316, 88%, 42%, 1);
+      }
+    }
+  }
+
+  .bo-footer-smap {
+    width: auto;
+    float: left;
+    padding: 5px 10px;
+    text-align: left;
+    font-size: 18px;
+    word-spacing:20px;
+  }
+
+  .bo-footer-images{
     display: inline;
     max-width:120px;
     max-height:95px;
     width: auto;
     height: auto; 
     vertical-align: bottom;
-}
-
-.bo-footer-uonline {
-  width: 300px; /* Account for margins + border values */
-  float: left;
-  padding: 5px 10px;
-  text-align: center;
-}
-
-.bo-footer-power {
-  width: 300px;
-  padding: 5px 10px;
-  float: left;
-  text-align: right;
-  font-size: 14px;
-  color: #636A7D;
-  vertical-align: middle;
-}
-
-
-
-
-/*##### Footer Responsive #####*/
-/* for 980px or less */
-@media screen and (max-width: 980px) {
-  
-  .bo-footer {
-    width: 95%;
-    padding: 1% 2%;
   }
-  .bo-footer-smap {
-    width: 33%;
-    padding: 1% 2%;
-  }
+
   .bo-footer-uonline {
-    width: 46%;
-    padding: 1% 2%;
-    float: right;
+    width: 300px; /* Account for margins + border values */
+    float: left;
+    padding: 5px 10px;
+    text-align: center;
+  }
+
+  .bo-footer-power {
+    width: 300px;
+    padding: 5px 10px;
+    float: left;
     text-align: right;
-  }
-  
-  .bo-footer-power {
-    clear: both;
-    padding: 1% 2%;
-    width: auto;
-    float: none;
-    text-align: center;
-  }
-}
-/* for 700px or less */
-@media screen and (max-width: 600px) {
-
-  .bo-footer-smap {
-    width: auto; 
-    float: none;
-    text-align: center;
-  }
-  
-  .bo-footer-uonline {
-    width: auto;
-    float: none;
-    text-align: center;
-  }
-  
-  .bo-footer-power {
-    width: auto;
-    float: none;
-    text-align: center;
+    font-size: 14px;
+    color: #636A7D;
+    vertical-align: middle;
   }
 
-}
+
+
+
+  /*##### Footer Responsive #####*/
+  /* for 980px or less */
+  @media screen and (max-width: 980px) {
+
+    .bo-footer {
+      width: 95%;
+      padding: 1% 2%;
+    }
+    .bo-footer-smap {
+      width: 33%;
+      padding: 1% 2%;
+    }
+    .bo-footer-uonline {
+      width: 46%;
+      padding: 1% 2%;
+      float: right;
+      text-align: right;
+    }
+
+    .bo-footer-power {
+      clear: both;
+      padding: 1% 2%;
+      width: auto;
+      float: none;
+      text-align: center;
+    }
+  }
+  /* for 700px or less */
+  @media screen and (max-width: 600px) {
+
+    .bo-footer-smap {
+      width: auto; 
+      float: none;
+      text-align: center;
+    }
+
+    .bo-footer-uonline {
+      width: auto;
+      float: none;
+      text-align: center;
+    }
+
+    .bo-footer-power {
+      width: auto;
+      float: none;
+      text-align: center;
+    }
+
+  }
 
 </style>
 
+<div class="row">
+  <div class="small-12 medium-12 large-12 columns ">
+    <div class="row">
 
-	{% get_gstudio_footer_links  as footer_links %}
+     {% get_gstudio_footer_links  as footer_links %}
 
-		<div class="bo-wrap clr4" style="">
->>>>>>> 99b3d8c94ef775119539fe4652e2411d6bbbeee6
-		  <div class="bo-footer">
-		    <div class="bo-footer-social">
-		      <a href="{{site.ABOUT}}" target="_blank">About </a>
-		      <a href="{{site.CONTACT}}" target="_blank">Contact </a>
-		      <a href="http://www.tiss.edu/disclaimer/" target="_blank">Disclaimer </a>
-		    </div>
-		  </div>
-		</div>
-		<div class="bo-wrap clr3">
-		  <div class="bo-footer">
-		    <div class="bo-footer-smap">
-<<<<<<< HEAD
-		    	<a href="http://http://ncert.nic.in/" target="_blank" >
+     <div class="bo-wrap clr4" style="">
+      <div class="bo-footer">
+        <div class="bo-footer-social">
+          <a href="{{site.ABOUT}}" target="_blank">About </a>
+          <a href="{{site.CONTACT}}" target="_blank">Contact </a>
+          <a href="http://www.tiss.edu/disclaimer/" target="_blank">Disclaimer </a>
+        </div>
+      </div>
+     </div>
+
+     <div class="bo-wrap clr3">
+      <div class="bo-footer">
+        <div class="bo-footer-smap">
+		    <!-- 	<a href="http://http://ncert.nic.in/" target="_blank" >
 		            <img src="/static/ndf/images/logos/ncert.png" style="height: 90px; width:85px;"/>
 		        </a>
 		       	<a href="http://mhrd.gov.in/" target="_blank">
@@ -189,34 +188,31 @@
 		        </a>
 		        <a href="http://www.hbcse.tifr.res.in/" target="_blank">
 		          <img src="/static/ndf/images/logos/tifr.png" style="height: 55px; width:122px;"/>
-		        </a>
-=======
-  	    	{% for each in footer_links %}
-		        {% for path, link in each.items %}
-					<a href="{{link}}" target="_blank">
-			            <img src="{{path}}" class="bo-footer-images" />
-			        </a>		          
-  	    	{% endfor %}
-  	    	{% endfor %}
->>>>>>> 99b3d8c94ef775119539fe4652e2411d6bbbeee6
-		    </div>
+		        </a> -->
+            {% for each in footer_links %}
+            {% for path, link in each.items %}
+            <a href="{{link}}" target="_blank">
+             <img src="{{path}}" class="bo-footer-images" />
+           </a>		          
+           {% endfor %}
+           {% endfor %}
+         </div>
 
+         <div class="clearfix"></div>
+       </div>
+     </div>
 
-		    <div class="clearfix"></div>
-		  </div>
-		</div>
-		<div class="bo-wrap clr4">
-		  <div class="bo-footer">
-		    <div class="bo-footer-copyright">
-		      <a href="">Privacy</a>
-		      <a href="">Terms Of Use</a>
-		      {% get_latest_git_hash as git_commit_hash %}
-		      <a href="https://gitlab.com/gnowledge/gstudio/tree/{{git_commit_hash}}" target="_blank">Version</a>
-		    </div>
-		  </div>
-		</div>
-		</div>
+     <div class="bo-wrap clr4">
+      <div class="bo-footer">
+        <div class="bo-footer-copyright">
+          <a href="">Privacy</a>
+          <a href="">Terms Of Use</a>
+          {% get_latest_git_hash as git_commit_hash %}
+          <a href="https://gitlab.com/gnowledge/gstudio/tree/{{git_commit_hash}}" target="_blank">Version</a>
+        </div>
+      </div>
+    </div>
+  </div>
 
-
-
-
+</div>
+</div>
