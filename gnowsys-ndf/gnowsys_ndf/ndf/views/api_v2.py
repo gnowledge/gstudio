@@ -9,8 +9,9 @@ try:
 except ImportError:
     from pymongo.objectid import ObjectId
 
+from bson import json_util
 
-from django.http import HttpResponseRedirect, HttpResponse
+from django.http import HttpResponseRedirect, HttpResponse, StreamingHttpResponse
 from django.contrib.auth.admin import User
 from django.views.decorators.csrf import csrf_exempt
 
@@ -35,8 +36,9 @@ gst_api_fields_dict = {k: 1 for k in api_configs['fields']}
 api_name_model_name_dict = {v: k for v, k in field_verbose_configs.iteritems()}
 
 
+# TODO: write decorator for making JSON result OPEN API or JSON api compliance
 @csrf_exempt
-def db_schema(request, collection_name='', field_name=''):
+def db_schema(request, collection_name='', field_name='', field_value=''):
     '''
     GET /api/v2/schema
     {"Filehives": ["Filehive"], "Triples": ["GAttribute", "GRelation"], "Buddies": ["Buddy"], "Benchmarks": ["Benchmark"], "Nodes": ["MetaType", "GSystemType", "RelationType", "AttributeType", "GSystem", "Group", "ToReduceDocs", "Author"], "Counters": ["Counter"]}
@@ -44,19 +46,30 @@ def db_schema(request, collection_name='', field_name=''):
     GET /api/v2/schema/Filehive
     ["_type", "first_uploader", "if_image_dimensions", "relurl", "first_parent", "uploaded_at", "filename", "length", "if_image_size_name", "md5", "mime_type"]
     '''
+    # TODO: change logical sequence of `if` checking statements:
     if collection_name:
+        # TODO: check for validity of collection_name.
         # get all class names and cache them. Use this list for validation.
         get_parameters_dict = request.GET.dict()
         json_response = json.dumps(db_utils.get_model_structure(collection_name).keys())
 
         if field_name:
+            # TODO: check for validity of field.
             # get all possible values from DB for provided field
-            query_utils.get_unique_values(collection_name, field_name)
-            return HttpResponse()
+            all_unique_field_values = query_utils.get_unique_values(collection_name, field_name)
+            # print all_unique_field_values
+            json_response = json.dumps(all_unique_field_values, cls=NodeJSONEncoder)
+
+            if field_value:
+                query_cur = query_utils.get_documents(collection_name, field_name, field_value)
+                # print query_cur.count()
+                # json_response = json.dumps(query_cur, cls=NodeJSONEncoder)
+                json_response = json.dumps(list(query_cur), cls=NodeJSONEncoder)
+                # print json_response
     else:
         json_response = json.dumps(db_utils.get_collection_hierarchy())
 
-    return HttpResponse(json_response) 
+    return StreamingHttpResponse(json_response)
 
 
 @csrf_exempt
