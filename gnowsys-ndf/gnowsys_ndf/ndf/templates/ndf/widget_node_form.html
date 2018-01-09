@@ -75,7 +75,9 @@
                 <input type="submit" class="button-save-new" value="Save"/>
 
                 {% if cancel_url %}
-                    <a class="button-cancel-new" href="{{cancel_url}}"> <i class="fa fa-times" aria-hidden="true"></i> {% trans "Cancel" %}</a>
+                    <button class="button-cancel-new">
+                        <a href="{{cancel_url}}"> <i class="fa fa-times" aria-hidden="true"></i> {% trans "Cancel" %}</a>
+                    </button>
                 {% endif %}
             </div>
         </form>

@@ -6213,9 +6213,9 @@ ul.nav_menu_1 > li > a.selected, ul.nav_menu_1 > li > a:hover {
   margin-right: 80px !important;
 }
 
-/* line 6425, ../../../scss/_clix2017.scss */
+/* line 6427, ../../../scss/_clix2017.scss */
 .button-cancel-new {
-  height: 2.5rem;
+  height: 2rem;
   padding: 0 2rem;
   background: none;
   font-family: open_sansbold,sans-serif;
@@ -6231,15 +6231,32 @@ ul.nav_menu_1 > li > a.selected, ul.nav_menu_1 > li > a:hover {
   transition: all .1s ease;
   margin-right: 1px;
 }
-/* line 6441, ../../../scss/_clix2017.scss */
+/* line 6443, ../../../scss/_clix2017.scss */
 .button-cancel-new:hover {
   background-color: #fff;
   color: #333333;
 }
-
 /* line 6448, ../../../scss/_clix2017.scss */
+.button-cancel-new > a {
+  font-family: open_sansbold,sans-serif;
+  font-size: 1.2rem;
+  text-transform: uppercase;
+  cursor: pointer;
+  border-radius: 3px;
+  background-color: #f5f5f5;
+  color: #757575;
+  transition: all .1s ease;
+  margin-right: 1px;
+}
+/* line 6458, ../../../scss/_clix2017.scss */
+.button-cancel-new > a:hover {
+  background-color: #fff;
+  color: #333333;
+}
+
+/* line 6466, ../../../scss/_clix2017.scss */
 .button-save-new {
-  height: 2.5rem;
+  height: 2rem;
   padding: 0 2rem;
   background: none;
   font-family: open_sansbold,sans-serif;
@@ -6254,7 +6271,7 @@ ul.nav_menu_1 > li > a.selected, ul.nav_menu_1 > li > a:hover {
   color: #fff;
   transition: all .1s ease;
 }
-/* line 6463, ../../../scss/_clix2017.scss */
+/* line 6481, ../../../scss/_clix2017.scss */
 .button-save-new:hover {
   background-color: #fff;
   color: #912a7d;
