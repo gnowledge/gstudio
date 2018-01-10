@@ -117,8 +117,9 @@
                     </div>
                     <div id="group_elibrary">
                         {% if title == "asset_list" %}
-                            {% include "ndf/assets.html" %}
+                            {% include "ndf/assets.html" with title="asset_list" %}
                         {% endif %}
+
                         {% if title == "asset_detail" or title == "asset_content_detail" %}
                             {% include "ndf/add_asset.html" %}
                         {% endif %}
