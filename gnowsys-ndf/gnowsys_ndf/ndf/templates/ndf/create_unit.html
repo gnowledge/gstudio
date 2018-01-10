@@ -26,7 +26,6 @@
                 </div>
 
 
-                {% if unit_node %}
                 <div class="course_creator_header">
                     <div class="left course_heading">
                     <h5>{% trans "Enter alternate Name" %}</h5>
@@ -37,7 +36,6 @@
 
                     </div>
                 </div>
-                {% endif %}
 
                 <hr/>
                 {% if 'Group' not in unit_node.member_of_names_list or 'base_unit' in unit_node.member_of_names_list or 'announced_unit' in unit_node.member_of_names_list %}
