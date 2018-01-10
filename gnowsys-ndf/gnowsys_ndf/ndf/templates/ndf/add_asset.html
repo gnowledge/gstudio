@@ -119,7 +119,7 @@
                 {% endif     %}
                 </h3>
 
-                <button type="button" class="blue-white-button save-asset right" data-asset_id='{{asset_obj.pk}}' style="margin-top: 9px;margin-right: -150px;">{% trans "Save" %}</button>
+                <!--<button type="button" class="button-hollow-grey save-asset right" data-asset_id='{{asset_obj.pk}}' style="margin-top: 9px;margin-right: -150px;">{% trans "Save" %}</button>-->
             {% endif %}
 <div class="row">
     <hr/>
@@ -227,6 +227,8 @@
             </div>
         </div>
 
+        <button type="button" class="button-save-new save-asset" data-asset_id='{{asset_obj.pk}}' style="margin-top: 9px;margin-right: -150px;">{% trans "Save" %}</button>
+        
         {% endif %}
 
     <div class="asset-content-area"{% if not asset_obj %} style="display:none"{% endif %}>
