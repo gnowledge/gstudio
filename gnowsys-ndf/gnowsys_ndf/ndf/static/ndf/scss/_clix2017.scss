@@ -1053,7 +1053,7 @@ ul.horizontal_tabs_gstudio {
     .asset_preview {
         height: 200px;
         //margin-left: 5px;
-        width:100%;
+        width:99.9%;
         //background-color: #eee;
         //background: url(/static/ndf/images/asset_thumbnail.png)no-repeat;
         border-width: 5px;
@@ -3353,6 +3353,21 @@ ul.jqtree-tree .jqtree-toggler {
     // //font-size: 13px;
     cursor: pointer;
     @include transition-two-prop(color, border-color);
+        &:hover{
+            background-color: #f5f5f5;
+            
+        }
+
+    >a{
+        font-family: open_sansbold,sans-serif;
+        font-size: 1.2rem;
+        text-transform: uppercase;
+        cursor: pointer;
+        background-color: inherit;
+        color: #757575 !important; 
+        transition: all .1s ease;
+        margin-right:1px;
+    }
 }
 
 .button-hollow-blue{
