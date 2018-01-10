@@ -9,11 +9,11 @@
 <input type="button" data-reveal-id="enrollBuddiesModal-{{group_object.pk}}" class="fa enrollBtn enrollact-{{group_object.pk}} module-card-enrol unit-card-enrol"  
   "{% if request.user.pk in group_object.author_set and not module_enrollment or module_enrollment and enrolled_status_dict|get_dict_value_from_key:'full_enrolled' %}"  
     "{% if is_workspace %}" value="Joined"
-      "{% else %}"  value="Enrolled" style="background-color:#006400;" title="You are enrolled " 
+      "{% else %}"  value="Enrolled" style="margin-left: 82px;background-color:#006400;" title="You are enrolled " 
     "{% endif %}" 
     "{% else %}" 
       "{% if is_workspace %}" value="Join"
-      "{% else %}"  value="Enroll &#xf234;" title="Enroll your Buddies "
+      "{% else %}"  value="Enroll &#xf234;" style="margin-left: 82px;" title="Enroll your Buddies "
     "{% endif %}"
   "{%  endif %}" />
 
