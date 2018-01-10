@@ -157,6 +157,7 @@ def module_detail(request, group_id, node_id,title=""):
 
     
     if title == "drafts":
+        print "(((((((((((((((((((((((((("
         module_detail_query.update({'$or': [
         {'$and': [
             {'member_of': gst_base_unit_id},
