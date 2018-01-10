@@ -3485,7 +3485,7 @@ def assets(request, group_id, asset_id=None,page_no=1):
         asset_obj = node_collection.one({'_id': ObjectId(asset_id)})
         asset_content_list = get_relation_value(ObjectId(asset_obj._id),'has_assetcontent')
         # topic_gst_name, topic_gst_id = GSystemType.get_gst_name_id("Topic")
-
+        
         asset_nodes = node_collection.find({'member_of': {'$in': [asset_gst_id]},
             'group_set': {'$all': [ObjectId(group_id)]}}).sort('last_update', -1)
         # topic_nodes = node_collection.find({'member_of': {'$in': [topic_gst_id]}})
@@ -3497,13 +3497,16 @@ def assets(request, group_id, asset_id=None,page_no=1):
             'group_obj':group_obj
         }
         if 'announced_unit' in group_obj.member_of_names_list or 'Group' in group_obj.member_of_names_list and 'base_unit' not in group_obj.member_of_names_list :
-            template = 'ndf/lms.html'     
+                 
             if 'raw@material' in asset_obj.tags:
                 context_variables.update({'title':'raw_material_detail'})
-            if 'asset@gallery' in asset_obj.tags:
+                template = 'ndf/lms.html'
+            elif 'asset@gallery' in asset_obj.tags:
                 context_variables.update({'title':'asset_gallery_detail'})
-            
-        
+                template = 'ndf/lms.html'
+                        
+            else:
+                template = 'ndf/gevent_base.html'
         return render_to_response(template,
                                     context_variables,
                                     context_instance = RequestContext(request)
@@ -3518,8 +3521,6 @@ def assets(request, group_id, asset_id=None,page_no=1):
             'group_obj':group_obj,'assets_page_info':assets_page_info
         }
     
-    if 'announced_unit' in group_obj.member_of_names_list:
-            template = 'ndf/lms.html'
     return render_to_response(template,
                                 context_variables,
                                 context_instance = RequestContext(request)

@@ -6815,7 +6815,6 @@ def create_edit_asset(request,group_id):
     if selected_topic:
       # selected_topic_list = map(ObjectId,selected_topic_list)
       create_grelation(asset_obj._id,rt_teaches,ObjectId(selected_topic))
-    
     if "asset@asset" not in asset_obj.tags and "base_unit" in group_obj.member_of_names_list:
       asset_obj.tags.append(u'asset@asset')
 
@@ -6827,9 +6826,12 @@ def create_edit_asset(request,group_id):
     if "announced_unit" in group_obj.member_of_names_list and title == "raw material":
       asset_obj.tags.append(u'raw@material')
     
-    if "announced_unit" in group_obj.member_of_names_list  or "Group" in group_obj.member_of_names_list and "gallery" == title:
+    if ("announced_unit" in group_obj.member_of_names_list  or "Group" in group_obj.member_of_names_list) and "gallery" == title:
       asset_obj.tags.append(u'asset@gallery')    
     
+    if "announced_unit" in group_obj.member_of_names_list  and title == None or title == "None":
+      asset_obj.tags.append(u'asset@asset')
+
     if asset_lang:
       language = get_language_tuple(asset_lang)
       asset_obj.language = language
