@@ -30315,3 +30315,67 @@ ul.horizontal_tabs_gstudio > li.sub_group_action:hover ul {
   width: 95%;
   margin-left: 24px;
 }
+
+/* line 7140, ../../../scss/_app_styles.scss */
+.button-cancel-new {
+  height: 2rem;
+  padding: 0 2rem;
+  background: none;
+  font-family: open_sansbold,sans-serif;
+  font-size: 1.2rem;
+  text-transform: uppercase;
+  cursor: pointer;
+  border-radius: 3px;
+  -webkit-box-align: center;
+  align-items: center;
+  border: .1rem solid #a9a9a9;
+  background-color: #f5f5f5;
+  color: #757575;
+  transition: all .1s ease;
+  margin-right: 1px;
+}
+/* line 7156, ../../../scss/_app_styles.scss */
+.button-cancel-new:hover {
+  background-color: #fff;
+  color: #333333;
+}
+/* line 7161, ../../../scss/_app_styles.scss */
+.button-cancel-new > a {
+  font-family: open_sansbold,sans-serif;
+  font-size: 1.2rem;
+  text-transform: uppercase;
+  cursor: pointer;
+  border-radius: 3px;
+  background-color: #f5f5f5;
+  color: #757575;
+  transition: all .1s ease;
+  margin-right: 1px;
+}
+/* line 7171, ../../../scss/_app_styles.scss */
+.button-cancel-new > a:hover {
+  background-color: #fff;
+  color: #333333;
+}
+
+/* line 7179, ../../../scss/_app_styles.scss */
+.button-save-new {
+  height: 2rem;
+  padding: 0 2rem;
+  background: none;
+  font-family: open_sansbold,sans-serif;
+  font-size: 1.2rem;
+  text-transform: uppercase;
+  cursor: pointer;
+  border-radius: 3px;
+  -webkit-box-align: center;
+  align-items: center;
+  border: .2rem solid #912a7d;
+  background-color: #912a7d;
+  color: #fff;
+  transition: all .1s ease;
+}
+/* line 7194, ../../../scss/_app_styles.scss */
+.button-save-new:hover {
+  background-color: #fff;
+  color: #912a7d;
+}

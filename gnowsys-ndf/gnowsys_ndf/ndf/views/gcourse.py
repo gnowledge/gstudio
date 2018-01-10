@@ -98,7 +98,7 @@ def course(request, group_id, course_id=None):
     app_set_name, app_set_id = GSystemType.get_gst_name_id("Announced Course")
 
     # ce_gst = node_collection.one({'_type': "GSystemType", 'name': "CourseEventGroup"})
-    ce_gst_name, ce_gst_id = GSystemType.get_gst_name_id("CourseEventGroup")
+    ce_gst_name, ce_gst_id = GSystemType.get_gst_name_id("announced_unit")
 
     # Course search view
     # title = GST_COURSE.name
@@ -113,14 +113,14 @@ def course(request, group_id, course_id=None):
         if not gstaff_access:
             query.update({'author_set':{'$ne':int(request.user.id)}})
 
-        course_coll = node_collection.find({'member_of': course_gst_id,'group_set': ObjectId(group_id),'status':u"DRAFT"}).sort('last_update', -1)
+        course_coll = node_collection.find({'member_of': ce_gst_id}).sort('last_update', -1)
         enr_ce_coll = node_collection.find({'member_of': ce_gst_id,'author_set': int(request.user.id),'_id':{'$in': group_obj_post_node_list}}).sort('last_update', -1)
 
         user_access =  user_access_policy(group_id ,request.user)
         if user_access == "allow":
             # show PRIVATE CourseEvent
             query.update({'group_type': {'$in':[u"PRIVATE",u"PUBLIC"]}})
-
+    
     ce_coll = node_collection.find(query).sort('last_update', -1)
     # print "\n\n ce_coll",ce_coll.count()
     return render_to_response("ndf/gcourse.html",
@@ -2396,14 +2396,6 @@ def progress_report(request, group_id, user_id, render_template=False, get_resul
     group_name = group_obj.name
 
     analytics_data = {'user_id': user_id}
-    analytics_data.update({
-                'correct_attempted_quizitems' : 0,
-                'unattempted_quizitems': 0,
-                'visited_quizitems': 0,
-                'notapplicable_quizitems': 0,
-                'incorrect_attempted_quizitems': 0,
-                'attempted_quizitems': 0,
-            })
     data_points_dict = {}
     assessment_and_quiz_data = kwargs.get('assessment_and_quiz_data', False)
 
@@ -2428,6 +2420,15 @@ def progress_report(request, group_id, user_id, render_template=False, get_resul
             'group_obj': group_obj, 'title': 'progress_report', 'allow_to_join': allow_to_join,
             'old_profile_pics':old_profile_pics, "prof_pic_obj": banner_pic_obj,
             }
+    context_variables.update({
+                'correct_attempted_quizitems' : 0,
+                'unattempted_quizitems': 0,
+                'visited_quizitems': 0,
+                'notapplicable_quizitems': 0,
+                'incorrect_attempted_quizitems': 0,
+                'attempted_quizitems': 0,
+            })
+
 
     if request.user.is_authenticated():
         user_id = request.user.id
@@ -2515,7 +2516,8 @@ def progress_report(request, group_id, user_id, render_template=False, get_resul
     context_variables['username'] = author_obj.name
     # QuizItem Section
 
-    if "announced_unit" in group_obj_member_of_names_list:
+
+    if "announced_unit" in group_obj_member_of_names_list or "Group" in group_obj_member_of_names_list:
         visited_nodes = []
         if counter_obj:
             visited_nodes = counter_obj['visited_nodes'].keys()
@@ -2541,6 +2543,7 @@ def progress_report(request, group_id, user_id, render_template=False, get_resul
                                     completed_activities = completed_activities + 1
             if all(each_act_id in visited_nodes for each_act_id in lesson_act_ids):
                 completed_lessons = completed_lessons + 1
+
         context_variables['level1_lbl'] = "Lesson Visited"
         context_variables['level2_lbl'] = "Activity Visited"
 
@@ -3860,7 +3863,7 @@ def assets(request, group_id, asset_id=None,page_no=1):
         asset_obj = node_collection.one({'_id': ObjectId(asset_id)})
         asset_content_list = get_relation_value(ObjectId(asset_obj._id),'has_assetcontent')
         # topic_gst_name, topic_gst_id = GSystemType.get_gst_name_id("Topic")
-
+        
         asset_nodes = node_collection.find({'member_of': {'$in': [asset_gst_id]},
             'group_set': {'$all': [ObjectId(group_id)]}}).sort('last_update', -1)
         # topic_nodes = node_collection.find({'member_of': {'$in': [topic_gst_id]}})
@@ -3873,14 +3876,18 @@ def assets(request, group_id, asset_id=None,page_no=1):
             'asset_nodes':asset_nodes,'asset_content_list':asset_content_list,
             'group_obj':group_obj
         }
-        if ('announced_unit' in group_obj.member_of_names_list or 'Group' in group_obj.member_of_names_list or 'Author' in group_obj.member_of_names_list ) and 'base_unit' not in group_obj.member_of_names_list :
-            template = 'ndf/lms.html'
+
+        if 'announced_unit' in group_obj.member_of_names_list or 'Group' in group_obj.member_of_names_list and 'base_unit' not in group_obj.member_of_names_list :
+                 
             if 'raw@material' in asset_obj.tags:
                 context_variables.update({'title':'raw_material_detail'})
-            if 'asset@gallery' in asset_obj.tags:
+                template = 'ndf/lms.html'
+            elif 'asset@gallery' in asset_obj.tags:
                 context_variables.update({'title':'asset_gallery_detail'})
-
-
+                template = 'ndf/lms.html'
+                        
+            else:
+                template = 'ndf/gevent_base.html'
         return render_to_response(template,
                                     context_variables,
                                     context_instance = RequestContext(request)
@@ -3908,8 +3915,6 @@ def assets(request, group_id, asset_id=None,page_no=1):
             'group_obj':group_obj,'assets_page_info':assets_page_info
         }
 
-    if 'announced_unit' in group_obj.member_of_names_list:
-            template = 'ndf/lms.html'
     return render_to_response(template,
                                 context_variables,
                                 context_instance = RequestContext(request)
