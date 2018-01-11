@@ -60,6 +60,8 @@
       </a>
     </li>
 
+    {% if is_gstaff %}
+
     <li>
         <a href="{% url 'course_pages' group_id %}" {% if title == 'course_pages' or title == 'create_course_pages' %}class="selected"{% endif %}>{% trans "Activities" %}</a>
     </li>
@@ -69,6 +71,8 @@
     <li >
         <a href="https://clix-authoring.mit.edu/#/" target="_blank" {% if title == 'Assessments' %}class="selected"{% endif %}>{% trans "Assessments" %}</a>
     </li>
+  {% endif %}
+
     {% if 'Group'  in group_object_member_of_names_list %}
     <li>
       <a href="{% url 'curriculum_list' groupid  %}" tabindex="6"> {% trans "Topic Map" %}</a>
