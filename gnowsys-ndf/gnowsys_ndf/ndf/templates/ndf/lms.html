@@ -76,7 +76,7 @@
     </li>
   {% endif %}
 
-    {% if 'Group'  in group_object_member_of_names_list %}
+    {% if 'Group'  in group_object_member_of_names_list and "base_unit" not in group_object_member_of_names_list and "announced_unit" not in group_object_member_of_names_list %}
     <li>
       <a href="{% url 'curriculum_list' groupid  %}" tabindex="6"> {% trans "Topic Map" %}</a>
     </li>
@@ -95,7 +95,7 @@
               </li>
 
               <li>
-                  <a href="{% url 'unit_detail' groupid %}" target="_blank" class="fi-pencil"> {% trans "Edit Structure" %} </a>
+                  <a href="{% url 'unit_detail' groupid %}" class="fi-pencil"> {% trans "Edit Structure" %} </a>
               </li>
 
               <li>
