@@ -41,8 +41,7 @@ def all_translations(request, group_id, node_id):
                                 'node': node_obj,
                                 'source_node_id': node_id,
                                 'card_url_name': 'show_translation',
-                                'supported_languages': supported_languages
-                               },
+                                'supported_languages': supported_languages                               },
                               context_instance=RequestContext(request))
 
 
@@ -126,6 +125,11 @@ def translate(request, group_id, node_id, lang, translated_node_id=None, **kwarg
                                 'node_obj': translated_node,
                                 'source_obj': source_obj,
                                 'post_url': reverse('translate', kwargs={
+                                        'group_id': group_id,
+                                        'node_id': node_id,
+                                        'lang': lang,
+                                        }),
+                                'cancel_url':reverse('show_translation', kwargs={
                                         'group_id': group_id,
                                         'node_id': node_id,
                                         'lang': lang,

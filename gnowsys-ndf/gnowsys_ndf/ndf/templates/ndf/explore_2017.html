@@ -22,6 +22,6 @@
 		{% if modules_is_cur %}
 			{% rewind_cursor modules_cur as modules_cur %}
 		{% endif %}
-		{% include "ndf/lms_explore.html"  %}
+		{% include "ndf/lms_explore.html" with title=title  %}
 	{% endif %}
 {% endblock body_content %}

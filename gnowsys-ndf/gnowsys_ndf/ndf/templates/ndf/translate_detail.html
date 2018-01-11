@@ -7,12 +7,16 @@
 {% block body_content %}
 <div class="row group_content translation-detail-top-margin">
     <div class="small-12 columns  top-bar-secondions_content" id="scstyle">
-	<h1 class="text-center"> {% firstof node.altnames node.name %}
-		<small>
-			<a href="{% url 'translated' group_id source_node_id node.language.0 node.pk %}"> <i>{% trans "EDIT" %} </i></a>
-		</small>
-	</h1>
-
+    	<div class="row">
+    		<div class="small-11 columns left">
+				<h1> {% firstof node.altnames node.name %}</h1>
+    		</div>
+    		<div class="small-1 columns">
+    			<button class="button-hollow-grey" style="margin-top:15px">
+					<a href="{% url 'translated' group_id source_node_id node.language.0 node.pk %}"> <i>{% trans "Edit" %} </i></a>
+    			</button>
+    		</div>
+    	</div>
     {% include 'ndf/node_ajax_content.html' %}
 
     {% if other_translations %}

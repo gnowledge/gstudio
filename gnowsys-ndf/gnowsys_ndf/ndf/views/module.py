@@ -99,7 +99,7 @@ def module_create_edit(request, group_id, module_id=None, cancel_url='list_modul
 
 
 @get_execution_time
-def module_detail(request, group_id, node_id):
+def module_detail(request, group_id, node_id,title=""):
     '''
     detail of of selected module
     '''
@@ -123,6 +123,10 @@ def module_detail(request, group_id, node_id):
 
 
     gstaff_access = check_is_gstaff(group_id,request.user)
+    module_detail_query = {'_id': {'$in': module_obj.collection_set},
+    'status':'PUBLISHED'
+    }
+
     if module_obj.collection_set:
         module_detail_query = {'_id': {'$in': module_obj.collection_set},
         'status':'PUBLISHED'
@@ -131,7 +135,7 @@ def module_detail(request, group_id, node_id):
         module_detail_query = {'_id': {'$in': module_obj.post_node},
         'status':'PUBLISHED'
         }
-
+    
     if not gstaff_access:
         module_detail_query.update({'$or': [
         {'$and': [
@@ -144,7 +148,32 @@ def module_detail(request, group_id, node_id):
         ]},
         {'member_of': gst_announced_unit_id}
       ]})
+    
+    if title == "courses":
+        module_detail_query.update({'$or': [
+        {'$and': [
+            {'member_of': gst_announced_unit_id},
+            {'$or': [
+              {'created_by': request.user.id},
+              {'group_admin': request.user.id},
+              {'author_set': request.user.id},
+            ]}
+        ]},
+        {'member_of': gst_announced_unit_id }
+      ]})
 
+    
+    if title == "drafts":
+        module_detail_query.update({'$or': [
+        {'$and': [
+            {'member_of': gst_base_unit_id},
+            {'$or': [
+              {'created_by': request.user.id},
+              {'group_admin': request.user.id},
+              {'author_set': request.user.id},
+            ]}
+        ]},
+      ]}) 
 
     # units_under_module = Node.get_nodes_by_ids_list(module_obj.collection_set)
     '''
@@ -160,7 +189,7 @@ def module_detail(request, group_id, node_id):
     template = 'ndf/module_detail.html'
 
     req_context = RequestContext(request, {
-                                'title': 'Module',
+                                'title': title,
                                 'node': module_obj, 'units_under_module': units_under_module,
                                 'group_id': group_id, 'groupid': group_id,
                                 'card': 'ndf/event_card.html', 'card_url_name': 'groupchange'

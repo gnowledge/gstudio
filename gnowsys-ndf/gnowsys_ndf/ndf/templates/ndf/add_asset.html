@@ -26,15 +26,8 @@
             <a class="right close-reveal-modal reveal-modal-overlay" aria-label="Close">&#215;</a>
         {% endif %}
             <div class="small-1 columns icon-widget" style="margin-top: 5.6px;">
-                  {% if title == "asset_detail" %}
+                 
                 <a href="javascript:window.history.back();"><i class="fa fa-chevron-left large" aria-hidden="true"></i></a>
-                {% endif %}
-                {% if title == "raw_material_detail" %}
-                <a href="javascript:window.history.back();"><i class="fa fa-chevron-left large" aria-hidden="true"></i></a>
-                {% endif %}
-                {% if title == "asset_gallery_detail" %}
-                <a href="javascript:window.history.back();"><i class="fa fa-chevron-left large" aria-hidden="true"></i></a>
-                {% endif %}
             </div>
 
             <div class="small-7 columns">
@@ -127,7 +120,7 @@
                 {% endif     %}
                 </h3>
 
-                <button type="button" class="blue-white-button save-asset right" data-asset_id='{{asset_obj.pk}}' style="margin-top: 9px;margin-right: -150px;">{% trans "Save" %}</button>
+                <!--<button type="button" class="button-hollow-grey save-asset right" data-asset_id='{{asset_obj.pk}}' style="margin-top: 9px;margin-right: -150px;">{% trans "Save" %}</button>-->
             {% endif %}
 <div class="row">
     <hr/>
@@ -229,18 +222,21 @@
         <div class="row">
             <div class="asset-tags-container small-12 medium-10 large-10 columns">
                 <label>
-                {% if not "announced_unit" in group_obj.member_of_names_list %}
                 <input type="checkbox" name="is_raw_material" class="is_raw_material" {% if "raw@material" in asset_obj.tags %} checked="checked" {% endif %}> {% trans "Mark as Raw Material" %}
 
                 </label>
-                {% endif %}
+{% comment %}
                 <div class="switch round large">
                     <input id="exampleCheckboxSwitch" name="access_policy" {% if "Author" in group_obj.member_of_names_list and not asset_obj %} checked {% elif asset_obj.access_policy == "PRIVATE" %} checked {% endif %} type="checkbox">
                     <label for="exampleCheckboxSwitch"> </label>
                 </div>
+{% endcomment %}
+
             </div>
         </div>
 
+        <button type="button" class="button-save-new save-asset" data-asset_id='{{asset_obj.pk}}' style="margin-top: 9px;margin-right: -150px;">{% trans "Save" %}</button>
+        
         {% endif %}
 
     <div class="asset-content-area"{% if not asset_obj %} style="display:none"{% endif %}>
@@ -326,6 +322,7 @@
 
     $(".add-asset-content").click(function(){
         $(".asset-content-area").removeClass("hide")
+        $(".delete-asset-content").css('display', 'none')
         $(".name-desc-asset-cont-area").removeClass("hide")
 
         $("#upload_asset").removeClass("hide")
