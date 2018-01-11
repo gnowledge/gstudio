@@ -3603,7 +3603,7 @@ def course_pages(request, group_id, page_id=None,page_no=1):
     group_obj = get_group_name_id(group_id, get_obj=True)
     group_id = group_obj._id
     group_name = group_obj.name
-    template = 'ndf/gevent_base.html'
+    template = 'ndf/lms.html'
     context_variables = {
             'group_id': group_id, 'groupid': group_id, 'group_name':group_name,
             'group_obj': group_obj, 'title': 'course_pages',

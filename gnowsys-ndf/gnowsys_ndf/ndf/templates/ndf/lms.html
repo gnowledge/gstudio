@@ -174,6 +174,9 @@
         {% if title == "gallery" %}
               {% include "ndf/assets.html" with title=title %}
         {% endif %}
+        {% if title == "course_pages" %}
+              {% include "ndf/course_pages.html" with title=title %}
+        {% endif %}
         {% if title == "asset_detail" or title == "asset_content_detail" or  title == "raw_material_detail" or title == "asset_gallery_detail"  %}
             {% include "ndf/add_asset.html"  with title=title %}
         {% endif %}
