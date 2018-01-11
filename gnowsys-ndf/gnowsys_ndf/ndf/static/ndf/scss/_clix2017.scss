@@ -4452,8 +4452,9 @@ ul.nav_menu_1 {
 .activity_page_rendered{
     //margin-top:10px;
     margin-left:20px;
-    max-width: 900px;
+    //max-width: 900px;
    // width:145%;
+   max-width:100%;
 }
 /* Rating css */
 
@@ -5232,8 +5233,18 @@ ul.nav_menu_1 {
                 border-bottom: 3px solid $nav_menu_1_tab_border;
             }
         }
-
     }
+
+            .authoring-tab{
+                background-color:$nav_menu_1_color;
+                >a{
+                        color:#ffffff !important;
+                        &.selected, &:hover{
+                            border-bottom: 3px solid $nav_menu_1_tab_border;
+                        }
+                }
+            }
+    
 }
 
 .course-content {
