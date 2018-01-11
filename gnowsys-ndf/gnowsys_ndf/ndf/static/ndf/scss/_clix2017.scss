@@ -4452,8 +4452,9 @@ ul.nav_menu_1 {
 .activity_page_rendered{
     //margin-top:10px;
     margin-left:20px;
-    max-width: 900px;
+    //max-width: 900px;
    // width:145%;
+   max-width:100%;
 }
 /* Rating css */
 
@@ -5206,6 +5207,8 @@ $module-card-lines-to-show: 3;
             }
         }
     }
+
+    
 }
 
 $nav_menu_1_color: #164a7b;
@@ -5214,6 +5217,8 @@ $nav_menu_1_tab_border: #a2238d;
 ul.nav_menu_1 {
     margin-bottom: 0px;
     background-color: $nav_menu_1_bg_color;
+    display:inline;
+    width:50%;
     >li {
             display: inline-block;
 
@@ -5232,9 +5237,39 @@ ul.nav_menu_1 {
                 border-bottom: 3px solid $nav_menu_1_tab_border;
             }
         }
-
     }
+
 }
+
+ul.authoring-tab{
+        background-color:$nav_menu_1_color;
+        margin-bottom: 0px;
+        display:inline;
+        width:50%;
+        >li {
+            display: inline-block;
+            
+                >a{
+                        list-style-type: none;
+                        margin-right:-4px;
+                        background-color:$nav_menu_1_color;
+                        padding: 12px 12px 9px;
+                        cursor: pointer;
+                        font-size: 18px;
+                        display: inline-block;
+                        letter-spacing: 0.8px;
+                        border-bottom: 3px solid transparent;
+                        color:#ffffff !important;
+                        &.selected, &:hover{
+                            border-bottom: 3px solid $nav_menu_1_tab_border;
+                        }
+                }
+            }
+}
+
+
+    
+
 
 .course-content {
     background: #fff;
