@@ -3877,7 +3877,8 @@ def assets(request, group_id, asset_id=None,page_no=1):
             'group_obj':group_obj
         }
 
-        if 'announced_unit' in group_obj.member_of_names_list or 'Group' in group_obj.member_of_names_list and 'base_unit' not in group_obj.member_of_names_list :
+
+        if ('announced_unit' in group_obj.member_of_names_list or 'Group' in group_obj.member_of_names_list or 'Author' in group_obj.member_of_names_list) and 'base_unit' not in group_obj.member_of_names_list :
                  
             if 'raw@material' in asset_obj.tags:
                 context_variables.update({'title':'raw_material_detail'})
@@ -3885,7 +3886,6 @@ def assets(request, group_id, asset_id=None,page_no=1):
             elif 'asset@gallery' in asset_obj.tags:
                 context_variables.update({'title':'asset_gallery_detail'})
                 template = 'ndf/lms.html'
-                        
             else:
                 template = 'ndf/gevent_base.html'
         return render_to_response(template,
@@ -3894,7 +3894,7 @@ def assets(request, group_id, asset_id=None,page_no=1):
         )
     
     if gstaff_access:
-        asset_nodes = node_collection.find({'member_of': {'$in': [asset_gst_id]},'group_set': {'$all': [ObjectId(group_id)]},'access_policy': {'$in': ['PRIVATE','PUBLIC']  } })
+        asset_nodes = node_collection.find({'member_of': {'$in': [asset_gst_id]},'group_set': {'$all': [ObjectId(group_id)]},'access_policy': {'$in': ['PRIVATE','PUBLIC']  } }).sort('last_update', -1)
     
     else:
         asset_nodes = node_collection.find({'member_of': {'$in': [asset_gst_id]},
@@ -3906,7 +3906,7 @@ def assets(request, group_id, asset_id=None,page_no=1):
                 {'access_policy': 'PRIVATE'}
                 ]
               }
-            ]})
+            ]}).sort('last_update', -1)
     
     assets_page_info = paginator.Paginator(asset_nodes, page_no, GSTUDIO_NO_OF_OBJS_PP)
     context_variables = {

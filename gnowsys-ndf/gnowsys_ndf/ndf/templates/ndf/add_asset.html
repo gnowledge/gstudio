@@ -225,10 +225,13 @@
                 <input type="checkbox" name="is_raw_material" class="is_raw_material" {% if "raw@material" in asset_obj.tags %} checked="checked" {% endif %}> {% trans "Mark as Raw Material" %}
 
                 </label>
+{% comment %}
                 <div class="switch round large">
                     <input id="exampleCheckboxSwitch" name="access_policy" {% if "Author" in group_obj.member_of_names_list and not asset_obj %} checked {% elif asset_obj.access_policy == "PRIVATE" %} checked {% endif %} type="checkbox">
                     <label for="exampleCheckboxSwitch"> </label>
                 </div>
+{% endcomment %}
+
             </div>
         </div>
 

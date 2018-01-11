@@ -4232,11 +4232,12 @@ def get_module_enrollment_status(request, module_obj):
 @get_execution_time
 @register.filter
 def get_unicode_lang(lang_code):
-	try:
-		return get_language_tuple(lang_code)[1]
-	except Exception as e:
-		return lang_code
-		pass
+
+    try:
+        return get_language_tuple(lang_code)[1]
+    except Exception as e:
+        return lang_code
+        pass
 
 @get_execution_time
 @register.filter

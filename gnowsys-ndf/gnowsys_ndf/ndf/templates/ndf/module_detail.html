@@ -2,7 +2,7 @@
 {% load i18n %}
 {% load check_is_gstaff from ndf_tags %}
 
-{% block title %} {{title}} {% endblock %}
+{% block title %}  {% if title == "drafts" %} Draft Courses {% elif title == "courses" %} Courses {% else %} {{title}} {% endif %} {% endblock %}
 
 {% block body_content %}
 {% check_is_gstaff group_id request.user as is_gstaff %}
@@ -14,9 +14,8 @@
 	{% include 'ndf/widget_photo_upload.html' with url_name='module_detail' widget_for="group_banner" is_banner=True  no_update_btn=True node=node  groupid=group_id if_module=True %}
 	</div>
 
-
-
 		<div class="small-10 columns title-strip strip">
+
 			<div class="small-11 columns">
 				<h7 class="text-button-blue">{% trans "Showing all Units in" %}</h7>{{node.name}} <br/>
 				<h7 class="text-button-blue">{% trans "Module Description:" %}</h7>{{node.content|safe}}
