@@ -3569,7 +3569,8 @@ def create_edit_course_page(request, group_id, page_id=None,page_type=None):
     group_obj = get_group_name_id(group_id, get_obj=True)
     group_id = group_obj._id
     group_name = group_obj.name
-    template = 'ndf/gevent_base.html'
+    #template = 'ndf/gevent_base.html'
+    template = 'ndf/lms.html'
     # templates_gst = node_collection.one({"_type":"GSystemType","name":"Template"})
     # if templates_gst._id:
     #   # templates_cur = node_collection.find({"member_of":ObjectId(GST_PAGE._id),"type_of":ObjectId(templates_gst._id)})
@@ -3653,7 +3654,8 @@ def save_course_page(request, group_id):
         tags = json.loads(tags)
     else:
         tags = []    
-    template = 'ndf/gevent_base.html'
+    #template = 'ndf/gevent_base.html'
+    template = 'ndf/lms.html'
     page_gst_name, page_gst_id = GSystemType.get_gst_name_id("Page")
     page_obj = None
     activity_lang =  request.POST.get("lan", '')
