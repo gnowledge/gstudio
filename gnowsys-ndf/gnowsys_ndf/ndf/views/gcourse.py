@@ -3890,7 +3890,7 @@ def assets(request, group_id, asset_id=None,page_no=1):
         )
     
     if gstaff_access:
-        asset_nodes = node_collection.find({'member_of': {'$in': [asset_gst_id]},'group_set': {'$all': [ObjectId(group_id)]},'access_policy': {'$in': ['PRIVATE','PUBLIC']  } })
+        asset_nodes = node_collection.find({'member_of': {'$in': [asset_gst_id]},'group_set': {'$all': [ObjectId(group_id)]},'access_policy': {'$in': ['PRIVATE','PUBLIC']  } }).sort('last_update', -1)
     
     else:
         asset_nodes = node_collection.find({'member_of': {'$in': [asset_gst_id]},
@@ -3902,7 +3902,7 @@ def assets(request, group_id, asset_id=None,page_no=1):
                 {'access_policy': 'PRIVATE'}
                 ]
               }
-            ]})
+            ]}).sort('last_update', -1)
     
     assets_page_info = paginator.Paginator(asset_nodes, page_no, GSTUDIO_NO_OF_OBJS_PP)
     context_variables = {
