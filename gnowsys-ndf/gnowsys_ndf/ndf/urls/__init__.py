@@ -8,14 +8,14 @@ from registration.backends.default.views import RegistrationView
 from registration.backends.default.views import ActivationView
 from jsonrpc import jsonrpc_site
 
-# from gnowsys_ndf.ndf.forms import *
 from gnowsys_ndf.settings import GSTUDIO_SITE_NAME
-from gnowsys_ndf.ndf.views.email_registration import password_reset_email, password_reset_error, GstudioEmailRegistrationForm
 from gnowsys_ndf.ndf.forms import UserChangeform, UserResetform
+from gnowsys_ndf.ndf.views.email_registration import password_reset_email, password_reset_error, GstudioEmailRegistrationForm
 from gnowsys_ndf.ndf.views.home import homepage, landing_page
 from gnowsys_ndf.ndf.views.methods import tag_info
 from gnowsys_ndf.ndf.views.custom_app_view import custom_app_view, custom_app_new_view
 from gnowsys_ndf.ndf.views import rpc_resources
+from gnowsys_ndf.ndf.views.esearch import get_search,get_advanced_search_form,advanced_search
 
 if GSTUDIO_SITE_NAME.lower() == 'clix':
     login_template = 'registration/login_clix.html'
@@ -30,6 +30,7 @@ urlpatterns = patterns('',
 
     # gstudio admin url's
     (r'^admin/', include('gnowsys_ndf.ndf.urls.gstudio_admin')),
+    (r'^api/v1', include('gnowsys_ndf.ndf.urls.api')),
 
     # --mobwrite-- commented for time being
     # (r'^raw/(?P<name>.+)/', 'gnowsys_ndf.mobwrite.views.raw'),
@@ -45,9 +46,17 @@ urlpatterns = patterns('',
     url(r'^$', homepage, {"group_id": "home"}, name="homepage"),
     url(r'^welcome/?', landing_page, name="landing_page"),
 
+    # Elastic Search
+    # url(r'^esearch/advanced/?', get_triples, name="get_triples"),
+    url(r'^esearch/?', get_search, name="get_search"),
+    url(r'^advanced_form/?', get_advanced_search_form, name="get_advanced_search_form"),
+    url(r'^advanced_search/?', advanced_search, name="advanced_search"),
+    # url(r'^esearch//?',advanced_search,name='advanced_search')
+    # url(r'^esearch/get_mapping_json/(?P<json_type>[^/]+)/?$', '', name=''),
+    # --END of Elastic Search
+
     url(r'^captcha/', include('captcha.urls')),
     (r'^', include('gnowsys_ndf.ndf.urls.captcha')),
-
     # all main apps
     (r'^(?P<group_id>[^/]+)/mailclient', include('gnowsys_ndf.ndf.urls.mailclient')),
     (r'^(?P<group_id>[^/]+)/analytics', include('gnowsys_ndf.ndf.urls.analytics')),
@@ -64,8 +73,7 @@ urlpatterns = patterns('',
     (r'^(?P<group_id>[^/]+)/quiz', include('gnowsys_ndf.ndf.urls.quiz')),
     (r'^(?P<group_id>[^/]+)/discussion', include('gnowsys_ndf.ndf.urls.discussion')),
     (r'^(?P<group_id>[^/]+)/unit',include('gnowsys_ndf.ndf.urls.unit')),
-    (r'^api/v1',include('gnowsys_ndf.ndf.urls.api')),
-    
+
     # Commented following url for khaal hackathon
     (r'^(?P<group_id>[^/]+)/course', include('gnowsys_ndf.ndf.urls.course')),
 

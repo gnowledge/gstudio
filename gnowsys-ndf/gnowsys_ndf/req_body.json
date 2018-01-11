@@ -1,0 +1,466 @@
+{
+	"settings": {
+		"index.mapping.total_fields.limit": 5000, 
+		"number_of_shards": 1,
+		"number_of_replicas": 0,
+		"analysis": {
+			"analyzer": {
+				"trigram": {
+					"type": "custom",
+					"tokenizer": "standard",
+					"stopwords": "_english_",
+					"filter": [
+						"standard",
+						"lowercase",
+						"shingle"
+					],
+					"char_filter": ["html_strip"]
+				}
+			},
+			"filter": {
+				"shingle": {
+					"type": "shingle",
+					"min_shingle_size": 2,
+					"max_shingle_size": 3
+				}
+			}
+		}
+	},
+	"mappings": {
+		"Author": {
+			"properties": {
+				"name": {
+					"type": "text",
+					"fields": {
+						"trigram": {
+							"type": "text",
+							"analyzer": "trigram"
+						}
+					}
+				},
+				"altnames":{
+					"type": "text",
+					"fields": {
+						"trigram": {
+							"type": "text",
+							"analyzer": "trigram"
+						}
+					}
+				},
+				"content": {
+					"type": "text",
+					"fields": {
+						"trigram": {
+							"type": "text",
+							"analyzer": "trigram"
+						}
+					}
+				},
+				"tags": {
+					"type": "text",
+					"fields": {
+						"trigram": {
+							"type": "text",
+							"analyzer": "trigram"
+						}
+					}
+				}
+			}
+		},
+		"image": {		
+			"properties": {
+				"name": {
+					"type": "text",
+					"fields": {
+						"trigram": {
+							"type": "text",
+							"analyzer": "trigram"
+						}
+					}
+				},
+				"altnames":{
+					"type": "text",
+					"fields": {
+						"trigram": {
+							"type": "text",
+							"analyzer": "trigram"
+						}
+					}
+				},
+				"content": {
+					"type": "text",
+					"fields": {
+						"trigram": {
+							"type": "text",
+							"analyzer": "trigram"
+						}
+					}
+				},
+				"tags": {
+					"type": "text",
+					"fields": {
+						"trigram": {
+							"type": "text",
+							"analyzer": "trigram"
+						}
+					}
+				}
+			}
+		},
+		"video": {		
+			"properties": {
+				"name": {
+					"type": "text",
+					"fields": {
+						"trigram": {
+							"type": "text",
+							"analyzer": "trigram"
+						}
+					}
+				},
+				"altnames":{
+					"type": "text",
+					"fields": {
+						"trigram": {
+							"type": "text",
+							"analyzer": "trigram"
+						}
+					}
+				},
+				"content": {
+					"type": "text",
+					"fields": {
+						"trigram": {
+							"type": "text",
+							"analyzer": "trigram"
+						}
+					}
+				},
+				"tags": {
+					"type": "text",
+					"fields": {
+						"trigram": {
+							"type": "text",
+							"analyzer": "trigram"
+						}
+					}
+				}
+			}
+		},
+		"text": {		
+			"properties": {
+				"name": {
+					"type": "text",
+					"fields": {
+						"trigram": {
+							"type": "text",
+							"analyzer": "trigram"
+						}
+					}
+				},
+				"altnames":{
+					"type": "text",
+					"fields": {
+						"trigram": {
+							"type": "text",
+							"analyzer": "trigram"
+						}
+					}
+				},
+				"content": {
+					"type": "text",
+					"fields": {
+						"trigram": {
+							"type": "text",
+							"analyzer": "trigram"
+						}
+					}
+				},
+				"tags": {
+					"type": "text",
+					"fields": {
+						"trigram": {
+							"type": "text",
+							"analyzer": "trigram"
+						}
+					}
+				}
+			}
+		},
+		"application": {		
+			"properties": {
+				"name": {
+					"type": "text",
+					"fields": {
+						"trigram": {
+							"type": "text",
+							"analyzer": "trigram"
+						}
+					}
+				},
+				"altnames":{
+					"type": "text",
+					"fields": {
+						"trigram": {
+							"type": "text",
+							"analyzer": "trigram"
+						}
+					}
+				},
+				"content": {
+					"type": "text",
+					"fields": {
+						"trigram": {
+							"type": "text",
+							"analyzer": "trigram"
+						}
+					}
+				},
+				"tags": {
+					"type": "text",
+					"fields": {
+						"trigram": {
+							"type": "text",
+							"analyzer": "trigram"
+						}
+					}
+				}
+			}
+		},
+		"audio": {		
+			"properties": {
+				"name": {
+					"type": "text",
+					"fields": {
+						"trigram": {
+							"type": "text",
+							"analyzer": "trigram"
+						}
+					}
+				},
+				"altnames":{
+					"type": "text",
+					"fields": {
+						"trigram": {
+							"type": "text",
+							"analyzer": "trigram"
+						}
+					}
+				},
+				"content": {
+					"type": "text",
+					"fields": {
+						"trigram": {
+							"type": "text",
+							"analyzer": "trigram"
+						}
+					}
+				},
+				"tags": {
+					"type": "text",
+					"fields": {
+						"trigram": {
+							"type": "text",
+							"analyzer": "trigram"
+						}
+					}
+				}
+			}
+		},
+		"NotMedia": {		
+			"properties": {
+				"name": {
+					"type": "text",
+					"fields": {
+						"trigram": {
+							"type": "text",
+							"analyzer": "trigram"
+						}
+					}
+				},
+				"altnames":{
+					"type": "text",
+					"fields": {
+						"trigram": {
+							"type": "text",
+							"analyzer": "trigram"
+						}
+					}
+				},
+				"content": {
+					"type": "text",
+					"fields": {
+						"trigram": {
+							"type": "text",
+							"analyzer": "trigram"
+						}
+					}
+				},
+				"tags": {
+					"type": "text",
+					"fields": {
+						"trigram": {
+							"type": "text",
+							"analyzer": "trigram"
+						}
+					}
+				}
+			}
+		},
+		"Filehive": {
+			"properties": {
+				"filename": {
+					"type": "text",
+					"fields": {
+						"trigram": {
+							"type": "text",
+							"analyzer": "trigram"
+						}
+					}					
+				}
+			}
+		},
+		"RelationType": {	
+			"properties": {
+				"name": {
+					"type": "text",
+					"fields": {
+						"trigram": {
+							"type": "text",
+							"analyzer": "trigram"
+						}
+					}
+				},
+				"altnames":{
+					"type": "text",
+					"fields": {
+						"trigram": {
+							"type": "text",
+							"analyzer": "trigram"
+						}
+					}
+				},
+				"content": {
+					"type": "text",
+					"fields": {
+						"trigram": {
+							"type": "text",
+							"analyzer": "trigram"
+						}
+					}
+				},
+				"tags": {
+					"type": "text",
+					"fields": {
+						"trigram": {
+							"type": "text",
+							"analyzer": "trigram"
+						}
+					}
+				}
+			}
+		},
+		"Group": {
+			"properties": {
+				"name": {
+					"type": "text",
+					"fields": {
+						"trigram": {
+							"type": "text",
+							"analyzer": "trigram"
+						}
+					}
+				},
+				"altnames":{
+					"type": "text",
+					"fields": {
+						"trigram": {
+							"type": "text",
+							"analyzer": "trigram"
+						}
+					}
+				},
+				"content": {
+					"type": "text",
+					"fields": {
+						"trigram": {
+							"type": "text",
+							"analyzer": "trigram"
+						}
+					}
+				},
+				"tags": {
+					"type": "text",
+					"fields": {
+						"trigram": {
+							"type": "text",
+							"analyzer": "trigram"
+						}
+					}
+				}
+			}
+		},
+		"AttributeType": {
+			"properties": {
+				"name": {
+					"type": "text",
+					"fields": {
+						"trigram": {
+							"type": "text",
+							"analyzer": "trigram"
+						}
+					}
+				},
+				"altnames":{
+					"type": "text",
+					"fields": {
+						"trigram": {
+							"type": "text",
+							"analyzer": "trigram"
+						}
+					}
+				},
+				"content": {
+					"type": "text",
+					"fields": {
+						"trigram": {
+							"type": "text",
+							"analyzer": "trigram"
+						}
+					}
+				},
+				"tags": {
+					"type": "text",
+					"fields": {
+						"trigram": {
+							"type": "text",
+							"analyzer": "trigram"
+						}
+					}
+				}
+			}
+		},
+		"GAttribute": {
+			"properties": {
+				"name": {
+					"type": "text",
+					"fields": {
+						"trigram": {
+							"type": "text",
+							"analyzer": "trigram"
+						}
+					}
+				},
+				"tags": {
+					"type": "text",
+					"fields": {
+						"trigram": {
+							"type": "text",
+							"analyzer": "trigram"
+						}
+					}
+				}
+			}
+		}
+	}
+}

@@ -1025,13 +1025,23 @@ GSTUDIO_ENABLE_USER_DASHBOARD = True
 GSTUDIO_PRIMARY_COURSE_LANGUAGE = u'en'
 
 # --- BUDDY Module configurations ---
-#
 GSTUDIO_BUDDY_LOGIN = False
+# --- End of BUDDY Module ---
+
+# Institute ID, name configs
 GSTUDIO_INSTITUTE_ID = ''
 GSTUDIO_INSTITUTE_ID_SECONDARY = ''
 GSTUDIO_INSTITUTE_NAME = ''
-#
-# --- End of BUDDY Module ---
+# --- End of Institute ID, name configs
+
+# Elastic Search
+GSTUDIO_DOCUMENT_MAPPING = ''
+GSTUDIO_ELASTIC_SEARCH = False
+GSTUDIO_ELASTIC_SEARCH_ALIAS = 'gsearch'
+GSTUDIO_ELASTIC_SEARCH_SUPERUSER = 'elsearch'
+GSTUDIO_ELASTIC_SEARCH_SUPERUSER_PASSWORD = 'changeit'
+GSTUDIO_ELASTIC_SEARCH_PORT = '9200'
+# --- End of Elastic Search
 
 
 # # textb

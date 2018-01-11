@@ -1,0 +1,179 @@
+# INSTALLING ELASTIC SEARCH CONTAINER:
+
+1. GETTING DOCKER IMAGE:
+	$ docker pull docker.elastic.co/elasticsearch/elasticsearch:5.4.0
+
+
+2. CREATEING CONTAINER:
+	$ docker run -p 9200:9200 -e "http.host=0.0.0.0" -e "transport.host=127.0.0.1" docker.elastic.co/elasticsearch/elasticsearch:5.4.0
+
+
+3. CREATE A SUPERUSER TO USE THE ELASTIC SEARCH:
+	- A login is required to use the elasticsearch container.
+	- Open the bash of elasticsearch and run following inside the bash
+		$ curl -XPOST 'http://elastic:changeme@localhost:9200/_xpack/security/user/elsearch?pretty' -H 'Content-Type:application/json' -d '{"password": "<GSTUDIO_ELASTIC_SEARCH_PASSWORD in local_settings.py of gstudio container>", "roles": ["superuser"]}'
+		- NOTE: Make sure same passowrd is used at both places:
+			1. GSTUDIO_ELASTIC_SEARCH_PASSWORD
+			2. 
+
+
+4. LINK THE GSTUDIO CONTAINER WITH THE ELASTICSEARCH CONTAINER (using the docker run):
+
+	$ docker run -itd --link <elasticsearch_container_name>:alias --name=<gstudio-container-name> -p 80:80 -p 8000:8000 -v <linking_code_directory> -v <linking_data_directory image_id>
+
+- NOTE: The alias we gave was gsearch -> this alias is used while creating instance of elasticsearch in the program.
+
+(--link flag is now deprecated)
+
+5. INSTALL THE PYTHON ELASTICSEARCH CLIENT (in the gstudio container):
+	$ pip install elasticsearch
+
+
+
+------------------------------------------------------------------------------------------
+
+
+
+# IMPLEMENTATION:
+
+- Our search url can be found in __init__.py file of urls folder. In the search form, the if filter Users is selected then the contributions of the user entered in the search box will be searched, else if any other filter is selected, normal search will happen.
+
+If group is also selected with Users filter, the contributions of that user in a particular group will be searched.
+***********************************************************************************************************************************
+First run the `esinitialize_map.py` script which creates all the necessary mappings then run the es_init.py script which will index all documents into elasticsearch.
+Go to project shell (`python manage.py shell`) and run following commands in specified order:
+```
+>>> execfile('../doc/deployer/esinitialize_map.py')
+>>> execfile('../doc/deployer/es_initialize.py')
+```
+
+index→ analogous to database
+Type → analogous to table in database
+Body → analogous to a record in a table
+ 
+******Documentation for initializing the index i.e. indexing all the documents into elasticsearch******
+ 
+MAPPINGS:
+Attribute Map : Mapping from GSystemType ID to possible attribute names for that GSystemType
+Author Map : Mapping from author name to PostGRESQL ID of that author
+Group Map : Mapping from Group ID to Group name.
+Gsystem Type Map : Mapping from GSystemType name to ID.
+Relation Map : Mapping from GSystemType ID to possible relation names for that GSystemType
+
+
+
+# main():
+ 
+* Deleting existing indexes to re-create new ones:
+	es.indices.exists(index_name) -> checks if the index already exists in elasticsearch, if it exists already then, es.indices.delete(index_name) will delete the index for creating a fresh index and re indexing all the documents. The delete function returns the response if the index has been successfully deleted.
+ 
+* Mapping Configs:
+	The json body request_body has the mapping settings and the index settings. Mapping is the process of defining how a document, and the fields it contains, are stored and indexed.
+
+ 
+SETTINGS:
+	* `number_of_shards`: An index can potentially store a large amount of data that can exceed the hardware limits of a single node. For example, a single index of a billion documents taking up 1TB of disk space may not fit on the disk of a single node or may be too slow to serve search requests from a single node alone. To solve this problem, Elasticsearch provides the ability to subdivide your index into multiple pieces called shards. When you create an index, you can simply define the number of shards that you want. 
+	 
+	* `analysis` is the part which tells about how to analyze the search query which is provided by the user. We have used a `trigram analyzer. While creating the inverted index(indexing of words inside name, content and tags field), trigram analyzer indexes the values as phrases(of size = min 1 word and max 3 words). This helps in phrase search and also phrase suggester(discussed in esearch.py documentation). Trigram analyzer uses shingles filter to do this.
+	 
+	* `shingles`:  it creates combinations of tokens as a single token. For example, the sentence "please divide this sentence into shingles" might be tokenized into shingles "please divide", "divide this", "this sentence", "sentence into", and "into shingles".
+	 
+	* `lowercase` filter: is used to convert all the letters in the words while indexing documents also convert the search query to lowercase. This useful in the sense that if the query is “Ram” and the word “ram” is indexed in then that document will be retrieved in the search results.  
+	 
+	* `char_filter`: “html_strip” *  this filter is used to remove the html tags if given in the search query. 
+	 
+	* `stopwords`: remove the stopwords(like a, an, the) from the search query 
+
+	---------------------------------------------------------------------------------------------------------------------------------------
+
+	* `mappings`:  Mapping is the process of defining how a document, and the fields it contains, are stored and indexed.
+
+	->We have defined Author type, Filehive, RelationType, Group, AttributeType, GAttribute, GRelation.
+	GSystem is broken down to different media types which will help in filter search(if user wants to search only for images/videos/audio, etc) - image, video, text, application, audio, NotMedia(all those Gsystem docs that have mime_type as null)
+	 
+	->All these types have mappings defined. Each mapping type contains a list of fields or properties pertinent to that type. Each field has a data type . 
+	 
+	->We can specify the index_analyzer and search_analyzer in the mapping for a field itself. But here we are specifying analyzer in the properties of the field which will act as both index and search analyzer. 
+	 
+	->The fields for which mappings is created are: name, altnames, content, tags, since these are the most relevant fields for search. The values of these fields are of type text and are indexed based on trigram filter.
+---------------------------------------------------------------------------------------------------------------------------------------
+
+es.indices.create(index_name,request_body) : is used to create a new index with the mapping and settings given by request_body
+
+For indexing the documents into elasticsearch all the MongoDB objects are needed. Using the node_collection.find() function all the documents in MongoDB are obtained.
+*********************************************************************************************************************************** 
+
+index_docs(all_docs)
+ 
+	**This function takes a list of MongoDB documents as parameter and indexes those documents which have “name” key into elasticsearch. Some of the functions called inside this function:
+		->json.dumps(node,default=json_util.default): returns JSON string representation of MongoDB object. 
+		->json.loads(doc): returns a python dictionary form of the JSON string
+ 
+	**Since, _id, _type cannot be inserted into elasticsearch, we have changed their key names to “id” and “type” respectively.
+	The keys object_type, property_order, object_value are having values as string in some documents and an array of strings in other documents. Elasticsearch expects similar type of value for a single field across all documents. So the code converts all the value (be it string, array) to a string. 
+ 
+	**The document type is given by  get_document_type(document) function. The document is passed as parameter to this function and it returns the doc_type i.e. the type in which you want the document to be indexed.
+	 
+	**es.index(index=index_name, doc_type=doc_type, id=document["id"]["$oid"], body=document)
+	 
+	**This function indexes the document into elasticsearch. 
+ 
+	**If the document has “contributors” as a key then we are indexing the document into another index (author_index) with the type as author post greSQL ID. This is necessary if the user wants to search for the contributions of a particular author in a particular group or across all groups. 
+***********************************************************************************************************************************
+******Documentation for esinitialize_map in views folder******
+create_map(document): This function is used to create 2 maps. One is an author_map and other is a group_map. Author map is used to search for the contributions of some author. Group map is used in forms.py to show the group filter. 
+
+create_advanced_map(document) : This function is used to create the gsystem type map, attribute map, relation map. All these 3 maps are used in advanced search.
+
+******Documentation for esearch.py in views folder******(get_search documentation remains to be written)
+
+##def get_suggestion_body(query,field_value,slop_value,field_name_value) ->
+ 
+	Arguments: query, field in which suggestion is to be found + “.trigram” to use trigram analyzer, slop value, field in which suggestion is to be found
+	Returns:  the suggestion body
+ 
+	This function is used to return the suggestion json body that will be passed to the suggest function of elasticsearch query DSL. 
+		->“Gram_size” : sets the max size of shingles in the field to be searched. 
+		->“Max_errors” :  the maximum number of terms that are at most considered to be misspellings in order to form a correction.
+		->“Prefix_length” : is set to zero since the misspelling in the word can be at the first letter too. (eg: qutub->kutub).
+		->“Suggest_mode”: is set to missing because the function should return a suggestion only when the word for which we are searching a suggestion is not indexed. 
+		->“Collate”: collate is used to match the returned suggestions with the existing index and sets collate_match to true if the suggestion is found in the index else false.
+ 
+##get_suggestion(suggestion_body, queryInfo, doc_types, query,field)
+ 
+	Arguments: suggestion_body, queryInfo is an array which has flag(to check if we got a query to search for or not), score(how close is the first suggestion to the query), doc_types(the type in which to search), query, the field in which query is to be searched.
+	 
+	This function searches for suggestion and if suggestion is not found, it may mean that the query is already indexed and if query is also not indexed, then the flag remains 0. If we find a suggestion or if the query is indexed, the flag is set to 1.
+	 
+##def get_search_results(resultArray)
+
+	Arguments: the results array which contains all the search results along with id, type, index name. We need to extract only the json source of the search results.
+	Returns: Array of json objects which will be passed to the html template for rendering.
+	 
+ 
+##def resources_in_group(res,group)
+	Arguments: the results json body which is returned by the es.search function. The group filter(i.e. Get results from a particular group)
+	Returns: the search results pertaining to a group.
+
+##def searchTheQuery(index_name, select, group, query)
+ 
+	Arguments: name of the index in which to search the query, what type of results to show(filter-images,audio,video,etc), in which groups to search, query
+	Returns: an array of json bodies(search results)
+	 
+	This is the main function which does the search. If index_name passed to it is author_index, the function searches for the contributions of a particular author.
+ 
+	“match_all” :{} when this query body is passed to the search function, it returns all the documents indexed in elasticsearch. An infinite loop is used inside loop since es.search returns only size number of documents, so we change the from parameter in the query body to get all the search results.  
+	 
+	 
+ 
+Res = es.search returns a json body. Res[“hits”][“hits”] is an array of search results.  
+
+******Documentation for advanced_search.html in templates/ndf folder******
+
+This file is used for rendering the advanced search form. The gsystem type map, attribute map and relation map is passed by python get_advanced_form function in esearch.py.
+
+First the drop down list of GSystem types is rendered. When the user selects a GSystem type, the possible attributes and possible relations are shown to the user in the form of check boxes. 
+
+Then when the user selects any attribute or relation, text boxes appear for that attribute which the user has to fill in to search for the left subject/object which belongs to the selected node type and has the attribute/relation selected and the right predicate/object as given in the text box.
+
+On clicking the submit button, the input is validated(checking if all text boxes are filled or not) and then data is sent using an ajax call. The data is sent to url 'advanced_search'. The data that is sent is 2 dictionaries and the node type selected. Key is the selected attribute and value is the value provided for that attribute in the text box.

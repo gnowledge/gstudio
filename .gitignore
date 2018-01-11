@@ -92,6 +92,7 @@ mathjax/
 *~
 wikidata/
 *local_settings.py
+*server_settings.py
 img/
 media/
 
