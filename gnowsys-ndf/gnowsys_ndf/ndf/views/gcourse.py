@@ -2623,7 +2623,8 @@ def course_about(request, group_id):
         template = 'ndf/basecourse_group.html'
         show_analytics_notifications = False
     if 'base_unit' in group_obj.member_of_names_list :
-        template = 'ndf/gevent_base.html'
+        # template = 'ndf/gevent_base.html'
+        template = 'ndf/lms.html'
         show_analytics_notifications = False
         educationalsubject = get_attribute_value(group_obj._id,"educationalsubject")
         educationallevel = get_attribute_value(group_obj._id,"educationallevel")
