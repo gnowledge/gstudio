@@ -59,7 +59,7 @@ def gtask(request, group_name, task_id=None):
 
     GST_TASK = node_collection.one({'_type': "GSystemType", 'name': 'Task'})
     title = "Task"
-    TASK_inst = node_collection.find({'member_of': {'$all': [GST_TASK._id]}, 'group_set': ObjectId(group_id) })
+    TASK_inst = node_collection.find({'member_of': {'$all': [GST_TASK._id]}, 'group_set': ObjectId(group_id),'status':"PUBLISHED" })
     template = "ndf/lms.html"
     variable = RequestContext(request, {'title': title, 'appId':app._id, 'TASK_inst': TASK_inst, 'group_id': group_id, 'groupid': group_id, 'group_name':group_name })
     return render_to_response(template, variable)
@@ -217,12 +217,13 @@ def gcreate_edit_task(request, group_name, task_id=None):
   """
   group_object = node_collection.one({'name': unicode(group_name)})
   update = request.POST.get("update")
-  if update == "True":
+  if not update == "True":
     name = request.POST.get("name")
     task_obj = node_collection.collection.GSystem()
     task_obj.fill_gstystem_values(request=request,name=str(name),group_set=group_object._id,member_of=app._id)
     task_obj.save(group_id=group_object._id)
-    print "&&&&&&&&&&&&&&&&&&",task_obj
+
+  
   if not task_id:
     return render_to_response("ndf/gtask_create_edit.html",
           {"group_object" : group_object },

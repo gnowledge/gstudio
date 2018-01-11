@@ -67,7 +67,7 @@
       <a href="{% url 'progress_report' group_id request.user.pk %}" {% if title == 'progress_report' %} class="selected" {% endif %} tabindex="6" title="See how you have done, how many comments have you received." > <i class="fa fa-line-chart"></i> {% trans "Progress Report" %} </a>
     </li>
     <li>
-      <a href="{% url 'gtask' group_id  %}"  tabindex="7" > <i class="fa fa-list-alt"></i> {% trans "Task" %}</a>
+      <a href="{% url 'gtask' group_id  %}" {% if title == "Task" %} class="selected"  {% endif %} tabindex="7" > <i class="fa fa-list-alt"></i> {% trans "Task" %}</a>
     </li>
 
   </ul>
