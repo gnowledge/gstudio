@@ -63,15 +63,15 @@
   </li>
 </ul>
 <ul class="nav_menu_1 authoring-tab" style="width:50%; display:inline">
-  >
+  
     {% if is_gstaff %}
-    <li class="authoring-tab">
+    <li>
         <a href="{% url 'course_pages' group_id %}"  {% if title == 'course_pages' or title == 'create_course_pages' %}class="selected"{% endif %}><i class="fi-page-filled "></i> {% trans "Activities" %}</a>
     </li>
-    <li class="authoring-tab">
+    <li>
         <a href="{% url 'asset_list' group_id %}" {% if title == 'asset_list' or title == 'asset_detail' or title == 'asset_content_detail'%}class="selected"{% endif %}><i class="fi-folder-lock"></i> {%trans "Assets" %}</a>
     </li>
-    <li class="authoring-tab" >
+    <li>
         <a href="https://clix-authoring.mit.edu/#/" target="_blank" {% if title == 'Assessments' %}class="selected"{% endif %}><i class="fi-graph-trend"></i> {% trans "Assessments" %}</a>
     </li>
   {% endif %}
