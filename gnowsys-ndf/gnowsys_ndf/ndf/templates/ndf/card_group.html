@@ -19,10 +19,14 @@
 
     {% if "base_unit" in node.member_of_names_list %}
     <div class="status-draft">DRAFT</div>
-    {% endif  %}
+    {% elif "Group" in node.member_of_names_list %}
+        <div class="status-draft">Workspaces</div>
+    {% endif %}
+
     {% if get_status %}
         <div class="status-{{get_status}}">{{get_status}}</div>
     {% endif %}
+
     <div class="unit_header">
     {% if "announced_unit" in node.member_of_names_list %}
         {% get_relation_value node.pk 'has_banner_pic' as grel_dict %}
