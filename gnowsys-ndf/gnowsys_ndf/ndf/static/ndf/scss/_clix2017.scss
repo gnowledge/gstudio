@@ -5233,8 +5233,18 @@ ul.nav_menu_1 {
                 border-bottom: 3px solid $nav_menu_1_tab_border;
             }
         }
-
     }
+
+            .authoring-tab{
+                background-color:$nav_menu_1_color;
+                >a{
+                        color:#ffffff !important;
+                        &.selected, &:hover{
+                            border-bottom: 3px solid $nav_menu_1_tab_border;
+                        }
+                }
+            }
+    
 }
 
 .course-content {
