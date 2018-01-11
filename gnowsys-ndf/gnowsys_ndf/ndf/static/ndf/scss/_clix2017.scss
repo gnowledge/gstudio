@@ -5215,6 +5215,8 @@ $nav_menu_1_tab_border: #a2238d;
 ul.nav_menu_1 {
     margin-bottom: 0px;
     background-color: $nav_menu_1_bg_color;
+    display:inline;
+    width:50%;
     >li {
             display: inline-block;
 

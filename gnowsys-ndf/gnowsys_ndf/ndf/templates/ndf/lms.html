@@ -37,8 +37,8 @@
 <div class="lms_secondary_header">
 <div class="small-10 medium-10 large-10 columns" style="border-bottom: 1px solid #00000029; background-color:#ffffff;">
  
-  <ul class="nav_menu_1">
-    <li>
+  <ul class="nav_menu_1" style="width:50%; display:inline">
+     <li>
       <a href="{% url 'course_about' group_id %}" {% if title == 'about' %}class="selected"{% endif %} tabindex="1" title="Course Summary"><i class="fi-eye"></i> {% trans "Overview" %} </a> 
     </li>
     <li>
@@ -60,6 +60,10 @@
       {% endif %}
       </a>
     </li>
+  </li>
+</ul>
+<ul class="nav_menu_1 authoring-tab" style="width:50%; display:inline">
+  >
     {% if is_gstaff %}
     <li class="authoring-tab">
         <a href="{% url 'course_pages' group_id %}"  {% if title == 'course_pages' or title == 'create_course_pages' %}class="selected"{% endif %}><i class="fi-page-filled "></i> {% trans "Activities" %}</a>
