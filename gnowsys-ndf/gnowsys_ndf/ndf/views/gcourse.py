@@ -3480,7 +3480,8 @@ def assets(request, group_id, asset_id=None,page_no=1):
     group_obj = get_group_name_id(group_id, get_obj=True)
     asset_gst_name, asset_gst_id = GSystemType.get_gst_name_id("Asset")
     from gnowsys_ndf.settings import GSTUDIO_NO_OF_OBJS_PP
-    template = 'ndf/gevent_base.html'
+    #template = 'ndf/gevent_base.html'
+    template = 'ndf/lms.html'
     if asset_id:
         asset_obj = node_collection.one({'_id': ObjectId(asset_id)})
         asset_content_list = get_relation_value(ObjectId(asset_obj._id),'has_assetcontent')
@@ -3506,7 +3507,8 @@ def assets(request, group_id, asset_id=None,page_no=1):
                 template = 'ndf/lms.html'
                         
             else:
-                template = 'ndf/gevent_base.html'
+                #template = 'ndf/gevent_base.html'
+                template = 'ndf/lms.html'
         return render_to_response(template,
                                     context_variables,
                                     context_instance = RequestContext(request)
@@ -3603,6 +3605,7 @@ def course_pages(request, group_id, page_id=None,page_no=1):
     group_obj = get_group_name_id(group_id, get_obj=True)
     group_id = group_obj._id
     group_name = group_obj.name
+    #template = 'ndf/gevent_base.html'
     template = 'ndf/lms.html'
     context_variables = {
             'group_id': group_id, 'groupid': group_id, 'group_name':group_name,
