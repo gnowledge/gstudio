@@ -3,395 +3,349 @@
 {% load ndf_tags %}
 {% block body_content %}
 
-{% comment %} 
-<style type="text/css">
-  .create-new-task{
-      width: 60%;
-      margin-left: 17%;
-      border-left: 2px solid gray;
-      height: 460px;
-      border-bottom: 2px solid gray;
-      border-right: 2px solid gray;
-      border-top: 2px solid gray;
-      margin-top: 5px;
+<!-- 
+<link rel='stylesheet' href='/static/ndf/bower_components/fullcalendar/dist/fullcalendar.css'/>
+<link rel='stylesheet' href='/static/ndf/bower_components/fullcalendar/dist/fullcalendar.min.css'/>
+<link rel='stylesheet' href='/static/ndf/bower_components/fullcalendar/dist/fullcalendar.print.min.css'/>
+
+
+
+<script src='/static/ndf/bower_components/jquery/dist/jquery.min.js'></script>
+<script src="/static/ndf/bower_components/moment/min/moment.min.js"></script>
+<script src="/static/ndf/bower_components/fullcalendar/dist/fullcalendar.min.js"></script>
+<script src="/static/ndf/bower_components/fullcalendar/dist/gcal.min.js"></script>
+
+ -->
+
+<!-- <script type="text/javascript">
+
+  $(document).ready(function(){
+
+    $('#calendar').fullCalendar({
+                  // enable theme
+          theme: true,
+          // emphasizes business hours
+          businessHours: true,
+          // event dragging & resizing
+          editable: true,
+          // header
+          header: {
+            left: 'prev,next today',
+            center: 'title',
+            right: 'month,agendaWeek,agendaDay'
+          },
+          selectable: true,
+          selectHelper: true,
+          eventLimit: true,
+
+          // dayClick: function() {
+          //   alert('a day has been clicked!');
+          // },
+
+           //defaultView: 'timelineMonth',
+
+          // defaultView: 'agendaDay',
+
+      //     events: [
+      //   // events go here
+      //       // all day event
+      //       {
+      //         title  : 'Meeting',
+      //         start  : '2015-11-12'
+      //       },
+      //   // long-term event 
+      //       {
+      //           title  : 'Conference',
+      //           start  : '2015-11-13',
+      //           end    : '2015-11-15'
+      //       },
+      //   // short term event 
+      //         {
+      //             title  : 'Dentist',
+      //               start  : '2015-11-09T11:30:00',
+      //               end  : '2015-11-09T012:30:00'
+      //             allDay : false // will make the time show
+      //         }
+      //     ],
+      //     resources: [
+      //   // resources go here
+      //     ]
+
+       });   
+
+    // $('#calendar').fullCalendar('next');
+
+  });
+
+
+
+</script> 
+
+ -->
+
+
+<link rel='stylesheet' href=' https://cdnjs.cloudflare.com/ajax/libs/fullcalendar/3.8.0/fullcalendar.min.css' />
+
+<script src='http://code.jquery.com/jquery-1.11.3.min.js'></script>
+<script src="/static/ndf/bower_components/later/src/later.js"></script></script>
+<script src="/static/ndf/bower_components/later/src/core/schedule.js"></script>
+
+<script src='https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.11.1/moment.min.js'></script>
+<script src='https://cdnjs.cloudflare.com/ajax/libs/fullcalendar/3.8.0/fullcalendar.min.js'></script>
+
+
+
+
+<!-- 
+<link href='../fullcalendar.min.css' rel='stylesheet' />
+<link href='../fullcalendar.print.min.css' rel='stylesheet' media='print' />
+<script src='../lib/moment.min.js'></script>
+<script src='../lib/jquery.min.js'></script>
+<script src='../fullcalendar.min.js'></script> -->
+
+<style>
+
+  body {
+    margin: 0;
+    padding: 0;
+    font-family: "Lucida Grande",Helvetica,Arial,Verdana,sans-serif;
+    font-size: 14px;
   }
 
+  .column.small-centered {
+margin-left: auto;
+margin-right: auto;
+float: none !important; 
+} 
 
+  #script-warning {
+    display: none;
+    background: #eee;
+    border-bottom: 1px solid #ddd;
+    padding: 0 10px;
+    line-height: 40px;
+    text-align: center;
+    font-weight: bold;
+    font-size: 12px;
+    color: red;
+  }
 
-  input[type="file"]:before {
-    content: 'Select files';
-    display: inline-block;
-    border: 1px solid #999;
-    border-radius: 5px;
-    padding: 8px 10px;
-    outline: none;
-    white-space: nowrap;
-    -webkit-user-select: none;
-    cursor: pointer;
-    font-weight: 500;
-    // //font-size: 10pt;
-    color: black;
-    border-color: black;
-    float: right;
-    background-color: gray;
-}
-input[type="file"] {
-    padding: 5px;
-    margin-top: 10px;
-    margin-left: 30.4px;
-    border-radius: 4px;
-    border: 1px solid #ccc;
-    width: 95%;
-}
-.vl {
-    border-left: 1px solid gray;
-    height: 300px;
-}
+  #loading {
+    display: none;
+    position: absolute;
+    top: 10px;
+    right: 10px;
+  }
+
+  #calendar {
+    max-width: 900px;
+    margin: 40px auto;
+    padding: 0 10px;
+  }
 
 </style>
 
-<div class="create-new-task">
-    <div class="small-11 columns">
-      <h4> New Task </h4>
-    </div>
-  <hr/>
-  <div class="small-6 columns ">
-      <div class="row">
-        <div class="small-3 columns">
-          <h6> Task Name </h6>
-        </div>
-        <div class="small-9 columns">
-          <input type="text" placeholder="Enter Task name" />
-        </div>
-      </div>
-      <div class="row">
-        <div class="small-3 columns">
-          <h6>Task Type:</h6>
-        </div>
-        <div class="small-9 columns" >
-          <select required="" class="medium" id="customDropdown" name="Status" data-invalid="" style="background-color:#719dc7;">
-            <option selected="selected" value="Feature" id="Feature">{% trans 'Feature' %}</option>
-            <option value="Support" id="Support">{% trans 'Support' %}</option>
-          </select>
-        </div>
-      </div>
-      <div class="row">
-        <div class="small-3 columns"> 
-          <h6>Start Date </h6>
-        </div>
-        <div class="small-3 columns">
-          <input id="start_date" class="date_month_day_year" type="text" style="background-color:#719dc7;" placeholder="DD/MM/YYYY" value="" name="start_time" readonly="">
-        </div>
-        <div class="small-3 columns">
-          <h6>Due Date</h6>
-        </div>
-        <div class="small-3 columns">
-          <input id="due_date" class="date_month_day_year" type="text" style="background-color:#719dc7;"   placeholder="DD/MM/YYYY" value="" name="due_date" readonly="">
-        </div>
-      </div>
-      
-      <div class="row">
-        <div class="small-3 columns">
-          <h6>Status:</h6>
-        </div>
-        <div class="small-9 columns" >
-          <select required="" class="medium" id="customDropdown" name="Status" data-invalid="" style="background-color:#719dc7;">
-            <option selected="selected" value="New" id="New">{% trans 'New' %}</option>
-            <option value="In Progress" id="In Progress">{% trans 'In Progress' %}</option>
-          </select>
-        </div>
-      </div>
-      <div class="row">
-        <div class="small-3 columns">
-          <h6>Priority</h6>
-        </div>
-        <div class="small-9 columns">
-          <select required="" class="medium" id="customDropdown1" name="Priority" data-invalid="" style="background-color:#719dc7;">
-            <option value="Low" id="Low">{% trans 'Low' %}</option>
-            <option value="High" id="High">{% trans 'High' %}</option>
-            <option value="Immediate" id="Immediate">{% trans 'Immediate' %}</option>
-          </select>
-        </div>
-      </div>
-      <div class="row">
-        <div class="small-3 columns">
-          <h6> Assigned To: </h6>
-        </div>
-        <div class="small-9 columns" style="margin-top:2px;">
-          <a href="#" style="color:#3b7ebe">Add Assignees</a>
-        </div>
-      </div>
+
+<div class="row">
+<div class="small-12 medium-8 small-centered medium-centered columns">
+
+  <div id='calendar'></div>
+
+<!-- 
+  <div id='script-warning'>
+    <code>php/get-events.php</code> must be running.
   </div>
-  <div class="small-6 columns vl">
-      
-      <div class="row">
-        <div class="small-3 columns">
-          <h6>Supporting Files:</h6>
-        </div>
-        <div class="small-9 columns">
-          <!--<input type="file" class="button" name="" onChange="" id="" value= ""/>-->
-          <a href="#" style="color:#3b7ebe">Upload Files</a>
+
+  <div id='loading'>loading...</div>
+ -->
+</div>
+</div>
+
+
+<script>
+
+  $(document).ready(function() {
+
+
+          var date = new Date();
+          var d = date.getDate();
+          var m = date.getMonth();
+          var y = date.getFullYear();
+
+    $('#calendar').fullCalendar({
+
+          theme: true,
+          // emphasizes business hours
+          businessHours: true,
+          // event dragging & resizing
+          editable: true,
+          // header
+          header: {
+            left: 'prev,next today',
+            center: 'title',
+            right: 'month,agendaWeek,agendaDay'
+          },
+          firstDay:1,
+          selectable: true,
+          selectHelper: true,
+
+          eventBackgroundColor:'#23000',
+          //defaultDate: '2017-12-12',
+
+          navLinks: true, // can click day/week names to navigate views
+          eventLimit: true, // allow "more" link when too many events
+          // events: {
+          //   url: 'php/get-events.php',
+          //   error: function() {
+          //   $('#script-warning').show();
+          //   }
+          // },
+
           
-        </div>
-      </div>
-      <div class="row">
-        <div class="small-3 columns">
-          <h6>Estimated Hours:</h6>
-        </div>
-        <div class="small-9 columns">
-          <input type="text" placeholder="Approx hours of work" />
-        </div>
-      </div>
-      <div class="row">
-        <div class="small-3 columns">
-          <h6>To be Done By:</h6>
-        </div>
-        <div class="small-9 columns" >
-          <select required="" class="medium" id="customDropdown" name="Status" data-invalid="" style="background-color:#719dc7;">
-            <option selected="selected" value="Single Assignee" id="Single Assignee">{% trans 'Single Assignee' %}</option>
-            <option value="Multiple Assignee" id="Multiple Assignee">{% trans 'Multiple Assignee' %}</option>
-            <option value="Group Assignee" id="Group Assignee">{% trans 'Group Assignee' %}</option>
-          </select>
-        </div>
-      </div>
-      <div class="row">
-        <div class="small-3 columns">
-          <h6>Notes:</h6>
-        </div>
-        <div class="small-9 columns">
-          <textarea rows="5" cols="50">
-          </textarea>
-        </div>
-      </div>
-  </div>
-  <hr/>
+          // loading: function(bool) {
+          //   $('#loading').toggle(bool);
+          // }
+          
+          views: {
+                month:
+                 {
+                    eventLimit: 6 // adjust to 6 only for agendaWeek/agendaDay
+                 }
+          },
+          customButtons: {
+            myCustomButton: {
+              text: 'custom!',
+              click: function() {
+                alert('clicked the custom button!');
+              }
+            }
+          },
 
-    <div class="small-2 columns right">
-      <button type="button" class="button expand" style="background-color:#164A7B; border-radius:10px;">Cancel</button>
-    </div>
-    <div class="small-2 columns right">
-      <button type="button" class="button expand" style="background-color:#164A7B; border-radius:10px;">Create Task</button>
-    </div>
-</div>
-{% endcomment %}
+          events: [
+                    {
+                      "title": "All Day Event",
+                      "start": "2017-12-01"
+                    },
+                    {
+                      "title": "Long Event",
+                      "start": "2017-12-07",
+                      "end": "2017-12-10"
+                    },
+                    {
+                      "id": "999",
+                      "title": "Repeating Event",
+                      "start": "2017-12-09T16:00:00-05:00"
+                    },
+                    {
+                      "id": "999",
+                      "title": "Repeating Event",
+                      "start": "2017-12-16T16:00:00-05:00"
+                    },
+                    {
+                      "title": "Conference",
+                      "start": "2017-12-11",
+                      "end": "2017-12-13"
+                    },
+                    {
+                      "title": "Meeting",
+                      "start": "2017-12-12T10:30:00-05:00",
+                      "end": "2017-12-12T12:30:00-05:00"
+                    },
+                    {
+                      "title": "Meeting",
+                      "start": "2018-01-11T10:30:00-05:00",
+                      "end": "2018-01-12T12:30:00-05:00"
+                    },
+                    {
+                      "title": "Meeting",
+                      "start": "2018-01-21T10:30:00-05:00",
+                      "end": "2018-01-18T12:30:00-05:00"
+                    },
+                    {
+                      "title": "Meeting",
+                      "start": "2018-01-18T10:30:00-05:00",
+                      "end": "2018-01-14T12:30:00-05:00"
+                    },
+                    {
+                      "title": "Lunch",
+                      "start": "2017-12-12T12:00:00-05:00"
+                    },
+                    {
+                      "title": "Meeting",
+                      "start": "2017-12-12T14:30:00-05:00"
+                    },
+                    {
+                      "title": "Happy Hour",
+                      "start": "2017-12-12T17:30:00-05:00"
+                    },
+                    {
+                      "title": "Dinner",
+                      "start": "2017-12-12T20:00:00"
+                    },
+                    {
+                      "title": "Birthday Party",
+                      "start": "2017-12-13T07:00:00-05:00"
+                    },
+                    {
+                      "title": "Click for Google",
+                      "url": "http://google.com/",
+                      "start": "2017-12-28"
+                    },
+                    {
+                      "title": "Lunch",
+                      "start": "2018-02-12T12:00:00-05:00"
+                    },
+                    {
+                      "title": "Meeting",
+                      "start": "2018-01-12T14:30:00-05:00"
+                    },
+                    {
+                      "title": "Happy Hour",
+                      "start": "2018-01-12T17:30:00-05:00"
+                    },
+                    {
+                      "title": "Dinner",
+                      "start": "2018-01-18T20:00:00"
+                    },
+                                        {
+                      "title": "Lunch",
+                      "start": "2018-01-28T12:00:00-05:00"
+                    },
+                    {
+                      "title": "Meeting",
+                      "start": "2018-02-16T14:30:00-05:00"
+                    },
+                    {
+                      "title": "Happy Hour",
+                      "start": "2018-01-19T17:30:00-05:00"
+                    },
+                    {
+                      "title": "Dinner",
+                      "start": "2018-01-01T20:00:00"
+                    },
+                    {
+                      "title": "Lunch",
+                      "start": "20178-02-12T12:00:00-05:00"
+                    },
+                    {
+                      "title": "Meeting",
+                      "start": "2018-12-12T14:30:00-05:00"
+                    },
+                    {
+                      "title": "Happy Hour",
+                      "start": "2018-01-03T17:30:00-05:00"
+                    },
+                    {
+                      "title": "Dinner",
+                      "start": "2018-01-22T20:00:00"
+                    },
+                  ],
+        })
+    });
 
+</script>
 
-<!-- Analytics UI -->
-<style type="text/css">
-  .analytics-details{
-    border-style: solid;
-    border-width: 70px;
-    border-color: rgba(107, 0, 84, 0.97);
-    background-color: #80808026;
-  }
-  .analytics-user{
-    //background-color: #80808026;
-  }
-  .analytics-card{
-    background-color: black;
-  }
-
-  .analytics_tile {
-    height: 300px;
-    background-size: 100% 100%;
-    background-color: white;
-    padding: 20px 22px;
-    color: #fff;
-    margin-bottom: 30px;
-    cursor: pointer;
-    border-radius: 6px;
-  }
-
-    .analytics_tile-name {
-        font-size: 25px;
-        font-weight: 500;
-        letter-spacing: 1.1px;
-        margin-bottom: 15px;
-        display: block;
-        color:black;
-    }
-
-    .analytics_tile_desc {
-        letter-spacing: 0.5px;
-        font-size: 17px;
-        color:black;
-    }
-    .course-metric-heading {
-    text-transform: uppercase;
-    // //font-size: 12px;
-    letter-spacing: 0.9px;
-    font-weight: 500;
-    color: #000000;
-    display: block;
-  }
-
-.course-section-heading {
-      text-transform: uppercase;
-      font-weight: 600;
-      letter-spacing: 1.5px;
-      // //font-size: 14px;
-      display: block;
-      margin: 2px 0px 15px;
-      color: #888;
-    }
-    .course-section-icon {
-      //position: absolute;
-      font-size: 20px;
-      top: -35px;
-      //right: 5px;
-      color: #000000;
-      background: #ffffff;
-      margin-left: 22px;
-    }
-    .course-metric-count {
-    // //font-size: 30px;
-    font-weight: 600;
-    letter-spacing: 0.5px;
-    display: block;
-    color: #000000;
-    font-size: 17px;
-  }
-
-</style>
-<div class="analytics-details">
-  <div class="row analytics-user">
-    <h6><b>PROGRESS REPORT</b></h6>
-      <div class="small-4 columns">
-        <h4 class="inner left-space">Course: Health and disease </h4><br/>
-      </div>
-      <div class="small-3 columns">
-        <h4 class="inner left-space"> User: black-bull-ct1 </h4> 
-      </div>
-      <div class="small-4 columns">
-        <h4 class="inner">Total points gained:  <h3 class="course-metric-count users_points inner left-space">100</h3></h4>
-      </div>
-  </div>
-  <hr/>
-  <div class="row">
-    <div class="large-3 medium-6 small-12 columns">
-      <div class="analytics_tile">
-          <span class="course-metric-heading">Lesson Visited</span>
-          <h4 class="module_progress_stmt">0 out of 20 lessons visited</h4>
-          <div class="progress success round">
-            <div class="module_progress_meter meter" style="width:{{level1_progress_meter}}%"></div>
-          </div>
-          <br/>
-          <span class="course-metric-heading">Activity Visited</span>
-            <h4 class='units_progress_stmt'>0 out of 4 activities visited</h4>
-            <div class="progress success round">
-              <div class="unit_progress_meter meter" style="width:{{level2_progress_meter}}%"></div>
-            </div>
-      </div>
-    </div>
-    <div class="large-3 medium-6 small-12 columns">
-      <div class="analytics_tile">
-          <span class="course-section-icon">
-            <i class="fa fa-question-circle"></i>
-          </span>
-          <span class="course-section-heading inner">Assessment Performance  </span>
-          <a class="fetch-assessment-analytics inner left-space" data-user-id={{user_id}}>Refresh</a>
-          <hr/>
-          <div class="small-6 columns">
-            <span class="course-metric-heading">{% trans "Total Questions" %}</span>
-            <span class="course-metric-count total_quizitems">0</span>
-          </div>
-          <span class="course-metric-heading">Correct Answers</span>
-          <span class="course-metric-count correct-count correct_attempted_quizitems">0</span>
-          <div class="small-6 columns">
-            <span class="course-metric-heading">Attempted</span>
-              <span class="course-metric-count attempted_quizitems">0</span>
-          </div>
-          <span class="course-metric-heading">{% trans "Incorrect answers" %}</span>
-          <span class="course-metric-count incorrect-count incorrect_attempted_quizitems">0</span>
-          <div class="small-6 columns">
-          <span class="course-metric-heading">{% trans "Not Attempted" %}</span>
-          <span class="course-metric-count unattempted_quizitems">0</span>
-          </div>
-      </div>
-    </div>
-    <div class="large-3 medium-6 small-12 columns">
-      <div class="analytics_tile">
-          <span class="course-section-icon">
-            <i class="fa fa-pencil-square-o"></i>
-          </span>
-          <span class="course-section-heading inner">{% trans "Note Making" %}</span>
-          <hr/>
-          <div class="small-6 columns">
-            <span class="course-metric-heading">{% trans "Notes Written" %}</span>
-            <span class="course-metric-count user_notes">0</span>
-          </div>
-          <span class="course-metric-heading">{% trans "Views Gained" %}</span>
-            <span class="course-metric-count others_reading_my_notes">0</span>
-          <div class="small-6 columns">
-            <span class="course-metric-heading">{% trans "Comments recieved" %}</span>
-            <span class="course-metric-count cmts_on_user_notes">0</span>
-          </div>
-          <span class="course-metric-heading">{% trans "Visits on Other Notes" %}</span>
-            <span class="course-metric-count total_notes_read_by_user">0</span>
-          <div class="small-6 columns">
-            <span class="course-metric-heading">{% trans "Comments on other notes" %}</span>
-            <span class="course-metric-count commented_on_others_notes">0</span>
-          </div>
-          <span class="course-metric-heading">{% trans "Avg. Rating Awarded" %}</span>
-            <span class="course-metric-count total_notes_read_by_user">0</span>
-
-      </div>
-    </div>
-    <div class="large-3 medium-6 small-12 columns">
-      <div class="analytics_tile">
-        <span class="course-section-icon">
-          <i class="fa fa-comments"></i>
-        </span>
-        <span class="course-section-heading inner">{% trans "Interactions" %}
-        </span>
-        <hr/>
-        <span class="course-metric-heading">{% trans "Comments By me" %}</span>
-            <span class="course-metric-count total_cmnts_by_user">0</span>
-            <br/>
-        <span class="course-metric-heading">{% trans "Comments for me" %}</span>
-            <span class="course-metric-count cmnts_rcvd_by_user">0</span>
-      </div>
-    </div>
-    <div class="large-6 medium-8 small-12 columns">
-      <div class="analytics_tile">
-        <div class="columns small-12 medium-6 points-data">
-          <div class="course-points-breakup">
-          </div>
-        </div>
-      </div>
-    </div>
-    <div class="large-6 medium-8 small-12 columns">
-      <div class="analytics_tile">
-          <span class="course-section-icon">
-            <i class="fa fa-upload"></i>
-          </span>
-          <span class="course-section-heading inner">{% trans "Gallery uploads" %}</span>
-          <hr/>
-          <div class="small-6 columns">
-            <span class="course-metric-heading">{% trans "Files Uploaded" %}</span>
-            <span class="course-metric-count user_files">0</span>
-            <span class="course-metric-heading">{% trans "Avg. Rating awarded" %}</span>
-            <span class="course-metric-count commented_on_others_files">0</span>
-            <span class="course-metric-heading">{% trans "Comments on other Files" %}</span>
-            <span class="course-metric-count commented_on_others_files">0</span>
-            <span class="course-metric-heading">{% trans "Comments on other Files" %}</span>
-            <span class="course-metric-count commented_on_others_files">0</span>
-          </div>
-          <div class="small-6 columns">
-            <span class="course-metric-heading">{% trans "Comments by unique users" %}</span>
-            <span class="course-metric-count unique_users_commented_on_user_files">0</span>
-            <span class="course-metric-heading">{% trans "Visits gained" %}</span>
-            <span class="course-metric-count other_viewing_my_files">0</span>
-            <span class="course-metric-heading">{% trans "Comments recieved" %}</span>
-            <span class="course-metric-count cmts_on_user_files">0</span>
-            <span class="course-metric-heading">{% trans "Visits on Other Files" %}</span>
-            <span class="course-metric-count total_files_viewed_by_user">0</span>
-            
-          </div>
-      </div>
-    </div>
-    
-  </div>
-</div>
+  <!-- <div id='calendar'></div>
+ -->
 
 {% endblock body_content %}

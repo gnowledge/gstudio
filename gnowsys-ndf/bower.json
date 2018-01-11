@@ -24,7 +24,7 @@
     "leaflet": "#0.7.3",
     "Leaflet.awesome-markers": "#2.0.2",
     "jquery-ui": "#1.11.2",
-    "fullcalendar": "#2.1.1",
+    "fullcalendar": "#3.8.0",
     "jqueryui-timepicker-addon": "#1.4.5",
     "jqtree": "#0.21.0",
     "jquery-legacy": "jquery#1.10.2",
