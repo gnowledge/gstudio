@@ -109,14 +109,14 @@
                       <a class="close-reveal-modal">&#215;</a>
                   </div>
               </li>
-              {% if 'Group' not in group_object_member_of_names_list %}
+              {% if 'Group' not in group_object_member_of_names_list and 'announced_unit' in group_object_member_of_names_list or "base_unit" in  group_object_member_of_names_list %}
               <li>
                   <a href="{% url 'create_event_group' group_id 'CourseEventGroup' %}" class="fi-volume"> {% trans "Announce" %}</a>
               </li>
               {% get_lessons group_object as lessons_list %}
               {% include 'ndf/epub_export_widget.html' with exp_collection=lessons_list %}
               <li class="lesson_name_in_export">
-                <a href="#" data-reveal-id='exportLesson' class="export_lesson" title="Export Content into distinct ePubs">{% trans "Export Content into ePubs" %}</a>
+                <a href="#" data-reveal-id='exportLesson' class="export_lesson fi-archive" title="Export Content into distinct ePubs"> {% trans "Export Content into ePubs" %}</a>
               </li>
 
 
