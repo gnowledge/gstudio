@@ -2241,7 +2241,7 @@ def course_content(request, group_id):
     if 'BaseCourseGroup' in group_obj.member_of_names_list:
         template = 'ndf/basecourse_group.html'
     if 'base_unit' in group_obj.member_of_names_list:
-        template = 'ndf/gevent_base.html'
+        template = 'ndf/lms.html'
     if 'announced_unit' in group_obj.member_of_names_list or 'Group' in group_obj.member_of_names_list and 'base_unit' not in group_obj.member_of_names_list:
         template = 'ndf/lms.html'
     banner_pic_obj,old_profile_pics = get_current_and_old_display_pics(group_obj)
@@ -2427,6 +2427,7 @@ def progress_report(request, group_id, user_id, render_template=False, get_resul
                 'notapplicable_quizitems': 0,
                 'incorrect_attempted_quizitems': 0,
                 'attempted_quizitems': 0,
+                'admin_analytics': False
             })
 
 
@@ -2998,7 +2999,8 @@ def course_about(request, group_id):
         show_analytics_notifications = False
 
     if 'base_unit' in group_obj.member_of_names_list :
-        template = 'ndf/gevent_base.html'
+        # template = 'ndf/gevent_base.html'
+        template = 'ndf/lms.html'
         show_analytics_notifications = False
         educationalsubject = get_attribute_value(group_obj._id,"educationalsubject")
         educationallevel = get_attribute_value(group_obj._id,"educationallevel")
@@ -3538,11 +3540,26 @@ def course_analytics_admin(request, group_id):
 
     cache_key = u'course_analytics_admin' + unicode(group_id)
     cache_result = cache.get(cache_key)
-    if cache_result:
-        return HttpResponse(cache_result)
+    # if cache_result:
+    #     return HttpResponse(cache_result)
 
     # from gnowsys_ndf.ndf.views.analytics_methods import AnalyticsMethods
     # from gnowsys_ndf.settings import GSTUDIO_FILE_UPLOAD_POINTS, GSTUDIO_COMMENT_POINTS, GSTUDIO_NOTE_CREATE_POINTS, GSTUDIO_QUIZ_CORRECT_POINTS
+    group_obj   = get_group_name_id(group_id, get_obj=True)
+    group_id    = group_obj._id
+    group_name  = group_obj.name
+
+    thread_node = None
+    banner_pic_obj,old_profile_pics = get_current_and_old_display_pics(group_obj)
+    
+
+    allow_to_join = get_group_join_status(group_obj)
+    context_variables = {
+            'group_id': group_id, 'groupid': group_id, 'group_name':group_name,
+            'group_obj': group_obj, 'title': 'progress_report', 'allow_to_join': allow_to_join,
+            'old_profile_pics':old_profile_pics, "prof_pic_obj": banner_pic_obj, "admin_analytics":  True
+            }
+
 
     group_obj = get_group_name_id(group_id, get_obj=True)
     admin_analytics_data_list = []
@@ -3622,9 +3639,14 @@ def course_analytics_admin(request, group_id):
     response_dict["success"] = True
     response_dict["students_data_set"] = admin_analytics_data_list
     response_dict['max_points_dict'] = max_points_dict
-
-    response_dict = json.dumps(response_dict)
+    context_variables["response_dict"] = json.dumps(response_dict)
     cache.set(cache_key, response_dict, 60*10)
+    print 
+    return render_to_response("ndf/lms.html",
+                                context_variables,
+                                context_instance = RequestContext(request)
+    )
+
 
     # print "\n admin_analytics_data_list === ",admin_analytics_data_list
     return HttpResponse(response_dict)
@@ -3857,8 +3879,9 @@ def assets(request, group_id, asset_id=None,page_no=1):
     group_obj = get_group_name_id(group_id, get_obj=True)
     asset_gst_name, asset_gst_id = GSystemType.get_gst_name_id("Asset")
     from gnowsys_ndf.settings import GSTUDIO_NO_OF_OBJS_PP
-    template = 'ndf/gevent_base.html'
-    gstaff_access = check_is_gstaff(group_id,request.user)
+
+    #template = 'ndf/gevent_base.html'
+    template = 'ndf/lms.html'
     if asset_id:
         asset_obj = node_collection.one({'_id': ObjectId(asset_id)})
         asset_content_list = get_relation_value(ObjectId(asset_obj._id),'has_assetcontent')
@@ -3887,7 +3910,8 @@ def assets(request, group_id, asset_id=None,page_no=1):
                 context_variables.update({'title':'asset_gallery_detail'})
                 template = 'ndf/lms.html'
             else:
-                template = 'ndf/gevent_base.html'
+                #template = 'ndf/gevent_base.html'
+                template = 'ndf/lms.html'
         return render_to_response(template,
                                     context_variables,
                                     context_instance = RequestContext(request)
@@ -3962,7 +3986,8 @@ def create_edit_course_page(request, group_id, page_id=None,page_type=None):
     forbid_private_group(request, group_obj)
     group_id = group_obj._id
     group_name = group_obj.name
-    template = 'ndf/gevent_base.html'
+    #template = 'ndf/gevent_base.html'
+    template = 'ndf/lms.html'
     # templates_gst = node_collection.one({"_type":"GSystemType","name":"Template"})
     # if templates_gst._id:
     #   # templates_cur = node_collection.find({"member_of":ObjectId(GST_PAGE._id),"type_of":ObjectId(templates_gst._id)})
@@ -4034,7 +4059,8 @@ def course_pages(request, group_id, page_id=None,page_no=1):
     forbid_private_group(request, group_obj)
     group_id = group_obj._id
     group_name = group_obj.name
-    template = 'ndf/gevent_base.html'
+    #template = 'ndf/gevent_base.html'
+    template = 'ndf/lms.html'
     context_variables = {
             'group_id': group_id, 'groupid': group_id, 'group_name':group_name,
             'group_obj': group_obj, 'title': 'course_pages',
@@ -4080,8 +4106,10 @@ def save_course_page(request, group_id):
     if tags:
         tags = json.loads(tags)
     else:
-        tags = []
-    template = 'ndf/gevent_base.html'
+
+        tags = []    
+    #template = 'ndf/gevent_base.html'
+    template = 'ndf/lms.html'
     page_gst_name, page_gst_id = GSystemType.get_gst_name_id("Page")
     page_obj = None
     activity_lang =  request.POST.get("lan", '')

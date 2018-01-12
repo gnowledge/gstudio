@@ -37,6 +37,7 @@ def all_translations(request, group_id, node_id):
                               {
                                 'group_id': Group.get_group_name_id(group_id)[1],
                                 'groupid': Group.get_group_name_id(group_id)[1],
+                                'title': 'Translation',
                                 'nodes': all_translation_nodes,
                                 'node': node_obj,
                                 'source_node_id': node_id,

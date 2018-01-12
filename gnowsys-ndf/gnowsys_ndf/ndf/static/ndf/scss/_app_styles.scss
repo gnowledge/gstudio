@@ -4941,6 +4941,34 @@ ul.nav_menu_1 {
     }
 }
 
+
+
+
+ul.authoring-tab{
+        margin-bottom: 0px;
+        display:inline;
+        width:50%;
+        >li {
+            display: inline-block;
+            background-color:$nav_menu_1_color;
+                >a{
+                        list-style-type: none;
+                        margin-right:-4px;
+                        background-color:$nav_menu_1_color;
+                        padding: 12px 12px 9px;
+                        cursor: pointer;
+                        font-size: 18px;
+                        display: inline-block;
+                        letter-spacing: 0.8px;
+                        border-bottom: 3px solid transparent;
+                        color:#ffffff !important;
+                        &.selected, &:hover{
+                            border-bottom: 3px solid $nav_menu_1_tab_border;
+                        }
+                }
+            }
+}
+
 /* Secondary Top Bar */
 
 
@@ -7276,4 +7304,70 @@ $ah_2_background_color_hover: rgba(244, 244, 244, 0.3);;
 .lms_explore_back_unit{
     background-color: #fff;
     margin-top:-19.3px;
+}
+
+
+//analytics for admin 
+  .course-students-data {
+    margin: 2px 2px 2px 2px;
+    border: 2px solid #164a7b;
+    padding: 19px 14px 0px 5px;
+
+
+    .students-table-legends {
+      >span:nth-child(odd) {
+        margin: 0px 10px;
+      }
+      >span:nth-child(even) {
+        display: inline-block;
+        vertical-align: top;
+        margin-right: 10px;
+      }
+    }
+  }
+
+  .badge_ex {
+  display: inline-block;
+  line-height: 22px;
+  height: 22px;
+  font-weight: bolder;
+  padding: 0px 7px;
+  /*font-family: Arial, sans-serif;*/
+  color: white;
+  text-shadow: 0 1px rgba(0, 0, 0, 0.25);
+  border: 1px solid;
+  border-radius: 18px;
+  -webkit-box-shadow: inset 0 1px rgba(255, 255, 255, 0.3), 0 1px 1px rgba(0, 0, 0, 0.08);
+  box-shadow: inset 0 1px rgba(255, 255, 255, 0.3), 0 1px 1px rgba(0, 0, 0, 0.08);
+  // //font-size: 1.8em;
+}
+
+
+
+
+.badge_ex.green {
+  background: #77cc51;
+  border-color: #59ad33;
+  background-image: -webkit-linear-gradient(top, #a5dd8c, #77cc51);
+  background-image: -moz-linear-gradient(top, #a5dd8c, #77cc51);
+  background-image: -o-linear-gradient(top, #a5dd8c, #77cc51);
+  background-image: linear-gradient(to bottom, #a5dd8c, #77cc51);
+}
+
+.badge_ex.yellow {
+  background: #faba3e;
+  border-color: #f4a306;
+  background-image: -webkit-linear-gradient(top, #fcd589, #faba3e);
+  background-image: -moz-linear-gradient(top, #fcd589, #faba3e);
+  background-image: -o-linear-gradient(top, #fcd589, #faba3e);
+  background-image: linear-gradient(to bottom, #fcd589, #faba3e);
+}
+
+.badge_ex.red {
+  background: #fa623f;
+  border-color: #fa5a35;
+  background-image: -webkit-linear-gradient(top, #fc9f8a, #fa623f);
+  background-image: -moz-linear-gradient(top, #fc9f8a, #fa623f);
+  background-image: -o-linear-gradient(top, #fc9f8a, #fa623f);
+  background-image: linear-gradient(to bottom, #fc9f8a, #fa623f);
 }
