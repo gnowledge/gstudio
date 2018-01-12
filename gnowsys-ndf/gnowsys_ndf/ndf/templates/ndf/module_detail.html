@@ -2,7 +2,7 @@
 {% load i18n %}
 {% load check_is_gstaff from ndf_tags %}
 
-{% block title %} {{title}} {% endblock %}
+{% block title %}  {% if title == "drafts" %} Draft Courses {% elif title == "courses" %} Courses {% else %} {{title}} {% endif %} {% endblock %}
 
 {% block body_content %}
 {% check_is_gstaff group_id request.user as is_gstaff %}
@@ -14,24 +14,25 @@
 	</div>
 
 		<div class="small-10 columns title-strip strip">
-			{% trans "Showing all Units in" %}<h7 class="text-button-blue">{{node.name}} </h7><br/>
-			{% trans "Module Description:" %}<h7 class="text-button-blue">{{node.content|safe}}</h7>
-
-
-		         <div class="right course_actions" style="margin-top:0px;">
+			<div class="small-11 columns">
+				<h7 class="text-button-blue">{% trans "Showing all Units in" %}</h7>{{node.name}} <br/>
+				<h7 class="text-button-blue">{% trans "Module Description:" %}</h7>{{node.content|safe}}
+			</div>
+			<div class="small-1 columns" style="margin-top:25px;">
+		         <div class="right course_actions">
           		{% if is_gstaff   %}
 		            <span data-dropdown="course-settings-drop" aria-controls="course-settings-drop" aria-expanded="false" class="tiny radius right" style="margin-top: -25px;position:absolute;margin-left:-50px;" data-options="align:left">
 		                  <i class="icon-widget fi-widget"></i>
 		            </span>
-		            <ul id="course-settings-drop" class="f-dropdown" data-dropdown-content aria-hidden="true" tabindex="-1">
+		            <ul id="course-settings-drop" class="f-dropdown" data-dropdown-content aria-hidden="true" tabindex="-1" >
 		                <li>
-									<a  class="buddy_margin right edit_button dropdown-settings" href="{% url 'module_edit' group_id node.pk %}" style="margin-top:0px; margin-right:0px; text-transform: none;"><i class="fa fa-pencil"></i> {% trans "Edit" %}</a>
+									<a  class="buddy_margin right edit_button dropdown-settings" href="{% url 'module_edit' group_id node.pk %}" style="margin-top:0px;margin-right:0px;text-transform:none;width:100%;"><i class="fa fa-pencil"></i> {% trans "Edit" %}</a>
 						</li>
 						<li>
 									{% if node.collection_set %}
-									<a data-reveal-id="delete-unit" class="dropdown-settings tiny button secondary " title="Please delete all units associated with this module." style="margin-right:0px;" disabled > <i class="fa fa-trash"></i> {% trans "Delete" %} </a>
+									<a data-reveal-id="delete-unit" class="dropdown-settings tiny button secondary buddy_margin right edit_button " title="Please delete all units associated with this module." style="margin-top:0px;margin-right:0px;text-transform:none;width:100%;" disabled > <i class="fa fa-trash"></i> {% trans "Delete" %} </a>
 				 	 				{% else %}
-								 	<a data-reveal-id="delete-unit" class=" dropdown-settings tiny button secondary disab-button" style="margin-right:0px; background-color:#ffffff;"><i class="fa fa-trash"></i> {% trans "Delete" %} </a>
+								 	<a data-reveal-id="delete-unit" class=" dropdown-settings tiny button secondary buddy_margin right edit_button disab-button" style="margin-top:0px; margin-right:0px; text-transform:none; width:100%;"><i class="fa fa-trash"></i> {% trans "Delete" %} </a>
 								 	{% endif %}
 								 	<div id="delete-unit" class="reveal-modal tiny text-center" data-reveal>
 					                    <h3>{% trans "Delete Unit:" %} {% firstof group_object.altnames group_object.name  %} ?</h3>
@@ -45,17 +46,18 @@
 					    </li>
 
 		              	<li>
-		                    <a class="fi-photo dropdown-settings" style="position: relative;top: -3px;left: 0px;" data-reveal-id="group_banner_prof_pic_prop">
+		                    <a class="fi-photo dropdown-settings" style="margin-top:0px;margin-right:0px;text-transform:none;width:100%;" data-reveal-id="group_banner_prof_pic_prop">
 		                    {% trans "Change image" %} </a>
 		              	</li>
 							{% endif %}
 		            </ul>
 		        </div>
+		    </div>
 		</div>
 
 
 
-{# {% include 'ndf/card_group.html' with node %} #}
+{# {% include 'ndf/card_group.html' with node=node groupid=node.pk %} #}
 
 
 <!-- Existing card list-->
@@ -67,7 +69,7 @@
 <!-- Existing card list-->
 	{% for each_node in units_under_module  %}
     <li class="card-image-wrapper" >
-			{% include 'ndf/card_group.html' with node=each_node  url_name='groupchange' first_arg=each_node.pk  %}	
+		{% include 'ndf/card_group.html' with node=each_node  url_name='groupchange' first_arg=each_node.pk groupid=each_node.pk is_gstaff=is_gstaff %}	
 	</li>
 	{% endfor %}
 </ul>

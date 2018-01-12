@@ -19,9 +19,10 @@ from gnowsys_ndf.ndf.views.esearch import get_search, get_advanced_search_form, 
 
 if GSTUDIO_SITE_NAME.lower() == 'clix':
     login_template = 'registration/login_clix.html'
+    logout_template = "ndf/landing_page_clix.html"
 else:
     login_template = 'registration/login.html'
-
+    logout_template = 'registration/logout.html'
 
 urlpatterns = patterns('',
     (r'^i18n/', include('django.conf.urls.i18n')),
@@ -217,6 +218,7 @@ urlpatterns = patterns('',
         name='registration_register'),
 
     url(r'^accounts/login/$', auth_views.login ,{'template_name': login_template}, name='login'),
+    url(r'^accounts/logout/$', auth_views.logout ,{'template_name': logout_template}, name='logout'),
     url(r'^accounts/', include('registration_email.backends.default.urls')),
 
    # --end of django-registration
