@@ -11,11 +11,11 @@ from gnowsys_ndf.local_settings import GSTUDIO_DOCUMENT_MAPPING
 # reload(sys)  
 # sys.setdefaultencoding('UTF8')
 
-es = Elasticsearch("http://elastic:changeme@gsearch:9200", timeout=30)
+es = Elasticsearch("http://elastic:changeme@gsearch:9200", timeout=100, retry_on_timeout=True)
 
-author_index = "author_" + GSTUDIO_SITE_NAME
+author_index = "author_" + GSTUDIO_SITE_NAME.lower()
 index = GSTUDIO_SITE_NAME.lower()
-gsystemtype_index = "node_type_" + GSTUDIO_SITE_NAME
+gsystemtype_index = "node_type_" + GSTUDIO_SITE_NAME.lower()
 page_id = 0 
 
 def index_docs(all_docs):
