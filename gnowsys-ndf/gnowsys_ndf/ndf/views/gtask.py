@@ -59,7 +59,8 @@ def gtask(request, group_name, task_id=None):
 
     GST_TASK = node_collection.one({'_type': "GSystemType", 'name': 'Task'})
     title = "Task"
-    TASK_inst = node_collection.find({'member_of': {'$all': [GST_TASK._id]}, 'group_set': ObjectId(group_id),'status':"PUBLISHED" })
+    
+    TASK_inst = node_collection.find({'member_of': {'$all': [GST_TASK._id]}, 'group_set': ObjectId(group_id),'status':"PUBLISHED" }).sort('last_update', -1)
     template = "ndf/lms.html"
     variable = RequestContext(request, {'title': title, 'appId':app._id, 'TASK_inst': TASK_inst, 'group_id': group_id, 'groupid': group_id, 'group_name':group_name })
     return render_to_response(template, variable)
@@ -219,11 +220,40 @@ def gcreate_edit_task(request, group_name, task_id=None):
   update = request.POST.get("update")
   if not update == "True":
     name = request.POST.get("name")
+    content = request.POST.get("content")
+    task_type = request.POST.get("task_type")
+    Status = request.POST.get("task_status")
+    start_time = request.POST.get("start_date")
+    end_time = request.POST.get("due_date")
+    Priority = request.POST.get("task_priority")
+    Estimated_time = request.POST.get("estimated_time")
     task_obj = node_collection.collection.GSystem()
-    task_obj.fill_gstystem_values(request=request,name=str(name),group_set=group_object._id,member_of=app._id)
+    task_obj.fill_gstystem_values(request=request,name=str(name),content=content, group_set=group_object._id,member_of=app._id)
     task_obj.save(group_id=group_object._id)
+    at_list = ["Status", "start_time", "Priority", "end_time", "Assignee", "Estimated_time"]
+    
+    
+    if Status:
+      attributetype_key = node_collection.find_one({"_type": 'AttributeType', 'name': 'Status' })
+      ga_node = create_gattribute(task_obj._id, attributetype_key, Status)
 
-  
+    if start_time:
+      attributetype_key = node_collection.find_one({"_type": 'AttributeType', 'name': 'start_time' })
+      ga_node = create_gattribute(task_obj._id, attributetype_key, start_time)
+
+    if end_time:
+      attributetype_key = node_collection.find_one({"_type": 'AttributeType', 'name': 'end_time' })
+      ga_node = create_gattribute(task_obj._id, attributetype_key, end_time)
+
+    if Priority:
+      attributetype_key = node_collection.find_one({"_type": 'AttributeType', 'name': 'Priority' })
+      ga_node = create_gattribute(task_obj._id, attributetype_key, Priority)
+
+    if Estimated_time:
+      attributetype_key = node_collection.find_one({"_type": 'AttributeType', 'name': 'Estimated_time' })
+      ga_node = create_gattribute(task_obj._id, attributetype_key, Estimated_time)
+
+
   if not task_id:
     return render_to_response("ndf/gtask_create_edit.html",
           {"group_object" : group_object },
@@ -669,7 +699,7 @@ def gcheck_filter(request,group_name,choice=1,status='New',each_page=1):
 
     Completed_Status_List=['Resolved','Closed']
     title = "Task"
-    TASK_inst = node_collection.find({'member_of': {'$all': [GST_TASK._id]},'group_set': {'$all': [ObjectId(group_id)]}})
+    TASK_inst = node_collection.find({'member_of': {'$all': [GST_TASK._id]},'group_set': {'$all': [ObjectId(group_id)]}}).sort('last_update', -1)
     task_list=[]
     message=""
     send="This group doesn't have any files"
@@ -756,9 +786,9 @@ def gcheck_filter(request,group_name,choice=1,status='New',each_page=1):
                     if attr_value['Status'] == status:
                         task_list.append(dict(attr_value))
 
-    paged_resources = Paginator(task_list,10)
+    # paged_resources = Paginator(task_list,10)
     files_list = []
-    for each_resource in (paged_resources.page(each_page)).object_list:
+    for each_resource in task_list:
         files_list.append(each_resource)
 
     count_list=[]
@@ -767,6 +797,6 @@ def gcheck_filter(request,group_name,choice=1,status='New',each_page=1):
     count=len(task_list)
 
     template = "ndf/gtask_list_view.html"
-    variable = RequestContext(request, {'TASK_inst':files_list,'group_name':group_name, 'appId':app._id, 'group_id': group_id, 'groupid': group_id,'send':message,'count':count,'TASK_obj':TASK_inst,"page_info":paged_resources,'page_no':each_page,'choice':choice,'status':status})
+    variable = RequestContext(request, {'TASK_inst':files_list,'group_name':group_name, 'appId':app._id, 'group_id': group_id, 'groupid': group_id,'send':message,'count':count,'TASK_obj':TASK_inst,'page_no':each_page,'choice':choice,'status':status})
     return render_to_response(template, variable)
     #return HttpResponse(json.dumps(self_task,cls=NodeJSONEncoder))

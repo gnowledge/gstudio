@@ -80,7 +80,7 @@ input[type="file"] {
           <h6>Task Type:</h6>
         </div>
         <div class="small-9 columns" >
-          <select required="" class="medium" id="customDropdown" name="Status" data-invalid="" style="background-color:#719dc7;">
+          <select required="" class="medium" id="task_type" name="Status" data-invalid="" style="background-color:#719dc7;">
             <option selected="selected" value="Feature" id="Feature">{% trans 'Feature' %}</option>
             <option value="Support" id="Support">{% trans 'Support' %}</option>
           </select>
@@ -115,7 +115,7 @@ input[type="file"] {
           <h6>Status:</h6>
         </div>
         <div class="small-9 columns" >
-          <select required="" class="medium" id="customDropdown" name="status" data-invalid="" style="background-color:#719dc7;">
+          <select required="" class="medium" id="task_status" name="status" data-invalid="" style="background-color:#719dc7;">
             <option selected="selected" value="New" id="New">{% trans 'New' %}</option>
             <option value="In Progress" id="In Progress">{% trans 'In Progress' %}</option>
           </select>
@@ -126,7 +126,7 @@ input[type="file"] {
           <h6>Priority</h6>
         </div>
         <div class="small-9 columns">
-          <select required="" class="medium" id="customDropdown1" name="priority" data-invalid="" style="background-color:#719dc7;">
+          <select required="" class="medium" id="task_priority" name="priority" data-invalid="" style="background-color:#719dc7;">
             <option value="Low" id="Low">{% trans 'Low' %}</option>
             <option value="High" id="High">{% trans 'High' %}</option>
             <option value="Immediate" id="Immediate">{% trans 'Immediate' %}</option>
@@ -178,8 +178,7 @@ input[type="file"] {
           <h6>Notes:</h6>
         </div>
         <div class="small-9 columns">
-          <textarea rows="5" cols="50">
-          </textarea>
+          <textarea id="task_notes" rows="5" cols="50"></textarea>
         </div>
       </div>
   </div>
@@ -218,8 +217,15 @@ input[type="file"] {
   
     });
   
+
   $( ".create-task-btn" ).click(function() {
     task_name = $(".task-name").val();
+    sel_task_type =  $('#task_type').find(':selected').val();
+    sel_task_status =  $('#task_status').find(':selected').val();
+    sel_task_priority =  $('#task_priority').find(':selected').val();
+    task_notes =  $('#task_notes').val();
+    start_date = $('#start_date').val();
+    due_date = $('#due_date').val();
     $.ajax({
           url: "{% url 'gtask_create_edit' group_object.name %}",
 
@@ -227,6 +233,12 @@ input[type="file"] {
           data: {
             'csrfmiddlewaretoken': "{{csrf_token}}",
             'name' : task_name,
+            'task_type' : sel_task_type,
+            'task_status' : sel_task_status,
+            'task_priority' : sel_task_priority,
+            'start_date' : start_date,
+            'due_date' : due_date,
+            'content' : task_notes
           } ,
           
           success: function(data){
@@ -235,6 +247,8 @@ input[type="file"] {
           },
         });
 });
+
+
 </script>
 
 

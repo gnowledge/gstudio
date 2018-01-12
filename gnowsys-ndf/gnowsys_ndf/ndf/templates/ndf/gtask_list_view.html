@@ -33,7 +33,7 @@
                     <td>{{each.Assignee.0}}</td>
                     <td><i class="circle-{{each.Priority|lower}}"></i>{{each.Priority}}</td>
                     <td><a class="status-indication" title="Upcoming">{{each.Status}}</a></td>
-                    <td><i class="fa fa-pencil iconclr"> </td>
+                    <td class="task-edit" ><i class="fa fa-pencil iconclr"> </td>
                       {% if each.owner == 'owner'  or is_gstaff %}
                         <td><i class="fa fa-trash iconclr" onclick="deleteTask('{{each.id}}')"></i></td>
                       {% endif %}
@@ -79,5 +79,23 @@
 
                 }
             }
+
+
+$( ".task-edit" ).click(function() {
+    $.ajax({
+          url: "{% url 'gtask_create_edit' group_object.name %}",
+
+          type: "GET",
+          data: {
+            'csrfmiddlewaretoken': "{{csrf_token}}",
+            ''
+          } ,
+          
+          success: function(data){
+            
+            $( ".created-by-me" ).trigger( "click" );
+          },
+        });
+});
 
             </script>
