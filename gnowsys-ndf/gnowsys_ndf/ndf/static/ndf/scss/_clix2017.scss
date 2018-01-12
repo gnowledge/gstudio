@@ -5546,6 +5546,22 @@ ul.authoring-tab{
   letter-spacing: 0.4px;
 }
 
+.status-workspace {
+  width: auto;
+  top: -1.15em;
+  position: absolute;
+  display: inline-block;
+  color: #fff;
+  font-family:OpenSans-Bold;
+  right: 1em;
+  padding: 0.3em 0.5em;
+  text-transform: uppercase;
+  font-size: 10px;
+  border-radius: 4px;
+  //border: 2px solid #ffc14e;
+  background-color: #000000b8;
+  letter-spacing: 0.4px;
+}
 
 .lesson-dropdown ul {
     display:none;
