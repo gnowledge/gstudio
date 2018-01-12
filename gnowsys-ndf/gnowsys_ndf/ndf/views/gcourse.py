@@ -2246,7 +2246,7 @@ def course_content(request, group_id):
     if 'BaseCourseGroup' in group_obj.member_of_names_list:
         template = 'ndf/basecourse_group.html'
     if 'base_unit' in group_obj.member_of_names_list:
-        template = 'ndf/gevent_base.html'
+        template = 'ndf/lms.html'
     if 'announced_unit' in group_obj.member_of_names_list or 'Group' in group_obj.member_of_names_list and 'base_unit' not in group_obj.member_of_names_list:
         template = 'ndf/lms.html'
     banner_pic_obj,old_profile_pics = _get_current_and_old_display_pics(group_obj)
@@ -2623,7 +2623,8 @@ def course_about(request, group_id):
         template = 'ndf/basecourse_group.html'
         show_analytics_notifications = False
     if 'base_unit' in group_obj.member_of_names_list :
-        template = 'ndf/gevent_base.html'
+        # template = 'ndf/gevent_base.html'
+        template = 'ndf/lms.html'
         show_analytics_notifications = False
         educationalsubject = get_attribute_value(group_obj._id,"educationalsubject")
         educationallevel = get_attribute_value(group_obj._id,"educationallevel")
@@ -3480,7 +3481,8 @@ def assets(request, group_id, asset_id=None,page_no=1):
     group_obj = get_group_name_id(group_id, get_obj=True)
     asset_gst_name, asset_gst_id = GSystemType.get_gst_name_id("Asset")
     from gnowsys_ndf.settings import GSTUDIO_NO_OF_OBJS_PP
-    template = 'ndf/gevent_base.html'
+    #template = 'ndf/gevent_base.html'
+    template = 'ndf/lms.html'
     if asset_id:
         asset_obj = node_collection.one({'_id': ObjectId(asset_id)})
         asset_content_list = get_relation_value(ObjectId(asset_obj._id),'has_assetcontent')
@@ -3506,7 +3508,8 @@ def assets(request, group_id, asset_id=None,page_no=1):
                 template = 'ndf/lms.html'
                         
             else:
-                template = 'ndf/gevent_base.html'
+                #template = 'ndf/gevent_base.html'
+                template = 'ndf/lms.html'
         return render_to_response(template,
                                     context_variables,
                                     context_instance = RequestContext(request)
@@ -3567,7 +3570,8 @@ def create_edit_course_page(request, group_id, page_id=None,page_type=None):
     group_obj = get_group_name_id(group_id, get_obj=True)
     group_id = group_obj._id
     group_name = group_obj.name
-    template = 'ndf/gevent_base.html'
+    #template = 'ndf/gevent_base.html'
+    template = 'ndf/lms.html'
     # templates_gst = node_collection.one({"_type":"GSystemType","name":"Template"})
     # if templates_gst._id:
     #   # templates_cur = node_collection.find({"member_of":ObjectId(GST_PAGE._id),"type_of":ObjectId(templates_gst._id)})
@@ -3603,7 +3607,8 @@ def course_pages(request, group_id, page_id=None,page_no=1):
     group_obj = get_group_name_id(group_id, get_obj=True)
     group_id = group_obj._id
     group_name = group_obj.name
-    template = 'ndf/gevent_base.html'
+    #template = 'ndf/gevent_base.html'
+    template = 'ndf/lms.html'
     context_variables = {
             'group_id': group_id, 'groupid': group_id, 'group_name':group_name,
             'group_obj': group_obj, 'title': 'course_pages',
@@ -3650,7 +3655,8 @@ def save_course_page(request, group_id):
         tags = json.loads(tags)
     else:
         tags = []    
-    template = 'ndf/gevent_base.html'
+    #template = 'ndf/gevent_base.html'
+    template = 'ndf/lms.html'
     page_gst_name, page_gst_id = GSystemType.get_gst_name_id("Page")
     page_obj = None
     activity_lang =  request.POST.get("lan", '')

@@ -15,7 +15,9 @@ from gnowsys_ndf.ndf.views.home import homepage, landing_page
 from gnowsys_ndf.ndf.views.methods import tag_info
 from gnowsys_ndf.ndf.views.custom_app_view import custom_app_view, custom_app_new_view
 from gnowsys_ndf.ndf.views import rpc_resources
-from gnowsys_ndf.ndf.views.esearch import get_search,get_advanced_search_form,advanced_search
+
+from gnowsys_ndf.ndf.views.esearch import get_search, get_advanced_search_form, advanced_search
+
 
 if GSTUDIO_SITE_NAME.lower() == 'clix':
     login_template = 'registration/login_clix.html'

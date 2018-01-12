@@ -6818,9 +6818,15 @@ def create_edit_asset(request,group_id):
     if "asset@asset" not in asset_obj.tags and "base_unit" in group_obj.member_of_names_list:
       asset_obj.tags.append(u'asset@asset')
 
-    if is_raw_material and u'raw@material' not in asset_obj.tags and "base_unit" in group_obj.member_of_names_list:
+
+    # if is_raw_material and u'raw@material' not in asset_obj.tags and "base_unit" in group_obj.member_of_names_list:
+    if is_raw_material and u'raw@material' not in asset_obj.tags:
+      # marking Asset as RawMaterial
       asset_obj.tags.append(u'raw@material')
-    elif not is_raw_material and u'raw@material' in asset_obj.tags and "base_unit" in group_obj.member_of_names_list:
+
+    elif not is_raw_material and u'raw@material' in asset_obj.tags:
+      # elif not is_raw_material and u'raw@material' in asset_obj.tags and "base_unit" in group_obj.member_of_names_list:
+      # UNmarking Asset as RawMaterial
       asset_obj.tags.remove(u'raw@material')
     
     if "announced_unit" in group_obj.member_of_names_list and title == "raw material":

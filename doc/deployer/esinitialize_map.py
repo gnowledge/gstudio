@@ -4,7 +4,11 @@ import sys
 import json
 # from elasticsearch import Elasticsearch
 from gnowsys_ndf.ndf.models import *
+<<<<<<< HEAD
 from gnowsys_ndf.local_settings import GSTUDIO_DOCUMENT_MAPPING
+=======
+from gnowsys_ndf.settings import GSTUDIO_DOCUMENT_MAPPING
+>>>>>>> 3be8cc3b19dfd83abb70d72039df767fcf3e3396
 
 # es = Elasticsearch("http://elsearch:changeit@gsearch:9200")
 

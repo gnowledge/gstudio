@@ -2918,6 +2918,13 @@ ul.jqtree-tree .jqtree-toggler {
                     border-bottom: 2px solid #9abfd9;
                     @include transition-prop(border-color);
 
+
+                        &:hover{
+                                li {
+                                    color:$primary-blue;
+                                }
+                        }
+
                     &.accordion-navigation {
                         position: relative;
                         padding-left:0px;
@@ -2946,7 +2953,6 @@ ul.jqtree-tree .jqtree-toggler {
                                 // //font-size: 14px;
                                 display: block;
                                 position: relative;
-                                display: none;
 
                                 i {
                                     display: none;
@@ -2958,16 +2964,20 @@ ul.jqtree-tree .jqtree-toggler {
 
                                     li {
                                         white-space: nowrap;
-                                        list-style: none;
+                                        list-style: inline-block;
                                         display: inline-block;
                                         margin: 0px 10px;
                                         cursor: pointer;
+                                        &:hover{
+                                            border-bottom:1px solid #9e2289;
+                                            color:$primary-orange;
+                                        }
                                     }
                                 }
                             }
                             &:hover {
                                 .edit_entity {
-                                    display: block;
+                                   // display: block;
                                 }
                             }
                         }
@@ -3552,9 +3562,9 @@ ul.jqtree-tree .jqtree-toggler {
     margin-left: 15px;
 }
 
-.activity-detail-content{
-    margin-left: 20px !important;
-}
+// .activity-detail-content{
+//     margin-left: 20px !important;
+// }
 
 .activity-detail-content #scstyle header{
     margin-top: 0px !important;
@@ -4206,10 +4216,13 @@ ul.nav_menu_1 {
                 font-weight: bold;
                 border-bottom: 3px solid $nav_menu_1_tab_border;
             }
+
         }
 
     }
 }
+
+
 
 .activity_sheet {
     background: rgba(231, 231, 231, 0.12);
@@ -4256,6 +4269,8 @@ ul.nav_menu_1 {
                         position: relative;
                         padding-left:0px;
 
+
+
                         &>a {
                             &:before {
                                 // content: '&#8250';
@@ -4289,6 +4304,7 @@ ul.nav_menu_1 {
 
                                 >.entity_actions {
                                     margin-bottom: 0px;
+
 
                                     li {
                                         white-space: nowrap;
@@ -4452,8 +4468,9 @@ ul.nav_menu_1 {
 .activity_page_rendered{
     //margin-top:10px;
     margin-left:20px;
-    max-width: 900px;
+    //max-width: 900px;
    // width:145%;
+   max-width:100%;
 }
 /* Rating css */
 
@@ -5206,6 +5223,8 @@ $module-card-lines-to-show: 3;
             }
         }
     }
+
+    
 }
 
 $nav_menu_1_color: #164a7b;
@@ -5214,6 +5233,8 @@ $nav_menu_1_tab_border: #a2238d;
 ul.nav_menu_1 {
     margin-bottom: 0px;
     background-color: $nav_menu_1_bg_color;
+    display:inline;
+    width:50%;
     >li {
             display: inline-block;
 
@@ -5232,9 +5253,39 @@ ul.nav_menu_1 {
                 border-bottom: 3px solid $nav_menu_1_tab_border;
             }
         }
-
     }
+
 }
+
+ul.authoring-tab{
+        background-color:$nav_menu_1_color;
+        margin-bottom: 0px;
+        display:inline;
+        width:50%;
+        >li {
+            display: inline-block;
+            
+                >a{
+                        list-style-type: none;
+                        margin-right:-4px;
+                        background-color:$nav_menu_1_color;
+                        padding: 12px 12px 9px;
+                        cursor: pointer;
+                        font-size: 18px;
+                        display: inline-block;
+                        letter-spacing: 0.8px;
+                        border-bottom: 3px solid transparent;
+                        color:#ffffff !important;
+                        &.selected, &:hover{
+                            border-bottom: 3px solid $nav_menu_1_tab_border;
+                        }
+                }
+            }
+}
+
+
+    
+
 
 .course-content {
     background: #fff;

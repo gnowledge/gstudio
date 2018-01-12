@@ -1,4 +1,5 @@
 {% extends "ndf/gbase.html" %}
+<<<<<<< HEAD
 {% block title %} Elastic Search {% endblock %}
 {% block body_content %}
 
@@ -96,4 +97,120 @@
 		{% endfor %}
 	</span>
 </div>
+=======
+{% load apply_eval from simple_filters %}
+{% block title %} Search {% endblock %}
+
+{% block body_content %}
+
+	<script type="text/javascript">
+		// hiding all top level search elements:
+		document.getElementById("search_text").style.display = "none";
+		document.getElementById("groupbox").style.display = "none";
+		document.getElementById("search-submit").style.display = "none";
+	</script>
+
+	<style>
+		ul.errorlist {display: none;}
+		h3 {text-align:center;}
+		p {text-align:center;}
+		div.pagination {display: block; width: 40%; margin: 0 auto; }
+		#grid {width: 200px; padding-top: 5px;}
+		#selid {width: 200px; padding-top: 5px}
+		#but { position:absolute;
+	  			top:50px;
+	   			right:0;}
+		#filter {
+			padding-top: 5px;
+		}
+		#ss {
+			padding-top: 5px; width:200px;
+		}
+	</style>
+
+	<div class="form_class"> 
+		<form action="" method="get">
+		<ul class="small-block-grid-1 medium-block-grid-3 large-block-grid-4">
+	    <li>{{form.query}}</li>
+	    <li id="grid">
+	    <select name="group">
+	    	{% for grname in grp %}
+	    		{% ifequal grname grpnam %}
+	    			<option value="{{grname}}" selected="selected">{{grpnam}}</option>
+	    		{% else %}
+	    			<option value="{{grname}}">{{grname}}</option>
+	    		{% endifequal %}
+	    	{% endfor %}
+	    </select>
+	    </li>
+	    <li id="ss">{{form.search_select}}</li>
+
+	    <div id="filter">
+	    	{% with '{"all": "All", "Author": "Users", "image": "Images", "video": "Video", "text": "Text", "audio": "Audio", "Page": "Page", "Group": "Courses"}'|apply_eval as additional_filters_dict %}
+		    	{% for k, v in additional_filters_dict.iteritems  %}
+				    <input type="checkbox" name="checks[]" value={{k}} {% if k in searchop %} checked {% endif %}/> {{v}}
+		    	{% endfor %}
+	    	{% endwith %}
+	    	{% comment %}
+				<!--			    
+			    <input type="checkbox" name="checks[]" value="all" {% if "all" in searchop %} checked {% endif %}/> All
+			    <input type="checkbox" name="checks[]" value="Author" {% if "Author" in searchop %} checked {% endif %} /> Users
+				<input type="checkbox" name="checks[]" value="image" {% if "image" in searchop %} checked {% endif %}/> Images
+				<input type="checkbox" name="checks[]" value="video" {% if "video" in searchop %} checked {% endif %}/> Video
+			    <input type="checkbox" name="checks[]" value="text" {% if "text" in searchop %} checked {% endif %}/> Text
+			    <input type="checkbox" name="checks[]" value="audio" {% if "audio" in searchop %} checked {% endif %}/> Audio
+			    <input type="checkbox" name="checks[]" value="Page" {% if "Page" in searchop %} checked {% endif %}/> Page
+			    <input type="checkbox" name="checks[]" value="Group" {% if "Group" in searchop %} checked {% endif %}/> Courses
+				-->
+	    	{% endcomment %}
+	    </div>
+	    
+	    <input type="submit" id="but" value="Search" />
+	    <a href="{% url 'get_advanced_search_form' %}">Advanced Search</a>
+	    </ul>
+	    </form>
+	</div> 
+
+	<br/> 
+
+	{% for c in alternate %}
+		<p>{{c|safe}}</p>
+	{% endfor %}
+
+	{% for c in header %}
+		<p>{{c|safe}}</p>
+	{% endfor %}
+
+	<div>
+	<ul class="small-block-grid-1 medium-block-grid-3 large-block-grid-4">
+	{% for each in content %}
+		{% if each.group_set.0 %}
+		<li class="card-image-wrapper">
+		{% include "ndf/card_gsearch.html" with node=each url_name="node_detail" first_arg=each.group_set.0 second_arg=each.id %}
+		</li>
+		{% else %}			<!-- sending the id of home as group id if group-set is empty-->
+		<li class="card-image-wrapper">
+		{% include "ndf/card_gsearch.html" with node=each url_name="node_detail" first_arg="5752ad5a2e01310a05dca583" second_arg=each.id %}
+		</li>
+		{% endif %}
+	{% endfor %}
+	</ul>
+
+	</div>
+
+	{% if content.paginator.num_pages > 1 %}
+		<div class="pagination">
+			<span class="step-links">	
+				{% for num in content.paginator.page_range %}
+				  {% ifequal num content.number %}
+				    <span class="current"><b>{{ num }}</b></span>
+				  {% else %}
+				    <a href="?page={{ num }}&query={{ request.GET.query }}&group={{ request.GET.group }}&search_select={{ request.GET.search_select }}{{ append_to_url }}">{{ num }}</a>
+				  {% endifequal %} 
+				{% endfor %}
+			</span>
+		</div>
+	{% endif %}
+
+>>>>>>> 3be8cc3b19dfd83abb70d72039df767fcf3e3396
 {% endblock %}

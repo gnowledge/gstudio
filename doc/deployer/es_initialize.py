@@ -4,18 +4,30 @@ import sys
 import json
 from elasticsearch import Elasticsearch
 from gnowsys_ndf.ndf.models import *
+<<<<<<< HEAD
 from gnowsys_ndf.settings import GSTUDIO_SITE_NAME
 from gnowsys_ndf.local_settings import GSTUDIO_DOCUMENT_MAPPING
+=======
+from gnowsys_ndf.settings import GSTUDIO_SITE_NAME, GSTUDIO_DOCUMENT_MAPPING
+>>>>>>> 3be8cc3b19dfd83abb70d72039df767fcf3e3396
 
 ##### use the below commented lines if you are working with Python 2.x   #####
 # reload(sys)  
 # sys.setdefaultencoding('UTF8')
 
+<<<<<<< HEAD
 es = Elasticsearch("http://elastic:changeme@gsearch:9200", timeout=100, retry_on_timeout=True)
 
 author_index = "author_" + GSTUDIO_SITE_NAME.lower()
 index = GSTUDIO_SITE_NAME.lower()
 gsystemtype_index = "node_type_" + GSTUDIO_SITE_NAME.lower()
+=======
+es = Elasticsearch("http://elsearch:changeit@gsearch:9200", timeout=30)
+
+author_index = "author_" + GSTUDIO_SITE_NAME
+index = GSTUDIO_SITE_NAME
+gsystemtype_index = "node_type_" + GSTUDIO_SITE_NAME
+>>>>>>> 3be8cc3b19dfd83abb70d72039df767fcf3e3396
 page_id = 0 
 
 def index_docs(all_docs):

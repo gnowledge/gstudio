@@ -5,14 +5,14 @@
 <script type="text/javascript" src="/static/ndf/bower_components/MathJax/MathJax.js?config=TeX-AMS-MML_HTMLorMML" async></script>
 {% endblock head %}
 
-<div class="row course_creator">
+<div class="row course_creator" {% if title == 'unit_authoring' %} class="small-10 columns" style="margin-left:150px; width:79.4%" {% endif %}>
     <div class="small-12 columns">
         <div class="course_editor ">
 
             <!-- Left PANEL -->
             <div class="course_tree">
-                <dl class="accordion course-lessons" data-accordion role="tablist">
-                </dl>
+                    <dl class="accordion course-lessons" data-accordion role="tablist">
+                    </dl>
                 <a class="button-hollow-grey add-lesson add-lesson-top-margin" data-reveal-id="add-lesson-reveal">
                     {% if not unit_obj.project_config.section_name %}{% trans "Add Lesson" %}{% else %}{% trans 'Add' %} {{unit_obj.project_config.section_name}} {% endif %}
                 </a>

@@ -244,7 +244,11 @@ def get_search(request):
 		# esearch.py sends results to -> sform.html sends one result at a time to -> card_gsearch.html for rendering of cards
 		#if a card is clicked, the result's group id and node id is sent to -> node.py(node_detail function) which renders the media
 		# by sending mongoDB node to ->result_detailed_view.html
-		return render(request, 'ndf/sform.html', {'form': form, 'grpnam': group, 'grp': GROUP_CHOICES, 'searchop': search_filter, 'header':res_list, 'alternate': altinfo_list ,'content': results, 'append_to_url':append_to_url})
+
+		return render(request, 'ndf/sform.html', {
+					'form': form, 'grpnam': group, 'grp': GROUP_CHOICES, 'searchop': search_filter,
+					'header':res_list, 'alternate': altinfo_list ,'content': results, 'append_to_url':append_to_url })
+
 
 	return render(request, 'ndf/sform.html', {'form': form, 'grp': GROUP_CHOICES, 'searchop': []})
 	
