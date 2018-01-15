@@ -28689,6 +28689,7 @@ ul.horizontal_tabs_gstudio > li.sub_group_action:hover ul {
 .group_content .group_banner {
   transition: all 1s ease;
   -webkit-transition: all 1s ease;
+  height: 200px;
   overflow-y: auto;
   background: url("/static/ndf/images/course-cover.png") no-repeat;
   background-size: 100% 100%;
