@@ -1654,6 +1654,7 @@ class EventGroupCreateEditHandler(View):
             nodes_list = [str(g_obj.name.strip().lower()) for g_obj in available_nodes]
 
         title = action + ' ' + spl_group_type
+        print spl_group_type
 
         # In the case of need, we can simply replace:
         # "ndf/create_group.html" with "ndf/edit_group.html"

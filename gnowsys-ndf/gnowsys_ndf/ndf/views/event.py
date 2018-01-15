@@ -23,11 +23,12 @@ except ImportError:  # old pymongo
 
 ''' -- imports from application folders/files -- '''
 from gnowsys_ndf.ndf.models import Node, AttributeType, RelationType
-from gnowsys_ndf.ndf.models import node_collection,Group
+from gnowsys_ndf.ndf.models import node_collection,Group, GSystemType
 from gnowsys_ndf.ndf.views.methods import get_node_common_fields, parse_template_data
 from gnowsys_ndf.ndf.views.methods import get_property_order_with_value,get_execution_time
-from gnowsys_ndf.ndf.views.methods import create_gattribute, create_grelation
+from gnowsys_ndf.ndf.views.methods import create_gattribute, create_grelation, get_group_name_id
 from gnowsys_ndf.notification import models as notification
+
 
 ''' -- imports for bigbluebutton wrappers -- '''
 from bbb_api import *
@@ -38,8 +39,8 @@ from gnowsys_ndf.local_settings import *
 @get_execution_time
 @login_required
 def event(request, group_id):
- 
- if ObjectId.is_valid(group_id) is False :
+  '''
+  if ObjectId.is_valid(group_id) is False :
     group_ins = node_collection.one({'_type': "Group","name": group_id})
     auth = node_collection.one({'_type': 'Author', 'name': unicode(request.user.username) })
     if group_ins:
@@ -48,57 +49,22 @@ def event(request, group_id):
       auth = node_collection.one({'_type': 'Author', 'name': unicode(request.user.username) })
       if auth :
         group_id = str(auth._id)
- else :
+  else :
     pass
+  '''
 
- #view written just to show the landing page of the events
- group_inverse_rel_id = [] 
- Event_app = True
- Group_type=node_collection.one({'_id':ObjectId(group_id)})
- for i in Group_type.relation_set:
-     if unicode("group_of") in i.keys():
-        group_inverse_rel_id = i['group_of']
- Group_name = node_collection.one({'_type':'GSystem','_id':{'$in':group_inverse_rel_id}})
- Eventtype='Eventtype'
- if Group_name:
+  group_obj = get_group_name_id(group_id, get_obj=True)
+  group_id  = group_obj._id
+  grp_gst_name, grp_gst_id = GSystemType.get_gst_name_id("Group")
+  app_collection_set=node_collection.find({'member_of': grp_gst_id})
 
-    if (any( unicode('has_group') in d for d in Group_name.relation_set)) == True:
-         Eventtype='CollegeEvents'     
-    else:
-         Eventtype='Eventtype'
-      
- Glisttype=node_collection.find({"_type": "GSystemType", "name":"GList"})
- #bug
- #Event_Types = node_collection.one({"member_of":ObjectId(Glisttype[0]["_id"]),"name":"Eventtype"},{'collection_set': 1})
- #buggy
- Event_Types = node_collection.one({"member_of":ObjectId(Glisttype[0]["_id"]),"name":unicode(Eventtype)},{'collection_set': 1})
- 
- app_collection_set=[]
- Mis_admin_list=[]
- #check for the mis group Admin
- #check for exam session to be created only by the Mis_Admin
+  print app_collection_set[1]
 
- Add=""
- Mis_admin=node_collection.one({"_type":"Group","name":"MIS_admin"})
- if  Mis_admin:
-    Mis_admin_list=Mis_admin.group_admin
-    Mis_admin_list.append(Mis_admin.created_by)
-    if request.user.id in Mis_admin_list:
-        Add="Allow"  
-    else: 
-        Add= "Stop"
- else:
-    Add="Stop"       
-
- if Event_Types:
-    for eachset in Event_Types.collection_set:
-          app_collection_set.append(node_collection.one({"_id": eachset}, {'_id': 1, 'name': 1, 'type_of': 1}))      
- return render_to_response('ndf/event.html',{'app_collection_set':app_collection_set,
+  app_collection_set=None
+  return render_to_response('ndf/gevent.html',{'events':app_collection_set,
                                              'groupid':group_id,
                                              'group_id':group_id,
                                              'group_name':group_id,
-                                             'Event_app':Event_app,
-                                             'Add':Add
                                             },
                               context_instance = RequestContext(request)
                           )
