@@ -26,7 +26,7 @@
 			{% endif %}
 			{% if request.user.is_superuser or user_grp_count.drafts > 0  %}
 			<a href="{% url 'explore_drafts' %}" class="secondary-header-tabs {%if title == 'drafts'%} active{% endif %}">
-				{% trans "Drafts Courses" %}
+				{% trans "Draft Courses" %}
 			</a>
 			{% endif %}
 

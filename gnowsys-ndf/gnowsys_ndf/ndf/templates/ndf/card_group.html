@@ -56,9 +56,8 @@
                     Points :<a class="unit-card-analytics-points">  {{get_unit_points}} </a>
                     <a onclick="show_my_performance($(this))" data-node-id = "{{node.pk}}" class="right unit-card-analytics"><i class="fa fa-eye" aria-hidden="true"></i> View details</a>
                 {% else %} 
-                    {% if prevent_click %}
+                    
                         <a href="{% url url_name first_arg %}" class="view_unit">{% trans "View" %}</a>
-                    {% endif %}
                     {% if "base_unit" not in node.member_of_names_list %}
                         <div class="right">
                         {% if not no_enroll and not is_gstaff %}

@@ -2,7 +2,7 @@
 {% load i18n %}
 {% load check_is_gstaff from ndf_tags %}
 
-{% block title %} {{title}} {% endblock %}
+{% block title %}  {% if title == "drafts" %} Draft Courses {% elif title == "courses" %} Courses {% else %} {{title}} {% endif %} {% endblock %}
 
 {% block body_content %}
 {% check_is_gstaff group_id request.user as is_gstaff %}
