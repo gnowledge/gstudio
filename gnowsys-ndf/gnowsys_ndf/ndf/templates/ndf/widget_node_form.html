@@ -1,46 +1,46 @@
 {% load i18n %}
 
 <div class="row group_content">
-    <div class="small-12 columns  group_sections_content">
-        <form enctype="multipart/form-data" method="post" action="{{post_url}}" class="node-create-edit-form">
+    <div class="small-12 medium-12 large-12 columns  group_sections_content">
+        <form enctype="multipart/form-data" method="post" action="{{post_url}}" class="node-create-edit-form small-12  medium-10 large-10 columns small-centered medium-centered ">
             {% csrf_token %}
             <!-- _id -->
             <input type="hidden" name="_id" value="{{node_obj.pk}}">
 
             <!-- name -->
             <div>
-                <div class="left">
+                <div class="left small-1 medium-1 large-1 columns">
                 <h5>{% trans "Name" %}</h5>
                 <div class="gray-text"></div>
                 </div>
-                <div class="small-11 medium-11 large-11 columns">
+                <div class="small-11 medium-11 large-11 columns small-centered medium-centered">
                     <input name="name" type="text" class="node_name" style="margin-top:11px;margin-left:40px" placeholder="Enter Name"  
                     value="{{node_obj.name|safe}}"/>
                     <label class="node_name_empty hide" style="color:red">{% trans "Please enter Name" %}</label>
 
                 </div>
-                <br><br><br>
+                <br>
                 {% if not no_altnames %}
-                <div class="left">
+                <div class="left small-1 medium-1 large-1 columns">
                 <h5>{% trans "Display Name" %}</h5>
                 <div class="gray-text"></div>
                 </div>
-                <div class="small-11 medium-11 large-11 columns">
-                    <input name="altnames" type="text" class="orange-button node_altnames" style="margin-top:11px;margin-left:40px" placeholder="Enter Display Name"  
+                <div class="small-11 medium-11 large-11 columns small-centered medium-centered">
+                    <input name="altnames" type="text" class="orange-button node_altnames" style="margin-top:11px;" placeholder="Enter Display Name"  
                     value="{{node_obj.altnames}}"/>
 
                 </div>
                 {% endif %}
                 {{source_obj.name}}
             </div>
-
+            <br>
 
             <!-- content -->
-            <div>
-                <div class="left">
+            <div style="margin-top:10px;">
+                <div class="left small-1 medium-1 large-1 columns small-centered medium-centered">
                 <h5>{% trans "Description" %}</h5>
                 </div><br/> 
-                <div class="left" style="width:100%;">
+                <div class="left small-11 medium-11 large-11 columns" style="width:100%;">
                     {% include "ndf/html_editor.html" with var_name="content" var_value=node_obj.content node_id=node_obj.pk ckeditor_toolbar=editor_type %}
                     <br/>
                 </div>
@@ -72,7 +72,7 @@
 
             {% endfor %}
             <div class="row" style="margin-left: 2px;">
-                <input type="submit" class="button-save-new" value="Save" style="margin:20px 0px 20px 0px;"/>
+                <input type="submit" class="button-save-new" value="Save" style="margin:30px 30px 2px 0px;"/>
 
                 {% if cancel_url %}
                     <button class="button-cancel-new">
