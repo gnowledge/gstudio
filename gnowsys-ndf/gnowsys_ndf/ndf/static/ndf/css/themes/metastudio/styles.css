@@ -30379,3 +30379,26 @@ ul.horizontal_tabs_gstudio > li.sub_group_action:hover ul {
   background-color: #fff;
   color: #912a7d;
 }
+
+/*  Buttons custom css */
+/* line 7203, ../../../scss/_app_styles.scss */
+.secondary-header-tabs {
+  color: #719dc7;
+  font-weight: 400;
+  padding: 14px 10px 3px 10px;
+  cursor: pointer;
+  transition: color 1s ease, border-color 1s ease;
+  -webkit-transition: color 1s ease, border-color 1s ease;
+  display: inline-block;
+}
+/* line 7212, ../../../scss/_app_styles.scss */
+.secondary-header-tabs:hover {
+  color: #164A7B;
+}
+/* line 7216, ../../../scss/_app_styles.scss */
+.secondary-header-tabs.active {
+  color: #164A7B;
+  border-bottom: 2px solid #164A7B;
+  padding-bottom: 14px;
+  font-weight: 600;
+}
