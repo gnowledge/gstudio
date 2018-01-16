@@ -59,7 +59,7 @@ def event(request, group_id):
   app_collection_set=node_collection.find({'member_of': grp_gst_id})
 
   print app_collection_set[1]
-
+  
   app_collection_set=None
   return render_to_response('ndf/gevent.html',{'events':app_collection_set,
                                              'groupid':group_id,

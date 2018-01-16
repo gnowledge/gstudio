@@ -3858,13 +3858,10 @@ def assets(request, group_id, asset_id=None,page_no=1):
     group_obj = get_group_name_id(group_id, get_obj=True)
     asset_gst_name, asset_gst_id = GSystemType.get_gst_name_id("Asset")
     from gnowsys_ndf.settings import GSTUDIO_NO_OF_OBJS_PP
-<<<<<<< HEAD
-    template = 'ndf/gevent_base.html'
-    gstaff_access = check_is_gstaff(group_id,request.user)
-=======
+
     #template = 'ndf/gevent_base.html'
     template = 'ndf/lms.html'
->>>>>>> 5b588788a0abc662af47a7b2ed4e2845a974a19e
+
     if asset_id:
         asset_obj = node_collection.one({'_id': ObjectId(asset_id)})
         asset_content_list = get_relation_value(ObjectId(asset_obj._id),'has_assetcontent')
