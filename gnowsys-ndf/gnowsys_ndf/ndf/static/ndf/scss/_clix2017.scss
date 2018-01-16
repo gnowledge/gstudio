@@ -5165,7 +5165,7 @@ $module-card-lines-to-show: 3;
                 margin-left: 40px;
                 border-radius: 8px 0px 0px 8px;
                 transition: border-radius .2s;
-                text-shadow: 3px 2px #164a7b;
+                text-shadow: -1px -1px 8px #000, 1px -1px 8px #000, -1px 1px 8px #000, 1px 1px 0 #000;
             }
 
             .right-margin{
