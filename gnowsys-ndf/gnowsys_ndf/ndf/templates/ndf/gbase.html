@@ -74,7 +74,29 @@
 
     {% block extended_header %}{% endblock %}
 
-    {% block body_content %} {% endblock %}
+
+    <style type="text/css">
+             
+            html,
+            body {
+              margin: 0;
+              padding: 0;
+              height: 100%;
+            }           
+            #bodywrapper {
+              min-height: 100%;
+              position: relative;
+            }
+
+
+    </style>
+    {% block body_content %}
+
+    <div id="bodywrapper">
+
+    </div>
+     {% endblock %}
+    
   <!-- JS -->
   <!--<script src="/static/ndf/js/app.js"></script>-->
   <script src="/static/ndf/bower_components/foundation/js/foundation.min.js"></script>
@@ -203,8 +225,24 @@
     {% block script %} {% endblock %}
   </script>
 
-    {% if not no_footer %}
-        {% include 'ndf/footer_clix.html' %}
-    {% endif %}
+
 </body>
+
+    
+    <style type="text/css">
+        
+            #footer {
+              margin-top:10px;
+              height: auto;
+              bottom: 0;
+              left: 0;
+              clear:both;
+
+            }
+    </style>
+    {% if not no_footer %}
+    <div id="footer">
+        {% include 'ndf/footer_clix.html' %}
+     </div>   
+    {% endif %}
 </html>
