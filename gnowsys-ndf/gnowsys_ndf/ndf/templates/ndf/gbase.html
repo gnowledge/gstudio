@@ -74,27 +74,9 @@
 
     {% block extended_header %}{% endblock %}
 
-
-    <style type="text/css">
-             
-            html,
-            body {
-              margin: 0;
-              padding: 0;
-              height: 100%;
-            }           
-            #bodywrapper {
-              min-height: 100%;
-              position: relative;
-            }
-
-
-    </style>
     {% block body_content %}
 
-    <div id="bodywrapper">
-
-    </div>
+    
      {% endblock %}
     
   <!-- JS -->
@@ -226,13 +208,23 @@
   </script>
 
 
-</body>
-
-    
     <style type="text/css">
-        
+            
+            * {
+              margin: 0;
+            }
+            html, body {
+              height: 100%;
+            }
+
+            .group_sections_content:after {
+                  content: "";
+                  display: block;
+                  height: 180px;
+                }
+
             #footer {
-              margin-top:-80px;
+              height: 180px;
               position: relative;
               bottom: 0;
               left: 0;
@@ -246,4 +238,27 @@
         {% include 'ndf/footer_clix.html' %}
      </div>   
     {% endif %}
+
+        
+    <script type="text/javascript">
+      
+       $(window).bind("load", function () {
+        var footer = $("#footer");
+        var pos = footer.position();
+        var height = $(window).height();
+        height = height - pos.top;
+        height = height - footer.height();
+        if (height > 0) {
+            footer.css({
+                'margin-top': height + 'px'
+            });
+        }
+    });
+  
+
+</script>
+
+</body>
+
+    
 </html>

@@ -2,87 +2,193 @@
 {% load get_latest_git_hash  from simple_filters %}
 {% load ndf_tags %}
 
-    
+<style type="text/css">
 
-	{% get_gstudio_footer_links  as footer_links %}
-
-  <div class="clr4 small-12 medium-12 columns">
-    <div class="bo-wrap">
-      
-      <div class="small-8 meduim-8 columns">
-      <p style="color:#C0C0C0; margin-bottom: -2px;"> A collabration of, </p>
-        <div class="bo-footer">
-          <div class="bo-footer-social">
-            <div class="bo-wrap clr3">
-              <div class="bo-footer">
-                <div class="bo-footer-smap">
-                  {% for each in footer_links %}
-                  {% for path, link in each.items %}
-                  <a href="{{link}}" target="_blank">
-                    <img src="{{path}}" class="bo-footer-images" />
-                  </a>              
-                  {% endfor %}
-                  {% endfor %}
-                </div>
-                <div class="clearfix"></div>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>  
-
-    <div class="small-4 medium-4 columns" style="margin-top: 20px;">
-      
-      <ul class="small-4 medium-2 columns" style="list-style: none; text-align: left; width:110px">
-    
-        <li class="bo-footer"><a href="#">About</a></li> 
-        <li class="bo-footer"><a href="#">Partners</a></li>
-        <li class="bo-footer"><a href="#">Groups</a></li>
-        <li class="bo-footer"><a href="#">Contribute</a></li>
-        <li class="bo-footer"><a href="#">Credits</a></li>
-      </ul> 
-
-      <ul class="small-4 medium-2 columns" style="list-style: none; text-align: left; left; width:130px">
-  
-        <li class="bo-footer"><a href="#">Tips</a></li>
-        <li class="bo-footer"><a href="#">FAQs</a></li>
-        <li class="bo-footer"><a href="#">Feedback</a></li>
-        <li class="bo-footer"><a href="#">Contact us</a></li>
-      
-      </ul>
+/* responsive footer */
+.clearfix {clear: both;}
 
 
-    </div>
-  </div>
+.clr1 {background: #FFFFFF; color: #333743;}
+.clr2 {background: #F1F3F5; color: #8F94A3;}
+.clr3 {background: rgba(221, 221, 221, 0.18); color: #BDC3CF;}
+.clr4 {background: rgba(221, 221, 221, 0.18); color: #E3E7F2;}
+.clr5 {color: #F1F3F5;}
+.clr6 {color: #39B5A1;}
+.clr7 {color: #D45245;}
 
-    <span style="color:#A9A9A9"> Powered by gstudio built at the Gnowledge lab, Homi Bhabha......</span>
-    <hr/>
-    <span style="color:#A9A9A9"> Terms of service</span>&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:#A9A9A9"> Privacy policy</span>
-    </div>
 
-</div>    
 
-<style type="text/css"></style>
-   
+/*##### Footer Structure #####*/
+.bo-wrap {
+    clear:both; 
+    width: auto;
+}
+.bo-footer {
+  clear:both;
+  width: auto;
+  padding: 5px;
+  width: 960px;
+  margin: 0 auto;
+}
 
-<script type="text/javascript">
-  
-   $(window).bind("load", function () {
-    var footer = $("#footer");
-    var pos = footer.position();
-    var height = $(window).height();
-    height = height - pos.top;
-    height = height - footer.height();
-    if (height > 0) {
-        footer.css({
-            'margin-top': height + 'px'
-        });
+.bo-footer-social {
+  text-align: left; 
+  line-height: 1px;
+  padding: 10px 10px 10px 10px;
+
+      &>a{
+            color:$primary-orange;
+            word-spacing:8px;
+            &:hover {
+            color: $primary-orange;
+            border-bottom: 3px solid $secondary-orange;
+
+        }
     }
-});
+            
+}
+
+.bo-footer-copyright{
+    &>a{
+            transition: link-color 0.15s ease-in-out 0s,border 0.15s ease-in-out 0s;
+            border-bottom: none;
+            color: #777;
+            text-decoration: none !important;
+            word-spacing:3px;
+            &:hover {
+            color:#777;
+            border-bottom: 3px solid hsla(316, 88%, 42%, 1);
+        }
+    }
+}
+
+.bo-footer-smap {
+  width: 670px;
+  float: left;
+  padding: 5px 10px;
+  text-align: left;
+  font-size: 18px;
+  word-spacing:20px;
+}
+
+.bo-footer-images{
+    display: inline;
+    max-width:120px;
+    max-height:95px;
+    width: auto;
+    height: auto; 
+    vertical-align: bottom;
+}
+
+.bo-footer-uonline {
+  width: 300px; /* Account for margins + border values */
+  float: left;
+  padding: 5px 10px;
+  text-align: center;
+}
+
+.bo-footer-power {
+  width: 300px;
+  padding: 5px 10px;
+  float: left;
+  text-align: right;
+  font-size: 14px;
+  color: #636A7D;
+  vertical-align: middle;
+}
+
+
+
+
+/*##### Footer Responsive #####*/
+/* for 980px or less */
+@media screen and (max-width: 980px) {
   
+  .bo-footer {
+    width: 95%;
+    padding: 1% 2%;
+  }
+  .bo-footer-smap {
+    width: 33%;
+    padding: 1% 2%;
+  }
+  .bo-footer-uonline {
+    width: 46%;
+    padding: 1% 2%;
+    float: right;
+    text-align: right;
+  }
+  
+  .bo-footer-power {
+    clear: both;
+    padding: 1% 2%;
+    width: auto;
+    float: none;
+    text-align: center;
+  }
+}
+/* for 700px or less */
+@media screen and (max-width: 600px) {
 
-</script>
- 
+  .bo-footer-smap {
+    width: auto; 
+    float: none;
+    text-align: center;
+  }
+  
+  .bo-footer-uonline {
+    width: auto;
+    float: none;
+    text-align: center;
+  }
+  
+  .bo-footer-power {
+    width: auto;
+    float: none;
+    text-align: center;
+  }
 
+}
+
+</style>
+
+
+  {% get_gstudio_footer_links  as footer_links %}
+
+    <div class="bo-wrap clr4" style="">
+      <div class="bo-footer">
+        <div class="bo-footer-social">
+          <a href="{{site.ABOUT}}" target="_blank">About </a>
+          <a href="{{site.CONTACT}}" target="_blank">Contact </a>
+          <a href="http://www.tiss.edu/disclaimer/" target="_blank">Disclaimer </a>
+        </div>
+      </div>
+    </div>
+    <div class="bo-wrap clr3">
+      <div class="bo-footer">
+        <div class="bo-footer-smap">
+          {% for each in footer_links %}
+            {% for path, link in each.items %}
+          <a href="{{link}}" target="_blank">
+                  <img src="{{path}}" class="bo-footer-images" />
+              </a>              
+          {% endfor %}
+          {% endfor %}
+        </div>
+
+
+        <div class="clearfix"></div>
+      </div>
+    </div>
+    <div class="bo-wrap clr4">
+      <div class="bo-footer">
+        <div class="bo-footer-copyright">
+          <a href="">Privacy</a>
+          <a href="">Terms Of Use</a>
+          {% get_latest_git_hash as git_commit_hash %}
+          <a href="https://gitlab.com/gnowledge/gstudio/tree/{{git_commit_hash}}" target="_blank">Version</a>
+        </div>
+      </div>
+    </div>
 
 
