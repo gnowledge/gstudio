@@ -9,7 +9,6 @@
 {% elif first_arg %}
     <a href='{% url url_name first_arg %}{{search_url_text|safe}}'>
 {% endif %}
-
 <div class="module_card">
     <div class="card_banner">
         {% get_relation_value node.pk 'has_banner_pic' as grel_dict %}
@@ -18,16 +17,13 @@
         {% else %}
             <img  src="/static/ndf/images/module-card.png"/></img>
         {% endif %}
-            <h4 class="card_title" title="{% firstof node.altnames node.name %} ">
-                {% firstof node.altnames|truncatechars:50 node.name|truncatechars:50  %}
-            </h4>
     {% get_dict_from_list_of_dicts node.attribute_set as node_attrs %}
     </div>
     <div class="card_summary">
         <div class="card_section">
-            <p class="module_brief">
-                {{node.content|safe|striptags|truncatechars:100}}
-            </p>
+            <h4 class="card_title" title="{% firstof node.altnames node.name %} ">
+                {% firstof node.altnames|truncatechars:50 node.name|truncatechars:50  %}
+            </h4>
         </div>
         <div class="card_section">
             <span class="card_label">
