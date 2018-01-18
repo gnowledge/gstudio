@@ -46,7 +46,7 @@
           {% firstof group_object.altnames group_object.name  %}
 
             {% if "QuizItemEvent" in node.member_of_names_list or "QuizItem" in node.member_of_names_list%}
-              <a href="{% url 'course_quiz_data' group_id %}" class="header_text_block right">RESULTS</a>
+              <a href="{% url 'course_quiz_data' group_id %}" class="header_text_block right"><span> Results</span></a>
             {% endif %}
         </div>
 
@@ -361,6 +361,13 @@
 
   // start of document.ready()
   $(document).ready(function(event) {
+
+      var $container = $('.course_tree'),
+      $scrollTo = $('.activity-title').children('li.active');
+      $container.scrollTop(
+          $scrollTo.offset().top - $container.offset().top- $container.offset().top + $container.scrollTop()
+      );
+
     var iframes = document.getElementsByTagName('iframe');
     var key = 'assessment.Bank';
 

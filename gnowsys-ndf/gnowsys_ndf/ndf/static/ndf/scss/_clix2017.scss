@@ -4852,10 +4852,13 @@ $module-card-lines-to-show: 3;
     .card_title {
         display: block;
         font-size: 32px;
+        width:230px;
         font-weight: 600;
         text-align: center;
         margin: 0px auto;
         letter-spacing: 1px;
+        //font-size: 32px;
+        font-size: 1.4vw;
     }
 
     &.animated_card {
@@ -4991,7 +4994,7 @@ $module-card-lines-to-show: 3;
                 margin-left: 40px;
                 border-radius: 8px 0px 0px 8px;
                 transition: border-radius .2s;
-                text-shadow: 3px 2px #164a7b;
+                text-shadow: -1px -1px 8px #000, 1px -1px 8px #000, -1px 1px 8px #000, 1px 1px 0 #000;
             }
 
             .right-margin{
