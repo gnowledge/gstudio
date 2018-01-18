@@ -186,7 +186,8 @@ def unit_detail(request, group_id):
 
     unit_structure = get_unit_hierarchy(unit_group_obj, request.LANGUAGE_CODE)
     # template = "ndf/unit_structure.html"
-    template = 'ndf/gevent_base.html'
+    # template = 'ndf/gevent_base.html'
+    template = 'ndf/lms.html'
 
     # print unit_structure
     req_context = RequestContext(request, {
@@ -195,6 +196,7 @@ def unit_detail(request, group_id):
                                 'group_id': group_id,
                                 'groupid': group_id,
                                 'unit_obj': unit_group_obj,
+                                'group_obj': unit_group_obj,
                                 'unit_structure': json.dumps(unit_structure)
                             })
     return render_to_response(template, req_context)
