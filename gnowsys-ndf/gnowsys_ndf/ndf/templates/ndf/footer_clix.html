@@ -2,32 +2,15 @@
 {% load get_latest_git_hash  from simple_filters %}
 {% load ndf_tags %}
 
-<style type="text/css">
-
-dt {
-    float: left;
-}
-
-.container{
-      position: relative;
-    max-width: 1260px;
-    margin: 0 auto;
-}
-.footer-meta-list-treehouse {
-    width: 34%;
-    padding-left: 0;
-}
-
-</style>
-
     
 
 	{% get_gstudio_footer_links  as footer_links %}
-  <div class="container">
+
   <div class="clr4 small-12 medium-12 columns">
-    <div class="bo-wrap " style="">
-      <p style="color:#C0C0C0"> A collabration of, </p>
+    <div class="bo-wrap">
+      
       <div class="small-8 meduim-8 columns">
+      <p style="color:#C0C0C0; margin-bottom: -2px;"> A collabration of, </p>
         <div class="bo-footer">
           <div class="bo-footer-social">
             <div class="bo-wrap clr3">
@@ -46,52 +29,40 @@ dt {
             </div>
           </div>
         </div>
-      </div> 
-    </div>  
+      </div>  
 
-    <div class="small-4 medium-4 columns">
-      <div class="bo-wrap ">
-		   <!-- <div class="bo-footer">
-		    <div class="bo-footer-copyright">
-		      <a href="">Privacy</a>
-		      <a href="">Terms Of Use</a>
-		      {% get_latest_git_hash as git_commit_hash %}
-		      <a href="https://gitlab.com/gnowledge/gstudio/tree/{{git_commit_hash}}" target="_blank">Version</a>
-		    </div>
-		  </div> -->
-      <div class="small-2 columns">
-      <dl>
+    <div class="small-4 medium-4 columns" style="margin-top: 20px;">
+      
+      <ul class="small-4 medium-2 columns" style="list-style: none; text-align: left; width:110px">
     
-        <dt class="bo-footer"><a href="#">About</a></dt> 
-        <dt class="bo-footer"><a href="#">Partners</a></dt>
-        <dt class="bo-footer"><a href="#">Groups</a></dt>
-        <dt class="bo-footer"><a href="#">Contribute</a></dt>
-        <dt class="bo-footer"><a href="#">Credits</a></dt>
-      </dl> 
-      </div>
-      <div class="small-2">
-      <dl > 
-        <dt class="bo-footer"><a href="#">Tips</a></dt>
-        <dt class="bo-footer"><a href="#">FAQs</a></dt>
-        <dt class="bo-footer"><a href="#">Feedback</a></dt>
-        <dt class="bo-footer"><a href="#">Contact us</a></dt>
-      </dl>
-      </div>
+        <li class="bo-footer"><a href="#">About</a></li> 
+        <li class="bo-footer"><a href="#">Partners</a></li>
+        <li class="bo-footer"><a href="#">Groups</a></li>
+        <li class="bo-footer"><a href="#">Contribute</a></li>
+        <li class="bo-footer"><a href="#">Credits</a></li>
+      </ul> 
+
+      <ul class="small-4 medium-2 columns" style="list-style: none; text-align: left; left; width:130px">
+  
+        <li class="bo-footer"><a href="#">Tips</a></li>
+        <li class="bo-footer"><a href="#">FAQs</a></li>
+        <li class="bo-footer"><a href="#">Feedback</a></li>
+        <li class="bo-footer"><a href="#">Contact us</a></li>
+      
+      </ul>
 
 
     </div>
   </div>
 
-    </br>
-
-    <p style="color:#A9A9A9"> Powered by gstudio built at the Gnowledge lab, Homi Bhabha......</p>
-    </hr>
-    <span> Terms of service</span><span> Privacy policy</span>
+    <span style="color:#A9A9A9"> Powered by gstudio built at the Gnowledge lab, Homi Bhabha......</span>
+    <hr/>
+    <span style="color:#A9A9A9"> Terms of service</span>&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:#A9A9A9"> Privacy policy</span>
     </div>
 
 </div>    
 
-
+<style type="text/css"></style>
    
 
 <script type="text/javascript">

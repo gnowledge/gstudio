@@ -31219,13 +31219,13 @@ button[disabled], .button.disabled, .button[disabled] {
 
 /* line 8104, ../../../scss/_app_styles.scss */
 .clr3 {
-  background: rgba(221, 221, 221, 0.18);
-  color: #BDC3CF;
+  background: #fdfbfb;
+  color: #ffffff;
 }
 
 /* line 8105, ../../../scss/_app_styles.scss */
 .clr4 {
-  background: rgba(221, 221, 221, 0.18);
+  background: rgba(203, 202, 202, 0.18);
   color: #E3E7F2;
 }
 
@@ -31245,20 +31245,19 @@ button[disabled], .button.disabled, .button[disabled] {
 }
 
 /*##### Footer Structure #####*/
-/* line 8113, ../../../scss/_app_styles.scss */
-.bo-wrap {
-  clear: both;
-  width: auto;
-}
+/*.bo-wrap {
+    clear:both; 
+    width: auto;
 
-/* line 8117, ../../../scss/_app_styles.scss */
+}*/
+/* line 8118, ../../../scss/_app_styles.scss */
 .bo-footer {
   clear: both;
   padding: 5px;
-  /*width: 700px;*/
-  margin: 2 auto;
-  font-weight: bold;
-  font-size: 12px;
+  font-family: Medium-65,Helvetica Neue,Helvetica,Arial,sans-serif;
+  font-weight: 400;
+  text-align: left;
+  font-size: 18px;
 }
 
 /* line 8127, ../../../scss/_app_styles.scss */
@@ -31294,7 +31293,7 @@ button[disabled], .button.disabled, .button[disabled] {
 
 /* line 8158, ../../../scss/_app_styles.scss */
 .bo-footer-smap {
-  width: 670px;
+  width: 650px;
   float: left;
   padding: 5px 10px;
   text-align: left;
@@ -31332,22 +31331,31 @@ button[disabled], .button.disabled, .button[disabled] {
   vertical-align: middle;
 }
 
+/* line 8192, ../../../scss/_app_styles.scss */
+hr {
+  margin: 3px;
+  height: 1px;
+  color: #9fc1cb;
+  background-color: #9fc1cb;
+  border: none;
+}
+
 /*##### Footer Responsive #####*/
 /* for 980px or less */
 @media screen and (max-width: 980px) {
-  /* line 8199, ../../../scss/_app_styles.scss */
+  /* line 8206, ../../../scss/_app_styles.scss */
   .bo-footer {
-    width: 95%;
+    width: 100%;
     padding: 1% 2%;
   }
 
-  /* line 8203, ../../../scss/_app_styles.scss */
+  /* line 8210, ../../../scss/_app_styles.scss */
   .bo-footer-smap {
     width: 33%;
     padding: 1% 2%;
   }
 
-  /* line 8207, ../../../scss/_app_styles.scss */
+  /* line 8214, ../../../scss/_app_styles.scss */
   .bo-footer-uonline {
     width: 46%;
     padding: 1% 2%;
@@ -31355,7 +31363,7 @@ button[disabled], .button.disabled, .button[disabled] {
     text-align: right;
   }
 
-  /* line 8214, ../../../scss/_app_styles.scss */
+  /* line 8221, ../../../scss/_app_styles.scss */
   .bo-footer-power {
     clear: both;
     padding: 1% 2%;
@@ -31366,21 +31374,21 @@ button[disabled], .button.disabled, .button[disabled] {
 }
 /* for 700px or less */
 @media screen and (max-width: 600px) {
-  /* line 8225, ../../../scss/_app_styles.scss */
+  /* line 8232, ../../../scss/_app_styles.scss */
   .bo-footer-smap {
     width: auto;
     float: none;
     text-align: center;
   }
 
-  /* line 8231, ../../../scss/_app_styles.scss */
+  /* line 8238, ../../../scss/_app_styles.scss */
   .bo-footer-uonline {
     width: auto;
     float: none;
     text-align: center;
   }
 
-  /* line 8237, ../../../scss/_app_styles.scss */
+  /* line 8244, ../../../scss/_app_styles.scss */
   .bo-footer-power {
     width: auto;
     float: none;
