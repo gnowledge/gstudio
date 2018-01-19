@@ -75,7 +75,7 @@
 
 
 <!-- <meta charset='utf-8' /> -->
-<link href='/static/ndf/bower_components/fullcalendar/dist/fullcalendar.min.css' rel='stylesheet' /> <!-- checked -->
+<link href='/static/ndf/bower_components/fullcalendar/dist/fullcalendar.css' rel='stylesheet' /> <!-- checked -->
 <link href='/static/ndf/bower_components/fullcalendar/dist/fullcalendar.print.min.css' rel='stylesheet' media='print' /> <!-- checked -->
 <script src='/static/ndf/bower_components/jquery/dist/jquery.min.js'></script> <!-- checked -->
 <script src='/static/ndf/bower_components/jquery-ui/jquery-ui.min.js'></script> <!-- checked -->
@@ -170,7 +170,7 @@ float: none !important;
 
     $('#calendar').fullCalendar({
           default: true,
-          theme: true,
+          theme: false,
           // emphasizes business hours
           businessHours: true,
           // event dragging & resizing
@@ -185,10 +185,11 @@ float: none !important;
           //firstDay:1,
           selectable: true,
           selectHelper: true,
+          timezone:'local',
           defaultView: 'month',
           eventBackgroundColor:'#23000',
           slotDuration:'00:15:00',
-              scrollTime:'07:00:00',
+          scrollTime:'07:00:00',
 
           navLinks: true, // can click day/week names to navigate views
           eventLimit: true, // allow "more" link when too many events
@@ -236,7 +237,6 @@ float: none !important;
           },
 
 
-
           events: [
                     {
                       "title": "All Day Event",
@@ -265,12 +265,12 @@ float: none !important;
                     {
                       "title": "Meeting",
                       "start": "2017-12-12T10:30:00-05:00",
-                      "end": "2017-12-12T12:30:00-05:00"
+                      "end": "2017-12-18T12:30:00-05:00"
                     },
                     {
                       "title": "Meeting",
                       "start": "2018-01-11T10:30:00-05:00",
-                      "end": "2018-02-12T12:30:00-05:00"
+                      "end": "2018-01-13T12:30:00-05:00"
                     },
                    {
                       "title": "Meeting",
