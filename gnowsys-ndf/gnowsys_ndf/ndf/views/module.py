@@ -136,6 +136,8 @@ def module_detail(request, group_id, node_id,title=""):
         'status':'PUBLISHED'
         }
     
+
+    
     if not gstaff_access:
         module_detail_query.update({'$or': [
         {'$and': [

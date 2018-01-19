@@ -25,9 +25,9 @@
     <li class="card-image-wrapper" > 
     <!--old card-view > card.html &&  new card-view > simple_card.html  -->
     {% if notebook_filter %}
-      {% include 'ndf/simple_card.html' with  has_contributor=True resource=each_res url_name='course_notebook_tab_note' first_arg=group_id second_arg="all-notes" third_arg=each_res.pk %}
+      {% include 'ndf/simple_card.html' with  has_contributor=True resource=each_res url_name='course_notebook_tab_note' first_arg=group_name second_arg="all-notes" third_arg=each_res.pk %}
     {% else %}
-      {% include 'ndf/simple_card.html' with  has_contributor=True resource=each_res url_name=detail_urlname first_arg=group_id second_arg=each_res.pk %}
+      {% include 'ndf/simple_card.html' with  has_contributor=True resource=each_res url_name=detail_urlname first_arg=group_name second_arg=each_res.pk %}
     {% endif %}
     </li>
 
