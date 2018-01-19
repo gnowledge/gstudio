@@ -5345,7 +5345,7 @@ $module-card-lines-to-show: 3;
     .card_title {
         display: block;
         width:230px;
-        font-size: 1.4vw;
+        font-size: 24px;
         font-weight: 600;
         text-align: center;
         margin: 0px auto;
@@ -5572,7 +5572,6 @@ $nav_menu_1_tab_border: #a2238d;
 ul.nav_menu_1 {
     margin-bottom: 0px;
     background-color: $nav_menu_1_bg_color;
-    border-bottom: 2px solid #80808063;
     >li {
             display: inline-block;
 
