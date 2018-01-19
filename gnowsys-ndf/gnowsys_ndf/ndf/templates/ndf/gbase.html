@@ -210,27 +210,21 @@
 
     <style type="text/css">
             
-            * {
-              margin: 0;
+            .group_sections_content{
+                height:auto;
             }
-            html, body {
-              height: 100%;
+            html,body {
+                height:100%;
+                width: 100%;
             }
 
-            .group_sections_content:after {
-                  content: "";
-                  display: block;
-                  height: 180px;
-                }
+            body {
+                display: table;
+            }
 
             #footer {
-              height: 180px;
-              position: relative;
-              bottom: 0;
-              left: 0;
-              right: 0;
-              clear:both;
-
+                display: table-row;
+                height: 1px;
             }
     </style>
     {% if not no_footer %}
@@ -239,7 +233,7 @@
      </div>   
     {% endif %}
 
-        
+        <!-- 
     <script type="text/javascript">
       
        $(window).bind("load", function () {
@@ -253,10 +247,8 @@
                 'margin-top': height + 'px'
             });
         }
-    });
-  
-
-</script>
+        });
+    </script> -->
 
 </body>
 
