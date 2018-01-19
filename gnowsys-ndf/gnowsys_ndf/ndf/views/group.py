@@ -2938,7 +2938,7 @@ def notification_details(request,group_id):
             activity =  'created ' + each.name 
               
         else:
-          if each.if_file.mime_type:
+          if each.if_file.mime_type and each.relation_set[0]['assetcontent_of']:
             node_obj = Node.get_node_by_id(each.relation_set[0]['assetcontent_of'][0])
             activity =  'uploaded ' + each.name +  ' in ' + node_obj.name
           elif 'Asset' in each.member_of_names_list and 'asset@gallery' in each.tags:

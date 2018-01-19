@@ -3916,7 +3916,7 @@ def assets(request, group_id, asset_id=None,page_no=1):
                                     context_variables,
                                     context_instance = RequestContext(request)
         )
-    
+    gstaff_access = check_is_gstaff(group_id, request.user)    
     if gstaff_access:
         asset_nodes = node_collection.find({'member_of': {'$in': [asset_gst_id]},'group_set': {'$all': [ObjectId(group_id)]},'access_policy': {'$in': ['PRIVATE','PUBLIC']  } }).sort('last_update', -1)
     
