@@ -5,7 +5,7 @@
 {% block title %} {{title}} {% endblock %}
 {% block body_content %}
     <div class="row create_unit">
-        <div class="small-12 columns">
+        <div class="small-10 medium-10 small-offset-1 columns">
             <form id ="course_page_form" enctype="multipart/form-data" method="post" action="{% url 'unit_create_edit' group_id %}">{% csrf_token %}
             <input type="hidden" name="node_id" value="{{unit_node.pk}}">
                 <div class="course_creator_header">
@@ -26,16 +26,18 @@
                 </div>
 
 
+                {% if unit_node %}
                 <div class="course_creator_header">
                     <div class="left course_heading">
                     <h5>{% trans "Enter alternate Name" %}</h5>
                     </div>
-                    <div class="right course_heading">
+                    <div class="right course_heading" style="margin-left:200px;">
                         <input id="unit-altname" name="altnames" type="text" placeholder="Enter alternate name"
                         value="{% firstof unit_node.altnames unit_node.name %}" autofocus onfocus="this.value = this.value;"/>
 
                     </div>
                 </div>
+                {% endif %}
 
                 <hr/>
                 {% if 'Group' not in unit_node.member_of_names_list or 'base_unit' in unit_node.member_of_names_list or 'announced_unit' in unit_node.member_of_names_list %}
@@ -147,10 +149,10 @@
                     </div>
                 </div>
                 
-                <div class=" course_heading_unit tags-container">
+                <div class=" course_heading_unit  tags-container ">
                  {% include 'ndf/widget_tags.html' with node=unit_node %}
-
                 </div>
+
 
                 <hr/>
                 <label style="color:red;" class="right hide duplicate_unit_name">{% trans "Unit with same name exists" %}. {% trans "Please choose another name" %}.</label>
@@ -163,13 +165,14 @@
                     </div>
                 </div>
                 <br/>
+                <br/>
                 <div class="row">
                     {% comment %}
                         <button type="button" class ="right asset-unit-button" id="save_unit">Save</button>
                     {% endcomment %}
                     <!-- <input type="button" class="asset-unit-button right" value="Cancel"/> -->
-                    <a href="{% if unit_node %} {% url 'groupchange' unit_node.pk %}{% else %} {% url 'explore_basecourses' %}{% endif %} " class="button-cancel-new right" style="margin-right: 30px;margin-bottom: 8px;margin-top: 300px;" value="Cancel"/>{% trans "Cancel" %}</a>
-                    <input type="submit" class="button-save-new right" style="margin-right: 30px;margin-bottom: 8px;margin-top: 300px;" id="save_unit" value="Save"/>
+                    <a href="{% if unit_node %} {% url 'groupchange' unit_node.pk %}{% else %} {% url 'explore_basecourses' %}{% endif %} " class="asset-unit-button right" value="Cancel"/>{% trans "Cancel" %}</a>
+                    <input type="submit" class="asset-unit-button right" id="save_unit" value="Save"/>
                 </div>
             </form>
         </div>

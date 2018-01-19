@@ -135,7 +135,7 @@
               
 
               <li>
-                  <a href="{% url 'unit_detail' groupid %}" class="fi-pencil"> {% trans "Edit Structure" %} </a>
+                <a href="{% url 'course_about' group_id %}" {% if title == 'about' %}class="selected"{% endif %} tabindex="1" title="Course Summary"><i class="fi-eye"></i> {% trans "About" %} </a> 
               </li>
               {% if 'Group' in group_object_member_of_names_list %}
               <li>
@@ -149,6 +149,10 @@
                   {% trans "Stats" %}{% else %}{% trans "Progress Report" %}
                 {% endif %}</a>
             </li>
+                  <a href="{% url 'unit_detail' groupid %}" class="fi-pencil"> {% trans "Edit Structure" %} </a>
+
+
+              </li>
 
               <li>
                     <a class="fi-photo" style="position: relative;top: -3px;left: 2px;" data-reveal-id="group_banner_prof_pic_prop">

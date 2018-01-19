@@ -7,9 +7,10 @@
 {% block body_content %}
 {% check_is_gstaff group_id request.user as is_gstaff %}
     
-
+{% comment %}
 {% include 'ndf/explore_secondary_header.html' %}
-<div class="medium-12 columns">
+{% endcomment %}
+<div class="medium-12 columns" style="margin-top:33px;">
 	<div class="medium-2 columns thumbnail_style">
 	{% include 'ndf/widget_photo_upload.html' with url_name='module_detail' widget_for="group_banner" is_banner=True  no_update_btn=True node=node  groupid=group_id if_module=True %}
 	</div>

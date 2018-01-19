@@ -75,7 +75,7 @@
 
 
 <!-- <meta charset='utf-8' /> -->
-<link href='/static/ndf/bower_components/fullcalendar/dist/fullcalendar.min.css' rel='stylesheet' /> <!-- checked -->
+<link href='/static/ndf/bower_components/fullcalendar/dist/fullcalendar.css' rel='stylesheet' /> <!-- checked -->
 <link href='/static/ndf/bower_components/fullcalendar/dist/fullcalendar.print.min.css' rel='stylesheet' media='print' /> <!-- checked -->
 <script src='/static/ndf/bower_components/jquery/dist/jquery.min.js'></script> <!-- checked -->
 <script src='/static/ndf/bower_components/jquery-ui/jquery-ui.min.js'></script> <!-- checked -->
@@ -145,7 +145,7 @@ float: none !important;
 <div class="row">
 <div class="small-12 medium-8 small-centered medium-centered columns">
   <div id="view-scheduler-calendar">
-  <div id='calendar' data-event-timing="{{ app_set_instance_atlist }}"></div>
+  <div id='calendar'></div>
   </div>
 <!-- 
   <div id='script-warning'>
@@ -170,7 +170,7 @@ float: none !important;
 
     $('#calendar').fullCalendar({
           default: true,
-          theme: true,
+          theme: false,
           // emphasizes business hours
           businessHours: true,
           // event dragging & resizing
@@ -179,14 +179,17 @@ float: none !important;
           header: {
             left: 'prev,next today',
             center: 'title',
-            right: 'month,agendaWeek,agendaDay,listDay,listWeek,listMonth',      
+            right: 'month,agendaWeek,agendaDay,listWeek',      
           },
           // defaultDate: '2017-12-12',
           //firstDay:1,
           selectable: true,
           selectHelper: true,
+          timezone:'local',
           defaultView: 'month',
           eventBackgroundColor:'#23000',
+          slotDuration:'00:15:00',
+          scrollTime:'07:00:00',
 
           navLinks: true, // can click day/week names to navigate views
           eventLimit: true, // allow "more" link when too many events
@@ -223,9 +226,6 @@ float: none !important;
             $('#calendar').fullCalendar('unselect');
           },
 
-          // dayClick: function() {
-          //   alert('a day has been clicked!');
-          // },
           
           customButtons: {
             myCustomButton: {
@@ -235,6 +235,7 @@ float: none !important;
               }
             }
           },
+
 
           events: [
                     {
@@ -264,12 +265,17 @@ float: none !important;
                     {
                       "title": "Meeting",
                       "start": "2017-12-12T10:30:00-05:00",
-                      "end": "2017-12-12T12:30:00-05:00"
+                      "end": "2017-12-18T12:30:00-05:00"
                     },
                     {
                       "title": "Meeting",
                       "start": "2018-01-11T10:30:00-05:00",
-                      "end": "2018-01-12T12:30:00-05:00"
+                      "end": "2018-01-13T12:30:00-05:00"
+                    },
+                   {
+                      "title": "Meeting",
+                      "start": "2018-02-11T10:30:00-05:00",
+                      "end": "2018-05-12T12:30:00-05:00"
                     },
                     {
                       "title": "Meeting",
@@ -363,105 +369,5 @@ float: none !important;
 
   <!-- <div id='calendar'></div>
  -->
-
- <style type="text/css">
-  
-  footer {
-  background: red;
-  padding: 20px;
-}
-
-body {
-  height: auto;
-
-  color:#ddd;
-}  
-
- </style>
-<!-- 
- <footer>
-    Sticky Footer!
-</footer> -->
-<script type="text/javascript">
-  
-  /*!
- * jQuery Sticky Footer 1.1
- * Corey Snyder
- * http://tangerineindustries.com
- *
- * Released under the MIT license
- *
- * Copyright 2013 Corey Snyder.
- *
- * Date: Thu Jan 22 2013 13:34:00 GMT-0630 (Eastern Daylight Time)
- * Modification for jquery 1.9+ Tue May 7 2013
- * Modification for non-jquery, removed all, now classic JS Wed Jun 12 2013
- */
-
-window.onload = function() {
-  stickyFooter();
-  
-  //you can either uncomment and allow the setInterval to auto correct the footer
-  //or call stickyFooter() if you have major DOM changes
-  //setInterval(checkForDOMChange, 1000);
-};
-
-//check for changes to the DOM
-function checkForDOMChange() {
-  stickyFooter();
-}
-
-//check for resize event if not IE 9 or greater
-window.onresize = function() {
-  stickyFooter();
-}
-
-//lets get the marginTop for the <footer>
-function getCSS(element, property) {
-
-  var elem = document.getElementsByTagName(element)[0];
-  var css = null;
-  
-  if (elem.currentStyle) {
-    css = elem.currentStyle[property];
-  
-  } else if (window.getComputedStyle) {
-  css = document.defaultView.getComputedStyle(elem, null).
-  getPropertyValue(property);
-  }
-  
-  return css;
-
-}
-
-function stickyFooter() {
-  
-  if (document.getElementsByTagName("footer")[0].getAttribute("style") != null) {
-    document.getElementsByTagName("footer")[0].removeAttribute("style");
-  }
-  
-  if (window.innerHeight != document.body.offsetHeight) {
-    var offset = window.innerHeight - document.body.offsetHeight;
-    var current = getCSS("footer", "margin-top");
-    
-    if (isNaN(current) == true) {
-      document.getElementsByTagName("footer")[0].setAttribute("style","margin-top:0px;");
-      current = 0;
-    } else {
-      current = parseInt(current);
-    }
-            
-    if (current+offset > parseInt(getCSS("footer", "margin-top"))) {      
-      document.getElementsByTagName("footer")[0].setAttribute("style","margin-top:"+(current+offset)+"px;");
-    }
-  }
-}
-
-/*
-! end sticky footer
-*/
-  
-
-</script>
 
 {% endblock body_content %}
