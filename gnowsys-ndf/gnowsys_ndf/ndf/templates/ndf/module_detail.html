@@ -10,13 +10,23 @@
 {% if site.SITE_NAME != "NROER" %}
 	{% include 'ndf/explore_secondary_header.html' %}
 {% endif %}
+
+<style type="text/css">
+.flex-container {
+  display: flex;
+  flex-wrap: nowrap;
+  height: auto;
+  min-height:143px;
+}
+
+</style>
 <div class="medium-12 columns">
 
 	<div class="medium-2 columns thumbnail_style">
 	{% include 'ndf/widget_photo_upload.html' with url_name='module_detail' widget_for="group_banner" is_banner=True  no_update_btn=True node=node  groupid=group_id if_module=True %}
 	</div>
 
-		<div class="small-10 columns title-strip strip">
+		<div class="small-10 columns title-strip strip flex-container">
 
 			<div class="small-11 columns">
 				<h7 class="text-button-blue">{% trans "Showing all Units in" %}</h7>{{node.name}} <br/>

@@ -15,7 +15,7 @@
         {% if not grel_dict.cursor and grel_dict.grel_node and grel_dict.grel_node.if_file.thumbnail.relurl %}
             <img  src="{{MEDIA_URL}}{{grel_dict.grel_node.if_file.mid.relurl}}" alt="" />
         {% else %}
-            <img  src="/static/ndf/images/module-card.png"/></img>
+            <img  src="/static/ndf/images/module-card.png"/>
         {% endif %}
     {% get_dict_from_list_of_dicts node.attribute_set as node_attrs %}
     </div>
@@ -27,23 +27,24 @@
         </div>
         <div class="card_section">
             <span class="card_label">
-                {% trans "Subject" %}: {{node_attrs.educationalsubject}}
-            </span class="card_label">
-            <p class="ellipsis"></p>
+                <p class="ellipsis">
+                    {% trans "Subject" %}: {{node_attrs.educationalsubject}}
+                </p>
+            </span>
             <span class="card_label">
-                {% trans "No. of Units" %}: {{node.collection_set|length}}
-            </span class="card_label">
-            <p class="ellipsis"></p>
-                <span class="card_label">
+                <p class="ellipsis">
+                    {% trans "No. of Units" %}: {{node.collection_set|length}}
+                </p>
+            </span>
+            <span class="card_label">
+                <p class="ellipsis">
                    {% trans "Grade" %} : {{node_attrs.educationallevel|join:', '}}
-                </span class="card_label">
-            <p class="ellipsis"></p>
+                </p>
+            </span>
                 <!-- <span class="card_label">
                     Units
                 </span class="card_label"> -->
-            <p class="ellipsis"></p>
         </div>
-    </a>
         <div class="card_section">
             {% if not is_gstaff %}
             {% if request.user.is_authenticated %}
