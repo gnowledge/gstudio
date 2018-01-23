@@ -123,6 +123,9 @@ def module_detail(request, group_id, node_id,title=""):
 
 
     gstaff_access = check_is_gstaff(group_id,request.user)
+    module_detail_query = {'_id': {'$in': module_obj.collection_set},
+    'status':'PUBLISHED'
+    }
 
     if module_obj.collection_set:
         module_detail_query = {'_id': {'$in': module_obj.collection_set},
@@ -132,10 +135,9 @@ def module_detail(request, group_id, node_id,title=""):
         module_detail_query = {'_id': {'$in': module_obj.post_node},
         'status':'PUBLISHED'
         }
+    
 
     
-    '''
->>>>>>> 5b588788a0abc662af47a7b2ed4e2845a974a19e
     if not gstaff_access:
         module_detail_query.update({'$or': [
         {'$and': [
@@ -148,7 +150,6 @@ def module_detail(request, group_id, node_id,title=""):
         ]},
         {'member_of': gst_announced_unit_id}
       ]})
-    '''
     
     if title == "courses":
         module_detail_query.update({'$or': [
@@ -165,7 +166,6 @@ def module_detail(request, group_id, node_id,title=""):
 
     
     if title == "drafts":
-        print "(((((((((((((((((((((((((("
         module_detail_query.update({'$or': [
         {'$and': [
             {'member_of': gst_base_unit_id},

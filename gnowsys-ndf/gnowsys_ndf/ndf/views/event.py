@@ -15,7 +15,7 @@ from django.contrib.auth.models import User
 from django.contrib.sites.models import Site
 from django.contrib.auth.decorators import login_required
 from django.template.defaultfilters import slugify
-
+import json
 try:
     from bson import ObjectId
 except ImportError:  # old pymongo
@@ -28,7 +28,7 @@ from gnowsys_ndf.ndf.views.methods import get_node_common_fields, parse_template
 from gnowsys_ndf.ndf.views.methods import get_property_order_with_value,get_execution_time
 from gnowsys_ndf.ndf.views.methods import create_gattribute, create_grelation, get_group_name_id
 from gnowsys_ndf.notification import models as notification
-
+from gnowsys_ndf.ndf.templatetags.ndf_tags import get_attribute_value
 
 ''' -- imports for bigbluebutton wrappers -- '''
 from bbb_api import *
@@ -56,15 +56,46 @@ def event(request, group_id):
   group_obj = get_group_name_id(group_id, get_obj=True)
   group_id  = group_obj._id
   grp_gst_name, grp_gst_id = GSystemType.get_gst_name_id("Group")
-  app_collection_set=node_collection.find({'member_of': grp_gst_id})
-
-  print app_collection_set[1]
+  # app_collection_set=node_collection.find({'member_of': grp_gst_id})
   
+  GST_TASK = node_collection.one({'_type': "GSystemType", 'name': 'Task'})
+
+    
+  TASK_inst = node_collection.find({'member_of': {'$all': [GST_TASK._id]}, 'group_set': ObjectId(group_id),'status':"PUBLISHED" }).sort('last_update', -1)
+  event_list = []
+
+  for each in TASK_inst:
+    start_date_val = get_attribute_value(each._id, "start_time")
+    end_date_val = get_attribute_value(each._id, "end_time")
+
+    start_date_splited_val = start_date_val.split("/")
+    start_reverse_date_val = start_date_splited_val[::-1]
+
+    end_date_splited_val = end_date_val.split("/")
+    end_reverse_date_val = end_date_splited_val[::-1]
+    # print start_reverse_date_val
+
+
+
+    # start_date_reverse_val = start_date_splited_val.reverse()
+    # print start_date_reverse_val
+
+    start_date_new_val = '-'.join(start_reverse_date_val)
+    print start_date_new_val
+
+
+    end_date_new_val = '-'.join(end_reverse_date_val)
+    print end_date_new_val
+
+    event_list.append({"title":str(each.name), "start":str(start_date_new_val), "end":str(end_date_new_val)})
+
+    
   app_collection_set=None
-  return render_to_response('ndf/gevent.html',{'events':app_collection_set,
+  return render_to_response('ndf/gevent.html',{
                                              'groupid':group_id,
                                              'group_id':group_id,
                                              'group_name':group_id,
+                                             'events':json.dumps(event_list)
                                             },
                               context_instance = RequestContext(request)
                           )

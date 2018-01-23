@@ -265,48 +265,49 @@
   <div class="course-overview-container">
     <div class="collapse course-overview">
       {# <div class="columns small-12 medium-12"> #}
-      {% comment %}
-      <div class="ongoing-session">
-        <h5>ONGOING SESSION </h5>
-        <h3>Taking Screenshots of the work and doing something</h3>
-        <button class="tiny button"><i class="fa fa-sign-in"></i>&nbsp;Enter Session</button>
-      </div>
-      {% endcomment %}
-      <div class="notifications-analytics-tabs">
-        <ul class="tabs" data-tab role="tablist">
+        {% comment %}
+        <div class="ongoing-session">
+          <h5>ONGOING SESSION </h5>
+          <h3>Taking Screenshots of the work and doing something</h3>
+          <button class="tiny button"><i class="fa fa-sign-in"></i>&nbsp;Enter Session</button>
+        </div>
+        {% endcomment %}
+        <div class="notifications-analytics-tabs">
+          <ul class="tabs" data-tab role="tablist">
 
-          <li class="tab-title active" ><a href="#course-notification" role="tab" tabindex="0" aria-selected="true" aria-controls="panel2-1"> <i class="fa fa-bell" aria-hidden="true"></i> Notifications</a></li>
+            <li class="tab-title active" ><a href="#course-notification" role="tab" tabindex="0" aria-selected="true" aria-controls="panel2-1"> <i class="fa fa-bell" aria-hidden="true"></i> Notifications</a></li>
 
+            
 
+          </ul>
+          <div class="tabs-content">
+            <section role="tabpanel" aria-hidden="true" class="content active" id="course-notification">
+            </section>
 
-        </ul>
-        <div class="tabs-content">
-          <section role="tabpanel" aria-hidden="true" class="content active" id="course-notification">
-          </section>
-          <section role="tabpanel" aria-hidden="false" class="content active" id="analytics-content">
-            {% if gstaff_access %}
-            <div class="group-analytics hide">
-              <div class="row course-students-data">
-                <div class="small-12 medium-3 columns">
-                  Points table for students
+            <section role="tabpanel" aria-hidden="false" class="content active" id="analytics-content">
+              {% if gstaff_access %}
+                <div class="group-analytics hide">
+                  <div class="row course-students-data">
+                    <div class="small-12 medium-3 columns">
+                      Points table for students
+                    </div>
+                    <div class="small-12 medium-10 columns students-table-legends">
+                      <span class=" badge_ex green">&nbsp;</span>
+                      <span>Gallery uploads</span>
+                      <span class=" badge_ex">&nbsp;</span>
+                      <span>Note Making</span>
+                      <span class=" badge_ex red">&nbsp;</span>
+                      <span>Quiz Performance</span>
+                      <span class=" badge_ex yellow">&nbsp;</span>
+                      <span>Interactions</span>
+                    </div>
+                  </div>
+                  <small>* Click on the student's name to view detailed analytics.</small>
+                  <div class="row students-tabular-data">
+                    <div class="small-12 columns table-container">
+                    </div>
+                  </div>
                 </div>
-                <div class="small-12 medium-10 columns students-table-legends">
-                  <span class=" badge_ex green">&nbsp;</span>
-                  <span>Gallery uploads</span>
-                  <span class=" badge_ex">&nbsp;</span>
-                  <span>Note Making</span>
-                  <span class=" badge_ex red">&nbsp;</span>
-                  <span>Quiz Performance</span>
-                  <span class=" badge_ex yellow">&nbsp;</span>
-                  <span>Interactions</span>
-                </div>
-              </div>
-              <small>* Click on the student's name to view detailed analytics.</small>
-              <div class="row students-tabular-data">
-                <div class="small-12 columns table-container">
-                </div>
-              </div>
-            </div>
             <div id="userAnalyticsModal" class="reveal-modal reveal-modal-overlay" data-options="close_on_background_click:false;close_on_esc:false;" data-reveal aria-hidden="true" role="dialog">
               <label id="userAnalyticsModalLabel"></label>
               <div class="userAnalyticsData"></div>
@@ -319,7 +320,6 @@
       {# </div> #}
       </div>
     </div>
-  </div>
 
   <script type="text/javascript">
       // Student analytics view
