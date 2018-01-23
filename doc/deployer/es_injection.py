@@ -9,6 +9,10 @@ from gnowsys_ndf.ndf.models import *
 #from gnowsys_ndf.local_settings import GSTUDIO_DOCUMENT_MAPPING
 from gnowsys_ndf.local_settings import GSTUDIO_ELASTIC_SEARCH_INDEX
 
+try:
+    from bson import ObjectId
+except ImportError:  # old pymongo
+    from pymongo.objectid import ObjectId
 ##### use the below commented lines if you are working with Python 2.x   #####
 # reload(sys)
 # sys.setdefaultencoding('UTF8')
@@ -24,7 +28,7 @@ es = Elasticsearch("http://elastic:changeme@gsearch:9200", timeout=100, retry_on
 page_id = 0
 
 
-def index_docs(all_docs,index,doc_type,file_name):
+def index_docs(all_docs,index,doc_type):
     k = 0
     all_docs_count = all_docs.count()
     for docs in all_docs:
@@ -121,44 +125,104 @@ def get_document_type(document):
 
 
 def main():
+    f = open("/data/nodes.txt", "w")
+    os.chmod("/data/nodes.txt", 0o777)
 
-
-    nodes = node_collection.find(no_cursor_timeout=True).batch_size(5)
-    triples= triple_collection.find(no_cursor_timeout=True).batch_size(5)
-    benchmarks = benchmark_collection.find(no_cursor_timeout=True).batch_size(5)
-    filehives = filehive_collection.find(no_cursor_timeout=True).batch_size(5)
-    buddys = buddy_collection.find(no_cursor_timeout=True).batch_size(5)
-    counters = counter_collection.find(no_cursor_timeout=True).batch_size(5)
+    nodes = {}
+    triples = {}
+    benchmarks = {}
+    filehives = {}
+    buddys = {}
+    counters = {}
 
     #all_docs = [ triples, buddys, benchmarks, nodes, counters]
+
     print("Starting the indexing process...")
 
-    res = es.search(index="nodes", body={"query": {"match_all": {}},"_source": ["id"] }, scroll= "1m",size="10000")
-
-    print(res['_scroll_id'])
-    print(res['hits']['total'])
-
-
-
-    if( res['hits']['total'] < nodes.counts()):
-        if(nodes.counts() < 10000):
-            f = open("/data/nodes.txt", "w+")
-            os.chmod("/data/nodes.txt", 0o777)
-            for hit in res['hits']['hits']:
-                #print(hit["_source"]["id"])
-                f.write(hit["_source"]["id"] + '\n')
-
-
-    f.close()
-    # DELETING existing/old indexes
-
-    for index in GSTUDIO_ELASTIC_SEARCH_INDEX.keys():
+    for index, doc_type in GSTUDIO_ELASTIC_SEARCH_INDEX.items():
+        temp = []
         if (es.indices.exists(index.lower())):
-            print("Deleting the existing index: " + index.lower() + " for reindexing")
-            res = es.indices.delete(index=index.lower())
-            print("The delete response is %s " % res)
 
-    # --- END of DELETING existing/old indexes
+            res = es.search(index=index.lower(), body={"query": {"match_all": {}}, "_source": ["id"]}, scroll="1m", size="10")
+
+            scrollid = res['_scroll_id']
+
+            while len(res['hits']['hits']) > 0:
+
+                for hit in res['hits']['hits']:
+                    # print(hit["_source"]["id"])
+                    # f.write(hit["_source"]["id"] + '\n')
+                    # res = es.search(index="nodes", body={"scroll_id": '"' + scrollid + '"'}, search_type="scan",
+                    #           scroll="1m", size="10")
+                    temp.append(ObjectId(hit["_source"]["id"]))
+
+                res = es.scroll(scrollid, scroll="1m")
+
+
+            if(index.lower() == "nodes"):
+                nodes = node_collection.find({ '_id': {'$nin': temp} }).batch_size(5)
+            elif (index.lower() == "triples"):
+                triples = triple_collection.find({ '_id': {'$nin': temp} }).batch_size(5)
+            elif (index.lower() == "benchmarks"):
+                benchmarks = benchmark_collection.find({ '_id': {'$nin': temp} }).batch_size(5)
+            elif (index.lower() == "filehives"):
+                filehives = filehive_collection.find({ '_id': {'$nin': temp} }).batch_size(5)
+            elif (index.lower() == "buddies"):
+                buddys = buddy_collection.find({ '_id': {'$nin': temp} }).batch_size(5)
+            elif (index.lower() == "counters"):
+                counters = counter_collection.find({ '_id': {'$nin': temp} }).batch_size(5)
+
+
+
+            print(res['_scroll_id'])
+            print(res['hits']['total'])
+
+
+
+            if (res['hits']['total'] < nodes.count()):
+
+                #f = open("/data/nodes.txt", "w+")
+                #os.chmod("/data/nodes.txt", 0o777)
+
+                if (nodes.count() < 10):
+
+                    for hit in res['hits']['hits']:
+                        # print(hit["_source"]["id"])
+                        temp.append(hit["_source"]["id"])
+
+                    #f.close()
+
+                else:
+
+                    scrollid = res['_scroll_id']
+
+                    # f = open("/data/nodes.txt", "w+")
+                    # os.chmod("/data/nodes.txt", 0o777)
+
+                    # es.scroll(scrollid, scroll="1m")
+
+                    while len(res['hits']['hits']) > 0:
+
+                        for hit in res['hits']['hits']:
+                            # print(hit["_source"]["id"])
+                            # f.write(hit["_source"]["id"] + '\n')
+                            # res = es.search(index="nodes", body={"scroll_id": '"' + scrollid + '"'}, search_type="scan",
+                            #           scroll="1m", size="10")
+                            temp.append(hit["_source"]["id"])
+
+                        res = es.scroll(scrollid, scroll="1m")
+                    #print(temp)
+
+                    # DELETING existing/old indexes
+
+                    # for index in GSTUDIO_ELASTIC_SEARCH_INDEX.keys():
+                    # if (es.indices.exists(index.lower())):
+                    #   print("Deleting the existing index: " + index.lower() + " for reindexing")
+                    #   res = es.indices.delete(index=index.lower())
+                    #   print("The delete response is %s " % res)
+
+
+                    # --- END of DELETING existing/old indexes
 
 
     i=0
@@ -167,39 +231,43 @@ def main():
         request_body = json.load(req_body)
 
     for index, doc_type in GSTUDIO_ELASTIC_SEARCH_INDEX.items():
-        res = es.indices.create(index=index.lower(), body=request_body)
+        if (not es.indices.exists(index.lower())):
+            res = es.indices.create(index=index.lower(), body=request_body)
+
         print("Response for index creation")
-        #print "%s/%s" %(i,len(all_docs))
+        # print "%s/%s" %(i,len(all_docs))
 
-        if(index.strip('[]').lower()=="triples"):
-            #f = open("/data/triples.txt", "w")
-            #os.chmod("/data/triples.txt", 0o777)
-            index_docs(triples ,index.lower(),doc_type,f)
+        if (index.strip('[]').lower() == "triples"):
+            # f = open("/data/triples.txt", "w")
+            # os.chmod("/data/triples.txt", 0o777)
+            index_docs(triples, index.lower(), doc_type)
 
-        elif(index.strip('[]').lower()=="buddies"):
-            #f = open("/data/buddies.txt", "w")
-            #os.chmod("/data/buddies.txt", 0o777)
-            index_docs(buddys, index.lower(), doc_type,f)
+        elif (index.strip('[]').lower() == "buddies"):
+            # f = open("/data/buddies.txt", "w")
+            # os.chmod("/data/buddies.txt", 0o777)
+            index_docs(buddys, index.lower(), doc_type)
 
-        elif(index.strip('[]').lower()=="benchmarks"):
-            #f = open("/data/benchmarks.txt", "w+")
-            #os.chmod("/data/benchmarks.txt", 0o777)
-            index_docs(benchmarks, index.lower(), doc_type,f)
+        elif (index.strip('[]').lower() == "benchmarks"):
+            # f = open("/data/benchmarks.txt", "w+")
+            # os.chmod("/data/benchmarks.txt", 0o777)
+            index_docs(benchmarks, index.lower(), doc_type)
 
         elif (index.strip('[]').lower() == "nodes"):
-            #f = open("/data/nodes.txt", "w+")
-            #os.chmod("/data/nodes.txt", 0o777)
-            index_docs(nodes, index.lower(), doc_type,f)
+            # f = open("/data/nodes.txt", "w+")
+            # os.chmod("/data/nodes.txt", 0o777)
+
+            index_docs(nodes, index.lower(), doc_type)
+
 
         elif (index.strip('[]').lower() == "counters"):
-            #f = open("/data/counters.txt", "w")
-            #os.chmod("/data/counters.txt", 0o777)
-            index_docs(counters, index.lower(), doc_type,f)
+            # f = open("/data/counters.txt", "w")
+            # os.chmod("/data/counters.txt", 0o777)
+            index_docs(counters, index.lower(), doc_type)
 
         elif (index.strip('[]').lower() == "filehives"):
-            #f = open("/data/filehives.txt", "w")
+            # f = open("/data/filehives.txt", "w")
             ##os.chmod("/data/filehives.txt", 0o777)
-            index_docs(filehives, index.lower(), doc_type,f)
+            index_docs(filehives, index.lower(), doc_type)
 
         i=i+1
 
