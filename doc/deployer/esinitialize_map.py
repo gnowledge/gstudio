@@ -4,11 +4,8 @@ import sys
 import json
 # from elasticsearch import Elasticsearch
 from gnowsys_ndf.ndf.models import *
-<<<<<<< HEAD
+
 from gnowsys_ndf.local_settings import GSTUDIO_DOCUMENT_MAPPING
-=======
-from gnowsys_ndf.settings import GSTUDIO_DOCUMENT_MAPPING
->>>>>>> 3be8cc3b19dfd83abb70d72039df767fcf3e3396
 
 # es = Elasticsearch("http://elsearch:changeit@gsearch:9200")
 
@@ -51,7 +48,7 @@ def create_map(all_docs):
 				for grid in node.member_of:
 					gid = str(grid)
 					for attr_dict in node.attribute_set:
-						for key in attr_dict.keys():
+						for key in attr_dict.keys():	
 							if(key not in attr):
 								id_attribute_map[gid].append(key)
 					for rel_dict in node.relation_set:

@@ -133,14 +133,11 @@ def get_site_variables():
 	site_var['ENABLE_USER_DASHBOARD'] = GSTUDIO_ENABLE_USER_DASHBOARD
 	site_var['BUDDY_LOGIN'] = GSTUDIO_BUDDY_LOGIN
 	site_var['INSTITUTE_ID'] = GSTUDIO_INSTITUTE_ID
-<<<<<<< HEAD
+
 	#site_var['HEADER_LANGUAGES'] = HEADER_LANGUAGES
 	site_var['ELASTIC_SEARCH'] = GSTUDIO_ELASTIC_SEARCH
 
-=======
-	site_var['ELASTIC_SEARCH'] = GSTUDIO_ELASTIC_SEARCH
-	site_var['HEADER_LANGUAGES'] = HEADER_LANGUAGES
->>>>>>> 3be8cc3b19dfd83abb70d72039df767fcf3e3396
+
 
 	cache.set('site_var', site_var, 60 * 30)
 

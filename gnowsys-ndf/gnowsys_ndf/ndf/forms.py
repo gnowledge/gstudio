@@ -11,7 +11,7 @@ from models import GSystemType
 from registration.forms import RegistrationForm
 from passwords.fields import PasswordField
 
-CHOICES=[("all",'All'),("Author",'Users'),("image",'Images'),("video",'Video'),("text",'Text'),("audio","Audio"),("Page",'Page'),("Group",'Courses')]
+CHOICES=[("all",'All'),("Author",'Users'),("image",'Images'),("video",'Video'),("application",'Application'),("text",'Text'),("audio","Audio"),("Page",'Page'),("Group",'Courses')]
 SEARCH_CHOICE = [(0,'Search for data'),(1,'Contributions of Author')]
 GROUP_CHOICES=[]
 NODE_TYPE_CHOICES = []

@@ -9,9 +9,13 @@ from django.http import HttpResponseRedirect, HttpResponse, StreamingHttpRespons
 from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 from gnowsys_ndf.ndf.forms import SearchForm
 from gnowsys_ndf.ndf.models import *
-from gnowsys_ndf.settings import GSTUDIO_SITE_NAME, GSTUDIO_NO_OF_OBJS_PP, GSTUDIO_DOCUMENT_MAPPING
+from gnowsys_ndf.settings import  GSTUDIO_NO_OF_OBJS_PP
 from gnowsys_ndf.settings import GSTUDIO_ELASTIC_SEARCH_ALIAS, GSTUDIO_ELASTIC_SEARCH_SUPERUSER, \
 	GSTUDIO_ELASTIC_SEARCH_PORT, GSTUDIO_ELASTIC_SEARCH_SUPERUSER_PASSWORD
+
+from gnowsys_ndf.local_settings import GSTUDIO_SITE_NAME, GSTUDIO_DOCUMENT_MAPPING
+
+GSTUDIO_SITE_NAME = GSTUDIO_SITE_NAME.lower()
 
 try:
 	from elasticsearch import Elasticsearch		
@@ -74,18 +78,24 @@ def get_search(request):
 		
 		group = request.GET.get("group")
 		chkl = request.GET.getlist("groupspec")
+
 		if(len(chkl)>0):
 			group = "All"
 		page = request.GET.get("page")
 
+
 		if(page is None):
 			query_display = ""
-			search_select = request.GET.get('search_select')
+			#search_select = request.GET.get('search_select')
+			search_select = 0
+
 			search_filter = request.GET.getlist('checks[]')
+
 			if(str(search_select) == '1'):
 				append_to_url = ""
 				select = "Author"
-				resultSet = search_query(author_index, select, group, query)
+
+				resultSet = search_query("nodes", select, group, query)
 				hits =  "<h3> No of docs found: <b>%d</b></h3> " % len(resultSet)
 				med_list = get_search_results(resultSet)
 				if(group == "All"):
@@ -96,12 +106,13 @@ def get_search(request):
 			else:
 				append_to_url = ""
 				if(len(search_filter) == 0 or str(search_filter[0])=="all"):
+					#select = "Author,image,video,text,application,audio,Page,NotMedia,Group"
 					select = "Author,image,video,text,application,audio,Page,NotMedia,Group"
 					append_to_url += "&checks%5B%5D=all"
 				else:
 					select = ""
 					for i in range(0,len(search_filter)-1):
-						select += search_filter[i]+"," 
+						select += search_filter[i]+","
 						append_to_url += "&checks%5B%5D="+search_filter[i]
 					append_to_url  += "&checks%5B%5D="+search_filter[len(search_filter) - 1]
 					select += search_filter[len(search_filter) - 1]
@@ -119,9 +130,9 @@ def get_search(request):
 
 				#including quotes
 				if('"' in query):
-					l = re.split('(")', query) # this will split the query into tokens where delemiter is " and the delimiter is itself a token 
+					l = re.split('(")', query) # this will split the query into tokens where delemiter is " and the delimiter is itself a token
 					qlist = list(filter(lambda a: a!='', l))
-					
+
 					itr = 0
 					while(itr<len(qlist)):
 						if(qlist[itr]=='"'):
@@ -140,7 +151,8 @@ def get_search(request):
 					if(q!=''):
 						query_body += ('{"multi_match": {"query": "%s", "fields": ["name^3", "altnames", "content^2", "tags"], "type": "best_fields"}},' % (q))
 					query_body += (']}}, "from": 0, "size": 100}')
-					query_body = eval(query_body)	
+					query_body = eval(query_body)
+					print(query_body)
 					query_display = query
 
 				else:
@@ -219,7 +231,7 @@ def get_search(request):
 									}
 
 
-				resultSet = search_query(GSTUDIO_SITE_NAME, select, group, query_body)
+				resultSet = search_query("nodes", select, group, query_body)
 				hits = "<h3>No of docs found: <b>%d</b></h3>" % len(resultSet)
 				if(group=="All"):
 					res_list = ['<h3>Showing results for <b>%s</b> :</h3' % query_display, hits]
@@ -245,9 +257,8 @@ def get_search(request):
 		#if a card is clicked, the result's group id and node id is sent to -> node.py(node_detail function) which renders the media
 		# by sending mongoDB node to ->result_detailed_view.html
 
-		return render(request, 'ndf/sform.html', {
-					'form': form, 'grpnam': group, 'grp': GROUP_CHOICES, 'searchop': search_filter,
-					'header':res_list, 'alternate': altinfo_list ,'content': results, 'append_to_url':append_to_url })
+		return render(request, 'ndf/sform.html', {'form': form, 'grpnam': group, 'grp': GROUP_CHOICES, 'searchop': search_filter, 'header':res_list, 'alternate': altinfo_list ,'content': results, 'append_to_url':append_to_url})
+
 
 
 	return render(request, 'ndf/sform.html', {'form': form, 'grp': GROUP_CHOICES, 'searchop': []})
@@ -305,7 +316,9 @@ def get_suggestion(suggestion_body, queryInfo, doc_types, query, field):
 	This function searches for suggestion and if suggestion is not found, it may mean that the query is already indexed 
 	and if query is also not indexed, then the flag remains 0. If we find a suggestion or if the query is indexed, the flag is set to 1.
 	'''
-	res = es.suggest(body=suggestion_body, index=GSTUDIO_SITE_NAME)						#first we search for suggestion in the name field as it has the highest priority
+	#print GSTUDIO_SITE_NAME
+	res = es.suggest(body=suggestion_body, index="nodes")						#first we search for suggestion in the name field as it has the highest priority
+	#print(res)
 	if(len(res['suggest'][0]['options'])>0):									#if we get a suggestion means the phrase doesnt exist in the index
 		for sugitem in res['suggest'][0]['options']:
 			if sugitem['collate_match'] == True:								#we find the suggestion with collate_match = True
@@ -316,7 +329,7 @@ def get_suggestion(suggestion_body, queryInfo, doc_types, query, field):
 				break
 	else:						#should slop be included in the search part here?
 		query_body = {"query":{"match_phrase":{field: query,}}}
-		if(es.search(index=GSTUDIO_SITE_NAME, doc_type=doc_types, body=query_body)['hits']['total']>0):
+		if(es.search(index="nodes", doc_type=doc_types, body=query_body)['hits']['total']>0):
 			queryInfo[0] = 1							#set queryNameInfo[0] = 1 when we found a suggestion or we found a hit in the indexed data
 			queryInfo[2] = query
 
@@ -360,7 +373,9 @@ def search_query(index_name, select, group, query):
 	siz = 100
 	if(index_name == author_index):
 		try:
+
 			doctype = author_map[str(query)]
+
 		except:
 			return []
 		else:
@@ -372,20 +387,21 @@ def search_query(index_name, select, group, query):
 						"size": siz
 					} 
 
-	elif(index_name == GSTUDIO_SITE_NAME):
+	elif(index_name == "nodes"):
 		doctype = select
 		body = query
 
-	elif(index_name == gsystemtype_index):
-		body = query
-		doctype = select
-	
+	#elif(index_name == gsystemtype_index):
+		#body = query
+		#doctype = select
+
 	resultSet = []
 	temp = []
 	i = 0
 	
 	while(True):
 		body['from'] = i
+		print(doctype)
 		res = es.search(index=index_name, doc_type=doctype, body=body)
 		l = len(res["hits"]["hits"])
 		if(l==0):
@@ -397,8 +413,8 @@ def search_query(index_name, select, group, query):
 				temp = resources_in_group(res,group)
 				resultSet.extend(temp)
 			if l < siz:
-				break		
-			i+=siz	
+				break
+			i+=siz
 
 	return resultSet
 
@@ -428,7 +444,7 @@ def advanced_search(request):
 	node_type = request.GET.get("node_type")
 	arr_attributes = json.loads(request.GET["arr_attributes"])
 	arr_relations = json.loads(request.GET["arr_relations"])
-
+	print(node_type)
 	query_body = ""
 	if(len(arr_attributes.keys())>0):
 		query_body = '{ "query": {"bool": { "must": ['
