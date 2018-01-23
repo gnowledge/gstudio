@@ -35537,7 +35537,11 @@ ul.nav_menu_1 > li > a.selected, ul.nav_menu_1 > li > a:hover {
 .module_card .card_title {
   display: block;
   width: 230px;
+<<<<<<< HEAD
   font-size: 24px;
+=======
+  font-size: 1.4vw;
+>>>>>>> 45cf0cc63255279b4151df9f3cf9238ad6ddd512
   font-weight: 600;
   text-align: center;
   margin: 0px auto;

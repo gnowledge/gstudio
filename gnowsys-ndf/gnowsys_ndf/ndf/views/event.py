@@ -60,12 +60,12 @@ def event(request, group_id):
   
   GST_TASK = node_collection.one({'_type': "GSystemType", 'name': 'Task'})
 
-    
   TASK_inst = node_collection.find({'member_of': {'$all': [GST_TASK._id]}, 'group_set': ObjectId(group_id),'status':"PUBLISHED" }).sort('last_update', -1)
   event_list = []
 
   for each in TASK_inst:
     start_date_val = get_attribute_value(each._id, "start_time")
+
     end_date_val = get_attribute_value(each._id, "end_time")
 
     start_date_splited_val = start_date_val.split("/")
