@@ -83,9 +83,6 @@ def db_schema(request, collection_name='', field_name='', field_value=''):
 
 @csrf_exempt
 def api_create_gs(request, gst_name="Page"):
-    # curl -i --form "docfile=@config.rb" -X POST http://172.17.0.3:8000/api/v2/create/File
-    # curl -i -H "Content-Type: multipart/form-data" -F "file=@fabfile.py" -X POST http://172.17.0.2:8000/api/v2/create/note
-    # curl -i -X POST -H "Content-Type: multipart/form-data" -F "filehive=@config.rb" -F "name=Test the Tiger" -F "tags=check, 1, 2, aa" http://172.17.0.3:8000/api/v2/create/File
     # curl -i -X POST -H "Content-Type: multipart/form-data" -F "filehive=@CIET-Mix.csv" -F "content=hey, this is sample content" -F "name=Test the FAB" -F "tags=check, 1, 2, aa" -F 'user_name=administrator'  -F 'workspace=warehouse' http://172.17.0.2:8000/api/v2/create/File
 
     # print gst_name
