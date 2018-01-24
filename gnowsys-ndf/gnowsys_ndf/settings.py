@@ -34,7 +34,8 @@ GSTUDIO_ALTERNATE_SIZE = {'image':['100px','1048px'],'video':['144px','720px'],'
 GSTUDIO_DEFAULT_GROUP = u'desk'
 GSTUDIO_EDUCATIONAL_SUBJECTS_AS_GROUPS = False
 
-LANGUAGES = (('en', 'English'), ('hi', u'\u0939\u093f\u0902\u0926\u0940'),('te', u'\u0c24\u0c46\u0c32\u0c41\u0c17\u0c41'))
+LANGUAGES = (('en', 'English'), ('hi', 'Hindi'), ('te', 'Telugu'))
+HEADER_LANGUAGES = (('en', 'English'), ('hi', u'\u0939\u093f\u0902\u0926\u0940'),('te', u'\u0c24\u0c46\u0c32\u0c41\u0c17\u0c41'))
 GSTUDIO_DEFAULT_LANGUAGE = ('en', 'English')
 GSTUDIO_WORKSPACE_INSTANCE = False
 OTHER_COMMON_LANGUAGES = [
@@ -1024,13 +1025,23 @@ GSTUDIO_ENABLE_USER_DASHBOARD = True
 GSTUDIO_PRIMARY_COURSE_LANGUAGE = u'en'
 
 # --- BUDDY Module configurations ---
-#
 GSTUDIO_BUDDY_LOGIN = False
+# --- End of BUDDY Module ---
+
+# Institute ID, name configs
 GSTUDIO_INSTITUTE_ID = ''
 GSTUDIO_INSTITUTE_ID_SECONDARY = ''
 GSTUDIO_INSTITUTE_NAME = ''
-#
-# --- End of BUDDY Module ---
+# --- End of Institute ID, name configs
+
+# Elastic Search
+GSTUDIO_DOCUMENT_MAPPING = ''
+GSTUDIO_ELASTIC_SEARCH = False
+GSTUDIO_ELASTIC_SEARCH_ALIAS = 'gsearch'
+GSTUDIO_ELASTIC_SEARCH_SUPERUSER = 'elsearch'
+GSTUDIO_ELASTIC_SEARCH_SUPERUSER_PASSWORD = 'changeit'
+GSTUDIO_ELASTIC_SEARCH_PORT = '9200'
+# --- End of Elastic Search
 
 
 # # textb

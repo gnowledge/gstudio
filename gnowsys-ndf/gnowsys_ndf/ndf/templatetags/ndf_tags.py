@@ -133,6 +133,8 @@ def get_site_variables():
 	site_var['ENABLE_USER_DASHBOARD'] = GSTUDIO_ENABLE_USER_DASHBOARD
 	site_var['BUDDY_LOGIN'] = GSTUDIO_BUDDY_LOGIN
 	site_var['INSTITUTE_ID'] = GSTUDIO_INSTITUTE_ID
+	site_var['ELASTIC_SEARCH'] = GSTUDIO_ELASTIC_SEARCH
+	site_var['HEADER_LANGUAGES'] = HEADER_LANGUAGES
 
 	cache.set('site_var', site_var, 60 * 30)
 
@@ -4210,8 +4212,16 @@ def get_module_enrollment_status(request, module_obj):
 @get_execution_time
 @register.filter
 def get_unicode_lang(lang_code):
-	try:
-		return get_language_tuple(lang_code)[1]
-	except Exception as e:
-		return lang_code
-		pass
+    try:
+        return get_language_tuple(lang_code)[1]
+    except Exception as e:
+        return lang_code
+        pass
+
+@get_execution_time
+@register.filter
+def get_header_lang(lang):
+    for each_lang in HEADER_LANGUAGES:
+        if lang in each_lang:
+            return each_lang[1]
+    return lang

@@ -107,8 +107,10 @@
             <div class="asset_text">
                 <div class="asset_title" title="{% firstof each_asset.altnames each_asset.name %}">{% firstof each_asset.altnames|truncatechars:25  each_asset.name|truncatechars:25 %}
                   </a>  
+                  {% if not no_checkbox %}
                     {% if user.is_authenticated  and not group_object.edit_policy == "NON_EDITABLE"  or gstaff_access %}
                                 <input type="checkbox" class="select-chkbox" name="filenode" value="{{each_asset.pk}}" style="margin-top:6px; margin-right: 2px; float:right;" class="asset_content_checkbox" />
+                    {% endif %}
                     {% endif %}
                 <div class="asset_desc">{{each_asset.content|striptags|truncatechars:25}}</div>
                 </div>
