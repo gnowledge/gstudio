@@ -25,21 +25,23 @@
         {% if edit or not asset_obj.name %}
             <a class="right close-reveal-modal reveal-modal-overlay" aria-label="Close">&#215;</a>
         {% endif %}
-            <div class="small-1 columns icon-widget" style="margin-top: 5.6px;">
-                 
-                <a href="javascript:window.history.back();"><i class="fa fa-chevron-left large" aria-hidden="true"></i></a>
+            <div class="small-1 medium-2 large-1 columns icon-widget" style="margin-top: 5.6px;">
+                <a href="javascript:window.history.back();"><i class="fa fa-chevron-left large" aria-hidden="true"></i> Back</a>
             </div>
 
-            <div class="small-7 columns">
+            <div class="small-7 medium-4 large-7 columns">
             {% if not edit and asset_obj %}
                 <h4 class="page-name">{% firstof asset_obj.altnames|truncatechars:25  asset_obj.name|truncatechars:25 %} </h4>
-
+                <!-- description -->
+                <div class="small-12 columns">
+                  <i>{{asset_obj.content|safe|striptags}}</i>
+                </div>
             </div>
-
-            <div class="small-4 columns right margin-right-50">
+            
+        <div class="small-4 medium-6 large-4 columns right margin-right-50">
             {% if not edit and asset_obj %}
                 {% if asset_obj.created_by == request.user.id or is_gstaff  %}
-                    <span data-dropdown="asset-settings-drop" aria-controls="asset-settings-drop" aria-expanded="false" class="large orange-button right">
+                    <span data-dropdown="asset-settings-drop" aria-controls="asset-settings-drop" aria-expanded="false" class="large orange-button">
                         {% trans "Actions" %} <i class="fa fa-chevron-down"></i>
                     </span>
                     <ul id="asset-settings-drop" class="f-dropdown" data-dropdown-content aria-hidden="true" tabindex="-1">
@@ -60,41 +62,30 @@
                         </li>
                     </ul>
                 {% endif %}
-
             {% endif%}
 
             {% if request.user.is_authenticated  %}
-                <button type="button" class="orange-button add-asset-content right"><i class="fi-plus"></i> {% trans "Add File" %}</button>
-                <a class="right orange-button-template" href="{% url 'create_edit_asset_page' group_id asset_obj.pk %}"><i class="fi-plus"></i> {% trans "Add  page" %}</a>
-
+                <button type="button" class="orange-button add-asset-content"><i class="fi-plus"></i> {% trans "Add File" %}</button>
+                <button type="button" class="orange-button" href="{% url 'create_edit_asset_page' group_id asset_obj.pk %}"><i class="fi-plus"></i> {% trans "Add  page" %}</button>
             {% endif %}
-            </div>
-   </div>
 
-    <div class="row">
-        <div class="small-8 columns left">
-             {% if asset_obj.tags %}
-                {% for tag in asset_obj.tags %}
-                    {% if tag != "asset@asset" and tag != "raw@material" and tag != "asset@gallery" %}
-                        <small><label class="tag-ele">
-                        <a href="{% url 'tag_info' group_id tag %}">{{tag}} </a></label></small>
-                    {% endif %}
-                {% endfor %}
-            {% endif %}
-        </div>
-            <div class="small-4 columns right">
+            <div class="small-3 columns page-name">
             {% include 'ndf/rating.html' with node=asset_obj %}
-
             </div>
 
-    </div>
-    <br/>
-
-    <div class="row ">
-      {{asset_obj.content|safe|striptags}}
-    </div>
-
-
+            <!-- tags -->
+            <div class="small-10 columns left">
+                 {% if asset_obj.tags %}
+                    {% for tag in asset_obj.tags %}
+                        {% if tag != "asset@asset" and tag != "raw@material" and tag != "asset@gallery" %}
+                            <small><label class="tag-ele">
+                            <a href="{% url 'tag_info' group_id tag %}">{{tag}} </a></label></small>
+                        {% endif %}
+                    {% endfor %}
+                {% endif %}
+            </div>
+        </div>
+   </div>
             {% else %}
 
                 <h3 class="left overlay-title">&nbsp;
@@ -114,9 +105,7 @@
 
                 <!--<button type="button" class="button-hollow-grey save-asset right" data-asset_id='{{asset_obj.pk}}' style="margin-top: 9px;margin-right: -150px;">{% trans "Save" %}</button>-->
             {% endif %}
-<div class="row">
-    <hr/>
-</div>
+<hr/>
         <div class="row">
             <div class="small-12 medium-10 large-10 columns">
                 <label>
@@ -272,7 +261,7 @@
             </div>
             {% endif %}
 
-        <div class="row listing-row">
+        <div class="row listing-row" style="margin-left:10px;">
             {% for each in asset_content_list.grel_node %}
                 {% if  'DELETED' != each.status %}
                    {% include "ndf/asset_card.html" with url_name="assetcontent_detail" each_asset=each first_arg=group_id second_arg=asset_obj.pk third_arg=each.pk no_asset=True %}
@@ -283,16 +272,11 @@
         <!-- </div> -->
     {% include 'ndf/pagination.html' with urlname="asset_details_paged" first_arg=group_id second_arg=asset_obj.pk page_info=assetcontent_page_info %}
 
-        <div class="row asset-content-detail">
+        <div class="asset-content-detail">
               {% if node %}
-              <hr/>
                &nbsp; {% include "ndf/asset_content_detail.html" with node=node %}
               {%  endif %}
         </div>
-    <!-- </div> -->
-    <div class="row">
-    <hr/>
-    </div>
     <div class="row asset-comments-section">
       <div class="small-10 columns" id="view-discussion" style="overflow-x:auto;overflow-y:hidden">
             <!-- discussion content area -->
