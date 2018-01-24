@@ -1,4 +1,4 @@
-{% load get_nroer_menu  get_user_group  get_group_object  get_existing_groups_excluded  get_profile_pic  get_gapps_iconbar user_access_policy get_user_object check_is_gstaff get_attribute_value get_sg_member_of get_relation_value get_explore_url get_test_page_oid get_gstudio_registration get_gstudio_workspace_instance get_unicode_lang from  ndf_tags %}
+{% load get_nroer_menu  get_user_group  get_group_object  get_existing_groups_excluded  get_profile_pic  get_gapps_iconbar user_access_policy get_user_object check_is_gstaff get_attribute_value get_sg_member_of get_relation_value get_explore_url get_test_page_oid get_gstudio_registration get_gstudio_workspace_instance get_header_lang from  ndf_tags %}
 {% load i18n %}
 {% load cache %}
 
@@ -42,7 +42,7 @@
                 </li>
 
                 <li>
-                    <a  title="Click here to play games and interactives" target="_blank" href="{% url 'tools_temp' %}" {% if title == 'tools' %} class="active" {% endif %}> <i class="fi-die-three" aria-hidden="true" style="font-size:20px;"></i> Tools</a>
+                    <a  title="Click here to play, learn and have Fun!" target="_blank" href="{% url 'tools_temp' %}" {% if title == 'tools' %} class="active" {% endif %}> <i class="fi-die-three" aria-hidden="true" style="font-size:20px;"></i> Apps</a>
                 </li>
                 
             </ul>
@@ -52,10 +52,10 @@
                 {% endif %}
                 <li class="has-dropdown not-click" title="Choose Language">
                     <a href="#"> <i class="fa fa-globe" aria-hidden="true"></i>
-                    {{request.LANGUAGE_CODE|get_unicode_lang}}
+                    {{request.LANGUAGE_CODE|get_header_lang}}
                     </a>
                     <ul class="dropdown">
-                        {% for lang in LANGUAGES %}
+                        {% for lang in site.HEADER_LANGUAGES %}
                             <li>
                                 <form action="/i18n/setlang/" method="POST">
                                 {% csrf_token %}

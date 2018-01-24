@@ -1,4 +1,4 @@
-{% extends "ndf/base.html" %}
+{% extends "ndf/gbase.html" %}
 {% load i18n %}
 {% load ndf_tags %}
 {% load cache %}
@@ -31,11 +31,10 @@ this template is modified. So for the fields in the template it supports -
         Edit | {{node.name}}
 
       {% else %} 
-        {% trans "Create " %}
         {% if spl_group_type == "CourseEventGroup" %}
-          Course
+          {% trans "Announce Course" %}
         {% elif spl_group_type == "ProgramEventGroup" %}
-          Program
+          {% trans "Create Program" %}
         {% endif %}
       {% endif %}
     </small>
@@ -64,7 +63,7 @@ this template is modified. So for the fields in the template it supports -
 
     <!-- name -->
     <div class="row">
-      <div class="small-12 medium-6 medium-centered columns">
+      <div class="small-12 medium-12 medium-centered columns">
         <div class="row">
           
           <div class="small-4 columns">
@@ -83,7 +82,7 @@ this template is modified. So for the fields in the template it supports -
 
     <!-- altnames -->
     <div class="row">
-      <div class="small-12 medium-6 medium-centered columns">
+      <div class="small-12 medium-12 medium-centered columns">
         <div class="row">
           
           <div class="small-4 columns">
@@ -102,7 +101,7 @@ this template is modified. So for the fields in the template it supports -
 
     <!-- group_type -->
     <div class="row">
-      <div class="small-12 medium-6 medium-centered columns">
+      <div class="small-12 medium-12 medium-centered columns">
         <div class="row">
           
           <div class="small-4 columns">
@@ -128,7 +127,7 @@ this template is modified. So for the fields in the template it supports -
 
     <!-- language -->
     <div class="row">
-      <div class="small-12 medium-6 medium-centered columns">
+      <div class="small-12 medium-12 medium-centered columns">
         <div class="row">
           <div class="small-4 columns">
             <label for="right-label" class="inline">{% trans "Language" %}</label>
@@ -156,7 +155,7 @@ this template is modified. So for the fields in the template it supports -
     {% if spl_group_type == "ProgramEventGroup" %}
     <!-- moderation level -->
     <div class="row" id="moderation-level">
-      <div class="small-12 medium-6 medium-centered columns">
+      <div class="small-12 medium-12 medium-centered columns">
         <div class="row">
       
           <div class="small-4 columns">
@@ -186,7 +185,7 @@ this template is modified. So for the fields in the template it supports -
 
       <!-- start date -->
       <div class="row">
-        <div class="small-12 medium-6 medium-centered columns">
+        <div class="small-12 medium-12 medium-centered columns">
           <div class="row">
             
             <div class="small-4 columns">
@@ -204,7 +203,7 @@ this template is modified. So for the fields in the template it supports -
 
       <!-- end date -->
       <div class="row">
-        <div class="small-12 medium-6 medium-centered columns">
+        <div class="small-12 medium-12 medium-centered columns">
           <div class="row">
             
             <div class="small-4 columns">
@@ -224,7 +223,7 @@ this template is modified. So for the fields in the template it supports -
 
       <!-- start enroll -->
       <div class="row">
-        <div class="small-12 medium-6 medium-centered columns">
+        <div class="small-12 medium-12 medium-centered columns">
           <div class="row">
             
             <div class="small-4 columns">
@@ -242,7 +241,7 @@ this template is modified. So for the fields in the template it supports -
 
       <!-- end enroll -->
       <div class="row">
-        <div class="small-12 medium-6 medium-centered columns">
+        <div class="small-12 medium-12 medium-centered columns">
           <div class="row">
             
             <div class="small-4 columns">
@@ -353,7 +352,7 @@ this template is modified. So for the fields in the template it supports -
 
     <!-- Upload logo for ProgramEvent -->
     <div class="row">
-      <div class="small-12 medium-6 medium-centered columns">
+      <div class="small-12 medium-12 medium-centered columns">
         <div class="row">
               
           <div class="small-4 columns">
@@ -379,10 +378,10 @@ this template is modified. So for the fields in the template it supports -
           
       <!-- <div class="small-12 medium-6 medium-centered columns"> -->
     <dl class="accordion row" title="Click to Add/Edit Description" data-accordion>
-      <dd class="accordion-navigation small-12 medium-6 medium-centered columns">
+      <dd class="accordion-navigation small-12 medium-12 medium-centered columns">
         <a href="#content">
           <label for="right-label" class="">
-            {% if node.content %}Edit{% else %}Add{% endif %} {% trans "Description" %}
+            Click to {% if node.content %}Edit{% else %}Add{% endif %} {% trans "Description" %}
           </label>
         </a>
         <div id="content" class="content">
@@ -394,7 +393,7 @@ this template is modified. So for the fields in the template it supports -
     <br/>
 
     <div class="row">
-      <div class="small-12 medium-6 medium-centered columns">
+      <div class="small-12 medium-6 right columns">
       {% if spl_group_type == "CourseEventGroup" %}
         <input type="hidden" name="course_node_id" value="{{course_node_id}}">
       {% endif %}
@@ -402,11 +401,10 @@ this template is modified. So for the fields in the template it supports -
         <input type="hidden" name="edit_policy" value="EDITABLE_MODERATED">
         <input type="hidden" name="agency_type" value="Other">
 
-        {% if node %}
-          <input type="submit" value="Update {{spl_group_type}}" id="group-submit" class="button expand">
-        {% else %}
-          <input type="submit" value="Create {{spl_group_type}}" id="group-submit" class="button expand">
-        {% endif %}
+          <input type="submit" value="Submit" id="group-submit" class="button-save-new">
+          <button class="button-cancel-new">
+              <a href="javascript:window.history.back();"> <i class="fa fa-times" aria-hidden="true"></i> {% trans "Cancel" %}</a>
+          </button>
       </div>
     </div>
 

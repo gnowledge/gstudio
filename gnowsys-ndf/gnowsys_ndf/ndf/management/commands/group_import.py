@@ -104,7 +104,7 @@ def validate_data_dump(*args):
     md5hash = dirhash(DATA_DUMP_PATH, 'md5')
     if CONFIG_VARIABLES.MD5 != md5hash:
         print "\n MD5 NOT matching."
-        print "\nargs: ", args
+        # print "\nargs: ", args
         if args and len(args) == 4:
             proceed_without_validation = args[1]
         else:
@@ -561,7 +561,7 @@ def call_group_import(rcs_repo_path,non_grp_root_node=None):
     rcs_counters_path = os.path.join(rcs_repo_path, "Counters")
 
     # Following sequence is IMPORTANT
-    # restore_filehive_objects(rcs_filehives_path)
+    restore_filehive_objects(rcs_filehives_path)
     restore_node_objects(rcs_nodes_path, non_grp_root_node)
     restore_triple_objects(rcs_triples_path)
 
@@ -672,7 +672,7 @@ def restore_node(filepath, non_grp_root_node=None):
     log_file.write("\nRestoring Node: " +  str(filepath))
 
     node_json = get_json_file(filepath)
-    print node_json
+    # print node_json
     proceed_flag = True
     try:
         if non_grp_root_node:
@@ -872,6 +872,13 @@ def get_json_file(filepath):
         # fp = filepath
         if fp.endswith(',v'):
             fp = fp.split(',')[0]
+
+        if not os.path.exists(fp):
+            if filepath.endswith(',v'):
+                fp = fp.split(',')[0]
+            elif filepath.endswith('.json'):
+                fp = filepath
+        # print "fp: ", fp
         with open(fp, 'r') as version_file:
             obj_as_json = json.loads(version_file.read(), object_hook=json_util.object_hook)
             parse_json_values(obj_as_json)
