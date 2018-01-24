@@ -2,6 +2,7 @@ from django.http import HttpResponse, HttpResponseRedirect
 from django.shortcuts import render_to_response  # , render
 from django.template import RequestContext
 from gnowsys_ndf.ndf.models import *
+from gnowsys_ndf.ndf.models import node_collection
 # from gnowsys_ndf.ndf.views.page import page
 # from gnowsys_ndf.ndf.views.file import file
 from gnowsys_ndf.ndf.views.group import *

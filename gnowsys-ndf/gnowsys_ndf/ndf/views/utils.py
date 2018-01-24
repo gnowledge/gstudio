@@ -53,7 +53,7 @@ def add_to_list(list_to_update, value_to_append):
 
 def cast_to_data_type(value, data_type):
     '''
-    This method will cast first argument: "value" to second argument: "data_type" and returns catsed value.
+    This method will cast first argument: "value" to second argument: "data_type" and returns casted value.
     '''
 
     if (data_type in ["basestring", "unicode"]) and isinstance(value, (str, unicode)):
@@ -142,3 +142,11 @@ def merge_lists_and_maintain_unique_ele(list_a, list_b, advanced_merge=False):
     else:
         merged_list = list(set(list_a) | set(list_b))
     return merged_list
+
+
+def reverse_dict_having_listvalues(dict_listvalues):
+    '''
+    >>> reverse_dict_having_listvalues({ 'a': ['b', 'c'], 'd': ['e', 'f'] })
+    >>> {'c': 'a', 'f': 'd', 'b': 'a', 'e': 'd'}
+    '''
+    return {value: key for key in dict_listvalues for value in dict_listvalues[key]}
