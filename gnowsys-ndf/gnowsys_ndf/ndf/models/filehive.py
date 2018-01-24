@@ -379,7 +379,7 @@ class Filehive(DjangoDocument):
                 try:
                     if history_manager.create_or_replace_json_file(self):
                         fp = history_manager.get_file_path(self)
-                        message = "This document (" + str(self.md5) + ") is re-created on " + datetime.uploaded_at.strftime("%d %B %Y")
+                        message = "This document (" + str(self.md5) + ") is re-created on " + self.uploaded_at.strftime("%d %B %Y")
                         rcs_obj.checkin(fp, 1, message.encode('utf-8'), "-i")
 
                 except Exception as err:
