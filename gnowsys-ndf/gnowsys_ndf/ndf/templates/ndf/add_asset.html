@@ -3,37 +3,29 @@
 {% check_is_gstaff group_id request.user as is_gstaff %}
 {% user_access_policy groupid request.user as user_access_priv %}
 {% block head %}
-
-    <style type="text/css">
-    .right-btn, .left-btn{
-        /*float: left;*/
-        /*margin-left: 1rem;*/
-        width: 40%;
-        font-size: 0.85em !important;
-        margin-top: 0.1rem !important;
-        text-align: center;
-    }
+<style type="text/css">
+.right-btn, .left-btn{
+    width: 40%;
+    font-size: 0.85em !important;
+    margin-top: 0.1rem !important;
+    text-align: center;
+}
 
 </style>
 {% endblock %}
-
    <!--  Interaction settings modal ends  -->
    {% include 'ndf/widget_user_access_modal.html' %}
-
 <div class="overlay-head">
    <div class="row">
         {% if edit or not asset_obj.name %}
             <a class="right close-reveal-modal reveal-modal-overlay" aria-label="Close">&#215;</a>
         {% endif %}
             <div class="small-1 columns icon-widget" style="margin-top: 5.6px;">
-                 
-                <a href="javascript:window.history.back();"><i class="fa fa-chevron-left large" aria-hidden="true"></i></a>
+                <a href="javascript:window.history.back();"><i class="fa fa-chevron-left large" aria-hidden="true"></i> Back</a>
             </div>
-
-            <div class="small-7 columns">
+            <div class="small-6 columns">
             {% if not edit and asset_obj %}
                 <h4 class="page-name">{% firstof asset_obj.altnames|truncatechars:25  asset_obj.name|truncatechars:25 %} </h4>
-
             </div>
 
             <div class="small-4 columns right margin-right-50">
