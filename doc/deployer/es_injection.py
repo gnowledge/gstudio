@@ -74,7 +74,7 @@ def index_docs(all_docs,index,doc_type):
             #file_name.write(document["id"] + '\n')
             get_doc_type=get_document_type(document)
             print(get_doc_type)
-            es.index(index=index, doc_type=get_doc_type, id=document["id"], body=document)
+            es.index(index="gsystem", doc_type=get_doc_type, id=document["id"], body=document)
 
         elif document["type"] == "Group":
             es.index(index=index, doc_type="group", id=document["id"], body=document)
@@ -141,6 +141,13 @@ def main():
 
     for index, doc_type in GSTUDIO_ELASTIC_SEARCH_INDEX.items():
         temp = []
+
+        with open("/home/docker/code/gstudio/gnowsys-ndf/gnowsys_ndf/req_body.json") as req_body:
+            request_body = json.load(req_body)
+
+        if (not es.indices.exists(index.lower())):
+            res = es.indices.create(index=index.lower(), body=request_body)
+
         if (es.indices.exists(index.lower())):
 
             res = es.search(index=index.lower(), body={"query": {"match_all": {}}, "_source": ["id"]}, scroll="1m", size="10")
@@ -161,56 +168,67 @@ def main():
 
             if(index.lower() == "nodes"):
                 nodes = node_collection.find({ '_id': {'$nin': temp} }).batch_size(5)
+
+                if(nodes.count() == 0):
+                    print("All "+ index.lower() +" documents have injected to elasticsearch")
+                    continue
+                else:
+                    index_docs(nodes, index.lower(), doc_type)
+
             elif (index.lower() == "triples"):
                 triples = triple_collection.find({ '_id': {'$nin': temp} }).batch_size(5)
+                if (triples.count() == 0):
+                    print("All " + index.lower() + " documents have injected to elasticsearch")
+                    continue
+                else:
+                    # f = open("/data/triples.txt", "w")
+                    # os.chmod("/data/triples.txt", 0o777)
+                    index_docs(triples, index.lower(), doc_type)
+
             elif (index.lower() == "benchmarks"):
                 benchmarks = benchmark_collection.find({ '_id': {'$nin': temp} }).batch_size(5)
+                if (benchmarks.count() == 0):
+                    print("All " + index.lower() + " documents have injected to elasticsearch")
+                    continue
+                else:
+                    index_docs(benchmarks, index.lower(), doc_type)
+
             elif (index.lower() == "filehives"):
                 filehives = filehive_collection.find({ '_id': {'$nin': temp} }).batch_size(5)
+                if (filehives.count() == 0):
+                    print("All " + index.lower() + " documents have injected to elasticsearch")
+                    continue
+                else:
+                    index_docs(filehives, index.lower(), doc_type)
+                    
             elif (index.lower() == "buddies"):
                 buddys = buddy_collection.find({ '_id': {'$nin': temp} }).batch_size(5)
+                if (buddys.count() == 0):
+                    print("All " + index.lower() + " documents have injected to elasticsearch")
+                    continue
+                else:
+                    index_docs(buddys, index.lower(), doc_type)
+
             elif (index.lower() == "counters"):
                 counters = counter_collection.find({ '_id': {'$nin': temp} }).batch_size(5)
-
+                if (counters.count() == 0):
+                    print("All " + index.lower() + " documents have injected to elasticsearch")
+                    continue
+                else:
+                    index_docs(counters, index.lower(), doc_type)
 
 
             print(res['_scroll_id'])
             print(res['hits']['total'])
 
-
-
-            if (res['hits']['total'] < nodes.count()):
-
                 #f = open("/data/nodes.txt", "w+")
                 #os.chmod("/data/nodes.txt", 0o777)
 
-                if (nodes.count() < 10):
-
-                    for hit in res['hits']['hits']:
-                        # print(hit["_source"]["id"])
-                        temp.append(hit["_source"]["id"])
-
-                    #f.close()
-
-                else:
-
-                    scrollid = res['_scroll_id']
-
-                    # f = open("/data/nodes.txt", "w+")
+                   # f = open("/data/nodes.txt", "w+")
                     # os.chmod("/data/nodes.txt", 0o777)
 
                     # es.scroll(scrollid, scroll="1m")
 
-                    while len(res['hits']['hits']) > 0:
-
-                        for hit in res['hits']['hits']:
-                            # print(hit["_source"]["id"])
-                            # f.write(hit["_source"]["id"] + '\n')
-                            # res = es.search(index="nodes", body={"scroll_id": '"' + scrollid + '"'}, search_type="scan",
-                            #           scroll="1m", size="10")
-                            temp.append(hit["_source"]["id"])
-
-                        res = es.scroll(scrollid, scroll="1m")
                     #print(temp)
 
                     # DELETING existing/old indexes
@@ -225,50 +243,5 @@ def main():
                     # --- END of DELETING existing/old indexes
 
 
-    i=0
-
-    with open("/home/docker/code/gstudio/gnowsys-ndf/gnowsys_ndf/req_body.json") as req_body:
-        request_body = json.load(req_body)
-
-    for index, doc_type in GSTUDIO_ELASTIC_SEARCH_INDEX.items():
-        if (not es.indices.exists(index.lower())):
-            res = es.indices.create(index=index.lower(), body=request_body)
-
-        print("Response for index creation")
-        # print "%s/%s" %(i,len(all_docs))
-
-        if (index.strip('[]').lower() == "triples"):
-            # f = open("/data/triples.txt", "w")
-            # os.chmod("/data/triples.txt", 0o777)
-            index_docs(triples, index.lower(), doc_type)
-
-        elif (index.strip('[]').lower() == "buddies"):
-            # f = open("/data/buddies.txt", "w")
-            # os.chmod("/data/buddies.txt", 0o777)
-            index_docs(buddys, index.lower(), doc_type)
-
-        elif (index.strip('[]').lower() == "benchmarks"):
-            # f = open("/data/benchmarks.txt", "w+")
-            # os.chmod("/data/benchmarks.txt", 0o777)
-            index_docs(benchmarks, index.lower(), doc_type)
-
-        elif (index.strip('[]').lower() == "nodes"):
-            # f = open("/data/nodes.txt", "w+")
-            # os.chmod("/data/nodes.txt", 0o777)
-
-            index_docs(nodes, index.lower(), doc_type)
-
-
-        elif (index.strip('[]').lower() == "counters"):
-            # f = open("/data/counters.txt", "w")
-            # os.chmod("/data/counters.txt", 0o777)
-            index_docs(counters, index.lower(), doc_type)
-
-        elif (index.strip('[]').lower() == "filehives"):
-            # f = open("/data/filehives.txt", "w")
-            ##os.chmod("/data/filehives.txt", 0o777)
-            index_docs(filehives, index.lower(), doc_type)
-
-        i=i+1
-
+   
 main()
