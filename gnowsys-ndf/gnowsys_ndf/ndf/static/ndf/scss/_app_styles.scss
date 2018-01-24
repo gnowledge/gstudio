@@ -5255,215 +5255,7 @@ $unit-card-lines-to-show: 3;
 
 /*Overridding foundation css*/
 
-.top-bar, .top-bar .name {
-    height: 52px;
-    background: $primary-blue;
 
-}
-
-.top-bar {
-    .title-area {
-        box-shadow: 0px 0.6px 3px #000;
-        z-index: 20;
-    }
-    .name {
-        text-align: center;
-
-        .close-dropdown, .side-bar-button {
-            position: absolute;
-            left: 15px;
-            color: #fff;
-            font-weight: 100;
-        }
-
-    }
-    li.toggle-topbar {
-        i {
-            color: #fff;
-            display: inline-block;
-            vertical-align: bottom;
-        }
-    }
-    .top-bar-section {
-        ul {
-            &.left li {
-                border-right: 2px solid #16539f;
-            }
-            li {
-                background: $primary-blue;
-
-
-                &>a {
-                    color: #ffffff;
-                    line-height: 40px;
-                    font-weight: 500;
-                    letter-spacing: 1px;
-                    display: block;
-                    padding: 12px 0 12px 0;
-                    font-family: "OpenSans-Regular";
-                    font-size: 16px;
-
-                }
-                &:hover {
-                    &>a {
-                        //border-left-color: $secondary-orange;
-                        //color: $primary-orange;
-                        color:#fff;
-                        //color: $header-link-hover-color;
-
-                    }
-                
-                }
-
-                input{
-                    color: $secondry-blue;
-                    background: $primary-blue;
-                    font-family: OpenSans-Regular;
-                    font-size: 15px;
-                    letter-spacing: 1.4px;
-                    
-
-                    &:hover{
-                        color: white;
-                        border-left: 4px solid $secondary-orange;
-                        background: $primary-blue;
-                    }
-                }
-
-                .lang-font{
-                        
-                            font-family: "OpenSans-Light";
-                            font-size: 14px;
-                        
-                    }
-
-                &.active{
-                    color:#fff;
-                    
-                }
-                &.active {
-                    &>a {
-                        color: #fff;
-                        
-                    }
-                }
-            }
-        }
-
-        .dropdown li.parent-link a {
-            display: none;
-
-        }
-
-        .side-bar-menu {
-            .add_buddy {
-                i {
-                    color: #2e3f51;
-                    background: #acd4fa;
-                }
-            }
-        }
-    }
-}
-
-@media screen and (min-width: 40.063em) {
-    .top-bar {
-        .title-area {
-            box-shadow: none;
-            .name {
-                text-align: right;
-            }
-        }
-        .top-bar-section {
-            ul.left li>a {
-                padding: 0px 20px;
-                    &.active{
-                    color:#fff;
-                    font-size: 17px;
-                    font-family: OpenSans-Bold;
-                    margin-top: -3px;
-                    border-bottom: 3px solid $secondary-orange;
-                    background-color:#164a7b !important;
-                    }
-            }
-            li {
-                &:not(.has-form) {
-                    a:not(.button) {
-                        cursor: pointer;
-                        background: transparent;
-                        border-bottom: 0px;
-                        line-height: 50px;
-                        border-left-width: 0px;
-                        font-family: OpenSans-Regular;
-
-                    }
-                    &.active {
-                        a:not(.button) {
-                            //color: $header-link-active-color;
-                            //color: $primary-orange;
-                            color: #fff;
-                            font-family: OpenSans-Bold;
-                            font-size: 18px;
-                            //border-bottom: 3px solid $secondary-orange;
-                        }
-                    }
-                    &.has-dropdown {
-                        a:not(.button) a:not(.not-click) {
-                            &:hover {
-                                color: $secondry-blue;
-                                border-bottom: 0px;
-                                border-left: 3px solid $secondary-orange;
-
-
-                            }
-                        }
-                    }
-                }
-
-                &.active:not(.has-form) {
-                    a:not(.button):hover {
-                        background: transparent;
-                        color: #fff;
-                    }
-                }
-            }
-
-            .profile-menu {
-                &>a svg {
-                    height: 52px;
-                    width: 52px;
-                    vertical-align: top;
-                    background: #fff;
-                    margin-right: 15px;
-                }
-            }
-
-            .dropdown {
-                li:not(.has-form) {
-                    &> a:not(.button) {
-                        border-left-width: 2px;
-                        color: $secondry-blue;
-                        background: $primary-blue;
-                      }
-
-                    &:hover, &.active{
-                        a:not(.button){
-                            background: $primary-blue;
-                            color: $header-link-hover-color;
-                            border-bottom: 0px;
-                            border-left: 2px solid $secondary-orange;
-                            /*&:hover {
-                                color: $secondry-blue;
-                                border-bottom: 0px;
-                            }*/
-                        }
-                    }
-
-                }
-            }
-        }
-    }
-}
 
 
 
@@ -9233,7 +9025,6 @@ $inCompleteBgColor: #fd9e29;
 }
 
 .thumbnail_style{
-        margin-top: -30px;
     margin-left: -30px;
 }
 
@@ -9245,7 +9036,7 @@ $inCompleteBgColor: #fd9e29;
 
 .title-strip{
     box-shadow: 0px 0px 6px rgba(0, 0, 0, 0.2);
-    margin-top: -29px;
+    margin-top: -6px;
     padding-left:10px;
     a{
         
@@ -10569,20 +10360,6 @@ ul.authoring-tab{
   transform: scale(1.05);
 }
 
-
-.container {
-  text-align: center;
-  padding: 10px 20px;
-  border-top:5px solid #164a7b;
-  margin-top: 0px;
-
-  >p{
-    color: black;
-    font-size: 16px;
-    font-weight: 500;
-
-  }
-}
 
 
 .tool-bg{

@@ -28472,198 +28472,36 @@ buttons when hovering. */
   }
 }
 /*Overridding foundation css*/
-/* line 5258, ../../../scss/_app_styles.scss */
-.top-bar, .top-bar .name {
-  height: 52px;
-  background: #164A7B;
-}
-
-/* line 5265, ../../../scss/_app_styles.scss */
-.top-bar .title-area {
-  box-shadow: 0px 0.6px 3px #000;
-  z-index: 20;
-}
-/* line 5269, ../../../scss/_app_styles.scss */
-.top-bar .name {
-  text-align: center;
-}
-/* line 5272, ../../../scss/_app_styles.scss */
-.top-bar .name .close-dropdown, .top-bar .name .side-bar-button {
-  position: absolute;
-  left: 15px;
-  color: #fff;
-  font-weight: 100;
-}
-/* line 5281, ../../../scss/_app_styles.scss */
-.top-bar li.toggle-topbar i {
-  color: #fff;
-  display: inline-block;
-  vertical-align: bottom;
-}
-/* line 5289, ../../../scss/_app_styles.scss */
-.top-bar .top-bar-section ul.left li {
-  border-right: 2px solid #16539f;
-}
-/* line 5292, ../../../scss/_app_styles.scss */
-.top-bar .top-bar-section ul li {
-  background: #164A7B;
-}
-/* line 5296, ../../../scss/_app_styles.scss */
-.top-bar .top-bar-section ul li > a {
-  color: #ffffff;
-  line-height: 40px;
-  font-weight: 500;
-  letter-spacing: 1px;
-  display: block;
-  padding: 12px 0 12px 0;
-  font-family: "OpenSans-Regular";
-  font-size: 16px;
-}
-/* line 5308, ../../../scss/_app_styles.scss */
-.top-bar .top-bar-section ul li:hover > a {
-  color: #fff;
-}
-/* line 5318, ../../../scss/_app_styles.scss */
-.top-bar .top-bar-section ul li input {
-  color: #74b3dc;
-  background: #164A7B;
-  font-family: OpenSans-Regular;
-  font-size: 15px;
-  letter-spacing: 1.4px;
-}
-/* line 5326, ../../../scss/_app_styles.scss */
-.top-bar .top-bar-section ul li input:hover {
-  color: white;
-  border-left: 4px solid #ffc14e;
-  background: #164A7B;
-}
-/* line 5333, ../../../scss/_app_styles.scss */
-.top-bar .top-bar-section ul li .lang-font {
-  font-family: "OpenSans-Light";
-  font-size: 14px;
-}
-/* line 5340, ../../../scss/_app_styles.scss */
-.top-bar .top-bar-section ul li.active {
-  color: #fff;
-}
-/* line 5345, ../../../scss/_app_styles.scss */
-.top-bar .top-bar-section ul li.active > a {
-  color: #fff;
-}
-/* line 5353, ../../../scss/_app_styles.scss */
-.top-bar .top-bar-section .dropdown li.parent-link a {
-  display: none;
-}
-/* line 5360, ../../../scss/_app_styles.scss */
-.top-bar .top-bar-section .side-bar-menu .add_buddy i {
-  color: #2e3f51;
-  background: #acd4fa;
-}
-
-@media screen and (min-width: 40.063em) {
-  /* line 5371, ../../../scss/_app_styles.scss */
-  .top-bar .title-area {
-    box-shadow: none;
-  }
-  /* line 5373, ../../../scss/_app_styles.scss */
-  .top-bar .title-area .name {
-    text-align: right;
-  }
-  /* line 5378, ../../../scss/_app_styles.scss */
-  .top-bar .top-bar-section ul.left li > a {
-    padding: 0px 20px;
-  }
-  /* line 5380, ../../../scss/_app_styles.scss */
-  .top-bar .top-bar-section ul.left li > a.active {
-    color: #fff;
-    font-size: 17px;
-    font-family: OpenSans-Bold;
-    margin-top: -3px;
-    border-bottom: 3px solid #ffc14e;
-    background-color: #164a7b !important;
-  }
-  /* line 5391, ../../../scss/_app_styles.scss */
-  .top-bar .top-bar-section li:not(.has-form) a:not(.button) {
-    cursor: pointer;
-    background: transparent;
-    border-bottom: 0px;
-    line-height: 50px;
-    border-left-width: 0px;
-    font-family: OpenSans-Regular;
-  }
-  /* line 5401, ../../../scss/_app_styles.scss */
-  .top-bar .top-bar-section li:not(.has-form).active a:not(.button) {
-    color: #fff;
-    font-family: OpenSans-Bold;
-    font-size: 18px;
-  }
-  /* line 5412, ../../../scss/_app_styles.scss */
-  .top-bar .top-bar-section li:not(.has-form).has-dropdown a:not(.button) a:not(.not-click):hover {
-    color: #74b3dc;
-    border-bottom: 0px;
-    border-left: 3px solid #ffc14e;
-  }
-  /* line 5424, ../../../scss/_app_styles.scss */
-  .top-bar .top-bar-section li.active:not(.has-form) a:not(.button):hover {
-    background: transparent;
-    color: #fff;
-  }
-  /* line 5432, ../../../scss/_app_styles.scss */
-  .top-bar .top-bar-section .profile-menu > a svg {
-    height: 52px;
-    width: 52px;
-    vertical-align: top;
-    background: #fff;
-    margin-right: 15px;
-  }
-  /* line 5443, ../../../scss/_app_styles.scss */
-  .top-bar .top-bar-section .dropdown li:not(.has-form) > a:not(.button) {
-    border-left-width: 2px;
-    color: #74b3dc;
-    background: #164A7B;
-  }
-  /* line 5450, ../../../scss/_app_styles.scss */
-  .top-bar .top-bar-section .dropdown li:not(.has-form):hover a:not(.button), .top-bar .top-bar-section .dropdown li:not(.has-form).active a:not(.button) {
-    background: #164A7B;
-    color: #50c2fa;
-    border-bottom: 0px;
-    border-left: 2px solid #ffc14e;
-    /*&:hover {
-        color: $secondry-blue;
-        border-bottom: 0px;
-    }*/
-  }
-}
 /*Custom css*/
-/* line 5471, ../../../scss/_app_styles.scss */
+/* line 5263, ../../../scss/_app_styles.scss */
 [class*="column"] + [class*="column"]:last-child {
   float: left;
 }
 
-/* line 5475, ../../../scss/_app_styles.scss */
+/* line 5267, ../../../scss/_app_styles.scss */
 .icons-medium {
   line-height: 23px;
   vertical-align: sub;
 }
 
-/* line 5480, ../../../scss/_app_styles.scss */
+/* line 5272, ../../../scss/_app_styles.scss */
 .icons-large {
   line-height: 45px;
 }
 
-/* line 5485, ../../../scss/_app_styles.scss */
+/* line 5277, ../../../scss/_app_styles.scss */
 .round-icon {
   border-radius: 100%;
   height: 20px;
   padding: 2px 5px;
 }
 
-/* line 5492, ../../../scss/_app_styles.scss */
+/* line 5284, ../../../scss/_app_styles.scss */
 .hide {
   display: none !important;
 }
 
-/* line 5495, ../../../scss/_app_styles.scss */
+/* line 5287, ../../../scss/_app_styles.scss */
 .badge {
   display: inline-block;
   height: 21px;
@@ -28672,19 +28510,19 @@ buttons when hovering. */
   line-height: 21px;
   text-align: center;
 }
-/* line 5504, ../../../scss/_app_styles.scss */
+/* line 5296, ../../../scss/_app_styles.scss */
 .badge.badge-blue {
   background-color: #74b3dc;
   color: #fff;
 }
 
-/* line 5512, ../../../scss/_app_styles.scss */
+/* line 5304, ../../../scss/_app_styles.scss */
 #menu_bar_gstudio .user-profile-pic-small {
   height: 46px;
   width: 46px;
   margin: 0px 10px;
 }
-/* line 5518, ../../../scss/_app_styles.scss */
+/* line 5310, ../../../scss/_app_styles.scss */
 #menu_bar_gstudio .loggedin-user {
   # background: #505e6c;
   border-radius: 100%;
@@ -28694,18 +28532,18 @@ buttons when hovering. */
   margin: 5px 5px 0px 5px;
   overflow: hidden;
 }
-/* line 5528, ../../../scss/_app_styles.scss */
+/* line 5320, ../../../scss/_app_styles.scss */
 #menu_bar_gstudio .loggedin-user img {
   height: 100%;
   width: 100%;
 }
 
 /*  group_list */
-/* line 5535, ../../../scss/_app_styles.scss */
+/* line 5327, ../../../scss/_app_styles.scss */
 .group_breadcumbs {
   color: #6e8ba6;
 }
-/* line 5537, ../../../scss/_app_styles.scss */
+/* line 5329, ../../../scss/_app_styles.scss */
 .group_breadcumbs a {
   display: inline-block;
   margin: 15px auto;
@@ -28713,7 +28551,7 @@ buttons when hovering. */
   letter-spacing: 1px;
 }
 
-/* line 5545, ../../../scss/_app_styles.scss */
+/* line 5337, ../../../scss/_app_styles.scss */
 .group_tile {
   height: 300px;
   background: url(/static/ndf/images/group-tile.png) no-repeat;
@@ -28724,34 +28562,34 @@ buttons when hovering. */
   cursor: pointer;
   box-shadow: 0px 0px 9px rgba(0, 0, 0, 0.4);
 }
-/* line 5554, ../../../scss/_app_styles.scss */
+/* line 5346, ../../../scss/_app_styles.scss */
 .group_tile:hover {
   opacity: 0.7;
 }
-/* line 5557, ../../../scss/_app_styles.scss */
+/* line 5349, ../../../scss/_app_styles.scss */
 .group_tile .group-name {
   font-weight: 700;
   font-size: 24px;
   letter-spacing: 1.1px;
   text-shadow: 0px 0px 7px rgba(46, 63, 81, 0.7);
 }
-/* line 5564, ../../../scss/_app_styles.scss */
+/* line 5356, ../../../scss/_app_styles.scss */
 .group_tile .group_desc {
   letter-spacing: 0.5px;
 }
 
 /* curriculum */
-/* line 5571, ../../../scss/_app_styles.scss */
+/* line 5363, ../../../scss/_app_styles.scss */
 ul.horizontal_tabs_gstudio {
   margin: 0px;
   height: 44px;
 }
-/* line 5574, ../../../scss/_app_styles.scss */
+/* line 5366, ../../../scss/_app_styles.scss */
 ul.horizontal_tabs_gstudio > li {
   display: inline-block;
   height: 100%;
 }
-/* line 5577, ../../../scss/_app_styles.scss */
+/* line 5369, ../../../scss/_app_styles.scss */
 ul.horizontal_tabs_gstudio > li > a {
   color: #ce7869;
   padding: 8px 20px 7.5px;
@@ -28759,15 +28597,15 @@ ul.horizontal_tabs_gstudio > li > a {
   border-bottom: 3px solid transparent;
   letter-spacing: 0.3px;
 }
-/* line 5585, ../../../scss/_app_styles.scss */
+/* line 5377, ../../../scss/_app_styles.scss */
 ul.horizontal_tabs_gstudio > li > a.selected, ul.horizontal_tabs_gstudio > li > a:hover {
   border-bottom: 4px solid #ffc14e;
 }
-/* line 5589, ../../../scss/_app_styles.scss */
+/* line 5381, ../../../scss/_app_styles.scss */
 ul.horizontal_tabs_gstudio > li.sub_group_action {
   position: relative;
 }
-/* line 5591, ../../../scss/_app_styles.scss */
+/* line 5383, ../../../scss/_app_styles.scss */
 ul.horizontal_tabs_gstudio > li.sub_group_action > ul {
   position: absolute;
   top: 50px;
@@ -28778,27 +28616,27 @@ ul.horizontal_tabs_gstudio > li.sub_group_action > ul {
   background: #fff;
   box-shadow: 0px 1px 6px 1px #ccc;
 }
-/* line 5601, ../../../scss/_app_styles.scss */
+/* line 5393, ../../../scss/_app_styles.scss */
 ul.horizontal_tabs_gstudio > li.sub_group_action > ul li {
   list-style: none;
   white-space: nowrap;
   padding: 15px 15px;
 }
-/* line 5606, ../../../scss/_app_styles.scss */
+/* line 5398, ../../../scss/_app_styles.scss */
 ul.horizontal_tabs_gstudio > li.sub_group_action > ul li:hover {
   background: #d6f2fe;
 }
-/* line 5612, ../../../scss/_app_styles.scss */
+/* line 5404, ../../../scss/_app_styles.scss */
 ul.horizontal_tabs_gstudio > li.sub_group_action:hover ul {
   display: block;
 }
 
-/* line 5619, ../../../scss/_app_styles.scss */
+/* line 5411, ../../../scss/_app_styles.scss */
 .max-width {
   max-width: 100%;
 }
 
-/* line 5624, ../../../scss/_app_styles.scss */
+/* line 5416, ../../../scss/_app_styles.scss */
 .group_content .group_banner {
   transition: all 1s ease;
   -webkit-transition: all 1s ease;
@@ -28809,7 +28647,7 @@ ul.horizontal_tabs_gstudio > li.sub_group_action:hover ul {
   margin-bottom: -70px;
   -webkit-box-shadow: 0px 0px 5px 5px #C9C9C;
 }
-/* line 5633, ../../../scss/_app_styles.scss */
+/* line 5425, ../../../scss/_app_styles.scss */
 .group_content .group_header {
   height: 45px;
   padding-bottom: 5px;
@@ -28826,7 +28664,7 @@ ul.horizontal_tabs_gstudio > li.sub_group_action:hover ul {
   filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#0049667a', endColorstr='#8049667a',GradientType=0 );
   /* IE6-9 */
 }
-/* line 5646, ../../../scss/_app_styles.scss */
+/* line 5438, ../../../scss/_app_styles.scss */
 .group_content .group_header .group_title {
   font-size: 28px;
   font-weight: 700;
@@ -28836,28 +28674,28 @@ ul.horizontal_tabs_gstudio > li.sub_group_action:hover ul {
   left: 25px;
   color: #164A7B;
 }
-/* line 5655, ../../../scss/_app_styles.scss */
+/* line 5447, ../../../scss/_app_styles.scss */
 .group_content .group_header .group_actions > button {
   display: inline-block;
   margin: 7px 10px;
 }
-/* line 5660, ../../../scss/_app_styles.scss */
+/* line 5452, ../../../scss/_app_styles.scss */
 .group_content .group_sections {
   text-align: center;
   border-bottom: 2px solid #f5f5f5;
   background: #eefaff;
 }
-/* line 5665, ../../../scss/_app_styles.scss */
+/* line 5457, ../../../scss/_app_styles.scss */
 .group_content .group_sections_content {
   background-color: #fff;
   margin-bottom: 100px;
   margin-top: -1px;
 }
-/* line 5671, ../../../scss/_app_styles.scss */
+/* line 5463, ../../../scss/_app_styles.scss */
 .group_content .top-bar-secondions_content {
   background-color: #fff;
 }
-/* line 5675, ../../../scss/_app_styles.scss */
+/* line 5467, ../../../scss/_app_styles.scss */
 .group_content .course_actions > span {
   margin-right: 5px;
   background: #2e3f51;
@@ -28870,7 +28708,7 @@ ul.horizontal_tabs_gstudio > li.sub_group_action:hover ul {
   border-radius: 3px;
   margin-left: 130px;
 }
-/* line 5688, ../../../scss/_app_styles.scss */
+/* line 5480, ../../../scss/_app_styles.scss */
 .group_content .course_actions > i {
   margin-right: 5px;
   background: rgba(0, 0, 0, 0.6);
@@ -28884,7 +28722,7 @@ ul.horizontal_tabs_gstudio > li.sub_group_action:hover ul {
   margin-right: 80px;
 }
 
-/* line 5703, ../../../scss/_app_styles.scss */
+/* line 5495, ../../../scss/_app_styles.scss */
 .activity_tile {
   margin-top: 10px;
   margin-bottom: 25px;
@@ -28893,22 +28731,22 @@ ul.horizontal_tabs_gstudio > li.sub_group_action:hover ul {
   height: 260px;
   border: 1px solid #164A7B;
 }
-/* line 5712, ../../../scss/_app_styles.scss */
+/* line 5504, ../../../scss/_app_styles.scss */
 .activity_tile .activity_preview {
   height: 200px;
   width: 100%;
   border-width: 5px;
 }
-/* line 5719, ../../../scss/_app_styles.scss */
+/* line 5511, ../../../scss/_app_styles.scss */
 .activity_tile .activity_preview img {
   width: 100%;
   height: 210px;
 }
-/* line 5725, ../../../scss/_app_styles.scss */
+/* line 5517, ../../../scss/_app_styles.scss */
 .activity_tile .activity_text {
   padding: 7px 0px 0px 0px;
 }
-/* line 5727, ../../../scss/_app_styles.scss */
+/* line 5519, ../../../scss/_app_styles.scss */
 .activity_tile .activity_text .activity_title {
   letter-spacing: 0.2px;
   overflow: hidden;
@@ -28917,15 +28755,15 @@ ul.horizontal_tabs_gstudio > li.sub_group_action:hover ul {
   padding-top: 10px;
   padding-left: 6px;
 }
-/* line 5734, ../../../scss/_app_styles.scss */
+/* line 5526, ../../../scss/_app_styles.scss */
 .activity_tile .activity_text .activity_title > a {
   margin-right: 0px !important;
 }
-/* line 5738, ../../../scss/_app_styles.scss */
+/* line 5530, ../../../scss/_app_styles.scss */
 .activity_tile .activity_text .activity_title .filenode {
   z-index: -1;
 }
-/* line 5744, ../../../scss/_app_styles.scss */
+/* line 5536, ../../../scss/_app_styles.scss */
 .activity_tile .activity_text .activity_desc {
   letter-spacing: 0.3px;
   overflow: hidden;
@@ -28934,7 +28772,7 @@ ul.horizontal_tabs_gstudio > li.sub_group_action:hover ul {
   color: grey;
 }
 
-/* line 5755, ../../../scss/_app_styles.scss */
+/* line 5547, ../../../scss/_app_styles.scss */
 .asset_tile {
   margin-top: 10px;
   margin-bottom: 25px;
@@ -28943,24 +28781,24 @@ ul.horizontal_tabs_gstudio > li.sub_group_action:hover ul {
   height: 260px;
   border: 1px solid #164A7B;
 }
-/* line 5764, ../../../scss/_app_styles.scss */
+/* line 5556, ../../../scss/_app_styles.scss */
 .asset_tile .asset_preview {
   height: 200px;
   width: 100%;
   border-width: 5px;
 }
-/* line 5771, ../../../scss/_app_styles.scss */
+/* line 5563, ../../../scss/_app_styles.scss */
 .asset_tile .asset_preview .photos-1 img {
   /* Just in case there are inline attributes */
   width: 100% !important;
   height: 210px !important;
 }
-/* line 5776, ../../../scss/_app_styles.scss */
+/* line 5568, ../../../scss/_app_styles.scss */
 .asset_tile .asset_preview img {
   width: 100%;
   height: 210px;
 }
-/* line 5780, ../../../scss/_app_styles.scss */
+/* line 5572, ../../../scss/_app_styles.scss */
 .asset_tile .asset_preview .photos {
   /* Prevent vertical gaps */
   line-height: 0;
@@ -28971,14 +28809,14 @@ ul.horizontal_tabs_gstudio > li.sub_group_action:hover ul {
   column-count: 2;
   column-gap: 0px;
 }
-/* line 5790, ../../../scss/_app_styles.scss */
+/* line 5582, ../../../scss/_app_styles.scss */
 .asset_tile .asset_preview .photos img {
   /* Just in case there are inline attributes */
   width: 100% !important;
   height: 100px !important;
 }
 @media (max-width: 1200px) {
-  /* line 5797, ../../../scss/_app_styles.scss */
+  /* line 5589, ../../../scss/_app_styles.scss */
   .asset_tile .asset_preview .photos {
     -moz-column-count: 2;
     -webkit-column-count: 2;
@@ -28986,7 +28824,7 @@ ul.horizontal_tabs_gstudio > li.sub_group_action:hover ul {
   }
 }
 @media (max-width: 1000px) {
-  /* line 5806, ../../../scss/_app_styles.scss */
+  /* line 5598, ../../../scss/_app_styles.scss */
   .asset_tile .asset_preview .photos {
     -moz-column-count: 2;
     -webkit-column-count: 2;
@@ -28994,7 +28832,7 @@ ul.horizontal_tabs_gstudio > li.sub_group_action:hover ul {
   }
 }
 @media (max-width: 800px) {
-  /* line 5813, ../../../scss/_app_styles.scss */
+  /* line 5605, ../../../scss/_app_styles.scss */
   .asset_tile .asset_preview .photos {
     -moz-column-count: 2;
     -webkit-column-count: 2;
@@ -29002,14 +28840,14 @@ ul.horizontal_tabs_gstudio > li.sub_group_action:hover ul {
   }
 }
 @media (max-width: 400px) {
-  /* line 5820, ../../../scss/_app_styles.scss */
+  /* line 5612, ../../../scss/_app_styles.scss */
   .asset_tile .asset_preview .photos {
     -moz-column-count: 1;
     -webkit-column-count: 1;
     column-count: 1;
   }
 }
-/* line 5828, ../../../scss/_app_styles.scss */
+/* line 5620, ../../../scss/_app_styles.scss */
 .asset_tile .asset_preview .photos-02 {
   /* no vertical space*/
   line-height: 0;
@@ -29024,14 +28862,14 @@ ul.horizontal_tabs_gstudio > li.sub_group_action:hover ul {
   -webkit-row-gap: 0px;
   -moz-row-gap: 0px;
 }
-/* line 5844, ../../../scss/_app_styles.scss */
+/* line 5636, ../../../scss/_app_styles.scss */
 .asset_tile .asset_preview .photos-02 img {
   /* Just in case there are inline attributes */
   width: 100% !important;
   height: 105px !important;
 }
 @media (max-width: 1200px) {
-  /* line 5851, ../../../scss/_app_styles.scss */
+  /* line 5643, ../../../scss/_app_styles.scss */
   .asset_tile .asset_preview .photos-02 {
     -moz-row-count: 2;
     -webkit-column-count: 1;
@@ -29042,7 +28880,7 @@ ul.horizontal_tabs_gstudio > li.sub_group_action:hover ul {
   }
 }
 @media (max-width: 1000px) {
-  /* line 5862, ../../../scss/_app_styles.scss */
+  /* line 5654, ../../../scss/_app_styles.scss */
   .asset_tile .asset_preview .photos-02 {
     -moz-row-count: 2;
     -webkit-column-count: 1;
@@ -29053,7 +28891,7 @@ ul.horizontal_tabs_gstudio > li.sub_group_action:hover ul {
   }
 }
 @media (max-width: 800px) {
-  /* line 5873, ../../../scss/_app_styles.scss */
+  /* line 5665, ../../../scss/_app_styles.scss */
   .asset_tile .asset_preview .photos-02 {
     -moz-row-count: 2;
     -webkit-column-count: 0;
@@ -29064,7 +28902,7 @@ ul.horizontal_tabs_gstudio > li.sub_group_action:hover ul {
   }
 }
 @media (max-width: 400px) {
-  /* line 5884, ../../../scss/_app_styles.scss */
+  /* line 5676, ../../../scss/_app_styles.scss */
   .asset_tile .asset_preview .photos-02 {
     -moz-row-count: 2;
     -webkit-column-count: 1;
@@ -29074,7 +28912,7 @@ ul.horizontal_tabs_gstudio > li.sub_group_action:hover ul {
     -moz-row-gap: 0px;
   }
 }
-/* line 5895, ../../../scss/_app_styles.scss */
+/* line 5687, ../../../scss/_app_styles.scss */
 .asset_tile .asset_preview .photos-03 {
   /* no vertical space*/
   line-height: 0;
@@ -29089,14 +28927,14 @@ ul.horizontal_tabs_gstudio > li.sub_group_action:hover ul {
   -webkit-row-gap: 0px;
   -moz-row-gap: 0px;
 }
-/* line 5911, ../../../scss/_app_styles.scss */
+/* line 5703, ../../../scss/_app_styles.scss */
 .asset_tile .asset_preview .photos-03 img {
   /* Just in case there are inline attributes */
   width: 100% !important;
   height: 70px !important;
 }
 @media (max-width: 1200px) {
-  /* line 5918, ../../../scss/_app_styles.scss */
+  /* line 5710, ../../../scss/_app_styles.scss */
   .asset_tile .asset_preview .photos-03 {
     -moz-row-count: 3;
     -webkit-column-count: 1;
@@ -29107,7 +28945,7 @@ ul.horizontal_tabs_gstudio > li.sub_group_action:hover ul {
   }
 }
 @media (max-width: 1000px) {
-  /* line 5929, ../../../scss/_app_styles.scss */
+  /* line 5721, ../../../scss/_app_styles.scss */
   .asset_tile .asset_preview .photos-03 {
     -moz-row-count: 3;
     -webkit-column-count: 1;
@@ -29118,7 +28956,7 @@ ul.horizontal_tabs_gstudio > li.sub_group_action:hover ul {
   }
 }
 @media (max-width: 800px) {
-  /* line 5940, ../../../scss/_app_styles.scss */
+  /* line 5732, ../../../scss/_app_styles.scss */
   .asset_tile .asset_preview .photos-03 {
     -moz-row-count: 3;
     -webkit-column-count: 0;
@@ -29129,7 +28967,7 @@ ul.horizontal_tabs_gstudio > li.sub_group_action:hover ul {
   }
 }
 @media (max-width: 400px) {
-  /* line 5951, ../../../scss/_app_styles.scss */
+  /* line 5743, ../../../scss/_app_styles.scss */
   .asset_tile .asset_preview .photos-03 {
     -moz-row-count: 3;
     -webkit-column-count: 1;
@@ -29139,11 +28977,11 @@ ul.horizontal_tabs_gstudio > li.sub_group_action:hover ul {
     -moz-row-gap: 0px;
   }
 }
-/* line 5962, ../../../scss/_app_styles.scss */
+/* line 5754, ../../../scss/_app_styles.scss */
 .asset_tile .asset_text {
   padding: 7px 0px 0px 0px;
 }
-/* line 5964, ../../../scss/_app_styles.scss */
+/* line 5756, ../../../scss/_app_styles.scss */
 .asset_tile .asset_text .asset_title {
   letter-spacing: 0.2px;
   overflow: hidden;
@@ -29152,11 +28990,11 @@ ul.horizontal_tabs_gstudio > li.sub_group_action:hover ul {
   padding-top: 10px;
   padding-left: 6px;
 }
-/* line 5972, ../../../scss/_app_styles.scss */
+/* line 5764, ../../../scss/_app_styles.scss */
 .asset_tile .asset_text .asset_title .filenode {
   z-index: -1;
 }
-/* line 5978, ../../../scss/_app_styles.scss */
+/* line 5770, ../../../scss/_app_styles.scss */
 .asset_tile .asset_text .asset_desc {
   letter-spacing: 0.3px;
   overflow: hidden;
@@ -29165,7 +29003,7 @@ ul.horizontal_tabs_gstudio > li.sub_group_action:hover ul {
   color: grey;
 }
 
-/* line 5989, ../../../scss/_app_styles.scss */
+/* line 5781, ../../../scss/_app_styles.scss */
 .audio_tile {
   display: inline-block;
   margin-top: 10px;
@@ -29176,22 +29014,22 @@ ul.horizontal_tabs_gstudio > li.sub_group_action:hover ul {
   width: 270px;
   margin-right: 15px;
 }
-/* line 5999, ../../../scss/_app_styles.scss */
+/* line 5791, ../../../scss/_app_styles.scss */
 .audio_tile .audio_preview audio {
   width: 100%;
 }
-/* line 6002, ../../../scss/_app_styles.scss */
+/* line 5794, ../../../scss/_app_styles.scss */
 .audio_tile .audio_preview figcaption {
   margin-left: 5px;
 }
-/* line 6007, ../../../scss/_app_styles.scss */
+/* line 5799, ../../../scss/_app_styles.scss */
 .audio_tile:hover {
   border-width: 2px 2px 5px 2px;
   border-style: solid;
   border-color: #ce7869;
 }
 
-/* line 6017, ../../../scss/_app_styles.scss */
+/* line 5809, ../../../scss/_app_styles.scss */
 .template_tile {
   display: inline-block;
   margin-top: 10px;
@@ -29202,26 +29040,26 @@ ul.horizontal_tabs_gstudio > li.sub_group_action:hover ul {
   width: 120px;
   margin-right: 15px;
 }
-/* line 6027, ../../../scss/_app_styles.scss */
+/* line 5819, ../../../scss/_app_styles.scss */
 .template_tile .template_preview {
   height: 85px;
   width: 100%;
 }
-/* line 6030, ../../../scss/_app_styles.scss */
+/* line 5822, ../../../scss/_app_styles.scss */
 .template_tile .template_preview img {
   width: 100%;
 }
-/* line 6034, ../../../scss/_app_styles.scss */
+/* line 5826, ../../../scss/_app_styles.scss */
 .template_tile:hover {
   border-width: 2px 2px 5px 2px;
   border-style: solid;
   border-color: #ce7869;
 }
-/* line 6040, ../../../scss/_app_styles.scss */
+/* line 5832, ../../../scss/_app_styles.scss */
 .template_tile .template_text {
   padding: 10px 0px 0px 0px;
 }
-/* line 6042, ../../../scss/_app_styles.scss */
+/* line 5834, ../../../scss/_app_styles.scss */
 .template_tile .template_text .template_title {
   letter-spacing: 0.2px;
   overflow: hidden;
@@ -29230,7 +29068,7 @@ ul.horizontal_tabs_gstudio > li.sub_group_action:hover ul {
   padding-top: 22px;
   padding-left: 6px;
 }
-/* line 6051, ../../../scss/_app_styles.scss */
+/* line 5843, ../../../scss/_app_styles.scss */
 .template_tile .template_text .template_desc {
   letter-spacing: 0.3px;
   overflow: hidden;
@@ -29239,7 +29077,7 @@ ul.horizontal_tabs_gstudio > li.sub_group_action:hover ul {
   color: grey;
 }
 
-/* line 6065, ../../../scss/_app_styles.scss */
+/* line 5857, ../../../scss/_app_styles.scss */
 .preview_asset {
   background: #ccc;
   border: 2px solid #999;
@@ -29248,31 +29086,31 @@ ul.horizontal_tabs_gstudio > li.sub_group_action:hover ul {
   margin-left: 14px;
 }
 
-/* line 6073, ../../../scss/_app_styles.scss */
+/* line 5865, ../../../scss/_app_styles.scss */
 h6 {
   margin-left: 15px;
 }
 
 /*Custom css*/
-/* line 6079, ../../../scss/_app_styles.scss */
+/* line 5871, ../../../scss/_app_styles.scss */
 .add_more_files {
   color: #aaa;
   letter-spacing: 0.6px;
   margin-left: 10px;
 }
 
-/* line 6087, ../../../scss/_app_styles.scss */
+/* line 5879, ../../../scss/_app_styles.scss */
 input.trans-sub[type="text"], input.trans-sub[type="file"] {
   margin-top: 5px;
   margin-left: 20px;
 }
 
-/* line 6093, ../../../scss/_app_styles.scss */
+/* line 5885, ../../../scss/_app_styles.scss */
 input.trans-sub[type="file"]::-webkit-file-upload-button {
   visibility: hidden;
 }
 
-/* line 6096, ../../../scss/_app_styles.scss */
+/* line 5888, ../../../scss/_app_styles.scss */
 input.trans-sub[type="file"]:before {
   content: 'Select files';
   display: inline-block;
@@ -29290,7 +29128,7 @@ input.trans-sub[type="file"]:before {
   margin-left: 20px;
 }
 
-/* line 6113, ../../../scss/_app_styles.scss */
+/* line 5905, ../../../scss/_app_styles.scss */
 input.trans-sub[type="file"] {
   padding: 5px;
   margin-top: 10px;
@@ -29300,17 +29138,17 @@ input.trans-sub[type="file"] {
   width: 98%;
 }
 
-/* line 6121, ../../../scss/_app_styles.scss */
+/* line 5913, ../../../scss/_app_styles.scss */
 input.trans-sub[type="text"] {
   text-align: left;
 }
 
-/* line 6126, ../../../scss/_app_styles.scss */
+/* line 5918, ../../../scss/_app_styles.scss */
 input[type="text"], input[type="file"] {
   margin-top: 5px;
 }
 
-/* line 6129, ../../../scss/_app_styles.scss */
+/* line 5921, ../../../scss/_app_styles.scss */
 label {
   font-size: 12px;
   text-transform: uppercase;
@@ -29319,12 +29157,12 @@ label {
   margin-left: 20px;
 }
 
-/* line 6138, ../../../scss/_app_styles.scss */
+/* line 5930, ../../../scss/_app_styles.scss */
 input[type="file"]::-webkit-file-upload-button {
   visibility: hidden;
 }
 
-/* line 6141, ../../../scss/_app_styles.scss */
+/* line 5933, ../../../scss/_app_styles.scss */
 input[type="file"]:before {
   content: 'Select files';
   display: inline-block;
@@ -29341,7 +29179,7 @@ input[type="file"]:before {
   float: right;
 }
 
-/* line 6157, ../../../scss/_app_styles.scss */
+/* line 5949, ../../../scss/_app_styles.scss */
 input[type="file"] {
   padding: 5px;
   margin-top: 10px;
@@ -29351,7 +29189,7 @@ input[type="file"] {
   width: 95%;
 }
 
-/* line 6169, ../../../scss/_app_styles.scss */
+/* line 5961, ../../../scss/_app_styles.scss */
 input[type="button"] {
   -webkit-appearance: button;
   cursor: pointer;
@@ -29359,7 +29197,7 @@ input[type="button"] {
   width: 8%;
 }
 
-/* line 6180, ../../../scss/_app_styles.scss */
+/* line 5972, ../../../scss/_app_styles.scss */
 .select-language {
   display: block;
   border: 1px solid #999;
@@ -29371,20 +29209,20 @@ input[type="button"] {
   border-color: #cc7769;
 }
 
-/* line 6192, ../../../scss/_app_styles.scss */
+/* line 5984, ../../../scss/_app_styles.scss */
 .name-desc-asset-cont-area {
   width: 95%;
   margin-left: 24px;
 }
 
-/* line 6197, ../../../scss/_app_styles.scss */
+/* line 5989, ../../../scss/_app_styles.scss */
 #asset_content_desc, #asset_content_name {
   color: black !important;
   font-size: 13px;
 }
 
 /*  Buttons custom css */
-/* line 6203, ../../../scss/_app_styles.scss */
+/* line 5995, ../../../scss/_app_styles.scss */
 .button-hollow-white {
   background: inherit;
   border: 2px solid #fff;
@@ -29399,7 +29237,7 @@ input[type="button"] {
 }
 
 /*  Buttons custom css */
-/* line 6216, ../../../scss/_app_styles.scss */
+/* line 6008, ../../../scss/_app_styles.scss */
 .secondary-header-tabs {
   color: #719dc7;
   font-weight: 400;
@@ -29409,11 +29247,11 @@ input[type="button"] {
   -webkit-transition: color 1s ease, border-color 1s ease;
   display: inline-block;
 }
-/* line 6225, ../../../scss/_app_styles.scss */
+/* line 6017, ../../../scss/_app_styles.scss */
 .secondary-header-tabs:hover {
   color: #164A7B;
 }
-/* line 6229, ../../../scss/_app_styles.scss */
+/* line 6021, ../../../scss/_app_styles.scss */
 .secondary-header-tabs.active {
   color: #164A7B;
   border-bottom: 2px solid #164A7B;
@@ -29421,7 +29259,7 @@ input[type="button"] {
   font-weight: 600;
 }
 
-/* line 6238, ../../../scss/_app_styles.scss */
+/* line 6030, ../../../scss/_app_styles.scss */
 .secondary-header-button {
   color: #3c556d;
   font-weight: 700;
@@ -29434,12 +29272,12 @@ input[type="button"] {
   font-size: 13px;
   letter-spacing: 1.2px;
 }
-/* line 6250, ../../../scss/_app_styles.scss */
+/* line 6042, ../../../scss/_app_styles.scss */
 .secondary-header-button:hover {
   opacity: 0.5;
 }
 
-/* line 6256, ../../../scss/_app_styles.scss */
+/* line 6048, ../../../scss/_app_styles.scss */
 .orange-button {
   color: #ce7869;
   padding: 7px 14px;
@@ -29453,13 +29291,13 @@ input[type="button"] {
   margin-top: 8px;
   cursor: pointer;
 }
-/* line 6268, ../../../scss/_app_styles.scss */
+/* line 6060, ../../../scss/_app_styles.scss */
 .orange-button:hover {
   background-color: rgba(206, 120, 105, 0.2);
   color: #ce7869;
 }
 
-/* line 6274, ../../../scss/_app_styles.scss */
+/* line 6066, ../../../scss/_app_styles.scss */
 .pink-button {
   background: #a2238d;
   height: 37px;
@@ -29472,12 +29310,12 @@ input[type="button"] {
   margin-top: 2px !important;
   letter-spacing: 0.4px;
 }
-/* line 6285, ../../../scss/_app_styles.scss */
+/* line 6077, ../../../scss/_app_styles.scss */
 .pink-button:hover {
   box-shadow: 0px 0px 17px rgba(0, 0, 0, 0.68);
 }
 
-/* line 6290, ../../../scss/_app_styles.scss */
+/* line 6082, ../../../scss/_app_styles.scss */
 .orange-button-template {
   color: #ce7869;
   padding: 7px 14px;
@@ -29490,13 +29328,13 @@ input[type="button"] {
   margin-bottom: 8px;
   margin-top: 10px;
 }
-/* line 6301, ../../../scss/_app_styles.scss */
+/* line 6093, ../../../scss/_app_styles.scss */
 .orange-button-template:hover {
   background-color: rgba(206, 120, 105, 0.2);
   color: #ce7869;
 }
 
-/* line 6309, ../../../scss/_app_styles.scss */
+/* line 6101, ../../../scss/_app_styles.scss */
 .orange-button-subtitle {
   color: #ce7869;
   padding: 7px 14px;
@@ -29509,13 +29347,13 @@ input[type="button"] {
   margin-bottom: 8px;
   margin-top: 10px;
 }
-/* line 6320, ../../../scss/_app_styles.scss */
+/* line 6112, ../../../scss/_app_styles.scss */
 .orange-button-subtitle:hover {
   background-color: rgba(206, 120, 105, 0.2);
   color: #ce7869;
 }
 
-/* line 6327, ../../../scss/_app_styles.scss */
+/* line 6119, ../../../scss/_app_styles.scss */
 .asset-unit-button {
   color: #ce7869;
   padding: 7px 14px;
@@ -29528,13 +29366,13 @@ input[type="button"] {
   margin-bottom: 8px;
   margin-top: 300px;
 }
-/* line 6338, ../../../scss/_app_styles.scss */
+/* line 6130, ../../../scss/_app_styles.scss */
 .asset-unit-button:hover {
   background-color: rgba(206, 120, 105, 0.2);
   color: #ce7869;
 }
 
-/* line 6345, ../../../scss/_app_styles.scss */
+/* line 6137, ../../../scss/_app_styles.scss */
 .disab-button {
   margin-right: 10px;
   background-color: #fff;
@@ -29542,13 +29380,13 @@ input[type="button"] {
   font-size: 14px;
 }
 
-/* line 6353, ../../../scss/_app_styles.scss */
+/* line 6145, ../../../scss/_app_styles.scss */
 .save-asset {
   margin-top: 9px;
   margin-right: -133px;
 }
 
-/* line 6357, ../../../scss/_app_styles.scss */
+/* line 6149, ../../../scss/_app_styles.scss */
 .asset-save-button {
   color: #ce7869;
   display: inline-block;
@@ -29568,7 +29406,7 @@ input[type="button"] {
   margin-top: 5px;
 }
 
-/* line 6377, ../../../scss/_app_styles.scss */
+/* line 6169, ../../../scss/_app_styles.scss */
 .blue-white-button {
   color: #fff;
   background: #164A7B;
@@ -29579,7 +29417,7 @@ input[type="button"] {
   padding: 8px 10px;
 }
 
-/* line 6387, ../../../scss/_app_styles.scss */
+/* line 6179, ../../../scss/_app_styles.scss */
 button[disabled], .button.disabled, .button[disabled] {
   background-color: #eefaff;
   border-color: #eefaff;
@@ -29593,17 +29431,17 @@ button[disabled], .button.disabled, .button[disabled] {
   padding: 8px 10px;
 }
 
-/* line 6403, ../../../scss/_app_styles.scss */
+/* line 6195, ../../../scss/_app_styles.scss */
 .button-small {
   padding: 1px 5px;
 }
 
 /* Create Curriculum */
-/* line 6408, ../../../scss/_app_styles.scss */
+/* line 6200, ../../../scss/_app_styles.scss */
 ul.jqtree_common {
   position: relative;
 }
-/* line 6410, ../../../scss/_app_styles.scss */
+/* line 6202, ../../../scss/_app_styles.scss */
 ul.jqtree_common:before {
   border-width: 0px 0px 1px 1px;
   position: absolute;
@@ -29628,11 +29466,11 @@ ul.jqtree_common:before {
         width: 15px;
     }
 }*/
-/* line 6435, ../../../scss/_app_styles.scss */
+/* line 6227, ../../../scss/_app_styles.scss */
 ul:not(:only-child) li:first-child {
   position: relative;
 }
-/* line 6437, ../../../scss/_app_styles.scss */
+/* line 6229, ../../../scss/_app_styles.scss */
 ul:not(:only-child) li:first-child:before {
   border-width: 1px 0px 0px 0px;
   position: absolute;
@@ -29644,11 +29482,11 @@ ul:not(:only-child) li:first-child:before {
   width: 30px;
 }
 
-/* line 6448, ../../../scss/_app_styles.scss */
+/* line 6240, ../../../scss/_app_styles.scss */
 .jqtree_common .jqtree-element:not(.leaf_node):not(:only-child), .jqtree_common .jqtree-element.leaf_node {
   position: relative;
 }
-/* line 6450, ../../../scss/_app_styles.scss */
+/* line 6242, ../../../scss/_app_styles.scss */
 .jqtree_common .jqtree-element:not(.leaf_node):not(:only-child):before, .jqtree_common .jqtree-element.leaf_node:before {
   border-width: 1px 0px 0px 0px;
   position: absolute;
@@ -29660,31 +29498,31 @@ ul:not(:only-child) li:first-child:before {
   width: 10px;
 }
 
-/* line 6463, ../../../scss/_app_styles.scss */
+/* line 6255, ../../../scss/_app_styles.scss */
 ul.jqtree-tree .jqtree-element {
   margin-top: 15px;
 }
 
-/* line 6467, ../../../scss/_app_styles.scss */
+/* line 6259, ../../../scss/_app_styles.scss */
 ul.jqtree-tree ul.jqtree_common {
   margin-left: 35px;
 }
 
-/* line 6471, ../../../scss/_app_styles.scss */
+/* line 6263, ../../../scss/_app_styles.scss */
 ul.jqtree-tree li.jqtree-selected > .jqtree-element, ul.jqtree-tree li.jqtree-selected > .jqtree-element:hover {
   background: transparent;
 }
 
-/* line 6475, ../../../scss/_app_styles.scss */
+/* line 6267, ../../../scss/_app_styles.scss */
 ul.jqtree-tree .jqtree-toggler {
   color: #aaa;
 }
-/* line 6477, ../../../scss/_app_styles.scss */
+/* line 6269, ../../../scss/_app_styles.scss */
 ul.jqtree-tree .jqtree-toggler:hover {
   color: #aaa;
 }
 
-/* line 6482, ../../../scss/_app_styles.scss */
+/* line 6274, ../../../scss/_app_styles.scss */
 .curriculum_creator {
   background: #fff;
   box-shadow: 0px 2px 6px #000;
@@ -29695,7 +29533,7 @@ ul.jqtree-tree .jqtree-toggler:hover {
   padding: 15px;
 }
 
-/* line 6491, ../../../scss/_app_styles.scss */
+/* line 6283, ../../../scss/_app_styles.scss */
 .curriculum_creator_header {
   width: 100%;
   height: 60px;
@@ -29703,13 +29541,13 @@ ul.jqtree-tree .jqtree-toggler:hover {
   padding: 5px 15px;
   box-shadow: 1px 0px 13px #000;
 }
-/* line 6498, ../../../scss/_app_styles.scss */
+/* line 6290, ../../../scss/_app_styles.scss */
 .curriculum_creator_header .course_heading span {
   letter-spacing: 0.9px;
   font-weight: 600;
   line-height: 50px;
 }
-/* line 6508, ../../../scss/_app_styles.scss */
+/* line 6300, ../../../scss/_app_styles.scss */
 .curriculum_creator_header .course_actions ul li {
   list-style-type: none;
   display: inline-block;
@@ -29718,12 +29556,12 @@ ul.jqtree-tree .jqtree-toggler:hover {
   cursor: pointer;
   letter-spacing: 0.8px;
 }
-/* line 6518, ../../../scss/_app_styles.scss */
+/* line 6310, ../../../scss/_app_styles.scss */
 .curriculum_creator_header .course_actions ul li.active, .curriculum_creator_header .course_actions ul li:hover {
   border-bottom: 3px solid #ffc14e;
 }
 
-/* line 6526, ../../../scss/_app_styles.scss */
+/* line 6318, ../../../scss/_app_styles.scss */
 .curriculum_list {
   width: 100%;
   height: 60px;
@@ -29732,14 +29570,14 @@ ul.jqtree-tree .jqtree-toggler:hover {
   box-shadow: 0px 1px 4px #004;
   color: #2b78e4;
 }
-/* line 6533, ../../../scss/_app_styles.scss */
+/* line 6325, ../../../scss/_app_styles.scss */
 .curriculum_list a {
   color: #164A7B;
   font-size: 20px;
   font-weight: 600;
 }
 
-/* line 6540, ../../../scss/_app_styles.scss */
+/* line 6332, ../../../scss/_app_styles.scss */
 .curriculum_list_header {
   max-width: 1176px !important;
   margin: 0 auto !important;
@@ -29762,7 +29600,7 @@ ul.jqtree-tree .jqtree-toggler:hover {
   box-shadow: 0px 3px 6px #000;
   background-color: #ffffff;
 }
-/* line 6561, ../../../scss/_app_styles.scss */
+/* line 6353, ../../../scss/_app_styles.scss */
 .curriculum_list_header .title-curriculum {
   font-family: inherit !important;
   font-weight: bold !important;
@@ -29772,7 +29610,7 @@ ul.jqtree-tree .jqtree-toggler:hover {
   font-weight: 500 !important;
   font-size: 20px !important;
 }
-/* line 6571, ../../../scss/_app_styles.scss */
+/* line 6363, ../../../scss/_app_styles.scss */
 .curriculum_list_header .add-curriculum {
   position: relative !important;
   display: -moz-box !important;
@@ -29788,7 +29626,7 @@ ul.jqtree-tree .jqtree-toggler:hover {
   font-weight: 500 !important;
 }
 
-/* line 6587, ../../../scss/_app_styles.scss */
+/* line 6379, ../../../scss/_app_styles.scss */
 .curriculum_listing {
   max-width: 1176px !important;
   margin: 0 auto !important;
@@ -29806,7 +29644,7 @@ ul.jqtree-tree .jqtree-toggler:hover {
   background: #fff;
   box-shadow: 0px 2px 6px #000;
 }
-/* line 6604, ../../../scss/_app_styles.scss */
+/* line 6396, ../../../scss/_app_styles.scss */
 .curriculum_listing .curriculum_content {
   display: -moz-box !important;
   display: -ms-flexbox !important;
@@ -29827,11 +29665,11 @@ ul.jqtree-tree .jqtree-toggler:hover {
   -ms-flex-pack: justify !important;
   -webkit-box-pack: justify !important;
 }
-/* line 6623, ../../../scss/_app_styles.scss */
+/* line 6415, ../../../scss/_app_styles.scss */
 .curriculum_listing .curriculum_content:hover {
   background: #F0F1F2 !important;
 }
-/* line 6626, ../../../scss/_app_styles.scss */
+/* line 6418, ../../../scss/_app_styles.scss */
 .curriculum_listing .curriculum_content .curriculum_content_left {
   display: -moz-box !important;
   display: -ms-flexbox !important;
@@ -29844,7 +29682,7 @@ ul.jqtree-tree .jqtree-toggler:hover {
   -ms-flex-align: center !important;
   -webkit-box-align: center !important;
 }
-/* line 6637, ../../../scss/_app_styles.scss */
+/* line 6429, ../../../scss/_app_styles.scss */
 .curriculum_listing .curriculum_content .curriculum_content_left .curriculum_content_details {
   display: -moz-box !important;
   display: -ms-flexbox !important;
@@ -29863,7 +29701,7 @@ ul.jqtree-tree .jqtree-toggler:hover {
   -webkit-box-orient: vertical !important;
   -webkit-box-direction: normal !important;
 }
-/* line 6654, ../../../scss/_app_styles.scss */
+/* line 6446, ../../../scss/_app_styles.scss */
 .curriculum_listing .curriculum_content .curriculum_content_left .curriculum_content_details .hyperlink-style {
   text-decoration: none !important;
   font-family: inherit !important;
@@ -29876,7 +29714,7 @@ ul.jqtree-tree .jqtree-toggler:hover {
   overflow: hidden !important;
   text-overflow: ellipsis !important;
 }
-/* line 6666, ../../../scss/_app_styles.scss */
+/* line 6458, ../../../scss/_app_styles.scss */
 .curriculum_listing .curriculum_content .curriculum_content_left .curriculum_content_details .hyperlink-info {
   text-decoration: none !important;
   font-family: inherit !important;
@@ -29886,28 +29724,28 @@ ul.jqtree-tree .jqtree-toggler:hover {
   margin-top: 4px !important;
 }
 
-/* line 6679, ../../../scss/_app_styles.scss */
+/* line 6471, ../../../scss/_app_styles.scss */
 .explore-header {
   line-height: 4em;
 }
-/* line 6681, ../../../scss/_app_styles.scss */
+/* line 6473, ../../../scss/_app_styles.scss */
 .explore-header > div {
   vertical-align: middle;
   display: inline-block;
 }
-/* line 6687, ../../../scss/_app_styles.scss */
+/* line 6479, ../../../scss/_app_styles.scss */
 .explore-header .heading a {
   color: #fff;
 }
 
-/* line 6704, ../../../scss/_app_styles.scss */
+/* line 6496, ../../../scss/_app_styles.scss */
 .node_name_empty {
   border-radius: 5px;
   margin-top: 11px;
 }
 
 /*Common css*/
-/* line 6714, ../../../scss/_app_styles.scss */
+/* line 6506, ../../../scss/_app_styles.scss */
 .toggleButtons a {
   padding: 0.5em 1em;
   margin: 0px;
@@ -29916,20 +29754,20 @@ ul.jqtree-tree .jqtree-toggler:hover {
   border: 1px solid #B7B7B7;
   display: inline;
 }
-/* line 6722, ../../../scss/_app_styles.scss */
+/* line 6514, ../../../scss/_app_styles.scss */
 .toggleButtons a:first-child {
   margin-right: -3px;
   border-right: 0px solid #000;
 }
-/* line 6726, ../../../scss/_app_styles.scss */
+/* line 6518, ../../../scss/_app_styles.scss */
 .toggleButtons a:first-child {
   border-radius: 10px 0px 0px 10px;
 }
-/* line 6729, ../../../scss/_app_styles.scss */
+/* line 6521, ../../../scss/_app_styles.scss */
 .toggleButtons a:last-child {
   border-radius: 0px 10px 10px 0px;
 }
-/* line 6732, ../../../scss/_app_styles.scss */
+/* line 6524, ../../../scss/_app_styles.scss */
 .toggleButtons a.active {
   background-color: #908F8F;
   color: #fff;
@@ -29937,12 +29775,12 @@ ul.jqtree-tree .jqtree-toggler:hover {
 
 /* about_course style */
 /* abput and modules */
-/* line 6743, ../../../scss/_app_styles.scss */
+/* line 6535, ../../../scss/_app_styles.scss */
 .about-course {
   background-color: #fff;
   padding: 10px 23px;
 }
-/* line 6746, ../../../scss/_app_styles.scss */
+/* line 6538, ../../../scss/_app_styles.scss */
 .about-course > h5 {
   text-transform: uppercase;
   font-weight: 600;
@@ -29953,7 +29791,7 @@ ul.jqtree-tree .jqtree-toggler:hover {
   margin-left: 5px;
 }
 
-/* line 6757, ../../../scss/_app_styles.scss */
+/* line 6549, ../../../scss/_app_styles.scss */
 .course-desc {
   letter-spacing: 0.7px;
   font-weight: 400;
@@ -29963,7 +29801,7 @@ ul.jqtree-tree .jqtree-toggler:hover {
   margin-top: 5px;
 }
 
-/* line 6767, ../../../scss/_app_styles.scss */
+/* line 6559, ../../../scss/_app_styles.scss */
 .course-highlight {
   letter-spacing: 0.7px;
   font-weight: 400;
@@ -29974,29 +29812,29 @@ ul.jqtree-tree .jqtree-toggler:hover {
   margin-left: 4px;
   margin-bottom: 5px;
 }
-/* line 6778, ../../../scss/_app_styles.scss */
+/* line 6570, ../../../scss/_app_styles.scss */
 .course-highlight > span {
   color: #164a7b;
 }
 
 /* group analytics and notifications */
-/* line 6788, ../../../scss/_app_styles.scss */
+/* line 6580, ../../../scss/_app_styles.scss */
 .course-overview-container .course-overview > .columns {
   padding: 0px 10px;
 }
-/* line 6791, ../../../scss/_app_styles.scss */
+/* line 6583, ../../../scss/_app_styles.scss */
 .course-overview-container h5 {
   text-transform: uppercase;
 }
-/* line 6794, ../../../scss/_app_styles.scss */
+/* line 6586, ../../../scss/_app_styles.scss */
 .course-overview-container .correct-count {
   color: #367714;
 }
-/* line 6797, ../../../scss/_app_styles.scss */
+/* line 6589, ../../../scss/_app_styles.scss */
 .course-overview-container .incorrect-count {
   color: #9b0000;
 }
-/* line 6800, ../../../scss/_app_styles.scss */
+/* line 6592, ../../../scss/_app_styles.scss */
 .course-overview-container .course-metric-heading {
   text-transform: uppercase;
   letter-spacing: 0.9px;
@@ -30004,7 +29842,7 @@ ul.jqtree-tree .jqtree-toggler:hover {
   color: #000000;
   display: block;
 }
-/* line 6808, ../../../scss/_app_styles.scss */
+/* line 6600, ../../../scss/_app_styles.scss */
 .course-overview-container .course-metric-count {
   font-weight: 600;
   letter-spacing: 0.5px;
@@ -30012,37 +29850,37 @@ ul.jqtree-tree .jqtree-toggler:hover {
   color: #000000;
   font-size: 17px;
 }
-/* line 6816, ../../../scss/_app_styles.scss */
+/* line 6608, ../../../scss/_app_styles.scss */
 .course-overview-container .ongoing-session {
   border-bottom: 1px solid #ccc;
   margin-bottom: 12px;
   padding-bottom: 15px;
 }
-/* line 6821, ../../../scss/_app_styles.scss */
+/* line 6613, ../../../scss/_app_styles.scss */
 .course-overview-container .ongoing-session h5, .course-overview-container .ongoing-session h3 {
   color: #2b78e4;
 }
-/* line 6824, ../../../scss/_app_styles.scss */
+/* line 6616, ../../../scss/_app_styles.scss */
 .course-overview-container .ongoing-session button {
   padding: 7px;
   margin: 0px;
   background-color: #2B78E4;
 }
-/* line 6832, ../../../scss/_app_styles.scss */
+/* line 6624, ../../../scss/_app_styles.scss */
 .course-overview-container .course-status > h5 {
   color: #888;
 }
-/* line 6835, ../../../scss/_app_styles.scss */
+/* line 6627, ../../../scss/_app_styles.scss */
 .course-overview-container .course-status > .row {
   margin: 10px 0px;
 }
-/* line 6838, ../../../scss/_app_styles.scss */
+/* line 6630, ../../../scss/_app_styles.scss */
 .course-overview-container .course-status .tabs {
   width: 100%;
   margin: 0em 0em 0.5em;
   border-bottom: 1px solid #CCC;
 }
-/* line 6843, ../../../scss/_app_styles.scss */
+/* line 6635, ../../../scss/_app_styles.scss */
 .course-overview-container .course-status .tabs .tab-title {
   width: 40%;
   background-color: #DEDEDE;
@@ -30051,17 +29889,17 @@ ul.jqtree-tree .jqtree-toggler:hover {
   top: 1px;
   text-transform: uppercase;
 }
-/* line 6851, ../../../scss/_app_styles.scss */
+/* line 6643, ../../../scss/_app_styles.scss */
 .course-overview-container .course-status .tabs .tab-title.active {
   background-color: #fff;
   border: 1px solid #CCC;
   border-bottom: 0px;
 }
-/* line 6862, ../../../scss/_app_styles.scss */
+/* line 6654, ../../../scss/_app_styles.scss */
 .course-overview-container .course-notif-logs ul {
   list-style: none;
 }
-/* line 6866, ../../../scss/_app_styles.scss */
+/* line 6658, ../../../scss/_app_styles.scss */
 .course-overview-container .course-section {
   border: 1px solid #ccc;
   padding: 10px;
@@ -30069,11 +29907,11 @@ ul.jqtree-tree .jqtree-toggler:hover {
   margin: 40px 0px;
   position: relative;
 }
-/* line 6873, ../../../scss/_app_styles.scss */
+/* line 6665, ../../../scss/_app_styles.scss */
 .course-overview-container .course-section > .row {
   margin: 20px 0px;
 }
-/* line 6877, ../../../scss/_app_styles.scss */
+/* line 6669, ../../../scss/_app_styles.scss */
 .course-overview-container .course-section .course-section-heading {
   text-transform: uppercase;
   font-weight: 600;
@@ -30082,7 +29920,7 @@ ul.jqtree-tree .jqtree-toggler:hover {
   margin: 2px 0px 15px;
   color: #888;
 }
-/* line 6887, ../../../scss/_app_styles.scss */
+/* line 6679, ../../../scss/_app_styles.scss */
 .course-overview-container .course-section .course-section-icon {
   font-size: 20px;
   top: -35px;
@@ -30090,59 +29928,59 @@ ul.jqtree-tree .jqtree-toggler:hover {
   background: #ffffff;
   margin-left: 22px;
 }
-/* line 6912, ../../../scss/_app_styles.scss */
+/* line 6704, ../../../scss/_app_styles.scss */
 .course-overview-container .course-warning {
   background-color: #fffdd7;
 }
-/* line 6914, ../../../scss/_app_styles.scss */
+/* line 6706, ../../../scss/_app_styles.scss */
 .course-overview-container .course-warning > h5 {
   color: #c09100;
 }
-/* line 6917, ../../../scss/_app_styles.scss */
+/* line 6709, ../../../scss/_app_styles.scss */
 .course-overview-container .course-warning i {
   padding: 10px;
   margin-right: 5px;
   color: #c09100;
 }
-/* line 6922, ../../../scss/_app_styles.scss */
+/* line 6714, ../../../scss/_app_styles.scss */
 .course-overview-container .course-warning a {
   text-decoration: underline;
 }
-/* line 6926, ../../../scss/_app_styles.scss */
+/* line 6718, ../../../scss/_app_styles.scss */
 .course-overview-container .course-students-data {
   margin: 20px 0px;
 }
-/* line 6930, ../../../scss/_app_styles.scss */
+/* line 6722, ../../../scss/_app_styles.scss */
 .course-overview-container .course-students-data .students-table-legends > span:nth-child(odd) {
   margin: 0px 10px;
 }
-/* line 6933, ../../../scss/_app_styles.scss */
+/* line 6725, ../../../scss/_app_styles.scss */
 .course-overview-container .course-students-data .students-table-legends > span:nth-child(even) {
   display: inline-block;
   vertical-align: top;
   margin-right: 10px;
 }
-/* line 6940, ../../../scss/_app_styles.scss */
+/* line 6732, ../../../scss/_app_styles.scss */
 .course-overview-container .student-overview-table {
   width: 100%;
   margin: 15px 0px;
 }
-/* line 6944, ../../../scss/_app_styles.scss */
+/* line 6736, ../../../scss/_app_styles.scss */
 .course-overview-container .student-overview-table tr {
   border: none;
 }
-/* line 6948, ../../../scss/_app_styles.scss */
+/* line 6740, ../../../scss/_app_styles.scss */
 .course-overview-container .student-overview-table .progress .merter-val {
   margin-left: 5px;
 }
 
-/* line 6956, ../../../scss/_app_styles.scss */
+/* line 6748, ../../../scss/_app_styles.scss */
 .notifications-analytics-tabs .tabs {
   width: 100%;
   margin: 0em 0em 0.5em;
   border-bottom: 1px solid #CCC;
 }
-/* line 6961, ../../../scss/_app_styles.scss */
+/* line 6753, ../../../scss/_app_styles.scss */
 .notifications-analytics-tabs .tabs .tab-title {
   width: 40%;
   background-color: #DEDEDE;
@@ -30151,19 +29989,19 @@ ul.jqtree-tree .jqtree-toggler:hover {
   top: 1px;
   text-transform: uppercase;
 }
-/* line 6969, ../../../scss/_app_styles.scss */
+/* line 6761, ../../../scss/_app_styles.scss */
 .notifications-analytics-tabs .tabs .tab-title.active {
   border: 1px solid #CCC;
   border-bottom: 0px;
 }
 
 /* The notification Dashboard */
-/* line 6985, ../../../scss/_app_styles.scss */
+/* line 6777, ../../../scss/_app_styles.scss */
 .course-dashboard .course-status > ul, .course-dashboard .course-notifications > ul,
 .course-dashboard .course-performance > ul {
   list-style: none;
 }
-/* line 6989, ../../../scss/_app_styles.scss */
+/* line 6781, ../../../scss/_app_styles.scss */
 .course-dashboard .course-status > .row, .course-dashboard .course-notifications > .row,
 .course-dashboard .course-performance > .row {
   padding: 0px;
@@ -30175,75 +30013,75 @@ ul.jqtree-tree .jqtree-toggler:hover {
   margin: 0em 0em;
   border-radius: 10px;
 }
-/* line 7001, ../../../scss/_app_styles.scss */
+/* line 6793, ../../../scss/_app_styles.scss */
 .course-dashboard .dash-tile-heading {
   padding: 0.2em 0.7em;
   border-bottom: 1px solid #DADADA;
   font-weight: 500;
 }
-/* line 7007, ../../../scss/_app_styles.scss */
+/* line 6799, ../../../scss/_app_styles.scss */
 .course-dashboard .dash-tile-row {
   padding: 1em;
 }
-/* line 7010, ../../../scss/_app_styles.scss */
+/* line 6802, ../../../scss/_app_styles.scss */
 .course-dashboard .dash-tile-row:nth-child(n+3) {
   border-top: 1px solid #DCDCDC;
 }
-/* line 7016, ../../../scss/_app_styles.scss */
+/* line 6808, ../../../scss/_app_styles.scss */
 .course-dashboard .course-status .course-update .course-current-state {
   color: #000;
   font-weight: bold;
   padding: 0.5em 0.8em 0.6em;
 }
-/* line 7026, ../../../scss/_app_styles.scss */
+/* line 6818, ../../../scss/_app_styles.scss */
 .course-dashboard .course-notifications {
   position: relative;
 }
-/* line 7031, ../../../scss/_app_styles.scss */
+/* line 6823, ../../../scss/_app_styles.scss */
 .course-dashboard .course-notifications .notification-row .notification-text {
   letter-spacing: 0em;
   word-spacing: 0.2em;
 }
-/* line 7036, ../../../scss/_app_styles.scss */
+/* line 6828, ../../../scss/_app_styles.scss */
 .course-dashboard .course-notifications .notification-row .time-elapsed {
   color: #424242;
   cursor: pointer;
 }
-/* line 7043, ../../../scss/_app_styles.scss */
+/* line 6835, ../../../scss/_app_styles.scss */
 .course-dashboard .course-notifications .notification-count {
   position: absolute;
   right: 0.5em;
   top: 0.3em;
 }
 
-/* line 7060, ../../../scss/_app_styles.scss */
+/* line 6852, ../../../scss/_app_styles.scss */
 .notebook .notebook-header a, .notebook .notebook-header input {
   margin: 0px;
 }
-/* line 7063, ../../../scss/_app_styles.scss */
+/* line 6855, ../../../scss/_app_styles.scss */
 .notebook .notebook-header .notes-count {
   text-align: center;
 }
-/* line 7068, ../../../scss/_app_styles.scss */
+/* line 6860, ../../../scss/_app_styles.scss */
 .notebook .notebook-header .notes-count span:first-child {
   font-weight: 600;
   padding: 15px;
 }
-/* line 7073, ../../../scss/_app_styles.scss */
+/* line 6865, ../../../scss/_app_styles.scss */
 .notebook .notebook-header .notes-count span:last-child {
   background: lightgrey;
   padding: 2px 5px;
   vertical-align: text-bottom;
 }
-/* line 7083, ../../../scss/_app_styles.scss */
+/* line 6875, ../../../scss/_app_styles.scss */
 .notebook .notebook-body {
   padding: 0px 0px;
 }
-/* line 7086, ../../../scss/_app_styles.scss */
+/* line 6878, ../../../scss/_app_styles.scss */
 .notebook .notebook-body .note-cards .row {
   margin: 30px 0px;
 }
-/* line 7089, ../../../scss/_app_styles.scss */
+/* line 6881, ../../../scss/_app_styles.scss */
 .notebook .notebook-body .note-cards .note-card, .notebook .notebook-body .note-cards .note-details {
   border: 1px solid #ccc;
   padding: 10px 15px;
@@ -30253,11 +30091,11 @@ ul.jqtree-tree .jqtree-toggler:hover {
   cursor: pointer;
   position: relative;
 }
-/* line 7098, ../../../scss/_app_styles.scss */
+/* line 6890, ../../../scss/_app_styles.scss */
 .notebook .notebook-body .note-cards .note-card .note-heading, .notebook .notebook-body .note-cards .note-details .note-heading {
   font-weight: 800;
 }
-/* line 7102, ../../../scss/_app_styles.scss */
+/* line 6894, ../../../scss/_app_styles.scss */
 .notebook .notebook-body .note-cards .note-card .note-close, .notebook .notebook-body .note-cards .note-details .note-close {
   position: absolute;
   right: 7px;
@@ -30265,21 +30103,21 @@ ul.jqtree-tree .jqtree-toggler:hover {
   font-weight: 700;
   color: #929292;
 }
-/* line 7110, ../../../scss/_app_styles.scss */
+/* line 6902, ../../../scss/_app_styles.scss */
 .notebook .notebook-body .note-cards .note-card .note-summary, .notebook .notebook-body .note-cards .note-details .note-summary {
   margin: 15px 0px;
 }
-/* line 7113, ../../../scss/_app_styles.scss */
+/* line 6905, ../../../scss/_app_styles.scss */
 .notebook .notebook-body .note-cards .note-card .note-info, .notebook .notebook-body .note-cards .note-card .note-extra-data, .notebook .notebook-body .note-cards .note-details .note-info, .notebook .notebook-body .note-cards .note-details .note-extra-data {
   color: #989898;
   letter-spacing: 0.9px;
   font-weight: 500;
 }
-/* line 7119, ../../../scss/_app_styles.scss */
+/* line 6911, ../../../scss/_app_styles.scss */
 .notebook .notebook-body .note-cards .note-card .note-info > span, .notebook .notebook-body .note-cards .note-card .note-extra-data > span, .notebook .notebook-body .note-cards .note-details .note-info > span, .notebook .notebook-body .note-cards .note-details .note-extra-data > span {
   margin-right: 5px;
 }
-/* line 7124, ../../../scss/_app_styles.scss */
+/* line 6916, ../../../scss/_app_styles.scss */
 .notebook .notebook-body .note-cards .note-card .note-tags > span, .notebook .notebook-body .note-cards .note-details .note-tags > span {
   display: inline-block;
   margin: 10px;
@@ -30287,53 +30125,53 @@ ul.jqtree-tree .jqtree-toggler:hover {
   color: #cba552;
   padding: 2px 5px;
 }
-/* line 7132, ../../../scss/_app_styles.scss */
+/* line 6924, ../../../scss/_app_styles.scss */
 .notebook .notebook-body .note-cards .note-card .note-actions, .notebook .notebook-body .note-cards .note-details .note-actions {
   color: #989898;
   cursor: pointer;
 }
-/* line 7136, ../../../scss/_app_styles.scss */
+/* line 6928, ../../../scss/_app_styles.scss */
 .notebook .notebook-body .note-cards .note-card .note-actions span, .notebook .notebook-body .note-cards .note-details .note-actions span {
   margin-right: 10px 5px;
 }
-/* line 7142, ../../../scss/_app_styles.scss */
+/* line 6934, ../../../scss/_app_styles.scss */
 .notebook .notebook-body .note-cards .note-details .note-info, .notebook .notebook-body .note-cards .note-details .note-extra-data, .notebook .notebook-body .note-cards .note-details .note-tags, .notebook .notebook-body .note-cards .note-details .note-actions {
   display: inline-block;
   margin-right: 10px;
 }
-/* line 7149, ../../../scss/_app_styles.scss */
+/* line 6941, ../../../scss/_app_styles.scss */
 .notebook .notebook-body .note-cards .note-details .note-tags {
   float: right;
 }
-/* line 7151, ../../../scss/_app_styles.scss */
+/* line 6943, ../../../scss/_app_styles.scss */
 .notebook .notebook-body .note-cards .note-details .note-tags > span {
   margin: 0px;
 }
-/* line 7160, ../../../scss/_app_styles.scss */
+/* line 6952, ../../../scss/_app_styles.scss */
 .notebook .notebook-body > div {
   padding: 0px;
 }
-/* line 7166, ../../../scss/_app_styles.scss */
+/* line 6958, ../../../scss/_app_styles.scss */
 .notebook .notebook-body .notebook-index {
   border-right: 1px solid #AFAEAE;
   padding: 4px 0px;
   background-color: #F1F1F1;
 }
-/* line 7171, ../../../scss/_app_styles.scss */
+/* line 6963, ../../../scss/_app_styles.scss */
 .notebook .notebook-body .notebook-index .tabs-content {
   padding: 0px;
 }
-/* line 7174, ../../../scss/_app_styles.scss */
+/* line 6966, ../../../scss/_app_styles.scss */
 .notebook .notebook-body .notebook-index .tabs-content .active {
   padding: 0px;
 }
-/* line 7178, ../../../scss/_app_styles.scss */
+/* line 6970, ../../../scss/_app_styles.scss */
 .notebook .notebook-body .notebook-index .tabs {
   width: 100%;
   margin: 0em 0em 0.5em;
   border-bottom: 1px solid #CCC;
 }
-/* line 7183, ../../../scss/_app_styles.scss */
+/* line 6975, ../../../scss/_app_styles.scss */
 .notebook .notebook-body .notebook-index .tabs .tab-title {
   width: 50%;
   /*background-color: #DEDEDE;*/
@@ -30341,172 +30179,172 @@ ul.jqtree-tree .jqtree-toggler:hover {
   position: relative;
   top: 1px;
 }
-/* line 7190, ../../../scss/_app_styles.scss */
+/* line 6982, ../../../scss/_app_styles.scss */
 .notebook .notebook-body .notebook-index .tabs .tab-title a {
   border-radius: inherit;
   text-align: center;
   color: #989898;
 }
-/* line 7197, ../../../scss/_app_styles.scss */
+/* line 6989, ../../../scss/_app_styles.scss */
 .notebook .notebook-body .notebook-index .tabs .tab-title.active {
   background-color: #fff;
   border: 1px solid #CCC;
   border-bottom: 0px;
 }
-/* line 7201, ../../../scss/_app_styles.scss */
+/* line 6993, ../../../scss/_app_styles.scss */
 .notebook .notebook-body .notebook-index .tabs .tab-title.active a {
   color: #3a3169;
 }
-/* line 7208, ../../../scss/_app_styles.scss */
+/* line 7000, ../../../scss/_app_styles.scss */
 .notebook .notebook-body .notebook-index .tab-content {
   padding: 0px;
 }
-/* line 7213, ../../../scss/_app_styles.scss */
+/* line 7005, ../../../scss/_app_styles.scss */
 .notebook .notebook-body .notebook-index .notes .date {
   font-weight: bold;
   background: #EFEFEF;
   padding: 7px 10px;
 }
-/* line 7219, ../../../scss/_app_styles.scss */
+/* line 7011, ../../../scss/_app_styles.scss */
 .notebook .notebook-body .notebook-index .notes .date .note-count {
   line-height: 2em;
 }
-/* line 7224, ../../../scss/_app_styles.scss */
+/* line 7016, ../../../scss/_app_styles.scss */
 .notebook .notebook-body .notebook-index .notes > div {
   border-bottom: 1px solid #AFAEAE;
 }
-/* line 7227, ../../../scss/_app_styles.scss */
+/* line 7019, ../../../scss/_app_styles.scss */
 .notebook .notebook-body .notebook-index .notes .note {
   padding: 5px 15px;
   background: #FFF;
   cursor: pointer;
   color: #A2A2A2;
 }
-/* line 7233, ../../../scss/_app_styles.scss */
+/* line 7025, ../../../scss/_app_styles.scss */
 .notebook .notebook-body .notebook-index .notes .note .note-heading {
   font-weight: 400;
 }
-/* line 7241, ../../../scss/_app_styles.scss */
+/* line 7033, ../../../scss/_app_styles.scss */
 .notebook .notebook-body .notebook-index .notes .note .note-meta > span:not(:first-child) {
   font-weight: 600;
   color: #717171;
 }
-/* line 7248, ../../../scss/_app_styles.scss */
+/* line 7040, ../../../scss/_app_styles.scss */
 .notebook .notebook-body .notebook-index .notes .note .note-footer {
   color: #888888;
 }
-/* line 7251, ../../../scss/_app_styles.scss */
+/* line 7043, ../../../scss/_app_styles.scss */
 .notebook .notebook-body .notebook-index .notes .note .note-footer span {
   margin-right: 10px;
 }
-/* line 7256, ../../../scss/_app_styles.scss */
+/* line 7048, ../../../scss/_app_styles.scss */
 .notebook .notebook-body .notebook-index .notes .note.active {
   border-left: 5px solid #6153AE;
   background: #F4E7FF;
   font-weight: 800;
   color: #6153AE;
 }
-/* line 7262, ../../../scss/_app_styles.scss */
+/* line 7054, ../../../scss/_app_styles.scss */
 .notebook .notebook-body .notebook-index .notes .note.active .note-heading {
   font-weight: 500;
 }
-/* line 7266, ../../../scss/_app_styles.scss */
+/* line 7058, ../../../scss/_app_styles.scss */
 .notebook .notebook-body .notebook-index .notes .note.active .note-meta > span:not(:first-child) {
   color: #6153AE;
 }
-/* line 7274, ../../../scss/_app_styles.scss */
+/* line 7066, ../../../scss/_app_styles.scss */
 .notebook .notebook-body .note-page {
   margin-left: 15px;
   background-color: #fff;
 }
-/* line 7280, ../../../scss/_app_styles.scss */
+/* line 7072, ../../../scss/_app_styles.scss */
 .notebook .notebook-body .note-page .group_sections_content {
   margin-top: 5px;
 }
-/* line 7284, ../../../scss/_app_styles.scss */
+/* line 7076, ../../../scss/_app_styles.scss */
 .notebook .notebook-body .note-page > div {
   background-color: #fff;
 }
-/* line 7288, ../../../scss/_app_styles.scss */
+/* line 7080, ../../../scss/_app_styles.scss */
 .notebook .notebook-body .note-page .note-toolbar {
   padding: 1.8em 1.2em 0em;
   margin: 0em;
   background-color: #FFF;
 }
-/* line 7293, ../../../scss/_app_styles.scss */
+/* line 7085, ../../../scss/_app_styles.scss */
 .notebook .notebook-body .note-page .note-toolbar .note-creator {
   font-weight: bold;
 }
-/* line 7296, ../../../scss/_app_styles.scss */
+/* line 7088, ../../../scss/_app_styles.scss */
 .notebook .notebook-body .note-page .note-toolbar .creator-title {
   text-align: left;
   color: #C3C3C3;
   letter-spacing: 0.3px;
   margin-top: 5px;
 }
-/* line 7303, ../../../scss/_app_styles.scss */
+/* line 7095, ../../../scss/_app_styles.scss */
 .notebook .notebook-body .note-page .note-toolbar .creator-rating {
   text-align: right;
 }
-/* line 7305, ../../../scss/_app_styles.scss */
+/* line 7097, ../../../scss/_app_styles.scss */
 .notebook .notebook-body .note-page .note-toolbar .creator-rating > div {
   display: inline-block;
 }
-/* line 7310, ../../../scss/_app_styles.scss */
+/* line 7102, ../../../scss/_app_styles.scss */
 .notebook .notebook-body .note-page .note-title {
   font-size: 20px;
   font-weight: 500;
   margin-right: 1em;
 }
-/* line 7316, ../../../scss/_app_styles.scss */
+/* line 7108, ../../../scss/_app_styles.scss */
 .notebook .notebook-body .note-page .note-content {
   padding: 2em 2em 1em;
   background: #fff;
   margin: 0em;
 }
-/* line 7322, ../../../scss/_app_styles.scss */
+/* line 7114, ../../../scss/_app_styles.scss */
 .notebook .notebook-body .note-page .note-content .note-header > div {
   display: inline-block;
 }
-/* line 7327, ../../../scss/_app_styles.scss */
+/* line 7119, ../../../scss/_app_styles.scss */
 .notebook .notebook-body .note-page .note-content .note-text {
   letter-spacing: 0.7px;
 }
-/* line 7330, ../../../scss/_app_styles.scss */
+/* line 7122, ../../../scss/_app_styles.scss */
 .notebook .notebook-body .note-page .note-content .note-text p {
   padding: 0px;
 }
-/* line 7336, ../../../scss/_app_styles.scss */
+/* line 7128, ../../../scss/_app_styles.scss */
 .notebook .notebook-body .note-page .comment-sections {
   padding: 0em 1em 0em;
 }
-/* line 7340, ../../../scss/_app_styles.scss */
+/* line 7132, ../../../scss/_app_styles.scss */
 .notebook .notebook-body .note-page .comment-sections .comments-header span {
   font-weight: bold;
 }
-/* line 7343, ../../../scss/_app_styles.scss */
+/* line 7135, ../../../scss/_app_styles.scss */
 .notebook .notebook-body .note-page .comment-sections .comments-header i:not(:first-child) {
   margin-left: 15px;
 }
-/* line 7348, ../../../scss/_app_styles.scss */
+/* line 7140, ../../../scss/_app_styles.scss */
 .notebook .notebook-body .note-page .comment-sections .new-comment {
   border-top: 1px solid grey;
   padding: 15px 10px;
   margin-top: 5px;
 }
-/* line 7353, ../../../scss/_app_styles.scss */
+/* line 7145, ../../../scss/_app_styles.scss */
 .notebook .notebook-body .note-page .comment-sections .new-comment .trumbowyg-box,
 .notebook .notebook-body .note-page .comment-sections .new-comment .trumbowyg-editor {
   min-height: 200px;
   margin-top: 0px;
 }
-/* line 7359, ../../../scss/_app_styles.scss */
+/* line 7151, ../../../scss/_app_styles.scss */
 .notebook .notebook-body .note-page .comment-sections .new-comment .user-prof-image {
   line-height: 0em;
 }
 
 /* Explore badges */
-/* line 7371, ../../../scss/_app_styles.scss */
+/* line 7163, ../../../scss/_app_styles.scss */
 .badge_ex {
   display: inline-block;
   line-height: 22px;
@@ -30522,7 +30360,7 @@ ul.jqtree-tree .jqtree-toggler:hover {
   box-shadow: inset 0 1px rgba(255, 255, 255, 0.3), 0 1px 1px rgba(0, 0, 0, 0.08);
 }
 
-/* line 7387, ../../../scss/_app_styles.scss */
+/* line 7179, ../../../scss/_app_styles.scss */
 .badge_ex {
   background: #67c1ef;
   border-color: #30aae9;
@@ -30532,7 +30370,7 @@ ul.jqtree-tree .jqtree-toggler:hover {
   background-image: linear-gradient(to bottom, #acddf6, #67c1ef);
 }
 
-/* line 7396, ../../../scss/_app_styles.scss */
+/* line 7188, ../../../scss/_app_styles.scss */
 .badge_ex.green {
   background: #77cc51;
   border-color: #59ad33;
@@ -30542,7 +30380,7 @@ ul.jqtree-tree .jqtree-toggler:hover {
   background-image: linear-gradient(to bottom, #a5dd8c, #77cc51);
 }
 
-/* line 7405, ../../../scss/_app_styles.scss */
+/* line 7197, ../../../scss/_app_styles.scss */
 .badge_ex.yellow {
   background: #faba3e;
   border-color: #f4a306;
@@ -30552,7 +30390,7 @@ ul.jqtree-tree .jqtree-toggler:hover {
   background-image: linear-gradient(to bottom, #fcd589, #faba3e);
 }
 
-/* line 7414, ../../../scss/_app_styles.scss */
+/* line 7206, ../../../scss/_app_styles.scss */
 .badge_ex.red {
   background: #fa623f;
   border-color: #fa5a35;
@@ -30563,7 +30401,7 @@ ul.jqtree-tree .jqtree-toggler:hover {
 }
 
 /* Create_Unit styles */
-/* line 7425, ../../../scss/_app_styles.scss */
+/* line 7217, ../../../scss/_app_styles.scss */
 .course_creator_header {
   width: 100%;
   height: 50px;
@@ -30571,7 +30409,7 @@ ul.jqtree-tree .jqtree-toggler:hover {
   padding: 5px 15px;
   box-shadow: 1px 0px 0px #000;
 }
-/* line 7432, ../../../scss/_app_styles.scss */
+/* line 7224, ../../../scss/_app_styles.scss */
 .course_creator_header .unit_editor {
   width: 100%;
   height: 320px;
@@ -30579,13 +30417,13 @@ ul.jqtree-tree .jqtree-toggler:hover {
   padding: 5px 15px;
   box-shadow: 1px 0px 0px #000;
 }
-/* line 7441, ../../../scss/_app_styles.scss */
+/* line 7233, ../../../scss/_app_styles.scss */
 .course_creator_header .back_to_group {
   padding: 0px 15px 0px 10px;
   border-right: 1px solid #ccc;
   margin-right: 15px;
 }
-/* line 7447, ../../../scss/_app_styles.scss */
+/* line 7239, ../../../scss/_app_styles.scss */
 .course_creator_header .course_heading_unit {
   width: 500px;
   height: 40px;
@@ -30594,24 +30432,24 @@ ul.jqtree-tree .jqtree-toggler:hover {
   float: right;
   text-align: center;
 }
-/* line 7456, ../../../scss/_app_styles.scss */
+/* line 7248, ../../../scss/_app_styles.scss */
 .course_creator_header .course_heading_unit:focus {
   border: 1px solid #74b3dc;
 }
-/* line 7460, ../../../scss/_app_styles.scss */
+/* line 7252, ../../../scss/_app_styles.scss */
 .course_creator_header .course_heading_unit::-webkit-input-placeholder
  {
   color: #d9dfe4;
   letter-spacing: 0.8px;
 }
-/* line 7468, ../../../scss/_app_styles.scss */
+/* line 7260, ../../../scss/_app_styles.scss */
 .course_creator_header .course_heading_unit select {
   font-size: 14px;
   font-family: 'OpenSans-Regular', sans-serif;
   color: gray;
   border: 0px solid #74b3dc;
 }
-/* line 7479, ../../../scss/_app_styles.scss */
+/* line 7271, ../../../scss/_app_styles.scss */
 .course_creator_header .course_heading input {
   width: 500px;
   height: 40px;
@@ -30620,31 +30458,31 @@ ul.jqtree-tree .jqtree-toggler:hover {
   float: right;
   text-align: center;
 }
-/* line 7487, ../../../scss/_app_styles.scss */
+/* line 7279, ../../../scss/_app_styles.scss */
 .course_creator_header .course_heading input:focus {
   border: 1px solid #74b3dc;
 }
-/* line 7491, ../../../scss/_app_styles.scss */
+/* line 7283, ../../../scss/_app_styles.scss */
 .course_creator_header .course_heading input::-webkit-input-placeholder
  {
   color: #d9dfe4;
   letter-spacing: 0.8px;
 }
-/* line 7501, ../../../scss/_app_styles.scss */
+/* line 7293, ../../../scss/_app_styles.scss */
 .course_creator_header .course_heading h5 {
   margin-top: 15px;
 }
-/* line 7506, ../../../scss/_app_styles.scss */
+/* line 7298, ../../../scss/_app_styles.scss */
 .course_creator_header .course_heading span {
   letter-spacing: 0.9px;
   font-weight: 600;
   line-height: 50px;
 }
-/* line 7514, ../../../scss/_app_styles.scss */
+/* line 7306, ../../../scss/_app_styles.scss */
 .course_creator_header .course_actions ul {
   margin: 0px;
 }
-/* line 7517, ../../../scss/_app_styles.scss */
+/* line 7309, ../../../scss/_app_styles.scss */
 .course_creator_header .course_actions ul li {
   list-style-type: none;
   display: inline-block;
@@ -30653,11 +30491,11 @@ ul.jqtree-tree .jqtree-toggler:hover {
   cursor: pointer;
   letter-spacing: 0.8px;
 }
-/* line 7526, ../../../scss/_app_styles.scss */
+/* line 7318, ../../../scss/_app_styles.scss */
 .course_creator_header .course_actions ul li.active, .course_creator_header .course_actions ul li:hover {
   border-bottom: 3px solid #ffc14e;
 }
-/* line 7531, ../../../scss/_app_styles.scss */
+/* line 7323, ../../../scss/_app_styles.scss */
 .course_creator_header .course_actions span {
   margin-right: 5px;
   background: rgba(0, 0, 0, 0.6);
@@ -30669,7 +30507,7 @@ ul.jqtree-tree .jqtree-toggler:hover {
   cursor: pointer;
   border-radius: 3px;
 }
-/* line 7543, ../../../scss/_app_styles.scss */
+/* line 7335, ../../../scss/_app_styles.scss */
 .course_creator_header .course_actions i {
   margin-right: 5px;
   background: rgba(0, 0, 0, 0.6);
@@ -30682,7 +30520,7 @@ ul.jqtree-tree .jqtree-toggler:hover {
   border-radius: 3px;
 }
 
-/* line 7561, ../../../scss/_app_styles.scss */
+/* line 7353, ../../../scss/_app_styles.scss */
 .create_unit {
   background: #fff;
   box-shadow: 0px 2px 3px #000;
@@ -30690,7 +30528,7 @@ ul.jqtree-tree .jqtree-toggler:hover {
   padding: 10px;
 }
 
-/* line 7569, ../../../scss/_app_styles.scss */
+/* line 7361, ../../../scss/_app_styles.scss */
 .button-hollow-black {
   background: #fff;
   border: 2px solid #164A7B;
@@ -30701,14 +30539,14 @@ ul.jqtree-tree .jqtree-toggler:hover {
   padding: 2px 10px;
 }
 
-/* line 7579, ../../../scss/_app_styles.scss */
+/* line 7371, ../../../scss/_app_styles.scss */
 .vertically-center {
   top: 50%;
   transform: translateY(-50%);
 }
 
 /* Unit_Structure styles */
-/* line 7587, ../../../scss/_app_styles.scss */
+/* line 7379, ../../../scss/_app_styles.scss */
 .course_creator {
   background: #fff;
   box-shadow: 0px 2px 6px #000;
@@ -30716,12 +30554,12 @@ ul.jqtree-tree .jqtree-toggler:hover {
   padding: 0px 0px;
   max-width: 100vw;
 }
-/* line 7595, ../../../scss/_app_styles.scss */
+/* line 7387, ../../../scss/_app_styles.scss */
 .course_creator > .columns {
   padding: 0px;
   height: 100%;
 }
-/* line 7599, ../../../scss/_app_styles.scss */
+/* line 7391, ../../../scss/_app_styles.scss */
 .course_creator .course_editor {
   margin-bottom: 10px;
   position: relative;
@@ -30729,17 +30567,17 @@ ul.jqtree-tree .jqtree-toggler:hover {
   /*Custom css*/
   /* Course edit in the edit mode. */
 }
-/* line 7605, ../../../scss/_app_styles.scss */
+/* line 7397, ../../../scss/_app_styles.scss */
 .course_creator .course_editor .accordion .accordion-navigation > .content, .course_creator .course_editor .accordion dd > .content {
   padding: 0px;
   padding-left: 0px;
 }
-/* line 7611, ../../../scss/_app_styles.scss */
+/* line 7403, ../../../scss/_app_styles.scss */
 .course_creator .course_editor > div {
   display: inline-block;
   vertical-align: top;
 }
-/* line 7616, ../../../scss/_app_styles.scss */
+/* line 7408, ../../../scss/_app_styles.scss */
 .course_creator .course_editor .course_tree {
   transition: all 1s ease;
   -webkit-transition: all 1s ease;
@@ -30749,25 +30587,25 @@ ul.jqtree-tree .jqtree-toggler:hover {
   overflow-y: auto;
   height: 100vh;
 }
-/* line 7625, ../../../scss/_app_styles.scss */
+/* line 7417, ../../../scss/_app_styles.scss */
 .course_creator .course_editor .course_tree .course-lessons dd {
   border-bottom: 2px solid #9abfd9;
   transition: border-color 1s ease;
   -webkit-transition: border-color 1s ease;
 }
-/* line 7629, ../../../scss/_app_styles.scss */
+/* line 7421, ../../../scss/_app_styles.scss */
 .course_creator .course_editor .course_tree .course-lessons dd.accordion-navigation {
   position: relative;
   padding-left: 0px;
 }
-/* line 7634, ../../../scss/_app_styles.scss */
+/* line 7426, ../../../scss/_app_styles.scss */
 .course_creator .course_editor .course_tree .course-lessons dd.accordion-navigation > a:before {
   position: absolute;
   left: 23px;
   line-height: 20px;
   color: #74b3dc;
 }
-/* line 7643, ../../../scss/_app_styles.scss */
+/* line 7435, ../../../scss/_app_styles.scss */
 .course_creator .course_editor .course_tree .course-lessons dd.accordion-navigation a.entity-title {
   background: inherit;
   cursor: pointer;
@@ -30776,7 +30614,7 @@ ul.jqtree-tree .jqtree-toggler:hover {
   transition: color 1s ease;
   -webkit-transition: color 1s ease;
 }
-/* line 7650, ../../../scss/_app_styles.scss */
+/* line 7442, ../../../scss/_app_styles.scss */
 .course_creator .course_editor .course_tree .course-lessons dd.accordion-navigation a.entity-title .edit_entity {
   color: #c9d1d8;
   font-weight: 400;
@@ -30785,15 +30623,15 @@ ul.jqtree-tree .jqtree-toggler:hover {
   position: relative;
   display: none;
 }
-/* line 7659, ../../../scss/_app_styles.scss */
+/* line 7451, ../../../scss/_app_styles.scss */
 .course_creator .course_editor .course_tree .course-lessons dd.accordion-navigation a.entity-title .edit_entity i {
   display: none;
 }
-/* line 7664, ../../../scss/_app_styles.scss */
+/* line 7456, ../../../scss/_app_styles.scss */
 .course_creator .course_editor .course_tree .course-lessons dd.accordion-navigation a.entity-title .edit_entity > .entity_actions {
   margin-bottom: 0px;
 }
-/* line 7667, ../../../scss/_app_styles.scss */
+/* line 7459, ../../../scss/_app_styles.scss */
 .course_creator .course_editor .course_tree .course-lessons dd.accordion-navigation a.entity-title .edit_entity > .entity_actions li {
   white-space: nowrap;
   list-style: none;
@@ -30801,21 +30639,21 @@ ul.jqtree-tree .jqtree-toggler:hover {
   margin: 0px 10px;
   cursor: pointer;
 }
-/* line 7677, ../../../scss/_app_styles.scss */
+/* line 7469, ../../../scss/_app_styles.scss */
 .course_creator .course_editor .course_tree .course-lessons dd.accordion-navigation a.entity-title:hover .edit_entity {
   display: block;
 }
-/* line 7683, ../../../scss/_app_styles.scss */
+/* line 7475, ../../../scss/_app_styles.scss */
 .course_creator .course_editor .course_tree .course-lessons dd.accordion-navigation.active > a:before {
   content: '';
   line-height: 55px;
   color: #d7d7d7;
 }
-/* line 7691, ../../../scss/_app_styles.scss */
+/* line 7483, ../../../scss/_app_styles.scss */
 .course_creator .course_editor .course_tree .course-lessons dd.accordion-navigation .course-activities {
   margin: 0px;
 }
-/* line 7693, ../../../scss/_app_styles.scss */
+/* line 7485, ../../../scss/_app_styles.scss */
 .course_creator .course_editor .course_tree .course-lessons dd.accordion-navigation .course-activities > li {
   list-style: none;
   border-top: 1px solid #e9e9e9;
@@ -30824,7 +30662,7 @@ ul.jqtree-tree .jqtree-toggler:hover {
   transition: border-color 1s ease;
   -webkit-transition: border-color 1s ease;
 }
-/* line 7700, ../../../scss/_app_styles.scss */
+/* line 7492, ../../../scss/_app_styles.scss */
 .course_creator .course_editor .course_tree .course-lessons dd.accordion-navigation .course-activities > li > a {
   color: #7ca0d0;
   width: 100%;
@@ -30832,11 +30670,11 @@ ul.jqtree-tree .jqtree-toggler:hover {
   transition: color 1s ease;
   -webkit-transition: color 1s ease;
 }
-/* line 7709, ../../../scss/_app_styles.scss */
+/* line 7501, ../../../scss/_app_styles.scss */
 .course_creator .course_editor .course_tree .course-lessons dd.accordion-navigation .content {
   background: inherit;
 }
-/* line 7718, ../../../scss/_app_styles.scss */
+/* line 7510, ../../../scss/_app_styles.scss */
 .course_creator .course_editor .course-editor-section {
   width: 0%;
   display: inline-block;
@@ -30848,49 +30686,49 @@ ul.jqtree-tree .jqtree-toggler:hover {
   overflow-y: auto;
   background: #fff;
 }
-/* line 7728, ../../../scss/_app_styles.scss */
+/* line 7520, ../../../scss/_app_styles.scss */
 .course_creator .course_editor .course-editor-section .editor-header {
   height: 55px;
   background-color: #e5f1f6;
   border-bottom: 1px solid #e6e6e7;
   margin-bottom: 10px;
 }
-/* line 7734, ../../../scss/_app_styles.scss */
+/* line 7526, ../../../scss/_app_styles.scss */
 .course_creator .course_editor .course-editor-section .editor-header .header-left {
   padding: 14px 10px 10px 10px;
 }
-/* line 7737, ../../../scss/_app_styles.scss */
+/* line 7529, ../../../scss/_app_styles.scss */
 .course_creator .course_editor .course-editor-section .editor-header .header-left > span {
   color: #3c5264;
   font-weight: 600;
   margin-right: 10px;
 }
-/* line 7746, ../../../scss/_app_styles.scss */
+/* line 7538, ../../../scss/_app_styles.scss */
 .course_creator .course_editor .course-editor-section .editor-header .custom_dropdown {
   margin: 40px 35px 0px;
 }
-/* line 7751, ../../../scss/_app_styles.scss */
+/* line 7543, ../../../scss/_app_styles.scss */
 .course_creator .course_editor .course-editor-section .editor-tool .editor_actions {
   background-color: #fff;
   border-bottom: 1px solid #ccc;
   height: 55px;
 }
-/* line 7755, ../../../scss/_app_styles.scss */
+/* line 7547, ../../../scss/_app_styles.scss */
 .course_creator .course_editor .course-editor-section .editor-tool .editor_actions ul {
   margin: 0px;
 }
-/* line 7757, ../../../scss/_app_styles.scss */
+/* line 7549, ../../../scss/_app_styles.scss */
 .course_creator .course_editor .course-editor-section .editor-tool .editor_actions ul li {
   list-style: none;
   display: inline-block;
 }
-/* line 7760, ../../../scss/_app_styles.scss */
+/* line 7552, ../../../scss/_app_styles.scss */
 .course_creator .course_editor .course-editor-section .editor-tool .editor_actions ul li:not(:first-child) {
   padding: 1px 30px;
   border-left: 1px solid #ccc;
   text-align: center;
 }
-/* line 7766, ../../../scss/_app_styles.scss */
+/* line 7558, ../../../scss/_app_styles.scss */
 .course_creator .course_editor .course-editor-section .editor-tool .editor_actions ul li span {
   display: inline-block;
   letter-spacing: 0.5px;
@@ -30898,29 +30736,29 @@ ul.jqtree-tree .jqtree-toggler:hover {
   padding: 15px 5px;
   cursor: pointer;
 }
-/* line 7781, ../../../scss/_app_styles.scss */
+/* line 7573, ../../../scss/_app_styles.scss */
 .course_creator .course_editor .add-lesson {
   margin-top: 20px;
   margin-left: 20px;
   float: left;
 }
-/* line 7789, ../../../scss/_app_styles.scss */
+/* line 7581, ../../../scss/_app_styles.scss */
 .course_creator .course_editor .add_activity {
   margin-top: 3px;
 }
-/* line 7795, ../../../scss/_app_styles.scss */
+/* line 7587, ../../../scss/_app_styles.scss */
 .course_creator .course_editor .create_activity {
   margin-top: 0px;
   margin-left: -7.1px;
 }
-/* line 7804, ../../../scss/_app_styles.scss */
+/* line 7596, ../../../scss/_app_styles.scss */
 .course_creator .course_editor.edit_mode button {
   color: #5097b5;
   border-color: #5097b5;
   transition: color 1s ease, border-color 1s ease;
   -webkit-transition: color 1s ease, border-color 1s ease;
 }
-/* line 7809, ../../../scss/_app_styles.scss */
+/* line 7601, ../../../scss/_app_styles.scss */
 .course_creator .course_editor.edit_mode .course_tree {
   transition: all 1s ease;
   -webkit-transition: all 1s ease;
@@ -30928,28 +30766,28 @@ ul.jqtree-tree .jqtree-toggler:hover {
   background-color: #2a6882;
   border: 1px solid #e5f1f6;
 }
-/* line 7816, ../../../scss/_app_styles.scss */
+/* line 7608, ../../../scss/_app_styles.scss */
 .course_creator .course_editor.edit_mode .course_tree .course-lessons dd {
   border-color: #295566;
   transition: border-color 1s ease;
   -webkit-transition: border-color 1s ease;
 }
-/* line 7821, ../../../scss/_app_styles.scss */
+/* line 7613, ../../../scss/_app_styles.scss */
 .course_creator .course_editor.edit_mode .course_tree .course-lessons dd.accordion-navigation a {
   background: inherit;
   color: #8fbbd8;
   transition: color 1s ease;
   -webkit-transition: color 1s ease;
 }
-/* line 7826, ../../../scss/_app_styles.scss */
+/* line 7618, ../../../scss/_app_styles.scss */
 .course_creator .course_editor.edit_mode .course_tree .course-lessons dd.accordion-navigation a .edit_entity {
   width: 20px;
 }
-/* line 7828, ../../../scss/_app_styles.scss */
+/* line 7620, ../../../scss/_app_styles.scss */
 .course_creator .course_editor.edit_mode .course_tree .course-lessons dd.accordion-navigation a .edit_entity i {
   display: block;
 }
-/* line 7832, ../../../scss/_app_styles.scss */
+/* line 7624, ../../../scss/_app_styles.scss */
 .course_creator .course_editor.edit_mode .course_tree .course-lessons dd.accordion-navigation a .edit_entity > .entity_actions {
   display: none;
   position: absolute;
@@ -30961,21 +30799,21 @@ ul.jqtree-tree .jqtree-toggler:hover {
   color: #999999;
   border-radius: 3px;
 }
-/* line 7843, ../../../scss/_app_styles.scss */
+/* line 7635, ../../../scss/_app_styles.scss */
 .course_creator .course_editor.edit_mode .course_tree .course-lessons dd.accordion-navigation a .edit_entity > .entity_actions li {
   display: block;
   margin: 0px;
   padding: 5px 25px;
 }
-/* line 7848, ../../../scss/_app_styles.scss */
+/* line 7640, ../../../scss/_app_styles.scss */
 .course_creator .course_editor.edit_mode .course_tree .course-lessons dd.accordion-navigation a .edit_entity > .entity_actions li:hover {
   background-color: #d5f2ff;
 }
-/* line 7854, ../../../scss/_app_styles.scss */
+/* line 7646, ../../../scss/_app_styles.scss */
 .course_creator .course_editor.edit_mode .course_tree .course-lessons dd.accordion-navigation a .edit_entity:hover > .entity_actions {
   display: block;
 }
-/* line 7860, ../../../scss/_app_styles.scss */
+/* line 7652, ../../../scss/_app_styles.scss */
 .course_creator .course_editor.edit_mode .course_tree .course-lessons dd.accordion-navigation .course-activities > li {
   transition: border-color 1s ease;
   -webkit-transition: border-color 1s ease;
@@ -30983,19 +30821,19 @@ ul.jqtree-tree .jqtree-toggler:hover {
   border-color: #295566;
   border-bottom: 1px solid transparent;
 }
-/* line 7867, ../../../scss/_app_styles.scss */
+/* line 7659, ../../../scss/_app_styles.scss */
 .course_creator .course_editor.edit_mode .course_tree .course-lessons dd.accordion-navigation .course-activities > li:not(:last-child):hover, .course_creator .course_editor.edit_mode .course_tree .course-lessons dd.accordion-navigation .course-activities > li:not(:last-child).active {
   border-width: 1px 0px 1px 0px;
   border-style: solid;
   border-color: #50c0f8;
 }
-/* line 7874, ../../../scss/_app_styles.scss */
+/* line 7666, ../../../scss/_app_styles.scss */
 .course_creator .course_editor.edit_mode .course_tree .course-lessons dd.accordion-navigation .course-activities > li > a {
   color: #edf6ff;
   transition: color 1s ease;
   -webkit-transition: color 1s ease;
 }
-/* line 7885, ../../../scss/_app_styles.scss */
+/* line 7677, ../../../scss/_app_styles.scss */
 .course_creator .course_editor.edit_mode .course-editor-section {
   width: 77%;
   opacity: 1;
@@ -31006,18 +30844,18 @@ ul.jqtree-tree .jqtree-toggler:hover {
   -webkit-transition: width 1.9s ease, opacity 4s ease;
 }
 
-/* line 7904, ../../../scss/_app_styles.scss */
+/* line 7696, ../../../scss/_app_styles.scss */
 .tile_modal .editor_modal_content .modal_tile .th {
   width: 100%;
   height: 210px;
   box-shadow: none;
 }
-/* line 7909, ../../../scss/_app_styles.scss */
+/* line 7701, ../../../scss/_app_styles.scss */
 .tile_modal .editor_modal_content .modal_tile .th > img {
   height: 180px;
   width: 100%;
 }
-/* line 7914, ../../../scss/_app_styles.scss */
+/* line 7706, ../../../scss/_app_styles.scss */
 .tile_modal .editor_modal_content .modal_tile .th > span {
   display: block;
   width: 100%;
@@ -31025,76 +30863,76 @@ ul.jqtree-tree .jqtree-toggler:hover {
   line-height: 22px;
 }
 
-/* line 7928, ../../../scss/_app_styles.scss */
+/* line 7720, ../../../scss/_app_styles.scss */
 #appModal .editor_modal_content > div {
   width: 100%;
 }
-/* line 7930, ../../../scss/_app_styles.scss */
+/* line 7722, ../../../scss/_app_styles.scss */
 #appModal .editor_modal_content > div > div {
   display: inline-block;
   vertical-align: top;
 }
-/* line 7935, ../../../scss/_app_styles.scss */
+/* line 7727, ../../../scss/_app_styles.scss */
 #appModal .editor_modal_content .app_row {
   margin-bottom: 39px;
 }
-/* line 7938, ../../../scss/_app_styles.scss */
+/* line 7730, ../../../scss/_app_styles.scss */
 #appModal .editor_modal_content .app_row .app_image {
   padding: 10px;
 }
-/* line 7941, ../../../scss/_app_styles.scss */
+/* line 7733, ../../../scss/_app_styles.scss */
 #appModal .editor_modal_content .app_row .app_image > div {
   border: 1px solid #999;
   height: 222px;
 }
-/* line 7947, ../../../scss/_app_styles.scss */
+/* line 7739, ../../../scss/_app_styles.scss */
 #appModal .editor_modal_content .app_row .app_desc {
   padding-left: 10px;
 }
 
-/* line 7956, ../../../scss/_app_styles.scss */
+/* line 7748, ../../../scss/_app_styles.scss */
 .editor_modal .editor_modal_title {
   color: #3c5264;
 }
-/* line 7961, ../../../scss/_app_styles.scss */
+/* line 7753, ../../../scss/_app_styles.scss */
 .editor_modal .editor_modal_actions > a {
   display: inline-block;
 }
-/* line 7964, ../../../scss/_app_styles.scss */
+/* line 7756, ../../../scss/_app_styles.scss */
 .editor_modal .editor_modal_actions > a.close-reveal-modal {
   line-height: inherit;
   position: inherit;
   color: #c601bc;
 }
 
-/* line 7974, ../../../scss/_app_styles.scss */
+/* line 7766, ../../../scss/_app_styles.scss */
 .reveal-modal-overlay, dialog {
   padding: 0px;
   padding-bottom: 13px;
 }
 
-/* line 7979, ../../../scss/_app_styles.scss */
+/* line 7771, ../../../scss/_app_styles.scss */
 .overlay-title {
   margin: 15px 10px 10px 10px;
   letter-spacing: -1px;
 }
 
-/* line 7984, ../../../scss/_app_styles.scss */
+/* line 7776, ../../../scss/_app_styles.scss */
 .custom_dropdown {
   position: relative;
   z-index: 10;
   display: inline-block;
 }
-/* line 7990, ../../../scss/_app_styles.scss */
+/* line 7782, ../../../scss/_app_styles.scss */
 .custom_dropdown > a {
   height: 30px;
   display: block;
 }
-/* line 7996, ../../../scss/_app_styles.scss */
+/* line 7788, ../../../scss/_app_styles.scss */
 .custom_dropdown:hover .dropdown_content {
   display: block;
 }
-/* line 8001, ../../../scss/_app_styles.scss */
+/* line 7793, ../../../scss/_app_styles.scss */
 .custom_dropdown .dropdown_content {
   background-color: #fff;
   border-radius: 10px;
@@ -31103,35 +30941,35 @@ ul.jqtree-tree .jqtree-toggler:hover {
   top: 30px;
   border: 1px solid #ccc;
 }
-/* line 8009, ../../../scss/_app_styles.scss */
+/* line 7801, ../../../scss/_app_styles.scss */
 .custom_dropdown .dropdown_content.left_align {
   left: -54px;
 }
-/* line 8013, ../../../scss/_app_styles.scss */
+/* line 7805, ../../../scss/_app_styles.scss */
 .custom_dropdown .dropdown_content.right_align {
   right: -10px;
 }
-/* line 8017, ../../../scss/_app_styles.scss */
+/* line 7809, ../../../scss/_app_styles.scss */
 .custom_dropdown .dropdown_content li {
   padding: 10px 35px;
   list-style: none;
   white-space: nowrap;
 }
-/* line 8022, ../../../scss/_app_styles.scss */
+/* line 7814, ../../../scss/_app_styles.scss */
 .custom_dropdown .dropdown_content li a {
   margin: 0px;
   width: 70px;
 }
-/* line 8027, ../../../scss/_app_styles.scss */
+/* line 7819, ../../../scss/_app_styles.scss */
 .custom_dropdown .dropdown_content li:hover {
   background-color: #d5f2ff;
 }
-/* line 8034, ../../../scss/_app_styles.scss */
+/* line 7826, ../../../scss/_app_styles.scss */
 .custom_dropdown a {
   color: #999999;
 }
 
-/* line 8040, ../../../scss/_app_styles.scss */
+/* line 7832, ../../../scss/_app_styles.scss */
 .button-hollow-purple {
   background: inherit;
   border: 2px solid #c601bc;
@@ -31145,7 +30983,7 @@ ul.jqtree-tree .jqtree-toggler:hover {
   -webkit-transition: color 1s ease, border-color 1s ease;
 }
 
-/* line 8053, ../../../scss/_app_styles.scss */
+/* line 7845, ../../../scss/_app_styles.scss */
 .button-hollow-grey {
   background: inherit;
   border: 2px solid #c9d1d8;
@@ -31159,7 +30997,7 @@ ul.jqtree-tree .jqtree-toggler:hover {
   -webkit-transition: color 1s ease, border-color 1s ease;
 }
 
-/* line 8066, ../../../scss/_app_styles.scss */
+/* line 7858, ../../../scss/_app_styles.scss */
 .button-hollow-blue {
   background: inherit;
   border: 2px solid #5097b5;
@@ -31172,88 +31010,88 @@ ul.jqtree-tree .jqtree-toggler:hover {
   -webkit-transition: color 1s ease, border-color 1s ease;
 }
 
-/* line 8077, ../../../scss/_app_styles.scss */
+/* line 7869, ../../../scss/_app_styles.scss */
 .save_edit_activity {
   margin-right: 16.9px;
   margin-top: 37.3px;
 }
 
-/* line 8082, ../../../scss/_app_styles.scss */
+/* line 7874, ../../../scss/_app_styles.scss */
 .activity-name {
   margin-left: 20px;
   margin-top: 5px;
 }
 
-/* line 8087, ../../../scss/_app_styles.scss */
+/* line 7879, ../../../scss/_app_styles.scss */
 .activity-name-label {
   width: 80%;
   margin-left: 20px;
   margin-top: 5px;
 }
 
-/* line 8094, ../../../scss/_app_styles.scss */
+/* line 7886, ../../../scss/_app_styles.scss */
 .create_activity_new {
   margin-left: -15px;
 }
 
-/* line 8098, ../../../scss/_app_styles.scss */
+/* line 7890, ../../../scss/_app_styles.scss */
 .create-discussion {
   position: relative;
   margin-bottom: 20px;
 }
-/* line 8102, ../../../scss/_app_styles.scss */
+/* line 7894, ../../../scss/_app_styles.scss */
 .create-discussion > div {
   display: inline-block;
   vertical-align: top;
   margin: 5px 0px;
 }
-/* line 8108, ../../../scss/_app_styles.scss */
+/* line 7900, ../../../scss/_app_styles.scss */
 .create-discussion .button {
   margin: 5px 0px;
 }
-/* line 8111, ../../../scss/_app_styles.scss */
+/* line 7903, ../../../scss/_app_styles.scss */
 .create-discussion .ckeditor-content-comment {
   width: 85%;
   margin-left: 1em;
 }
-/* line 8115, ../../../scss/_app_styles.scss */
+/* line 7907, ../../../scss/_app_styles.scss */
 .create-discussion .ckeditor-content-comment > div {
   display: inline-block;
   vertical-align: top;
 }
-/* line 8120, ../../../scss/_app_styles.scss */
+/* line 7912, ../../../scss/_app_styles.scss */
 .create-discussion .ckeditor-content-comment .ckeditor-reply-area {
   width: 90%;
 }
 
-/* line 8127, ../../../scss/_app_styles.scss */
+/* line 7919, ../../../scss/_app_styles.scss */
 #replies-area .ckeditor-content-reply {
   margin-top: 1em;
   /*width: 97%;*/
 }
-/* line 8131, ../../../scss/_app_styles.scss */
+/* line 7923, ../../../scss/_app_styles.scss */
 #replies-area .ckeditor-content-reply .ckeditor-reply-area {
   display: inline-block;
   width: 90%;
   margin-left: 1em;
 }
-/* line 8136, ../../../scss/_app_styles.scss */
+/* line 7928, ../../../scss/_app_styles.scss */
 #replies-area .ckeditor-content-reply .post-btn-div {
   display: inline-block;
   vertical-align: top;
 }
-/* line 8140, ../../../scss/_app_styles.scss */
+/* line 7932, ../../../scss/_app_styles.scss */
 #replies-area .ckeditor-content-reply .post-btn {
   background-color: #720f5e;
   width: 77px;
   margin-left: 17px;
 }
-/* line 8144, ../../../scss/_app_styles.scss */
+/* line 7936, ../../../scss/_app_styles.scss */
 #replies-area .ckeditor-content-reply .post-btn:hover {
   color: #720f5e;
   background-color: #ffffff;
 }
-/* line 8153, ../../../scss/_app_styles.scss */
+/* line 7945, ../../../scss/_app_styles.scss */
 #replies-area .disc-replies {
   /*background-color:#ddd;*/
   margin-left: 48px;
@@ -31262,16 +31100,16 @@ ul.jqtree-tree .jqtree-toggler:hover {
   border-top: 1px solid #B1B1B1;
   width: 80%;
 }
-/* line 8162, ../../../scss/_app_styles.scss */
+/* line 7954, ../../../scss/_app_styles.scss */
 #replies-area .disc-replies .reply-btn {
   cursor: pointer;
   color: grey !important;
 }
-/* line 8167, ../../../scss/_app_styles.scss */
+/* line 7959, ../../../scss/_app_styles.scss */
 #replies-area .disc-replies .reply-btn:hover {
   color: #000 !important;
 }
-/* line 8170, ../../../scss/_app_styles.scss */
+/* line 7962, ../../../scss/_app_styles.scss */
 #replies-area .disc-replies .discussion-title-username {
   color: #ffffff !important;
   height: 2em;
@@ -31279,7 +31117,7 @@ ul.jqtree-tree .jqtree-toggler:hover {
   padding-left: 10px;
   line-height: 1.5em;
 }
-/* line 8180, ../../../scss/_app_styles.scss */
+/* line 7972, ../../../scss/_app_styles.scss */
 #replies-area .disc-replies .discussion-footer {
   /*background-color:#CCCCCC;*/
   color: gray !important;
@@ -31289,19 +31127,19 @@ ul.jqtree-tree .jqtree-toggler:hover {
   border-radius: 0px 0px 5px 5px;
   /*background-color:  #f2f2f2;*/
 }
-/* line 8189, ../../../scss/_app_styles.scss */
+/* line 7981, ../../../scss/_app_styles.scss */
 #replies-area .disc-replies .discussion-footer > a {
   vertical-align: middle;
   line-height: 2em;
 }
-/* line 8195, ../../../scss/_app_styles.scss */
+/* line 7987, ../../../scss/_app_styles.scss */
 #replies-area .disc-replies .discussion-content {
   color: #262626;
   word-wrap: break-word;
   /*background-color:  #f2f2f2;*/
 }
 
-/* line 8207, ../../../scss/_app_styles.scss */
+/* line 7999, ../../../scss/_app_styles.scss */
 .bg-img {
   background: url(/static/ndf/images/i2c-bg.png);
   height: 100%;
@@ -31309,34 +31147,34 @@ ul.jqtree-tree .jqtree-toggler:hover {
   background-repeat: no-repeat;
 }
 
-/* line 8215, ../../../scss/_app_styles.scss */
+/* line 8007, ../../../scss/_app_styles.scss */
 .clix-text {
   z-index: -1;
 }
 
-/* line 8218, ../../../scss/_app_styles.scss */
+/* line 8010, ../../../scss/_app_styles.scss */
 .panel-mod {
   background-color: transparent;
   border: none;
 }
 
-/* line 8223, ../../../scss/_app_styles.scss */
+/* line 8015, ../../../scss/_app_styles.scss */
 .asset_content_upload {
   width: 100% !important;
 }
 
-/* line 8227, ../../../scss/_app_styles.scss */
+/* line 8019, ../../../scss/_app_styles.scss */
 #upload_asset {
   margin-top: 60px !important;
 }
 
-/* line 8231, ../../../scss/_app_styles.scss */
+/* line 8023, ../../../scss/_app_styles.scss */
 #profile-img {
   height: 40px;
   margin-right: 5px;
 }
 
-/* line 8236, ../../../scss/_app_styles.scss */
+/* line 8028, ../../../scss/_app_styles.scss */
 .profile-img {
   height: 40px;
   width: 40px;
@@ -31344,29 +31182,29 @@ ul.jqtree-tree .jqtree-toggler:hover {
   border-radius: 2px;
 }
 
-/* line 8243, ../../../scss/_app_styles.scss */
+/* line 8035, ../../../scss/_app_styles.scss */
 .activity-detail-page {
   margin-top: 20px;
   margin-left: 15px;
 }
 
-/* line 8248, ../../../scss/_app_styles.scss */
+/* line 8040, ../../../scss/_app_styles.scss */
 .activity-detail-content {
   margin-left: 20px !important;
 }
 
-/* line 8252, ../../../scss/_app_styles.scss */
+/* line 8044, ../../../scss/_app_styles.scss */
 .activity-detail-content #scstyle header {
   margin-top: 0px !important;
 }
 
-/* line 8256, ../../../scss/_app_styles.scss */
+/* line 8048, ../../../scss/_app_styles.scss */
 .activity-editor {
   margin: 50px;
   margin-left: 15px;
 }
 
-/* line 8262, ../../../scss/_app_styles.scss */
+/* line 8054, ../../../scss/_app_styles.scss */
 .tag-ele {
   font-weight: normal;
   text-align: center;
@@ -31387,7 +31225,7 @@ ul.jqtree-tree .jqtree-toggler:hover {
 }
 
 /* Tags styles */
-/* line 8285, ../../../scss/_app_styles.scss */
+/* line 8077, ../../../scss/_app_styles.scss */
 .asset-tags-container {
   width: 100%;
   height: 50px;
@@ -31395,16 +31233,16 @@ ul.jqtree-tree .jqtree-toggler:hover {
   padding: 5px 15px;
   margin-bottom: 65px;
 }
-/* line 8292, ../../../scss/_app_styles.scss */
+/* line 8084, ../../../scss/_app_styles.scss */
 .asset-tags-container .tag-input-ele {
   margin-left: 17px;
   width: 96%;
 }
-/* line 8297, ../../../scss/_app_styles.scss */
+/* line 8089, ../../../scss/_app_styles.scss */
 .asset-tags-container .added-tags-div {
   margin-left: -206px;
 }
-/* line 8302, ../../../scss/_app_styles.scss */
+/* line 8094, ../../../scss/_app_styles.scss */
 .asset-tags-container #add-tag-btn {
   color: #ce7869;
   padding: 7px 14px;
@@ -31419,13 +31257,13 @@ ul.jqtree-tree .jqtree-toggler:hover {
   cursor: pointer;
   display: inline-block;
 }
-/* line 8315, ../../../scss/_app_styles.scss */
+/* line 8107, ../../../scss/_app_styles.scss */
 .asset-tags-container #add-tag-btn:hover {
   background-color: rgba(206, 120, 105, 0.2);
   color: #ce7869;
 }
 
-/* line 8323, ../../../scss/_app_styles.scss */
+/* line 8115, ../../../scss/_app_styles.scss */
 .tags-container {
   width: 100%;
   height: 50px;
@@ -31434,7 +31272,7 @@ ul.jqtree-tree .jqtree-toggler:hover {
   box-shadow: 1px 0px 0px #000;
   margin-bottom: 65px;
 }
-/* line 8331, ../../../scss/_app_styles.scss */
+/* line 8123, ../../../scss/_app_styles.scss */
 .tags-container .add-tag-heading span {
   width: 40%;
   color: #99aaba;
@@ -31445,17 +31283,17 @@ ul.jqtree-tree .jqtree-toggler:hover {
   margin-left: 8px;
   font-family: "Helvetica Neue", "Helvetica", "Roboto", "Arial", "sans-serif";
 }
-/* line 8342, ../../../scss/_app_styles.scss */
+/* line 8134, ../../../scss/_app_styles.scss */
 .tags-container .tag-input-ele {
   margin-left: 193px;
   width: 54%;
 }
-/* line 8347, ../../../scss/_app_styles.scss */
+/* line 8139, ../../../scss/_app_styles.scss */
 .tags-container .added-tags-div {
   margin-left: 293px !important;
   width: 54%;
 }
-/* line 8352, ../../../scss/_app_styles.scss */
+/* line 8144, ../../../scss/_app_styles.scss */
 .tags-container #add-tag-btn {
   color: #ce7869;
   padding: 7px 14px;
@@ -31470,13 +31308,13 @@ ul.jqtree-tree .jqtree-toggler:hover {
   cursor: pointer;
   display: inline-block;
 }
-/* line 8365, ../../../scss/_app_styles.scss */
+/* line 8157, ../../../scss/_app_styles.scss */
 .tags-container #add-tag-btn:hover {
   background-color: rgba(206, 120, 105, 0.2);
   color: #ce7869;
 }
 
-/* line 8373, ../../../scss/_app_styles.scss */
+/* line 8165, ../../../scss/_app_styles.scss */
 .activity-lang {
   border: 1px solid #cccccc;
   border-radius: 5px;
@@ -31492,39 +31330,39 @@ ul.jqtree-tree .jqtree-toggler:hover {
     width: 99%;
 }
 */
-/* line 8390, ../../../scss/_app_styles.scss */
+/* line 8182, ../../../scss/_app_styles.scss */
 .editor-div {
   height: 100%;
 }
 
-/* line 8394, ../../../scss/_app_styles.scss */
+/* line 8186, ../../../scss/_app_styles.scss */
 #asset-descid {
   margin-bottom: 7px;
 }
 
-/* line 8398, ../../../scss/_app_styles.scss */
+/* line 8190, ../../../scss/_app_styles.scss */
 .page-name {
   margin-top: 4px;
 }
 
-/* line 8402, ../../../scss/_app_styles.scss */
+/* line 8194, ../../../scss/_app_styles.scss */
 .asset_list {
   margin-left: 30px;
 }
 
-/* line 8406, ../../../scss/_app_styles.scss */
+/* line 8198, ../../../scss/_app_styles.scss */
 .interaction-settings-div {
   margin-left: 25px;
   margin-top: 10px;
 }
-/* line 8410, ../../../scss/_app_styles.scss */
+/* line 8202, ../../../scss/_app_styles.scss */
 .interaction-settings-div .yes_no_disc_div {
   text-align: center;
   font-size: 24px;
   font-weight: 300;
 }
 
-/* line 8422, ../../../scss/_app_styles.scss */
+/* line 8214, ../../../scss/_app_styles.scss */
 body {
   background-color: #fff;
 }
@@ -31532,23 +31370,23 @@ body {
 /*
     Styling for the Secondary header 2
 */
-/* line 8432, ../../../scss/_app_styles.scss */
+/* line 8224, ../../../scss/_app_styles.scss */
 .activity_player_header {
   background-color: rgba(107, 0, 84, 0.97);
   box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.1);
 }
-/* line 8435, ../../../scss/_app_styles.scss */
+/* line 8227, ../../../scss/_app_styles.scss */
 .activity_player_header > div {
   height: 45px;
   line-height: 45px;
   display: inline-block;
   vertical-align: top;
 }
-/* line 8443, ../../../scss/_app_styles.scss */
+/* line 8235, ../../../scss/_app_styles.scss */
 .activity_player_header > div:not(:last-child) {
   border-right: 1px solid #fff;
 }
-/* line 8452, ../../../scss/_app_styles.scss */
+/* line 8244, ../../../scss/_app_styles.scss */
 .activity_player_header .header_title {
   position: relative;
   color: #fff;
@@ -31559,56 +31397,56 @@ body {
   margin-left: -2px;
   border-right: 1px solid white;
 }
-/* line 8461, ../../../scss/_app_styles.scss */
+/* line 8253, ../../../scss/_app_styles.scss */
 .activity_player_header .header_title a {
   color: #ffc14f;
 }
 @media only screen and (min-device-width: 1025px) and (max-device-width: 2130px) {
-  /* line 8452, ../../../scss/_app_styles.scss */
+  /* line 8244, ../../../scss/_app_styles.scss */
   .activity_player_header .header_title {
     text-overflow: ellipsis;
     width: calc(100% - 938px);
   }
 }
 @media only screen and (min-device-width: 2131px) {
-  /* line 8452, ../../../scss/_app_styles.scss */
+  /* line 8244, ../../../scss/_app_styles.scss */
   .activity_player_header .header_title {
     text-overflow: ellipsis;
     width: calc(100% - 970px);
   }
 }
 @media only screen and (max-device-width: 1024px) {
-  /* line 8452, ../../../scss/_app_styles.scss */
+  /* line 8244, ../../../scss/_app_styles.scss */
   .activity_player_header .header_title {
     text-overflow: ellipsis;
     width: calc(100% - 753px);
   }
 }
-/* line 8538, ../../../scss/_app_styles.scss */
+/* line 8330, ../../../scss/_app_styles.scss */
 .activity_player_header .header_icon {
   font-size: 16px;
   line-height: 45px;
   color: #ffc14f;
 }
-/* line 8544, ../../../scss/_app_styles.scss */
+/* line 8336, ../../../scss/_app_styles.scss */
 .activity_player_header .header_icon_block {
   color: #ffc14f;
   width: 70px;
   cursor: pointer;
   text-align: center;
 }
-/* line 8550, ../../../scss/_app_styles.scss */
+/* line 8342, ../../../scss/_app_styles.scss */
 .activity_player_header .header_text_sm_block {
   padding: 0px 10px;
 }
 @media screen and (min-width: 1025px) {
-  /* line 8550, ../../../scss/_app_styles.scss */
+  /* line 8342, ../../../scss/_app_styles.scss */
   .activity_player_header .header_text_sm_block {
     padding: 0px 15px;
   }
 }
 @media screen and (min-width: 1025px) {
-  /* line 8557, ../../../scss/_app_styles.scss */
+  /* line 8349, ../../../scss/_app_styles.scss */
   .activity_player_header .lesson-nav {
     float: right;
     margin-right: 70px;
@@ -31616,78 +31454,78 @@ body {
   }
 }
 @media screen and (max-width: 1024px) {
-  /* line 8557, ../../../scss/_app_styles.scss */
+  /* line 8349, ../../../scss/_app_styles.scss */
   .activity_player_header .lesson-nav {
     background-color: rgba(107, 0, 84, 0.97);
   }
 }
-/* line 8570, ../../../scss/_app_styles.scss */
+/* line 8362, ../../../scss/_app_styles.scss */
 .activity_player_header .lesson-nav div {
   height: 45px;
   line-height: 45px;
   display: inline-block;
   vertical-align: top;
 }
-/* line 8576, ../../../scss/_app_styles.scss */
+/* line 8368, ../../../scss/_app_styles.scss */
 .activity_player_header .lesson-nav .header_text_block {
   padding: 0px 15px;
   margin-left: -2px;
   border-right: 1px solid white;
 }
-/* line 8580, ../../../scss/_app_styles.scss */
+/* line 8372, ../../../scss/_app_styles.scss */
 .activity_player_header .lesson-nav .header_text_block a {
   color: #ffc14f;
 }
-/* line 8586, ../../../scss/_app_styles.scss */
+/* line 8378, ../../../scss/_app_styles.scss */
 .activity_player_header .lesson-nav .header_text_lg_block {
   padding: 0px 9px;
 }
 @media screen and (min-width: 1025px) {
-  /* line 8586, ../../../scss/_app_styles.scss */
+  /* line 8378, ../../../scss/_app_styles.scss */
   .activity_player_header .lesson-nav .header_text_lg_block {
     padding: 0px 15px;
   }
 }
-/* line 8594, ../../../scss/_app_styles.scss */
+/* line 8386, ../../../scss/_app_styles.scss */
 .activity_player_header .lesson-nav .header_text_md_block {
   padding: 0px 7px;
 }
 @media screen and (min-width: 1025px) {
-  /* line 8594, ../../../scss/_app_styles.scss */
+  /* line 8386, ../../../scss/_app_styles.scss */
   .activity_player_header .lesson-nav .header_text_md_block {
     padding: 0px 15px;
   }
 }
-/* line 8603, ../../../scss/_app_styles.scss */
+/* line 8395, ../../../scss/_app_styles.scss */
 .activity_player_header .lesson-nav .back_button {
   border-color: #e0e0e0;
   background-color: rgba(244, 244, 244, 0.3);
 }
-/* line 8606, ../../../scss/_app_styles.scss */
+/* line 8398, ../../../scss/_app_styles.scss */
 .activity_player_header .lesson-nav .back_button i {
   color: #71318b;
 }
-/* line 8612, ../../../scss/_app_styles.scss */
+/* line 8404, ../../../scss/_app_styles.scss */
 .activity_player_header .lesson-nav .settings i {
   transition: transform .5s ease-in-out;
   -webkit-transition: -webkit-transform .5s ease-in-out;
 }
-/* line 8616, ../../../scss/_app_styles.scss */
+/* line 8408, ../../../scss/_app_styles.scss */
 .activity_player_header .lesson-nav .settings:hover i {
   transform: rotate(90deg);
   -webkit-transform: rotate(90deg);
 }
-/* line 8622, ../../../scss/_app_styles.scss */
+/* line 8414, ../../../scss/_app_styles.scss */
 .activity_player_header .lesson-nav .pagination:not(i) {
   color: #a983b9;
 }
 
-/* line 8631, ../../../scss/_app_styles.scss */
+/* line 8423, ../../../scss/_app_styles.scss */
 .float-right {
   float: right;
 }
 
-/* line 8635, ../../../scss/_app_styles.scss */
+/* line 8427, ../../../scss/_app_styles.scss */
 .float-left {
   float: left;
 }
@@ -31695,7 +31533,7 @@ body {
 /*
 Buddy Vertical Bar Css
 */
-/* line 8644, ../../../scss/_app_styles.scss */
+/* line 8436, ../../../scss/_app_styles.scss */
 .buddy_panel {
   position: fixed;
   right: 0px;
@@ -31707,7 +31545,7 @@ Buddy Vertical Bar Css
   overflow-y: auto;
   z-index: 100;
 }
-/* line 8657, ../../../scss/_app_styles.scss */
+/* line 8449, ../../../scss/_app_styles.scss */
 .buddy_panel .add_buddy_icon {
   height: 50px;
   width: 50px;
@@ -31715,7 +31553,7 @@ Buddy Vertical Bar Css
   cursor: pointer;
 }
 
-/* line 8665, ../../../scss/_app_styles.scss */
+/* line 8457, ../../../scss/_app_styles.scss */
 .buddy_icon {
   border-radius: 4px;
   overflow: hidden;
@@ -31725,13 +31563,13 @@ Buddy Vertical Bar Css
   margin-bottom: 10px;
   position: relative;
 }
-/* line 8674, ../../../scss/_app_styles.scss */
+/* line 8466, ../../../scss/_app_styles.scss */
 .buddy_icon svg {
   height: 50px;
   width: 50px;
   background-color: #fff;
 }
-/* line 8680, ../../../scss/_app_styles.scss */
+/* line 8472, ../../../scss/_app_styles.scss */
 .buddy_icon.buddy_inactive:before {
   content: '';
   position: absolute;
@@ -31742,11 +31580,11 @@ Buddy Vertical Bar Css
   display: block;
   background: rgba(0, 0, 0, 0.5);
 }
-/* line 8691, ../../../scss/_app_styles.scss */
+/* line 8483, ../../../scss/_app_styles.scss */
 .buddy_icon .buddy_edit, .buddy_icon .buddy_delete {
   display: none;
 }
-/* line 8696, ../../../scss/_app_styles.scss */
+/* line 8488, ../../../scss/_app_styles.scss */
 .buddy_icon.buddy_editable:hover .buddy_edit {
   position: absolute;
   background: rgba(255, 255, 255, 0.5);
@@ -31755,7 +31593,7 @@ Buddy Vertical Bar Css
   bottom: 0px;
   display: block;
 }
-/* line 8707, ../../../scss/_app_styles.scss */
+/* line 8499, ../../../scss/_app_styles.scss */
 .buddy_icon.buddy_deleteable:hover .buddy_delete {
   position: absolute;
   background: rgba(255, 255, 255, 0.5);
@@ -31765,43 +31603,43 @@ Buddy Vertical Bar Css
   display: block;
 }
 
-/* line 8718, ../../../scss/_app_styles.scss */
+/* line 8510, ../../../scss/_app_styles.scss */
 .add_buddy_modal {
   padding: 0px;
 }
-/* line 8720, ../../../scss/_app_styles.scss */
+/* line 8512, ../../../scss/_app_styles.scss */
 .add_buddy_modal .modal_header {
   padding: 10px 20px;
   position: relative;
 }
-/* line 8724, ../../../scss/_app_styles.scss */
+/* line 8516, ../../../scss/_app_styles.scss */
 .add_buddy_modal .modal_header .modal_title {
   font-size: 25px;
   color: #CE7869;
   letter-spacing: 0;
   line-height: 35px;
 }
-/* line 8730, ../../../scss/_app_styles.scss */
+/* line 8522, ../../../scss/_app_styles.scss */
 .add_buddy_modal .modal_header .modal_meta {
   font-size: 14px;
   color: #9DBEDD;
   letter-spacing: 0;
   line-height: 30px;
 }
-/* line 8737, ../../../scss/_app_styles.scss */
+/* line 8529, ../../../scss/_app_styles.scss */
 .add_buddy_modal .modal_header .sample_buddy {
   position: absolute;
   right: 30px;
   top: 15px;
 }
-/* line 8744, ../../../scss/_app_styles.scss */
+/* line 8536, ../../../scss/_app_styles.scss */
 .add_buddy_modal .modal_body {
   background-color: #101d29;
   padding: 10px 20px;
   max-height: 500px;
   overflow: auto;
 }
-/* line 8750, ../../../scss/_app_styles.scss */
+/* line 8542, ../../../scss/_app_styles.scss */
 .add_buddy_modal .modal_body .step_title {
   font-size: 20px;
   font-weight: 400;
@@ -31809,11 +31647,11 @@ Buddy Vertical Bar Css
   letter-spacing: 0.9px;
   margin: 10px 0px;
 }
-/* line 8757, ../../../scss/_app_styles.scss */
+/* line 8549, ../../../scss/_app_styles.scss */
 .add_buddy_modal .modal_body .step_title .step_number {
   color: #82A4C3;
 }
-/* line 8762, ../../../scss/_app_styles.scss */
+/* line 8554, ../../../scss/_app_styles.scss */
 .add_buddy_modal .modal_body .buddy_color_option {
   max-width: 75px;
   display: inline-block;
@@ -31821,7 +31659,7 @@ Buddy Vertical Bar Css
   margin: 10px 20px;
   cursor: pointer;
 }
-/* line 8769, ../../../scss/_app_styles.scss */
+/* line 8561, ../../../scss/_app_styles.scss */
 .add_buddy_modal .modal_body .buddy_color_option .color_sample {
   display: block;
   width: 50px;
@@ -31829,7 +31667,7 @@ Buddy Vertical Bar Css
   border-radius: 100%;
   margin: 0px auto;
 }
-/* line 8777, ../../../scss/_app_styles.scss */
+/* line 8569, ../../../scss/_app_styles.scss */
 .add_buddy_modal .modal_body .buddy_color_option .color_name {
   text-transform: capitalize;
   font-size: 15px;
@@ -31839,42 +31677,42 @@ Buddy Vertical Bar Css
   letter-spacing: 1px;
   margin-top: 10px;
 }
-/* line 8788, ../../../scss/_app_styles.scss */
+/* line 8580, ../../../scss/_app_styles.scss */
 .add_buddy_modal .modal_body .buddy_color_option:hover .color_sample, .add_buddy_modal .modal_body .buddy_color_option.selected .color_sample {
   border: 3px solid #bfe0ff;
 }
-/* line 8794, ../../../scss/_app_styles.scss */
+/* line 8586, ../../../scss/_app_styles.scss */
 .add_buddy_modal .modal_body .buddy_animal {
   display: inline-block;
   margin: 10px;
   cursor: pointer;
 }
-/* line 8799, ../../../scss/_app_styles.scss */
+/* line 8591, ../../../scss/_app_styles.scss */
 .add_buddy_modal .modal_body .buddy_animal svg {
   height: 80px;
   width: 80px;
 }
-/* line 8803, ../../../scss/_app_styles.scss */
+/* line 8595, ../../../scss/_app_styles.scss */
 .add_buddy_modal .modal_body .buddy_animal svg path {
   fill: #374B5E;
 }
-/* line 8808, ../../../scss/_app_styles.scss */
+/* line 8600, ../../../scss/_app_styles.scss */
 .add_buddy_modal .modal_body .buddy_animal .buddy_animal_name {
   color: #fff;
   text-align: center;
   text-transform: capitalize;
   letter-spacing: 1px;
 }
-/* line 8816, ../../../scss/_app_styles.scss */
+/* line 8608, ../../../scss/_app_styles.scss */
 .add_buddy_modal .modal_body .buddy_animal:hover path, .add_buddy_modal .modal_body .buddy_animal.selected path {
   fill: #bfe0ff;
 }
-/* line 8823, ../../../scss/_app_styles.scss */
+/* line 8615, ../../../scss/_app_styles.scss */
 .add_buddy_modal .modal_footer {
   height: 70px;
   padding: 20px;
 }
-/* line 8828, ../../../scss/_app_styles.scss */
+/* line 8620, ../../../scss/_app_styles.scss */
 .add_buddy_modal .modal_footer .removeBuddy i {
   color: #bd2b2b;
   font-size: 25px;
@@ -31883,7 +31721,7 @@ Buddy Vertical Bar Css
 /*
     Common css that can be kept at a single place.
 */
-/* line 8843, ../../../scss/_app_styles.scss */
+/* line 8635, ../../../scss/_app_styles.scss */
 .blue_round_button {
   background-color: #00a9ee;
   color: #fff;
@@ -31894,7 +31732,7 @@ Buddy Vertical Bar Css
   line-height: 25px;
 }
 
-/* line 8852, ../../../scss/_app_styles.scss */
+/* line 8644, ../../../scss/_app_styles.scss */
 .text_button {
   background-color: #fff;
   color: #949494;
@@ -31905,7 +31743,7 @@ Buddy Vertical Bar Css
   line-height: 25px;
 }
 
-/* line 8862, ../../../scss/_app_styles.scss */
+/* line 8654, ../../../scss/_app_styles.scss */
 .edit_button {
   background-color: #fff;
   color: #717171;
@@ -31917,12 +31755,12 @@ Buddy Vertical Bar Css
   margin-top: 10px;
   margin-right: -50px;
 }
-/* line 8872, ../../../scss/_app_styles.scss */
+/* line 8664, ../../../scss/_app_styles.scss */
 .edit_button:hover {
   color: #ce7869;
 }
 
-/* line 8879, ../../../scss/_app_styles.scss */
+/* line 8671, ../../../scss/_app_styles.scss */
 .activity_sheet {
   background: rgba(231, 231, 231, 0.12);
   box-shadow: 0px 2px 6px #000;
@@ -31930,29 +31768,29 @@ Buddy Vertical Bar Css
   padding: 0px 0px;
   max-width: 100vw;
 }
-/* line 8886, ../../../scss/_app_styles.scss */
+/* line 8678, ../../../scss/_app_styles.scss */
 .activity_sheet > .columns {
   padding: 0px;
   height: 100%;
 }
-/* line 8890, ../../../scss/_app_styles.scss */
+/* line 8682, ../../../scss/_app_styles.scss */
 .activity_sheet .course_editor {
   margin-bottom: 10px;
   position: relative;
   /*Overriding default*/
   /*Custom css*/
 }
-/* line 8896, ../../../scss/_app_styles.scss */
+/* line 8688, ../../../scss/_app_styles.scss */
 .activity_sheet .course_editor .accordion .accordion-navigation > .content, .activity_sheet .course_editor .accordion dd > .content {
   padding: 0px;
   padding-left: 0px;
 }
-/* line 8902, ../../../scss/_app_styles.scss */
+/* line 8694, ../../../scss/_app_styles.scss */
 .activity_sheet .course_editor > div {
   display: inline-block;
   vertical-align: top;
 }
-/* line 8907, ../../../scss/_app_styles.scss */
+/* line 8699, ../../../scss/_app_styles.scss */
 .activity_sheet .course_editor .course_tree {
   transition: all 1s ease;
   -webkit-transition: all 1s ease;
@@ -31962,25 +31800,25 @@ Buddy Vertical Bar Css
   overflow-y: auto;
   height: 100vh;
 }
-/* line 8916, ../../../scss/_app_styles.scss */
+/* line 8708, ../../../scss/_app_styles.scss */
 .activity_sheet .course_editor .course_tree .course-lessons dd {
   border-bottom: 2px solid #9abfd9;
   transition: border-color 1s ease;
   -webkit-transition: border-color 1s ease;
 }
-/* line 8920, ../../../scss/_app_styles.scss */
+/* line 8712, ../../../scss/_app_styles.scss */
 .activity_sheet .course_editor .course_tree .course-lessons dd.accordion-navigation {
   position: relative;
   padding-left: 0px;
 }
-/* line 8925, ../../../scss/_app_styles.scss */
+/* line 8717, ../../../scss/_app_styles.scss */
 .activity_sheet .course_editor .course_tree .course-lessons dd.accordion-navigation > a:before {
   position: absolute;
   left: 23px;
   line-height: 20px;
   color: #74b3dc;
 }
-/* line 8934, ../../../scss/_app_styles.scss */
+/* line 8726, ../../../scss/_app_styles.scss */
 .activity_sheet .course_editor .course_tree .course-lessons dd.accordion-navigation a.entity-title {
   background: inherit;
   cursor: pointer;
@@ -31989,7 +31827,7 @@ Buddy Vertical Bar Css
   transition: color 1s ease;
   -webkit-transition: color 1s ease;
 }
-/* line 8941, ../../../scss/_app_styles.scss */
+/* line 8733, ../../../scss/_app_styles.scss */
 .activity_sheet .course_editor .course_tree .course-lessons dd.accordion-navigation a.entity-title .edit_entity {
   color: #c9d1d8;
   font-weight: 400;
@@ -31998,15 +31836,15 @@ Buddy Vertical Bar Css
   position: relative;
   display: none;
 }
-/* line 8950, ../../../scss/_app_styles.scss */
+/* line 8742, ../../../scss/_app_styles.scss */
 .activity_sheet .course_editor .course_tree .course-lessons dd.accordion-navigation a.entity-title .edit_entity i {
   display: none;
 }
-/* line 8955, ../../../scss/_app_styles.scss */
+/* line 8747, ../../../scss/_app_styles.scss */
 .activity_sheet .course_editor .course_tree .course-lessons dd.accordion-navigation a.entity-title .edit_entity > .entity_actions {
   margin-bottom: 0px;
 }
-/* line 8958, ../../../scss/_app_styles.scss */
+/* line 8750, ../../../scss/_app_styles.scss */
 .activity_sheet .course_editor .course_tree .course-lessons dd.accordion-navigation a.entity-title .edit_entity > .entity_actions li {
   white-space: nowrap;
   list-style: none;
@@ -32014,21 +31852,21 @@ Buddy Vertical Bar Css
   margin: 0px 10px;
   cursor: pointer;
 }
-/* line 8968, ../../../scss/_app_styles.scss */
+/* line 8760, ../../../scss/_app_styles.scss */
 .activity_sheet .course_editor .course_tree .course-lessons dd.accordion-navigation a.entity-title:hover .edit_entity {
   display: block;
 }
-/* line 8974, ../../../scss/_app_styles.scss */
+/* line 8766, ../../../scss/_app_styles.scss */
 .activity_sheet .course_editor .course_tree .course-lessons dd.accordion-navigation.active > a:before {
   content: '';
   line-height: 55px;
   color: #d7d7d7;
 }
-/* line 8982, ../../../scss/_app_styles.scss */
+/* line 8774, ../../../scss/_app_styles.scss */
 .activity_sheet .course_editor .course_tree .course-lessons dd.accordion-navigation .course-activities {
   margin: 0px;
 }
-/* line 8984, ../../../scss/_app_styles.scss */
+/* line 8776, ../../../scss/_app_styles.scss */
 .activity_sheet .course_editor .course_tree .course-lessons dd.accordion-navigation .course-activities > li {
   list-style: none;
   border-top: 1px solid #e9e9e9;
@@ -32037,7 +31875,7 @@ Buddy Vertical Bar Css
   transition: border-color 1s ease;
   -webkit-transition: border-color 1s ease;
 }
-/* line 8991, ../../../scss/_app_styles.scss */
+/* line 8783, ../../../scss/_app_styles.scss */
 .activity_sheet .course_editor .course_tree .course-lessons dd.accordion-navigation .course-activities > li > a {
   color: #7ca0d0;
   width: 100%;
@@ -32045,11 +31883,11 @@ Buddy Vertical Bar Css
   transition: color 1s ease;
   -webkit-transition: color 1s ease;
 }
-/* line 9000, ../../../scss/_app_styles.scss */
+/* line 8792, ../../../scss/_app_styles.scss */
 .activity_sheet .course_editor .course_tree .course-lessons dd.accordion-navigation .content {
   background: inherit;
 }
-/* line 9009, ../../../scss/_app_styles.scss */
+/* line 8801, ../../../scss/_app_styles.scss */
 .activity_sheet .course_editor .course-editor-section {
   width: 0%;
   display: inline-block;
@@ -32061,48 +31899,48 @@ Buddy Vertical Bar Css
   overflow-y: auto;
   background: #fff;
 }
-/* line 9019, ../../../scss/_app_styles.scss */
+/* line 8811, ../../../scss/_app_styles.scss */
 .activity_sheet .course_editor .course-editor-section .editor-header {
   height: 100px;
   background-color: #e5f1f6;
   border-bottom: 1px solid #e6e6e7;
 }
-/* line 9024, ../../../scss/_app_styles.scss */
+/* line 8816, ../../../scss/_app_styles.scss */
 .activity_sheet .course_editor .course-editor-section .editor-header .header-left {
   padding: 29px 0px;
 }
-/* line 9027, ../../../scss/_app_styles.scss */
+/* line 8819, ../../../scss/_app_styles.scss */
 .activity_sheet .course_editor .course-editor-section .editor-header .header-left > span {
   color: #3c5264;
   font-weight: 600;
   margin-right: 10px;
 }
-/* line 9036, ../../../scss/_app_styles.scss */
+/* line 8828, ../../../scss/_app_styles.scss */
 .activity_sheet .course_editor .course-editor-section .editor-header .custom_dropdown {
   margin: 40px 35px 0px;
 }
-/* line 9041, ../../../scss/_app_styles.scss */
+/* line 8833, ../../../scss/_app_styles.scss */
 .activity_sheet .course_editor .course-editor-section .editor-tool .editor_actions {
   background-color: #fff;
   border-bottom: 1px solid #ccc;
   height: 55px;
 }
-/* line 9045, ../../../scss/_app_styles.scss */
+/* line 8837, ../../../scss/_app_styles.scss */
 .activity_sheet .course_editor .course-editor-section .editor-tool .editor_actions ul {
   margin: 0px;
 }
-/* line 9047, ../../../scss/_app_styles.scss */
+/* line 8839, ../../../scss/_app_styles.scss */
 .activity_sheet .course_editor .course-editor-section .editor-tool .editor_actions ul li {
   list-style: none;
   display: inline-block;
 }
-/* line 9050, ../../../scss/_app_styles.scss */
+/* line 8842, ../../../scss/_app_styles.scss */
 .activity_sheet .course_editor .course-editor-section .editor-tool .editor_actions ul li:not(:first-child) {
   padding: 1px 30px;
   border-left: 1px solid #ccc;
   text-align: center;
 }
-/* line 9056, ../../../scss/_app_styles.scss */
+/* line 8848, ../../../scss/_app_styles.scss */
 .activity_sheet .course_editor .course-editor-section .editor-tool .editor_actions ul li span {
   display: inline-block;
   letter-spacing: 0.5px;
@@ -32111,7 +31949,7 @@ Buddy Vertical Bar Css
   cursor: pointer;
 }
 
-/* line 9072, ../../../scss/_app_styles.scss */
+/* line 8864, ../../../scss/_app_styles.scss */
 .course_editor_section {
   background: #fff;
   min-height: 100vh;
@@ -32119,26 +31957,26 @@ Buddy Vertical Bar Css
   margin-bottom: 10px;
   padding-right: 4px;
 }
-/* line 9078, ../../../scss/_app_styles.scss */
+/* line 8870, ../../../scss/_app_styles.scss */
 .course_editor_section #scstyle {
   margin-top: -10px;
 }
 
-/* line 9083, ../../../scss/_app_styles.scss */
+/* line 8875, ../../../scss/_app_styles.scss */
 .lesson-title {
   font-size: 18px;
   padding-top: 10px;
   padding-left: 10px;
 }
 
-/* line 9089, ../../../scss/_app_styles.scss */
+/* line 8881, ../../../scss/_app_styles.scss */
 .activity-title {
   font-size: 18px;
   padding-top: 10px;
   padding-left: 23px;
   margin: 0px;
 }
-/* line 9095, ../../../scss/_app_styles.scss */
+/* line 8887, ../../../scss/_app_styles.scss */
 .activity-title > li {
   list-style: none;
   border-top: 1px solid #e9e9e9;
@@ -32148,29 +31986,29 @@ Buddy Vertical Bar Css
   -webkit-transition: border-color 1s ease;
   margin-left: -23px;
 }
-/* line 9104, ../../../scss/_app_styles.scss */
+/* line 8896, ../../../scss/_app_styles.scss */
 .activity-title > li.active {
   background: rgba(116, 0, 255, 0.31);
 }
-/* line 9108, ../../../scss/_app_styles.scss */
+/* line 8900, ../../../scss/_app_styles.scss */
 .activity-title > li > a {
   color: black;
 }
 
-/* line 9117, ../../../scss/_app_styles.scss */
+/* line 8909, ../../../scss/_app_styles.scss */
 .activity_page_rendered {
   margin-left: 20px;
   max-width: 900px;
 }
 
 /* Rating css */
-/* line 9125, ../../../scss/_app_styles.scss */
+/* line 8917, ../../../scss/_app_styles.scss */
 .rating-bar {
   /* the hidden clearer */
   /* this is gross, I threw this in to override the starred
   buttons when hovering. */
 }
-/* line 9127, ../../../scss/_app_styles.scss */
+/* line 8919, ../../../scss/_app_styles.scss */
 .rating-bar > span {
   /* remove inline-block whitespace */
   font-size: 0;
@@ -32178,19 +32016,19 @@ Buddy Vertical Bar Css
   unicode-bidi: bidi-override;
   direction: rtl;
 }
-/* line 9135, ../../../scss/_app_styles.scss */
+/* line 8927, ../../../scss/_app_styles.scss */
 .rating-bar.unrated {
   /* If the user has not rated yet */
 }
-/* line 9137, ../../../scss/_app_styles.scss */
+/* line 8929, ../../../scss/_app_styles.scss */
 .rating-bar.unrated:checked ~ label:before {
   color: #ffc14e;
 }
-/* line 9143, ../../../scss/_app_styles.scss */
+/* line 8935, ../../../scss/_app_styles.scss */
 .rating-bar [type*="radio"] {
   display: none;
 }
-/* line 9145, ../../../scss/_app_styles.scss */
+/* line 8937, ../../../scss/_app_styles.scss */
 .rating-bar [type*="radio"] + label {
   /* only enough room for the star */
   display: inline-block;
@@ -32203,7 +32041,7 @@ Buddy Vertical Bar Css
   margin: 0;
   vertical-align: bottom;
 }
-/* line 9157, ../../../scss/_app_styles.scss */
+/* line 8949, ../../../scss/_app_styles.scss */
 .rating-bar [type*="radio"] + label:before {
   display: inline-block;
   text-indent: -9999px;
@@ -32211,32 +32049,32 @@ Buddy Vertical Bar Css
   /* WHITE STAR */
   color: #888;
 }
-/* line 9164, ../../../scss/_app_styles.scss */
+/* line 8956, ../../../scss/_app_styles.scss */
 .rating-bar [type*="radio"]:checked ~ label:before, .rating-bar [type*="radio"] + label:hover ~ label:before, .rating-bar [type*="radio"] + label:hover:before {
   content: '\2605';
   /* BLACK STAR */
   color: #FF980D;
   text-shadow: 0 0 1px #333;
 }
-/* line 9175, ../../../scss/_app_styles.scss */
+/* line 8967, ../../../scss/_app_styles.scss */
 .rating-bar .last[type*="radio"] + label {
   text-indent: -9999px;
   width: .5em;
   margin-left: -.5em;
 }
-/* line 9182, ../../../scss/_app_styles.scss */
+/* line 8974, ../../../scss/_app_styles.scss */
 .rating-bar .last[type*="radio"] + label:before {
   width: .5em;
   height: 1.4em;
 }
-/* line 9190, ../../../scss/_app_styles.scss */
+/* line 8982, ../../../scss/_app_styles.scss */
 .rating-bar:hover [type*="radio"] + label:before {
   content: '\2606';
   /* WHITE STAR */
   color: #888;
   text-shadow: none;
 }
-/* line 9195, ../../../scss/_app_styles.scss */
+/* line 8987, ../../../scss/_app_styles.scss */
 .rating-bar:hover [type*="radio"] + label:hover ~ label:before,
 .rating-bar:hover [type*="radio"] + label:hover:before {
   content: '\2605';
@@ -32248,7 +32086,7 @@ Buddy Vertical Bar Css
 /*
    Common css
  */
-/* line 9206, ../../../scss/_app_styles.scss */
+/* line 8998, ../../../scss/_app_styles.scss */
 .text-button-blue {
   background-color: transparent;
   color: #00A9EE;
@@ -32261,54 +32099,53 @@ Buddy Vertical Bar Css
 /**
     Status styles added for the unit styles.
  */
-/* line 9225, ../../../scss/_app_styles.scss */
+/* line 9017, ../../../scss/_app_styles.scss */
 .in-progress-status {
   color: #fff;
   background-color: #fd9e29;
 }
 
-/* line 9230, ../../../scss/_app_styles.scss */
+/* line 9022, ../../../scss/_app_styles.scss */
 .in-complete-status {
   color: #fff;
   background-color: #fd9e29;
 }
 
-/* line 9235, ../../../scss/_app_styles.scss */
+/* line 9027, ../../../scss/_app_styles.scss */
 .thumbnail_style {
-  margin-top: -30px;
   margin-left: -30px;
 }
 
-/* line 9240, ../../../scss/_app_styles.scss */
+/* line 9031, ../../../scss/_app_styles.scss */
 .strip {
   height: 143px;
   margin-left: -13px;
   margin-bottom: 10px;
 }
 
-/* line 9246, ../../../scss/_app_styles.scss */
+/* line 9037, ../../../scss/_app_styles.scss */
 .title-strip {
   box-shadow: 0px 0px 6px rgba(0, 0, 0, 0.2);
-  margin-top: -29px;
+  margin-top: -6px;
   padding-left: 10px;
 }
-/* line 9250, ../../../scss/_app_styles.scss */
+/* line 9041, ../../../scss/_app_styles.scss */
 .title-strip a {
   float: right;
   padding-right: 18px;
   text-transform: uppercase;
   color: #007095;
 }
-/* line 9260, ../../../scss/_app_styles.scss */
+/* line 9051, ../../../scss/_app_styles.scss */
 .title-strip .position-actions {
   margin-top: -60px;
   margin-left: 760px;
 }
-/* line 9265, ../../../scss/_app_styles.scss */
+/* line 9056, ../../../scss/_app_styles.scss */
 .title-strip .right-margin {
   margin-right: 46px;
 }
-/* line 9268, ../../../scss/_app_styles.scss */
+/* line 9059, ../../../scss/_app_styles.scss */
 .title-strip .course_actions > span {
   background: #fff;
   border: 1px solid rgba(255, 255, 255, 0.7);
@@ -32322,7 +32159,7 @@ Buddy Vertical Bar Css
   margin-top: 30px;
   z-index: 1;
 }
-/* line 9285, ../../../scss/_app_styles.scss */
+/* line 9076, ../../../scss/_app_styles.scss */
 .title-strip .course_actions > i {
   margin-right: 3px;
   background: rgba(0, 0, 0, 0.6);
@@ -32335,7 +32172,7 @@ Buddy Vertical Bar Css
   border-radius: 3px;
 }
 
-/* line 9299, ../../../scss/_app_styles.scss */
+/* line 9090, ../../../scss/_app_styles.scss */
 .dropdown-settings {
   text-align: left;
   text-transform: none;
@@ -32345,13 +32182,13 @@ Buddy Vertical Bar Css
   background: white;
   border-radius: 1px;
 }
-/* line 9307, ../../../scss/_app_styles.scss */
+/* line 9098, ../../../scss/_app_styles.scss */
 .dropdown-settings:hover {
   color: #ce7869;
   border-left: 2px solid #ffc14e;
 }
 
-/* line 9313, ../../../scss/_app_styles.scss */
+/* line 9104, ../../../scss/_app_styles.scss */
 .activity-slides-container {
   height: 100%;
   width: 80%;
@@ -32360,19 +32197,19 @@ Buddy Vertical Bar Css
   padding: 0em 0em 0em 0em;
   margin-bottom: 15px;
 }
-/* line 9322, ../../../scss/_app_styles.scss */
+/* line 9113, ../../../scss/_app_styles.scss */
 .activity-slides-container .activity-slides {
   height: 100%;
   color: #f8f8f8;
 }
-/* line 9327, ../../../scss/_app_styles.scss */
+/* line 9118, ../../../scss/_app_styles.scss */
 .activity-slides-container .activity-slides .activity-slide {
   padding: 1em;
   height: inherit;
   background: #fff;
   position: relative;
 }
-/* line 9333, ../../../scss/_app_styles.scss */
+/* line 9124, ../../../scss/_app_styles.scss */
 .activity-slides-container .activity-slides .activity-slide .view-related-content {
   border: 1px solid #999;
   display: inline-block;
@@ -32380,12 +32217,12 @@ Buddy Vertical Bar Css
   color: #999999;
   margin-left: 12%;
 }
-/* line 9341, ../../../scss/_app_styles.scss */
+/* line 9132, ../../../scss/_app_styles.scss */
 .activity-slides-container .activity-slides .activity-slide .page > section {
   margin-left: 50%;
   transform: translate(-50%);
 }
-/* line 9347, ../../../scss/_app_styles.scss */
+/* line 9138, ../../../scss/_app_styles.scss */
 .activity-slides-container .activity-slides .related-content-close {
   position: absolute;
   right: -2px;
@@ -32394,21 +32231,21 @@ Buddy Vertical Bar Css
   display: none;
   color: #8E8E8E;
 }
-/* line 9356, ../../../scss/_app_styles.scss */
+/* line 9147, ../../../scss/_app_styles.scss */
 .activity-slides-container .activity-slides .content-expanded > i {
   font-size: 20px !important;
   color: #ccc !important;
   top: 8px !important;
 }
-/* line 9361, ../../../scss/_app_styles.scss */
+/* line 9152, ../../../scss/_app_styles.scss */
 .activity-slides-container .activity-slides .content-expanded .related-content-header {
   margin-left: 20px !important;
 }
-/* line 9363, ../../../scss/_app_styles.scss */
+/* line 9154, ../../../scss/_app_styles.scss */
 .activity-slides-container .activity-slides .content-expanded .related-content-header > span:first-child {
   display: none !important;
 }
-/* line 9366, ../../../scss/_app_styles.scss */
+/* line 9157, ../../../scss/_app_styles.scss */
 .activity-slides-container .activity-slides .content-expanded .related-content-header .back-to-activity {
   display: inline-block !important;
   float: right;
@@ -32419,24 +32256,24 @@ Buddy Vertical Bar Css
   color: #757575;
   margin-right: 20px;
 }
-/* line 9376, ../../../scss/_app_styles.scss */
+/* line 9167, ../../../scss/_app_styles.scss */
 .activity-slides-container .activity-slides .content-expanded .related-content-header .related-content-title {
   font-size: 15px !important;
   position: relative;
 }
-/* line 9380, ../../../scss/_app_styles.scss */
+/* line 9171, ../../../scss/_app_styles.scss */
 .activity-slides-container .activity-slides .content-expanded .related-content-header .related-content-title .related-content-close {
   display: block;
 }
-/* line 9383, ../../../scss/_app_styles.scss */
+/* line 9174, ../../../scss/_app_styles.scss */
 .activity-slides-container .activity-slides .content-expanded .related-content-header .related-content-title > i {
   display: none !important;
 }
-/* line 9388, ../../../scss/_app_styles.scss */
+/* line 9179, ../../../scss/_app_styles.scss */
 .activity-slides-container .activity-slides .content-expanded .related-content-body {
   display: block !important;
 }
-/* line 9392, ../../../scss/_app_styles.scss */
+/* line 9183, ../../../scss/_app_styles.scss */
 .activity-slides-container .activity-slides #related-content {
   width: 100%;
   margin: 0px auto;
@@ -32448,7 +32285,7 @@ Buddy Vertical Bar Css
   position: relative;
   color: #222222;
 }
-/* line 9403, ../../../scss/_app_styles.scss */
+/* line 9194, ../../../scss/_app_styles.scss */
 .activity-slides-container .activity-slides #related-content > i {
   color: #fff;
   font-size: 40px;
@@ -32456,15 +32293,15 @@ Buddy Vertical Bar Css
   left: 8px;
   top: 4px;
 }
-/* line 9411, ../../../scss/_app_styles.scss */
+/* line 9202, ../../../scss/_app_styles.scss */
 .activity-slides-container .activity-slides #related-content .related-content-header {
   margin-left: 40px;
 }
-/* line 9413, ../../../scss/_app_styles.scss */
+/* line 9204, ../../../scss/_app_styles.scss */
 .activity-slides-container .activity-slides #related-content .related-content-header .back-to-activity {
   display: none;
 }
-/* line 9416, ../../../scss/_app_styles.scss */
+/* line 9207, ../../../scss/_app_styles.scss */
 .activity-slides-container .activity-slides #related-content .related-content-header span {
   display: block;
   vertical-align: top;
@@ -32474,13 +32311,13 @@ Buddy Vertical Bar Css
   letter-spacing: 0.8px;
   color: #999999;
 }
-/* line 9425, ../../../scss/_app_styles.scss */
+/* line 9216, ../../../scss/_app_styles.scss */
 .activity-slides-container .activity-slides #related-content .related-content-header .related-content-title {
   font-size: 20px;
   color: #000;
   cursor: pointer;
 }
-/* line 9431, ../../../scss/_app_styles.scss */
+/* line 9222, ../../../scss/_app_styles.scss */
 .activity-slides-container .activity-slides #related-content .related-content-body {
   display: none;
 }
@@ -32488,7 +32325,7 @@ Buddy Vertical Bar Css
 /**
  * Sass styles related to module cards
  */
-/* line 9446, ../../../scss/_app_styles.scss */
+/* line 9237, ../../../scss/_app_styles.scss */
 .module_card {
   display: table;
   height: 290px;
@@ -32499,16 +32336,16 @@ Buddy Vertical Bar Css
   position: relative;
   box-shadow: 0px 0px 5px 1px rgba(0, 0, 0, 0.15);
 }
-/* line 9456, ../../../scss/_app_styles.scss */
+/* line 9247, ../../../scss/_app_styles.scss */
 .module_card:hover {
   box-shadow: 0px 0px 17px rgba(0, 0, 0, 0.68);
 }
-/* line 9460, ../../../scss/_app_styles.scss */
+/* line 9251, ../../../scss/_app_styles.scss */
 .module_card > div {
   display: table-cell;
   height: 290px;
 }
-/* line 9465, ../../../scss/_app_styles.scss */
+/* line 9256, ../../../scss/_app_styles.scss */
 .module_card .card_banner {
   width: 250px;
   height: 290px;
@@ -32522,14 +32359,14 @@ Buddy Vertical Bar Css
   -webkit-transition: border-radius .2s;
   transition: border-radius .2s;
 }
-/* line 9478, ../../../scss/_app_styles.scss */
+/* line 9269, ../../../scss/_app_styles.scss */
 .module_card .card_banner > img {
   height: 100%;
   width: 100%;
   border-radius: 4px;
   -webkit-filter: drop-shadow(16px 16px 10px rgba(0, 0, 0, 0.9));
 }
-/* line 9483, ../../../scss/_app_styles.scss */
+/* line 9274, ../../../scss/_app_styles.scss */
 .module_card .card_banner > img:hover {
   -webkit-transform: scale(1.03);
   -moz-transform: scale(1.03);
@@ -32538,7 +32375,7 @@ Buddy Vertical Bar Css
   transform: scale(1.03);
   opacity: 0.8;
 }
-/* line 9495, ../../../scss/_app_styles.scss */
+/* line 9286, ../../../scss/_app_styles.scss */
 .module_card .card_banner > h4 {
   position: absolute;
   top: 100px;
@@ -32547,7 +32384,7 @@ Buddy Vertical Bar Css
   color: #ffffff !important;
   text-shadow: 2px 0px 8px black;
 }
-/* line 9510, ../../../scss/_app_styles.scss */
+/* line 9301, ../../../scss/_app_styles.scss */
 .module_card .card_title {
   display: block;
   width: 230px;
@@ -32557,27 +32394,27 @@ Buddy Vertical Bar Css
   margin: 0px auto;
   letter-spacing: 1px;
 }
-/* line 9521, ../../../scss/_app_styles.scss */
+/* line 9312, ../../../scss/_app_styles.scss */
 .module_card.animated_card .card_banner {
   border-radius: 8px;
 }
-/* line 9524, ../../../scss/_app_styles.scss */
+/* line 9315, ../../../scss/_app_styles.scss */
 .module_card.animated_card:hover .card_banner {
   border-radius: 8px 0px 0px 8px;
 }
-/* line 9529, ../../../scss/_app_styles.scss */
+/* line 9320, ../../../scss/_app_styles.scss */
 .module_card.animated_card.isOpen .card_banner {
   border-radius: 8px 0px 0px 8px;
 }
-/* line 9533, ../../../scss/_app_styles.scss */
+/* line 9324, ../../../scss/_app_styles.scss */
 .module_card.animated_card:hover .card_summary {
   left: 30px;
 }
-/* line 9536, ../../../scss/_app_styles.scss */
+/* line 9327, ../../../scss/_app_styles.scss */
 .module_card.animated_card .card_summary {
   left: 5px;
 }
-/* line 9540, ../../../scss/_app_styles.scss */
+/* line 9331, ../../../scss/_app_styles.scss */
 .module_card .card_summary {
   width: 290px;
   padding: 0px 15px;
@@ -32593,35 +32430,35 @@ Buddy Vertical Bar Css
   /* Safari */
   transition-property: left;
 }
-/* line 9554, ../../../scss/_app_styles.scss */
+/* line 9345, ../../../scss/_app_styles.scss */
 .module_card .card_summary .card_label {
   font-weight: 500;
   font-size: 12.5px;
   letter-spacing: 1px;
   color: black;
 }
-/* line 9560, ../../../scss/_app_styles.scss */
+/* line 9351, ../../../scss/_app_styles.scss */
 .module_card .card_summary .card_section {
   margin: 5px 0px;
   padding: 5px 0px;
 }
-/* line 9564, ../../../scss/_app_styles.scss */
+/* line 9355, ../../../scss/_app_styles.scss */
 .module_card .card_summary .card_section:not(:last-child) {
   border-bottom: 1px solid #ccc;
 }
-/* line 9567, ../../../scss/_app_styles.scss */
+/* line 9358, ../../../scss/_app_styles.scss */
 .module_card .card_summary .card_section p {
   margin-bottom: 7px;
   font-size: 12.5px;
 }
-/* line 9571, ../../../scss/_app_styles.scss */
+/* line 9362, ../../../scss/_app_styles.scss */
 .module_card .card_summary .card_section .ellipsis {
   width: 245px;
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
 }
-/* line 9579, ../../../scss/_app_styles.scss */
+/* line 9370, ../../../scss/_app_styles.scss */
 .module_card .card_summary .card_section .module-card-enrol {
   background: #a2238d;
   height: 37px;
@@ -32635,11 +32472,11 @@ Buddy Vertical Bar Css
   margin-top: 2px !important;
   letter-spacing: 0.4px;
 }
-/* line 9592, ../../../scss/_app_styles.scss */
+/* line 9383, ../../../scss/_app_styles.scss */
 .module_card .card_summary .card_section .module-card-enrol:hover {
   box-shadow: 0px 0px 17px rgba(0, 0, 0, 0.68);
 }
-/* line 9598, ../../../scss/_app_styles.scss */
+/* line 9389, ../../../scss/_app_styles.scss */
 .module_card .card_summary .module_brief {
   display: block;
   /* Fallback for non-webkit */
@@ -32656,7 +32493,7 @@ Buddy Vertical Bar Css
   color: black;
 }
 
-/* line 9617, ../../../scss/_app_styles.scss */
+/* line 9408, ../../../scss/_app_styles.scss */
 .lms_secondary_header {
   width: 100%;
   position: relative;
@@ -32664,11 +32501,11 @@ Buddy Vertical Bar Css
   box-shadow: 0 0 2px 0 rgba(0, 0, 0, 0.2);
   border-bottom: 1px solid rgba(0, 0, 0, 0.25);
 }
-/* line 9623, ../../../scss/_app_styles.scss */
+/* line 9414, ../../../scss/_app_styles.scss */
 .lms_secondary_header .course_actions {
   margin-top: 8px;
 }
-/* line 9626, ../../../scss/_app_styles.scss */
+/* line 9417, ../../../scss/_app_styles.scss */
 .lms_secondary_header .course_actions > span {
   background: #2e3f51;
   border: 1px solid rgba(255, 255, 255, 0.7);
@@ -32680,11 +32517,11 @@ Buddy Vertical Bar Css
   opacity: 0.8;
 }
 @media screen and (min-width: 980px) and (max-width: 1000px) {
-  /* line 9640, ../../../scss/_app_styles.scss */
+  /* line 9431, ../../../scss/_app_styles.scss */
   .lms_secondary_header .course_actions .course_actions {
     margin-top: 8px;
   }
-  /* line 9643, ../../../scss/_app_styles.scss */
+  /* line 9434, ../../../scss/_app_styles.scss */
   .lms_secondary_header .course_actions .course_actions > span {
     margin-left: 50px;
     background: #2e3f51;
@@ -32698,16 +32535,16 @@ Buddy Vertical Bar Css
   }
 }
 
-/* line 9663, ../../../scss/_app_styles.scss */
+/* line 9454, ../../../scss/_app_styles.scss */
 ul.nav_menu_1 {
   margin-bottom: 0px;
   background-color: #fff;
 }
-/* line 9666, ../../../scss/_app_styles.scss */
+/* line 9457, ../../../scss/_app_styles.scss */
 ul.nav_menu_1 > li {
   display: inline-block;
 }
-/* line 9669, ../../../scss/_app_styles.scss */
+/* line 9460, ../../../scss/_app_styles.scss */
 ul.nav_menu_1 > li > a {
   list-style-type: none;
   display: inline-block;
@@ -32718,23 +32555,23 @@ ul.nav_menu_1 > li > a {
   letter-spacing: 0.8px;
   border-bottom: 3px solid transparent;
 }
-/* line 9680, ../../../scss/_app_styles.scss */
+/* line 9471, ../../../scss/_app_styles.scss */
 ul.nav_menu_1 > li > a.selected, ul.nav_menu_1 > li > a:hover {
   border-bottom: 3px solid #a2238d;
 }
 
-/* line 9688, ../../../scss/_app_styles.scss */
+/* line 9479, ../../../scss/_app_styles.scss */
 ul.authoring-tab {
   margin-bottom: 0px;
   display: inline;
   width: 50%;
 }
-/* line 9692, ../../../scss/_app_styles.scss */
+/* line 9483, ../../../scss/_app_styles.scss */
 ul.authoring-tab > li {
   display: inline-block;
   background-color: #164a7b;
 }
-/* line 9695, ../../../scss/_app_styles.scss */
+/* line 9486, ../../../scss/_app_styles.scss */
 ul.authoring-tab > li > a {
   list-style-type: none;
   margin-right: -4px;
@@ -32747,56 +32584,56 @@ ul.authoring-tab > li > a {
   border-bottom: 3px solid transparent;
   color: #ffffff !important;
 }
-/* line 9706, ../../../scss/_app_styles.scss */
+/* line 9497, ../../../scss/_app_styles.scss */
 ul.authoring-tab > li > a.selected, ul.authoring-tab > li > a:hover {
   border-bottom: 3px solid #a2238d;
 }
 
-/* line 9713, ../../../scss/_app_styles.scss */
+/* line 9504, ../../../scss/_app_styles.scss */
 .course-content {
   background: #fff;
   margin: 20px auto;
   padding: 20px 0px;
   margin-top: 0px;
 }
-/* line 9721, ../../../scss/_app_styles.scss */
+/* line 9512, ../../../scss/_app_styles.scss */
 .course-content ul.jqtree-tree .course-tree-node.jqtree-selected .jqtree-element {
   background: #fff;
 }
-/* line 9724, ../../../scss/_app_styles.scss */
+/* line 9515, ../../../scss/_app_styles.scss */
 .course-content ul.jqtree-tree .course-tree-node > div {
   height: 35px;
 }
-/* line 9726, ../../../scss/_app_styles.scss */
+/* line 9517, ../../../scss/_app_styles.scss */
 .course-content ul.jqtree-tree .course-tree-node > div a {
   margin-right: 0.7em;
 }
-/* line 9733, ../../../scss/_app_styles.scss */
+/* line 9524, ../../../scss/_app_styles.scss */
 .course-content .course-unit-name {
   padding-left: 20px;
 }
-/* line 9735, ../../../scss/_app_styles.scss */
+/* line 9526, ../../../scss/_app_styles.scss */
 .course-content .course-unit-name:not(:last-child) {
   border-bottom: 1px solid #d2cfcf;
 }
-/* line 9740, ../../../scss/_app_styles.scss */
+/* line 9531, ../../../scss/_app_styles.scss */
 .course-content .course-unit-name > div .jqtree-title {
   color: #3c5264;
   font-size: 19px;
   font-weight: 600;
 }
-/* line 9748, ../../../scss/_app_styles.scss */
+/* line 9539, ../../../scss/_app_styles.scss */
 .course-content .course-activity-group > div .jqtree-title {
   color: #74a0c0;
   font-size: 17px;
 }
-/* line 9754, ../../../scss/_app_styles.scss */
+/* line 9545, ../../../scss/_app_styles.scss */
 .course-content .course-activity-name > div .jqtree-title {
   color: #74a0c0;
   font-size: 17px;
 }
 
-/* line 9763, ../../../scss/_app_styles.scss */
+/* line 9554, ../../../scss/_app_styles.scss */
 .raw_material_asset {
   width: auto;
   top: -0.50em;
@@ -32813,7 +32650,7 @@ ul.authoring-tab > li > a.selected, ul.authoring-tab > li > a:hover {
   letter-spacing: 0.3px;
 }
 
-/* line 9779, ../../../scss/_app_styles.scss */
+/* line 9570, ../../../scss/_app_styles.scss */
 .status-completed {
   width: auto;
   top: -1.15em;
@@ -32830,7 +32667,7 @@ ul.authoring-tab > li > a.selected, ul.authoring-tab > li > a:hover {
   letter-spacing: 0.4px;
 }
 
-/* line 9795, ../../../scss/_app_styles.scss */
+/* line 9586, ../../../scss/_app_styles.scss */
 .status-in-progress {
   width: auto;
   top: -1.15em;
@@ -32847,7 +32684,7 @@ ul.authoring-tab > li > a.selected, ul.authoring-tab > li > a:hover {
   letter-spacing: 0.4px;
 }
 
-/* line 9812, ../../../scss/_app_styles.scss */
+/* line 9603, ../../../scss/_app_styles.scss */
 .status-upcoming {
   width: auto;
   top: -1.15em;
@@ -32864,7 +32701,7 @@ ul.authoring-tab > li > a.selected, ul.authoring-tab > li > a:hover {
   letter-spacing: 0.4px;
 }
 
-/* line 9829, ../../../scss/_app_styles.scss */
+/* line 9620, ../../../scss/_app_styles.scss */
 .status-draft {
   width: auto;
   top: -1.15em;
@@ -32881,7 +32718,7 @@ ul.authoring-tab > li > a.selected, ul.authoring-tab > li > a:hover {
   letter-spacing: 0.4px;
 }
 
-/* line 9846, ../../../scss/_app_styles.scss */
+/* line 9637, ../../../scss/_app_styles.scss */
 .status-workspace {
   width: auto;
   top: -1.15em;
@@ -32898,33 +32735,33 @@ ul.authoring-tab > li > a.selected, ul.authoring-tab > li > a:hover {
   letter-spacing: 0.4px;
 }
 
-/* line 9863, ../../../scss/_app_styles.scss */
+/* line 9654, ../../../scss/_app_styles.scss */
 .lesson-dropdown ul {
   display: none;
 }
 
-/* line 9867, ../../../scss/_app_styles.scss */
+/* line 9658, ../../../scss/_app_styles.scss */
 .lesson-dropdown:hover ul {
   display: block;
 }
 
-/* line 9871, ../../../scss/_app_styles.scss */
+/* line 9662, ../../../scss/_app_styles.scss */
 .lesson_name_in_export {
   list-style: none;
 }
-/* line 9873, ../../../scss/_app_styles.scss */
+/* line 9664, ../../../scss/_app_styles.scss */
 .lesson_name_in_export:hover {
   border-left: 2.5px solid #ce7869;
 }
 
-/* line 9878, ../../../scss/_app_styles.scss */
+/* line 9669, ../../../scss/_app_styles.scss */
 .buddy_margin {
   margin-right: 80px;
   font-family: OpenSans-Regular;
   margin-top: 6px;
 }
 
-/* line 9884, ../../../scss/_app_styles.scss */
+/* line 9675, ../../../scss/_app_styles.scss */
 .lms_explore_head {
   width: 100%;
   height: 45px;
@@ -32932,57 +32769,57 @@ ul.authoring-tab > li > a.selected, ul.authoring-tab > li > a:hover {
   color: #164A7B;
   margin-top: -30px;
 }
-/* line 9890, ../../../scss/_app_styles.scss */
+/* line 9681, ../../../scss/_app_styles.scss */
 .lms_explore_head > p {
   margin-left: 81px;
   padding: 12px 0px 0px 1px;
   font-family: OpenSans-Semibold;
   font-size: 20px;
 }
-/* line 9896, ../../../scss/_app_styles.scss */
+/* line 9687, ../../../scss/_app_styles.scss */
 .lms_explore_head > a {
   padding: 12px 85px 3px 0px;
 }
 
-/* line 9900, ../../../scss/_app_styles.scss */
+/* line 9691, ../../../scss/_app_styles.scss */
 .lms_explore_head_unit {
   width: 100%;
   height: 50px;
   background-color: #fff;
   color: #164A7B;
 }
-/* line 9905, ../../../scss/_app_styles.scss */
+/* line 9696, ../../../scss/_app_styles.scss */
 .lms_explore_head_unit > p {
   margin-left: 81px;
   padding: 0px 0px 0px 1px;
   font-family: OpenSans-Semibold;
   font-size: 20px;
 }
-/* line 9911, ../../../scss/_app_styles.scss */
+/* line 9702, ../../../scss/_app_styles.scss */
 .lms_explore_head_unit > a {
   padding: 0px 85px 3px 0px;
 }
 
-/* line 9916, ../../../scss/_app_styles.scss */
+/* line 9707, ../../../scss/_app_styles.scss */
 .lms_explore_back {
   background-color: #fff;
 }
 
-/* line 9922, ../../../scss/_app_styles.scss */
+/* line 9713, ../../../scss/_app_styles.scss */
 .empty-dashboard-message {
   border: 3px solid #e4e4e4;
   background: #f8f8f8;
   padding: 40px 0;
   text-align: center;
 }
-/* line 9927, ../../../scss/_app_styles.scss */
+/* line 9718, ../../../scss/_app_styles.scss */
 .empty-dashboard-message > p {
   font-size: 24px;
   color: #646464;
   margin-bottom: 20px;
   text-shadow: 0 1px rgba(255, 255, 255, 0.6);
 }
-/* line 9933, ../../../scss/_app_styles.scss */
+/* line 9724, ../../../scss/_app_styles.scss */
 .empty-dashboard-message > a {
   background-color: #164a7b;
   border: 1px solid #164a7b;
@@ -32996,7 +32833,7 @@ ul.authoring-tab > li > a.selected, ul.authoring-tab > li > a:hover {
   margin-left: 5px;
   padding: 15px 20px;
 }
-/* line 9946, ../../../scss/_app_styles.scss */
+/* line 9737, ../../../scss/_app_styles.scss */
 .empty-dashboard-message .button-explore-courses {
   font-size: 20px;
   font-weight: normal;
@@ -33006,7 +32843,7 @@ ul.authoring-tab > li > a.selected, ul.authoring-tab > li > a:hover {
   width: 170px;
 }
 
-/* line 9959, ../../../scss/_app_styles.scss */
+/* line 9750, ../../../scss/_app_styles.scss */
 .mydesk_page .page_banner {
   width: 100%;
   height: 200px;
@@ -33014,7 +32851,7 @@ ul.authoring-tab > li > a.selected, ul.authoring-tab > li > a:hover {
   background-size: 100% 100%;
   position: relative;
 }
-/* line 9966, ../../../scss/_app_styles.scss */
+/* line 9757, ../../../scss/_app_styles.scss */
 .mydesk_page .page_banner:before {
   content: ' ';
   background-color: rgba(0, 0, 0, 0.1);
@@ -33028,13 +32865,13 @@ ul.authoring-tab > li > a.selected, ul.authoring-tab > li > a:hover {
   z-index: 10;
   box-shadow: inset 0 0 40px rgba(0, 0, 0, 0.2);
 }
-/* line 9980, ../../../scss/_app_styles.scss */
+/* line 9771, ../../../scss/_app_styles.scss */
 .mydesk_page .page_banner .banner_profile {
   position: absolute;
   bottom: 30px;
   left: 40px;
 }
-/* line 9985, ../../../scss/_app_styles.scss */
+/* line 9776, ../../../scss/_app_styles.scss */
 .mydesk_page .page_banner .banner_profile .buddy_logo {
   display: inline-block;
   margin-right: 10px;
@@ -33043,53 +32880,53 @@ ul.authoring-tab > li > a.selected, ul.authoring-tab > li > a:hover {
   overflow: hidden;
   background-color: #fff;
 }
-/* line 9993, ../../../scss/_app_styles.scss */
+/* line 9784, ../../../scss/_app_styles.scss */
 .mydesk_page .page_banner .banner_profile .buddy_logo svg {
   height: 100px;
   width: 100px;
 }
-/* line 9998, ../../../scss/_app_styles.scss */
+/* line 9789, ../../../scss/_app_styles.scss */
 .mydesk_page .page_banner .banner_profile .buddy_logo svg path {
   fill: #7a422a;
 }
-/* line 10003, ../../../scss/_app_styles.scss */
+/* line 9794, ../../../scss/_app_styles.scss */
 .mydesk_page .page_banner .banner_profile .banner_heading {
   color: #fff;
   display: inline-block;
   vertical-align: top;
 }
-/* line 10008, ../../../scss/_app_styles.scss */
+/* line 9799, ../../../scss/_app_styles.scss */
 .mydesk_page .page_banner .banner_profile .banner_heading .buddy_name {
   font-size: 23px;
   display: block;
   margin-bottom: 10px;
 }
-/* line 10016, ../../../scss/_app_styles.scss */
+/* line 9807, ../../../scss/_app_styles.scss */
 .mydesk_page .page_menu {
   border-bottom: 1px solid #e5e5e5;
 }
-/* line 10020, ../../../scss/_app_styles.scss */
+/* line 9811, ../../../scss/_app_styles.scss */
 .mydesk_page .page_menu li > a {
   padding: 12px 20px 9px;
 }
 
-/* line 10030, ../../../scss/_app_styles.scss */
+/* line 9821, ../../../scss/_app_styles.scss */
 .input_links {
   margin-left: 10px;
 }
-/* line 10032, ../../../scss/_app_styles.scss */
+/* line 9823, ../../../scss/_app_styles.scss */
 .input_links a {
   margin-right: 35px;
   margin-top: 5px;
 }
 
-/* line 10038, ../../../scss/_app_styles.scss */
+/* line 9829, ../../../scss/_app_styles.scss */
 #course-notification
 #status {
   width: 100% !important;
 }
 
-/* line 10044, ../../../scss/_app_styles.scss */
+/* line 9835, ../../../scss/_app_styles.scss */
 .add-note-btn {
   padding: 3px 11px;
   border-radius: 100%;
@@ -33101,7 +32938,7 @@ ul.authoring-tab > li > a.selected, ul.authoring-tab > li > a:hover {
   color: #6153AE;
 }
 
-/* line 10055, ../../../scss/_app_styles.scss */
+/* line 9846, ../../../scss/_app_styles.scss */
 .bef-note-btn {
   padding: 3px 11px;
   border-radius: 100%;
@@ -33113,7 +32950,7 @@ ul.authoring-tab > li > a.selected, ul.authoring-tab > li > a:hover {
   color: #6153AE;
 }
 
-/* line 10066, ../../../scss/_app_styles.scss */
+/* line 9857, ../../../scss/_app_styles.scss */
 .edit-note-btn {
   float: right;
   border: 1px solid #CFCFCF;
@@ -33123,12 +32960,12 @@ ul.authoring-tab > li > a.selected, ul.authoring-tab > li > a:hover {
   background-color: #f7f7f7;
   width: 85px;
 }
-/* line 10074, ../../../scss/_app_styles.scss */
+/* line 9865, ../../../scss/_app_styles.scss */
 .edit-note-btn i {
   margin-right: 5px;
 }
 
-/* line 10078, ../../../scss/_app_styles.scss */
+/* line 9869, ../../../scss/_app_styles.scss */
 .delete-note-btn {
   float: right;
   border: 1px solid #CFCFCF;
@@ -33139,39 +32976,39 @@ ul.authoring-tab > li > a.selected, ul.authoring-tab > li > a:hover {
   background-color: #f7f7f7;
   width: 85px;
 }
-/* line 10087, ../../../scss/_app_styles.scss */
+/* line 9878, ../../../scss/_app_styles.scss */
 .delete-note-btn i {
   margin-right: 5px;
 }
 
-/* line 10092, ../../../scss/_app_styles.scss */
+/* line 9883, ../../../scss/_app_styles.scss */
 .jqtree-title > .fa-check {
   color: green;
 }
 
-/* line 10095, ../../../scss/_app_styles.scss */
+/* line 9886, ../../../scss/_app_styles.scss */
 .jqtree-title > .fa-check-circle-o {
   color: green;
 }
 
-/* line 10098, ../../../scss/_app_styles.scss */
+/* line 9889, ../../../scss/_app_styles.scss */
 .jqtree-title > .fa-clock-o {
   color: orange;
 }
 
-/* line 10101, ../../../scss/_app_styles.scss */
+/* line 9892, ../../../scss/_app_styles.scss */
 .course-status-icon {
   font-size: 20px;
   margin-right: 5px;
 }
 
-/* line 10105, ../../../scss/_app_styles.scss */
+/* line 9896, ../../../scss/_app_styles.scss */
 .img-height {
   height: 150px;
   width: 1351px;
 }
 
-/* line 10110, ../../../scss/_app_styles.scss */
+/* line 9901, ../../../scss/_app_styles.scss */
 .wrapper-footer {
   box-shadow: 0 -1px 5px 0 rgba(0, 0, 0, 0.1);
   border-top: 1px solid #c5c6c7;
@@ -33185,7 +33022,7 @@ ul.authoring-tab > li > a.selected, ul.authoring-tab > li > a:hover {
   background: rgba(221, 221, 221, 0.18);
   clear: both;
 }
-/* line 10126, ../../../scss/_app_styles.scss */
+/* line 9917, ../../../scss/_app_styles.scss */
 .wrapper-footer #footer-clix {
   box-sizing: border-box;
   max-width: 1200px;
@@ -33193,85 +33030,85 @@ ul.authoring-tab > li > a.selected, ul.authoring-tab > li > a:hover {
   margin-right: auto;
   margin: 0 auto;
 }
-/* line 10134, ../../../scss/_app_styles.scss */
+/* line 9925, ../../../scss/_app_styles.scss */
 .wrapper-footer #footer-clix .links-logos {
   float: left;
   display: block;
   margin-right: 2.35765%;
   width: 65.88078%;
 }
-/* line 10140, ../../../scss/_app_styles.scss */
+/* line 9931, ../../../scss/_app_styles.scss */
 .wrapper-footer #footer-clix .links-logos .nav-links-logos {
   margin: 10px 0px 0px 18px;
 }
-/* line 10143, ../../../scss/_app_styles.scss */
+/* line 9934, ../../../scss/_app_styles.scss */
 .wrapper-footer #footer-clix .links-logos .nav-links-logos ol {
   display: inline;
   list-style-type: none;
 }
-/* line 10146, ../../../scss/_app_styles.scss */
+/* line 9937, ../../../scss/_app_styles.scss */
 .wrapper-footer #footer-clix .links-logos .nav-links-logos ol li {
   float: left;
   margin-right: 15px;
 }
-/* line 10149, ../../../scss/_app_styles.scss */
+/* line 9940, ../../../scss/_app_styles.scss */
 .wrapper-footer #footer-clix .links-logos .nav-links-logos ol li > a {
   color: #ce7869;
 }
-/* line 10151, ../../../scss/_app_styles.scss */
+/* line 9942, ../../../scss/_app_styles.scss */
 .wrapper-footer #footer-clix .links-logos .nav-links-logos ol li > a:hover {
   color: #ce7869;
   border-bottom: 3px solid #ffc14e;
 }
-/* line 10162, ../../../scss/_app_styles.scss */
+/* line 9953, ../../../scss/_app_styles.scss */
 .wrapper-footer #footer-clix .links-logos .nav-legal {
   margin: 0px 0px 0px 20px;
 }
-/* line 10164, ../../../scss/_app_styles.scss */
+/* line 9955, ../../../scss/_app_styles.scss */
 .wrapper-footer #footer-clix .links-logos .nav-legal ol {
   display: inline;
   list-style-type: none;
 }
-/* line 10167, ../../../scss/_app_styles.scss */
+/* line 9958, ../../../scss/_app_styles.scss */
 .wrapper-footer #footer-clix .links-logos .nav-legal ol li {
   float: left;
   margin-right: 15px;
   display: inline-block;
   font-size: 0.6875em;
 }
-/* line 10172, ../../../scss/_app_styles.scss */
+/* line 9963, ../../../scss/_app_styles.scss */
 .wrapper-footer #footer-clix .links-logos .nav-legal ol li > a {
   transition: link-color 0.15s ease-in-out 0s,border 0.15s ease-in-out 0s;
   border-bottom: none;
   color: #777;
   text-decoration: none !important;
 }
-/* line 10177, ../../../scss/_app_styles.scss */
+/* line 9968, ../../../scss/_app_styles.scss */
 .wrapper-footer #footer-clix .links-logos .nav-legal ol li > a:hover {
   color: #777;
   border-bottom: 3px solid #c90d97;
 }
-/* line 10187, ../../../scss/_app_styles.scss */
+/* line 9978, ../../../scss/_app_styles.scss */
 .wrapper-footer #footer-clix .links-logos .wrapper-logo {
   margin: 13px 0;
   display: inline-block;
 }
-/* line 10190, ../../../scss/_app_styles.scss */
+/* line 9981, ../../../scss/_app_styles.scss */
 .wrapper-footer #footer-clix .links-logos .wrapper-logo p {
   color: inherit;
   margin: 0;
   display: inline-block;
 }
-/* line 10194, ../../../scss/_app_styles.scss */
+/* line 9985, ../../../scss/_app_styles.scss */
 .wrapper-footer #footer-clix .links-logos .wrapper-logo p a {
   display: inline-block;
 }
-/* line 10200, ../../../scss/_app_styles.scss */
+/* line 9991, ../../../scss/_app_styles.scss */
 .wrapper-footer #footer-clix .links-logos .wrapper-logo .footer-logo > img {
   height: 10px;
 }
 
-/* line 10210, ../../../scss/_app_styles.scss */
+/* line 10001, ../../../scss/_app_styles.scss */
 #overlay {
   /* we set all of the properties for are overlay */
   height: 116px;
@@ -33292,7 +33129,7 @@ ul.authoring-tab > li > a.selected, ul.authoring-tab > li > a:hover {
   border-radius: 10px;
 }
 
-/* line 10230, ../../../scss/_app_styles.scss */
+/* line 10021, ../../../scss/_app_styles.scss */
 #mask {
   /* create are mask */
   position: fixed;
@@ -33306,13 +33143,13 @@ ul.authoring-tab > li > a.selected, ul.authoring-tab > li > a:hover {
 }
 
 /* use :target to look for a link to the overlay then we find are mask */
-/* line 10241, ../../../scss/_app_styles.scss */
+/* line 10032, ../../../scss/_app_styles.scss */
 #overlay:target, #overlay:target + #mask {
   display: block;
   opacity: 1;
 }
 
-/* line 10245, ../../../scss/_app_styles.scss */
+/* line 10036, ../../../scss/_app_styles.scss */
 .close {
   /* to make a nice looking pure CSS3 close button */
   display: block;
@@ -33334,7 +33171,7 @@ ul.authoring-tab > li > a.selected, ul.authoring-tab > li > a:hover {
   border-radius: 38px;
 }
 
-/* line 10264, ../../../scss/_app_styles.scss */
+/* line 10055, ../../../scss/_app_styles.scss */
 #open-overlay {
   /* open the overlay */
   padding: 0px 0px;
@@ -33347,7 +33184,7 @@ ul.authoring-tab > li > a.selected, ul.authoring-tab > li > a:hover {
   -o-border-radius: 10px;
 }
 
-/* line 10275, ../../../scss/_app_styles.scss */
+/* line 10066, ../../../scss/_app_styles.scss */
 .enroll-btn {
   width: 90px;
   opacity: 1;
@@ -33363,44 +33200,44 @@ ul.authoring-tab > li > a.selected, ul.authoring-tab > li > a:hover {
   background-color: #4b4852;
 }
 
-/* line 10297, ../../../scss/_app_styles.scss */
+/* line 10088, ../../../scss/_app_styles.scss */
 .img-style-land {
   margin-top: 28px;
   margin-left: -56px;
 }
 
-/* line 10302, ../../../scss/_app_styles.scss */
+/* line 10093, ../../../scss/_app_styles.scss */
 .top-margin-translation {
   margin-top: 0px;
 }
 
-/* line 10306, ../../../scss/_app_styles.scss */
+/* line 10097, ../../../scss/_app_styles.scss */
 .activity-editor-header-top {
   margin-top: -50px;
 }
 
-/* line 10310, ../../../scss/_app_styles.scss */
+/* line 10101, ../../../scss/_app_styles.scss */
 .add-lesson-top-margin {
   margin-top: 5px;
 }
 
-/* line 10313, ../../../scss/_app_styles.scss */
+/* line 10104, ../../../scss/_app_styles.scss */
 .translation-detail-top-margin {
   margin-top: 0px;
 }
 
-/* line 10316, ../../../scss/_app_styles.scss */
+/* line 10107, ../../../scss/_app_styles.scss */
 .outer {
   width: 100%;
   text-align: center;
 }
 
-/* line 10321, ../../../scss/_app_styles.scss */
+/* line 10112, ../../../scss/_app_styles.scss */
 .inner {
   display: inline-block !important;
 }
 
-/* line 10326, ../../../scss/_app_styles.scss */
+/* line 10117, ../../../scss/_app_styles.scss */
 .transcript-toggler {
   display: block;
   width: 155px !important;
@@ -33416,33 +33253,33 @@ ul.authoring-tab > li > a.selected, ul.authoring-tab > li > a:hover {
   text-transform: uppercase;
 }
 
-/* line 10342, ../../../scss/_app_styles.scss */
+/* line 10133, ../../../scss/_app_styles.scss */
 .double-buttons {
   margin-top: 100px;
   margin-left: 729px;
 }
 
-/* line 10347, ../../../scss/_app_styles.scss */
+/* line 10138, ../../../scss/_app_styles.scss */
 .lesson-form-name {
   padding-top: 10px;
 }
 
-/* line 10351, ../../../scss/_app_styles.scss */
+/* line 10142, ../../../scss/_app_styles.scss */
 .lesson-form-desc {
   padding-top: 25px;
 }
 
-/* line 10355, ../../../scss/_app_styles.scss */
+/* line 10146, ../../../scss/_app_styles.scss */
 .enroll_chkbox {
   transform: scale(1.5);
 }
 
-/* line 10358, ../../../scss/_app_styles.scss */
+/* line 10149, ../../../scss/_app_styles.scss */
 .enroll_all_users {
   width: 15% !important;
 }
 
-/* line 10362, ../../../scss/_app_styles.scss */
+/* line 10153, ../../../scss/_app_styles.scss */
 .enrollBtn {
   background: #a2238d;
   height: 50px;
@@ -33458,24 +33295,24 @@ ul.authoring-tab > li > a.selected, ul.authoring-tab > li > a:hover {
   letter-spacing: 0.4px;
 }
 
-/* line 10396, ../../../scss/_app_styles.scss */
+/* line 10187, ../../../scss/_app_styles.scss */
 .enroll-act_lbl {
   color: #0c2944;
 }
 
-/* line 10401, ../../../scss/_app_styles.scss */
+/* line 10192, ../../../scss/_app_styles.scss */
 .wrkspace {
   margin-right: 80px;
 }
 
-/* line 10405, ../../../scss/_app_styles.scss */
+/* line 10196, ../../../scss/_app_styles.scss */
 .status-btn {
   background-color: #fff;
   margin-right: auto;
   padding-bottom: 0px;
   text-transform: none;
 }
-/* line 10410, ../../../scss/_app_styles.scss */
+/* line 10201, ../../../scss/_app_styles.scss */
 .status-btn .disabled {
   background-color: #008cba;
   border-color: #007095;
@@ -33485,41 +33322,41 @@ ul.authoring-tab > li > a.selected, ul.authoring-tab > li > a:hover {
   box-shadow: none;
 }
 
-/* line 10420, ../../../scss/_app_styles.scss */
+/* line 10211, ../../../scss/_app_styles.scss */
 .margin-right-50 {
   margin-right: 50px;
 }
 
-/* line 10429, ../../../scss/_app_styles.scss */
+/* line 10220, ../../../scss/_app_styles.scss */
 .color-btn {
   background-color: #720f5e;
   width: 77px;
   margin-left: 17px;
 }
-/* line 10433, ../../../scss/_app_styles.scss */
+/* line 10224, ../../../scss/_app_styles.scss */
 .color-btn:hover {
   color: #720f5e;
   background-color: #ffffff;
 }
 
-/* line 10439, ../../../scss/_app_styles.scss */
+/* line 10230, ../../../scss/_app_styles.scss */
 .mid_label {
   margin-top: 15px;
   font-size: 15px;
 }
 
-/* line 10444, ../../../scss/_app_styles.scss */
+/* line 10235, ../../../scss/_app_styles.scss */
 .compulsory {
   color: red;
   font-size: smaller;
 }
 
-/* line 10449, ../../../scss/_app_styles.scss */
+/* line 10240, ../../../scss/_app_styles.scss */
 .select-drop {
   height: auto;
 }
 
-/* line 10453, ../../../scss/_app_styles.scss */
+/* line 10244, ../../../scss/_app_styles.scss */
 .template-select {
   border: 1px solid #cccccc;
   border-radius: 5px;
@@ -33528,41 +33365,41 @@ ul.authoring-tab > li > a.selected, ul.authoring-tab > li > a:hover {
   font-size: 14px;
 }
 
-/* line 10461, ../../../scss/_app_styles.scss */
+/* line 10252, ../../../scss/_app_styles.scss */
 .white-text {
   color: white;
 }
 
-/* line 10466, ../../../scss/_app_styles.scss */
+/* line 10257, ../../../scss/_app_styles.scss */
 .quiz-player .quiz_qtn {
   margin-left: 20px !important;
   font-size: 20px;
 }
-/* line 10470, ../../../scss/_app_styles.scss */
+/* line 10261, ../../../scss/_app_styles.scss */
 .quiz-player .question_edit {
   margin-left: 20px !important;
 }
-/* line 10474, ../../../scss/_app_styles.scss */
+/* line 10265, ../../../scss/_app_styles.scss */
 .quiz-player input[type=checkbox], .quiz-player input[type=radio] {
   margin-right: 10px;
   width: 15px;
   height: 15px;
 }
-/* line 10480, ../../../scss/_app_styles.scss */
+/* line 10271, ../../../scss/_app_styles.scss */
 .quiz-player .chk_ans_lbl, .quiz-player .rad_ans_lbl {
   font-size: 22px;
   margin-left: 5px;
 }
-/* line 10485, ../../../scss/_app_styles.scss */
+/* line 10276, ../../../scss/_app_styles.scss */
 .quiz-player .fi-check {
   color: green;
 }
-/* line 10489, ../../../scss/_app_styles.scss */
+/* line 10280, ../../../scss/_app_styles.scss */
 .quiz-player .fi-x {
   color: red;
 }
 
-/* line 10494, ../../../scss/_app_styles.scss */
+/* line 10285, ../../../scss/_app_styles.scss */
 .hyperlink-tag {
   cursor: pointer;
   cursor: pointer;
@@ -33575,44 +33412,44 @@ ul.authoring-tab > li > a.selected, ul.authoring-tab > li > a:hover {
   color: #164A7B;
 }
 
-/* line 10507, ../../../scss/_app_styles.scss */
+/* line 10298, ../../../scss/_app_styles.scss */
 .published.scard-action {
   background: #A6D9CB;
 }
 
-/* line 10511, ../../../scss/_app_styles.scss */
+/* line 10302, ../../../scss/_app_styles.scss */
 .draft.scard-action {
   content: "Draft";
   background: #DCDCDC;
 }
 
-/* line 10518, ../../../scss/_app_styles.scss */
+/* line 10309, ../../../scss/_app_styles.scss */
 .auto_width {
   width: auto !important;
 }
 
-/* line 10523, ../../../scss/_app_styles.scss */
+/* line 10314, ../../../scss/_app_styles.scss */
 .attempts_count {
   color: #000000 !important;
 }
 
-/* line 10529, ../../../scss/_app_styles.scss */
+/* line 10320, ../../../scss/_app_styles.scss */
 #course-settings-drop li a {
   text-align: left;
 }
 
-/* line 10537, ../../../scss/_app_styles.scss */
+/* line 10328, ../../../scss/_app_styles.scss */
 #asset-settings-drop li a {
   text-align: left;
 }
 
-/* line 10544, ../../../scss/_app_styles.scss */
+/* line 10335, ../../../scss/_app_styles.scss */
 .button-bg {
   background-color: #74b3dc;
 }
 
 /* Tools page css listing*/
-/* line 10551, ../../../scss/_app_styles.scss */
+/* line 10342, ../../../scss/_app_styles.scss */
 .polaroid {
   width: 330px;
   background-color: white;
@@ -33626,7 +33463,7 @@ ul.authoring-tab > li > a.selected, ul.authoring-tab > li > a:hover {
   cursor: pointer;
 }
 
-/* line 10564, ../../../scss/_app_styles.scss */
+/* line 10355, ../../../scss/_app_styles.scss */
 .polaroid:hover img {
   -webkit-transform: scale(1.05);
   -moz-transform: scale(1.05);
@@ -33635,26 +33472,12 @@ ul.authoring-tab > li > a.selected, ul.authoring-tab > li > a:hover {
   transform: scale(1.05);
 }
 
-/* line 10573, ../../../scss/_app_styles.scss */
-.container {
-  text-align: center;
-  padding: 10px 20px;
-  border-top: 5px solid #164a7b;
-  margin-top: 0px;
-}
-/* line 10579, ../../../scss/_app_styles.scss */
-.container > p {
-  color: black;
-  font-size: 16px;
-  font-weight: 500;
-}
-
-/* line 10588, ../../../scss/_app_styles.scss */
+/* line 10365, ../../../scss/_app_styles.scss */
 .tool-bg {
   background-color: rgba(87, 198, 250, 0.07);
 }
 
-/* line 10591, ../../../scss/_app_styles.scss */
+/* line 10368, ../../../scss/_app_styles.scss */
 .purple-btn {
   width: inherit;
   text-transform: uppercase;
@@ -33665,7 +33488,7 @@ ul.authoring-tab > li > a.selected, ul.authoring-tab > li > a:hover {
   border: 2px solid #6a0054;
 }
 
-/* line 10601, ../../../scss/_app_styles.scss */
+/* line 10378, ../../../scss/_app_styles.scss */
 .disable-purple-btn {
   width: inherit;
   text-transform: uppercase !important;
@@ -33676,22 +33499,22 @@ ul.authoring-tab > li > a.selected, ul.authoring-tab > li > a:hover {
   border: 2px solid #4b4852;
 }
 
-/* line 10611, ../../../scss/_app_styles.scss */
+/* line 10388, ../../../scss/_app_styles.scss */
 .user-analytics-data {
   margin: 42px 37px 37px 37px;
   border: 2px solid #aaaaaa;
 }
-/* line 10614, ../../../scss/_app_styles.scss */
+/* line 10391, ../../../scss/_app_styles.scss */
 .user-analytics-data .close-reveal-modal {
   font-size: 20px;
 }
 
-/* line 10618, ../../../scss/_app_styles.scss */
+/* line 10395, ../../../scss/_app_styles.scss */
 .left-space {
   margin-left: 0.5em;
 }
 
-/* line 10626, ../../../scss/_app_styles.scss */
+/* line 10403, ../../../scss/_app_styles.scss */
 .top-right-menu {
   margin-right: 80px !important;
 }
