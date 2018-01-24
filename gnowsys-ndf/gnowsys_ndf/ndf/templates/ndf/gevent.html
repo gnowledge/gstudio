@@ -115,9 +115,6 @@ float: none !important;
         cursor: pointer;
     }
 
-    
-
-
     #view-scheduler-calendar table {
         border: none;
         margin-bottom: 0px;
@@ -134,10 +131,6 @@ float: none !important;
         padding-top: 1em !important;
     }
 
-    .fc-week-number {
-        background-color: #DDDDDD;
-        color: #808080;
-    }
 
 </style>
 
@@ -169,6 +162,7 @@ float: none !important;
     
     
     $('#calendar').fullCalendar({
+          height: "auto",
           default: true,
           theme: false,
           // emphasizes business hours
@@ -182,14 +176,18 @@ float: none !important;
             right: 'month,agendaWeek,agendaDay,listWeek',      
           },
           // defaultDate: '2017-12-12',
-          //firstDay:1,
+          firstDay:1,
           selectable: true,
           selectHelper: true,
           timezone:'local',
           defaultView: 'month',
-          eventBackgroundColor:'#23000',
-          slotDuration:'00:15:00',
-          scrollTime:'07:00:00',
+          // eventBackgroundColor:'#23000',
+          // slotDuration:'00:15:00',
+          // scrollTime:'07:00:00',
+          yearCellMinH: 60,
+          dragOpacity: 0.7,
+          resourceAreaWidth: 230,
+          aspectRatio: 1.5,
 
           navLinks: true, // can click day/week names to navigate views
           eventLimit: true, // allow "more" link when too many events
@@ -219,25 +217,49 @@ float: none !important;
                 eventData = {
                   title: title,
                   start: start,
-                  end: end
+                  end: end,
+                  priority: priority,
                 };
               $('#calendar').fullCalendar('renderEvent', eventData, true); // stick? = true
             }
             $('#calendar').fullCalendar('unselect');
           },
 
-          
-          customButtons: {
-            myCustomButton: {
-              text: 'custom!',
-              click: function() {
-                alert('clicked the custom button!');
-              }
+
+          events: {{events|safe}},
+
+          eventRender: function(event, element) {
+            if (event.priority == 'Immediate') {
+              element.css({
+                  'background-color': '#ffc14e',
+                  'border-color': '#ffc14e',
+                  'border-radius': '10px',
+                  'padding': '0px 0px 0px 2px',
+                  'margin-right': '2px',
+              });
+            } else if (event.priority == 'High'){
+                element.css({
+                  'background-color': '#f04124',
+                  'border-color': '#f04124',
+                  'border-radius': '10px',
+                  'padding': '0px 0px 0px 2px',
+                  'margin-right': '2px',
+              });
+            } else {
+                element.css({
+                  'background-color': '#008cba',
+                  'border-color': '#008cba',
+                  'border-radius': '10px',
+                  'padding': '0px 0px 0px 2px',
+                  'margin-right': '2px',
+              });
             }
+            // var dateString = event.start.format("YYYY-MM-DD");
+            // $(view.el[0]).find('.fc-day[data-date=' + dateString + ']').css('background-color', '#FAA732');
           },
 
 
-          events: {{events|safe}}
+
         });
         
     // will listener today click
