@@ -144,9 +144,14 @@ def main():
 
         with open("/home/docker/code/gstudio/gnowsys-ndf/gnowsys_ndf/req_body.json") as req_body:
             request_body = json.load(req_body)
+        with open("/home/docker/code/gstudio/gnowsys-ndf/gnowsys_ndf/triples.json") as triples:
+            triples_body = json.load(triples)
 
         if (not es.indices.exists(index.lower())):
-            res = es.indices.create(index=index.lower(), body=request_body)
+            if (index.lower() == "triples"):
+                res = es.indices.create(index=index.lower(), body=triples_body)
+            else:
+                res = es.indices.create(index=index.lower(), body=req_body)
 
         if (es.indices.exists(index.lower())):
 
