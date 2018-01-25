@@ -1,3 +1,5 @@
+The following document is deprecated. Please visit on 10th Feb 2018 for updated description.
+
 **POINTS Multiplier factor**
 - FILE UPLOAD POINTS = 25
 - NOTE CREATE POINTS = 30
