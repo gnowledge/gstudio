@@ -1286,6 +1286,7 @@ class CreateCourseEventGroup(CreateEventGroup):
 
             self.update_raw_material_group_set(existing_course_obj, new_course_obj)
             self.call_setup(request, existing_course_obj, new_course_obj, new_course_obj)
+            new_course_obj = get_all_iframes_of_unit(new_course_obj, request.META['HTTP_HOST'])
             return True
 
         except Exception as e:
@@ -1297,7 +1298,9 @@ class CreateCourseEventGroup(CreateEventGroup):
         # rm_files_cur = node_collection.find({'tags': 'raw@material', 'member_of': file_gst._id, 'group_set': old_group_obj._id})
 
         # June 17 2016. Importing files uploaded by user 'administrator' in old_group_obj
-        administrator_user = User.objects.get(username='administrator')
+        # administrator_user = User.objects.get(username='administrator')
+        # Commented fetching 'administrator_user '
+
         # raw_material_fetch_query = {'group_set': old_group_obj._id,
         #  '$or':[{'tags': 'raw@material'}, {'created_by': administrator_user.id}]}
         raw_material_fetch_query = {'group_set': old_group_obj._id,
@@ -2055,6 +2058,18 @@ def group_dashboard(request, group_id=None):
     old_profile_pics = []
     selected = request.GET.get('selected','')
     group_obj = get_group_name_id(group_id, get_obj=True)
+    try:
+        if 'tab_name' in group_obj.project_config and group_obj.project_config['tab_name'].lower() == "questions":
+            if "announced_unit" in group_obj.member_of_names_list:
+                if group_obj.collection_set:
+                    lesson_id = group_obj.collection_set[0]
+                    lesson_node = node_collection.one({'_id': ObjectId(lesson_id)})
+                    activity_id = lesson_node.collection_set[0]
+                return HttpResponseRedirect(reverse('activity_player_detail', kwargs={'group_id': group_id,
+                    'lesson_id': lesson_id, 'activity_id': activity_id}))
+    except Exception as e:
+        pass
+
     if ("base_unit" in group_obj.member_of_names_list or
         "CourseEventGroup" in group_obj.member_of_names_list or
         "BaseCourseGroup" in group_obj.member_of_names_list or 
@@ -2132,6 +2147,7 @@ def group_dashboard(request, group_id=None):
           shelves = []
     '''
   except Exception as e:
+    print "\nError: ", e
     group_obj=node_collection.one({'$and':[{'_type':u'Group'},{'name':u'home'}]})
     group_id=group_obj['_id']
     pass
@@ -2177,7 +2193,8 @@ def group_dashboard(request, group_id=None):
       alternate_template = "ndf/gcourse_event_group.html"
       # course_collection_data = get_collection(request,group_obj._id,group_obj._id)
       # course_collection_data = json.loads(course_collection_data.content)
-
+  if 'Group' in group_obj.member_of_names_list:
+    alternate_template = "ndf/lms.html"
   # The line below is commented in order to:
   #     Fetch files_cur - resources under moderation in groupdahsboard.html
   # if  u"ProgramEventGroup" not in group_obj.member_of_names_list:
@@ -2711,6 +2728,8 @@ def upload_using_save_file(request,group_id):
 
     group_obj = node_collection.one({'_id': ObjectId(group_id)})
     title = request.POST.get('context_name','')
+    sel_topic = request.POST.get('topic_list','')
+    
     usrid = request.user.id
     name  = request.POST.get('name')
     # print "\n\n\nusrid",usrid
@@ -2837,7 +2856,8 @@ def upload_using_save_file(request,group_id):
             # # print "++++++++++++++++++++++++++++++++++++++++",asset_node._id
             # asset_content_node = create_assetcontent(ObjectId('58a3dd4cc6bd690400016ae5'),file_node.name,group_id,file_node.created_by)
             # print "---------------------------------------",asset_content_node
-
+            rt_teaches = node_collection.one({'_type': "RelationType", 'name': unicode("teaches")})
+            create_grelation(file_node._id,rt_teaches,ObjectId(sel_topic))
             file_node.save(groupid=group_id,validate=False)
 
             return HttpResponseRedirect( reverse('file_detail', kwargs={"group_id": group_id,'_id':file_node._id}) )

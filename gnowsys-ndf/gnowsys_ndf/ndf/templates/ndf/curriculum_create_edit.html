@@ -134,13 +134,6 @@ background-repeat:no-repeat; background-size: 48px 48px
 		  			</div>
 				</div>
 
-				<div class="row">
-		  			<div class="medium-12 columns">
-		    			<span data-tooltip class="has-tip" title="Tags help identify similiar work easily. You can add as many labels as you wish using a comma ','"><label>Tag{{node.tags|pluralize|default_if_none:"s"}}</label>
-		    			</span>
-		    			<input id="tags_id" name="tags" type="text" value="{{node.tags|join:', '|default_if_none:""}}" placeholder="Separate tags with commas...">
-		  			</div>		
-				</div>
 
 	  		</div>
 		</div>
@@ -255,14 +248,6 @@ background-repeat:no-repeat; background-size: 48px 48px
 					  {% include "ndf/add_editor.html" with var_name="content_org" var_placeholder="Enter the content here" %}
 					  </div>
 				</div>
-
-				<div class="row">
-		  			<div class="medium-12 columns">
-		    			<span data-tooltip class="has-tip" title="Tags are like keywords, they help identify similiar resources easily. You can add as many tags as you wish using a comma ','"><label>{% trans "Tag" %}</label>
-		    			</span>
-		    			<input id="tags_id" name="tags" type="text" placeholder="Separate tags with commas...">
-		  			</div>		
-				</div>
 		
 	      		</div>
   			</div>
@@ -338,7 +323,7 @@ background-repeat:no-repeat; background-size: 48px 48px
 	      		alert("Please enter sub theme name");
 	      	}
 
-	        location.reload(true);
+	        location.reload();
 	        $("#sub_theme_id").val("");
 	      }
 	    });
@@ -370,7 +355,7 @@ background-repeat:no-repeat; background-size: 48px 48px
 	      		alert("Please enter topic name");
 	      	}
 
-	        location.reload(true);
+	        location.reload();
 	        $("#add_topic_id").val("");
 	      }
 	    });

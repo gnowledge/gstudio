@@ -75,9 +75,8 @@
         <div style="margin-left:calc(({{each_reply.level}} - 1) * 48px); {% if each_reply.level == 1 %}margin-top:25px;{% endif %}" class="disc-replies" data-reply-id="{{ each_reply.oid }}" data-priornode-id="{{ each_reply.prior_node }}">
           <div clas="discussion-title row " >
              <div class="discussion-title-username">
-              <a  href="{% url 'dashboard' each_reply.userid %}" style="color:#ADABAB !important" title=" {{ each_reply.username }}">
-                {# {{ each_reply.username }} #}
-                {{ each_reply.contributors|join:', ' }} 
+              <a  href="#" style="color:#ADABAB !important" title=" {{ each_reply.username }}">
+                {{ each_reply.contributors|join:', ' }}{% include 'ndf/rating.html' with if_comments=True nodeid=each_reply.oid %} 
               </a>
                 <small style="float:right;color:#999999">{{ each_reply.last_update }}</small>
             </div>
@@ -107,7 +106,7 @@
 
           </div>
           <div class="discussion-footer">
-            <a class="reply-btn reply_res"  data-id='{{ each_reply.oid }}' onclick='openCKEditor($(this),"{{each_reply.oid}}")' data-org-content='{{ each_reply.content }}'>
+            <a  data-id='{{ each_reply.oid }}' {% if user_access_priv == "allow" %} class="reply-btn reply_res" onclick='openCKEditor($(this),"{{each_reply.oid}}")'  {% else %} class="user_not_enrolled reply-btn reply_res" {% endif %} data-org-content='{{ each_reply.content }}'>
               <i class="fa fa-reply"></i>
               {% trans "Reply" %} 
             </a>
@@ -356,9 +355,8 @@
                 //sample format of data = [0:"status_info", 1:"reply_id", 2:"prior_node", 3:"html_content", 4:"org_content", 5:"user_id", 6:"user_name", 7:"created_at" ]
                 // add reply text content after #replies-area
                 var parent_margin_level = $(sourceObj).closest("div").attr("class");
-                
                 $("#replies-area").prepend(createReplyHTML('margin-top:25px;margin-left:0px', data,1));
-                // $(".content").appendChild().(createReplyHTML('margin-top:20px;', data)).fadeIn(8000);
+                                // $(".content").appendChild().(createReplyHTML('margin-top:20px;', data)).fadeIn(8000);
               }
               else  // sub-reply
               {
@@ -594,5 +592,6 @@ function save_reply(sourceObj){
     };
   }, 10000);
 </script>
+
 
 

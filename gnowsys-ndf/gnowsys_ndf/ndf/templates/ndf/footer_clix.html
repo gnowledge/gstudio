@@ -3,68 +3,47 @@
 {% load ndf_tags %}
 
 
-<div class="wrapper-footer">
-      <footer id="footer-clix" class="grid-container">
-        <div class="links-logos">
-          <nav class="nav-links-logos" aria-label="About">
-            <ol>
-              <li class="nav-links-logos-01">
-                  <a id="about" href="http://clix.tiss.edu/about/" target="_blank">About</a>
-              </li>
-              <li class="nav-links-logos-02">
-                  <a id="contact" href="http://clix.tiss.edu/contact/" target="_blank">Contact</a>
-              </li>
-              <li class="nav-links-logos-03">
-                  <a id="disclaimer" href="http://www.tiss.edu/disclaimer/" target="_blank">Disclaimer</a>
-              </li>
-            </ol>
-          </nav>
-          <div class="row wrapper-logo">
-            <div class="small-3 medium-3 large-3 columns ">
-              <p>
-                <a href="http://tatatrusts.org/" target="_blank">
-                    <img src="/static/ndf/images/tata-trusts-logo.svg" style="padding-top:90px;" />
-                </a>
-              </p>
-            </div>
-            <div class="small-3 medium-3 large-3 columns ">
-              <p>
-                <a href="http://www.mit.edu" target="_blank">
-                    <img src="/static/ndf/images/mit-logo.svg" style="padding-top:70px;"/>
-                </a>
-              </p>
-            </div>
-            <div class="small-3 medium-3 large-2 columns">
-              <p>
-                <a href="http://www.tiss.edu/" target="_blank" >
-                    <img src="/static/ndf/images/logos/tiss-logo-text.svg"/>
-                </a>
-              </p>
-            </div>
-            <div class="small-3 medium-3 large-2 columns">
-              <p>
-                <a href="http://www.hbcse.tifr.res.in/" target="_blank">
-                    <img src="/static/ndf/images/logos/tifr.png" style="padding-top:66px;"/>
-                </a>
-              </p>
-            </div>
-          </div>
-          <nav class="nav-legal" aria-label="Legal">
-            <div class="row">
-              <ol>
-                <li class="nav-legal-01">
-                  <a href="">Privacy Policy</a>
-                </li>
-                <li class="nav-legal-02">
-                  <a href="">Terms Of Use</a>
-                </li>
-                <li class="nav-legal-03">
-                {% get_latest_git_hash as git_commit_hash %}
-                <a href="https://gitlab.com/gnowledge/gstudio/tree/{{git_commit_hash}}" target="_blank">Version</a>
-                </li>
-              </ol>
-            </div>
-          </nav>
-        </div>
-      </footer>
-    </div>
+
+
+		<div class="bo-wrap clr4" style="margin-top:100px;">
+		  <div class="bo-footer">
+		    <div class="bo-footer-social">
+		      <a href="http://clix.tiss.edu/about/" target="_blank">About </a>
+		      <a href="http://clix.tiss.edu/contact/" target="_blank">Contact </a>
+		      <a href="http://www.tiss.edu/disclaimer/" target="_blank">Disclaimer </a>
+		    </div>
+		  </div>
+		</div>
+		<div class="bo-wrap clr3">
+		  <div class="bo-footer">
+		    <div class="bo-footer-smap">
+		        <a href="http://tatatrusts.org/" target="_blank">
+		            <img src="/static/ndf/images/tata-trusts-logo.svg" style="height: 14px; width:110px;" />
+		        </a>
+		        <a href="http://www.mit.edu" target="_blank">
+		            <img src="/static/ndf/images/mit-logo.svg" style="height: 35px; width:145px;"/>
+		        </a> 
+		        <a href="http://www.tiss.edu/" target="_blank" >
+		            <img src="/static/ndf/images/logos/tiss-logo-text.svg" style="height: 90px; width:85px;"/>
+		        </a>
+		        <a href="http://www.hbcse.tifr.res.in/" target="_blank">
+		          <img src="/static/ndf/images/logos/tifr.png" style="height: 55px; width:122px;"/>
+		        </a>
+		    </div>
+
+
+		    <div class="clearfix"></div>
+		  </div>
+		</div>
+		<div class="bo-wrap clr4">
+		  <div class="bo-footer">
+		    <div class="bo-footer-copyright">
+		      <a href="">Privacy</a>
+		      <a href="">Terms Of Use</a>
+		      {% get_latest_git_hash as git_commit_hash %}
+		      <a href="https://gitlab.com/gnowledge/gstudio/tree/{{git_commit_hash}}" target="_blank">Version</a>
+		    </div>
+		  </div>
+		</div>
+
+

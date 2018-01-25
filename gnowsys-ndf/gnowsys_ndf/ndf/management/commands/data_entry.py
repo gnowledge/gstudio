@@ -23,7 +23,7 @@ from gnowsys_ndf.ndf.models import Node
 from gnowsys_ndf.ndf.models import GSystemType, AttributeType, RelationType
 from gnowsys_ndf.ndf.models import GSystem, GAttribute, GRelation
 from gnowsys_ndf.ndf.views.methods import create_gattribute, create_grelation, create_college_group_and_setup_data
-from gnowsys_ndf.ndf.views.methods import get_student_enrollment_code
+from gnowsys_ndf.ndf.views.methods import get_student_enrollment_code, create_thread
 
 ####################################################################################################################
 
@@ -183,7 +183,6 @@ class Command(BaseCommand):
                         # End of processing json file
                         info_message = "\n------- Task finised: Successfully processed json-file -------\n"
                         info_message += "- Total time taken for the processing: \n\n\t" + str(total_time_minute) + " MINUTES\n\t=== OR ===\n\t" + str(total_time_hour) + " HOURS\n"
-                        print info_message
                         log_list.append(str(info_message))
 
                         # End of processing json file
@@ -250,22 +249,35 @@ def parse_data_create_gsystem(json_file_path, file_name):
 
     for i, json_document in enumerate(json_documents_list):
         try:
-            if file_name == "QuizItem.csv":
+            if file_name in ["QuizItem.csv", "QuizItemEvent.csv"]:
                 print "\n\n *******************"
-                question_content = json_document['content']
-                question_content = question_content.split(' ')
-                question_content = question_content[:4]
-                question_content = ' '.join(question_content)
-                json_document['name'] = question_content
-                json_document['altnames'] = json_document['content']
-                group_id = ObjectId(json_document['group_id'])
-                group_obj = node_collection.one({'_id': group_id})
-                if group_obj:
-                    group_id = group_obj._id
-                else:
-                    group_id = home_grp._id
-                user_id = int(json_document['user_id'])
-                print "\n\n NAME ======= ", json_document['name'], group_id, user_id
+                try:
+                    question_content = json_document['content']
+                    question_content = question_content.split(' ')
+                    question_content = question_content[:4]
+                    question_content = ' '.join(question_content)
+                    print "\nquestion_content: ", question_content 
+                    json_document['name'] = unicode(question_content)
+                    json_document['altnames'] = json_document['content']
+                    group_id =  ObjectId(json_document['group_id'])
+                    group_obj = node_collection.one({'_id': group_id})
+                    if group_obj:
+                        group_id = group_obj._id
+                    else:
+                        group_id = home_grp._id
+                    json_document['group_id'] = group_id
+                    json_document['user_id'] = user_id = int(json_document['user_id'])
+                    # options = json_document['options']
+                    # json_document['options'] = options.split(' ')
+                    # json_document['options'] = ','.join(json_document['options'])
+                    # correct_answer = json_document['correct_answer']
+                    # json_document['correct_answer']  = correct_answer.split(' ')
+                    # json_document['correct_answer'] = ','.join(json_document['correct_answer'])
+                    # json_document['max_attempts'] = int(json_document['max_attempts'])
+                    # json_document['problem_weight'] = int(json_document['problem_weight'])
+                except Exception as de:
+                    print "Error: ",de
+                print "\n\n NAME ======= ", json_document, group_id, user_id
             global node_repeated
             node_repeated = False
             n_name = ""
@@ -297,7 +309,7 @@ def parse_data_create_gsystem(json_file_path, file_name):
                 else:
                     parsed_json_document[key] = json_document[key]
                     attribute_relation_list.append(key)
-
+            # print "\nparsed_json_document: ", parsed_json_document
             info_message = "\n Creating "+gsystem_type_name+" ("+parsed_json_document["name"]+")..."
             log_list.append(info_message)
             print "\n HERE == "
@@ -589,6 +601,10 @@ def parse_data_create_gsystem(json_file_path, file_name):
                         except Exception as e:
                             error_message = "\n CollegeGroupCreateError: " + str(e) + "!!!"
                             log_list.append(error_message)
+                if file_name in ["QuizItem.csv", "QuizItemEvent.csv"]:
+                    therad_node = create_thread(group_id=group_id, node=node, user_id=user_id, 
+                        release_response_val=False, interaction_type_val=None, start_time=None, end_time=None)
+
 
         except Exception as e:
             error_message = "\n While creating "+gsystem_type_name+"'s GSystem ("+json_document['name']+") got following error...\n " + str(e)
@@ -658,7 +674,7 @@ def create_edit_gsystem(gsystem_type_id, gsystem_type_name, json_document, user_
 
     info_message = "\n query for " + json_document['name'] + " : " + str(query) +  "\n"
     log_list.append(info_message)
-    if gsystem_type_name != "QuizItem":
+    if "QuizItem" not in gsystem_type_name:
         node = node_collection.one(query)
 
     if node is None:
@@ -792,6 +808,8 @@ def create_edit_gsystem(gsystem_type_id, gsystem_type_name, json_document, user_
                 node.contributors.append(user_id)
 
             node.member_of.append(gsystem_type_id)
+            if 'group_id' in json_document:
+                group_id = json_document['group_id']
             node.group_set.append(group_id)
             node.status = u"PUBLISHED"
 

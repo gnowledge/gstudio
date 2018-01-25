@@ -10,21 +10,22 @@
             <input type="hidden" name="node_id" value="{{unit_node.pk}}">
                 <div class="course_creator_header">
                     <div class="left course_heading">
-                    <h5>{% trans "Enter Unit Name" %}</h5>
+                    <h5> {% if 'Group' in unit_node.member_of_names_list and 'base_unit' not in unit_node.member_of_names_list %} {% trans "Enter Group Name" %} {% else %} {% trans "Enter Unit Name" %} {% endif %} </h5>
                     </div>
                     <div class="right course_heading">
                         {% if unit_node %}
-                        <input id="unit-name" name="name" type="text" placeholder="Enter unit name"
+                        <input id="unit-name" name="name" type="text"  "{% if 'Group' in unit_node.member_of_names_list and 'base_unit' not in unit_node.member_of_names_list %}" placeholder="Enter group name"
+                        "{% else %}" placeholder="Enter unit name" "{% endif %}"
                         value="{% if unit_node %}{{unit_node.name}}{% endif %}" disabled="disabled" />
                         {% else %}
-                        <input id="unit-name" name="name" type="text" placeholder="Enter unit name"
+                        <input id="unit-name" name="name" type="text" "{% if 'Group' in unit_node.member_of_names_list and 'base_unit' not in unit_node.member_of_names_list %}" placeholder="Enter group name"
+                        "{% else %}" placeholder="Enter unit name" "{% endif %}"
                          autofocus onfocus="this.value = this.value;"/>
                         {% endif %}
                     </div>
                 </div>
 
 
-                {% if unit_node %}
                 <div class="course_creator_header">
                     <div class="left course_heading">
                     <h5>{% trans "Enter alternate Name" %}</h5>
@@ -35,9 +36,9 @@
 
                     </div>
                 </div>
-                {% endif %}
 
                 <hr/>
+                {% if 'Group' not in unit_node.member_of_names_list or 'base_unit' in unit_node.member_of_names_list or 'announced_unit' in unit_node.member_of_names_list %}
                 <div class="course_creator_header">
                     <div class="left course_heading">
                     <h5>{% trans "Select Module" %}</h5>
@@ -83,7 +84,7 @@
                         </select>
                     </div>
                 </div>
-
+                {% endif %}
                 <div class="course_creator_header">
                     <div class="left course_heading">
                     <h5>{% trans "Select Language" %}</h5>
@@ -130,6 +131,21 @@
                          <input id="subsection-name" name="subsection_name" value="{{unit_node.project_config.subsection_name}}" type="text" placeholder="Enter Sub Section name"/>
                     </div>
                 </div>
+                <div class="course_creator_header">
+                    <div class="left course_heading">
+                    <h5>{% trans "Group Type" %}</h5>
+                    </div>
+                    <div class="right course_heading_unit">
+                         {% get_possible_group_type_values as poss_gr_type %}
+                            <select name="group_type" class="gtype">
+                              {% for each_gtype in poss_gr_type %}
+                                <option {% if each_gtype == unit_node.group_type %}selected=selected{% endif %}>
+                                  {{each_gtype}}
+                                </option>
+                              {% endfor %}
+                            </select>
+                    </div>
+                </div>
                 
                 <div class=" course_heading_unit tags-container">
                  {% include 'ndf/widget_tags.html' with node=unit_node %}
@@ -152,8 +168,8 @@
                         <button type="button" class ="right asset-unit-button" id="save_unit">Save</button>
                     {% endcomment %}
                     <!-- <input type="button" class="asset-unit-button right" value="Cancel"/> -->
-                    <a href="{% if unit_node %} {% url 'groupchange' unit_node.pk %}{% else %} {% url 'explore_basecourses' %}{% endif %} " class="asset-unit-button right" value="Cancel"/>{% trans "Cancel" %}</a>
-                    <input type="submit" class="asset-unit-button right" id="save_unit" value="Save"/>
+                    <a href="{% if unit_node %} {% url 'groupchange' unit_node.pk %}{% else %} {% url 'explore_basecourses' %}{% endif %} " class="button-cancel-new right" style="margin-right: 30px;margin-bottom: 8px;margin-top: 300px;" value="Cancel"/>{% trans "Cancel" %}</a>
+                    <input type="submit" class="button-save-new right" style="margin-right: 30px;margin-bottom: 8px;margin-top: 300px;" id="save_unit" value="Save"/>
                 </div>
             </form>
         </div>

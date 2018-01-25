@@ -120,15 +120,17 @@ urlpatterns = patterns('gnowsys_ndf.ndf.views.ajax_views',
     url(r'^add_transcript/', 'add_transcript', name='add_transcript'),
     url(r'^get_node_json_from_id/', 'get_node_json_from_id', name='get_node_json_from_id'),
     url(r'^save_node/', 'save_node', name='save_node'),
-    url(r'^get_group_pages/$', 'get_group_pages', name='get_group_pages'),
+    # url(r'^get_group_pages/$', 'get_group_pages', name='get_group_pages'),
+    url(r'^get_group_resources/(?P<res_type>[\w-]+)$', 'get_group_resources', name='get_group_resources'),
     url(r'^get_info_pages/$', 'get_info_pages', name='get_info_pages'),
     url(r'^add_to_collection_set/$', 'add_to_collection_set', name='add_to_collection_set'),
     url(r'^remove_from_nodelist/$', 'remove_from_nodelist', name='remove_from_nodelist'),
     url(r'^ajax_delete_node/$', 'ajax_delete_node', name='ajax_delete_node'),
     url(r'^get_translated_node/$', 'get_translated_node', name='get_translated_node'),
-
+    url(r'^delete_curriculum_node/$', 'delete_curriculum_node', name='delete_curriculum_node'),
     # url for graph display
     url(r'^graph/adminRenderGraph/(?P<node_id>[^/]+)/fetch/(?P<graph_type>[^/]+)$', 'adminRenderGraph', name='adminRenderGraph'),
+    # url(r'^get_rating_template/$', 'get_rating_template', name='get_rating_template'),
 
 
 )

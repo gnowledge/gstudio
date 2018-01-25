@@ -68,20 +68,22 @@
             {% include "ndf/node_ajax_content.html" with node=activity_node expand_content=True  no_discussion=True hide_breadcrumbs=True %}
         </div>
         <div id="info-page-area">
+
                     
         </div>
         <div class="row listing-row"> 
           {% for each in other_translations %}
-            <a href="{% url 'view_course_page' group_id each.pk %}"  title="{{each.name}}">
+            <a href="{% url 'view_course_page' group_id each.pk %}"  title="{% firstof each.altnames each.name %}">
               <div class="small-12 medium-6 large-3 columns ">
-                <div class="asset_tile">
-                  <div class="asset_preview">
+                <div class="activity_tile">
+                  <div class="activity_preview">
                     <div class="raw_material_asset">{{each.language.1}}</div>                
                       <img src="/static/ndf/images/asset.png">
                   </div>
                   <div class="asset_text">
-                      <div class="asset_title">{{each.name|truncatechars:25}}</div>
+                      <div class="asset_title">{% firstof each.altnames|truncatechars:25 each.name|truncatechars:25 %}</div>
                       <div class="asset_desc">{{each.content|striptags|truncatechars:25}}</div>
+
                   </div>
                 </div>
               </div>
@@ -110,54 +112,28 @@
     
 
 
-    <div id="page_listing">
-    
-    
-    
-        <div class="row">
+        <div class="row listing-row">
             {% for each in all_pages %}
-                <a class="view-page" data-page-id="{{each.pk}}" data-del-activity-page-id="{{each.pk}}"  data-node-name="{{each.name}}" title="{{each.name}}" href="{% url 'view_course_page' group_id each.pk %}">
-                    <div class="small-12 medium-6 large-3 columns">
-                        <div class="asset_tile">
-                            <div class="asset_preview">
-                                {% if each.if_file.mid.relurl and 'video' not in each.if_file.mime_type %}
-                                <img src="{{MEDIA_URL}}{{each.if_file.mid.relurl}}">
-                                {% elif 'video' not in each.if_file.mime_type and each.if_file.thumbnail.relurl %}
-                                <img src="{{MEDIA_URL}}{{each.if_file.thumbnail.relurl}}">
-                                {% else %}
-                                <img src="/static/ndf/images/asset_thumbnail.png">
-                                {% endif %}
-                            </div>
-                            <div class="asset_text">
-                                <div class="asset_title" title="{{each.name}}">{% firstof each.altnames|truncatechars:25 each.name|truncatechars:25 %}</div>
-                                    {% if user.is_authenticated  and not group_object.edit_policy == "NON_EDITABLE"  or gstaff_access %}
-                                    </a>
-                                    <input type="checkbox" class="activitynode" name="activitynode" value="{{each.pk}}" style="margin:0; float:right;" class="asset_content_checkbox">
-                                    {% endif %}
-                                <div class="asset_desc">{{each.content|safe|striptags|truncatechars:25}}</div>
-                            </div>
-                        </div>
-                    </div>
-                </a>
+
+                   {% include "ndf/asset_card.html" with url_name="view_course_page" each_asset=each first_arg=group_id second_arg=each.pk  no_asset=True if_activities=True %} 
             {% endfor %}
         </div>
-    </div>
 
 
 
 {% endif %}
+{% include 'ndf/pagination.html' with urlname="course_pages_paged" first_arg=group_id page_info=course_pages_info  %}
 
 <script type="text/javascript">
     $(".delete-activity").click(function(){
-        var checked = $('.activitynode:checked').length;
+        var checked = $('.select-chkbox:checked').length;
         if (checked > 0){
 
             if (confirm("Do you want to delete selected files?.") == true) {
                 coll_arr = []
-                $('.activitynode:checked').each(function() {
+                $('.select-chkbox:checked').each(function() {
                     coll_arr.push($(this).val());
                 });
-                console.log(coll_arr)
                 $.ajax({
                           type: "POST",
                           data:{

@@ -1,6 +1,6 @@
 {% load ndf_tags %}
 {% load i18n %}
-{% get_group_object groupid as group_object %}
+{% get_group_object group_id as group_object %}
 
     <div id="upload_picModal" class="processing-screen reveal-modal medium  radius" data-reveal data-alert>
         <div id="upload_picModalLabel" class="processing-screen-label"></div>
@@ -50,7 +50,8 @@
             <div id="{{widget_for}}_prof_pic_prop" class="reveal-modal medium old-pics-data" data-reveal >
                 <a id="{{widget_for}}_upload_photo">
                   <div id="upload-photo-div" class="text-center">
-                    <label class="upload_photo_lbl fi-upload">Upload New Photo</label>
+
+                    <label class="upload_photo_lbl fi-upload"> Upload New Photo</label>
                   </div>
                 </a>
                 {% if old_profile_pics %}
@@ -69,7 +70,11 @@
                 </fieldset>
                 {% endif %}
                 <div id="{{widget_for}}_pic_div" class="hide row">
+                    {% if if_module %}
+                    <form class="dropzone" id ="{{widget_for}}_docPost" enctype="multipart/form-data" method="post"  action="{% url 'upload_prof_pic' node.pk %}">
+                    {% else %}
                     <form class="dropzone" id ="{{widget_for}}_docPost" enctype="multipart/form-data" method="post"  action="{% url 'upload_prof_pic' group_id %}">
+                    {% endif %}
                         {% csrf_token %}
                         <input type="file" name="filehive" id="{{widget_for}}_docFile" accept="image/*" class="hide" />
                         {% if is_banner and not is_profile %}
@@ -80,7 +85,6 @@
                           <input type="hidden" name="pic_rt" value="is_banner"></input>
                         {% elif  is_thumbnail and not is_banner or is_profile %}
                           <input type="hidden" name="pic_rt" value="is_thumbnail"></input>
-                          <input type="hidden" name="node_id" value="{{node_id}}"></input>
 
                         {% endif %}
 
@@ -89,7 +93,9 @@
                             <input type="submit" id="{{widget_for}}_submitpostid" value="Save" class="button tiny margin-p5 submit-btn" />
                             <input type="button" class="button tiny margin-p5" id="{{widget_for}}_btnUploadCancel" value="Cancel">
                         </div>
+                        <input type="hidden" name="group_id_for_module" value="{{groupid}}"></input>
                         <input type="hidden" name="type" value="profile_pic">
+                        <input type="hidden" name="if_module" value="{{if_module}}">
                         <input type="hidden" name="user" value="{{usr}}">
                         {% if url_name %}
                         <input type="hidden" name="url_name" value="{{url_name}}">

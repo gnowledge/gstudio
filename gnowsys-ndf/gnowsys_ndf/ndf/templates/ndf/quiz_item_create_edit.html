@@ -38,6 +38,10 @@
 	{% if quiz_node_id %}
 		<input type="hidden" name="quiz_node_id" value="{{quiz_node_id}}">
 	{% endif %}
+	{% if translate %}
+		<input type="hidden" name="translate" value="{{translate}}">
+	{% endif %}
+
 	<div id="node-details-edit-div" class="tabs-content" >
 		<div class="active content row" id="panel-name-description"> 
 			<div class="row text-center">
@@ -62,7 +66,7 @@
 				</div>
 
 				<div class="small-8 large-8 columns left ck-editor-div">
-			  		{% include "ndf/html_editor.html" with var_name="content_org" var_placeholder="Enter the content here" var_value=node.content|default_if_none:"" node_id=node.pk ckeditor_toolbar="GeneralToolbar" %}		  
+			  		{% include "ndf/html_editor.html" with var_name="content_org" var_placeholder="Enter the content here"  var_value=question_content|default_if_none:"" node_id=node.pk ckeditor_toolbar="GeneralToolbar" %}		  
 				</div>
 			</div>
 
@@ -72,7 +76,7 @@
 				</div>
 
 				<div class="small-8 large-8 columns left">
-				{% for option in node.options %}
+				{% for option in options_list %}
 					<div class="row" id="option_div{% if not forloop.first %}_{{forloop.counter}}{% endif %}">
 						<div class="small-1 large-1 columns">
 						<label for="option" class="right inline">{{forloop.counter}}.</label>
@@ -100,10 +104,11 @@
 						</div>
 					</div>
 				{% endfor %}
+				{% if not translate %}
+					<input id="add_option" name="add_option" type="button" class="button small" style="float:right;" value="+ Add Option"/>
 
-				<input id="add_option" name="add_option" type="button" class="button small" style="float:right;" value="+ Add Option"/>
-
-				<input id="no_of_options" name="no_of_options" type="hidden" value="{% if node%}{{node.options|length}}{% else %}2{% endif %}" />
+				{% endif %}
+				<input id="no_of_options" name="no_of_options" type="hidden" value="{% if node%}{{options_list|length}}{% else %}2{% endif %}" />
 
 				</div>
 			</div>
@@ -122,8 +127,8 @@
 				{% endcomment %}
 
 				<div class="quiz-type-based-div small-8 large-8 columns left" id="Single-Choice" style="display:{% if node.quiz_type == "Single-Choice" %}block{% else %}none{% endif %};">
-					<select id="correct_answer_single" name="correct_answer_single">
-					{% for option in node.options %}
+					<select id="correct_answer_single" name="correct_answer_single" {% if translate %}disabled {% endif %}>
+					{% for option in options_list %}
 						<option value="{{forloop.counter}}" {% ifequal node.correct_answer.0 option %}selected{% endifequal %} >{{forloop.counter}}</option>
 						{% empty %}
 						<option value="1">1</option>
@@ -134,8 +139,8 @@
 
 				<div class="quiz-type-based-div small-8 large-8 columns left" id="Multiple-Choice" style="display:{% if node.quiz_type == "Multiple-Choice" %}block{% else %}none{% endif %};">
 					<small>(Press Ctrl to select multiple answers)</small></label>
-					<select id="correct_answer_multiple" name="correct_answer_multiple" multiple style="height:75px;">
-					{% for option in node.options %}
+					<select id="correct_answer_multiple" name="correct_answer_multiple" {% if translate %}disabled {% endif %} multiple style="height:75px;">
+					{% for option in options_list %}
 						<option value="{{forloop.counter}}" {% if option in node.correct_answer %}selected{% endif %} >{{forloop.counter}}</option>
 						{% empty %}
 						<option value="1" selected>1</option>
@@ -152,7 +157,7 @@
 				</div>
 
 				<div class="small-8 large-8 columns left">
-					<select name="show_correct_ans" class="sel_show_correct_ans">
+					<select name="show_correct_ans" class="sel_show_correct_ans" {% if translate %}disabled {% endif %}>
 						<option value="True" >True</option>
 						<option value="False">False</option>
 					</select>
@@ -166,7 +171,7 @@
 				</div>
 
 				<div class="small-8 large-8 columns left">
-					<select name="check_ans" class="sel_check_ans">
+					<select name="check_ans" class="sel_check_ans" {% if translate %}disabled {% endif %}>
 						<option value="True" >True</option>
 						<option value="False">False</option>
 					</select>
@@ -180,7 +185,7 @@
 				</div>
 
 				<div class="small-8 large-8 columns left">
-					<input type="text" name="problem_weight" value="{% if node %}{{node.quizitem_problem_weight}}{% else %}1{% endif %}">
+					<input type="text" id="problem_weight" name="problem_weight" value="{% if node %}{{node.quizitem_problem_weight}}{% else %}1{% endif %}" {% if translate %}disabled {% endif %}>
 				</div>
 			</div>
 
@@ -191,7 +196,7 @@
 				</div>
 
 				<div class="small-8 large-8 columns left">
-					<input type="text" name="maximum_attempts" value="{% if node %}{{node.quizitem_max_attempts}}{% else %}1{% endif %}">
+					<input type="text" id="maximum_attempts" name="maximum_attempts" value="{% if node %}{{node.quizitem_max_attempts}}{% else %}1{% endif %}" {% if translate %}disabled {% endif %}>
 				</div>
 			</div>
 
@@ -212,7 +217,7 @@
 			</div>
 
 			<div class="small-8 large-8 columns left">
-		        <select id="release_resp_sel" name="release_resp_sel">
+		        <select id="release_resp_sel" name="release_resp_sel" {% if translate %}disabled {% endif %}>
 		          <option value="True">Show Replies to All</option>
 		          <option value="False">Hide Replies from All</option>
 		        </select>
@@ -228,7 +233,7 @@
 			</div>
 
 			<div class="small-8 large-8 columns left">
-		      	<input type="text" id="thread_start_date" name="thread_start_date" value="" placeholder="DD/MM/YYYY" readonly="" class="date_month_day_year" style="width:15rem"> 
+		      	<input type="text" id="thread_start_date" name="thread_start_date" value="" placeholder="DD/MM/YYYY" readonly="" class="date_month_day_year" style="width:15rem" {% if translate %}disabled {% endif %}> 
 			</div>
 		</div>
 
@@ -240,7 +245,7 @@
 			</div>
 
 			<div class="small-8 large-8 columns left">
-		      	<input type="text" id="thread_close_date" name="thread_close_date" value="" placeholder="DD/MM/YYYY" readonly="" class="date_month_day_year" style="width:15rem"> 
+		      	<input type="text" id="thread_close_date" name="thread_close_date" value="" placeholder="DD/MM/YYYY" readonly="" class="date_month_day_year" style="width:15rem" {% if translate %}disabled {% endif %}> 
 			</div>
 		</div>
 	<input type="hidden" value="Answer" name="interaction_type_sel">
@@ -271,6 +276,10 @@
 					$('#options').css('display', 'block');
 					$(".quiz_type_based_correct_ans_div").removeClass("hide");
 					$("#{{node.quiz_type}}").css('display', 'block');
+				{% endif %}
+
+				{% if translate %}
+
 				{% endif %}
 			{% endif %}
 		 })

@@ -80,6 +80,13 @@ def delete_group(request, group_id, url_name='groupchange'):
     group_obj = get_group_name_id(group_id, get_obj=True)
     del_s,del_msg = delete_node(group_obj._id, deletion_type=0)
     group_obj.reload()
+
+    if 'base_unit' in group_obj.member_of_names_list and 'announced_unit' in group_obj.member_of_names_list:
+      linked_modules = node_collection.find({'collection_set': group_obj._id })
+      for each in linked_modules:
+        each.collection_set.remove(ObjectId(group_obj._id))
+        each.save()
+
     if trash_group._id not in group_obj.group_set:
 		group_obj.group_set.append(trash_group._id)
 		group_obj.save(groupid=group_obj._id)

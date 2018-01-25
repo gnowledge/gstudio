@@ -93,7 +93,6 @@ def landing_page(request):
     '''
     Method to render landing page after checking variables in local_settings/settings file.
     '''
-
     if (GSTUDIO_SITE_LANDING_PAGE == "home") and (GSTUDIO_SITE_NAME == "NROER"):
         return render_to_response(
                                 "ndf/landing_page_nroer.html",
@@ -106,7 +105,16 @@ def landing_page(request):
 
     elif GSTUDIO_SITE_LANDING_TEMPLATE:
         if GSTUDIO_SITE_NAME == "clix":
-            if request.user.id:
+            if request.META['QUERY_STRING']  == "True":
+                return render_to_response(
+                                        GSTUDIO_SITE_LANDING_TEMPLATE,
+                                        {
+                                            "group_id": "home", 'groupid':"home",
+                                            'title': 'CLIx'
+                                        },
+                                        context_instance=RequestContext(request)
+                                    )
+            elif request.user.id:
                 return HttpResponseRedirect( reverse('my_desk', kwargs={"group_id": request.user.id}) )        
             else:
         

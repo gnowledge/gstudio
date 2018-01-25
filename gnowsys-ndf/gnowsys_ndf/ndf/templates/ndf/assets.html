@@ -3,6 +3,8 @@
 {% user_access_policy groupid request.user as user_access_priv %}
 {% check_is_gstaff groupid request.user as is_gstaff %}
 
+
+
 <div class="elibrary-actions">
 <!--     <button type="button" class="orange-button">
         <i class="fi-filter"> </i>
@@ -11,20 +13,41 @@
 
  -->    
     {% include 'ndf/widget_user_access_modal.html' %}
+       <div class ="row">
+           
+            {% if title == "raw material" and is_gstaff %}
+                <input type="hidden"  class="title-for-filters" value="raw_material_lms">
+                {% get_course_filters group_id "raw_material_lms" as filter_dict %}
+                {% include "ndf/filters.html" with filter_dict=filter_dict %}
+
+            {% endif %}
+            {% if title == "gallery"  %}
+                <input type="hidden"  class="title-for-filters" value="gallery_lms">
+                {% get_course_filters group_id "gallery_lms" as filter_dict %}
+                {% include "ndf/filters.html" with filter_dict=filter_dict %}
+            {% endif %}
+            {% if title == "asset_list"  %}
+                <input type="hidden"  class="title-for-filters" value="assets_lms">
+                {% get_course_filters group_id "assets_lms" as filter_dict %}
+                {% include "ndf/filters.html" with filter_dict=filter_dict %}
+            {% endif %}
+        
+       </div>
+       
         <div class="row">
         {% if user.is_authenticated  %}
             {% if title == "raw material" and is_gstaff %}
-                <button type="button" class="right orange-button createAsset">
+                <button type="button" class="right orange-button createAsset" style="margin-right:70px;">
                     <i class="fi-plus"> </i>{% trans "Add Resource" %} 
                 </button>
             {% endif %}
             {% if title == "gallery"  %}
-                <button {% if user_access_priv == "allow" %} type="button" class="right orange-button createAsset" {% else %} class=" right orange-button user_not_enrolled" {% endif %}>
+                <button {% if user_access_priv == "allow" %} type="button" class="right orange-button createAsset" style="margin-right:70px;" {% else %} class=" right orange-button user_not_enrolled" {% endif %}>
                     <i class="fi-plus"> </i>{% trans "Add Folder" %} 
                 </button>
             {% endif %}
             {% if title == "asset_list"  %}
-                <button type="button" class="right orange-button createAsset">
+                <button type="button" class="right orange-button createAsset" style="margin-right:70px;">
                     <i class="fi-plus"> </i>{% trans "Add Asset" %} 
                 </button>
             {% endif %}
@@ -32,33 +55,21 @@
         {% endif %}
         </div>
 </div>
-<div class="row listing-row"> 
-      {% for each in asset_nodes %}
-      <a href="{% url 'asset_detail' group_id each.pk %}"  title="{{each.name}}">
-      <div class="small-12 medium-6 large-3 columns ">
-        <div class="asset_tile">
-            <div class="asset_preview">
-            {% if "raw@material" in each.tags and title == "asset_list" %}
-                <div class="raw_material_asset">{% trans "Raw Material" %}</div>
-            {% endif %}
-                {% if each.if_file.mid.relurl and 'video' not in each.if_file.mime_type %}
-                    <img src="{{MEDIA_URL}}{{each.if_file.mid.relurl}}">
-                {% elif 'video' not in each.if_file.mime_type and each.if_file.thumbnail.relurl %}
-                    <img src="{{MEDIA_URL}}{{each.if_file.thumbnail.relurl}}">
-                {% else %}
-                    <img src="/static/ndf/images/asset.png">
-                {% endif %}
-            </div>
-            <div class="asset_text">
-                <div class="asset_title" title="{% firstof each.altnames each.name %}">{% firstof each.altnames|truncatechars:25  each.name|truncatechars:25 %}</div>
-                <div class="asset_desc">{{each.content|striptags|truncatechars:25}}</div>
-            </div>
-        </div>
-    </div>
-    </a>
-    {% endfor %}
+<div class="row listing-row">
+  {% for each_asset in asset_nodes %}
+    
+    {% include 'ndf/asset_card.html' with url_name="asset_detail" first_arg=group_id second_arg=each_asset.pk each=each_asset no_checkbox=True %}    
+  {% endfor %}
 </div>
-
+{% comment %}
+{% if title == "gallery" %}
+{% include 'ndf/pagination.html' with urlname="course_gallery_paged" first_arg=group_id page_info=assets_page_info %}
+{% elif title == "raw material" %}
+{% include 'ndf/pagination.html' with urlname="course_raw_material_paged" first_arg=group_id page_info=assets_page_info %}
+{% elif title == "asset_list"  %}
+{% include 'ndf/pagination.html' with urlname="course_assets_paged" first_arg=group_id page_info=assets_page_info %}
+{% endif %}
+{% endcomment %}
 <script type="text/javascript">
    $( ".createAsset" ).click(function() {
                    var asset_id = $(this).attr('data-asset_id');
@@ -76,4 +87,46 @@
                            }
                      });
            });
+
+function getRandomSize(min, max) {
+  return Math.round(Math.random() * (max - min) + min);
+}
+{% comment %}
+var allImages1 = "";
+
+{% for k,v in thumbnails_dict.items %} 
+    alert("{{k}}")
+    {% for each in v %}
+        var width = getRandomSize(208, 218);
+        var height =  getRandomSize(240, 220);
+        allImagesfor+"_"+"{{k}}" = allImagesfor+"_"+"{{k}}" +  '<img src="/media/{{each}}" style="width='+width+' height='+height+'" alt="pretty kitty">';
+    {% endfor %}
+{% endfor %}
+{% for k,v in thumbnails_dict.items %}
+    alert(allImagesfor+"_"+"{{k}}");
+{% endfor %}
+{% endcomment %}
+
+   function applyFilter(filtersObjArr){
+        filtersObjArr = JSON.stringify(getFiltersObjsInAndOrFormat());
+        title = $(".title-for-filters").val();
+        $.ajax({
+          url: "{% url 'course_filters' group_id %}",
+          data: {
+            filter_dict: filtersObjArr,
+            'filter_applied': 'True',
+            'title': title
+          },
+          type: "GET",
+          dataType: "html",
+          success: function(data){
+            if(data == "reload"){
+                location.reload()
+            }
+            else{
+                $(".listing-row").html(data)
+            }
+          },
+        });//end of ajax
+    }
 </script> 

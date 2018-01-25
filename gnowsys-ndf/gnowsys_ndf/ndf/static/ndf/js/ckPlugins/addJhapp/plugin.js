@@ -498,16 +498,20 @@ CKEDITOR.plugins.add('addJhapp',
                           });
 
                             $("#insert_find_the_rate").click(function(event){
-                                tool_val = "<iframe src='/FindTheRateProportionalReasoning/' style='height:100vh;width:100%'></iframe>"
+                                tool_val = "<iframe src='/FindTheRateProportionalReasoning/' style='min-height:100vh;width:100%'></iframe>"
                             
                              CKEDITOR.instances[textAreaId].insertHtml(tool_val);
                             $('#group_imgs_on_modal').foundation('reveal', 'close');
                           });
+
+
+
+                            
                           
                           $("#insert_starlogo_model1_en").click(function(event){
                             
 
-                            tool_val = "<a href='/starlogonova/en/model1/' target='_blank'><img src='/static/ndf/images/starlogo-english.png' alt='Star Logo Thumbnail'  height='1000px' width='1000px' >"
+                            tool_val = "<a href='/starlogonova/en/Anemia1' target='_blank'><img src='/static/ndf/images/Anemia_english.png' alt='Star Logo Thumbnail'  height='1000px' width='1000px' >"
                             
                              CKEDITOR.instances[textAreaId].insertHtml(tool_val);
                             $('#group_imgs_on_modal').foundation('reveal', 'close');
@@ -516,7 +520,7 @@ CKEDITOR.plugins.add('addJhapp',
                           $("#insert_starlogo_model2_en").click(function(event){
                             
 
-                            tool_val = "<a href='/starlogonova/en/model2/' target='_blank'><img src='/static/ndf/images/starlogo-english.png' alt='Star Logo Thumbnail'  height='1000px' width='1000px' >"
+                            tool_val = "<a href='/starlogonova/en/Anemia2/' target='_blank'><img src='/static/ndf/images/Anemia_english.png' alt='Star Logo Thumbnail'  height='1000px' width='1000px' >"
                             
                              CKEDITOR.instances[textAreaId].insertHtml(tool_val);
                             $('#group_imgs_on_modal').foundation('reveal', 'close');
@@ -524,7 +528,7 @@ CKEDITOR.plugins.add('addJhapp',
                           $("#insert_starlogo_model1_hi").click(function(event){
                             
 
-                            tool_val = "<a href='/starlogonova/hi/model1/' target='_blank'><img src='/static/ndf/images/starlogo-hindi.png' alt='Star Logo Thumbnail'  height='1000px' width='1000px' >"
+                            tool_val = "<a href='/starlogonova/hi/Anemia1/' target='_blank'><img src='/static/ndf/images/Anemia_hindi.png' alt='Star Logo Thumbnail'  height='1000px' width='1000px' >"
                             
                              CKEDITOR.instances[textAreaId].insertHtml(tool_val);
                             $('#group_imgs_on_modal').foundation('reveal', 'close');
@@ -533,11 +537,278 @@ CKEDITOR.plugins.add('addJhapp',
                           $("#insert_starlogo_model2_hi").click(function(event){
                             
 
-                            tool_val = "<a href='/starlogonova/hi/model2/' target='_blank'><img src='/static/ndf/images/starlogo-hindi.png' alt='Star Logo Thumbnail'  height='1000px' width='1000px' >"
+                            tool_val = "<a href='/starlogonova/hi/Anemia2/' target='_blank'><img src='/static/ndf/images/Anemia_hindi.png' alt='Star Logo Thumbnail'  height='1000px' width='1000px' >"
                             
                              CKEDITOR.instances[textAreaId].insertHtml(tool_val);
                             $('#group_imgs_on_modal').foundation('reveal', 'close');
                           });
+
+                            $("#insert_starlogo_model1_te").click(function(event){
+                            
+
+                            tool_val = "<a href='/starlogonova/te/Anemia1' target='_blank'><img src='/static/ndf/images/AnemeaTelugu.png' alt='Star Logo Thumbnail'  height='1000px' width='1000px' >"
+                            
+                             CKEDITOR.instances[textAreaId].insertHtml(tool_val);
+                            $('#group_imgs_on_modal').foundation('reveal', 'close');
+                          });
+
+                            $("#insert_starlogo_model2_te").click(function(event){
+                            
+
+                            tool_val = "<a href='/starlogonova/te/Anemia2' target='_blank'><img src='/static/ndf/images/AnemeaTelugu.png' alt='Star Logo Thumbnail'  height='1000px' width='1000px' >"
+                            
+                             CKEDITOR.instances[textAreaId].insertHtml(tool_val);
+                            $('#group_imgs_on_modal').foundation('reveal', 'close');
+                          });
+
+                            $("#insert_starlogo_model3_en").click(function(event){
+                            
+
+                            tool_val = "<a href='/starlogonova/en/FishAlgae' target='_blank'><img src='/static/ndf/images/FishAlgae-English.jpg' alt='Star Logo Thumbnail'  height='1000px' width='1000px' >"
+                            
+                             CKEDITOR.instances[textAreaId].insertHtml(tool_val);
+                            $('#group_imgs_on_modal').foundation('reveal', 'close');
+                          });
+
+
+                            $("#insert_starlogo_model3_hi").click(function(event){
+                            
+
+                            tool_val = "<a href='/starlogonova/hi/FishAlgae' target='_blank'><img src='/static/ndf/images/FishAlgae-Hindi.jpg' alt='Star Logo Thumbnail'  height='1000px' width='1000px' >"
+                            
+                             CKEDITOR.instances[textAreaId].insertHtml(tool_val);
+                            $('#group_imgs_on_modal').foundation('reveal', 'close');
+                          });
+
+                            $("#insert_starlogo_model3_te").click(function(event){
+                            
+
+                            tool_val = "<a href='/starlogonova/te/FishAlgae' target='_blank'><img src='/static/ndf/images/FishAlgae-Telugu.jpg' alt='Star Logo Thumbnail'  height='1000px' width='1000px' >"
+                            
+                             CKEDITOR.instances[textAreaId].insertHtml(tool_val);
+                            $('#group_imgs_on_modal').foundation('reveal', 'close');
+                          });
+
+
+
+
+                          $("#insert_AST_U1_L4_DA1_Ani_En").click(function(event){
+                            
+
+                            tool_val = "<a href='/Rotation_of_Earth_Animation/en/' target='_blank'><img src='/static/ndf/images/Rotation_of_Earth.jpg' alt='Rotation_of_Earth'  height='1000px' width='1000px' >"
+                            
+                             CKEDITOR.instances[textAreaId].insertHtml(tool_val);
+                            $('#group_imgs_on_modal').foundation('reveal', 'close');
+                          });
+
+                          $("#insert_AST_U1_L4_DA2_WTT_En").click(function(event){
+                            
+
+                            tool_val = "<a href='/Astroamer_Element_Hunt_Activity/en/' target='_blank'><img src='/static/ndf/images/Rotation_of_Earth.jpg' alt='Rotation_of_Earth'  height='1000px' width='1000px' >"
+                            
+                             CKEDITOR.instances[textAreaId].insertHtml(tool_val);
+                            $('#group_imgs_on_modal').foundation('reveal', 'close');
+                          });
+
+                          $("#insert_AST_U2_L8_DA1_Ani_En").click(function(event){
+                            
+
+                            tool_val = "<a href='/Motions_of_the_Moon_Animation/en/' target='_blank'><img src='/static/ndf/images/Motions_of_Moon.jpg' alt='Motions_of_Moon'  height='1000px' width='1000px' >"
+                            
+                             CKEDITOR.instances[textAreaId].insertHtml(tool_val);
+                            $('#group_imgs_on_modal').foundation('reveal', 'close');
+                          });
+
+                          $("#insert_AST_U2_L8_DA2_MT_En").click(function(event){
+                            
+
+                            tool_val = "<a href='/Astroamer_Moon_Track/en/' target='_blank'><img src='/static/ndf/images/Motions_of_Moon.jpg' alt='Motions_of_Moon'  height='1000px' width='1000px' >"
+                            
+                             CKEDITOR.instances[textAreaId].insertHtml(tool_val);
+                            $('#group_imgs_on_modal').foundation('reveal', 'close');
+                          });
+
+                          $("#insert_AST_U3_L11_DA1_Ani_En").click(function(event){
+                            
+
+                            tool_val = "<a href='/Solar_System_Animation/en/' target='_blank'><img src='/static/ndf/images/Solar_System.jpg' alt='Solar_System'  height='1000px' width='1000px' >"
+                            
+                             CKEDITOR.instances[textAreaId].insertHtml(tool_val);
+                            $('#group_imgs_on_modal').foundation('reveal', 'close');
+                          });
+
+                          $("#insert_AST_U3_L11_DA2_PT_En").click(function(event){
+                            
+
+                            tool_val = "<a href='/Astroamer_Planet_Trek_Activity/en/' target='_blank'><img src='/static/ndf/images/Solar_System.jpg' alt='Solar_System'  height='1000px' width='1000px' >"
+                            
+                             CKEDITOR.instances[textAreaId].insertHtml(tool_val);
+                            $('#group_imgs_on_modal').foundation('reveal', 'close');
+                          });
+
+                          $("#insert_AST_U1_L4_DA1_Ani_Hi").click(function(event){
+                            
+
+                            tool_val = "<a href='/Rotation_of_Earth_Animation/hi/' target='_blank'><img src='/static/ndf/images/Rotation_of_Earth_hi.png' alt=' Rotation_of_Earth_hi'  height='1000px' width='1000px' >"
+                            
+                             CKEDITOR.instances[textAreaId].insertHtml(tool_val);
+                            $('#group_imgs_on_modal').foundation('reveal', 'close');
+                          });
+
+                          $("#insert_AST_U1_L4_DA2_WTT_Hi").click(function(event){
+                            
+
+                            tool_val = "<a href='/Astroamer_Element_Hunt_Activity/hi/' target='_blank'><img src='/static/ndf/images/Rotation_of_Earth_hi.png' alt='Rotation_of_Earth_hi'  height='1000px' width='1000px' >"
+                            
+                             CKEDITOR.instances[textAreaId].insertHtml(tool_val);
+                            $('#group_imgs_on_modal').foundation('reveal', 'close');
+                          });
+
+                          $("#insert_AST_U2_L8_DA1_Ani_Hi").click(function(event){
+                            
+
+                            tool_val = "<a href='/Motions_of_the_Moon_Animation/hi/' target='_blank'><img src='/static/ndf/images/Motions_of_Moon_hi.png' alt='Motions_of_Moon_hi'  height='1000px' width='1000px' >"
+                            
+                             CKEDITOR.instances[textAreaId].insertHtml(tool_val);
+                            $('#group_imgs_on_modal').foundation('reveal', 'close');
+                          });
+
+                          $("#insert_AST_U2_L8_DA2_MT_Hi").click(function(event){
+                            
+
+                            tool_val = "<a href='/Astroamer_Moon_Track/hi/' target='_blank'><img src='/static/ndf/images/Motions_of_Moon_hi.png' alt='Motions_of_Moon_hi'  height='1000px' width='1000px' >"
+                            
+                             CKEDITOR.instances[textAreaId].insertHtml(tool_val);
+                            $('#group_imgs_on_modal').foundation('reveal', 'close');
+                          });
+
+                          $("#insert_AST_U3_L11_DA1_Ani_Hi").click(function(event){
+                            
+
+                            tool_val = "<a href='/Solar_System_Animation/hi/' target='_blank'><img src='/static/ndf/images/Solar_System_hi.png' alt='Solar_System_hi'  height='1000px' width='1000px' >"
+                            
+                             CKEDITOR.instances[textAreaId].insertHtml(tool_val);
+                            $('#group_imgs_on_modal').foundation('reveal', 'close');
+                          });
+
+                          $("#insert_AST_U3_L11_DA2_PT_Hi").click(function(event){
+                            
+
+                            tool_val = "<a href='/Astroamer_Planet_Trek_Activity/hi/' target='_blank'><img src='/static/ndf/images/Solar_System_hi.png' alt='Solar_System_hi'  height='1000px' width='1000px' >"
+                            
+                             CKEDITOR.instances[textAreaId].insertHtml(tool_val);
+                            $('#group_imgs_on_modal').foundation('reveal', 'close');
+                          });
+
+                          $("#insert_AST_U1_L4_DA1_Ani_Te").click(function(event){
+                            
+
+                            tool_val = "<a href='/Rotation_of_Earth_Animation/te/' target='_blank'><img src='/static/ndf/images/Rotation_of_Earth_te.png' alt='Rotation_of_Earth_te'  height='1000px' width='1000px' >"
+                            
+                             CKEDITOR.instances[textAreaId].insertHtml(tool_val);
+                            $('#group_imgs_on_modal').foundation('reveal', 'close');
+                          });
+
+                          $("#insert_AST_U1_L4_DA2_WTT_Te").click(function(event){
+                            
+
+                            tool_val = "<a href='/Astroamer_Element_Hunt_Activity/te/' target='_blank'><img src='/static/ndf/images/Rotation_of_Earth_te.png' alt='Rotation_of_Earth_te'  height='1000px' width='1000px' >"
+                            
+                             CKEDITOR.instances[textAreaId].insertHtml(tool_val);
+                            $('#group_imgs_on_modal').foundation('reveal', 'close');
+                          });
+
+                          $("#insert_AST_U2_L8_DA1_Ani_Te").click(function(event){
+                            
+
+                            tool_val = "<a href='/Motions_of_the_Moon_Animation/te/' target='_blank'><img src='/static/ndf/images/Motions_of_Moon_te.png' alt='Motions_of_Moon_te'  height='1000px' width='1000px' >"
+                            
+                             CKEDITOR.instances[textAreaId].insertHtml(tool_val);
+                            $('#group_imgs_on_modal').foundation('reveal', 'close');
+                          });
+
+                          $("#insert_AST_U2_L8_DA2_MT_Te").click(function(event){
+                            
+
+                            tool_val = "<a href='/Astroamer_Moon_Track/te/' target='_blank'><img src='/static/ndf/images/Motions_of_Moon_te.png' alt='Motions_of_Moon_te'  height='1000px' width='1000px' >"
+                            
+                             CKEDITOR.instances[textAreaId].insertHtml(tool_val);
+                            $('#group_imgs_on_modal').foundation('reveal', 'close');
+                          });
+
+                          $("#insert_AST_U3_L11_DA1_Ani_Te").click(function(event){
+                            
+
+                            tool_val = "<a href='/Solar_System_Animation/te/' target='_blank'><img src='/static/ndf/images/Solar_System_te.png' alt='Solar_System_te'  height='1000px' width='1000px' >"
+                            
+                             CKEDITOR.instances[textAreaId].insertHtml(tool_val);
+                            $('#group_imgs_on_modal').foundation('reveal', 'close');
+                          });
+
+                          $("#insert_AST_U3_L11_DA2_PT_Te").click(function(event){
+                            
+
+                            tool_val = "<a href='/Astroamer_Planet_Trek_Activity/te/' target='_blank'><img src='/static/ndf/images/Solar_System_te.png' alt='Solar_System_te'  height='1000px' width='1000px' >"
+                            
+                             CKEDITOR.instances[textAreaId].insertHtml(tool_val);
+                            $('#group_imgs_on_modal').foundation('reveal', 'close');
+                          });
+
+
+                          $("#insert_Build_An_Atom_en").click(function(event){
+                            
+
+                            tool_val = "<a href='/PhET-customized/Build_An_Atom/en/Build_An_Atom.html' target='_blank'><img src='/static/ndf/images/BuildanAtom_en.png' alt='Build an Atom_en'  height='1000px' width='1000px' >"
+                            
+                             CKEDITOR.instances[textAreaId].insertHtml(tool_val);
+                            $('#group_imgs_on_modal').foundation('reveal', 'close');
+                          });
+
+                          $("#insert_Build_An_Atom_hi").click(function(event){
+                            
+
+                            tool_val = "<a href='/PhET-customized/Build_An_Atom/hi/Build_An_Atom.html' target='_blank'><img src='/static/ndf/images/BuildanAtom_en.png' alt='Build an Atom_en'  height='1000px' width='1000px' >"
+                            
+                             CKEDITOR.instances[textAreaId].insertHtml(tool_val);
+                            $('#group_imgs_on_modal').foundation('reveal', 'close');
+                          });
+
+                          $("#insert_Build_An_Atom_te").click(function(event){
+                            
+
+                            tool_val = "<a href='/PhET-customized/Build_An_Atom/te/Build_An_Atom.html' target='_blank'><img src='/static/ndf/images/BuildanAtom_en.png' alt='Build an Atom_en'  height='1000px' width='1000px' >"
+                            
+                             CKEDITOR.instances[textAreaId].insertHtml(tool_val);
+                            $('#group_imgs_on_modal').foundation('reveal', 'close');
+                          });
+
+                          $("#insert_Build_A_Molecule_en").click(function(event){
+                            
+
+                            tool_val = "<a href='/PhET-customized/Build_A_Molecule/en/Build_A_Molecule.html' target='_blank'><img src='/static/ndf/images/BuildaMolecule_en.png' alt='Build an Atom_en'  height='1000px' width='1000px' >"
+                            
+                             CKEDITOR.instances[textAreaId].insertHtml(tool_val);
+                            $('#group_imgs_on_modal').foundation('reveal', 'close');
+                          });
+
+                          $("#insert_Build_A_Molecule_hi").click(function(event){
+                            
+
+                            tool_val = "<a href='/PhET-customized/Build_A_Molecule/hi/Build_A_Molecule.html' target='_blank'><img src='/static/ndf/images/BuildaMolecule_en.png' alt='Build an Atom_en'  height='1000px' width='1000px' >"
+                            
+                             CKEDITOR.instances[textAreaId].insertHtml(tool_val);
+                            $('#group_imgs_on_modal').foundation('reveal', 'close');
+                          });
+
+                          $("#insert_Build_A_Molecule_te").click(function(event){
+                            
+
+                            tool_val = "<a href='/PhET-customized/Build_A_Molecule/te/Build_A_Molecule.html' target='_blank'><img src='/static/ndf/images/BuildaMolecule_en.png' alt='Build an Atom_en'  height='1000px' width='1000px' >"
+                            
+                             CKEDITOR.instances[textAreaId].insertHtml(tool_val);
+                            $('#group_imgs_on_modal').foundation('reveal', 'close');
+                          });
+
 
                         }
                     });

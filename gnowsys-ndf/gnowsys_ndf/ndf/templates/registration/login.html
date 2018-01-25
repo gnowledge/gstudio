@@ -83,7 +83,7 @@
 				<!-- Login button -->
 				<div class="row">
 					<div class="small-6 medium-6 large-2 small-offset-3 medium-offset-2 large-offset-3 columns end">
-						<input type="submit" class="button small expand" tabindex= "4" value="{% trans "Login" %}" style="font-size:15px" />
+						<input type="submit" onclick='trim_space()' class="button small expand" tabindex= "4" value="{% trans "Login" %}" style="font-size:15px" />
 					</div>
 				</div>
 
@@ -114,8 +114,16 @@
 	</div>
 {% endblock %}
 
+
+
 {% block document_ready %}
 	{{block.super}}
+
+		function trim_space() {
+		user_name_val = $('#id_username').val();
+	    trim_usrname = user_name_val.trim();
+	    $('#id_username').val(trim_usrname);
+}
 
 	// Setting tabindex for following html elements
 	$("#id_username").attr("tabindex", "1");

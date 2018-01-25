@@ -21,7 +21,7 @@
 				{% endif %}
 			</div>
 			<div class="asset_text">
-				<div class="asset_title">{{node.name|truncatechars:35}}</div>
+				<div class="asset_title">{% firstof node.altnames|truncatechars:35 node.name|truncatechars:35 %}</div>
 				<div class="asset_desc">{{node.content|striptags|truncatechars:35}}</div>
 			</div>
 		</div>

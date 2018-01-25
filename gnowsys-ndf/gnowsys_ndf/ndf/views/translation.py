@@ -14,13 +14,13 @@ from gnowsys_ndf.ndf.models import Node, GSystem, GSystemType, RelationType, Gro
 from gnowsys_ndf.ndf.models import node_collection, triple_collection
 from gnowsys_ndf.ndf.views.methods import get_group_name_id, get_language_tuple, create_grelation
 from gnowsys_ndf.settings import GSTUDIO_DEFAULT_LANGUAGE
+from gnowsys_ndf.ndf.templatetags.ndf_tags import  get_relation_value
+
 
 # gst_page_name, gst_page_id = GSystemType.get_gst_name_id(u'Page')
 rt_translation_of = Node.get_name_id_from_type('translation_of', 'RelationType', get_obj=True)
 supported_languages = ['Hindi', 'Telugu']
 trans_node_gst_name, trans_node_gst_id = GSystemType.get_gst_name_id("trans_node")
-
-
 
 def all_translations(request, group_id, node_id):
     '''
@@ -37,12 +37,12 @@ def all_translations(request, group_id, node_id):
                               {
                                 'group_id': Group.get_group_name_id(group_id)[1],
                                 'groupid': Group.get_group_name_id(group_id)[1],
+                                'title': 'Translation',
                                 'nodes': all_translation_nodes,
                                 'node': node_obj,
                                 'source_node_id': node_id,
                                 'card_url_name': 'show_translation',
-                                'supported_languages': supported_languages
-                               },
+                                'supported_languages': supported_languages                               },
                               context_instance=RequestContext(request))
 
 
@@ -129,6 +129,11 @@ def translate(request, group_id, node_id, lang, translated_node_id=None, **kwarg
                                         'group_id': group_id,
                                         'node_id': node_id,
                                         'lang': lang,
+                                        }),
+                                'cancel_url':reverse('show_translation', kwargs={
+                                        'group_id': group_id,
+                                        'node_id': node_id,
+                                        'lang': lang,
                                         })
                                },
                               context_instance=RequestContext(request))
@@ -170,3 +175,160 @@ def translate(request, group_id, node_id, lang, translated_node_id=None, **kwarg
     # return HttpResponseRedirect(reverse('all_translations', kwargs={'group_id': group_id, 'node_id': node_id }))
     return HttpResponseRedirect(reverse('show_translation', kwargs={'group_id': group_id, 'node_id': node_id, 'lang': lang }))
     # return translated_node, translate_grel
+
+
+def get_lang_node(node_id,lang):
+    rel_value = get_relation_value(ObjectId(node_id),"translation_of")
+    for each in rel_value['grel_node']:
+        if each.language[0] ==  get_language_tuple(lang)[0]:
+            trans_node = each
+            return trans_node
+
+def get_trans_node_list(node_list,lang):
+    trans_node_list = []
+    for each in node_list:
+        each_node = get_lang_node(each,lang)
+        if each_node :  
+            # trans_node_list.append({ObjectId(each_node._id): {"name":(each_node.altnames or each_node.name),"basenodeid":ObjectId(each)}})
+            trans_node_list.append({ObjectId(each_node._id): {"name": each_node.name, "basenodeid":ObjectId(each)}})
+        else:
+            node = node_collection.one({"_id":ObjectId(each)})
+            # trans_node_list.append({ObjectId(node._id): {"name":(node.altnames or node.name),"basenodeid":ObjectId(node._id)}})
+            trans_node_list.append({ObjectId(node._id): {"name": node.name, "basenodeid":ObjectId(node._id)}})
+    if trans_node_list:
+        return trans_node_list
+
+def get_course_content_hierarchy(unit_group_obj,lang="en"):
+    '''
+    ARGS: unit_group_obj
+    Result will be of following form:
+    {
+        name: 'Lesson1',
+        type: 'lesson',
+        id: 'l1',
+        activities: [
+            {
+                name: 'Activity 1',
+                type: 'activity',
+                id: 'a1'
+            },
+            {
+                name: 'Activity 1',
+                type: 'activity',
+                id: 'a2'
+            }
+        ]
+    }, {
+        name: 'Lesson2',
+        type: 'lesson',
+        id: 'l2',
+        activities: [
+            {
+                name: 'Activity 1',
+                type: 'activity',
+                id: 'a1'
+            }
+        ]
+    }
+    '''
+
+    unit_structure = []
+    for each in unit_group_obj.collection_set:
+        lesson_dict ={}
+        lesson = Node.get_node_by_id(each)
+        if lesson:
+            trans_lesson = get_lang_node(lesson._id,lang)
+            if trans_lesson:
+                lesson_dict['label'] = trans_lesson.name
+            else:
+                lesson_dict['label'] = lesson.name
+            lesson_dict['id'] = lesson._id
+            lesson_dict['type'] = 'unit-name'
+            lesson_dict['children'] = []
+            if lesson.collection_set:
+                for each_act in lesson.collection_set:
+                    activity_dict ={}
+                    activity = Node.get_node_by_id(each_act)
+                    if activity:
+                        trans_act_name = get_lang_node(each_act,lang)
+                        # activity_dict['label'] = trans_act_name.name or activity.name  
+                        if trans_act_name:
+                            activity_dict['label'] = trans_act_name.altnames or trans_act_name.name
+                            # activity_dict['label'] = trans_act_name.name
+                        else:
+                            # activity_dict['label'] = activity.name
+                            activity_dict['label'] = activity.altnames or activity.name
+                        activity_dict['type'] = 'activity-group'
+                        activity_dict['id'] = str(activity._id)
+                        lesson_dict['children'].append(activity_dict)
+            unit_structure.append(lesson_dict)
+    return unit_structure
+
+
+
+def get_unit_hierarchy(unit_group_obj,lang="en"):
+    '''
+    ARGS: unit_group_obj
+    Result will be of following form:
+    {
+        name: 'Lesson1',
+        type: 'lesson',
+        id: 'l1',
+        activities: [
+            {
+                name: 'Activity 1',
+                type: 'activity',
+                id: 'a1'
+            },
+            {
+                name: 'Activity 1',
+                type: 'activity',
+                id: 'a2'
+            }
+        ]
+    }, {
+        name: 'Lesson2',
+        type: 'lesson',
+        id: 'l2',
+        activities: [
+            {
+                name: 'Activity 1',
+                type: 'activity',
+                id: 'a1'
+            }
+        ]
+    }
+    '''
+    unit_structure = []
+    for each in unit_group_obj.collection_set:
+        lesson_dict ={}
+        lesson = Node.get_node_by_id(each)
+        if lesson:
+            trans_lesson = get_lang_node(lesson._id,lang)
+            if trans_lesson:
+                lesson_dict['name'] = trans_lesson.name
+            else:
+                lesson_dict['name'] = lesson.name
+            lesson_dict['type'] = 'lesson'
+            lesson_dict['id'] = str(lesson._id)
+            lesson_dict['language'] = lesson.language[0]
+            lesson_dict['activities'] = []
+            if lesson.collection_set:
+                for each_act in lesson.collection_set:
+                    activity_dict ={}
+                    activity = Node.get_node_by_id(each_act)
+                    trans_act = get_lang_node(activity._id,lang)
+                    if activity:
+                        trans_act = get_lang_node(activity._id,lang)
+                        if trans_act:
+                            # activity_dict['name'] = trans_act.name
+                            activity_dict['name'] = trans_act.altnames or trans_act.name
+                        else:
+                            # activity_dict['name'] = activity.name
+                            activity_dict['name'] = activity.altnames or activity.name
+                        activity_dict['type'] = 'activity'
+                        activity_dict['id'] = str(activity._id)
+                        lesson_dict['activities'].append(activity_dict)
+            unit_structure.append(lesson_dict)
+
+    return unit_structure

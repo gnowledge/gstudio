@@ -34,8 +34,10 @@ GSTUDIO_ALTERNATE_SIZE = {'image':['100px','1048px'],'video':['144px','720px'],'
 GSTUDIO_DEFAULT_GROUP = u'desk'
 GSTUDIO_EDUCATIONAL_SUBJECTS_AS_GROUPS = False
 
-LANGUAGES = (('en', 'English'), ('hi', u'Hindi'),('te','Telugu'))
+LANGUAGES = (('en', 'English'), ('hi', 'Hindi'), ('te', 'Telugu'))
+HEADER_LANGUAGES = (('en', 'English'), ('hi', u'\u0939\u093f\u0902\u0926\u0940'),('te', u'\u0c24\u0c46\u0c32\u0c41\u0c17\u0c41'))
 GSTUDIO_DEFAULT_LANGUAGE = ('en', 'English')
+GSTUDIO_WORKSPACE_INSTANCE = False
 OTHER_COMMON_LANGUAGES = [
     ('mr', 'Marathi'), ('mni','Manipuri'), ('ori','Oriya'),
     ('pi','Pali'), ('raj','Rajasthani'), ('gu','Gujarati'),
@@ -487,7 +489,7 @@ BROKER_URL = 'amqp://'
 
 INSTALLED_APPS = (
     'gnowsys_ndf.ndf',
-    'dlkit',
+    # 'dlkit',
     'django.contrib.auth',
     'django.contrib.admin',
     'django.contrib.contenttypes',
@@ -513,8 +515,8 @@ INSTALLED_APPS = (
     'memcache_admin',
     'django_mailbox',
     'djcelery',
-    'dlkit',
-    'dlkit_runtime'
+    #'dlkit',
+    #'dlkit_runtime'
 )
 
 AUTHENTICATION_BACKENDS = (
@@ -1026,6 +1028,8 @@ GSTUDIO_PRIMARY_COURSE_LANGUAGE = u'en'
 #
 GSTUDIO_BUDDY_LOGIN = False
 GSTUDIO_INSTITUTE_ID = ''
+GSTUDIO_INSTITUTE_ID_SECONDARY = ''
+GSTUDIO_INSTITUTE_NAME = ''
 #
 # --- End of BUDDY Module ---
 

@@ -41,12 +41,12 @@
     "mousetrap": "#1.5.3",
     "pdfjs-build": "#87e7aef6e8",
     "blockui": "#316f6e5d76",
-    "datatables-plugins": "#1.0.1",
-    "DataTables": "#1.10.7",
+    "datatables-plugins": "#1.10.16",
+    "DataTables": "#1.10.16",
     "videojs": "#5.10.2",
     "epub.js": "#0.2.5",
     "font-awesome": "#4.4.0",
-    "ckeditor": "#4.5.6",
+    "ckeditor": "#4.7.3",
     "modernizr": "#2.8.3",
     "handlebars": "#4.0.5",
     "pace": "#1.0.2",
@@ -56,7 +56,11 @@
     "rubik-googlefont": "#a23ec91574",
     "MathJax": "2.7.0",
     "jquery-backstretch": "^2.1.15",
-    "datatables-rowsgroup": "1.0.0"
+    "datatables-rowsgroup": "#2.0.0",
+    "datatables.net-buttons": "#1.4.2",
+    "datatables.net-buttons-dt": "#1.4.2",
+    "pdfmake": "#0.1.33",
+    "jszip": "#3.1.4"
   },
   "resolutions": {
     "jquery": "2.2.1"

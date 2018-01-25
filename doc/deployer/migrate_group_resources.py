@@ -9,12 +9,14 @@ hard_clone_files = False
 source_group_id = raw_input("Enter source group _id: ")
 destination_group_id = raw_input("Enter destination group _id: ")
 
-resource_type_input = raw_input("\nChoose Resource type:\n  1. File\n  2. Page\n  3. Cancel\nEnter option no. (1 or 2 or 3): ")
+resource_type_input = raw_input("\nChoose Resource type:\n  1. File\n  2. Page\n  3. Asset\n 4. Cancel\nEnter option no. (1 or 2 or 3): ")
 if resource_type_input == '1':
 	resource_type_name = 'File'
 elif resource_type_input == '2':
 	resource_type_name = 'Page'
 elif resource_type_input == '3':
+	resource_type_name = 'Asset'
+elif resource_type_input == '4':
 	sys.exit()
 else:
 	print '\nYou have choosen wrong option. "File" will be default option selected in this case.'

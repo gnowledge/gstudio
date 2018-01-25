@@ -38,21 +38,9 @@
                     {% trans "Login" %}
                   </div>
                 </a>
-              {% else %}
-                {% get_explore_url as explore_url %}
-                  <a class="small expand" href="{% url explore_url %}">
-                    <div class="small-6 medium-6 text-center columns end login-home-button">
-                      {% trans "Explore Projects" %}
-                    </div>
-                  </a>
-                  <div class="row">
-                    <div class="medium-12 large-12 small-text-left text-center columns end forgot-password">
-                    </div>
-                  </div>
-                  <input type="hidden" name="next" value="/welcome">
               </div>
+              {% endif %}
       </div>
-          {% endif %}
             <!--<div class="medium-1 columns pannel">-->
                   <!--<img src="/static/ndf/images/landing_page/flowers.svg" class="flowers" />-->
             <!--</div> -->

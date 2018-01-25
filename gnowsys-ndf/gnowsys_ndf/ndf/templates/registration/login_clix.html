@@ -86,7 +86,7 @@
 
 				<div class="row">
 					<div class="small-12 medium-12 large-12 text-center columns end login-button">
-						<input type="submit" class="button small expand" tabindex= "4" value="{% trans "Login" %}" style="font-size:15px" />
+						<input type="submit" onclick='trim_space()' class="button small expand" tabindex= "4" value="{% trans "Login" %}" style="font-size:15px"  />
 					</div>
 				</div>
 		{% get_gstudio_registration as registration %}
@@ -130,9 +130,20 @@
 	</div>
 {% endblock %}
 
+
+<script type="text/javascript">
+
+</script>
+
 {% block document_ready %}
 	{{block.super}}
+	$("input[name='username']").focus();
 
+	function trim_space() {
+		user_name_val = $('#id_username').val();
+	    trim_usrname = user_name_val.trim();
+	    $('#id_username').val(trim_usrname);
+}
 	// Setting tabindex for following html elements
 	$("#id_username").attr("tabindex", "1");
 	$("#id_password").attr("tabindex", "2");

@@ -1,0 +1,58 @@
+{% extends "ndf/gbase.html" %}
+{% load i18n %}
+{% load ndf_tags %}
+
+{% block title %} Apps: Play, Learn and have Fun! {% endblock%}
+{% block body_content %}
+
+
+
+<div class="small-12 columns tool-bg">
+  		<ul class="small-block-grid-1 medium-block-grid-3 large-block-grid-3">
+	        <li class="card-image-wrapper">
+	        	<div class="polaroid">
+	        		<a href="/phet/" title="phet" target="_blank">
+					  <img src="/static/ndf/images/phet-logo-tm.svg" alt="Norway" style="width: 310px;
+    height: 222px;
+    border: 2px solid #164a7b;
+    padding: 10px 10px 10px 10px;" />
+					  <div class="container">
+					    <p>Phet- Interactive Simulations</p>
+					  </div>
+					</a>
+				</div>
+        	</li>
+        	<li>   
+        		<div class="polaroid">
+        			<a href="/sugar/" title="Sugar Labs" target="_blank">
+						<img src="/static/ndf/images/sugar-xo-logo.svg" alt="Norway" style="width: 310px;
+    height: 222px;
+    border: 2px solid #164a7b;
+    padding: 10px 10px 10px 10px;" />
+							<div class="container">
+					    	<p>Sugar Labs</p>
+					  		</div>
+					</a>
+				</div>
+        	</li>
+        	<li>   
+        		<div class="polaroid">
+        		<a href="/turtle/" title="turtle blocks" target="_blank">
+					<img src="/static/ndf/images/turtle-blocks.svg" alt="Norway" style="width: 310px;
+    height: 222px;
+    border: 2px solid #164a7b;
+    padding: 10px 10px 10px 10px;" />
+						<div class="container">
+					    	<p>Turtle Blocks</p>
+					  	</div>
+				</a>
+				</div>
+        	</li>
+        </ul>
+    </div>
+</div>
+</body>
+</html>
+
+
+{% endblock body_content %}

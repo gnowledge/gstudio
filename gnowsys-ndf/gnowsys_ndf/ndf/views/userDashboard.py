@@ -17,8 +17,9 @@ except ImportError:  # old pymongo
 
 
 ''' -- imports from application folders/files -- '''
-from gnowsys_ndf.settings import META_TYPE, GAPPS, GSTUDIO_SITE_DEFAULT_LANGUAGE, GSTUDIO_SITE_NAME, GSTUDIO_USER_GAPPS_LIST
-from gnowsys_ndf.settings import GSTUDIO_RESOURCES_CREATION_RATING, GSTUDIO_RESOURCES_REGISTRATION_RATING, GSTUDIO_RESOURCES_REPLY_RATING
+# Commented below imports from settings file, because of the wild-import from models
+# from gnowsys_ndf.settings import META_TYPE, GAPPS, GSTUDIO_SITE_DEFAULT_LANGUAGE, GSTUDIO_SITE_NAME, GSTUDIO_USER_GAPPS_LIST
+# from gnowsys_ndf.settings import GSTUDIO_RESOURCES_CREATION_RATING, GSTUDIO_RESOURCES_REGISTRATION_RATING, GSTUDIO_RESOURCES_REPLY_RATING
 from mongokit import paginator
 
 # from gnowsys_ndf.ndf.models import *
@@ -618,6 +619,9 @@ def user_data_profile(request, group_id):
 def upload_prof_pic(request, group_id):
     if request.method == "POST" :
         user = request.POST.get('user','')
+        if_module = request.POST.get('if_module','')
+        if if_module == "True":
+            group_id_for_module = request.POST.get('group_id_for_module','')
         url_name = request.POST.get('url_name','') # used for reverse
         # print "\n\n url_name", url_name
         group_obj = node_collection.one({'_id': ObjectId(group_id)})
@@ -666,7 +670,10 @@ def upload_prof_pic(request, group_id):
 
         if user:
             group_id = user
-        return HttpResponseRedirect(reverse(str(url_name), kwargs={'group_id': group_id}))
+        if if_module == "True":
+            return HttpResponseRedirect(reverse(str(url_name), kwargs={'group_id': ObjectId(group_id_for_module),'node_id':group_obj._id }))
+        else:
+            return HttpResponseRedirect(reverse(str(url_name), kwargs={'group_id': group_id}))
 
 
 def my_courses(request, group_id):
@@ -697,6 +704,7 @@ def my_courses(request, group_id):
         )
 
 def my_desk(request, group_id):
+    from gnowsys_ndf.settings import GSTUDIO_WORKSPACE_INSTANCE
 
     if str(request.user) == 'AnonymousUser':
         raise Http404("You don't have an authority for this page!")
@@ -733,9 +741,14 @@ def my_desk(request, group_id):
     # for each in my_modules_cur:
     #     my_modules.append(each._id)
 
-    my_units = node_collection.find({'member_of': {'$in': [ce_gst._id, announced_unit_gst._id]},
-                                          'author_set': request.user.id,
-                                        }).sort('last_update', -1)
+    
+    my_units = node_collection.find(
+                {'member_of':
+                    {'$in': [ce_gst._id, announced_unit_gst._id, gst_group._id]
+                },
+                'name': {'$nin': GSTUDIO_DEFAULT_GROUPS_LIST },
+                'author_set': request.user.id}).sort('last_update', -1)
+
     # my_modules_cur.rewind()
     return render_to_response('ndf/lms_dashboard.html',
                 {
@@ -832,6 +845,7 @@ def my_dashboard(request, group_id):
 
 
 def my_performance(request, group_id):
+    from gnowsys_ndf.settings import GSTUDIO_WORKSPACE_INSTANCE
 
     if str(request.user) == 'AnonymousUser':
         raise Http404("You don't have an authority for this page!")
@@ -847,10 +861,12 @@ def my_performance(request, group_id):
     auth_id = auth_obj._id
     title = 'my performance'
 
-    my_units = node_collection.find({'member_of': {'$in': [ce_gst._id, announced_unit_gst._id]},
-                                          'author_set': request.user.id,
-                                        }).sort('last_update', -1)
-    # my_modules_cur.rewind()
+    my_units = node_collection.find(
+                {'member_of':
+                    {'$in': [ce_gst._id, announced_unit_gst._id, gst_group._id]
+                },
+                'name': {'$nin': GSTUDIO_DEFAULT_GROUPS_LIST },
+                'author_set': request.user.id}).sort('last_update', -1)
     return render_to_response('ndf/lms_dashboard.html',
                 {
                     'group_id': auth_id, 'groupid': auth_id,

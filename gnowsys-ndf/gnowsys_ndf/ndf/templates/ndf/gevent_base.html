@@ -28,6 +28,7 @@
                     {% if is_gstaff %}
                     <div class="right course_actions margin-right-50">
 
+
                         <span data-dropdown="course-settings-drop" aria-controls="course-settings-drop" aria-expanded="false" class="tiny radius right" data-options="align:left">
                             <i class="icon-widget fi-widget"></i>
                         </span>
@@ -91,6 +92,7 @@
                         <li >
                             <a href="{% url 'course_notebook' group_id %}" {% if title == 'notebook' %}class="selected"{% endif %}>{% trans "Notebook" %}</a>
                         </li>
+                        
                     </ul>
                 </nav>
 
@@ -115,8 +117,9 @@
                     </div>
                     <div id="group_elibrary">
                         {% if title == "asset_list" %}
-                            {% include "ndf/assets.html" %}
+                            {% include "ndf/assets.html" with title="asset_list" %}
                         {% endif %}
+
                         {% if title == "asset_detail" or title == "asset_content_detail" %}
                             {% include "ndf/add_asset.html" %}
                         {% endif %}

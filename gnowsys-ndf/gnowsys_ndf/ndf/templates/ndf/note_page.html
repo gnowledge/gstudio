@@ -8,9 +8,7 @@
 {% include 'ndf/widget_user_access_modal.html' %}
 
     <div class="row note-toolbar">
-        <div class="small-12 medium-10 columns">
 
-            <div class="row">
                 <div class="small-12 columns">
                    <span class="note-title">{{node.name}}</span>
                    {% if node.tags %}
@@ -32,55 +30,56 @@
                         </div>
                     {% endif %}
                 </div>
-            </div>
-            <div class="row">
-                <div class="small-12 columns creator-title">
-                    <i class="fi-torso"></i>
+            <div class ="row">
+                <div class="small-8 medium-8 large-6 columns">
+                    <div class="creator-title">
+                        <i class="fi-torso"></i>
 
-                    <span class="note-creator" title="{{ node.user_details_dict.contributors|join:', ' }}">{{ node.user_details_dict.contributors|join:', ' }}</span>
-                    &nbsp;
-                    &#8226;
-                    &nbsp;
-                    <span class="note-creation-date">{{node.created_at|date:"d M Y h:i A"}}</span>
-                    &nbsp;
+                        <span class="note-creator" title="{{ node.user_details_dict.contributors|join:', ' }}">{{ node.user_details_dict.contributors|join:', ' }}</span>
+                        &nbsp;
                         &#8226;
                         &nbsp;
+                        <span class="note-creation-date">{{node.created_at|date:"d M Y h:i A"}}</span>
+                        &nbsp;
+                            &#8226;
+                            &nbsp;
 
-                    <div style="display: inline-block;" class="creator-rating">
-                    {# <div>Your rating</div> #}
+                        <div style="display: inline-block;" class="creator-rating">
+                        {# <div>Your rating</div> #}
 
-                        <div>
+                            <div>
 
-                        {% include 'ndf/rating.html'%}
-                        {% comment %}
-                            <i class="fi-like"></i>
-                            <i class="fi-like"></i>
-                            <i class="fi-like"></i>
-                            <i class="fi-like"></i>
-                            <i class="fi-like"></i>
-                        {% endcomment %}
+                            {% include 'ndf/rating.html'%}
+                            {% comment %}
+                                <i class="fi-like"></i>
+                                <i class="fi-like"></i>
+                                <i class="fi-like"></i>
+                                <i class="fi-like"></i>
+                                <i class="fi-like"></i>
+                            {% endcomment %}
+                            </div>
                         </div>
-                    </div>
-                    &nbsp;
-                        &#8226;
                         &nbsp;
-                    {% comment %}
-                    <div style="display: inline-block;">
-                        {% include "ndf/widget_analytics_views.html" %}
+                            &#8226;
+                            &nbsp;
+                        {% comment %}
+                        <div style="display: inline-block;">
+                            {% include "ndf/widget_analytics_views.html" %}
+                        </div>
+                        {% endcomment %}
                     </div>
-                    {% endcomment %}
+                </div>
+                <div class="small-4 medium-4 large-6 columns">
+                    <div class="creator-rating">
+                        {% if is_gstaff or node.created_by == request.user.id %}
+
+                           <a class="edit-note-btn" data-note-id="{{node.pk}}"><i class ="fi-pencil"></i>{% trans "Edit" %}</a> 
+                           <a class="delete-note-btn" data-note-id="{{node.pk}}"><i class ="fi-trash"></i>{% trans "Delete" %}</a> 
+                        {% endif %}
+                    </div>
                 </div>
             </div>
-        </div>
-        <div class="small-12 medium-2 columns creator-rating">
-            {% if is_gstaff or node.created_by == request.user.id %}
-
-               <a class="edit-note-btn" data-note-id="{{node.pk}}"><i class ="fi-pencil"></i>{% trans "Edit" %}</a> 
-               <a class="delete-note-btn" data-note-id="{{node.pk}}"><i class ="fi-trash"></i>{% trans "Delete" %}</a> 
-            {% endif %}
-
-        </div>
-    </div>
+        
     <div class="row note-content">
         <div class="small-12 columns">
             <div class="note-header row">

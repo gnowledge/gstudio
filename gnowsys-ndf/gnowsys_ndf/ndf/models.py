@@ -672,6 +672,10 @@ class Node(DjangoDocument):
 
     @staticmethod
     def get_name_id_from_type(node_name_or_id, node_type, get_obj=False):
+        '''
+        e.g:
+            Node.get_name_id_from_type('pink-bunny', 'Author')
+        '''
         if not get_obj:
             # if cached result exists return it
 
@@ -1956,6 +1960,7 @@ class GSystem(Node):
 
         return node_collection.find({
                             '_type': 'GSystem',
+                            'status': 'PUBLISHED',
                             'group_set': {'$in': [group_id]},
                             'member_of': {'$in': [gst_id]},
                             '$or':[
@@ -2359,7 +2364,7 @@ class Filehive(DjangoDocument):
                 try:
                     if history_manager.create_or_replace_json_file(self):
                         fp = history_manager.get_file_path(self)
-                        message = "This document (" + str(self.md5) + ") is re-created on " + datetime.uploaded_at.strftime("%d %B %Y")
+                        message = "This document (" + str(self.md5) + ") is re-created on " + self.uploaded_at.strftime("%d %B %Y")
                         rcs_obj.checkin(fp, 1, message.encode('utf-8'), "-i")
 
                 except Exception as err:
@@ -2639,6 +2644,8 @@ class Group(GSystem):
             finally:
                 self[field_key] = default_val
 
+        if group_type:
+            self.group_type = group_type
         self.fill_gstystem_values(request=request, **kwargs)
 
         # explicit: group's should not have draft stage. So publish them:
@@ -3194,10 +3201,10 @@ class ActiveUsers(object):
         for session in sessions:
             data = session.get_decoded()
             user_id = data.get('_auth_user_id', 0)
-            # if user_id:
+            if user_id:
+                userid_session_key_dict[user_id] = session.session_key
             # uid_list_append(user_id)
             # session_key_list.append(session.session_key)
-            userid_session_key_dict[user_id] = session.session_key
 
         return userid_session_key_dict
 
@@ -3206,6 +3213,45 @@ class ActiveUsers(object):
         #     return User.objects.filter(id__in=uid_list).values_list('id', flat=True)
         # else:
         #     return User.objects.filter(id__in=uid_list)
+
+    @staticmethod
+    def logout_all_users():
+        """
+        Read all available users and all available not expired sessions. Then
+        logout from each session. This method also releases all buddies with each user session.
+        """
+        from django.utils.importlib import import_module
+        from django.conf import settings
+        from django.contrib.auth import logout
+        
+        request = HttpRequest()
+
+        # sessions = Session.objects.filter(expire_date__gte=timezone.now())
+        sessions = Session.objects.filter(expire_date__gte=timezone.now()).distinct('session_data')
+
+        # Experimental trial (aggregate query):
+        # unique_sessions_list = Session.objects.filter(expire_date__gte=timezone.now()).values('session_data').annotate(Count('session_data')).filter(session_data__count__lte=1)
+        
+        print('Found %d non-expired session(s).' % len(sessions))
+
+        for session in sessions:
+            try:
+                user_id = session.get_decoded().get('_auth_user_id')
+                engine = import_module(settings.SESSION_ENGINE)
+                request.session = engine.SessionStore(session.session_key)
+
+                request.user = User.objects.get(id=user_id)
+                print ('\nProcessing session of [ %d : "%s" ]\n' % (request.user.id, request.user.username))
+
+                logout(request)
+                print('- Successfully logout user with id: %r ' % user_id)
+
+            except Exception as e:
+                # print "Exception: ", e
+                pass
+
+        Buddy.sitewide_remove_all_buddies()
+
 
 
 # class DjangoActiveUsersGroup(object):
@@ -3355,9 +3401,7 @@ class Triple(DjangoDocument):
         }
         gr_or_rt_name, gr_or_rt_id = Node.get_name_id_from_type(gt_or_rt_name_or_id,
             triple_node_mapping_dict[cls._meta.verbose_name])
-
         status = [status] if status else ['PUBLISHED', 'DELETED']
-
         return triple_collection.find({
                                     '_type': cls._meta.verbose_name,
                                     'subject': ObjectId(subject_id),
@@ -3441,8 +3485,8 @@ class Triple(DjangoDocument):
       at_node = node_collection.one({'_id': ObjectId(self.attribute_type)})
       attribute_type_name = at_node.name
       attribute_object_value = unicode(self.object_value)
-
-      self.name = "%(subject_name)s -- %(attribute_type_name)s -- %(attribute_object_value)s" % locals()
+      attribute_object_value_for_name = attribute_object_value[:20]
+      self.name = "%(subject_name)s -- %(attribute_type_name)s -- %(attribute_object_value_for_name)s" % locals()
       name_value = self.name
 
       subject_type_list = at_node.subject_type
@@ -3805,6 +3849,7 @@ class Buddy(DjangoDocument):
         active_buddy_authid_list = self.get_active_authid_list_from_single_buddy()
 
         for each_buddy_authid in active_buddy_authid_list:
+            print "- Released Buddy: ", Node.get_name_id_from_type(each_buddy_authid, u'Author')[0]
             self.get_latest_in_out_dict(self.buddy_in_out[each_buddy_authid])['out'] = datetime.datetime.now()
 
         return self
@@ -4176,9 +4221,11 @@ class Counter(DjangoDocument):
 
         # 'visited_nodes' = {str(ObjectId): int(count_of_visits)}
         'visited_nodes': {basestring: int},
-        'assessment': {
-                    'offered_id': {'total': int, 'correct': int, 'incorrect_attempts': int}
-                    }
+        'assessment': []
+        #             [{'id: basestring, 'correct': int, 'failed_attempts': int}]
+        # 'assessment': {
+        #             'offered_id': {'total': int, 'correct': int, 'incorrect_attempts': int}
+        #             }
     }
 
     default_values = {
@@ -4323,6 +4370,15 @@ class Counter(DjangoDocument):
         from gnowsys_ndf.settings import GSTUDIO_QUIZ_CORRECT_POINTS
         return self['quiz']['correct'] * GSTUDIO_QUIZ_CORRECT_POINTS
 
+    def get_assessment_points(self):
+        from gnowsys_ndf.settings import GSTUDIO_QUIZ_CORRECT_POINTS
+        total_correct = 0
+        for each_dict in self['assessment']:
+            try:
+                total_correct = each_dict['correct']
+            except Exception as possible_key_err:
+                print "Ignore if KeyError. Error: {0}".forma
+        return total_correct * GSTUDIO_QUIZ_CORRECT_POINTS
 
     def get_interaction_points(self):
         from gnowsys_ndf.settings import GSTUDIO_COMMENT_POINTS
@@ -4334,7 +4390,10 @@ class Counter(DjangoDocument):
 
         point_breakup_dict['Files'] = self.get_file_points()
         point_breakup_dict['Notes'] = self.get_page_points(page_type='blog')
-        point_breakup_dict['Quiz']  = self.get_quiz_points()
+        if 'assessment' in self and self['assessment']:
+            point_breakup_dict['Assessment']  = self.get_assessment_points()
+        else:
+            point_breakup_dict['Quiz']  = self.get_quiz_points()
         point_breakup_dict['Interactions'] = self.get_interaction_points()
 
         return point_breakup_dict

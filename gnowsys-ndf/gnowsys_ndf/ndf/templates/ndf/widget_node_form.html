@@ -14,12 +14,12 @@
                 <div class="gray-text"></div>
                 </div>
                 <div class="small-11 medium-11 large-11 columns">
-                    <input name="name" type="text" class="orange-button node_name" style="margin-top:11px;margin-left:40px" placeholder="Enter Name"  
+                    <input name="name" type="text" class="node_name" style="margin-top:11px;margin-left:40px" placeholder="Enter Name"  
                     value="{{node_obj.name|safe}}"/>
                     <label class="node_name_empty hide" style="color:red">{% trans "Please enter Name" %}</label>
 
                 </div>
-                <br>
+                <br><br><br>
                 {% if not no_altnames %}
                 <div class="left">
                 <h5>{% trans "Display Name" %}</h5>
@@ -40,7 +40,7 @@
                 <div class="left">
                 <h5>{% trans "Description" %}</h5>
                 </div><br/> 
-                <div class="left" style="width:980px;">
+                <div class="left" style="width:100%;">
                     {% include "ndf/html_editor.html" with var_name="content" var_value=node_obj.content node_id=node_obj.pk ckeditor_toolbar=editor_type %}
                     <br/>
                 </div>
@@ -71,11 +71,13 @@
                 </div>
 
             {% endfor %}
-            <div class="row">
-                <input type="submit" class="small-2 columns right orange-button" id="" value="Save"/>
+            <div class="row" style="margin-left: 2px;">
+                <input type="submit" class="button-save-new" value="Save" style="margin:20px 0px 20px 0px;"/>
 
                 {% if cancel_url %}
-                    <a class="small-2 small-push-1 columns text-center orange-button" href="{{cancel_url}}">{% trans "Cancel" %}</a>
+                    <button class="button-cancel-new">
+                        <a href="{{cancel_url}}"> <i class="fa fa-times" aria-hidden="true"></i> {% trans "Cancel" %}</a>
+                    </button>
                 {% endif %}
             </div>
         </form>

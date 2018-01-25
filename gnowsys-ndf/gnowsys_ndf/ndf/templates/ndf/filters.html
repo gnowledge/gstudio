@@ -1,3 +1,4 @@
+{% load i18n %}
 <!-- {# /**
 	===: Instructions :===
 
@@ -28,7 +29,6 @@
 	applyFilter(filtersObjArr).
 **/ } -->
 
-{% load i18n %}
 <style type="text/css">
 
 	div#filter-area {
@@ -45,6 +45,18 @@
  		margin: 0px 10px;
  		margin-bottom: 0px;
  	}
+
+ 	@media screen and (min-width: 1026px) {
+ 		div.filter-body>div{
+ 			display: inline-block;
+	 		vertical-align: top;
+	 		margin-bottom: 0px;
+ 			width: 330px;
+ 		}
+
+
+        }
+
  	div.filter-body>div {
  		color: #A2A2A2;
  	}
@@ -141,8 +153,8 @@
 							<option value=""> -- {% trans 'Select' %} -- </option>
 
 						</select>
-						<input type="button" class="button radius tiny" value="{% trans 'Filter' %}" id="filter-btn">
-						<input type="button" class="button radius tiny" value="Clear" id="filter-clear-btn">
+						<input type="button" class="button radius tiny" value="{% trans 'Filter' %}"  style="width:65px!important" id="filter-btn">
+						<input type="button" class="button radius tiny" value="Clear" id="filter-clear-btn" style="width:65px!important">
 					</div>
 				</div>
 			</div>

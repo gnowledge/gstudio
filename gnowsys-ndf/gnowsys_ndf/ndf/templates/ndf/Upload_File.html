@@ -84,7 +84,7 @@
 						<select name="topic_list" tabindex=3 required>
 								<option value="">--- Select Topic ---</option>
 								{% for each_topic in topic_nodes %}
-								<option value="{{ each_topic }}">
+								<option value="{{ each_topic.pk }}">
 									{{ each_topic.name }}
 								</option>
 								{% endfor %}

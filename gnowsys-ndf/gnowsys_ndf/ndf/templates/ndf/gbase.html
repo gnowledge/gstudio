@@ -10,7 +10,6 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-
     <meta charset="utf-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="description" content="">
@@ -27,7 +26,13 @@
     <link rel="stylesheet" href="/static/ndf/bower_components/font-awesome/css/font-awesome.css">
     <link rel="stylesheet" href="/static/ndf/bower_components/font-awesome/css/font-awesome.min.css">
     <link rel="stylesheet" type="text/css" href="/static/ndf/css/themes/clix/clix2017.css">
+    <!-- variables for js ussage -->
+    
+    <input type="hidden" name="group_id" class="group_id" value="{{group_id}}">
+    <input type="hidden" name="is_authenticated" class="is_authenticated" value="{{user.is_authenticated}}">
+    <input type="hidden" name="csrf_token" class="csrf_token" value="{{csrf_token}}">
 
+    <!-- end variables for js ussage -->
     <script type="text/javascript" src="/static/ndf/bower_components/jquery/dist/jquery.min.js"></script>
     <script type="text/javascript" src="/static/ndf/bower_components/foundation/js/foundation.min.js"></script>
     <script type="text/javascript" src="/static/ndf/bower_components/foundation/js/foundation/foundation.topbar.js"></script>
@@ -55,6 +60,7 @@
 
 </head>
 <body>
+
     {% if site.BUDDY_LOGIN and user.is_authenticated and request.author.agency_type == 'Student'%}
         {% include "ndf/buddy.html" %}
     {% endif %}
@@ -63,12 +69,10 @@
     {% block extended_header %}{% endblock %}
 
     {% block body_content %} {% endblock %}
-{% if not no_footer %}
-    {% include 'ndf/footer_clix.html' %}
-{% endif %}
   <!-- JS -->
   <!--<script src="/static/ndf/js/app.js"></script>-->
   <script src="/static/ndf/bower_components/foundation/js/foundation.min.js"></script>
+  <script src="/static/ndf/js/gstudio-functions.js"></script>
 
   <!-- end of footer cache -->
 
@@ -193,4 +197,9 @@
     {% block script %} {% endblock %}
   </script>
 </body>
+<footer>
+    {% if not no_footer %}
+        {% include 'ndf/footer_clix.html' %}
+    {% endif %}
+</footer>
 </html>

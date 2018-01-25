@@ -26,15 +26,8 @@
             <a class="right close-reveal-modal reveal-modal-overlay" aria-label="Close">&#215;</a>
         {% endif %}
             <div class="small-1 columns icon-widget" style="margin-top: 5.6px;">
-                  {% if title == "asset_detail" %}
+                 
                 <a href="javascript:window.history.back();"><i class="fa fa-chevron-left large" aria-hidden="true"></i></a>
-                {% endif %}
-                {% if title == "raw_material_detail" %}
-                <a href="javascript:window.history.back();"><i class="fa fa-chevron-left large" aria-hidden="true"></i></a>
-                {% endif %}
-                {% if title == "asset_gallery_detail" %}
-                <a href="javascript:window.history.back();"><i class="fa fa-chevron-left large" aria-hidden="true"></i></a>
-                {% endif %}
             </div>
 
             <div class="small-7 columns">
@@ -43,7 +36,7 @@
 
             </div>
             
-            <div class="small-4 columns right">       
+            <div class="small-4 columns right margin-right-50">       
             {% if not edit and asset_obj %}
                 {% if asset_obj.created_by == request.user.id or is_gstaff  %}
                     <span data-dropdown="asset-settings-drop" aria-controls="asset-settings-drop" aria-expanded="false" class="large orange-button right">
@@ -126,7 +119,7 @@
                 {% endif     %}
                 </h3>
 
-                <button type="button" class="blue-white-button save-asset right" data-asset_id='{{asset_obj.pk}}' style="margin-top: 9px;margin-right: -150px;">{% trans "Save" %}</button>
+                <!--<button type="button" class="button-hollow-grey save-asset right" data-asset_id='{{asset_obj.pk}}' style="margin-top: 9px;margin-right: -150px;">{% trans "Save" %}</button>-->
             {% endif %}
 <div class="row">
     <hr/>
@@ -172,6 +165,28 @@
             </label>
             </div>
         </div>
+        <div class="row">
+            <div class="small-12 medium-10 large-10 columns">
+            <label>  
+                     {% if asset_obj %}
+                        {% get_relation_value asset_obj.pk "teaches"  as selected_topic %}
+                    {%  endif %}                                  
+                    choose topic :
+                        <select name="topics" id = "topic_list" multiple style="height:100px">
+                                <option value="">--- Select Topic ---</option>
+                                {% for each in topic_nodes %}
+                                 {% if each.pk == selected_topic.grel_node.0.pk %}
+                                    <option selected value="{{ each.pk }}" data-topic="{{ each.pk }}">
+                                        {{each.name}}
+                                {% else %}
+                                    <option value="{{ each.pk }}" data-topic="{{ each.pk }}">
+                                        {{each.name}}
+                                {%  endif %}
+                                {% endfor %}
+                        </select>
+            </label>
+            </div>
+        </div>
 
 
         <div class="row">
@@ -206,14 +221,14 @@
         <div class="row">
             <div class="asset-tags-container small-12 medium-10 large-10 columns">
                 <label>
-                {% if not "announced_unit" in group_obj.member_of_names_list %}
                 <input type="checkbox" name="is_raw_material" class="is_raw_material" {% if "raw@material" in asset_obj.tags %} checked="checked" {% endif %}> {% trans "Mark as Raw Material" %}
 
                 </label>
-                {% endif %}
             </div>
         </div>
 
+        <button type="button" class="button-save-new save-asset" data-asset_id='{{asset_obj.pk}}' style="margin-top: 9px;margin-right: -150px;">{% trans "Save" %}</button>
+        
         {% endif %}
 
     <div class="asset-content-area"{% if not asset_obj %} style="display:none"{% endif %}>
@@ -253,42 +268,20 @@
         <div class="row">
             {% if asset_content_list.grel_id and asset_obj.created_by == request.user.id  or is_gstaff and asset_obj and asset_content_list.grel_id  %}
             <div class="row">
-                <button type="button" class="orange-button delete-asset-content right icon-widget" style="margin-right: 53px;" title="Click on the checkbox on the files below to Delete"><i class="fa fa-trash"></i> {% trans "Delete Files" %}</button>
+                <button type="button" class="orange-button delete-asset-content right icon-widget" style="margin-right: 100px;" title="Click on the checkbox on the files below to Delete"><i class="fa fa-trash"></i> {% trans "Delete Files" %}</button>
             </div>
             {% endif %}
 
+        <div class="row listing-row">
             {% for each in asset_content_list.grel_node %}
                 {% if  'DELETED' != each.status %}
-                <div class="small-12 medium-6 large-3 columns">
-                    <div class="asset_tile">
-                        <div class="asset_preview">
-                            <a href="{% url 'assetcontent_detail' group_id asset_obj.pk each.pk %}" title="{{each.name}}" >
-                                {% if each.if_file.mid.relurl and 'video' not in each.if_file.mime_type %}
-                                <img src="{{MEDIA_URL}}{{each.if_file.mid.relurl}}"/>
-                                {% elif  each.if_file.thumbnail.relurl %}
-                                <img src="{{MEDIA_URL}}{{each.if_file.thumbnail.relurl}}"/>
-                                {% elif  'audio' in each.if_file.mime_type %}
-                                <img src="/static/ndf/images/audio.png"/>
-                                {% else %}
-                                <img src="/static/ndf/images/file.png"/>
-                                {% endif %}
-                            </a>
-                        </div>
-                        <div class="asset_text">
-                            <div class="asset_title" style="color: #2e3f51">{{each.name|truncatechars:35}}
-                            {% if user.is_authenticated  and not group_object.edit_policy == "NON_EDITABLE"  or gstaff_access %}
-                                <input type="checkbox" class="filenode" name="filenode" value="{{each.pk}}" style="margin-top:6px; margin-right: 2px; float:right;" class="asset_content_checkbox"/>
-                            {% endif %}
-                                <div title="{{each.content}}"class="asset_desc">{{each.content|truncatechars:35}}</div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
+                   {% include "ndf/asset_card.html" with url_name="assetcontent_detail" each_asset=each first_arg=group_id second_arg=asset_obj.pk third_arg=each.pk no_asset=True %} 
                 {% endif %}
             {% endfor %}
         </div>
+        </div>
         <!-- </div> -->
-    
+    {% include 'ndf/pagination.html' with urlname="asset_details_paged" first_arg=group_id second_arg=asset_obj.pk page_info=assetcontent_page_info %}
     
         <div class="row asset-content-detail">
               {% if node %}
@@ -303,12 +296,10 @@
     <div class="row asset-comments-section">
       <div class="small-10 columns" id="view-discussion" style="overflow-x:auto;overflow-y:hidden">
             <!-- discussion content area -->
-            {% if user.is_authenticated %}
             {% get_thread_node asset_obj.pk as thread_node_obj %}
             {% if thread_node_obj %}
                 {% get_disc_replies thread_node_obj.pk group_id global_disc_all_replies as all_replies %}
                 {% include 'ndf/in-line-texteditor.html' with node=thread_node_obj var_name="content_org" allow_to_comment=True ckeditor_toolbar="LMSStudentsToolbar" %}
-            {% endif %}
             {% endif %}
 
 
@@ -323,18 +314,19 @@
 
     $(".add-asset-content").click(function(){
         $(".asset-content-area").removeClass("hide")
+        $(".delete-asset-content").css('display', 'none')
         $(".name-desc-asset-cont-area").removeClass("hide")
 
         $("#upload_asset").removeClass("hide")
     });
 
     $(".delete-asset-content").click(function(){
-        var checked = $('.filenode:checked').length;
+        var checked = $('.select-chkbox:checked').length;
         if (checked > 0){
 
             if (confirm("Do you want to delete selected files?.") == true) {
                 coll_arr = []
-                $('.filenode:checked').each(function() {
+                $('.select-chkbox:checked').each(function() {
                     coll_arr.push($(this).val());
                 });
 
@@ -377,7 +369,20 @@
                   url: "{% url 'delete_asset' group_id %}",
                   datatype: "html",
                   success: function(data) {
-                        location.href = "{% url 'asset_list' group_id  %}";
+                        
+                        if("{{title}}" == "asset_detail"){
+
+                            location.href = "{% url 'course_gallery' group_id  %}";
+                        }
+                        else if ("{{title}}" == "asset_gallery_detail") {
+                            
+                            location.href = "{% url 'course_gallery' group_id  %}";
+                        }
+                        else if ("{{title}}" == "raw_material_detail"){
+                            location.href = "{% url 'course_raw_material' group_id  %}";
+
+                        }
+                        
                 }
             });
         }
@@ -415,6 +420,12 @@
     })
     $( ".save-asset" ).click(function(event) {
         updateAllTags();
+        coll_arr = []
+        
+        $('#topic_list :selected').each(function(){
+            coll_arr.push($(this).val())
+        });
+        
         var tagsStr = tags.value.trim();
         if(checkTag())
         {
@@ -432,6 +443,7 @@
         sel_tags = $("input:hidden[name='tags']").val()
         sel_asset_lang =  $('#asset_lang').find(':selected').attr('data-sub-code');
         asset_name = $("#asset-name").val();
+        topic_list = $("#topic_list").find(':selected').attr('data-topic');
         asset_disp_name = $("#asset-disp-name").val();
         asset_description = $("#asset-descid").val();
         var asset_id = $(this).attr('data-asset_id');
@@ -447,7 +459,10 @@
                         "sel_tags":sel_tags,
                         "sel_asset_lang":sel_asset_lang,
                         "is_raw_material": is_raw_material,
-                        title :"{{title}}"
+                        'topic_list':topic_list,
+                        //'coll_arr':coll_arr,
+                        'title' :"{{title}}",
+
                         // "asset_objective":asset_objective
                     },
                   url: "{% url 'create_edit_asset' group_id %}",

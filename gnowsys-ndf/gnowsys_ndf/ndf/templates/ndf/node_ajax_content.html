@@ -482,13 +482,10 @@ Still keeping for future ref (if needed).
 
             {% endif %}
           {% endif %}
-            {% if "QuizItemEvent" in node.member_of_names_list %}
-                {% if request.user.is_authenticated %}
-                  {% include 'ndf/quiz_player.html' %}
-                {% else %}
-                  <label>Please <a href="{% url 'auth_login' %}?next={{request.path}}">LOGIN</a>  to view the Quiz</label>
-                {% endif %}
-            {% endif %}
+
+          {% if "QuizItemEvent" in node.member_of_names_list or "QuizItem" in node.member_of_names_list%}
+              {% load_quiz_player request group_id node %}
+          {% endif %}
 
           {% block add_fields %} {% endblock %}
 
@@ -525,7 +522,7 @@ Still keeping for future ref (if needed).
           {% endfor %}
 
           <!-- <div id="commentable-area"> -->
-          {% if "QuizItemEvent" not in node.member_of_names_list %}
+          {% if "QuizItemEvent" not in node.member_of_names_list and "QuizItem" not in node.member_of_names_list%}
           <div class="node-content-div">
             {% with node.content|safe as description %}
             {% if description != "None" %}
@@ -647,7 +644,7 @@ Still keeping for future ref (if needed).
 
         {% if topic %}
           <div id="topic-resources">
-          {% include "ndf/topic_resources_listing.html" %}
+          {% include "ndf/topic_resources_listing.html" with node=node %}
           </div>
         {% endif %}
 

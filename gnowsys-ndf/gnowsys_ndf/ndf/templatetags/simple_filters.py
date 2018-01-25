@@ -100,10 +100,11 @@ def joinby(delimiter, arg):
 @stringfilter
 def re_format(value):
     import re
-    value = eval(value)
     l = []
-    for e in value:
-        l.append(re.sub(r'[\r]', '', e))
+    if value:
+        value = eval(value)
+        for e in value:
+            l.append(re.sub(r'[\r]', '', e))
     return l
 
 @get_execution_time
@@ -160,9 +161,10 @@ def multiply(value,multiply_factor):
 
 
 @register.filter
-def get_dict_value_from_key(dict, key):    
+def get_dict_value_from_key(dict_obj, key):
     try:
-        return dict[key]
+        if isinstance(dict_obj, dict):
+            return dict_obj[key]
     except KeyError:
         return ''
 

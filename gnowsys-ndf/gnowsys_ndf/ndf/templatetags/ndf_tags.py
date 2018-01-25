@@ -37,7 +37,7 @@ from django.core.cache import cache
 from mongokit import IS
 
 ''' -- imports from application folders/files -- '''
-from gnowsys_ndf.settings import GAPPS as setting_gapps, GSTUDIO_DEFAULT_GAPPS_LIST, META_TYPE, CREATE_GROUP_VISIBILITY, GSTUDIO_SITE_DEFAULT_LANGUAGE,GSTUDIO_DEFAULT_EXPLORE_URL,GSTUDIO_EDIT_LMS_COURSE_STRUCTURE
+from gnowsys_ndf.settings import GAPPS as setting_gapps, GSTUDIO_DEFAULT_GAPPS_LIST, META_TYPE, CREATE_GROUP_VISIBILITY, GSTUDIO_SITE_DEFAULT_LANGUAGE,GSTUDIO_DEFAULT_EXPLORE_URL,GSTUDIO_EDIT_LMS_COURSE_STRUCTURE,GSTUDIO_WORKSPACE_INSTANCE
 # from gnowsys_ndf.settings import GSTUDIO_SITE_LOGO,GSTUDIO_COPYRIGHT,GSTUDIO_GIT_REPO,GSTUDIO_SITE_PRIVACY_POLICY, GSTUDIO_SITE_TERMS_OF_SERVICE,GSTUDIO_ORG_NAME,GSTUDIO_SITE_ABOUT,GSTUDIO_SITE_POWEREDBY,GSTUDIO_SITE_PARTNERS,GSTUDIO_SITE_GROUPS,GSTUDIO_SITE_CONTACT,GSTUDIO_ORG_LOGO,GSTUDIO_SITE_CONTRIBUTE,GSTUDIO_SITE_VIDEO,GSTUDIO_SITE_LANDING_PAGE
 from gnowsys_ndf.settings import *
 try:
@@ -133,6 +133,7 @@ def get_site_variables():
 	site_var['ENABLE_USER_DASHBOARD'] = GSTUDIO_ENABLE_USER_DASHBOARD
 	site_var['BUDDY_LOGIN'] = GSTUDIO_BUDDY_LOGIN
 	site_var['INSTITUTE_ID'] = GSTUDIO_INSTITUTE_ID
+	site_var['HEADER_LANGUAGES'] = HEADER_LANGUAGES
 
 	cache.set('site_var', site_var, 60 * 30)
 
@@ -577,11 +578,11 @@ def get_metadata_values(metadata_type=None):
 
 @get_execution_time
 @register.assignment_tag
-def get_attribute_value(node_id, attr_name, get_data_type=False):
+def get_attribute_value(node_id, attr_name, get_data_type=False, use_cache=True):
     cache_key = str(node_id) + 'attribute_value' + str(attr_name)
     cache_result = cache.get(cache_key)
 
-    if (cache_key in cache) and not get_data_type:
+    if (cache_key in cache) and not get_data_type and use_cache:
         return cache_result
 
     attr_val = ""
@@ -595,7 +596,7 @@ def get_attribute_value(node_id, attr_name, get_data_type=False):
             node_attr = triple_collection.find_one({'_type': "GAttribute", "subject": ObjectId(node_id), 'attribute_type': gattr._id, 'status': u"PUBLISHED"})
     if node_attr:
         attr_val = node_attr.object_value
-        # print "\n here: ", attr_name, " : ", attr_val, " : ", node_id
+        # print "\n here: ", attr_name, " : ", type(attr_val), " : ", node_id
     if get_data_type:
         return {'value': attr_val, 'data_type': data_type}
     cache.set(cache_key, attr_val, 60 * 60)
@@ -3717,13 +3718,11 @@ def get_user_quiz_resp(node_obj, user_obj):
 				if qip_sub:
 					result['count'] = len(qip_sub)
 					recent_ans = qip_sub[-1]
-					if node_obj.quiz_type == "Short-Response":
-						result['recent_ans'] = recent_ans
-					else:
-						user_ans = recent_ans.values()[0]
-						# result['recent_ans'] = (map(unicode,[re.sub(r'[\t\n\r]', '', u_ans) for u_ans in user_ans]))
-						# result['recent_ans'] = [u_ans.decode('utf-8').decode('utf-8') for u_ans in user_ans]
-						result['recent_ans'] = user_ans
+					result['recent_ans'] = recent_ans
+					user_ans = recent_ans.values()[0]
+					# result['recent_ans'] = (map(unicode,[re.sub(r'[\t\n\r]', '', u_ans) for u_ans in user_ans]))
+					# result['recent_ans'] = [u_ans.decode('utf-8').decode('utf-8') for u_ans in user_ans]
+					result['recent_ans'] = user_ans
 		# return json.dumps(result,ensure_ascii=False)
 		return result
 
@@ -3790,6 +3789,12 @@ def get_course_filters(group_id, filter_context):
 				result_cur = node_collection.find({'member_of':page_gst._id, 'type_of': blogpage_gst._id,
 							'group_set': group_obj._id, 'tags':{'$exists': True, '$not': {'$size': 0}} #'tags':{'$exists': True, '$ne': []}}
 							},{'tags': 1, '_id': False})
+			elif filter_context.lower() == "notebook_lms":
+				page_gst = node_collection.one({'_type': "GSystemType", 'name': "Page"})
+				blogpage_gst = node_collection.one({'_type': "GSystemType", 'name': "Blog page"})
+				result_cur = node_collection.find({'member_of':page_gst._id, 'type_of': blogpage_gst._id,
+							'group_set': group_obj._id, 'tags':{'$exists': True, '$not': {'$size': 0}} #'tags':{'$exists': True, '$ne': []}}
+							},{'tags': 1, '_id': False})
 
 			elif filter_context.lower() == "gallery":
 				# all_user_objs_id = [eachuser.id for eachuser in all_user_objs]
@@ -3805,13 +3810,38 @@ def get_course_filters(group_id, filter_context):
 							'created_by': {'$in': gstaff_users}
 							},{'tags': 1, '_id': False})
 
+			elif filter_context.lower() == "raw_material_lms":
+				# all_user_objs_id = [eachuser.id for eachuser in all_user_objs if check_is_gstaff(group_obj._id,eachuser)]
+				asset_gst_name, asset_gst_id = GSystemType.get_gst_name_id("Asset")
+				result_cur = node_collection.find({'member_of': {'$in': [asset_gst_id]},
+            'group_set': {'$all': [ObjectId(group_id)]},'tags':'raw@material'}).sort('last_update', -1)
+
+			elif filter_context.lower() == "gallery_lms":
+				# all_user_objs_id = [eachuser.id for eachuser in all_user_objs if check_is_gstaff(group_obj._id,eachuser)]
+				asset_gst_name, asset_gst_id = GSystemType.get_gst_name_id("Asset")
+				result_cur = node_collection.find({'member_of': {'$in': [asset_gst_id]},
+				'group_set': {'$all': [ObjectId(group_id)]},'tags':'asset@gallery'}).sort('last_update', -1)
+
+			elif filter_context.lower() == "assets_lms":
+				# all_user_objs_id = [eachuser.id for eachuser in all_user_objs if check_is_gstaff(group_obj._id,eachuser)]
+				asset_gst_name, asset_gst_id = GSystemType.get_gst_name_id("Asset")
+				result_cur = node_collection.find({'member_of': {'$in': [asset_gst_id]},
+				'group_set': {'$all': [ObjectId(group_id)]},'tags':'asset@asset'}).sort('last_update', -1)
+
 			# print "\n\n result_cur.count()--",result_cur.count()
-			all_tags_from_cursor = map(lambda x: x['tags'], result_cur)
-			# all_tags_from_cursor is a list having nested list
-			all_tags_list = list(itertools.chain(*all_tags_from_cursor))
-			if all_tags_list:
-				all_tags_list = json.dumps(all_tags_list)
-			filters_dict[each_course_filter_key].update({'value': all_tags_list})
+			# all_tags_from_cursor = map(lambda x: x['tags'], result_cur)
+			# # # all_tags_from_cursor is a list having nested list
+			# all_tags_list = list(itertools.chain(*all_tags_from_cursor))
+			# if all_tags_list:
+			# 	all_tags_list = json.dumps(all_tags_list)
+			distinct_res_cur = result_cur.distinct('tags')
+			if 'raw@material' in distinct_res_cur:
+				distinct_res_cur.remove('raw@material')
+			if 'asset@gallery' in distinct_res_cur:
+				distinct_res_cur.remove('asset@gallery')
+			if 'asset@asset' in distinct_res_cur:
+				distinct_res_cur.remove('asset@asset')
+			filters_dict[each_course_filter_key].update({'value': json.dumps(distinct_res_cur)})
 	return filters_dict
 
 
@@ -3878,8 +3908,9 @@ def get_file_obj(node):
 
 @get_execution_time
 @register.assignment_tag
-def get_help_pages_of_node(node_obj,rel_name="has_help"):
+def get_help_pages_of_node(node_obj,rel_name="has_help",language="en"):
 	all_help_page_node_list = []
+	from gnowsys_ndf.ndf.views.translation import get_lang_node
 	try:
 		has_help_rt = node_collection.one({'_type': 'RelationType', 'name': rel_name})
 		help_rt = triple_collection.find({'subject':node_obj._id,'relation_type': has_help_rt._id, 'status': u'PUBLISHED'})
@@ -3887,6 +3918,8 @@ def get_help_pages_of_node(node_obj,rel_name="has_help"):
 			for each_help_rt in help_rt:
 				# print each_help_rt.right_subject
 				help_pg_node = node_collection.one({'_id':ObjectId(each_help_rt.right_subject)})
+				trans_node =   get_lang_node(help_pg_node._id,language)
+				help_pg_node =  trans_node or help_pg_node 
 				if help_pg_node:
 					all_help_page_node_list.append(help_pg_node)
 
@@ -3989,6 +4022,33 @@ def get_gstudio_registration():
 @register.assignment_tag
 def get_unit_total_points(user_id,group_id):
 	counter_obj = Counter.get_counter_obj(user_id, ObjectId(group_id))
+	return counter_obj['group_points']
+
+"""  commented for section subsection template """
+# @register.assignment_tag
+# def get_node_hierarchy(node_obj):
+#     node_structure = []
+#     for each in node_obj.collection_set:
+#         lesson_dict ={}
+#         lesson = Node.get_node_by_id(each)
+#         if lesson:
+#             lesson_dict['name'] = lesson.name
+#             lesson_dict['type'] = 'lesson'
+#             lesson_dict['id'] = str(lesson._id)
+#             lesson_dict['language'] = lesson.language[0]
+#             lesson_dict['activities'] = []
+#             if lesson.collection_set:
+#                 for each_act in lesson.collection_set:
+#                     activity_dict ={}
+#                     activity = Node.get_node_by_id(each_act)
+#                     if activity:
+#                         activity_dict['name'] = activity.name
+#                         activity_dict['type'] = 'activity'
+#                         activity_dict['id'] = str(activity._id)
+#                         lesson_dict['activities'].append(activity_dict)
+#             node_structure.append(lesson_dict)
+
+#     return json.dumps(node_structure)
 
 
 @register.assignment_tag
@@ -4051,3 +4111,116 @@ def if_edit_course_structure():
 @register.assignment_tag
 def get_default_discussion_lbl():
 	return DEFAULT_DISCUSSION_LABEL
+
+@register.assignment_tag
+def get_gstudio_workspace_instance():
+	return GSTUDIO_WORKSPACE_INSTANCE
+
+@register.assignment_tag
+def get_topic_nodes(node_id):
+	RT_teaches = node_collection.one({'_type':'RelationType', 'name': 'teaches'})
+	teaches_grelations = triple_collection.find({'_type': 'GRelation', 'right_subject': ObjectId(node_id), 'relation_type': RT_teaches._id })
+	teaches_grelations_id_list = []
+	for each in teaches_grelations:
+		teaches_grelations_id_list.append(each.subject)
+	teaches_nodes = node_collection.find({"_id":{'$in' : teaches_grelations_id_list } })
+	return teaches_nodes
+
+@register.assignment_tag
+def get_selected_topics(node_id):
+	rel_val = get_relation_value(ObjectId(node_id),'teaches')
+	teaches_grelations_id_list = []
+	for each in rel_val['grel_node']:
+		teaches_grelations_id_list.append(str(each._id))
+		# teaches_grelations_id_list = map(ObjectId,teaches_grelations_id_list)
+	return teaches_grelations_id_list
+
+@register.assignment_tag
+def rewind_cursor(cursor_obj):
+	cursor_obj.rewind()
+	return cursor_obj
+
+@register.assignment_tag
+def get_node_by_member_of_name(group_id, member_of_name):
+	member_of_gst_name, member_of_gst_id = GSystemType.get_gst_name_id(member_of_name)
+	return list(node_collection.find({'group_set': group_id, 'member_of': member_of_gst_id}))
+
+@get_execution_time
+@register.assignment_tag
+def cast_to_node(node_or_node_list):
+	# print "\nInput type: ", type(node_or_node_list)
+	if isinstance(node_or_node_list, list):
+		return map(Node,node_or_node_list)
+	else:
+		return Node(node_or_node_list)
+
+@register.assignment_tag
+def get_trans_node(node_id,lang):
+    rel_value = get_relation_value(ObjectId(node_id),"translation_of")
+    for each in rel_value['grel_node']:
+        if each.language[0] ==  get_language_tuple(lang)[0]:
+            trans_node = each
+            print "\n\ntrans_node", trans_node
+            return trans_node
+
+# @register.assignment_tag
+@register.inclusion_tag('ndf/quiz_player.html')
+def load_quiz_player(request, group_id, node, hide_edit_opt=False):
+    from gnowsys_ndf.ndf.views.quiz import render_quiz_player
+    node_member_of_names_list = node.member_of_names_list
+    if "QuizItem" in node_member_of_names_list or "QuizItemEvent" in node_member_of_names_list:
+        con_var = render_quiz_player(request, group_id, node, get_context=True)
+        con_var.update({'template': 'ndf/quiz_player.html', 'request': request,
+			'hide_edit_opt': hide_edit_opt})
+    # rel_value = get_relation_value(ObjectId(node._id),"translation_of")
+    # for each in rel_value['grel_node']:
+    #     if each.language[0] ==  get_language_tuple(lang)[0]:
+    #         node = each
+    #         print "\n\nnode", node
+    return con_var
+
+
+@register.assignment_tag
+def get_module_enrollment_status(request, module_obj):
+    def _user_enrolled(userid,unit_ids_list):
+        user_data_dict = {userid: None}
+        enrolled_flag = True
+        for unit_id in unit_ids_list:
+            unit_obj = node_collection.one({'_id': ObjectId(unit_id), '_type': 'Group'})
+            if unit_obj:
+	            if userid not in unit_obj.author_set:
+	                enrolled_flag = False
+        user_data_dict[userid] = enrolled_flag
+        return user_data_dict
+
+    data_dict = {}
+    buddies_ids = request.session.get('buddies_userid_list', [])
+    # print "\nbuddies_ids: ", buddies_ids
+
+    buddies_ids.append(request.user.pk)
+    if buddies_ids:
+        for  userid in buddies_ids:
+            data_dict.update(_user_enrolled(userid, module_obj.collection_set))
+            # data_dict.update({userid : all(userid in groupobj.author_set for ind, groupobj in module_obj.collection_dict.items())})
+            data_dict.update({'full_enrolled': all(data_dict.values())})
+        # print "\n data: ", data_dict
+        return data_dict
+    return _user_enrolled(request.user.pk, module_obj.collection_set)
+    # return {request.user.pk : user_enrolled, 'full_enrolled': user_enrolled}
+
+@get_execution_time
+@register.filter
+def get_unicode_lang(lang_code):
+    try:
+        return get_language_tuple(lang_code)[1]
+    except Exception as e:
+        return lang_code
+        pass
+
+@get_execution_time
+@register.filter
+def get_header_lang(lang):
+    for each_lang in HEADER_LANGUAGES:
+        if lang in each_lang:
+            return each_lang[1]
+    return lang

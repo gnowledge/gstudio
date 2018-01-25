@@ -1,4 +1,4 @@
-{% load get_nroer_menu  get_user_group  get_group_object  get_existing_groups_excluded  get_profile_pic  get_gapps_iconbar user_access_policy get_user_object check_is_gstaff get_attribute_value get_sg_member_of get_relation_value get_explore_url get_test_page_oid get_gstudio_registration from  ndf_tags %}
+{% load get_nroer_menu  get_user_group  get_group_object  get_existing_groups_excluded  get_profile_pic  get_gapps_iconbar user_access_policy get_user_object check_is_gstaff get_attribute_value get_sg_member_of get_relation_value get_explore_url get_test_page_oid get_gstudio_registration get_gstudio_workspace_instance get_header_lang from  ndf_tags %}
 {% load i18n %}
 {% load cache %}
 
@@ -6,11 +6,12 @@
   {% get_explore_url as explore_url %}
   {% get_test_page_oid as help_oid %}
   {% get_gstudio_registration as registration %}
+  {% get_gstudio_workspace_instance as is_workspace_instance %}
 
 <nav class="top-bar" data-topbar role="navigation" id="menu_bar_gstudio">
         <ul class="title-area">
             <li class="name show-for-medium-up">
-                <a class="loggedin-user" href="{% url 'landing_page' %}">
+                <a title="About: Connected Learning Initiative (CLIx)" class="loggedin-user" href="{% url 'landing_page'  %}?True">
                 
                 <img src="{{site.SECONDARY_LOGO}}">
                 </a>
@@ -28,37 +29,47 @@
         </ul>
 
         <section class="top-bar-section">
-            <!-- Right Nav Section -->
-
-            <ul class="right show-for-medium-up">
-<!--                 <li class=""><a href="#">Blog</a></li>
-                <li class=""><a href="#"><i class="icons-medium fi-info"></i>&nbsp;Help Topics</a></li>
- -->             
-
-                {% if help_oid %}
-                <li class=""><a {% if title == 'Help Page'  %} class="active" {% endif %} target="_blank" href="{% url 'course_content' help_oid %}"> <i class="fa fa-info-circle"></i> Help </a></li>
+            <!-- Left Nav Section -->
+            <ul class="left show-for-medium-up">
+                {% if request.user.is_authenticated %}
+                    <li> 
+                        <a title="Click here to view your enrolled Courses" href="{% url 'my_desk' request.user.id %}" {% if title == "my desk" or title == "my performance" %} class="active" {% endif %}> <i class="fa fa-briefcase" aria-hidden="true"></i> My Desk</a>
+                    </li>
                 {% endif %}
-                <ul class="">
-          <li class="has-dropdown">
-            <a>{% trans "Language" %} &nbsp; | &nbsp; {{request.LANGUAGE_CODE}}</a>
-            <ul class="dropdown">
-
-              {% for lang in LANGUAGES %}
+            
                 <li>
-                  <form action="/i18n/setlang/" method="POST">
-                    {% csrf_token %}
-                    <input name="url" type="hidden" value="{{request.get_full_path}}"/>
-                    <input type="hidden"  name="language" value="{{ lang.0 }}">
-                    <input type="submit" class="button expand secondary" value="{{ lang.1 }}"/>
-                  </form>
+                    <a title="Click here to view all Courses" href="{% url explore_url %}" {% if title == 'base courses' or title == "courses" or title == "drafts" %} class="active" {% endif %} ><i class="fa fa-binoculars" aria-hidden="true"></i> Explore</a>
                 </li>
-              {% endfor %}
 
+                <li>
+                    <a  title="Click here to play, learn and have Fun!" target="_blank" href="{% url 'tools_temp' %}" {% if title == 'tools' %} class="active" {% endif %}> <i class="fi-die-three" aria-hidden="true" style="font-size:20px;"></i> Apps</a>
+                </li>
+                
             </ul>
-          </li>
-        </ul>
-            {% if user.is_authenticated %}
-                <li class="has-dropdown buddy_margin">
+            <ul class="right show-for-medium-up top-right-menu">
+                {% if help_oid %}
+                    <li class=""><a title="Click here to view FAQ Help" {% if title == 'Help Page'  %} class="active" {% endif %} target="_blank" href="{% url 'course_content' help_oid %}"> <i class="fa fa-info-circle"></i> Help </a></li>
+                {% endif %}
+                <li class="has-dropdown not-click" title="Choose Language">
+                    <a href="#"> <i class="fa fa-globe" aria-hidden="true"></i>
+                    {{request.LANGUAGE_CODE|get_header_lang}}
+                    </a>
+                    <ul class="dropdown">
+                        {% for lang in site.HEADER_LANGUAGES %}
+                            <li>
+                                <form action="/i18n/setlang/" method="POST">
+                                {% csrf_token %}
+                                <input name="url" type="hidden" value="{{request.get_full_path}}"/>
+                                <input type="hidden" name="language" value="{{ lang.0 }}">
+                                <input type="submit" class="button expand secondary" value="{{ lang.1 }}"/>
+                                </form>
+                            </li>
+                        {% endfor %}
+                    </ul>
+                </li>
+          
+            {% if request.user.is_authenticated %}
+                <li class="has-dropdown buddy_margin white-text" style="margin-right: auto;"  title="{{ user.username }}">
                     {% get_profile_pic request.user.pk as prof_pic %}
                     <!-- <a href="{% url 'dashboard' request.user.pk %}"> -->
                     
@@ -66,55 +77,43 @@
                       <img src="{{MEDIA_URL}}{{prof_pic.if_file.original.relurl}}" id="profile-img">
                       {{ user.username }}
                     {% else %}
-                            <img class="profile-img" style="background-color:rgba(0, 0, 0, 0.34);" src="/static/ndf/bower_components/foundation-icon-fonts/svgs/fi-torso.svg" >
-                            {{ user.username }}
+                        <img class="profile-img" style="background-color:rgba(0, 0, 0, 0.34);" src="/static/ndf/bower_components/foundation-icon-fonts/svgs/fi-torso.svg" >
+                        {{ user.username }}
                     {% endif %}
-                    <!-- </a> -->
-                                        <ul class="dropdown">
+                    <ul class="dropdown">
                         {% if registration %}
                         <li class="text-center">
                           <a href="{% url 'auth_password_change' %}">{% trans "Change Password" %}</a>
                         </li>
                         {% endif %}
                         <li>
-                          <a class="logout" href="{% url 'auth_logout' %}">
+                          <a title="Click here to logout" class="logout" href="{% url 'auth_logout' %}">
                             <i class="fi-power"></i> &nbsp;{% trans "Logout" %}
                           </a>
                         </li>
                     </ul>
                 </li>
-              {% else %}
+            {% else %}
                 <li>
-                    <a class="" href="{% url 'auth_login' %}" accesskey="l">
+                    <a title="Click here to login" class="" href="{% url 'auth_login' %}" accesskey="l">
                     <i class="fi-key"></i>&nbsp; {% trans "Login" %}
                   </a>
                 </li>
-              {% endif %}
+            {% endif %}
             </ul>
             <ul class="right hide-for-medium-up dropdown-menu hide">
-                <li class=""><a href="#">My Desk</a></li>
-                <li><a  class="{%if title == 'courses'%}active{%endif%}" href="{% url explore_url %}">Explore </a></li>
+                <li class=""><a href="#"> <i class="fa fa-briefcase" aria-hidden="true"></i> My Desk</a></li>
+                <li><a  class="{%if title == 'courses'%}active{%endif%}" href="{% url explore_url %}"> <i class="fa fa-binoculars" aria-hidden="true"></i> Explore </a></li>
                 <li class=""><a href="#"> Blog</a></li>
                 <li class=""><a href="#"><i class="fi-info"></i> Help Topics</a></li>
-                <!--li class="has-dropdown not-click">
-                    <ul class="dropdown">
-                        <!--li class="title back js-generated">
-                            <h5>
-                                <a href="javascript:void(0)">Back</a>
-                            </h5>
-                        </li>
-                        <li class="parent-link hide-for-medium-up">
-                            <a class="parent-link js-generated" href="#">Right Dropdown</a>
-                        </li>
-                        <li><a href="#">First link in dropdown</a></li>
-                        <li class="active"><a href="#">Active link in dropdown</a></li>
-                    </ul>
-                </li-->
             </ul>
             {% if user.is_authenticated %}
             <ul class="right hide-for-medium-up side-bar-menu hide">
                 <li class="">
-                    <a href="{% url 'dashboard' request.user.pk %}">
+                    {% comment %}
+                    <!--<a href="{% url 'dashboard' request.user.pk %}">-->
+                        {% endcomment %}
+                    <a href="{% url 'my_desk' request.user.pk %}">
                         <i class="icons-medium fi-torso"></i>&nbsp;
                         <span>LOGGED IN BUDDIES</span>&nbsp;
                         <span class="badge badge-blue">1</span>
@@ -149,22 +148,13 @@
             {% else %}
               <ul class="right hide-for-medium-up side-bar-menu hide">
                 <li class="">
-                    <a class="" href="{% url 'auth_login' %}" accesskey="l">
+                    <a title="Click here to Login" class="" href="{% url 'auth_login' %}" accesskey="l">
                     <i class="fi-key"></i>&nbsp; {% trans "Login" %}
                   </a>
                 </li>
             </ul>
             {% endif %}
 
-            <!-- Left Nav Section -->
-            <ul class="left show-for-medium-up">
-                {% if request.user.id %}
-                <li class=""><a href="{% url 'my_desk' request.user.id %}" {% if title == "my desk" %} class="active" {% endif %}>My Desk</a></li>
-                {% endif %}
-                <li><a href="{% url explore_url %}" {% if title == 'base courses' or title == "courses" or title == "drafts" %} class="active" {% endif %} > Explore</a>
-                </li>
-                
-            </ul>
           </section>
     </nav>
     <script type="text/javascript">

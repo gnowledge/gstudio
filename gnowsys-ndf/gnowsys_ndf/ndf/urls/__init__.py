@@ -19,9 +19,10 @@ from gnowsys_ndf.ndf.views import rpc_resources
 
 if GSTUDIO_SITE_NAME.lower() == 'clix':
     login_template = 'registration/login_clix.html'
+    logout_template = "ndf/landing_page_clix.html"
 else:
     login_template = 'registration/login.html'
-
+    logout_template = 'registration/logout.html'
 
 urlpatterns = patterns('',
     (r'^i18n/', include('django.conf.urls.i18n')),
@@ -63,7 +64,8 @@ urlpatterns = patterns('',
     (r'^(?P<group_id>[^/]+)/quiz', include('gnowsys_ndf.ndf.urls.quiz')),
     (r'^(?P<group_id>[^/]+)/discussion', include('gnowsys_ndf.ndf.urls.discussion')),
     (r'^(?P<group_id>[^/]+)/unit',include('gnowsys_ndf.ndf.urls.unit')),
-
+    (r'^api/v1',include('gnowsys_ndf.ndf.urls.api')),
+    
     # Commented following url for khaal hackathon
     (r'^(?P<group_id>[^/]+)/course', include('gnowsys_ndf.ndf.urls.course')),
 
@@ -113,6 +115,7 @@ urlpatterns = patterns('',
     (r'^(?P<group_id>[^/]+)/mis-po', include('gnowsys_ndf.ndf.urls.mis', namespace='mis-po'), {'app_name': "MIS-PO"}),
     # ---end of mis
 
+    #test url
     (r'^dev/', include('gnowsys_ndf.ndf.urls.dev_utils')),
     (r'^tools/', include('gnowsys_ndf.ndf.urls.tools')),
     
@@ -207,6 +210,7 @@ urlpatterns = patterns('',
         name='registration_register'),
 
     url(r'^accounts/login/$', auth_views.login ,{'template_name': login_template}, name='login'),
+    url(r'^accounts/logout/$', auth_views.logout ,{'template_name': logout_template}, name='logout'),
     url(r'^accounts/', include('registration_email.backends.default.urls')),
 
    # --end of django-registration
