@@ -1,0 +1,59 @@
+{
+	"settings": {
+		"index.mapping.total_fields.limit": 5000, 
+		"number_of_shards": 1,
+		"number_of_replicas": 0,
+		"analysis": {
+			"analyzer": {
+				"trigram": {
+					"type": "custom",
+					"tokenizer": "standard",
+					"stopwords": "_english_",
+					"filter": [
+						"standard",
+						"lowercase",
+						"shingle"
+					],
+					"char_filter": ["html_strip"]
+				}
+			},
+			"filter": {
+				"shingle": {
+					"type": "shingle",
+					"min_shingle_size": 2,
+					"max_shingle_size": 3
+				}
+			}
+		}
+	},
+	"mappings": {
+         "_default_": {
+           "dynamic": "false"
+        },
+		"gattribute": {
+			"properties": {
+			    "name": {
+					"type": "text",
+					"fields": {
+						"trigram": {
+							"type": "text",
+							"analyzer": "trigram"
+						}
+					}
+				},
+				"tags": {
+					"type": "text",
+					"fields": {
+						"trigram": {
+							"type": "text",
+							"analyzer": "trigram"
+						}
+					}
+				}
+			}
+		}
+    
+        
+
+	}
+}
