@@ -109,14 +109,9 @@ def event(request, group_id):
 
     event_list.append({"title":str(each.name), "start": created_at_date_val.strftime('%Y-%m-%d')})
     
-    print event_list
+    # print event_list
     #event_list.append({"created_at": created_at_date_val.strftime('%Y-%m-%d')})
     
-
-  
-
-  
-
   return render_to_response('ndf/gevent.html',{
                                              'groupid':group_id,
                                              'group_id':group_id,
