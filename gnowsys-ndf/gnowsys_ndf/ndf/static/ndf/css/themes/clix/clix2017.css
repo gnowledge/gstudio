@@ -4615,11 +4615,8 @@ ul.nav_menu_1 > li > a.selected, ul.nav_menu_1 > li > a:hover {
   text-align: center;
   margin: 0px auto;
   letter-spacing: 1px;
-<<<<<<< HEAD
-  font-size: 24px;
-=======
+
   font-size: 1.4vw;
->>>>>>> 45cf0cc63255279b4151df9f3cf9238ad6ddd512
 }
 /* line 4863, ../../../scss/_clix2017.scss */
 .module_card.animated_card .card_banner {
