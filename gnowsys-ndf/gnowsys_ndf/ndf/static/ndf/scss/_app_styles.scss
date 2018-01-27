@@ -6751,6 +6751,42 @@ $ah_2_background_color_hover: rgba(244, 244, 244, 0.3);;
     
 }
 
+.orange-button-subtitle {
+    color: $primary-orange;
+    padding: 4px 5px;
+    background:#fff ;
+    border: 1px solid #ce7869;
+    font-size: 12px;
+    font-family: "OpenSans-Regular", serif;
+    border-radius: 4px;
+    margin-right: 20px;
+    margin-bottom: 8px;
+    margin-top: 10px;
+    &:hover{
+        background-color:rgba(206,120,105,0.2);
+        color: $primary-orange;
+    }
+}
+
+.transcript-toggler{
+        display: block;
+        width: 155px !important;
+        height: 30px;
+        margin-top: -14px !important;
+        padding: 9px 16px 2px;
+        background: radial-gradient(hsla(259, 40%, 40%, 1), hsla(259, 40%,30%, 1));
+        border-radius: 0 0 5px 5px;
+        color: #fff;
+        cursor: pointer;
+        font-size: .75rem;
+        padding-top:7px !important;
+        text-transform: uppercase;
+}
+
+.asset_list{
+    margin-left:12px;
+}
+
 .activity_tile {
     margin-top: 10px;
     margin-bottom: 25px;
@@ -7117,8 +7153,8 @@ $ah_2_background_color_hover: rgba(244, 244, 244, 0.3);;
 .preview_asset {
     background: #ccc;
     border: 2px solid #999;
-    width: 485px;
-    min-height: 350px;
+    width: 750px;
+    min-height: 445px;
     margin-left: 14px;
 }
 
@@ -7126,7 +7162,7 @@ $ah_2_background_color_hover: rgba(244, 244, 244, 0.3);;
 /*  Asset detail */
 
 .overlay-head{
-    background-color: #fff;
+//    background-color: #fff;
     height: 60px;
     margin-bottom:20px;
 }
@@ -7154,6 +7190,29 @@ $ah_2_background_color_hover: rgba(244, 244, 244, 0.3);;
     }
 }
 
+.orange-button-template{
+  color: $primary-orange;
+    background:#fff ;
+    &:hover{
+        background-color:#fff;;
+    }
+  >a{
+    color: $primary-orange;
+    padding: 7px 14px;
+    background:#fff ;
+    border: 1px solid #ce7869;
+    font-size: 12px;
+    font-family: "OpenSans-Regular", serif;
+    border-radius: 4px;
+    margin-right: 20px;
+    margin-bottom: 8px;
+    margin-top: 10px;
+    &:hover{
+        background-color:rgba(206,120,105,0.2);
+        color: $primary-orange;
+    }
+  }
+}
 
 .explore-button {
       // //font-size: 25px;
@@ -7182,6 +7241,27 @@ $ah_2_background_color_hover: rgba(244, 244, 244, 0.3);;
 
 
 
+.page-name{
+    margin-top:8px;
+}
+
+.tag-ele{
+    font-weight: normal;
+    text-align: center;
+    text-decoration: none;
+    line-height: 1;
+    white-space: nowrap;
+    display: inline-block;
+    position: relative;
+    margin-bottom: inherit;
+    padding: 0.25rem 0.5rem 0.25rem;
+    font-size: 0.6875rem;
+    background-color: #ffffff;
+    color: #ce7869;
+    border: 1px solid;
+    border-radius: 6px;
+    text-transform: none;
+}
 
 .button-cancel-new{
     height: 2rem;
