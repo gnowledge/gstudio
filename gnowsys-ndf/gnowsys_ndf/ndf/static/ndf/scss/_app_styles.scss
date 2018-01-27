@@ -30,6 +30,7 @@ $primary-orange : #ce7869;
 }
 
 
+
 /*
 *   Foundation extensions
 */
@@ -7469,3 +7470,39 @@ $ah_2_background_color_hover: rgba(244, 244, 244, 0.3);;
   background-image: -o-linear-gradient(top, #fc9f8a, #fa623f);
   background-image: linear-gradient(to bottom, #fc9f8a, #fa623f);
 }
+
+/*****  Create Event Form**********/
+
+/*
+  .tabs{
+    display: inline-block;
+        li.active a{
+        color:$active-color;
+        border: 1px solid;    
+        background-color: #A6D7F5;
+    }
+  }*/
+
+
+  .create-task-event-tabs{
+    .tabs {
+      width: 100%;
+      margin: 0em 0em 0.5em;
+      border-bottom: 1px solid #CCC;
+
+      .tab-title {
+        width: 40%;
+/*        background-color: blue;*/
+        margin-left: 1em;
+        position: relative;
+        top: 1px;
+        text-transform: uppercase;
+
+        &.active {
+          background-color: #fff;
+          border: 1px solid #CCC;
+          border-bottom: 0px;
+        }
+      }
+    }  
+  }

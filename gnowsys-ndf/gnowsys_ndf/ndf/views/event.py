@@ -54,22 +54,64 @@ def event(request, group_id):
   '''
 
   group_obj = get_group_name_id(group_id, get_obj=True)
+  group_name, group_id = get_group_name_id(group_id)
   group_id  = group_obj._id
   grp_gst_name, grp_gst_id = GSystemType.get_gst_name_id("Group")
+  asset_gst_name, asset_gst_id = GSystemType.get_gst_name_id("Asset")
+
   # app_collection_set=node_collection.find({'member_of': grp_gst_id})
   
   GST_TASK = node_collection.one({'_type': "GSystemType", 'name': 'Task'})
-    
+
   TASK_inst = node_collection.find({'member_of': {'$all': [GST_TASK._id]}, 'group_set': ObjectId(group_id),'status':"PUBLISHED" }).sort('last_update', -1)
   event_list = []
 
+  asset_nodes = node_collection.find({'member_of': {'$in': [asset_gst_id]},
+            'group_set': {'$all': [ObjectId(group_id)]},
+            '$and': [
+              {'access_policy': 'PUBLIC'},
+              {'$or': [
+                {'created_by': request.user.id},
+                {'access_policy': 'PRIVATE'}
+                ]
+              }
+            ]}).sort('last_update', -1)
+
+
   for each in TASK_inst:
     start_date_val = get_attribute_value(each._id, "start_time")
-    
-    event_list.append({"title":str(each.name),"start":str(start_date_val)})
 
+    end_date_val = get_attribute_value(each._id, "end_time")
+
+    priority_val = get_attribute_value(each._id, "Priority")
+
+    start_date_splited_val = start_date_val.split("/")
+    start_reverse_date_val = start_date_splited_val[::-1]
     
-  app_collection_set=None
+    end_date_splited_val = end_date_val.split("/")
+    end_reverse_date_val = end_date_splited_val[::-1]
+    # print start_reverse_date_val
+    # print priority_val
+
+    # start_date_reverse_val = start_date_splited_val.reverse()
+    # print start_date_reverse_val
+
+    start_date_new_val = '-'.join(start_reverse_date_val)
+    
+    end_date_new_val = '-'.join(end_reverse_date_val)
+    
+    event_list.append({"title":str(each.name), "start":str(start_date_new_val), "end":str(end_date_new_val), "priority": str(priority_val)})
+
+
+  for each in asset_nodes:
+
+    created_at_date_val = each.created_at
+
+    event_list.append({"title":str(each.name), "start": created_at_date_val.strftime('%Y-%m-%d')})
+    
+    # print event_list
+    #event_list.append({"created_at": created_at_date_val.strftime('%Y-%m-%d')})
+    
   return render_to_response('ndf/gevent.html',{
                                              'groupid':group_id,
                                              'group_id':group_id,

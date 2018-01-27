@@ -9,68 +9,68 @@
 {% block title %}{% trans 'Events' %} {% endblock %}
 
 {% block style %}
-  .course_outline_table, tr {
-    border: 2px solid #0b8a91;
-    border-collapse: collapse;
-  }
+.course_outline_table, tr {
+border: 2px solid #0b8a91;
+border-collapse: collapse;
+}
 
-  .gray-text{
-    color: gray;
-  }
+.gray-text{
+color: gray;
+}
 
-  #content > p {
-    color: #6F6F6F !important;
-    /*font-size: inherit;*/
-  }
+#content > p {
+color: #6F6F6F !important;
+/*font-size: inherit;*/
+}
 
-  tr:hover{
-    cursor:pointer;
-  }
+tr:hover{
+cursor:pointer;
+}
 
-  .tab{
-    padding-left: 2em;
-    background-color:yellow !important;
-  }
+.tab{
+padding-left: 2em;
+background-color:yellow !important;
+}
 
-  .tab2{
-    padding-left: 4em;
-  }
+.tab2{
+padding-left: 4em;
+}
 
-  #eventModal > label {
-    color: white;
-    font-weight: bold;
-    font-size: 1rem;
-  }
+#eventModal > label {
+color: white;
+font-weight: bold;
+font-size: 1rem;
+}
 
-  .all_blogs{
-    overflow-y: auto;
-    height:500px;
-  }
+.all_blogs{
+overflow-y: auto;
+height:500px;
+}
 
-  .jqtree-tree .jqtree-title {
-    margin: 5px;
-    font-size: 15px;
-    color: black !important;
-    /*Change the color here to change font color of tree*/
-  }
+.jqtree-tree .jqtree-title {
+margin: 5px;
+font-size: 15px;
+color: black !important;
+/*Change the color here to change font color of tree*/
+}
 
-  li.remove-dot{
-    list-style: none;
-  }
+li.remove-dot{
+list-style: none;
+}
 
-  .div-height {
-    margin-bottom: 0px !important;
-    height: 258px !important;
-  }
+.div-height {
+margin-bottom: 0px !important;
+height: 258px !important;
+}
 
-  .course-banner{
-    text-shadow: 2px 2px black !important;
-    background: none !important;
-  }
+.course-banner{
+text-shadow: 2px 2px black !important;
+background: none !important;
+}
 
-  #status{
-    width: 100% !important;
-  }
+#status{
+width: 100% !important;
+}
 {% endblock %}
 
 {% block head %}
@@ -89,19 +89,19 @@
 {% endblock %}
 
 {% block body_content %}
-  {% check_is_gstaff groupid request.user as is_gstaff %}
-  {% user_access_policy groupid request.user as user_access %}
-  {# {% get_course_session_status group_obj True as next_session_in_course %} #}
+{% check_is_gstaff groupid request.user as is_gstaff %}
+{% user_access_policy groupid request.user as user_access %}
+{# {% get_course_session_status group_obj True as next_session_in_course %} #}
 
-  <div id="eventModal" class="reveal-modal medium alert-box radius" data-reveal data-alert>
-    <label id="eventModalLabel"></label>
-    <a class="close-reveal-modal">&#215;</a>
-  </div>
-  <div class="course-page-opacity"></div>
+<div id="eventModal" class="reveal-modal medium alert-box radius" data-reveal data-alert>
+  <label id="eventModalLabel"></label>
+  <a class="close-reveal-modal">&#215;</a>
+</div>
+<div class="course-page-opacity"></div>
 
-  <div class="course-page">
+<div class="course-page">
 
-    <div class="container">
+  <div class="container">
 
 
 
@@ -109,29 +109,29 @@
     <div id="envelop-cover">
 
       <div class="medium-12 course-page-header">
-      <div class="row " >
-        <div class="course-header-background" style="background-color: #000080;">
-          {% include 'ndf/widget_photo_upload.html' with url_name='course_about' widget_for="group_banner" is_banner=True is_profile=False no_update_btn=True node=group_obj %}
-          <div class="course-header-background-layer"></div>
-        </div>
-        {% if is_gstaff %}
+        <div class="row " >
+          <div class="course-header-background" style="background-color: #000080;">
+            {% include 'ndf/widget_photo_upload.html' with url_name='course_about' widget_for="group_banner" is_banner=True is_profile=False no_update_btn=True node=group_obj %}
+            <div class="course-header-background-layer"></div>
+          </div>
+          {% if is_gstaff %}
           <div class="row" style="z-index: 2;">
-              <div class="course-settings">
-                <span data-dropdown="course-settings-drop" aria-controls="course-settings-drop" aria-expanded="false" class="tiny radius right">
-                  <i class="fi-widget"></i>
-                </span>
-                <span data-reveal-id="group_banner_prof_pic_prop" id="group_banner_btnUploadProfilePic" class="right">
-                  <i class="fi-photo"></i>
-                  <span style="position: relative;top: -3px;left: 2px;">Change image</span>
-                </span>
-                <ul id="course-settings-drop" class="f-dropdown" data-dropdown-content aria-hidden="true" tabindex="-1">
-                  {% with group_obj.member_of_names_list.0 as sg_type %}
-                    <li><a href="{% if sg_type != 'CourseEventGroup' %}{% url 'edit_event_group' groupid 'ProgramEventGroup' %}{% else %}{% url 'edit_event_group' groupid sg_type %}{% endif %}" class="tiny radius"><i class="fi-page-edit"></i> {% trans "Edit " %}{% if sg_type == "CourseEventGroup" %}{% trans "eCourse" %}{% else %}{% trans "Event" %}{% endif %}</a></li>
-                  <li><a class="tiny radius" href="{% url 'create_course_struct' group_id group_obj.pk %}"> <i class="fi-clipboard-notes"></i> 
+            <div class="course-settings">
+              <span data-dropdown="course-settings-drop" aria-controls="course-settings-drop" aria-expanded="false" class="tiny radius right">
+                <i class="fi-widget"></i>
+              </span>
+              <span data-reveal-id="group_banner_prof_pic_prop" id="group_banner_btnUploadProfilePic" class="right">
+                <i class="fi-photo"></i>
+                <span style="position: relative;top: -3px;left: 2px;">Change image</span>
+              </span>
+              <ul id="course-settings-drop" class="f-dropdown" data-dropdown-content aria-hidden="true" tabindex="-1">
+                {% with group_obj.member_of_names_list.0 as sg_type %}
+                <li><a href="{% if sg_type != 'CourseEventGroup' %}{% url 'edit_event_group' groupid 'ProgramEventGroup' %}{% else %}{% url 'edit_event_group' groupid sg_type %}{% endif %}" class="tiny radius"><i class="fi-page-edit"></i> {% trans "Edit " %}{% if sg_type == "CourseEventGroup" %}{% trans "eCourse" %}{% else %}{% trans "Event" %}{% endif %}</a></li>
+                <li><a class="tiny radius" href="{% url 'create_course_struct' group_id group_obj.pk %}"> <i class="fi-clipboard-notes"></i> 
                   {% if group_obj.collection_set %} 
-                    {% if sg_type == "CourseEventGroup" %} {% trans "Edit Course Structure" %}{% else %}{% trans "Edit Event Structure" %} {% endif %}
+                  {% if sg_type == "CourseEventGroup" %} {% trans "Edit Course Structure" %}{% else %}{% trans "Edit Event Structure" %} {% endif %}
                   {% else %}
-                     {% if sg_type == "CourseEventGroup" %} {% trans "Add Course Structure" %}{% else %}{% trans "Add Event Structure" %}  {% endif %}  
+                  {% if sg_type == "CourseEventGroup" %} {% trans "Add Course Structure" %}{% else %}{% trans "Add Event Structure" %}  {% endif %}  
                   {% endif %}</a></li>
                   {% comment %}
                   <li><a class="tiny radius settings" ><i class="fi-clock"></i> {% trans " Plan Release Dates" %}</a></li>
@@ -154,100 +154,100 @@
                   {% endwith %}
                 </ul>
               </div>
-          </div>
+            </div>
 
-        {% else %}
-          <div class="row" >
+            {% else %}
+            <div class="row" >
               <div class="small-2 course-settings">
                 {% if user_access == "allow" %}
-                  <a class="button radius small" disabled="disabled"> ENROLLED</a>
+                <a class="button radius small" disabled="disabled"> ENROLLED</a>
                 {% else %}
-                  {% if user.is_authenticated %}
-                    {% if allow_to_join == "Open" %}
-                      <a class="enroll-btn button radius small"> ENROLL</a>
-                    {% else %}
-                      <a class="button radius small" disabled="disabled"> Enrollment {{allow_to_join}} </a>
-                    {% endif %}
-                  {% else %}
-                      <a href="{% url 'auth_login' %}" class="button radius small" title="Please login to Enroll">ENROLL</a>
-                  {% endif %}
+                {% if user.is_authenticated %}
+                {% if allow_to_join == "Open" %}
+                <a class="enroll-btn button radius small"> ENROLL</a>
+                {% else %}
+                <a class="button radius small" disabled="disabled"> Enrollment {{allow_to_join}} </a>
+                {% endif %}
+                {% else %}
+                <a href="{% url 'auth_login' %}" class="button radius small" title="Please login to Enroll">ENROLL</a>
+                {% endif %}
                 {% endif %}
               </div>
-          </div>
-        {% endif %}
-
-
-        <div class="row">
-          <div class="columns small-3 small-centered course-title">
-            {% firstof group_obj.altnames group_obj.name  %}
-          </div>
-        </div>
-        {% comment %}
-
-        {% if request.user.is_authenticated %}
-        <div class="row">
-          <div class="columns small-3 small-centered">
-            <label>{{completed_count}} out of {{total_count}} modules completed</label>
-            <div class="progress success round">
-            <div class="meter" style="width: {{course_complete_percentage}}%"></div>
             </div>
-          </div>
-        </div>
-        {% endif %}
-        {% endcomment %}
+            {% endif %}
 
-        {% comment %}
-        {% if request.user.is_authenticated %}
+
+            <div class="row">
+              <div class="columns small-3 small-centered course-title">
+                {% firstof group_obj.altnames group_obj.name  %}
+              </div>
+            </div>
+            {% comment %}
+
+            {% if request.user.is_authenticated %}
+            <div class="row">
+              <div class="columns small-3 small-centered">
+                <label>{{completed_count}} out of {{total_count}} modules completed</label>
+                <div class="progress success round">
+                  <div class="meter" style="width: {{course_complete_percentage}}%"></div>
+                </div>
+              </div>
+            </div>
+            {% endif %}
+            {% endcomment %}
+
+            {% comment %}
+            {% if request.user.is_authenticated %}
           <!--div class="small-12 medium-4 columns">
             <label>{{completed_count}} out of {{total_count}} modules completed</label>
             <div class="progress success round">
             <div class="meter" style="width: {{course_complete_percentage}}%"></div>
             </div>
           </div-->
-        {% endif %}
-        {% endcomment %}
+          {% endif %}
+          {% endcomment %}
 
 
-        <div class="row" style="line-height: 0.7em;">
-          <ul class="tabs course-tabs show-for-medium-up"  style="background-color: #cccce6;">
+          <div class="row" style="line-height: 0.7em;">
+            <ul class="tabs course-tabs show-for-medium-up"  style="background-color: #cccce6;">
 
-            <li class="tab-title {% ifequal title 'about' %}active{% endifequal %}">
-              <a href="{% url 'course_about' group_id %}">
-                <i class="fa fa-eye"></i>
-                <span>{% trans "Overview" %}</span>
-              </a>
-            </li>
+              <li class="tab-title {% ifequal title 'about' %}active{% endifequal %}">
+                <a href="{% url 'course_about' group_id %}">
+                  <i class="fa fa-eye"></i>
+                  <span>{% trans "Overview" %}</span>
+                </a>
+              </li>
 
-            <li class="tab-title {% ifequal title 'course content' %}active{% endifequal %}">
-              <a href="{% url 'course_content' group_id %}">
-                <i class="fi-list-thumbnails"></i><span>{% trans "Course Content" %}</span>
-              </a>
-            </li>
+              <li class="tab-title {% ifequal title 'course content' %}active{% endifequal %}">
+                <a href="{% url 'course_content' group_id %}">
+                  <i class="fi-list-thumbnails"></i><span>{% trans "Course Content" %}</span>
+                </a>
+              </li>
 
-            <li class="tab-title {% ifequal title 'raw material' %}active{% endifequal %}">
-              <a href="{% url 'course_raw_material' group_id %}">
-                <i class="fi-paint-bucket "></i><span>{% trans "Raw Material" %}</span>
-              </a>
-            </li>
+              <li class="tab-title {% ifequal title 'raw material' %}active{% endifequal %}">
+                <a href="{% url 'course_raw_material' group_id %}">
+                  <i class="fi-paint-bucket "></i><span>{% trans "Raw Material" %}</span>
+                </a>
+              </li>
 
-            <li class="tab-title {% ifequal title 'notebook' %}active{% endifequal %}">
-              <a href="{% url 'course_notebook' group_id %}">
-                <i class="fi-book "></i><span>{% trans "Notebook" %}</span>
-              </a>
-            </li>
+              <li class="tab-title {% ifequal title 'notebook' %}active{% endifequal %}">
+                <a href="{% url 'course_notebook' group_id %}">
+                  <i class="fi-book "></i><span>{% trans "Notebook" %}</span>
+                </a>
+              </li>
 
-            <li class="tab-title {% ifequal title 'gallery' %}active{% endifequal %}">
-              <a href="{% url 'course_gallery' group_id %}">
-                <i class="fi-photo "></i> <span>{% trans "Gallery" %}</span>
-              </a>
-            </li>
-            {% if 'CourseEventGroup' in group_obj.member_of_names_list and request.user.is_superuser %}
+              <li class="tab-title {% ifequal title 'gallery' %}active{% endifequal %}">
+                <a href="{% url 'course_gallery' group_id %}">
+                  <i class="fi-photo "></i> <span>{% trans "Gallery" %}</span>
+                </a>
+              </li>
+              {% if 'CourseEventGroup' in group_obj.member_of_names_list and request.user.is_superuser %}
               <li class="tab-title {% ifequal title 'course_quiz_data' %}active{% endifequal %}">
                 <a href="{% url 'course_quiz_data' group_id %}">
                   <i class="fi-photo "></i> <span>{% trans "Quiz" %}</span>
                 </a>
               </li>
-            {% endif %}
+              {% endif %}
 
             <!--
             <li class="tab-title {% ifequal title 'dashboard' %}active{% endifequal %}">
@@ -255,11 +255,11 @@
                 <i class="fi-clipboard-notes"></i>{% trans "Dashboard" %}
               </a>
             </li>
-             -->
-          </ul>
-        </div>
+          -->
+        </ul>
       </div>
-      </div>
+    </div>
+  </div>
       <!--div class="row collapse meta">
         <div class="key">Starts on</div>
         <div class="value">
@@ -280,50 +280,50 @@
       </div>
       {% endif %}
       {% endcomment %}
-      </div>
+    </div>
 
 
 
     <!-- Tabs -->
     <div id="envelop-content" >
       <div class="row">
-      <!-- Envelop box-->
-      <div class="small-12 large-12 columns">
-        <div class="row show-for-small-only">
-          <div class="large-12 columns">
-            <label>
-              <select id="selectCourseTab">
-                <option value="about_course" {% ifequal title 'about' %}selected{% endifequal %}>{% trans "About the course" %}</option>
-                <option value="course_content" {% ifequal title 'course content' %}selected{% endifequal %}>{% trans "Course Content" %}</option>
-                <option value="raw_material" {% ifequal title 'raw material' %}selected{% endifequal %}>{% trans "Raw Material" %}g</option>
-                <option value="notebook" {% ifequal title 'notebook' %}selected{% endifequal %}>{% trans "Notebook" %}</option>
-                <option value="gallery" {% ifequal title 'gallery' %}selected{% endifequal %}>{% trans "Gallery" %}</option>
-              </select>
-            </label>
+        <!-- Envelop box-->
+        <div class="small-12 large-12 columns">
+          <div class="row show-for-small-only">
+            <div class="large-12 columns">
+              <label>
+                <select id="selectCourseTab">
+                  <option value="about_course" {% ifequal title 'about' %}selected{% endifequal %}>{% trans "About the course" %}</option>
+                  <option value="course_content" {% ifequal title 'course content' %}selected{% endifequal %}>{% trans "Course Content" %}</option>
+                  <option value="raw_material" {% ifequal title 'raw material' %}selected{% endifequal %}>{% trans "Raw Material" %}g</option>
+                  <option value="notebook" {% ifequal title 'notebook' %}selected{% endifequal %}>{% trans "Notebook" %}</option>
+                  <option value="gallery" {% ifequal title 'gallery' %}selected{% endifequal %}>{% trans "Gallery" %}</option>
+                </select>
+              </label>
+            </div>
           </div>
-        </div>
-        <!-- Load tab contents dynamically -->
-        <div class="tabs-content course-book">
-          <div class="content active" id="course-dashboard">
-            {% if title == 'dashboard' %}
+          <!-- Load tab contents dynamically -->
+          <div class="tabs-content course-book">
+            <div class="content active" id="course-dashboard">
+              {% if title == 'dashboard' %}
               {% include "ndf/gcourseDashboard.html" %}
 
-            {% elif title == 'course content' %}
+              {% elif title == 'course content' %}
               {% include "ndf/gcollection_ajax_view.html" %}
 
-            {% elif title == 'notebook' %}
+              {% elif title == 'notebook' %}
               {% include "ndf/gnotebook.html" %}
 
-            {% elif title == 'gallery' %}
+              {% elif title == 'gallery' %}
               {% include "ndf/ggallerypage.html" with file_detail_url='course_gallery_detail' redirect_tab_url='course_gallery' %}
 
-            {% elif title == 'raw material' %}
+              {% elif title == 'raw material' %}
               {% include "ndf/ggallerypage.html" with file_detail_url='course_raw_material_detail' redirect_tab_url='course_raw_material'%}
 
-            {% elif title == 'course_quiz_data' %}
+              {% elif title == 'course_quiz_data' %}
               {% include "ndf/course_quiz_data.html" %}
 
-            {% elif title == 'about' %}
+              {% elif title == 'about' %}
               {% include "ndf/course_about.html" %}
               {% comment %}
               <div class="row collapse">
@@ -341,43 +341,44 @@
                 </div-->
               </div>
               {% endcomment %}
-            {% endif %}
+              {% endif %}
+            </div>
           </div>
+          <!-- tab-content ends here -->
         </div>
-        <!-- tab-content ends here -->
       </div>
-      </div>
-      </div>
-      {% if title == "gallery" %}
-          {% include 'ndf/pagination.html' with urlname="course_gallery_paged" first_arg=group_name_tag page_info=gallery_page_info %}
-        {% elif title == "raw material" %}
-          {% include 'ndf/pagination.html' with urlname="course_raw_material_paged" first_arg=group_name_tag    page_info=raw_material_page_info %}
-        {% endif  %}
     </div>
+    {% if title == "gallery" %}
+    {% include 'ndf/pagination.html' with urlname="course_gallery_paged" first_arg=group_name_tag page_info=gallery_page_info %}
+    {% elif title == "raw material" %}
+    {% include 'ndf/pagination.html' with urlname="course_raw_material_paged" first_arg=group_name_tag    page_info=raw_material_page_info %}
+    {% endif  %}
   </div>
+</div>
+
 <script type="text/javascript">
   $(function() {
     $("#selectCourseTab").on('change', function() {
-        switch($(this).val()) {
-          case 'about_course':
-            window.location="{% url 'course_about' group_id %}"
-          break;
-          case 'course_content':
-            window.location="{% url 'course_content' group_id %}"
-          break;
-          case 'raw_material':
-            window.location="{% url 'course_raw_material' group_id %}"
-          break;
-          case 'notebook':
-            window.location="{% url 'course_notebook' group_id %}"
-          break;
-          case 'gallery':
-            window.location="{% url 'course_gallery' group_id %}"
-          break;
-          case 'dashboard':
-            window.location="{% url 'course_dashboard' group_id %}"
-          break;
-        }
+      switch($(this).val()) {
+        case 'about_course':
+        window.location="{% url 'course_about' group_id %}"
+        break;
+        case 'course_content':
+        window.location="{% url 'course_content' group_id %}"
+        break;
+        case 'raw_material':
+        window.location="{% url 'course_raw_material' group_id %}"
+        break;
+        case 'notebook':
+        window.location="{% url 'course_notebook' group_id %}"
+        break;
+        case 'gallery':
+        window.location="{% url 'course_gallery' group_id %}"
+        break;
+        case 'dashboard':
+        window.location="{% url 'course_dashboard' group_id %}"
+        break;
+      }
     })
   })
 </script>
@@ -385,71 +386,71 @@
 
 
 {% block script %}
-  {{block.super}}
+{{block.super}}
 
-  $(document).on('click','.enroll-btn',function(){
-    //trigger the ajax call to enroll
-    $.ajax({
-      url: "{% url 'enroll_to_course' group_id %}",
+$(document).on('click','.enroll-btn',function(){
+//trigger the ajax call to enroll
+$.ajax({
+url: "{% url 'enroll_to_course' group_id %}",
 
-      data: {
-        'csrfmiddlewaretoken': "{{csrf_token}}"
-      },
+data: {
+'csrfmiddlewaretoken': "{{csrf_token}}"
+},
 
-      type: "POST",
+type: "POST",
 
-      dataType: "json",
+dataType: "json",
 
-      success: function(data){
-        success_state = data["success"]
-        if(success_state){
-        $(".enroll-btn").attr('value', 'ENROLLED')
-        $(".enroll-btn").attr("disabled","disabled")
-        location.reload();
-        }
-      },
-    });//end of ajax
+success: function(data){
+success_state = data["success"]
+if(success_state){
+$(".enroll-btn").attr('value', 'ENROLLED')
+$(".enroll-btn").attr("disabled","disabled")
+location.reload();
+}
+},
+});//end of ajax
+})
+
+// <script type="text/javascript">
+
+$(document).on("change", ".date_month_day_year", function(){
+  $(".save_date").attr("disabled",false);
+})
+
+$(document).on('click','.save_date',function(){
+  $.each(all_css_js_var,function(index,css_dict){
+    if($(".date_val_"+css_dict['id']).val()){
+      css_dict['start_time'] = $(".date_val_"+css_dict['id']).val()
+    }
+    else{
+      css_dict['start_time'] = null;
+    }
   })
+  $.ajax({
+    url: "{% url 'set_release_date_css' group_obj.pk %}",
 
-  // <script type="text/javascript">
+    data: {
+      'css_date_dict':JSON.stringify(all_css_js_var),
+      'csrfmiddlewaretoken': "{{csrf_token}}"
+    },
 
-  $(document).on("change", ".date_month_day_year", function(){
-    $(".save_date").attr("disabled",false);
-  })
+    type: "POST",
 
-  $(document).on('click','.save_date',function(){
-    $.each(all_css_js_var,function(index,css_dict){
-      if($(".date_val_"+css_dict['id']).val()){
-        css_dict['start_time'] = $(".date_val_"+css_dict['id']).val()
+    dataType: "json",
+
+    success: function(data){
+      success_state = data["success"]
+      $("#eventModalLabel").text(data["message"]);
+      if(success_state){
+        $("#eventModal").addClass("success");
       }
       else{
-        css_dict['start_time'] = null;
+        $("#eventModal").addClass("warning");
       }
-    })
-    $.ajax({
-      url: "{% url 'set_release_date_css' group_obj.pk %}",
-
-      data: {
-        'css_date_dict':JSON.stringify(all_css_js_var),
-        'csrfmiddlewaretoken': "{{csrf_token}}"
-      },
-
-      type: "POST",
-
-      dataType: "json",
-
-      success: function(data){
-          success_state = data["success"]
-          $("#eventModalLabel").text(data["message"]);
-          if(success_state){
-            $("#eventModal").addClass("success");
-          }
-          else{
-            $("#eventModal").addClass("warning");
-          }
-          $("#eventModal").foundation('reveal', 'open');
-          location.reload();
-      },
+      $("#eventModal").foundation('reveal', 'open');
+      location.reload();
+    },
     });//end of ajax
     // console.log(JSON.stringify(all_css_js_var))
   })
@@ -464,8 +465,8 @@
     // Reset reveal-modal content & it's setting
     $("#eventModalLabel").text("<p>Please select course type.</p>");
     $("#eventModal")
-      .removeClass("success").removeClass("warning").removeClass("alert").removeClass("small")
-      .addClass("medium")
+    .removeClass("success").removeClass("warning").removeClass("alert").removeClass("small")
+    .addClass("medium")
   });
 
   $(".date_month_day_year").datepicker({
@@ -493,10 +494,10 @@
       var reader = new FileReader();
       reader.onload = function (e) {
         $('#img_preview')
-          .attr('src', e.target.result)
-          .width(150)
-          .height(200)
-          .removeClass("hide");
+        .attr('src', e.target.result)
+        .width(150)
+        .height(200)
+        .removeClass("hide");
       };
       reader.readAsDataURL(this.files[0]);
       $('#file_preview').addClass("hide")
@@ -504,9 +505,9 @@
     else{
       $('#img_preview').addClass("hide")
       $('#file_preview')
-        .text(file_name)
-        .removeClass("hide");
-        $(".upload-btn").css("display","block")
+      .text(file_name)
+      .removeClass("hide");
+      $(".upload-btn").css("display","block")
     }
     /*
     file_mime_type = this.files[0].type;
@@ -544,5 +545,5 @@
     }
   });
 
-// </script>
-{% endblock %}
+  // </script>
+  {% endblock %}
