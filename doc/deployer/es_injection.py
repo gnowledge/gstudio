@@ -151,7 +151,7 @@ def main():
             if (index.lower() == "triples"):
                 res = es.indices.create(index=index.lower(), body=triples_body)
             else:
-                res = es.indices.create(index=index.lower(), body=req_body)
+                res = es.indices.create(index=index.lower(), body=request_body)
 
         if (es.indices.exists(index.lower())):
 
