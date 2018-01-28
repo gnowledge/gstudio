@@ -31,7 +31,7 @@ urlpatterns = patterns('',
 
     # gstudio admin url's
     (r'^admin/', include('gnowsys_ndf.ndf.urls.gstudio_admin')),
-    (r'^api/v1', include('gnowsys_ndf.ndf.urls.api')),
+    #(r'^api/v1', include('gnowsys_ndf.ndf.urls.api')),
 
     # --mobwrite-- commented for time being
     # (r'^raw/(?P<name>.+)/', 'gnowsys_ndf.mobwrite.views.raw'),
