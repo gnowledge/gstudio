@@ -13,6 +13,7 @@
 {% get_gstudio_workspace_instance as is_workspace_instance %}
 
 <div class="mydesk_page">
+
   <div class="page_banner">
     <div class="banner_overlay"></div>
     <div class="banner_profile">
@@ -32,13 +33,22 @@
   <div class="page_menu">
     <ul class="nav_menu_1">
       <li>
-        <a href="{% url 'my_desk' request.user.id  %}" {% if title == "my desk" %} class="selected" {% endif %}> {% if  is_workspace_instance %} {% trans "My Workspaces" %} {% else %} <i class="fi-book-bookmark" style="font-size:20px;"></i> {% trans "My Courses" %} {% endif %} </a>
+
+        {% if site.SITE_NAME == "NROER" %}
+          <a href="{% url 'my_desk' request.user.id  %}" {% if title == "my desk" %} class="selected" {% endif %}><i class="fi-book-bookmark" style="font-size:20px;"></i> {% trans "My Workspaces" %}</a>
+
+        {% else %}
+          <a href="{% url 'my_desk' request.user.id  %}" {% if title == "my desk" %} class="selected" {% endif %}> {% if  is_workspace_instance %} {% trans "My Workspaces" %} {% else %} <i class="fi-book-bookmark" style="font-size:20px;"></i> {% trans "My Courses" %} {% endif %} </a>
+        {% endif %}
       </li>
 
+
+     {# <li class=""><a {% if title == "my workspace" %} class="selected" {% endif %} href="{% url 'course_about' request.user.username  %}">{% trans "My WorkSpace" %}</a> </li> #} 
       <li class=""><a {% if title == "my performance" %} class="selected" {% endif %} href="{% url 'my_performance' request.user.id  %}"> <i class="fa fa-line-chart" aria-hidden="true"></i> {% trans "My Performance" %}</a> </li>
 
     </ul>
   </div>
+
 
   <ul class="small-block-grid-1 medium-block-grid-2 large-block-grid-2" >
     {% comment %}
@@ -55,21 +65,52 @@
 {% endcomment %}
 </br>
 <div class="small-12 columns group_sections_content">
-  {% if title == "my desk" %}
-  <div class="small-12 columns lms_explore_back_unit">
-    <ul class="small-block-grid-1 medium-block-grid-3 large-block-grid-3">
-      {% for each_obj in units_cur %}
-      <li class="card-image-wrapper">
-        {% include "ndf/card_group.html" with node=each_obj url_name="groupchange" first_arg=each_obj.pk no_enroll=True %}
-      </li>
-      {% empty %}
-      <section class="empty-dashboard-message">
-        <p>You are not enrolled in any course!</p>
-          <a class="button-explore-courses" href="{% url 'explore_courses' %}"> <i class="fa fa-binoculars" aria-hidden="true"></i>  Explore</a>
-      </section>
-      {% endfor %}
-    </ul>
-  </div>
+  {% if site.SITE_NAME == "NROER" %}
+    {% if title == "my desk" %}
+        <div class="row">
+          <h3>Workspace</h3>
+            <ul class="small-block-grid-1 medium-block-grid-3 large-block-grid-3">
+              <li class="card-image-wrapper">
+                {% include "ndf/card_group.html" with node=node url_name="course_about" first_arg=node.pk  no_enroll=True %}
+              </li>
+            </ul>
+        </div>
+        <hr/>
+        <div class="row">
+          <h3>workspaces & Enrolled Courses</h3>
+        </div>
+        <div class="small-12 columns lms_explore_back_unit">
+          <ul class="small-block-grid-1 medium-block-grid-3 large-block-grid-3">
+            {% for each_obj in units_cur %}
+            <li class="card-image-wrapper">
+              {% include "ndf/card_group.html" with node=each_obj url_name="groupchange" first_arg=each_obj.pk no_enroll=True %}
+            </li>
+            {% empty %}
+            <section class="empty-dashboard-message">
+              <p>You are not enrolled in any course!</p>
+                <a class="button-explore-courses" href="{% url 'explore_courses' %}"> <i class="fa fa-binoculars" aria-hidden="true"></i>  Explore</a>
+            </section>
+            {% endfor %}
+          </ul>
+        </div>
+    {% endif %}
+  {% else %}
+    {% if title == "my desk" %}
+      <div class="small-12 columns lms_explore_back_unit">
+        <ul class="small-block-grid-1 medium-block-grid-3 large-block-grid-3">
+          {% for each_obj in units_cur %}
+          <li class="card-image-wrapper">
+            {% include "ndf/card_group.html" with node=each_obj url_name="groupchange" first_arg=each_obj.pk no_enroll=True %}
+          </li>
+          {% empty %}
+          <section class="empty-dashboard-message">
+            <p>You are not enrolled in any course!</p>
+              <a class="button-explore-courses" href="{% url 'explore_courses' %}"> <i class="fa fa-binoculars" aria-hidden="true"></i>  Explore</a>
+          </section>
+          {% endfor %}
+        </ul>
+      </div>
+    {% endif %}
   {% endif %}
 </div>
 

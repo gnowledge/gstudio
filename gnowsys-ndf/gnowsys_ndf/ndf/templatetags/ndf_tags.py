@@ -37,7 +37,8 @@ from django.core.cache import cache
 from mongokit import IS
 
 ''' -- imports from application folders/files -- '''
-from gnowsys_ndf.settings import GAPPS as setting_gapps, GSTUDIO_DEFAULT_GAPPS_LIST, META_TYPE, CREATE_GROUP_VISIBILITY, GSTUDIO_SITE_DEFAULT_LANGUAGE,GSTUDIO_DEFAULT_EXPLORE_URL,GSTUDIO_EDIT_LMS_COURSE_STRUCTURE,GSTUDIO_WORKSPACE_INSTANCE
+from gnowsys_ndf.settings import GAPPS as setting_gapps, GSTUDIO_DEFAULT_GAPPS_LIST, META_TYPE, CREATE_GROUP_VISIBILITY, GSTUDIO_SITE_DEFAULT_LANGUAGE,GSTUDIO_DEFAULT_EXPLORE_URL,GSTUDIO_EDIT_LMS_COURSE_STRUCTURE,GSTUDIO_WORKSPACE_INSTANCE,GSTUDIO_SITE_LANDING_PAGE_LOGO,GSTUDIO_SITE_LANDING_PAGE_TEXT, GSTUDIO_SITE_LANDING_PAGE_BG, GSTUDIO_SITE_LOGIN_PAGE_LOGO,GSTUDIO_FOOTER_LINKS
+
 # from gnowsys_ndf.settings import GSTUDIO_SITE_LOGO,GSTUDIO_COPYRIGHT,GSTUDIO_GIT_REPO,GSTUDIO_SITE_PRIVACY_POLICY, GSTUDIO_SITE_TERMS_OF_SERVICE,GSTUDIO_ORG_NAME,GSTUDIO_SITE_ABOUT,GSTUDIO_SITE_POWEREDBY,GSTUDIO_SITE_PARTNERS,GSTUDIO_SITE_GROUPS,GSTUDIO_SITE_CONTACT,GSTUDIO_ORG_LOGO,GSTUDIO_SITE_CONTRIBUTE,GSTUDIO_SITE_VIDEO,GSTUDIO_SITE_LANDING_PAGE
 from gnowsys_ndf.settings import *
 try:
@@ -1066,7 +1067,7 @@ def get_nroer_menu(request, group_name):
 				break
 
 		# print "selected_gapp : ", selected_gapp
-	if (selected_gapp == "partner") and (len(url_split) > 2) and (url_split[2] in ["Partners", "Groups"]):
+	if (selected_gapp == "partner") and (len(url_split) > 2) and (url_split[2] in ["Partners", "Workspaces"]):
 		top_menu_selected = url_split[2]
 
 	mapping = GSTUDIO_NROER_MENU_MAPPINGS
@@ -1083,7 +1084,7 @@ def get_nroer_menu(request, group_name):
 		# with help of sub_menu_selected get it's parent from GSTUDIO_NROER_MENU
 		top_menu_selected = [i.keys()[0] for i in GSTUDIO_NROER_MENU[1:] if sub_menu_selected in i.values()[0]][0]
 		# for Partners, "Curated Zone" should not appear
-		gapps = gapps[1:] if (top_menu_selected in ["Partners", "Groups"]) else gapps
+		gapps = gapps[1:] if (top_menu_selected in ["Partners", "Workspaces"]) else gapps
 
 	elif (len(url_split) >= 3) and ("nroer_groups" in url_split) and (url_split[2] in [i.keys()[0] for i in GSTUDIO_NROER_MENU[1:]]):
 		# print "top_menu_selected ", top_menu_selected
@@ -1094,7 +1095,7 @@ def get_nroer_menu(request, group_name):
 	nroer_menu_dict["gapps"] = gapps
 	nroer_menu_dict["top_menu_selected"] = top_menu_selected
 	nroer_menu_dict["mapping"] = mapping
-	nroer_menu_dict["top_menus"] = GSTUDIO_NROER_MENU[1:]
+	nroer_menu_dict["top_menus"] = GSTUDIO_NROER_MENU[1:2]
 
 	# print "nroer_menu_dict : ", nroer_menu_dict
 	return nroer_menu_dict
@@ -1534,6 +1535,10 @@ def get_url(groupid):
 			return 'show'
 		elif type_name.name == 'Task' or type_name.name == 'task_update_history':
 			return 'task_details'
+		elif type_name.name == 'Topic':
+			return 'topic_details'
+		elif type_name.name == 'Asset':
+			return 'asset_details'
 		elif type_name.name == 'File':
 			if (node.if_file.mime_type) == ("application/octet-stream"):
 				return 'video_detail'
@@ -4119,6 +4124,22 @@ def get_default_discussion_lbl():
 @register.assignment_tag
 def get_gstudio_workspace_instance():
 	return GSTUDIO_WORKSPACE_INSTANCE
+@register.assignment_tag
+def get_gstudio_landing_page_logo():
+	return GSTUDIO_SITE_LANDING_PAGE_LOGO
+@register.assignment_tag
+def get_gstudio_landing_page_text():
+	return GSTUDIO_SITE_LANDING_PAGE_TEXT
+@register.assignment_tag
+def get_gstudio_landing_page_bg():
+	return GSTUDIO_SITE_LANDING_PAGE_BG
+@register.assignment_tag
+def get_gstudio_login_page_logo():
+	return GSTUDIO_SITE_LOGIN_PAGE_LOGO
+
+@register.assignment_tag
+def get_gstudio_footer_links():
+	return GSTUDIO_FOOTER_LINKS
 
 @register.assignment_tag
 def get_topic_nodes(node_id):
@@ -4215,6 +4236,7 @@ def get_module_enrollment_status(request, module_obj):
 @get_execution_time
 @register.filter
 def get_unicode_lang(lang_code):
+
     try:
         return get_language_tuple(lang_code)[1]
     except Exception as e:

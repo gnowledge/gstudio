@@ -15,6 +15,8 @@
 </style>
 {% endblock %}
 
+{% block body_content %}
+{% get_list_of_fields activity_node.type_of "name" as type_of_list %}
 <!-- Handles Activity page detail and listing -->
 {% if activity_node and not editor_view %}
     <div class="activity-detail-page">
@@ -38,7 +40,7 @@
                 <li><a href="{% url 'edit_course_page' group_id activity_node.pk %}">{% trans "Edit" %}</a></li>
                 <li><a title="Edit Content" class="edit_res_unit">{% trans " Edit Content" %}</a></li>
                 <li><a title="Edit Interaction Settings" class="edit-interaction">{% trans "Interaction Settings" %}</a></li>
-                {% if not activity_node.type_of %}
+                {% if  "Info page" not in  type_of_list %}
                   <li><a title="add admin page" class="add-admin-page">{% trans "Link Teacher's page" %}</a></li>
                   <li><a title="add help page" class="add-help-page">{% trans "Link Help page" %}</a></li>
                 {% endif %}
@@ -123,7 +125,7 @@
 
 {% endif %}
 {% include 'ndf/pagination.html' with urlname="course_pages_paged" first_arg=group_id page_info=course_pages_info  %}
-
+{% endblock %}
 <script type="text/javascript">
     $(".delete-activity").click(function(){
         var checked = $('.select-chkbox:checked').length;

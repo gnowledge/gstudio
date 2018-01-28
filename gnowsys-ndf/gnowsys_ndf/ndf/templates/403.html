@@ -8,19 +8,18 @@
 	<h2>Permission Denied!</h2>
 	<br/>
 	<h4>
-		<small>
 			{% if site.SITE_NAME == "NROER" %}
+				<small>
 				Please check the URL or navigate back to:
 				<blockquote>
 					<a href="{% url 'repository' 'home' %}"> Repository </a> | 
 					<a href="{% url 'nroer_groups' 'home' 'Partners' %}"> Partners </a> | 
 					<a href="{% url 'nroer_groups' 'home' 'Groups' %}"> Groups </a>
 				</blockquote>
+				</small>
 			{% else %}
-				You do not have permission to retrieve the URL or link you requested.<br/>
-				Please check the URL or head to the 
-				<a href="/home/"> <i class="fi-home"> </i> homepage</a>.
+				You do not have permission to access the link/URL you requested.<br/>
+				<a href="javascript:history.back()">Go back</a> or visit our <a href="{% url 'landing_page' %}">homepage</a>
 			{% endif %}
-		</small>
 	</h4>
 {% endblock %}

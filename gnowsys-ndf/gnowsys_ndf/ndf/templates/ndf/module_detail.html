@@ -6,14 +6,18 @@
 
 {% block body_content %}
 {% check_is_gstaff group_id request.user as is_gstaff %}
-
-{% include 'ndf/explore_secondary_header.html' %}
+    
+{% if site.SITE_NAME != "NROER" %}
+	{% include 'ndf/explore_secondary_header.html' %}
+{% endif %}
 <div class="medium-12 columns">
+
 	<div class="medium-2 columns thumbnail_style">
 	{% include 'ndf/widget_photo_upload.html' with url_name='module_detail' widget_for="group_banner" is_banner=True  no_update_btn=True node=node  groupid=group_id if_module=True %}
 	</div>
 
 		<div class="small-10 columns title-strip strip">
+
 			<div class="small-11 columns">
 				<h7 class="text-button-blue">{% trans "Showing all Units in" %}</h7>{{node.name}} <br/>
 				<h7 class="text-button-blue">{% trans "Module Description:" %}</h7>{{node.content|safe}}
@@ -27,6 +31,10 @@
 		            <ul id="course-settings-drop" class="f-dropdown" data-dropdown-content aria-hidden="true" tabindex="-1" >
 		                <li>
 									<a  class="buddy_margin right edit_button dropdown-settings" href="{% url 'module_edit' group_id node.pk %}" style="margin-top:0px;margin-right:0px;text-transform:none;width:100%;"><i class="fa fa-pencil"></i> {% trans "Edit" %}</a>
+						</li>
+						<li>
+							<a href="{% url 'create_group' node.pk %}?subgroup=True" class="tiny button radius left-btn" title="Create New Sub Group">{% trans "New SubGroup" %}</a>
+
 						</li>
 						<li>
 									{% if node.collection_set %}
