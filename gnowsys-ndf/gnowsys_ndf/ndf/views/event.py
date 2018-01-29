@@ -99,8 +99,15 @@ def event(request, group_id):
     start_date_new_val = '-'.join(start_reverse_date_val)
     
     end_date_new_val = '-'.join(end_reverse_date_val)
+
+    parts = [ '/', str(group_id), 'gtask', str(each._id)]
+    # print parts
+    conparts = '/'.join([x.strip('/') for x in parts])
+
+    # print conparts
+    # eventurl = url_path_join(*parts)
     
-    event_list.append({"title":str(each.name), "start":str(start_date_new_val), "end":str(end_date_new_val), "priority": str(priority_val)})
+    event_list.append({"title":str(each.name), "start":str(start_date_new_val), "end":str(end_date_new_val), "priority": str(priority_val), "url":str(conparts)})
 
 
   for each in asset_nodes:
