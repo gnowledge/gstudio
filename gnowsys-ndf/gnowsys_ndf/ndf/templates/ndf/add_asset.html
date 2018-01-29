@@ -46,7 +46,7 @@
                     </span>
                     <ul id="asset-settings-drop" class="f-dropdown" data-dropdown-content aria-hidden="true" tabindex="-1">
                         <li> <a class="createAsset" data-asset_id='{{asset_obj.pk}}'>{% trans "Edit" %}</a></li>
-                        <li><a class="edit-metadata">{% trans "Metadata" %}</a></li>
+                        
                         <li>
                         {% if not asset_content_list.grel_id %}
                             <a class="delete-asset">
@@ -64,6 +64,14 @@
                 {% endif %}
             {% endif%}
 
+            {% if not edit and asset_obj %}
+                {% if asset_obj.created_by == request.user.id or is_gstaff  %}
+                    <button class="edit-metadata orange-button">{% trans " Add Metadata" %}</button>
+                {% else %}
+                    <button class="view-metadata orange-button">{% trans " View Metadata" %}</button>
+                {% endif %}
+            {% endif %}
+            
             {% if request.user.is_authenticated  %}
                 <button type="button" class="orange-button add-asset-content"><i class="fi-plus"></i> {% trans "Add File" %}</button>
                 <button type="button" class="orange-button" href="{% url 'create_edit_asset_page' group_id asset_obj.pk %}"><i class="fi-plus"></i> {% trans "Add  page" %}</button>
@@ -583,6 +591,27 @@ $( ".edit-metadata" ).click(function(event) {
               success: function(data) {
               $('#addAsset').foundation('reveal', 'open');
               $('#addAsset').html(data);
+
+            }
+        });
+})
+
+$( ".view-metadata" ).click(function(event) {
+    $.ajax({
+              type: "POST",
+              data:{
+                    'csrfmiddlewaretoken': "{{csrf_token}}",
+                    "node_id":'{{asset_obj}}',
+                },
+              url: "{% url 'get_metadata_page' group_id  %}",
+              datatype: "html",
+              success: function(data) {
+              $('#addAsset').foundation('reveal', 'open');
+              $('#addAsset').html(data);
+              $('select').attr('disabled', "True");
+              $('input').attr('readonly', 'readonly');
+              $(':input[type="submit"]').hide();
+              
             }
         });
 })
