@@ -2,29 +2,28 @@
 {% load ndf_tags %}
 
 {% block body_content %}
-  
-  <script type="text/javascript" src="/static/ndf/bower_components/jquery-ui/jquery-ui.min.js"></script> <!-- checked -->
-  <script type="text/javascript" src="/static/ndf/bower_components/foundation-datepicker/js/foundation-datepicker.js"></script> <!-- checked -->
-  <link rel="stylesheet" type="text/css" href="/static/ndf/bower_components/foundation-datepicker/stylesheets/foundation-datepicker.css"> <!-- checked -->
-  <link rel="stylesheet" type="text/css" href="/static/ndf/bower_components/jquery-ui/themes/smoothness/jquery-ui.min.css"> <!-- checked -->
 
-  <script src="/static/ndf/bower_components/jquery-ui/jquery-ui.js"></script> <!-- checked -->
-  <script src="/static/ndf/bower_components/jqueryui-timepicker-addon/dist/jquery-ui-timepicker-addon.min.js"></script> <!-- checked -->
-  <script src="/static/ndf/bower_components/jqueryui-timepicker-addon/dist/jquery-ui-sliderAccess.js"></script> <!-- checked -->
-  <link rel="stylesheet" href="/static/ndf/bower_components/jqueryui-timepicker-addon/dist/jquery-ui-timepicker-addon.css"> <!-- checked -->
-  <link rel="stylesheet" type="text/css" href="/static/ndf/bower_components/jquery-ui/themes/smoothness/jquery-ui.css"> <!-- checked -->
+<script type="text/javascript" src="/static/ndf/bower_components/jquery-ui/jquery-ui.min.js"></script> <!-- checked -->
+<script type="text/javascript" src="/static/ndf/bower_components/foundation-datepicker/js/foundation-datepicker.js"></script> <!-- checked -->
+<link rel="stylesheet" type="text/css" href="/static/ndf/bower_components/foundation-datepicker/stylesheets/foundation-datepicker.css"> <!-- checked -->
+<link rel="stylesheet" type="text/css" href="/static/ndf/bower_components/jquery-ui/themes/smoothness/jquery-ui.min.css"> <!-- checked -->
+<script src="/static/ndf/bower_components/jquery-ui/jquery-ui.js"></script> <!-- checked -->
+<script src="/static/ndf/bower_components/jqueryui-timepicker-addon/dist/jquery-ui-timepicker-addon.min.js"></script> <!-- checked -->
+<script src="/static/ndf/bower_components/jqueryui-timepicker-addon/dist/jquery-ui-sliderAccess.js"></script> <!-- checked -->
+<link rel="stylesheet" href="/static/ndf/bower_components/jqueryui-timepicker-addon/dist/jquery-ui-timepicker-addon.css"> <!-- checked -->
+<link rel="stylesheet" type="text/css" href="/static/ndf/bower_components/jquery-ui/themes/smoothness/jquery-ui.css"> <!-- checked -->
 <style type="text/css">
 
 
   .create-new-task{
-      width: 60%;
-      margin-left: 17%;
-      border-left: 2px solid gray;
-      height: 460px;
-      border-bottom: 2px solid gray;
-      border-right: 2px solid gray;
-      border-top: 2px solid gray;
-      margin-top: 5px;
+    width: 60%;
+    margin-left: 17%;
+    border-left: 2px solid gray;
+    height: 460px;
+    border-bottom: 2px solid gray;
+    border-right: 2px solid gray;
+    border-top: 2px solid gray;
+    margin-top: 5px;
   }
 
 
@@ -45,28 +44,162 @@
     border-color: black;
     float: right;
     background-color: gray;
-}
-input[type="file"] {
+  }
+  input[type="file"] {
     padding: 5px;
     margin-top: 10px;
     margin-left: 30.4px;
     border-radius: 4px;
     border: 1px solid #ccc;
     width: 95%;
-}
-.vl {
+  }
+  .vl {
     border-left: 1px solid gray;
     height: 300px;
-}
+  }
+
 
 </style>
 
-<div class="create-new-task">
-    <div class="small-11 columns">
-      <h4> New Task </h4>
+<div class="create-new-task create-task-event-tabs">
+  <div class="small-11 columns">
+   <ul class="tabs" data-tab role="tablist">
+    <li class="tab-title  active" role="presentation"><a href="#create_new_event" role="tab" tabindex="0" aria-selected="false" aria-controls="panel2-1" checked>Create New Event</a></li>
+    <li class="tab-title" role="presentation"><a href="#create_new_task" role="tab" tabindex="0" aria-selected="true" aria-controls="panel2-2">Create New Task</a></li>
+  </ul>  
+</div>
+<hr/>
+
+<div class="tabs-content">
+  <section role="tabpanel" aria-hidden="false" class="content active" id="create_new_event">
+    <div class="small-6 columns ">
+      <div class="row">
+        <div class="small-3 columns">
+          <h6> Event Name </h6>
+        </div>
+        <div class="small-9 columns">
+          <input type="text" class="task-name" name="name" placeholder="Enter Task name" />
+        </div>
+      </div>
+      <div class="row">
+        <div class="small-3 columns">
+          <h6>Task Type:</h6>
+        </div>
+        <div class="small-9 columns" >
+          <select required="" class="medium" id="task_type" name="Status" data-invalid="" style="background-color:#719dc7;">
+            <option selected="selected" value="Feature" id="Feature">{% trans 'Feature' %}</option>
+            <option value="Support" id="Support">{% trans 'Support' %}</option>
+          </select>
+        </div>
+      </div>
+      <div class="row">
+        <div class="small-3 columns"> 
+          <h6>Start Date </h6>
+        </div>
+        <div class="small-3 columns">
+          <input id="start_date" class="start_date" type="text" style="background-color:#719dc7;" placeholder="DD/MM/YYYY" value="" name="start_time" readonly="">
+        </div>
+        <div class="small-3 columns">
+          <h6>Due Date</h6>
+        </div>
+        <div class="small-3 columns">
+          <input id="due_date" class="due_date" type="text" style="background-color:#719dc7;"   placeholder="DD/MM/YYYY" value="" name="due_date" readonly="">
+        </div>
+      </div>
+      {% comment %}
+      <div class="row">
+        <div class="small-3 columns">
+          <h6> Created By: </h6>
+        </div>
+        <div class="small-9 columns">
+          <input type="text" placeholder="Write the name of the creator" />
+        </div>
+      </div>
+      {% endcomment %}
+      <div class="row">
+        <div class="small-3 columns">
+          <h6>Status:</h6>
+        </div>
+        <div class="small-9 columns" >
+          <select required="" class="medium" id="task_status" name="status" data-invalid="" style="background-color:#719dc7;">
+            <option selected="selected" value="New" id="New">{% trans 'New' %}</option>
+            <option value="In Progress" id="In Progress">{% trans 'In Progress' %}</option>
+          </select>
+        </div>
+      </div>
+      <div class="row">
+        <div class="small-3 columns">
+          <h6>Priority</h6>
+        </div>
+        <div class="small-9 columns">
+          <select required="" class="medium" id="task_priority" name="priority" data-invalid="" style="background-color:#719dc7;">
+            <option value="Low" id="Low">{% trans 'Low' %}</option>
+            <option value="High" id="High">{% trans 'High' %}</option>
+            <option value="Immediate" id="Immediate">{% trans 'Immediate' %}</option>
+          </select>
+        </div>
+      </div>
     </div>
-  <hr/>
-  <div class="small-6 columns ">
+    <div class="small-6 columns vl">
+      <div class="row">
+        <div class="small-3 columns">
+          <h6> Assigned To: </h6>
+        </div>
+        <div class="small-9 columns" style="margin-top:2px;">
+          <a href="#" style="color:#3b7ebe">Add Assignees</a>
+        </div>
+      </div>
+      <div class="row">
+        <div class="small-3 columns">
+          <h6>Supporting Files:</h6>
+        </div>
+        <div class="small-9 columns">
+          <!--<input type="file" class="button" name="" onChange="" id="" value= ""/>-->
+          <a href="#" style="color:#3b7ebe">Upload Files</a>
+          
+        </div>
+      </div>
+      <div class="row">
+        <div class="small-3 columns">
+          <h6>Estimated Hours:</h6>
+        </div>
+        <div class="small-9 columns">
+          <input type="text" placeholder="Approx hours of work" />
+        </div>
+      </div>
+      <div class="row">
+        <div class="small-3 columns">
+          <h6>To be Done By:</h6>
+        </div>
+        <div class="small-9 columns" >
+          <select required="" class="medium" id="customDropdown" name="Status" data-invalid="" style="background-color:#719dc7;">
+            <option selected="selected" value="Single Assignee" id="Single Assignee">{% trans 'Single Assignee' %}</option>
+            <option value="Multiple Assignee" id="Multiple Assignee">{% trans 'Multiple Assignee' %}</option>
+            <option value="Group Assignee" id="Group Assignee">{% trans 'Group Assignee' %}</option>
+          </select>
+        </div>
+      </div>
+      <div class="row">
+        <div class="small-3 columns">
+          <h6>Notes:</h6>
+        </div>
+        <div class="small-9 columns">
+          <textarea id="task_notes" rows="5" cols="50"></textarea>
+        </div>
+      </div>
+    </div>
+    <hr/>
+
+    <div class="small-2 columns right">
+      <button type="button" class="button expand" style="background-color:#164A7B; border-radius:10px;">Cancel</button>
+    </div>
+    <div class="small-2 columns right">
+      <button type="button" class="button expand create-task-btn" style="background-color:#164A7B; border-radius:10px;">Create Task</button>
+    </div>
+  </section>
+
+  <section role="tabpanel" aria-hidden="true" class="content" id="create_new_task">
+    <div class="small-6 columns ">
       <div class="row">
         <div class="small-3 columns">
           <h6> Task Name </h6>
@@ -133,8 +266,8 @@ input[type="file"] {
           </select>
         </div>
       </div>
-  </div>
-  <div class="small-6 columns vl">
+    </div>
+    <div class="small-6 columns vl">
       <div class="row">
         <div class="small-3 columns">
           <h6> Assigned To: </h6>
@@ -181,8 +314,8 @@ input[type="file"] {
           <textarea id="task_notes" rows="5" cols="50"></textarea>
         </div>
       </div>
-  </div>
-  <hr/>
+    </div>
+    <hr/>
 
     <div class="small-2 columns right">
       <button type="button" class="button expand" style="background-color:#164A7B; border-radius:10px;">Cancel</button>
@@ -190,32 +323,38 @@ input[type="file"] {
     <div class="small-2 columns right">
       <button type="button" class="button expand create-task-btn" style="background-color:#164A7B; border-radius:10px;">Create Task</button>
     </div>
+  </section>
+</div>
+
 </div>
 
 <script type="text/javascript">
-  
+
+  $(document).foundation('tab', 'reflow');
+
+
   $( function() {
-  
+
     $( ".start_date" ).datepicker(
       { changeMonth: true,
+        dateFormat: 'dd/mm/yy',
+        minDate: '0',
+        maxDate: '+2m',
+        defaultDate: '0'}
+        );
+    
+    $( ".due_date" ).datepicker(
+    {
+      changeMonth: true,
       dateFormat: 'dd/mm/yy',
       minDate: '0',
       maxDate: '+2m',
-      defaultDate: '0'}
-      );
-    
-    $( ".due_date" ).datepicker(
-        {
-          changeMonth: true,
-          dateFormat: 'dd/mm/yy',
-          minDate: '0',
-          maxDate: '+2m',
-          defaultDate: '0',
-        }
-      );
-      
-  
-    });
+      defaultDate: '0',
+    }
+    );
+
+
+  });
   
 
   $( ".create-task-btn" ).click(function() {
@@ -227,26 +366,26 @@ input[type="file"] {
     start_date = $('#start_date').val();
     due_date = $('#due_date').val();
     $.ajax({
-          url: "{% url 'gtask_create_edit' group_object.name %}",
+      url: "{% url 'gtask_create_edit' group_object.name %}",
 
-          type: "POST",
-          data: {
-            'csrfmiddlewaretoken': "{{csrf_token}}",
-            'name' : task_name,
-            'task_type' : sel_task_type,
-            'task_status' : sel_task_status,
-            'task_priority' : sel_task_priority,
-            'start_date' : start_date,
-            'due_date' : due_date,
-            'content' : task_notes
-          } ,
-          
-          success: function(data){
-            
-            $( ".created-by-me" ).trigger( "click" );
-          },
-        });
-});
+      type: "POST",
+      data: {
+        'csrfmiddlewaretoken': "{{csrf_token}}",
+        'name' : task_name,
+        'task_type' : sel_task_type,
+        'task_status' : sel_task_status,
+        'task_priority' : sel_task_priority,
+        'start_date' : start_date,
+        'due_date' : due_date,
+        'content' : task_notes
+      } ,
+
+      success: function(data){
+
+        $( ".created-by-me" ).trigger( "click" );
+      },
+    });
+  });
 
 
 </script>

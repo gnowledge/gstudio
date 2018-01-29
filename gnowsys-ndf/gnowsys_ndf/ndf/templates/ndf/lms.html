@@ -112,11 +112,21 @@
   
     {% if is_gstaff %}
     <li>
-        <a href="{% url 'course_pages' group_id %}"  {% if title == 'course_pages' or title == 'create_course_pages' %}class="selected"{% endif %}><i class="fi-page-filled "></i> {% trans "Activities" %}</a>
+    	{% if site.SITE_NAME == 'NROER' %}
+        	<a href="{% url 'course_pages' group_id %}"  {% if title == 'course_pages' or title == 'create_course_pages' %}class="selected"{% endif %}><i class="fi-page-filled "></i> {% trans "Pages" %}</a>
+    	{% else %}
+    		<a href="{% url 'course_pages' group_id %}"  {% if title == 'course_pages' or title == 'create_course_pages' %}class="selected"{% endif %}><i class="fi-page-filled "></i> {% trans "Activities" %}</a>
+    	{% endif %}
+    	{% comment %}
       <a href="{% url 'gtask' group_id  %}" {% if title == "Task" %} class="selected"  {% endif %} tabindex="7" > <i class="fa fa-list-alt"></i> {% trans "Task" %}</a>
+      {% endcomment %}
     </li>
     <li>
-        <a href="{% url 'asset_list' group_id %}" {% if title == 'asset_list' or title == 'asset_detail' or title == 'asset_content_detail'%}class="selected"{% endif %}><i class="fi-folder-lock"></i> {%trans "Assets" %}</a>
+    	{% if site.SITE_NAME == 'NROER' %}
+        	<a href="{% url 'asset_list' group_id %}" {% if title == 'asset_list' or title == 'asset_detail' or title == 'asset_content_detail'%}class="selected"{% endif %}><i class="fi-folder-lock"></i> {%trans "Asset Collection" %}</a>
+    	{% else %}
+    		<a href="{% url 'asset_list' group_id %}" {% if title == 'asset_list' or title == 'asset_detail' or title == 'asset_content_detail'%}class="selected"{% endif %}><i class="fi-folder-lock"></i> {%trans "Assets" %}</a>
+    	{% endif %}
     </li>
     <li>
         <a href="https://clix-authoring.mit.edu/#/" target="_blank" {% if title == 'Assessments' %}class="selected"{% endif %}><i class="fi-graph-trend"></i> {% trans "Assessments" %}</a>
@@ -126,7 +136,7 @@
    
   </ul>
 </div>
-<div class="small-2 medium-2 large-2 columns" style="border-bottom: 1px solid #00000029; background-color:#ffffff; height: 53px;">
+<div class="small-2 medium-2 large-2 columns" style="border-bottom: 1px solid #00000029; background-color:#ffffff; height: 50px;">
   {% if is_gstaff %}
           <div class="small-3 medium-6 large-6 columns course_actions" style="color:#164a7b;">
               <span data-dropdown="course-settings-drop" aria-controls="course-settings-drop" aria-expanded="false"  data-options="align:left">
@@ -216,7 +226,7 @@
 </div>
 
 
-  <div class="small-12 columns group_sections_content">
+  <div class="small-12 columns group_sections_content" style="background-color:#ffffff;">
 
    <div id="group_overview">
       {% if title == "about" %}

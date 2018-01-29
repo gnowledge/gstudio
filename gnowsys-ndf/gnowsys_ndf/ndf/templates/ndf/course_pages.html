@@ -41,7 +41,13 @@
                 <li><a title="Edit Content" class="edit_res_unit">{% trans " Edit Content" %}</a></li>
                 <li><a title="Edit Interaction Settings" class="edit-interaction">{% trans "Interaction Settings" %}</a></li>
                 {% if  "Info page" not in  type_of_list %}
-                  <li><a title="add admin page" class="add-admin-page">{% trans "Link Teacher's page" %}</a></li>
+                  <li>
+                    {% if site.SITE_NAME == 'NROER' %}
+                      <a title="add admin page" class="add-admin-page">{% trans "Link Coordinator's page" %}</a>
+                    {% else %}
+                      <a title="add admin page" class="add-admin-page">{% trans "Link Teacher's page" %}</a>
+                    {% endif %}
+                  </li>
                   <li><a title="add help page" class="add-help-page">{% trans "Link Help page" %}</a></li>
                 {% endif %}
                 <li><a href="{% url 'all_translations' group_id activity_node.pk %}" target="_blank">{% trans "Alternate Language" %}</a></li>
@@ -104,7 +110,11 @@
             {% endif %}
             {% if user.is_authenticated %}
             <a class="right orange-button-template" href="{% url 'create_course_page' group_id %}"><i class="fi-plus"></i> {% trans "Add Activity page" %}</a>
-            <a class="right orange-button-template" href="{% url 'create_course_page_info'  group_id 'Info' %}"><i class="fi-plus"></i> {% trans "Add Teacher's page" %}</a>
+              {% if site.SITE_NAME == 'NROER' %}
+                <a class="right orange-button-template" href="{% url 'create_course_page_info'  group_id 'Info' %}"><i class="fi-plus"></i> {% trans "Add Cordinator's page" %}</a>
+              {% else %}
+                <a class="right orange-button-template" href="{% url 'create_course_page_info'  group_id 'Info' %}"><i class="fi-plus"></i> {% trans "Add Teacher's page" %}</a>
+              {% endif %}
             <a class="right orange-button-template" href="{% url 'create_course_page_info' group_id 'Info' %}"><i class="fi-plus"></i> {% trans "Add Help page" %}</a>
             {% endif %}
 
