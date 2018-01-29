@@ -40,13 +40,24 @@
             
         <div class="small-4 medium-6 large-4 columns right margin-right-50">
             {% if not edit and asset_obj %}
-                {% if asset_obj.created_by == request.user.id or is_gstaff  %}
                     <span data-dropdown="asset-settings-drop" aria-controls="asset-settings-drop" aria-expanded="false" class="large orange-button">
                         {% trans "Actions" %} <i class="fa fa-chevron-down"></i>
                     </span>
                     <ul id="asset-settings-drop" class="f-dropdown" data-dropdown-content aria-hidden="true" tabindex="-1">
-                        <li> <a class="createAsset" data-asset_id='{{asset_obj.pk}}'>{% trans "Edit" %}</a></li>
-                        
+                        {% if asset_obj.created_by == request.user.id or is_gstaff  %}
+                            <li> 
+                                <a class="createAsset" data-asset_id='{{asset_obj.pk}}'>{% trans "Edit" %}</a></li>
+                        {% endif %}
+                        <!-- metadata conditions -->
+                        {% if not edit and asset_obj %}
+                            <li>
+                                {% if asset_obj.created_by == request.user.id or is_gstaff  %}
+                                    <a class="edit-metadata">{% trans " Add Metadata" %}</a>
+                                {% else %}
+                                    <a class="view-metadata ">{% trans " View Metadata" %}</a>
+                                {% endif %}
+                            </li>
+                        {% endif %}
                         <li>
                         {% if not asset_content_list.grel_id %}
                             <a class="delete-asset">
@@ -61,16 +72,9 @@
                         {% endif  %}
                         </li>
                     </ul>
-                {% endif %}
             {% endif%}
 
-            {% if not edit and asset_obj %}
-                {% if asset_obj.created_by == request.user.id or is_gstaff  %}
-                    <button class="edit-metadata orange-button">{% trans " Add Metadata" %}</button>
-                {% else %}
-                    <button class="view-metadata orange-button">{% trans " View Metadata" %}</button>
-                {% endif %}
-            {% endif %}
+            
             
             {% if request.user.is_authenticated  %}
                 <button type="button" class="orange-button add-asset-content"><i class="fi-plus"></i> {% trans "Add File" %}</button>
