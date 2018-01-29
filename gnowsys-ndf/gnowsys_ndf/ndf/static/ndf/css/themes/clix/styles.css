@@ -28238,7 +28238,7 @@ ul.authoring-tab > li > a.selected, ul.authoring-tab > li > a:hover {
 }
 
 /* Secondary Top Bar */
-/* line 4973, ../../../scss/_app_styles.scss */
+/* line 4972, ../../../scss/_app_styles.scss */
 .top-bar-second, .top-bar-second .name {
   height: 55px;
   background: #ddeff9;
@@ -28246,34 +28246,34 @@ ul.authoring-tab > li > a.selected, ul.authoring-tab > li > a:hover {
   margin-bottom: 30px;
 }
 
-/* line 4983, ../../../scss/_app_styles.scss */
+/* line 4982, ../../../scss/_app_styles.scss */
 .top-bar-second .title-area {
   box-shadow: 0px 0.6px 3px #000;
   z-index: 20;
   width: 100%;
 }
-/* line 4988, ../../../scss/_app_styles.scss */
+/* line 4987, ../../../scss/_app_styles.scss */
 .top-bar-second .name {
   text-align: center;
 }
-/* line 4991, ../../../scss/_app_styles.scss */
+/* line 4990, ../../../scss/_app_styles.scss */
 .top-bar-second .name .close-dropdown, .top-bar-second .name .side-bar-button {
   position: absolute;
   left: 15px;
   color: #fff;
   font-weight: 100;
 }
-/* line 5001, ../../../scss/_app_styles.scss */
+/* line 5000, ../../../scss/_app_styles.scss */
 .top-bar-second li.toggle-topbar i {
   color: #fff;
   display: inline-block;
   vertical-align: bottom;
 }
-/* line 5009, ../../../scss/_app_styles.scss */
+/* line 5008, ../../../scss/_app_styles.scss */
 .top-bar-second .top-bar-second-section ul li {
   background: #164A7B;
 }
-/* line 5011, ../../../scss/_app_styles.scss */
+/* line 5010, ../../../scss/_app_styles.scss */
 .top-bar-second .top-bar-second-section ul li > a {
   border-left: 3px solid transparent;
   border-bottom: 1px solid #4b5b6b;
@@ -28282,31 +28282,31 @@ ul.authoring-tab > li > a.selected, ul.authoring-tab > li > a:hover {
   font-weight: bold;
   letter-spacing: 0.5px;
 }
-/* line 5022, ../../../scss/_app_styles.scss */
+/* line 5021, ../../../scss/_app_styles.scss */
 .top-bar-second .top-bar-second-section ul li:hover > a, .top-bar-second .top-bar-second-section ul li.active > a {
   border-left-color: #ffc14e;
   color: #ce7869;
 }
-/* line 5030, ../../../scss/_app_styles.scss */
+/* line 5029, ../../../scss/_app_styles.scss */
 .top-bar-second .top-bar-second-section .dropdown li.parent-link a {
   display: none;
 }
-/* line 5036, ../../../scss/_app_styles.scss */
+/* line 5035, ../../../scss/_app_styles.scss */
 .top-bar-second .top-bar-second-section .side-bar-menu .add_buddy i {
   color: #2e3f51;
   background: #acd4fa;
 }
 
 @media screen and (min-width: 40.063em) {
-  /* line 5047, ../../../scss/_app_styles.scss */
+  /* line 5046, ../../../scss/_app_styles.scss */
   .top-bar-second .title-area {
     box-shadow: none;
   }
-  /* line 5049, ../../../scss/_app_styles.scss */
+  /* line 5048, ../../../scss/_app_styles.scss */
   .top-bar-second .title-area .name {
     text-align: right;
   }
-  /* line 5056, ../../../scss/_app_styles.scss */
+  /* line 5055, ../../../scss/_app_styles.scss */
   .top-bar-second .top-bar-second-section li:not(.has-form) a:not(.button) {
     cursor: pointer;
     background: transparent;
@@ -28314,32 +28314,32 @@ ul.authoring-tab > li > a.selected, ul.authoring-tab > li > a:hover {
     line-height: 52px;
     border-left-width: 0px;
   }
-  /* line 5063, ../../../scss/_app_styles.scss */
+  /* line 5062, ../../../scss/_app_styles.scss */
   .top-bar-second .top-bar-second-section li:not(.has-form) a:not(.button):hover {
     color: #ce7869;
     border-bottom: 3px solid #ffc14e;
   }
-  /* line 5069, ../../../scss/_app_styles.scss */
+  /* line 5068, ../../../scss/_app_styles.scss */
   .top-bar-second .top-bar-second-section li:not(.has-form).active a:not(.button) {
     color: #ce7869;
     border-bottom: 3px solid #ffc14e;
   }
-  /* line 5077, ../../../scss/_app_styles.scss */
+  /* line 5076, ../../../scss/_app_styles.scss */
   .top-bar-second .top-bar-second-section li:not(.has-form).has-dropdown a:not(.button):hover {
     color: #74b3dc;
     border-bottom: 0px;
   }
-  /* line 5087, ../../../scss/_app_styles.scss */
+  /* line 5086, ../../../scss/_app_styles.scss */
   .top-bar-second .top-bar-second-section li.active:not(.has-form) a:not(.button):hover {
     background: transparent;
   }
-  /* line 5096, ../../../scss/_app_styles.scss */
+  /* line 5095, ../../../scss/_app_styles.scss */
   .top-bar-second .top-bar-second-section .dropdown li:not(.has-form) > a:not(.button) {
     border-left-width: 2px;
     color: #74b3dc;
     background: #164A7B;
   }
-  /* line 5103, ../../../scss/_app_styles.scss */
+  /* line 5102, ../../../scss/_app_styles.scss */
   .top-bar-second .top-bar-second-section .dropdown li:not(.has-form):hover a:not(.button), .top-bar-second .top-bar-second-section .dropdown li:not(.has-form).active a:not(.button) {
     background: #164A7B;
     color: #74b3dc;
