@@ -5,6 +5,7 @@ from django.shortcuts import render_to_response
 from django.template import RequestContext
 # from django.core.urlresolvers import reverse
 from mongokit import paginator
+from django.core.paginator import Paginator
 
 
 try:
@@ -18,13 +19,26 @@ from gnowsys_ndf.ndf.models import node_collection
 # from gnowsys_ndf.ndf.views.file import *
 from gnowsys_ndf.ndf.views.methods import get_group_name_id, cast_to_data_type, get_execution_time
 from gnowsys_ndf.ndf.views.methods import get_filter_querydict
-
+from elasticsearch import Elasticsearch
 
 # GST_IMAGE = node_collection.one({'_type':'GSystemType', 'name': u"Image"})
-ebook_gst = node_collection.one({'_type':'GSystemType', 'name': u"E-Book"})
-GST_FILE = node_collection.one({'_type':'GSystemType', 'name': u"File"})
-GST_PAGE = node_collection.one({'_type':'GSystemType', 'name': u'Page'})
 
+es = Elasticsearch("http://elastic:changeme@gsearch:9200", timeout=100, retry_on_timeout=True)
+
+#ebook_gst = node_collection.one({'_type':'GSystemType', 'name': u"E-Book"})
+#GST_FILE = node_collection.one({'_type':'GSystemType', 'name': u"File"})
+#GST_PAGE = node_collection.one({'_type':'GSystemType', 'name': u'Page'})
+
+ebook_gst =  res = es.search(index="nodes", doc_type="gsystemtype", body={
+                        "query":   {"bool":{"must":  [ {"term":  {"name":"e-book"}  }]  }}})
+#print ebook_gst
+GST_FILE =   es.search(index="nodes", doc_type="gsystemtype", body={
+                        "query": {"bool": {"must": [{"term": {"name":"file"}}]}}})
+GST_PAGE =  es.search(index="nodes", doc_type="gsystemtype", body={
+                        "query": {"bool": {"must": [{"term": {"name":"page"}}]}}})
+
+
+#print GST_FILE
 @get_execution_time
 def ebook_listing(request, group_id, page_no=1):
 	from gnowsys_ndf.settings import GSTUDIO_NO_OF_OBJS_PP
@@ -52,8 +66,34 @@ def ebook_listing(request, group_id, page_no=1):
 	# 		'collection_set': {'$exists': "true", '$not': {'$size': 0} }
 	# 	})
 
-	all_ebooks = node_collection.find({												
-								'member_of': {'$in': [GST_FILE._id, GST_PAGE._id]},
+	#print GST_FILE._id
+	temp=[]
+
+
+	for a in GST_FILE['hits']['hits']:
+		temp1=ObjectId(a['_source']['id'])
+		temp.append(temp1)
+
+	#print temp
+
+	for a in GST_PAGE['hits']['hits']:
+		temp1=ObjectId(a['_source']['id'])
+		temp.append(temp1)
+
+	print "-----------------------------------------------------"
+	#print temp
+	
+	
+	all_ebooks1=es.search(index="nodes", doc_type="metatype,gsystemtype,gsystem", body={
+                        "query": {"bool": {"filter":{ "terms":{ "member_of": ["444"] }} }}})
+
+	print all_ebooks1
+
+	all_ebooks = node_collection.find({
+								'member_of': {'$in': temp },
+	#							'member_of': {'$in': [GST_FILE._id, GST_PAGE._id]},
+
+
 								# '_type': 'File',
 								# 'fs_file_ids': {'$ne': []}, 
 								'group_set': {'$in': [ObjectId(group_id)]},
@@ -69,6 +109,7 @@ def ebook_listing(request, group_id, page_no=1):
 									],
 								'collection_set': {'$exists': "true", '$not': {'$size': 0} }
 								}).sort("last_update", -1)
+
 
 	ebooks_page_info = paginator.Paginator(all_ebooks, page_no, GSTUDIO_NO_OF_OBJS_PP)
 

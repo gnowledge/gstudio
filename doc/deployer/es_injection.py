@@ -22,7 +22,10 @@ es = Elasticsearch("http://elastic:changeme@gsearch:9200", timeout=100, retry_on
 #author_index = "author_" + GSTUDIO_SITE_NAME.lower()
 #index = GSTUDIO_SITE_NAME.lower()
 #gsystemtype_index = "node_type_" + GSTUDIO_SITE_NAME.lower()
-
+with open("/home/docker/code/gstudio/gnowsys-ndf/gnowsys_ndf/req_body.json") as req_body:
+    request_body = json.load(req_body)
+with open("/home/docker/code/gstudio/gnowsys-ndf/gnowsys_ndf/triples.json") as triples:
+    triples_body = json.load(triples)
 
 
 page_id = 0
@@ -55,10 +58,10 @@ def index_docs(all_docs,index,doc_type):
             es.index(index=index, doc_type="grelation", id=document["id"], body=document)
             #file_name.write(document["id"] + '\n')
         elif document["type"] == "MetaType":
-            es.index(index=index, doc_type="metaType", id=document["id"], body=document)
+            es.index(index=index, doc_type="metatype", id=document["id"], body=document)
             #file_name.write(document["id"] + '\n')
         elif document["type"] == "GSystemType":
-            es.index(index=index, doc_type="gsystemType", id=document["id"], body=document)
+            es.index(index=index, doc_type="gsystemtype", id=document["id"], body=document)
             #file_name.write(document["id"] + '\n')
         elif document["type"] == "Author":
             es.index(index=index, doc_type="author", id=document["id"], body=document)
@@ -74,7 +77,10 @@ def index_docs(all_docs,index,doc_type):
             #file_name.write(document["id"] + '\n')
             get_doc_type=get_document_type(document)
             print(get_doc_type)
+            if (not es.indices.exists("gsystem")):
+                res = es.indices.create(index="gsystem", body=request_body)
             es.index(index="gsystem", doc_type=get_doc_type, id=document["id"], body=document)
+            print "gsystem block"
 
         elif document["type"] == "Group":
             es.index(index=index, doc_type="group", id=document["id"], body=document)
@@ -90,6 +96,7 @@ def index_docs(all_docs,index,doc_type):
             #file_name.write(document["id"] + '\n')
 
         else:
+            print "else block"
             print index
             # print str(doc_type).strip('[]').replace("'", "").lower()
             es.index(index=index, doc_type=str(doc_type).strip('[]').replace("'", "").lower(), id=document["id"],
@@ -125,8 +132,8 @@ def get_document_type(document):
 
 
 def main():
-    f = open("/data/nodes.txt", "w")
-    os.chmod("/data/nodes.txt", 0o777)
+    #f = open("/data/nodes.txt", "w")
+    #os.chmod("/data/nodes.txt", 0o777)
 
     nodes = {}
     triples = {}
@@ -142,10 +149,7 @@ def main():
     for index, doc_type in GSTUDIO_ELASTIC_SEARCH_INDEX.items():
         temp = []
 
-        with open("/home/docker/code/gstudio/gnowsys-ndf/gnowsys_ndf/req_body.json") as req_body:
-            request_body = json.load(req_body)
-        with open("/home/docker/code/gstudio/gnowsys-ndf/gnowsys_ndf/triples.json") as triples:
-            triples_body = json.load(triples)
+
 
         if (not es.indices.exists(index.lower())):
             if (index.lower() == "triples"):

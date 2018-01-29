@@ -43,10 +43,13 @@ def resource_list(request, group_id, app_id=None, page_no=1):
 
 	is_video = request.GET.get('is_video', "")
 
+
 	try:
 		group_id = ObjectId(group_id)
+		#print group_id
 	except:
 		group_name, group_id = get_group_name_id(group_id)
+		print group_name
 
 	if app_id is None:
 		app_id = str(app._id)
@@ -100,6 +103,7 @@ def resource_list(request, group_id, app_id=None, page_no=1):
 		query_dict = get_filter_querydict(selfilters)
 
 	query_dict.append({'attribute_set.educationaluse': {'$ne': 'eBooks'}})
+	
 
 	# files = node_collection.find({
 	# 								'member_of': ObjectId(GST_FILE._id),
@@ -134,7 +138,6 @@ def resource_list(request, group_id, app_id=None, page_no=1):
 											}
 										]
 									}).sort("last_update", -1)
-
 	# print "files.count : ", files.count()
 
   	# pageCollection=node_collection.find({'member_of':GST_PAGE._id, 'group_set': ObjectId(group_id),
