@@ -1,0 +1,100 @@
+{% load i18n %}
+{% load jsonify from ndf_tags %}
+<!--Example insert
+<li> <a class="crossPublish-assetContent" title="Click on the checkbox on the files below to Cross Publish"><i class="fa fa-external-link"></i> {% trans "Cross Publish" %}</a></li>
+-->
+<div id="publish_resource" class="reveal-modal" data-reveal style="position:absolute;"> 
+  <h4 class="inner">{% trans "Select Groups" %} </h4> <h4 class="inner selGroupCount"></h4> 
+  <div id="switchgrp" class="content">
+    <select id = "selGroup" multiple = "multiple" size = "10" style="height: 500px;"> </select>
+  </div>
+    <div class="row">
+            <a href="#" class="button-save-new" id="save_switch_group">{% trans "Save" %}</a>
+        <button class="button-cancel-new">
+            <a href="#" class="cancel-page-create">{% trans "Cancel" %}</a>
+        </button>
+    </div>
+
+  <a class="close-reveal-modal">&#215;</a>
+</div>
+
+<script type="text/javascript">
+  var existing_group_ids = {{node.group_set|jsonify|safe}}
+
+  $(document).ready(function(){
+    $(".selGroupCount").html("("+ {{node.group_set|length}} + ")")
+  })
+
+  function select_option(i) {
+    $('select#selGroup option[value="' + i + '"]').prop('selected', true);
+  }
+
+  $(document).on('open.fndtn.reveal', '#publish_resource', function () {
+    for (var ind=0; ind < existing_group_ids.length; ind++){
+      select_option(existing_group_ids[ind])
+    }
+    $(".selGroupCount").html("("+ existing_group_ids.length + ")")
+  })
+
+  $(document).on('click', '.button-cancel-new', function(){
+    $("#publish_resource").foundation('reveal', 'close');
+  })
+
+  $(document).on('click', '.crossPublish', function(){
+    $('#selGroup').find('option').remove()
+
+    $.ajax({
+      type: "GET",
+      url: "{% url 'cross_publish' group_id %}",
+      datatype: "html",
+      success: function(data) {
+        data = JSON.parse(data)
+        data_length = data.length
+        while(data_length--){
+          dict_obj = data[data_length]
+          var option = document.createElement('option');
+          option.text = dict_obj["altnames"] ? dict_obj["altnames"] : dict_obj["name"];
+          option.value = dict_obj["_id"];
+          option.selected = (existing_group_ids.indexOf(dict_obj["_id"]) > -1) ? true : false;
+          $("#selGroup").append(option)
+        }
+        $("#publish_resource").foundation('reveal', 'open');
+      }
+    })
+  })
+
+  $(document).on('change', '#selGroup', function(event){
+    $(".selGroupCount").html("("+ $(selGroup).val().length + ")")
+  })
+
+  $(document).on('click', '#save_switch_group', function(){
+    selectedGroups = $("#selGroup").val()
+    if (selectedGroups){
+
+    $.ajax({
+      type: "POST",
+      url: "{% url 'cross_publish' group_id %}",
+      data: {
+        "group_ids": selectedGroups,
+        "node_id": "{{node.pk}}",
+        "publishChildren": "True",
+        "csrfmiddlewaretoken": "{{csrf_token}}"
+      },
+      datatype: "html",
+      success: function(data) {
+        for (var i = selectedGroups.length - 1; i >= 0; i--) {
+          existing_group_ids.push(selectedGroups[i])
+        }
+        $("#publish_resource").foundation('reveal', 'close');
+      }
+    })
+    }
+    else{
+      alert("Please select any Group");
+    }
+  })
+
+</script>
+
+
+        <!--$(".crossPublish-assetContent").css('display', 'none')-->
