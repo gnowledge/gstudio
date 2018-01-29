@@ -46,7 +46,7 @@
                     <ul id="asset-settings-drop" class="f-dropdown" data-dropdown-content aria-hidden="true" tabindex="-1">
                         <li><a class="createAsset" data-asset_id='{{asset_obj.pk}}'><i class="fa fa-pencil" aria-hidden="true"></i> {% trans "Edit" %}</a></li>
                         <li><a class="edit-metadata"><i class="fa fa-info-circle" aria-hidden="true"></i> {% trans "Metadata" %}</a></li>
-                        <li><a class="crossPublish" title="Click to Cross Publish all files "><i class="fa fa-external-link" aria-hidden="true"></i> {% trans "Cross Publish" %}</a></li>
+                        <li><a class="crossPublish-{{asset_obj.pk}}" title="Click to Cross Publish all files "><i class="fa fa-external-link" aria-hidden="true"></i> {% trans "Cross Publish" %}</a></li>
                         <li>
                         {% if not asset_content_list.grel_id %}
                             <a class="delete-asset">
