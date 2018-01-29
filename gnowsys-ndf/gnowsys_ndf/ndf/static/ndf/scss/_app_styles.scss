@@ -7191,9 +7191,26 @@ $ah_2_background_color_hover: rgba(244, 244, 244, 0.3);;
     }
 }
 
+
+.orange-button-template{
+    color: $primary-orange;
+    padding: 7px 14px;
+    background:#fff ;
+    border: 1px solid #ce7869;
+    font-size: 12px;
+    font-family: "OpenSans-Regular", serif;
+    border-radius: 4px;
+    margin-right: 20px;
+    margin-bottom: 8px;
+    margin-top: 10px;
+    &:hover{
+        background-color:rgba(206,120,105,0.2);
+        color: $primary-orange;
+    }
+}
 .orange-button-template{
   color: $primary-orange;
-    background:#fff ;
+  background:#fff ;
     &:hover{
         background-color:#fff;;
     }
@@ -7506,3 +7523,5 @@ $ah_2_background_color_hover: rgba(244, 244, 244, 0.3);;
       }
     }  
   }
+
+

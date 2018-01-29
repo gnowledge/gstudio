@@ -30352,16 +30352,35 @@ ul.horizontal_tabs_gstudio > li.sub_group_action:hover ul {
   color: #ce7869;
 }
 
-/* line 7194, ../../../scss/_app_styles.scss */
+/* line 7195, ../../../scss/_app_styles.scss */
+.orange-button-template {
+  color: #ce7869;
+  padding: 7px 14px;
+  background: #fff;
+  border: 1px solid #ce7869;
+  font-size: 12px;
+  font-family: "OpenSans-Regular", serif;
+  border-radius: 4px;
+  margin-right: 20px;
+  margin-bottom: 8px;
+  margin-top: 10px;
+}
+/* line 7206, ../../../scss/_app_styles.scss */
+.orange-button-template:hover {
+  background-color: rgba(206, 120, 105, 0.2);
+  color: #ce7869;
+}
+
+/* line 7211, ../../../scss/_app_styles.scss */
 .orange-button-template {
   color: #ce7869;
   background: #fff;
 }
-/* line 7197, ../../../scss/_app_styles.scss */
+/* line 7214, ../../../scss/_app_styles.scss */
 .orange-button-template:hover {
   background-color: #fff;
 }
-/* line 7200, ../../../scss/_app_styles.scss */
+/* line 7217, ../../../scss/_app_styles.scss */
 .orange-button-template > a {
   color: #ce7869;
   padding: 7px 14px;
@@ -30374,13 +30393,13 @@ ul.horizontal_tabs_gstudio > li.sub_group_action:hover ul {
   margin-bottom: 8px;
   margin-top: 10px;
 }
-/* line 7211, ../../../scss/_app_styles.scss */
+/* line 7228, ../../../scss/_app_styles.scss */
 .orange-button-template > a:hover {
   background-color: rgba(206, 120, 105, 0.2);
   color: #ce7869;
 }
 
-/* line 7218, ../../../scss/_app_styles.scss */
+/* line 7235, ../../../scss/_app_styles.scss */
 .explore-button {
   border-radius: 5px;
   text-transform: uppercase;
@@ -30392,7 +30411,7 @@ ul.horizontal_tabs_gstudio > li.sub_group_action:hover ul {
   border: 2px solid #6a0054;
   background-color: #6a0054;
 }
-/* line 7229, ../../../scss/_app_styles.scss */
+/* line 7246, ../../../scss/_app_styles.scss */
 .explore-button:hover {
   background-color: #ffffff;
   cursor: pointer;
@@ -30400,18 +30419,18 @@ ul.horizontal_tabs_gstudio > li.sub_group_action:hover ul {
 }
 
 /* asset description */
-/* line 7238, ../../../scss/_app_styles.scss */
+/* line 7255, ../../../scss/_app_styles.scss */
 .name-desc-asset-cont-area {
   width: 95%;
   margin-left: 24px;
 }
 
-/* line 7245, ../../../scss/_app_styles.scss */
+/* line 7262, ../../../scss/_app_styles.scss */
 .page-name {
   margin-top: 8px;
 }
 
-/* line 7249, ../../../scss/_app_styles.scss */
+/* line 7266, ../../../scss/_app_styles.scss */
 .tag-ele {
   font-weight: normal;
   text-align: center;
@@ -30430,7 +30449,7 @@ ul.horizontal_tabs_gstudio > li.sub_group_action:hover ul {
   text-transform: none;
 }
 
-/* line 7267, ../../../scss/_app_styles.scss */
+/* line 7284, ../../../scss/_app_styles.scss */
 .button-cancel-new {
   height: 2rem;
   padding: 0 2rem;
@@ -30448,12 +30467,12 @@ ul.horizontal_tabs_gstudio > li.sub_group_action:hover ul {
   transition: all .1s ease;
   margin-right: 1px;
 }
-/* line 7283, ../../../scss/_app_styles.scss */
+/* line 7300, ../../../scss/_app_styles.scss */
 .button-cancel-new:hover {
   background-color: #fff;
   color: #333333;
 }
-/* line 7288, ../../../scss/_app_styles.scss */
+/* line 7305, ../../../scss/_app_styles.scss */
 .button-cancel-new > a {
   font-family: open_sansbold,sans-serif;
   font-size: 1.2rem;
@@ -30465,13 +30484,13 @@ ul.horizontal_tabs_gstudio > li.sub_group_action:hover ul {
   transition: all .1s ease;
   margin-right: 1px;
 }
-/* line 7298, ../../../scss/_app_styles.scss */
+/* line 7315, ../../../scss/_app_styles.scss */
 .button-cancel-new > a:hover {
   background-color: #fff;
   color: #333333;
 }
 
-/* line 7306, ../../../scss/_app_styles.scss */
+/* line 7323, ../../../scss/_app_styles.scss */
 .button-save-new {
   height: 2rem;
   padding: 0 2rem;
@@ -30488,13 +30507,13 @@ ul.horizontal_tabs_gstudio > li.sub_group_action:hover ul {
   color: #fff;
   transition: all .1s ease;
 }
-/* line 7321, ../../../scss/_app_styles.scss */
+/* line 7338, ../../../scss/_app_styles.scss */
 .button-save-new:hover {
   background-color: #fff;
   color: #912a7d;
 }
 
-/* line 7332, ../../../scss/_app_styles.scss */
+/* line 7349, ../../../scss/_app_styles.scss */
 .mydesk_page .page_banner {
   width: 100%;
   height: 200px;
@@ -30502,7 +30521,7 @@ ul.horizontal_tabs_gstudio > li.sub_group_action:hover ul {
   background-size: 100% 100%;
   position: relative;
 }
-/* line 7339, ../../../scss/_app_styles.scss */
+/* line 7356, ../../../scss/_app_styles.scss */
 .mydesk_page .page_banner:before {
   content: ' ';
   background-color: rgba(0, 0, 0, 0.1);
@@ -30516,13 +30535,13 @@ ul.horizontal_tabs_gstudio > li.sub_group_action:hover ul {
   z-index: 10;
   box-shadow: inset 0 0 40px rgba(0, 0, 0, 0.2);
 }
-/* line 7353, ../../../scss/_app_styles.scss */
+/* line 7370, ../../../scss/_app_styles.scss */
 .mydesk_page .page_banner .banner_profile {
   position: absolute;
   bottom: 30px;
   left: 40px;
 }
-/* line 7358, ../../../scss/_app_styles.scss */
+/* line 7375, ../../../scss/_app_styles.scss */
 .mydesk_page .page_banner .banner_profile .buddy_logo {
   display: inline-block;
   margin-right: 10px;
@@ -30531,60 +30550,60 @@ ul.horizontal_tabs_gstudio > li.sub_group_action:hover ul {
   overflow: hidden;
   background-color: #fff;
 }
-/* line 7366, ../../../scss/_app_styles.scss */
+/* line 7383, ../../../scss/_app_styles.scss */
 .mydesk_page .page_banner .banner_profile .buddy_logo svg {
   height: 100px;
   width: 100px;
 }
-/* line 7371, ../../../scss/_app_styles.scss */
+/* line 7388, ../../../scss/_app_styles.scss */
 .mydesk_page .page_banner .banner_profile .buddy_logo svg path {
   fill: #7a422a;
 }
-/* line 7376, ../../../scss/_app_styles.scss */
+/* line 7393, ../../../scss/_app_styles.scss */
 .mydesk_page .page_banner .banner_profile .banner_heading {
   color: #fff;
   display: inline-block;
   vertical-align: top;
 }
-/* line 7381, ../../../scss/_app_styles.scss */
+/* line 7398, ../../../scss/_app_styles.scss */
 .mydesk_page .page_banner .banner_profile .banner_heading .buddy_name {
   font-size: 23px;
   display: block;
   margin-bottom: 10px;
 }
-/* line 7389, ../../../scss/_app_styles.scss */
+/* line 7406, ../../../scss/_app_styles.scss */
 .mydesk_page .page_menu {
   border-bottom: 1px solid #e5e5e5;
 }
-/* line 7393, ../../../scss/_app_styles.scss */
+/* line 7410, ../../../scss/_app_styles.scss */
 .mydesk_page .page_menu li > a {
   padding: 12px 20px 9px;
 }
 
-/* line 7403, ../../../scss/_app_styles.scss */
+/* line 7420, ../../../scss/_app_styles.scss */
 .lms_explore_back_unit {
   background-color: #fff;
   margin-top: -19.3px;
 }
 
-/* line 7410, ../../../scss/_app_styles.scss */
+/* line 7427, ../../../scss/_app_styles.scss */
 .course-students-data {
   margin: 2px 2px 2px 2px;
   border: 2px solid #164a7b;
   padding: 19px 14px 0px 5px;
 }
-/* line 7417, ../../../scss/_app_styles.scss */
+/* line 7434, ../../../scss/_app_styles.scss */
 .course-students-data .students-table-legends > span:nth-child(odd) {
   margin: 0px 10px;
 }
-/* line 7420, ../../../scss/_app_styles.scss */
+/* line 7437, ../../../scss/_app_styles.scss */
 .course-students-data .students-table-legends > span:nth-child(even) {
   display: inline-block;
   vertical-align: top;
   margin-right: 10px;
 }
 
-/* line 7428, ../../../scss/_app_styles.scss */
+/* line 7445, ../../../scss/_app_styles.scss */
 .badge_ex {
   display: inline-block;
   line-height: 22px;
@@ -30600,7 +30619,7 @@ ul.horizontal_tabs_gstudio > li.sub_group_action:hover ul {
   box-shadow: inset 0 1px rgba(255, 255, 255, 0.3), 0 1px 1px rgba(0, 0, 0, 0.08);
 }
 
-/* line 7447, ../../../scss/_app_styles.scss */
+/* line 7464, ../../../scss/_app_styles.scss */
 .badge_ex.green {
   background: #77cc51;
   border-color: #59ad33;
@@ -30610,7 +30629,7 @@ ul.horizontal_tabs_gstudio > li.sub_group_action:hover ul {
   background-image: linear-gradient(to bottom, #a5dd8c, #77cc51);
 }
 
-/* line 7456, ../../../scss/_app_styles.scss */
+/* line 7473, ../../../scss/_app_styles.scss */
 .badge_ex.yellow {
   background: #faba3e;
   border-color: #f4a306;
@@ -30620,7 +30639,7 @@ ul.horizontal_tabs_gstudio > li.sub_group_action:hover ul {
   background-image: linear-gradient(to bottom, #fcd589, #faba3e);
 }
 
-/* line 7465, ../../../scss/_app_styles.scss */
+/* line 7482, ../../../scss/_app_styles.scss */
 .badge_ex.red {
   background: #fa623f;
   border-color: #fa5a35;
@@ -30640,13 +30659,13 @@ ul.horizontal_tabs_gstudio > li.sub_group_action:hover ul {
         background-color: #A6D7F5;
     }
   }*/
-/* line 7488, ../../../scss/_app_styles.scss */
+/* line 7505, ../../../scss/_app_styles.scss */
 .create-task-event-tabs .tabs {
   width: 100%;
   margin: 0em 0em 0.5em;
   border-bottom: 1px solid #CCC;
 }
-/* line 7493, ../../../scss/_app_styles.scss */
+/* line 7510, ../../../scss/_app_styles.scss */
 .create-task-event-tabs .tabs .tab-title {
   width: 40%;
   /*        background-color: blue;*/
@@ -30655,7 +30674,7 @@ ul.horizontal_tabs_gstudio > li.sub_group_action:hover ul {
   top: 1px;
   text-transform: uppercase;
 }
-/* line 7501, ../../../scss/_app_styles.scss */
+/* line 7518, ../../../scss/_app_styles.scss */
 .create-task-event-tabs .tabs .tab-title.active {
   background-color: #fff;
   border: 1px solid #CCC;
