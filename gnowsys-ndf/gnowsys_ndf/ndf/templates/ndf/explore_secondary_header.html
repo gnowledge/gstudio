@@ -36,7 +36,7 @@
 				<ul id="explore-settings" data-dropdown-content class="f-dropdown" aria-hidden="true">
 					{% if title == "workspaces" %}
 					<li>
-						<a class="wrkspace" href="" title="Create New Workspace">New Workspace </a>
+						<a href="{% url 'create_group' group_object.pk %}" class="wrkspace" href="" title="Create New Workspace">New Workspace </a>
 					</li>
 					{% else %}
 					<li>
