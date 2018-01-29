@@ -16,6 +16,8 @@ from django.contrib.auth.decorators import login_required
 from django.contrib.sites.models import Site
 from django.contrib.auth.models import User
 from django.views.generic import View
+from django.core.cache import cache
+
 try:
     from bson import ObjectId
 except ImportError:  # old pymongo
@@ -2582,7 +2584,6 @@ def cross_publish(request, group_id):
     except:
         group_name, group_id = get_group_name_id(group_id)
 
-
     gstaff_access = check_is_gstaff(group_id,request.user)
     if request.method == "GET":
         query = {'_type': 'Group', 'status': u'PUBLISHED',
@@ -2607,9 +2608,10 @@ def cross_publish(request, group_id):
     elif request.method == "POST":
         success_flag = True
         target_group_ids = request.POST.getlist("group_ids[]", None)
+        # print "\ntarget_group_ids:", target_group_ids
         if target_group_ids:
             try:
-                target_group_ids = map(ObjectId, list(target_group_ids))
+                target_group_ids = map(ObjectId, list(set(target_group_ids)))
                 node_id = request.POST.get("node_id", None)
                 publish_children = eval(request.POST.get("publishChildren", False))
                 node_obj = Node.get_node_by_id(node_id)
@@ -2633,7 +2635,7 @@ def cross_publish(request, group_id):
                 success_flag = False
                 pass
 
-        return HttpResponse({"success": success_flag})
+        return HttpResponse(json.dumps(target_group_ids, cls=NodeJSONEncoder))
 
 
 
