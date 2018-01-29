@@ -19,6 +19,7 @@
 
    <!--  Interaction settings modal ends  -->
    {% include 'ndf/widget_user_access_modal.html' %}
+   {% include 'ndf/widget_cross_publish.html' with node=asset_obj %}
 
 <div class="overlay-head">
    <div class="row">
@@ -33,7 +34,6 @@
             <div class="small-7 columns">
             {% if not edit and asset_obj %}
                 <h4 class="page-name">{% firstof asset_obj.altnames|truncatechars:25  asset_obj.name|truncatechars:25 %} </h4>
-
             </div>
             
             <div class="small-4 columns">       
@@ -44,8 +44,9 @@
                         {% trans "Actions" %} <i class="fa fa-chevron-down"></i>
                     </span>
                     <ul id="asset-settings-drop" class="f-dropdown" data-dropdown-content aria-hidden="true" tabindex="-1">
-                        <li> <a class="createAsset" data-asset_id='{{asset_obj.pk}}'>{% trans "Edit" %}</a></li>
-                        <li><a class="edit-metadata">{% trans "Metadata" %}</a></li>
+                        <li><a class="createAsset" data-asset_id='{{asset_obj.pk}}'><i class="fa fa-pencil" aria-hidden="true"></i> {% trans "Edit" %}</a></li>
+                        <li><a class="edit-metadata"><i class="fa fa-info-circle" aria-hidden="true"></i> {% trans "Metadata" %}</a></li>
+                        <li><a class="crossPublish" title="Click to Cross Publish all files "><i class="fa fa-external-link" aria-hidden="true"></i> {% trans "Cross Publish" %}</a></li>
                         <li>
                         {% if not asset_content_list.grel_id %}
                             <a class="delete-asset">
@@ -65,16 +66,18 @@
             {% endif%}
             
             {% if request.user.is_authenticated  %}            
+                <button type="button" class="orange-button add-asset-content right"><i class="fi-plus"></i> {% trans "Add File" %}</button>
+                <!--
                 {% if 'raw@material' in asset_obj.tags and is_gstaff and title == "raw_material_detail"  %}
                 <button type="button" class="orange-button add-asset-content right"><i class="fi-plus"></i> {% trans "Add File" %}</button>
                 {% endif %}
                 {% if 'asset@gallery' in asset_obj.tags  %}
-                <button   type="button" class="orange-button add-asset-content right" ><i class="fi-plus"></i> {% trans "Add File" %}</button>
+                <button type="button" class="orange-button add-asset-content right"><i class="fi-plus"></i> {% trans "Add File" %}</button>
                 {% endif %}
                 {% if title == 'asset_detail'  %}
                 <button type="button" class="orange-button add-asset-content right"><i class="fi-plus"></i> {% trans "Add File" %}</button>
                 {% endif %}
-
+                -->
             {% endif %}
             </div>
    </div>
