@@ -1,6 +1,6 @@
 {% extends "ndf/gbase.html" %}
 
-{% block title %} {{title}} {% endblock %}
+{% block title %} {{title}} {% firstof node_obj.altnames node_obj.name %}{% endblock %}
 
 {% block head %}
 	{# <script type="text/javascript" src="/static/ndf/bower_components/MathJax/MathJax.js?config=TeX-AMS-MML_HTMLorMML" async></script> #}
