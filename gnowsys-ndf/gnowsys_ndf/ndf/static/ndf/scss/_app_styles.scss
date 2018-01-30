@@ -5352,7 +5352,6 @@ $unit-card-lines-to-show: 3;
 /* module detail css */
 
 .thumbnail_style{
-        margin-top: -30px;
     margin-left: -30px;
 }
 
@@ -5364,7 +5363,6 @@ $unit-card-lines-to-show: 3;
 
 .title-strip{
     box-shadow: 0px 0px 6px rgba(0, 0, 0, 0.2);
-    margin-top: -29px;
     padding-left:10px;
     a{
         
@@ -7893,3 +7891,9 @@ $module-card-lines-to-show: 3;
         }
     }
 } 
+
+
+.inner
+{
+    display: inline-block !important;
+}
