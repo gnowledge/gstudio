@@ -200,16 +200,18 @@
                 {# Adding alternate Language, if present #}
               </div>
               {% endif %}
-              <div class="activity_page_rendered buddy_margin" style="margin-top:-80px;">
+              <div class="activity_page_rendered buddy_margin">
                 {% if "QuizItemEvent" in node_member_of_names_list or "QuizItem" in node_member_of_names_list%}
                   {% load_quiz_player request group_id node True %}
                 {% else %}
                 {# {{node.content|safe}} #}
-                {% include "ndf/node_ajax_content.html" with node=trans_node expand_content=True  no_discussion=True hide_breadcrumbs=True %}
+                <div style="margin-top:-80px;">
+                  {% include "ndf/node_ajax_content.html" with node=trans_node expand_content=True  no_discussion=True hide_breadcrumbs=True %}
+                </div>
                 {% endif %}
               </div>
               {% endwith %}
-              <div class="discussion-area activity_page_rendered" style="">
+              <div class="discussion-area activity_page_rendered">
                 {% get_attribute_value node.pk 'discussion_enable' as node_discussion %}
                 {% if  player_discussion or node_discussion %}
                     
