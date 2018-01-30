@@ -4805,6 +4805,41 @@ $header-link-active-color: #50c2fa;
     }
 }
 
+.edit_button{
+    color:#717171;
+    &:hover{
+      border-left: 2px solid $primary-orange;
+
+    }
+}
+
+.left-btn{
+    margin-top: 0px;
+    margin-right: 0px;
+    text-transform: capitalize;
+    width: 100%;
+    background-color:#ffffff;
+    display: block;
+    padding: 0.5rem;
+    color: #555555;
+    font-size:11px;
+    &:hover{
+      display: block;
+      padding: 0.5rem;
+      color: #555555;
+      border-left: 2px solid $primary-orange;
+    }
+}
+
+.chnge-img{
+  &:hover{
+      display: block;
+      padding: 0.5rem;
+      color: #555555;
+      border-left: 2px solid $primary-orange;
+    }
+
+}
 //LMS Page: Unit detail of LMS
 
 .lms_page{
