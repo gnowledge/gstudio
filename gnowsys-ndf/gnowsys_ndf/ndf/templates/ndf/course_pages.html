@@ -16,6 +16,8 @@
 {% endblock %}
 
 <!-- Handles Activity page detail and listing -->
+{% include 'ndf/widget_cross_publish.html' with node=activity_node %}
+
 {% if activity_node and not editor_view %}
     <div class="activity-detail-page">
         <div class="row">
@@ -42,6 +44,7 @@
                   <li><a title="add admin page" class="add-admin-page">{% trans "Link Teacher's page" %}</a></li>
                   <li><a title="add help page" class="add-help-page">{% trans "Link Help page" %}</a></li>
                 {% endif %}
+                <li><a class="crossPublish-{{activity_node.pk}}" title="Click to Cross Publish this Activty Page" ><i class="fa fa-external-link" aria-hidden="true"></i></a></li>
                 <li><a href="{% url 'all_translations' group_id activity_node.pk %}" target="_blank">{% trans "Alternate Language" %}</a></li>
                 
                 </ul>
