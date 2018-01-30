@@ -4665,9 +4665,18 @@ h5{
     float: right;
     margin: 5px 5px 8px 0px;
     border: 1px solid #6153AE;
-    background: #fff;
-    font-size: 23px;
+    background: #f1f1f1;
+    font-size: 17px;
+    margin: 7px 19px;
+    display: inline-block;
     color: #6153AE;
+
+    &:hover{
+        cursor:pointer;
+        color: #6153AE;
+        background-color:#ffffff;
+
+    }
 }
 
 .explore-button {
@@ -4969,11 +4978,54 @@ ul.authoring-tab{
 
 /* Secondary Top Bar */
 
+.secondary-header-tabs{
+   color: #719dc7;
+    font-weight: 400;
+    padding: 14px 10px 3px 10px;
+    cursor: pointer;
+    transition: color 1s ease, border-color 1s ease;
+    -webkit-transition: color 1s ease, border-color 1s ease;
+    display: inline-block;
+
+    &:hover{
+        color: $primary-blue;
+
+    }
+    &.active{
+        color: $primary-blue;
+        border-bottom: 2px solid $primary-blue;
+        padding-bottom: 14px;
+        font-weight: 600;
+
+    }
+}
+
+
+.secondary-header-button{
+    color: #3c556d;
+    font-weight: 700;
+    padding: 17px 0px 0px 10px;
+    cursor: pointer;
+    transition: color 1s ease, border-color 1s ease;
+    -webkit-transition: color 1s ease, border-color 1s ease;
+    display: inline-block;
+    text-transform: uppercase;
+    font-size: 13px;
+    letter-spacing: 1.2px;
+
+    &:hover{
+        opacity:0.5;
+
+    }
+}
+
+
 .top-bar-second, .top-bar-second .name {
     height: 55px;
     background:#ddeff9;
     color: #719dc9;
     margin-bottom:30px;
+    margin-top:-8px;
 
 }
 
@@ -5352,7 +5404,6 @@ $unit-card-lines-to-show: 3;
 /* module detail css */
 
 .thumbnail_style{
-        margin-top: -30px;
     margin-left: -30px;
 }
 
@@ -5364,8 +5415,9 @@ $unit-card-lines-to-show: 3;
 
 .title-strip{
     box-shadow: 0px 0px 6px rgba(0, 0, 0, 0.2);
-    margin-top: -29px;
     padding-left:10px;
+    height:auto;
+    min-height:143px;
     a{
         
         float: right;
@@ -7505,17 +7557,19 @@ $ah_2_background_color_hover: rgba(244, 244, 244, 0.3);;
       border-bottom: 1px solid #CCC;
 
       .tab-title {
-        width: 40%;
+        width: 43%;
 /*        background-color: blue;*/
         margin-left: 1em;
         position: relative;
         top: 1px;
         text-transform: uppercase;
+        color: #fff;
 
         &.active {
-          background-color: #fff;
+          background-color: #719dc7;
           border: 1px solid #CCC;
           border-bottom: 0px;
+          color: #fff;
         }
       }
     }  
@@ -7891,3 +7945,44 @@ $module-card-lines-to-show: 3;
         }
     }
 } 
+
+
+.inner
+{
+    display: inline-block !important;
+}
+
+
+.enroll-btn{
+                width: 90px;
+                opacity: 1;
+                background-color: rgba(0,0,0,.1);
+                /* margin-bottom: -69px; */
+                color: #ffc14e;
+                background-color: none;
+                /* margin-bottom: 8px; */
+                cursor: pointer;
+                padding: 1px 5px 1px 5px;
+                border-radius: 6px;
+                //border: 2px solid #ffc14e;
+                border: 1px solid #c1b4b5;
+                background-color: #4b4852;
+
+
+
+    }
+
+
+.enrollBtn{
+    background: #a2238d;
+    height: 37px;
+    text-align: center;
+    color: #ffffff;
+    font-size: 19px;
+    border: 2px solid rgba(43, 51, 63, 0.42);
+    border-radius: 5px;
+    width: 120px !important;
+    margin-top: 2px !important;
+    letter-spacing: 0.4px;
+}
+
