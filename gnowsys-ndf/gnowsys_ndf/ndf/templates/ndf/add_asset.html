@@ -19,6 +19,7 @@
 
    <!--  Interaction settings modal ends  -->
    {% include 'ndf/widget_user_access_modal.html' %}
+   {% include 'ndf/widget_cross_publish.html' with node=asset_obj %}
 
 <div class="overlay-head">
    <div class="row">
@@ -33,8 +34,8 @@
             {% if not edit and asset_obj %}
                 <h4 class="page-name">{% firstof asset_obj.altnames|truncatechars:25  asset_obj.name|truncatechars:25 %} </h4>
                 <!-- description -->
-                <div class="small-12 columns">
-                  <i>{{asset_obj.content|safe|striptags}}</i>
+                <div class="small-12 columns "><label>Description: </label>
+                  <i>{{asset_obj.content|default:'No description added yet.'|safe|striptags}}</i>
                 </div>
             </div>
             
@@ -46,18 +47,19 @@
                     <ul id="asset-settings-drop" class="f-dropdown" data-dropdown-content aria-hidden="true" tabindex="-1">
                         {% if asset_obj.created_by == request.user.id or is_gstaff  %}
                             <li> 
-                                <a class="createAsset" data-asset_id='{{asset_obj.pk}}'>{% trans "Edit" %}</a></li>
+                                <a class="createAsset" data-asset_id='{{asset_obj.pk}}'><i class="fa fa-pencil" aria-hidden="true"></i>{% trans "Edit" %}</a></li>
                         {% endif %}
                         <!-- metadata conditions -->
                         {% if not edit and asset_obj %}
                             <li>
                                 {% if asset_obj.created_by == request.user.id or is_gstaff  %}
-                                    <a class="edit-metadata">{% trans " Add Metadata" %}</a>
+                                    <a class="edit-metadata"><i class="fa fa-info-circle" aria-hidden="true"></i>{% trans " Add Metadata" %}</a>
                                 {% else %}
                                     <a class="view-metadata ">{% trans " View Metadata" %}</a>
                                 {% endif %}
                             </li>
                         {% endif %}
+                        <li><a class="crossPublish-{{asset_obj.pk}}" title="Click to Cross Publish all files "><i class="fa fa-external-link" aria-hidden="true"></i> {% trans "Cross Publish" %}</a></li>
                         <li>
                         {% if not asset_content_list.grel_id %}
                             <a class="delete-asset">
@@ -73,9 +75,6 @@
                         </li>
                     </ul>
             {% endif%}
-
-            
-            
             {% if request.user.is_authenticated  %}
                 <button type="button" class="orange-button add-asset-content"><i class="fi-plus"></i> {% trans "Add File" %}</button>
                 <button type="button" class="orange-button" href="{% url 'create_edit_asset_page' group_id asset_obj.pk %}"><i class="fi-plus"></i> {% trans "Add  page" %}</button>
@@ -98,6 +97,7 @@
             </div>
         </div>
    </div>
+
             {% else %}
 
                 <h3 class="left overlay-title">&nbsp;
@@ -312,7 +312,6 @@
         $(".asset-content-area").removeClass("hide")
         $(".delete-asset-content").css('display', 'none')
         $(".name-desc-asset-cont-area").removeClass("hide")
-
         $("#upload_asset").removeClass("hide")
     });
 
