@@ -78,7 +78,7 @@
             
             {% if request.user.is_authenticated  %}
                 <button type="button" class="orange-button add-asset-content"><i class="fi-plus"></i> {% trans "Add File" %}</button>
-                <button type="button" class="orange-button" href="{% url 'create_edit_asset_page' group_id asset_obj.pk %}"><i class="fi-plus"></i> {% trans "Add  page" %}</button>
+                <a href="{% url 'create_edit_asset_page' group_id asset_obj.pk %}"><button type="button" class="orange-button" ><i class="fi-plus"></i> {% trans "Add  page" %}</button></a>
             {% endif %}
 
             <div class="small-3 columns page-name">
