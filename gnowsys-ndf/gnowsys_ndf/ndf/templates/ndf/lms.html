@@ -4,8 +4,10 @@
 {% load ndf_tags %}
 {% user_access_policy groupid request.user as user_access %}
 
+{% get_group_object groupid as group_obj %}
 
-{% block title %}  Unit {% endblock%}
+{% block title %} {% firstof group_obj.altnames group_obj.name %}  {% endblock%}
+
 
 {% block head %}
   <script src="/static/ndf/bower_components/jquery-backstretch/jquery.backstretch.min.js"></script>
