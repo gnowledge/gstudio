@@ -2604,11 +2604,13 @@ def cross_publish(request, group_id):
     elif request.method == "POST":
         success_flag = True
         target_group_ids = request.POST.getlist("group_ids[]", None)
+
         # print "\ntarget_group_ids:", target_group_ids
         if target_group_ids:
             try:
                 target_group_ids = map(ObjectId, list(set(target_group_ids)))
                 node_id = request.POST.get("node_id", None)
+                remove_from_curr_grp_flag = eval((request.POST.get("remove_from_curr_grp_flag", "False")).title())
                 publish_children = eval(request.POST.get("publishChildren", False))
                 node_obj = Node.get_node_by_id(node_id)
                 if publish_children:
@@ -2619,12 +2621,21 @@ def cross_publish(request, group_id):
                     else:
                         child_ids = node_obj.collection_set
                     child_cur =  node_collection.find({'_id': {'$in': child_ids}})
-                    for each_child in child_cur:
-                        # each_child.group_set = add_to_list(each_child.group_set, target_group_ids)
-                        each_child.group_set = target_group_ids
-                        each_child.save()
+                    if remove_from_curr_grp_flag:
+                        for each_child in child_cur:
+                            # each_child.group_set = add_to_list(each_child.group_set, target_group_ids)
+                            each_child.group_set = filter(lambda x: x != group_id, target_group_ids)
+                            each_child.save()
+                    else:
+                        for each_child in child_cur:
+                            # each_child.group_set = add_to_list(each_child.group_set, target_group_ids)
+                            each_child.group_set = target_group_ids
+                            each_child.save()
                 # node_obj.group_set = add_to_list(node_obj.group_set, target_group_ids)
-                node_obj.group_set = target_group_ids
+                if remove_from_curr_grp_flag:
+                    node_obj.group_set = filter(lambda x: x != group_id, target_group_ids)
+                else:
+                    node_obj.group_set = target_group_ids
                 node_obj.save()
             except Exception as e:
                 print "\nError occurred in Cross-Publish", e
