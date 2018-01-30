@@ -4665,9 +4665,18 @@ h5{
     float: right;
     margin: 5px 5px 8px 0px;
     border: 1px solid #6153AE;
-    background: #fff;
-    font-size: 23px;
+    background: #f1f1f1;
+    font-size: 17px;
+    margin: 7px 19px;
+    display: inline-block;
     color: #6153AE;
+
+    &:hover{
+        cursor:pointer;
+        color: #6153AE;
+        background-color:#ffffff;
+
+    }
 }
 
 .explore-button {
@@ -4969,11 +4978,54 @@ ul.authoring-tab{
 
 /* Secondary Top Bar */
 
+.secondary-header-tabs{
+   color: #719dc7;
+    font-weight: 400;
+    padding: 14px 10px 3px 10px;
+    cursor: pointer;
+    transition: color 1s ease, border-color 1s ease;
+    -webkit-transition: color 1s ease, border-color 1s ease;
+    display: inline-block;
+
+    &:hover{
+        color: $primary-blue;
+
+    }
+    &.active{
+        color: $primary-blue;
+        border-bottom: 2px solid $primary-blue;
+        padding-bottom: 14px;
+        font-weight: 600;
+
+    }
+}
+
+
+.secondary-header-button{
+    color: #3c556d;
+    font-weight: 700;
+    padding: 17px 0px 0px 10px;
+    cursor: pointer;
+    transition: color 1s ease, border-color 1s ease;
+    -webkit-transition: color 1s ease, border-color 1s ease;
+    display: inline-block;
+    text-transform: uppercase;
+    font-size: 13px;
+    letter-spacing: 1.2px;
+
+    &:hover{
+        opacity:0.5;
+
+    }
+}
+
+
 .top-bar-second, .top-bar-second .name {
     height: 55px;
     background:#ddeff9;
     color: #719dc9;
     margin-bottom:30px;
+    margin-top:-8px;
 
 }
 
