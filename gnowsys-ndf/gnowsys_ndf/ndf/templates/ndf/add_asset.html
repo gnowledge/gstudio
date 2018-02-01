@@ -15,28 +15,49 @@
 {% endblock %}
    <!--  Interaction settings modal ends  -->
    {% include 'ndf/widget_user_access_modal.html' %}
+
+   {% include 'ndf/widget_cross_publish.html' with node=asset_obj %}
+
 <div class="overlay-head">
    <div class="row">
         {% if edit or not asset_obj.name %}
             <a class="right close-reveal-modal reveal-modal-overlay" aria-label="Close">&#215;</a>
         {% endif %}
-            <div class="small-1 columns icon-widget" style="margin-top: 5.6px;">
+
+            <div class="small-1 medium-2 large-1 columns icon-widget" style="margin-top: 5.6px;">
                 <a href="javascript:window.history.back();"><i class="fa fa-chevron-left large" aria-hidden="true"></i> Back</a>
             </div>
-            <div class="small-6 columns">
+
+            <div class="small-7 medium-4 large-7 columns">
             {% if not edit and asset_obj %}
                 <h4 class="page-name">{% firstof asset_obj.altnames|truncatechars:25  asset_obj.name|truncatechars:25 %} </h4>
+                <!-- description -->
+                <div class="small-12 columns "><label>Description: </label>
+                  <i>{{asset_obj.content|default:'No description added yet.'|safe|striptags}}</i>
+                </div>
             </div>
-
-            <div class="small-4 columns right margin-right-50">
+            
+        <div class="small-4 medium-6 large-4 columns right margin-right-50">
             {% if not edit and asset_obj %}
-                {% if asset_obj.created_by == request.user.id or is_gstaff  %}
-                    <span data-dropdown="asset-settings-drop" aria-controls="asset-settings-drop" aria-expanded="false" class="large orange-button right">
+                    <span data-dropdown="asset-settings-drop" aria-controls="asset-settings-drop" aria-expanded="false" class="large orange-button">
                         {% trans "Actions" %} <i class="fa fa-chevron-down"></i>
                     </span>
                     <ul id="asset-settings-drop" class="f-dropdown" data-dropdown-content aria-hidden="true" tabindex="-1">
-                        <li> <a class="createAsset" data-asset_id='{{asset_obj.pk}}'>{% trans "Edit" %}</a></li>
-                        <li><a class="edit-metadata">{% trans "Metadata" %}</a></li>
+                        {% if asset_obj.created_by == request.user.id or is_gstaff  %}
+                            <li> 
+                                <a class="createAsset" data-asset_id='{{asset_obj.pk}}'><i class="fa fa-pencil" aria-hidden="true"></i>{% trans "Edit" %}</a></li>
+                        {% endif %}
+                        <!-- metadata conditions -->
+                        {% if not edit and asset_obj %}
+                            <li>
+                                {% if asset_obj.created_by == request.user.id or is_gstaff  %}
+                                    <a class="edit-metadata"><i class="fa fa-info-circle" aria-hidden="true"></i>{% trans " Add Metadata" %}</a>
+                                {% else %}
+                                    <a class="view-metadata ">{% trans " View Metadata" %}</a>
+                                {% endif %}
+                            </li>
+                        {% endif %}
+                        <li><a class="crossPublish-{{asset_obj.pk}}" title="Click to Cross Publish all files "><i class="fa fa-external-link" aria-hidden="true"></i> {% trans "Cross Publish" %}</a></li>
                         <li>
                         {% if not asset_content_list.grel_id %}
                             <a class="delete-asset">
@@ -51,41 +72,29 @@
                         {% endif  %}
                         </li>
                     </ul>
-                {% endif %}
-
             {% endif%}
-
             {% if request.user.is_authenticated  %}
-                <button type="button" class="orange-button add-asset-content right"><i class="fi-plus"></i> {% trans "Add File" %}</button>
-                <a class="right orange-button-template" href="{% url 'create_edit_asset_page' group_id asset_obj.pk %}"><i class="fi-plus"></i> {% trans "Add  page" %}</a>
-
+                <button type="button" class="orange-button add-asset-content"><i class="fi-plus"></i> {% trans "Add File" %}</button>
+                <a href="{% url 'create_edit_asset_page' group_id asset_obj.pk %}"><button type="button" class="orange-button" ><i class="fi-plus"></i> {% trans "Add  page" %}</button></a>
             {% endif %}
-            </div>
-   </div>
 
-    <div class="row">
-        <div class="small-8 columns left">
-             {% if asset_obj.tags %}
-                {% for tag in asset_obj.tags %}
-                    {% if tag != "asset@asset" and tag != "raw@material" and tag != "asset@gallery" %}
-                        <small><label class="tag-ele">
-                        <a href="{% url 'tag_info' group_id tag %}">{{tag}} </a></label></small>
-                    {% endif %}
-                {% endfor %}
-            {% endif %}
-        </div>
-            <div class="small-4 columns right">
+            <div class="small-3 columns page-name">
             {% include 'ndf/rating.html' with node=asset_obj %}
-
             </div>
 
-    </div>
-    <br/>
-
-    <div class="row ">
-      {{asset_obj.content|safe|striptags}}
-    </div>
-
+            <!-- tags -->
+            <div class="small-10 columns left">
+                 {% if asset_obj.tags %}
+                    {% for tag in asset_obj.tags %}
+                        {% if tag != "asset@asset" and tag != "raw@material" and tag != "asset@gallery" %}
+                            <small><label class="tag-ele">
+                            <a href="{% url 'tag_info' group_id tag %}">{{tag}} </a></label></small>
+                        {% endif %}
+                    {% endfor %}
+                {% endif %}
+            </div>
+        </div>
+   </div>
 
             {% else %}
 
@@ -106,9 +115,7 @@
 
                 <!--<button type="button" class="button-hollow-grey save-asset right" data-asset_id='{{asset_obj.pk}}' style="margin-top: 9px;margin-right: -150px;">{% trans "Save" %}</button>-->
             {% endif %}
-<div class="row">
-    <hr/>
-</div>
+<hr/>
         <div class="row">
             <div class="small-12 medium-10 large-10 columns">
                 <label>
@@ -264,7 +271,7 @@
             </div>
             {% endif %}
 
-        <div class="row listing-row">
+        <div class="row listing-row" style="margin-left:10px;">
             {% for each in asset_content_list.grel_node %}
                 {% if  'DELETED' != each.status %}
                    {% include "ndf/asset_card.html" with url_name="assetcontent_detail" each_asset=each first_arg=group_id second_arg=asset_obj.pk third_arg=each.pk no_asset=True %}
@@ -275,16 +282,11 @@
         <!-- </div> -->
     {% include 'ndf/pagination.html' with urlname="asset_details_paged" first_arg=group_id second_arg=asset_obj.pk page_info=assetcontent_page_info %}
 
-        <div class="row asset-content-detail">
+        <div class="asset-content-detail">
               {% if node %}
-              <hr/>
                &nbsp; {% include "ndf/asset_content_detail.html" with node=node %}
               {%  endif %}
         </div>
-    <!-- </div> -->
-    <div class="row">
-    <hr/>
-    </div>
     <div class="row asset-comments-section">
       <div class="small-10 columns" id="view-discussion" style="overflow-x:auto;overflow-y:hidden">
             <!-- discussion content area -->
@@ -308,7 +310,6 @@
         $(".asset-content-area").removeClass("hide")
         $(".delete-asset-content").css('display', 'none')
         $(".name-desc-asset-cont-area").removeClass("hide")
-
         $("#upload_asset").removeClass("hide")
     });
 
@@ -591,6 +592,27 @@ $( ".edit-metadata" ).click(function(event) {
               success: function(data) {
               $('#addAsset').foundation('reveal', 'open');
               $('#addAsset').html(data);
+
+            }
+        });
+})
+
+$( ".view-metadata" ).click(function(event) {
+    $.ajax({
+              type: "POST",
+              data:{
+                    'csrfmiddlewaretoken': "{{csrf_token}}",
+                    "node_id":'{{asset_obj}}',
+                },
+              url: "{% url 'get_metadata_page' group_id  %}",
+              datatype: "html",
+              success: function(data) {
+              $('#addAsset').foundation('reveal', 'open');
+              $('#addAsset').html(data);
+              $('select').attr('disabled', "True");
+              $('input').attr('readonly', 'readonly');
+              $(':input[type="submit"]').hide();
+              
             }
         });
 })

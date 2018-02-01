@@ -2,7 +2,7 @@
 {% load i18n %}
 {% load check_is_gstaff from ndf_tags %}
 
-{% block title %}  {% if title == "drafts" %} Draft Courses {% elif title == "courses" %} Courses {% else %} {{title}} {% endif %} {% endblock %}
+{% block title %}  {% firstof node.altnames node.name %}{% endblock %}
 
 {% block body_content %}
 {% check_is_gstaff group_id request.user as is_gstaff %}
@@ -29,8 +29,8 @@
 		<div class="small-10 columns title-strip strip flex-container">
 
 			<div class="small-11 columns">
-				<h7 class="text-button-blue">{% trans "Showing all Units in" %}</h7>{{node.name}} <br/>
-				<h7 class="text-button-blue">{% trans "Module Description:" %}</h7>{{node.content|safe}}
+				<h7 class="text-button-blue"><i>{% trans "Module Name: " %}</h7></i><strong> {{node.name}} </strong><br/>
+				<h7 class="text-button-blue"><i>{% trans "Module Description: " %}</i></h7> {{node.content|default:'No description added yet.'|safe}}
 			</div>
 			<div class="small-1 columns" style="margin-top:25px;">
 		         <div class="right course_actions">
@@ -40,35 +40,37 @@
 		            </span>
 		            <ul id="course-settings-drop" class="f-dropdown" data-dropdown-content aria-hidden="true" tabindex="-1" >
 		                <li>
-									<a  class="buddy_margin right edit_button dropdown-settings" href="{% url 'module_edit' group_id node.pk %}" style="margin-top:0px;margin-right:0px;text-transform:none;width:100%;"><i class="fa fa-pencil"></i> {% trans "Edit" %}</a>
+									<a  class="buddy_margin right edit_button dropdown-settings" href="{% url 'module_edit' group_id node.pk %}" style="margin-top:0px;margin-right:0px;text-transform:none;width:100%;font-size:12px;"><i class="fa fa-pencil"></i> {% trans "Edit" %}</a>
 						</li>
 						<li>
-							<a href="{% url 'create_group' node.pk %}?subgroup=True" class="tiny button radius left-btn" title="Create New Sub Group">{% trans "New SubGroup" %}</a>
+							<a href="{% url 'create_group' node.pk %}?subgroup=True" class="left-btn" style="text-transform:none;" title="Create New Sub Group"><i class="fa fa-plus" aria-hidden="true"></i> {% trans "New SubGroup" %}</a>
 
 						</li>
 						<li>
-									{% if node.collection_set %}
-									<a data-reveal-id="delete-unit" class="dropdown-settings tiny button secondary buddy_margin right edit_button " title="Please delete all units associated with this module." style="margin-top:0px;margin-right:0px;text-transform:none;width:100%;" disabled > <i class="fa fa-trash"></i> {% trans "Delete" %} </a>
-				 	 				{% else %}
-								 	<a data-reveal-id="delete-unit" class=" dropdown-settings tiny button secondary buddy_margin right edit_button disab-button" style="margin-top:0px; margin-right:0px; text-transform:none; width:100%;"><i class="fa fa-trash"></i> {% trans "Delete" %} </a>
-								 	{% endif %}
-								 	<div id="delete-unit" class="reveal-modal tiny text-center" data-reveal>
-					                    <h3>{% trans "Delete Unit:" %} {% firstof group_object.altnames group_object.name  %} ?</h3>
-					                        <br/>
-					                        {% trans "Are you sure want to delete this module?" %}
-					                        <br/>
-					                        <a href="#" class="button tiny success">{% trans "Cancel" %}</a>
-					                        <a href="{% url 'delete_group_url_redirect' node.pk 'explore_courses' %}" class="button tiny alert">{% trans "Yes" %}</a>
-					                        <a class="close-reveal-modal" aria-label="Close">&#215;</a>
-					                </div>
-					    </li>
-
-		              	<li>
-		                    <a class="fi-photo dropdown-settings" style="margin-top:0px;margin-right:0px;text-transform:none;width:100%;" data-reveal-id="group_banner_prof_pic_prop">
+		                    <a class="fi-photo dropdown-settings chnge-img" style="font-size:12px;margin-top:0px;margin-right:0px;text-transform:none;width:100%;" data-reveal-id="group_banner_prof_pic_prop">
 		                    {% trans "Change image" %} </a>
 		              	</li>
-							{% endif %}
+		              	{% comment %}
+						<li>
+									{% if node.collection_set %}
+										<a data-reveal-id="delete-unit" class="dropdown-settings tiny button secondary buddy_margin right edit_button " title="Please delete all units associated with this module." style="margin-top:0px;margin-right:0px;text-transform:none;width:100%;" disabled > <i class="fa fa-trash"></i> {% trans "Delete" %} </a>
+				 	 				{% else %}
+								 		<a data-reveal-id="delete-unit" class=" dropdown-settings tiny button secondary buddy_margin right edit_button disab-button" style="margin-top:0px; margin-right:0px; text-transform:none; width:100%;"><i class="fa fa-trash"></i> {% trans "Delete" %} </a>
+								 	{% endif %}
+								 		<div id="delete-unit" class="reveal-modal tiny text-center" data-reveal>
+					                    	<h3>{% trans "Delete Unit:" %} {% firstof group_object.altnames group_object.name  %} ?</h3>
+						                        <br/>
+						                        {% trans "Are you sure want to delete this module?" %}
+						                        <br/>
+						                        <a href="#" class="button tiny success">{% trans "Cancel" %}</a>
+						                        <a href="{% url 'delete_group_url_redirect' node.pk 'explore_courses' %}" class="button tiny alert">{% trans "Yes" %}</a>
+						                        <a class="close-reveal-modal" aria-label="Close">&#215;</a>
+					                	</div>
+					    </li>
+						{% endcomment %}
+		              	
 		            </ul>
+				{% endif %}
 		        </div>
 		    </div>
 		</div>

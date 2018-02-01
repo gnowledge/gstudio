@@ -7056,29 +7056,41 @@ def save_metadata(request, group_id):
   copyright = request.POST.get("copyright_val", "")
   Based_url = request.POST.get("basedonurl_val", "")
   obj_list = request.POST.get("obj_list", "")
-
+  assetcontent_ids_list = []
+  assetcontent_ids_list.append(ObjectId(node_id))
+  if node:
+    asset_content_list = get_relation_value(ObjectId(node._id),'has_assetcontent')
+    for each in asset_content_list['grel_node']:
+      assetcontent_ids_list.append(ObjectId(each._id))
   if obj_list :
     for k, v in json.loads(obj_list).iteritems():
       attr_node = node_collection.one({'_type':'AttributeType','name':unicode(k)})
-      if v is not None and (not isinstance(v,list) and "select" not in v.lower()) or (isinstance(v,list) and "select" not in v[0].lower() ):
-        if attr_node:
-          create_gattribute(ObjectId(node_id), attr_node, v)
-      else:
-          ga_node = triple_collection.find_one({'_type': "GAttribute",
-               "subject": ObjectId(node_id), 'attribute_type': attr_node._id, 'status':"PUBLISHED"})
-          if ga_node:
-              d,dd = delete_gattribute(subject_id=None, deletion_type=1, **{'node_id': ga_node._id})
+      for each in assetcontent_ids_list:
+        if v is not None and (not isinstance(v,list) and "select" not in v.lower()) or (isinstance(v,list) and "select" not in v[0].lower() ):
+          if attr_node:
+            create_gattribute(ObjectId(each), attr_node, v)
+        else:
+            ga_node = triple_collection.find_one({'_type': "GAttribute",
+                 "subject": ObjectId(each), 'attribute_type': attr_node._id, 'status':"PUBLISHED"})
+            if ga_node:
+                d,dd = delete_gattribute(subject_id=None, deletion_type=1, **{'node_id': ga_node._id})
+  
   if source:
     source_attr = node_collection.one({'_type':'AttributeType','name':'source'})
-    create_gattribute(ObjectId(node_id), source_attr, source)
+    for each in assetcontent_ids_list:
+      create_gattribute(ObjectId(each), source_attr, source)
 
   if copyright:
-    node.legal.copyright = unicode(copyright)
-    node.save()
+    for each in assetcontent_ids_list:
+      each_obj = Node.get_node_by_id(each)
+      each_obj.legal.copyright = unicode(copyright)
+      each_obj.save()
 
   if Based_url:
     basedurl_attr = node_collection.one({'_type':'AttributeType','name':'basedonurl'})
-    create_gattribute(ObjectId(node_id), basedurl_attr, Based_url)
+    for each in assetcontent_ids_list:
+      create_gattribute(ObjectId(each), basedurl_attr, Based_url)
+  
   if "Page" in node.member_of_names_list:
     return HttpResponseRedirect(reverse('view_course_page', kwargs={'group_id':ObjectId(group_id),'page_id': ObjectId(node._id)}))
   else:

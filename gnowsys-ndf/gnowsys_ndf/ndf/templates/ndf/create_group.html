@@ -1,4 +1,4 @@
-{% extends "ndf/base.html" %}
+{% extends "ndf/gbase.html" %}
 {% load i18n %}
 {% load ndf_tags %}
 {% load cache %}
@@ -324,11 +324,10 @@ this template is modified. So for the fields in the template it supports -
 
     <div class="row">
       <div class="small-12 medium-6 medium-centered columns">
-        {% if node %}
-          <input type="submit" value="Save Changes" id="group-submit" class="button expand">
-        {% else %}
-          <input type="submit" value="Create Group" id="group-submit" class="button expand">
-        {% endif %}
+          <input type="submit" value="Submit" id="group-submit" class="button-save-new">
+          <button class="button-cancel-new">
+              <a href="javascript:window.history.back();"> <i class="fa fa-times" aria-hidden="true"></i> {% trans "Cancel" %}</a>
+          </button>
       </div>
     </div>
 

@@ -115,9 +115,6 @@ float: none !important;
         cursor: pointer;
     }
 
-    
-
-
     #view-scheduler-calendar table {
         border: none;
         margin-bottom: 0px;
@@ -134,10 +131,6 @@ float: none !important;
         padding-top: 1em !important;
     }
 
-    .fc-week-number {
-        background-color: #DDDDDD;
-        color: #808080;
-    }
 
 </style>
 
@@ -167,14 +160,15 @@ float: none !important;
           var m = date.getMonth();
           var y = date.getFullYear();
     
-
+    
     $('#calendar').fullCalendar({
+          height: "auto",
           default: true,
           theme: false,
           // emphasizes business hours
           businessHours: true,
           // event dragging & resizing
-          editable: true,
+          // editable: true,
           // header
           header: {
             left: 'prev,next today',
@@ -182,14 +176,18 @@ float: none !important;
             right: 'month,agendaWeek,agendaDay,listWeek',      
           },
           // defaultDate: '2017-12-12',
-          //firstDay:1,
+          firstDay:1,
           selectable: true,
           selectHelper: true,
           timezone:'local',
           defaultView: 'month',
-          eventBackgroundColor:'#23000',
-          slotDuration:'00:15:00',
-          scrollTime:'07:00:00',
+          // eventBackgroundColor:'#23000',
+          // slotDuration:'00:15:00',
+          // scrollTime:'07:00:00',
+          yearCellMinH: 60,
+    
+          resourceAreaWidth: 230,
+          aspectRatio: 1.5,
 
           navLinks: true, // can click day/week names to navigate views
           eventLimit: true, // allow "more" link when too many events
@@ -212,158 +210,74 @@ float: none !important;
             listMonth: { buttonText: 'list month' }
           },
 
-          select: function(start, end) {
+          select: function(start, end, jsEvent, view) {
               var title = prompt('Event Title:');
               var eventData;
               if (title) {
                 eventData = {
                   title: title,
                   start: start,
-                  end: end
+                  end: end,
+                  priority: priority,
+                  //url: eventurl,
                 };
               $('#calendar').fullCalendar('renderEvent', eventData, true); // stick? = true
             }
             $('#calendar').fullCalendar('unselect');
           },
 
-          
-          customButtons: {
-            myCustomButton: {
-              text: 'custom!',
-              click: function() {
-                alert('clicked the custom button!');
-              }
+
+          events: {{events|safe}},
+
+
+          eventRender: function(event, element) {
+            if (event.priority == 'Immediate') {
+              element.css({
+                  'background-color': '#ffc14e',
+                  'border-color': '#ffc14e',
+                  'border-radius': '10px',
+                  'padding': '0px 0px 0px 2px',
+                  'margin-right': '2px',
+              });
+            } else if (event.priority == 'High'){
+                element.css({
+                  'background-color': '#f04124',
+                  'border-color': '#f04124',
+                  'border-radius': '10px',
+                  'padding': '0px 0px 0px 2px',
+                  'margin-right': '2px',
+              });
+            } else {
+                element.css({
+                  'background-color': '#008cba',
+                  'border-color': '#008cba',
+                  'border-radius': '10px',
+                  'padding': '0px 0px 0px 2px',
+                  'margin-right': '2px',
+              });
             }
+            // var dateString = event.start.format("YYYY-MM-DD");
+            // $(view.el[0]).find('.fc-day[data-date=' + dateString + ']').css('background-color', '#FAA732');
           },
 
+          eventClick: function(event,jsEvent,view) {
+          if (event.url) {
+              window.open(event.url, "_blank");
+              return false;
+            }
+          }
 
-          events: [
-                    {
-                      "title": "All Day Event",
-                      "start": "2017-12-01"
-                    },
-                    {
-                      "title": "Long Event",
-                      "start": "2017-12-07",
-                      "end": "2017-12-10"
-                    },
-                    {
-                      "id": "999",
-                      "title": "Repeating Event",
-                      "start": "2017-12-09T16:00:00-05:00"
-                    },
-                    {
-                      "id": "999",
-                      "title": "Repeating Event",
-                      "start": "2017-12-16T16:00:00-05:00"
-                    },
-                    {
-                      "title": "Conference",
-                      "start": "2017-12-11",
-                      "end": "2017-12-13"
-                    },
-                    {
-                      "title": "Meeting",
-                      "start": "2017-12-12T10:30:00-05:00",
-                      "end": "2017-12-18T12:30:00-05:00"
-                    },
-                    {
-                      "title": "Meeting",
-                      "start": "2018-01-11T10:30:00-05:00",
-                      "end": "2018-01-13T12:30:00-05:00"
-                    },
-                   {
-                      "title": "Meeting",
-                      "start": "2018-02-11T10:30:00-05:00",
-                      "end": "2018-05-12T12:30:00-05:00"
-                    },
-                    {
-                      "title": "Meeting",
-                      "start": "2018-01-21T10:30:00-05:00",
-                      "end": "2018-01-18T12:30:00-05:00"
-                    },
-                    {
-                      "title": "Meeting",
-                      "start": "2018-01-18T10:30:00-05:00",
-                      "end": "2018-01-14T12:30:00-05:00"
-                    },
-                    {
-                      "title": "Lunch",
-                      "start": "2017-12-12T12:00:00-05:00"
-                    },
-                    {
-                      "title": "Meeting",
-                      "start": "2017-12-12T14:30:00-05:00"
-                    },
-                    {
-                      "title": "Happy Hour",
-                      "start": "2017-12-12T17:30:00-05:00"
-                    },
-                    {
-                      "title": "Dinner",
-                      "start": "2017-12-12T20:00:00"
-                    },
-                    {
-                      "title": "Birthday Party",
-                      "start": "2017-12-13T07:00:00-05:00"
-                    },
-                    {
-                      "title": "Click for Google",
-                      "url": "http://google.com/",
-                      "start": "2017-12-28"
-                    },
-                    {
-                      "title": "Lunch",
-                      "start": "2018-02-12T12:00:00-05:00"
-                    },
-                    {
-                      "title": "Meeting",
-                      "start": "2018-01-12T14:30:00-05:00"
-                    },
-                    {
-                      "title": "Happy Hour",
-                      "start": "2018-01-12T17:30:00-05:00"
-                    },
-                    {
-                      "title": "Dinner",
-                      "start": "2018-01-18T20:00:00"
-                    },
-                                        {
-                      "title": "Lunch",
-                      "start": "2018-01-28T12:00:00-05:00"
-                    },
-                    {
-                      "title": "Meeting",
-                      "start": "2018-02-16T14:30:00-05:00"
-                    },
-                    {
-                      "title": "Happy Hour",
-                      "start": "2018-01-19T17:30:00-05:00"
-                    },
-                    {
-                      "title": "Dinner",
-                      "start": "2018-01-01T20:00:00"
-                    },
-                    {
-                      "title": "Lunch",
-                      "start": "20178-02-12T12:00:00-05:00"
-                    },
-                    {
-                      "title": "Meeting",
-                      "start": "2018-12-12T14:30:00-05:00"
-                    },
-                    {
-                      "title": "Happy Hour",
-                      "start": "2018-01-03T17:30:00-05:00"
-                    },
-                    {
-                      "title": "Dinner",
-                      "start": "2018-01-22T20:00:00"
-                    },
-                  ],
+
         });
-      
+        
+    // will listener today click
+    $('#calendar').on('click', '.fc-button',function (){
+      console.log('click');
     });
+
+
+      
+});
 
 </script>
 

@@ -2079,7 +2079,8 @@ def activity_player_detail(request, group_id, lesson_id, activity_id):
     
     for each in group_obj.collection_set:
         node = node_collection.one({"_id":ObjectId(each)})
-        lesson_list.append({'name':node.name,'id':node._id,'first_act':node.collection_set[0]})
+        if node and node.collection_set:
+            lesson_list.append({'name':node.name,'id':node._id,'first_act':node.collection_set[0]})
 
     parent_node_id = activity_id
     node_obj = node_collection.one({'_id': ObjectId(activity_id)})
@@ -2154,9 +2155,9 @@ def activity_player_detail(request, group_id, lesson_id, activity_id):
     }
     
     
-    if prev_lesson_obj:
+    if prev_lesson_obj and prev_lesson_obj.collection_set :
         context_variables.update({ 'lesson_act_prev_id': prev_lesson_obj.collection_set[0],'prev_lesson_id':prev_lesson_obj._id })
-    if next_lesson_obj:
+    if next_lesson_obj and next_lesson_obj.collection_set :
         context_variables.update({ 'next_lesson_id':next_lesson_obj._id,'lesson_next_act_id': next_lesson_obj.collection_set[0] })
     
     
@@ -3953,7 +3954,7 @@ def assetcontent_detail(request, group_id, asset_id,asst_content_id,page_no=1):
     group_obj = get_group_name_id(group_id, get_obj=True)
     # print group_id,asset_id,asst_content_id
     asset_content_list = get_relation_value(ObjectId(asset_obj._id),'has_assetcontent')
-    template = 'ndf/gevent_base.html'
+    template = 'ndf/lms.html'
     assetcontent_page_info = paginator.Paginator(asset_content_list['grel_node'], page_no, GSTUDIO_NO_OF_OBJS_PP)
     context_variables = {
             'asset_content_list':asset_content_list,'group_id':group_id,

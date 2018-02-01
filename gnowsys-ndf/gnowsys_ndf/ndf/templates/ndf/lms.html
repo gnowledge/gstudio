@@ -4,8 +4,9 @@
 {% load ndf_tags %}
 {% user_access_policy groupid request.user as user_access %}
 
+{% get_group_object groupid as group_obj %}
 
-{% block title %}   {% endblock%}
+{% block title %} {% firstof group_obj.altnames group_obj.name %}  {% endblock%}
 
 {% block head %}
   <script src="/static/ndf/bower_components/jquery-backstretch/jquery.backstretch.min.js"></script>
@@ -112,10 +113,21 @@
   
     {% if is_gstaff %}
     <li>
-        <a href="{% url 'course_pages' group_id %}"  {% if title == 'course_pages' or title == 'create_course_pages' %}class="selected"{% endif %}><i class="fi-page-filled "></i> {% trans "Activities" %}</a>
+    	{% if site.SITE_NAME == 'NROER' %}
+        	<a href="{% url 'course_pages' group_id %}"  {% if title == 'course_pages' or title == 'create_course_pages' %}class="selected"{% endif %}><i class="fi-page-filled "></i> {% trans "Pages" %}</a>
+    	{% else %}
+    		<a href="{% url 'course_pages' group_id %}"  {% if title == 'course_pages' or title == 'create_course_pages' %}class="selected"{% endif %}><i class="fi-page-filled "></i> {% trans "Activities" %}</a>
+    	{% endif %}
+    	{% comment %}
+      <a href="{% url 'gtask' group_id  %}" {% if title == "Task" %} class="selected"  {% endif %} tabindex="7" > <i class="fa fa-list-alt"></i> {% trans "Task" %}</a>
+      {% endcomment %}
     </li>
     <li>
-        <a href="{% url 'asset_list' group_id %}" {% if title == 'asset_list' or title == 'asset_detail' or title == 'asset_content_detail'%}class="selected"{% endif %}><i class="fi-folder-lock"></i> {%trans "Assets" %}</a>
+    	{% if site.SITE_NAME == 'NROER' %}
+        	<a href="{% url 'asset_list' group_id %}" {% if title == 'asset_list' or title == 'asset_detail' or title == 'asset_content_detail'%}class="selected"{% endif %}><i class="fi-folder-lock"></i> {%trans "Asset Collection" %}</a>
+    	{% else %}
+    		<a href="{% url 'asset_list' group_id %}" {% if title == 'asset_list' or title == 'asset_detail' or title == 'asset_content_detail'%}class="selected"{% endif %}><i class="fi-folder-lock"></i> {%trans "Assets" %}</a>
+    	{% endif %}
     </li>
     <li>
         <a href="https://clix-authoring.mit.edu/#/" target="_blank" {% if title == 'Assessments' %}class="selected"{% endif %}><i class="fi-graph-trend"></i> {% trans "Assessments" %}</a>
@@ -215,7 +227,7 @@
 </div>
 
 
-  <div class="small-12 columns group_sections_content">
+  <div class="small-12 columns group_sections_content" style="background-color:#ffffff;">
 
    <div id="group_overview">
       {% if title == "about" %}
@@ -356,6 +368,7 @@
 <script type="text/javascript">
   var imgSrc = $('.lms_banner .div-height img').attr('src');
   $('.lms_banner').css('z-index','');
+  $('.lms_banner').css('margin-top','-5px');
   $('.lms_banner .div-height img').attr('src', '');
   $('.lms_banner .div-height img').attr('alt', '');
   $('.lms_banner').backstretch(imgSrc);

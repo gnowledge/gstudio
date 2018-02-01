@@ -16,6 +16,8 @@ from django.contrib.auth.decorators import login_required
 from django.contrib.sites.models import Site
 from django.contrib.auth.models import User
 from django.views.generic import View
+from django.core.cache import cache
+
 try:
     from bson import ObjectId
 except ImportError:  # old pymongo
@@ -25,10 +27,10 @@ except ImportError:  # old pymongo
 from gnowsys_ndf.settings import GAPPS, GSTUDIO_GROUP_AGENCY_TYPES, GSTUDIO_NROER_MENU, GSTUDIO_NROER_MENU_MAPPINGS,GSTUDIO_FILE_UPLOAD_FORM, GSTUDIO_FILE_UPLOAD_POINTS, GSTUDIO_BUDDY_LOGIN
 from gnowsys_ndf.settings import GSTUDIO_MODERATING_GROUP_ALTNAMES, GSTUDIO_PROGRAM_EVENT_MOD_GROUP_ALTNAMES, GSTUDIO_COURSE_EVENT_MOD_GROUP_ALTNAMES
 from gnowsys_ndf.settings import GSTUDIO_SITE_NAME
-from gnowsys_ndf.ndf.models import NodeJSONEncoder, node_collection, triple_collection, Counter, counter_collection
+from gnowsys_ndf.ndf.models import NodeJSONEncoder, node_collection, triple_collection, Counter, counter_collection, Node
 from gnowsys_ndf.ndf.views.methods import *
 from gnowsys_ndf.ndf.views.asset import *
-
+from gnowsys_ndf.ndf.views.utils import add_to_list
 # from gnowsys_ndf.ndf.models import GSystemType, GSystem, Group, Triple
 # from gnowsys_ndf.ndf.models import c
 from gnowsys_ndf.ndf.views.ajax_views import *
@@ -2015,11 +2017,11 @@ def group(request, group_id, app_id=None, agency_type=None):
 @login_required
 @get_execution_time
 def populate_list_of_members():
-	members = User.objects.all()
-	memList = []
-	for mem in members:
-		memList.append(mem.username)
-	return memList
+    members = User.objects.all()
+    memList = []
+    for mem in members:
+        memList.append(mem.username)
+    return memList
 
 
 @login_required
@@ -2526,6 +2528,130 @@ def upload_using_save_file(request,group_id):
     # print "\n\nretirn gs_obj_list",gs_obj_list
     # gs_obj_id = gs_obj_list[0]['_id']
     # print "\n\n\ngs_obj_id: ",gs_obj_id
+        new_grps_list_all = []
+
+        for each_group_id in new_grps_list:
+            each_group_obj = node_collection.one({'_id': ObjectId(each_group_id)})
+
+            if each_group_obj.moderation_level > -1:
+                # means group is moderated one.
+                each_result_dict = moderation_status(request, each_group_obj._id, node._id, get_only_response_dict=True)
+                if each_result_dict['is_under_moderation']:
+                    # means, this node already exists in one of -
+                    # - the underlying mod group of this (each_group_obj).
+                    pass
+                else:
+                    each_group_set = get_moderator_group_set(existing_grps, each_group_id, get_details=False)
+                    merge_group_set = set(each_group_set + new_grps_list_all)
+                    new_grps_list_all = list(merge_group_set)
+                    t = create_moderator_task(request, node.group_set[-1], node._id,on_upload=True)
+
+            else:
+                if each_group_id not in new_grps_list_all:
+                    new_grps_list_all.append(ObjectId(each_group_id))
+
+
+        node.group_set = list(set(new_grps_list_all))
+        node.save()
+        # node_collection.collection.update({'_id': node._id}, {'$set': {'group_set': new_grps_list_all}}, upsert=False, multi=False)
+        # node.reload()
+        response_dict["success"] = True
+        response_dict["message"] = "Published to selected groups"
+    else:
+        response_dict["success"] = False
+        response_dict["message"] = node.member_of_names_list[0] + " with name " + node.name + \
+                " already exists. Hence Cannot Publish to selected groups."
+        response_dict["message"] = node.member_of_names_list[0] + " with name " + node.name + \
+                " already exists in selected group(s). " + \
+                "Hence cannot be cross published now." + \
+                " For publishing, you can rename this " + node.member_of_names_list[0] + " and try again."
+      # print response_dict
+        return HttpResponse(json.dumps(response_dict))
+
+    
+    
+
+
+@login_required
+@get_execution_time
+def cross_publish(request, group_id):
+    try:
+        group_id = ObjectId(group_id)
+    except:
+        group_name, group_id = get_group_name_id(group_id)
+
+    gstaff_access = check_is_gstaff(group_id,request.user)
+    if request.method == "GET":
+        query = {'_type': 'Group', 'status': u'PUBLISHED',
+                '$or': [
+                            {'access_policy': u"PUBLIC"},
+                            {'$and': [
+                                    {'access_policy': u"PRIVATE"},
+                                    {'created_by': request.user.id}
+                                ]
+                            }
+                        ],
+                }
+
+        if gstaff_access:
+            query.update({'group_type': {'$in': [u'PUBLIC', u'PRIVATE']}})
+        else:
+            query.update({'name': {'$nin': GSTUDIO_DEFAULT_GROUPS_LIST},
+                        'group_type': u'PUBLIC'})
+        group_cur = node_collection.find(query,{ '_id': 1, 'name':1, 'altnames':1}).sort('last_update', -1)
+        response_dict = {'groups_cur': group_cur}
+        return HttpResponse(json.dumps(list(group_cur), cls=NodeJSONEncoder))
+    elif request.method == "POST":
+        success_flag = True
+        target_group_ids = request.POST.getlist("group_ids[]", None)
+
+        # print "\ntarget_group_ids:", target_group_ids
+        if target_group_ids:
+            try:
+                target_group_ids = map(ObjectId, list(set(target_group_ids)))
+                node_id = request.POST.get("node_id", None)
+                remove_from_curr_grp_flag = eval((request.POST.get("remove_from_curr_grp_flag", "False")).title())
+                publish_children = eval(request.POST.get("publishChildren", False))
+                node_obj = Node.get_node_by_id(node_id)
+                if publish_children:
+                    # Exclusive action for Asset
+                    if u"Asset" in node_obj.member_of_names_list:
+                        asset_content_tr = node_obj.get_relation("has_assetcontent")
+                        child_ids = [each_tr.right_subject for each_tr in asset_content_tr]
+                    else:
+                        child_ids = node_obj.collection_set
+                    child_cur =  node_collection.find({'_id': {'$in': child_ids}})
+                    if remove_from_curr_grp_flag:
+                        for each_child in child_cur:
+                            # each_child.group_set = add_to_list(each_child.group_set, target_group_ids)
+                            each_child.group_set = filter(lambda x: x != group_id, target_group_ids)
+                            each_child.save()
+                    else:
+                        for each_child in child_cur:
+                            # each_child.group_set = add_to_list(each_child.group_set, target_group_ids)
+                            each_child.group_set = target_group_ids
+                            each_child.save()
+                # node_obj.group_set = add_to_list(node_obj.group_set, target_group_ids)
+                if remove_from_curr_grp_flag:
+                    node_obj.group_set = filter(lambda x: x != group_id, target_group_ids)
+                else:
+                    node_obj.group_set = target_group_ids
+                node_obj.save()
+            except Exception as e:
+                print "\nError occurred in Cross-Publish", e
+                success_flag = False
+                pass
+
+        return HttpResponse(json.dumps(target_group_ids, cls=NodeJSONEncoder))
+
+
+
+@login_required
+@get_execution_time
+def publish_group(request,group_id,node):
+
+    group_obj = get_group_name_id(group_id, get_obj=True)
+    profile_pic_image = None
 
     discussion_enable_at = node_collection.one({"_type": "AttributeType", "name": "discussion_enable"})
     for each_gs_file in fileobj_list:

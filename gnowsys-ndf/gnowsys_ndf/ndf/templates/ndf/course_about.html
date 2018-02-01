@@ -3,28 +3,28 @@
 {% block head %}
 {% if show_analytics_notifications %}
 
-  <!-- DataTables -->
-  <script src="/static/ndf/bower_components/DataTables/media/js/jquery.dataTables.js"></script>
-  <script src="/static/ndf/bower_components/datatables-plugins/integration/foundation/dataTables.foundation.js"></script>
+<!-- DataTables -->
+<script src="/static/ndf/bower_components/DataTables/media/js/jquery.dataTables.js"></script>
+<script src="/static/ndf/bower_components/datatables-plugins/integration/foundation/dataTables.foundation.js"></script>
 
-  <script src="/static/ndf/bower_components/pace/pace.js"></script>
-  <link href="/static/ndf/bower_components/pace/themes/blue/pace-theme-loading-bar.css" rel="stylesheet" />
-  <!-- DataTables CSS -->
-  <link href="/static/ndf/bower_components/datatables-plugins/integration/foundation/dataTables.foundation.css" rel="stylesheet" type="text/css" />
+<script src="/static/ndf/bower_components/pace/pace.js"></script>
+<link href="/static/ndf/bower_components/pace/themes/blue/pace-theme-loading-bar.css" rel="stylesheet" />
+<!-- DataTables CSS -->
+<link href="/static/ndf/bower_components/datatables-plugins/integration/foundation/dataTables.foundation.css" rel="stylesheet" type="text/css" />
 {% endif %}
 <style type="text/css">
-    .right-btn, .left-btn{
-        /*float: left;*/
-        /*margin-left: 1rem;*/
-        width: 40%;
-        font-size: 0.85em !important;
-        margin-top: 0.1rem !important;
-        text-align: center;
-    }
-    .tag-rating-div{
-        margin-left: 0.6rem !important;
-        margin-top: 0.3rem !important;
-    }
+  .right-btn, .left-btn{
+    /*float: left;*/
+    /*margin-left: 1rem;*/
+    width: 40%;
+    font-size: 0.85em !important;
+    margin-top: 0.1rem !important;
+    text-align: center;
+  }
+  .tag-rating-div{
+    margin-left: 0.6rem !important;
+    margin-top: 0.3rem !important;
+  }
     /*  
     .right-btn{
         float: right;
@@ -34,137 +34,137 @@
     }
     */
     .rating-lbl{
-        display: inline-block;
-        font-size: 1rem !important;
-        /*font-style: italic;*/
-        /*margin-left: 3rem;*/
+      display: inline-block;
+      font-size: 1rem !important;
+      /*font-style: italic;*/
+      /*margin-left: 3rem;*/
 
     }
     .rating_template{
-        display: inline-table;
+      display: inline-table;
     }
     .mod-btn{
-        width: 80% !important;
-        font-size: 0.75rem !important;
+      width: 80% !important;
+      font-size: 0.75rem !important;
     }
     .btn-row{
-        /*margin-left: 1rem !important;*/
-        text-align: center;
-        margin-bottom: -1rem !important;
+      /*margin-left: 1rem !important;*/
+      text-align: center;
+      margin-bottom: -1rem !important;
     }
     .lbl_tag{
-        display: inline-block;
-        font-size: 0.80rem !important;
+      display: inline-block;
+      font-size: 0.80rem !important;
     }
     .lbl_field{
-        width: 20%;
-        color: #194d6f;
-        /*font-weight: bold;*/
-        margin-top: 1rem;
-        font-size: 1rem !important;
+      width: 20%;
+      color: #194d6f;
+      /*font-weight: bold;*/
+      margin-top: 1rem;
+      font-size: 1rem !important;
     }
     .label > a{
-        color: white !important;
+      color: white !important;
     }
 
     .graph_btn{
-        margin-left: 3rem;
+      margin-left: 3rem;
     }
 
     #group_drawer{
-        height: 400px;
-        overflow-y: auto;
-        margin-left: 2em;
+      height: 400px;
+      overflow-y: auto;
+      margin-left: 2em;
     }
-</style>
-<style type="text/css">
+  </style>
+  <style type="text/css">
 
-  .short-text {
-    overflow: hidden;
-    height: 6em;
-  }
-  .full-text{
-    height: auto;
-  }
+    .short-text {
+      overflow: hidden;
+      height: 6em;
+    }
+    .full-text{
+      height: auto;
+    }
 
-  #course-notification{
-    overflow-y:scroll !important;
-    height: 400px !important;
-  }
+    #course-notification{
+      overflow-y:scroll !important;
+      height: 400px !important;
+    }
 
-  .selFile{
-    margin-left: 2% !important;
-    margin-right: 2% !important;
-    padding: 15px 5px;
-  }
-</style>
-{% endblock %}
+    .selFile{
+      margin-left: 2% !important;
+      margin-right: 2% !important;
+      padding: 15px 5px;
+    }
+  </style>
+  {% endblock %}
 
-<script src="/static/ndf/bower_components/d3/d3.js"></script>
-<input type="hidden" class="admin_analytics_fetched" value="False">
+  <script src="/static/ndf/bower_components/d3/d3.js"></script>
+  <input type="hidden" class="admin_analytics_fetched" value="False">
 
-<div id="course-about">
+  <div id="course-about">
 
-  <div class="about-course">
-    <h5>Description:</h5>
+    <div class="about-course">
+      <h5>Description:</h5>
       <div class="course-desc" id="scstyle">
-          {{group_object.content|default:'No description added yet.'|safe}}
+        {{group_object.content|default:'No description added yet.'|safe}}
       </div>
       <div>
         <u><a class="show-more hide">Show more</a></u>
       </div>
       <br/>
       {% if group_object.tags %}
-          <h5>Tags:</h5>
-          {% for tag in group_object.tags %}
-                  <small><label class="tag-ele">
-              <a href="{% url 'tag_info' group_id tag %}">{{tag}} </a></label></small>
-          {% endfor %} 
-      {% else %}
-          <!-- <i><small><label class="tag-ele">{% trans "No tags defined yet!" %}</label></small></i> -->
-      {% endif %}
-  </div>
+      <h5>Tags:</h5>
+      {% for tag in group_object.tags %}
+      <small><label class="tag-ele">
+        <a href="{% url 'tag_info' group_id tag %}">{{tag}} </a></label></small>
+        {% endfor %} 
+        {% else %}
+        <!-- <i><small><label class="tag-ele">{% trans "No tags defined yet!" %}</label></small></i> -->
+        {% endif %}
+      </div>
 
-  <div class="about-course">
+      <div class="about-course">
 
-      <div class="medium-3 rows">
-        <div class="left">
-          <i class="icon-wid fa fa-user"></i>
-        </div>
-        <div class="left">
-          <h5>No. of Members</h5>
-          <div class="course-highlight">
-        <span>
-          {{group_object.author_set|length}} 
-        </span>
+        <div class="medium-3 rows">
+          <div class="left">
+            <i class="icon-wid fa fa-user"></i>
+          </div>
+          <div class="left">
+            <h5>No. of Members</h5>
+            <div class="course-highlight">
+              <span>
+                {{group_object.author_set|length}} 
+              </span>
 
+            </div>
           </div>
         </div>
-      </div>
-      <br/>
-      <br/>
-     
+        <br/>
+        <br/>
 
-      {% if show_analytics_notifications %}
-      <div class="medium-3 rows">
-        <div class="left">
-          <i class="icon-wid fa fa-list"></i>
-        </div>
-        <div class="left module_text">
-          <h5>No. of {% firstof group_object.project_config.tab_name 'Lessons' %}</h5>
-          <div class="course-highlight">
+
+        {% if show_analytics_notifications %}
+        <div class="medium-3 rows">
+          <div class="left">
+            <i class="icon-wid fa fa-list"></i>
+          </div>
+          <div class="left module_text">
+            <h5>No. of {% firstof group_object.project_config.tab_name 'Lessons' %}</h5>
+            <div class="course-highlight">
              <span>{{group_object.collection_set|length}}</span>
-          </div>
-        </div>
-      </div>
-      <br/>
+           </div>
+         </div>
+       </div>
+       <br/>
 
-     
-      
-      <br/>
-      
-        {% if 'Group' not in  group_obj.member_of_names_list %}
-      <div class="medium-3 rows">
+
+
+       <br/>
+
+       {% if 'Group' not in  group_obj.member_of_names_list %}
+       <div class="medium-3 rows">
         <div class="left">
           <i class="icon-wid fa fa-clock-o"></i>
         </div>
@@ -176,92 +176,92 @@
         </div>
       </div>
       <br/>
-        {% endif %}
+      {% endif %}
       {% endif %}
     </div>
 
 
 
 
-{% if educationallevel_val %}
- 
+    {% if educationallevel_val %}
+
     <div class="about-course">
-    <div class="medium-3 rows">
+      <div class="medium-3 rows">
         <div class="left">
           <i class="icon-wid fi-results-demographics"></i>
         </div>
         <div class="left">
           <h5>Grade</h5>
           <div class="course-highlight">
-             <span> {{educationallevel_val}}</span>
-          </div>
-        </div>
-      </div>
-      <br/>
+           <span> {{educationallevel_val}}</span>
+         </div>
+       </div>
+     </div>
+     <br/>
 
      
-      
-      <br/>
-      
-    </div>
- 
-{% endif %}
 
-{% if educationalsubject_val %}
-  
-    <div class="about-course">
+     <br/>
+
+   </div>
+
+   {% endif %}
+
+   {% if educationalsubject_val %}
+
+   <div class="about-course">
     <div class="medium-3 rows">
-        <div class="left">
-          <i class="icon-wid fa fa-book"></i>
-        </div>
-        <div class="left">
-          <h5>Subject</h5>
-          <div class="course-highlight">
-              <span>{{educationalsubject_val}}</span>
-          </div>
+      <div class="left">
+        <i class="icon-wid fa fa-book"></i>
+      </div>
+      <div class="left">
+        <h5>Subject</h5>
+        <div class="course-highlight">
+          <span>{{educationalsubject_val}}</span>
         </div>
       </div>
-      <br/>
-
-     
-      
-      <br/>
-
-      
-        {# </div> #}
     </div>
-  
-{% endif %}
+    <br/>
 
-{# <div class="row"> #}
+
+
+    <br/>
+
+
+    {# </div> #}
+  </div>
+  
+  {% endif %}
+
+  {# <div class="row"> #}
   <div class="about-course">
     <div class="medium-3 rows">
-        <div class="left">
-          <i class="icon-wid fa fa-calendar"></i>
-        </div>
-        <div class="left">
-          <h5>Created On</h5>
-          <div class="course-highlight">
-              <span> {{group_obj.created_at}}</span>
-          </div>
+      <div class="left">
+        <i class="icon-wid fa fa-calendar"></i>
+      </div>
+      <div class="left">
+        <h5>Created On</h5>
+        <div class="course-highlight">
+          <span> {{group_obj.created_at}}</span>
         </div>
       </div>
-      <br/>
+    </div>
+    <br/>
 
-     
-      
-      <br/>
-  
-      {# </div> #}
+
+
+    <br/>
+
+    {# </div> #}
   </div>
-{# </div> #}
+  {# </div> #}
 
-<br/>
-<br/>
+  <br/>
+  <br/>
 
 
-{% if show_analytics_notifications %}
-{% check_is_gstaff group_id request.user as gstaff_access %}
+  {% if show_analytics_notifications %}
+  {% check_is_gstaff group_id request.user as gstaff_access %}
   <div class="course-overview-container">
     <div class="collapse course-overview">
       {# <div class="columns small-12 medium-12"> #}
@@ -308,42 +308,42 @@
                     </div>
                   </div>
                 </div>
-                <div id="userAnalyticsModal" class="reveal-modal reveal-modal-overlay" data-options="close_on_background_click:false;close_on_esc:false;" data-reveal aria-hidden="true" role="dialog">
-                  <label id="userAnalyticsModalLabel"></label>
-                  <div class="userAnalyticsData"></div>
-                </div>
-              {% endif %}
+            <div id="userAnalyticsModal" class="reveal-modal reveal-modal-overlay" data-options="close_on_background_click:false;close_on_esc:false;" data-reveal aria-hidden="true" role="dialog">
+              <label id="userAnalyticsModalLabel"></label>
+              <div class="userAnalyticsData"></div>
+            </div>
+            {% endif %}
 
-            </section>
-          </div>
+          </section>
         </div>
+      </div>
       {# </div> #}
+      </div>
     </div>
-  </div>
-
+</div>
   <script type="text/javascript">
       // Student analytics view
       $(document).on('click','.fetch-analytics',function(){
-          var user_id = $(this).attr("data-id");
-          var dataPointsDict = $(this).attr('data-points-dict');
+        var user_id = $(this).attr("data-id");
+        var dataPointsDict = $(this).attr('data-points-dict');
           // $(this).addClass("hide")
           $.ajax({
-              url: "{% url 'course_analytics' group_id 'user_id' %}".replace("user_id", user_id),
-              type: "GET",
-              dataType: "html",
-              data: {'data_points_dict': dataPointsDict},
-              global: false,
-              success: function(data){
-                  if($(".is_admin").val() == "True"){
-                    $(".userAnalyticsData").html(data)
-                    $("#userAnalyticsModal").foundation('reveal', 'open');
-                  }
-                  else{
-                    $("#analytics-content").html(data)
-                  }
-              },
+            url: "{% url 'course_analytics' group_id 'user_id' %}".replace("user_id", user_id),
+            type: "GET",
+            dataType: "html",
+            data: {'data_points_dict': dataPointsDict},
+            global: false,
+            success: function(data){
+              if($(".is_admin").val() == "True"){
+                $(".userAnalyticsData").html(data)
+                $("#userAnalyticsModal").foundation('reveal', 'open');
+              }
+              else{
+                $("#analytics-content").html(data)
+              }
+            },
           });//end of ajax
-      })
+        })
 
       // Admin analytics view
       $(document).on('click','.fetch-group-analytics',function(){
@@ -351,26 +351,26 @@
           // $(".fetch-group-analytics").addClass("hide")
           $(".pre-analytics-msg-div").removeClass("hide")
           $.ajax({
-              url: "{% url 'course_analytics_admin' group_id %}",
+            url: "{% url 'course_analytics_admin' group_id %}",
 
-              type: "GET",
+            type: "GET",
 
-              dataType: "html",
-              global: false,
-              success: function(data){
-                $(".admin_analytics_fetched").attr('value', "True");
-                data = JSON.parse(data)
-                column_headers = data["column_headers"];
-                students_data_set = data["students_data_set"];
-                max_data = data['max_points_dict']
-                file_max_points = max_data['file_max_points']
-                notes_max_points = max_data['notes_max_points']
-                quiz_max_points =  max_data['quiz_max_points']
-                interactions_max_points = max_data['interactions_max_points']
-                dataTable_columns_set = [];
+            dataType: "html",
+            global: false,
+            success: function(data){
+              $(".admin_analytics_fetched").attr('value', "True");
+              data = JSON.parse(data)
+              column_headers = data["column_headers"];
+              students_data_set = data["students_data_set"];
+              max_data = data['max_points_dict']
+              file_max_points = max_data['file_max_points']
+              notes_max_points = max_data['notes_max_points']
+              quiz_max_points =  max_data['quiz_max_points']
+              interactions_max_points = max_data['interactions_max_points']
+              dataTable_columns_set = [];
 
-                var students_points_table = '<table cellpadding="0" cellspacing="0" border="0" class="display" id="students-points-table-tbody">' + '</table>';
-                $(".table-container").html(students_points_table)
+              var students_points_table = '<table cellpadding="0" cellspacing="0" border="0" class="display" id="students-points-table-tbody">' + '</table>';
+              $(".table-container").html(students_points_table)
                 // Prepare title & data headers used in dataTable
                 $.each(column_headers, function(index, v) {
                   d = {};
@@ -384,13 +384,13 @@
                   "columns": dataTable_columns_set,
                   "autoWidth": false,
                   "columnDefs": [
-                        { width: '10%', targets: 0 },
-                        { width: '10%', targets: 1 },
-                        { width: '20%', targets: 2 },
-                        { width: '20%', targets: 3 },
-                        { width: '20%', targets: 4 },
-                        { width: '20%', targets: 5 }
-                     ],
+                  { width: '10%', targets: 0 },
+                  { width: '10%', targets: 1 },
+                  { width: '20%', targets: 2 },
+                  { width: '20%', targets: 3 },
+                  { width: '20%', targets: 4 },
+                  { width: '20%', targets: 5 }
+                  ],
                   "createdRow": function ( row, data, index ) {
                     user_id = data["user_id"];
                     $(row).attr("data-id", user_id);
@@ -449,9 +449,9 @@
       // pi chart for score points
       function generateGraph(data){
         var dataSet = []
-          $.each(data,function(i,v){
-            dataSet.push({'legendLabel':i,'magnitude':v})
-          })
+        $.each(data,function(i,v){
+          dataSet.push({'legendLabel':i,'magnitude':v})
+        })
 
         var canvasWidth = 600, //width
           canvasHeight = 300,   //height
@@ -479,7 +479,7 @@
 
         // This will create <path> elements for us using arc data...
         var arc = d3.svg.arc()
-          .outerRadius(outerRadius);
+        .outerRadius(outerRadius);
 
         var pie = d3.layout.pie() //this will create arc data for us given a list of values
           .value(function(d) { return d.magnitude; }) // Binding each value to the pie
@@ -498,7 +498,7 @@
           .append("svg:g")
           .attr("class", "slice");    //allow us to style things in the slices (like text)
 
-        arcs.append("svg:path")
+          arcs.append("svg:path")
           //set the color for each slice to be chosen from the color function defined above
           .attr("fill", function(d, i) { return color(i); } )
           //this creates the actual SVG path using the associated data (pie) with the arc drawing function
@@ -519,14 +519,14 @@
 
         // Add a magnitude value to the larger arcs, translated to the arc centroid and rotated.
         var quant = arcs.filter(function(d) { return d.endAngle - d.startAngle > .2; })
-            .append('g')
-          var temp = quant.append("svg:text")
-              .style("fill", "White")
-              .style("font", "15px Arial")
-              .text(function(d) { return d.data.magnitude; })
+        .append('g')
+        var temp = quant.append("svg:text")
+        .style("fill", "White")
+        .style("font", "15px Arial")
+        .text(function(d) { return d.data.magnitude; })
 
-          quant.attr("dy", ".35em")
-          .attr("text-anchor", "middle")
+        quant.attr("dy", ".35em")
+        .attr("text-anchor", "middle")
           //.attr("transform", function(d) { return "translate(" + arc.centroid(d) + ")rotate(" + angle(d) + ")"; })
           .attr("transform", function(d) { //set the label's origin to the center of the arc
             //we have to make sure to set these before calling arc.centroid
@@ -558,24 +558,24 @@
 
       // Scroll event for Notifications div
       $("#course-notification").scroll(function(){
-          if (count == 0) {
-              loaddata();
-              count = count+1;
-          }
+        if (count == 0) {
+          loaddata();
+          count = count+1;
+        }
       })
 
       // Fetch notifications ajax call with function
-  </script>
-{% endif %}
-<script type="text/javascript">
+    </script>
+    {% endif %}
+    <script type="text/javascript">
 
     // ready function
     $(document).ready(function() {
-        var course_about_panel = $('.course-desc')
-        if(course_about_panel.height() > 90 ){
-          $(".show-more").removeClass("hide")
-          $(".course-desc").addClass("short-text")
-        }
+      var course_about_panel = $('.course-desc')
+      if(course_about_panel.height() > 90 ){
+        $(".show-more").removeClass("hide")
+        $(".course-desc").addClass("short-text")
+      }
     })
 
     // Show more/less Course Description
@@ -592,4 +592,4 @@
       }
     })
 
-</script>
+  </script>

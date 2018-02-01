@@ -155,12 +155,14 @@
 
   {% get_gstudio_footer_links  as footer_links %}
 
+
     <div class="bo-wrap clr4" style="">
       <div class="bo-footer">
         <div class="bo-footer-social">
           <a href="{{site.ABOUT}}" target="_blank">About </a>
           <a href="{{site.CONTACT}}" target="_blank">Contact </a>
-          <a href="http://www.tiss.edu/disclaimer/" target="_blank">Disclaimer </a>
+          <a href="" >Disclaimer </a>
+
         </div>
       </div>
     </div>
@@ -183,12 +185,12 @@
     <div class="bo-wrap clr4">
       <div class="bo-footer">
         <div class="bo-footer-copyright">
-          <a href="">Privacy</a>
-          <a href="">Terms Of Use</a>
+          <a href="">Privacy</a>&nbsp;
+          <a href="">Terms Of Use</a>&nbsp;
           {% get_latest_git_hash as git_commit_hash %}
           <a href="https://gitlab.com/gnowledge/gstudio/tree/{{git_commit_hash}}" target="_blank">Version</a>
         </div>
       </div>
     </div>
-
-
+  </div>
+  </div>
