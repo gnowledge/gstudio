@@ -5,9 +5,9 @@
 {% get_pages "Info page" as infopages %}
 <footer>
     <div class="myfooter">
-    <div class="footer-section container content-section">
-        <div class="row" style="padding-left:0px;">
-            <div class="footer_content">
+        <div class="footer-section container content-section">
+            <div class="row" style="padding-left:0px;">
+<!--             <div class="footer_content">
                 <img class="footer-logo" title="{{site.SITE_NAME}}" src="{{site.LOGO}}">
                 <br>
                 <ul>
@@ -19,10 +19,10 @@
                         <strong><a href="http://www.hbcse.tifr.res.in/" target="_blank">Homi Bhabha Centre for Science Education</a>, <a href="http://www.tifr.res.in/" target="_blank">TIFR</a>.</strong>
                     </li>
                 </ul>
-            </div>
+            </div> -->
 
             <!--  -->
-            <div style="display:block;clear:both;">
+           <!--  <div style="display:block;clear:both;">
                 <div class="footer_link_cont">
                     <h4 style="color: #999;">Quick Links</h4>
                     <div class="links_collapse">
@@ -34,9 +34,9 @@
                             <li><a href="{{site.PRIVACY_POLICY}}">{% trans "Privacy Policy" %}</a></li>
                             <li><a href="{{site.CONTRIBUTE}}">{% trans "Contribute" %}</a></li>
                             <li><a href="{{site.CONTACT}}">{% trans "Contact" %}</a></li>
-                            <!--
+                            
                             <li><a href="https://gitlab.com/gnowledge/gstudio/issues">{% trans "Issues" %}</a></li>
-                            -->
+                            
                             <li><a href="{{site.ISSUES_PAGE}}">{% trans "Feedback" %}</a></li>
                         </ul>
                     </div>
@@ -54,11 +54,112 @@
                     <div class="show_foot_links">Show More</div>
                 </div>
             </div>
-            <!-- ****** -->
+  -->           <!-- ****** -->
+
+                <div class="small-12 medium-12 columns" style="margin-bottom:15px;">
+                    <div class="small-3 medium-3 columns">
+                        <div class="footer_link_cont">
+                            <h4 style="color: #999;">Quick Links</h4>
+                            <div class="links_collapse">
+                                <ul>
+                                    <li><a href="{{site.ABOUT}}">{% trans "About" %}</a></li>
+                                    <li><a href="{{site.PARTNERS}}">{% trans "Partners" %}</a></li>
+                                    <li><a href="{{site.GROUPS}}">{% trans "Groups" %}</a></li>
+                                    <li><a href="{{site.TERMS_OF_SERVICE}}">{% trans "Terms of Service" %}</a></li>
+                                    <li><a href="{{site.PRIVACY_POLICY}}">{% trans "Privacy Policy" %}</a></li>
+                                    <li><a href="{{site.CONTRIBUTE}}">{% trans "Contribute" %}</a></li>
+                                    <li><a href="{{site.CONTACT}}">{% trans "Contact" %}</a></li>
+                                    
+                                    <li><a href="https://gitlab.com/gnowledge/gstudio/issues">{% trans "Issues" %}</a></li>
+                                    
+                                    <li><a href="{{site.ISSUES_PAGE}}">{% trans "Feedback" %}</a></li>
+                                </ul>
+                            </div>
+                            <div class="show_foot_links">Show More</div>
+                        </div>
+                    </div>
+
+                    <div class="small-3 medium-3 columns">
+                        <div class="footer_link_cont">
+                            <h4 style="color: #999;">Other Links</h4>
+                            <div class="links_collapse">
+                                <ul>
+                                    <li><a href="http://ncert.nic.in">NCERT</a></li>
+                                    <li><a href="http://ciet.nic.in">CIET</a></li>
+                                    <li><a href="http://epathshala.nic.in">Epathshala</a></li>
+                                    <li><a href="http://ictcurriculum.gov.in">ICT Curriculum</a></li>
+                                    <li><a href="http://swayam.nic.in">SWAYAM</a></li>
+                                    <li><a href="http://ncert.org.in/ictschools/index.php/cyber-security/">Cyber Security</a></li>
+                                    <li><a href="http://ncert.org.in/ictschools/index.php/links/">See all</a></li>
+                                </ul>
+                            </div>
+                            <div class="show_foot_links">Show More</div>
+                        </div>
+                    </div>
+
+                    <div class="small-6 medium-6 columns">
+                        <div class="footer_link_cont">
+                            <h4 style="color: #999;">Connect With Us</h4>
+        
+                            <div class="social_links" >
+                                <a href="https://www.facebook.com/National-Council-of-Educational-Research-and-Training-NCERT-1603463793208763/"><i class="fi-social-facebook" style="font-size: 24px; margin-right:5px; "></i></a>
+                                <a href="https://twitter.com/ciet_ncert"><i class="fi-social-twitter" style="font-size: 24px;"></i></a>
+                            </div>
+                           <!-- <hr style="border-color: #555; margin-bottom: 8px;">-->
+                            <div class="footer_link_cont no-gap">
+                                <ul>
+                                    <li>
+                                        {% get_latest_git_hash as git_commit_hash %}
+                                        Powered by <a href="https://gitlab.com/gnowledge/gstudio/tree/{{git_commit_hash}}" target="_blank">gstudio </a> built at Gnowledge Lab,
+                                    </li>
+                                    <li>
+                                        <a href="http://www.hbcse.tifr.res.in/" target="_blank">Homi Bhabha Centre for Science Education</a>, <a href="http://www.tifr.res.in/" target="_blank">TIFR</a>.
+                                    </li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                    
+                    <div id="logos" style="margin-top: 10px;">
+                    <hr style="border-color: #555; margin-top: 10px;">
+                        <div class="footer_link_cont">
+                            
+                            <ul id="footerlogo">
+                                <li><a href="http://mhrd.gov.in/" target="_blank"><img src="/static/ndf/images/logos/ministry_logos/mhrd-logo.png"/></a></li>
+                                <li><a href="http://digitalindia.gov.in/" target="_blank">
+                                    <img src="/static/ndf/images/logos/ministry_logos/digital_india.png"/></a></li>
+                                <li><a href="http://www.ncert.nic.in/" target="_blank">
+                                    <img src="/static/ndf/images/logos/ncert.png"/ style="height:60px;"></a></li>
+                                <li><a href="https://india.gov.in/" target="_blank">
+                                    <img src="/static/ndf/images/logos/ministry_logos/india_gov_logo.png"/></a></li>
+                                <li><a href="http://mygov.in/" target="_blank">
+                                    <img src="/static/ndf/images/logos/ministry_logos/my_gov_logo.png"/></a></li>
+                                <li><a href="https://data.gov.in/" target="_blank">
+                                    <img src="/static/ndf/images/logos/ministry_logos/datagov_logo.png"/></a></li>                             
+                            </ul>
+                        </div>
+
+                    </div>
+
+            </div>
         </div>
     </div>
-    </div>
 </footer>
+
+<style type="text/css">
+    #footerlogo li
+        {
+          margin: 0px 5px;
+          display:inline;
+        }
+        .no-gap ul
+        {
+            margin-left: 0rem;
+        }
+</style>
+
 <script>
     $(document).ready(function(){
         $('.show_foot_links').click(function(){
