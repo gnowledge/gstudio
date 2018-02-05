@@ -181,7 +181,7 @@ def copy_file_and_update_content_file(file_node, source_ele, src_val, epub_name)
         file_loc = "Videos"
     elif "audio" in mimetype_val:
         file_loc = "Audios"
-    elif "text" in mimetype_val:
+    elif "text" in mimetype_val or "application" in mimetype_val:
         file_loc = "Misc"
     source_ele[src_val] = (os.path.join('..',file_loc, file_name))
     shutil.copyfile("/data/media/" + file_node['if_file']['original']['relurl'], os.path.join(oebps_path, file_loc, file_name))
