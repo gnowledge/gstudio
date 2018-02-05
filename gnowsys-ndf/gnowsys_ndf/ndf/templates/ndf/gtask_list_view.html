@@ -1,0 +1,86 @@
+{% load i18n %}
+{% load ndf_tags %}
+{% check_is_gstaff group_id request.user as is_gstaff %}
+            
+            <div class="task_editor_top">
+            </div>
+            <div class="row task_head">
+                <div class="large-2 columns left ">
+                    All Tasks
+                </div>
+                <div class="large-2 columns right">
+                    <a href="#"><i class="fa fa-ellipsis-h" aria-hidden="true"></i></a>
+                </div>
+            </div>
+            
+
+            <table style="margin-left:-5px;" class="small-12 columns">
+              <thead>
+                <tr>
+                  <th width="600">Task Name</th>
+                  <th width="150">Task Owner</th>
+                  <th width="150">Task Priority</th>
+                  <th width="150">Task status</th>
+                  <th width="150">Edit Task</th>
+                  <th width="150">Delete Task</th>
+                </tr>
+              </thead>
+                <tbody class="{{each.id}}">
+              {% for each in TASK_inst %}
+                  <tr>
+                    
+                    <td><input type="checkbox" name="task" value="task"/>{{each.Name}}</td>
+                    <td>{{each.Assignee.0}}</td>
+                    <td><i class="circle-{{each.Priority|lower}}"></i>{{each.Priority}}</td>
+                    <td><a class="status-indication" title="Upcoming">{{each.Status}}</a></td>
+                    <td class="task-edit" ><i class="fa fa-pencil iconclr"> </td>
+                      {% if each.owner == 'owner'  or is_gstaff %}
+                        <td><i class="fa fa-trash iconclr" onclick="deleteTask('{{each.id}}')"></i></td>
+                      {% endif %}
+                  </tr>
+              {% endfor %}
+              
+                </tbody>
+            </table>
+
+
+
+            <script type="text/javascript">
+        
+           function deleteTask(task_id){
+
+                if (confirm("Do you want to delete this task?.") == true){
+                    //url = "/" + "{{group_id}}" + "/" + "gtask/gdelete_task/" + task_id
+                    $.ajax({
+                        url: "{% url 'ajax_delete_node' group_id  %}",
+                        type: "POST",
+                        data: {
+                          'csrfmiddlewaretoken': "{{csrf_token}}",
+                          "node_to_delete": task_id,
+                          "deletion_type": 0,
+                          "right_subject": 1,
+
+                        },
+                        
+                        success: function(data){ 
+                        node_id = JSON.parse(data)
+                        alert("Deleted task successfully");
+                        $('.' +node_id['node_id'] ).remove();
+                        
+                        },
+                        
+                        complete: function(){
+                          // $('#Student').foundation('reveal', 'open');
+                        }
+                    });
+                
+                }
+                else{
+
+                }
+            }
+
+
+
+
+            </script>

@@ -128,7 +128,7 @@ def explore_groups(request,page_no=1):
 
     grp_page_cur = paginator.Paginator(group_cur, page_no, GSTUDIO_NO_OF_OBJS_PP)
     context_variable = {'title': title, 'groups_cur': group_cur, 'card': 'ndf/card_group.html',
-                        'group_id': group_id, 'groupid': group_id,'grp_page_cur': grp_page_cur}
+                        'group_id': ObjectId(group_id), 'groupid': group_id,'grp_page_cur': grp_page_cur}
 
     return render_to_response(
         "ndf/explore_2017.html",

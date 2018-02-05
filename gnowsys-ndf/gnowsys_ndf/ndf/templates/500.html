@@ -1,27 +1,25 @@
-<!DOCTYPE html>
-<html>
-<head>
-	<title>500 - Internal Server Error</title>
-</head>
+{% extends "error_base.html" %}
 
-<body style="background-color:#f5f5f5">
-	<center>
+{% block error_title %} 500 - Internal Server Error {% endblock %}
 
-		<br/>
-		<h2 style="color: #3f3f3f;">Sorry, Internal Server Error.</h2>
-
-		<div style="color: gray;">
-			<h4>
-				<br/>
+{% block error_body_text %}
+	<br/>
+	<h2>Something went wrong!</h2>
+	<br/>
+	<h4>
+			{% if site.SITE_NAME == "NROER" %}
 				<small>
-					The requested page is unavailable.
-					<br/>
-					Our developers have been informed about error.
-					<br/><br/>
+				Please check the URL or navigate back to:
+				<blockquote>
+					<a href="{% url 'repository' 'home' %}"> Repository </a> | 
+					<a href="{% url 'nroer_groups' 'home' 'Partners' %}"> Partners </a> | 
+					<a href="{% url 'nroer_groups' 'home' 'Groups' %}"> Groups </a>
+				</blockquote>
 				</small>
-			</h4>
-		</div>
-	</center>
-</body>
+			{% else %}
+				Please try again after sometime or contact support@gnowledge.org <br/>
+				<a href="javascript:history.back()">Go back</a> or visit our <a href="{% url 'landing_page' %}">homepage</a>
+			{% endif %}
+	</h4>
+{% endblock %}
 
-</html>

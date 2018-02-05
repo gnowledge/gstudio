@@ -15,9 +15,9 @@
 
 
 {% block body_content %}
-
+<!--
 	<div class="repository-title medium-3 medium-offset-2 large-3 large-offset-2 columns">{% trans "Repository" %}</div>
-	<div class="repository-desc medium-6 large-7 columns">{% trans "Digital resource grouped in multiple ways" %}</div>
+	<div class="repository-desc medium-6 large-7 columns">{% trans "Digital resource grouped in multiple ways" %}</div>-->
 	
 	<!-- <ul class="inline-list card-holder"> -->
 	<div class="app-card-wrapper">
@@ -36,7 +36,8 @@
 				{% elif each_gapp.name %}
 					{% trans each_gapp.name %}
 				{% endif %}
-				</h4></div>
+				</h4>
+				</div>
 					<!-- <div class="app-card-title"><h4>{% firstof each_gapp.altnames each_gapp.name %}</h4></div> -->
 					<div class="app-card-icon"><img src="{{ each_gapp.url }}" width="50%"></div>
 					<div class="app-card-content">{{each_gapp.content_org|truncatechars:60 }}</div>

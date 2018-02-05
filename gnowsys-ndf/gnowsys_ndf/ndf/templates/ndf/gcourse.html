@@ -58,23 +58,14 @@
 {# {% datetime_now as datetime_now %} #}
 
   <h3>My Courses</h3>
-  {% for k, v in user_concern_groups.items %}
-  <section role="tabpanel" aria-hidden="true" class="content active small-block-grid-1 medium-block-grid-3 large-block-grid-4" style="background-color:#fafafa;border-style:none; padding-left: 1em;">
-    {% if v %}
-    <h3><small>{{k}}</small></h3>
-      {% for vk in v %}
-
-    {# <a href="{% url 'course_about' vk.pk %}">{{vk.name}}</a> #}
-    {# {% for each_obj in doc_cur %} #}
-      <li class="card-image-wrapper" style="margin-top:13px;margin-left:-10px">
-            {% include 'ndf/event_card.html' with resource=vk is_event=True no_footer=True has_prof_pic=True url_name="course_about" first_arg=vk.name  next_session=True %}
-          </li>
-    {% endfor %}
-        
-      {# {% endfor %} #}
-    {% endif %}
-    </section>
+  <ul class="small-block-grid-1 medium-block-grid-2 large-block-grid-4" >
+<!-- Existing card list-->
+  {% for each_node in course_coll  %}
+    <li class="card-image-wrapper" >
+    {% include 'ndf/card_group.html' with node=each_node  url_name='groupchange' first_arg=each_node.pk groupid=each_node.pk is_gstaff=is_gstaff %} 
+  </li>
   {% endfor %}
+</ul>
 
 
   {% comment %}
