@@ -28,9 +28,8 @@
                 <h2>{% trans "Log In" %}</h2>
                 </div>
             </div>
-        </div>
 
-		<div class="small-12 medium-8 large-8 small-centered large-centered columns">
+		<div class="small-12 medium-6 large-6 small-centered medium-centered large-centered columns">
 			<br/>
 			{% if form.errors %}
 				<small class="small-10 medium-8 large-8 columns error all-error">{% trans "Either your email or password is incorrect !" %}</small>
@@ -82,7 +81,7 @@
 				{% endif %}
 				<!-- Login button -->
 				<div class="row">
-					<div class="small-6 medium-6 large-2 small-offset-3 medium-offset-2 large-offset-3 columns end">
+					<div class="small-8 medium-8 large-4 small-offset-2 medium-offset-2 large-offset-3 columns end">
 						<input type="submit" onclick='trim_space()' class="button small expand" tabindex= "4" value="{% trans "Login" %}" style="font-size:15px" />
 					</div>
 				</div>
