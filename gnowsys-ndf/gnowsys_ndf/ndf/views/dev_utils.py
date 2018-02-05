@@ -25,6 +25,7 @@ import urllib
 from django.shortcuts import render_to_response
 from django.template import RequestContext
 from mongokit import paginator
+from django.core.paginator import Paginator
 
 
 try:
@@ -55,6 +56,7 @@ es = Elasticsearch("http://elastic:changeme@gsearch:9200", timeout=100, retry_on
 GST_FILE =  res = es.search(index="nodes", doc_type="gsystemtype", body={
                         "query":   {"bool":{"must":  [ {"term":  {"name":"file"}  }]  }}})
 
+print GST_FILE
 
 GST_PAGE =  res = es.search(index="nodes", doc_type="gsystemtype", body={
                         "query":   {"bool":{"must":  [ {"term":  {"name":"page"}  }]  }}})
@@ -139,7 +141,8 @@ def render_test_template(request,group_id='home', app_id=None, page_no=1):
 
 	GST_FILE_temp=[]
 	for a in GST_FILE['hits']['hits']:
-		temp1=ObjectId(a['_source']['id'])
+		#temp1=ObjectId(a['_source']['id'])
+		temp1=a['_source']['id']
 		GST_FILE_temp.append(temp1)
 
 	#file_id = GST_FILE._id
@@ -156,7 +159,7 @@ def render_test_template(request,group_id='home', app_id=None, page_no=1):
 
 
 	file_id = GST_FILE_temp
-	print file_id
+	#print file_id
 	datavisual = []
 	no_of_objs_pp = 24
 
@@ -191,12 +194,18 @@ def render_test_template(request,group_id='home', app_id=None, page_no=1):
 										]
 									}).sort("last_update", -1)
 
-
+	print GST_FILE_temp
 	files1 =  res = es.search(index="nodes", doc_type="gsystemtype,gsystem", body={
                         "query":   {"bool": { "must":  [ {"term":  {"group_set": str(ObjectId(group_id))}  },{"term": {"access_policy": "public"}}],
-     										 "must_not":  [ {"term":  {"attribute_set.educationaluse": "ebooks" } } ]
+     										 "must_not":  [ {"term":  {"attribute_set.educationaluse": "ebooks" } } ],
+     										 "must":  [ {"terms":  {"member_of": GST_FILE_temp } } ],
+     										 "must":[  {"term": {'access_policy':'public'}} ]
+
+     										 #"must":  [ {"term":  {'created_by': request.user.id}}],
+
      } }} )
-	print files1
+	#print "----------------------------------------------------------"
+	#print files1
 	# print "files.count : ", files.count()
 
   	# pageCollection=node_collection.find({'member_of':GST_PAGE._id, 'group_set': ObjectId(group_id),
@@ -211,7 +220,15 @@ def render_test_template(request,group_id='home', app_id=None, page_no=1):
 			# 							'type_of': {'$in': [wiki_page._id]}
 			# 							}).sort("last_update", -1)
 
-	images_count =  res = es.search(index="gsystem", doc_type="images", body={
+	images_count =   es.search(index="gsystem", doc_type="image", body={
+                        "query":   {"bool":{"must":  [ {"term":  {"status":"published"}  }]  }}})
+	audios_count =   es.search(index="gsystem", doc_type="audio", body={
+                        "query":   {"bool":{"must":  [ {"term":  {"status":"published"}  }]  }}})
+	videos_count =   es.search(index="gsystem", doc_type="video", body={
+                        "query":   {"bool":{"must":  [ {"term":  {"status":"published"}  }]  }}})
+	applications_count =  es.search(index="gsystem", doc_type="application", body={
+                        "query":   {"bool":{"must":  [ {"term":  {"status":"published"}  }]  }}})
+	all_count =   es.search(index="gsystem", doc_type="images,audios,videos,application", body={
                         "query":   {"bool":{"must":  [ {"term":  {"status":"published"}  }]  }}})
 
 
@@ -219,12 +236,12 @@ def render_test_template(request,group_id='home', app_id=None, page_no=1):
 	educationaluse_stats = {}
 
 
-	if files:
+	if files1:
 		eu_list = []  # count
-		for each in files:
+		for each in files1['hits']['hits']['_source']:
 			eu_list += [i.get("educationaluse") for i in each.attribute_set if i.has_key("educationaluse")]
 
-		files.rewind()
+		files1.rewind()
 
 		if set(eu_list):
 			if len(set(eu_list)) > 1:
@@ -239,7 +256,9 @@ def render_test_template(request,group_id='home', app_id=None, page_no=1):
 		result_pages = paginator.Paginator(result_paginated_cur, page_no, no_of_objs_pp)
 
 
-		
+	#print request.user.id
+	#print "--------------"
+
 
 	collection_pages_cur = node_collection.find({
 									'member_of': {'$in': [GST_FILE_temp, GST_PAGE_temp ]},
@@ -255,6 +274,14 @@ def render_test_template(request,group_id='home', app_id=None, page_no=1):
                                     ],
                                     'collection_set': {'$exists': "true", '$not': {'$size': 0} }
                                 }).sort("last_update", -1)
+
+	collection_pages_cur1 =  res = es.search(index="nodes", doc_type="gsystemtype,gsystem", body={
+                        "query":   {"bool": { "must":  [ {"term":  {"group_set": str(ObjectId(group_id))}  },{"term": {"access_policy": "public"}}],
+     										 "must_not":  [ {"term":  {"attribute_set.educationaluse": "ebooks" } } ],
+     										 #"must":  [ {"term":  {'created_by': request.user.id}}],
+
+     } }} )
+
 
 	coll_page_count = collection_pages_cur.count() if collection_pages_cur else 0
 	collection_pages = paginator.Paginator(collection_pages_cur, page_no, no_of_objs_pp)
@@ -280,7 +307,7 @@ def render_test_template(request,group_id='home', app_id=None, page_no=1):
         {"node":test_node,'title': title, 'app':e_library_GST,
 								 'appId':app_id, "app_gst": app,
 								 # 'already_uploaded': already_uploaded,'shelf_list': shelf_list,'shelves': shelves,
-								 'files': files,
+								 'files': files1,
 								 "detail_urlname": "file_detail",
 								 'ebook_pages': educationaluse_stats.get("eBooks", 0),
 								 # 'page_count': pageCollection.count(),
@@ -289,9 +316,12 @@ def render_test_template(request,group_id='home', app_id=None, page_no=1):
 								 'image_pages': images_count['hits']['total'],
 								 'interactive_pages': educationaluse_stats.get("Interactives", 0),
 								 'educationaluse_stats': json.dumps(educationaluse_stats),
-								 'doc_pages': educationaluse_stats.get("Documents", 0),
-								 'video_pages': educationaluse_stats.get("Videos", 0),
-								 'audio_pages': educationaluse_stats.get("Audios", 0),
+								 #'doc_pages': educationaluse_stats.get("Documents", 0),
+								 #'video_pages': educationaluse_stats.get("Videos", 0),
+								 #'audio_pages': educationaluse_stats.get("Audios", 0),
+								 'doc_pages': applications_count['hits']['total'],
+								 'video_pages': videos_count['hits']['total'],
+								 'audio_pages': audios_count['hits']['total'],
 								 'collection_pages': collection_pages,
 								 'collection': collection_pages_cur,
 								 'groupid': group_id, 'group_id':group_id,
