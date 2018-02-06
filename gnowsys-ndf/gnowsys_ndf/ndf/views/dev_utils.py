@@ -25,7 +25,7 @@ import urllib
 from django.shortcuts import render_to_response
 from django.template import RequestContext
 from mongokit import paginator
-from django.core.paginator import Paginator
+from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 
 
 try:
@@ -264,9 +264,17 @@ def render_test_template(request,group_id='home', app_id=None, page_no=1):
 		
 
 		# print educationaluse_stats
-		result_paginated_cur = files
-		result_pages = paginator.Paginator(result_paginated_cur, page_no, no_of_objs_pp)
+		#result_paginated_cur = files
+		#result_pages = paginator.Paginator(result_paginated_cur, page_no, no_of_objs_pp)
+		result_paginated_cur = tuple(files1_temp)
 
+		result_pages = Paginator(result_paginated_cur,no_of_objs_pp)
+		try:
+			results = result_pages.page(page_no)
+		except PageNotAnInteger:
+			results = result_pages.page(1)
+		except EmptyPage:
+			results = result_pages.page(results.num_page)
 
 	#print request.user.id
 	#print "--------------"
@@ -333,7 +341,7 @@ def render_test_template(request,group_id='home', app_id=None, page_no=1):
 								 'ebook_pages': educationaluse_stats.get("eBooks", 0),
 								 # 'page_count': pageCollection.count(),
 								 # 'page_nodes':pageCollection
-								 'file_pages': result_pages,
+								 'file_pages': results,
 								 'image_pages': images_count['hits']['total'],
 								 'interactive_pages': educationaluse_stats.get("Interactives", 0),
 								 'educationaluse_stats': json.dumps(educationaluse_stats),
