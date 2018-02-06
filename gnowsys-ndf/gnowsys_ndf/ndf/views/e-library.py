@@ -14,7 +14,8 @@ except ImportError:  # old pymongo
 
 ''' -- imports from application folders/files -- '''
 from gnowsys_ndf.settings import GAPPS
-from gnowsys_ndf.ndf.models import Node, GRelation,GSystemType,File,Triple
+# from gnowsys_ndf.ndf.models import Node, GRelation,GSystemType,File,Triple
+from gnowsys_ndf.ndf.models import Node, GRelation,GSystemType, Triple
 from gnowsys_ndf.ndf.models import node_collection
 from gnowsys_ndf.ndf.views.file import *
 from gnowsys_ndf.ndf.views.methods import get_group_name_id, cast_to_data_type, get_execution_time
