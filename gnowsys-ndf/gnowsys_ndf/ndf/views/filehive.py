@@ -12,7 +12,7 @@ from django.template import RequestContext
 
 from gnowsys_ndf.settings import MEDIA_ROOT, GSTUDIO_SITE_DEFAULT_LANGUAGE
 from gnowsys_ndf.ndf.models import node_collection, filehive_collection, gfs
-from gnowsys_ndf.ndf.models import GSystem
+from gnowsys_ndf.ndf.models import GSystem, Author
 from gnowsys_ndf.ndf.views.methods import get_language_tuple, get_group_name_id
 from gnowsys_ndf.ndf.views.tasks import convertVideo
 
@@ -31,20 +31,26 @@ def upload_form(request, group_id):
 			}, context_instance=RequestContext(request))
 
 
-def write_files(request, group_id, make_collection=False, unique_gs_per_file=True):
+def write_files(request, group_id, make_collection=False, unique_gs_per_file=True, **kwargs):
 
-	user_id        = request.user.id
-	author_obj     = node_collection.one({'_type': u'Author', 'created_by': user_id})
-	author_obj_id  = author_obj._id
+	user_id = request.user.id
+	try:
+		user_id = Author.extract_userid(request, **kwargs)
+	except Exception as e:
+		pass
+	# print "user_id: ", user_id
+
+	# author_obj = node_collection.one({'_type': u'Author', 'created_by': int(user_id)})
+	author_obj = Author.get_author_obj_from_name_or_id(user_id)
+	author_obj_id = author_obj._id
+	kwargs['created_by'] = user_id
 
 	group_name, group_id = get_group_name_id(group_id)
 
 	first_obj      = None
 	collection_set = []
 	uploaded_files = request.FILES.getlist('filehive', [])
-	# print "uploaded_files",uploaded_files
 	name           = request.POST.get('name')
-	# print "name",name
 
 	gs_obj_list    = []
 	for each_file in uploaded_files:
@@ -66,7 +72,8 @@ def write_files(request, group_id, make_collection=False, unique_gs_per_file=Tru
 									group_set=group_set,
 									language=language,
 									uploaded_file=each_file,
-									unique_gs_per_file=unique_gs_per_file)
+									unique_gs_per_file=unique_gs_per_file,
+									**kwargs)
 		# print "existing_file_gs",existing_file_gs
 		if (gs_obj.get('_id', None) or existing_file_gs.get('_id', None)) and \
 		   (existing_file_gs.get('_id', None) == gs_obj.get('_id', None)):
