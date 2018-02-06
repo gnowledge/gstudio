@@ -36,7 +36,8 @@ from gnowsys_ndf.settings import GSTUDIO_SITE_VIDEO, EXTRA_LANG_INFO, GAPPS, MED
 # from gnowsys_ndf.settings import WETUBE_USERNAME, WETUBE_PASSWORD
 from gnowsys_ndf.ndf.views.notify import set_notif_val
 # from gnowsys_ndf.ndf.org2any import org2html
-from gnowsys_ndf.ndf.models import Node, GSystemType, File, GRelation, STATUS_CHOICES, Triple, node_collection, triple_collection, gridfs_collection
+# from gnowsys_ndf.ndf.models import Node, GSystemType, File, GRelation, STATUS_CHOICES, Triple, node_collection, triple_collection, gridfs_collection
+from gnowsys_ndf.ndf.models import Node, GSystemType, GRelation, STATUS_CHOICES, Triple, node_collection, triple_collection, gridfs_collection
 from gnowsys_ndf.ndf.views.methods import get_node_metadata, get_node_common_fields, create_gattribute, get_page, get_execution_time,set_all_urls,get_group_name_id, get_language_tuple  # , get_page
 from gnowsys_ndf.ndf.views.methods import node_thread_access, create_thread_for_node, create_grelation, delete_grelation
 from gnowsys_ndf.ndf.templatetags.ndf_tags import get_relation_value
