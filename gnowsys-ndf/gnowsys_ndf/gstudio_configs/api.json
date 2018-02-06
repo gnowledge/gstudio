@@ -1,0 +1,27 @@
+{
+    "fields": [
+        "_id",
+        "name",
+        "altnames",
+        "language",
+        "content",
+        "if_file",
+        "tags",
+        "location",
+        "created_by",
+        "modified_by",
+        "contributors",
+        "legal",
+        "rating",
+        "created_at",
+        "last_update",
+        "collection_set",
+        "post_node",
+        "prior_node",
+        "access_policy",
+        "status",
+        "group_set",
+        "member_of",
+        "type_of"
+        ]
+}
