@@ -32,10 +32,12 @@ pathlib2==2.2.1
 # pycrypto
 sphinx==1.6.5
 recommonmark
+# nltk can be removed when we replace search with ES
+nltk==3.2.1
 
 # QBANK-LITE REQ: https://github.com/CLIxIndia-Dev/qbank-lite/blob/master/requirements.txt
 # also make sure following are updated w.r.t qbank repo
-dlkit==0.5.13
+dlkit==0.5.17
 beautifulsoup4==4.4.1
 cffi==1.7.0
 enum34==1.1.6
@@ -46,7 +48,7 @@ ipaddress==1.0.16
 lxml==3.6.0
 mpmath==0.19
 nodeenv==1.0.0
-nose==1.3.7
+# nose==1.3.7
 Paste==2.0.3
 pyasn1==0.1.9
 pycparser==2.14
@@ -55,11 +57,11 @@ pyOpenSSL==16.0.0
 signit==0.3.0
 six==1.10.0
 sympy==1.0
-waitress==0.8.10
+# waitress==0.8.10
 -e git://github.com/CLIxIndia-Dev/webpy.git@362dcecae9416eef6622922264e6c6482992c898#egg=web.py
 bs4==0.0.1
 html==1.16
 checksumdir==1.1.0
 cryptography==1.4
 # version needed to overwrite on all above intermediate installs
-pymongo==2.8
+# pymongo==2.8

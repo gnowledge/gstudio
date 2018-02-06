@@ -73,5 +73,14 @@
 "Solar_System_Animation/te": "/static/Solar_System_Animation/te/",
 "Astroamer_Planet_Trek_Activity/en": "/static/Astroamer_Planet_Trek_Activity/en/",
 "Astroamer_Planet_Trek_Activity/hi": "/static/Astroamer_Planet_Trek_Activity/hi/",
-"Astroamer_Planet_Trek_Activity/te": "/static/Astroamer_Planet_Trek_Activity/te/"
+"Astroamer_Planet_Trek_Activity/te": "/static/Astroamer_Planet_Trek_Activity/te/",
+"starlogonova/en/Anemia1": "/static/StarLogoNova/Anemia1/en/",
+"starlogonova/hi/Anemia1": "/static/StarLogoNova/Anemia1/hi/",
+"starlogonova/te/Anemia1":"/static/StarLogoNova/Anemia1/te/",
+"starlogonova/en/Anemia2": "/static/StarLogoNova/Anemia2/en/",
+"starlogonova/hi/Anemia2": "/static/StarLogoNova/Anemia2/hi/",
+"starlogonova/te/Anemia2": "/static/StarLogoNova/Anemia2/te/",
+"starlogonova/en/FishAlgae": "/static/StarLogoNova/FishAlgae/en/",
+"starlogonova/hi/FishAlgae": "/static/StarLogoNova/FishAlgae/hi/",
+"starlogonova/te/FishAlgae": "/static/StarLogoNova/FishAlgae/te/"
 }

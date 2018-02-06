@@ -1465,272 +1465,272 @@ def build_collection(node, check_collection, right_drawer_list, checked):
                 node_collection.collection.update({'_id': ObjectId(each), 'prior_node': {'$in':[node._id]} },{'$pull': {'prior_node': ObjectId(node._id)}})
     is_changed = False
 
-    if check_collection == "prior_node":
-        if right_drawer_list != '':
-            # prior_node_list = [ObjectId(each.strip()) for each in prior_node_list.split(",")]
-            right_drawer_list = [ObjectId(each.strip())
-                                 for each in right_drawer_list.split(",")]
+  if check_collection == "prior_node":
+      if right_drawer_list != '':
+          # prior_node_list = [ObjectId(each.strip()) for each in prior_node_list.split(",")]
+          right_drawer_list = [ObjectId(each.strip())
+                               for each in right_drawer_list.split(",")]
 
-            if node.prior_node != right_drawer_list:
-                i = 0
-                node.prior_node = []
-                while (i < len(right_drawer_list)):
-                    node_id = ObjectId(right_drawer_list[i])
-                    node_obj = node_collection.one({"_id": node_id})
-                    if node_obj:
-                        node.prior_node.append(node_id)
+          if node.prior_node != right_drawer_list:
+              i = 0
+              node.prior_node = []
+              while (i < len(right_drawer_list)):
+                  node_id = ObjectId(right_drawer_list[i])
+                  node_obj = node_collection.one({"_id": node_id})
+                  if node_obj:
+                      node.prior_node.append(node_id)
 
-                    i = i + 1
-                # print "\n Changed: prior_node"
-                is_changed = True
-        else:
-            node.prior_node = []
-            is_changed = True
+                  i = i + 1
+              # print "\n Changed: prior_node"
+              is_changed = True
+      else:
+          node.prior_node = []
+          is_changed = True
 
-    elif check_collection == "collection":
-        #  collection
+  elif check_collection == "collection":
+      #  collection
 
-        if right_drawer_list != '':
-            if isinstance(right_drawer_list, list):
-                right_drawer_list = [ObjectId(each)
-                                     for each in right_drawer_list]
-            else:
-                right_drawer_list = [ObjectId(each.strip())
-                                     for each in right_drawer_list.split(",")]
+      if right_drawer_list != '':
+          if isinstance(right_drawer_list, list):
+              right_drawer_list = [ObjectId(each)
+                                   for each in right_drawer_list]
+          else:
+              right_drawer_list = [ObjectId(each.strip())
+                                   for each in right_drawer_list.split(",")]
 
-            nlist = node.collection_set
+          nlist = node.collection_set
 
-            # if set(node.collection_set) != set(right_drawer_list):
-            if node.collection_set != right_drawer_list:
-                i = 0
-                node.collection_set = []
-                # checking if each _id in collection_list is valid or not
-                while (i < len(right_drawer_list)):
-                    node_id = ObjectId(right_drawer_list[i])
-                    node_obj = node_collection.one({"_id": node_id})
-                    if node_obj:
-                        if node_id not in nlist:
-                            nlist.append(node_id)
-                        else:
-                            node.collection_set.append(node_id)
-                            # After adding it to collection_set also make the
-                            # 'node' as prior node for added collection element
-                            node_collection.collection.update({'_id': ObjectId(node_id), 'prior_node': {
-                                                              '$nin': [node._id]}}, {'$push': {'prior_node': ObjectId(node._id)}})
+          # if set(node.collection_set) != set(right_drawer_list):
+          if node.collection_set != right_drawer_list:
+              i = 0
+              node.collection_set = []
+              # checking if each _id in collection_list is valid or not
+              while (i < len(right_drawer_list)):
+                  node_id = ObjectId(right_drawer_list[i])
+                  node_obj = node_collection.one({"_id": node_id})
+                  if node_obj:
+                      if node_id not in nlist:
+                          nlist.append(node_id)
+                      else:
+                          node.collection_set.append(node_id)
+                          # After adding it to collection_set also make the
+                          # 'node' as prior node for added collection element
+                          node_collection.collection.update({'_id': ObjectId(node_id), 'prior_node': {
+                                                            '$nin': [node._id]}}, {'$push': {'prior_node': ObjectId(node._id)}})
 
-                    i = i + 1
+                  i = i + 1
 
-                for each in nlist:
-                    if each not in node.collection_set:
-                        node.collection_set.append(each)
-                        # After adding it to collection_set also make the
-                        # 'node' as prior node for added collection element
-                        node_collection.collection.update({'_id': ObjectId(each), 'prior_node': {
-                                                          '$nin': [node._id]}}, {'$push': {'prior_node': ObjectId(node._id)}})
+              for each in nlist:
+                  if each not in node.collection_set:
+                      node.collection_set.append(each)
+                      # After adding it to collection_set also make the
+                      # 'node' as prior node for added collection element
+                      node_collection.collection.update({'_id': ObjectId(each), 'prior_node': {
+                                                        '$nin': [node._id]}}, {'$push': {'prior_node': ObjectId(node._id)}})
 
-                # For removing collection elements from heterogeneous
-                # collection drawer only
-                if not checked:
-                    if nlist:
-                        for each in nlist:
-                            if each not in right_drawer_list:
-                                node.collection_set.remove(each)
-                                # Also for removing prior node element after
-                                # removing collection element
-                                node_collection.collection.update({'_id': ObjectId(each), 'prior_node': {
-                                                                  '$in': [node._id]}}, {'$pull': {'prior_node': ObjectId(node._id)}})
+              # For removing collection elements from heterogeneous
+              # collection drawer only
+              if not checked:
+                  if nlist:
+                      for each in nlist:
+                          if each not in right_drawer_list:
+                              node.collection_set.remove(each)
+                              # Also for removing prior node element after
+                              # removing collection element
+                              node_collection.collection.update({'_id': ObjectId(each), 'prior_node': {
+                                                                '$in': [node._id]}}, {'$pull': {'prior_node': ObjectId(node._id)}})
 
-                else:
-                    if nlist and checked:
-                        if checked == "QuizObj":
-                            quiz = node_collection.one(
-                                {'_type': 'GSystemType', 'name': "Quiz"})
-                            quizitem = node_collection.one(
-                                {'_type': 'GSystemType', 'name': "QuizItem"})
-                            for each in nlist:
-                                obj = node_collection.one(
-                                    {'_id': ObjectId(each)})
-                                if quiz._id in obj.member_of or quizitem._id in obj.member_of:
-                                    if obj._id not in right_drawer_list:
-                                        node.collection_set.remove(obj._id)
-                                        # Also for removing prior node element
-                                        # after removing collection element
-                                        node_collection.collection.update({'_id': ObjectId(each), 'prior_node': {
-                                                                          '$in': [node._id]}}, {'$pull': {'prior_node': ObjectId(node._id)}})
+              else:
+                  if nlist and checked:
+                      if checked == "QuizObj":
+                          quiz = node_collection.one(
+                              {'_type': 'GSystemType', 'name': "Quiz"})
+                          quizitem = node_collection.one(
+                              {'_type': 'GSystemType', 'name': "QuizItem"})
+                          for each in nlist:
+                              obj = node_collection.one(
+                                  {'_id': ObjectId(each)})
+                              if quiz._id in obj.member_of or quizitem._id in obj.member_of:
+                                  if obj._id not in right_drawer_list:
+                                      node.collection_set.remove(obj._id)
+                                      # Also for removing prior node element
+                                      # after removing collection element
+                                      node_collection.collection.update({'_id': ObjectId(each), 'prior_node': {
+                                                                        '$in': [node._id]}}, {'$pull': {'prior_node': ObjectId(node._id)}})
 
-                        elif checked == "Pandora Video":
-                            check = node_collection.one(
-                                {'_type': 'GSystemType', 'name': 'Pandora_video'})
-                            for each in nlist:
-                                obj = node_collection.one(
-                                    {'_id': ObjectId(each)})
-                                if check._id == obj.member_of[0]:
-                                    if obj._id not in right_drawer_list:
-                                        node.collection_set.remove(obj._id)
-                                        node_collection.collection.update({'_id': ObjectId(each), 'prior_node': {
-                                                                          '$in': [node._id]}}, {'$pull': {'prior_node': ObjectId(node._id)}})
-                        else:
-                            check = node_collection.one(
-                                {'_type': 'GSystemType', 'name': unicode(checked)})
-                            for each in nlist:
-                                obj = node_collection.one(
-                                    {'_id': ObjectId(each)})
-                                if len(obj.member_of) < 2:
-                                    if check._id == obj.member_of[0]:
-                                        if obj._id not in right_drawer_list:
-                                            node.collection_set.remove(obj._id)
-                                            node_collection.collection.update({'_id': ObjectId(each), 'prior_node': {
-                                                                              '$in': [node._id]}}, {'$pull': {'prior_node': ObjectId(node._id)}})
-                                else:
-                                    if check._id == obj.member_of[1]:
-                                        if obj._id not in right_drawer_list:
-                                            node.collection_set.remove(obj._id)
-                                            node_collection.collection.update({'_id': ObjectId(each), 'prior_node': {
-                                                                              '$in': [node._id]}}, {'$pull': {'prior_node': ObjectId(node._id)}})
+                      elif checked == "Pandora Video":
+                          check = node_collection.one(
+                              {'_type': 'GSystemType', 'name': 'Pandora_video'})
+                          for each in nlist:
+                              obj = node_collection.one(
+                                  {'_id': ObjectId(each)})
+                              if check._id == obj.member_of[0]:
+                                  if obj._id not in right_drawer_list:
+                                      node.collection_set.remove(obj._id)
+                                      node_collection.collection.update({'_id': ObjectId(each), 'prior_node': {
+                                                                        '$in': [node._id]}}, {'$pull': {'prior_node': ObjectId(node._id)}})
+                      else:
+                          check = node_collection.one(
+                              {'_type': 'GSystemType', 'name': unicode(checked)})
+                          for each in nlist:
+                              obj = node_collection.one(
+                                  {'_id': ObjectId(each)})
+                              if len(obj.member_of) < 2:
+                                  if check._id == obj.member_of[0]:
+                                      if obj._id not in right_drawer_list:
+                                          node.collection_set.remove(obj._id)
+                                          node_collection.collection.update({'_id': ObjectId(each), 'prior_node': {
+                                                                            '$in': [node._id]}}, {'$pull': {'prior_node': ObjectId(node._id)}})
+                              else:
+                                  if check._id == obj.member_of[1]:
+                                      if obj._id not in right_drawer_list:
+                                          node.collection_set.remove(obj._id)
+                                          node_collection.collection.update({'_id': ObjectId(each), 'prior_node': {
+                                                                            '$in': [node._id]}}, {'$pull': {'prior_node': ObjectId(node._id)}})
 
-                is_changed = True
+              is_changed = True
 
-        else:
-            if node.collection_set and checked:
-                if checked == "QuizObj":
-                    quiz = node_collection.one(
-                        {'_type': 'GSystemType', 'name': "Quiz"})
-                    quizitem = node_collection.one(
-                        {'_type': 'GSystemType', 'name': "QuizItem"})
-                    for each in node.collection_set:
-                        obj = node_collection.one({'_id': ObjectId(each)})
-                        if quiz._id in obj.member_of or quizitem._id in obj.member_of:
-                            node.collection_set.remove(obj._id)
-                            node_collection.collection.update({'_id': ObjectId(each), 'prior_node': {
-                                                              '$in': [node._id]}}, {'$pull': {'prior_node': ObjectId(node._id)}})
-                elif checked == "Pandora Video":
-                    check = node_collection.one(
-                        {'_type': 'GSystemType', 'name': 'Pandora_video'})
-                    for each in node.collection_set:
-                        obj = node_collection.one({'_id': ObjectId(each)})
-                        if check._id == obj.member_of[0]:
-                            node.collection_set.remove(obj._id)
-                            node_collection.collection.update({'_id': ObjectId(each), 'prior_node': {
-                                                              '$in': [node._id]}}, {'$pull': {'prior_node': ObjectId(node._id)}})
-                else:
-                    check = node_collection.one(
-                        {'_type': 'GSystemType', 'name': unicode(checked)})
-                    for each in node.collection_set:
-                        obj = node_collection.one({'_id': ObjectId(each)})
-                        if len(obj.member_of) < 2:
-                            if check._id == obj.member_of[0]:
-                                node.collection_set.remove(obj._id)
-                                node_collection.collection.update({'_id': ObjectId(each), 'prior_node': {
-                                                                  '$in': [node._id]}}, {'$pull': {'prior_node': ObjectId(node._id)}})
-                        else:
-                            if check._id == obj.member_of[1]:
-                                node.collection_set.remove(obj._id)
-                                node_collection.collection.update({'_id': ObjectId(each), 'prior_node': {
-                                                                  '$in': [node._id]}}, {'$pull': {'prior_node': ObjectId(node._id)}})
+      else:
+          if node.collection_set and checked:
+              if checked == "QuizObj":
+                  quiz = node_collection.one(
+                      {'_type': 'GSystemType', 'name': "Quiz"})
+                  quizitem = node_collection.one(
+                      {'_type': 'GSystemType', 'name': "QuizItem"})
+                  for each in node.collection_set:
+                      obj = node_collection.one({'_id': ObjectId(each)})
+                      if quiz._id in obj.member_of or quizitem._id in obj.member_of:
+                          node.collection_set.remove(obj._id)
+                          node_collection.collection.update({'_id': ObjectId(each), 'prior_node': {
+                                                            '$in': [node._id]}}, {'$pull': {'prior_node': ObjectId(node._id)}})
+              elif checked == "Pandora Video":
+                  check = node_collection.one(
+                      {'_type': 'GSystemType', 'name': 'Pandora_video'})
+                  for each in node.collection_set:
+                      obj = node_collection.one({'_id': ObjectId(each)})
+                      if check._id == obj.member_of[0]:
+                          node.collection_set.remove(obj._id)
+                          node_collection.collection.update({'_id': ObjectId(each), 'prior_node': {
+                                                            '$in': [node._id]}}, {'$pull': {'prior_node': ObjectId(node._id)}})
+              else:
+                  check = node_collection.one(
+                      {'_type': 'GSystemType', 'name': unicode(checked)})
+                  for each in node.collection_set:
+                      obj = node_collection.one({'_id': ObjectId(each)})
+                      if len(obj.member_of) < 2:
+                          if check._id == obj.member_of[0]:
+                              node.collection_set.remove(obj._id)
+                              node_collection.collection.update({'_id': ObjectId(each), 'prior_node': {
+                                                                '$in': [node._id]}}, {'$pull': {'prior_node': ObjectId(node._id)}})
+                      else:
+                          if check._id == obj.member_of[1]:
+                              node.collection_set.remove(obj._id)
+                              node_collection.collection.update({'_id': ObjectId(each), 'prior_node': {
+                                                                '$in': [node._id]}}, {'$pull': {'prior_node': ObjectId(node._id)}})
 
-            else:
-                node.collection_set = []
+          else:
+              node.collection_set = []
 
-            is_changed = True
+          is_changed = True
 
-    elif check_collection == "teaches":
-        # Teaches
-        if right_drawer_list != '':
+  elif check_collection == "teaches":
+      # Teaches
+      if right_drawer_list != '':
 
-            right_drawer_list = [ObjectId(each.strip())
-                                 for each in right_drawer_list.split(",")]
+          right_drawer_list = [ObjectId(each.strip())
+                               for each in right_drawer_list.split(",")]
 
-            relationtype = node_collection.one(
-                {"_type": "RelationType", "name": "teaches"})
-            list_grelations = triple_collection.find(
-                {"_type": "GRelation", "subject": node._id, "relation_type": relationtype._id})
-            for relation in list_grelations:
-                # nlist.append(ObjectId(relation.right_subject))
-                relation.delete()
+          relationtype = node_collection.one(
+              {"_type": "RelationType", "name": "teaches"})
+          list_grelations = triple_collection.find(
+              {"_type": "GRelation", "subject": node._id, "relation_type": relationtype._id})
+          for relation in list_grelations:
+              # nlist.append(ObjectId(relation.right_subject))
+              relation.delete()
 
-            if right_drawer_list:
-                list_grelations.rewind()
-                i = 0
+          if right_drawer_list:
+              list_grelations.rewind()
+              i = 0
 
-                while (i < len(right_drawer_list)):
-                    node_id = ObjectId(right_drawer_list[i])
-                    node_obj = node_collection.one({"_id": node_id})
-                    if node_obj:
-                        create_grelation(node._id, relationtype, node_id)
-                    i = i + 1
+              while (i < len(right_drawer_list)):
+                  node_id = ObjectId(right_drawer_list[i])
+                  node_obj = node_collection.one({"_id": node_id})
+                  if node_obj:
+                      create_grelation(node._id, relationtype, node_id)
+                  i = i + 1
 
-                # print "\n Changed: teaches_list"
-                is_changed = True
-        else:
-            relationtype = node_collection.one(
-                {"_type": "RelationType", "name": "teaches"})
-            list_grelations = triple_collection.find(
-                {"_type": "GRelation", "subject": node._id, "relation_type": relationtype._id})
-            for relation in list_grelations:
-                relation.delete()
+              # print "\n Changed: teaches_list"
+              is_changed = True
+      else:
+          relationtype = node_collection.one(
+              {"_type": "RelationType", "name": "teaches"})
+          list_grelations = triple_collection.find(
+              {"_type": "GRelation", "subject": node._id, "relation_type": relationtype._id})
+          for relation in list_grelations:
+              relation.delete()
 
-            is_changed = True
+          is_changed = True
 
-    elif check_collection == "assesses":
-        # Assesses
-        if right_drawer_list != '':
-            right_drawer_list = [ObjectId(each.strip())
-                                 for each in right_drawer_list.split(",")]
+  elif check_collection == "assesses":
+      # Assesses
+      if right_drawer_list != '':
+          right_drawer_list = [ObjectId(each.strip())
+                               for each in right_drawer_list.split(",")]
 
-            relationtype = node_collection.one(
-                {"_type": "RelationType", "name": "assesses"})
-            list_grelations = triple_collection.find(
-                {"_type": "GRelation", "subject": node._id, "relation_type": relationtype._id})
-            for relation in list_grelations:
-                relation.delete()
+          relationtype = node_collection.one(
+              {"_type": "RelationType", "name": "assesses"})
+          list_grelations = triple_collection.find(
+              {"_type": "GRelation", "subject": node._id, "relation_type": relationtype._id})
+          for relation in list_grelations:
+              relation.delete()
 
-            if right_drawer_list:
-                list_grelations.rewind()
-                i = 0
+          if right_drawer_list:
+              list_grelations.rewind()
+              i = 0
 
-                while (i < len(right_drawer_list)):
-                    node_id = ObjectId(right_drawer_list[i])
-                    node_obj = node_collection.one({"_id": node_id})
-                    if node_obj:
-                        create_grelation(node._id, relationtype, node_id)
-                    i = i + 1
+              while (i < len(right_drawer_list)):
+                  node_id = ObjectId(right_drawer_list[i])
+                  node_obj = node_collection.one({"_id": node_id})
+                  if node_obj:
+                      create_grelation(node._id, relationtype, node_id)
+                  i = i + 1
 
-                # print "\n Changed: teaches_list"
-                is_changed = True
-        else:
-            relationtype = node_collection.one(
-                {"_type": "RelationType", "name": "assesses"})
-            list_grelations = triple_collection.find(
-                {"_type": "GRelation", "subject": node._id, "relation_type": relationtype._id})
-            for relation in list_grelations:
-                relation.delete()
+              # print "\n Changed: teaches_list"
+              is_changed = True
+      else:
+          relationtype = node_collection.one(
+              {"_type": "RelationType", "name": "assesses"})
+          list_grelations = triple_collection.find(
+              {"_type": "GRelation", "subject": node._id, "relation_type": relationtype._id})
+          for relation in list_grelations:
+              relation.delete()
 
-            is_changed = True
+          is_changed = True
 
-    # elif check_collection == "module":
-        #  Module
-        # if right_drawer_list != '':
-        #   right_drawer_list = [ObjectId(each.strip()) for each in right_drawer_list.split(",")]
+  # elif check_collection == "module":
+      #  Module
+      # if right_drawer_list != '':
+      #   right_drawer_list = [ObjectId(each.strip()) for each in right_drawer_list.split(",")]
 
-        #   if set(node.collection_set) != set(right_drawer_list):
-        #     i = 0
-        #     while (i < len(right_drawer_list)):
-        #       node_id = ObjectId(right_drawer_list[i])
-        #       node_obj = node_collection.one({"_id": node_id})
-        #       if node_obj:
-        #         if node_id not in node.collection_set:
-        #           node.collection_set.append(node_id)
+      #   if set(node.collection_set) != set(right_drawer_list):
+      #     i = 0
+      #     while (i < len(right_drawer_list)):
+      #       node_id = ObjectId(right_drawer_list[i])
+      #       node_obj = node_collection.one({"_id": node_id})
+      #       if node_obj:
+      #         if node_id not in node.collection_set:
+      #           node.collection_set.append(node_id)
 
-        #       i = i+1
-            # print "\n Changed: module_list"
-            # is_changed = True
-        # else:
-            # node.module_set = []
-            # is_changed = True
-    if is_changed == True:
-        return True
-    else:
-        return False
+      #       i = i+1
+          # print "\n Changed: module_list"
+          # is_changed = True
+      # else:
+          # node.module_set = []
+          # is_changed = True
+  if is_changed == True:
+      return True
+  else:
+      return False
 
 
 @get_execution_time

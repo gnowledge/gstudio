@@ -67,6 +67,7 @@ def call_exit():
     os._exit(0)
 
 
+
 # def get_file_path_with_id(node_id):
 #     file_name = (node_id + '.json')
     
@@ -630,7 +631,7 @@ def restore_node(filepath, non_grp_root_node=None):
     log_file.write("\nRestoring Node: " +  str(filepath))
 
     node_json = get_json_file(filepath)
-    print node_json
+    # print node_json
     proceed_flag = True
     try:
         if non_grp_root_node:
@@ -829,6 +830,13 @@ def get_json_file(filepath):
         # fp = filepath
         if fp.endswith(',v'):
             fp = fp.split(',')[0]
+
+        if not os.path.exists(fp):
+            if filepath.endswith(',v'):
+                fp = fp.split(',')[0]
+            elif filepath.endswith('.json'):
+                fp = filepath
+        # print "fp: ", fp
         with open(fp, 'r') as version_file:
             obj_as_json = json.loads(version_file.read(), object_hook=json_util.object_hook)
             parse_json_values(obj_as_json)
