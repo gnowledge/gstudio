@@ -14,6 +14,7 @@
       <div class="small-12 medium-3 large-3 columns ">
         <div class="asset_tile">
             <div class="asset_preview">
+
               {% if not no_asset %}
                 {% if grel_asstcontent.grel_id %}
                 {% for each_asset_rel_set in each_asset.relation_set %}
@@ -106,16 +107,19 @@
             </div>
             <div class="asset_text">
                 <div class="asset_title" title="{% firstof each_asset.altnames each_asset.name %}">{% firstof each_asset.altnames|truncatechars:25  each_asset.name|truncatechars:25 %}
-                  </a>  
+                  </a>
+                    <a class="crossPublish-{{each_asset.pk}} right" title="Click to Cross Publish this files" style="margin: -2px 1px 0px 2px; float:right; font-size: 20px;"><i class="fa fa-external-link" aria-hidden="true"></i></a>
                   {% if not no_checkbox %}
                     {% if user.is_authenticated  and not group_object.edit_policy == "NON_EDITABLE"  or gstaff_access %}
                                 <input type="checkbox" class="select-chkbox" name="filenode" value="{{each_asset.pk}}" style="margin-top:6px; margin-right: 2px; float:right;" class="asset_content_checkbox" />
                     {% endif %}
                     {% endif %}
-                <div class="asset_desc">{{each_asset.content|striptags|truncatechars:25}}</div>
+
+                    <div class="asset_desc">{{each_asset.content|striptags|truncatechars:25}}</div>
                 </div>
             </div>
         </div>
     </div>
-    
+    {% include 'ndf/widget_cross_publish.html' with node=each_asset %}
+
     
