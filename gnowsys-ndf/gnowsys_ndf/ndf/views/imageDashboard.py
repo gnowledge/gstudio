@@ -11,7 +11,7 @@ try:
     from bson import ObjectId
 except ImportError:  # old pymongo
     from pymongo.objectid import ObjectId
-from gnowsys_ndf.ndf.models import File
+# from gnowsys_ndf.ndf.models import File
 
 ''' -- imports from application folders/files -- '''
 from gnowsys_ndf.settings import META_TYPE, GAPPS, MEDIA_ROOT
