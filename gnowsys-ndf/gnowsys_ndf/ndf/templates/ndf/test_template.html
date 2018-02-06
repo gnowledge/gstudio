@@ -1,16 +1,761 @@
-
-{% extends "ndf/file.html" %}
+{% extends "ndf/base.html" %}
 {% load i18n %}
 {% load ndf_tags %}
-{% load simple_filters %}
+{% get_group_name groupid as group_name_tag %}
+{% check_is_gstaff groupid request.user as is_gstaff %}
+{% get_node groupid as group_obj %}
+{% block title %} {{title}} {% endblock %}
 
 
+{% block style %}
+.top-gap
+{
+margin-top:15px !important;
+}
+.filter-body
+{
+margin-top:5px !important;
+}
+  .first-load { display: none; }
+
+  .tabs dd.active a, .tabs .tab-title.active a { background-color: #f7f7f7; color: black; }
+  .tabs dd > a, .tabs .tab-title > a {color: #4c4c4c;}
+
+  .tabs dd { width: 100%; }
+
+  .tabs dd a { padding-right: 0; width: 100%; }
+
+  .count { position: absolute; right: 5px; opacity: 0.75; }
+
+  .panel > .side-nav > .tabs i {margin-right: 0.5rem;}
+
+  .tabs-content > .content.active{
+  margin-left:-1px !important;
+  }
+
+
+{% endblock %}
+
+
+
+
+<!--
+{% comment %}
+  {% block help_content %}
+    <h3>{% trans "Files" %}</h3>
+    <p>
+      {% trans "Upload your files from your computer to metaStudio. You can view the existing files in the group and create collections." %}
+    </p>
+  {% endblock %}
+{% endcomment %}
+-->
+
+
+<!-- shelf part is commented for being not active -->
+<!--
+{% comment %}
+  {% block shelf_content %}
+    {% if user.is_authenticated %}
+      {% include "ndf/shelf.html" %}
+    {% else %}
+      <h4>Please Login to create your shelf</h4>
+    {% endif %}  
+  {% endblock %}
+{% endcomment %}
+ -->
+
+<!-- left top panel -->
+{% block meta_content %}
+  
+{% endblock %}
+
+
+{% block related_content %}
+  {% check_user_join request groupid as user_is_joined %}
+
+  <div class="panel" style="background-color:#ddd; padding: 0.25rem;margin-top:1em">
+    
+    <ul class="side-nav">
+      <dl class="tabs" data-tab >
+
+        <!-- Collections -->
+        <dd {% if collection_count > 0 %} class="active" {% endif %} data-filetype="Collections">
+          <a href="#view-collection"><i class="fi-page-multiple"></i>
+            {% trans "Collections" %}
+            <span class="count">
+              {{ collection_count }}
+            </span>
+          </a>
+        </dd><br/>
+
+        <!-- all files -->
+        <dd {% if collection_count < 1 %} class="active" {% endif %} data-filetype="all">
+          <a href="#view-all">
+            <i class="fi-eye"></i>
+            {% trans "All files" %}
+            <span class="count text-right">
+              {{ file_pages.count }}
+            </span>
+          </a>
+        </dd>
+
+        <!-- Documents -->
+        <dd data-filetype="Documents">
+          <a href="#view-doc">
+            <i class="fi-page-doc"></i>
+            {% trans "Documents" %}
+            <span class="count">
+              {{ doc_pages }}
+            </span>
+          </a>
+        </dd><br/>
+
+        {% comment %}
+        <!-- Pages -->
+        <dd data-filetype="Pages">
+          <a href="#view-page">
+            <i class="fi-page-filled"></i>
+            {% trans "Pages" %}
+            <span class="count">
+              {{ page_count }}
+            </span>
+          </a>
+        </dd><br/>   
+        {% endcomment %}
+        
+        <!-- Interactives -->
+        <dd data-filetype="Interactives">
+          <a href="#view-interactive">
+            <i class="fi-shuffle"></i>
+            {% trans "Interactives" %}
+            <span class="count">
+              {{ interactive_pages }}
+            </span>
+          </a>
+        </dd><br/>
+
+          
+        {% comment %}
+        <!-- eBooks -->
+        {% if ebook_pages %}
+          <dd data-filetype="eBooks">
+            <a href="#view-ebook">
+              <i class="fi-book"></i>
+              {% trans "eBooks" %}
+              <span class="count">
+                {{ ebook_pages }}
+              </span>
+            </a>
+          </dd><br/>
+        {% endif %}
+        {% endcomment %}
+        
+        <!-- Audio -->
+        <dd data-filetype="Audios">
+          <a href="#view-audio">
+            <i class="fi-music"></i>
+            {% trans "Audios" %}
+            <span class="count">
+              {{ audio_pages }}
+            </span>
+          </a>
+        </dd><br/>
+        
+        <!-- Image -->
+        <dd data-filetype="Images">
+          <a href="#view-image"><i class="fi-camera"></i>
+            {% trans "Images" %}
+            <span class="count">
+              {{ image_pages }}
+            </span>
+          </a>
+        </dd><br/>
+        
+        <!-- Video -->
+        {% if site.SITE_VIDEO == 'pandora_and_local' or site.SITE_VIDEO == 'local' %}
+
+          <dd data-filetype="Videos">
+            <a href="#view-video"><i class="fi-video"></i>
+              {% trans "Videos" %}
+              <span class="count">
+                {{ video_pages }}
+              </span>
+            </a>
+          </dd><br/>
+        {% endif %}
+        
+        <!-- Pandora -->
+        {% comment %}
+        <!--
+        {% if site.SITE_VIDEO == 'pandora_and_local' %}
+
+          <dd data-filetype="Videos">
+            <a href="#view-pandora-video"><i class="fi-video"></i>
+              {% trans "Pandora Videos" %}
+            </a>
+          </dd><br/>
+        {% endif %}
+        -->
+        {% endcomment %}
+
+        {% if site.SITE_VIDEO == 'pandora' %}
+          <dd data-filetype="Videos">
+            <a href="#view-pandora-video"><i class="fi-video"></i>
+              {% trans "Videos" %}
+              <span class="count">
+                {{ video_pages }}
+              </span>
+            </a>
+          </dd><br/>
+        {% endif %}
+
+        <dd>
+        
+      </dl><br/>
+
+     
+      <a href="#" data-reveal-id="library-statistics" class="tiny button radius expand">
+        {% trans "File Statistics" %}
+      </a>
+      <div class="medium reveal-modal" id="library-statistics" data-reveal>
+        {% include "ndf/file_statistics.html" %}
+        <a class="close-reveal-modal">&#215;</a>
+      </div>
+
+      <div class="coll_label row" style="display:none;">
+        <span class="small-12 columns">Create Collection</span>
+        <div class="small-11 columns"><input type="text" class="coll_value" placeholder="Enter collection name" name="coll_name"/></div><a class="create_coll"><span class="fi-check" style="color:green;"></span></a>
+
+        {% if group_obj.created_by == request.user.id or user.is_superuser %}
+        <div class="small-11 columns">
+                <a class="tiny button radius right-btn delete-multiple-files" title="Delete  {{node.member_of_names_list.0}}">{% trans 'Delete Files' %}</a>
+        </div>
+        {% endif %}
+        
+      </div>
+    </ul>
+  </div>
+{% endblock %}
+<!-- END of left panel -->
 
 
 {% block body_content %}
+  <div class="large-4 columns repository-title top-gap">
 
-
-  {% get_filters_data "E-Book" as filter_dict %}
+      {% if app_gst.altnames and app_gst.altnames != "None" %}
+         {% trans app_gst.altnames %}
+      {% else %}
+        {% trans app_gst %}
+      {% endif%}
+  </div>
+    <div class="large-8 columns repository-desc top-gap">{{app_gst.content_org|default_if_none:""|safe}}</div>
+  {% if title == "E-Library" %}
+    {% get_filters_data "File" groupid as filter_dict %}
     {% include "ndf/filters.html" with filter_dict=filter_dict %}
+  {% endif %}
+  <div class="tabs-content gallery">
 
-{% endblock body_content %}
+    {% if already_uploaded %} 
+      <div id="message">
+        <span style="color:red">
+          {% trans "Files Listed below are already uploaded. Duplicate file uploads are not possible." %}
+        </span>
+        <ul>
+          {% for each in already_uploaded %} 
+            <li><b>"{{each}}"</b> {% trans "this file is already uploaded please choose different file" %} </li>
+          {% endfor %}
+        </ul>
+      </div>
+    {% endif %}
+
+    {% group_type_info groupid request.user as grouptype %}
+
+    {% if collection_count > 0 %}
+
+      <div class="content row active" id="view-collection" data-filetype="Collections">
+        {% include "ndf/file_list_tab_new.html" with has_contributor=True resource_type=collection all_collection_count=collection_count  detail_urlname="page_details" filetype="Collections" res_type_name="" page_info=collection_pages %}
+      </div>
+  
+    {% else %}
+      <!-- Tab View #1 - All (Case -I: default landing)-->
+      <div class="content row active" id="view-all" data-filetype="all">
+        {% include "ndf/file_list_tab_new.html" with resource_type=files detail_urlname="file_detail" filetype="all" res_type_name="" page_info=file_pages %}
+      </div>
+    {% endif %}
+      
+    <!-- Tab View #1 - All (Case -II: ajax) -->
+    <div class="content" id="view-all" data-filetype="all">
+      {% if title == "E-Library" %}
+        <a href='{% url "elib_paged_file_objs" group_name_tag "all" 1 %}' class="first-load">1</a>
+      {% else %}
+        <a href='{% url "paged_file_objs" group_name_tag "all" 1 %}' class="first-load">1</a>
+      {% endif %}
+    </div>
+
+      
+    <!-- Tab View 2 - Documents -->
+    <div class="content" id="view-doc" data-filetype="Documents">
+      {% if title == "E-Library" %}
+        <a href='{% url "elib_paged_file_objs" group_name_tag "Documents" 1 %}' class="first-load">1</a>
+      {% else %}
+        <a href='{% url "paged_file_objs" group_name_tag "Documents" 1 %}' class="first-load">1</a>
+      {% endif %}
+    </div>
+
+    {% comment %}
+      
+    <!-- Tab View 2 - Pages -->
+    <div class="content" id="view-page" data-filetype="Pages">
+      {% if title == "E-Library" %}
+        <a href='{% url "elib_paged_file_objs" group_name_tag "Pages" 1 %}' class="first-load">1</a>
+      {% else %}
+        <a href='{% url "paged_file_objs" group_name_tag "Pages" 1 %}' class="first-load">1</a>
+      {% endif %}
+    </div>
+    {% endcomment %}
+
+
+    <!-- Tab View 3 - Interactives -->
+    <div class="content" id="view-interactive" data-filetype="Interactives">
+      {% if title == "E-Library" %}
+        <a href='{% url "elib_paged_file_objs" group_name_tag "Interactives" 1 %}' class="first-load">1</a>
+      {% else %}
+        <a href='{% url "paged_file_objs" group_name_tag "Interactives" 1 %}' class="first-load">1</a>
+      {% endif %}
+    </div>
+
+
+    <!-- Tab View 4 - e-book -->
+    {% comment %}
+      {% if ebook_pages %}
+        <div class="content" id="view-ebook" data-filetype="eBooks">
+          {% if title == "E-Library" %}
+            <a href='{% url "elib_paged_file_objs" group_name_tag "eBooks" 1 %}' class="first-load">1</a>
+          {% else %}
+            <a href='{% url "paged_file_objs" group_name_tag "eBooks" 1 %}' class="first-load">1</a>
+          {% endif %}
+        </div>
+      {% endif %}
+    {% endcomment %}
+
+    <!-- Tab View 5 - Audios -->
+    <div class="content" id="view-audio" data-filetype="Audios">
+      {% if title == "E-Library" %}
+        <a href='{% url "elib_paged_file_objs" group_name_tag "Audios" 1 %}' class="first-load">1</a>
+      {% else %}
+        <a href='{% url "paged_file_objs" group_name_tag "Audios" 1 %}' class="first-load">1</a>
+      {% endif %}
+    </div>
+
+    <!-- Tab View 6 - Images -->
+    <div class="content" id="view-image" data-filetype="Images">
+      {% if title == "E-Library" %}
+        <a href='{% url "elib_paged_file_objs" group_name_tag "Images" 1 %}' class="first-load">1</a>
+      {% else %}
+        <a href='{% url "paged_file_objs" group_name_tag "Images" 1 %}' class="first-load">1</a>
+      {% endif %}
+    </div>
+
+    <!-- Tab View 7 - Videos -->
+    <div class="content" id="view-video" data-filetype="Videos">
+      {% if title == "E-Library" %}
+        <a href='{% url "elib_paged_file_objs" group_name_tag "Videos" 1 %}' class="first-load">1</a>
+      {% else %}
+        <a href='{% url "paged_file_objs" group_name_tag "Videos" 1 %}' class="first-load">1</a>
+      {% endif %}
+    </div>
+
+    <!-- Tab View 8 - pandora Videos -->
+    <div class="content" id="view-pandora-video" data-filetype="Videos">
+      {% if title == "E-Library" %}
+          <a href='{% url "elib_paged_file_objs" group_name_tag "Videos" 1 %}' class="first-load">1</a>
+        {% else %}
+          <a href='{% url "paged_file_objs" group_name_tag "Videos" 1 %}' class="first-load">1</a>
+        {% endif %}
+      </div>
+      
+      {% comment %}
+      <div class="content" id="view-collection" data-filetype="collection">
+        {% get_resource_collection groupid "File" as file_collections %}
+
+        {% include "ndf/file_list_tab.html" with resource_type=file_collections detail_urlname="file_detail" filetype="collection" res_type_name="collection" %}
+
+        {% if title == "E-Library" %}
+          <a href='{% url "elib_paged_file_objs" group_name_tag "Collections" 1 %}' class="first-load">1</a>
+        {% else %}
+          <a href='{% url "paged_file_objs" group_name_tag "Collections" 1 %}' class="first-load">1</a>
+        {% endif %}
+
+      </div>
+      {% endcomment %}
+
+
+    </div>
+
+  {% endblock %}
+
+
+  {% block script %}
+  // <script type="text/javascript">
+
+
+    $(document).on('change','.filenode',function(){
+
+        var checked = $('.filenode:checked').length;
+        if (checked){
+          $(".coll_label").css("display", "block");          
+        }
+        else{
+          $(".coll_label").css("display", "none");          
+        }
+        
+    });
+
+    $('.create_coll').click(function() {
+
+      var coll_arr = []
+      var coll_node = $(".coll_value").val()
+      $('.filenode:checked').each(function() {
+        coll_arr.push($(this).val());
+      });
+
+      var r = confirm("Do you want to save the collection of selected elements");
+      if (r == true) {
+          x = "Your collection is saved successfully";
+          $.ajax({
+            type: "POST",
+            url: "{% url 'collection_create' group_id %}",
+            datatype: "html",
+            data:{
+              collection: coll_arr,
+              name: coll_node,
+              csrfmiddlewaretoken: '{{ csrf_token }}'
+            },
+            success: function(data) {
+              
+              location.href = "{% url 'e-library' group_name_tag %}";
+
+            }
+          });
+
+          
+      } else {
+          x = "Cancelled";
+      }
+      
+      
+          
+    });
+
+    // pagination ajax  
+    $('ul.pagination a').click(function(e)
+    {
+        e.preventDefault();
+        populateFileList(this);    
+    });
+
+    isFilterChanged = false;
+
+  function ddLHSBindEvents(){
+
+    $("dl.tabs dd").click(function(e){
+
+
+      var tabDivId = $(this).children("a").attr("href");
+
+      // if((tabDivId != "#view-collection") && (tabDivId != "view-pandora-video"))
+      if(tabDivId != "view-pandora-video")
+      {
+        var pageAnchor = $(tabDivId).children("a.first-load")[0];
+        // console.log(pageAnchor);
+        if(! pageAnchor)
+        {
+          var pageAnchor = $(tabDivId).find("ul.pagination > li > a:first")[0];
+        }
+        if(pageAnchor)
+        {
+          populateFileList(pageAnchor);
+        }
+      }
+
+      // check the origin of click. Via filter-triggered or normal-click.
+      if(!e.originalEvent && e.isTrigger)   // filter-triggered
+      {
+        isFilterChanged = true;
+      }
+      else                                  // normal-click.
+      {
+        isFilterChanged = false;
+      }
+      $(this).off("click");
+    });
+
+  }
+  
+  ddLHSBindEvents();
+
+  function populateFileList(pageAnchor)
+  {
+
+    var filetype = pageAnchor.href.split("/")[5],
+        page_no = pageAnchor.text.trim(),
+        no_of_objs_pp = 24,
+        url = pageAnchor.href.substr(pageAnchor.href.search(pageAnchor.host)+pageAnchor.host.length);
+
+    // getting already added filers as an array of objects, holding entire properties of it.
+    {% if title == "E-Library" %}
+      var filtersObjArr = {};
+      if (getFiltersObjsInAndOrFormat){
+        filtersObjArr = JSON.stringify(getFiltersObjsInAndOrFormat());
+      }
+    {% endif %}
+
+    var tabContainerDiv = $(pageAnchor).closest("div.content");
+
+    $.ajax({
+
+      type: 'POST',
+      url: url,
+      datatype: 'html',
+      data: {
+
+        title: "{{title}}",
+        filetype: filetype,
+        page_no: page_no,
+        no_of_objs_pp: no_of_objs_pp,
+  
+        {% if title == "E-Library" %}
+          filters: filtersObjArr,
+        {% endif %}
+  
+        csrfmiddlewaretoken: '{{ csrf_token }}'
+      },
+      success: function(data){
+        
+        $(tabContainerDiv).html(data);
+
+        // making newly loaded html pagination <a> non clickable and bind with populateFileList()
+        $(tabContainerDiv).find("ul.pagination a").click(function(e){
+
+          e.preventDefault();
+          populateFileList(this);
+
+          });
+          
+          var pageAnchors = document.querySelectorAll('ul.pagination > li > a');
+          for (var i = pageAnchors.length - 1; i >= 0; i--) {
+            pageAnchors[i].href += location.search; 
+          }
+
+          if(isFilterChanged) { updateLHSpanelCounters(); }
+        }
+      });
+    }
+
+    // providing function to handle filtering part
+    function applyFilter(filtersArr)
+    {
+      if (updateFilterUrl){ updateFilterUrl("{% url 'e-library' group_name_tag %}"); }
+
+      var url = html = "";
+
+      {% if title == "E-Library" %}
+        href = '{% url "elib_paged_file_objs" group_name_tag "replace-this" 1 %}';
+        urlHtml = "<a href="+href+" class='first-load'>1</a>";
+      {% else %}
+        href = '{% url "paged_file_objs" group_name_tag "replace-this" 1 %}';
+        urlHtml = "<a href="+href+" class='first-load'>1</a>";
+      {% endif %}
+      // console.log(url);
+
+      $("div.tabs-content.gallery > div.content").each(function(){
+
+        var tempFiletype = this.getAttribute("data-filetype");
+        $(this).html(urlHtml.replace("replace-this", tempFiletype));
+
+    });
+    ddLHSBindEvents();
+    $("dl.tabs dd:first a").trigger("click")
+
+  }
+
+  function updateLHSpanelCounters()
+  {
+    var educationaluse_stats = $("div[data-educationaluse-stats]").attr("data-educationaluse-stats")
+
+    // console.log("innnn : " + educationaluse_stats);
+
+    educationaluse_stats = JSON.parse(educationaluse_stats);
+
+    $("dl.tabs dd").each(function(){
+      
+      var c = this.getAttribute("data-filetype");
+
+      if(educationaluse_stats.hasOwnProperty(c)){
+        $(this).find("a > span.count:visible").text(educationaluse_stats[c]);
+      }
+      else
+      {
+        $(this).find("a > span.count:visible").text("0");
+      }
+
+    });
+  }
+
+// $("input[type='radio'][name='crxcr']").change(function(){
+//   $("ul.pagination li.current > a").trigger("click");
+// })
+
+// --END of pagination.
+
+
+//   var eventhandler = function(e) { e.preventDefault();}
+
+//   $(document).on('click',".video",function(){
+//   //$('#body').css({opacity: "0.4"});
+//   $("#backcover").show();
+//   $('#body').bind('click', eventhandler);
+//   $('#pop_video').show();
+//   var video_id = this.id;
+//   var video_index = $('.video').index(this)
+//   var video_total = $('.video').length;
+//   var pre = $(".video_pre");
+//   var next = $(".video_next");
+//   var url = "/{{groupid}}/video/fullvideo/"+video_id
+//   $("#play_video").attr("src",url);
+//   $(".video_details_link").attr("href","/{{groupid}}/video/video_detail/"+video_id)
+//   if(video_index >= 1 && video_index < video_total-1)
+//   {
+//    pre.attr("id",video_index-1);
+//    next.attr("id",video_index+1);
+//  }
+//  else if(video_index == 0)
+//  {
+//   pre.hide();
+//   next.attr("id",video_index+1);
+// }
+// else if(video_index == video_total-1){
+//   pre.attr("id",video_index-1);
+//   next.hide();
+// }
+// else{
+//   pre.hide();
+//   next.hide();
+// }
+// });
+
+//   $(document).on('click',"#close",function(){
+//     $('#pop_video').hide();
+//     $("#backcover").hide();
+//     $("#play_video").attr("src","");
+//     $('#body').css({opacity: "1"});
+//     $('#body').unbind('click', eventhandler);
+//   });
+
+//   $(document).on('click',".video_pre",function(){
+//     var video_id = this.id;
+//     var video_index = parseInt(this.id);
+//     var video_total = $('.video').length;
+//     var pre = $(".video_pre");
+//     var next = $(".video_next");
+//     pre.show();
+//     next.show();
+//     var video_url = $(".video")[this.id].id
+//     var url = "/{{groupid}}/video/fullvideo/"+video_url
+//     $("#play_video").attr("src",url);
+//     $(".video_details_link").attr("href","/{{groupid}}/video/video_detail/"+video_url)
+//     if(video_index >= 1 && video_index < video_total-1)
+//     {
+//       pre.attr("id",video_index-1);
+//       next.attr("id",video_index + 1);
+//     }
+//     else if(video_index == 0)
+//     {
+//       pre.hide();
+//       next.attr("id",video_index+1);
+//     }
+//     else if(video_index == video_total-1){
+//       pre.attr("id",video_index-1);
+//       next.hide();
+//     }
+//     else{
+//       pre.hide();
+//       next.hide();
+//     }
+//   });
+
+//   $(document).on('click',".video_next",function(){
+//     var video_id = this.id;
+//     var video_index = parseInt(this.id);
+//     var video_total = $('.video').length;
+//     var pre = $(".video_pre");
+//     var next = $(".video_next");
+//     pre.show();
+//     next.show();
+//     var video_url = $(".video")[this.id].id
+//     var url = "/{{groupid}}/video/fullvideo/"+video_url
+//     $("#play_video").attr("src",url);
+//     $(".video_details_link").attr("href","/{{groupid}}/video/video_detail/"+video_url)
+//     if(video_index >= 1 && video_index < video_total-1)
+//     {
+//       pre.attr("id",video_index-1);
+//       next.attr("id",video_index+1);
+//     }
+//     else if(video_index == 0)
+//     {
+//       pre.hide();
+//       next.attr("id",video_index+1);
+//     }
+//     else if(video_index == video_total-1){
+//       pre.attr("id",video_index-1);
+//       next.hide();
+//     }
+//     else{
+//       pre.hide();
+//       next.hide();
+//     }
+//   });
+
+
+  {% if is_video %}
+    alert("Your video file uploaded succesfully, But still in process, play video about 1 hour after");
+  {% endif %}
+
+  $(".delete-multiple-files").click(function(){
+   // var coll_node = $(".coll_value").val()
+      var coll_arr = []
+      $('.filenode:checked').each(function() {
+        coll_arr.push($(this).val());
+      });
+      // alert(coll_arr);
+
+      var r = confirm("Do you want to save the collection of selected elements");
+      if (r == true) {
+          x = "Your collection is saved successfully";
+          $.ajax({
+            type: "POST",
+            url: "{% url 'delete_multiple_resources' group_id %}",
+            datatype: "html",
+            data:{
+              collection: coll_arr,
+              csrfmiddlewaretoken: '{{ csrf_token }}'
+            },
+            success: function(data) {
+              alert("File(s) deleted successfully");
+              location.reload();
+
+            }
+          });
+
+          
+      } else {
+          x = "Cancelled";
+      }
+  })
+
+
+
+
+// </script>
+
+{% endblock %}

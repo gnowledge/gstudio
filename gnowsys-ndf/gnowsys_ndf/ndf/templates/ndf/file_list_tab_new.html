@@ -1,0 +1,53 @@
+{% load i18n %}
+{% load ndf_tags %}
+
+
+<!-- Card -->
+<ul class="small-block-grid-1 medium-block-grid-3 large-block-grid-5" >
+
+  <!-- Existing card list-->
+  
+  {% for each_res in resource_type %} 
+    
+    <!-- #{#%# get_grid_fs_object each_res as grid_fs_obj %} -->
+    <li class="card-image-wrapper" > 
+    <!--old card-view > card.html &&  new card-view > simple_card.html  -->
+    {% if notebook_filter %}
+      {% include 'ndf/simple_card_new.html' with  has_contributor=True resource=each_res
+      url_name='course_notebook_tab_note' first_arg=group_name second_arg="all-notes" third_arg=each_res|get:'_source'|get:'id' %}
+    {% else %}
+
+      {% include 'ndf/simple_card_new.html' with  has_contributor=True resource=each_res url_name=detail_urlname first_arg=group_id second_arg=each_res|get:'_source'|get:'id' %}
+    {% endif %}
+    </li>
+
+    
+      <!-- end new -->      
+
+    
+      
+  {% endfor %}
+  
+</ul>
+
+
+
+<link rel="stylesheet" type="text/css" href="/static/ndf/bower_components/slick-carousel/slick/slick.css"/>
+<link rel="stylesheet" type="text/css" href="/static/ndf/css/open-sans-bold-font.css">
+<script type="text/javascript" src="/static/ndf/bower_components/slick-carousel/slick/slick.min.js"></script>
+
+
+<script type="text/javascript">
+  $(document).ready(function () {
+
+      $('.rcard .content').slick({
+      // dots: true,
+      infinite: true,
+      arrows: true,
+      speed: 500,
+      // fade: true,
+      cssEase: 'linear'
+    });
+    
+  })
+</script>
