@@ -129,7 +129,7 @@ urlpatterns = patterns('',
     # ---end of mis
 
     #test url
-    (r'^dev/', include('gnowsys_ndf.ndf.urls.dev_utils')),
+    (r'^dev', include('gnowsys_ndf.ndf.urls.dev_utils')),
     (r'^tools/', include('gnowsys_ndf.ndf.urls.tools')),
     
     # meeting app

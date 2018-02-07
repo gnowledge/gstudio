@@ -1,8 +1,6 @@
 {% load i18n %}
 {% load ndf_tags %}
 {% load simple_filters %}
-
-
 <style type="text/css">
 
   .rating-stars > div {
@@ -25,9 +23,8 @@
 
   </style>
  
- <div class="scard-container" data-id="{{resource|get:'_source'|get:'id'}}">
+ <div class="scard-container" data-id="{{resource.pk}}">
  <div class="scard" data-mime-type="{{resource.if_file.mime_type}}" original-src="{% if 'video' in resource.if_file.mime_type   %}{{MEDIA_URL}}{{resource.if_file.mid.relurl}}{% else %}{{MEDIA_URL}}{{resource.if_file.original.relurl}}{% endif %}">
-
  {% if is_event %}
   {% get_event_status resource as event_status_msg %}
   {% if event_status_msg %}
@@ -49,20 +46,17 @@
   <a href='{% url url_name  %}{{search_url_text|safe}}'>
 {% endif %}
 {% endif %}
+<div class="scard-image" title="{% firstof resource.altnames resource.name %}">
 
-<div class="scard-image" title="{% firstof resource|get:'_source'|get:'altnames' resource|get:'_source'|get:'name' %}">
+    {% get_dict_from_list_of_dicts resource.attribute_set as attr_set_dict %}
 
-    {% get_dict_from_list_of_dicts resource|get:'_source'|get:'attribute_set' as attr_set_dict %}
-
-    {% get_relation_value resource|get:'_source'|get:'has_thumbnail' as grel_dict %}
+    {% get_relation_value resource.pk 'has_thumbnail' as grel_dict %}
     {% if not grel_dict.cursor and grel_dict.grel_node and grel_dict.grel_node.fs_file_ids.1 %}
         <img src="{{MEDIA_URL}}{{grel_dict.grel_node.if_file.mid.relurl}}" alt="" />
-
-
     {% elif grel_dict.grel_node.if_file.thumbnail.relurl and  'video' or "File" in resource.if_file.mime_type %}
         <img src="{{MEDIA_URL}}{{grel_dict.grel_node.if_file.mid.relurl}}">
-    {% elif resource|get:'_source'|get:'if_file'|get:'thumbnail'|get:'relurl' and 'video' in resource|get:'_source'|get:'if_file'|get:'mime_type' %}
-        <img src="{{MEDIA_URL}}{{resource|get:'_source'|get:'if_file'|get:'thumbnail'|get:'relurl'}}">
+    {% elif resource.if_file.thumbnail.relurl and 'video' in resource.if_file.mime_type %}
+        <img src="{{MEDIA_URL}}{{resource.if_file.thumbnail.relurl}}">
     {% elif resource.if_file.mid.relurl %}
         <img src="{{MEDIA_URL}}{{resource.if_file.mid.relurl}}">
     {% elif resource.if_file.original.relurl and 'image' in resource.if_file.mime_type %}
