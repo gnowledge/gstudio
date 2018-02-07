@@ -18,21 +18,38 @@
     color:gray !important;
   }
   .course_editor_section{
-    min-width:930px;
-    margin-left: -15px;
   }
   .node-content-div{
     
     margin-left: -4px;
-    margin-right: 20%;
+    width:100%;
 
   }
 </style>
 
 {% include 'ndf/widget_user_access_modal.html' %}
 
-<div class="activity_player_secondary_header activity_player_header sticky">
-  <nav class="activity_player_secondary_header activity_player_header" data-topbar role="navigation" data-options="sticky_on: large">
+{% if site.SITE_NAME == "NROER" %}
+  <div class="activity_player_secondary_header activity_player_header sticky" style="margin-top:-8px;">
+
+    <nav class="activity_player_secondary_header activity_player_header" data-topbar role="navigation" data-options="sticky_on: large">
+{% else %}
+  <div class="activity_player_secondary_header activity_player_header sticky">
+
+    <nav class="activity_player_secondary_header activity_player_header" data-topbar role="navigation" data-options="sticky_on: large">
+{% endif %}
+
+
+    {% if site.SITE_NAME == "NROER" %}
+      <div class="small-1 columns end header_text_sm_block">
+        <a title="Go back to Overview" href="{% url 'course_content' group_id  %}">
+        <div class="header_icon_block prev_button">
+          <span>
+            <i class="fa fa-angle-left header_icon"></i> Back</span>
+        </div>
+        </a>
+      </div>
+    {% else %}
       <div class="small-1 columns end header_text_sm_block">
         <a title="Go back to all Lessons" href="{% url 'course_content' group_id  %}">
         <div class="header_icon_block prev_button">
@@ -41,13 +58,14 @@
         </div>
         </a>
       </div>
+    {% endif %}
 
         
         <div class="header_title" title ="{% firstof group_object.altnames group_object.name %}">
           {% firstof group_object.altnames group_object.name  %}
 
             {% if "QuizItemEvent" in node.member_of_names_list or "QuizItem" in node.member_of_names_list%}
-              <a href="{% url 'course_quiz_data' group_id %}" class="header_text_block right">RESULTS</a>
+              <a href="{% url 'course_quiz_data' group_id %}" class="header_text_block right"><span> Results</span></a>
             {% endif %}
         </div>
 
@@ -63,6 +81,7 @@
                {% trans "Previous Lesson" %}  
             </a>
         </div>
+
         <div class="pagination prev_button header_text_block header_text_md_block">
             
               <a {% if resource_prev_id %} href="{% url 'activity_player_detail' group_id lesson_node.pk resource_prev_id %}" title="Go to previous activity"  {% else %} class = "disabled" title="You are on the first activity" {% endif %}> 
@@ -79,6 +98,7 @@
               </a>
             
         </div>
+
         <div class="new_note header_text_block header_text_lg_block">
             <a {% if next_lesson_id  and lesson_next_act_id and not resource_next_id %} title="Go to next lesson"  href="{% url 'activity_player_detail' group_id next_lesson_id lesson_next_act_id %}" {% else %} class = "disabled"   title="You are on the last Lesson" {% endif %} >
                {% trans "Next Lesson" %} <i class="fa fa-angle-double-right header_icon"></i>    
@@ -91,12 +111,151 @@
 </div>
 
 
+<div class="off-canvas-wrap" data-offcanvas>
+  <div class="inner-wrap">
+    <nav class="tab-bar show-for-medium">
+      <section class="left-small">
+        <a class="left-off-canvas-toggle fi-list" style="color:white; margin-left:15px;" ></a>
+      </section>
 
-<div class="row activity_sheet ">
+      <section class="middle tab-bar-section">
+        <h1 class="title">{% firstof group_object.altnames group_object.name  %}</h1>
+      </section>
+
+      <section class="right-small">
+        <a class="right-off-canvas-toggle fi-list" style="color:white; margin-left:15px;"></a>
+      </section>
+    </nav>
+
+    <aside class="left-off-canvas-menu">
+      <ul class="off-canvas-list">
+        <li><label>{{trans_lesson_name}}</label></li>
+              {% for each in act_list %}
+                  {% for k,v in each.items  %}
+                    <li  {% if v.basenodeid == activityid %} class="active" {% endif %}> <a href="{% url 'activity_player_detail' group_id lesson_node.pk v.basenodeid %}"> {% firstof v.altnames v.name %} </a></li>
+                  {% endfor %}
+              {% endfor %}
+        <li class="has-submenu"><a href="#" style="background-color:#444444;">Unit Structure</a>
+            <ul class="left-submenu">
+                <li class="back"><a href="#">Back</a></li>
+                    {% for each in lesson_list %}
+                    <a href="{% url 'activity_player_detail' group_id each.id each.first_act %}"><li class="has-submenu"> {{each.name}}</li></a>
+                    {% endfor %}
+            </ul>
+        </li>
+      </ul>
+    </aside>
+
+        <aside class="right-off-canvas-menu">
+      <ul class="off-canvas-list">
+        <li><label>Navigation</label></li>
+        <li><a   {% if prev_lesson_id and lesson_act_prev_id %} href="{% url 'activity_player_detail' group_id prev_lesson_id lesson_act_prev_id %}" {% else %} class = "disabled" {% endif %} ><i class="fa fa-fast-backward header_icon"></i>&nbsp;
+               {% trans "Previous Lesson" %}  
+            </a></li>
+        <li><a {% if resource_prev_id %} href="{% url 'activity_player_detail' group_id lesson_node.pk resource_prev_id %}" {% else %} class = "disabled"{% endif %}> 
+                  <i class="fa fa-angle-left header_icon"></i> {% trans "Previous Activity" %}</a>
+        </li>
+        <li><a {% if resource_next_id %}  href="{% url 'activity_player_detail' group_id lesson_node.pk resource_next_id %}" {% else %} class = "disabled" {% endif %}>
+                  {% trans "Next Activity" %} <i class="fa fa-angle-right header_icon"></i>
+              </a></li>
+        <li> <a  {% if next_lesson_id  and lesson_next_act_id %} href="{% url 'activity_player_detail' group_id next_lesson_id lesson_next_act_id %}"  {% else %} class = "disabled" {% endif %} ><i class="fa fa-fast-forward header_icon"></i>&nbsp;
+               {% trans "Next Lesson" %}    
+            </a></li>
+
+        <li class="has-submenu"><a href="#" style="background-color:#444444">More..</a>
+            <ul class="right-submenu">
+                <li class="back"><a href="#">Back</a></li>
+                <li><a {% if user_access_priv == "allow" %} href="{% url 'course_notebook' group_id %}?create=True" {% else %} class="user_not_enrolled" {% endif %}><i class="fa fa-edit header_icon"></i>{% trans "Write a new Note" %}</a>
+                </li>
+                <li><a href="#">View Gallery</a></li>
+                <li><a href="#">Upload a Image</a></li>
+                
+            </ul>
+        </li>
+      </ul>
+    </aside>
+
+
+
+
+
+<div class="off-canvas-wrap" data-offcanvas>
+  <div class="inner-wrap">
+    <nav class="tab-bar show-for-small">
+      <section class="left-small">
+        <a class="left-off-canvas-toggle fi-list" style="color:white; margin-left:15px;"></a>
+      </section>
+
+      <section class="middle tab-bar-section">
+        <h1 class="title">{% firstof group_object.altnames group_object.name  %}</h1>
+      </section>
+
+
+      <section class="right-small">
+          <a class="right-off-canvas-toggle fi-list" style="color:white; margin-left:15px;"></a>
+      </section>
+    </nav>
+
+    <aside class="left-off-canvas-menu">
+      <ul class="off-canvas-list">
+        <li><label>{{trans_lesson_name}}</label></li>
+              {% for each in act_list %}
+                  {% for k,v in each.items  %}
+                    <li  {% if v.basenodeid == activityid %} class="active" {% endif %}> <a href="{% url 'activity_player_detail' group_id lesson_node.pk v.basenodeid %}"> {% firstof v.altnames v.name %} </a></li>
+                  {% endfor %}
+              {% endfor %}
+        <!-- mobile view -->
+        <li class="has-submenu"><a href="#" style="background-color:#444444;">Unit Structure</a>
+            <ul class="left-submenu">
+                <li class="back"><a href="#">Back</a></li>
+                    {% for each in lesson_list %}
+                        <a href="{% url 'activity_player_detail' group_id each.id each.first_act %}"><li class="has-submenu"> {{each.name}}</li></a>
+                    {% endfor %}
+                    
+            </ul>
+        </li>
+        <!-- mobile view -->
+      </ul>
+    </aside>
+<!--  mobile view  -->
+    <aside class="right-off-canvas-menu">
+      <ul class="off-canvas-list">
+        <li><label>Navigation</label></li>
+        <li><a   {% if prev_lesson_id and lesson_act_prev_id %} href="{% url 'activity_player_detail' group_id prev_lesson_id lesson_act_prev_id %}" {% else %} class = "disabled" {% endif %} ><i class="fa fa-fast-backward header_icon"></i>&nbsp;
+               {% trans "Previous Lesson" %}  
+            </a></li>
+        <li><a {% if resource_prev_id %} href="{% url 'activity_player_detail' group_id lesson_node.pk resource_prev_id %}" {% else %} class = "disabled"{% endif %}> 
+                  <i class="fa fa-angle-left header_icon"></i> {% trans "Previous Activity" %}</a>
+        </li>
+        <li><a {% if resource_next_id %}  href="{% url 'activity_player_detail' group_id lesson_node.pk resource_next_id %}" {% else %} class = "disabled" {% endif %}>
+                  {% trans "Next Activity" %} <i class="fa fa-angle-right header_icon"></i>
+              </a></li>
+        <li> <a  {% if next_lesson_id  and lesson_next_act_id %} href="{% url 'activity_player_detail' group_id next_lesson_id lesson_next_act_id %}"  {% else %} class = "disabled" {% endif %} ><i class="fa fa-fast-forward header_icon"></i>&nbsp;
+               {% trans "Next Lesson" %}    
+            </a></li>
+
+        <li class="has-submenu"><a href="#" style="background-color:#444444">More..</a>
+            <ul class="right-submenu">
+                <li class="back"><a href="#">Back</a></li>
+                <li><a {% if user_access_priv == "allow" %} href="{% url 'course_notebook' group_id %}?create=True" {% else %} class="user_not_enrolled" {% endif %}><i class="fa fa-edit header_icon"></i>{% trans "Write a new Note" %}</a>
+                </li>
+                <li><a href="#">View Gallery</a></li>
+                <li><a href="#">Upload a Image</a></li>
+                
+            </ul>
+        </li>
+      </ul>
+    </aside>
+
+<!--  mobile view  -->
+
+  
+  <div class="row activity_sheet ">
+
 
     <div class="small-12 columns">
         <div class="course_editor ">
-          <div class="small-3 columns">
+          <div class="small-3 columns hide-for-small hide-for-medium">
             <div class="course_tree">
               <div class="lesson-title" title="{{trans_lesson_name}}">
                   <b>{{trans_lesson_name}}</b>
@@ -115,10 +274,12 @@
               </div>
               </div>
           </div>
-          
-          <div class="small-8 columns">
+  
 
-            <div class="course_editor_section">
+
+          
+          <div class="small-12 medium-12 large-8 columns">
+            <div class="small-12 medium-12 large-12 columns course_editor_section">
               {% with node.member_of_names_list as node_member_of_names_list %}
               {% if "QuizItemEvent" not in node_member_of_names_list and "QuizItem" not in node_member_of_names_list%}
               <div class="input_links row" style="margin-left:10px;">
@@ -172,6 +333,7 @@
             </div>
           </div>
         </div>
+        </div>
       </div>
 </div>             
 
@@ -218,6 +380,13 @@
 
   // start of document.ready()
   $(document).ready(function(event) {
+
+      var $container = $('.course_tree'),
+      $scrollTo = $('.activity-title').children('li.active');
+      $container.scrollTop(
+          $scrollTo.offset().top - $container.offset().top- $container.offset().top + $container.scrollTop()
+      );
+    /*
     var iframes = document.getElementsByTagName('iframe');
     var key = 'assessment.Bank';
 
@@ -266,7 +435,7 @@
                 $(iframes[i]).attr('src', new_source)
             }
        }
-    }
+    }*/
   })
 
   $(".admin-page").click(function(event){

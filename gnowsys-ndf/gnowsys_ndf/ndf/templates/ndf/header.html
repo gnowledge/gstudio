@@ -2,10 +2,14 @@
 {% load i18n %}
 {% load cache %}
 
-  {% get_group_object groupid as group_object %}
+  {% if groupid %}
+    {% get_group_object groupid as group_object %}
+  {% endif %}
   {% get_explore_url as explore_url %}
 
   {% if site.SITE_NAME != "NROER" %}
+
+
   <div id="feedsModal" class="reveal-modal medium alert-box radius" data-reveal data-alert>
     <p id="feedsModalLabel"></p>
     <div class="row feeds_proceed">
@@ -20,6 +24,54 @@
     <a class="close-reveal-modal">&#215;</a>
   </div>
   {% endif %}
+
+  <div id ="toolbar" style="background-color: #2d2c2c;">
+    
+      <div class="row " >
+        <div class="small-6 medium-6 columns">    
+          <div class="datetime" style="color: #eaeaea; padding: 4px 0px 2px 5px; font-size: 11px;">
+
+            <script type="text/javascript">
+              document.write ('<div id="date-time">', new Date().toLocaleString(), '<\/div>')
+              if (document.getElementById) onload = function () {
+                setInterval ("document.getElementById ('date-time').firstChild.data = new Date().toLocaleString()", 50)
+              }
+            </script>
+          </div>
+        </div>
+        
+        <div class="small-6 medium-6 columns">
+          <div class="changefont" style="text-align: right; padding: 2px 5px 1px 0px;  ">
+             <div class="fontlist" style=" cursor: pointer;">
+              <a class="font-button minus" style="font-size:60%; color: #eaeaea;">A-</a> &nbsp;<a class="font-button normal " style="font-size:80%; color: #eaeaea;">A</a>&nbsp; <a class="font-button plus" style="font-size:100%; color: #eaeaea;">A+</a>
+              <script type="text/javascript">
+                $(function () {
+                    $(".font-button").bind("click", function () {
+                        var size = parseInt($('body').css("font-size"));
+                        if ($(this).hasClass("plus")) {
+                            size = size + 1;
+                        } else if ($(this).hasClass("minus")){
+                            size = size - 1;
+                            if (size <= 10) {
+                                size = 10;
+                            }}
+                            else if ($(this).hasClass("normal")){
+                                size = 13;
+                            }
+
+                            else {}
+                                $('body').css("font-size", size);
+                        });
+                });
+              </script>
+             </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  
+
+<div class="nroer_header">
 
   <div id="top-headers">
 
@@ -103,8 +155,26 @@
               </ul>
             </li>
 
+
             {% endfor %}
           {% endfor %}
+
+          <li>
+
+            <a href="{% url 'nroer_groups' 'home' 'Groups' %}" {% if nroer_menu.top_menu_selected == "Workspaces" %}class="active"{% endif %}>
+                {% trans "Workspaces" %}
+              </a>
+          </li>
+
+            <li>
+              <a title="Click here to view all Courses" href="{% url explore_url %}" {% if title == 'base courses' or title == "courses" or title == "drafts" %} class="active" {% endif %} > Explore</a>
+            </li>
+
+           {% if request.user.is_authenticated %}
+              <li> 
+                  <a title="Click here to view your enrolled Courses" href="{% url 'my_desk' request.user.id %}" {% if title == "my desk" or title == "my performance" %} class="active" {% endif %}> My Desk</a>
+              </li>
+            {% endif %}
 
         </ul>
         <!-- -END of NROER level one menu -->
@@ -397,6 +467,7 @@
         </section>
 
       </nav>
+
       <!-- closing of first nav -->
 
 
@@ -577,6 +648,7 @@
     {# </div> #}
     <!-- end of section appointed for two header's -->
   </div>
+</div>
   <!-- end of LOGO + top header's -->
 
 {% if site.SITE_NAME != "NROER" %}
@@ -615,3 +687,7 @@
 </script>
 
 {% endif %}
+
+
+
+<!-- ****** toolbar script   ****** -->

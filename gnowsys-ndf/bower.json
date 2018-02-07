@@ -24,7 +24,7 @@
     "leaflet": "#0.7.3",
     "Leaflet.awesome-markers": "#2.0.2",
     "jquery-ui": "#1.11.2",
-    "fullcalendar": "#2.1.1",
+    "fullcalendar": "#3.8.0",
     "jqueryui-timepicker-addon": "#1.4.5",
     "jqtree": "#0.21.0",
     "jquery-legacy": "jquery#1.10.2",
@@ -56,11 +56,13 @@
     "rubik-googlefont": "#a23ec91574",
     "MathJax": "2.7.0",
     "jquery-backstretch": "^2.1.15",
+    "ckeditor-youtube-plugin": "#2.1.4",
     "datatables-rowsgroup": "#2.0.0",
     "datatables.net-buttons": "#1.4.2",
     "datatables.net-buttons-dt": "#1.4.2",
     "pdfmake": "#0.1.33",
-    "jszip": "#3.1.4"
+    "jszip": "#3.1.4",
+    "css-toggle-switch": "^4.1.0"
   },
   "resolutions": {
     "jquery": "2.2.1"

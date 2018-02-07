@@ -1,264 +1,467 @@
-
 {% extends "ndf/gbase.html" %}
 {% load i18n %}
 {% load ndf_tags %}
+{% block title %} {% trans "Events" %} {% endblock %}
+
+
 {% block body_content %}
 
-        <div class="small-12 columns curriculum_creator">
-            <h3>Create Curriculum Tree Structure</h3>
-            <div id="curriculum_tree"></div>
-            <!--button type="button" class="blue-white-button" id="create_first_branch">Create Branch</button-->
-        </div>
 
-        <div id="addBranch" class="reveal-modal" data-reveal aria-labelledby="modalTitle" aria-hidden="true" role="dialog">
-        	<div>
-	            <h4>Create new Section</h4>
-	            <label>Section Name
-	                <input type="text" placeholder="Section Name" name="branch_name"/>
-	            </label>
-	            <label>Section Description
-	                <textarea type="text" placeholder="Section description" ></textarea>
-	            </label>
-	            <br />
-	            <button type="button" class="blue-white-button create_branch">
-	                Add
-	            </button>
-	            <button type="button" class="blue-white-button delete_branch" style="display: none;">
-	                Delete
-	            </button>
-        	</div>
-      		<a class="close-reveal-modal" aria-label="Close">&#215;</a>
-    	</div>
+<!-- <script type="text/javascript">
 
-    	    <div id="addDivision" class="reveal-modal" data-reveal aria-labelledby="modalTitle" aria-hidden="true" role="dialog">
-        <div>
-            <h4>Create new Sub-Section</h4>
-            <label>Sub-Section Name
-                <input type="text" placeholder="Sub-Section Name" />
-            </label>
-            <label>Topic
-                <input type="checkbox" name="isLeafNode" value="leafNode"/>
-            </label>
-            <br />
+  $(document).ready(function(){
 
-            <br />
-            <button type="button" class="blue-white-button create_division">
-                Add
-            </button>
-            <button type="button" class="blue-white-button delete_division" style="display: none;">
-                Delete
-            </button>
-        </div>
-      <a class="close-reveal-modal" aria-label="Close">&#215;</a>
-    </div>
+    $('#calendar').fullCalendar({
+                  // enable theme
+          theme: true,
+          // emphasizes business hours
+          businessHours: true,
+          // event dragging & resizing
+          editable: true,
+          // header
+          header: {
+            left: 'prev,next today',
+            center: 'title',
+            right: 'month,agendaWeek,agendaDay'
+          },
+          selectable: true,
+          selectHelper: true,
+          eventLimit: true,
+
+          // dayClick: function() {
+          //   alert('a day has been clicked!');
+          // },
+
+           //defaultView: 'timelineMonth',
+
+          // defaultView: 'agendaDay',
+
+      //     events: [
+      //   // events go here
+      //       // all day event
+      //       {
+      //         title  : 'Meeting',
+      //         start  : '2015-11-12'
+      //       },
+      //   // long-term event 
+      //       {
+      //           title  : 'Conference',
+      //           start  : '2015-11-13',
+      //           end    : '2015-11-15'
+      //       },
+      //   // short term event 
+      //         {
+      //             title  : 'Dentist',
+      //               start  : '2015-11-09T11:30:00',
+      //               end  : '2015-11-09T012:30:00'
+      //             allDay : false // will make the time show
+      //         }
+      //     ],
+      //     resources: [
+      //   // resources go here
+      //     ]
+
+       });   
+
+    // $('#calendar').fullCalendar('next');
+
+  });
+
+
+
+</script> 
+
+ -->
+
+
+<!-- <meta charset='utf-8' /> -->
+<link href='/static/ndf/bower_components/fullcalendar/dist/fullcalendar.min.css' rel='stylesheet' /> <!-- checked -->
+<link href='/static/ndf/bower_components/fullcalendar/dist/fullcalendar.print.min.css' rel='stylesheet' media='print' /> <!-- checked -->
+<script src='/static/ndf/bower_components/jquery/dist/jquery.min.js'></script> <!-- checked -->
+<script src='/static/ndf/bower_components/jquery-ui/jquery-ui.min.js'></script> <!-- checked -->
+<script src='/static/ndf/bower_components/moment/min/moment.min.js'></script> <!-- checked -->
+<script src='/static/ndf/bower_components/fullcalendar/dist/fullcalendar.min.js'></script> <!-- checked -->
 
 
 
 
 
+<style>
+
+  body {
+    margin: 0;
+    padding: 0;
+    font-family: "Lucida Grande",Helvetica,Arial,Verdana,sans-serif;
+    font-size: 14px;
+  }
+
+  .column.small-centered {
+margin-left: auto;
+margin-right: auto;
+float: none !important; 
+} 
+
+     .MaxHght {
+        height:16px;
+    }
+   .fc-title
+      {
+
+        font-size: 0.9rem;
+      }
+    .viewMore {
+        float: right;
+        color: rgb(219, 104, 28);
+        cursor: pointer;
+    }
+
+    
 
 
+    #view-scheduler-calendar table {
+        border: none;
+        margin-bottom: 0px;
+    }
+
+    #calendar {
+
+        width: auto;
+        margin-left: auto;
+        margin-right: auto;
+    }
+    
+    .fc-header-left, .fc-header-right {
+        padding-top: 1em !important;
+    }
+
+    .fc-week-number {
+        background-color: #DDDDDD;
+        color: #808080;
+    }
+
+</style>
 
 
+<div class="row">
+<div class="small-12 medium-8 small-centered medium-centered columns">
+  <div id="view-scheduler-calendar">
+  <div id='calendar' data-event-timing="{{ app_set_instance_atlist }}"></div>
+  </div>
+<!-- 
+  <div id='script-warning'>
+    <code>php/get-events.php</code> must be running.
+  </div>
+
+  <div id='loading'>loading...</div>
+ -->
+</div>
+</div>
 
 
+<script>
 
-    <script type="text/javascript">
-        // var baseTree = [{
-        //     name: 'Add Branch',
-        //     class: 'create_branch',
-        //     type: 'branch'
-        // }];
-        var baseTree = [{"name":"asdasd","description":"","is_open":true,"children":[{"name":"asdasd","isLeaf":false,"is_open":true,"children":[{"name":"Add Division","class":"create_division"}]},{"name":"Add Division","class":"create_division"}]},{"name":"Add Branch","class":"create_branch"}];
-        var selectedBranch;
-        var selectedDivison;
-        var isUpdateOperation;
+  $(document).ready(function() {
 
-        $(function(){
+          var date = new Date();
+          var d = date.getDate();
+          var m = date.getMonth();
+          var y = date.getFullYear();
+    
 
-            $(document).foundation({
-                accordion: {
-                    multi_expand: true
-                }
-            });
+    $('#calendar').fullCalendar({
+          default: true,
+          theme: true,
+          // emphasizes business hours
+          businessHours: true,
+          // event dragging & resizing
+          editable: true,
+          // header
+          header: {
+            left: 'prev,next today',
+            center: 'title',
+            right: 'month,agendaWeek,agendaDay,listDay,listWeek,listMonth',      
+          },
+          // defaultDate: '2017-12-12',
+          //firstDay:1,
+          selectable: true,
+          selectHelper: true,
+          defaultView: 'month',
+          eventBackgroundColor:'#23000',
 
-            //Describing the tree and the render method
-            $('#curriculum_tree').tree({
-                data: baseTree,
-                onCreateLi: function(node, $li) {
-                    var leafClass = node.isLeaf ? 'leaf_node' : '';
+          navLinks: true, // can click day/week names to navigate views
+          eventLimit: true, // allow "more" link when too many events
+          // events: {
+          //   url: 'php/get-events.php',
+          //   error: function() {
+          //   $('#script-warning').show();
+          //   }
+          // },
 
-                    // Classes are there for only butons
-                    //var delete_edit_icons = '<button type="button" class="edit_icon_button right">Edit</button><button type="button" class="delete_icon_button right">Delete</button>'
-                    var delete_edit_icons = '';
-                    switch (node.class) {
-                        case 'create_branch':
-                            $li.find('.jqtree-title').html('<button type="button" class="button-small blue-white-button add_branch '+leafClass+'">Add Section</button>');
-                        break;
-                        case 'create_division':
-                            $li.find('.jqtree-title').html('<button type="button" class="button-small blue-white-button add_branch'+leafClass+'">Add Sub-Section</button>');
-                        break;
-                        default:
-                            $li.find('.jqtree-element').addClass(leafClass);
-                            $li.find('.jqtree-title').append(delete_edit_icons);
-                        break
-                    }
-                }
-            });
+          
+          // loading: function(bool) {
+          //   $('#loading').toggle(bool);
+          // }
+          
+          eventLimit: true, // for all non-agenda views
+          views: {
+            listDay: { buttonText: 'list day' },
+            listWeek: { buttonText: 'list week' },
+            listMonth: { buttonText: 'list month' }
+          },
 
-            var curriculum_tree = $('#curriculum_tree');
-
-            // Binding to the tree to capture different events
-            curriculum_tree.bind('tree.click', function(event) {
-                var node = event.node;
-                switch(node.class) {
-                    case 'create_branch' :
-                        selectedBranch = node;
-                        isUpdateOperation = false;
-                        $('#addBranch').find('input, textarea').val('');
-                        $('#addBranch').find('.create_branch').html('Add Section');
-                        $('#addBranch').find('.delete_branch').hide();
-                        $('#addBranch').foundation('reveal', 'open');
-                    break;
-                    case 'create_division' :
-                        selectedDivison = node;
-                        isUpdateOperation = false;
-                        $('#addDivision').find('input').val('');
-                        $('#addDivision').find('input[type="checkbox"]').attr('checked', false);
-                        $('#addDivision').find('label').show();
-                        $('#addDivision').find('.create_division').html('Add Sub-Section');
-                        $('#addDivision').find('.delete_division').hide();
-                        $('#addDivision').find('.add_asset').hide();
-                        $('#addDivision').foundation('reveal', 'open');
-                    break;
-                    default:
-                        isUpdateOperation = true;
-                        if(node.type === 'branch') {
-                            selectedBranch = node;
-                            $('#addBranch').find('.create_branch').html('Update Section');
-                            $('#addBranch').find('.delete_branch').show();
-                            $('#addBranch').find('input').val(node.name);
-                            $('#addBranch').find('textarea').val(node.description);
-                            $('#addBranch').foundation('reveal', 'open');
-                        } else if(node.type === 'division') {
-                            selectedDivison = node;
-                            if(node.isLeaf) {
-                                $('#addDivision').find('.add_asset').show();
-                            }
-                            $('#addDivision').find('.create_division').html('Update Sub-Section');
-                            $('#addDivision').find('.delete_division').show();
-                            $('#addDivision').find('input[type=text][name="branch_name"]').val(node.name);
-                            //$('#addDivision').find('input[type=checkbox]').val(node.isLeaf);
-                            $('#addDivision').find('input[type=checkbox][name="isLeafNode"]').closest('label').hide();
-                            $('#addDivision').foundation('reveal', 'open');
-                        }
-                    break;
-                }
-            })
-
-            // Creation of the Branch
-            $('.create_branch').on('click', function(){
-                var branchName = $('#addBranch input').val();
-                if (branchName === '') {
-                    alert('Branch name cannot be empty');
-                    return;
-                }
-                $('.close-reveal-modal').trigger('click');
-                var branchDesc = $('#addBranch textarea').val();
-                var branchObj = {
-                    name: branchName,
-                    description: branchDesc,
-                    type: 'branch'
+          select: function(start, end) {
+              var title = prompt('Event Title:');
+              var eventData;
+              if (title) {
+                eventData = {
+                  title: title,
+                  start: start,
+                  end: end
                 };
-                if (!isUpdateOperation) { //Create operation
+              $('#calendar').fullCalendar('renderEvent', eventData, true); // stick? = true
+            }
+            $('#calendar').fullCalendar('unselect');
+          },
 
-                    var createdBranch = curriculum_tree.tree('addNodeBefore', branchObj, selectedBranch);
-                    curriculum_tree.tree('appendNode', {
-                        name: 'Add Division',
-                        class: 'create_division'
-                    }, createdBranch);
-                    curriculum_tree.tree('openNode', createdBranch);
-                } else { //Update operation
+          // dayClick: function() {
+          //   alert('a day has been clicked!');
+          // },
+          
+          customButtons: {
+            myCustomButton: {
+              text: 'custom!',
+              click: function() {
+                alert('clicked the custom button!');
+              }
+            }
+          },
 
-                    curriculum_tree.tree(
-                        'updateNode',
-                        selectedBranch,
-                        {
-                            name: branchName,
-                            description: branchDesc,
-                            type: 'branch',
-                            children: selectedBranch.children
-                        }
-                    );
-                }
-            })
+          events: [
+                    {
+                      "title": "All Day Event",
+                      "start": "2017-12-01"
+                    },
+                    {
+                      "title": "Long Event",
+                      "start": "2017-12-07",
+                      "end": "2017-12-10"
+                    },
+                    {
+                      "id": "999",
+                      "title": "Repeating Event",
+                      "start": "2017-12-09T16:00:00-05:00"
+                    },
+                    {
+                      "id": "999",
+                      "title": "Repeating Event",
+                      "start": "2017-12-16T16:00:00-05:00"
+                    },
+                    {
+                      "title": "Conference",
+                      "start": "2017-12-11",
+                      "end": "2017-12-13"
+                    },
+                    {
+                      "title": "Meeting",
+                      "start": "2017-12-12T10:30:00-05:00",
+                      "end": "2017-12-12T12:30:00-05:00"
+                    },
+                    {
+                      "title": "Meeting",
+                      "start": "2018-01-11T10:30:00-05:00",
+                      "end": "2018-01-12T12:30:00-05:00"
+                    },
+                    {
+                      "title": "Meeting",
+                      "start": "2018-01-21T10:30:00-05:00",
+                      "end": "2018-01-18T12:30:00-05:00"
+                    },
+                    {
+                      "title": "Meeting",
+                      "start": "2018-01-18T10:30:00-05:00",
+                      "end": "2018-01-14T12:30:00-05:00"
+                    },
+                    {
+                      "title": "Lunch",
+                      "start": "2017-12-12T12:00:00-05:00"
+                    },
+                    {
+                      "title": "Meeting",
+                      "start": "2017-12-12T14:30:00-05:00"
+                    },
+                    {
+                      "title": "Happy Hour",
+                      "start": "2017-12-12T17:30:00-05:00"
+                    },
+                    {
+                      "title": "Dinner",
+                      "start": "2017-12-12T20:00:00"
+                    },
+                    {
+                      "title": "Birthday Party",
+                      "start": "2017-12-13T07:00:00-05:00"
+                    },
+                    {
+                      "title": "Click for Google",
+                      "url": "http://google.com/",
+                      "start": "2017-12-28"
+                    },
+                    {
+                      "title": "Lunch",
+                      "start": "2018-02-12T12:00:00-05:00"
+                    },
+                    {
+                      "title": "Meeting",
+                      "start": "2018-01-12T14:30:00-05:00"
+                    },
+                    {
+                      "title": "Happy Hour",
+                      "start": "2018-01-12T17:30:00-05:00"
+                    },
+                    {
+                      "title": "Dinner",
+                      "start": "2018-01-18T20:00:00"
+                    },
+                                        {
+                      "title": "Lunch",
+                      "start": "2018-01-28T12:00:00-05:00"
+                    },
+                    {
+                      "title": "Meeting",
+                      "start": "2018-02-16T14:30:00-05:00"
+                    },
+                    {
+                      "title": "Happy Hour",
+                      "start": "2018-01-19T17:30:00-05:00"
+                    },
+                    {
+                      "title": "Dinner",
+                      "start": "2018-01-01T20:00:00"
+                    },
+                    {
+                      "title": "Lunch",
+                      "start": "20178-02-12T12:00:00-05:00"
+                    },
+                    {
+                      "title": "Meeting",
+                      "start": "2018-12-12T14:30:00-05:00"
+                    },
+                    {
+                      "title": "Happy Hour",
+                      "start": "2018-01-03T17:30:00-05:00"
+                    },
+                    {
+                      "title": "Dinner",
+                      "start": "2018-01-22T20:00:00"
+                    },
+                  ],
+        });
+      
+    });
 
-            // Creation of the Division
-            $('.create_division').on('click', function(){
-                var divisionName = $('#addDivision input').val();
-                if (divisionName === '') {
-                    alert('Division name cannot be empty.');
-                    return;
-                }
-                $('.close-reveal-modal').trigger('click');
-                var isLeafNode = $('#addDivision [name="isLeafNode"]').is(":checked");
-                var divisionObj = {
-                    name: divisionName,
-                    isLeaf: isLeafNode,
-                    type: 'division'
-                };
-                if (!isUpdateOperation) { //Create operation
-                    var createdDivision = curriculum_tree.tree('addNodeBefore', divisionObj, selectedDivison);
+</script>
 
-                    if (!isLeafNode) {
-                        curriculum_tree.tree('appendNode', {
-                            name: 'Add Division',
-                            class: 'create_division'
-                        }, createdDivision);
-                    };
+  <!-- <div id='calendar'></div>
+ -->
 
-                    curriculum_tree.tree('openNode', createdDivision);
-                } else {
-                    curriculum_tree.tree(
-                        'updateNode',
-                        selectedDivison,
-                        {
-                            name: divisionName,
-                            type: 'division',
-                            children: selectedDivison.children
-                        }
-                    );
-                }
+ <style type="text/css">
+  
+  footer {
+  background: red;
+  padding: 20px;
+}
 
-            })
+body {
+  height: auto;
 
-            //Deleting a Branch
-            $('.delete_branch').on('click', function(){
-                $('.close-reveal-modal').trigger('click');
-                curriculum_tree.tree('removeNode', selectedBranch);
-            });
+  color:#ddd;
+}  
 
-            //Deleting a division
-            $('.delete_division').on('click', function(){
-                $('.close-reveal-modal').trigger('click');
-                curriculum_tree.tree('removeNode', selectedDivison);
-            });
+ </style>
+<!-- 
+ <footer>
+    Sticky Footer!
+</footer> -->
+<script type="text/javascript">
+  
+  /*!
+ * jQuery Sticky Footer 1.1
+ * Corey Snyder
+ * http://tangerineindustries.com
+ *
+ * Released under the MIT license
+ *
+ * Copyright 2013 Corey Snyder.
+ *
+ * Date: Thu Jan 22 2013 13:34:00 GMT-0630 (Eastern Daylight Time)
+ * Modification for jquery 1.9+ Tue May 7 2013
+ * Modification for non-jquery, removed all, now classic JS Wed Jun 12 2013
+ */
 
-            // Save and close handled
-            $('#save_page').on('click', function(){
-                // You can save the json from here and redirect.
-                var jsonTree = curriculum_tree.tree('toJson');
-                console.log(jsonTree);
-                jsonTree = jsonTree.replace(',{"name":"Add Division","class":"create_division"}', '');
-                jsonTree = jsonTree.replace('{"name":"Add Division","class":"create_division"}', '');
-                /*jsonTree = jsonTree.replace('{"name":"Add Division","class":"create_division"}', '');*/
-                jsonTree = jsonTree.replace(',{"name":"Add Branch","class":"create_branch"}', '');
-                console.log(jsonTree);
-                console.log(JSON.parse(jsonTree));
-            })
-        })
-    </script>
+window.onload = function() {
+  stickyFooter();
+  
+  //you can either uncomment and allow the setInterval to auto correct the footer
+  //or call stickyFooter() if you have major DOM changes
+  //setInterval(checkForDOMChange, 1000);
+};
 
+//check for changes to the DOM
+function checkForDOMChange() {
+  stickyFooter();
+}
 
+//check for resize event if not IE 9 or greater
+window.onresize = function() {
+  stickyFooter();
+}
+
+//lets get the marginTop for the <footer>
+function getCSS(element, property) {
+
+  var elem = document.getElementsByTagName(element)[0];
+  var css = null;
+  
+  if (elem.currentStyle) {
+    css = elem.currentStyle[property];
+  
+  } else if (window.getComputedStyle) {
+  css = document.defaultView.getComputedStyle(elem, null).
+  getPropertyValue(property);
+  }
+  
+  return css;
+
+}
+
+function stickyFooter() {
+  
+  if (document.getElementsByTagName("footer")[0].getAttribute("style") != null) {
+    document.getElementsByTagName("footer")[0].removeAttribute("style");
+  }
+  
+  if (window.innerHeight != document.body.offsetHeight) {
+    var offset = window.innerHeight - document.body.offsetHeight;
+    var current = getCSS("footer", "margin-top");
+    
+    if (isNaN(current) == true) {
+      document.getElementsByTagName("footer")[0].setAttribute("style","margin-top:0px;");
+      current = 0;
+    } else {
+      current = parseInt(current);
+    }
+            
+    if (current+offset > parseInt(getCSS("footer", "margin-top"))) {      
+      document.getElementsByTagName("footer")[0].setAttribute("style","margin-top:"+(current+offset)+"px;");
+    }
+  }
+}
+
+/*
+! end sticky footer
+*/
+  
+
+</script>
 
 {% endblock body_content %}

@@ -3,7 +3,7 @@ import json
 
 from django.http import StreamingHttpResponse
 from django.http import HttpResponse
-# from django.http import HttpResponseRedirect
+from django.http import HttpResponseRedirect
 from django.shortcuts import render_to_response #render  uncomment when to use
 from django.template import RequestContext
 from django.core.urlresolvers import reverse

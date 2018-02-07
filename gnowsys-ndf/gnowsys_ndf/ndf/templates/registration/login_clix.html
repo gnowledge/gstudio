@@ -23,12 +23,14 @@
 {% block body_content %}
 	{% url 'auth_password_reset' as auth_pwd_reset_url %}
 	{% url 'registration_register' as register_url %}
+	{% get_gstudio_login_page_logo as login_page_logo %}
+
 	<div class="login-page row">
 		<div class="login-page-opacity"></div>
         <div class="login-page-form">
             <div class="row">
                 <div class="small-12 medium-12 large-12 columns end text-center login-page-header">
-                	<img src="/static/ndf/images/landing_pg_slides/clix-logo-i2c-site.svg">
+                	<img src="{{login_page_logo}}">
                 	<span>{% trans "LogIn" %}</span>
                 </div>
             </div>
