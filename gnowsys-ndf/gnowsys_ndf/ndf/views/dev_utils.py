@@ -435,18 +435,36 @@ def elib_paged_file_objects(request, group_id, filetype, page_no):
 		#										}
 		#									]
 		#								}).sort("last_update", -1)
+		print filetype
 
-		files1  = es.search(index="gsystem", doc_type="image,video,audio,application", body={
+		if filetype != "all":
+			filetype = str(filetype)
+			
+			files1  = es.search(index="gsystem", doc_type="image,video,audio,application", body={
                         "query":   {"bool": { "must":[ {"terms":  {"group_set": str(ObjectId(group_id))}  } ],
      										 #"must":  [ {"match":  {"attribute_set.educationaluse": "imag" } } ],
      										 "must":[ { "terms":  {'member_of': GST_FILE_temp } } ],
      										 "must":[ {"terms":  {'member_of': GST_JSMOL_temp } } ],
      										 "must":[ {"term": {'access_policy':'public'}} ] ,
-     										 "must":[ {"term": {'attribute_set.educationaluse': str(filetype).lower()}} ] ,
-
+     										 #"must":[ {"terms": {'attribute_set.educationaluse': filetype }} ] ,
+     										 "must": [ {'term': {'attribute_set.educationaluse': filetype}} ],
      										 } }  }
      										 , size=20 )
 		
+		else:
+			filetype = [ "images","videos","documents","audios"]
+			files1  = es.search(index="gsystem", doc_type="image,video,audio,application", body={
+                        "query":   {"bool": { "must":[ {"terms":  {"group_set": str(ObjectId(group_id))}  } ],
+     										 #"must":  [ {"match":  {"attribute_set.educationaluse": "imag" } } ],
+     										 "must":[ { "terms":  {'member_of': GST_FILE_temp } } ],
+     										 "must":[ {"terms":  {'member_of': GST_JSMOL_temp } } ],
+     										 "must":[ {"term": {'access_policy':'public'}} ] ,
+     										 #"must":[ {"terms": {'attribute_set.educationaluse': filetype }} ] ,
+     										 "must": [ {'terms': {'attribute_set.educationaluse': filetype}} ],
+     										 } }  }
+     										 , size=20 )
+		
+
 		all_files_count=files1['hits']['total']
 		
 		

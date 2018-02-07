@@ -296,7 +296,7 @@ margin-top:5px !important;
     <!-- Tab View 2 - Documents -->
     <div class="content" id="view-doc" data-filetype="Documents">
       {% if title == "E-Library" %}
-        <a href='{% url "elib_paged_file_objects" group_name_tag "Documents" 1 %}' class="first-load">1</a>
+        <a href='{% url "elib_paged_file_objects" group_name_tag "documents" 1 %}' class="first-load">1</a>
       {% else %}
         <a href='{% url "paged_file_objs" group_name_tag "Documents" 1 %}' class="first-load">1</a>
       {% endif %}
@@ -307,7 +307,7 @@ margin-top:5px !important;
     <!-- Tab View 2 - Pages -->
     <div class="content" id="view-page" data-filetype="Pages">
       {% if title == "E-Library" %}
-        <a href='{% url "elib_paged_file_objs" group_name_tag "Pages" 1 %}' class="first-load">1</a>
+        <a href='{% url "elib_paged_file_objs" group_name_tag "pages" 1 %}' class="first-load">1</a>
       {% else %}
         <a href='{% url "paged_file_objs" group_name_tag "Pages" 1 %}' class="first-load">1</a>
       {% endif %}
@@ -318,7 +318,7 @@ margin-top:5px !important;
     <!-- Tab View 3 - Interactives -->
     <div class="content" id="view-interactive" data-filetype="Interactives">
       {% if title == "E-Library" %}
-        <a href='{% url "elib_paged_file_objects" group_name_tag "Interactives" 1 %}' class="first-load">1</a>
+        <a href='{% url "elib_paged_file_objects" group_name_tag "interactives" 1 %}' class="first-load">1</a>
       {% else %}
         <a href='{% url "paged_file_objs" group_name_tag "Interactives" 1 %}' class="first-load">1</a>
       {% endif %}
@@ -330,7 +330,7 @@ margin-top:5px !important;
       {% if ebook_pages %}
         <div class="content" id="view-ebook" data-filetype="eBooks">
           {% if title == "E-Library" %}
-            <a href='{% url "elib_paged_file_objs" group_name_tag "eBooks" 1 %}' class="first-load">1</a>
+            <a href='{% url "elib_paged_file_objs" group_name_tag "ebooks" 1 %}' class="first-load">1</a>
           {% else %}
             <a href='{% url "paged_file_objs" group_name_tag "eBooks" 1 %}' class="first-load">1</a>
           {% endif %}
@@ -341,7 +341,7 @@ margin-top:5px !important;
     <!-- Tab View 5 - Audios -->
     <div class="content" id="view-audio" data-filetype="Audios">
       {% if title == "E-Library" %}
-        <a href='{% url "elib_paged_file_objects" group_name_tag "Audios" 1 %}' class="first-load">1</a>
+        <a href='{% url "elib_paged_file_objects" group_name_tag "audios" 1 %}' class="first-load">1</a>
       {% else %}
         <a href='{% url "paged_file_objs" group_name_tag "Audios" 1 %}' class="first-load">1</a>
       {% endif %}
@@ -350,7 +350,7 @@ margin-top:5px !important;
     <!-- Tab View 6 - Images -->
     <div class="content" id="view-image" data-filetype="Images">
       {% if title == "E-Library" %}
-        <a href='{% url "elib_paged_file_objects" group_name_tag "Images" 1 %}' class="first-load">1</a>
+        <a href='{% url "elib_paged_file_objects" group_name_tag "images" 1 %}' class="first-load">1</a>
       {% else %}
         <a href='{% url "paged_file_objs" group_name_tag "Images" 1 %}' class="first-load">1</a>
       {% endif %}
@@ -359,7 +359,7 @@ margin-top:5px !important;
     <!-- Tab View 7 - Videos -->
     <div class="content" id="view-video" data-filetype="Videos">
       {% if title == "E-Library" %}
-        <a href='{% url "elib_paged_file_objects" group_name_tag "Videos" 1 %}' class="first-load">1</a>
+        <a href='{% url "elib_paged_file_objects" group_name_tag "videos" 1 %}' class="first-load">1</a>
       {% else %}
         <a href='{% url "paged_file_objs" group_name_tag "Videos" 1 %}' class="first-load">1</a>
       {% endif %}
@@ -368,7 +368,7 @@ margin-top:5px !important;
     <!-- Tab View 8 - pandora Videos -->
     <div class="content" id="view-pandora-video" data-filetype="Videos">
       {% if title == "E-Library" %}
-          <a href='{% url "elib_paged_file_objects" group_name_tag "Videos" 1 %}' class="first-load">1</a>
+          <a href='{% url "elib_paged_file_objects" group_name_tag "videos" 1 %}' class="first-load">1</a>
         {% else %}
           <a href='{% url "paged_file_objs" group_name_tag "Videos" 1 %}' class="first-load">1</a>
         {% endif %}
