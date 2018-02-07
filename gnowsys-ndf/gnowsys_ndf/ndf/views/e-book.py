@@ -105,7 +105,7 @@ def ebook_listing(request, group_id, page_no=1):
 
      										 #"must":  [ {"term":  {'created_by': request.user.id}}],
 
-     } }} )
+     } }} ,size=24)
 
 	#print all_ebooks1
 

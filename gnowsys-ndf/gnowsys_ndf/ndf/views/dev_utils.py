@@ -57,8 +57,8 @@ es = Elasticsearch("http://elastic:changeme@gsearch:9200", timeout=100, retry_on
 #GST_JSMOL = node_collection.one({"_type":"GSystemType","name":"Jsmol"})
 GST_FILE =  res = es.search(index="nodes", doc_type="gsystemtype", body={
                         "query":   {"bool":{"must":  [ {"term":  {"name":"file"}  }]  }}})
-print "----------------------"
-print GST_FILE
+#print "----------------------"
+#print GST_FILE
 
 GST_PAGE =  res = es.search(index="nodes", doc_type="gsystemtype", body={
                         "query":   {"bool":{"must":  [ {"term":  {"name":"page"}  }]  }}})
@@ -303,17 +303,19 @@ def render_test_template(request,group_id='home', app_id=None, page_no=1):
 		temp1=ObjectId(a['_source']['id'])
 		GST_PAGE_collection.append(temp1)
 
+	print GST_FILE_temp
 
+	print GST_PAGE_collection
 
-	collection_pages_cur1 =  es.search(index="nodes", doc_type="gsystemtype,gsystem,metatype,relationtype,attribute_type,group,author", body={
-                        "query":   {"bool": { "must":  [ {"term":  {"group_set": str(ObjectId(group_id))}  },{"term": {"access_policy": "public"}}],
+	collection_pages_cur1 =  es.search(index="nodes", doc_type="gsystemtype,gsystem,metatype,relationtype,attribute_type,group,author", 
+						body={ "query":   {"bool": { "must":  [ {"term":  {"group_set": str(ObjectId(group_id))}  },{"term": {"status": "published"}}],
      										 "must_not":  [ {"term":  {"attribute_set.educationaluse": "ebooks" } } ],
      										 #"must":  [ {"term":  {'created_by': request.user.id}}],
-     										 "must":  [ {"terms":  {'member_of': GST_FILE_temp }}],
+     										 "must":  [ {"term":  {'member_of': GST_FILE_temp }}],
      										 "must":  [ {"terms":  {'member_of': GST_PAGE_collection}}],
      										 "must": {"exists": {"field":"collection_set"}},
-     } }} ,size=24)
-	#print collection_pages_cur1
+     } }} )
+	#	print collection_pages_cur1
 
 	#coll_page_count = collection_pages_cur.count() if collection_pages_cur else 0
 	coll_page_count = collection_pages_cur1['hits']['total'] if collection_pages_cur1 else 0
@@ -403,6 +405,8 @@ def elib_paged_file_objects(request, group_id, filetype, page_no):
 			else:
 				query_dict.append({"attribute_set.educationaluse": filetype})
 
+		
+
 		GST_FILE_temp=[]
 		for a in GST_FILE['hits']['hits']:
 		#temp1=ObjectId(a['_source']['id'])
@@ -432,17 +436,19 @@ def elib_paged_file_objects(request, group_id, filetype, page_no):
 		#									]
 		#								}).sort("last_update", -1)
 
-		files1 =  res = es.search(index="gsystem", doc_type="image,video,audio", body={
-                        "query":   {"bool": { "must":  [ {"term":  {"group_set": str(ObjectId(group_id))}  },{"term": {"access_policy": "public"}}],
-     										 "must_not":  [ {"term":  {"attribute_set.educationaluse": "ebooks" } } ],
-     										 "must":  [ {"terms":  {"member_of": GST_FILE_temp } } ],
-     										 "must":  [ {"terms":  {"member_of": GST_JSMOL_temp } } ],
-     										 "must":[  {"term": {'access_policy':'public'}} ]
-     										 } }},size=24 )
+		files1  = es.search(index="gsystem", doc_type="image,video,audio,application", body={
+                        "query":   {"bool": { "must":[ {"terms":  {"group_set": str(ObjectId(group_id))}  } ],
+     										 #"must":  [ {"match":  {"attribute_set.educationaluse": "imag" } } ],
+     										 "must":[ { "terms":  {'member_of': GST_FILE_temp } } ],
+     										 "must":[ {"terms":  {'member_of': GST_JSMOL_temp } } ],
+     										 "must":[ {"term": {'access_policy':'public'}} ] ,
+     										 "must":[ {"term": {'attribute_set.educationaluse': str(filetype).lower()}} ] ,
 
-
+     										 } }  }
+     										 , size=20 )
 		
 		all_files_count=files1['hits']['total']
+		
 		
 
 		files1_temp = [doc['_source'] for doc in files1['hits']['hits']]
@@ -484,7 +490,9 @@ def elib_paged_file_objects(request, group_id, filetype, page_no):
 
 		filter_result = "True" if (files1['hits']['total'] > 0) else "False"
 
+
 		if filetype == "Collections":
+
 				detail_urlname = "page_details"
 				result_cur = node_collection.find({
 									'member_of': {'$in': [GST_FILE._id, GST_PAGE._id]},
@@ -509,7 +517,7 @@ def elib_paged_file_objects(request, group_id, filetype, page_no):
 				"filter_result": filter_result,
 				"group_id": group_id, "group_name_tag": group_id, "groupid": group_id,
 				'title': "E-Library", "educationaluse_stats": json.dumps(educationaluse_stats),
-				"resource_type": result_paginated_cur, "detail_urlname": detail_urlname,
+				"resource_type": files1_temp, "detail_urlname": detail_urlname,
 				"filetype": filetype, "res_type_name": "", "page_info": results,
 			},
 			context_instance = RequestContext(request))

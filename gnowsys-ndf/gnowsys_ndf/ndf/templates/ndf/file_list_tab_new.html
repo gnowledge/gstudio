@@ -29,19 +29,6 @@
   
 </ul>
 
-<div class="pagination">
-  <span class="step-links">
-    {% for num in page_info.paginator.page_range %}
-      {% ifequal num page_info.number %}
-        <span class="current"><b>{{ num }}</b></span>
-      {% else %}
-        <a href="?page={{ num }}&query={{ request.GET.query }}&group={{ request.GET.group }}&search_select={{ request.GET.search_select }}{{ append_to_url }}">{{ num }}</a>
-      {% endifequal %}
-    {% endfor %}
-  </span>
-</div>
-
-
 <link rel="stylesheet" type="text/css" href="/static/ndf/bower_components/slick-carousel/slick/slick.css"/>
 <link rel="stylesheet" type="text/css" href="/static/ndf/css/open-sans-bold-font.css">
 <script type="text/javascript" src="/static/ndf/bower_components/slick-carousel/slick/slick.min.js"></script>
@@ -54,7 +41,7 @@
       // dots: true,
       infinite: true,
       arrows: true,
-      speed: 500,
+      speed: 10,
       // fade: true,
       cssEase: 'linear'
     });
