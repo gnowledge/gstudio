@@ -41,11 +41,15 @@ def get_query_dict(**kwargs):
 
     return q
 
-
 def add_to_list(list_to_update, value_to_append):
     '''
     adding <value_to_append> after checking it's presence in list_to_update
     '''
+    if isinstance(value_to_append, list):
+        list_to_update_copy = []
+        [list_to_update_copy.append(each_val) for each_val in value_to_append if each_val not in list_to_update]
+        list_to_update.extend(list_to_update_copy)
+        return list_to_update
     if value_to_append not in list_to_update:
         list_to_update.append(value_to_append)
     return list_to_update

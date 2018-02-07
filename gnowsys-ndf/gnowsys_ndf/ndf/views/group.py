@@ -16,206 +16,11 @@ from django.contrib.auth.decorators import login_required
 from django.contrib.sites.models import Site
 from django.contrib.auth.models import User
 from django.views.generic import View
+from django.core.cache import cache
+
 try:
     from bson import ObjectId
-except ImportError:  # old pymongo
-    from pymongo.objectid import ObjectId
-
-''' -- imports from application folders/files -- '''
-from gnowsys_ndf.settings import GAPPS, GSTUDIO_GROUP_AGENCY_TYPES, GSTUDIO_NROER_MENU, GSTUDIO_NROER_MENU_MAPPINGS,GSTUDIO_FILE_UPLOAD_FORM, GSTUDIO_FILE_UPLOAD_POINTS, GSTUDIO_BUDDY_LOGIN
-from gnowsys_ndf.settings import GSTUDIO_MODERATING_GROUP_ALTNAMES, GSTUDIO_PROGRAM_EVENT_MOD_GROUP_ALTNAMES, GSTUDIO_COURSE_EVENT_MOD_GROUP_ALTNAMES
-from gnowsys_ndf.settings import GSTUDIO_SITE_NAME
-from gnowsys_ndf.ndf.models import NodeJSONEncoder, node_collection, triple_collection, Counter, counter_collection
-from gnowsys_ndf.ndf.views.methods import *
-from gnowsys_ndf.ndf.views.asset import *
-
-# from gnowsys_ndf.ndf.models import GSystemType, GSystem, Group, Triple
-# from gnowsys_ndf.ndf.models import c
-from gnowsys_ndf.ndf.views.ajax_views import *
-from gnowsys_ndf.ndf.templatetags.ndf_tags import get_all_user_groups, get_sg_member_of, get_relation_value, get_attribute_value, check_is_gstaff, user_access_policy # get_existing_groups
-# from gnowsys_ndf.ndf.org2any import org2html
-from gnowsys_ndf.ndf.views.moderation import *
-# from gnowsys_ndf.ndf.views.moderation import moderation_status, get_moderator_group_set, create_moderator_task
-# ######################################################################################################################################
-
-group_gst = node_collection.one({'_type': 'GSystemType', 'name': u'Group'})
-gst_group = group_gst
-app = gst_group
-
-moderating_group_gst = node_collection.one({'_type': 'GSystemType', 'name': u'ModeratingGroup'})
-programevent_group_gst = node_collection.one({'_type': 'GSystemType', 'name': u'ProgramEventGroup'})
-courseevent_group_gst = node_collection.one({'_type': 'GSystemType', 'name': u'CourseEventGroup'})
-announced_unit_gst = node_collection.one({'_type': 'GSystemType', 'name': u'announced_unit'})
-partner_group_gst = node_collection.one({'_type': 'GSystemType', 'name': u'PartnerGroup'})
-
-file_gst = node_collection.one({'_type': 'GSystemType', 'name': 'File'})
-page_gst = node_collection.one({'_type': 'GSystemType', 'name': 'Page'})
-task_gst = node_collection.one({'_type': 'GSystemType', 'name': 'Task'})
-
-# ######################################################################################################################################
-#      V I E W S   D E F I N E D   F O R   G A P P -- ' G R O U P '
-# ######################################################################################################################################
-
-class CreateGroup(object):
-    """
-    Creates group.
-    Instantiate group with request as argument
-    """
-    def __init__(self, request=HttpRequest()):
-        super(CreateGroup, self).__init__()
-        self.request = request
-        self.moderated_groups_member_of = ['ProgramEventGroup',\
-         'CourseEventGroup', 'PartnerGroup', 'ModeratingGroup']
-
-
-    def is_group_exists(self, group_name):
-        '''
-        Checks if group with the given name exists.
-        Returns Bool.
-            - True: If group exists.
-            - False: If group doesn't exists.
-        '''
-
-        # explicitely using "find_one" query
-        group = node_collection.find_one({'_type': 'Group', 'name': unicode(group_name)})
-        if group:
-            return True
-
-        else:
-            return False
-
-
-    def get_group_fields(self, group_name, **kwargs):
-        '''
-        function to fill the empty group object with values supplied.
-        - group name is must and it's first argument.
-        - group information may be sent either from "request" or from "kwargs".
-
-        # If arg is kwargs, provide following dict as kwargs arg to this function.
-        group_fields = {
-          'altnames': '', 'group_type': '', 'edit_policy': '',
-          'agency_type': '', 'moderation_level': '',
-          ...., ...
-        }
-
-        # call in following way
-        class_instance_var.get_group_fields(group_name, **group_fields)
-        (NOTE: use ** before dict variables, in above case it's group_fields so it's: **group_fields)
-        '''
-        # getting the data into variables
-        name = group_name
-
-        # to check if existing group is getting edited
-        node_id = kwargs.get('node_id', None)
-
-        if kwargs.get('altnames', ''):
-            altnames = kwargs.get('altnames', name)
-        elif self.request:
-            altnames = self.request.POST.get('altnames', name).strip()
-
-        group_set = []
-        if kwargs.get('group_set', ''):
-            group_set = kwargs.get('group_set', [])
-        else:
-            group_set = self.request.POST.get('group_set', [])
-        group_set = [group_set] if not isinstance(group_set, list) else group_set
-        group_set = [ObjectId(g) for g in group_set]
-
-        member_of = []
-        if kwargs.get('member_of', ''):
-            member_of = kwargs.get('member_of', [])
-        else:
-            member_of = self.request.POST.get('member_of', [])
-        member_of = [member_of] if not isinstance(member_of, list) else member_of
-        member_of = [ObjectId(m) for m in member_of]
-
-        if kwargs.get('group_type', ''):
-            group_type = kwargs.get('group_type', u'PUBLIC')
-        elif self.request:
-            group_type = self.request.POST.get('group_type', u'PUBLIC')
-
-        if kwargs.get('access_policy', ''):
-            access_policy = kwargs.get('access_policy', group_type)
-        elif self.request:
-            access_policy = self.request.POST.get('access_policy', group_type)
-
-        if kwargs.get('edit_policy', ''):
-            edit_policy = kwargs.get('edit_policy', u'EDITABLE_NON_MODERATED')
-        elif self.request:
-            edit_policy = self.request.POST.get('edit_policy', u'EDITABLE_NON_MODERATED')
-
-        if kwargs.get('subscription_policy', ''):
-            subscription_policy = kwargs.get('subscription_policy', u'OPEN')
-        elif self.request:
-            subscription_policy = self.request.POST.get('subscription_policy', u"OPEN")
-
-        if kwargs.get('visibility_policy', ''):
-            visibility_policy = kwargs.get('visibility_policy', u'ANNOUNCED')
-        elif self.request:
-            visibility_policy = self.request.POST.get('visibility_policy', u'ANNOUNCED')
-
-        if kwargs.get('disclosure_policy', ''):
-            disclosure_policy = kwargs.get('disclosure_policy', u'DISCLOSED_TO_MEM')
-        elif self.request:
-            disclosure_policy = self.request.POST.get('disclosure_policy', u'DISCLOSED_TO_MEM')
-
-        if kwargs.get('encryption_policy', ''):
-            encryption_policy = kwargs.get('encryption_policy', u'NOT_ENCRYPTED')
-        elif self.request:
-            encryption_policy = self.request.POST.get('encryption_policy', u'NOT_ENCRYPTED')
-
-        if kwargs.get('agency_type', ''):
-            agency_type = kwargs.get('agency_type', u'Other')
-        elif self.request:
-            agency_type = self.request.POST.get('agency_type', u'Other')
-
-        if kwargs.get('content_org', ''):
-            content_org = kwargs.get('content_org', u'')
-        elif self.request:
-            content_org = self.request.POST.get('content_org', u'')
-
-        if kwargs.get('content', ''):
-            content = kwargs.get('content', u'')
-        elif self.request:
-            content = self.request.POST.get('content', u'')
-
-        # if not content or not content_org:
-        #     content = content_org = u""
-
-        if kwargs.get('language', ''):
-            language = kwargs.get('language', '')
-        elif self.request:
-            language = self.request.POST.get('language', ('en', 'English'))
-
-        # whenever we are passing int: 0, condition gets false
-        # therefor casting to str
-        if str(kwargs.get('moderation_level', '')):
-            moderation_level = kwargs.get('moderation_level', '-1')
-        elif self.request:
-            moderation_level = self.request.POST.get('moderation_level', '-1')
-
-        if node_id:
-            # Existing group: if node_id exists means group already exists.
-            # So fetch that group and use same object to override the fields.
-            group_obj = node_collection.one({'_id': ObjectId(node_id)})
-        else:
-            # New group: instantiate empty group object
-            group_obj = node_collection.collection.Group()
-
-        # filling the values with variables in group object:
-        group_obj.name = unicode(name)
-        group_obj.altnames = unicode(altnames)
-
-        for each_gset in group_set:
-            if each_gset not in group_obj.group_set:
-                group_obj.group_set.append(each_gset)
-
-        for each_mof in member_of:
-            if each_mof not in group_obj.member_of:
-                group_obj.member_of.append(each_mof)
-
-        # while doing append operation make sure to-be-append is not in the list
-        if gst_group._id not in group_obj.member_of:
+except ImportError:  # old pymongo<<
             group_obj.member_of.append(gst_group._id)
 
         if gst_group._id not in group_obj.type_of:
@@ -2522,10 +2327,193 @@ def upload_using_save_file(request,group_id):
             create_grelation(file_node._id,rt_teaches,ObjectId(sel_topic))
             file_node.save(groupid=group_id,validate=False)
 
-            return HttpResponseRedirect( reverse('file_detail', kwargs={"group_id": group_id,'_id':file_node._id}) )
-    # print "\n\nretirn gs_obj_list",gs_obj_list
-    # gs_obj_id = gs_obj_list[0]['_id']
-    # print "\n\n\ngs_obj_id: ",gs_obj_id
+
+        new_grps_list_all = []
+
+        for each_group_id in new_grps_list:
+            each_group_obj = node_collection.one({'_id': ObjectId(each_group_id)})
+
+            if each_group_obj.moderation_level > -1:
+                # means group is moderated one.
+                each_result_dict = moderation_status(request, each_group_obj._id, node._id, get_only_response_dict=True)
+                if each_result_dict['is_under_moderation']:
+                    # means, this node already exists in one of -
+                    # - the underlying mod group of this (each_group_obj).
+                    pass
+                else:
+                    each_group_set = get_moderator_group_set(existing_grps, each_group_id, get_details=False)
+                    merge_group_set = set(each_group_set + new_grps_list_all)
+                    new_grps_list_all = list(merge_group_set)
+                    t = create_moderator_task(request, node.group_set[-1], node._id,on_upload=True)
+
+            else:
+                if each_group_id not in new_grps_list_all:
+                    new_grps_list_all.append(ObjectId(each_group_id))
+
+
+        node.group_set = list(set(new_grps_list_all))
+        node.save()
+        # node_collection.collection.update({'_id': node._id}, {'$set': {'group_set': new_grps_list_all}}, upsert=False, multi=False)
+        # node.reload()
+        response_dict["success"] = True
+        response_dict["message"] = "Published to selected groups"
+      else:
+        response_dict["success"] = False
+        response_dict["message"] = node.member_of_names_list[0] + " with name " + node.name + \
+                " already exists. Hence Cannot Publish to selected groups."
+        response_dict["message"] = node.member_of_names_list[0] + " with name " + node.name + \
+                " already exists in selected group(s). " + \
+                "Hence cannot be cross published now." + \
+                " For publishing, you can rename this " + node.member_of_names_list[0] + " and try again."
+      # print response_dict
+      return HttpResponse(json.dumps(response_dict))
+
+    else:
+      coll_obj_list = []
+      data_list = []
+      user_id = request.user.id
+      all_user_groups = []
+      # for each in get_all_user_groups():
+      #   all_user_groups.append(each.name)
+      #loop replaced by a list comprehension
+      top_partners_list = ["State Partners", "Individual Partners", "Institutional Partners"]
+      all_user_groups = [each.name for each in get_all_user_groups()]
+      if not request.user.is_superuser:
+          all_user_groups.append('home')
+          # exclude home group in listing if not SU
+      all_user_groups.append('Trash')
+      all_user_groups.extend(top_partners_list)
+
+      st = node_collection.find({
+            '$and': [
+                        {'_type': 'Group'},
+                        {'$or':[
+                                {'author_set': {'$in':[user_id]}},
+                                {'group_admin': {'$in':[user_id]}}
+                            ]
+                        },
+                        {'name':{'$nin':all_user_groups}},
+                        {'member_of': {'$in': [group_gst._id]}},
+                        {'status': u'PUBLISHED'}
+                      # ,{'edit_policy': {'$ne': "EDITABLE_MODERATED"}}
+                    ]
+                }).sort('name',-1)
+      # st = node_collection.find({'$and': [{'_type': 'Group'}, {'author_set': {'$in':[user_id]}},
+      #                                     {'name':{'$nin':all_user_groups}},
+      #                                     {'edit_policy': {'$ne': "EDITABLE_MODERATED"}}
+      #                                    ]
+      #                           })
+      # for each in node.group_set:
+      #   coll_obj_list.append(node_collection.one({'_id': each}))
+      #loop replaced by a list comprehension
+
+      # coll_obj_list=[node_collection.one({'_id': each}) for each in node.group_set ]
+
+
+
+      for each_coll_obj_id in node.group_set:
+        each_coll_obj = node_collection.one({'_id': ObjectId(each_coll_obj_id)})
+        if each_coll_obj and moderating_group_gst._id not in each_coll_obj.member_of:
+            coll_obj_list.append(each_coll_obj)
+        elif each_coll_obj:
+
+            try:
+                mod_group_instance = CreateModeratedGroup(request)
+                is_top_group, top_group_obj = mod_group_instance.get_top_group_of_hierarchy(each_coll_obj_id)
+                coll_obj_list.append(top_group_obj)
+            except Exception as d:
+                print d
+
+      data_list = set_drawer_widget(st, coll_obj_list, 'moderation_level')
+      # print "\n\n data_list",data_list
+      return HttpResponse(json.dumps(data_list))
+
+  except Exception as e:
+    print "Exception in switch_group: "+str(e)
+    return HttpResponse("Failure")
+
+
+@login_required
+@get_execution_time
+def cross_publish(request, group_id):
+    try:
+        group_id = ObjectId(group_id)
+    except:
+        group_name, group_id = get_group_name_id(group_id)
+
+    gstaff_access = check_is_gstaff(group_id,request.user)
+    if request.method == "GET":
+        query = {'_type': 'Group', 'status': u'PUBLISHED',
+                '$or': [
+                            {'access_policy': u"PUBLIC"},
+                            {'$and': [
+                                    {'access_policy': u"PRIVATE"},
+                                    {'created_by': request.user.id}
+                                ]
+                            }
+                        ],
+                }
+
+        if gstaff_access:
+            query.update({'group_type': {'$in': [u'PUBLIC', u'PRIVATE']}})
+        else:
+            query.update({'name': {'$nin': GSTUDIO_DEFAULT_GROUPS_LIST},
+                        'group_type': u'PUBLIC'})
+        group_cur = node_collection.find(query,{ '_id': 1, 'name':1, 'altnames':1}).sort('last_update', -1)
+        response_dict = {'groups_cur': group_cur}
+        return HttpResponse(json.dumps(list(group_cur), cls=NodeJSONEncoder))
+    elif request.method == "POST":
+        success_flag = True
+        target_group_ids = request.POST.getlist("group_ids[]", None)
+
+        # print "\ntarget_group_ids:", target_group_ids
+        if target_group_ids:
+            try:
+                target_group_ids = map(ObjectId, list(set(target_group_ids)))
+                node_id = request.POST.get("node_id", None)
+                remove_from_curr_grp_flag = eval((request.POST.get("remove_from_curr_grp_flag", "False")).title())
+                publish_children = eval(request.POST.get("publishChildren", False))
+                node_obj = Node.get_node_by_id(node_id)
+                if publish_children:
+                    # Exclusive action for Asset
+                    if u"Asset" in node_obj.member_of_names_list:
+                        asset_content_tr = node_obj.get_relation("has_assetcontent")
+                        child_ids = [each_tr.right_subject for each_tr in asset_content_tr]
+                    else:
+                        child_ids = node_obj.collection_set
+                    child_cur =  node_collection.find({'_id': {'$in': child_ids}})
+                    if remove_from_curr_grp_flag:
+                        for each_child in child_cur:
+                            # each_child.group_set = add_to_list(each_child.group_set, target_group_ids)
+                            each_child.group_set = filter(lambda x: x != group_id, target_group_ids)
+                            each_child.save()
+                    else:
+                        for each_child in child_cur:
+                            # each_child.group_set = add_to_list(each_child.group_set, target_group_ids)
+                            each_child.group_set = target_group_ids
+                            each_child.save()
+                # node_obj.group_set = add_to_list(node_obj.group_set, target_group_ids)
+                if remove_from_curr_grp_flag:
+                    node_obj.group_set = filter(lambda x: x != group_id, target_group_ids)
+                else:
+                    node_obj.group_set = target_group_ids
+                node_obj.save()
+            except Exception as e:
+                print "\nError occurred in Cross-Publish", e
+                success_flag = False
+                pass
+
+        return HttpResponse(json.dumps(target_group_ids, cls=NodeJSONEncoder))
+
+
+
+@login_required
+@get_execution_time
+def publish_group(request,group_id,node):
+
+    group_obj = get_group_name_id(group_id, get_obj=True)
+    profile_pic_image = None
+
 
     discussion_enable_at = node_collection.one({"_type": "AttributeType", "name": "discussion_enable"})
     for each_gs_file in fileobj_list:
