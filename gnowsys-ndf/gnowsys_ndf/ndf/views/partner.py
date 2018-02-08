@@ -168,6 +168,7 @@ def partner_list(request, group_id):
 @get_execution_time
 def nroer_groups(request, group_id, groups_category):
     group_name, group_id = get_group_name_id(group_id)
+    print 'groups_category: ',groups_category
 
     mapping = GSTUDIO_NROER_MENU_MAPPINGS
 
@@ -182,6 +183,7 @@ def nroer_groups(request, group_id, groups_category):
             break
     # print "\n\ngroups_names_list",groups_names_list
     group_nodes = []
+
     '''
     For displaying Partners and Groups in same order
      as defined in settings GSTUDIO_NROER_MENU_MAPPINGS
@@ -202,6 +204,8 @@ def nroer_groups(request, group_id, groups_category):
 
     elif groups_category == "Groups":
         app_gst = gst_group
+
+    print 'group_nodes: ',groups_names_list
 
     # print "=============", app_gst
     # group_nodes_count = group_nodes.count() if group_nodes else 0
