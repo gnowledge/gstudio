@@ -6946,9 +6946,19 @@ def add_assetcontent(request,group_id):
 
     return StreamingHttpResponse("success")
 
-  create_assetcontent(ObjectId(asset_obj),asset_cont_name,group_id,
+  asset_content = create_assetcontent(ObjectId(asset_obj),asset_cont_name,group_id,
     request.user.id,content=asset_cont_desc,files=uploaded_files,
     resource_type='File', request=request)
+
+  asset_node = Node.get_node_by_id(asset_obj)
+  
+  for each in asset_node.attribute_set:
+    for each_attrset in each.iteritems():
+      attr_node = node_collection.one({'_type':'AttributeType','name':unicode(each_attrset[0])})
+      if attr_node:
+        create_gattribute(ObjectId(asset_content._id), attr_node, each_attrset[1])
+
+
   return StreamingHttpResponse("success")
 
 
