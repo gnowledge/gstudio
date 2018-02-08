@@ -127,10 +127,10 @@ urlpatterns = patterns('gnowsys_ndf.ndf.views.ajax_views',
     url(r'^remove_from_nodelist/$', 'remove_from_nodelist', name='remove_from_nodelist'),
     url(r'^ajax_delete_node/$', 'ajax_delete_node', name='ajax_delete_node'),
     url(r'^get_translated_node/$', 'get_translated_node', name='get_translated_node'),
-    url(r'^delete_curriculum_node/$', 'delete_curriculum_node', name='delete_curriculum_node'),
     # url for graph display
     url(r'^graph/adminRenderGraph/(?P<node_id>[^/]+)/fetch/(?P<graph_type>[^/]+)$', 'adminRenderGraph', name='adminRenderGraph'),
     # url(r'^get_rating_template/$', 'get_rating_template', name='get_rating_template'),
+    url(r'^get_telegram_content/$', 'get_telegram_content', name='get_telegram_content'),
 
 
 )

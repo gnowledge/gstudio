@@ -15,7 +15,7 @@ from django.contrib.auth.models import User
 from django.contrib.sites.models import Site
 from django.contrib.auth.decorators import login_required
 from django.template.defaultfilters import slugify
-
+import json
 try:
     from bson import ObjectId
 except ImportError:  # old pymongo
@@ -23,11 +23,12 @@ except ImportError:  # old pymongo
 
 ''' -- imports from application folders/files -- '''
 from gnowsys_ndf.ndf.models import Node, AttributeType, RelationType
-from gnowsys_ndf.ndf.models import node_collection,Group
+from gnowsys_ndf.ndf.models import node_collection,Group, GSystemType
 from gnowsys_ndf.ndf.views.methods import get_node_common_fields, parse_template_data
 from gnowsys_ndf.ndf.views.methods import get_property_order_with_value,get_execution_time
-from gnowsys_ndf.ndf.views.methods import create_gattribute, create_grelation
+from gnowsys_ndf.ndf.views.methods import create_gattribute, create_grelation, get_group_name_id
 from gnowsys_ndf.notification import models as notification
+from gnowsys_ndf.ndf.templatetags.ndf_tags import get_attribute_value
 
 ''' -- imports for bigbluebutton wrappers -- '''
 from bbb_api import *
@@ -38,8 +39,8 @@ from gnowsys_ndf.local_settings import *
 @get_execution_time
 @login_required
 def event(request, group_id):
- 
- if ObjectId.is_valid(group_id) is False :
+  '''
+  if ObjectId.is_valid(group_id) is False :
     group_ins = node_collection.one({'_type': "Group","name": group_id})
     auth = node_collection.one({'_type': 'Author', 'name': unicode(request.user.username) })
     if group_ins:
@@ -48,57 +49,81 @@ def event(request, group_id):
       auth = node_collection.one({'_type': 'Author', 'name': unicode(request.user.username) })
       if auth :
         group_id = str(auth._id)
- else :
+  else :
     pass
+  '''
 
- #view written just to show the landing page of the events
- group_inverse_rel_id = [] 
- Event_app = True
- Group_type=node_collection.one({'_id':ObjectId(group_id)})
- for i in Group_type.relation_set:
-     if unicode("group_of") in i.keys():
-        group_inverse_rel_id = i['group_of']
- Group_name = node_collection.one({'_type':'GSystem','_id':{'$in':group_inverse_rel_id}})
- Eventtype='Eventtype'
- if Group_name:
+  group_obj = get_group_name_id(group_id, get_obj=True)
+  group_name, group_id = get_group_name_id(group_id)
+  group_id  = group_obj._id
+  grp_gst_name, grp_gst_id = GSystemType.get_gst_name_id("Group")
+  asset_gst_name, asset_gst_id = GSystemType.get_gst_name_id("Asset")
 
-    if (any( unicode('has_group') in d for d in Group_name.relation_set)) == True:
-         Eventtype='CollegeEvents'     
-    else:
-         Eventtype='Eventtype'
-      
- Glisttype=node_collection.find({"_type": "GSystemType", "name":"GList"})
- #bug
- #Event_Types = node_collection.one({"member_of":ObjectId(Glisttype[0]["_id"]),"name":"Eventtype"},{'collection_set': 1})
- #buggy
- Event_Types = node_collection.one({"member_of":ObjectId(Glisttype[0]["_id"]),"name":unicode(Eventtype)},{'collection_set': 1})
- 
- app_collection_set=[]
- Mis_admin_list=[]
- #check for the mis group Admin
- #check for exam session to be created only by the Mis_Admin
+  # app_collection_set=node_collection.find({'member_of': grp_gst_id})
+  
+  GST_TASK = node_collection.one({'_type': "GSystemType", 'name': 'Task'})
 
- Add=""
- Mis_admin=node_collection.one({"_type":"Group","name":"MIS_admin"})
- if  Mis_admin:
-    Mis_admin_list=Mis_admin.group_admin
-    Mis_admin_list.append(Mis_admin.created_by)
-    if request.user.id in Mis_admin_list:
-        Add="Allow"  
-    else: 
-        Add= "Stop"
- else:
-    Add="Stop"       
+  TASK_inst = node_collection.find({'member_of': {'$all': [GST_TASK._id]}, 'group_set': ObjectId(group_id),'status':"PUBLISHED" }).sort('last_update', -1)
+  event_list = []
 
- if Event_Types:
-    for eachset in Event_Types.collection_set:
-          app_collection_set.append(node_collection.one({"_id": eachset}, {'_id': 1, 'name': 1, 'type_of': 1}))      
- return render_to_response('ndf/event.html',{'app_collection_set':app_collection_set,
+  asset_nodes = node_collection.find({'member_of': {'$in': [asset_gst_id]},
+            'group_set': {'$all': [ObjectId(group_id)]},
+            '$and': [
+              {'access_policy': 'PUBLIC'},
+              {'$or': [
+                {'created_by': request.user.id},
+                {'access_policy': 'PRIVATE'}
+                ]
+              }
+            ]}).sort('last_update', -1)
+
+
+  for each in TASK_inst:
+    start_date_val = get_attribute_value(each._id, "start_time")
+
+    end_date_val = get_attribute_value(each._id, "end_time")
+
+    priority_val = get_attribute_value(each._id, "Priority")
+
+    start_date_splited_val = start_date_val.split("/")
+    start_reverse_date_val = start_date_splited_val[::-1]
+    
+    end_date_splited_val = end_date_val.split("/")
+    end_reverse_date_val = end_date_splited_val[::-1]
+    # print start_reverse_date_val
+    # print priority_val
+
+    # start_date_reverse_val = start_date_splited_val.reverse()
+    # print start_date_reverse_val
+
+    start_date_new_val = '-'.join(start_reverse_date_val)
+    
+    end_date_new_val = '-'.join(end_reverse_date_val)
+
+    parts = [ '/', str(group_id), 'gtask', str(each._id)]
+    # print parts
+    conparts = '/'.join([x.strip('/') for x in parts])
+
+    # print conparts
+    # eventurl = url_path_join(*parts)
+    
+    event_list.append({"title":str(each.name), "start":str(start_date_new_val), "end":str(end_date_new_val), "priority": str(priority_val), "url":str(conparts)})
+
+
+  for each in asset_nodes:
+
+    created_at_date_val = each.created_at
+
+    event_list.append({"title":str(each.name), "start": created_at_date_val.strftime('%Y-%m-%d')})
+    
+    # print event_list
+    #event_list.append({"created_at": created_at_date_val.strftime('%Y-%m-%d')})
+    
+  return render_to_response('ndf/gevent.html',{
                                              'groupid':group_id,
                                              'group_id':group_id,
                                              'group_name':group_id,
-                                             'Event_app':Event_app,
-                                             'Add':Add
+                                             'events':json.dumps(event_list)
                                             },
                               context_instance = RequestContext(request)
                           )

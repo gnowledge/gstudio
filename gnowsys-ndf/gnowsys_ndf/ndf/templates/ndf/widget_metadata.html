@@ -1,6 +1,5 @@
 {% load i18n %}
 {% load ndf_tags %}
- <form data-abide id="form-edit-node" method="POST"   action="{% url 'save_metadata' group_id %}" enctype="multipart/form-data">
 <div class="row">
   <input type="hidden" name="node_id" class="form_node_id" value="{{node.pk}}">
         
@@ -95,7 +94,6 @@
         </div>
     <button type="button" class="right button-cancel-new cancel-metadata">Cancel</button>
     <button type="submit" class="right button-save-new save-metadata">Save Changes</button>
-  </form>
 <script type="text/javascript">
   $( ".save-metadata" ).click(function(event) {
       source_val = $("#source").val();
