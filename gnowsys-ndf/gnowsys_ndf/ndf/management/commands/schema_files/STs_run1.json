@@ -1,0 +1,490 @@
+[
+    {
+        "attribute_type_set": "[]", 
+        "name": "Place", 
+        "member_of": "[\"factory_types\"]", 
+        "collection_set": "[]", 
+        "relation_type_set": "[]", 
+        "type_of": "[]"
+    }, 
+    {
+        "attribute_type_set": "[]", 
+        "name": "Country", 
+        "member_of": "[\"factory_types\"]", 
+        "collection_set": "[]", 
+        "relation_type_set": "[]", 
+        "type_of": "[\"Place\"]"
+    }, 
+    {
+        "attribute_type_set": "[]", 
+        "name": "State", 
+        "member_of": "[\"factory_types\"]", 
+        "collection_set": "[]", 
+        "relation_type_set": "[]", 
+        "type_of": "[\"Place\"]"
+    }, 
+    {
+        "attribute_type_set": "[]", 
+        "name": "District", 
+        "member_of": "[\"factory_types\"]", 
+        "collection_set": "[]", 
+        "relation_type_set": "[]", 
+        "type_of": "[\"Place\"]"
+    }, 
+    {
+        "attribute_type_set": "[]", 
+        "name": "Organization", 
+        "member_of": "[\"factory_types\"]", 
+        "collection_set": "[]", 
+        "relation_type_set": "[]", 
+        "type_of": "[]"
+    }, 
+    {
+        "attribute_type_set": "[]", 
+        "name": "University", 
+        "member_of": "[\"factory_types\"]", 
+        "collection_set": "[]", 
+        "relation_type_set": "[]", 
+        "type_of": "[\"Organization\"]"
+    }, 
+    {
+        "attribute_type_set": "[]", 
+        "name": "College", 
+        "member_of": "[\"factory_types\"]", 
+        "collection_set": "[]", 
+        "relation_type_set": "[]", 
+        "type_of": "[\"Organization\"]"
+    }, 
+    {
+        "attribute_type_set": "[]", 
+        "name": "NUSSD Course", 
+        "member_of": "[\"factory_types\"]", 
+        "collection_set": "[]", 
+        "relation_type_set": "[]", 
+        "type_of": "[\"Course\"]"
+    }, 
+    {
+        "attribute_type_set": "[]", 
+        "name": "Announced Course", 
+        "member_of": "[\"factory_types\"]", 
+        "collection_set": "[]", 
+        "relation_type_set": "[]", 
+        "type_of": "[\"Course\"]"
+    }, 
+    {
+        "attribute_type_set": "[]", 
+        "name": "Caste", 
+        "member_of": "[\"factory_types\"]", 
+        "collection_set": "[]", 
+        "relation_type_set": "[]", 
+        "type_of": "[]"
+    }, 
+    {
+        "attribute_type_set": "[]", 
+        "name": "Person", 
+        "member_of": "[\"factory_types\"]", 
+        "collection_set": "[]", 
+        "relation_type_set": "[]", 
+        "type_of": "[]"
+    }, 
+    {
+        "attribute_type_set": "[]", 
+        "name": "Student", 
+        "member_of": "[\"factory_types\"]", 
+        "collection_set": "[]", 
+        "relation_type_set": "[]", 
+        "type_of": "[\"Person\"]"
+    }, 
+    {
+        "attribute_type_set": "[]", 
+        "name": "Voluntary Teacher", 
+        "member_of": "[\"factory_types\"]", 
+        "collection_set": "[]", 
+        "relation_type_set": "[]", 
+        "type_of": "[\"Person\"]"
+    }, 
+    {
+        "attribute_type_set": "[]", 
+        "name": "Master Trainer", 
+        "member_of": "[\"factory_types\"]", 
+        "collection_set": "[]", 
+        "relation_type_set": "[]", 
+        "type_of": "[\"Person\"]"
+    }, 
+    {
+        "attribute_type_set": "[]", 
+        "name": "Faculty Coordinator", 
+        "member_of": "[\"factory_types\"]", 
+        "collection_set": "[]", 
+        "relation_type_set": "[]", 
+        "type_of": "[\"Person\"]"
+    }, 
+    {
+        "attribute_type_set": "[]", 
+        "name": "NSS Coordinator", 
+        "member_of": "[\"factory_types\"]", 
+        "collection_set": "[]", 
+        "relation_type_set": "[]", 
+        "type_of": "[\"Person\"]"
+    }, 
+    {
+        "attribute_type_set": "[]", 
+        "name": "Course Developer", 
+        "member_of": "[\"factory_types\"]", 
+        "collection_set": "[]", 
+        "relation_type_set": "[]", 
+        "type_of": "[\"Person\"]"
+    }, 
+    {
+        "attribute_type_set": "[]", 
+        "name": "Steering Committee Member", 
+        "member_of": "[\"factory_types\"]", 
+        "collection_set": "[]", 
+        "relation_type_set": "[]", 
+        "type_of": "[\"Person\"]"
+    }, 
+    {
+        "attribute_type_set": "[]", 
+        "name": "Program Officer", 
+        "member_of": "[\"factory_types\"]", 
+        "collection_set": "[]", 
+        "relation_type_set": "[]", 
+        "type_of": "[\"Person\"]"
+    }, 
+    {
+        "attribute_type_set": "[]", 
+        "name": "Program Manager", 
+        "member_of": "[\"factory_types\"]", 
+        "collection_set": "[]", 
+        "relation_type_set": "[]", 
+        "type_of": "[\"Person\"]"
+    }, 
+    {
+        "attribute_type_set": "[]", 
+        "name": "Partners", 
+        "member_of": "[\"factory_types\"]", 
+        "collection_set": "[]", 
+        "relation_type_set": "[]", 
+        "type_of": "[\"Person\"]"
+    }, 
+    {
+        "attribute_type_set": "[]", 
+        "name": "Event", 
+        "member_of": "[\"GAPP\"]", 
+        "collection_set": "[]", 
+        "relation_type_set": "[]", 
+        "type_of": "[]"
+    }, 
+    {
+        "attribute_type_set": "[]", 
+        "name": "Inauguration", 
+        "member_of": "[\"factory_types\"]", 
+        "collection_set": "[]", 
+        "relation_type_set": "[]", 
+        "type_of": "[\"Event\"]"
+    }, 
+    {
+        "attribute_type_set": "[]", 
+        "name": "Field Visit", 
+        "member_of": "[\"factory_types\"]", 
+        "collection_set": "[]", 
+        "relation_type_set": "[]", 
+        "type_of": "[\"Event\"]"
+    }, 
+    {
+        "attribute_type_set": "[]", 
+        "name": "Meeting", 
+        "member_of": "[\"factory_types\"]", 
+        "collection_set": "[]", 
+        "relation_type_set": "[]", 
+        "type_of": "[\"Event\"]"
+    }, 
+    {
+        "attribute_type_set": "[]", 
+        "name": "Orientation", 
+        "member_of": "[\"factory_types\"]", 
+        "collection_set": "[]", 
+        "relation_type_set": "[]", 
+        "type_of": "[\"Event\"]"
+    }, 
+    {
+        "attribute_type_set": "[]", 
+        "name": "Master Trainer Program", 
+        "member_of": "[\"factory_types\"]", 
+        "collection_set": "[]", 
+        "relation_type_set": "[]", 
+        "type_of": "[\"Event\"]"
+    }, 
+    {
+        "attribute_type_set": "[]", 
+        "name": "Training of Teachers", 
+        "member_of": "[\"factory_types\"]", 
+        "collection_set": "[]", 
+        "relation_type_set": "[]", 
+        "type_of": "[\"Event\"]"
+    }, 
+    {
+        "attribute_type_set": "[]", 
+        "name": "Course Developers Meeting", 
+        "member_of": "[\"factory_types\"]", 
+        "collection_set": "[]", 
+        "relation_type_set": "[]", 
+        "type_of": "[\"Event\"]"
+    }, 
+    {
+        "attribute_type_set": "[]", 
+        "name": "Session", 
+        "member_of": "[\"factory_types\"]", 
+        "collection_set": "[]", 
+        "relation_type_set": "[]", 
+        "type_of": "[\"Event\"]"
+    }, 
+    {
+        "attribute_type_set": "[]", 
+        "name": "Classroom Session", 
+        "member_of": "[\"factory_types\"]", 
+        "collection_set": "[]", 
+        "relation_type_set": "[]", 
+        "type_of": "[\"Event\"]"
+    }, 
+    {
+        "attribute_type_set": "[]", 
+        "name": "Lab Session", 
+        "member_of": "[\"factory_types\"]", 
+        "collection_set": "[]", 
+        "relation_type_set": "[]", 
+        "type_of": "[\"Event\"]"
+    }, 
+    {
+        "attribute_type_set": "[]", 
+        "name": "Exam", 
+        "member_of": "[\"factory_types\"]", 
+        "collection_set": "[]", 
+        "relation_type_set": "[]", 
+        "type_of": "[\"Event\"]"
+    }, 
+    {
+        "attribute_type_set": "[]", 
+        "name": "Enrollment", 
+        "member_of": "[\"factory_types\"]", 
+        "collection_set": "[]", 
+        "relation_type_set": "[]", 
+        "type_of": "[]"
+    }, 
+    {
+        "attribute_type_set": "[]", 
+        "name": "StudentCourseEnrollment", 
+        "member_of": "[\"factory_types\"]", 
+        "collection_set": "[]", 
+        "relation_type_set": "[]", 
+        "type_of": "[\"Enrollment\"]"
+    }, 
+    {
+        "attribute_type_set": "[]", 
+        "name": "MIS", 
+        "member_of": "[\"GAPP\"]", 
+        "collection_set": "[]", 
+        "relation_type_set": "[]", 
+        "type_of": "[]"
+    }, 
+    {
+        "attribute_type_set": "[]", 
+        "name": "MIS-PO", 
+        "member_of": "[\"GAPP\"]", 
+        "collection_set": "[]", 
+        "relation_type_set": "[]", 
+        "type_of": "[]"
+    }, 
+    {
+        "attribute_type_set": "[]", 
+        "name": "CourseSection", 
+        "member_of": "[\"factory_types\"]", 
+        "collection_set": "[]", 
+        "relation_type_set": "[]", 
+        "type_of": "[]"
+    }, 
+    {
+        "attribute_type_set": "[]", 
+        "name": "CourseSubSection", 
+        "member_of": "[\"factory_types\"]", 
+        "collection_set": "[]", 
+        "relation_type_set": "[]", 
+        "type_of": "[]"
+    }, 
+    {
+        "attribute_type_set": "[]", 
+        "name": "CourseUnit", 
+        "member_of": "[\"factory_types\"]", 
+        "collection_set": "[]", 
+        "relation_type_set": "[]", 
+        "type_of": "[]"
+    }, 
+    {
+        "attribute_type_set": "[]", 
+        "name": "GListItem", 
+        "member_of": "[\"factory_types\"]", 
+        "collection_set": "[]", 
+        "relation_type_set": "[]", 
+        "type_of": "[]"
+    }, 
+    {
+        "attribute_type_set": "[]", 
+        "name": "CourseSectionEvent", 
+        "member_of": "[\"factory_types\"]", 
+        "collection_set": "[]", 
+        "relation_type_set": "[]", 
+        "type_of": "[]"
+    }, 
+    {
+        "attribute_type_set": "[]", 
+        "name": "CourseSubSectionEvent", 
+        "member_of": "[\"factory_types\"]", 
+        "collection_set": "[]", 
+        "relation_type_set": "[]", 
+        "type_of": "[]"
+    }, 
+    {
+        "attribute_type_set": "[]", 
+        "name": "CourseUnitEvent", 
+        "member_of": "[\"factory_types\"]", 
+        "collection_set": "[]", 
+        "relation_type_set": "[]", 
+        "type_of": "[]"
+    }, 
+    {
+        "attribute_type_set": "[]", 
+        "name": "QuizItemEvent", 
+        "member_of": "[\"factory_types\"]", 
+        "collection_set": "[]", 
+        "relation_type_set": "[]", 
+        "type_of": "[\"QuizItem\"]"
+    }, 
+    {
+        "attribute_type_set": "[]", 
+        "name": "Jhapp", 
+        "member_of": "[\"factory_types\"]", 
+        "collection_set": "[]", 
+        "relation_type_set": "[]", 
+        "type_of": "[]"
+    }, 
+    {
+        "attribute_type_set": "[]", 
+        "name": "QuizItemPost", 
+        "member_of": "[\"factory_types\"]", 
+        "collection_set": "[]", 
+        "relation_type_set": "[]", 
+        "type_of": "[\"Reply\"]"
+    }, 
+    {
+        "attribute_type_set": "[]", 
+        "name": "Jsmol", 
+        "member_of": "[\"factory_types\"]", 
+        "collection_set": "[]", 
+        "relation_type_set": "[]", 
+        "type_of": "[\"Jhapp\"]"
+    }, 
+    {
+        "attribute_type_set": "[]", 
+        "name": "TurtleBlocks", 
+        "member_of": "[\"factory_types\"]", 
+        "collection_set": "[]", 
+        "relation_type_set": "[]", 
+        "type_of": "[\"Jhapp\"]"
+    }, 
+    {
+        "attribute_type_set": "[]", 
+        "name": "Asset", 
+        "member_of": "[\"factory_types\"]", 
+        "collection_set": "[]", 
+        "relation_type_set": "[]", 
+        "type_of": "[]"
+    }, 
+    {
+        "attribute_type_set": "[]", 
+        "name": "PoliceSquad", 
+        "member_of": "[\"factory_types\"]", 
+        "collection_set": "[]", 
+        "relation_type_set": "[]", 
+        "type_of": "[\"Jhapp\"]"
+    }, 
+    {
+        "attribute_type_set": "[]", 
+        "name": "OpenStoryTool", 
+        "member_of": "[\"factory_types\"]", 
+        "collection_set": "[]", 
+        "relation_type_set": "[]", 
+        "type_of": "[\"Jhapp\"]"
+    }, 
+    {
+        "attribute_type_set": "[]", 
+        "name": "BioMechanics", 
+        "member_of": "[\"factory_types\"]", 
+        "collection_set": "[]", 
+        "relation_type_set": "[]", 
+        "type_of": "[\"Jhapp\"]"
+    }, 
+    {
+        "attribute_type_set": "[]", 
+        "name": "Template", 
+        "member_of": "[\"factory_types\"]", 
+        "collection_set": "[]", 
+        "relation_type_set": "[]", 
+        "type_of": "[\"Page\"]"
+    }, 
+    {
+        "attribute_type_set": "[]", 
+        "name": "base_unit", 
+        "member_of": "[\"factory_types\"]", 
+        "collection_set": "[]", 
+        "relation_type_set": "[]", 
+        "type_of": "[]"
+    }, 
+    {
+        "attribute_type_set": "[]", 
+        "name": "lesson", 
+        "member_of": "[\"factory_types\"]", 
+        "collection_set": "[]", 
+        "relation_type_set": "[]", 
+        "type_of": "[]"
+    }, 
+    {
+        "attribute_type_set": "[]", 
+        "name": "activity", 
+        "member_of": "[\"factory_types\"]", 
+        "collection_set": "[]", 
+        "relation_type_set": "[]", 
+        "type_of": "[]"
+    }, 
+    {
+        "attribute_type_set": "[]", 
+        "name": "announced_unit", 
+        "member_of": "[\"factory_types\"]", 
+        "collection_set": "[]", 
+        "relation_type_set": "[]", 
+        "type_of": "[]"
+    }, 
+    {
+        "attribute_type_set": "[]", 
+        "name": "trans_node", 
+        "member_of": "[\"factory_types\"]", 
+        "collection_set": "[]", 
+        "relation_type_set": "[]", 
+        "type_of": "[]"
+    }, 
+    {
+        "attribute_type_set": "[]", 
+        "name": "base_survey", 
+        "member_of": "[\"factory_types\"]", 
+        "collection_set": "[]", 
+        "relation_type_set": "[]", 
+        "type_of": "[]"
+    }, 
+    {
+        "attribute_type_set": "[]", 
+        "name": "announced_survey", 
+        "member_of": "[\"factory_types\"]", 
+        "collection_set": "[]", 
+        "relation_type_set": "[]", 
+        "type_of": "[]"
+    }
+]
