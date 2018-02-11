@@ -339,7 +339,13 @@ def render_test_template(request,group_id='home', app_id=None, page_no=1):
 
 	#print collection_pages_cur.count()
 	#print collection_pages_cur.to_dict()
-	collection_pages_cur = collection_pages_cur[0:24]
+
+	if page_no==1:
+		collection_pages_cur=collection_pages_cur[0:24]
+	else:
+		temp=( int(page_no) - 1) * 24
+		collection_pages_cur=collection_pages_cur[temp:temp+24]
+
 	paginator = Paginator(collection_pages_cur, 24)
 
 
@@ -412,7 +418,7 @@ def elib_paged_file_objects(request, group_id, filetype, page_no):
 	'''
 	Method to implement pagination in File and E-Library app.
 	'''
-	print "siddhu dhangar"
+
 	if request.method == "POST":
 
 		group_name, group_id = get_group_name_id(group_id)
@@ -424,7 +430,7 @@ def elib_paged_file_objects(request, group_id, filetype, page_no):
 		filters = json.loads(filters)
 		filters = get_filter_querydict(filters)
 
-		print "++++++++++++++++++++++++++++++"
+		
 		print filters
 		query_dict = filters
 
@@ -479,7 +485,12 @@ def elib_paged_file_objects(request, group_id, filetype, page_no):
 				should=[Q('match',member_of=GST_FILE1.hits[0].id)])
 
 			files1 =Search(using=es, index="nodes",doc_type="gsystemtype,gsystem,metatype,relationtype,attribute_type,group,author").query(q)
-			files1=files1[0:24]
+
+			if page_no==1:
+				files1=files1[0:24]
+			else:
+				temp=( int(page_no) - 1) * 24
+				files1=files1[temp:temp+24]
 			#files1  = es.search(index="gsystem,nodes", doc_type="image,video,audio,application,gsystemtype,gsystem,metatype,relationtype,attribute_type,group,author", body={
             #            "query":   {"bool": { "must":[ {"terms":  {"group_set": str(ObjectId(group_id))}  } ],
      		#								 #"must":  [ {"match":  {"attribute_set.educationaluse": "imag" } } ],
@@ -495,8 +506,11 @@ def elib_paged_file_objects(request, group_id, filetype, page_no):
 				)
 
 			files1 =Search(using=es, index="gsystem",doc_type="image,video,audio,application").query(q)
-			files1=files1[0:24]
-
+			if page_no==1:
+				files1=files1[0:24]
+			else:
+				temp=( int(page_no) - 1) * 24
+				files1=files1[temp:temp+24]
 			#filetype = [ "images","videos","documents","audios"]
 			print files1.count()
 
@@ -545,7 +559,7 @@ def elib_paged_file_objects(request, group_id, filetype, page_no):
 			#result_paginated_cur = tuple(files1_temp)
 
 			paginator = Paginator(result_paginated_cur, 24)
-			page_no = request.GET.get('page_no')
+			#page_no = request.GET.get('page_no')
 			try:
 				results = paginator.page(page_no)
 			except PageNotAnInteger:
@@ -580,9 +594,15 @@ def elib_paged_file_objects(request, group_id, filetype, page_no):
 				result_cur =Search(using=es, index="nodes",doc_type="gsystemtype,gsystem,metatype,relationtype,attribute_type,group,author").query(q)
 
 				print filters
-				print "=====================", result_cur.count()
+				print "=============================================================", result_cur.count()
+				if page_no==1:
+					result_cur=result_cur[0:24]
+				else:
+					temp=( int(page_no) - 1) * 24
+					result_cur=result_cur[temp:temp+24]
+					
 
-				result_paginated_cur = result_paginated_cur
+				result_paginated_cur = result_cur
 				#result_pages = paginator.Paginator(result_paginated_cur, page_no, no_of_objs_pp)
 
 				paginator = Paginator(result_paginated_cur, 24)
