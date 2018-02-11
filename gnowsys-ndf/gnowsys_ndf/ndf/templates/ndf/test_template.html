@@ -33,6 +33,23 @@ margin-top:5px !important;
   margin-left:-1px !important;
   }
 
+  ul.errorlist {display: none;}
+  h3 {text-align:center;}
+  p {text-align:center;}
+  div.pagination {display: block; width: 40%; margin: 0 auto; }
+  #grid {width: 200px; padding-top: 5px;}
+  #selid {width: 200px; padding-top: 5px}
+  #but { position:absolute;
+        top:50px;
+        right:0;}
+  #filter {
+    padding-top: 5px;
+  }
+  #ss {
+    padding-top: 5px; width:200px;
+  }
+
+
 
 {% endblock %}
 
@@ -250,9 +267,10 @@ margin-top:5px !important;
   </div>
     <div class="large-8 columns repository-desc top-gap">{{app_gst.content_org|default_if_none:""|safe}}</div>
   {% if title == "E-Library" %}
-    {% get_filters_data "File" groupid as filter_dict %}
-    {% include "ndf/filters.html" with filter_dict=filter_dict %}
+  {% get_filters_data "File" groupid as filter_dict %}
+  {% include "ndf/filters.html" with filter_dict=filter_dict %}
   {% endif %}
+
   <div class="tabs-content gallery">
 
     {% if already_uploaded %} 
@@ -391,9 +409,10 @@ margin-top:5px !important;
 
 
     </div>
+</ul>
+
 
   {% endblock %}
-
 
   {% block script %}
   // <script type="text/javascript">

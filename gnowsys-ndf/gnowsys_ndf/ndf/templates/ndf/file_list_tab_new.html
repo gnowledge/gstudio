@@ -5,7 +5,7 @@
 <!-- Card -->
 <ul class="small-block-grid-1 medium-block-grid-3 large-block-grid-5" >
 
-  <!-- Existing card list-->
+<!-- Existing card list-->
   
   {% for each_res in resource_type %} 
 
@@ -14,7 +14,7 @@
     <li class="card-image-wrapper" > 
     <!--old card-view > card.html &&  new card-view > simple_card.html  -->
     {% if notebook_filter %}
-     
+      
       {% include 'ndf/simple_card_new.html' with  has_contributor=True resource=each_res
       url_name='course_notebook_tab_note' first_arg=group_name second_arg="all-notes" third_arg=each_res.id %}
     {% else %}
@@ -26,8 +26,24 @@
     
       <!-- end new -->      
   {% endfor %}
+
+      
   
 </ul>
+
+{% if title == "E-Library" %}
+  
+  {% include 'ndf/pagination_new.html' with urlname="elib_paged_file_objects" first_arg=group_name_tag second_arg=filetype third_arg="" %}
+  
+{% elif title == "eBooks" %}
+
+  {% include 'ndf/pagination.html' with urlname="e-book_filter_page" first_arg=group_name_tag second_arg=""  third_arg="" page_info=page_info %}
+
+{% else %}
+
+  {% include 'ndf/pagination.html' with urlname="paged_file_objs" first_arg=group_name_tag second_arg=filetype third_arg="" %}
+
+{% endif %}
 
 <link rel="stylesheet" type="text/css" href="/static/ndf/bower_components/slick-carousel/slick/slick.css"/>
 <link rel="stylesheet" type="text/css" href="/static/ndf/css/open-sans-bold-font.css">
@@ -41,7 +57,7 @@
       // dots: true,
       infinite: true,
       arrows: true,
-      speed: 10,
+      speed: 500,
       // fade: true,
       cssEase: 'linear'
     });

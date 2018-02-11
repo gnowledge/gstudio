@@ -48,7 +48,7 @@
 {% endif %}
 <div class="scard-image" title="{% firstof resource.altnames resource.name %}">
 
-    {% get_dict_from_list_of_dicts resource.attribute_set as attr_set_dict %}
+    
 
     {% get_relation_value resource.pk 'has_thumbnail' as grel_dict %}
     {% if not grel_dict.cursor and grel_dict.grel_node and grel_dict.grel_node.fs_file_ids.1 %}
@@ -112,6 +112,7 @@
     <!-- {% get_node_ratings request resource.pk as ratings %} -->
             <!-- <div class="rating-stars center" style="width:{{ratings.avg|multiply:16}}px;"> <!-16px = 1 star -->
               <!-- <div></div>
+
             </div> -->
     {% endcomment %}
 

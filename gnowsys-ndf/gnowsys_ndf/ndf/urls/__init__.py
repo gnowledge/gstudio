@@ -43,7 +43,7 @@ urlpatterns = patterns('',
     # --end of mobwrite
 
     # url(r'^(?P<group_id>[^/]+)/mailclient[/]error[/](?P<error_obj>[\w-]+)$', 'gnowsys_ndf.ndf.views.mailclient.mailclient_error_display', name='mailclient_error_display'),
-
+    
     url(r'^$', homepage, {"group_id": "home"}, name="homepage"),
     url(r'^welcome/?', landing_page, name="landing_page"),
 
@@ -131,6 +131,7 @@ urlpatterns = patterns('',
     #test url
     (r'^dev', include('gnowsys_ndf.ndf.urls.dev_utils')),
     (r'^tools/', include('gnowsys_ndf.ndf.urls.tools')),
+    (r'^search/', include('gnowsys_ndf.ndf.urls.search')),
     
     # meeting app
     # (r'^online/', include('online_status.urls')),   #for online_users.
