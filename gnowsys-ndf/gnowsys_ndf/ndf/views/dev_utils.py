@@ -166,10 +166,34 @@ def render_test_template(request,group_id='home', app_id=None, page_no=1):
 		selfilters = json.loads(selfilters)
 		query_dict = get_filter_querydict(selfilters)
 
-	query_dict.append({'attribute_set.educationaluse': {'$ne': 'eBooks'}})
-
+	#query_dict.append({'attribute_set.educationaluse': {'$ne': 'eBooks'}})
+	i=-1
+	#rint len(query_dict)
+	#print query_dict
+	strconcat="Q('bool',must=["
+	endstring="]"
+	temp_dict={}
 	print query_dict
-
+	
+	for each in list(query_dict):
+		for temp in each.values():
+			for a in temp:
+				for key,value in a.items():
+					if isinstance(value, dict): 
+						#print value["$in"][0]
+						if value["$in"]:
+							temp_dict[key]=value["$in"][0]
+						elif value["$or"]:
+							temp_dict[key]=value["$or"][0]
+					elif isinstance(value, tuple):
+						temp_dict["language"]= value[1]	
+					else:
+						temp_dict[key]=value
+					
+	print temp_dict
+	strconcat=strconcat+endstring
+	print strconcat
+		
 	#files = node_collection.find({
 									# 'member_of': {'$in': [GST_FILE._id, GST_PAGE._id]},
 									#'member_of': {'$in': [GST_FILE._id,GST_JSMOL._id]},
@@ -205,10 +229,16 @@ def render_test_template(request,group_id='home', app_id=None, page_no=1):
 	#files1_temp = []
 	#all_files_count=files1['hits']['total']
 	#print all_files_count
-	
+	if selfilters:
 
-	q = Q('bool', must=[Q('match', group_set=str(group_id)), Q('match',access_policy='public'),Q('match',member_of=GST_FILE1.hits[0].id) ],
+		q = Q('bool', must=[Q('match', group_set=str(group_id)), Q('match',access_policy='public'),Q('match',member_of=GST_FILE1.hits[0].id)
+			],
 		must_not=[Q('match', attribute_set__educationaluse ='ebooks')])
+
+	else:
+		q = Q('bool', must=[Q('match', group_set=str(group_id)), Q('match',access_policy='public'),Q('match',member_of=GST_FILE1.hits[0].id)],
+		must_not=[Q('match', attribute_set__educationaluse ='ebooks')])
+
 	files_new =Search(using=es, index="nodes",doc_type="gsystem").query(q)
 	files_new = files_new[0:24]
 
@@ -267,9 +297,10 @@ def render_test_template(request,group_id='home', app_id=None, page_no=1):
 	ebooks_count =Search(using=es, index="nodes",doc_type="gsystemtype,gsystem,metatype,relationtype,attribute_type,group,author").query(q)
 
 
-	q = Q('bool', should=[Q('match', attribute_set__educationaluse='images'),Q('match', attribute_set__educationaluse='videos'),
-		Q('match', attribute_set__educationaluse='audios'),Q('match', attribute_set__educationaluse='documents'),
-		Q('match', attribute_set__educationaluse='interactives')])
+	#q = Q('bool', should=[Q('match', attribute_set__educationaluse='images'),Q('match', attribute_set__educationaluse='videos'),
+	#	Q('match', attribute_set__educationaluse='audios'),Q('match', attribute_set__educationaluse='documents'),
+	#	Q('match', attribute_set__educationaluse='interactives')])
+	q=  Q('bool', must=[Q('terms',attribute_set__educationaluse=['documents','images','audios','videos','interactives'])])
 	all_count =Search(using=es, index="nodes",doc_type="gsystemtype,gsystem,metatype,relationtype,attribute_type,group,author").query(q)
 
 	print all_count.to_dict()
@@ -430,8 +461,6 @@ def elib_paged_file_objects(request, group_id, filetype, page_no):
 		filters = json.loads(filters)
 		filters = get_filter_querydict(filters)
 
-		
-		print filters
 		query_dict = filters
 
 		selfilters = urllib.unquote(request.GET.get('selfilters', ''))
@@ -600,7 +629,7 @@ def elib_paged_file_objects(request, group_id, filetype, page_no):
 				else:
 					temp=( int(page_no) - 1) * 24
 					result_cur=result_cur[temp:temp+24]
-					
+
 
 				result_paginated_cur = result_cur
 				#result_pages = paginator.Paginator(result_paginated_cur, page_no, no_of_objs_pp)
