@@ -550,6 +550,12 @@ body>footer {
   }
 }
 
+body > footer ul#footerlogo li
+{
+   
+  display:inline;
+}
+
 .coll-arrows {
     cursor:pointer;
     display: block;
