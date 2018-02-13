@@ -177,12 +177,12 @@
 					</li>
 
 
-					{% if page_info.next_page != page_info.paginator.num_pages %}
+					{% if page_info.next_page_number != page_info.paginator.num_pages %}
 						
-						{% if page_info.next_page != page_info.paginator.num_pages|add:"-1" %}
+						{% if page_info.next_page_number != page_info.paginator.num_pages|add:"-1" %}
 
 							<!-- for .... -->
-							{% if page_info.next_page != page_info.paginator.num_pages|add:"-2" %}
+							{% if page_info.next_page_number != page_info.paginator.num_pages|add:"-2" %}
 								<li class="unavailable" aria-disabled="true"><span class="subheader">&hellip;</span></li>
 							{% endif %}
 			

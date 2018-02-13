@@ -89,7 +89,7 @@ margin-top:5px !important;
 
 {% block related_content %}
   {% check_user_join request groupid as user_is_joined %}
-  {{ files1_temp }}
+  
   <div class="panel" style="background-color:#ddd; padding: 0.25rem;margin-top:1em">
     
     <ul class="side-nav">
@@ -396,7 +396,7 @@ margin-top:5px !important;
       <div class="content" id="view-collection" data-filetype="collection">
         {% get_resource_collection groupid "File" as file_collections %}
 
-        {% include "ndf/file_list_tab.html" with resource_type=file_collections detail_urlname="file_detail" filetype="collection" res_type_name="collection" %}
+        {% include "ndf/file_list_tab_new.html" with resource_type=file_collections detail_urlname="file_detail" filetype="collection" res_type_name="collection" %}
 
         {% if title == "E-Library" %}
           <a href='{% url "elib_paged_file_objs" group_name_tag "Collections" 1 %}' class="first-load">1</a>

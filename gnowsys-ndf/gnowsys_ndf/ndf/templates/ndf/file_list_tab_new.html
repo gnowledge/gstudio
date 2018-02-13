@@ -18,7 +18,7 @@
       {% include 'ndf/simple_card_new.html' with  has_contributor=True resource=each_res
       url_name='course_notebook_tab_note' first_arg=group_name second_arg="all-notes" third_arg=each_res.id %}
     {% else %}
-      <!-- <p>{{ each_res }}</p> -->
+      
 
       {% include 'ndf/simple_card_new.html' with  has_contributor=True resource=each_res url_name=detail_urlname first_arg=group_id second_arg=each_res.id %}
     {% endif %}

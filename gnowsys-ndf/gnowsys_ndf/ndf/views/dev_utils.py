@@ -132,7 +132,7 @@ def query_doc(request, doc_id_or_name=None, option=None):
 						    )
 
 
-def render_test_template(request,group_id='home', app_id=None, page_no=1):
+def render_test_template(request,group_id='55ab34ff81fccb4f1d806025', app_id=None, page_no=1):
 
 	is_video = request.GET.get('is_video', "")
 
@@ -458,7 +458,7 @@ def render_test_template(request,group_id='home', app_id=None, page_no=1):
 	print "cccccccccccccccccccccccccccccccccccccccccccccccccccc"
 	#print collection_pages_cur.to_dict()
 
-	if page_no==1:
+	if int(page_no)==1:
 		collection_pages_cur=collection_pages_cur[0:24]
 	else:
 		temp=( int(page_no) - 1) * 24
@@ -533,7 +533,7 @@ def render_test_template(request,group_id='home', app_id=None, page_no=1):
     )
 
 
-def elib_paged_file_objects(request, group_id, filetype, page_no):
+def elib_paged_file_objects(request, group_id, filetype, page_no=1):
 	'''
 	Method to implement pagination in File and E-Library app.
 	'''
@@ -544,6 +544,7 @@ def elib_paged_file_objects(request, group_id, filetype, page_no):
 
 		no_of_objs_pp = 24
 		result_pages = None
+		results = None
 
 		filters = request.POST.get("filters", "")
 		filters = json.loads(filters)
@@ -610,16 +611,16 @@ def elib_paged_file_objects(request, group_id, filetype, page_no):
 
 
 		detail_urlname = "file_detail"
-		if filetype != "all":
+		#if filetype != "all":
 			
 
 			# elif filetype == "Collections":
-			if filetype == "Collections":
-				pass
+		#	if filetype == "Collections":
+		#		pass
 	
-			else:
+		#	else:
 				#query_dict.append({"attribute_set.educationaluse": filetype})
-				pass
+		#		pass
 
 		
 
@@ -724,20 +725,19 @@ def elib_paged_file_objects(request, group_id, filetype, page_no):
 					must_not=[Q('match', attribute_set__educationaluse ='ebooks')])	
 			else:
 				print "----------11111111111111111111111111-----------------------------"
+				
 				q = Q('bool', must=[Q('match', group_set=str(group_id)), Q('match',access_policy='public'),Q('match', attribute_set__educationaluse =filetype)],
 				should=[Q('match',member_of=GST_FILE1.hits[0].id)])
-
+			
 				collection_query = Q('bool', must=[Q('match', group_set=str(group_id)), Q('match',access_policy='public'),Q('exists',field='collection_set')],
 				should=[Q('match',member_of=GST_FILE1.hits[0].id),Q('match',member_of=GST_PAGE1.hits[0].id) ],
 				must_not=[Q('match', attribute_set__educationaluse ='ebooks')])	
 
-				q = Q('bool', must=[Q('match', group_set=str(group_id)), Q('match',access_policy='public'),Q('exists',field='collection_set')],
-		should=[Q('match',member_of=GST_FILE1.hits[0].id),Q('match',member_of=GST_PAGE1.hits[0].id) ],
-		must_not=[Q('match', attribute_set__educationaluse ='ebooks')])
+				
 
 			files1 =Search(using=es, index="nodes",doc_type="gsystemtype,gsystem,metatype,relationtype,attribute_type,group,author").query(q)
-
-			if page_no==1:
+			print files1.count()
+			if int(page_no)==1:
 				files1=files1[0:24]
 			else:
 				temp=( int(page_no) - 1) * 24
@@ -824,7 +824,7 @@ def elib_paged_file_objects(request, group_id, filetype, page_no):
 
 				q = Q('bool', must=[Q('match', group_set=str(group_id)), Q('match',access_policy='public'),Q('match',member_of=GST_FILE1.hits[0].id),Q('terms',attribute_set__educationaluse=['documents','images','audios','videos'])],
 				)
-				print "CCCCCCCCCVVVVvvvvvvvvvvvvvvvvvvvvv"
+				
 
 				collection_query = Q('bool', must=[Q('match', group_set=str(group_id)), Q('match',access_policy='public'),Q('exists',field='collection_set')],
 					should=[Q('match',member_of=GST_FILE1.hits[0].id),Q('match',member_of=GST_PAGE1.hits[0].id) ],
@@ -833,10 +833,10 @@ def elib_paged_file_objects(request, group_id, filetype, page_no):
 
 
 			print query_dict
-			print "---------------------------------wwwwwwwwwwwwwwwwwwwwwwwww"
+			
 
 			files1 =Search(using=es, index="gsystem",doc_type="image,video,audio,application").query(q)
-			if page_no==1:
+			if int(page_no)==1:
 				files1=files1[0:24]
 			else:
 				temp=( int(page_no) - 1) * 24
@@ -865,9 +865,9 @@ def elib_paged_file_objects(request, group_id, filetype, page_no):
 
 		educationaluse_stats = {}
 
-		if files1:# and not result_pages:
+		if files1 and filetype != "Collections":# and not result_pages:
 			# print "=======", educationaluse_stats
-
+			
 			eu_list = []  # count
 			collection_set_count = 0
 			#for each in files:
@@ -887,7 +887,7 @@ def elib_paged_file_objects(request, group_id, filetype, page_no):
 			result_paginated_cur = files1
 			#result_pages = paginator.Paginator(result_paginated_cur, page_no, no_of_objs_pp)
 			#result_paginated_cur = tuple(files1_temp)
-
+			
 			paginator = Paginator(result_paginated_cur, 24)
 			#page_no = request.GET.get('page_no')
 			try:
@@ -902,7 +902,7 @@ def elib_paged_file_objects(request, group_id, filetype, page_no):
 
 		if filetype == "Collections":
 
-				detail_urlname = "page_details"
+			detail_urlname = "page_details"
 				#result_cur = node_collection.find({
 				#					'member_of': {'$in': [GST_FILE._id, GST_PAGE._id]},
                 #                    'group_set': {'$all': [ObjectId(group_id)]},
@@ -921,35 +921,40 @@ def elib_paged_file_objects(request, group_id, filetype, page_no):
 				#should=[Q('match',member_of=GST_FILE1.hits[0].id),Q('match',member_of=GST_PAGE1.hits[0].id) ],
 				#must_not=[Q('match', attribute_set__educationaluse ='ebooks')])
 
-				result_cur =Search(using=es, index="nodes",doc_type="gsystemtype,gsystem,metatype,relationtype,attribute_type,group,author").query(collection_query)
+			result_cur =Search(using=es, index="nodes",doc_type="gsystemtype,gsystem,metatype,relationtype,attribute_type,group,author").query(collection_query)
 
-				print filters
-				print "=============================================================", result_cur.count()
-				if page_no==1:
-					result_cur=result_cur[0:24]
-				else:
-					temp=( int(page_no) - 1) * 24
-					result_cur=result_cur[temp:temp+24]
+			print filters
+			#print "=============================================================", result_cur.count()
+			#print page_no
+			if int(page_no) == 1:
+				result_cur=result_cur[0:24]
+				
+			else:
+				temp=int(( int(page_no) - 1) * 24)
+				result_cur=result_cur[temp:temp+24]
+				
 
-
-				result_paginated_cur = result_cur
+			result_paginated_cur = result_cur
 				#result_pages = paginator.Paginator(result_paginated_cur, page_no, no_of_objs_pp)
 
-				paginator = Paginator(result_paginated_cur, 24)
+			print result_cur
+			paginator = Paginator(result_paginated_cur, 24)
 				#page = request.GET.get('page')
-				try:
-					results = paginator.page(page_no)
-				except PageNotAnInteger:
-					results = paginator.page(1)
-				except EmptyPage:
-					results = paginator.page(paginator.num_pages)
+			
+			try:
+				results = paginator.page(int(page_no))
+			except PageNotAnInteger:
+				results = paginator.page(1)
+			except EmptyPage:
+				results = paginator.page(paginator.num_pages)
+		
 
-		return render_to_response ("ndf/file_list_tab_new.html", {
-				"filter_result": filter_result,
-				"group_id": group_id, "group_name_tag": group_id, "groupid": group_id,
-				'title': "E-Library", "educationaluse_stats": json.dumps(educationaluse_stats),
-				"resource_type": files1, "detail_urlname": detail_urlname,
-				"filetype": filetype, "res_type_name": "", "page_info": results,
+	return render_to_response ("ndf/file_list_tab_new.html", {
+			"filter_result": filter_result,
+			"group_id": group_id, "group_name_tag": group_id, "groupid": group_id,
+			'title': "E-Library", "educationaluse_stats": json.dumps(educationaluse_stats),
+			"resource_type": result_paginated_cur, "detail_urlname": detail_urlname,
+			"filetype": filetype, "res_type_name": "", "page_info": results,
 			},
 			context_instance = RequestContext(request))
 
