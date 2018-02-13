@@ -530,17 +530,27 @@ body>footer {
     .footer_link_cont {
       display: inline-block;
       vertical-align: top;
-      margin: 20px;
+      /*margin: 20px;*/
       text-align: left;
 
       .links_show {
         //change as per requirement on addition on more links in future
         max-height: 600px;
       }
+      h4{
+        color: #999;
+      }
+      .social_links{
+        font-size: 24px; 
+        margin-right:5px;
+      }
+      
       .show_foot_links {
         color: #777777;
         cursor: pointer;
-
+        i{
+          font-size: 24px; margin-right:5px;
+        }
         &:hover {
           text-decoration: underline;
         }
@@ -548,7 +558,39 @@ body>footer {
     }
 
   }
+  hr.footerlogo-divider{
+  border-color: #555;
+  margin-top: 10px;
+  }  
 }
+
+body > footer ul#footerlogo li
+{
+  margin: 0px 5px; 
+  display:inline;
+
+}
+.no-gap ul
+{
+    margin-left: 0rem;
+}
+
+
+body > footer ul#poweredlogos{
+  margin-left: 0px;
+}    
+
+#poweredlogos li
+{
+  margin: 0px 5px;
+  display:inline;
+
+}
+.no-gap ul
+{
+  margin-left: 0rem;
+}
+
 
 .coll-arrows {
     cursor:pointer;
@@ -8019,5 +8061,30 @@ $module-card-lines-to-show: 3;
     width: 120px !important;
     margin-top: 2px !important;
     letter-spacing: 0.4px;
+}
+
+
+/*****Toolbar CSS******/
+#toolbar{
+  background-color: #3e3e3e;
+}
+.datetime{
+  color: #eaeaea; 
+  padding: 4px 0px 2px 5px; 
+  font-size: 11px;
+}
+.changefont{
+  text-align: right; 
+  padding: 2px 5px 1px 0px; 
+
+  .minus{
+    font-size:60%; color: #eaeaea;
+  } 
+  .normal{
+    font-size:80%; color: #eaeaea;
+  }
+  .plus{
+    font-size:100%; color: #eaeaea;
+  }
 }
 
