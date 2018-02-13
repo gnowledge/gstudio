@@ -24,8 +24,9 @@ import urllib
 ''' -- imports from installed packages -- '''
 from django.shortcuts import render_to_response
 from django.template import RequestContext
-from mongokit import paginator
-from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
+#from mongokit import paginator
+from gnowsys_ndf.ndf.paginator import Paginator ,EmptyPage, PageNotAnInteger
+#from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 
 try:
 	from bson import ObjectId
@@ -98,8 +99,6 @@ pandora_video_st1=pandora_video_st.execute()
 
 app = Search(using=es, index="nodes",doc_type="gsystemtype").query("match", name="library")
 app1=app.execute()
-
-
 wiki_page = Search(using=es, index="nodes",doc_type="gsystemtype").query("match", name="wiki")
 wiki_page1=wiki_page.execute()
 
@@ -132,7 +131,7 @@ def query_doc(request, doc_id_or_name=None, option=None):
 						    )
 
 
-def render_test_template(request,group_id='55ab34ff81fccb4f1d806025', app_id=None, page_no=1):
+def render_test_template(request,group_id='home', app_id=None, page_no=1):
 
 	is_video = request.GET.get('is_video', "")
 
@@ -213,7 +212,7 @@ def render_test_template(request,group_id='55ab34ff81fccb4f1d806025', app_id=Non
 	print temp_dict
 	#strconcat=strconcat
 	print strconcat
-	
+
 	#files = node_collection.find({
 									# 'member_of': {'$in': [GST_FILE._id, GST_PAGE._id]},
 									#'member_of': {'$in': [GST_FILE._id,GST_JSMOL._id]},
@@ -244,16 +243,13 @@ def render_test_template(request,group_id='55ab34ff81fccb4f1d806025', app_id=Non
 
      										 #"must":  [ {"term":  {'created_by': request.user.id}}],
 
-     #} }} )
+    #} }} )
+	a,b,c,d,e = ([] for i in range(5))
 
-
-	#files1_temp = []
-	#all_files_count=files1['hits']['total']
-	#print all_files_count
 	if selfilters:
 		if strconcat.count('match') == 1:
-			a=strconcat.split()
-			a="".join(a)
+			a=strconcat.split() #give list output
+			a="".join(a) # we convert list to string 
 			print a
 			q = Q('bool', must=[Q('match', group_set=str(group_id)), Q('match',member_of=GST_FILE1.hits[0].id) , eval(str(a))],
 			must_not=[Q('match', attribute_set__educationaluse ='ebooks')])
@@ -263,7 +259,14 @@ def render_test_template(request,group_id='55ab34ff81fccb4f1d806025', app_id=Non
 			should=[Q('match',member_of=GST_FILE1.hits[0].id),Q('match',member_of=GST_PAGE1.hits[0].id) ],
 			must_not=[Q('match', attribute_set__educationaluse ='ebooks')])
 
-	
+			q_images_count = Q('bool', must=[Q('match', attribute_set__educationaluse='images'),eval(str(a))])
+			q_audios_count = Q('bool', must=[Q('match', attribute_set__educationaluse='audios'),eval(str(a))])
+			q_videos_count = Q('bool', must=[Q('match', attribute_set__educationaluse='videos'),eval(str(a))])
+			q_intercatives_count = Q('bool', must=[Q('match', attribute_set__educationaluse='interactives'),eval(str(a))])
+			q_applications_count = Q('bool', must=[Q('match', attribute_set__educationaluse='documents'),eval(str(a))])
+			q_ebooks_count = Q('bool', must=[Q('match', attribute_set__educationaluse='ebooks'),eval(str(a))])
+			q_all_count=  Q('bool', must=[Q('terms',attribute_set__educationaluse=['documents','images','audios','videos','interactives']),eval(str(a))])
+			
 		elif strconcat.count('match') == 2:
 
 			a,b = strconcat.split()
@@ -277,6 +280,16 @@ def render_test_template(request,group_id='55ab34ff81fccb4f1d806025', app_id=Non
 								,eval(str(a)), eval(str(b))],
 			should=[Q('match',member_of=GST_FILE1.hits[0].id),Q('match',member_of=GST_PAGE1.hits[0].id) ],
 			must_not=[Q('match', attribute_set__educationaluse ='ebooks')])
+
+			q_images_count = Q('bool', must=[Q('match', attribute_set__educationaluse='images'),eval(str(a)),eval(str(b))])
+			q_audios_count = Q('bool', must=[Q('match', attribute_set__educationaluse='audios'),eval(str(a)),eval(str(b))])
+			q_videos_count = Q('bool', must=[Q('match', attribute_set__educationaluse='videos'),eval(str(a)),eval(str(b))])
+			q_intercatives_count = Q('bool', must=[Q('match', attribute_set__educationaluse='interactives'),eval(str(a)),eval(str(b))])
+			q_applications_count = Q('bool', must=[Q('match', attribute_set__educationaluse='documents'),eval(str(a)),eval(str(b))])
+			q_ebooks_count = Q('bool', must=[Q('match', attribute_set__educationaluse='ebooks'),eval(str(a)),eval(str(b))])
+			q_all_count=  Q('bool', must=[Q('terms',attribute_set__educationaluse=['documents','images','audios','videos','interactives']),eval(str(a)),eval(str(b))])
+
+
 		elif strconcat.count('match') == 3:
 			a,b,c=strconcat.split()
 			a="".join(a)
@@ -290,6 +303,16 @@ def render_test_template(request,group_id='55ab34ff81fccb4f1d806025', app_id=Non
 								,eval(str(a)), eval(str(b)), eval(str(c))],
 			should=[Q('match',member_of=GST_FILE1.hits[0].id),Q('match',member_of=GST_PAGE1.hits[0].id) ],
 			must_not=[Q('match', attribute_set__educationaluse ='ebooks')])
+
+			q_images_count = Q('bool', must=[Q('match', attribute_set__educationaluse='images'),eval(str(a)),eval(str(b)),eval(str(c))])
+			q_audios_count = Q('bool', must=[Q('match', attribute_set__educationaluse='audios'),eval(str(a)),eval(str(b)),eval(str(c))])
+			q_videos_count = Q('bool', must=[Q('match', attribute_set__educationaluse='videos'),eval(str(a)),eval(str(b)),eval(str(c))])
+			q_intercatives_count = Q('bool', must=[Q('match', attribute_set__educationaluse='interactives'),eval(str(a)),eval(str(b)),eval(str(c))])
+			q_applications_count = Q('bool', must=[Q('match', attribute_set__educationaluse='documents'),eval(str(a)),eval(str(b)),eval(str(c))])
+			q_ebooks_count = Q('bool', must=[Q('match', attribute_set__educationaluse='ebooks'),eval(str(a)),eval(str(b)),eval(str(c))])
+			q_all_count=  Q('bool', must=[Q('terms',attribute_set__educationaluse=['documents','images','audios','videos','interactives']),eval(str(a)),eval(str(b)),eval(str(c))])
+
+
 		elif strconcat.count('match') == 4:
 			a,b,c,d=strconcat.split()
 			a="".join(a)
@@ -302,6 +325,17 @@ def render_test_template(request,group_id='55ab34ff81fccb4f1d806025', app_id=Non
 								,eval(str(a)), eval(str(b)), eval(str(c)), eval(str(d))],
 			should=[Q('match',member_of=GST_FILE1.hits[0].id),Q('match',member_of=GST_PAGE1.hits[0].id) ],
 			must_not=[Q('match', attribute_set__educationaluse ='ebooks')])
+
+			q_images_count = Q('bool', must=[Q('match', attribute_set__educationaluse='images'),eval(str(a)),eval(str(b)),eval(str(c)),eval(str(d))])
+			q_audios_count = Q('bool', must=[Q('match', attribute_set__educationaluse='audios'),eval(str(a)),eval(str(b)),eval(str(c)),eval(str(d))])
+			q_videos_count = Q('bool', must=[Q('match', attribute_set__educationaluse='videos'),eval(str(a)),eval(str(b)),eval(str(c)),eval(str(d))])
+			q_intercatives_count = Q('bool', must=[Q('match', attribute_set__educationaluse='interactives'),eval(str(a)),eval(str(b)),eval(str(c)),eval(str(d))])
+			q_applications_count = Q('bool', must=[Q('match', attribute_set__educationaluse='documents'),eval(str(a)),eval(str(b)),eval(str(c)),eval(str(d))])
+			q_ebooks_count = Q('bool', must=[Q('match', attribute_set__educationaluse='ebooks'),eval(str(a)),eval(str(b)),eval(str(c)),eval(str(d))])
+			q_all_count=  Q('bool', must=[Q('terms',attribute_set__educationaluse=['documents','images','audios','videos','interactives']),eval(str(a)),eval(str(b)),eval(str(c)),eval(str(d))])
+
+
+
 		elif strconcat.count('match') == 5:
 			a,b,c=strconcat.split()
 			a="".join(a)
@@ -316,6 +350,16 @@ def render_test_template(request,group_id='55ab34ff81fccb4f1d806025', app_id=Non
 								,eval(str(a)), eval(str(b)), eval(str(c)), eval(str(d)), eval(str(e))],
 			should=[Q('match',member_of=GST_FILE1.hits[0].id),Q('match',member_of=GST_PAGE1.hits[0].id) ],
 			must_not=[Q('match', attribute_set__educationaluse ='ebooks')])
+
+			q_images_count = Q('bool', must=[Q('match', attribute_set__educationaluse='images'),eval(str(a)),eval(str(b)),eval(str(c)),eval(str(d)),eval(str(e))])
+			q_audios_count = Q('bool', must=[Q('match', attribute_set__educationaluse='audios'),eval(str(a)),eval(str(b)),eval(str(c)),eval(str(d)),eval(str(e))])
+			q_videos_count = Q('bool', must=[Q('match', attribute_set__educationaluse='videos'),eval(str(a)),eval(str(b)),eval(str(c)),eval(str(d)),eval(str(e))])
+			q_intercatives_count = Q('bool', must=[Q('match', attribute_set__educationaluse='interactives'),eval(str(a)),eval(str(b)),eval(str(c)),eval(str(d)),eval(str(e))])
+			q_applications_count = Q('bool', must=[Q('match', attribute_set__educationaluse='documents'),eval(str(a)),eval(str(b)),eval(str(c)),eval(str(d)),eval(str(e))])
+			q_ebooks_count = Q('bool', must=[Q('match', attribute_set__educationaluse='ebooks'),eval(str(a)),eval(str(b)),eval(str(c)),eval(str(d)),eval(str(e))])
+			q_all_count=  Q('bool', must=[Q('terms',attribute_set__educationaluse=['documents','images','audios','videos','interactives']),eval(str(a)),eval(str(b)),eval(str(c)),eval(str(d)),eval(str(e))])
+
+
 
 	else:
 		q = Q('bool', must=[Q('match', group_set=str(group_id)), Q('match',access_policy='public'),Q('match',member_of=GST_FILE1.hits[0].id)],
@@ -360,31 +404,28 @@ def render_test_template(request,group_id='55ab34ff81fccb4f1d806025', app_id=Non
     #                    "query":   {"bool":{"must":  [ {"term":  {"status":"published"}  }]  }}})
 	#all_count =   es.search(index="gsystem", doc_type="images,audios,videos,application", body={
     #                    "query":   {"bool":{"must":  [ {"term":  {"status":"published"}  }]  }}})
+	temp111 = ""
+	if selfilters in (None,'',""):
+		q_images_count = Q('bool', must=[Q('match', attribute_set__educationaluse='images')])
+		q_audios_count = Q('bool', must=[Q('match', attribute_set__educationaluse='audios')])
+		q_videos_count = Q('bool', must=[Q('match', attribute_set__educationaluse='videos')])
+		q_intercatives_count = Q('bool', must=[Q('match', attribute_set__educationaluse='interactives')])
+		q_applications_count = Q('bool', must=[Q('match', attribute_set__educationaluse='documents')])
+		q_ebooks_count = Q('bool', must=[Q('match', attribute_set__educationaluse='ebooks')])
+		q_all_count=  Q('bool', must=[Q('terms',attribute_set__educationaluse=['documents','images','audios','videos','interactives'])])
 
-	q = Q('bool', must=[Q('match', attribute_set__educationaluse='images')])
-	images_count =Search(using=es, index="nodes",doc_type="gsystemtype,gsystem,metatype,relationtype,attribute_type,group,author").query(q)
-
-	q = Q('bool', must=[Q('match', attribute_set__educationaluse='audios')])
-	audios_count =Search(using=es, index="nodes",doc_type="gsystemtype,gsystem,metatype,relationtype,attribute_type,group,author").query(q)
-
-	q = Q('bool', must=[Q('match', attribute_set__educationaluse='videos')])
-	videos_count =Search(using=es, index="nodes",doc_type="gsystemtype,gsystem,metatype,relationtype,attribute_type,group,author").query(q)
-
-	q = Q('bool', must=[Q('match', attribute_set__educationaluse='interactives')])
-	intercatives_count =Search(using=es, index="nodes",doc_type="gsystemtype,gsystem,metatype,relationtype,attribute_type,group,author").query(q)
-
-	q = Q('bool', must=[Q('match', attribute_set__educationaluse='documents')])
-	applications_count =Search(using=es, index="nodes",doc_type="gsystemtype,gsystem,metatype,relationtype,attribute_type,group,author").query(q)
-
-	q = Q('bool', must=[Q('match', attribute_set__educationaluse='ebooks')])
-	ebooks_count =Search(using=es, index="nodes",doc_type="gsystemtype,gsystem,metatype,relationtype,attribute_type,group,author").query(q)
-
-
+	images_count =Search(using=es, index="nodes",doc_type="gsystemtype,gsystem,metatype,relationtype,attribute_type,group,author").query(q_images_count)
+	audios_count =Search(using=es, index="nodes",doc_type="gsystemtype,gsystem,metatype,relationtype,attribute_type,group,author").query(q_audios_count)
+	videos_count =Search(using=es, index="nodes",doc_type="gsystemtype,gsystem,metatype,relationtype,attribute_type,group,author").query(q_videos_count)
+	intercatives_count =Search(using=es, index="nodes",doc_type="gsystemtype,gsystem,metatype,relationtype,attribute_type,group,author").query(q_intercatives_count)
+	applications_count =Search(using=es, index="nodes",doc_type="gsystemtype,gsystem,metatype,relationtype,attribute_type,group,author").query(q_applications_count)
+	ebooks_count =Search(using=es, index="nodes",doc_type="gsystemtype,gsystem,metatype,relationtype,attribute_type,group,author").query(q_ebooks_count)
+	all_count =Search(using=es, index="nodes",doc_type="gsystemtype,gsystem,metatype,relationtype,attribute_type,group,author").query(q_all_count)
 	#q = Q('bool', should=[Q('match', attribute_set__educationaluse='images'),Q('match', attribute_set__educationaluse='videos'),
 	#	Q('match', attribute_set__educationaluse='audios'),Q('match', attribute_set__educationaluse='documents'),
 	#	Q('match', attribute_set__educationaluse='interactives')])
-	q=  Q('bool', must=[Q('terms',attribute_set__educationaluse=['documents','images','audios','videos','interactives'])])
-	all_count =Search(using=es, index="nodes",doc_type="gsystemtype,gsystem,metatype,relationtype,attribute_type,group,author").query(q)
+	
+	
 
 	#print all_count.to_dict()
 	educationaluse_stats = {}
@@ -483,7 +524,7 @@ def render_test_template(request,group_id='55ab34ff81fccb4f1d806025', app_id=Non
 
 	#collection_pages_cur1_temp = [doc['_source'] for doc in collection_pages_cur1['hits']['hits']]
 
-	#collection_pages = paginator.Paginator(collection_pages_cur, page_no, no_of_objs_pp)
+	#results = paginator.Paginator(collection_pages_cur, page_no, no_of_objs_pp)
 	datavisual.append({"name":"Doc", "count": educationaluse_stats.get("Documents", 0)})
 	datavisual.append({"name":"Page", "count": educationaluse_stats.get("Pages", 0)})
 	datavisual.append({"name":"Image","count": educationaluse_stats.get("Images", 0)})
@@ -550,6 +591,8 @@ def elib_paged_file_objects(request, group_id, filetype, page_no=1):
 		filters = json.loads(filters)
 		filters = get_filter_querydict(filters)
 
+		print filters
+		print "0000000000000000000000000000000000000000000"
 		query_dict = filters
 
 		selfilters = urllib.unquote(request.GET.get('selfilters', ''))
@@ -558,7 +601,6 @@ def elib_paged_file_objects(request, group_id, filetype, page_no=1):
 			query_dict = get_filter_querydict(selfilters)
 
 		#query_dict.append({'attribute_set.educationaluse': {'$ne': u'eBooks'}})
-
 		i=-1
 
 		strconcat=""
@@ -657,8 +699,10 @@ def elib_paged_file_objects(request, group_id, filetype, page_no=1):
 
 			filetype = str(filetype)
 
-			if selfilters:
+			if filters:
+
 				if strconcat.count('match') == 1:
+
 					a=strconcat.split()
 					a="".join(a)
 					print a
@@ -754,11 +798,12 @@ def elib_paged_file_objects(request, group_id, filetype, page_no=1):
 		
 		else:
 			print "else execute"
-			if selfilters:
+			if filters:
 				if strconcat.count('match') == 1:
 					a=strconcat.split()
 					a="".join(a)
 					print a
+					print "```````````````````````````````````````"
 					q = Q('bool', must=[Q('match', group_set=str(group_id)), Q('match',member_of=GST_FILE1.hits[0].id) ,Q('terms',attribute_set__educationaluse=['documents','images','audios','videos']), eval(str(a))],
 					must_not=[Q('match', attribute_set__educationaluse ='ebooks')])
 
@@ -843,6 +888,7 @@ def elib_paged_file_objects(request, group_id, filetype, page_no=1):
 				files1=files1[temp:temp+24]
 			#filetype = [ "images","videos","documents","audios"]
 			print files1.count()
+			
 
 			#files1  = es.search(index="gsystem", doc_type="image,video,audio,application", body={
             #            "query":   {"bool": { "must":[ {"terms":  {"group_set": str(ObjectId(group_id))}  } ],
@@ -865,7 +911,7 @@ def elib_paged_file_objects(request, group_id, filetype, page_no=1):
 
 		educationaluse_stats = {}
 
-		if files1 and filetype != "Collections":# and not result_pages:
+		if files1:# and not result_pages:
 			# print "=======", educationaluse_stats
 			
 			eu_list = []  # count
