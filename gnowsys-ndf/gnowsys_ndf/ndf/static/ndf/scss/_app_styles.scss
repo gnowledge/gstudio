@@ -530,7 +530,7 @@ body>footer {
     .footer_link_cont {
       display: inline-block;
       vertical-align: top;
-      margin: 20px;
+      /*margin: 20px;*/
       text-align: left;
 
       .links_show {
@@ -549,7 +549,11 @@ body>footer {
 
   }
 }
+body > footer ul#footerlogo li
+{
 
+  display:inline;
+}
 .coll-arrows {
     cursor:pointer;
     display: block;

@@ -1,0 +1,490 @@
+[
+    {
+        "attribute_type_set": "[]", 
+        "name": "Place", 
+        "member_of": "[\"factory_types\"]", 
+        "collection_set": "[]", 
+        "relation_type_set": "[]", 
+        "type_of": "[]"
+    }, 
+    {
+        "attribute_type_set": "[]", 
+        "name": "Country", 
+        "member_of": "[\"factory_types\"]", 
+        "collection_set": "[]", 
+        "relation_type_set": "[]", 
+        "type_of": "[\"Place\"]"
+    }, 
+    {
+        "attribute_type_set": "[\"state_code\"]", 
+        "name": "State", 
+        "member_of": "[\"factory_types\"]", 
+        "collection_set": "[]", 
+        "relation_type_set": "[]", 
+        "type_of": "[\"Place\"]"
+    }, 
+    {
+        "attribute_type_set": "[]", 
+        "name": "District", 
+        "member_of": "[\"factory_types\"]", 
+        "collection_set": "[]", 
+        "relation_type_set": "[\"district_of\"]", 
+        "type_of": "[\"Place\"]"
+    }, 
+    {
+        "attribute_type_set": "[]", 
+        "name": "Organization", 
+        "member_of": "[\"factory_types\"]", 
+        "collection_set": "[]", 
+        "relation_type_set": "[]", 
+        "type_of": "[]"
+    }, 
+    {
+        "attribute_type_set": "[\"house_street\", \"village\", \"taluka\", \"town_city\", \"pin_code\"]", 
+        "name": "University", 
+        "member_of": "[\"factory_types\"]", 
+        "collection_set": "[]", 
+        "relation_type_set": "[\"organization_belongs_to_district\", \"organization_belongs_to_state\", \"organization_belongs_to_country\", \"affiliated_college\"]", 
+        "type_of": "[\"Organization\"]"
+    }, 
+    {
+        "attribute_type_set": "[\"enrollment_code\", \"house_street\", \"village\", \"taluka\", \"town_city\", \"pin_code\"]", 
+        "name": "College", 
+        "member_of": "[\"factory_types\"]", 
+        "collection_set": "[]", 
+        "relation_type_set": "[\"organization_belongs_to_district\", \"organization_belongs_to_state\", \"organization_belongs_to_country\"]", 
+        "type_of": "[\"Organization\"]"
+    }, 
+    {
+        "attribute_type_set": "[\"nussd_course_type\"]", 
+        "name": "NUSSD Course", 
+        "member_of": "[\"factory_types\"]", 
+        "collection_set": "[]", 
+        "relation_type_set": "[]", 
+        "type_of": "[\"Course\"]"
+    }, 
+    {
+        "attribute_type_set": "[\"nussd_course_type\", \"start_time\", \"end_time\", \"ann_course_closure\"]", 
+        "name": "Announced Course", 
+        "member_of": "[\"factory_types\"]", 
+        "collection_set": "[]", 
+        "relation_type_set": "[\"announced_for\", \"acourse_for_college\"]", 
+        "type_of": "[\"Course\"]"
+    }, 
+    {
+        "attribute_type_set": "[]", 
+        "name": "Caste", 
+        "member_of": "[\"factory_types\"]", 
+        "collection_set": "[]", 
+        "relation_type_set": "[]", 
+        "type_of": "[]"
+    }, 
+    {
+        "attribute_type_set": "[]", 
+        "name": "Person", 
+        "member_of": "[\"factory_types\"]", 
+        "collection_set": "[]", 
+        "relation_type_set": "[]", 
+        "type_of": "[]"
+    }, 
+    {
+        "attribute_type_set": "[\"first_name\", \"middle_name\", \"last_name\", \"dob\", \"gender\", \"religion\", \"email_id\", \"languages_known\", \"signature\", \"user_photo\", \"mobile_number\", \"alternate_number\", \"house_street\", \"village\", \"taluka\", \"town_city\", \"pin_code\", \"12_passing_year\", \"12_passing_certificate\", \"degree_name\", \"degree_specialization\", \"degree_year\", \"college_enroll_num\", \"registration_date\", \"is_nss_registered\", \"attendance_record\", \"performance_record\", \"cumulative_performance_report\", \"course_enrollment_status\", \"enrollment_code\",\"aadhar_id\"]", 
+        "name": "Student", 
+        "member_of": "[\"factory_types\"]", 
+        "collection_set": "[]", 
+        "relation_type_set": "[\"student_of_caste_category\", \"person_belongs_to_state\", \"person_belongs_to_district\", \"student_belongs_to_university\", \"student_belongs_to_college\", \"selected_course\"]", 
+        "type_of": "[\"Person\"]"
+    }, 
+    {
+        "attribute_type_set": "[\"first_name\", \"middle_name\", \"last_name\", \"gender\", \"dob\", \"religion\", \"email_id\", \"languages_known\", \"signature\", \"user_photo\", \"mobile_number\", \"alternate_number\", \"house_street\", \"village\", \"taluka\", \"town_city\", \"pin_code\", \"degree_name\", \"degree_specialization\", \"degree_passing_year\", \"other_qualifications\", \"voln_tr_qualifications\", \"key_skills\", \"profession\", \"designation\", \"work_exp\"]", 
+        "name": "Voluntary Teacher", 
+        "member_of": "[\"factory_types\"]", 
+        "collection_set": "[]", 
+        "relation_type_set": "[\"person_belongs_to_state\", \"person_belongs_to_district\", \"trainer_teaches_course_in_college\"]", 
+        "type_of": "[\"Person\"]"
+    }, 
+    {
+        "attribute_type_set": "[\"first_name\", \"middle_name\", \"last_name\", \"gender\", \"dob\", \"religion\", \"email_id\", \"languages_known\", \"signature\", \"user_photo\", \"mobile_number\", \"alternate_number\", \"house_street\", \"village\", \"taluka\", \"town_city\", \"pin_code\", \"degree_name\", \"degree_specialization\", \"degree_passing_year\", \"other_qualifications\", \"mast_tr_qualifications\"]", 
+        "name": "Master Trainer", 
+        "member_of": "[\"factory_types\"]", 
+        "collection_set": "[]", 
+        "relation_type_set": "[\"person_belongs_to_state\", \"person_belongs_to_district\", \"master_trainer_of_course\", \"master_trainer_of_university\"]", 
+        "type_of": "[\"Person\"]"
+    }, 
+    {
+        "attribute_type_set": "[\"first_name\", \"middle_name\", \"last_name\", \"gender\", \"dob\", \"religion\", \"languages_known\", \"mobile_number\", \"alternate_number\", \"email_id\", \"house_street\", \"village\", \"taluka\", \"town_city\", \"pin_code\", \"degree_name\", \"degree_specialization\", \"degree_passing_year\", \"other_qualifications\"]", 
+        "name": "Faculty Coordinator", 
+        "member_of": "[\"factory_types\"]", 
+        "collection_set": "[]", 
+        "relation_type_set": "[\"person_belongs_to_district\", \"person_belongs_to_state\", \"person_belongs_to_country\", \"faculty_incharge_of_university\", \"faculty_incharge_of_college\"]", 
+        "type_of": "[\"Person\"]"
+    }, 
+    {
+        "attribute_type_set": "[\"first_name\", \"middle_name\", \"last_name\", \"gender\", \"dob\", \"religion\", \"languages_known\", \"mobile_number\", \"alternate_number\", \"email_id\", \"house_street\", \"village\", \"taluka\", \"town_city\", \"pin_code\", \"degree_name\", \"degree_specialization\", \"degree_passing_year\", \"other_qualifications\"]", 
+        "name": "NSS Coordinator", 
+        "member_of": "[\"factory_types\"]", 
+        "collection_set": "[]", 
+        "relation_type_set": "[\"person_belongs_to_district\", \"person_belongs_to_state\", \"person_belongs_to_country\"]", 
+        "type_of": "[\"Person\"]"
+    }, 
+    {
+        "attribute_type_set": "[\"first_name\", \"middle_name\", \"last_name\", \"gender\", \"dob\", \"religion\", \"languages_known\", \"mobile_number\", \"alternate_number\", \"email_id\", \"house_street\", \"village\", \"taluka\", \"town_city\", \"pin_code\", \"degree_name\", \"degree_specialization\", \"degree_passing_year\", \"other_qualifications\"]", 
+        "name": "Course Developer", 
+        "member_of": "[\"factory_types\"]", 
+        "collection_set": "[]", 
+        "relation_type_set": "[\"person_belongs_to_district\", \"person_belongs_to_state\", \"person_belongs_to_country\", \"developer_of_course\"]", 
+        "type_of": "[\"Person\"]"
+    }, 
+    {
+        "attribute_type_set": "[\"first_name\", \"middle_name\", \"last_name\", \"gender\", \"dob\", \"religion\", \"languages_known\", \"mobile_number\", \"alternate_number\", \"email_id\", \"house_street\", \"village\", \"taluka\", \"town_city\", \"pin_code\", \"degree_name\", \"degree_specialization\", \"degree_passing_year\", \"other_qualifications\"]", 
+        "name": "Steering Committee Member", 
+        "member_of": "[\"factory_types\"]", 
+        "collection_set": "[\"Organization\", \"University\", \"College\", \"Course\", \"NUSSD Course\", \"Announced Course\", \"Person\", \"Partners\", \"Program Manager\", \"Steering Committee Member\", \"Faculty Coordinator\", \"Program Officer\", \"NSS Coordinator\", \"Course Developer\", \"Master Trainer\", \"Voluntary Teacher\", \"Student\", \"Enrollment\", \"StudentCourseEnrollment\"]", 
+        "relation_type_set": "[\"person_belongs_to_district\", \"person_belongs_to_state\", \"person_belongs_to_country\"]", 
+        "type_of": "[\"Person\"]"
+    }, 
+    {
+        "attribute_type_set": "[\"first_name\", \"middle_name\", \"last_name\", \"gender\", \"dob\", \"religion\", \"languages_known\", \"mobile_number\", \"alternate_number\", \"email_id\", \"house_street\", \"village\", \"taluka\", \"town_city\", \"pin_code\", \"degree_name\", \"degree_specialization\", \"degree_passing_year\", \"other_qualifications\"]", 
+        "name": "Program Officer", 
+        "member_of": "[\"factory_types\"]", 
+        "collection_set": "[\"Person\", \"Student\", \"Enrollment\", \"StudentCourseEnrollment\"]", 
+        "relation_type_set": "[\"person_belongs_to_district\", \"person_belongs_to_state\", \"person_belongs_to_country\", \"officer_incharge_of\"]", 
+        "type_of": "[\"Person\"]"
+    }, 
+    {
+        "attribute_type_set": "[\"first_name\", \"middle_name\", \"last_name\", \"gender\", \"dob\", \"religion\", \"languages_known\", \"mobile_number\", \"alternate_number\", \"email_id\", \"house_street\", \"village\", \"taluka\", \"town_city\", \"pin_code\", \"degree_name\", \"degree_specialization\", \"degree_passing_year\", \"other_qualifications\"]", 
+        "name": "Program Manager", 
+        "member_of": "[\"factory_types\"]", 
+        "collection_set": "[]", 
+        "relation_type_set": "[\"person_belongs_to_district\", \"person_belongs_to_state\", \"person_belongs_to_country\"]", 
+        "type_of": "[\"Person\"]"
+    }, 
+    {
+        "attribute_type_set": "[\"first_name\", \"middle_name\", \"last_name\", \"gender\", \"dob\", \"religion\", \"languages_known\", \"mobile_number\", \"alternate_number\", \"email_id\", \"house_street\", \"village\", \"taluka\", \"town_city\", \"pin_code\", \"degree_name\", \"degree_specialization\", \"degree_passing_year\", \"other_qualifications\"]", 
+        "name": "Partners", 
+        "member_of": "[\"factory_types\"]", 
+        "collection_set": "[]", 
+        "relation_type_set": "[\"person_belongs_to_district\", \"person_belongs_to_state\", \"person_belongs_to_country\"]", 
+        "type_of": "[\"Person\"]"
+    }, 
+    {
+        "attribute_type_set": "[\"start_time\", \"end_time\", \"event_status\",\"is_bigbluebutton\", \"open_event\"]", 
+        "name": "Event", 
+        "member_of": "[\"GAPP\"]", 
+        "collection_set": "[]", 
+        "relation_type_set": "[\"event_organised_by\", \"event_coordinator\", \"has_attendees\", \"has_attended\"]", 
+        "type_of": "[]"
+    }, 
+    {
+        "attribute_type_set": "[\"start_time\", \"end_time\"]", 
+        "name": "Inauguration", 
+        "member_of": "[\"factory_types\"]", 
+        "collection_set": "[]", 
+        "relation_type_set": "[\"event_organised_by\", \"event_coordinator\", \"has_attendees\", \"has_attended\"]", 
+        "type_of": "[\"Event\"]"
+    }, 
+    {
+        "attribute_type_set": "[\"start_time\", \"end_time\"]", 
+        "name": "Field Visit", 
+        "member_of": "[\"factory_types\"]", 
+        "collection_set": "[]", 
+        "relation_type_set": "[\"event_organised_by\", \"event_coordinator\", \"has_attendees\", \"has_attended\"]", 
+        "type_of": "[\"Event\"]"
+    }, 
+    {
+        "attribute_type_set": "[\"start_time\", \"end_time\"]", 
+        "name": "Meeting", 
+        "member_of": "[\"factory_types\"]", 
+        "collection_set": "[]", 
+        "relation_type_set": "[\"event_organised_by\", \"event_coordinator\", \"has_attendees\", \"has_attended\"]", 
+        "type_of": "[\"Event\"]"
+    }, 
+    {
+        "attribute_type_set": "[\"start_time\", \"end_time\"]", 
+        "name": "Orientation", 
+        "member_of": "[\"factory_types\"]", 
+        "collection_set": "[]", 
+        "relation_type_set": "[\"event_organised_by\", \"event_coordinator\", \"has_attendees\", \"has_attended\"]", 
+        "type_of": "[\"Event\"]"
+    }, 
+    {
+        "attribute_type_set": "[\"start_time\", \"end_time\"]", 
+        "name": "Master Trainer Program", 
+        "member_of": "[\"factory_types\"]", 
+        "collection_set": "[]", 
+        "relation_type_set": "[\"event_organised_by\", \"event_coordinator\", \"has_attendees\", \"has_attended\"]", 
+        "type_of": "[\"Event\"]"
+    }, 
+    {
+        "attribute_type_set": "[\"start_time\", \"end_time\"]", 
+        "name": "Training of Teachers", 
+        "member_of": "[\"factory_types\"]", 
+        "collection_set": "[]", 
+        "relation_type_set": "[\"event_organised_by\", \"event_coordinator\", \"has_attendees\", \"has_attended\"]", 
+        "type_of": "[\"Event\"]"
+    }, 
+    {
+        "attribute_type_set": "[\"start_time\", \"end_time\"]", 
+        "name": "Course Developers Meeting", 
+        "member_of": "[\"factory_types\"]", 
+        "collection_set": "[]", 
+        "relation_type_set": "[\"event_organised_by\", \"event_coordinator\", \"has_attendees\", \"has_attended\"]", 
+        "type_of": "[\"Event\"]"
+    }, 
+    {
+        "attribute_type_set": "[\"start_time\", \"end_time\"]", 
+        "name": "Session", 
+        "member_of": "[\"factory_types\"]", 
+        "collection_set": "[]", 
+        "relation_type_set": "[\"event_organised_by\", \"event_coordinator\", \"has_attendees\", \"has_attended\"]", 
+        "type_of": "[\"Event\"]"
+    }, 
+    {
+        "attribute_type_set": "[\"nussd_course_type\", \"start_time\", \"end_time\", \"reschedule_attendance\", \"marks_entry_completed\", \"event_edit_reschedule\", \"event_attendance_task\", \"event_date_task\"]", 
+        "name": "Classroom Session", 
+        "member_of": "[\"factory_types\"]", 
+        "collection_set": "[]", 
+        "relation_type_set": "[\"event_organised_by\", \"event_coordinator\", \"has_attendees\", \"has_attended\", \"event_has_batch\", \"session_of\"]", 
+        "type_of": "[\"Event\"]"
+    }, 
+    {
+        "attribute_type_set": "[\"start_time\", \"end_time\"]", 
+        "name": "Lab Session", 
+        "member_of": "[\"factory_types\"]", 
+        "collection_set": "[]", 
+        "relation_type_set": "[\"event_organised_by\", \"event_coordinator\", \"has_attendees\", \"has_attended\"]", 
+        "type_of": "[\"Event\"]"
+    }, 
+    {
+        "attribute_type_set": "[\"nussd_course_type\", \"start_time\", \"end_time\", \"reschedule_attendance\", \"marks_entry_completed\", \"event_edit_reschedule\", \"event_attendance_task\", \"event_date_task\"]", 
+        "name": "Exam", 
+        "member_of": "[\"factory_types\"]", 
+        "collection_set": "[]", 
+        "relation_type_set": "[\"event_organised_by\", \"event_coordinator\", \"has_attendees\", \"has_attended\", \"event_has_batch\", \"session_of\"]", 
+        "type_of": "[\"Event\"]"
+    }, 
+    {
+        "attribute_type_set": "[]", 
+        "name": "Enrollment", 
+        "member_of": "[\"factory_types\"]", 
+        "collection_set": "[]", 
+        "relation_type_set": "[]", 
+        "type_of": "[]"
+    }, 
+    {
+        "attribute_type_set": "[\"nussd_course_type\", \"start_enroll\", \"end_enroll\", \"enrollment_status\", \"has_enrollment_task\", \"has_approval_task\"]", 
+        "name": "StudentCourseEnrollment", 
+        "member_of": "[\"factory_types\"]", 
+        "collection_set": "[]", 
+        "relation_type_set": "[\"for_acourse\", \"for_college\", \"for_university\", \"has_current_approval_task\"]", 
+        "type_of": "[\"Enrollment\"]"
+    }, 
+    {
+        "attribute_type_set": "[]", 
+        "name": "MIS", 
+        "member_of": "[\"GAPP\"]", 
+        "collection_set": "[\"Organization\", \"University\", \"College\", \"Course\", \"NUSSD Course\", \"Announced Course\", \"Person\", \"Partners\", \"Program Manager\", \"Steering Committee Member\", \"Faculty Coordinator\", \"Program Officer\", \"NSS Coordinator\", \"Course Developer\", \"Master Trainer\", \"Voluntary Teacher\", \"Student\", \"Enrollment\", \"StudentCourseEnrollment\"]", 
+        "relation_type_set": "[]", 
+        "type_of": "[]"
+    }, 
+    {
+        "attribute_type_set": "[]", 
+        "name": "MIS-PO", 
+        "member_of": "[\"GAPP\"]", 
+        "collection_set": "[\"Person\", \"Voluntary Teacher\", \"Student\"]", 
+        "relation_type_set": "[]", 
+        "type_of": "[]"
+    }, 
+    {
+        "attribute_type_set": "[]", 
+        "name": "CourseSection", 
+        "member_of": "[\"factory_types\"]", 
+        "collection_set": "[]", 
+        "relation_type_set": "[]", 
+        "type_of": "[]"
+    }, 
+    {
+        "attribute_type_set": "[\"course_structure_minutes\", \"course_structure_assignment\", \"course_structure_assessment\", \"min_marks\", \"max_marks\"]", 
+        "name": "CourseSubSection", 
+        "member_of": "[\"factory_types\"]", 
+        "collection_set": "[]", 
+        "relation_type_set": "[]", 
+        "type_of": "[]"
+    }, 
+    {
+        "attribute_type_set": "[]", 
+        "name": "CourseUnit", 
+        "member_of": "[\"factory_types\"]", 
+        "collection_set": "[]", 
+        "relation_type_set": "[]", 
+        "type_of": "[]"
+    }, 
+    {
+        "attribute_type_set": "[]", 
+        "name": "GListItem", 
+        "member_of": "[\"factory_types\"]", 
+        "collection_set": "[]", 
+        "relation_type_set": "[]", 
+        "type_of": "[]"
+    }, 
+    {
+        "attribute_type_set": "[]", 
+        "name": "CourseSectionEvent", 
+        "member_of": "[\"factory_types\"]", 
+        "collection_set": "[]", 
+        "relation_type_set": "[]", 
+        "type_of": "[]"
+    }, 
+    {
+        "attribute_type_set": "[\"course_structure_minutes\", \"course_structure_assignment\", \"course_structure_assessment\", \"min_marks\", \"max_marks\"]", 
+        "name": "CourseSubSectionEvent", 
+        "member_of": "[\"factory_types\"]", 
+        "collection_set": "[]", 
+        "relation_type_set": "[]", 
+        "type_of": "[]"
+    }, 
+    {
+        "attribute_type_set": "[]", 
+        "name": "CourseUnitEvent", 
+        "member_of": "[\"factory_types\"]", 
+        "collection_set": "[]", 
+        "relation_type_set": "[]", 
+        "type_of": "[]"
+    }, 
+    {
+        "attribute_type_set": "[\"quizitem_show_correct_ans\",\"quizitem_problem_weight\" ,\"quizitem_max_attempts\" ]", 
+        "name": "QuizItemEvent", 
+        "member_of": "[\"factory_types\"]", 
+        "collection_set": "[]", 
+        "relation_type_set": "[\"clone_of\", \"translation_of\"]", 
+        "type_of": "[\"QuizItem\"]"
+    }, 
+    {
+        "attribute_type_set": "[\"quizitempost_user_submitted_ans\", \"quizitempost_user_checked_ans\"]", 
+        "name": "QuizItemPost", 
+        "member_of": "[\"factory_types\"]", 
+        "collection_set": "[]", 
+        "relation_type_set": "[]", 
+        "type_of": "[\"Reply\"]"
+    }, 
+    {
+        "attribute_type_set": "[]", 
+        "name": "Jhapp", 
+        "member_of": "[\"factory_types\"]", 
+        "collection_set": "[]", 
+        "relation_type_set": "[]", 
+        "type_of": "[]"
+    }, 
+    {
+        "attribute_type_set": "[]", 
+        "name": "Jsmol", 
+        "member_of": "[\"factory_types\"]", 
+        "collection_set": "[]", 
+        "relation_type_set": "[]", 
+        "type_of": "[\"Jhapp\"]"
+    }, 
+    {
+        "attribute_type_set": "[]", 
+        "name": "TurtleBlocks", 
+        "member_of": "[\"factory_types\"]", 
+        "collection_set": "[]", 
+        "relation_type_set": "[]", 
+        "type_of": "[\"Jhapp\"]"
+    }, 
+    {
+        "attribute_type_set": "[]", 
+        "name": "Asset", 
+        "member_of": "[\"factory_types\"]", 
+        "collection_set": "[]", 
+        "relation_type_set": "[\"has_assetcontent\"]", 
+        "type_of": "[]"
+    }, 
+    {
+        "attribute_type_set": "[]", 
+        "name": "PoliceSquad", 
+        "member_of": "[\"factory_types\"]", 
+        "collection_set": "[]", 
+        "relation_type_set": "[]", 
+        "type_of": "[\"Jhapp\"]"
+    }, 
+    {
+        "attribute_type_set": "[]", 
+        "name": "OpenStoryTool", 
+        "member_of": "[\"factory_types\"]", 
+        "collection_set": "[]", 
+        "relation_type_set": "[]", 
+        "type_of": "[\"Jhapp\"]"
+    }, 
+    {
+        "attribute_type_set": "[]", 
+        "name": "BioMechanics", 
+        "member_of": "[\"factory_types\"]", 
+        "collection_set": "[]", 
+        "relation_type_set": "[]", 
+        "type_of": "[\"Jhapp\"]"
+    }, 
+    {
+        "attribute_type_set": "[]", 
+        "name": "Template", 
+        "member_of": "[\"factory_types\"]", 
+        "collection_set": "[]", 
+        "relation_type_set": "[]", 
+        "type_of": "[\"Page\"]"
+    }, 
+    {
+        "attribute_type_set": "[\"educationalsubject\", \"educationallevel\",  \"assessment_list\"]", 
+        "name": "base_unit", 
+        "member_of": "[\"factory_types\"]", 
+        "collection_set": "[]", 
+        "relation_type_set": "[]", 
+        "type_of": "[]"
+    }, 
+    {
+        "attribute_type_set": "[]", 
+        "name": "lesson", 
+        "member_of": "[\"factory_types\"]", 
+        "collection_set": "[]", 
+        "relation_type_set": "[]", 
+        "type_of": "[]"
+    }, 
+    {
+        "attribute_type_set": "[]", 
+        "name": "activity", 
+        "member_of": "[\"factory_types\"]", 
+        "collection_set": "[]", 
+        "relation_type_set": "[]", 
+        "type_of": "[]"
+    }, 
+    {
+        "attribute_type_set": "[\"educationalsubject\", \"educationallevel\", \"start_time\", \"end_time\", \"start_enroll\", \"end_enroll\", \"assessment_list\", \"total_assessment_items\"]", 
+        "name": "announced_unit", 
+        "member_of": "[\"factory_types\"]", 
+        "collection_set": "[]", 
+        "relation_type_set": "[]", 
+        "type_of": "[]"
+    }, 
+    {
+        "attribute_type_set": "[\"options\"]", 
+        "name": "trans_node", 
+        "member_of": "[\"factory_types\"]", 
+        "collection_set": "[]", 
+        "relation_type_set": "[]", 
+        "type_of": "[]"
+    }, 
+    {
+        "attribute_type_set": "[]", 
+        "name": "base_survey", 
+        "member_of": "[\"factory_types\"]", 
+        "collection_set": "[]", 
+        "relation_type_set": "[]", 
+        "type_of": "[]"
+    }, 
+    {
+        "attribute_type_set": "[\"start_time\", \"end_time\", \"start_enroll\", \"end_enroll\"]", 
+        "name": "announced_survey", 
+        "member_of": "[\"factory_types\"]", 
+        "collection_set": "[]", 
+        "relation_type_set": "[]", 
+        "type_of": "[]"
+    }
+]

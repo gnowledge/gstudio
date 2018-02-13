@@ -8,6 +8,8 @@
   {% get_explore_url as explore_url %}
 
   {% if site.SITE_NAME != "NROER" %}
+
+
   <div id="feedsModal" class="reveal-modal medium alert-box radius" data-reveal data-alert>
     <p id="feedsModalLabel"></p>
     <div class="row feeds_proceed">
@@ -22,6 +24,9 @@
     <a class="close-reveal-modal">&#215;</a>
   </div>
   {% endif %}
+    
+  {% include "ndf/toolbar.html" %} 
+  
 
 <div class="nroer_header">
 
@@ -33,6 +38,7 @@
       <img src="{{site.LOGO}}">
     </a> #}-->
     {% endcache %}
+
 
     <!-- two menus headers -->
     {# <div class="large-12 small-7 medium-7 columns two-nav-container"> #}
@@ -46,6 +52,7 @@
               <img  title="{{site.SITE_NAME}}" src="{{site.LOGO}}">
             </a></h1>
           </li>
+
           <!-- Remove the class "menu-icon" to get rid of menu icon. Take out "Menu" to just have icon alone -->
           <li class="toggle-topbar menu-icon"><a href="#"><span>{% trans "Menu" %}</span></a></li>
         </ul>
@@ -639,3 +646,7 @@
 </script>
 
 {% endif %}
+
+
+
+<!-- ****** toolbar script   ****** -->
