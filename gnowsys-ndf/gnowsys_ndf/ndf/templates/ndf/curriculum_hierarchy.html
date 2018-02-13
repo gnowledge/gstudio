@@ -6,7 +6,7 @@
 {% block body_content %}
         {% check_is_gstaff group_id request.user as is_gstaff %} 
         {% if curriculum_obj %}
-
+            {% get_relation_value asset_obj.pk "teaches"  as selected_topic %}
         <div class="curriculum-name-desc" >
             <div class="curriculum_listing">
                 <div class="curriculum_content">
@@ -92,7 +92,19 @@
                     <input type="checkbox"  class="topic-checkbox" name="isLeafNode" value="leafNode"/>
                 </label>
                 <br />
-
+                    choose topic :
+                        <select name="topics" id = "topic_list" multiple style="height:100px">
+                                <option value="">--- Select Topic ---</option>
+                                {% for each in topic_nodes %}
+                                 {% if each.pk == selected_topic.grel_node.0.pk %}
+                                    <option selected value="{{ each.pk }}" data-topic="{{ each.pk }}">
+                                        {{each.name}}
+                                {% else %}
+                                    <option value="{{ each.pk }}" data-topic="{{ each.pk }}">
+                                        {{each.name}}
+                                {%  endif %}
+                                {% endfor %}
+                        </select>
                 <br />
                 <button type="button" class="button-hollow-grey create_division">
                     Add
@@ -100,6 +112,7 @@
                 <button type="button" class="button-hollow-grey delete_division" style="display: none;">
                     Delete
                 </button>
+
             </div>
 
                <div class="subsection-view-area">
@@ -431,6 +444,12 @@
                 sel_row = $(".jqtree-selected").parent().parent().attr("id");
                 var checked = $('.topic-checkbox:checked').length;
                 topic_checked = "False"
+                topic_arr = []
+
+                $('#topic_list :selected').each(function(){
+                    topic_arr.push($(this).val())
+                });
+                sel_topic_list =  $('#topic_list').find(':selected').val();
                 if(checked > 0){
                     topic_checked = "True"
                 }
@@ -442,7 +461,8 @@
                                 'context_theme':"{{curriculum_obj.pk}}",
                                 'parent_id':sel_row,
                                 'is_topic':topic_checked,
-                                'existing_id':existing_id
+                                'existing_id':existing_id,
+                                'topic_list':sel_topic_list,
                             },
                           url: "{% url 'add_theme_item' group_id  %}",
                           datatype: "html",
