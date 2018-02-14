@@ -60,11 +60,15 @@ def quiz(request, group_id):
     group_name = group_obj.name
     title = gst_quiz.name
     quiz_nodes = node_collection.find({'member_of': gst_quiz._id, 'group_set': ObjectId(group_id)}).sort('last_update', -1)
-    gst_quiz_item_ids = [gst_quiz_item._id]
-    if "CourseEventGroup" in group_obj.member_of_names_list or "announced_unit" in group_obj.member_of_names_list:
-        gst_quiz_item_ids = [gst_quiz_item_event._id]
-    quiz_item_nodes = node_collection.find({'member_of': {'$in': gst_quiz_item_ids},
+    # gst_quiz_item_ids = [gst_quiz_item._id]
+    quiz_item_nodes = node_collection.find({'member_of': gst_quiz_item._id,
      'group_set': ObjectId(group_id)}).sort('last_update', -1)
+
+    if "CourseEventGroup" in group_obj.member_of_names_list or "announced_unit" in group_obj.member_of_names_list:
+        # gst_quiz_item_ids = [gst_quiz_item_event._id]
+        if not quiz_item_nodes.count():
+            quiz_item_nodes = node_collection.find({'member_of': gst_quiz_item_event._id,
+             'group_set': ObjectId(group_id)}).sort('last_update', -1)
     supported_languages = ['Hindi', 'Telugu']
 
     print "\nquiz_item_nodes: ", quiz_item_nodes.count()
