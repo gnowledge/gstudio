@@ -145,11 +145,7 @@
               <li>
                 <a href="{% url 'course_about' group_id %}" {% if title == 'about' %}class="selected"{% endif %} tabindex="1" title="Course Summary"><i class="fi-eye"></i> {% trans "About" %} </a> 
               </li>
-              {% if 'Group' in group_object_member_of_names_list %}
-              <li>
-                <a href="{% url 'course_about' group_id %}" {% if title == 'about' %}class="selected"{% endif %} tabindex="1" title="Course Summary"><i class="fi-eye"></i> {% trans "About" %} </a> 
-              </li>
-              {% endif %}
+              
               <li>
 
               <a {% if is_gstaff %} href="{% url 'course_analytics_admin' group_id %}" {% else %} href="{% url 'progress_report' group_id request.user.pk %}" {% endif %}{% if title == 'progress_report' %} class="selected" {% endif %} tabindex="6" title="See how you have done, how many comments have you received." > <i class="fa fa-line-chart"></i> 
