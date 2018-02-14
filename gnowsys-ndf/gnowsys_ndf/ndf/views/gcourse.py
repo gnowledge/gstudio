@@ -3644,7 +3644,6 @@ def course_analytics_admin(request, group_id):
     response_dict['max_points_dict'] = max_points_dict
     context_variables["response_dict"] = json.dumps(response_dict)
     cache.set(cache_key, response_dict, 60*10)
-    print 
     return render_to_response("ndf/lms.html",
                                 context_variables,
                                 context_instance = RequestContext(request)
