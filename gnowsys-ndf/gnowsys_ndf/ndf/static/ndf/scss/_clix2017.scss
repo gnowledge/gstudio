@@ -6193,13 +6193,6 @@ ul.authoring-tab{
 
     }
 
-.scard_footer {
-  border-top: 1px solid rgba(160, 160, 160, 0.2);
-  padding: 0.25rem 0.5rem;
-  color: gray;
-  font-size: small;
-  height: 2rem;
-  }
 
 .auto_width{
     width: auto !important;
@@ -7096,3 +7089,57 @@ ul.authoring-tab{
     }
 }
 }
+
+  //Site footer
+
+  .myfooter {
+
+    .footer-section {
+      color: #ffffff;
+      text-align: center;
+    }
+    .inline_mar-right {
+      display: inline-block;
+      margin: 0 25px 15px 0;
+    }
+    //Footer links
+    .footer_content {
+      margin: 20px;
+
+      .footer-logo {
+        height: 65px;
+        width: 150px;
+      }
+    }
+    .links_collapse {
+      max-height: 78px;
+      overflow: hidden;
+      transition: all 0.5s ease-out;
+
+      ul {
+        display: inline;
+        padding: 0;
+        margin: 0px !important;
+      }
+    }
+    .footer_link_cont {
+      display: inline-block;
+      vertical-align: top;
+      margin: 20px;
+      text-align: left;
+
+      .links_show {
+        //change as per requirement on addition on more links in future
+        max-height: 600px;
+      }
+      .show_foot_links {
+        color: #777777;
+        cursor: pointer;
+
+        &:hover {
+          text-decoration: underline;
+        }
+      }
+    }
+
+  }

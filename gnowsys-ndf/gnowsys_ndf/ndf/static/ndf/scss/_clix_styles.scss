@@ -19,9 +19,7 @@
   }*/
 }
 
-body>footer {
-    background-color: rgb(93, 5, 95);
-}
+
 
 #top-headers {
 
@@ -6659,3 +6657,56 @@ ul.nav_menu_1 {
 
 
 
+.myfooter {
+
+  background-color:$primary-orange;
+
+    .footer-section {
+      color: #ffffff;
+      text-align: center;
+    }
+    .inline_mar-right {
+      display: inline-block;
+      margin: 0 25px 15px 0;
+    }
+    //Footer links
+    .footer_content {
+      margin: 20px;
+
+      .footer-logo {
+        height: 65px;
+        width: 150px;
+      }
+    }
+    .links_collapse {
+      max-height: 78px;
+      overflow: hidden;
+      transition: all 0.5s ease-out;
+
+      ul {
+        display: inline;
+        padding: 0;
+        margin: 0px !important;
+      }
+    }
+    .footer_link_cont {
+      display: inline-block;
+      vertical-align: top;
+      margin: 20px;
+      text-align: left;
+
+      .links_show {
+        //change as per requirement on addition on more links in future
+        max-height: 600px;
+      }
+      .show_foot_links {
+        color: #777777;
+        cursor: pointer;
+
+        &:hover {
+          text-decoration: underline;
+        }
+      }
+    }
+
+  }
