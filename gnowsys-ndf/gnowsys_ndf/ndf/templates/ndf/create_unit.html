@@ -130,8 +130,8 @@
                      {% include 'ndf/widget_tags.html' with node=unit_node hide_lbl=True %}
                     </div>
                     <div class="large-6 columns">
-                        <label>{% trans "Enter Description" %}</label>
-                            <textarea placeholder="small-12.columns"></textarea>
+                        <label>{% trans "Enter Description" %}
+                            {% include "ndf/html_editor.html" with var_name="content" var_placeholder="Enter the content here" var_value=unit_node.content|default_if_none:"" node_id=unit_node.pk ckeditor_toolbar="GeneralToolbar" %}
                       </label>
                     </div>
                 </div>            
