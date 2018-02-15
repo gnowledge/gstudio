@@ -4,10 +4,10 @@ import json
 import datetime
 
 ''' -- imports from installed packages -- '''
-from django.http import HttpResponse, Http404, HttpResponseRedirect
+from django.http import HttpResponseRedirect
+from django.http import HttpResponse
 from django.http.request import HttpRequest
 from django.core.urlresolvers import reverse
-from django.core.exceptions import PermissionDenied
 from django.shortcuts import render_to_response  # , render
 from django.template import RequestContext
 from django.template.defaultfilters import slugify
@@ -20,7 +20,204 @@ from django.core.cache import cache
 
 try:
     from bson import ObjectId
-except ImportError:  # old pymongo<<
+except ImportError:  # old pymongo
+    from pymongo.objectid import ObjectId
+
+''' -- imports from application folders/files -- '''
+from gnowsys_ndf.settings import GAPPS, GSTUDIO_GROUP_AGENCY_TYPES, GSTUDIO_NROER_MENU, GSTUDIO_NROER_MENU_MAPPINGS,GSTUDIO_FILE_UPLOAD_FORM, GSTUDIO_FILE_UPLOAD_POINTS, GSTUDIO_BUDDY_LOGIN
+from gnowsys_ndf.settings import GSTUDIO_MODERATING_GROUP_ALTNAMES, GSTUDIO_PROGRAM_EVENT_MOD_GROUP_ALTNAMES, GSTUDIO_COURSE_EVENT_MOD_GROUP_ALTNAMES
+from gnowsys_ndf.settings import GSTUDIO_SITE_NAME
+from gnowsys_ndf.ndf.models import NodeJSONEncoder, node_collection, triple_collection, Counter, counter_collection, Node
+from gnowsys_ndf.ndf.views.methods import *
+from gnowsys_ndf.ndf.views.asset import *
+from gnowsys_ndf.ndf.views.utils import add_to_list
+# from gnowsys_ndf.ndf.models import GSystemType, GSystem, Group, Triple
+# from gnowsys_ndf.ndf.models import c
+from gnowsys_ndf.ndf.views.ajax_views import *
+from gnowsys_ndf.ndf.templatetags.ndf_tags import get_all_user_groups, get_sg_member_of, get_relation_value, get_attribute_value, check_is_gstaff # get_existing_groups
+# from gnowsys_ndf.ndf.org2any import org2html
+from gnowsys_ndf.ndf.views.moderation import *
+# from gnowsys_ndf.ndf.views.moderation import moderation_status, get_moderator_group_set, create_moderator_task
+# ######################################################################################################################################
+
+group_gst = node_collection.one({'_type': 'GSystemType', 'name': u'Group'})
+gst_group = group_gst
+app = gst_group
+
+moderating_group_gst = node_collection.one({'_type': 'GSystemType', 'name': u'ModeratingGroup'})
+programevent_group_gst = node_collection.one({'_type': 'GSystemType', 'name': u'ProgramEventGroup'})
+courseevent_group_gst = node_collection.one({'_type': 'GSystemType', 'name': u'CourseEventGroup'})
+announced_unit_gst = node_collection.one({'_type': 'GSystemType', 'name': u'announced_unit'})
+partner_group_gst = node_collection.one({'_type': 'GSystemType', 'name': u'PartnerGroup'})
+
+file_gst = node_collection.one({'_type': 'GSystemType', 'name': 'File'})
+page_gst = node_collection.one({'_type': 'GSystemType', 'name': 'Page'})
+task_gst = node_collection.one({'_type': 'GSystemType', 'name': 'Task'})
+
+# ######################################################################################################################################
+#      V I E W S   D E F I N E D   F O R   G A P P -- ' G R O U P '
+# ######################################################################################################################################
+
+class CreateGroup(object):
+    """
+    Creates group.
+    Instantiate group with request as argument
+    """
+    def __init__(self, request=HttpRequest()):
+        super(CreateGroup, self).__init__()
+        self.request = request
+        self.moderated_groups_member_of = ['ProgramEventGroup',\
+         'CourseEventGroup', 'PartnerGroup', 'ModeratingGroup']
+
+
+    def is_group_exists(self, group_name):
+        '''
+        Checks if group with the given name exists.
+        Returns Bool.
+            - True: If group exists.
+            - False: If group doesn't exists.
+        '''
+
+        # explicitely using "find_one" query
+        group = node_collection.find_one({'_type': 'Group', 'name': unicode(group_name)})
+        if group:
+            return True
+
+        else:
+            return False
+
+
+    def get_group_fields(self, group_name, **kwargs):
+        '''
+        function to fill the empty group object with values supplied.
+        - group name is must and it's first argument.
+        - group information may be sent either from "request" or from "kwargs".
+
+        # If arg is kwargs, provide following dict as kwargs arg to this function.
+        group_fields = {
+          'altnames': '', 'group_type': '', 'edit_policy': '',
+          'agency_type': '', 'moderation_level': '',
+          ...., ...
+        }
+
+        # call in following way
+        class_instance_var.get_group_fields(group_name, **group_fields)
+        (NOTE: use ** before dict variables, in above case it's group_fields so it's: **group_fields)
+        '''
+        # getting the data into variables
+        name = group_name
+
+        # to check if existing group is getting edited
+        node_id = kwargs.get('node_id', None)
+
+        if kwargs.get('altnames', ''):
+            altnames = kwargs.get('altnames', name)
+        elif self.request:
+            altnames = self.request.POST.get('altnames', name).strip()
+
+        group_set = []
+        if kwargs.get('group_set', ''):
+            group_set = kwargs.get('group_set', [])
+        else:
+            group_set = self.request.POST.get('group_set', [])
+        group_set = [group_set] if not isinstance(group_set, list) else group_set
+        group_set = [ObjectId(g) for g in group_set]
+
+        member_of = []
+        if kwargs.get('member_of', ''):
+            member_of = kwargs.get('member_of', [])
+        else:
+            member_of = self.request.POST.get('member_of', [])
+        member_of = [member_of] if not isinstance(member_of, list) else member_of
+        member_of = [ObjectId(m) for m in member_of]
+
+        if kwargs.get('group_type', ''):
+            group_type = kwargs.get('group_type', u'PUBLIC')
+        elif self.request:
+            group_type = self.request.POST.get('group_type', u'PUBLIC')
+
+        if kwargs.get('access_policy', ''):
+            access_policy = kwargs.get('access_policy', group_type)
+        elif self.request:
+            access_policy = self.request.POST.get('access_policy', group_type)
+
+        if kwargs.get('edit_policy', ''):
+            edit_policy = kwargs.get('edit_policy', u'EDITABLE_NON_MODERATED')
+        elif self.request:
+            edit_policy = self.request.POST.get('edit_policy', u'EDITABLE_NON_MODERATED')
+
+        if kwargs.get('subscription_policy', ''):
+            subscription_policy = kwargs.get('subscription_policy', u'OPEN')
+        elif self.request:
+            subscription_policy = self.request.POST.get('subscription_policy', u"OPEN")
+
+        if kwargs.get('visibility_policy', ''):
+            visibility_policy = kwargs.get('visibility_policy', u'ANNOUNCED')
+        elif self.request:
+            visibility_policy = self.request.POST.get('visibility_policy', u'ANNOUNCED')
+
+        if kwargs.get('disclosure_policy', ''):
+            disclosure_policy = kwargs.get('disclosure_policy', u'DISCLOSED_TO_MEM')
+        elif self.request:
+            disclosure_policy = self.request.POST.get('disclosure_policy', u'DISCLOSED_TO_MEM')
+
+        if kwargs.get('encryption_policy', ''):
+            encryption_policy = kwargs.get('encryption_policy', u'NOT_ENCRYPTED')
+        elif self.request:
+            encryption_policy = self.request.POST.get('encryption_policy', u'NOT_ENCRYPTED')
+
+        if kwargs.get('agency_type', ''):
+            agency_type = kwargs.get('agency_type', u'Other')
+        elif self.request:
+            agency_type = self.request.POST.get('agency_type', u'Other')
+
+        if kwargs.get('content_org', ''):
+            content_org = kwargs.get('content_org', u'')
+        elif self.request:
+            content_org = self.request.POST.get('content_org', u'')
+
+        if kwargs.get('content', ''):
+            content = kwargs.get('content', u'')
+        elif self.request:
+            content = self.request.POST.get('content', u'')
+
+        # if not content or not content_org:
+        #     content = content_org = u""
+
+        if kwargs.get('language', ''):
+            language = kwargs.get('language', '')
+        elif self.request:
+            language = self.request.POST.get('language', ('en', 'English'))
+
+        # whenever we are passing int: 0, condition gets false
+        # therefor casting to str
+        if str(kwargs.get('moderation_level', '')):
+            moderation_level = kwargs.get('moderation_level', '-1')
+        elif self.request:
+            moderation_level = self.request.POST.get('moderation_level', '-1')
+
+        if node_id:
+            # Existing group: if node_id exists means group already exists.
+            # So fetch that group and use same object to override the fields.
+            group_obj = node_collection.one({'_id': ObjectId(node_id)})
+        else:
+            # New group: instantiate empty group object
+            group_obj = node_collection.collection.Group()
+
+        # filling the values with variables in group object:
+        group_obj.name = unicode(name)
+        group_obj.altnames = unicode(altnames)
+
+        for each_gset in group_set:
+            if each_gset not in group_obj.group_set:
+                group_obj.group_set.append(each_gset)
+
+        for each_mof in member_of:
+            if each_mof not in group_obj.member_of:
+                group_obj.member_of.append(each_mof)
+
+        # while doing append operation make sure to-be-append is not in the list
+        if gst_group._id not in group_obj.member_of:
             group_obj.member_of.append(gst_group._id)
 
         if gst_group._id not in group_obj.type_of:
@@ -1820,11 +2017,11 @@ def group(request, group_id, app_id=None, agency_type=None):
 @login_required
 @get_execution_time
 def populate_list_of_members():
-	members = User.objects.all()
-	memList = []
-	for mem in members:
-		memList.append(mem.username)
-	return memList
+    members = User.objects.all()
+    memList = []
+    for mem in members:
+        memList.append(mem.username)
+    return memList
 
 
 @login_required
@@ -1846,82 +2043,40 @@ def populate_list_of_group_members(group_id):
         return []
 
 
+@get_execution_time
 def group_dashboard(request, group_id=None):
-    '''
-      This view handles redirection to Group Dashboard
-      based on the type of Group.
-      Available Group types: base_unit, announced_unit,
-      CourseEventGroup, Group, ProgramEventGroup.
-    '''
 
-    # Variable declarations
-    group_obj = profile_pic_image = subgroups_cur = None
-    all_blogs = blog_pages = user_blogs = None
-    course_structure_exists = False
-    files_cur = parent_groupid_of_pe = sg_type = None
-    # allow_to_join = "" Remove this line
-    # Do not make list datatype variables into single line of assignment.
-    course_collection_data = []
-    old_profile_pics = []
+  try:
+    group_obj = ""
+    # shelf_list = {}
+    # shelves = []
+    alternate_template = ""
+    profile_pic_image = None
     list_of_unit_events = []
-
-    # Default landing_page template name should be defined in local_settings.py
-    # which can be used for `alternate_template`
-    alternate_template = None 
-
+    all_blogs = None
+    blog_pages = None
+    user_blogs = None
+    subgroups_cur = None
+    old_profile_pics = []
     selected = request.GET.get('selected','')
     group_obj = get_group_name_id(group_id, get_obj=True)
     try:
-        if not group_obj:
-            raise Http404("Group Not Found")
-        forbid_private_group(request, group_obj)
-        group_id = group_obj._id
-        group_member_of = group_obj.member_of_names_list
+        if 'tab_name' in group_obj.project_config and group_obj.project_config['tab_name'].lower() == "questions":
+            if "announced_unit" in group_obj.member_of_names_list:
+                if group_obj.collection_set:
+                    lesson_id = group_obj.collection_set[0]
+                    lesson_node = node_collection.one({'_id': ObjectId(lesson_id)})
+                    activity_id = lesson_node.collection_set[0]
+                return HttpResponseRedirect(reverse('activity_player_detail', kwargs={'group_id': group_id,
+                    'lesson_id': lesson_id, 'activity_id': activity_id}))
+    except Exception as e:
+        pass
 
-        # Redirection based on Group type
-        # case for Survey type Groups
-        try:
-            if 'tab_name' in group_obj.project_config and group_obj.project_config['tab_name'].lower() == "questions":
-                if "announced_unit" in group_member_of:
-                    if group_obj.collection_set:
-                        lesson_id = group_obj.collection_set[0]
-                        lesson_node = node_collection.one({'_id': ObjectId(lesson_id)})
-                        activity_id = lesson_node.collection_set[0]
-                    return HttpResponseRedirect(reverse('activity_player_detail', kwargs={'group_id': group_id,
-                        'lesson_id': lesson_id, 'activity_id': activity_id}))
-        except Exception as survey_redir_err:
-            print "\nError in Survey Group redirection. ", survey_redir_err
-            pass
-
-        redir_groups_type = ["base_unit", "CourseEventGroup", \
-                    "BaseCourseGroup", "announced_unit", "Group"]
-        if any(group_type in group_member_of for group_type in redir_groups_type):
-            return HttpResponseRedirect(reverse('course_content', kwargs={'group_id': group_id}))
-
-        # Subgroups listing
-        if group_obj and group_obj.post_node:
-            # now we are showing moderating group too:
-            subgroups_cur = node_collection.find({
-                    '_type': u'Group',
-                    '_id': {'$in': group_obj.post_node},
-                    '$or': [
-                                {'created_by': request.user.id},
-                                {'group_admin': request.user.id},
-                                {'author_set': request.user.id},
-                                {'group_type': 'PUBLIC'}
-                            ]
-                    }).sort("last_update",-1)
-
-        '''
-        --------- Shelf related Code block starts here --------
-        # shelf_list = {}
-        # shelves = []
-        auth = node_collection.one({'_type': 'Author', 'name': unicode(request.user.username) })
     if ("base_unit" in group_obj.member_of_names_list or
         "CourseEventGroup" in group_obj.member_of_names_list or
         "BaseCourseGroup" in group_obj.member_of_names_list or 
         "announced_unit" in group_obj.member_of_names_list):
-        return HttpResponseRedirect(reverse('course_content', kwargs={'group_id': group_id}))
+        return HttpResponseRedirect(reverse('course_about', kwargs={'group_id': group_id}))
 
     if group_obj and group_obj.post_node:
         # subgroups_cur = node_collection.find({'_id': {'$in': group_obj.post_node}, 'edit_policy': {'$ne': "EDITABLE_MODERATED"},
@@ -1947,106 +2102,51 @@ def group_dashboard(request, group_id=None):
       # group_obj=node_collection.one({'_id':ObjectId(group_id)})
       group_id = group_obj._id
 
-        if auth:
+      # getting the profile pic File object
+      # profile_pic_image, grelation_node = get_relation_value(group_obj._id,"has_profile_pic")
+      # profile_pic_image = get_relation_value(group_obj._id,"has_profile_pic")
+      # if profile_pic_image:
+      #   profile_pic_image =  profile_pic_image[0]
 
-          has_shelf_RT = node_collection.one({'_type': 'RelationType', 'name': u'has_shelf' })
+      grel_dict = get_relation_value(group_obj._id, "has_profile_pic")
+      is_cursor = grel_dict.get("cursor",False)
+      if not is_cursor:
+          profile_pic_image = grel_dict.get("grel_node")
+          # grel_id = grel_dict.get("grel_id")
 
-          shelf = triple_collection.find({'_type': 'GRelation', 'subject': ObjectId(auth._id), 'relation_type': has_shelf_RT._id })
-          shelf_list = {}
 
-          if shelf:
-            #a temp. variable which stores the lookup for append method
-            shelves_append_temp=shelves.append
-            for each in shelf:
-              shelf_name = node_collection.one({'_id': ObjectId(each.right_subject)})
-              shelves_append_temp(shelf_name)
+      # for each in group_obj.relation_set:
+      #     if "has_profile_pic" in each:
+      #         profile_pic_image = node_collection.one(
+      #             {'_type': "File", '_id': each["has_profile_pic"][0]}
+      #         )
+      #         break
+    '''
+    auth = node_collection.one({'_type': 'Author', 'name': unicode(request.user.username) })
 
-              shelf_list[shelf_name.name] = []
-              #a temp. variable which stores the lookup for append method
-              shelf_lst_shelfname_append=shelf_list[shelf_name.name].append
-              for ID in shelf_name.collection_set:
-                shelf_item = node_collection.one({'_id': ObjectId(ID) })
-                shelf_lst_shelfname_append(shelf_item.name)
+    if auth:
 
-          else:
-              shelves = []
-        --------- Shelf related Code block ends here --------
-        '''
+      has_shelf_RT = node_collection.one({'_type': 'RelationType', 'name': u'has_shelf' })
 
-        profile_pic_image, old_profile_pics = get_current_and_old_display_pics(group_obj,\
-                                                       rt_name="has_profile_pic")
+      shelf = triple_collection.find({'_type': 'GRelation', 'subject': ObjectId(auth._id), 'relation_type': has_shelf_RT._id })
+      shelf_list = {}
 
-        # Call to get_neighbourhood() is required for setting-up property_order_list
-        # group_obj.get_neighbourhood(group_obj.member_of)
+      if shelf:
+        #a temp. variable which stores the lookup for append method
+        shelves_append_temp=shelves.append
+        for each in shelf:
+          shelf_name = node_collection.one({'_id': ObjectId(each.right_subject)})
+          shelves_append_temp(shelf_name)
 
-        list_of_sg_member_of = get_sg_member_of(group_obj._id)
-        if  u"ProgramEventGroup" in list_of_sg_member_of and \
-                  u"ProgramEventGroup" not in group_member_of:
-            return HttpResponseRedirect( reverse('course_about', kwargs={"group_id": group_id}) )
-            # This code block is never executed because of the above return statement
-            # sg_type = "ProgramEventGroup"
-            # # files_cur = node_collection.find({'group_set': ObjectId(group_obj._id), '_type': "File"})
-            # parent_groupid_of_pe = node_collection.find_one({'_type':"Group", \
-            #   "post_node": group_obj._id})
-            # if parent_groupid_of_pe:
-            #   parent_groupid_of_pe = parent_groupid_of_pe._id
+          shelf_list[shelf_name.name] = []
+          #a temp. variable which stores the lookup for append method
+          shelf_lst_shelfname_append=shelf_list[shelf_name.name].append
+          for ID in shelf_name.collection_set:
+            shelf_item = node_collection.one({'_id': ObjectId(ID) })
+            shelf_lst_shelfname_append(shelf_item.name)
 
-            # alternate_template = "ndf/gprogram_event_group.html"
-
-        # The line below is commented in order to:
-        #     Fetch files_cur - resources under moderation in groupdahsboard.html
-        if group_obj.edit_policy == "EDITABLE_MODERATED":# and group_obj._type != "Group":
-            files_cur = node_collection.find({'group_set': ObjectId(group_obj._id), 
-              '_type': {'$in': ["File","GSystem"]}})
-
-        '''
-        property_order_list = []
-        if "group_of" in group_obj:
-          if group_obj['group_of']:
-            college = node_collection.one({'_type': "GSystemType", 'name': "College"}, {'_id': 1})
-
-            if college:
-              if college._id in group_obj['group_of'][0]['member_of']:
-                alternate_template = "ndf/college_group_details.html"
-
-            property_order_list = get_property_order_with_value(group_obj['group_of'][0])
-
-        annotations = json.dumps(group_obj.annotations)
-        '''
-        default_template = "ndf/groupdashboard.html"
-        return render_to_response([alternate_template,default_template] ,{'node': group_obj, 'groupid':group_id,
-                                                             'group_id':group_id, 'user':request.user,
-                                                             # 'shelf_list': shelf_list,
-                                                             'list_of_unit_events': list_of_unit_events,
-                                                             'blog_pages':blog_pages,
-                                                             'user_blogs': user_blogs,
-                                                             'selected': selected,
-                                                             'files_cur': files_cur,
-                                                             'sg_type': sg_type,
-                                                             'course_collection_data':course_collection_data,
-                                                             'parent_groupid_of_pe':parent_groupid_of_pe,
-                                                             'course_structure_exists':course_structure_exists,
-                                                             'allow_to_join': allow_to_join,
-                                                             'appId':app._id, 'app_gst': group_gst,
-                                                             'subgroups_cur':subgroups_cur,
-                                                             # 'annotations' : annotations, 'shelves': shelves,
-                                                             'prof_pic_obj': profile_pic_image,
-                                                             'old_profile_pics':old_profile_pics,
-                                                             'group_obj': group_obj,
-                                                            },context_instance=RequestContext(request)
-                                )
-
-    except Http404 as ne:
-        raise Http404("Test123")
-        pass
-
-    except PermissionDenied as pe:
-        raise PermissionDenied("pe")
-
-    except Exception as e:
-        pass
-#       else:
-#           shelves = []
+      else:
+          shelves = []
     '''
   except Exception as e:
     print "\nError: ", e
@@ -2143,190 +2243,233 @@ def group_dashboard(request, group_id=None):
   if group_obj.edit_policy == "EDITABLE_MODERATED":# and group_obj._type != "Group":
       files_cur = node_collection.find({'group_set': ObjectId(group_obj._id), '_type': {'$in': ["File","GSystem"]}})
   '''
-    property_order_list = []
-    if "group_of" in group_obj:
-        if group_obj['group_of']:
-            college = node_collection.one({'_type': "GSystemType", 'name': "College"}, {'_id': 1})
+  property_order_list = []
+  if "group_of" in group_obj:
+    if group_obj['group_of']:
+      college = node_collection.one({'_type': "GSystemType", 'name': "College"}, {'_id': 1})
 
-        if college:
-            if college._id in group_obj['group_of'][0]['member_of']:
-                alternate_template = "ndf/college_group_details.html"
+      if college:
+        if college._id in group_obj['group_of'][0]['member_of']:
+          alternate_template = "ndf/college_group_details.html"
 
-        property_order_list = get_property_order_with_value(group_obj['group_of'][0])
+      property_order_list = get_property_order_with_value(group_obj['group_of'][0])
 
-    annotations = json.dumps(group_obj.annotations)
-  
-    default_template = "ndf/groupdashboard.html"
+  annotations = json.dumps(group_obj.annotations)
+  '''
+  default_template = "ndf/groupdashboard.html"
   # print "\n\n blog_pages.count------",blog_pages
-    if alternate_template:
-        return HttpResponseRedirect( reverse('course_content', kwargs={"group_id": group_id}) )
-    else:
-        return render_to_response([alternate_template,default_template] ,{'node': group_obj, 'groupid':group_id,
-                                                           'group_id':group_id, 'user':request.user,
-                                                           # 'shelf_list': shelf_list,
-                                                           'list_of_unit_events': list_of_unit_events,
-                                                           'blog_pages':blog_pages,
-                                                           'user_blogs': user_blogs,
-                                                           'selected': selected,
-                                                           'files_cur': files_cur,
-                                                           'sg_type': sg_type,
-                                                           'course_collection_data':course_collection_data,
-                                                           'parent_groupid_of_pe':parent_groupid_of_pe,
-                                                           'course_structure_exists':course_structure_exists,
-                                                           'allow_to_join': allow_to_join,
-                                                           'appId':app._id, 'app_gst': group_gst,
-                                                           'subgroups_cur':subgroups_cur,
-                                                           # 'annotations' : annotations, 'shelves': shelves,
-                                                           'prof_pic_obj': profile_pic_image,
-                                                           'old_profile_pics':old_profile_pics,
-                                                           'group_obj': group_obj,
-                                                          },context_instance=RequestContext(request)
-                              )
+  if alternate_template:
+    return HttpResponseRedirect( reverse('course_about', kwargs={"group_id": group_id}) )
+  else:
+    return render_to_response([alternate_template,default_template] ,{'node': group_obj, 'groupid':group_id,
+                                                       'group_id':group_id, 'user':request.user,
+                                                       # 'shelf_list': shelf_list,
+                                                       'list_of_unit_events': list_of_unit_events,
+                                                       'blog_pages':blog_pages,
+                                                       'user_blogs': user_blogs,
+                                                       'selected': selected,
+                                                       'files_cur': files_cur,
+                                                       'sg_type': sg_type,
+                                                       'course_collection_data':course_collection_data,
+                                                       'parent_groupid_of_pe':parent_groupid_of_pe,
+                                                       'course_structure_exists':course_structure_exists,
+                                                       'allow_to_join': allow_to_join,
+                                                       'appId':app._id, 'app_gst': group_gst,
+                                                       'subgroups_cur':subgroups_cur,
+                                                       # 'annotations' : annotations, 'shelves': shelves,
+                                                       'prof_pic_obj': profile_pic_image,
+                                                       'old_profile_pics':old_profile_pics,
+                                                       'group_obj': group_obj,
+                                                      },context_instance=RequestContext(request)
+                          )
+
+
+# @login_required
+# @get_execution_time
+# def edit_group(request, group_id):
+
+#   # page_node = node_collection.one({"_id": ObjectId(group_id)})
+#   # title = gst_group.name
+#   # if request.method == "POST":
+#   #   is_node_changed=get_node_common_fields(request, page_node, group_id, gst_group)
+
+#   #   if page_node.access_policy == "PUBLIC":
+#   #     page_node.group_type = "PUBLIC"
+
+#   #   if page_node.access_policy == "PRIVATE":
+#   #     page_node.group_type = "PRIVATE"
+#     # page_node.save(is_changed=is_node_changed)
+#     # page_node.save()
+#   #   group_id=page_node._id
+#   #   page_node.get_neighbourhood(page_node.member_of)
+#   #   return HttpResponseRedirect(reverse('groupchange', kwargs={'group_id':group_id}))
+
+#   # else:
+#   #   if page_node.status == u"DRAFT":
+#   #     page_node, ver = get_page(request, page_node)
+#   #     page_node.get_neighbourhood(page_node.member_of)
+
+#   # available_nodes = node_collection.find({'_type': u'Group', 'member_of': ObjectId(gst_group._id) })
+#   # nodes_list = []
+#   # for each in available_nodes:
+#   #     nodes_list.append(str((each.name).strip().lower()))
+
+#   # return render_to_response("ndf/edit_group.html",
+#   #                                   { 'node': page_node,'title':title,
+#   #                                     'appId':app._id,
+#   #                                     'groupid':group_id,
+#   #                                     'nodes_list': nodes_list,
+#   #                                     'group_id':group_id,
+#   #                                     'is_auth_node':is_auth_node
+#   #                                     },
+#   #                                   context_instance=RequestContext(request)
+#   #                                   )
+
+#     group_obj = get_group_name_id(group_id, get_obj=True)
+
+#     if request.method == "POST":
+#         is_node_changed = get_node_common_fields(request, group_obj, group_id, gst_group)
+#         # print "=== ", is_node_changed
+
+#         if group_obj.access_policy == "PUBLIC":
+#             group_obj.group_type = "PUBLIC"
+
+#         elif group_obj.access_policy == "PRIVATE":
+#             group_obj.group_type = "PRIVATE"
+
+#         group_obj.save(is_changed=is_node_changed)
+
+#         group_obj.get_neighbourhood(group_obj.member_of)
+
+#         return HttpResponseRedirect(reverse('groupchange', kwargs={'group_id':group_obj._id}))
+
+#     elif request.method == "GET":
+#         if group_obj.status == u"DRAFT":
+#             group_obj, ver = get_page(request, group_obj)
+#             group_obj.get_neighbourhood(group_obj.member_of)
+
+#         available_nodes = node_collection.find({'_type': u'Group', '_id': {'$nin': [group_obj._id]}}, {'name': 1, '_id': 0})
+#         nodes_list = [str(g_obj.name.strip().lower()) for g_obj in available_nodes]
+#         # print nodes_list
+
+#         return render_to_response("ndf/create_group.html",
+#                                         {
+#                                         'node': group_obj,
+#                                         'title': 'Group',
+#                                         # 'appId':app._id,
+#                                         'groupid':group_id,
+#                                         'group_id':group_id,
+#                                         'nodes_list': nodes_list,
+#                                         # 'is_auth_node':is_auth_node
+#                                       },
+#                                     context_instance=RequestContext(request)
+#                                     )
 
 
 @login_required
 @get_execution_time
-def upload_using_save_file(request,group_id):
-    from gnowsys_ndf.ndf.views.file import save_file
+def app_selection(request, group_id):
+    from gnowsys_ndf.ndf.views.ajax_views import set_drawer_widget
+
+    if ObjectId.is_valid(group_id) is False:
+        group_ins = node_collection.find_one({
+            '_type': "Group", "name": group_id
+        })
+        auth = node_collection.one({
+            '_type': 'Author', 'name': unicode(request.user.username)
+        })
+        if group_ins:
+            group_id = str(group_ins._id)
+        else:
+            auth = collection.Node.one({
+                '_type': 'Author', 'name': unicode(request.user.username)
+            })
+            if auth:
+                group_id = str(auth._id)
+    else:
+        pass
+
     try:
-        group_id = ObjectId(group_id)
-    except:
-        group_name, group_id = get_group_name_id(group_id)
+        grp = node_collection.one({
+            "_id": ObjectId(group_id)
+        }, {
+            "name": 1, "attribute_set.apps_list": 1
+        })
+        if request.method == "POST":
+            apps_to_set = request.POST['apps_to_set']
+            apps_to_set = json.loads(apps_to_set)
 
-    group_obj = node_collection.one({'_id': ObjectId(group_id)})
-    title = request.POST.get('context_name','')
-    sel_topic = request.POST.get('topic_list','')
-    
-    usrid = request.user.id
-    name  = request.POST.get('name')
-    # print "\n\n\nusrid",usrid
-    # # url_name = "/"+str(group_id)
-    # for key,value in request.FILES.items():
-    #     fname=unicode(value.__dict__['_name'])
-    #     # print "key=",key,"value=",value,"fname=",fname
-    #     fileobj,fs = save_file(value,fname,usrid,group_id, "", "", username=unicode(request.user.username), access_policy=group_obj.access_policy, count=0, first_object="", oid=True)
-    #     file_obj = node_collection.find_one({'_id': ObjectId(fileobj)})
-    #     if file_obj:
-    #         #set interaction-settings
-    #         discussion_enable_at = node_collection.one({"_type": "AttributeType", "name": "discussion_enable"})
-    #         create_gattribute(file_obj._id, discussion_enable_at, True)
-    #         return_status = create_thread_for_node(request,group_obj._id, file_obj)
+            apps_to_set = [
+                ObjectId(app_id) for app_id in apps_to_set if app_id
+            ]
 
-    #     # if file_obj:
-    #     #     url_name = "/"+str(group_id)+"/#gallery-tab"
+            apps_list = []
+            apps_list_append = apps_list.append
+            for each in apps_to_set:
+                apps_list_append(
+                    node_collection.find_one({
+                        "_id": each
+                    })
+                )
 
-    from gnowsys_ndf.ndf.views.filehive import write_files
-    is_user_gstaff = check_is_gstaff(group_obj._id, request.user)
-    content_org = request.POST.get('content_org', '')
-    uploaded_files = request.FILES.getlist('filehive', [])
-    # gs_obj_list = write_files(request, group_id)
-    # fileobj_list = write_files(request, group_id)
-    # fileobj_id = fileobj_list[0]['_id']
-    fileobj_list = write_files(request, group_id,unique_gs_per_file=False)
-    # fileobj_list = write_files(request, group_id)
-    fileobj_id = fileobj_list[0]['_id']
-    file_node = node_collection.one({'_id': ObjectId(fileobj_id) })
+            at_apps_list = node_collection.one({
+                '_type': 'AttributeType', 'name': 'apps_list'
+            })
+            ga_node = create_gattribute(grp._id, at_apps_list, apps_list)
+            return HttpResponse("Apps list updated successfully.")
 
-    # if GSTUDIO_FILE_UPLOAD_FORM == 'detail' and GSTUDIO_SITE_NAME == "NROER" and title != "raw material" and title != "gallery":
-    if GSTUDIO_FILE_UPLOAD_FORM == 'detail' and title != "raw material" and title != "gallery":
-        if request.POST:
-            # mtitle = request.POST.get("docTitle", "")
-            # userid = request.POST.get("user", "")
-            language = request.POST.get("lan", "")
-            # img_type = request.POST.get("type", "")
-            # topic_file = request.POST.get("type", "")
-            # doc = request.POST.get("doc", "")
-            usrname = request.user.username
-            page_url = request.POST.get("page_url", "")
-            access_policy = request.POST.get("login-mode", '') # To add access policy(public or private) to file object
-            tags = request.POST.get('tags', "")
-            copyright = request.POST.get("Copyright", "")
-            source = request.POST.get("Source", "")
-            Audience = request.POST.getlist("audience", "")
-            fileType = request.POST.get("FileType", "")
-            Based_url = request.POST.get("based_url", "")
-            co_contributors = request.POST.get("co_contributors", "")
-            map_geojson_data = request.POST.get('map-geojson-data')
-            subject = request.POST.get("Subject", "")
-            level = request.POST.getlist("Level", "")
-            content_org = request.POST.get('content_org', '')
+        else:
+            list_apps = []
 
-            subject = '' if (subject=='< Not Sure >') else subject
-            level = '' if (level=='< Not Sure >') else level
+            for attr in grp.attribute_set:
+                if attr and "apps_list" in attr:
+                    list_apps = attr["apps_list"]
+                    break
 
-            if content_org:
-                file_node.content_org = content_org
+            st = get_gapps(already_selected_gapps=list_apps)
 
-            if map_geojson_data:
-                map_geojson_data = map_geojson_data + ","
-                map_geojson_data = list(ast.literal_eval(map_geojson_data))
-            else:
-                map_geojson_data = []
+            data_list = set_drawer_widget(st, list_apps)
+            return HttpResponse(json.dumps(data_list))
 
-            file_node.legal['copyright'] = unicode(copyright)
+    except Exception as e:
+        print "Error in app_selection " + str(e)
 
-            file_node.location = map_geojson_data
-            # file_node.save(groupid=group_id)
-            if language:
-                # fileobj.language = unicode(language)
-                file_node.language = get_language_tuple(language)
-            file_node.created_by = int(usrid)
 
-            file_node.modified_by = int(usrid)
-            if source:
-                # create gattribute for file with source value
-                source_AT = node_collection.one({'_type':'AttributeType','name':'source'})
-                src = create_gattribute(ObjectId(file_node._id), source_AT, source)
+@get_execution_time
+def switch_group(request,group_id,node_id):
+  from gnowsys_ndf.ndf.views.ajax_views import set_drawer_widget
 
-            if Audience:
-              # create gattribute for file with Audience value
-                audience_AT = node_collection.one({'_type':'AttributeType','name':'audience'})
-                aud = create_gattribute(file_node._id, audience_AT, Audience)
+  try:
+      group_id = ObjectId(group_id)
+  except:
+      group_name, group_id = get_group_name_id(group_id)
 
-            if fileType:
-              # create gattribute for file with 'educationaluse' value
-                educationaluse_AT = node_collection.one({'_type':'AttributeType', 'name': 'educationaluse'})
-                FType = create_gattribute(file_node._id, educationaluse_AT, fileType)
+  try:
+    node = node_collection.one({"_id": ObjectId(node_id)})
+    existing_grps = node.group_set
 
-            if subject:
-                # create gattribute for file with 'educationaluse' value
-                subject_AT = node_collection.one({'_type':'AttributeType', 'name': 'educationalsubject'})
-                sub = create_gattribute(file_node._id, subject_AT, subject)
+    if request.method == "POST":
 
-            if level:
-              # create gattribute for file with 'educationaluse' value
-                educationallevel_AT = node_collection.one({'_type':'AttributeType', 'name': 'educationallevel'})
-                edu_level = create_gattribute(file_node._id, educationallevel_AT, level)
-            if Based_url:
-              # create gattribute for file with 'educationaluse' value
-                basedonurl_AT = node_collection.one({'_type':'AttributeType', 'name': 'basedonurl'})
-                basedUrl = create_gattribute(file_node._id, basedonurl_AT, Based_url)
+      new_grps_list = request.POST.getlist("new_groups_list[]", "")
+      resource_exists = False
+      resource_exists_in_grps = []
+      response_dict = {'success': False, 'message': ''}
+      #a temp. variable which stores the lookup for append method
+      resource_exists_in_grps_append_temp = resource_exists_in_grps.append
+      new_grps_list_distinct = [ObjectId(item) for item in new_grps_list if ObjectId(item) not in existing_grps]
+      # print "\nnew_grps_list_distinct",new_grps_list_distinct
+      if new_grps_list_distinct:
+        for each_new_grp in new_grps_list_distinct:
+          if each_new_grp:
+            grp = node_collection.find({'name': node.name, "group_set": ObjectId(each_new_grp), "member_of":ObjectId(node.member_of[0])})
+            if grp.count() > 0:
+              resource_exists = True
+              resource_exists_in_grps_append_temp(unicode(each_new_grp))
 
-            if co_contributors:
-              # create gattribute for file with 'co_contributors' value
-                co_contributors_AT = node_collection.one({'_type':'AttributeType', 'name': 'co_contributors'})
-                co_contributors = create_gattribute(file_node._id, co_contributors_AT, co_contributors)
-            if content_org:
-                    file_node.content_org = unicode(content_org)
-                    # Required to link temporary files with the current user who is modifying this document
-                    filename_content = slugify(title) + "-" + usrname + "-"
-                    file_node.content = content_org
-            if tags:
-                # print "\n\n tags",tags
-                if not type(tags) is list:
-                    tags = [unicode(t.strip()) for t in tags.split(",") if t != ""]
-                file_node.tags = tags
-            # rt_has_asset_content = node_collection.one({'_type': 'RelationType','name': 'has_assetcontent'})
-            # gr = create_grelation(ObjectId('58a3dd4cc6bd690400016ae5'), rt_has_asset_content, ObjectId(file_node._id))
-            # print gr
-            # # asset_node = create_asset(file_node.name,group_id,file_node.created_by,request)
-            # # print "++++++++++++++++++++++++++++++++++++++++",asset_node._id
-            # asset_content_node = create_assetcontent(ObjectId('58a3dd4cc6bd690400016ae5'),file_node.name,group_id,file_node.created_by)
-            # print "---------------------------------------",asset_content_node
-            rt_teaches = node_collection.one({'_type': "RelationType", 'name': unicode("teaches")})
-            create_grelation(file_node._id,rt_teaches,ObjectId(sel_topic))
-            file_node.save(groupid=group_id,validate=False)
+        response_dict["resource_exists_in_grps"] = resource_exists_in_grps
 
+      if not resource_exists:
+        # new_grps_list_all = [ObjectId(item) for item in new_grps_list]
 
         new_grps_list_all = []
 
@@ -2514,53 +2657,33 @@ def publish_group(request,group_id,node):
     group_obj = get_group_name_id(group_id, get_obj=True)
     profile_pic_image = None
 
+    if group_obj:
+      group_id = group_obj._id
 
-    discussion_enable_at = node_collection.one({"_type": "AttributeType", "name": "discussion_enable"})
-    for each_gs_file in fileobj_list:
-        #set interaction-settings
-        each_gs_file.status = u"PUBLISHED"
-        if usrid not in each_gs_file.contributors:
-            each_gs_file.contributors.append(usrid)
+      # getting the profile pic File object
+      for each in group_obj.relation_set:
 
-        if title == "raw material" or (title == "gallery" and is_user_gstaff):
-            if u'raw@material' not in each_gs_file.tags:
-                each_gs_file.tags.append(u'raw@material')
+          if "has_profile_pic" in each:
+              profile_pic_image = node_collection.one( {'_type': "File", '_id': each["has_profile_pic"][0]} )
+              break
 
-        group_object = node_collection.one({'_id': ObjectId(group_id)})
-        if (group_object.edit_policy == "EDITABLE_MODERATED") and (group_object.moderation_level > 0):
-            from gnowsys_ndf.ndf.views.moderation import get_moderator_group_set
-            # print "\n\n\n\ninside editable moderated block"
-            each_gs_file.group_set = get_moderator_group_set(each_gs_file.group_set, group_object._id)
-            # print "\n\n\npage_node._id",page_node._id
-            each_gs_file.status = u'MODERATION'
-            # print "\n\n\n page_node.status",page_node.status
-        each_gs_file.save()
-        create_gattribute(each_gs_file._id, discussion_enable_at, True)
-        return_status = create_thread_for_node(request,group_obj._id, each_gs_file)
+    node=node_collection.one({'_id':ObjectId(node)})
 
-    if (title == "gallery") or (title == "raw material"):
+    page_node,v=get_page(request,node)
 
-        active_user_ids_list = [request.user.id]
-        if GSTUDIO_BUDDY_LOGIN:
-            active_user_ids_list += Buddy.get_buddy_userids_list_within_datetime(request.user.id, datetime.now())
-            # removing redundancy of user ids:
-            active_user_ids_list = dict.fromkeys(active_user_ids_list).keys()
+    node.content = page_node.content
+    node.content_org=page_node.content_org
+    node.status=unicode("PUBLISHED")
+    node.modified_by = int(request.user.id)
+    node.save(groupid=group_id)
 
-        counter_objs_cur = Counter.get_counter_objs_cur(active_user_ids_list, group_id)
-        # counter_obj = Counter.get_counter_obj(request.user.id, group_id)
-        for each_counter_obj in counter_objs_cur:
-            each_counter_obj['file']['created'] += len(fileobj_list)
-            each_counter_obj['group_points'] += (len(fileobj_list) * GSTUDIO_FILE_UPLOAD_POINTS)
-            each_counter_obj.last_update = datetime.now()
-            each_counter_obj.save()
-
-    if title == "gallery" and not is_user_gstaff:
-        return HttpResponseRedirect(reverse('course_gallery', kwargs={'group_id': group_id}))
-    elif title == "raw material" or (title == "gallery" and is_user_gstaff):
-        return HttpResponseRedirect(reverse('course_raw_material', kwargs={'group_id': group_id}))
-    else:
-        return HttpResponseRedirect( reverse('file_detail', kwargs={"group_id": group_id,'_id':fileobj_id}))
-    # return HttpResponseRedirect(url_name)
+    return render_to_response("ndf/groupdashboard.html",
+                                   { 'group_id':group_id, 'groupid':group_id,
+                                   'node':node, 'appId':app._id,
+                                   'prof_pic_obj': profile_pic_image
+                                 },
+                                  context_instance=RequestContext(request)
+                              )
 
 
 @login_required
@@ -2667,290 +2790,200 @@ def create_sub_group(request,group_id):
       return render_to_response("ndf/create_sub_group.html", {'groupid':group_id,'maingroup':grpname,'group_id':group_id,'nodes_list': nodes_list},RequestContext(request))
   except Exception as e:
       print "Exception in create subgroup "+str(e)
+
+
+
 @login_required
 @get_execution_time
-def app_selection(request, group_id):
-    from gnowsys_ndf.ndf.views.ajax_views import set_drawer_widget
-
-    if ObjectId.is_valid(group_id) is False:
-        group_ins = node_collection.find_one({
-            '_type': "Group", "name": group_id
-        })
-        auth = node_collection.one({
-            '_type': 'Author', 'name': unicode(request.user.username)
-        })
-        if group_ins:
-            group_id = str(group_ins._id)
-        else:
-            auth = collection.Node.one({
-                '_type': 'Author', 'name': unicode(request.user.username)
-            })
-            if auth:
-                group_id = str(auth._id)
-    else:
-        pass
-
+def upload_using_save_file(request,group_id):
+    from gnowsys_ndf.ndf.views.file import save_file
     try:
-        grp = node_collection.one({
-            "_id": ObjectId(group_id)
-        }, {
-            "name": 1, "attribute_set.apps_list": 1
-        })
-        if request.method == "POST":
-            apps_to_set = request.POST['apps_to_set']
-            apps_to_set = json.loads(apps_to_set)
+        group_id = ObjectId(group_id)
+    except:
+        group_name, group_id = get_group_name_id(group_id)
 
-            apps_to_set = [
-                ObjectId(app_id) for app_id in apps_to_set if app_id
-            ]
-
-            apps_list = []
-            apps_list_append = apps_list.append
-            for each in apps_to_set:
-                apps_list_append(
-                    node_collection.find_one({
-                        "_id": each
-                    })
-                )
-
-            at_apps_list = node_collection.one({
-                '_type': 'AttributeType', 'name': 'apps_list'
-            })
-            ga_node = create_gattribute(grp._id, at_apps_list, apps_list)
-            return HttpResponse("Apps list updated successfully.")
-
-        else:
-            list_apps = []
-
-            for attr in grp.attribute_set:
-                if attr and "apps_list" in attr:
-                    list_apps = attr["apps_list"]
-                    break
-
-            st = get_gapps(already_selected_gapps=list_apps)
-
-            data_list = set_drawer_widget(st, list_apps)
-            return HttpResponse(json.dumps(data_list))
-
-    except Exception as e:
-        print "Error in app_selection " + str(e)
-
-@get_execution_time
-def switch_group(request,group_id,node_id):
-  from gnowsys_ndf.ndf.views.ajax_views import set_drawer_widget
-
-  try:
-      group_id = ObjectId(group_id)
-  except:
-      group_name, group_id = get_group_name_id(group_id)
-
-  try:
-    node = node_collection.one({"_id": ObjectId(node_id)})
-    existing_grps = node.group_set
-
-    if request.method == "POST":
-
-      new_grps_list = request.POST.getlist("new_groups_list[]", "")
-      resource_exists = False
-      resource_exists_in_grps = []
-      response_dict = {'success': False, 'message': ''}
-      #a temp. variable which stores the lookup for append method
-      resource_exists_in_grps_append_temp = resource_exists_in_grps.append
-      new_grps_list_distinct = [ObjectId(item) for item in new_grps_list if ObjectId(item) not in existing_grps]
-      # print "\nnew_grps_list_distinct",new_grps_list_distinct
-      if new_grps_list_distinct:
-        for each_new_grp in new_grps_list_distinct:
-          if each_new_grp:
-            grp = node_collection.find({'name': node.name, "group_set": ObjectId(each_new_grp), "member_of":ObjectId(node.member_of[0])})
-            if grp.count() > 0:
-              resource_exists = True
-              resource_exists_in_grps_append_temp(unicode(each_new_grp))
-
-        response_dict["resource_exists_in_grps"] = resource_exists_in_grps
-
-      if not resource_exists:
-        # new_grps_list_all = [ObjectId(item) for item in new_grps_list]
-
-        new_grps_list_all = []
-
-        for each_group_id in new_grps_list:
-            each_group_obj = node_collection.one({'_id': ObjectId(each_group_id)})
-
-            if each_group_obj.moderation_level > -1:
-                # means group is moderated one.
-                each_result_dict = moderation_status(request, each_group_obj._id, node._id, get_only_response_dict=True)
-                if each_result_dict['is_under_moderation']:
-                    # means, this node already exists in one of -
-                    # - the underlying mod group of this (each_group_obj).
-                    pass
-                else:
-                    each_group_set = get_moderator_group_set(existing_grps, each_group_id, get_details=False)
-                    merge_group_set = set(each_group_set + new_grps_list_all)
-                    new_grps_list_all = list(merge_group_set)
-                    t = create_moderator_task(request, node.group_set[-1], node._id,on_upload=True)
-
-            else:
-                if each_group_id not in new_grps_list_all:
-                    new_grps_list_all.append(ObjectId(each_group_id))
-
-
-        node.group_set = list(set(new_grps_list_all))
-        node.save()
-        # node_collection.collection.update({'_id': node._id}, {'$set': {'group_set': new_grps_list_all}}, upsert=False, multi=False)
-        # node.reload()
-        response_dict["success"] = True
-        response_dict["message"] = "Published to selected groups"
-      else:
-        response_dict["success"] = False
-        response_dict["message"] = node.member_of_names_list[0] + " with name " + node.name + \
-                " already exists. Hence Cannot Publish to selected groups."
-        response_dict["message"] = node.member_of_names_list[0] + " with name " + node.name + \
-                " already exists in selected group(s). " + \
-                "Hence cannot be cross published now." + \
-                " For publishing, you can rename this " + node.member_of_names_list[0] + " and try again."
-      # print response_dict
-      return HttpResponse(json.dumps(response_dict))
-
-    else:
-      coll_obj_list = []
-      data_list = []
-      user_id = request.user.id
-      all_user_groups = []
-      # for each in get_all_user_groups():
-      #   all_user_groups.append(each.name)
-      #loop replaced by a list comprehension
-      top_partners_list = ["State Partners", "Individual Partners", "Institutional Partners"]
-      all_user_groups = [each.name for each in get_all_user_groups()]
-      if not request.user.is_superuser:
-          all_user_groups.append('home')
-          # exclude home group in listing if not SU
-      all_user_groups.append('Trash')
-      all_user_groups.extend(top_partners_list)
-
-      st = node_collection.find({
-            '$and': [
-                        {'_type': 'Group'},
-                        {'$or':[
-                                {'author_set': {'$in':[user_id]}},
-                                {'group_admin': {'$in':[user_id]}}
-                            ]
-                        },
-                        {'name':{'$nin':all_user_groups}},
-                        {'member_of': {'$in': [group_gst._id]}},
-                        {'status': u'PUBLISHED'}
-                      # ,{'edit_policy': {'$ne': "EDITABLE_MODERATED"}}
-                    ]
-                }).sort('name',-1)
-      # st = node_collection.find({'$and': [{'_type': 'Group'}, {'author_set': {'$in':[user_id]}},
-      #                                     {'name':{'$nin':all_user_groups}},
-      #                                     {'edit_policy': {'$ne': "EDITABLE_MODERATED"}}
-      #                                    ]
-      #                           })
-      # for each in node.group_set:
-      #   coll_obj_list.append(node_collection.one({'_id': each}))
-      #loop replaced by a list comprehension
-
-      # coll_obj_list=[node_collection.one({'_id': each}) for each in node.group_set ]
-
-
-
-      for each_coll_obj_id in node.group_set:
-        each_coll_obj = node_collection.one({'_id': ObjectId(each_coll_obj_id)})
-        if each_coll_obj and moderating_group_gst._id not in each_coll_obj.member_of:
-            coll_obj_list.append(each_coll_obj)
-        elif each_coll_obj:
-
-            try:
-                mod_group_instance = CreateModeratedGroup(request)
-                is_top_group, top_group_obj = mod_group_instance.get_top_group_of_hierarchy(each_coll_obj_id)
-                coll_obj_list.append(top_group_obj)
-            except Exception as d:
-                print d
-
-      data_list = set_drawer_widget(st, coll_obj_list, 'moderation_level')
-      # print "\n\n data_list",data_list
-      return HttpResponse(json.dumps(data_list))
-
-  except Exception as e:
-    print "Exception in switch_group: "+str(e)
-    return HttpResponse("Failure")
-
-@login_required
-@get_execution_time
-def publish_group(request,group_id,node):
-
-    group_obj = get_group_name_id(group_id, get_obj=True)
-    profile_pic_image = None
-
-    if group_obj:
-      group_id = group_obj._id
-
-      # getting the profile pic File object
-      for each in group_obj.relation_set:
-
-          if "has_profile_pic" in each:
-              profile_pic_image = node_collection.one( {'_type': "File", '_id': each["has_profile_pic"][0]} )
-              break
-
-    node=node_collection.one({'_id':ObjectId(node)})
-
-    page_node,v=get_page(request,node)
-
-    node.content = page_node.content
-    node.content_org=page_node.content_org
-    node.status=unicode("PUBLISHED")
-    node.modified_by = int(request.user.id)
-    node.save(groupid=group_id)
-
-    return render_to_response("ndf/groupdashboard.html",
-                                   { 'group_id':group_id, 'groupid':group_id,
-                                   'node':node, 'appId':app._id,
-                                   'prof_pic_obj': profile_pic_image
-                                 },
-                                  context_instance=RequestContext(request)
-                              )
-
-@get_execution_time
-def notification_details(request,group_id):
-    group_obj = node_collection.find({'group_set':ObjectId(group_id)}).sort('last_update', -1)
-    files_list = []
-    user_activity = []
-    user_activity_append_temp=user_activity.append
-    files_list_append_temp=files_list.append
-    for each in group_obj:
-      if each.created_by == each.modified_by :
-        if each.last_update == each.created_at:
-          if each.if_file.mime_type:
-            activity =  'created in asset'
-          else:
-            activity =  'created ' + each.name 
-              
-        else:
-          if each.if_file.mime_type and each.relation_set[0]['assetcontent_of']:
-            node_obj = Node.get_node_by_id(each.relation_set[0]['assetcontent_of'][0])
-            activity =  'uploaded ' + each.name +  ' in ' + node_obj.name
-          elif 'Asset' in each.member_of_names_list and 'asset@gallery' in each.tags:
-            activity =  'Modified Folder ' + each.name
-          elif 'Asset' in each.member_of_names_list and 'raw@material' in each.tags:
-            activity =  'Modified Resource ' + each.name
-          elif 'Asset' in each.member_of_names_list:
-            activity =  'Modified Asset ' + each.name
-          else:
-            activity =  'Modified ' + each.name
-
-      else:
-        activity =  'created ' + each.name
-      if each._type == 'Group':
-        user_activity_append_temp(each)
-      each.update({'activity':activity})
-      files_list_append_temp(each)
+    group_obj = node_collection.one({'_id': ObjectId(group_id)})
+    title = request.POST.get('context_name','')
+    sel_topic = request.POST.get('topic_list','')
     
+    usrid = request.user.id
+    name  = request.POST.get('name')
+    # print "\n\n\nusrid",usrid
+    # # url_name = "/"+str(group_id)
+    # for key,value in request.FILES.items():
+    #     fname=unicode(value.__dict__['_name'])
+    #     # print "key=",key,"value=",value,"fname=",fname
+    #     fileobj,fs = save_file(value,fname,usrid,group_id, "", "", username=unicode(request.user.username), access_policy=group_obj.access_policy, count=0, first_object="", oid=True)
+    #     file_obj = node_collection.find_one({'_id': ObjectId(fileobj)})
+    #     if file_obj:
+    #         #set interaction-settings
+    #         discussion_enable_at = node_collection.one({"_type": "AttributeType", "name": "discussion_enable"})
+    #         create_gattribute(file_obj._id, discussion_enable_at, True)
+    #         return_status = create_thread_for_node(request,group_obj._id, file_obj)
 
-    return render_to_response('ndf/notification_detail.html',
-                                { 
-                                  'group_id': group_id,
-                                  'groupid':group_id,
-                                  'activity_list' : files_list
-                                },
-                                context_instance = RequestContext(request)
-                            )
+    #     # if file_obj:
+    #     #     url_name = "/"+str(group_id)+"/#gallery-tab"
+
+    from gnowsys_ndf.ndf.views.filehive import write_files
+    is_user_gstaff = check_is_gstaff(group_obj._id, request.user)
+    content_org = request.POST.get('content_org', '')
+    uploaded_files = request.FILES.getlist('filehive', [])
+    # gs_obj_list = write_files(request, group_id)
+    # fileobj_list = write_files(request, group_id)
+    # fileobj_id = fileobj_list[0]['_id']
+    fileobj_list = write_files(request, group_id,unique_gs_per_file=False)
+    # fileobj_list = write_files(request, group_id)
+    fileobj_id = fileobj_list[0]['_id']
+    file_node = node_collection.one({'_id': ObjectId(fileobj_id) })
+
+    # if GSTUDIO_FILE_UPLOAD_FORM == 'detail' and GSTUDIO_SITE_NAME == "NROER" and title != "raw material" and title != "gallery":
+    if GSTUDIO_FILE_UPLOAD_FORM == 'detail' and title != "raw material" and title != "gallery":
+        if request.POST:
+            # mtitle = request.POST.get("docTitle", "")
+            # userid = request.POST.get("user", "")
+            language = request.POST.get("lan", "")
+            # img_type = request.POST.get("type", "")
+            # topic_file = request.POST.get("type", "")
+            # doc = request.POST.get("doc", "")
+            usrname = request.user.username
+            page_url = request.POST.get("page_url", "")
+            access_policy = request.POST.get("login-mode", '') # To add access policy(public or private) to file object
+            tags = request.POST.get('tags', "")
+            copyright = request.POST.get("Copyright", "")
+            source = request.POST.get("Source", "")
+            Audience = request.POST.getlist("audience", "")
+            fileType = request.POST.get("FileType", "")
+            Based_url = request.POST.get("based_url", "")
+            co_contributors = request.POST.get("co_contributors", "")
+            map_geojson_data = request.POST.get('map-geojson-data')
+            subject = request.POST.get("Subject", "")
+            level = request.POST.getlist("Level", "")
+            content_org = request.POST.get('content_org', '')
+
+            subject = '' if (subject=='< Not Sure >') else subject
+            level = '' if (level=='< Not Sure >') else level
+
+            if content_org:
+                file_node.content_org = content_org
+
+            if map_geojson_data:
+                map_geojson_data = map_geojson_data + ","
+                map_geojson_data = list(ast.literal_eval(map_geojson_data))
+            else:
+                map_geojson_data = []
+
+            file_node.legal['copyright'] = unicode(copyright)
+
+            file_node.location = map_geojson_data
+            # file_node.save(groupid=group_id)
+            if language:
+                # fileobj.language = unicode(language)
+                file_node.language = get_language_tuple(language)
+            file_node.created_by = int(usrid)
+
+            file_node.modified_by = int(usrid)
+            if source:
+                # create gattribute for file with source value
+                source_AT = node_collection.one({'_type':'AttributeType','name':'source'})
+                src = create_gattribute(ObjectId(file_node._id), source_AT, source)
+
+            if Audience:
+              # create gattribute for file with Audience value
+                audience_AT = node_collection.one({'_type':'AttributeType','name':'audience'})
+                aud = create_gattribute(file_node._id, audience_AT, Audience)
+
+            if fileType:
+              # create gattribute for file with 'educationaluse' value
+                educationaluse_AT = node_collection.one({'_type':'AttributeType', 'name': 'educationaluse'})
+                FType = create_gattribute(file_node._id, educationaluse_AT, fileType)
+
+            if subject:
+                # create gattribute for file with 'educationaluse' value
+                subject_AT = node_collection.one({'_type':'AttributeType', 'name': 'educationalsubject'})
+                sub = create_gattribute(file_node._id, subject_AT, subject)
+
+            if level:
+              # create gattribute for file with 'educationaluse' value
+                educationallevel_AT = node_collection.one({'_type':'AttributeType', 'name': 'educationallevel'})
+                edu_level = create_gattribute(file_node._id, educationallevel_AT, level)
+            if Based_url:
+              # create gattribute for file with 'educationaluse' value
+                basedonurl_AT = node_collection.one({'_type':'AttributeType', 'name': 'basedonurl'})
+                basedUrl = create_gattribute(file_node._id, basedonurl_AT, Based_url)
+
+            if co_contributors:
+              # create gattribute for file with 'co_contributors' value
+                co_contributors_AT = node_collection.one({'_type':'AttributeType', 'name': 'co_contributors'})
+                co_contributors = create_gattribute(file_node._id, co_contributors_AT, co_contributors)
+            if content_org:
+                    file_node.content_org = unicode(content_org)
+                    # Required to link temporary files with the current user who is modifying this document
+                    filename_content = slugify(title) + "-" + usrname + "-"
+                    file_node.content = content_org
+            if tags:
+                # print "\n\n tags",tags
+                if not type(tags) is list:
+                    tags = [unicode(t.strip()) for t in tags.split(",") if t != ""]
+                file_node.tags = tags
+            # rt_has_asset_content = node_collection.one({'_type': 'RelationType','name': 'has_assetcontent'})
+            # gr = create_grelation(ObjectId('58a3dd4cc6bd690400016ae5'), rt_has_asset_content, ObjectId(file_node._id))
+            # print gr
+            # # asset_node = create_asset(file_node.name,group_id,file_node.created_by,request)
+            # # print "++++++++++++++++++++++++++++++++++++++++",asset_node._id
+            # asset_content_node = create_assetcontent(ObjectId('58a3dd4cc6bd690400016ae5'),file_node.name,group_id,file_node.created_by)
+            # print "---------------------------------------",asset_content_node
+            rt_teaches = node_collection.one({'_type': "RelationType", 'name': unicode("teaches")})
+            create_grelation(file_node._id,rt_teaches,ObjectId(sel_topic))
+            file_node.save(groupid=group_id,validate=False)
+
+            return HttpResponseRedirect( reverse('file_detail', kwargs={"group_id": group_id,'_id':file_node._id}) )
+    # print "\n\nretirn gs_obj_list",gs_obj_list
+    # gs_obj_id = gs_obj_list[0]['_id']
+    # print "\n\n\ngs_obj_id: ",gs_obj_id
+
+    discussion_enable_at = node_collection.one({"_type": "AttributeType", "name": "discussion_enable"})
+    for each_gs_file in fileobj_list:
+        #set interaction-settings
+        each_gs_file.status = u"PUBLISHED"
+        if usrid not in each_gs_file.contributors:
+            each_gs_file.contributors.append(usrid)
+
+        if title == "raw material" or (title == "gallery" and is_user_gstaff):
+            if u'raw@material' not in each_gs_file.tags:
+                each_gs_file.tags.append(u'raw@material')
+
+        group_object = node_collection.one({'_id': ObjectId(group_id)})
+        if (group_object.edit_policy == "EDITABLE_MODERATED") and (group_object.moderation_level > 0):
+            from gnowsys_ndf.ndf.views.moderation import get_moderator_group_set
+            # print "\n\n\n\ninside editable moderated block"
+            each_gs_file.group_set = get_moderator_group_set(each_gs_file.group_set, group_object._id)
+            # print "\n\n\npage_node._id",page_node._id
+            each_gs_file.status = u'MODERATION'
+            # print "\n\n\n page_node.status",page_node.status
+        each_gs_file.save()
+        create_gattribute(each_gs_file._id, discussion_enable_at, True)
+        return_status = create_thread_for_node(request,group_obj._id, each_gs_file)
+
+    if (title == "gallery") or (title == "raw material"):
+
+        active_user_ids_list = [request.user.id]
+        if GSTUDIO_BUDDY_LOGIN:
+            active_user_ids_list += Buddy.get_buddy_userids_list_within_datetime(request.user.id, datetime.now())
+            # removing redundancy of user ids:
+            active_user_ids_list = dict.fromkeys(active_user_ids_list).keys()
+
+        counter_objs_cur = Counter.get_counter_objs_cur(active_user_ids_list, group_id)
+        # counter_obj = Counter.get_counter_obj(request.user.id, group_id)
+        for each_counter_obj in counter_objs_cur:
+            each_counter_obj['file']['created'] += len(fileobj_list)
+            each_counter_obj['group_points'] += (len(fileobj_list) * GSTUDIO_FILE_UPLOAD_POINTS)
+            each_counter_obj.last_update = datetime.now()
+            each_counter_obj.save()
+
+    if title == "gallery" and not is_user_gstaff:
+        return HttpResponseRedirect(reverse('course_gallery', kwargs={'group_id': group_id}))
+    elif title == "raw material" or (title == "gallery" and is_user_gstaff):
+        return HttpResponseRedirect(reverse('course_raw_material', kwargs={'group_id': group_id}))
+    else:
+        return HttpResponseRedirect( reverse('file_detail', kwargs={"group_id": group_id,'_id':fileobj_id}))
+    # return HttpResponseRedirect(url_name)

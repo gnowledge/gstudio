@@ -5,7 +5,7 @@ from django.views.generic import TemplateView
 urlpatterns = patterns('gnowsys_ndf.ndf.views.group',
                         url(r'^[/]$', 'group', name='group'),
                         url(r'^/(?P<app_id>[\w-]+)$', 'group', name='group'),
-                        url(r'^/notification/details','notification_details' , name='notification_details'),
+                        #url(r'^/notification/details','notification_details' , name='notification_details'),
                         url(r'^/edit_group/', GroupCreateEditHandler.as_view(), {'action': 'edit'}, name='edit_group'),
                         url(r'^/create_event/(?P<sg_type>[^/]+)/$', EventGroupCreateEditHandler.as_view(), {'action': 'create'}, name='create_event_group'),
                         url(r'^/edit_event/(?P<sg_type>[^/]+)/$', EventGroupCreateEditHandler.as_view(), {'action': 'edit'}, name='edit_event_group'),
