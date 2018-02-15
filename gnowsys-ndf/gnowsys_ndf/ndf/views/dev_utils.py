@@ -45,6 +45,7 @@ from gnowsys_ndf.ndf.views.methods import get_group_name_id, cast_to_data_type, 
 from gnowsys_ndf.ndf.views.methods import get_filter_querydict
 from elasticsearch import Elasticsearch
 from elasticsearch_dsl import *
+from gnowsys_ndf.local_settings import GSTUDIO_ELASTIC_SEARCH
 
 
 es = Elasticsearch("http://elastic:changeme@gsearch:9200", timeout=100, retry_on_timeout=True)
@@ -145,7 +146,6 @@ def render_test_template(request,group_id='home', app_id=None, page_no=1):
 		group_name, group_id = get_group_name_id(group_id)
 		#print group_id, group_name
 
-	print app1
 	if app_id is None:
 		app_id = app1.hits[0].id
 
@@ -373,7 +373,7 @@ def render_test_template(request,group_id='home', app_id=None, page_no=1):
 		q = Q('bool', must=[Q('match', group_set=str(group_id)), Q('match',access_policy='public'),Q('match',member_of=GST_FILE1.hits[0].id)],
 		must_not=[Q('match', attribute_set__educationaluse ='ebooks')])
 
-	files_new =Search(using=es, index="nodes",doc_type="gsystem").query(q)
+	files_new = Search(using=es, index="nodes",doc_type="gsystem").query(q)
 	files_new = files_new[0:24]
 
 	print "+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++"
@@ -577,7 +577,8 @@ def render_test_template(request,group_id='home', app_id=None, page_no=1):
 
 								 'collection_count': collection_pages_cur.count(),
 								 'groupid': group_id, 'group_id':group_id,
-								 "datavisual":datavisual},
+								 "datavisual":datavisual,
+								 "GSTUDIO_ELASTIC_SEARCH":GSTUDIO_ELASTIC_SEARCH},
         context_instance=RequestContext(request)
     )
 

@@ -291,13 +291,13 @@ margin-top:5px !important;
     {% if collection_count > 0 %}
 
       <div class="content row active" id="view-collection" data-filetype="Collections">
-        {% include "ndf/file_list_tab_new.html" with has_contributor=True resource_type=collection all_collection_count=collection_count  detail_urlname="page_details" filetype="Collections" res_type_name="" page_info=collection_pages %}
+        {% include "ndf/file_list_tab.html" with has_contributor=True resource_type=collection all_collection_count=collection_count  detail_urlname="page_details" filetype="Collections" res_type_name="" page_info=collection_pages %}
       </div>
   
     {% else %}
       <!-- Tab View #1 - All (Case -I: default landing)-->
       <div class="content row active" id="view-all" data-filetype="all">
-        {% include "ndf/file_list_tab_new.html" with resource_type=results detail_urlname="file_detail" filetype="all" res_type_name="" page_info=file_pages %}
+        {% include "ndf/file_list_tab.html" with resource_type=results detail_urlname="file_detail" filetype="all" res_type_name="" page_info=file_pages %}
       </div>
     {% endif %}
       
