@@ -68,6 +68,7 @@ es_client = Search(using=es)
 GST_FILE = Search(using=es, index="nodes",doc_type="gsystemtype").query("match", name="file")
 GST_FILE1=GST_FILE.execute()
 
+
 q = Q('bool', must=[Q('match', name='file')],should=[ Q('match', name='file1')])
 GST_FILE_new1 =Search(using=es, index="nodes",doc_type="gsystemtype").query(q)
 
@@ -135,7 +136,8 @@ def render_test_template(request,group_id='home', app_id=None, page_no=1):
 
 	is_video = request.GET.get('is_video', "")
 
-
+	print GST_FILE1
+	print "----------------------------------print GST_FILE1"
 	try:
 		group_id = ObjectId(group_id)
 		#print group_id
@@ -143,9 +145,9 @@ def render_test_template(request,group_id='home', app_id=None, page_no=1):
 		group_name, group_id = get_group_name_id(group_id)
 		#print group_id, group_name
 
-
+	print app1
 	if app_id is None:
-		 app_id = app1.hits[0].id
+		app_id = app1.hits[0].id
 
 	title = e_library_GST1.hits[0].name
 	
@@ -186,7 +188,9 @@ def render_test_template(request,group_id='home', app_id=None, page_no=1):
 							print "-----------------------------"
 							temp_dict[t]=value["$in"][0]
 							#strconcat=strconcat+"Q('match',"+ t+"='"+value["$in"][0]+"'),"
-							strconcat=strconcat+"Q('match',"+ t+"='"+value["$in"][0]+"') "
+							#Q('match',name=dict(query="e-book", type="phrase"))
+							strconcat=strconcat+"Q('match',"+t+"=dict(query='"+value["$in"][0]+"',type='phrase'))$$"
+
 						elif value["$or"]:
 							key = list(key)
 							key[13]='__'
@@ -194,20 +198,24 @@ def render_test_template(request,group_id='home', app_id=None, page_no=1):
 							print t
 							print "------------------------"
 							temp_dict[t]=value["$or"][0]
-							strconcat=strconcat+"Q('match',"+ t+"='"+value["$or"][0]+"') "
+							#strconcat=strconcat+"Q('match',"+t+"='"+value["$or"][0]+"') "
+							strconcat=strconcat+"Q('match',"+t+"=dict(query='"+value["$or"][0]+"',type='phrase'))$$"
 					elif isinstance(value, tuple):
 						temp_dict["language"]= value[1]	
-						strconcat=strconcat+"Q('match',"+ key+"='"+value[1]+"') "
+						#strconcat=strconcat+"Q('match',"+key+"='"+value[1]+"') "
+						strconcat=strconcat+"Q('match',"+key+"=dict(query='"+value[1]+"',type='phrase'))$$"
 					else:
 						if key != "source":
 							key = list(key)
 							key[13]='__'
 							t="".join(key)
 							temp_dict[t]=value
-							strconcat=strconcat+"Q('match',"+ t+"='"+value+"') "	
+							#strconcat=strconcat+"Q('match',"+ t+"='"+value+"') "
+							strconcat=strconcat+"Q('match',"+t+"=dict(query='"+value+"',type='phrase'))$$"	
 						else:
 							temp_dict[key]=value
-							strconcat=strconcat+"Q('match',"+ key+"='"+value+"') "	
+							#strconcat=strconcat+"Q('match',"+ key+"='"+value+"') "
+							strconcat=strconcat+"Q('match',"+key+"=dict(query='"+value+"',type='phrase'))$$"	
 
 	print temp_dict
 	#strconcat=strconcat
@@ -248,7 +256,7 @@ def render_test_template(request,group_id='home', app_id=None, page_no=1):
 
 	if selfilters:
 		if strconcat.count('match') == 1:
-			a=strconcat.split() #give list output
+			a=strconcat.split("$$") #give list output
 			a="".join(a) # we convert list to string 
 			print a
 			q = Q('bool', must=[Q('match', group_set=str(group_id)), Q('match',member_of=GST_FILE1.hits[0].id) , eval(str(a))],
@@ -269,9 +277,9 @@ def render_test_template(request,group_id='home', app_id=None, page_no=1):
 			
 		elif strconcat.count('match') == 2:
 
-			a,b = strconcat.split()
+			a,b = strconcat.split("$$",1)
 			a="".join(a)
-			b="".join(b)
+			b="".join(b[:-2])
 
 			q = Q('bool', must=[Q('match', group_set=str(group_id)), Q('match',member_of=GST_FILE1.hits[0].id) , eval(str(a)), eval(str(b))],
 			must_not=[Q('match', attribute_set__educationaluse ='ebooks')])
@@ -291,10 +299,10 @@ def render_test_template(request,group_id='home', app_id=None, page_no=1):
 
 
 		elif strconcat.count('match') == 3:
-			a,b,c=strconcat.split()
+			a,b,c=strconcat.split("$$",2)
 			a="".join(a)
 			b="".join(b)
-			c="".join(c)
+			c="".join(c[:-2])
 
 			
 			q = Q('bool', must=[Q('match', group_set=str(group_id)), Q('match',member_of=GST_FILE1.hits[0].id) , eval(str(a)),eval(str(b)),eval(str(c))],
@@ -314,11 +322,11 @@ def render_test_template(request,group_id='home', app_id=None, page_no=1):
 
 
 		elif strconcat.count('match') == 4:
-			a,b,c,d=strconcat.split()
+			a,b,c,d=strconcat.split("$$",3)
 			a="".join(a)
 			b="".join(b)
 			c="".join(c)
-			d="".join(d)
+			d="".join(d[:-2])
 			q = Q('bool', must=[Q('match', group_set=str(group_id)), Q('match',member_of=GST_FILE1.hits[0].id) , eval(str(a)),eval(str(b)),eval(str(c)),eval(str(d))],
 			must_not=[Q('match', attribute_set__educationaluse ='ebooks')])
 			collection_query = Q('bool', must=[Q('match', group_set=str(group_id)), Q('match',access_policy='public'),Q('exists',field='collection_set')
@@ -337,12 +345,12 @@ def render_test_template(request,group_id='home', app_id=None, page_no=1):
 
 
 		elif strconcat.count('match') == 5:
-			a,b,c=strconcat.split()
+			a,b,c,d,e=strconcat.split("$$",4)
 			a="".join(a)
 			b="".join(b)
 			c="".join(c)
 			d="".join(d)
-			e="".join(e)
+			e="".join(e[:-2])
 
 			q = Q('bool', must=[Q('match', group_set=str(group_id)), Q('match',member_of=GST_FILE1.hits[0].id) , eval(str(a)),eval(str(b)),eval(str(c)),eval(str(d)),eval(str(e))],
 			must_not=[Q('match', attribute_set__educationaluse ='ebooks')])
@@ -574,7 +582,7 @@ def render_test_template(request,group_id='home', app_id=None, page_no=1):
     )
 
 
-def elib_paged_file_objects(request, group_id, filetype, page_no=1):
+def elib_paged_file_objects(request, group_id, filetype, page_no):
 	'''
 	Method to implement pagination in File and E-Library app.
 	'''
@@ -622,7 +630,8 @@ def elib_paged_file_objects(request, group_id, filetype, page_no=1):
 								print "-----------------------------"
 								temp_dict[t]=value["$in"][0]
 								#strconcat=strconcat+"Q('match',"+ t+"='"+value["$in"][0]+"'),"
-								strconcat=strconcat+"Q('match',"+ t+"='"+value["$in"][0]+"') "
+								#strconcat=strconcat+"Q('match',"+ t+"='"+value["$in"][0]+"') "
+								strconcat=strconcat+"Q('match',"+t+"=dict(query='"+value["$in"][0]+"',type='phrase'))$$"
 							elif value["$or"]:
 								key = list(key)
 								key[13]='__'
@@ -630,20 +639,24 @@ def elib_paged_file_objects(request, group_id, filetype, page_no=1):
 								print t
 								print "------------------------"
 								temp_dict[t]=value["$or"][0]
-								strconcat=strconcat+"Q('match',"+ t+"='"+value["$or"][0]+"') "
+								#strconcat=strconcat+"Q('match',"+ t+"='"+value["$or"][0]+"') "
+								strconcat=strconcat+"Q('match',"+t+"=dict(query='"+value["$or"][0]+"',type='phrase'))$$"
 						elif isinstance(value, tuple):
 							temp_dict["language"]= value[1]	
-							strconcat=strconcat+"Q('match',"+ key+"='"+value[1]+"') "
+							#strconcat=strconcat+"Q('match',"+ key+"='"+value[1]+"') "
+							strconcat=strconcat+"Q('match',"+key+"=dict(query='"+value[1]+"',type='phrase'))$$"
 						else:
 							if key != "source":
 								key = list(key)
 								key[13]='__'
 								t="".join(key)
 								temp_dict[t]=value
-								strconcat=strconcat+"Q('match',"+ t+"='"+value+"') "	
+								#strconcat=strconcat+"Q('match',"+ t+"='"+value+"') "
+								strconcat=strconcat+"Q('match',"+t+"=dict(query='"+value+"',type='phrase'))$$"	
 							else:
 								temp_dict[key]=value
-								strconcat=strconcat+"Q('match',"+ key+"='"+value+"') "	
+								#strconcat=strconcat+"Q('match',"+ key+"='"+value+"') "
+								strconcat=strconcat+"Q('match',"+key+"=dict(query='"+value+"',type='phrase'))$$"	
 
 		print temp_dict
 		#strconcat=strconcat
@@ -703,7 +716,7 @@ def elib_paged_file_objects(request, group_id, filetype, page_no=1):
 
 				if strconcat.count('match') == 1:
 
-					a=strconcat.split()
+					a=strconcat.split("$$")
 					a="".join(a)
 					print a
 					q = Q('bool', must=[Q('match', group_set=str(group_id)), Q('match',member_of=GST_FILE1.hits[0].id) , Q('match', attribute_set__educationaluse =filetype), eval(str(a))],
@@ -717,9 +730,9 @@ def elib_paged_file_objects(request, group_id, filetype, page_no=1):
 			
 				elif strconcat.count('match') == 2:
 
-					a,b = strconcat.split()
+					a,b = strconcat.split("$$",1)
 					a="".join(a)
-					b="".join(b)
+					b="".join(b[:-2])
 
 					q = Q('bool', must=[Q('match', group_set=str(group_id)), Q('match',member_of=GST_FILE1.hits[0].id) ,  Q('match', attribute_set__educationaluse =filetype),eval(str(a)), eval(str(b))],
 					must_not=[Q('match', attribute_set__educationaluse ='ebooks')])
@@ -729,10 +742,10 @@ def elib_paged_file_objects(request, group_id, filetype, page_no=1):
 					should=[Q('match',member_of=GST_FILE1.hits[0].id),Q('match',member_of=GST_PAGE1.hits[0].id) ],
 					must_not=[Q('match', attribute_set__educationaluse ='ebooks')])
 				elif strconcat.count('match') == 3:
-					a,b,c=strconcat.split()
+					a,b,c=strconcat.split("$$",2)
 					a="".join(a)
 					b="".join(b)
-					c="".join(c)
+					c="".join(c[:-2])
 
 					
 					q = Q('bool', must=[Q('match', group_set=str(group_id)), Q('match',member_of=GST_FILE1.hits[0].id) ,Q('match', attribute_set__educationaluse =filetype), eval(str(a)),eval(str(b)),eval(str(c))],
@@ -742,11 +755,11 @@ def elib_paged_file_objects(request, group_id, filetype, page_no=1):
 					should=[Q('match',member_of=GST_FILE1.hits[0].id),Q('match',member_of=GST_PAGE1.hits[0].id) ],
 					must_not=[Q('match', attribute_set__educationaluse ='ebooks')])
 				elif strconcat.count('match') == 4:
-					a,b,c,d=strconcat.split()
+					a,b,c,d=strconcat.split("$$",3)
 					a="".join(a)
 					b="".join(b)
 					c="".join(c)
-					d="".join(d)
+					d="".join(d[:-2])
 					q = Q('bool', must=[Q('match', group_set=str(group_id)), Q('match',member_of=GST_FILE1.hits[0].id) , Q('match', attribute_set__educationaluse =filetype), eval(str(a)),eval(str(b)),eval(str(c)),eval(str(d))],
 					must_not=[Q('match', attribute_set__educationaluse ='ebooks')])
 					collection_query = Q('bool', must=[Q('match', group_set=str(group_id)), Q('match',access_policy='public'),Q('exists',field='collection_set'), Q('match', attribute_set__educationaluse =filetype)
@@ -754,12 +767,12 @@ def elib_paged_file_objects(request, group_id, filetype, page_no=1):
 					should=[Q('match',member_of=GST_FILE1.hits[0].id),Q('match',member_of=GST_PAGE1.hits[0].id) ],
 					must_not=[Q('match', attribute_set__educationaluse ='ebooks')])
 				elif strconcat.count('match') == 5:
-					a,b,c=strconcat.split()
+					a,b,c,d,e=strconcat.split("$$",4)
 					a="".join(a)
 					b="".join(b)
 					c="".join(c)
 					d="".join(d)
-					e="".join(e)
+					e="".join(e[:-2])
 
 					q = Q('bool', must=[Q('match', group_set=str(group_id)), Q('match',member_of=GST_FILE1.hits[0].id) , Q('match', attribute_set__educationaluse =filetype),eval(str(a)),eval(str(b)),eval(str(c)),eval(str(d)),eval(str(e))],
 					must_not=[Q('match', attribute_set__educationaluse ='ebooks')])
@@ -800,7 +813,7 @@ def elib_paged_file_objects(request, group_id, filetype, page_no=1):
 			print "else execute"
 			if filters:
 				if strconcat.count('match') == 1:
-					a=strconcat.split()
+					a=strconcat.split("$$")
 					a="".join(a)
 					print a
 					print "```````````````````````````````````````"
@@ -815,9 +828,9 @@ def elib_paged_file_objects(request, group_id, filetype, page_no=1):
 			
 				elif strconcat.count('match') == 2:
 
-					a,b = strconcat.split()
+					a,b = strconcat.split("$$",1)
 					a="".join(a)
-					b="".join(b)
+					b="".join(b[:-2])
 
 					q = Q('bool', must=[Q('match', group_set=str(group_id)), Q('match',member_of=GST_FILE1.hits[0].id) ,Q('terms',attribute_set__educationaluse=['documents','images','audios','videos']), eval(str(a)), eval(str(b))],
 					must_not=[Q('match', attribute_set__educationaluse ='ebooks')])
@@ -827,10 +840,10 @@ def elib_paged_file_objects(request, group_id, filetype, page_no=1):
 					should=[Q('match',member_of=GST_FILE1.hits[0].id),Q('match',member_of=GST_PAGE1.hits[0].id) ],
 					must_not=[Q('match', attribute_set__educationaluse ='ebooks')])
 				elif strconcat.count('match') == 3:
-					a,b,c=strconcat.split()
+					a,b,c=strconcat.split("$$",2)
 					a="".join(a)
 					b="".join(b)
-					c="".join(c)
+					c="".join(c[:-2])
 
 					
 					q = Q('bool', must=[Q('match', group_set=str(group_id)), Q('match',member_of=GST_FILE1.hits[0].id) ,Q('terms',attribute_set__educationaluse=['documents','images','audios','videos']), eval(str(a)),eval(str(b)),eval(str(c))],
@@ -840,11 +853,11 @@ def elib_paged_file_objects(request, group_id, filetype, page_no=1):
 					should=[Q('match',member_of=GST_FILE1.hits[0].id),Q('match',member_of=GST_PAGE1.hits[0].id) ],
 					must_not=[Q('match', attribute_set__educationaluse ='ebooks')])
 				elif strconcat.count('match') == 4:
-					a,b,c,d=strconcat.split()
+					a,b,c,d=strconcat.split("$$",3)
 					a="".join(a)
 					b="".join(b)
 					c="".join(c)
-					d="".join(d)
+					d="".join(d[:-2])
 					q = Q('bool', must=[Q('match', group_set=str(group_id)), Q('match',member_of=GST_FILE1.hits[0].id) ,Q('terms',attribute_set__educationaluse=['documents','images','audios','videos']), eval(str(a)),eval(str(b)),eval(str(c)),eval(str(d))],
 					must_not=[Q('match', attribute_set__educationaluse ='ebooks')])
 					collection_query = Q('bool', must=[Q('match', group_set=str(group_id)), Q('match',access_policy='public'),Q('exists',field='collection_set')
@@ -852,12 +865,12 @@ def elib_paged_file_objects(request, group_id, filetype, page_no=1):
 					should=[Q('match',member_of=GST_FILE1.hits[0].id),Q('match',member_of=GST_PAGE1.hits[0].id) ],
 					must_not=[Q('match', attribute_set__educationaluse ='ebooks')])
 				elif strconcat.count('match') == 5:
-					a,b,c=strconcat.split()
+					a,b,c,d,e=strconcat.split("$$",4)
 					a="".join(a)
 					b="".join(b)
 					c="".join(c)
 					d="".join(d)
-					e="".join(e)
+					e="".join(e[:-2])
 
 					q = Q('bool', must=[Q('match', group_set=str(group_id)), Q('match',member_of=GST_FILE1.hits[0].id) ,Q('terms',attribute_set__educationaluse=['documents','images','audios','videos']),eval(str(a)),eval(str(b)),eval(str(c)),eval(str(d)),eval(str(e))],
 					must_not=[Q('match', attribute_set__educationaluse ='ebooks')])
