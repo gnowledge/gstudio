@@ -45,6 +45,7 @@ from gnowsys_ndf.ndf.views.methods import get_group_name_id, cast_to_data_type, 
 from gnowsys_ndf.ndf.views.methods import get_filter_querydict
 from elasticsearch import Elasticsearch
 from elasticsearch_dsl import *
+from gnowsys_ndf.local_settings import GSTUDIO_ELASTIC_SEARCH
 
 
 es = Elasticsearch("http://elastic:changeme@gsearch:9200", timeout=100, retry_on_timeout=True)
@@ -370,6 +371,7 @@ def render_test_template(request,group_id='home', app_id=None, page_no=1):
 
 
 	else:
+		
 		q = Q('bool', must=[Q('match', group_set=str(group_id)), Q('match',access_policy='public'),Q('match',member_of=GST_FILE1.hits[0].id)],
 		must_not=[Q('match', attribute_set__educationaluse ='ebooks')])
 
@@ -577,7 +579,9 @@ def render_test_template(request,group_id='home', app_id=None, page_no=1):
 
 								 'collection_count': collection_pages_cur.count(),
 								 'groupid': group_id, 'group_id':group_id,
-								 "datavisual":datavisual},
+								 "datavisual":datavisual,
+								 "GSTUDIO_ELASTIC_SEARCH":GSTUDIO_ELASTIC_SEARCH,
+								 },
         context_instance=RequestContext(request)
     )
 
@@ -1008,12 +1012,13 @@ def elib_paged_file_objects(request, group_id, filetype, page_no):
 				results = paginator.page(paginator.num_pages)
 		
 
-	return render_to_response ("ndf/file_list_tab_new.html", {
+	return render_to_response ("ndf/file_list_tab.html", {
 			"filter_result": filter_result,
 			"group_id": group_id, "group_name_tag": group_id, "groupid": group_id,
 			'title': "E-Library", "educationaluse_stats": json.dumps(educationaluse_stats),
 			"resource_type": result_paginated_cur, "detail_urlname": detail_urlname,
 			"filetype": filetype, "res_type_name": "", "page_info": results,
+			"GSTUDIO_ELASTIC_SEARCH":GSTUDIO_ELASTIC_SEARCH,
 			},
 			context_instance = RequestContext(request))
 
