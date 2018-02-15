@@ -460,43 +460,9 @@ pre{
 
 
 
-body>footer {
-  //Site footer
-  padding:10px 5px;
-  position: relative;
-  background-color: rgba(0,0,0,0.8);
 
-  ul {
-    list-style-type: none;
-    text-decoration: none;
-    li {
-      font-size: 15px;
-      margin-bottom: 5px;
-    }
-  }
-  p {
-    margin: 10px;
-    font-size: 18px;
-  }
-  h2 {
-    font-size: 25px;
-  }
-  li {
-    color: #bbbbbb;
-  }
-  a {
-    color: #bbbbbb;
-    margin-top:0;
-    padding: 0;
-    display: inline;
-    &:hover {
-      text-decoration: none;
-      color: #ffffff;
-      margin-top:0;
-      padding: 0;
-      display: inline;
-    }
-  }
+  //Site footer
+
   .myfooter {
 
     .footer-section {
@@ -548,7 +514,7 @@ body>footer {
     }
 
   }
-}
+
 
 .coll-arrows {
     cursor:pointer;
