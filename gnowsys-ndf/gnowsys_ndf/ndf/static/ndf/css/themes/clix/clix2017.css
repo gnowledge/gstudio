@@ -6800,54 +6800,211 @@ ul.nav_menu_1 .button-save-new:hover {
   color: #912a7d;
 }
 
-/* line 7097, ../../../scss/_clix2017.scss */
-.myfooter .footer-section {
+/* line 7093, ../../../scss/_clix2017.scss */
+body > footer {
+  padding: 10px 5px;
+  position: relative;
+  background-color: rgba(0, 0, 0, 0.8);
+}
+/* line 7099, ../../../scss/_clix2017.scss */
+body > footer ul {
+  list-style-type: none;
+  text-decoration: none;
+}
+/* line 7102, ../../../scss/_clix2017.scss */
+body > footer ul li {
+  font-size: 15px;
+  margin-bottom: 5px;
+}
+/* line 7107, ../../../scss/_clix2017.scss */
+body > footer p {
+  margin: 10px;
+  font-size: 18px;
+}
+/* line 7111, ../../../scss/_clix2017.scss */
+body > footer h2 {
+  font-size: 25px;
+}
+/* line 7114, ../../../scss/_clix2017.scss */
+body > footer li {
+  color: #bbbbbb;
+}
+/* line 7117, ../../../scss/_clix2017.scss */
+body > footer a {
+  color: #bbbbbb;
+  margin-top: 0;
+  padding: 0;
+  display: inline;
+}
+/* line 7122, ../../../scss/_clix2017.scss */
+body > footer a:hover {
+  text-decoration: none;
+  color: #ffffff;
+  margin-top: 0;
+  padding: 0;
+  display: inline;
+}
+/* line 7132, ../../../scss/_clix2017.scss */
+body > footer .myfooter .footer-section {
   color: #ffffff;
   text-align: center;
 }
-/* line 7101, ../../../scss/_clix2017.scss */
-.myfooter .inline_mar-right {
+/* line 7136, ../../../scss/_clix2017.scss */
+body > footer .myfooter .inline_mar-right {
   display: inline-block;
   margin: 0 25px 15px 0;
 }
-/* line 7106, ../../../scss/_clix2017.scss */
-.myfooter .footer_content {
+/* line 7141, ../../../scss/_clix2017.scss */
+body > footer .myfooter .footer_content {
   margin: 20px;
 }
-/* line 7109, ../../../scss/_clix2017.scss */
-.myfooter .footer_content .footer-logo {
+/* line 7144, ../../../scss/_clix2017.scss */
+body > footer .myfooter .footer_content .footer-logo {
   height: 65px;
   width: 150px;
 }
-/* line 7114, ../../../scss/_clix2017.scss */
-.myfooter .links_collapse {
+/* line 7149, ../../../scss/_clix2017.scss */
+body > footer .myfooter .links_collapse {
   max-height: 78px;
   overflow: hidden;
   transition: all 0.5s ease-out;
 }
-/* line 7119, ../../../scss/_clix2017.scss */
-.myfooter .links_collapse ul {
+/* line 7154, ../../../scss/_clix2017.scss */
+body > footer .myfooter .links_collapse ul {
   display: inline;
   padding: 0;
   margin: 0px !important;
 }
-/* line 7125, ../../../scss/_clix2017.scss */
-.myfooter .footer_link_cont {
+/* line 7160, ../../../scss/_clix2017.scss */
+body > footer .myfooter .footer_link_cont {
   display: inline-block;
   vertical-align: top;
-  margin: 20px;
+  /*margin: 20px;*/
   text-align: left;
 }
-/* line 7131, ../../../scss/_clix2017.scss */
-.myfooter .footer_link_cont .links_show {
+/* line 7166, ../../../scss/_clix2017.scss */
+body > footer .myfooter .footer_link_cont .links_show {
   max-height: 600px;
 }
-/* line 7135, ../../../scss/_clix2017.scss */
-.myfooter .footer_link_cont .show_foot_links {
+/* line 7170, ../../../scss/_clix2017.scss */
+body > footer .myfooter .footer_link_cont h4 {
+  color: #999;
+}
+/* line 7173, ../../../scss/_clix2017.scss */
+body > footer .myfooter .footer_link_cont .social_links {
+  font-size: 24px;
+  margin-right: 5px;
+}
+/* line 7178, ../../../scss/_clix2017.scss */
+body > footer .myfooter .footer_link_cont .show_foot_links {
   color: #777777;
   cursor: pointer;
 }
-/* line 7139, ../../../scss/_clix2017.scss */
-.myfooter .footer_link_cont .show_foot_links:hover {
+/* line 7181, ../../../scss/_clix2017.scss */
+body > footer .myfooter .footer_link_cont .show_foot_links i {
+  font-size: 24px;
+  margin-right: 5px;
+}
+/* line 7184, ../../../scss/_clix2017.scss */
+body > footer .myfooter .footer_link_cont .show_foot_links:hover {
   text-decoration: underline;
+}
+/* line 7191, ../../../scss/_clix2017.scss */
+body > footer hr.footerlogo-divider {
+  border-color: #555;
+  margin-top: 10px;
+}
+
+/*<<<<<<< HEAD
+
+  //Site footer
+
+  .myfooter {
+
+    .footer-section {
+      color: #ffffff;
+      text-align: center;
+    }
+    .inline_mar-right {
+      display: inline-block;
+      margin: 0 25px 15px 0;
+    }
+    //Footer links
+    .footer_content {
+      margin: 20px;
+
+      .footer-logo {
+        height: 65px;
+        width: 150px;
+      }
+    }
+    .links_collapse {
+      max-height: 78px;
+      overflow: hidden;
+      transition: all 0.5s ease-out;
+
+      ul {
+        display: inline;
+        padding: 0;
+        margin: 0px !important;
+      }
+    }
+    .footer_link_cont {
+      display: inline-block;
+      vertical-align: top;
+      margin: 20px;
+      text-align: left;
+
+      .links_show {
+        //change as per requirement on addition on more links in future
+        max-height: 600px;
+      }
+      .show_foot_links {
+        color: #777777;
+        cursor: pointer;
+
+        &:hover {
+          text-decoration: underline;
+        }
+      }
+    }
+
+  }
+=======*/
+/* line 7253, ../../../scss/_clix2017.scss */
+body > footer ul#footerlogo li {
+  margin: 0px 5px;
+  display: inline;
+}
+
+/* line 7259, ../../../scss/_clix2017.scss */
+.no-gap ul {
+  margin-left: 0rem;
+}
+
+/* line 7265, ../../../scss/_clix2017.scss */
+body > footer ul#poweredlogos {
+  margin-left: 0px;
+}
+
+/* line 7269, ../../../scss/_clix2017.scss */
+#poweredlogos li {
+  margin: 0px 5px;
+  display: inline;
+}
+
+/* line 7275, ../../../scss/_clix2017.scss */
+.no-gap ul {
+  margin-left: 0rem;
+}
+
+/* line 7280, ../../../scss/_clix2017.scss */
+.coll-arrows {
+  cursor: pointer;
+  display: block;
+  padding: 0.5rem;
+}
+/* line 7285, ../../../scss/_clix2017.scss */
+.coll-arrows:hover {
+  background-color: #D3D3D3;
 }

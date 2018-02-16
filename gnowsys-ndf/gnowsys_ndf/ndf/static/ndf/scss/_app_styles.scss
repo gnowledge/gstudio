@@ -458,11 +458,19 @@ pre{
     //     }
 }
 
+html,body {
+                height:100%;
+              width: 100%;
+          }
+
 body>footer {
   //Site footer
   padding:10px 5px;
   position: relative;
   background-color: rgba(0,0,0,0.8);
+  height:auto;
+  width:100%;
+  display:table;
 
   ul {
     list-style-type: none;
@@ -497,6 +505,9 @@ body>footer {
   }
   .myfooter {
 
+    display:table-row;
+    height:1px;
+
     .footer-section {
       color: #ffffff;
       text-align: center;
@@ -528,17 +539,27 @@ body>footer {
     .footer_link_cont {
       display: inline-block;
       vertical-align: top;
-      margin: 20px;
+      /*margin: 20px;*/
       text-align: left;
 
       .links_show {
         //change as per requirement on addition on more links in future
         max-height: 600px;
       }
+      h4{
+        color: #999;
+      }
+      .social_links{
+        font-size: 24px; 
+        margin-right:5px;
+      }
+      
       .show_foot_links {
         color: #777777;
         cursor: pointer;
-
+        i{
+          font-size: 24px; margin-right:5px;
+        }
         &:hover {
           text-decoration: underline;
         }
@@ -546,63 +567,38 @@ body>footer {
     }
 
   }
+  hr.footerlogo-divider{
+  border-color: #555;
+  margin-top: 10px;
+  }  
+}
+
+body > footer ul#footerlogo li
+{
+  margin: 0px 5px; 
+  display:inline;
+
+}
+.no-gap ul
+{
+    margin-left: 0rem;
 }
 
 
-  //Site footer
+body > footer ul#poweredlogos{
+  margin-left: 0px;
+}    
 
-  .myfooter {
+#poweredlogos li
+{
+  margin: 0px 5px;
+  display:inline;
 
-    .footer-section {
-      color: #ffffff;
-      text-align: center;
-    }
-    .inline_mar-right {
-      display: inline-block;
-      margin: 0 25px 15px 0;
-    }
-    //Footer links
-    .footer_content {
-      margin: 20px;
-
-      .footer-logo {
-        height: 65px;
-        width: 150px;
-      }
-    }
-    .links_collapse {
-      max-height: 78px;
-      overflow: hidden;
-      transition: all 0.5s ease-out;
-
-      ul {
-        display: inline;
-        padding: 0;
-        margin: 0px !important;
-      }
-    }
-    .footer_link_cont {
-      display: inline-block;
-      vertical-align: top;
-      margin: 20px;
-      text-align: left;
-
-      .links_show {
-        //change as per requirement on addition on more links in future
-        max-height: 600px;
-      }
-      .show_foot_links {
-        color: #777777;
-        cursor: pointer;
-
-        &:hover {
-          text-decoration: underline;
-        }
-      }
-    }
-
-  }
-
+}
+.no-gap ul
+{
+  margin-left: 0rem;
+}
 
 .coll-arrows {
     cursor:pointer;
@@ -613,6 +609,7 @@ body>footer {
       background-color: #D3D3D3;
   }
 }
+
 
 /* Sections */
 main>article {
@@ -8072,5 +8069,30 @@ $module-card-lines-to-show: 3;
     width: 120px !important;
     margin-top: 2px !important;
     letter-spacing: 0.4px;
+}
+
+
+/*****Toolbar CSS******/
+#toolbar{
+  background-color: #3e3e3e;
+}
+.datetime{
+  color: #eaeaea; 
+  padding: 4px 0px 2px 5px; 
+  font-size: 11px;
+}
+.changefont{
+  text-align: right; 
+  padding: 2px 5px 1px 0px; 
+
+  .minus{
+    font-size:60%; color: #eaeaea;
+  } 
+  .normal{
+    font-size:80%; color: #eaeaea;
+  }
+  .plus{
+    font-size:100%; color: #eaeaea;
+  }
 }
 
