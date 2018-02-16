@@ -190,7 +190,7 @@ def render_test_template(request,group_id='home', app_id=None, page_no=1):
 							temp_dict[t]=value["$in"][0]
 							#strconcat=strconcat+"Q('match',"+ t+"='"+value["$in"][0]+"'),"
 							#Q('match',name=dict(query="e-book", type="phrase"))
-							strconcat=strconcat+"Q('match',"+t+"=dict(query='"+value["$in"][0]+"',type='phrase'))$$"
+							#strconcat=strconcat+"Q('match',"+t+"=dict(query='"+value["$in"][0]+"',type='phrase'))$$"
 							lists.append("Q('match',"+t+"=dict(query='"+value["$in"][0]+"',type='phrase'))")
 						elif value["$or"]:
 							key = list(key)
@@ -200,7 +200,7 @@ def render_test_template(request,group_id='home', app_id=None, page_no=1):
 							print "------------------------"
 							temp_dict[t]=value["$or"][0]
 							#strconcat=strconcat+"Q('match',"+t+"='"+value["$or"][0]+"') "
-							strconcat=strconcat+"Q('match',"+t+"=dict(query='"+value["$or"][0]+"',type='phrase'))$$"
+							#strconcat=strconcat+"Q('match',"+t+"=dict(query='"+value["$or"][0]+"',type='phrase'))$$"
 							lists.append("Q('match',"+t+"=dict(query='"+value["$or"][0]+"',type='phrase'))")
 					elif isinstance(value, tuple):
 						temp_dict["language"]= value[1]	
@@ -214,12 +214,12 @@ def render_test_template(request,group_id='home', app_id=None, page_no=1):
 							t="".join(key)
 							temp_dict[t]=value
 							#strconcat=strconcat+"Q('match',"+ t+"='"+value+"') "
-							strconcat=strconcat+"Q('match',"+t+"=dict(query='"+value+"',type='phrase'))$$"
+							#strconcat=strconcat+"Q('match',"+t+"=dict(query='"+value+"',type='phrase'))$$"
 							lists.append("Q('match',"+t+"=dict(query='"+value+"',type='phrase'))")	
 						else:
 							temp_dict[key]=value
 							#strconcat=strconcat+"Q('match',"+ key+"='"+value+"') "
-							strconcat=strconcat+"Q('match',"+key+"=dict(query='"+value+"',type='phrase'))$$"	
+							#strconcat=strconcat+"Q('match',"+key+"=dict(query='"+value+"',type='phrase'))$$"	
 							lists.append("Q('match',"+key+"=dict(query='"+value+"',type='phrase'))")
 
 	print temp_dict
@@ -268,123 +268,22 @@ def render_test_template(request,group_id='home', app_id=None, page_no=1):
 			strconcat1 = strconcat1+'eval(str("'+ value +'")),'
 		print strconcat1
 
+
 		q = eval("Q('bool', must=[Q('match', group_set=str(group_id)), Q('match',member_of=GST_FILE1.hits[0].id),"+strconcat1[:-1]+"],must_not=[Q('match', attribute_set__educationaluse ='ebooks')])")
-		if strconcat.count('match') == 11:
-			a=strconcat.split("$$") #give list output
-			a="".join(a) # we convert list to string 
-			print a
-			a = "Q('match',attribute_set__educationalsubject=dict(query='Science',type='phrase'))"
-			b= a = "Q('match',attribute_set__educationalsubject=dict(query='Science',type='phrase'))"
-			q = eval("Q('bool', must=[Q('match', group_set=str(group_id)), Q('match',member_of=GST_FILE1.hits[0].id) , eval(str(a)),eval(str(b))],must_not=[Q('match', attribute_set__educationaluse ='ebooks')])")
 
+		collection_query = eval("Q('bool', must=[Q('match', group_set=str(group_id)), Q('match',access_policy='public'),Q('exists',field='collection_set'),"+strconcat1[:-1]+"],"
+							+ "should=[Q('match',member_of=GST_FILE1.hits[0].id),Q('match',member_of=GST_PAGE1.hits[0].id) ],"
+							+ "must_not=[Q('match', attribute_set__educationaluse ='ebooks')])")
 
-
-			collection_query = Q('bool', must=[Q('match', group_set=str(group_id)), Q('match',access_policy='public'),Q('exists',field='collection_set')
-								,eval(str(a))],
-			should=[Q('match',member_of=GST_FILE1.hits[0].id),Q('match',member_of=GST_PAGE1.hits[0].id) ],
-			must_not=[Q('match', attribute_set__educationaluse ='ebooks')])
-
-			q_images_count = Q('bool', must=[Q('match', attribute_set__educationaluse='images'),eval(str(a))])
-			q_audios_count = Q('bool', must=[Q('match', attribute_set__educationaluse='audios'),eval(str(a))])
-			q_videos_count = Q('bool', must=[Q('match', attribute_set__educationaluse='videos'),eval(str(a))])
-			q_intercatives_count = Q('bool', must=[Q('match', attribute_set__educationaluse='interactives'),eval(str(a))])
-			q_applications_count = Q('bool', must=[Q('match', attribute_set__educationaluse='documents'),eval(str(a))])
-			q_ebooks_count = Q('bool', must=[Q('match', attribute_set__educationaluse='ebooks'),eval(str(a))])
-			q_all_count=  Q('bool', must=[Q('terms',attribute_set__educationaluse=['documents','images','audios','videos','interactives']),eval(str(a))])
-			
-		elif strconcat.count('match') == 21:
-
-			a,b = strconcat.split("$$",1)
-			a="".join(a)
-			b="".join(b[:-2])
-
-			q = Q('bool', must=[Q('match', group_set=str(group_id)), Q('match',member_of=GST_FILE1.hits[0].id) , eval(str(a)), eval(str(b))],
-			must_not=[Q('match', attribute_set__educationaluse ='ebooks')])
-
-			collection_query = Q('bool', must=[Q('match', group_set=str(group_id)), Q('match',access_policy='public'),Q('exists',field='collection_set')
-								,eval(str(a)), eval(str(b))],
-			should=[Q('match',member_of=GST_FILE1.hits[0].id),Q('match',member_of=GST_PAGE1.hits[0].id) ],
-			must_not=[Q('match', attribute_set__educationaluse ='ebooks')])
-
-			q_images_count = Q('bool', must=[Q('match', attribute_set__educationaluse='images'),eval(str(a)),eval(str(b))])
-			q_audios_count = Q('bool', must=[Q('match', attribute_set__educationaluse='audios'),eval(str(a)),eval(str(b))])
-			q_videos_count = Q('bool', must=[Q('match', attribute_set__educationaluse='videos'),eval(str(a)),eval(str(b))])
-			q_intercatives_count = Q('bool', must=[Q('match', attribute_set__educationaluse='interactives'),eval(str(a)),eval(str(b))])
-			q_applications_count = Q('bool', must=[Q('match', attribute_set__educationaluse='documents'),eval(str(a)),eval(str(b))])
-			q_ebooks_count = Q('bool', must=[Q('match', attribute_set__educationaluse='ebooks'),eval(str(a)),eval(str(b))])
-			q_all_count=  Q('bool', must=[Q('terms',attribute_set__educationaluse=['documents','images','audios','videos','interactives']),eval(str(a)),eval(str(b))])
-
-
-		elif strconcat.count('match') == 31:
-			a,b,c=strconcat.split("$$",2)
-			a="".join(a)
-			b="".join(b)
-			c="".join(c[:-2])
-
-			
-			q = Q('bool', must=[Q('match', group_set=str(group_id)), Q('match',member_of=GST_FILE1.hits[0].id) , eval(str(a)),eval(str(b)),eval(str(c))],
-			must_not=[Q('match', attribute_set__educationaluse ='ebooks')])
-			collection_query = Q('bool', must=[Q('match', group_set=str(group_id)), Q('match',access_policy='public'),Q('exists',field='collection_set')
-								,eval(str(a)), eval(str(b)), eval(str(c))],
-			should=[Q('match',member_of=GST_FILE1.hits[0].id),Q('match',member_of=GST_PAGE1.hits[0].id) ],
-			must_not=[Q('match', attribute_set__educationaluse ='ebooks')])
-
-			q_images_count = Q('bool', must=[Q('match', attribute_set__educationaluse='images'),eval(str(a)),eval(str(b)),eval(str(c))])
-			q_audios_count = Q('bool', must=[Q('match', attribute_set__educationaluse='audios'),eval(str(a)),eval(str(b)),eval(str(c))])
-			q_videos_count = Q('bool', must=[Q('match', attribute_set__educationaluse='videos'),eval(str(a)),eval(str(b)),eval(str(c))])
-			q_intercatives_count = Q('bool', must=[Q('match', attribute_set__educationaluse='interactives'),eval(str(a)),eval(str(b)),eval(str(c))])
-			q_applications_count = Q('bool', must=[Q('match', attribute_set__educationaluse='documents'),eval(str(a)),eval(str(b)),eval(str(c))])
-			q_ebooks_count = Q('bool', must=[Q('match', attribute_set__educationaluse='ebooks'),eval(str(a)),eval(str(b)),eval(str(c))])
-			q_all_count=  Q('bool', must=[Q('terms',attribute_set__educationaluse=['documents','images','audios','videos','interactives']),eval(str(a)),eval(str(b)),eval(str(c))])
-
-
-		elif strconcat.count('match') == 41:
-			a,b,c,d=strconcat.split("$$",3)
-			a="".join(a)
-			b="".join(b)
-			c="".join(c)
-			d="".join(d[:-2])
-			q = Q('bool', must=[Q('match', group_set=str(group_id)), Q('match',member_of=GST_FILE1.hits[0].id) , eval(str(a)),eval(str(b)),eval(str(c)),eval(str(d))],
-			must_not=[Q('match', attribute_set__educationaluse ='ebooks')])
-			collection_query = Q('bool', must=[Q('match', group_set=str(group_id)), Q('match',access_policy='public'),Q('exists',field='collection_set')
-								,eval(str(a)), eval(str(b)), eval(str(c)), eval(str(d))],
-			should=[Q('match',member_of=GST_FILE1.hits[0].id),Q('match',member_of=GST_PAGE1.hits[0].id) ],
-			must_not=[Q('match', attribute_set__educationaluse ='ebooks')])
-
-			q_images_count = Q('bool', must=[Q('match', attribute_set__educationaluse='images'),eval(str(a)),eval(str(b)),eval(str(c)),eval(str(d))])
-			q_audios_count = Q('bool', must=[Q('match', attribute_set__educationaluse='audios'),eval(str(a)),eval(str(b)),eval(str(c)),eval(str(d))])
-			q_videos_count = Q('bool', must=[Q('match', attribute_set__educationaluse='videos'),eval(str(a)),eval(str(b)),eval(str(c)),eval(str(d))])
-			q_intercatives_count = Q('bool', must=[Q('match', attribute_set__educationaluse='interactives'),eval(str(a)),eval(str(b)),eval(str(c)),eval(str(d))])
-			q_applications_count = Q('bool', must=[Q('match', attribute_set__educationaluse='documents'),eval(str(a)),eval(str(b)),eval(str(c)),eval(str(d))])
-			q_ebooks_count = Q('bool', must=[Q('match', attribute_set__educationaluse='ebooks'),eval(str(a)),eval(str(b)),eval(str(c)),eval(str(d))])
-			q_all_count=  Q('bool', must=[Q('terms',attribute_set__educationaluse=['documents','images','audios','videos','interactives']),eval(str(a)),eval(str(b)),eval(str(c)),eval(str(d))])
-
-
-
-		elif strconcat.count('match') == 51:
-			a,b,c,d,e=strconcat.split("$$",4)
-			a="".join(a)
-			b="".join(b)
-			c="".join(c)
-			d="".join(d)
-			e="".join(e[:-2])
-
-			q = Q('bool', must=[Q('match', group_set=str(group_id)), Q('match',member_of=GST_FILE1.hits[0].id) , eval(str(a)),eval(str(b)),eval(str(c)),eval(str(d)),eval(str(e))],
-			must_not=[Q('match', attribute_set__educationaluse ='ebooks')])
-			collection_query = Q('bool', must=[Q('match', group_set=str(group_id)), Q('match',access_policy='public'),Q('exists',field='collection_set')
-								,eval(str(a)), eval(str(b)), eval(str(c)), eval(str(d)), eval(str(e))],
-			should=[Q('match',member_of=GST_FILE1.hits[0].id),Q('match',member_of=GST_PAGE1.hits[0].id) ],
-			must_not=[Q('match', attribute_set__educationaluse ='ebooks')])
-
-			q_images_count = Q('bool', must=[Q('match', attribute_set__educationaluse='images'),eval(str(a)),eval(str(b)),eval(str(c)),eval(str(d)),eval(str(e))])
-			q_audios_count = Q('bool', must=[Q('match', attribute_set__educationaluse='audios'),eval(str(a)),eval(str(b)),eval(str(c)),eval(str(d)),eval(str(e))])
-			q_videos_count = Q('bool', must=[Q('match', attribute_set__educationaluse='videos'),eval(str(a)),eval(str(b)),eval(str(c)),eval(str(d)),eval(str(e))])
-			q_intercatives_count = Q('bool', must=[Q('match', attribute_set__educationaluse='interactives'),eval(str(a)),eval(str(b)),eval(str(c)),eval(str(d)),eval(str(e))])
-			q_applications_count = Q('bool', must=[Q('match', attribute_set__educationaluse='documents'),eval(str(a)),eval(str(b)),eval(str(c)),eval(str(d)),eval(str(e))])
-			q_ebooks_count = Q('bool', must=[Q('match', attribute_set__educationaluse='ebooks'),eval(str(a)),eval(str(b)),eval(str(c)),eval(str(d)),eval(str(e))])
-			q_all_count=  Q('bool', must=[Q('terms',attribute_set__educationaluse=['documents','images','audios','videos','interactives']),eval(str(a)),eval(str(b)),eval(str(c)),eval(str(d)),eval(str(e))])
-
-
+		q_images_count = eval("Q('bool', must=[Q('match', attribute_set__educationaluse='images'),"+strconcat1[:-1]+"])")
+		q_audios_count = eval("Q('bool', must=[Q('match', attribute_set__educationaluse='audios'),"+strconcat1[:-1]+"])")
+		q_videos_count = eval("Q('bool', must=[Q('match', attribute_set__educationaluse='videos'),"+strconcat1[:-1]+"])")
+		q_intercatives_count = eval("Q('bool', must=[Q('match', attribute_set__educationaluse='interactives'),"+strconcat1[:-1]+"])")
+		q_applications_count = eval("Q('bool', must=[Q('match', attribute_set__educationaluse='documents'),"+strconcat1[:-1]+"])")
+		q_ebooks_count = eval("Q('bool', must=[Q('match', attribute_set__educationaluse='ebooks'),"+strconcat1[:-1]+"])")
+		q_all_count = eval("Q('bool', must=["+strconcat1[:-1]+"],"
+							+"should=[Q('match', attribute_set__educationaluse='documents'),Q('match', attribute_set__educationaluse='images'),Q('match', attribute_set__educationaluse='videos'),"
+							"Q('match', attribute_set__educationaluse='interactives')])")
 
 	else:
 		
@@ -440,6 +339,7 @@ def render_test_template(request,group_id='home', app_id=None, page_no=1):
 		q_ebooks_count = Q('bool', must=[Q('match', attribute_set__educationaluse='ebooks')])
 		q_all_count=  Q('bool', must=[Q('terms',attribute_set__educationaluse=['documents','images','audios','videos','interactives'])])
 
+
 	images_count =Search(using=es, index="nodes",doc_type="gsystemtype,gsystem,metatype,relationtype,attribute_type,group,author").query(q_images_count)
 	audios_count =Search(using=es, index="nodes",doc_type="gsystemtype,gsystem,metatype,relationtype,attribute_type,group,author").query(q_audios_count)
 	videos_count =Search(using=es, index="nodes",doc_type="gsystemtype,gsystem,metatype,relationtype,attribute_type,group,author").query(q_videos_count)
@@ -447,9 +347,9 @@ def render_test_template(request,group_id='home', app_id=None, page_no=1):
 	applications_count =Search(using=es, index="nodes",doc_type="gsystemtype,gsystem,metatype,relationtype,attribute_type,group,author").query(q_applications_count)
 	ebooks_count =Search(using=es, index="nodes",doc_type="gsystemtype,gsystem,metatype,relationtype,attribute_type,group,author").query(q_ebooks_count)
 	all_count =Search(using=es, index="nodes",doc_type="gsystemtype,gsystem,metatype,relationtype,attribute_type,group,author").query(q_all_count)
-	#q = Q('bool', should=[Q('match', attribute_set__educationaluse='images'),Q('match', attribute_set__educationaluse='videos'),
-	#	Q('match', attribute_set__educationaluse='audios'),Q('match', attribute_set__educationaluse='documents'),
-	#	Q('match', attribute_set__educationaluse='interactives')])
+	q = Q('bool', should=[Q('match', attribute_set__educationaluse='images'),Q('match', attribute_set__educationaluse='videos'),
+		Q('match', attribute_set__educationaluse='audios'),Q('match', attribute_set__educationaluse='documents'),
+		Q('match', attribute_set__educationaluse='interactives')])
 	
 	
 
@@ -630,11 +530,12 @@ def elib_paged_file_objects(request, group_id, filetype, page_no):
 			query_dict = get_filter_querydict(selfilters)
 
 		#query_dict.append({'attribute_set.educationaluse': {'$ne': u'eBooks'}})
-		i=-1
 
+		i=-1
 		strconcat=""
 		endstring=""
 		temp_dict={}
+		lists = []
 		#print query_dict
 
 		for each in list(query_dict):
@@ -651,8 +552,9 @@ def elib_paged_file_objects(request, group_id, filetype, page_no):
 								print "-----------------------------"
 								temp_dict[t]=value["$in"][0]
 								#strconcat=strconcat+"Q('match',"+ t+"='"+value["$in"][0]+"'),"
-								#strconcat=strconcat+"Q('match',"+ t+"='"+value["$in"][0]+"') "
-								strconcat=strconcat+"Q('match',"+t+"=dict(query='"+value["$in"][0]+"',type='phrase'))$$"
+								#Q('match',name=dict(query="e-book", type="phrase"))
+								#strconcat=strconcat+"Q('match',"+t+"=dict(query='"+value["$in"][0]+"',type='phrase'))$$"
+								lists.append("Q('match',"+t+"=dict(query='"+value["$in"][0]+"',type='phrase'))")
 							elif value["$or"]:
 								key = list(key)
 								key[13]='__'
@@ -660,12 +562,14 @@ def elib_paged_file_objects(request, group_id, filetype, page_no):
 								print t
 								print "------------------------"
 								temp_dict[t]=value["$or"][0]
-								#strconcat=strconcat+"Q('match',"+ t+"='"+value["$or"][0]+"') "
-								strconcat=strconcat+"Q('match',"+t+"=dict(query='"+value["$or"][0]+"',type='phrase'))$$"
+								#strconcat=strconcat+"Q('match',"+t+"='"+value["$or"][0]+"') "
+								#strconcat=strconcat+"Q('match',"+t+"=dict(query='"+value["$or"][0]+"',type='phrase'))$$"
+								lists.append("Q('match',"+t+"=dict(query='"+value["$or"][0]+"',type='phrase'))")
 						elif isinstance(value, tuple):
 							temp_dict["language"]= value[1]	
-							#strconcat=strconcat+"Q('match',"+ key+"='"+value[1]+"') "
+							#strconcat=strconcat+"Q('match',"+key+"='"+value[1]+"') "
 							strconcat=strconcat+"Q('match',"+key+"=dict(query='"+value[1]+"',type='phrase'))$$"
+							lists.append("Q('match',"+key+"=dict(query='"+value[1]+"',type='phrase'))")
 						else:
 							if key != "source":
 								key = list(key)
@@ -673,17 +577,18 @@ def elib_paged_file_objects(request, group_id, filetype, page_no):
 								t="".join(key)
 								temp_dict[t]=value
 								#strconcat=strconcat+"Q('match',"+ t+"='"+value+"') "
-								strconcat=strconcat+"Q('match',"+t+"=dict(query='"+value+"',type='phrase'))$$"	
+								#strconcat=strconcat+"Q('match',"+t+"=dict(query='"+value+"',type='phrase'))$$"
+								lists.append("Q('match',"+t+"=dict(query='"+value+"',type='phrase'))")	
 							else:
 								temp_dict[key]=value
 								#strconcat=strconcat+"Q('match',"+ key+"='"+value+"') "
-								strconcat=strconcat+"Q('match',"+key+"=dict(query='"+value+"',type='phrase'))$$"	
+								#strconcat=strconcat+"Q('match',"+key+"=dict(query='"+value+"',type='phrase'))$$"	
+								lists.append("Q('match',"+key+"=dict(query='"+value+"',type='phrase'))")
 
 		print temp_dict
 		#strconcat=strconcat
 		print strconcat
-		print 
-
+		print lists
 
 
 		detail_urlname = "file_detail"
@@ -735,72 +640,22 @@ def elib_paged_file_objects(request, group_id, filetype, page_no):
 
 			if filters:
 
-				if strconcat.count('match') == 1:
+				strconcat1 = ""
+				for value in lists:
+					print "************************************************"
+					print value
+					print "************************************************"
+					strconcat1 = strconcat1+'eval(str("'+ value +'")),'
+				print strconcat1
 
-					a=strconcat.split("$$")
-					a="".join(a)
-					print a
-					q = Q('bool', must=[Q('match', group_set=str(group_id)), Q('match',member_of=GST_FILE1.hits[0].id) , Q('match', attribute_set__educationaluse =filetype), eval(str(a))],
-					must_not=[Q('match', attribute_set__educationaluse ='ebooks')])
 
-					collection_query = Q('bool', must=[Q('match', group_set=str(group_id)), Q('match',access_policy='public'),Q('exists',field='collection_set'), Q('match', attribute_set__educationaluse =filetype)
-										,eval(str(a))],
-					should=[Q('match',member_of=GST_FILE1.hits[0].id),Q('match',member_of=GST_PAGE1.hits[0].id) ],
-					must_not=[Q('match', attribute_set__educationaluse ='ebooks')])
+				q = eval("Q('bool', must=[Q('match', group_set=str(group_id)), Q('match',member_of=GST_FILE1.hits[0].id),Q('match', attribute_set__educationaluse =filetype),"+strconcat1[:-1]+"])")
 
-			
-				elif strconcat.count('match') == 2:
+				collection_query = eval("Q('bool', must=[Q('match', group_set=str(group_id)),Q('match',access_policy='public'),Q('exists',field='collection_set'),Q('match', attribute_set__educationaluse =filetype),"+strconcat1[:-1]+"],"
+									+ "should=[Q('match',member_of=GST_FILE1.hits[0].id),Q('match',member_of=GST_PAGE1.hits[0].id) ],"
+									+ "must_not=[Q('match', attribute_set__educationaluse ='ebooks')])")
 
-					a,b = strconcat.split("$$",1)
-					a="".join(a)
-					b="".join(b[:-2])
 
-					q = Q('bool', must=[Q('match', group_set=str(group_id)), Q('match',member_of=GST_FILE1.hits[0].id) ,  Q('match', attribute_set__educationaluse =filetype),eval(str(a)), eval(str(b))],
-					must_not=[Q('match', attribute_set__educationaluse ='ebooks')])
-
-					collection_query = Q('bool', must=[Q('match', group_set=str(group_id)), Q('match',access_policy='public'),Q('exists',field='collection_set'), Q('match', attribute_set__educationaluse =filetype)
-										,eval(str(a)), eval(str(b))],
-					should=[Q('match',member_of=GST_FILE1.hits[0].id),Q('match',member_of=GST_PAGE1.hits[0].id) ],
-					must_not=[Q('match', attribute_set__educationaluse ='ebooks')])
-				elif strconcat.count('match') == 3:
-					a,b,c=strconcat.split("$$",2)
-					a="".join(a)
-					b="".join(b)
-					c="".join(c[:-2])
-
-					
-					q = Q('bool', must=[Q('match', group_set=str(group_id)), Q('match',member_of=GST_FILE1.hits[0].id) ,Q('match', attribute_set__educationaluse =filetype), eval(str(a)),eval(str(b)),eval(str(c))],
-					must_not=[Q('match', attribute_set__educationaluse ='ebooks')])
-					collection_query = Q('bool', must=[Q('match', group_set=str(group_id)), Q('match',access_policy='public'),Q('exists',field='collection_set'), Q('match', attribute_set__educationaluse =filetype)
-										,eval(str(a)), eval(str(b)), eval(str(c))],
-					should=[Q('match',member_of=GST_FILE1.hits[0].id),Q('match',member_of=GST_PAGE1.hits[0].id) ],
-					must_not=[Q('match', attribute_set__educationaluse ='ebooks')])
-				elif strconcat.count('match') == 4:
-					a,b,c,d=strconcat.split("$$",3)
-					a="".join(a)
-					b="".join(b)
-					c="".join(c)
-					d="".join(d[:-2])
-					q = Q('bool', must=[Q('match', group_set=str(group_id)), Q('match',member_of=GST_FILE1.hits[0].id) , Q('match', attribute_set__educationaluse =filetype), eval(str(a)),eval(str(b)),eval(str(c)),eval(str(d))],
-					must_not=[Q('match', attribute_set__educationaluse ='ebooks')])
-					collection_query = Q('bool', must=[Q('match', group_set=str(group_id)), Q('match',access_policy='public'),Q('exists',field='collection_set'), Q('match', attribute_set__educationaluse =filetype)
-										,eval(str(a)), eval(str(b)), eval(str(c)), eval(str(d))],
-					should=[Q('match',member_of=GST_FILE1.hits[0].id),Q('match',member_of=GST_PAGE1.hits[0].id) ],
-					must_not=[Q('match', attribute_set__educationaluse ='ebooks')])
-				elif strconcat.count('match') == 5:
-					a,b,c,d,e=strconcat.split("$$",4)
-					a="".join(a)
-					b="".join(b)
-					c="".join(c)
-					d="".join(d)
-					e="".join(e[:-2])
-
-					q = Q('bool', must=[Q('match', group_set=str(group_id)), Q('match',member_of=GST_FILE1.hits[0].id) , Q('match', attribute_set__educationaluse =filetype),eval(str(a)),eval(str(b)),eval(str(c)),eval(str(d)),eval(str(e))],
-					must_not=[Q('match', attribute_set__educationaluse ='ebooks')])
-					collection_query = Q('bool', must=[Q('match', group_set=str(group_id)), Q('match',access_policy='public'),Q('exists',field='collection_set'), Q('match', attribute_set__educationaluse =filetype)
-										,eval(str(a)), eval(str(b)), eval(str(c)), eval(str(d)), eval(str(e))],
-					should=[Q('match',member_of=GST_FILE1.hits[0].id),Q('match',member_of=GST_PAGE1.hits[0].id) ],
-					must_not=[Q('match', attribute_set__educationaluse ='ebooks')])	
 			else:
 				print "----------11111111111111111111111111-----------------------------"
 				
