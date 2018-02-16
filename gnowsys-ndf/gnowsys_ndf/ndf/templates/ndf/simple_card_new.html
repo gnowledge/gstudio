@@ -23,7 +23,7 @@
 
   </style>
  
- <div class="scard-container" data-id="{{resource.pk}}">
+ <div class="scard-container" data-id="{{resource.id}}">
  <div class="scard" data-mime-type="{{resource.if_file.mime_type}}" original-src="{% if 'video' in resource.if_file.mime_type   %}{{MEDIA_URL}}{{resource.if_file.mid.relurl}}{% else %}{{MEDIA_URL}}{{resource.if_file.original.relurl}}{% endif %}">
  {% if is_event %}
   {% get_event_status resource as event_status_msg %}
@@ -48,9 +48,12 @@
 {% endif %}
 <div class="scard-image" title="{% firstof resource.altnames resource.name %}">
 
+    {% if GSTUDIO_ELASTIC_SEARCH != True %}
+      {% get_dict_from_list_of_dicts resource.attribute_set as attr_set_dict %}
+    {% endif %}
     
 
-    {% get_relation_value resource.pk 'has_thumbnail' as grel_dict %}
+    {% get_relation_value resource.id 'has_thumbnail' as grel_dict %}
     {% if not grel_dict.cursor and grel_dict.grel_node and grel_dict.grel_node.fs_file_ids.1 %}
         <img src="{{MEDIA_URL}}{{grel_dict.grel_node.if_file.mid.relurl}}" alt="" />
     {% elif grel_dict.grel_node.if_file.thumbnail.relurl and  'video' or "File" in resource.if_file.mime_type %}
@@ -83,7 +86,7 @@
     {% elif "Group" in resource.member_of_names_list or has_logo == True or has_prof_pic == True %}
       {% if "Course" in resource.member_of_names_list or has_logo == True %}
 
-        {% get_relation_value resource.pk 'has_logo' as grel_dict %}
+        {% get_relation_value resource.id 'has_logo' as grel_dict %}
         {% if not grel_dict.cursor and grel_dict.grel_node and grel_dict.grel_node.if_file.mid.relurl %}
                   <img src="{{MEDIA_URL}}{{grel_dict.grel_node.if_file.mid.relurl}}" alt="" />
           {% else %}
@@ -92,7 +95,7 @@
 
 
       {% else %}
-        {% get_relation_value resource.pk 'has_profile_pic' as grel_dict %}
+        {% get_relation_value resource.id 'has_profile_pic' as grel_dict %}
         {% if not grel_dict.cursor and grel_dict.grel_node and grel_dict.grel_node.if_file.mid.relurl %}
                   <img src="{{MEDIA_URL}}{{grel_dict.grel_node.if_file.mid.relurl}}" alt="" />
           {% else %}
@@ -139,7 +142,7 @@
      
      {% if user.is_authenticated  and not group_object.edit_policy == "NON_EDITABLE"  or gstaff_access %} 
       {% if not no_checkbox  %}
-        </a> <input type="checkbox" style="margin:0; float:left;" class="filenode" name="filenode" value="{{resource.pk}}">
+        </a> <input type="checkbox" style="margin:0; float:left;" class="filenode" name="filenode" value="{{resource.id}}">
       {% endif %}
     {% endif %}
   </div>
