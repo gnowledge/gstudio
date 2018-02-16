@@ -211,8 +211,14 @@
   </script>
   </div>   
 </body>
+
       {% if not no_footer %}
-        {% include 'ndf/footer_clix.html' %}
+        {% if site.SITE_NAME == "NROER" %}
+            {% include 'ndf/footer.html' %}
+        {% else %}
+            {% include 'ndf/footer_clix.html' %}
+      
+        {% endif %}
       {% endif %}
 
 </html>
