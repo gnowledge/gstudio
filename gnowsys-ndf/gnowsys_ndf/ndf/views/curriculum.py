@@ -272,6 +272,9 @@ def curriculum_create_edit(request, group_id,curriculum_id=None):
             #                 collection_list = get_collection_list(collection_list, obj)
             #     collection_list.append({"name":"Add Branch","class":"create_branch","type":"branch"})
             # print "\n context_variables: ", context_variables
+            topic_gst = node_collection.one({'_type': 'GSystemType', 'name': 'Topic'})
+            topic_nodes = node_collection.find({'member_of': {'$in': [topic_gst._id]}})
+            context_variables.update({"topic_nodes" : topic_nodes})
             return render_to_response("ndf/curriculum_hierarchy.html",
                                   context_variables,
                                   context_instance=RequestContext(request))
