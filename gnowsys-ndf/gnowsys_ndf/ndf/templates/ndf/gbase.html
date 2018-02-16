@@ -209,63 +209,16 @@
 
 
   </script>
-<footer>
   </div>   
-    <style type="text/css">
-/*            
-            #page_content{
-                                display: table;
-                height:auto;
-                                display: table-row;
-
-            }
-            
-            html,body {
-                height:100%;
-                width: 100%;
-            }
-
-
-
-            body {
-
-                    display: table;
-            }
-
-            .footer_container{
-                    height: auto;
-                    display: table-row;
-            }
-
-            #footer {
-                height: 1px;
-            }
-*/    </style>
-
-    {% if not no_footer %}
-    <div id="footer" class="footer_container">
-        {% include 'ndf/footer_clix.html' %}
-     </div>   
-    {% endif %}
-
-        
-    <script type="text/javascript">
-      
-       $(window).bind("load", function () {
-        var footer = $("#footer");
-        var pos = footer.position();
-        var height = $(window).height();
-        height = height - pos.top;
-        height = height - footer.height();
-        if (height > 0) {
-            footer.css({
-                'margin-top': height + 'px'
-            });
-        }
-        });
-    </script>
-
 </body>
 
-    
+      {% if not no_footer %}
+        {% if site.SITE_NAME == "NROER" %}
+            {% include 'ndf/footer.html' %}
+        {% else %}
+            {% include 'ndf/footer_clix.html' %}
+      
+        {% endif %}
+      {% endif %}
+
 </html>
