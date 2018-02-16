@@ -172,6 +172,7 @@ def render_test_template(request,group_id='home', app_id=None, page_no=1):
 	strconcat=""
 	endstring=""
 	temp_dict={}
+	lists = []
 	#print query_dict
 
 	for each in list(query_dict):
@@ -190,7 +191,7 @@ def render_test_template(request,group_id='home', app_id=None, page_no=1):
 							#strconcat=strconcat+"Q('match',"+ t+"='"+value["$in"][0]+"'),"
 							#Q('match',name=dict(query="e-book", type="phrase"))
 							strconcat=strconcat+"Q('match',"+t+"=dict(query='"+value["$in"][0]+"',type='phrase'))$$"
-
+							lists.append("Q('match',"+t+"=dict(query='"+value["$in"][0]+"',type='phrase'))")
 						elif value["$or"]:
 							key = list(key)
 							key[13]='__'
@@ -200,10 +201,12 @@ def render_test_template(request,group_id='home', app_id=None, page_no=1):
 							temp_dict[t]=value["$or"][0]
 							#strconcat=strconcat+"Q('match',"+t+"='"+value["$or"][0]+"') "
 							strconcat=strconcat+"Q('match',"+t+"=dict(query='"+value["$or"][0]+"',type='phrase'))$$"
+							lists.append("Q('match',"+t+"=dict(query='"+value["$or"][0]+"',type='phrase'))")
 					elif isinstance(value, tuple):
 						temp_dict["language"]= value[1]	
 						#strconcat=strconcat+"Q('match',"+key+"='"+value[1]+"') "
 						strconcat=strconcat+"Q('match',"+key+"=dict(query='"+value[1]+"',type='phrase'))$$"
+						lists.append("Q('match',"+key+"=dict(query='"+value[1]+"',type='phrase'))")
 					else:
 						if key != "source":
 							key = list(key)
@@ -211,16 +214,18 @@ def render_test_template(request,group_id='home', app_id=None, page_no=1):
 							t="".join(key)
 							temp_dict[t]=value
 							#strconcat=strconcat+"Q('match',"+ t+"='"+value+"') "
-							strconcat=strconcat+"Q('match',"+t+"=dict(query='"+value+"',type='phrase'))$$"	
+							strconcat=strconcat+"Q('match',"+t+"=dict(query='"+value+"',type='phrase'))$$"
+							lists.append("Q('match',"+t+"=dict(query='"+value+"',type='phrase'))")	
 						else:
 							temp_dict[key]=value
 							#strconcat=strconcat+"Q('match',"+ key+"='"+value+"') "
 							strconcat=strconcat+"Q('match',"+key+"=dict(query='"+value+"',type='phrase'))$$"	
+							lists.append("Q('match',"+key+"=dict(query='"+value+"',type='phrase'))")
 
 	print temp_dict
 	#strconcat=strconcat
 	print strconcat
-
+	print lists
 	#files = node_collection.find({
 									# 'member_of': {'$in': [GST_FILE._id, GST_PAGE._id]},
 									#'member_of': {'$in': [GST_FILE._id,GST_JSMOL._id]},
@@ -255,12 +260,24 @@ def render_test_template(request,group_id='home', app_id=None, page_no=1):
 	a,b,c,d,e = ([] for i in range(5))
 
 	if selfilters:
-		if strconcat.count('match') == 1:
+		strconcat1 = ""
+		for value in lists:
+			print "************************************************"
+			print value
+			print "************************************************"
+			strconcat1 = strconcat1+'eval(str("'+ value +'")),'
+		print strconcat1
+
+		q = eval("Q('bool', must=[Q('match', group_set=str(group_id)), Q('match',member_of=GST_FILE1.hits[0].id),"+strconcat1[:-1]+"],must_not=[Q('match', attribute_set__educationaluse ='ebooks')])")
+		if strconcat.count('match') == 11:
 			a=strconcat.split("$$") #give list output
 			a="".join(a) # we convert list to string 
 			print a
-			q = Q('bool', must=[Q('match', group_set=str(group_id)), Q('match',member_of=GST_FILE1.hits[0].id) , eval(str(a))],
-			must_not=[Q('match', attribute_set__educationaluse ='ebooks')])
+			a = "Q('match',attribute_set__educationalsubject=dict(query='Science',type='phrase'))"
+			b= a = "Q('match',attribute_set__educationalsubject=dict(query='Science',type='phrase'))"
+			q = eval("Q('bool', must=[Q('match', group_set=str(group_id)), Q('match',member_of=GST_FILE1.hits[0].id) , eval(str(a)),eval(str(b))],must_not=[Q('match', attribute_set__educationaluse ='ebooks')])")
+
+
 
 			collection_query = Q('bool', must=[Q('match', group_set=str(group_id)), Q('match',access_policy='public'),Q('exists',field='collection_set')
 								,eval(str(a))],
@@ -275,7 +292,7 @@ def render_test_template(request,group_id='home', app_id=None, page_no=1):
 			q_ebooks_count = Q('bool', must=[Q('match', attribute_set__educationaluse='ebooks'),eval(str(a))])
 			q_all_count=  Q('bool', must=[Q('terms',attribute_set__educationaluse=['documents','images','audios','videos','interactives']),eval(str(a))])
 			
-		elif strconcat.count('match') == 2:
+		elif strconcat.count('match') == 21:
 
 			a,b = strconcat.split("$$",1)
 			a="".join(a)
@@ -298,7 +315,7 @@ def render_test_template(request,group_id='home', app_id=None, page_no=1):
 			q_all_count=  Q('bool', must=[Q('terms',attribute_set__educationaluse=['documents','images','audios','videos','interactives']),eval(str(a)),eval(str(b))])
 
 
-		elif strconcat.count('match') == 3:
+		elif strconcat.count('match') == 31:
 			a,b,c=strconcat.split("$$",2)
 			a="".join(a)
 			b="".join(b)
@@ -321,7 +338,7 @@ def render_test_template(request,group_id='home', app_id=None, page_no=1):
 			q_all_count=  Q('bool', must=[Q('terms',attribute_set__educationaluse=['documents','images','audios','videos','interactives']),eval(str(a)),eval(str(b)),eval(str(c))])
 
 
-		elif strconcat.count('match') == 4:
+		elif strconcat.count('match') == 41:
 			a,b,c,d=strconcat.split("$$",3)
 			a="".join(a)
 			b="".join(b)
@@ -344,7 +361,7 @@ def render_test_template(request,group_id='home', app_id=None, page_no=1):
 
 
 
-		elif strconcat.count('match') == 5:
+		elif strconcat.count('match') == 51:
 			a,b,c,d,e=strconcat.split("$$",4)
 			a="".join(a)
 			b="".join(b)
