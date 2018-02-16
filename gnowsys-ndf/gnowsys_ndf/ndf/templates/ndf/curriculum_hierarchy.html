@@ -267,15 +267,24 @@
                                 $('#addDivision').find('.add_asset').show();
                             }
                             $('.subsection-label-view').html("");
-                            $('.subsection-label-view').append("Sub-Section Name " + ": " +node.name);
-                            $('#addDivision').find('.create_division').html('Update Sub-Section');
                             $('#addDivision').find('.create_division').attr("id",node.id);
                             $('#addDivision').find('.delete_division').show();
                             $('#addDivision').find('input[type=text][name="branch_name"]').val(node.name);
                             $('#addDivision').find('input').val(node.name);
                             //$('#addDivision').find('input[type=checkbox]').val(node.isLeaf);
                             $('#addDivision').find('input[type=checkbox][name="isLeafNode"]').closest('label').hide();
-                            $('.subsection-label-heading').html("Update Sub-Section");
+                            if(node.node_type == "Topic"){
+                                $('.subsection-label-view').html("");
+                                $('.subsection-label-heading').html("Update Topic");
+                                $('.subsection-label-view').append("Topic Name " + ": " +node.name);
+                                $('#addDivision').find('.create_division').html('Update Topic');
+                            }
+                            else{
+                                $('.subsection-label-view').html("");
+                                $('.subsection-label-view').append("Sub-Section Name " + ": " +node.name);
+                                $('.subsection-label-heading').html("Update Sub-Section");
+                                $('#addDivision').find('.create_division').html('Update Sub-Section');
+                            }
                             $('.subsection-view-area').css('display','block');
                             $('.subsection-edit-area').css('display','none');
                             
