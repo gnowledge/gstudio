@@ -211,5 +211,8 @@
   </script>
   </div>   
 </body>
-{% include 'ndf/footer.html' %}
+      {% if not no_footer %}
+        {% include 'ndf/footer_clix.html' %}
+      {% endif %}
+
 </html>

@@ -135,7 +135,6 @@
                       </label>
                     </div>
                 </div>            
-            </form>
                 <a href="{% if unit_node %} {% url 'groupchange' unit_node.pk %}{% else %} {% url 'explore_basecourses' %}{% endif %} " class="asset-unit-button right" value="Cancel"/>{% trans "Cancel" %}</a>
                 <input type="submit" class="asset-unit-button right" id="save_unit" value="Save" style="border-radius: 4px !important;" />
 
@@ -161,6 +160,7 @@
                     <input type="submit" class="asset-unit-button right" id="save_unit" value="Save"/>
                 </div>
                     {% endcomment %}
+            </form>
         </div>
     </div>
 
