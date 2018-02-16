@@ -1,76 +1,76 @@
 **gStudio Data Collection**
 
-    [A]. Quantitative data
-        1. Comments
-            Created
-            Received (on Notes or Files)
+[A]. Quantitative data
+1. Comments
+    - Created (integer)
+    - Received (on Notes or Files)
 
-        2. Notes
-            Created
-            Views [ No. of visits NOT USERS]
-                Views gained
-                Views on others Notes
-                //self visits are NOT counted
+2. Notes
+    - Created
+    - Views [ No. of visits NOT USERS]
+        - Views gained
+        - Views on others Notes
+        //self visits are NOT counted
 
-            Comments
-                Comments gained 
-                Commented on others Notes [No. of comments NOT NOTES]
-                Comments by others [No. of comments NOT NOTES]
-                Comments by unique users [No. of users NOT COMMENTS]*
+    - Comments
+        - Comments gained 
+        - Commented on others Notes [No. of comments NOT NOTES]
+        - Comments by others [No. of comments NOT NOTES]
+        - Comments by unique users [No. of users NOT COMMENTS]*
 
-            Average Rating
-                Average of rating on all created Notes 
+    - Average Rating
+        - Average of rating on all created Notes 
 
-        3. Files
-            Created
-            Views [ No. of visits NOT USERS]
-                Views gained
-                Views on others Notes
-                //self visits are NOT counted
+3. Files
+    - Created
+    - Views [ No. of visits NOT USERS]
+        - Views gained
+        - Views on others Notes
+        //self visits are NOT counted
 
-            Comments
-                Comments gained 
-                Commented on others Notes [No. of comments NOT NOTES]
-                Comments by others [No. of comments NOT NOTES]
-                Comments by unique users [No. of users NOT COMMENTS]*
+    - Comments
+        - Comments gained 
+        - Commented on others Notes [No. of comments NOT NOTES]
+        - Comments by others [No. of comments NOT NOTES]
+        - Comments by unique users [No. of users NOT COMMENTS]*
 
-            Average Rating
-                Average of rating on all created Notes 
+    - Average Rating
+        Average of rating on all created Notes 
 
-        4. Quiz
-            Attempt
-                Type
-                    Submit
-                    Check*
-                Attempt(s)
-                    No. of Attempt(s)*
-                    Response(s) with timestamp(s)*
-            Correct
-            Incorrect
+4. Quiz
+    - Attempt
+        - Type
+            - Submit
+            - Check*
+        - Attempt(s)
+            - No. of Attempt(s)*
+            - Response(s) with timestamp(s)*
+    - Correct
+    - Incorrect
 
-        5. Assessments
-            Questions:
-                Total in Unit*
-                Attempted
-                UnAttempted
-                Correct
-                InCorrect
+5. Assessments
+    - Questions:
+        - Total in Unit*
+        - Attempted
+        - UnAttempted
+        - Correct
+        - InCorrect
 
-        6. Course View Status
-            Activities
-                isVisited
-                Visits [Activity X was visited N no. of times]*
-            Lessons 
-                Finish
-                    if ALL Activties within Lesson is/are visited
-                In-Progress
-                    if SOME Activties within Lesson are visited*
+6. Course View Status
+    - Activities
+        - isVisited
+        - Visits [Activity X was visited N no. of times]*
+    - Lessons 
+        - Finish
+            - if ALL Activties within Lesson is/are visited
+        - In-Progress
+            - if SOME Activties within Lesson are visited*
 
-    [B]. Qualitative data
-        1. Artefacts
-            Comments
-            Files
-            Notes
+[B]. Qualitative data
+1. Artefacts
+    - Comments
+    - Files
+    - Notes
 
 
 

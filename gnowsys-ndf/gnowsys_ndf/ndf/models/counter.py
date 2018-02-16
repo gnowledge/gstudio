@@ -22,6 +22,7 @@ class Counter(DjangoDocument):
         'comments_gained':  0,  # Count of comments not resources
         'commented_on_others_res':  0, # count of resources not comments
         'comments_by_others_on_res': {},
+        # {userid: <count int>, userid: <count int>, ..}
 
         'avg_rating_gained': 0,  # total_rating/rating_count_received
         'rating_count_received': 0,
@@ -55,15 +56,18 @@ class Counter(DjangoDocument):
         # Total fields should be updated on enroll action
         # On module/unit add/delete, update 'total' fields for all users in celery
         
+        # following is mapping of fields w.r.t. newer unit/lesson/activity implementation
+        # <i2c time course>: <newer unit implementation>
+        #
+        # course: unit
+        # modules: lesson
+        # units: activities
         'course':{'modules':{'completed':int, 'total':int}, 'units':{'completed':int, 'total':int}},
 
         # 'visited_nodes' = {str(ObjectId): int(count_of_visits)}
         'visited_nodes': {basestring: int},
         'assessment': []
         #             [{'id: basestring, 'correct': int, 'failed_attempts': int}]
-        # 'assessment': {
-        #             'offered_id': {'total': int, 'correct': int, 'incorrect_attempts': int}
-        #             }
     }
 
     default_values = {
