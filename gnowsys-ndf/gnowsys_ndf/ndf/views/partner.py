@@ -168,44 +168,43 @@ def partner_list(request, group_id):
 @get_execution_time
 def nroer_groups(request, group_id, groups_category):
     group_name, group_id = get_group_name_id(group_id)
-    print 'groups_category: ',groups_category
-
+    GSTUDIO_NROER_MENU = ["States", "Institutions", "Individuals" , "Teachers", "Interest Groups", "Schools"]
     mapping = GSTUDIO_NROER_MENU_MAPPINGS
 
     groups_names_list = []
     # loop over nroer menu except "Repository"
-    for each_item in GSTUDIO_NROER_MENU[1:]:
-        temp_key_name = each_item.keys()[0]
-        if temp_key_name == groups_category:
-            groups_names_list = each_item.get(groups_category, [])
-            # mapping for the text names in list
-            groups_names_list = [mapping.get(i) for i in groups_names_list]
-            break
-    # print "\n\ngroups_names_list",groups_names_list
-    group_nodes = []
+    # for each_item in GSTUDIO_NROER_MENU[1:]:
+    #     temp_key_name = each_item.keys()[0]
+    #     if temp_key_name == groups_category:
+    #         groups_names_list = each_item.get(groups_category, [])
+    #         # mapping for the text names in list
+    #         groups_names_list = [mapping.get(i) for i in groups_names_list]
+    #         break
+    # # print "\n\ngroups_names_list",groups_names_list
+    # group_nodes = []
 
-    '''
-    For displaying Partners and Groups in same order
-     as defined in settings GSTUDIO_NROER_MENU_MAPPINGS
-    '''
-    for eachgroup in groups_names_list:
-        grp_node = node_collection.one({'_type': "Group", 'name': unicode(eachgroup)})
-        group_nodes.append(grp_node)
+    # '''
+    # For displaying Partners and Groups in same order
+    #  as defined in settings GSTUDIO_NROER_MENU_MAPPINGS
+    # '''
+    # for eachgroup in groups_names_list:
+    #     grp_node = node_collection.one({'_type': "Group", 'name': unicode(eachgroup)})
+    #     group_nodes.append(grp_node)
 
-    # group_nodes = node_collection.find({ '_type': "Group",
-    #                                     '_id': {'$nin': [ObjectId(group_id)]},
+    # # group_nodes = node_collection.find({ '_type': "Group",
+    # #                                     '_id': {'$nin': [ObjectId(group_id)]},
 
-    #                                     'name': {'$nin': ["home"], '$in': groups_names_list},
-    #                                     'group_type': "PUBLIC"
-    #                                  }).sort('created_at', -1)
+    # #                                     'name': {'$nin': ["home"], '$in': groups_names_list},
+    # #                                     'group_type': "PUBLIC"
+    # #                                  }).sort('created_at', -1)
 
     if groups_category == "Partners":
         app_gst = node_collection.one({'_type': 'GSystemType', 'name': 'PartnerGroup'})
 
     elif groups_category == "Groups":
         app_gst = gst_group
+    group_nodes = node_collection.find({"_type":'Group',"name" : {"$in" : GSTUDIO_NROER_MENU }})
 
-    print 'group_nodes: ',groups_names_list
 
     # print "=============", app_gst
     # group_nodes_count = group_nodes.count() if group_nodes else 0
