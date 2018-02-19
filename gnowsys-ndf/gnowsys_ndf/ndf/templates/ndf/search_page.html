@@ -28,7 +28,11 @@
     <ul class="small-block-grid-5 medium-block-grid-3 large-block-grid-5" >
       {% for each in  search_curr %}
         <li class="card-image-wrapper" >
-        {% include 'ndf/simple_card.html' with  no_footer=True resource=each url_name="page_details" first_arg=groupid second_arg=each %}
+        {% if GSTUDIO_ELASTIC_SEARCH == True %}
+          {% include 'ndf/simple_card.html' with  no_footer=True resource=each url_name="page_details" first_arg=groupid second_arg=each.id %}
+        {% else %}
+          {% include 'ndf/simple_card.html' with  no_footer=True resource=each url_name="page_details" first_arg=groupid second_arg=each%}
+        {%endif%}
         </li>
       {% endfor %}
     </ul>

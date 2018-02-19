@@ -95,7 +95,7 @@ GST_VIDEO1=GST_VIDEO.execute()
 
 e_library_GST = Search(using=es, index="nodes",doc_type="gsystemtype").query("match", name="library")
 e_library_GST1=e_library_GST.execute()
-
+		
 pandora_video_st = Search(using=es, index="nodes",doc_type="gsystemtype").query("match", name="pandora")
 pandora_video_st1=pandora_video_st.execute()
 

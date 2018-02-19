@@ -4,7 +4,7 @@ import json
 from django.shortcuts import render_to_response
 from django.template import RequestContext
 # from django.core.urlresolvers import reverse
-from mongokit import paginator
+#from mongokit import paginator
 #from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 
 try:
@@ -21,7 +21,7 @@ from gnowsys_ndf.ndf.views.methods import get_filter_querydict
 from elasticsearch import Elasticsearch
 from elasticsearch_dsl import *
 from gnowsys_ndf.ndf.paginator import Paginator ,EmptyPage, PageNotAnInteger
-
+from gnowsys_ndf.local_settings import GSTUDIO_ELASTIC_SEARCH
 
 # GST_IMAGE = node_collection.one({'_type':'GSystemType', 'name': u"Image"})
 
@@ -79,24 +79,16 @@ def ebook_listing(request, group_id, page_no=1):
 	# 	})
 
 	#print GST_FILE._id
-	GST_FILE_temp=[]
-
+	#GST_FILE_temp=[]
+	GST_FILE_ID=None
 
 	for a in GST_FILE:
-		temp1=a.id
-		GST_FILE_temp.append(temp1)
+		GST_FILE_ID = a.id
 
-	#print temp
-	GST_PAGE_temp=[]
+	GST_PAGE_ID=None
 
 	for a in GST_PAGE:
-		temp1=a.id
-		GST_PAGE_temp.append(temp1)
-
-	#ebook_gst_temp=[]
-	#for a in ebook_gst['hits']['hits']:
-	#	temp1=ObjectId(a['_source']['id'])
-	#	ebook_gst_temp.append(temp1)
+		GST_PAGE_ID = a.id
 
 	
 	#ebook_gst1 = [doc['_source'] for doc in ebook_gst['hits']['hits']]
@@ -120,7 +112,7 @@ def ebook_listing(request, group_id, page_no=1):
 
 
 	all_ebooks1 = Q('bool', must=[Q('match', group_set=str(group_id)), Q('match',access_policy='public'),Q('match', attribute_set__educationaluse ='ebooks')]
-					,should=[Q('match',member_of=GST_FILE_temp),Q('match',member_of=GST_PAGE_temp) ])
+					,should=[Q('match',member_of=GST_FILE_ID),Q('match',member_of=GST_PAGE_ID) ])
 	all_ebooks =Search(using=es, index="nodes",doc_type="gsystemtype,gsystem,metatype,relationtype,attribute_type,group,author").query(all_ebooks1)
 
 
@@ -148,10 +140,10 @@ def ebook_listing(request, group_id, page_no=1):
 	#							'collection_set': {'$exists': "true", '$not': {'$size': 0} }
 	#							}).sort("last_update", -1)
 
-	all_ebooks_temp = []
+	#all_ebooks_temp = []
 
 	#print all_ebooks.count()
-	print all_ebooks.to_dict()
+	#print all_ebooks.to_dict()
 
 
 	#all_ebooks1 = [doc['_source'] for doc in all_ebooks1['hits']['hits']]
@@ -160,7 +152,7 @@ def ebook_listing(request, group_id, page_no=1):
 
 	result_paginated_cur = all_ebooks
 
-	if page_no == 1:
+	if int(page_no) == 1:
 		result_cur=all_ebooks[0:24]
 				
 	else:
@@ -175,9 +167,9 @@ def ebook_listing(request, group_id, page_no=1):
 	print result_cur
 	paginator = Paginator(result_paginated_cur, 24)
 				#page = request.GET.get('page')
-			
+	
 	try:
-		results = paginator.page(page_no)
+		results = paginator.page(int(page_no))
 	except PageNotAnInteger:
 		results = paginator.page(1)
 	except EmptyPage:
@@ -186,5 +178,5 @@ def ebook_listing(request, group_id, page_no=1):
 	return render_to_response("ndf/ebook.html", {
 								"all_ebooks": all_ebooks, "ebook_gst": ebook_gst,
 								"page_info": results, "title": "eBooks",
-								"group_id": group_id, "groupid": group_id,"all_ebooks1_count":10
+								"group_id": group_id, "groupid": group_id,"all_ebooks1_count":all_ebooks.count(),
 								}, context_instance = RequestContext(request))
