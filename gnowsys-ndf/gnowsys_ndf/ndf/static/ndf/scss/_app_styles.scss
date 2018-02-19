@@ -7554,6 +7554,22 @@ $ah_2_background_color_hover: rgba(244, 244, 244, 0.3);;
     }
 }
 
+.lms_explore_head_unit{
+    width: 100%;
+    height: 50px;
+    background-color:#fff;
+    color: $primary-blue;
+    >p{
+        margin-left: 81px;
+        padding: 0px 0px 0px 1px;
+        font-family: OpenSans-Semibold;
+        font-size: 20px;
+    }
+    >a{
+        padding: 0px 85px 3px 0px;
+    }
+}
+
 
 .lms_explore_back_unit{
     background-color: #fff;
