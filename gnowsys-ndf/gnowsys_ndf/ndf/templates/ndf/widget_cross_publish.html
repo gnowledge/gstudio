@@ -8,9 +8,11 @@
   <p class="inner compulsory"> {% trans "* Use Ctrl + Click to select multiple options" %}</p>
   <div class="row">
   <i><p class="inner">{% trans "Selections: "%}</i> <strong class="selGroupCount"></strong></p>
-  <div class="inner right">
+  
+  <!--<div class="inner right">
   <input type="checkbox" id="remove_from_curr_grp-{{node.pk}}" value="1"> {% trans "Remove from " %} '{% firstof group_object.altnames group_object.name %}'
   </div>
+  -->
   </div>
   <div id="switchgrp" class="content">
     <select id="selGroup-{{node.pk}}" multiple = "multiple" size = "10" style="height: 500px;"> </select>
@@ -90,10 +92,10 @@
   $(document).on('click', '#save_switch_group-{{node.pk}}', function(){
 
     selectedGroups = $("#selGroup-{{node.pk}}").val()
-    remove_from_curr_grp_flag = document.getElementById('remove_from_curr_grp-{{node.pk}}').checked
-    console.log("selectedGroups")
+    // remove_from_curr_grp_flag = document.getElementById('remove_from_curr_grp-{{node.pk}}').checked
+    selectedGroups.push($("option:disabled").val())
     if (selectedGroups){
-    console.log(selectedGroups)
+    // console.log(selectedGroups)
 
     $.ajax({
       type: "POST",
@@ -102,7 +104,7 @@
         "group_ids": selectedGroups,
         "node_id": "{{node.pk}}",
         "publishChildren": "True",
-        "remove_from_curr_grp_flag": remove_from_curr_grp_flag,
+        // "remove_from_curr_grp_flag": remove_from_curr_grp_flag,
         "csrfmiddlewaretoken": "{{csrf_token}}"
       },
       datatype: "html",
