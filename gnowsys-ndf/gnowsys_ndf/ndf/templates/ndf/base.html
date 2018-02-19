@@ -58,7 +58,7 @@
 </head>
 
 <body itemscope itemtype="http://schema.org/Webpage">
-
+   <div id="base_wrap">
   {% get_group_object groupid as group_object %}
   {% check_accounts_url request.path as is_ac_url %}
 
@@ -82,6 +82,7 @@
    {% endif %}
    {% endcomment %}
   <div class="workspace">
+   
     <div class="off-canvas-wrap" data-offcanvas>
       <div class="inner-wrap">
 
@@ -152,6 +153,7 @@
         </main>
       </div>
     </div>
+  </div>
   </div>
 
 
@@ -326,7 +328,9 @@
     {% block script %} {% endblock %}
 
   </script>
+
 </body>
+ 
 
 </html>
 

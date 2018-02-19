@@ -61,7 +61,7 @@
 
 </head>
 <body>
-    <div class="page_content">
+    <div id="gbase_wrap">
     {% if site.BUDDY_LOGIN and user.is_authenticated and site.SITE_NAME == 'clix' and request.author.agency_type == 'Student'%}
         {% include "ndf/buddy.html" %}
     {% endif %}
@@ -190,7 +190,7 @@
     //       {% block document_ready %} {% endblock %}
 
     //     }
-    //     finally{
+    //     finally{s
     //       // function defined in app.js to check the font and load it asynchronously.
     //       checkOpenSansFont();
     //     }
@@ -212,7 +212,7 @@
 
  
     
-        </div> 
+  </div> 
 
 
       {% if not no_footer %}
@@ -222,6 +222,23 @@
             {% include 'ndf/footer_clix.html' %}   
         {% endif %}
       {% endif %} 
+
+<!-- 
+      <script type="text/javascript">
+      
+       $(window).bind("load", function () {
+        var footer = $("#footer");
+        var pos = footer.position();
+        var height = $(window).height();
+        height = height - pos.top;
+        height = height - footer.height();
+        if (height > 0) {
+            footer.css({
+                'margin-top': height + 'px'
+            });
+        }
+        });
+    </script> -->
 
 </body>
 
