@@ -6129,6 +6129,34 @@ ul.authoring-tab{
 
 
   }
+.transcript-toggler{
+        display: block;
+        width: 155px !important;
+        height: 30px;
+        margin-top: 0px !important;
+        padding: 40px 29px 28px;
+        background: radial-gradient(hsla(259, 40%, 40%, 1), hsla(259, 40%,30%, 1));
+        border-radius: 0 0 5px 5px;
+        color: #fff;
+        cursor: pointer;
+        font-size: .75rem;
+        padding-top:7px !important;
+        text-transform: uppercase;
+
+
+}
+
+input.transcript-toggler{
+        background-image: url(/static/ndf/images/Transcript.svg) no-repeat !important;
+        background-color: transparent; /* make the button transparent */
+        background-repeat: no-repeat;  /* make the background image appear only once */
+        background-position: 0px 0px;  /* equivalent to 'top left' */
+        border: none;           /* assuming we don't want any borders */
+        cursor: pointer;        /* make the cursor like hovering over an <a> element */
+        height: 16px;           /* make this the size of your image */
+        padding-left: 16px;     /* make text start to the right of the image */
+        vertical-align: middle; /* align the text vertically centered */
+}
 
 .scard-action {
     //color:#ececec;
