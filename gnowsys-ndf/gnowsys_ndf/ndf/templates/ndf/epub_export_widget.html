@@ -1,0 +1,20 @@
+{% load i18n %}
+
+<div id="exportLesson" class="reveal-modal medium radius" data-reveal data-alert>
+  <p id="exportLessonLabel">Click to Export into ePub: </p>
+  <div style="display: inline-block;" class="right">
+    <a href="#" id="expLessonbtnCancel" class="orange-button">Cancel</a>
+  </div>
+  <div class="row">
+    {% for each_node in lessons_list  %}
+    <a href="{% url 'export_to_epub' group_id each_node.pk %}" class="orange-button exp_node" target="_blank" title="{{each_node.name}}">{{each_node.name|truncatechars:15}}</a>
+    {% if forloop.counter|divisibleby:5 %}<br/><br/>{% endif %}
+    {% endfor %}
+  </div>
+</div>
+
+<script type="text/javascript">
+  $(document).on('click', '#expLessonbtnCancel' ,function(e){
+    $('#exportLesson').foundation('reveal', 'close');
+  })
+</script>

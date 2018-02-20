@@ -1,0 +1,126 @@
+{% load i18n %}
+{% load jsonify from ndf_tags %}
+<!--Example insert
+<li> <a class="crossPublish-assetContent" title="Click on the checkbox on the files below to Cross Publish"><i class="fa fa-external-link"></i> {% trans "Cross Publish" %}</a></li>
+-->
+<div id="publish_resource-{{node.pk}}" class="reveal-modal" data-reveal style="position:absolute;" data-options="close_on_background_click:false;close_on_esc:false;"> 
+  <h4 class="inner">{% trans "Select from the following: " %} </h4>
+  <p class="inner compulsory"> {% trans "* Use Ctrl + Click to select multiple options" %}</p>
+  <div class="row">
+  <i><p class="inner">{% trans "Selections: "%}</i> <strong class="selGroupCount"></strong></p>
+  
+  <!--<div class="inner right">
+  <input type="checkbox" id="remove_from_curr_grp-{{node.pk}}" value="1"> {% trans "Remove from " %} '{% firstof group_object.altnames group_object.name %}'
+  </div>
+  -->
+  </div>
+  <div id="switchgrp" class="content">
+    <select id="selGroup-{{node.pk}}" multiple = "multiple" size = "10" style="height: 500px;"> </select>
+  </div>
+    <div class="row">
+            <a href="#" class="button-save-new" id="save_switch_group-{{node.pk}}">{% trans "Save" %}</a>
+        <button class="button-cancel-new">
+            <a href="#" class="cancel-page-create">{% trans "Cancel" %}</a>
+        </button>
+    </div>
+  <input type="hidden" name="existing_group_ids-{{node.pk}}">
+  <a class="close-reveal-modal">&#215;</a>
+</div>
+
+<script type="text/javascript">
+
+  $(document).ready(function(){
+    $("#publish_resource-{{node.pk}}").find(".selGroupCount").html({{node.group_set|length}})
+    $("input[name=existing_group_ids-{{node.pk}}]").attr("value", '{{node.group_set|jsonify|safe}}')
+  })
+
+  function select_option(i) {
+    $('select#selGroup-{{node.pk}} option[value="' + i + '"]').prop('selected', true);
+  }
+
+  /*
+  $(document).on('open.fndtn.reveal', '#publish_resource-{{node.pk}}', function () {
+    var existing_group_ids = $("input[name=existing_group_ids-{{node.pk}}]").attr("value")
+    console.log(typeof existing_group_ids)
+    if (typeof existing_group_ids == 'string'){
+      existing_group_ids = JSON.parse($("input[name=existing_group_ids-{{node.pk}}]").attr("value"))
+      $("input[name=existing_group_ids-{{node.pk}}]").attr("value", JSON.stringify(existing_group_ids))
+    }
+    console.log("existing_group_ids")
+    console.log(existing_group_ids)
+    for (var ind=0; ind < existing_group_ids.length; ind++){
+      select_option(existing_group_ids[ind])
+    }
+    $("#publish_resource-{{node.pk}}").find(".selGroupCount").html("("+ existing_group_ids.length + ")")
+  })
+  */
+  $(document).on('click', '.button-cancel-new', function(){
+    $("#publish_resource-{{node.pk}}").foundation('reveal', 'close');
+  })
+
+  $(document).on('click', '.crossPublish-{{node.pk}}', function(){
+    var existing_group_ids = $("input[name=existing_group_ids-{{node.pk}}]").attr("value")
+
+    $("select#selGroup-{{node.pk}}").find("option").remove()
+
+    $.ajax({
+      type: "GET",
+      url: "{% url 'cross_publish' group_id %}",
+      datatype: "html",
+      success: function(data) {
+        data = JSON.parse(data)
+        data_length = data.length
+        console.log(data)
+        while(data_length--){
+          dict_obj = data[data_length]
+          var option = document.createElement('option');
+          option.text = dict_obj["altnames"] ? dict_obj["altnames"] : dict_obj["name"];
+          option.value = dict_obj["_id"];
+          option.selected = (existing_group_ids.indexOf(dict_obj["_id"]) > -1) ? true : false;
+          option.disabled = (dict_obj["_id"]=="{{group_id}}") ? true : false;
+          $("#selGroup-{{node.pk}}").append(option)
+        }
+        $("#publish_resource-{{node.pk}}").foundation('reveal', 'open');
+      }
+    })
+  })
+
+  $(document).on('change', '#selGroup-{{node.pk}}', function(event){
+    $("#publish_resource-{{node.pk}}").find(".selGroupCount").html($("#selGroup-{{node.pk}}").val().length)
+  })
+
+  $(document).on('click', '#save_switch_group-{{node.pk}}', function(){
+
+    selectedGroups = $("#selGroup-{{node.pk}}").val()
+    // remove_from_curr_grp_flag = document.getElementById('remove_from_curr_grp-{{node.pk}}').checked
+    selectedGroups.push($("option:disabled").val())
+    if (selectedGroups){
+    // console.log(selectedGroups)
+
+    $.ajax({
+      type: "POST",
+      url: "{% url 'cross_publish' group_id %}",
+      data: {
+        "group_ids": selectedGroups,
+        "node_id": "{{node.pk}}",
+        "publishChildren": "True",
+        // "remove_from_curr_grp_flag": remove_from_curr_grp_flag,
+        "csrfmiddlewaretoken": "{{csrf_token}}"
+      },
+      datatype: "html",
+      success: function(data) {
+        $("input[name=existing_group_ids-{{node.pk}}]").attr("value", selectedGroups)
+        $("#publish_resource-{{node.pk}}").foundation('reveal', 'close');
+        location.reload();
+      }
+    })
+    }
+    else{
+      alert("Please select any Group");
+    }
+  })
+
+</script>
+
+
+        <!--$(".crossPublish-assetContent").css('display', 'none')-->
