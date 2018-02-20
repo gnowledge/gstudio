@@ -7103,10 +7103,10 @@ html,body{
   padding: 0 0 60px;
 }
 #base_wrap{
-   min-height: 100%;
+    min-height: auto;
   height: auto;
   /* Negative indent footer by its height */
-  margin: 0 auto ;
+  margin: 0 0 -10px 0;
   /* Pad bottom by footer height */
   padding: 0 0 10px;
 }
@@ -7119,6 +7119,7 @@ body>footer {
   height:auto;
   width:100%;
   display:table;
+
 
   ul {
     list-style-type: none;
@@ -7152,7 +7153,7 @@ body>footer {
     }
   }
   .myfooter {
-
+    margin-top: 10px;
     display:table-row;
     height:1px;
 

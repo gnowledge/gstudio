@@ -6817,10 +6817,10 @@ html, body {
 
 /* line 7105, ../../../scss/_clix2017.scss */
 #base_wrap {
-  min-height: 100%;
+  min-height: auto;
   height: auto;
   /* Negative indent footer by its height */
-  margin: 0 auto;
+  margin: 0 0 -10px 0;
   /* Pad bottom by footer height */
   padding: 0 0 10px;
 }
@@ -6834,37 +6834,37 @@ body > footer {
   width: 100%;
   display: table;
 }
-/* line 7123, ../../../scss/_clix2017.scss */
+/* line 7124, ../../../scss/_clix2017.scss */
 body > footer ul {
   list-style-type: none;
   text-decoration: none;
 }
-/* line 7126, ../../../scss/_clix2017.scss */
+/* line 7127, ../../../scss/_clix2017.scss */
 body > footer ul li {
   font-size: 15px;
   margin-bottom: 5px;
 }
-/* line 7131, ../../../scss/_clix2017.scss */
+/* line 7132, ../../../scss/_clix2017.scss */
 body > footer p {
   margin: 10px;
   font-size: 18px;
 }
-/* line 7135, ../../../scss/_clix2017.scss */
+/* line 7136, ../../../scss/_clix2017.scss */
 body > footer h2 {
   font-size: 25px;
 }
-/* line 7138, ../../../scss/_clix2017.scss */
+/* line 7139, ../../../scss/_clix2017.scss */
 body > footer li {
   color: #bbbbbb;
 }
-/* line 7141, ../../../scss/_clix2017.scss */
+/* line 7142, ../../../scss/_clix2017.scss */
 body > footer a {
   color: #bbbbbb;
   margin-top: 0;
   padding: 0;
   display: inline;
 }
-/* line 7146, ../../../scss/_clix2017.scss */
+/* line 7147, ../../../scss/_clix2017.scss */
 body > footer a:hover {
   text-decoration: none;
   color: #ffffff;
@@ -6872,116 +6872,117 @@ body > footer a:hover {
   padding: 0;
   display: inline;
 }
-/* line 7154, ../../../scss/_clix2017.scss */
+/* line 7155, ../../../scss/_clix2017.scss */
 body > footer .myfooter {
+  margin-top: 10px;
   display: table-row;
   height: 1px;
 }
-/* line 7159, ../../../scss/_clix2017.scss */
+/* line 7160, ../../../scss/_clix2017.scss */
 body > footer .myfooter .footer-section {
   color: #ffffff;
   text-align: center;
 }
-/* line 7163, ../../../scss/_clix2017.scss */
+/* line 7164, ../../../scss/_clix2017.scss */
 body > footer .myfooter .inline_mar-right {
   display: inline-block;
   margin: 0 25px 15px 0;
 }
-/* line 7168, ../../../scss/_clix2017.scss */
+/* line 7169, ../../../scss/_clix2017.scss */
 body > footer .myfooter .footer_content {
   margin: 20px;
 }
-/* line 7171, ../../../scss/_clix2017.scss */
+/* line 7172, ../../../scss/_clix2017.scss */
 body > footer .myfooter .footer_content .footer-logo {
   height: 65px;
   width: 150px;
 }
-/* line 7176, ../../../scss/_clix2017.scss */
+/* line 7177, ../../../scss/_clix2017.scss */
 body > footer .myfooter .links_collapse {
   max-height: 78px;
   overflow: hidden;
   transition: all 0.5s ease-out;
 }
-/* line 7181, ../../../scss/_clix2017.scss */
+/* line 7182, ../../../scss/_clix2017.scss */
 body > footer .myfooter .links_collapse ul {
   display: inline;
   padding: 0;
   margin: 0px !important;
 }
-/* line 7187, ../../../scss/_clix2017.scss */
+/* line 7188, ../../../scss/_clix2017.scss */
 body > footer .myfooter .footer_link_cont {
   display: inline-block;
   vertical-align: top;
   /*margin: 20px;*/
   text-align: left;
 }
-/* line 7193, ../../../scss/_clix2017.scss */
+/* line 7194, ../../../scss/_clix2017.scss */
 body > footer .myfooter .footer_link_cont .links_show {
   max-height: 600px;
 }
-/* line 7197, ../../../scss/_clix2017.scss */
+/* line 7198, ../../../scss/_clix2017.scss */
 body > footer .myfooter .footer_link_cont h4 {
   color: #999;
 }
-/* line 7200, ../../../scss/_clix2017.scss */
+/* line 7201, ../../../scss/_clix2017.scss */
 body > footer .myfooter .footer_link_cont .social_links {
   font-size: 24px;
   margin-right: 5px;
 }
-/* line 7205, ../../../scss/_clix2017.scss */
+/* line 7206, ../../../scss/_clix2017.scss */
 body > footer .myfooter .footer_link_cont .show_foot_links {
   color: #777777;
   cursor: pointer;
 }
-/* line 7208, ../../../scss/_clix2017.scss */
+/* line 7209, ../../../scss/_clix2017.scss */
 body > footer .myfooter .footer_link_cont .show_foot_links i {
   font-size: 24px;
   margin-right: 5px;
 }
-/* line 7211, ../../../scss/_clix2017.scss */
+/* line 7212, ../../../scss/_clix2017.scss */
 body > footer .myfooter .footer_link_cont .show_foot_links:hover {
   text-decoration: underline;
 }
-/* line 7218, ../../../scss/_clix2017.scss */
+/* line 7219, ../../../scss/_clix2017.scss */
 body > footer hr.footerlogo-divider {
   border-color: #555;
   margin-top: 10px;
 }
 
-/* line 7224, ../../../scss/_clix2017.scss */
+/* line 7225, ../../../scss/_clix2017.scss */
 body > footer ul#footerlogo li {
   margin: 0px 5px;
   display: inline;
 }
 
-/* line 7230, ../../../scss/_clix2017.scss */
+/* line 7231, ../../../scss/_clix2017.scss */
 .no-gap ul {
   margin-left: 0rem;
 }
 
-/* line 7236, ../../../scss/_clix2017.scss */
+/* line 7237, ../../../scss/_clix2017.scss */
 body > footer ul#poweredlogos {
   margin-left: 0px;
 }
 
-/* line 7240, ../../../scss/_clix2017.scss */
+/* line 7241, ../../../scss/_clix2017.scss */
 #poweredlogos li {
   margin: 0px 5px;
   display: inline;
 }
 
-/* line 7246, ../../../scss/_clix2017.scss */
+/* line 7247, ../../../scss/_clix2017.scss */
 .no-gap ul {
   margin-left: 0rem;
 }
 
-/* line 7251, ../../../scss/_clix2017.scss */
+/* line 7252, ../../../scss/_clix2017.scss */
 .coll-arrows {
   cursor: pointer;
   display: block;
   padding: 0.5rem;
 }
-/* line 7256, ../../../scss/_clix2017.scss */
+/* line 7257, ../../../scss/_clix2017.scss */
 .coll-arrows:hover {
   background-color: #D3D3D3;
 }
