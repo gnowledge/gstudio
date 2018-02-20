@@ -168,7 +168,7 @@ def partner_list(request, group_id):
 @get_execution_time
 def nroer_groups(request, group_id, groups_category):
     group_name, group_id = get_group_name_id(group_id)
-    GSTUDIO_NROER_MENU = ["States", "Institutions", "Individuals" , "Teachers", "Interest Groups", "Schools"]
+    GSTUDIO_NROER_MENU = ["State Partners", "Institutional Partners", "Individual Partners" , "Teachers", "Interest Groups", "Schools"]
     mapping = GSTUDIO_NROER_MENU_MAPPINGS
 
     groups_names_list = []
