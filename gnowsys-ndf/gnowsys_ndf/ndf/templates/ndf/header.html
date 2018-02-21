@@ -70,7 +70,7 @@
               {% trans "Repository" %}
             </a>
           </li>
-
+          {% comment %}
           {% for each_menu in nroer_menu.top_menus %}
             {% for menuk, menuv in each_menu.items %}
 
@@ -112,7 +112,7 @@
 
             {% endfor %}
           {% endfor %}
-
+          {% endcomment %}
           <li>
 
             <a href="{% url 'nroer_groups' 'home' 'Groups' %}" {% if nroer_menu.top_menu_selected == "Workspaces" %}class="active"{% endif %}>
