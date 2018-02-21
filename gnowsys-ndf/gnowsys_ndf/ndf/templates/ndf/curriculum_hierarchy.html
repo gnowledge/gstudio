@@ -301,6 +301,20 @@
                                 $('.subsection-label-heading').html("Update Topic");
                                 $('.subsection-label-view').append("Topic Name " + ": " +node.name);
                                 $('#addDivision').find('.create_division').html('Update Topic');
+
+                                url = "/{{group_id}}" +"/curriculum/prerequisite/" + "{{curriculum_obj.pk}}" + "/" + node.id;
+                                $.ajax({
+                                      type: "GET",
+                                      data:{
+
+                                        },
+                                      url: url,
+                                      datatype: "html",
+                                      success: function(data) {
+                                        alert(data)
+                                    }
+                                });
+
                             }
                             else{
                                 $('.subsection-label-view').html("");
