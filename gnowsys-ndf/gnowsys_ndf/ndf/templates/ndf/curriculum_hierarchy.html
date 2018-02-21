@@ -576,18 +576,18 @@
  
       
  function search_func(){
-            var filter,x,z,i,a,input;
-            input = document.getElementById("myInput");
-            filter = input.value.toUpperCase();
-            x = document.getElementById("topic_list");
-            z = x.getElementsByTagName("option");
+            var filter_caps,topiclist_arr,option_val,i,input_var;
+            input_var = document.getElementById("myInput");
+            filter_caps = input_var.value.toUpperCase();
+            topiclist_arr = document.getElementById("topic_list");
+            option_val = topiclist_arr.getElementsByTagName("option");
 
-            for (i = 0; i < z.length; i++) {
-                a = z[i].getAttribute('data-topic');
-                if (a.toUpperCase().indexOf(filter) > -1) {
-                z[i].style.display = "";
+            for (i = 0; i < option_val.length; i++) {
+                section_name = option_val[i].getAttribute('data-topic');
+                if (section_name.toUpperCase().indexOf(filter_caps) > -1) {
+                option_val[i].style.display = "";
                 } else {
-                z[i].style.display = "none";
+                option_val[i].style.display = "none";
 
         }
     }
