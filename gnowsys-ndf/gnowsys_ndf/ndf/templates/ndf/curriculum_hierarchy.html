@@ -1,7 +1,25 @@
 {% extends "ndf/gbase.html" %}
 {% load i18n %}
 {% load ndf_tags %}
-{% block title %} {% trans "Topic Map" %} -- {{curriculum_obj.name }}  {% endblock %}
+{% block title %} {% trans "Topic Map" %} -- {{curriculum_obj.name }}  
+
+<style type="text/css">
+#myInput {
+  background-position: 10px 12px;
+  background-repeat: no-repeat;
+  width: 100%;
+  font-size: 16px;
+  padding: 12px 20px 12px 40px;
+  border: 1px solid #ddd;
+  margin-bottom: 12px;
+}
+#topic-list {
+  list-style-type: none;
+  padding: 0;
+  margin: 0;
+}
+</style>
+{% endblock %}
 
 {% block body_content %}
         {% check_is_gstaff group_id request.user as is_gstaff %} 
@@ -88,19 +106,24 @@
                 <label>Sub-Section Name
                     <input type="text" placeholder="Sub-Section Name" name="sub-section-name" />
                 </label>
+               
                 <label>Topic
                     <input type="checkbox"  class="topic-checkbox" name="isLeafNode" value="leafNode"/>
                 </label>
                 <br />
+        
+                <label> Search
+                 <input type="text" placeholder="Enter a subtopic" id="myInput" onkeyup="search_func()" >
+                   </label>              
                     choose topic :
                         <select name="topics" id = "topic_list" multiple style="height:100px">
-                                <option value="">--- Select Topic ---</option>
-                                {% for each in topic_nodes %}
+                                                            {% for each in topic_nodes %}
                                  {% if each.pk == selected_topic.grel_node.0.pk %}
-                                    <option selected value="{{ each.pk }}" data-topic="{{ each.pk }}">
+                                    <option selected value="{{ each.pk }}" data-topic="{{ each.name }}">
                                         {{each.name}}
+
                                 {% else %}
-                                    <option value="{{ each.pk }}" data-topic="{{ each.pk }}">
+                                    <option value="{{ each.pk }}" data-topic="{{ each.name }}">
                                         {{each.name}}
                                 {%  endif %}
                                 {% endfor %}
@@ -550,7 +573,28 @@
                 
             });
     
-    </script>
+ 
+      
+ function search_func(){
+            var filter,x,z,i,a,input;
+            input = document.getElementById("myInput");
+            filter = input.value.toUpperCase();
+            x = document.getElementById("topic_list");
+            z = x.getElementsByTagName("option");
+
+            for (i = 0; i < z.length; i++) {
+                a = z[i].getAttribute('data-topic');
+                if (a.toUpperCase().indexOf(filter) > -1) {
+                z[i].style.display = "";
+                } else {
+                z[i].style.display = "none";
+
+        }
+    }
+}    
+</script>
+
 
 
 {% endblock body_content %}
+</html>
