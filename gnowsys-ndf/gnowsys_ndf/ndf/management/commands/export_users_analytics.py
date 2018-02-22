@@ -13,7 +13,7 @@ from django.core.management.base import BaseCommand, CommandError
 # from django.contrib.auth.models import User
 
 ''' imports from application folders/files '''
-from gnowsys_ndf.ndf.models import Group, GSystemType, node_collection
+from gnowsys_ndf.ndf.models import Group, GSystemType, Counter, node_collection
 from gnowsys_ndf.settings import GSTUDIO_LOGS_DIR_PATH, GSTUDIO_DATA_ROOT
 from gnowsys_ndf.ndf.views.gcourse import course_analytics
 # from gnowsys_ndf.ndf.views.methods import get_group_name_id   
@@ -62,7 +62,10 @@ def export_group_analytics(group_obj, assessment_and_quiz_data):
     #     raise ValueError('\nSorry. Request could not be completed. \
     #         \nGroup/Course, matching argument entered "' + group_name_or_id + '" does not exists!')
 
-    group_users = group_obj.author_set
+    # group_users = group_obj.author_set
+    # Previously, above was implementation strategy. Now we are using counter users instead of group's author_set,
+    # because we do wanted to gather all data irrespective of student enrollment.
+    group_users = Counter.get_group_counters(group_obj._id).distinct('user_id')
     # print group_users
 
     # CSV file name-convention: schoolcode-course-name-datetimestamp.csv
