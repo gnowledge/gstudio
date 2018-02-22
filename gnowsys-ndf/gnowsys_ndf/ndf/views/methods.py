@@ -5135,7 +5135,8 @@ def create_thread(group_id, node, user_id, release_response_val, interaction_typ
         create_gattribute(thread_node._id, 'release_response', release_response_val)
     if not interaction_type_val:
         interaction_type_val = unicode(DEFAULT_DISCUSSION_LABEL)
-        print "\n inte: ", interaction_type_val
+        create_gattribute(thread_node._id, 'thread_interaction_type', interaction_type_val)
+    else:
         create_gattribute(thread_node._id, 'thread_interaction_type', interaction_type_val)
 
     if start_time and end_time:
