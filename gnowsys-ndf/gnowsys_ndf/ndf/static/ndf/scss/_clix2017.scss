@@ -7130,8 +7130,8 @@ html,body{
   /* Pad bottom by footer height */
   padding: 0 0 60px;
 }
-#base_wrap{
-    min-height: 100%;
+#base_wrap{/*
+    min-height: 100%;*/
   height: auto;
   /* Negative indent footer by its height */
   margin: 0 0 -10px 0;

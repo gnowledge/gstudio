@@ -6852,7 +6852,8 @@ html, body {
 
 /* line 7133, ../../../scss/_clix2017.scss */
 #base_wrap {
-  min-height: 100%;
+       /*
+min-height: 100%;*/
   height: auto;
   /* Negative indent footer by its height */
   margin: 0 0 -10px 0;
