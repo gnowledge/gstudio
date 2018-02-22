@@ -33,7 +33,7 @@ log_file = open(log_file_path, 'a+')
 script_start_str = "\n\n######### Script ran on : " + time.strftime("%c") + " #########\n----------------\n"
 log_file.write(str(script_start_str))
 
-column_keys_list = ["server_id", "school_name", "school_code", "unit_name", "username", "user_id", "total_lessons", "lessons_completed", "percentage_lessons_completed", "total_activities", "activities_completed", "percentage_activities_completed", "total_quizitems", "visited_quizitems", "attempted_quizitems", "unattempted_quizitems", "correct_attempted_quizitems", "notapplicable_quizitems", "incorrect_attempted_quizitems", "user_files", "total_files_viewed_by_user", "other_viewing_my_files", "unique_users_commented_on_user_files", "total_rating_rcvd_on_files", "commented_on_others_files", "cmts_on_user_files", "total_cmnts_by_user", "user_notes", "others_reading_my_notes", "cmts_on_user_notes", "cmnts_rcvd_by_user", "total_notes_read_by_user", "commented_on_others_notes", "total_rating_rcvd_on_notes", "correct_attempted_assessments", "unattempted_assessments", "visited_assessments", "notapplicable_assessments", "incorrect_attempted_assessments", "attempted_assessments", "total_assessment_items"]
+column_keys_list = ["server_id", "school_name", "school_code", "unit_name", "username", "user_id", "enrollment_status", "total_lessons", "lessons_completed", "percentage_lessons_completed", "total_activities", "activities_completed", "percentage_activities_completed", "total_quizitems", "visited_quizitems", "attempted_quizitems", "unattempted_quizitems", "correct_attempted_quizitems", "notapplicable_quizitems", "incorrect_attempted_quizitems", "user_files", "total_files_viewed_by_user", "other_viewing_my_files", "unique_users_commented_on_user_files", "total_rating_rcvd_on_files", "commented_on_others_files", "cmts_on_user_files", "total_cmnts_by_user", "user_notes", "others_reading_my_notes", "cmts_on_user_notes", "cmnts_rcvd_by_user", "total_notes_read_by_user", "commented_on_others_notes", "total_rating_rcvd_on_notes", "correct_attempted_assessments", "unattempted_assessments", "visited_assessments", "notapplicable_assessments", "incorrect_attempted_assessments", "attempted_assessments", "total_assessment_items"]
 
 column_keys_dict = OrderedDict()
 map(lambda x: column_keys_dict.update({x: "NA"}), column_keys_list)
@@ -66,6 +66,7 @@ def export_group_analytics(group_obj, assessment_and_quiz_data):
     # Previously, above was implementation strategy. Now we are using counter users instead of group's author_set,
     # because we do wanted to gather all data irrespective of student enrollment.
     group_users = Counter.get_group_counters(group_obj._id).distinct('user_id')
+    # group_users is a list of integer user ids
     # print group_users
 
     # CSV file name-convention: schoolcode-course-name-datetimestamp.csv
@@ -97,36 +98,29 @@ def export_group_analytics(group_obj, assessment_and_quiz_data):
             if not analytics_data:
                 continue
 
+            print index, "] Group User ID: ", each_user
+
             each_row_dict = column_keys_dict.copy()    
             each_row_dict['server_id'] = GSTUDIO_INSTITUTE_ID
             each_row_dict['school_code'] = GSTUDIO_INSTITUTE_ID_SECONDARY
             each_row_dict['school_name'] = GSTUDIO_INSTITUTE_NAME
             each_row_dict['unit_name'] = group_name
 
-            # refactor dict:
-            # analytics_data.pop('users_points_breakup')
-            # analytics_data.pop('users_points')
-
             temp_lessons_stat_str = analytics_data['level1_progress_stmt']
             temp_lessons_stat_str = analytics_data['level1_progress_stmt']
             each_row_dict['lessons_completed'] = int(temp_lessons_stat_str.split(' ')[0])
             each_row_dict['total_lessons'] = int(temp_lessons_stat_str.split(' ')[3])
-            # analytics_data.pop('level1_progress_stmt')
 
             temp_activities_stat_str = analytics_data['level2_progress_stmt']
             each_row_dict['activities_completed'] = int(temp_activities_stat_str.split(' ')[0])
             each_row_dict['total_activities'] = int(temp_activities_stat_str.split(' ')[3])
-            # analytics_data.pop('level2_progress_stmt')
-
-            # remove non required fields
-            # analytics_data.pop('level1_lbl')
-            # analytics_data.pop('level2_lbl')
 
             each_row_dict['percentage_lessons_completed'] = analytics_data['level1_progress_meter']
             each_row_dict['percentage_activities_completed'] = analytics_data['level2_progress_meter']
 
             each_row_dict['username'] = analytics_data['username']
             each_row_dict['user_id'] = analytics_data['user_id']
+            each_row_dict['enrollment_status'] = True if (each_user in group_obj.author_set) else False
             each_row_dict['total_quizitems'] = analytics_data['total_quizitems']
             each_row_dict['visited_quizitems'] = analytics_data['visited_quizitems']
             each_row_dict['unattempted_quizitems'] = analytics_data['unattempted_quizitems']
