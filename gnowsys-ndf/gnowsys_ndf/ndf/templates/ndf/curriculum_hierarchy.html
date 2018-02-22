@@ -311,7 +311,9 @@
                                       url: url,
                                       datatype: "html",
                                       success: function(data) {
-                                        $('#topic_list option[value='+data+']').attr("selected", "selected");
+                                        if (data){
+                                            $('#topic_list option[value='+data+']').attr("selected", "selected");                                            
+                                        }
                                     }
                                 });
 
