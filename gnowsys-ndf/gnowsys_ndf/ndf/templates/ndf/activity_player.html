@@ -14,6 +14,7 @@
 {% get_attribute_value node.pk 'player_discussion_enable' as player_discussion %}
 {% get_thread_node node.pk as thread_node_obj %}
 {% get_attribute_value thread_node_obj.pk 'thread_interaction_type' as thr_int_type %}
+{% get_default_discussion_lbl as disc_label %}
 
 
 
@@ -138,7 +139,7 @@
 
                 
                 {% if player_discussion %}
-                <a class="discuss right"> {% if not thr_int_type %} Discuss {% else %} {{thr_int_type}} {% endif %} </a>
+                <a class="discuss right"> {% if not thr_int_type %} {{disc_label}} {% else %} {{thr_int_type}} {% endif %} </a>
                 {% endif %}
                 {% comment %}
                 <a class="translate right"> Translate</a>
