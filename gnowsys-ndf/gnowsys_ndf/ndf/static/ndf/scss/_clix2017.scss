@@ -7118,9 +7118,72 @@ input.transcript-toggler{
 }
 }
 
-  //Site footer
 
+html,body{
+  height: 100%;
+}
+#gbase_wrap{
+   min-height: 100%;
+  height: auto;
+  /* Negative indent footer by its height */
+  margin: 0 auto ;
+  /* Pad bottom by footer height */
+  padding: 0 0 60px;
+}
+#base_wrap{/*
+    min-height: 100%;*/
+  height: auto;
+  /* Negative indent footer by its height */
+  margin: 0 0 -10px 0;
+  /* Pad bottom by footer height */
+  padding: 0 0 10px;
+}
+
+body>footer {
+  //Site footer
+  padding:10px 5px;
+  position: relative;
+  background-color: rgba(0,0,0,0.8);
+  height:auto;
+  width:100%;
+  display:table;
+
+
+  ul {
+    list-style-type: none;
+    text-decoration: none;
+    li {
+      font-size: 15px;
+      margin-bottom: 5px;
+    }
+  }
+  p {
+    margin: 10px;
+    font-size: 18px;
+  }
+  h2 {
+    font-size: 25px;
+  }
+  li {
+    color: #bbbbbb;
+  }
+  a {
+    color: #bbbbbb;
+    margin-top:0;
+    padding: 0;
+    display: inline;
+    &:hover {
+      text-decoration: none;
+      color: #ffffff;
+      margin-top:0;
+      padding: 0;
+      display: inline;
+    }
+  }
   .myfooter {
+    margin-top: 10px;
+    display:table-row;
+    height:1px;
 
     .footer-section {
       color: #ffffff;
@@ -7153,17 +7216,27 @@ input.transcript-toggler{
     .footer_link_cont {
       display: inline-block;
       vertical-align: top;
-      margin: 20px;
+      /*margin: 20px;*/
       text-align: left;
 
       .links_show {
         //change as per requirement on addition on more links in future
         max-height: 600px;
       }
+      h4{
+        color: #999;
+      }
+      .social_links{
+        font-size: 24px; 
+        margin-right:5px;
+      }
+      
       .show_foot_links {
         color: #777777;
         cursor: pointer;
-
+        i{
+          font-size: 24px; margin-right:5px;
+        }
         &:hover {
           text-decoration: underline;
         }
@@ -7171,3 +7244,46 @@ input.transcript-toggler{
     }
 
   }
+  hr.footerlogo-divider{
+  border-color: #555;
+  margin-top: 10px;
+  }  
+}
+
+body > footer ul#footerlogo li
+{
+  margin: 0px 5px; 
+  display:inline;
+
+}
+.no-gap ul
+{
+    margin-left: 0rem;
+}
+
+
+body > footer ul#poweredlogos{
+  margin-left: 0px;
+}    
+
+#poweredlogos li
+{
+  margin: 0px 5px;
+  display:inline;
+
+}
+.no-gap ul
+{
+  margin-left: 0rem;
+}
+
+.coll-arrows {
+    cursor:pointer;
+    display: block;
+    padding: 0.5rem;
+
+    &:hover{
+      background-color: #D3D3D3;
+  }
+}
+
