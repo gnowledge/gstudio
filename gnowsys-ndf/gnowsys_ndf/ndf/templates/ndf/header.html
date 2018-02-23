@@ -414,6 +414,9 @@
           <li>
             <a href="/help/"><i class="fa fa-info-circle"></i> Help</a>
           </li>
+          {% if groupid %}          
+            <li class=""><a title="Click here to view Notifications"  target="_blank" href="{% url 'notification_details' groupid %}"> <i class="fa fa-bell-o"></i></a></li>
+          {% endif %}
         </ul>
 
         <!-- Closes Right Nav section -->
