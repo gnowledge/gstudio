@@ -3063,6 +3063,8 @@ def publish_group(request,group_id,node):
 
 @get_execution_time
 def notification_details(request,group_id):
+    from gnowsys_ndf.ndf.views.utils import get_dict_from_list_of_dicts
+    group_name, group_id = get_group_name_id(group_id)
     group_obj = node_collection.find({'group_set':ObjectId(group_id)}).sort('last_update', -1)
     files_list = []
     user_activity = []
@@ -3077,7 +3079,8 @@ def notification_details(request,group_id):
             activity =  'created ' + each.name 
               
         else:
-          if each.if_file.mime_type and each.relation_set[0]['assetcontent_of']:
+          rel_set_dict = get_dict_from_list_of_dicts(each.relation_set)
+          if each.if_file.mime_type and 'assetcontent_of' in rel_set_dict:
             node_obj = Node.get_node_by_id(each.relation_set[0]['assetcontent_of'][0])
             activity =  'uploaded ' + each.name +  ' in ' + node_obj.name
           elif 'Asset' in each.member_of_names_list and 'asset@gallery' in each.tags:
