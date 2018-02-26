@@ -606,17 +606,17 @@ h5{
                 }
 
                 input{
-                    color: $secondry-blue;
-                    background: $primary-blue;
+                    color: #FFFFFF;
+                    background: #6f0859;
                     font-family: OpenSans-Regular;
                     font-size: 15px;
                     letter-spacing: 1.4px;
                     
 
                     &:hover{
-                        color: white;
+                        color: #6f0859;
                         border-left: 4px solid $secondary-orange;
-                        background: $primary-blue;
+                        background: #FFFFFF;
                     }
                 }
 
@@ -731,17 +731,17 @@ h5{
                 li:not(.has-form) {
                     &> a:not(.button) {
                         border-left-width: 2px;
-                        color: $secondry-blue;
-                        background: $primary-blue;
+                        color: white;
+                        background: #6f0859;
 
                     }
 
                     &:hover, &.active{
                         a:not(.button){
-                            background: $primary-blue;
-                            color: $header-link-hover-color;
+                            background: white;
+                            color: #6f0859;
                             border-bottom: 0px;
-                            border-left-width: 2px;
+                            border-left: 3px solid $secondary-orange;
                             /*&:hover {
                                 color: $secondry-blue;
                                 border-bottom: 0px;
@@ -3896,7 +3896,7 @@ $ah_2_background_color_hover: rgba(244, 244, 244, 0.3);;
             padding: 0px 15px;
             margin-left: -2px;
             border-right: 1px solid white;
-            
+
             a {
                 color: $ah_2_icon_color;
             }

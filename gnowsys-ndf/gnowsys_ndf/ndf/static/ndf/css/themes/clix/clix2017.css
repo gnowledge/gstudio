@@ -514,17 +514,17 @@ h5 {
 }
 /* line 608, ../../../scss/_clix2017.scss */
 .top-bar .top-bar-section ul li input {
-  color: #74b3dc;
-  background: #164A7B;
+  color: #FFFFFF;
+  background: #6f0859;
   font-family: OpenSans-Regular;
   font-size: 15px;
   letter-spacing: 1.4px;
 }
 /* line 616, ../../../scss/_clix2017.scss */
 .top-bar .top-bar-section ul li input:hover {
-  color: white;
+  color: #6f0859;
   border-left: 4px solid #ffc14e;
-  background: #164A7B;
+  background: #FFFFFF;
 }
 /* line 623, ../../../scss/_clix2017.scss */
 .top-bar .top-bar-section ul li .lang-font {
@@ -607,15 +607,15 @@ h5 {
   /* line 732, ../../../scss/_clix2017.scss */
   .top-bar .top-bar-section .dropdown li:not(.has-form) > a:not(.button) {
     border-left-width: 2px;
-    color: #74b3dc;
-    background: #164A7B;
+    color: white;
+    background: #6f0859;
   }
   /* line 740, ../../../scss/_clix2017.scss */
   .top-bar .top-bar-section .dropdown li:not(.has-form):hover a:not(.button), .top-bar .top-bar-section .dropdown li:not(.has-form).active a:not(.button) {
-    background: #164A7B;
-    color: #50c2fa;
+    background: white;
+    color: #6f0859;
     border-bottom: 0px;
-    border-left-width: 2px;
+    border-left: 3px solid #ffc14e;
     /*&:hover {
         color: $secondry-blue;
         border-bottom: 0px;
