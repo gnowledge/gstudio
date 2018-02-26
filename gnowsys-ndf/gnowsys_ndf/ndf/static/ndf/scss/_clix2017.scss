@@ -1569,10 +1569,10 @@ input[type="button"] {
 }
 
 .orange-button {
-    color: $primary-orange;
+    color: #6f0859;
     padding: 7px 14px;
     background:#fff ;
-    border: 1px solid #ce7869;
+    border: 1px solid #6f0859;
     font-size: 12px;
     font-family: "OpenSans-Regular", serif;
     border-radius: 5px !important;
@@ -1581,8 +1581,8 @@ input[type="button"] {
     margin-top: 8px;
     cursor: pointer;
     &:hover{
-        background-color:rgba(206,120,105,0.2);
-        color: $primary-orange;
+        background-color:#6f0859;
+        color: white;
     }
 }
 
@@ -1603,10 +1603,10 @@ input[type="button"] {
 }
 
 .orange-button-template{
-    color: $primary-orange;
+    color: #6f0859;
     padding: 7px 14px;
-    background:#fff ;
-    border: 1px solid #ce7869;
+    background:white ;
+    border: 1px solid #6f0859;
     font-size: 12px;
     font-family: "OpenSans-Regular", serif;
     border-radius: 4px;
@@ -1614,8 +1614,8 @@ input[type="button"] {
     margin-bottom: 8px;
     margin-top: 10px;
     &:hover{
-        background-color:rgba(206,120,105,0.2);
-        color: $primary-orange;
+        background-color:#6f0859;
+        color: white;
     }
 }
 
@@ -3643,10 +3643,10 @@ ul.jqtree-tree .jqtree-toggler {
 
     }
     #add-tag-btn{
-        color: $primary-orange;
+        color: #6f0859;
         padding: 7px 14px;
         background:#fff ;
-        border: 1px solid #ce7869;
+        border: 1px solid #6f0859;
         font-size: 12px;
         font-family: "OpenSans-Regular", serif;
         border-radius: 5px !important;
@@ -3656,8 +3656,8 @@ ul.jqtree-tree .jqtree-toggler {
         cursor: pointer;
         display: inline-block;
         &:hover{
-            background-color:rgba(206,120,105,0.2);
-            color: $primary-orange;
+            background-color:#6f0859;
+            color: white;
         }
 
     }

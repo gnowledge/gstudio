@@ -1460,10 +1460,10 @@ input[type="button"] {
 
 /* line 1571, ../../../scss/_clix2017.scss */
 .orange-button {
-  color: #ce7869;
+  color: #6f0859;
   padding: 7px 14px;
   background: #fff;
-  border: 1px solid #ce7869;
+  border: 1px solid #6f0859;
   font-size: 12px;
   font-family: "OpenSans-Regular", serif;
   border-radius: 5px !important;
@@ -1474,8 +1474,8 @@ input[type="button"] {
 }
 /* line 1583, ../../../scss/_clix2017.scss */
 .orange-button:hover {
-  background-color: rgba(206, 120, 105, 0.2);
-  color: #ce7869;
+  background-color: #6f0859;
+  color: white;
 }
 
 /* line 1589, ../../../scss/_clix2017.scss */
@@ -1498,10 +1498,10 @@ input[type="button"] {
 
 /* line 1605, ../../../scss/_clix2017.scss */
 .orange-button-template {
-  color: #ce7869;
+  color: #6f0859;
   padding: 7px 14px;
-  background: #fff;
-  border: 1px solid #ce7869;
+  background: white;
+  border: 1px solid #6f0859;
   font-size: 12px;
   font-family: "OpenSans-Regular", serif;
   border-radius: 4px;
@@ -1511,8 +1511,8 @@ input[type="button"] {
 }
 /* line 1616, ../../../scss/_clix2017.scss */
 .orange-button-template:hover {
-  background-color: rgba(206, 120, 105, 0.2);
-  color: #ce7869;
+  background-color: #6f0859;
+  color: white;
 }
 
 /* line 1624, ../../../scss/_clix2017.scss */
@@ -3443,10 +3443,10 @@ ul.jqtree-tree .jqtree-toggler:hover {
 }
 /* line 3645, ../../../scss/_clix2017.scss */
 .asset-tags-container #add-tag-btn {
-  color: #ce7869;
+  color: #6f0859;
   padding: 7px 14px;
   background: #fff;
-  border: 1px solid #ce7869;
+  border: 1px solid #6f0859;
   font-size: 12px;
   font-family: "OpenSans-Regular", serif;
   border-radius: 5px !important;
@@ -3458,8 +3458,8 @@ ul.jqtree-tree .jqtree-toggler:hover {
 }
 /* line 3658, ../../../scss/_clix2017.scss */
 .asset-tags-container #add-tag-btn:hover {
-  background-color: rgba(206, 120, 105, 0.2);
-  color: #ce7869;
+  background-color: #6f0859;
+  color: white;
 }
 
 /* line 3666, ../../../scss/_clix2017.scss */
