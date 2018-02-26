@@ -394,9 +394,10 @@ h5{
 
 .top-bar-second, .top-bar-second .name {
     height: 55px;
-    background:#ddeff9;
+    background:#FFFFFF;
     color: #719dc9;
     margin-bottom:30px;
+    border-bottom:2px solid #d5d5d5;
 
 }
 
@@ -598,10 +599,14 @@ h5{
                     &>a {
                         //border-left-color: $secondary-orange;
                         //color: $primary-orange;
-                        color:#fff;
+                        color:#6f0859;
+                        background-color: white;
                         //color: $header-link-hover-color;
 
                     }
+
+                        color:#6f0859;
+                        background-color: white;
                 
                 }
 
@@ -629,11 +634,18 @@ h5{
 
                 &.active{
                     color:#fff;
-                    
+                    &:hover{
+                        color:#6f0859;
+                        background-color: white;
+                    }
                 }
                 &.active {
                     &>a {
                         color: #fff;
+                        &:hover{
+                        color:#6f0859;
+                        background-color: white;
+                        }
                         
                     }
                 }
@@ -673,7 +685,13 @@ h5{
                     font-family: OpenSans-Bold;
                     margin-top: -3px;
                     border-bottom: 3px solid $secondary-orange;
+                    &:hover{
+                        &:hover{
+                        color:#6f0859;
+                        background-color: white;
+                        }
                     }
+                }
             }
             li {
                 &:not(.has-form) {
@@ -1505,23 +1523,29 @@ input[type="button"] {
 
 /*  Buttons custom css */
 .secondary-header-tabs{
-   color: #719dc7;
+   color: #6f0859;
     font-weight: 400;
     padding: 14px 10px 3px 10px;
     cursor: pointer;
     transition: color 1s ease, border-color 1s ease;
     -webkit-transition: color 1s ease, border-color 1s ease;
     display: inline-block;
+    padding-bottom: 14px;
 
     &:hover{
-        color: $primary-blue;
+        color: white;
+        background-color: #6f0859;
 
     }
     &.active{
-        color: $primary-blue;
-        border-bottom: 2px solid $primary-blue;
+        color: #6f0859;
+        border-bottom: 2px solid $secondary-orange;
         padding-bottom: 14px;
         font-weight: 600;
+        &:hover{
+            color: white;
+            background-color: #6f0859;
+        }
 
     }
 }
@@ -5236,7 +5260,7 @@ $module-card-lines-to-show: 3;
     
 }
 
-$nav_menu_1_color: #164a7b;
+$nav_menu_1_color: #6f0859;
 $nav_menu_1_bg_color: #fff;
 $nav_menu_1_tab_border: #a2238d;
 ul.nav_menu_1 {
@@ -6366,11 +6390,11 @@ input.transcript-toggler{
     margin-left: 59%;
     display: inline-block;
     &> button {
-    color: #164a7b;
+    color: #6f0859;
     font-weight: 400;
     cursor: pointer;
-    background-color: #ddeff9;
-    border: 2px solid #719dc8;
+    background-color: #FFFFFF;
+    border: 2px solid #6f0859;
     border-radius: 5px !important;
     display: inline-block;
     padding: 3px 8px 4px 8px;
@@ -6378,8 +6402,8 @@ input.transcript-toggler{
     margin-left: 20px;
         &:hover{
             border-radius: 10px;
-            background-color: #ddeff9;
-            color: #164a7b;
+            background-color: #6f0859;
+            color: #ffffff;
         }
     }
     a{
@@ -6391,14 +6415,19 @@ input.transcript-toggler{
         cursor: pointer;
         line-height: 1.125rem;
         margin: 0;
-        background-color: $primary-blue;
+        background-color: #6f0859;
 
             a{
-                color: $secondry-blue;
+                color: white;
+                &:hover{
+                    color: #6f0859;
+                }
             }
 
             &:hover{
                 border-left: 4px solid $secondary-orange;
+                background-color:white;
+
             }
 
     }
