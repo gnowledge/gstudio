@@ -3,6 +3,8 @@ $primary-blue : #164A7B;
 $secondry-blue : #74b3dc;
 $tertiary-blue : #719dc7;
 
+
+
 /*Orange color variables*/
 $primary-orange : #ce7869;
 $secondary-orange : #ffc14e;
@@ -545,7 +547,7 @@ h5{
 
 .top-bar, .top-bar .name {
     height: 52px;
-    background: $primary-blue;
+    background: rgba(107, 0, 84, 0.97);
 
 }
 
@@ -575,10 +577,10 @@ h5{
     .top-bar-section {
         ul {
             &.left li {
-                border-right: 2px solid #16539f;
+                border-right: 2px solid rgba(107, 0, 84, 0.97);
             }
             li {
-                background: $primary-blue;
+                background: rgba(107, 0, 84, 0.97);
 
 
                 &>a {
@@ -3743,8 +3745,8 @@ body {
 /*
     Styling for the Secondary header 2
 */
-$ah_2_icon_color: #ffc14f;
-$ah_2_background_color: rgba(107, 0, 84, 0.97);
+$ah_2_icon_color: rgba(107, 0, 84, 0.97);
+$ah_2_background_color: #ffffff;
 $ah_2_background_color_hover: rgba(244, 244, 244, 0.3);;
 .activity_player_header {
     background-color: $ah_2_background_color;
@@ -3768,12 +3770,12 @@ $ah_2_background_color_hover: rgba(244, 244, 244, 0.3);;
 
     .header_title {
         position: relative;
-        color: #fff;
+        color: #6f0859;
         font-weight: 500;
         font-size: 20px;
         letter-spacing: 0.6px;
         padding: 0px 15px;
-        margin-left: -2px;
+        //margin-left: -2px;
         border-right: 1px solid white;
         a {
             color: $ah_2_icon_color;
@@ -3894,6 +3896,7 @@ $ah_2_background_color_hover: rgba(244, 244, 244, 0.3);;
             padding: 0px 15px;
             margin-left: -2px;
             border-right: 1px solid white;
+            
             a {
                 color: $ah_2_icon_color;
             }
@@ -3939,6 +3942,7 @@ $ah_2_background_color_hover: rgba(244, 244, 244, 0.3);;
             &:not(i) {
                 color: #a983b9;
             }
+                
         }
     }
 
@@ -4226,7 +4230,7 @@ ul.nav_menu_1 {
 
 .activity_sheet {
     background: rgba(231, 231, 231, 0.12);
-    box-shadow: 0px 2px 6px #000;
+    //box-shadow: 0px 2px 6px #000;
     margin: 0px auto;
     padding: 0px 0px;
     max-width: 100vw;
@@ -4239,6 +4243,7 @@ ul.nav_menu_1 {
         // height: 80vh;
         margin-bottom: 10px;
         position: relative;
+        margin-top: 2px;
 
         /*Overriding default*/
         .accordion .accordion-navigation > .content, .accordion dd > .content {
@@ -4256,9 +4261,9 @@ ul.nav_menu_1 {
             @include transition-prop(all);
             width: 100%;
             background-color: #fff;
-            max-height: 100%;
+            //max-height: 100%;
             overflow-y: auto;
-            height: 100vh;
+            //height: 100vh;
 
             .course-lessons {
                 dd {
@@ -4426,15 +4431,15 @@ ul.nav_menu_1 {
     min-width:910px;
     margin-bottom:10px;
     padding-right:4px;
-    #scstyle{
-        margin-top:-10px;
-    }
+    margin-top: 2px;
+    
 }
 
 .lesson-title{
     font-size: 18px;
     padding-top: 10px;
     padding-left: 10px;
+
 }
 
 .activity-title{
@@ -4459,7 +4464,11 @@ ul.nav_menu_1 {
                 &>a {
                             color:black;
                         }
+                &:hover{
+                    background: rgba(111, 8, 89, 0.24);
+                }
             }
+
 
 }
 
