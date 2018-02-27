@@ -4281,106 +4281,132 @@ ul.nav_menu_1 {
             vertical-align: top;
             // height: calc(100vh - 120px);
         }
-        .course_tree {
-            @include transition-prop(all);
-            width: 100%;
-            background-color: #fff;
-            //max-height: 100%;
-            overflow-y: auto;
-            //height: 100vh;
-
-            .course-lessons {
-                dd {
-                    border-bottom: 2px solid #9abfd9;
-                    @include transition-prop(border-color);
-
-                    &.accordion-navigation {
-                        position: relative;
-                        padding-left:0px;
 
 
+        .colapse-container{
+                position: relative;
+                -webkit-transition: all .6s ease;
+                -webkit-box-align: stretch;
+                align-items: stretch;
+                overflow-x: hidden;
+                color: #fff;
+                font-weight: 300;
 
-                        &>a {
-                            &:before {
-                                // content: '&#8250';
-                                position: absolute;
-                                left: 23px;
-                                // //font-size: 45px;
-                                line-height: 20px;
-                                color: $secondry-blue;
-                            }
-                        }
-                        a.entity-title {
-                            background: inherit;
-                            cursor: pointer;
-                            font-weight: 600;
-                            color: #3c5267;
-                            @include transition-prop(color);
+                .first-strip{
+                    padding: 12px 16px 9px;
+                    background-color: #333;
+                    font-size: .75rem;
+                    text-transform: uppercase;
+                    cursor: pointer;
+                    &:hover{
+                    border-bottom: 3px solid #333;
+                    }
+                }
 
-                            .edit_entity {
-                                color: #c9d1d8;
-                                font-weight: 400;
-                                letter-spacing: 0.5px;
-                                // //font-size: 14px;
-                                display: block;
-                                position: relative;
-                                display: none;
+                
 
-                                i {
-                                    display: none;
-                                    // //font-size: 20px;
+
+            .course_tree {
+                @include transition-prop(all);
+                width: 100%;
+                background-color: #fff;
+                //max-height: 100%;
+                overflow-y: auto;
+                //height: 100vh;
+
+                .course-lessons {
+                    dd {
+                        border-bottom: 2px solid #9abfd9;
+                        @include transition-prop(border-color);
+
+                        &.accordion-navigation {
+                            position: relative;
+                            padding-left:0px;
+
+
+
+                            &>a {
+                                &:before {
+                                    // content: '&#8250';
+                                    position: absolute;
+                                    left: 23px;
+                                    // //font-size: 45px;
+                                    line-height: 20px;
+                                    color: $secondry-blue;
                                 }
+                            }
+                            a.entity-title {
+                                background: inherit;
+                                cursor: pointer;
+                                font-weight: 600;
+                                color: #3c5267;
+                                @include transition-prop(color);
 
-                                >.entity_actions {
-                                    margin-bottom: 0px;
+                                .edit_entity {
+                                    color: #c9d1d8;
+                                    font-weight: 400;
+                                    letter-spacing: 0.5px;
+                                    // //font-size: 14px;
+                                    display: block;
+                                    position: relative;
+                                    display: none;
+
+                                    i {
+                                        display: none;
+                                        // //font-size: 20px;
+                                    }
+
+                                    >.entity_actions {
+                                        margin-bottom: 0px;
 
 
-                                    li {
-                                        white-space: nowrap;
-                                        list-style: none;
-                                        display: inline-block;
-                                        margin: 0px 10px;
-                                        cursor: pointer;
+                                        li {
+                                            white-space: nowrap;
+                                            list-style: none;
+                                            display: inline-block;
+                                            margin: 0px 10px;
+                                            cursor: pointer;
+                                        }
+                                    }
+                                }
+                                &:hover {
+                                    .edit_entity {
+                                        display: block;
                                     }
                                 }
                             }
-                            &:hover {
-                                .edit_entity {
-                                    display: block;
+
+                            &.active >a:before {
+                                content: ''; //arrow facing down
+                                // //font-size: 45px;
+                                line-height: 55px;
+                                color: #d7d7d7;
+
+                            }
+
+                            .course-activities {
+                                margin: 0px;
+                                &>li {
+                                    list-style: none;
+                                    border-top: 1px solid #e9e9e9;
+                                    padding: 10px 0px 10px 30px;
+                                    background: inherit;
+                                    @include transition-prop(border-color);
+
+                                    &>a {
+                                        color: #7ca0d0;
+                                        width: 100%;
+                                        display: block;
+                                        @include transition-prop(color);
+                                    }
                                 }
                             }
-                        }
 
-                        &.active >a:before {
-                            content: ''; //arrow facing down
-                            // //font-size: 45px;
-                            line-height: 55px;
-                            color: #d7d7d7;
-
-                        }
-
-                        .course-activities {
-                            margin: 0px;
-                            &>li {
-                                list-style: none;
-                                border-top: 1px solid #e9e9e9;
-                                padding: 10px 0px 10px 30px;
+                            .content {
                                 background: inherit;
-                                @include transition-prop(border-color);
-
-                                &>a {
-                                    color: #7ca0d0;
-                                    width: 100%;
-                                    display: block;
-                                    @include transition-prop(color);
-                                }
                             }
-                        }
 
-                        .content {
-                            background: inherit;
                         }
-
                     }
                 }
             }
@@ -4460,9 +4486,10 @@ ul.nav_menu_1 {
 }
 
 .lesson-title{
-    font-size: 18px;
-    padding-top: 10px;
-    padding-left: 10px;
+    font-size: 14px;
+    //padding-top: 10px;
+    //padding-left: 10px;
+    color:white;
 
 }
 
@@ -4482,7 +4509,8 @@ ul.nav_menu_1 {
                 margin-left: -23px;
 
                 &.active {
-                            background: rgba(116, 0, 255, 0.31);
+                            background: rgba(111, 8, 89, 0.49);
+                            font-weight:600;
 
                         }
                 &>a {
