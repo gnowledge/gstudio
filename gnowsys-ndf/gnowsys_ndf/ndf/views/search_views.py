@@ -182,7 +182,7 @@ def results_search(request, group_id, page_no=1, return_only_dict = None):
 		print "search page"
 		print search_result.count()
 
-		return render_to_response('ndf/search_page.html', {'search_curr':search_result ,'group_id':group_id,'groupid':group_id,'GSTUDIO_ELASTIC_SEARCH':GSTUDIO_ELASTIC_SEARCH},
+		return render_to_response('ndf/search_page.html', {'search_curr':search_result[0:30] ,'group_id':group_id,'groupid':group_id,'GSTUDIO_ELASTIC_SEARCH':GSTUDIO_ELASTIC_SEARCH},
 				context_instance=RequestContext(request))
 	else:
 		userid = request.user.id

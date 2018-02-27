@@ -66,48 +66,84 @@ es = Elasticsearch("http://elastic:changeme@gsearch:9200", timeout=100, retry_on
 
 es_client = Search(using=es)
 
-GST_FILE = Search(using=es, index="nodes",doc_type="gsystemtype").query("match", name="file")
-GST_FILE1=GST_FILE.execute()
+#GST_FILE = Search(using=es, index="nodes",doc_type="gsystemtype").query("match", name="file")
+#GST_FILE1=GST_FILE.execute()
+
+#print "GST File"
+#print  GST_FILE1.hits[0].id
 
 
-q = Q('bool', must=[Q('match', name='file')],should=[ Q('match', name='file1')])
-GST_FILE_new1 =Search(using=es, index="nodes",doc_type="gsystemtype").query(q)
+q = Q('match',name=dict(query='File',type='phrase'))
+GST_FILE = Search(using=es, index="nodes",doc_type="gsystemtype").query(q)
+GST_FILE1 = GST_FILE.execute()
 
-q = Q('match',name=dict(query="e-book", type="phrase"))
-GST_FILE_new11 =Search(using=es, index="nodes",doc_type="gsystemtype").query(q)
+#q = Q('bool', must=[Q('match', name='file')],should=[ Q('match', name='file1')])
+#GST_FILE_new1 =Search(using=es, index="nodes",doc_type="gsystemtype").query(q)
 
-print "e-book ids"
-for a in GST_FILE_new11:
-	print a.id
+#q = Q('match',name=dict(query="e-book", type="phrase"))
+#GST_FILE_new11 =Search(using=es, index="nodes",doc_type="gsystemtype").query(q)
 
-print "--------------------------------------------"
-print GST_FILE_new11.to_dict()
+#print "e-book ids"
+#for a in GST_FILE_new11:
+#	print a.id
+q = Q('match',name=dict(query='Page',type='phrase'))
+GST_PAGE = Search(using=es, index="nodes",doc_type="gsystemtype").query(q)
+GST_PAGE1 = GST_PAGE.execute()
+
+#GST_PAGE= Search(using=es, index="nodes",doc_type="gsystemtype").query("match", name="page")
+#GST_PAGE1=GST_PAGE.execute()   
+
+q = Q('match',name=dict(query='Image',type='phrase'))
+GST_IMAGE = Search(using=es, index="nodes",doc_type="gsystemtype").query(q)
+GST_IMAGE1 = GST_IMAGE.execute()
+
+#GST_IMAGE = Search(using=es, index="nodes",doc_type="gsystemtype").query("match", name="image")
+#GST_IMAGE1=GST_IMAGE.execute()
+
+q = Q('match',name=dict(query='Video',type='phrase'))
+GST_VIDEO = Search(using=es, index="nodes",doc_type="gsystemtype").query(q)
+GST_VIDEO1 = GST_VIDEO.execute()
+
+#GST_VIDEO = Search(using=es, index="nodes",doc_type="gsystemtype").query("match", name="video")
+#GST_VIDEO1=GST_VIDEO.execute()
+
+q = Q('match',name=dict(query='E-Library',type='phrase'))
+e_library_GST = Search(using=es, index="nodes",doc_type="gsystemtype").query(q)
+e_library_GST1 = e_library_GST.execute()
+
+#e_library_GST = Search(using=es, index="nodes",doc_type="gsystemtype").query("match", name="library")
+#e_library_GST1=e_library_GST.execute()
+	
+q = Q('match',name=dict(query='Pandora_video',type='phrase'))
+pandora_video_st = Search(using=es, index="nodes",doc_type="gsystemtype").query(q)
+pandora_video_st1 = pandora_video_st.execute()
+
+#pandora_video_st = Search(using=es, index="nodes",doc_type="gsystemtype").query("match", name="pandora")
+#pandora_video_st1=pandora_video_st.execute()
+
+#app = Search(using=es, index="nodes",doc_type="gsystemtype").query("match", name="library")
+#app1=app.execute()
+
+q = Q('match',name=dict(query='E-Library',type='phrase'))
+app = Search(using=es, index="nodes",doc_type="gsystemtype").query(q)
+app1 = app.execute()
+
+	
+q = Q('match',name=dict(query='Wiki page',type='phrase'))
+wiki_page = Search(using=es, index="nodes",doc_type="gsystemtype").query(q)
+wiki_page1 = wiki_page.execute()
+
+#wiki_page = Search(using=es, index="nodes",doc_type="gsystemtype").query("match", name="wiki")
+#wiki_page1=wiki_page.execute()
+
+	
+q = Q('match',name=dict(query='Jsmol',type='phrase'))
+GST_JSMOL = Search(using=es, index="nodes",doc_type="gsystemtype").query(q)
+GST_JSMOL1 = GST_JSMOL.execute()
 
 
-GST_PAGE= Search(using=es, index="nodes",doc_type="gsystemtype").query("match", name="page")
-GST_PAGE1=GST_PAGE.execute()   
-
-GST_IMAGE = Search(using=es, index="nodes",doc_type="gsystemtype").query("match", name="image")
-GST_IMAGE1=GST_IMAGE.execute()
-
-GST_VIDEO = Search(using=es, index="nodes",doc_type="gsystemtype").query("match", name="video")
-GST_VIDEO1=GST_VIDEO.execute()
-
-e_library_GST = Search(using=es, index="nodes",doc_type="gsystemtype").query("match", name="library")
-e_library_GST1=e_library_GST.execute()
-		
-pandora_video_st = Search(using=es, index="nodes",doc_type="gsystemtype").query("match", name="pandora")
-pandora_video_st1=pandora_video_st.execute()
-
-app = Search(using=es, index="nodes",doc_type="gsystemtype").query("match", name="library")
-app1=app.execute()
-wiki_page = Search(using=es, index="nodes",doc_type="gsystemtype").query("match", name="wiki")
-wiki_page1=wiki_page.execute()
-
-GST_JSMOL = Search(using=es, index="nodes",doc_type="gsystemtype").query("match", name="jsmol")
-GST_JSMOL1=GST_JSMOL.execute()
-
-print GST_JSMOL1.hits.total
+#GST_JSMOL = Search(using=es, index="nodes",doc_type="gsystemtype").query("match", name="jsmol")
+#GST_JSMOL1=GST_JSMOL.execute()
 
 def query_doc(request, doc_id_or_name=None, option=None):
 
@@ -148,6 +184,8 @@ def render_test_template(request,group_id='home', app_id=None, page_no=1):
 
 	if app_id is None:
 		app_id = app1.hits[0].id
+		print app_id
+
 
 	title = e_library_GST1.hits[0].name
 	
