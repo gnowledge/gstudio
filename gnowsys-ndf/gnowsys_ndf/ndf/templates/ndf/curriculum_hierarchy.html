@@ -1,6 +1,7 @@
 {% extends "ndf/gbase.html" %}
 {% load i18n %}
 {% load ndf_tags %}
+
 {% block title %} {% trans "Topic Map" %} -- {{curriculum_obj.name }}  
 
 <style type="text/css">
@@ -12,15 +13,18 @@
   padding: 12px 20px 12px 40px;
   border: 1px solid #ddd;
   margin-bottom: 12px;
+  margin-right: 40px;
 }
 #topic-list {
   list-style-type: none;
   padding: 0;
-  margin: 0;
+  
 }
-</style>
-{% endblock %}
 
+</style>
+
+
+{% endblock %}
 {% block body_content %}
         {% check_is_gstaff group_id request.user as is_gstaff %} 
         {% if curriculum_obj %}
@@ -67,7 +71,7 @@
         <div id="addBranch" class="reveal-modal" data-reveal aria-labelledby="modalTitle" aria-hidden="true" role="dialog">
             
             <div  class="section-edit-area" style="display:none">
-                <h4 class="section-label-heading">Create new Section</h4>
+                <h4 class="section-label-heading" style="margin-left:20px">Create new Section</h4>
                 <label class="section-label">Section Name
                     <input type="text" placeholder="Section Name" name="branch_name"/>
                 </label>
@@ -90,7 +94,7 @@
 
                     </label>
                     {% if is_gstaff or curriculum_obj.created_by == request.user.id %}
-                    <button type="button" class="button-hollow-grey edit_section">
+                    <button type="button" class="btn button-hollow-grey btn-lg edit_section">
                         Edit
                     </button>
                     {% endif %}
@@ -98,27 +102,33 @@
             <a class="close-reveal-modal" aria-label="Close">&#215;</a>
         </div>
 
-    <div id="addDivision" class="reveal-modal" data-reveal aria-labelledby="modalTitle" aria-hidden="true" role="dialog">
-        <div>
+            <div id="addDivision" class="reveal-modal" data-reveal aria-labelledby="modalTitle" aria-hidden="true" role="dialog">
+          <div>
             <div class="subsection-edit-area" style="display:none">
                 
-                <h4 class="subsection-label-heading" >Create new Sub-Section</h4>
+               <h4 class="subsection-label-heading" style="margin-left: 20px" >Create new Sub-Section</h4>
                 <label>Sub-Section Name
-                    <input type="text" placeholder="Sub-Section Name" name="sub-section-name" />
+                    <input type="text" tabindex="1" placeholder="Sub-Section Name" name="sub-section-name"  />
                 </label>
                
                 <label>Topic
                     <input type="checkbox"  class="topic-checkbox" name="isLeafNode" value="leafNode"/>
                 </label>
                 <br />
-        
-                <label> Search
-                 <input type="text" placeholder="Enter a subtopic" id="myInput" onkeyup="search_func()" >
-                   </label>              
-                    choose topic :
-                        <select name="topics" id = "topic_list" multiple style="height:100px">
-                                                            {% for each in topic_nodes %}
-                                 {% if each.pk == selected_topic.grel_node.0.pk %}
+             
+                  <dl class="accordion" id="myAccordion" data-accordion style="margin-left: 20px">
+
+                  <dd class="accordion-navigation">
+                  <a href="#abc"  >Select Prequisite Topic:</a>
+                  <div id="abc" class="content" data-options="deep_linking:true" >
+                  	
+                  <label > Search    
+                  <input type="text" placeholder="Enter a subtopic" id="myInput" onkeyup="search_func()"  ></label>
+                    <select id = "topic_list" name="topics" multiple style="height:100px; margin-left:20px ">
+                      <!-- <select   multiple style="height:100px; margin-left: 20px; ">-->
+                            {% for each in topic_nodes %}
+
+                                {% if each.pk == selected_topic.grel_node.0.pk %}
                                     <option selected value="{{ each.pk }}" data-topic="{{ each.name }}">
                                         {{each.name}}
 
@@ -126,18 +136,23 @@
                                     <option value="{{ each.pk }}" data-topic="{{ each.name }}">
                                         {{each.name}}
                                 {%  endif %}
-                                {% endfor %}
-                        </select>
+                            {% endfor %}
+                        </select> 
+                    </div>
+                </dd>
+
+                </dl>
+              
                 <br />
                 <button type="button" class="button-hollow-grey create_division">
                     Add
                 </button>
                 <button type="button" class="button-hollow-grey delete_division" style="display: none;">
-                    Delete
+                    Delete Topic
                 </button>
 
-            </div>
-
+            
+           </div>
                <div class="subsection-view-area">
                     <label class="subsection-label-view">Sub-Section Name
                     </label>
@@ -149,7 +164,8 @@
                         Edit
                     </button>
                     {% endif %}   
-               </div> 
+               </div>
+                
         </div>
         <div class="row listing-row">
         </div>
@@ -199,6 +215,9 @@
                     multi_expand: true
                 }
             });
+            //$('#myAccordion').on('toggled', function (event, accordion) {
+            //console.log(accordion); 
+             //});
 
             //Describing the tree and the render method
             $('#curriculum_tree').tree({
@@ -296,11 +315,17 @@
                             $('#addDivision').find('input').val(node.name);
                             //$('#addDivision').find('input[type=checkbox]').val(node.isLeaf);
                             $('#addDivision').find('input[type=checkbox][name="isLeafNode"]').closest('label').hide();
+                            //removed the subsection label
+                          // $('#addDivision').find('input[type=text][name="sub-section-name"]').closest('label').hide();
                             if(node.node_type == "Topic"){
                                 $('.subsection-label-view').html("");
-                                $('.subsection-label-heading').html("Update Topic");
-                                $('.subsection-label-view').append("Topic Name " + ": " +node.name);
-                                $('#addDivision').find('.create_division').html('Update Topic');
+                                $('.subsection-label-heading').html("<h4>Edit Topic : " +node.name+ "</h4>");
+                                 $('.subsection-label-heading').append("<h4>Prequisites : </h4>");
+                                 //$('.subsection-label-heading').append("<h6>Select Prequisite topics for : " +node.name+ "</h6>");
+                                $('.subsection-label-view').append(" Topic Name " + ": " +node.name+ "<br/>" )
+                                
+                                $('.subsection-label-view').append("Prerequisite of " +node.name+ " are " + ": <br/>");
+                                $('#addDivision').find('.create_division').html('Save');
 
                                 url = "/{{group_id}}" +"/curriculum/prerequisite/" + "{{curriculum_obj.pk}}" + "/" + node.id;
                                 $.ajax({
@@ -586,7 +611,8 @@
                 $(".listing-row").html("");
                 $('.subsection-edit-area').css('display', 'block')
                 $('.subsection-view-area').css('display', 'none')
-                
+             
+
             });
     
  
