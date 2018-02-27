@@ -3760,7 +3760,7 @@ ul.jqtree-tree .jqtree-toggler {
 // Activity player header
 
 $activity-border-color: #e0e0e0;
-$activity-header-height: 45px;
+$activity-header-height: 35px;;
 $activity-header-icon-block-width: 70px;
 body {
     background-color: #fff;
@@ -3796,7 +3796,7 @@ $ah_2_background_color_hover: rgba(244, 244, 244, 0.3);;
         position: relative;
         color: #6f0859;
         font-weight: 500;
-        font-size: 20px;
+        font-size: 16px;
         letter-spacing: 0.6px;
         padding: 0px 15px;
         //margin-left: -2px;
@@ -3898,11 +3898,15 @@ $ah_2_background_color_hover: rgba(244, 244, 244, 0.3);;
     }
 
     .lesson-nav{
+        position: relative;
+        color: #6f0859;
+        font-weight: 500;
+        font-size: 14px;
+        letter-spacing: 0.6px;
         @media screen and (min-width: 1025px) {
             float: right;
             margin-right:70px;
             background-color: $ah_2_background_color;
-
         }
 
         @media screen and (max-width: 1024px) {
@@ -3911,8 +3915,6 @@ $ah_2_background_color_hover: rgba(244, 244, 244, 0.3);;
         }
 
         div{
-            height: 45px;
-            line-height: 45px;
             display: inline-block;
             vertical-align: top;
         }
