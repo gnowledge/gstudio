@@ -13,14 +13,18 @@
 {% endblock %}
 
 {% block body_content %}
-  <div class="repository-title medium-3 medium-offset-2 large-3 large-offset-2 columns">{{groups_category}}</div> 
+
+
+
+
+  <div class="repository-title medium-3 medium-offset-2 large-3 large-offset-2 columns"></div> 
   <div class="repository-desc medium-6 large-7 columns">{{app_gst.content_org|default_if_none:''|safe}}</div>
 <div class="content row">
   <div class="app-card-wrapper">
     {% autopaginate group_nodes 23 %}
     {% for node in group_nodes %}
       <div class="app-card-container">
-        {% include 'ndf/main_simple_card.html' with  resource=node has_prof_pic=True url_name="groupchange" first_arg=node.name %}
+        {% include 'ndf/main_simple_card.html' with  resource=node has_prof_pic=True url_name="module_detail" first_arg=group_id second_arg=node.pk %}
       </div>
     {% endfor %}
   </div>

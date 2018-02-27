@@ -6,6 +6,9 @@
 {% block body_content %}
 <div class="row group_content">
     <div class="small-12 columns group_sections_content top-margin-translation">
+        <div class="small-1 columns icon-widget" style="margin-top: 5.6px;">
+            <a href="{% url 'course_pages' group_id %}"><i class="fa fa-chevron-left large" aria-hidden="true"></i></a>
+        </div>
 
         <h3> {% firstof node.altnames node.name %}</h3>
 
