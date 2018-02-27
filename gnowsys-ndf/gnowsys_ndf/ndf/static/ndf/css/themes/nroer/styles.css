@@ -23434,7 +23434,7 @@ th.hide-for-touch {
 .workspace {
   background: url("watermark.png") no-repeat 1% 65%;
   min-height: 100%;
-  margin-bottom: -130px !important;
+  margin-bottom: -180px !important;
   -webkit-box-sizing: border-box;
   -moz-box-sizing: border-box;
   box-sizing: border-box;
@@ -24023,7 +24023,7 @@ body > footer .myfooter .footer_link_cont .links_show {
 }
 /* line 567, ../../../scss/_app_styles.scss */
 body > footer .myfooter .footer_link_cont h4 {
-  color: #999;
+  color: #b4b2b2 !important;
 }
 /* line 570, ../../../scss/_app_styles.scss */
 body > footer .myfooter .footer_link_cont .social_links {

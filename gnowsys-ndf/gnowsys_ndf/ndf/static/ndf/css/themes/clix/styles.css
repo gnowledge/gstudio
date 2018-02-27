@@ -23907,7 +23907,7 @@ body > footer .myfooter .footer_link_cont .links_show {
 }
 /* line 567, ../../../scss/_app_styles.scss */
 body > footer .myfooter .footer_link_cont h4 {
-  color: #999;
+  color: #b4b2b2 !important;
 }
 /* line 570, ../../../scss/_app_styles.scss */
 body > footer .myfooter .footer_link_cont .social_links {
