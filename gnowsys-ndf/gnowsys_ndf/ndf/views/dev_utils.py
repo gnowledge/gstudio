@@ -489,13 +489,13 @@ def render_test_template(request,group_id='home', app_id=None, page_no=1):
 	#collection_pages_cur1_temp = [doc['_source'] for doc in collection_pages_cur1['hits']['hits']]
 
 	#results = paginator.Paginator(collection_pages_cur, page_no, no_of_objs_pp)
-	datavisual.append({"name":"Doc", "count": educationaluse_stats.get("Documents", 0)})
-	datavisual.append({"name":"Page", "count": educationaluse_stats.get("Pages", 0)})
-	datavisual.append({"name":"Image","count": educationaluse_stats.get("Images", 0)})
-	datavisual.append({"name":"Video","count": educationaluse_stats.get("Videos", 0)})
-	datavisual.append({"name":"Interactives","count": educationaluse_stats.get("Interactives", 0)})
-	datavisual.append({"name":"Audios","count": educationaluse_stats.get("Audios", 0)})
-	datavisual.append({"name":"eBooks","count": educationaluse_stats.get("eBooks", 0)})
+	datavisual.append({"name":"Doc", "count":  applications_count.count()})
+	#datavisual.append({"name":"Page", "count": educationaluse_stats.get("Pages", 0)})
+	datavisual.append({"name":"Image","count": images_count.count()})
+	datavisual.append({"name":"Video","count": videos_count.count()})
+	datavisual.append({"name":"Interactives","count": intercatives_count.count()})
+	datavisual.append({"name":"Audios","count": audios_count.count()})
+	datavisual.append({"name":"eBooks","count": ebooks_count.count()})
 	#if collection_pages_cur:	
 	#	datavisual.append({"name":"Collections","count": coll_page_count})
 	datavisual = json.dumps(datavisual)
