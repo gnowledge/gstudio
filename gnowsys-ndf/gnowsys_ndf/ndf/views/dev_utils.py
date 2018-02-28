@@ -369,12 +369,12 @@ def render_test_template(request,group_id='home', app_id=None, page_no=1):
     #                    "query":   {"bool":{"must":  [ {"term":  {"status":"published"}  }]  }}})
 	temp111 = ""
 	if selfilters in (None,'',""):
-		q_images_count = Q('bool', must=[Q('match', attribute_set__educationaluse='images')])
-		q_audios_count = Q('bool', must=[Q('match', attribute_set__educationaluse='audios')])
-		q_videos_count = Q('bool', must=[Q('match', attribute_set__educationaluse='videos')])
-		q_intercatives_count = Q('bool', must=[Q('match', attribute_set__educationaluse='interactives')])
-		q_applications_count = Q('bool', must=[Q('match', attribute_set__educationaluse='documents')])
-		q_ebooks_count = Q('bool', must=[Q('match', attribute_set__educationaluse='ebooks')])
+		q_images_count = Q('bool', must=[Q('match', attribute_set__educationaluse='images'),Q('match', access_policy='public'),Q('match', group_set=str(group_id))])
+		q_audios_count = Q('bool', must=[Q('match', attribute_set__educationaluse='audios'),Q('match', access_policy='public'),Q('match', group_set=str(group_id))])
+		q_videos_count = Q('bool', must=[Q('match', attribute_set__educationaluse='videos'),Q('match', access_policy='public'),Q('match', group_set=str(group_id))])
+		q_intercatives_count = Q('bool', must=[Q('match', attribute_set__educationaluse='interactives'),Q('match', access_policy='public'),Q('match', group_set=str(group_id))])
+		q_applications_count = Q('bool', must=[Q('match', attribute_set__educationaluse='documents'),Q('match', access_policy='public'),Q('match', group_set=str(group_id))])
+		q_ebooks_count = Q('bool', must=[Q('match', attribute_set__educationaluse='ebooks'),Q('match', access_policy='public'),Q('match', group_set=str(group_id))])
 		q_all_count=  Q('bool', must=[Q('terms',attribute_set__educationaluse=['documents','images','audios','videos','interactives'])])
 
 
@@ -454,12 +454,13 @@ def render_test_template(request,group_id='home', app_id=None, page_no=1):
 	else:
 		q = Q('bool', must=[Q('match', group_set=str(group_id)), Q('match',access_policy='public'),Q('exists',field='collection_set')],
 		should=[Q('match',member_of=GST_FILE1.hits[0].id),Q('match',member_of=GST_PAGE1.hits[0].id) ],
-		must_not=[Q('match', attribute_set__educationaluse ='ebooks')])
+		must_not=[Q('match', attribute_set__educationaluse ='ebooks')], minimum_should_match=1)
 		collection_pages_cur =Search(using=es, index="nodes",doc_type="gsystemtype,gsystem,metatype,relationtype,attribute_type,group,author").query(q)
 
 
 
 	print collection_pages_cur.count()
+
 	print "cccccccccccccccccccccccccccccccccccccccccccccccccccc"
 	#print collection_pages_cur.to_dict()
 
@@ -691,18 +692,18 @@ def elib_paged_file_objects(request, group_id, filetype, page_no):
 
 				collection_query = eval("Q('bool', must=[Q('match', group_set=str(group_id)),Q('match',access_policy='public'),Q('exists',field='collection_set'),Q('match', attribute_set__educationaluse =filetype),"+strconcat1[:-1]+"],"
 									+ "should=[Q('match',member_of=GST_FILE1.hits[0].id),Q('match',member_of=GST_PAGE1.hits[0].id) ],"
-									+ "must_not=[Q('match', attribute_set__educationaluse ='ebooks')])")
+									+ "must_not=[Q('match', attribute_set__educationaluse ='ebooks')]), minimum_should_match=1")
 
 
 			else:
 				print "----------11111111111111111111111111-----------------------------"
 				
 				q = Q('bool', must=[Q('match', group_set=str(group_id)), Q('match',access_policy='public'),Q('match', attribute_set__educationaluse =filetype)],
-				should=[Q('match',member_of=GST_FILE1.hits[0].id)])
+				should=[Q('match',member_of=GST_FILE1.hits[0].id)], minimum_should_match=1)
 			
 				collection_query = Q('bool', must=[Q('match', group_set=str(group_id)), Q('match',access_policy='public'),Q('exists',field='collection_set')],
 				should=[Q('match',member_of=GST_FILE1.hits[0].id),Q('match',member_of=GST_PAGE1.hits[0].id) ],
-				must_not=[Q('match', attribute_set__educationaluse ='ebooks')])	
+				must_not=[Q('match', attribute_set__educationaluse ='ebooks')], minimum_should_match=1)	
 
 				
 
