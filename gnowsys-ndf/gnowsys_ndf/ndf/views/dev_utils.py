@@ -375,7 +375,7 @@ def render_test_template(request,group_id='home', app_id=None, page_no=1):
 		q_intercatives_count = Q('bool', must=[Q('match', attribute_set__educationaluse='interactives'),Q('match', access_policy='public'),Q('match', group_set=str(group_id))])
 		q_applications_count = Q('bool', must=[Q('match', attribute_set__educationaluse='documents'),Q('match', access_policy='public'),Q('match', group_set=str(group_id))])
 		q_ebooks_count = Q('bool', must=[Q('match', attribute_set__educationaluse='ebooks'),Q('match', access_policy='public'),Q('match', group_set=str(group_id))])
-		q_all_count=  Q('bool', must=[Q('terms',attribute_set__educationaluse=['documents','images','audios','videos','interactives','maps','events','publications'])])
+		q_all_count=  Q('bool', must=[Q('terms',attribute_set__educationaluse=['documents','images','audios','videos','interactives','maps','audio','select','teachers'])])
 
 
 	images_count =Search(using=es, index="nodes",doc_type="gsystemtype,gsystem,metatype,relationtype,attribute_type,group,author").query(q_images_count)
@@ -497,8 +497,8 @@ def render_test_template(request,group_id='home', app_id=None, page_no=1):
 	datavisual.append({"name":"Interactives","count": intercatives_count.count()})
 	datavisual.append({"name":"Audios","count": audios_count.count()})
 	datavisual.append({"name":"eBooks","count": ebooks_count.count()})
-	#if collection_pages_cur:	
-	#	datavisual.append({"name":"Collections","count": coll_page_count})
+	if collection_pages_cur:	
+		datavisual.append({"name":"Collections","count": collection_pages_cur.count()})
 	datavisual = json.dumps(datavisual)
 
 	#title=''.join(title)
@@ -518,7 +518,7 @@ def render_test_template(request,group_id='home', app_id=None, page_no=1):
 								 #'ebook_pages': educationaluse_stats.get("eBooks", 0),
 								 # 'page_count': pageCollection.count(),
 								 # 'page_nodes':pageCollection
-								 'all_files_count':all_count.count(),
+								 'all_files_count':files_new.count(),
 								 'file_pages': files_new,
 								 'image_pages': images_count.count(),
 								 'interactive_pages': intercatives_count.count(),
