@@ -233,6 +233,12 @@ class Node(DjangoDocument):
             if 'contributors' not in values_dict:
                 values_dict.update({'contributors': add_to_list(self.contributors, user_id)})
 
+        if 'member_of' in values_dict  and not isinstance(values_dict['member_of'],ObjectId):
+            from gsystem_type import GSystemType
+            gst_node = GSystemType.get_gst_name_id(values_dict['member_of'])
+            if gst_node:
+                values_dict.update({'member_of': ObjectId(gst_node[1])})
+
         # filter keys from values dict there in node structure.
         node_str = Node.structure
         node_str_keys_set = set(node_str.keys())
