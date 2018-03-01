@@ -692,7 +692,7 @@ def elib_paged_file_objects(request, group_id, filetype, page_no):
 
 				collection_query = eval("Q('bool', must=[Q('match', group_set=str(group_id)),Q('match',access_policy='public'),Q('exists',field='collection_set'),Q('match', attribute_set__educationaluse =filetype),"+strconcat1[:-1]+"],"
 									+ "should=[Q('match',member_of=GST_FILE1.hits[0].id),Q('match',member_of=GST_PAGE1.hits[0].id) ],"
-									+ "must_not=[Q('match', attribute_set__educationaluse ='ebooks')]), minimum_should_match=1")
+									+ "must_not=[Q('match', attribute_set__educationaluse ='ebooks')], minimum_should_match=1)")
 
 
 			else:
