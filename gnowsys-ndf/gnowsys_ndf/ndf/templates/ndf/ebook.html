@@ -120,14 +120,14 @@ margin-top:5px;
 
 <a href="{% url 'e-book' group_name_tag %}" title="Click to go to ebooks">
     <div class="large-4 columns repository-title top-gap" >
-      {% if ebook_gst.0.altnames and ebook_gst.0.altnames != "None" %}
-        {{ebook_gst.0.altnames}}
+      {% if ebook_gst.altnames and ebook_gst.0.altnames != "None" %}
+        {{ebook_gst.altnames}}
       {% else %}
-        {{ebook_gst.0.name}}
+        {{ebook_gst.name}}
       {% endif%}
     </div>
   </a>
-  <div class="large-8 columns repository-desc top-gap">{{ebook_gst.0.content_org|default_if_none:""|safe}}</div>
+  <div class="large-8 columns repository-desc top-gap">{{ebook_gst.content_org|default_if_none:""|safe}}</div>
 
   {% get_filters_data "E-Book" as filter_dict %}
   {% include "ndf/filters.html" with filter_dict=filter_dict %}

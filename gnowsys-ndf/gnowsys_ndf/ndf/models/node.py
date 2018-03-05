@@ -1,5 +1,8 @@
 from base_imports import *
 from history_manager import HistoryManager
+from elasticsearch import Elasticsearch
+from elasticsearch_dsl import Q
+from gnowsys_ndf.local_settings import GSTUDIO_ELASTIC_SEARCH,GLITE_RCS_REPO_DIRNAME
 
 @connection.register
 class Node(DjangoDocument):
@@ -707,6 +710,35 @@ class Node(DjangoDocument):
             # gets the last version no.
             rcsno = history_manager.get_current_version(self)
             node_collection.collection.update({'_id':self._id}, {'$set': {'snapshot'+"."+str(kwargs['groupid']):rcsno }}, upsert=False, multi=True)
+
+
+        if GSTUDIO_ELASTIC_SEARCH :
+            print "elastic if block....."
+
+            if not os.path.exists(GLITE_RCS_REPO_DIRNAME):
+                os.makedirs(GLITE_RCS_REPO_DIRNAME)
+
+            fp = history_manager.get_file_path(self)
+            rcs_obj.checkout(fp, otherflags="-f")
+
+            temp1 = fp[:-29]
+            temp2 = temp1[14:]
+
+            glite_fp = "/data/glite-rcs-repo-new" + temp2
+
+            try:
+                os.makedirs(glite_fp)
+            except OSError as exc:  # Python >2.5
+                if exc.errno == errno.EEXIST and os.path.isdir(path):
+                    pass
+                else:
+                    raise
+
+            temp = "mv " +fp+" "+glite_fp 
+            os.system(temp)
+            
+            #glite_fp = glite_fp + self._id + ".json"
+           
 
 
     # User-Defined Functions

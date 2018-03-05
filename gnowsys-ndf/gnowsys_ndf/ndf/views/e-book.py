@@ -93,7 +93,7 @@ def ebook_listing(request, group_id, page_no=1):
 	
 	#ebook_gst1 = [doc['_source'] for doc in ebook_gst['hits']['hits']]
 
-
+	print GST_PAGE_ID
 	print "----------------------------------------================================================"
 	#print ebook_gst1
 	#all_ebooks1=es.search(index="nodes", doc_type="metatype,gsystemtype,gsystem", body={
@@ -117,7 +117,7 @@ def ebook_listing(request, group_id, page_no=1):
 
 
 
-	#print all_ebooks1
+	print all_ebooks.count()
 
 	#all_ebooks = node_collection.find({
 	#							'member_of': {'$in': temp },
@@ -152,21 +152,20 @@ def ebook_listing(request, group_id, page_no=1):
 
 	result_paginated_cur = all_ebooks
 
-	if int(page_no) == 1:
-		result_cur=all_ebooks[0:24]
+	if page_no == 1:
+		all_ebooks=all_ebooks[0:24]
 				
 	else:
-		temp=int(( int(page_no) - 1) * 24)
-		result_cur=all_ebooks[temp:temp+24]
+		temp=( int(page_no) - 1) * 24
+		all_ebooks=all_ebooks[temp:temp+24]
 				
 	#all_ebooks_count=all_ebooks.count()
 
-	result_paginated_cur = result_cur
+	#result_paginated_cur = result_cur
 				#result_pages = paginator.Paginator(result_paginated_cur, page_no, no_of_objs_pp)
 
-	print result_cur
-	paginator = Paginator(result_paginated_cur, 24)
-				#page = request.GET.get('page')
+	#print result_cur
+	paginator = Paginator(all_ebooks, 24)
 	
 	try:
 		results = paginator.page(int(page_no))
@@ -179,4 +178,5 @@ def ebook_listing(request, group_id, page_no=1):
 								"all_ebooks": all_ebooks, "ebook_gst": ebook_gst,
 								"page_info": results, "title": "eBooks",
 								"group_id": group_id, "groupid": group_id,"all_ebooks1_count":all_ebooks.count(),
+								"GSTUDIO_ELASTIC_SEARCH":GSTUDIO_ELASTIC_SEARCH
 								}, context_instance = RequestContext(request))
