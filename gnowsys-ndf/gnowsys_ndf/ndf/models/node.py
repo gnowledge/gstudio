@@ -729,15 +729,20 @@ class Node(DjangoDocument):
             try:
                 os.makedirs(glite_fp)
             except OSError as exc:  # Python >2.5
-                if exc.errno == errno.EEXIST and os.path.isdir(path):
+                if os.path.isdir(glite_fp):
                     pass
                 else:
                     raise
 
             temp = "mv " +fp+" "+glite_fp 
             os.system(temp)
+            temp = "rm -rf"+" "+fp
+            os.system(temp)
             
             #glite_fp = glite_fp + self._id + ".json"
+
+            es = Elasticsearch("http://elastic:changeme@gsearch:9200", timeout=100, retry_on_timeout=True)
+            
            
 
 
