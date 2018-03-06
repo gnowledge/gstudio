@@ -2,18 +2,74 @@
 {% load i18n %}
 {% load ndf_tags %}
 
-{% block title %} {% trans "Topic Map" %} -- {{curriculum_obj.name }}  
 
+{% block title %} {% trans "Topic Map" %} -- {{curriculum_obj.name }}  
+{% endblock %}
+
+
+
+
+
+{% block body_content %}
 <style type="text/css">
+
+.tagsfor #tag1 a {
+	height: 25px;
+	margin: 0 5px 0 10px;
+	padding: 0 7px 0 14px;
+	white-space: normal;
+	position: relative;
+
+	background: -moz-linear-gradient(top, #A9A9A9 0%, #A9A9A9 100%);
+	background: -webkit-gradient(linear, left top, left bottom, color-stop(0%,#A9A9A9), color-stop(100%,#A9A9A9));
+	background: -webkit-linear-gradient(top, #A9A9A9 0%,#A9A9A9 100%);
+	background: -o-linear-gradient(top, #A9A9A9 0%,#A9A9A9 100%);
+	background: linear-gradient(to bottom, #A9A9A9 0%,#A9A9A9 100%);
+
+
+	color: #191919;
+	font: bold 11px/21px Arial, Tahoma, sans-serif;
+	text-decoration: none;
+	text-shadow: 0 1px rgba(255,255,255,0.4);
+
+	border-top: 1px solid #A9A9A9;
+	border-bottom: 1px solid #A9A9A9;
+	border-right: 1px solid #A9A9A9;
+	border-radius: 1px 3px 3px 1px;
+	box-shadow: inset 0 1px #b1b1b1, 0 1px 2px rgba(0,0,0,0.21);
+}
+
+
+
+
+.tagsfor a:hover {
+	color: #FFF;
+	text-shadow: -1px -1px 0 rgba(153,102,51,0.3);
+}
+
+.tagsfor ul{
+	  display: inline-block;
+
+}
+.tagsfor > ul{
+	
+	white-space: normal;
+
+
+}
+#tag1 div{
+display:inline;
+float:left;
+}
 #myInput {
   background-position: 10px 12px;
   background-repeat: no-repeat;
   width: 100%;
   font-size: 16px;
-  padding: 12px 20px 12px 40px;
+  padding: 12px 20px 12px 10px;
   border: 1px solid #ddd;
   margin-bottom: 12px;
-  margin-right: 40px;
+  margin-right: 20px;
 }
 #topic-list {
   list-style-type: none;
@@ -22,10 +78,6 @@
 }
 
 </style>
-
-
-{% endblock %}
-{% block body_content %}
         {% check_is_gstaff group_id request.user as is_gstaff %} 
         {% if curriculum_obj %}
             {% get_relation_value asset_obj.pk "teaches"  as selected_topic %}
@@ -116,15 +168,36 @@
                 </label>
                 <br />
              
+<!--              <div class="control">
+    <div class="tags has-addons">
+      <span class="tag">Sizes</span>
+      
+        <a class="tag is-success" href="#sizes">Yes</a>
+      
+    </div>
+  </div>
+  <p><span class="w3-tag w3-blue">New!</span></p>-->
+ <div class ="elements_for_editing" style="display:none">
+ <div class="tagsfor">
+ <ul> <h4 style="margin-left: 5px; ">Prequisites: </h4></ul>
+	<span id="tag1">
+
+	<ul><a href="#">molecule<i id="reveal-tag" onclick="$(this).closest('a').remove();return false;" class="fa fa-close"></i></a></ul>
+	<ul><a href="#">ion<i id="reveal-tag" onclick="$(this).closest('a').remove();return false;" class="fa fa-close"></i></a></ul>
+	<ul><a href="#">proton<i id="reveal-tag" onclick="$(this).closest('a').remove();return false;" class="fa fa-close"></i></a></ul>
+</span>
+</div>
+
+
                   <dl class="accordion" id="myAccordion" data-accordion style="margin-left: 20px">
 
                   <dd class="accordion-navigation">
                   <a href="#abc"  >Select Prequisite Topic:</a>
                   <div id="abc" class="content" data-options="deep_linking:true" >
                   	
-                  <label > Search    
+                  <label style="margin-left: 0px"> Search    
                   <input type="text" placeholder="Enter a subtopic" id="myInput" onkeyup="search_func()"  ></label>
-                    <select id = "topic_list" name="topics" multiple style="height:100px; margin-left:20px ">
+                    <select id = "topic_list" name="topics" multiple style="height:100px; margin-left:0px">
                       <!-- <select   multiple style="height:100px; margin-left: 20px; ">-->
                             {% for each in topic_nodes %}
 
@@ -142,7 +215,7 @@
                 </dd>
 
                 </dl>
-              
+              </div>
                 <br />
                 <button type="button" class="button-hollow-grey create_division">
                     Add
@@ -160,7 +233,12 @@
                     <label>Topic
                         <input type="checkbox"  class="topic-checkbox" name="isLeafNode" value="leafNode"/>
                     </label>
-                    <button type="button" class="button-hollow-grey edit_subsection">
+<span id="tag1" >
+   	<div> molecule , ion , proton</div>
+</span>
+<br/>
+<br/>
+                    <button type="button" class="button-hollow-grey edit_subsection" style="margin-left: 0px;">
                         Edit
                     </button>
                     {% endif %}   
@@ -277,6 +355,8 @@
                         $('.subsection-edit-area').css('display','block');
                         $(".listing-row").html("");
                         $('.subsection-view-area').css('display','none');
+//hide the topic list and tags //
+                        $('.elements_for_editing').css('display','none'); 
                         {% if is_gstaff or curriculum_obj.created_by == request.user.id %}
                             $('#addDivision').foundation('reveal', 'open');
                         {% else %}
@@ -320,11 +400,14 @@
                             if(node.node_type == "Topic"){
                                 $('.subsection-label-view').html("");
                                 $('.subsection-label-heading').html("<h4>Edit Topic : " +node.name+ "</h4>");
-                                 $('.subsection-label-heading').append("<h4>Prequisites : </h4>");
+                                 //$('.subsection-label-heading').append("<h4>Prequisites : </h4>");
+                                  
                                  //$('.subsection-label-heading').append("<h6>Select Prequisite topics for : " +node.name+ "</h6>");
-                                $('.subsection-label-view').append(" Topic Name " + ": " +node.name+ "<br/>" )
-                                
-                                $('.subsection-label-view').append("Prerequisite of " +node.name+ " are " + ": <br/>");
+                                $('.subsection-label-view').append(" <div>Topic Name " + ": " +node.name+ "</div>" ).css("margin-left","0px" ,"color","#000000");
+                                         
+                                $('.subsection-view-area #tag1').prepend("<div>Prequisites Of " +node.name+ " are " + ": </div>").css('color','#A9A9A9');
+
+                                $('.elements_for_editing').css('display','block');     
                                 $('#addDivision').find('.create_division').html('Save');
 
                                 url = "/{{group_id}}" +"/curriculum/prerequisite/" + "{{curriculum_obj.pk}}" + "/" + node.id;
@@ -346,11 +429,12 @@
                             else{
                                 $('.subsection-label-view').html("");
                                 $('.subsection-label-view').append("Sub-Section Name " + ": " +node.name);
+                                      
                                 $('.subsection-label-heading').html("Update Sub-Section");
                                 $('#addDivision').find('.create_division').html('Update Sub-Section');
                             }
                             $('.subsection-view-area').css('display','block');
-                            $('.subsection-edit-area').css('display','none');
+                            $('.subsection-edit-area').css('display','none'); 
                             
                             $('#addDivision').foundation('reveal', 'open');
                             $(".listing-row").html("")
@@ -614,6 +698,7 @@
              
 
             });
+        
     
  
       
@@ -634,8 +719,8 @@
         }
     }
 }    
-</script>
 
+</script>
 
 
 {% endblock body_content %}
