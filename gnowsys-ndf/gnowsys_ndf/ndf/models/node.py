@@ -711,7 +711,7 @@ class Node(DjangoDocument):
             rcsno = history_manager.get_current_version(self)
             node_collection.collection.update({'_id':self._id}, {'$set': {'snapshot'+"."+str(kwargs['groupid']):rcsno }}, upsert=False, multi=True)
 
-
+        GSTUDIO_ELASTIC_SEARCH = False
         if GSTUDIO_ELASTIC_SEARCH :
             print "elastic if block....."
 
@@ -734,16 +734,95 @@ class Node(DjangoDocument):
                 else:
                     raise
 
-            temp = "mv " +fp+" "+glite_fp 
+            temp = "cp " +fp+" "+glite_fp 
             os.system(temp)
-            temp = "rm -rf"+" "+fp
-            os.system(temp)
+            #temp = "rm -rf"+" "+fp
+            #os.system(temp)
             
             #glite_fp = glite_fp + self._id + ".json"
 
+            with open(fp, 'r') as f:
+                document = json.load(f)
+
+            document["id"] = document.pop("_id")
+            document["type"] = document.pop("_type")
+
             es = Elasticsearch("http://elastic:changeme@gsearch:9200", timeout=100, retry_on_timeout=True)
-            
-           
+
+            index = "backup"
+            if document["type"] == "GAttribute":
+                es.index(index=index, doc_type="gattribute", id=document["id"], body=document)
+                #file_name.write(document["id"] + '\n')
+            elif document["type"] == "GRelation":
+                es.index(index=index, doc_type="grelation", id=document["id"], body=document)
+                #file_name.write(document["id"] + '\n')
+            elif document["type"] == "MetaType":
+                es.index(index=index, doc_type="metatype", id=document["id"], body=document)
+                #file_name.write(document["id"] + '\n')
+            elif document["type"] == "GSystemType":
+                es.index(index=index, doc_type="gsystemtype", id=document["id"], body=document)
+                #file_name.write(document["id"] + '\n')
+            elif document["type"] == "Author":
+                es.index(index=index, doc_type="author", id=document["id"], body=document)
+                #file_name.write(document["id"] + '\n')
+            elif document["type"] == "RelationType":
+                es.index(index=index, doc_type="relationtype", id=document["id"], body=document)
+                #file_name.write(document["id"] + '\n')
+            elif document["type"] == "AttributeType":
+                es.index(index=index, doc_type="attributetype", id=document["id"], body=document)
+                #file_name.write(document["id"] + '\n')
+            elif document["type"] == "GSystem":
+                es.index(index=index, doc_type="gsystem", id=document["id"], body=document)
+                #file_name.write(document["id"] + '\n')
+                get_doc_type=get_document_type(document)
+                print(get_doc_type)
+                if (not es.indices.exists("gsystem")):
+                    res = es.indices.create(index="gsystem", body=request_body)
+                es.index(index="gsystem", doc_type=get_doc_type, id=document["id"], body=document)
+                print "gsystem block"
+
+            elif document["type"] == "Group":
+                es.index(index=index, doc_type="group", id=document["id"], body=document)
+                #file_name.write(document["id"] + '\n')
+            elif document["type"] == "ToReduceDocs":
+                es.index(index=index, doc_type="toreducedocs", id=document["id"], body=document)
+               # file_name.write(document["id"] + '\n')
+            elif document["type"] == "node_holder":
+                es.index(index=index, doc_type="node_holder", id=document["id"], body=document)
+                #file_name.write(document["id"] + '\n')
+            elif document["type"] == "File":
+                es.index(index=index, doc_type="file", id=document["id"], body=document)
+                #file_name.write(document["id"] + '\n')
+
+            else:
+                print "else block"
+                print index
+                # print str(doc_type).strip('[]').replace("'", "").lower()
+                es.index(index=index, doc_type=str(doc_type).strip('[]').replace("'", "").lower(), id=document["id"],
+                         body=document)
+                #file_name.write(document["id"] + '\n')
+
+
+
+    def get_document_type(document):
+
+        if document["type"]=="GSystem":
+            #for ids in document['member_of']:  #document is a member of the Page GSystemType
+                #if(ids == page_id):
+                    #return "Page"
+            if('if_file' in document.keys()):
+                if(document["if_file"]["mime_type"] is not None):
+                    data = document["if_file"]["mime_type"].split("/")
+                    doc_type = data[0]
+                else:
+                    doc_type = "NotMedia"
+            else:
+                doc_type = "NotMedia"
+
+        else:
+            doc_type = "DontCare"
+        return doc_type
+
 
 
     # User-Defined Functions
