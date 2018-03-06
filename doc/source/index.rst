@@ -14,6 +14,8 @@ Welcome to gstudio's documentation
     counter-analytics-notes
     dump-restore
     quiz
+    implementation/gstudio-lite
+    implementation/implementing-interactives
 
 .. :titlesonly:
 .. :name: mastertoc

@@ -98,14 +98,14 @@ def api_get_gs_nodes(request):
     if get_resource_type:
         gst_name, gst_id = GSystemType.get_gst_name_id(get_resource_type)
         oid_name_dict[gst_id] = gst_name
-        get_parameters_dict['member_of'] = [gst_id]
+        get_parameters_dict['member_of'] = gst_id
         attributes = sample_gs.get_possible_attributes([gst_id]) 
 
     get_workspace = request.GET.get('workspace', None)
     if get_workspace:
         group_name, group_id = Group.get_group_name_id(get_workspace)
         oid_name_dict[group_id] = group_name
-        get_parameters_dict['group_set'] = [group_id]
+        get_parameters_dict['group_set'] = group_id
 
     for key, val in get_parameters_dict.iteritems():
         stripped_key = key.split('.')[0]
