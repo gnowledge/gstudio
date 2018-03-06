@@ -120,7 +120,7 @@ def export_group_analytics(group_obj, assessment_and_quiz_data):
 
             each_row_dict['username'] = analytics_data['username']
             each_row_dict['user_id'] = analytics_data['user_id']
-            each_row_dict['enrollment_status'] = True if (each_user in group_obj.author_set) else False
+            each_row_dict['enrollment_status'] = "Yes" if (each_user in group_obj.author_set) else "No"
             each_row_dict['total_quizitems'] = analytics_data['total_quizitems']
             each_row_dict['visited_quizitems'] = analytics_data['visited_quizitems']
             each_row_dict['unattempted_quizitems'] = analytics_data['unattempted_quizitems']
