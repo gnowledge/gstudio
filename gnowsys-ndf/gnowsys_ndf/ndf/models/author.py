@@ -99,17 +99,35 @@ class Author(Group):
 
     @staticmethod
     def get_author_oid_list_from_user_id_list(user_ids_list=[], list_of_str_oids=False):
-        all_authors_cur = node_collection.find(
-                                        {
+        all_authors_cur = node_collection.find({
                                             '_type': 'Author',
                                             'created_by': {'$in': [int(uid) for uid in user_ids_list]}
-                                        },
-                                        {'_id': 1}
-                                    )
+                                        }, {'_id': 1})
         if list_of_str_oids:
             return [str(user['_id']) for user in all_authors_cur]
         else:
             return [user['_id'] for user in all_authors_cur]
+
+
+    @staticmethod
+    def get_author_usernames_list_from_user_id_list(user_ids_list=[]):
+        all_authors_cur = node_collection.find({
+                                            '_type': 'Author',
+                                            'created_by': {'$in': [int(uid) for uid in user_ids_list]}
+                                        }, {'name': 1})
+
+        result_list = auth_result_list = [user['name'] for user in all_authors_cur]
+        user_ids_len = len(user_ids_list)
+
+        # following to address objects inconsistency(if any) in mongo and sql db
+        if all_authors_cur.count() != user_ids_len:
+            user_result_list = User.objects.values_list('username', flat=True).filter(id__in=user_ids_list)
+            if user_ids_len == user_result_list:
+                result_list = user_result_list
+            else:
+                result_list = max(auth_result_list, user_result_list, key=len)
+
+        return result_list
 
 
     @staticmethod
