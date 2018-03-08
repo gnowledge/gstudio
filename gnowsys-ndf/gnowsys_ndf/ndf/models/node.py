@@ -768,7 +768,7 @@ class Node(DjangoDocument):
 
             index = None
             print GSTUDIO_ELASTIC_SEARCH_INDEX
-            
+
             for k in GSTUDIO_ELASTIC_SEARCH_INDEX:
                 for v in GSTUDIO_ELASTIC_SEARCH_INDEX[k]:
                     if document_type in v:
@@ -778,34 +778,12 @@ class Node(DjangoDocument):
                         break
 
             #index = "backup"
-            if document["type"] == "GAttribute":
-                es.index(index=index, doc_type="gattribute", id=document["id"], body=document)
-                #file_name.write(document["id"] + '\n')
-            elif document["type"] == "GRelation":
-                es.index(index=index, doc_type="grelation", id=document["id"], body=document)
-                #file_name.write(document["id"] + '\n')
-            elif document["type"] == "MetaType":
-                es.index(index=index, doc_type="metatype", id=document["id"], body=document)
-                #file_name.write(document["id"] + '\n')
-            elif document["type"] == "GSystemType":
-                es.index(index=index, doc_type="gsystemtype", id=document["id"], body=document)
-                #file_name.write(document["id"] + '\n')
-            elif document["type"] == "Author":
-                es.index(index=index, doc_type="author", id=document["id"], body=document)
-                #file_name.write(document["id"] + '\n')
-            elif document["type"] == "RelationType":
-                es.index(index=index, doc_type="relationtype", id=document["id"], body=document)
-                #file_name.write(document["id"] + '\n')
-            elif document["type"] == "AttributeType":
-                es.index(index=index, doc_type="attributetype", id=document["id"], body=document)
-                #file_name.write(document["id"] + '\n')
-            elif document["type"] == "GSystem":
+            document_type
+
+            if document_type == "GSystem":
                 es.index(index=index, doc_type="gsystem", id=document["id"], body=document)
                 #file_name.write(document["id"] + '\n')
                 if document["type"]=="GSystem":
-                    #for ids in document['member_of']:  #document is a member of the Page GSystemType
-                        #if(ids == page_id):
-                            #return "Page"
                     if('if_file' in document.keys()):
                         if(document["if_file"]["mime_type"] is not None):
                             data = document["if_file"]["mime_type"].split("/")
@@ -817,33 +795,14 @@ class Node(DjangoDocument):
 
                 else:
                     doc_type = "DontCare"
-                #get_doc_type=get_document_type(document)
                 print(doc_type)
                 if (not es.indices.exists("gsystem")):
                     res = es.indices.create(index="gsystem", body=request_body)
                 es.index(index="gsystem", doc_type=doc_type, id=document["id"], body=document)
                 print "gsystem block"
-
-            elif document["type"] == "Group":
-                es.index(index=index, doc_type="group", id=document["id"], body=document)
-                #file_name.write(document["id"] + '\n')
-            elif document["type"] == "ToReduceDocs":
-                es.index(index=index, doc_type="toreducedocs", id=document["id"], body=document)
-               # file_name.write(document["id"] + '\n')
-            elif document["type"] == "node_holder":
-                es.index(index=index, doc_type="node_holder", id=document["id"], body=document)
-                #file_name.write(document["id"] + '\n')
-            elif document["type"] == "File":
-                es.index(index=index, doc_type="file", id=document["id"], body=document)
-                #file_name.write(document["id"] + '\n')
-
             else:
                 print "else block"
-                print index
-                # print str(doc_type).strip('[]').replace("'", "").lower()
-                es.index(index=index, doc_type=str(doc_type).strip('[]').replace("'", "").lower(), id=document["id"],
-                         body=document)
-                #file_name.write(document["id"] + '\n')
+                es.index(index=index, doc_type=document_type.lower(), id=document["id"], body=document)
 
 
     # User-Defined Functions
