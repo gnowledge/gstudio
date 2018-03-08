@@ -21,6 +21,7 @@
   <!-- Foundation 5 - Responsive CSS Framework http://foundation.zurb.com/docs/css.html-->
   <link rel="stylesheet" href="/static/ndf/bower_components/foundation/css/normalize.css">
   <link rel="stylesheet" href="/static/ndf/css/themes/{{site.SITE_NAME|lower}}/styles.css">
+  <link rel="stylesheet" type="text/css" href="/static/ndf/css/clix-activity-styles.css">
 
   <!-- Foundation Icon Font http://zurb.com/playground/foundation-icon-fonts-3 -->
   <link rel="stylesheet" href="/static/ndf/bower_components/foundation-icon-fonts/foundation-icons.css">
@@ -58,7 +59,7 @@
 </head>
 
 <body itemscope itemtype="http://schema.org/Webpage">
-
+   <div id="base_wrap">
   {% get_group_object groupid as group_object %}
   {% check_accounts_url request.path as is_ac_url %}
 
@@ -82,6 +83,7 @@
    {% endif %}
    {% endcomment %}
   <div class="workspace">
+   
     <div class="off-canvas-wrap" data-offcanvas>
       <div class="inner-wrap">
 
@@ -152,6 +154,7 @@
         </main>
       </div>
     </div>
+  </div>
   </div>
 
 
@@ -326,7 +329,9 @@
     {% block script %} {% endblock %}
 
   </script>
+
 </body>
+ 
 
 </html>
 

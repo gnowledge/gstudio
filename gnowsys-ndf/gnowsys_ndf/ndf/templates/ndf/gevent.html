@@ -210,7 +210,7 @@ float: none !important;
             listMonth: { buttonText: 'list month' }
           },
 
-          select: function(start, end) {
+          select: function(start, end, jsEvent, view) {
               var title = prompt('Event Title:');
               var eventData;
               if (title) {
@@ -219,6 +219,7 @@ float: none !important;
                   start: start,
                   end: end,
                   priority: priority,
+                  //url: eventurl,
                 };
               $('#calendar').fullCalendar('renderEvent', eventData, true); // stick? = true
             }
@@ -227,6 +228,7 @@ float: none !important;
 
 
           events: {{events|safe}},
+
 
           eventRender: function(event, element) {
             if (event.priority == 'Immediate') {
@@ -258,6 +260,12 @@ float: none !important;
             // $(view.el[0]).find('.fc-day[data-date=' + dateString + ']').css('background-color', '#FAA732');
           },
 
+          eventClick: function(event,jsEvent,view) {
+          if (event.url) {
+              window.open(event.url, "_blank");
+              return false;
+            }
+          }
 
 
         });
@@ -266,8 +274,10 @@ float: none !important;
     $('#calendar').on('click', '.fc-button',function (){
       console.log('click');
     });
+
+
       
-    });
+});
 
 </script>
 

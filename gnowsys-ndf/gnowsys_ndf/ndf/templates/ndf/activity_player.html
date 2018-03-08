@@ -27,16 +27,34 @@
   .node-content-div{
     
     margin-left: -4px;
-    margin-right: 20%;
+    width:100%;
 
   }
 </style>
 
 {% include 'ndf/widget_user_access_modal.html' %}
 
-<div class="activity_player_secondary_header activity_player_header sticky">
+{% if site.SITE_NAME == "NROER" %}
+  <div class="activity_player_secondary_header activity_player_header sticky" style="margin-top:-8px;">
 
-  <nav class="activity_player_secondary_header activity_player_header" data-topbar role="navigation" data-options="sticky_on: large">
+    <nav class="activity_player_secondary_header activity_player_header" data-topbar role="navigation" data-options="sticky_on: large">
+{% else %}
+  <div class="activity_player_secondary_header activity_player_header sticky">
+
+    <nav class="activity_player_secondary_header activity_player_header" data-topbar role="navigation" data-options="sticky_on: large">
+{% endif %}
+
+
+    {% if site.SITE_NAME == "NROER" %}
+      <div class="small-1 columns end header_text_sm_block">
+        <a title="Go back to Overview" href="{% url 'course_content' group_id  %}">
+        <div class="header_icon_block prev_button">
+          <span>
+            <i class="fa fa-angle-left header_icon"></i> Back</span>
+        </div>
+        </a>
+      </div>
+    {% else %}
       <div class="small-1 columns end header_text_sm_block">
         <a title="Go back to all Lessons" href="{% url 'course_content' group_id  %}">
         <div class="header_icon_block prev_button">
@@ -45,6 +63,7 @@
         </div>
         </a>
       </div>
+    {% endif %}
 
         
         <div class="header_title" title ="{% firstof group_object.altnames group_object.name %}">
@@ -372,7 +391,7 @@
       $container.scrollTop(
           $scrollTo.offset().top - $container.offset().top- $container.offset().top + $container.scrollTop()
       );
-
+    /*
     var iframes = document.getElementsByTagName('iframe');
     var key = 'assessment.Bank';
 
@@ -421,7 +440,7 @@
                 $(iframes[i]).attr('src', new_source)
             }
        }
-    }
+    }*/
   })
 
   $(".admin-page").click(function(event){

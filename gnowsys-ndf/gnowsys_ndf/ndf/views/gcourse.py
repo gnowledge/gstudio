@@ -2155,9 +2155,9 @@ def activity_player_detail(request, group_id, lesson_id, activity_id):
     }
     
     
-    if prev_lesson_obj:
+    if prev_lesson_obj and prev_lesson_obj.collection_set :
         context_variables.update({ 'lesson_act_prev_id': prev_lesson_obj.collection_set[0],'prev_lesson_id':prev_lesson_obj._id })
-    if next_lesson_obj:
+    if next_lesson_obj and next_lesson_obj.collection_set :
         context_variables.update({ 'next_lesson_id':next_lesson_obj._id,'lesson_next_act_id': next_lesson_obj.collection_set[0] })
     
     
@@ -2847,8 +2847,7 @@ def course_raw_material(request, group_id, node_id=None,page_no=1):
     #     allow_to_upload = True
     if gstaff_access:
         allow_to_upload = True
-    template = 'ndf/gcourse_event_group.html'
-    
+    template = 'ndf/gcourse_event_group.html'    
     if "announced_unit" in group_obj.member_of_names_list or "Group" in group_obj.member_of_names_list or "base_unit" in group_obj.member_of_names_list :
 
         template = 'ndf/lms.html'
@@ -2943,7 +2942,7 @@ def course_gallery(request, group_id,node_id=None,page_no=1):
     else:
         asset_nodes = GSystem.query_list(group_id, 'Asset', request.user.id,tags="asset@gallery")
     template = 'ndf/gcourse_event_group.html'
-
+    
     if "announced_unit" in group_obj.member_of_names_list or "Group" in group_obj.member_of_names_list and 'base_unit' in group_obj.member_of_names_list:
 
         template = 'ndf/lms.html'
@@ -3644,7 +3643,6 @@ def course_analytics_admin(request, group_id):
     response_dict['max_points_dict'] = max_points_dict
     context_variables["response_dict"] = json.dumps(response_dict)
     cache.set(cache_key, response_dict, 60*10)
-    print 
     return render_to_response("ndf/lms.html",
                                 context_variables,
                                 context_instance = RequestContext(request)
@@ -3956,12 +3954,13 @@ def assetcontent_detail(request, group_id, asset_id,asst_content_id,page_no=1):
     group_obj = get_group_name_id(group_id, get_obj=True)
     # print group_id,asset_id,asst_content_id
     asset_content_list = get_relation_value(ObjectId(asset_obj._id),'has_assetcontent')
-    template = 'ndf/gevent_base.html'
-    assetcontent_page_info = paginator.Paginator(asset_content_list['grel_node'], page_no, GSTUDIO_NO_OF_OBJS_PP)
+    template = 'ndf/lms.html'
+    # assetcontent_page_info = paginator.Paginator(asset_content_list['grel_node'], page_no, GSTUDIO_NO_OF_OBJS_PP)
     context_variables = {
             'asset_content_list':asset_content_list,'group_id':group_id,
             'groupid':group_id,'node':assetcontent_obj,'asset_obj':asset_obj,
-            'title':"asset_content_detail",'group_obj':group_obj,'assetcontent_page_info':assetcontent_page_info
+            'title':"asset_content_detail",'group_obj':group_obj,
+            # 'assetcontent_page_info':assetcontent_page_info
         }
     if request.user.is_authenticated():
         # Counter.add_visit_count.delay(resource_obj_or_id=file_obj._id.__str__(),

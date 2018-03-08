@@ -61,7 +61,7 @@
 
 </head>
 <body>
-    <div class="page_content">
+    <div id="gbase_wrap">
     {% if site.BUDDY_LOGIN and user.is_authenticated and site.SITE_NAME == 'clix' and request.author.agency_type == 'Student'%}
         {% include "ndf/buddy.html" %}
     {% endif %}
@@ -190,7 +190,7 @@
     //       {% block document_ready %} {% endblock %}
 
     //     }
-    //     finally{
+    //     finally{s
     //       // function defined in app.js to check the font and load it asynchronously.
     //       checkOpenSansFont();
     //     }
@@ -250,9 +250,20 @@
         {% include 'ndf/footer_clix.html' %}
      </div>   
     {% endif %}
+    
+  </div> 
 
-        
-    <script type="text/javascript">
+
+      {% if not no_footer %}
+        {% if site.SITE_NAME == "NROER" %}
+            {% include 'ndf/footer.html' %}
+        {% else %}
+            {% include 'ndf/footer_clix.html' %}   
+        {% endif %}
+      {% endif %} 
+
+<!-- 
+      <script type="text/javascript">
       
        $(window).bind("load", function () {
         var footer = $("#footer");
@@ -266,9 +277,9 @@
             });
         }
         });
-    </script>
+    </script> -->
 
 </body>
 
-    
+
 </html>
