@@ -7,7 +7,7 @@
     	<p>{% trans "Search Results:" %} <span class="label success round">{% trans 'Found' %} {{resource_type.count}} {{title|lower}}{{resource_type.count|pluralize}}.</span></p>
     </div>
   </div>
-{% elif searching and resource_type.count == 0 %}
+{% elif searching or resource_type.count == 0 %}
   <div class="row">
     <div class="small-12 columns">
       <p>{% trans "Search Results:" %} <span class="label alert">No {{title|lower}}{{resource_type.count|pluralize}} matched your search criteria!!!</span></p>
@@ -162,7 +162,7 @@
   <div class="hide" data-educationaluse-stats='{{ educationaluse_stats }}'></div>
 {% elif title == "eBooks" %}
   
-  {% include 'ndf/pagination.html' with urlname="e-book_filter_page" first_arg=group_name_tag second_arg=""  third_arg="" page_info=page_info %}  
+  {% include 'ndf/pagination.html' with urlname="e-book_filter_page" first_arg=group_name_tag second_arg="" third_arg="" page_info=page_info %}  
 
 {% else %}
 

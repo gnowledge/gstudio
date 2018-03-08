@@ -335,6 +335,12 @@ def render_test_template(request,group_id='home', app_id=None, page_no=1):
 	print files_new.count()
 	print files_new.to_dict()
 
+	if int(page_no)==1:
+		files_new=files_new[0:24]
+	else:
+		temp=( int(page_no) - 1) * 24
+		files_new=files_new[temp:temp+24]
+
 
 	#files1_temp = [doc['_source'] for doc in files1['hits']['hits']]
 
@@ -411,7 +417,16 @@ def render_test_template(request,group_id='home', app_id=None, page_no=1):
 				educationaluse_stats = { eu_list[0]: eu_list.count(eu_list[0])}
 			educationaluse_stats["all"] = files.count()
 		
+		paginator = Paginator(files_new, 24)
 
+
+	#page_no = request.GET.get('page_no')
+		try:
+			result_pages = paginator.page(page_no)
+		except PageNotAnInteger:
+			result_pages = paginator.page(1)
+		except EmptyPage:
+			result_pages = paginator.page(paginator.num_pages)
 		# print educationaluse_stats
 		#result_paginated_cur = files1_temp
 		#result_pages = paginator.Paginator(result_paginated_cur, page_no, no_of_objs_pp)
@@ -519,7 +534,7 @@ def render_test_template(request,group_id='home', app_id=None, page_no=1):
 								 # 'page_count': pageCollection.count(),
 								 # 'page_nodes':pageCollection
 								 'all_files_count':files_new.count(),
-								 'file_pages': files_new,
+								 'file_pages': result_pages,
 								 'image_pages': images_count.count(),
 								 'interactive_pages': intercatives_count.count(),
 								 'educationaluse_stats': json.dumps(educationaluse_stats),
