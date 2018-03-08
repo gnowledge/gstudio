@@ -8,6 +8,7 @@
 {% get_gstudio_twitter_via as twitter_via %}
 {% check_is_gstaff groupid request.user as is_gstaff %}
 {#% get_gstudio_facebook_app_id as fb_app_id %#}
+{% get_group_object groupid as group_obj %}
 {% get_gstudio_social_share_resource as social_share %}
 <script type="text/javascript" src="/static/ndf/bower_components/ckeditor/ckeditor.js"></script>
 <script type="text/javascript" src="/static/ndf/bower_components/ckeditor/config.js"></script>
@@ -535,7 +536,7 @@ Still keeping for future ref (if needed).
 
      {% if not topic and not is_group %}
              <div>
-             {% if site.SITE_NAME != "NROER" %}
+             {% if site.SITE_NAME != "NROER"  and 'announced_unit' not in group_obj.member_of_names_list %}
                <small class="text-gray">
                   [<em>{% trans "Contributed by" %} {{ node.user_details_dict.contributors|join:', ' }}</em> on {{node.last_update}}]
                 </small>
