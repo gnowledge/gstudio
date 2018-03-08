@@ -13,7 +13,7 @@ from django.core.management.base import BaseCommand, CommandError
 # from django.contrib.auth.models import User
 
 ''' imports from application folders/files '''
-from gnowsys_ndf.ndf.models import Group, GSystemType, Counter, node_collection, Buddy, Author
+from gnowsys_ndf.ndf.models import Node, Group, GSystemType, Counter, node_collection, Buddy, Author
 from gnowsys_ndf.settings import GSTUDIO_LOGS_DIR_PATH, GSTUDIO_DATA_ROOT
 from gnowsys_ndf.ndf.views.gcourse import course_analytics
 # from gnowsys_ndf.ndf.views.methods import get_group_name_id   
@@ -94,7 +94,7 @@ def export_group_analytics(group_obj, assessment_and_quiz_data):
     header_written = False
     for index, each_user in enumerate(group_users):
         try:
-            analytics_data = course_analytics(None, group_obj._id, each_user, get_result_dict=True, assessment_and_quiz_data=assessment_and_quiz_data)
+            analytics_data = course_analytics(None, group_obj._id, each_user, get_result_dict=True, assessment_and_quiz_data=assessment_and_quiz_data, get_counter_obj_in_result=True)
             if not analytics_data:
                 continue
 
@@ -153,6 +153,14 @@ def export_group_analytics(group_obj, assessment_and_quiz_data):
             # each_row_dict["buddies"] = str(Buddy.get_buddy_userids_list_within_datetime(1, datetime.datetime.now()))
             each_row_dict["buddies"] = Author.get_author_usernames_list_from_user_id_list\
                 (Buddy.get_buddy_userids_list_within_datetime(each_user, datetime.datetime.now()))
+            all_activities_cur = Node.get_tree_nodes(group_obj, field_name='collection_set', level=1, get_obj=True)
+            for each_act in all_activities_cur:
+                column_key_name = each_act['altnames'] if each_act['altnames'].strip() else each_act['name']
+                column_key_name += " [" + unicode(each_act._id) + "]"
+                if column_key_name not in column_keys_list:
+                    column_keys_list.append(column_key_name)
+                    column_keys_dict.update({column_key_name: 0})
+                each_row_dict[column_key_name] = analytics_data["counter_obj"]["visited_nodes"].get(unicode(each_act._id), 0)
             # print analytics_data
 
             with open(file_name_path, 'a') as f:  # Just use 'w' mode in 3.x
@@ -162,10 +170,13 @@ def export_group_analytics(group_obj, assessment_and_quiz_data):
                     header_written = True
                 w.writerow(each_row_dict)
 
+
         except Exception, e:
             print e
             error_msg = "\nUser with id: " + str(each_user) + " does not exists!!"
             log_file.write(str(e))
             log_file.write(error_msg)
             continue
+
+    print "\nExported user CSV: %s"%file_name_path
             
