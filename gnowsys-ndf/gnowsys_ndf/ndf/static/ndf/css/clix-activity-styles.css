@@ -741,7 +741,7 @@
         height: 30px;
         margin-top: -14px !important;
         padding: 9px 16px 2px;
-        background: radial-gradient(hsla(259, 40%, 40%, 1), hsla(259, 40%,30%, 1));
+        background: #713558;
         border-radius: 0 0 5px 5px;
         color: #fff;
         cursor: pointer;
