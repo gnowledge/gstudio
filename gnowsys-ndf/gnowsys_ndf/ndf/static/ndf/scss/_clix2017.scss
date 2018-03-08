@@ -4638,6 +4638,10 @@ $unit-card-lines-to-show: 3;
     position: relative;
     height:210px;
 
+    width: 230px;
+    height: 270px;
+    display:flex; justify-content: flex-end; flex-direction: column;
+
     &:hover {
         box-shadow: 0px 0px 5px 1px rgba(0, 0, 0, 0.25);
     }
@@ -4659,8 +4663,8 @@ $unit-card-lines-to-show: 3;
         .unit_banner {
             display: table-cell;
             border-radius: 5px;
-            height: 50px;
-            width: 50px;
+            height: 100px;
+            //width: 50px;
             margin-right: 10px;
             color: #333333;
         }
@@ -4672,7 +4676,7 @@ $unit-card-lines-to-show: 3;
             margin: 0px 0px 12px;
             width: 200px;
             overflow: hidden;
-            white-space: nowrap;
+            //white-space: nowrap;
             text-overflow: ellipsis;
             vertical-align: middle;
             color: #333333;
@@ -5548,7 +5552,7 @@ ul.authoring-tab{
 
 .lms_explore_back_unit{
     background-color: #fff;
-    margin-top:-23.3px;
+    margin-top: 10.5%;
     margin-left: 60px; 
 }
 
@@ -6653,4 +6657,28 @@ input.transcript-toggler{
     padding: 6px 6px;
     border-radius: 100%;
     background-color: orange;
+}
+
+[class*="img-banner-card-"]{
+    margin: -11px -11px 0px -11px;
+    height: 100px;
+}
+[class*="high-img-banner-card-"]{
+    margin: -11px -11px 0px -11px;
+    height: 160px;
+}
+[class*="mid-img-banner-card-"]{
+    margin: -11px -11px 0px -11px;
+    height: 104px;
+    .unit_banner {
+        height:85px;
+    }
+}
+.unit_actions{
+    height: 40%;
+}
+.unit_header{
+
+    height: 80%;
+    border-bottom: 1px solid black;
 }

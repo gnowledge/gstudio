@@ -77,7 +77,7 @@
         </div>
         <hr/>
         <div class="row" style=" margin-left: 10px !important ">
-          <h3 >Joined Workspaces & Enrolled Courses </h3>
+          <h3 >Joined Workspaces and Enrolled Courses </h3>
         </div>
           </br>
         <div class="small-12 columns lms_explore_back_unit">
@@ -100,10 +100,10 @@
 <div class="small-12 columns group_sections_content">
   {% if title == "my performance" %}
   <div class="small-12 columns lms_explore_back_unit">
-    <ul class="small-block-grid-1 medium-block-grid-3 large-block-grid-3" style="margin-top: -200px;">
+    <ul class="small-block-grid-1 medium-block-grid-3 large-block-grid-4" style="margin-top: -200px;">
       {% for each_obj in units_cur %}
       <li class="card-image-wrapper">
-        {% include "ndf/card_group.html" with group_counts=True node=each_obj no_url=True first_arg=each_obj.pk  %}
+        {% include "ndf/card_group.html" with group_counts=True node=each_obj no_url=True first_arg=each_obj.pk is_performance=True %}
       </li>
       {% empty %}
       <section class="empty-dashboard-message">

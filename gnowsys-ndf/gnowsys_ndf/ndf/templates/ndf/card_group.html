@@ -6,7 +6,116 @@
         {% get_unit_total_points request.user.id  node.pk as get_unit_points %}
     {% endif %}
 
-<div class="unit_card">
+<style type="text/css">
+
+.unit_card > div {
+    height: 33%;
+}
+        .unit_title {
+            display: table-cell;
+            font-size: 18px;
+            font-weight: 500;
+            letter-spacing: 0.6px;
+            margin: 0px 0px 12px;
+            width: 200px;
+            overflow: hidden;
+            //white-space: nowrap;
+            text-overflow: ellipsis;
+            vertical-align: middle;
+            color: #333333;
+
+        }
+        .unit_banner {
+            display: table-cell;
+            border-radius: 5px;
+            height: 100px;
+            //width: 50px;
+            margin-right: 10px;
+            color: #333333;
+        }
+.unit_actions {
+    border-top: 1px solid black;
+
+  padding: 5px 0px;
+}
+/* line 4712, ../../../scss/_clix2017.scss */
+.unit_actions .unit-card-enrol {
+  background: #a2238d;
+  height: 37px;
+  text-align: center;
+  color: #ffffff;
+  font-size: 19px;
+  border: 2px solid rgba(43, 51, 63, 0.42);
+  border-radius: 5px;
+  width: 120px !important;
+  margin-top: 2px !important;
+  letter-spacing: 0.4px;
+}
+/* line 4724, ../../../scss/_clix2017.scss */
+.unit_actions .unit-card-enrol:hover {
+  box-shadow: 0px 0px 17px rgba(0, 0, 0, 0.68);
+}
+/* line 4729, ../../../scss/_clix2017.scss */
+.unit_actions .unit-card-analytics {
+  color: #a2238d;
+  font-weight: 500;
+  font-size: 14px;
+  letter-spacing: 0.3px;
+  border-bottom: 2px solid #a2238d;
+}
+/* line 4737, ../../../scss/_clix2017.scss */
+.unit_actions .unit-card-analytics-points {
+  background: #ffffff;
+  color: #a2238d;
+  font-size: 15px;
+  border-radius: 20px;
+  letter-spacing: 0.4px;
+  padding: 2px 3px 3px 1px;
+  font-weight: bold;
+  cursor: default;
+}
+/* line 4748, ../../../scss/_clix2017.scss */
+.unit_actions .view_unit {
+  height: 37px;
+  text-align: center;
+  color: #a2238d;
+  font-size: 19px;
+  margin-top: 2px !important;
+  letter-spacing: 0.4px;
+}
+/* line 4756, ../../../scss/_clix2017.scss */
+.unit_actions .view_unit:hover {
+  border-bottom: 2px solid #ffc14e;
+}
+
+[class*="unit_card-"]{
+    width: 300px;
+    // height: 300px; commented as info of number of lesson and etc was not passed currently
+    color: #000;
+    padding: 15px;
+    margin: 10px;
+    border-radius: 5px;
+    font-size: $unit-card-font-size;
+    border: 2px solid #d5d5d5;
+    position: relative;
+    height:210px;
+
+    width: 230px;
+    height: 270px;
+    display:flex; justify-content: flex-end; flex-direction: column;
+
+    &:hover {
+        box-shadow: 0px 0px 5px 1px rgba(0, 0, 0, 0.25);
+    }
+    
+
+
+</style>
+  <script src="/static/ndf/bower_components/jquery-backstretch/jquery.backstretch.min.js"></script>
+
+
+<div class="unit_card-{{node.pk}}" style="height:246px;">
+
     {% if not no_url and not prevent_click %}
         {% if first_arg and second_arg and third_arg %}
             <a href="{% url url_name first_arg second_arg third_arg %}{{search_url_text|safe}}"/>
@@ -17,57 +126,73 @@
         {% endif %}
     {% endif %}
 
-    {% if "base_unit" in node.member_of_names_list %}
-    <div class="status-draft">DRAFT</div>
-    {% endif  %}
-    {% if get_status %}
-        <div class="status-{{get_status}}">{{get_status}}</div>
-    {% endif %}
-    <div class="unit_header">
-    {% if "announced_unit" in node.member_of_names_list %}
-        {% get_relation_value node.pk 'has_banner_pic' as grel_dict %}
-        {% if not grel_dict.cursor and grel_dict.grel_node and grel_dict.grel_node.if_file.thumbnail.relurl %}
-            <img class="unit_banner" src="{{MEDIA_URL}}{{grel_dict.grel_node.if_file.mid.relurl}}" alt="" style="height:50px ;width:50px" />
-        {% else %}
-            <img class="unit_banner" src="/static/ndf/images/module_banner.png" style="height:50px ;width:50px"/>
-        {% endif %}
-    {% elif "Group" in node.member_of_names_list %}
-        {% get_relation_value node.pk 'has_profile_pic' as grel_dict %}
-        {% if not grel_dict.cursor and grel_dict.grel_node and grel_dict.grel_node.if_file.thumbnail.relurl %}
-            <img src="{{MEDIA_URL}}{{grel_dict.grel_node.if_file.mid.relurl}}" alt="" style="height:50px ;width:50px" />
-        {% else %}
-            <img class="unit_banner" src="/static/ndf/images/module_banner.png" style="height:50px ;width:50px"/>
-        {% endif %}
+    {% if is_performance %}
+    <div class="img-banner-card" style="height: 131px;position: relative;">
+    {% elif is_module_detail%}
+    <div class="mid-img-banner-card" style="height: 104px;position: relative;">
     {% else %}
-        <img class="unit_banner" src="/static/ndf/images/module_banner.png" style="height:50px ;width:50px"/>
+    <div class="high-img-banner-card" style="height: 106px;position: relative;">
     {% endif %}
-    {% if node.altnames %}
-        <span class="unit_title" title="{{node.altnames}}">{{node.altnames|truncatechars:20}}</span>
-    {% else %}
-        <span class="unit_title" title="{{node.name}}">{{node.name|truncatechars:20}}</span>
-    {% endif %}
+        {% if "announced_unit" in node.member_of_names_list %}
+            {% get_relation_value node.pk 'has_banner_pic' as grel_dict %}
+            {% if not grel_dict.cursor and grel_dict.grel_node and grel_dict.grel_node.if_file.mid.relurl %}
+                <img class="unit_banner" src="{{MEDIA_URL}}{{grel_dict.grel_node.if_file.mid.relurl}}" alt=""  />
+            {% else %}
+                <img class="unit_banner" src="/static/ndf/images/module_banner.png" />
+            {% endif %}
+        {% elif "Group" in node.member_of_names_list %}
+            {% get_relation_value node.pk 'has_profile_pic' as grel_dict %}
+            {% if not grel_dict.cursor and grel_dict.grel_node and grel_dict.grel_node.if_file.mid.relurl %}
+                <img src="{{MEDIA_URL}}{{grel_dict.grel_node.if_file.mid.relurl}}" alt=""  />
+            {% else %}
+                <img class="unit_banner" src="/static/ndf/images/module_banner.png" />
+            {% endif %}
+        {% else %}
+            <img class="unit_banner" src="/static/ndf/images/module_banner.png" />
+        {% endif %}
     </div>
-    <div class="unit_desc">
-        {{node.content|safe|striptags}}
+    <div class="col2" style="height: 55px;">
+        {% if node.altnames %}
+            <div class="unit_title" title="{{node.altnames}}">{{node.altnames|truncatechars:36}}</div>
+        {% else %}
+            <div class="unit_title" title="{{node.name}}">{{node.name|truncatechars:36}}</div>
+        {% endif %}
     </div>
-   
+
      <div class="unit_actions">
-                {% if group_counts %} 
-                    Points :<a class="unit-card-analytics-points">  {{get_unit_points}} </a>
-                    <a onclick="show_my_performance($(this))" data-node-id = "{{node.pk}}" class="right unit-card-analytics"><i class="fa fa-eye" aria-hidden="true"></i> View details</a>
-                {% else %} 
-                    
-                        <a href="{% url url_name first_arg %}" class="view_unit">{% trans "View" %}</a>
-                    {% if "base_unit" not in node.member_of_names_list %}
-                        <div class="right">
-                        {% if not no_enroll and not is_gstaff %}
+        {% if group_counts %} 
+            <div >
+                Points :<a class="unit-card-analytics-points">  {{get_unit_points}} </a><br/>
+                <a onclick="show_my_performance($(this))" data-node-id = "{{node.pk}}" class="unit-card-analytics"><i class="fa fa-eye" aria-hidden="true"></i> View details</a>
+            </div>
+        {% else %} 
+            {% if "base_unit" not in node.member_of_names_list %}
+                <div class="left">
+                    <i style="font-size:15px; color: black" class="fi-list-thumbnails"></i> 
+                    <div style="font-size:15px; color: black" class="inner" value="{{node.collection_set|length}}">{{node.collection_set|length}} Lesson{{node.collection_set|pluralize}}</div>
+                    <br/>
+                    <i style="font-size:15px; color: black" class="fi-torsos" title="Member{{node.author_set|length|pluralize }}"></i>
+                    <div style="font-size:15px; color: black" class="inner" value="{{node.author_set|length}}">{{node.author_set|length}} Student{{node.author_set|pluralize}}</div>
+                </div>
+                <div class="right">
+                    {% if not no_enroll and not is_gstaff %}
                         {% if request.user.is_authenticated %}
                             {% include 'ndf/widget_enroll.html' %}
                         {% endif %}
-                        {% endif %}
-                        </div> 
                     {% endif %}
-                {% endif %}
+                </div> 
+            {% endif %}
+        {% endif %}
     </div>
+
 </div>
-     
+<script type="text/javascript">
+    {% if is_performance%}
+        $(".unit_card-{{node.pk}}")..find("col2").css("height", "100px");
+    {% else %}
+    {% if not no_enroll and not is_gstaff and request.user.is_authenticated %}
+        $(".unit_card-{{node.pk}}").css("height", "290px");
+    {% endif %}
+    {% endif %}
+    
+</script>
