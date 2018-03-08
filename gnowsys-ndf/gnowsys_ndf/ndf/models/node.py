@@ -2,7 +2,10 @@ from base_imports import *
 from history_manager import HistoryManager
 from elasticsearch import Elasticsearch
 from elasticsearch_dsl import Q
-from gnowsys_ndf.local_settings import GSTUDIO_ELASTIC_SEARCH,GLITE_RCS_REPO_DIRNAME
+from gnowsys_ndf.local_settings import GSTUDIO_ELASTIC_SEARCH,GLITE_RCS_REPO_DIRNAME,GSTUDIO_ELASTIC_SEARCH_INDEX
+from bson.json_util import loads, dumps
+from models_utils import NodeJSONEncoder
+
 
 @connection.register
 class Node(DjangoDocument):
@@ -711,7 +714,7 @@ class Node(DjangoDocument):
             rcsno = history_manager.get_current_version(self)
             node_collection.collection.update({'_id':self._id}, {'$set': {'snapshot'+"."+str(kwargs['groupid']):rcsno }}, upsert=False, multi=True)
 
-        GSTUDIO_ELASTIC_SEARCH = False
+        #GSTUDIO_ELASTIC_SEARCH = False
         if GSTUDIO_ELASTIC_SEARCH :
             print "elastic if block....."
 
@@ -741,15 +744,40 @@ class Node(DjangoDocument):
             
             #glite_fp = glite_fp + self._id + ".json"
 
-            with open(fp, 'r') as f:
-                document = json.load(f)
+            #with open(fp, 'r') as f:
+            #    document = json.load(f)
+
+            read_file_data = open(fp,'r').read()
+
+            convert_oid_to_object_id = loads(read_file_data)
+
+            doc = json.dumps(convert_oid_to_object_id,cls=NodeJSONEncoder)
+
+            document = json.loads(doc)
+
+            print document
 
             document["id"] = document.pop("_id")
             document["type"] = document.pop("_type")
 
+            document_type = document["type"]
+            print document_type
+            print "----------------------------------"
+
             es = Elasticsearch("http://elastic:changeme@gsearch:9200", timeout=100, retry_on_timeout=True)
 
-            index = "backup"
+            index = None
+            print GSTUDIO_ELASTIC_SEARCH_INDEX
+            
+            for k in GSTUDIO_ELASTIC_SEARCH_INDEX:
+                for v in GSTUDIO_ELASTIC_SEARCH_INDEX[k]:
+                    if document_type in v:
+                        index = k
+                        index = index.lower()
+                        print k
+                        break
+
+            #index = "backup"
             if document["type"] == "GAttribute":
                 es.index(index=index, doc_type="gattribute", id=document["id"], body=document)
                 #file_name.write(document["id"] + '\n')
@@ -774,11 +802,26 @@ class Node(DjangoDocument):
             elif document["type"] == "GSystem":
                 es.index(index=index, doc_type="gsystem", id=document["id"], body=document)
                 #file_name.write(document["id"] + '\n')
-                get_doc_type=get_document_type(document)
-                print(get_doc_type)
+                if document["type"]=="GSystem":
+                    #for ids in document['member_of']:  #document is a member of the Page GSystemType
+                        #if(ids == page_id):
+                            #return "Page"
+                    if('if_file' in document.keys()):
+                        if(document["if_file"]["mime_type"] is not None):
+                            data = document["if_file"]["mime_type"].split("/")
+                            doc_type = data[0]
+                        else:
+                            doc_type = "NotMedia"
+                    else:
+                        doc_type = "NotMedia"
+
+                else:
+                    doc_type = "DontCare"
+                #get_doc_type=get_document_type(document)
+                print(doc_type)
                 if (not es.indices.exists("gsystem")):
                     res = es.indices.create(index="gsystem", body=request_body)
-                es.index(index="gsystem", doc_type=get_doc_type, id=document["id"], body=document)
+                es.index(index="gsystem", doc_type=doc_type, id=document["id"], body=document)
                 print "gsystem block"
 
             elif document["type"] == "Group":
@@ -801,28 +844,6 @@ class Node(DjangoDocument):
                 es.index(index=index, doc_type=str(doc_type).strip('[]').replace("'", "").lower(), id=document["id"],
                          body=document)
                 #file_name.write(document["id"] + '\n')
-
-
-
-    def get_document_type(document):
-
-        if document["type"]=="GSystem":
-            #for ids in document['member_of']:  #document is a member of the Page GSystemType
-                #if(ids == page_id):
-                    #return "Page"
-            if('if_file' in document.keys()):
-                if(document["if_file"]["mime_type"] is not None):
-                    data = document["if_file"]["mime_type"].split("/")
-                    doc_type = data[0]
-                else:
-                    doc_type = "NotMedia"
-            else:
-                doc_type = "NotMedia"
-
-        else:
-            doc_type = "DontCare"
-        return doc_type
-
 
 
     # User-Defined Functions
