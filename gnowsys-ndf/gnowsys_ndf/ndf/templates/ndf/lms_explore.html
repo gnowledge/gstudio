@@ -6,7 +6,7 @@
   </div>
   <div class="small-12 columns">
   <ul class="small-block-grid-1 medium-block-grid-1 large-block-grid-2" >
-      {% for each_obj in modules_cur %}
+      {% for each_obj in modules_node_sort_list %}
       <li class="card-image-wrapper">
         {% include "ndf/horizontal_card.html" with node=each_obj url_name="module_detail_url" first_arg=group_id second_arg=each_obj.pk third_arg=title %}
       </li>
