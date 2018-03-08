@@ -3,6 +3,7 @@
 {% check_is_gstaff group_id request.user as is_gstaff %}
 {% get_download_filename node as download_filename %}
 {% get_group_object groupid as group_object %}
+{% get_file_obj node as file_obj %}
 <div class="row">
   <div class="medium 12 columns">
 	    <div class="left small-12 medium-6 columns">
@@ -13,6 +14,11 @@
                     <label>{% trans "Created By:" %} <b> {{ node.user_details_dict.contributors|join:', ' }} </b>
                       <!--<input type="text" placeholder="" name="resource_name" />-->
                   </label>
+                  {% if file_obj.length %}
+                  <label>{% trans "File Size:" %} <b> {{file_obj.length|filesizeformat}} </b>
+                      <!--<input type="text" placeholder="" name="resource_name" />-->
+                  </label>
+                  {% endif %}
 
 	      <div class="preview_asset"> 
            {% if title == "asset_content_detail" or title == "asset_gallery_detail" or title == "raw_material_detail"%}
