@@ -32,6 +32,39 @@
     margin-right: 20%;
 
   }
+
+  .collapse-container--open {
+    width: 245px;
+    position: relative;
+                -webkit-transition: all .6s ease;
+                -webkit-box-align: stretch;
+                align-items: stretch;
+                overflow-x: hidden;
+                color: #fff;
+                font-weight: 300;
+
+  }
+
+  .first-strip{
+                    padding: 12px 16px 9px;
+                    background-color: #333;
+                    font-size: .75rem;
+                    border-bottom: 3px solid #333;
+                    text-transform: uppercase;
+                    cursor: pointer;
+                }
+
+  .svg-arrow {
+        height: 12px;
+        width: 8px;
+        position: absolute;
+        right: .5rem;
+        top: .9rem;
+        -webkit-transform: rotate(0deg);
+        transform: rotate(0deg);
+        -webkit-transition: all .6s ease;
+        transition: all .6s ease;
+    }
 </style>
 
 {% include 'ndf/widget_user_access_modal.html' %}
@@ -101,16 +134,19 @@
 
     <div class="small-12 columns">
         <div class="course_editor ">
-          <div class="small-3 columns">
-            <div class="course_tree">
-              <div class="lesson-title" title="{{trans_lesson_name}}">
-                  <b>{{trans_lesson_name}}</b>
-                  {% comment %}
-                  {% if allow_finish_lesson %}
-                    <a href="#" class="purple-btn finish-lesson right">Finish</a>
-                  {% endif %}
-                  {% endcomment %}
-              </div>
+          <div class="small-3 columns colapse-container index">
+            <div class="course_tree ">
+              <a>
+                <div class="first-strip">
+                  <div class="lesson-title" title="{{trans_lesson_name}}">
+                    <b>{{trans_lesson_name}}</b>
+                  </div>
+                  <svg class="svg-arrow" style="margin-right:30px;" viewBox="0 0 8 12" version="1.1"><g id="Page-1" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+                      <g id="Core" transform="translate(-260.000000, -90.000000)" fill="#FFFFFF">
+                          <g id="chevron-right" transform="translate(259.500000, 90.000000)">
+                            <polygon id="Shape" points="2 0 0.6 1.4 5.2 6 0.6 10.6 2 12 8 6"></polygon></g></g></g></svg>
+                </div>
+              </a>
               <div class="activity-title">
               {% for each in act_list %}
                   {% for k,v in each.items  %}
@@ -121,7 +157,7 @@
               </div>
           </div>
           
-          <div class="small-8 columns">
+          <div class="small-8 columns section-expand">
 
             <div class="course_editor_section">
               {% with node.member_of_names_list as node_member_of_names_list %}
@@ -194,6 +230,15 @@
 </div>
 
 <script type="text/javascript">
+
+    $('.first-strip').click(function(){
+      $('.index').toggleClass('colapse-container collapse-container--open');
+      $('.section-expand').toggleClass('small-8 small-10');
+    });
+
+   
+      
+
    function onMessage(message) {
     // Inconveniently, we don't seem to be able to locate the
     // assessment-player's iframe inside the content's iframe.  Conventiently,
@@ -215,6 +260,8 @@
         break;
     }
   }
+
+  
 
   function componentDidMount() {
     window.addEventListener("message", (e) => this.onMessage(e), false);
