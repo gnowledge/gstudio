@@ -26,8 +26,8 @@ from gnowsys_ndf.settings import GAPPS, MEDIA_ROOT, GSTUDIO_TASK_TYPES,GSTUDIO_D
 from gnowsys_ndf.settings import GSTUDIO_SITE_NAME, GSTUDIO_NO_OF_OBJS_PP, GSTUDIO_PRIMARY_COURSE_LANGUAGE
 from gnowsys_ndf.ndf.models import Node, Group, GSystemType,  AttributeType, RelationType
 from gnowsys_ndf.ndf.models import node_collection, triple_collection
-from gnowsys_ndf.ndf.views.methods import get_execution_time, get_language_tuple, create_gattribute
-from gnowsys_ndf.ndf.templatetags.ndf_tags import check_is_gstaff, get_attribute_value
+from gnowsys_ndf.ndf.views.methods import get_execution_time, get_language_tuple, create_gattribute, delete_gattribute
+from gnowsys_ndf.ndf.templatetags.ndf_tags import check_is_gstaff, get_attribute_value, cast_to_node
 # from gnowsys_ndf.ndf.views.methods import get_group_name_id
 # from gnowsys_ndf.ndf.views.methods import get_node_common_fields, parse_template_data, get_execution_time, delete_node, replicate_resource
 
@@ -41,6 +41,7 @@ gst_group = node_collection.one({'_type': "GSystemType", 'name': "Group"})
 group_id = node_collection.one({'_type': "Group", 'name': "home"})._id
 gst_module_name, gst_module_id = GSystemType.get_gst_name_id('Module')
 gst_base_unit_name, gst_base_unit_id = GSystemType.get_gst_name_id('base_unit')
+at_items_sort_list = node_collection.one({'_type': "AttributeType", 'name': "items_sort_list"})
 
 def explore(request):
     return HttpResponseRedirect(reverse('explore_courses', kwargs={}))
@@ -227,18 +228,20 @@ def explore_courses(request):
     context_variable = {
                         'title': title, 
                         'group_id': group_id, 'groupid': group_id,
+                        'modules_is_cur': True,
                     }
-    module_sort_list = get_attribute_value(group_id, 'items_sort_list')
-
-    if module_sort_list:
-        modules_cur = map(Node,module_sort_list)
-        context_variable.update({'modules_is_cur': False})
+    modules_sort_list = get_attribute_value(group_id, 'items_sort_list')
+    all_modules = node_collection.find({'member_of': gst_module_id ,'status':'PUBLISHED'}).sort('last_update', -1)
+    if modules_sort_list:
+        context_variable.update({'modules_sort_list': modules_sort_list})
     else:
-        modules_cur = node_collection.find({'member_of': gst_module_id ,'status':'PUBLISHED'}).sort('last_update', -1)
-        context_variable.update({'modules_is_cur': True})
+        context_variable.update({'modules_sort_list': list(all_modules)})
+        # modules_cur = map(Node,modules_sort_list)
+        # context_variable.update({'modules_is_cur': False})
+        # modules_node_sort_list = cast_to_node(modules_sort_list)
 
-    module_unit_ids = [val for each_module in modules_cur for val in each_module.collection_set ]
-
+    all_modules.rewind()
+    module_unit_ids = [val for each_module in all_modules for val in each_module.collection_set ]
 
     primary_lang_tuple = get_language_tuple(GSTUDIO_PRIMARY_COURSE_LANGUAGE)
 
@@ -306,8 +309,7 @@ def explore_courses(request):
                                               }).sort('last_update', -1)
     # base_unit_page_cur = paginator.Paginator(base_unit_cur, page_no, GSTUDIO_NO_OF_OBJS_PP)
 
-    context_variable.update({'modules_cur': modules_cur,'units_cur': base_unit_cur})
-
+    context_variable.update({'all_modules': all_modules, 'units_cur': base_unit_cur})
     return render_to_response(
         # "ndf/explore.html", changed as per new Clix UI
         "ndf/explore_2017.html",
@@ -319,20 +321,25 @@ def explore_courses(request):
 @get_execution_time
 def explore_drafts(request):
     title = 'drafts'
-    module_sort_list = None
-    module_sort_list = get_attribute_value(group_id, 'items_sort_list')
+    modules_sort_list = None
+    modules_sort_list = get_attribute_value(group_id, 'items_sort_list')
     context_variable = {
                         'title': title, 
                         'group_id': group_id, 'groupid': group_id,
+                        'modules_is_cur': True
                     }
-    if module_sort_list:
-        modules_cur = map(Node,module_sort_list)
-        context_variable.update({'modules_is_cur': False})
-    else:
-        modules_cur = node_collection.find({'member_of': gst_module_id ,'status':'PUBLISHED'}).sort('last_update', -1)
-        context_variable.update({'modules_is_cur': True})
+    modules_sort_list = get_attribute_value(group_id, 'items_sort_list')
 
-    module_unit_ids = [val for each_module in modules_cur for val in each_module.collection_set ]
+    all_modules = node_collection.find({'member_of': gst_module_id ,'status':'PUBLISHED'}).sort('last_update', -1)
+    if modules_sort_list:
+        context_variable.update({'modules_sort_list': modules_sort_list})
+    else:
+        context_variable.update({'modules_sort_list': list(all_modules)})
+        # modules_cur = map(Node,modules_sort_list)
+        # context_variable.update({'modules_is_cur': False})
+        # modules_node_sort_list = cast_to_node(modules_sort_list)
+    all_modules.rewind()
+    module_unit_ids = [val for each_module in all_modules for val in each_module.collection_set ]
 
 
     gstaff_access = check_is_gstaff(group_id,request.user)
@@ -368,8 +375,9 @@ def explore_drafts(request):
 #     base_unit_page_cur = paginator.Paginator(base_unit_cur, page_no, GSTUDIO_NO_OF_OBJS_PP)
 
     # base_unit_page_cur = paginator.Paginator(base_unit_cur, page_no, GSTUDIO_NO_OF_OBJS_PP)
+    context_variable.update({'all_modules': all_modules, 'units_cur': base_unit_cur})
 
-    context_variable.update({'modules_cur': modules_cur,'units_cur': base_unit_cur})
+    # context_variable.update({'modules_cur': modules_cur,'units_cur': base_unit_cur})
 
     return render_to_response(
         # "ndf/explore.html", changed as per new Clix UI
@@ -383,11 +391,17 @@ def module_order_list(request):
     response_dict = {"success": False}
     module_id_list = request.POST.get('module_list', [])
     try:
+        items_sort_list_gattr_node = triple_collection.one({'_type': 'GAttribute', 'subject': group_id, 
+            'attribute_type': at_items_sort_list._id, 'status': u'PUBLISHED'})
+        if items_sort_list_gattr_node:
+            ga_node = delete_gattribute(node_id=items_sort_list_gattr_node._id, deletion_type=0)
+
         if module_id_list:
             module_id_list = json.loads(module_id_list)
             module_obj_list = map(lambda each_id: Node.get_node_by_id(ObjectId(each_id)), module_id_list)
             ga_node = create_gattribute(ObjectId(group_id), 'items_sort_list', module_obj_list)
             response_dict["success"] = True
+
     except Exception as module_order_list_err:
         print "\nError Occurred in module_order_list(). ", module_order_list_err
         pass
