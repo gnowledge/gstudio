@@ -6410,3 +6410,17 @@ input.transcript-toggler {
 .exp-module-container {
   margin-left: 60px;
 }
+
+/* line 6646, ../../../scss/_clix2017.scss */
+.fill-green-circle {
+  padding: 6px 6px;
+  border-radius: 100%;
+  background-color: green;
+}
+
+/* line 6652, ../../../scss/_clix2017.scss */
+.fill-orange-circle {
+  padding: 6px 6px;
+  border-radius: 100%;
+  background-color: orange;
+}
