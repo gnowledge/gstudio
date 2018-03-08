@@ -3538,7 +3538,7 @@ def assetcontent_detail(request, group_id, asset_id,asst_content_id,page_no=1):
     group_obj = get_group_name_id(group_id, get_obj=True)
     # print group_id,asset_id,asst_content_id
     asset_content_list = get_relation_value(ObjectId(asset_obj._id),'has_assetcontent')
-    template = 'ndf/gevent_base.html'
+    template = 'ndf/lms.html'
     assetcontent_page_info = paginator.Paginator(asset_content_list['grel_node'], page_no, GSTUDIO_NO_OF_OBJS_PP)
     context_variables = {
             'asset_content_list':asset_content_list,'group_id':group_id,

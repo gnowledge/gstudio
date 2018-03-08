@@ -5975,7 +5975,7 @@ ul.authoring-tab{
 
 input.transcript-toggler{
         background-image: url(/static/ndf/images/Transcript.svg) no-repeat !important;
-        background-color: transparent; /* make the button transparent */
+       // background-color: transparent; /* make the button transparent */
         background-repeat: no-repeat;  /* make the background image appear only once */
         background-position: 0px 0px;  /* equivalent to 'top left' */
         border: none;           /* assuming we don't want any borders */

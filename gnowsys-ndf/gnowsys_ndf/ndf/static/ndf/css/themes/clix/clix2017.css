@@ -5699,8 +5699,6 @@ ul.authoring-tab > li > a.selected, ul.authoring-tab > li > a:hover {
 /* line 5976, ../../../scss/_clix2017.scss */
 input.transcript-toggler {
   background-image: url(/static/ndf/images/Transcript.svg) no-repeat !important;
-  background-color: transparent;
-  /* make the button transparent */
   background-repeat: no-repeat;
   /* make the background image appear only once */
   background-position: 0px 0px;

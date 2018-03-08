@@ -79,6 +79,10 @@
                 {% endif %}
                 -->
             {% endif %}
+            {% if asset_content_list.grel_id and asset_obj.created_by == request.user.id  or is_gstaff and asset_obj and asset_content_list.grel_id  %}
+            
+                <button type="button" class="orange-button delete-asset-content right"  title="Click on the checkbox on the files below to Delete"><i class="fa fa-trash"></i> {% trans "Delete Files" %}</button>
+            {% endif %}
             </div>
    </div>
 
@@ -270,10 +274,7 @@
 
 
         <div class="row">
-            {% if asset_content_list.grel_id and asset_obj.created_by == request.user.id  or is_gstaff and asset_obj and asset_content_list.grel_id  %}
-
-                <button type="button" class="orange-button delete-asset-content right icon-widget" style="margin-right: 100px;" title="Click on the checkbox on the files below to Delete"><i class="fa fa-trash"></i> {% trans "Delete Files" %}</button>
-            {% endif %}
+            
 
         <div class="row listing-row">
             {% for each in asset_content_list.grel_node %}
