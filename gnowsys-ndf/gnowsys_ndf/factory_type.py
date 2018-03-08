@@ -298,6 +298,15 @@ factory_relation_types = [
         }
     },
 
+    {'has_prerequisite': {
+                'subject_type':['Topic'],
+                'object_type':['Topic'],
+                'inverse_name':'prerequisite_of',
+                'meta_type':'factory_types',
+                'object_cardinality': 100
+            }
+        },
+
 ]
 
 
