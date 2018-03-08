@@ -45,9 +45,9 @@
 
       <div {% if user_access_priv == "allow" %} onclick="createDiscussion()" class="ckeditor-comment  explore-button "{% else %} class="ckeditor-comment explore-button user_not_enrolled" {% endif %} id="create-discussion" data-id="{{ node.pk }}"   style="margin-bottom:0;">
         {% if thr_int_type %}
-          {{thr_int_type}} <i class="fa fa-comments"></i>  {% if all_replies|length > 0 %}({{all_replies|length }}) {% endif %}
+          <i class="fa fa-comments"></i> {{thr_int_type}}   {% if all_replies|length > 0 %}({{all_replies|length }}) {% endif %}
         {% else %}
-          {{default_discussion_lbl}}  <i class="fa fa-comments"></i> {% if all_replies|length > 0 %} ({{all_replies|length }}) {% endif %}
+           <i class="fa fa-comments"></i> {{default_discussion_lbl}}   {% if all_replies|length > 0 %} ({{all_replies|length }}) {% endif %}
         {% endif %}
       </div>
     {% endif %}
