@@ -2,7 +2,7 @@
 $primary-blue : #164A7B;
 $secondry-blue : #74b3dc;
 $tertiary-blue : #719dc7;
-
+$primary-pink : #713558;
 
 
 /*Orange color variables*/
@@ -548,7 +548,7 @@ h5{
 
 .top-bar, .top-bar .name {
     height: 52px;
-    background: rgba(107, 0, 84, 0.97);
+    background: $primary-pink;
 
 }
 
@@ -578,10 +578,10 @@ h5{
     .top-bar-section {
         ul {
             &.left li {
-                border-right: 2px solid rgba(107, 0, 84, 0.97);
+                border-right: 2px solid $primary-pink;
             }
             li {
-                background: rgba(107, 0, 84, 0.97);
+                background: $primary-pink;
 
 
                 &>a {
@@ -3769,7 +3769,7 @@ body {
 /*
     Styling for the Secondary header 2
 */
-$ah_2_icon_color: rgba(107, 0, 84, 0.97);
+$ah_2_icon_color: $primary-pink;
 $ah_2_background_color: #ffffff;
 $ah_2_background_color_hover: rgba(244, 244, 244, 0.3);;
 .activity_player_header {
@@ -4497,7 +4497,7 @@ ul.nav_menu_1 {
 
 .activity-title{
     font-size: 18px;
-    padding-top: 10px;
+    //padding-top: 10px;
     padding-left: 23px;
     margin: 0px;
 
@@ -5067,11 +5067,13 @@ $module-card-lines-to-show: 3;
     .card_title {
         display: block;
         width:230px;
-        font-size: 32px;
+        //font-size: 32px;
+        color: $primary-pink !important;
         font-weight: 600;
         text-align: center;
         margin: 0px auto;
         letter-spacing: 1px;
+        font-size: 1.4vw
     }
 
     &.animated_card {
@@ -5110,7 +5112,8 @@ $module-card-lines-to-show: 3;
 
         .card_label {
             font-weight: 500;
-            font-size: $module-card-font-size;
+            //font-size: $module-card-font-size;
+            font-size: 14px;
             letter-spacing: 1px;
             color: black;
         }
@@ -5511,7 +5514,7 @@ ul.authoring-tab{
     width: 100%;
     height: 45px;
     background-color:#fff;
-    color: $primary-blue;
+    color: $primary-pink;
     margin-top:-30px;
     >p{
         margin-left: 81px;
@@ -5527,7 +5530,7 @@ ul.authoring-tab{
     width: 100%;
     height: 50px;
     background-color:#fff;
-    color: $primary-blue;
+    color: $primary-pink;
     >p{
         margin-left: 81px;
         padding: 0px 0px 0px 1px;
@@ -5546,6 +5549,7 @@ ul.authoring-tab{
 .lms_explore_back_unit{
     background-color: #fff;
     margin-top:-23.3px;
+    margin-left: 60px; 
 }
 
 .empty-dashboard-message {
@@ -5958,7 +5962,7 @@ ul.authoring-tab{
         height: 30px;
         margin-top: 0px !important;
         padding: 40px 29px 28px;
-        background: radial-gradient(hsla(259, 40%, 40%, 1), hsla(259, 40%,30%, 1));
+        background: $primary-pink;
         border-radius: 0 0 5px 5px;
         color: #fff;
         cursor: pointer;
@@ -6632,4 +6636,21 @@ input.transcript-toggler{
         color: #912a7d;
     }
 
+}
+
+
+.exp-module-container{
+    margin-left: 60px;
+}
+
+.fill-green-circle{
+    padding: 6px 6px;
+    border-radius: 100%;
+    background-color: green;
+}
+
+.fill-orange-circle{
+    padding: 6px 6px;
+    border-radius: 100%;
+    background-color: orange;
 }
