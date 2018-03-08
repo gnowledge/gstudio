@@ -465,7 +465,7 @@ h5 {
 /* line 549, ../../../scss/_clix2017.scss */
 .top-bar, .top-bar .name {
   height: 52px;
-  background: rgba(107, 0, 84, 0.97);
+  background: #713558;
 }
 
 /* line 556, ../../../scss/_clix2017.scss */
@@ -492,11 +492,11 @@ h5 {
 }
 /* line 580, ../../../scss/_clix2017.scss */
 .top-bar .top-bar-section ul.left li {
-  border-right: 2px solid rgba(107, 0, 84, 0.97);
+  border-right: 2px solid #713558;
 }
 /* line 583, ../../../scss/_clix2017.scss */
 .top-bar .top-bar-section ul li {
-  background: rgba(107, 0, 84, 0.97);
+  background: #713558;
 }
 /* line 587, ../../../scss/_clix2017.scss */
 .top-bar .top-bar-section ul li > a {
@@ -3597,7 +3597,7 @@ body {
 }
 /* line 3804, ../../../scss/_clix2017.scss */
 .activity_player_header .header_title a {
-  color: rgba(107, 0, 84, 0.97);
+  color: #713558;
 }
 @media only screen and (min-device-width: 1025px) and (max-device-width: 2130px) {
   /* line 3795, ../../../scss/_clix2017.scss */
@@ -3624,11 +3624,11 @@ body {
 .activity_player_header .header_icon {
   font-size: 16px;
   line-height: 35px;
-  color: rgba(107, 0, 84, 0.97);
+  color: #713558;
 }
 /* line 3887, ../../../scss/_clix2017.scss */
 .activity_player_header .header_icon_block {
-  color: rgba(107, 0, 84, 0.97);
+  color: #713558;
   width: 70px;
   cursor: pointer;
   text-align: center;
@@ -3678,7 +3678,7 @@ body {
 }
 /* line 3926, ../../../scss/_clix2017.scss */
 .activity_player_header .lesson-nav .header_text_block a {
-  color: rgba(107, 0, 84, 0.97);
+  color: #713558;
 }
 /* line 3932, ../../../scss/_clix2017.scss */
 .activity_player_header .lesson-nav .header_text_lg_block {
@@ -4218,7 +4218,6 @@ ul.nav_menu_1 > li > a.selected, ul.nav_menu_1 > li > a:hover {
 /* line 4498, ../../../scss/_clix2017.scss */
 .activity-title {
   font-size: 18px;
-  padding-top: 10px;
   padding-left: 23px;
   margin: 0px;
 }
@@ -5202,7 +5201,7 @@ ul.authoring-tab > li > a.selected, ul.authoring-tab > li > a:hover {
   width: 100%;
   height: 45px;
   background-color: #fff;
-  color: #164A7B;
+  color: #713558;
   margin-top: -30px;
 }
 /* line 5516, ../../../scss/_clix2017.scss */
@@ -5686,7 +5685,7 @@ ul.authoring-tab > li > a.selected, ul.authoring-tab > li > a:hover {
   height: 30px;
   margin-top: 0px !important;
   padding: 40px 29px 28px;
-  background: radial-gradient(#573d8f, #412e6b);
+  background: #713558;
   border-radius: 0 0 5px 5px;
   color: #fff;
   cursor: pointer;
