@@ -4626,8 +4626,8 @@ $unit-card-font-size: 14px;
 $unit-card-line-height: 1.4;
 $unit-card-lines-to-show: 3;
 
-.unit_card {
-    width: 300px;
+[class*="unit_card-"]{
+    width: 71%;
     // height: 300px; commented as info of number of lesson and etc was not passed currently
     color: #000;
     padding: 15px;
@@ -4636,16 +4636,12 @@ $unit-card-lines-to-show: 3;
     font-size: $unit-card-font-size;
     border: 2px solid #d5d5d5;
     position: relative;
-    height:210px;
-
-    width: 230px;
-    height: 270px;
+    height: 279px;
     display:flex; justify-content: flex-end; flex-direction: column;
 
     &:hover {
         box-shadow: 0px 0px 5px 1px rgba(0, 0, 0, 0.25);
     }
-    
 
     .unit_status {
         position: absolute;
@@ -4657,20 +4653,16 @@ $unit-card-lines-to-show: 3;
         border-radius: 3px;
         letter-spacing: 0.6px;
     }
-
-    .unit_header {
-        display: table;
-        .unit_banner {
-            display: table-cell;
-            border-radius: 5px;
-            height: 100px;
-            //width: 50px;
-            margin-right: 10px;
-            color: #333333;
-        }
+    div >.unit_banner{
+        height: 85%;
+        border-radius: 4px;
+    }
+    .unit-title-container{
+        height: 90px;
         .unit_title {
             display: table-cell;
-            font-size: 20px;
+            font-size: 17px;
+            font-family: Open Sans Bold;
             font-weight: 500;
             letter-spacing: 0.6px;
             margin: 0px 0px 12px;
@@ -4708,9 +4700,10 @@ $unit-card-lines-to-show: 3;
         //border-top : 1px solid #ccc;
         //margin: 20px 0px 0px;
         padding: 5px 0px;
+        height: 40%;
          //enroll-button 
         .unit-card-enrol{
-            background: rgb(162, 35, 141);
+            background: #a2238d;
             height: 37px;
             text-align: center;
             color: #ffffff;
@@ -4720,45 +4713,42 @@ $unit-card-lines-to-show: 3;
             width: 120px !important;
             margin-top: 2px !important;
             letter-spacing: 0.4px;
-
             &:hover {
                 box-shadow: 0px 0px 17px rgba(0, 0, 0, 0.68);
             }
         }
 
-        .unit-card-analytics{
-            color: #a2238d;
-            font-weight: 500;
-            font-size: 14px;
-            letter-spacing: 0.3px;
-            border-bottom:2px solid #a2238d;
-        }
-
-        .unit-card-analytics-points{
-            background: #ffffff;
-            color: rgb(162, 35, 141);
-            font-size: 15px;
-            border-radius: 20px;
-            letter-spacing: 0.4px;
-            padding: 2px 3px 3px 1px;
-            font-weight:bold;
-            cursor: default;
-        }
-
-        .view_unit{
-            height: 37px;
-            text-align: center;
-            color: rgb(162, 35, 141);
-            font-size: 19px;
-            margin-top: 2px !important;
-            letter-spacing: 0.4px;
-
-            &:hover {
-                border-bottom:2px solid $secondary-orange;
-            }
-        }
     }
+}
+.unit-card-analytics{
+    color: #a2238d;
+    font-weight: 500;
+    font-size: 14px;
+    letter-spacing: 0.3px;
+    border-bottom: 2px solid #a2238d;
+}
 
+.unit-card-analytics-points{
+    background: #ffffff;
+    color: #a2238d;
+    font-size: 15px;
+    border-radius: 20px;
+    letter-spacing: 0.4px;
+    padding: 2px 3px 3px 1px;
+    font-weight: bold;
+    cursor: default;
+}
+
+.view_unit{
+    height: 37px;
+    text-align: center;
+    color: #a2238d;
+    font-size: 19px;
+    margin-top: 2px !important;
+    letter-spacing: 0.4px;
+    &:hover {
+      border-bottom: 2px solid #ffc14e;
+    }
 }
 
 /*
@@ -5553,7 +5543,7 @@ ul.authoring-tab{
 .lms_explore_back_unit{
     background-color: #fff;
     margin-top: 10.5%;
-    margin-left: 60px; 
+    margin-left: 30px; 
 }
 
 .empty-dashboard-message {
@@ -6674,11 +6664,23 @@ input.transcript-toggler{
         height:85px;
     }
 }
-.unit_actions{
-    height: 40%;
-}
-.unit_header{
 
-    height: 80%;
-    border-bottom: 1px solid black;
+.view-progress-report {
+    height: 2rem;
+    /* padding: 0 2rem; */
+    background: none;
+    font-family: open_sansbold,sans-serif;
+    font-size: 1.2rem;
+    text-transform: uppercase;
+    cursor: pointer;
+    border-radius: 3px;
+    -webkit-box-align: center;
+    align-items: center;
+    border: .2rem solid #912a7d;
+    background-color: #912a7d;
+    color: #fff;
+    transition: all .1s ease;
+    padding: 0px 7px 0px 7px;
+    margin-top: 10px;
+    text-align: right;
 }
