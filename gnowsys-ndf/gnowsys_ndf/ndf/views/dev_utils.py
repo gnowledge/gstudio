@@ -556,7 +556,7 @@ def render_test_template(request,group_id='home', app_id=None, page_no=1):
         context_instance=RequestContext(request)
     )
 
-
+@get_execution_time
 def elib_paged_file_objects(request, group_id, filetype, page_no):
 	'''
 	Method to implement pagination in File and E-Library app.
@@ -591,7 +591,7 @@ def elib_paged_file_objects(request, group_id, filetype, page_no):
 			query_dict = get_filter_querydict(selfilters)
 
 		#query_dict.append({'attribute_set.educationaluse': {'$ne': u'eBooks'}})
-
+		detail_urlname = "file_detail"
 		i=-1
 		strconcat=""
 		endstring=""
@@ -652,7 +652,7 @@ def elib_paged_file_objects(request, group_id, filetype, page_no):
 		print lists
 
 
-		detail_urlname = "file_detail"
+		
 		#if filetype != "all":
 			
 
@@ -710,7 +710,7 @@ def elib_paged_file_objects(request, group_id, filetype, page_no):
 
 				q = eval("Q('bool', must=[Q('match', group_set=str(group_id)), Q('match',member_of=GST_FILE1.hits[0].id),Q('match', attribute_set__educationaluse=filetype),"+strconcat1[:-1]+"])")
 
-				collection_query = eval("Q('bool', must=[Q('match', group_set=str(group_id)),Q('match',access_policy='public'),Q('exists',field='collection_set'),Q('match', attribute_set__educationaluse =filetype),"+strconcat1[:-1]+"],"
+				collection_query = eval("Q('bool', must=[Q('match', group_set=str(group_id)),Q('match',access_policy='public'),Q('exists',field='collection_set'),"+strconcat1[:-1]+"],"
 									+ "should=[Q('match',member_of=GST_FILE1.hits[0].id),Q('match',member_of=GST_PAGE1.hits[0].id) ],"
 									+ "must_not=[Q('match', attribute_set__educationaluse ='ebooks')], minimum_should_match=1)")
 
@@ -759,7 +759,6 @@ def elib_paged_file_objects(request, group_id, filetype, page_no):
 				q = Q('bool', must=[Q('match', group_set=str(group_id)), Q('match',access_policy='public'),Q('match',member_of=GST_FILE1.hits[0].id),Q('terms',attribute_set__educationaluse=['documents','images','audios','videos'])],
 				)
 				
-
 				collection_query = Q('bool', must=[Q('match', group_set=str(group_id)), Q('match',access_policy='public'),Q('exists',field='collection_set')],
 					should=[Q('match',member_of=GST_FILE1.hits[0].id),Q('match',member_of=GST_PAGE1.hits[0].id) ],
 					must_not=[Q('match', attribute_set__educationaluse ='ebooks')])
@@ -836,7 +835,7 @@ def elib_paged_file_objects(request, group_id, filetype, page_no):
 
 
 		if filetype == "Collections":
-
+			print "collections if block"
 			detail_urlname = "page_details"
 				#result_cur = node_collection.find({
 				#					'member_of': {'$in': [GST_FILE._id, GST_PAGE._id]},
@@ -859,6 +858,7 @@ def elib_paged_file_objects(request, group_id, filetype, page_no):
 			result_cur =Search(using=es, index="nodes",doc_type="gsystemtype,gsystem,metatype,relationtype,attribute_type,group,author").query(collection_query)
 
 			print filters
+			print result_cur.count()
 			#print "=============================================================", result_cur.count()
 			#print page_no
 			if int(page_no) == 1:
