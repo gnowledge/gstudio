@@ -33,11 +33,12 @@ log_file = open(log_file_path, 'a+')
 script_start_str = "\n\n######### Script ran on : " + time.strftime("%c") + " #########\n----------------\n"
 log_file.write(str(script_start_str))
 
-column_keys_list = ["server_id", "school_name", "school_code", "unit_name", "username", "user_id", "enrollment_status", "total_lessons", "lessons_completed", "percentage_lessons_completed", "total_activities", "activities_completed", "percentage_activities_completed", "total_quizitems", "visited_quizitems", "attempted_quizitems", "unattempted_quizitems", "correct_attempted_quizitems", "notapplicable_quizitems", "incorrect_attempted_quizitems", "user_files", "total_files_viewed_by_user", "other_viewing_my_files", "unique_users_commented_on_user_files", "total_rating_rcvd_on_files", "commented_on_others_files", "cmts_on_user_files", "total_cmnts_by_user", "user_notes", "others_reading_my_notes", "cmts_on_user_notes", "cmnts_rcvd_by_user", "total_notes_read_by_user", "commented_on_others_notes", "total_rating_rcvd_on_notes", "correct_attempted_assessments", "unattempted_assessments", "visited_assessments", "notapplicable_assessments", "incorrect_attempted_assessments", "attempted_assessments", "total_assessment_items", "buddies"]
+column_keys_list = ["server_id", "school_name", "school_code", "module_name", "unit_name", "username", "user_id", "enrollment_status", "total_lessons", "lessons_completed", "percentage_lessons_completed", "total_activities", "activities_completed", "percentage_activities_completed", "total_quizitems", "visited_quizitems", "attempted_quizitems", "unattempted_quizitems", "correct_attempted_quizitems", "notapplicable_quizitems", "incorrect_attempted_quizitems", "user_files", "total_files_viewed_by_user", "other_viewing_my_files", "unique_users_commented_on_user_files", "total_rating_rcvd_on_files", "commented_on_others_files", "cmts_on_user_files", "total_cmnts_by_user", "user_notes", "others_reading_my_notes", "cmts_on_user_notes", "cmnts_rcvd_by_user", "total_notes_read_by_user", "commented_on_others_notes", "total_rating_rcvd_on_notes", "correct_attempted_assessments", "unattempted_assessments", "visited_assessments", "notapplicable_assessments", "incorrect_attempted_assessments", "attempted_assessments", "total_assessment_items", "buddies"]
 
 column_keys_dict = OrderedDict()
 map(lambda x: column_keys_dict.update({x: "NA"}), column_keys_list)
 
+module_gst_name, module_gst_id = Node.get_name_id_from_type('Module', 'GSystemType')
 
 class Command(BaseCommand):
 
@@ -89,7 +90,26 @@ def export_group_analytics(group_obj, assessment_and_quiz_data):
     if not os.path.exists(GSTUDIO_EXPORTED_CSVS_DIR_PATH):
         os.makedirs(GSTUDIO_EXPORTED_CSVS_DIR_PATH)
 
+
+
     file_name_path = os.path.join(GSTUDIO_EXPORTED_CSVS_DIR_PATH, file_name)
+    column_keys_list_addons = []
+
+    # dict to keep new name key and _id as value
+    # {'<activity name or altnames>': <activity _id>}
+    column_keys_dict_addons = {}  
+
+    all_activities_cur = Node.get_tree_nodes(group_obj, field_name='collection_set', level=1, get_obj=True)
+    # print all_activities_cur.count()
+    for each_act in all_activities_cur:
+        column_key_name = each_act['altnames'] if (each_act['altnames'] and each_act['altnames'].strip()) else each_act['name']
+        column_key_name += " [" + unicode(each_act._id) + "]"
+        # if column_key_name not in column_keys_list_addons:
+        column_keys_list_addons.append(column_key_name)
+        column_keys_dict_addons[column_key_name] = each_act['_id']
+            # column_keys_dict.update({column_key_name: 0})
+        # each_row_dict[column_key_name] = analytics_data["counter_obj"]["visited_nodes"].get(unicode(each_act._id), 0)
+    # print column_keys_list_addons
 
     header_written = False
     for index, each_user in enumerate(group_users):
@@ -104,6 +124,7 @@ def export_group_analytics(group_obj, assessment_and_quiz_data):
             each_row_dict['server_id'] = GSTUDIO_INSTITUTE_ID
             each_row_dict['school_code'] = GSTUDIO_INSTITUTE_ID_SECONDARY
             each_row_dict['school_name'] = GSTUDIO_INSTITUTE_NAME
+            each_row_dict['module_name'] = [(i.altnames if (i.altnames and i.altnames.strip()) else i.name) for i in node_collection.find({'_type': 'GSystem', 'member_of': module_gst_id, 'collection_set': group_obj._id}) if i]
             each_row_dict['unit_name'] = group_name
 
             temp_lessons_stat_str = analytics_data['level1_progress_stmt']
@@ -153,18 +174,14 @@ def export_group_analytics(group_obj, assessment_and_quiz_data):
             # each_row_dict["buddies"] = str(Buddy.get_buddy_userids_list_within_datetime(1, datetime.datetime.now()))
             each_row_dict["buddies"] = Author.get_author_usernames_list_from_user_id_list\
                 (Buddy.get_buddy_userids_list_within_datetime(each_user, datetime.datetime.now()))
-            all_activities_cur = Node.get_tree_nodes(group_obj, field_name='collection_set', level=1, get_obj=True)
-            for each_act in all_activities_cur:
-                column_key_name = each_act['altnames'] if each_act['altnames'].strip() else each_act['name']
-                column_key_name += " [" + unicode(each_act._id) + "]"
-                if column_key_name not in column_keys_list:
-                    column_keys_list.append(column_key_name)
-                    column_keys_dict.update({column_key_name: 0})
-                each_row_dict[column_key_name] = analytics_data["counter_obj"]["visited_nodes"].get(unicode(each_act._id), 0)
+
+            for each_act_key, each_act_val in column_keys_dict_addons.iteritems():
+                each_row_dict[each_act_key] = analytics_data["counter_obj"]["visited_nodes"].get(unicode(each_act_val), 0)
+
             # print analytics_data
 
             with open(file_name_path, 'a') as f:  # Just use 'w' mode in 3.x
-                w = csv.DictWriter(f, column_keys_list)
+                w = csv.DictWriter(f, (column_keys_list + column_keys_list_addons))
                 if not header_written:
                     w.writeheader()
                     header_written = True
@@ -179,4 +196,5 @@ def export_group_analytics(group_obj, assessment_and_quiz_data):
             continue
 
     print "\nExported user CSV: %s"%file_name_path
+    print "\n", "=" * 100
             
