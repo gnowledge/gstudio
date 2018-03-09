@@ -11,24 +11,28 @@
 		"update": 1,
 		"delete": 1,
 		},
-	"admin": {
+	"group_admin": {
 		"create": 1,
 		"read": 1,
 		"update": 1,
 		"delete": 1,
 		},
-	"user": {
-		"self": {
+	"group_member": {
 			"create": 1,
 			"read": 1,
-			"update": 1,
-			"delete": 1,
+			"update": 0,
+			"delete": 0,
 		},
-		"others": {
-			"create": 1,
+	"authenticated_user": {
+			"create": 0,
 			"read": 1,
-			"update": 1,
-			"delete": 1,
+			"update": 0,
+			"delete": 0,
+		},
+	"anonymous_user": {
+			"create": 0,
+			"read": 1,
+			"update": 0,
+			"delete": 0,
 		}
-	}
 }
