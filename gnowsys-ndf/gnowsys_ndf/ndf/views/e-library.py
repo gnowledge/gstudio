@@ -791,7 +791,7 @@ if GSTUDIO_ELASTIC_SEARCH:
 
 
 else:
-
+	print "mongo E-Library Running"
 	##############################################################################
 
 	GST_FILE = node_collection.one({'_type':'GSystemType', 'name': "File"})
@@ -805,8 +805,6 @@ else:
 	GST_JSMOL = node_collection.one({"_type":"GSystemType","name":"Jsmol"})
 
 	##############################################################################
-
-
 
 	@get_execution_time
 	def resource_list(request, group_id, app_id=None, page_no=1):
