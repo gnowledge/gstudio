@@ -1,5 +1,5 @@
 {% extends "ndf/gbase.html" %}
-{% load check_is_gstaff get_group_object rewind_cursor from ndf_tags %}
+{% load check_is_gstaff get_group_object rewind_cursor cast_to_node from ndf_tags %}
 {% load i18n %}
 
 {% block title %} {{title|capfirst}} {% endblock title %}
@@ -7,7 +7,9 @@
 {% block body_content %}
 {% get_group_object as group_object %}
 {% check_is_gstaff group_id request.user as is_gstaff %}
-		{% include 'ndf/explore_secondary_header.html' %}
+{% cast_to_node modules_sort_list as modules_node_sort_list %}
+
+		{% include 'ndf/explore_secondary_header.html' with modules_node_sort_list=modules_node_sort_list %}
 		
 	<!--section role="tabpanel" aria-hidden="true" class="content active " style="border-style:none;"-->
 	{% if title == "workspaces" %}
@@ -20,8 +22,8 @@
 		</ul>
 	{% else %}
 		{% if modules_is_cur %}
-			{% rewind_cursor modules_cur as modules_cur %}
+			{% rewind_cursor all_modules as all_modules %}
 		{% endif %}
-		{% include "ndf/lms_explore.html" with title=title  %}
+		{% include "ndf/lms_explore.html" with title=title modules_node_sort_list=modules_node_sort_list %}
 	{% endif %}
 {% endblock body_content %}

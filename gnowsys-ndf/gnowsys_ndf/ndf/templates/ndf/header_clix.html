@@ -95,7 +95,7 @@
                 </li>
             {% else %}
                 <li>
-                    <a title="Click here to login" class="" href="{% url 'auth_login' %}" accesskey="l">
+                    <a title="Click here to login" class="" href="{% url 'auth_login' %}{% if not is_ac_url %}?next={{request.path}}{% endif %}" accesskey="l">
                     <i class="fi-key"></i>&nbsp; {% trans "Login" %}
                   </a>
                 </li>
