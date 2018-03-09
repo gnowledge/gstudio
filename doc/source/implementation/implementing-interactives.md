@@ -16,6 +16,9 @@
         - Following is exemplar hierarchy:
         ```
             <tool-name>
+            ├── 0-180212162948.json(ananoumus)
+            ├── 0-180212162912.json
+            ├── 0-180212162807.json
             ├── 5-180212162952.json
             ├── 5-180212163000.json
             ├── 65-180212163022.json
@@ -31,6 +34,7 @@
     - Create a Unique Token Key (UTK).
         - Format: USERID-YYMMDDHHMMSS
         - User id is in cookies with key: `user_id` which needs to be pick up by JS method.
+        - *Note: Anonymous user will have `0` User Id*
     - Get JSON data at any given time.
     - Add/Update additional metadata (AMD) in same JSON data. *(TODO: Decide on AMD schema and fields)*
         - Gstudio to provide JS method giving context of current activity at any given page.
@@ -39,8 +43,14 @@
             1. Data saving end point url
             2. Time in minutes, after which periodic writing should happen to gstudio end-point/server. 
         - POST data:
-            1. UGD
-            2. AMD
+            1. UGD (json)
+            2. AMD 
+                2.1 `timestamp`
+                2.2 `locale`
+                2.3 `user_id`
+                2.4 `session_id`
+                2.5 `buddies_user_ids_list`
+                2.6 `appName`
             3. UTK
     - An event listner method which will listen to any of above specified (3) events and trigger POST AJAX method.
 
