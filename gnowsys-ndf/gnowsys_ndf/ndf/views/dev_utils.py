@@ -686,7 +686,13 @@ def elib_paged_file_objects(request, group_id, filetype, page_no):
 		collection_query = None
 		q= None
 
-			
+		strconcat1 = ""
+		for value in lists:
+			print "************************************************"
+			print value
+			print "************************************************"
+			strconcat1 = strconcat1+'eval(str("'+ value +'")),'
+		print strconcat1
 
 		if filetype != "all":
 
@@ -694,13 +700,7 @@ def elib_paged_file_objects(request, group_id, filetype, page_no):
 
 			if filters:
 
-				strconcat1 = ""
-				for value in lists:
-					print "************************************************"
-					print value
-					print "************************************************"
-					strconcat1 = strconcat1+'eval(str("'+ value +'")),'
-				print strconcat1
+
 
 
 				q = eval("Q('bool', must=[Q('match', group_set=str(group_id)), Q('match',member_of=GST_FILE1.hits[0].id),Q('match', attribute_set__educationaluse =filetype),"+strconcat1[:-1]+"])")
@@ -742,7 +742,14 @@ def elib_paged_file_objects(request, group_id, filetype, page_no):
 		else:
 			print "else execute"
 			if filters:
-				if strconcat.count('match') == 1:
+
+				q = eval("Q('bool', must=[Q('match', group_set=str(group_id)), Q('match',member_of=GST_FILE1.hits[0].id),Q('terms',attribute_set__educationaluse=['documents','images','audios','videos']),"+strconcat1[:-1]+"])")
+
+				collection_query = eval("Q('bool', must=[Q('match', group_set=str(group_id)),Q('match',access_policy='public'),Q('exists',field='collection_set'),"+strconcat1[:-1]+"],"
+									+ "should=[Q('match',member_of=GST_FILE1.hits[0].id),Q('match',member_of=GST_PAGE1.hits[0].id) ],"
+									+ "must_not=[Q('match', attribute_set__educationaluse ='ebooks')], minimum_should_match=1)")
+
+				if strconcat.count('match') == 11:
 					a=strconcat.split("$$")
 					a="".join(a)
 					print a
@@ -756,7 +763,7 @@ def elib_paged_file_objects(request, group_id, filetype, page_no):
 					must_not=[Q('match', attribute_set__educationaluse ='ebooks')])
 
 			
-				elif strconcat.count('match') == 2:
+				elif strconcat.count('match') == 21:
 
 					a,b = strconcat.split("$$",1)
 					a="".join(a)
@@ -769,7 +776,7 @@ def elib_paged_file_objects(request, group_id, filetype, page_no):
 										,eval(str(a)), eval(str(b))],
 					should=[Q('match',member_of=GST_FILE1.hits[0].id),Q('match',member_of=GST_PAGE1.hits[0].id) ],
 					must_not=[Q('match', attribute_set__educationaluse ='ebooks')])
-				elif strconcat.count('match') == 3:
+				elif strconcat.count('match') == 31:
 					a,b,c=strconcat.split("$$",2)
 					a="".join(a)
 					b="".join(b)
@@ -782,7 +789,7 @@ def elib_paged_file_objects(request, group_id, filetype, page_no):
 										,eval(str(a)), eval(str(b)), eval(str(c))],
 					should=[Q('match',member_of=GST_FILE1.hits[0].id),Q('match',member_of=GST_PAGE1.hits[0].id) ],
 					must_not=[Q('match', attribute_set__educationaluse ='ebooks')])
-				elif strconcat.count('match') == 4:
+				elif strconcat.count('match') == 41:
 					a,b,c,d=strconcat.split("$$",3)
 					a="".join(a)
 					b="".join(b)
@@ -794,7 +801,7 @@ def elib_paged_file_objects(request, group_id, filetype, page_no):
 										,eval(str(a)), eval(str(b)), eval(str(c)), eval(str(d))],
 					should=[Q('match',member_of=GST_FILE1.hits[0].id),Q('match',member_of=GST_PAGE1.hits[0].id) ],
 					must_not=[Q('match', attribute_set__educationaluse ='ebooks')])
-				elif strconcat.count('match') == 5:
+				elif strconcat.count('match') == 51:
 					a,b,c,d,e=strconcat.split("$$",4)
 					a="".join(a)
 					b="".join(b)
