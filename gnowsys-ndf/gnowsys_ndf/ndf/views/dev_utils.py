@@ -311,7 +311,7 @@ def render_test_template(request,group_id='home', app_id=None, page_no=1):
 
 		collection_query = eval("Q('bool', must=[Q('match', group_set=str(group_id)), Q('match',access_policy='public'),Q('exists',field='collection_set'),"+strconcat1[:-1]+"],"
 							+ "should=[Q('match',member_of=GST_FILE1.hits[0].id),Q('match',member_of=GST_PAGE1.hits[0].id) ],"
-							+ "must_not=[Q('match', attribute_set__educationaluse ='ebooks')])")
+							+ "must_not=[Q('match', attribute_set__educationaluse ='ebooks')],minimum_should_match=1)")
 
 		q_images_count = eval("Q('bool', must=[Q('match', attribute_set__educationaluse='images'),"+strconcat1[:-1]+"])")
 		q_audios_count = eval("Q('bool', must=[Q('match', attribute_set__educationaluse='audios'),"+strconcat1[:-1]+"])")
@@ -575,11 +575,18 @@ def elib_paged_file_objects(request, group_id, filetype, page_no):
 		filters = get_filter_querydict(filters)
 
 		print filters
-		print "0000000000000000000000000000000000000000000"
 		query_dict = filters
 
 		selfilters = urllib.unquote(request.GET.get('selfilters', ''))
+		if "?selfilters" in selfilters:
+			temp_list = selfilters.split("?selfilters")
+			selfilters = temp_list[0]
+
+		print selfilters
+		print "111111122222222222222222222222222222222222222222222222"
+
 		if selfilters:
+			print "if block for selfilters"
 			selfilters = json.loads(selfilters)
 			query_dict = get_filter_querydict(selfilters)
 
@@ -697,13 +704,11 @@ def elib_paged_file_objects(request, group_id, filetype, page_no):
 		if filetype != "all":
 
 			filetype = str(filetype)
-
+			print filetype
+			print "///////////////////"
 			if filters:
 
-
-
-
-				q = eval("Q('bool', must=[Q('match', group_set=str(group_id)), Q('match',member_of=GST_FILE1.hits[0].id),Q('match', attribute_set__educationaluse =filetype),"+strconcat1[:-1]+"])")
+				q = eval("Q('bool', must=[Q('match', group_set=str(group_id)), Q('match',member_of=GST_FILE1.hits[0].id),Q('match', attribute_set__educationaluse=filetype),"+strconcat1[:-1]+"])")
 
 				collection_query = eval("Q('bool', must=[Q('match', group_set=str(group_id)),Q('match',access_policy='public'),Q('exists',field='collection_set'),Q('match', attribute_set__educationaluse =filetype),"+strconcat1[:-1]+"],"
 									+ "should=[Q('match',member_of=GST_FILE1.hits[0].id),Q('match',member_of=GST_PAGE1.hits[0].id) ],"
