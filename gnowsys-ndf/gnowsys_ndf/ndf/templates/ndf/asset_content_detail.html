@@ -3,76 +3,24 @@
 {% check_is_gstaff group_id request.user as is_gstaff %}
 {% get_download_filename node as download_filename %}
 {% get_group_object groupid as group_object %}
+{% get_file_obj node as file_obj %}
 <div class="row">
   <div class="medium 12 columns">
-      <div class="left small-3 columns">
-            <h3>{% trans "File name:" %}<a href="{% url 'read_file' group_name_tag node download_filename %}" download="{{ download_filename }}"> {{node.name}} <i class="fa fa-download" aria-hidden="true"></i></a></h3>
-            <h5>{% trans "Created By:" %}{{ node.user_details_dict.contributors|join:', ' }} </h5>
-            <!--alternate file listing -->
-           <div class="row">
-              {% get_relation_node node.pk  'has_alt_content' as alt_lang_rel_node %}
-                {% if alt_lang_rel_node %}
-                  <div class="asset_list">
-                  {% for each in  alt_lang_rel_node %} 
-                    <a href="{% url 'assetcontent_detail' group_id asset_obj.pk each.file_id %}" >
-                    <h5>{% trans "Alternate File:" %}{{each.file_name}}</h5>
-                    </a>
-                  {% endfor  %} 
-                  </div>
-                {% endif %} 
-            </div>
-            <div class="row">
-                 {% get_relation_value node.pk 'has_subtitle' as grel_sub %}
-                 {% for each in grel_sub.grel_node %}
-                  <div class="small-4 columns asset_list">
-                     
-                    <h5 style="margin-left:-10px;">{% trans "Subtitle:" %}{{each.name}} </h5>
-                  </div>
-                   <div class="small-5 columns right" >
-                    {% if node.created_by == request.user.id or is_gstaff %}
-                    <button type="button" data-sub-id = "{{each.pk}}" class="right orange-button-subtitle delete-subtitle" onclick="delete_rel_files('{{each.pk}}','has_subtitle')">{% trans "Delete subtitle" %}</button> <br>
-                    {% endif %}
-                   </div>
-                 {% endfor %}
-            </div>
-      
-            <div class="row">     
-                  {% get_relation_value node.pk 'has_transcript' as grel_trans %}
-                  {% if grel_trans.grel_node.pk %}
-                  {% if node.created_by == request.user.id or is_gstaff %}
-                  <div class="small-4 columns asset_list">
-                    <h5 style="margin-left:-10px;">{% trans "Transcript:" %}{{grel_trans.grel_node.name}}</h5>
-                  </div>
-                  <div class="small-5 columns right " >
-                     <button type="button"  class="right orange-button-subtitle delete-transcript" onclick="delete_rel_files('{{grel_trans.grel_node.pk}}','has_transcript')" >{% trans "Delete transcript" %}</button>
-                  </div> 
-                    {% endif %}
-                  <br>
+	    <div class="left small-12 medium-6 columns">
+	                <label>{% trans "File name:" %} <b> {{node.name}} </b>
+                  	                    
+	                    <!--<input type="text" placeholder="" name="resource_name" />-->
+	                </label>
+                    <label>{% trans "Created By:" %} <b> {{ node.user_details_dict.contributors|join:', ' }} </b>
+                      <!--<input type="text" placeholder="" name="resource_name" />-->
+                  </label>
+                  {% if file_obj.length %}
+                  <label>{% trans "File Size:" %} <b> {{file_obj.length|filesizeformat}} </b>
+                      <!--<input type="text" placeholder="" name="resource_name" />-->
+                  </label>
                   {% endif %}
-              </div>
-          {% if 'Page'  not in node.member_of_names_list %}
-            <div class="small-12 medium-6 columns">
-                {% if node.created_by == request.user.id or is_gstaff  %}
-                  <span data-dropdown="assetcontent-settings-drop" aria-controls="assetcontent-settings-drop" aria-expanded="false" class="orange-button" style="margin-left:-10px;">
-                     {% trans "Link/Add Related File" %}  <i class="fa fa-chevron-down"></i>
-                  </span>
-                  <ul id="assetcontent-settings-drop" class="f-dropdown" data-dropdown-content aria-hidden="true" tabindex="-1">
-                    <li><a onclick="load_file_upload_modal(1)">{% trans "Add Alternate File" %}</a> </li>
-                    {% if 'video' in node.if_file.mime_type or 'audio' in node.if_file.mime_type %}
-                      <li><a onclick="load_file_upload_modal(2)">{% trans "Add Transcript" %}</a></li>
-                    {%  endif %}
-                    {% if 'video' in node.if_file.mime_type %}
-                      <li><a onclick="load_file_upload_modal(3)">{% trans "Add Subtitle" %}</a></li>
-                    {%  endif %}
-                  </ul>
-                {%  endif %}
-            {% else %}
-              <a href="{% url 'edit_asset_page' group_id asset_obj.pk node.pk %}">{% trans "Edit" %}</a>
-            {% endif %}
-            </div>
-      </div>
-      <div class="small-9 columns">
-            <div  {% if 'Page' in node.member_of_names_list %} class="preview_asset_page" {% else %} class="preview_asset" style="text-align:center;"{% endif %} > 
+
+	      <div class="preview_asset"> 
            {% if title == "asset_content_detail" or title == "asset_gallery_detail" or title == "raw_material_detail"%}
 
             {% include "ndf/resource_view.html" with node=node %}

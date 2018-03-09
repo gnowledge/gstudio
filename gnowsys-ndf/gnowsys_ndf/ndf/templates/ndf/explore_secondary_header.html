@@ -4,11 +4,8 @@
 {% user_groups request.user.is_superuser request.user.id as user_grp_count %}
 {% get_gstudio_workspace_instance as is_workspace_instance %}
 {% if modules_is_cur %}
-{% rewind_cursor modules_cur as modules_cur %}
+	{% rewind_cursor all_modules as all_modules %}
 {% endif %}
-{% get_attribute_value group_id 'items_sort_list' as modules_sort_list %}
-{% cast_to_node modules_sort_list as modules_node_sort_list %}
-
 
 <nav class="top-bar-second" data-topbar role="navigation" id="top-bar-second">
 	<div class="small-12 medium-12 columns expore-type">
@@ -51,7 +48,7 @@
 							<div class="content">
 								<h4>{% trans "Workspace Display Ordering: " %}</h4>
 								<div>
-									{% include "ndf/widget_selector.html" with for='module_list' all_options=modules_cur selected_options=modules_node_sort_list oneline_element='true' %}
+									{% include "ndf/widget_selector.html" with for='module_list' all_options=all_modules selected_options=modules_node_sort_list oneline_element='true' %}
 								</div><br/>
 								<input type="button" id="save_module_order_list" class="right orange-button" value="{% trans 'SAVE' %}">
 							</div>

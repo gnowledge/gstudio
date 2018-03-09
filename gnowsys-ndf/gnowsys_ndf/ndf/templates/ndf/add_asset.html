@@ -80,6 +80,14 @@
                 <a href="{% url 'create_edit_asset_page' group_id asset_obj.pk %}"><button type="button" class="orange-button" ><i class="fi-plus"></i> {% trans "Add  page" %}</button></a>
             {% endif %}
 
+            {% if asset_content_list.grel_id and asset_obj.created_by == request.user.id  or is_gstaff and asset_obj and asset_content_list.grel_id  %}
+            
+                <button type="button" class="orange-button delete-asset-content right"  title="Click on the checkbox on the files below to Delete"><i class="fa fa-trash"></i> {% trans "Delete Files" %}</button>
+            {% endif %}
+            </div>
+   </div>
+
+
             <div class="small-3 columns page-name">
             {% include 'ndf/rating.html' with node=asset_obj %}
             </div>
@@ -269,11 +277,6 @@
 
 
         <div class="row">
-            {% if asset_content_list.grel_id and asset_obj.created_by == request.user.id  or is_gstaff and asset_obj and asset_content_list.grel_id  %}
-            <div class="row">
-                <button type="button" class="orange-button delete-asset-content right icon-widget" style="margin-right: 100px;display:none" title="Click on the checkbox on the files below to Delete"><i class="fa fa-trash"></i> {% trans "Delete Files" %}</button>
-            </div>
-            {% endif %}
 
         <div class="row listing-row" style="margin-left:10px;">
             {% for each in asset_content_list.grel_node %}
