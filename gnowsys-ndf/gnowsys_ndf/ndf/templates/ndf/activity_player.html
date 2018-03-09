@@ -171,7 +171,7 @@
 
                 
                 {% if player_discussion or node_discussion %}
-                <a class="discuss right"> {% if not thr_int_type %} {{disc_label}} {% else %} {{thr_int_type}} {% endif %} </a>
+                <a class="discuss right"> {% if not thr_int_type %} <i class="fa fa-comments"></i> {{disc_label}} {% else %} <i class="fa fa-comments"></i> {{thr_int_type}} {% endif %} </a>
                 {% endif %}
                 {% comment %}
                 <a class="translate right"> Translate</a>
