@@ -4702,30 +4702,39 @@ $unit-card-lines-to-show: 3;
         padding: 5px 0px;
         height: 40%;
          //enroll-button 
-        .unit-card-enrol{
-            background: #a2238d;
-            height: 37px;
-            text-align: center;
-            color: #ffffff;
-            font-size: 19px;
-            border: 2px solid rgba(43, 51, 63, 0.42);
-            border-radius: 5px;
-            width: 120px !important;
-            margin-top: 2px !important;
-            letter-spacing: 0.4px;
-            &:hover {
-                box-shadow: 0px 0px 17px rgba(0, 0, 0, 0.68);
+        div {
+            .unit-card-enrol{
+                background: #a2238d;
+                height: 37px;
+                text-align: center;
+                color: #ffffff;
+                font-size: 19px;
+                border: 2px solid rgba(43, 51, 63, 0.42);
+                border-radius: 5px;
+                width: 120px !important;
+                margin-top: 2px !important;
+                letter-spacing: 0.4px;
+                &:hover{
+                    background-color: #fff;
+                    color: #912a7d;
+                    font-weight: 600;
+                }
             }
         }
-
     }
 }
+
 .unit-card-analytics{
     color: #a2238d;
     font-weight: 500;
     font-size: 14px;
     letter-spacing: 0.3px;
     border-bottom: 2px solid #a2238d;
+    &:hover{
+        background-color: #fff;
+        color: #912a7d;
+    }
+
 }
 
 .unit-card-analytics-points{
@@ -6683,4 +6692,9 @@ input.transcript-toggler{
     padding: 0px 7px 0px 7px;
     margin-top: 10px;
     text-align: right;
+    &:hover{
+        background-color: #fff;
+        color: #912a7d;
+    }
+
 }
