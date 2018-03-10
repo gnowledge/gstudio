@@ -8,61 +8,39 @@
 
 <style type="text/css">
 
-.unit_actions {
-    border-top: 1px solid black;
-    padding: 5px 0px;
-}
-
-}
-.unit-title-container{
-   height: 90px;
-   margin-top: 4px;
-}
-
 </style>
-
-<div class="unit_card-{{node.pk}}" style="position: relative; {% if not no_enroll and not is_gstaff and request.user.is_authenticated %}height:290px;{% else %}height:278px;{% endif %}">
+<div class="unit_card-{{node.pk}}" style="position: relative; {% if is_desk or is_gstaff  %}height:305px; {% else %} height:290px;{% endif %}">
 
     {% if not no_url and not prevent_click %}
-    {% if first_arg and second_arg and third_arg %}
-    <a href="{% url url_name first_arg second_arg third_arg %}{{search_url_text|safe}}"/>
-    {% elif first_arg and second_arg %}
-    <a href="{% url url_name first_arg second_arg %}{{search_url_text|safe}}"/>
-    {% elif first_arg %}
-    <a href='{% url url_name first_arg %}{{search_url_text|safe}}'/>
-    {% endif %}
+        {% if first_arg and second_arg and third_arg %}
+            <a href="{% url url_name first_arg second_arg third_arg %}{{search_url_text|safe}}">
+        {% elif first_arg and second_arg %}
+            <a href="{% url url_name first_arg second_arg %}{{search_url_text|safe}}">
+        {% elif first_arg %}
+            <a href='{% url url_name first_arg %}{{search_url_text|safe}}'>
+        {% endif %}
     {% endif %}
 
-    {% if is_performance %}
-    <div class="img-banner-card unit_header" style="height: 131px;position: relative;">
-    {% elif is_module_detail%}
-    <div class="mid-img-banner-card unit_header" style="height: 104px;position: relative;">
-    {% else %}
-    <div class="high-img-banner-card unit_header" style="height: 106px;position: relative;">
-        {% endif %}
+    <div class="unit_header" >
         {% if "announced_unit" in node.member_of_names_list %}
-        {% get_relation_value node.pk 'has_banner_pic' as grel_dict %}
-        {% if not grel_dict.cursor and grel_dict.grel_node and grel_dict.grel_node.if_file.mid.relurl %}
-        <img class="unit_banner" src="{{MEDIA_URL}}{{grel_dict.grel_node.if_file.mid.relurl}}" alt=""  />
-        {% else %}
-        <img class="unit_banner" src="/static/ndf/images/module_banner.png" />
-        {% endif %}
+            {% get_relation_value node.pk 'has_banner_pic' as grel_dict %}
+            {% if not grel_dict.cursor and grel_dict.grel_node and grel_dict.grel_node.if_file.mid.relurl %}
+                <img class="unit_banner" src="{{MEDIA_URL}}{{grel_dict.grel_node.if_file.mid.relurl}}" alt=""  />
+            {% else %}
+                <img class="unit_banner" src="/static/ndf/images/module_banner.png" />
+            {% endif %}
         {% elif "Group" in node.member_of_names_list %}
-        {% get_relation_value node.pk 'has_profile_pic' as grel_dict %}
-        {% if not grel_dict.cursor and grel_dict.grel_node and grel_dict.grel_node.if_file.mid.relurl %}
-        <img src="{{MEDIA_URL}}{{grel_dict.grel_node.if_file.mid.relurl}}" alt=""  />
+            {% get_relation_value node.pk 'has_profile_pic' as grel_dict %}
+            {% if not grel_dict.cursor and grel_dict.grel_node and grel_dict.grel_node.if_file.mid.relurl %}
+                <img src="{{MEDIA_URL}}{{grel_dict.grel_node.if_file.mid.relurl}}" alt="" class="unit_banner" />
+            {% else %}
+                <img class="unit_banner" src="/static/ndf/images/module_banner.png" />
+            {% endif %}
         {% else %}
-        <img class="unit_banner" src="/static/ndf/images/module_banner.png" />
-        {% endif %}
-        {% else %}
-        <img class="unit_banner" src="/static/ndf/images/module_banner.png" />
+            <img class="unit_banner" src="/static/ndf/images/module_banner.png" />
         {% endif %}
     </div>
-    {% if is_performance%}
-    <div class="unit-title-container" style="height:151px;">
-    {% else %}
     <div class="unit-title-container">
-    {% endif %}
         {% if node.altnames %}
         <div class="unit_title" title="{{node.altnames}}">{{node.altnames|truncatechars:45}}</div>
         {% else %}
@@ -73,32 +51,33 @@
     <div class="unit_actions">
         {% if group_counts %} 
         <div class="row">
-            <div class="small-8 columns" style="margin-top:16px;">
-
-                <span>Points :<a class="unit-card-analytics-points">  {{get_unit_points}} </a></span>
+            <div class="small-8 columns" style="font-size:15px; padding: 0px;">
+                Points :<a class="unit-card-analytics-points">  {{get_unit_points}} </a>
             </div>
             <div class="small-4 columns">
-                <a href="#" class="view-progress-report right" onclick="show_my_performance($(this))" data-node-id = "{{node.pk}}" class="unit-card-analytics" >View </a>
+                <a href="#" class="view-progress-report unit-card-analytics right" onclick="show_my_performance($(this))" data-node-id = "{{node.pk}}" >View </a>
             </div>
         </div>
         {% else %} 
         {% if "base_unit" not in node.member_of_names_list %}
-        <div class="left">
-            <i style="font-size:15px; color: black" class="fi-list-thumbnails"></i> 
-            <div style="font-size:15px; color: black" class="inner" value="{{node.collection_set|length}}">{{node.collection_set|length}} Lesson{{node.collection_set|pluralize}}</div>
-            <br/>
-            <i style="font-size:15px; color: black" class="fi-torsos" title="Member{{node.author_set|length|pluralize }}"></i>
-            <div style="font-size:15px; color: black" class="inner" value="{{node.author_set|length}}">{{node.author_set|length}} Student{{node.author_set|pluralize}}</div>
+        <div class="row">
+            <div class="small-6 columns" style="padding: 0px;">
+                <i style="font-size:15px; color: black" class="fi-list-thumbnails"></i> 
+                <div style="font-size:15px; color: black" class="inner" value="{{node.collection_set|length}}">{{node.collection_set|length}} Lesson{{node.collection_set|pluralize}}</div>
+                <br/>
+                <i style="font-size:15px; color: black" class="fi-torsos" title="Member{{node.author_set|length|pluralize }}"></i>
+                <div style="font-size:15px; color: black" class="inner" value="{{node.author_set|length}}">{{node.author_set|length}} Student{{node.author_set|pluralize}}</div>
+            </div>
+            <div class="small-6 columns" style="padding: 0px;">
+                {% if not no_enroll and not is_gstaff %}
+                {% if request.user.is_authenticated %}
+                {% include 'ndf/widget_enroll.html' %}
+                {% endif %}
+                {% endif %}
+            </div> 
         </div>
-        <div class="right">
-            {% if not no_enroll and not is_gstaff %}
-            {% if request.user.is_authenticated %}
-            {% include 'ndf/widget_enroll.html' %}
-            {% endif %}
-            {% endif %}
-        </div> 
         {% endif %}
         {% endif %}
     </div>
-
+    </a>
     </div>
