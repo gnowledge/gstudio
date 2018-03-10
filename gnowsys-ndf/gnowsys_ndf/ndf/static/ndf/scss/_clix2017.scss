@@ -4617,8 +4617,6 @@ ul.nav_menu_1 {
 }
 
 
-
-
 /**
  * Sass styles related to unit cards
  */
@@ -4627,7 +4625,7 @@ $unit-card-line-height: 1.4;
 $unit-card-lines-to-show: 3;
 
 [class*="unit_card-"]{
-    width: 71%;
+    width: 235px !important;
     // height: 300px; commented as info of number of lesson and etc was not passed currently
     color: #000;
     padding: 15px;
@@ -4653,12 +4651,15 @@ $unit-card-lines-to-show: 3;
         border-radius: 3px;
         letter-spacing: 0.6px;
     }
-    div >.unit_banner{
-        height: 85%;
+    .unit_header{
+    height: 120px !important;
+    .unit_banner{
+        height: 105px !important;
         border-radius: 4px;
     }
-    .unit-title-container{
-        height: 90px;
+    }
+    .unit-title-container {
+        height: 100px !important;
         .unit_title {
             display: table-cell;
             font-size: 17px;
@@ -4666,7 +4667,7 @@ $unit-card-lines-to-show: 3;
             font-weight: 500;
             letter-spacing: 0.6px;
             margin: 0px 0px 12px;
-            width: 200px;
+            //width: 200px;
             overflow: hidden;
             //white-space: nowrap;
             text-overflow: ellipsis;
@@ -4700,7 +4701,8 @@ $unit-card-lines-to-show: 3;
         //border-top : 1px solid #ccc;
         //margin: 20px 0px 0px;
         padding: 5px 0px;
-        height: 40%;
+        border-top: 1px solid black;
+        height: 40px;
          //enroll-button 
         div {
             .unit-card-enrol{
@@ -4711,8 +4713,9 @@ $unit-card-lines-to-show: 3;
                 font-size: 19px;
                 border: 2px solid rgba(43, 51, 63, 0.42);
                 border-radius: 5px;
-                width: 120px !important;
+                width: 86px !important;
                 margin-top: 2px !important;
+                margin-left: 14px !important;
                 letter-spacing: 0.4px;
                 &:hover{
                     background-color: #fff;
@@ -4724,23 +4727,11 @@ $unit-card-lines-to-show: 3;
     }
 }
 
-.unit-card-analytics{
-    color: #a2238d;
-    font-weight: 500;
-    font-size: 14px;
-    letter-spacing: 0.3px;
-    border-bottom: 2px solid #a2238d;
-    &:hover{
-        background-color: #fff;
-        color: #912a7d;
-    }
-
-}
 
 .unit-card-analytics-points{
     background: #ffffff;
     color: #a2238d;
-    font-size: 15px;
+    font-size: 16px;
     border-radius: 20px;
     letter-spacing: 0.4px;
     padding: 2px 3px 3px 1px;
@@ -5551,7 +5542,7 @@ ul.authoring-tab{
 
 .lms_explore_back_unit{
     background-color: #fff;
-    margin-top: 10.5%;
+    //margin-top: 10.5%;
     margin-left: 30px; 
 }
 
@@ -6675,11 +6666,11 @@ input.transcript-toggler{
 }
 
 .view-progress-report {
-    height: 2rem;
+    //height: 2rem;
     /* padding: 0 2rem; */
     background: none;
     font-family: open_sansbold,sans-serif;
-    font-size: 1.2rem;
+    font-size: 1rem;
     text-transform: uppercase;
     cursor: pointer;
     border-radius: 3px;
@@ -6690,8 +6681,10 @@ input.transcript-toggler{
     color: #fff;
     transition: all .1s ease;
     padding: 0px 7px 0px 7px;
-    margin-top: 10px;
+    //margin-top: 10px;
     text-align: right;
+    width: 62px;
+    margin-right: -15px;
     &:hover{
         background-color: #fff;
         color: #912a7d;
