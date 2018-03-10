@@ -57,7 +57,7 @@
           <h3> My Workspace</h3>
           <ul class="small-block-grid-1 medium-block-grid-3 large-block-grid-3">
             <li class="card-image-wrapper">
-              {% include "ndf/card_group.html" with node=node url_name="course_about" first_arg=node.pk no_enroll=True is_performance=True %}
+              {% include "ndf/card_group.html" with node=node url_name="course_about" first_arg=node.pk no_enroll=True  %}
             </li>
           </ul>
         </div>
@@ -70,7 +70,7 @@
           <ul class="small-block-grid-1 medium-block-grid-3 large-block-grid-4">
             {% for each_obj in units_cur %}
             <li class="card-image-wrapper">
-              {% include "ndf/card_group.html" with node=each_obj url_name="groupchange" first_arg=each_obj.pk no_enroll=True is_desk=True %}
+              {% include "ndf/card_group.html" with node=each_obj url_name="groupchange" first_arg=each_obj.pk no_enroll=True %}
             </li>
             {% empty %}
             <section class="empty-dashboard-message">
@@ -92,7 +92,7 @@
       <ul class="small-block-grid-1 medium-block-grid-3 large-block-grid-4">
         {% for each_obj in units_cur %}
         <li class="card-image-wrapper">
-          {% include "ndf/card_group.html" with group_counts=True node=each_obj no_url=True first_arg=each_obj.pk is_performance=True %}
+          {% include "ndf/card_group.html" with group_counts=True node=each_obj no_url=True first_arg=each_obj.pk  %}
         </li>
         {% empty %}
         <section class="empty-dashboard-message">
