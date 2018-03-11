@@ -19,7 +19,7 @@ from gnowsys_ndf.ndf.models import node_collection,triple_collection
 
 from gnowsys_ndf.ndf.views.group import CreateGroup
 from gnowsys_ndf.ndf.views.translation import get_lang_node,get_unit_hierarchy
-from gnowsys_ndf.ndf.views.methods import get_execution_time, staff_required, create_gattribute,get_language_tuple,create_grelation
+from gnowsys_ndf.ndf.views.methods import get_execution_time, staff_required, create_gattribute,get_language_tuple,create_grelation, update_unit_in_modules
 from gnowsys_ndf.ndf.views.ajax_views import get_collection
 
 gst_base_unit_name, gst_base_unit_id = GSystemType.get_gst_name_id('base_unit')
@@ -97,41 +97,11 @@ def unit_create_edit(request, group_id, unit_group_id=None):
         if educationalsubject_val and "choose" not in educationalsubject_val.lower():
             educationalsubject_at = node_collection.one({'_type': 'AttributeType', 'name': "educationalsubject"})
             create_gattribute(unit_node._id, educationalsubject_at, educationalsubject_val)
+
         # modules
         module_val = request.POST.getlist('module', [])
-        # get all modules which are parent's of this unit/group
-        parent_modules = node_collection.find({
-                '_type': 'GSystem',
-                'member_of': gst_module_id,
-                'collection_set': {'$in': [unit_id]}
-            })
-        # check for any mismatch in parent_modules and module_val
-        if parent_modules or module_val:
-            # import ipdb; ipdb.set_trace()
-            module_oid_list = [ObjectId(m) for m in module_val if m]
-            parent_modules_oid_list = [o._id for o in parent_modules]
-
-            # summing all ids to iterate over
-            oids_set = set(module_oid_list + parent_modules_oid_list)
-
-            for each_oid in oids_set:
-                if each_oid not in module_oid_list:
-                    # it is an old module existed with curent unit.
-                    # remove current node's id from it's collection_set
-                    # existing deletion
-                    each_node_obj = Node.get_node_by_id(each_oid)
-                    each_node_obj_cs = each_node_obj.collection_set
-                    each_node_obj_cs.pop(each_node_obj_cs.index(unit_id))
-                    each_node_obj.collection_set = each_node_obj_cs
-                    each_node_obj.save(group_id=group_id)
-                elif each_oid not in parent_modules_oid_list:
-                    # if this id does not exists with existing parent's id list
-                    # then add current node_id in collection_set of each_oid.
-                    # new addition
-                    each_node_obj = Node.get_node_by_id(each_oid)
-                    if unit_id not in each_node_obj.collection_set:
-                        each_node_obj.collection_set.append(unit_id)
-                        each_node_obj.save(group_id=group_id)
+        if module_val:
+            update_unit_in_modules(module_val, unit_id)
 
         if not success_flag:
             return HttpResponseRedirect(reverse('list_units', kwargs={'group_id': parent_group_id, 'groupid': parent_group_id,}))
