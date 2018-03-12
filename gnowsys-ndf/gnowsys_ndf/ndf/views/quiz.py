@@ -66,8 +66,8 @@ def quiz(request, group_id):
 
     if "CourseEventGroup" in group_obj.member_of_names_list or "announced_unit" in group_obj.member_of_names_list:
         # gst_quiz_item_ids = [gst_quiz_item_event._id]
-        if not quiz_item_nodes.count():
-            quiz_item_nodes = node_collection.find({'member_of': gst_quiz_item_event._id,
+        # if not quiz_item_nodes.count():
+        quiz_item_nodes = node_collection.find({'member_of': {'$in': [gst_quiz_item_event._id, gst_quiz_item._id]},
              'group_set': ObjectId(group_id)}).sort('last_update', -1)
     supported_languages = ['Hindi', 'Telugu']
 
