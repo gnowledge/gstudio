@@ -716,10 +716,10 @@ class Node(DjangoDocument):
             node_collection.collection.update({'_id':self._id}, {'$set': {'snapshot'+"."+str(kwargs['groupid']):rcsno }}, upsert=False, multi=True)
 
         ########################## ES ##################################
-
-        #es = esearch(fp)
-        #es.inject()
-        esearch.inject(fp)
+        if GSTUDIO_ELASTIC_SEARCH == True:
+            #es = esearch(fp)
+            #es.inject()
+            esearch.inject(fp)
 
 
     # User-Defined Functions

@@ -24,8 +24,6 @@ class esearch:
 			os.makedirs(GLITE_RCS_REPO_DIRNAME)
 		
         #fp = history_manager.get_file_path(self)
-        print fp
-        print "888888888888899999999999999999999999888888888888888888"
 
         rcs_obj = RCS()
         rcs_obj.checkout(fp, otherflags="-f")
