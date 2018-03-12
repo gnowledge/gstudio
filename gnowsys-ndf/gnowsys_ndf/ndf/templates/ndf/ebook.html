@@ -120,10 +120,19 @@ margin-top:5px;
 
 <a href="{% url 'e-book' group_name_tag %}" title="Click to go to ebooks">
     <div class="large-4 columns repository-title top-gap" >
-      {% if ebook_gst.altnames and ebook_gst.0.altnames != "None" %}
-        {{ebook_gst.altnames}}
+
+      {% if GSTUDIO_ELASTIC_SEARCH %}
+        {% if ebook_gst.altnames and ebook_gst.altnames != "None" %}
+          {{ebook_gst.altnames}}
+        {% else %}
+          {{ebook_gst.name}}
+        {% endif%}
       {% else %}
-        {{ebook_gst.name}}
+        {% if ebook_gst.altnames and ebook_gst.0.altnames != "None" %}
+          {{ebook_gst.altnames}}
+        {% else %}
+          {{ebook_gst.name}}
+        {% endif%}
       {% endif%}
     </div>
   </a>

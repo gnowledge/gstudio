@@ -22,12 +22,11 @@ from elasticsearch import Elasticsearch
 from elasticsearch_dsl import *
 from gnowsys_ndf.ndf.paginator import Paginator ,EmptyPage, PageNotAnInteger
 from gnowsys_ndf.local_settings import GSTUDIO_ELASTIC_SEARCH
-
-# GST_IMAGE = node_collection.one({'_type':'GSystemType', 'name': u"Image"})
-
-es = Elasticsearch("http://elastic:changeme@gsearch:9200", timeout=100, retry_on_timeout=True)
+from gnowsys_ndf.ndf.models.es import *
 
 #ebook_gst = node_collection.one({'_type':'GSystemType', 'name': u"E-Book"})
+
+
 #GST_FILE = node_collection.one({'_type':'GSystemType', 'name': u"File"})
 #GST_PAGE = node_collection.one({'_type':'GSystemType', 'name': u'Page'})
 
@@ -36,19 +35,17 @@ es = Elasticsearch("http://elastic:changeme@gsearch:9200", timeout=100, retry_on
 
 q = Q('bool', must=[Q('match', name='e-book')])
 ebook_gst =Search(using=es, index="nodes",doc_type="gsystemtype").query(q)
-#print ebook_gst
+ebook_gst = ebook_gst.execute()
+
+for temp in ebook_gst:
+	ebook_gst = temp
+	break;
 
 q = Q('bool', must=[Q('match', name='file')])
 GST_FILE =Search(using=es, index="nodes",doc_type="gsystemtype").query(q)
 
 q = Q('bool', must=[Q('match', name='page')])
 GST_PAGE =Search(using=es, index="nodes",doc_type="gsystemtype").query(q)
-
-#GST_FILE =   es.search(index="nodes", doc_type="gsystemtype", body={
-#                        "query": {"bool": {"must": [{"term": {"name":"file"}}]}}})
-#GST_PAGE =  es.search(index="nodes", doc_type="gsystemtype", body={
-#                        "query": {"bool": {"must": [{"term": {"name":"page" }}]}}})
-
 
 #print GST_FILE
 @get_execution_time
@@ -90,34 +87,10 @@ def ebook_listing(request, group_id, page_no=1):
 	for a in GST_PAGE:
 		GST_PAGE_ID = a.id
 
-	
-	#ebook_gst1 = [doc['_source'] for doc in ebook_gst['hits']['hits']]
-
-	print GST_PAGE_ID
-	print "----------------------------------------================================================"
-	#print ebook_gst1
-	#all_ebooks1=es.search(index="nodes", doc_type="metatype,gsystemtype,gsystem", body={
-    #                    "query": {"bool": {"filter":{ "terms":{ "member_of": temp  }} }}})
-
-	#all_ebooks1 =es.search(index="gsystem", doc_type="application", body={
-    #                    "query":   {"bool": { "must":  [ {"term":  {"group_set": str(ObjectId(group_id))}  },{"term": {"access_policy": "public"}}],
-    # 										 "must":  [ {"term":  {"attribute_set.educationaluse": "ebooks" } } ],
-    # 										 "must":  [ {"terms":  {"member_of": GST_FILE_temp } } ],
-    # 										 "must":  [ {"terms":  {"member_of": GST_PAGE_temp } } ],
-    # 										 "must":[  {"term": {'access_policy':'public'}} ]
-
-     										 #"must":  [ {"term":  {'created_by': request.user.id}}],
-
-    # } }} ,size=24)
-
-
 	all_ebooks1 = Q('bool', must=[Q('match', group_set=str(group_id)), Q('match',access_policy='public'),Q('match', attribute_set__educationaluse ='ebooks')]
 					,should=[Q('match',member_of=GST_FILE_ID),Q('match',member_of=GST_PAGE_ID) ])
 	all_ebooks =Search(using=es, index="nodes",doc_type="gsystemtype,gsystem,metatype,relationtype,attribute_type,group,author").query(all_ebooks1)
 
-
-
-	print all_ebooks.count()
 
 	#all_ebooks = node_collection.find({
 	#							'member_of': {'$in': temp },
@@ -174,9 +147,11 @@ def ebook_listing(request, group_id, page_no=1):
 	except EmptyPage:
 		results = paginator.page(paginator.num_pages)
 
+#	print ebook_gst.hits[0].id
+
 	return render_to_response("ndf/ebook.html", {
 								"all_ebooks": all_ebooks, "ebook_gst": ebook_gst,
 								"page_info": results, "title": "eBooks",
 								"group_id": group_id, "groupid": group_id,"all_ebooks1_count":all_ebooks.count(),
-								"GSTUDIO_ELASTIC_SEARCH":GSTUDIO_ELASTIC_SEARCH
+								"GSTUDIO_ELASTIC_SEARCH":GSTUDIO_ELASTIC_SEARCH,
 								}, context_instance = RequestContext(request))
