@@ -619,9 +619,9 @@ h5{
                     
 
                     &:hover{
-                        color: #6f0859;
+                        color: #FFFFFF;
                         border-left: 4px solid $secondary-orange;
-                        background: #FFFFFF;
+                        background: #6f0859;
                     }
                 }
 
@@ -3771,10 +3771,11 @@ body {
 */
 $ah_2_icon_color: $primary-pink;
 $ah_2_background_color: #ffffff;
-$ah_2_background_color_hover: rgba(244, 244, 244, 0.3);;
+$ah_2_background_color_hover: rgba(244, 244, 244, 0.3);
 .activity_player_header {
     background-color: $ah_2_background_color;
     box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.1);
+
     >div {
 
         height: $activity-header-height;
@@ -3796,7 +3797,7 @@ $ah_2_background_color_hover: rgba(244, 244, 244, 0.3);;
         position: relative;
         color: #6f0859;
         font-weight: 500;
-        font-size: 16px;
+        font-size: 21px;
         letter-spacing: 0.6px;
         padding: 0px 15px;
         //margin-left: -2px;
@@ -3882,6 +3883,10 @@ $ah_2_background_color_hover: rgba(244, 244, 244, 0.3);;
         font-size: 16px;
         line-height: $activity-header-height;
         color: $ah_2_icon_color;
+        &:hover{
+            background-color:$ah_2_icon_color;
+            color:#ffffff;
+        }
     }
 
     .header_icon_block {
@@ -3889,11 +3894,19 @@ $ah_2_background_color_hover: rgba(244, 244, 244, 0.3);;
         width: $activity-header-icon-block-width;
         cursor: pointer;
         text-align: center;
+        &:hover{
+            background-color:$ah_2_icon_color;
+            color:#ffffff;
+        }
     }
     .header_text_sm_block{
         padding: 0px 10px;
         @media screen and (min-width: 1025px) {
             padding: 0px 15px;
+        }
+        &:hover{
+            background-color:$ah_2_icon_color;
+            color:#ffffff;
         }
     }
 
@@ -3925,6 +3938,15 @@ $ah_2_background_color_hover: rgba(244, 244, 244, 0.3);;
 
             a {
                 color: $ah_2_icon_color;
+                &:hover{
+                    background-color:$ah_2_icon_color;
+                    color:#ffffff;
+                }
+            }
+
+            &:hover{
+                background-color:$ah_2_icon_color;
+                color:#ffffff;
             }
 
 
