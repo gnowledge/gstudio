@@ -87,11 +87,14 @@ def ebook_listing(request, group_id, page_no=1):
 	for a in GST_PAGE:
 		GST_PAGE_ID = a.id
 
-	all_ebooks1 = Q('bool', must=[Q('match', group_set=str(group_id)), Q('match',access_policy='public'),Q('match', attribute_set__educationaluse ='ebooks')]
-					,should=[Q('match',member_of=GST_FILE_ID),Q('match',member_of=GST_PAGE_ID) ])
-	all_ebooks =Search(using=es, index="nodes",doc_type="gsystemtype,gsystem,metatype,relationtype,attribute_type,group,author").query(all_ebooks1)
+	if selfilters:
+		print "sel filtrers"
+	else:
+		all_ebooks1 = Q('bool', must=[Q('match', group_set=str(group_id)), Q('match',access_policy='public'),Q('match', attribute_set__educationaluse ='ebooks'),Q('exists',field='collection_set')]
+					,should=[Q('match',member_of=GST_FILE_ID),Q('match',member_of=GST_PAGE_ID) ],minimum_should_match=1)
+		all_ebooks =Search(using=es, index="nodes",doc_type="gsystemtype,gsystem,metatype,relationtype,attribute_type,group,author").query(all_ebooks1)
 
-
+	print all_ebooks.count()
 	#all_ebooks = node_collection.find({
 	#							'member_of': {'$in': temp },
 	#							'member_of': {'$in': [GST_FILE._id, GST_PAGE._id]},
