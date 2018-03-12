@@ -58,14 +58,16 @@
             </div>
         </div>
         {% else %} 
-        {% if "base_unit" not in node.member_of_names_list %}
         <div class="row">
             <div class="small-6 columns" style="padding: 0px;">
                 <i style="font-size:15px; color: black" class="fi-list-thumbnails"></i> 
                 <div style="font-size:15px; color: black" class="inner" value="{{node.collection_set|length}}">{{node.collection_set|length}} Lesson{{node.collection_set|pluralize}}</div>
+
                 <br/>
-                <i style="font-size:15px; color: black" class="fi-torsos" title="Member{{node.author_set|length|pluralize }}"></i>
+
+                <i style="font-size:15px; color: black" class="fi-torsos"></i>
                 <div style="font-size:15px; color: black" class="inner" value="{{node.author_set|length}}">{{node.author_set|length}} Student{{node.author_set|pluralize}}</div>
+
             </div>
             <div class="small-6 columns" style="padding: 0px;">
                 {% if not no_enroll and not is_gstaff %}
@@ -75,7 +77,6 @@
                 {% endif %}
             </div> 
         </div>
-        {% endif %}
         {% endif %}
     </div>
     </a>
