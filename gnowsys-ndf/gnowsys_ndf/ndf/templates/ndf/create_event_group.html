@@ -98,6 +98,25 @@ this template is modified. So for the fields in the template it supports -
     </div>
 
     <br/>
+    <!-- Module Link -->
+    <div class="row">
+      <div class="small-12 medium-12 medium-centered columns">
+        <div class="row">
+          <div class="small-4 columns">
+            <label for="right-label" class="inline">{% trans "Select Module" %}</label>
+          </div>
+          <div class="small-8 columns">
+               <select name="module" multiple style="height:46px;">
+                  <option value="">{% trans "Choose Module" %}</option>
+                  {% for opts in modules %}
+                      <option value="{{opts.pk}}" {% if opts.pk in module_val_list %} selected {% endif %}>{{opts.name}}</option>
+                  {% endfor %}
+              </select>
+            </div>
+          </div>
+      </div>
+    </div>
+
 
     <!-- group_type -->
     <div class="row">
