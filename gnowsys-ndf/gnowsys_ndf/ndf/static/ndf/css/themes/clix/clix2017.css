@@ -5023,7 +5023,7 @@ ul.authoring-tab > li {
 /* line 5329, ../../../scss/_clix2017.scss */
 ul.authoring-tab > li > a {
   list-style-type: none;
-  margin-right: -4px;
+  margin-right: -5px;
   background-color: #6f0859;
   padding: 12px 12px 9px;
   cursor: pointer;
