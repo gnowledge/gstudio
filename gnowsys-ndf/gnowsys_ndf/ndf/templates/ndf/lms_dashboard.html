@@ -67,6 +67,8 @@
 
 <div class="small-12 columns group_sections_content">
     {% if title == "my desk" %}
+        {% get_agency_type_of_group node.pk as agency_type %}
+        {% if agency_type != "Student" %}
         <div class="row" style=" margin-left: 10px !important ">
           <h3> My Workspace</h3>
             <ul class="small-block-grid-1 medium-block-grid-3 large-block-grid-3">
@@ -75,6 +77,7 @@
               </li>
             </ul>
         </div>
+        {% endif %}
         <hr/>
         <div class="row" style=" margin-left: 10px !important ">
           <h3 >Joined Workspaces & Enrolled Courses </h3>
