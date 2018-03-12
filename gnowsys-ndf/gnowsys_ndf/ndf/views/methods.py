@@ -5795,3 +5795,40 @@ def update_total_assessment_items(group_id, assessment_list, domain):
         print "\nError Occurred in update_total_assessment_items() {0}".format(
             update_total_assessment_items_err)
         return questionCount_val
+
+@get_execution_time
+def update_unit_in_modules(module_val, unit_id):
+    gst_module_name, gst_module_id = GSystemType.get_gst_name_id('Module')
+    # get all modules which are parent's of this unit/group
+    parent_modules = node_collection.find({
+            '_type': 'GSystem',
+            'member_of': gst_module_id,
+            'collection_set': {'$in': [unit_id]}
+        })
+    # check for any mismatch in parent_modules and module_val
+    if parent_modules or module_val:
+        # import ipdb; ipdb.set_trace()
+        module_oid_list = [ObjectId(m) for m in module_val if m]
+        parent_modules_oid_list = [o._id for o in parent_modules]
+
+        # summing all ids to iterate over
+        oids_set = set(module_oid_list + parent_modules_oid_list)
+
+        for each_oid in oids_set:
+            if each_oid not in module_oid_list:
+                # it is an old module existed with curent unit.
+                # remove current node's id from it's collection_set
+                # existing deletion
+                each_node_obj = Node.get_node_by_id(each_oid)
+                each_node_obj_cs = each_node_obj.collection_set
+                each_node_obj_cs.pop(each_node_obj_cs.index(unit_id))
+                each_node_obj.collection_set = each_node_obj_cs
+                each_node_obj.save(group_id=unit_id)
+            elif each_oid not in parent_modules_oid_list:
+                # if this id does not exists with existing parent's id list
+                # then add current node_id in collection_set of each_oid.
+                # new addition
+                each_node_obj = Node.get_node_by_id(each_oid)
+                if unit_id not in each_node_obj.collection_set:
+                    each_node_obj.collection_set.append(unit_id)
+                    each_node_obj.save(group_id=unit_id)

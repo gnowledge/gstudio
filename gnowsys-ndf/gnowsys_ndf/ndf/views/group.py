@@ -1625,8 +1625,17 @@ class EventGroupCreateEditHandler(View):
         nodes_list = []
         spl_group_type = sg_type
         logo_img_node = None
+        gst_module_name, gst_module_id = GSystemType.get_gst_name_id('Module')
+        modules = GSystem.query_list('home', 'Module', request.user.id)
         # spl_group_type = request.GET.get('sg_type','')
         # print "\n\n spl_group_type", spl_group_type
+        title = action + ' ' + spl_group_type
+        context_variables = {
+            'title': title, 'modules': modules,
+            'spl_group_type': spl_group_type,
+            'groupid': group_id, 'group_id': group_id,
+            'nodes_list': nodes_list
+          }
 
         if action == "edit":  # to edit existing group
 
@@ -1644,6 +1653,14 @@ class EventGroupCreateEditHandler(View):
                 logo_img_node = grel_dict.get("grel_node")
                 grel_id = grel_dict.get("grel_id")
 
+            # get all modules which are parent's of this unit/group
+            parent_modules = node_collection.find({
+                    '_type': 'GSystem',
+                    'member_of': gst_module_id,
+                    'collection_set': {'$in': [group_id]}
+                })
+            context_variables.update({'module_val_list': [str(pm._id) for pm in parent_modules],
+                'node': group_obj, 'logo_img_node':logo_img_node})
 
             # as group edit will not have provision to change name field.
             # there is no need to send nodes_list while group edit.
@@ -1655,21 +1672,11 @@ class EventGroupCreateEditHandler(View):
             # making list of group names (to check uniqueness of the group):
             nodes_list = [str(g_obj.name.strip().lower()) for g_obj in available_nodes]
 
-        title = action + ' ' + spl_group_type
+            context_variables.update({'nodes_list': nodes_list})
 
         # In the case of need, we can simply replace:
         # "ndf/create_group.html" with "ndf/edit_group.html"
-        return render_to_response("ndf/create_event_group.html",
-                                    {
-                                        'node': group_obj, 'title': title,
-                                        'nodes_list': nodes_list,
-                                        'spl_group_type': spl_group_type,
-                                        # 'course_node_id': course_node_id,
-                                        'groupid': group_id, 'group_id': group_id,
-                                        'logo_img_node':logo_img_node
-
-                                        # 'appId':app._id, # 'is_auth_node':is_auth_node
-                                      }, context_instance=RequestContext(request))
+        return render_to_response("ndf/create_event_group.html",RequestContext(request, context_variables))
     # --- END of get() ---
 
     @method_decorator(login_required)
@@ -1722,6 +1729,11 @@ class EventGroupCreateEditHandler(View):
                 if parent_group_obj.project_config:
                     group_obj.project_config = parent_group_obj.project_config
                 group_obj.save()
+                # modules
+                module_val = request.POST.getlist('module', [])
+                if module_val:
+                    update_unit_in_modules(module_val, group_obj._id)
+
                 if node_id:
                     return HttpResponseRedirect(reverse('groupchange',
                      kwargs={'group_id': group_name}))
@@ -2017,11 +2029,11 @@ def group(request, group_id, app_id=None, agency_type=None):
 @login_required
 @get_execution_time
 def populate_list_of_members():
-	members = User.objects.all()
-	memList = []
-	for mem in members:
-		memList.append(mem.username)
-	return memList
+    members = User.objects.all()
+    memList = []
+    for mem in members:
+        memList.append(mem.username)
+    return memList
 
 
 @login_required

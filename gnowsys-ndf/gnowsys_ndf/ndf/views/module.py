@@ -25,6 +25,7 @@ from gnowsys_ndf.ndf.templatetags.ndf_tags import check_is_gstaff
 gst_module_name, gst_module_id = GSystemType.get_gst_name_id('Module')
 gst_base_unit_name, gst_base_unit_id = GSystemType.get_gst_name_id('base_unit')
 gst_announced_unit_name, gst_announced_unit_id = GSystemType.get_gst_name_id('announced_unit')
+gst_ce_name, gst_ce_id = GSystemType.get_gst_name_id('CourseEventGroup')
 
 
 @get_execution_time
@@ -145,7 +146,7 @@ def module_detail(request, group_id, node_id,title=""):
     if title == "courses":
         module_detail_query.update({'$or': [
         {'$and': [
-            {'member_of': gst_announced_unit_id},
+            {'member_of': {'$in': [gst_announced_unit_id, gst_ce_id]}},
             {'$or': [
               {'created_by': request.user.id},
               {'group_admin': request.user.id},
@@ -157,7 +158,6 @@ def module_detail(request, group_id, node_id,title=""):
 
     
     if title == "drafts":
-        print "(((((((((((((((((((((((((("
         module_detail_query.update({'$or': [
         {'$and': [
             {'member_of': gst_base_unit_id},
