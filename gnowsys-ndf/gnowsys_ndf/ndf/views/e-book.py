@@ -60,6 +60,10 @@ def ebook_listing(request, group_id, page_no=1):
 
 	selfilters = urllib.unquote(request.GET.get('selfilters', ''))
 	# print "===\n", selfilters, "===\n"
+	if "?selfilters" in selfilters:
+		temp_list = selfilters.split("?selfilters")
+		selfilters = temp_list[0]
+
 	query_dict = [{}]
 	if selfilters:
 		selfilters = json.loads(selfilters)
@@ -75,6 +79,8 @@ def ebook_listing(request, group_id, page_no=1):
 	# 		'collection_set': {'$exists': "true", '$not': {'$size': 0} }
 	# 	})
 
+
+
 	#print GST_FILE._id
 	#GST_FILE_temp=[]
 	GST_FILE_ID=None
@@ -89,6 +95,75 @@ def ebook_listing(request, group_id, page_no=1):
 
 	if selfilters:
 		print "sel filtrers"
+
+		i=-1
+		strconcat=""
+		endstring=""
+		temp_dict={}
+		lists = []
+		#print query_dict
+
+		for each in list(query_dict):
+			for temp in each.values():
+				for a in temp:
+					for key,value in a.items():
+						if isinstance(value, dict): 
+							#print value["$in"][0]
+							if value["$in"]:
+								key = list(key)
+								key[13]='__'
+								t="".join(key)
+								print t
+								print "-----------------------------"
+								temp_dict[t]=value["$in"][0]
+								#strconcat=strconcat+"Q('match',"+ t+"='"+value["$in"][0]+"'),"
+								#Q('match',name=dict(query="e-book", type="phrase"))
+								#strconcat=strconcat+"Q('match',"+t+"=dict(query='"+value["$in"][0]+"',type='phrase'))$$"
+								lists.append("Q('match',"+t+"=dict(query='"+value["$in"][0]+"',type='phrase'))")
+							elif value["$or"]:
+								key = list(key)
+								key[13]='__'
+								t="".join(key)
+								print t
+								print "------------------------"
+								temp_dict[t]=value["$or"][0]
+								#strconcat=strconcat+"Q('match',"+t+"='"+value["$or"][0]+"') "
+								#strconcat=strconcat+"Q('match',"+t+"=dict(query='"+value["$or"][0]+"',type='phrase'))$$"
+								lists.append("Q('match',"+t+"=dict(query='"+value["$or"][0]+"',type='phrase'))")
+						elif isinstance(value, tuple):
+							temp_dict["language"]= value[1]	
+							#strconcat=strconcat+"Q('match',"+key+"='"+value[1]+"') "
+							strconcat=strconcat+"Q('match',"+key+"=dict(query='"+value[1]+"',type='phrase'))$$"
+							lists.append("Q('match',"+key+"=dict(query='"+value[1]+"',type='phrase'))")
+						else:
+							if key != "source":
+								key = list(key)
+								key[13]='__'
+								t="".join(key)
+								temp_dict[t]=value
+								#strconcat=strconcat+"Q('match',"+ t+"='"+value+"') "
+								#strconcat=strconcat+"Q('match',"+t+"=dict(query='"+value+"',type='phrase'))$$"
+								lists.append("Q('match',"+t+"=dict(query='"+value+"',type='phrase'))")	
+							else:
+								temp_dict[key]=value
+								#strconcat=strconcat+"Q('match',"+ key+"='"+value+"') "
+								#strconcat=strconcat+"Q('match',"+key+"=dict(query='"+value+"',type='phrase'))$$"	
+								lists.append("Q('match',"+key+"=dict(query='"+value+"',type='phrase'))")
+
+		print temp_dict
+		#strconcat=strconcat
+		print strconcat
+		print 
+		strconcat1 = ""
+		for value in lists:
+			print value
+			strconcat1 = strconcat1+'eval(str("'+ value +'")),'
+
+		all_ebooks1 = eval("Q('bool', must=[Q('match', group_set=str(group_id)), Q('match',access_policy='public'),Q('match', attribute_set__educationaluse ='ebooks'),Q('exists',field='collection_set'),"+strconcat1[:-1]+"],"
+					+"should=[Q('match',member_of=GST_FILE_ID),Q('match',member_of=GST_PAGE_ID) ],minimum_should_match=1)")
+		all_ebooks =Search(using=es, index="nodes",doc_type="gsystemtype,gsystem,metatype,relationtype,attribute_type,group,author").query(all_ebooks1)
+
+
 	else:
 		all_ebooks1 = Q('bool', must=[Q('match', group_set=str(group_id)), Q('match',access_policy='public'),Q('match', attribute_set__educationaluse ='ebooks'),Q('exists',field='collection_set')]
 					,should=[Q('match',member_of=GST_FILE_ID),Q('match',member_of=GST_PAGE_ID) ],minimum_should_match=1)
