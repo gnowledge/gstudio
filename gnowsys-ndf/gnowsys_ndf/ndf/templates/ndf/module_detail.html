@@ -65,11 +65,11 @@
 
 
 
-<ul class="small-block-grid-1 medium-block-grid-2 large-block-grid-4" >
+<ul class="small-block-grid-1 medium-block-grid-3 large-block-grid-4" style="margin-left: 3.3%">
 <!-- Existing card list-->
 	{% for each_node in units_under_module  %}
     <li class="card-image-wrapper" >
-		{% include 'ndf/card_group.html' with node=each_node  url_name='groupchange' first_arg=each_node.pk groupid=each_node.pk is_gstaff=is_gstaff %}	
+		{% include 'ndf/card_group.html' with node=each_node  url_name='groupchange' first_arg=each_node.pk groupid=each_node.pk is_gstaff=is_gstaff is_module_detail=True %}	
 	</li>
 	{% endfor %}
 </ul>

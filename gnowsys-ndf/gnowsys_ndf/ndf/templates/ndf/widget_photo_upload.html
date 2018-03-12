@@ -6,9 +6,10 @@
         <div id="upload_picModalLabel" class="processing-screen-label"></div>
         <a class="close-reveal-modal">&#215;</a>
     </div>
+
        <div class="text-center">
 
-        <div class="div-height">
+        <div class="div-height img-container-{{node.pk}}">
           {% get_relation_value node.pk 'has_thumbnail' as grel_dict %}
           {% get_relation_value node.pk 'has_logo' as grel_dict_logo %}
           {% get_relation_value node.pk 'has_banner_pic' as grel_banner %}

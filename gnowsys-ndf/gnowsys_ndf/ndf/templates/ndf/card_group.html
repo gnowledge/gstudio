@@ -1,73 +1,83 @@
 {% load i18n %}
 {% load get_relation_value get_event_status get_unit_total_points from ndf_tags %}
 
-    {% get_event_status node as get_status %}
-    {% if group_counts %}
-        {% get_unit_total_points request.user.id  node.pk as get_unit_points %}
-    {% endif %}
+{% get_event_status node as get_status %}
+{% if group_counts %}
+{% get_unit_total_points request.user.id  node.pk as get_unit_points %}
+{% endif %}
 
-<div class="unit_card">
+<style type="text/css">
+
+</style>
+<div class="unit_card-{{node.pk}}" style="position: relative; height:305px;">
     {% if not no_url and not prevent_click %}
         {% if first_arg and second_arg and third_arg %}
-            <a href="{% url url_name first_arg second_arg third_arg %}{{search_url_text|safe}}"/>
+            <a href="{% url url_name first_arg second_arg third_arg %}{{search_url_text|safe}}">
         {% elif first_arg and second_arg %}
-            <a href="{% url url_name first_arg second_arg %}{{search_url_text|safe}}"/>
+            <a href="{% url url_name first_arg second_arg %}{{search_url_text|safe}}">
         {% elif first_arg %}
-            <a href='{% url url_name first_arg %}{{search_url_text|safe}}'/>
+            <a href='{% url url_name first_arg %}{{search_url_text|safe}}'>
         {% endif %}
     {% endif %}
 
-    {% if "base_unit" in node.member_of_names_list %}
-    <div class="status-draft">DRAFT</div>
-    {% endif  %}
-    {% if get_status %}
-        <div class="status-{{get_status}}">{{get_status}}</div>
-    {% endif %}
-    <div class="unit_header">
-    {% if "announced_unit" in node.member_of_names_list %}
-        {% get_relation_value node.pk 'has_banner_pic' as grel_dict %}
-        {% if not grel_dict.cursor and grel_dict.grel_node and grel_dict.grel_node.if_file.thumbnail.relurl %}
-            <img class="unit_banner" src="{{MEDIA_URL}}{{grel_dict.grel_node.if_file.mid.relurl}}" alt="" style="height:50px ;width:50px" />
+    <div class="unit_header" >
+        {% if "announced_unit" in node.member_of_names_list %}
+            {% get_relation_value node.pk 'has_banner_pic' as grel_dict %}
+            {% if not grel_dict.cursor and grel_dict.grel_node and grel_dict.grel_node.if_file.mid.relurl %}
+                <img class="unit_banner" src="{{MEDIA_URL}}{{grel_dict.grel_node.if_file.mid.relurl}}" alt=""  />
+            {% else %}
+                <img class="unit_banner" src="/static/ndf/images/module_banner.png" />
+            {% endif %}
+        {% elif "Group" in node.member_of_names_list %}
+            {% get_relation_value node.pk 'has_profile_pic' as grel_dict %}
+            {% if not grel_dict.cursor and grel_dict.grel_node and grel_dict.grel_node.if_file.mid.relurl %}
+                <img src="{{MEDIA_URL}}{{grel_dict.grel_node.if_file.mid.relurl}}" alt="" class="unit_banner" />
+            {% else %}
+                <img class="unit_banner" src="/static/ndf/images/module_banner.png" />
+            {% endif %}
         {% else %}
-            <img class="unit_banner" src="/static/ndf/images/module_banner.png" style="height:50px ;width:50px"/>
+            <img class="unit_banner" src="/static/ndf/images/module_banner.png" />
         {% endif %}
-    {% elif "Group" in node.member_of_names_list %}
-        {% get_relation_value node.pk 'has_profile_pic' as grel_dict %}
-        {% if not grel_dict.cursor and grel_dict.grel_node and grel_dict.grel_node.if_file.thumbnail.relurl %}
-            <img src="{{MEDIA_URL}}{{grel_dict.grel_node.if_file.mid.relurl}}" alt="" style="height:50px ;width:50px" />
+    </div>
+    <div class="unit-title-container">
+        {% if node.altnames %}
+        <div class="unit_title" title="{{node.altnames}}">{{node.altnames|truncatechars:45}}</div>
         {% else %}
-            <img class="unit_banner" src="/static/ndf/images/module_banner.png" style="height:50px ;width:50px"/>
+        <div class="unit_title" title="{{node.name}}">{{node.name|truncatechars:45}}</div>
         {% endif %}
-    {% else %}
-        <img class="unit_banner" src="/static/ndf/images/module_banner.png" style="height:50px ;width:50px"/>
-    {% endif %}
-    {% if node.altnames %}
-        <span class="unit_title" title="{{node.altnames}}">{{node.altnames|truncatechars:20}}</span>
-    {% else %}
-        <span class="unit_title" title="{{node.name}}">{{node.name|truncatechars:20}}</span>
-    {% endif %}
-    </div>
-    <div class="unit_desc">
-        {{node.content|safe|striptags}}
-    </div>
-   
-     <div class="unit_actions">
-                {% if group_counts %} 
-                    Points :<a class="unit-card-analytics-points">  {{get_unit_points}} </a>
-                    <a onclick="show_my_performance($(this))" data-node-id = "{{node.pk}}" class="right unit-card-analytics"><i class="fa fa-eye" aria-hidden="true"></i> View details</a>
-                {% else %} 
-                    
-                        <a href="{% url url_name first_arg %}" class="view_unit">{% trans "View" %}</a>
-                    {% if "base_unit" not in node.member_of_names_list %}
-                        <div class="right">
-                        {% if not no_enroll and not is_gstaff %}
-                        {% if request.user.is_authenticated %}
-                            {% include 'ndf/widget_enroll.html' %}
-                        {% endif %}
-                        {% endif %}
-                        </div> 
+        </div>
+
+    <div class="unit_actions">
+        {% if group_counts %} 
+        <div class="row">
+            <div class="small-8 columns" style="font-size:15px; padding: 0px;">
+                Points :<a class="unit-card-analytics-points">  {{get_unit_points}} </a>
+            </div>
+            <div class="small-4 columns">
+                <a href="#" class="view-progress-report unit-card-analytics right" onclick="show_my_performance($(this))" data-node-id = "{{node.pk}}" >View </a>
+            </div>
+        </div>
+        {% else %} 
+        <div class="row">
+            <div class="small-6 columns" style="padding: 0px;">
+                <i style="font-size:15px; color: black" class="fi-list-thumbnails"></i> 
+                <div style="font-size:15px; color: black" class="inner" value="{{node.collection_set|length}}">{{node.collection_set|length}} Lesson{{node.collection_set|pluralize}}</div>
+
+                <br/>
+
+                <i style="font-size:15px; color: black" class="fi-torsos"></i>
+                <div style="font-size:15px; color: black" class="inner" value="{{node.author_set|length}}">{{node.author_set|length}} Student{{node.author_set|pluralize}}</div>
+
+            </div>
+            <div class="small-6 columns" style="padding: 0px;">
+                {% if not no_enroll and not is_gstaff %}
+                    {% if request.user.is_authenticated %}
+                        {% include 'ndf/widget_enroll.html' %}
                     {% endif %}
                 {% endif %}
+            </div> 
+        </div>
+        {% endif %}
     </div>
-</div>
-     
+    </a>
+    </div>

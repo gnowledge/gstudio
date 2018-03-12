@@ -104,8 +104,8 @@
             <button type="button" class="orange-button delete-activity right" title="Click on the checkbox on the files below to Delete"><i class="fa fa-trash"></i> {% trans "Delete" %}</button>
             {% endif %}
             {% if user.is_authenticated %}
-            <a class="right orange-button-template" href="{% url 'create_course_page' group_id %}"><i class="fi-plus"></i> {% trans "Add Activity page" %}</a>
-            <a class="right orange-button-template" href="{% url 'create_course_page_info'  group_id 'Info' %}"><i class="fi-plus"></i> {% trans "Add Teacher's page" %}</a>
+             <a class="right orange-button-template" href="{% url 'create_course_page' group_id %}"><i class="fi-plus"></i> {% trans "Add Activity page" %}</a>
+            {# <a class="right orange-button-template" href="{% url 'create_course_page_info'  group_id 'Info' %}"><i class="fi-plus"></i> {% trans "Add Teacher's page" %}</a> #}
             <a class="right orange-button-template" href="{% url 'create_course_page_info' group_id 'Info' %}"><i class="fi-plus"></i> {% trans "Add Help page" %}</a>
             {% endif %}
 
