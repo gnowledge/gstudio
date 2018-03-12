@@ -4617,8 +4617,6 @@ ul.nav_menu_1 {
 }
 
 
-
-
 /**
  * Sass styles related to unit cards
  */
@@ -4626,8 +4624,8 @@ $unit-card-font-size: 14px;
 $unit-card-line-height: 1.4;
 $unit-card-lines-to-show: 3;
 
-.unit_card {
-    width: 300px;
+[class*="unit_card-"]{
+    width: 235px !important;
     // height: 300px; commented as info of number of lesson and etc was not passed currently
     color: #000;
     padding: 15px;
@@ -4636,12 +4634,12 @@ $unit-card-lines-to-show: 3;
     font-size: $unit-card-font-size;
     border: 2px solid #d5d5d5;
     position: relative;
-    height:210px;
+    height: 279px;
+    display:flex; justify-content: flex-end; flex-direction: column;
 
     &:hover {
         box-shadow: 0px 0px 5px 1px rgba(0, 0, 0, 0.25);
     }
-    
 
     .unit_status {
         position: absolute;
@@ -4653,26 +4651,25 @@ $unit-card-lines-to-show: 3;
         border-radius: 3px;
         letter-spacing: 0.6px;
     }
-
-    .unit_header {
-        display: table;
-        .unit_banner {
-            display: table-cell;
-            border-radius: 5px;
-            height: 50px;
-            width: 50px;
-            margin-right: 10px;
-            color: #333333;
-        }
+    .unit_header{
+    height: 120px !important;
+    .unit_banner{
+        height: 105px !important;
+        border-radius: 4px;
+    }
+    }
+    .unit-title-container {
+        height: 100px !important;
         .unit_title {
             display: table-cell;
-            font-size: 20px;
+            font-size: 17px;
+            font-family: Open Sans Bold;
             font-weight: 500;
             letter-spacing: 0.6px;
             margin: 0px 0px 12px;
-            width: 200px;
+            //width: 200px;
             overflow: hidden;
-            white-space: nowrap;
+            //white-space: nowrap;
             text-overflow: ellipsis;
             vertical-align: middle;
             color: #333333;
@@ -4704,57 +4701,54 @@ $unit-card-lines-to-show: 3;
         //border-top : 1px solid #ccc;
         //margin: 20px 0px 0px;
         padding: 5px 0px;
+        border-top: 1px solid black;
+        height: 40px;
          //enroll-button 
-        .unit-card-enrol{
-            background: rgb(162, 35, 141);
-            height: 37px;
-            text-align: center;
-            color: #ffffff;
-            font-size: 19px;
-            border: 2px solid rgba(43, 51, 63, 0.42);
-            border-radius: 5px;
-            width: 120px !important;
-            margin-top: 2px !important;
-            letter-spacing: 0.4px;
-
-            &:hover {
-                box-shadow: 0px 0px 17px rgba(0, 0, 0, 0.68);
-            }
-        }
-
-        .unit-card-analytics{
-            color: #a2238d;
-            font-weight: 500;
-            font-size: 14px;
-            letter-spacing: 0.3px;
-            border-bottom:2px solid #a2238d;
-        }
-
-        .unit-card-analytics-points{
-            background: #ffffff;
-            color: rgb(162, 35, 141);
-            font-size: 15px;
-            border-radius: 20px;
-            letter-spacing: 0.4px;
-            padding: 2px 3px 3px 1px;
-            font-weight:bold;
-            cursor: default;
-        }
-
-        .view_unit{
-            height: 37px;
-            text-align: center;
-            color: rgb(162, 35, 141);
-            font-size: 19px;
-            margin-top: 2px !important;
-            letter-spacing: 0.4px;
-
-            &:hover {
-                border-bottom:2px solid $secondary-orange;
+        div {
+            .unit-card-enrol{
+                background: #a2238d;
+                height: 37px;
+                text-align: center;
+                color: #ffffff;
+                font-size: 19px;
+                border: 2px solid rgba(43, 51, 63, 0.42);
+                border-radius: 5px;
+                width: 86px !important;
+                margin-top: 2px !important;
+                margin-left: 14px !important;
+                letter-spacing: 0.4px;
+                &:hover{
+                    background-color: #fff;
+                    color: #912a7d;
+                    font-weight: 600;
+                }
             }
         }
     }
+}
 
+
+.unit-card-analytics-points{
+    background: #ffffff;
+    color: #a2238d;
+    font-size: 16px;
+    border-radius: 20px;
+    letter-spacing: 0.4px;
+    padding: 2px 3px 3px 1px;
+    font-weight: bold;
+    cursor: default;
+}
+
+.view_unit{
+    height: 37px;
+    text-align: center;
+    color: #a2238d;
+    font-size: 19px;
+    margin-top: 2px !important;
+    letter-spacing: 0.4px;
+    &:hover {
+      border-bottom: 2px solid #ffc14e;
+    }
 }
 
 /*
@@ -5548,8 +5542,8 @@ ul.authoring-tab{
 
 .lms_explore_back_unit{
     background-color: #fff;
-    margin-top:-23.3px;
-    margin-left: 60px; 
+    //margin-top: 10.5%;
+    margin-left: 30px; 
 }
 
 .empty-dashboard-message {
@@ -6653,4 +6647,47 @@ input.transcript-toggler{
     padding: 6px 6px;
     border-radius: 100%;
     background-color: orange;
+}
+
+[class*="img-banner-card-"]{
+    margin: -11px -11px 0px -11px;
+    height: 100px;
+}
+[class*="high-img-banner-card-"]{
+    margin: -11px -11px 0px -11px;
+    height: 160px;
+}
+[class*="mid-img-banner-card-"]{
+    margin: -11px -11px 0px -11px;
+    height: 104px;
+    .unit_banner {
+        height:85px;
+    }
+}
+
+.view-progress-report {
+    //height: 2rem;
+    /* padding: 0 2rem; */
+    background: none;
+    font-family: open_sansbold,sans-serif;
+    font-size: 1rem;
+    text-transform: uppercase;
+    cursor: pointer;
+    border-radius: 3px;
+    -webkit-box-align: center;
+    align-items: center;
+    border: .2rem solid #912a7d;
+    background-color: #912a7d;
+    color: #fff;
+    transition: all .1s ease;
+    padding: 0px 7px 0px 7px;
+    //margin-top: 10px;
+    text-align: right;
+    width: 62px;
+    margin-right: -15px;
+    &:hover{
+        background-color: #fff;
+        color: #912a7d;
+    }
+
 }

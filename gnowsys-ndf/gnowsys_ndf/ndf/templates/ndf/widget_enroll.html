@@ -9,7 +9,7 @@
 <input type="button" data-reveal-id="enrollBuddiesModal-{{group_object.pk}}" class="fa enrollBtn enrollact-{{group_object.pk}} module-card-enrol unit-card-enrol"  
   "{% if request.user.pk in group_object.author_set and not module_enrollment or module_enrollment and enrolled_status_dict|get_dict_value_from_key:'full_enrolled' %}"  
     "{% if is_workspace %}" value="Joined"
-      "{% else %}"  value="Enrolled" style="background-color:#006400;" title="You are enrolled " 
+      "{% else %}"  value="Enrolled" style="background-color:#006400;" onMouseOut="this.style.background='#006400';this.style.color='white'" onMouseOver="this.style.color='#a2238d';this.style.background='lightgrey'";  title="You are enrolled " 
     "{% endif %}" 
     "{% else %}" 
       "{% if is_workspace %}" value="Join"
@@ -58,7 +58,7 @@
     </div>
     </div>
 
-    <a class="close-reveal-modal">&#215;</a>
+    <p class="close-reveal-modal">&#215;</p>
 </div>
 
 
