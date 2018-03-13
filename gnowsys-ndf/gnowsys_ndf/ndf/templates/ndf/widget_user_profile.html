@@ -1,0 +1,25 @@
+{% load get_attribute_value from ndf_tags %}
+{% load i18n %}
+{% load cache %}
+{% get_attribute_value author_obj.pk 'first_name' as first_name %}
+{% get_attribute_value author_obj.pk 'last_name' as last_name %}
+{% get_attribute_value author_obj.pk 'educationallevel' as educationallevel %}
+{% get_attribute_value author_obj.pk 'enrollment_code' as enrollment_code %}
+{% get_attribute_value author_obj.pk 'organization_name' as organization_name %}
+
+<div class="user-profile-container">
+	<div class="row">
+		<div class="small-6 columns"> {{first_name}} {{last_name}}
+		</div>
+	</div>
+	<div class="row">
+		<div class="small-6 columns end"> Grade: {{educationallevel}}
+		</div>
+		<div class="small-6 columns end"> Roll No.: {{enrollment_code}}
+		</div>
+	</div>
+	<div class="row">
+		<div class="small-12 columns"> School: {{organization_name}}
+		</div>
+	</div>
+</div>
