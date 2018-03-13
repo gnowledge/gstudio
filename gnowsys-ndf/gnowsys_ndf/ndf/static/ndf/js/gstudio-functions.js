@@ -1,4 +1,3 @@
-
 function get_group_id()
 {
 	
@@ -27,4 +26,25 @@ function user_access_policy()
 	 return  user_access_priv        
 }
 
+function isInGroup() {
+	var url = window.location.pathname;
+	var groupUrlArr = ["/course/about/", "/course/notebook/", "/course/gallery/", "/course/raw-material/", "/course/content/"];
+	for (var i = groupUrlArr.length - 1; i >= 0; i--) {
+		if(url.match(groupUrlArr[i])){
+			return true
+			break;
+		}
+	}
+}
 
+function getCookieValue(keyName) {
+	// will return value of cookie of provided key
+	var allCookiesList = document.cookie.split(';');
+	// l.forEach(function(c){if(c.indexOf('user_id') > 0){c = c.trim(); c.split('=').pop()} })
+	for (var i = allCookiesList.length - 1; i >= 0; i--) {
+		if(allCookiesList[i].indexOf(keyName) > -1){
+			return allCookiesList[i].trim().split('=').pop()
+			break;
+		}
+	}
+}
