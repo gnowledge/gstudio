@@ -24,8 +24,14 @@ class UserDetails(object):
     def process_response(self, request, response):
         try:
             user_id = request.user.id
-            response.set_cookie('user_id', user_id)
+            response.set_cookie('user_id', str(user_id))
+            # keeping this as redundant entry to have this in every response's cookie irrespective of buddies existance.
+            response.set_cookie('user_and_buddy_ids', str(user_id))
+            # initializing
+            response.set_cookie('buddy_ids', None)
+
             buddies_userid_str = '&'.join([str(i) for i in request.session['buddies_userid_list']])
+
             if buddies_userid_str:
                 # using [1:] to truncate starting '&'
                 response.set_cookie('buddy_ids', buddies_userid_str)
