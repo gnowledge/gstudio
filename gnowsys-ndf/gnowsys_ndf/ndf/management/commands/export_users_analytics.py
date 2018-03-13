@@ -101,15 +101,16 @@ def export_group_analytics(group_obj, assessment_and_quiz_data):
 
     all_activities_cur = Node.get_tree_nodes(group_obj, field_name='collection_set', level=1, get_obj=True)
     # print all_activities_cur.count()
-    for each_act in all_activities_cur:
-        column_key_name = each_act['altnames'] if (each_act['altnames'] and each_act['altnames'].strip()) else each_act['name']
-        column_key_name += " [" + unicode(each_act._id) + "]"
-        # if column_key_name not in column_keys_list_addons:
-        column_keys_list_addons.append(column_key_name)
-        column_keys_dict_addons[column_key_name] = each_act['_id']
-            # column_keys_dict.update({column_key_name: 0})
-        # each_row_dict[column_key_name] = analytics_data["counter_obj"]["visited_nodes"].get(unicode(each_act._id), 0)
-    # print column_keys_list_addons
+    if all_activities_cur:
+        for each_act in all_activities_cur:
+            column_key_name = each_act['altnames'] if (each_act['altnames'] and each_act['altnames'].strip()) else each_act['name']
+            column_key_name += " [" + unicode(each_act._id) + "]"
+            # if column_key_name not in column_keys_list_addons:
+            column_keys_list_addons.append(column_key_name)
+            column_keys_dict_addons[column_key_name] = each_act['_id']
+                # column_keys_dict.update({column_key_name: 0})
+            # each_row_dict[column_key_name] = analytics_data["counter_obj"]["visited_nodes"].get(unicode(each_act._id), 0)
+        # print column_keys_list_addons
 
     header_written = False
     for index, each_user in enumerate(group_users):

@@ -387,7 +387,8 @@ class Node(DjangoDocument):
         while level:
            nodes_ids_cur = Node.get_nodes_by_ids_list(nodes_ids_list)
            nodes_ids_list = []
-           [nodes_ids_list.extend(i[field_name]) for i in nodes_ids_cur]
+           if nodes_ids_cur:
+               [nodes_ids_list.extend(i[field_name]) for i in nodes_ids_cur]
            level = level - 1
 
         if get_obj:
