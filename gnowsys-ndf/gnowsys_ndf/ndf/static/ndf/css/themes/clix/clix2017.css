@@ -6470,3 +6470,56 @@ input.transcript-toggler {
   background-color: #fff;
   color: #912a7d;
 }
+
+/* line 6694, ../../../scss/_clix2017.scss */
+.user-profile-edit {
+  border: 1px solid white;
+  background-color: white;
+  padding: 3px 5px 3px 3px;
+  border-radius: 3px;
+  font-size: 17px;
+  color: #713557;
+}
+
+/* line 6703, ../../../scss/_clix2017.scss */
+.profile-field {
+  color: black;
+  font-size: 15px;
+  text-transform: none;
+  margin-top: 10px;
+  margin-left: 55px;
+}
+
+/* line 6711, ../../../scss/_clix2017.scss */
+.profile-form {
+  margin: 307px 283px 42px;
+  margin-top: 45px;
+  padding: 25px 0px 100px 5px;
+  border: 1px solid #713557;
+}
+
+/* line 6718, ../../../scss/_clix2017.scss */
+.button-cancel-profile {
+  height: 2rem;
+  padding: 0 2rem;
+  background: none;
+  font-family: open_sansbold,sans-serif;
+  font-size: 1.2rem;
+  text-transform: uppercase;
+  cursor: pointer;
+  border-radius: 3px;
+  align-items: center;
+  border: .1rem solid #a9a9a9;
+  background-color: #f5f5f5;
+  color: #757575;
+  margin-right: 1px;
+  background-color: #f5f5f5;
+  transition: all .1s ease;
+  margin-right: 1px;
+  width: auto !important;
+}
+/* line 6736, ../../../scss/_clix2017.scss */
+.button-cancel-profile:hover {
+  background-color: #fff;
+  color: #333333;
+}
