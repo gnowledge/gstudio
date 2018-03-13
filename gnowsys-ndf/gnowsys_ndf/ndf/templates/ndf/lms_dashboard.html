@@ -75,19 +75,6 @@
         <div class="row">
           
           <div class="small-4 columns">
-            <label for="right-label" class="profile-field">{% trans "Grade" %}</label>
-          </div>
-
-          <div class="small-8 columns">
-            <input type="text" name="educationallevel" id="educationallevel" value="{{auth_attr.educationallevel}}">
-          </div>
-
-        </div>
-      </div>
-      <div class="small-6 medium-6 columns">
-        <div class="row">
-          
-          <div class="small-4 columns">
             <label for="right-label" class="profile-field">{% trans "Roll No." %}</label>
           </div>
 
@@ -97,17 +84,37 @@
 
         </div>
       </div>
+      <div class="small-6 medium-6 columns">
+        <div class="row">
+          
+          <div class="small-4 columns">
+            <label for="right-label" class="profile-field">{% trans "Grade" %}</label>
+          </div>
+
+          <div class="small-8 columns">
+            {% get_metadata_values "educationallevel" as metadata_educationallevel %}
+             <select name="educationallevel">
+                <option selected>{% trans "Choose Class / Grade" %}</option>
+                {% for opts in metadata_educationallevel %}
+                    <option {% if auth_attr.educationallevel == opts %} selected {% endif %}>{{opts}}</option>
+                {% endfor %}
+            </select>
+          </div>
+
+        </div>
+      </div>
+
     </div>
     <div class="row">
         <div class="small-4 columns end">
           <label for="right-label" class="profile-field">{% trans "School Name" %}</label>
         </div>
 
-        <div class="small-8 columns" style="margin-left: -166px;">
+        <div class="small-8 columns" style="margin-left: -170px;">
           <input type="text" name="organization_name" id="organization_name" value="{{auth_attr.organization_name}}">
         </div>
     </div>
-    <div class="row" style="margin: 1px 0px -70px 498px;">
+    <div class="row" style="margin-left: 400px;">
         <input type="submit" class="button-save-new" value="Save" style="margin:20px 0px 20px 0px;"/>
         <input type="button" class="button-cancel-profile" onclick="hide_profile_form()" value={% trans "Cancel" %} />
     </div>

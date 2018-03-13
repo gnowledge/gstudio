@@ -6522,13 +6522,11 @@ input.transcript-toggler {
 
 /* line 6739, ../../../scss/_clix2017.scss */
 .profile-form {
-  margin: 307px 283px 42px;
-  margin-top: 45px;
-  padding: 25px 0px 100px 5px;
   border: 1px solid #713557;
+  margin: 15px;
 }
 
-/* line 6746, ../../../scss/_clix2017.scss */
+/* line 6744, ../../../scss/_clix2017.scss */
 .button-cancel-profile {
   height: 2rem;
   padding: 0 2rem;
@@ -6548,8 +6546,32 @@ input.transcript-toggler {
   margin-right: 1px;
   width: auto !important;
 }
-/* line 6764, ../../../scss/_clix2017.scss */
+/* line 6762, ../../../scss/_clix2017.scss */
 .button-cancel-profile:hover {
   background-color: #fff;
   color: #333333;
+}
+
+/* line 6768, ../../../scss/_clix2017.scss */
+.large_text_input {
+  margin-left: -170px;
+}
+
+/* line 6771, ../../../scss/_clix2017.scss */
+.save-profile-actions {
+  margin-left: 400px;
+}
+/* line 6773, ../../../scss/_clix2017.scss */
+.save-profile-actions .submit-user-profile {
+  margin: 20px 0px 20px 0px;
+}
+
+/* line 6778, ../../../scss/_clix2017.scss */
+.uname-in-profile-form {
+  margin-left: 20px !important;
+}
+
+/* line 6782, ../../../scss/_clix2017.scss */
+.uname-in-dashboard {
+  font-family: Open Sans Bold;
 }

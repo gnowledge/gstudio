@@ -6737,10 +6737,8 @@ input.transcript-toggler{
 }
 
 .profile-form{
-    margin: 307px 283px 42px;
-    margin-top: 45px;
-    padding: 25px 0px 100px 5px;
     border: 1px solid #713557;
+    margin: 15px;
 }
 
 .button-cancel-profile{
@@ -6765,4 +6763,22 @@ input.transcript-toggler{
         background-color: #fff;
         color: #333333;
     }
+}
+
+.large_text_input{
+    margin-left: -170px;
+}
+.save-profile-actions{
+    margin-left: 400px;
+    .submit-user-profile{
+        margin:20px 0px 20px 0px;
+    }
+
+}
+.uname-in-profile-form{
+    margin-left:20px !important;
+}
+
+.uname-in-dashboard{
+    font-family: Open Sans Bold;
 }
