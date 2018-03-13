@@ -23,7 +23,7 @@
         {% endif %}
       </div>
       <div class="banner_heading">
-        <span class="buddy_name inner">{{user.username}}</span> <a class="user-profile-edit inner" style="z-index: 99; position: relative;"> <i class="fa fa-pencil"></i> {% trans "Edit Profile" %}</a>
+        <span class="buddy_name uname-in-dashboard inner">{{user.username}}</span> <a class="user-profile-edit inner" style="z-index: 99; position: relative;"> <i class="fa fa-pencil"></i> {% trans "Edit Profile" %}</a>
         <div class="profile-detail-widget-container">
           {% if auth_profile_exists %}
           {% include "ndf/widget_user_profile.html" with auth_attr=auth_attr %}
@@ -41,7 +41,7 @@
   {% csrf_token %}
     
   <div>
-    <h3 style="margin-left:20px;">{{user.username}} Profile: </h3>
+    <h3 class="uname-in-profile-form" >{{user.username}} Profile: </h3>
     <div class="row">
       <div class="small-6 medium-6 columns">
         <div class="row">
@@ -110,12 +110,12 @@
           <label for="right-label" class="profile-field">{% trans "School Name" %}</label>
         </div>
 
-        <div class="small-8 columns" style="margin-left: -170px;">
+        <div class="small-8 columns large_text_input">
           <input type="text" name="organization_name" id="organization_name" value="{{auth_attr.organization_name}}">
         </div>
     </div>
-    <div class="row" style="margin-left: 400px;">
-        <input type="submit" class="button-save-new" value="Save" style="margin:20px 0px 20px 0px;"/>
+    <div class="row save-profile-actions">
+        <input type="submit" class="button-save-new submit-user-profile" value="Save"/>
         <input type="button" class="button-cancel-profile" onclick="hide_profile_form()" value={% trans "Cancel" %} />
     </div>
   </div>
