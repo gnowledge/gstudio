@@ -881,21 +881,31 @@ def my_performance(request, group_id):
 def save_profile(request, user_id):
     from django.contrib.auth.models import User
 
-    auth_node = Author.get_author_by_userid(int(user_id))
-    auth_id = auth_node._id
-
-    user_dict = {'success': False}
+    user_dict = {'success': True, 'message': 'Profile updated successfully.'}
     request_variables = {}
-    if request.method == "POST":
-        first_name = request.POST.get('first_name', None)
-        last_name = request.POST.get('last_name', None)
-        educationallevel = request.POST.get('educationallevel', None)
-        organization_name = request.POST.get('organization_name', None)
-        enrollment_code = request.POST.get('enrollment_code', None)
-        request_variables.update({'first_name': first_name, 'last_name': last_name, 
-            'educationallevel': educationallevel, 'organization_name': organization_name,
-            'enrollment_code': enrollment_code})
-        for at_name, ga_val in request_variables.items():
-            if ga_val:
-                create_gattribute(auth_id, at_name, ga_val) 
-    return HttpResponse(json.dumps(user_dict,cls=NodeJSONEncoder))
+
+    auth_node = Author.get_author_by_userid(int(user_id))
+    try:
+        auth_id = auth_node._id
+        if request.method == "POST":
+
+            first_name = request.POST.get('first_name', None)
+            last_name = request.POST.get('last_name', None)
+            educationallevel = request.POST.get('educationallevel', None)
+            organization_name = request.POST.get('organization_name', None)
+            enrollment_code = request.POST.get('enrollment_code', None)
+            request_variables.update({'first_name': first_name, 'last_name': last_name,
+                'educationallevel': educationallevel, 'organization_name': organization_name,
+                'enrollment_code': enrollment_code})
+
+            for at_name, ga_val in request_variables.items():
+                if ga_val:
+                    create_gattribute(auth_id, at_name, ga_val)
+    except AttributeError as no_auth:
+        user_dict.update({'success': False, 'message': 'Something went wrong. Please try again later.'})
+        pass
+    except Exception as no_auth:
+        user_dict.update({'success': False, 'message': 'Something went wrong. Please try again later.'})
+        pass
+
+    return HttpResponse(json.dumps(user_dict))
