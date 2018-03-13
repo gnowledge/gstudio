@@ -118,14 +118,31 @@ def unit_create_edit(request, group_id, unit_group_id=None):
         unit_node.fill_group_values(group_type=group_type,tags=tags,author_set=unit_node.author_set)
         unit_node.content = content
         tab_name = request.POST.get('tab_name', '')
+        resource_name = request.POST.get('resource_name', '')
+        blog_name = request.POST.get('blog_name', '')
         section_name = request.POST.get('section_name', '')
         subsection_name = request.POST.get('subsection_name', '')
+
         if tab_name:
             unit_node['project_config'].update( {"tab_name":tab_name})
         elif "base_unit" in unit_node.member_of_names_list or "announced_unit" in unit_node.member_of_names_list :
             unit_node['project_config'].update( {"tab_name":"Lessons"})
         else:
             unit_node['project_config'].update( {"tab_name":"Tab Name"})
+
+        if resource_name:
+            unit_node['project_config'].update( {"resource_name":resource_name})
+        elif "base_unit" in unit_node.member_of_names_list or "announced_unit" in unit_node.member_of_names_list :
+            unit_node['project_config'].update( {"resource_name":"Resources"})
+        else:
+            unit_node['project_config'].update( {"resource_name":"Resource Name"})
+
+        if blog_name:
+            unit_node['project_config'].update( {"blog_name":blog_name})
+        elif "base_unit" in unit_node.member_of_names_list or "announced_unit" in unit_node.member_of_names_list :
+            unit_node['project_config'].update( {"blog_name":"Blog"})
+        else:
+            unit_node['project_config'].update( {"blog_name":"blog Name"})
         
         if section_name:
             unit_node['project_config'].update( {"section_name":section_name})
