@@ -92,3 +92,4 @@ player_discussion_enable,Player Discussion Enable,bool,[],"[""Page"", ""File"","
 assessment_list,AssessmentList,list,[],"[""CourseEventGroup"", ""base_unit"",""announced_unit""]",TRUE,TRUE,[],[],,[],[],[]
 total_assessment_items,TotalAssessmentItems,int,[],"[""CourseEventGroup"", ""base_unit"",""announced_unit""]",TRUE,TRUE,[],[],,[],[],[]
 items_sort_list,Items Sort List,list,[],"[""Group""]",TRUE,TRUE,[],[],,[],[],[]
+organization_name,Organization Name,basestring,[],"[""Author""]",TRUE,FALSE,[],,,[],[],[]

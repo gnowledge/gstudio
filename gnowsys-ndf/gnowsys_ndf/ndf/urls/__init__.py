@@ -219,6 +219,8 @@ urlpatterns = patterns('',
 
    (r'^status/cache/$', 'gnowsys_ndf.ndf.views.cache.cache_status'),
     # url(r'^Beta/', TemplateView.as_view(template_name= 'gstudio/beta.html'), name="beta"),
+    url(r'^(?P<user_id>[\w-]+)/profile$', 'gnowsys_ndf.ndf.views.userDashboard.save_profile', name='save_user_profile'),
+
 )
 
 if settings.DEBUG:

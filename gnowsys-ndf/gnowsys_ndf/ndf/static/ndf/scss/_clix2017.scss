@@ -6714,3 +6714,71 @@ input.transcript-toggler{
     }
 
 }
+.user-profile-edit{
+    border: 1px solid white;
+    background-color: #713557;
+    padding: 1px 5px 1px 5px;
+    border-radius: 3px;
+    color: #ffffff;
+    font-size: 15px;
+    &:hover{
+        background-color: #fff;
+        color: #912a7d;
+    }
+
+}
+
+.profile-field{
+    color: black;
+    font-size: 15px;
+    text-transform: none;
+    margin-top: 10px;
+    margin-left: 55px;
+}
+
+.profile-form{
+    border: 1px solid #713557;
+    margin: 15px;
+}
+
+.button-cancel-profile{
+    height: 2rem;
+    padding: 0 2rem;
+    background: none;
+    font-family: open_sansbold,sans-serif;
+    font-size: 1.2rem;
+    text-transform: uppercase;
+    cursor: pointer;
+    border-radius: 3px;
+    align-items: center;        
+    border: .1rem solid #a9a9a9;
+    background-color: #f5f5f5;
+    color: #757575;
+    margin-right:1px;
+    background-color: #f5f5f5;
+    transition: all .1s ease;
+    margin-right:1px;
+    width: auto !important;
+    &:hover{
+        background-color: #fff;
+        color: #333333;
+    }
+}
+
+.large_text_input{
+    margin-left: -170px;
+}
+.save-profile-actions{
+    margin-left: 400px;
+    .submit-user-profile{
+        margin:20px 0px 20px 0px;
+    }
+
+}
+.uname-in-profile-form{
+    margin-left:20px !important;
+}
+
+.uname-in-dashboard{
+    font-family: Open Sans Bold;
+}

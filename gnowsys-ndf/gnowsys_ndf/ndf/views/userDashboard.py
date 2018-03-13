@@ -741,7 +741,9 @@ def my_desk(request, group_id):
     # for each in my_modules_cur:
     #     my_modules.append(each._id)
 
-    
+    list_of_attr = ['first_name', 'last_name', 'enrollment_code', 'organization_name', 'educationallevel']
+    auth_attr = auth_obj.get_attributes_from_names_list(list_of_attr)
+    auth_profile_exists = all(v not in ['', None] for v in auth_attr.values())
     my_units = node_collection.find(
                 {'member_of':
                     {'$in': [ce_gst._id, announced_unit_gst._id, gst_group._id]
@@ -756,6 +758,7 @@ def my_desk(request, group_id):
                     'node': auth_obj, 'title': title,
                     # 'my_course_objs': my_course_objs,
                     'units_cur':my_units,
+                    'auth_attr': auth_attr, 'auth_profile_exists': auth_profile_exists
                     # 'modules_cur': my_modules_cur
                 },
                 context_instance=RequestContext(request)
@@ -860,6 +863,9 @@ def my_performance(request, group_id):
 
     auth_id = auth_obj._id
     title = 'my performance'
+    list_of_attr = ['first_name', 'last_name', 'enrollment_code', 'organization_name', 'educationallevel']
+    auth_attr = auth_obj.get_attributes_from_names_list(list_of_attr)
+    auth_profile_exists = all(v not in ['', None] for v in auth_attr.values())
 
     my_units = node_collection.find(
                 {'member_of':
@@ -873,7 +879,51 @@ def my_performance(request, group_id):
                     'node': auth_obj, 'title': title,
                     # 'my_course_objs': my_course_objs,
                     'units_cur':my_units,
+                    'auth_attr': auth_attr, 'auth_profile_exists': auth_profile_exists
                     # 'modules_cur': my_modules_cur
                 },
                 context_instance=RequestContext(request)
         )
+
+def save_profile(request, user_id):
+    from django.contrib.auth.models import User
+
+    user_dict = {'success': True, 'message': 'Profile updated successfully.'}
+    request_variables = {}
+
+    auth_obj = Author.get_author_by_userid(int(user_id))
+    try:
+        auth_id = auth_obj._id
+        if request.method == "POST":
+
+            first_name = request.POST.get('first_name', None)
+            last_name = request.POST.get('last_name', None)
+            educationallevel = request.POST.get('educationallevel', None)
+            organization_name = request.POST.get('organization_name', None)
+            enrollment_code = request.POST.get('enrollment_code', None)
+            request_variables.update({'first_name': first_name, 'last_name': last_name,
+                'educationallevel': educationallevel, 'organization_name': organization_name,
+                'enrollment_code': enrollment_code})
+
+            for at_name, ga_val in request_variables.items():
+                if ga_val:
+                    create_gattribute(auth_id, at_name, ga_val)
+
+            auth_attr = request_variables
+
+    except AttributeError as no_auth:
+        # user_dict.update({'success': False, 'message': 'Something went wrong. Please try again later.'})
+        pass
+    except Exception as no_auth:
+        # user_dict.update({'success': False, 'message': 'Something went wrong. Please try again later.'})
+        pass
+    # return HttpResponse(json.dumps(user_dict))
+
+
+    return render_to_response('ndf/widget_user_profile.html',
+                {
+                    'auth_attr': auth_attr, #'user_dict': json.dumps(user_dict)
+                },
+                context_instance=RequestContext(request)
+        )
+
