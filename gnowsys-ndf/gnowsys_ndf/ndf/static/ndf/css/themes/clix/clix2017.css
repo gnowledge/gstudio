@@ -6503,12 +6503,12 @@ input.transcript-toggler {
   padding: 1px 5px 1px 5px;
   border-radius: 3px;
   color: #ffffff;
+  font-size: 15px;
 }
-/* line 6723, ../../../scss/_clix2017.scss */
+/* line 6724, ../../../scss/_clix2017.scss */
 .user-profile-edit:hover {
   background-color: #fff;
   color: #912a7d;
-  font-size: 17px;
 }
 
 /* line 6731, ../../../scss/_clix2017.scss */
