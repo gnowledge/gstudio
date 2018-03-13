@@ -65,45 +65,42 @@
     {% endcomment %}
     </br>
 
-<div class="small-12 columns group_sections_content">
-    {% if title == "my desk" %}
-        {% get_agency_type_of_group node.pk as agency_type %}
-        {% if agency_type != "Student" %}
-    <div class="small-12 columns group_sections_content">
-      {% if title == "my desk" %}
-        <div class="row" style=" margin-left: 10px !important ">
-          <h3> My Workspace</h3>
-          <ul class="small-block-grid-1 medium-block-grid-3 large-block-grid-3">
-            <li class="card-image-wrapper">
-              {% include "ndf/card_group.html" with node=node url_name="course_about" first_arg=node.pk no_enroll=True  %}
-            </li>
-          </ul>
-        </div>
-        <hr/>
-        {% endif %}
-        {% endif %}
-        <div class="row" style=" margin-left: 10px !important ">
-          <h3 >Joined Workspaces and Enrolled Courses </h3>
-        </div>
-        </br>
-        <div class="small-12 columns lms_explore_back_unit">
-          <ul class="small-block-grid-1 medium-block-grid-3 large-block-grid-4">
-            {% for each_obj in units_cur %}
-            <li class="card-image-wrapper">
-              {% include "ndf/card_group.html" with node=each_obj url_name="groupchange" first_arg=each_obj.pk no_enroll=True %}
-            </li>
-            {% empty %}
-            <section class="empty-dashboard-message">
-              <p>You are not enrolled in any course!</p>
-              <a class="button-explore-courses" href="{% url 'explore_courses' %}"> <i class="fa fa-binoculars" aria-hidden="true"></i>  Explore</a>
-            </section>
-            {% endfor %}
-          </ul>
-        </div>
-      {% endif %}  
+  {% if title == "my desk" %}
+  <div class="small-12 columns group_sections_content">
+    {% get_agency_type_of_group node.pk as agency_type %}
+    {% if agency_type != "Student" %}
+      <div class="row" style="margin-left: 10px !important ">
+        <h3> My Workspace</h3>
+      </div>
+      <div class="small-12 columns lms_explore_back_unit">
+        <ul class="small-block-grid-1 medium-block-grid-3 large-block-grid-3">
+          <li class="card-image-wrapper">
+            {% include "ndf/card_group.html" with node=node url_name="course_about" first_arg=node.pk no_enroll=True  %}
+          </li>
+        </ul>
+      </div>
+      <hr/>
+    {% endif %}
+
+    <div class="row" style="margin-left: 10px !important ">
+      <h3 >Joined Workspaces and Enrolled Courses </h3>
     </div>
-  </ul>
-</div>
+    <div class="small-12 columns lms_explore_back_unit">
+      <ul class="small-block-grid-1 medium-block-grid-3 large-block-grid-4">
+        {% for each_obj in units_cur %}
+          <li class="card-image-wrapper">
+            {% include "ndf/card_group.html" with node=each_obj url_name="groupchange" first_arg=each_obj.pk no_enroll=True %}
+          </li>
+        {% empty %}
+        <section class="empty-dashboard-message">
+          <p>You are not enrolled in any course!</p>
+          <a class="button-explore-courses" href="{% url 'explore_courses' %}"> <i class="fa fa-binoculars" aria-hidden="true"></i>  Explore</a>
+        </section>
+        {% endfor %}
+      </ul>
+    </div>
+  </div>
+  {% endif %}  
 
 {% if title == "my performance" %}
   <div class="small-12 columns group_sections_content">
@@ -125,7 +122,7 @@
     </div>
 
   <div id="show-overlay" class="reveal-modal reveal-modal-overlay" data-options="close_on_background_click:false;close_on_esc:false;"  data-reveal aria-labelledby="modalTitle" aria-hidden="true" role="dialog"></div>
-  </div>
+  
 
   <script type="text/javascript">
 
@@ -150,4 +147,7 @@
 
   </script>
 {% endif %}
+</ul>
+</div>
+
 {% endblock  %}
