@@ -24,12 +24,16 @@
       </div>
       <div class="banner_heading">
         <span class="buddy_name inner">{{user.username}}</span> <a class="user-profile-edit inner" style="z-index: 99; position: relative;"> <i class="fa fa-pencil"></i> {% trans "Edit Profile" %}</a>
-        {% include "ndf/widget_user_profile.html" with author_obj=request.author %}
+        <div class="profile-detail-widget-container">
+          {% if auth_profile_exists %}
+          {% include "ndf/widget_user_profile.html" with auth_attr=auth_attr %}
+          {% endif  %}
+        </div>
       </div>
     </div>
   </div>
-  <div id="profile_updateModal" class="reveal-modal medium radius" data-reveal data-alert>
-      <div id="profile_updateModalLabel"></div>
+  <div id="profile_updateModal" class="reveal-modal medium success radius" data-reveal data-alert>
+      <div id="profile_updateModalLabel">{% trans "Profile updated successfully" %}</div>
       <a class="close-reveal-modal">&#215;</a>
   </div>
 
@@ -47,7 +51,7 @@
           </div>
 
           <div class="small-8 columns">
-            <input type="text" name="first_name" class="input_only_text" id="first_name" >
+            <input type="text" name="first_name" class="input_only_text" id="first_name" value="{{auth_attr.first_name}}">
           </div>
 
         </div>
@@ -60,7 +64,7 @@
           </div>
 
           <div class="small-8 columns">
-            <input type="text" name="last_name" class="input_only_text" id="last_name" >
+            <input type="text" name="last_name" class="input_only_text" id="last_name" value="{{auth_attr.last_name}}">
           </div>
 
         </div>
@@ -75,7 +79,7 @@
           </div>
 
           <div class="small-8 columns">
-            <input type="text" name="educationallevel" id="educationallevel" >
+            <input type="text" name="educationallevel" id="educationallevel" value="{{auth_attr.educationallevel}}">
           </div>
 
         </div>
@@ -88,7 +92,7 @@
           </div>
 
           <div class="small-8 columns">
-            <input type="text" name="enrollment_code" class="input_only_num" id="enrollment_code" >
+            <input type="text" name="enrollment_code" class="input_only_num" id="enrollment_code" value="{{auth_attr.enrollment_code}}">
           </div>
 
         </div>
@@ -100,7 +104,7 @@
         </div>
 
         <div class="small-8 columns" style="margin-left: -166px;">
-          <input type="text" name="organization_name" id="organization_name" >
+          <input type="text" name="organization_name" id="organization_name" value="{{auth_attr.organization_name}}">
         </div>
     </div>
     <div class="row" style="margin: 1px 0px -70px 498px;">
@@ -246,19 +250,11 @@
       $.ajax({
              type: "POST",
              url: "{% url 'save_user_profile' request.user.pk %}",
-             data: $(".profile-form").serialize(),
+             data: $(this).serialize(),
              success: function(data)
              {
                 hide_profile_form()
-                console.log(data)
-                data = JSON.parse(data)
-                if (data['success']){
-                  $("#profile_updateModal").addClass("success");
-                }
-                else{
-                  $("#profile_updateModal").addClass("alert");
-                }
-                $("#profile_updateModalLabel").text(data['message']);
+                $(".profile-detail-widget-container").html(data)
                 $("#profile_updateModal").foundation('reveal', 'open');
              }
            });
