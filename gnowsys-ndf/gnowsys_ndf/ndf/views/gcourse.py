@@ -2848,6 +2848,14 @@ def course_analytics(request, group_id, user_id, render_template=False, get_resu
     #                                 context_instance = RequestContext(request)
     #                             )
 
+    # possible kwargs keys:
+    # 
+    # `get_counter_obj_in_result`  # flag named such to avoid confusion with builtin Counter method
+    # - default value is False (i.e: get_counter_obj_in_result=False)
+    # - By setting this to True, result dict will have counter object as a value for key, `counter_obj`
+    # 
+    # `assessment_and_quiz_data`
+
     analytics_data = {'user_id': user_id}
     analytics_data.update({
                 'correct_attempted_quizitems' : 0,
@@ -3137,6 +3145,8 @@ def course_analytics(request, group_id, user_id, render_template=False, get_resu
     # analytics_data['users_points_breakup'] = analytics_instance.get_users_points(True)
     analytics_data['users_points_breakup'] = counter_obj.get_all_user_points_dict()
     analytics_data['group_obj'] = group_obj
+    if kwargs.get('get_counter_obj_in_result', False):
+        analytics_data['counter_obj'] = counter_obj
     del analytics_instance
     # print analytics_data
 

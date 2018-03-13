@@ -27,10 +27,7 @@ def list_buddy(request, group_id='home'):
     '''
 
     buddies_authid_name_dict= request.session.get('buddies_authid_name_dict', {})
-    # print "buddies_authid_name_dict : ", buddies_authid_name_dict
     buddies_authid_list     = request.session.get('buddies_authid_list', [])
-    # print "buddies_authid_list : ", buddies_authid_list
-
     # to load all user's at page load time (performance penalty, kept for ref):
     #
     # filter_authors = [ObjectId(auth_oid)for auth_oid in buddies_authid_list]
