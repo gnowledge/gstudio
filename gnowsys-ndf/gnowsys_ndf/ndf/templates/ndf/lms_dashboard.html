@@ -4,10 +4,7 @@
 
 
 {# lms_dashboard.html lms My Desk screen #}
-
 {% block title %} My Desk {% endblock%}
-
-
 {% block body_content %}
 {% load ndf_tags %}
 {% get_gstudio_workspace_instance as is_workspace_instance %}
@@ -27,9 +24,87 @@
       </div>
       <div class="banner_heading">
         <span class="buddy_name">{{user.username}}</span>
+        <a class="user-profile-edit" style="z-index: 99; position: relative;"> <i class="fa fa-pencil"></i> {% trans "Edit Profile" %}</a>
       </div>
     </div>
   </div>
+  <form method="post" class="profile-form hide" action="{% url 'save_user_profile' request.user.pk %}">
+  {% csrf_token %}
+    
+  <div>
+    <h3 style="margin-left:20px;">{{user.username}} Profile: </h3>
+    <div class="row">
+      <div class="small-6 medium-6 columns">
+        <div class="row">
+          
+          <div class="small-4 columns">
+            <label for="right-label" class="profile-field">{% trans "First Name" %}</label>
+          </div>
+
+          <div class="small-8 columns">
+            <input type="text" name="first_name" id="first_name" >
+          </div>
+
+        </div>
+      </div>
+      <div class="small-6 medium-6 columns">
+        <div class="row">
+          
+          <div class="small-4 columns">
+            <label for="right-label" class="profile-field">{% trans "Last Name" %}</label>
+          </div>
+
+          <div class="small-8 columns">
+            <input type="text" name="last_name" id="last_name" >
+          </div>
+
+        </div>
+      </div>
+    </div>
+    <div class="row">
+      <div class="small-6 medium-6 columns">
+        <div class="row">
+          
+          <div class="small-4 columns">
+            <label for="right-label" class="profile-field">{% trans "Grade" %}</label>
+          </div>
+
+          <div class="small-8 columns">
+            <input type="text" name="educationallevel" id="educationallevel" >
+          </div>
+
+        </div>
+      </div>
+      <div class="small-6 medium-6 columns">
+        <div class="row">
+          
+          <div class="small-4 columns">
+            <label for="right-label" class="profile-field">{% trans "Roll No." %}</label>
+          </div>
+
+          <div class="small-8 columns">
+            <input type="text" name="enrollment_code" id="enrollment_code" >
+          </div>
+
+        </div>
+      </div>
+    </div>
+    <div class="row">
+        <div class="small-4 columns end">
+          <label for="right-label" class="profile-field">{% trans "School Name" %}</label>
+        </div>
+
+        <div class="small-8 columns" style="margin-left: -166px;">
+          <input type="text" name="organization_name" id="organization_name" >
+        </div>
+    </div>
+    <div class="row" style="margin: 1px 0px -70px 498px;">
+        <input type="submit" class="button-save-new" value="Save" style="margin:20px 0px 20px 0px;"/>
+        <input type="button" class="button-cancel-profile" value={% trans "Cancel" %} />
+    </div>
+  </div>
+  </form>
+
   <div class="page_menu">
     <ul class="nav_menu_1">
       <li>
@@ -150,4 +225,17 @@
 </ul>
 </div>
 
+<script type="text/javascript">
+    $(document).on('click','.user-profile-edit', function(){
+        $(".profile-form").removeClass("hide")
+        $('.user-profile-edit').addClass("hide")
+    })
+
+    $(document).on('click','.button-cancel-profile', function(){
+        $('.user-profile-edit').removeClass("hide")
+        $(".profile-form").addClass("hide")
+    })
+
+ 
+</script>
 {% endblock  %}
