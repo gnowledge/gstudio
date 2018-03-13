@@ -64,141 +64,14 @@
 <div class="create-new-task create-task-event-tabs">
   <div class="small-11 columns">
    <ul class="tabs" data-tab role="tablist">
-    <li class="tab-title  active" role="presentation"><a href="#create_new_event" role="tab" tabindex="0" aria-selected="false" aria-controls="panel2-1" checked>Create New Event</a></li>
-    <li class="tab-title" role="presentation"><a href="#create_new_task" role="tab" tabindex="0" aria-selected="true" aria-controls="panel2-2">Create New Task</a></li>
+    <li class="tab-title  active" role="presentation"><a href="#create_new_task" role="tab" tabindex="0" aria-selected="false" aria-controls="panel2-1" checked>Create New Task</a></li>
+    <li class="tab-title" role="presentation"><a href="#create_new_event" role="tab" tabindex="0" aria-selected="true" aria-controls="panel2-2">Create New Event</a></li>
   </ul>  
 </div>
 <hr/>
 
 <div class="tabs-content">
-  <section role="tabpanel" aria-hidden="false" class="content active" id="create_new_event">
-    <div class="small-6 columns ">
-      <div class="row">
-        <div class="small-3 columns">
-          <h6> Event Name </h6>
-        </div>
-        <div class="small-9 columns">
-          <input type="text" class="task-name" name="name" placeholder="Enter Task name" />
-        </div>
-      </div>
-      <div class="row">
-        <div class="small-3 columns">
-          <h6>Task Type:</h6>
-        </div>
-        <div class="small-9 columns" >
-          <select required="" class="medium" id="task_type" name="Status" data-invalid="" style="background-color:#719dc7;">
-            <option selected="selected" value="Feature" id="Feature">{% trans 'Feature' %}</option>
-            <option value="Support" id="Support">{% trans 'Support' %}</option>
-          </select>
-        </div>
-      </div>
-      <div class="row">
-        <div class="small-3 columns"> 
-          <h6>Start Date </h6>
-        </div>
-        <div class="small-3 columns">
-          <input id="start_date" class="start_date" type="text" style="background-color:#719dc7;" placeholder="DD/MM/YYYY" value="" name="start_time" readonly="">
-        </div>
-        <div class="small-3 columns">
-          <h6>Due Date</h6>
-        </div>
-        <div class="small-3 columns">
-          <input id="due_date" class="due_date" type="text" style="background-color:#719dc7;"   placeholder="DD/MM/YYYY" value="" name="due_date" readonly="">
-        </div>
-      </div>
-      {% comment %}
-      <div class="row">
-        <div class="small-3 columns">
-          <h6> Created By: </h6>
-        </div>
-        <div class="small-9 columns">
-          <input type="text" placeholder="Write the name of the creator" />
-        </div>
-      </div>
-      {% endcomment %}
-      <div class="row">
-        <div class="small-3 columns">
-          <h6>Status:</h6>
-        </div>
-        <div class="small-9 columns" >
-          <select required="" class="medium" id="task_status" name="status" data-invalid="" style="background-color:#719dc7;">
-            <option selected="selected" value="New" id="New">{% trans 'New' %}</option>
-            <option value="In Progress" id="In Progress">{% trans 'In Progress' %}</option>
-          </select>
-        </div>
-      </div>
-      <div class="row">
-        <div class="small-3 columns">
-          <h6>Priority</h6>
-        </div>
-        <div class="small-9 columns">
-          <select required="" class="medium" id="task_priority" name="priority" data-invalid="" style="background-color:#719dc7;">
-            <option value="Low" id="Low">{% trans 'Low' %}</option>
-            <option value="High" id="High">{% trans 'High' %}</option>
-            <option value="Immediate" id="Immediate">{% trans 'Immediate' %}</option>
-          </select>
-        </div>
-      </div>
-    </div>
-    <div class="small-6 columns vl">
-      <div class="row">
-        <div class="small-3 columns">
-          <h6> Assigned To: </h6>
-        </div>
-        <div class="small-9 columns" style="margin-top:2px;">
-          <a href="#" style="color:#3b7ebe">Add Assignees</a>
-        </div>
-      </div>
-      <div class="row">
-        <div class="small-3 columns">
-          <h6>Supporting Files:</h6>
-        </div>
-        <div class="small-9 columns">
-          <!--<input type="file" class="button" name="" onChange="" id="" value= ""/>-->
-          <a href="#" style="color:#3b7ebe">Upload Files</a>
-          
-        </div>
-      </div>
-      <div class="row">
-        <div class="small-3 columns">
-          <h6>Estimated Hours:</h6>
-        </div>
-        <div class="small-9 columns">
-          <input type="text" placeholder="Approx hours of work" />
-        </div>
-      </div>
-      <div class="row">
-        <div class="small-3 columns">
-          <h6>To be Done By:</h6>
-        </div>
-        <div class="small-9 columns" >
-          <select required="" class="medium" id="customDropdown" name="Status" data-invalid="" style="background-color:#719dc7;">
-            <option selected="selected" value="Single Assignee" id="Single Assignee">{% trans 'Single Assignee' %}</option>
-            <option value="Multiple Assignee" id="Multiple Assignee">{% trans 'Multiple Assignee' %}</option>
-            <option value="Group Assignee" id="Group Assignee">{% trans 'Group Assignee' %}</option>
-          </select>
-        </div>
-      </div>
-      <div class="row">
-        <div class="small-3 columns">
-          <h6>Notes:</h6>
-        </div>
-        <div class="small-9 columns">
-          <textarea id="task_notes" rows="5" cols="50"></textarea>
-        </div>
-      </div>
-    </div>
-    <hr/>
-
-    <div class="small-2 columns right">
-      <button type="button" class="button expand" style="background-color:#164A7B; border-radius:10px;">Cancel</button>
-    </div>
-    <div class="small-2 columns right">
-      <button type="button" class="button expand create-task-btn" style="background-color:#164A7B; border-radius:10px;">Create Task</button>
-    </div>
-  </section>
-
-  <section role="tabpanel" aria-hidden="true" class="content" id="create_new_task">
+  <section role="tabpanel" aria-hidden="false" class="content active" id="create_new_task">
     <div class="small-6 columns ">
       <div class="row">
         <div class="small-3 columns">
@@ -324,6 +197,96 @@
       <button type="button" class="button expand create-task-btn" style="background-color:#164A7B; border-radius:10px;">Create Task</button>
     </div>
   </section>
+
+  <section role="tabpanel" aria-hidden="true" class="content" id="create_new_event">
+    <div class="small-6 columns ">
+      <div class="row">
+        <div class="small-3 columns">
+          <h6> Event Name </h6>
+        </div>
+        <div class="small-9 columns">
+          <input type="text" class="task-name" name="name" placeholder="Enter Event name" />
+        </div>
+      </div>
+      <div class="row">
+        <div class="small-3 columns">
+          <h6>Event Type:</h6>
+        </div>
+        <div class="small-9 columns" >
+          <select required="" class="medium" id="task_type" name="Status" data-invalid="" style="background-color:#719dc7;">
+            <option selected="selected" value="Orientation" id="orientation">{% trans 'Orientation' %}</option>
+            <option value="Lab Session" id="lab_session">{% trans 'Lab Session' %}</option>
+            <option value="Session" id="session">{% trans 'Session' %}</option>
+            <option value="Meeting" id="meeting">{% trans 'Meeting' %}</option>
+            <option value="Field_visit" id="field_fisit">{% trans 'Field Visit' %}</option>
+            <option value="Master Trainer Program" id="master_trainer_program">{% trans 'Master Trainer Program' %}</option>
+            <option value="Course Developers Meeting" id="course_developers_meeting">{% trans 'Course Developers Meeting' %}</option>
+            <option value="Training of Teachers" id="training_of_teachers">{% trans 'Training of Teachers' %}</option>
+          </select>
+        </div>
+      </div>
+      <div class="row">
+        <div class="small-3 columns"> 
+          <h6>Start Time </h6>
+        </div>
+        <div class="small-3 columns">
+          <input id="start_date" class="start_date" type="text" style="background-color:#719dc7;" placeholder="DD/MM/YYYY" value="" name="start_time" readonly="">
+        </div>
+        <div class="small-3 columns">
+          <h6>End Time</h6>
+        </div>
+        <div class="small-3 columns">
+          <input id="due_date" class="due_date" type="text" style="background-color:#719dc7;"   placeholder="DD/MM/YYYY" value="" name="due_date" readonly="">
+        </div>
+      </div>
+<!--       <div class="row">
+        <div class="small-2 columns">
+          <h6>Online Meeting:</h6>
+        </div>
+        <div class="small-4 columns">
+          <input type="radio" id="yeschoice"
+          name="yes" value="yes" checked>
+          <label for="yes">Yes</label>
+
+          <input type="radio" id=""
+          name="No" value="No">
+          <label for="No">No</label>
+        </div>
+      </div>
+      <div class="row">
+        <div class="small-2 columns">
+          <h6>Open Event:</h6>
+        </div>
+        <div class="small-4 columns">
+          <input type="radio" id="yeschoice"
+          name="yes" value="yes" checked>
+          <label for="yes">Yes</label>
+
+          <input type="radio" id=""
+          name="No" value="No">
+          <label for="No">No</label>
+        </div>
+      </div> -->
+    </div>
+    <div class="small-6 columns vl">
+      <div class="row">
+        <div class="small-3 columns">
+          <h6>Notes:</h6>
+        </div>
+        <div class="small-9 columns">
+          <textarea id="task_notes" rows="5" cols="50"></textarea>
+        </div>
+      </div>
+    </div>
+    <hr/>
+
+    <div class="small-2 columns right">
+      <button type="button" class="button expand" style="background-color:#164A7B; border-radius:10px;">Cancel</button>
+    </div>
+    <div class="small-2 columns right">
+      <button type="button" class="button expand create-event-btn" style="background-color:#164A7B; border-radius:10px;">Create Event</button>
+    </div>
+  </section>
 </div>
 
 </div>
@@ -385,6 +348,10 @@
         $( ".created-by-me" ).trigger( "click" );
       },
     });
+  });
+
+  $(".create-event-btn").click(function(){
+
   });
 
 
