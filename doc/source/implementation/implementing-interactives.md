@@ -33,7 +33,7 @@
 - Provide following JS methods to:
     - Create a Unique Token Key (UTK).
         - Format: USERID-YYMMDDHHMMSS
-        - User id is in cookies with key: `user_id` which needs to be pick up by JS method.
+        - User id is in [cookies](../cookie.html) with key: `user_id` which needs to be pick up by JS method.
         - *Note: Anonymous user will have `0` User Id*
     - Get JSON data at any given time.
     - Add/Update additional metadata (AMD) in same JSON data. *(TODO: Decide on AMD schema and fields)*
