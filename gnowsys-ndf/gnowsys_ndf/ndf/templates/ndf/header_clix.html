@@ -15,7 +15,7 @@
       <div class="datetime">
 
         <script type="text/javascript">
-          document.write ('<div id="date-time">', new Date().toLocaleString(), '<\/div>')
+          document.write ('<span id="date-time">', new Date().toLocaleString(), '<\/span>')
           if (document.getElementById) onload = function () {
             setInterval ("document.getElementById ('date-time').firstChild.data = new Date().toLocaleString()", 50)
           }
