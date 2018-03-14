@@ -6599,19 +6599,19 @@ input.transcript-toggler {
 }
 
 /* line 6798, ../../../scss/_clix2017.scss */
-.font-button-minus {
+.font-minus {
   font-size: 70%;
   color: #713558;
 }
 
 /* line 6801, ../../../scss/_clix2017.scss */
-.font-button-normal {
+.font-normal {
   font-size: 85%;
   color: #713558;
 }
 
 /* line 6805, ../../../scss/_clix2017.scss */
-.font-button-plus {
+.font-plus {
   font-size: 100%;
   color: #713558;
 }
