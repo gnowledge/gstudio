@@ -42,8 +42,14 @@
   <ul class="nav_menu_1" style="width:50%; display:inline">
      <li>
 
+      <a href="{% url 'course_about' group_id %}" {% if title == 'about'  %}class="selected"{% endif %} tabindex="1" title="Overview of the course"><i class="fa-eye-thumbnails"></i> 
+      {% trans "Overview" %}  </a>
+      
+    </li>
+     <li>
+
       <a href="{% url 'course_content' group_id %}" {% if title == 'course content' or title == 'unit_authoring' %}class="selected"{% endif %} tabindex="2" title="List of all the lessons"><i class="fi-list-thumbnails"></i> 
-      {% if not group_object.project_config.tab_name %}{% trans "Overview" %}{% else %}{{group_object.project_config.tab_name}} {% endif %}</a>
+      {% if not group_object.project_config.tab_name %}{% trans "Lessons" %}{% else %}{{group_object.project_config.tab_name}} {% endif %}</a>
       {% if is_gstaff %}<a href="{% url 'unit_detail' groupid %}" title="Edit Structure" style="background-color:#6f0859; border-radius:4px; margin-left:-13px; width:0px;"><i class="fa fa-pencil" style="margin-left:-7px; color:white;"></i>{% endif %}</a>
     </li>
 
