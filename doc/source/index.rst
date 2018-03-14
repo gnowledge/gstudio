@@ -14,6 +14,7 @@ Welcome to gstudio's documentation
     counter-analytics-notes
     dump-restore
     quiz
+    data-collection
     implementation/gstudio-lite
     implementation/implementing-interactives
 
