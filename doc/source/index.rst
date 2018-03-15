@@ -11,15 +11,20 @@ Welcome to gstudio's documentation
        
     gstudio-index
     api
-    CounterAnalyticsNotes.md
+    CounterAnalyticsNotes
     dump-restore
     quiz
     data-collection
     implementation/gstudio-lite
     implementation/implementing-interactives
+    cookie
 
 
-.. include:: counter-analytics-notes.rst
+.. toctree::
+    :hidden:
+
+    counter-analytics-notes.rst
+
 
 .. :titlesonly:
 .. :name: mastertoc
