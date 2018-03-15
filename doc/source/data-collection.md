@@ -27,6 +27,7 @@ Year (YYYY)                                             [ LEVEL 0 ]
                 - assessment-media                      [ LEVEL 4 ]
                     - repository                        [ LEVEL 5 ]
                     - studentResponseFiles              [ LEVEL 5 ]
+                - nginx-logs                            [ LEVEL 4 ]
             - unplatform (Optional)                     [ LEVEL 3 ]
 ```
 
@@ -76,7 +77,7 @@ we have a provision to collect data from the said platforms and both may reside 
     - `assessment-media`: Assessment files and user uploaded files in assessments. This folder will have following [LEVEL 5] directories *(qbank)*
         - `repository`: Files/Media used in assessments.
         - `studentResponseFiles`: User uploaded files in assessments e.g: recorded-audio, images etc. 
-
+    - `nginx-logs`: Contains logs produced by nginx.
 
 ---
 
@@ -98,6 +99,7 @@ Example-data-collection-dir-str/
     │       │   ├── local_settings.py
     │       │   ├── server_settings.py
     │       │   ├── git-commit.log
+    │       │   ├── nginx-logs
     │       │   └── assessment-media
     │       │       ├── repository
     │       │       └── studentResponseFiles
@@ -115,6 +117,7 @@ Example-data-collection-dir-str/
             │   ├── local_settings.py
             │   ├── server_settings.py
             │   ├── git-commit.log
+            │   ├── nginx-logs
             │   └── assessment-media
             │       ├── repository
             │       └── studentResponseFiles
