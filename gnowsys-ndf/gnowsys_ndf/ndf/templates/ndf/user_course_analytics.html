@@ -13,260 +13,314 @@
     display: none;
   }
 
+    .analytics-details{
+    border-style: solid;
+    border-width: 70px;
+    border-color: rgba(107, 0, 84, 0.97);
+    background-color: #80808026;
+  }
+  .analytics-user{
+    //background-color: #80808026;
+  }
+  .analytics-card{
+    background-color: black;
+  }
+
+  .analytics_tile {
+    height: 300px;
+    background-size: 100% 100%;
+    background-color: white;
+    padding: 20px 22px;
+    color: #fff;
+    margin-bottom: 30px;
+    cursor: pointer;
+    border-radius: 6px;
+  }
+
+    .analytics_tile-name {
+        font-size: 25px;
+        font-weight: 500;
+        letter-spacing: 1.1px;
+        margin-bottom: 15px;
+        display: block;
+        color:black;
+    }
+
+    .analytics_tile_desc {
+        letter-spacing: 0.5px;
+        font-size: 17px;
+        color:black;
+    }
+
+    .course-section-heading {
+      text-transform: uppercase;
+      font-weight: 600;
+      letter-spacing: 1.5px;
+      // //font-size: 14px;
+      display: block;
+      margin: 2px 0px 15px;
+      color: #888;
+    }
+
+    .course-section-icon {
+      //position: absolute;
+      font-size: 20px;
+      top: -35px;
+      //right: 5px;
+      color: #000000;
+      background: #ffffff;
+      margin-left: 22px;
+    }
+    .course-metric-count {
+    // //font-size: 30px;
+    font-weight: 600;
+    letter-spacing: 0.5px;
+    display: block;
+    color: #000000;
+    font-size: 17px;
+  }
+
+  .course-metric-heading {
+    text-transform: uppercase;
+    // //font-size: 12px;
+    letter-spacing: 0.9px;
+    font-weight: 500;
+    color: #000000;
+    display: block;
+  }
+
+  .course-points-breakup{
+    color:black;
+  }
+
+  .user-analytics-data{
+    margin: 42px 37px 37px 37px;
+    border: 2px solid #aaaaaa;
+    .close-reveal-modal{
+        font-size: 20px;
+    }
+}
+
+.admin-analytics{
+  //background-color: #164A7B;
+    border-style: solid;
+    border-width: 50px;
+    border-color: #164A7B;
+}
+
 </style>
 <script src="/static/ndf/bower_components/d3/d3.js"></script>
-<div class="user-analytics-data">
-<div class="pre-analytics-msg-div text-center hide">
-   {% trans "Your analytics is loading. Please wait." %} 
-</div>
-<div class="row">
-<h4 class="text-center"><u><b>PROGRESS REPORT</b></u></h4>
-    <a class="close-reveal-modal" aria-label="Close">Close [&#215;]</a>
-  <div class="small-6 columns">
-    <h3 class="inner left-space"> {{ group_name }} </h3><br/>
-    <h3 class="inner left-space"> User:  <h3 class="inner left-space"> {{username}} </h3></h3>
-  </div>
-  <div class="small-6 columns">
-    <h4 class="inner">Total points gained:  <h3 class="course-metric-count users_points inner left-space">{{users_points}}</h3></h4>
-  </div>
-</div><hr/>
-<div class="course-overview-container">
-  <div class="row collapse course-overview">
-    <div class="columns small-12 medium-6">
-      <div class="course-status">
-        {% comment %}
-        <h4>{% trans "Course status" %}</h4>
-        {% endcomment %}
-        <div class="row">
-          <div class="small-12 columns">
-            <span class="course-metric-heading">{{level1_lbl}}</span>
-            <h4 class="module_progress_stmt">{{level1_progress_stmt}}</h4>
-            <div class="progress success round">
-              <div class="module_progress_meter meter" style="width:{{level1_progress_meter}}%"></div>
-            </div>
+
+<!-- new analytics UI -->
+      {% if admin_analytics %}
+  <script src="/static/ndf/bower_components/DataTables/media/js/jquery.dataTables.js"></script>
+  <script src="/static/ndf/bower_components/datatables-plugins/integration/foundation/dataTables.foundation.js"></script>
+
+  <script src="/static/ndf/bower_components/pace/pace.js"></script>
+  <link href="/static/ndf/bower_components/pace/themes/blue/pace-theme-loading-bar.css" rel="stylesheet" />
+  <!-- DataTables CSS -->
+  <link href="/static/ndf/bower_components/datatables-plugins/integration/foundation/dataTables.foundation.css" rel="stylesheet" type="text/css" />
+
+<div id="analytics-content" class="admin-analytics">
+    <div class="group-analytics admin_inner">
+      <div class="row course-students-data ">
+        <div class="small-12 columns">
+          <div class="small-2 columns">
+            <h4>Points table for students:</h4>
+          </div>
+          <div class="small-7 columns students-table-legends">
+            <span class=" badge_ex green">&nbsp;</span>
+            <span>Gallery uploads</span>
+            <span class=" badge_ex">&nbsp;</span>
+            <span>Note Making</span>
+            <span class=" badge_ex red">&nbsp;</span>
+            <span>Quiz Performance</span>
+            <span class=" badge_ex yellow">&nbsp;</span>
+            <span>Interactions</span>
+          </div>
+          <div class="small-3 columns">
+              <h6><small>* Click on the student's name to view detailed analytics.</small></h6>
           </div>
         </div>
-        <div class="row">
-          <div class="small-12 columns">
-            <span class="course-metric-heading">{{level2_lbl}}</span>
+      </div>
+      <hr/>
+      <div class="row students-tabular-data">
+        <div class="small-12 columns table-container">
+        </div>
+      </div>
+    </div>
+    <div id="userAnalyticsModal" class="reveal-modal reveal-modal-overlay" data-options="close_on_background_click:false;close_on_esc:false;" data-reveal aria-hidden="true" role="dialog">
+      <label id="userAnalyticsModalLabel"></label>
+      <div class="userAnalyticsData"></div>
+    </div>
+
+</div>
+
+  {% else %}
+
+<div class="analytics-details">
+  <div class="row analytics-user">
+    <h6><b>PROGRESS REPORT</b></h6>
+      <div class="small-4 columns">
+        <h4 class="inner left-space">Course: {{ group_name }} </h4><br/>
+      </div>
+      <div class="small-3 columns">
+        <h4 class="inner left-space"> User: {{username}} </h4> 
+      </div>
+      <div class="small-4 columns">
+        <h4 class="inner">Total points gained:  <h3 class="course-metric-count users_points inner left-space">{{users_points}}</h3></h4>
+      </div>
+      <a class="close-reveal-modal" >&#215;</a>
+  </div>
+  <hr/>
+  <div class="row">
+    <div class="large-3 medium-6 small-12 columns">
+      <div class="analytics_tile">
+          <span class="course-metric-heading">{{level1_lbl}}</span>
+          <h4 class="module_progress_stmt">{{level1_progress_stmt}}</h4>
+          <div class="progress success round">
+            <div class="module_progress_meter meter" style="width:{{level1_progress_meter}}%"></div>
+          </div>
+          <br/>
+          <span class="course-metric-heading">{{level2_lbl}}</span>
             <h4 class='units_progress_stmt'>{{level2_progress_stmt}}</h4>
             <div class="progress success round">
               <div class="unit_progress_meter meter" style="width:{{level2_progress_meter}}%"></div>
             </div>
-
-          </div>
-        </div>
       </div>
     </div>
-    <div class="columns small-12 medium-6 points-data">
-      <div class="course-points-breakup">
-      </div>
-    </div>
-  </div>
-  <div class="analytics-panels">
-  {% with group_obj.member_of_names_list as group_member_of_name %}
-  <!-- Assessment/Quiz Performance and Inetractions -->
-  <div class="row">
-    <div class="columns small-12 medium-6">
-      <div class="course-quiz-perf course-section">
-        <span class="course-section-heading inner">Assessment Performance  </span>
-          {% if "announced_unit" in group_member_of_name %}
-          <a class="fetch-assessment-analytics inner left-space" data-user-id={{user_id}}>Refresh</a>
-          <span class="course-section-icon">
-            <i class="fa fa-question-circle"></i>
-          </span>
-        </span>
-        {% endif %}
-        <!-- Total Questions and Correct Answers -->
-        <div class="row">
-          <div class="columns small-12 medium-6">
-            <span class="course-metric-heading">{% trans "Total Questions" %}</span>
-            <span class="course-metric-count total_quizitems">{{total_quizitems}}</span>
-          </div>
-          <div class="columns small-12 medium-6">
+    {% with group_obj.member_of_names_list as group_member_of_name %}
+    <div class="large-3 medium-6 small-12 columns">
+        <div class="analytics_tile">
+            <span class="course-section-icon">
+              <i class="fa fa-question-circle"></i>
+            </span>
+            <span class="course-section-heading inner">Assessment Performance  </span>
+            {% if "announced_unit" in group_member_of_name %}
+              <a class="fetch-assessment-analytics inner left-space" data-user-id={{user_id}}>Refresh</a>
+            {% endif %}
+            <hr/>
+            <div class="small-6 columns">
+              <span class="course-metric-heading">{% trans "Total Questions" %}</span>
+              <span class="course-metric-count total_quizitems">{{total_quizitems}}</span>
+            </div>
             <span class="course-metric-heading">Correct Answers</span>
             <span class="course-metric-count correct-count correct_attempted_quizitems">{{correct_attempted_quizitems}}</span>
-          </div>
-        </div>
-
-        <!-- Attempted Questions and Incorrect Answers -->
-        <div class="row">
-          <div class="columns small-12 medium-6">
-            <span class="course-metric-heading">Attempted</span>
-            <span class="course-metric-count attempted_quizitems">{{attempted_quizitems}}</span>
-          </div>
-
-          <div class="columns small-12 medium-6">
+            <div class="small-6 columns">
+              <span class="course-metric-heading">Attempted</span>
+                <span class="course-metric-count attempted_quizitems">{{attempted_quizitems}}</span>
+            </div>
             <span class="course-metric-heading">{% trans "Incorrect answers" %}</span>
             <span class="course-metric-count incorrect-count incorrect_attempted_quizitems">{{incorrect_attempted_quizitems}}</span>
-          </div>
-        </div>
-
-        {% if "announced_unit" in group_member_of_name %}
-        <div class="row">
-          <div class="columns small-12 medium-6">
-            <span class="course-metric-heading">{% trans "Not Attempted" %}</span>
-            <span class="course-metric-count unattempted_quizitems">{{unattempted_quizitems}}</span>
-          </div>
-        </div>
-        {% endif %}
-      </div>
-    </div>
-    <div class="columns small-12 medium-6">
-      <div class="course-interactions course-section">
-        <span class="course-section-heading">{% trans "Interactions" %}
-        <span class="course-section-icon">
-          <i class="fa fa-comments"></i>
-        </span>
-        </span>
-        <div class="row">
-          <div class="columns small-12 medium-6">
-            <span class="course-metric-heading">{% trans "Comments By me" %}</span>
-            <span class="course-metric-count total_cmnts_by_user">{{total_cmnts_by_user}}</span>
-          </div>
-          {% comment %}
-          <div class="columns small-12 medium-6">
-            <span class="course-metric-heading">Avg Rating for my comments</span>
-            <span class="course-metric-count">
-              <div class="row avg_rating_for_my_cmnts">
-                <div class="columns small-6 medium-6 rating-stars"></div>
-                <div class="columns small-6 medium-6 rating_lbl left"></div>
+            {% if "announced_unit" in group_member_of_name %}
+              <div class="small-6 columns">
+                <span class="course-metric-heading">{% trans "Not Attempted" %}</span>
+                <span class="course-metric-count unattempted_quizitems">{{unattempted_quizitems}}</span>
               </div>
-            </span>
-          </div>
-          {% endcomment %}
+            {% endif %}
         </div>
-        <div class="row">
-          <div class="columns small-12 medium-6">
-            <span class="course-metric-heading">{% trans "Comments for me" %}</span>
-            <span class="course-metric-count cmnts_rcvd_by_user">{{cmnts_rcvd_by_user}}</span>
-          </div>
-          {% comment %}
-          <div class="columns small-12 medium-6">
-            <span class="course-metric-heading">Avg Ratings to others</span>
-            <span class="course-metric-count">
-              <div class="row avg_rating_to_othr_cmnts_by_me">
-                <div class="columns small-6 medium-6 rating-stars"></div>
-                <div class="columns small-6 medium-6 rating_lbl left"></div>
-              </div>
-
-            </span>
-          </div>
-          {% endcomment %}
-        </div>
-      </div>
     </div>
-  </div>
-  {% endwith %}
-
-  <!-- Gallery and Notes -->
-  <div class="row">
-    <div class="columns small-12 medium-6">
-
-      <div class="course-gallery-uploads course-section">
-        <span class="course-section-heading">{% trans "Gallery uploads" %}
+    {% endwith %}
+    <div class="large-3 medium-6 small-12 columns">
+      <div class="analytics_tile">
           <span class="course-section-icon">
-            <i class="fa fa-file-image-o"></i>
+            <i class="fa fa-pencil-square-o"></i>
           </span>
-        </span>
-        <div class="row">
-          <div class="columns small-12 medium-4">
-            <span class="course-metric-heading">{% trans "Files Uploaded" %}</span>
-            <span class="course-metric-count user_files">{{user_files}}</span>
-          </div>
-          <div class="columns small-12 medium-4">
-            <span class="course-metric-heading">{% trans "Visits gained" %}</span>
-            <span class="course-metric-count other_viewing_my_files">{{other_viewing_my_files}}</span>
-          </div>
-          <div class="columns small-12 medium-4">
-            <span class="course-metric-heading">{% trans "Comments recieved" %}</span>
-            <span class="course-metric-count cmts_on_user_files">{{cmts_on_user_files}}</span>
-          </div>
-        </div>
-        <div class="row">
-          <div class="columns small-12 medium-4">
-            <span class="course-metric-heading">{% trans "Visits on Other Files" %}</span>
-            <span class="course-metric-count total_files_viewed_by_user">{{total_files_viewed_by_user}}</span>
-          </div>
-          <div class="columns small-12 medium-4">
-            <span class="course-metric-heading">{% trans "Comments on other files" %}</span>
-            <span class="course-metric-count commented_on_others_files">{{commented_on_others_files}}</span>
-          </div>
-          <div class="columns small-12 medium-4">
-            <span class="course-metric-heading">{% trans "Comments by unique users" %}</span>
-            <span class="course-metric-count unique_users_commented_on_user_files">{{unique_users_commented_on_user_files}}</span>
-          </div>
-        </div>
-        <div class="row">
-          <div class="columns small-12">
-            <span class="course-metric-heading">{% trans "Avg. Rating Awarded" %}</span>
-            <span class="course-metric-count">
-              <div class="row total_rating_rcvd_on_files">
-                <div class="columns small-6 medium-6 rating-stars" style="width:{{total_rating_rcvd_on_files|multiply:16}}px; {% if total_rating_rcvd_on_files > 0 %}display:block !important;{% endif %}"></div>
-                <div class="columns small-6 medium-6 rating_lbl left">{{total_rating_rcvd_on_files}}</div>
-              </div>
-            </span>
-          </div>
-        </div>
-      </div>
-    </div>
-    <div class="columns small-12 medium-6">
-
-      <div class="course-notes course-section">
-        <span class="course-section-heading">{% trans "Note Making" %}
-        <span class="course-section-icon">
-          <i class="fi-clipboard-pencil"></i>
-        </span>
-        </span>
-        <div class="row">
-          <div class="columns small-12 medium-4">
+          <span class="course-section-heading inner">{% trans "Note Making" %}</span>
+          <hr/>
+          <div class="small-6 columns">
             <span class="course-metric-heading">{% trans "Notes Written" %}</span>
             <span class="course-metric-count user_notes">{{user_notes}}</span>
           </div>
-          <div class="columns small-12 medium-4">
-            <span class="course-metric-heading">{% trans "Views Gained" %}</span>
+          <span class="course-metric-heading">{% trans "Views Gained" %}</span>
             <span class="course-metric-count others_reading_my_notes">{{others_reading_my_notes}}</span>
-          </div>
-          <div class="columns small-12 medium-4">
+          <div class="small-6 columns">
             <span class="course-metric-heading">{% trans "Comments recieved" %}</span>
             <span class="course-metric-count cmts_on_user_notes">{{cmts_on_user_notes}}</span>
           </div>
-        </div>
-        <div class="row">
-          <div class="columns small-12 medium-4">
-            <span class="course-metric-heading">{% trans "Visits on Other Notes" %}</span>
+          <span class="course-metric-heading">{% trans "Visits on Other Notes" %}</span>
             <span class="course-metric-count total_notes_read_by_user">{{total_notes_read_by_user}}</span>
-          </div>
-          <div class="columns small-12 medium-4">
+          <div class="small-6 columns">
             <span class="course-metric-heading">{% trans "Comments on other notes" %}</span>
             <span class="course-metric-count commented_on_others_notes">{{commented_on_others_notes}}</span>
           </div>
-        </div>
-        <div class="row">
-          <div class="columns small-12">
-            <span class="course-metric-heading">{% trans "Avg. Rating Awarded" %}</span>
+          <span class="course-metric-heading">{% trans "Avg. Rating Awarded" %}</span>
             <span class="course-metric-count">
               <div class="row total_rating_rcvd_on_notes">
                 <div class="columns small-6 medium-6 rating-stars" style="width:{{total_rating_rcvd_on_notes|multiply:16}}px;{% if total_rating_rcvd_on_notes > 0 %}display:block !important;{% endif %}"></div>
                 <div class="columns small-6 medium-6 rating_lbl left">{{total_rating_rcvd_on_notes}}</div>
               </div>
             </span>
+      </div>
+    </div>
+    {% with group_obj.member_of_names_list as group_member_of_name %}
+    <div class="large-3 medium-6 small-12 columns">
+      <div class="analytics_tile">
+        <span class="course-section-icon">
+          <i class="fa fa-comments"></i>
+        </span>
+        <span class="course-section-heading inner">{% trans "Interactions" %}
+        </span>
+        <hr/>
+        <span class="course-metric-heading">{% trans "Comments By me" %}</span>
+            <span class="course-metric-count total_cmnts_by_user">{{total_cmnts_by_user}}</span>
+            <br/>
+        <span class="course-metric-heading">{% trans "Comments for me" %}</span>
+            <span class="course-metric-count cmnts_rcvd_by_user">{{cmnts_rcvd_by_user}}</span>
+      </div>
+    </div>
+    {% endwith %}
+    <div class="large-6 medium-8 small-12 columns">
+      <div class="analytics_tile">
+        <div class="columns small-12 medium-6 points-data">
+          <div class="course-points-breakup">
           </div>
         </div>
       </div>
-    </div>  
+    </div>
+    <div class="large-6 medium-8 small-12 columns">
+      <div class="analytics_tile">
+          <span class="course-section-icon">
+            <i class="fa fa-upload"></i>
+          </span>
+          <span class="course-section-heading inner">{% trans "Gallery uploads" %}</span>
+          <hr/>
+          <div class="small-6 columns">
+            <span class="course-metric-heading">{% trans "Files Uploaded" %}</span>
+            <span class="course-metric-count user_files">{{user_files}}</span>
+            <span class="course-metric-heading">{% trans "Avg. Rating awarded" %}</span>
+            <span class="course-metric-count">
+              <div class="row total_rating_rcvd_on_files">
+                <div class="columns small-6 medium-6 rating-stars" style="width:{{total_rating_rcvd_on_files|multiply:16}}px; {% if total_rating_rcvd_on_files > 0 %}display:block !important;{% endif %}"></div>
+                <div class="columns small-6 medium-6 rating_lbl left">{{total_rating_rcvd_on_files}}</div>
+              </div>
+            </span>
+            <span class="course-metric-heading">{% trans "Comments on other Files" %}</span>
+            <span class="course-metric-count commented_on_others_files">{{commented_on_others_files}}</span>
+          </div>
+          <div class="small-6 columns">
+            <span class="course-metric-heading">{% trans "Comments by unique users" %}</span>
+            <span class="course-metric-count unique_users_commented_on_user_files">{{unique_users_commented_on_user_files}}</span>
+            <span class="course-metric-heading">{% trans "Visits gained" %}</span>
+            <span class="course-metric-count other_viewing_my_files">{{other_viewing_my_files}}</span>
+            <span class="course-metric-heading">{% trans "Comments recieved" %}</span>
+            <span class="course-metric-count cmts_on_user_files">{{cmts_on_user_files}}</span>
+            <span class="course-metric-heading">{% trans "Visits on Other Files" %}</span>
+            <span class="course-metric-count total_files_viewed_by_user">{{total_files_viewed_by_user}}</span>
+            
+          </div>
+      </div>
+    </div>
+    
   </div>
-  </div>  
-  {% comment %}
-  <div class="course-warning course-section">
-      <h5>WAITING FOR YOUR FEEDBACK</h5>
-      <div><i class="fa fa-sign-in"></i><a>3 New notes added</a></div>
-      <div><i class="fa fa-file-image-o"></i><a>36 New files uploaded in the gallery</a></div>
-      <div></div>
-  </div>
-  {% endcomment %}
 </div>
-</div>
+  {% endif %}
+
+
+
+
+
+
 
 
 <script type="text/javascript">
@@ -376,21 +430,27 @@
     }
 
     $(document).ready(function() {
-      var points_dict = {{users_points_breakup|safe}}
-        if({{users_points}} >  0){
-          if (points_dict.hasOwnProperty('Total')){
-            delete points_dict['Total']
-          }
-          $.each(points_dict, function(e,v){
-            if(v==0){
-              delete points_dict[e]
+      window.scrollTo(0,150);
+
+      {% if admin_analytics %}
+        fetch_group_analytics()
+      {% else %}
+        var points_dict = {{users_points_breakup|safe}}
+          if({{users_points}} >  0){
+            if (points_dict.hasOwnProperty('Total')){
+              delete points_dict['Total']
             }
-          })
-          generateGraph(points_dict)
-        }
-        else{
-          $(".course-points-breakup").html("<i>No points to show Pie Chart</i>")
-        }
+            $.each(points_dict, function(e,v){
+              if(v==0){
+                delete points_dict[e]
+              }
+            })
+            generateGraph(points_dict)
+          }
+          else{
+            $(".course-points-breakup").html("<i>No points to show Pie Chart</i>")
+          }
+      {% endif %}
       })
 
     $(document).on('click', '.fetch-assessment-analytics', function(){
@@ -419,5 +479,91 @@
       });//end of ajax
 
     })
+
+
+      // Admin analytics view
+      function fetch_group_analytics(){
+          $(".admin_analytics_fetched").attr('value', "True");
+          data = {{response_dict|safe}}
+          column_headers = data["column_headers"];
+          students_data_set = data["students_data_set"];
+          max_data = data['max_points_dict']
+          file_max_points = max_data['file_max_points']
+          notes_max_points = max_data['notes_max_points']
+          quiz_max_points =  max_data['quiz_max_points']
+          interactions_max_points = max_data['interactions_max_points']
+          dataTable_columns_set = [];
+
+          var students_points_table = '<table cellpadding="0" cellspacing="0" border="0" class="display" id="students-points-table-tbody">' + '</table>';
+          $(".table-container").html(students_points_table)
+          // Prepare title & data headers used in dataTable
+          $.each(column_headers, function(index, v) {
+            d = {};
+            d["data"] = v[0];
+            d["title"] = v[1];
+            dataTable_columns_set.push(d);
+          });
+          // Set defintion dataTable
+          sce_dt_var = $("#students-points-table-tbody").dataTable({
+            "data": students_data_set,
+            "columns": dataTable_columns_set,
+            "autoWidth": false,
+            "columnDefs": [
+                  { width: '10%', targets: 0 },
+                  { width: '10%', targets: 1 },
+                  { width: '20%', targets: 2 },
+                  { width: '20%', targets: 3 },
+                  { width: '20%', targets: 4 },
+                  { width: '20%', targets: 5 }
+               ],
+            "createdRow": function ( row, data, index ) {
+              user_id = data["user_id"];
+              $(row).attr("data-id", user_id);
+
+              $(row).attr("data-points-dict", JSON.stringify(data));
+
+              $(row).addClass("fetch-analytics")
+              $(row).find("td:nth-child(3)").html(generate_points_bar(data['files_points'], "Files",data['users_points'],file_max_points));
+              $(row).find("td:nth-child(4)").html(generate_points_bar(data['notes_points'], "Notes",data['users_points'],notes_max_points));
+              $(row).find("td:nth-child(5)").html(generate_points_bar(data['quiz_points'], "Quiz",data['users_points'],quiz_max_points));
+              $(row).find("td:nth-child(6)").html(generate_points_bar(data['interactions_points'], "Interactions",data['users_points'],interactions_max_points));
+
+            }
+          });
+      }
+
+      // Admin analytics view. Score-points in horizontal bars of enrolled students
+      function generate_points_bar(data_for_bars, bar_name, total_user_points, max){
+        if(data_for_bars && total_user_points){
+          var outer_div = document.createElement("div");
+          outer_div.className = "progress small-12 large-12"
+          var span_ele = document.createElement("span");
+          span_ele.className = "meter";
+          span_ele.style.width = (data_for_bars/parseInt(max, 10))* 100 + "%"
+          if (bar_name == "Interactions"){
+            bg_color_val = "#ffe694"
+          }
+          else if(bar_name == "Files"){
+            bg_color_val = "#b5d8a6"
+          }
+          else if(bar_name == "Notes"){
+            bg_color_val = "#9ec4fa"
+          }
+          else if(bar_name == "Quiz"){
+            bg_color_val = "#fa623f"
+          }
+
+          span_ele.style.backgroundColor = bg_color_val
+          var inner_span_ele = document.createElement("span")
+          inner_span_ele.className = "pull-left merter-val"
+          inner_span_ele.innerHTML = data_for_bars
+          $(span_ele).append(inner_span_ele)
+          $(outer_div).append(span_ele)
+          return outer_div.outerHTML;
+        }
+        else{
+          return "NA"
+        }
+      }
 
 </script>

@@ -62,6 +62,15 @@
       <a href="{% url 'course_notebook' group_id %}" {% if title == 'notebook' %}class="selected"{% endif %} tabindex="5" title="Create and share notes, read notes shared by all students"><i class="fi-book "></i>{% if not group_object.project_config.blog_name %}{% trans "Blog" %}{% else %} {{group_object.project_config.blog_name}} {% endif %}
       </a>
     </li>
+    {% if request.user.is_authenticated %}
+    <li>
+      <a {% if is_gstaff %} href="{% url 'course_analytics_admin' group_id %}" {% else %} href="" {% endif %}{% if title == 'progress_report' %} class="selected" {% endif %} tabindex="6" title="See how you have done, how many comments have you received." > <i class="fa fa-line-chart"></i> 
+                {% if 'Group' in group_object_member_of_names_list %}
+                  {% trans "Stats" %}{% else %}{% trans "Progress Report" %}
+                {% endif %}
+      </a>
+    </li>
+       {% endif %}
      {% if 'Group'  in group_object_member_of_names_list and "base_unit" not in group_object_member_of_names_list and "announced_unit" not in group_object_member_of_names_list %}
     <li>
       <a href="{% url 'curriculum_list' groupid  %}" tabindex="6"> <i class="fa fa-sitemap ">  </i> {% trans "Topic Map" %}</a>
@@ -205,6 +214,11 @@
     <div id="group_blog">
        {% if title == 'notebook' %}
           {% include "ndf/gnotebook.html" %}
+        {% endif %}
+    </div>
+    <div id="progress_report">
+       {% if title == 'progress_report' %}
+          {% include "ndf/user_course_analytics.html" %}
         {% endif %}
     </div>
     <div id="group_course_content">

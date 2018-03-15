@@ -3165,8 +3165,123 @@ def course_analytics(request, group_id, user_id, render_template=False, get_resu
     )
 
     # return HttpResponse(json.dumps(analytics_data))
+@login_required
+@get_execution_time
+def course_analytics_admin(request, group_id):
+
+    cache_key = u'course_analytics_admin' + unicode(group_id)
+    cache_result = cache.get(cache_key)
+    # if cache_result:
+    #     return HttpResponse(cache_result)
+
+    # from gnowsys_ndf.ndf.views.analytics_methods import AnalyticsMethods
+    # from gnowsys_ndf.settings import GSTUDIO_FILE_UPLOAD_POINTS, GSTUDIO_COMMENT_POINTS, GSTUDIO_NOTE_CREATE_POINTS, GSTUDIO_QUIZ_CORRECT_POINTS
+    group_obj   = get_group_name_id(group_id, get_obj=True)
+    group_id    = group_obj._id
+    group_name  = group_obj.name
+
+    thread_node = None
+    banner_pic_obj,old_profile_pics = _get_current_and_old_display_pics(group_obj)
+    
+
+    allow_to_join = get_group_join_status(group_obj)
+    context_variables = {
+            'group_id': group_id, 'groupid': group_id, 'group_name':group_name,
+            'group_obj': group_obj, 'title': 'progress_report', 'allow_to_join': allow_to_join,
+            'old_profile_pics':old_profile_pics, "prof_pic_obj": banner_pic_obj, "admin_analytics":  True
+            }
 
 
+    group_obj = get_group_name_id(group_id, get_obj=True)
+    admin_analytics_data_list = []
+    admin_analytics_data_append = admin_analytics_data_list.append
+    FILES_MAX_POINT_VAL = NOTES_MAX_POINT_VAL = QUIZ_MAX_POINT_VAL = INTERACTIONS_MAX_POINT_VAL = 0
+
+    all_group_authors = node_collection.find({'_type': u'Author', 'created_by': {'$in': group_obj.author_set}})
+    # print group_obj.author_set
+
+    auth_counters = counter_collection.find({'user_id': {'$in': group_obj.author_set}, 'group_id': ObjectId(group_id) })
+
+    for each_author_obj in all_group_authors:
+        admin_analytics_data = {}
+
+        try:
+            user_counter_obj = Counter(auth_counters.clone().where('this.user_id == '+str(each_author_obj.created_by)+' && this.group_id ==  "'+str(group_id)+'"')[0])
+        except Exception, e:
+            user_counter_obj = Counter.get_counter_obj(each_author_obj.created_by, ObjectId(group_id))
+            print e
+
+        # try:
+        #     user_obj = User.objects.get(pk=int(each_author_obj))
+        # except Exception, e:
+        #     continue
+
+        # analytics_instance = AnalyticsMethods(request, user_obj.id,user_obj.username, group_id)
+        # username = user_obj.username
+        # user_id = user_obj.id
+        # users_points = analytics_instance.get_users_points()
+        admin_analytics_data['username']    = each_author_obj.name
+        admin_analytics_data['user_id']     = each_author_obj.created_by
+        admin_analytics_data['users_points']= user_counter_obj['group_points']
+
+        # admin_analytics_data["files_points"] = user_counter_obj['file']['created'] * GSTUDIO_FILE_UPLOAD_POINTS
+        admin_analytics_data["files_points"] = user_counter_obj.get_file_points()
+        if FILES_MAX_POINT_VAL < admin_analytics_data["files_points"]:
+            FILES_MAX_POINT_VAL = admin_analytics_data["files_points"]
+
+        # admin_analytics_data['notes_points'] = user_counter_obj['page']['blog']['created'] * GSTUDIO_NOTE_CREATE_POINTS
+        admin_analytics_data['notes_points'] = user_counter_obj.get_page_points(page_type='blog')
+        if NOTES_MAX_POINT_VAL < admin_analytics_data['notes_points']:
+            NOTES_MAX_POINT_VAL = admin_analytics_data['notes_points']
+
+
+        if "announced_unit" in group_obj.member_of_names_list:
+            admin_analytics_data['quiz_points'] = user_counter_obj.get_assessment_points()
+            if QUIZ_MAX_POINT_VAL < admin_analytics_data['quiz_points']:
+                QUIZ_MAX_POINT_VAL = admin_analytics_data['quiz_points']
+        else:
+            # admin_analytics_data['quiz_points'] = user_counter_obj['quiz']['correct'] * GSTUDIO_QUIZ_CORRECT_POINTS
+            admin_analytics_data['quiz_points'] = user_counter_obj.get_quiz_points()
+            if QUIZ_MAX_POINT_VAL < admin_analytics_data['quiz_points']:
+                QUIZ_MAX_POINT_VAL = admin_analytics_data['quiz_points']
+
+        # admin_analytics_data['interactions_points'] = user_counter_obj['total_comments_by_user'] * GSTUDIO_COMMENT_POINTS
+        admin_analytics_data['interactions_points'] = user_counter_obj.get_interaction_points()
+        if INTERACTIONS_MAX_POINT_VAL < admin_analytics_data['interactions_points']:
+            INTERACTIONS_MAX_POINT_VAL = admin_analytics_data['interactions_points']
+
+        # del analytics_instance
+        admin_analytics_data_append(admin_analytics_data)
+
+    max_points_dict = {'file_max_points': FILES_MAX_POINT_VAL,'notes_max_points': NOTES_MAX_POINT_VAL,
+    'quiz_max_points': QUIZ_MAX_POINT_VAL, 'interactions_max_points': INTERACTIONS_MAX_POINT_VAL}
+
+    column_headers = [
+        ("username", "Name"),
+        # ("user_id", "user_id"),
+        ("users_points", "Total Points"),
+        ("files_points", "Files"),
+        ("notes_points", "Notes"),
+        ("quiz_points", "Quiz"),
+        ("interactions_points", "Interactions"),
+    ]
+    response_dict = {}
+    response_dict["column_headers"] = column_headers
+    response_dict["success"] = True
+    response_dict["students_data_set"] = admin_analytics_data_list
+    response_dict['max_points_dict'] = max_points_dict
+    context_variables["response_dict"] = json.dumps(response_dict)
+    cache.set(cache_key, response_dict, 60*10)
+    return render_to_response("ndf/lms.html",
+                                context_variables,
+                                context_instance = RequestContext(request)
+    )
+
+
+    # print "\n admin_analytics_data_list === ",admin_analytics_data_list
+    return HttpResponse(response_dict)
+
+'''
 @login_required
 @get_execution_time
 def course_analytics_admin(request, group_id):
@@ -3264,7 +3379,6 @@ def course_analytics_admin(request, group_id):
     # print "\n admin_analytics_data_list === ",admin_analytics_data_list
     return HttpResponse(response_dict)
 
-'''
 @login_required
 @get_execution_time
 def course_analytics_admin(request, group_id):
