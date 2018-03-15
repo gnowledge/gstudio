@@ -13,6 +13,9 @@
 	   CKEDITOR.plugins.addExternal('addJhapp',basePath+'ndf/js/ckPlugins/addJhapp/','plugin.js');
 	   CKEDITOR.plugins.addExternal('mathjax',basePath+'ndf/bower_components/ckeditor/plugins/mathjax/','plugin.js');
 	   CKEDITOR.plugins.addExternal('font',basePath+'ndf/bower_components/ckeditor/plugins/font/','plugin.js');
+	   CKEDITOR.plugins.addExternal('find',basePath+'ndf/bower_components/ckeditor/plugins/find/','plugin.js');
+	   CKEDITOR.plugins.addExternal('smiley',basePath+'ndf/bower_components/ckeditor/plugins/smiley/','plugin.js');
+	
 	})
 	();
     CKEDITOR.config.bodyId = 'scstyle';
@@ -29,7 +32,7 @@ CKEDITOR.editorConfig = function( config ) {
 	config.toolbar_GeneralToolbar =
 	[
 
-		{ name: 'basicstyles', items : [ 'Bold','Italic','Strike','-','RemoveFormat','Subscript','Superscript' ] },
+		{ name: 'basicstyles', items : [ 'Bold','Italic','Underline','Strike','-','RemoveFormat','Subscript','Superscript','Undo','Redo' ] },
 		{ name: 'editing', items : [ 'Find','Replace','-','SelectAll','-','Scayt' ] },
 		{ name: 'insert', items : [ 'Flash','Table','HorizontalRule','Smiley','SpecialChar','PageBreak','Iframe','video'] },
 		{ name: 'styles', items: [ 'Format', 'FontSize' ] },
@@ -46,7 +49,7 @@ CKEDITOR.editorConfig = function( config ) {
 
 	config.toolbar_BasicToolbar =
 	[
-		{ name: 'basicstyles', items : [ 'Bold','Italic','Strike','-','RemoveFormat','Subscript', 'Superscript' ] },
+		{ name: 'basicstyles', items : [ 'Bold','Italic','Underline','Strike','-','RemoveFormat','Subscript', 'Superscript','Undo','Redo','Find','Smiley' ] },
 		{ name: 'paragraph', items : [ 'NumberedList','BulletedList','Mathjax','-','JustifyLeft', 'JustifyCenter', 'JustifyRight', 'JustifyBlock' ] },
 		{ name: 'links', items : [ 'Link','Unlink'] },
 		{ name: 'editing', groups: [ 'find', 'selection', 'spellchecker' ]},
@@ -58,14 +61,14 @@ CKEDITOR.editorConfig = function( config ) {
 
 	config.toolbar_GgallaryCommentsToolbar =
 	[
-		{ name: 'basicstyles', items : [ 'Bold','Italic','align' ] },
+		{ name: 'basicstyles', items : [ 'Bold','Italic','Underline','align','Undo','Redo','Find','Smiley' ] },
 		{ name: 'links', items : [ 'Link','Unlink'] },
 		{ name: 'tools', items : ['closebtn'] },
 	];
 
 	config.toolbar_LMSStudentsToolbar =
 	[
-		{ name: 'basicstyles', items : [ 'Bold','Italic','align' ] },
+		{ name: 'basicstyles', items : [ 'Bold','Italic','Underline','align','Undo','Redo','Find','Smiley' ] },
 		{ name: 'paragraph', items : [ 'NumberedList','BulletedList','Mathjax','-','JustifyLeft', 'JustifyCenter', 'JustifyRight', 'JustifyBlock' ] },
 		{ name: 'links', items : [ 'Link','Unlink'] },
 		{ name: 'tools', items : ['addImage','addAudio','addVideo','Anchors','closebtn'] },
@@ -97,7 +100,7 @@ CKEDITOR.editorConfig = function( config ) {
 	// not needed in the Standard(s) toolbar.
 	// config.mathJaxLib = '//cdn.mathjax.org/mathjax/2.6-latest/MathJax.js?config=TeX-AMS_HTML';
 	config.mathJaxLib = '/static/ndf/bower_components/MathJax/MathJax.js?config=TeX-AMS-MML_HTMLorMML';
-	config.removeButtons = 'Underline';
+	//config.removeButtons = 'Underline';
 
 	// Set the most common block elements.
 	config.format_tags = 'p;h1;h2;h3;pre';
@@ -107,7 +110,7 @@ CKEDITOR.editorConfig = function( config ) {
 
 	// Simplify the dialog windows.
 	config.removeDialogTabs = 'image:advanced;link:advanced';
-	config.extraPlugins = 'addImage,closebtn,addAudio,addVideo,addJhapp,mathjax,justify,font';
+	config.extraPlugins = 'addImage,closebtn,addAudio,addVideo,addJhapp,mathjax,justify,font,find,smiley';
 	config.allowedContent = true;
 
 };
