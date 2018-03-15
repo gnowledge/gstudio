@@ -3761,7 +3761,7 @@ ul.jqtree-tree .jqtree-toggler {
 
 $activity-border-color: #e0e0e0;
 $activity-header-height: 35px;;
-$activity-header-icon-block-width: 70px;
+$activity-header-icon-block-width: 75px;
 body {
     background-color: #fff;
 }
@@ -3884,6 +3884,7 @@ $ah_2_background_color_hover: rgba(244, 244, 244, 0.3);
         font-size: 16px;
         line-height: $activity-header-height;
         color: $ah_2_icon_color;
+
         &:hover{
             background-color:$ah_2_icon_color;
             color:#ffffff;
@@ -5680,6 +5681,7 @@ ul.authoring-tab{
 
 .input_links{
     margin-left: 10px;
+    padding-bottom : 40px;
     a{
         margin-right: 35px;
         margin-top: 5px;
