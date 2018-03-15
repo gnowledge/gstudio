@@ -6575,3 +6575,43 @@ input.transcript-toggler {
 .uname-in-dashboard {
   font-family: Open Sans Bold;
 }
+
+/*toolbar css*/
+/* line 6788, ../../../scss/_clix2017.scss */
+#toolbar {
+  width: 100%;
+  display: inline-block;
+  margin-bottom: -7px;
+}
+
+/* line 6791, ../../../scss/_clix2017.scss */
+.datetime {
+  color: #713558;
+  padding: 4px 0px 2px 5px;
+  font-size: 12px;
+}
+
+/* line 6794, ../../../scss/_clix2017.scss */
+.changefont {
+  text-align: right;
+  padding: 2px 5px 1px 0px;
+  margin-right: 88px;
+}
+
+/* line 6797, ../../../scss/_clix2017.scss */
+.font-minus {
+  font-size: 70%;
+  color: #713558;
+}
+
+/* line 6800, ../../../scss/_clix2017.scss */
+.font-normal {
+  font-size: 85%;
+  color: #713558;
+}
+
+/* line 6804, ../../../scss/_clix2017.scss */
+.font-plus {
+  font-size: 100%;
+  color: #713558;
+}
