@@ -3783,6 +3783,7 @@ $ah_2_background_color_hover: rgba(244, 244, 244, 0.3);
         display: inline-block;
         vertical-align: top;
         //cursor: pointer;
+        z-index : 99;
 
         &:not(:last-child) {
             border-right: 1px solid #fff;
