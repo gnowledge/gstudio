@@ -140,7 +140,7 @@ def unit_create_edit(request, group_id, unit_group_id=None):
         if blog_name:
             unit_node['project_config'].update( {"blog_name":blog_name})
         elif "base_unit" in unit_node.member_of_names_list or "announced_unit" in unit_node.member_of_names_list :
-            unit_node['project_config'].update( {"blog_name":"Blog"})
+            unit_node['project_config'].update( {"blog_name":"e-Notes"})
         else:
             unit_node['project_config'].update( {"blog_name":"blog Name"})
         
