@@ -3191,7 +3191,7 @@ def course_filters(request, group_id):
 
 
 # @login_required
-# @get_execution_time
+@get_execution_time
 def course_analytics(request, group_id, user_id, render_template=False, get_result_dict=False, **kwargs):
     # set get_result_dict=True to get only raw data in dict format,
     # without being redirected to template. So that this method can
