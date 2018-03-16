@@ -2139,9 +2139,9 @@ def activity_player_detail(request, group_id, lesson_id, activity_id):
     }
     
     
-    if prev_lesson_obj:
+    if prev_lesson_obj and prev_lesson_obj.collection_set:
         context_variables.update({ 'lesson_act_prev_id': prev_lesson_obj.collection_set[0],'prev_lesson_id':prev_lesson_obj._id })
-    if next_lesson_obj:
+    if next_lesson_obj and next_lesson_obj.collection_set:
         context_variables.update({ 'next_lesson_id':next_lesson_obj._id,'lesson_next_act_id': next_lesson_obj.collection_set[0] })
     
     
