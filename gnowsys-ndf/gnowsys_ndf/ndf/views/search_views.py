@@ -27,9 +27,9 @@ from elasticsearch import Elasticsearch
 from elasticsearch_dsl import *
 from django.shortcuts import render_to_response  # , render
 from elasticsearch_dsl.query import MultiMatch, Match
+from gnowsys_ndf.ndf.models.es import *
 
-
-es = Elasticsearch("http://elastic:changeme@gsearch:9200", timeout=100, retry_on_timeout=True)
+#es = Elasticsearch("http://elastic:changeme@gsearch:9200", timeout=100, retry_on_timeout=True)
 
 my_doc_requirement = u'storing_orignal_doc'
 reduced_doc_requirement = u'storing_reduced_doc'
@@ -166,7 +166,6 @@ def results_search(request, group_id, page_no=1, return_only_dict = None):
 	"""
 	context_to_return = {}
 	if GSTUDIO_ELASTIC_SEARCH == True :
-		print "siddhu"
 	
 		try:
 			group_id = ObjectId(group_id)
