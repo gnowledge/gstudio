@@ -31,7 +31,7 @@ class esearch:
         temp1 = fp[:-29]
         temp2 = temp1[14:]
 
-        glite_fp = "/data/glite-rcs-repo-new" + temp2
+        glite_fp = "/data/glite-rcs-repo" + temp2
 
         try:
             os.makedirs(glite_fp)
