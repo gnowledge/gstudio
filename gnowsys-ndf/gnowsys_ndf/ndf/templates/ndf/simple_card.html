@@ -50,7 +50,6 @@
     {% if GSTUDIO_ELASTIC_SEARCH != True %}
       {% get_dict_from_list_of_dicts resource.attribute_set as attr_set_dict %}
     {% endif %}
-
     {% get_relation_value resource.pk 'has_thumbnail' as grel_dict %}
     {% if not grel_dict.cursor and grel_dict.grel_node and grel_dict.grel_node.fs_file_ids.1 %}
         <img src="{{MEDIA_URL}}{{grel_dict.grel_node.if_file.mid.relurl}}" alt="" />
@@ -135,8 +134,11 @@
      <a style="margin-left:2px" href="{% url 'dashboard' resource.created_by %}" title="{{resource.created_by|get_username}}" target="_blank">
       {{resource.created_by|get_username|truncatechars:"10"}}</a>
      {% endif %}
-         <i style="float:right">{{resource.created_at|date:"d-m-Y"}}</i>
-     
+        {% if GSTUDIO_ELASTIC_SEARCH != True %}
+          <i style="float:right">{{resource.created_at|date:"d-m-Y"}}</i>
+        {% else %}
+          <i style="float:right">{{resource.created_at|slice:"10"}}</i>
+        {% endif %}     
      {% if user.is_authenticated  and not group_object.edit_policy == "NON_EDITABLE"  or gstaff_access %} 
       {% if not no_checkbox  %}
         </a> <input type="checkbox" style="margin:0; float:left;" class="filenode" name="filenode" value="{{resource.pk}}">
