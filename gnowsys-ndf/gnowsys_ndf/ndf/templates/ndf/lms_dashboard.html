@@ -212,8 +212,13 @@
     </div>
     </div>
 
-  <div id="show-overlay" class="reveal-modal reveal-modal-overlay" data-options="close_on_background_click:false;close_on_esc:false;"  data-reveal aria-labelledby="modalTitle" aria-hidden="true" role="dialog"></div>
-  
+    <div id="performaceReportModal" class="reveal-modal reveal-modal-overlay" data-options="close_on_background_click:false;close_on_esc:false;"  data-reveal aria-labelledby="modalTitle" aria-hidden="true" role="dialog">
+      <label id="performaceReportModalLabel"></label>
+      <div class="performaceReportModalData"></div>
+      <a class="close-reveal-modal" aria-label="Close" style="font-size: inherit">Close [&#215;]</a>
+
+    </div>
+
 
   <script type="text/javascript">
 
@@ -230,8 +235,8 @@
         global: false,
         success: function(data){
           $.unblockUI();
-          $('#show-overlay').foundation('reveal', 'open');
-          $('#show-overlay').html(data);
+          $('.performaceReportModalData').html(data);
+          $('#performaceReportModal').foundation('reveal', 'open');
         },
       });
     }
