@@ -890,7 +890,7 @@ def save_profile(request, user_id):
 
     user_dict = {'success': True, 'message': 'Profile updated successfully.'}
     request_variables = {}
-
+    auth_attr = None
     auth_obj = Author.get_author_by_userid(int(user_id))
     try:
         auth_id = auth_obj._id
