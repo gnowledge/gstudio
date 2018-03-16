@@ -397,6 +397,7 @@ $(document).on('click',".download-progress-report",function(){
     }
 
     $(document).ready(function() {
+      {% if users_points %}
       var points_dict = {{users_points_breakup|safe}}
         if({{users_points}} >  0){
           if (points_dict.hasOwnProperty('Total')){
@@ -412,6 +413,7 @@ $(document).on('click',".download-progress-report",function(){
         else{
           $(".course-points-breakup").html("<i>No points to show Pie Chart</i>")
         }
+      {% endif %}
       })
 
     $(document).on('click', '.fetch-assessment-analytics', function(){
