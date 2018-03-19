@@ -27,32 +27,35 @@
       
       </div>
 <div class="infinite-container">
-  <div id="pages">
-      <ul class="small-block-grid-5 medium-block-grid-3 large-block-grid-5" >
-        {% for each in search_curr %}
-          <li class="card-image-wrapper" >
-          {% if GSTUDIO_ELASTIC_SEARCH == True %}
-            <div style="display: inline;float: left;margin: 20px 20px" class="infinite-item">
-              {% include 'ndf/simple_card.html' with  no_footer=True resource=each url_name="page_details" first_arg=groupid second_arg=each.id %}
-            </div>
-          {% else %}
-            {% include 'ndf/simple_card.html' with  no_footer=True resource=each url_name="page_details" first_arg=groupid second_arg=each%}
-          {%endif%}
-          </li>
-        {% endfor %}
-      </ul>
-        {% if not search_curr %}
-         <b> No results found  </b>
-        {% endif %}
-  </div>
+  <span class="infinite-item">
+    <div id="pages">
+        <ul class="small-block-grid-5 medium-block-grid-3 large-block-grid-5" >
+
+          {% for each in search_curr %}
+            <li class="card-image-wrapper" >
+            {% if GSTUDIO_ELASTIC_SEARCH == True %}
+              
+                {% include 'ndf/simple_card.html' with  no_footer=True resource=each url_name="page_details" first_arg=groupid second_arg=each.id %}
+              </span>
+            {% else %}
+              {% include 'ndf/simple_card.html' with  no_footer=True resource=each url_name="page_details" first_arg=groupid second_arg=each%}
+            {%endif%}
+            </li>
+          {% endfor %}
+        </ul>
+          {% if not search_curr %}
+           <b> No results found  </b>
+          {% endif %}
+    </div>
+  </span>
 </div>
 <div class="loading" style="display: none;">
   Loading...
 </div>
 {% if has_next %}
-  <a class="infinite-more-link" href="?search_text={{search_text}}&page={{page_no}}">More</a>
-
+  <span class="infinite-more-link" href="?search_text={{search_text}}&page={{page_no}}"></span>
 {% endif %}
+
 <hr>
    {% comment %} 
     <dl class="accordion" data-accordion>
