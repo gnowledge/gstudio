@@ -28,6 +28,8 @@ from elasticsearch_dsl import *
 from django.shortcuts import render_to_response  # , render
 from elasticsearch_dsl.query import MultiMatch, Match
 from gnowsys_ndf.ndf.models.es import *
+from gnowsys_ndf.ndf.paginator import Paginator ,EmptyPage, PageNotAnInteger
+
 
 #es = Elasticsearch("http://elastic:changeme@gsearch:9200", timeout=100, retry_on_timeout=True)
 
@@ -164,6 +166,7 @@ def results_search(request, group_id, page_no=1, return_only_dict = None):
 	This view returns the results for global search on all GSystems by name, tags and contents.
 	Only publicly accessible GSystems are returned in results.
 	"""
+
 	context_to_return = {}
 	if GSTUDIO_ELASTIC_SEARCH == True :
 	
@@ -171,17 +174,41 @@ def results_search(request, group_id, page_no=1, return_only_dict = None):
 			group_id = ObjectId(group_id)
 		except:
 			group_name, group_id = get_group_name_id(group_id)
-		""
+		""		
+		page_no = 1
+		page_no=request.GET.get('page',None)
+		print "88888888888888888888888888888888888888"
+		print page_no
+		print "88888888888888888888888888888888888888"
 		search_str_user = str(request.GET['search_text']).strip()
-
-
 
 		q = MultiMatch(query=search_str_user, fields=['title', 'tags','content'])
 		search_result =Search(using=es, index="nodes,gsystem",doc_type="gsystemtype,gsystem,metatype,relationtype,attribute_type,group,author,images,applications,videos,audios").query(q)
 		print "search page"
 		print search_result.count()
+		
+		has_next = True
+		if search_result.count() <=20:
+			has_next = False
 
-		return render_to_response('ndf/search_page.html', {'search_curr':search_result[0:30] ,'group_id':group_id,'groupid':group_id,'GSTUDIO_ELASTIC_SEARCH':GSTUDIO_ELASTIC_SEARCH},
+		if request.GET.get('page',None) in [None,'']:
+			search_result=search_result[0:20]
+			page_no = 2	
+		else:
+			p = int(int(page_no) -1)
+			temp1=int((int(p)) * 20)
+			temp2=temp1+20
+			search_result=search_result[temp1:temp2]
+
+			if temp1 < search_result.count() <= temp2:
+				print temp2
+				has_next = False
+			page_no = int(int(page_no)+1)
+			#elif temp <= search_result.count():
+			#	has_next = False
+		
+
+		return render_to_response('ndf/search_page.html', {'has_next':has_next,'page_no':page_no,'search_curr':search_result ,'search_text':search_str_user,'group_id':group_id,'groupid':group_id,'GSTUDIO_ELASTIC_SEARCH':GSTUDIO_ELASTIC_SEARCH},
 				context_instance=RequestContext(request))
 	else:
 		userid = request.user.id
