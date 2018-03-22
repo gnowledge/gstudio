@@ -1,6 +1,8 @@
 from base_imports import *
 from history_manager import HistoryManager
 from gnowsys_ndf.ndf.models.es import esearch
+from gnowsys_ndf.local_settings import GSTUDIO_ELASTIC_SEARCH,GLITE_RCS_REPO_DIRNAME,GSTUDIO_ELASTIC_SEARCH_INDEX
+
 
 @connection.register
 class Filehive(DjangoDocument):
@@ -397,7 +399,12 @@ class Filehive(DjangoDocument):
                 print "\n DocumentError: This document (", self._id, ":", str(self.md5), ") can't be updated!!!\n"
                 raise RuntimeError(err)
 
+        # data save into ES...
+        if GSTUDIO_ELASTIC_SEARCH == True:
+            esearch.inject(fp)
+
         # --- END of storing Filehive JSON in RSC system ---
+
 
 
 filehive_collection = db["Filehives"].Filehive

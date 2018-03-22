@@ -30,8 +30,12 @@ class esearch:
 
         temp1 = fp[:-29]
         temp2 = temp1[14:]
+        print temp1
+        print "zzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzz"
+        print temp2
+        print "zzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzz"
 
-        glite_fp = "/data/glite-rcs-repo" + temp2
+        glite_fp = "/data/"+GLITE_RCS_REPO_DIRNAME+ temp2
 
         try:
             os.makedirs(glite_fp)
@@ -105,5 +109,7 @@ class esearch:
             es.index(index="gsystem", doc_type=doc_type, id=document["id"], body=document)
             print "gsystem block"
         else:
-            print "else block"
+            print "inject method called .............. else block......................................"
             es.index(index=index, doc_type=document_type.lower(), id=document["id"], body=document)
+        
+

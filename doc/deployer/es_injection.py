@@ -121,12 +121,12 @@ def get_document_type(document):
 				data = document["if_file"]["mime_type"].split("/")
 				doc_type = data[0]
 			else:
-				doc_type = "NotMedia"
+				doc_type = "notmedia"
 		else:
-			doc_type = "NotMedia"
+			doc_type = "notmedia"
 
 	else:
-		doc_type = "DontCare"
+		doc_type = "dontcare"
 	return doc_type
 
 
