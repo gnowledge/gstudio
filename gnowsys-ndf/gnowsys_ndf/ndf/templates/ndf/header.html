@@ -532,10 +532,13 @@
                   <li class="has-form">
                     <form {% if groupid %} action="{% url 'results' groupid %}" {% else %} action="" {% endif %}
                       name="search_form" method="GET" >
-
                       <div class="row collapse">
-                        <div class="large-11 small-10 columns">
+                        <div class="large-11 small-10 columns" >
                           <input type="text" name="search_text" id="search_text" placeholder='{% trans "Search" %} {{group_object.name|truncatechars:15}}' autocomplete="off" required/>
+                          <input type="checkbox" name="name" id="name" placeholder="name">title
+                          <input type="checkbox" name="content" id="content" placeholder="content">content
+                          <input type="checkbox" name="tags" id="tags" placeholder="tags">tags
+                          
                         </div>
                         <div class="large-1 small-2 columns">
                           <button type="submit" class="tiny button" value="" id="search-submit">

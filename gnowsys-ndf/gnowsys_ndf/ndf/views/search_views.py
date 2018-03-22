@@ -166,15 +166,24 @@ def results_search(request, group_id, page_no=1, return_only_dict = None):
 	This view returns the results for global search on all GSystems by name, tags and contents.
 	Only publicly accessible GSystems are returned in results.
 	"""
-
+		
 	context_to_return = {}
 	if GSTUDIO_ELASTIC_SEARCH == True :
+		temp=False
+		strconcat=''
 	
 		try:
 			group_id = ObjectId(group_id)
 		except:
 			group_name, group_id = get_group_name_id(group_id)
-		""		
+				
+		name=request.GET.get('name',None)
+		content=request.GET.get('content',None)
+		tags=request.GET.get('tags',None)
+		print name
+		print content
+		print tags
+
 		page_no = 1
 		page_no=request.GET.get('page',None)
 		print "88888888888888888888888888888888888888"
@@ -182,7 +191,30 @@ def results_search(request, group_id, page_no=1, return_only_dict = None):
 		print "88888888888888888888888888888888888888"
 		search_str_user = str(request.GET['search_text']).strip()
 
-		q = MultiMatch(query=search_str_user, fields=['title', 'tags','content'])
+		fields =[]
+		if name == "on":
+			fields.append("name")
+		if content == "on":
+			fields.append("content")
+		if tags == "on":
+			fields.append("tags")
+		print fields
+
+		
+
+		if name != "on" and content != "on" and fields != "on":
+			q = MultiMatch(query=search_str_user, fields=['name', 'tags','content'])
+		else:	
+			temp = True
+			q = MultiMatch(query=search_str_user, fields=fields)
+			print len(fields)
+			
+			for value in fields:
+				value=value+"=on&"
+				strconcat = strconcat + value
+			print strconcat
+
+
 		search_result =Search(using=es, index="nodes,gsystem",doc_type="gsystemtype,gsystem,metatype,relationtype,attribute_type,group,author,images,applications,videos,audios").query(q)
 		print "search page"
 		print search_result.count()
@@ -206,10 +238,15 @@ def results_search(request, group_id, page_no=1, return_only_dict = None):
 			page_no = int(int(page_no)+1)
 			#elif temp <= search_result.count():
 			#	has_next = False
-		
-
-		return render_to_response('ndf/search_page.html', {'has_next':has_next,'page_no':page_no,'search_curr':search_result ,'search_text':search_str_user,'group_id':group_id,'groupid':group_id,'GSTUDIO_ELASTIC_SEARCH':GSTUDIO_ELASTIC_SEARCH},
+		if temp:
+			return render_to_response('ndf/search_page.html', {'has_next':has_next,'page_no':page_no,'search_curr':search_result ,'search_text':search_str_user,'group_id':group_id,'groupid':group_id,'GSTUDIO_ELASTIC_SEARCH':GSTUDIO_ELASTIC_SEARCH,'fields':strconcat},
 				context_instance=RequestContext(request))
+		else:
+			return render_to_response('ndf/search_page.html', {'has_next':has_next,'page_no':page_no,'search_curr':search_result ,'search_text':search_str_user,'group_id':group_id,'groupid':group_id,'GSTUDIO_ELASTIC_SEARCH':GSTUDIO_ELASTIC_SEARCH},
+				context_instance=RequestContext(request))
+
+
+
 	else:
 		userid = request.user.id
 		# print "\n------\n", request.GET
