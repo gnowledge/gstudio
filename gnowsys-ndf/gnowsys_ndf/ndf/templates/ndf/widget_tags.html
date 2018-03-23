@@ -56,7 +56,7 @@
 
 				<!-- show added tags -->
 				<div class="row added-tags-div">
-					<div id="added_tags" class="small-9 small-push-3 columns">
+					<div id="added_tags" class="">
 						{% for each_tag in node.tags %}
 							
 								<div {% if each_tag == "asset@asset" or each_tag == "raw@material" or each_tag == "asset@gallery" %} style="display:none"{% endif %} class="tags label radius info">{{each_tag}}<i title="Remove this tag" class="fi-x-circle remove-tag"></i></div>

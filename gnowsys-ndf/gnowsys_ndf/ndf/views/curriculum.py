@@ -27,12 +27,13 @@ from gnowsys_ndf.ndf.views.methods import get_node_common_fields, get_drawers,cr
 from gnowsys_ndf.ndf.views.methods import get_filter_querydict
 from gnowsys_ndf.ndf.views.ajax_views import get_collection
 from gnowsys_ndf.ndf.templatetags.simple_filters import get_dict_from_list_of_dicts
-from gnowsys_ndf.ndf.templatetags.ndf_tags import get_topic_nodes, check_is_gstaff
+from gnowsys_ndf.ndf.templatetags.ndf_tags import get_topic_nodes, check_is_gstaff, get_relation_value
 #######################################################################################################################################
 theme_GST = node_collection.one({'_type': 'GSystemType', 'name': 'Theme'})
 topic_GST = node_collection.one({'_type': 'GSystemType', 'name': 'Topic'})
 theme_item_GST = node_collection.one({'_type': 'GSystemType', 'name': 'theme_item'})
 app = node_collection.one({'name': u'Topics', '_type': 'GSystemType'})
+home_obj = node_collection.one({'_type':'Group','name': unicode('home')})
 #######################################################################################################################################
 
 @get_execution_time
@@ -44,7 +45,6 @@ def curriculum(request, group_id, app_id=None, app_set_id=None):
         group_name, group_id = get_group_name_id(group_id)
 
     theme_GST = node_collection.one({'_type': 'GSystemType', 'name': 'Theme'})
-
     if app_id is None:
         # app_ins = node_collection.find_one({'_type': 'GSystemType', 'name': 'Topics'})
         app_ins = app
@@ -167,7 +167,6 @@ def list_themes(request, group_id):
 
 @get_execution_time
 def curriculum_list(request, group_id):
-
     try:
         group_id = ObjectId(group_id)
     except:
@@ -175,9 +174,10 @@ def curriculum_list(request, group_id):
 
     title = theme_GST.name
     group_obj   = get_group_name_id(group_id, get_obj=True)
+    
     nodes = node_collection.find({
         'member_of': {'$all': [theme_GST._id]},
-        'group_set':{'$all': [ObjectId(group_id)]}
+        'group_set':{'$all': [ObjectId(home_obj._id)]}
         })
     
     gstaff_access = check_is_gstaff(group_id,request.user)
@@ -236,7 +236,7 @@ def curriculum_create_edit(request, group_id,curriculum_id=None):
                 curriculum_obj = node_collection.one({"_id" : ObjectId(curr_id)})
                 curriculum_obj.fill_gstystem_values(request=request,
                                     name=str(curr_name),
-                                    group_set=group_id,content_org=unicode(curr_desc))
+                                    group_set=home_obj._id,content_org=unicode(curr_desc))
                 curriculum_obj.save()
                 return HttpResponse(curriculum_obj._id)
         else:
@@ -246,7 +246,7 @@ def curriculum_create_edit(request, group_id,curriculum_id=None):
             theme_gs_obj = node_collection.collection.GSystem()
             theme_gs_obj.fill_gstystem_values(request=request,
                                     name=str(curr_name),
-                                    group_set=group_id,content_org=unicode(curr_desc),member_of=theme_GST._id) 
+                                    group_set=home_obj._id,content_org=unicode(curr_desc),member_of=theme_GST._id) 
             theme_gs_obj.save(group_id=group_id)           
             return HttpResponse(theme_gs_obj._id)
     else:
@@ -272,6 +272,9 @@ def curriculum_create_edit(request, group_id,curriculum_id=None):
             #                 collection_list = get_collection_list(collection_list, obj)
             #     collection_list.append({"name":"Add Branch","class":"create_branch","type":"branch"})
             # print "\n context_variables: ", context_variables
+            topic_gst = node_collection.one({'_type': 'GSystemType', 'name': 'Topic'})
+            topic_nodes = node_collection.find({'member_of': {'$in': [topic_gst._id]}})
+            context_variables.update({"topic_nodes" : topic_nodes})
             return render_to_response("ndf/curriculum_hierarchy.html",
                                   context_variables,
                                   context_instance=RequestContext(request))
@@ -1114,3 +1117,17 @@ def get_collection_list(collection_list, node):
 
     else:
         return collection_list
+
+@get_execution_time
+@get_execution_time
+def get_prerequisite(request, group_id,curriculum_id,topic_id):
+  try:
+      group_id = ObjectId(group_id)
+  except:
+      group_name, group_id = get_group_name_id(group_id)
+  prerequisite_list = []
+  teaches_rel = get_relation_value(ObjectId(topic_id),'has_prerequisite')
+  if teaches_rel:
+    for each in teaches_rel['grel_node']:
+        prerequisite_list.append(each._id)
+  return HttpResponse(prerequisite_list)

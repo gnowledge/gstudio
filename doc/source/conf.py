@@ -34,10 +34,16 @@ needs_sphinx = '1.6'
 from recommonmark.parser import CommonMarkParser
 
 source_parsers = {
-    '.md': CommonMarkParser,
+    # '.md': CommonMarkParser,
+    '.md': 'recommonmark.parser.CommonMarkParser',
 }
 
-source_suffix = ['.rst', '.md', '.org']
+# source_suffix = ['.rst', '.md', '.org']
+source_suffix = {
+    '.rst': 'restructuredtext',
+    '.txt': 'restructuredtext',
+    '.md': 'markdown',
+}
 
 extensions = ['sphinx.ext.autodoc',
     'sphinx.ext.doctest',

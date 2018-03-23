@@ -61,15 +61,15 @@
     No modules found!
     {% endfor %}
   </ul>
-</div>
-{% endcomment %}
-</br>
+
+    {% endcomment %}
+    </br>
 
 <div class="small-12 columns group_sections_content">
   {% if site.SITE_NAME == "NROER" %}
     {% if title == "my desk" %}
         <div class="row">
-          <h3>Workspace</h3>
+          <h3> My Workspace</h3>
             <ul class="small-block-grid-1 medium-block-grid-3 large-block-grid-3">
               <li class="card-image-wrapper">
                 {% include "ndf/card_group.html" with node=node url_name="course_about" first_arg=node.pk  no_enroll=True %}
@@ -78,7 +78,7 @@
         </div>
         <hr/>
         <div class="row">
-          <h3>Workspaces & Enrolled Courses</h3>
+          <h3>Joined Workspaces & Enrolled Courses</h3>
           </br>
         </div>
         <div class="small-12 columns lms_explore_back_unit">
@@ -114,12 +114,12 @@
       </div>
     {% endif %}
   {% endif %}
-</div>
+</div></div></div>
 
 <div class="small-12 columns group_sections_content">
   {% if title == "my performance" %}
   <div class="small-12 columns lms_explore_back_unit">
-    <ul class="small-block-grid-1 medium-block-grid-3 large-block-grid-3">
+    <ul class="small-block-grid-1 medium-block-grid-3 large-block-grid-3" style="margin-top: -200px;">
       {% for each_obj in units_cur %}
       <li class="card-image-wrapper">
         {% include "ndf/card_group.html" with group_counts=True node=each_obj no_url=True first_arg=each_obj.pk  %}
@@ -136,7 +136,7 @@
 
 <div id="show-overlay" class="reveal-modal reveal-modal-overlay" data-options="close_on_background_click:false;close_on_esc:false;"  data-reveal aria-labelledby="modalTitle" aria-hidden="true" role="dialog"></div>
 </div>
-</div>
+
   <script type="text/javascript">
 
     function show_my_performance(this_obj){

@@ -1022,6 +1022,7 @@ def add_theme_item(request, group_id):
     content_org = request.POST.get('content_org')
     parent_node_id =request.POST.get('parent_id','')
     is_topic =request.POST.get('is_topic','')
+    selected_topic =  request.POST.get("topic_list",'')
 
     context_theme = node_collection.one({'_id': ObjectId(context_theme_id) })
     if existing_id:
@@ -1030,6 +1031,11 @@ def add_theme_item(request, group_id):
         existing_node.name = unicode(name)
         existing_node.content_org = unicode(content_org)
         existing_node.save()
+        if is_topic == "True" or 'Topic' in existing_node.member_of_names_list:
+          # rt_teaches = node_collection.one({'_type': "RelationType", 'name': unicode("teaches")})        
+          rt_has_prerequisite =  node_collection.one({'_type': "RelationType", 'name': unicode("has_prerequisite")})
+          if selected_topic:
+            create_grelation(existing_node._id,rt_has_prerequisite,ObjectId(selected_topic))
         return HttpResponse("success")
     list_theme_items = []
     if name and context_theme:
@@ -1042,6 +1048,7 @@ def add_theme_item(request, group_id):
       theme_item_node = node_collection.collection.GSystem()
       if is_topic == "True":
         theme_item_node.save(is_changed=get_node_common_fields(request, theme_item_node, group_id, topic_GST),groupid=group_id)
+      
       else:
         theme_item_node.save(is_changed=get_node_common_fields(request, theme_item_node, group_id, theme_item_GST),groupid=group_id)
       theme_item_node.reload()
@@ -1053,6 +1060,12 @@ def add_theme_item(request, group_id):
         node_collection.collection.update({'_id': context_theme._id}, {'$push': {'collection_set': ObjectId(theme_item_node._id) }}, upsert=False, multi=False)
       context_theme.reload()
 
+    if is_topic == "True" or 'Topic' in theme_item_node.member_of_names_list:
+        print "is_topic****************************"
+        # rt_teaches = node_collection.one({'_type': "RelationType", 'name': unicode("teaches")})
+        rt_has_prerequisite =  node_collection.one({'_type': "RelationType", 'name': unicode("has_prerequisite")})        
+        if selected_topic:
+          create_grelation(theme_item_node._id,rt_has_prerequisite,ObjectId(selected_topic))
     return HttpResponse("success")
 
 @get_execution_time
@@ -6946,9 +6959,19 @@ def add_assetcontent(request,group_id):
 
     return StreamingHttpResponse("success")
 
-  create_assetcontent(ObjectId(asset_obj),asset_cont_name,group_id,
+  asset_content = create_assetcontent(ObjectId(asset_obj),asset_cont_name,group_id,
     request.user.id,content=asset_cont_desc,files=uploaded_files,
     resource_type='File', request=request)
+
+  asset_node = Node.get_node_by_id(asset_obj)
+  
+  for each in asset_node.attribute_set:
+    for each_attrset in each.iteritems():
+      attr_node = node_collection.one({'_type':'AttributeType','name':unicode(each_attrset[0])})
+      if attr_node:
+        create_gattribute(ObjectId(asset_content._id), attr_node, each_attrset[1])
+
+
   return StreamingHttpResponse("success")
 
 
