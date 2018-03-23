@@ -1032,9 +1032,10 @@ def add_theme_item(request, group_id):
         existing_node.content_org = unicode(content_org)
         existing_node.save()
         if is_topic == "True" or 'Topic' in existing_node.member_of_names_list:
-          rt_teaches = node_collection.one({'_type': "RelationType", 'name': unicode("teaches")})        
+          # rt_teaches = node_collection.one({'_type': "RelationType", 'name': unicode("teaches")})        
+          rt_has_prerequisite =  node_collection.one({'_type': "RelationType", 'name': unicode("has_prerequisite")})
           if selected_topic:
-            create_grelation(existing_node._id,rt_teaches,ObjectId(selected_topic))
+            create_grelation(existing_node._id,rt_has_prerequisite,ObjectId(selected_topic))
         return HttpResponse("success")
     list_theme_items = []
     if name and context_theme:
@@ -1061,11 +1062,10 @@ def add_theme_item(request, group_id):
 
     if is_topic == "True" or 'Topic' in theme_item_node.member_of_names_list:
         print "is_topic****************************"
-        rt_teaches = node_collection.one({'_type': "RelationType", 'name': unicode("teaches")})
-        
-        print "###################### selected_topic",selected_topic
+        # rt_teaches = node_collection.one({'_type': "RelationType", 'name': unicode("teaches")})
+        rt_has_prerequisite =  node_collection.one({'_type': "RelationType", 'name': unicode("has_prerequisite")})        
         if selected_topic:
-          create_grelation(theme_item_node._id,rt_teaches,ObjectId(selected_topic))
+          create_grelation(theme_item_node._id,rt_has_prerequisite,ObjectId(selected_topic))
     return HttpResponse("success")
 
 @get_execution_time
