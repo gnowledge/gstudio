@@ -115,9 +115,9 @@
                 <label> Search
                  <input type="text" placeholder="Enter a subtopic" id="myInput" onkeyup="search_func()" >
                    </label>              
-                    choose topic :
+                    choose prerequisite :
                         <select name="topics" id = "topic_list" multiple style="height:100px">
-                                                            {% for each in topic_nodes %}
+                                {% for each in topic_nodes %}
                                  {% if each.pk == selected_topic.grel_node.0.pk %}
                                     <option selected value="{{ each.pk }}" data-topic="{{ each.name }}">
                                         {{each.name}}
