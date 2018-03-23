@@ -20,6 +20,13 @@ from gnowsys_ndf.settings import GAPPS, GSTUDIO_SITE_LANDING_PAGE, GSTUDIO_SITE_
 from gnowsys_ndf.ndf.models import GSystemType, Node
 from gnowsys_ndf.ndf.models import node_collection
 
+###############Mastodon OAUTH Dependancy##########
+from gnowsys_ndf.ndf.forms import mform
+import mastodon
+from django.contrib.auth import authenticate, login
+from mastodon import Mastodon 
+########################################
+
 ###################################################
 #   V I E W S   D E F I N E D   F O R   H O M E   #
 ###################################################
@@ -195,3 +202,79 @@ def help_page_view(request,page_name):
                                         },
                                         context_instance=RequestContext(request)
                                     )
+
+
+
+##########LOGIN WITH MASTODON METHOD####################
+def moauth(request,**kwargs):
+    
+    if request.method == 'POST':
+        # from mastodon import Mastodon
+            
+        form = mform(request.POST)
+        ###GET username and password from user##### 
+        Username = request.POST.get('username')
+        Password = request.POST.get('password')
+        
+         
+        ###CHECKING CLIENT CREDENTIALS########## 
+        mastodon_var = mastodon.Mastodon(
+            
+            client_id='gnowsys_ndf/ndf/NROER-client_cred.secret',
+            api_base_url='https://member.metastudio.org'
+        )
+        
+        ####GET ACCESS FROM MASTODON HERE#######
+        access_token  = mastodon_var.log_in(
+        Username,
+        Password,
+        to_file='gnowsys_ndf/ndf/NROER-access_token.secret',
+        
+        )
+        
+        name = Username
+        email = Username 
+        password = Password
+        
+
+        #######IF USER GETS ACCESS TOKEN THEN FOLLOWING CODE WILL BE EXECUTED##########
+        if access_token:
+            if User.objects.filter(username=name).exists():
+                
+                
+                request.session['username'] = name
+                request.session['email'] = email
+                member = User.objects.get(username=name)
+                request.session['member_id'] = member.id
+                #print request.session['member_id']
+                print member.id
+
+                ####SECOND AND BY-DEFAULT LAYER FOR AUTHENTICATION
+                user = authenticate(username=name, password=password)
+                if user is not None:
+                    if user.is_active:
+                        login(request, user)
+                        return HttpResponseRedirect( reverse('landing_page') )
+                    else:
+                        HttpResponse("Error")
+            else:
+                member = User.objects.create_user(name,email,password)
+                member.save()
+                execfile("/home/docker/code/gstudio/doc/deployer/create_auth_objs.py")
+                print member.id
+                
+                ####SECOND AND BY-DEFAULT LAYER FOR AUTHENTICATION
+                user = authenticate(username=name, password=password)
+                if user is not None:
+                    if user.is_active:
+                        login(request, user)
+                        return HttpResponseRedirect( reverse('landing_page') )
+                    else:
+                        HttpResponse("Error")
+               
+              
+        else:
+             return HttpResponse("Error")
+    else:
+       
+        return HttpResponse("Invalid Credentials.")
