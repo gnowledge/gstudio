@@ -49,13 +49,15 @@ urlpatterns = patterns('',
 
     # Elastic Search
     # url(r'^esearch/advanced/?', get_triples, name="get_triples"),
-    url(r'^esearch/?', get_search, name="get_search"),
-    url(r'^advanced_form/?', get_advanced_search_form, name="get_advanced_search_form"),
-    url(r'^advanced_search/?', advanced_search, name="advanced_search"),
+    #url(r'^esearch/?', get_search, name="get_search"),
+    #url(r'^advanced_form/?', get_advanced_search_form, name="get_advanced_search_form"),
+    #url(r'^advanced_search/?', advanced_search, name="advanced_search"),
+    
     # url(r'^esearch//?',advanced_search,name='advanced_search')
     # url(r'^esearch/get_mapping_json/(?P<json_type>[^/]+)/?$', '', name=''),
     # --END of Elastic Search
 
+    url(r'^autocompletion/', include('gnowsys_ndf.ndf.urls.autocompletion')),
     url(r'^captcha/', include('captcha.urls')),
     (r'^', include('gnowsys_ndf.ndf.urls.captcha')),
     # all main apps
