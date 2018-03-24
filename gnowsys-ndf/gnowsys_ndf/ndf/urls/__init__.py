@@ -119,7 +119,7 @@ urlpatterns = patterns('',
 
     #test url
 
-#    (r'^dev/', include('gnowsys_ndf.ndf.urls.dev_utils')),
+    (r'^dev/', include('gnowsys_ndf.ndf.urls.dev_utils')),
     (r'^tools/', include('gnowsys_ndf.ndf.urls.tools')),
     (r'^sitemap.html/',include('gnowsys_ndf.ndf.urls.sitemap')),
     (r'^(?P<group_name>[^/]+)/gtask', include('gnowsys_ndf.ndf.urls.gtask')),

@@ -217,6 +217,7 @@ float:left;
            </div>
                <div class="subsection-view-area">
                     <label class="subsection-label-view">Sub-Section Name
+                    <label class="prerequisite_name"></label>
                     </label>
                     {% if is_gstaff or curriculum_obj.created_by == request.user.id %}
                     <label>Topic
@@ -376,6 +377,7 @@ float:left;
                                 $('#addDivision').find('.add_asset').show();
                             }
                             $('.subsection-label-view').html("");
+                            $(".prerequisite_name").html("");
                             $('#addDivision').find('.create_division').attr("id",node.id);
                             $('#addDivision').find('.delete_division').show();
                             $('#addDivision').find('input[type=text][name="branch_name"]').val(node.name);
@@ -394,14 +396,17 @@ float:left;
                                  //$('.subsection-label-heading').append("<h6>Select Prequisite topics for : " +node.name+ "</h6>");
                                 
                                 $('.subsection-label-view').append(" <div>Topic Name " + ": " +node.name+ "</div>" ).css("margin-left","0px" ,"color","#000000");
-                                      
-                                $('.subsection-label-view ').append("<div class='prerequisite_name'>Prequisites Of " +node.name+ " are " + ":" +  node.prerequisite_name + " </div>").css('color','#A9A9A9');
+                                
+                                if(node.prerequisite_name){
+
+                                    $('.subsection-label-view ').append("<div class='prerequisite_name'>Prequisites Of " +node.name+ " are " + ":" +  node.prerequisite_name + " </div>").css('color','#A9A9A9');
+                                }
 
                                 
-
                                 $('.elements_for_editing').css('display','block');     
                                 $('#addDivision').find('.create_division').html('Save');
                                 url = "/{{group_id}}" +"/curriculum/prerequisite/" + "{{curriculum_obj.pk}}" + "/" + node.id;
+                                
                                 $.ajax({
                                       type: "GET",
                                       data:{

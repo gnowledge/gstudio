@@ -888,7 +888,6 @@ def get_inner_collection(collection_list, node, no_res=False):
   inner_list = []
   error_list = []
   inner_list_append_temp=inner_list.append #a temp. variable which stores the lookup for append method
-  prerequisite_name = ""
   # if not no_res or not res_flag:
   is_unit = any(mem_of_name in ["CourseUnit", "CourseUnitEvent"] for mem_of_name in node.member_of_names_list)
   if not no_res or not is_unit:
@@ -897,6 +896,7 @@ def get_inner_collection(collection_list, node, no_res=False):
         col_obj = node_collection.one({'_id': ObjectId(each)})
         if col_obj:
           for cl in collection_list:
+            prerequisite_name = ""
             if cl['id'] == node.pk:
               node_type = node_collection.one({'_id': ObjectId(col_obj.member_of[0])}).name
               # if col_obj._id in completed_ids:
@@ -973,6 +973,7 @@ def get_collection(request, group_id, node_id, no_res=False):
           no_res = True
         collection_list = get_inner_collection(collection_list, obj, no_res)
     data = collection_list
+    print "*************************************",data
     updated_data = []
     # print data
     # cache.set(cache_key, json.dumps(data), 60*15)
