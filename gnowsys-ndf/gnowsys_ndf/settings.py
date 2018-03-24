@@ -1072,6 +1072,29 @@ GSTUDIO_ELASTIC_SEARCH_PASSWORD = "gelastic@412"
 # --- END of meeting gapp ---
 
 
+GSTUDIO_ELASTIC_SEARCH_PASSWORD = ""
+
+# Elastic Search
+GSTUDIO_DOCUMENT_MAPPING = '/data'
+GSTUDIO_ELASTIC_SEARCH = True
+GSTUDIO_ELASTIC_SEARCH_PROTOCOL = 'http' # we can use http or https protocol
+GSTUDIO_ELASTIC_SEARCH_ALIAS = 'gsearch'
+GSTUDIO_ELASTIC_SEARCH_SUPERUSER = ''
+GSTUDIO_ELASTIC_SEARCH_SUPERUSER_PASSWORD = ''
+GSTUDIO_ELASTIC_SEARCH_PORT = '9200'
+# --- End of Elastic Search
+
+GLITE_RCS_REPO_DIRNAME = "glite-rcs-repo"
+GLITE_RCS_REPO_DIR = os.path.join('/data/', RCS_REPO_DIRNAME)
+
+GSTUDIO_ELASTIC_SEARCH_INDEX = {
+ "Filehives": ["Filehive"],
+ "Triples": ["GAttribute", "GRelation"],
+ "Buddies": ["Buddy"],
+ "Benchmarks": ["Benchmark"],
+ "Nodes": ["MetaType", "GSystemType", "RelationType", "AttributeType", "GSystem", "Group", "ToReduceDocs", "Author"],
+ "Counters": ["Counter"]
+}
 
 
 # ----------------------------------------------------------------------------
