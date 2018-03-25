@@ -25,6 +25,7 @@ from gnowsys_ndf.ndf.forms import mform
 import mastodon
 from django.contrib.auth import authenticate, login
 from mastodon import Mastodon 
+from django.template.response import TemplateResponse
 ########################################
 
 ###################################################
@@ -223,15 +224,20 @@ def moauth(request,**kwargs):
             client_id='gnowsys_ndf/ndf/NROER-client_cred.secret',
             api_base_url='https://member.metastudio.org'
         )
-        
+
+        access_token = None
         ####GET ACCESS FROM MASTODON HERE#######
-        access_token  = mastodon_var.log_in(
-        Username,
-        Password,
-        to_file='gnowsys_ndf/ndf/NROER-access_token.secret',
-        
-        )
-        
+        try:
+            access_token  = mastodon_var.log_in(
+            Username,
+            Password,
+            to_file='gnowsys_ndf/ndf/NROER-access_token.secret',
+            
+            )
+        except Exception as e:
+            print e
+            pass        
+            
         name = Username
         email = Username 
         password = Password
@@ -256,7 +262,7 @@ def moauth(request,**kwargs):
                         login(request, user)
                         return HttpResponseRedirect( reverse('landing_page') )
                     else:
-                        HttpResponse("Error")
+                        HttpResponse("Error1")
             else:
                 member = User.objects.create_user(name,email,password)
                 member.save()
@@ -270,11 +276,14 @@ def moauth(request,**kwargs):
                         login(request, user)
                         return HttpResponseRedirect( reverse('landing_page') )
                     else:
-                        HttpResponse("Error")
-               
+                        HttpResponse("Error2")
+            return HttpResponseRedirect( reverse('landing_page') )   
               
         else:
-             return HttpResponse("Error")
+            #t = TemplateResponse(request, 'login_template', {})
+            #return t.render()
+            return HttpResponse("OOps!!!!! You entered wrong credentials")
+        #return HttpResponseRedirect( reverse('landing_page') )
     else:
        
         return HttpResponse("Invalid Credentials.")
