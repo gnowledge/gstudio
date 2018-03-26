@@ -169,9 +169,10 @@ def results_search(request, group_id, page_no=1, return_only_dict = None):
 		
 	context_to_return = {}
 	if GSTUDIO_ELASTIC_SEARCH == True :
+
 		temp=False
 		strconcat=''
-	
+		group_id_str=group_id
 		try:
 			group_id = ObjectId(group_id)
 		except:
@@ -189,7 +190,6 @@ def results_search(request, group_id, page_no=1, return_only_dict = None):
 		print "88888888888888888888888888888888888888"
 		print page_no
 		print "88888888888888888888888888888888888888"
-		search_str_user = str(request.GET['search_text']).strip()
 
 		fields =[]
 		if name == "on":
@@ -200,30 +200,46 @@ def results_search(request, group_id, page_no=1, return_only_dict = None):
 			fields.append("tags")
 		print fields
 
+		q = Q('match',name=dict(query='File',type='phrase'))
+		GST_FILE = Search(using=es, index="nodes",doc_type="gsystemtype").query(q)
+		GST_FILE1 = GST_FILE.execute()
+
 		
+		if request.GET.get('search_text',None) in (None,''):
 
-		if name != "on" and content != "on" and fields != "on":
-			q = MultiMatch(query=search_str_user, fields=['name', 'tags','content'])
-		else:	
-			temp = True
-			q = MultiMatch(query=search_str_user, fields=fields)
-			print len(fields)
-			
-			for value in fields:
-				value=value+"=on&"
-				strconcat = strconcat + value
-			print strconcat
+			q = Q('bool', must=[Q('match', member_of=GST_FILE1.hits[0].id),~Q('exists',field='content')])
+			search_result =Search(using=es, index="nodes",doc_type="gsystemtype,gsystem,metatype,relationtype,attribute_type,group,author").query(q)
+			#search_result.filter('exists', field='content')
+			search_str_user=""
+			print search_result.count()
+			print group_id
+		else:
+			search_str_user = str(request.GET['search_text']).strip()
 
 
-		search_result =Search(using=es, index="nodes,gsystem",doc_type="gsystemtype,gsystem,metatype,relationtype,attribute_type,group,author,images,applications,videos,audios").query(q)
-		print "search page"
-		print search_result.count()
+			if name != "on" and content != "on" and fields != "on":
+				q = MultiMatch(query=search_str_user, fields=['name', 'tags','content'])
+			else:	
+				temp = True
+				q = MultiMatch(query=search_str_user, fields=fields)
+				print len(fields)
+				
+				for value in fields:
+					value=value+"=on&"
+					strconcat = strconcat + value
+				print strconcat
+
+
+			search_result =Search(using=es, index="nodes,gsystem",doc_type="gsystemtype,gsystem,metatype,relationtype,attribute_type,group,author,images,applications,videos,audios").query(q)
+			print "search page"
+			print search_result.count()
 		
 		has_next = True
 		if search_result.count() <=20:
 			has_next = False
 
 		if request.GET.get('page',None) in [None,'']:
+			print "siddhu"
 			search_result=search_result[0:20]
 			page_no = 2	
 		else:
