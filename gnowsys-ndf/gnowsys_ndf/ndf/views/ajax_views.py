@@ -45,7 +45,7 @@ from gnowsys_ndf.ndf.views.methods import get_node_common_fields, get_node_metad
 from gnowsys_ndf.ndf.views.methods import create_task,parse_template_data,get_execution_time,get_group_name_id, dig_nodes_field
 from gnowsys_ndf.ndf.views.methods import get_widget_built_up_data, parse_template_data, get_prior_node_hierarchy, create_clone
 from gnowsys_ndf.ndf.views.methods import create_grelation, create_gattribute, create_task, node_thread_access, get_course_units_tree, delete_node
-from gnowsys_ndf.ndf.templatetags.ndf_tags import get_profile_pic, edit_drawer_widget, get_contents, get_sg_member_of, get_attribute_value, check_is_gstaff
+from gnowsys_ndf.ndf.templatetags.ndf_tags import get_profile_pic, edit_drawer_widget, get_contents, get_sg_member_of, get_attribute_value, check_is_gstaff,get_relation_value
 from gnowsys_ndf.settings import GSTUDIO_SITE_NAME
 # from gnowsys_ndf.mobwrite.models import ViewObj
 from gnowsys_ndf.notification import models as notification
@@ -888,7 +888,6 @@ def get_inner_collection(collection_list, node, no_res=False):
   inner_list = []
   error_list = []
   inner_list_append_temp=inner_list.append #a temp. variable which stores the lookup for append method
-
   # if not no_res or not res_flag:
   is_unit = any(mem_of_name in ["CourseUnit", "CourseUnitEvent"] for mem_of_name in node.member_of_names_list)
   if not no_res or not is_unit:
@@ -897,6 +896,7 @@ def get_inner_collection(collection_list, node, no_res=False):
         col_obj = node_collection.one({'_id': ObjectId(each)})
         if col_obj:
           for cl in collection_list:
+            prerequisite_name = ""
             if cl['id'] == node.pk:
               node_type = node_collection.one({'_id': ObjectId(col_obj.member_of[0])}).name
               # if col_obj._id in completed_ids:
@@ -908,7 +908,11 @@ def get_inner_collection(collection_list, node, no_res=False):
               #   # print "\n completed_ids -- ",completed_ids
               #   # print "\n\n col_obj ---- ", col_obj.name, " - - ",col_obj.member_of_names_list, " -- ", col_obj._id
               # else:
-              inner_sub_dict = {'name': col_obj.name, 'id': col_obj.pk,'node_type': node_type,"type":"division",'description':col_obj.content_org}
+              rel_has_prerequisite = get_relation_value(ObjectId(col_obj._id),'has_prerequisite')
+              for each in rel_has_prerequisite['grel_node']:
+                prerequisite_name = each.name
+              inner_sub_dict = {'name': col_obj.name, 'id': col_obj.pk,'node_type': node_type,"type":"division",'description':col_obj.content_org,'prerequisite_name' : prerequisite_name }
+              
               inner_sub_list = [inner_sub_dict]
               inner_sub_list = get_inner_collection(inner_sub_list, col_obj, no_res)
               # if "CourseSubSectionEvent" == node_type:
@@ -962,14 +966,14 @@ def get_collection(request, group_id, node_id, no_res=False):
       obj = node_collection.one({'_id': ObjectId(each) })
       if obj:
         node_type = node_collection.one({'_id': ObjectId(obj.member_of[0])}).name
-        # print "000000000000000000000",node.name
-
+        # print "000000000000000000000\n\n\n\n\n\n\n\n\n\n\n\n",node_type,obj._id
         collection_list.append({'name':obj.name,'id':obj.pk,'node_type':node_type,'type' : "branch",'description':obj.content_org})
         # collection_list = get_inner_collection(collection_list, obj, gstaff_access, completed_ids_list, incompleted_ids_list)
         if "BaseCourseGroup" in node.member_of_names_list:
           no_res = True
         collection_list = get_inner_collection(collection_list, obj, no_res)
     data = collection_list
+    print "*************************************",data
     updated_data = []
     # print data
     # cache.set(cache_key, json.dumps(data), 60*15)
@@ -1032,9 +1036,10 @@ def add_theme_item(request, group_id):
         existing_node.content_org = unicode(content_org)
         existing_node.save()
         if is_topic == "True" or 'Topic' in existing_node.member_of_names_list:
-          rt_teaches = node_collection.one({'_type': "RelationType", 'name': unicode("teaches")})        
+          # rt_teaches = node_collection.one({'_type': "RelationType", 'name': unicode("teaches")})        
+          rt_has_prerequisite =  node_collection.one({'_type': "RelationType", 'name': unicode("has_prerequisite")})
           if selected_topic:
-            create_grelation(existing_node._id,rt_teaches,ObjectId(selected_topic))
+            create_grelation(existing_node._id,rt_has_prerequisite,ObjectId(selected_topic))
         return HttpResponse("success")
     list_theme_items = []
     if name and context_theme:
@@ -1061,11 +1066,10 @@ def add_theme_item(request, group_id):
 
     if is_topic == "True" or 'Topic' in theme_item_node.member_of_names_list:
         print "is_topic****************************"
-        rt_teaches = node_collection.one({'_type': "RelationType", 'name': unicode("teaches")})
-        
-        print "###################### selected_topic",selected_topic
+        # rt_teaches = node_collection.one({'_type': "RelationType", 'name': unicode("teaches")})
+        rt_has_prerequisite =  node_collection.one({'_type': "RelationType", 'name': unicode("has_prerequisite")})        
         if selected_topic:
-          create_grelation(theme_item_node._id,rt_teaches,ObjectId(selected_topic))
+          create_grelation(theme_item_node._id,rt_has_prerequisite,ObjectId(selected_topic))
     return HttpResponse("success")
 
 @get_execution_time

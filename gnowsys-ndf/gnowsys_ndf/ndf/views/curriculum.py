@@ -1126,9 +1126,8 @@ def get_prerequisite(request, group_id,curriculum_id,topic_id):
   except:
       group_name, group_id = get_group_name_id(group_id)
   prerequisite_list = []
-  teaches_rel = get_relation_value(ObjectId(topic_id),'teaches')
+  teaches_rel = get_relation_value(ObjectId(topic_id),'has_prerequisite')
   if teaches_rel:
     for each in teaches_rel['grel_node']:
         prerequisite_list.append(each._id)
-  print "************",prerequisite_list  
   return HttpResponse(prerequisite_list)
