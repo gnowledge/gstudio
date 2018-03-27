@@ -2243,7 +2243,7 @@ def course_content(request, group_id):
         template = 'ndf/basecourse_group.html'
     if 'base_unit' in group_obj.member_of_names_list:
         template = 'ndf/lms.html'
-    if 'announced_unit' in group_obj.member_of_names_list or 'Group' in group_obj.member_of_names_list and 'base_unit' not in group_obj.member_of_names_list:
+    if 'announced_unit' in group_obj.member_of_names_list or 'Group' in group_obj.member_of_names_list or 'base_unit' in group_obj.member_of_names_list or 'Author' in group_obj.member_of_names_list:
         template = 'ndf/lms.html'
     banner_pic_obj,old_profile_pics = get_current_and_old_display_pics(group_obj)
     if request.user.is_authenticated():
