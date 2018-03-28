@@ -89,17 +89,56 @@
 
                 <div class="row">
                     <h3> Select the tab names for the header </h3>
-                    <div class="large-4 columns ">
-                        <label>Enter 1st Tab name</label>
-                        <input id="tab-name" name="tab_name" value="{{unit_node.project_config.tab_name}}" type="text" placeholder="Enter tab name"/>
+                    <div class="row">
+                        <div class="large-6 columns ">
+                            <label>Enter 1st Tab name</label>
+                            <input id="tab-name" name="tab_name" value="{{unit_node.project_config.tab_name}}" type="text" placeholder="Enter tab name"/>
+                        </div>
+                        <div class="large-6 columns">
+                          <label> Default Display</label>
+                          <input type="radio" name="tab_name" value="Yes" id="tab_nameyes" checked><label for="tab_nameyes">Yes</label>
+                          <input type="radio" name="tab_name" value="No" id="tab_nameno"><label for="tab_nameno">No</label>
+                        </div>
                     </div>
-                    <div class="large-4 columns">
-                        <label>Enter 2nd Tab name</label>
-                        <input id="resource-name" name="resource_name" value="{{unit_node.project_config.resource_name}}" type="text" placeholder="Enter resource name"/>
+                    <div class="row">
+                        <div class="large-6 columns">
+                            <label>Enter 2nd Tab name</label>
+                            <input id="resource-name" name="resource_name" value="{{unit_node.project_config.resource_name}}" type="text" placeholder="Enter resource name"/>
+                        </div>
+                        <div class="large-6 columns">
+                          <label>Default Display</label>
+                          <input type="radio" name="resource_name" value="Yes" id="resource_nameyes" checked><label for="resource_nameyes">Yes</label>
+                          <input type="radio" name="resource_name" value="No" id="resource_nameno"><label for="resource_nameno">No</label>
+                        </div>
                     </div>
-                    <div class="large-4 columns">
-                        <label>Enter 3rd Tab name</label>
-                        <input id="blog-name" name="blog_name" value="{{unit_node.project_config.blog_name}}" type="text" placeholder="Enter blog tab name"/>
+                    <div class="row">
+                        <div class="large-6 columns">
+                            <label>Enter 3rd Tab name</label>
+                            <input id="blog-name" name="blog_name" value="{{unit_node.project_config.blog_name}}" type="text" placeholder="Enter blog tab name"/>
+                        </div>
+                        <div class="large-6 columns">
+                              <label>Default Display</label>
+                              <input type="radio" name="blog_name" value="Yes" id="blog_nameyes" checked><label for="blog_nameyes">Yes</label>
+                              <input type="radio" name="blog_name" value="No" id="blog_nameno"><label for="blog_nameno">No</label>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="large-6 columns">
+                            <label>Default Topic Map</label>
+                            <input id="topic_map" name="topic_map" value="Topic Map" type="text" disabled="Yes" />
+                        </div>
+                        <label>Default Display</label>
+                            <input type="radio" name="topic_map" value="Yes" id="topic_mapyes"><label for="topic_mapyes">Yes</label>
+                            <input type="radio" name="topic_map" value="No" id="topic_mapno" checked><label for="topic_mapno">No</label>
+                    </div>
+                    <div class="row">
+                        <div class="large-6 columns">
+                            <label>Default Events</label>
+                            <input id="Task" name="Task" value="Task" type="text" disabled="Yes" />
+                        </div>
+                        <label>Default Display</label>
+                            <input type="radio" name="Task" value="Yes" id="Taskyes"><label for="Taskyes">Yes</label>
+                            <input type="radio" name="Task" value="No" id="Taskno" checked><label for="Taskno">No</label>
                     </div>
                 </div>
 
