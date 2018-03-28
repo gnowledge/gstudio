@@ -6857,11 +6857,11 @@ def create_edit_asset(request,group_id):
       # UNmarking Asset as RawMaterial
       asset_obj.tags.remove(u'raw@material')
 
-    if "announced_unit" in group_obj.member_of_names_list and title == "raw material":
+    if ( "announced_unit" in group_obj.member_of_names_list or "Author" in group_obj.member_of_names_list) and title == "raw material":
       asset_obj.tags.append(u'raw@material')
 
     
-    if ("announced_unit" in group_obj.member_of_names_list  or "Group" in group_obj.member_of_names_list) and "gallery" == title:
+    if ("announced_unit" in group_obj.member_of_names_list  or "Group" in group_obj.member_of_names_list or "Author"  in group_obj.member_of_names_list) and "gallery" == title:
       asset_obj.tags.append(u'asset@gallery')    
     
     if "announced_unit" in group_obj.member_of_names_list  and title == None or title == "None":
@@ -6886,7 +6886,7 @@ def add_assetcontent(request,group_id):
   if_transcript = request.POST.get('if_transcript','')
   if_alt_lang_file = request.POST.get('if_alt_file','')
   if_alt_format_file = request.POST.get('if_alt_format_file','')
-  assetcontentid = request.POST.get('assetcontentid','')
+  assetcontentid = request.POST.get('assetcontentid','')  
 
   uploaded_files = request.FILES.getlist('filehive', [])
   uploaded_transcript = request.FILES.getlist('uploaded_transcript', [])
@@ -6898,7 +6898,7 @@ def add_assetcontent(request,group_id):
   alt_file_format = request.POST.get('sel_alt_fr_type','')
 
   asset_cont_desc = request.POST.get('asset_cont_desc','')
-  asset_cont_name = request.POST.get('asset_cont_name','')
+  asset_cont_name = request.POST.get('name','')
   node_id = request.POST.get('node_id',None)
   if if_subtitle == "True":
     file_name = uploaded_subtitle[0].name
@@ -6962,7 +6962,6 @@ def add_assetcontent(request,group_id):
     alt_lang_file_node = create_grelation(ObjectId(assetcontentid), rt_alt_content, alt_lang_file_list, **{'triple_scope':{'relation_type_scope':{ alt_file_type : '' }, 'subject_scope': "many"}})
 
     return StreamingHttpResponse("success")
-
   asset_content = create_assetcontent(ObjectId(asset_obj),asset_cont_name,group_id,
     request.user.id,content=asset_cont_desc,files=uploaded_files,
     resource_type='File', request=request)
@@ -6976,7 +6975,9 @@ def add_assetcontent(request,group_id):
         create_gattribute(ObjectId(asset_content._id), attr_node, each_attrset[1])
 
 
-  return StreamingHttpResponse("success")
+  # return StreamingHttpResponse("success")
+  # return  , asset_node ,asset_content._id
+  return HttpResponseRedirect(reverse('assetcontent_detail', kwargs={'group_id':ObjectId(group_id),'asset_id': ObjectId(asset_node._id),'asst_content_id': ObjectId(asset_content._id)})) 
 
 
 def add_to_collection_set(request, group_id):
