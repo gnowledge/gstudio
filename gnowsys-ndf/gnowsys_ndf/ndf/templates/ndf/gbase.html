@@ -61,7 +61,7 @@
 
 </head>
 <body>
-    <div class="page_content">
+    <div id="gbase_wrap">
     {% if site.BUDDY_LOGIN and user.is_authenticated and site.SITE_NAME == 'clix' and request.author.agency_type == 'Student'%}
         {% include "ndf/buddy.html" %}
     {% endif %}
@@ -190,7 +190,7 @@
     //       {% block document_ready %} {% endblock %}
 
     //     }
-    //     finally{
+    //     finally{s
     //       // function defined in app.js to check the font and load it asynchronously.
     //       checkOpenSansFont();
     //     }
@@ -209,47 +209,22 @@
 
 
   </script>
-<footer>
-  </div>   
-    <style type="text/css">
-/*            
-            #page_content{
-                                display: table;
-                height:auto;
-                                display: table-row;
 
-            }
-            
-            html,body {
-                height:100%;
-                width: 100%;
-            }
+ 
+    
+  </div> 
 
 
+      {% if not no_footer %}
+        {% if site.SITE_NAME == "NROER" %}
+            {% include 'ndf/footer.html' %}
+        {% else %}
+            {% include 'ndf/footer_clix.html' %}   
+        {% endif %}
+      {% endif %} 
 
-            body {
-
-                    display: table;
-            }
-
-            .footer_container{
-                    height: auto;
-                    display: table-row;
-            }
-
-            #footer {
-                height: 1px;
-            }
-*/    </style>
-
-    {% if not no_footer %}
-    <div id="footer" class="footer_container">
-        {% include 'ndf/footer_clix.html' %}
-     </div>   
-    {% endif %}
-
-        
-    <script type="text/javascript">
+<!-- 
+      <script type="text/javascript">
       
        $(window).bind("load", function () {
         var footer = $("#footer");
@@ -263,9 +238,9 @@
             });
         }
         });
-    </script>
+    </script> -->
 
 </body>
 
-    
+
 </html>

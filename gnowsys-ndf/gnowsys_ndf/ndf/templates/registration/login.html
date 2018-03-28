@@ -4,35 +4,35 @@
 {% block title %}{% trans "Login" %}{% endblock %}
 
 {% block style %}
-	{{block.super}}
+{{block.super}}
 
-	label, small.all-error { font-size: 15px; }
+label, small.all-error { font-size: 15px; }
 
-  /* Setting css-properties for small.error */
-  small.error {
-    padding: 0 0 0 0.5rem !important;
-    margin-top: 0rem !important;
-    position: relative !important;
-  }
+/* Setting css-properties for small.error */
+small.error {
+padding: 0 0 0 0.5rem !important;
+margin-top: 0rem !important;
+position: relative !important;
+}
 {% endblock %}
 
 {% block body_content %} 
-	{% url 'auth_password_reset' as auth_pwd_reset_url %}
-	{% url 'registration_register' as register_url %}
-    
-    
-    <div class="row" style="margin: 1.2rem 0;">
-        <div class="small-8 medium-8 large-8 small-centered medium-centered large-centered columns">
-            <div class="row">
-                <div class="small-8 medium-8 large-8 columns end text-center">
-                <h2>{% trans "Log In" %}</h2>
-                </div>
-            </div>
+{% url 'auth_password_reset' as auth_pwd_reset_url %}
+{% url 'registration_register' as register_url %}
+
+
+<div class="row" style="margin: 1.2rem 0;">
+	<div class="small-8 medium-8 large-8 small-centered medium-centered large-centered columns">
+		<div class="row">
+			<div class="small-8 medium-8 large-8 columns end text-center">
+				<h2>{% trans "Log In" %}</h2>
+			</div>
+		</div>
 
 		<div class="small-12 medium-6 large-6 small-centered medium-centered large-centered columns">
 			<br/>
 			{% if form.errors %}
-				<small class="small-10 medium-8 large-8 columns error all-error">{% trans "Either your email or password is incorrect !" %}</small>
+			<small class="small-10 medium-8 large-8 columns error all-error">{% trans "Either your email or password is incorrect !" %}</small>
 			{% endif %}
 
 			<form method="post" id="loginSubmit" action="{% url 'auth_login' %}" data-abide>
@@ -87,14 +87,14 @@
 				</div>
 
 				<!-- Forgot password link & New Registration link -->
-      			{# {% if site.SITE_NAME != "NROER" %}  #}
-					<div class="row">
-						<div class="small-6 medium-6 large-6 small-offset-3 large-offset-1 columns end">
-							<center>
+				{# {% if site.SITE_NAME != "NROER" %}  #}
+				<div class="row">
+					<div class="small-6 medium-6 large-6 small-offset-3 large-offset-1 columns end">
+						<center>
 							<label>
-							<a title={% trans "Click here to register" %} href="{{ register_url }}">
-								{% trans "Don't have an account? Register yourself now." %}
-							</a>
+								<a title={% trans "Click here to register" %} href="{{ register_url }}">
+									{% trans "Don't have an account? Register yourself now." %}
+								</a>
 							</label>
 							{% if site.SITE_NAME == "NROER" %}
 							<br/>
@@ -102,47 +102,48 @@
 								Can't register? Contact us for help.
 							</a>  
 							{% endif %}
-							</center>
-						</div>
+						</center>
 					</div>
+				</div>
 				{# {% endif %} #}
 				<input type="hidden" name="next" value="{{ next }}" />
 			</form>
 
 		</div>
 	</div>
-{% endblock %}
+	</div>
+	{% endblock %}
 
 
 
-{% block document_ready %}
+	{% block document_ready %}
 	{{block.super}}
 
-		function trim_space() {
-		user_name_val = $('#id_username').val();
-	    trim_usrname = user_name_val.trim();
-	    $('#id_username').val(trim_usrname);
+	function trim_space() {
+	user_name_val = $('#id_username').val();
+	trim_usrname = user_name_val.trim();
+	$('#id_username').val(trim_usrname);
 }
 
-	// Setting tabindex for following html elements
-	$("#id_username").attr("tabindex", "1");
-	$("#id_password").attr("tabindex", "2");
-	$("a[title='Recover your password']").attr("tabindex", "5");
-	$("a[title='Click here to register']").attr("tabindex", "6");
+// Setting tabindex for following html elements
+$("#id_username").attr("tabindex", "1");
+$("#id_password").attr("tabindex", "2");
+$("a[title='Recover your password']").attr("tabindex", "5");
+$("a[title='Click here to register']").attr("tabindex", "6");
 
-	$("input[id='id_username'], input[id='id_password']").each(function(){
-		$(this).attr("required", "");
-		$(this).after("<small class='error'>Please fill valid "+this.name+"</small>");
-	});
-    
-	//Code to refresh the Captcha
-    $('.js-captcha-refresh').click(function(){
-    $form = $(this).parents('form');
+$("input[id='id_username'], input[id='id_password']").each(function(){
+$(this).attr("required", "");
+$(this).after("<small class='error'>Please fill valid "+this.name+"</small>");
+});
 
-    $.getJSON($(this).data('url'), {}, function(json) {
-        // This should update your captcha image src and captcha hidden input
-    });
+//Code to refresh the Captcha
+$('.js-captcha-refresh').click(function(){
+$form = $(this).parents('form');
 
-    return false;
-	});
+$.getJSON($(this).data('url'), {}, function(json) {
+// This should update your captcha image src and captcha hidden input
+});
+
+return false;
+});
 {% endblock %}

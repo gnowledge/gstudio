@@ -64,7 +64,9 @@ urlpatterns = patterns('',
     (r'^(?P<group_id>[^/]+)/quiz', include('gnowsys_ndf.ndf.urls.quiz')),
     (r'^(?P<group_id>[^/]+)/discussion', include('gnowsys_ndf.ndf.urls.discussion')),
     (r'^(?P<group_id>[^/]+)/unit',include('gnowsys_ndf.ndf.urls.unit')),
-    (r'^api/v1',include('gnowsys_ndf.ndf.urls.api')),
+    # (r'^api/v1|api',include('gnowsys_ndf.ndf.urls.api')),
+    (r'^api/v1',include('gnowsys_ndf.ndf.urls.api_v1')),
+    (r'^api/v2',include('gnowsys_ndf.ndf.urls.api_v2')),
     
     # Commented following url for khaal hackathon
     (r'^(?P<group_id>[^/]+)/course', include('gnowsys_ndf.ndf.urls.course')),
@@ -75,7 +77,6 @@ urlpatterns = patterns('',
     (r'^(?P<group_id>[^/]+)/module', include('gnowsys_ndf.ndf.urls.module')),
     (r'^(?P<group_id>[^/]+)/search', include('gnowsys_ndf.ndf.urls.search_urls')),
     (r'^(?P<group_name>[^/]+)/task', include('gnowsys_ndf.ndf.urls.task')),
-    (r'^(?P<group_name>[^/]+)/gtask', include('gnowsys_ndf.ndf.urls.gtask')),
     (r'^(?P<group_id>[^/]+)/batch', include('gnowsys_ndf.ndf.urls.batch')),
     (r'^(?P<group_id>[^/]+)/ajax/', include('gnowsys_ndf.ndf.urls.ajax-urls')),
     (r'^(?P<group_id>[^/]+)/bib_app', include('gnowsys_ndf.ndf.urls.Bib_App')),
@@ -117,9 +118,11 @@ urlpatterns = patterns('',
     # ---end of mis
 
     #test url
+
     (r'^dev/', include('gnowsys_ndf.ndf.urls.dev_utils')),
     (r'^tools/', include('gnowsys_ndf.ndf.urls.tools')),
-    
+    (r'^sitemap.html/',include('gnowsys_ndf.ndf.urls.sitemap')),
+    (r'^(?P<group_name>[^/]+)/gtask', include('gnowsys_ndf.ndf.urls.gtask')),
     # meeting app
     # (r'^online/', include('online_status.urls')),   #for online_users.
     # url(r'^(?P<group_id>[^/]+)/inviteusers/(?P<meetingid>[^/]+)','gnowsys_ndf.ndf.views.meeting.invite_meeting', name='invite_meeting'),
@@ -229,7 +232,3 @@ if settings.DEBUG:
             'document_root': settings.STATIC_ROOT,
         }),
 )
-
-handler404 = 'gnowsys_ndf.ndf.views.errors.handler404'
-handlerPermissionDenied = 'gnowsys_ndf.ndf.views.errors.handlerPermissionDenied'
-handler500 = 'gnowsys_ndf.ndf.views.errors.handler500'

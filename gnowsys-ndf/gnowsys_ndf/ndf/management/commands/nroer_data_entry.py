@@ -30,12 +30,12 @@ except ImportError:  # old pymongo
     from pymongo.objectid import ObjectId
 
 ''' imports from application folders/files '''
-from gnowsys_ndf.ndf.models import Node, File, Filehive, gfs
+from gnowsys_ndf.ndf.models import Node, Filehive, gfs
 from gnowsys_ndf.ndf.models import GSystemType, AttributeType, RelationType
 from gnowsys_ndf.ndf.models import GSystem, GAttribute, GRelation
 from gnowsys_ndf.ndf.models import node_collection, triple_collection, gridfs_collection, filehive_collection
 # from gnowsys_ndf.ndf.models import node_collection
-from gnowsys_ndf.ndf.views.file import save_file
+# from gnowsys_ndf.ndf.views.file import save_file
 from gnowsys_ndf.ndf.views.methods import create_grelation, create_gattribute, get_language_tuple
 from gnowsys_ndf.ndf.management.commands.create_theme_topic_hierarchy import add_to_collection_set
 from gnowsys_ndf.ndf.views.tasks import convertVideo

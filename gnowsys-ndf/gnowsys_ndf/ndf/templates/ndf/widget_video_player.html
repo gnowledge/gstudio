@@ -25,7 +25,7 @@
 			    document.getElementById("mySpan").innerHTML = "Seeking: " + vid.seeking;
 			} 
 			function togglerTranscript(a){
-                $(a).next(".transcript-data").toggleClass("hide");
+                $(a).next().siblings(".transcript-data").toggleClass("hide");
             };
          
 			</script>
@@ -36,20 +36,17 @@
 		</div>
 			{% endif %}
 		</div>
+
 	
 			{% get_relation_value video_obj.pk 'has_transcript' as transcript_rel %}
 			{% if transcript_rel %}
 			<div>
 				<input type="button" class="small radius transcript-toggler" onclick="togglerTranscript(this)" value="Transcript">
+				<img src="/static/ndf/images/Transcript.svg" style="margin-top: -60px;margin-left: 9px;" />
 	      			<div class="transcript-data hide">
 	      				<object type="text/html" data="{{MEDIA_URL}}{{transcript_rel.grel_node.if_file.original.relurl}}" style="width:100%; height:100%"></object>
 	      			</div>
 	      	</div>
-
-		
-		
-    
-	
-	{% endif %}
+			{% endif %}
 			
 </div>

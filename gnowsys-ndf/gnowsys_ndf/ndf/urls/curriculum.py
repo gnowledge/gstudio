@@ -8,6 +8,8 @@ urlpatterns = patterns('gnowsys_ndf.ndf.views.curriculum',
                        url(r'^/create-edit-curriculum$', 'curriculum_create_edit', name='create_edit_curriculum'),
                        url(r'^/curriculum-detail/(?P<curriculum_id>[\w-]+)$', 'curriculum_create_edit', name='curriculum_detail'),
                        url(r'^/topic-resources/(?P<curriculum_id>[\w-]+)/(?P<topic_id>[\w-]+)$', 'topic_resources', name='topic_resources'),
+                       url(r'^/prerequisite/(?P<curriculum_id>[\w-]+)/(?P<topic_id>[\w-]+)$', 'get_prerequisite', name='get_prerequisite'),
+                       
                        url(r'^/(?P<app_id>[\w-]+)$', 'curriculum', name='theme_page'),
 					   # url(r'^/(?P<app_Id>[\w-]+)/topic_details$', 'topic_detail_view', name='topic_details'),
                        url(r'^/delete-theme/(?P<theme_id>[\w-]+)/$', 'delete_theme', name='delete_theme'),

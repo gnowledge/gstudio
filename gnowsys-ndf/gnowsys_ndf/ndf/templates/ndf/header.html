@@ -23,6 +23,8 @@
   </div>
   {% endif %}
 
+  {% include "ndf/toolbar.html" %} 
+
 <div class="nroer_header">
 
   <div id="top-headers">
@@ -68,7 +70,7 @@
               {% trans "Repository" %}
             </a>
           </li>
-
+          {% comment %}
           {% for each_menu in nroer_menu.top_menus %}
             {% for menuk, menuv in each_menu.items %}
 
@@ -110,7 +112,7 @@
 
             {% endfor %}
           {% endfor %}
-
+          {% endcomment %}
           <li>
 
             <a href="{% url 'nroer_groups' 'home' 'Groups' %}" {% if nroer_menu.top_menu_selected == "Workspaces" %}class="active"{% endif %}>
@@ -412,6 +414,9 @@
           <li>
             <a href="/help/"><i class="fa fa-info-circle"></i> Help</a>
           </li>
+          {% if groupid %}          
+            <li class=""><a title="Click here to view Notifications"  target="_blank" href="{% url 'notification_details' groupid %}"> <i class="fa fa-bell-o"></i></a></li>
+          {% endif %}
         </ul>
 
         <!-- Closes Right Nav section -->

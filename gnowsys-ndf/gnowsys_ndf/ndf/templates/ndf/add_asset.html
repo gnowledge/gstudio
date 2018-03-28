@@ -215,9 +215,11 @@
         <div class="row">
             <div class="asset-tags-container small-12 medium-10 large-10 columns">
                 <label>
-                <input type="checkbox" name="is_raw_material" class="is_raw_material" {% if "raw@material" in asset_obj.tags %} checked="checked" {% endif %}> {% trans "Mark as Raw Material" %}
+                {% if not title == "raw material" %}
+                <input type="checkbox" name="is_raw_material" class="is_raw_material" {% if "raw@material" in asset_obj.tags %} checked="checked" {% endif %}> {% trans "Mark as Resource" %}
 
                 </label>
+                {% endif %}
 {% comment %}
                 <div class="switch round large">
                     <input id="exampleCheckboxSwitch" name="access_policy" {% if "Author" in group_obj.member_of_names_list and not asset_obj %} checked {% elif asset_obj.access_policy == "PRIVATE" %} checked {% endif %} type="checkbox">
@@ -240,28 +242,29 @@
         <div class="name-desc-asset-cont-area hide">
             <div class="row">
                 <div class="small-8 medium-6 large-6 columns">
+                <form class="dropzone" id ="docPost" enctype="multipart/form-data" method="post" action="{% url 'add_assetcontent' group_id %}" style="margin-left: -13px;width: 429px;" > {% csrf_token %}
                     <label>{% trans "Enter File Name" %} <h9 style="color: red;">*</h9>
-                        <input type="text" placeholder="Enter File name" class="required" id = "asset_content_name" name="" style="padding-bottom: 10px;margin-bottom: 31px;"/>
+                        <input type="text" placeholder="Enter File name" class="required" id = "asset_content_name" name="name" style="padding-bottom: 10px;margin-bottom: 31px;"/>
                     </label>
-                    <form class="dropzone" id ="docPost" enctype="multipart/form-data" method="post" action="{% url 'add_assetcontent' group_id %}" style="margin-left: -13px;width: 429px;" >
-                        <input type="file" id="docFile" class="asset_content_upload" placeholder="" name=""/>
-                    </form>
+                        <input type="file" id="docFile" class="asset_content_upload" placeholder="" name="filehive"/>
                 </div>
 
                 <div class="small-8 medium-6 large-6 columns">
                 <label>{% trans "Enter File Description" %} <br/>
                     <textarea rows="6" cols="2" class="small-12 columns" placeholder="Enter File Description" id="asset_content_desc"></textarea>
                 </label>
-                    <button type="button" class="orange-button right" id="upload_asset" onclick="save_form()" style="margin-right: -3px;">{% trans "Upload" %}</button>
+                    <button type="submit" class="orange-button right" id="upload_asset"  style="margin-right: -3px;">{% trans "Upload" %}</button>
                 </div>
             </div>
         </div>
         <!--<button type="button" class="right orange-button save-asset" onclick="save_asset_cont_data()">Save Asset</button>-->
         <input type="hidden" name="context_name" value="{{title}}"/>
         <input type="hidden" class ="asset_obj_val" name="asset_obj_name" data-asset-obj-val=""/>
+        <input type="hidden" class ="asset_obj" name="asset_obj" data-asset-obj-val="" value="{{asset_obj}}" />
 
 
 
+        </form>
 
     </div>
 

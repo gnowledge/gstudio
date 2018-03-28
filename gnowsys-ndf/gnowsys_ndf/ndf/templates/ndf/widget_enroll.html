@@ -147,13 +147,26 @@
 
         {% if module_enrollment %}
           {% if not enrolled_status_dict|get_dict_value_from_key:request.user.pk %}
+            {% if site.SITE_NAME == "NROER" %}
+              $(".enrollact-{{group_object.pk}}").val("Join").attr("title", "Join ")
+            {% else %}
               $(".enrollact-{{group_object.pk}}").val("Enroll").attr("title", "Enroll ")
+            {% endif %}
           {% endif %}
         {% else %}
           {% if request.user.pk not in group_object.author_set %}
-            $(".enrollact-{{group_object.pk}}").val("Enroll").attr("title", "Enroll")
+             {% if site.SITE_NAME == "NROER" %}
+                $(".enrollact-{{group_object.pk}}").val("join").attr("title", "Join")
+              {% else %}
+                $(".enrollact-{{group_object.pk}}").val("Enroll").attr("title", "Enroll")
+              {% endif %}
+          
           {% else %}
-            $(".enrollact-{{group_object.pk}}").val("Enrolled").attr("title", "You are enrolled")
+             {% if site.SITE_NAME == "NROER" %}
+                $(".enrollact-{{group_object.pk}}").val("Joined").attr("title", "You are joined")
+              {% else %}
+                $(".enrollact-{{group_object.pk}}").val("Enrolled").attr("title", "You are enrolled")
+              {% endif %}
           {% endif %}
         {% endif %}
 

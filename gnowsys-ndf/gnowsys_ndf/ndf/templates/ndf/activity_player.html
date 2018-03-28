@@ -11,6 +11,11 @@
 {% user_access_policy groupid request.user as user_access_priv %}
 {% get_group_object groupid as group_object %}
 {% get_attribute_value node.pk 'discussion_enable' as node_discussion %}
+{% get_attribute_value node.pk 'player_discussion_enable' as player_discussion %}
+{% get_thread_node node.pk as thread_node_obj %}
+{% get_attribute_value thread_node_obj.pk 'thread_interaction_type' as thr_int_type %}
+{% get_default_discussion_lbl as disc_label %}
+
 
 
 <style type="text/css">
@@ -294,8 +299,8 @@
                   {% endif  %}
 
                 
-                {% if node_discussion %}
-                <a class="discuss right">{% trans "Discuss" %} </a>
+                {% if player_discussion or node_discussion %}
+                <a class="discuss right"> {% if not thr_int_type %} {{disc_label}} {% else %} {{thr_int_type}} {% endif %} </a>
                 {% endif %}
                 {% comment %}
                 <a class="translate right"> Translate</a>
@@ -314,9 +319,9 @@
               </div>
               {% endwith %}
               <div class="discussion-area activity_page_rendered" style="">
-                
-                {% if node_discussion %}
-                    {% get_thread_node node.pk as thread_node_obj %}
+                {% get_attribute_value node.pk 'discussion_enable' as node_discussion %}
+                {% if  player_discussion or node_discussion %}
+                    
                     {% if thread_node_obj %}
                         {% get_disc_replies thread_node_obj.pk group_id global_disc_all_replies as all_replies %}
                         {% include 'ndf/in-line-texteditor.html' with node=thread_node_obj var_name="content_org" ckeditor_toolbar="LMSStudentsToolbar" %}
