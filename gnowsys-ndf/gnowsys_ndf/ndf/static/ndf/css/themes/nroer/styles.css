@@ -23543,6 +23543,214 @@ div.banner > * p {
   font-size: 1.35vw;
 }
 
+/* line 121, ../../../scss/_nroer_styles.scss */
+.curriculum_creator {
+  background: #fff;
+  box-shadow: 0px 2px 6px #000;
+  margin: 20px auto;
+  padding: 0px 0px;
+  min-height: calc(100vh - 100px);
+  overflow-y: auto;
+  padding: 15px;
+}
+
+/* line 130, ../../../scss/_nroer_styles.scss */
+.curriculum_creator_header {
+  width: 100%;
+  height: 60px;
+  background: #fff;
+  padding: 5px 15px;
+  box-shadow: 1px 0px 13px #000;
+}
+/* line 137, ../../../scss/_nroer_styles.scss */
+.curriculum_creator_header .course_heading span {
+  letter-spacing: 0.9px;
+  font-weight: 600;
+  line-height: 50px;
+}
+/* line 147, ../../../scss/_nroer_styles.scss */
+.curriculum_creator_header .course_actions ul li {
+  list-style-type: none;
+  display: inline-block;
+  padding: 12px;
+  color: #999999;
+  cursor: pointer;
+  letter-spacing: 0.8px;
+}
+/* line 157, ../../../scss/_nroer_styles.scss */
+.curriculum_creator_header .course_actions ul li.active, .curriculum_creator_header .course_actions ul li:hover {
+  border-bottom: 3px solid #ffc14e;
+}
+
+/* line 165, ../../../scss/_nroer_styles.scss */
+.curriculum_list {
+  width: 100%;
+  height: 60px;
+  background: #fff;
+  padding: 17px 81px;
+  box-shadow: 0px 1px 4px #004;
+  color: #2b78e4;
+}
+/* line 172, ../../../scss/_nroer_styles.scss */
+.curriculum_list a {
+  color: #164A7B;
+  font-size: 20px;
+  font-weight: 600;
+}
+
+/* line 179, ../../../scss/_nroer_styles.scss */
+.curriculum_list_header {
+  max-width: 1176px !important;
+  margin: 0 auto !important;
+  box-sizing: border-box !important;
+  padding-left: 20px !important;
+  padding-right: 20px !important;
+  padding: 8px !important;
+  padding-top: 20px !important;
+  display: -moz-box !important;
+  display: -ms-flexbox !important;
+  display: -webkit-box !important;
+  display: -webkit-flex !important;
+  display: flex !important;
+  justify-content: space-between !important;
+  border-bottom: 1px solid #D6D8DA !important;
+  -moz-box-sizing: border-box !important;
+  -webkit-justify-content: space-between !important;
+  -ms-flex-pack: justify !important;
+  -webkit-box-pack: justify !important;
+  box-shadow: 0px 3px 6px #000;
+  background-color: #ffffff;
+}
+/* line 200, ../../../scss/_nroer_styles.scss */
+.curriculum_list_header .title-curriculum {
+  font-family: inherit !important;
+  font-weight: bold !important;
+  line-height: 23px !important;
+  color: #21242C !important;
+  padding: 0px 0px 0px 10px !important;
+  font-weight: 500 !important;
+  font-size: 20px !important;
+}
+/* line 210, ../../../scss/_nroer_styles.scss */
+.curriculum_list_header .add-curriculum {
+  position: relative !important;
+  display: -moz-box !important;
+  display: -ms-inline-flexbox !important;
+  display: -webkit-box !important;
+  display: -webkit-inline-flex !important;
+  display: inline-flex !important;
+  align-items: center !important;
+  -webkit-align-items: center !important;
+  -ms-flex-align: center !important;
+  -webkit-box-align: center !important;
+  font-size: 19px !important;
+  font-weight: 500 !important;
+}
+
+/* line 226, ../../../scss/_nroer_styles.scss */
+.curriculum_listing {
+  max-width: 1176px !important;
+  margin: 0 auto !important;
+  display: -moz-box !important;
+  display: -ms-flexbox !important;
+  display: -webkit-box !important;
+  display: -webkit-flex !important;
+  display: flex !important;
+  flex-direction: column !important;
+  padding-bottom: 32px !important;
+  -webkit-flex-direction: column !important;
+  -ms-flex-direction: column !important;
+  -webkit-box-orient: vertical !important;
+  -webkit-box-direction: normal !important;
+  background: #fff;
+  box-shadow: 0px 2px 6px #000;
+}
+/* line 243, ../../../scss/_nroer_styles.scss */
+.curriculum_listing .curriculum_content {
+  display: -moz-box !important;
+  display: -ms-flexbox !important;
+  display: -webkit-box !important;
+  display: -webkit-flex !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: space-between !important;
+  width: 100% !important;
+  box-sizing: border-box !important;
+  border-bottom: 1px solid #D6D8DA !important;
+  padding: 16px 8px !important;
+  -webkit-align-items: center !important;
+  -webkit-justify-content: space-between !important;
+  -moz-box-sizing: border-box !important;
+  -ms-flex-align: center !important;
+  -webkit-box-align: center !important;
+  -ms-flex-pack: justify !important;
+  -webkit-box-pack: justify !important;
+}
+/* line 262, ../../../scss/_nroer_styles.scss */
+.curriculum_listing .curriculum_content:hover {
+  background: #F0F1F2 !important;
+}
+/* line 265, ../../../scss/_nroer_styles.scss */
+.curriculum_listing .curriculum_content .curriculum_content_left {
+  display: -moz-box !important;
+  display: -ms-flexbox !important;
+  display: -webkit-box !important;
+  display: -webkit-flex !important;
+  display: flex !important;
+  align-items: center !important;
+  width: 80% !important;
+  -webkit-align-items: center !important;
+  -ms-flex-align: center !important;
+  -webkit-box-align: center !important;
+}
+/* line 276, ../../../scss/_nroer_styles.scss */
+.curriculum_listing .curriculum_content .curriculum_content_left .curriculum_content_details {
+  display: -moz-box !important;
+  display: -ms-flexbox !important;
+  display: -webkit-box !important;
+  display: -webkit-flex !important;
+  display: flex !important;
+  align-items: flex-start !important;
+  flex-direction: column !important;
+  padding-left: 15px !important;
+  width: 85% !important;
+  -webkit-align-items: flex-start !important;
+  -webkit-flex-direction: column !important;
+  -ms-flex-direction: column !important;
+  -ms-flex-align: start !important;
+  -webkit-box-align: start !important;
+  -webkit-box-orient: vertical !important;
+  -webkit-box-direction: normal !important;
+}
+/* line 293, ../../../scss/_nroer_styles.scss */
+.curriculum_listing .curriculum_content .curriculum_content_left .curriculum_content_details .hyperlink-user {
+  border: 2px solid #b9b9b9;
+  height: 50px;
+  width: 50px;
+}
+/* line 298, ../../../scss/_nroer_styles.scss */
+.curriculum_listing .curriculum_content .curriculum_content_left .curriculum_content_details .hyperlink-style {
+  text-decoration: none !important;
+  font-family: inherit !important;
+  font-size: 17px !important;
+  font-weight: bold !important;
+  line-height: 23px !important;
+  color: #164A7B !important;
+  width: 100% !important;
+  white-space: nowrap !important;
+  overflow: hidden !important;
+  text-overflow: ellipsis !important;
+}
+/* line 311, ../../../scss/_nroer_styles.scss */
+.curriculum_listing .curriculum_content .curriculum_content_left .curriculum_content_details .hyperlink-info {
+  text-decoration: none !important;
+  font-family: inherit !important;
+  font-size: 15px !important;
+  line-height: 22px !important;
+  color: rgba(0, 0, 0, 0.56) !important;
+  margin-top: 4px !important;
+}
+
 /*
 *   The Foundation Stylesheet
 *   You can paste sass snippets from compass or foundation here
