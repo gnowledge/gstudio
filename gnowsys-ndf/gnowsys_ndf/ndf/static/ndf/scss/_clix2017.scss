@@ -3884,11 +3884,6 @@ $ah_2_background_color_hover: rgba(244, 244, 244, 0.3);
         font-size: 16px;
         line-height: $activity-header-height;
         color: $ah_2_icon_color;
-
-        &:hover{
-            background-color:$ah_2_icon_color;
-            color:#ffffff;
-        }
     }
 
     .header_icon_block {
@@ -3896,21 +3891,39 @@ $ah_2_background_color_hover: rgba(244, 244, 244, 0.3);
         width: $activity-header-icon-block-width;
         cursor: pointer;
         text-align: center;
+        font-weight: 500;
         &:hover{
-            background-color:$ah_2_icon_color;
-            color:#ffffff;
+            border-bottom: 2px solid $secondary-orange;
         }
     }
+
     .header_text_sm_block{
+        font-weight: 400;
+        padding: 14px 10px 3px 10px;
+        cursor: pointer;
+        transition: color 1s ease, border-color 1s ease;
+        -webkit-transition: color 1s ease, border-color 1s ease;
+        display: inline-block;
+        padding-bottom: 14px;
+        letter-spacing: 0.6px;
         padding: 0px 10px;
         @media screen and (min-width: 1025px) {
             padding: 0px 15px;
         }
-        &:hover{
-            background-color:$ah_2_icon_color;
-            color:#ffffff;
+         &:hover{
+            color: white;
         }
+        &.active{
+            color: #6f0859;
+            border-bottom: 2px solid $secondary-orange;
+            padding-bottom: 14px;
+            font-weight: 600;
+            &:hover{
+                color: white;
+                background-color: #6f0859;
+            }
     }
+}
 
     .lesson-nav{
         position: relative;
@@ -5860,6 +5873,83 @@ ul.authoring-tab{
     
 }
 
+.nav-legal{
+            margin-left:-400px;
+                ol {
+                    list-style-type: none;
+                    li {
+                        &>a{
+                            transition: link-color 0.15s ease-in-out 0s,border 0.15s ease-in-out 0s;
+                            border-bottom: none;
+                            color: #777;
+                            text-decoration: none !important;
+                            &:hover {
+                            color:#777;
+                            border-bottom: 3px solid hsla(316, 88%, 42%, 1);
+                        }
+                        }
+                    }
+
+
+                }
+
+            @media screen and (min-width: 968px) and (max-width: 1400px){
+                    margin-left:-200px;
+                ol {
+                    list-style-type: none;
+                    li {
+                        &>a{
+                            transition: link-color 0.15s ease-in-out 0s,border 0.15s ease-in-out 0s;
+                            border-bottom: none;
+                            color: #777;
+                            text-decoration: none !important;
+                            &:hover {
+                            color:#777;
+                            border-bottom: 3px solid hsla(316, 88%, 42%, 1);
+                        }
+                        }
+                    }
+
+
+                }
+            }
+
+            @media screen and (max-width: 967px){
+                ol {
+                    list-style-type: none;
+                    li {
+                        &>a{
+                            transition: link-color 0.15s ease-in-out 0s,border 0.15s ease-in-out 0s;
+                            border-bottom: none;
+                            color: #777;
+                            text-decoration: none !important;
+                            &:hover {
+                            color:#777;
+                            border-bottom: 3px solid hsla(316, 88%, 42%, 1);
+                        }
+                        }
+                    }
+
+
+                }
+
+            }
+}
+
+.coyright-links{
+    &>a{
+        &>p{
+            transition: link-color 0.15s ease-in-out 0s,border 0.15s ease-in-out 0s;
+            border-bottom: none;
+            color: #777;
+            text-decoration: none !important;
+            &:hover {
+                color:hsla(316, 88%, 42%, 1);
+            }
+        }
+    }
+}
+
 #overlay{ /* we set all of the properties for are overlay */
     
     height: 116px;
@@ -6807,3 +6897,21 @@ input.transcript-toggler{
 .font-plus{
 font-size:100%; color: #713558;
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
