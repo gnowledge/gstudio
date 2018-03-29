@@ -451,16 +451,19 @@
               <ul class="title-area text-center">
                 <li class="name" title="{% firstof  group_object.altnames group_object.name %}">
                   <h1>
-                    <a href="{% url 'groupchange' group_id %}">
+                      {% if group_object.name == "home" %}
+                        <a href="{% url 'landing_page' %}">      
+                      {% else %}
+                        <a href="{% url 'groupchange' group_id %}">      
+                      {% endif %}
+                        {% get_relation_value group_object.pk 'has_profile_pic' as grel_dict %}
+                        {% if not grel_dict.cursor and grel_dict.grel_node %}
+                                  <img src="{{MEDIA_URL}}{{grel_dict.grel_node.if_file.original.relurl}}" />
+                        {% else %}
+                                  <img src="/static/ndf/images/metaStudio-profile.svg" alt="Profile picture for this group."  height="20px" width="20px" >
+                        {% endif %}
 
-                          {% get_relation_value group_object.pk 'has_profile_pic' as grel_dict %}
-                          {% if not grel_dict.cursor and grel_dict.grel_node %}
-                                    <img src="{{MEDIA_URL}}{{grel_dict.grel_node.if_file.original.relurl}}" />
-                          {% else %}
-                                    <img src="/static/ndf/images/metaStudio-profile.svg" alt="Profile picture for this group."  height="20px" width="20px" >
-                          {% endif %}
-
-                          <span style="color:black!important">{% firstof group_object.altnames|truncatechars:7 group_object.name|truncatechars:7 %}</span>
+                        <span style="color:black!important">{% firstof group_object.altnames|truncatechars:7 group_object.name|truncatechars:7 %}</span>
                     </a>
                   </h1>
                 </li>
