@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2018-03-28 17:09+0530\n"
+"POT-Creation-Date: 2018-03-29 12:49+0530\n"
 "PO-Revision-Date: 2018-02-26 02:58+0530\n"
 "Last-Translator: \n"
 "Language-Team: \n"
@@ -544,6 +544,7 @@ msgid "Dependency Graph"
 msgstr "निर्भरता ग्राफ"
 
 #: gnowsys_ndf/ndf/templates/ndf/action_panel.html:311
+#: gnowsys_ndf/ndf/templates/ndf/header.html:418
 #: gnowsys_ndf/ndf/templates/ndf/node_edit_base.html:129
 msgid "Help"
 msgstr "सहायता"
@@ -1478,8 +1479,8 @@ msgstr "इतिहास देखें"
 
 #: gnowsys_ndf/ndf/templates/ndf/beta.html:21
 #: gnowsys_ndf/ndf/templates/ndf/file_search.html:16
-#: gnowsys_ndf/ndf/templates/ndf/header.html:527
-#: gnowsys_ndf/ndf/templates/ndf/header.html:541
+#: gnowsys_ndf/ndf/templates/ndf/header.html:528
+#: gnowsys_ndf/ndf/templates/ndf/header.html:542
 #: gnowsys_ndf/ndf/templates/ndf/node_search_base.html:6
 #: gnowsys_ndf/ndf/templates/ndf/search_page.html:4
 msgid "Search"
@@ -2674,7 +2675,7 @@ msgstr "कड़ी संपादन करें"
 #: gnowsys_ndf/ndf/templates/ndf/footer.html:19
 #: gnowsys_ndf/ndf/templates/ndf/gevent_base.html:41
 #: gnowsys_ndf/ndf/templates/ndf/group_dashboard.html:99
-#: gnowsys_ndf/ndf/templates/ndf/header.html:488
+#: gnowsys_ndf/ndf/templates/ndf/header.html:489
 #: gnowsys_ndf/ndf/templates/ndf/lms.html:147
 #: gnowsys_ndf/ndf/templates/ndf/quiz_details.html:43
 msgid "About"
@@ -2906,6 +2907,10 @@ msgstr "पहले से ही लागू है"
 msgid "Please select the proper filter first"
 msgstr "कृपया संस्था चुनें"
 
+#: gnowsys_ndf/ndf/templates/ndf/footer.html:15
+msgid "Quick Links"
+msgstr ""
+
 #: gnowsys_ndf/ndf/templates/ndf/footer.html:20
 msgid "Partners"
 msgstr "पार्टर्नस"
@@ -2935,11 +2940,24 @@ msgstr "संपर्क करें"
 msgid "Issues"
 msgstr "मुद्दे"
 
+#: gnowsys_ndf/ndf/templates/ndf/footer.html:28
+msgid "Sitemap"
+msgstr ""
+
 #: gnowsys_ndf/ndf/templates/ndf/footer.html:29
 #: gnowsys_ndf/ndf/templates/ndf/task.html:67
 #: gnowsys_ndf/ndf/templates/ndf/task_create_edit.html:190
 msgid "Feedback"
 msgstr "प्रतिक्रिया"
+
+#: gnowsys_ndf/ndf/templates/ndf/footer.html:39
+#, fuzzy
+msgid "Other Links"
+msgstr "अन्य विवरण"
+
+#: gnowsys_ndf/ndf/templates/ndf/footer.html:58
+msgid "Connect With Us"
+msgstr ""
 
 #: gnowsys_ndf/ndf/templates/ndf/forum.html:34
 #, fuzzy
@@ -3163,10 +3181,6 @@ msgstr "एडमिन डिजाइनर"
 msgid "Home Dashboard"
 msgstr "हॉम डेशबोर्ड"
 
-#: gnowsys_ndf/ndf/templates/ndf/gheader.html:228
-msgid "Home"
-msgstr "हॉम "
-
 #: gnowsys_ndf/ndf/templates/ndf/gheader.html:234
 #: gnowsys_ndf/ndf/templates/ndf/header.html:350
 #: gnowsys_ndf/ndf/templates/ndf/header_clix.html:145
@@ -3187,7 +3201,7 @@ msgid "Login"
 msgstr "लॉगिन"
 
 #: gnowsys_ndf/ndf/templates/ndf/gheader.html:471
-#: gnowsys_ndf/ndf/templates/ndf/header.html:623
+#: gnowsys_ndf/ndf/templates/ndf/header.html:624
 msgid ""
 "RSS Feeds may not be displayed properly in this browser. Would you still "
 "like to continue?"
@@ -3219,6 +3233,12 @@ msgstr ""
 msgid "All Groups"
 msgstr "सभी समूह"
 
+#: gnowsys_ndf/ndf/templates/ndf/group.html:80
+#, fuzzy, python-format
+msgid ""
+" No %(title|lower)s%(group_nodes_count|pluralize)s matched your search "
+"criteria "
+msgstr "आपके खोज मापदंड से मेल खाती है %(title|lower)s%(TASK_inst.count|pluralize)s"
 
 #: gnowsys_ndf/ndf/templates/ndf/group.html:120
 #: gnowsys_ndf/ndf/templates/ndf/uDashboard.html:184
@@ -3446,6 +3466,14 @@ msgstr "&#215;"
 msgid "Nothing is Changed"
 msgstr "कुछ भी नहीं मिला"
 
+#: gnowsys_ndf/ndf/templates/ndf/header.html:125
+msgid "Explore"
+msgstr ""
+
+#: gnowsys_ndf/ndf/templates/ndf/header.html:130
+msgid "My Desk"
+msgstr ""
+
 #: gnowsys_ndf/ndf/templates/ndf/header.html:214
 msgid "MY DASHBOARD"
 msgstr "मेरा डैशबोर्ड"
@@ -3454,16 +3482,16 @@ msgstr "मेरा डैशबोर्ड"
 msgid "MY GROUPS"
 msgstr "मेरे समूह"
 
-#: gnowsys_ndf/ndf/templates/ndf/header.html:473
+#: gnowsys_ndf/ndf/templates/ndf/header.html:474
 msgid "APPS"
 msgstr "ऐप्स"
 
-#: gnowsys_ndf/ndf/templates/ndf/header.html:495
-#: gnowsys_ndf/ndf/templates/ndf/header.html:505
+#: gnowsys_ndf/ndf/templates/ndf/header.html:496
+#: gnowsys_ndf/ndf/templates/ndf/header.html:506
 msgid "Updates"
 msgstr "अद्यतन सूची"
 
-#: gnowsys_ndf/ndf/templates/ndf/header.html:560
+#: gnowsys_ndf/ndf/templates/ndf/header.html:561
 msgid "BACK"
 msgstr "पीछे"
 
@@ -4044,6 +4072,10 @@ msgstr "एस्ट्रोमर प्लैनेट ट्रेक गत
 #: gnowsys_ndf/ndf/templates/ndf/landing_page_nroer.html:7
 msgid "Welcome"
 msgstr "स्वागत है"
+
+#: gnowsys_ndf/ndf/templates/ndf/landing_page_nroer.html:160
+msgid "Recent News"
+msgstr ""
 
 #: gnowsys_ndf/ndf/templates/ndf/lms.html:52
 #: gnowsys_ndf/ndf/templates/ndf/lms.html:83
@@ -4854,7 +4886,7 @@ msgid "created yet."
 msgstr "अभी तक सृजन"
 
 #: gnowsys_ndf/ndf/templates/ndf/partner_showcase.html:4
-#: gnowsys_ndf/ndf/templates/ndf/repository.html:49
+#: gnowsys_ndf/ndf/templates/ndf/repository.html:52
 msgid "Partner Showcase"
 msgstr "पार्टनर शोकेस"
 
@@ -5204,7 +5236,7 @@ msgstr "विवरण"
 msgid "Digital resource grouped in multiple ways"
 msgstr "डिजि़टल संसाधन बहु-माध्यम समूहों में उपलब्ध हैं"
 
-#: gnowsys_ndf/ndf/templates/ndf/repository.html:52
+#: gnowsys_ndf/ndf/templates/ndf/repository.html:55
 msgid "Contributions from institutions and individuals"
 msgstr "व्यक्तिगत तथा संस्थाओं से योगदान"
 
@@ -6677,6 +6709,9 @@ msgid ""
 "        </p>\n"
 "        "
 msgstr "%(email_url)s आपके पास एक सत्यापित ईमेल नहीं है जिसमें सूचनाएं भेजी जा सकती हैं।"
+
+#~ msgid "Home"
+#~ msgstr "हॉम "
 
 #~ msgid "Mark as Raw Material"
 #~ msgstr "रॉ मटीरियल के रूप में चिह्नित करें"
