@@ -111,9 +111,9 @@
 
             <ul class="tabs" data-tab style="">
                 <li class="tab-title {% ifequal tab 'all-notes' %} active{% endifequal %}"><a href="#all-notes" title="Notes created by all">
-                {% if 'Group' in group_object.member_of_names_list and 'base_unit' not in group_object.member_of_names_list %}All Blogs {% else %} All Notes {% endif %} ({{blog_pages.count}})</a></li>
+                {% if 'Group' in group_object.member_of_names_list and 'base_unit' not in group_object.member_of_names_list %}Other's Posts {% else %} Other's Posts {% endif %} ({{blog_pages.count}})</a></li>
                 {% if user.is_authenticated %}
-                    <li class="tab-title {% ifequal tab 'my-notes' %} active{% endifequal %}"><a href="#my-notes" title="Notes created by me"> {% if 'Group' in group_object.member_of_names_list and 'base_unit' not in group_object.member_of_names_list %}My Blogs {% else %} My Notes {% endif %} ({{user_blogs.count}})</a></li>
+                    <li class="tab-title {% ifequal tab 'my-notes' %} active{% endifequal %}"><a href="#my-notes" title="Notes created by me"> {% if 'Group' in group_object.member_of_names_list and 'base_unit' not in group_object.member_of_names_list %}My Posts {% else %} My Posts {% endif %} ({{user_blogs.count}})</a></li>
                 {% endif %}
                 {% comment %}
                     <li class="tab-title"><a href="#my-drafts">My Drafts</a></li>
