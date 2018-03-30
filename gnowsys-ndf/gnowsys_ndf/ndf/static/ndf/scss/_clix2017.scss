@@ -699,9 +699,10 @@ h5{
                         cursor: pointer;
                         background: transparent;
                         border-bottom: 0px;
-                        line-height: 50px;
+                        line-height: 49px;
                         border-left-width: 0px;
                         font-family: OpenSans-Regular;
+                        border-top: 2px solid #713558;
 
                     }
                     &.active {
