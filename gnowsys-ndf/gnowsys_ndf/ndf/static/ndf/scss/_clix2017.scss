@@ -5362,6 +5362,10 @@ ul.nav_menu_1 {
 }
 
 ul.authoring-tab{
+    nav select {
+        display: none;
+    }
+
         background-color:$nav_menu_1_color;
         margin-bottom: 0px;
         display:inline;
@@ -5385,10 +5389,16 @@ ul.authoring-tab{
                         }
                 }
             }
-    
 
+    @media only screen and (min-width : 760px) and (max-width : 1500px) { 
+                 display: none;
 
+                 nav select{
+                    display:inline-block;
+                 }
+     }     
 }
+
 
 
     
