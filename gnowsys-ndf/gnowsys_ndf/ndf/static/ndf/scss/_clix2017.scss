@@ -2938,6 +2938,7 @@ ul.jqtree-tree .jqtree-toggler {
             max-height: 100%;
             overflow-y: auto;
             height: 100vh;
+            position:fixed;
 
             .course-lessons {
                 dd {
@@ -3886,8 +3887,9 @@ $ah_2_background_color_hover: rgba(244, 244, 244, 0.3);
         color: $ah_2_icon_color;
 
         &:hover{
-            background-color:$ah_2_icon_color;
-            color:#ffffff;
+            //border-bottom: 2px solid $ah_2_icon_color;
+            //background-color:$ah_2_icon_color;
+            //color:#ffffff;
         }
     }
 
@@ -3897,18 +3899,31 @@ $ah_2_background_color_hover: rgba(244, 244, 244, 0.3);
         cursor: pointer;
         text-align: center;
         &:hover{
-            background-color:$ah_2_icon_color;
-            color:#ffffff;
+            //background-color:$ah_2_icon_color;
+            //color:#ffffff;
         }
     }
     .header_text_sm_block{
         padding: 0px 10px;
+        position: relative;
+        color: #6f0859;
+        font-weight: 500;
+        font-size: 14px;
+        letter-spacing: 0.6px;
+        font-family: 'OpenSans-Regular', sans-serif;
         @media screen and (min-width: 1025px) {
             padding: 0px 15px;
+            position: relative;
+            color: #6f0859;
+            font-weight: 500;
+            font-size: 14px;
+            letter-spacing: 0.6px;
+            font-family: 'OpenSans-Regular', sans-serif;
         }
         &:hover{
-            background-color:$ah_2_icon_color;
-            color:#ffffff;
+            border-bottom: 2px solid $ah_2_icon_color;
+            //background-color:$ah_2_icon_color;
+            //color:#ffffff;
         }
     }
 
@@ -3940,15 +3955,17 @@ $ah_2_background_color_hover: rgba(244, 244, 244, 0.3);
 
             a {
                 color: $ah_2_icon_color;
-                &:hover{
-                    background-color:$ah_2_icon_color;
-                    color:#ffffff;
-                }
+                
             }
 
             &:hover{
-                background-color:$ah_2_icon_color;
-                color:#ffffff;
+                border-bottom: 2px solid $ah_2_icon_color;
+                //background-color:$ah_2_icon_color;
+                //color:#ffffff;
+            }
+            &:active{
+                border-bottom: 2px solid $ah_2_icon_color;
+
             }
 
 
@@ -4528,6 +4545,7 @@ ul.nav_menu_1 {
         &>li {
                 list-style: none;
                 border-top: 1px solid #e9e9e9;
+                border-bottom: 1px solid #e9e9e9;
                 padding: 9px 0px 9px 11px;
                 background: inherit;
                 transition: border-color 1s ease;

@@ -23,17 +23,16 @@
     color:gray !important;
   }
   .course_editor_section{
-    min-width:930px;
+    min-width:100%;
     margin-left: -15px;
   }
   .node-content-div{
-    
     margin-left: -4px;
 
   }
 
   .collapse-container--open {
-    width: 245px;
+    width: 160px;
     position: relative;
                 -webkit-transition: all .6s ease;
                 -webkit-box-align: stretch;
@@ -93,7 +92,7 @@
       <div class="small-1 columns end header_text_sm_block">
         <a title="Go back to all Lessons" href="{% url 'course_content' group_id  %}">
         <div class="header_icon_block prev_button">
-          <i class="fa fa-angle-left header_icon"> Lessons </i>
+          <i class="fa fa-angle-left header_icon"></i> Lessons
           
         </div>
         </a>
@@ -173,7 +172,7 @@
               </div>
           </div>
           
-          <div class="small-8 columns section-expand">
+          <div class="small-8 medium-9 large-9 columns section-expand">
 
             <div class="course_editor_section">
               {% with node.member_of_names_list as node_member_of_names_list %}
@@ -252,7 +251,9 @@
     $('.first-strip').click(function(){
       $('.index').toggleClass('colapse-container collapse-container--open');
       $('.collapse-icon').toggleClass('fa-angle-right fa-angle-left')
-      $('.section-expand').toggleClass('small-8 small-10');
+      $('.section-expand').toggleClass('small-3 small-10');
+      $('.activity-title').toggleClass('hide');
+
     });
 
    
