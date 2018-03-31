@@ -132,16 +132,16 @@
               <li class="second-has-form">
                 <div class="large-1 small-2 columns">
                   <button type="submit" class="tiny button" value="" id="search-submit" class="checked">
-                  <i class="fi-magnifying-glass"></i>
+                  <i class="fi-magnifying-glass" title="Search"></i>
                   </button>
                 </div>
 
               </li>  
               <li class="has-form">
-                <form id = "search_form" {% if groupid %} action="{% url 'results' groupid %}" {% else %} action="" {% endif %}
+              <!--  <form id = "search_form" {% if groupid %} action="{% url 'results' groupid %}" {% else %} action="" {% endif %}
                   name="search_form" method="GET" >
-                <!--<form id="search_form"  name="search_form" method="GET" >-->
-                  <!--{{group_object.name|truncatechars:15}}-->
+                <!--<form id="search_form"  name="search_form" method="GET" >
+                  {{group_object.name|truncatechars:15}}
                   <div class="row collapse">
                     <div class="large-11 small-10 columns">
                       <input type="text" name="search_text" id="search_text" placeholder='{% trans "Search" %} ' autocomplete="off" required />
@@ -153,7 +153,7 @@
                     </div>
                   </div>
 
-                </form>
+                </form>-->
               </li>
         </ul>
         <!-- -END of NROER level one menu -->
@@ -683,19 +683,19 @@
  // });
   //$('#search_form').submit(function (event)
   $( document ).ready(function() {
-    $("li.has-form").hide();
     $("li.second-has-form").show();
+    //$("li.has-form").hide();
     
   });
 
 
-  $(document).on("click", "#search-submit", function() {
+  $(document).on("click", "#search-submit1", function() {
 
     //var action = '';
     // compute action here...
-
-    $("li.has-form").show();
     $("li.second-has-form").hide();
+    $("li.has-form").show();
+    
 
 //    if( $("#search_text").val().length === 0 )
 //    {
@@ -723,5 +723,20 @@
 //    }
     
   });
+  </script>
+  <script>
+  $(document).on("click", "#search-submit", function() {
+           $("li.second-has-form").hide();
+    
+            //$('li').attr({class: "has-form"});            
+            $('li.has-form').append("<form id = 'search_form' {% if groupid %} action='{% url 'results' groupid %}' {% else %} action='' {% endif %} name='search_form' method=GET></form>");
+            $('#search_form').append('<div class="row collapse"><div class="large-11 small-10 columns"><input type="text" name="search_text" id="search_text" placeholder="{% trans "Search" %}" autocomplete="off" required /></div><div class="large-1 small-2 columns"><button type="submit" class="tiny button" value="" id="search-submit1" class="checked"><i class="fi-magnifying-glass"></i></button></div></div>');
 
+            //$('form').attr({id: "search_form"});
+
+    
+
+ });
 </script>
+
+
