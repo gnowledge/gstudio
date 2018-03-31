@@ -207,7 +207,7 @@ def results_search(request, group_id, page_no=1, return_only_dict = None):
 		
 		if request.GET.get('search_text',None) in (None,''):
 
-			q = Q('bool', must=[Q('match', member_of=GST_FILE1.hits[0].id),~Q('exists',field='content')])
+			q = Q('bool', must=[Q('match', member_of=GST_FILE1.hits[0].id),Q('match', str(group_id)),~Q('exists',field='content')])
 			search_result =Search(using=es, index="nodes",doc_type="gsystemtype,gsystem,metatype,relationtype,attribute_type,group,author").query(q)
 			#search_result.filter('exists', field='content')
 			search_str_user=""
@@ -230,7 +230,12 @@ def results_search(request, group_id, page_no=1, return_only_dict = None):
 				print strconcat
 
 
-			search_result =Search(using=es, index="nodes,gsystem",doc_type="gsystemtype,gsystem,metatype,relationtype,attribute_type,group,author,images,applications,videos,audios").query(q)
+			search_result =Search(using=es, index="nodes",doc_type="gsystemtype,gsystem,metatype,relationtype,attribute_type,group,author").query(q)
+			search_result = search_result.filter('match', group_set=str(group_id))
+			search_result = search_result.filter('match', member_of=GST_FILE1.hits[0].id)
+			search_result = search_result.filter('match', access_policy='public')
+
+
 			print "search page"
 			print search_result.count()
 		
