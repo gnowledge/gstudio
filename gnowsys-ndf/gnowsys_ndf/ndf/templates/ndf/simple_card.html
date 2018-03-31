@@ -46,7 +46,7 @@
 {% endif %}
 {% endif %}
 <div class="scard-image" title="{% firstof resource.altnames resource.name %}">
-
+    {{resource.member_of}}
     {% if GSTUDIO_ELASTIC_SEARCH != True %}
       {% get_dict_from_list_of_dicts resource.attribute_set as attr_set_dict %}
     {% endif %}
@@ -65,7 +65,7 @@
       <img src="{% url 'get_mid_size_img' first_arg second_arg %}" alt="">
     {% elif resource.fs_file_ids.1 %}
       <img src="{% url 'getImageThumbnail' first_arg second_arg %}" alt="">
-    {% elif "File" in resource.member_of_names_list or "Page" in resource.member_of_names_list%}
+    {% elif "File" in resource.member_of_names_list or "Page" in resource.member_of_names_list or '55ab34ff81fccb4f1d806001' in resource.member_of or '55ab34ff81fccb4f1d805fff' in resource.member_of %}
       {% if resource.collection_set  %}
         <i class="collection"></i>
       {% elif attr_set_dict.educationaluse and attr_set_dict.educationaluse != "Documents" %}
