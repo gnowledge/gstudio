@@ -60,7 +60,10 @@ urlpatterns = patterns('',
     url(r'^autocompletion/', include('gnowsys_ndf.ndf.urls.autocompletion')),
     url(r'^captcha/', include('captcha.urls')),
     (r'^', include('gnowsys_ndf.ndf.urls.captcha')),
+    # advanced search using ES
+    (r'^(?P<group_id>[^/]+)/advanced_search/', include('gnowsys_ndf.ndf.urls.advanced_search')),
     # all main apps
+
     (r'^(?P<group_id>[^/]+)/mailclient', include('gnowsys_ndf.ndf.urls.mailclient')),
     (r'^(?P<group_id>[^/]+)/analytics', include('gnowsys_ndf.ndf.urls.analytics')),
     (r'^(?P<group_id>[^/]+)/file', include('gnowsys_ndf.ndf.urls.file')),
@@ -131,6 +134,8 @@ urlpatterns = patterns('',
 
     #test url
     #(r'^dev', include('gnowsys_ndf.ndf.urls.dev_utils')),
+
+
     (r'^tools/', include('gnowsys_ndf.ndf.urls.tools')),
     (r'^sitemap.html/',include('gnowsys_ndf.ndf.urls.sitemap')),
     (r'^(?P<group_name>[^/]+)/gtask', include('gnowsys_ndf.ndf.urls.gtask')),
