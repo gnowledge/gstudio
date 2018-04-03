@@ -52,10 +52,10 @@
 
 <nav class="top-bar" data-topbar role="navigation" id="menu_bar_gstudio">
         <ul class="title-area">
-            <li class="name show-for-medium-up">
+            <li class="name show-for-medium-up" style="line-height:47px; height:47px;">
                 <a title="About: Connected Learning Initiative (CLIx)" class="loggedin-user" href="{% url 'landing_page'  %}?True">
                 
-                <img src="{{site.SECONDARY_LOGO}}">
+                <img src="{{site.SECONDARY_LOGO}}" style="padding: 0px 2px 8px 1px;">
                 </a>
             </li>
             <li class="name hide-for-medium-up">
@@ -84,7 +84,7 @@
                 </li>
 
                 <li>
-                    <a  title="Click here to play, learn and have Fun!" target="_blank" href="{% url 'tools_temp' %}" {% if title == 'tools' %} class="active" {% endif %}> <i class="fi-die-three" aria-hidden="true" style="font-size:20px;"></i> Apps</a>
+                    <a  title="Click here to play, learn and have Fun!" target="_blank" href="{% url 'tools_temp' %}" {% if title == 'tools' %} class="active" {% endif %}> <i class="fi-die-three" aria-hidden="true" style="font-size:16px;"></i> Apps</a>
                 </li>
                 
             </ul>
