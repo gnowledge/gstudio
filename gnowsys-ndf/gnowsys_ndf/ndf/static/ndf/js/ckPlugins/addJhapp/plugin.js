@@ -809,7 +809,34 @@ CKEDITOR.plugins.add('addJhapp',
                             $('#group_imgs_on_modal').foundation('reveal', 'close');
                           });
 
+                          $("#insert_AGES_PUZZLE").click(function(event){
+                            //ost_text_gallery = $('#paste-ost-gallery').val();
+                            //ost_text_file = $('#paste-ost-captions').val();
+                            tool_val = "<iframe src='/ages_puzzle/en/' style='height:100vh;width:100%'></iframe>"
+                            // split_word = ost_text_val.slice(0, 18) + "gallery=" + ost_text_gallery + "&amp;file=/ost/" + ost_text_file+"'"+ ost_text_val.slice(18);
+                            // alert(split_word)
+                             CKEDITOR.instances[textAreaId].insertHtml(tool_val);
+                            $('#group_imgs_on_modal').foundation('reveal', 'close');
+                          });
 
+                          $("#insert_FACTORISATION_PUZZLE").click(function(event){
+                            //ost_text_gallery = $('#paste-ost-gallery').val();
+                            //ost_text_file = $('#paste-ost-captions').val();
+                            tool_val = "<iframe src='/factorisation/en/' style='height:100vh;width:100%'></iframe>"
+                            // split_word = ost_text_val.slice(0, 18) + "gallery=" + ost_text_gallery + "&amp;file=/ost/" + ost_text_file+"'"+ ost_text_val.slice(18);
+                            // alert(split_word)
+                             CKEDITOR.instances[textAreaId].insertHtml(tool_val);
+                            $('#group_imgs_on_modal').foundation('reveal', 'close');
+                          });
+                          $("#insert_COINS_PUZZLE").click(function(event){
+                            //ost_text_gallery = $('#paste-ost-gallery').val();
+                            //ost_text_file = $('#paste-ost-captions').val();
+                            tool_val = "<iframe src='/coins_linear_eqn/en/' style='height:100vh;width:100%'></iframe>"
+                            // split_word = ost_text_val.slice(0, 18) + "gallery=" + ost_text_gallery + "&amp;file=/ost/" + ost_text_file+"'"+ ost_text_val.slice(18);
+                            // alert(split_word)
+                             CKEDITOR.instances[textAreaId].insertHtml(tool_val);
+                            $('#group_imgs_on_modal').foundation('reveal', 'close');
+                          });
                         }
                     });
             }
