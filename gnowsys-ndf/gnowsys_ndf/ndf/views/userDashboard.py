@@ -739,14 +739,26 @@ def my_desk(request, group_id,page_no=1):
     # my_modules = []
     # for each in my_modules_cur:
     #     my_modules.append(each._id)
-
+    search_text = request.GET.get("search_text",None)
     
-    my_units = node_collection.find(
-                {'member_of':
-                    {'$in': [ce_gst._id, announced_unit_gst._id, gst_group._id]
-                },
-                'name': {'$nin': GSTUDIO_DEFAULT_GROUPS_LIST },
-                'author_set': request.user.id}).sort('last_update', -1)
+    if search_text:
+        my_units = node_collection.find(
+                    {
+                     '$or':[{'altnames':search_text},{'name':search_text}],
+                    'member_of':
+                        {'$in': [ce_gst._id, announced_unit_gst._id, gst_group._id]
+                    },
+                    'name': {'$nin': GSTUDIO_DEFAULT_GROUPS_LIST },
+                    'author_set': request.user.id}).sort('last_update', -1)
+    else:
+        my_units = node_collection.find(
+                    {'member_of':
+                        {'$in': [ce_gst._id, announced_unit_gst._id, gst_group._id]
+                    },
+                    'name': {'$nin': GSTUDIO_DEFAULT_GROUPS_LIST },
+                    'author_set': request.user.id}).sort('last_update', -1)
+
+        my_units_page_cur = paginator.Paginator(my_units, page_no, GSTUDIO_NO_OF_OBJS_PP)
 
     my_units_page_cur = paginator.Paginator(my_units, page_no, GSTUDIO_NO_OF_OBJS_PP)
     # my_modules_cur.rewind()
