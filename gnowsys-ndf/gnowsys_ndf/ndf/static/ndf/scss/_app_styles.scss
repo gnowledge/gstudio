@@ -459,7 +459,8 @@ pre{
 }
 
 html,body{
-  height: 100%;
+  height: 100%;/*
+  overflow-x: hidden;*/
 }
 #gbase_wrap{
    min-height: 100%;
@@ -468,6 +469,7 @@ html,body{
   margin: 0 auto ;
   /* Pad bottom by footer height */
   padding: 0 0 60px;
+    overflow-x: hidden;
 }
 #base_wrap{
   min-height: 100%;
