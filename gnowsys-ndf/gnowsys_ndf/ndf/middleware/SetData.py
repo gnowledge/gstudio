@@ -52,4 +52,5 @@ class AdditionalDetails(object):
     """ Additional details can be added in this class """
     def process_response(self, request, response):
         response.set_cookie('institute_id', GSTUDIO_INSTITUTE_ID)
+        response.set_cookie('language_code', request.LANGUAGE_CODE)
         return response
