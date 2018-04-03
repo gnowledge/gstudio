@@ -273,7 +273,7 @@ def convertVideo(userid, file_id, filename):
 
 
 @task
-def record_in_benchmark(kwargs_len, total_param_size, post_bool, get_bool, sessionid, user_name, path, funct_name, time_taken):
+def record_in_benchmark(kwargs_len, total_param_size, post_bool, get_bool, sessionid, user_name, path, funct_name, time_taken, locale):
     benchmark_node = benchmark_collection.Benchmark()
     benchmark_node.time_taken   = time_taken
     benchmark_node.name         = unicode(funct_name)
@@ -283,6 +283,7 @@ def record_in_benchmark(kwargs_len, total_param_size, post_bool, get_bool, sessi
     benchmark_node.session_key  = unicode(sessionid)
     benchmark_node.user = unicode(user_name)
     benchmark_node.parameters = unicode(kwargs_len)
+    benchmark_node.locale = locale
     benchmark_node.size_of_parameters = unicode(total_param_size)
     benchmark_node.last_update = datetime.datetime.now()
     try:

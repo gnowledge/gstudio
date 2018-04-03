@@ -91,11 +91,13 @@ def get_execution_time(f):
         sessionid = user_name = path = '',
 
         req = args[0] if len(args) else None
+        locale = 'en'
 
         if isinstance(req, WSGIRequest):
             # try :
             post_bool = bool(args[0].POST)
             get_bool = bool(args[0].GET)
+            locale = req.LANGUAGE_CODE
             # except :
             #     pass
 
@@ -123,7 +125,9 @@ def get_execution_time(f):
                             user_name=user_name,
                             path=path,
                             funct_name=f.func_name,
-                            time_taken=unicode(str(time2 - time1))
+                            time_taken=unicode(str(time2 - time1)),
+                            locale=locale
+
                         )
         return ret
     return wrap
