@@ -123,12 +123,15 @@ def explore_groups(request,page_no=1):
 
     if gstaff_access:
         if search_text:
-            query.update({'$or':[{'altnames':search_text},{'name':search_text}],'group_type': {'$in': [u'PUBLIC', u'PRIVATE']}})
+            search_text = ".*"+search_text+".*"
+            query.update({'$or':[{'altnames':{'$regex' : search_text, '$options' : 'i'}},{'name':{'$regex' : search_text, '$options' : 'i'}}]
+            ,'group_type': {'$in': [u'PUBLIC', u'PRIVATE']}})
         else:
             query.update({'group_type': {'$in': [u'PUBLIC', u'PRIVATE']}})
     else:
         if search_text:
-            query.update({'$or':[{'altnames':search_text},{'name':search_text}],
+            search_text = ".*"+search_text+".*"
+            query.update({'$or':[{'altnames':{'$regex' : search_text, '$options' : 'i'}},{'name':{'$regex' : search_text, '$options' : 'i'}}],
                 'group_type': u'PUBLIC'})
         else:
             query.update({'name': {'$nin': GSTUDIO_DEFAULT_GROUPS_LIST},
@@ -276,6 +279,7 @@ def explore_courses(request):
     
     search_text = request.GET.get("search_text",None)
     if search_text:
+        search_text = ".*"+search_text+".*"
         base_unit_cur = node_collection.find({
                                             '$or': [
                                                 {
@@ -314,7 +318,8 @@ def explore_courses(request):
                                             ],
                                             '_type': 'Group',
                                             #'name': search_text,
-                                            '$or':[{'altnames':search_text},{'name':search_text}],
+                                            #'$or':[{'altnames':search_text},{'name':search_text}],
+                                            '$or':[{'altnames':{'$regex' : search_text, '$options' : 'i'}},{'name':{'$regex' : search_text, '$options' : 'i'}}],
                                             '_id': {'$nin': module_unit_ids},
                                               }).sort('last_update', -1)
 
