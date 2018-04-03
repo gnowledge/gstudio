@@ -11,26 +11,15 @@
         2. Before user leaving page.
         3. After fixed configured period (e.g: 2 min).
 - UGD is **CREATE only** for research purpose, which is not intended to get Read/Update/Delete within/via platform UI.
-    - UGD will get stored as JSON file under `/data/gstudio-tool-logs/<tool-name>` folder in server.
+    - UGD will get stored as JSON file under `/data/gstudio_tools_logs/<tool-name>` folder in server.
         - Following is exemplar hierarchy:
         ```
             <tool-name>
-            ├── 0-en-180212162912.json
-            ├── 0-en-180212162807.json
-            ├── 0-hi-180212162948.json
-            ├── 5-hi-180212162952.json
-            ├── 5-hi-180212163000.json
-            ├── 66-en-180212163022.json
-            ├── 66-hi-180212163023.json
-            ├── 98-en-180212163009.json
-            └── 98-en-180212163025.json
+            ├── 0-<tool-name>.json
+            ├── 5-<tool-name>.json
+            ├── 66-<tool-name>.json
+            └── 98-<tool-name>.json
         ```
-        - File naming convention:
-            - It is combination of following 3 values:
-                1. User ID (e.g: *66*)
-                2. Language Code (e.g: *hi*)
-                3. Timestamp: YYMMDDHHMMSS (e.g: *180212163009*)
-            - Final file name will be: `66-hi-180212163023.json`
 
 
 ### II. Steps to achieve:
@@ -38,6 +27,10 @@
 - Provide following JS-methods to:
     - Create a Unique Token Key (UTK).
         - Format: USERID-LANGCODE-YYMMDDHHMMSS
+            - It is combination of following 3 values:
+                1. USERID (e.g: *66*)
+                2. LANGCODE (e.g: *hi*)
+                3. YYMMDDHHMMSS (e.g: *180212163009*)
             - USERID and LANGCODE is in [cookies](../cookie.html) with key: `user_id` and `language_code` respectively. Which needs to be pick up by JS method.
         - *Note: Anonymous user will have `0` User Id, cookie will have value `None`*
     - Get JSON data at any given time.
@@ -51,16 +44,15 @@
                 - Core interactive data.  
                 - AMD
                     - `timestamp` (e.g: `YYMMDDHHMMSS`)
-                    - `locale` (e.g: `en` or `hi`)
-                    - `user_id` (e.g: `12345`)
+                    - `locale` (pick from cookie e.g: `en` or `hi`)
+                    - `user_id` (pick from cookie e.g: `12345`)
                     - `user_and_buddy_ids` (pick from cookie, e.g: `12345&1417`)
                     - `app_name` (i.e: Name of app/interactive)
                 - UTK
                     - USERID-LANGCODE-YYMMDDHHMMSS
-                    - e.g: `66-hi-180212163023`
+                    - e.g: `66-en-180411132056`
             2. `csrfmiddlewaretoken`:
-                - `csrftoken`
-                - Can be taken from cookie named - `csrftoken`
+                - `csrftoken` (pick from cookie)
     - An event listner method which will listen to any of above specified (3) events and trigger POST AJAX method.
 
 
