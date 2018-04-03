@@ -680,12 +680,13 @@
                  
             if (window.location.pathname == "/home/repository" | window.location.pathname == "/55ab34ff81fccb4f1d806025/repository") {
             //$('li').attr({class: "has-form"});            
-            $('li.has-form').append("<form id = 'search_form' {% if groupid %} action='{% url 'repository' groupid %}' {% else %} action='' {% endif %} name='search_form' method=GET></form>");}
-            else if(window.location.pathname == "/home/e-library" | window.location.pathname == "/55ab34ff81fccb4f1d806025/e-library") {
-            $('li.has-form').append("<form id = 'search_form' {% if groupid %} action='{% url 'e-library' groupid %}' {% else %} action='' {% endif %} name='search_form' method=GET></form>");
+              $('li.has-form').append("<form id = 'search_form' {% if groupid %} action='{% url 'repository' groupid %}' {% else %} action='' {% endif %} name='search_form' method=GET></form>");}
+            else if(window.location.pathname == "/home/e-library/" | window.location.pathname == "/home/e-library" | window.location.pathname == "/55ab34ff81fccb4f1d806025/e-library") {
+              $('li.has-form').append("<form id = 'search_form' {% if groupid %} action='{% url 'e-library' groupid %}' {% else %} action='' {% endif %} name='search_form' method=GET></form>");
+              
             }
             else if(window.location.pathname == "/explore/courses" | window.location.pathname == "/55ab34ff81fccb4f1d806025/courses") {
-            $('li.has-form').append("<form id = 'search_form' {% if groupid %} action='{% url 'explore_courses' %}' {% else %} action='' {% endif %} name='search_form' method=GET></form>");
+              $('li.has-form').append("<form id = 'search_form' {% if groupid %} action='{% url 'explore_courses' %}' {% else %} action='' {% endif %} name='search_form' method=GET></form>");
             }
             else if(window.location.pathname == "/explore/workspaces" | window.location.pathname == "/55ab34ff81fccb4f1d806025/workspaces") {
               $('li.has-form').append("<form id = 'search_form' {% if groupid %} action='{% url 'explore_groups' %}' {% else %} action='' {% endif %} name='search_form' method=GET></form>");
@@ -697,7 +698,6 @@
               $('li.has-form').append("<form id = 'search_form' {% if groupid %} action='{% url 'my_desk' groupid %}' {% else %} action='' {% endif %} name='search_form' method=GET></form>");
               }  
             else{
-
               $('li.has-form').append("<form id = 'search_form' {% if groupid %} action='{% url 'results' groupid %}' {% else %} action='' {% endif %} name='search_form' method=GET></form>");
             }
             $('#search_form').append('<div class="row collapse"><div class="large-11 small-10 columns"><input type="text" name="search_text" id="search_text" placeholder="{% trans "Search" %}" autocomplete="off" required /></div><div class="large-1 small-2 columns"><button type="submit" class="tiny button" value="" id="search-submit1" class="checked"><i class="fi-magnifying-glass"></i></button></div></div><div class="row collapse"><div class="large-11 small-10 columns"><input type="radio" id= "current_search" name="search" value="current" checked> Current Page<input id="global_search" type="radio" name="search" value="global"> global </div></div>');
@@ -712,6 +712,9 @@
 
   $(document).on("click", "#global_search", function() {
         $("li.has-form").empty();
+        if(window.location.pathname == "/1/my-desk/" | window.location.pathname == "/55efd51681fccb14c0deb79a/my-desk/") {
+              $('li.has-form').append("<form id = 'search_form' {% if groupid %} action='{% url 'results' 'home' %}' {% else %} action='' {% endif %} name='search_form' method=GET></form>");
+              } 
         $('li.has-form').append("<form id = 'search_form' {% if groupid %} action='{% url 'results' groupid %}' {% else %} action='' {% endif %} name='search_form' method=GET></form>");
         $('#search_form').append('<div class="row collapse"><div class="large-11 small-10 columns"><input type="text" name="search_text" id="search_text" placeholder="{% trans "Search" %}" autocomplete="off" required /></div><div class="large-1 small-2 columns"><button type="submit" class="tiny button" value="" id="search-submit1" class="checked"><i class="fi-magnifying-glass"></i></button></div></div><div class="row collapse"><div class="large-11 small-10 columns"><input type="radio" id= "current_search" name="search" value="current"> Current Page<input id= "global_search" type="radio" name="search" value="global" checked> global </div></div>');
 
@@ -722,7 +725,7 @@
         if (window.location.pathname == "/home/repository" | window.location.pathname == "/55ab34ff81fccb4f1d806025/repository") {
           $('li.has-form').append("<form id = 'search_form' {% if groupid %} action='{% url 'repository' groupid %}' {% else %} action='' {% endif %} name='search_form' method=GET></form>");
         }
-        else if(window.location.pathname == "/home/e-library" | window.location.pathname == "/55ab34ff81fccb4f1d806025/e-library")
+        else if(window.location.pathname == "/home/e-library" | window.location.pathname == "/home/e-library/" | window.location.pathname == "/55ab34ff81fccb4f1d806025/e-library")
         {
           $('li.has-form').append("<form id = 'search_form' {% if groupid %} action='{% url 'e-library' groupid %}' {% else %} action='' {% endif %} name='search_form' method=GET></form>");
         }
