@@ -742,9 +742,10 @@ def my_desk(request, group_id,page_no=1):
     search_text = request.GET.get("search_text",None)
     
     if search_text:
+        search_text = ".*"+search_text+".*"
         my_units = node_collection.find(
                     {
-                     '$or':[{'altnames':search_text},{'name':search_text}],
+                     '$or':[{'altnames':{'$regex' : search_text, '$options' : 'i'}},{'name':{'$regex' : search_text, '$options' : 'i'}}],
                     'member_of':
                         {'$in': [ce_gst._id, announced_unit_gst._id, gst_group._id]
                     },
