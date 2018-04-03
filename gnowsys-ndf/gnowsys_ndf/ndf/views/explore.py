@@ -120,14 +120,15 @@ def explore_groups(request,page_no=1):
              '$nin': [gst_course._id, gst_basecoursegroup._id, ce_gst._id, gst_course._id, gst_base_unit_id]},
             }
     search_text = request.GET.get("search_text",None)
+
     if gstaff_access:
         if search_text:
-            query.update({'name':search_text,'group_type': {'$in': [u'PUBLIC', u'PRIVATE']}})
+            query.update({'$or':[{'altnames':search_text},{'name':search_text}],'group_type': {'$in': [u'PUBLIC', u'PRIVATE']}})
         else:
             query.update({'group_type': {'$in': [u'PUBLIC', u'PRIVATE']}})
     else:
         if search_text:
-            query.update({'name': search_text,
+            query.update({'$or':[{'altnames':search_text},{'name':search_text}],
                 'group_type': u'PUBLIC'})
         else:
             query.update({'name': {'$nin': GSTUDIO_DEFAULT_GROUPS_LIST},
@@ -312,7 +313,8 @@ def explore_courses(request):
                                                 }
                                             ],
                                             '_type': 'Group',
-                                            'name': search_text,
+                                            #'name': search_text,
+                                            '$or':[{'altnames':search_text},{'name':search_text}],
                                             '_id': {'$nin': module_unit_ids},
                                               }).sort('last_update', -1)
 
