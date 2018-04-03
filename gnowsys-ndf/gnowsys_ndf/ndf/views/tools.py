@@ -20,13 +20,16 @@ from gnowsys_ndf.ndf.models import node_collection, triple_collection, gridfs_co
 
 def tools_logging(request):
 
-	#test method for tools logging
+	#Method for tools logging
 	userdata = json.loads(request.POST.get('user_data',' '))
 	app_name = request.POST.get('app_name',' ')
+	sessionid = ""
+	sessionid = request.COOKIES.get("sessionid")
 	old_data = []
 	buddies_authid_list = request.session.get('buddies_authid_list', [])
 	buddy_id_list = []
 	buddy_id_list.append(userdata['user_id'])
+	userdata['sessionid'] = sessionid 
 	if buddies_authid_list:
 	    buddy_id_list = buddy_id_list +  Author.get_user_id_list_from_author_oid_list(buddies_authid_list)
 	if userdata['user_id'] and userdata['user_id']!= "None":
