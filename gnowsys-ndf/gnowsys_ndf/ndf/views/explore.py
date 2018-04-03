@@ -28,6 +28,7 @@ from gnowsys_ndf.ndf.models import Node, Group, GSystemType,  AttributeType, Rel
 from gnowsys_ndf.ndf.models import node_collection, triple_collection
 from gnowsys_ndf.ndf.views.methods import get_execution_time, get_language_tuple, create_gattribute
 from gnowsys_ndf.ndf.templatetags.ndf_tags import check_is_gstaff, get_attribute_value
+from gnowsys_ndf.local_settings import GSTUDIO_ELASTIC_SEARCH
 # from gnowsys_ndf.ndf.views.methods import get_group_name_id
 # from gnowsys_ndf.ndf.views.methods import get_node_common_fields, parse_template_data, get_execution_time, delete_node, replicate_resource
 
@@ -264,7 +265,53 @@ def explore_courses(request):
                 executing condition C then do not display factory Groups.
 
     '''
-    base_unit_cur = node_collection.find({
+    if GSTUDIO_ELASTIC_SEARCH:
+        search_text = request.GET.get("search_text",None)
+        if search_text:
+            base_unit_cur = node_collection.find({
+                                            '$or': [
+                                                {
+                                                    '$and': [
+                                                                {'member_of': ce_gst._id},
+                                                                {'status':'PUBLISHED'},
+                                                                {'$or':
+                                                                    [
+                                                                        {'created_by': request.user.id},
+                                                                        {'group_admin': request.user.id},
+                                                                        {'author_set': request.user.id},
+                                                                        {
+                                                                            '$and': [
+                                                                                {'group_type': 'PUBLIC'},
+                                                                                {'language': primary_lang_tuple},
+                                                                            ]
+                                                                        }
+                                                                    ]
+                                                                }
+                                                            ]
+                                                },
+                                                {
+                                                    '$and': [
+                                                                {'member_of': announced_unit_gst._id},
+                                                                {'status':'PUBLISHED'},
+                                                                {'$or':
+                                                                    [
+                                                                        {'created_by': request.user.id},
+                                                                        {'group_admin': request.user.id},
+                                                                        {'author_set': request.user.id},
+                                                                        {'group_type': 'PUBLIC'}
+                                                                    ]
+                                                                }
+                                                            ]
+                                                }
+                                            ],
+                                            '_type': 'Group',
+                                            'name': search_text,
+                                            '_id': {'$nin': module_unit_ids},
+                                              }).sort('last_update', -1)
+
+    else:
+
+        base_unit_cur = node_collection.find({
                                             '$or': [
                                                 {
                                                     '$and': [

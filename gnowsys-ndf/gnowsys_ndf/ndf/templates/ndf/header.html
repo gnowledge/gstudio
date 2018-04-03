@@ -684,6 +684,10 @@
             else if(window.location.pathname == "/home/e-library" | window.location.pathname == "/55ab34ff81fccb4f1d806025/e-library") {
             $('li.has-form').append("<form id = 'search_form' {% if groupid %} action='{% url 'e-library' groupid %}' {% else %} action='' {% endif %} name='search_form' method=GET></form>");
             }
+            else if(window.location.pathname == "/explore/courses" | window.location.pathname == "/55ab34ff81fccb4f1d806025/courses") {
+            $('li.has-form').append("<form id = 'search_form' {% if groupid %} action='{% url 'explore_courses' %}' {% else %} action='' {% endif %} name='search_form' method=GET></form>");
+            }
+            
             else{
 
               $('li.has-form').append("<form id = 'search_form' {% if groupid %} action='{% url 'results' groupid %}' {% else %} action='' {% endif %} name='search_form' method=GET></form>");
@@ -714,6 +718,10 @@
         {
           $('li.has-form').append("<form id = 'search_form' {% if groupid %} action='{% url 'e-library' groupid %}' {% else %} action='' {% endif %} name='search_form' method=GET></form>");
         }
+        else if(window.location.pathname == "/explore/courses" | window.location.pathname == "/55ab34ff81fccb4f1d806025/courses") {
+        $('li.has-form').append("<form id = 'search_form' {% if groupid %} action='{% url 'explore_courses' %}' {% else %} action='' {% endif %} name='search_form' method=GET></form>");
+        }
+
         else
         {
           $('li.has-form').append("<form id = 'search_form' {% if groupid %} action='{% url 'results' groupid %}' {% else %} action='' {% endif %} name='search_form' method=GET></form>");        
