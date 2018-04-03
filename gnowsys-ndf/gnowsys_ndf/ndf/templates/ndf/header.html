@@ -690,6 +690,9 @@
             else if(window.location.pathname == "/explore/workspaces" | window.location.pathname == "/55ab34ff81fccb4f1d806025/workspaces") {
               $('li.has-form').append("<form id = 'search_form' {% if groupid %} action='{% url 'explore_groups' %}' {% else %} action='' {% endif %} name='search_form' method=GET></form>");
               }
+            else if(window.location.pathname == "/explore/drafts" | window.location.pathname == "/55ab34ff81fccb4f1d806025/drafts") {
+              $('li.has-form').append("<form id = 'search_form' {% if groupid %} action='{% url 'explore_drafts' %}' {% else %} action='' {% endif %} name='search_form' method=GET></form>");
+              }  
             else{
 
               $('li.has-form').append("<form id = 'search_form' {% if groupid %} action='{% url 'results' groupid %}' {% else %} action='' {% endif %} name='search_form' method=GET></form>");
@@ -726,7 +729,9 @@
         else if(window.location.pathname == "/explore/workspaces" | window.location.pathname == "/55ab34ff81fccb4f1d806025/workspaces") {
         $('li.has-form').append("<form id = 'search_form' {% if groupid %} action='{% url 'explore_groups' %}' {% else %} action='' {% endif %} name='search_form' method=GET></form>");
         }
-
+        else if(window.location.pathname == "/explore/drafts" | window.location.pathname == "/55ab34ff81fccb4f1d806025/drafts") {
+        $('li.has-form').append("<form id = 'search_form' {% if groupid %} action='{% url 'explore_drafts' %}' {% else %} action='' {% endif %} name='search_form' method=GET></form>");
+              } 
         else
         {
           $('li.has-form').append("<form id = 'search_form' {% if groupid %} action='{% url 'results' groupid %}' {% else %} action='' {% endif %} name='search_form' method=GET></form>");        
