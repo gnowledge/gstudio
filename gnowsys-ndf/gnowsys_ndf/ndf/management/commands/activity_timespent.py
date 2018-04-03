@@ -21,13 +21,27 @@ def activity_details(group_id, username):
     group_obj = get_group_name_id(group_id, get_obj=True)
     user_obj = None
     username = unicode(username.strip())
-    header_written = False
     try:
         user_obj = User.objects.get(username=username)
     except Exception as no_user:
         print "\n No user found with this {0}".format(username)
 
     if group_obj and user_obj:
+        dt = "{:%Y%m%d-%Hh%Mm}".format(datetime.datetime.now())
+        file_name = GSTUDIO_INSTITUTE_ID_SECONDARY + '-' + GSTUDIO_INSTITUTE_ID + '-' + group_id + '-activity-timespent-' + username+ '-' + dt + '.csv'
+
+        GSTUDIO_EXPORTED_CSVS_DIRNAME = 'gstudio-exported-users-analytics-csvs'
+        GSTUDIO_EXPORTED_CSVS_DIR_PATH = os.path.join('/data/', GSTUDIO_EXPORTED_CSVS_DIRNAME)
+
+        if not os.path.exists(GSTUDIO_EXPORTED_CSVS_DIR_PATH):
+            os.makedirs(GSTUDIO_EXPORTED_CSVS_DIR_PATH)
+
+        file_name_path = os.path.join(GSTUDIO_EXPORTED_CSVS_DIR_PATH, file_name)
+        column_keys_list = ['VisitedOn', 'Language','Lesson', 'Activity', 'Timespent']
+        f = open(file_name_path, 'w')
+        w = csv.DictWriter(f, column_keys_list)
+        w.writeheader()
+
         regex_pattern = '^/'+group_id+'/course.*|.*my-desk.*|.*explore.*|.*tools/tool-page.*|.*course/content.*'
 
         all_visits = benchmark_collection.find({'calling_url': {'$regex': '.*course/activity_player.*',
@@ -37,9 +51,13 @@ def activity_details(group_id, username):
         
         for ind, each_visit in enumerate(all_visits):
             # print each_visit
-            row_dict = {'VisitedOn': 'NA', 'Lesson': 'NA', 'Activity': 'NA', 'Timespent': 'NA'}
+            row_dict = {'VisitedOn': 'NA', 'Language': 'NA', 'Lesson': 'NA', 'Activity': 'NA', 'Timespent': 'NA'}
             visited_on = each_visit['last_update']
             row_dict['VisitedOn'] = str(visited_on)
+            locale = each_visit['locale']
+            if not locale:
+                locale = 'en'
+            row_dict['Language'] = str(locale)
             calling_url_str = each_visit['calling_url']
             if calling_url_str.startswith('/') and calling_url_str.endswith('/'):
                 splitted_results = calling_url_str.split('/')
@@ -53,6 +71,7 @@ def activity_details(group_id, username):
                     activity_name = activity_node.name
                     row_dict.update({'Lesson': lesson_name, 'Activity': activity_name})
                     print "\n {0}. Visited On: {1}".format(ind, visited_on) 
+                    print " Language: ", locale
                     print " Lesson Name: ", lesson_name 
                     activity_disp_name = activity_node.name
                     if activity_node.altnames:
@@ -72,24 +91,8 @@ def activity_details(group_id, username):
                         print " ## Unable to track time psent on this activity. ##"
                 else:
                     print "## Unable to track time psent on this activity. ##"
-
-            dt = "{:%Y%m%d-%Hh%Mm}".format(datetime.datetime.now())
-            file_name = GSTUDIO_INSTITUTE_ID_SECONDARY + '-' + GSTUDIO_INSTITUTE_ID + '-' + group_id + '-activity-timespent-' + username+ '-' + dt + '.csv'
-
-            GSTUDIO_EXPORTED_CSVS_DIRNAME = 'gstudio-exported-users-analytics-csvs'
-            GSTUDIO_EXPORTED_CSVS_DIR_PATH = os.path.join('/data/', GSTUDIO_EXPORTED_CSVS_DIRNAME)
-
-            if not os.path.exists(GSTUDIO_EXPORTED_CSVS_DIR_PATH):
-                os.makedirs(GSTUDIO_EXPORTED_CSVS_DIR_PATH)
-
-            file_name_path = os.path.join(GSTUDIO_EXPORTED_CSVS_DIR_PATH, file_name)
-            column_keys_list = ['VisitedOn', 'Lesson', 'Activity', 'Timespent']
-            with open(file_name_path, 'a') as f:
-                w = csv.DictWriter(f, column_keys_list)
-                if not header_written:
-                    w.writeheader()
-                    header_written = True
                 w.writerow(row_dict)
+        f.close()
     else:
         print "\n No Group or User found with {0}/{1}".format(group_id, username)
 
