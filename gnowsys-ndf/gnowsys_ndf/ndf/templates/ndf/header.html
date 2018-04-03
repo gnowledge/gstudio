@@ -140,7 +140,7 @@
               <li class="has-form">
               <!--  <form id = "search_form" {% if groupid %} action="{% url 'results' groupid %}" {% else %} action="" {% endif %}
                   name="search_form" method="GET" >
-                <!--<form id="search_form"  name="search_form" method="GET" >
+                <form id="search_form"  name="search_form" method="GET" >
                   {{group_object.name|truncatechars:15}}
                   <div class="row collapse">
                     <div class="large-11 small-10 columns">
@@ -744,9 +744,13 @@
   <script>
   $(document).on("click", "#search-submit", function() {
            $("li.second-has-form").hide();
-    
+            if (window.location.pathname == "/home/repository" | window.location.pathname == "/55ab34ff81fccb4f1d806025/repository") {
             //$('li').attr({class: "has-form"});            
-            $('li.has-form').append("<form id = 'search_form' {% if groupid %} action='{% url 'results' groupid %}' {% else %} action='' {% endif %} name='search_form' method=GET></form>");
+            $('li.has-form').append("<form id = 'search_form' {% if groupid %} action='{% url 'repository' groupid %}' {% else %} action='' {% endif %} name='search_form' method=GET></form>");}
+            else {
+              $('li.has-form').append("<form id = 'search_form' {% if groupid %} action='{% url 'e-library' groupid %}' {% else %} action='' {% endif %} name='search_form' method=GET></form>");
+            }
+
             $('#search_form').append('<div class="row collapse"><div class="large-11 small-10 columns"><input type="text" name="search_text" id="search_text" placeholder="{% trans "Search" %}" autocomplete="off" required /></div><div class="large-1 small-2 columns"><button type="submit" class="tiny button" value="" id="search-submit1" class="checked"><i class="fi-magnifying-glass"></i></button></div></div>');
 
             //$('form').attr({id: "search_form"});
