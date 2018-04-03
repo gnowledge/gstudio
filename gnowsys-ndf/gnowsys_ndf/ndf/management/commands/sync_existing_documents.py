@@ -9,7 +9,7 @@ except ImportError:  # old pymongo
   from pymongo.objectid import ObjectId
 
 ''' imports from application folders/files '''
-from gnowsys_ndf.ndf.models import node_collection, triple_collection, counter_collection
+from gnowsys_ndf.ndf.models import node_collection, triple_collection, counter_collection, benchmark_collection
 from gnowsys_ndf.ndf.models import Node, db, AttributeType, RelationType, GSystem, GSystemType
 from gnowsys_ndf.settings import GSTUDIO_AUTHOR_AGENCY_TYPES, LANGUAGES, OTHER_COMMON_LANGUAGES, GSTUDIO_DEFAULT_SYSTEM_TYPES_LIST
 from gnowsys_ndf.settings import GSTUDIO_DEFAULT_LICENSE, GSTUDIO_DEFAULT_LANGUAGE, GSTUDIO_DEFAULT_COPYRIGHT
@@ -175,6 +175,11 @@ class Command(BaseCommand):
 
     if ctr_res['updatedExisting']: # and ctr_res['nModified']:
         print "\n Added 'assessment' field to " + ctr_res['n'].__str__() + " Counter instances."
+
+    benchmark_rec = benchmark_collection.update({'locale': {'$exists': False}}, {'$set':{'locale': 'en'} }, upsert=False, multi=True)
+
+    if benchmark_rec['updatedExisting']: # and benchmark_rec['nModified']:
+        print "\n Added 'locale' field to " + benchmark_rec['n'].__str__() + " Benchmark instances."
 
 
     # adding 'if_file' in GSystem instances:
