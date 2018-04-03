@@ -108,6 +108,7 @@ def themes(request, group_id, app_id=None, app_set_id=None):
 
     # to display the tree hierarchy of themes items inside particular theme(Here app_id defines the Theme id)
     elif ObjectId(app_id) != topics_GST._id:
+        print "else if "
         themes_hierarchy = True
         themes_cards = ""
         Theme_obj = node_collection.one({'_id': ObjectId(app_id)})
@@ -123,7 +124,17 @@ def themes(request, group_id, app_id=None, app_set_id=None):
         #     nodes_dict = node_collection.find({'member_of': {'$all': [theme_GST._id]},'group_set':{'$all': [ObjectId(group_id)]}})
         
     lang = list(get_language_tuple(request.LANGUAGE_CODE))
-    nodes_dict = node_collection.find({'member_of': {'$all': [theme_GST._id]},'group_set':{'$all': [ObjectId(group_id)]}, 'language': lang})
+    search_text = request.GET.get("search_text",None)
+
+    if search_text:
+        search_text = ".*"+search_text+".*"
+        nodes_dict = node_collection.find({'$or':[{'altnames':{'$regex' : search_text, '$options' : 'i'}},{'name':{'$regex' : search_text, '$options' : 'i'}}],
+        'member_of': {'$all': [theme_GST._id]},'group_set':{'$all': [ObjectId(group_id)]}, 'language': lang})
+        nodes_dict_count = nodes_dict.count()
+    else:
+        nodes_dict = node_collection.find({'member_of': {'$all': [theme_GST._id]},'group_set':{'$all': [ObjectId(group_id)]}, 'language': lang})
+        
+        
 
     return render_to_response("ndf/theme.html",
                                {'theme_GST_id':theme_GST._id, 'theme_GST':theme_GST, 'themes_cards': themes_cards, 'theme_GST':theme_GST,
@@ -131,7 +142,7 @@ def themes(request, group_id, app_id=None, app_set_id=None):
                                'nodes':nodes_dict,'app_id': app_id,'app_name': appName,"selected": selected,
                                'title': title,'themes_list_items': themes_list_items,
                                'themes_hierarchy': themes_hierarchy, 'unfold': unfold,
-                                'appId':app._id,
+                                'appId':app._id,'search_text':search_text,'nodes_count':nodes_dict_count
                                },
                              
                               context_instance = RequestContext(request)

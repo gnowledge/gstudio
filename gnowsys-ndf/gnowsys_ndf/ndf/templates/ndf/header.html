@@ -696,7 +696,11 @@
               }
             else if(window.location.pathname == "/1/my-desk/" | window.location.pathname == "/55efd51681fccb14c0deb79a/my-desk/") {
               $('li.has-form').append("<form id = 'search_form' {% if groupid %} action='{% url 'my_desk' groupid %}' {% else %} action='' {% endif %} name='search_form' method=GET></form>");
-              }  
+              }
+            else if(window.location.pathname == "/home/topics/" | window.location.pathname == "/55ab34ff81fccb4f1d806025/topics/" | window.location.pathname == "/home/topics") {
+              $('li.has-form').append("<form id = 'search_form' {% if groupid %} action='{% url 'topics' groupid %}' {% else %} action='' {% endif %} name='search_form' method=GET></form>");
+              }
+              
             else{
               $('li.has-form').append("<form id = 'search_form' {% if groupid %} action='{% url 'results' groupid %}' {% else %} action='' {% endif %} name='search_form' method=GET></form>");
             }
@@ -740,6 +744,9 @@
               }
         else if(window.location.pathname == "/1/my-desk/" | window.location.pathname == "/55efd51681fccb14c0deb79a/my-desk/") {
         $('li.has-form').append("<form id = 'search_form' {% if groupid %} action='{% url 'my_desk' groupid %}' {% else %} action='' {% endif %} name='search_form' method=GET></form>");
+              }
+        else if(window.location.pathname == "/home/topics/" | window.location.pathname == "/55ab34ff81fccb4f1d806025/topics/" | window.location.pathname == "/home/topics") {
+        $('li.has-form').append("<form id = 'search_form' {% if groupid %} action='{% url 'topics' groupid %}' {% else %} action='' {% endif %} name='search_form' method=GET></form>");
               }           
         else
         {
