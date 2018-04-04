@@ -32,27 +32,63 @@
                 2. LANGCODE (e.g: *hi*)
                 3. YYMMDDHHMMSS (e.g: *180212163009*)
             - USERID and LANGCODE is in [cookies](../cookie.html) with key: `user_id` and `language_code` respectively. Which needs to be pick up by JS method.
-        - *Note: Anonymous user will have `0` User Id, cookie will have value `None`*
+        - *Note: Anonymous user will have `0` User Id, cookie will have value `0`*
     - Get JSON data at any given time.
     - Add/Update additional metadata (AMD) in same JSON data. *(TODO: Decide on AMD schema and fields)*
         - Pending: Gstudio to provide JS method giving context of current activity at any given page.
     - POST AJAX method to push UGD in gstudio server.
         - This method should take following arguments *(arguments can be taken via iframe query url or URI seperator, `#`)*:
-            1. Data saving end point url: `/tools/logging/`
+            - Data saving end point url: `/tools/logging/`
         - POST data:
-            1. UGD (json):
-                - Core interactive data.  
-                - AMD
-                    - `timestamp` (e.g: `YYMMDDHHMMSS`)
-                    - `locale` (pick from cookie e.g: `en` or `hi`)
-                    - `user_id` (pick from cookie e.g: `12345`)
-                    - `user_and_buddy_ids` (pick from cookie, e.g: `12345&1417`)
-                    - `app_name` (i.e: Name of app/interactive)
-                - UTK
-                    - USERID-LANGCODE-YYMMDDHHMMSS
-                    - e.g: `66-en-180411132056`
-            2. `csrfmiddlewaretoken`:
-                - `csrftoken` (pick from cookie)
+            - UGD having key-name, `"payload"`:
+                - Core interactive data having key-name: `"appData"`
+                - AMD having following key-name:
+                    - `"createdAt"`: `"<YY-MM-DD HH:MM:SS>"`
+                        - Example value, `"18-02-12 16:30:09"`
+                        - e.g. `"createdAt"`: `"18-02-12 16:30:09"`
+                    - `"language"`: `"<2/3 digit locale/language code>"`
+                        - Pick it from cookie having key, `language_code`
+                        - Example value, `"en"`
+                        - e.g. `"language"`: `"en"`
+                    - `"userId"`: `"<integer user Id>"`
+                        - Pick it from cookie having key, `user_id`
+                        - Example value, `"12345"`
+                        - e.g. `"userId"`: `"1234"`
+                    - `"buddyIds"`: `"<int buddy ids concatinated by &>"`
+                        - Pick it from cookie having key, `buddy_ids`
+                        - Example value, `"12345&1417"`
+                        - e.g. `"buddyIds"`: `"12345&1417"`
+                    - `"appName"`: `<"Name of app/interactive">`
+                        - Example value: `"policequad"`
+                        - e.g. `"appName"`: `"policequad"`
+                    - (*optional*) `"appUTK"` : `"USERID-LANGCODE-YYMMDDHHMMSS"`
+                        - Example value, `"66-en-180411132056"`
+                        - e.g. `"appUTK"`: `"66-en-180411132056"`
+            - `"csrfmiddlewaretoken"`: `"csrftoken"`
+                - pick it from cookie having key, `csrftoken`
+                - Example value, `"fBIqmJXByqDrWUochThtKNyE7DrVr9RB"`
+                - e.g. `"csrfmiddlewaretoken"`: `"fBIqmJXByqDrWUochThtKNyE7DrVr9RB"`
+            - Example:
+            ```
+            {
+                "payload":
+                {
+                    "appData":
+                    {
+                        // this will have all data
+                        // generated from interactive/app
+                        // in JSON format.
+                    },
+                    "appName": "policequad",
+                    "language": "en",
+                    "createdAt": "18-02-12 16:30:09",
+                    "userId": "1234",
+                    "buddyIds": "12345&1417"
+                },
+                "csrfmiddlewaretoken": "fBIqmJXByqDrWUochThtKNyE7DrVr9RB"
+            }
+
+            ```
     - An event listner method which will listen to any of above specified (3) events and trigger POST AJAX method.
 
 
