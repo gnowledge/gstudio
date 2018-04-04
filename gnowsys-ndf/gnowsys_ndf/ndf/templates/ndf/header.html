@@ -710,6 +710,15 @@
               }
             else if(window.location.pathname == "/55ab34ff81fccb4f1d806025/module/5623bad981fccb5aec149bed" | window.location.pathname == "/home/module/5623bad981fccb5aec149bed") {
               $('li.has-form').append("<form id = 'search_form' {% if groupid %} action='{% url 'module_detail' groupid '5623bad981fccb5aec149bed' %}' {% else %} action='' {% endif %} name='search_form' method=GET></form>");
+              }
+            else if(window.location.pathname == "/55ab34ff81fccb4f1d806025/module/5623baf981fccb5aec149c14" | window.location.pathname == "/home/module/5623baf981fccb5aec149c14") {
+              $('li.has-form').append("<form id = 'search_form' {% if groupid %} action='{% url 'module_detail' groupid '5623baf981fccb5aec149c14' %}' {% else %} action='' {% endif %} name='search_form' method=GET></form>");
+              }
+            else if(window.location.pathname == "/55ab34ff81fccb4f1d806025/module/5623ba1a81fccb5aec149ba1" | window.location.pathname == "/home/module/5623ba1a81fccb5aec149ba1") {
+              $('li.has-form').append("<form id = 'search_form' {% if groupid %} action='{% url 'module_detail' groupid '5623ba1a81fccb5aec149ba1' %}' {% else %} action='' {% endif %} name='search_form' method=GET></form>");
+              }
+            else if(window.location.pathname == "/home/e-book/" | window.location.pathname == "/55ab34ff81fccb4f1d806025/e-book/") {
+              $('li.has-form').append("<form id = 'search_form' {% if groupid %} action='{% url 'e-book' groupid  %}' {% else %} action='' {% endif %} name='search_form' method=GET></form>");
               }  
               
                
@@ -776,7 +785,16 @@
               } 
         else if(window.location.pathname == "/55ab34ff81fccb4f1d806025/module/5623bad981fccb5aec149bed" | window.location.pathname == "/home/module/5623bad981fccb5aec149bed") {
               $('li.has-form').append("<form id = 'search_form' {% if groupid %} action='{% url 'module_detail' groupid '5623bad981fccb5aec149bed' %}' {% else %} action='' {% endif %} name='search_form' method=GET></form>");
-              }      
+              }
+        else if(window.location.pathname == "/55ab34ff81fccb4f1d806025/module/5623baf981fccb5aec149c14" | window.location.pathname == "/home/module/5623baf981fccb5aec149c14") {
+              $('li.has-form').append("<form id = 'search_form' {% if groupid %} action='{% url 'module_detail' groupid '5623baf981fccb5aec149c14' %}' {% else %} action='' {% endif %} name='search_form' method=GET></form>");
+              }    
+        else if(window.location.pathname == "/55ab34ff81fccb4f1d806025/module/5623ba1a81fccb5aec149ba1" | window.location.pathname == "/home/module/5623ba1a81fccb5aec149ba1") {
+              $('li.has-form').append("<form id = 'search_form' {% if groupid %} action='{% url 'module_detail' groupid '5623ba1a81fccb5aec149ba1' %}' {% else %} action='' {% endif %} name='search_form' method=GET></form>");
+              }
+        else if(window.location.pathname == "/home/e-book/" | window.location.pathname == "/55ab34ff81fccb4f1d806025/e-book/") {
+              $('li.has-form').append("<form id = 'search_form' {% if groupid %} action='{% url 'e-book' groupid  %}' {% else %} action='' {% endif %} name='search_form' method=GET></form>");
+              }   
         else
         {
           $('li.has-form').append("<form id = 'search_form' {% if groupid %} action='{% url 'results' groupid %}' {% else %} action='' {% endif %} name='search_form' method=GET></form>");        

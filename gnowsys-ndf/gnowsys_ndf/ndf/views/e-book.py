@@ -72,6 +72,7 @@ if GSTUDIO_ELASTIC_SEARCH == True:
 		# 		'collection_set': {'$exists': "true", '$not': {'$size': 0} }
 		# 	})
 
+		search_text = request.GET.get("search_text",None)
 
 
 		#print GST_FILE._id
@@ -146,16 +147,29 @@ if GSTUDIO_ELASTIC_SEARCH == True:
 			for value in lists:
 				print value
 				strconcat1 = strconcat1+'eval(str("'+ value +'")),'
+			if search_text:
 
-			all_ebooks1 = eval("Q('bool', must=[Q('match', group_set=str(group_id)), Q('match',access_policy='public'),Q('match', attribute_set__educationaluse ='ebooks'),Q('exists',field='collection_set'),"+strconcat1[:-1]+"],"
+				all_ebooks1 = eval("Q('bool', must=[Q('match', group_set=str(group_id)), Q('match',access_policy='public'),Q('match', attribute_set__educationaluse ='ebooks'),Q('exists',field='collection_set'),"+strconcat1[:-1]+"],"
+						+"should=[Q('match',member_of=GST_FILE_ID),Q('match',name=search_text),Q('match',altnames=search_text),Q('match',tags=search_text),Q('match',content=search_text) ],minimum_should_match=1)")
+				all_ebooks =Search(using=es, index="nodes",doc_type="gsystemtype,gsystem,metatype,relationtype,attribute_type,group,author").query(all_ebooks1)
+			else:
+				all_ebooks1 = eval("Q('bool', must=[Q('match', group_set=str(group_id)), Q('match',access_policy='public'),Q('match', attribute_set__educationaluse ='ebooks'),Q('exists',field='collection_set'),"+strconcat1[:-1]+"],"
 						+"should=[Q('match',member_of=GST_FILE_ID),Q('match',member_of=GST_PAGE_ID) ],minimum_should_match=1)")
-			all_ebooks =Search(using=es, index="nodes",doc_type="gsystemtype,gsystem,metatype,relationtype,attribute_type,group,author").query(all_ebooks1)
+				all_ebooks =Search(using=es, index="nodes",doc_type="gsystemtype,gsystem,metatype,relationtype,attribute_type,group,author").query(all_ebooks1)
+			
 
 
 		else:
-			all_ebooks1 = Q('bool', must=[Q('match', group_set=str(group_id)), Q('match',access_policy='public'),Q('match', attribute_set__educationaluse ='ebooks'),Q('exists',field='collection_set')]
-						,should=[Q('match',member_of=GST_FILE_ID),Q('match',member_of=GST_PAGE_ID) ],minimum_should_match=1)
-			all_ebooks =Search(using=es, index="nodes",doc_type="gsystemtype,gsystem,metatype,relationtype,attribute_type,group,author").query(all_ebooks1)
+			if search_text:
+
+				all_ebooks1 = Q('bool', must=[Q('match', group_set=str(group_id)),Q('match',access_policy='public'),Q('match', attribute_set__educationaluse ='ebooks'),Q('exists',field='collection_set'),
+								Q('bool',should=[Q('match',name=search_text),Q('match',altnames=search_text),Q('match',tags=search_text),Q('match',content=search_text)])]
+							,should=[Q('match',member_of=GST_FILE_ID),Q('match',member_of=GST_PAGE_ID) ],minimum_should_match=1)
+				all_ebooks =Search(using=es, index="nodes",doc_type="gsystemtype,gsystem,metatype,relationtype,attribute_type,group,author").query(all_ebooks1)
+			else:
+				all_ebooks1 = Q('bool', must=[Q('match', group_set=str(group_id)), Q('match',access_policy='public'),Q('match', attribute_set__educationaluse ='ebooks'),Q('exists',field='collection_set')]
+							,should=[Q('match',member_of=GST_FILE_ID),Q('match',member_of=GST_PAGE_ID) ],minimum_should_match=1)
+				all_ebooks =Search(using=es, index="nodes",doc_type="gsystemtype,gsystem,metatype,relationtype,attribute_type,group,author").query(all_ebooks1)
 
 		#all_ebooks = node_collection.find({
 		#							'member_of': {'$in': temp },
