@@ -442,7 +442,7 @@
 
       <div class="contain-to-grid {% if request.path != '/welcome' %}{% if group_object.edit_policy != 'EDITABLE_MODERATED' %}{% if not is_ac_url %}sticky{% endif %}{% endif %}{% endif %}" id="group-level-header">
       <!--remove secondary header for activity page-->  
-      {% if not "/course/activity_player/" in request.path %}
+      {% comment %}
         <nav class="top-bar" id="second-header" data-topbar data-options="sticky_on: large" role="navigation">
         <!-- don't show this app bar for groups with editable moderated -->
         {% if "ModeratingGroup" not in group_object.member_of_names_list %}
@@ -602,7 +602,7 @@
           {% endif %} <!-- end of "accounts" urls check -->
         {% endif %} <!-- end of "group's edit_policy" urls check -->
         </nav>
-      {% endif %}
+      {% endcomment %}
       </div>
 
       {% endif %} <!-- landing page if -->
