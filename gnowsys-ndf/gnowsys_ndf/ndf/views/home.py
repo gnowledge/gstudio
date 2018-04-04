@@ -26,6 +26,7 @@ import mastodon
 from django.contrib.auth import authenticate, login
 from mastodon import Mastodon 
 from django.template.response import TemplateResponse
+from gnowsys_ndf.ndf.models import *
 ########################################
 
 ###################################################
@@ -240,7 +241,7 @@ def moauth(request,**kwargs):
             
         name = Username
         email = Username 
-        password = Password
+        password = access_token
         
 
         #######IF USER GETS ACCESS TOKEN THEN FOLLOWING CODE WILL BE EXECUTED##########
@@ -252,37 +253,90 @@ def moauth(request,**kwargs):
                 request.session['email'] = email
                 member = User.objects.get(username=name)
                 request.session['member_id'] = member.id
-                #print request.session['member_id']
-                print member.id
+                #author = node_collection.one({"created_by":int(member.id),"_type":unicode("Author")})
+                #nodes = node_collection.one({'email':{'$regex':email,'$options': 'i' },'_type':unicode("Author")})
+                #nodes.access_token
+                #print nodes.access_token
+                #print author
+                #pa = author.access_token
 
+                #print author
+                #print request.session['member_id']
+                #print member.id
+                nodes = node_collection.one({'email':{'$regex':email,'$options': 'i' },'_type':unicode("Author")})
+                if(nodes!=None):
+                
                 ####SECOND AND BY-DEFAULT LAYER FOR AUTHENTICATION
-                user = authenticate(username=name, password=password)
-                if user is not None:
-                    if user.is_active:
-                        login(request, user)
-                        return HttpResponseRedirect( reverse('landing_page') )
-                    else:
-                        HttpResponse("Error1")
+                    user = authenticate(username=name, password=password)
+                    #print "+++++++++++++++++++++++++"
+                    if user is not None:
+                        if user.is_active:
+                            login(request, user)
+                            return HttpResponseRedirect( reverse('landing_page') )
+                        else:
+                            HttpResponse("Error1")
+                else:
+                    execfile("/home/docker/code/gstudio/doc/deployer/create_auth_objs.py")
+                    #print member.id
+                    #print "-------------------"
+                    author = node_collection.one({"created_by":int(member.id),"_type":unicode("Author")})
+                    author.access_token = access_token
+                    author.save()
+                    user = authenticate(username=name, password=password)
+                    if user is not None:
+                        if user.is_active:
+                            login(request, user)
+                            return HttpResponseRedirect( reverse('landing_page') )
+                        else:
+                            HttpResponse("Error1")
+
             else:
                 member = User.objects.create_user(name,email,password)
                 member.save()
-                execfile("/home/docker/code/gstudio/doc/deployer/create_auth_objs.py")
-                print member.id
-                
-                ####SECOND AND BY-DEFAULT LAYER FOR AUTHENTICATION
-                user = authenticate(username=name, password=password)
-                if user is not None:
-                    if user.is_active:
-                        login(request, user)
-                        return HttpResponseRedirect( reverse('landing_page') )
-                    else:
-                        HttpResponse("Error2")
+
+
+                nodes = node_collection.one({'email':{'$regex':email,'$options': 'i' },'_type':unicode("Author")})
+                # print "*************************"
+
+                # print nodes
+                # print "*************************"
+                if(nodes!=None):
+
+                    print "Successs!!!!!!"
+                    user = authenticate(username=name, password=password)
+                    if user is not None:
+                        if user.is_active:
+                            print "********"
+                            login(request, user)
+                            return HttpResponseRedirect( reverse('landing_page') )
+                        else:
+                            HttpResponse("Error2")
+
+
+
+                else:
+#################################                    
+                    execfile("/home/docker/code/gstudio/doc/deployer/create_auth_objs.py")
+                    #print member.id
+                    print "//////////////"
+                    author = node_collection.one({"created_by":int(member.id),"_type":unicode("Author")})
+                    author.access_token = access_token
+                    author.save()
+                    ####SECOND AND BY-DEFAULT LAYER FOR AUTHENTICATION
+                    user = authenticate(username=name, password=password)
+                    if user is not None:
+                        if user.is_active:
+                            login(request, user)
+                            return HttpResponseRedirect( reverse('landing_page') )
+                        else:
+                            HttpResponse("Error2")
             return HttpResponseRedirect( reverse('landing_page') )   
               
         else:
             #t = TemplateResponse(request, 'login_template', {})
             #return t.render()
-            return HttpResponse("OOps!!!!! You entered wrong credentials")
+            HttpResponseRedirect( reverse('landing_page') )
+            #return HttpResponse("OOps!!!!! You entered wrong credentials")
         #return HttpResponseRedirect( reverse('landing_page') )
     else:
        
