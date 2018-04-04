@@ -125,7 +125,7 @@ def themes(request, group_id, app_id=None, app_set_id=None):
         
     lang = list(get_language_tuple(request.LANGUAGE_CODE))
     search_text = request.GET.get("search_text",None)
-
+    nodes_dict_count = -1
     if search_text:
         search_text = ".*"+search_text+".*"
         nodes_dict = node_collection.find({'$or':[{'altnames':{'$regex' : search_text, '$options' : 'i'}},{'name':{'$regex' : search_text, '$options' : 'i'}}],

@@ -25,7 +25,7 @@ from gnowsys_ndf.ndf.paginator import Paginator ,EmptyPage, PageNotAnInteger
 
 
 if GSTUDIO_ELASTIC_SEARCH:
-
+	search_text = None
 	##############################################################################
 	q = Q('match',name=dict(query='File',type='phrase'))
 	GST_FILE = Search(using=es, index="nodes",doc_type="gsystemtype").query(q)
@@ -72,6 +72,11 @@ if GSTUDIO_ELASTIC_SEARCH:
 		is_video = request.GET.get('is_video', "")
 
 		search_text = request.GET.get('search_text', None)
+		
+		if search_text != None:
+			with open("Output.txt", "w") as text_file:
+				text_file.write(search_text)
+				text_file.close()
 		print search_text
 		print "-------------------------------"
 
@@ -417,15 +422,15 @@ if GSTUDIO_ELASTIC_SEARCH:
 		'''
 		Method to implement pagination in File and E-Library app.
 		'''
-		search_text = request.GET.get("search_text", None)
+		#search_text = request.GET.get("search_text", None)
 
 		if request.method == "POST":
-			
-			print "111111111111111111111111111111111111111111118888888888888"
+			with open("Output.txt", "r") as text_file:
+				search_text = text_file.read()
+				text_file.close()
+
 			print search_text
-			print "111111111111111111111111111111111111111111118888888888888"
-
-
+			
 			group_name, group_id = get_group_name_id(group_id)
 
 			no_of_objs_pp = 24
