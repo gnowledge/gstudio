@@ -342,6 +342,30 @@
                   {# --{{request.session.buddies_authid_name_dict}}-- #}
             {% endif %}
 
+            {% if "CourseEventGroup" not in group_object.member_of_names_list and site.SITE_NAME != "clix" %}
+              <ul class="right">
+                <li class="has-dropdown">
+                  <a>{% trans "Language" %} &nbsp; | &nbsp; {{request.LANGUAGE_CODE}}</a>
+                  <ul class="dropdown">
+
+                    {% for lang in LANGUAGES %}
+                      <li>
+                        <form action="/i18n/setlang/" method="POST">
+                          {% csrf_token %}
+                          <input name="url" type="hidden" value="{{request.get_full_path}}"/>
+                          <input type="hidden"  name="language" value="{{ lang.0 }}">
+                          <input type="submit" class="button expand secondary" value="{{ lang.1 }}"/>
+                        </form>
+                      </li>
+                    {% endfor %}
+
+                  </ul>
+                </li>
+              </ul>
+            {% endif %}
+
+
+
             <li>
               <a class="logout" href="{% url 'auth_logout' %}">
                 <i class="fi-power"></i> &nbsp;{% trans "Logout" %}
@@ -387,7 +411,7 @@
          -->
         <!-- Closes Right Nav section -->
 
-{% if "CourseEventGroup" not in group_object.member_of_names_list and site.SITE_NAME != "clix" %}
+<!-- {% if "CourseEventGroup" not in group_object.member_of_names_list and site.SITE_NAME != "clix" %}
         <ul class="right">
           <li class="has-dropdown">
             <a>{% trans "Language" %} &nbsp; | &nbsp; {{request.LANGUAGE_CODE}}</a>
@@ -409,7 +433,7 @@
         </ul>
 {% endif %}
 
-        <!-- Right Nav Section -->
+ -->        <!-- Right Nav Section -->
         <ul class="right">
           <li>
             <a href="/help/"><i class="fa fa-info-circle"></i> {% trans "Help" %}</a>
