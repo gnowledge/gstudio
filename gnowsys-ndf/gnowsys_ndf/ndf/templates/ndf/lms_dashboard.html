@@ -87,14 +87,17 @@
             <li class="card-image-wrapper">
               {% include "ndf/card_group.html" with node=each_obj url_name="groupchange" first_arg=each_obj.pk no_enroll=True %}
             </li>
-            {% empty %}
-            <section class="empty-dashboard-message">
-              <p>You are not enrolled in any course!</p>
-                <a class="button-explore-courses" href="{% url 'explore_courses' %}"> <i class="fa fa-binoculars" aria-hidden="true"></i>  Explore</a>
-            </section>
             {% endfor %}
           </ul>
-        </div>
+                </div>
+
+            <section class="empty-dashboard-message">
+              
+                <a class="button-explore-courses" href="{% url 'explore_courses' %}"> <i class="fa fa-binoculars" aria-hidden="true"></i>  Explore</a>
+            </section>
+            
+          
+        
     {% endif %}
   {% else %}
     {% if title == "my desk" %}
@@ -104,14 +107,17 @@
           <li class="card-image-wrapper">
             {% include "ndf/card_group.html" with node=each_obj url_name="groupchange" first_arg=each_obj.pk no_enroll=True %}
           </li>
-          {% empty %}
+
+          {% endfor %}
+          </ul>
+        </div>
           <section class="empty-dashboard-message">
             <p>You are not enrolled in any course!</p>
               <a class="button-explore-courses" href="{% url 'explore_courses' %}"> <i class="fa fa-binoculars" aria-hidden="true"></i>  Explore</a>
           </section>
-          {% endfor %}
-        </ul>
-      </div>
+          
+        
+    
     {% endif %}
   {% endif %}
 </div></div></div>
