@@ -123,8 +123,9 @@ def module_detail(request, group_id, node_id,title=""):
     search_text = request.GET.get("search_text",None)
     
 
-
+    has_search = False
     if search_text:
+        has_search = True
         search_text = ".*"+search_text+".*"
         gstaff_access = check_is_gstaff(group_id,request.user)
         module_detail_query = {'$or':[{'altnames':{'$regex' : search_text, '$options' : 'i'}},{'name':{'$regex' : search_text, '$options' : 'i'}}],'_id': {'$in': module_obj.collection_set},
@@ -260,7 +261,8 @@ def module_detail(request, group_id, node_id,title=""):
                                 'group_id': group_id, 'groupid': group_id,
                                 'card': 'ndf/event_card.html', 'card_url_name': 'groupchange',
                                 'search_text':search_text,
-                                'units_under_module_count':units_under_module_count
+                                'units_under_module_count':units_under_module_count,
+                                'has_search':has_search
 
                             })
     return render_to_response(template, req_context)
