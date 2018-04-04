@@ -702,6 +702,10 @@
             else if(window.location.pathname == "/home/topics/" | window.location.pathname == "/55ab34ff81fccb4f1d806025/topics/" | window.location.pathname == "/home/topics") {
               $('li.has-form').append("<form id = 'search_form' {% if groupid %} action='{% url 'topics' groupid %}' {% else %} action='' {% endif %} name='search_form' method=GET></form>");
               }
+            else if(window.location.pathname == "/55ab34ff81fccb4f1d806025/module/55d6ef7581fccb016e97ef82" | window.location.pathname == "/home/module/55d6ef7581fccb016e97ef82") {
+              $('li.has-form').append("<form id = 'search_form' {% if groupid %} action='{% url 'module_detail' groupid '55d6ef7581fccb016e97ef82' %}' {% else %} action='' {% endif %} name='search_form' method=GET></form>");
+              }
+              
                
             else{
               $('li.has-form').append("<form id = 'search_form' {% if groupid %} action='{% url 'results' groupid %}' {% else %} action='' {% endif %} name='search_form' method=GET></form>");
@@ -758,6 +762,9 @@
         else if(window.location.pathname == "/home/topics/" | window.location.pathname == "/55ab34ff81fccb4f1d806025/topics/" | window.location.pathname == "/home/topics") {
         $('li.has-form').append("<form id = 'search_form' {% if groupid %} action='{% url 'topics' groupid %}' {% else %} action='' {% endif %} name='search_form' method=GET></form>");
               }           
+        else if(window.location.pathname == "/55ab34ff81fccb4f1d806025/module/55d6ef7581fccb016e97ef82" | window.location.pathname == "/home/module/55d6ef7581fccb016e97ef82" ) {
+              $('li.has-form').append("<form id = 'search_form' {% if groupid %} action='{% url 'module_detail' groupid '55d6ef7581fccb016e97ef82' %}' {% else %} action='' {% endif %} name='search_form' method=GET></form>");
+              }      
         else
         {
           $('li.has-form').append("<form id = 'search_form' {% if groupid %} action='{% url 'results' groupid %}' {% else %} action='' {% endif %} name='search_form' method=GET></form>");        

@@ -64,6 +64,11 @@
 		        </div>
 		    </div>
 		</div>
+{% if units_under_module_count == 0  %}
+		<div class="large-8 columns">
+		<h3>Sorry, We couldn't find any results matching "{{ search_text|slice:"2:"|slice:"-2" }}" </h3>
+		</div>
+{% endif %}
 
 
 
