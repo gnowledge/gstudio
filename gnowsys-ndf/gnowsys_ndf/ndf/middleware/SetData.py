@@ -23,12 +23,12 @@ class UserDetails(object):
     # desired cookie will be available in every HttpResponse parser like browser but not in django view
     def process_response(self, request, response):
         try:
-            user_id = request.user.id
+            user_id = (request.user.id or 0)
             response.set_cookie('user_id', str(user_id))
             # keeping this as redundant entry to have this in every response's cookie irrespective of buddies existance.
             response.set_cookie('user_and_buddy_ids', str(user_id))
             # initializing
-            response.set_cookie('buddy_ids', None)
+            response.set_cookie('buddy_ids', '')
 
             buddies_userid_str = '&'.join([str(i) for i in request.session['buddies_userid_list']])
 
