@@ -703,6 +703,7 @@ def my_courses(request, group_id):
                 context_instance=RequestContext(request)
         )
 
+@get_execution_time
 def my_desk(request, group_id):
     from gnowsys_ndf.settings import GSTUDIO_WORKSPACE_INSTANCE
 

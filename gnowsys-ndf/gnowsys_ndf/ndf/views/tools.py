@@ -14,7 +14,7 @@ try:
 except ImportError:  # old pymongo
     from pymongo.objectid import ObjectId
 
-
+from gnowsys_ndf.ndf.views.methods import get_execution_time
 ''' -- imports from application folders/files -- '''
 from gnowsys_ndf.ndf.models import node_collection, triple_collection, gridfs_collection, NodeJSONEncoder,Author, Buddy
 
@@ -51,6 +51,7 @@ def tools_logging(request):
 	            json.dump(old_data, wrfile)   
 	return StreamingHttpResponse("Success")    	
 
+@get_execution_time
 def tools_temp(request):
     context_variables = {'title' : "tools"}
     return render_to_response(
