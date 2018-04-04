@@ -13,7 +13,7 @@
         <h3> {% firstof node.altnames node.name %}</h3>
 
         {% include 'ndf/node_ajax_content.html' %}
-        <hr/>
+        <div class="small-4 columns">
         <label>
         {% trans "Translations:" %}
             <div>
@@ -26,6 +26,9 @@
                 </ul>
             </div>
         </label>
+        </div>
+        <hr/>
+
         <br/>
         {% for each_node in nodes %}
             {% include "ndf/widget_card.html" with node=each_node url_name=card_url_name url_first_arg=group_id url_second_arg=source_node_id url_third_arg=each_node.language.0 %}
