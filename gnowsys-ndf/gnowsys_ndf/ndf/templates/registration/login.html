@@ -35,7 +35,7 @@ position: relative !important;
 			<small class="small-10 medium-8 large-8 columns error all-error">{% trans "Either your email or password is incorrect !" %}</small>
 			{% endif %}
 
-			<form method="post" id="loginSubmit" action="{% url 'auth_login' %}" data-abide>
+			<form method="post" id="loginSubmit" action="{% url 'login_view' %}" data-abide>
 				{% csrf_token %}
 
 				<!-- Email -->
