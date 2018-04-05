@@ -557,7 +557,7 @@
                       </div>
                     </form>
                   </li> -->
-                  <li class="has-form">
+                  <!--<li class="has-form">
                     <form {% if groupid %} action="{% url 'results' groupid %}" {% else %} action="" {% endif %}
                       name="search_form" method="GET" >
                       <div class="row collapse">
@@ -573,7 +573,7 @@
                             <i class="fi-magnifying-glass"></i>
                           </button>
                         </div>
-                      </div>
+                      </div>-->
 
 
                   <!-- END of search in the app bar -->
@@ -719,7 +719,8 @@
               }
             else if(window.location.pathname == "/home/e-book/" | window.location.pathname == "/55ab34ff81fccb4f1d806025/e-book/") {
               $('li.has-form').append("<form id = 'search_form' {% if groupid %} action='{% url 'e-book' groupid  %}' {% else %} action='' {% endif %} name='search_form' method=GET></form>");
-              }  
+              }
+
               
                
             else{
@@ -794,7 +795,9 @@
               }
         else if(window.location.pathname == "/home/e-book/" | window.location.pathname == "/55ab34ff81fccb4f1d806025/e-book/") {
               $('li.has-form').append("<form id = 'search_form' {% if groupid %} action='{% url 'e-book' groupid  %}' {% else %} action='' {% endif %} name='search_form' method=GET></form>");
-              }   
+              }
+      
+           
         else
         {
           $('li.has-form').append("<form id = 'search_form' {% if groupid %} action='{% url 'results' groupid %}' {% else %} action='' {% endif %} name='search_form' method=GET></form>");        
