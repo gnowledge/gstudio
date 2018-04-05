@@ -1,6 +1,6 @@
 from elasticsearch import Elasticsearch
 from elasticsearch_dsl import *
-from gnowsys_ndf.local_settings import GSTUDIO_ELASTIC_SEARCH_PROTOCOL,GSTUDIO_ELASTIC_SEARCH_SUPERUSER,GSTUDIO_ELASTIC_SEARCH_SUPERUSER_PASSWORD,GSTUDIO_ELASTIC_SEARCH_ALIAS,GSTUDIO_ELASTIC_SEARCH_PORT
+from gnowsys_ndf.local_settings import GSTUDIO_ELASTIC_SEARCH ,GSTUDIO_ELASTIC_SEARCH_PROTOCOL,GSTUDIO_ELASTIC_SEARCH_SUPERUSER,GSTUDIO_ELASTIC_SEARCH_SUPERUSER_PASSWORD,GSTUDIO_ELASTIC_SEARCH_ALIAS,GSTUDIO_ELASTIC_SEARCH_PORT
 from base_imports import *
 from history_manager import HistoryManager
 #from gnowsys_ndf.ndf.models.node import *
@@ -30,10 +30,6 @@ class esearch:
 
         temp1 = fp[:-29]
         temp2 = temp1[14:]
-        print temp1
-        print "zzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzz"
-        print temp2
-        print "zzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzz"
 
         glite_fp = "/data/"+GLITE_RCS_REPO_DIRNAME+ temp2
 
@@ -63,16 +59,11 @@ class esearch:
 
         document = json.loads(doc)
 
-        print document
 
         document["id"] = document.pop("_id")
         document["type"] = document.pop("_type")
 
         document_type = document["type"]
-        print document_type
-        print "----------------------------------"
-
-        #es = Elasticsearch("http://elastic:changeme@gsearch:9200", timeout=100, retry_on_timeout=True)
 
         index = None
         print GSTUDIO_ELASTIC_SEARCH_INDEX
@@ -82,10 +73,9 @@ class esearch:
                 if document_type in v:
                     index = k
                     index = index.lower()
-                    print k
+                    
                     break
 
-        #index = "backup"
         document_type
 
         if document_type == "GSystem":
@@ -97,19 +87,19 @@ class esearch:
                         data = document["if_file"]["mime_type"].split("/")
                         doc_type = data[0]
                     else:
-                        doc_type = "NotMedia"
+                        doc_type = "notmedia"
                 else:
-                    doc_type = "NotMedia"
+                    doc_type = "notmedia"
 
             else:
-                doc_type = "DontCare"
-            print(doc_type)
+                doc_type = "dontcare"
+            
             if (not es.indices.exists("gsystem")):
                 res = es.indices.create(index="gsystem", body=request_body)
             es.index(index="gsystem", doc_type=doc_type, id=document["id"], body=document)
-            print "gsystem block"
+            
         else:
-            print "inject method called .............. else block......................................"
+            
             es.index(index=index, doc_type=document_type.lower(), id=document["id"], body=document)
         
 
