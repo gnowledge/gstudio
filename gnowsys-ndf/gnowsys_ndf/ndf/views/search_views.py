@@ -28,7 +28,7 @@ from elasticsearch_dsl import *
 from django.shortcuts import render_to_response  # , render
 from elasticsearch_dsl.query import MultiMatch, Match
 from gnowsys_ndf.ndf.gstudio_es.es import *
-from gnowsys_ndf.ndf.paginator import Paginator ,EmptyPage, PageNotAnInteger
+from gnowsys_ndf.ndf.gstudio_es.paginator import Paginator ,EmptyPage, PageNotAnInteger
 
 
 #es = Elasticsearch("http://elastic:changeme@gsearch:9200", timeout=100, retry_on_timeout=True)
@@ -181,15 +181,9 @@ def results_search(request, group_id, page_no=1, return_only_dict = None):
 		name=request.GET.get('name',None)
 		content=request.GET.get('content',None)
 		tags=request.GET.get('tags',None)
-		print name
-		print content
-		print tags
 
 		page_no = 1
 		page_no=request.GET.get('page',None)
-		print "88888888888888888888888888888888888888"
-		print page_no
-		print "88888888888888888888888888888888888888"
 
 		fields =[]
 		if name == "on":
@@ -198,7 +192,7 @@ def results_search(request, group_id, page_no=1, return_only_dict = None):
 			fields.append("content")
 		if tags == "on":
 			fields.append("tags")
-		print fields
+		
 
 		q = Q('match',name=dict(query='File',type='phrase'))
 		GST_FILE = Search(using=es, index="nodes",doc_type="gsystemtype").query(q)
@@ -211,8 +205,7 @@ def results_search(request, group_id, page_no=1, return_only_dict = None):
 			search_result =Search(using=es, index="nodes",doc_type="gsystemtype,gsystem,metatype,relationtype,attribute_type,group,author").query(q)
 			#search_result.filter('exists', field='content')
 			search_str_user=""
-			print search_result.count()
-			print group_id
+
 		else:
 			search_str_user = str(request.GET['search_text']).strip()
 
@@ -222,29 +215,24 @@ def results_search(request, group_id, page_no=1, return_only_dict = None):
 			else:	
 				temp = True
 				q = MultiMatch(query=search_str_user, fields=fields)
-				print len(fields)
+				
 				
 				for value in fields:
 					value=value+"=on&"
 					strconcat = strconcat + value
-				print strconcat
+				
 
 
 			search_result =Search(using=es, index="nodes",doc_type="gsystemtype,gsystem,metatype,relationtype,attribute_type,group,author").query(q)
 			search_result = search_result.filter('match', group_set=str(group_id))
 			search_result = search_result.filter('match', member_of=GST_FILE1.hits[0].id)
 			search_result = search_result.filter('match', access_policy='public')
-
-
-			print "search page"
-			print search_result.count()
 		
 		has_next = True
 		if search_result.count() <=20:
 			has_next = False
 
 		if request.GET.get('page',None) in [None,'']:
-			print "siddhu"
 			search_result=search_result[0:20]
 			page_no = 2	
 		else:
