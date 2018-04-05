@@ -79,7 +79,9 @@
 {% endif %}
 
 
+      {% comment %}
     {% if site.SITE_NAME == "NROER" %}
+      {% endcomment %}
       <div class="small-1 columns end header_text_sm_block">
         <a title="Go back to Overview" href="{% url 'course_content' group_id  %}">
         <div class="header_icon_block prev_button">
@@ -88,6 +90,7 @@
         </div>
         </a>
       </div>
+      {% comment %}
     {% else %}
       <div class="small-1 columns end header_text_sm_block">
         <a title="Go back to all Lessons" href="{% url 'course_content' group_id  %}">
@@ -98,6 +101,7 @@
         </a>
       </div>
     {% endif %}
+    {% endcomment %}
 
         
         <div class="header_title" title ="{% firstof group_object.altnames group_object.name %}">
