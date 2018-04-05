@@ -27,7 +27,7 @@ from elasticsearch import Elasticsearch
 from elasticsearch_dsl import *
 from django.shortcuts import render_to_response  # , render
 from elasticsearch_dsl.query import MultiMatch, Match
-from gnowsys_ndf.ndf.models.es import *
+from gnowsys_ndf.ndf.gstudio_es.es import *
 from gnowsys_ndf.ndf.paginator import Paginator ,EmptyPage, PageNotAnInteger
 
 

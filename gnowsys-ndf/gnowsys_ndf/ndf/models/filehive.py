@@ -1,6 +1,6 @@
 from base_imports import *
 from history_manager import HistoryManager
-from gnowsys_ndf.ndf.models.es import esearch
+from gnowsys_ndf.ndf.gstudio_es.es import esearch
 from gnowsys_ndf.local_settings import GSTUDIO_ELASTIC_SEARCH,GLITE_RCS_REPO_DIRNAME,GSTUDIO_ELASTIC_SEARCH_INDEX
 
 

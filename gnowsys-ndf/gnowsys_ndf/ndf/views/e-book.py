@@ -22,7 +22,7 @@ from elasticsearch import Elasticsearch
 from elasticsearch_dsl import *
 from gnowsys_ndf.ndf.paginator import Paginator ,EmptyPage, PageNotAnInteger
 from gnowsys_ndf.local_settings import GSTUDIO_ELASTIC_SEARCH
-from gnowsys_ndf.ndf.models.es import *
+from gnowsys_ndf.ndf.gstudio_es.es import *
 
 
 if GSTUDIO_ELASTIC_SEARCH == True:

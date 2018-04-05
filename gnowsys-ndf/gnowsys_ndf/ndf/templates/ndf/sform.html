@@ -1,4 +1,4 @@
-{% extends "ndf/gbase.html" %}
+<!--  {% extends "ndf/gbase.html" %}
 
 {% block title %} Elastic Search {% endblock %}
 {% block body_content %}
@@ -78,7 +78,7 @@
 	<li class="card-image-wrapper">
 	{% include "ndf/card_gsearch.html" with node=each url_name="node_detail" first_arg=each.group_set.0 second_arg=each.id %}
 	</li>
-	{% else %}			<!-- sending the id of home as group id if group-set is empty-->
+	{% else %}			sending the id of home as group id if group-set is empty
 	<li class="card-image-wrapper">
 	{% include "ndf/card_gsearch.html" with node=each url_name="node_detail" first_arg="5752ad5a2e01310a05dca583" second_arg=each.id %}
 	</li>
@@ -101,4 +101,4 @@
 </div>
 
 
-{% endblock %}
+{% endblock %} --> 

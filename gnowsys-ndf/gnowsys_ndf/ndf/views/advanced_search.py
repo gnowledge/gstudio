@@ -20,7 +20,7 @@ from gnowsys_ndf.ndf.models import node_collection
 from gnowsys_ndf.ndf.views.file import *
 from gnowsys_ndf.ndf.views.methods import get_group_name_id, cast_to_data_type, get_execution_time
 from gnowsys_ndf.ndf.views.methods import get_filter_querydict
-from gnowsys_ndf.ndf.models.es import *
+from gnowsys_ndf.ndf.gstudio_es.es import *
 from gnowsys_ndf.ndf.paginator import Paginator ,EmptyPage, PageNotAnInteger
 from gnowsys_ndf.local_settings import GSTUDIO_ADVANCED_SEARCH
 from gnowsys_ndf.ndf.templatetags.ndf_tags import get_relation_value
