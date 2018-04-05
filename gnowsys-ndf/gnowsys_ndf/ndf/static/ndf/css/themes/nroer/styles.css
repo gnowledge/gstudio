@@ -31608,16 +31608,15 @@ ul.horizontal_tabs_gstudio > li.sub_group_action:hover ul {
 /***********Landing page***************/
 /* line 8138, ../../../scss/_app_styles.scss */
 .about_us {
-  height: 300px;
   background: #20ade0;
 }
 
-/* line 8142, ../../../scss/_app_styles.scss */
+/* line 8141, ../../../scss/_app_styles.scss */
 .analytics {
   margin-top: 20px;
 }
 
-/* line 8145, ../../../scss/_app_styles.scss */
+/* line 8144, ../../../scss/_app_styles.scss */
 .square {
   border: 4px solid #ffffff;
   position: relative;
@@ -31628,15 +31627,15 @@ ul.horizontal_tabs_gstudio > li.sub_group_action:hover ul {
   margin-left: 30px;
 }
 
-/* line 8155, ../../../scss/_app_styles.scss */
+/* line 8154, ../../../scss/_app_styles.scss */
 .square:after {
   content: "";
   display: block;
   padding-bottom: 100%;
 }
 
-/* line 8161, ../../../scss/_app_styles.scss */
-.content {
+/* line 8160, ../../../scss/_app_styles.scss */
+.box-content {
   position: absolute;
   width: 100%;
   height: 80%;
@@ -31644,7 +31643,7 @@ ul.horizontal_tabs_gstudio > li.sub_group_action:hover ul {
   padding-top: 20%;
 }
 
-/* line 8174, ../../../scss/_app_styles.scss */
+/* line 8173, ../../../scss/_app_styles.scss */
 .activity-slider {
   font-family: Arial;
   width: 800px;
@@ -31652,7 +31651,7 @@ ul.horizontal_tabs_gstudio > li.sub_group_action:hover ul {
   margin: 0 auto;
 }
 
-/* line 8181, ../../../scss/_app_styles.scss */
+/* line 8180, ../../../scss/_app_styles.scss */
 .activity-slider h3 {
   background: #fff;
   color: #3498db;
@@ -31680,7 +31679,7 @@ ul.horizontal_tabs_gstudio > li.sub_group_action:hover ul {
 .action a:hover{
   background:#000;
 }*/
-/* line 8208, ../../../scss/_app_styles.scss */
+/* line 8207, ../../../scss/_app_styles.scss */
 .footer_link_cont h4 {
   color: #999;
 }

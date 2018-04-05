@@ -160,7 +160,7 @@ article.columns{
 <!--     </div> -->
 
         
-    <section class="about-blog" style="margin-top: 30px;">
+    <div class="about-blog" style="margin-top: 30px;">
         <div class="medium-10 medium-centered columns" style="height:100%; background: #20ade0;">
             <h3 align="center" style="color: #ececec">WHO WE ARE</h3>
             <span style="color: #ececec; margin-bottom: 30px;">
@@ -172,57 +172,55 @@ article.columns{
                 <a href="https://www.facebook.com/National-Council-of-Educational-Research-and-Training-NCERT-1603463793208763/"><i class="fi-social-facebook size-36" ></i></a>
                 <a href="https://twitter.com/ciet_ncert"><i class="fi-social-twitter "></i></a>
             </div> -->
-            
-
         </div>
 
-    </section>
+    </div>
 
 
-    <section class="about-blog" style="margin-top: 30px;">
+    <div class="analytics-blog" style="margin-top: 30px;">
         <div class="medium-10 medium-centered columns" style="height: 237px;background: #d8dbdc;">
 
-          <div class="medium-11 medium-centered columns" style="margin-top: 20px;">
+          <div class="medium-10 medium-centered columns" style="margin-top: 20px;">
             <span><h3 class="analytics" align="center">ANALYTICS</h3></span>
             <div class="square" style="background-color: #ff8080">
-                <div class="content">
+                <div class="box-content">
                   <h3>GROUPS</h3>
-                  <h3>45</h3>
+                  <h3>{{group_count}}</h3>
                 </div>
             </div>
             <div class="square" style="background-color: #80d4ff">
-                 <div class="content">
+                 <div class="box-content">
                   <h3>TASKS</h3>
-                  <h3>22</h3>
+                  <h3>-</h3>
                 </div>
             </div>
             <div class="square" style="background-color: #ffffb3">
-                <div class="content">
+                <div class="box-content">
                  <h3>DISCUSSION</h3> 
-                 <h3>38</h3>
+                 <h3>-</h3>
                 </div>
             </div>
             <div class="square" style="background-color: #d5ff80">
-                <div class="content">
+                <div class="box-content">
               <h3>eResourses</h3>
-              <h3>{{ file_pages.count }}</h3>
+              <h3>{{ files_count }}</h3>
                 </div>
             </div>
             <div class="square" style="background-color: #ffaa80">
-                <div class="content">
+                <div class="box-content">
               <h3>Users</h3>
-              <h3>29,034</h3>
+              <h3>{{author_count}}</h3>
                 </div>
             </div>
           </div>  
         </div>
 
-    </section>
+    </div>
 
 
     <h3 align="center" style="margin-top: 20px; color: #c35e76">Activities / Schemes</h3>
-    <section class="linked-links" id="linked-links" style="margin-top: 5px;">
-        <div class="medium-8 medium-centered columns" style="height: 135px;background: #c7c9c938;">
+    <div class="linked-links" id="linked-links" style="margin-top: 5px;">
+        <div class="medium-8 medium-centered columns" style="height: 100%;background: #c7c9c938;">
             <div class="activity-slider">
               <div class="slider slider-nav" data-slick='{"slidesToShow": 4, "slidesToScroll": 4}'>
                 <div><h3>1</h3></div>
@@ -237,7 +235,7 @@ article.columns{
             </div>
         </div>
 
-    </section>
+    </div>
 
 
     {% endcache %}
