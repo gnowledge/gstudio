@@ -71,12 +71,12 @@ if GSTUDIO_ELASTIC_SEARCH:
 
 		is_video = request.GET.get('is_video', "")
 
-		search_text = request.GET.get('search_text', None)
+		search_text = request.GET.get('search_text', "")
 		
-		if search_text != None:
-			with open("Output.txt", "w") as text_file:
-				text_file.write(search_text)
-				text_file.close()
+		#if search_text != None:
+		with open("Output.txt", "w") as text_file:
+			text_file.write(search_text)
+			text_file.close()
 		print search_text
 		print "-------------------------------"
 
