@@ -4029,6 +4029,16 @@ $ah_2_background_color_hover: rgba(244, 244, 244, 0.3);
 }
 
 
+.filter-position{
+    @media screen and (max-width: 1756px){
+        margin-left:0px;
+    }
+    @media screen and (min-width: 1757px){
+        margin-left:-715px;
+    }
+        
+}
+
 .float-right{
     float:right;
 }
