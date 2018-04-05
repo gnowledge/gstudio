@@ -40,50 +40,32 @@ def search_detail(request,group_id,page_no=1):
 	except:
 		group_name, group_id = get_group_name_id(group_id)
 
-
-	
 	chk_advanced_search = request.GET.get('chk_advanced_search',None)
-	print chk_advanced_search
+	
 	if request.GET.get('field_list',None):
 		selected_field = request.GET.get('field_list',None)
 	else:
 		selected_field = "content"
-	print selected_field
-	print "mmmmmmmmmmmmmmmmmmmmmmmmmmmm----------------------"
-	#,Q('exists',field='content')55ab34ff81fccb4f1d806025
+
 
 	q = Q('bool', must=[Q('match', member_of=GST_FILE1.hits[0].id),Q('match',group_set='55ab34ff81fccb4f1d806025'),Q('match',access_policy='public'),~Q('exists',field=selected_field)])
 	search_result =Search(using=es, index="nodes",doc_type="gsystemtype,gsystem,metatype,relationtype,attribute_type,group,author").query(q)
-	#search_result.filter('exists', field='attribute_set__educationaluse')
 
 	if request.GET.get('field_list',None) == "true":
-		print "chk_advanced_search"
-		#q = Q('bool', must=[Q('match',language=dict(query='english',type='phrase')),Q('match', access_policy='public'),Q('match', group_set=str(group_id))])
-		#lan = Search(using=es, index="nodes",doc_type="gsystemtype,gsystem,metatype,relationtype,attribute_type,group,author").query(q)
-		#lan1 = lan.execute()
-		#print lan.count()
-		print ";;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;"
-		#Q('match',language=dict(query='hindi',type='phrase'))
-		#Q('match', content=request.GET.get('search_text','')),
-		q = Q('bool', must=[Q('match', language='en'),Q('match', access_policy='public'),Q('match', group_set=str(group_id))])
-		search_result =Search(using=es, index="nodes",doc_type="gsystemtype,gsystem,metatype,relationtype,attribute_type,group,author").query(q)
-		#search_result =Search(using=es, index="nodes",doc_type="gsystemtype,gsystem,metatype,relationtype,attribute_type,group,author")
-		#search_result.filter( 'range', gte='900', lte='097f', field='content' )
-		#for a in search_result:
-		#	print a.id
-		search_result = search_result.filter("terms", content=["ncert"])
-		
-    	#search_result.query('regexp', title="my * is")
-		response = s.execute()
 
+		search_text = request.GET.get("search_text",None)
+
+		q = Q('bool', must=[Q('match', language='en'),Q('match', access_policy='public'),Q('match', group_set=str(group_id)),
+			Q('bool', must=[Q('match_phrase', content=search_text)])])
+		search_result =Search(using=es, index="nodes",doc_type="gsystemtype,gsystem,metatype,relationtype,attribute_type,group,author").query(q)
+
+
+	if_teaches = False
 
 	search_str_user=""
-	#print search_result.count()
-	#print group_id
+
 
 	page_no = request.GET.get('page_no',None)
-	print page_no
-	print "44444444444444444444444444"
 
 	has_next = True
 	if search_result.count() <=20:
@@ -105,10 +87,9 @@ def search_detail(request,group_id,page_no=1):
 		page_no = int(int(page_no)+1)
 
 	if request.GET.get('field_list',None) == "attribute_type_set" :
-		print "if block"
-		temp = node_collection.find({'_type': 'GSystem'})
 		
-
+		temp = node_collection.find({'_type': 'GSystem','access_policy':'PUBLIC'})
+		
 		lst = []
 		for each in temp:
 		    if each._id:
@@ -118,14 +99,9 @@ def search_detail(request,group_id,page_no=1):
 
 		search_result = node_collection.find({ '_id': {'$in': lst} })
 
-
-		#print search_result1
-		print "aaaaaaaaaaaa"
-		#temp.rewind()
+		if_teaches = True
 
 
-
-
-	return render_to_response('ndf/asearch.html', {"page_no":page_no,"has_next":has_next,'GSTUDIO_ELASTIC_SEARCH':GSTUDIO_ELASTIC_SEARCH,'advanced_search':"true",'groupid':group_id,'group_id':group_id,'title':"advanced_search","search_curr":search_result,'field_list':selected_field,'chk_advanced_search':chk_advanced_search},
+	return render_to_response('ndf/asearch.html', {"page_no":page_no,"has_next":has_next,'GSTUDIO_ELASTIC_SEARCH':GSTUDIO_ELASTIC_SEARCH,'advanced_search':"true",'groupid':group_id,'group_id':group_id,'title':"advanced_search","search_curr":search_result,'field_list':selected_field,'chk_advanced_search':chk_advanced_search,'if_teaches':if_teaches},
 				context_instance=RequestContext(request))
 		 

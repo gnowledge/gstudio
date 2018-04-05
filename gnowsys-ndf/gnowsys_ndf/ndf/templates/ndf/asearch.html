@@ -4,15 +4,13 @@
 {% block title %} {{title}} {% endblock %}
 {% block concern_information %}
 <script src="/static/ndf/js/jquery-3.1.1.min.js"></script>
-<!--<script src="/static/ndf/js/jquery.waypoints.min.js"></script>
-<script src="/static/ndf/js/infinite.min.js"></script>-->
 <script src="/static/ndf/bower_components/waypoints/lib/jquery.waypoints.min.js"></script>
 <script src="/static/ndf/bower_components/waypoints/lib/shortcuts/infinite.min.js"></script>
 {% endblock %}
 {% block related_content %}
 
 <form {% if groupid %} action="{% url 'advanced_search' groupid %}" {% else %} action="" {% endif %}
-                        name="search_form" method="GET" >
+                       id="a_search_form" name="a_search_form" method="GET" >
 
 	<select id="field_list" name="field_list">
 	 	<option value="content">No description</option>
@@ -22,11 +20,9 @@
 	  	<option value="attribute_type_set">Teaches </option>
 
 	</select>
-	<button type="submit" value="search" >Search
-	</button>
+	<button type="submit" value="search"> Search </button>
 	<input type="hidden" name="chk_advanced_search" value="true">
-	<!--<input type="hidden" name="search_text" value="न[^]*">-->
-	
+	<input type="hidden" name="search_text" value="ल">
 
 
 </form>
@@ -49,9 +45,9 @@
 
 		          {% for each in search_curr %}
 		            <li class="card-image-wrapper" >
-		            {% if GSTUDIO_ELASTIC_SEARCH == True %}
+		            {% if GSTUDIO_ELASTIC_SEARCH == True and if_teaches != True %}
 		              
-		                {% include 'ndf/simple_card.html' with  no_footer=True resource=each url_name="page_details" first_arg=groupid second_arg=each.pk %}
+		                {% include 'ndf/simple_card.html' with  no_footer=True resource=each url_name="page_details" first_arg=groupid second_arg=each.id %}
 		              </span>
 		            {% else %}
 		              {% include 'ndf/simple_card.html' with  no_footer=True resource=each url_name="page_details" first_arg=groupid second_arg=each%}
