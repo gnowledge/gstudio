@@ -10,6 +10,7 @@ except ImportError:  # old pymongo
 
 from django.core.management.base import BaseCommand, CommandError
 from django.contrib.auth.models import User
+from django.template.defaultfilters import slugify
 from gnowsys_ndf.ndf.models import *
 from gnowsys_ndf.ndf.views.methods import get_group_name_id
 try:
@@ -19,6 +20,9 @@ except Exception, e:
 
 def activity_details(group_id, username):
     group_obj = get_group_name_id(group_id, get_obj=True)
+    group_name = group_obj.name
+    if group_obj.altnames:
+        group_name = group_obj.altnames
     user_obj = None
     username = unicode(username.strip())
     try:
@@ -28,7 +32,7 @@ def activity_details(group_id, username):
 
     if group_obj and user_obj:
         dt = "{:%Y%m%d-%Hh%Mm}".format(datetime.datetime.now())
-        file_name = GSTUDIO_INSTITUTE_ID_SECONDARY + '-' + GSTUDIO_INSTITUTE_ID + '-' + group_id + '-activity-timespent-' + username+ '-' + dt + '.csv'
+        file_name = GSTUDIO_INSTITUTE_ID + '-' + slugify(group_name) + '-' + username+ '-' + dt + '.csv'
 
         GSTUDIO_EXPORTED_CSVS_DIRNAME = 'gstudio-exported-users-analytics-csvs'
         GSTUDIO_EXPORTED_CSVS_DIR_PATH = os.path.join('/data/', GSTUDIO_EXPORTED_CSVS_DIRNAME)
@@ -37,21 +41,22 @@ def activity_details(group_id, username):
             os.makedirs(GSTUDIO_EXPORTED_CSVS_DIR_PATH)
 
         file_name_path = os.path.join(GSTUDIO_EXPORTED_CSVS_DIR_PATH, file_name)
-        column_keys_list = ['VisitedOn', 'Language','Lesson', 'Activity', 'Timespent']
+        column_keys_list = ['Unit', 'VisitedOn', 'Language','Lesson', 'Activity', 'Timespent', 'Buddies']
         f = open(file_name_path, 'w')
         w = csv.DictWriter(f, column_keys_list)
         w.writeheader()
 
-        regex_pattern = '^/'+group_id+'/course.*|.*my-desk.*|.*explore.*|.*tools/tool-page.*|.*course/content.*'
+        activity_in_regex_pattern = ".*/" + group_id + "/course/activity_player.*"
+        activity_out_regex_pattern = '^/'+group_id+'/course.*|.*my-desk.*|.*explore.*|.*tools/tool-page.*|.*course/content.*'
 
-        all_visits = benchmark_collection.find({'calling_url': {'$regex': '.*course/activity_player.*',
+        all_visits = benchmark_collection.find({'calling_url': {'$regex': activity_in_regex_pattern,
          '$options': "i"}, 'user': username}).sort('last_update', -1)
         
         print "\nTotal activity-player visits in {0}: {1}".format(group_obj.name, all_visits.count())
         
         for ind, each_visit in enumerate(all_visits):
             # print each_visit
-            row_dict = {'VisitedOn': 'NA', 'Language': 'NA', 'Lesson': 'NA', 'Activity': 'NA', 'Timespent': 'NA'}
+            row_dict = {'Unit': slugify(group_name), 'VisitedOn': 'NA', 'Language': 'NA', 'Lesson': 'NA', 'Activity': 'NA', 'Timespent': 'NA', 'Buddies': 'NA'}
             visited_on = each_visit['last_update']
             row_dict['VisitedOn'] = str(visited_on)
             locale = each_visit['locale']
@@ -69,7 +74,7 @@ def activity_details(group_id, username):
                     activity_node = node_collection.one({'_id': ObjectId(activity_id)})
                     lesson_name = lesson_node.name
                     activity_name = activity_node.name
-                    row_dict.update({'Lesson': lesson_name, 'Activity': activity_name})
+                    row_dict.update({'Lesson': slugify(lesson_name), 'Activity': slugify(activity_name)})
                     print "\n {0}. Visited On: {1}".format(ind, visited_on) 
                     print " Language: ", locale
                     print " Lesson Name: ", lesson_name 
@@ -78,17 +83,23 @@ def activity_details(group_id, username):
                         activity_disp_name = activity_node.altnames
                     print " Activity Name ({0}): {1}".format(activity_node._id, activity_disp_name)
 
-                    nav_action_cur = benchmark_collection.find({'last_update': {'$gte': each_visit['last_update']}, 
+                    nav_out_action_cur = benchmark_collection.find({'last_update': {'$gte': each_visit['last_update']}, 
                         '_id': {'$ne': each_visit['_id']}, 'user': username, 
-                        'calling_url': {'$regex': regex_pattern, '$options': 'i' }}).sort('last_update', -1)
-                    if nav_action_cur.count():
-                        out_nav = nav_action_cur[0]
-                        end_time = out_nav['last_update']
+                        'calling_url': {'$regex': activity_out_regex_pattern, '$options': 'i' }}).sort('last_update', -1)
+                    if nav_out_action_cur.count():
+                        nav_out_obj = nav_out_action_cur[0]
+                        end_time = nav_out_obj['last_update']
                         timespent = (end_time-visited_on).total_seconds()
                         print " Time spent: ", timespent, " seconds."
                         row_dict['Timespent'] = str(timespent)
                     else:
-                        print " ## Unable to track time psent on this activity. ##"
+                        print " ## Unable to track time spent on this activity. ##"
+                    buddies_obj = Buddy.query_buddy_obj(user_obj.pk, each_visit['session_key'])
+                    if buddies_obj:
+                        auth_id_list = buddies_obj.get_all_buddies_auth_ids()
+                        buddies_names = Node.get_names_list_from_obj_id_list(auth_id_list, u'Author')
+                        print " Buddies: ", buddies_names
+                        row_dict.update({'Buddies': buddies_names})
                 else:
                     print "## Unable to track time psent on this activity. ##"
                 w.writerow(row_dict)
