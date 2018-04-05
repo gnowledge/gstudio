@@ -15,6 +15,7 @@ if GSTUDIO_INSTITUTE_ID and GSTUDIO_INSTITUTE_NAME:
 		group_obj.created_by = 1
 		group_obj.modified_by = 1
 		group_obj.contributors = [1]
+		group_obj.author_set = [1]
 		group_obj.encryption_policy = u"NOT_ENCRYPTED"
 		group_obj.disclosure_policy = u"DISCLOSED_TO_MEM"
 		group_obj.edit_policy = u"EDITABLE_NON_MODERATED"
