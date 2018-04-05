@@ -31614,20 +31614,12 @@ ul.horizontal_tabs_gstudio > li.sub_group_action:hover ul {
   background: #20ade0;
 }
 
-<<<<<<< HEAD
-/* line 8141, ../../../scss/_app_styles.scss */
-=======
-/* line 8144, ../../../scss/_app_styles.scss */
->>>>>>> 4960655b3edc4a236ba0247fb69897dc23a6af84
+/* line 8143, ../../../scss/_app_styles.scss */
 .analytics {
   margin-top: 20px;
 }
 
-<<<<<<< HEAD
-/* line 8144, ../../../scss/_app_styles.scss */
-=======
-/* line 8147, ../../../scss/_app_styles.scss */
->>>>>>> 4960655b3edc4a236ba0247fb69897dc23a6af84
+/* line 8146, ../../../scss/_app_styles.scss */
 .square {
   border: 4px solid #ffffff;
   position: relative;
@@ -31638,24 +31630,15 @@ ul.horizontal_tabs_gstudio > li.sub_group_action:hover ul {
   margin-left: 30px;
 }
 
-<<<<<<< HEAD
-/* line 8154, ../../../scss/_app_styles.scss */
-=======
-/* line 8157, ../../../scss/_app_styles.scss */
->>>>>>> 4960655b3edc4a236ba0247fb69897dc23a6af84
+/* line 8156, ../../../scss/_app_styles.scss */
 .square:after {
   content: "";
   display: block;
   padding-bottom: 100%;
 }
 
-<<<<<<< HEAD
-/* line 8160, ../../../scss/_app_styles.scss */
+/* line 8162, ../../../scss/_app_styles.scss */
 .box-content {
-=======
-/* line 8163, ../../../scss/_app_styles.scss */
-.content {
->>>>>>> 4960655b3edc4a236ba0247fb69897dc23a6af84
   position: absolute;
   width: 100%;
   height: 80%;
@@ -31663,11 +31646,7 @@ ul.horizontal_tabs_gstudio > li.sub_group_action:hover ul {
   padding-top: 20%;
 }
 
-<<<<<<< HEAD
-/* line 8173, ../../../scss/_app_styles.scss */
-=======
-/* line 8176, ../../../scss/_app_styles.scss */
->>>>>>> 4960655b3edc4a236ba0247fb69897dc23a6af84
+/* line 8175, ../../../scss/_app_styles.scss */
 .activity-slider {
   font-family: Arial;
   width: 800px;
@@ -31675,11 +31654,7 @@ ul.horizontal_tabs_gstudio > li.sub_group_action:hover ul {
   margin: 0 auto;
 }
 
-<<<<<<< HEAD
-/* line 8180, ../../../scss/_app_styles.scss */
-=======
-/* line 8183, ../../../scss/_app_styles.scss */
->>>>>>> 4960655b3edc4a236ba0247fb69897dc23a6af84
+/* line 8182, ../../../scss/_app_styles.scss */
 .activity-slider h3 {
   background: #fff;
   color: #3498db;
@@ -31707,16 +31682,12 @@ ul.horizontal_tabs_gstudio > li.sub_group_action:hover ul {
 .action a:hover{
   background:#000;
 }*/
-<<<<<<< HEAD
-/* line 8207, ../../../scss/_app_styles.scss */
-=======
-/* line 8210, ../../../scss/_app_styles.scss */
->>>>>>> 4960655b3edc4a236ba0247fb69897dc23a6af84
+/* line 8208, ../../../scss/_app_styles.scss */
 .footer_link_cont h4 {
   color: #999;
 }
 
-/* line 8211, ../../../scss/_app_styles.scss */
+/* line 8212, ../../../scss/_app_styles.scss */
 .about_content {
   color: #ececec;
   margin-bottom: 30px;
@@ -31724,7 +31695,7 @@ ul.horizontal_tabs_gstudio > li.sub_group_action:hover ul {
   font-size: 20px;
 }
 
-/* line 8219, ../../../scss/_app_styles.scss */
+/* line 8220, ../../../scss/_app_styles.scss */
 .about-blog {
   height: 100%;
   background: #20ade0;
