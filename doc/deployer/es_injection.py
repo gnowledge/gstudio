@@ -17,7 +17,8 @@ except ImportError:  # old pymongo
 # reload(sys)
 # sys.setdefaultencoding('UTF8')
 
-es = Elasticsearch(GSTUDIO_ELASTIC_SEARCH_PROTOCOL+"://"+GSTUDIO_ELASTIC_SEARCH_SUPERUSER+":"+GSTUDIO_ELASTIC_SEARCH_SUPERUSER_PASSWORD+"@"+GSTUDIO_ELASTIC_SEARCH_ALIAS+":"+GSTUDIO_ELASTIC_SEARCH_PORT,timeout=100, retry_on_timeout=True)
+es = Elasticsearch("http://elastic:changeme@14.139.123.11:9200", timeout=100, retry_on_timeout=True)
+#es = Elasticsearch(GSTUDIO_ELASTIC_SEARCH_PROTOCOL+"://"+GSTUDIO_ELASTIC_SEARCH_SUPERUSER+":"+GSTUDIO_ELASTIC_SEARCH_SUPERUSER_PASSWORD+"@"+GSTUDIO_ELASTIC_SEARCH_ALIAS+":"+GSTUDIO_ELASTIC_SEARCH_PORT,timeout=100, retry_on_timeout=True)
 
 #author_index = "author_" + GSTUDIO_SITE_NAME.lower()
 #index = GSTUDIO_SITE_NAME.lower()

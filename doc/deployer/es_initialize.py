@@ -6,14 +6,15 @@ from elasticsearch import Elasticsearch
 from gnowsys_ndf.ndf.models import *
 
 from gnowsys_ndf.settings import GSTUDIO_SITE_NAME
-from gnowsys_ndf.local_settings import GSTUDIO_DOCUMENT_MAPPING
+from gnowsys_ndf.local_settings import *
 
 
 ##### use the below commented lines if you are working with Python 2.x   #####
 # reload(sys)  
 # sys.setdefaultencoding('UTF8')
 
-es = Elasticsearch("http://elastic:changeme@gsearch:9200", timeout=100, retry_on_timeout=True)
+es = Elasticsearch(GSTUDIO_ELASTIC_SEARCH_PROTOCOL+"://"+GSTUDIO_ELASTIC_SEARCH_SUPERUSER+":"+GSTUDIO_ELASTIC_SEARCH_SUPERUSER_PASSWORD+"@"+GSTUDIO_ELASTIC_SEARCH_ALIAS+":"+GSTUDIO_ELASTIC_SEARCH_PORT,timeout=100, retry_on_timeout=True)
+
 
 author_index = "author_" + GSTUDIO_SITE_NAME.lower()
 index = GSTUDIO_SITE_NAME.lower()
