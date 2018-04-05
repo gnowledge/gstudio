@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2018-03-29 18:52+0530\n"
+"POT-Creation-Date: 2018-04-05 13:00+0530\n"
 "PO-Revision-Date: 2018-03-29 13:17+0530\n"
 "Last-Translator: \n"
 "Language-Team: \n"
@@ -544,7 +544,7 @@ msgid "Dependency Graph"
 msgstr "निर्भरता ग्राफ"
 
 #: gnowsys_ndf/ndf/templates/ndf/action_panel.html:311
-#: gnowsys_ndf/ndf/templates/ndf/header.html:418
+#: gnowsys_ndf/ndf/templates/ndf/header.html:442
 #: gnowsys_ndf/ndf/templates/ndf/node_edit_base.html:129
 msgid "Help"
 msgstr "सहायता"
@@ -1478,8 +1478,8 @@ msgstr "इतिहास देखें"
 
 #: gnowsys_ndf/ndf/templates/ndf/beta.html:21
 #: gnowsys_ndf/ndf/templates/ndf/file_search.html:16
-#: gnowsys_ndf/ndf/templates/ndf/header.html:528
-#: gnowsys_ndf/ndf/templates/ndf/header.html:542
+#: gnowsys_ndf/ndf/templates/ndf/header.html:552
+#: gnowsys_ndf/ndf/templates/ndf/header.html:566
 #: gnowsys_ndf/ndf/templates/ndf/node_search_base.html:6
 #: gnowsys_ndf/ndf/templates/ndf/search_page.html:4
 msgid "Search"
@@ -1842,7 +1842,8 @@ msgstr "कृपया समूह प्रकार चुनें"
 #: gnowsys_ndf/ndf/templates/ndf/create_event_group.html:133
 #: gnowsys_ndf/ndf/templates/ndf/curriculum_create_edit.html:113
 #: gnowsys_ndf/ndf/templates/ndf/curriculum_create_edit.html:230
-#: gnowsys_ndf/ndf/templates/ndf/header.html:396
+#: gnowsys_ndf/ndf/templates/ndf/header.html:351
+#: gnowsys_ndf/ndf/templates/ndf/header.html:420
 #: gnowsys_ndf/ndf/templates/ndf/node_edit_base.html:259
 #: gnowsys_ndf/ndf/templates/ndf/theme_create_edit.html:113
 #: gnowsys_ndf/ndf/templates/ndf/theme_create_edit.html:237
@@ -2674,7 +2675,7 @@ msgstr "कड़ी संपादन करें"
 #: gnowsys_ndf/ndf/templates/ndf/footer.html:19
 #: gnowsys_ndf/ndf/templates/ndf/gevent_base.html:41
 #: gnowsys_ndf/ndf/templates/ndf/group_dashboard.html:99
-#: gnowsys_ndf/ndf/templates/ndf/header.html:489
+#: gnowsys_ndf/ndf/templates/ndf/header.html:513
 #: gnowsys_ndf/ndf/templates/ndf/lms.html:147
 #: gnowsys_ndf/ndf/templates/ndf/quiz_details.html:43
 msgid "About"
@@ -2743,8 +2744,8 @@ msgstr "पाठ्यक्रम"
 
 #: gnowsys_ndf/ndf/templates/ndf/explore_secondary_header.html:35
 #, fuzzy
-msgid " Options "
-msgstr "विकल्प"
+msgid " Actions "
+msgstr "एक्शन"
 
 #: gnowsys_ndf/ndf/templates/ndf/explore_secondary_header.html:52
 msgid "Workspace Display Ordering: "
@@ -3065,7 +3066,6 @@ msgstr "सदस्य"
 
 #: gnowsys_ndf/ndf/templates/ndf/gcourse_event_group.html:238
 #: gnowsys_ndf/ndf/templates/ndf/gcourse_event_group.html:303
-#: gnowsys_ndf/ndf/templates/ndf/lms.html:92
 #, fuzzy
 msgid "Notebook"
 msgstr "ई-पुस्तक"
@@ -3181,14 +3181,14 @@ msgid "Home Dashboard"
 msgstr "हॉम डेशबोर्ड"
 
 #: gnowsys_ndf/ndf/templates/ndf/gheader.html:234
-#: gnowsys_ndf/ndf/templates/ndf/header.html:350
+#: gnowsys_ndf/ndf/templates/ndf/header.html:374
 #: gnowsys_ndf/ndf/templates/ndf/header_clix.html:145
 #: gnowsys_ndf/ndf/templates/ndf/header_clix.html:190
 msgid "Logout"
 msgstr "लोगआउट"
 
 #: gnowsys_ndf/ndf/templates/ndf/gheader.html:256
-#: gnowsys_ndf/ndf/templates/ndf/header.html:376
+#: gnowsys_ndf/ndf/templates/ndf/header.html:400
 #: gnowsys_ndf/ndf/templates/ndf/header_clix.html:153
 #: gnowsys_ndf/ndf/templates/ndf/header_clix.html:208
 #: gnowsys_ndf/ndf/templates/ndf/landing_page_clix.html:41
@@ -3200,7 +3200,7 @@ msgid "Login"
 msgstr "लॉगिन"
 
 #: gnowsys_ndf/ndf/templates/ndf/gheader.html:471
-#: gnowsys_ndf/ndf/templates/ndf/header.html:624
+#: gnowsys_ndf/ndf/templates/ndf/header.html:648
 msgid ""
 "RSS Feeds may not be displayed properly in this browser. Would you still "
 "like to continue?"
@@ -3286,6 +3286,7 @@ msgid "Activity"
 msgstr "क्रियाकलाप"
 
 #: gnowsys_ndf/ndf/templates/ndf/group_dashboard.html:203
+#: gnowsys_ndf/ndf/templates/ndf/lms.html:66
 msgid "Calendar"
 msgstr "कैलेंडर"
 
@@ -3387,7 +3388,6 @@ msgid "New Task"
 msgstr "नया कार्य"
 
 #: gnowsys_ndf/ndf/templates/ndf/gtask_details.html:25
-#: gnowsys_ndf/ndf/templates/ndf/lms.html:66
 #: gnowsys_ndf/ndf/templates/ndf/lms.html:104
 #: gnowsys_ndf/ndf/templates/ndf/task_create_edit.html:176
 #: gnowsys_ndf/ndf/templates/ndf/task_details.html:49
@@ -3481,16 +3481,16 @@ msgstr "मेरा डैशबोर्ड"
 msgid "MY GROUPS"
 msgstr "मेरे समूह"
 
-#: gnowsys_ndf/ndf/templates/ndf/header.html:474
+#: gnowsys_ndf/ndf/templates/ndf/header.html:498
 msgid "APPS"
 msgstr "ऐप्स"
 
-#: gnowsys_ndf/ndf/templates/ndf/header.html:496
-#: gnowsys_ndf/ndf/templates/ndf/header.html:506
+#: gnowsys_ndf/ndf/templates/ndf/header.html:520
+#: gnowsys_ndf/ndf/templates/ndf/header.html:530
 msgid "Updates"
 msgstr "अद्यतन सूची"
 
-#: gnowsys_ndf/ndf/templates/ndf/header.html:561
+#: gnowsys_ndf/ndf/templates/ndf/header.html:585
 msgid "BACK"
 msgstr "पीछे"
 
@@ -4096,6 +4096,10 @@ msgstr "ब्लॉग"
 msgid "Lessons"
 msgstr "पाठ"
 
+#: gnowsys_ndf/ndf/templates/ndf/lms.html:92
+msgid "blog"
+msgstr ""
+
 #: gnowsys_ndf/ndf/templates/ndf/lms.html:124
 #, fuzzy
 msgid "Asset Collection"
@@ -4136,8 +4140,18 @@ msgid "My Courses"
 msgstr "मेरे पाठ्यक्रम"
 
 #: gnowsys_ndf/ndf/templates/ndf/lms_dashboard.html:47
-msgid "My Performance"
-msgstr "मेरा प्रदर्शन"
+#, fuzzy
+msgid "My Progress"
+msgstr "प्रगति में"
+
+#: gnowsys_ndf/ndf/templates/ndf/lms_dashboard.html:73
+#, fuzzy
+msgid "My Workspace"
+msgstr "मेरे वर्कस्पेस"
+
+#: gnowsys_ndf/ndf/templates/ndf/lms_dashboard.html:82
+msgid "Joined Workspaces & Enrolled Courses"
+msgstr ""
 
 #: gnowsys_ndf/ndf/templates/ndf/mailbox_create_edit.html:14
 #, fuzzy
@@ -4304,7 +4318,6 @@ msgid "College :"
 msgstr "संस्था"
 
 #: gnowsys_ndf/ndf/templates/ndf/mis_report.html:100
-#, fuzzy
 msgid "From :"
 msgstr "से"
 
@@ -5537,7 +5550,7 @@ msgstr "समूह कार्य"
 #: gnowsys_ndf/ndf/templates/ndf/templates_list.html:25
 #, fuzzy
 msgid "Select Template"
-msgstr "टेम्पलेट चुनें (वैकल्पिक)"
+msgstr "टेमपलेट चुनें"
 
 #: gnowsys_ndf/ndf/templates/ndf/term.html:11
 msgid "Topics"
@@ -6077,8 +6090,8 @@ msgid "Enroll"
 msgstr "नामांकन"
 
 #: gnowsys_ndf/ndf/templates/ndf/widget_interaction.html:20
-msgid ""
-"Do you want to enable Comments/Discussion on this Activity for Students ? "
+#, fuzzy
+msgid "Do you want to enable Comments/Discussion on this Activity ? "
 msgstr ""
 "क्या आप विद्यार्थियों के लिए इस गतिविधि पर टिप्पणी / चर्चा को सक्षम करना चाहते हैं?"
 
@@ -6708,6 +6721,13 @@ msgstr "%(email_url)s आपके पास एक सत्यापित ई
 
 #~ msgid "Mark as Raw Material"
 #~ msgstr "रॉ मटीरियल के रूप में चिह्नित करें"
+
+#, fuzzy
+#~ msgid " Options "
+#~ msgstr "विकल्प"
+
+#~ msgid "My Performance"
+#~ msgstr "मेरा प्रदर्शन"
 
 #~ msgid "List Members"
 #~ msgstr "सदस्यों की सूची"
