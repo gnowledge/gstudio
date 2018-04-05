@@ -77,44 +77,18 @@
                         </li>
                     </ul>
             {% endif%}
-<<<<<<< HEAD
 
-            
-            {% if request.user.is_authenticated  %}            
-                <button type="button" class="orange-button add-asset-content right"><i class="fi-plus"></i> {% trans "Add File" %}</button>
-                <!--
-                {% if 'raw@material' in asset_obj.tags and is_gstaff and title == "raw_material_detail"  %}
-                <button type="button" class="orange-button add-asset-content right"><i class="fi-plus"></i> {% trans "Add File" %}</button>
-                {% endif %}
-                {% if 'asset@gallery' in asset_obj.tags  %}
-                <button type="button" class="orange-button add-asset-content right"><i class="fi-plus"></i> {% trans "Add File" %}</button>
-                {% endif %}
-                {% if title == 'asset_detail'  %}
-                <button type="button" class="orange-button add-asset-content right"><i class="fi-plus"></i> {% trans "Add File" %}</button>
-                {% endif %}
-                -->
-
-=======
             {% if request.user.is_authenticated  %}
                 <button type="button" class="orange-button add-asset-content"><i class="fi-plus"></i> {% trans "Add File" %}</button>
                 <a href="{% url 'create_edit_asset_page' group_id asset_obj.pk %}"><button type="button" class="orange-button" ><i class="fi-plus"></i> {% trans "Add  page" %}</button></a>
->>>>>>> b5e58753fd1285bd4c4005c4ac4dc412afd0a134
+
             {% endif %}
 
             <div class="small-3 columns page-name">
             {% include 'ndf/rating.html' with node=asset_obj %}
             </div>
 
-<<<<<<< HEAD
-
-    </div>
-    <br/>
-
-    <div class="row "><label>Description: </label>
-      <p>{{asset_obj.content|default:'No description added yet.'|safe|striptags}}</p>
-    </div>
             
-=======
             <!-- tags -->
             <div class="small-10 columns left">
                  {% if asset_obj.tags %}
@@ -129,7 +103,6 @@
         </div>
    </div>
 
->>>>>>> b5e58753fd1285bd4c4005c4ac4dc412afd0a134
             {% else %}
 
                 <h3 class="left overlay-title">&nbsp;
@@ -274,44 +247,40 @@
         <div class="name-desc-asset-cont-area hide">
             <div class="row">
                 <div class="small-8 medium-6 large-6 columns">
+                <form class="dropzone" id ="docPost" enctype="multipart/form-data" method="post" action="{% url 'add_assetcontent' group_id %}" style="margin-left: -13px;width: 429px;" > {% csrf_token %}
                     <label>{% trans "Enter File Name" %} <h9 style="color: red;">*</h9>
-                        <input type="text" placeholder="Enter File name" class="required" id = "asset_content_name" name="" style="padding-bottom: 10px;margin-bottom: 31px;"/>
+                        <input type="text" placeholder="Enter File name" class="required" id = "asset_content_name" name="name" style="padding-bottom: 10px;margin-bottom: 31px;"/>
                     </label>
-                    <form class="dropzone" id ="docPost" enctype="multipart/form-data" method="post" action="{% url 'add_assetcontent' group_id %}" style="margin-left: -13px;width: 429px;" >
-                        <input type="file" id="docFile" class="asset_content_upload" placeholder="" name=""/>
-                    </form>
+                        <input type="file" id="docFile" class="asset_content_upload" placeholder="" name="filehive"/>
                 </div>
 
                 <div class="small-8 medium-6 large-6 columns">
                 <label>{% trans "Enter File Description" %} <br/>
                     <textarea rows="6" cols="2" class="small-12 columns" placeholder="Enter File Description" id="asset_content_desc"></textarea>
                 </label>
-                    <button type="button" class="orange-button right" id="upload_asset" onclick="save_form()" style="margin-right: -3px;">{% trans "Upload" %}</button>
+                    <button type="submit" class="orange-button right" id="upload_asset"  style="margin-right: -3px;">{% trans "Upload" %}</button>
                 </div>
             </div>
         </div>
         <!--<button type="button" class="right orange-button save-asset" onclick="save_asset_cont_data()">Save Asset</button>-->
         <input type="hidden" name="context_name" value="{{title}}"/>
         <input type="hidden" class ="asset_obj_val" name="asset_obj_name" data-asset-obj-val=""/>
+        <input type="hidden" class ="asset_obj" name="asset_obj" data-asset-obj-val="" value="{{asset_obj}}" />
 
 
 
+        </form>
 
     </div>
 
 
         <div class="row">
             {% if asset_content_list.grel_id and asset_obj.created_by == request.user.id  or is_gstaff and asset_obj and asset_content_list.grel_id  %}
-<<<<<<< HEAD
 
-
-                <button type="button" class="orange-button delete-asset-content right icon-widget" style="margin-right: 100px;" title="Click on the checkbox on the files below to Delete"><i class="fa fa-trash"></i> {% trans "Delete Files" %}</button>
-
-=======
             <div class="row">
                 <button type="button" class="orange-button delete-asset-content right icon-widget" style="margin-right: 100px;display:none" title="Click on the checkbox on the files below to Delete"><i class="fa fa-trash"></i> {% trans "Delete Files" %}</button>
             </div>
->>>>>>> b5e58753fd1285bd4c4005c4ac4dc412afd0a134
+
             {% endif %}
 
         <div class="row listing-row" style="margin-left:10px;">
