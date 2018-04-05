@@ -24231,7 +24231,7 @@ body > footer .myfooter .footer_link_cont .links_show {
 }
 /* line 567, ../../../scss/_app_styles.scss */
 body > footer .myfooter .footer_link_cont .flinks {
-  font-size: 18px;
+  font-size: 22px;
   color: #999;
 }
 /* line 571, ../../../scss/_app_styles.scss */
@@ -31682,4 +31682,18 @@ ul.horizontal_tabs_gstudio > li.sub_group_action:hover ul {
 /* line 8207, ../../../scss/_app_styles.scss */
 .footer_link_cont h4 {
   color: #999;
+}
+
+/* line 8211, ../../../scss/_app_styles.scss */
+.about_content {
+  color: #ececec;
+  margin-bottom: 30px;
+  font-family: ubuntu-regular;
+  font-size: 20px;
+}
+
+/* line 8219, ../../../scss/_app_styles.scss */
+.about-blog {
+  height: 100%;
+  background: #20ade0;
 }

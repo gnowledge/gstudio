@@ -565,7 +565,7 @@ body>footer {
         max-height: 600px;
       }
       .flinks{
-        font-size: 18px;
+        font-size: 22px;
         color: #999;
       }
       .social_links a{
@@ -8206,4 +8206,17 @@ $module-card-lines-to-show: 3;
 
 .footer_link_cont h4{
   color: #999;
+}
+
+.about_content{
+  color: #ececec; 
+  margin-bottom: 30px; 
+  font-family: ubuntu-regular;
+  
+  font-size: 20px;
+}
+
+.about-blog{
+  height:100%;
+  background: #20ade0;
 }
