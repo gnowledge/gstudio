@@ -55,7 +55,7 @@ from gnowsys_ndf.settings import SYNCDATA_KEY_PUB, GSTUDIO_MAIL_DIR_PATH
 from gnowsys_ndf.ndf.views.tasks import record_in_benchmark
 from datetime import datetime, timedelta, date
 from gnowsys_ndf.ndf.views.utils import get_dict_from_list_of_dicts
-from gnowsys_ndf.local_settings import GSTUDIO_ELASTIC_SEARCH
+from gnowsys_ndf.settings import GSTUDIO_ELASTIC_SEARCH
 
 history_manager = HistoryManager()
 theme_GST = node_collection.one({'_type': 'GSystemType', 'name': 'Theme'})

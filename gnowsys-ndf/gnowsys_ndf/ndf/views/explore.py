@@ -28,7 +28,7 @@ from gnowsys_ndf.ndf.models import Node, Group, GSystemType,  AttributeType, Rel
 from gnowsys_ndf.ndf.models import node_collection, triple_collection
 from gnowsys_ndf.ndf.views.methods import get_execution_time, get_language_tuple, create_gattribute
 from gnowsys_ndf.ndf.templatetags.ndf_tags import check_is_gstaff, get_attribute_value
-from gnowsys_ndf.local_settings import GSTUDIO_ELASTIC_SEARCH
+from gnowsys_ndf.settings import GSTUDIO_ELASTIC_SEARCH
 # from gnowsys_ndf.ndf.views.methods import get_group_name_id
 # from gnowsys_ndf.ndf.views.methods import get_node_common_fields, parse_template_data, get_execution_time, delete_node, replicate_resource
 
