@@ -729,7 +729,7 @@
               
             }
  
-            $('#search_form').append('<div class="row collapse"><div class="large-11 small-10 columns"><input type="text" name="search_text" id="search_text" placeholder="{% trans "Search" %}" autocomplete="off" required /></div><div class="large-1 small-2 columns"><button type="submit" class="tiny button" value="" id="search-submit1" class="checked"><i class="fi-magnifying-glass"></i></button></div></div><div class="row collapse"><div class="large-11 small-10 columns"><input type="radio" id= "current_search" name="search" value="current" checked> Local <input id="global_search" type="radio" name="search" value="global"> Global </div></div>');
+            $('#search_form').append('<div class="row collapse"><div class="large-6 small-6 columns"><input type="text" name="search_text" id="search_text" placeholder="{% trans "Search" %}" autocomplete="off" required /></div><div class="large-1 small-2 columns"><button type="submit" class="tiny button" value="" id="search-submit1" class="checked"><i class="fi-magnifying-glass"></i></button></div> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<input type="radio" id= "current_search" name="search" value="current" checked> Local <input id="global_search" type="radio" name="search" value="global"> Global <div></div>');
             if(temp == "True") {
               $("#current_search").attr('disabled', true);
               $("#global_search").prop("checked", true)
@@ -750,7 +750,7 @@
               $('li.has-form').append("<form id = 'search_form' {% if groupid %} action='{% url 'results' 'home' %}' {% else %} action='' {% endif %} name='search_form' method=GET></form>");
               } 
         $('li.has-form').append("<form id = 'search_form' {% if groupid %} action='{% url 'results' groupid %}' {% else %} action='' {% endif %} name='search_form' method=GET></form>");
-        $('#search_form').append('<div class="row collapse"><div class="large-11 small-10 columns"><input type="text" name="search_text" id="search_text" placeholder="{% trans "Search" %}" autocomplete="off" required /></div><div class="large-1 small-2 columns"><button type="submit" class="tiny button" value="" id="search-submit1" class="checked"><i class="fi-magnifying-glass"></i></button></div></div><div class="row collapse"><div class="large-11 small-10 columns"><input type="radio" id= "current_search" name="search" value="local"> Local <input id= "global_search" type="radio" name="search" value="global" checked> Global </div></div>');
+        $('#search_form').append('<div class="row collapse"><div class="large-6 small-6 columns"><input type="text" name="search_text" id="search_text" placeholder="{% trans "Search" %}" autocomplete="off" required /></div><div class="large-1 small-2 columns"><button type="submit" class="tiny button" value="" id="search-submit1" class="checked"><i class="fi-magnifying-glass"></i></button></div> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<input type="radio" id= "current_search" name="search" value="current" > Local <input id="global_search" type="radio" name="search" value="global" checked> Global <div></div>');
 
  });
 
@@ -802,7 +802,7 @@
         {
           $('li.has-form').append("<form id = 'search_form' {% if groupid %} action='{% url 'results' groupid %}' {% else %} action='' {% endif %} name='search_form' method=GET></form>");        
         }
-        $('#search_form').append('<div class="row collapse"><div class="large-11 small-10 columns"><input type="text" name="search_text" id="search_text" placeholder="{% trans "Search" %}" autocomplete="off" required /></div><div class="large-1 small-2 columns"><button type="submit" class="tiny button" value="" id="search-submit1" class="checked"><i class="fi-magnifying-glass"></i></button></div></div><div class="row collapse"><div class="large-11 small-10 columns"><input type="radio" id= "current_search" name="search" value="local" checked> Local <input id= "global_search" type="radio" name="search" value="global" > Global </div></div>');
+        $('#search_form').append('<div class="row collapse"><div class="large-6 small-6 columns"><input type="text" name="search_text" id="search_text" placeholder="{% trans "Search" %}" autocomplete="off" required /></div><div class="large-1 small-2 columns"><button type="submit" class="tiny button" value="" id="search-submit1" class="checked"><i class="fi-magnifying-glass"></i></button></div> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<input type="radio" id= "current_search" name="search" value="current" checked> Local <input id="global_search" type="radio" name="search" value="global"> Global <div></div>');
 
  });
 </script>
