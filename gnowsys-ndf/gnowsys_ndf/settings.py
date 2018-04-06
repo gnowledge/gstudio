@@ -1040,16 +1040,6 @@ GSTUDIO_INSTITUTE_ID_SECONDARY = ''
 GSTUDIO_INSTITUTE_NAME = ''
 # --- End of Institute ID, name configs
 
-# Elastic Search
-GSTUDIO_DOCUMENT_MAPPING = '/data'
-GSTUDIO_ELASTIC_SEARCH = True
-GSTUDIO_ELASTIC_SEARCH_ALIAS = 'gsearch'
-GSTUDIO_ELASTIC_SEARCH_SUPERUSER = 'elastic'
-GSTUDIO_ELASTIC_SEARCH_SUPERUSER_PASSWORD = 'changeit'
-GSTUDIO_ELASTIC_SEARCH_PORT = '9200'
-# --- End of Elastic Search
-
-GSTUDIO_ELASTIC_SEARCH_PASSWORD = "gelastic@412"
 # # textb
 # import warnings
 # warnings.filterwarnings(
