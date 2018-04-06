@@ -1,6 +1,7 @@
 {% load i18n %}
 {% load ndf_tags %}
-
+<!--<script type="text/javascript" src="http://www.jquerycookbook.com/demos/scripts/jquery-1.11.1.min.js"></script>
+<script type="text/javascript" src="http://www.jquerycookbook.com/demos/scripts/jquery-ui.min.js"></script>-->
 <style type="text/css">
 	
 
@@ -25,8 +26,53 @@
 	.multiple-select {
 		height: 8rem;
 	}
+	
 
 </style>
+<!--<script type="text/javascript">
+$(document).ready(function(){
+
+    $("#tags_id").keyup(function(){
+        var search = $("#tags_id").val();
+
+        if((search != "" )&& (search.length > 2)){
+            $.ajax({
+                url: "{% url 'autocompletion' %}",
+                type: 'get',
+                data: {search:search},
+                //dataType: 'json',
+                success:function(response){
+                
+                    var len = response['total_count'];
+
+                    //$("#searchResult").append("<li value='"+11+"'>"+response['results']+"</li>");
+                    $("#topic_list1").empty();
+                    //$("#searchResult").append("<li value='"+11+"'>"+"sasasas"+"</li>");
+                    for( var i = 0; i<len; i++){
+                        var name = response['results'][i];
+                        //var fname = response[i]['tags'];
+
+                        //$("#searchResult").append("<li value='"+name+"'>"+name+"</li>");
+                        $("#topic_list1").append("<option value='"+name+"'>"+name+"</option>");
+
+                    }
+
+                    // binding click event to li
+                    //$("#searchResult li").bind("click",function(){
+                    //    setText(this);
+                    //});
+                    $("#topic_list1 option").bind("click",function(){
+                        setText(this);
+                    });
+
+                }
+            });
+        }
+
+    });
+
+})
+</script>-->
 
 {% get_group_name groupid as group_name_tag %}
 {% if user.is_authenticated %}	
@@ -71,8 +117,15 @@
 									
 								<div class="small-9 columns">
 							    	<input id="tags_id" tabindex="11" type="text" value="" placeholder="{% trans 'Add one tag at a time' %}">
+								    <ul id="searchResult"></ul>
+								    <select id="topic_list1" name="topic_list1" tabindex=3 required>
+									<option value="">--- Select Topic ---</option>
+									
+									</select>
+							    	
 							    	<input type="hidden" value="{{node.tags|join:', '|default_if_none:""}}" name="tags">
 						        </div>
+
 						        <div class="small-3 columns">
 						        	<span tabindex="12" id="add-tag-btn" class="tiny button">
 						        		{% trans 'Add' %}
@@ -284,6 +337,8 @@
 	    </div>
 
 	</form>
+	
+	
 
 {% else %}
 	<p><em>{% trans "You are not an authorised user. Please login to upload files." %} </em></p>
@@ -464,3 +519,4 @@
 	});
 
 </script>
+

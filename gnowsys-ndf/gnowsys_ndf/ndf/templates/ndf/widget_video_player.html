@@ -37,6 +37,7 @@
 			{% endif %}
 		</div>
 
+		{% if site.SITE_NAME == 'clix' %}
 	
 			{% get_relation_value video_obj.pk 'has_transcript' as transcript_rel %}
 			{% if transcript_rel %}
@@ -48,5 +49,6 @@
 	      			</div>
 	      	</div>
 			{% endif %}
+	    {% endif %}
 			
 </div>

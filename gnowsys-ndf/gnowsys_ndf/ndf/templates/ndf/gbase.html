@@ -210,7 +210,46 @@
 
   </script>
 
- 
+  </div>   
+    <style type="text/css">
+            
+
+            #page_content{
+                                display: table;
+                height:auto;
+                                display: table-row;
+
+            }
+            
+            html,body {
+                height:100%;
+                width: 100%;
+            }
+
+
+
+            body {
+
+                    display: table;
+            }
+
+            .footer_container{
+                    height: auto;
+                    display: table-row;
+            }
+
+            #footer {
+                height: 1px;
+            }
+
+*/    </style>
+
+
+    {% if not no_footer %}
+    <div id="footer" class="footer_container">
+        {% include 'ndf/footer_clix.html' %}
+     </div>   
+    {% endif %}
     
   </div> 
 
