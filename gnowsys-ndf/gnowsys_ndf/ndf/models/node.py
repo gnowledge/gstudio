@@ -2,7 +2,7 @@ from base_imports import *
 from history_manager import HistoryManager
 from elasticsearch import Elasticsearch
 from elasticsearch_dsl import Q
-from gnowsys_ndf.local_settings import GSTUDIO_ELASTIC_SEARCH,GLITE_RCS_REPO_DIRNAME,GSTUDIO_ELASTIC_SEARCH_INDEX
+from gnowsys_ndf.settings import GSTUDIO_ELASTIC_SEARCH,GLITE_RCS_REPO_DIRNAME,GSTUDIO_ELASTIC_SEARCH_INDEX
 from bson.json_util import loads, dumps
 from models_utils import NodeJSONEncoder
 from gnowsys_ndf.ndf.gstudio_es.es import esearch

@@ -7,7 +7,7 @@ from gnowsys_ndf.ndf.models import *
 
 #from gnowsys_ndf.settings import GSTUDIO_SITE_NAME
 #from gnowsys_ndf.local_settings import GSTUDIO_DOCUMENT_MAPPING
-from gnowsys_ndf.local_settings import *
+from gnowsys_ndf.settings import *
 
 try:
     from bson import ObjectId
@@ -17,15 +17,14 @@ except ImportError:  # old pymongo
 # reload(sys)
 # sys.setdefaultencoding('UTF8')
 
-es = Elasticsearch("http://elastic:changeme@14.139.123.11:9200", timeout=100, retry_on_timeout=True)
-#es = Elasticsearch(GSTUDIO_ELASTIC_SEARCH_PROTOCOL+"://"+GSTUDIO_ELASTIC_SEARCH_SUPERUSER+":"+GSTUDIO_ELASTIC_SEARCH_SUPERUSER_PASSWORD+"@"+GSTUDIO_ELASTIC_SEARCH_ALIAS+":"+GSTUDIO_ELASTIC_SEARCH_PORT,timeout=100, retry_on_timeout=True)
+es = Elasticsearch(GSTUDIO_ELASTIC_SEARCH_PROTOCOL+"://"+GSTUDIO_ELASTIC_SEARCH_SUPERUSER+":"+GSTUDIO_ELASTIC_SEARCH_SUPERUSER_PASSWORD+"@"+GSTUDIO_ELASTIC_SEARCH_ALIAS+":"+GSTUDIO_ELASTIC_SEARCH_PORT,timeout=100, retry_on_timeout=True)
 
 #author_index = "author_" + GSTUDIO_SITE_NAME.lower()
 #index = GSTUDIO_SITE_NAME.lower()
 #gsystemtype_index = "node_type_" + GSTUDIO_SITE_NAME.lower()
-with open("/home/docker/code/gstudio/gnowsys-ndf/gnowsys_ndf/req_body.json") as req_body:
+with open("/home/docker/code/gstudio/gnowsys-ndf/gnowsys_ndf/gstudio_configs/req_body.json") as req_body:
     request_body = json.load(req_body)
-with open("/home/docker/code/gstudio/gnowsys-ndf/gnowsys_ndf/triples.json") as triples:
+with open("/home/docker/code/gstudio/gnowsys-ndf/gnowsys_ndf/gstudio_configs/triples.json") as triples:
     triples_body = json.load(triples)
 
 

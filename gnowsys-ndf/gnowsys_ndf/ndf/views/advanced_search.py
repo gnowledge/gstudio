@@ -22,7 +22,7 @@ from gnowsys_ndf.ndf.views.methods import get_group_name_id, cast_to_data_type, 
 from gnowsys_ndf.ndf.views.methods import get_filter_querydict
 from gnowsys_ndf.ndf.gstudio_es.es import *
 from gnowsys_ndf.ndf.gstudio_es.paginator import Paginator ,EmptyPage, PageNotAnInteger
-from gnowsys_ndf.local_settings import GSTUDIO_ADVANCED_SEARCH
+from gnowsys_ndf.settings import GSTUDIO_ADVANCED_SEARCH
 from gnowsys_ndf.ndf.templatetags.ndf_tags import get_relation_value
 
 
