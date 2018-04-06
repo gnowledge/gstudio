@@ -83,7 +83,11 @@ margin-top:5px !important;
           <a href="#view-collection"><i class="fi-page-multiple"></i>
             {% trans "Collections" %}
             <span class="count">
-              {{ collection.count }}
+              {% if GSTUDIO_ELASTIC_SEARCH %}
+                {{ collection_count }}
+              {% else %}
+               {{ collection.count }}
+              {% endif %}
             </span>
           </a>
         </dd><br/>

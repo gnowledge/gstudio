@@ -1,0 +1,219 @@
+<!-- {% extends "ndf/gbase.html" %}
+{% block body_content %}	
+	<style type="text/css">
+		#node_types_col {
+			float: left;
+		}
+		#attribute_types_col {
+			float: left;
+		}
+		#relation_types_col {
+			float: left;
+		}
+		#input_attributes {
+			float: left;
+		}
+		#input_relations {
+			float: left;
+		}
+		#submit_btn {
+			float: right;
+		}
+		
+	</style>
+	<script type="text/javascript">
+		
+	</script>
+	<script type="text/javascript">
+		// the three maps sent from python esearch.py get_advanced_search_form function
+		var node_types_ch = {{ gsystemtype_map | safe }};
+		var attribute_type_ch = {{ attribute_map | safe }};
+		var relation_types_ch = {{ relation_map | safe }};
+		// html for drop down list
+		var drop_down_list = "<select name='node_type' id='nt_drop_down'><option value='none'>Select Node Type</option>"
+		var i;
+		// appending all the node types to the drop down list
+		for(var system_type_name in node_types_ch)
+		{
+			if(node_types_ch.hasOwnProperty(system_type_name))
+			{
+				var type_id = node_types_ch[system_type_name];
+				drop_down_list += "<option value='"+type_id+"'>"+system_type_name+"</option>";
+			}
+		}
+		$(document).ready(function() {
+			var attr_selected_count = 0; // number of attributes selected 
+			var reln_selected_count = 0; // number of relations selected
+			$('#node_types_col').append(drop_down_list);
+			$('#nt_drop_down').on("change",function(){
+				//console.log(this.value);
+				var checkbox_attr = ""; // html for attribute checkboxes
+				var checkbox_reln = ""; // html for relation checkboxes
+				$('#input_attributes').html("");
+				$('#input_relations').html("");
+				if(this.value == "none")
+				{
+					checkbox_attr += "";
+					checkbox_reln += "";
+					$('#attribute_types_col').html('');
+					$('#relation_types_col').html('');
+				}
+				else
+				{
+					var possible_attributes = attribute_type_ch[this.value];
+					var possible_relations = relation_types_ch[this.value];
+					$('#attribute_types_col').html('<p>Attributes</p><br />');
+					$('#relation_types_col').html('<p>Relations</p><br />');
+					console.log(possible_attributes);
+					console.log(possible_relations);
+					if(possible_attributes.length != 0)
+					{
+						for(var i = 0; i < possible_attributes.length; i++)
+						{
+							checkbox_attr += "<input type='checkbox' name='at_cb' value='"+possible_attributes[i]+"'/>"+possible_attributes[i]+"<br />";
+						}	
+					}
+					else
+					{
+						checkbox_attr += "<p>No attributes for this GSystemType</p>";
+					}
+					if(possible_relations.length != 0)
+					{
+						for(var i = 0; i < possible_relations.length; i++)
+						{
+							//console.log(reln)
+							checkbox_reln += "<input type='checkbox' name='rt_cb' value='"+possible_relations[i]+"'/>"+possible_relations[i]+"<br />";
+						}
+					}
+					else
+					{
+						checkbox_reln += "<p>No relations for this GSystemType</p>";
+					}
+				}
+				$('#attribute_types_col').append(checkbox_attr);
+				$('#relation_types_col').append(checkbox_reln);
+			});
+			var selected_attributes = {}; // selected_attributes is a dictionary where the key is the attribute name and value is the value entered by user in the text box
+			var selected_relations = {};
+			// on selecting a checkbox, a textbox is displayed with the attribute name
+			$('#attribute_types_col').on('click',function() {
+				selected_attributes = {};
+				var attr_checkboxes = $("input[name='at_cb']");
+				attr_selected_count = 0;
+				var selectedAttr = "Enter Attibute value:<br />"
+				$('#input_attributes').html("");
+				attr_checkboxes.each(function() {
+					if(this.checked == true)
+					{
+						selected_attributes[$(this).val()] = "";
+						attr_selected_count++;
+						selectedAttr += $(this).val()+":"+"<input type='text' id='a"+attr_selected_count+"'><br />";
+					}
+				});
+				$('#input_attributes').append(selectedAttr);
+			
+			});
+			// on selecting a checkbox, a textbox is displayed with the relation name
+			$('#relation_types_col').on('click',function() {
+				selected_relations = {};
+				var reln_checkboxes = $("input[name='rt_cb']");
+				reln_selected_count = 0;
+				var selectedReln = "Enter Relation value:<br />"
+				$('#input_relations').html("");
+				reln_checkboxes.each(function() {
+					if(this.checked == true)
+					{
+						selected_relations[$(this).val()] = "";
+						reln_selected_count++;
+						selectedReln += $(this).val()+":"+"<input type='text' id='r"+reln_selected_count+"'><br />";
+					}
+				});
+				$('#input_relations').append(selectedReln);
+			});
+			// on submitting the form, first the input is validated and  if input is valid, an ajax call is made which sends the node type selected, both the selcted_attributes and selected_relations dictionary
+			$('#user_form').on('submit',function(e) {
+				e.preventDefault();
+				var i = 1;
+				var flag = true;
+				for(var key in selected_attributes)
+				{
+					if($('#a'+i).val() == "")
+					{
+						$('#a'+i).css('border-color','red');
+						flag = false;
+					}
+					else
+					{
+						selected_attributes[key] = $('#a'+i).val();
+					}
+					i+=1
+				}
+				i = 1;	
+				for(var key in selected_relations)
+				{
+					if($('#r'+i).val() == "")
+					{
+						$('#r'+i).css('border-color','red');
+						flag = false;
+					}
+					else
+					{
+						selected_relations[key] = $('#r'+i).val();
+					}
+				}
+				if(flag)
+				{
+					console.log(selected_attributes);
+					console.log(selected_relations);
+					attr = JSON.stringify(selected_attributes);
+					reln = JSON.stringify(selected_relations);
+					$.ajax({
+						type: 'GET',
+						url: "{% url 'advanced_search' %}",
+						data:{
+							node_type:$('#nt_drop_down').val(),
+							arr_attributes:attr,
+							arr_relations:reln
+						},
+						success:function(res){
+							// var res_str ='<ul class="small-block-grid-1 medium-block-grid-3 large-block-grid-4">'
+							$('#result').empty();
+							console.log(res);
+							var res_str = '<ul class="small-block-grid-1 medium-block-grid-3 large-block-grid-4">';
+							//alert(med_list[0]['id']['$oid'])
+							var i;
+							for(i = 0; i < res["results"].length; i++){	
+								res_str += '<li class="card-image-wrapper">';
+								// res_str += '{% include "ndf/card_group.html" with ';
+								// res_str += eval('node=res["results"][i]');
+								// res_str += ' %}';
+								res_str += '<p>';
+								res_str += res["results"][i]["name"];
+								res_str += "</p";
+								res_str += '</li>';
+								//console.log(res_str);
+								console.log(res["results"][i]);
+								//alert(c);
+								// console.log(c['_source']["id"]["$oid"]);
+							}
+							res_str += '</ul>';
+							$('#result').append(res_str);
+						}
+					});
+				}
+			});
+		});
+	</script>
+	
+	<div id="node_types_col"></div>
+	<div id="attribute_types_col"></div>
+	<div id="relation_types_col"></div>
+	<form id="user_form">
+		<div id="input_attributes"></div>
+		<div id="input_relations"></div>
+		<input id="submit_btn" type="submit" value="Search">
+	</form>
+
+	<div id="result" margin-top="100dp">
+	</div>
+{% endblock %} -->

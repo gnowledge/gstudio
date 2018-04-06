@@ -1,0 +1,86 @@
+{% extends "ndf/base.html" %}
+{% load i18n %}
+{% load ndf_tags %}
+{% block title %} {{title}} {% endblock %}
+{% block concern_information %}
+<script src="/static/ndf/js/jquery-3.1.1.min.js"></script>
+<script src="/static/ndf/bower_components/waypoints/lib/jquery.waypoints.min.js"></script>
+<script src="/static/ndf/bower_components/waypoints/lib/shortcuts/infinite.min.js"></script>
+{% endblock %}
+{% block related_content %}
+
+<form {% if groupid %} action="{% url 'advanced_search' groupid %}" {% else %} action="" {% endif %}
+                       id="a_search_form" name="a_search_form" method="GET" >
+
+	<select id="field_list" name="field_list">
+	 	<option value="content">No description</option>
+	  	<option value="tags">No tags</option>
+	  	<option value="location">No location</option>
+	  	<option value="true">hindi desc but language is in english </option>
+	  	<option value="attribute_type_set">Teaches </option>
+
+	</select>
+	<button type="submit" value="search"> Search </button>
+	<input type="hidden" name="chk_advanced_search" value="true">
+	<input type="hidden" name="search_text" value="ल">
+
+
+</form>
+
+{% endblock %}
+
+{% if chk_advanced_search %}
+
+	{% block body_content %} 
+	<hr>
+	      <div id="results" width="100%" style="position:relative">
+	      
+	      
+	      </div>
+
+		<div class="infinite-container">
+		  <span class="infinite-item">
+		    <div id="pages">
+		        <ul class="small-block-grid-5 medium-block-grid-3 large-block-grid-5" >
+
+		          {% for each in search_curr %}
+		            <li class="card-image-wrapper" >
+		            {% if GSTUDIO_ELASTIC_SEARCH == True and if_teaches != True %}
+		              
+		                {% include 'ndf/simple_card.html' with  no_footer=True resource=each url_name="page_details" first_arg=groupid second_arg=each.id %}
+		              </span>
+		            {% else %}
+		              {% include 'ndf/simple_card.html' with  no_footer=True resource=each url_name="page_details" first_arg=groupid second_arg=each%}
+		            {%endif%}
+		            </li>
+		          {% endfor %}
+		        </ul>
+		          {% if not search_curr %}
+		           <b> No results found  </b>
+		          {% endif %}
+		    </div>
+		  </span>
+		</div>
+		<div class="loading" style="display: none;">
+		  Loading...
+		</div>
+		{% if has_next %}
+		  <span class="infinite-more-link" href="?page_no={{page_no}}&field_list={{field_list}}&chk_advanced_search={{chk_advanced_search}}"></span>
+		{% endif %}
+	<hr>
+
+	<script>
+	  var infinite = new Waypoint.Infinite({
+	    element: $('.infinite-container')[0],
+	    onBeforePageLoad: function () {
+	      $('.loading').show();
+	    },
+	    onAfterPageLoad: function ($items) {
+	      $('.loading').hide();
+	    }
+	  });
+	</script>
+
+	{% endblock %}
+{% endif%}
+

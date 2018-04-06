@@ -1,0 +1,753 @@
+{
+	"settings": {
+		"index.mapping.total_fields.limit": 10000, 
+		"number_of_shards": 5,
+		"number_of_replicas": 2,
+        "index.mapping.ignore_malformed": true,
+		"analysis": {
+			"analyzer": {
+				"trigram": {
+					"type": "custom",
+					"tokenizer": "standard",
+					"stopwords": "_english_",
+					"filter": [
+						"standard",
+						"lowercase",
+						"shingle"
+					],
+					"char_filter": ["html_strip"]
+				}
+			},
+			"filter": {
+				"shingle": {
+					"type": "shingle",
+					"min_shingle_size": 2,
+					"max_shingle_size": 3
+				}
+			}
+		}
+	},
+	"mappings": {
+		"filehive": {
+			"properties": {
+				"name": {
+					"type": "text",
+					"fields": {
+						"trigram": {
+							"type": "text",
+							"analyzer": "trigram"
+						}
+					}
+				},
+				"altnames":{
+					"type": "text",
+					"fields": {
+						"trigram": {
+							"type": "text",
+							"analyzer": "trigram"
+						}
+					}
+				},
+				"content": {
+					"type": "text",
+					"fields": {
+						"trigram": {
+							"type": "text",
+							"analyzer": "trigram"
+						}
+					}
+				},
+				"tags": {
+					"type": "text",
+					"fields": {
+						"trigram": {
+							"type": "text",
+							"analyzer": "trigram"
+						}
+					}
+				}
+			}
+		},
+		"gattribute": {		
+			"properties": {
+				"name": {
+					"type": "text",
+					"fields": {
+						"trigram": {
+							"type": "text",
+							"analyzer": "trigram"
+						}
+					}
+				},
+				"altnames":{
+					"type": "text",
+					"fields": {
+						"trigram": {
+							"type": "text",
+							"analyzer": "trigram"
+						}
+					}
+				},
+				"content": {
+					"type": "text",
+					"fields": {
+						"trigram": {
+							"type": "text",
+							"analyzer": "trigram"
+						}
+					}
+				},
+				"tags": {
+					"type": "text",
+					"fields": {
+						"trigram": {
+							"type": "text",
+							"analyzer": "trigram"
+						}
+					}
+				}
+			}
+		},
+		"grelation": {		
+			"properties": {
+				"name": {
+					"type": "text",
+					"fields": {
+						"trigram": {
+							"type": "text",
+							"analyzer": "trigram"
+						}
+					}
+				},
+				"altnames":{
+					"type": "text",
+					"fields": {
+						"trigram": {
+							"type": "text",
+							"analyzer": "trigram"
+						}
+					}
+				},
+				"content": {
+					"type": "text",
+					"fields": {
+						"trigram": {
+							"type": "text",
+							"analyzer": "trigram"
+						}
+					}
+				},
+				"tags": {
+					"type": "text",
+					"fields": {
+						"trigram": {
+							"type": "text",
+							"analyzer": "trigram"
+						}
+					}
+				}
+			}
+		},
+		"buddy": {		
+			"properties": {
+				"name": {
+					"type": "text",
+					"fields": {
+						"trigram": {
+							"type": "text",
+							"analyzer": "trigram"
+						}
+					}
+				},
+				"altnames":{
+					"type": "text",
+					"fields": {
+						"trigram": {
+							"type": "text",
+							"analyzer": "trigram"
+						}
+					}
+				},
+				"content": {
+					"type": "text",
+					"fields": {
+						"trigram": {
+							"type": "text",
+							"analyzer": "trigram"
+						}
+					}
+				},
+				"tags": {
+					"type": "text",
+					"fields": {
+						"trigram": {
+							"type": "text",
+							"analyzer": "trigram"
+						}
+					}
+				}
+			}
+		},
+		"benchmark": {		
+			"properties": {
+				"name": {
+					"type": "text",
+					"fields": {
+						"trigram": {
+							"type": "text",
+							"analyzer": "trigram"
+						}
+					}
+				},
+				"altnames":{
+					"type": "text",
+					"fields": {
+						"trigram": {
+							"type": "text",
+							"analyzer": "trigram"
+						}
+					}
+				},
+				"content": {
+					"type": "text",
+					"fields": {
+						"trigram": {
+							"type": "text",
+							"analyzer": "trigram"
+						}
+					}
+				},
+				"tags": {
+					"type": "text",
+					"fields": {
+						"trigram": {
+							"type": "text",
+							"analyzer": "trigram"
+						}
+					}
+				}
+			}
+		},
+		"metatype": {		
+			"properties": {
+				"name": {
+					"type": "text",
+					"fields": {
+						"trigram": {
+							"type": "text",
+							"analyzer": "trigram"
+						}
+					}
+				},
+				"altnames":{
+					"type": "text",
+					"fields": {
+						"trigram": {
+							"type": "text",
+							"analyzer": "trigram"
+						}
+					}
+				},
+				"content": {
+					"type": "text",
+					"fields": {
+						"trigram": {
+							"type": "text",
+							"analyzer": "trigram"
+						}
+					}
+				},
+				"tags": {
+					"type": "text",
+					"fields": {
+						"trigram": {
+							"type": "text",
+							"analyzer": "trigram"
+						}
+					}
+				}
+			}
+		},
+		"gsystemtype": {		
+			"properties": {
+				"name": {
+					"type": "text",
+					"fields": {
+						"trigram": {
+							"type": "text",
+							"analyzer": "trigram"
+						}
+					}
+				},
+				"altnames":{
+					"type": "text",
+					"fields": {
+						"trigram": {
+							"type": "text",
+							"analyzer": "trigram"
+						}
+					}
+				},
+				"content": {
+					"type": "text",
+					"fields": {
+						"trigram": {
+							"type": "text",
+							"analyzer": "trigram"
+						}
+					}
+				},
+				"tags": {
+					"type": "text",
+					"fields": {
+						"trigram": {
+							"type": "text",
+							"analyzer": "trigram"
+						}
+					}
+				}
+			}
+		},		
+		"relationtype": {		
+			"properties": {
+				"name": {
+					"type": "text",
+					"fields": {
+						"trigram": {
+							"type": "text",
+							"analyzer": "trigram"
+						}
+					}
+				},
+				"altnames":{
+					"type": "text",
+					"fields": {
+						"trigram": {
+							"type": "text",
+							"analyzer": "trigram"
+						}
+					}
+				},
+				"content": {
+					"type": "text",
+					"fields": {
+						"trigram": {
+							"type": "text",
+							"analyzer": "trigram"
+						}
+					}
+				},
+				"tags": {
+					"type": "text",
+					"fields": {
+						"trigram": {
+							"type": "text",
+							"analyzer": "trigram"
+						}
+					}
+				}
+			}
+		},
+		"attributetype": {		
+			"properties": {
+				"name": {
+					"type": "text",
+					"fields": {
+						"trigram": {
+							"type": "text",
+							"analyzer": "trigram"
+						}
+					}
+				},
+				"altnames":{
+					"type": "text",
+					"fields": {
+						"trigram": {
+							"type": "text",
+							"analyzer": "trigram"
+						}
+					}
+				},
+				"content": {
+					"type": "text",
+					"fields": {
+						"trigram": {
+							"type": "text",
+							"analyzer": "trigram"
+						}
+					}
+				},
+				"tags": {
+					"type": "text",
+					"fields": {
+						"trigram": {
+							"type": "text",
+							"analyzer": "trigram"
+						}
+					}
+				}
+			}
+		},
+		"gsystem": {		
+			"properties": {
+				"name": {
+					"type": "text",
+					"fields": {
+						"trigram": {
+							"type": "text",
+							"analyzer": "trigram"
+						}
+					}
+				},
+				"altnames":{
+					"type": "text",
+					"fields": {
+						"trigram": {
+							"type": "text",
+							"analyzer": "trigram"
+						}
+					}
+				},
+				"content": {
+					"type": "text",
+					"fields": {
+						"trigram": {
+							"type": "text",
+							"analyzer": "trigram"
+						}
+					}
+				},
+				"tags": {
+					"type": "text",
+					"fields": {
+						"trigram": {
+							"type": "text",
+							"analyzer": "trigram"
+						}
+					}
+				}
+			}
+		},
+		"group": {		
+			"properties": {
+				"name": {
+					"type": "text",
+					"fields": {
+						"trigram": {
+							"type": "text",
+							"analyzer": "trigram"
+						}
+					}
+				},
+				"altnames":{
+					"type": "text",
+					"fields": {
+						"trigram": {
+							"type": "text",
+							"analyzer": "trigram"
+						}
+					}
+				},
+				"content": {
+					"type": "text",
+					"fields": {
+						"trigram": {
+							"type": "text",
+							"analyzer": "trigram"
+						}
+					}
+				},
+				"tags": {
+					"type": "text",
+					"fields": {
+						"trigram": {
+							"type": "text",
+							"analyzer": "trigram"
+						}
+					}
+				}
+			}
+		},
+		"toreducedocs": {		
+			"properties": {
+				"name": {
+					"type": "text",
+					"fields": {
+						"trigram": {
+							"type": "text",
+							"analyzer": "trigram"
+						}
+					}
+				},
+				"altnames":{
+					"type": "text",
+					"fields": {
+						"trigram": {
+							"type": "text",
+							"analyzer": "trigram"
+						}
+					}
+				},
+				"content": {
+					"type": "text",
+					"fields": {
+						"trigram": {
+							"type": "text",
+							"analyzer": "trigram"
+						}
+					}
+				},
+				"tags": {
+					"type": "text",
+					"fields": {
+						"trigram": {
+							"type": "text",
+							"analyzer": "trigram"
+						}
+					}
+				}
+			}
+		},
+		"author": {		
+			"properties": {
+				"name": {
+					"type": "text",
+					"fields": {
+						"trigram": {
+							"type": "text",
+							"analyzer": "trigram"
+						}
+					}
+				},
+				"altnames":{
+					"type": "text",
+					"fields": {
+						"trigram": {
+							"type": "text",
+							"analyzer": "trigram"
+						}
+					}
+				},
+				"content": {
+					"type": "text",
+					"fields": {
+						"trigram": {
+							"type": "text",
+							"analyzer": "trigram"
+						}
+					}
+				},
+				"tags": {
+					"type": "text",
+					"fields": {
+						"trigram": {
+							"type": "text",
+							"analyzer": "trigram"
+						}
+					}
+				}
+			}
+		},
+		"counter": {		
+			"properties": {
+				"name": {
+					"type": "text",
+					"fields": {
+						"trigram": {
+							"type": "text",
+							"analyzer": "trigram"
+						}
+					}
+				},
+				"altnames":{
+					"type": "text",
+					"fields": {
+						"trigram": {
+							"type": "text",
+							"analyzer": "trigram"
+						}
+					}
+				},
+				"content": {
+					"type": "text",
+					"fields": {
+						"trigram": {
+							"type": "text",
+							"analyzer": "trigram"
+						}
+					}
+				},
+				"tags": {
+					"type": "text",
+					"fields": {
+						"trigram": {
+							"type": "text",
+							"analyzer": "trigram"
+						}
+					}
+				}
+			}
+		},
+		"image": {		
+			"properties": {
+				"name": {
+					"type": "text",
+					"fields": {
+						"trigram": {
+							"type": "text",
+							"analyzer": "trigram"
+						}
+					}
+				},
+				"altnames":{
+					"type": "text",
+					"fields": {
+						"trigram": {
+							"type": "text",
+							"analyzer": "trigram"
+						}
+					}
+				},
+				"content": {
+					"type": "text",
+					"fields": {
+						"trigram": {
+							"type": "text",
+							"analyzer": "trigram"
+						}
+					}
+				},
+				"tags": {
+					"type": "text",
+					"fields": {
+						"trigram": {
+							"type": "text",
+							"analyzer": "trigram"
+						}
+					}
+				}
+			}
+		},
+		"audio": {		
+			"properties": {
+				"name": {
+					"type": "text",
+					"fields": {
+						"trigram": {
+							"type": "text",
+							"analyzer": "trigram"
+						}
+					}
+				},
+				"altnames":{
+					"type": "text",
+					"fields": {
+						"trigram": {
+							"type": "text",
+							"analyzer": "trigram"
+						}
+					}
+				},
+				"content": {
+					"type": "text",
+					"fields": {
+						"trigram": {
+							"type": "text",
+							"analyzer": "trigram"
+						}
+					}
+				},
+				"tags": {
+					"type": "text",
+					"fields": {
+						"trigram": {
+							"type": "text",
+							"analyzer": "trigram"
+						}
+					}
+				}
+			}
+		},
+		"video": {		
+			"properties": {
+				"name": {
+					"type": "text",
+					"fields": {
+						"trigram": {
+							"type": "text",
+							"analyzer": "trigram"
+						}
+					}
+				},
+				"altnames":{
+					"type": "text",
+					"fields": {
+						"trigram": {
+							"type": "text",
+							"analyzer": "trigram"
+						}
+					}
+				},
+				"content": {
+					"type": "text",
+					"fields": {
+						"trigram": {
+							"type": "text",
+							"analyzer": "trigram"
+						}
+					}
+				},
+				"tags": {
+					"type": "text",
+					"fields": {
+						"trigram": {
+							"type": "text",
+							"analyzer": "trigram"
+						}
+					}
+				}
+			}
+		},
+		"application": {		
+			"properties": {
+				"name": {
+					"type": "text",
+					"fields": {
+						"trigram": {
+							"type": "text",
+							"analyzer": "trigram"
+						}
+					}
+				},
+				"altnames":{
+					"type": "text",
+					"fields": {
+						"trigram": {
+							"type": "text",
+							"analyzer": "trigram"
+						}
+					}
+				},
+				"content": {
+					"type": "text",
+					"fields": {
+						"trigram": {
+							"type": "text",
+							"analyzer": "trigram"
+						}
+					}
+				},
+				"tags": {
+					"type": "text",
+					"fields": {
+						"trigram": {
+							"type": "text",
+							"analyzer": "trigram"
+						}
+					}
+				}
+			}
+		}
+
+    }
+}

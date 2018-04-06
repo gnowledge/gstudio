@@ -68,6 +68,11 @@ at_apps_list = node_collection.one({
 translation_set=[]
 check=[]
 
+
+@register.filter(name='get')
+def get(d, k):
+	return d.get(k, None)
+
 @get_execution_time
 @register.assignment_tag
 def get_site_registration_variable_visibility(registration_variable=None):
@@ -134,7 +139,11 @@ def get_site_variables():
 	site_var['ENABLE_USER_DASHBOARD'] = GSTUDIO_ENABLE_USER_DASHBOARD
 	site_var['BUDDY_LOGIN'] = GSTUDIO_BUDDY_LOGIN
 	site_var['INSTITUTE_ID'] = GSTUDIO_INSTITUTE_ID
-	site_var['HEADER_LANGUAGES'] = HEADER_LANGUAGES
+
+	#site_var['HEADER_LANGUAGES'] = HEADER_LANGUAGES
+	site_var['GSTUDIO_ELASTIC_SEARCH'] = GSTUDIO_ELASTIC_SEARCH
+
+
 
 	cache.set('site_var', site_var, 60 * 30)
 
