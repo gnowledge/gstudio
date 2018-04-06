@@ -95,58 +95,21 @@ def landing_page(request):
     '''
     is_video = request.GET.get('is_video', "")
 
-    try:
-        group_id = ObjectId('home')
-    except:
-        group_name, group_id = get_group_name_id('home')
+    group_name, group_id = get_group_name_id('home')
 
 
-    group_count = node_collection.find({"_type":"Group"})
-    group_count = group_count.count()
+    group_count = node_collection.find({"_type":"Group"}).count()
 
-    author_count = node_collection.find({"_type":"Author"})
-    author_count = author_count.count()
+    author_count = node_collection.find({"_type":"Author"}).count()
 
     GST_FILE = node_collection.one({'_type':'GSystemType', 'name': "File"})
     GST_JSMOL = node_collection.one({"_type":"GSystemType","name":"Jsmol"})
 
-    files = node_collection.find({
-                                    # 'member_of': {'$in': [GST_FILE._id, GST_PAGE._id]},
+    files_count = node_collection.find({
                                     'member_of': {'$in': [GST_FILE._id,GST_JSMOL._id]},
-                                    # '_type': 'File',
-                                    # 'fs_file_ids': {'$ne': []},
-                                    'group_set': {'$all': [ObjectId('55ab34ff81fccb4f1d806025')]},
-                                    '$and': [{'attribute_set.educationaluse': {'$ne': 'eBooks'}}],
-                                    '$or': [
-                                            { 'access_policy': u"PUBLIC" },
-                                            { '$and': [
-                                                        {'access_policy': u"PRIVATE"},
-                                                        {'created_by': request.user.id}
-                                                    ]
-                                            }
-                                        ]
-                                    }).sort("last_update", -1)
+                                    'group_set': {'$all': [group_id]},
+                                    }).sort("last_update", -1).count()
 
-    educationaluse_stats = {}
-
-    if files:
-        eu_list = []  # count
-        for each in files:
-            eu_list += [i.get("educationaluse") for i in each.attribute_set if i.has_key("educationaluse")]
-
-        files.rewind()
-
-        if set(eu_list):
-            if len(set(eu_list)) > 1:
-                educationaluse_stats = dict((x, eu_list.count(x)) for x in set(eu_list))
-            elif len(set(eu_list)) == 1:
-                educationaluse_stats = { eu_list[0]: eu_list.count(eu_list[0])}
-            educationaluse_stats["all"] = files.count()
-        
-
-        # print educationaluse_stats
-        result_paginated_cur = files
-    files_count= files.count()
 
 
     if (GSTUDIO_SITE_LANDING_PAGE == "home") and (GSTUDIO_SITE_NAME == "NROER"):
