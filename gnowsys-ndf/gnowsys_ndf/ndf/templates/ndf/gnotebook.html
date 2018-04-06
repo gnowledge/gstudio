@@ -17,7 +17,7 @@
       <input type="hidden"  class="title-for-filters" value="notebook_lms">
         {% get_course_filters group_id "notebook_lms" as filter_dict %}
       {% endif %}
-        <div style="margin-left:-715px;">
+        <div class="filter-position">
             {% include "ndf/filters.html" with filter_dict=filter_dict %}
         </div>
 
