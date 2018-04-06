@@ -83,7 +83,7 @@
             <div class="small-3 columns page-name">
             {% include 'ndf/rating.html' with node=asset_obj %}
             </div>
-            <form >
+
             <!-- tags -->
             <div class="small-10 columns left">
                  {% if asset_obj.tags %}
@@ -123,17 +123,16 @@
                 <label>
                     {% if edit or not asset_obj %}
                         {% if title == "raw material"  or 'raw@material' in asset_obj.tags %}
-                            {% trans "Resource Name" %}  <h9 style="color: red;" id="req2"></h9>
+                            {% trans "Resource Name" %}  
 
                         {% elif title == "gallery"  or 'asset@gallery' in asset_obj.tags %}
-                             {% trans "Folder Name" %}  <h9 style="color: red;" id="req2"></h9> 
+                             {% trans "Folder Name" %}  
 
                         {% else %}
-                       {% trans "Asset Name:" %} {% endif %}<h9 style="color: red;">*</h9> <h9 style="color: red;" id="req2"></h9>
-                       <input type="text" placeholder="" class="required" id = "asset-name" name="asset_unique_name" value="{% if asset_obj %} {{asset_obj.name}}{% endif %}" required/>
-                       
-                        {% trans "Display Name:" %}  <h9 style="color: red;">*</h9> <h9 style="color: red;" id="req3"></h9>
-                       <input type="text" placeholder="" class="required" id = "asset-disp-name" name="asset_display_name" value="{% if asset_obj %} {{asset_obj.altnames}}{% endif %}" required />
+                       {% trans "Asset Name:" %} {% endif %}<h9 style="color: red;">*</h9> 
+                       <input type="text" placeholder="" class="required" id = "asset-name" name="asset_unique_name" value="{% if asset_obj %} {{asset_obj.name}}{% endif %}"/>
+                       {% trans "Display Name:" %}  <h9 style="color: red;">*</h9> 
+                       <input type="text" placeholder="" class="required" id = "asset-disp-name" name="asset_display_name" value="{% if asset_obj %} {{asset_obj.altnames}}{% endif %}"/>
 
 
                     {% endif %}
@@ -148,14 +147,14 @@
             <label>
 
                     {% if title == "raw material"  or 'raw@material' in asset_obj.tags %}
-                        {% trans "Resource Description" %} <h9 style="color: red;" id="req1"></h9>
+                        {% trans "Resource Description" %}
 
                     {% elif title == "gallery"  or 'asset@gallery' in asset_obj.tags %}
-                         {% trans "Folder Description" %}  <h9 style="color: red;" id="req1"></h9>
+                         {% trans "Folder Description" %}
                     {% else %}
 
-                    {% trans "Asset description" %} {% endif %} <h9 style="color: red;">* </h9 \t> <h9 style="color: red;" id="req1"></h9>
-                    <textarea rows="4" cols="2" class="small-12 columns" placeholder="Enter Description" id="asset-descid" value='' required>{% if asset_obj %} {{asset_obj.content|safe|striptags}}{% endif %}</textarea>
+                    {% trans "Asset description" %} {% endif %} <h9 style="color: red;">*</h9>
+                    <textarea rows="4" cols="2" class="small-12 columns" placeholder="Enter Description" id="asset-descid" value='' >{% if asset_obj %} {{asset_obj.content|safe|striptags}}{% endif %}</textarea>
             </label>
             </div>
         </div>
@@ -231,7 +230,7 @@
         </div>
 
         <button type="submit" class="button-save-new save-asset" data-asset_id='{{asset_obj.pk}}' style="margin-top: 9px;margin-right: -150px;">{% trans "Save" %}</button>
-        </form>
+        
         {% endif %}
 
     <div class="asset-content-area"{% if not asset_obj %} style="display:none"{% endif %}>
@@ -243,7 +242,7 @@
             <div class="row">
                 <div class="small-8 medium-6 large-6 columns">
                 <form class="dropzone" id ="docPost" enctype="multipart/form-data" method="post" action="{% url 'add_assetcontent' group_id %}" style="margin-left: -13px;width: 429px;" > {% csrf_token %}
-                    <label>{% trans "Enter File Name" %} <h9 style="color: red;" id= "req">*</h9>
+                    <label>{% trans "Enter File Name" %} <h9 style="color: red;">*</h9>
                         <input type="text" placeholder="Enter File name" class="required" id = "asset_content_name" name="name" style="padding-bottom: 10px;margin-bottom: 31px;"/>
                     </label>
                         <input type="file" id="docFile" class="asset_content_upload" placeholder="" name="filehive"/>
@@ -435,21 +434,7 @@
     $( ".save-asset" ).click(function(event) {
         updateAllTags();
         coll_arr = []
-     if($('#asset-name').val().length==0)
-          {
-          $('#req2').html("* This is a required field");
-          }
-            
-     else if ($('#asset-disp-name').val().length==0)
-      	  {
-      	  $('#req3').html(" This is a required field *");
-      	  }
-
-     else if($('#asset-descid').val().length==0)
-          {
-          $('#req1').html("* This is a required field");
-          }
-      
+           
 
     // If x is Not a Number or less than one or greater than 10
 
@@ -485,10 +470,7 @@
         asset_disp_name = $("#asset-disp-name").val();
         asset_description = $("#asset-descid").val();
         var asset_id = $(this).attr('data-asset_id');
-       
-
-
-      
+           
          if (asset_name != '' && asset_description != ''){
             $.ajax({
                   type: "POST",
