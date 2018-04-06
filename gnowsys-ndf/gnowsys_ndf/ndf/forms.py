@@ -3,7 +3,7 @@ import json
 from django import forms
 from django_mongokit.forms import DocumentForm
 from django.contrib.auth.forms import PasswordChangeForm, SetPasswordForm
-from gnowsys_ndf.settings import GSTUDIO_DOCUMENT_MAPPING
+#from gnowsys_ndf.settings import GSTUDIO_DOCUMENT_MAPPING
 
 from models import Node
 from models import GSystemType

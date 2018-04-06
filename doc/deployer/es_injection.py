@@ -150,16 +150,16 @@ def main():
         temp = []
 
 
-
-        if (not es.indices.exists(index.lower())):
-            if (index.lower() == "triples"):
-                res = es.indices.create(index=index.lower(), body=triples_body)
+        index_lower = index.lower()
+        if (not es.indices.exists(index_lower)):
+            if (index_lower == "triples"):
+                res = es.indices.create(index=index_lower, body=triples_body)
             else:
-                res = es.indices.create(index=index.lower(), body=request_body)
+                res = es.indices.create(index=index_lower, body=request_body)
 
-        if (es.indices.exists(index.lower())):
+        if (es.indices.exists(index_lower)):
 
-            res = es.search(index=index.lower(), body={"query": {"match_all": {}}, "_source": ["id"]}, scroll="1m", size="10")
+            res = es.search(index=index_lower, body={"query": {"match_all": {}}, "_source": ["id"]}, scroll="1m", size="10")
 
             scrollid = res['_scroll_id']
 
@@ -175,56 +175,56 @@ def main():
                 res = es.scroll(scrollid, scroll="1m")
 
 
-            if(index.lower() == "nodes"):
+            if(index_lower == "nodes"):
                 nodes = node_collection.find({ '_id': {'$nin': temp} }).batch_size(5)
 
                 if(nodes.count() == 0):
-                    print("All "+ index.lower() +" documents has injected to elasticsearch")
+                    print("All "+ index_lower +" documents has injected to elasticsearch")
                     continue
                 else:
-                    index_docs(nodes, index.lower(), doc_type)
+                    index_docs(nodes, index_lower, doc_type)
 
-            elif (index.lower() == "triples"):
+            elif (index_lower == "triples"):
                 triples = triple_collection.find({ '_id': {'$nin': temp} }).batch_size(5)
                 if (triples.count() == 0):
-                    print("All " + index.lower() + " documents has injected to elasticsearch")
+                    print("All " + index_lower + " documents has injected to elasticsearch")
                     continue
                 else:
                     # f = open("/data/triples.txt", "w")
                     # os.chmod("/data/triples.txt", 0o777)
-                    index_docs(triples, index.lower(), doc_type)
+                    index_docs(triples, index_lower, doc_type)
 
-            elif (index.lower() == "benchmarks"):
+            elif (index_lower == "benchmarks"):
                 benchmarks = benchmark_collection.find({ '_id': {'$nin': temp} }).batch_size(5)
                 if (benchmarks.count() == 0):
-                    print("All " + index.lower() + " documents has injected to elasticsearch")
+                    print("All " + index_lower + " documents has injected to elasticsearch")
                     continue
                 else:
-                    index_docs(benchmarks, index.lower(), doc_type)
+                    index_docs(benchmarks, index_lower, doc_type)
 
-            elif (index.lower() == "filehives"):
+            elif (index_lower == "filehives"):
                 filehives = filehive_collection.find({ '_id': {'$nin': temp} }).batch_size(5)
                 if (filehives.count() == 0):
-                    print("All " + index.lower() + " documents has injected to elasticsearch")
+                    print("All " + index_lower + " documents has injected to elasticsearch")
                     continue
                 else:
-                    index_docs(filehives, index.lower(), doc_type)
+                    index_docs(filehives, index_lower, doc_type)
                     
-            elif (index.lower() == "buddies"):
+            elif (index_lower == "buddies"):
                 buddys = buddy_collection.find({ '_id': {'$nin': temp} }).batch_size(5)
                 if (buddys.count() == 0):
-                    print("All " + index.lower() + " documents has injected to elasticsearch")
+                    print("All " + index_lower + " documents has injected to elasticsearch")
                     continue
                 else:
-                    index_docs(buddys, index.lower(), doc_type)
+                    index_docs(buddys, index_lower, doc_type)
 
-            elif (index.lower() == "counters"):
+            elif (index_lower == "counters"):
                 counters = counter_collection.find({ '_id': {'$nin': temp} }).batch_size(5)
                 if (counters.count() == 0):
-                    print("All " + index.lower() + " documents has injected to elasticsearch")
+                    print("All " + index_lower + " documents has injected to elasticsearch")
                     continue
                 else:
-                    index_docs(counters, index.lower(), doc_type)
+                    index_docs(counters, index_lower, doc_type)
 
 
             #print(res['_scroll_id'])
@@ -243,7 +243,7 @@ def main():
                     # DELETING existing/old indexes
 
                     # for index in GSTUDIO_ELASTIC_SEARCH_INDEX.keys():
-                    # if (es.indices.exists(index.lower())):
+                    # if (es.indices.exists(index_lower)):
                     #   print("Deleting the existing index: " + index.lower() + " for reindexing")
                     #   res = es.indices.delete(index=index.lower())
                     #   print("The delete response is %s " % res)
