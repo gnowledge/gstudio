@@ -454,7 +454,7 @@
 
       <!-- =========| divider between two nav's/header's |=========== -->
 
-
+       
       <!-- start of second nav  or group level header-->
       {% if site.SECOND_LEVEL_HEADER %}
 
@@ -465,12 +465,15 @@
 
 
       <div class="contain-to-grid {% if request.path != '/welcome' %}{% if group_object.edit_policy != 'EDITABLE_MODERATED' %}{% if not is_ac_url %}sticky{% endif %}{% endif %}{% endif %}" id="group-level-header">
-        {% comment %}
+
+      <!--remove secondary header for activity page-->  
+      {% comment %}
         <nav class="top-bar" id="second-header" data-topbar data-options="sticky_on: large" role="navigation">
         <!-- don't show this app bar for groups with editable moderated -->
         {% if "ModeratingGroup" not in group_object.member_of_names_list %}
           {% if not is_ac_url %}
             {% if request.path != "/welcome" %}
+              
               <!-- #{#% cache 3600 group_header request.LANGUAGE_CODE request.path request.user.username %} -->
               <ul class="title-area text-center">
                 <li class="name" title="{% firstof  group_object.altnames group_object.name %}">
@@ -491,10 +494,12 @@
                 </li>
                 <li>
                 </li>
+                
                 <!-- Remove the class "menu-icon" to get rid of menu icon. Take out "Menu" to just have icon alone -->
+              
                 <li class="toggle-topbar menu-icon"><a href="#"><span>{% trans "APPS" %}</span></a></li>
               </ul>
-
+               
               <section class="top-bar-section">
                 <!-- Right Nav Section -->
 
@@ -513,6 +518,7 @@
                         {% else %}
 
                           {% if site.SITE_NAME == "NROER" and user.is_superuser  %}
+                              
                             <a title="Find Latest Updates in {{ group_object.name }}" href="{% url 'group_dashboard' group_object.name %}">
                               <i class="fi-results"></i> {% trans "Updates" %}
                             </a>
@@ -521,6 +527,7 @@
                                 <i class="fi-rss"></i>
                               </a>
                             </li>
+                              
                           {% endif %}
                           {% if site.SITE_NAME != "NROER"   %}
                             <a title="Find Latest Updates in {{ group_object.name }}" href="{% url 'group_dashboard' group_object.name %}">
@@ -532,7 +539,7 @@
                               </a>
                             </li>
                           {% endif %}
-
+                         
                         {% endif %}
                       {% endif %}
 
@@ -614,18 +621,24 @@
                 </ul>
 
               </section>
+              
               <!-- {#% endcache %} -->
+
             {% endif %} <!-- end of "/welcome" landing page check -->
           {% endif %} <!-- end of "accounts" urls check -->
         {% endif %} <!-- end of "group's edit_policy" urls check -->
         </nav>
-        {% endcomment %}
+
+      {% endcomment %}
+
       </div>
+
       {% endif %} <!-- landing page if -->
 
       {% endif %}
       {% endif %}
       {% endif %}
+       
       <!-- end of second nav -->
 
     {# </div> #}
