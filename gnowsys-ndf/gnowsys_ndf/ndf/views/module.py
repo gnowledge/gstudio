@@ -20,7 +20,7 @@ from gnowsys_ndf.ndf.models import node_collection, triple_collection
 from gnowsys_ndf.ndf.views.group import CreateGroup
 from gnowsys_ndf.ndf.views.methods import get_execution_time, staff_required, create_gattribute,get_language_tuple, delete_gattribute
 from gnowsys_ndf.ndf.views.ajax_views import get_collection
-from gnowsys_ndf.settings import GSTUDIO_RESOURCES_EDUCATIONAL_LEVEL, GSTUDIO_RESOURCES_EDUCATIONAL_SUBJECT
+from gnowsys_ndf.settings import GSTUDIO_RESOURCES_EDUCATIONAL_LEVEL, GSTUDIO_RESOURCES_EDUCATIONAL_SUBJECT, GSTUDIO_PRIMARY_COURSE_LANGUAGE
 from gnowsys_ndf.ndf.templatetags.ndf_tags import check_is_gstaff, get_attribute_value
 gst_module_name, gst_module_id = GSystemType.get_gst_name_id('Module')
 gst_base_unit_name, gst_base_unit_id = GSystemType.get_gst_name_id('base_unit')
@@ -149,7 +149,7 @@ def module_detail(request, group_id, node_id,title=""):
         {'member_of': gst_announced_unit_id}
       ]})
     '''
-    
+    primary_lang_tuple = get_language_tuple(GSTUDIO_PRIMARY_COURSE_LANGUAGE)
     if title == "courses":
         module_detail_query.update({'$or': [
         {'$and': [
@@ -158,9 +158,15 @@ def module_detail(request, group_id, node_id,title=""):
               {'created_by': request.user.id},
               {'group_admin': request.user.id},
               {'author_set': request.user.id},
+              {
+               '$and': [
+                   {'group_type': u'PUBLIC'},
+                   {'language': primary_lang_tuple},
+               ]
+              },
             ]}
         ]},
-        {'member_of': gst_announced_unit_id }
+        #{'member_of': gst_announced_unit_id }
       ]})
 
     
