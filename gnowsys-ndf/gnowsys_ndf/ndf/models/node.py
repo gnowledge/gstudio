@@ -991,6 +991,16 @@ class Node(DjangoDocument):
             self.structure[key] = value['subject_or_object_type']
             self[key] = value['subject_or_right_subject_list']
 
+    @staticmethod
+    def get_names_list_from_obj_id_list(obj_ids_list, node_type):
+        obj_ids_list = map(ObjectId, obj_ids_list)
+        nodes_cur = node_collection.find({
+                                            '_type': node_type,
+                                            '_id': {'$in': obj_ids_list}
+                                        }, {'name': 1})
+        result_list = [node['name'] for node in nodes_cur]
+        return result_list
+
 
 # DATABASE Variables
 node_collection     = db[Node.collection_name].Node
