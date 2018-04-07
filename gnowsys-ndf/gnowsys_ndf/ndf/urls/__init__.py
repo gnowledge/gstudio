@@ -57,11 +57,11 @@ urlpatterns = patterns('',
     # url(r'^esearch/get_mapping_json/(?P<json_type>[^/]+)/?$', '', name=''),
     # --END of Elastic Search
 
-    url(r'^autocompletion/', include('gnowsys_ndf.ndf.urls.autocompletion')),
+    # url(r'^autocompletion/', include('gnowsys_ndf.ndf.urls.autocompletion')),
     url(r'^captcha/', include('captcha.urls')),
     (r'^', include('gnowsys_ndf.ndf.urls.captcha')),
-    # advanced search using ES
-    (r'^(?P<group_id>[^/]+)/advanced_search/', include('gnowsys_ndf.ndf.urls.advanced_search')),
+    # # advanced search using ES
+    # (r'^(?P<group_id>[^/]+)/advanced_search/', include('gnowsys_ndf.ndf.urls.advanced_search')),
     # all main apps
 
     (r'^(?P<group_id>[^/]+)/mailclient', include('gnowsys_ndf.ndf.urls.mailclient')),
