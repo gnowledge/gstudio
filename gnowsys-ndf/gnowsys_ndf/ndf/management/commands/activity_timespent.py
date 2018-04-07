@@ -18,11 +18,7 @@ try:
 except Exception, e:
     from gnowsys_ndf.settings import GSTUDIO_INSTITUTE_ID, GSTUDIO_INSTITUTE_ID_SECONDARY, GSTUDIO_INSTITUTE_NAME
 
-def activity_details(group_id, username):
-    group_obj = get_group_name_id(group_id, get_obj=True)
-    group_name = group_obj.name
-    if group_obj.altnames:
-        group_name = group_obj.altnames
+def activity_details(username):
     user_obj = None
     username = unicode(username.strip())
     try:
@@ -30,9 +26,9 @@ def activity_details(group_id, username):
     except Exception as no_user:
         print "\n No user found with this {0}".format(username)
 
-    if group_obj and user_obj:
+    if user_obj:
         dt = "{:%Y%m%d-%Hh%Mm}".format(datetime.datetime.now())
-        file_name = GSTUDIO_INSTITUTE_ID + '-' + slugify(group_name) + '-' + username+ '-' + dt + '.csv'
+        file_name = GSTUDIO_INSTITUTE_ID + '-' + username+ '-activity-visits-' + dt + '.csv'
 
         GSTUDIO_EXPORTED_CSVS_DIRNAME = 'gstudio-exported-users-analytics-csvs'
         GSTUDIO_EXPORTED_CSVS_DIR_PATH = os.path.join('/data/', GSTUDIO_EXPORTED_CSVS_DIRNAME)
@@ -41,12 +37,12 @@ def activity_details(group_id, username):
             os.makedirs(GSTUDIO_EXPORTED_CSVS_DIR_PATH)
 
         file_name_path = os.path.join(GSTUDIO_EXPORTED_CSVS_DIR_PATH, file_name)
-        column_keys_list = ['Unit', 'VisitedOn', 'Language','Lesson', 'Activity', 'Timespent', 'Buddies']
+        column_keys_list = ['Unit', 'VisitedOn', 'Language','Lesson', 'Activity', 'Timespent', 'Buddies', 'OutAction']
         f = open(file_name_path, 'w')
         w = csv.DictWriter(f, column_keys_list)
         w.writeheader()
 
-        activity_in_regex_pattern = ".*/" + group_id + "/course/activity_player.*"
+        activity_in_regex_pattern = ".*/course/activity_player.*"
         activity_out_regex_pattern = '^/'+group_id+'/course.*|.*my-desk.*|.*explore.*|.*tools/tool-page.*|.*course/content.*'
 
         all_visits = benchmark_collection.find({'calling_url': {'$regex': activity_in_regex_pattern,
@@ -56,7 +52,7 @@ def activity_details(group_id, username):
         
         for ind, each_visit in enumerate(all_visits):
             # print each_visit
-            row_dict = {'Unit': slugify(group_name), 'VisitedOn': 'NA', 'Language': 'NA', 'Lesson': 'NA', 'Activity': 'NA', 'Timespent': 'NA', 'Buddies': 'NA'}
+            row_dict = {'Unit': slugify(group_name), 'VisitedOn': 'NA', 'Language': 'NA', 'Lesson': 'NA', 'Activity': 'NA', 'Timespent': 'NA', 'Buddies': 'NA', 'OutAction': 'NA'}
             visited_on = each_visit['last_update']
             row_dict['VisitedOn'] = str(visited_on)
             locale = each_visit['locale']
@@ -68,20 +64,28 @@ def activity_details(group_id, username):
                 splitted_results = calling_url_str.split('/')
 
                 if len(splitted_results) == 7:
+                    unit_id = splitted_results[1]
                     lesson_id = splitted_results[4]
                     activity_id = splitted_results[5]
+                    unit_node = get_group_name_id(ObjectId(unit_id), get_obj=True)
                     lesson_node = node_collection.one({'_id': ObjectId(lesson_id)})
                     activity_node = node_collection.one({'_id': ObjectId(activity_id)})
                     lesson_name = lesson_node.name
                     activity_name = activity_node.name
-                    row_dict.update({'Lesson': slugify(lesson_name), 'Activity': slugify(activity_name)})
-                    print "\n {0}. Visited On: {1}".format(ind, visited_on) 
-                    print " Language: ", locale
-                    print " Lesson Name: ", lesson_name 
+                    unit_name = unit_node.name
+                    if unit_node.altnames:
+                        unit_name = unit_node.altnames
+                    row_dict.update({'Unit': slugify(unit_name), 'Lesson': slugify(lesson_name), 
+                        'Activity': slugify(activity_name)})
+
                     activity_disp_name = activity_node.name
                     if activity_node.altnames:
                         activity_disp_name = activity_node.altnames
+                    print "\n  Unit: ", unit_name
+                    print " Lesson Name: ", lesson_name
                     print " Activity Name ({0}): {1}".format(activity_node._id, activity_disp_name)
+                    print " {0}. Visited On: {1}".format(ind, visited_on)
+                    print " Language: ", locale
 
                     nav_out_action_cur = benchmark_collection.find({'last_update': {'$gte': each_visit['last_update']}, 
                         '_id': {'$ne': each_visit['_id']}, 'user': username, 
@@ -91,7 +95,7 @@ def activity_details(group_id, username):
                         end_time = nav_out_obj['last_update']
                         timespent = (end_time-visited_on).total_seconds()
                         print " Time spent: ", timespent, " seconds."
-                        row_dict['Timespent'] = str(timespent)
+                        row_dict.update({'Timespent': str(timespent), 'OutAction': nav_out_obj['name']})
                     else:
                         print " ## Unable to track time spent on this activity. ##"
                     buddies_obj = Buddy.query_buddy_obj(user_obj.pk, each_visit['session_key'])
@@ -109,7 +113,7 @@ def activity_details(group_id, username):
 
 class Command(BaseCommand):
     def handle(self, *args, **options):
-        if args and len(args) == 2:
-            activity_details(args[0], args[1])
+        if args and len(args) == 1:
+            activity_details(args[0])
         else:
-            print "\n Please enter arguments"
+            print "\n Please enter username"
