@@ -60,7 +60,9 @@ urlpatterns = patterns('',
     # url(r'^autocompletion/', include('gnowsys_ndf.ndf.urls.autocompletion')),
     url(r'^captcha/', include('captcha.urls')),
     (r'^', include('gnowsys_ndf.ndf.urls.captcha')),
-    # # advanced search using ES
+
+    # advanced search using ES
+
     # (r'^(?P<group_id>[^/]+)/advanced_search/', include('gnowsys_ndf.ndf.urls.advanced_search')),
     # all main apps
 

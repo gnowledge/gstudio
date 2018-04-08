@@ -5090,7 +5090,7 @@ def repository(request, group_id):
         for a in GSTUDIO_NROER_GAPPS:
             for k,v in a.iteritems():
                 if k.lower() == search_text.lower():
-                    print "siddhu"
+                    
                     GSTUDIO_NROER_GAPPS_NEW[k] = v
             
         GSTUDIO_NROER_GAPPS = []

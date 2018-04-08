@@ -13,8 +13,13 @@
 {% elif first_arg %}
   <a class="app-card text-center" href='{% url url_name first_arg %}{{search_url_text|safe}}'>
 {% endif %}
-   <div class="app-card-title"><h4>{% firstof resource.altnames resource.name %}</h4></div>
 
+  {% if lang_code == "hi" %}
+
+    <div class="app-card-title"><h4>{% trans resource.name %}</h4></div>
+  {% else %}
+   <div class="app-card-title"><h4>{% firstof resource.altnames resource.name %}</h4></div>
+  {% endif %}
 
     <div class="app-card-icon" title="{% firstof resource.altnames resource.name %}" >
 <!--{{resource.member_of_names_list}} --> 
@@ -29,8 +34,6 @@
     <div class="app-card-content" title="{{resource.content_org}}">
      {{resource.content_org|default_if_none:"Add some description."|truncatechars:45}}
     </div>   
-</a>
-
-  
+</a>  
 </li>
 </ul>
