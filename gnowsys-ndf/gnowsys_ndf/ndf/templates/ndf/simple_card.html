@@ -138,6 +138,8 @@
      {% endif %}
         {% if GSTUDIO_ELASTIC_SEARCH != True %}
           <i style="float:right">{{resource.created_at|date:"d-m-Y"}}</i>
+        {% elif resource.created_at|cal_length == 13 %}
+          <i style="float:right">{{resource.created_at|convert_date_string_to_date|slice:"10"}}</i>     
         {% else %}
           <i style="float:right">{{resource.created_at|slice:"10"}}</i>
         {% endif %}     
