@@ -361,13 +361,10 @@ pre{
   }
 
   #search-submit{
-    background-color: #fafafa;
+/*    background-color: #fafafa;*/
     // color: gray;
-    top: 10px;
-    position: absolute;
-    left: -30px;
-    opacity: 0.3;
-    color: black;
+    top: -3px;
+
   }
 
   #search-submit:hover {
@@ -8221,3 +8218,34 @@ $module-card-lines-to-show: 3;
   height:100%;
   background: #20ade0;
 }
+
+.searchbar {
+  margin: 0.8rem;
+}
+
+.search-field {
+  width: 0;
+  height: 40px;
+  margin-left: 1rem;
+  padding: 0;
+  border-radius: 50px;
+  border: none;
+  transition: all 0.5s ease;
+}
+
+.expand-search {
+  width: 80%;
+  max-width: calc(80% - 3rem);
+  border: 1px solid #c9c9c9;
+  padding: .5rem;
+}
+
+svg {
+  width: 20px;
+  height: 20px;
+}
+
+.button {
+  border-radius: 50px;
+}
+
