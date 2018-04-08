@@ -400,8 +400,8 @@ class Filehive(DjangoDocument):
                 raise RuntimeError(err)
 
         # data save into ES...
-        #if GSTUDIO_ELASTIC_SEARCH == True:
-        #    esearch.inject(fp)
+        if GSTUDIO_ELASTIC_SEARCH == True:  
+            esearch.inject(fp)
 
         # --- END of storing Filehive JSON in RSC system ---
 
