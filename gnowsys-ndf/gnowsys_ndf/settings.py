@@ -447,6 +447,8 @@ MIDDLEWARE_CLASSES = (
     # gstudio custom middleware(s):
     'gnowsys_ndf.ndf.middleware.SetCookie.UserId',
     'gnowsys_ndf.ndf.middleware.SetData.Author',
+
+    'gnowsys_ndf.ndf.oauth_middleware.test',
     # 'gnowsys_ndf.ndf.middleware.Buddy.BuddySession',
     # 'gnowsys_ndf.ndf.middleware.UserRestrictMiddleware.UserRestrictMiddleware',
 
@@ -516,15 +518,25 @@ INSTALLED_APPS = (
     'memcache_admin',
     'django_mailbox',
     'djcelery',
+    'provider',
+    'provider.oauth2',
     #'dlkit',
     #'dlkit_runtime'
 )
 
-AUTHENTICATION_BACKENDS = (
-    'registration_email.auth.EmailBackend',
-)
+# AUTHENTICATION_BACKENDS = (
+#     'registration_email.auth.EmailBackend',
+# )
 
 ACCOUNT_ACTIVATION_DAYS = 2  # Two days for activation.
+
+###########################
+
+AUTHENTICATION_BACKENDS = (
+    'gnowsys_ndf.ndf.oauth_middleware.MyCustomBackend',
+)
+
+##########################
 
 # A sample logging configuration. The only tangible logging
 # performed by this configuration is to send an email to
