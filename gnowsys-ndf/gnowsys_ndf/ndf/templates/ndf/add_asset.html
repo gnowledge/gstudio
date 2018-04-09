@@ -133,9 +133,9 @@
                              {% trans "Folder Name" %}  
 
                         {% else %}
-                       {% trans "Asset Name:" %} {% endif %}<h9 style="color: red;">*</h9> 
+                       {% trans "Asset Name:" %} {% endif %}<h9 style="color: red;" id="asset_req">*</h9> 
                        <input type="text" placeholder="" class="required" id = "asset-name" name="asset_unique_name" value="{% if asset_obj %} {{asset_obj.name}}{% endif %}"/>
-                       {% trans "Display Name:" %}  <h9 style="color: red;">*</h9> 
+                       {% trans "Display Name:" %}  <h9 style="color: red;" id="display_name">*</h9> 
                        <input type="text" placeholder="" class="required" id = "asset-disp-name" name="asset_display_name" value="{% if asset_obj %} {{asset_obj.altnames}}{% endif %}"/>
 
 
@@ -157,8 +157,8 @@
                          {% trans "Folder Description" %}
                     {% else %}
 
-                    {% trans "Asset description" %} {% endif %} <h9 style="color: red;">*</h9>
-                    <textarea rows="4" cols="2" class="small-12 columns" placeholder="Enter Description" id="asset-descid" value='' >{% if asset_obj %} {{asset_obj.content|safe|striptags}}{% endif %}</textarea>
+                    {% trans "Asset description" %} {% endif %} <h9 style="color: red;" id="asset_description">*</h9>
+                    <textarea rows="4" cols="2" class="small-12 columns" placeholder="Enter Description" id="asset-descid" value='' required/>{% if asset_obj %} {{asset_obj.content|safe|striptags}}{% endif %}</textarea>
             </label>
             </div>
         </div>
@@ -414,8 +414,7 @@
 
     $('#asset-name').keyup(function(){
         //if($(this).val().length !=0 && $('#asset-descid').val().length !=0 && $('#asset-disp-name').val().length !=0 )
-            if($(this).val().length !=0 )
-            $('#req2').html("");	
+            if($(this).val().length !=0 )	
             $('.save-asset').attr('disabled', false);
        // else
            // $('.save-asset').attr('disabled',true);
@@ -424,7 +423,6 @@
     $('#asset-descid').keyup(function(){
        // if($(this).val().length !=0 &&  $('#asset-name').val().length !=0 && $('#asset-disp-name').val().length !=0)
             if($(this).val().length !=0 )
-            $('#req1').html("");
             $('.save-asset').attr('disabled', false);
        // else
            // $('.save-asset').attr('disabled',true);
@@ -432,7 +430,6 @@
     $('#asset-disp-name').keyup(function(){
         //if($(this).val().length !=0 &&  $('#asset-name').val().length !=0 && $('#asset-descid').val().length !=0 )
             if($(this).val().length !=0 )
-            $('#req3').html("");
             $('.save-asset').attr('disabled', false);
         //else
            // $('.save-asset').attr('disabled',true);
@@ -440,7 +437,20 @@
     $( ".save-asset" ).click(function(event) {
         updateAllTags();
         coll_arr = []
-           
+
+        if($('#asset-name').val().length==0)
+        {
+          $('#asset_req').html("Asset Name is required !");
+        }
+        else if ($('#asset-disp-name').val().length==0)
+        {
+          $('#display_name').html(" Display Name is required !");
+        }
+
+        else if($('#asset-descid').val().length==0)
+        {
+          $('#asset_description').html("Asset Description is required !")
+        }   
 
     // If x is Not a Number or less than one or greater than 10
 
