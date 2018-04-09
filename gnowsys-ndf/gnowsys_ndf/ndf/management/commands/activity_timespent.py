@@ -43,16 +43,17 @@ def activity_details(username):
         w.writeheader()
 
         activity_in_regex_pattern = ".*/course/activity_player.*"
-        activity_out_regex_pattern = '^/'+group_id+'/course.*|.*my-desk.*|.*explore.*|.*tools/tool-page.*|.*course/content.*'
+        activity_out_regex_pattern = '.*/course.*|.*my-desk.*|.*explore.*|.*tools/tool-page.*|.*course/content.*'
+        #activity_out_regex_pattern = '^/'+group_id+'/course.*|.*my-desk.*|.*explore.*|.*tools/tool-page.*|.*course/content.*'
 
         all_visits = benchmark_collection.find({'calling_url': {'$regex': activity_in_regex_pattern,
          '$options': "i"}, 'user': username}).sort('last_update', -1)
         
-        print "\nTotal activity-player visits in {0}: {1}".format(group_obj.name, all_visits.count())
+        print "\nTotal activity-player visits: {0}".format(all_visits.count())
         
         for ind, each_visit in enumerate(all_visits):
             # print each_visit
-            row_dict = {'Unit': slugify(group_name), 'VisitedOn': 'NA', 'Language': 'NA', 'Lesson': 'NA', 'Activity': 'NA', 'Timespent': 'NA', 'Buddies': 'NA', 'OutAction': 'NA'}
+            row_dict = {'Unit': 'NA', 'VisitedOn': 'NA', 'Language': 'NA', 'Lesson': 'NA', 'Activity': 'NA', 'Timespent': 'NA', 'Buddies': 'NA', 'OutAction': 'NA'}
             visited_on = each_visit['last_update']
             row_dict['VisitedOn'] = str(visited_on)
             locale = each_visit['locale']
@@ -81,14 +82,14 @@ def activity_details(username):
                     activity_disp_name = activity_node.name
                     if activity_node.altnames:
                         activity_disp_name = activity_node.altnames
-                    print "\n  Unit: ", unit_name
+                    print "\n {0}. Unit: ".format(ind), unit_name
                     print " Lesson Name: ", lesson_name
                     print " Activity Name ({0}): {1}".format(activity_node._id, activity_disp_name)
-                    print " {0}. Visited On: {1}".format(ind, visited_on)
+                    print " Visited On: {0}".format(visited_on)
                     print " Language: ", locale
 
                     nav_out_action_cur = benchmark_collection.find({'last_update': {'$gte': each_visit['last_update']}, 
-                        '_id': {'$ne': each_visit['_id']}, 'user': username, 
+                        '_id': {'$ne': each_visit['_id']}, 'user': username, 'session_key': each_visit['session_key'],
                         'calling_url': {'$regex': activity_out_regex_pattern, '$options': 'i' }}).sort('last_update', -1)
                     if nav_out_action_cur.count():
                         nav_out_obj = nav_out_action_cur[0]
