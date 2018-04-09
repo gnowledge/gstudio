@@ -3471,7 +3471,7 @@ msgstr "खोजें "
 
 #: gnowsys_ndf/ndf/templates/ndf/header.html:130
 msgid "My Desk"
-msgstr "मेरी मेजz"
+msgstr "मेरी मेज"
 
 #: gnowsys_ndf/ndf/templates/ndf/header.html:214
 msgid "MY DASHBOARD"
