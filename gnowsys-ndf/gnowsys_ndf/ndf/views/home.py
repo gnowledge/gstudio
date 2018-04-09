@@ -20,6 +20,8 @@ from gnowsys_ndf.settings import GAPPS, GSTUDIO_SITE_LANDING_PAGE, GSTUDIO_SITE_
 from gnowsys_ndf.ndf.models import GSystemType, Node
 from gnowsys_ndf.ndf.models import node_collection
 
+
+
 ###################################################
 #   V I E W S   D E F I N E D   F O R   H O M E   #
 ###################################################
@@ -217,3 +219,5 @@ def help_page_view(request,page_name):
                                         },
                                         context_instance=RequestContext(request)
                                     )
+
+

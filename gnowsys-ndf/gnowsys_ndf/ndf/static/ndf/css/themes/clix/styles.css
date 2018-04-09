@@ -30170,7 +30170,7 @@ ul.horizontal_tabs_gstudio > li.sub_group_action:hover ul {
   margin-bottom: 25px;
   padding-bottom: 10px;
   cursor: pointer;
-  height: 260px;
+  height: 280px;
   border: 1px solid #164A7B;
 }
 /* line 7003, ../../../scss/_app_styles.scss */
@@ -30562,7 +30562,7 @@ ul.horizontal_tabs_gstudio > li.sub_group_action:hover ul {
 .explore-button {
   border-radius: 5px;
   text-transform: uppercase;
-  margin-left: 150px;
+  margin-left: 1150px;
   color: #ffffff;
   padding: 5px 17px;
   width: inherit;
@@ -31370,7 +31370,7 @@ ul.horizontal_tabs_gstudio > li.sub_group_action:hover ul {
 /* line 8217, ../../../scss/_app_styles.scss */
 .about-blog {
   height: 100%;
-  background: #20ade0;
+  background: #107aa1;
 }
 
 /* line 8222, ../../../scss/_app_styles.scss */
