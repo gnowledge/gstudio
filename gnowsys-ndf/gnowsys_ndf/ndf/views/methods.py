@@ -5126,6 +5126,8 @@ def repository(request, group_id):
                                         })
         gapps_obj_list.append(gapp_obj)
 
+    lang_code = request.LANGUAGE_CODE
+
     return render_to_response("ndf/repository.html",
                               {"gapps_obj_list": gapps_obj_list,
                                "gapps_dict": GSTUDIO_NROER_GAPPS,
@@ -5133,8 +5135,8 @@ def repository(request, group_id):
                                'search_text':search_text,
                                'temp_search_text':temp_search_text,
                                'GSTUDIO_ELASTIC_SEARCH':GSTUDIO_ELASTIC_SEARCH,
-                               'GSTUDIO_NROER_GAPPS_NEW_count':GSTUDIO_NROER_GAPPS_NEW_count
-
+                               'GSTUDIO_NROER_GAPPS_NEW_count':GSTUDIO_NROER_GAPPS_NEW_count,
+                                'lang_code':lang_code
                                },
                               context_instance=RequestContext(request)
                               )
