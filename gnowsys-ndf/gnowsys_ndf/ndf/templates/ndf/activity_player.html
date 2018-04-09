@@ -119,7 +119,7 @@
         	{% if "announced_unit" in node.member_of_names_list or "drafts_unit" in node.member_of_names_list%}
 
 	            <a {% if next_lesson_id  and lesson_next_act_id and not resource_next_id %} title="Go to next lesson"  href="{% url 'activity_player_detail' group_id next_lesson_id lesson_next_act_id %}" {% else %} class = "disabled"   title="You are on the last Lesson" {% endif %} >
-	        	{% trans "Previous Lesson" %} 
+	        	{% trans "Next Lesson" %} 
             
             {% else %}
                 <a {% if next_lesson_id  and lesson_next_act_id and not resource_next_id %} title="Go to next section"  href="{% url 'activity_player_detail' group_id next_lesson_id lesson_next_act_id %}" {% else %} class = "disabled"   title="You are on the last section" {% endif %} >

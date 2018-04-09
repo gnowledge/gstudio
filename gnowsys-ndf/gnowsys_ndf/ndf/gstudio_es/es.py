@@ -1,6 +1,6 @@
 from elasticsearch import Elasticsearch
 from elasticsearch_dsl import *
-from gnowsys_ndf.settings import GSTUDIO_ELASTIC_SEARCH ,GSTUDIO_ELASTIC_SEARCH_PROTOCOL,GSTUDIO_ELASTIC_SEARCH_SUPERUSER,GSTUDIO_ELASTIC_SEARCH_SUPERUSER_PASSWORD,GSTUDIO_ELASTIC_SEARCH_ALIAS,GSTUDIO_ELASTIC_SEARCH_PORT
+from gnowsys_ndf.settings import GSTUDIO_ELASTIC_SEARCH ,GSTUDIO_ELASTIC_SEARCH_PROTOCOL,GSTUDIO_ELASTIC_SEARCH_SUPERUSER,GSTUDIO_ELASTIC_SEARCH_SUPERUSER_PASSWORD,GSTUDIO_ELASTIC_SEARCH_ALIAS,GSTUDIO_ELASTIC_SEARCH_PORT,GLITE_RCS_REPO_DIRNAME,GSTUDIO_ELASTIC_SEARCH_INDEX
 from gnowsys_ndf.ndf.models.base_imports import *
 from gnowsys_ndf.ndf.models.history_manager import HistoryManager
 #from gnowsys_ndf.ndf.models.node import *
@@ -20,6 +20,10 @@ class esearch:
     #	self.fp = fp
     @staticmethod
     def inject(fp):
+
+        with open("/home/docker/code/gstudio/gnowsys-ndf/gnowsys_ndf/gstudio_configs/req_body.json") as req_body:
+            request_body = json.load(req_body)
+
         if not os.path.exists(GLITE_RCS_REPO_DIRNAME):
 			os.makedirs(GLITE_RCS_REPO_DIRNAME)
 		

@@ -434,6 +434,7 @@
 
            {# <a href="#" data-reveal-id="loginModal" id="login-button-medium">{% trans "Login to your clix account" %}</a> #}
           {# <a href="#" data-reveal-id="loginModal" id="login-button-small">{% trans "Login" %}</a> #}        
+
           <a class="" href="{% url 'auth_login' %}{% if not is_ac_url %}?next={{request.path}}{% endif %}" accesskey="l">
             <i class="fi-key"></i>&nbsp; {% trans "Login" %}
           </a>

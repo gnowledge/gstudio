@@ -117,11 +117,6 @@ $(document).ready(function(){
 									
 								<div class="small-9 columns">
 							    	<input id="tags_id" tabindex="11" type="text" value="" placeholder="{% trans 'Add one tag at a time' %}">
-								    <ul id="searchResult"></ul>
-								    <select id="topic_list1" name="topic_list1" tabindex=3 required>
-									<option value="">--- Select Topic ---</option>
-									
-									</select>
 							    	
 							    	<input type="hidden" value="{{node.tags|join:', '|default_if_none:""}}" name="tags">
 						        </div>
