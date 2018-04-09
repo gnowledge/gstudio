@@ -65,5 +65,7 @@ checksumdir==1.1.0
 cryptography==1.4
 # version needed to overwrite on all above intermediate installs
 # pymongo==2.8
+Mastodon.py==1.2.2
+ndg-httpsclient==0.4.4
 elasticsearch==6.1.1
 elasticsearch-dsl==6.1.0
