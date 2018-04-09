@@ -49,7 +49,7 @@
 		                {% include 'ndf/simple_card.html' with  no_footer=True resource=each url_name="page_details" first_arg=groupid second_arg=each.id %}
 		              </span>
 		            {% else %}
-		              {% include 'ndf/simple_card.html' with  no_footer=True resource=each url_name="page_details" first_arg=groupid second_arg=each%}
+		              {% include 'ndf/simple_card.html' with  no_footer=True resource=each url_name="page_details" first_arg=groupid second_arg=each.pk %}
 		            {%endif%}
 		            </li>
 		          {% endfor %}
@@ -63,9 +63,12 @@
 		<div class="loading" style="display: none;">
 		  Loading...
 		</div>
-		{% if has_next %}
+		{% if has_next and if_teaches != True %}
 		  <span class="infinite-more-link" href="?page_no={{page_no}}&field_list={{field_list}}&chk_advanced_search={{chk_advanced_search}}"></span>
 		{% endif %}
+
+		<!--{% include 'ndf/pagination.html' with urlname="advanced_search" first_arg=group_name_tag second_arg="" third_arg="" %}-->
+
 	<hr>
 
 	<script>
