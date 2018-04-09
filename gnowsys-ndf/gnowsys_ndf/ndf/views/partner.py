@@ -208,9 +208,7 @@ def nroer_groups(request, group_id, groups_category):
     group_nodes = node_collection.find({"_type":'Group',"name" : {"$in" : GSTUDIO_NROER_MENU }})
 
     lang_code = request.LANGUAGE_CODE
-    if lang_code == 'hi':
-
-      GSTUDIO_NROER_MENU = {"State Partners":"\u0938\u094d\u091f\u0947\u091f \u092a\u093e\u0930\u094d\u091f\u0928\u0930\u094d\u0938", "Institutional Partners":"\u0907\u0902\u0938\u094d\u091f\u0940\u091f\u0942\u0936\u0928\u0932 \u092a\u093e\u0930\u094d\u091f\u0928\u0930\u094d\u0938", "Individual Partners":"\u0907\u0902\u0921\u093f\u0935\u093f\u091c\u0941\u0905\u0932\u0020\u092a\u093e\u0930\u094d\u091f\u0928\u0930\u094d\u0938\u0020" , "Teachers":"Teachers", "Interest Groups":"Interest Groups", "Schools":"Schools"}
+    
 
     # print "=============", app_gst
     # group_nodes_count = group_nodes.count() if group_nodes else 0

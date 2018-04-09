@@ -47,6 +47,7 @@ def search_detail(request,group_id,page_no=1):
 	else:
 		selected_field = "content"
 
+	print GST_FILE1.hits[0].id
 
 	q = Q('bool', must=[Q('match', member_of=GST_FILE1.hits[0].id),Q('match',group_set='55ab34ff81fccb4f1d806025'),Q('match',access_policy='public'),~Q('exists',field=selected_field)])
 	search_result =Search(using=es, index="nodes",doc_type="gsystemtype,gsystem,metatype,relationtype,attribute_type,group,author").query(q)
@@ -72,7 +73,7 @@ def search_detail(request,group_id,page_no=1):
 		has_next = False
 
 	if request.GET.get('page_no',None) in [None,'']:
-		print "siddhu11"
+		
 		search_result=search_result[0:20]
 		page_no = 2	
 	else:
@@ -85,10 +86,11 @@ def search_detail(request,group_id,page_no=1):
 			print temp2
 			has_next = False
 		page_no = int(int(page_no)+1)
+	paginator_search_result = None
 
 	if request.GET.get('field_list',None) == "attribute_type_set" :
 		
-		temp = node_collection.find({'_type': 'GSystem','access_policy':'PUBLIC'})
+		temp = node_collection.find({'_type': 'GSystem','access_policy':'PUBLIC','member_of': { '$nin': [ObjectId('55ab34ff81fccb4f1d806027')] } ,'group_set':ObjectId('55ab34ff81fccb4f1d806025')})
 		
 		lst = []
 		for each in temp:
@@ -101,7 +103,10 @@ def search_detail(request,group_id,page_no=1):
 
 		if_teaches = True
 
+		print search_result.count()
+		#paginator_search_result = paginator.Paginator(search_result, page_no, 24)
 
-	return render_to_response('ndf/asearch.html', {"page_no":page_no,"has_next":has_next,'GSTUDIO_ELASTIC_SEARCH':GSTUDIO_ELASTIC_SEARCH,'advanced_search':"true",'groupid':group_id,'group_id':group_id,'title':"advanced_search","search_curr":search_result,'field_list':selected_field,'chk_advanced_search':chk_advanced_search,'if_teaches':if_teaches},
+
+	return render_to_response('ndf/asearch.html', {"page_info":paginator_search_result,"page_no":page_no,"has_next":has_next,'GSTUDIO_ELASTIC_SEARCH':GSTUDIO_ELASTIC_SEARCH,'advanced_search':"true",'groupid':group_id,'group_id':group_id,'title':"advanced_search","search_curr":search_result,'field_list':selected_field,'chk_advanced_search':chk_advanced_search,'if_teaches':if_teaches},
 				context_instance=RequestContext(request))
 		 
