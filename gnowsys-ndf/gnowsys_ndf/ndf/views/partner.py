@@ -169,6 +169,8 @@ def partner_list(request, group_id):
 def nroer_groups(request, group_id, groups_category):
     group_name, group_id = get_group_name_id(group_id)
     GSTUDIO_NROER_MENU = ["State Partners", "Institutional Partners", "Individual Partners" , "Teachers", "Interest Groups", "Schools"]
+
+
     mapping = GSTUDIO_NROER_MENU_MAPPINGS
 
     groups_names_list = []
@@ -205,6 +207,8 @@ def nroer_groups(request, group_id, groups_category):
         app_gst = gst_group
     group_nodes = node_collection.find({"_type":'Group',"name" : {"$in" : GSTUDIO_NROER_MENU }})
 
+    lang_code = request.LANGUAGE_CODE
+    
 
     # print "=============", app_gst
     # group_nodes_count = group_nodes.count() if group_nodes else 0
@@ -213,6 +217,9 @@ def nroer_groups(request, group_id, groups_category):
                            #'group_nodes_count': group_nodes_count,
                           'app_gst': app_gst,
                            'groupid': group_id, 'group_id': group_id,
+                           'GSTUDIO_NROER_MENU':GSTUDIO_NROER_MENU,
+                           'lang_code': lang_code
+
 
                           }, context_instance=RequestContext(request))
 

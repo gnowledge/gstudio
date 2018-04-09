@@ -36,10 +36,24 @@
 					{% endif %}
 					>
 					<div class="app-card-title"><h4>  
-					{% if each_gapp.altnames %}
-						{% trans each_gapp.altnames %}
-					{% elif each_gapp.name %}
-						{% trans each_gapp.name %}
+					{% if lang_code == "hi" %}
+						{% if each_gapp.altnames %}
+							{% if "eLibrary" == each_gapp.altnames %}
+								{% trans "eLibrary" %}
+							{% elif "Themes" == each_gapp.altnames %}
+								{% trans "Themes" %}
+							{% elif "eCourses" == each_gapp.altnames %}
+								{% trans "eCourses" %}
+							{% else %}
+								{% trans each_gapp.altnames %}
+							{% endif %}
+						{% endif %}
+					{% else %}
+						{% if each_gapp.altnames %}
+							{% trans each_gapp.altnames %}
+						{% elif each_gapp.name %}
+							{% trans each_gapp.name %}
+						{% endif %}
 					{% endif %}
 					</h4>
 					</div>

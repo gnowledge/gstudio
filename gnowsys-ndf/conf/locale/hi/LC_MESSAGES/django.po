@@ -7106,9 +7106,6 @@ msgstr "%(email_url)s आपके पास एक सत्यापित ई
 #~ msgid "Thread Name:"
 #~ msgstr "कड़ी नाम:"
 
-#~ msgid "Themes"
-#~ msgstr "प्रसंग"
-
 #~ msgid "Tree Browser"
 #~ msgstr "ट्री ब्राउज़र"
 
@@ -7136,11 +7133,6 @@ msgstr "%(email_url)s आपके पास एक सत्यापित ई
 #~ msgid "Individuals"
 #~ msgstr "व्यक्तिगत"
 
-#~ msgid "Interest Groups"
-#~ msgstr "अभिरूचि समूह"
-
-#~ msgid "Schools"
-#~ msgstr "विद्यालय"
 
 #~ msgid "Open Educational Resources mapped to school curricular"
 #~ msgstr "विद्यालय पाठ्यचर्या से संबद्ध मुक्त शैक्षिक संसाधन"
@@ -7154,9 +7146,6 @@ msgstr "%(email_url)s आपके पास एक सत्यापित ई
 #~ msgid "Device independent digital books"
 #~ msgstr "स्वतंत्र डिजि़टल पुस्तकों की युक्ति"
 
-#~ msgid "eCourses"
-#~ msgstr "ई-पाठ्यक्रम"
-
 #~ msgid "Online and blended courses"
 #~ msgstr "आॅनलाइन और मिश्रित पाठ्यक्रम"
 
@@ -7165,3 +7154,39 @@ msgstr "%(email_url)s आपके पास एक सत्यापित ई
 
 #~ msgid "New password"
 #~ msgstr "नया पासवर्ड "
+
+#: gnowsys_ndf/ndf/templates/ndf/main_simple_card.html:19
+msgid "State Partners"
+msgstr "राज्य पार्टनर्स"
+
+#: gnowsys_ndf/ndf/templates/ndf/main_simple_card.html:21
+msgid "Teachers"
+msgstr "शिक्षक"
+
+#: gnowsys_ndf/ndf/templates/ndf/main_simple_card.html:23
+msgid "Institutional Partners"
+msgstr "संस्थागत पार्टनर्स"
+
+#: gnowsys_ndf/ndf/templates/ndf/main_simple_card.html:25
+msgid "Individual Partners"
+msgstr "व्यक्तिगत पार्टनर्स"
+
+#: gnowsys_ndf/ndf/templates/ndf/main_simple_card.html:27
+msgid "Interest Groups"
+msgstr "अभिरूचि समूह"
+
+#: gnowsys_ndf/ndf/templates/ndf/main_simple_card.html:29
+msgid "Schools"
+msgstr "विद्यालय"
+
+#: gnowsys_ndf/ndf/templates/ndf/repository.html:42
+msgid "eLibrary"
+msgstr "ई-पुस्तकालय"
+
+#: gnowsys_ndf/ndf/templates/ndf/repository.html:44
+msgid "Themes"
+msgstr "प्रसंग"
+
+#: gnowsys_ndf/ndf/templates/ndf/repository.html:46
+msgid "eCourses"
+msgstr "ई-पाठ्यक्रम"
