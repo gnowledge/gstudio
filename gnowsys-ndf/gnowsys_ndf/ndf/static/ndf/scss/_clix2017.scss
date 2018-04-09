@@ -699,9 +699,10 @@ h5{
                         cursor: pointer;
                         background: transparent;
                         border-bottom: 0px;
-                        line-height: 50px;
+                        line-height: 49px;
                         border-left-width: 0px;
                         font-family: OpenSans-Regular;
+                        border-top: 2px solid #713558;
 
                     }
                     &.active {
@@ -772,6 +773,7 @@ h5{
         }
     }
 }
+
 
 
 
@@ -2938,6 +2940,7 @@ ul.jqtree-tree .jqtree-toggler {
             max-height: 100%;
             overflow-y: auto;
             height: 100vh;
+            position:fixed;
 
             .course-lessons {
                 dd {
@@ -3884,6 +3887,12 @@ $ah_2_background_color_hover: rgba(244, 244, 244, 0.3);
         font-size: 16px;
         line-height: $activity-header-height;
         color: $ah_2_icon_color;
+
+        &:hover{
+            //border-bottom: 2px solid $ah_2_icon_color;
+            //background-color:$ah_2_icon_color;
+            //color:#ffffff;
+        }
     }
 
     .header_icon_block {
@@ -3891,42 +3900,36 @@ $ah_2_background_color_hover: rgba(244, 244, 244, 0.3);
         width: $activity-header-icon-block-width;
         cursor: pointer;
         text-align: center;
-        font-weight: 500;
         &:hover{
-            border-bottom: 2px solid $secondary-orange;
+            //background-color:$ah_2_icon_color;
+            //color:#ffffff;
         }
     }
-
     .header_text_sm_block{
-        font-weight: 400;
-        padding: 14px 10px 3px 10px;
-        cursor: pointer;
-        transition: color 1s ease, border-color 1s ease;
-        -webkit-transition: color 1s ease, border-color 1s ease;
-        display: inline-block;
-        padding-bottom: 14px;
-        letter-spacing: 0.6px;
         padding: 0px 10px;
+        position: relative;
+        color: #6f0859;
+        font-weight: 500;
+        font-size: 14px;
+        letter-spacing: 0.6px;
+        font-family: 'OpenSans-Regular', sans-serif;
         @media screen and (min-width: 1025px) {
             padding: 0px 15px;
-        }
-         &:hover{
-            color: white;
-        }
-        &.active{
+            position: relative;
             color: #6f0859;
-            border-bottom: 2px solid $secondary-orange;
-            padding-bottom: 14px;
-            font-weight: 600;
-            &:hover{
-                color: white;
-                background-color: #6f0859;
-            }
+            font-weight: 500;
+            font-size: 14px;
+            letter-spacing: 0.6px;
+            font-family: 'OpenSans-Regular', sans-serif;
+        }
+        &:hover{
+            border-bottom: 2px solid $ah_2_icon_color;
+            //background-color:$ah_2_icon_color;
+            //color:#ffffff;
+        }
     }
-}
 
     .lesson-nav{
-        position: relative;
         color: #6f0859;
         font-weight: 500;
         font-size: 14px;
@@ -3953,15 +3956,17 @@ $ah_2_background_color_hover: rgba(244, 244, 244, 0.3);
 
             a {
                 color: $ah_2_icon_color;
-                &:hover{
-                    background-color:$ah_2_icon_color;
-                    color:#ffffff;
-                }
+                
             }
 
             &:hover{
-                background-color:$ah_2_icon_color;
-                color:#ffffff;
+                border-bottom: 2px solid $ah_2_icon_color;
+                //background-color:$ah_2_icon_color;
+                //color:#ffffff;
+            }
+            &:active{
+                border-bottom: 2px solid $ah_2_icon_color;
+
             }
 
 
@@ -4541,6 +4546,7 @@ ul.nav_menu_1 {
         &>li {
                 list-style: none;
                 border-top: 1px solid #e9e9e9;
+                border-bottom: 1px solid #e9e9e9;
                 padding: 9px 0px 9px 11px;
                 background: inherit;
                 transition: border-color 1s ease;
@@ -5357,6 +5363,10 @@ ul.nav_menu_1 {
 }
 
 ul.authoring-tab{
+    nav select {
+        display: none;
+    }
+
         background-color:$nav_menu_1_color;
         margin-bottom: 0px;
         display:inline;
@@ -5380,7 +5390,16 @@ ul.authoring-tab{
                         }
                 }
             }
+
+    @media only screen and (min-width : 760px) and (max-width : 1500px) { 
+                 display: none;
+
+                 nav select{
+                    display:inline-block;
+                 }
+     }     
 }
+
 
 
     
@@ -5873,6 +5892,37 @@ ul.authoring-tab{
     
 }
 
+#overlay{ /* we set all of the properties for are overlay */
+    
+    height: 116px;
+    width: 1024px;
+    margin: 0 auto;
+    background: white;
+    color: #999999;
+    padding: 28px 10px 10px 0px;
+    position: absolute;
+    top: 40%;
+    left: 10%;
+    z-index: 1000;
+    text-align: center;
+    display: none;
+    -webkit-border-radius: 10px;
+    -moz-border-radius: 10px;
+    -o-border-radius: 10px;
+    border-radius: 10px;
+}
+
+#mask{ /* create are mask */
+    position:fixed;
+    top:0;
+    left:0;
+    background:rgba(0,0,0,0.6);
+    z-index:500;
+    width:100%;
+    height:100%;
+    display:none;
+}
+
 .nav-legal{
             margin-left:-400px;
                 ol {
@@ -5948,37 +5998,6 @@ ul.authoring-tab{
             }
         }
     }
-}
-
-#overlay{ /* we set all of the properties for are overlay */
-    
-    height: 116px;
-    width: 1024px;
-    margin: 0 auto;
-    background: white;
-    color: #999999;
-    padding: 28px 10px 10px 0px;
-    position: absolute;
-    top: 40%;
-    left: 10%;
-    z-index: 1000;
-    text-align: center;
-    display: none;
-    -webkit-border-radius: 10px;
-    -moz-border-radius: 10px;
-    -o-border-radius: 10px;
-    border-radius: 10px;
-}
-
-#mask{ /* create are mask */
-    position:fixed;
-    top:0;
-    left:0;
-    background:rgba(0,0,0,0.6);
-    z-index:500;
-    width:100%;
-    height:100%;
-    display:none;
 }
 /* use :target to look for a link to the overlay then we find are mask */
 #overlay:target, #overlay:target + #mask{
@@ -6897,21 +6916,3 @@ input.transcript-toggler{
 .font-plus{
 font-size:100%; color: #713558;
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-

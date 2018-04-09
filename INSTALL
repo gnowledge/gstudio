@@ -12,7 +12,7 @@
 
   [1] Installing required following packages and its dependencies:
 
-      > sudo apt-get install python-setuptools git build-essential python-dev rcs mongodb python-virtualenv ipython libjpeg-dev memcached libevent-dev libfreetype6-dev zlib1g-dev ffmpeg2theora rabbitmq-server libssl-dev libffi-dev libxml2-dev libxslt1-dev apt-transport-https
+      > sudo apt-get install python-setuptools git build-essential python-dev rcs python-virtualenv ipython libjpeg-dev memcached libevent-dev libfreetype6-dev zlib1g-dev ffmpeg2theora rabbitmq-server libssl-dev libffi-dev libxml2-dev libxslt1-dev apt-transport-https
 
   [2] Get latest version of gstudio using one of the following commands:
 

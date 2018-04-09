@@ -17,6 +17,7 @@
 }
 
 
+
 </style>
 
 <h2>Fixed/Sticky Footer Example</h2>
@@ -24,6 +25,7 @@
 
 <div class="footer">
     <div class="small-7 medium-9 large-10 columns" style="margin-left:122px;">
+                {% comment %}
           <div class="row">
                 <div class="small-2 columns">
                     <p>Seeded By</p>
@@ -35,23 +37,36 @@
                     <p>Technology Partner</p>
                 </div>
                  </div>
+                {% endcomment %}
           <div class="row" style="width:100%;">
-                <div class="small-6 columns">
-                    <a href="">
-                        <img src="/static/ndf/images/Brand Logo Strip Updated.png"/>
+                <div class="small-3 columns">
+                    <a href="http://tatatrusts.org/" target="_blank">
+                        <img src="/static/ndf/images/footer-svg/Tata Trust Source.svg" style="margin-top:45px;"/>
                     </a>
                 </div>
+                <div class="small-2 columns">
+                    <a href="http://www.tiss.edu/" target="_blank">
+                        <img src="/static/ndf/images/footer-svg/TISS Logo EPS Colour copy.svg"/>
+                    </a>
+                </div>
+                <div class="small-3 columns">
+                    <a href="http://www.mit.edu" target="_blank">
+                        <img src="/static/ndf/images/footer-svg/MIT-logo-with-spelling-print-black-red-design1 copy.svg" style="margin-top:50px;"/>
+                    </a>
+                </div>
+                {% comment %}
                 <div class="small-2 columns">
                     <a href="http://www.hbcse.tifr.res.in/" target="_blank">
                         <img src="/static/ndf/images/logos/tifr.png"/>
                     </a>
                 </div>
+                {% endcomment %}
           </div>
     </div>
     <div class="small-3 medium-3 large-2 columns nav-legal">
         <ol>
             <li>
-                <a href="#">About Project</a>
+                <a href="http://clix.tiss.edu/about/" target="_blank">About Project</a>
             </li>
             <li>
                 <a href="#">About Platform</a>
@@ -66,7 +81,7 @@
                 <a href="#">Feedback</a>
             </li>
             <li>
-                <a href="#">Contact Us</a>
+                <a href="http://clix.tiss.edu/contact/" target="_blank">Contact Us</a>
             </li>
         </ol>
     </div>

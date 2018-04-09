@@ -17,7 +17,8 @@ Year (YYYY)                                             [ LEVEL 0 ]
                 - db                                    [ LEVEL 4 ]
                 - media                                 [ LEVEL 4 ]
                 - rcs-repo                              [ LEVEL 4 ]
-                - pgdump-YYYYMMDD-HHMM.sql              [ LEVEL 4 ]
+                - pgdump-all.sql                        [ LEVEL 4 ]
+                - system-heartbeat                      [ LEVEL 4 ]
                 - gstudio-exported-users-analytics-csvs [ LEVEL 4 ]
                 - gstudio_tools_logs                    [ LEVEL 4 ]
                 - gstudio-logs                          [ LEVEL 4 ]
@@ -63,7 +64,16 @@ we have a provision to collect data from the said platforms and both may reside 
     - `db`: mongoDB data *(gStudio + qbank)*.
     - `media`: Files uploaded on clixserver *(gStudio)*.
     - `rcs-repo`: rcs, versioned json files *(gStudio)*.
-    - `pgdump-YYYYMMDD-HHMM.sql`: Postgres DB dump with specified naming convention *(gStudio)*.
+    - `pgdump-all.sql`: Postgres DB dump.
+    - `system-heartbeat`: Contains log of following:
+        - Server Id
+        - School Id
+        - School Name
+        - Internal IP Address
+        - RAM usage details (`free -h`)
+        - HDD usage details (`df -h`)
+        - `uptime`
+        - Current Processes (`ps aux`)
     - `gstudio-exported-users-analytics-csvs`: Folder, contains students unitwise quantitative data in CSV form.
     - `gstudio_tools_logs`: Tools (which supports data logging and configured gstudio end points) data in `json` format will be stored in this folder.
     - `gstudio-logs`: Folder containing gstudio level general logs for scripts and updates.
@@ -92,10 +102,11 @@ Example-data-collection-dir-str/
     │       │   ├── db
     │       │   ├── media
     │       │   ├── rcs-repo
-    │       │   ├── pgdump-20170921-1305.sql
+    │       │   ├── pgdump-all.sql
     │       |   ├── gstudio-exported-users-analytics-csvs
     │       |   ├── gstudio_tools_logs
     │       |   ├── gstudio-logs
+    │       |   ├── system-heartbeat
     │       │   ├── local_settings.py
     │       │   ├── server_settings.py
     │       │   ├── git-commit.log
@@ -110,10 +121,11 @@ Example-data-collection-dir-str/
             │   ├── db
             │   ├── media
             │   ├── rcs-repo
-            │   ├── pgdump-20170921-1305.sql
+            │   ├── pgdump-all.sql
             │   ├── gstudio-exported-users-analytics-csvs
             │   ├── gstudio_tools_logs
             │   ├── gstudio-logs
+            │   ├── system-heartbeat
             │   ├── local_settings.py
             │   ├── server_settings.py
             │   ├── git-commit.log

@@ -43,6 +43,7 @@ gst_module_name, gst_module_id = GSystemType.get_gst_name_id('Module')
 gst_base_unit_name, gst_base_unit_id = GSystemType.get_gst_name_id('base_unit')
 at_items_sort_list = node_collection.one({'_type': "AttributeType", 'name': "items_sort_list"})
 
+@get_execution_time
 def explore(request):
     return HttpResponseRedirect(reverse('explore_courses', kwargs={}))
 

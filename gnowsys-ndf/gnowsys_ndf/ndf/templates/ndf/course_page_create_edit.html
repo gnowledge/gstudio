@@ -118,14 +118,14 @@
         node_altname_val = $(".node_altname").val()
         updateAllTags();
         var tagsStr = tags.value.trim();
-        if(checkTag())
-        {
-            $("input:hidden[name='tags']").val($("input:hidden[name='tags']").val() + ', ' + tagsStr);
-        }
-        else if(tagsStr)
-        {
-            event.preventDefault();
-        }
+        // if(checkTag())
+        // {
+        //     $("input:hidden[name='tags']").val($("input:hidden[name='tags']").val() + ', ' + tagsStr);
+        // }
+        // else if(tagsStr)
+        // {
+        //     event.preventDefault();
+        // }
         if(!node_name_val){
             event.preventDefault()
             $('.node_name_empty').removeClass('hide')

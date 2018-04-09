@@ -20,7 +20,8 @@ class Benchmark(DjangoDocument):
     'user' : basestring,
     'session_key' : basestring,
     'group' : basestring,
-    'has_data' : dict
+    'has_data' : dict,
+    'locale': basestring
   }
 
   required_fields = ['name']
