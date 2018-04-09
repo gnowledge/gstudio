@@ -15,8 +15,21 @@
 {% endif %}
 
   {% if lang_code == "hi" %}
-
-    <div class="app-card-title"><h4>{% trans resource.name %}</h4></div>
+    {% if "State Partners" == resource.name %}
+    <div class="app-card-title"><h4>{% trans "State Partners" %}</h4></div>
+    {% elif "Teachers" == resource.name %}
+    <div class="app-card-title"><h4>{% trans "Teachers" %}</h4></div>
+    {% elif "Institutional Partners" == resource.name %}
+    <div class="app-card-title"><h4>{% trans "Institutional Partners" %}</h4></div>
+    {% elif "Individual Partners" == resource.name %}
+    <div class="app-card-title"><h4>{% trans "Individual Partners" %}</h4></div>
+    {% elif "Interest Groups" == resource.name %}
+    <div class="app-card-title"><h4>{% trans "Interest Groups" %}</h4></div>
+    {% elif "Schools" == resource.name %}
+    <div class="app-card-title"><h4>{% trans "Schools" %}</h4></div>
+    {% else %}
+    <div class="app-card-title"><h4>{% resource.name %}</h4></div>
+    {% endif %}
   {% else %}
    <div class="app-card-title"><h4>{% firstof resource.altnames resource.name %}</h4></div>
   {% endif %}
