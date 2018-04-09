@@ -81,7 +81,7 @@
 			success: function(data) {
 				data = JSON.parse(data)
 				if (!data['success']){
-					alert("Something went wrrong. Please try again later.")
+					alert("Something went wrong. Please try again later.")
 				}
 				$('#sort-module-reveal').foundation('reveal', 'close');
 				location.reload()

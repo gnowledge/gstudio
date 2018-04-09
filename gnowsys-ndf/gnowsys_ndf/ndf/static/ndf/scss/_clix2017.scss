@@ -683,7 +683,6 @@ h5{
                     color:#fff;
                     font-size: 17px;
                     font-family: OpenSans-Bold;
-                    margin-top: -3px;
                     border-bottom: 3px solid $secondary-orange;
                     &:hover{
                         &:hover{
@@ -3828,6 +3827,8 @@ $ah_2_background_color_hover: rgba(244, 244, 244, 0.3);
         // /* Styles */
                  text-overflow:ellipsis;
                 width:calc(100% - 753px);
+                font-size:16px;
+                overflow: hidden;
 
         }
         
@@ -3934,6 +3935,7 @@ $ah_2_background_color_hover: rgba(244, 244, 244, 0.3);
         font-weight: 500;
         font-size: 14px;
         letter-spacing: 0.6px;
+        
         @media screen and (min-width: 1025px) {
             float: right;
             margin-right:70px;
@@ -3959,6 +3961,7 @@ $ah_2_background_color_hover: rgba(244, 244, 244, 0.3);
                 
             }
 
+
             &:hover{
                 border-bottom: 2px solid $ah_2_icon_color;
                 //background-color:$ah_2_icon_color;
@@ -3968,9 +3971,11 @@ $ah_2_background_color_hover: rgba(244, 244, 244, 0.3);
                 border-bottom: 2px solid $ah_2_icon_color;
 
             }
-
-
+            
         }
+
+        
+        
         .header_text_lg_block{
             padding: 0px 9px;
             @media screen and (min-width: 1025px){
@@ -3985,6 +3990,8 @@ $ah_2_background_color_hover: rgba(244, 244, 244, 0.3);
             padding: 0px 15px;
                 
             }
+
+
         
         }
 
@@ -4009,6 +4016,11 @@ $ah_2_background_color_hover: rgba(244, 244, 244, 0.3);
         .pagination {
             &:not(i) {
                 color: #a983b9;
+
+            }
+            a {
+                color: $ah_2_icon_color;
+                
             }
                 
         }
@@ -4016,6 +4028,19 @@ $ah_2_background_color_hover: rgba(244, 244, 244, 0.3);
 
 }
 
+
+.filter-position{
+    @media screen and (max-width: 1756px){
+        margin-left:0px;
+    }
+    @media screen and (min-width: 1757px) and (max-width: 1800px) {
+        margin-left:-20px;
+    }
+    @media screen and (min-width: 1801px) {
+        margin-left:-716px;
+    }
+        
+}
 
 .float-right{
     float:right;

@@ -11,6 +11,7 @@ urlpatterns = patterns('gnowsys_ndf.ndf.views.module',
                         url(r'^/edit/(?P<module_id>[\w-]+)/?$', 'module_create_edit', name='module_edit'),
 
                         # detail
+                        url(r'^/(?P<node_id>[\w-]+)/reorder_units$', 'unit_order_list', name='unit_order_list'),
                         url(r'^/(?P<node_id>[\w-]+)/?$', 'module_detail', name='module_detail'),
                         url(r'^/(?P<node_id>[\w-]+)/(?P<title>[^/]+)/?$', 'module_detail', name='module_detail_url'),
 

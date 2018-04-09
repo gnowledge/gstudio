@@ -1,6 +1,6 @@
 {% extends "ndf/gbase.html" %}
 {% load i18n %}
-{% load check_is_gstaff from ndf_tags %}
+{% load check_is_gstaff rewind_cursor cast_to_node from ndf_tags %}
 
 {% block title %}  {% firstof node.altnames node.name %}{% endblock %}
 
@@ -8,6 +8,9 @@
 {% check_is_gstaff group_id request.user as is_gstaff %}
 
 {% include 'ndf/explore_secondary_header.html' %}
+{% cast_to_node units_sort_list as units_node_sort_list %}
+{% rewind_cursor units_under_module as units_under_module %}
+
 <div class="medium-12 columns">
 	<div class="medium-2 columns thumbnail_style">
 	{% include 'ndf/widget_photo_upload.html' with url_name='module_detail' widget_for="group_banner" is_banner=True  no_update_btn=True node=node  groupid=group_id if_module=True %}
@@ -26,48 +29,51 @@
 		            </span>
 		            <ul id="course-settings-drop" class="f-dropdown" data-dropdown-content aria-hidden="true" tabindex="-1" >
 		                <li>
-									<a  class="buddy_margin right edit_button dropdown-settings" href="{% url 'module_edit' group_id node.pk %}" style="margin-top:0px;margin-right:0px;text-transform:none;width:100%;"><i class="fa fa-pencil"></i> {% trans "Edit" %}</a>
+							<a  class="buddy_margin right edit_button dropdown-settings" href="{% url 'module_edit' group_id node.pk %}" style="margin-top:0px;margin-right:0px;text-transform:none;width:100%;"><i class="fa fa-pencil"></i> {% trans "Edit" %}</a>
 						</li>
-						<li>
-									{% if node.collection_set %}
-									<a data-reveal-id="delete-unit" class="dropdown-settings tiny button secondary buddy_margin right edit_button " title="Please delete all units associated with this module." style="margin-top:0px;margin-right:0px;text-transform:none;width:100%;" disabled > <i class="fa fa-trash"></i> {% trans "Delete" %} </a>
-				 	 				{% else %}
-								 	<a data-reveal-id="delete-unit" class=" dropdown-settings tiny button secondary buddy_margin right edit_button disab-button" style="margin-top:0px; margin-right:0px; text-transform:none; width:100%;"><i class="fa fa-trash"></i> {% trans "Delete" %} </a>
-								 	{% endif %}
-								 	<div id="delete-unit" class="reveal-modal tiny text-center" data-reveal>
-					                    <h3>{% trans "Delete Unit:" %} {% firstof group_object.altnames group_object.name  %} ?</h3>
-					                        <br/>
-					                        {% trans "Are you sure want to delete this module?" %}
-					                        <br/>
-					                        <a href="#" class="button tiny success">{% trans "Cancel" %}</a>
-					                        <a href="{% url 'delete_group_url_redirect' node.pk 'explore_courses' %}" class="button tiny alert">{% trans "Yes" %}</a>
-					                        <a class="close-reveal-modal" aria-label="Close">&#215;</a>
-					                </div>
-					    </li>
-
 		              	<li>
-		                    <a class="fi-photo dropdown-settings" style="margin-top:0px;margin-right:0px;text-transform:none;width:100%;" data-reveal-id="group_banner_prof_pic_prop">
+		                    <a class="fi-photo dropdown-settings buddy_margin right edit_button" style="margin-top:0px;margin-right:0px;text-transform:none;width:100%;" data-reveal-id="group_banner_prof_pic_prop">
 		                    {% trans "Change image" %} </a>
 		              	</li>
-							{% endif %}
+		              	<li>
+							<a class="fi-list-thumbnails dropdown-settings buddy_margin right edit_button" style="margin-top:0px;margin-right:0px;text-transform:none;width:100%;" data-reveal-id="sort-unit-reveal"> Sort Units</a>
+							<div id="sort-unit-reveal" class="reveal-modal large" data-reveal > 
+								<div class="content">
+									<h4>{% trans "Units Display Ordering: " %}</h4>
+									<div>
+										{% include "ndf/widget_selector.html" with for='unit_list' all_options=units_under_module selected_options=units_node_sort_list oneline_element='true' %}
+									</div><br/>
+									<input type="button" id="save_units_order_list" class="right orange-button" value="{% trans 'SAVE' %}">
+								</div>
+								<a class="close-reveal-modal">&#215;</a>
+							</div>
+						</li>
+						<li>
+							{% if node.collection_set %}
+								<a data-reveal-id="delete-unit" class="dropdown-settings buddy_margin right edit_button " title="Please delete all units associated with this module." style="margin-top:0px;margin-right:0px;text-transform:none;width:100%;" disabled > <i class="fa fa-trash"></i> {% trans "Delete" %} </a>
+		 	 				{% else %}
+							 	<a data-reveal-id="delete-unit" class=" dropdown-settings buddy_margin right edit_button disab-button" style="margin-top:0px; margin-right:0px; text-transform:none; width:100%;"><i class="fa fa-trash"></i> {% trans "Delete" %} </a>
+						 	{% endif %}
+						 	<div id="delete-unit" class="reveal-modal tiny text-center" data-reveal>
+			                    <h3>{% trans "Delete Unit:" %} {% firstof group_object.altnames group_object.name  %} ?</h3><br/>
+		                        {% trans "Are you sure want to delete this module?" %}<br/>
+		                        <a href="#" class="button tiny success">{% trans "Cancel" %}</a>
+		                        <a href="{% url 'delete_group_url_redirect' node.pk 'explore_courses' %}" class="button tiny alert">{% trans "Yes" %}</a>
+		                        <a class="close-reveal-modal" aria-label="Close">&#215;</a>
+			                </div>
+					    </li>
 		            </ul>
+				{% endif %}
 		        </div>
 		    </div>
 		</div>
 
-
-
-{# {% include 'ndf/card_group.html' with node=node groupid=node.pk %} #}
-
-
-<!-- Existing card list-->
 </div>	
 
 
-
 <ul class="small-block-grid-1 medium-block-grid-3 large-block-grid-4" style="margin-left: 3.3%">
-<!-- Existing card list-->
-	{% for each_node in units_under_module  %}
+	<!-- Existing card list-->
+	{% for each_node in units_node_sort_list  %}
     <li class="card-image-wrapper" >
 		{% include 'ndf/card_group.html' with node=each_node  url_name='groupchange' first_arg=each_node.pk groupid=each_node.pk is_gstaff=is_gstaff is_module_detail=True %}	
 	</li>
@@ -75,8 +81,31 @@
 </ul>
 
 
+
+<script type="text/javascript">
+	$(document).on('click', '#save_units_order_list', function(e){
+		getSelValuesHiddenElement('unit_list', 'sort-unit-reveal')
+		unit_list_ids = $("input[name=unit_list]").val()
+		$.ajax({
+			type: "POST",
+
+			url: "{% url 'unit_order_list' group_id node.pk %}",
+			datatype: "html",
+			data:{
+				'csrfmiddlewaretoken': "{{csrf_token}}",
+				'unit_list': unit_list_ids,
+			},
+			success: function(data) {
+				data = JSON.parse(data)
+				if (!data['success']){
+					alert("Something went wrong. Please try again later.")
+				}
+				$('#sort-unit-reveal').foundation('reveal', 'close');
+				location.reload()
+			}
+		});
+
+	})
+
+</script>
 {% endblock %}
-
-
-
-
