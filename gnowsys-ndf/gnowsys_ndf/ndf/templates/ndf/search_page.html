@@ -3,6 +3,13 @@
 {% load i18n %}
 {% block title %}{% trans 'Search' %}{% endblock %}
 {% block concern_information %}
+<script src="/static/ndf/js/jquery-3.1.1.min.js"></script>
+<!--<script src="/static/ndf/js/jquery.waypoints.min.js"></script>
+<script src="/static/ndf/js/infinite.min.js"></script>-->
+<script src="/static/ndf/bower_components/waypoints/lib/jquery.waypoints.min.js"></script>
+<script src="/static/ndf/bower_components/waypoints/lib/shortcuts/infinite.min.js"></script>
+
+
     <div id="search_help" align="justify">
       <h3><strong>Search Help</strong></h3>
       <ul>
@@ -23,19 +30,35 @@
       
       
       </div>
+<div class="infinite-container">
+  <span class="infinite-item">
+    <div id="pages">
+        <ul class="small-block-grid-5 medium-block-grid-3 large-block-grid-5" >
 
-<div id="pages">
-    <ul class="small-block-grid-5 medium-block-grid-3 large-block-grid-5" >
-      {% for each in  search_curr %}
-        <li class="card-image-wrapper" >
-        {% include 'ndf/simple_card.html' with  no_footer=True resource=each url_name="page_details" first_arg=groupid second_arg=each %}
-        </li>
-      {% endfor %}
-    </ul>
-      {% if not search_curr %}
-       <b> No results found  </b>
-      {% endif %}
+          {% for each in search_curr %}
+            <li class="card-image-wrapper" >
+            {% if GSTUDIO_ELASTIC_SEARCH == True %}
+              
+                {% include 'ndf/simple_card.html' with  no_footer=True resource=each url_name="page_details" first_arg=groupid second_arg=each.id %}
+              </span>
+            {% else %}
+              {% include 'ndf/simple_card.html' with  no_footer=True resource=each url_name="page_details" first_arg=groupid second_arg=each%}
+            {%endif%}
+            </li>
+          {% endfor %}
+        </ul>
+          {% if not search_curr %}
+           <b> No results found  </b>
+          {% endif %}
+    </div>
+  </span>
 </div>
+<div class="loading" style="display: none;">
+  Loading...
+</div>
+{% if has_next %}
+  <span class="infinite-more-link" href="?search_text={{search_text}}&page={{page_no}}&{{fields}}"></span>
+{% endif %}
 
 <hr>
    {% comment %} 
@@ -200,6 +223,18 @@
   }
 
 
+</script>
+
+<script>
+  var infinite = new Waypoint.Infinite({
+    element: $('.infinite-container')[0],
+    onBeforePageLoad: function () {
+      $('.loading').show();
+    },
+    onAfterPageLoad: function ($items) {
+      $('.loading').hide();
+    }
+  });
 </script>
 
 

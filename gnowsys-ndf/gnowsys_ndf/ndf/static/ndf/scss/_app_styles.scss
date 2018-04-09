@@ -361,13 +361,10 @@ pre{
   }
 
   #search-submit{
-    background-color: #fafafa;
+/*    background-color: #fafafa;*/
     // color: gray;
-    top: 10px;
-    position: absolute;
-    left: -30px;
-    opacity: 0.3;
-    color: black;
+    top: -3px;
+
   }
 
   #search-submit:hover {
@@ -459,7 +456,8 @@ pre{
 }
 
 html,body{
-  height: 100%;
+  height: 100%;/*
+  overflow-x: hidden;*/
 }
 #gbase_wrap{
    min-height: 100%;
@@ -468,6 +466,7 @@ html,body{
   margin: 0 auto ;
   /* Pad bottom by footer height */
   padding: 0 0 60px;
+    overflow-x: hidden;
 }
 #base_wrap{
   min-height: 100%;
@@ -564,10 +563,11 @@ body>footer {
         //change as per requirement on addition on more links in future
         max-height: 600px;
       }
-      h4{
+      .flinks{
+        font-size: 22px;
         color: #999;
       }
-      .social_links{
+      .social_links a{
         font-size: 24px; 
         margin-right:5px;
       }
@@ -4764,8 +4764,6 @@ h5{
     }
 }
 
-
-
 /*Blue color variable*/
 $primary-blue : #164A7B;
 $secondry-blue : #74b3dc;
@@ -5520,6 +5518,7 @@ $unit-card-lines-to-show: 3;
 .title-strip{
     box-shadow: 0px 0px 6px rgba(0, 0, 0, 0.2);
     padding-left:10px;
+
     height:auto;
     min-height:143px;
     a{
@@ -6702,7 +6701,6 @@ $ah_2_background_color_hover: rgba(244, 244, 244, 0.3);;
       height: 100%;
       color: #f8f8f8;
 
-
       .activity-slide {
         padding: 1em;
         height: inherit;
@@ -7716,6 +7714,7 @@ $ah_2_background_color_hover: rgba(244, 244, 244, 0.3);;
     border-radius: 4px;
     margin-right: 30px;
     margin-bottom: 8px;
+
     &:hover{
         background-color:rgba(206,120,105,0.2);
         color: $primary-orange;
@@ -8072,6 +8071,7 @@ $module-card-lines-to-show: 3;
 }
 
 
+
 .enroll-btn{
                 width: 90px;
                 opacity: 1;
@@ -8128,5 +8128,124 @@ $module-card-lines-to-show: 3;
   .plus{
     font-size:100%; color: #eaeaea;
   }
+}
+
+
+
+/***********Landing page***************/
+  
+  .about_us{
+    background: #20ade0;
+  }
+  .analytics{
+    margin-top: 20px;
+  }
+  .square { 
+    border: 4px solid #ffffff;
+    position: relative;
+    text-align: center;
+    width: 16%;
+    float:left;
+    height: 100%;
+    margin-left:30px;
+  }
+
+  .square:after {
+    content: "";
+    display: block;
+    padding-bottom: 100%;
+  }
+
+  .box-content {
+    position: absolute;
+    width: 100%;
+    height: 80%;
+    
+    font-size: 2em;
+    padding-top: 20%;
+  }
+
+  .linked-links{
+   
+  }
+  
+.activity-slider {
+
+  font-family:Arial;
+  width:800px;
+  display:block;
+  margin:0 auto;
+}
+.activity-slider h3{
+      background: #fff;
+      color: #3498db;
+      font-size: 36px;
+      line-height: 100px;
+      margin: 10px;
+      padding: 2%;
+      position: relative;
+      text-align: center;
+  }
+/*.action{
+  display:block;
+  margin:100px auto;
+  width:100%;
+  text-align:center;
+}
+.action a {
+  display:inline-block;
+  padding:5px 10px; 
+  background:#f30;
+  color:#fff;
+  text-decoration:none;
+}
+.action a:hover{
+  background:#000;
+}*/
+.footer_link_cont h4{
+  color: #999;
+}
+
+.about_content{
+  color: #ececec; 
+  margin-bottom: 30px; 
+  font-family: ubuntu-regular;
+  
+  font-size: 20px;
+}
+
+.about-blog{
+  height:100%;
+  background: #107aa1;
+}
+
+.searchbar {
+  margin: 0.8rem;
+}
+
+.search-field {
+  width: 0;
+  height: 40px;
+  margin-left: 1rem;
+  padding: 0;
+  border-radius: 50px;
+  border: none;
+  transition: all 0.5s ease;
+}
+
+.expand-search {
+  width: 80%;
+  max-width: calc(80% - 3rem);
+  border: 1px solid #c9c9c9;
+  padding: .5rem;
+}
+
+svg {
+  width: 20px;
+  height: 20px;
+}
+
+.button {
+  border-radius: 50px;
 }
 

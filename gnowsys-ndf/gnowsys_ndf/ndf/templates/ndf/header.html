@@ -44,7 +44,7 @@
 
         <ul class="title-area">
           <li class="name">
-            <h1><a href="{{site.HOME_PAGE|default_if_none:'/home/'}}">
+            <h1><a href="{{site.HOME_PAGE|default_if_none:'/home'}}">
               <img  title="{{site.SITE_NAME}}" src="{{site.LOGO}}">
             </a></h1>
           </li>
@@ -119,17 +119,35 @@
                 {% trans "Workspaces" %}
               </a>
           </li>
-
+<!-- 
             <li>
-              <a title="Click here to view all Courses" href="{% url explore_url %}" {% if title == 'base courses' or title == "courses" or title == "drafts" %} class="active" {% endif %} > Explore</a>
-            </li>
+              <a title="Click here to view all Courses" href="{% url explore_url %}" {% if title == 'base courses' or title == "courses" or title == "drafts" %} class="active" {% endif %} > {% trans "Explore" %}</a>
+            </li> -->
 
            {% if request.user.is_authenticated %}
               <li> 
-                  <a title="Click here to view your enrolled Courses" href="{% url 'my_desk' request.user.id %}" {% if title == "my desk" or title == "my performance" %} class="active" {% endif %}> My Desk</a>
+                  <a title="Click here to view your enrolled Courses" href="{% url 'my_desk' request.user.id %}" {% if title == "my desk" or title == "my performance" %} class="active" {% endif %}> {% trans "My Desk" %} </a>
               </li>
             {% endif %}
+  
+              <li class="has-form">
+              <!--  <form id = "search_form" {% if groupid %} action="{% url 'results' groupid %}" {% else %} action="" {% endif %}
+                  name="search_form" method="GET" >
+                <form id="search_form"  name="search_form" method="GET" >
+                  {{group_object.name|truncatechars:15}}
+                  <div class="row collapse">
+                    <div class="large-11 small-10 columns">
+                      <input type="text" name="search_text" id="search_text" placeholder='{% trans "Search" %} ' autocomplete="off" required />
+                    </div>
+                    <div class="large-1 small-2 columns">
+                      <button type="submit" class="tiny button" value="" id="search-submit" class="checked">
+                        <i class="fi-magnifying-glass"></i>
+                      </button>
+                    </div>
+                  </div>
 
+                </form>-->
+              </li>
         </ul>
         <!-- -END of NROER level one menu -->
       {% comment %}
@@ -342,6 +360,30 @@
                   {# --{{request.session.buddies_authid_name_dict}}-- #}
             {% endif %}
 
+            {% if "CourseEventGroup" not in group_object.member_of_names_list and site.SITE_NAME != "clix" %}
+              <ul>
+                <li class="has-dropdown">
+                  <a>{% trans "Language" %} &nbsp; | &nbsp; {{request.LANGUAGE_CODE}}</a>
+                  <ul class="dropdown">
+
+                    {% for lang in LANGUAGES %}
+                      <li>
+                        <form action="/i18n/setlang/" method="POST">
+                          {% csrf_token %}
+                          <input name="url" type="hidden" value="{{request.get_full_path}}"/>
+                          <input type="hidden"  name="language" value="{{ lang.0 }}">
+                          <input type="submit" class="button expand secondary" value="{{ lang.1 }}"/>
+                        </form>
+                      </li>
+                    {% endfor %}
+
+                  </ul>
+                </li>
+              </ul>
+            {% endif %}
+
+
+
             <li>
               <a class="logout" href="{% url 'auth_logout' %}">
                 <i class="fi-power"></i> &nbsp;{% trans "Logout" %}
@@ -363,11 +405,35 @@
           Otherwise it will get into unending loop i.e. as soon as logs-in it gets logged-out
           as redirection-url was of logout; similar case with password-reset!
         -->
+        <li>
+          
+          {% if not user.is_authenticated %}
+          <ul class="right">
+            <li class="has-dropdown">
+              <a>{% trans "Language" %} &nbsp; | &nbsp; {{request.LANGUAGE_CODE}}</a>
+              <ul class="dropdown">
+
+                {% for lang in LANGUAGES %}
+                  <li>
+                    <form action="/i18n/setlang/" method="POST">
+                      {% csrf_token %}
+                      <input name="url" type="hidden" value="{{request.get_full_path}}"/>
+                      <input type="hidden"  name="language" value="{{ lang.0 }}">
+                      <input type="submit" class="button expand secondary" value="{{ lang.1 }}"/>
+                    </form>
+                  </li>
+                {% endfor %}
+
+              </ul>
+            </li>
+          </ul>
+          {% endif %}
+        </li>
 
         <li>
 
            {# <a href="#" data-reveal-id="loginModal" id="login-button-medium">{% trans "Login to your clix account" %}</a> #}
-          {# <a href="#" data-reveal-id="loginModal" id="login-button-small">{% trans "Login" %}</a> #}
+          {# <a href="#" data-reveal-id="loginModal" id="login-button-small">{% trans "Login" %}</a> #}        
 
           <a class="" href="{% url 'auth_login' %}{% if not is_ac_url %}?next={{request.path}}{% endif %}" accesskey="l">
             <i class="fi-key"></i>&nbsp; {% trans "Login" %}
@@ -387,7 +453,7 @@
          -->
         <!-- Closes Right Nav section -->
 
-{% if "CourseEventGroup" not in group_object.member_of_names_list and site.SITE_NAME != "clix" %}
+<!-- {% if "CourseEventGroup" not in group_object.member_of_names_list and site.SITE_NAME != "clix" %}
         <ul class="right">
           <li class="has-dropdown">
             <a>{% trans "Language" %} &nbsp; | &nbsp; {{request.LANGUAGE_CODE}}</a>
@@ -409,10 +475,31 @@
         </ul>
 {% endif %}
 
-        <!-- Right Nav Section -->
+ -->        <!-- Right Nav Section -->
         <ul class="right">
-          <li>
-            <a href="/help/"><i class="fa fa-info-circle"></i> Help</a>
+
+          <li class="second-has-form">
+            <div class="input-group searchbar">
+              <div class="input-group-button">
+                    <button type="submit" class="search tiny button" id="search-submit" ><svg width="100" height="100" viewBox="0 0 100 100">
+                  <path fill="#FFF" fill-rule="evenodd" d="M42.117,12.246 C50.1209,12.246 57.797,15.4257 63.453,21.0858 C69.1132,26.742 72.2928,34.4178 72.2928,42.4218 C72.2928,50.4258 69.1131,58.1018 63.453,63.7578 C57.7968,69.418 50.121,72.5976 42.117,72.5976 C34.1131,72.5976 26.437,69.4179 20.781,63.7578 C15.1208,58.1016 11.9412,50.4258 11.9412,42.4218 C11.9412,34.4178 15.1209,26.7418 20.781,21.0858 C26.4372,15.4256 34.113,12.246 42.117,12.246 L42.117,12.246 Z M76.0828827,67.3362833 C82.3527829,58.7859894 85.2617455,48.0434678 83.9173,37.22271 C82.0618,22.28871 72.3743,9.47671 58.5153,3.61771 L58.51139,3.61771 C53.32389,1.41851 47.74139,0.28961 42.10539,0.29741 L42.117,0.305 C29.058,0.30891 16.742,6.3675 8.769001,16.707 C0.7924008,27.047 -1.933999,40.5 1.382301,53.129 C4.698701,65.758 13.6833,76.137 25.7103,81.223 L25.7103,81.22691 C39.5733,87.08631 55.5113,85.10191 67.5153,76.02771 C67.5852345,75.9748392 67.6549736,75.9217748 67.724517,75.8685177 L91.555,99.6990032 L100.0003,91.253703 L76.0828827,67.3362833 Z"/>
+                </svg>
+                <i class="" title="Search"></i>
+                </button>
+              </div>
+            </div>
+          </li>
+
+          <!-- <li class="second-has-form">
+                <div class="large-1 small-2 columns">
+                  <button type="submit" class="tiny button" value="" id="search-submit" class="checked">
+                  <i class="fi-magnifying-glass" title="Search"></i>
+                  </button>
+                </div>
+
+          <li> -->
+          <li>  
+            <a href="/help/"><i class="fa fa-info-circle"></i> {% trans "Help" %}</a>
           </li>
           {% if groupid %}          
             <li class=""><a title="Click here to view Notifications"  target="_blank" href="{% url 'notification_details' groupid %}"> <i class="fa fa-bell-o"></i></a></li>
@@ -430,7 +517,7 @@
 
       <!-- =========| divider between two nav's/header's |=========== -->
 
-
+       
       <!-- start of second nav  or group level header-->
       {% if site.SECOND_LEVEL_HEADER %}
 
@@ -442,34 +529,41 @@
 
       <div class="contain-to-grid {% if request.path != '/welcome' %}{% if group_object.edit_policy != 'EDITABLE_MODERATED' %}{% if not is_ac_url %}sticky{% endif %}{% endif %}{% endif %}" id="group-level-header">
 
+      <!--remove secondary header for activity page-->  
+      {% comment %}
         <nav class="top-bar" id="second-header" data-topbar data-options="sticky_on: large" role="navigation">
         <!-- don't show this app bar for groups with editable moderated -->
         {% if "ModeratingGroup" not in group_object.member_of_names_list %}
           {% if not is_ac_url %}
             {% if request.path != "/welcome" %}
+              
               <!-- #{#% cache 3600 group_header request.LANGUAGE_CODE request.path request.user.username %} -->
               <ul class="title-area text-center">
                 <li class="name" title="{% firstof  group_object.altnames group_object.name %}">
-                  <h1>
-                    <a href="{% url 'groupchange' group_id %}">
+                      {% if group_object.name == "home" %}
+                        <a href="{% url 'landing_page' %}">      
+                      {% else %}
+                        <a href="{% url 'groupchange' group_id %}">      
+                      {% endif %}
+                        {% get_relation_value group_object.pk 'has_profile_pic' as grel_dict %}
+                        {% if not grel_dict.cursor and grel_dict.grel_node %}
+                                  <img src="{{MEDIA_URL}}{{grel_dict.grel_node.if_file.original.relurl}}" />
+                        {% else %}
+                                  <img src="/static/ndf/images/metaStudio-profile.svg" alt="Profile picture for this group."  height="20px" width="20px" >
+                        {% endif %}
 
-                          {% get_relation_value group_object.pk 'has_profile_pic' as grel_dict %}
-                          {% if not grel_dict.cursor and grel_dict.grel_node %}
-                                    <img src="{{MEDIA_URL}}{{grel_dict.grel_node.if_file.original.relurl}}" />
-                          {% else %}
-                                    <img src="/static/ndf/images/metaStudio-profile.svg" alt="Profile picture for this group."  height="20px" width="20px" >
-                          {% endif %}
-
-                          <span style="color:black!important">{% firstof group_object.altnames|truncatechars:7 group_object.name|truncatechars:7 %}</span>
+                        <span style="color:black!important">{% firstof group_object.altnames|truncatechars:7 group_object.name|truncatechars:7 %}</span>
                     </a>
                   </h1>
                 </li>
                 <li>
                 </li>
+                
                 <!-- Remove the class "menu-icon" to get rid of menu icon. Take out "Menu" to just have icon alone -->
+              
                 <li class="toggle-topbar menu-icon"><a href="#"><span>{% trans "APPS" %}</span></a></li>
               </ul>
-
+               
               <section class="top-bar-section">
                 <!-- Right Nav Section -->
 
@@ -488,6 +582,7 @@
                         {% else %}
 
                           {% if site.SITE_NAME == "NROER" and user.is_superuser  %}
+                              
                             <a title="Find Latest Updates in {{ group_object.name }}" href="{% url 'group_dashboard' group_object.name %}">
                               <i class="fi-results"></i> {% trans "Updates" %}
                             </a>
@@ -496,6 +591,7 @@
                                 <i class="fi-rss"></i>
                               </a>
                             </li>
+                              
                           {% endif %}
                           {% if site.SITE_NAME != "NROER"   %}
                             <a title="Find Latest Updates in {{ group_object.name }}" href="{% url 'group_dashboard' group_object.name %}">
@@ -507,7 +603,7 @@
                               </a>
                             </li>
                           {% endif %}
-
+                         
                         {% endif %}
                       {% endif %}
 
@@ -529,23 +625,21 @@
                       </div>
                     </form>
                   </li> -->
-                  <li class="has-form">
+                  <!--<li class="has-form">
                     <form {% if groupid %} action="{% url 'results' groupid %}" {% else %} action="" {% endif %}
                       name="search_form" method="GET" >
-
                       <div class="row collapse">
                         <div class="large-11 small-10 columns">
-                          <input type="text" name="search_text" id="search_text" placeholder='{% trans "Search" %} {{group_object.name|truncatechars:15}}' autocomplete="off" required/>
+                          <input type="text" name="search_text" id="search_text" placeholder="{% trans 'Search' %} {{group_object.name|truncatechars:15}}" autocomplete="off" required/>
+
                         </div>
                         <div class="large-1 small-2 columns">
                           <button type="submit" class="tiny button" value="" id="search-submit">
                             <i class="fi-magnifying-glass"></i>
                           </button>
                         </div>
-                      </div>
+                      </div>-->
 
-                    </form>
-                  </li>
 
                   <!-- END of search in the app bar -->
 
@@ -589,17 +683,24 @@
                 </ul>
 
               </section>
+              
               <!-- {#% endcache %} -->
+
             {% endif %} <!-- end of "/welcome" landing page check -->
           {% endif %} <!-- end of "accounts" urls check -->
         {% endif %} <!-- end of "group's edit_policy" urls check -->
         </nav>
+
+      {% endcomment %}
+
       </div>
+
       {% endif %} <!-- landing page if -->
 
       {% endif %}
       {% endif %}
       {% endif %}
+       
       <!-- end of second nav -->
 
     {# </div> #}
@@ -644,3 +745,141 @@
 </script>
 
 {% endif %}
+
+  <script>
+  
+
+
+  $(document).on("click", "#search-submit", function() {
+          $("li.second-has-form").hide();
+                 
+            var temp = "False"
+            if (window.location.pathname == "/home/repository" | window.location.pathname == "/55ab34ff81fccb4f1d806025/repository" | window.location.pathname == "/home/repository/" |  window.location.pathname == "/55ab34ff81fccb4f1d806025/repository/") {
+            //$('li').attr({class: "has-form"});            
+              $('li.has-form').append("<form id = 'search_form' {% if groupid %} action='{% url 'repository' groupid %}' {% else %} action='' {% endif %} name='search_form' method=GET></form>");}
+            else if(window.location.pathname == "/home/e-library/" | window.location.pathname == "/home/e-library" | window.location.pathname == "/55ab34ff81fccb4f1d806025/e-library" | window.location.pathname == "/55ab34ff81fccb4f1d806025/e-library/") {
+              $('li.has-form').append("<form id = 'search_form' {% if groupid %} action='{% url 'e-library' groupid %}' {% else %} action='' {% endif %} name='search_form' method=GET></form>");
+              
+            }
+            else if(window.location.pathname == "/explore/courses" | window.location.pathname == "/55ab34ff81fccb4f1d806025/courses") {
+              $('li.has-form').append("<form id = 'search_form' {% if groupid %} action='{% url 'explore_courses' %}' {% else %} action='' {% endif %} name='search_form' method=GET></form>");
+            }
+            else if(window.location.pathname == "/explore/workspaces" | window.location.pathname == "/55ab34ff81fccb4f1d806025/workspaces") {
+              $('li.has-form').append("<form id = 'search_form' {% if groupid %} action='{% url 'explore_groups' %}' {% else %} action='' {% endif %} name='search_form' method=GET></form>");
+              }
+            else if(window.location.pathname == "/explore/drafts" | window.location.pathname == "/55ab34ff81fccb4f1d806025/drafts") {
+              $('li.has-form').append("<form id = 'search_form' {% if groupid %} action='{% url 'explore_drafts' %}' {% else %} action='' {% endif %} name='search_form' method=GET></form>");
+              }
+            else if(window.location.pathname == "/1/my-desk/" | window.location.pathname == "/55efd51681fccb14c0deb79a/my-desk/") {
+              $('li.has-form').append("<form id = 'search_form' {% if groupid %} action='{% url 'my_desk' groupid %}' {% else %} action='' {% endif %} name='search_form' method=GET></form>");
+              }
+            else if(window.location.pathname == "/home/topics/" | window.location.pathname == "/55ab34ff81fccb4f1d806025/topics/" | window.location.pathname == "/home/topics") {
+              $('li.has-form').append("<form id = 'search_form' {% if groupid %} action='{% url 'topics' groupid %}' {% else %} action='' {% endif %} name='search_form' method=GET></form>");
+              }
+            else if(window.location.pathname == "/55ab34ff81fccb4f1d806025/module/55d6ef7581fccb016e97ef82" | window.location.pathname == "/home/module/55d6ef7581fccb016e97ef82") {
+              $('li.has-form').append("<form id = 'search_form' {% if groupid %} action='{% url 'module_detail' groupid '55d6ef7581fccb016e97ef82' %}' {% else %} action='' {% endif %} name='search_form' method=GET></form>");
+              }
+            else if(window.location.pathname == "/55ab34ff81fccb4f1d806025/module/55d6c86981fccb016e97eea7" | window.location.pathname == "/home/module/55d6c86981fccb016e97eea7") {
+              $('li.has-form').append("<form id = 'search_form' {% if groupid %} action='{% url 'module_detail' groupid '55d6c86981fccb016e97eea7' %}' {% else %} action='' {% endif %} name='search_form' method=GET></form>");
+              }
+            else if(window.location.pathname == "/55ab34ff81fccb4f1d806025/module/5623bad981fccb5aec149bed" | window.location.pathname == "/home/module/5623bad981fccb5aec149bed") {
+              $('li.has-form').append("<form id = 'search_form' {% if groupid %} action='{% url 'module_detail' groupid '5623bad981fccb5aec149bed' %}' {% else %} action='' {% endif %} name='search_form' method=GET></form>");
+              }
+            else if(window.location.pathname == "/55ab34ff81fccb4f1d806025/module/5623baf981fccb5aec149c14" | window.location.pathname == "/home/module/5623baf981fccb5aec149c14") {
+              $('li.has-form').append("<form id = 'search_form' {% if groupid %} action='{% url 'module_detail' groupid '5623baf981fccb5aec149c14' %}' {% else %} action='' {% endif %} name='search_form' method=GET></form>");
+              }
+            else if(window.location.pathname == "/55ab34ff81fccb4f1d806025/module/5623ba1a81fccb5aec149ba1" | window.location.pathname == "/home/module/5623ba1a81fccb5aec149ba1") {
+              $('li.has-form').append("<form id = 'search_form' {% if groupid %} action='{% url 'module_detail' groupid '5623ba1a81fccb5aec149ba1' %}' {% else %} action='' {% endif %} name='search_form' method=GET></form>");
+              }
+            else if(window.location.pathname == "/home/e-book/" | window.location.pathname == "/55ab34ff81fccb4f1d806025/e-book/") {
+              $('li.has-form').append("<form id = 'search_form' {% if groupid %} action='{% url 'e-book' groupid  %}' {% else %} action='' {% endif %} name='search_form' method=GET></form>");
+              }
+
+              
+               
+            else{
+              $('li.has-form').append("<form id = 'search_form' {% if groupid %} action='{% url 'results' groupid %}' {% else %} action='' {% endif %} name='search_form' method=GET></form>");
+              temp = "True"
+              
+            }
+ 
+            $('#search_form').append('<div class="row collapse"><div class="large-6 small-6 columns"><input type="text" name="search_text" id="search_text" placeholder="{% trans "Search" %}" autocomplete="off" required /></div><div class="large-1 small-2 columns"><button type="submit" class="tiny button" value="" id="search-submit1" class="checked"><i class="fi-magnifying-glass"></i></button></div> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<input type="radio" id= "current_search" name="search" value="current" checked> Local <input id="global_search" type="radio" name="search" value="global"> Global <div></div>');
+            if(temp == "True") {
+              $("#current_search").attr('disabled', true);
+              $("#global_search").prop("checked", true)
+              
+            }
+              //var selValue = $('input[name=search]:checked').val(); 
+             // $('#sid').html('<br/>Selected Radio Button Value is : <b>' + selValue + '</b>');
+
+            //$('form').attr({id: "search_form"});
+            
+    
+
+ });
+
+  $(document).on("click", "#global_search", function() {
+        $("li.has-form").empty();
+        if(window.location.pathname == "/1/my-desk/" | window.location.pathname == "/55efd51681fccb14c0deb79a/my-desk/") {
+              $('li.has-form').append("<form id = 'search_form' {% if groupid %} action='{% url 'results' 'home' %}' {% else %} action='' {% endif %} name='search_form' method=GET></form>");
+              } 
+        $('li.has-form').append("<form id = 'search_form' {% if groupid %} action='{% url 'results' groupid %}' {% else %} action='' {% endif %} name='search_form' method=GET></form>");
+        $('#search_form').append('<div class="row collapse"><div class="large-6 small-6 columns"><input type="text" name="search_text" id="search_text" placeholder="{% trans "Search" %}" autocomplete="off" required /></div><div class="large-1 small-2 columns"><button type="submit" class="tiny button" value="" id="search-submit1" class="checked"><i class="fi-magnifying-glass"></i></button></div> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<input type="radio" id= "current_search" name="search" value="current" > Local <input id="global_search" type="radio" name="search" value="global" checked> Global <div></div>');
+
+ });
+
+  $(document).on("click", "#current_search", function() {
+        $("li.has-form").empty();
+        if (window.location.pathname == "/home/repository" | window.location.pathname == "/55ab34ff81fccb4f1d806025/repository") {
+          $('li.has-form').append("<form id = 'search_form' {% if groupid %} action='{% url 'repository' groupid %}' {% else %} action='' {% endif %} name='search_form' method=GET></form>");
+        }
+        else if(window.location.pathname == "/home/e-library/" | window.location.pathname == "/home/e-library" | window.location.pathname == "/55ab34ff81fccb4f1d806025/e-library" | window.location.pathname == "/55ab34ff81fccb4f1d806025/e-library/")
+        {
+          $('li.has-form').append("<form id = 'search_form' {% if groupid %} action='{% url 'e-library' groupid %}' {% else %} action='' {% endif %} name='search_form' method=GET></form>");
+        }
+        else if(window.location.pathname == "/explore/courses" | window.location.pathname == "/55ab34ff81fccb4f1d806025/courses") {
+        $('li.has-form').append("<form id = 'search_form' {% if groupid %} action='{% url 'explore_courses' %}' {% else %} action='' {% endif %} name='search_form' method=GET></form>");
+        }
+        else if(window.location.pathname == "/explore/workspaces" | window.location.pathname == "/55ab34ff81fccb4f1d806025/workspaces") {
+        $('li.has-form').append("<form id = 'search_form' {% if groupid %} action='{% url 'explore_groups' %}' {% else %} action='' {% endif %} name='search_form' method=GET></form>");
+        }
+        else if(window.location.pathname == "/explore/drafts" | window.location.pathname == "/55ab34ff81fccb4f1d806025/drafts") {
+        $('li.has-form').append("<form id = 'search_form' {% if groupid %} action='{% url 'explore_drafts' %}' {% else %} action='' {% endif %} name='search_form' method=GET></form>");
+              }
+        else if(window.location.pathname == "/1/my-desk/" | window.location.pathname == "/55efd51681fccb14c0deb79a/my-desk/") {
+        $('li.has-form').append("<form id = 'search_form' {% if groupid %} action='{% url 'my_desk' groupid %}' {% else %} action='' {% endif %} name='search_form' method=GET></form>");
+              }
+        else if(window.location.pathname == "/home/topics/" | window.location.pathname == "/55ab34ff81fccb4f1d806025/topics/" | window.location.pathname == "/home/topics") {
+        $('li.has-form').append("<form id = 'search_form' {% if groupid %} action='{% url 'topics' groupid %}' {% else %} action='' {% endif %} name='search_form' method=GET></form>");
+              }           
+        else if(window.location.pathname == "/55ab34ff81fccb4f1d806025/module/55d6ef7581fccb016e97ef82" | window.location.pathname == "/home/module/55d6ef7581fccb016e97ef82" ) {
+              $('li.has-form').append("<form id = 'search_form' {% if groupid %} action='{% url 'module_detail' groupid '55d6ef7581fccb016e97ef82' %}' {% else %} action='' {% endif %} name='search_form' method=GET></form>");
+              }
+        else if(window.location.pathname == "/55ab34ff81fccb4f1d806025/module/55d6c86981fccb016e97eea7" | window.location.pathname == "/home/module/55d6c86981fccb016e97eea7") {
+              $('li.has-form').append("<form id = 'search_form' {% if groupid %} action='{% url 'module_detail' groupid '55d6c86981fccb016e97eea7' %}' {% else %} action='' {% endif %} name='search_form' method=GET></form>");
+              } 
+        else if(window.location.pathname == "/55ab34ff81fccb4f1d806025/module/5623bad981fccb5aec149bed" | window.location.pathname == "/home/module/5623bad981fccb5aec149bed") {
+              $('li.has-form').append("<form id = 'search_form' {% if groupid %} action='{% url 'module_detail' groupid '5623bad981fccb5aec149bed' %}' {% else %} action='' {% endif %} name='search_form' method=GET></form>");
+              }
+        else if(window.location.pathname == "/55ab34ff81fccb4f1d806025/module/5623baf981fccb5aec149c14" | window.location.pathname == "/home/module/5623baf981fccb5aec149c14") {
+              $('li.has-form').append("<form id = 'search_form' {% if groupid %} action='{% url 'module_detail' groupid '5623baf981fccb5aec149c14' %}' {% else %} action='' {% endif %} name='search_form' method=GET></form>");
+              }    
+        else if(window.location.pathname == "/55ab34ff81fccb4f1d806025/module/5623ba1a81fccb5aec149ba1" | window.location.pathname == "/home/module/5623ba1a81fccb5aec149ba1") {
+              $('li.has-form').append("<form id = 'search_form' {% if groupid %} action='{% url 'module_detail' groupid '5623ba1a81fccb5aec149ba1' %}' {% else %} action='' {% endif %} name='search_form' method=GET></form>");
+              }
+        else if(window.location.pathname == "/home/e-book/" | window.location.pathname == "/55ab34ff81fccb4f1d806025/e-book/") {
+              $('li.has-form').append("<form id = 'search_form' {% if groupid %} action='{% url 'e-book' groupid  %}' {% else %} action='' {% endif %} name='search_form' method=GET></form>");
+              }
+      
+           
+        else
+        {
+          $('li.has-form').append("<form id = 'search_form' {% if groupid %} action='{% url 'results' groupid %}' {% else %} action='' {% endif %} name='search_form' method=GET></form>");        
+        }
+        $('#search_form').append('<div class="row collapse"><div class="large-6 small-6 columns"><input type="text" name="search_text" id="search_text" placeholder="{% trans "Search" %}" autocomplete="off" required /></div><div class="large-1 small-2 columns"><button type="submit" class="tiny button" value="" id="search-submit1" class="checked"><i class="fi-magnifying-glass"></i></button></div> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<input type="radio" id= "current_search" name="search" value="current" checked> Local <input id="global_search" type="radio" name="search" value="global"> Global <div></div>');
+
+ });
+
+</script>
+
+

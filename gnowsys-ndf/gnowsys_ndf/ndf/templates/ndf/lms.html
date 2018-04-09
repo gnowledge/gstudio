@@ -63,7 +63,7 @@
     </li>
     {% endif %}
     <li>
-      <a href="{% url 'gtask' group_id  %}"  tabindex="7" > <i class="fa fa-list-alt"></i> {% trans "Task" %}</a>
+      <a href="{% url 'gtask' group_id  %}"  tabindex="7" > <i class="fa fa-list-alt"></i> {% trans "Calendar" %}</a>
     </li>
 
     {% else %}
@@ -89,7 +89,7 @@
       {% if 'Group' in group_object_member_of_names_list and  'base_unit' not in group_object_member_of_names_list %}
         {% trans "Blog" %} 
       {% else %}
-        {% trans "Notebook" %} 
+        {% trans "blog" %} 
       {% endif %}
       </a>
     </li>
@@ -101,7 +101,7 @@
 
     
     <li>
-      <a href="{% url 'gtask' group_id  %}"  tabindex="7" > <i class="fa fa-list-alt"></i> {% trans "Task" %}</a>
+      <a href="{% url 'gtask' group_id  %}"  tabindex="7" > <i class="fa fa-list-alt"></i> {% trans "Calendar" %}</a>
     </li>
   {% endif %}
 </ul>
@@ -126,7 +126,7 @@
     	{% endif %}
     </li>
     <li>
-        <a href="https://clix-authoring.mit.edu/#/" target="_blank" {% if title == 'Assessments' %}class="selected"{% endif %}><i class="fi-graph-trend"></i> {% trans "Assessments" %}</a>
+        <a href="https://interx.metastudio.org/wp-admin/admin.php?page=h5p" target="_blank" {% if title == 'Assessments' %}class="selected"{% endif %}><i class="fi-graph-trend"></i> {% trans "Assessments" %}</a>
     </li>
   {% endif %}
 
@@ -184,7 +184,7 @@
 
               {% endif %}
               <li>
-                  <a href="{% url 'unit_edit' groupid group_object.pk %}" class="fi-pencil"> {% trans "Edit Metadata" %}</a>
+                  <a href="{% url 'unit_edit' groupid group_object.pk %}" class="fi-pencil"> {% if 'Author' in group_object_member_of_names_list %} {% trans "Edit Profile" %} {% else %} {% trans "Edit Metadata" %} {% endif %}</a>
               </li>
               <li> <a data-reveal-id="delete-unit"><i class="fa fa-trash"></i> {% trans "Delete" %}</a> </li>
               <div id="delete-unit" class="reveal-modal tiny text-center" data-reveal>

@@ -97,3 +97,19 @@ def node_create_edit(request,
 
 
         return HttpResponseRedirect(reverse(detail_url_name, kwargs={'group_id': group_id, 'node_id': node_id}))
+@get_execution_time
+def node_detail(request,
+                    group_id,
+                    node_id):
+    '''
+    creation as well as edit of node
+    '''
+    node_obj = Node.get_node_by_id(node_id)
+
+    # return HttpResponseRedirect(reverse(detail_url_name, kwargs={'group_id': group_id, 'node_id': node_id}))  
+    return render_to_response("ndf/result_detailed_view.html",
+                                          {
+                                           'group_id':group_id,
+                                           'node':node_obj
+                                          },
+                                          context_instance=RequestContext(request))
