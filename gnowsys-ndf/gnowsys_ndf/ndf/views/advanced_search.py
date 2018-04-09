@@ -57,7 +57,7 @@ def search_detail(request,group_id,page_no=1):
 		search_text = request.GET.get("search_text",None)
 
 		q = Q('bool', must=[Q('match', language='en'),Q('match', access_policy='public'),Q('match', group_set=str(group_id)),
-			Q('bool', must=[Q('match_phrase', content=search_text)])])
+			Q('terms', content=[search_text])] )
 		search_result =Search(using=es, index="nodes",doc_type="gsystemtype,gsystem,metatype,relationtype,attribute_type,group,author").query(q)
 
 
