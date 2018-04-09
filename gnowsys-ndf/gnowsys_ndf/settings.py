@@ -518,10 +518,6 @@ INSTALLED_APPS = (
     'memcache_admin',
     'django_mailbox',
     'djcelery',
-    # 'provider',
-    # 'provider.oauth2',
-    # #'dlkit',
-    #'dlkit_runtime'
 )
 
 # AUTHENTICATION_BACKENDS = (
