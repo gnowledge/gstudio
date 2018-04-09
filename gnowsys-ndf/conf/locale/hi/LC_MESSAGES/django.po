@@ -3471,7 +3471,7 @@ msgstr "खोजें "
 
 #: gnowsys_ndf/ndf/templates/ndf/header.html:130
 msgid "My Desk"
-msgstr "मेरी मेजz"
+msgstr "मेरी मेज"
 
 #: gnowsys_ndf/ndf/templates/ndf/header.html:214
 msgid "MY DASHBOARD"
@@ -7139,8 +7139,10 @@ msgstr "%(email_url)s आपके पास एक सत्यापित ई
 #~ msgid "Interest Groups"
 #~ msgstr "अभिरूचि समूह"
 
-#~ msgid "Schools"
-#~ msgstr "विद्यालय"
+
+#: gnowsys_ndf/ndf/templates/ndf/main_simple_card.html:19
+msgid "Schools"
+msgstr "विद्यालय"
 
 #~ msgid "Open Educational Resources mapped to school curricular"
 #~ msgstr "विद्यालय पाठ्यचर्या से संबद्ध मुक्त शैक्षिक संसाधन"
