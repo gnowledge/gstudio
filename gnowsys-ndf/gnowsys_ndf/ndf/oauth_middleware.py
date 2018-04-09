@@ -19,11 +19,6 @@ from django.contrib.auth.models import User
 ########################################
 
 
-
-
-
-
-
 class test(object):
     def moauth(self,request):
        
@@ -31,12 +26,13 @@ class test(object):
             # from mastodon import Mastodon
                
             form = mform(request.POST)
+
             ###GET username and password from user#####
             Username = request.POST.get('username')
             Password = request.POST.get('password')
            
             
-            ###CHECKING CLIENT CREDENTIALS##########
+            ###CHECKING CLIENT CREDENTIALS USING MASTODON API##########
             mastodon_var = mastodon.Mastodon(
                
                 client_id='gnowsys_ndf/ndf/NROER-client_cred.secret',
@@ -44,13 +40,14 @@ class test(object):
             )
 
             access_token = None
+
             ####GET ACCESS FROM MASTODON HERE#######
             try:
                 access_token  = mastodon_var.log_in(
                 Username,
                 Password,
                 to_file='gnowsys_ndf/ndf/NROER-access_token.secret',
-                #redirect_uri = 'landing_page'
+               
                
                 )
                 mastodon_var2 = Mastodon(
@@ -67,53 +64,50 @@ class test(object):
             password = None
            
 
-
-            print "============0000000000================"
-            print access_token
-            print "----------------------------"
-
            
             if access_token:
                
-
-               
+                ###check whether given email is present in user table or not####
                 user_email = User.objects.filter(email=name).exists()
 
                 if (user_email==True):
                    
 
-                    print ",,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,"
+                    ##Fetch auth object using email
                     nodes = node_collection.one({'email':{'$regex':email,'$options': 'i' },'_type':unicode("Author")})
                     #nodes.access_token = access_token
+
                     if(nodes!=None):
                         nodes.access_token = access_token
-                        print "^^^^^^^^^^^^^^^^^^^^^^^^^^^^^"
+                       
                         
                         ####SECOND AND BY-DEFAULT CUSTOMIZE LAYER FOR AUTHENTICATION
                         user = authenticate(username=name, password=None)
 
                         print "+++++++++++++++++++++++++"
                         if user is not None:
-                        #if access_token in request.session:
+                        
                             if user.is_active:
                                 user.is_active=True
-                                #print "//////////////////////////////"
+                               
                                 login(request,user)
                                
-                            #return mastodon_var.auth_request_url(client_id=client_id, redirect_uris='http://172.17.0.2:8000/welcome')
                                 return HttpResponseRedirect( reverse('landing_page') )
                         else:
                             HttpResponse("Error1")
                     else:
+                        ##Creating auth object for user
                         execfile("/home/docker/code/gstudio/doc/deployer/create_auth_objs.py")
-                        #print member.id
-                        #print "-------------------"
                         
-                        #author = node_collection.one({"created_by":int(member.id),"_type":unicode("Author")})
+                        ##Fetch auth object using email
                         author = node_collection.one({'email':{'$regex':email,'$options': 'i' },'_type':unicode("Author")})
-                        print author
+                        
+                        ##Assign access token for auth object
                         author.access_token = access_token
+
                         author.save()
+
+                        #By default layer and customise layer of authentication
                         user = authenticate(username=name, password=None)
                         if user is not None:
                             if user.is_active:
@@ -123,19 +117,20 @@ class test(object):
                                 HttpResponse("Error1")
 
                 else:
+                    ##Creating user in django user table 
                     member = User.objects.create_user(name,email,password)
                     member.save()
 
-
+                    ##Fetch auth object using email
                     nodes = node_collection.one({'email':{'$regex':email,'$options': 'i' },'_type':unicode("Author")})
 
                     if(nodes!=None):
 
-                        print "Successs!!!!!!"
+                        
                         user = authenticate(username=name, password=None)
                         if user is not None:
                             if user.is_active:
-                                print "********"
+                                
                                 login(request, user)
                                 return HttpResponseRedirect( reverse('landing_page') )
                             else:
@@ -144,10 +139,9 @@ class test(object):
 
 
                     else:
-                        #################################                   
+                                           
                         execfile("/home/docker/code/gstudio/doc/deployer/create_auth_objs.py")
-                        #print member.id
-                        print "//////////////"
+                       
                         author = node_collection.one({"created_by":int(member.id),"_type":unicode("Author")})
                         author.access_token = access_token
                         author.save()
@@ -164,7 +158,7 @@ class test(object):
             else:
 
                 return HttpResponseRedirect(reverse('login') ) 
-            #return HttpResponseRedirect( reverse('landing_page') )
+            
         else:
           
             return HttpResponse("Invalid Credentials.")
@@ -172,7 +166,7 @@ class test(object):
 
 
 
-# Name my backend 'MyCustomBackend'
+# Below class used for overriding defualt authenticate method of django
 class MyCustomBackend:
    
     # Create an authentication method

@@ -17,7 +17,7 @@ from gnowsys_ndf.ndf.views.methods import tag_info
 from gnowsys_ndf.ndf.views.custom_app_view import custom_app_view, custom_app_new_view
 from gnowsys_ndf.ndf.views import rpc_resources
 ################################################
-#from gnowsys_ndf.ndf.views.home import test
+#Middleware for login with mastodon oauth
 from gnowsys_ndf.ndf.oauth_middleware import test 
 ################################################
 
@@ -46,7 +46,7 @@ urlpatterns = patterns('',
     # (r'^mobwrite/', 'gnowsys_ndf.mobwrite.views.mobwrite'),
     # --end of mobwrite
     ############################################################################
-    url(r'^oauth2/', include('provider.oauth2.urls', namespace = 'oauth2')),
+    #url(r'^oauth2/', include('provider.oauth2.urls', namespace = 'oauth2')),
     ############################################################################
 
     # url(r'^(?P<group_id>[^/]+)/mailclient[/]error[/](?P<error_obj>[\w-]+)$', 'gnowsys_ndf.ndf.views.mailclient.mailclient_error_display', name='mailclient_error_display'),
