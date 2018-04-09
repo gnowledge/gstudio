@@ -31430,3 +31430,21 @@ svg {
 .button {
   border-radius: 50px;
 }
+
+/* line 8253, ../../../scss/_app_styles.scss */
+#page_content {
+  display: table;
+  height: auto;
+  display: table-row;
+}
+
+/* line 8261, ../../../scss/_app_styles.scss */
+.footer_container {
+  height: auto;
+  display: table-row;
+}
+
+/* line 8268, ../../../scss/_app_styles.scss */
+#footer {
+  height: 1px;
+}
