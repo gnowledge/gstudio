@@ -23907,7 +23907,7 @@ overflow-x: hidden;*/
 
 /* line 462, ../../../scss/_app_styles.scss */
 #gbase_wrap {
-  min-height: 100%;
+  /*min-height: 100%;*/
   height: auto;
   /* Negative indent footer by its height */
   margin: 0 auto;
