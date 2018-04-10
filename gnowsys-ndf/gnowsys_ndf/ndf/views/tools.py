@@ -25,7 +25,7 @@ def tools_logging(request):
 	user_data_old_strategy = request.POST.get('user_data',None)
 	if userdata!= None:
 		userdata = json.loads(userdata)
-	# app_name = request.POST.get('app_name',' ')
+		# app_name = request.POST.get('app_name',' ')
 		app_name = userdata['appName']
 		sessionid = ""
 		sessionid = request.COOKIES.get("sessionid")
