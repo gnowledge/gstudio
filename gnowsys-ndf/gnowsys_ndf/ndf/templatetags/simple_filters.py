@@ -181,3 +181,13 @@ def datetime_now():
 def replace(str_to_process, to_be_replace, replace_by):
    replaced_str = str_to_process.replace(to_be_replace, replace_by)   
    return replaced_str
+
+@get_execution_time
+@register.assignment_tag
+def convert_list_to_dict(list_of_dicts):
+    
+    req_list = {}
+    for each in list_of_dicts:
+        if "educationaluse" in each:
+            req_list["educationaluse"] = str(each["educationaluse"])
+    return req_list

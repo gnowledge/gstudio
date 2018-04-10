@@ -1,5 +1,12 @@
 from base_imports import *
 from history_manager import HistoryManager
+from elasticsearch import Elasticsearch
+from elasticsearch_dsl import Q
+from gnowsys_ndf.settings import GSTUDIO_ELASTIC_SEARCH,GLITE_RCS_REPO_DIRNAME,GSTUDIO_ELASTIC_SEARCH_INDEX
+from bson.json_util import loads, dumps
+from models_utils import NodeJSONEncoder
+from gnowsys_ndf.ndf.gstudio_es.es import esearch
+
 
 @connection.register
 class Node(DjangoDocument):
@@ -707,6 +714,12 @@ class Node(DjangoDocument):
             # gets the last version no.
             rcsno = history_manager.get_current_version(self)
             node_collection.collection.update({'_id':self._id}, {'$set': {'snapshot'+"."+str(kwargs['groupid']):rcsno }}, upsert=False, multi=True)
+
+        ########################## ES ##################################
+        if GSTUDIO_ELASTIC_SEARCH == True:
+            #es = esearch(fp)
+            #es.inject()
+            esearch.inject(fp)
 
 
     # User-Defined Functions

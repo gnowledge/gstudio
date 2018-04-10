@@ -46,9 +46,12 @@
 {% endif %}
 {% endif %}
 <div class="scard-image" title="{% firstof resource.altnames resource.name %}">
-
-    {% get_dict_from_list_of_dicts resource.attribute_set as attr_set_dict %}
-
+    
+    {% if GSTUDIO_ELASTIC_SEARCH != True %}
+      {% get_dict_from_list_of_dicts resource.attribute_set as attr_set_dict %}
+    {% endif %}
+    {% convert_list_to_dict resource.attribute_set as attr_set_dict %}
+    
     {% get_relation_value resource.pk 'has_thumbnail' as grel_dict %}
     {% if not grel_dict.cursor and grel_dict.grel_node and grel_dict.grel_node.fs_file_ids.1 %}
         <img src="{{MEDIA_URL}}{{grel_dict.grel_node.if_file.mid.relurl}}" alt="" />
@@ -64,7 +67,7 @@
       <img src="{% url 'get_mid_size_img' first_arg second_arg %}" alt="">
     {% elif resource.fs_file_ids.1 %}
       <img src="{% url 'getImageThumbnail' first_arg second_arg %}" alt="">
-    {% elif "File" in resource.member_of_names_list or "Page" in resource.member_of_names_list%}
+    {% elif "File" in resource.member_of_names_list or "Page" in resource.member_of_names_list or '55ab34ff81fccb4f1d806001' in resource.member_of or '55ab34ff81fccb4f1d805fff' in resource.member_of %}
       {% if resource.collection_set  %}
         <i class="collection"></i>
       {% elif attr_set_dict.educationaluse and attr_set_dict.educationaluse != "Documents" %}
@@ -82,7 +85,7 @@
     {% elif "Group" in resource.member_of_names_list or has_logo == True or has_prof_pic == True %}
       {% if "Course" in resource.member_of_names_list or has_logo == True %}
 
-        {% get_relation_value resource.pk 'has_logo' as grel_dict %}
+        {% get_relation_value resource.pk|default_if_none:resource.id 'has_logo' as grel_dict %}
         {% if not grel_dict.cursor and grel_dict.grel_node and grel_dict.grel_node.if_file.mid.relurl %}
                   <img src="{{MEDIA_URL}}{{grel_dict.grel_node.if_file.mid.relurl}}" alt="" />
           {% else %}
@@ -91,7 +94,7 @@
 
 
       {% else %}
-        {% get_relation_value resource.pk 'has_profile_pic' as grel_dict %}
+        {% get_relation_value resource.pk|default_if_none:resource.id 'has_profile_pic' as grel_dict %}
         {% if not grel_dict.cursor and grel_dict.grel_node and grel_dict.grel_node.if_file.mid.relurl %}
                   <img src="{{MEDIA_URL}}{{grel_dict.grel_node.if_file.mid.relurl}}" alt="" />
           {% else %}
@@ -133,8 +136,13 @@
      <a style="margin-left:2px" href="{% url 'dashboard' resource.created_by %}" title="{{resource.created_by|get_username}}" target="_blank">
       {{resource.created_by|get_username|truncatechars:"10"}}</a>
      {% endif %}
-         <i style="float:right">{{resource.created_at|date:"d-m-Y"}}</i>
-     
+        {% if GSTUDIO_ELASTIC_SEARCH != True %}
+          <i style="float:right">{{resource.created_at|date:"d-m-Y"}}</i>
+        {% elif resource.created_at|cal_length == 13 %}
+          <i style="float:right">{{resource.created_at|convert_date_string_to_date|slice:"10"}}</i>     
+        {% else %}
+          <i style="float:right">{{resource.created_at|slice:"10"}}</i>
+        {% endif %}     
      {% if user.is_authenticated  and not group_object.edit_policy == "NON_EDITABLE"  or gstaff_access %} 
       {% if not no_checkbox  %}
         </a> <input type="checkbox" style="margin:0; float:left;" class="filenode" name="filenode" value="{{resource.pk}}">

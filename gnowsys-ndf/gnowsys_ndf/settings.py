@@ -1038,14 +1038,14 @@ GSTUDIO_ENABLE_USER_DASHBOARD = True
 GSTUDIO_PRIMARY_COURSE_LANGUAGE = u'en'
 
 # --- BUDDY Module configurations ---
-#
 GSTUDIO_BUDDY_LOGIN = False
+# --- End of BUDDY Module ---
+
+# Institute ID, name configs
 GSTUDIO_INSTITUTE_ID = ''
 GSTUDIO_INSTITUTE_ID_SECONDARY = ''
 GSTUDIO_INSTITUTE_NAME = ''
-#
-# --- End of BUDDY Module ---
-
+# --- End of Institute ID, name configs
 
 # # textb
 # import warnings
@@ -1069,6 +1069,29 @@ GSTUDIO_INSTITUTE_NAME = ''
 # --- END of meeting gapp ---
 
 
+GSTUDIO_ELASTIC_SEARCH_PASSWORD = ""
+
+# Elastic Search
+GSTUDIO_DOCUMENT_MAPPING = '/data'
+GSTUDIO_ELASTIC_SEARCH = False
+GSTUDIO_ELASTIC_SEARCH_PROTOCOL = 'http' # we can use http or https protocol
+GSTUDIO_ELASTIC_SEARCH_ALIAS = 'gsearch'
+GSTUDIO_ELASTIC_SEARCH_SUPERUSER = ''
+GSTUDIO_ELASTIC_SEARCH_SUPERUSER_PASSWORD = ''
+GSTUDIO_ELASTIC_SEARCH_PORT = '9200'
+# --- End of Elastic Search
+
+GLITE_RCS_REPO_DIRNAME = "glite-rcs-repo"
+GLITE_RCS_REPO_DIR = os.path.join('/data/', RCS_REPO_DIRNAME)
+
+GSTUDIO_ELASTIC_SEARCH_INDEX = {
+ "Filehives": ["Filehive"],
+ "Triples": ["GAttribute", "GRelation"],
+ "Buddies": ["Buddy"],
+ "Benchmarks": ["Benchmark"],
+ "Nodes": ["MetaType", "GSystemType", "RelationType", "AttributeType", "GSystem", "Group", "ToReduceDocs", "Author"],
+ "Counters": ["Counter"]
+}
 
 
 

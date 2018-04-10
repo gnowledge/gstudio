@@ -78,12 +78,23 @@
 
         <div class="new_note header_text_block header_text_md_block">
             <a title="Click here to write a Note" {% if user_access_priv == "allow" %} target="_blank" href="{% url 'course_notebook' group_id %}?create=True" {% else %} class="user_not_enrolled" {% endif %}><i class="fa fa-edit header_icon"></i>&nbsp;
-               {% trans "Write Note" %} 
+              {% if "announced_unit" in node.member_of_names_list or "drafts_unit" in node.member_of_names_list%}
+               {% trans "Write Note" %}
+              {% else %}
+                {% trans "Write Blog" %}
+              {% endif %}
+               
             </a>
+              }
         </div>
         <div class="new_note header_text_block  header_text_lg_block">
-            <a {% if prev_lesson_id and lesson_act_prev_id and not resource_prev_id%} href="{% url 'activity_player_detail' group_id prev_lesson_id lesson_act_prev_id %}" title="Go to previous lesson"   {% else %} class = "disabled" title="You are on the first lesson"   {% endif %} ><i class="fa fa-angle-double-left header_icon"></i>&nbsp;
-               {% trans "Previous Lesson" %}  
+        	{% if "announced_unit" in node.member_of_names_list or "drafts_unit" in node.member_of_names_list%}
+	            <a {% if prev_lesson_id and lesson_act_prev_id and not resource_prev_id%} href="{% url 'activity_player_detail' group_id prev_lesson_id lesson_act_prev_id %}" title="Go to previous lesson"   {% else %} class = "disabled" title="You are on the first lesson"   {% endif %} ><i class="fa fa-angle-double-left header_icon"></i>&nbsp;
+           		{% trans "Previous Lesson" %}  
+            {% else %}
+            	<a {% if prev_lesson_id and lesson_act_prev_id and not resource_prev_id%} href="{% url 'activity_player_detail' group_id prev_lesson_id lesson_act_prev_id %}" title="Go to previous section"   {% else %} class = "disabled" title="You are on the first section"   {% endif %} ><i class="fa fa-angle-double-left header_icon"></i>&nbsp;
+                {% trans "Previous Section" %}  
+            {% endif %} 
             </a>
         </div>
 
@@ -105,8 +116,16 @@
         </div>
 
         <div class="new_note header_text_block header_text_lg_block">
-            <a {% if next_lesson_id  and lesson_next_act_id and not resource_next_id %} title="Go to next lesson"  href="{% url 'activity_player_detail' group_id next_lesson_id lesson_next_act_id %}" {% else %} class = "disabled"   title="You are on the last Lesson" {% endif %} >
-               {% trans "Next Lesson" %} <i class="fa fa-angle-double-right header_icon"></i>    
+        	{% if "announced_unit" in node.member_of_names_list or "drafts_unit" in node.member_of_names_list%}
+
+	            <a {% if next_lesson_id  and lesson_next_act_id and not resource_next_id %} title="Go to next lesson"  href="{% url 'activity_player_detail' group_id next_lesson_id lesson_next_act_id %}" {% else %} class = "disabled"   title="You are on the last Lesson" {% endif %} >
+	        	{% trans "Next Lesson" %} 
+            
+            {% else %}
+                <a {% if next_lesson_id  and lesson_next_act_id and not resource_next_id %} title="Go to next section"  href="{% url 'activity_player_detail' group_id next_lesson_id lesson_next_act_id %}" {% else %} class = "disabled"   title="You are on the last section" {% endif %} >
+                {% trans "Next Section" %}  
+            {% endif %} 
+               <i class="fa fa-angle-double-right header_icon"></i>    
             </a>
         </div>
       </div>

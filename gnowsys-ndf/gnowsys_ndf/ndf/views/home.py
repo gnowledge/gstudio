@@ -95,12 +95,34 @@ def landing_page(request):
     '''
     Method to render landing page after checking variables in local_settings/settings file.
     '''
+    is_video = request.GET.get('is_video', "")
+
+    group_name, group_id = get_group_name_id('home')
+
+
+    group_count = node_collection.find({"_type":"Group"}).count()
+
+    author_count = node_collection.find({"_type":"Author"}).count()
+
+    GST_FILE = node_collection.one({'_type':'GSystemType', 'name': "File"})
+    GST_JSMOL = node_collection.one({"_type":"GSystemType","name":"Jsmol"})
+
+    files_count = node_collection.find({
+                                    'member_of': {'$in': [GST_FILE._id,GST_JSMOL._id]},
+                                    'group_set': {'$all': [group_id]},
+                                    }).sort("last_update", -1).count()
+
+
+
     if (GSTUDIO_SITE_LANDING_PAGE == "home") and (GSTUDIO_SITE_NAME == "NROER"):
         return render_to_response(
                                 "ndf/landing_page_nroer.html",
                                 {
                                     "group_id": "home", 'groupid':"home",
-                                    'landing_page': 'landing_page'
+                                    'landing_page': 'landing_page',
+                                    'group_count':group_count,
+                                    'author_count':author_count,
+                                    'files_count':files_count
                                 },
                                 context_instance=RequestContext(request)
                             )
