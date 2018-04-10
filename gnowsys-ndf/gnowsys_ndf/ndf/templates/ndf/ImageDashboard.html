@@ -241,15 +241,14 @@ $("#btnUploadCancel").click(function() {
 
 <script type="text/javascript">
     $(document).on("click", "#image_search-submit", function(event) {
-
-
       event.preventDefault();
       $.ajax({
         url:"{% url 'image' groupid %}",
         type:"GET",
         datatype: "html",
         data:{
-          search_text: $('#show_all_workspace option:selected').val()
+          search_text : $('#search_text').val(),
+          search_workspace: $('#show_all_workspace option:selected').val()
         },
         success:function(data){
           $(".small-block-grid-1").empty()

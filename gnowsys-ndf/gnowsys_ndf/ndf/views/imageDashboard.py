@@ -55,10 +55,14 @@ def imageDashboard(request, group_id, image_id=None,page_no=1):
     except:
         group_name, group_id = get_group_name_id(group_id)
 
+    search_workspace = request.GET.get("search_workspace",None)
     search_text = request.GET.get("search_text",None)
-    if search_text :
-        group_name, group_id = get_group_name_id(search_text)
-        print group_name
+    search_text = str(search_text)
+
+    if search_workspace and search_text:
+        group_name, group_id = get_group_name_id(search_workspace)
+
+        print group_id
 
 
     if image_id is None:
@@ -72,13 +76,14 @@ def imageDashboard(request, group_id, image_id=None,page_no=1):
                     }
                     }).sort('last_update', -1)
     all_workspaces_count = all_workspaces.count()
+    print all_workspaces_count
 
     # img_col = node_collection.find({'_type': 'File', 'member_of': {'$all': [ObjectId(image_id)]}, 'group_set': ObjectId(group_id)}).sort("last_update", -1)
-    files_cur = node_collection.find({
+    files_cur = node_collection.find({  '$and':[{'group_set': {'$all': [ObjectId(group_id)]}},{'$or':[{'content':{'$regex' : search_text, '$options' : 'i'}},{'name':{'$regex' : search_text, '$options' : 'i'}},{'altnames':{'$regex' : search_text, '$options' : 'i'}},{'tags':{'$regex' : search_text, '$options' : 'i'}}] }],
                                         '_type': {'$in': ["GSystem"]},
                                         'member_of': file_gst._id,
                                         #'group_set': {'$all': [ObjectId(group_id)]},
-                                        'group_set': {'$all': [ObjectId(group_id)]},
+                                        
                                         'if_file.mime_type': {'$regex': 'image'},
                                         'status' : { '$ne': u"DELETED" },
                                         # 'created_by': {'$in': gstaff_users},
@@ -108,6 +113,10 @@ def imageDashboard(request, group_id, image_id=None,page_no=1):
                             'if_file':1
                         }).sort("last_update", -1)
     # print "file count\n\n\n",files_cur.count()
+
+    print files_cur.count()
+    if files_cur.count() !=0:
+        has_files = False 
 
     # image_page_info = paginator.Paginator(files_cur, page_no, GSTUDIO_NO_OF_OBJS_PP)
     template = "ndf/ImageDashboard.html"

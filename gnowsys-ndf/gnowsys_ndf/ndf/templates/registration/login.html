@@ -42,7 +42,7 @@ position: relative !important;
 			<form method="post" id="loginSubmit" action="{% url 'login_view' %}" data-abide>
 
 		{% else %}
-			<form method="post" id="loginSubmit" action="{% url 'login' %}" data-abide>
+			<form method="post" id="loginSubmit" action="{% url 'auth_login' %}" data-abide>
 				
 		{% endif %}
 		{% csrf_token %}

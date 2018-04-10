@@ -528,6 +528,14 @@ AUTHENTICATION_BACKENDS = (
 
 ACCOUNT_ACTIVATION_DAYS = 2  # Two days for activation.
 
+###########################
+
+#AUTHENTICATION_BACKENDS = (
+#    'gnowsys_ndf.ndf.oauth_middleware.MyCustomBackend',
+#)
+
+ACCOUNT_ACTIVATION_DAYS = 2  # Two days for activation.
+
 
 # A sample logging configuration. The only tangible logging
 # performed by this configuration is to send an email to
