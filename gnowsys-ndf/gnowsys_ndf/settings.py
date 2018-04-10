@@ -428,6 +428,9 @@ TEMPLATE_LOADERS = (
     #  'django.template.loaders.eggs.Loader',
 )
 
+##LOGIN WITH MASTODON###
+LOGIN_WITH_MASTODON = False
+
 MIDDLEWARE_CLASSES = (
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.locale.LocaleMiddleware',
@@ -448,7 +451,6 @@ MIDDLEWARE_CLASSES = (
     'gnowsys_ndf.ndf.middleware.SetCookie.UserId',
     'gnowsys_ndf.ndf.middleware.SetData.Author',
 
-    'gnowsys_ndf.ndf.oauth_middleware.test',
     # 'gnowsys_ndf.ndf.middleware.Buddy.BuddySession',
     # 'gnowsys_ndf.ndf.middleware.UserRestrictMiddleware.UserRestrictMiddleware',
 
@@ -520,19 +522,12 @@ INSTALLED_APPS = (
     'djcelery',
 )
 
-# AUTHENTICATION_BACKENDS = (
-#     'registration_email.auth.EmailBackend',
-# )
+AUTHENTICATION_BACKENDS = (
+    'registration_email.auth.EmailBackend',
+)
 
 ACCOUNT_ACTIVATION_DAYS = 2  # Two days for activation.
 
-###########################
-
-AUTHENTICATION_BACKENDS = (
-    'gnowsys_ndf.ndf.oauth_middleware.MyCustomBackend',
-)
-
-##########################
 
 # A sample logging configuration. The only tangible logging
 # performed by this configuration is to send an email to
@@ -1019,6 +1014,10 @@ CACHES = {
     }
 }
 
+#####################MASTODON########################
+if LOGIN_WITH_MASTODON:
+    MIDDLEWARE_CLASSES += ('gnowsys_ndf.ndf.oauth_middleware.test',)
+    AUTHENTICATION_BACKENDS = ('gnowsys_ndf.ndf.middleware.oauth_middleware.MyCustomBackend',)
 
 # Captcha settings
 CAPTCHA_CHALLENGE_FUNCT =  'captcha.helpers.random_char_challenge'
@@ -1068,6 +1067,8 @@ GSTUDIO_INSTITUTE_NAME = ''
 # USERS_ONLINE__CACHE_USERS
 #
 # --- END of meeting gapp ---
+
+
 
 
 

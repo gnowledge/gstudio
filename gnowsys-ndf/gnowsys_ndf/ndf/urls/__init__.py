@@ -9,7 +9,7 @@ from registration.backends.default.views import ActivationView
 from jsonrpc import jsonrpc_site
 
 # from gnowsys_ndf.ndf.forms import *
-from gnowsys_ndf.settings import GSTUDIO_SITE_NAME
+from gnowsys_ndf.settings import GSTUDIO_SITE_NAME,LOGIN_WITH_MASTODON
 from gnowsys_ndf.ndf.views.email_registration import password_reset_email, password_reset_error, GstudioEmailRegistrationForm
 from gnowsys_ndf.ndf.forms import UserChangeform, UserResetform
 from gnowsys_ndf.ndf.views.home import homepage, landing_page
@@ -18,7 +18,7 @@ from gnowsys_ndf.ndf.views.custom_app_view import custom_app_view, custom_app_ne
 from gnowsys_ndf.ndf.views import rpc_resources
 ################################################
 #Middleware for login with mastodon oauth
-from gnowsys_ndf.ndf.oauth_middleware import test 
+from gnowsys_ndf.ndf.middleware.oauth_middleware import test 
 ################################################
 
 
@@ -29,6 +29,7 @@ else:
     login_template = 'registration/login.html'
     logout_template = 'registration/logout.html'
     some_instance=test()
+    
 
 urlpatterns = patterns('',
     (r'^i18n/', include('django.conf.urls.i18n')),
@@ -245,3 +246,10 @@ if settings.DEBUG:
             'document_root': settings.STATIC_ROOT,
         }),
 )
+
+# if settings.login_with_mastodon=True:
+#     urlpatterns += patterns('',
+#         url(r'^accounts/login_test_view/$', some_instance.moauth , name='login_view'),    
+
+
+# )
