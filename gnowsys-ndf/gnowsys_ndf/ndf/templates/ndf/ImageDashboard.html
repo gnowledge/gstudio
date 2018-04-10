@@ -53,7 +53,7 @@
                alert("Error occurred");
             }
             // check if image is not in the list, add it.
-            else if(xhr.responseText )
+            else if(xhr.responseText)
             {
               // alert("success"+xhr.responseText);
               var imageURL = "{{MEDIA_URL}}"  + xhr.responseText;
@@ -188,6 +188,23 @@ $("#btnUploadCancel").click(function() {
   <br> <br>
 {% endcomment %}
 <h4>Select Image</h4>
+<form id = "image_search_form"  action="" name="image_search_form" method="POST" >
+  <div class="large-11 small-10 columns">
+    {% csrf_token %}
+     <select id="show_all_workspace">
+    <option value="">--- Select Workspace ---</option>
+                {% for each_workspace in all_workspaces %}
+                <option value="{{ each_workspace.pk }}">
+                  {{ each_workspace.name }}
+                </option>
+                {% endfor %}
+    </select>
+    <input type="text" name="search_text" id="search_text" placeholder='{% trans "Search" %} ' autocomplete="off" required />
+  </div>
+  <button type="submit" class="tiny button" value="" id="image_search-submit" class="checked">
+  <i class="fi-magnifying-glass"></i>
+  </button>
+</form>
   <ul class="small-block-grid-1 medium-block-grid-3 large-block-grid-4" >
     {% for each in imageCollection %}
     
@@ -221,5 +238,46 @@ $("#btnUploadCancel").click(function() {
   </li>
   {% endfor %}
 </ul>
+
+<script type="text/javascript">
+    $(document).on("click", "#image_search-submit", function(event) {
+
+
+      event.preventDefault();
+      $.ajax({
+        url:"{% url 'image' groupid %}",
+        type:"GET",
+        datatype: "html",
+        data:{
+          search_text: $('#show_all_workspace option:selected').val()
+        },
+        success:function(data){
+          $(".small-block-grid-1").empty()
+          $(".small-block-grid-1").append(data)
+
+          $("#image_search_form").empty()
+          $("h4").empty()
+          $(".card-image-wrapper").click(function(event){
+          var imageURL = $(this).children('img').attr("data-image-src");
+          var imageTitle = $(this).attr("title");
+          // var locationURL = 'http://' + location.host;
+          var locationURL = window.location.origin
+          var completeURL = imageURL
+          var width = prompt("Please enter width in px",'600');
+          if(width == null)
+          {
+              return false;
+          }
+          CKEDITOR.instances['ckeditor_textarea'].insertHtml('<img width="'+  width + '"src=' + completeURL + ' '+ 'alt=' + imageTitle + '>' + '</img>');
+          $('#group_imgs_on_modal').foundation('reveal', 'close');
+          });
+        },
+        failure:function(data){
+          alert('GOT AN ERROR');
+        }
+      });
+    });
+
+</script>
 
 {% endblock %}
