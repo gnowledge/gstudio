@@ -33,7 +33,7 @@ log_file = open(log_file_path, 'a+')
 script_start_str = "\n\n######### Script ran on : " + time.strftime("%c") + " #########\n----------------\n"
 log_file.write(str(script_start_str))
 
-column_keys_list = ["server_id", "school_name", "school_code", "module_name", "unit_name", "username", "user_id", "first_name", "last_name", "roll_no", "grade", "enrollment_status", "total_lessons", "lessons_completed", "percentage_lessons_completed", "total_activities", "activities_completed", "percentage_activities_completed", "total_quizitems", "visited_quizitems", "attempted_quizitems", "unattempted_quizitems", "correct_attempted_quizitems", "notapplicable_quizitems", "incorrect_attempted_quizitems", "user_files", "total_files_viewed_by_user", "other_viewing_my_files", "unique_users_commented_on_user_files", "total_rating_rcvd_on_files", "commented_on_others_files", "cmts_on_user_files", "total_cmnts_by_user", "user_notes", "others_reading_my_notes", "cmts_on_user_notes", "cmnts_rcvd_by_user", "total_notes_read_by_user", "commented_on_others_notes", "total_rating_rcvd_on_notes", "correct_attempted_assessments", "unattempted_assessments", "visited_assessments", "notapplicable_assessments", "incorrect_attempted_assessments", "attempted_assessments", "total_assessment_items", "buddies"]
+column_keys_list = ["server_id", "school_name", "school_code", "module_name", "unit_name", "username", "user_id", "first_name", "last_name", "roll_no", "grade", "enrollment_status", "buddies", "total_lessons", "lessons_visited", "percentage_lessons_completed", "total_activities", "activities_visited", "percentage_activities_completed", "total_quizitems", "visited_quizitems", "attempted_quizitems", "unattempted_quizitems", "correct_attempted_quizitems", "notapplicable_quizitems", "incorrect_attempted_quizitems", "user_files", "total_files_viewed_by_user", "other_viewing_my_files", "unique_users_commented_on_user_files", "total_rating_rcvd_on_files", "commented_on_others_files", "cmts_on_user_files", "total_cmnts_by_user", "user_notes", "others_reading_my_notes", "cmts_on_user_notes", "cmnts_rcvd_by_user", "total_notes_read_by_user", "commented_on_others_notes", "total_rating_rcvd_on_notes", "correct_attempted_assessments", "unattempted_assessments", "visited_assessments", "notapplicable_assessments", "incorrect_attempted_assessments", "attempted_assessments", "total_assessment_items"]
 
 column_keys_dict = OrderedDict()
 map(lambda x: column_keys_dict.update({x: "NA"}), column_keys_list)
@@ -137,11 +137,11 @@ def export_group_analytics(group_obj, assessment_and_quiz_data):
 
             temp_lessons_stat_str = analytics_data['level1_progress_stmt']
             temp_lessons_stat_str = analytics_data['level1_progress_stmt']
-            each_row_dict['lessons_completed'] = int(temp_lessons_stat_str.split(' ')[0])
+            each_row_dict['lessons_visited'] = int(temp_lessons_stat_str.split(' ')[0])
             each_row_dict['total_lessons'] = int(temp_lessons_stat_str.split(' ')[3])
 
             temp_activities_stat_str = analytics_data['level2_progress_stmt']
-            each_row_dict['activities_completed'] = int(temp_activities_stat_str.split(' ')[0])
+            each_row_dict['activities_visited'] = int(temp_activities_stat_str.split(' ')[0])
             each_row_dict['total_activities'] = int(temp_activities_stat_str.split(' ')[3])
 
             each_row_dict['percentage_lessons_completed'] = analytics_data['level1_progress_meter']
