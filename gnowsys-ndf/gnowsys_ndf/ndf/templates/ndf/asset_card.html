@@ -116,6 +116,7 @@
                     {% endif %}
 
                     <div class="asset_desc">{{each_asset.content|striptags|truncatechars:25}}</div>
+                    <div class="asset_desc">{{ each_asset.user_details_dict.contributors|join:', ' }}</div>
                 </div>
             </div>
         </div>

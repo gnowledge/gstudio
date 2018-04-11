@@ -1,5 +1,7 @@
 {% extends "registration/registration_base.html" %}
 {% load i18n %}
+{% load get_site_variables from ndf_tags%}
+{% get_site_variables as site%}
 {% load ndf_tags %}
 {% block title %}{% trans "Login" %}{% endblock %}
 
@@ -33,11 +35,17 @@ position: relative !important;
 			<br/>
 			{% if form.errors %}
 			<small class="small-10 medium-8 large-8 small-centered medium-centered columns error all-error">{% trans "Either your email or password is incorrect !" %}</small>
+
 			{% endif %}
 
-			<form method="post" id="loginSubmit" action="{% url 'auth_login' %}" data-abide>
-				{% csrf_token %}
+		{%if site.LOGIN_WITH_MASTODON %}
+			<form method="post" id="loginSubmit" action="{% url 'login_view' %}" data-abide>
 
+		{% else %}
+			<form method="post" id="loginSubmit" action="{% url 'auth_login' %}" data-abide>
+				
+		{% endif %}
+		{% csrf_token %}
 				<!-- Email -->
 				<div class="row">
 					<div class="small-10 medium-8 large-8 columns end">
