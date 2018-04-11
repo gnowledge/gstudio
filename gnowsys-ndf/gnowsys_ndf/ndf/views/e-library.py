@@ -867,6 +867,25 @@ else:
 												}
 											]
 										}).sort("last_update", -1)
+
+		pages = node_collection.find({
+										# 'member_of': {'$in': [GST_FILE._id, GST_PAGE._id]},
+										'member_of': {'$in': [GST_PAGE._id]},
+										# '_type': 'File',
+										# 'fs_file_ids': {'$ne': []},
+										'group_set': {'$all': [ObjectId(group_id)]},
+										'$and': query_dict,
+										'$or': [
+												{ 'access_policy': u"PUBLIC" },
+												{ '$and': [
+															{'access_policy': u"PRIVATE"},
+															{'created_by': request.user.id}
+														]
+												}
+											]
+										}).sort("last_update", -1)
+		# print pages.count()
+
 		# print "files.count : ", files.count()
 
 	  	# pageCollection=node_collection.find({'member_of':GST_PAGE._id, 'group_set': ObjectId(group_id),
@@ -952,6 +971,7 @@ else:
 									 'collection': collection_pages_cur,
 									 'groupid': group_id, 'group_id':group_id,
 									 "datavisual":datavisual,
+									 'pages': pages.count()
 									},
 									context_instance = RequestContext(request))
 
@@ -1028,7 +1048,8 @@ else:
 
 					# query_dict.append({ 'collection_set': {'$exists': "true", '$not': {'$size': 0} } })
 				else:
-					query_dict.append({"attribute_set.educationaluse": filetype})
+					if filetype != "Pages":
+						query_dict.append({"attribute_set.educationaluse": filetype})
 
 			# print filters
 			# if filters:
@@ -1073,8 +1094,28 @@ else:
 													}
 												]
 											}).sort("last_update", -1)
+			pages = None
+			if filetype == "Pages":
+				print "pages*******************************",GST_PAGE._id,query_dict
+				files = node_collection.find({
+										# 'member_of': {'$in': [GST_FILE._id, GST_PAGE._id]},
+										'member_of': {'$in': [GST_PAGE._id]},
+										# '_type': 'File',
+										# 'fs_file_ids': {'$ne': []},
+										'group_set': {'$all': [ObjectId(group_id)]},
+										'$and': query_dict,
+										'$or': [
+												{ 'access_policy': u"PUBLIC" },
+												{ '$and': [
+															{'access_policy': u"PRIVATE"},
+															{'created_by': request.user.id}
+														]
+												}
+											]
+										}).sort("last_update", -1)
 
-
+				pages_count = files.count()
+				print pages_count
 			educationaluse_stats = {}
 			# print "files_count: ", files.count()
 
@@ -1161,6 +1202,6 @@ else:
 					"group_id": group_id, "group_name_tag": group_id, "groupid": group_id,
 					'title': "E-Library", "educationaluse_stats": json.dumps(educationaluse_stats),
 					"resource_type": result_paginated_cur, "detail_urlname": detail_urlname,
-					"filetype": filetype, "res_type_name": "", "page_info": result_pages
+					"filetype": filetype, "res_type_name": "", "page_info": result_pages,'pages':pages_count
 				},
 				context_instance = RequestContext(request))

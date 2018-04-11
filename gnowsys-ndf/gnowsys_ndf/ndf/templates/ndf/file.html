@@ -214,8 +214,19 @@ margin-top:5px !important;
         {% endif %}
 
         <dd>
+          <!-- Pages -->
+        <dd data-filetype="Pages">
+          <a href="#view-pages"><i class="fi-camera"></i>
+            {% trans "Pages" %}
+            <span class="count">
+              {{ pages }}
+            </span>
+          </a>
+        </dd><br/>
         
       </dl><br/>
+
+        
 
       {% if user.is_authenticated %}
       {% if user_is_joined == "joined" or user_is_joined == "author" %}
@@ -334,7 +345,7 @@ margin-top:5px !important;
     {% comment %}
       
     <!-- Tab View 2 - Pages -->
-    <div class="content" id="view-page" data-filetype="Pages">
+    <div class="content" id="view-pages" data-filetype="Pages">
       {% if title == "E-Library" %}
         <a href='{% url "elib_paged_file_objs" group_name_tag "Pages" 1 %}' class="first-load">1</a>
       {% else %}
@@ -402,6 +413,13 @@ margin-top:5px !important;
           <a href='{% url "paged_file_objs" group_name_tag "Videos" 1 %}' class="first-load">1</a>
         {% endif %}
       </div>
+    <div class="content" id="view-pages" data-filetype="Pages">
+      {% if title == "E-Library" %}
+          <a href='{% url "elib_paged_file_objs" group_name_tag "Pages" 1 %}' class="first-load">1</a>
+        {% else %}
+          <a href='{% url "paged_file_objs" group_name_tag "Pages" 1 %}' class="first-load">1</a>
+        {% endif %}
+    </div>
       
       {% comment %}
       <div class="content" id="view-collection" data-filetype="collection">
