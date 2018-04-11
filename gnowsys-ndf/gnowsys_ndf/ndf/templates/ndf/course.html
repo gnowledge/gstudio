@@ -26,7 +26,7 @@
     <!-- Existing card list-->
     {% for each_node in course_coll  %}
       <li class="card-image-wrapper" >
-      {% include 'ndf/card_group.html' with node=each_node  url_name='groupchange' first_arg=each_node.name groupid=each_node.pk is_gstaff=is_gsta
+      {% include 'ndf/card_group.html' with node=each_node  url_name='groupchange' first_arg=each_node.name groupid=each_node.pk is_gstaff=is_gstaff %}
     </li>
     {% endfor %}
   </ul>
