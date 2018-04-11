@@ -112,7 +112,9 @@ def landing_page(request):
                                     'group_set': {'$all': [group_id]},
                                     }).sort("last_update", -1).count()
 
-
+    discussion = node_collection.find_one({'_type':'GSystemType',"name":"Reply"})
+    discussion_count = node_collection.find({"member_of":ObjectId(discussion._id)}).count()
+    
 
     if (GSTUDIO_SITE_LANDING_PAGE == "home") and (GSTUDIO_SITE_NAME == "NROER"):
         return render_to_response(
@@ -122,7 +124,8 @@ def landing_page(request):
                                     'landing_page': 'landing_page',
                                     'group_count':group_count,
                                     'author_count':author_count,
-                                    'files_count':files_count
+                                    'files_count':files_count,
+                                    'discussion_count':discussion_count
                                 },
                                 context_instance=RequestContext(request)
                             )
