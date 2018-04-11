@@ -299,10 +299,10 @@
                   {% endif  %}
 
                 
+                {% comment %}
                 {% if player_discussion or node_discussion %}
                 <a class="discuss right"> {% if not thr_int_type %} {{disc_label}} {% else %} {{thr_int_type}} {% endif %} </a>
                 {% endif %}
-                {% comment %}
                 <a class="translate right"> Translate</a>
                 {% endcomment %}
                 
@@ -318,7 +318,7 @@
                 {% endif %}
               </div>
               {% endwith %}
-              <div class="discussion-area activity_page_rendered" style="">
+              <div class="discussion-area activity_page_rendered" >
                 {% get_attribute_value node.pk 'discussion_enable' as node_discussion %}
                 {% if  player_discussion or node_discussion %}
                     
