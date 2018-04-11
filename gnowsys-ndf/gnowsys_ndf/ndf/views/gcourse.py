@@ -4530,10 +4530,11 @@ def update_assessment_analytics_for_buddies(offeredId, user_ids, logged_in_user_
 
 def get_lang_node(node_id,lang):
     rel_value = get_relation_value(ObjectId(node_id),"translation_of")
-    for each in rel_value['grel_node']:
-        if each.language[0] ==  get_language_tuple(lang)[0]:
-            trans_node = each
-            return trans_node
+    if 'grel_node' in rel_value:
+        for each in rel_value['grel_node']:
+            if each.language[0] ==  get_language_tuple(lang)[0]:
+                trans_node = each
+                return trans_node
 
 def get_trans_node_list(node_list,lang):
     trans_node_list = []
@@ -4545,7 +4546,8 @@ def get_trans_node_list(node_list,lang):
         else:
             node = node_collection.one({"_id":ObjectId(each)})
             # trans_node_list.append({ObjectId(node._id): {"name":(node.altnames or node.name),"basenodeid":ObjectId(node._id)}})
-            trans_node_list.append({ObjectId(node._id): {"name": node.name,"altnames": node.altnames, "basenodeid":ObjectId(node._id)}})
+            if node:
+                trans_node_list.append({ObjectId(node._id): {"name": node.name,"altnames": node.altnames, "basenodeid":ObjectId(node._id)}})
     if trans_node_list:
         return trans_node_list
 
