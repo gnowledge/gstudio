@@ -832,7 +832,7 @@ else:
 			query_dict = get_filter_querydict(selfilters)
 
 		query_dict.append({'attribute_set.educationaluse': {'$ne': 'eBooks'}})
-		
+		print query_dict
 
 		# files = node_collection.find({
 		# 								'member_of': ObjectId(GST_FILE._id),
@@ -867,7 +867,7 @@ else:
 												}
 											]
 										}).sort("last_update", -1)
-
+		print "8888888888888888888888",files.count()
 		pages = node_collection.find({
 										# 'member_of': {'$in': [GST_FILE._id, GST_PAGE._id]},
 										'member_of': {'$in': [GST_PAGE._id]},
@@ -941,7 +941,7 @@ else:
 		coll_page_count = collection_pages_cur.count() if collection_pages_cur else 0
 		collection_pages = paginator.Paginator(collection_pages_cur, page_no, no_of_objs_pp)
 		datavisual.append({"name":"Doc", "count": educationaluse_stats.get("Documents", 0)})
-		datavisual.append({"name":"Page", "count": educationaluse_stats.get("Pages", 0)})
+		#datavisual.append({"name":"Page", "count": educationaluse_stats.get("Pages", 0)})
 		datavisual.append({"name":"Image","count": educationaluse_stats.get("Images", 0)})
 		datavisual.append({"name":"Video","count": educationaluse_stats.get("Videos", 0)})
 		datavisual.append({"name":"Interactives","count": educationaluse_stats.get("Interactives", 0)})
@@ -1094,7 +1094,7 @@ else:
 													}
 												]
 											}).sort("last_update", -1)
-			pages_count = None
+			pages_count	 = None
 			if filetype == "Pages":
 				print "pages*******************************",GST_PAGE._id,query_dict
 				files = node_collection.find({
