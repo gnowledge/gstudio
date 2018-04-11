@@ -1094,7 +1094,7 @@ else:
 													}
 												]
 											}).sort("last_update", -1)
-			pages = None
+			pages_count = None
 			if filetype == "Pages":
 				print "pages*******************************",GST_PAGE._id,query_dict
 				files = node_collection.find({
