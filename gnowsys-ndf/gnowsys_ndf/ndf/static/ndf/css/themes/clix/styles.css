@@ -25201,13 +25201,11 @@ p {
 }
 
 /* Watermark background for node_ajax_content  */
-/* line 1974, ../../../scss/_app_styles.scss */
-.allow.draft {
-  background-size: 10%;
-  background-repeat: repeat;
-  background-image: url("/static/ndf/images/draft-watermark.png");
-}
-
+/*.allow.draft{
+    background-size: 10%;
+    background-repeat:repeat;
+    background-image:url("/static/ndf/images/draft-watermark.png");
+}*/
 /* line 1982, ../../../scss/_app_styles.scss */
 .text-gray {
   color: gray;
