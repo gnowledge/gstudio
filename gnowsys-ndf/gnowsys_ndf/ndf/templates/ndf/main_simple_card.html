@@ -14,6 +14,7 @@
   <a class="app-card text-center" href='{% url url_name first_arg %}{{search_url_text|safe}}'>
 {% endif %}
 
+  <!-- The following block of code is a temporary fix -->
   {% if lang_code == "hi" %}
     {% if "State Partners" == resource.name %}
     <div class="app-card-title"><h4>{% trans "State Partners" %}</h4></div>
@@ -48,7 +49,7 @@
     {% endif %}
   </div>
     <div class="app-card-content" title="{{resource.content_org}}">
-     {{resource.content_org|default_if_none:"Add some description."|truncatechars:85}}
+     {{resource.content_org|default_if_none:"Add some description."|safe|striptags|truncatechars:45}}
     </div>   
 </a>  
 </li>

@@ -460,7 +460,7 @@ html,body{
   overflow-x: hidden;*/
 }
 #gbase_wrap{
-   min-height: 100%;
+   /*min-height: 100%;*/
   height: auto;
   /* Negative indent footer by its height */
   margin: 0 auto ;
@@ -1971,11 +1971,11 @@ aside#help{
 }
 
 /* Watermark background for node_ajax_content  */
-.allow.draft{
+/*.allow.draft{
     background-size: 10%;
     background-repeat:repeat;
     background-image:url("/static/ndf/images/draft-watermark.png");
-}
+}*/
 
 
 
@@ -8211,7 +8211,7 @@ $module-card-lines-to-show: 3;
   margin-bottom: 30px; 
   font-family: ubuntu-regular;
   
-  font-size: 20px;
+  font-size: 18px;
 }
 
 .about-blog{
@@ -8248,4 +8248,25 @@ svg {
 .button {
   border-radius: 50px;
 }
+
+
+#page_content
+{
+  display: table;
+  height:auto;
+  display: table-row;
+
+}
+
+.footer_container
+{
+  height: auto;
+  display: table-row;
+}
+
+
+#footer {
+    height: 1px;
+}
+
 

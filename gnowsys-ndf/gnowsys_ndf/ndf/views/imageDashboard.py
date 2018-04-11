@@ -26,6 +26,12 @@ GST_IMAGE = node_collection.one({'member_of': gapp_mt._id, 'name': GAPPS[3]})
 image_ins = node_collection.find_one({'_type': "GSystemType", "name": "Image"})
 file_gst = node_collection.find_one( { "_type" : "GSystemType","name":"File" } )
 
+from gnowsys_ndf.ndf.models import GSystemType
+announced_unit_gst = node_collection.one({'_type': "GSystemType", 'name': "announced_unit"})
+gst_base_unit_name, gst_base_unit_id = GSystemType.get_gst_name_id('base_unit')
+
+
+
 @get_execution_time
 def imageDashboard(request, group_id, image_id=None,page_no=1):
     from gnowsys_ndf.settings import GSTUDIO_NO_OF_OBJS_PP
@@ -49,16 +55,33 @@ def imageDashboard(request, group_id, image_id=None,page_no=1):
     except:
         group_name, group_id = get_group_name_id(group_id)
 
+    search_workspace = request.GET.get("search_workspace",None)
+    search_text = request.GET.get("search_text",None)
+    search_text = str(search_text)
+    print group_id
+    if search_workspace != "default" and search_workspace != None and search_text:
+        group_name, group_id = get_group_name_id(search_workspace)
+
+
     if image_id is None:
         image_ins = node_collection.find_one({'_type': "GSystemType", "name": "Image"})
         if image_ins:
             image_id = str(image_ins._id)
 
+    all_workspaces = node_collection.find(
+                    {'_type':'Group','member_of':
+                        {'$nin': [ announced_unit_gst._id,gst_base_unit_id]
+                    }
+                    }).sort('last_update', -1)
+    all_workspaces_count = all_workspaces.count()
+    print all_workspaces_count
+
     # img_col = node_collection.find({'_type': 'File', 'member_of': {'$all': [ObjectId(image_id)]}, 'group_set': ObjectId(group_id)}).sort("last_update", -1)
-    files_cur = node_collection.find({
+    files_cur = node_collection.find({  '$and':[{'group_set': {'$all': [ObjectId(group_id)]}},{'$or':[{'content':{'$regex' : search_text, '$options' : 'i'}},{'name':{'$regex' : search_text, '$options' : 'i'}},{'altnames':{'$regex' : search_text, '$options' : 'i'}},{'tags':{'$regex' : search_text, '$options' : 'i'}}] }],
                                         '_type': {'$in': ["GSystem"]},
                                         'member_of': file_gst._id,
-                                        'group_set': {'$all': [ObjectId(group_id)]},
+                                        #'group_set': {'$all': [ObjectId(group_id)]},
+                                        
                                         'if_file.mime_type': {'$regex': 'image'},
                                         'status' : { '$ne': u"DELETED" },
                                         # 'created_by': {'$in': gstaff_users},
@@ -89,10 +112,14 @@ def imageDashboard(request, group_id, image_id=None,page_no=1):
                         }).sort("last_update", -1)
     # print "file count\n\n\n",files_cur.count()
 
+    print files_cur.count()
+    if files_cur.count() !=0:
+        has_files = False 
+
     # image_page_info = paginator.Paginator(files_cur, page_no, GSTUDIO_NO_OF_OBJS_PP)
     template = "ndf/ImageDashboard.html"
     already_uploaded=request.GET.getlist('var',"")
-    variable = RequestContext(request, {'imageCollection': files_cur,'already_uploaded':already_uploaded,'groupid':group_id,'group_id':group_id })
+    variable = RequestContext(request, {'all_workspaces_count':all_workspaces_count,'all_workspaces':all_workspaces,'imageCollection': files_cur,'already_uploaded':already_uploaded,'groupid':group_id,'group_id':group_id })
     return render_to_response(template, variable)
 
 @get_execution_time

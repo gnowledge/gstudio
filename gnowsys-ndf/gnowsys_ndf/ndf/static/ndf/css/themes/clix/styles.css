@@ -23791,7 +23791,7 @@ overflow-x: hidden;*/
 
 /* line 462, ../../../scss/_app_styles.scss */
 #gbase_wrap {
-  min-height: 100%;
+  /*min-height: 100%;*/
   height: auto;
   /* Negative indent footer by its height */
   margin: 0 auto;
@@ -25201,13 +25201,11 @@ p {
 }
 
 /* Watermark background for node_ajax_content  */
-/* line 1974, ../../../scss/_app_styles.scss */
-.allow.draft {
-  background-size: 10%;
-  background-repeat: repeat;
-  background-image: url("/static/ndf/images/draft-watermark.png");
-}
-
+/*.allow.draft{
+    background-size: 10%;
+    background-repeat:repeat;
+    background-image:url("/static/ndf/images/draft-watermark.png");
+}*/
 /* line 1982, ../../../scss/_app_styles.scss */
 .text-gray {
   color: gray;
@@ -31364,7 +31362,7 @@ ul.horizontal_tabs_gstudio > li.sub_group_action:hover ul {
   color: #ececec;
   margin-bottom: 30px;
   font-family: ubuntu-regular;
-  font-size: 20px;
+  font-size: 18px;
 }
 
 /* line 8217, ../../../scss/_app_styles.scss */
@@ -31406,6 +31404,24 @@ svg {
 /* line 8248, ../../../scss/_app_styles.scss */
 .button {
   border-radius: 50px;
+}
+
+/* line 8253, ../../../scss/_app_styles.scss */
+#page_content {
+  display: table;
+  height: auto;
+  display: table-row;
+}
+
+/* line 8261, ../../../scss/_app_styles.scss */
+.footer_container {
+  height: auto;
+  display: table-row;
+}
+
+/* line 8268, ../../../scss/_app_styles.scss */
+#footer {
+  height: 1px;
 }
 
 /*

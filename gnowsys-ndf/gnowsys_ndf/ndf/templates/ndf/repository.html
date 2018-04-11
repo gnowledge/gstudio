@@ -31,6 +31,8 @@
 					<a class="app-card text-center" 
 					{% if each_gapp.name|lower == "event" %}
 						href="{% url 'program' group_id %}"
+					{% elif each_gapp.name|lower == "course" %}
+ 					    href="{% url 'explore_courses' %}"	
 					{% else %}
 						href="{% url each_gapp.name|lower group_id %}"
 					{% endif %}
