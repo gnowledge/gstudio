@@ -14,6 +14,7 @@
   <a class="app-card text-center" href='{% url url_name first_arg %}{{search_url_text|safe}}'>
 {% endif %}
 
+  <!-- The following block of code is a temporary fix -->
   {% if lang_code == "hi" %}
     {% if "State Partners" == resource.name %}
     <div class="app-card-title"><h4>{% trans "State Partners" %}</h4></div>

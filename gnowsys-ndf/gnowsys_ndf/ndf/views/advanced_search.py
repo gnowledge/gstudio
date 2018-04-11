@@ -99,11 +99,8 @@ def search_detail(request,group_id,page_no=1):
 		        if not rel_val['grel_id']:
 		            lst.append(each._id)
 
-		search_result = node_collection.find({ '_id': {'$in': lst} })
-
+		search_result = node_collection.find({ '_id': {'$in': lst} }).limit(300)
 		if_teaches = True
-
-		print search_result.count()
 		#paginator_search_result = paginator.Paginator(search_result, page_no, 24)
 
 
