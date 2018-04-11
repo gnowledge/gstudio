@@ -317,7 +317,6 @@ def get_unit_hierarchy(unit_group_obj,lang="en"):
                 for each_act in lesson.collection_set:
                     activity_dict ={}
                     activity = Node.get_node_by_id(each_act)
-                    trans_act = get_lang_node(activity._id,lang)
                     if activity:
                         trans_act = get_lang_node(activity._id,lang)
                         if trans_act:

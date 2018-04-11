@@ -17,7 +17,7 @@ margin-top:13px;
 <ul class="small-block-grid-2 medium-block-grid-3 large-block-grid-5 top-gap2">
 {% for each_partner in source_partners %}
 <li class="card-image-wrapper"> 
-  {% include 'ndf/simple_card.html' with resource=each_partner has_prof_pic=True url_name='e-library' first_arg='home' second_arg='' search_url_text='filter?selfilters=[{"or":[{"selFieldValue":"source","selFieldValueAltnames":"source","selFieldGstudioType":"attribute","selFieldText":"'|add:each_partner.name|add:'","selFieldPrimaryType":"basestring"}]}]' %}
+  {% include 'ndf/card_group.html' with node=each_partner has_prof_pic=True url_name='e-library' first_arg='home' second_arg='' search_url_text='filter?selfilters=[{"or":[{"selFieldValue":"source","selFieldValueAltnames":"source","selFieldGstudioType":"attribute","selFieldText":"'|add:each_partner.name|add:'","selFieldPrimaryType":"basestring"}]}]' %}
   </li>
 {% endfor %}
 </ul>
