@@ -144,16 +144,30 @@ article.columns{
     {% endcomment %}
 
     <div id="landing-slider-container">
-    <div>
-        <img src="static/ndf/images/landing_pg_slides/Slider1.png" style="width:100%;">
-    </div>
-    <div>
-        <img src="static/ndf/images/landing_pg_slides/Slider2.png" style="width:100%;">
+        <!-- <div>
+            <img src="static/ndf/images/landing_pg_slides/Slider1.png" style="width:100%;">
         </div>
-    <div>
-        <img src="static/ndf/images/landing_pg_slides/Slider3.png" style="width:100%;">
+        <div>
+            <img src="static/ndf/images/landing_pg_slides/Slider2.png" style="width:100%;">
+        </div>
+        <div>
+            <img src="static/ndf/images/landing_pg_slides/Slider3.png" style="width:100%;">
+        </div> -->
+        <div>
+            <img src="static/ndf/images/landing_pg_slides/3-01-01.jpg" style="width:100%;">
+        </div>
+        <div>
+            <img src="static/ndf/images/landing_pg_slides/photo_2018-04-10_18-11-51.jpg" style="width:100%;">
+        </div>
+        <div>
+            <img src="static/ndf/images/landing_pg_slides/slider_1a-01.jpg" style="width:100%;">
+        </div>
+        <div>
+            <img src="static/ndf/images/landing_pg_slides/slider_1b-01.png" style="width:100%;">
         </div>
     </div>
+
+
 <!--     <div class="text-left" style="background:#444;color:#aeaeae;"> -->
      <!--  <a href="http://nroer.in" target="_blank"> Click here to visit the old site</a> -->
        <!-- <span style="color:#eaeaea; padding:3px;margin: 3px 10px 3px 0px; font-weight: bold; border-bottom-color:#5281d4;"><i class="fi-calendar size-48"></i> Recent News | </span>Latest News goes here -->
@@ -162,12 +176,14 @@ article.columns{
         
     <div class="about_blog" >
         <div class="medium-10 medium-centered columns about-blog" style="margin-top: 30px;">
+          <div class="row">  
             <h3 align="center" style="color: #ececec">WHO WE ARE</h3>
             <div>
-            <span>
-                <p class="about_content">NROER is a collaborative platform, which brings together everyone interested in school and teacher education.Initiated by the Department of School Education and Literacy, Ministry of Human Resource Development, Government of India and managed by the Central Institute of Educational Technology, National Council of Educational Research and Training, the Repository runs on the MetaStudio platform, an initiative of the Gnowledge Labs, Homi Bhabha Centre for Science Education.</p>
-            </span>
+                <span>
+                    <p class="about_content">NROER is a collaborative platform, which brings together everyone interested in school and teacher education.Initiated by the Department of School Education and Literacy, Ministry of Human Resource Development, Government of India and managed by the Central Institute of Educational Technology, National Council of Educational Research and Training, the Repository runs on the MetaStudio platform, an initiative of the Gnowledge Labs, Homi Bhabha Centre for Science Education.</p>
+                </span>
             </div>
+          </div>  
 
             <!-- 
             <div class="social_links" align="left">
@@ -175,52 +191,58 @@ article.columns{
                 <a href="https://twitter.com/ciet_ncert"><i class="fi-social-twitter "></i></a>
             </div> -->
         </div>
-
     </div>
 
 
     <div class="analytics-blog" style="margin-top: 30px;">
-        <div class="medium-10 medium-centered columns" style="height: 237px;background: #d8dbdc;">
-
-          <div class="medium-10 medium-centered columns" style="margin-top: 20px;">
+        <div class="large-9 medium-8 medium-centered columns" style="background: #d8dbdc;">
+          <div class="row">
             <span><h3 class="analytics" align="center">ANALYTICS</h3></span>
-            <div class="square" style="background-color: #ff8080">
-                <div class="box-content">
-                  <h3>GROUPS</h3>
-                  <h3>{{group_count}}</h3>
-                </div>
-            </div>
-            <div class="square" style="background-color: #80d4ff">
+                <div class="medium-3 columns" >
+                    <div class="panel" style="background-color: #ff8080">
+                        <div align="center">    
+                            <h3>GROUPS</h3>
+                            <h3>{{group_count}}</h3>
+                        </div>    
+                    </div>
+                </div>    
+            <!-- <div class="square" style="background-color: #80d4ff">
                  <div class="box-content">
                   <h3>TASKS</h3>
                   <h3>-</h3>
                 </div>
-            </div>
-            <div class="square" style="background-color: #ffffb3">
-                <div class="box-content">
-                 <h3>DISCUSSION</h3> 
-                 <h3>-</h3>
+            </div> -->
+
+            <div class="medium-3 columns">
+                <div class="panel" style="background-color: #ffffb3;">
+                    <div align="center">  
+                        <h3>DISCUSSION</h3>
+                        <h3>{{ discussion_count }}</h3>
+                    </div>    
                 </div>
             </div>
-            <div class="square" style="background-color: #d5ff80">
-                <div class="box-content">
-              <h3>eResourses</h3>
-              <h3>{{ files_count }}</h3>
+            <div class="medium-3 columns">
+                <div class="panel" style="background-color: #d5ff80;">
+                    <div align="center">  
+                        <h3>eResourses</h3>
+                        <h3>{{ files_count }}</h3>
+                    </div>    
                 </div>
             </div>
-            <div class="square" style="background-color: #ffaa80">
-                <div class="box-content">
-              <h3>Users</h3>
-              <h3>{{author_count}}</h3>
+            <div class="medium-3 columns">
+                <div class="panel" style="background-color: #ffaa80">
+                    <div align="center">    
+                        <h3>Users</h3>
+                        <h3>{{author_count}}</h3>
+                    </div>    
                 </div>
-            </div>
+            </div> 
           </div>  
         </div>
-
     </div>
 
 
-    <h3 align="center" style="margin-top: 20px; color: #c35e76">Activities / Schemes</h3>
+<!--     <h3 align="center" style="margin-top: 20px; color: #c35e76">Activities / Schemes</h3>
     <div class="linked-links" id="linked-links" style="margin-top: 5px;">
         <div class="medium-8 medium-centered columns" style="height: 100%;background: #c7c9c938;">
             <div class="activity-slider">
@@ -237,7 +259,7 @@ article.columns{
             </div>
         </div>
 
-    </div>
+    </div> -->
 
 
     {% endcache %}
