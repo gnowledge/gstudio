@@ -45,7 +45,7 @@
     {% endif %}
   </div>
     <div class="app-card-content" title="{{resource.content_org}}">
-     {{resource.content_org|default_if_none:"Add some description."|truncatechars:45}}
+     {{resource.content_org|default_if_none:"Add some description."|safe|striptags|truncatechars:45}}
     </div>   
 </a>  
 </li>
