@@ -37,7 +37,7 @@ from django.core.cache import cache
 from mongokit import IS
 
 ''' -- imports from application folders/files -- '''
-from gnowsys_ndf.settings import GAPPS as setting_gapps, GSTUDIO_DEFAULT_GAPPS_LIST, META_TYPE, CREATE_GROUP_VISIBILITY, GSTUDIO_SITE_DEFAULT_LANGUAGE,GSTUDIO_DEFAULT_EXPLORE_URL,GSTUDIO_EDIT_LMS_COURSE_STRUCTURE,GSTUDIO_WORKSPACE_INSTANCE,GSTUDIO_SITE_LANDING_PAGE_LOGO,GSTUDIO_SITE_LANDING_PAGE_TEXT, GSTUDIO_SITE_LANDING_PAGE_BG, GSTUDIO_SITE_LOGIN_PAGE_LOGO,GSTUDIO_FOOTER_LINKS
+from gnowsys_ndf.settings import GAPPS as setting_gapps, GSTUDIO_DEFAULT_GAPPS_LIST, META_TYPE, CREATE_GROUP_VISIBILITY, GSTUDIO_SITE_DEFAULT_LANGUAGE,GSTUDIO_DEFAULT_EXPLORE_URL,GSTUDIO_EDIT_LMS_COURSE_STRUCTURE,GSTUDIO_WORKSPACE_INSTANCE,GSTUDIO_SITE_LANDING_PAGE_LOGO,GSTUDIO_SITE_LANDING_PAGE_TEXT, GSTUDIO_SITE_LANDING_PAGE_BG, GSTUDIO_SITE_LOGIN_PAGE_LOGO,GSTUDIO_FOOTER_LINKS, LOGIN_WITH_MASTODON
 
 # from gnowsys_ndf.settings import GSTUDIO_SITE_LOGO,GSTUDIO_COPYRIGHT,GSTUDIO_GIT_REPO,GSTUDIO_SITE_PRIVACY_POLICY, GSTUDIO_SITE_TERMS_OF_SERVICE,GSTUDIO_ORG_NAME,GSTUDIO_SITE_ABOUT,GSTUDIO_SITE_POWEREDBY,GSTUDIO_SITE_PARTNERS,GSTUDIO_SITE_GROUPS,GSTUDIO_SITE_CONTACT,GSTUDIO_ORG_LOGO,GSTUDIO_SITE_CONTRIBUTE,GSTUDIO_SITE_VIDEO,GSTUDIO_SITE_LANDING_PAGE
 from gnowsys_ndf.settings import *
@@ -60,6 +60,7 @@ from django.contrib.sites.models import Site
 from gnowsys_ndf.ndf.node_metadata_details import schema_dict
 from django_mailbox.models import Mailbox
 import itertools
+
 
 register = Library()
 at_apps_list = node_collection.one({
@@ -143,6 +144,9 @@ def get_site_variables():
 	#site_var['HEADER_LANGUAGES'] = HEADER_LANGUAGES
 	site_var['GSTUDIO_ELASTIC_SEARCH'] = GSTUDIO_ELASTIC_SEARCH
 
+
+
+	site_var['LOGIN_WITH_MASTODON'] = LOGIN_WITH_MASTODON
 
 
 	cache.set('site_var', site_var, 60 * 30)
@@ -3269,13 +3273,9 @@ def get_sg_member_of(group_id):
 
 	sg_member_of_list = []
 	# get all underlying groups
-	try:
-		group_id = ObjectId(group_id)
-	except:
-		group_id, group_name = get_group_name_id(group_id)
-
-	group_obj = node_collection.one({'_id': ObjectId(group_id)})
-	# print group_obj.name
+	group_obj = get_group_name_id(group_id, get_obj=True)
+	group_id = group_obj._id
+	group_name = group_obj.name
 	# Fetch post_node of group
 	if group_obj:
 		if "post_node" in group_obj:
