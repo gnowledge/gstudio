@@ -1,7 +1,7 @@
 from base_imports import *
 from history_manager import HistoryManager
 from gnowsys_ndf.ndf.gstudio_es.es import esearch
-from gnowsys_ndf.settings import GSTUDIO_ELASTIC_SEARCH
+from gnowsys_ndf.settings import GSTUDIO_ELASTIC_SEARCH,GSTUDIO_ELASTIC_SEARCH_IN_FILEHIVE_CLASS
 
 
 @connection.register
@@ -400,7 +400,7 @@ class Filehive(DjangoDocument):
                 raise RuntimeError(err)
 
         # data save into ES...
-        if GSTUDIO_ELASTIC_SEARCH == True:  
+        if GSTUDIO_ELASTIC_SEARCH_IN_FILEHIVE_CLASS == True:  
             esearch.inject(fp)
 
         # --- END of storing Filehive JSON in RSC system ---
