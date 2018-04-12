@@ -3274,8 +3274,9 @@ def get_sg_member_of(group_id):
 	sg_member_of_list = []
 	# get all underlying groups
 	group_obj = get_group_name_id(group_id, get_obj=True)
-	group_id = group_obj._id
-	group_name = group_obj.name
+	if group_obj:
+		group_id = group_obj._id
+		group_name = group_obj.name
 	# Fetch post_node of group
 	if group_obj:
 		if "post_node" in group_obj:
