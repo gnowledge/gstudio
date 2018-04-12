@@ -182,6 +182,7 @@ def unit_detail(request, group_id):
                                 'hide_bannerpic': True,
                                 'group_id': group_id,
                                 'groupid': group_id,
+                                'group_name': unit_group_obj.name,
                                 'unit_obj': unit_group_obj,
                                 'group_obj': unit_group_obj,
                                 'unit_structure': json.dumps(unit_structure)
