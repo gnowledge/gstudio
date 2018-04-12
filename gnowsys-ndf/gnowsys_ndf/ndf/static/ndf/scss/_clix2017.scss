@@ -2,7 +2,9 @@
 $primary-blue : #164A7B;
 $secondry-blue : #74b3dc;
 $tertiary-blue : #719dc7;
-$primary-pink : #713558;
+//$primary-pink : #713558;
+$primary-pink : #a3238e;
+
 
 
 /*Orange color variables*/
@@ -701,7 +703,7 @@ h5{
                         line-height: 49px;
                         border-left-width: 0px;
                         font-family: OpenSans-Regular;
-                        border-top: 2px solid #713558;
+                        border-top: 2px solid $primary-pink;
 
                     }
                     &.active {
