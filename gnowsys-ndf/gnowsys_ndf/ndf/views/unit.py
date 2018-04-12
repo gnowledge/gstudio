@@ -159,7 +159,7 @@ def unit_create_edit(request, group_id, unit_group_id=None):
             unit_node['project_config'].update({"subsection_name":"Add SubSection"})
 
         unit_node.save()
-        return HttpResponseRedirect(reverse('course_about',
+        return HttpResponseRedirect(reverse('course_content',
             kwargs={'group_id': unit_node._id}))
 
 

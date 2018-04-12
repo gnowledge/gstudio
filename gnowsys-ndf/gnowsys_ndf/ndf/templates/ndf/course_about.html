@@ -13,6 +13,8 @@
   <link href="/static/ndf/bower_components/datatables-plugins/integration/foundation/dataTables.foundation.css" rel="stylesheet" type="text/css" />
 {% endif %}
 <style type="text/css">
+
+
     .right-btn, .left-btn{
         /*float: left;*/
         /*margin-left: 1rem;*/
@@ -103,166 +105,6 @@
 <script src="/static/ndf/bower_components/d3/d3.js"></script>
 <input type="hidden" class="admin_analytics_fetched" value="False">
 
-<div id="course-about">
-
-  <div class="about-course">
-    <h5>Description:</h5>
-      <div class="course-desc" id="scstyle">
-          {{group_object.content|default:'No description added yet.'|safe}}
-      </div>
-      <div>
-        <u><a class="show-more hide">Show more</a></u>
-      </div>
-      <br/>
-      {% if group_object.tags %}
-          <h5>Tags:</h5>
-          {% for tag in group_object.tags %}
-                  <small><label class="tag-ele">
-              <a href="{% url 'tag_info' group_id tag %}">{{tag}} </a></label></small>
-          {% endfor %} 
-      {% else %}
-          <!-- <i><small><label class="tag-ele">{% trans "No tags defined yet!" %}</label></small></i> -->
-      {% endif %}
-  </div>
-
-  <div class="about-course">
-
-      <div class="medium-3 rows">
-        <div class="left">
-          <i class="icon-wid fa fa-user"></i>
-        </div>
-        <div class="left">
-          <h5>No. of Members</h5>
-          <div class="course-highlight">
-        <span>
-          {{group_object.author_set|length}} 
-        </span>
-
-          </div>
-        </div>
-      </div>
-      <br/>
-      <br/>
-     
-
-      {% if show_analytics_notifications %}
-      <div class="medium-3 rows">
-        <div class="left">
-          <i class="icon-wid fa fa-list"></i>
-        </div>
-        <div class="left module_text">
-          <h5>No. of {% firstof group_object.project_config.tab_name 'Lessons' %}</h5>
-          <div class="course-highlight">
-             <span>{{group_object.collection_set|length}}</span>
-          </div>
-        </div>
-      </div>
-      <br/>
-
-     
-      
-      <br/>
-      
-        {% if 'Group' not in  group_obj.member_of_names_list %}
-      <div class="medium-3 rows">
-        <div class="left">
-          <i class="icon-wid fa fa-clock-o"></i>
-        </div>
-        <div class="left">
-          <h5>  Course Duration</h5>
-          <div class="course-highlight">
-            <span>{{weeks_count}} week{{weeks_count|pluralize}}</span>
-          </div>
-        </div>
-      </div>
-      <br/>
-        {% endif %}
-      {% endif %}
-    </div>
-
-
-
-
-{% if educationallevel_val %}
- 
-    <div class="about-course">
-    <div class="medium-3 rows">
-        <div class="left">
-          <i class="icon-wid fi-results-demographics"></i>
-        </div>
-        <div class="left">
-          <h5>Grade</h5>
-          <div class="course-highlight">
-             <span> {{educationallevel_val}}</span>
-          </div>
-        </div>
-      </div>
-      <br/>
-
-     
-      
-      <br/>
-      
-    </div>
- 
-{% endif %}
-
-{% if educationalsubject_val %}
-  
-    <div class="about-course">
-    <div class="medium-3 rows">
-        <div class="left">
-          <i class="icon-wid fa fa-book"></i>
-        </div>
-        <div class="left">
-          <h5>Subject</h5>
-          <div class="course-highlight">
-              <span>{{educationalsubject_val}}</span>
-          </div>
-        </div>
-      </div>
-      <br/>
-
-     
-      
-      <br/>
-
-      
-        {# </div> #}
-    </div>
-  
-{% endif %}
-
-{# <div class="row"> #}
-  <div class="about-course">
-    <div class="medium-3 rows">
-        <div class="left">
-          <i class="icon-wid fa fa-calendar"></i>
-        </div>
-        <div class="left">
-          <h5>Created On</h5>
-          <div class="course-highlight">
-              <span> {{group_obj.created_at}}</span>
-          </div>
-        </div>
-      </div>
-      <br/>
-
-     
-      
-      <br/>
-  
-      {# </div> #}
-  </div>
-{# </div> #}
-
-<br/>
-<br/>
-
-
-
-
-
 
 {% if show_analytics_notifications %}
 {% check_is_gstaff group_id request.user as gstaff_access %}
@@ -333,6 +175,25 @@
     </div>
   </div>
   <script type="text/javascript">
+
+
+
+  //
+
+var acc = document.getElementsByClassName("accordion");
+var i;
+
+for (i = 0; i < acc.length; i++) {
+    acc[i].addEventListener("click", function() {
+        this.classList.toggle("active");
+        var panel = this.nextElementSibling;
+        if (panel.style.display === "block") {
+            panel.style.display = "none";
+        } else {
+            panel.style.display = "block";
+        }
+    });
+}
       // Student analytics view
       $(document).on('click','.fetch-analytics',function(){
           var user_id = $(this).attr("data-id");
