@@ -8,7 +8,7 @@ from django.http import StreamingHttpResponse
 from django.shortcuts import render_to_response  # , render
 from django.template import RequestContext
 from django.http import Http404
-
+from collections import OrderedDict
 try:
     from bson import ObjectId
 except ImportError:  # old pymongo
@@ -24,7 +24,7 @@ def tools_logging(request):
 	userdata = request.POST.get('payload',None)
 	user_data_old_strategy = request.POST.get('user_data',None)
 	if userdata!= None:
-		userdata = json.loads(userdata)
+		userdata = json.loads(userdata,object_pairs_hook=OrderedDict)
 		# app_name = request.POST.get('app_name',' ')
 		app_name = userdata['appName']
 		sessionid = ""
@@ -58,7 +58,7 @@ def tools_logging(request):
 
 
 	elif user_data_old_strategy != None:
-		userdata = json.loads(user_data_old_strategy)
+		userdata = json.loads(user_data_old_strategy,object_pairs_hook=OrderedDict)
 		app_name = request.POST.get('app_name','')
 		old_data = []
 		sessionid = ""
