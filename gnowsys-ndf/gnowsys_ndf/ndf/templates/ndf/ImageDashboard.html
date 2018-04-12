@@ -192,7 +192,7 @@ $("#btnUploadCancel").click(function() {
   <div class="large-11 small-10 columns">
     {% csrf_token %}
      <select id="show_all_workspace">
-    <option value="">--- Select Workspace ---</option>
+    <option value="default">--- Select Workspace ---</option>
                 {% for each_workspace in all_workspaces %}
                 <option value="{{ each_workspace.pk }}">
                   {{ each_workspace.name }}

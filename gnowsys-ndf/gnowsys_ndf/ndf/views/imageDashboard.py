@@ -58,11 +58,9 @@ def imageDashboard(request, group_id, image_id=None,page_no=1):
     search_workspace = request.GET.get("search_workspace",None)
     search_text = request.GET.get("search_text",None)
     search_text = str(search_text)
-
-    if search_workspace and search_text:
+    print group_id
+    if search_workspace != "default" and search_workspace != None and search_text:
         group_name, group_id = get_group_name_id(search_workspace)
-
-        print group_id
 
 
     if image_id is None:

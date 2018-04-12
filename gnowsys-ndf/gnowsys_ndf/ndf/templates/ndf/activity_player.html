@@ -35,7 +35,7 @@
 {% include 'ndf/widget_user_access_modal.html' %}
 
 {% if site.SITE_NAME == "NROER" %}
-  <div class="activity_player_secondary_header activity_player_header sticky" style="margin-top:-8px;">
+  <div class="activity_player_secondary_header activity_player_header sticky" style="margin-top:-7px;">
 
     <nav class="activity_player_secondary_header activity_player_header" data-topbar role="navigation" data-options="sticky_on: large">
 {% else %}
@@ -85,7 +85,7 @@
               {% endif %}
                
             </a>
-              }
+              
         </div>
         <div class="new_note header_text_block  header_text_lg_block">
         	{% if "announced_unit" in node.member_of_names_list or "drafts_unit" in node.member_of_names_list%}
@@ -318,6 +318,7 @@
                   {% endif  %}
 
                 
+                {% comment %}
                 {% if player_discussion or node_discussion %}
 
                  <div {% if user_access_priv == "allow" %} onclick="createDiscussion()" class="ckeditor-comment  explore-button "{% else %} class="ckeditor-comment explore-button user_not_enrolled" {% endif %} id="create-discussion" data-id="{{ node.pk }}"   style="margin-bottom:0;">
@@ -333,7 +334,6 @@
                <!-- <a class="discuss right"> {% if not thr_int_type %} {{disc_label}} {% else %} {{thr_int_type}} {% endif %} </a>-->
 
                 {% endif %}
-                {% comment %}
                 <a class="translate right"> Translate</a>
                 {% endcomment %}
                 
@@ -349,7 +349,7 @@
                 {% endif %}
               </div>
               {% endwith %}
-              <div class="discussion-area activity_page_rendered" style="">
+              <div class="discussion-area activity_page_rendered" >
                 {% get_attribute_value node.pk 'discussion_enable' as node_discussion %}
                 {% if  player_discussion or node_discussion %}
                     
