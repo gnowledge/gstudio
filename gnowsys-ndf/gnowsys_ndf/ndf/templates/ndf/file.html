@@ -278,7 +278,12 @@ margin-top:5px !important;
         {% trans app_gst.name %}
       {% endif%}
   </div>
-    <div class="large-8 columns repository-desc top-gap">{{app_gst.content_org|default_if_none:""|safe}}</div>
+  {% if lang_code == "hi" %}
+      <div class="large-8 columns repository-desc top-gap">{% trans "Homogeneous collections of resources" %}</div>
+  {% else %}    
+      <div class="large-8 columns repository-desc top-gap">{{app_gst.content_org|default_if_none:""|safe}}</div>
+  {% endif %}  
+    
   {% if title == "E-Library" %}
     {% get_filters_data "File" groupid as filter_dict %}
     {% include "ndf/filters.html" with filter_dict=filter_dict %}
