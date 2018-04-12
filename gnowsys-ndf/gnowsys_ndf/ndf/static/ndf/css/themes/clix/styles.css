@@ -31469,6 +31469,11 @@ svg {
   font-family: 'Proxima Nova', 'Helvetica Neue', 'sans-serif', Arial;
 }
 
+/* line 8312, ../../../scss/_app_styles.scss */
+.second-has-form {
+  margin-top: -7px;
+}
+
 /*
 *  CLIx Platform Stylesheet
 */
