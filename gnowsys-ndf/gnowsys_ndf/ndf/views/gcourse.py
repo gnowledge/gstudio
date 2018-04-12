@@ -3523,11 +3523,12 @@ def course_analytics(request, group_id, user_id, render_template=False, get_resu
     )
 
     # return HttpResponse(json.dumps(analytics_data))
+
 @login_required
 @get_execution_time
 def course_analytics_admin(request, group_id):
 
-    cache_key = u'course_analytics_admin' + unicode(group_id)
+    cache_key = u'course_analytics_admin' + unicode(slugify(group_id))
     cache_result = cache.get(cache_key)
     # if cache_result:
     #     return HttpResponse(cache_result)
@@ -3537,7 +3538,6 @@ def course_analytics_admin(request, group_id):
     group_obj   = get_group_name_id(group_id, get_obj=True)
     group_id    = group_obj._id
     group_name  = group_obj.name
-
     thread_node = None
     banner_pic_obj,old_profile_pics = _get_current_and_old_display_pics(group_obj)
     
@@ -3630,14 +3630,13 @@ def course_analytics_admin(request, group_id):
     response_dict['max_points_dict'] = max_points_dict
     context_variables["response_dict"] = json.dumps(response_dict)
     cache.set(cache_key, response_dict, 60*10)
+    print "\n admin_analytics_data_list === ",admin_analytics_data_list
     return render_to_response("ndf/lms.html",
                                 context_variables,
                                 context_instance = RequestContext(request)
     )
 
 
-    # print "\n admin_analytics_data_list === ",admin_analytics_data_list
-    return HttpResponse(response_dict)
 
 '''
 @login_required
@@ -3904,7 +3903,7 @@ def course_analytics_admin(request, group_id):
 @login_required
 @get_execution_time
 def build_progress_bar(request, group_id, node_id):
-    cache_key = u'build_progress_bar_' + unicode(group_id) + "_" + unicode(node_id) + "_" + unicode(request.user.id)
+    cache_key = u'build_progress_bar_' + unicode(slugify(group_id)) + "_" + unicode(node_id) + "_" + unicode(request.user.id)
     cache_result = cache.get(cache_key)
     if cache_result:
         return HttpResponse(cache_result)
@@ -3978,7 +3977,7 @@ def assets(request, group_id, asset_id=None,page_no=1):
             'group_id': group_id, 'groupid': group_id,
             'title':'asset_detail','asset_obj':asset_obj,
             'asset_nodes':asset_nodes,'asset_content_list':asset_content_list,
-            'group_obj':group_obj
+            'group_obj':group_obj, 'group_name':group_obj.name
         }
         if 'announced_unit' in group_obj.member_of_names_list or 'Group' in group_obj.member_of_names_list and 'base_unit' not in group_obj.member_of_names_list :
                  
@@ -4001,7 +4000,7 @@ def assets(request, group_id, asset_id=None,page_no=1):
         'group_set': {'$all': [ObjectId(group_id)]}}).sort('last_update', -1)
     assets_page_info = paginator.Paginator(asset_nodes, page_no, GSTUDIO_NO_OF_OBJS_PP)
     context_variables = {
-            'group_id': group_id, 'groupid': group_id,
+            'group_id': group_id, 'groupid': group_id, 'group_name':group_obj.name, 
             'asset_nodes': asset_nodes,'title':'asset_list',
             'group_obj':group_obj,'assets_page_info':assets_page_info
         }
