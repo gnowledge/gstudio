@@ -68,7 +68,7 @@ def activity_details(username):
                     unit_id = splitted_results[1]
                     lesson_id = splitted_results[4]
                     activity_id = splitted_results[5]
-                    unit_node = get_group_name_id(ObjectId(unit_id), get_obj=True)
+                    unit_node = get_group_name_id(unit_id, get_obj=True)
                     lesson_node = node_collection.one({'_id': ObjectId(lesson_id)})
                     activity_node = node_collection.one({'_id': ObjectId(activity_id)})
                     lesson_name = lesson_node.name
@@ -90,7 +90,7 @@ def activity_details(username):
 
                     nav_out_action_cur = benchmark_collection.find({'last_update': {'$gte': each_visit['last_update']}, 
                         '_id': {'$ne': each_visit['_id']}, 'user': username, 'session_key': each_visit['session_key'],
-                        'calling_url': {'$regex': activity_out_regex_pattern, '$options': 'i' }}).sort('last_update', -1)
+                        'calling_url': {'$regex': activity_out_regex_pattern, '$options': 'i' }}).sort('last_update', 1)
                     if nav_out_action_cur.count():
                         nav_out_obj = nav_out_action_cur[0]
                         end_time = nav_out_obj['last_update']
