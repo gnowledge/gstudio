@@ -241,11 +241,13 @@ if GSTUDIO_ELASTIC_SEARCH:
 
 		else:
 			if search_text in (None,'',""):
-				q = Q('bool', must=[Q('match', group_set=str(group_id)), Q('match',access_policy='public'),Q('bool',should=[Q('match',member_of=GST_FILE1.hits[0].id),Q('match',member_of=GST_PAGE1.hits[0].id)] )],
-				must_not=[Q('match', attribute_set__educationaluse ='ebooks')])
+				q = Q('bool', must=[Q('match', group_set=str(group_id)), Q('match',access_policy='public')],
+					should=[Q('match',member_of=GST_FILE1.hits[0].id),Q('match',member_of=GST_PAGE1.hits[0].id),Q('match',member_of=GST_JSMOL1.hits[0].id)],
+				must_not=[Q('match', attribute_set__educationaluse ='ebooks')],minimum_should_match=1)
 			else:
-				q = Q('bool', must=[Q('match', group_set=str(group_id)), Q('match',access_policy='public'),Q('multi_match', query=search_text, fields=['content','name','tags']),Q('bool',should=[Q('match',member_of=GST_FILE1.hits[0].id),Q('match',member_of=GST_PAGE1.hits[0].id)] )],
-				must_not=[Q('match', attribute_set__educationaluse ='ebooks')])
+				q = Q('bool', must=[Q('match', group_set=str(group_id)), Q('match',access_policy='public'),Q('multi_match', query=search_text, fields=['content','name','tags'])],
+				should=[Q('match',member_of=GST_FILE1.hits[0].id),Q('match',member_of=GST_PAGE1.hits[0].id)], 
+				must_not=[Q('match', attribute_set__educationaluse ='ebooks')],minimum_should_match=1)
 
 
 		files_new = Search(using=es, index="nodes",doc_type="gsystemtype,gsystem,metatype,relationtype,attribute_type,group,author").query(q)
@@ -584,14 +586,14 @@ if GSTUDIO_ELASTIC_SEARCH:
 					if search_text in (None,'',""):
 					
 						q = Q('bool', must=[Q('match', group_set=str(group_id)), Q('match',access_policy='public'),Q('match', attribute_set__educationaluse =filetype)],
-						should=[Q('match',member_of=GST_FILE1.hits[0].id)], minimum_should_match=1)
+						should=[Q('match',member_of=GST_FILE1.hits[0].id),Q('match',member_of=GST_PAGE1.hits[0].id)], minimum_should_match=1)
 					
 						collection_query = Q('bool', must=[Q('match', group_set=str(group_id)), Q('match',access_policy='public'),Q('exists',field='collection_set')],
 						should=[Q('match',member_of=GST_FILE1.hits[0].id),Q('match',member_of=GST_PAGE1.hits[0].id) ],
 						must_not=[Q('match', attribute_set__educationaluse ='ebooks')], minimum_should_match=1)	
 					else:
 						q = Q('bool', must=[Q('match', group_set=str(group_id)), Q('match',access_policy='public'),Q('match', attribute_set__educationaluse =filetype),Q('multi_match', query=search_text, fields=['content','name','tags'])],
-						should=[Q('match',member_of=GST_FILE1.hits[0].id)], minimum_should_match=1)
+						should=[Q('match',member_of=GST_FILE1.hits[0].id),Q('match',member_of=GST_PAGE1.hits[0].id)], minimum_should_match=1)
 					
 						collection_query = Q('bool', must=[Q('match', group_set=str(group_id)), Q('match',access_policy='public'),Q('exists',field='collection_set'),Q('multi_match', query=search_text, fields=['content','name','tags'])],
 						should=[Q('match',member_of=GST_FILE1.hits[0].id),Q('match',member_of=GST_PAGE1.hits[0].id) ],
@@ -628,14 +630,16 @@ if GSTUDIO_ELASTIC_SEARCH:
 
 				else:
 					if search_text in (None,'',""):
-						q = Q('bool', must=[Q('match', group_set=str(group_id)), Q('match',access_policy='public'),Q('match',member_of=GST_FILE1.hits[0].id),Q('terms',attribute_set__educationaluse=['documents','images','audios','videos'])],
+						q = Q('bool', must=[Q('match', group_set=str(group_id)), Q('match',access_policy='public'),Q('terms',attribute_set__educationaluse=['documents','images','audios','videos'])],
+							should=[Q('match',member_of=GST_FILE1.hits[0].id),Q('match',member_of=GST_PAGE1.hits[0].id)],minimum_should_match=1
 						)
 						
 						collection_query = Q('bool', must=[Q('match', group_set=str(group_id)), Q('match',access_policy='public'),Q('exists',field='collection_set')],
 							should=[Q('match',member_of=GST_FILE1.hits[0].id),Q('match',member_of=GST_PAGE1.hits[0].id) ],
 							must_not=[Q('match', attribute_set__educationaluse ='ebooks')])
 					else:
-						q = Q('bool', must=[Q('match', group_set=str(group_id)), Q('match',access_policy='public'),Q('match',member_of=GST_FILE1.hits[0].id),Q('multi_match', query=search_text, fields=['content','name','tags']),Q('terms',attribute_set__educationaluse=['documents','images','audios','videos'])],
+						q = Q('bool', must=[Q('match', group_set=str(group_id)), Q('match',access_policy='public'),Q('multi_match', query=search_text, fields=['content','name','tags']),Q('terms',attribute_set__educationaluse=['documents','images','audios','videos'])],
+						should=[Q('match',member_of=GST_FILE1.hits[0].id),Q('match',member_of=GST_PAGE1.hits[0].id)],minimum_should_match=1
 						)
 						
 						collection_query = Q('bool', must=[Q('match', group_set=str(group_id)),Q('multi_match', query=search_text, fields=['content','name','tags']), Q('match',access_policy='public'),Q('exists',field='collection_set')],
