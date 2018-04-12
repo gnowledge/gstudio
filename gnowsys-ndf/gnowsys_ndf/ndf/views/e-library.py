@@ -341,11 +341,6 @@ if GSTUDIO_ELASTIC_SEARCH:
 				collection_pages_cur =Search(using=es, index="nodes",doc_type="gsystemtype,gsystem,metatype,relationtype,attribute_type,group,author").query(q)
 
 
-
-
-		print collection_pages_cur.count()
-
-		print "cccccccccccccccccccccccccccccccccccccccccccccccccccc"
 		#print collection_pages_cur.to_dict()
 
 		if int(page_no)==1:

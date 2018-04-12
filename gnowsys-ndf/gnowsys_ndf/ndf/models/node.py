@@ -1,7 +1,7 @@
 from base_imports import *
 from history_manager import HistoryManager
 from gnowsys_ndf.ndf.gstudio_es.es import esearch
-from gnowsys_ndf.settings import GSTUDIO_ELASTIC_SEARCH
+from gnowsys_ndf.settings import GSTUDIO_ELASTIC_SEARCH,GSTUDIO_ELASTIC_SEARCH_IN_NODE_CLASS
 
 
 @connection.register
@@ -712,7 +712,7 @@ class Node(DjangoDocument):
             node_collection.collection.update({'_id':self._id}, {'$set': {'snapshot'+"."+str(kwargs['groupid']):rcsno }}, upsert=False, multi=True)
 
         ########################## ES ##################################
-        if GSTUDIO_ELASTIC_SEARCH == True:
+        if GSTUDIO_ELASTIC_SEARCH_IN_NODE_CLASS == True:
             #es = esearch(fp)
             #es.inject()
             esearch.inject(fp)
