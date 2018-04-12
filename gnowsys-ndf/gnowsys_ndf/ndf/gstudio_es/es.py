@@ -70,7 +70,6 @@ class esearch:
         document_type = document["type"]
 
         index = None
-        print GSTUDIO_ELASTIC_SEARCH_INDEX
 
         for k in GSTUDIO_ELASTIC_SEARCH_INDEX:
             for v in GSTUDIO_ELASTIC_SEARCH_INDEX[k]:
