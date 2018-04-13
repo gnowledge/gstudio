@@ -74,7 +74,6 @@ def imageDashboard(request, group_id, image_id=None,page_no=1):
                     }
                     }).sort('last_update', -1)
     all_workspaces_count = all_workspaces.count()
-    print all_workspaces_count
 
     # img_col = node_collection.find({'_type': 'File', 'member_of': {'$all': [ObjectId(image_id)]}, 'group_set': ObjectId(group_id)}).sort("last_update", -1)
     files_cur = node_collection.find({  '$and':[{'group_set': {'$all': [ObjectId(group_id)]}},{'$or':[{'content':{'$regex' : search_text, '$options' : 'i'}},{'name':{'$regex' : search_text, '$options' : 'i'}},{'altnames':{'$regex' : search_text, '$options' : 'i'}},{'tags':{'$regex' : search_text, '$options' : 'i'}}] }],
