@@ -746,22 +746,5 @@
 
 {% endif %}
 
-<script>
-    $(document).on("click", "#search-submit", function() {
-            // $("li.second-has-form").hide();
-            $("#search-submit").hide();
-            
-            $('li.second-has-form').append("<form id = 'search_form' {% if groupid %} action='{% url 'results' groupid %}' {% else %} action='' {% endif %} name='search_form' method=GET></form>");
-   
-              $('#search_form').append('<div class="row collapse menu_search"><div class="large-9 small-9 columns"><input type="text" name="search_text" id="search_text" placeholder="{% trans "Search" %}" autocomplete="off" required /></div><div class="large-1 small-2 columns"><button type="submit" class="tiny button" value="" id="search-submit1" class="checked"><i class="fi-magnifying-glass"></i></button></div> <div></div>');
-              if(temp == "True") {
-                $("#current_search").attr('disabled', true);
-                $("#global_search").prop("checked", true)
-                
-              }
-   });
-
-    
-  </script>
 
 
