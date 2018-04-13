@@ -4919,10 +4919,9 @@ $inCompleteBgColor: #fd9e29;
 }
 
 
-.accordion {
+.accordion-overview {
     background-color: #eee;
     color: #444;
-    cursor: pointer;
     padding: 18px;
     width: 100%;
     border: none;
@@ -4932,8 +4931,13 @@ $inCompleteBgColor: #fd9e29;
     transition: 0.4s;
 }
 
-.active, .accordion:hover {
+ .accordion-overview:hover {
+   & .active{
+   
     background-color: #6f0859; 
+   }
+
+
 }
 
 .panel {
