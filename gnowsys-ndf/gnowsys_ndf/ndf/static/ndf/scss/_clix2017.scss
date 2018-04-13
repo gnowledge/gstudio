@@ -5135,7 +5135,7 @@ $module-card-lines-to-show: 3;
         //font-size: 32px;
         color: $primary-pink !important;
         font-weight: 600;
-        text-align: center;
+        //text-align: center;
         margin: 0px auto;
         letter-spacing: 1px;
         font-size: 1.4vw
@@ -5216,6 +5216,8 @@ $module-card-lines-to-show: 3;
 
                 &:hover {
                     box-shadow: 0px 0px 17px rgba(0, 0, 0, 0.68);
+                    background: #ffffff;
+                    color: rgb(162, 35, 141);
                 }
             }
         }
@@ -6116,6 +6118,11 @@ input.transcript-toggler{
     width: 164px !important;
     margin-top: 2px !important;
     letter-spacing: 0.4px;
+    &:hover {
+         background: #ffffff;
+         color: rgb(162, 35, 141);
+    }
+
 }
 
 .enroll-act_lbl{
