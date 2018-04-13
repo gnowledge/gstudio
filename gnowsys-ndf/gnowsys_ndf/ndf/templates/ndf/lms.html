@@ -72,11 +72,11 @@
     </li>
        {% endif %}
      {% if 'Group'  in group_object_member_of_names_list and "base_unit" not in group_object_member_of_names_list and "announced_unit" not in group_object_member_of_names_list %}
+    {% endif %}
+    {% comment %}
     <li>
       <a href="{% url 'curriculum_list' groupid  %}" tabindex="6"> <i class="fa fa-sitemap ">  </i> {% trans "Topic Map" %}</a>
     </li>
-    {% endif %}
-    {% comment %}
     <li>
       <a href="{% url 'gtask' group_id  %}"  tabindex="7" > <i class="fa fa-list-alt"></i> {% trans "Task" %}</a>
     </li>
