@@ -4063,13 +4063,12 @@ msgstr "एस्ट्रोमर प्लैनेट ट्रेक गत
 msgid "Welcome"
 msgstr "स्वागत है"
 
-#: gnowsys_ndf/ndf/templates/ndf/landing_page_nroer.html:220
+#: gnowsys_ndf/ndf/templates/ndf/landing_page_nroer.html:219
 #, fuzzy
 msgid "Discussion"
 msgstr "परिचर्चा"
 
-#: gnowsys_ndf/ndf/templates/ndf/landing_page_nroer.html:228
-#, fuzzy
+#: gnowsys_ndf/ndf/templates/ndf/landing_page_nroer.html:227
 msgid "eResourses"
 msgstr "संसाधन"
 
