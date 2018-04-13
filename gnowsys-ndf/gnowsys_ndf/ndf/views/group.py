@@ -3028,7 +3028,8 @@ def notification_details(request,group_id):
           rel_set_dict = get_dict_from_list_of_dicts(each.relation_set)
           if each.if_file.mime_type and 'assetcontent_of' in rel_set_dict:
             node_obj = Node.get_node_by_id(each.relation_set[0]['assetcontent_of'][0])
-            activity =  'uploaded ' + each.name +  ' in ' + node_obj.name
+            if node_obj:
+                activity =  'uploaded ' + each.name +  ' in ' + node_obj.name
           elif 'Asset' in each.member_of_names_list and 'asset@gallery' in each.tags:
             activity =  'Modified Folder ' + each.name
           elif 'Asset' in each.member_of_names_list and 'raw@material' in each.tags:
