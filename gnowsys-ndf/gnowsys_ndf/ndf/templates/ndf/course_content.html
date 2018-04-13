@@ -1,19 +1,21 @@
 <div class="course-content">
     <button class="accordion-overview">Overview</button>
     <div class="panel">
-         <div class="about-course">
-            <h5>Description:</h5>
-              <div class="course-desc" id="scstyle">
-                {{group_object.content|default:'No description added yet.'|safe}}
+         <div class="about-course  rows">            
+            <div class="medium-3  large-12 columns rows">
+              <div class="left">
+                <i class="icon-wid fa fa-user"></i>
               </div>
-              <div>
-                <u><a class="show-more hide">Show more</a></u>
+              <div class="left">
+                <h5>Description</h5> <br>
+                  <div class="course-highlight">
+                    <span>
+                      {{group_object.content|default:'No description added yet.'|safe}}  
+                    </span>
+                  </div>
               </div>
-              <br/>
-        </div>
-
-        <div class="about-course">
-            <div class="medium-3 rows">
+            </div>
+            <div class="medium-3 large-3 columns rows">
               <div class="left">
                 <i class="icon-wid fa fa-user"></i>
               </div>
@@ -21,14 +23,27 @@
                 <h5>No. of Members</h5>
                   <div class="course-highlight">
                     <span>
-                      {{group_object.author_set|length}} 
+                      {{group_object.author_set|length}}  
+                    </span>
+                  </div>
+              </div>
+            </div> 
+            <div class="medium-3  large-3 columns rows">
+              <div class="left">
+                <i class="icon-wid fa fa-list"></i>
+              </div>
+              <div class="left">
+                <h5>No. of {% firstof group_object.project_config.tab_name 'Lessons' %}</h5>
+                  <div class="course-highlight">
+                    <span>
+                      {{group_object.collection_set|length}}
                     </span>
                   </div>
               </div>
             </div>
             <br/>
-            <br/>
         </div>
+      </div>
        
         {% comment %}
         {% if show_analytics_notifications %}
@@ -61,7 +76,6 @@
             <br/>
           {% endif %}
         {% endif %}
-      </div>
 
       {% if educationallevel_val %}
         <div class="about-course">
@@ -120,7 +134,7 @@
           <br/>
       </div>
     {% endcomment %}
-    </div>
+
     <div id="tree1">
     </div>
 </div>
