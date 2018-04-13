@@ -362,8 +362,10 @@ pre{
 
   #search-submit{
 /*    background-color: #fafafa;*/
-    // color: gray;
-    top: -3px;
+    /*color: gray;
+    top: -3px;*/
+    width:60px;
+/*    height:-40px;*/
 
   }
 
@@ -8218,9 +8220,9 @@ $module-card-lines-to-show: 3;
   background: #107aa1;
 }
 
-.searchbar {
+/*.searchbar {
   margin: 0.8rem;
-}
+}*/
 
 .search-field {
   width: 0;
@@ -8308,4 +8310,11 @@ svg {
 .footer-copyright{
   margin-top: -70px;
   font-family: 'Proxima Nova', 'Helvetica Neue', 'sans-serif', Arial;
+}
+.second-has-form{
+  margin-top: 0px;
+  margin-bottom: -2px;
+}
+.searchbar{
+
 }

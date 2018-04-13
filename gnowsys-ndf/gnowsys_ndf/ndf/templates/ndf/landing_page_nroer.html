@@ -143,7 +143,7 @@ article.columns{
     </article>
     {% endcomment %}
 <!--     <div class="small-12 medium-12 large-12 columns"> -->
-    <div id="landing-slider-container" class="small-12 medium-12 large-12 medium-centered small-centered columns">
+    <div id="landing-slider-container">
         <!-- <div>
             <img src="static/ndf/images/landing_pg_slides/Slider1.png" style="width:100%;">
         </div>
@@ -154,16 +154,16 @@ article.columns{
             <img src="static/ndf/images/landing_pg_slides/Slider3.png" style="width:100%;">
         </div> -->
         <div>
-            <img src="static/ndf/images/landing_pg_slides/photo_2018-04-10_18-11-51.jpg" style="width:100%;">
-        </div>
-        <div>
-            <img src="static/ndf/images/landing_pg_slides/3-01-01.jpg" style="width:100%;">
+            <img src="static/ndf/images/landing_pg_slides/slider_1b-01.jpg" style="width:100%;">
         </div>
         <div>
             <img src="static/ndf/images/landing_pg_slides/slider_1a-01.jpg" style="width:100%;">
         </div>
         <div>
-            <img src="static/ndf/images/landing_pg_slides/slider_1b-01.png" style="width:100%;">
+            <img src="static/ndf/images/landing_pg_slides/parakh_1280x350-01.jpg" style="width:100%;">
+        </div>
+        <div>
+            <img src="static/ndf/images/landing_pg_slides/Channel_slider1-01.jpg" style="width:100%;">
         </div>
     </div>
 
@@ -197,11 +197,11 @@ article.columns{
     <div class="analytics-blog" style="margin-top: 50px;">
         <div class="large-8 medium-7 medium-centered columns" style="background: #d8dbdc;">
           <div class="row">
-            <span><h3 class="analytics" align="center">Analytics</h3></span>
+            <span><h3 class="analytics" align="center">{% trans "Analytics" %}</h3></span>
                 <div class="medium-3 columns" >
                     <div class="panel" style="background-color: #ff8080">
                         <div align="center">    
-                            <h3>Workspaces</h3>
+                            <h3>{% trans "Workspaces" %}</h3>
                             <h3>{{group_count}}</h3>
                         </div>    
                     </div>
@@ -216,7 +216,7 @@ article.columns{
             <div class="medium-3 columns">
                 <div class="panel" style="background-color: #ffffb3;">
                     <div align="center">  
-                        <h3>Discussion</h3>
+                        <h3>{% trans "Discussion" %}</h3>
                         <h3>{{ discussion_count }}</h3>
                     </div>    
                 </div>
@@ -224,7 +224,7 @@ article.columns{
             <div class="medium-3 columns">
                 <div class="panel" style="background-color: #d5ff80;">
                     <div align="center">  
-                        <h3>eResourses</h3>
+                        <h3>{% trans "eResourses" %}</h3>
                         <h3>{{ files_count }}</h3>
                     </div>    
                 </div>
@@ -232,7 +232,7 @@ article.columns{
             <div class="medium-3 columns">
                 <div class="panel" style="background-color: #ffaa80">
                     <div align="center">    
-                        <h3>Users</h3>
+                        <h3>{% trans "Users" %}</h3>
                         <h3>{{author_count}}</h3>
                     </div>    
                 </div>

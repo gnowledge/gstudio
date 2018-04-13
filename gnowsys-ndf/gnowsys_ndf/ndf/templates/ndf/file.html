@@ -79,7 +79,7 @@ margin-top:5px !important;
       <dl class="tabs" data-tab >
 
         <!-- Collections -->
-        <dd {% if collection.count > 0 %} class="active" {% endif %} data-filetype="Collections">
+        <dd {% if file_pages.count < 0 %} class="active" {% endif %} data-filetype="Collections">
           <a href="#view-collection"><i class="fi-page-multiple"></i>
             {% trans "Collections" %}
             <span class="count">
@@ -93,12 +93,16 @@ margin-top:5px !important;
         </dd><br/>
 
         <!-- all files -->
-        <dd {% if collection.count < 1 %} class="active" {% endif %} data-filetype="all">
+        <dd {% if file_pages.count > 1 %} class="active" {% endif %} data-filetype="all">
           <a href="#view-all">
             <i class="fi-eye"></i>
             {% trans "All files" %}
             <span class="count text-right">
-              {{ file_pages.count }}
+              {% if GSTUDIO_ELASTIC_SEARCH %}
+                {{ file_pages_count }}
+              {% else %}
+               {{ file_pages.count }}
+              {% endif %}
             </span>
           </a>
         </dd>
@@ -289,7 +293,12 @@ margin-top:5px !important;
         {% trans app_gst.name %}
       {% endif%}
   </div>
-    <div class="large-8 columns repository-desc top-gap">{{app_gst.content_org|default_if_none:""|safe}}</div>
+  {% if lang_code == "hi" %}
+      <div class="large-8 columns repository-desc top-gap">{% trans "Homogeneous collections of resources" %}</div>
+  {% else %}    
+      <div class="large-8 columns repository-desc top-gap">{{app_gst.content_org|default_if_none:""|safe}}</div>
+  {% endif %}  
+    
   {% if title == "E-Library" %}
     {% get_filters_data "File" groupid as filter_dict %}
     {% include "ndf/filters.html" with filter_dict=filter_dict %}
@@ -311,9 +320,9 @@ margin-top:5px !important;
 
     {% group_type_info groupid request.user as grouptype %}
 
-    {% if collection.count > 0 %}
+    {% if collection.count < 0 %}
       <div class="content row active" id="view-collection" data-filetype="Collections">
-        {% include "ndf/file_list_tab.html" with has_contributor=True resource_type=collection detail_urlname="page_details" filetype="Collections" res_type_name="" page_info=collection_pages %}
+        {% include "ndf/file_list_tab.html" with  resource_type=files detail_urlname="file_detail" filetype="Collections" res_type_name="" page_info=file_pages %}
       </div>
   
     {% else %}
