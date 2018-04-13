@@ -1,106 +1,269 @@
-<!DOCTYPE html>
-
 {% load i18n %}
-{% load get_site_variables from ndf_tags %}
+{% load ndf_tags %}
+{% load cache %}
+
+{% get_group_name group_id as group_name_tag %}
 {% get_site_variables as site %}
+{# {% get_oid_variables as oids %} #}
+{% user_access_policy group_id request.user as user_access %}
 
-<html>
+<!DOCTYPE html>
+<html lang="en">
 <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="description" content="">
+    <meta name="viewport" content="initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0, user-scalable=no, width=device-width" />
 
-	<meta charset="utf-8">
-	<meta http-equiv="X-UA-Compatible" content="IE=edge">
-	<meta name="viewport" content="width=device-width, initial-scale=1.0">
-	<meta name="description" content="">
+    <link rel="stylesheet" type="text/css" href="/static/ndf/bower_components/foundation/css/normalize.css">
+    <link rel="stylesheet" type="text/css" href="/static/ndf/bower_components/foundation-icon-fonts/foundation-icons.css">
+   <link rel="stylesheet" type="text/css" href="/static/ndf/css/opensans-fonts.css">
+   <link rel="stylesheet" type="text/css" href="/static/ndf/css/open-sans-bold-font.css">
+    <link rel="stylesheet" type="text/css" href="/static/ndf/css/clix-activity-styles.css">
+    <link rel="stylesheet" type="text/css" href="/static/ndf/bower_components/foundation/css/foundation.css">
+    <link rel="shortcut icon" href="{{site.FAVICON}}">
+    <link rel="stylesheet" href="/static/ndf/bower_components/foundation/css/normalize.css">
+    <!--<link rel="stylesheet" href="/static/ndf/css/themes/{{site.SITE_NAME|lower}}/styles.css">-->
+    <link rel="stylesheet" href="/static/ndf/bower_components/font-awesome/css/font-awesome.css">
+    <link rel="stylesheet" href="/static/ndf/bower_components/font-awesome/css/font-awesome.min.css">
+    <link rel="stylesheet" type="text/css" href="/static/ndf/css/themes/clix/clix2017.css">
+    <!-- variables for js ussage -->
+    
+    <input type="hidden" name="group_id" class="group_id" value="{{group_id}}">
+    <input type="hidden" name="is_authenticated" class="is_authenticated" value="{{user.is_authenticated}}">
+    <input type="hidden" name="csrf_token" class="csrf_token" value="{{csrf_token}}">
 
-	<title>{% block error_title %}{% endblock %}</title>
-	
-	<script src="/static/ndf/js/app.js"></script> 
+    <!-- end variables for js ussage -->
+    <script type="text/javascript" src="/static/ndf/bower_components/jquery/dist/jquery.min.js"></script>
+    <script type="text/javascript" src="/static/ndf/bower_components/foundation/js/foundation.min.js"></script>
+    <script type="text/javascript" src="/static/ndf/bower_components/foundation/js/foundation/foundation.topbar.js"></script>
+    <script type="text/javascript" src="/static/ndf/bower_components/modernizr/modernizr.js"></script>
+    </script>
+    <!-- Foundation 5 - Responsive CSS Framework http://foundation.zurb.com/docs/css.html-->
+    <script src="/static/ndf/js/MediaStreamRecorder.js"></script>
+    <script src="/static/ndf/js/adapter.js"></script>
+    <script src="/static/ndf/bower_components/modernizr/modernizr.js"></script>
+    <!-- jQuery -->
+    <script src="/static/ndf/bower_components/jquery/dist/jquery.min.js"></script>
+    <script src="/static/ndf/bower_components/blockui/jquery.blockUI.js"></script>
+    <script type="text/javascript" src="/static/ndf/bower_components/jqtree/tree.jquery.js"></script>
+    <link rel="stylesheet" type="text/css" href="/static/ndf/bower_components/jqtree/jqtree.css">
 
-	<link rel="shortcut icon" href="/static/ndf/images/favicon/logo.png"> 
-	
-	<!-- Foundation 5 - Responsive CSS Framework http://foundation.zurb.com/docs/css.html-->
-	<link rel="stylesheet" href="/static/ndf/bower_components/foundation/css/normalize.css"> 
-	<link rel="stylesheet" href="/static/ndf/css/themes/metastudio/styles.css"> 
 
-	<!-- Foundation Icon Font http://zurb.com/playground/foundation-icon-fonts-3 -->
-	<link rel="stylesheet" href="/static/ndf/bower_components/foundation-icon-fonts/foundation-icons.css"> 
+    <title>{{ site.SITE_NAME }} - {% block title %} {% endblock %}</title>
+    {% block head %}{% endblock %}
 
-	<style type="text/css">
+    <style>
 
-		body > footer{
-			position: absolute;
-			bottom: 0;
-			width: 100%;
-		}
+    {% block style %}{% endblock %}
 
-		.bk-image {
-		    position: absolute;
-		    top: 0%;
-		    left: 12%;
-		    color: gray;
-		    font-size: 20em;
-		    z-index: -1;
-		    opacity: 0.5;
-		    -ms-transform: rotate(25deg); /* IE 9 */
-		    -webkit-transform: rotate(25deg); /* Chrome, Safari, Opera */
-		    transform: rotate(-25deg);
-		}
-
-	</style>
+  </style>
 
 </head>
 <body>
 
-    <nav class="top-bar drop-shadow row" data-topbar role="navigation">
+    {% if site.BUDDY_LOGIN and user.is_authenticated and request.author.agency_type == 'Student'%}
+        {% include "ndf/buddy.html" %}
+    {% endif %}
 
-		<ul class="title-area ">
+    {% include "ndf/header_clix.html" %}
+    {% block extended_header %}{% endblock %}
 
-		<li class="name">
-		    <h1>
-		      <a href="/home/" class="group" accesskey="q" id="home-group">
-		      	<img src="{{site.LOGO}}" style="height:45px;">
-		      </a>
-		    </h1>
-		</li>
-
-		<li class="toggle-topbar menu-icon">
-		  <a href="#">{% trans "Menu" %}</a>
-		</li>
-
-		</ul>
-    </nav>
-
+    {% block body_content %} 
     <div class="bk-image">
-    	<i class="fi-paw"></i>
+        <i class="fi-paw"></i>
+    </div>
+        <div class="text-center">
+        {% block error_body_text %} 
+            dasdsadsdssadsdsd
+            {% if message %}
+                <h2>{{message}}</h2>
+                <br/>
+                <a href="javascript:window.history.back();">
+                    {% trans "Click here to go back" %}
+                </a>
+            {% endif %}
+        {% endblock %}
     </div>
 
-    <br/>
-    <br/>
+    {% endblock %}
+  <!-- JS -->
+  <!--<script src="/static/ndf/js/app.js"></script>-->
+  <script src="/static/ndf/bower_components/foundation/js/foundation.min.js"></script>
+  <script src="/static/ndf/js/gstudio-functions.js"></script>
 
-	<div class="text-center">
-		{% block error_body_text %}	
-			{% if message %}
-				<h2>{{message}}</h2>
-				<br/>
-				<a href="javascript:window.history.back();">
-					{% trans "Click here to go back" %}
-				</a>
-			{% endif %}
-		{% endblock %}
-	</div>
+  <!-- end of footer cache -->
 
-	{% include "ndf/footer.html" with site=site %} 
+  <script type="text/javascript">
+    // Initialize Foundation CSS
+       $(document).foundation();
 
-	<script type="text/javascript">
+    // Register global ajax start and complete events to show ajax loader when request is in process
+      $(document).ajaxStart($.blockUI).ajaxStop($.unblockUI);
 
-        try{
-			// function defined in app.js to check the font and load it asynchronously.
-			checkOpenSansFont();
-        }
-        finally{
-        }
+    // // Toggles the display of main sidebar for 12 col article view
+    //   var toggleMainSidebar = function(){
+    //     $("main>aside").toggle();
+    //     $("main>article").toggleClass("large-9 large-12");
+    //   };
 
-	</script>
+    // // Hide broken image links
+    //   $('img').error(function(){
+    //     $(this).addClass("hide");
+    //     //$(this).attr('src', 'missing.png');
+    //   });
 
+    // // If on the home group, change group dropdown text to "Groups"
+    //   if($(".group a.active").html() == "home") {
+    //     $(".group a.active").html("Groups").removeClass("active");
+    //     $("#home-group").addClass("active");
+    //   }
+
+    // //Functions to automatically add an <i> element icon inside node spans
+
+    // /* Attaches user icon with gnow level color for every user link */
+    // $(".user").prepend(function(){return "<i class='fi-torso'></i>"});
+
+    // /* Attaches icon for node type */
+    // $(".card .course").prepend(function(){return "<i class='fi-book'></i>"});
+
+    // /* Attaches icon for node type */
+    // $(".card .quiz").prepend(function(){return "<i class='fi-graph-bar'></i>"});
+
+    // /* Attaches icon for node type */
+    // $(".card .forum").prepend(function(){return "<i class='fi-comments'></i>"});
+
+    // /* Attaches icon for node type */
+    // $(".card .group").prepend(function(){return "<i class='fi-torsos'></i>"});
+
+    //   /* Attaches icon for node type */
+    // $(".card .page").prepend(function(){return "<i class='fi-page'></i>"});
+
+    // /* Attaches icon for node type */
+    // $(".card .ebook").prepend(function(){return "<i class='fi-book'></i>"});
+
+    // /* Attaches icon for node type */
+    // $("aside.page").prepend(function(){return "<i class='fi-page'></i>"});
+
+    // //set language prefernce
+    //   $(document).on('click', "#savepref", function(){
+    //     var vpref=$("#pref").val();
+    //     var fb=$("#fallback").val();
+    //     var vurl='/{{group_id}}/userpreference/';
+
+    //     $.ajax({
+    //       url: vurl,
+    //       type: 'POST',
+    //       data: {pref:vpref,fallback:fb,csrfmiddlewaretoken: '{{ csrf_token }}'},
+
+    //       success:function(data){
+    //         alert("Successfully set the preferences");
+    //         location.reload();
+    //       }
+    //     }); //ajax closes
+    //   }); //document closes
+
+      // after opening overlay node'sdescription should fetch from oid
+      $('.overlay-description-by-oid-caller').click(function(){
+        // alert(this.getAttribute('data-oid'));
+        var oid = this.getAttribute('data-oid');
+        document.getElementById('overlay-description-by-oid').setAttribute('caught-data-oid', oid);
+
+        // wiping out #overlay-description-by-oid-content and overlay-description-by-oid-title
+        document.getElementById('overlay-description-by-oid-content').textContent = ""
+        document.getElementById('overlay-description-by-oid-title').textContent = ""
+      });
+
+      $(document).on('open', '#overlay-description-by-oid[data-reveal]', function () {
+        var modal = this;
+        // console.log(modal.getAttribute('caught-data-oid'));
+        var oid = modal.getAttribute('caught-data-oid');
+        // var url = "/{{group_id}}/ajax/get_resource_by_oid/" + oid;
+
+        if (!oid) {return};
+
+      });
+
+    // // start of document.ready()
+    //   $(document).ready(function() {
+    //     try{
+    //         $("#help-canvas-menu").click(function(){
+    //             $("#help-canvas-menu").toggleClass("expanded");
+    //             // $("div").addClass("expanded");
+    //         });
+
+    //       // $('select option[value="{{request.LANGUAGE_CODE}}"]').attr("selected",true);
+
+    //       {% block document_ready %} {% endblock %}
+
+    //     }
+    //     finally{
+    //       // function defined in app.js to check the font and load it asynchronously.
+    //       checkOpenSansFont();
+    //     }
+
+    //     //function defined to inject
+    //     (function(win,doc,tag,script){
+    //       var element = doc.createElement(tag);
+    //       var ftag = doc.getElementsByTagName(tag)[0];
+    //       element.async = 1;
+    //       element.src = script;
+    //       ftag.parentNode.insertBefore(element,ftag)
+    //     })(window,document,'script','/static/ndf/js/analytics.js');
+    //   });
+
+    {% block script %} {% endblock %}
+  </script>
 </body>
+<footer>
+  </div>   
+    <style type="text/css">
+    .bk-image {
+            position: absolute;
+            top: 0%;
+            left: 12%;
+            color: gray;
+            font-size: 20em;
+            z-index: -1;
+            opacity: 0.5;
+            -ms-transform: rotate(25deg); /* IE 9 */
+            -webkit-transform: rotate(25deg); /* Chrome, Safari, Opera */
+            transform: rotate(-25deg);
+        }
+/*            
+            #page_content{
+                                display: table;
+                height:auto;
+                                display: table-row;
+
+            }
+            
+            html,body {
+                height:100%;
+                width: 100%;
+            }
+
+
+
+            body {
+
+                    display: table;
+            }
+
+            .footer_container{
+                    height: auto;
+                    display: table-row;
+            }
+
+            #footer {
+                height: 1px;
+            }
+*/    </style>
+    <div clas="footer-test">
+        
+    {% if not no_footer %}
+        {% include 'ndf/footer_clix.html' %}
+    {% endif %}
+    </div>
+</footer>
 </html>
