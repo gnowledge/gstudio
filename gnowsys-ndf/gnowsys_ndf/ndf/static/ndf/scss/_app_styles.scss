@@ -556,7 +556,6 @@ body>footer {
     .footer_link_cont {
       display: inline-block;
       vertical-align: top;
-      /*margin: 20px;*/
       text-align: left;
 
       .links_show {
@@ -8270,3 +8269,43 @@ svg {
 }
 
 
+
+
+/* ----New Footer For NROER -------*/
+
+.footer-nav{
+  margin-right: auto;
+  margin-left: auto;
+  margin-top: 60px;
+  display:table-row;
+  height:1px;
+  display:flex;
+  flex-flow:row wrap;
+  flex-direction: row;
+  flex-wrap: row;
+  align-items: center;
+  background-color: rgba(0,0,0,0.8);
+  padding:1.8rem;
+  width:100%;
+  justify-content: center;
+  font-family: 'Proxima Nova', 'Helvetica Neue', 'sans-serif', Arial;
+}
+
+.footer-nav-center{
+  flex: 1 1 0px;
+}
+.footer-nav-menu{
+  list-style: none;
+  margin-bottom: 0;
+  text-align: center;
+}
+.footer-nav-menu-item{
+  display: inline-block;
+  margin-right: 1.5rem;
+  font-size: 1.2rem;
+  padding: 0.4rem 0;
+}
+.footer-copyright{
+  margin-top: -70px;
+  font-family: 'Proxima Nova', 'Helvetica Neue', 'sans-serif', Arial;
+}

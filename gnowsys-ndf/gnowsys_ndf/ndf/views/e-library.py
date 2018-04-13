@@ -77,10 +77,7 @@ if GSTUDIO_ELASTIC_SEARCH:
 		with open("Output.txt", "w") as text_file:
 			text_file.write(search_text)
 			text_file.close()
-		print search_text
-		print "-------------------------------"
 
-		print GST_FILE1
 		try:
 			group_id = ObjectId(group_id)
 		except:
@@ -88,8 +85,6 @@ if GSTUDIO_ELASTIC_SEARCH:
 
 		if app_id is None:
 			app_id = app1.hits[0].id
-			print app_id
-
 
 		title = e_library_GST1.hits[0].name
 		
@@ -124,8 +119,7 @@ if GSTUDIO_ELASTIC_SEARCH:
 								key = list(key)
 								key[13]='__'
 								t="".join(key)
-								print t
-								print "-----------------------------"
+								
 								temp_dict[t]=value["$in"][0]
 								#strconcat=strconcat+"Q('match',"+ t+"='"+value["$in"][0]+"'),"
 								#Q('match',name=dict(query="e-book", type="phrase"))
@@ -135,8 +129,7 @@ if GSTUDIO_ELASTIC_SEARCH:
 								key = list(key)
 								key[13]='__'
 								t="".join(key)
-								print t
-								print "------------------------"
+								
 								temp_dict[t]=value["$or"][0]
 								#strconcat=strconcat+"Q('match',"+t+"='"+value["$or"][0]+"') "
 								#strconcat=strconcat+"Q('match',"+t+"=dict(query='"+value["$or"][0]+"',type='phrase'))$$"
@@ -161,10 +154,6 @@ if GSTUDIO_ELASTIC_SEARCH:
 								#strconcat=strconcat+"Q('match',"+key+"=dict(query='"+value+"',type='phrase'))$$"	
 								lists.append("Q('match',"+key+"=dict(query='"+value+"',type='phrase'))")
 
-		print temp_dict
-		#strconcat=strconcat
-		print strconcat
-		print lists
 		#files = node_collection.find({
 										# 'member_of': {'$in': [GST_FILE._id, GST_PAGE._id]},
 										#'member_of': {'$in': [GST_FILE._id,GST_JSMOL._id]},
@@ -305,7 +294,7 @@ if GSTUDIO_ELASTIC_SEARCH:
 			if set(eu_list):
 				if len(set(eu_list)) > 1:
 					educationaluse_stats = dict((x, eu_list.count(x)) for x in set(eu_list))
-					print educationaluse_stats
+					
 				elif len(set(eu_list)) == 1:
 					educationaluse_stats = { eu_list[0]: eu_list.count(eu_list[0])}
 				educationaluse_stats["all"] = files.count()
@@ -340,9 +329,6 @@ if GSTUDIO_ELASTIC_SEARCH:
 				must_not=[Q('match', attribute_set__educationaluse ='ebooks')], minimum_should_match=1)
 				collection_pages_cur =Search(using=es, index="nodes",doc_type="gsystemtype,gsystem,metatype,relationtype,attribute_type,group,author").query(q)
 
-
-		#print collection_pages_cur.to_dict()
-
 		if int(page_no)==1:
 			collection_pages_cur=collection_pages_cur[0:24]
 		else:
@@ -352,7 +338,6 @@ if GSTUDIO_ELASTIC_SEARCH:
 		paginator = Paginator(collection_pages_cur, 24)
 
 
-		#page_no = request.GET.get('page_no')
 		try:
 			results = paginator.page(page_no)
 		except PageNotAnInteger:
@@ -360,9 +345,6 @@ if GSTUDIO_ELASTIC_SEARCH:
 		except EmptyPage:
 			results = paginator.page(paginator.num_pages)
 
-		#	print collection_pages_cur1
-
-		#coll_page_count = collection_pages_cur.count() if collection_pages_cur else 0
 		coll_page_count = collection_pages_cur.count() if collection_pages_cur else 0
 
 
@@ -426,8 +408,6 @@ if GSTUDIO_ELASTIC_SEARCH:
 			with open("Output.txt", "r") as text_file:
 				search_text = text_file.read()
 				text_file.close()
-
-			print search_text
 			
 			group_name, group_id = get_group_name_id(group_id)
 
@@ -469,8 +449,7 @@ if GSTUDIO_ELASTIC_SEARCH:
 									key = list(key)
 									key[13]='__'
 									t="".join(key)
-									print t
-									print "-----------------------------"
+									
 									temp_dict[t]=value["$in"][0]
 									#strconcat=strconcat+"Q('match',"+ t+"='"+value["$in"][0]+"'),"
 									#Q('match',name=dict(query="e-book", type="phrase"))
@@ -480,8 +459,7 @@ if GSTUDIO_ELASTIC_SEARCH:
 									key = list(key)
 									key[13]='__'
 									t="".join(key)
-									print t
-									print "------------------------"
+									
 									temp_dict[t]=value["$or"][0]
 									#strconcat=strconcat+"Q('match',"+t+"='"+value["$or"][0]+"') "
 									#strconcat=strconcat+"Q('match',"+t+"=dict(query='"+value["$or"][0]+"',type='phrase'))$$"
@@ -506,12 +484,6 @@ if GSTUDIO_ELASTIC_SEARCH:
 									#strconcat=strconcat+"Q('match',"+key+"=dict(query='"+value+"',type='phrase'))$$"	
 									lists.append("Q('match',"+key+"=dict(query='"+value+"',type='phrase'))")
 
-			print temp_dict
-			#strconcat=strconcat
-			print strconcat
-			print lists
-
-
 			
 			#if filetype != "all":
 				
@@ -524,13 +496,6 @@ if GSTUDIO_ELASTIC_SEARCH:
 					#query_dict.append({"attribute_set.educationaluse": filetype})
 			#		pass
 
-			
-
-			#GST_FILE_temp=[]
-			#for a in GST_FILE['hits']['hits']:
-			#temp1=ObjectId(a['_source']['id'])
-			#	temp1=a['_source']['id']
-			#	GST_FILE_temp.append(temp1)
 			#files = node_collection.find({
 			#								'member_of': {'$in': [GST_FILE._id,GST_JSMOL._id]},
 											# 'member_of': {'$in': [GST_FILE._id, GST_PAGE._id]},
@@ -648,7 +613,7 @@ if GSTUDIO_ELASTIC_SEARCH:
 				else:
 					temp=( int(page_no) - 1) * 24
 					files1=files1[temp:temp+24]
-				print files1.count()
+	
 				
 
 			educationaluse_stats = {}
@@ -689,7 +654,6 @@ if GSTUDIO_ELASTIC_SEARCH:
 
 
 			if filetype == "Collections":
-				print "collections if block"
 				detail_urlname = "page_details"
 					#result_cur = node_collection.find({
 					#					'member_of': {'$in': [GST_FILE._id, GST_PAGE._id]},
@@ -721,7 +685,6 @@ if GSTUDIO_ELASTIC_SEARCH:
 
 				result_paginated_cur = result_cur
 
-				print result_cur
 				paginator = Paginator(result_paginated_cur, 24)
 					#page = request.GET.get('page')
 				
