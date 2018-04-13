@@ -63,22 +63,13 @@
                 {% endcomment %}
           </div>
     </div>
-    <div class="small-3 medium-3 large-2 columns nav-legal">
+    <div class="small-3 medium-3 large-2 columns nav-legal" style="margin-top:37px;">
         <ol>
             <li>
-                <a href="http://clix.tiss.edu/about/" target="_blank">About Project</a>
-            </li>
-            <li>
-                <a href="#">About Platform</a>
-            </li>
-            <li>
-                <a href="#">Partners</a>
+                <a href="http://clix.tiss.edu/about/" target="_blank">About</a>
             </li>
             <li>
                 <a href="#">Credits</a>
-            </li>
-            <li>
-                <a href="#">Feedback</a>
             </li>
             <li>
                 <a href="http://clix.tiss.edu/contact/" target="_blank">Contact Us</a>
@@ -87,12 +78,23 @@
     </div>
     <div class="row">
         <hr>
-        <div class="small-6 columns coyright-links">
+        <div class="small-3 columns coyright-links">
             <a href="#"><p>Terms of Use</p></a>
                
         </div>
-        <div class="small-6 columns coyright-links">
+        <div class="small-3 columns coyright-links">
             <a href="#"><p>Privacy Policy</p></a>
+        </div>
+        <div class="small-6 columns coyright-links">
+            {% comment %}
+                {% get_latest_git_hash as git_commit_hash %}  // kindly uncooment once you check it and put in footer_clix
+            {% endcomment %}
+              <a href="https://gitlab.com/gnowledge/gstudio/tree/{{git_commit_hash}}" style="margin-left:319px;" target="_blank">Powered by Gstudio</a>
+            }
+            }
+            <a href="http://www.hbcse.tifr.res.in/" target="_blank">
+                <img src="/static/ndf/images/logos/tifr.png" style="height: 30px;margin-left: 330px;margin-bottom:10px;" />
+            </a>
         </div>
     </div>
 </div>

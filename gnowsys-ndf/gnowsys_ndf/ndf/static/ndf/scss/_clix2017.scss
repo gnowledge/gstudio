@@ -6015,6 +6015,13 @@ ul.authoring-tab{
 
 .coyright-links{
     &>a{
+        transition: link-color 0.15s ease-in-out 0s,border 0.15s ease-in-out 0s;
+            border-bottom: none;
+            color: #777;
+            text-decoration: none !important;
+            &:hover {
+                color:hsla(316, 88%, 42%, 1);
+            }
         &>p{
             transition: link-color 0.15s ease-in-out 0s,border 0.15s ease-in-out 0s;
             border-bottom: none;
