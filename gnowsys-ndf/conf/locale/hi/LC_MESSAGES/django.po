@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2018-04-12 15:28+0530\n"
+"POT-Creation-Date: 2018-04-13 12:13+0530\n"
 "PO-Revision-Date: 2018-04-06 15:32+0530\n"
 "Last-Translator: \n"
 "Language-Team: \n"
@@ -44,7 +44,8 @@ msgstr "अमान्य कैप्चा, दोबारा प्रय�
 
 #: gnowsys_ndf/ndf/templates/ndf/DocumentList.html:8
 #: gnowsys_ndf/ndf/templates/ndf/beta.html:8
-#: gnowsys_ndf/ndf/templates/ndf/file.html:300
+
+#: gnowsys_ndf/ndf/templates/ndf/file.html:306
 msgid ""
 "Files Listed below are already uploaded. Duplicate file uploads are not "
 "possible."
@@ -57,7 +58,7 @@ msgstr "फ़ाइल नाम"
 
 #: gnowsys_ndf/ndf/templates/ndf/DocumentList.html:19
 #: gnowsys_ndf/ndf/templates/ndf/DocumentList.html:25
-#: gnowsys_ndf/ndf/templates/ndf/card_group.html:64
+#: gnowsys_ndf/ndf/templates/ndf/card_group.html:60
 #: gnowsys_ndf/ndf/templates/ndf/version_page.html:35
 msgid "View"
 msgstr "देखें"
@@ -74,9 +75,8 @@ msgstr "केवल इमेज फ़ाइलों को अपलोड �
 #: gnowsys_ndf/ndf/templates/ndf/beta.html:21
 #: gnowsys_ndf/ndf/templates/ndf/file_search.html:16
 #: gnowsys_ndf/ndf/templates/ndf/header.html:141
-#: gnowsys_ndf/ndf/templates/ndf/header.html:810
-#: gnowsys_ndf/ndf/templates/ndf/header.html:831
-#: gnowsys_ndf/ndf/templates/ndf/header.html:883
+
+#: gnowsys_ndf/ndf/templates/ndf/header.html:760
 #: gnowsys_ndf/ndf/templates/ndf/node_search_base.html:6
 #: gnowsys_ndf/ndf/templates/ndf/search_page.html:4
 msgid "Search"
@@ -141,7 +141,8 @@ msgstr "नई फ़ाइल"
 #: gnowsys_ndf/ndf/templates/ndf/Upload_File.html:85
 #: gnowsys_ndf/ndf/templates/ndf/action_panel.html:171
 #: gnowsys_ndf/ndf/templates/ndf/custom_template_for_app.html:417
-#: gnowsys_ndf/ndf/templates/ndf/file.html:233
+
+#: gnowsys_ndf/ndf/templates/ndf/file.html:244
 #: gnowsys_ndf/ndf/templates/ndf/filehive.html:53
 #: gnowsys_ndf/ndf/templates/ndf/mis_create_edit.html:285
 #: gnowsys_ndf/ndf/templates/ndf/uploadjhapp.html:84
@@ -379,7 +380,7 @@ msgid "to learn more about licenses"
 msgstr "लाइसेंस के बारे में अधिक जानकारी के लिए"
 
 #: gnowsys_ndf/ndf/templates/ndf/User_Activity.html:9
-#: gnowsys_ndf/ndf/templates/ndf/lms.html:122
+#: gnowsys_ndf/ndf/templates/ndf/lms.html:126
 msgid "Activities"
 msgstr "क्रियाकलाप"
 
@@ -398,7 +399,7 @@ msgstr "हाल ही में कोई क्रियाकलाप न�
 #: gnowsys_ndf/ndf/templates/ndf/fetch_fields.html:59
 #: gnowsys_ndf/ndf/templates/ndf/gevent_base.html:149
 #: gnowsys_ndf/ndf/templates/ndf/group_dashboard.html:118
-#: gnowsys_ndf/ndf/templates/ndf/lms.html:204
+#: gnowsys_ndf/ndf/templates/ndf/lms.html:208
 #: gnowsys_ndf/ndf/templates/ndf/mis_create_edit.html:182
 #: gnowsys_ndf/ndf/templates/ndf/mis_create_edit.html:184
 #: gnowsys_ndf/ndf/templates/ndf/moderation_data_review.html:47
@@ -474,7 +475,7 @@ msgstr "इतिहास"
 #: gnowsys_ndf/ndf/templates/ndf/gin-line-texteditor.html:126
 #: gnowsys_ndf/ndf/templates/ndf/in-line-texteditor.html:117
 #: gnowsys_ndf/ndf/templates/ndf/list_themes.html:60
-#: gnowsys_ndf/ndf/templates/ndf/lms.html:197
+#: gnowsys_ndf/ndf/templates/ndf/lms.html:201
 #: gnowsys_ndf/ndf/templates/ndf/note_page.html:79
 #: gnowsys_ndf/ndf/templates/ndf/nussd_course_create_edit.html:304
 #: gnowsys_ndf/ndf/templates/ndf/replytwistrep.html:174
@@ -729,7 +730,7 @@ msgstr "शिक्षक सहायता"
 
 #: gnowsys_ndf/ndf/templates/ndf/add_asset.html:47
 #: gnowsys_ndf/ndf/templates/ndf/course_pages.html:38
-#: gnowsys_ndf/ndf/templates/ndf/file.html:225
+#: gnowsys_ndf/ndf/templates/ndf/file.html:236
 #: gnowsys_ndf/ndf/templates/ndf/list_themes.html:35
 msgid "Actions"
 msgstr "एक्शन"
@@ -903,7 +904,7 @@ msgid "Upload"
 msgstr "अपलोड"
 
 #: gnowsys_ndf/ndf/templates/ndf/add_asset.html:279
-#: gnowsys_ndf/ndf/templates/ndf/file.html:266
+#: gnowsys_ndf/ndf/templates/ndf/file.html:277
 #, fuzzy
 msgid "Delete Files"
 msgstr "डिलीट फ़ाइल"
@@ -1205,7 +1206,7 @@ msgstr "आगे"
 #: gnowsys_ndf/ndf/templates/ndf/course_detail.html:75
 #: gnowsys_ndf/ndf/templates/ndf/gcourse_detail.html:75
 #: gnowsys_ndf/ndf/templates/ndf/gevent_base.html:56
-#: gnowsys_ndf/ndf/templates/ndf/lms.html:184
+#: gnowsys_ndf/ndf/templates/ndf/lms.html:188
 msgid "Announce"
 msgstr "घोषणा करें"
 
@@ -1437,7 +1438,7 @@ msgstr "एडमिन जोड़ें"
 #: gnowsys_ndf/ndf/templates/ndf/gcourse_event_group.html:220
 #: gnowsys_ndf/ndf/templates/ndf/gevent_base.html:91
 #: gnowsys_ndf/ndf/templates/ndf/lms.html:47
-#: gnowsys_ndf/ndf/templates/ndf/lms.html:78
+#: gnowsys_ndf/ndf/templates/ndf/lms.html:82
 msgid "Overview"
 msgstr "अवलोकन"
 
@@ -1580,7 +1581,7 @@ msgstr "अपने जानवर/ फूल/ फल का चयन कर�
 #: gnowsys_ndf/ndf/templates/ndf/curriculum_list.html:29
 #: gnowsys_ndf/ndf/templates/ndf/edit_forum.html:127
 #: gnowsys_ndf/ndf/templates/ndf/gevent_base.html:148
-#: gnowsys_ndf/ndf/templates/ndf/lms.html:203
+#: gnowsys_ndf/ndf/templates/ndf/lms.html:207
 #: gnowsys_ndf/ndf/templates/ndf/node_ajax_content.html:344
 #: gnowsys_ndf/ndf/templates/ndf/node_ajax_content.html:363
 #: gnowsys_ndf/ndf/templates/ndf/resource_view.html:38
@@ -1600,35 +1601,6 @@ msgstr "अधिक"
 #: gnowsys_ndf/ndf/templates/ndf/compose_mail.html:83
 msgid "You are not an authorised user. Please Log in"
 msgstr "आप अधिकृत उपयोगकर्ता नहीं हैं। कृपया लॉगिन करें।"
-
-#: gnowsys_ndf/ndf/templates/ndf/course.html:35
-msgid " New Course"
-msgstr "नया कोर्स "
-
-#: gnowsys_ndf/ndf/templates/ndf/course.html:39
-msgid " New Event"
-msgstr "नया इवेंट"
-
-#: gnowsys_ndf/ndf/templates/ndf/course.html:44
-msgid "All eCourses"
-msgstr "सभी ई-कोर्स"
-
-#: gnowsys_ndf/ndf/templates/ndf/course.html:44
-msgid "All"
-msgstr "सभी"
-
-#: gnowsys_ndf/ndf/templates/ndf/course.html:46
-msgid "My eCourses"
-msgstr "मेरे ई-कोर्सेस"
-
-#: gnowsys_ndf/ndf/templates/ndf/course.html:46
-msgid "My Events"
-msgstr "मेरे इवेंटस"
-
-#: gnowsys_ndf/ndf/templates/ndf/course.html:49
-#: gnowsys_ndf/ndf/templates/ndf/explore_secondary_header.html:18
-msgid "Courses"
-msgstr "कोर्सेस "
 
 #: gnowsys_ndf/ndf/templates/ndf/course_create_edit.html:13
 msgid ""
@@ -1734,7 +1706,7 @@ msgid "Select Template (Optional): "
 msgstr "टेम्पलेट चुनें (वैकल्पिक)"
 
 #: gnowsys_ndf/ndf/templates/ndf/course_page_create_edit.html:71
-#: gnowsys_ndf/ndf/templates/ndf/lms.html:195
+#: gnowsys_ndf/ndf/templates/ndf/lms.html:199
 #, fuzzy
 msgid "Edit Metadata"
 msgstr "मेटाडाटा सम्पादित करें"
@@ -2703,7 +2675,7 @@ msgstr "कड़ी संपादन करें"
 #: gnowsys_ndf/ndf/templates/ndf/footer.html:20
 #: gnowsys_ndf/ndf/templates/ndf/gevent_base.html:41
 #: gnowsys_ndf/ndf/templates/ndf/group_dashboard.html:99
-#: gnowsys_ndf/ndf/templates/ndf/lms.html:154
+#: gnowsys_ndf/ndf/templates/ndf/lms.html:158
 #: gnowsys_ndf/ndf/templates/ndf/quiz_details.html:43
 msgid "About"
 msgstr "बारे में"
@@ -2721,7 +2693,7 @@ msgstr "ई-पुस्तक"
 #: gnowsys_ndf/ndf/templates/ndf/gcourse_event_group.html:244
 #: gnowsys_ndf/ndf/templates/ndf/gcourse_event_group.html:304
 #: gnowsys_ndf/ndf/templates/ndf/lms.html:55
-#: gnowsys_ndf/ndf/templates/ndf/lms.html:92
+#: gnowsys_ndf/ndf/templates/ndf/lms.html:96
 msgid "Gallery"
 msgstr "गेलरी"
 
@@ -2759,8 +2731,13 @@ msgstr "इस समूह में कोई पंजीकृत नही�
 msgid " Create Course"
 msgstr "पाठ्यक्रम का नाम"
 
+#: gnowsys_ndf/ndf/templates/ndf/explore_secondary_header.html:18
+msgid "Courses"
+msgstr "कोर्सेस "
+
 #: gnowsys_ndf/ndf/templates/ndf/explore_secondary_header.html:23
 #: gnowsys_ndf/ndf/templates/ndf/header.html:120
+#: gnowsys_ndf/ndf/templates/ndf/landing_page_nroer.html:205
 msgid "Workspaces"
 msgstr "कार्यस्थान"
 
@@ -2812,28 +2789,31 @@ msgstr "इमेज"
 msgid "Videos"
 msgstr "वीडियो"
 
-#: gnowsys_ndf/ndf/templates/ndf/file.html:229
+#: gnowsys_ndf/ndf/templates/ndf/file.html:223
+#: gnowsys_ndf/ndf/templates/ndf/gevent_base.html:96
+#: gnowsys_ndf/ndf/templates/ndf/lms.html:124
+#: gnowsys_ndf/ndf/templates/ndf/page_list.html:139
+msgid "Pages"
+msgstr "पृष्ठ"
+
+#: gnowsys_ndf/ndf/templates/ndf/file.html:240
 #, fuzzy
 msgid "Upload File in desk"
 msgstr " डेस्क पर फ़ाइल अपलोड करें"
 
-#: gnowsys_ndf/ndf/templates/ndf/file.html:244
+#: gnowsys_ndf/ndf/templates/ndf/file.html:255
 msgid "Review"
 msgstr "अवलोकन"
 
-#: gnowsys_ndf/ndf/templates/ndf/file.html:246
+#: gnowsys_ndf/ndf/templates/ndf/file.html:257
 msgid "Data Review"
 msgstr "विषय अवलोकन"
 
-#: gnowsys_ndf/ndf/templates/ndf/file.html:253
+#: gnowsys_ndf/ndf/templates/ndf/file.html:264
 msgid "File Statistics"
 msgstr "फाईल सांख्यिकी"
 
-#: gnowsys_ndf/ndf/templates/ndf/file.html:282
-msgid "Homogeneous collections of resources"
-msgstr "संसाधनों का सजातीय संग्रह"
-
-#: gnowsys_ndf/ndf/templates/ndf/file.html:304
+#: gnowsys_ndf/ndf/templates/ndf/file.html:310
 msgid "this file is already uploaded please choose different file"
 msgstr "यह फाइल अपलोड की गई है कृपया अन्य फाइल चुने"
 
@@ -2971,6 +2951,10 @@ msgstr "संपर्क करें"
 msgid "Issues"
 msgstr "मुद्दे"
 
+#: gnowsys_ndf/ndf/templates/ndf/footer.html:29
+msgid "sitemap"
+msgstr "साइटमैप"
+
 #: gnowsys_ndf/ndf/templates/ndf/footer.html:30
 #: gnowsys_ndf/ndf/templates/ndf/task.html:67
 #: gnowsys_ndf/ndf/templates/ndf/task_create_edit.html:190
@@ -2978,7 +2962,6 @@ msgid "Feedback"
 msgstr "प्रतिक्रिया"
 
 #: gnowsys_ndf/ndf/templates/ndf/footer.html:40
-#, fuzzy
 msgid "Other Links"
 msgstr "अन्य विवरण"
 
@@ -3117,7 +3100,7 @@ msgid "Unit: "
 msgstr "इकाई का नाम"
 
 #: gnowsys_ndf/ndf/templates/ndf/gevent_base.html:47
-#: gnowsys_ndf/ndf/templates/ndf/lms.html:174
+#: gnowsys_ndf/ndf/templates/ndf/lms.html:178
 #, fuzzy
 msgid "Manage Users"
 msgstr "प्रबंधन"
@@ -3126,20 +3109,14 @@ msgstr "प्रबंधन"
 msgid "Export to ePub"
 msgstr "ePub मैं एक्सपोर्ट करें "
 
-#: gnowsys_ndf/ndf/templates/ndf/gevent_base.html:96
-#: gnowsys_ndf/ndf/templates/ndf/lms.html:120
-#: gnowsys_ndf/ndf/templates/ndf/page_list.html:139
-msgid "Pages"
-msgstr "पृष्ठ"
-
 #: gnowsys_ndf/ndf/templates/ndf/gevent_base.html:99
-#: gnowsys_ndf/ndf/templates/ndf/lms.html:133
+#: gnowsys_ndf/ndf/templates/ndf/lms.html:137
 #, fuzzy
 msgid "Assets"
 msgstr "आकलन"
 
 #: gnowsys_ndf/ndf/templates/ndf/gevent_base.html:102
-#: gnowsys_ndf/ndf/templates/ndf/lms.html:137
+#: gnowsys_ndf/ndf/templates/ndf/lms.html:141
 #, fuzzy
 msgid "Assessments"
 msgstr "आकलन"
@@ -3151,13 +3128,13 @@ msgid "Discuss"
 msgstr "परिचर्चा"
 
 #: gnowsys_ndf/ndf/templates/ndf/gevent_base.html:144
-#: gnowsys_ndf/ndf/templates/ndf/lms.html:199
+#: gnowsys_ndf/ndf/templates/ndf/lms.html:203
 #, fuzzy
 msgid "Delete Unit:"
 msgstr "डिलीट यूनिट "
 
 #: gnowsys_ndf/ndf/templates/ndf/gevent_base.html:146
-#: gnowsys_ndf/ndf/templates/ndf/lms.html:201
+#: gnowsys_ndf/ndf/templates/ndf/lms.html:205
 msgid "Are you sure want to delete this unit?"
 msgstr "क्या आप वाकई इस यूनिट को हटाना चाहते हैं?"
 
@@ -3192,6 +3169,7 @@ msgid "Change Password"
 msgstr "पासवर्ड बदलें"
 
 #: gnowsys_ndf/ndf/templates/ndf/gheader.html:217
+#: gnowsys_ndf/ndf/templates/ndf/landing_page_nroer.html:201
 msgid "Analytics"
 msgstr "विश्लेषण"
 
@@ -4085,60 +4063,79 @@ msgstr "एस्ट्रोमर प्लैनेट ट्रेक गत
 msgid "Welcome"
 msgstr "स्वागत है"
 
+#: gnowsys_ndf/ndf/templates/ndf/landing_page_nroer.html:220
+#, fuzzy
+msgid "Discussion"
+msgstr "परिचर्चा"
+
+#: gnowsys_ndf/ndf/templates/ndf/landing_page_nroer.html:228
+#, fuzzy
+msgid "eResourses"
+msgstr "संसाधन"
+
+#: gnowsys_ndf/ndf/templates/ndf/landing_page_nroer.html:236
+#: gnowsys_ndf/ndf/templates/ndf/refresh_subscribed_users.html:13
+msgid "Users"
+msgstr "उपयोगकर्ता"
+
 #: gnowsys_ndf/ndf/templates/ndf/lms.html:52
-#: gnowsys_ndf/ndf/templates/ndf/lms.html:89
+#: gnowsys_ndf/ndf/templates/ndf/lms.html:93
 msgid "Resources"
 msgstr "संसाधन"
 
 #: gnowsys_ndf/ndf/templates/ndf/lms.html:55
-#: gnowsys_ndf/ndf/templates/ndf/lms.html:92
+#: gnowsys_ndf/ndf/templates/ndf/lms.html:96
 #, fuzzy
 msgid "E-Library"
 msgstr "ई-पुस्तकालय"
 
-#: gnowsys_ndf/ndf/templates/ndf/lms.html:58
-#: gnowsys_ndf/ndf/templates/ndf/lms.html:96
+
+#: gnowsys_ndf/ndf/templates/ndf/lms.html:61
+#: gnowsys_ndf/ndf/templates/ndf/lms.html:100
 msgid "Blog"
 msgstr "ब्लॉग"
 
-#: gnowsys_ndf/ndf/templates/ndf/lms.html:84
+#: gnowsys_ndf/ndf/templates/ndf/lms.html:88
 msgid "Lessons"
 msgstr "पाठ"
 
-#: gnowsys_ndf/ndf/templates/ndf/lms.html:98
+#: gnowsys_ndf/ndf/templates/ndf/lms.html:102
 msgid "blog"
 msgstr "ब्लॉग "
 
-#: gnowsys_ndf/ndf/templates/ndf/lms.html:131
+#: gnowsys_ndf/ndf/templates/ndf/lms.html:135
 #, fuzzy
 msgid "Asset Collection"
 msgstr "संग्रह"
 
-#: gnowsys_ndf/ndf/templates/ndf/lms.html:161
+
+#: gnowsys_ndf/ndf/templates/ndf/lms.html:165
 #, fuzzy
 msgid "Stats"
 msgstr "स्थिति:"
 
-#: gnowsys_ndf/ndf/templates/ndf/lms.html:161
+#: gnowsys_ndf/ndf/templates/ndf/lms.html:165
 msgid "Progress Report"
 msgstr "प्रगति रिपोर्ट"
 
-#: gnowsys_ndf/ndf/templates/ndf/lms.html:164
+#: gnowsys_ndf/ndf/templates/ndf/lms.html:168
 #, fuzzy
 msgid "Edit Structure"
 msgstr "पाठ्यक्रम संरचना संपादित करें"
 
-#: gnowsys_ndf/ndf/templates/ndf/lms.html:171
+
+#: gnowsys_ndf/ndf/templates/ndf/lms.html:175
 #: gnowsys_ndf/ndf/templates/ndf/module_detail.html:41
 #, fuzzy
 msgid "Change image"
 msgstr "बदलें"
 
-#: gnowsys_ndf/ndf/templates/ndf/lms.html:189
+
+#: gnowsys_ndf/ndf/templates/ndf/lms.html:193
 msgid "Export Content into ePubs"
 msgstr "ePub मैं एक्सपोर्ट करें "
 
-#: gnowsys_ndf/ndf/templates/ndf/lms.html:195
+#: gnowsys_ndf/ndf/templates/ndf/lms.html:199
 #, fuzzy
 msgid "Edit Profile"
 msgstr "कोर्स संपादन"
@@ -5253,10 +5250,6 @@ msgstr "सदस्यों की सूची"
 #: gnowsys_ndf/ndf/templates/ndf/refresh_subscribed_users.html:7
 msgid "For the course:  "
 msgstr "पाठ्यक्रम के लिए:"
-
-#: gnowsys_ndf/ndf/templates/ndf/refresh_subscribed_users.html:13
-msgid "Users"
-msgstr "उपयोगकर्ता"
 
 #: gnowsys_ndf/ndf/templates/ndf/refresh_subscribed_users.html:22
 msgid "Remove"
@@ -6782,8 +6775,24 @@ msgid ""
 "        "
 msgstr "%(email_url)s आपके पास एक सत्यापित ईमेल नहीं है जिसमें सूचनाएं भेजी जा सकती हैं।"
 
-#~ msgid "Sitemap"
-#~ msgstr "साइटमैप"
+
+#~ msgid " New Course"
+#~ msgstr "नया कोर्स "
+
+#~ msgid " New Event"
+#~ msgstr "नया इवेंट"
+
+#~ msgid "All eCourses"
+#~ msgstr "सभी ई-कोर्स"
+
+#~ msgid "All"
+#~ msgstr "सभी"
+
+#~ msgid "My eCourses"
+#~ msgstr "मेरे ई-कोर्सेस"
+
+#~ msgid "My Events"
+#~ msgstr "मेरे इवेंटस"
 
 #~ msgid "APPS"
 #~ msgstr "ऐप्स"
