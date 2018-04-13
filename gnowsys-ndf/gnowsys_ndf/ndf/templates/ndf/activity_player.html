@@ -83,7 +83,7 @@
     {% if site.SITE_NAME == "NROER" %}
       {% endcomment %}
       <div class="small-1 columns end header_text_sm_block">
-        <a title="Go back to Overview" href="{% url 'course_content' group_id  %}">
+        <a title="Go back to Overview" href="{% url 'course_content' group_name  %}">
         <div class="header_icon_block prev_button">
           <span>
             <i class="fa fa-angle-left header_icon"></i> Back</span>
@@ -115,18 +115,18 @@
       <div class="lesson-nav">
 
         <div class="new_note header_text_block header_text_md_block">
-            <a title="Click here to write a Note" {% if user_access_priv == "allow" %} target="_blank" href="{% url 'course_notebook' group_id %}?create=True" {% else %} class="user_not_enrolled" {% endif %}><i class="fa fa-edit header_icon"></i>&nbsp;
+            <a title="Click here to write a Note" {% if user_access_priv == "allow" %} target="_blank" href="{% url 'course_notebook' group_name %}?create=True" {% else %} class="user_not_enrolled" {% endif %}><i class="fa fa-edit header_icon"></i>&nbsp;
                {% trans "e-Notes" %} 
             </a>
         </div>
         <div class="new_note header_text_block  header_text_lg_block">
-            <a {% if prev_lesson_id and lesson_act_prev_id and not resource_prev_id%} href="{% url 'activity_player_detail' group_id prev_lesson_id lesson_act_prev_id %}" title="Go to previous lesson"   {% else %} class = "disabled hide" title="You are on the first lesson"   {% endif %} ><i class="fa fa-angle-double-left header_icon"></i>&nbsp;
+            <a {% if prev_lesson_id and lesson_act_prev_id and not resource_prev_id%} href="{% url 'activity_player_detail' group_name prev_lesson_id lesson_act_prev_id %}" title="Go to previous lesson"   {% else %} class = "disabled hide" title="You are on the first lesson"   {% endif %} ><i class="fa fa-angle-double-left header_icon"></i>&nbsp;
                {% trans "Previous Lesson" %}  
             </a>
         </div>
         <div class="pagination prev_button header_text_block header_text_md_block">
             
-              <a {% if resource_prev_id %} href="{% url 'activity_player_detail' group_id lesson_node.pk resource_prev_id %}" title="Go to previous activity"  {% else %} class = "disabled hide" title="You are on the first activity" {% endif %}> 
+              <a {% if resource_prev_id %} href="{% url 'activity_player_detail' group_name lesson_node.pk resource_prev_id %}" title="Go to previous activity"  {% else %} class = "disabled hide" title="You are on the first activity" {% endif %}> 
                   <i class="fa fa-angle-left header_icon"></i> {% trans "PREV" %}
               </a>
             
@@ -135,13 +135,13 @@
             {{resource_index|add:'1'}} {% trans "OF" %} {{lesson_node.collection_set|length}}</a>
         </div>
         <div class="pagination page_count header_text_block header_text_md_block">
-              <a {% if resource_next_id %} title="Go to next activity"  href="{% url 'activity_player_detail' group_id lesson_node.pk resource_next_id %}" {% else %} class = "disabled hide" title="You are on the last activity" {% endif %}>
+              <a {% if resource_next_id %} title="Go to next activity"  href="{% url 'activity_player_detail' group_name lesson_node.pk resource_next_id %}" {% else %} class = "disabled hide" title="You are on the last activity" {% endif %}>
                   {% trans "NEXT" %} <i class="fa fa-angle-right header_icon"></i>
               </a>
             
         </div>
         <div class="new_note header_text_block header_text_lg_block">
-            <a {% if next_lesson_id  and lesson_next_act_id and not resource_next_id %} title="Go to next lesson"  href="{% url 'activity_player_detail' group_id next_lesson_id lesson_next_act_id %}" {% else %} class = "disabled hide"   title="You are on the last Lesson" {% endif %} >
+            <a {% if next_lesson_id  and lesson_next_act_id and not resource_next_id %} title="Go to next lesson"  href="{% url 'activity_player_detail' group_name next_lesson_id lesson_next_act_id %}" {% else %} class = "disabled hide"   title="You are on the last Lesson" {% endif %} >
                {% trans "Next Lesson" %} <i class="fa fa-angle-double-right header_icon"></i>    
             </a>
         </div>
@@ -169,7 +169,7 @@
               <div class="activity-title"  style="height: 90vh;">
               {% for each in act_list %}
                   {% for k,v in each.items  %}
-                    <li  {% if v.basenodeid == activityid %} class="active" {% endif %}> <a href="{% url 'activity_player_detail' group_id lesson_node.pk v.basenodeid %}"> {% firstof v.altnames v.name %} </a></li>
+                    <li  {% if v.basenodeid == activityid %} class="active" {% endif %}> <a href="{% url 'activity_player_detail' group_name lesson_node.pk v.basenodeid %}"> {% firstof v.altnames v.name %} </a></li>
                   {% endfor %}
               {% endfor %}
               </div>

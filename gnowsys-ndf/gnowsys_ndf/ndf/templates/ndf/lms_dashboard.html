@@ -135,7 +135,7 @@
 
 
      {# <li class=""><a {% if title == "my workspace" %} class="selected" {% endif %} href="{% url 'course_about' request.user.username  %}">{% trans "My WorkSpace" %}</a> </li> #} 
-      <li class=""><a {% if title == "my performance" %} class="selected" {% endif %} href="{% url 'my_performance' request.user.id  %}"> <i class="fa fa-line-chart" aria-hidden="true"></i> {% trans "My Performance" %}</a> </li>
+      <li class=""><a {% if title == "my performance" %} class="selected" {% endif %} href="{% url 'my_performance' request.user.id  %}"> <i class="fa fa-line-chart" aria-hidden="true"></i> {% trans "My Progress" %}</a> </li>
 
     </ul>
   </div>
@@ -180,7 +180,7 @@
       <ul class="small-block-grid-1 medium-block-grid-3 large-block-grid-4">
         {% for each_obj in units_cur %}
           <li class="card-image-wrapper">
-            {% include "ndf/card_group.html" with node=each_obj url_name="groupchange" first_arg=each_obj.pk no_enroll=True %}
+            {% include "ndf/card_group.html" with node=each_obj url_name="groupchange" first_arg=each_obj.name no_enroll=True %}
           </li>
         {% empty %}
         <section class="empty-dashboard-message">

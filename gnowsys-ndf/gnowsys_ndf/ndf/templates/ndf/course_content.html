@@ -93,7 +93,7 @@
                 }
 
                 else if (node.type == "activity-group"){
-                    url = '/{{group_id}}/course/activity_player/' + node.parent.id + '/' + node.id
+                    url = '/{{group_name}}/course/activity_player/' + node.parent.id + '/' + node.id
                     $li.find('.jqtree-title').html('<a href="'+url+'" id='+node.id +' class="redirect_to_unitplayer"><span>' + $li.find('.jqtree-title').html() + ' </a></span>')
                     if(visited_nodes_ids.indexOf(node.id) != -1){
                         if (visited_nodes[node.id] > 1){
