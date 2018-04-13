@@ -331,6 +331,13 @@ margin-top:5px !important;
         {% include "ndf/file_list_tab.html" with resource_type=files detail_urlname="file_detail" filetype="all" res_type_name="" page_info=file_pages %}
       </div>
     {% endif %}
+    <div class="content" id="view-collection" data-filetype="Collections">
+      {% if title == "E-Library" %}
+        <a href='{% url "elib_paged_file_objs" group_name_tag "Collections" 1 %}' class="first-load">1</a>
+      {% else %}
+        <a href='{% url "paged_file_objs" group_name_tag "all" 1 %}' class="first-load">1</a>
+      {% endif %}
+    </div>
       
     <!-- Tab View #1 - All (Case -II: ajax) -->
     <div class="content" id="view-all" data-filetype="all">
