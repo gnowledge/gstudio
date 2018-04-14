@@ -63,18 +63,18 @@
       </a>
     </li>
     {% if request.user.is_authenticated %}
-    <li>
-      <a {% if is_gstaff %} href="{% url 'course_analytics_admin' group_name %}" {% else %} href="{% url 'progress_report' group_name request.user.pk %}" {% endif %}{% if title == 'progress_report' %} class="selected" {% endif %} tabindex="6" title="See how you have done, how many comments have you received." > <i class="fa fa-line-chart"></i> 
-                {% if 'Group' in group_object_member_of_names_list %}
-                  {% trans "Stats" %}{% else %}{% trans "Progress Report" %}
-                {% endif %}
-      </a>
-    </li>
-       {% endif %}
+      <li>
+        <a {% if is_gstaff %} href="{% url 'course_analytics_admin' group_name %}" {% else %} href="{% url 'progress_report' group_name request.user.pk %}" {% endif %}{% if title == 'progress_report' %} class="selected" {% endif %} tabindex="6" title="See how you have done, how many comments have you received." > <i class="fa fa-line-chart"></i> 
+            {% if 'Group' in group_object_member_of_names_list %}
+              {% trans "Stats" %}{% else %}{% trans "Progress Report" %}
+            {% endif %}
+        </a>
+      </li>
+     {% endif %}
      {% if 'Group'  in group_object_member_of_names_list and "base_unit" not in group_object_member_of_names_list and "announced_unit" not in group_object_member_of_names_list %}
-    <li>
-      <a href="{% url 'curriculum_list' groupid  %}" tabindex="6"> <i class="fa fa-sitemap ">  </i> {% trans "Topic Map" %}</a>
-    </li>
+      <li>
+        <a href="{% url 'curriculum_list' groupid  %}" tabindex="6"> <i class="fa fa-sitemap ">  </i> {% trans "Topic Map" %}</a>
+      </li>
     {% endif %}
     {% comment %}
     <li>
@@ -218,7 +218,11 @@
     </div>
     <div id="progress_report">
        {% if title == 'progress_report' %}
+       {% if is_gstaff %}
+          {% include "ndf/admin_course_analytics.html" %}
+        {% else %}
           {% include "ndf/user_course_analytics.html" %}
+        {% endif %}
         {% endif %}
     </div>
     <div id="group_course_content">
@@ -337,6 +341,26 @@
   // setTimeout(function(){
     
   // }, 1000);
+    var header_logo_dataURL;
+    function toDataUrl(url, callback) {
+        var xhr = new XMLHttpRequest();
+        xhr.onload = function() {
+            var reader = new FileReader();
+            reader.onloadend = function() {
+                callback(reader.result);
+            }
+            reader.readAsDataURL(xhr.response);
+        };
+        xhr.open('GET', url);
+        xhr.responseType = 'blob';
+        xhr.send();
+    }
+
+    toDataUrl('/static/ndf/images/Clix-logo.png', function(myBase64) {
+        header_logo_dataURL = myBase64; // myBase64 is the base64 string
+    });
+ 
+
 </script>
 
 {% endblock %}
