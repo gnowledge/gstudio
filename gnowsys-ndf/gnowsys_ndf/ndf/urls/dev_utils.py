@@ -7,6 +7,6 @@ urlpatterns = patterns('gnowsys_ndf.ndf.views.dev_utils',
 )
 
 urlpatterns += patterns('',
-	    url(r'^/query/(?P<doc_id_or_name>[^/]+)?$', 'gnowsys_ndf.ndf.views.dev_utils.query_doc'),
-	    url(r'^/query/(?P<doc_id_or_name>[\w-]+)/(?P<option>[^/]+)?$', 'gnowsys_ndf.ndf.views.dev_utils.query_doc'),
+	    url(r'^query/(?P<doc_id_or_name>[^/]+)?$', 'gnowsys_ndf.ndf.views.dev_utils.query_doc'),
+	    url(r'^query/(?P<doc_id_or_name>[\w-]+)/(?P<option>[^/]+)?$', 'gnowsys_ndf.ndf.views.dev_utils.query_doc'),
 )

@@ -80,8 +80,6 @@ if GSTUDIO_ELASTIC_SEARCH:
 		except:
 			group_name, group_id = get_group_name_id(group_id)
 
-		print group_name
-
 		if app_id is None:
 			app_id = app1.hits[0].id
 
