@@ -2411,6 +2411,10 @@ def progress_report(request, group_id, user_id, render_template=False, get_resul
     thread_node = None
     banner_pic_obj,old_profile_pics = _get_current_and_old_display_pics(group_obj)
     
+    gstaff_access = check_is_gstaff(group_id,request.user)
+
+    if gstaff_access:
+        template = "ndf/user_course_analytics.html"
 
     allow_to_join = get_group_join_status(group_obj)
     context_variables = {
@@ -2719,12 +2723,7 @@ def progress_report(request, group_id, user_id, render_template=False, get_resul
 
     # cache.set(cache_key, context_variables, 60*10)
     context_variables['group_member_of'] = group_obj.member_of_names_list
-    if group_obj.altnames:
-        context_variables['group_name'] = group_obj.altnames
-    else:
-        context_variables['group_name'] = group_obj.name
-    
-
+    context_variables['group_name'] = group_obj.name
     return render_to_response(template,
                                 context_variables,
                                 context_instance = RequestContext(request)
@@ -3213,7 +3212,6 @@ def course_analytics(request, group_id, user_id, render_template=False, get_resu
     # - By setting this to True, result dict will have counter object as a value for key, `counter_obj`
     # 
     # `assessment_and_quiz_data`
-
     analytics_data = {'user_id': user_id}
     analytics_data.update({
                 'correct_attempted_quizitems' : 0,
@@ -3222,6 +3220,7 @@ def course_analytics(request, group_id, user_id, render_template=False, get_resu
                 'notapplicable_quizitems': 0,
                 'incorrect_attempted_quizitems': 0,
                 'attempted_quizitems': 0,
+                'admin_view': False
             })
     data_points_dict = {}
     assessment_and_quiz_data = kwargs.get('assessment_and_quiz_data', False)
@@ -3495,7 +3494,6 @@ def course_analytics(request, group_id, user_id, render_template=False, get_resu
     if 'cmts_on_user_notes' in analytics_data and 'cmts_on_user_files' in analytics_data:
         analytics_data['cmnts_rcvd_by_user'] = analytics_data['cmts_on_user_notes'] + analytics_data['cmts_on_user_files']
 
-
     if "users_points" not in analytics_data:
         # analytics_data['users_points'] = counter_obj.course_score
         analytics_data['users_points'] = counter_obj['group_points']
@@ -3513,10 +3511,7 @@ def course_analytics(request, group_id, user_id, render_template=False, get_resu
 
     # cache.set(cache_key, analytics_data, 60*10)
     analytics_data['group_member_of'] = group_obj.member_of_names_list
-    if group_obj.altnames:
-        analytics_data['group_name'] = group_obj.altnames
-    else:
-        analytics_data['group_name'] = group_obj.name
+    analytics_data['group_name'] = group_obj.name
     return render_to_response("ndf/user_course_analytics.html",
                                 analytics_data,
                                 context_instance = RequestContext(request)
@@ -3546,7 +3541,8 @@ def course_analytics_admin(request, group_id):
     context_variables = {
             'group_id': group_id, 'groupid': group_id, 'group_name':group_name,
             'group_obj': group_obj, 'title': 'progress_report', 'allow_to_join': allow_to_join,
-            'old_profile_pics':old_profile_pics, "prof_pic_obj": banner_pic_obj, "admin_analytics":  True
+            'old_profile_pics':old_profile_pics, "prof_pic_obj": banner_pic_obj, "admin_analytics":  True,
+            'admin_view': True
             }
 
 
@@ -3630,7 +3626,7 @@ def course_analytics_admin(request, group_id):
     response_dict['max_points_dict'] = max_points_dict
     context_variables["response_dict"] = json.dumps(response_dict)
     cache.set(cache_key, response_dict, 60*10)
-    print "\n admin_analytics_data_list === ",admin_analytics_data_list
+    # print "\n admin_analytics_data_list === ",admin_analytics_data_list
     return render_to_response("ndf/lms.html",
                                 context_variables,
                                 context_instance = RequestContext(request)

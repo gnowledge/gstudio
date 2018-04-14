@@ -4233,6 +4233,7 @@ def get_profile_full_name(user_obj):
 	auth_attr = auth_obj.get_attributes_from_names_list(list_of_attr)
 	if auth_attr.values():
 		full_name = ' '.join("%s" % val for (key,val) in auth_attr.iteritems())
+		full_name += " ("+user_obj.username+ ")"
 	else:
 		full_name = user_obj.username
 	return full_name
