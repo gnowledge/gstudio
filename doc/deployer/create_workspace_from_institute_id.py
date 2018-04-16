@@ -9,7 +9,7 @@ if GSTUDIO_INSTITUTE_ID and GSTUDIO_INSTITUTE_NAME:
 		group_obj = node_collection.collection.Group()
 		group_obj.name = unicode(GSTUDIO_INSTITUTE_ID.strip())
 		group_obj.altnames = unicode(workspace_name.strip())
-		group_obj.content = unicode("Welcome to CLIx workspace!Here all students and teachers in your school can collaboratively work to create interesting learning content. You can create activity pages and lessons, write e-Notes, upload and share files such as images, audios, videos, Turtle projects, GeoGebra projects, PhET simulations, CLIx Apps. You can take help from other CLIx modules under Explore section.Unleash the fun of learning by creation :)")
+		group_obj.content = unicode("Welcome to CLIx workspace!\n Here all students and teachers in your school can collaboratively work to create interesting learning content.\nYou can create activity pages and lessons, write e-Notes, upload and share files such as images, audios, videos, Turtle projects, GeoGebra projects, PhET simulations, CLIx Apps. You can take help from other CLIx modules under Explore section.\n\n Unleash the fun of learning by creation :)\n")
 		group_obj.access_policy = u"PUBLIC"
 		group_obj.subscription_policy=u"OPEN"
 		group_obj.group_type = u"PUBLIC"
