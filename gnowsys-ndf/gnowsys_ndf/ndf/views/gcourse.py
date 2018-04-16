@@ -2871,9 +2871,9 @@ def course_analytics(request, group_id, user_id, render_template=False, get_resu
         # user_obj = User.objects.get(pk=int(user_id))
         author_obj = node_collection.one({ '_type': u'Author', 'created_by': int(user_id) })
     except Exception, e:
-        print e
         return analytics_data
 
+    template = "ndf/lms.html"
 
     if request:
         # let's keep all get calls from request in this block.
@@ -2883,9 +2883,10 @@ def course_analytics(request, group_id, user_id, render_template=False, get_resu
 
         unit_id = request.GET.get("data_unit_id",'')
         if unit_id:
+            # This marks request from My-Desk
             group_id = ObjectId(unit_id)
+            template = "ndf/user_course_analytics.html"
 
-    template = "ndf/lms.html"
     gstaff_access = check_is_gstaff(group_id, request.user)
     if gstaff_access:
         template = "ndf/user_course_analytics.html"
@@ -3276,8 +3277,8 @@ def course_analytics_admin(request, group_id):
     response_dict["success"] = True
     response_dict["students_data_set"] = admin_analytics_data_list
     response_dict['max_points_dict'] = max_points_dict
-    # response_dict['timestamp_val'] = datetime.datetime.now()
-    context_variables["response_dict"] = json.dumps(response_dict)
+    response_dict['timestamp_val'] = datetime.datetime.now()
+    context_variables["response_dict"] = json.dumps(response_dict, cls= NodeJSONEncoder)
     cache.set(cache_key, response_dict, 60*10)
     # print "\n admin_analytics_data_list === ",admin_analytics_data_list
     return render_to_response("ndf/lms.html",
@@ -3336,8 +3337,6 @@ def manage_users(request, group_id):
                                 context_variables,
                                 context_instance = RequestContext(request)
     )
-
-
 
 @get_execution_time
 def assets(request, group_id, asset_id=None,page_no=1):

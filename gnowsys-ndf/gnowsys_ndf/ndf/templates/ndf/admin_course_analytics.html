@@ -18,23 +18,24 @@
 <script src="/static/ndf/bower_components/pdfmake/build/pdfmake.min.js"></script>
 <script src="/static/ndf/bower_components/html2canvas/build/html2canvas.js"></script>
 <script src="/static/ndf/bower_components/pdfmake/build/vfs_fonts.js"></script>
+<script src="/static/ndf/bower_components/DataTables/media/js/jquery.dataTables.js"></script>
+<script src="/static/ndf/bower_components/DataTables/media/js/jquery.dataTables.min.js"></script>
+<script src="/static/ndf/bower_components/datatables-rowsgroup/dataTables.rowsGroup.js"></script>
+<script src="/static/ndf/bower_components/datatables.net-buttons/js/dataTables.buttons.js"></script>
+<script src="/static/ndf/bower_components/datatables.net-buttons/js/dataTables.buttons.min.js"></script>
+<script src="/static/ndf/bower_components/datatables.net-buttons/js/buttons.html5.js"></script>
+<script src="/static/ndf/bower_components/datatables.net-buttons/js/buttons.print.min.js"></script>
+<link href="/static/ndf/bower_components/datatables.net-buttons-dt/css/buttons.dataTables.min.css" rel="stylesheet" type="text/css" />
+<link href="/static/ndf/bower_components/DataTables/media/css/jquery.dataTables.css" rel="stylesheet" type="text/css" />
+<script src="/static/ndf/bower_components/pdfmake/build/pdfmake.min.js"></script>
+<script src="/static/ndf/bower_components/pdfmake/build/vfs_fonts.js"></script>
+<script src="/static/ndf/bower_components/jszip/dist/jszip.min.js"></script>
+
+{% get_profile_full_name request.user as req_user_full_name %}
 <div class="user-analytics-data" id="grp-analytics">
 <div class="pre-analytics-msg-div text-center hide">
    {% trans "Your analytics is loading. Please wait." %} 
 </div>
-{% get_profile_full_name request.user as req_user_full_name %}
-  <script src="/static/ndf/bower_components/DataTables/media/js/jquery.dataTables.js"></script>
-  <script src="/static/ndf/bower_components/DataTables/media/js/jquery.dataTables.min.js"></script>
-  <script src="/static/ndf/bower_components/datatables-rowsgroup/dataTables.rowsGroup.js"></script>
-  <script src="/static/ndf/bower_components/datatables.net-buttons/js/dataTables.buttons.js"></script>
-  <script src="/static/ndf/bower_components/datatables.net-buttons/js/dataTables.buttons.min.js"></script>
-  <script src="/static/ndf/bower_components/datatables.net-buttons/js/buttons.html5.js"></script>
-  <script src="/static/ndf/bower_components/datatables.net-buttons/js/buttons.print.min.js"></script>
-  <link href="/static/ndf/bower_components/datatables.net-buttons-dt/css/buttons.dataTables.min.css" rel="stylesheet" type="text/css" />
-  <link href="/static/ndf/bower_components/DataTables/media/css/jquery.dataTables.css" rel="stylesheet" type="text/css" />
-  <script src="/static/ndf/bower_components/pdfmake/build/pdfmake.min.js"></script>
-  <script src="/static/ndf/bower_components/pdfmake/build/vfs_fonts.js"></script>
-  <script src="/static/ndf/bower_components/jszip/dist/jszip.min.js"></script>
   
   <div class="group-analytics ">
     <div class="small-12 columns course-students-data">
@@ -229,7 +230,6 @@
               dataType: "html",
               data: {'data_points_dict': dataPointsDict},
               success: function(data){
-                console.log(data)
                 $(".userAnalyticsData").html(data)
                 $("#userAnalyticsModal").foundation('reveal', 'open');
                 // $(".pre-analytics-msg-div").addClass("hide")
