@@ -27,7 +27,4 @@ if GSTUDIO_INSTITUTE_ID and GSTUDIO_INSTITUTE_NAME:
 		group_obj.save()
 		print "workspace created:",group_obj.altnames
 	else:
-		if gst_group_id not in group_obj.member_of:
-	  		group_obj.member_of = [gst_group_id]
-			group_obj.save()
-	    	print "\n Already exists Group: ", workspace_name
+		print "\n Already exists Group: ", workspace_name
