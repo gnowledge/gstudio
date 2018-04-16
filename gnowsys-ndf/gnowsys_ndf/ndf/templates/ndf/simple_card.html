@@ -51,11 +51,14 @@
       {% get_dict_from_list_of_dicts resource.attribute_set as attr_set_dict %}
     {% endif %}
     {% convert_list_to_dict resource.attribute_set as attr_set_dict %}
-    
-    {% get_relation_value resource.pk 'has_thumbnail' as grel_dict %}
+    {% if GSTUDIO_ELASTIC_SEARCH != True %}
+      {% get_relation_value resource.pk 'has_thumbnail' as grel_dict %}
+    {% else %}
+      {% get_relation_value resource.id 'has_thumbnail' as grel_dict %}
+    {% endif %}
     {% if not grel_dict.cursor and grel_dict.grel_node and grel_dict.grel_node.fs_file_ids.1 %}
         <img src="{{MEDIA_URL}}{{grel_dict.grel_node.if_file.mid.relurl}}" alt="" />
-    {% elif grel_dict.grel_node.if_file.thumbnail.relurl and  'video' or "File" in resource.if_file.mime_type %}
+    {% elif grel_dict.grel_node.if_file.thumbnail.relurl and  'video' or "File" or "audio" in resource.if_file.mime_type %}
         <img src="{{MEDIA_URL}}{{grel_dict.grel_node.if_file.mid.relurl}}">
     {% elif resource.if_file.thumbnail.relurl and 'video' in resource.if_file.mime_type %}
         <img src="{{MEDIA_URL}}{{resource.if_file.thumbnail.relurl}}">
