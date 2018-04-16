@@ -28,16 +28,22 @@
         </div>
         <div class="card_section">
             <span class="card_label">
+                <i class="fa fa-book"></i>
                 {% trans "Subject" %}: {{node_attrs.educationalsubject}}
             </span class="card_label">
             <p class="ellipsis"></p>
+            {% comment %}
+            <!--
             <span class="card_label">
                 {% trans "No. of Units" %}: {{node.collection_set|length}}
             </span class="card_label">
             <p class="ellipsis"></p>
-                <span class="card_label">
-                   {% trans "Class / Grade" %} : {% for each_attr in node_attrs.educationallevel %}{{each_attr|slice:"5:"}}{% if not forloop.last %}, {%endif %} {% endfor %}
-                </span class="card_label">
+            -->
+            {% endcomment %}
+            <span class="card_label">
+                <i class="fa fa-certificate"></i>
+               {% trans "Class / Grade" %} : {% for each_attr in node_attrs.educationallevel %}{{each_attr|slice:"5:"}}{% if not forloop.last %}, {%endif %} {% endfor %}
+            </span class="card_label">
             <p class="ellipsis"></p>
                 <!-- <span class="card_label">
                     Units

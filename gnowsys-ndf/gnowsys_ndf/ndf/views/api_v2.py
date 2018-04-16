@@ -58,22 +58,23 @@ def db_schema(request, collection_name='', field_name='', field_value=''):
         # get all class names and cache them. Use this list for validation.
         get_parameters_dict = query_dict = request.GET.dict()
         # print "get_parameters_dict: ", get_parameters_dict
-        json_response = json.dumps(db_utils.get_model_structure(collection_name).keys())
 
-        if field_name:
+        if field_value:
+            query_dict.update({field_name: field_value})
+            query_cur = query_utils.get_documents(collection_name, **query_dict)
+            # print query_cur.count()
+            # json_response = json.dumps(query_cur, cls=NodeJSONEncoder)
+            json_response = json.dumps(list(query_cur), cls=NodeJSONEncoder)
+            # print json_response
+
+        elif field_name:
             # TODO: check for validity of field.
             # get all possible values from DB for provided field
             all_unique_field_values = query_utils.get_unique_values(collection_name, field_name)
             # print all_unique_field_values
             json_response = json.dumps(all_unique_field_values, cls=NodeJSONEncoder)
-
-            if field_value:
-                query_dict.update({field_name: field_value})
-                query_cur = query_utils.get_documents(collection_name, **query_dict)
-                # print query_cur.count()
-                # json_response = json.dumps(query_cur, cls=NodeJSONEncoder)
-                json_response = json.dumps(list(query_cur), cls=NodeJSONEncoder)
-                # print json_response
+        else:
+            json_response = json.dumps(db_utils.get_model_structure(collection_name).keys())
 
     else:  # if no collection_name then return DB schema
         json_response = json.dumps(db_utils.get_collection_hierarchy())

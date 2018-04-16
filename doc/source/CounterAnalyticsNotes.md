@@ -1,6 +1,6 @@
-**gStudio Data Collection**
+# gStudio Data
 
-[A]. Quantitative data
+### [A]. [Quantitative data](counter-analytics-notes.html)
 1. Comments
     - Created (integer)
     - Received (on Notes or Files)
@@ -66,14 +66,11 @@
         - In-Progress
             - if SOME Activties within Lesson are visited*
 
-[B]. Qualitative data
+### [B]. Qualitative data
 1. Artefacts
     - Comments
     - Files
     - Notes
-
-
-
 
 Essentially, a user is allocated `POINTS` to most of the actions mentioned in Quantitative data. This score is displayed in `Progress Report` as diagrammatically (pie-chart) along with other relevant quantitative information.
 

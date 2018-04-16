@@ -15,13 +15,17 @@
 
 </style>
 <script src="/static/ndf/bower_components/d3/d3.js"></script>
-<div class="user-analytics-data">
+<script src="/static/ndf/bower_components/pdfmake/build/pdfmake.min.js"></script>
+<script src="/static/ndf/bower_components/html2canvas/build/html2canvas.js"></script>
+<script src="/static/ndf/bower_components/pdfmake/build/vfs_fonts.js"></script>
+
+<a class=" download-progress-report" style="padding-left: 38px"><i class="fi-archive"></i> Download </a><br/>
+<div class="user-analytics-data" id="user-pr-report">
 <div class="pre-analytics-msg-div text-center hide">
    {% trans "Your analytics is loading. Please wait." %} 
 </div>
 <div class="row">
-<h4 class="text-center"><u><b>PROGRESS REPORT</b></u></h4>
-    <a class="close-reveal-modal" aria-label="Close">Close [&#215;]</a>
+  <h4 class="text-center"><u><b>PROGRESS REPORT</b></u></h4>
   <div class="small-6 columns">
     <h3 class="inner left-space"> {{ group_name }} </h3><br/>
     <h3 class="inner left-space"> User:  <h3 class="inner left-space"> {{username}} </h3></h3>
@@ -270,6 +274,23 @@
 
 
 <script type="text/javascript">
+
+
+$(document).on('click',".download-progress-report",function(){
+  html2canvas(document.getElementById('user-pr-report'), {
+        onrendered: function (canvas) {
+            var data = canvas.toDataURL();
+            var docDefinition = {
+                content: [{
+                    image: data,
+                    width: 500,
+                }]
+            };
+            pdfMake.createPdf(docDefinition).download("{{group_name|slugify}}-{{username}}.pdf");
+        }
+  });
+})
+
     // pi chart for score points
     function generateGraph(data){
         var dataSet = []
@@ -376,6 +397,7 @@
     }
 
     $(document).ready(function() {
+      {% if users_points %}
       var points_dict = {{users_points_breakup|safe}}
         if({{users_points}} >  0){
           if (points_dict.hasOwnProperty('Total')){
@@ -391,6 +413,7 @@
         else{
           $(".course-points-breakup").html("<i>No points to show Pie Chart</i>")
         }
+      {% endif %}
       })
 
     $(document).on('click', '.fetch-assessment-analytics', function(){

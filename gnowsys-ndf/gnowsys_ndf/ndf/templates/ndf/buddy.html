@@ -1,6 +1,7 @@
 {% load i18n %}
 {% block head %}
   <script src="/static/ndf/bower_components/handlebars/handlebars.js"></script>
+  <script src="/static/ndf/js/gstudio-functions.js"></script>
 {% endblock head %}
 
 {% block body_content %}
@@ -88,7 +89,17 @@
             <button type="button" class="text_button close_delete_buddy_modal">{% trans "Cancel" %}</button>
             <button type="button" class="blue_round_button delete_buddy_submit">{% trans "Delete" %}</button>
         </div>
+    </div>
 
+
+    <div class="reveal-modal progrees_report_buddy_modal large" id="progrees_report_buddy_modal" data-reveal aria-labelledby="modalTitle" aria-hidden="true" role="dialog">
+        <div id="progress_report_content">
+          <h2 class="text-center">{% trans "Progress Report" %}</h2>
+          <p>
+            {% trans "Please go to any unit to see your progress report." %} 
+          </p>
+          <button type="button" class="right blue_round_button close_progrees_report_buddy_modal">{% trans "OK" %}</button>
+        </div>
     </div>
     <!-- Handle bar templates -->
     {% verbatim %}
@@ -1051,24 +1062,9 @@
                       </g>
                     </svg>`
                 },
-                
-                
-                
-                
-                
-                
-                
-                
-               
-                
-                
-                
-                
-
-
-                
-
             ]
+
+
 
             var colorsKeyIdMap = {};
             $.each(colorsList, function(index, colorObj) {
@@ -1117,6 +1113,12 @@
                 buddies_authid_name_dict_js = {{request.session.buddies_authid_name_dict|safe}};
               {% else %}
                 buddies_authid_name_dict_js = {};
+              {% endif %}
+
+              {% if request.session.buddies_username_id_dict %}
+                buddies_username_id_dict_js = {{request.session.buddies_username_id_dict|safe}};
+              {% else %}
+                buddies_username_id_dict_js = {};
               {% endif %}
 
             // console.log(buddies_authid_name_dict_js)
@@ -1208,6 +1210,10 @@
 
             $('.delete_buddy_modal').on('click', '.close_delete_buddy_modal', function() {
                 $('#delete_buddy_modal').foundation('reveal', 'close');
+            });
+
+            $('.progrees_report_buddy_modal').on('click', '.close_progrees_report_buddy_modal', function() {
+                $('#progrees_report_buddy_modal').foundation('reveal', 'close');
             });
 
             var currentSelectedAnimal = {};
@@ -1304,11 +1310,18 @@
             /**
              * Function to handle on click of the buddy
              */
-            $('.buddy_panel').on('click', '.buddy_icon', function() {
+            $('.buddy_panel').on('click', '.buddy_icon', function(event) {
                 currentSelectedBuddy = onlineBuddiesMap[parseInt($(this).attr('data'))];
                 // Do the required ajax call and update the onlineBuddiesMap
                 // to set the selected buddy as active
-                console.log('Clicked on the buddy icon');
+                if(!event.target.className.length){
+                  var clickedBuddyName = this.getAttribute('title');
+                  clickedBuddyUsername = clickedBuddyName + '-' + getCookieValue('institute_id');
+                  clickedBuddyUserId = buddies_username_id_dict_js[clickedBuddyUsername]
+                  console.log('Clicked on the buddy icon ' + clickedBuddyUsername);
+                  $('#progrees_report_buddy_modal').foundation('reveal', 'open');
+                }
+                console.log('Clicked on the buddy icon' + currentSelectedBuddy);
             });
             /**
              *  Editing the Buddy logo
@@ -1531,6 +1544,22 @@
                 $('#add_buddy_modal').foundation('reveal', 'close');
             })
 
+            function show_my_performance(){
+              $('#progress_report_content').addClass('hide');
+              $.blockUI();
+              $.ajax({
+                url: "/" + '{{group_id}}' + "/course/course_analytics/" + clickedBuddyUserId,
+                type: "GET",
+                dataType: "html",
+                global: false,
+                success: function(data){
+                  $.unblockUI();
+                  $('#progress_report_content').removeClass('hide');
+                  $('#progress_report_content').html(data);
+                },
+              });
+            }
+
             /**
              * The delete button should be shown or hidden on depending upon the mode.
              */
@@ -1542,6 +1571,9 @@
                     } else {
                         $('.add_buddy_modal .removeBuddy').hide();
                     }
+                }
+                else if (($(this).attr('id') === 'progrees_report_buddy_modal') && isInGroup()) {
+                    show_my_performance();
                 }
             });
 

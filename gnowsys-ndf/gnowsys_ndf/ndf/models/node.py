@@ -376,6 +376,26 @@ class Node(DjangoDocument):
             return None, None
 
 
+    def get_tree_nodes(node_id_or_obj, field_name, level, get_obj=False):
+        '''
+        node_id_or_obj: root node's _id or obj
+        field_name: It can be either of collection_set, prior_node
+        level: starts from 0
+        '''
+        node_obj = Node.get_node_obj_from_id_or_obj(node_id_or_obj, Node)
+        nodes_ids_list = node_obj[field_name]
+        while level:
+           nodes_ids_cur = Node.get_nodes_by_ids_list(nodes_ids_list)
+           nodes_ids_list = []
+           if nodes_ids_cur:
+               [nodes_ids_list.extend(i[field_name]) for i in nodes_ids_cur]
+           level = level - 1
+
+        if get_obj:
+            return Node.get_nodes_by_ids_list(nodes_ids_list)
+
+        return nodes_ids_list
+
 
     ########## Setter(@x.setter) & Getter(@property) ##########
     @property
@@ -970,6 +990,16 @@ class Node(DjangoDocument):
         for key, value in relations.iteritems():
             self.structure[key] = value['subject_or_object_type']
             self[key] = value['subject_or_right_subject_list']
+
+    @staticmethod
+    def get_names_list_from_obj_id_list(obj_ids_list, node_type):
+        obj_ids_list = map(ObjectId, obj_ids_list)
+        nodes_cur = node_collection.find({
+                                            '_type': node_type,
+                                            '_id': {'$in': obj_ids_list}
+                                        }, {'name': 1})
+        result_list = [node['name'] for node in nodes_cur]
+        return result_list
 
 
 # DATABASE Variables

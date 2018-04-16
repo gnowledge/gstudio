@@ -45,9 +45,10 @@
 
       <div {% if user_access_priv == "allow" %} onclick="createDiscussion()" class="ckeditor-comment  explore-button "{% else %} class="ckeditor-comment explore-button user_not_enrolled" {% endif %} id="create-discussion" data-id="{{ node.pk }}"   style="margin-bottom:0;">
         {% if thr_int_type %}
-          <i class="fa fa-comments"></i> {{thr_int_type}}   {% if all_replies|length > 0 %}({{all_replies|length }}) {% endif %}
+          <i class="fa fa-comments"></i>  {% if thr_int_type == "None" %} Feedback {% else %}   {{thr_int_type}} {% endif %}     
+          {% if all_replies|length > 0 %}({{all_replies|length }}) {% endif %}
         {% else %}
-           <i class="fa fa-comments"></i> {{default_discussion_lbl}}   {% if all_replies|length > 0 %} ({{all_replies|length }}) {% endif %}
+           <i class="fa fa-comments"></i> {{default_discussion_lbl}}    {% if all_replies|length > 0 %} ({{all_replies|length }}) {% endif %}
         {% endif %}
       </div>
     {% endif %}
@@ -153,9 +154,11 @@
   var user_access = "{{ user_access }}"; // "allow" or "disallow"
   var edit_policy = "allow"; // "allow" or "disallow"
   var is_user_authenticated = {{ request.user.is_authenticated|lower }};
-  {% if thr_int_type %}
-    thr_int_type_var = "{{thr_int_type}}"
-  {% else %}
+  {% if thr_int_type == "None" %}
+    thr_int_type_var = "Feedback"
+  {% elif thr_int_type %}
+    thr_int_type_var =  "{{thr_int_type}}"
+   {% else %}
     thr_int_type_var = "{{default_discussion_lbl}}"
   {% endif %}
 

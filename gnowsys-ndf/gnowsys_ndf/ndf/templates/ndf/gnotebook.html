@@ -17,7 +17,9 @@
       <input type="hidden"  class="title-for-filters" value="notebook_lms">
         {% get_course_filters group_id "notebook_lms" as filter_dict %}
       {% endif %}
-    {% include "ndf/filters.html" with filter_dict=filter_dict %}
+        <div class="filter-position">
+            {% include "ndf/filters.html" with filter_dict=filter_dict %}
+        </div>
 
 </div>
 
@@ -96,8 +98,11 @@
                     <a href="#" data-reveal-id="newNoteModal" class="button expand radius" style="margin: 0em 0em 1em;"><i class="fi-plus"></i> </a>
                     {% endcomment %}
 
+                    {% comment %}
                     <a {% if user_access_priv == "allow" %} class=" add-note-btn button radius" title="Create Note" {% else %} class="bef-note-btn button radius user_not_enrolled" {% endif %}><i class="fi-plus"></i></a>
+                    {% endcomment %}
 
+                    <a {% if user_access_priv == "allow" %} class="add-note-btn button radius" title="Create Note" {% else %} class="bef-note-btn button radius user_not_enrolled" {% endif %}>Create New <i class="fi-plus"></i></a>
                     {# <a class="add-note-btn"><i class="fi-plus"></i></a> #}
 <!--                     <a href="{% url 'page_create_edit' group_name %}?course_event_id={{group_id}}&blog_type=True" class="button radius" style="padding: 3px 11px;border-radius: 100%;float: right;margin: 5px 5px 8px 0px;border: 1px solid #6153AE;background: #fff;font-size: 23px;color: #6153AE;"><i class="fi-plus"></i></a>
 

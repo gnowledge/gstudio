@@ -1,0 +1,22 @@
+{% load i18n %}
+{% load cache %}
+
+<div class="user-profile-container">
+	<div class="row">
+		<div class="small-12 columns"> {{auth_attr.first_name}} {{auth_attr.last_name}}
+		</div>
+	</div>
+	<div class="row">
+		<div class="small-12 columns end"> Roll No.: {{auth_attr.enrollment_code}}
+		</div>
+	</div>
+	<div class="row">
+		<div class="small-12 columns end"> Class / Grade: {{auth_attr.educationallevel}}
+		</div>
+	</div>
+
+	<div class="row">
+		<div class="small-12 columns"> School: {{auth_attr.organization_name}}
+		</div>
+	</div>
+</div>

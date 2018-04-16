@@ -772,6 +772,19 @@ def restore_node(filepath, non_grp_root_node=None):
                 #     log_file.write("\n New collection_set :\n\t "+ str(node_obj.collection_set))
                 #     node_changed = True
 
+
+                if node_obj.name != node_json['name'] and node_json['name']:
+                    log_file.write("\n Old name :\n\t "+ str(node_obj.name))
+                    node_obj.name = node_json['name']
+                    node_changed = True
+                    log_file.write("\n New name :\n\t "+ str(node_obj.name))
+
+                if node_obj.altnames != node_json['altnames'] and node_json['altnames']:
+                    log_file.write("\n Old altnames :\n\t "+ str(node_obj.altnames))
+                    node_obj.altnames = node_json['altnames']
+                    node_changed = True
+                    log_file.write("\n New altnames :\n\t "+ str(node_obj.altnames))
+
                 if node_obj.content != node_json['content'] and node_json['content']:
                     log_file.write("\n Old content :\n\t "+ str(node_obj.content))
                     node_obj.content = node_json['content']

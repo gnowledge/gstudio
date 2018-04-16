@@ -13,9 +13,16 @@
             <div class="course_tree">
                     <dl class="accordion course-lessons" data-accordion role="tablist">
                     </dl>
-                <a class="button-hollow-grey add-lesson add-lesson-top-margin" data-reveal-id="add-lesson-reveal">
+                
+                {% if site.SITE_NAME == "NROER" %}
+                    <a class="button-hollow-grey add-lesson add-lesson-top-margin" data-reveal-id="add-lesson-reveal">
+                    {% if not unit_obj.project_config.section_name %}{% trans "Add Section" %}{% else %}{% trans 'Add' %} {{unit_obj.project_config.section_name}} {% endif %}
+                    </a>
+                {% else %}
+                    <a class="button-hollow-grey add-lesson add-lesson-top-margin" data-reveal-id="add-lesson-reveal">
                     {% if not unit_obj.project_config.section_name %}{% trans "Add Lesson" %}{% else %}{% trans 'Add' %} {{unit_obj.project_config.section_name}} {% endif %}
-                </a>
+                    </a>
+                {% endif %}
             </div>
             <!-- END of LEFT PANEL -->
 
@@ -307,16 +314,37 @@ This will not be used because now only existing activities will be added.
     </select><br/>
 </div>
 </div>
-<div>
-    <div class="small-3 columns left lesson-form-name"><h3>{% if not unit_obj.project_config.section_name %}{% trans "Lesson Name" %}{% else %} {{unit_obj.project_config.section_name}} {% endif %} <h9 style="color:red">*</h9></h3></div>
-    <div class="small-9 columns right lesson_disp_name"><input type="text" id="lesson-name"></div>
-</div>
-<div class="hide">
-    <div class="small-3 columns left lesson-form-desc"><h3>{% trans "Lesson Description" %}<h9 style="color: rgba(128, 128, 128, 0.48);font-style: italic;font-size: 15px;"> {% trans "optional" %}</h9></h3></div>
-    <div class="small-9 columns right lesson_disp_desc"><textarea rows="3" cols="50" id="lesson-desc"></textarea></div>
-</div> 
+    {% if site.SITE_NAME == "NROER" %}
+        <div>
+            <div class="small-3 columns left lesson-form-name"><h3>{% if not unit_obj.project_config.section_name %}{% trans "Name" %}{% else %} {{unit_obj.project_config.section_name}} {% endif %} <h9 style="color:red">*</h9></h3></div>
+            <div class="small-9 columns right lesson_disp_name"><input type="text" id="lesson-name"></div>
+        </div>
+    {% else %}
+        <div>
+            <div class="small-3 columns left lesson-form-name"><h3>{% if not unit_obj.project_config.section_name %}{% trans "Lesson Name" %}{% else %} {{unit_obj.project_config.section_name}} {% endif %} <h9 style="color:red">*</h9></h3></div>
+            <div class="small-9 columns right lesson_disp_name"><input type="text" id="lesson-name"></div>
+        </div>
+    {% endif %}
+
+    {% if site.SITE_NAME == "NROER" %}
+        <div class="hide">
+            <div class="small-3 columns left lesson-form-desc"><h3>{% trans "Description" %}<h9 style="color: rgba(128, 128, 128, 0.48);font-style: italic;font-size: 15px;"> {% trans "optional" %}</h9></h3></div>
+            <div class="small-9 columns right lesson_disp_desc"><textarea rows="3" cols="50" id="lesson-desc"></textarea></div>
+        </div> 
+    {% else %}
+        <div class="hide">
+            <div class="small-3 columns left lesson-form-desc"><h3>{% trans "Lesson Description" %}<h9 style="color: rgba(128, 128, 128, 0.48);font-style: italic;font-size: 15px;"> {% trans "optional" %}</h9></h3></div>
+            <div class="small-9 columns right lesson_disp_desc"><textarea rows="3" cols="50" id="lesson-desc"></textarea></div>
+        </div> 
+    {% endif %}
+
+    
 <div class="double-buttons">
-    <button type="button" class="button-hollow-grey save-lesson add-lesson-top-margin" data-node-id=""> {% if not unit_obj.project_config.section_name %}{% trans "Save Lesson" %}{% else %} {% trans 'Save' %} {{unit_obj.project_config.section_name}}  {% endif %} </button>
+    {% if site.SITE_NAME == "NROER" %}
+        <button type="button" class="button-hollow-grey save-lesson add-lesson-top-margin" data-node-id=""> {% if not unit_obj.project_config.section_name %}{% trans "Save Section" %} {% else %} {% trans 'Save' %} {{unit_obj.project_config.section_name}}  {% endif %} </button>
+    {% else %}
+        <button type="button" class="button-hollow-grey save-lesson add-lesson-top-margin" data-node-id=""> {% if not unit_obj.project_config.section_name %}{% trans "Save Lesson" %}{% else %} {% trans 'Save' %} {{unit_obj.project_config.section_name}}  {% endif %} </button>
+    {% endif %}
     {% comment %}
     <button type="button" class="button-hollow-grey save-lesson add-lesson-top-margin" data-node-id=""> {% trans "Cancel" %} </button>
     {% endcomment %}

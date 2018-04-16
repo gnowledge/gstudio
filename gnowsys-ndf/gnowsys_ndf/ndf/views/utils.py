@@ -2,12 +2,13 @@
 Include all core python code/methods to process set/batch of data.
 Possibly avoid (direct) queries.
 '''
+import bson
+import datetime
+
 try:
     from bson import ObjectId
 except ImportError:  # old pymongo
     from pymongo.objectid import ObjectId
-
-import datetime
 
 
 def get_dict_from_list_of_dicts(list_of_dicts,convert_objid_to_str=False):
@@ -109,7 +110,11 @@ def cast_to_data_type(value, data_type):
         # Out[10]: datetime(2014, 12, 11, 0, 0)
         casted_value = datetime.strptime(value, "%d/%m/%Y")
 
+    elif data_type in [bson.objectid.ObjectId, 'bson.objectid.ObjectId']:
+        casted_value = ObjectId(value)
+
     return casted_value
+
 
 def replace_in_list(list_to_update, old_val, new_val, append_if_not=False):
     '''

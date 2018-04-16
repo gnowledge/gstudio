@@ -50,6 +50,7 @@ class ActiveUsers(object):
         from django.utils.importlib import import_module
         from django.conf import settings
         from django.contrib.auth import logout
+        from .buddy import Buddy
         
         request = HttpRequest()
 

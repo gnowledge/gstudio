@@ -1,5 +1,6 @@
 from base_imports import *
 from node import node_collection
+from group import Group
 from buddy import Buddy
 from history_manager import HistoryManager
 
@@ -246,6 +247,8 @@ class Counter(DjangoDocument):
         return sum(point_breakup_dict.values())
 
 
+    # static methods:
+
     # private helper functions:
     @staticmethod
     def __key_str_counter_resource_type_of(resource_type,
@@ -260,6 +263,12 @@ class Counter(DjangoDocument):
         return (counter_obj_var_name + key_str_resource_type)
 
 
+    @staticmethod
+    def get_group_counters(group_id_or_name):
+        group_name, group_id = Group.get_group_name_id(group_id_or_name)
+        return counter_collection.find({'group_id': group_id})
+
+     
     @staticmethod
     def add_comment_pt(resource_obj_or_id, current_group_id, active_user_id_or_list=[]):
         from node import Node

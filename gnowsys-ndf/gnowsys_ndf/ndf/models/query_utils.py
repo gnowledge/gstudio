@@ -21,5 +21,5 @@ def get_documents(collection_cls_name, db_collection_name='', **kwargs):
     query_dict = {'_type': collection_cls_name}
     query_dict.update(kwargs)
     query_dict = db_utils.cast_model_values_data_type(collection_cls_name, **query_dict)
-    # print kwargs
+
     return db[db_collection_name].find(query_dict)

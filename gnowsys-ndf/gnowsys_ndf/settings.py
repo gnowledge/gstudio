@@ -444,8 +444,9 @@ MIDDLEWARE_CLASSES = (
     # 'django.middleware.clickjacking.XFrameOptionsMiddleware',
 
     # gstudio custom middleware(s):
-    'gnowsys_ndf.ndf.middleware.SetCookie.UserId',
+    'gnowsys_ndf.ndf.middleware.SetData.UserDetails',
     'gnowsys_ndf.ndf.middleware.SetData.Author',
+    'gnowsys_ndf.ndf.middleware.SetData.AdditionalDetails',
     # 'gnowsys_ndf.ndf.middleware.Buddy.BuddySession',
     # 'gnowsys_ndf.ndf.middleware.UserRestrictMiddleware.UserRestrictMiddleware',
 
