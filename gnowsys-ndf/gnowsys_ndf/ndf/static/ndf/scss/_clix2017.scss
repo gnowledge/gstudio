@@ -777,6 +777,7 @@ h5{
 
 
 
+
 /*Custom css*/
 [class*="column"] + [class*="column"]:last-child {
     float: left;
@@ -5950,6 +5951,90 @@ ul.authoring-tab{
     width:100%;
     height:100%;
     display:none;
+}
+
+.nav-legal{
+            margin-left:-400px;
+                ol {
+                    list-style-type: none;
+                    li {
+                        &>a{
+                            transition: link-color 0.15s ease-in-out 0s,border 0.15s ease-in-out 0s;
+                            border-bottom: none;
+                            color: #777;
+                            text-decoration: none !important;
+                            &:hover {
+                            color:#777;
+                            border-bottom: 3px solid hsla(316, 88%, 42%, 1);
+                        }
+                        }
+                    }
+
+
+                }
+
+            @media screen and (min-width: 968px) and (max-width: 1400px){
+                    margin-left:-200px;
+                ol {
+                    list-style-type: none;
+                    li {
+                        &>a{
+                            transition: link-color 0.15s ease-in-out 0s,border 0.15s ease-in-out 0s;
+                            border-bottom: none;
+                            color: #777;
+                            text-decoration: none !important;
+                            &:hover {
+                            color:#777;
+                            border-bottom: 3px solid hsla(316, 88%, 42%, 1);
+                        }
+                        }
+                    }
+
+
+                }
+            }
+
+            @media screen and (max-width: 967px){
+                ol {
+                    list-style-type: none;
+                    li {
+                        &>a{
+                            transition: link-color 0.15s ease-in-out 0s,border 0.15s ease-in-out 0s;
+                            border-bottom: none;
+                            color: #777;
+                            text-decoration: none !important;
+                            &:hover {
+                            color:#777;
+                            border-bottom: 3px solid hsla(316, 88%, 42%, 1);
+                        }
+                        }
+                    }
+
+
+                }
+
+            }
+}
+
+.coyright-links{
+    &>a{
+        transition: link-color 0.15s ease-in-out 0s,border 0.15s ease-in-out 0s;
+            border-bottom: none;
+            color: #777;
+            text-decoration: none !important;
+            &:hover {
+                color:hsla(316, 88%, 42%, 1);
+            }
+        &>p{
+            transition: link-color 0.15s ease-in-out 0s,border 0.15s ease-in-out 0s;
+            border-bottom: none;
+            color: #777;
+            text-decoration: none !important;
+            &:hover {
+                color:hsla(316, 88%, 42%, 1);
+            }
+        }
+    }
 }
 /* use :target to look for a link to the overlay then we find are mask */
 #overlay:target, #overlay:target + #mask{
