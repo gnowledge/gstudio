@@ -417,11 +417,13 @@
       });//end of ajax
 
     })
+
     $(document).on('click',".download-progress-report",function(){
       html2canvas(document.getElementById('user-pr-report'), {
             onrendered: function (canvas) {
                 var data = canvas.toDataURL();
                 var docDefinition = {
+                    pageMargins: [ 30, 30, 30, 30 ],
                     content: [{
                         image: data,
                         width: 400,
@@ -439,10 +441,11 @@
                         ]
                 },
 
-                footer: function(page, pages) { 
+                footer: function() {
                     return { 
                         columns: [ 
-                            'Connected Learning Initiative (CLIx),\n Tata Institute of Social Sciences',
+                            'Connected Learning Initiative (CLIx),\n Tata Institute of Social Sciences\n',
+                            { text: datetime_val, alignment: 'right' }
                         ],
                         margin: [10, 0]
                     };

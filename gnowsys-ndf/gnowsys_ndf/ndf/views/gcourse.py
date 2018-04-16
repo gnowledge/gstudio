@@ -3164,7 +3164,6 @@ def course_analytics(request, group_id, user_id, render_template=False, get_resu
     analytics_data['group_id'] = group_obj._id
     analytics_data['groupid'] = group_obj._id
     analytics_data['title'] = "course_analytics"
-
     return render_to_response(template,
                                 analytics_data,
                                 context_instance = RequestContext(request)
@@ -3277,8 +3276,7 @@ def course_analytics_admin(request, group_id):
     response_dict["success"] = True
     response_dict["students_data_set"] = admin_analytics_data_list
     response_dict['max_points_dict'] = max_points_dict
-    response_dict['timestamp_val'] = datetime.datetime.now()
-    context_variables["response_dict"] = json.dumps(response_dict, cls= NodeJSONEncoder)
+    context_variables["response_dict"] = json.dumps(response_dict)
     cache.set(cache_key, response_dict, 60*10)
     # print "\n admin_analytics_data_list === ",admin_analytics_data_list
     return render_to_response("ndf/lms.html",
