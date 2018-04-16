@@ -224,7 +224,7 @@
           // $(this).addClass("hide")
           // $(".pre-analytics-msg-div").removeClass("hide")
           $.ajax({
-              url: "{% url 'progress_report' group_id 'user_id' %}".replace("user_id", user_id),
+              url: "{% url 'course_analytics' group_id 'user_id' %}".replace("user_id", user_id),
               type: "GET",
               dataType: "html",
               data: {'data_points_dict': dataPointsDict},
