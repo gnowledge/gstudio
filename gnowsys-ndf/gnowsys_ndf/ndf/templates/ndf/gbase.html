@@ -197,6 +197,14 @@
 
     {% block script %} {% endblock %}
   </script>
+
+  {% include 'session_security/all.html' %}
+  <script>
+    {% if request.user.is_authenticated %}
+        // sessionSecurity.confirmFormDiscard = undefined;
+    {% endif %}
+  </script>
+
 </body>
 <footer>
   </div>   

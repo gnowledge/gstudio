@@ -433,6 +433,7 @@ MIDDLEWARE_CLASSES = (
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
+    'session_security.middleware.SessionSecurityMiddleware',
     # 'django.middleware.activeuser_middleware.ActiveUserMiddleware',                 #for online_users
     # 'online_status.middleware.OnlineStatusMiddleware',                              #for online_users
     'django.contrib.messages.middleware.MessageMiddleware',
@@ -474,9 +475,12 @@ TEMPLATE_CONTEXT_PROCESSORS = (
     'django.core.context_processors.request',
     'django.core.context_processors.static',
     'django.core.context_processors.media',
+    'django.core.context_processors.request',
     # 'django.core.context_processors.csrf',
 )
 
+SESSION_SECURITY_WARN_AFTER = 60*30
+SESSION_SECURITY_EXPIRE_AFTER = 60*2
 
 djcelery.setup_loader()
 # # CELERY_RESULT_BACKEND = "mongodb"
@@ -516,6 +520,7 @@ INSTALLED_APPS = (
     'memcache_admin',
     'django_mailbox',
     'djcelery',
+    'session_security',
     #'dlkit',
     #'dlkit_runtime'
 )

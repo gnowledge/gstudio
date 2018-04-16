@@ -34,6 +34,7 @@ sphinx==1.6.5
 recommonmark
 # nltk can be removed when we replace search with ES
 nltk==3.2.1
+django-session-security==2.3.2
 
 # QBANK-LITE REQ: https://github.com/CLIxIndia-Dev/qbank-lite/blob/master/requirements.txt
 # also make sure following are updated w.r.t qbank repo
