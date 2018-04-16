@@ -3,6 +3,8 @@ $primary-blue : #164A7B;
 $secondry-blue : #74b3dc;
 $tertiary-blue : #719dc7;
 $primary-pink : #713558;
+//$primary-pink : #a3238e;
+
 
 
 /*Orange color variables*/
@@ -701,7 +703,7 @@ h5{
                         line-height: 49px;
                         border-left-width: 0px;
                         font-family: OpenSans-Regular;
-                        border-top: 2px solid #713558;
+                        border-top: 2px solid $primary-pink;
 
                     }
                     &.active {
@@ -3943,6 +3945,7 @@ $ah_2_background_color_hover: rgba(244, 244, 244, 0.3);
 
         @media screen and (max-width: 1024px) {
             background-color: $ah_2_background_color;
+            margin-left:210px;
 
         }
 
@@ -5133,7 +5136,7 @@ $module-card-lines-to-show: 3;
         //font-size: 32px;
         color: $primary-pink !important;
         font-weight: 600;
-        text-align: center;
+        //text-align: center;
         margin: 0px auto;
         letter-spacing: 1px;
         font-size: 1.4vw
@@ -5214,6 +5217,8 @@ $module-card-lines-to-show: 3;
 
                 &:hover {
                     box-shadow: 0px 0px 17px rgba(0, 0, 0, 0.68);
+                    background: #ffffff;
+                    color: rgb(162, 35, 141);
                 }
             }
         }
@@ -6114,6 +6119,11 @@ input.transcript-toggler{
     width: 164px !important;
     margin-top: 2px !important;
     letter-spacing: 0.4px;
+    &:hover {
+         background: #ffffff;
+         color: rgb(162, 35, 141);
+    }
+
 }
 
 .enroll-act_lbl{
