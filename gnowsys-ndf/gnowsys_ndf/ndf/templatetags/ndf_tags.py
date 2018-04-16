@@ -4236,5 +4236,5 @@ def get_profile_full_name(user_obj):
 		full_name = ' '.join("%s" % val for (key,val) in auth_attr.iteritems())
 		full_name += " (Username: " + user_obj.username + ", ID: " + str(user_obj.pk) + ")"
 	else:
-		full_name = user_obj.username
+		full_name = "Username: " + user_obj.username  + ", ID: " + str(user_obj.pk)
 	return full_name
