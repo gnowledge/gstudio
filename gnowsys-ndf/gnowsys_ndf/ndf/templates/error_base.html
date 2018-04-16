@@ -45,6 +45,10 @@
             transform: rotate(-25deg);
         }
 
+        .inverse-icon::before{
+            transform: scaleX(-1)
+        }
+
     </style>
 
 </head>
@@ -63,9 +67,7 @@
             {% if message %}
                 <h2>{{message}}</h2>
                 <br/>
-                <a href="javascript:window.history.back();">
-                    {% trans "Click here to go back" %}
-                </a>
+                <a href="javascript:window.history.back();"><i class="fi-play inverse-icon"> </i> Go Back</a>  &nbsp; | &nbsp; <a href="/welcome?True"> <i class="fi-home"> </i> Homepage</a>
             {% endif %}
         {% endblock %}
     </div>

@@ -1,6 +1,6 @@
 {% extends "error_base.html" %}
 
-{% block error_title %} 400 - Page not found {% endblock %}
+{% block error_title %} 404 - Page not found {% endblock %}
 
 {% block error_body_text %}
     <br/>
@@ -17,7 +17,7 @@
                     <a href="{% url 'nroer_groups' 'home' 'Groups' %}"> Groups </a>
                 </blockquote>
             {% else %}
-                <a href="javascript:window.history.back();">Click here to go Back.</a> &nbsp; <a href="/welcome?True"> <i class="fi-home"> </i> homepage</a>.
+                <a href="javascript:window.history.back();"><i class="fi-play inverse-icon"> </i> Go Back</a>  &nbsp; | &nbsp; <a href="/welcome?True"> <i class="fi-home"> </i> Homepage</a>
             {% endif %}
         </small>
     </h4>
