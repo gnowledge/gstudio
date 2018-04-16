@@ -105,369 +105,154 @@
 <script src="/static/ndf/bower_components/d3/d3.js"></script>
 <input type="hidden" class="admin_analytics_fetched" value="False">
 
+<div id="course-about">
 
-{% if show_analytics_notifications %}
-{% check_is_gstaff group_id request.user as gstaff_access %}
-  <div class="course-overview-container">
-    <div class="collapse course-overview">
-      {# <div class="columns small-12 medium-12"> #}
-        {% comment %}
-        <div class="ongoing-session">
-          <h5>ONGOING SESSION </h5>
-          <h3>Taking Screenshots of the work and doing something</h3>
-          <button class="tiny button"><i class="fa fa-sign-in"></i>&nbsp;Enter Session</button>
+  <div class="about-course">
+    <h5>Description:</h5>
+      <div class="course-desc" id="scstyle">
+          {{group_object.content|default:'No description added yet.'|safe}}
+      </div>
+      <div>
+        <u><a class="show-more hide">Show more</a></u>
+      </div>
+      <br/>
+      {% if group_object.tags %}
+          <h5>Tags:</h5>
+          {% for tag in group_object.tags %}
+                  <small><label class="tag-ele">
+              <a href="{% url 'tag_info' group_id tag %}">{{tag}} </a></label></small>
+          {% endfor %} 
+      {% else %}
+          <!-- <i><small><label class="tag-ele">{% trans "No tags defined yet!" %}</label></small></i> -->
+      {% endif %}
+  </div>
+
+  <div class="about-course">
+
+      <div class="medium-3 rows">
+        <div class="left">
+          <i class="icon-wid fa fa-user"></i>
         </div>
-        {% endcomment %}
-        <div class="notifications-analytics-tabs">
-          <ul class="tabs" data-tab role="tablist">
-            <li class="tab-title active" ><a href="#course-notification" role="tab" tabindex="0" aria-selected="true" aria-controls="panel2-1"> <i class="fa fa-bell" aria-hidden="true"></i> Notifications</a></li>
+        <div class="left">
+          <h5>No. of Members</h5>
+          <div class="course-highlight">
+        <span>
+          {{group_object.author_set|length}} 
+        </span>
 
-            {% if request.user.is_authenticated and not gstaff_access %}
-            {# {% if request.user.is_authenticated and not gstaff_access and request.user.id in group_obj.author_set %} #}
-              <li class="tab-title" title="Click here to refresh">
-                <a role="tab" href="#analytics-content" class="fetch-analytics" tabindex="1" aria-selected="false" aria-controls="panel2-2" data-id={{request.user.id}}> <i class="fa fa-line-chart" aria-hidden="true"></i> Progress Report</a>
-              </li>
-              <input type="hidden" class="is_admin" value="False" />
-            {% elif gstaff_access or request.user.id in group_object.group_admin %}
-              <input type="hidden" class="is_admin" value="True" />
-              <li class="tab-title" ><a role="tab" href="#analytics-content" tabindex="1" aria-selected="false" class="fetch-group-analytics" aria-controls="panel2-2" data-id={{request.user.id}}> <i class="fa fa-line-chart" aria-hidden="true"></i> Group Analytics</a></li>
-            {% endif %}
-
-          </ul>
-          <div class="tabs-content">
-            <section role="tabpanel" aria-hidden="true" class="content active" id="course-notification">
-            </section>
-            <section role="tabpanel" aria-hidden="false" class="content active" id="analytics-content">
-              {% if gstaff_access %}
-                <div class="group-analytics hide">
-                  <div class="row course-students-data">
-                    <div class="small-12 medium-3 columns">
-                      Points table for students
-                    </div>
-                    <div class="small-12 medium-10 columns students-table-legends">
-                      <span class=" badge_ex green">&nbsp;</span>
-                      <span>Gallery uploads</span>
-                      <span class=" badge_ex">&nbsp;</span>
-                      <span>Note Making</span>
-                      <span class=" badge_ex red">&nbsp;</span>
-                      <span>Quiz Performance</span>
-                      <span class=" badge_ex yellow">&nbsp;</span>
-                      <span>Interactions</span>
-                    </div>
-                  </div>
-                  <small>* Click on the student's name to view detailed analytics.</small>
-                  <div class="row students-tabular-data">
-                    <div class="small-12 columns table-container">
-                    </div>
-                  </div>
-                </div>
-                <div id="userAnalyticsModal" class="reveal-modal reveal-modal-overlay" data-options="close_on_background_click:false;close_on_esc:false;" data-reveal aria-hidden="true" role="dialog">
-                  <label id="userAnalyticsModalLabel"></label>
-                  <div class="userAnalyticsData"></div>
-                  <a class="close-reveal-modal" aria-label="Close">Close [&#215;]</a>
-                </div>
-              {% endif %}
-
-            </section>
           </div>
         </div>
+      </div>
+      <br/>
+      <br/>
+     
+
+      {% if show_analytics_notifications %}
+      <div class="medium-3 rows">
+        <div class="left">
+          <i class="icon-wid fa fa-list"></i>
+        </div>
+        <div class="left module_text">
+          <h5>No. of {% firstof group_object.project_config.tab_name 'Lessons' %}</h5>
+          <div class="course-highlight">
+             <span>{{group_object.collection_set|length}}</span>
+          </div>
+        </div>
+      </div>
+      <br/>
+
+     
+      
+      <br/>
+      
+        {% if 'Group' not in  group_obj.member_of_names_list %}
+      <div class="medium-3 rows">
+        <div class="left">
+          <i class="icon-wid fa fa-clock-o"></i>
+        </div>
+        <div class="left">
+          <h5>  Course Duration</h5>
+          <div class="course-highlight">
+            <span>{{weeks_count}} week{{weeks_count|pluralize}}</span>
+          </div>
+        </div>
+      </div>
+      <br/>
+        {% endif %}
+      {% endif %}
+    </div>
+
+
+
+
+{% if educationallevel_val %}
+ 
+    <div class="about-course">
+    <div class="medium-3 rows">
+        <div class="left">
+          <i class="icon-wid fi-results-demographics"></i>
+        </div>
+        <div class="left">
+          <h5>Grade</h5>
+          <div class="course-highlight">
+             <span> {{educationallevel_val}}</span>
+          </div>
+        </div>
+      </div>
+      <br/>
+
+     
+      
+      <br/>
+      
+    </div>
+ 
+{% endif %}
+
+{% if educationalsubject_val %}
+  
+    <div class="about-course">
+    <div class="medium-3 rows">
+        <div class="left">
+          <i class="icon-wid fa fa-book"></i>
+        </div>
+        <div class="left">
+          <h5>Subject</h5>
+          <div class="course-highlight">
+              <span>{{educationalsubject_val}}</span>
+          </div>
+        </div>
+      </div>
+      <br/><br/>
       {# </div> #}
     </div>
-  </div>
-  <script type="text/javascript">
-
-
-
-  //
-
-var acc = document.getElementsByClassName("accordion");
-var i;
-
-for (i = 0; i < acc.length; i++) {
-    acc[i].addEventListener("click", function() {
-        this.classList.toggle("active");
-        var panel = this.nextElementSibling;
-        if (panel.style.display === "block") {
-            panel.style.display = "none";
-        } else {
-            panel.style.display = "block";
-        }
-    });
-}
-      // Student analytics view
-      $(document).on('click','.fetch-analytics',function(){
-          var user_id = $(this).attr("data-id");
-          var dataPointsDict = $(this).attr('data-points-dict');
-          // $(this).addClass("hide")
-          $(".pre-analytics-msg-div").removeClass("hide")
-          $.ajax({
-              url: "{% url 'course_analytics' group_id 'user_id' %}".replace("user_id", user_id),
-              type: "GET",
-              dataType: "html",
-              data: {'data_points_dict': dataPointsDict},
-              global: false,
-              success: function(data){
-                  if($(".is_admin").val() == "True"){
-                    $(".userAnalyticsData").html(data)
-                    $("#userAnalyticsModal").foundation('reveal', 'open');
-                  }
-                  else{
-                    $("#analytics-content").html(data)
-                  }
-                  $(".pre-analytics-msg-div").addClass("hide")
-              },
-          });//end of ajax
-      })
-
-      // Admin analytics view
-      $(document).on('click','.fetch-group-analytics',function(){
-        if($(".admin_analytics_fetched").val() == "False"){
-          // $(".fetch-group-analytics").addClass("hide")
-          $(".pre-analytics-msg-div").removeClass("hide")
-          $.ajax({
-              url: "{% url 'course_analytics_admin' group_id %}",
-
-              type: "GET",
-
-              dataType: "html",
-              global: false,
-              success: function(data){
-                $(".admin_analytics_fetched").attr('value', "True");
-                data = JSON.parse(data)
-                column_headers = data["column_headers"];
-                students_data_set = data["students_data_set"];
-                max_data = data['max_points_dict']
-                file_max_points = max_data['file_max_points']
-                notes_max_points = max_data['notes_max_points']
-                quiz_max_points =  max_data['quiz_max_points']
-                interactions_max_points = max_data['interactions_max_points']
-                dataTable_columns_set = [];
-
-                var students_points_table = '<table cellpadding="0" cellspacing="0" border="0" class="display" id="students-points-table-tbody">' + '</table>';
-                $(".table-container").html(students_points_table)
-                // Prepare title & data headers used in dataTable
-                $.each(column_headers, function(index, v) {
-                  d = {};
-                  d["data"] = v[0];
-                  d["title"] = v[1];
-                  dataTable_columns_set.push(d);
-                });
-                // Set defintion dataTable
-                sce_dt_var = $("#students-points-table-tbody").dataTable({
-                  "data": students_data_set,
-                  "columns": dataTable_columns_set,
-                  "autoWidth": false,
-                  "columnDefs": [
-                        { width: '10%', targets: 0 },
-                        { width: '10%', targets: 1 },
-                        { width: '20%', targets: 2 },
-                        { width: '20%', targets: 3 },
-                        { width: '20%', targets: 4 },
-                        { width: '20%', targets: 5 }
-                     ],
-                  "createdRow": function ( row, data, index ) {
-                    user_id = data["user_id"];
-                    $(row).attr("data-id", user_id);
-
-                    $(row).attr("data-points-dict", JSON.stringify(data));
-
-                    $(row).addClass("fetch-analytics")
-                    $(row).find("td:nth-child(3)").html(generate_points_bar(data['files_points'], "Files",data['users_points'],file_max_points));
-                    $(row).find("td:nth-child(4)").html(generate_points_bar(data['notes_points'], "Notes",data['users_points'],notes_max_points));
-                    $(row).find("td:nth-child(5)").html(generate_points_bar(data['quiz_points'], "Quiz",data['users_points'],quiz_max_points));
-                    $(row).find("td:nth-child(6)").html(generate_points_bar(data['interactions_points'], "Interactions",data['users_points'],interactions_max_points));
-
-                  }
-                });
-                $(".group-analytics").removeClass("hide")
-                $(".pre-analytics-msg-div").addClass("hide")
-              },
-          });//end of ajax
-        }
-      })
-
-      // Admin analytics view. Score-points in horizontal bars of enrolled students
-      function generate_points_bar(data_for_bars, bar_name, total_user_points, max){
-        if(data_for_bars && total_user_points){
-          var outer_div = document.createElement("div");
-          outer_div.className = "progress small-12 large-12"
-          var span_ele = document.createElement("span");
-          span_ele.className = "meter";
-          span_ele.style.width = (data_for_bars/parseInt(max, 10))* 100 + "%"
-          if (bar_name == "Interactions"){
-            bg_color_val = "#ffe694"
-          }
-          else if(bar_name == "Files"){
-            bg_color_val = "#b5d8a6"
-          }
-          else if(bar_name == "Notes"){
-            bg_color_val = "#9ec4fa"
-          }
-          else if(bar_name == "Quiz"){
-            bg_color_val = "#fa623f"
-          }
-
-          span_ele.style.backgroundColor = bg_color_val
-          var inner_span_ele = document.createElement("span")
-          inner_span_ele.className = "pull-left merter-val"
-          inner_span_ele.innerHTML = data_for_bars
-          $(span_ele).append(inner_span_ele)
-          $(outer_div).append(span_ele)
-          return outer_div.outerHTML;
-        }
-        else{
-          return "NA"
-        }
-      }
-
-      // pi chart for score points
-      function generateGraph(data){
-        var dataSet = []
-          $.each(data,function(i,v){
-            dataSet.push({'legendLabel':i,'magnitude':v})
-          })
-
-        var canvasWidth = 600, //width
-          canvasHeight = 300,   //height
-          outerRadius = 100,   //radius
-          color = d3.scale.category20(); //builtin range of colors
-
-        // var dataSet = [
-        //   {"legendLabel":"One", "magnitude":20},
-        //   {"legendLabel":"Two", "magnitude":40},
-        //   {"legendLabel":"Three", "magnitude":50},
-        //   {"legendLabel":"Four", "magnitude":16},
-        //   {"legendLabel":"Five", "magnitude":50},
-        //   {"legendLabel":"Six", "magnitude":8},
-        //   {"legendLabel":"Six", "magnitude":8},
-        //   {"legendLabel":"Seven", "magnitude":30}];
-
-        var vis = d3.select(".course-points-breakup")
-          .append("svg:svg") //create the SVG element inside the <body>
-            .data([dataSet]) //associate our data with the document
-            .attr("width", canvasWidth) //set the width of the canvas
-            .attr("height", canvasHeight) //set the height of the canvas
-            .append("svg:g") //make a group to hold our pie chart
-              // .attr("transform", "translate(" + 1.5*outerRadius + "," + 1.5*outerRadius + ")") // relocate center of pie to 'outerRadius,outerRadius'
-              .attr("transform", "translate(" + 200 + "," + 100 + ")") // relocate center of pie to 'outerRadius,outerRadius'
-
-        // This will create <path> elements for us using arc data...
-        var arc = d3.svg.arc()
-          .outerRadius(outerRadius);
-
-        var pie = d3.layout.pie() //this will create arc data for us given a list of values
-          .value(function(d) { return d.magnitude; }) // Binding each value to the pie
-          .sort( function(d) { return null; } );
-
-        // Select all <g> elements with class slice (there aren't any yet)
-        var arcs = vis.selectAll("g.slice")
-          // Associate the generated pie data (an array of arcs, each having startAngle,
-          // endAngle and value properties)
-          .data(pie)
-          // This will create <g> elements for every "extra" data element that should be associated
-          // with a selection. The result is creating a <g> for every object in the data array
-          .enter()
-          // Create a group to hold each slice (we will have a <path> and a <text>
-          // element associated with each slice)
-          .append("svg:g")
-          .attr("class", "slice");    //allow us to style things in the slices (like text)
-
-        arcs.append("svg:path")
-          //set the color for each slice to be chosen from the color function defined above
-          .attr("fill", function(d, i) { return color(i); } )
-          //this creates the actual SVG path using the associated data (pie) with the arc drawing function
-          .attr("d", arc);
-
-        // Add a legendLabel to each arc slice...
-        arcs.append("svg:text")
-          .attr("transform", function(d) { //set the label's origin to the center of the arc
-            //we have to make sure to set these before calling arc.centroid
-            d.outerRadius = outerRadius + 50; // Set Outer Coordinate
-            d.innerRadius = outerRadius + 45; // Set Inner Coordinate
-            return "translate(" + arc.centroid(d) + ")";
-          })
-          .attr("text-anchor", "middle") //center the text on it's origin
-          .style("fill", "Purple")
-          .style("font", "15px Arial")
-          .text(function(d, i) { return dataSet[i].legendLabel + "(" + dataSet[i].magnitude + ")"; }); //get the label from our original data array
-
-        // Add a magnitude value to the larger arcs, translated to the arc centroid and rotated.
-        var quant = arcs.filter(function(d) { return d.endAngle - d.startAngle > .2; })
-            .append('g')
-          var temp = quant.append("svg:text")
-              .style("fill", "White")
-              .style("font", "15px Arial")
-              .text(function(d) { return d.data.magnitude; })
-
-          quant.attr("dy", ".35em")
-          .attr("text-anchor", "middle")
-          //.attr("transform", function(d) { return "translate(" + arc.centroid(d) + ")rotate(" + angle(d) + ")"; })
-          .attr("transform", function(d) { //set the label's origin to the center of the arc
-            //we have to make sure to set these before calling arc.centroid
-            d.outerRadius = outerRadius; // Set Outer Coordinate
-            d.innerRadius = outerRadius/2; // Set Inner Coordinate
-            return "translate(" + arc.centroid(d) + ")rotate(" + angle(d) + ")";
-          })
-
-        // Computes the angle of an arc, converting from radians to degrees.
-        function angle(d) {
-          var a = (d.startAngle + d.endAngle) * 90 / Math.PI - 90;
-          return a > 90 ? a - 180 : a;
-        }
-        // Converts from degrees to radians.
-        Math.radians = function(degrees) {
-          return degrees * Math.PI / 180;
-        };
-
-        // Converts from radians to degrees.
-        Math.degrees = function(radians) {
-          return radians * 180 / Math.PI;
-        };
-      }
-
-      // Global variables to manage notifications ajax call
-      var count = 0;
-      var morecount = 0;
-      var counter = 1;
-
-      // Scroll event for Notifications div
-      $("#course-notification").scroll(function(){
-          if (count == 0) {
-              loaddata();
-              count = count+1;
-          }
-      })
-
-      // Fetch notifications ajax call with function
-      function loaddata() {
-        $.ajax({
-            url: "{% url 'page_scroll' groupid 'counter' %}".replace("counter", counter),
-            type: "GET",
-            data:{'links': false},
-            datatype: "json",
-            global: false,
-            beforeSend: function(){
-                $("#course-notification").append("<label class='loading_lbl'>Loading...</label>");
-            },
-            success:function(data){
-                if(String(data)) {
-                    $(".loading_lbl").remove()
-                    $("#course-notification").append(data);
-                    counter = counter+1;
-                }
-
-                else{
-                    if(morecount ==0) {
-                        $("#course-notification").append("<h6>  No more data to show </h6>");
-                        morecount = morecount+1;
-                        counter = 2;
-                    }
-                }
-            }
-        });
-      }
-  </script>
+  
 {% endif %}
+
+{# <div class="row"> #}
+  <div class="about-course">
+    <div class="medium-3 rows">
+        <div class="left">
+          <i class="icon-wid fa fa-calendar"></i>
+        </div>
+        <div class="left">
+          <h5>Created On</h5>
+          <div class="course-highlight">
+              <span> {{group_obj.created_at}}</span>
+          </div>
+        </div>
+      </div>
+      <br/>
+
+     
+      
+      <br/>
+  
+      {# </div> #}
+  </div>
+{# </div> #}
+<br/><br/>
+
 <script type="text/javascript">
 
     // ready function

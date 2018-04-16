@@ -5,6 +5,10 @@
 
 {# lms_dashboard.html lms My Desk screen #}
 {% block title %} My Desk {% endblock%}
+{% block head %}
+  <script src="/static/ndf/js/meta_info.js"></script>
+{% endblock %}
+
 {% block body_content %}
 {% load ndf_tags %}
 {% get_gstudio_workspace_instance as is_workspace_instance %}
@@ -216,7 +220,6 @@
       <label id="performaceReportModalLabel"></label>
       <div class="performaceReportModalData"></div>
       <a class="close-reveal-modal" aria-label="Close" style="font-size: inherit">Close [&#215;]</a>
-
     </div>
 
 
@@ -224,7 +227,6 @@
 
     function show_my_performance(this_obj){
       data_unit_id  = $(this_obj).attr("data-node-id");
-      $.blockUI();
       $.ajax({
         url: "{% url 'course_analytics' group_id request.user.id %}",
         type: "GET",
@@ -232,9 +234,7 @@
         data: {
           "data_unit_id":data_unit_id
         },
-        global: false,
         success: function(data){
-          $.unblockUI();
           $('.performaceReportModalData').html(data);
           $('#performaceReportModal').foundation('reveal', 'open');
         },
@@ -302,6 +302,5 @@
       }
     });
 
- 
 </script>
 {% endblock  %}
