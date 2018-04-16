@@ -25,7 +25,7 @@ from gnowsys_ndf.settings import GSTUDIO_ELASTIC_SEARCH
 from gnowsys_ndf.ndf.gstudio_es.es import *
 
 
-if GSTUDIO_ELASTIC_SEARCH == True:
+if GSTUDIO_ELASTIC_SEARCH :
 	q = Q('bool', must=[Q('match', name='e-book')])
 	ebook_gst =Search(using=es, index="nodes",doc_type="gsystemtype").query(q)
 	ebook_gst = ebook_gst.execute()
@@ -213,11 +213,10 @@ if GSTUDIO_ELASTIC_SEARCH == True:
 		return render_to_response("ndf/ebook.html", {
 									"all_ebooks": all_ebooks, "ebook_gst": ebook_gst,
 									"page_info": results, "title": "eBooks",
-									"group_id": group_id, "groupid": group_id,"all_ebooks1_count":all_ebooks.count(),
+									"group_id": group_id, "groupid": group_id,"all_ebooks_count":all_ebooks.count(),
 									"GSTUDIO_ELASTIC_SEARCH":GSTUDIO_ELASTIC_SEARCH,
 									}, context_instance = RequestContext(request))
 else:
-
 	ebook_gst = node_collection.one({'_type':'GSystemType', 'name': u"E-Book"})
 	GST_FILE = node_collection.one({'_type':'GSystemType', 'name': u"File"})
 	GST_PAGE = node_collection.one({'_type':'GSystemType', 'name': u'Page'})

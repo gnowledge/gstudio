@@ -190,8 +190,10 @@ $("#btnUploadCancel").click(function() {
 <h4>Select Image</h4>
 <form id = "image_search_form"  action="" name="image_search_form" method="POST" >
   <div class="large-11 small-10 columns">
+      {% get_filters_data "File" "home" as filter_dict %}
+      {% include "ndf/filters.html" with filter_dict=filter_dict %}
     {% csrf_token %}
-     <select id="show_all_workspace">
+    <select id="show_all_workspace">
     <option value="default">--- Select Workspace ---</option>
                 {% for each_workspace in all_workspaces %}
                 <option value="{{ each_workspace.pk }}">
