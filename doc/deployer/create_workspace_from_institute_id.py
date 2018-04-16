@@ -1,7 +1,8 @@
 from gnowsys_ndf.ndf.models import *
 from gnowsys_ndf.settings import GSTUDIO_INSTITUTE_ID ,GSTUDIO_INSTITUTE_NAME
 
-workspace_name = GSTUDIO_INSTITUTE_ID+"-"+GSTUDIO_INSTITUTE_NAME
+# workspace_name = GSTUDIO_INSTITUTE_ID+"-"+GSTUDIO_INSTITUTE_NAME
+workspace_name = GSTUDIO_INSTITUTE_NAME + " ( " + GSTUDIO_INSTITUTE_ID + " )"
 gst_group_id = node_collection.one({'_type': 'GSystemType', 'name': 'Group'})._id
 group_obj = node_collection.one({'_type': 'Group', 'name': unicode(GSTUDIO_INSTITUTE_ID)})
 if GSTUDIO_INSTITUTE_ID and GSTUDIO_INSTITUTE_NAME: 
