@@ -69,11 +69,6 @@ at_apps_list = node_collection.one({
 translation_set=[]
 check=[]
 
-
-@register.filter(name='get')
-def get(d, k):
-	return d.get(k, None)
-
 @get_execution_time
 @register.assignment_tag
 def get_site_registration_variable_visibility(registration_variable=None):
