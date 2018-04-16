@@ -1,0 +1,241 @@
+{% load i18n %}
+{% load multiply from simple_filters %}
+{% load get_group_object check_is_gstaff get_profile_full_name from ndf_tags %}
+
+<style type="text/css">
+  .reveal-modal{
+    color: black !important;
+  }
+
+  .rating-stars {
+    background-image:url("/static/ndf/images/stars.png");
+    height: 17px;
+    display: none;
+  }
+
+</style>
+<script src="/static/ndf/bower_components/d3/d3.js"></script>
+<script src="/static/ndf/bower_components/pdfmake/build/pdfmake.min.js"></script>
+<script src="/static/ndf/bower_components/html2canvas/build/html2canvas.js"></script>
+<script src="/static/ndf/bower_components/pdfmake/build/vfs_fonts.js"></script>
+<div class="user-analytics-data" id="grp-analytics">
+<div class="pre-analytics-msg-div text-center hide">
+   {% trans "Your analytics is loading. Please wait." %} 
+</div>
+{% get_profile_full_name request.user as req_user_full_name %}
+  <script src="/static/ndf/bower_components/DataTables/media/js/jquery.dataTables.js"></script>
+  <script src="/static/ndf/bower_components/DataTables/media/js/jquery.dataTables.min.js"></script>
+  <script src="/static/ndf/bower_components/datatables-rowsgroup/dataTables.rowsGroup.js"></script>
+  <script src="/static/ndf/bower_components/datatables.net-buttons/js/dataTables.buttons.js"></script>
+  <script src="/static/ndf/bower_components/datatables.net-buttons/js/dataTables.buttons.min.js"></script>
+  <script src="/static/ndf/bower_components/datatables.net-buttons/js/buttons.html5.js"></script>
+  <script src="/static/ndf/bower_components/datatables.net-buttons/js/buttons.print.min.js"></script>
+  <link href="/static/ndf/bower_components/datatables.net-buttons-dt/css/buttons.dataTables.min.css" rel="stylesheet" type="text/css" />
+  <link href="/static/ndf/bower_components/DataTables/media/css/jquery.dataTables.css" rel="stylesheet" type="text/css" />
+  <script src="/static/ndf/bower_components/pdfmake/build/pdfmake.min.js"></script>
+  <script src="/static/ndf/bower_components/pdfmake/build/vfs_fonts.js"></script>
+  <script src="/static/ndf/bower_components/jszip/dist/jszip.min.js"></script>
+  
+  <div class="group-analytics ">
+    <div class="small-12 columns course-students-data">
+      <div class="small-12 medium-10 columns students-table-legends">
+        Points table for students <br/>
+        <span class=" badge_ex green">&nbsp;</span>
+        <span>Gallery uploads</span>
+        <span class=" badge_ex">&nbsp;</span>
+        <span>Note Making</span>
+        <span class=" badge_ex red">&nbsp;</span>
+        <span>Quiz Performance</span>
+        <span class=" badge_ex yellow">&nbsp;</span>
+        <span>Interactions</span><br/>
+        <small>* Click on the student's name to view detailed analytics.</small>
+      </div>
+    </div>
+    <div class="small-12 columns students-tabular-data text-center">
+      <div class="small-12 columns table-container">
+      </div>
+    </div>
+  </div>
+  <div id="userAnalyticsModal" class="reveal-modal reveal-modal-overlay" data-options="close_on_background_click:false;close_on_esc:false;" data-reveal aria-hidden="true" role="dialog">
+    <label id="userAnalyticsModalLabel"></label>
+    <div class="userAnalyticsData"></div>
+    <a class="close-reveal-modal" aria-label="Close">Close [&#215;]</a>
+  </div>
+</div>
+
+
+<script type="text/javascript">
+
+
+
+
+      // Admin analytics view
+      $(document).ready(function() {
+          $(".pre-analytics-msg-div").removeClass("hide")
+          data = {{response_dict|safe}}
+          column_headers = data["column_headers"];
+          students_data_set = data["students_data_set"];
+          max_data = data['max_points_dict']
+          file_max_points = max_data['file_max_points']
+          notes_max_points = max_data['notes_max_points']
+          quiz_max_points =  max_data['quiz_max_points']
+          interactions_max_points = max_data['interactions_max_points']
+          dataTable_columns_set = [];
+
+          var students_points_table = '<table cellpadding="0" cellspacing="0" border="0" class="display" id="students-points-table-tbody">' + '</table>';
+          $(".table-container").html(students_points_table)
+          // Prepare title & data headers used in dataTable
+          $.each(column_headers, function(index, v) {
+            d = {};
+            d["data"] = v[0];
+            d["title"] = v[1];
+            dataTable_columns_set.push(d);
+          });
+          // Set defintion dataTable
+          sce_dt_var = $("#students-points-table-tbody").dataTable({
+            "data": students_data_set,
+            "columns": dataTable_columns_set,
+            "dom": 'Bfrtip',
+            "buttons": [
+              'pageLength', 
+                {
+                    extend: 'csvHtml5',
+                    title: function(){
+                      return "{{group_name|slugify}}" 
+                    } 
+                },
+                {
+                    extend: 'pdfHtml5',
+                    header : true,
+                    footer: true,
+
+                    customize: function ( doc ) {
+                        doc.pageMargins = [40,70,30,30];
+                        doc.content[1].table.widths = [ '25%', '15%', '15%', '15%', '15%', '15%'];
+                        doc['footer'] = (function() {
+                            return {
+                                columns: [
+                                    'Report generated by: {{req_user_full_name}}\n' + 
+                                    'Connected Learning Initiative (CLIx), Tata Institute of Social Sciences',
+                                ],
+                                margin: [10, 0]
+                            }
+                        });
+                        doc['header'] = (function() {
+                            return {
+                                margin: 10,
+                                columns: [
+                                    {
+                                        image: header_logo_dataURL,
+                                        width: 120,
+                                        margin: [30, 20, 0, 0],
+                                    }]
+                            }
+                        });
+
+                        // doc['content'] = (function(page, pages) {
+                        //     return {
+                        //         margin: 10,
+                        //     }
+                        // });
+
+                        doc.styles.title = {
+                          margin: [ 20, 0, 0, 5 ],
+                          color: '#6e3254',
+                          fontSize: '22',
+                          fontWeight: 'bold',
+                          alignment: 'center'
+                        }
+                    },
+                    title: function(){
+                      return "{{group_name|slugify}}" 
+                    } 
+
+                }
+            ],
+
+            "autoWidth": false,
+            "columnDefs": [
+             {"className": "dt-center", "targets": "_all"},
+
+                  { width: '10%', targets: 0 },
+                  { width: '10%', targets: 1 },
+                  { width: '20%', targets: 2 },
+                  { width: '20%', targets: 3 },
+                  { width: '20%', targets: 4 },
+                  { width: '20%', targets: 5 }
+               ],
+            "createdRow": function ( row, data, index ) {
+              user_id = data["user_id"];
+              $(row).attr("data-id", user_id);
+
+              $(row).attr("data-points-dict", JSON.stringify(data));
+
+              $(row).addClass("fetch-analytics")
+              $(row).find("td:nth-child(1)").addClass("user_name_analytics")
+              $(row).find("td:nth-child(3)").html(generate_points_bar(data['files_points'], "Files",data['users_points'],file_max_points));
+              $(row).find("td:nth-child(4)").html(generate_points_bar(data['notes_points'], "Notes",data['users_points'],notes_max_points));
+              $(row).find("td:nth-child(5)").html(generate_points_bar(data['quiz_points'], "Quiz",data['users_points'],quiz_max_points));
+              $(row).find("td:nth-child(6)").html(generate_points_bar(data['interactions_points'], "Interactions",data['users_points'],interactions_max_points));
+
+            }
+          });
+          $(".group-analytics").removeClass("hide")
+          $(".pre-analytics-msg-div").addClass("hide")
+      })
+
+      // Admin analytics view. Score-points in horizontal bars of enrolled students
+      function generate_points_bar(data_for_bars, bar_name, total_user_points, max){
+        if(data_for_bars && total_user_points){
+          var outer_div = document.createElement("div");
+          outer_div.className = "progress small-12 large-12"
+          var span_ele = document.createElement("span");
+          span_ele.className = "meter";
+          span_ele.style.width = (data_for_bars/parseInt(max, 10))* 100 + "%"
+          if (bar_name == "Interactions"){
+            bg_color_val = "#ffe694"
+          }
+          else if(bar_name == "Files"){
+            bg_color_val = "#b5d8a6"
+          }
+          else if(bar_name == "Notes"){
+            bg_color_val = "#9ec4fa"
+          }
+          else if(bar_name == "Quiz"){
+            bg_color_val = "#fa623f"
+          }
+
+          span_ele.style.backgroundColor = bg_color_val
+          var inner_span_ele = document.createElement("span")
+          inner_span_ele.className = "pull-left merter-val"
+          inner_span_ele.innerHTML = data_for_bars
+          $(span_ele).append(inner_span_ele)
+          $(outer_div).append(span_ele)
+          return outer_div.outerHTML;
+        }
+        else{
+          return "NA"
+        }
+      }
+
+      $(document).on('click','.fetch-analytics',function(){
+          var user_id = $(this).attr("data-id");
+          var dataPointsDict = $(this).attr('data-points-dict');
+          // $(this).addClass("hide")
+          // $(".pre-analytics-msg-div").removeClass("hide")
+          $.ajax({
+              url: "{% url 'progress_report' group_id 'user_id' %}".replace("user_id", user_id),
+              type: "GET",
+              dataType: "html",
+              data: {'data_points_dict': dataPointsDict},
+              success: function(data){
+                console.log(data)
+                $(".userAnalyticsData").html(data)
+                $("#userAnalyticsModal").foundation('reveal', 'open');
+                // $(".pre-analytics-msg-div").addClass("hide")
+              },
+          });//end of ajax
+      })
+
+
+</script>
