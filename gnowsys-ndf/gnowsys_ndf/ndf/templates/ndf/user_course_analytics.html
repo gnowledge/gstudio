@@ -20,8 +20,8 @@
 <script src="/static/ndf/bower_components/html2canvas/build/html2canvas.js"></script>
 <script src="/static/ndf/bower_components/pdfmake/build/vfs_fonts.js"></script>
 {% check_is_gstaff group_id request.user as gstaff_access %}
-<a class=" download-progress-report" style="padding-left: 38px"><i class="fi-archive"></i> Download </a><br/>
-<div class="user-analytics-data" id="user-pr-report">
+<a class=" download-progress-report-{{group_id|slugify}}-{{request.user.pk}}" style="padding-left: 38px"><i class="fi-archive"></i> Download </a><br/>
+<div class="user-analytics-data" id="user-pr-report-{{group_id|slugify}}-{{request.user.pk}}">
   <div class="pre-analytics-msg-div text-center hide">
      {% trans "Your analytics is loading. Please wait." %} 
   </div>
@@ -419,9 +419,9 @@
 
     })
 
-    $(document).on('click',".download-progress-report",function(){
+    $(document).on('click',".download-progress-report-{{group_id|slugify}}-{{request.user.pk}}",function(){
       var datetime_val = get_current_datetime_val()
-      html2canvas(document.getElementById('user-pr-report'), {
+      html2canvas(document.getElementById('user-pr-report-{{group_id|slugify}}-{{request.user.pk}}'), {
             onrendered: function (canvas) {
                 var data = canvas.toDataURL();
                 var docDefinition = {
