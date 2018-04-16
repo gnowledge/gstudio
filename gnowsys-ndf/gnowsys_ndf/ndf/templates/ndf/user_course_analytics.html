@@ -1,6 +1,7 @@
 {% load i18n %}
 {% load multiply from simple_filters %}
-{% load get_group_object check_is_gstaff from ndf_tags %}
+{% load get_group_object check_is_gstaff get_site_variables from ndf_tags %}
+{% get_site_variables as site %}
 
 <style type="text/css">
   .reveal-modal{
@@ -419,6 +420,7 @@
     })
 
     $(document).on('click',".download-progress-report",function(){
+      var datetime_val = get_current_datetime_val()
       html2canvas(document.getElementById('user-pr-report'), {
             onrendered: function (canvas) {
                 var data = canvas.toDataURL();
@@ -444,7 +446,7 @@
                 footer: function() {
                     return { 
                         columns: [ 
-                            'Connected Learning Initiative (CLIx),\n Tata Institute of Social Sciences\n',
+                            "{{site.GSTUDIO_DOC_FOOTER_TEXT}}", 
                             { text: datetime_val, alignment: 'right' }
                         ],
                         margin: [10, 0]

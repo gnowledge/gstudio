@@ -18,5 +18,7 @@
     });
  
 
-var date = new Date();
-var datetime_val = date.toDateString() + date.toLocaleTimeString()
+function get_current_datetime_val(){
+    var date = new Date();
+    return date.toDateString() + date.toLocaleTimeString()
+}

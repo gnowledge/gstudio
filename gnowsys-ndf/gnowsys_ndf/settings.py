@@ -787,6 +787,7 @@ GSTUDIO_COURSE_EVENT_MOD_GROUP_ALTNAMES = ['Screening House', 'Selection House']
 
 GSTUDIO_PROGRAM_EVENT_MOD_GROUP_ALTNAMES = ['Screening House', 'Selection House']
 
+GSTUDIO_DOC_FOOTER_TEXT = "gStudio, Gnowledge Lab"
 
 GSTUDIO_HELP_TIP = {
    "name":"Title of the object",
