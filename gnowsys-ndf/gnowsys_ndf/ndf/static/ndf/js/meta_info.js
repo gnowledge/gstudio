@@ -18,3 +18,5 @@
     });
  
 
+var date = new Date();
+var datetime_val = date.toDateString() + date.toLocaleTimeString()
