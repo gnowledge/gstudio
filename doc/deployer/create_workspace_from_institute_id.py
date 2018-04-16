@@ -24,6 +24,7 @@ if GSTUDIO_INSTITUTE_ID and GSTUDIO_INSTITUTE_NAME:
 		group_obj.visibility_policy = u"ANNOUNCED"
 		group_obj.member_of = [gst_group_id]
 		group_obj.agency_type = u"School"
+		group_obj.origin.append({'source': 'create_workspace_from_institute_id'})
 
 		group_obj.save()
 		print "workspace created:",group_obj.altnames
