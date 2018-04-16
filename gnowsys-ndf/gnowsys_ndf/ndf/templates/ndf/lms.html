@@ -64,9 +64,14 @@
     </li>
     {% if request.user.is_authenticated %}
       <li>
-        <a {% if is_gstaff %} href="{% url 'course_analytics_admin' group_name %}" {% else %} href="{% url 'progress_report' group_name request.user.pk %}" {% endif %}{% if title == 'progress_report' %} class="selected" {% endif %} tabindex="6" title="See how you have done, how many comments have you received." > <i class="fa fa-line-chart"></i> 
+        <a {% if is_gstaff %} href="{% url 'course_analytics_admin' group_name %}" {% else %} href="{% url 'course_analytics' group_id request.user.pk %}" {% endif %}{% if title == 'course_analytics' %} class="selected" {% endif %} tabindex="6" title="See how you have done, how many comments have you received." > <i class="fa fa-line-chart"></i> 
             {% if 'Group' in group_object_member_of_names_list %}
-              {% trans "Stats" %}{% else %}{% trans "Progress Report" %}
+              {% trans "Stats" %}{% else %}
+              {% if is_gstaff %}
+                {% trans "Group Progress" %}
+              {% else %}
+                {% trans "Progress" %}
+              {% endif %}
             {% endif %}
         </a>
       </li>
@@ -204,7 +209,6 @@
 
 
   <div class="small-12 columns group_sections_content">
-
    <div id="group_overview">
       {% if title == "about" %}
         {% include "ndf/course_about.html" %}
@@ -216,8 +220,8 @@
           {% include "ndf/gnotebook.html" %}
         {% endif %}
     </div>
-    <div id="progress_report">
-       {% if title == 'progress_report' %}
+    <div id="course_analytics">
+       {% if title == 'course_analytics' %}
        {% if is_gstaff %}
           {% include "ndf/admin_course_analytics.html" %}
         {% else %}
