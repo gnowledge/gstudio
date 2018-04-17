@@ -4,24 +4,24 @@
 
 
 <style type="text/css">
- .footer{
- /*background-color: #111111;*/
+ .footer-clix{
     /*color: #eeeeee;*/
     /*border-top: 1px solid red;*/
     height: 60px;  /* footer height */
-    padding-top: 800px;
+    padding-top: 500px;
     display: block;
     margin-top: 20px; /* space between content and footer */
     box-sizing: border-box;
     position: relative;
     width: 100%;
+    z-index: -1;
 }
 
 
 
 </style>
 
-<div class="footer">
+<div class="footer-clix">
     <div class="small-7 medium-9 large-10 columns" style="margin-left:122px;">
                 {% comment %}
           <div class="row">
@@ -76,14 +76,14 @@
     </div>
     <div class="row">
         <hr>
-        <div class="small-3 columns coyright-links">
+        <div class="small-2 columns coyright-links">
             <a href="#"><p>Terms of Use</p></a>
                
         </div>
-        <div class="small-3 columns coyright-links">
+        <div class="small-2 columns coyright-links">
             <a href="#"><p>Privacy Policy</p></a>
         </div>
-        <div class="small-6 columns coyright-links">
+        <div class="small-8 columns coyright-links">
             {% comment %}
                 {% get_latest_git_hash as git_commit_hash %}  // kindly uncooment once you check it and put in footer_clix
             {% endcomment %}
