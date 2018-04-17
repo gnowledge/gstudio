@@ -2887,9 +2887,9 @@ def course_analytics(request, group_id, user_id, render_template=False, get_resu
             group_id = ObjectId(unit_id)
             template = "ndf/user_course_analytics.html"
 
-    gstaff_access = check_is_gstaff(group_id, request.user)
-    if gstaff_access:
-        template = "ndf/user_course_analytics.html"
+        gstaff_access = check_is_gstaff(group_id, request.user)
+        if gstaff_access:
+            template = "ndf/user_course_analytics.html"
 
     group_obj   = get_group_name_id(group_id, get_obj=True)
     group_id    = group_obj._id
