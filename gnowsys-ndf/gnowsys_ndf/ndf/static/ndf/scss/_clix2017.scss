@@ -2941,7 +2941,6 @@ ul.jqtree-tree .jqtree-toggler {
             max-height: 100%;
             overflow-y: auto;
             height: 100vh;
-            position:fixed;
 
             .course-lessons {
                 dd {
@@ -3227,8 +3226,8 @@ ul.jqtree-tree .jqtree-toggler {
             }
         }
     }
-
 }
+
 
 .tile_modal {
     .editor_modal_content {
@@ -4918,6 +4917,39 @@ $inCompleteBgColor: #fd9e29;
        border-radius: 3px;
     }
 
+}
+
+
+.accordion-overview {
+    background-color: #eee;
+    color: #753d68;
+    padding: 18px;
+    width: 100%;
+    border: none;
+    text-align: left;
+    outline: none;
+    font-size: 19px;
+    transition: 0.4s;
+}
+
+.accordion-overview:hover, .accordion-overview:focus {
+    color: #753d68;
+    background-color: #eee;
+    font-weight: 600;
+}
+.accordion-overview {
+   & .active{
+    color: #753d68;
+    background-color: #eee;
+    font-weight: 600;
+}
+}
+
+.panel {
+    padding: 0 18px;
+    display: none;
+    background-color: white;
+    overflow: hidden;
 }
 
 .dropdown-settings{
