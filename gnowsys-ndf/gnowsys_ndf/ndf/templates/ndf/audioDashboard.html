@@ -23,12 +23,9 @@
     <div class="upload-file small-12 medium-3 large-2 columns" id="upload_form_div">
                         <form class="dropzone" id ="docPost" enctype="multipart/form-data" method="post" action="{% url 'upload_file_ckeditor' group_id %}">
                             {% csrf_token %}
-                           {% comment %}
                             <label class="tiny button radius expand upload-btn" style="margin: 0px;">
                                 <i class="fa fa-upload"></i>
                                 &nbsp;
-                                 <span>Upload File</span>
-                                <input type="file" name="filehive" id="docFile" style="display: none;" multiple/>
                             </label>
                             <br><br>
                             <div class="save_cancel" style="display:none">
@@ -39,7 +36,6 @@
                               <input type="button" id="btnUploadCancel" class="tiny button radius" value="Cancel"/>
                             </div>
                             <input type="hidden" name="context_name" value="{{title}}">
-                             {% endcomment %}
                         </form>
                     </div>
 
@@ -306,6 +302,7 @@
     };
     </script>
 
+{% comment %}
 <script type="text/javascript">
   var form = document.getElementById('docPost');
   var fileSelect = document.getElementById('docFile');
@@ -431,12 +428,12 @@ $(document).on('change','#docFile',function(){
     */
 
   });
-
 $("#btnUploadCancel").click(function() {
     $(".save_cancel").addClass("hide");
     $("#docFile").val("");
     $(".upload-btn").css("display","block")
 
   });
+{% endcomment %}
 
 </script>
