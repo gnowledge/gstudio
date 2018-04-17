@@ -2088,7 +2088,7 @@ def group_dashboard(request, group_id=None):
         "CourseEventGroup" in group_obj.member_of_names_list or
         "BaseCourseGroup" in group_obj.member_of_names_list or 
         "announced_unit" in group_obj.member_of_names_list):
-        return HttpResponseRedirect(reverse('course_about', kwargs={'group_id': group_id}))
+        return HttpResponseRedirect(reverse('course_content', kwargs={'group_id': group_id}))
 
     if group_obj and group_obj.post_node:
         # subgroups_cur = node_collection.find({'_id': {'$in': group_obj.post_node}, 'edit_policy': {'$ne': "EDITABLE_MODERATED"},
@@ -2271,7 +2271,7 @@ def group_dashboard(request, group_id=None):
   default_template = "ndf/groupdashboard.html"
   # print "\n\n blog_pages.count------",blog_pages
   if alternate_template:
-    return HttpResponseRedirect( reverse('course_about', kwargs={"group_id": group_id}) )
+    return HttpResponseRedirect( reverse('course_content', kwargs={"group_id": group_id}) )
   else:
     return render_to_response([alternate_template,default_template] ,{'node': group_obj, 'groupid':group_id,
                                                        'group_id':group_id, 'user':request.user,
