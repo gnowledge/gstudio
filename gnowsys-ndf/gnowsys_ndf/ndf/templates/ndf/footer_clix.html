@@ -4,7 +4,7 @@
 
 
 <style type="text/css">
- .footer-clix{
+ .footer-clix1{
     /*color: #eeeeee;*/
     /*border-top: 1px solid red;*/
     height: 60px;  /* footer height */
@@ -15,13 +15,15 @@
     position: relative;
     width: 100%;
     z-index: -1;
+    /*background-color: gray;*/
+    width: 100%!important;
 }
 
 
 
 </style>
-
-<div class="footer-clix">
+<div class="footer-clix1">
+	<hr>
     <div class="small-7 medium-9 large-10 columns" style="margin-left:122px;">
                 {% comment %}
           <div class="row">
@@ -64,34 +66,42 @@
     <div class="small-3 medium-3 large-2 columns nav-legal" style="margin-top:37px;">
         <ol>
             <li>
-                <a href="http://clix.tiss.edu/about/" target="_blank">About</a>
+                <a href="http://clix.tiss.edu/about/" style="font-size: 18px!important" target="_blank">About</a>
             </li>
             <li>
-                <a href="#">Credits</a>
+                <a href="#" style="font-size: 18px!important">Credits</a>
             </li>
             <li>
-                <a href="http://clix.tiss.edu/contact/" target="_blank">Contact Us</a>
+                <a href="http://clix.tiss.edu/contact/" style="font-size: 18px!important" target="_blank">Contact Us</a>
             </li>
         </ol>
     </div>
+    <br>
+    <br>
+    <br>
+    <br>
+    <br>
+    <br>
     <div class="row">
         <hr>
         <div class="small-2 columns coyright-links">
-            <a href="#"><p>Terms of Use</p></a>
+            <a href="#" style="font-size: 15px!important">Terms of Use</a>
                
         </div>
         <div class="small-2 columns coyright-links">
-            <a href="#"><p>Privacy Policy</p></a>
+            <a href="#" style="font-size: 15px!important">Privacy Policy</a>
         </div>
         <div class="small-8 columns coyright-links">
             {% comment %}
                 {% get_latest_git_hash as git_commit_hash %}  // kindly uncooment once you check it and put in footer_clix
             {% endcomment %}
-              <a href="https://gitlab.com/gnowledge/gstudio/tree/{{git_commit_hash}}" style="margin-left:319px;" target="_blank">Powered by Gstudio</a>
+              <a href="https://gitlab.com/gnowledge/gstudio/tree/{{git_commit_hash}}" style="margin-left:319px;font-size: 15px!important" target="_blank">Powered by Gstudio</a>
             <a href="http://www.hbcse.tifr.res.in/" target="_blank">
-                <img src="/static/ndf/images/logos/tifr.png" style="height: 30px;margin-left: 330px;margin-bottom:10px;" />
+                <img src="/static/ndf/images/logos/tifr.png" style="height: 30px;margin-left: 410px;margin-bottom:10px;" />
             </a>
-        </div>
+
+<br> 
+       </div>
     </div>
 </div>
 
