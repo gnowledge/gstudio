@@ -42,7 +42,7 @@ app=gst_group
 
 @login_required
 @get_execution_time
-def create_partner(request,group_id):
+def create_partner(request,group_id,partner_id):
   # ins_objectid  = ObjectId()
   # if ins_objectid.is_valid(group_id) is False :
   #   group_ins = node_collection.find_one({'_type': "Group","name": group_id})
@@ -63,8 +63,8 @@ def create_partner(request,group_id):
   try:
     if request.method == "POST":
       colg = node_collection.collection.Group()
-      street = request.POST.get('street', "")
-      cname = request.POST.get('groupname', "").strip()
+      street = request.POST.get('house_street', "")
+      cname = request.POST.get('name', "").strip()
       colg.altnames = cname
       colg.name = unicode(cname)
       colg.member_of.append(gst_group._id)
@@ -132,7 +132,7 @@ def create_partner(request,group_id):
 
   for each in available_nodes:
       nodes_list.append(str((each.name).strip().lower()))
-  return render_to_response("ndf/create_partner.html", {'groupid': group_id, 'group_obj':group_obj,'appId': app._id, 'group_id': group_id, 'nodes_list': nodes_list},RequestContext(request))
+  return render_to_response("ndf/create_partner.html", {'partner_id':partner_id,'groupid': group_id, 'group_obj':group_obj,'appId': app._id, 'group_id': group_id, 'nodes_list': nodes_list},RequestContext(request))
 
 
 def partner_list(request, group_id):
