@@ -126,12 +126,13 @@
   </ul>
 </div>
 <div class="small-2 medium-2 large-2 columns" style="border-bottom: 1px solid #00000029; background-color:#ffffff; height: 53px;">
-  {% if is_gstaff and request.author.agency_type != 'Teacher' or group_object.agency_type == 'School' %}
-          <div class="small-3 medium-6 large-6 columns course_actions" style="color:#164a7b;">
-              <span data-dropdown="course-settings-drop" aria-controls="course-settings-drop" aria-expanded="false"  data-options="align:left">
-                  <i class="icon-widget fi-widget"></i>
-              </span>
-              <ul id="course-settings-drop" class="f-dropdown" data-dropdown-content aria-hidden="true" tabindex="-1">
+      {% if is_gstaff  %}
+        <div class="small-3 medium-6 large-6 columns course_actions" style="color:#164a7b;">
+            <span data-dropdown="course-settings-drop" aria-controls="course-settings-drop" aria-expanded="false"  data-options="align:left">
+                <i class="icon-widget fi-widget"></i>
+            </span>
+            <ul id="course-settings-drop" class="f-dropdown" data-dropdown-content aria-hidden="true" tabindex="-1">
+      {% if request.author.agency_type != 'Teacher' or group_object.agency_type == 'School' %}
               
 
               <li>
@@ -142,28 +143,14 @@
                     <a class="fi-photo" style="position: relative;top: -3px;left: 2px;" data-reveal-id="group_banner_prof_pic_prop">
                     {% trans "Change image" %}</a>
               </li>
-              <li>
-                  <a data-reveal-id="manage_users_modal" href="{% url 'manage_users' group_id %}"  class="fi-torsos"> {% trans "Manage Users" %}</a>
-                  <div id="manage_users_modal" class="reveal-modal large" data-reveal style="position:absolute;">
-                      <div id="group_drawer">
-                      {% include "ndf/widget_user_search.html" with subscription_status=True %}
-                      </div>
-                      <a class="close-reveal-modal">&#215;</a>
-                  </div>
-              </li>
               {% if 'Group' not in group_object_member_of_names_list and 'announced_unit' in group_object_member_of_names_list or "base_unit" in  group_object_member_of_names_list %}
               <li>
                   <a href="{% url 'create_event_group' group_id 'CourseEventGroup' %}" class="fi-volume"> {% trans "Announce" %}</a>
               </li>
-              {% get_lessons group_object as lessons_list %}
-              {% include 'ndf/epub_export_widget.html' with exp_collection=lessons_list %}
-              <li class="lesson_name_in_export">
-                <a href="#" data-reveal-id='exportLesson' class="export_lesson fi-archive" title="Export Content into distinct ePubs"> {% trans "Export Content into ePubs" %}</a>
-              </li>
-
-
               {% endif %}
-              <li>
+ 
+
+             <li>
                   <a href="{% url 'unit_edit' group_name group_object.pk %}" class="fi-pencil"> {% trans "Edit Metadata" %}</a>
               </li>
               <li> <a data-reveal-id="delete-unit"><i class="fa fa-trash"></i> {% trans "Delete" %}</a> </li>
@@ -175,10 +162,29 @@
                         <a href="#" class="button tiny success">{% trans "Cancel" %}</a>
                         <a href="{% url 'delete_group_url_redirect' group_object.pk 'explore_basecourses' %}" class="button tiny alert">{% trans "Yes" %}</a>
                         <a class="close-reveal-modal" aria-label="Close">&#215;</a>
-                    </div>
-              </ul>
+              </div>
+
+      {% endif %}
+
+              <li>
+                  <a data-reveal-id="manage_users_modal" href="{% url 'manage_users' group_id %}"  class="fi-torsos"> {% trans "Manage Users" %}</a>
+                  <div id="manage_users_modal" class="reveal-modal large" data-reveal style="position:absolute;">
+                      <div id="group_drawer">
+                      {% include "ndf/widget_user_search.html" with subscription_status=True %}
+                      </div>
+                      <a class="close-reveal-modal">&#215;</a>
+                  </div>
+              </li>
+ 
+              {% get_lessons group_object as lessons_list %}
+              {% include 'ndf/epub_export_widget.html' with exp_collection=lessons_list %}
+              <li class="lesson_name_in_export">
+                <a href="#" data-reveal-id='exportLesson' class="export_lesson fi-archive" title="Export Content into distinct ePubs"> {% trans "Export Content into ePubs" %}</a>
+              </li>
+          </ul>
           </div>
-  {% else %}
+      {% endif %}
+  {% if not is_gstaff %}
   <div class="small-9 medium-4 large-4 columns enroll-unit" >
     {% if request.user.is_authenticated %}
       {% include 'ndf/widget_enroll.html' %}
