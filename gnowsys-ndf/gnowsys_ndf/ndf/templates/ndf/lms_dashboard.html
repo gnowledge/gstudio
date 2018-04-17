@@ -133,7 +133,7 @@
           <a href="{% url 'my_desk' request.user.id  %}" {% if title == "my desk" %} class="selected" {% endif %}><i class="fi-book-bookmark" style="font-size:20px;"></i> {% trans "My Workspaces" %}</a>
 
         {% else %}
-          <a href="{% url 'my_desk' request.user.id  %}" {% if title == "my desk" %} class="selected" {% endif %}> {% if  is_workspace_instance %} {% trans "My Workspaces" %} {% else %} <i class="fi-book-bookmark" style="font-size:20px;"></i> {% trans "My Courses" %} {% endif %} </a>
+          <a href="{% url 'my_desk' request.user.id  %}" {% if title == "my desk" %} class="selected" {% endif %}>  <i class="fi-book-bookmark" style="font-size:20px;"></i> {% trans "My Courses" %} </a>
         {% endif %}
       </li>
 

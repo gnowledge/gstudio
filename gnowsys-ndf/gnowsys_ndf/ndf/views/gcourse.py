@@ -3405,8 +3405,8 @@ def assetcontent_detail(request, group_id, asset_id,asst_content_id,page_no=1):
     template = 'ndf/lms.html'
     assetcontent_page_info = paginator.Paginator(asset_content_list['grel_node'], page_no, GSTUDIO_NO_OF_OBJS_PP)
     context_variables = {
-            'asset_content_list':asset_content_list,'group_id':group_id,
-            'groupid':group_id,'node':assetcontent_obj,'asset_obj':asset_obj,
+            'asset_content_list':asset_content_list,'group_id':group_obj._id,'group_name':group_obj.name,
+            'groupid':group_obj._id,'node':assetcontent_obj,'asset_obj':asset_obj,
             'title':"asset_content_detail",'group_obj':group_obj,'assetcontent_page_info':assetcontent_page_info
         }
     if request.user.is_authenticated():
@@ -3422,7 +3422,6 @@ def assetcontent_detail(request, group_id, asset_id,asst_content_id,page_no=1):
         if "asset@gallery" in asset_obj.tags:
             context_variables.update( {'title':"asset_gallery_detail"})
             
-    
     return render_to_response(template,
                                 context_variables,
                                 context_instance = RequestContext(request)
