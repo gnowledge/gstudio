@@ -182,7 +182,8 @@
               {% with node.member_of_names_list as node_member_of_names_list %}
               {% if "QuizItemEvent" not in node_member_of_names_list and "QuizItem" not in node_member_of_names_list%}
               <div class="input_links row" style="margin-left:10px;">
-                {% include 'ndf/rating.html'%}
+                <div class="left">{% include 'ndf/rating.html'%}</div>
+                
                 {% get_relation_value node.pk 'has_help' as grel_help %}
                 {% get_relation_value node.pk 'has_admin_page' as grel_admin_page %}
                   {% if grel_help.grel_id  %}
