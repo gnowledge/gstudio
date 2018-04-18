@@ -202,6 +202,7 @@ def results_search(request, group_id, page_no=1, return_only_dict = None):
 			q = Q('bool', must=[Q('match', member_of=GST_FILE1.hits[0].id),Q('match', str(group_id)),~Q('exists',field='content')])
 			search_result =Search(using=es, index="nodes",doc_type="gsystemtype,gsystem,metatype,relationtype,attribute_type,group,author").query(q)
 			#search_result.filter('exists', field='content')
+			search_result = search_result.exclude('terms', name=['thumbnail','jpg','png'])
 			search_str_user=""
 
 		else:
@@ -225,6 +226,7 @@ def results_search(request, group_id, page_no=1, return_only_dict = None):
 			search_result = search_result.filter('match', group_set=str(group_id))
 			search_result = search_result.filter('match', member_of=GST_FILE1.hits[0].id)
 			search_result = search_result.filter('match', access_policy='public')
+			search_result = search_result.exclude('terms', name=['thumbnail','jpg','png'])
 		
 		has_next = True
 		if search_result.count() <=20:
