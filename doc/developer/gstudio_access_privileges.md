@@ -12,7 +12,7 @@ Note on Access Privileges:
             - Manage Users
             - Export Content into ePubs
         3. User
-            - __No LMS Actions__
+            - __No Actions Applicable__
 
   [B]. **LMS Activities AND School/Common Workspace Activities**
         1. SuperUser
@@ -45,4 +45,4 @@ Note on Access Privileges:
             - Manage Users
             - Export Content into ePubs
         3. User
-            - __No LMS Actions__
+            - __No Actions Applicable__
