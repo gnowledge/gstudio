@@ -24,7 +24,7 @@ def tools_logging(request):
 	userdata = request.POST.get('payload',None)
 	user_data_old_strategy = request.POST.get('user_data',None)
 	if userdata!= None:
-		userdata = json.loads(userdata,object_pairs_hook=OrderedDict)
+		userdata = json.loads(userdata)
 		# app_name = request.POST.get('app_name',' ')
 		app_name = userdata['appName']
 		sessionid = ""
@@ -87,7 +87,8 @@ def tools_logging(request):
 		            old_data.append(userdata)
 		            json.dump(old_data, wrfile)   
 		return StreamingHttpResponse("Success")
-
+	else:
+		return StreamingHttpResponse("Failure")
 @get_execution_time
 def tools_temp(request):
     context_variables = {'title' : "tools"}
