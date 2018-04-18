@@ -271,6 +271,8 @@ class Buddy(DjangoDocument):
 
         active_buddy_auth_list = buddy_obj.get_active_authid_list_from_single_buddy()
 
+        buddy_obj.ends_at = None if active_buddy_auth_list else datetime.datetime.now()
+
         if current_active_buddy_auth_list != active_buddy_auth_list:
             buddy_obj.save()
 

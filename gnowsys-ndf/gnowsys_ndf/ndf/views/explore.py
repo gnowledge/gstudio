@@ -109,6 +109,7 @@ def explore_groups(request,page_no=1):
     gstaff_access = check_is_gstaff(group_id,request.user)
 
     query = {'_type': 'Group', 'status': u'PUBLISHED',
+            'agency_type':u"School",
             '$or': [
                         {'access_policy': u"PUBLIC"},
                         {'$and': [
