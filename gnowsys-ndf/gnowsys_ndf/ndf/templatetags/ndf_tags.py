@@ -3899,11 +3899,11 @@ def get_download_filename(node, file_size_name='original'):
 		name = node.altnames if node.altnames else node.name
 		name = name.split('.')[0]
 		file_name = slugify(name)
-
+		name = name.encode('utf-8')
 		if extension:
-			file_name += extension
+			name += extension
 
-		return file_name
+		return name
 
 	else:
 		name = node.altnames if node.altnames else node.name
