@@ -2220,8 +2220,6 @@ def user_access_policy(node, user):
         auth_obj = node_collection.one({'_type': 'Author', 'created_by': user.id})
         if auth_obj and auth_obj.agency_type == 'Teacher':
           user_access = True
-      else:
-        user_access = False
 
     if user_access:
       return "allow"
