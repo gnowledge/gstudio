@@ -37,8 +37,9 @@ GStudio work with platforms that support OSID (http://osid.org/). A
 python binding of DLKit (http://dlkit-doc.readthedocs.io/en/latest/) is
 being used in collaboration with Office of the Digital Learning at MIT.
 
-Design of the Platform
-======================
+
+Platform Design
+===============
 
 The platform is designed around Users, Workspaces and Apps to make and
 publish digital resources.
