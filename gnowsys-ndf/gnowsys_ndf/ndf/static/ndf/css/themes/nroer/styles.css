@@ -29864,7 +29864,6 @@ ul.horizontal_tabs_gstudio > li.sub_group_action:hover ul {
 /* line 6595, ../../../scss/_app_styles.scss */
 .activity-slides-container .activity-slides {
   height: 100%;
-  color: #f8f8f8;
 }
 /* line 6600, ../../../scss/_app_styles.scss */
 .activity-slides-container .activity-slides .activity-slide {
@@ -31200,4 +31199,33 @@ ul.horizontal_tabs_gstudio > li.sub_group_action:hover ul {
 /* line 7948, ../../../scss/_app_styles.scss */
 .inner {
   display: inline-block !important;
+}
+
+/* line 7955, ../../../scss/_app_styles.scss */
+.quiz-player .quiz_qtn {
+  margin-left: 20px !important;
+  font-size: 20px;
+}
+/* line 7959, ../../../scss/_app_styles.scss */
+.quiz-player .question_edit {
+  margin-left: 20px !important;
+}
+/* line 7963, ../../../scss/_app_styles.scss */
+.quiz-player input[type=checkbox], .quiz-player input[type=radio] {
+  margin-right: 10px;
+  width: 15px;
+  height: 15px;
+}
+/* line 7969, ../../../scss/_app_styles.scss */
+.quiz-player .chk_ans_lbl, .quiz-player .rad_ans_lbl {
+  font-size: 22px;
+  margin-left: 5px;
+}
+/* line 7974, ../../../scss/_app_styles.scss */
+.quiz-player .fi-check {
+  color: green;
+}
+/* line 7978, ../../../scss/_app_styles.scss */
+.quiz-player .fi-x {
+  color: red;
 }
