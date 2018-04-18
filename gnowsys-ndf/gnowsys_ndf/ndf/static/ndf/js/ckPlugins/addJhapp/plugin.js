@@ -349,37 +349,37 @@ CKEDITOR.plugins.add('addJhapp',
 
                             $("#insert_rp_l2a1").click(function(event){
 
-                                tool_val = "<a href='/RatioPatterns/en/L2A1/' target='_blank'><img src='/static/ndf/images/rp_en.png' alt='Ratio Patterns Tool' height='1000px' width='1000px' >"
+                                tool_val = "<a href='/RatioPatterns/L2A1/' target='_blank'><img src='/static/ndf/images/rp_en.png' alt='Ratio Patterns Tool' height='1000px' width='1000px' >"
                             
                              CKEDITOR.instances[textAreaId].insertHtml(tool_val);
                             $('#group_imgs_on_modal').foundation('reveal', 'close');
                           });
                             $("#insert_rp_l2a2").click(function(event){
-                                tool_val = "<a href='/RatioPatterns/en/L2A2/' target='_blank'><img src='/static/ndf/images/rp_en.png' alt='Ratio Patterns Tool' height='1000px' width='1000px' >"
+                                tool_val = "<a href='/RatioPatterns/L2A2/' target='_blank'><img src='/static/ndf/images/rp_en.png' alt='Ratio Patterns Tool' height='1000px' width='1000px' >"
                             
                              CKEDITOR.instances[textAreaId].insertHtml(tool_val);
                             $('#group_imgs_on_modal').foundation('reveal', 'close');
                           });
                             $("#insert_rp_l2a3").click(function(event){
-                                tool_val = "<a href='/RatioPatterns/en/L2A3/' target='_blank'><img src='/static/ndf/images/rp_en.png' alt='Ratio Patterns Tool' height='1000px' width='1000px' >"
+                                tool_val = "<a href='/RatioPatterns/L2A3/' target='_blank'><img src='/static/ndf/images/rp_en.png' alt='Ratio Patterns Tool' height='1000px' width='1000px' >"
                             
                              CKEDITOR.instances[textAreaId].insertHtml(tool_val);
                             $('#group_imgs_on_modal').foundation('reveal', 'close');
                           });
                             $("#insert_rp_l2a4").click(function(event){
-                                tool_val = "<a href='/RatioPatterns/en/L2A4/' target='_blank'><img src='/static/ndf/images/rp_en.png' alt='Ratio Patterns Tool' height='1000px' width='1000px' >"
+                                tool_val = "<a href='/RatioPatterns/L2A4/' target='_blank'><img src='/static/ndf/images/rp_en.png' alt='Ratio Patterns Tool' height='1000px' width='1000px' >"
                             
                              CKEDITOR.instances[textAreaId].insertHtml(tool_val);
                             $('#group_imgs_on_modal').foundation('reveal', 'close');
                           });
                             $("#insert_rp_l2a5").click(function(event){
-                                tool_val = "<a href='/RatioPatterns/en/L2A5/' target='_blank'><img src='/static/ndf/images/rp_en.png' alt='Ratio Patterns Tool' height='1000px' width='1000px' >"
+                                tool_val = "<a href='/RatioPatterns/L2A5/' target='_blank'><img src='/static/ndf/images/rp_en.png' alt='Ratio Patterns Tool' height='1000px' width='1000px' >"
                             
                              CKEDITOR.instances[textAreaId].insertHtml(tool_val);
                             $('#group_imgs_on_modal').foundation('reveal', 'close');
                           });
                             $("#insert_rp_l2a6").click(function(event){
-                                tool_val6 = "<a href='/RatioPatterns/en/L2A6/' target='_blank'><img src='/static/ndf/images/rp_en.png' alt='Ratio Patterns Tool' height='1000px' width='1000px' >"
+                                tool_val6 = "<a href='/RatioPatterns/L2A6/' target='_blank'><img src='/static/ndf/images/rp_en.png' alt='Ratio Patterns Tool' height='1000px' width='1000px' >"
                             
                              CKEDITOR.instances[textAreaId].insertHtml(tool_val);
                             $('#group_imgs_on_modal').foundation('reveal', 'close');
@@ -812,7 +812,7 @@ CKEDITOR.plugins.add('addJhapp',
                           $("#insert_AGES_PUZZLE").click(function(event){
                             //ost_text_gallery = $('#paste-ost-gallery').val();
                             //ost_text_file = $('#paste-ost-captions').val();
-                            tool_val = "<iframe src='/ages_puzzle/en/' style='height:100vh;width:100%'></iframe>"
+                            tool_val = "<iframe src='/ages_puzzle' style='height:100vh;width:100%'></iframe>"
                             // split_word = ost_text_val.slice(0, 18) + "gallery=" + ost_text_gallery + "&amp;file=/ost/" + ost_text_file+"'"+ ost_text_val.slice(18);
                             // alert(split_word)
                              CKEDITOR.instances[textAreaId].insertHtml(tool_val);
@@ -822,7 +822,7 @@ CKEDITOR.plugins.add('addJhapp',
                           $("#insert_FACTORISATION_PUZZLE").click(function(event){
                             //ost_text_gallery = $('#paste-ost-gallery').val();
                             //ost_text_file = $('#paste-ost-captions').val();
-                            tool_val = "<iframe src='/factorisation/en/' style='height:100vh;width:100%'></iframe>"
+                            tool_val = "<iframe src='/factorisation' style='height:100vh;width:100%'></iframe>"
                             // split_word = ost_text_val.slice(0, 18) + "gallery=" + ost_text_gallery + "&amp;file=/ost/" + ost_text_file+"'"+ ost_text_val.slice(18);
                             // alert(split_word)
                              CKEDITOR.instances[textAreaId].insertHtml(tool_val);
@@ -831,7 +831,7 @@ CKEDITOR.plugins.add('addJhapp',
                           $("#insert_COINS_PUZZLE").click(function(event){
                             //ost_text_gallery = $('#paste-ost-gallery').val();
                             //ost_text_file = $('#paste-ost-captions').val();
-                            tool_val = "<iframe src='/coins_linear_eqn/en/' style='height:100vh;width:100%'></iframe>"
+                            tool_val = "<iframe src='/coins_linear_eqn' style='height:100vh;width:100%'></iframe>"
                             // split_word = ost_text_val.slice(0, 18) + "gallery=" + ost_text_gallery + "&amp;file=/ost/" + ost_text_file+"'"+ ost_text_val.slice(18);
                             // alert(split_word)
                              CKEDITOR.instances[textAreaId].insertHtml(tool_val);
