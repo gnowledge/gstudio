@@ -75,7 +75,7 @@
         </div>
 
       <div class="lesson-nav">
-
+<!-- 
         <div class="new_note header_text_block header_text_md_block">
             <a title="Click here to write a Note" {% if user_access_priv == "allow" %} target="_blank" href="{% url 'course_notebook' group_id %}?create=True" {% else %} class="user_not_enrolled" {% endif %}><i class="fa fa-edit header_icon"></i>&nbsp;
               {% if "announced_unit" in node.member_of_names_list or "drafts_unit" in node.member_of_names_list%}
@@ -86,7 +86,7 @@
                
             </a>
               
-        </div>
+        </div> -->
         <div class="new_note header_text_block  header_text_lg_block">
         	{% if "announced_unit" in node.member_of_names_list or "drafts_unit" in node.member_of_names_list%}
 	            <a {% if prev_lesson_id and lesson_act_prev_id and not resource_prev_id%} href="{% url 'activity_player_detail' group_id prev_lesson_id lesson_act_prev_id %}" title="Go to previous lesson"   {% else %} class = "disabled" title="You are on the first lesson"   {% endif %} ><i class="fa fa-angle-double-left header_icon"></i>&nbsp;

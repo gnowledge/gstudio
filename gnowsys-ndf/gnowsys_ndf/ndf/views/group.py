@@ -2065,6 +2065,7 @@ def group_dashboard(request, group_id=None):
     # Default landing_page template name should be defined in local_settings.py
     # which can be used for `alternate_template`
     alternate_template = None 
+    allow_to_join=[]
 
     selected = request.GET.get('selected','')
     group_obj = get_group_name_id(group_id, get_obj=True)
