@@ -58,7 +58,7 @@
         {% else %} 
         
         <a href="{% url url_name first_arg %}" class="view_unit">{% trans "View" %}</a>
-        {% if "base_unit" not in node.member_of_names_list %}
+        {% if "base_unit" not in node.member_of_names_list and node.agency_type != "Other" %}
         <div class="right">
             {% if not no_enroll and not is_gstaff %}
             {% if request.user.is_authenticated %}
