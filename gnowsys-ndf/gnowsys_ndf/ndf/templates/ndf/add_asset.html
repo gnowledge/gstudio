@@ -218,7 +218,7 @@
         <div class="row">
             <div class="asset-tags-container small-12 medium-10 large-10 columns">
                 <label>
-                {% if not title == "raw material" %}
+                {% if not title == "raw material" and 'Author' not in group_object_member_of_names_list %}
                 <input type="checkbox" name="is_raw_material" class="is_raw_material" {% if "raw@material" in asset_obj.tags %} checked="checked" {% endif %}> {% trans "Mark as Resource" %}
 
                 </label>
