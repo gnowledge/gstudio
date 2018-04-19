@@ -70,21 +70,15 @@
 		</div>
 {% endif %}
 
-
-
 {# {% include 'ndf/card_group.html' with node=node groupid=node.pk %} #}
-
 
 <!-- Existing card list-->
 </div>	
-
-
 
 <ul class="small-block-grid-1 medium-block-grid-2 large-block-grid-4" >
 <!-- Existing card list-->
 	{% for each_node in units_under_module %}
 		<li class="card-image-wrapper">
-		{{each_node.name}}
 		{% if each_node.name in PARTNER_LIST %}
 			{% include 'ndf/card_group.html' with node=each_node has_prof_pic=True url_name='e-library' first_arg='home' second_arg='' search_url_text='filter?selfilters=[{"or":[{"selFieldValue":"source","selFieldValueAltnames":"source","selFieldGstudioType":"attribute","selFieldText":"'|add:each_node.name|add:'","selFieldPrimaryType":"basestring"}]}]' %}
 		{% else %}
