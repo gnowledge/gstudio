@@ -20,7 +20,7 @@
 <script src="/static/ndf/bower_components/html2canvas/build/html2canvas.js"></script>
 <script src="/static/ndf/bower_components/pdfmake/build/vfs_fonts.js"></script>
 {% check_is_gstaff group_id request.user as gstaff_access %}
-<a class=" download-progress-report-{{group_id|slugify}}-{{request.user.pk}}" style="padding-left: 38px"><i class="fi-archive"></i> Download </a><br/>
+<a class="download-report download-progress-report-{{group_id|slugify}}-{{request.user.pk}}" ><i class="fi-archive"></i> Download </a><br/>
 <div class="user-analytics-data" id="user-pr-report-{{group_id|slugify}}-{{request.user.pk}}">
   <div class="pre-analytics-msg-div text-center hide">
      {% trans "Your analytics is loading. Please wait." %} 

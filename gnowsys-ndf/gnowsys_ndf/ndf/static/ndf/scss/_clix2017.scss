@@ -6786,21 +6786,16 @@ input.transcript-toggler{
 
 }
 
-
 .exp-module-container{
     margin-left: 60px;
 }
 
-.fill-green-circle{
-    padding: 6px 6px;
-    border-radius: 100%;
-    background-color: green;
+.green{
+    color: green;
 }
 
-.fill-orange-circle{
-    padding: 6px 6px;
-    border-radius: 100%;
-    background-color: orange;
+.orange{
+    color: orange;
 }
 
 [class*="img-banner-card-"]{
@@ -6934,4 +6929,11 @@ input.transcript-toggler{
 
 .font-plus{
 font-size:100%; color: #713558;
+}
+
+.download-report{
+    padding-right: 38px;
+    font-size: 20px;
+    float: right;
+    margin-top: 5px;
 }

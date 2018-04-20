@@ -372,3 +372,395 @@ body>footer {
         }
     }
 }
+
+.notebook {
+  .notebook-header {
+    // border-color: black;
+    // border-style: solid;
+    // border-width: 1px 0px;
+    // padding-top: 1em;
+
+    a, input {
+      margin: 0px;
+    }
+    .notes-count {
+      text-align: center;
+
+      span
+        {
+          &:first-child {
+            // //font-size: 21px;
+            font-weight: 600;
+            padding: 15px;
+          }
+          &:last-child {
+            background: lightgrey;
+            padding: 2px 5px;
+            vertical-align: text-bottom;
+          }
+
+        }
+    }
+
+  }
+  .notebook-body {
+    padding: 0px 0px;
+    .note-cards {
+      .row {
+        margin: 30px 0px;
+      }
+      .note-card, .note-details {
+        border: 1px solid #ccc;
+        padding: 10px 15px;
+        box-shadow: 0px 0px 5px rgba(0, 0, 0, 0.5);
+        border-radius: 5px;
+        line-height: 23px;
+        cursor: pointer;
+        position: relative;
+
+        .note-heading{
+          font-weight: 800;
+          // //font-size: 20px;
+        }
+        .note-close {
+            position: absolute;
+            right: 7px;
+            top: 3px;
+            // //font-size: 25px;
+            font-weight: 700;
+            color: #929292;
+        }
+        .note-summary{
+          margin: 15px 0px;
+        }
+        .note-info,.note-extra-data{
+          color: #989898;
+          // //font-size: 13px;
+          letter-spacing: 0.9px;
+          font-weight: 500;
+
+          >span{
+            margin-right: 5px;
+          }
+        }
+        .note-tags {
+            >span {
+              display: inline-block;
+              margin: 10px;
+              background: #ffebb2;
+              color: #cba552;
+              padding: 2px 5px;
+            }
+        }
+        .note-actions {
+          color: #989898;
+          cursor: pointer;
+
+          span {
+            margin-right: 10px 5px;
+          }
+        }
+      }
+      .note-details {
+          .note-info, .note-extra-data, .note-tags, .note-actions {
+              display: inline-block;
+              margin-right: 10px;
+          }
+          .note-extra-data {
+
+          }
+          .note-tags {
+              float: right;
+              >span {
+                margin: 0px;
+              }
+          }
+          .note-actions {
+          }
+      }
+    }
+
+    >div {
+      padding: 0px;
+      //height: 50em;
+      //overflow: scroll;
+    }
+
+    .notebook-index {
+      border-right: 1px solid #AFAEAE;
+      padding: 4px 0px;
+      background-color: #F1F1F1;
+
+      .tabs-content {
+        padding: 0px;
+
+        .active {
+          padding: 0px;
+        }
+      }
+      .tabs {
+        width: 100%;
+        margin:0em 0em 0.5em;
+        border-bottom: 1px solid #CCC;
+
+        .tab-title {
+          width: 50%;
+          /*background-color: #DEDEDE;*/
+          border-radius: 5px 5px 0px 0px ;
+          position: relative;
+          top: 1px;
+
+          a {
+            border-radius: inherit;
+            // //font-size: 0.9rem;
+            text-align: center;
+            color: #989898;
+          }
+
+          &.active {
+            background-color: #fff;
+            border: 1px solid #CCC;
+            border-bottom: 0px;
+            a {
+              color: rgb(58, 49, 105);
+            }
+          }
+        }
+      }
+
+      .tab-content {
+        padding: 0px;
+      }
+
+      .notes {
+
+        .date {
+          // //font-size: 12px;
+          font-weight: bold;
+          background: #EFEFEF;
+          padding: 7px 10px;
+
+          .note-count {
+            // //font-size: 11px;
+            line-height: 2em;
+          }
+        }
+        >div {
+          border-bottom: 1px solid #AFAEAE;
+        }
+        .note {
+          padding: 5px 15px;
+          background: #FFF;
+          cursor: pointer;
+          color: #000;
+
+          &:hover:not(.active){
+              border-left: 5px solid rgba(111, 8, 89, 0.24);
+              background: rgba(111, 8, 89, 0.11);
+              font-weight: 800;
+              color: #000;
+          }
+
+          .note-heading {
+            font-weight: 400;
+            // //font-size: 17px;
+          }
+
+          .note-meta {
+            font-size: 14px;
+            /*
+            >span:not(:first-child) {
+              // //font-size: 11px;
+              font-weight: 600;
+              color: #717171;
+            }
+            */
+          }
+
+          .note-footer {
+            color: #888888;
+
+            span {
+              margin-right:10px;
+            }
+          }
+
+          &.active {
+            border-left: 5px solid #713557;
+            background: rgba(111, 8, 89, 0.24);
+            font-weight: 800;
+            color: #000;
+
+            .note-heading {
+              font-weight: 600;
+              // //font-size: 17px;
+            }
+            /*
+            .note-meta>span:not(:first-child) {
+              color: #6153AE;
+            }
+            */
+          }
+        }
+      }
+    }
+
+    .note-page {
+      // display: none;
+      //color: #000000;
+      margin-left: 15px;
+      background-color: #fff;
+      //padding-bottom: 30px;
+      .group_sections_content{
+        margin-top:5px;
+      }
+
+      >div{
+        background-color: #fff;
+      }
+
+      .note-toolbar {
+        padding: 1.8em 1.2em 0em;
+        margin: 0em;
+        background-color: #FFF;
+
+        .note-creator {
+          font-weight:bold;
+        }
+        .creator-title {
+            text-align: left;
+            color: #000;
+            letter-spacing: 0.3px;
+            margin-top: 5px;
+            margin-left: 14px;
+            font-size: 14px;
+          }
+        .creator-rating {
+          text-align: right;
+          >div {
+            display: inline-block;
+          }
+        }
+      }
+      .note-title {
+        // //font-size: 2.3em;
+        font-size: 20px;
+        font-weight: 500;
+        margin-right: 1em;
+      }
+      .note-content {
+        padding: 2em 2em 1em;
+        background: #fff;
+        margin: 0em;
+        .note-header {
+
+          >div {
+            display: inline-block;
+          }
+
+        }
+        .note-text {
+          // //font-size: 19px;
+          letter-spacing: 0.7px;
+          p{
+            padding: 0px;
+          }
+        }
+      }
+
+      .comment-sections {
+        padding: 0em 1em 0em;
+
+        .comments-header {
+          span {
+            font-weight: bold;
+          }
+          i:not(:first-child) {
+            margin-left: 15px;
+          }
+        }
+
+        .new-comment {
+          border-top: 1px solid grey;
+          padding: 15px 10px;
+          margin-top: 5px;
+
+          .trumbowyg-box,
+          .trumbowyg-editor {
+            min-height: 200px;
+            margin-top: 0px;
+          }
+
+          .user-prof-image {
+            // //font-size: 90px;
+            line-height: 0em;
+          }
+        }
+      }
+    }
+  }
+}
+
+.add-note-btn{
+    padding: 0px 5px;
+    border-radius: 5px;
+    float: right;
+    margin: 5px 5px 10px 0px;
+    border: 1px solid #713557;
+    background: #fff;
+    font-size: 18px;
+    color: #713557;
+    &:hover {
+        background-color: #713557;
+        border-color: #713557;
+        color: #fff;
+    }
+}
+
+.edit-note-btn{
+    float: right;
+    margin-left: 10px;
+    width: 65px;
+    padding: 0px 5px;
+    border-radius: 5px;
+    float: right;
+    border: 1px solid #713557;
+    background: #fff;
+    font-size: 18px;
+    color: #713557;
+    &:hover {
+        background-color: #713557;
+        border-color: #713557;
+        color: #fff;
+    }
+    i{
+        margin-right: 5px;
+    }
+}
+.delete-note-btn{
+    float: right;
+    width: 85px;
+    padding: 0px 5px;
+    border-radius: 5px;
+    float: right;
+    border: 1px solid #713557;
+    background: #fff;
+    font-size: 18px;
+    color: #713557;
+    &:hover {
+        background-color: #713557;
+        border-color: #713557;
+        color: #fff;
+    }
+    i{
+        margin-right: 5px;
+    }
+}
+
+
+.download-report{
+    padding-right: 38px;
+    font-size: 20px;
+    float: right;
+    margin-top: 5px;
+}
