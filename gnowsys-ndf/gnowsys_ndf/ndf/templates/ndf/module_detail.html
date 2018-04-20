@@ -17,15 +17,17 @@
 	</div>
 
 		<div class="small-10 columns title-strip strip">
-			<div class="small-11 columns">
+			<div class="small-10 columns">
 				<h7 class="text-button-blue"><i>{% trans "Module Name: " %}</i></h7><strong> {{node.name}} </strong><br/>
 				<h7 class="text-button-blue"><i>{% trans "Module Description: " %}</i></h7> {{node.content|default:'No description added yet.'|safe}}
 			</div>
-			<div class="small-1 columns" style="margin-top:25px;">
-		         <div class="right course_actions">
+            <div class="small-2 columns">
+
+		         <div class="right">
           		{% if is_gstaff   %}
-		            <span data-dropdown="course-settings-drop" aria-controls="course-settings-drop" aria-expanded="false" class="tiny radius right" style="margin-top: -25px;position:absolute;margin-left:-50px;" data-options="align:left">
-		                  <i class="icon-widget fi-widget"></i>
+
+		            <span data-dropdown="course-settings-drop" aria-controls="course-settings-drop" aria-expanded="false" class="orange-button right" data-options="align:left">
+	                    {% trans "Actions" %} <i class="fa fa-chevron-down"></i>
 		            </span>
 		            <ul id="course-settings-drop" class="f-dropdown" data-dropdown-content aria-hidden="true" tabindex="-1" >
 		                <li>

@@ -53,10 +53,9 @@ class Command(BaseCommand):
                 # user_id, school_code, username, password, oid
                 users = csv.reader(csvfile, delimiter=',')
 
+                for index, (user_id, school_code, username, password, oid) in enumerate(users, 1):
 
-                for i, (user_id, school_code, username, password, oid) in enumerate(users):
-
-                    print "\n\n[ %s / 1050 ]"%i
+                    print "\n\n %s. "%index,
                     user_id = int(user_id)
                     set_icon = True
                     if User.objects.filter(id=user_id):
