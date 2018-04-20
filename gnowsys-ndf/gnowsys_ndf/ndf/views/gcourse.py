@@ -2895,6 +2895,8 @@ def course_analytics(request, group_id, user_id, render_template=False, get_resu
     group_id    = group_obj._id
     group_name  = group_obj.name
     group_obj_member_of_names_list = group_obj.member_of_names_list
+    if "CourseEventGroup" in group_obj_member_of_names_list:
+        template = "ndf/gcourse_event_group.html"
 
     if data_points_dict and not isinstance(data_points_dict, dict):
         data_points_dict = json.loads(data_points_dict)
@@ -3187,7 +3189,10 @@ def course_analytics_admin(request, group_id):
     group_name  = group_obj.name
     thread_node = None
     banner_pic_obj,old_profile_pics = _get_current_and_old_display_pics(group_obj)
-    
+    template = "ndf/lms.html"
+
+    if "CourseEventGroup" in group_obj.member_of_names_list:
+        template = "ndf/gcourse_event_group.html"
 
     allow_to_join = get_group_join_status(group_obj)
     context_variables = {
@@ -3279,7 +3284,7 @@ def course_analytics_admin(request, group_id):
     context_variables["response_dict"] = json.dumps(response_dict)
     cache.set(cache_key, response_dict, 60*10)
     # print "\n admin_analytics_data_list === ",admin_analytics_data_list
-    return render_to_response("ndf/lms.html",
+    return render_to_response(template,
                                 context_variables,
                                 context_instance = RequestContext(request)
     )
