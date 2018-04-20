@@ -1,5 +1,5 @@
-gStudio Cookie
-==============
+Cookies
+=======
 
 **This document describes how gStudio creates/uses cookies**
 
