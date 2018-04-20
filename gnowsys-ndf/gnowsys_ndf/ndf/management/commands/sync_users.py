@@ -55,7 +55,7 @@ class Command(BaseCommand):
 
                 for index, (user_id, school_code, username, password, oid) in enumerate(users, 1):
 
-                    print "\n\n %s. "%index,
+                    print "\n\n[", index, "]. User: ",username
                     user_id = int(user_id)
                     set_icon = True
                     if User.objects.filter(id=user_id):
