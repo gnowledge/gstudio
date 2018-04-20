@@ -60,3 +60,4 @@ announced_unit,[],"[""factory_types""]","[""educationalsubject"", ""educationall
 trans_node,[],"[""factory_types""]","[""options""]",[],[]
 base_survey,[],"[""factory_types""]",[],[],[]
 announced_survey,[],"[""factory_types""]","[""start_time"", ""end_time"", ""start_enroll"", ""end_enroll""]",[],[]
+interactive_page,"[""Page""]","[""factory_types""]",[],[],[]
