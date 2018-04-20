@@ -31418,3 +31418,381 @@ body > footer {
 .login-page .login-page-form .register-user span {
   color: #A0148E;
 }
+
+/* line 383, ../../../scss/_clix_styles.scss */
+.notebook .notebook-header a, .notebook .notebook-header input {
+  margin: 0px;
+}
+/* line 386, ../../../scss/_clix_styles.scss */
+.notebook .notebook-header .notes-count {
+  text-align: center;
+}
+/* line 391, ../../../scss/_clix_styles.scss */
+.notebook .notebook-header .notes-count span:first-child {
+  font-weight: 600;
+  padding: 15px;
+}
+/* line 396, ../../../scss/_clix_styles.scss */
+.notebook .notebook-header .notes-count span:last-child {
+  background: lightgrey;
+  padding: 2px 5px;
+  vertical-align: text-bottom;
+}
+/* line 406, ../../../scss/_clix_styles.scss */
+.notebook .notebook-body {
+  padding: 0px 0px;
+}
+/* line 409, ../../../scss/_clix_styles.scss */
+.notebook .notebook-body .note-cards .row {
+  margin: 30px 0px;
+}
+/* line 412, ../../../scss/_clix_styles.scss */
+.notebook .notebook-body .note-cards .note-card, .notebook .notebook-body .note-cards .note-details {
+  border: 1px solid #ccc;
+  padding: 10px 15px;
+  box-shadow: 0px 0px 5px rgba(0, 0, 0, 0.5);
+  border-radius: 5px;
+  line-height: 23px;
+  cursor: pointer;
+  position: relative;
+}
+/* line 421, ../../../scss/_clix_styles.scss */
+.notebook .notebook-body .note-cards .note-card .note-heading, .notebook .notebook-body .note-cards .note-details .note-heading {
+  font-weight: 800;
+}
+/* line 425, ../../../scss/_clix_styles.scss */
+.notebook .notebook-body .note-cards .note-card .note-close, .notebook .notebook-body .note-cards .note-details .note-close {
+  position: absolute;
+  right: 7px;
+  top: 3px;
+  font-weight: 700;
+  color: #929292;
+}
+/* line 433, ../../../scss/_clix_styles.scss */
+.notebook .notebook-body .note-cards .note-card .note-summary, .notebook .notebook-body .note-cards .note-details .note-summary {
+  margin: 15px 0px;
+}
+/* line 436, ../../../scss/_clix_styles.scss */
+.notebook .notebook-body .note-cards .note-card .note-info, .notebook .notebook-body .note-cards .note-card .note-extra-data, .notebook .notebook-body .note-cards .note-details .note-info, .notebook .notebook-body .note-cards .note-details .note-extra-data {
+  color: #989898;
+  letter-spacing: 0.9px;
+  font-weight: 500;
+}
+/* line 442, ../../../scss/_clix_styles.scss */
+.notebook .notebook-body .note-cards .note-card .note-info > span, .notebook .notebook-body .note-cards .note-card .note-extra-data > span, .notebook .notebook-body .note-cards .note-details .note-info > span, .notebook .notebook-body .note-cards .note-details .note-extra-data > span {
+  margin-right: 5px;
+}
+/* line 447, ../../../scss/_clix_styles.scss */
+.notebook .notebook-body .note-cards .note-card .note-tags > span, .notebook .notebook-body .note-cards .note-details .note-tags > span {
+  display: inline-block;
+  margin: 10px;
+  background: #ffebb2;
+  color: #cba552;
+  padding: 2px 5px;
+}
+/* line 455, ../../../scss/_clix_styles.scss */
+.notebook .notebook-body .note-cards .note-card .note-actions, .notebook .notebook-body .note-cards .note-details .note-actions {
+  color: #989898;
+  cursor: pointer;
+}
+/* line 459, ../../../scss/_clix_styles.scss */
+.notebook .notebook-body .note-cards .note-card .note-actions span, .notebook .notebook-body .note-cards .note-details .note-actions span {
+  margin-right: 10px 5px;
+}
+/* line 465, ../../../scss/_clix_styles.scss */
+.notebook .notebook-body .note-cards .note-details .note-info, .notebook .notebook-body .note-cards .note-details .note-extra-data, .notebook .notebook-body .note-cards .note-details .note-tags, .notebook .notebook-body .note-cards .note-details .note-actions {
+  display: inline-block;
+  margin-right: 10px;
+}
+/* line 472, ../../../scss/_clix_styles.scss */
+.notebook .notebook-body .note-cards .note-details .note-tags {
+  float: right;
+}
+/* line 474, ../../../scss/_clix_styles.scss */
+.notebook .notebook-body .note-cards .note-details .note-tags > span {
+  margin: 0px;
+}
+/* line 483, ../../../scss/_clix_styles.scss */
+.notebook .notebook-body > div {
+  padding: 0px;
+}
+/* line 489, ../../../scss/_clix_styles.scss */
+.notebook .notebook-body .notebook-index {
+  border-right: 1px solid #AFAEAE;
+  padding: 4px 0px;
+  background-color: #F1F1F1;
+}
+/* line 494, ../../../scss/_clix_styles.scss */
+.notebook .notebook-body .notebook-index .tabs-content {
+  padding: 0px;
+}
+/* line 497, ../../../scss/_clix_styles.scss */
+.notebook .notebook-body .notebook-index .tabs-content .active {
+  padding: 0px;
+}
+/* line 501, ../../../scss/_clix_styles.scss */
+.notebook .notebook-body .notebook-index .tabs {
+  width: 100%;
+  margin: 0em 0em 0.5em;
+  border-bottom: 1px solid #CCC;
+}
+/* line 506, ../../../scss/_clix_styles.scss */
+.notebook .notebook-body .notebook-index .tabs .tab-title {
+  width: 50%;
+  /*background-color: #DEDEDE;*/
+  border-radius: 5px 5px 0px 0px;
+  position: relative;
+  top: 1px;
+}
+/* line 513, ../../../scss/_clix_styles.scss */
+.notebook .notebook-body .notebook-index .tabs .tab-title a {
+  border-radius: inherit;
+  text-align: center;
+  color: #989898;
+}
+/* line 520, ../../../scss/_clix_styles.scss */
+.notebook .notebook-body .notebook-index .tabs .tab-title.active {
+  background-color: #fff;
+  border: 1px solid #CCC;
+  border-bottom: 0px;
+}
+/* line 524, ../../../scss/_clix_styles.scss */
+.notebook .notebook-body .notebook-index .tabs .tab-title.active a {
+  color: #3a3169;
+}
+/* line 531, ../../../scss/_clix_styles.scss */
+.notebook .notebook-body .notebook-index .tab-content {
+  padding: 0px;
+}
+/* line 537, ../../../scss/_clix_styles.scss */
+.notebook .notebook-body .notebook-index .notes .date {
+  font-weight: bold;
+  background: #EFEFEF;
+  padding: 7px 10px;
+}
+/* line 543, ../../../scss/_clix_styles.scss */
+.notebook .notebook-body .notebook-index .notes .date .note-count {
+  line-height: 2em;
+}
+/* line 548, ../../../scss/_clix_styles.scss */
+.notebook .notebook-body .notebook-index .notes > div {
+  border-bottom: 1px solid #AFAEAE;
+}
+/* line 551, ../../../scss/_clix_styles.scss */
+.notebook .notebook-body .notebook-index .notes .note {
+  padding: 5px 15px;
+  background: #FFF;
+  cursor: pointer;
+  color: #000;
+}
+/* line 557, ../../../scss/_clix_styles.scss */
+.notebook .notebook-body .notebook-index .notes .note:hover:not(.active) {
+  border-left: 5px solid rgba(111, 8, 89, 0.24);
+  background: rgba(111, 8, 89, 0.11);
+  font-weight: 800;
+  color: #000;
+}
+/* line 564, ../../../scss/_clix_styles.scss */
+.notebook .notebook-body .notebook-index .notes .note .note-heading {
+  font-weight: 400;
+}
+/* line 569, ../../../scss/_clix_styles.scss */
+.notebook .notebook-body .notebook-index .notes .note .note-meta {
+  font-size: 14px;
+  /*
+  >span:not(:first-child) {
+    // //font-size: 11px;
+    font-weight: 600;
+    color: #717171;
+  }
+  */
+}
+/* line 580, ../../../scss/_clix_styles.scss */
+.notebook .notebook-body .notebook-index .notes .note .note-footer {
+  color: #888888;
+}
+/* line 583, ../../../scss/_clix_styles.scss */
+.notebook .notebook-body .notebook-index .notes .note .note-footer span {
+  margin-right: 10px;
+}
+/* line 588, ../../../scss/_clix_styles.scss */
+.notebook .notebook-body .notebook-index .notes .note.active {
+  border-left: 5px solid #713557;
+  background: rgba(111, 8, 89, 0.24);
+  font-weight: 800;
+  color: #000;
+  /*
+  .note-meta>span:not(:first-child) {
+    color: #6153AE;
+  }
+  */
+}
+/* line 594, ../../../scss/_clix_styles.scss */
+.notebook .notebook-body .notebook-index .notes .note.active .note-heading {
+  font-weight: 600;
+}
+/* line 608, ../../../scss/_clix_styles.scss */
+.notebook .notebook-body .note-page {
+  margin-left: 15px;
+  background-color: #fff;
+}
+/* line 614, ../../../scss/_clix_styles.scss */
+.notebook .notebook-body .note-page .group_sections_content {
+  margin-top: 5px;
+}
+/* line 618, ../../../scss/_clix_styles.scss */
+.notebook .notebook-body .note-page > div {
+  background-color: #fff;
+}
+/* line 622, ../../../scss/_clix_styles.scss */
+.notebook .notebook-body .note-page .note-toolbar {
+  padding: 1.8em 1.2em 0em;
+  margin: 0em;
+  background-color: #FFF;
+}
+/* line 627, ../../../scss/_clix_styles.scss */
+.notebook .notebook-body .note-page .note-toolbar .note-creator {
+  font-weight: bold;
+}
+/* line 630, ../../../scss/_clix_styles.scss */
+.notebook .notebook-body .note-page .note-toolbar .creator-title {
+  text-align: left;
+  color: #000;
+  letter-spacing: 0.3px;
+  margin-top: 5px;
+  margin-left: 14px;
+  font-size: 14px;
+}
+/* line 638, ../../../scss/_clix_styles.scss */
+.notebook .notebook-body .note-page .note-toolbar .creator-rating {
+  text-align: right;
+}
+/* line 640, ../../../scss/_clix_styles.scss */
+.notebook .notebook-body .note-page .note-toolbar .creator-rating > div {
+  display: inline-block;
+}
+/* line 645, ../../../scss/_clix_styles.scss */
+.notebook .notebook-body .note-page .note-title {
+  font-size: 20px;
+  font-weight: 500;
+  margin-right: 1em;
+}
+/* line 651, ../../../scss/_clix_styles.scss */
+.notebook .notebook-body .note-page .note-content {
+  padding: 2em 2em 1em;
+  background: #fff;
+  margin: 0em;
+}
+/* line 657, ../../../scss/_clix_styles.scss */
+.notebook .notebook-body .note-page .note-content .note-header > div {
+  display: inline-block;
+}
+/* line 662, ../../../scss/_clix_styles.scss */
+.notebook .notebook-body .note-page .note-content .note-text {
+  letter-spacing: 0.7px;
+}
+/* line 665, ../../../scss/_clix_styles.scss */
+.notebook .notebook-body .note-page .note-content .note-text p {
+  padding: 0px;
+}
+/* line 671, ../../../scss/_clix_styles.scss */
+.notebook .notebook-body .note-page .comment-sections {
+  padding: 0em 1em 0em;
+}
+/* line 675, ../../../scss/_clix_styles.scss */
+.notebook .notebook-body .note-page .comment-sections .comments-header span {
+  font-weight: bold;
+}
+/* line 678, ../../../scss/_clix_styles.scss */
+.notebook .notebook-body .note-page .comment-sections .comments-header i:not(:first-child) {
+  margin-left: 15px;
+}
+/* line 683, ../../../scss/_clix_styles.scss */
+.notebook .notebook-body .note-page .comment-sections .new-comment {
+  border-top: 1px solid grey;
+  padding: 15px 10px;
+  margin-top: 5px;
+}
+/* line 688, ../../../scss/_clix_styles.scss */
+.notebook .notebook-body .note-page .comment-sections .new-comment .trumbowyg-box,
+.notebook .notebook-body .note-page .comment-sections .new-comment .trumbowyg-editor {
+  min-height: 200px;
+  margin-top: 0px;
+}
+/* line 694, ../../../scss/_clix_styles.scss */
+.notebook .notebook-body .note-page .comment-sections .new-comment .user-prof-image {
+  line-height: 0em;
+}
+
+/* line 704, ../../../scss/_clix_styles.scss */
+.add-note-btn {
+  padding: 0px 5px;
+  border-radius: 5px;
+  float: right;
+  margin: 5px 5px 10px 0px;
+  border: 1px solid #713557;
+  background: #fff;
+  font-size: 18px;
+  color: #713557;
+}
+/* line 713, ../../../scss/_clix_styles.scss */
+.add-note-btn:hover {
+  background-color: #713557;
+  border-color: #713557;
+  color: #fff;
+}
+
+/* line 720, ../../../scss/_clix_styles.scss */
+.edit-note-btn {
+  float: right;
+  margin-left: 10px;
+  width: 65px;
+  padding: 0px 5px;
+  border-radius: 5px;
+  float: right;
+  border: 1px solid #713557;
+  background: #fff;
+  font-size: 18px;
+  color: #713557;
+}
+/* line 731, ../../../scss/_clix_styles.scss */
+.edit-note-btn:hover {
+  background-color: #713557;
+  border-color: #713557;
+  color: #fff;
+}
+/* line 736, ../../../scss/_clix_styles.scss */
+.edit-note-btn i {
+  margin-right: 5px;
+}
+
+/* line 740, ../../../scss/_clix_styles.scss */
+.delete-note-btn {
+  float: right;
+  width: 85px;
+  padding: 0px 5px;
+  border-radius: 5px;
+  float: right;
+  border: 1px solid #713557;
+  background: #fff;
+  font-size: 18px;
+  color: #713557;
+}
+/* line 750, ../../../scss/_clix_styles.scss */
+.delete-note-btn:hover {
+  background-color: #713557;
+  border-color: #713557;
+  color: #fff;
+}
+/* line 755, ../../../scss/_clix_styles.scss */
+.delete-note-btn i {
+  margin-right: 5px;
+}
+
+/* line 761, ../../../scss/_clix_styles.scss */
+.download-report {
+  padding-right: 38px;
+  font-size: 20px;
+  float: right;
+  margin-top: 5px;
+}
