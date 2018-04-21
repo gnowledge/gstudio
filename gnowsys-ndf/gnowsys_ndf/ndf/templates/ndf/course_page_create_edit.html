@@ -72,6 +72,14 @@
                             </div>
                         {% endif %}
                     </div>
+                    {% if site.SITE_NAME == 'NROER' %}
+                    <div class="row">
+                        <div class="small-3 columns">
+                            <input type="checkbox" name="h5p_page" ><label class="mid_label inner">{% trans " Mark as H5P Page " %}</label>
+                        </div>
+                    </div>
+                    {% endif %}
+
                 </div>
                 <input type="hidden" name="node_id" class="form_node_id" value="{{activity_node.pk}}">
                 <input type="hidden" name="page_type" class="form_node_id" value="{{page_type}}">
