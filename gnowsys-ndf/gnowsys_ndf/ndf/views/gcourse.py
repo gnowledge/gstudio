@@ -59,8 +59,7 @@ file_gst_name, file_gst_id = GSystemType.get_gst_name_id("File")
 # gst_page = node_collection.one({'_type': "GSystemType", 'name': u"Page"})
 page_gst_name, page_gst_id = GSystemType.get_gst_name_id("Page")
 blog_page_gst_name, blog_page_gst_id = GSystemType.get_gst_name_id('Blog page')
-
-
+interactive_page_gst_name, interactive_page_gst_id = GSystemType.get_gst_name_id('interactive_page')
 app = GST_COURSE
 
 
@@ -4089,7 +4088,7 @@ def course_pages(request, group_id, page_id=None,page_no=1):
     else:
         activity_gst_name, activity_gst_id = GSystemType.get_gst_name_id("activity")
         all_pages = node_collection.find({'member_of':
-                    {'$in': [page_gst_id, activity_gst_id] }, 'group_set': group_id,
+                    {'$in': [page_gst_id, activity_gst_id,interactive_page_gst_id] }, 'group_set': group_id,
                     'type_of': {'$ne': [blog_page_gst_id]}
                     # 'content': {'$regex': 'clix-activity-styles.css', '$options': 'i'}
                     }).sort('last_update',-1)
@@ -4135,10 +4134,15 @@ def save_course_page(request, group_id):
             if is_info_page == "Info":
                 info_page_gst_name, info_page_gst_id = GSystemType.get_gst_name_id('Info page')
                 page_obj.type_of = [info_page_gst_id]
-
         if activity_lang:
             language = get_language_tuple(activity_lang)
             page_obj.language = language
+        is_h5p_page = request.POST.get("h5p_page",None)
+        if is_h5p_page:
+            page_obj.member_of = [interactive_page_gst_id]
+        elif interactive_page_gst_id in page_obj.member_of:
+            page_obj.member_of = [page_gst_id]
+
         if 'admin_info_page' in request.POST:
             admin_info_page = request.POST['admin_info_page']
             if admin_info_page:
@@ -4530,10 +4534,11 @@ def update_assessment_analytics_for_buddies(offeredId, user_ids, logged_in_user_
 
 def get_lang_node(node_id,lang):
     rel_value = get_relation_value(ObjectId(node_id),"translation_of")
-    for each in rel_value['grel_node']:
-        if each.language[0] ==  get_language_tuple(lang)[0]:
-            trans_node = each
-            return trans_node
+    if 'grel_node' in rel_value:
+        for each in rel_value['grel_node']:
+            if each.language[0] ==  get_language_tuple(lang)[0]:
+                trans_node = each
+                return trans_node
 
 def get_trans_node_list(node_list,lang):
     trans_node_list = []
@@ -4545,7 +4550,8 @@ def get_trans_node_list(node_list,lang):
         else:
             node = node_collection.one({"_id":ObjectId(each)})
             # trans_node_list.append({ObjectId(node._id): {"name":(node.altnames or node.name),"basenodeid":ObjectId(node._id)}})
-            trans_node_list.append({ObjectId(node._id): {"name": node.name,"altnames": node.altnames, "basenodeid":ObjectId(node._id)}})
+            if node:
+                trans_node_list.append({ObjectId(node._id): {"name": node.name,"altnames": node.altnames, "basenodeid":ObjectId(node._id)}})
     if trans_node_list:
         return trans_node_list
 
