@@ -6739,3 +6739,19 @@ input.transcript-toggler {
   float: right;
   margin-top: 5px;
 }
+
+/* line 6941, ../../../scss/_clix2017.scss */
+.unit_under_mod_lbl {
+  position: relative;
+  color: #6f0859;
+  font-weight: 500;
+  font-size: 21px;
+  letter-spacing: 0.6px;
+  border-bottom: 2px solid #713558;
+  margin-top: 1em;
+  margin-bottom: 1em;
+}
+/* line 6950, ../../../scss/_clix2017.scss */
+.unit_under_mod_lbl a {
+  color: #713558;
+}

@@ -6937,3 +6937,17 @@ font-size:100%; color: #713558;
     float: right;
     margin-top: 5px;
 }
+
+.unit_under_mod_lbl{
+    position: relative;
+    color: #6f0859;
+    font-weight: 500;
+    font-size: 21px;
+    letter-spacing: 0.6px;
+    border-bottom: 2px solid #713558;
+    margin-top: 1em;
+    margin-bottom: 1em;
+    a {
+        color: $ah_2_icon_color;
+    }
+}
