@@ -43,8 +43,27 @@ def program_event_list(request, group_id):
 
     # program events
     title = "Events"
+    # pe_coll is cursor of mod groups
+    query = {
+            'member_of': pe_gst._id,
+            '$or':[
+                {'access_policy': u'PUBLIC'},
+                {
+                    '$and': [
+                        {'access_policy': u"PRIVATE"},
+                        {'$or': [
+                          {'created_by': request.user.id},
+                          {'group_admin': request.user.id},
+                          {'author_set': request.user.id},
+                        ]}
+                    ]
+                }
+            ]
+        }
 
-    pe_coll = node_collection.find({'member_of': pe_gst._id}).sort('last_update', -1)
+    query.update({'moderation_level': {'$ne': -1}})
+    pe_coll = node_collection.find(query).sort('last_update', -1)
+
     for each_pe in pe_coll:
         list_of_hierarchy = get_prior_node_hierarchy(each_pe._id)
         if list_of_hierarchy:
@@ -52,6 +71,13 @@ def program_event_list(request, group_id):
         if pe_obj not in list_of_pe and pe_obj._id in group_obj.post_node:
             list_of_pe.append(pe_obj)
     # print "\n\n list_of_pe",list_of_pe
+
+    query.update({'moderation_level': {'$eq': -1}})
+    pe_no_mod_coll = node_collection.find(query).sort('last_update', -1)
+
+    for each_no_mod_pe in pe_no_mod_coll:
+        list_of_pe.append(each_no_mod_pe)
+    '''
     gstaff_access = False
     if request.user.id:
         gstaff_access = check_is_gstaff(group_id,request.user)
@@ -66,6 +92,7 @@ def program_event_list(request, group_id):
         all_pe = list_of_pe
     if gstaff_access:
         all_pe = enr_ce_coll
+    '''
     # If request.user is admin, enr_ce_coll is all_pe. 
     # As admin is added in author set of all pe
         # enr_ce_coll = node_collection.find({'$in': list_of_pe,'author_set': int(request.user.id)}).sort('last_update', -1)
