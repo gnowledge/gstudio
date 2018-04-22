@@ -45,10 +45,15 @@ def program_event_list(request, group_id):
     title = "Events"
     # pe_coll is cursor of mod groups
     query = {
-            'member_of': pe_gst._id,
-            '$or':[
-                {'access_policy': u'PUBLIC'},
-                {
+            'member_of': pe_gst._id
+        }
+    gstaff_access = False
+    if request.user.is_authenticated():
+        gstaff_access = check_is_gstaff(group_id,request.user)
+        if gstaff_access:
+            query.update({'access_policy': {'$in': [u'PUBLIC', u'PRIVATE']}})
+        else:
+            query,update({
                     '$and': [
                         {'access_policy': u"PRIVATE"},
                         {'$or': [
@@ -57,9 +62,9 @@ def program_event_list(request, group_id):
                           {'author_set': request.user.id},
                         ]}
                     ]
-                }
-            ]
-        }
+                })
+    else:
+        query.update({'access_policy': u'PUBLIC'})
 
     query.update({'moderation_level': {'$ne': -1}})
     pe_coll = node_collection.find(query).sort('last_update', -1)
