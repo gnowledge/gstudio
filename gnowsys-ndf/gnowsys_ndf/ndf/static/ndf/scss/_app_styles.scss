@@ -6594,7 +6594,7 @@ $ah_2_background_color_hover: rgba(244, 244, 244, 0.3);;
 
     .activity-slides {
       height: 100%;
-      color: #f8f8f8;
+      //color: #f8f8f8;
 
 
       .activity-slide {
@@ -7948,4 +7948,34 @@ $module-card-lines-to-show: 3;
 .inner
 {
     display: inline-block !important;
+}
+
+
+.quiz-player{
+    .quiz_qtn{
+        margin-left:20px !important;
+        font-size: 20px;
+    }
+    .question_edit{
+        margin-left: 20px !important;
+    }
+
+    input[type=checkbox], input[type=radio]{
+        margin-right: 10px;
+        width: 15px;
+        height: 15px;
+    }
+
+    .chk_ans_lbl, .rad_ans_lbl{
+        font-size: 22px;
+        margin-left: 5px;
+    }
+
+    .fi-check{
+        color: green;
+    }
+
+    .fi-x{
+        color: red;
+    }
 }

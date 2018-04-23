@@ -26,8 +26,8 @@
                   <i class="fi-torso style2 text-center"></i>
               {% elif node.if_file.mid.relurl %}
                    <img src="{{MEDIA_URL}}{{node.if_file.mid.relurl}}" alt="Profile picture for this group." class="img-height">
-              {% elif "announced_unit" in  group_object.member_of_names_list %}
-                    <img src="/static/ndf/images/maths-cover.png" alt="Profile picture for this group." class="img-height">
+              {% elif "announced_unit" in  group_object.member_of_names_list or  "draft_unit" in  group_object.member_of_names_list %}
+                    <img src="/static/ndf/images/course_backbround-2.png" alt="Profile picture for this group." class="img-height">
               {% else %}
                     <img src="/static/ndf/css/themes/{{site.SITE_NAME|lower}}/images/default-bg.png" alt="Profile picture for this group." class="img-height">
               {% endif %}

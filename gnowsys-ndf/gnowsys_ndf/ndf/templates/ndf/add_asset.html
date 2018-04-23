@@ -173,29 +173,6 @@
             </label>
             </div>
         </div>
-        <div class="row">
-            <div class="small-12 medium-10 large-10 columns">
-            <label>  
-                     {% if asset_obj %}
-                        {% get_relation_value asset_obj.pk "teaches"  as selected_topic %}
-                    {%  endif %}                                  
-                    choose topic :
-                        <select name="topics" id = "topic_list" multiple style="height:100px">
-                                <option value="">--- Select Topic ---</option>
-                                {% for each in topic_nodes %}
-                                 {% if each.pk == selected_topic.grel_node.0.pk %}
-                                    <option selected value="{{ each.pk }}" data-topic="{{ each.pk }}">
-                                        {{each.name}}
-                                {% else %}
-                                    <option value="{{ each.pk }}" data-topic="{{ each.pk }}">
-                                        {{each.name}}
-                                {%  endif %}
-                                {% endfor %}
-                        </select>
-            </label>
-            </div>
-        </div>
-
 
         <div class="row">
             <div class="small-12 medium-10 large-10 columns">
@@ -280,7 +257,7 @@
         <div class="row listing-row">
             {% for each in asset_content_list.grel_node %}
                 {% if  'DELETED' != each.status %}
-                   {% include "ndf/asset_card.html" with url_name="assetcontent_detail" each_asset=each first_arg=group_id second_arg=asset_obj.pk third_arg=each.pk no_asset=True %} 
+                   {% include "ndf/asset_card.html" with url_name="assetcontent_detail" each_asset=each first_arg=group_name second_arg=asset_obj.pk third_arg=each.pk no_asset=True %} 
                 {% endif %}
             {% endfor %}
         </div>
@@ -426,10 +403,6 @@
         updateAllTags();
         coll_arr = []
         
-        $('#topic_list :selected').each(function(){
-            coll_arr.push($(this).val())
-        });
-        
         var tagsStr = tags.value.trim();
         if(checkTag())
         {
@@ -447,7 +420,6 @@
         sel_tags = $("input:hidden[name='tags']").val()
         sel_asset_lang =  $('#asset_lang').find(':selected').attr('data-sub-code');
         asset_name = $("#asset-name").val();
-        topic_list = $("#topic_list").find(':selected').attr('data-topic');
         asset_disp_name = $("#asset-disp-name").val();
         asset_description = $("#asset-descid").val();
         var asset_id = $(this).attr('data-asset_id');
@@ -463,7 +435,6 @@
                         "sel_tags":sel_tags,
                         "sel_asset_lang":sel_asset_lang,
                         "is_raw_material": is_raw_material,
-                        'topic_list':topic_list,
                         //'coll_arr':coll_arr,
                         'title' :"{{title}}",
 
