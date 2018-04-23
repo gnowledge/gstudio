@@ -42,7 +42,7 @@ app=gst_group
 
 @login_required
 @get_execution_time
-def create_partner(request,group_id):
+def create_partner(request,group_id,partner_id):
   # ins_objectid  = ObjectId()
   # if ins_objectid.is_valid(group_id) is False :
   #   group_ins = node_collection.find_one({'_type': "Group","name": group_id})
@@ -63,8 +63,8 @@ def create_partner(request,group_id):
   try:
     if request.method == "POST":
       colg = node_collection.collection.Group()
-      street = request.POST.get('street', "")
-      cname = request.POST.get('groupname', "").strip()
+      street = request.POST.get('house_street', "")
+      cname = request.POST.get('name', "").strip()
       colg.altnames = cname
       colg.name = unicode(cname)
       colg.member_of.append(gst_group._id)
@@ -132,7 +132,7 @@ def create_partner(request,group_id):
 
   for each in available_nodes:
       nodes_list.append(str((each.name).strip().lower()))
-  return render_to_response("ndf/create_partner.html", {'groupid': group_id, 'group_obj':group_obj,'appId': app._id, 'group_id': group_id, 'nodes_list': nodes_list},RequestContext(request))
+  return render_to_response("ndf/create_partner.html", {'partner_id':partner_id,'groupid': group_id, 'group_obj':group_obj,'appId': app._id, 'group_id': group_id, 'nodes_list': nodes_list},RequestContext(request))
 
 
 def partner_list(request, group_id):
@@ -169,6 +169,8 @@ def partner_list(request, group_id):
 def nroer_groups(request, group_id, groups_category):
     group_name, group_id = get_group_name_id(group_id)
     GSTUDIO_NROER_MENU = ["State Partners", "Institutional Partners", "Individual Partners" , "Teachers", "Interest Groups", "Schools"]
+
+
     mapping = GSTUDIO_NROER_MENU_MAPPINGS
 
     groups_names_list = []
@@ -205,6 +207,8 @@ def nroer_groups(request, group_id, groups_category):
         app_gst = gst_group
     group_nodes = node_collection.find({"_type":'Group',"name" : {"$in" : GSTUDIO_NROER_MENU }})
 
+    lang_code = request.LANGUAGE_CODE
+    
 
     # print "=============", app_gst
     # group_nodes_count = group_nodes.count() if group_nodes else 0
@@ -213,6 +217,9 @@ def nroer_groups(request, group_id, groups_category):
                            #'group_nodes_count': group_nodes_count,
                           'app_gst': app_gst,
                            'groupid': group_id, 'group_id': group_id,
+                           'GSTUDIO_NROER_MENU':GSTUDIO_NROER_MENU,
+                           'lang_code': lang_code
+
 
                           }, context_instance=RequestContext(request))
 

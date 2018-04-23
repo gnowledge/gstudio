@@ -37,7 +37,7 @@ nltk==3.2.1
 
 # QBANK-LITE REQ: https://github.com/CLIxIndia-Dev/qbank-lite/blob/master/requirements.txt
 # also make sure following are updated w.r.t qbank repo
-dlkit==0.5.17
+dlkit==0.5.18
 beautifulsoup4==4.4.1
 cffi==1.7.0
 enum34==1.1.6
@@ -65,3 +65,7 @@ checksumdir==1.1.0
 cryptography==1.4
 # version needed to overwrite on all above intermediate installs
 # pymongo==2.8
+Mastodon.py==1.0.1
+ndg-httpsclient==0.4.4
+elasticsearch==6.1.1
+elasticsearch-dsl==6.1.0

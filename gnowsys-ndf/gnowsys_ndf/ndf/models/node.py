@@ -1,5 +1,8 @@
 from base_imports import *
 from history_manager import HistoryManager
+from gnowsys_ndf.ndf.gstudio_es.es import esearch
+from gnowsys_ndf.settings import GSTUDIO_ELASTIC_SEARCH,GSTUDIO_ELASTIC_SEARCH_IN_NODE_CLASS
+
 
 @connection.register
 class Node(DjangoDocument):
@@ -232,6 +235,12 @@ class Node(DjangoDocument):
                 values_dict.update({'modified_by': user_id})
             if 'contributors' not in values_dict:
                 values_dict.update({'contributors': add_to_list(self.contributors, user_id)})
+
+        if 'member_of' in values_dict  and not isinstance(values_dict['member_of'],ObjectId):
+            from gsystem_type import GSystemType
+            gst_node = GSystemType.get_gst_name_id(values_dict['member_of'])
+            if gst_node:
+                values_dict.update({'member_of': ObjectId(gst_node[1])})
 
         # filter keys from values dict there in node structure.
         node_str = Node.structure
@@ -701,6 +710,12 @@ class Node(DjangoDocument):
             # gets the last version no.
             rcsno = history_manager.get_current_version(self)
             node_collection.collection.update({'_id':self._id}, {'$set': {'snapshot'+"."+str(kwargs['groupid']):rcsno }}, upsert=False, multi=True)
+
+        ########################## ES ##################################
+        if GSTUDIO_ELASTIC_SEARCH_IN_NODE_CLASS == True:
+            #es = esearch(fp)
+            #es.inject()
+            esearch.inject(fp)
 
 
     # User-Defined Functions

@@ -1,7 +1,5 @@
 {% load i18n %}
-{% load get_relation_value get_event_status get_unit_total_points from ndf_tags %}
-
-{% get_event_status node as get_status %}
+{% load get_relation_value get_unit_total_points from ndf_tags %}
 {% if group_counts %}
 {% get_unit_total_points request.user.id  node.pk as get_unit_points %}
 {% endif %}
@@ -19,12 +17,10 @@
 
     {% if "base_unit" in node.member_of_names_list %}
     <div class="status-draft">DRAFT</div>
+    {% elif "PartnerGroup" in node.member_of_names_list %}
+    <div class="status-draft">Partner</div>
     {% elif "Group" in node.member_of_names_list %}
     <div class="status-workspace">Workspaces</div>
-    {% endif %}
-
-    {% if get_status %}
-    <div class="status-{{get_status}}">{{get_status}}</div>
     {% endif %}
 
     <div class="unit_header">
@@ -62,7 +58,7 @@
         {% else %} 
         
         <a href="{% url url_name first_arg %}" class="view_unit">{% trans "View" %}</a>
-        {% if "base_unit" not in node.member_of_names_list %}
+        {% if "base_unit" not in node.member_of_names_list and node.agency_type != "Other" %}
         <div class="right">
             {% if not no_enroll and not is_gstaff %}
             {% if request.user.is_authenticated %}

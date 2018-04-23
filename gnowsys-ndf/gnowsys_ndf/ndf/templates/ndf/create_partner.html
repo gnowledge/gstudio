@@ -25,7 +25,7 @@
   <h3> {% if node %}Edit {% else %}Create New {% endif %}{{parent_obj_partner.name}}</h3><br>
   <form id="create_partner" class="" method="post"
   {% if node %} action="{% url 'edit_group' group_id %}"
-  {% else %} action="{% url 'create_group' parent_obj_partner.pk %}"
+  {% else %} action="{% url 'create_partner' group_id partner_id %}"
   {% endif %}
   data-abide enctype="multipart/form-data">
     {% csrf_token %}

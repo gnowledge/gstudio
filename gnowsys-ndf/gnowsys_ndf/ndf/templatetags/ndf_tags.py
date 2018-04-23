@@ -37,7 +37,7 @@ from django.core.cache import cache
 from mongokit import IS
 
 ''' -- imports from application folders/files -- '''
-from gnowsys_ndf.settings import GAPPS as setting_gapps, GSTUDIO_DEFAULT_GAPPS_LIST, META_TYPE, CREATE_GROUP_VISIBILITY, GSTUDIO_SITE_DEFAULT_LANGUAGE,GSTUDIO_DEFAULT_EXPLORE_URL,GSTUDIO_EDIT_LMS_COURSE_STRUCTURE,GSTUDIO_WORKSPACE_INSTANCE,GSTUDIO_SITE_LANDING_PAGE_LOGO,GSTUDIO_SITE_LANDING_PAGE_TEXT, GSTUDIO_SITE_LANDING_PAGE_BG, GSTUDIO_SITE_LOGIN_PAGE_LOGO,GSTUDIO_FOOTER_LINKS
+from gnowsys_ndf.settings import GAPPS as setting_gapps, GSTUDIO_DEFAULT_GAPPS_LIST, META_TYPE, CREATE_GROUP_VISIBILITY, GSTUDIO_SITE_DEFAULT_LANGUAGE,GSTUDIO_DEFAULT_EXPLORE_URL,GSTUDIO_EDIT_LMS_COURSE_STRUCTURE,GSTUDIO_WORKSPACE_INSTANCE,GSTUDIO_SITE_LANDING_PAGE_LOGO,GSTUDIO_SITE_LANDING_PAGE_TEXT, GSTUDIO_SITE_LANDING_PAGE_BG, GSTUDIO_SITE_LOGIN_PAGE_LOGO,GSTUDIO_FOOTER_LINKS, LOGIN_WITH_MASTODON
 
 # from gnowsys_ndf.settings import GSTUDIO_SITE_LOGO,GSTUDIO_COPYRIGHT,GSTUDIO_GIT_REPO,GSTUDIO_SITE_PRIVACY_POLICY, GSTUDIO_SITE_TERMS_OF_SERVICE,GSTUDIO_ORG_NAME,GSTUDIO_SITE_ABOUT,GSTUDIO_SITE_POWEREDBY,GSTUDIO_SITE_PARTNERS,GSTUDIO_SITE_GROUPS,GSTUDIO_SITE_CONTACT,GSTUDIO_ORG_LOGO,GSTUDIO_SITE_CONTRIBUTE,GSTUDIO_SITE_VIDEO,GSTUDIO_SITE_LANDING_PAGE
 from gnowsys_ndf.settings import *
@@ -60,6 +60,7 @@ from django.contrib.sites.models import Site
 from gnowsys_ndf.ndf.node_metadata_details import schema_dict
 from django_mailbox.models import Mailbox
 import itertools
+
 
 register = Library()
 at_apps_list = node_collection.one({
@@ -134,7 +135,14 @@ def get_site_variables():
 	site_var['ENABLE_USER_DASHBOARD'] = GSTUDIO_ENABLE_USER_DASHBOARD
 	site_var['BUDDY_LOGIN'] = GSTUDIO_BUDDY_LOGIN
 	site_var['INSTITUTE_ID'] = GSTUDIO_INSTITUTE_ID
-	site_var['HEADER_LANGUAGES'] = HEADER_LANGUAGES
+
+	#site_var['HEADER_LANGUAGES'] = HEADER_LANGUAGES
+	site_var['GSTUDIO_ELASTIC_SEARCH'] = GSTUDIO_ELASTIC_SEARCH
+
+
+
+	site_var['LOGIN_WITH_MASTODON'] = LOGIN_WITH_MASTODON
+
 
 	cache.set('site_var', site_var, 60 * 30)
 
@@ -3260,13 +3268,10 @@ def get_sg_member_of(group_id):
 
 	sg_member_of_list = []
 	# get all underlying groups
-	try:
-		group_id = ObjectId(group_id)
-	except:
-		group_id, group_name = get_group_name_id(group_id)
-
-	group_obj = node_collection.one({'_id': ObjectId(group_id)})
-	# print group_obj.name
+	group_obj = get_group_name_id(group_id, get_obj=True)
+	if group_obj:
+		group_id = group_obj._id
+		group_name = group_obj.name
 	# Fetch post_node of group
 	if group_obj:
 		if "post_node" in group_obj:
@@ -3889,11 +3894,11 @@ def get_download_filename(node, file_size_name='original'):
 		name = node.altnames if node.altnames else node.name
 		name = name.split('.')[0]
 		file_name = slugify(name)
-
+		name = name.encode('utf-8')
 		if extension:
-			file_name += extension
+			name += extension
 
-		return file_name
+		return name
 
 	else:
 		name = node.altnames if node.altnames else node.name
@@ -4246,3 +4251,28 @@ def get_header_lang(lang):
         if lang in each_lang:
             return each_lang[1]
     return lang
+
+
+#convert 13 digit number to slash date format 
+
+@get_execution_time
+@register.filter
+def convert_date_string_to_date(your_timestamp):
+
+	date = str(datetime.datetime.fromtimestamp( your_timestamp / 1000))
+
+	temp1 = date[8:10]
+	temp2 = date[5:7]
+	temp3 = date[0:4]
+	date = temp1 + "/"+ temp2 +"/"+ temp3
+
+	return date
+
+
+@get_execution_time
+@register.filter
+def cal_length(string):
+	return len(str(string))
+
+
+

@@ -13,24 +13,44 @@
 {% elif first_arg %}
   <a class="app-card text-center" href='{% url url_name first_arg %}{{search_url_text|safe}}'>
 {% endif %}
-   <div class="app-card-title"><h4>{% firstof resource.altnames resource.name %}</h4></div>
 
+  <!-- The following block of code is a temporary fix -->
+  {% if lang_code == "hi" %}
+    {% if "State Partners" == resource.name %}
+    <div class="app-card-title"><h4>{% trans "State Partners" %}</h4></div>
+    {% elif "Teachers" == resource.name %}
+    <div class="app-card-title"><h4>{% trans "Teachers" %}</h4></div>
+    {% elif "Institutional Partners" == resource.name %}
+    <div class="app-card-title"><h4>{% trans "Institutional Partners" %}</h4></div>
+    {% elif "Individual Partners" == resource.name %}
+    <div class="app-card-title"><h4>{% trans "Individual Partners" %}</h4></div>
+    {% elif "Interest Groups" == resource.name %}
+    <div class="app-card-title"><h4>{% trans "Interest Groups" %}</h4></div>
+    {% elif "Schools" == resource.name %}
+    <div class="app-card-title"><h4>{% trans "Schools" %}</h4></div>
+    {% else %}
+    <div class="app-card-title"><h4></h4></div>
+    {% endif %}  
+  {% else %}
+   <div class="app-card-title"><h4>{% firstof resource.altnames resource.name %}</h4></div>
+  {% endif %}
 
     <div class="app-card-icon" title="{% firstof resource.altnames resource.name %}" >
 <!--{{resource.member_of_names_list}} --> 
     {% get_relation_value resource.pk 'has_profile_pic' as grel_dict %}
+    {% get_relation_value resource.pk 'has_banner_pic' as grel_banner_dict %}
     {% get_dict_from_list_of_dicts resource.attribute_set as attr_set_dict %}
     {% if grel_dict.grel_node.if_file.original.relurl %}
       <img src="{{MEDIA_URL}}{{grel_dict.grel_node.if_file.original.relurl}}" style="width:50%">
+      {% elif grel_banner_dict.grel_node.if_file.original.relurl  %}
+      <img src="{{MEDIA_URL}}{{grel_banner_dict.grel_node.if_file.original.relurl}}" style="width:50%">
     {% else %}
       <img src="/static/ndf/images/metaStudio-profile.svg" alt="Profile picture for this group." style="width:50%" class="img-height" >
     {% endif %}
   </div>
     <div class="app-card-content" title="{{resource.content_org}}">
-     {{resource.content_org|default_if_none:"Add some description."|truncatechars:45}}
+     {{resource.content_org|default_if_none:"Add some description."|safe|striptags|truncatechars:85}}
     </div>   
-</a>
-
-  
+</a>  
 </li>
 </ul>
