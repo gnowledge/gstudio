@@ -6633,11 +6633,16 @@ input.transcript-toggler {
   color: #912a7d;
 }
 
+<<<<<<< HEAD
 /* line 6875, ../../../scss/_clix2017.scss */
+=======
+/* line 6789, ../../../scss/_clix2017.scss */
+>>>>>>> 744571370ca4f8e366b3c9c0f9eda8088032c1f7
 .exp-module-container {
   margin-left: 60px;
 }
 
+<<<<<<< HEAD
 /* line 6879, ../../../scss/_clix2017.scss */
 .fill-green-circle {
   padding: 6px 6px;
@@ -6653,28 +6658,57 @@ input.transcript-toggler {
 }
 
 /* line 6891, ../../../scss/_clix2017.scss */
+=======
+/* line 6793, ../../../scss/_clix2017.scss */
+.green {
+  color: green;
+}
+
+/* line 6797, ../../../scss/_clix2017.scss */
+.orange {
+  color: orange;
+}
+
+/* line 6801, ../../../scss/_clix2017.scss */
+>>>>>>> 744571370ca4f8e366b3c9c0f9eda8088032c1f7
 [class*="img-banner-card-"] {
   margin: -11px -11px 0px -11px;
   height: 100px;
 }
 
+<<<<<<< HEAD
 /* line 6895, ../../../scss/_clix2017.scss */
+=======
+/* line 6805, ../../../scss/_clix2017.scss */
+>>>>>>> 744571370ca4f8e366b3c9c0f9eda8088032c1f7
 [class*="high-img-banner-card-"] {
   margin: -11px -11px 0px -11px;
   height: 160px;
 }
 
+<<<<<<< HEAD
 /* line 6899, ../../../scss/_clix2017.scss */
+=======
+/* line 6809, ../../../scss/_clix2017.scss */
+>>>>>>> 744571370ca4f8e366b3c9c0f9eda8088032c1f7
 [class*="mid-img-banner-card-"] {
   margin: -11px -11px 0px -11px;
   height: 104px;
 }
+<<<<<<< HEAD
 /* line 6902, ../../../scss/_clix2017.scss */
+=======
+/* line 6812, ../../../scss/_clix2017.scss */
+>>>>>>> 744571370ca4f8e366b3c9c0f9eda8088032c1f7
 [class*="mid-img-banner-card-"] .unit_banner {
   height: 85px;
 }
 
+<<<<<<< HEAD
 /* line 6907, ../../../scss/_clix2017.scss */
+=======
+/* line 6817, ../../../scss/_clix2017.scss */
+>>>>>>> 744571370ca4f8e366b3c9c0f9eda8088032c1f7
 .view-progress-report {
   /* padding: 0 2rem; */
   background: none;
@@ -6694,13 +6728,21 @@ input.transcript-toggler {
   width: 62px;
   margin-right: -15px;
 }
+<<<<<<< HEAD
 /* line 6927, ../../../scss/_clix2017.scss */
+=======
+/* line 6837, ../../../scss/_clix2017.scss */
+>>>>>>> 744571370ca4f8e366b3c9c0f9eda8088032c1f7
 .view-progress-report:hover {
   background-color: #fff;
   color: #912a7d;
 }
 
+<<<<<<< HEAD
 /* line 6933, ../../../scss/_clix2017.scss */
+=======
+/* line 6843, ../../../scss/_clix2017.scss */
+>>>>>>> 744571370ca4f8e366b3c9c0f9eda8088032c1f7
 .user-profile-edit {
   border: 1px solid white;
   background-color: #713557;
@@ -6709,13 +6751,21 @@ input.transcript-toggler {
   color: #ffffff;
   font-size: 15px;
 }
+<<<<<<< HEAD
 /* line 6940, ../../../scss/_clix2017.scss */
+=======
+/* line 6850, ../../../scss/_clix2017.scss */
+>>>>>>> 744571370ca4f8e366b3c9c0f9eda8088032c1f7
 .user-profile-edit:hover {
   background-color: #fff;
   color: #912a7d;
 }
 
+<<<<<<< HEAD
 /* line 6947, ../../../scss/_clix2017.scss */
+=======
+/* line 6857, ../../../scss/_clix2017.scss */
+>>>>>>> 744571370ca4f8e366b3c9c0f9eda8088032c1f7
 .profile-field {
   color: black;
   font-size: 15px;
@@ -6724,13 +6774,21 @@ input.transcript-toggler {
   margin-left: 55px;
 }
 
+<<<<<<< HEAD
 /* line 6955, ../../../scss/_clix2017.scss */
+=======
+/* line 6865, ../../../scss/_clix2017.scss */
+>>>>>>> 744571370ca4f8e366b3c9c0f9eda8088032c1f7
 .profile-form {
   border: 1px solid #713557;
   margin: 15px;
 }
 
+<<<<<<< HEAD
 /* line 6960, ../../../scss/_clix2017.scss */
+=======
+/* line 6870, ../../../scss/_clix2017.scss */
+>>>>>>> 744571370ca4f8e366b3c9c0f9eda8088032c1f7
 .button-cancel-profile {
   height: 2rem;
   padding: 0 2rem;
@@ -6750,72 +6808,170 @@ input.transcript-toggler {
   margin-right: 1px;
   width: auto !important;
 }
+<<<<<<< HEAD
 /* line 6978, ../../../scss/_clix2017.scss */
+=======
+/* line 6888, ../../../scss/_clix2017.scss */
+>>>>>>> 744571370ca4f8e366b3c9c0f9eda8088032c1f7
 .button-cancel-profile:hover {
   background-color: #fff;
   color: #333333;
 }
 
+<<<<<<< HEAD
 /* line 6984, ../../../scss/_clix2017.scss */
+=======
+/* line 6894, ../../../scss/_clix2017.scss */
+>>>>>>> 744571370ca4f8e366b3c9c0f9eda8088032c1f7
 .large_text_input {
   margin-left: -170px;
 }
 
+<<<<<<< HEAD
 /* line 6987, ../../../scss/_clix2017.scss */
 .save-profile-actions {
   margin-left: 400px;
 }
 /* line 6989, ../../../scss/_clix2017.scss */
+=======
+/* line 6897, ../../../scss/_clix2017.scss */
+.save-profile-actions {
+  margin-left: 400px;
+}
+/* line 6899, ../../../scss/_clix2017.scss */
+>>>>>>> 744571370ca4f8e366b3c9c0f9eda8088032c1f7
 .save-profile-actions .submit-user-profile {
   margin: 20px 0px 20px 0px;
 }
 
+<<<<<<< HEAD
 /* line 6994, ../../../scss/_clix2017.scss */
+=======
+/* line 6904, ../../../scss/_clix2017.scss */
+>>>>>>> 744571370ca4f8e366b3c9c0f9eda8088032c1f7
 .uname-in-profile-form {
   margin-left: 20px !important;
 }
 
+<<<<<<< HEAD
 /* line 6998, ../../../scss/_clix2017.scss */
+=======
+/* line 6908, ../../../scss/_clix2017.scss */
+>>>>>>> 744571370ca4f8e366b3c9c0f9eda8088032c1f7
 .uname-in-dashboard {
   font-family: Open Sans Bold;
 }
 
 /*toolbar css*/
+<<<<<<< HEAD
 /* line 7004, ../../../scss/_clix2017.scss */
+=======
+/* line 6914, ../../../scss/_clix2017.scss */
+>>>>>>> 744571370ca4f8e366b3c9c0f9eda8088032c1f7
 #toolbar {
   width: 100%;
   display: inline-block;
   margin-bottom: -7px;
 }
 
+<<<<<<< HEAD
 /* line 7007, ../../../scss/_clix2017.scss */
+=======
+/* line 6917, ../../../scss/_clix2017.scss */
+>>>>>>> 744571370ca4f8e366b3c9c0f9eda8088032c1f7
 .datetime {
   color: #713558;
   padding: 4px 0px 2px 5px;
   font-size: 12px;
 }
 
+<<<<<<< HEAD
 /* line 7010, ../../../scss/_clix2017.scss */
+=======
+/* line 6920, ../../../scss/_clix2017.scss */
+>>>>>>> 744571370ca4f8e366b3c9c0f9eda8088032c1f7
 .changefont {
   text-align: right;
   padding: 2px 5px 1px 0px;
   margin-right: 88px;
 }
 
+<<<<<<< HEAD
 /* line 7013, ../../../scss/_clix2017.scss */
+=======
+/* line 6923, ../../../scss/_clix2017.scss */
+>>>>>>> 744571370ca4f8e366b3c9c0f9eda8088032c1f7
 .font-minus {
   font-size: 70%;
   color: #713558;
 }
 
+<<<<<<< HEAD
 /* line 7016, ../../../scss/_clix2017.scss */
+=======
+/* line 6926, ../../../scss/_clix2017.scss */
+>>>>>>> 744571370ca4f8e366b3c9c0f9eda8088032c1f7
 .font-normal {
   font-size: 85%;
   color: #713558;
 }
 
+<<<<<<< HEAD
 /* line 7020, ../../../scss/_clix2017.scss */
+=======
+/* line 6930, ../../../scss/_clix2017.scss */
+>>>>>>> 744571370ca4f8e366b3c9c0f9eda8088032c1f7
 .font-plus {
   font-size: 100%;
   color: #713558;
+}
+
+/* line 6934, ../../../scss/_clix2017.scss */
+.download-report {
+  padding-right: 38px;
+  font-size: 20px;
+  float: right;
+  margin-top: 5px;
+}
+
+/* line 6941, ../../../scss/_clix2017.scss */
+.unit_under_mod_lbl {
+  position: relative;
+  color: #6f0859;
+  font-weight: 500;
+  font-size: 21px;
+  letter-spacing: 0.6px;
+  border-bottom: 2px solid #713558;
+  margin-top: 1em;
+  margin-bottom: 1em;
+}
+/* line 6950, ../../../scss/_clix2017.scss */
+.unit_under_mod_lbl a {
+  color: #713558;
+}
+
+/* line 6955, ../../../scss/_clix2017.scss */
+.mcard-title {
+  display: block;
+  color: #713558 !important;
+  font-weight: 600;
+  margin: 0px auto;
+  letter-spacing: 1px;
+  font-size: 1.4vw;
+}
+
+/* line 6964, ../../../scss/_clix2017.scss */
+.short-mtext {
+  overflow: hidden;
+  height: 7em;
+}
+
+/* line 6968, ../../../scss/_clix2017.scss */
+.full-mtext {
+  height: auto;
+}
+
+/* line 6971, ../../../scss/_clix2017.scss */
+.mod-detail-container {
+  margin-left: 3.3%;
 }

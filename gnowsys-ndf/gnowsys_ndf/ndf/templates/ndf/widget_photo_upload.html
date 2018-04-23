@@ -8,7 +8,7 @@
     </div>
 
        <div class="text-center">
-
+        {% if not no_img %}
         <div class="div-height img-container-{{node.pk}}">
           {% get_relation_value node.pk 'has_thumbnail' as grel_dict %}
           {% get_relation_value node.pk 'has_logo' as grel_dict_logo %}
@@ -33,6 +33,7 @@
               {% endif %}
           {% endif %}
         </div>
+        {% endif %}
         {% if not no_update_btn %}
         {% if request.user.is_authenticated %}
         {% check_is_gstaff groupid request.user as gstaff_access %}

@@ -6871,21 +6871,16 @@ input.transcript-toggler{
 
 }
 
-
 .exp-module-container{
     margin-left: 60px;
 }
 
-.fill-green-circle{
-    padding: 6px 6px;
-    border-radius: 100%;
-    background-color: green;
+.green{
+    color: green;
 }
 
-.fill-orange-circle{
-    padding: 6px 6px;
-    border-radius: 100%;
-    background-color: orange;
+.orange{
+    color: orange;
 }
 
 [class*="img-banner-card-"]{
@@ -7019,4 +7014,45 @@ input.transcript-toggler{
 
 .font-plus{
 font-size:100%; color: #713558;
+}
+
+.download-report{
+    padding-right: 38px;
+    font-size: 20px;
+    float: right;
+    margin-top: 5px;
+}
+
+.unit_under_mod_lbl{
+    position: relative;
+    color: #6f0859;
+    font-weight: 500;
+    font-size: 21px;
+    letter-spacing: 0.6px;
+    border-bottom: 2px solid #713558;
+    margin-top: 1em;
+    margin-bottom: 1em;
+    a {
+        color: $ah_2_icon_color;
+    }
+}
+
+.mcard-title{
+    display: block;
+    color: #713558 !important;
+    font-weight: 600;
+    margin: 0px auto;
+    letter-spacing: 1px;
+    font-size: 1.4vw;
+}
+
+.short-mtext {
+    overflow: hidden;
+    height: 7em;
+}
+.full-mtext{
+    height: auto;
+}
+.mod-detail-container{
+    margin-left: 3.3%;
 }

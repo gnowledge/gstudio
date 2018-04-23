@@ -81,6 +81,7 @@
 {# <link rel="stylesheet" type="text/css" href="/static/ndf/orgitdown/skins/gstudio/style.css" /> #}
 
 <script src="/static/ndf/bower_components/jquery-ui/jquery-ui.min.js"></script>
+<script src="/static/ndf/js/meta_info.js"></script>
 <link rel="stylesheet" href="/static/ndf/bower_components/jquery-ui/themes/smoothness/jquery-ui.css">
 
 {% endblock %}
@@ -241,12 +242,26 @@
                 <i class="fi-photo "></i> <span>{% trans "Gallery" %}</span>
               </a>
             </li>
-            {% if 'CourseEventGroup' in group_obj.member_of_names_list and request.user.is_superuser %}
-              <li class="tab-title {% ifequal title 'course_quiz_data' %}active{% endifequal %}">
-                <a href="{% url 'course_quiz_data' group_id %}">
-                  <i class="fi-photo "></i> <span>{% trans "Quiz" %}</span>
-                </a>
-              </li>
+            {% if 'CourseEventGroup' in group_obj.member_of_names_list %}
+              {%  if request.user.is_superuser %}
+                <li class="tab-title {% ifequal title 'course_quiz_data' %}active{% endifequal %}">
+                  <a href="{% url 'course_quiz_data' group_id %}">
+                    <i class="fi-photo "></i> <span>{% trans "Quiz" %}</span>
+                  </a>
+                </li>
+                <li class="tab-title {% if title == 'course_analytics' %} active  {% endif %}">
+                  <a href="{% url 'course_analytics_admin' group_name %}" > <i class="fa fa-line-chart"></i> 
+                    <span>{% trans "Group Progress" %}</span>
+                  </a>
+                </li>
+
+              {% else %}
+                <li class="tab-title {% if title == 'course_analytics' %} active  {% endif %}">
+                  <a href="{% url 'course_analytics' group_id request.user.pk %}"> <i class="fa fa-line-chart"></i> 
+                      <span>{% trans "Progress" %}</span>
+                  </a>
+                </li>
+              {% endif %}
             {% endif %}
 
             <!--
@@ -322,6 +337,13 @@
 
             {% elif title == 'course_quiz_data' %}
               {% include "ndf/course_quiz_data.html" %}
+
+            {% elif title == 'course_analytics' %}
+              {% if is_gstaff %}
+                {% include "ndf/admin_course_analytics.html" %}
+              {% else %}
+                {% include "ndf/user_course_analytics.html" %}
+              {% endif %}
 
             {% elif title == 'about' %}
               {% include "ndf/course_about.html" %}
