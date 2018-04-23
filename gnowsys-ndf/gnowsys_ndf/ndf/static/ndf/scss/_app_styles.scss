@@ -6098,6 +6098,11 @@ ul.horizontal_tabs_gstudio {
                 color: #3c5264;
                 font-size: 19px;
                 font-weight: 600;
+                padding-bottom: 2px;
+            }
+            @media screen and (max-width: 400px) {
+              margin: 25px 10px;
+              height: 55px;
             }
         }
     }
