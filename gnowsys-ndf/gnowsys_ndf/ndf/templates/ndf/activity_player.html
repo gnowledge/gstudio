@@ -307,7 +307,9 @@
               {% with node.member_of_names_list as node_member_of_names_list %}
               {% if "QuizItemEvent" not in node_member_of_names_list and "QuizItem" not in node_member_of_names_list%}
               <div class="input_links row" style="margin-left:10px;">
+              {% if player_discussion or node_discussion %}
                 <a class="discuss right explore-button"> {% if not thr_int_type %} {{disc_label}} {% else %} {{thr_int_type}} {% endif %} </a>
+              {% endif %}
                 {% include 'ndf/rating.html'%}
                 {% get_relation_value node.pk 'has_help' as grel_help %}
                 {% get_relation_value node.pk 'has_admin_page' as grel_admin_page %}
