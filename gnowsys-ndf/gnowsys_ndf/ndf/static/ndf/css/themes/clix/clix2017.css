@@ -6755,3 +6755,29 @@ input.transcript-toggler {
 .unit_under_mod_lbl a {
   color: #713558;
 }
+
+/* line 6955, ../../../scss/_clix2017.scss */
+.mcard-title {
+  display: block;
+  color: #713558 !important;
+  font-weight: 600;
+  margin: 0px auto;
+  letter-spacing: 1px;
+  font-size: 1.4vw;
+}
+
+/* line 6964, ../../../scss/_clix2017.scss */
+.short-mtext {
+  overflow: hidden;
+  height: 7em;
+}
+
+/* line 6968, ../../../scss/_clix2017.scss */
+.full-mtext {
+  height: auto;
+}
+
+/* line 6971, ../../../scss/_clix2017.scss */
+.mod-detail-container {
+  margin-left: 3.3%;
+}

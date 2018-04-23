@@ -12,34 +12,13 @@
 {% cast_to_node units_sort_list as units_node_sort_list %}
 {% rewind_cursor units_under_module as units_under_module %}
 
-<style type="text/css">
-.card-title{
-    display: block;
-    color: #713558 !important;
-    font-weight: 600;
-    margin: 0px auto;
-    letter-spacing: 1px;
-    font-size: 1.4vw;
-}
-
-.short-text {
-	overflow: hidden;
-	height: 7em;
-}
-.full-text{
-	height: auto;
-}
-.mod-detail-container{
-	margin-left: 3.3%;
-}
-</style>
 {% include 'ndf/widget_photo_upload.html' with url_name='module_detail' widget_for="group_banner" is_banner=True  no_update_btn=True if_module=True no_img=True %}
 
 <div class="mod-detail-container small-12 medium-12 columns">
 	<div class="large-2 medium-3 small-3 columns thumbnail_style" style="height: 650px;
     margin-top: -18px;">
 		<div class="module_card" style="width: auto;">
-		    <div class="card_banner" style="display: block; width: 100%;">
+		    <div class="card_banner" style="display: block; width: 100%; display: cursor: default;">
 		        {% get_relation_value node.pk 'has_banner_pic' as grel_dict %}
 				{% get_dict_from_list_of_dicts node.attribute_set as node_attrs %}
 		        {% if not grel_dict.cursor and grel_dict.grel_node and grel_dict.grel_node.if_file.thumbnail.relurl %}
@@ -55,8 +34,8 @@
 
 	<div class="small-9 medium-9 large-10 columns" style="border-left: 2px solid #713558;">
 		<div class="small-12 columns">
-			<div class="small-9 columns">
-				<h4 class="card-title"> {% firstof node.altnames node.name %}</h4><br/>
+			<div class="small-9 columns" style="margin-left: -14px;">
+				<h4 class="mcard-title"> {% firstof node.altnames node.name %}</h4><br/>
 				<label  style="margin-left: auto;">{% trans "Description: " %}</label> <div class="module-desc">{{node.content|default:'No description added yet.'|safe}}
 			</div>
 			<u><a class="show-more hide">Show more</a></u>
@@ -133,20 +112,20 @@
         var course_about_panel = $('.module-desc')
         if(course_about_panel.height() > 130 ){
           $(".show-more").removeClass("hide")
-          $(".module-desc").addClass("short-text")
+          $(".module-desc").addClass("short-mtext")
         }
     })
 
     // Show more/less Course Description
     $(document).on('click','.show-more',function(){
-      if($(".module-desc").hasClass("short-text")){
-        $(".module-desc").removeClass("short-text")
-        $(".module-desc").addClass("full-text")
+      if($(".module-desc").hasClass("short-mtext")){
+        $(".module-desc").removeClass("short-mtext")
+        $(".module-desc").addClass("full-mtext")
         $(this).text("Show Less")
       }
-      else if($(".module-desc").hasClass("full-text")){
-        $(".module-desc").removeClass("full-text")
-        $(".module-desc").addClass("short-text")
+      else if($(".module-desc").hasClass("full-mtext")){
+        $(".module-desc").removeClass("full-mtext")
+        $(".module-desc").addClass("short-mtext")
         $(this).text("Show More")
       }
     })

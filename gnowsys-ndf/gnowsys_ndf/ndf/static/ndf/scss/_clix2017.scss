@@ -6951,3 +6951,23 @@ font-size:100%; color: #713558;
         color: $ah_2_icon_color;
     }
 }
+
+.mcard-title{
+    display: block;
+    color: #713558 !important;
+    font-weight: 600;
+    margin: 0px auto;
+    letter-spacing: 1px;
+    font-size: 1.4vw;
+}
+
+.short-mtext {
+    overflow: hidden;
+    height: 7em;
+}
+.full-mtext{
+    height: auto;
+}
+.mod-detail-container{
+    margin-left: 3.3%;
+}
