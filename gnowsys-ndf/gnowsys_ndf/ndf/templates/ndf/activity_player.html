@@ -66,7 +66,7 @@
     {% endif %}
 
         
-        <div class="small-4 header_title" title ="{% firstof group_object.altnames group_object.name %}">
+        <div class="header_title" title ="{% firstof group_object.altnames group_object.name %}">
           {% firstof group_object.altnames group_object.name  %}
 
             {% if "QuizItemEvent" in node.member_of_names_list or "QuizItem" in node.member_of_names_list%}
@@ -75,7 +75,7 @@
         </div>
 
       <div class="lesson-nav">
-<!-- -7
+<!-- 
         <div class="new_note header_text_block header_text_md_block">
             <a title="Click here to write a Note" {% if user_access_priv == "allow" %} target="_blank" href="{% url 'course_notebook' group_id %}?create=True" {% else %} class="user_not_enrolled" {% endif %}><i class="fa fa-edit header_icon"></i>&nbsp;
               {% if "announced_unit" in node.member_of_names_list or "drafts_unit" in node.member_of_names_list%}
