@@ -3166,8 +3166,7 @@ msgid "Assets"
 msgstr "आकलन"
 
 #: gnowsys_ndf/ndf/templates/ndf/gevent_base.html:102
-#: gnowsys_ndf/ndf/templates/ndf/lms.html:141
-#, fuzzy
+#: gnowsys_ndf/ndf/templates/ndf/lms.html:137
 msgid "Assessments"
 msgstr "आकलन"
 
@@ -3205,6 +3204,7 @@ msgstr "मेरे पाठ्यक्रम"
 
 #: gnowsys_ndf/ndf/templates/ndf/gheader.html:178
 #: gnowsys_ndf/ndf/templates/ndf/header.html:260
+#: gnowsys_ndf/ndf/templates/ndf/lms_dashboard.html:96
 msgid "EXPLORE"
 msgstr "खोजें"
 
@@ -4149,8 +4149,7 @@ msgstr "पाठ"
 msgid "blog"
 msgstr "ब्लॉग "
 
-#: gnowsys_ndf/ndf/templates/ndf/lms.html:135
-#, fuzzy
+#: gnowsys_ndf/ndf/templates/ndf/lms.html:131
 msgid "Asset Collection"
 msgstr "संग्रह"
 
