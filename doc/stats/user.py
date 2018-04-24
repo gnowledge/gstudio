@@ -70,8 +70,25 @@ def main():
         print "group_set : ", Node.get_names_list_from_obj_id_list(i.group_set, 'Group')
         print "\n-----------------------------------\n"
 
+    print "\n"
+    print "="*50
+    print "\n"
 
+    all_creators = node_collection.find({'_type': {'$in': ['GSystem']}}).distinct('created_by')
+    print "all_creators: ", all_creators
+    all_creators_nodes = node_collection.find({'_type': {'$in': ['GSystem']} })
+    print "all_creators_nodes.count(): ", all_creators_nodes.count()
+
+    all_creators_nodes_userid_1 = node_collection.find({'_type': {'$in': ['GSystem']}, 'created_by': 1 })
+    print "all_creators_nodes_userid_1.count(): ", all_creators_nodes_userid_1.count()
+
+    # # django ORM based user query
+    # User.objects.filter(id__in=all_creators)
+    # all_creators_users = User.objects.filter(id__in=all_creators)
+    # all_creators_users.count()
+    # [u.username for u in all_creators_users]
     # for each_auth_obj in all_authors:
+
 
     #     u = User.objects.get(id=each_auth_obj.created_by)
 
