@@ -4081,7 +4081,6 @@ $bp_background_color: #101d29;
     overflow-y: auto;
     z-index:100;
     //margin-top:52px;
-
     .add_buddy_icon {
         height: 50px;
         width: 50px;
@@ -4089,7 +4088,26 @@ $bp_background_color: #101d29;
         cursor: pointer;
     }
 }
-
+.username_panel {
+    //position: fixed;
+    right: 0px;
+    top: 0px;
+    width: 70px;
+    height: auto;
+    padding: 10px;
+    //background-color: $bp_background_color;
+    background-color: rgba(16, 29, 41, 0.64);
+    overflow-y: auto;
+    z-index:100;
+    //margin-top:52px;
+    margin-left: 120px;
+    .add_buddy_icon {
+        height: 50px;
+        width: 50px;
+        border-radius: 4px;
+        cursor: pointer;
+    }
+}
 .buddy_icon {
     border-radius: 4px;
     overflow: hidden;
