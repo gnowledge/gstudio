@@ -23,6 +23,7 @@
 {% block body_content %}
 	{% url 'auth_password_reset' as auth_pwd_reset_url %}
 	{% url 'registration_register' as register_url %}
+	{% include "ndf/user-login.html" %}
 	<div class="login-page row">
 		<div class="login-page-opacity"></div>
         <div class="login-page-form">
