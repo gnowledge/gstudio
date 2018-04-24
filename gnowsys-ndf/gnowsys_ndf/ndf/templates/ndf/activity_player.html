@@ -102,17 +102,19 @@
           <div class="small-9 medium-9 large-9 columns activity-section-expand">
             <div class="activity-player-controls">
               {% with node.member_of_names_list as node_member_of_names_list %}
+              {% get_relation_value node.pk 'has_help' as grel_help %}
+              {% get_relation_value node.pk 'has_admin_page' as grel_admin_page %}
+
               {% if "QuizItemEvent" not in node_member_of_names_list and "QuizItem" not in node_member_of_names_list%}
+              {% if grel_help.grel_id  or grel_admin_page.grel_id %}
               <div class="input_links row" style="margin-left:10px;">
-                
-                {% get_relation_value node.pk 'has_help' as grel_help %}
-                {% get_relation_value node.pk 'has_admin_page' as grel_admin_page %}
                   {% if grel_help.grel_id  %}
                     <a class="student-page right"> {% trans "Student Help" %}</a>
                   {% endif %}
-                  {% if  is_gstaff or user.is_superuser %}
-                    {% if grel_admin_page.grel_id %}<a class="admin-page right"> {% trans "Teacher's Help" %}</a>{% endif %}
-                  {% endif  %}
+                  {% if grel_admin_page.grel_id and is_gstaff or user.is_superuser %}
+                    <a class="admin-page right"> {% trans "Teacher's Help" %}</a>
+                  {% endif %}
+              {% endif %}
 
                 
                 {% if player_discussion or node_discussion %}
