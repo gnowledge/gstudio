@@ -4354,7 +4354,7 @@ ul.nav_menu_1 > li > a.selected, ul.nav_menu_1 > li > a:hover {
   width: 1em;
   height: 1.4em;
   white-space: nowrap;
-  font-size: 1.2rem;
+  font-size: 2rem;
   margin: 0;
   vertical-align: bottom;
 }
@@ -6780,4 +6780,32 @@ input.transcript-toggler {
 /* line 6971, ../../../scss/_clix2017.scss */
 .mod-detail-container {
   margin-left: 3.3%;
+}
+
+/* line 6975, ../../../scss/_clix2017.scss */
+.rating-widget-container {
+  margin-bottom: 6em;
+  font-size: 20px;
+}
+
+/* line 6980, ../../../scss/_clix2017.scss */
+.index-collapse-container {
+  padding: 12px 16px 9px;
+  background-color: #333;
+  font-size: .75rem;
+  border-bottom: 3px solid #333;
+  text-transform: uppercase;
+  cursor: pointer;
+}
+
+/* line 6989, ../../../scss/_clix2017.scss */
+.activity-content-container {
+  margin-top: -8vh;
+  margin-left: -4px;
+}
+
+/* line 6994, ../../../scss/_clix2017.scss */
+.activity-player-controls {
+  min-width: 100%;
+  margin-left: -15px;
 }
