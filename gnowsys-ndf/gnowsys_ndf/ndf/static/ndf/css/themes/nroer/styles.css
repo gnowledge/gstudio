@@ -29640,34 +29640,42 @@ ul.horizontal_tabs_gstudio > li.sub_group_action:hover ul {
   color: #3c5264;
   font-size: 19px;
   font-weight: 600;
+  padding-bottom: 2px;
 }
-/* line 6105, ../../../scss/_app_styles.scss */
+@media screen and (max-width: 400px) {
+  /* line 6096, ../../../scss/_app_styles.scss */
+  .course-content .course-unit-name > div {
+    margin: 25px 10px;
+    height: 55px;
+  }
+}
+/* line 6110, ../../../scss/_app_styles.scss */
 .course-content .course-activity-group > div .jqtree-title {
   color: #74a0c0;
   font-size: 17px;
 }
-/* line 6111, ../../../scss/_app_styles.scss */
+/* line 6116, ../../../scss/_app_styles.scss */
 .course-content .course-activity-name > div .jqtree-title {
   color: #74a0c0;
   font-size: 17px;
 }
 
-/* line 6118, ../../../scss/_app_styles.scss */
+/* line 6123, ../../../scss/_app_styles.scss */
 .jqtree-title > .fa-check {
   color: green;
 }
 
-/* line 6121, ../../../scss/_app_styles.scss */
+/* line 6126, ../../../scss/_app_styles.scss */
 .jqtree-title > .fa-check-circle-o {
   color: green;
 }
 
-/* line 6124, ../../../scss/_app_styles.scss */
+/* line 6129, ../../../scss/_app_styles.scss */
 .jqtree-title > .fa-clock-o {
   color: orange;
 }
 
-/* line 6127, ../../../scss/_app_styles.scss */
+/* line 6132, ../../../scss/_app_styles.scss */
 .course-status-icon {
   font-size: 20px;
   margin-right: 5px;
@@ -29677,23 +29685,23 @@ ul.horizontal_tabs_gstudio > li.sub_group_action:hover ul {
 /*
     Styling for the Secondary header 2
 */
-/* line 6146, ../../../scss/_app_styles.scss */
+/* line 6151, ../../../scss/_app_styles.scss */
 .activity_player_header {
   background-color: rgba(107, 0, 84, 0.97);
   box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.1);
 }
-/* line 6149, ../../../scss/_app_styles.scss */
+/* line 6154, ../../../scss/_app_styles.scss */
 .activity_player_header > div {
   height: 45px;
   line-height: 45px;
   display: inline-block;
   vertical-align: top;
 }
-/* line 6157, ../../../scss/_app_styles.scss */
+/* line 6162, ../../../scss/_app_styles.scss */
 .activity_player_header > div:not(:last-child) {
   border-right: 1px solid #fff;
 }
-/* line 6166, ../../../scss/_app_styles.scss */
+/* line 6171, ../../../scss/_app_styles.scss */
 .activity_player_header .header_title {
   position: relative;
   color: #fff;
@@ -29704,56 +29712,56 @@ ul.horizontal_tabs_gstudio > li.sub_group_action:hover ul {
   margin-left: -2px;
   border-right: 1px solid white;
 }
-/* line 6175, ../../../scss/_app_styles.scss */
+/* line 6180, ../../../scss/_app_styles.scss */
 .activity_player_header .header_title a {
   color: #ffc14f;
 }
 @media only screen and (min-device-width: 1025px) and (max-device-width: 2130px) {
-  /* line 6166, ../../../scss/_app_styles.scss */
+  /* line 6171, ../../../scss/_app_styles.scss */
   .activity_player_header .header_title {
     text-overflow: ellipsis;
     width: calc(100% - 938px);
   }
 }
 @media only screen and (min-device-width: 2131px) {
-  /* line 6166, ../../../scss/_app_styles.scss */
+  /* line 6171, ../../../scss/_app_styles.scss */
   .activity_player_header .header_title {
     text-overflow: ellipsis;
     width: calc(100% - 970px);
   }
 }
 @media only screen and (max-device-width: 1024px) {
-  /* line 6166, ../../../scss/_app_styles.scss */
+  /* line 6171, ../../../scss/_app_styles.scss */
   .activity_player_header .header_title {
     text-overflow: ellipsis;
     width: calc(100% - 753px);
   }
 }
-/* line 6252, ../../../scss/_app_styles.scss */
+/* line 6257, ../../../scss/_app_styles.scss */
 .activity_player_header .header_icon {
   font-size: 16px;
   line-height: 45px;
   color: #ffc14f;
 }
-/* line 6258, ../../../scss/_app_styles.scss */
+/* line 6263, ../../../scss/_app_styles.scss */
 .activity_player_header .header_icon_block {
   color: #ffc14f;
   width: 70px;
   cursor: pointer;
   text-align: center;
 }
-/* line 6264, ../../../scss/_app_styles.scss */
+/* line 6269, ../../../scss/_app_styles.scss */
 .activity_player_header .header_text_sm_block {
   padding: 0px 10px;
 }
 @media screen and (min-width: 1025px) {
-  /* line 6264, ../../../scss/_app_styles.scss */
+  /* line 6269, ../../../scss/_app_styles.scss */
   .activity_player_header .header_text_sm_block {
     padding: 0px 15px;
   }
 }
 @media screen and (min-width: 1025px) {
-  /* line 6271, ../../../scss/_app_styles.scss */
+  /* line 6276, ../../../scss/_app_styles.scss */
   .activity_player_header .lesson-nav {
     float: right;
     margin-right: 70px;
@@ -29761,73 +29769,73 @@ ul.horizontal_tabs_gstudio > li.sub_group_action:hover ul {
   }
 }
 @media screen and (max-width: 1024px) {
-  /* line 6271, ../../../scss/_app_styles.scss */
+  /* line 6276, ../../../scss/_app_styles.scss */
   .activity_player_header .lesson-nav {
     background-color: rgba(107, 0, 84, 0.97);
   }
 }
-/* line 6284, ../../../scss/_app_styles.scss */
+/* line 6289, ../../../scss/_app_styles.scss */
 .activity_player_header .lesson-nav div {
   height: 45px;
   line-height: 45px;
   display: inline-block;
   vertical-align: top;
 }
-/* line 6290, ../../../scss/_app_styles.scss */
+/* line 6295, ../../../scss/_app_styles.scss */
 .activity_player_header .lesson-nav .header_text_block {
   padding: 0px 15px;
   margin-left: -2px;
   border-right: 1px solid white;
 }
-/* line 6294, ../../../scss/_app_styles.scss */
+/* line 6299, ../../../scss/_app_styles.scss */
 .activity_player_header .lesson-nav .header_text_block a {
   color: #ffc14f;
 }
-/* line 6300, ../../../scss/_app_styles.scss */
+/* line 6305, ../../../scss/_app_styles.scss */
 .activity_player_header .lesson-nav .header_text_lg_block {
   padding: 0px 9px;
 }
 @media screen and (min-width: 1025px) {
-  /* line 6300, ../../../scss/_app_styles.scss */
+  /* line 6305, ../../../scss/_app_styles.scss */
   .activity_player_header .lesson-nav .header_text_lg_block {
     padding: 0px 15px;
   }
 }
-/* line 6308, ../../../scss/_app_styles.scss */
+/* line 6313, ../../../scss/_app_styles.scss */
 .activity_player_header .lesson-nav .header_text_md_block {
   padding: 0px 7px;
 }
 @media screen and (min-width: 1025px) {
-  /* line 6308, ../../../scss/_app_styles.scss */
+  /* line 6313, ../../../scss/_app_styles.scss */
   .activity_player_header .lesson-nav .header_text_md_block {
     padding: 0px 15px;
   }
 }
-/* line 6317, ../../../scss/_app_styles.scss */
+/* line 6322, ../../../scss/_app_styles.scss */
 .activity_player_header .lesson-nav .back_button {
   border-color: #e0e0e0;
   background-color: rgba(244, 244, 244, 0.3);
 }
-/* line 6320, ../../../scss/_app_styles.scss */
+/* line 6325, ../../../scss/_app_styles.scss */
 .activity_player_header .lesson-nav .back_button i {
   color: #71318b;
 }
-/* line 6326, ../../../scss/_app_styles.scss */
+/* line 6331, ../../../scss/_app_styles.scss */
 .activity_player_header .lesson-nav .settings i {
   transition: transform .5s ease-in-out;
   -webkit-transition: -webkit-transform .5s ease-in-out;
 }
-/* line 6330, ../../../scss/_app_styles.scss */
+/* line 6335, ../../../scss/_app_styles.scss */
 .activity_player_header .lesson-nav .settings:hover i {
   transform: rotate(90deg);
   -webkit-transform: rotate(90deg);
 }
-/* line 6336, ../../../scss/_app_styles.scss */
+/* line 6341, ../../../scss/_app_styles.scss */
 .activity_player_header .lesson-nav .pagination:not(i) {
   color: #a983b9;
 }
 
-/* line 6344, ../../../scss/_app_styles.scss */
+/* line 6349, ../../../scss/_app_styles.scss */
 .activity_sheet {
   background: rgba(231, 231, 231, 0.12);
   box-shadow: 0px 2px 6px #000;
@@ -29835,29 +29843,29 @@ ul.horizontal_tabs_gstudio > li.sub_group_action:hover ul {
   padding: 0px 0px;
   max-width: 100vw;
 }
-/* line 6351, ../../../scss/_app_styles.scss */
+/* line 6356, ../../../scss/_app_styles.scss */
 .activity_sheet > .columns {
   padding: 0px;
   height: 100%;
 }
-/* line 6355, ../../../scss/_app_styles.scss */
+/* line 6360, ../../../scss/_app_styles.scss */
 .activity_sheet .course_editor {
   margin-bottom: 10px;
   position: relative;
   /*Overriding default*/
   /*Custom css*/
 }
-/* line 6361, ../../../scss/_app_styles.scss */
+/* line 6366, ../../../scss/_app_styles.scss */
 .activity_sheet .course_editor .accordion .accordion-navigation > .content, .activity_sheet .course_editor .accordion dd > .content {
   padding: 0px;
   padding-left: 0px;
 }
-/* line 6367, ../../../scss/_app_styles.scss */
+/* line 6372, ../../../scss/_app_styles.scss */
 .activity_sheet .course_editor > div {
   display: inline-block;
   vertical-align: top;
 }
-/* line 6372, ../../../scss/_app_styles.scss */
+/* line 6377, ../../../scss/_app_styles.scss */
 .activity_sheet .course_editor .course_tree {
   transition: all 1s ease;
   -webkit-transition: all 1s ease;
@@ -29867,25 +29875,25 @@ ul.horizontal_tabs_gstudio > li.sub_group_action:hover ul {
   overflow-y: auto;
   height: 100vh;
 }
-/* line 6381, ../../../scss/_app_styles.scss */
+/* line 6386, ../../../scss/_app_styles.scss */
 .activity_sheet .course_editor .course_tree .course-lessons dd {
   border-bottom: 2px solid #9abfd9;
   transition: border-color 1s ease;
   -webkit-transition: border-color 1s ease;
 }
-/* line 6385, ../../../scss/_app_styles.scss */
+/* line 6390, ../../../scss/_app_styles.scss */
 .activity_sheet .course_editor .course_tree .course-lessons dd.accordion-navigation {
   position: relative;
   padding-left: 0px;
 }
-/* line 6390, ../../../scss/_app_styles.scss */
+/* line 6395, ../../../scss/_app_styles.scss */
 .activity_sheet .course_editor .course_tree .course-lessons dd.accordion-navigation > a:before {
   position: absolute;
   left: 23px;
   line-height: 20px;
   color: #74b3dc;
 }
-/* line 6399, ../../../scss/_app_styles.scss */
+/* line 6404, ../../../scss/_app_styles.scss */
 .activity_sheet .course_editor .course_tree .course-lessons dd.accordion-navigation a.entity-title {
   background: inherit;
   cursor: pointer;
@@ -29894,7 +29902,7 @@ ul.horizontal_tabs_gstudio > li.sub_group_action:hover ul {
   transition: color 1s ease;
   -webkit-transition: color 1s ease;
 }
-/* line 6406, ../../../scss/_app_styles.scss */
+/* line 6411, ../../../scss/_app_styles.scss */
 .activity_sheet .course_editor .course_tree .course-lessons dd.accordion-navigation a.entity-title .edit_entity {
   color: #c9d1d8;
   font-weight: 400;
@@ -29903,15 +29911,15 @@ ul.horizontal_tabs_gstudio > li.sub_group_action:hover ul {
   position: relative;
   display: none;
 }
-/* line 6415, ../../../scss/_app_styles.scss */
+/* line 6420, ../../../scss/_app_styles.scss */
 .activity_sheet .course_editor .course_tree .course-lessons dd.accordion-navigation a.entity-title .edit_entity i {
   display: none;
 }
-/* line 6420, ../../../scss/_app_styles.scss */
+/* line 6425, ../../../scss/_app_styles.scss */
 .activity_sheet .course_editor .course_tree .course-lessons dd.accordion-navigation a.entity-title .edit_entity > .entity_actions {
   margin-bottom: 0px;
 }
-/* line 6423, ../../../scss/_app_styles.scss */
+/* line 6428, ../../../scss/_app_styles.scss */
 .activity_sheet .course_editor .course_tree .course-lessons dd.accordion-navigation a.entity-title .edit_entity > .entity_actions li {
   white-space: nowrap;
   list-style: none;
@@ -29919,21 +29927,21 @@ ul.horizontal_tabs_gstudio > li.sub_group_action:hover ul {
   margin: 0px 10px;
   cursor: pointer;
 }
-/* line 6433, ../../../scss/_app_styles.scss */
+/* line 6438, ../../../scss/_app_styles.scss */
 .activity_sheet .course_editor .course_tree .course-lessons dd.accordion-navigation a.entity-title:hover .edit_entity {
   display: block;
 }
-/* line 6439, ../../../scss/_app_styles.scss */
+/* line 6444, ../../../scss/_app_styles.scss */
 .activity_sheet .course_editor .course_tree .course-lessons dd.accordion-navigation.active > a:before {
   content: '';
   line-height: 55px;
   color: #d7d7d7;
 }
-/* line 6447, ../../../scss/_app_styles.scss */
+/* line 6452, ../../../scss/_app_styles.scss */
 .activity_sheet .course_editor .course_tree .course-lessons dd.accordion-navigation .course-activities {
   margin: 0px;
 }
-/* line 6449, ../../../scss/_app_styles.scss */
+/* line 6454, ../../../scss/_app_styles.scss */
 .activity_sheet .course_editor .course_tree .course-lessons dd.accordion-navigation .course-activities > li {
   list-style: none;
   border-top: 1px solid #e9e9e9;
@@ -29942,7 +29950,7 @@ ul.horizontal_tabs_gstudio > li.sub_group_action:hover ul {
   transition: border-color 1s ease;
   -webkit-transition: border-color 1s ease;
 }
-/* line 6456, ../../../scss/_app_styles.scss */
+/* line 6461, ../../../scss/_app_styles.scss */
 .activity_sheet .course_editor .course_tree .course-lessons dd.accordion-navigation .course-activities > li > a {
   color: #7ca0d0;
   width: 100%;
@@ -29950,11 +29958,11 @@ ul.horizontal_tabs_gstudio > li.sub_group_action:hover ul {
   transition: color 1s ease;
   -webkit-transition: color 1s ease;
 }
-/* line 6465, ../../../scss/_app_styles.scss */
+/* line 6470, ../../../scss/_app_styles.scss */
 .activity_sheet .course_editor .course_tree .course-lessons dd.accordion-navigation .content {
   background: inherit;
 }
-/* line 6474, ../../../scss/_app_styles.scss */
+/* line 6479, ../../../scss/_app_styles.scss */
 .activity_sheet .course_editor .course-editor-section {
   width: 0%;
   display: inline-block;
@@ -29966,48 +29974,48 @@ ul.horizontal_tabs_gstudio > li.sub_group_action:hover ul {
   overflow-y: auto;
   background: #fff;
 }
-/* line 6484, ../../../scss/_app_styles.scss */
+/* line 6489, ../../../scss/_app_styles.scss */
 .activity_sheet .course_editor .course-editor-section .editor-header {
   height: 100px;
   background-color: #e5f1f6;
   border-bottom: 1px solid #e6e6e7;
 }
-/* line 6489, ../../../scss/_app_styles.scss */
+/* line 6494, ../../../scss/_app_styles.scss */
 .activity_sheet .course_editor .course-editor-section .editor-header .header-left {
   padding: 29px 0px;
 }
-/* line 6492, ../../../scss/_app_styles.scss */
+/* line 6497, ../../../scss/_app_styles.scss */
 .activity_sheet .course_editor .course-editor-section .editor-header .header-left > span {
   color: #3c5264;
   font-weight: 600;
   margin-right: 10px;
 }
-/* line 6501, ../../../scss/_app_styles.scss */
+/* line 6506, ../../../scss/_app_styles.scss */
 .activity_sheet .course_editor .course-editor-section .editor-header .custom_dropdown {
   margin: 40px 35px 0px;
 }
-/* line 6506, ../../../scss/_app_styles.scss */
+/* line 6511, ../../../scss/_app_styles.scss */
 .activity_sheet .course_editor .course-editor-section .editor-tool .editor_actions {
   background-color: #fff;
   border-bottom: 1px solid #ccc;
   height: 55px;
 }
-/* line 6510, ../../../scss/_app_styles.scss */
+/* line 6515, ../../../scss/_app_styles.scss */
 .activity_sheet .course_editor .course-editor-section .editor-tool .editor_actions ul {
   margin: 0px;
 }
-/* line 6512, ../../../scss/_app_styles.scss */
+/* line 6517, ../../../scss/_app_styles.scss */
 .activity_sheet .course_editor .course-editor-section .editor-tool .editor_actions ul li {
   list-style: none;
   display: inline-block;
 }
-/* line 6515, ../../../scss/_app_styles.scss */
+/* line 6520, ../../../scss/_app_styles.scss */
 .activity_sheet .course_editor .course-editor-section .editor-tool .editor_actions ul li:not(:first-child) {
   padding: 1px 30px;
   border-left: 1px solid #ccc;
   text-align: center;
 }
-/* line 6521, ../../../scss/_app_styles.scss */
+/* line 6526, ../../../scss/_app_styles.scss */
 .activity_sheet .course_editor .course-editor-section .editor-tool .editor_actions ul li span {
   display: inline-block;
   letter-spacing: 0.5px;
@@ -30016,7 +30024,7 @@ ul.horizontal_tabs_gstudio > li.sub_group_action:hover ul {
   cursor: pointer;
 }
 
-/* line 6539, ../../../scss/_app_styles.scss */
+/* line 6544, ../../../scss/_app_styles.scss */
 .course_editor_section {
   background: #fff;
   min-height: 100vh;
@@ -30024,26 +30032,26 @@ ul.horizontal_tabs_gstudio > li.sub_group_action:hover ul {
   margin-bottom: 10px;
   padding-right: 4px;
 }
-/* line 6545, ../../../scss/_app_styles.scss */
+/* line 6550, ../../../scss/_app_styles.scss */
 .course_editor_section #scstyle {
   margin-top: -10px;
 }
 
-/* line 6550, ../../../scss/_app_styles.scss */
+/* line 6555, ../../../scss/_app_styles.scss */
 .lesson-title {
   font-size: 18px;
   padding-top: 10px;
   padding-left: 10px;
 }
 
-/* line 6556, ../../../scss/_app_styles.scss */
+/* line 6561, ../../../scss/_app_styles.scss */
 .activity-title {
   font-size: 18px;
   padding-top: 10px;
   padding-left: 23px;
   margin: 0px;
 }
-/* line 6562, ../../../scss/_app_styles.scss */
+/* line 6567, ../../../scss/_app_styles.scss */
 .activity-title > li {
   list-style: none;
   border-top: 1px solid #e9e9e9;
@@ -30053,29 +30061,29 @@ ul.horizontal_tabs_gstudio > li.sub_group_action:hover ul {
   -webkit-transition: border-color 1s ease;
   margin-left: -23px;
 }
-/* line 6571, ../../../scss/_app_styles.scss */
+/* line 6576, ../../../scss/_app_styles.scss */
 .activity-title > li.active {
   background: rgba(116, 0, 255, 0.31);
 }
-/* line 6575, ../../../scss/_app_styles.scss */
+/* line 6580, ../../../scss/_app_styles.scss */
 .activity-title > li > a {
   color: black;
 }
 
-/* line 6584, ../../../scss/_app_styles.scss */
+/* line 6589, ../../../scss/_app_styles.scss */
 .activity_page_rendered {
   margin-left: 20px;
   max-width: 900px;
 }
 
 /* Rating css */
-/* line 6592, ../../../scss/_app_styles.scss */
+/* line 6597, ../../../scss/_app_styles.scss */
 .rating-bar {
   /* the hidden clearer */
   /* this is gross, I threw this in to override the starred
   buttons when hovering. */
 }
-/* line 6594, ../../../scss/_app_styles.scss */
+/* line 6599, ../../../scss/_app_styles.scss */
 .rating-bar > span {
   /* remove inline-block whitespace */
   font-size: 0;
@@ -30083,19 +30091,19 @@ ul.horizontal_tabs_gstudio > li.sub_group_action:hover ul {
   unicode-bidi: bidi-override;
   direction: rtl;
 }
-/* line 6602, ../../../scss/_app_styles.scss */
+/* line 6607, ../../../scss/_app_styles.scss */
 .rating-bar.unrated {
   /* If the user has not rated yet */
 }
-/* line 6604, ../../../scss/_app_styles.scss */
+/* line 6609, ../../../scss/_app_styles.scss */
 .rating-bar.unrated:checked ~ label:before {
   color: #ffc14e;
 }
-/* line 6610, ../../../scss/_app_styles.scss */
+/* line 6615, ../../../scss/_app_styles.scss */
 .rating-bar [type*="radio"] {
   display: none;
 }
-/* line 6612, ../../../scss/_app_styles.scss */
+/* line 6617, ../../../scss/_app_styles.scss */
 .rating-bar [type*="radio"] + label {
   /* only enough room for the star */
   display: inline-block;
@@ -30108,7 +30116,7 @@ ul.horizontal_tabs_gstudio > li.sub_group_action:hover ul {
   margin: 0;
   vertical-align: bottom;
 }
-/* line 6624, ../../../scss/_app_styles.scss */
+/* line 6629, ../../../scss/_app_styles.scss */
 .rating-bar [type*="radio"] + label:before {
   display: inline-block;
   text-indent: -9999px;
@@ -30116,32 +30124,32 @@ ul.horizontal_tabs_gstudio > li.sub_group_action:hover ul {
   /* WHITE STAR */
   color: #888;
 }
-/* line 6631, ../../../scss/_app_styles.scss */
+/* line 6636, ../../../scss/_app_styles.scss */
 .rating-bar [type*="radio"]:checked ~ label:before, .rating-bar [type*="radio"] + label:hover ~ label:before, .rating-bar [type*="radio"] + label:hover:before {
   content: '\2605';
   /* BLACK STAR */
   color: #FF980D;
   text-shadow: 0 0 1px #333;
 }
-/* line 6642, ../../../scss/_app_styles.scss */
+/* line 6647, ../../../scss/_app_styles.scss */
 .rating-bar .last[type*="radio"] + label {
   text-indent: -9999px;
   width: .5em;
   margin-left: -.5em;
 }
-/* line 6649, ../../../scss/_app_styles.scss */
+/* line 6654, ../../../scss/_app_styles.scss */
 .rating-bar .last[type*="radio"] + label:before {
   width: .5em;
   height: 1.4em;
 }
-/* line 6657, ../../../scss/_app_styles.scss */
+/* line 6662, ../../../scss/_app_styles.scss */
 .rating-bar:hover [type*="radio"] + label:before {
   content: '\2606';
   /* WHITE STAR */
   color: #888;
   text-shadow: none;
 }
-/* line 6662, ../../../scss/_app_styles.scss */
+/* line 6667, ../../../scss/_app_styles.scss */
 .rating-bar:hover [type*="radio"] + label:hover ~ label:before,
 .rating-bar:hover [type*="radio"] + label:hover:before {
   content: '\2605';
@@ -30150,29 +30158,29 @@ ul.horizontal_tabs_gstudio > li.sub_group_action:hover ul {
   text-shadow: 0 0 1px #333;
 }
 
-/* line 6672, ../../../scss/_app_styles.scss */
+/* line 6677, ../../../scss/_app_styles.scss */
 [class*="column"] + [class*="column"]:last-child {
   float: left;
 }
 
-/* line 6676, ../../../scss/_app_styles.scss */
+/* line 6681, ../../../scss/_app_styles.scss */
 .input_links {
   margin-left: 10px;
 }
-/* line 6678, ../../../scss/_app_styles.scss */
+/* line 6683, ../../../scss/_app_styles.scss */
 .input_links a {
   margin-right: 35px;
   margin-top: 5px;
 }
 
-/* line 6684, ../../../scss/_app_styles.scss */
+/* line 6689, ../../../scss/_app_styles.scss */
 .buddy_margin {
   margin-right: 80px;
   font-family: OpenSans-Regular;
   margin-top: 6px;
 }
 
-/* line 6692, ../../../scss/_app_styles.scss */
+/* line 6697, ../../../scss/_app_styles.scss */
 .activity-slides-container {
   height: 100%;
   width: 80%;
@@ -30181,19 +30189,19 @@ ul.horizontal_tabs_gstudio > li.sub_group_action:hover ul {
   padding: 0em 0em 0em 0em;
   margin-bottom: 15px;
 }
-/* line 6701, ../../../scss/_app_styles.scss */
+/* line 6706, ../../../scss/_app_styles.scss */
 .activity-slides-container .activity-slides {
   height: 100%;
   color: #f8f8f8;
 }
-/* line 6705, ../../../scss/_app_styles.scss */
+/* line 6710, ../../../scss/_app_styles.scss */
 .activity-slides-container .activity-slides .activity-slide {
   padding: 1em;
   height: inherit;
   background: #fff;
   position: relative;
 }
-/* line 6711, ../../../scss/_app_styles.scss */
+/* line 6716, ../../../scss/_app_styles.scss */
 .activity-slides-container .activity-slides .activity-slide .view-related-content {
   border: 1px solid #999;
   display: inline-block;
@@ -30201,12 +30209,12 @@ ul.horizontal_tabs_gstudio > li.sub_group_action:hover ul {
   color: #999999;
   margin-left: 12%;
 }
-/* line 6719, ../../../scss/_app_styles.scss */
+/* line 6724, ../../../scss/_app_styles.scss */
 .activity-slides-container .activity-slides .activity-slide .page > section {
   margin-left: 50%;
   transform: translate(-50%);
 }
-/* line 6725, ../../../scss/_app_styles.scss */
+/* line 6730, ../../../scss/_app_styles.scss */
 .activity-slides-container .activity-slides .related-content-close {
   position: absolute;
   right: -2px;
@@ -30215,21 +30223,21 @@ ul.horizontal_tabs_gstudio > li.sub_group_action:hover ul {
   display: none;
   color: #8E8E8E;
 }
-/* line 6734, ../../../scss/_app_styles.scss */
+/* line 6739, ../../../scss/_app_styles.scss */
 .activity-slides-container .activity-slides .content-expanded > i {
   font-size: 20px !important;
   color: #ccc !important;
   top: 8px !important;
 }
-/* line 6739, ../../../scss/_app_styles.scss */
+/* line 6744, ../../../scss/_app_styles.scss */
 .activity-slides-container .activity-slides .content-expanded .related-content-header {
   margin-left: 20px !important;
 }
-/* line 6741, ../../../scss/_app_styles.scss */
+/* line 6746, ../../../scss/_app_styles.scss */
 .activity-slides-container .activity-slides .content-expanded .related-content-header > span:first-child {
   display: none !important;
 }
-/* line 6744, ../../../scss/_app_styles.scss */
+/* line 6749, ../../../scss/_app_styles.scss */
 .activity-slides-container .activity-slides .content-expanded .related-content-header .back-to-activity {
   display: inline-block !important;
   float: right;
@@ -30240,24 +30248,24 @@ ul.horizontal_tabs_gstudio > li.sub_group_action:hover ul {
   color: #757575;
   margin-right: 20px;
 }
-/* line 6754, ../../../scss/_app_styles.scss */
+/* line 6759, ../../../scss/_app_styles.scss */
 .activity-slides-container .activity-slides .content-expanded .related-content-header .related-content-title {
   font-size: 15px !important;
   position: relative;
 }
-/* line 6758, ../../../scss/_app_styles.scss */
+/* line 6763, ../../../scss/_app_styles.scss */
 .activity-slides-container .activity-slides .content-expanded .related-content-header .related-content-title .related-content-close {
   display: block;
 }
-/* line 6761, ../../../scss/_app_styles.scss */
+/* line 6766, ../../../scss/_app_styles.scss */
 .activity-slides-container .activity-slides .content-expanded .related-content-header .related-content-title > i {
   display: none !important;
 }
-/* line 6766, ../../../scss/_app_styles.scss */
+/* line 6771, ../../../scss/_app_styles.scss */
 .activity-slides-container .activity-slides .content-expanded .related-content-body {
   display: block !important;
 }
-/* line 6770, ../../../scss/_app_styles.scss */
+/* line 6775, ../../../scss/_app_styles.scss */
 .activity-slides-container .activity-slides #related-content {
   width: 100%;
   margin: 0px auto;
@@ -30269,7 +30277,7 @@ ul.horizontal_tabs_gstudio > li.sub_group_action:hover ul {
   position: relative;
   color: #222222;
 }
-/* line 6781, ../../../scss/_app_styles.scss */
+/* line 6786, ../../../scss/_app_styles.scss */
 .activity-slides-container .activity-slides #related-content > i {
   color: #fff;
   font-size: 40px;
@@ -30277,15 +30285,15 @@ ul.horizontal_tabs_gstudio > li.sub_group_action:hover ul {
   left: 8px;
   top: 4px;
 }
-/* line 6789, ../../../scss/_app_styles.scss */
+/* line 6794, ../../../scss/_app_styles.scss */
 .activity-slides-container .activity-slides #related-content .related-content-header {
   margin-left: 40px;
 }
-/* line 6791, ../../../scss/_app_styles.scss */
+/* line 6796, ../../../scss/_app_styles.scss */
 .activity-slides-container .activity-slides #related-content .related-content-header .back-to-activity {
   display: none;
 }
-/* line 6794, ../../../scss/_app_styles.scss */
+/* line 6799, ../../../scss/_app_styles.scss */
 .activity-slides-container .activity-slides #related-content .related-content-header span {
   display: block;
   vertical-align: top;
@@ -30295,25 +30303,25 @@ ul.horizontal_tabs_gstudio > li.sub_group_action:hover ul {
   letter-spacing: 0.8px;
   color: #999999;
 }
-/* line 6803, ../../../scss/_app_styles.scss */
+/* line 6808, ../../../scss/_app_styles.scss */
 .activity-slides-container .activity-slides #related-content .related-content-header .related-content-title {
   font-size: 20px;
   color: #000;
   cursor: pointer;
 }
-/* line 6809, ../../../scss/_app_styles.scss */
+/* line 6814, ../../../scss/_app_styles.scss */
 .activity-slides-container .activity-slides #related-content .related-content-body {
   display: none;
 }
 
-/* line 6818, ../../../scss/_app_styles.scss */
+/* line 6823, ../../../scss/_app_styles.scss */
 .icon-color {
   color: #2e3f51 !important;
   padding: right;
 }
 
 /* The asset tile  */
-/* line 6828, ../../../scss/_app_styles.scss */
+/* line 6833, ../../../scss/_app_styles.scss */
 .group_content .group_banner {
   transition: all 1s ease;
   -webkit-transition: all 1s ease;
@@ -30323,7 +30331,7 @@ ul.horizontal_tabs_gstudio > li.sub_group_action:hover ul {
   margin-bottom: -70px;
   -webkit-box-shadow: 0px 0px 5px 5px #C9C9C;
 }
-/* line 6837, ../../../scss/_app_styles.scss */
+/* line 6842, ../../../scss/_app_styles.scss */
 .group_content .group_header {
   height: 45px;
   padding-bottom: 5px;
@@ -30340,7 +30348,7 @@ ul.horizontal_tabs_gstudio > li.sub_group_action:hover ul {
   filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#0049667a', endColorstr='#8049667a',GradientType=0 );
   /* IE6-9 */
 }
-/* line 6850, ../../../scss/_app_styles.scss */
+/* line 6855, ../../../scss/_app_styles.scss */
 .group_content .group_header .group_title {
   font-size: 28px;
   font-weight: 700;
@@ -30350,28 +30358,28 @@ ul.horizontal_tabs_gstudio > li.sub_group_action:hover ul {
   left: 25px;
   color: #164A7B;
 }
-/* line 6859, ../../../scss/_app_styles.scss */
+/* line 6864, ../../../scss/_app_styles.scss */
 .group_content .group_header .group_actions > button {
   display: inline-block;
   margin: 7px 10px;
 }
-/* line 6864, ../../../scss/_app_styles.scss */
+/* line 6869, ../../../scss/_app_styles.scss */
 .group_content .group_sections {
   text-align: center;
   border-bottom: 2px solid #f5f5f5;
   background: #eefaff;
 }
-/* line 6869, ../../../scss/_app_styles.scss */
+/* line 6874, ../../../scss/_app_styles.scss */
 .group_content .group_sections_content {
   background-color: #fff;
   margin-bottom: 100px;
   margin-top: -1px;
 }
-/* line 6875, ../../../scss/_app_styles.scss */
+/* line 6880, ../../../scss/_app_styles.scss */
 .group_content .top-bar-secondions_content {
   background-color: #fff;
 }
-/* line 6879, ../../../scss/_app_styles.scss */
+/* line 6884, ../../../scss/_app_styles.scss */
 .group_content .course_actions > span {
   margin-right: 5px;
   background: #2e3f51;
@@ -30384,7 +30392,7 @@ ul.horizontal_tabs_gstudio > li.sub_group_action:hover ul {
   border-radius: 3px;
   margin-left: 130px;
 }
-/* line 6892, ../../../scss/_app_styles.scss */
+/* line 6897, ../../../scss/_app_styles.scss */
 .group_content .course_actions > i {
   margin-right: 5px;
   background: rgba(0, 0, 0, 0.6);
@@ -30398,7 +30406,7 @@ ul.horizontal_tabs_gstudio > li.sub_group_action:hover ul {
   margin-right: 80px;
 }
 
-/* line 6907, ../../../scss/_app_styles.scss */
+/* line 6912, ../../../scss/_app_styles.scss */
 .orange-button-subtitle {
   color: #ce7869;
   padding: 4px 5px;
@@ -30411,13 +30419,13 @@ ul.horizontal_tabs_gstudio > li.sub_group_action:hover ul {
   margin-bottom: 8px;
   margin-top: 10px;
 }
-/* line 6918, ../../../scss/_app_styles.scss */
+/* line 6923, ../../../scss/_app_styles.scss */
 .orange-button-subtitle:hover {
   background-color: rgba(206, 120, 105, 0.2);
   color: #ce7869;
 }
 
-/* line 6924, ../../../scss/_app_styles.scss */
+/* line 6929, ../../../scss/_app_styles.scss */
 .transcript-toggler {
   display: block;
   width: 155px !important;
@@ -30433,12 +30441,12 @@ ul.horizontal_tabs_gstudio > li.sub_group_action:hover ul {
   text-transform: uppercase;
 }
 
-/* line 6939, ../../../scss/_app_styles.scss */
+/* line 6944, ../../../scss/_app_styles.scss */
 .asset_list {
   margin-left: 12px;
 }
 
-/* line 6943, ../../../scss/_app_styles.scss */
+/* line 6948, ../../../scss/_app_styles.scss */
 .activity_tile {
   margin-top: 10px;
   margin-bottom: 25px;
@@ -30447,22 +30455,22 @@ ul.horizontal_tabs_gstudio > li.sub_group_action:hover ul {
   height: 260px;
   border: 1px solid #164A7B;
 }
-/* line 6952, ../../../scss/_app_styles.scss */
+/* line 6957, ../../../scss/_app_styles.scss */
 .activity_tile .activity_preview {
   height: 200px;
   width: 100%;
   border-width: 5px;
 }
-/* line 6959, ../../../scss/_app_styles.scss */
+/* line 6964, ../../../scss/_app_styles.scss */
 .activity_tile .activity_preview img {
   width: 100%;
   height: 210px;
 }
-/* line 6965, ../../../scss/_app_styles.scss */
+/* line 6970, ../../../scss/_app_styles.scss */
 .activity_tile .activity_text {
   padding: 7px 0px 0px 0px;
 }
-/* line 6967, ../../../scss/_app_styles.scss */
+/* line 6972, ../../../scss/_app_styles.scss */
 .activity_tile .activity_text .activity_title {
   letter-spacing: 0.2px;
   overflow: hidden;
@@ -30471,15 +30479,15 @@ ul.horizontal_tabs_gstudio > li.sub_group_action:hover ul {
   padding-top: 10px;
   padding-left: 6px;
 }
-/* line 6974, ../../../scss/_app_styles.scss */
+/* line 6979, ../../../scss/_app_styles.scss */
 .activity_tile .activity_text .activity_title > a {
   margin-right: 0px !important;
 }
-/* line 6978, ../../../scss/_app_styles.scss */
+/* line 6983, ../../../scss/_app_styles.scss */
 .activity_tile .activity_text .activity_title .filenode {
   z-index: -1;
 }
-/* line 6984, ../../../scss/_app_styles.scss */
+/* line 6989, ../../../scss/_app_styles.scss */
 .activity_tile .activity_text .activity_desc {
   letter-spacing: 0.3px;
   overflow: hidden;
@@ -30488,7 +30496,7 @@ ul.horizontal_tabs_gstudio > li.sub_group_action:hover ul {
   color: grey;
 }
 
-/* line 6995, ../../../scss/_app_styles.scss */
+/* line 7000, ../../../scss/_app_styles.scss */
 .asset_tile {
   margin-top: 10px;
   margin-bottom: 25px;
@@ -30497,24 +30505,24 @@ ul.horizontal_tabs_gstudio > li.sub_group_action:hover ul {
   height: 280px;
   border: 1px solid #164A7B;
 }
-/* line 7004, ../../../scss/_app_styles.scss */
+/* line 7009, ../../../scss/_app_styles.scss */
 .asset_tile .asset_preview {
   height: 200px;
   width: 100%;
   border-width: 5px;
 }
-/* line 7011, ../../../scss/_app_styles.scss */
+/* line 7016, ../../../scss/_app_styles.scss */
 .asset_tile .asset_preview .photos-1 img {
   /* Just in case there are inline attributes */
   width: 100% !important;
   height: 210px !important;
 }
-/* line 7016, ../../../scss/_app_styles.scss */
+/* line 7021, ../../../scss/_app_styles.scss */
 .asset_tile .asset_preview img {
   width: 100%;
   height: 210px;
 }
-/* line 7020, ../../../scss/_app_styles.scss */
+/* line 7025, ../../../scss/_app_styles.scss */
 .asset_tile .asset_preview .photos {
   /* Prevent vertical gaps */
   line-height: 0;
@@ -30525,14 +30533,14 @@ ul.horizontal_tabs_gstudio > li.sub_group_action:hover ul {
   column-count: 2;
   column-gap: 0px;
 }
-/* line 7030, ../../../scss/_app_styles.scss */
+/* line 7035, ../../../scss/_app_styles.scss */
 .asset_tile .asset_preview .photos img {
   /* Just in case there are inline attributes */
   width: 100% !important;
   height: 100px !important;
 }
 @media (max-width: 1200px) {
-  /* line 7037, ../../../scss/_app_styles.scss */
+  /* line 7042, ../../../scss/_app_styles.scss */
   .asset_tile .asset_preview .photos {
     -moz-column-count: 2;
     -webkit-column-count: 2;
@@ -30540,7 +30548,7 @@ ul.horizontal_tabs_gstudio > li.sub_group_action:hover ul {
   }
 }
 @media (max-width: 1000px) {
-  /* line 7046, ../../../scss/_app_styles.scss */
+  /* line 7051, ../../../scss/_app_styles.scss */
   .asset_tile .asset_preview .photos {
     -moz-column-count: 2;
     -webkit-column-count: 2;
@@ -30548,7 +30556,7 @@ ul.horizontal_tabs_gstudio > li.sub_group_action:hover ul {
   }
 }
 @media (max-width: 800px) {
-  /* line 7053, ../../../scss/_app_styles.scss */
+  /* line 7058, ../../../scss/_app_styles.scss */
   .asset_tile .asset_preview .photos {
     -moz-column-count: 2;
     -webkit-column-count: 2;
@@ -30556,14 +30564,14 @@ ul.horizontal_tabs_gstudio > li.sub_group_action:hover ul {
   }
 }
 @media (max-width: 400px) {
-  /* line 7060, ../../../scss/_app_styles.scss */
+  /* line 7065, ../../../scss/_app_styles.scss */
   .asset_tile .asset_preview .photos {
     -moz-column-count: 1;
     -webkit-column-count: 1;
     column-count: 1;
   }
 }
-/* line 7068, ../../../scss/_app_styles.scss */
+/* line 7073, ../../../scss/_app_styles.scss */
 .asset_tile .asset_preview .photos-02 {
   /* no vertical space*/
   line-height: 0;
@@ -30578,14 +30586,14 @@ ul.horizontal_tabs_gstudio > li.sub_group_action:hover ul {
   -webkit-row-gap: 0px;
   -moz-row-gap: 0px;
 }
-/* line 7084, ../../../scss/_app_styles.scss */
+/* line 7089, ../../../scss/_app_styles.scss */
 .asset_tile .asset_preview .photos-02 img {
   /* Just in case there are inline attributes */
   width: 100% !important;
   height: 105px !important;
 }
 @media (max-width: 1200px) {
-  /* line 7091, ../../../scss/_app_styles.scss */
+  /* line 7096, ../../../scss/_app_styles.scss */
   .asset_tile .asset_preview .photos-02 {
     -moz-row-count: 2;
     -webkit-column-count: 1;
@@ -30596,7 +30604,7 @@ ul.horizontal_tabs_gstudio > li.sub_group_action:hover ul {
   }
 }
 @media (max-width: 1000px) {
-  /* line 7102, ../../../scss/_app_styles.scss */
+  /* line 7107, ../../../scss/_app_styles.scss */
   .asset_tile .asset_preview .photos-02 {
     -moz-row-count: 2;
     -webkit-column-count: 1;
@@ -30607,7 +30615,7 @@ ul.horizontal_tabs_gstudio > li.sub_group_action:hover ul {
   }
 }
 @media (max-width: 800px) {
-  /* line 7113, ../../../scss/_app_styles.scss */
+  /* line 7118, ../../../scss/_app_styles.scss */
   .asset_tile .asset_preview .photos-02 {
     -moz-row-count: 2;
     -webkit-column-count: 0;
@@ -30618,7 +30626,7 @@ ul.horizontal_tabs_gstudio > li.sub_group_action:hover ul {
   }
 }
 @media (max-width: 400px) {
-  /* line 7124, ../../../scss/_app_styles.scss */
+  /* line 7129, ../../../scss/_app_styles.scss */
   .asset_tile .asset_preview .photos-02 {
     -moz-row-count: 2;
     -webkit-column-count: 1;
@@ -30628,7 +30636,7 @@ ul.horizontal_tabs_gstudio > li.sub_group_action:hover ul {
     -moz-row-gap: 0px;
   }
 }
-/* line 7135, ../../../scss/_app_styles.scss */
+/* line 7140, ../../../scss/_app_styles.scss */
 .asset_tile .asset_preview .photos-03 {
   /* no vertical space*/
   line-height: 0;
@@ -30643,14 +30651,14 @@ ul.horizontal_tabs_gstudio > li.sub_group_action:hover ul {
   -webkit-row-gap: 0px;
   -moz-row-gap: 0px;
 }
-/* line 7151, ../../../scss/_app_styles.scss */
+/* line 7156, ../../../scss/_app_styles.scss */
 .asset_tile .asset_preview .photos-03 img {
   /* Just in case there are inline attributes */
   width: 100% !important;
   height: 70px !important;
 }
 @media (max-width: 1200px) {
-  /* line 7158, ../../../scss/_app_styles.scss */
+  /* line 7163, ../../../scss/_app_styles.scss */
   .asset_tile .asset_preview .photos-03 {
     -moz-row-count: 3;
     -webkit-column-count: 1;
@@ -30661,7 +30669,7 @@ ul.horizontal_tabs_gstudio > li.sub_group_action:hover ul {
   }
 }
 @media (max-width: 1000px) {
-  /* line 7169, ../../../scss/_app_styles.scss */
+  /* line 7174, ../../../scss/_app_styles.scss */
   .asset_tile .asset_preview .photos-03 {
     -moz-row-count: 3;
     -webkit-column-count: 1;
@@ -30672,7 +30680,7 @@ ul.horizontal_tabs_gstudio > li.sub_group_action:hover ul {
   }
 }
 @media (max-width: 800px) {
-  /* line 7180, ../../../scss/_app_styles.scss */
+  /* line 7185, ../../../scss/_app_styles.scss */
   .asset_tile .asset_preview .photos-03 {
     -moz-row-count: 3;
     -webkit-column-count: 0;
@@ -30683,7 +30691,7 @@ ul.horizontal_tabs_gstudio > li.sub_group_action:hover ul {
   }
 }
 @media (max-width: 400px) {
-  /* line 7191, ../../../scss/_app_styles.scss */
+  /* line 7196, ../../../scss/_app_styles.scss */
   .asset_tile .asset_preview .photos-03 {
     -moz-row-count: 3;
     -webkit-column-count: 1;
@@ -30693,11 +30701,11 @@ ul.horizontal_tabs_gstudio > li.sub_group_action:hover ul {
     -moz-row-gap: 0px;
   }
 }
-/* line 7202, ../../../scss/_app_styles.scss */
+/* line 7207, ../../../scss/_app_styles.scss */
 .asset_tile .asset_text {
   padding: 7px 0px 0px 0px;
 }
-/* line 7204, ../../../scss/_app_styles.scss */
+/* line 7209, ../../../scss/_app_styles.scss */
 .asset_tile .asset_text .asset_title {
   letter-spacing: 0.2px;
   overflow: hidden;
@@ -30706,11 +30714,11 @@ ul.horizontal_tabs_gstudio > li.sub_group_action:hover ul {
   padding-top: 10px;
   padding-left: 6px;
 }
-/* line 7212, ../../../scss/_app_styles.scss */
+/* line 7217, ../../../scss/_app_styles.scss */
 .asset_tile .asset_text .asset_title .filenode {
   z-index: -1;
 }
-/* line 7218, ../../../scss/_app_styles.scss */
+/* line 7223, ../../../scss/_app_styles.scss */
 .asset_tile .asset_text .asset_desc {
   letter-spacing: 0.3px;
   overflow: hidden;
@@ -30719,7 +30727,7 @@ ul.horizontal_tabs_gstudio > li.sub_group_action:hover ul {
   color: grey;
 }
 
-/* line 7229, ../../../scss/_app_styles.scss */
+/* line 7234, ../../../scss/_app_styles.scss */
 .audio_tile {
   display: inline-block;
   margin-top: 10px;
@@ -30730,22 +30738,22 @@ ul.horizontal_tabs_gstudio > li.sub_group_action:hover ul {
   width: 270px;
   margin-right: 15px;
 }
-/* line 7239, ../../../scss/_app_styles.scss */
+/* line 7244, ../../../scss/_app_styles.scss */
 .audio_tile .audio_preview audio {
   width: 100%;
 }
-/* line 7242, ../../../scss/_app_styles.scss */
+/* line 7247, ../../../scss/_app_styles.scss */
 .audio_tile .audio_preview figcaption {
   margin-left: 5px;
 }
-/* line 7247, ../../../scss/_app_styles.scss */
+/* line 7252, ../../../scss/_app_styles.scss */
 .audio_tile:hover {
   border-width: 2px 2px 5px 2px;
   border-style: solid;
   border-color: #ce7869;
 }
 
-/* line 7258, ../../../scss/_app_styles.scss */
+/* line 7263, ../../../scss/_app_styles.scss */
 .template_tile {
   display: inline-block;
   margin-top: 10px;
@@ -30756,26 +30764,26 @@ ul.horizontal_tabs_gstudio > li.sub_group_action:hover ul {
   width: 120px;
   margin-right: 15px;
 }
-/* line 7268, ../../../scss/_app_styles.scss */
+/* line 7273, ../../../scss/_app_styles.scss */
 .template_tile .template_preview {
   height: 85px;
   width: 100%;
 }
-/* line 7271, ../../../scss/_app_styles.scss */
+/* line 7276, ../../../scss/_app_styles.scss */
 .template_tile .template_preview img {
   width: 100%;
 }
-/* line 7275, ../../../scss/_app_styles.scss */
+/* line 7280, ../../../scss/_app_styles.scss */
 .template_tile:hover {
   border-width: 2px 2px 5px 2px;
   border-style: solid;
   border-color: #ce7869;
 }
-/* line 7281, ../../../scss/_app_styles.scss */
+/* line 7286, ../../../scss/_app_styles.scss */
 .template_tile .template_text {
   padding: 10px 0px 0px 0px;
 }
-/* line 7283, ../../../scss/_app_styles.scss */
+/* line 7288, ../../../scss/_app_styles.scss */
 .template_tile .template_text .template_title {
   letter-spacing: 0.2px;
   overflow: hidden;
@@ -30784,7 +30792,7 @@ ul.horizontal_tabs_gstudio > li.sub_group_action:hover ul {
   padding-top: 22px;
   padding-left: 6px;
 }
-/* line 7292, ../../../scss/_app_styles.scss */
+/* line 7297, ../../../scss/_app_styles.scss */
 .template_tile .template_text .template_desc {
   letter-spacing: 0.3px;
   overflow: hidden;
@@ -30793,7 +30801,7 @@ ul.horizontal_tabs_gstudio > li.sub_group_action:hover ul {
   color: grey;
 }
 
-/* line 7306, ../../../scss/_app_styles.scss */
+/* line 7311, ../../../scss/_app_styles.scss */
 .preview_asset {
   background: #ccc;
   border: 2px solid #999;
@@ -30803,19 +30811,19 @@ ul.horizontal_tabs_gstudio > li.sub_group_action:hover ul {
 }
 
 /*  Asset detail */
-/* line 7317, ../../../scss/_app_styles.scss */
+/* line 7322, ../../../scss/_app_styles.scss */
 .overlay-head {
   height: 60px;
   margin-bottom: 20px;
 }
 
-/* line 7323, ../../../scss/_app_styles.scss */
+/* line 7328, ../../../scss/_app_styles.scss */
 .listing-row {
   margin-top: 10px !important;
   background-color: #ffffff;
 }
 
-/* line 7328, ../../../scss/_app_styles.scss */
+/* line 7333, ../../../scss/_app_styles.scss */
 .orange-button {
   color: #ce7869;
   padding: 7px 14px;
@@ -30829,13 +30837,13 @@ ul.horizontal_tabs_gstudio > li.sub_group_action:hover ul {
   margin-top: 8px;
   cursor: pointer;
 }
-/* line 7340, ../../../scss/_app_styles.scss */
+/* line 7345, ../../../scss/_app_styles.scss */
 .orange-button:hover {
   background-color: rgba(206, 120, 105, 0.2);
   color: #ce7869;
 }
 
-/* line 7347, ../../../scss/_app_styles.scss */
+/* line 7352, ../../../scss/_app_styles.scss */
 .orange-button-template {
   color: #ce7869;
   padding: 7px 14px;
@@ -30848,22 +30856,22 @@ ul.horizontal_tabs_gstudio > li.sub_group_action:hover ul {
   margin-bottom: 8px;
   margin-top: 10px;
 }
-/* line 7358, ../../../scss/_app_styles.scss */
+/* line 7363, ../../../scss/_app_styles.scss */
 .orange-button-template:hover {
   background-color: rgba(206, 120, 105, 0.2);
   color: #ce7869;
 }
 
-/* line 7363, ../../../scss/_app_styles.scss */
+/* line 7368, ../../../scss/_app_styles.scss */
 .orange-button-template {
   color: #ce7869;
   background: #fff;
 }
-/* line 7366, ../../../scss/_app_styles.scss */
+/* line 7371, ../../../scss/_app_styles.scss */
 .orange-button-template:hover {
   background-color: #fff;
 }
-/* line 7369, ../../../scss/_app_styles.scss */
+/* line 7374, ../../../scss/_app_styles.scss */
 .orange-button-template > a {
   color: #ce7869;
   padding: 7px 14px;
@@ -30876,13 +30884,13 @@ ul.horizontal_tabs_gstudio > li.sub_group_action:hover ul {
   margin-bottom: 8px;
   margin-top: 10px;
 }
-/* line 7380, ../../../scss/_app_styles.scss */
+/* line 7385, ../../../scss/_app_styles.scss */
 .orange-button-template > a:hover {
   background-color: rgba(206, 120, 105, 0.2);
   color: #ce7869;
 }
 
-/* line 7387, ../../../scss/_app_styles.scss */
+/* line 7392, ../../../scss/_app_styles.scss */
 .explore-button {
   border-radius: 5px;
   text-transform: uppercase;
@@ -30894,7 +30902,7 @@ ul.horizontal_tabs_gstudio > li.sub_group_action:hover ul {
   border: 2px solid #6a0054;
   background-color: #6a0054;
 }
-/* line 7398, ../../../scss/_app_styles.scss */
+/* line 7403, ../../../scss/_app_styles.scss */
 .explore-button:hover {
   background-color: #ffffff;
   cursor: pointer;
@@ -30902,18 +30910,18 @@ ul.horizontal_tabs_gstudio > li.sub_group_action:hover ul {
 }
 
 /* asset description */
-/* line 7407, ../../../scss/_app_styles.scss */
+/* line 7412, ../../../scss/_app_styles.scss */
 .name-desc-asset-cont-area {
   width: 95%;
   margin-left: 24px;
 }
 
-/* line 7414, ../../../scss/_app_styles.scss */
+/* line 7419, ../../../scss/_app_styles.scss */
 .page-name {
   margin-top: 8px;
 }
 
-/* line 7418, ../../../scss/_app_styles.scss */
+/* line 7423, ../../../scss/_app_styles.scss */
 .tag-ele {
   font-weight: normal;
   text-align: center;
@@ -30932,7 +30940,7 @@ ul.horizontal_tabs_gstudio > li.sub_group_action:hover ul {
   text-transform: none;
 }
 
-/* line 7436, ../../../scss/_app_styles.scss */
+/* line 7441, ../../../scss/_app_styles.scss */
 .button-cancel-new {
   height: 2rem;
   padding: 0 2rem;
@@ -30950,12 +30958,12 @@ ul.horizontal_tabs_gstudio > li.sub_group_action:hover ul {
   transition: all .1s ease;
   margin-right: 1px;
 }
-/* line 7452, ../../../scss/_app_styles.scss */
+/* line 7457, ../../../scss/_app_styles.scss */
 .button-cancel-new:hover {
   background-color: #fff;
   color: #333333;
 }
-/* line 7457, ../../../scss/_app_styles.scss */
+/* line 7462, ../../../scss/_app_styles.scss */
 .button-cancel-new > a {
   font-family: open_sansbold,sans-serif;
   font-size: 1.2rem;
@@ -30967,13 +30975,13 @@ ul.horizontal_tabs_gstudio > li.sub_group_action:hover ul {
   transition: all .1s ease;
   margin-right: 1px;
 }
-/* line 7467, ../../../scss/_app_styles.scss */
+/* line 7472, ../../../scss/_app_styles.scss */
 .button-cancel-new > a:hover {
   background-color: #fff;
   color: #333333;
 }
 
-/* line 7475, ../../../scss/_app_styles.scss */
+/* line 7480, ../../../scss/_app_styles.scss */
 .button-save-new {
   height: 2rem;
   padding: 0 2rem;
@@ -30990,13 +30998,13 @@ ul.horizontal_tabs_gstudio > li.sub_group_action:hover ul {
   color: #fff;
   transition: all .1s ease;
 }
-/* line 7490, ../../../scss/_app_styles.scss */
+/* line 7495, ../../../scss/_app_styles.scss */
 .button-save-new:hover {
   background-color: #fff;
   color: #912a7d;
 }
 
-/* line 7501, ../../../scss/_app_styles.scss */
+/* line 7506, ../../../scss/_app_styles.scss */
 .mydesk_page .page_banner {
   width: 100%;
   height: 200px;
@@ -31004,7 +31012,7 @@ ul.horizontal_tabs_gstudio > li.sub_group_action:hover ul {
   background-size: 100% 100%;
   position: relative;
 }
-/* line 7508, ../../../scss/_app_styles.scss */
+/* line 7513, ../../../scss/_app_styles.scss */
 .mydesk_page .page_banner:before {
   content: ' ';
   background-color: rgba(0, 0, 0, 0.1);
@@ -31018,13 +31026,13 @@ ul.horizontal_tabs_gstudio > li.sub_group_action:hover ul {
   z-index: 10;
   box-shadow: inset 0 0 40px rgba(0, 0, 0, 0.2);
 }
-/* line 7522, ../../../scss/_app_styles.scss */
+/* line 7527, ../../../scss/_app_styles.scss */
 .mydesk_page .page_banner .banner_profile {
   position: absolute;
   bottom: 30px;
   left: 40px;
 }
-/* line 7527, ../../../scss/_app_styles.scss */
+/* line 7532, ../../../scss/_app_styles.scss */
 .mydesk_page .page_banner .banner_profile .buddy_logo {
   display: inline-block;
   margin-right: 10px;
@@ -31033,79 +31041,79 @@ ul.horizontal_tabs_gstudio > li.sub_group_action:hover ul {
   overflow: hidden;
   background-color: #fff;
 }
-/* line 7535, ../../../scss/_app_styles.scss */
+/* line 7540, ../../../scss/_app_styles.scss */
 .mydesk_page .page_banner .banner_profile .buddy_logo svg {
   height: 100px;
   width: 100px;
 }
-/* line 7540, ../../../scss/_app_styles.scss */
+/* line 7545, ../../../scss/_app_styles.scss */
 .mydesk_page .page_banner .banner_profile .buddy_logo svg path {
   fill: #7a422a;
 }
-/* line 7545, ../../../scss/_app_styles.scss */
+/* line 7550, ../../../scss/_app_styles.scss */
 .mydesk_page .page_banner .banner_profile .banner_heading {
   color: #fff;
   display: inline-block;
   vertical-align: top;
 }
-/* line 7550, ../../../scss/_app_styles.scss */
+/* line 7555, ../../../scss/_app_styles.scss */
 .mydesk_page .page_banner .banner_profile .banner_heading .buddy_name {
   font-size: 23px;
   display: block;
   margin-bottom: 10px;
 }
-/* line 7558, ../../../scss/_app_styles.scss */
+/* line 7563, ../../../scss/_app_styles.scss */
 .mydesk_page .page_menu {
   border-bottom: 1px solid #e5e5e5;
 }
-/* line 7562, ../../../scss/_app_styles.scss */
+/* line 7567, ../../../scss/_app_styles.scss */
 .mydesk_page .page_menu li > a {
   padding: 12px 20px 9px;
 }
 
-/* line 7571, ../../../scss/_app_styles.scss */
+/* line 7576, ../../../scss/_app_styles.scss */
 .lms_explore_head_unit {
   width: 100%;
   height: 50px;
   background-color: #fff;
   color: #164A7B;
 }
-/* line 7576, ../../../scss/_app_styles.scss */
+/* line 7581, ../../../scss/_app_styles.scss */
 .lms_explore_head_unit > p {
   margin-left: 81px;
   padding: 0px 0px 0px 1px;
   font-family: OpenSans-Semibold;
   font-size: 20px;
 }
-/* line 7582, ../../../scss/_app_styles.scss */
+/* line 7587, ../../../scss/_app_styles.scss */
 .lms_explore_head_unit > a {
   padding: 0px 85px 3px 0px;
 }
 
-/* line 7588, ../../../scss/_app_styles.scss */
+/* line 7593, ../../../scss/_app_styles.scss */
 .lms_explore_back_unit {
   background-color: #fff;
   margin-top: -19.3px;
 }
 
-/* line 7595, ../../../scss/_app_styles.scss */
+/* line 7600, ../../../scss/_app_styles.scss */
 .course-students-data {
   margin: 2px 2px 2px 2px;
   border: 2px solid #164a7b;
   padding: 19px 14px 0px 5px;
 }
-/* line 7602, ../../../scss/_app_styles.scss */
+/* line 7607, ../../../scss/_app_styles.scss */
 .course-students-data .students-table-legends > span:nth-child(odd) {
   margin: 0px 10px;
 }
-/* line 7605, ../../../scss/_app_styles.scss */
+/* line 7610, ../../../scss/_app_styles.scss */
 .course-students-data .students-table-legends > span:nth-child(even) {
   display: inline-block;
   vertical-align: top;
   margin-right: 10px;
 }
 
-/* line 7613, ../../../scss/_app_styles.scss */
+/* line 7618, ../../../scss/_app_styles.scss */
 .badge_ex {
   display: inline-block;
   line-height: 22px;
@@ -31121,7 +31129,7 @@ ul.horizontal_tabs_gstudio > li.sub_group_action:hover ul {
   box-shadow: inset 0 1px rgba(255, 255, 255, 0.3), 0 1px 1px rgba(0, 0, 0, 0.08);
 }
 
-/* line 7632, ../../../scss/_app_styles.scss */
+/* line 7637, ../../../scss/_app_styles.scss */
 .badge_ex.green {
   background: #77cc51;
   border-color: #59ad33;
@@ -31131,7 +31139,7 @@ ul.horizontal_tabs_gstudio > li.sub_group_action:hover ul {
   background-image: linear-gradient(to bottom, #a5dd8c, #77cc51);
 }
 
-/* line 7641, ../../../scss/_app_styles.scss */
+/* line 7646, ../../../scss/_app_styles.scss */
 .badge_ex.yellow {
   background: #faba3e;
   border-color: #f4a306;
@@ -31141,7 +31149,7 @@ ul.horizontal_tabs_gstudio > li.sub_group_action:hover ul {
   background-image: linear-gradient(to bottom, #fcd589, #faba3e);
 }
 
-/* line 7650, ../../../scss/_app_styles.scss */
+/* line 7655, ../../../scss/_app_styles.scss */
 .badge_ex.red {
   background: #fa623f;
   border-color: #fa5a35;
@@ -31161,13 +31169,13 @@ ul.horizontal_tabs_gstudio > li.sub_group_action:hover ul {
         background-color: #A6D7F5;
     }
   }*/
-/* line 7673, ../../../scss/_app_styles.scss */
+/* line 7678, ../../../scss/_app_styles.scss */
 .create-task-event-tabs .tabs {
   width: 100%;
   margin: 0em 0em 0.5em;
   border-bottom: 1px solid #CCC;
 }
-/* line 7678, ../../../scss/_app_styles.scss */
+/* line 7683, ../../../scss/_app_styles.scss */
 .create-task-event-tabs .tabs .tab-title {
   width: 43%;
   /*        background-color: blue;*/
@@ -31177,7 +31185,7 @@ ul.horizontal_tabs_gstudio > li.sub_group_action:hover ul {
   text-transform: uppercase;
   color: #fff;
 }
-/* line 7687, ../../../scss/_app_styles.scss */
+/* line 7692, ../../../scss/_app_styles.scss */
 .create-task-event-tabs .tabs .tab-title.active {
   background-color: #719dc7;
   border: 1px solid #CCC;
@@ -31185,7 +31193,7 @@ ul.horizontal_tabs_gstudio > li.sub_group_action:hover ul {
   color: #fff;
 }
 
-/* line 7700, ../../../scss/_app_styles.scss */
+/* line 7705, ../../../scss/_app_styles.scss */
 .create_unit {
   background: #fff;
   box-shadow: 0px 2px 3px #000;
@@ -31193,7 +31201,7 @@ ul.horizontal_tabs_gstudio > li.sub_group_action:hover ul {
   padding: 10px;
 }
 
-/* line 7708, ../../../scss/_app_styles.scss */
+/* line 7713, ../../../scss/_app_styles.scss */
 .asset-unit-button {
   color: #ce7869;
   padding: 7px 14px;
@@ -31205,13 +31213,13 @@ ul.horizontal_tabs_gstudio > li.sub_group_action:hover ul {
   margin-right: 30px;
   margin-bottom: 8px;
 }
-/* line 7719, ../../../scss/_app_styles.scss */
+/* line 7724, ../../../scss/_app_styles.scss */
 .asset-unit-button:hover {
   background-color: rgba(206, 120, 105, 0.2);
   color: #ce7869;
 }
 
-/* line 7725, ../../../scss/_app_styles.scss */
+/* line 7730, ../../../scss/_app_styles.scss */
 .course_creator_header {
   width: 100%;
   height: 70px;
@@ -31219,7 +31227,7 @@ ul.horizontal_tabs_gstudio > li.sub_group_action:hover ul {
   padding: 5px 15px;
   box-shadow: 1px 0px 0px #000;
 }
-/* line 7732, ../../../scss/_app_styles.scss */
+/* line 7737, ../../../scss/_app_styles.scss */
 .course_creator_header .unit_editor {
   width: 100%;
   height: 320px;
@@ -31227,13 +31235,13 @@ ul.horizontal_tabs_gstudio > li.sub_group_action:hover ul {
   padding: 5px 15px;
   box-shadow: 1px 0px 0px #000;
 }
-/* line 7741, ../../../scss/_app_styles.scss */
+/* line 7746, ../../../scss/_app_styles.scss */
 .course_creator_header .back_to_group {
   padding: 0px 15px 0px 10px;
   border-right: 1px solid #ccc;
   margin-right: 15px;
 }
-/* line 7747, ../../../scss/_app_styles.scss */
+/* line 7752, ../../../scss/_app_styles.scss */
 .course_creator_header .course_heading_unit {
   width: 500px;
   height: 40px;
@@ -31242,24 +31250,24 @@ ul.horizontal_tabs_gstudio > li.sub_group_action:hover ul {
   float: right;
   text-align: center;
 }
-/* line 7756, ../../../scss/_app_styles.scss */
+/* line 7761, ../../../scss/_app_styles.scss */
 .course_creator_header .course_heading_unit:focus {
   border: 1px solid #74b3dc;
 }
-/* line 7760, ../../../scss/_app_styles.scss */
+/* line 7765, ../../../scss/_app_styles.scss */
 .course_creator_header .course_heading_unit::-webkit-input-placeholder
  {
   color: #d9dfe4;
   letter-spacing: 0.8px;
 }
-/* line 7768, ../../../scss/_app_styles.scss */
+/* line 7773, ../../../scss/_app_styles.scss */
 .course_creator_header .course_heading_unit select {
   font-size: 14px;
   font-family: 'OpenSans-Regular', sans-serif;
   color: gray;
   border: 0px solid #74b3dc;
 }
-/* line 7779, ../../../scss/_app_styles.scss */
+/* line 7784, ../../../scss/_app_styles.scss */
 .course_creator_header .course_heading input {
   width: 500px;
   height: 40px;
@@ -31268,31 +31276,31 @@ ul.horizontal_tabs_gstudio > li.sub_group_action:hover ul {
   float: right;
   text-align: center;
 }
-/* line 7787, ../../../scss/_app_styles.scss */
+/* line 7792, ../../../scss/_app_styles.scss */
 .course_creator_header .course_heading input:focus {
   border: 1px solid #74b3dc;
 }
-/* line 7791, ../../../scss/_app_styles.scss */
+/* line 7796, ../../../scss/_app_styles.scss */
 .course_creator_header .course_heading input::-webkit-input-placeholder
  {
   color: #d9dfe4;
   letter-spacing: 0.8px;
 }
-/* line 7801, ../../../scss/_app_styles.scss */
+/* line 7806, ../../../scss/_app_styles.scss */
 .course_creator_header .course_heading h5 {
   margin-top: 15px;
 }
-/* line 7806, ../../../scss/_app_styles.scss */
+/* line 7811, ../../../scss/_app_styles.scss */
 .course_creator_header .course_heading span {
   letter-spacing: 0.9px;
   font-weight: 600;
   line-height: 50px;
 }
-/* line 7814, ../../../scss/_app_styles.scss */
+/* line 7819, ../../../scss/_app_styles.scss */
 .course_creator_header .course_actions ul {
   margin: 0px;
 }
-/* line 7817, ../../../scss/_app_styles.scss */
+/* line 7822, ../../../scss/_app_styles.scss */
 .course_creator_header .course_actions ul li {
   list-style-type: none;
   display: inline-block;
@@ -31301,11 +31309,11 @@ ul.horizontal_tabs_gstudio > li.sub_group_action:hover ul {
   cursor: pointer;
   letter-spacing: 0.8px;
 }
-/* line 7826, ../../../scss/_app_styles.scss */
+/* line 7831, ../../../scss/_app_styles.scss */
 .course_creator_header .course_actions ul li.active, .course_creator_header .course_actions ul li:hover {
   border-bottom: 3px solid #ffc14e;
 }
-/* line 7831, ../../../scss/_app_styles.scss */
+/* line 7836, ../../../scss/_app_styles.scss */
 .course_creator_header .course_actions span {
   margin-right: 5px;
   background: rgba(0, 0, 0, 0.6);
@@ -31317,7 +31325,7 @@ ul.horizontal_tabs_gstudio > li.sub_group_action:hover ul {
   cursor: pointer;
   border-radius: 3px;
 }
-/* line 7843, ../../../scss/_app_styles.scss */
+/* line 7848, ../../../scss/_app_styles.scss */
 .course_creator_header .course_actions i {
   margin-right: 5px;
   background: rgba(0, 0, 0, 0.6);
@@ -31330,20 +31338,20 @@ ul.horizontal_tabs_gstudio > li.sub_group_action:hover ul {
   border-radius: 3px;
 }
 
-/* line 7860, ../../../scss/_app_styles.scss */
+/* line 7865, ../../../scss/_app_styles.scss */
 .lms_explore_back_unit {
   background-color: #fff;
   margin-top: 2.7px;
 }
 
-/* line 7865, ../../../scss/_app_styles.scss */
+/* line 7870, ../../../scss/_app_styles.scss */
 .empty-dashboard-message {
   border: 3px solid #e4e4e4;
   background: #f8f8f8;
   padding: 40px 0;
   text-align: center;
 }
-/* line 7871, ../../../scss/_app_styles.scss */
+/* line 7876, ../../../scss/_app_styles.scss */
 .empty-dashboard-message > a {
   background-color: #164a7b;
   border: 1px solid #164a7b;
@@ -31357,7 +31365,7 @@ ul.horizontal_tabs_gstudio > li.sub_group_action:hover ul {
   margin-left: 5px;
   padding: 15px 20px;
 }
-/* line 7885, ../../../scss/_app_styles.scss */
+/* line 7890, ../../../scss/_app_styles.scss */
 .empty-dashboard-message .button-explore-courses {
   font-size: 20px;
   font-weight: normal;
@@ -31367,7 +31375,7 @@ ul.horizontal_tabs_gstudio > li.sub_group_action:hover ul {
   width: 170px;
 }
 
-/* line 7900, ../../../scss/_app_styles.scss */
+/* line 7905, ../../../scss/_app_styles.scss */
 .module_card {
   display: table;
   height: 290px;
@@ -31378,16 +31386,16 @@ ul.horizontal_tabs_gstudio > li.sub_group_action:hover ul {
   position: relative;
   box-shadow: 0px 0px 5px 1px rgba(0, 0, 0, 0.15);
 }
-/* line 7910, ../../../scss/_app_styles.scss */
+/* line 7915, ../../../scss/_app_styles.scss */
 .module_card:hover {
   box-shadow: 0px 0px 17px rgba(0, 0, 0, 0.68);
 }
-/* line 7914, ../../../scss/_app_styles.scss */
+/* line 7919, ../../../scss/_app_styles.scss */
 .module_card > div {
   display: table-cell;
   height: 290px;
 }
-/* line 7919, ../../../scss/_app_styles.scss */
+/* line 7924, ../../../scss/_app_styles.scss */
 .module_card .card_banner {
   width: 250px;
   height: 290px;
@@ -31401,14 +31409,14 @@ ul.horizontal_tabs_gstudio > li.sub_group_action:hover ul {
   -webkit-transition: border-radius .2s;
   transition: border-radius .2s;
 }
-/* line 7932, ../../../scss/_app_styles.scss */
+/* line 7937, ../../../scss/_app_styles.scss */
 .module_card .card_banner > img {
   height: 100%;
   width: 100%;
   border-radius: 4px;
   -webkit-filter: drop-shadow(16px 16px 10px rgba(0, 0, 0, 0.9));
 }
-/* line 7937, ../../../scss/_app_styles.scss */
+/* line 7942, ../../../scss/_app_styles.scss */
 .module_card .card_banner > img:hover {
   -webkit-transform: scale(1.03);
   -moz-transform: scale(1.03);
@@ -31417,7 +31425,7 @@ ul.horizontal_tabs_gstudio > li.sub_group_action:hover ul {
   transform: scale(1.03);
   opacity: 0.8;
 }
-/* line 7949, ../../../scss/_app_styles.scss */
+/* line 7954, ../../../scss/_app_styles.scss */
 .module_card .card_banner > h4 {
   position: absolute;
   top: 100px;
@@ -31426,7 +31434,7 @@ ul.horizontal_tabs_gstudio > li.sub_group_action:hover ul {
   color: #ffffff !important;
   text-shadow: 2px 0px 8px black;
 }
-/* line 7964, ../../../scss/_app_styles.scss */
+/* line 7969, ../../../scss/_app_styles.scss */
 .module_card .card_title {
   display: block;
   width: 230px;
@@ -31436,27 +31444,27 @@ ul.horizontal_tabs_gstudio > li.sub_group_action:hover ul {
   margin: 0px auto;
   letter-spacing: 1px;
 }
-/* line 7975, ../../../scss/_app_styles.scss */
+/* line 7980, ../../../scss/_app_styles.scss */
 .module_card.animated_card .card_banner {
   border-radius: 8px;
 }
-/* line 7978, ../../../scss/_app_styles.scss */
+/* line 7983, ../../../scss/_app_styles.scss */
 .module_card.animated_card:hover .card_banner {
   border-radius: 8px 0px 0px 8px;
 }
-/* line 7983, ../../../scss/_app_styles.scss */
+/* line 7988, ../../../scss/_app_styles.scss */
 .module_card.animated_card.isOpen .card_banner {
   border-radius: 8px 0px 0px 8px;
 }
-/* line 7987, ../../../scss/_app_styles.scss */
+/* line 7992, ../../../scss/_app_styles.scss */
 .module_card.animated_card:hover .card_summary {
   left: 30px;
 }
-/* line 7990, ../../../scss/_app_styles.scss */
+/* line 7995, ../../../scss/_app_styles.scss */
 .module_card.animated_card .card_summary {
   left: 5px;
 }
-/* line 7994, ../../../scss/_app_styles.scss */
+/* line 7999, ../../../scss/_app_styles.scss */
 .module_card .card_summary {
   width: 290px;
   padding: 0px 15px;
@@ -31472,35 +31480,35 @@ ul.horizontal_tabs_gstudio > li.sub_group_action:hover ul {
   /* Safari */
   transition-property: left;
 }
-/* line 8008, ../../../scss/_app_styles.scss */
+/* line 8013, ../../../scss/_app_styles.scss */
 .module_card .card_summary .card_label {
   font-weight: 500;
   font-size: 12.5px;
   letter-spacing: 1px;
   color: black;
 }
-/* line 8014, ../../../scss/_app_styles.scss */
+/* line 8019, ../../../scss/_app_styles.scss */
 .module_card .card_summary .card_section {
   margin: 5px 0px;
   padding: 5px 0px;
 }
-/* line 8018, ../../../scss/_app_styles.scss */
+/* line 8023, ../../../scss/_app_styles.scss */
 .module_card .card_summary .card_section:not(:last-child) {
   border-bottom: 1px solid #ccc;
 }
-/* line 8021, ../../../scss/_app_styles.scss */
+/* line 8026, ../../../scss/_app_styles.scss */
 .module_card .card_summary .card_section p {
   margin-bottom: 7px;
   font-size: 12.5px;
 }
-/* line 8025, ../../../scss/_app_styles.scss */
+/* line 8030, ../../../scss/_app_styles.scss */
 .module_card .card_summary .card_section .ellipsis {
   width: 245px;
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
 }
-/* line 8033, ../../../scss/_app_styles.scss */
+/* line 8038, ../../../scss/_app_styles.scss */
 .module_card .card_summary .card_section .module-card-enrol {
   background: #a2238d;
   height: 37px;
@@ -31514,11 +31522,11 @@ ul.horizontal_tabs_gstudio > li.sub_group_action:hover ul {
   margin-top: 2px !important;
   letter-spacing: 0.4px;
 }
-/* line 8046, ../../../scss/_app_styles.scss */
+/* line 8051, ../../../scss/_app_styles.scss */
 .module_card .card_summary .card_section .module-card-enrol:hover {
   box-shadow: 0px 0px 17px rgba(0, 0, 0, 0.68);
 }
-/* line 8052, ../../../scss/_app_styles.scss */
+/* line 8057, ../../../scss/_app_styles.scss */
 .module_card .card_summary .module_brief {
   display: block;
   /* Fallback for non-webkit */
@@ -31535,12 +31543,12 @@ ul.horizontal_tabs_gstudio > li.sub_group_action:hover ul {
   color: black;
 }
 
-/* line 8069, ../../../scss/_app_styles.scss */
+/* line 8074, ../../../scss/_app_styles.scss */
 .inner {
   display: inline-block !important;
 }
 
-/* line 8076, ../../../scss/_app_styles.scss */
+/* line 8081, ../../../scss/_app_styles.scss */
 .enroll-btn {
   width: 90px;
   opacity: 1;
@@ -31556,7 +31564,7 @@ ul.horizontal_tabs_gstudio > li.sub_group_action:hover ul {
   background-color: #4b4852;
 }
 
-/* line 8096, ../../../scss/_app_styles.scss */
+/* line 8101, ../../../scss/_app_styles.scss */
 .enrollBtn {
   background: #a2238d;
   height: 37px;
@@ -31571,51 +31579,51 @@ ul.horizontal_tabs_gstudio > li.sub_group_action:hover ul {
 }
 
 /*****Toolbar CSS******/
-/* line 8111, ../../../scss/_app_styles.scss */
+/* line 8116, ../../../scss/_app_styles.scss */
 #toolbar {
   background-color: #3e3e3e;
 }
 
-/* line 8114, ../../../scss/_app_styles.scss */
+/* line 8119, ../../../scss/_app_styles.scss */
 .datetime {
   color: #eaeaea;
   padding: 4px 0px 2px 5px;
   font-size: 11px;
 }
 
-/* line 8119, ../../../scss/_app_styles.scss */
+/* line 8124, ../../../scss/_app_styles.scss */
 .changefont {
   text-align: right;
   padding: 2px 5px 1px 0px;
 }
-/* line 8123, ../../../scss/_app_styles.scss */
+/* line 8128, ../../../scss/_app_styles.scss */
 .changefont .minus {
   font-size: 60%;
   color: #eaeaea;
 }
-/* line 8126, ../../../scss/_app_styles.scss */
+/* line 8131, ../../../scss/_app_styles.scss */
 .changefont .normal {
   font-size: 80%;
   color: #eaeaea;
 }
-/* line 8129, ../../../scss/_app_styles.scss */
+/* line 8134, ../../../scss/_app_styles.scss */
 .changefont .plus {
   font-size: 100%;
   color: #eaeaea;
 }
 
 /***********Landing page***************/
-/* line 8138, ../../../scss/_app_styles.scss */
+/* line 8143, ../../../scss/_app_styles.scss */
 .about_us {
   background: #20ade0;
 }
 
-/* line 8141, ../../../scss/_app_styles.scss */
+/* line 8146, ../../../scss/_app_styles.scss */
 .analytics {
   margin-top: 20px;
 }
 
-/* line 8144, ../../../scss/_app_styles.scss */
+/* line 8149, ../../../scss/_app_styles.scss */
 .square {
   border: 4px solid #ffffff;
   position: relative;
@@ -31626,14 +31634,14 @@ ul.horizontal_tabs_gstudio > li.sub_group_action:hover ul {
   margin-left: 30px;
 }
 
-/* line 8154, ../../../scss/_app_styles.scss */
+/* line 8159, ../../../scss/_app_styles.scss */
 .square:after {
   content: "";
   display: block;
   padding-bottom: 100%;
 }
 
-/* line 8160, ../../../scss/_app_styles.scss */
+/* line 8165, ../../../scss/_app_styles.scss */
 .box-content {
   position: absolute;
   width: 100%;
@@ -31642,7 +31650,7 @@ ul.horizontal_tabs_gstudio > li.sub_group_action:hover ul {
   padding-top: 20%;
 }
 
-/* line 8173, ../../../scss/_app_styles.scss */
+/* line 8178, ../../../scss/_app_styles.scss */
 .activity-slider {
   font-family: Arial;
   width: 800px;
@@ -31650,7 +31658,7 @@ ul.horizontal_tabs_gstudio > li.sub_group_action:hover ul {
   margin: 0 auto;
 }
 
-/* line 8180, ../../../scss/_app_styles.scss */
+/* line 8185, ../../../scss/_app_styles.scss */
 .activity-slider h3 {
   background: #fff;
   color: #3498db;
@@ -31678,12 +31686,12 @@ ul.horizontal_tabs_gstudio > li.sub_group_action:hover ul {
 .action a:hover{
   background:#000;
 }*/
-/* line 8206, ../../../scss/_app_styles.scss */
+/* line 8211, ../../../scss/_app_styles.scss */
 .footer_link_cont h4 {
   color: #999;
 }
 
-/* line 8210, ../../../scss/_app_styles.scss */
+/* line 8215, ../../../scss/_app_styles.scss */
 .about_content {
   color: #ececec;
   margin-bottom: 30px;
@@ -31691,7 +31699,7 @@ ul.horizontal_tabs_gstudio > li.sub_group_action:hover ul {
   font-size: 18px;
 }
 
-/* line 8218, ../../../scss/_app_styles.scss */
+/* line 8223, ../../../scss/_app_styles.scss */
 .about-blog {
   height: 100%;
   background: #107aa1;
@@ -31700,7 +31708,7 @@ ul.horizontal_tabs_gstudio > li.sub_group_action:hover ul {
 /*.searchbar {
   margin: 0.8rem;
 }*/
-/* line 8227, ../../../scss/_app_styles.scss */
+/* line 8232, ../../../scss/_app_styles.scss */
 .search-field {
   width: 0;
   height: 40px;
@@ -31711,7 +31719,7 @@ ul.horizontal_tabs_gstudio > li.sub_group_action:hover ul {
   transition: all 0.5s ease;
 }
 
-/* line 8237, ../../../scss/_app_styles.scss */
+/* line 8242, ../../../scss/_app_styles.scss */
 .expand-search {
   width: 80%;
   max-width: calc(80% - 3rem);
@@ -31719,37 +31727,37 @@ ul.horizontal_tabs_gstudio > li.sub_group_action:hover ul {
   padding: .5rem;
 }
 
-/* line 8244, ../../../scss/_app_styles.scss */
+/* line 8249, ../../../scss/_app_styles.scss */
 svg {
   width: 20px;
   height: 20px;
 }
 
-/* line 8249, ../../../scss/_app_styles.scss */
+/* line 8254, ../../../scss/_app_styles.scss */
 .button {
   border-radius: 50px;
 }
 
-/* line 8254, ../../../scss/_app_styles.scss */
+/* line 8259, ../../../scss/_app_styles.scss */
 #page_content {
   display: table;
   height: auto;
   display: table-row;
 }
 
-/* line 8262, ../../../scss/_app_styles.scss */
+/* line 8267, ../../../scss/_app_styles.scss */
 .footer_container {
   height: auto;
   display: table-row;
 }
 
-/* line 8269, ../../../scss/_app_styles.scss */
+/* line 8274, ../../../scss/_app_styles.scss */
 #footer {
   height: 1px;
 }
 
 /* ----New Footer For NROER -------*/
-/* line 8278, ../../../scss/_app_styles.scss */
+/* line 8283, ../../../scss/_app_styles.scss */
 .footer-nav {
   margin-right: auto;
   margin-left: auto;
@@ -31768,19 +31776,19 @@ svg {
   font-family: 'Proxima Nova', 'Helvetica Neue', 'sans-serif', Arial;
 }
 
-/* line 8296, ../../../scss/_app_styles.scss */
+/* line 8301, ../../../scss/_app_styles.scss */
 .footer-nav-center {
   flex: 1 1 0px;
 }
 
-/* line 8299, ../../../scss/_app_styles.scss */
+/* line 8304, ../../../scss/_app_styles.scss */
 .footer-nav-menu {
   list-style: none;
   margin-bottom: 0;
   text-align: center;
 }
 
-/* line 8304, ../../../scss/_app_styles.scss */
+/* line 8309, ../../../scss/_app_styles.scss */
 .footer-nav-menu-item {
   display: inline-block;
   margin-right: 1.5rem;
@@ -31788,13 +31796,13 @@ svg {
   padding: 0.4rem 0;
 }
 
-/* line 8310, ../../../scss/_app_styles.scss */
+/* line 8315, ../../../scss/_app_styles.scss */
 .footer-copyright {
   margin-top: -70px;
   font-family: 'Proxima Nova', 'Helvetica Neue', 'sans-serif', Arial;
 }
 
-/* line 8314, ../../../scss/_app_styles.scss */
+/* line 8319, ../../../scss/_app_styles.scss */
 .second-has-form {
   margin-top: 0px;
   margin-bottom: -2px;
