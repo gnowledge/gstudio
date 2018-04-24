@@ -2988,7 +2988,6 @@ msgid "Epathshala"
 msgstr "ई-पाठशाला"
 
 #: gnowsys_ndf/ndf/templates/ndf/footer.html:46
-#, fuzzy
 msgid "ICT Curriculum"
 msgstr "आईसीटी पाठ्यक्रम"
 
@@ -4195,12 +4194,11 @@ msgid "My Courses"
 msgstr "मेरे पाठ्यक्रम"
 
 #: gnowsys_ndf/ndf/templates/ndf/lms_dashboard.html:47
-#, fuzzy
 msgid "My Progress"
 msgstr "प्रगति में"
 
-#: gnowsys_ndf/ndf/templates/ndf/lms_dashboard.html:73
-#, fuzzy
+#: gnowsys_ndf/ndf/templates/ndf/lms_dashboard.html:72
+#: gnowsys_ndf/ndf/templates/ndf/lms_dashboard.html:46
 msgid "My Workspace"
 msgstr "मेरे वर्कस्पेस"
 
