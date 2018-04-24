@@ -12,7 +12,7 @@ from django.contrib.auth.models import User
 ########################################
 
 
-class test(object):
+class mastodon_login(object):
     def moauth(self,request):
        
         if request.method == 'POST':
@@ -54,15 +54,12 @@ class test(object):
             name = Username
             email = Username
             password = Password
-           
-
                        
             if access_token:
                
                 ###check whether given email is present in user table or not####
                 user_email = User.objects.filter(email=name).exists()
-                
-                
+                   
                 if user_email:
              
                     ##Fetch auth object using email
@@ -70,12 +67,10 @@ class test(object):
 
                     if(nodes!=None):
                         nodes.access_token = access_token
-                       
-                        
+                             
                         ####SECOND AND BY-DEFAULT CUSTOMIZE LAYER FOR AUTHENTICATION
                         user = authenticate(username=name, password=None)
 
-                        
                         if user is not None:
                         
                             if user.is_active:
@@ -117,8 +112,7 @@ class test(object):
                     nodes = node_collection.one({'email':{'$regex':email,'$options': 'i' },'_type':unicode("Author")})
 
                     if(nodes!=None):
-
-                        
+   
                         user = authenticate(username=name, password=None)
                         if user is not None:
                             if user.is_active:
@@ -127,8 +121,6 @@ class test(object):
                                 return HttpResponseRedirect( reverse('landing_page') )
                             else:
                                 HttpResponse("Error2")
-
-
 
                     else:
                                            
@@ -157,10 +149,8 @@ class test(object):
             return HttpResponse("Invalid Credentials.")
 
 
-
-
 # Below class used for overriding defualt authenticate method of django
-class MyCustomBackend:
+class CustomBackendAuthenticationForDjango:
    
     # Create an authentication method
     # This is called by the standard Django login procedure
