@@ -329,7 +329,7 @@
                 }
                  var buddyColorName = colorsKeyIdMap[currentSelectedColor.id].color;
                  var buddyAnimalName = animalsKeyIdMap[currentSelectedAnimal.id].name;
-                alert(buddyColorName+"-"+buddyAnimalName+"-"+"{{site.INSTITUTE_ID}}");
+                $('#add_buddy_modal').foundation('reveal', 'close');
                 $( "#id_username" ).val(buddyColorName+"-"+buddyAnimalName+"-"+"{{site.INSTITUTE_ID}}")
             });
 
