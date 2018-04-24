@@ -7,7 +7,7 @@
 
 {% block body_content %}
   <!-- RHS Buddy Panel -->
-  <div class="buddy_panel" id="sample_buddy_panel">
+  <div class="username_panel" id="sample_buddy_panel">
         <div class="add_buddy_icon">
             <a href="#" data-reveal-id="add_buddy_modal" title="Add Buddy">
 
@@ -39,16 +39,10 @@
     <!--Modal for Adding Buddy.-->
     <div class="reveal-modal add_buddy_modal" id="add_buddy_modal" data-reveal aria-labelledby="modalTitle" aria-hidden="true" role="dialog">
         <div class="modal_header">
-            <div class="modal_title">{% trans "Add a buddy" %} </div>
-            <div class="modal_meta"> {% trans "Multiple users can be logged into the platform. Just specify your color and animal and click add to join the session." %}</div>
+            <div class="modal_title">{% trans "Select username" %} </div>
                 <button type="button" class="text_button close_add_buddy_modal" style="margin-left:818px;">{% trans "Cancel" %}</button>
                 <button type="button" class="blue_round_button add_buddy_submit">{% trans "Add" %}</button>
-            <div class="sample_buddy buddy_icon">
-                <svg xmlns:svg="http://www.w3.org/2000/svg" xmlns="http://www.w3.org/2000/svg" width="100px" height="100px" viewBox="0 0 100 100" version="1.1">
-                    <g transform="translate(-381.42857,-570.93361)">
-                    </g>
-                </svg>
-            </div>
+            
 
         </div>
         <div class="modal_body">
@@ -71,11 +65,6 @@
             </div>
         </div>
         <div class="modal_footer">
-            <div class="left">
-                <a href="#" type="button" class="removeBuddy">
-                    <i class="fa fa-trash-o"></i>
-                </a>
-            </div>
             <div class="right">
                 <button type="button" class="text_button close_add_buddy_modal">{% trans "Cancel" %}</button>
                 <button type="button" class="blue_round_button add_buddy_submit">{% trans "Add" %}</button>
@@ -331,6 +320,7 @@
                  var buddyAnimalName = animalsKeyIdMap[currentSelectedAnimal.id].name;
                 $('#add_buddy_modal').foundation('reveal', 'close');
                 $( "#id_username" ).val(buddyColorName+"-"+buddyAnimalName+"-"+"{{site.INSTITUTE_ID}}")
+
             });
 
             /**

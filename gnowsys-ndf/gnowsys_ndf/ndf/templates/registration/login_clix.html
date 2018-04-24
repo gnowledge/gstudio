@@ -23,7 +23,7 @@
 {% block body_content %}
 	{% url 'auth_password_reset' as auth_pwd_reset_url %}
 	{% url 'registration_register' as register_url %}
-	{% include "ndf/user-login.html" %}
+	
 	<div class="login-page row">
 		<div class="login-page-opacity"></div>
         <div class="login-page-form">
@@ -32,6 +32,9 @@
                 	<img src="/static/ndf/images/landing_pg_slides/clix-logo-i2c-site.svg">
                 	<span>{% trans "LogIn" %}</span>
                 </div>
+                {% if site.USERNAME_SELECTION_WIDGET %}
+        			{% include "ndf/user-login.html" %}
+            	{% endif %}
             </div>
 			<br/>
 			{% if form.errors %}
