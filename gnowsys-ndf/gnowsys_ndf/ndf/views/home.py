@@ -110,7 +110,7 @@ def landing_page(request):
     files_count = node_collection.find({
                                     'member_of': {'$in': [GST_FILE._id,GST_JSMOL._id]},
                                     'group_set': {'$all': [group_id]},
-                                    'attribute_set.educationaluse': {'$in':['Images','Audios','Videos','Interactives','Documents']}
+                                    'attribute_set.educationaluse': {'$in':['Images','Audios','Videos','Interactives','Documents','eBooks']}
                                     }).sort("last_update", -1).count()
 
     discussion = node_collection.find_one({'_type':'GSystemType',"name":"Reply"})
