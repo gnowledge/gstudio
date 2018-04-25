@@ -3205,6 +3205,8 @@ msgstr "मेरे पाठ्यक्रम"
 #: gnowsys_ndf/ndf/templates/ndf/gheader.html:178
 #: gnowsys_ndf/ndf/templates/ndf/header.html:260
 #: gnowsys_ndf/ndf/templates/ndf/lms_dashboard.html:96
+#: gnowsys_ndf/ndf/templates/ndf/lms_dashboard.html:116
+#: gnowsys_ndf/ndf/templates/ndf/lms_dashboard.html:136
 msgid "EXPLORE"
 msgstr "खोजें"
 
@@ -7159,8 +7161,10 @@ msgstr "%(email_url)s आपके पास एक सत्यापित ई
 #~ msgstr ""
 #~ "इस समूह में कोई पाठ्यक्रम नहीं है। <b>आप पाठ्यक्रम बनाने वाले प्रथम व्यक्ति हो सकते हैं</b>"
 
-#~ msgid "You are not enrolled to any course yet."
-#~ msgstr "आप अभी तक किसी भी पाठ्यक्रम में नामांकित नहीं हैं"
+#: gnowsys_ndf/ndf/templates/ndf/lms_dashboard.html:116
+#: gnowsys_ndf/ndf/templates/ndf/lms_dashboard.html:115
+	msgid "You are not enrolled to any course !"
+	msgstr "आप अभी तक किसी भी पाठ्यक्रम में नामांकित नहीं हैं"
 
 #~ msgid ""
 #~ "This group doesn't have any Announced courses. <b>Be the first to "
