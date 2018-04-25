@@ -106,9 +106,10 @@ def landing_page(request):
 
     GST_FILE = node_collection.one({'_type':'GSystemType', 'name': "File"})
     GST_JSMOL = node_collection.one({"_type":"GSystemType","name":"Jsmol"})
+    GST_IPAGE = node_collection.one({"_type":"GSystemType","name":"interactive_page"})
 
     files_count = node_collection.find({
-                                    'member_of': {'$in': [GST_FILE._id,GST_JSMOL._id]},
+                                    'member_of': {'$in': [GST_FILE._id,GST_JSMOL._id,GST_IPAGE._id]},
                                     'group_set': {'$all': [group_id]},
                                     'attribute_set.educationaluse': {'$in':['Images','Audios','Videos','Interactives','Documents','eBooks']}
                                     }).sort("last_update", -1).count()
