@@ -3019,10 +3019,11 @@ def course_analytics(request, group_id, user_id, render_template=False, get_resu
 
         items_count_cur = group_obj.get_attribute("total_assessment_items")
         if items_count_cur.count():
+            items_count_cur_0_object_value = 0 if (items_count_cur[0].object_value == 'None') else items_count_cur[0].object_value
             if assessment_and_quiz_data:
-                analytics_data['total_assessment_items'] = items_count_cur[0].object_value
+                analytics_data['total_assessment_items'] = items_count_cur_0_object_value
             else:
-                analytics_data['total_quizitems'] = items_count_cur[0].object_value
+                analytics_data['total_quizitems'] = items_count_cur_0_object_value
 
         # total_quiz_points = 0  # not used anywhere
         # assessment_list_cur = group_obj.get_attribute("assessment_list")
